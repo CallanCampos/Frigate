@@ -1123,6 +1123,10 @@ src/system/c_gear_savedata.c:
     complete
     .text       start:0x02009854 end:0x02009930
 
+src/system/dream_world_savedata.c:
+    complete
+    .text       start:0x02009930 end:0x02009b5c
+
 src/system/version.c:
     complete
     .text       start:0x02015878 end:0x0201587c
