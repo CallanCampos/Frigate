@@ -30,10 +30,10 @@ a rule here changes, change it there too.
 - **Natural C only.** No inline asm, permuter noise, unexplained `volatile`, pointer-arithmetic tricks or meaningless
   temporaries. A function that doesn't match keeps the closest natural C and gets a row in
   `docs/nonmatching-functions.md` (both addresses, the difference, and what was tried). The exceptions, in `lib/` only:
-  a function that the SDK itself wrote in assembly (an `asm` function in its C file, such as NitroSDK's `MTX_Identity43`
-  or the CP15 cache functions) is an MWCC `asm` function, said to be one in a comment, and assembly the library inlined
-  at several sites (DS Protect's cache flush) is a `static inline` with an `asm {}` block, said to be one in a
-  comment. The user chose both.
+  a function that the SDK, or a library it bundles, wrote in assembly (an `asm` function in its C file, such as
+  NitroSDK's `MTX_Identity43`, the CP15 cache functions or DWC's big-number helpers) is an MWCC `asm` function, said
+  to be one in a comment, and assembly the library inlined at several sites (DS Protect's cache flush) is a
+  `static inline` with an `asm {}` block, said to be one in a comment. The user chose both.
 - **Bugs:** `// BUG:` plus an `#ifdef BUGFIX` fix, with the original in `#else`.
 - **Keep going.** Continue in file order and commit each file as it is done. Don't end a turn with a menu when the next
   step is obvious. Ask only real decisions, such as placement with no evidence or a change of scope. Answer any message
