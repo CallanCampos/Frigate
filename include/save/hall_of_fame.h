@@ -2,7 +2,9 @@
 #define POKEBW2_SAVE_HALL_OF_FAME_H
 
 #include "types.h"
+#include "gfl/heap.h"
 #include "gfl/str.h"
+#include "nitro/rtc.h"
 #include "struct_decls.h"
 
 // The Hall of Fame, extra save block 8: the last 15 teams that entered it, which s00EA_HOFCheckIntegrity checks and
@@ -23,6 +25,8 @@ typedef struct {
     u16 moves[4];
 } HallOfFamePokemon;
 
+// Adds a team to the Hall of Fame, dated date, with its strings in the heap
+void func_0200f57c(HallOfFameSave *save, PokeParty *party, const RTCDate *date, HeapID heapId);
 // The number of teams, at most 15
 u32 func_0200f660(HallOfFameSave *save);
 // The number of Pokémon in a team, counting back from the newest

@@ -3,3 +3,14 @@
     .ctor       start:0x0219d5a0 end:0x0219d5a0 kind:rodata align:4
     .data       start:0x0219d5c0 end:0x0219d5e0 kind:data align:32
     .bss        start:0x0219d5e0 end:0x0219d5e0 kind:bss align:32
+
+src/ov267/the_end.c:
+    complete
+    .text       start:0x0219ce80 end:0x0219d110
+    .rodata     start:0x0219d46c end:0x0219d4a8
+
+src/ov267/the_end_graphic.c:
+    complete
+    .text       start:0x0219d110 end:0x0219d46c
+    .rodata     start:0x0219d4a8 end:0x0219d5a0
+    .data       start:0x0219d5c0 end:0x0219d5e0

@@ -2,3 +2,8 @@
     .rodata     start:0x021ef0f8 end:0x021ef254 kind:rodata align:4
     .ctor       start:0x021ef254 end:0x021ef254 kind:rodata align:4
     .bss        start:0x021ef260 end:0x021ef260 kind:bss align:32
+
+src/ov098/gym_icirrus.c:
+    complete
+    .text       start:0x021eec80 end:0x021ef0f8
+    .rodata     start:0x021ef0f8 end:0x021ef254

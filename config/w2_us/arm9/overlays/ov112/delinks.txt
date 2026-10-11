@@ -2,3 +2,8 @@
     .rodata     start:0x021eef98 end:0x021ef0c8 kind:rodata align:4
     .ctor       start:0x021ef0c8 end:0x021ef0c8 kind:rodata align:4
     .bss        start:0x021ef0e0 end:0x021ef0e0 kind:bss align:32
+
+src/ov112/gimmick_aspertia_city.c:
+    complete
+    .text       start:0x021eecc0 end:0x021eef98
+    .rodata     start:0x021eef98 end:0x021ef0c8

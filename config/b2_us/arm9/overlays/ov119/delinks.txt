@@ -2,3 +2,8 @@
     .rodata     start:0x021ef058 end:0x021ef1a0 kind:rodata align:4
     .ctor       start:0x021ef1a0 end:0x021ef1a0 kind:rodata align:4
     .bss        start:0x021ef1c0 end:0x021ef1c0 kind:bss align:32
+
+src/ov119/gimmick_plasma_frigate_lights.c:
+    complete
+    .text       start:0x021eec80 end:0x021ef058
+    .rodata     start:0x021ef058 end:0x021ef1a0

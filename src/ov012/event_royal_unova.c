@@ -30,7 +30,7 @@ static u32 func_ov012_021609b4(PleasureBoat *boat, u32 room) {
     if (boat == NULL) {
         return 10;
     }
-    return boat->rooms[room].unk4;
+    return boat->rooms[room].objCode;
 }
 
 static GameEvent *EventRoyalUnova_Create(GameSystem *gsys, PleasureBoat *boat, u16 *result) {

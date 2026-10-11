@@ -33,6 +33,8 @@ typedef struct {
 u16 func_020198f0(u32 index);
 
 // Overlay 36
+// The index of the camera's defaults
+u32 func_ov036_02199774(WeatherTask *task);
 void *func_ov036_021997e4(WeatherTask *task);
 void func_ov036_0219978c(WeatherTask *task, u32 a1, u32 index);
 void func_ov036_021997bc(WeatherTask *task, int value, u32 index);

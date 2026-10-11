@@ -38,11 +38,10 @@ struct GameClearWork {
     s32 counter;
 };
 
-// The procs it runs, in overlays 265, 266, 267 and 295
+// The procs it runs, in overlays 265, 266, 267 (demo/the_end.h) and 295
 extern const GameProcFunctions data_ov265_0219b7d0;
 extern const GameProcFunctions data_ov266_0219e518;
-extern const GameProcFunctions data_ov267_0219d470;
-extern const GameProcFunctions data_ov295_0219d708;
+extern const GameProcFunctions GAME_CLEAR_SAVE_PROC_FUNCTIONS;
 
 GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *data);
 GameEvent *EventGameClear_Create(GameSystem *gsys, u32 param);

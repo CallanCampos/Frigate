@@ -22,6 +22,10 @@ void *func_02007454(SaveControl *save, u32 *size);
 u32 func_0200ce50(void);
 u32 func_0200f164(void);
 void func_0200f194(void *block, u32 valid);
+// A Pokédex skin block's characters and palette, and whether it is valid
+void *func_0200f180(void *block);
+void *func_0200f184(void *block);
+BOOL func_0200f18c(void *block);
 // Reads the downloaded musical's save block (6) into a new work, its archive and the archive's size, and frees it
 void *func_0200cca0(GameData *gameData, HeapID heapId);
 void func_0200cd10(void *work);

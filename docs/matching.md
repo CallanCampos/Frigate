@@ -940,6 +940,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   comparisons: `ringtone_sys.c`'s `RingtoneSys_UpdateState` matches only with all four states written, two of them
   empty.
 - A switch case that ends in the same code as another case is merged into it, so its end moves.
+- A state machine whose cases `break` to one `return FALSE;` after the switch lets MWCC merge the cases' identical
+  failure tails; a `return FALSE;` in every case keeps a copy in each. `net_common_download.c`'s
+  `NetCommonDownload_DownloadFileList` and `_DownloadFile` came out at 0x384 and 0x294 bytes with the returns, and at
+  the original's 0x2e0 and 0x22c with `break`.
 - A switch whose cases each set every argument of one call after it, as `research_top.c`'s button highlights set the
   BG, position, size and palette for `GFL_BGSysSetScrPaletteNo`, has each argument in a variable: the cases keep only
   the values that differ, and the values they share are set once at the merged end, in registers. Writing only the

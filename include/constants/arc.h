@@ -115,6 +115,12 @@
 #define ARCID_ISS_3D_SOUND 182
 // The walking Pokémon's object codes (tpoke_data.c)
 #define ARCID_TPOKE 208
+// The Marine Tube board's graphics on the main screen (marine_tube_board.c). Our name, not swan's
+#define ARCID_MARINE_TUBE_BOARD 297
+// The subway map's graphics on the main screen (subway_map.c). Our name, not swan's
+#define ARCID_SUBWAY_MAP 203
+// The graphics of the "THE END" picture after the credits (the_end.c). Our name, not swan's
+#define ARCID_THE_END 215
 // The Research Radar's graphics. Our name, not swan's
 #define ARCID_RESEARCH_RADAR 189
 // The graphics that many apps share, such as the touch bar, which getUINarcIdx returns. Our name, not swan's

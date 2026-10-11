@@ -1,33 +1,33 @@
-func_ov130_021eec80 kind:function(thumb,size=0x5a) addr:0x021eecc0
-func_ov130_021eecdc kind:function(thumb,size=0x2c) addr:0x021eed1c
-func_ov130_021eed08 kind:function(thumb,size=0x8e) addr:0x021eed48
-func_ov130_021eed98 kind:function(thumb,size=0x1c) addr:0x021eedd8
-func_ov130_021eedb4 kind:function(thumb,size=0x1c) addr:0x021eedf4
-func_ov130_021eedd0 kind:function(thumb,size=0x104) addr:0x021eee10
-func_ov130_021eeed4 kind:function(thumb,size=0xc) addr:0x021eef14
-func_ov130_021eeee0 kind:function(thumb,size=0xc) addr:0x021eef20
-func_ov130_021eeeec kind:function(thumb,size=0x4c) addr:0x021eef2c
-func_ov130_021eef38 kind:function(thumb,size=0x34) addr:0x021eef78
-func_ov130_021eef6c kind:function(thumb,size=0x20) addr:0x021eefac
-func_ov130_021eef8c kind:function(thumb,size=0x10) addr:0x021eefcc
-func_ov130_021eef9c kind:function(thumb,size=0xb4) addr:0x021eefdc
-func_ov130_021ef050 kind:function(thumb,size=0x18) addr:0x021ef090
-func_ov130_021ef068 kind:function(thumb,size=0x2c) addr:0x021ef0a8
-func_ov130_021ef094 kind:function(thumb,size=0x2c) addr:0x021ef0d4
-func_ov130_021ef0c0 kind:function(thumb,size=0x36) addr:0x021ef100
-func_ov130_021ef0f8 kind:function(thumb,size=0x1e) addr:0x021ef138
-func_ov130_021ef118 kind:function(thumb,size=0x38) addr:0x021ef158
-func_ov130_021ef150 kind:function(thumb,size=0x30) addr:0x021ef190
-data_ov130_021ef180 kind:data(any) addr:0x021ef1c0
-data_ov130_021ef184 kind:data(any) addr:0x021ef1c4
-data_ov130_021ef188 kind:data(any) addr:0x021ef1c8
-data_ov130_021ef190 kind:data(any) addr:0x021ef1d0
-data_ov130_021ef19c kind:data(any) addr:0x021ef1dc
-data_ov130_021ef1ac kind:data(any) addr:0x021ef1ec
-data_ov130_021ef1bc kind:data(any) addr:0x021ef1fc
+GimmickFunfestLevels_Setup kind:function(thumb,size=0x5a) addr:0x021eecc0
+GimmickFunfestLevels_End kind:function(thumb,size=0x2c) addr:0x021eed1c
+GimmickFunfestLevels_Update kind:function(thumb,size=0x8e) addr:0x021eed48
+GimmickFunfestLevels_PlayStartEffect kind:function(thumb,size=0x1c) addr:0x021eedd8
+GimmickFunfestLevels_PlayLeaveEffect kind:function(thumb,size=0x1c) addr:0x021eedf4
+GimmickFunfestLevels_InitModels kind:function(thumb,size=0x104) addr:0x021eee10
+GimmickFunfestLevels_Free kind:function(thumb,size=0xc) addr:0x021eef14
+GimmickFunfestLevels_StepAnimations kind:function(thumb,size=0xc) addr:0x021eef20
+GimmickFunfestLevels_PlayAnimation kind:function(thumb,size=0x4c) addr:0x021eef2c
+GimmickFunfestLevels_InitState kind:function(thumb,size=0x34) addr:0x021eef78
+GimmickFunfestLevels_HideLevels kind:function(thumb,size=0x20) addr:0x021eefac
+GetLevelSteps kind:function(thumb,size=0x10) addr:0x021eefcc
+GimmickFunfestLevels_ShowLevels kind:function(thumb,size=0xb4) addr:0x021eefdc
+GetCommWork kind:function(thumb,size=0x18) addr:0x021ef090
+GimmickFunfestLevels_ShowEffect0 kind:function(thumb,size=0x2c) addr:0x021ef0a8
+GimmickFunfestLevels_PlayEffect1 kind:function(thumb,size=0x2c) addr:0x021ef0d4
+GimmickFunfestLevels_ShowStartEffect kind:function(thumb,size=0x36) addr:0x021ef100
+GimmickFunfestLevels_ShowLeaveEffect kind:function(thumb,size=0x1e) addr:0x021ef138
+IsAtEffectStart kind:function(thumb,size=0x38) addr:0x021ef158
+IsAtEffectEnd kind:function(thumb,size=0x30) addr:0x021ef190
+sLeaveEffectAnimations kind:data(any) addr:0x021ef1c0
+sEffect1Animations kind:data(any) addr:0x021ef1c4
+sEffect0Animations kind:data(any) addr:0x021ef1c8
+sStartEffectAnimations kind:data(any) addr:0x021ef1d0
+sAnimationCounts kind:data(any) addr:0x021ef1dc
+sFunfestLevelsSceneSetup kind:data(any) addr:0x021ef1ec
+sFunfestLevelsResources kind:data(any) addr:0x021ef1fc
 data_ov130_021ef211 kind:data(any) addr:0x021ef251 ambiguous
 data_ov130_021ef231 kind:data(any) addr:0x021ef271 ambiguous
-data_ov130_021ef24c kind:data(any) addr:0x021ef28c
+sFunfestLevelsActors kind:data(any) addr:0x021ef28c
 data_ov130_021ef289 kind:data(any) addr:0x021ef2c9 ambiguous
 data_ov130_021ef29d kind:data(any) addr:0x021ef2dd ambiguous
 data_ov130_021ef2e1 kind:data(any) addr:0x021ef321 ambiguous

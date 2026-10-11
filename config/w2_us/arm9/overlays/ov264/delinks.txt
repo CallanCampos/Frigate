@@ -3,3 +3,14 @@
     .ctor       start:0x0219a2e4 end:0x0219a2e4 kind:rodata align:4
     .data       start:0x0219a300 end:0x0219a320 kind:data align:32
     .bss        start:0x0219a320 end:0x0219a320 kind:bss align:32
+
+src/ov264/cdemo_main.c:
+    complete
+    .text       start:0x02199900 end:0x02199b80
+    .rodata     start:0x0219a0d8 end:0x0219a204
+    .data       start:0x0219a300 end:0x0219a320
+
+src/ov264/cdemo_script.c:
+    complete
+    .text       start:0x02199b80 end:0x0219a0d8
+    .rodata     start:0x0219a204 end:0x0219a2e4

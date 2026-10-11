@@ -5,6 +5,7 @@
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/gimmick_funfest_levels.h"
 #include "field/player_state.h"
 #include "gfl/std.h"
 #include "struct_decls.h"
@@ -47,7 +48,7 @@ GameEventReturnCode func_ov033_02176d9c(GameEvent *event, u32 *state, void *data
         ++*state;
         break;
     case 1:
-        func_ov130_021eed98(gsys);
+        GimmickFunfestLevels_PlayStartEffect(gsys);
         if (GameCommSys_BootCheck(commSys) != 2) {
             gameData = GSYS_GetGameData(gsys);
             positionPtr = (s32 *)&position;
@@ -68,7 +69,7 @@ GameEventReturnCode func_ov033_02176d9c(GameEvent *event, u32 *state, void *data
         break;
     case 3:
         if ((*counter)++ >= 70) {
-            func_ov130_021eedb4(gsys);
+            GimmickFunfestLevels_PlayLeaveEffect(gsys);
             *counter = 0;
             ++*state;
         }

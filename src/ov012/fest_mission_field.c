@@ -3,6 +3,7 @@
 #include "types.h"
 #include "field/field.h"
 #include "field/fest_mission_people.h"
+#include "field/fest_mission_sparkle_place.h"
 #include "field/festival.h"
 #include "field/rival_select.h"
 #include "nitro/math.h"
@@ -66,7 +67,7 @@ void func_ov012_021683f4(GameSystem *gsys, u16 zoneId) {
     config = GetFestMissionCfg(festival);
     switch (config->type) {
     case 4:
-        func_ov024_0216f900(entry, gsys, festival, config, zoneId);
+        FestSparklePlace_OnZoneEnter(entry, gsys, festival, config, zoneId);
         break;
     case 5:
         FesMissionPeople_OnZoneEnter(entry, gsys, festival, config, zoneId);

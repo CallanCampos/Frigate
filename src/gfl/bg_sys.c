@@ -318,7 +318,7 @@ void GFL_BGSysSet3DBGPriority(u16 priority) {
     G2_SetBG0Priority(priority);
 }
 
-void GFL_BGSysSetBGPriority(u32 bg, u32 priority) {
+void GFL_BGSysSetBGPriority(u8 bg, u8 priority) {
     switch (bg) {
     case 0:
         G2_SetBG0Priority(priority);

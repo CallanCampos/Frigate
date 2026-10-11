@@ -309,13 +309,14 @@ BOOL s0151_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
     case 2:
         subwayMap = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(SubwayMapParam), TRUE, "scrcmd_proc.c", 563);
         subwayMap->playerInfo = playerInfo;
-        CreateScrCmdOverlayProcess(vm, env, OVERLAY_SUBWAY_MAP, &data_ov317_0219d4c8, subwayMap, NULL, NULL);
+        CreateScrCmdOverlayProcess(vm, env, OVERLAY_SUBWAY_MAP, &SUBWAY_MAP_PROC_FUNCTIONS, subwayMap, NULL, NULL);
         break;
     case 3:
         board = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MarineTubeBoardParam), TRUE, "scrcmd_proc.c", 570);
         board->gsys = gsys;
-        board->unk04 = value;
-        CreateScrCmdOverlayProcess(vm, env, OVERLAY_MARINE_TUBE_BOARD, &data_ov318_0219d550, board, NULL, NULL);
+        board->board = value;
+        CreateScrCmdOverlayProcess(vm, env, OVERLAY_MARINE_TUBE_BOARD, &MARINE_TUBE_BOARD_PROC_FUNCTIONS, board, NULL,
+                                   NULL);
         break;
     }
     return TRUE;

@@ -24,7 +24,7 @@ from:0x021ad06e kind:thumb_call to:0x0203a1fc module:main
 from:0x021ad088 kind:thumb_call to:0x0203a988 module:main
 from:0x021ad090 kind:thumb_call to:0x021ad044 module:overlay(302)
 from:0x021ad09c kind:load to:0x021ae5a0 module:overlay(302)
-from:0x021ad0a0 kind:load to:0x021a023c module:overlays(143,301,309)
+from:0x021ad0a0 kind:load to:0x021a023c module:overlay(301)
 from:0x021ad0d0 kind:thumb_call to:0x0200d1f8 module:main
 from:0x021ad0de kind:thumb_call to:0x0203a24c module:main
 from:0x021ad0fc kind:thumb_call to:0x0203a1fc module:main

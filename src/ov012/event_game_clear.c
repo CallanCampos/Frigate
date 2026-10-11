@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/pokemon.h"
 #include "constants/version.h"
+#include "demo/the_end.h"
 #include "field/encounter.h"
 #include "field/event_game_clear.h"
 #include "field/event_3d_demo.h"
@@ -103,7 +104,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         EventGameClear_NextState(work, state);
         break;
     case 12:
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(295), &data_ov295_0219d708, &work->ov295Param);
+        GSYS_QueueProcAsEvent(event, OVERLAY_ID(295), &GAME_CLEAR_SAVE_PROC_FUNCTIONS, &work->ov295Param);
         EventGameClear_NextState(work, state);
         break;
     case 13:
@@ -114,7 +115,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         work->counter++;
         break;
     case 14:
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(267), &data_ov267_0219d470, &work->ov267Param);
+        GSYS_QueueProcAsEvent(event, OVERLAY_THE_END, &THE_END_PROC_FUNCTIONS, &work->ov267Param);
         func_02016b40(gsys, 0);
         EventGameClear_NextState(work, state);
         break;

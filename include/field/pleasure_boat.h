@@ -15,24 +15,34 @@ enum {
     PLEASURE_BOAT_INFO_TRAINERS_DEFEATED,
 };
 
-// A room of the ship
+#define PLEASURE_BOAT_ROOM_COUNT 15
+
+// A room of the ship and who is in it. Overlay 89 fills it
 typedef struct {
-    u32 unk0;
+    // Which of the kind's people the room has
+    u32 index;
     u32 unk4;
-    u32 unk8;
-    u32 unkC[2];
-    u32 unk14;
-    u32 unk18;
+    // The object code of the person
+    u32 objCode;
+    // 0 for a Trainer, 1 for a person and 2 for a pair of them
+    u32 kind;
+    u32 values[2];
+    // Whether the Trainer was defeated
+    u32 defeated;
 } PleasureBoatRoom;
 
 struct PleasureBoat {
     u32 unk0;
     // The clock, which counts periods of 1350
     s16 clock;
+    // How many Trainers are aboard, by the day of the week
+    u16 trainerCount;
     // The last period reached
     s32 period;
-    u32 unkC;
-    PleasureBoatRoom rooms[];
+    PleasureBoatRoom rooms[PLEASURE_BOAT_ROOM_COUNT];
+    // The answers to PLEASURE_BOAT_INFO_STARBOARD_PEOPLE to PLEASURE_BOAT_INFO_UNK_3
+    u8 infoCounts[4];
+    u32 unk1B4;
 };
 
 // Sets up a cruise, with overlay 89

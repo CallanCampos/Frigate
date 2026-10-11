@@ -142,6 +142,12 @@ void SetGameDataNowSpawnZone(GameData *gameData, ZoneSpawnInfo *spawn);
 PlayerInfo *func_02017378(GameData *gameData, u32 netId);
 // The player's net ID
 u8 func_020175cc(GameData *gameData);
+// The number of players
+u8 func_020175bc(GameData *gameData);
+// The net ID of the player whose beacon is shown
+u8 func_020175fc(GameData *gameData);
+// The player's Entralink levels, as func_02017208 returns for the player's own
+void *func_020171fc(GameData *gameData, u32 netId);
 void func_020175c4(GameData *gameData, u32 a1);
 void func_020175d8(GameData *gameData, u32 a1);
 void func_02017608(GameData *gameData, u32 a1);

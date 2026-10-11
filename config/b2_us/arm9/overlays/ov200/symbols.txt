@@ -1,20 +1,20 @@
-func_ov200_021b2f80 kind:function(thumb,size=0x40) addr:0x021b2f80
-func_ov200_021b2fc0 kind:function(thumb,size=0x1e) addr:0x021b2fc0
-func_ov200_021b2fe0 kind:function(thumb,size=0x13e) addr:0x021b2fe0
-func_ov200_021b3120 kind:function(thumb,size=0x8) addr:0x021b3120
-func_ov200_021b3128 kind:function(thumb,size=0x10c) addr:0x021b3128
-func_ov200_021b3234 kind:function(thumb,size=0x2e) addr:0x021b3234
-func_ov200_021b3264 kind:function(thumb,size=0x24) addr:0x021b3264
-func_ov200_021b3288 kind:function(thumb,size=0x140) addr:0x021b3288
-func_ov200_021b33c8 kind:function(thumb,size=0x36) addr:0x021b33c8
-func_ov200_021b3400 kind:function(thumb,size=0x1a0) addr:0x021b3400
-func_ov200_021b35a0 kind:function(thumb,size=0x48) addr:0x021b35a0
-func_ov200_021b35e8 kind:function(thumb,size=0x9c) addr:0x021b35e8
-func_ov200_021b3684 kind:function(thumb,size=0x86) addr:0x021b3684
-func_ov200_021b370c kind:function(thumb,size=0x54) addr:0x021b370c
-func_ov200_021b3760 kind:function(thumb,size=0x70) addr:0x021b3760
-func_ov200_021b37d0 kind:function(thumb,size=0x30) addr:0x021b37d0
-func_ov200_021b3800 kind:function(thumb,size=0x2c) addr:0x021b3800
+CGHelp_Setup kind:function(thumb,size=0x40) addr:0x021b2f80
+CGHelp_Cleanup kind:function(thumb,size=0x1e) addr:0x021b2fc0
+CGHelp_Update kind:function(thumb,size=0x13e) addr:0x021b2fe0
+CGHelp_VBlank kind:function(thumb,size=0x8) addr:0x021b3120
+CGHelp_InitBGs kind:function(thumb,size=0x10c) addr:0x021b3128
+CGHelp_FreeBGs kind:function(thumb,size=0x2e) addr:0x021b3234
+CGHelp_CreateBG kind:function(thumb,size=0x24) addr:0x021b3264
+CGHelp_LoadGraphics kind:function(thumb,size=0x140) addr:0x021b3288
+CGHelp_FreeGraphics kind:function(thumb,size=0x36) addr:0x021b33c8
+CGHelp_InitText kind:function(thumb,size=0x1a0) addr:0x021b3400
+CGHelp_FreeText kind:function(thumb,size=0x48) addr:0x021b35a0
+CGHelp_HandleInput kind:function(thumb,size=0x9c) addr:0x021b35e8
+CGHelp_DrawPage kind:function(thumb,size=0x86) addr:0x021b3684
+CGHelp_ShowAnimation kind:function(thumb,size=0x54) addr:0x021b370c
+CGHelp_Init kind:function(thumb,size=0x70) addr:0x021b3760
+CGHelp_Exit kind:function(thumb,size=0x30) addr:0x021b37d0
+CGHelp_Main kind:function(thumb,size=0x2c) addr:0x021b3800
 data_ov200_021b382c kind:data(any) addr:0x021b382c
 data_ov200_021b383c kind:data(any) addr:0x021b383c
 data_ov200_021b384c kind:data(any) addr:0x021b384c
@@ -25,5 +25,5 @@ data_ov200_021b38cc kind:data(any) addr:0x021b38cc
 data_ov200_021b38cd kind:data(any) addr:0x021b38cd ambiguous
 data_ov200_021b38fc kind:data(any) addr:0x021b38fc
 data_ov200_021b3938 kind:data(any) addr:0x021b3938
-data_ov200_021b3960 kind:data(any) addr:0x021b3960 ambiguous
+CG_HELP_PROC_FUNCTIONS kind:data(any) addr:0x021b3960 ambiguous
 data_ov200_021b396c kind:data(any) addr:0x021b396c

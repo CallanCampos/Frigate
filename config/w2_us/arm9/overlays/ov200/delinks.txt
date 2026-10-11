@@ -3,3 +3,9 @@
     .ctor       start:0x021b3988 end:0x021b3988 kind:rodata align:4
     .data       start:0x021b39a0 end:0x021b39c0 kind:data align:32
     .bss        start:0x021b39c0 end:0x021b39c0 kind:bss align:32
+
+src/ov200/cg_help.c:
+    complete
+    .text       start:0x021b2fc0 end:0x021b386c
+    .rodata     start:0x021b386c end:0x021b3988
+    .data       start:0x021b39a0 end:0x021b39c0

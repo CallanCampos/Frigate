@@ -1,28 +1,28 @@
-func_ov078_021e90c0 kind:function(thumb,size=0x30) addr:0x021e90c0
-func_ov078_021e90f0 kind:function(thumb,size=0x50) addr:0x021e90f0
-func_ov078_021e9140 kind:function(thumb,size=0x2c) addr:0x021e9140
-func_ov078_021e916c kind:function(thumb,size=0x4) addr:0x021e916c
-func_ov078_021e9170 kind:function(thumb,size=0xe) addr:0x021e9170
-func_ov078_021e9180 kind:function(thumb,size=0x4c) addr:0x021e9180
-func_ov078_021e91cc kind:function(thumb,size=0x16) addr:0x021e91cc
-func_ov078_021e91e4 kind:function(thumb,size=0x2) addr:0x021e91e4
-func_ov078_021e91e8 kind:function(thumb,size=0x48) addr:0x021e91e8
-func_ov078_021e9230 kind:function(thumb,size=0x48) addr:0x021e9230
-func_ov078_021e9278 kind:function(thumb,size=0x48) addr:0x021e9278
-func_ov078_021e92c0 kind:function(thumb,size=0x48) addr:0x021e92c0
-func_ov078_021e9308 kind:function(thumb,size=0x50) addr:0x021e9308
-func_ov078_021e9358 kind:function(thumb,size=0x2c) addr:0x021e9358
-func_ov078_021e9384 kind:function(thumb,size=0x4) addr:0x021e9384
-func_ov078_021e9388 kind:function(thumb,size=0xe) addr:0x021e9388
-func_ov078_021e9398 kind:function(thumb,size=0x4c) addr:0x021e9398
-func_ov078_021e93e4 kind:function(thumb,size=0x16) addr:0x021e93e4
-func_ov078_021e93fc kind:function(thumb,size=0x2) addr:0x021e93fc
+Tint9_Init kind:function(thumb,size=0x30) addr:0x021e90c0
+Tint9_FadeIn kind:function(thumb,size=0x50) addr:0x021e90f0
+Tint9_InitNoFade kind:function(thumb,size=0x2c) addr:0x021e9140
+Tint9_Main kind:function(thumb,size=0x4) addr:0x021e916c
+Tint9_InitFadeOut kind:function(thumb,size=0xe) addr:0x021e9170
+Tint9_FadeOut kind:function(thumb,size=0x4c) addr:0x021e9180
+Tint9_Exit kind:function(thumb,size=0x16) addr:0x021e91cc
+Tint9_ObjFunc kind:function(thumb,size=0x2) addr:0x021e91e4
+Tint10_Init kind:function(thumb,size=0x48) addr:0x021e91e8
+Tint11_Init kind:function(thumb,size=0x48) addr:0x021e9230
+Tint13_Init kind:function(thumb,size=0x48) addr:0x021e9278
+Tint14_Init kind:function(thumb,size=0x48) addr:0x021e92c0
+Tint_FadeIn kind:function(thumb,size=0x50) addr:0x021e9308
+Tint_InitNoFade kind:function(thumb,size=0x2c) addr:0x021e9358
+Tint_Main kind:function(thumb,size=0x4) addr:0x021e9384
+Tint_InitFadeOut kind:function(thumb,size=0xe) addr:0x021e9388
+Tint_FadeOut kind:function(thumb,size=0x4c) addr:0x021e9398
+Tint_Exit kind:function(thumb,size=0x16) addr:0x021e93e4
+Tint_ObjFunc kind:function(thumb,size=0x2) addr:0x021e93fc
 data_ov078_021e9400 kind:data(any) addr:0x021e9400
 data_ov078_021e9424 kind:data(any) addr:0x021e9424
-data_ov078_021e94c0 kind:data(any) addr:0x021e94c0
-data_ov078_021e950c kind:data(any) addr:0x021e950c
+TINT_WEATHER_14 kind:data(any) addr:0x021e94c0
+TINT_WEATHER_10 kind:data(any) addr:0x021e950c
 data_ov078_021e9520 kind:data(any) addr:0x021e9520 ambiguous
-data_ov078_021e9558 kind:data(any) addr:0x021e9558 ambiguous
+TINT_WEATHER_9 kind:data(any) addr:0x021e9558 ambiguous
 data_ov078_021e956c kind:data(any) addr:0x021e956c ambiguous
-data_ov078_021e95a4 kind:data(any) addr:0x021e95a4 ambiguous
-data_ov078_021e95f0 kind:data(any) addr:0x021e95f0
+TINT_WEATHER_11 kind:data(any) addr:0x021e95a4 ambiguous
+TINT_WEATHER_13 kind:data(any) addr:0x021e95f0

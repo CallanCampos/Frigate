@@ -21,5 +21,7 @@ void FieldmapCtrlHybrid_Create(Field *field, VecFx32 *pos, u16 dir);
 void FieldmapCtrlHybrid_Free(Field *field);
 void FieldmapCtrlHybrid_Update(Field *field, VecFx32 *pos);
 VecFx32 *FieldmapCtrlHybrid_GetPos(Field *field);
+// Moves the player to the other kind of movement where it stands, if it can
+void func_ov036_0219e434(FieldmapCtrlHybrid *controller, Field *field);
 
 #endif // POKEBW2_FIELD_FIELDMAP_CTRL_HYBRID_H

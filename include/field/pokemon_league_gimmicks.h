@@ -5,6 +5,7 @@
 #include "struct_decls.h"
 #include "field/gimmick_league_caitlin.h"
 #include "field/gimmick_league_champion.h"
+#include "field/gimmick_league_grimsley.h"
 #include "field/gimmick_league_marshal.h"
 #include "field/gimmick_league_shauntal.h"
 
@@ -13,9 +14,7 @@
 
 // Shauntal's room, zone 140 (overlay 122), is in field/gimmick_league_shauntal.h
 
-// Grimsley's room, zone 141 (overlay 123)
-void func_ov123_021eed08(GameSystem *gsys, u16 a1);
-void func_ov123_021eed3c(GameSystem *gsys, u16 a1);
+// Grimsley's room, zone 141 (overlay 123), is in field/gimmick_league_grimsley.h
 
 // Marshal's room, zone 142 (overlay 124), is in field/gimmick_league_marshal.h
 

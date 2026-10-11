@@ -52,6 +52,8 @@ enum {
     // Not from swan: the phrase select's heap
     HEAPID_PMS_SELECT = 0x51,
     HEAPID_BATTLE_RETURN = 0x52,
+    // Not from swan: the heap of the Hall of Fame's save screen and of the lost battle's message, overlay 295
+    HEAPID_GAME_CLEAR_SAVE = 0x54,
     // Not from swan: the Battle Recorder's heaps, br_main.c's and the one its screens share
     HEAPID_BATTLE_RECORDER_SYS = 0x59,
     HEAPID_BATTLE_RECORDER = 0x5a,
@@ -71,10 +73,18 @@ enum {
     HEAPID_BATTLE_LOAD = 0x76,
     HEAPID_WIFILOGIN = 0x78,
     HEAPID_WIFILOGOUT = 0x79,
+    // Not from swan: the Pokédex opening's
+    HEAPID_ZUKAN_OPEN = 0x7e,
     HEAPID_CDEMO = 0x7f,
     HEAPID_SAVEDATA_DELETE = 0x81,
     HEAPID_PDC = 0x85,
+    // Not from swan: the heap of the "THE END" picture (overlay 267) and of the subway map (overlay 317), which never run
+    // together
+    HEAPID_THE_END = 0x88,
+    HEAPID_SUBWAY_MAP = 0x88,
     HEAPID_FIELD_CLACT = 0x89,
+    // Not from swan: the C-Gear's help screens' heap, overlay 200
+    HEAPID_CG_HELP = 0x8a,
     HEAPID_EGG_DEMO = 0x8f,
     // Not from swan: the trade's, in overlay 194's own memory
     HEAPID_POKEMON_TRADE = 0x91,
@@ -89,6 +99,8 @@ enum {
     HEAPID_KEY_SYSTEM = 0x9b,
     // Not from swan: the heap of the Pokémon World Tournament's win record and downloaded tournaments, overlay 326
     HEAPID_WBT_RECORD = 0x9e,
+    // Not from swan: the Marine Tube board's
+    HEAPID_MARINE_TUBE_BOARD = 0xa8,
 };
 
 // Allocates from the end of the heap instead of the start

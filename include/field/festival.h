@@ -42,9 +42,6 @@ void func_ov036_021b65e8(void *gimmick);
 void func_ov036_021b6690(void *gimmick);
 u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
 void *GetFestMissionCfg(LinkFestival *festival);
-// What missions of type 4 and 5 do when the player enters a zone, from overlays 24 and 25
-void func_ov024_0216f900(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival, FestMissionConfig *config,
-                         u16 zoneId);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
 // mission, a random number below max that the list doesn't have, and the mission's work on entering a zone
 u16 func_ov012_02168320(u16 zoneId);
@@ -74,8 +71,6 @@ BOOL func_020151c0(void *work, const GameBeacon *beacon);
 void func_0201528c(LinkFestival *festival, const GameBeacon *beacon);
 BOOL func_02015458(LinkFestival *festival, const GameBeacon *beacon);
 void func_02014774(LinkFestival *festival, u32 arg1);
-void func_ov130_021eed98(GameSystem *gsys);
-void func_ov130_021eedb4(GameSystem *gsys);
 u32 GetTrainerCardTextMSGID(u32 type);
 void *func_ov036_021b5b7c(GameSystem *gsys, HeapID heapId);
 void func_ov036_021b5bfc(void *work);

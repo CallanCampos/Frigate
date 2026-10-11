@@ -26,6 +26,14 @@ void func_ov036_021c6cf8(void *effect);
 FieldEffectTask *func_ov036_021b3f14(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 FieldEffectTask *func_ov036_021b3f64(FieldEffects *effects, FieldActor *actor, u32 kind, BOOL playSE);
 BOOL func_ov036_021b3fb4(FieldEffectTask *task);
+// Chargestone Cave's stones (field_gimmick_d06.c): the effect over a stone at pos for actor, and the one at a mark
+// at pos. Then lighting a stone's effect, starting and the state of its other animation, and stopping a mark's
+FieldEffectTask *func_ov036_021c2984(FieldEffects *effects, const VecFx32 *pos, FieldActor *actor);
+FieldEffectTask *func_ov036_021c2b78(FieldEffects *effects, const VecFx32 *pos);
+void func_ov036_021c29bc(FieldEffectTask *task);
+void func_ov036_021c29cc(FieldEffectTask *task);
+u8 func_ov036_021c29f0(FieldEffectTask *task);
+void func_ov036_021c2bac(FieldEffectTask *task);
 // Break the rock in front of an actor with Rock Smash
 void func_ov036_021a56c8(FieldActor *actor, FieldEffects *effects);
 // The ripples of a fishing line cast in dir from pos, and how fast they play

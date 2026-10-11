@@ -109,7 +109,7 @@ void GFL_BGSysCreateBG(u8 bg, const BGSetup *setup, u8 mode);
 void GFL_BGSysReleaseBG(u8 bg);
 // Enables BG 0 of the main engine, where the 3D is drawn, and sets its priority
 void GFL_BGSysSet3DBGPriority(u16 priority);
-void GFL_BGSysSetBGPriority(u32 bg, u32 priority);
+void GFL_BGSysSetBGPriority(u8 bg, u8 priority);
 void GFL_BGSysSetBGEnabled(u8 bg, u8 enabled);
 // Moves a BG now, with a BG_MOVE_* change, or at the next update
 void GFL_BGSysMoveBG(u8 bg, u8 op, int value);

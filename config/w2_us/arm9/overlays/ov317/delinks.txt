@@ -3,3 +3,14 @@
     .ctor       start:0x0219d638 end:0x0219d638 kind:rodata align:4
     .data       start:0x0219d640 end:0x0219d660 kind:data align:32
     .bss        start:0x0219d660 end:0x0219d660 kind:bss align:32
+
+src/ov317/subway_map.c:
+    complete
+    .text       start:0x0219cec0 end:0x0219d1ac
+    .rodata     start:0x0219d508 end:0x0219d540
+
+src/ov317/subway_map_graphic.c:
+    complete
+    .text       start:0x0219d1ac end:0x0219d508
+    .rodata     start:0x0219d540 end:0x0219d638
+    .data       start:0x0219d640 end:0x0219d660

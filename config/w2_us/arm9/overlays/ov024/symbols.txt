@@ -1,7 +1,7 @@
-func_ov024_0216f900 kind:function(thumb,size=0x66) addr:0x0216f940
-func_ov024_0216f968 kind:function(thumb,size=0x114) addr:0x0216f9a8
-func_ov024_0216fa7c kind:function(thumb,size=0x54) addr:0x0216fabc
-func_ov024_0216fad0 kind:function(thumb,size=0x38) addr:0x0216fb10
-func_ov024_0216fb08 kind:function(thumb,size=0x90) addr:0x0216fb48
+FestSparklePlace_OnZoneEnter kind:function(thumb,size=0x66) addr:0x0216f940
+FestSparklePlace_PickPlaces kind:function(thumb,size=0x114) addr:0x0216f9a8
+FestSparklePlace_PickSpecies kind:function(thumb,size=0x54) addr:0x0216fabc
+FestSparklePlace_IsLastZoneUsed kind:function(thumb,size=0x38) addr:0x0216fb10
+FestSparklePlace_AddZone kind:function(thumb,size=0x90) addr:0x0216fb48
 data_ov024_0216fb98 kind:data(any) addr:0x0216fbd8
 data_ov024_0216fbd0 kind:data(any) addr:0x0216fc10

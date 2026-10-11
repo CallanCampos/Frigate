@@ -1,10 +1,10 @@
-func_ov089_021eec80 kind:function(thumb,size=0x204) addr:0x021eecc0
-func_ov089_021eee84 kind:function(thumb,size=0x48) addr:0x021eeec4
-func_ov089_021eeecc kind:function(thumb,size=0x40) addr:0x021eef0c
-func_ov089_021eef0c kind:function(thumb,size=0x18) addr:0x021eef4c
-func_ov089_021eef24 kind:function(thumb,size=0x10) addr:0x021eef64
-func_ov089_021eef34 kind:function(thumb,size=0x24) addr:0x021eef74
-func_ov089_021eef58 kind:function(thumb,size=0xfc) addr:0x021eef98
+PleasureBoat_SetUpRooms kind:function(thumb,size=0x204) addr:0x021eecc0
+PickRandom kind:function(thumb,size=0x48) addr:0x021eeec4
+RoomPicker_Reset kind:function(thumb,size=0x40) addr:0x021eef0c
+RoomPicker_Find kind:function(thumb,size=0x18) addr:0x021eef4c
+RoomPicker_Get kind:function(thumb,size=0x10) addr:0x021eef64
+RoomPicker_Remove kind:function(thumb,size=0x24) addr:0x021eef74
+RoomPicker_PickOrder kind:function(thumb,size=0xfc) addr:0x021eef98
 data_ov089_021ef054 kind:data(any) addr:0x021ef094
 data_ov089_021ef05a kind:data(any) addr:0x021ef09a
 data_ov089_021ef068 kind:data(any) addr:0x021ef0a8

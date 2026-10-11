@@ -2,3 +2,8 @@
     .rodata     start:0x021ef1c0 end:0x021ef36c kind:rodata align:4
     .ctor       start:0x021ef36c end:0x021ef36c kind:rodata align:4
     .bss        start:0x021ef380 end:0x021ef380 kind:bss align:32
+
+src/ov130/gimmick_funfest_levels.c:
+    complete
+    .text       start:0x021eecc0 end:0x021ef1c0
+    .rodata     start:0x021ef1c0 end:0x021ef36c

@@ -5,7 +5,7 @@
 #include "field/field_event.h"
 #include "field/field_script.h"
 #include "field/gimmick_plasma_frigate.h"
-#include "field/ov119.h"
+#include "field/gimmick_plasma_frigate_lights.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "gfl/overlay.h"

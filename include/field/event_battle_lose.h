@@ -17,6 +17,6 @@ GameEventReturnCode EventBattleLose_Callback(GameEvent *event, u32 *state, void 
 
 // Overlay 12
 // The screen of overlay 295 that a lost battle shows
-extern const GameProcFunctions data_ov295_0219d774;
+extern const GameProcFunctions BATTLE_LOSE_MESSAGE_PROC_FUNCTIONS;
 
 #endif // POKEBW2_FIELD_EVENT_BATTLE_LOSE_H

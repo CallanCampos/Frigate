@@ -3,3 +3,9 @@
     .ctor       start:0x021e94ac end:0x021e94ac kind:rodata align:4
     .data       start:0x021e94c0 end:0x021e9640 kind:data align:32
     .bss        start:0x021e9640 end:0x021e9640 kind:bss align:32
+
+src/ov078/weather_tint.c:
+    complete
+    .text       start:0x021e90c0 end:0x021e9400
+    .rodata     start:0x021e9400 end:0x021e94ac
+    .data       start:0x021e94c0 end:0x021e9640
