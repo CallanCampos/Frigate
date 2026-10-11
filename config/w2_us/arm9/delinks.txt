@@ -981,7 +981,6 @@ lib/nnsys/src/snd/snd_player.c:
     .text       start:0x0206bd68 end:0x0206c4ac
     .bss        start:0x02148f0c end:0x021497e4
 
-
 lib/nnsys/src/snd/snd_fader.c:
     complete
     .text       start:0x0206ed5c end:0x0206edc0
@@ -1119,6 +1118,13 @@ src/system/record.c:
 src/system/mail.c:
     complete
     .text       start:0x0200965c end:0x02009854
+    .data       start:0x0209a1a4 end:0x0209a1ac
+
+src/system/version.c:
+    complete
+    .text       start:0x02015878 end:0x0201587c
+    .rodata     start:0x0208ffa8 end:0x0208ffb0
+
 src/system/c_gear_savedata.c:
     complete
     .text       start:0x02009854 end:0x02009930
@@ -1151,11 +1157,3 @@ src/system/resh_zek_savedata.c:
 
 src/system/trainer_log_savedata.c:
     .text       start:0x0200afbc end:0x0200b488
-
-src/system/version.c:
-    complete
-    .text       start:0x02015878 end:0x0201587c
-    .rodata     start:0x0208ffa8 end:0x0208ffb0
-
-    .data       start:0x0209a1a4 end:0x0209a1ac
-
