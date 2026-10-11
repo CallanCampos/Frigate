@@ -9,6 +9,10 @@
 . 0x0200588c reloc_addend 0x18
 . 0x02006de8 remove_symbol
 . 0x02006dec add_function ampOffFreeBlocks:thumb:0x20
+. 0x0200a9e4 reloc_module overlay(331)
+. 0x0200aa04 reloc_module overlay(331)
+. 0x0200aab8 reloc_module overlay(331)
+. 0x0200aafc reloc_module overlay(331)
 . 0x020131e8 reloc_module overlay(199)
 . 0x02026708 reloc_addend 0x2
 . 0x02026710 reloc_addend 0x2
