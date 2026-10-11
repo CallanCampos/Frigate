@@ -6,6 +6,7 @@
 #include "types.h"
 #include "gfl/proc.h"
 #include "save/save_control.h"
+#include "save/musical_savedata.h"
 #include "struct_decls.h"
 
 typedef struct {

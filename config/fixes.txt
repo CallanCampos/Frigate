@@ -11,6 +11,7 @@
 . 0x0200aa04 reloc_module overlay(331)
 . 0x0200aab8 reloc_module overlay(331)
 . 0x0200aafc reloc_module overlay(331)
+. 0x0200af7c reloc_module overlay(11)
 . 0x020131e8 reloc_module overlay(199)
 . 0x02019f78 reloc_addend 0x4c
 . 0x02019f84 reloc_addend 0x240

@@ -15,6 +15,7 @@
 #include "gfl/clact.h"
 #include "gfl/proc.h"
 #include "save/bsubway_save.h"
+#include "save/musical_savedata.h"
 #include "struct_decls.h"
 
 // The Battle Recorder's core proc (br_core.c), which overlay 272's br_main.c runs. It holds the systems its screens

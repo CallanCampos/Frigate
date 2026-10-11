@@ -1323,7 +1323,7 @@ from:0x0200ad0a kind:thumb_call to:0x0200add8 module:main
 from:0x0200ad1c kind:load to:0x02007449 module:main
 from:0x0200ae42 kind:thumb_call to:0x0200ad60 module:main
 from:0x0200ae5a kind:thumb_call to:0x0200ae30 module:main
-from:0x0200af7c kind:load to:0x0215cdcd module:overlays(11,12)
+from:0x0200af7c kind:load to:0x0215cdcd module:overlay(11)
 from:0x0200af88 kind:load to:0x02007449 module:main
 from:0x0200af98 kind:load to:0x0207894c module:main
 from:0x0200afa4 kind:load to:0x0207894c module:main

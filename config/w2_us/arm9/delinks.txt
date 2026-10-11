@@ -1141,6 +1141,17 @@ src/system/mystery_data.c:
     .text       start:0x0200a5f0 end:0x0200ac58
     .data       start:0x0209a1b8 end:0x0209a1c8
 
+src/system/musical_savedata.c:
+    complete
+    .text       start:0x0200ac58 end:0x0200af74
+
+src/system/resh_zek_savedata.c:
+    complete
+    .text       start:0x0200af74 end:0x0200afbc
+
+src/system/trainer_log_savedata.c:
+    .text       start:0x0200afbc end:0x0200b488
+
 src/system/version.c:
     complete
     .text       start:0x02015878 end:0x0201587c
