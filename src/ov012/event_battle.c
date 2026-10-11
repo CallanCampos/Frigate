@@ -413,7 +413,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         u32 index;
 
         GFL_OvlLoad(OVERLAY_ID(337));
-        func_ov337_02180bdc();
+        DSProt_Init();
         FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FALSE);
         CommPlayerSupport_EndBattle(GameData_GetCommPlayerSupport(gameData));
         index = OS_GetVBlankCount() & 1;
@@ -426,7 +426,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
     case 6: {
         u32 shift;
         u32 checksum;
-        const u32 *code = (const u32 *)func_ov337_0218092c;
+        const u32 *code = (const u32 *)DSProt_CallRunChecks1;
         u32 index;
 
         for (shift = 0x25, checksum = 0; shift != 0; shift--) {
@@ -434,7 +434,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
             code++;
         }
         if (checksum == 0x9f75a8d6) {
-            func_ov337_0218092c(&seed, wk);
+            DSProt_CallRunChecks1(&seed, wk);
         } else {
             data_ov337_02182444[data_ov337_02182440 ^ 1](&seed, wk);
         }
@@ -452,14 +452,14 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
     case 7: {
         u32 shift;
         u32 checksum;
-        const u32 *code = (const u32 *)func_ov337_021809d8;
+        const u32 *code = (const u32 *)DSProt_CallRunChecks3;
 
         for (shift = 0x25, checksum = 0; shift != 0; shift--) {
             checksum ^= (*code >> shift) | (*code << (32 - shift));
             code++;
         }
         if (checksum == 0x9f75a8d6) {
-            func_ov337_021809d8(&seed, wk);
+            DSProt_CallRunChecks3(&seed, wk);
         } else {
             data_ov337_02182444[data_ov337_02182440 ^ 1](&seed, wk);
         }

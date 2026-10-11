@@ -483,7 +483,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
     }
     case 1:
         GFL_OvlLoad(OVERLAY_DSPROT);
-        func_ov337_02180bdc();
+        DSProt_Init();
         if (IsZoneGameCommDisabled(wk->spawn.zoneId) == TRUE) {
             u8 status = GameCommSys_BootCheck(comm);
             if (status == 1 || status == 2) {
@@ -500,7 +500,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
         }
         break;
     case 3:
-        DSPROT_CHECKED_CALL(func_ov337_02180a84, EventMapChange_DSProtNop, EventMapChange_DSProtTamper1, wk, gsys);
+        DSPROT_CHECKED_CALL(DSProt_CallRunChecks2, EventMapChange_DSProtNop, EventMapChange_DSProtTamper1, wk, gsys);
         FieldMapControl_DeleteAllActors(gsys);
         if (wk->unk40 && wk->seasonChanged) {
             AdventureTime *adventureTime;
@@ -514,7 +514,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
             TransformVsPokePartyBySeason(gameData, party, season);
             func_ov012_021643f0(gameData, party, &adventureTime->time, season);
         }
-        DSPROT_CHECKED_CALL(func_ov337_02180b30, EventMapChange_DSProtNop, EventMapChange_DSProtTamper2, wk, gsys);
+        DSPROT_CHECKED_CALL(DSProt_CallRunChecks4, EventMapChange_DSProtNop, EventMapChange_DSProtTamper2, wk, gsys);
         FieldMapControl_LoadZone(gsys, wk->spawn.zoneId);
         GameData_UpdateZoneChangeFlag(gameData, wk->spawn.zoneId, wk->zoneId);
         FieldMapControl_InitSpawn(gsys, &wk->spawn);

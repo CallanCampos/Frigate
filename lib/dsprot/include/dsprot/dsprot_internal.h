@@ -127,6 +127,25 @@ asm u32 DSProt_CallCheckFlashcartA(DSProtCheckArgs *args);
 asm u32 DSProt_CallCheckFlashcartB(DSProtCheckArgs *args);
 asm void DSProt_DecryptDetectMulti(void);
 
+// The game's copy (overlay 337) has its own copies of the decryption and cipher code, under these names
+extern u8 DSProt_WorkMulti[];
+void DSProt_DecryptMulti(u32 *list);
+u32 DSProt_EncryptFunctionMulti(u32 key, u32 code, u32 end);
+u32 DSProt_DecryptFunctionMulti(u32 key, u32 code, u32 end);
+asm void DSProt_DispatchMulti(void);
+asm void DSProt_DecryptDispatchMulti(void);
+extern const u32 DSProt_DecryptCodeEntryMulti;
+extern const u32 DSProt_EncryptCodeEntryMulti;
+u32 DSProt_GetBranchTypeMulti(u32 instruction);
+void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength);
+u32 DSProt_Rc4NextMulti(DSProtCipherState *state);
+int DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
+int DSProt_DecryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
+int DSProt_EncryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size);
+int DSProt_DecryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size);
+asm void DSProt_DecryptCipherMulti(void);
+u32 DSProt_Crc32Multi(const u8 *data, u32 size);
+
 // What the checks call in the main module, which swan has not named: the game card's ROM header, the lock of the
 // card, and a read of its ROM (the source offset, the destination and the length, then the callback, its argument and
 // whether to read asynchronously)

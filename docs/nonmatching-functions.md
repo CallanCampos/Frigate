@@ -633,6 +633,15 @@ the original code is linked until they match. The differences are the same in bo
 | `lib/dsprot/src/dsprot_cipher.c` | `DSProt_Rc4Init` | `0x021a44c0` / `0x021a4500` | 0x88 against the original's 0x8c: registers and statement order. Tried declaration orders and loop shapes. |
 | `lib/dsprot/src/dsprot_cipher.c` | `DSProt_EncryptCode` | `0x021a45a4` / `0x021a45e4` | Same size, registers only: the original has the sum in `r5` and `i` in `r4`. |
 | `lib/dsprot/src/dsprot_cipher.c` | `DSProt_DecryptCode` | `0x021a46ec` / `0x021a472c` | 0x1c0 against the original's 0x1b4: the original spills `src`, `size` and the running sum to the stack, so it keeps more values live than ours. |
+| `lib/dsprot/src/dsprot_cipher_multi.c` | `DSProt_Rc4InitMulti` | `0x0217fd90` / `0x0217fdd0` | As `DSProt_Rc4Init`, of which it is overlay 337's copy. |
+| `lib/dsprot/src/dsprot_cipher_multi.c` | `DSProt_EncryptCodeMulti` | `0x0217fe74` / `0x0217feb4` | As `DSProt_EncryptCode`. |
+| `lib/dsprot/src/dsprot_cipher_multi.c` | `DSProt_DecryptCodeMulti` | `0x0217ffbc` / `0x0217fffc` | As `DSProt_DecryptCode`. |
+| `lib/dsprot/src/dsprot_run_multi.c` | `DSProt_RunChecks1` | `0x021802ac` / `0x021802ec` | 0x194 against the original's 0x1a0, with the same 0x98 frame: the original forms the address of its data plus 0x2200 in the literal pool and subtracts 0x2200 at run time, which MWCC folds in every spelling tried; it also keeps the checks' arguments' address in `fp`. |
+| `lib/dsprot/src/dsprot_run_multi.c` | `DSProt_RunChecks2` | `0x0218044c` / `0x0218048c` | As `DSProt_RunChecks1`. |
+| `lib/dsprot/src/dsprot_run_multi.c` | `DSProt_RunChecks3` | `0x021805ec` / `0x0218062c` | As `DSProt_RunChecks1`. |
+| `lib/dsprot/src/dsprot_run_multi.c` | `DSProt_RunChecks4` | `0x0218078c` / `0x021807cc` | As `DSProt_RunChecks1`. |
+| `lib/dsprot/src/dsprot_detect_multi.c` | `DSProt_CheckFlashcartA` | `0x021811ac` / `0x021811ec` | 0x780 against the original's 0x764, as `DSProt_CheckFlashcart`: the card registers' base is built from `1 << 26` in each inlined card read. |
+| `lib/dsprot/src/dsprot_detect_multi.c` | `DSProt_CheckFlashcartB` | `0x02181958` / `0x02181998` | As `DSProt_CheckFlashcartA`. |
 
 ## Matching, but not linkable as is
 
@@ -646,6 +655,11 @@ the original code is linked until they match. The differences are the same in bo
 - `BattleHandler_AbilityPopupAdd` (`src/ov167/btl_server_flow.c`) failed to link when it was tried alone, before
   overlay 167 was split into its files, giving a second ARM/Thumb cross-overlay thunk at `0x021ac84c`, and matches
   now. Check it when its file is completed.
+
+- `lib/dsprot/src/dsprot_stub_check_multi.c` and `dsprot_decrypt_multi.c` (overlay 337) match every function, but
+  linked complete they fail the module check: the literal pool of `dsprot_cipher_multi.c`'s still-delinked code at
+  `0x02180270` / `0x021802b0`, words of a code address plus 0x2200, then resolves to 0x2200 plus small offsets. They
+  stay incomplete until those address-plus-0x2200 references link.
 
 ## Keeping this list current
 

@@ -9,9 +9,9 @@
 
 typedef void *(*AntiPiracyCheck)(u32 *seed, void *work);
 
-void func_ov337_02180bdc(void);
-void *func_ov337_0218092c(u32 *seed, void *work);
-void *func_ov337_021809d8(u32 *seed, void *work);
+void DSProt_Init(void);
+void *DSProt_CallRunChecks1(u32 *seed, void *work);
+void *DSProt_CallRunChecks3(u32 *seed, void *work);
 
 extern u32 data_ov337_02182440;
 extern AntiPiracyCheck data_ov337_02182444[2];

@@ -58,9 +58,9 @@ extern DSProtCallback data_ov337_02182444[2];
         }                                                                                                              \
     }
 
-void *func_ov337_02180a84(void *arg0, void *arg1);
-void *func_ov337_02180b30(void *arg0, void *arg1);
-void func_ov337_02180bdc(void);
+void *DSProt_CallRunChecks2(void *arg0, void *arg1);
+void *DSProt_CallRunChecks4(void *arg0, void *arg1);
+void DSProt_Init(void);
 
 // Overlay 165's copy of DS Protect. DSProt_CallRunChecks calls callback(arg0, arg1) after its check and returns what
 // it returns, and DSProt_CallCrash is what the party list calls when the check's own code was changed
