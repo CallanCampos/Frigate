@@ -1,0 +1,1 @@
+GearStation7_Text_ItsSubwayMapUnova = It's a subway map of the Unova region.{be01}

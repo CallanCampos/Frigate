@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_STEELIX",
+    "moves": [ "MOVE_GYRO_BALL", "MOVE_PAYBACK", "MOVE_SWAGGER", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_RELAXED",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

@@ -1,9 +1,0 @@
-Virbank Complex\nWhere Fire Meets Steel
-Yo! This is a good deal.{be01}\nWhy don't you trade your Poké Ball\nfor my Great Ball?
-Heh, thanks! Enjoy the Great Ball!
-Oh! Seriously? You must be kidding.\nDon't you have a Poké Ball?!
-Oh! Seriously? You must be kidding.\nUsually people are happy to trade!
-See? It's a good deal, isn't it?\nWe can trade again tomorrow if you want!
-Oh! Seriously? You must be kidding.\nYou have way too many Great Balls!
-Gave the {0109:0} in exchange for\nthe {0109:2}!
-\pad{ae}

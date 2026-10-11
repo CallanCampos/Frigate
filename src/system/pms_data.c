@@ -1,5 +1,10 @@
 #include "types.h"
+#include "constants/abilities.h"
 #include "constants/arc.h"
+#include "constants/moves.h"
+#include "constants/pms_words.h"
+#include "constants/species.h"
+#include "constants/text_banks.h"
 #include "gfl/msg.h"
 #include "gfl/str.h"
 #include "system/pms_data.h"
@@ -10,7 +15,7 @@
 // Sentences with words filled in. The file's name is a guess: the ROM has no string for it
 
 // The word a word that isn't valid is replaced with
-#define PMS_WORD_DEFAULT 0x6a1
+#define PMS_WORD_DEFAULT PMS_WORD_TERM_POKEMON
 // The numbers a number word can be, from PMS_NUMBER_MIN to below PMS_NUMBER_END
 #define PMS_NUMBER_MIN 1
 #define PMS_NUMBER_END 11
@@ -20,7 +25,9 @@ static BOOL IsExcludedWord(u16 word);
 
 static const u8 sSentenceCounts[PMS_SENTENCE_TYPE_COUNT] = { 20, 20, 20, 20, 20, 21, 2 };
 
-static const u16 sSentenceMsgFiles[PMS_SENTENCE_TYPE_COUNT] = { 0xab, 0xad, 0xb0, 0xaa, 0xaf, 0xac, 0xae };
+static const u16 sSentenceMsgFiles[PMS_SENTENCE_TYPE_COUNT] = {
+    TEXT_BANK_0171, TEXT_BANK_0173, TEXT_BANK_0176, TEXT_BANK_0170, TEXT_BANK_0175, TEXT_BANK_0172, TEXT_BANK_0174,
+};
 
 void PMSData_Clear(PMSData *data) {
     int i;
@@ -51,22 +58,22 @@ void func_02029bfc(PMSData *data, u32 preset) {
     case 0:
         PMSData_Init(data, 1);
         data->id = 0;
-        data->words[0] = 0x5d2;
+        data->words[0] = PMS_WORD_GREETINGS_LETS_GO;
         break;
     case 1:
         PMSData_Init(data, 2);
         data->id = 0;
-        data->words[0] = 0x5cd;
+        data->words[0] = PMS_WORD_GREETINGS_THANKS;
         break;
     case 2:
         PMSData_Init(data, 3);
         data->id = 0;
-        data->words[0] = 0x667;
+        data->words[0] = PMS_WORD_FEELINGS_REGRET;
         break;
     case 3:
         PMSData_Init(data, 2);
         data->id = 13;
-        data->words[0] = 0x573;
+        data->words[0] = PMS_WORD_TRAINER_NO1;
         break;
     }
 }
@@ -74,7 +81,7 @@ void func_02029bfc(PMSData *data, u32 preset) {
 void func_02029c68(PMSData *data) {
     PMSData_Init(data, 0);
     data->id = 1;
-    data->words[0] = 0x58f;
+    data->words[0] = PMS_WORD_TRAINER_TRAINER;
 }
 
 StrBuf *PMSData_ToString(const PMSData *data, u32 heapId) {
@@ -330,7 +337,12 @@ BOOL PMSNumber_Validate(int *number, BOOL allowZero) {
 
 // Words that sentences can't use
 static BOOL IsExcludedWord(u16 word) {
-    const u16 excluded[] = { 0x0, 0x28b, 0x28a, 0x28c, 0x4ae, 0x4af, 0x4b0, 0x4b5, 0x4b6, 0x4b7, 0x4b9, 0x4cd };
+    const u16 excluded[] = {
+        PMS_WORD_SPECIES(SPECIES_NONE),   PMS_WORD_SPECIES_BAD_EGG,         PMS_WORD_SPECIES_EGG,
+        PMS_WORD_MOVE(MOVE_NONE),         PMS_WORD_MOVE(MOVE_TECHNO_BLAST), PMS_WORD_MOVE(MOVE_RELIC_SONG),
+        PMS_WORD_MOVE(MOVE_SECRET_SWORD), PMS_WORD_MOVE(MOVE_FREEZE_SHOCK), PMS_WORD_MOVE(MOVE_ICE_BURN),
+        PMS_WORD_MOVE(MOVE_SNARL),        PMS_WORD_MOVE(MOVE_V_CREATE),     PMS_WORD_ABILITY(ABILITY_NONE)
+    };
     u8 i;
 
     for (i = 0; i < NELEMS(excluded); i++) {

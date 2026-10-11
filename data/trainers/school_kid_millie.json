@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Millie",
+    "class": "TRAINER_CLASS_SCHOOL_KID_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 5,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ODDISH",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_TANGELA",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BELLOSSOM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hi, hi! Trainer!{be01}\nPlease show me what kinds of Pokémon\nyou are training!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Great, great! I didn't know\nthat way to raise Pokémon!"
+        },
+        {
+            "type": 2,
+            "text": "When you let a Pokémon evolve, it will be\nstronger, but if you don't let it evolve,{be00}\nit will learn moves quicker."
+        }
+    ]
+}

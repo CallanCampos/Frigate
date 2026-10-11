@@ -1,6 +1,0 @@
-Hi, Trainer!\nYou have a Pokédex, I see.{be01}\nI'm a traveler. I enjoy trekking around\nthe world and talking with various people.{be01}\nBy the way, do you know a Pokémon\ncalled Zoroark?
-Great!{be01}\nAre you armed with knowledge\nso that it won't trick you?{be01}
-Oh my...{be01}\nDon't you know anything of the world?\nIt may trick you.{be01}
-It's your choice to trust it and be\ntricked, or to live in doubt.{be01}\nI enjoyed talking with you.\nThis is a small present.{be01}
-They say Zoroark settled in around here\nabout two years ago.{be01}\nIt changed the appearance of this\ngrassland with its Illusion Ability{be00}\nand tricked people and Pokémon.{be01}\nIt's an outrageous rumor, but\na rumor has some truth in it.{be01}\nEvery rumor has a kernel of truth to it.{be01}
-Growwwwf!

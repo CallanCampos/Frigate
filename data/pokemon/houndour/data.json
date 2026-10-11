@@ -1,0 +1,196 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Houndour",
+    "pokedex": {
+        "category": "Dark Pokémon",
+        "entry": "It is smart enough to hunt in\npacks. It uses a variety of cries\nfor communicating with others.",
+        "height": "2'00\"",
+        "weight": "23.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Houndour",
+                "category": "Dark Pokémon",
+                "entry": "It is smart enough to hunt in\npacks. It uses a variety of cries\nfor communicating with others.",
+                "height": "2'00\"",
+                "weight": "23.8 lbs."
+            },
+            "fr": {
+                "name": "Malosse",
+                "category": "Pokémon Sombre",
+                "entry": "Il est assez évolué pour chasser\nen meute et communiquer par\ndes séries de cris modulés.",
+                "height": "0,6 m",
+                "weight": "10,8 kg"
+            },
+            "de": {
+                "name": "Hunduster",
+                "category": "Hades",
+                "entry": "Es jagt in Rudeln und kommuniziert\nüber eine ganze Reihe von Rufen mit\nanderen Hunduster.",
+                "height": "0,6 m",
+                "weight": "10,8 kg"
+            },
+            "it": {
+                "name": "Houndour",
+                "category": "Pokémon Buio",
+                "entry": "Va a caccia in branchi e comunica con\ngli altri emettendo una varietà di versi.",
+                "height": "0,6 m",
+                "weight": "10,8 kg"
+            },
+            "ko": {
+                "name": "델빌",
+                "category": "다크포켓몬",
+                "entry": "수많은 울음소리를 가려 써서\n동료들과 의사소통을 하며\n사냥을 하는 지능을 가지고 있다.",
+                "height": "0.6 m",
+                "weight": "10.8 kg"
+            },
+            "es": {
+                "name": "Houndour",
+                "category": "Pokémon Siniestro",
+                "entry": "Tiene suficiente inteligencia para\ncazar en manada. Se comunica\ncon los demás a través de gritos.",
+                "height": "0,6 m",
+                "weight": "10,8 kg"
+            },
+            "ja": {
+                "name": "デルビル",
+                "category": "ダークポケモン",
+                "entry": "さまざまな\\x{3000}なきごえを\\x{3000}つかいわけ\nなかまと\\x{3000}コミュニケーションしながら\nかりを\\x{3000}おこなう\\x{3000}かしこさをもつ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 60,
+        "defense": 30,
+        "speed": 65,
+        "special_attack": 80,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_DARK", "TYPE_FIRE" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_EARLY_BIRD", "ABILITY_FLASH_FIRE" ],
+    "hidden_ability": "ABILITY_UNNERVE",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 66,
+    "height": 6,
+    "weight": 108,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 4, "MOVE_HOWL" ],
+            [ 8, "MOVE_SMOG" ],
+            [ 13, "MOVE_ROAR" ],
+            [ 16, "MOVE_BITE" ],
+            [ 20, "MOVE_ODOR_SLEUTH" ],
+            [ 25, "MOVE_BEAT_UP" ],
+            [ 28, "MOVE_FIRE_FANG" ],
+            [ 32, "MOVE_FAINT_ATTACK" ],
+            [ 37, "MOVE_EMBARGO" ],
+            [ 40, "MOVE_FOUL_PLAY" ],
+            [ 44, "MOVE_FLAMETHROWER" ],
+            [ 49, "MOVE_CRUNCH" ],
+            [ 52, "MOVE_NASTY_PLOT" ],
+            [ 56, "MOVE_INFERNO" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM35",
+            "TM36",
+            "TM38",
+            "TM41",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM63",
+            "TM66",
+            "TM67",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM94",
+            "TM95"
+        ],
+        "by_tutor": [
+            "MOVE_SUPER_FANG",
+            "MOVE_UPROAR",
+            "MOVE_FOUL_PLAY",
+            "MOVE_DARK_PULSE",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_SPITE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FIRE_SPIN",
+            "MOVE_RAGE",
+            "MOVE_PURSUIT",
+            "MOVE_COUNTER",
+            "MOVE_SPITE",
+            "MOVE_REVERSAL",
+            "MOVE_BEAT_UP",
+            "MOVE_FIRE_FANG",
+            "MOVE_THUNDER_FANG",
+            "MOVE_NASTY_PLOT",
+            "MOVE_PUNISHMENT",
+            "MOVE_FEINT",
+            "MOVE_SUCKER_PUNCH"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 24,
+            "species": "SPECIES_HOUNDOOM"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_HOUNDOUR"
+}

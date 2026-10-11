@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Icicle Crash",
+    "description": "The user attacks by harshly dropping\nan icicle onto the target.\nIt may also make the target flinch.",
+    "type": "TYPE_ICE",
+    "quality": "MOVE_QUALITY_DAMAGE",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 85,
+    "accuracy": 90,
+    "pp": 10,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 30,
+    "effect": "BATTLE_EFFECT_FLINCH_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

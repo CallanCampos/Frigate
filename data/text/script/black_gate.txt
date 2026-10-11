@@ -1,0 +1,7 @@
+BlackGate_Text_TodayWereDancingNo = Today, we're dancing for no reason. ♪\nSomeday, we'll disappear for no reason.
+BlackGate_Text_TodayWereDancingNo_2 = Today, we're dancing for no reason. ♪\nSomeday, we'll disappear for no reason.
+BlackGate_Text_WhenGoThroughGate = When you go through the gate...\nWhere is this gate connected to?
+BlackGate_Text_CourseWhenCompareDifferent = Of course! When you compare\ndifferent things, it's natural to find{be00}\ngood points and bad points!
+BlackGate_Text_TownSomethingKeepsChanging = A town is something\nthat keeps changing...
+BlackGate_Text_Empty =        \x{ffff}
+\pad{08}

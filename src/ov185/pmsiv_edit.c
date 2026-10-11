@@ -3,6 +3,7 @@
 #include "app/pms_input.h"
 #include "app/pms_input_view.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -42,7 +43,7 @@ enum {
 #define CHAR_EOS 0xffff
 
 // The message file of the phrase input's texts
-#define PMSIV_EDIT_MSG_FILE 159
+#define PMSIV_EDIT_MSG_FILE TEXT_BANK_PMS_INPUT
 
 typedef struct {
     StrBuf *str;

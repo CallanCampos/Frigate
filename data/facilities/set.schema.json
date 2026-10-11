@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A battle facility's Pokémon set: data/facilities/<facility>/pokemon/<set>.json",
+    "description": "A set a facility's trainers pick from (BSubwayPokemonData in include/field/battle_facility.h), named after its species and numbered from 1. tools/data/facility_data.py packs them in the order of the facility's order.json. A string value is the name of a constant from data/constants/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "species", "moves", "ev_flags", "nature", "item", "form" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "species": { "type": "string", "x-constant": "SPECIES_" },
+        "moves": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": [ "string", "integer" ], "x-constant": "MOVE_", "minimum": 0, "maximum": 65535 } },
+        "ev_flags": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "hp", "attack", "defense", "speed", "special_attack", "special_defense" ],
+            "description": "The stats that get effort values",
+            "properties": {
+                "hp": { "type": "boolean" }, "attack": { "type": "boolean" }, "defense": { "type": "boolean" },
+                "speed": { "type": "boolean" }, "special_attack": { "type": "boolean" }, "special_defense": { "type": "boolean" }
+            }
+        },
+        "nature": { "type": [ "string", "integer" ], "x-constant": "NATURE_", "minimum": 0, "maximum": 255 },
+        "item": { "type": [ "string", "integer" ], "x-constant": "ITEM_", "minimum": 0, "maximum": 65535 },
+        "form": { "type": "integer", "minimum": 0, "maximum": 65535 }
+    }
+}

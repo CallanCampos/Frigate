@@ -2,3 +2,8 @@
     .rodata     start:0x021ef3ac end:0x021ef4b8 kind:rodata align:4
     .ctor       start:0x021ef4b8 end:0x021ef4b8 kind:rodata align:4
     .bss        start:0x021ef4c0 end:0x021ef4c0 kind:bss align:32
+
+src/ov120/gimmick_league_champion.c:
+    complete
+    .text       start:0x021eecc0 end:0x021ef3ac
+    .rodata     start:0x021ef3ac end:0x021ef4b8

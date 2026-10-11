@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DRUDDIGON",
+    "moves": [ "MOVE_DRAGON_TAIL", "MOVE_CRUNCH", "MOVE_SUPERPOWER", "MOVE_GLARE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_SALAC_BERRY",
+    "form": 0
+}

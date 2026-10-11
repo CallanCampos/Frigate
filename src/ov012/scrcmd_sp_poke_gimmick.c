@@ -6,7 +6,7 @@
 #include "constants/species.h"
 #include "field/field.h"
 #include "field/field_script.h"
-#include "field/ov129.h"
+#include "field/sp_poke_event.h"
 #include "field/scrcmd_sp_poke_gimmick.h"
 #include "nitro/fx.h"
 #include "pml/met_data.h"
@@ -55,7 +55,7 @@ BOOL func_ov012_02165598(VM *vm, FieldScriptEnv *env) {
         start = &pos;
         end = &playerPos;
     }
-    event = func_ov129_021ef834(gsys, mode, start, end, GRID_HEIGHT(height), a5);
+    event = SpPokeEvent_CreateJump(gsys, mode, start, end, GRID_HEIGHT(height), a5);
     if (event == NULL) {
         return TRUE;
     }
@@ -74,14 +74,14 @@ BOOL func_ov012_0216564c(VM *vm, FieldScriptEnv *env) {
     pos.x = GRID_CENTER(x);
     pos.y = GRID_HEIGHT(y);
     pos.z = GRID_CENTER(z);
-    func_ov129_021ef91c(gsys, a1, &pos);
+    SpPokeEvent_Appear(gsys, a1, &pos);
     return FALSE;
 }
 
 BOOL func_ov012_021656a8(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov129_021ef9e4(gsys, ScriptReadAny(vm, env));
+    GameEvent *event = SpPokeEvent_CreateWaitAnimEnd(gsys, ScriptReadAny(vm, env));
 
     if (event == NULL) {
         return TRUE;
@@ -93,7 +93,7 @@ BOOL func_ov012_021656a8(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov012_021656e0(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov129_021ef9bc(gsys, ScriptReadAny(vm, env));
+    GameEvent *event = SpPokeEvent_CreateWaitFrame(gsys, ScriptReadAny(vm, env));
 
     if (event == NULL) {
         return TRUE;

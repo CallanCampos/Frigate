@@ -1,5 +1,0 @@
-{be09:1}This is our destination...\nGo inside.{be09:0}{be01}
-{be09:1}I want you to go inside.{be09:0}{be01}
-                                  \x{ffff}
-                                    \x{ffff}
-{be09:1}I...want to see things no one can see.{be09:0}

@@ -1,0 +1,163 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Surskit",
+    "pokedex": {
+        "category": "Pond Skater Pokémon",
+        "entry": "It appears as if it is skating on\nwater. It draws prey with a sweet\nscent from the tip of its head.",
+        "height": "1'08\"",
+        "weight": "3.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Surskit",
+                "category": "Pond Skater Pokémon",
+                "entry": "It appears as if it is skating on\nwater. It draws prey with a sweet\nscent from the tip of its head.",
+                "height": "1'08\"",
+                "weight": "3.7 lbs."
+            },
+            "fr": {
+                "name": "Arakdo",
+                "category": "Pokémon Maresurfeur",
+                "entry": "Il semble patiner sur l'eau. Le parfum\ndiffusé par le sommet de sa tête sert\nà attirer ses proies.",
+                "height": "0,5 m",
+                "weight": "1,7 kg"
+            },
+            "de": {
+                "name": "Gehweiher",
+                "category": "Wassergeher",
+                "entry": "Scheinbar reitet es auf dem\nWasser. Es lockt seine Beute\nmit einem süßen Duft an.",
+                "height": "0,5 m",
+                "weight": "1,7 kg"
+            },
+            "it": {
+                "name": "Surskit",
+                "category": "Pokémon Sfiorapozze",
+                "entry": "Cammina a pelo d'acqua. Dall'aculeo sulla\ntesta emana un dolce aroma con cui\nattira le prede.",
+                "height": "0,5 m",
+                "weight": "1,7 kg"
+            },
+            "ko": {
+                "name": "비구술",
+                "category": "소금쟁이포켓몬",
+                "entry": "수면을 미끄러지듯이 걷는다.\n머리끝에서 달콤한 냄새를\n내어 먹이를 끌어들인다.",
+                "height": "0.5 m",
+                "weight": "1.7 kg"
+            },
+            "es": {
+                "name": "Surskit",
+                "category": "Pokémon Zapatero",
+                "entry": "Parece que patina sobre el agua.\nAtrae a las presas con el suave\naroma de su cabeza.",
+                "height": "0,5 m",
+                "weight": "1,7 kg"
+            },
+            "ja": {
+                "name": "アメタマ",
+                "category": "あめんぼポケモン",
+                "entry": "すいめんを\\x{3000}すべるように\\x{3000}あるく。\nあたまの\\x{3000}さきから\\x{3000}あまい\\x{3000}においを\nだして\\x{3000}えものを\\x{3000}さそう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 30,
+        "defense": 32,
+        "speed": 65,
+        "special_attack": 50,
+        "special_defense": 52
+    },
+    "types": [ "TYPE_BUG", "TYPE_WATER" ],
+    "catch_rate": 200,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_RAIN_DISH",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 54,
+    "height": 5,
+    "weight": 17,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BUBBLE" ],
+            [ 7, "MOVE_QUICK_ATTACK" ],
+            [ 13, "MOVE_SWEET_SCENT" ],
+            [ 19, "MOVE_WATER_SPORT" ],
+            [ 25, "MOVE_BUBBLE_BEAM" ],
+            [ 31, "MOVE_AGILITY" ],
+            [ 37, "MOVE_MIST" ],
+            [ 37, "MOVE_HAZE" ],
+            [ 43, "MOVE_BATON_PASS" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM55",
+            "TM70",
+            "TM76",
+            "TM77",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [ "MOVE_BUG_BITE", "MOVE_SIGNAL_BEAM", "MOVE_ICY_WIND", "MOVE_SNORE", "MOVE_GIGA_DRAIN", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_FORESIGHT",
+            "MOVE_MUD_SHOT",
+            "MOVE_PSYBEAM",
+            "MOVE_HYDRO_PUMP",
+            "MOVE_MIND_READER",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BUG_BITE",
+            "MOVE_AQUA_JET",
+            "MOVE_ENDURE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 22,
+            "species": "SPECIES_MASQUERAIN"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SURSKIT"
+}

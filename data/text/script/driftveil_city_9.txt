@@ -1,0 +1,5 @@
+DriftveilCity9_Text_SometimesCanLearnAbout = Sometimes you can learn about\nPokémon moves and items{be00}\non TV programs.
+DriftveilCity9_Text_SomePokemonEvolveBy = Some Pokémon evolve by trade!{be01}\nCool, right?\nWhy do they evolve?!
+DriftveilCity9_Text_QueakQueak = Queak, queak!
+DriftveilCity9_Text_MightAbleLearnSomething = You might be able to learn something\nif you check out battles between people{be00}\nwho are stronger than you.
+\pad{58}

@@ -3,3 +3,21 @@
     .ctor       start:0x021851c0 end:0x021851c0 kind:rodata align:4
     .data       start:0x021851e0 end:0x0218ba00 kind:data align:32
     .bss        start:0x0218ba00 end:0x021922c0 kind:bss align:32
+
+src/ov011/dwc_rapcommon.c:
+    complete
+    .text       start:0x02152078 end:0x0215251c
+    .data       start:0x02185394 end:0x0218542c
+    .bss        start:0x0218ba08 end:0x0218ba0c
+
+src/ov011/net_devwifi.c:
+    complete
+    .text       start:0x021503c0 end:0x021505d4
+    .data       start:0x021851e0 end:0x021852bc
+    .bss        start:0x0218ba00 end:0x0218ba04
+
+src/ov011/dwc_rap.c:
+    .text       start:0x021505d4 end:0x02152078
+    .rodata     start:0x02184fc8 end:0x02184fd4
+    .data       start:0x021852bc end:0x02185394
+    .bss        start:0x0218ba04 end:0x0218ba08

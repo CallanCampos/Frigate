@@ -1,5 +1,0 @@
-Hmm! You spoke to me...\nYou're a quite good Trainer.{be01}\nOK. I like you!\nTake this TM!{be01}
-Charge Beam sometimes raises\nthe user's Sp. Atk.{be01}\nIf it is successful, the power will go\nup and up!
-I was born here and will die here.{be01}\nLentimas Town is a country town,\nbut I don't mind, because I don't know{be00}\nanywhere else.
-There is nothing but beauty here,\nbut Skyla delivers things{be00}\nwe don't have.
-\pad{a2}

@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ae-Jin",
+    "class": "TRAINER_CLASS_SCIENTIST_F_46",
+    "pokemon": [
+        "gengar_1",
+        "roserade_1",
+        "gardevoir_1",
+        "espeon_1",
+        "glaceon_1",
+        "typhlosion_1",
+        "magnezone_1",
+        "porygon_z_1",
+        "vanilluxe_1",
+        "magmortar_1"
+    ]
+}

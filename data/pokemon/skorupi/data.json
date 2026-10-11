@@ -1,0 +1,194 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Skorupi",
+    "pokedex": {
+        "category": "Scorpion Pokémon",
+        "entry": "It lives in arid regions and\ncan go without food for a year\nwhile waiting for prey.",
+        "height": "2'07\"",
+        "weight": "26.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Skorupi",
+                "category": "Scorpion Pokémon",
+                "entry": "As soon as the tail claws close,\nits needle tips secrete poison.\nIt can survive a year without food.",
+                "height": "2'07\"",
+                "weight": "26.5 lbs."
+            },
+            "fr": {
+                "name": "Rapion",
+                "category": "Pokémon Scorpion",
+                "entry": "Il saisit sa proie avec les pinces de\nsa queue et lui injecte un poison.\nIl peut survivre un an sans manger.",
+                "height": "0,8 m",
+                "weight": "12,0 kg"
+            },
+            "de": {
+                "name": "Pionskora",
+                "category": "Skorpion",
+                "entry": "Es kann ein Jahr ohne Nahrung\nüberleben. Greift mit dem Gift aus\nden Krallen an seinem Schweif an.",
+                "height": "0,8 m",
+                "weight": "12,0 kg"
+            },
+            "it": {
+                "name": "Skorupi",
+                "category": "Pokémon Scorpione",
+                "entry": "Rilascia veleno dagli artigli sulla coda.\nPuò resistere senza cibo per un anno.",
+                "height": "0,8 m",
+                "weight": "12,0 kg"
+            },
+            "ko": {
+                "name": "스콜피",
+                "category": "전갈포켓몬",
+                "entry": "꼬리의 집게가 오므려지는 동시에\n침 끝에서 독이 배어 나온다.\n1년간 아무것도 안 먹고 지낼 수 있다.",
+                "height": "0.8 m",
+                "weight": "12.0 kg"
+            },
+            "es": {
+                "name": "Skorupi",
+                "category": "Pokémon Escorpión",
+                "entry": "Aferra las presas con las garras\nde la cola y les inyecta veneno.\nSobrevive un año sin comida.",
+                "height": "0,8 m",
+                "weight": "12,0 kg"
+            },
+            "ja": {
+                "name": "スコルピ",
+                "category": "さそりポケモン",
+                "entry": "しっぽのはさみが\\x{3000}とじると\\x{3000}どうじに\nはりのさきから\\x{3000}どくが\\x{3000}にじみだす。\n\\x{ff11}ねん\\x{3000}なにもたべずに\\x{3000}たえられる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 50,
+        "defense": 90,
+        "speed": 65,
+        "special_attack": 30,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_POISON", "TYPE_BUG" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_POISON_BARB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_BATTLE_ARMOR", "ABILITY_SNIPER" ],
+    "hidden_ability": "ABILITY_KEEN_EYE",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 66,
+    "height": 8,
+    "weight": 120,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BITE" ],
+            [ 1, "MOVE_POISON_STING" ],
+            [ 1, "MOVE_LEER" ],
+            [ 5, "MOVE_KNOCK_OFF" ],
+            [ 9, "MOVE_PIN_MISSILE" ],
+            [ 13, "MOVE_ACUPRESSURE" ],
+            [ 16, "MOVE_PURSUIT" ],
+            [ 20, "MOVE_BUG_BITE" ],
+            [ 23, "MOVE_POISON_FANG" ],
+            [ 27, "MOVE_VENOSHOCK" ],
+            [ 30, "MOVE_HONE_CLAWS" ],
+            [ 34, "MOVE_TOXIC_SPIKES" ],
+            [ 38, "MOVE_NIGHT_SLASH" ],
+            [ 41, "MOVE_SCARY_FACE" ],
+            [ 45, "MOVE_CRUNCH" ],
+            [ 49, "MOVE_CROSS_POISON" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM36",
+            "TM39",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM54",
+            "TM56",
+            "TM66",
+            "TM70",
+            "TM75",
+            "TM76",
+            "TM81",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_AQUA_TAIL",
+            "MOVE_DARK_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FAINT_ATTACK",
+            "MOVE_SCREECH",
+            "MOVE_SAND_ATTACK",
+            "MOVE_SLASH",
+            "MOVE_CONFUSE_RAY",
+            "MOVE_WHIRLWIND",
+            "MOVE_AGILITY",
+            "MOVE_PURSUIT",
+            "MOVE_NIGHT_SLASH",
+            "MOVE_IRON_TAIL",
+            "MOVE_TWINEEDLE",
+            "MOVE_POISON_TAIL"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 40,
+            "species": "SPECIES_DRAPION"
+        }
+    ],
+    "regional_dex_number": 201,
+    "baby_species": "SPECIES_SKORUPI"
+}

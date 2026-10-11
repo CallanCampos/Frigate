@@ -1,0 +1,168 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Masquerain",
+    "pokedex": {
+        "category": "Eyeball Pokémon",
+        "entry": "Its antennae have eye patterns\non them. Its four wings enable it\nto hover and fly in any direction.",
+        "height": "2'07\"",
+        "weight": "7.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Masquerain",
+                "category": "Eyeball Pokémon",
+                "entry": "Its antennae have eye patterns\non them. Its four wings enable it\nto hover and fly in any direction.",
+                "height": "2'07\"",
+                "weight": "7.9 lbs."
+            },
+            "fr": {
+                "name": "Maskadra",
+                "category": "Pokémon Boule Œil",
+                "entry": "Des motifs en forme d'yeux ornent\nses antennes. Ses 4 ailes l'aident\nà voler dans toutes les directions.",
+                "height": "0,8 m",
+                "weight": "3,6 kg"
+            },
+            "de": {
+                "name": "Maskeregen",
+                "category": "Auge",
+                "entry": "Seine Antenne besitzt ein Augenmuster.\nSeine vier Flügel erlauben es,\nin alle Richtungen zu fliegen.",
+                "height": "0,8 m",
+                "weight": "3,6 kg"
+            },
+            "it": {
+                "name": "Masquerain",
+                "category": "Pokémon Occhi",
+                "entry": "Le sue antenne presentano un motivo ad\nocchi. Con le quattro ali riesce a volar\nin ogni direzione.",
+                "height": "0,8 m",
+                "weight": "3,6 kg"
+            },
+            "ko": {
+                "name": "비나방",
+                "category": "안구포켓몬",
+                "entry": "눈알 모양의 더듬이를 가지고 있다.\n4장의 날개로 떠올라\n전후좌우로 움직일 수 있다.",
+                "height": "0.8 m",
+                "weight": "3.6 kg"
+            },
+            "es": {
+                "name": "Masquerain",
+                "category": "Pokémon Globocular",
+                "entry": "Sus antenas tienen dibujos de ojos,\nmientras que sus alas le permiten\nvolar en cualquier dirección.",
+                "height": "0,8 m",
+                "weight": "3,6 kg"
+            },
+            "ja": {
+                "name": "アメモース",
+                "category": "めだまポケモン",
+                "entry": "めだまもようの\\x{3000}しょっかくを\\x{3000}もつ。\n\\x{ff14}まいの\\x{3000}はねで\\x{3000}うかびあがり\nぜんごさゆうに\\x{3000}うごくことができる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 60,
+        "defense": 62,
+        "speed": 60,
+        "special_attack": 80,
+        "special_defense": 82
+    },
+    "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_SILVER_POWDER",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_INTIMIDATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_UNNERVE",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 145,
+    "height": 8,
+    "weight": 36,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_OMINOUS_WIND" ],
+            [ 1, "MOVE_BUBBLE" ],
+            [ 1, "MOVE_QUICK_ATTACK" ],
+            [ 1, "MOVE_SWEET_SCENT" ],
+            [ 1, "MOVE_WATER_SPORT" ],
+            [ 7, "MOVE_QUICK_ATTACK" ],
+            [ 13, "MOVE_SWEET_SCENT" ],
+            [ 19, "MOVE_WATER_SPORT" ],
+            [ 22, "MOVE_GUST" ],
+            [ 26, "MOVE_SCARY_FACE" ],
+            [ 33, "MOVE_STUN_SPORE" ],
+            [ 40, "MOVE_SILVER_WIND" ],
+            [ 47, "MOVE_AIR_SLASH" ],
+            [ 54, "MOVE_WHIRLWIND" ],
+            [ 61, "MOVE_BUG_BUZZ" ],
+            [ 68, "MOVE_QUIVER_DANCE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM55",
+            "TM68",
+            "TM70",
+            "TM76",
+            "TM77",
+            "TM87",
+            "TM89",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SURSKIT"
+}

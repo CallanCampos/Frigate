@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Geoff",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TIRTOUGA",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_AXEW",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "If there is a steep cave in the east,\nI go there and train my Pokémon, and{be00}\nif there is a strong Trainer in the west,{be00}\nI go there and challenge that Trainer!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My Pokémon clearly lack\nproper training!!"
+        },
+        {
+            "type": 2,
+            "text": "Pokémon training Pokémon...{be01}\nIf they live in rugged wilderness,\nthat can happen naturally."
+        }
+    ]
+}

@@ -1,0 +1,176 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Golbat",
+    "pokedex": {
+        "category": "Bat Pokémon",
+        "entry": "Flitting around in the dead of night,\nit sinks its fangs into its prey and\ndrains a nearly fatal amount of blood.",
+        "height": "5'03\"",
+        "weight": "121.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Golbat",
+                "category": "Bat Pokémon",
+                "entry": "Its sharp fangs puncture the\ntoughest of hides and have small\nholes for greedily sucking blood.",
+                "height": "5'03\"",
+                "weight": "121.3 lbs."
+            },
+            "fr": {
+                "name": "Nosferalto",
+                "category": "Pokémon Chovsouris",
+                "entry": "Ses crocs acérés et creux peuvent\npénétrer la plus épaisse des peaux\net sucer le sang de la victime.",
+                "height": "1,6 m",
+                "weight": "55,0 kg"
+            },
+            "de": {
+                "name": "Golbat",
+                "category": "Fledermaus",
+                "entry": "Seine scharfen Zähne durchstechen\ndickste Haut. Sie sind hohl und\nerlauben so das Saugen von Blut.",
+                "height": "1,6 m",
+                "weight": "55,0 kg"
+            },
+            "it": {
+                "name": "Golbat",
+                "category": "Pokémon Pipistrello",
+                "entry": "I suoi denti affilati penetrano anche\nle pelli più dure e hanno dei fori\nper succhiare il sangue.",
+                "height": "1,6 m",
+                "weight": "55,0 kg"
+            },
+            "ko": {
+                "name": "골뱃",
+                "category": "박쥐포켓몬",
+                "entry": "아무리 단단한 피부라도 뚫는 예리한\n송곳니에는 작은 구멍이 있어서\n그 구멍으로 피를 빤다.",
+                "height": "1.6 m",
+                "weight": "55.0 kg"
+            },
+            "es": {
+                "name": "Golbat",
+                "category": "Pokémon Murciélago",
+                "entry": "Sus afilados colmillos atraviesan\nlas pieles más duras y tienen\norificios para chupar sangre.",
+                "height": "1,6 m",
+                "weight": "55,0 kg"
+            },
+            "ja": {
+                "name": "ゴルバット",
+                "category": "こうもりポケモン",
+                "entry": "どんなに\\x{3000}かたい\\x{3000}ひふでも\\x{3000}つらぬく\nするどいキバには\\x{3000}ちいさな\\x{3000}あなが\nあって\\x{3000}そこから\\x{3000}ちを\\x{3000}すいまくる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 80,
+        "defense": 70,
+        "speed": 90,
+        "special_attack": 65,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_POISON", "TYPE_FLYING" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_INNER_FOCUS", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_INFILTRATOR",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 159,
+    "height": 16,
+    "weight": 550,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCREECH" ],
+            [ 1, "MOVE_LEECH_LIFE" ],
+            [ 1, "MOVE_SUPERSONIC" ],
+            [ 1, "MOVE_ASTONISH" ],
+            [ 4, "MOVE_SUPERSONIC" ],
+            [ 8, "MOVE_ASTONISH" ],
+            [ 12, "MOVE_BITE" ],
+            [ 15, "MOVE_WING_ATTACK" ],
+            [ 19, "MOVE_CONFUSE_RAY" ],
+            [ 24, "MOVE_SWIFT" ],
+            [ 28, "MOVE_AIR_CUTTER" ],
+            [ 33, "MOVE_ACROBATICS" ],
+            [ 38, "MOVE_MEAN_LOOK" ],
+            [ 42, "MOVE_POISON_FANG" ],
+            [ 47, "MOVE_HAZE" ],
+            [ 52, "MOVE_AIR_SLASH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM36",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM62",
+            "TM66",
+            "TM68",
+            "TM87",
+            "TM88",
+            "TM89",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_SUPER_FANG",
+            "MOVE_UPROAR",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_FRIENDSHIP",
+            "param": 0,
+            "species": "SPECIES_CROBAT"
+        }
+    ],
+    "regional_dex_number": 62,
+    "baby_species": "SPECIES_ZUBAT"
+}

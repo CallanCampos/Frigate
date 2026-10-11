@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LUCARIO",
+    "moves": [ "MOVE_CLOSE_COMBAT", "MOVE_STONE_EDGE", "MOVE_EXTREME_SPEED", "MOVE_DARK_PULSE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_NAIVE",
+    "item": "ITEM_LIFE_ORB",
+    "form": 0
+}

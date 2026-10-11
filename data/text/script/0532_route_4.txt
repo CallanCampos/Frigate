@@ -1,3 +1,0 @@
-Hmm? You're a Trainer with quick eyes!\nI'll give you these!{be01}
-Speak to many people, and\ngood things will happen to you.
-\pad{92}

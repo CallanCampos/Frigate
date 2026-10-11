@@ -1,52 +1,52 @@
-Tournament Download
-{013b:0}
-Battle Rules:
-Single Battle
-Double Battle
-Triple Battle
-Rotation Battle
-Tournament:
-Saved Tournaments
-Banned Pokémon
-Banned Items
-Banned Moves
-None
-Searching for tournament data.\nPlease wait a moment.
-Please choose the tournament\nyou would like to save.{be01}
-                       \x{ffff}
-Yes
-No
-                \x{ffff}
-    \x{ffff}
-    \x{ffff}
-This tournament has already\nbeen saved.{be01}
-Received the tournament data!{be01}
-Saving the tournament...\nDon't turn off the power.
-The tournament data has been saved.{be01}
-The tournament-data slots are full.\nPlease delete data and try again.{be01}
-Will you quit deleting tournament data?
-    \x{ffff}
-    \x{ffff}
-Is it OK to delete\n{013b:0}?
-    \x{ffff}
-    \x{ffff}
-Is it really OK to delete\n{013b:0}?
-    \x{ffff}
-    \x{ffff}
-The tournament data has been deleted.{be01}
-Data could not be found.{be01}
-Data could not be found.{be01}
-Data could not be found.{be01}
-What would you like to do with\n{013b:0}?
-       \x{ffff}
-    \x{ffff}
-Please choose the tournament\nyou would like to participate in.{be01}
-Will you participate in\n{013b:0}?
-Participate
-See Details
-Cancel
-{0101:0}
-{0109:0}
-{0107:0}
-Save
-Would you like to stop\ndownloading tournament data?
+Bank0404_Text_TournamentDownload = Tournament Download
+Bank0404_Text_Empty = {013b:0}
+Bank0404_Text_BattleRules = Battle Rules:
+Bank0404_Text_SingleBattle = Single Battle
+Bank0404_Text_DoubleBattle = Double Battle
+Bank0404_Text_TripleBattle = Triple Battle
+Bank0404_Text_RotationBattle = Rotation Battle
+Bank0404_Text_Tournament = Tournament:
+Bank0404_Text_SavedTournaments = Saved Tournaments
+Bank0404_Text_BannedPokemon = Banned Pokémon
+Bank0404_Text_BannedItems = Banned Items
+Bank0404_Text_BannedMoves = Banned Moves
+Bank0404_Text_None = None
+Bank0404_Text_SearchingTournamentDataPlease = Searching for tournament data.\nPlease wait a moment.
+Bank0404_Text_PleaseChooseTournamentWould = Please choose the tournament\nyou would like to save.{be01}
+Bank0404_Text_Empty_2 =                        \x{ffff}
+Bank0404_Text_Yes = Yes
+Bank0404_Text_No = No
+Bank0404_Text_Empty_3 =                 \x{ffff}
+Bank0404_Text_Empty_4 =     \x{ffff}
+Bank0404_Text_Empty_5 =     \x{ffff}
+Bank0404_Text_TournamentHasAlreadyBeen = This tournament has already\nbeen saved.{be01}
+Bank0404_Text_ReceivedTournamentData = Received the tournament data!{be01}
+Bank0404_Text_SavingTournamentDontTurn = Saving the tournament...\nDon't turn off the power.
+Bank0404_Text_TournamentDataHasBeen = The tournament data has been saved.{be01}
+Bank0404_Text_TournamentDataSlotsFull = The tournament-data slots are full.\nPlease delete data and try again.{be01}
+Bank0404_Text_WillQuitDeletingTournament = Will you quit deleting tournament data?
+Bank0404_Text_Empty_6 =     \x{ffff}
+Bank0404_Text_Empty_7 =     \x{ffff}
+Bank0404_Text_OkDelete = Is it OK to delete\n{013b:0}?
+Bank0404_Text_Empty_8 =     \x{ffff}
+Bank0404_Text_Empty_9 =     \x{ffff}
+Bank0404_Text_ReallyOkDelete = Is it really OK to delete\n{013b:0}?
+Bank0404_Text_Empty_10 =     \x{ffff}
+Bank0404_Text_Empty_11 =     \x{ffff}
+Bank0404_Text_TournamentDataHasBeen_2 = The tournament data has been deleted.{be01}
+Bank0404_Text_DataCouldNotFound = Data could not be found.{be01}
+Bank0404_Text_DataCouldNotFound_2 = Data could not be found.{be01}
+Bank0404_Text_DataCouldNotFound_3 = Data could not be found.{be01}
+Bank0404_Text_WhatWouldLike = What would you like to do with\n{013b:0}?
+Bank0404_Text_Empty_12 =        \x{ffff}
+Bank0404_Text_Empty_13 =     \x{ffff}
+Bank0404_Text_PleaseChooseTournamentWould_2 = Please choose the tournament\nyou would like to participate in.{be01}
+Bank0404_Text_WillParticipate = Will you participate in\n{013b:0}?
+Bank0404_Text_Participate = Participate
+Bank0404_Text_SeeDetails = See Details
+Bank0404_Text_Cancel = Cancel
+Bank0404_Text_Empty_14 = {0101:0}
+Bank0404_Text_Empty_15 = {0109:0}
+Bank0404_Text_Empty_16 = {0107:0}
+Bank0404_Text_Save = Save
+Bank0404_Text_WouldLikeStopDownloading = Would you like to stop\ndownloading tournament data?

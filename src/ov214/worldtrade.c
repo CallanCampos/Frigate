@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/worldtrade.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "dpw/dpw_tr.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -29,6 +30,7 @@
 #include "system/time_icon.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
+#include "text/system/0415.h"
 #include "worldtrade_local.h"
 
 // The Global Trade Station's proc: its work, the screens it switches between, and the graphics, menus and helpers
@@ -91,11 +93,11 @@ static BOOL WorldTradeProc_Init(GameProc *proc, u32 *state, void *param, void *w
     WorldTrade_PrintInit(&wk->print, wtParam->config);
 
     wk->wordSet = GFL_WordSetSystemCreate(11, 64, HEAPID_WORLDTRADE);
-    wk->msgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x19f, HEAPID_WORLDTRADE);
-    wk->lobbyMsgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x1a0, HEAPID_WORLDTRADE);
-    wk->systemMsgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x1b7, HEAPID_WORLDTRADE);
-    wk->monsNameManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x5a, HEAPID_WORLDTRADE);
-    wk->countryNameManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x1b6, HEAPID_WORLDTRADE);
+    wk->msgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0415, HEAPID_WORLDTRADE);
+    wk->lobbyMsgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0416, HEAPID_WORLDTRADE);
+    wk->systemMsgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, HEAPID_WORLDTRADE);
+    wk->monsNameManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_WORLDTRADE);
+    wk->countryNameManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF, HEAPID_WORLDTRADE);
 
     WorldTrade_InitWork(wk, wtParam);
     GFL_BGSysInitVRAM(0);
@@ -335,8 +337,8 @@ void WorldTrade_TouchWinYesNoMakeEx(WorldTradeWork *wk, int y, int cgx, int pale
         AppTaskMenuInit init;
 
         sys_memset(&init, 0, sizeof(AppTaskMenuInit));
-        items[0].str = GFL_MsgDataLoadStrbufNew(wk->msgManager, 0x3f);
-        items[1].str = GFL_MsgDataLoadStrbufNew(wk->msgManager, 0x40);
+        items[0].str = GFL_MsgDataLoadStrbufNew(wk->msgManager, Bank0415_Text_Yes);
+        items[1].str = GFL_MsgDataLoadStrbufNew(wk->msgManager, Bank0415_Text_No);
         init.heapId = HEAPID_WORLDTRADE;
         init.itemCount = 2;
         init.items = items;

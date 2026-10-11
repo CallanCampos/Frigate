@@ -1,6 +1,8 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_pass_power.h"
 #include "constants/items.h"
+#include "constants/script_text_banks.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -23,6 +25,7 @@
 #include "system/game_system.h"
 #include "system/str_tool.h"
 #include "system/wordset.h"
+#include "text/script/global_10435.h"
 
 // The pass power whose script gets 16 in place of its effect
 #define PASS_POWER_027 0x27
@@ -135,7 +138,7 @@ static void PassPowerList_Init(PassPowerListWork *work, GameSystem *gsys, Field 
     work->msgBGSys = Field_GetMsgBGSys(work->field);
     work->actorSystem = Field_GetActorSystem(work->field);
     work->passPowerData = PassPowerData_Create(work->heapId);
-    work->msgData = GFL_MsgSysLoadData(FALSE, 3, 414, work->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10435, work->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     work->strbuf = GFL_StrBufCreate(129, work->heapId);
     work->formatted = GFL_StrBufCreate(129, work->heapId);
@@ -249,9 +252,9 @@ static void PassPowerList_Print(PassPowerListWork *work) {
 
     // The High Link save is fetched and not used
     getHighLinkBlockAddress(GameData_GetSaveControl(work->gameData));
-    GFL_MsgDataLoadStrbuf(work->msgData, 5, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, Global10435_Text_ActivePassPower, work->strbuf);
     func_ov036_02187d28(work->listWindow, 0, 0, work->strbuf);
-    GFL_MsgDataLoadStrbuf(work->msgData, 7, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, Global10435_Text_Empty_3, work->strbuf);
 
     for (effect = 0, count = 0; effect < PASS_POWER_EFFECT_COUNT; effect++) {
         order[effect] = effect;

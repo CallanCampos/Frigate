@@ -1,5 +1,0 @@
-Trainers raise Pokémon.\nPokémon make Trainers strong.{be01}\nIt's always been that way\nand always will.{be01}\nIsn't that a solid thought?
-In good times and bad,\nPokémon will stay by your side.{be00}\nYou don't need anything{be00}\nmore than that, right?
-The people of the Unova region really\nlook up to the hero and Pokémon{be00}\nthat founded this place.{be01}\nThat shady Team Plasma tried to use\nthose feelings to their advantage!
-Ro gro!
-\pad{5a}

@@ -1,4 +1,0 @@
-What?\n{0102:0} is evolving!
-Huh? {0102:0}\nstopped evolving!
-Congratulations! Your {0102:0}\nevolved into {0101:1}!
-                          \x{ffff}

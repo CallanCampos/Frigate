@@ -1,350 +1,350 @@
-Greet
-Draw
-Battle
-Trade
-Cancel
-Spin
-    \x{ffff}
-{011c:2}{be02:15}{be01}\n{0100:0}\nhas contacted you.{be02:15}
-The chat has been dropped.
-Awaiting a response from\n{0100:0}...{be02:15}
-The chat was ended.
-You have an offer to see\n{0100:0}'s Trainer Card.{be01}\nWould you like to show your\nTrainer Card?
-This is the Trainer Card of\n{0100:0}, who lives in{be00}\n{0125:4},{be00}\n{0124:3}.{be02:60}
-This is the Trainer Card of\n{0100:0}, who lives in{be00}\n{0124:3}.{be02:60}
-This is the Trainer Card of\n{0100:0}, who lives in{be00}\n{0125:4}.{be02:60}
-This is {0100:0}'s\nTrainer Card.{be02:60}
-Waiting for the other player to finish.
-You declined the offer.
-{0100:0} has invited you to draw\nsomething.{be01}\nWould you like to join the other\nplayer and draw?
-                \x{ffff}
-You declined the offer.
-                                                        \x{ffff}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Single Battle\nwith no restrictions?{be01}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Single Battle\nwith Flat Battle rules?{be01}
-                                                       \x{ffff}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Double Battle\nwith no restrictions?{be01}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Double Battle\nwith Flat Battle rules?{be01}
-                                                        \x{ffff}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Triple Battle\nwith no restrictions?{be01}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Triple Battle\nwith Flat Battle rules?{be01}
-                                                              \x{ffff}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Rotation Battle\nwith no restrictions?{be01}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Rotation Battle\nwith Flat Battle rules?{be01}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Multi Battle\nwith no restrictions?{be01}
-{0100:0} proposed\na battle.{be01}\nWill you accept a Multi Battle\nwith Flat Battle rules?{be01}
-                  \x{ffff}
-You declined the offer.
-{0100:0} has offered to\nmake a trade.{be01}\nWill you accept this trade offer?
-The trade will be started!{be02:60}
-You declined the offer.
-You need at least two Pokémon\nin your party if you want to trade!
-                                                  \x{ffff}
-                  \x{ffff}
-              \x{ffff}
-{0100:0} has invited you to join\na Spin Trade session.{be01}\nWould you like to take part\nin the Spin Trade?
-                      \x{ffff}
-You declined the offer.
-You don't have an Egg.\nThe invitation was turned down.
-{011c:2}{be02:15}{be01}\nThis is {0100:0}! Is there\nsomething you wanted to do?
-{011c:2}{be02:15}{be01}\nHello, it's {0100:0}!\nWould you like to do something?
-Whoops! Sorry, but I have to do\nsomething else.{be00}\nAnother time, OK?
-Whoops! Sorry, but I have to do\nsomething else.{be00}\nAnother time, OK?
-What would you like to do?
-What would you like to do?
-...\nThe Trainer appears to be busy...
-... ...\nThe Trainer appears to be busy...
-{0100:0} did not reply...
-{0100:0} did not reply...
-Sure thing! Let me show you\nmy Trainer Card.
-Hi, let me introduce myself\nby showing you my Trainer Card.
-Huh? My Trainer Card...\nWhere'd it go now?{be01}\nSorry! I'll show you another time!
-Huh? My Trainer Card...\nWhere'd it go now?{be01}\nSorry! I'll show you another time!
-I'm just showing my Trainer Card\nas my way of a greeting.
-We're showing each other our\nTrainer Cards to get acquainted.
-I hope I get to know you better!
-Glad to meet you.\nPlease don't be a stranger!
-Oh, did you want to draw with me?\nSure thing, but hang on just a second.
-You want to draw with me?\nSure! Just give me a second...
-                              \x{ffff}
-                           \x{ffff}
-Oh, sorry! I can't now.\nLet's draw another time.
-Oh, I'm sorry!\nLet's draw another time!
-{0100:0}: We're drawing right\nnow.{be01}\nOh, I know! {0100:1}, would\nyou like to draw with us?
-{0100:0}: We're drawing right\nnow.{be01}\nOh, I know! {0100:1}, would\nyou like to draw with us?
-Oh, all right.\nCome see me anytime, OK?
-Oh...\nPlease come by anytime.
-OK! Just give me a second!
-OK! Just give me a second!
-OK! Let's do some drawing\ntogether!{be02:60}
-OK! Thanks for waiting!\nLet's get drawing!{be02:60}
-Oh, I'm sorry.\nI have too much to do right now.{be00}\nLet's draw some other time, OK?
-Oh, I'm sorry.\nI have too much to do right now.{be00}\nLet's draw some other time, OK?
-The last letter of what you draw has\nto be the first letter of what I draw?
-Wow!\nYou're really good!
-Stop drawing funny faces!\nIt hurts to laugh so much!
-Ahaha!\nWhat is that?!
-Wow, you're good!\nI'll try to imitate you!
-I love drawing!\nI can draw and draw!
-...Uh-huh... What is that?\nIs that supposed to be me?
-Oops!\nI can't stay inside the lines!
-A battle? Of course, but I need\ntime to get ready.
-A battle? Of course, but I need\ntime to get ready.
-Thanks for waiting!\nLet's get our battle started!{be02:60}
-Sorry I made you wait!\nLet's get started!{be02:60}
-Sorry! My Pokémon don't seem to\nbe feeling too well right now.{be00}\nLet me battle you another time.
-I'm terribly sorry, but my Pokémon\naren't feeling well...{be01}\nLet's battle another time.
-{0100:0}: We're about to have a\nMulti Battle.{be01}\nOh! {0100:1}, would you\njoin us in the Multi Battle?
-{0100:0}: We're about to have a\nMulti Battle.{be01}\nOh! {0100:1}, would you\njoin us in the Multi Battle?
-Oh, all right.\nCome see me anytime, OK?
-Oh...\nPlease come by anytime.
-OK! Just give me a second!
-OK! Just give me a second!
-Sorry to make you wait! OK then,\nlet's have a Multi Battle!{be02:60}
-Sorry to keep you waiting! OK then,\nlet's have a Multi Battle!{be02:60}
-Oh, I'm sorry.\nI have too much to do right now.{be00}\nAnother time, OK?
-Oh, sorry!\nLet's do this another time!
-You declined the offer.
-You declined the offer.
-Whoa!\nI can tell you're pretty tough!
-That Pokémon...\nIt's been raised really well!
-You used that move?\nThat's good strategy!
-That's it!\nThis is the right move now!
-Way to go!\nThat was an eye-opener!
-That's awesome!\nI've never seen that battle style!
-Oh! How could you use that\nPokémon in that situation?
-You have exquisite timing for\nswitching Pokémon!
-You want to trade, huh?\nSure, hold on just a second.
-A trade? Of course, but I need\ntime to get ready.
-                           \x{ffff}
-                        \x{ffff}
-Sorry! I don't have a Pokémon\nthat I can trade right now.{be01}\nLet's trade some other time.
-I'm sorry, but I don't have any\nPokémon that I can trade now...{be01}\nLet's trade some other time!
-Oh yeah!\nI really wanted this Pokémon!
-I'm trading Pokémon right now.
-Finally, I got that Pokémon\nI've wanted for so long.
-I finally got that Pokémon\nI wanted in a trade!
-You can't trade if you have only one\nPokémon with you.{be01}
-You can't trade if you have only\none Pokémon with you.{be01}
-If you want to do something\nwith me, just give me a shout!
-If you want to do something\nwith me, don't be shy. Just ask!
-                           \x{ffff}
-                         \x{ffff}
-                     \x{ffff}
-                       \x{ffff}
-                                           \x{ffff}
-                     \x{ffff}
-                                                               \x{ffff}
-                                                               \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                            \x{ffff}
-                               \x{ffff}
-                                           \x{ffff}
-                     \x{ffff}
-               \x{ffff}
-               \x{ffff}
-          \x{ffff}
-           \x{ffff}
-         \x{ffff}
-         \x{ffff}
-            \x{ffff}
-                \x{ffff}
-Spin Trade? Sure!\nOK, just hold on a second!
-Spin Trade? Of course!\nOK, can you just wait a moment?
-                          \x{ffff}
-                           \x{ffff}
-Oh, I'm sorry.\nI have too much to do right now.{be00}\nAnother time, OK?
-Oh, sorry!\nLet's do this another time!
-You need an Egg if you want to take\npart in a Spin Trade.{be01}
-You need an Egg if you want to\ntake part in a Spin Trade.{be01}
-{0100:0}: We're going to do a Spin\nTrade now.{be01}\nHey, {0100:1}! Do you want to join\nus for a Spin Trade, too?
-{0100:0}: We were doing Spin Trades\njust now.{be01}\n{0100:1}, do you want to join us\nand do some Spin Trades, too?
-Oh, all right.\nCome see me anytime, OK?
-Oh...\nPlease come by anytime.
-OK! Just give me a second!
-OK! Just give me a second!
-OK!\nLet's do a Spin Trade together!{be02:60}
-OK!\nLet's do a Spin Trade together!{be02:60}
-What's this?\nIt looks like you don't have an Egg.{be01}\nWhen you have an Egg, please come back!
-What's this?\nIt looks like you don't have an Egg.{be01}\nWhen you bring an Egg,\nlet's do this again!
-Oh, I'm sorry.\nI have too much to do right now.{be00}\nAnother time, OK?
-Oh, sorry!\nLet's do this another time!
-There is an Egg that cannot be traded\nin your party.
-There is an Egg that cannot be traded\nin your party.
-There is an Egg that cannot be traded\nin your party.{be01}
-There is an Egg that cannot be traded\nin your party.{be01}
-Spin Trades are so much fun!
-We're doing Spin Trades!
-There!\nStop there!
-Wah!\nIt moved again!
-My Egg's awesome!
-There goes the Egg I wanted...
-Yes!\nI got the Egg I wanted!
-If it stopped there,\nI would've gotten a Berry.
-Welcome to the Union Room.{be01}\nIf there is anything you need help with,\nplease let me know!{be01}
-                     \x{ffff}
-Which topic would you\nlike me to explain?
-There are five Battle Formats.{be01}\nSingle Battle is for two Trainers\nwith one or more Pokémon each.{be01}\nEach Trainer can have one Pokémon\nin battle at a time.{be01}\nDouble Battle is for two Trainers\nwith two or more Pokémon each.{be01}\nEach Trainer will send out two\nPokémon to battle at a time.{be01}\nTriple Battle is for two Trainers\nwith three or more Pokémon each.{be01}\nEach Trainer puts three Pokémon\ninto battle at one time.{be01}\nRotation Battle is for two Trainers.\nEach Trainer sends three Pokémon{be00}\ninto battle, with one Pokémon in front{be00}\nand the other two in back.{be01}\nMulti Battle is for four Trainers\nwith one or more Pokémon each.{be01}\nEach Trainer can have one Pokémon\nin battle at a time.{be01}
-You may trade your Pokémon with\nother players.{be01}\nMeeting new people could be a\nshortcut to meeting rare Pokémon!{be01}
-                                                                                                                                                   \x{ffff}
-In a Spin Trade, each participant brings\nan Egg to trade with others.{be01}\nWhich Egg will you end up with?\nWhat kind of Pokémon is in that Egg?{be00}\nIt's quite exciting and fun!{be01}\nUp to five players can take part,\nso try it with your friends!{be01}
-You may get together with others\nand draw.{be01}\nYou all work on one sheet\nof paper at the same time.{be01}\nI'm sure a drawing made by friends\nwill be a memorable masterpiece!{be01}\nUp to five players can take part,\nso try it with your friends!{be01}
-You can chat with other people\nby selecting “CHAT" in the menu.{be01}\nGo out and meet other players in\nthe Union Room!{be01}\nLet people know what you're like\nand what you'd like to do.{be01}\nMingle, chat, and add to your\ncircle of friends!{be01}
-                                                       \x{ffff}
-                                       \x{ffff}
-                                                            \x{ffff}
-                                                              \x{ffff}
-                                                                                                                                     \x{ffff}
-                                                                                                   \x{ffff}
-                                                                                                       \x{ffff}
-                                                                                   \x{ffff}
-                                                                                                                            \x{ffff}
-                                                             \x{ffff}
-                                                  \x{ffff}
-                                                                                      \x{ffff}
-                                                                            \x{ffff}
-                                                                                 \x{ffff}
-                                                                                               \x{ffff}
-                                                                         \x{ffff}
-                                                            \x{ffff}
-                                                                                               \x{ffff}
-                                                                \x{ffff}
-                                                                                                \x{ffff}
-                                                                                                      \x{ffff}
-                                                                        \x{ffff}
-                                                                                  \x{ffff}
-    \x{ffff}
-      \x{ffff}
-CANCEL
-Battle
-Trade
-    \x{ffff}
-Spin
-Draw
-Chat
-Cancel
-Talking to {0100:0}...
-Whoops! Sorry, but I have to do\nsomething else.{be00}\nAnother time, OK?
-    \x{ffff}
-         \x{ffff}
-         \x{ffff}
-こんにちは\x{ff01}
-Hello!
-Bonjour!
-Ciao!
-Hallo!
-Hola!
-H-e-l-l-o-!
-안녕하세요
-Battles for two
-Battles for four
-Cancel
-Single Battle
-Double Battle
-Triple Battle
-Rotation Battle
-Confirm
-Rules
-Cancel
-        \x{ffff}
-No Restrictions
-Flat Battle
-Wonder Launcher on
-Wonder Launcher off
-Cancel
-Battle Format{bd05:115}: {ff00:2}Single Battle{ff00:0}
-Battle Format{bd05:115}: {ff00:2}Double Battle{ff00:0}
-Battle Format{bd05:115}: {ff00:2}Triple Battle{ff00:0}
-Battle Format{bd05:115}: {ff00:2}Rotation Battle{ff00:0}
-Battle Format{bd05:115}: Multi Battle
-Battle Rules{bd05:115}: {ff00:2}No Restrictions{ff00:0}
-Battle Rules{bd05:115}: {ff00:2}Flat Battle{ff00:0}
-Wonder Launcher{bd05:115}: {ff00:2}On{ff00:0}
-Wonder Launcher{bd05:115}: {ff00:2}Off{ff00:0}
-                              \x{ffff}
-                              \x{ffff}
-                                 \x{ffff}
-                                 \x{ffff}
-                                 \x{ffff}
-                              \x{ffff}
-                  \x{ffff}
-            \x{ffff}
-            \x{ffff}
-                               \x{ffff}
-    \x{ffff}
-       \x{ffff}
-    \x{ffff}
-You don't meet the conditions,\nso you cannot participate.
-Please wait a moment...\nPress the B Button to cancel.
-Please choose the Pokémon\nthat will participate.{be02:60}
-Please select the three Pokémon\nthat will participate.{be02:60}
-Please select the four Pokémon\nthat will participate.{be02:60}
-Please select the six Pokémon\nthat will participate.{be02:60}
-Please select up to three Pokémon\nthat will participate.{be02:60}
-Please wait a moment.
-         \x{ffff}
-                           \x{ffff}
-         \x{ffff}
-             \x{ffff}
-         \x{ffff}
-                      \x{ffff}
-                      \x{ffff}
-                    \x{ffff}
-                    \x{ffff}
-                     \x{ffff}
-                     \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                      \x{ffff}
-                      \x{ffff}
-                    \x{ffff}
-                    \x{ffff}
-                         \x{ffff}
-                         \x{ffff}
-                       \x{ffff}
-                       \x{ffff}
-                 \x{ffff}
-             \x{ffff}
-             \x{ffff}
-            \x{ffff}
-            \x{ffff}
-                \x{ffff}
-       \x{ffff}
-        \x{ffff}
-       \x{ffff}
-                  \x{ffff}
-                 \x{ffff}
-I don't know this game, so I won't play!
-I don't meet the conditions, so I\ncan't battle!
-                 \x{ffff}
-Please wait a moment.
-                \x{ffff}
-                          \x{ffff}
-                \x{ffff}
-                        \x{ffff}
-              \x{ffff}
-                             \x{ffff}
-                \x{ffff}
-                         \x{ffff}
-            \x{ffff}
-                 \x{ffff}
-         \x{ffff}
-Ending communication.\nPlease wait...{be02:60}
-Please wait a moment...\nPress the B Button to cancel.
-Communication will end.\nIs that OK?
-Party
-Battle Box
-... ...\nThe Trainer appears to be busy...
-                  \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-                      \x{ffff}
-This is {0100:0}'s Trainer Card!{be01}\n...It's a Normal Card!
-This is {0100:0}'s Trainer Card!{be01}\n...It's a Bronze Card!
-This is {0100:0}'s Trainer Card!{be01}\n...It's a Copper Card!
-This is {0100:0}'s Trainer Card!{be01}\n...It's a Silver Card!
-This is {0100:0}'s Trainer Card!{be01}\n...It's a Gold Card!
-This is {0100:0}'s Trainer Card!{be01}\n...It's a White Card!
-This is {0100:0}'s Trainer Card!{be01}\n...It's a Black Card!
-This is {0100:0}'s Trainer Card!{be01}\n...It's a Card you haven't seen before!
+Bank0399_Text_Greet = Greet
+Bank0399_Text_Draw = Draw
+Bank0399_Text_Battle = Battle
+Bank0399_Text_Trade = Trade
+Bank0399_Text_Cancel = Cancel
+Bank0399_Text_Spin = Spin
+Bank0399_Text_Empty =     \x{ffff}
+Bank0399_Text_HasContacted = {011c:2}{be02:15}{be01}\n{0100:0}\nhas contacted you.{be02:15}
+Bank0399_Text_ChatHasBeenDropped = The chat has been dropped.
+Bank0399_Text_AwaitingResponseFrom = Awaiting a response from\n{0100:0}...{be02:15}
+Bank0399_Text_ChatEnded = The chat was ended.
+Bank0399_Text_HaveOfferSeeS = You have an offer to see\n{0100:0}'s Trainer Card.{be01}\nWould you like to show your\nTrainer Card?
+Bank0399_Text_TrainerCardWhoLives = This is the Trainer Card of\n{0100:0}, who lives in{be00}\n{0125:4},{be00}\n{0124:3}.{be02:60}
+Bank0399_Text_TrainerCardWhoLives_2 = This is the Trainer Card of\n{0100:0}, who lives in{be00}\n{0124:3}.{be02:60}
+Bank0399_Text_TrainerCardWhoLives_3 = This is the Trainer Card of\n{0100:0}, who lives in{be00}\n{0125:4}.{be02:60}
+Bank0399_Text_STrainerCard = This is {0100:0}'s\nTrainer Card.{be02:60}
+Bank0399_Text_WaitingOtherPlayerFinish = Waiting for the other player to finish.
+Bank0399_Text_DeclinedOffer = You declined the offer.
+Bank0399_Text_HasInvitedDrawSomething = {0100:0} has invited you to draw\nsomething.{be01}\nWould you like to join the other\nplayer and draw?
+Bank0399_Text_Empty_2 =                 \x{ffff}
+Bank0399_Text_DeclinedOffer_2 = You declined the offer.
+Bank0399_Text_Empty_3 =                                                         \x{ffff}
+Bank0399_Text_ProposedBattleWillAccept = {0100:0} proposed\na battle.{be01}\nWill you accept a Single Battle\nwith no restrictions?{be01}
+Bank0399_Text_ProposedBattleWillAccept_2 = {0100:0} proposed\na battle.{be01}\nWill you accept a Single Battle\nwith Flat Battle rules?{be01}
+Bank0399_Text_Empty_4 =                                                        \x{ffff}
+Bank0399_Text_ProposedBattleWillAccept_3 = {0100:0} proposed\na battle.{be01}\nWill you accept a Double Battle\nwith no restrictions?{be01}
+Bank0399_Text_ProposedBattleWillAccept_4 = {0100:0} proposed\na battle.{be01}\nWill you accept a Double Battle\nwith Flat Battle rules?{be01}
+Bank0399_Text_Empty_5 =                                                         \x{ffff}
+Bank0399_Text_ProposedBattleWillAccept_5 = {0100:0} proposed\na battle.{be01}\nWill you accept a Triple Battle\nwith no restrictions?{be01}
+Bank0399_Text_ProposedBattleWillAccept_6 = {0100:0} proposed\na battle.{be01}\nWill you accept a Triple Battle\nwith Flat Battle rules?{be01}
+Bank0399_Text_Empty_6 =                                                               \x{ffff}
+Bank0399_Text_ProposedBattleWillAccept_7 = {0100:0} proposed\na battle.{be01}\nWill you accept a Rotation Battle\nwith no restrictions?{be01}
+Bank0399_Text_ProposedBattleWillAccept_8 = {0100:0} proposed\na battle.{be01}\nWill you accept a Rotation Battle\nwith Flat Battle rules?{be01}
+Bank0399_Text_ProposedBattleWillAccept_9 = {0100:0} proposed\na battle.{be01}\nWill you accept a Multi Battle\nwith no restrictions?{be01}
+Bank0399_Text_ProposedBattleWillAccept_10 = {0100:0} proposed\na battle.{be01}\nWill you accept a Multi Battle\nwith Flat Battle rules?{be01}
+Bank0399_Text_Empty_7 =                   \x{ffff}
+Bank0399_Text_DeclinedOffer_3 = You declined the offer.
+Bank0399_Text_HasOfferedMakeTrade = {0100:0} has offered to\nmake a trade.{be01}\nWill you accept this trade offer?
+Bank0399_Text_TradeWillStarted = The trade will be started!{be02:60}
+Bank0399_Text_DeclinedOffer_4 = You declined the offer.
+Bank0399_Text_NeedLeastTwoPokemon = You need at least two Pokémon\nin your party if you want to trade!
+Bank0399_Text_Empty_8 =                                                   \x{ffff}
+Bank0399_Text_Empty_9 =                   \x{ffff}
+Bank0399_Text_Empty_10 =               \x{ffff}
+Bank0399_Text_HasInvitedJoinSpin = {0100:0} has invited you to join\na Spin Trade session.{be01}\nWould you like to take part\nin the Spin Trade?
+Bank0399_Text_Empty_11 =                       \x{ffff}
+Bank0399_Text_DeclinedOffer_5 = You declined the offer.
+Bank0399_Text_DontHaveEggInvitation = You don't have an Egg.\nThe invitation was turned down.
+Bank0399_Text_ThereSomethingWanted = {011c:2}{be02:15}{be01}\nThis is {0100:0}! Is there\nsomething you wanted to do?
+Bank0399_Text_HelloItsWouldLike = {011c:2}{be02:15}{be01}\nHello, it's {0100:0}!\nWould you like to do something?
+Bank0399_Text_WhoopsSorryButHave = Whoops! Sorry, but I have to do\nsomething else.{be00}\nAnother time, OK?
+Bank0399_Text_WhoopsSorryButHave_2 = Whoops! Sorry, but I have to do\nsomething else.{be00}\nAnother time, OK?
+Bank0399_Text_WhatWouldLike = What would you like to do?
+Bank0399_Text_WhatWouldLike_2 = What would you like to do?
+Bank0399_Text_TrainerAppearsBusy = ...\nThe Trainer appears to be busy...
+Bank0399_Text_TrainerAppearsBusy_2 = ... ...\nThe Trainer appears to be busy...
+Bank0399_Text_DidNotReply = {0100:0} did not reply...
+Bank0399_Text_DidNotReply_2 = {0100:0} did not reply...
+Bank0399_Text_SureThingLetShow = Sure thing! Let me show you\nmy Trainer Card.
+Bank0399_Text_HiLetIntroduceMyself = Hi, let me introduce myself\nby showing you my Trainer Card.
+Bank0399_Text_HuhTrainerCardWhered = Huh? My Trainer Card...\nWhere'd it go now?{be01}\nSorry! I'll show you another time!
+Bank0399_Text_HuhTrainerCardWhered_2 = Huh? My Trainer Card...\nWhere'd it go now?{be01}\nSorry! I'll show you another time!
+Bank0399_Text_ImJustShowingTrainer = I'm just showing my Trainer Card\nas my way of a greeting.
+Bank0399_Text_WereShowingEachOther = We're showing each other our\nTrainer Cards to get acquainted.
+Bank0399_Text_HopeGetKnowBetter = I hope I get to know you better!
+Bank0399_Text_GladMeetPleaseDont = Glad to meet you.\nPlease don't be a stranger!
+Bank0399_Text_OhDidWantDraw = Oh, did you want to draw with me?\nSure thing, but hang on just a second.
+Bank0399_Text_WantDrawSureJust = You want to draw with me?\nSure! Just give me a second...
+Bank0399_Text_Empty_12 =                               \x{ffff}
+Bank0399_Text_Empty_13 =                            \x{ffff}
+Bank0399_Text_OhSorryCantNow = Oh, sorry! I can't now.\nLet's draw another time.
+Bank0399_Text_OhImSorryLets = Oh, I'm sorry!\nLet's draw another time!
+Bank0399_Text_WereDrawingRightNow = {0100:0}: We're drawing right\nnow.{be01}\nOh, I know! {0100:1}, would\nyou like to draw with us?
+Bank0399_Text_WereDrawingRightNow_2 = {0100:0}: We're drawing right\nnow.{be01}\nOh, I know! {0100:1}, would\nyou like to draw with us?
+Bank0399_Text_OhAllRightCome = Oh, all right.\nCome see me anytime, OK?
+Bank0399_Text_OhPleaseComeBy = Oh...\nPlease come by anytime.
+Bank0399_Text_OkJustGiveSecond = OK! Just give me a second!
+Bank0399_Text_OkJustGiveSecond_2 = OK! Just give me a second!
+Bank0399_Text_OkLetsSomeDrawing = OK! Let's do some drawing\ntogether!{be02:60}
+Bank0399_Text_OkThanksWaitingLets = OK! Thanks for waiting!\nLet's get drawing!{be02:60}
+Bank0399_Text_OhImSorryHave = Oh, I'm sorry.\nI have too much to do right now.{be00}\nLet's draw some other time, OK?
+Bank0399_Text_OhImSorryHave_2 = Oh, I'm sorry.\nI have too much to do right now.{be00}\nLet's draw some other time, OK?
+Bank0399_Text_LastLetterWhatDraw = The last letter of what you draw has\nto be the first letter of what I draw?
+Bank0399_Text_WowYoureReallyGood = Wow!\nYou're really good!
+Bank0399_Text_StopDrawingFunnyFaces = Stop drawing funny faces!\nIt hurts to laugh so much!
+Bank0399_Text_AhahaWhat = Ahaha!\nWhat is that?!
+Bank0399_Text_WowYoureGoodIll = Wow, you're good!\nI'll try to imitate you!
+Bank0399_Text_LoveDrawingCanDraw = I love drawing!\nI can draw and draw!
+Bank0399_Text_UhHuhWhatSupposed = ...Uh-huh... What is that?\nIs that supposed to be me?
+Bank0399_Text_OopsCantStayInside = Oops!\nI can't stay inside the lines!
+Bank0399_Text_BattleCourseButNeed = A battle? Of course, but I need\ntime to get ready.
+Bank0399_Text_BattleCourseButNeed_2 = A battle? Of course, but I need\ntime to get ready.
+Bank0399_Text_ThanksWaitingLetsGet = Thanks for waiting!\nLet's get our battle started!{be02:60}
+Bank0399_Text_SorryMadeWaitLets = Sorry I made you wait!\nLet's get started!{be02:60}
+Bank0399_Text_SorryPokemonDontSeem = Sorry! My Pokémon don't seem to\nbe feeling too well right now.{be00}\nLet me battle you another time.
+Bank0399_Text_ImTerriblySorryBut = I'm terribly sorry, but my Pokémon\naren't feeling well...{be01}\nLet's battle another time.
+Bank0399_Text_WereAboutHaveMulti = {0100:0}: We're about to have a\nMulti Battle.{be01}\nOh! {0100:1}, would you\njoin us in the Multi Battle?
+Bank0399_Text_WereAboutHaveMulti_2 = {0100:0}: We're about to have a\nMulti Battle.{be01}\nOh! {0100:1}, would you\njoin us in the Multi Battle?
+Bank0399_Text_OhAllRightCome_2 = Oh, all right.\nCome see me anytime, OK?
+Bank0399_Text_OhPleaseComeBy_2 = Oh...\nPlease come by anytime.
+Bank0399_Text_OkJustGiveSecond_3 = OK! Just give me a second!
+Bank0399_Text_OkJustGiveSecond_4 = OK! Just give me a second!
+Bank0399_Text_SorryMakeWaitOk = Sorry to make you wait! OK then,\nlet's have a Multi Battle!{be02:60}
+Bank0399_Text_SorryKeepWaitingOk = Sorry to keep you waiting! OK then,\nlet's have a Multi Battle!{be02:60}
+Bank0399_Text_OhImSorryHave_3 = Oh, I'm sorry.\nI have too much to do right now.{be00}\nAnother time, OK?
+Bank0399_Text_OhSorryLetsAnother = Oh, sorry!\nLet's do this another time!
+Bank0399_Text_DeclinedOffer_6 = You declined the offer.
+Bank0399_Text_DeclinedOffer_7 = You declined the offer.
+Bank0399_Text_WhoaCanTellYoure = Whoa!\nI can tell you're pretty tough!
+Bank0399_Text_PokemonItsBeenRaised = That Pokémon...\nIt's been raised really well!
+Bank0399_Text_UsedMoveThatsGood = You used that move?\nThat's good strategy!
+Bank0399_Text_ThatsRightMoveNow = That's it!\nThis is the right move now!
+Bank0399_Text_WayGoEyeOpener = Way to go!\nThat was an eye-opener!
+Bank0399_Text_ThatsAwesomeIveNever = That's awesome!\nI've never seen that battle style!
+Bank0399_Text_OhHowCouldUse = Oh! How could you use that\nPokémon in that situation?
+Bank0399_Text_HaveExquisiteTimingSwitching = You have exquisite timing for\nswitching Pokémon!
+Bank0399_Text_WantTradeHuhSure = You want to trade, huh?\nSure, hold on just a second.
+Bank0399_Text_TradeCourseButNeed = A trade? Of course, but I need\ntime to get ready.
+Bank0399_Text_Empty_14 =                            \x{ffff}
+Bank0399_Text_Empty_15 =                         \x{ffff}
+Bank0399_Text_SorryDontHavePokemon = Sorry! I don't have a Pokémon\nthat I can trade right now.{be01}\nLet's trade some other time.
+Bank0399_Text_ImSorryButDont = I'm sorry, but I don't have any\nPokémon that I can trade now...{be01}\nLet's trade some other time!
+Bank0399_Text_OhYeahReallyWanted = Oh yeah!\nI really wanted this Pokémon!
+Bank0399_Text_ImTradingPokemonRight = I'm trading Pokémon right now.
+Bank0399_Text_FinallyGotPokemonIve = Finally, I got that Pokémon\nI've wanted for so long.
+Bank0399_Text_FinallyGotPokemonWanted = I finally got that Pokémon\nI wanted in a trade!
+Bank0399_Text_CantTradeIfHave = You can't trade if you have only one\nPokémon with you.{be01}
+Bank0399_Text_CantTradeIfHave_2 = You can't trade if you have only\none Pokémon with you.{be01}
+Bank0399_Text_IfWantSomethingJust = If you want to do something\nwith me, just give me a shout!
+Bank0399_Text_IfWantSomethingDont = If you want to do something\nwith me, don't be shy. Just ask!
+Bank0399_Text_Empty_16 =                            \x{ffff}
+Bank0399_Text_Empty_17 =                          \x{ffff}
+Bank0399_Text_Empty_18 =                      \x{ffff}
+Bank0399_Text_Empty_19 =                        \x{ffff}
+Bank0399_Text_Empty_20 =                                            \x{ffff}
+Bank0399_Text_Empty_21 =                      \x{ffff}
+Bank0399_Text_Empty_22 =                                                                \x{ffff}
+Bank0399_Text_Empty_23 =                                                                \x{ffff}
+Bank0399_Text_Empty_24 =                  \x{ffff}
+Bank0399_Text_Empty_25 =                  \x{ffff}
+Bank0399_Text_Empty_26 =                             \x{ffff}
+Bank0399_Text_Empty_27 =                                \x{ffff}
+Bank0399_Text_Empty_28 =                                            \x{ffff}
+Bank0399_Text_Empty_29 =                      \x{ffff}
+Bank0399_Text_Empty_30 =                \x{ffff}
+Bank0399_Text_Empty_31 =                \x{ffff}
+Bank0399_Text_Empty_32 =           \x{ffff}
+Bank0399_Text_Empty_33 =            \x{ffff}
+Bank0399_Text_Empty_34 =          \x{ffff}
+Bank0399_Text_Empty_35 =          \x{ffff}
+Bank0399_Text_Empty_36 =             \x{ffff}
+Bank0399_Text_Empty_37 =                 \x{ffff}
+Bank0399_Text_SpinTradeSureOk = Spin Trade? Sure!\nOK, just hold on a second!
+Bank0399_Text_SpinTradeCourseOk = Spin Trade? Of course!\nOK, can you just wait a moment?
+Bank0399_Text_Empty_38 =                           \x{ffff}
+Bank0399_Text_Empty_39 =                            \x{ffff}
+Bank0399_Text_OhImSorryHave_4 = Oh, I'm sorry.\nI have too much to do right now.{be00}\nAnother time, OK?
+Bank0399_Text_OhSorryLetsAnother_2 = Oh, sorry!\nLet's do this another time!
+Bank0399_Text_NeedEggIfWant = You need an Egg if you want to take\npart in a Spin Trade.{be01}
+Bank0399_Text_NeedEggIfWant_2 = You need an Egg if you want to\ntake part in a Spin Trade.{be01}
+Bank0399_Text_WereGoingSpinTrade = {0100:0}: We're going to do a Spin\nTrade now.{be01}\nHey, {0100:1}! Do you want to join\nus for a Spin Trade, too?
+Bank0399_Text_WeWereDoingSpin = {0100:0}: We were doing Spin Trades\njust now.{be01}\n{0100:1}, do you want to join us\nand do some Spin Trades, too?
+Bank0399_Text_OhAllRightCome_3 = Oh, all right.\nCome see me anytime, OK?
+Bank0399_Text_OhPleaseComeBy_3 = Oh...\nPlease come by anytime.
+Bank0399_Text_OkJustGiveSecond_5 = OK! Just give me a second!
+Bank0399_Text_OkJustGiveSecond_6 = OK! Just give me a second!
+Bank0399_Text_OkLetsSpinTrade = OK!\nLet's do a Spin Trade together!{be02:60}
+Bank0399_Text_OkLetsSpinTrade_2 = OK!\nLet's do a Spin Trade together!{be02:60}
+Bank0399_Text_WhatsLooksLikeDont = What's this?\nIt looks like you don't have an Egg.{be01}\nWhen you have an Egg, please come back!
+Bank0399_Text_WhatsLooksLikeDont_2 = What's this?\nIt looks like you don't have an Egg.{be01}\nWhen you bring an Egg,\nlet's do this again!
+Bank0399_Text_OhImSorryHave_5 = Oh, I'm sorry.\nI have too much to do right now.{be00}\nAnother time, OK?
+Bank0399_Text_OhSorryLetsAnother_3 = Oh, sorry!\nLet's do this another time!
+Bank0399_Text_ThereEggCannotTraded = There is an Egg that cannot be traded\nin your party.
+Bank0399_Text_ThereEggCannotTraded_2 = There is an Egg that cannot be traded\nin your party.
+Bank0399_Text_ThereEggCannotTraded_3 = There is an Egg that cannot be traded\nin your party.{be01}
+Bank0399_Text_ThereEggCannotTraded_4 = There is an Egg that cannot be traded\nin your party.{be01}
+Bank0399_Text_SpinTradesMuchFun = Spin Trades are so much fun!
+Bank0399_Text_WereDoingSpinTrades = We're doing Spin Trades!
+Bank0399_Text_ThereStopThere = There!\nStop there!
+Bank0399_Text_WahMovedAgain = Wah!\nIt moved again!
+Bank0399_Text_EggsAwesome = My Egg's awesome!
+Bank0399_Text_ThereGoesEggWanted = There goes the Egg I wanted...
+Bank0399_Text_YesGotEggWanted = Yes!\nI got the Egg I wanted!
+Bank0399_Text_IfStoppedThereWouldve = If it stopped there,\nI would've gotten a Berry.
+Bank0399_Text_WelcomeUnionRoomIf = Welcome to the Union Room.{be01}\nIf there is anything you need help with,\nplease let me know!{be01}
+Bank0399_Text_Empty_40 =                      \x{ffff}
+Bank0399_Text_WhichTopicWouldLike = Which topic would you\nlike me to explain?
+Bank0399_Text_ThereFiveBattleFormats = There are five Battle Formats.{be01}\nSingle Battle is for two Trainers\nwith one or more Pokémon each.{be01}\nEach Trainer can have one Pokémon\nin battle at a time.{be01}\nDouble Battle is for two Trainers\nwith two or more Pokémon each.{be01}\nEach Trainer will send out two\nPokémon to battle at a time.{be01}\nTriple Battle is for two Trainers\nwith three or more Pokémon each.{be01}\nEach Trainer puts three Pokémon\ninto battle at one time.{be01}\nRotation Battle is for two Trainers.\nEach Trainer sends three Pokémon{be00}\ninto battle, with one Pokémon in front{be00}\nand the other two in back.{be01}\nMulti Battle is for four Trainers\nwith one or more Pokémon each.{be01}\nEach Trainer can have one Pokémon\nin battle at a time.{be01}
+Bank0399_Text_MayTradePokemonOther = You may trade your Pokémon with\nother players.{be01}\nMeeting new people could be a\nshortcut to meeting rare Pokémon!{be01}
+Bank0399_Text_Empty_41 =                                                                                                                                                    \x{ffff}
+Bank0399_Text_SpinTradeEachParticipant = In a Spin Trade, each participant brings\nan Egg to trade with others.{be01}\nWhich Egg will you end up with?\nWhat kind of Pokémon is in that Egg?{be00}\nIt's quite exciting and fun!{be01}\nUp to five players can take part,\nso try it with your friends!{be01}
+Bank0399_Text_MayGetTogetherOthers = You may get together with others\nand draw.{be01}\nYou all work on one sheet\nof paper at the same time.{be01}\nI'm sure a drawing made by friends\nwill be a memorable masterpiece!{be01}\nUp to five players can take part,\nso try it with your friends!{be01}
+Bank0399_Text_CanChatOtherPeople = You can chat with other people\nby selecting “CHAT" in the menu.{be01}\nGo out and meet other players in\nthe Union Room!{be01}\nLet people know what you're like\nand what you'd like to do.{be01}\nMingle, chat, and add to your\ncircle of friends!{be01}
+Bank0399_Text_Empty_42 =                                                        \x{ffff}
+Bank0399_Text_Empty_43 =                                        \x{ffff}
+Bank0399_Text_Empty_44 =                                                             \x{ffff}
+Bank0399_Text_Empty_45 =                                                               \x{ffff}
+Bank0399_Text_Empty_46 =                                                                                                                                      \x{ffff}
+Bank0399_Text_Empty_47 =                                                                                                    \x{ffff}
+Bank0399_Text_Empty_48 =                                                                                                        \x{ffff}
+Bank0399_Text_Empty_49 =                                                                                    \x{ffff}
+Bank0399_Text_Empty_50 =                                                                                                                             \x{ffff}
+Bank0399_Text_Empty_51 =                                                              \x{ffff}
+Bank0399_Text_Empty_52 =                                                   \x{ffff}
+Bank0399_Text_Empty_53 =                                                                                       \x{ffff}
+Bank0399_Text_Empty_54 =                                                                             \x{ffff}
+Bank0399_Text_Empty_55 =                                                                                  \x{ffff}
+Bank0399_Text_Empty_56 =                                                                                                \x{ffff}
+Bank0399_Text_Empty_57 =                                                                          \x{ffff}
+Bank0399_Text_Empty_58 =                                                             \x{ffff}
+Bank0399_Text_Empty_59 =                                                                                                \x{ffff}
+Bank0399_Text_Empty_60 =                                                                 \x{ffff}
+Bank0399_Text_Empty_61 =                                                                                                 \x{ffff}
+Bank0399_Text_Empty_62 =                                                                                                       \x{ffff}
+Bank0399_Text_Empty_63 =                                                                         \x{ffff}
+Bank0399_Text_Empty_64 =                                                                                   \x{ffff}
+Bank0399_Text_Empty_65 =     \x{ffff}
+Bank0399_Text_Empty_66 =       \x{ffff}
+Bank0399_Text_Cancel_2 = CANCEL
+Bank0399_Text_Battle_2 = Battle
+Bank0399_Text_Trade_2 = Trade
+Bank0399_Text_Empty_67 =     \x{ffff}
+Bank0399_Text_Spin_2 = Spin
+Bank0399_Text_Draw_2 = Draw
+Bank0399_Text_Chat = Chat
+Bank0399_Text_Cancel_3 = Cancel
+Bank0399_Text_Talking = Talking to {0100:0}...
+Bank0399_Text_WhoopsSorryButHave_3 = Whoops! Sorry, but I have to do\nsomething else.{be00}\nAnother time, OK?
+Bank0399_Text_Empty_68 =     \x{ffff}
+Bank0399_Text_Empty_69 =          \x{ffff}
+Bank0399_Text_Empty_70 =          \x{ffff}
+Bank0399_Text_Empty_71 = こんにちは\x{ff01}
+Bank0399_Text_Hello = Hello!
+Bank0399_Text_Bonjour = Bonjour!
+Bank0399_Text_Ciao = Ciao!
+Bank0399_Text_Hallo = Hallo!
+Bank0399_Text_Hola = Hola!
+Bank0399_Text_HELL = H-e-l-l-o-!
+Bank0399_Text_Empty_72 = 안녕하세요
+Bank0399_Text_BattlesTwo = Battles for two
+Bank0399_Text_BattlesFour = Battles for four
+Bank0399_Text_Cancel_4 = Cancel
+Bank0399_Text_SingleBattle = Single Battle
+Bank0399_Text_DoubleBattle = Double Battle
+Bank0399_Text_TripleBattle = Triple Battle
+Bank0399_Text_RotationBattle = Rotation Battle
+Bank0399_Text_Confirm = Confirm
+Bank0399_Text_Rules = Rules
+Bank0399_Text_Cancel_5 = Cancel
+Bank0399_Text_Empty_73 =         \x{ffff}
+Bank0399_Text_NoRestrictions = No Restrictions
+Bank0399_Text_FlatBattle = Flat Battle
+Bank0399_Text_WonderLauncher = Wonder Launcher on
+Bank0399_Text_WonderLauncherOff = Wonder Launcher off
+Bank0399_Text_Cancel_6 = Cancel
+Bank0399_Text_BattleFormatSingleBattle = Battle Format{bd05:115}: {ff00:2}Single Battle{ff00:0}
+Bank0399_Text_BattleFormatDoubleBattle = Battle Format{bd05:115}: {ff00:2}Double Battle{ff00:0}
+Bank0399_Text_BattleFormatTripleBattle = Battle Format{bd05:115}: {ff00:2}Triple Battle{ff00:0}
+Bank0399_Text_BattleFormatRotationBattle = Battle Format{bd05:115}: {ff00:2}Rotation Battle{ff00:0}
+Bank0399_Text_BattleFormatMultiBattle = Battle Format{bd05:115}: Multi Battle
+Bank0399_Text_BattleRulesNoRestrictions = Battle Rules{bd05:115}: {ff00:2}No Restrictions{ff00:0}
+Bank0399_Text_BattleRulesFlatBattle = Battle Rules{bd05:115}: {ff00:2}Flat Battle{ff00:0}
+Bank0399_Text_WonderLauncher_2 = Wonder Launcher{bd05:115}: {ff00:2}On{ff00:0}
+Bank0399_Text_WonderLauncherOff_2 = Wonder Launcher{bd05:115}: {ff00:2}Off{ff00:0}
+Bank0399_Text_Empty_74 =                               \x{ffff}
+Bank0399_Text_Empty_75 =                               \x{ffff}
+Bank0399_Text_Empty_76 =                                  \x{ffff}
+Bank0399_Text_Empty_77 =                                  \x{ffff}
+Bank0399_Text_Empty_78 =                                  \x{ffff}
+Bank0399_Text_Empty_79 =                               \x{ffff}
+Bank0399_Text_Empty_80 =                   \x{ffff}
+Bank0399_Text_Empty_81 =             \x{ffff}
+Bank0399_Text_Empty_82 =             \x{ffff}
+Bank0399_Text_Empty_83 =                                \x{ffff}
+Bank0399_Text_Empty_84 =     \x{ffff}
+Bank0399_Text_Empty_85 =        \x{ffff}
+Bank0399_Text_Empty_86 =     \x{ffff}
+Bank0399_Text_DontMeetConditionsCannot = You don't meet the conditions,\nso you cannot participate.
+Bank0399_Text_PleaseWaitMomentPress = Please wait a moment...\nPress the B Button to cancel.
+Bank0399_Text_PleaseChoosePokemonWill = Please choose the Pokémon\nthat will participate.{be02:60}
+Bank0399_Text_PleaseSelectThreePokemon = Please select the three Pokémon\nthat will participate.{be02:60}
+Bank0399_Text_PleaseSelectFourPokemon = Please select the four Pokémon\nthat will participate.{be02:60}
+Bank0399_Text_PleaseSelectSixPokemon = Please select the six Pokémon\nthat will participate.{be02:60}
+Bank0399_Text_PleaseSelectUpThree = Please select up to three Pokémon\nthat will participate.{be02:60}
+Bank0399_Text_PleaseWaitMoment = Please wait a moment.
+Bank0399_Text_Empty_87 =          \x{ffff}
+Bank0399_Text_Empty_88 =                            \x{ffff}
+Bank0399_Text_Empty_89 =          \x{ffff}
+Bank0399_Text_Empty_90 =              \x{ffff}
+Bank0399_Text_Empty_91 =          \x{ffff}
+Bank0399_Text_Empty_92 =                       \x{ffff}
+Bank0399_Text_Empty_93 =                       \x{ffff}
+Bank0399_Text_Empty_94 =                     \x{ffff}
+Bank0399_Text_Empty_95 =                     \x{ffff}
+Bank0399_Text_Empty_96 =                      \x{ffff}
+Bank0399_Text_Empty_97 =                      \x{ffff}
+Bank0399_Text_Empty_98 =                    \x{ffff}
+Bank0399_Text_Empty_99 =                    \x{ffff}
+Bank0399_Text_Empty_100 =                       \x{ffff}
+Bank0399_Text_Empty_101 =                       \x{ffff}
+Bank0399_Text_Empty_102 =                     \x{ffff}
+Bank0399_Text_Empty_103 =                     \x{ffff}
+Bank0399_Text_Empty_104 =                          \x{ffff}
+Bank0399_Text_Empty_105 =                          \x{ffff}
+Bank0399_Text_Empty_106 =                        \x{ffff}
+Bank0399_Text_Empty_107 =                        \x{ffff}
+Bank0399_Text_Empty_108 =                  \x{ffff}
+Bank0399_Text_Empty_109 =              \x{ffff}
+Bank0399_Text_Empty_110 =              \x{ffff}
+Bank0399_Text_Empty_111 =             \x{ffff}
+Bank0399_Text_Empty_112 =             \x{ffff}
+Bank0399_Text_Empty_113 =                 \x{ffff}
+Bank0399_Text_Empty_114 =        \x{ffff}
+Bank0399_Text_Empty_115 =         \x{ffff}
+Bank0399_Text_Empty_116 =        \x{ffff}
+Bank0399_Text_Empty_117 =                   \x{ffff}
+Bank0399_Text_Empty_118 =                  \x{ffff}
+Bank0399_Text_DontKnowGameWont = I don't know this game, so I won't play!
+Bank0399_Text_DontMeetConditionsCant = I don't meet the conditions, so I\ncan't battle!
+Bank0399_Text_Empty_119 =                  \x{ffff}
+Bank0399_Text_PleaseWaitMoment_2 = Please wait a moment.
+Bank0399_Text_Empty_120 =                 \x{ffff}
+Bank0399_Text_Empty_121 =                           \x{ffff}
+Bank0399_Text_Empty_122 =                 \x{ffff}
+Bank0399_Text_Empty_123 =                         \x{ffff}
+Bank0399_Text_Empty_124 =               \x{ffff}
+Bank0399_Text_Empty_125 =                              \x{ffff}
+Bank0399_Text_Empty_126 =                 \x{ffff}
+Bank0399_Text_Empty_127 =                          \x{ffff}
+Bank0399_Text_Empty_128 =             \x{ffff}
+Bank0399_Text_Empty_129 =                  \x{ffff}
+Bank0399_Text_Empty_130 =          \x{ffff}
+Bank0399_Text_EndingCommunicationPleaseWait = Ending communication.\nPlease wait...{be02:60}
+Bank0399_Text_PleaseWaitMomentPress_2 = Please wait a moment...\nPress the B Button to cancel.
+Bank0399_Text_CommunicationWillEndOk = Communication will end.\nIs that OK?
+Bank0399_Text_Party = Party
+Bank0399_Text_BattleBox = Battle Box
+Bank0399_Text_TrainerAppearsBusy_3 = ... ...\nThe Trainer appears to be busy...
+Bank0399_Text_Empty_131 =                   \x{ffff}
+Bank0399_Text_Empty_132 =                   \x{ffff}
+Bank0399_Text_Empty_133 =                   \x{ffff}
+Bank0399_Text_Empty_134 =                       \x{ffff}
+Bank0399_Text_STrainerCardIts = This is {0100:0}'s Trainer Card!{be01}\n...It's a Normal Card!
+Bank0399_Text_STrainerCardIts_2 = This is {0100:0}'s Trainer Card!{be01}\n...It's a Bronze Card!
+Bank0399_Text_STrainerCardIts_3 = This is {0100:0}'s Trainer Card!{be01}\n...It's a Copper Card!
+Bank0399_Text_STrainerCardIts_4 = This is {0100:0}'s Trainer Card!{be01}\n...It's a Silver Card!
+Bank0399_Text_STrainerCardIts_5 = This is {0100:0}'s Trainer Card!{be01}\n...It's a Gold Card!
+Bank0399_Text_STrainerCardIts_6 = This is {0100:0}'s Trainer Card!{be01}\n...It's a White Card!
+Bank0399_Text_STrainerCardIts_7 = This is {0100:0}'s Trainer Card!{be01}\n...It's a Black Card!
+Bank0399_Text_STrainerCardIts_8 = This is {0100:0}'s Trainer Card!{be01}\n...It's a Card you haven't seen before!

@@ -1,0 +1,290 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 3,
+                "y": 0,
+                "z": 0
+            }
+        },
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 4,
+                "y": 0,
+                "z": 0
+            }
+        },
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 5,
+                "y": 0,
+                "z": 0
+            }
+        },
+        {
+            "script": 2,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 10,
+                "y": 4,
+                "z": 0
+            }
+        },
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+            }
+        },
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 2,
+                "y": 0,
+                "z": 0
+            }
+        },
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 6,
+                "y": 0,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 223,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0307",
+            "script": 4,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 6,
+                "z": 5,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": 73,
+            "movement": 16,
+            "type": 0,
+            "flag": 0,
+            "script": 6,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 2,
+                "z": 6,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": 219,
+            "movement": 43,
+            "type": 0,
+            "flag": 0,
+            "script": 12,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 2
+            },
+            "grid": {
+                "x": 4,
+                "z": 8,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": 73,
+            "movement": 17,
+            "type": 0,
+            "flag": 0,
+            "script": 7,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 10,
+                "z": 6,
+                "y": 0
+            }
+        },
+        {
+            "id": 4,
+            "model": 74,
+            "movement": 14,
+            "type": 0,
+            "flag": 0,
+            "script": 9,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 7,
+                "z": 3,
+                "y": 0
+            }
+        },
+        {
+            "id": 5,
+            "model": 217,
+            "movement": 44,
+            "type": 0,
+            "flag": 0,
+            "script": 10,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 2
+            },
+            "grid": {
+                "x": 3,
+                "z": 6,
+                "y": 0
+            }
+        },
+        {
+            "id": 6,
+            "model": 220,
+            "movement": 3,
+            "type": 0,
+            "flag": 0,
+            "script": 13,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 6,
+                "z": 1,
+                "y": 0
+            }
+        },
+        {
+            "id": 7,
+            "model": 218,
+            "movement": 3,
+            "type": 0,
+            "flag": 0,
+            "script": 11,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 1
+            },
+            "grid": {
+                "x": 9,
+                "z": 7,
+                "y": 0
+            }
+        },
+        {
+            "id": 8,
+            "model": 73,
+            "movement": 14,
+            "type": 0,
+            "flag": 0,
+            "script": 8,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 5,
+                "z": 1,
+                "y": 0
+            }
+        },
+        {
+            "id": 9,
+            "model": 84,
+            "movement": 15,
+            "type": 0,
+            "flag": 0,
+            "script": 14,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 1,
+                "z": 1,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_ROUTE_6",
+            "warp": 0,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 88,
+                "y": 0,
+                "z": 152,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": [
+        {
+            "type": 4,
+            "script": 5
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Drizzle",
+    "description": "The Pokémon makes it rain\nif it appears in battle."
+}

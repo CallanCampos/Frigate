@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_EMOLGA",
+    "moves": [ "MOVE_ELECTRO_BALL", "MOVE_ACROBATICS", "MOVE_DOUBLE_TEAM", "MOVE_ENCORE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_HARDY",
+    "item": "ITEM_BRIGHT_POWDER",
+    "form": 0
+}

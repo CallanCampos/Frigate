@@ -1,0 +1,154 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Elgyem",
+    "pokedex": {
+        "category": "Cerebral Pokémon",
+        "entry": "Rumors of its origin are linked to a UFO\ncrash site in the desert 50 years ago.",
+        "height": "1'08\"",
+        "weight": "19.8 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ブレインポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 55,
+        "defense": 55,
+        "speed": 30,
+        "special_attack": 85,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_TELEPATHY", "ABILITY_SYNCHRONIZE" ],
+    "hidden_ability": "ABILITY_ANALYTIC",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 67,
+    "height": 5,
+    "weight": 90,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CONFUSION" ],
+            [ 4, "MOVE_GROWL" ],
+            [ 8, "MOVE_HEAL_BLOCK" ],
+            [ 11, "MOVE_MIRACLE_EYE" ],
+            [ 15, "MOVE_PSYBEAM" ],
+            [ 18, "MOVE_HEADBUTT" ],
+            [ 22, "MOVE_HIDDEN_POWER" ],
+            [ 25, "MOVE_IMPRISON" ],
+            [ 29, "MOVE_SIMPLE_BEAM" ],
+            [ 32, "MOVE_ZEN_HEADBUTT" ],
+            [ 36, "MOVE_PSYCH_UP" ],
+            [ 39, "MOVE_PSYCHIC" ],
+            [ 43, "MOVE_CALM_MIND" ],
+            [ 46, "MOVE_RECOVER" ],
+            [ 50, "MOVE_GUARD_SPLIT" ],
+            [ 50, "MOVE_POWER_SPLIT" ],
+            [ 53, "MOVE_SYNCHRONOISE" ],
+            [ 56, "MOVE_WONDER_ROOM" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM24",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM51",
+            "TM53",
+            "TM57",
+            "TM63",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM80",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_DARK_PULSE",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_AFTER_YOU",
+            "MOVE_TRICK",
+            "MOVE_WONDER_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": [
+            "MOVE_TELEPORT",
+            "MOVE_DISABLE",
+            "MOVE_ASTONISH",
+            "MOVE_POWER_SWAP",
+            "MOVE_GUARD_SWAP",
+            "MOVE_BARRIER",
+            "MOVE_NASTY_PLOT",
+            "MOVE_SKILL_SWAP"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 42,
+            "species": "SPECIES_BEHEEYEM"
+        }
+    ],
+    "regional_dex_number": 188,
+    "baby_species": "SPECIES_ELGYEM"
+}

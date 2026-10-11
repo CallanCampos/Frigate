@@ -1,0 +1,120 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Cinccino",
+    "pokedex": {
+        "category": "Scarf Pokémon",
+        "entry": "Cinccino's body is coated\nin a special oil that helps it\ndeflect attacks, such as punches.",
+        "height": "1'08\"",
+        "weight": "16.5 lbs.",
+        "languages": {
+            "ja": {
+                "category": "スカーフポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 95,
+        "defense": 60,
+        "speed": 115,
+        "special_attack": 65,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_CHESTO_BERRY",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 191,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_CUTE_CHARM", "ABILITY_TECHNICIAN" ],
+    "hidden_ability": "ABILITY_SKILL_LINK",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 165,
+    "height": 5,
+    "weight": 75,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BULLET_SEED" ],
+            [ 1, "MOVE_ROCK_BLAST" ],
+            [ 1, "MOVE_HELPING_HAND" ],
+            [ 1, "MOVE_TICKLE" ],
+            [ 1, "MOVE_SING" ],
+            [ 1, "MOVE_TAIL_SLAP" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM52",
+            "TM56",
+            "TM67",
+            "TM68",
+            "TM73",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_UPROAR",
+            "MOVE_LAST_RESORT",
+            "MOVE_AQUA_TAIL",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_AFTER_YOU",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 108,
+    "baby_species": "SPECIES_MINCCINO"
+}

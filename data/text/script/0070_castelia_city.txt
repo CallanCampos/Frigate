@@ -1,9 +1,0 @@
-Do you want to go up?
-I need to check you.{be01}\nFrisk, frisk...\nFrisk, frisk... And one more frisk...{be01}
-You don't seem to have\nanything suspicious.{be01}\nOK! You can go.{be01}
-OK! You can go.
-...OK. That's fine, then.
-...OK. That's fine, then.{be01}
-I'm invited to a party, but the person\nin front of the elevator wants{be00}\nto pat me down.{be01}\nOr is it just my imagination?
-I talked with a lot of people upstairs.\nIt was fun!
-Where are you from?{be01}\nReally? You're from Aspertia City?\nIt's a great place!{be00}\nThat outlook is fantastic!

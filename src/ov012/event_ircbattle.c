@@ -1,5 +1,5 @@
 #include "types.h"
-#include "app/ov174.h"
+#include "app/ircbattlematch.h"
 #include "app/pokemon_trade.h"
 #include "battle/battle_proc.h"
 #include "battle/btl_net.h"
@@ -37,7 +37,7 @@ struct EventIRCWork {
     u32 bgm;
     BOOL useBattleBox;
     GameSystem *ov175Param;
-    Ov174Param ov174;
+    IrcBattleMatchParam ircMatch;
     u32 unk88;
     BtlSetup *btlSetup;
     BattlePlayers players;
@@ -110,14 +110,14 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
         partner = -1;
         count = 2;
     } else {
-        place = work->ov174.order[func_02042a6c(func_02040440())];
+        place = work->ircMatch.order[func_02042a6c(func_02040440())];
         if (place < 2) {
             partnerPlace = 1 - place;
         } else {
             partnerPlace = 3 - (place - 2);
         }
         for (i = 0; i < 4; i++) {
-            if (partnerPlace == work->ov174.order[i]) {
+            if (partnerPlace == work->ircMatch.order[i]) {
                 partner = i;
                 break;
             }
@@ -144,36 +144,36 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
 // Puts each player's party and info in their place in the battle
 void func_ov012_02150588(EventIRCWork *work, GameSystem *gsys) {
     if (work->btlSetup->fieldSituation.unk1a) {
-        if (work->ov174.order[func_02042a6c(func_02040440())] < 2) {
+        if (work->ircMatch.order[func_02042a6c(func_02040440())] < 2) {
             s32 i = 0;
 
             for (; i < 4; i++) {
-                work->players.players[work->ov174.order[i]].party = work->parties[i];
-                work->players.players[work->ov174.order[i]].info = func_02017378(GSYS_GetGameData(gsys), i);
+                work->players.players[work->ircMatch.order[i]].party = work->parties[i];
+                work->players.players[work->ircMatch.order[i]].info = func_02017378(GSYS_GetGameData(gsys), i);
             }
         } else {
             s32 i = 0;
             u8 places[4] = { 2, 3, 0, 1 };
 
             for (; i < 4; i++) {
-                work->players.players[places[work->ov174.order[i]]].party = work->parties[i];
-                work->players.players[places[work->ov174.order[i]]].info = func_02017378(GSYS_GetGameData(gsys), i);
+                work->players.players[places[work->ircMatch.order[i]]].party = work->parties[i];
+                work->players.players[places[work->ircMatch.order[i]]].info = func_02017378(GSYS_GetGameData(gsys), i);
             }
         }
     } else if (func_02042a6c(func_02040440()) == 0) {
         s32 i = 0;
 
         for (; i < 2; i++) {
-            work->players.players[work->ov174.order[i]].party = work->parties[i];
-            work->players.players[work->ov174.order[i]].info = func_02017378(GSYS_GetGameData(gsys), i);
+            work->players.players[work->ircMatch.order[i]].party = work->parties[i];
+            work->players.players[work->ircMatch.order[i]].info = func_02017378(GSYS_GetGameData(gsys), i);
         }
     } else {
         s32 i = 0;
         u8 places[2] = { 1, 0 };
 
         for (; i < 2; i++) {
-            work->players.players[places[work->ov174.order[i]]].party = work->parties[i];
-            work->players.players[places[work->ov174.order[i]]].info = func_02017378(GSYS_GetGameData(gsys), i);
+            work->players.players[places[work->ircMatch.order[i]]].party = work->parties[i];
+            work->players.players[places[work->ircMatch.order[i]]].info = func_02017378(GSYS_GetGameData(gsys), i);
         }
     }
 }
@@ -214,21 +214,21 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         break;
     case 5:
         battleBoxToLv50Party(work->useBattleBox, work);
-        work->ov174.gameData = work->gameData;
-        work->ov174.party = work->party;
-        work->ov174.parties[0] = work->parties[0];
-        work->ov174.parties[1] = work->parties[1];
-        work->ov174.parties[2] = work->parties[2];
-        work->ov174.parties[3] = work->parties[3];
-        work->ov174.result = work->mode;
-        GSYS_QueueProc(gsys, OVERLAY_OV174, &data_ov174_0219f0fc, &work->ov174);
+        work->ircMatch.gameData = work->gameData;
+        work->ircMatch.party = work->party;
+        work->ircMatch.parties[0] = work->parties[0];
+        work->ircMatch.parties[1] = work->parties[1];
+        work->ircMatch.parties[2] = work->parties[2];
+        work->ircMatch.parties[3] = work->parties[3];
+        work->ircMatch.result = work->mode;
+        GSYS_QueueProc(gsys, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS, &work->ircMatch);
         (*state)++;
         break;
     case 6:
         if (GSYS_GetProcMgrState(gsys)) {
             break;
         }
-        work->mode = work->ov174.result;
+        work->mode = work->ircMatch.result;
         switch (work->mode) {
         case 7:
             *state = 20;
@@ -299,7 +299,8 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
             work->players.unk44 = 3;
             work->players.rule = 18;
             BtlSetup_SetNetMultiVsNet(work->btlSetup, work->gameData, func_02040440(), 1,
-                                      positions[work->ov174.order[func_02042a6c(func_02040440())]], HEAPID_GAMEEVENT);
+                                      positions[work->ircMatch.order[func_02042a6c(func_02040440())]],
+                                      HEAPID_GAMEEVENT);
             work->btlSetup->fieldSituation.unk1a = 1;
             work->btlSetup->battleStyle = 1;
             func_ov012_02150484(work);

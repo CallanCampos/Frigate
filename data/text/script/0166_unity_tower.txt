@@ -1,4 +1,0 @@
-Return to Castelia City?
-Well then, please board the ship!{be01}
-Please board the ship\nat your convenience.
-\pad{98}

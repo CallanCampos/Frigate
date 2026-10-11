@@ -1,43 +1,43 @@
-SCENARIO
-SCENE 01
-SCENE 02
-SCENE 03
-SCENE 04
-SCENE 05
-SCENE 06
-SCENE 07
-SCENE 08
-SCENE 09
-SCENE 10
-SCENE 11
-SCENE 12
-SCENE 13
-SCENE 14
-SCENE 15
-SCENE 16
-SCENE 17
-SCENE 18
-SCENE 19
-SCENE 20
-Change your foe's Ability!
-The line you choose is important!\nAttack the foe!
-Attack the foe!
-The line you choose is important!\nAttack the foe!
-Attack the foe!
-The line you choose is important!\nAttack the foe!
-Attack the foe!
-The line you choose is important!\nAttack the foe!
-The line you choose is important!\nDeliver a decisive blow!
-Deliver a decisive blow!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0352_Text_Scenario = SCENARIO
+Bank0352_Text_Scene01 = SCENE 01
+Bank0352_Text_Scene02 = SCENE 02
+Bank0352_Text_Scene03 = SCENE 03
+Bank0352_Text_Scene04 = SCENE 04
+Bank0352_Text_Scene05 = SCENE 05
+Bank0352_Text_Scene06 = SCENE 06
+Bank0352_Text_Scene07 = SCENE 07
+Bank0352_Text_Scene08 = SCENE 08
+Bank0352_Text_Scene09 = SCENE 09
+Bank0352_Text_Scene10 = SCENE 10
+Bank0352_Text_Scene11 = SCENE 11
+Bank0352_Text_Scene12 = SCENE 12
+Bank0352_Text_Scene13 = SCENE 13
+Bank0352_Text_Scene14 = SCENE 14
+Bank0352_Text_Scene15 = SCENE 15
+Bank0352_Text_Scene16 = SCENE 16
+Bank0352_Text_Scene17 = SCENE 17
+Bank0352_Text_Scene18 = SCENE 18
+Bank0352_Text_Scene19 = SCENE 19
+Bank0352_Text_Scene20 = SCENE 20
+Bank0352_Text_ChangeFoesAbility = Change your foe's Ability!
+Bank0352_Text_LineChooseImportantAttack = The line you choose is important!\nAttack the foe!
+Bank0352_Text_AttackFoe = Attack the foe!
+Bank0352_Text_LineChooseImportantAttack_2 = The line you choose is important!\nAttack the foe!
+Bank0352_Text_AttackFoe_2 = Attack the foe!
+Bank0352_Text_LineChooseImportantAttack_3 = The line you choose is important!\nAttack the foe!
+Bank0352_Text_AttackFoe_3 = Attack the foe!
+Bank0352_Text_LineChooseImportantAttack_4 = The line you choose is important!\nAttack the foe!
+Bank0352_Text_LineChooseImportantDeliver = The line you choose is important!\nDeliver a decisive blow!
+Bank0352_Text_DeliverDecisiveBlow = Deliver a decisive blow!
+Bank0352_Text_Empty = なし
+Bank0352_Text_Empty_2 = なし
+Bank0352_Text_Empty_3 = なし
+Bank0352_Text_Empty_4 = なし
+Bank0352_Text_Empty_5 = なし
+Bank0352_Text_Empty_6 = なし
+Bank0352_Text_Empty_7 = なし
+Bank0352_Text_Empty_8 = なし
+Bank0352_Text_Empty_9 = なし
+Bank0352_Text_Empty_10 = なし
+Bank0352_Text_Empty_11 = なし
 \pad{d8}

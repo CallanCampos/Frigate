@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ALTARIA",
+    "moves": [ "MOVE_SING", "MOVE_COTTON_GUARD", "MOVE_ECHOED_VOICE", "MOVE_ROOST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_PECHA_BERRY",
+    "form": 0
+}

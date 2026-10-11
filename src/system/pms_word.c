@@ -1,6 +1,11 @@
 #include "types.h"
+#include "constants/abilities.h"
 #include "constants/arc.h"
 #include "constants/language.h"
+#include "constants/moves.h"
+#include "constants/pms_words.h"
+#include "constants/text_banks.h"
+#include "constants/types.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "gfl/std.h"
@@ -38,27 +43,34 @@ typedef struct {
 
 // The number of words in each category
 static const u16 sCategoryWordCounts[PMS_WORD_CATEGORY_COUNT] = {
-    0x28c, 0x230, 0x11, 0xa5, 0x2c, 0x26, 0x30, 0x67, 0x2f, 0x20, 0x1a, 0xa, 0x3d,
+    PMS_WORD_COUNT_SPECIES,  PMS_WORD_COUNT_MOVES,  PMS_WORD_COUNT_TYPES,      PMS_WORD_COUNT_ABILITIES,
+    PMS_WORD_COUNT_TRAINER,  PMS_WORD_COUNT_PEOPLE, PMS_WORD_COUNT_GREETINGS,  PMS_WORD_COUNT_LIFESTYLE,
+    PMS_WORD_COUNT_FEELINGS, PMS_WORD_COUNT_TERM,   PMS_WORD_COUNT_CONNECTION, PMS_WORD_COUNT_ANIMATED,
+    PMS_WORD_COUNT_VOICE,
 };
 
 // The message file of each category
 static const u16 sCategoryMsgFiles[PMS_WORD_CATEGORY_COUNT] = {
-    0x1e6, 0x1e8, 0x1e9, 0x1e7, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa1, 0xa9,
+    TEXT_BANK_SPECIES_NAMES_UPPER, TEXT_BANK_MOVE_NAMES_UPPER,     TEXT_BANK_TYPE_NAMES_UPPER,
+    TEXT_BANK_ABILITY_NAMES_UPPER, TEXT_BANK_PMS_WORDS_TRAINER,    TEXT_BANK_PMS_WORDS_PEOPLE,
+    TEXT_BANK_PMS_WORDS_GREETINGS, TEXT_BANK_PMS_WORDS_LIFESTYLE,  TEXT_BANK_PMS_WORDS_FEELINGS,
+    TEXT_BANK_PMS_WORDS_TERM,      TEXT_BANK_PMS_WORDS_CONNECTION, TEXT_BANK_PMS_WORDS_ANIMATED,
+    TEXT_BANK_PMS_WORDS_VOICE,
 };
 
-static const u16 sWordGroup0[] = { 0x5b3, 0x5a0 };
-static const u16 sWordGroup1[] = { 0x5c2, 0x59f, 0x5bf, 0x5c3 };
-static const u16 sWordGroup2[] = { 0x5be, 0x5b5 };
-static const u16 sWordGroup3[] = { 0x704, 0x6dd };
-static const u16 sWordGroup4[] = { 0x708, 0x6d8 };
-static const u16 sWordGroup5[] = { 0x5d4, 0x5f2 };
-static const u16 sWordGroup6[] = { 0x5cb, 0x5c5 };
-static const u16 sWordGroup7[] = { 0x4c9, 0x2ea };
-static const u16 sWordGroup8[] = { 0x664, 0x523 };
-static const u16 sWordGroup9[] = { 0x685, 0x5ef };
-static const u16 sWordGroup10[] = { 0x688, 0x538 };
-static const u16 sWordGroup11[] = { 0x6d1, 0x6f2 };
-static const u16 sWordGroup12[] = { 0x6e2, 0x6fb };
+static const u16 sWordGroup0[] = { PMS_WORD_PEOPLE_YOU_2, PMS_WORD_PEOPLE_YOU };
+static const u16 sWordGroup1[] = { PMS_WORD_PEOPLE_I_3, PMS_WORD_PEOPLE_I, PMS_WORD_PEOPLE_I_2, PMS_WORD_PEOPLE_I_4 };
+static const u16 sWordGroup2[] = { PMS_WORD_PEOPLE_KIDS_2, PMS_WORD_PEOPLE_KIDS };
+static const u16 sWordGroup3[] = { PMS_WORD_VOICE_OK_2, PMS_WORD_VOICE_OK };
+static const u16 sWordGroup4[] = { PMS_WORD_VOICE_WOW_2, PMS_WORD_VOICE_WOW };
+static const u16 sWordGroup5[] = { PMS_WORD_GREETINGS_WELCOME, PMS_WORD_GREETINGS_WELCOME_2 };
+static const u16 sWordGroup6[] = { PMS_WORD_GREETINGS_HELLO_2, PMS_WORD_GREETINGS_HELLO };
+static const u16 sWordGroup7[] = { PMS_WORD_TYPE(TYPE_PSYCHIC), PMS_WORD_MOVE(MOVE_PSYCHIC) };
+static const u16 sWordGroup8[] = { PMS_WORD_FEELINGS_SIMPLE, PMS_WORD_ABILITY(ABILITY_SIMPLE) };
+static const u16 sWordGroup9[] = { PMS_WORD_FEELINGS_NO_WAY, PMS_WORD_GREETINGS_NO_WAY };
+static const u16 sWordGroup10[] = { PMS_WORD_FEELINGS_ANTICIPATION, PMS_WORD_ABILITY(ABILITY_ANTICIPATION) };
+static const u16 sWordGroup11[] = { PMS_WORD_VOICE_HUH, PMS_WORD_VOICE_HUH_2 };
+static const u16 sWordGroup12[] = { PMS_WORD_VOICE_HEY, PMS_WORD_VOICE_HEY_4 };
 
 static const PMSWordGroup sWordGroups[] = {
     { sWordGroup0, NELEMS(sWordGroup0) },   { sWordGroup1, NELEMS(sWordGroup1) },

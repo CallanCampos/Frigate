@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Connor",
+    "class": "TRAINER_CLASS_INFIELDER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_SUPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_SANDILE",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "If you're persistent in your efforts,\nyou'll eventually get stronger!{be00}\nThat's why I love practicing!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I especially love practicing against you!"
+        },
+        {
+            "type": 15,
+            "text": "Take this as my thanks\nfor practicing with me!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "The more you practice, the better\nyou'll be in an actual match!{be01}\nI hope you keep practicing, too!"
+        }
+    ]
+}

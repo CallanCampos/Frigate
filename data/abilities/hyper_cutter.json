@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Hyper Cutter",
+    "description": "Prevents other Pokémon\nfrom lowering Attack stat."
+}

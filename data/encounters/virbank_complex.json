@@ -1,0 +1,88 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 0,
+            "shaking_grass": 1,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_PATRAT", 10, 10 ],
+                [ "SPECIES_PIDOVE", 10, 10 ],
+                [ "SPECIES_MAGBY", 10, 10 ],
+                [ "SPECIES_MAGNEMITE", 10, 10 ],
+                [ "SPECIES_PATRAT", 11, 11 ],
+                [ "SPECIES_PIDOVE", 11, 11 ],
+                [ "SPECIES_MAGBY", 11, 11 ],
+                [ "SPECIES_MAGNEMITE", 11, 11 ],
+                [ "SPECIES_PATRAT", 12, 12 ],
+                [ "SPECIES_PIDOVE", 12, 12 ],
+                [ "SPECIES_PATRAT", 13, 13 ],
+                [ "SPECIES_PIDOVE", 13, 13 ]
+            ],
+            "white2": [
+                [ "SPECIES_PATRAT", 10, 10 ],
+                [ "SPECIES_PIDOVE", 10, 10 ],
+                [ "SPECIES_ELEKID", 10, 10 ],
+                [ "SPECIES_MAGNEMITE", 10, 10 ],
+                [ "SPECIES_PATRAT", 11, 11 ],
+                [ "SPECIES_PIDOVE", 11, 11 ],
+                [ "SPECIES_ELEKID", 11, 11 ],
+                [ "SPECIES_MAGNEMITE", 11, 11 ],
+                [ "SPECIES_PATRAT", 12, 12 ],
+                [ "SPECIES_PIDOVE", 12, 12 ],
+                [ "SPECIES_PATRAT", 13, 13 ],
+                [ "SPECIES_PIDOVE", 13, 13 ]
+            ]
+        },
+        "dark_grass": [],
+        "shaking_grass": [
+            [ "SPECIES_AUDINO", 10, 10 ],
+            [ "SPECIES_AUDINO", 10, 10 ],
+            [ "SPECIES_AUDINO", 11, 11 ],
+            [ "SPECIES_AUDINO", 11, 11 ],
+            [ "SPECIES_AUDINO", 12, 12 ],
+            [ "SPECIES_AUDINO", 12, 12 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ]
+        ],
+        "surf": [
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_ALOMOMOLA", 5, 15 ],
+            [ "SPECIES_ALOMOMOLA", 5, 15 ],
+            [ "SPECIES_ALOMOMOLA", 5, 15 ],
+            [ "SPECIES_JELLICENT", 5, 15 ],
+            [ "SPECIES_JELLICENT", 5, 15 ]
+        ],
+        "fishing": [
+            [ "SPECIES_FINNEON", 40, 60 ],
+            [ "SPECIES_KRABBY", 40, 60 ],
+            [ "SPECIES_FINNEON", 50, 70 ],
+            [ "SPECIES_QWILFISH", 50, 70 ],
+            [ "SPECIES_QWILFISH", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_KRABBY", 40, 60 ],
+            [ "SPECIES_LUMINEON", 40, 60 ],
+            [ "SPECIES_KINGLER", 50, 70 ],
+            [ "SPECIES_KINGLER", 50, 70 ],
+            [ "SPECIES_KINGLER", 50, 70 ]
+        ]
+    }
+}

@@ -1,7 +1,9 @@
 #include "types.h"
 #include "app/wifi_login.h"
+#include "app/wifilogin_message.h"
 #include "constants/sound.h"
 #include "dpw/dpw_tr.h"
+#include "gfl/dpw_profile.h"
 #include "dwc/dwc.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
@@ -230,7 +232,7 @@ static int Enter_ServerResult(WorldTradeWork *wk) {
 }
 
 static int Enter_ProfileStart(WorldTradeWork *wk) {
-    func_ov189_0219d504(&wk->dcProfile, wk->param->mystatus);
+    DpwProfile_Fill(&wk->dcProfile, wk->param->mystatus);
     func_ov189_021a7efc(&wk->dcProfile, &wk->dcProfileResult);
     wk->timeoutCount = 0;
     return TRUE;
@@ -530,7 +532,7 @@ static int Enter_ServerErrorPrint(WorldTradeWork *wk, void *msgWork) {
         msgNo = 0x9f;
         break;
     }
-    func_ov190_021b48a4(msgWork, wk->msgManager, msgNo);
+    WifiLoginMessage_PrintFrom(msgWork, wk->msgManager, msgNo);
     wk->localSeq = 0;
     return TRUE;
 }
@@ -541,7 +543,7 @@ static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
         wk->localSeq++;
         break;
     case 1:
-        if (func_ov190_021b49b8(msgWork)) {
+        if (WifiLoginMessage_IsDone(msgWork)) {
             wk->localSeq++;
         }
         break;

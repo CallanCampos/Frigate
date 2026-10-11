@@ -1,0 +1,173 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Chatot",
+    "pokedex": {
+        "category": "Music Note Pokémon",
+        "entry": "Its tongue is just like a human's.\nAs a result, it can cleverly mimic\nhuman speech.",
+        "height": "1'08\"",
+        "weight": "4.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Chatot",
+                "category": "Music Note Pokémon",
+                "entry": "Its tongue is just like a human's.\nAs a result, it can cleverly mimic\nhuman speech.",
+                "height": "1'08\"",
+                "weight": "4.2 lbs."
+            },
+            "fr": {
+                "name": "Pijako",
+                "category": "Pokémon Note Musique",
+                "entry": "Sa langue comparable à celle\nde l'homme lui permet d'imiter\nhabilement le langage humain.",
+                "height": "0,5 m",
+                "weight": "1,9 kg"
+            },
+            "de": {
+                "name": "Plaudagei",
+                "category": "Musiknote",
+                "entry": "Seine Zunge ähnelt der eines Menschen.\nDaher kann es die menschliche Sprache\ngut nachahmen.",
+                "height": "0,5 m",
+                "weight": "1,9 kg"
+            },
+            "it": {
+                "name": "Chatot",
+                "category": "Pokémon Musicale",
+                "entry": "La sua lingua è uguale a quella degli\nuomini. Gli riesce quindi facile imitare\nla voce umana.",
+                "height": "0,5 m",
+                "weight": "1,9 kg"
+            },
+            "ko": {
+                "name": "페라페",
+                "category": "음표포켓몬",
+                "entry": "혀는 인간의 것을 똑 닮았다.\n그 때문에 인간이 하는 말을\n능숙하게 흉내 낼 수 있다.",
+                "height": "0.5 m",
+                "weight": "1.9 kg"
+            },
+            "es": {
+                "name": "Chatot",
+                "category": "Pokémon Corchea",
+                "entry": "Su lengua es como la de cualquier\npersona, así que puede imitar muy\nbien el habla humana.",
+                "height": "0,5 m",
+                "weight": "1,9 kg"
+            },
+            "ja": {
+                "name": "ペラップ",
+                "category": "おんぷポケモン",
+                "entry": "ベロは\\x{3000}にんげんのものに\\x{3000}そっくり。\nそのため\\x{3000}にんげんの\\x{3000}はなすことばを\nじょうずに\\x{3000}まねることが\\x{3000}できる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff19}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 76,
+        "attack": 65,
+        "defense": 45,
+        "speed": 91,
+        "special_attack": 92,
+        "special_defense": 42
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+    "catch_rate": 30,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_METRONOME",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_KEEN_EYE", "ABILITY_TANGLED_FEET" ],
+    "hidden_ability": "ABILITY_BIG_PECKS",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 144,
+    "height": 5,
+    "weight": 19,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_PECK" ],
+            [ 5, "MOVE_GROWL" ],
+            [ 9, "MOVE_MIRROR_MOVE" ],
+            [ 13, "MOVE_SING" ],
+            [ 17, "MOVE_FURY_ATTACK" ],
+            [ 21, "MOVE_CHATTER" ],
+            [ 25, "MOVE_TAUNT" ],
+            [ 29, "MOVE_ROUND" ],
+            [ 33, "MOVE_MIMIC" ],
+            [ 37, "MOVE_ECHOED_VOICE" ],
+            [ 41, "MOVE_ROOST" ],
+            [ 45, "MOVE_UPROAR" ],
+            [ 49, "MOVE_SYNCHRONOISE" ],
+            [ 53, "MOVE_FEATHER_DANCE" ],
+            [ 57, "MOVE_HYPER_VOICE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM83",
+            "TM87",
+            "TM88",
+            "TM89",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_TAILWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_ROOST",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_ENCORE",
+            "MOVE_NIGHT_SHADE",
+            "MOVE_AGILITY",
+            "MOVE_NASTY_PLOT",
+            "MOVE_SUPERSONIC",
+            "MOVE_STEEL_WING",
+            "MOVE_SLEEP_TALK",
+            "MOVE_DEFOG",
+            "MOVE_AIR_CUTTER"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CHATOT"
+}

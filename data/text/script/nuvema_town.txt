@@ -1,0 +1,12 @@
+NuvemaTown_Text_PowerScienceAmazingNow = The power of science is amazing!{be01}\nNow you can use infrared to trade\nPokémon and have battles--{be00}\nall in the blink of an eye!
+NuvemaTown_Text_ThinkTravelingPokemonChanges = Do you think traveling with Pokémon\nchanges people?
+NuvemaTown_Text_TooTravelingThinkingAbout = Me too! Traveling and thinking about many\nthings can definitely make a difference!
+NuvemaTown_Text_YoureRightItsFine = You're right! It's fine to just enjoy the\njourney without overthinking it!
+NuvemaTown_Text_KnowWhatNextBirthday = Know what? On my next birthday,\nProfessor Juniper is going to{be00}\ngive me a Pokémon as a present!{be01}\nI'll get a Pokédex, too, of course!{be01}\nMaybe I'll grow up to be a Pokémon\nprofessor, or a Champion!{be01}\nI haven't decided yet, but\nI'll pick my own dream to pursue!
+NuvemaTown_Text_NuvemaTownStartSomething = Nuvema Town\nThe Start of Something Big!
+NuvemaTown_Text_SHouse = {0100:0}'s House
+NuvemaTown_Text_SHouse_2 = ...'s House
+NuvemaTown_Text_CherensHouse = Cheren's House
+NuvemaTown_Text_BiancasHouse = Bianca's House
+NuvemaTown_Text_JuniperPokemonLab = Juniper Pokémon Lab
+\pad{ce}

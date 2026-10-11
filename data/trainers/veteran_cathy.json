@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cathy",
+    "class": "TRAINER_CLASS_VETERAN_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SIGILYPH",
+            "form": 0,
+            "level": 55,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_PSYCHIC", "MOVE_AIR_SLASH", "MOVE_CHARGE_BEAM", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_CROBAT",
+            "form": 0,
+            "level": 55,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_AIR_SLASH", "MOVE_POISON_FANG", "MOVE_SHADOW_BALL", "MOVE_X_SCISSOR" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Wait!\nYou, young Trainer over there!{be01}\nLook at my Pokémon.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Not bad!\nI like your strength."
+        },
+        {
+            "type": 2,
+            "text": "I'd love to brag about my Pokémon, but it\nwould take too long, so I'll resist!"
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+PlasmaFrigate20_Text_AhSleptVeryWell = Ah. I slept very well!{be01}\nYou're wearing strange clothes.\nAre you new here?{be01}\nAny bed in this room is available.\nFeel free to use them if you're tired!
+PlasmaFrigate20_Text_BedLooksNiceComfortable = The bed looks nice and comfortable.\nWill you take a quick rest?
+PlasmaFrigate20_Text_HoppedIntoBedFell = {0100:0} hopped into bed and\nfell asleep...{be01}
+PlasmaFrigate20_Text_PokemonTookNapRegained = {0100:0} and the Pokémon\ntook a nap and regained energy!
+\pad{2c}

@@ -1,71 +1,71 @@
-Chic Actress
-Popular Girl
-{0100:1}: No, no way...
-Barbara: Hm...{be01}\n(...Well now, prepare yourself!\nYou're going to feel even worse...){be01}\n(...You'll regret having professed\nyour love to me...)
-Barbara: That gets me off my game...
-{0100:1}: Barbara, your Pokémon\nis really aggressive!
-Barbara: Oh, come now.\nAre you afraid of my little Smeargle?{be01}\nYou'll never be worthy of being my man.
-{0100:1}: Please come at me\nwith everything you've got!
-Barbara: So you call me to a place like this,\njust to ask me to go out with you?
-{0100:1}: Um, I...\nFrom the first time I saw you,{be00}\nI couldn't think about anything else!{be01}\nI love you!
-Barbara: Me and you?\nYou're kidding, right?
-{0100:1}: I'm serious.\nI won't leave until I get an answer!
-Barbara: Hm...{be01}\n(...Oh, what a precocious little boy.\nMakes me want to be a little mean to him...)
-Barbara: How about this, then?\nWant to have a Pokémon battle{be00}\nto test how compatible we are?
-{0100:1}: Y-yes! I'll battle you!
-Barbara: Hm... That's good!{be01}\n(...Heh heh heh... I can't wait...\nI love seeing depressed men{be00}\nso much I can barely stand it...)
-Smeargle: Argle! Arrrrg!
-Barbara: OK! Here I come!{be01}\n(...Smeargle's raring to go, too!...){be01}\n(...The boys who've professed their\nlove to me so far...{be00}\nEvery single one was brought down,{be00}\nand their pride was shattered...){be01}\n(...I wonder how much this little boy\ncan stand...)
-{0100:1}: B-Barbara!\nBefore we start,{be00}\nI have a request!{be00}\nIf I win...
-Barbara: If you win?
-{0100:1}: Marry me!
-Barbara: Wh-whaaaaat?!\nMarriage? When you say marriage,{be00}\ndo you mean THAT marriage?{be01}\nWho would make a promise like that...\nThat's no good! I mean it's seriously bad!
-{0100:1}: Let's go on a date!
-Barbara: What are you saying\nall of a sudden?!{be01}\nA date with me?\nGet a life!
-{0100:1}: B-Barbara...\nYou're so cool...
-Barbara: What?
-{0100:1}: When you don't like what you\nhear, you express your opinion directly!{be01}\nThinking of me like that...\nYou are a wonderful person!
-Barbara: Ah, I see...{be01}\n(...What is going on?\nHe's really tough!{be00}\nNo more Ms. Nice Girl...)
-Barbara: Give it a rest!{be01}\nI don't care about you at all, all right?!
-{0100:1}: So great!
-Barbara: Aaahhh! C'mon!\nDo you have wax in your ears?!{be00}\nIf I can't make you understand with words,{be00}\nI guess I'll have to use force!
-{0100:1}: Please do!
-Smeargle: Smearrrrrg!
-{0100:1}: I-I'm scared!
-Smeargle: Smearrrg?
-{0100:1}: Noooo!\nI lost!{be01}\nBarbara, you're so strong!\nI didn't stand a chance!
-Barbara: What?\nAre you flattering me?{be00}\nThat won't get you{be00}\nanywhere with me at all!
-Barbara: ...{be01}\n(...That's strange...\nWhy don't I feel any malice...){be01}\n(...He took all of my Pokémon's attacks...\nWhat a big-hearted guy...)
-{0100:1}: Heh heh!
-Barbara: ...{be01}\n(...Sigh... No matter how terrible a thing\nI say, he keeps smiling that smile...){be01}\n(...Huh? Did I start to feel something\nfor him at some point?...)
-{0100:1}: Barbara,\nis something wrong?
-Barbara: If you want to be friends,\nI'll hang out with you!
-Barbara: Hm...{be01}\n(...What is this? It's weird.\nA guy who makes me feel good{be00}\njust by being around me.{be00}\nI've never felt this before...)
-Just as battles aren't won\nby power alone,{be01}\nthe strongest person doesn't always\nwin in relationships either.
-Turning the other cheek!\nThat's another form love takes!
-{0100:1}: Huff, puff...
-Barbara: Hm. What do you want?\nAre you winded already?{be01}\nAnother disappointment...\nWhere are the men worthy of me?
-{0100:1}: Barbara...\nNo...
-Barbara: I'm sorry,\nbut I'm just not interested{be00}\nin ordinary guys like you...{be01}\nI don't think we'll meet again.\nLet's go, Smeargle!
-Smeargle: Arg! Smearg!
-Just as the results of\nbattle don't follow a set pattern,{be00}\nrelationships between people don't{be00}\nalways go how you would expect.
-Sometimes you must endure\na painful parting because you care!{be00}\nThat's another form love takes!
-Smeargle: Arg... Argle argle...
-Barbara: Tsk. What?\nYou're terrible!{be00}\nBeating up my little Smeargle like that!{be01}\nSeriously! I can't believe you!\nI'm sorry. I never want to see you again.{be00}\nYou are so rude!
-{0100:1}: Rude?\nI'm a terrible guy?{be00}\nBarbara, you're so tough!{be01}\nEh heh heh... Eh heh heh heh...{be01}\nThat's what's great about you!
-Just as crazy things happen\nin the world of battling,{be01}\nyou never know what is\ngoing to happen in relationships.
-Some people take painful and\ncruel treatment with joy!{be00}\nThat's another form love takes!
-Barbara: What is it about you?\nI can't figure you out...
-{0100:1}: Hee hee.
-Barbara: Just getting involved won't work.\nThe only thing to do with guys{be00}\nlike you is leave...
-{0100:1}: Hey! No way!\nPay attention to me!
-Smeargle: Smearrrrgle!
-{0100:1}: I won't give up!\nI'll get you to turn my way!
-Just as the results of\nbattle don't follow a set pattern,{be01}\nrelationships between people don't\nalways go how you would expect.
-Not giving up on love,\neven if they won't look your way...{be00}\nThat's another form love takes!
-Barbara: What was that now?
-{0100:1}: Um... Er...\nIt was...Attract...
-Barbara: Ha ha...{be01}\nYou thought you could change\nmy mind with Attract?{be01}\nWhat a fool...
-{0100:1}: I'm...\nI'm sorry...
-Barbara: ...
-{0100:1}: Oohhh...
+Bank0220_Text_ChicActress = Chic Actress
+Bank0220_Text_PopularGirl = Popular Girl
+Bank0220_Text_NoNoWay = {0100:1}: No, no way...
+Bank0220_Text_BarbaraHmWellNow = Barbara: Hm...{be01}\n(...Well now, prepare yourself!\nYou're going to feel even worse...){be01}\n(...You'll regret having professed\nyour love to me...)
+Bank0220_Text_BarbaraGetsOffGame = Barbara: That gets me off my game...
+Bank0220_Text_BarbaraPokemonReallyAggressive = {0100:1}: Barbara, your Pokémon\nis really aggressive!
+Bank0220_Text_BarbaraOhComeNow = Barbara: Oh, come now.\nAre you afraid of my little Smeargle?{be01}\nYou'll never be worthy of being my man.
+Bank0220_Text_PleaseComeEverythingYouve = {0100:1}: Please come at me\nwith everything you've got!
+Bank0220_Text_BarbaraCallPlaceLike = Barbara: So you call me to a place like this,\njust to ask me to go out with you?
+Bank0220_Text_UmFromFirstTime = {0100:1}: Um, I...\nFrom the first time I saw you,{be00}\nI couldn't think about anything else!{be01}\nI love you!
+Bank0220_Text_BarbaraYoureKiddingRight = Barbara: Me and you?\nYou're kidding, right?
+Bank0220_Text_ImSeriousWontLeave = {0100:1}: I'm serious.\nI won't leave until I get an answer!
+Bank0220_Text_BarbaraHmOhWhat = Barbara: Hm...{be01}\n(...Oh, what a precocious little boy.\nMakes me want to be a little mean to him...)
+Bank0220_Text_BarbaraHowAboutThen = Barbara: How about this, then?\nWant to have a Pokémon battle{be00}\nto test how compatible we are?
+Bank0220_Text_YYesIllBattle = {0100:1}: Y-yes! I'll battle you!
+Bank0220_Text_BarbaraHmThatsGood = Barbara: Hm... That's good!{be01}\n(...Heh heh heh... I can't wait...\nI love seeing depressed men{be00}\nso much I can barely stand it...)
+Bank0220_Text_SmeargleArgleArrrrg = Smeargle: Argle! Arrrrg!
+Bank0220_Text_BarbaraOkHereCome = Barbara: OK! Here I come!{be01}\n(...Smeargle's raring to go, too!...){be01}\n(...The boys who've professed their\nlove to me so far...{be00}\nEvery single one was brought down,{be00}\nand their pride was shattered...){be01}\n(...I wonder how much this little boy\ncan stand...)
+Bank0220_Text_BBarbaraBeforeWe = {0100:1}: B-Barbara!\nBefore we start,{be00}\nI have a request!{be00}\nIf I win...
+Bank0220_Text_BarbaraIfWin = Barbara: If you win?
+Bank0220_Text_Marry = {0100:1}: Marry me!
+Bank0220_Text_BarbaraWhWhaaaaatMarriage = Barbara: Wh-whaaaaat?!\nMarriage? When you say marriage,{be00}\ndo you mean THAT marriage?{be01}\nWho would make a promise like that...\nThat's no good! I mean it's seriously bad!
+Bank0220_Text_LetsGoDate = {0100:1}: Let's go on a date!
+Bank0220_Text_BarbaraWhatSayingAll = Barbara: What are you saying\nall of a sudden?!{be01}\nA date with me?\nGet a life!
+Bank0220_Text_BBarbaraYoureCool = {0100:1}: B-Barbara...\nYou're so cool...
+Bank0220_Text_BarbaraWhat = Barbara: What?
+Bank0220_Text_WhenDontLikeWhat = {0100:1}: When you don't like what you\nhear, you express your opinion directly!{be01}\nThinking of me like that...\nYou are a wonderful person!
+Bank0220_Text_BarbaraAhSeeWhat = Barbara: Ah, I see...{be01}\n(...What is going on?\nHe's really tough!{be00}\nNo more Ms. Nice Girl...)
+Bank0220_Text_BarbaraGiveRestDont = Barbara: Give it a rest!{be01}\nI don't care about you at all, all right?!
+Bank0220_Text_Great = {0100:1}: So great!
+Bank0220_Text_BarbaraAaahhhCmonHave = Barbara: Aaahhh! C'mon!\nDo you have wax in your ears?!{be00}\nIf I can't make you understand with words,{be00}\nI guess I'll have to use force!
+Bank0220_Text_Please = {0100:1}: Please do!
+Bank0220_Text_SmeargleSmearrrrrg = Smeargle: Smearrrrrg!
+Bank0220_Text_ImScared = {0100:1}: I-I'm scared!
+Bank0220_Text_SmeargleSmearrrg = Smeargle: Smearrrg?
+Bank0220_Text_NooooLostBarbaraYoure = {0100:1}: Noooo!\nI lost!{be01}\nBarbara, you're so strong!\nI didn't stand a chance!
+Bank0220_Text_BarbaraWhatFlatteringWont = Barbara: What?\nAre you flattering me?{be00}\nThat won't get you{be00}\nanywhere with me at all!
+Bank0220_Text_BarbaraThatsStrangeWhy = Barbara: ...{be01}\n(...That's strange...\nWhy don't I feel any malice...){be01}\n(...He took all of my Pokémon's attacks...\nWhat a big-hearted guy...)
+Bank0220_Text_HehHeh = {0100:1}: Heh heh!
+Bank0220_Text_BarbaraSighNoMatter = Barbara: ...{be01}\n(...Sigh... No matter how terrible a thing\nI say, he keeps smiling that smile...){be01}\n(...Huh? Did I start to feel something\nfor him at some point?...)
+Bank0220_Text_BarbaraSomethingWrong = {0100:1}: Barbara,\nis something wrong?
+Bank0220_Text_BarbaraIfWantFriends = Barbara: If you want to be friends,\nI'll hang out with you!
+Bank0220_Text_BarbaraHmWhatIts = Barbara: Hm...{be01}\n(...What is this? It's weird.\nA guy who makes me feel good{be00}\njust by being around me.{be00}\nI've never felt this before...)
+Bank0220_Text_JustBattlesArentWon = Just as battles aren't won\nby power alone,{be01}\nthe strongest person doesn't always\nwin in relationships either.
+Bank0220_Text_TurningOtherCheekThats = Turning the other cheek!\nThat's another form love takes!
+Bank0220_Text_HuffPuff = {0100:1}: Huff, puff...
+Bank0220_Text_BarbaraHmWhatWant = Barbara: Hm. What do you want?\nAre you winded already?{be01}\nAnother disappointment...\nWhere are the men worthy of me?
+Bank0220_Text_BarbaraNo = {0100:1}: Barbara...\nNo...
+Bank0220_Text_BarbaraImSorryBut = Barbara: I'm sorry,\nbut I'm just not interested{be00}\nin ordinary guys like you...{be01}\nI don't think we'll meet again.\nLet's go, Smeargle!
+Bank0220_Text_SmeargleArgSmearg = Smeargle: Arg! Smearg!
+Bank0220_Text_JustResultsBattleDont = Just as the results of\nbattle don't follow a set pattern,{be00}\nrelationships between people don't{be00}\nalways go how you would expect.
+Bank0220_Text_SometimesMustEndurePainful = Sometimes you must endure\na painful parting because you care!{be00}\nThat's another form love takes!
+Bank0220_Text_SmeargleArgArgleArgle = Smeargle: Arg... Argle argle...
+Bank0220_Text_BarbaraTskWhatYoure = Barbara: Tsk. What?\nYou're terrible!{be00}\nBeating up my little Smeargle like that!{be01}\nSeriously! I can't believe you!\nI'm sorry. I never want to see you again.{be00}\nYou are so rude!
+Bank0220_Text_RudeImTerribleGuy = {0100:1}: Rude?\nI'm a terrible guy?{be00}\nBarbara, you're so tough!{be01}\nEh heh heh... Eh heh heh heh...{be01}\nThat's what's great about you!
+Bank0220_Text_JustCrazyThingsHappen = Just as crazy things happen\nin the world of battling,{be01}\nyou never know what is\ngoing to happen in relationships.
+Bank0220_Text_SomePeopleTakePainful = Some people take painful and\ncruel treatment with joy!{be00}\nThat's another form love takes!
+Bank0220_Text_BarbaraWhatAboutCant = Barbara: What is it about you?\nI can't figure you out...
+Bank0220_Text_HeeHee = {0100:1}: Hee hee.
+Bank0220_Text_BarbaraJustGettingInvolved = Barbara: Just getting involved won't work.\nThe only thing to do with guys{be00}\nlike you is leave...
+Bank0220_Text_HeyNoWayPay = {0100:1}: Hey! No way!\nPay attention to me!
+Bank0220_Text_SmeargleSmearrrrgle = Smeargle: Smearrrrgle!
+Bank0220_Text_WontGiveUpIll = {0100:1}: I won't give up!\nI'll get you to turn my way!
+Bank0220_Text_JustResultsBattleDont_2 = Just as the results of\nbattle don't follow a set pattern,{be01}\nrelationships between people don't\nalways go how you would expect.
+Bank0220_Text_NotGivingUpLove = Not giving up on love,\neven if they won't look your way...{be00}\nThat's another form love takes!
+Bank0220_Text_BarbaraWhatNow = Barbara: What was that now?
+Bank0220_Text_UmErAttract = {0100:1}: Um... Er...\nIt was...Attract...
+Bank0220_Text_BarbaraHaHaThought = Barbara: Ha ha...{be01}\nYou thought you could change\nmy mind with Attract?{be01}\nWhat a fool...
+Bank0220_Text_ImImSorry = {0100:1}: I'm...\nI'm sorry...
+Bank0220_Text_Barbara = Barbara: ...
+Bank0220_Text_Oohhh = {0100:1}: Oohhh...

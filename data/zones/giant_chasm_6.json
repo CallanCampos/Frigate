@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 28,
+    "npc_cache": 24,
+    "area": 332,
+    "matrix": "MAP_MATRIX_GIANT_CHASM_6",
+    "scripts": "SCRIPTS_GIANT_CHASM_6",
+    "text": "SCRIPT_TEXT_GIANT_CHASM_6",
+    "bgm": "SEQ_BGM_D_05",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_GIANT_CHASM",
+    "place": "PLACE_GIANT_CHASM",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 5,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 397,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

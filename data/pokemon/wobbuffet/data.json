@@ -1,0 +1,118 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Wobbuffet",
+    "pokedex": {
+        "category": "Patient Pokémon",
+        "entry": "It desperately tries to keep its\nblack tail hidden. It is said to be\nproof the tail hides a secret.",
+        "height": "4'03\"",
+        "weight": "62.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Wobbuffet",
+                "category": "Patient Pokémon",
+                "entry": "It desperately tries to keep its\nblack tail hidden. It is said to be\nproof the tail hides a secret.",
+                "height": "4'03\"",
+                "weight": "62.8 lbs."
+            },
+            "fr": {
+                "name": "Qulbutoké",
+                "category": "Pokémon Patient",
+                "entry": "Il cherche désespérément à cacher\nsa queue noire. Certains pensent\nqu'elle renferme un secret.",
+                "height": "1,3 m",
+                "weight": "28,5 kg"
+            },
+            "de": {
+                "name": "Woingenau",
+                "category": "Geduld",
+                "entry": "Verzweifelt versucht es, seinen\nschwarzen Schweif zu verstecken.\nEr soll ein Geheimnis enthalten.",
+                "height": "1,3 m",
+                "weight": "28,5 kg"
+            },
+            "it": {
+                "name": "Wobbuffet",
+                "category": "Pokémon Pazienza",
+                "entry": "Cerca di tenere nascosta la sua coda\nnera ad ogni costo. Pare che essa celi\nun segreto.",
+                "height": "1,3 m",
+                "weight": "28,5 kg"
+            },
+            "ko": {
+                "name": "마자용",
+                "category": "참기포켓몬",
+                "entry": "까만 꼬리를 필사적으로\n숨기는 것은 꼬리에 비밀이 있다는\n증거라고 의심받고 있다.",
+                "height": "1.3 m",
+                "weight": "28.5 kg"
+            },
+            "es": {
+                "name": "Wobbuffet",
+                "category": "Pokémon Paciente",
+                "entry": "Siempre intenta ocultar su cola,\npor lo que muchos creen que\ncontiene un secreto.",
+                "height": "1,3 m",
+                "weight": "28,5 kg"
+            },
+            "ja": {
+                "name": "ソーナンス",
+                "category": "がまんポケモン",
+                "entry": "くろい\\x{3000}しっぽを\\x{3000}ひっしになって\nかくすのは\\x{3000}しっぽに\\x{3000}ひみつがある\nしょうこだと\\x{3000}かんぐられている。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff18}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 190,
+        "attack": 33,
+        "defense": 58,
+        "speed": 33,
+        "special_attack": 33,
+        "special_defense": 58
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_SHADOW_TAG", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TELEPATHY",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 13,
+    "weight": 285,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_COUNTER" ],
+            [ 1, "MOVE_MIRROR_COAT" ],
+            [ 1, "MOVE_SAFEGUARD" ],
+            [ 1, "MOVE_DESTINY_BOND" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WYNAUT"
+}

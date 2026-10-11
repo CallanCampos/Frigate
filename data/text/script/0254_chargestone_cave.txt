@@ -1,7 +1,0 @@
-Bianca: Know what?\nI'm here at Professor Juniper's request!{be01}\nI'm researching a Pokémon\ncalled Tynamo!{be01}\nBut there aren't very many,\nand they don't seem very strong...
-Hi! I'm the Nugget man.{be01}
-And I'm the Nugget boy!{be01}
-Glad you showed up!\nI want to give you this.{be01}
-I want to give you this, too.{be01}
-That's a Nugget!{be01}\nHow'd it get so golden without\ndeep-frying? Trade secret!
-Nuggetaboutit!

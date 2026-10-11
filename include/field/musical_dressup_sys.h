@@ -20,9 +20,4 @@ void func_ov012_02151f88(MusicalDressUpParam *param);
 
 extern GameProcFunctions data_ov012_0216dfc4;
 
-// Overlay 208, the dressing room, which gets a copy of the parameter
-void *func_ov208_021998c0(MusicalDressUpParam *param, HeapID heapId);
-void func_ov208_02199a54(void *work);
-void *func_ov208_02199b7c(void *work);
-
 #endif // POKEBW2_FIELD_MUSICAL_DRESSUP_SYS_H

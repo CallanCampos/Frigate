@@ -1,0 +1,18 @@
+EventMapchange2_Text_WelcomeGeonetHighTech = Welcome to Geonet, the high-tech\nglobe!{be01}
+EventMapchange2_Text_WhatWouldLike = What would you like to do?
+EventMapchange2_Text_CanRegisterLocationInformation = You can register your location.\nThat information may be provided{be00}\nto friends and strangers through{be00}\nDS Wireless Communications{be00}\nor over Nintendo Wi-Fi Connection.{be01}\nWould you like to register your\nlocation now?
+EventMapchange2_Text_PleaseSelectLocationWhere = Please select the location\nwhere you live.
+EventMapchange2_Text_PleaseSelectAreaWhere = Please select the area\nwhere you live.
+EventMapchange2_Text_MayNotChangeLocation = You may not change your location data\nonce you have registered it.{be01}\nDo you wish to register this location?
+EventMapchange2_Text_Empty = {0124:0}
+EventMapchange2_Text_Empty_2 = {0125:0}
+EventMapchange2_Text_Yes = Yes
+EventMapchange2_Text_No = No
+EventMapchange2_Text_SeeList = See list
+EventMapchange2_Text_Register = Register
+EventMapchange2_Text_Cancel = Cancel
+EventMapchange2_Text_View = VIEW
+EventMapchange2_Text_RegisteredLocation = Your registered location:\n{0124:0}\n{0125:1}
+EventMapchange2_Text_DisplayRegisteredLocationsLine = To display registered locations, line up\nthe cursor and press the X Button.
+EventMapchange2_Text_Quit = QUIT
+\pad{88}

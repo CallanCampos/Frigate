@@ -1,3 +1,0 @@
-Burgh used this warehouse up until\nfour years ago.{be01}\nWhen Burgh gets artist's block,\nhe comes back here to Nacrene City!
-Burgh is an artist.\nHe's also the Gym Leader in Castelia City.{be01}\nWe want to be like him!{be01}\nI'll never stop admiring him!{be01}\nYup, I'm only going to keep on admiring!
-\pad{08}

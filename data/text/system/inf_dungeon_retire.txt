@@ -1,0 +1,4 @@
+InfDungeonRetire_Text_QuitAreaReturnLobby = Quit this area and return to the lobby?
+InfDungeonRetire_Text_Yes = YES
+InfDungeonRetire_Text_No = NO
+\pad{74}

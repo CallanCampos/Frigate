@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_COFAGRIGUS",
+    "moves": [ "MOVE_WILL_O_WISP", "MOVE_TOXIC", "MOVE_HEX", "MOVE_CALM_MIND" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

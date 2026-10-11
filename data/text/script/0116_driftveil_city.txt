@@ -1,5 +1,0 @@
-We can live unchanged,\nbecause we keep changing.{be01}\nI mean, Pokémon also evolve,\nbut their Natures stay the same.
-The Driftveil City that I remembered\nhad sort of a dowdy, you know,{be00}\nshabby look...
-Oh! The Pokémon has something\nin its mouth.{be01}
-Roooooar!
-\pad{12}

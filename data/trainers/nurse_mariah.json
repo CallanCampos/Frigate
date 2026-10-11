@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Mariah",
+    "class": "TRAINER_CLASS_NURSE",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_HEAL" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": true,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CLEFFA",
+            "form": 0,
+            "level": 22,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I am a Trainer before I'm a Nurse!{be01}\nI am itching for a Pokémon battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I was so itchy that I couldn't\nfight properly!"
+        },
+        {
+            "type": 13,
+            "text": "OK, let's get you all fixed up!\nJust leave it up to me!{be01}"
+        },
+        {
+            "type": 14,
+            "text": "Be careful of sandstorms as you explore\nthe Desert Resort!"
+        }
+    ]
+}

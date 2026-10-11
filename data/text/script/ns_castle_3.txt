@@ -1,0 +1,15 @@
+NsCastle3_Text_NPlaceEntireWorld = N: {be09:1}This place...\nwas my entire world...{be09:0}{be01}
+NsCastle3_Text_WhenLittleAbandonedDeep = {be09:1}When I was little, I was abandoned\ndeep in the woods.{be01}\nThe ones who took me in and raised me\nwere the Pokémon who lived there.{be09:0}{be01}
+NsCastle3_Text_ThenOneDayMan = {be09:1}Then, one day, a man appeared\nbefore me, claiming to be my father.{be01}\nThat...was Ghetsis.{be09:0}{be01}
+NsCastle3_Text_ThingsHeGaveWere = {be09:1}The things he gave me were...\nthe name “Harmonia"...{be01}\nthe knowledge a king would need...{be01}\nPokémon with their hearts shut so very\ntightly I couldn't even talk to them...{be01}\nand this room...{be09:0}{be01}
+NsCastle3_Text_IllOutside = {be09:1}I'll be outside...{be09:0}{be01}
+NsCastle3_Text_ItsSlightlyDirtyBasketball = It's a slightly dirty basketball.\nThe name “Harmonia" is written on it.
+NsCastle3_Text_ItsHomeStyleBasketball = It's a home-style basketball hoop.\nIt's been knocked over.
+NsCastle3_Text_ItsToyBoxBut = It's a toy box, but its contents\nhave spilled out.
+NsCastle3_Text_RubberTheseWheelsHas = The rubber of these wheels\nhas rotted away.
+NsCastle3_Text_HalfpipeSkateboardsHasPokemon = A halfpipe for skateboards...{be01}\nIt has Pokémon scratch marks\non it here and there...
+NsCastle3_Text_ArtPanelPrintedGeometric = An art panel with a\nprinted geometric pattern.
+NsCastle3_Text_PanelHasDartStuck = This panel has a dart stuck in it.
+NsCastle3_Text_ItsSetTrainsTracks = It's a set of trains and tracks.\nIt hasn't been touched in a long time.
+NsCastle3_Text_ToyBoxHasBeen = This toy box has been tipped over.
+\pad{34}

@@ -1,45 +1,45 @@
-Director: Hey!\nYou all right?!
-Director: Hey! Get your head in the game!\nYou've gotta nail this line! Be aggressive.
-Director: What are you doing?!\nDon't take your eyes off the other actor!
-Director: OK! Just like that!\nYou're doing all right!
-Director: Just relax!\nDon't be scared of the camera!
-Director: Hey! More!\nPut more feeling into it!
-Director: Mm... That sounds good!\nThat line gets me right here!
-Director: I guess that's all right!\nWe'll use that line.
-Director: What's with that line?!\nAre you taking the viewer seriously?
-Director: Hey! We're done!\nLet's nail the ending!
-Director: OK! Cut!\nGood work! That was great!
-Director: OK! OK! Cut!\nI'm done. I'm going home!
-Director: Cut, I guess?!\nEven I don't know what's going on anymore!
-Director: What you need\nis to read the script!
-Director: The script comes first!\nGot it?
-Director: Nice...\nYou've got a good look in your eyes!
-Director: Still not there, huh?\nDon't lose your concentration.
-Director: All right!\nThat acting is a keeper!
-Director: Ain't bad...\nBut I know you can do better!
-Director: Huh...\nHow far can you go?
-Director: Well...\nWhat are you going to do now?
-Director: Nice! OK!\nThat line's a keeper.
-Director: Oh, I see...\nThat line's a cautious choice...
-Director: Hey, hey!\nThat line's not gonna work!
-Director: You know what to do, right?\nTake us home!
-Director: OK! Cut!\nAll right! This is gonna work!
-Director: Cut! Cut!\nI've seen enough! We're done!
-Director: Cut! Cut!\nOpinions will be divided on this one!
-Director: You probably know already,\nbut read the script first...
-Director: You've got the script, right?\nWe'll keep going with the shoot!
-Director: Nice! Great!\nI feel good watching this!
-Director: Wheehoo! That's so cool!
-Director: Nice! Nice! Nice!\nYou're the best!
-Director: Heh heh...\nYou, my friend, are a real actor!
-Director: Ha ha ha!\nYou've got it down!
-Director: Niiiice.\nDrew me right in.
-Director: That sent shivers up my spine!\nNow, that was the perfect line!
-Director: Not a wasted move...\nThat line wasn't bad either...
-Director: Hey! That OK?!\nIs that line gonna be all right?
-Director: Your acting decides how\ngood this film will be! You know that, right?!
-Director: Cut!\nThat's the best! You're the best!
-Director: OK! Cut!\nHmm... That might not work...
-Director: Cut... I guess...\nWhat's gonna happen with this movie?
-Director: Hey! Make sure you're\non top of the script, all right?
-Director: I'm talking to you! You got\nthe script up in that head of yours?
+Bank0312_Text_DirectorHeyAllRight = Director: Hey!\nYou all right?!
+Bank0312_Text_DirectorHeyGetHead = Director: Hey! Get your head in the game!\nYou've gotta nail this line! Be aggressive.
+Bank0312_Text_DirectorWhatDoingDont = Director: What are you doing?!\nDon't take your eyes off the other actor!
+Bank0312_Text_DirectorOkJustLike = Director: OK! Just like that!\nYou're doing all right!
+Bank0312_Text_DirectorJustRelaxDont = Director: Just relax!\nDon't be scared of the camera!
+Bank0312_Text_DirectorHeyMorePut = Director: Hey! More!\nPut more feeling into it!
+Bank0312_Text_DirectorMmSoundsGood = Director: Mm... That sounds good!\nThat line gets me right here!
+Bank0312_Text_DirectorGuessThatsAll = Director: I guess that's all right!\nWe'll use that line.
+Bank0312_Text_DirectorWhatsLineTaking = Director: What's with that line?!\nAre you taking the viewer seriously?
+Bank0312_Text_DirectorHeyWereDone = Director: Hey! We're done!\nLet's nail the ending!
+Bank0312_Text_DirectorOkCutGood = Director: OK! Cut!\nGood work! That was great!
+Bank0312_Text_DirectorOkOkCut = Director: OK! OK! Cut!\nI'm done. I'm going home!
+Bank0312_Text_DirectorCutGuessEven = Director: Cut, I guess?!\nEven I don't know what's going on anymore!
+Bank0312_Text_DirectorWhatNeedRead = Director: What you need\nis to read the script!
+Bank0312_Text_DirectorScriptComesFirst = Director: The script comes first!\nGot it?
+Bank0312_Text_DirectorNiceYouveGot = Director: Nice...\nYou've got a good look in your eyes!
+Bank0312_Text_DirectorStillNotThere = Director: Still not there, huh?\nDon't lose your concentration.
+Bank0312_Text_DirectorAllRightActing = Director: All right!\nThat acting is a keeper!
+Bank0312_Text_DirectorAintBadBut = Director: Ain't bad...\nBut I know you can do better!
+Bank0312_Text_DirectorHuhHowFar = Director: Huh...\nHow far can you go?
+Bank0312_Text_DirectorWellWhatGoing = Director: Well...\nWhat are you going to do now?
+Bank0312_Text_DirectorNiceOkLines = Director: Nice! OK!\nThat line's a keeper.
+Bank0312_Text_DirectorOhSeeLines = Director: Oh, I see...\nThat line's a cautious choice...
+Bank0312_Text_DirectorHeyHeyLines = Director: Hey, hey!\nThat line's not gonna work!
+Bank0312_Text_DirectorKnowWhatRight = Director: You know what to do, right?\nTake us home!
+Bank0312_Text_DirectorOkCutAll = Director: OK! Cut!\nAll right! This is gonna work!
+Bank0312_Text_DirectorCutCutIve = Director: Cut! Cut!\nI've seen enough! We're done!
+Bank0312_Text_DirectorCutCutOpinions = Director: Cut! Cut!\nOpinions will be divided on this one!
+Bank0312_Text_DirectorProbablyKnowAlready = Director: You probably know already,\nbut read the script first...
+Bank0312_Text_DirectorYouveGotScript = Director: You've got the script, right?\nWe'll keep going with the shoot!
+Bank0312_Text_DirectorNiceGreatFeel = Director: Nice! Great!\nI feel good watching this!
+Bank0312_Text_DirectorWheehooThatsCool = Director: Wheehoo! That's so cool!
+Bank0312_Text_DirectorNiceNiceNice = Director: Nice! Nice! Nice!\nYou're the best!
+Bank0312_Text_DirectorHehHehFriend = Director: Heh heh...\nYou, my friend, are a real actor!
+Bank0312_Text_DirectorHaHaHa = Director: Ha ha ha!\nYou've got it down!
+Bank0312_Text_DirectorNiiiiceDrewRight = Director: Niiiice.\nDrew me right in.
+Bank0312_Text_DirectorSentShiversUp = Director: That sent shivers up my spine!\nNow, that was the perfect line!
+Bank0312_Text_DirectorNotWastedMove = Director: Not a wasted move...\nThat line wasn't bad either...
+Bank0312_Text_DirectorHeyOkLine = Director: Hey! That OK?!\nIs that line gonna be all right?
+Bank0312_Text_DirectorActingDecidesHow = Director: Your acting decides how\ngood this film will be! You know that, right?!
+Bank0312_Text_DirectorCutThatsBest = Director: Cut!\nThat's the best! You're the best!
+Bank0312_Text_DirectorOkCutHmm = Director: OK! Cut!\nHmm... That might not work...
+Bank0312_Text_DirectorCutGuessWhats = Director: Cut... I guess...\nWhat's gonna happen with this movie?
+Bank0312_Text_DirectorHeyMakeSure = Director: Hey! Make sure you're\non top of the script, all right?
+Bank0312_Text_DirectorImTalkingGot = Director: I'm talking to you! You got\nthe script up in that head of yours?

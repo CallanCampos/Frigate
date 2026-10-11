@@ -1,0 +1,192 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Larvitar",
+    "pokedex": {
+        "category": "Rock Skin Pokémon",
+        "entry": "Born deep underground, it comes\naboveground and becomes a pupa once it\nhas finished eating the surrounding soil.",
+        "height": "2'00\"",
+        "weight": "158.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Larvitar",
+                "category": "Rock Skin Pokémon",
+                "entry": "A Pokémon that eats soil. Once it\nhas eaten a large mountain, it\ngoes to sleep so it can grow.",
+                "height": "2'00\"",
+                "weight": "158.7 lbs."
+            },
+            "fr": {
+                "name": "Embrylex",
+                "category": "Pokémon Peaupierre",
+                "entry": "Un Pokémon qui se nourrit de terre.\nAprès avoir dévoré une montagne,\nil s'endort pour grandir.",
+                "height": "0,6 m",
+                "weight": "72,0 kg"
+            },
+            "de": {
+                "name": "Larvitar",
+                "category": "Felshaut",
+                "entry": "Dieses Pokémon frisst das Erdreich.\nHat es einen Berg verspeist,\nschläft es ein, um zu wachsen.",
+                "height": "0,6 m",
+                "weight": "72,0 kg"
+            },
+            "it": {
+                "name": "Larvitar",
+                "category": "Pokémon Peldisasso",
+                "entry": "Pokémon che mangia la terra. Dopo aver\nmangiato un'intera montagna, va a\ndormire per poter crescere.",
+                "height": "0,6 m",
+                "weight": "72,0 kg"
+            },
+            "ko": {
+                "name": "애버라스",
+                "category": "바위표면포켓몬",
+                "entry": "흙을 먹는 포켓몬이다.\n큰 산을 다 먹어치우면\n성장을 위해 잠자기 시작한다.",
+                "height": "0.6 m",
+                "weight": "72.0 kg"
+            },
+            "es": {
+                "name": "Larvitar",
+                "category": "Pokémon Piel Roca",
+                "entry": "Este Pokémon come tierra. Cuando se\ncome una montaña, se echa a dormir\npara crecer.",
+                "height": "0,6 m",
+                "weight": "72,0 kg"
+            },
+            "ja": {
+                "name": "ヨーギラス",
+                "category": "いわはだポケモン",
+                "entry": "つちを\\x{3000}たべる\\x{3000}ポケモン。\nおおきな\\x{3000}やまを\\x{3000}たいらげると\nせいちょうのため\\x{3000}ねむりはじめる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 64,
+        "defense": 50,
+        "speed": 41,
+        "special_attack": 45,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_ROCK", "TYPE_GROUND" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 40,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_GUTS", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SAND_VEIL",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 60,
+    "height": 6,
+    "weight": 720,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BITE" ],
+            [ 1, "MOVE_LEER" ],
+            [ 5, "MOVE_SANDSTORM" ],
+            [ 10, "MOVE_SCREECH" ],
+            [ 14, "MOVE_CHIP_AWAY" ],
+            [ 19, "MOVE_ROCK_SLIDE" ],
+            [ 23, "MOVE_SCARY_FACE" ],
+            [ 28, "MOVE_THRASH" ],
+            [ 32, "MOVE_DARK_PULSE" ],
+            [ 37, "MOVE_PAYBACK" ],
+            [ 41, "MOVE_CRUNCH" ],
+            [ 46, "MOVE_EARTHQUAKE" ],
+            [ 50, "MOVE_STONE_EDGE" ],
+            [ 55, "MOVE_HYPER_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM66",
+            "TM67",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "TM95"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_UPROAR",
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SUPERPOWER",
+            "MOVE_DARK_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SPITE",
+            "MOVE_OUTRAGE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_PURSUIT",
+            "MOVE_STOMP",
+            "MOVE_OUTRAGE",
+            "MOVE_FOCUS_ENERGY",
+            "MOVE_ANCIENT_POWER",
+            "MOVE_DRAGON_DANCE",
+            "MOVE_CURSE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ASSURANCE",
+            "MOVE_IRON_HEAD",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_IRON_TAIL"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_PUPITAR"
+        }
+    ],
+    "regional_dex_number": 292,
+    "baby_species": "SPECIES_LARVITAR"
+}

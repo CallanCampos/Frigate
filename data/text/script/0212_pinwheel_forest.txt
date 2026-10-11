@@ -1,7 +1,0 @@
-Forest paths were created by\nthe Pokémon that often walk there.{be01}\nIf you walk the paths, sometimes\nyou can feel like a Pokémon yourself.
-Yo! Traveling Trainer!{be01}\nBring a strong Pokémon\nto smash the challenge rock!
-It's a challenge rock.{be01}\nWould you like to have {0102:0}\nsmash the rock?
-{0102:0} tried to smash the\nchallenge rock.{be01}\nA piece of the rock broke away!{be01}
-It's a challenge rock.
-Pinwheel Forest\nDid you remember to pack an Antidote?
-\pad{3a}

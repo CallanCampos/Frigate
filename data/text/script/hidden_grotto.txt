@@ -1,0 +1,3 @@
+HiddenGrotto_Text_HeyPokemonPokemonHides = Hey, a Pokémon!{be01}\nA Pokémon that hides in a place\nlike this might be pretty amazing!{be01}
+HiddenGrotto_Text_AmazingHugeDiscoveryIncredible = Amazing! This is a huge discovery!\nAn incredible find!{be01}\nI'll go check a lot of other trees\nto see if there are more Hidden Grottoes!{be01}
+\pad{c6}

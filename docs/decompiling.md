@@ -19,11 +19,13 @@ The current C mismatches and attempted translations still in assembly are tracke
    and a context file preprocessed from the source.
 
 `ninja progress` prints how much of the game matches, from the report at `build/b2_us/report.json`.
-`tools/scripts/progress_image.py` draws that report as decomp.dev's treemap, `docs/progress.svg`, and rewrites the
-progress line of the README. Both are committed, so run it after `ninja progress` when a batch of work is done.
+CI's `build.yml` builds each version on every push to main and uploads its report as the artifact `b2_us_report` or
+`w2_us_report`. [decomp.dev](https://decomp.dev/fuddlesworth/pokebw2) reads them, and the README shows its treemap and
+badges, so there is nothing to update by hand. `objdiff_config.py` gives each unit progress categories, which become
+decomp.dev's separate bars: ARM9 main or the overlays, and the game's code or each library of `lib/`.
 
-`tools/scripts/add_source_file.py` adds a source file to both versions' `delinks.txt`, with White 2's ranges taken
-from the version map. `tools/scripts/compiler_probe.py src/... --compilers 1.1 --show-diff 1.1` compiles a file and
+`tools/decomp/add_source_file.py` adds a source file to both versions' `delinks.txt`, with White 2's ranges taken
+from the version map. `tools/decomp/compiler_probe.py src/... --compilers 1.1 --show-diff 1.1` compiles a file and
 diffs every function in it against the original. A library under `lib/` that has its own compiler, such as SPL
 with `1.2/base`, gets the compiler and flags of its `library.toml` by default. `--mismatches` leaves out the functions that
 match, and `--functions` limits the table and diffs to the functions named. `--align` shows only the hunks of the
@@ -34,12 +36,12 @@ A function the C leaves out entirely doesn't show at all, so compare the count o
 before marking a file complete: `mb_comm_sys.c` (overlay 181) linked without `MBComm_SendParentInfo`, whose callers in
 other files then went through a veneer to address 0, which shifted the rest of the overlay.
 
-`tools/scripts/try_variants.py src/... FUNC variants.c` puts each variant of a function, separated by lines of
+`tools/decomp/try_variants.py src/... FUNC variants.c` puts each variant of a function, separated by lines of
 `=====`, in place of its definition and probes it with the file's compiler, keeping the first that matches. `--score`
 adds each variant's count of differing aligned lines, to tell apart variants of the same size.
 `rename_symbol.py --file` renames each `old new` pair, one per line, of a file.
 
-`tools/scripts/locals.py src/... FUNC` prints the register or stack slot of each parameter and local of a function,
+`tools/decomp/locals.py src/... FUNC` prints the register or stack slot of each parameter and local of a function,
 from the debug info of its built object, which shows which variable to move when registers or stack slots differ.
 
 ## Compiler
@@ -60,12 +62,12 @@ named by directory, as in `compiler_probe.py --compilers 2.0/sp2p2`, and `1.2` n
 Game code needs the `dsi` builds: the evolution demo's view matches 36 of its 56 functions with every `2.0` build and
 25 with `1.2`.
 
-`tools/scripts/compiler_probe.py` compiles a C file with every version and compares each function against the
+`tools/decomp/compiler_probe.py` compiles a C file with every version and compares each function against the
 game, ignoring relocated bytes. For example:
 
 ```sh
-.venv/bin/python tools/scripts/compiler_probe.py tools/compiler_tests/main_loops.c
+.venv/bin/python tools/decomp/compiler_probe.py tools/compiler_tests/main_loops.c
 ```
 
 It needs `pyelftools`, `capstone` and `pyyaml`. To look at a function's disassembly, run `dsd dis` into
-`build/asm`, then use `tools/scripts/show_func.py`.
+`build/asm`, then use `tools/decomp/show_func.py`.

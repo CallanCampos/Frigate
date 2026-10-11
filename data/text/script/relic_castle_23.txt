@@ -1,0 +1,3 @@
+RelicCastle23_Text_Vraahhbrbrbr = Vraahhbrbrbr!
+RelicCastle23_Text_VolcaronaQuietlyFlewAway = Volcarona quietly flew away...
+\pad{30}

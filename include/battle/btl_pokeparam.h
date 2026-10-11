@@ -96,6 +96,12 @@ static inline void BattleMonDamageRecord_Init(BattleMonDamageRecord *record, u8 
     record->attackerPos = attackerPos;
 }
 
+// A condition's ID. The CONDITION_* values are #defines in constants/battle.h, which tr_ai.inc includes too. MWCC
+// keeps a local of this type in a register where it folds an integer one into each use, as HandlerChatter's status
+typedef enum {
+    CONDITION_ID_COUNT = 36,
+} BattleConditionID;
+
 // The first part of a BattleMon, which TransformSet keeps while it copies the rest from the target
 typedef struct {
     PartyPkm *src;
@@ -114,8 +120,8 @@ typedef struct {
     u8 transformed : 1;
     u8 illusion : 1;
     u8 unk1b_7 : 1;
-    BattleCondition conditions[36];
-    u8 conditionCounters[36];
+    BattleCondition conditions[CONDITION_ID_COUNT];
+    u8 conditionCounters[CONDITION_ID_COUNT];
     // The IDs of up to 24 Pokémon, each recorded once
     u8 unkD0Count;
     u8 unkD1[24];

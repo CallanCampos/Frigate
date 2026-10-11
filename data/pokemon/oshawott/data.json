@@ -1,0 +1,139 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Oshawott",
+    "pokedex": {
+        "category": "Sea Otter Pokémon",
+        "entry": "The scalchop on its stomach isn't\njust used for battle--it can be used\nto break open hard berries as well.",
+        "height": "1'08\"",
+        "weight": "13.0 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ラッコポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 55,
+        "defense": 45,
+        "speed": 45,
+        "special_attack": 63,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_TORRENT", "ABILITY_TORRENT" ],
+    "hidden_ability": "ABILITY_SHELL_ARMOR",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 62,
+    "height": 5,
+    "weight": 59,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 5, "MOVE_TAIL_WHIP" ],
+            [ 7, "MOVE_WATER_GUN" ],
+            [ 11, "MOVE_WATER_SPORT" ],
+            [ 13, "MOVE_FOCUS_ENERGY" ],
+            [ 17, "MOVE_RAZOR_SHELL" ],
+            [ 19, "MOVE_FURY_CUTTER" ],
+            [ 23, "MOVE_WATER_PULSE" ],
+            [ 25, "MOVE_REVENGE" ],
+            [ 29, "MOVE_AQUA_JET" ],
+            [ 31, "MOVE_ENCORE" ],
+            [ 35, "MOVE_AQUA_TAIL" ],
+            [ 37, "MOVE_RETALIATE" ],
+            [ 41, "MOVE_SWORDS_DANCE" ],
+            [ 43, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM54",
+            "TM55",
+            "TM56",
+            "TM67",
+            "TM75",
+            "TM81",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_WATER_PLEDGE",
+            "MOVE_COVET",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_COPYCAT",
+            "MOVE_DETECT",
+            "MOVE_AIR_SLASH",
+            "MOVE_ASSURANCE",
+            "MOVE_BRINE",
+            "MOVE_NIGHT_SLASH",
+            "MOVE_TRUMP_CARD",
+            "MOVE_SCREECH"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 17,
+            "species": "SPECIES_DEWOTT"
+        }
+    ],
+    "regional_dex_number": 7,
+    "baby_species": "SPECIES_OSHAWOTT"
+}

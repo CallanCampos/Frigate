@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Micki",
+    "class": "TRAINER_CLASS_PSYCHIC_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ESPEON",
+            "form": 0,
+            "level": 36,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Let's show the resting spirits\nthe dazzling splendor of life!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hm...?\nWas that a spirit just now?"
+        },
+        {
+            "type": 2,
+            "text": "When I come to Celestial Tower,\nstrangely, I feel the urge to fight.{be01}\nDoes it broadcast some sort of signal\nthat makes me want to fight?"
+        }
+    ]
+}

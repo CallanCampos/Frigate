@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Unaware",
+    "description": "Ignores any stat changes\nin the Pokémon."
+}

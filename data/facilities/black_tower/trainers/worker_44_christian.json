@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Christian",
+    "class": "TRAINER_CLASS_WORKER_44",
+    "pokemon": [
+        "nosepass_1",
+        "onix_1",
+        "graveler_1",
+        "sudowoodo_1",
+        "magcargo_1",
+        "shelgon_1",
+        "metang_1",
+        "marowak_1",
+        "lairon_1",
+        "tangela_1"
+    ]
+}

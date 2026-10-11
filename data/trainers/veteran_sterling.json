@@ -1,0 +1,54 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Sterling",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BEARTIC",
+            "form": 0,
+            "level": 54,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_ICICLE_CRASH", "MOVE_SLASH", "MOVE_BRINE", "MOVE_BRICK_BREAK" ]
+        },
+        {
+            "species": "SPECIES_THROH",
+            "form": 0,
+            "level": 54,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_CIRCLE_THROW", "MOVE_ROCK_SLIDE", "MOVE_BODY_SLAM", "MOVE_BULK_UP" ]
+        },
+        {
+            "species": "SPECIES_GOLURK",
+            "form": 0,
+            "level": 54,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_IRON_DEFENSE", "MOVE_MEGA_PUNCH", "MOVE_SHADOW_PUNCH" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "The people who pass by here\nhave such different moods!{be01}\nIt's fun to watch, and even more fun\nto fight against them!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Mwa haha!\nIt's fun!"
+        },
+        {
+            "type": 2,
+            "text": "Your Pokémon was in a really good mood\nthe moment that you won!"
+        }
+    ]
+}

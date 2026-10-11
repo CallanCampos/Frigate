@@ -9,6 +9,14 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
+// The players of the battle that overlay 28's Colosseum_BuildBattlePlayers builds: battle_proc.h's BattlePlayers, then the
+// records
+typedef struct {
+    BattlePlayers battle;
+    u32 unk50;
+    GameRecords *records;
+} ColosseumPlayers;
+
 typedef struct {
     PokeParty *party;
     u32 unk4;
@@ -17,7 +25,7 @@ typedef struct {
     u16 bgm;
     u8 unk12;
     Regulation *regulation;
-    BattlePlayers players;
+    ColosseumPlayers players;
 } ColosseumBattleParam;
 
 GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, ColosseumBattleParam *param);

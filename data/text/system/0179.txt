@@ -1,197 +1,197 @@
-{0102:0}
-⑭
-⑮
-Lv. {0202:0}
-Item
-{0109:0}
-None
-     \x{ffff}
-Dex No.
-{0202:0}
-Name
-{0101:0}
-Type
-OT
-{0100:0}
-ID No.
-{0204:0}
-Exp. Points
-{0206:0}
-To Next Lv.
-
-{0205:0}
-???
-       \x{ffff}
-                    \x{ffff}
-                    \x{ffff}
-                   \x{ffff}
-                    \x{ffff}
-                   \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-                   \x{ffff}
-                    \x{ffff}
-                    \x{ffff}
-                   \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                    \x{ffff}
-                   \x{ffff}
-                  \x{ffff}
-                    \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                    \x{ffff}
-                   \x{ffff}
-                                                    \x{ffff}
-                                                        \x{ffff}
-                                                     \x{ffff}
-                                                                                           \x{ffff}
-                                                                                             \x{ffff}
-                                                                                           \x{ffff}
-                                                                                             \x{ffff}
-                                                              \x{ffff}
-                                                                  \x{ffff}
-                                                                                                     \x{ffff}
-                                                                                                         \x{ffff}
-                                                                                                      \x{ffff}
-                                                                                                         \x{ffff}
-                                                                                                     \x{ffff}
-                                                                                                         \x{ffff}
-                                                     \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-                   \x{ffff}
-           \x{ffff}
-           \x{ffff}
-          \x{ffff}
-          \x{ffff}
-            \x{ffff}
-            \x{ffff}
-         \x{ffff}
-           \x{ffff}
-            \x{ffff}
-             \x{ffff}
-         \x{ffff}
-          \x{ffff}
-        \x{ffff}
-        \x{ffff}
-         \x{ffff}
-        \x{ffff}
-         \x{ffff}
-           \x{ffff}
-         \x{ffff}
-            \x{ffff}
-          \x{ffff}
-           \x{ffff}
-         \x{ffff}
-        \x{ffff}
-            \x{ffff}
-           \x{ffff}
-       \x{ffff}
-            \x{ffff}
-          \x{ffff}
-       \x{ffff}
-            \x{ffff}
-                                                         \x{ffff}
-                                                         \x{ffff}
-                                                                   \x{ffff}
-                                                                    \x{ffff}
-                                       \x{ffff}
-                                            \x{ffff}
-                                                \x{ffff}
-                                        \x{ffff}
-     \x{ffff}
-HP
-Attack
-Defense
-Sp. Atk
-Sp. Def
-Speed
-Ability
-/
-{0202:0}
-{0202:0}
-{0202:0}
-{0202:0}
-{0202:0}
-{0202:0}
-{0202:0}
-{0106:0}
-       \x{ffff}
-    \x{ffff}
-      \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-PP
-{0201:0}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-{0201:0}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-      \x{ffff}
-POWER
-ACCURACY
-CATEGORY
-{0202:0}
-{0202:0}
-    \x{ffff}
---
---
-    \x{ffff}
-HM moves can't be\nforgotten now.
-       \x{ffff}
-    \x{ffff}
-    \x{ffff}
-        \x{ffff}
-    \x{ffff}
-     \x{ffff}
-    \x{ffff}
-    \x{ffff}
-       \x{ffff}
-               \x{ffff}
-               \x{ffff}
-               \x{ffff}
-               \x{ffff}
-                \x{ffff}
-       \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                \x{ffff}
-                \x{ffff}
-            \x{ffff}
-                 \x{ffff}
-      \x{ffff}
-    \x{ffff}
-    \x{ffff}
-       \x{ffff}
-     \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-     \x{ffff}
-    \x{ffff}
-    \x{ffff}
-       \x{ffff}
-FORGET
-       \x{ffff}
-           \x{ffff}
+Bank0179_Text_Empty = {0102:0}
+Bank0179_Text_Empty_2 = ⑭
+Bank0179_Text_Empty_3 = ⑮
+Bank0179_Text_Lv = Lv. {0202:0}
+Bank0179_Text_Item = Item
+Bank0179_Text_Empty_4 = {0109:0}
+Bank0179_Text_None = None
+Bank0179_Text_Empty_5 =      \x{ffff}
+Bank0179_Text_DexNo = Dex No.
+Bank0179_Text_Empty_6 = {0202:0}
+Bank0179_Text_Name = Name
+Bank0179_Text_Empty_7 = {0101:0}
+Bank0179_Text_Type = Type
+Bank0179_Text_Ot = OT
+Bank0179_Text_Empty_8 = {0100:0}
+Bank0179_Text_IdNo = ID No.
+Bank0179_Text_Empty_9 = {0204:0}
+Bank0179_Text_ExpPoints = Exp. Points
+Bank0179_Text_Empty_10 = {0206:0}
+Bank0179_Text_NextLv = To Next Lv.
+Bank0179_Text_Empty_11 =
+Bank0179_Text_Empty_12 = {0205:0}
+Bank0179_Text_Empty_13 = ???
+Bank0179_Text_Empty_14 =        \x{ffff}
+Bank0179_Text_Empty_15 =                     \x{ffff}
+Bank0179_Text_Empty_16 =                     \x{ffff}
+Bank0179_Text_Empty_17 =                    \x{ffff}
+Bank0179_Text_Empty_18 =                     \x{ffff}
+Bank0179_Text_Empty_19 =                    \x{ffff}
+Bank0179_Text_Empty_20 =                   \x{ffff}
+Bank0179_Text_Empty_21 =                   \x{ffff}
+Bank0179_Text_Empty_22 =                   \x{ffff}
+Bank0179_Text_Empty_23 =                    \x{ffff}
+Bank0179_Text_Empty_24 =                     \x{ffff}
+Bank0179_Text_Empty_25 =                     \x{ffff}
+Bank0179_Text_Empty_26 =                    \x{ffff}
+Bank0179_Text_Empty_27 =                   \x{ffff}
+Bank0179_Text_Empty_28 =                   \x{ffff}
+Bank0179_Text_Empty_29 =                    \x{ffff}
+Bank0179_Text_Empty_30 =                    \x{ffff}
+Bank0179_Text_Empty_31 =                     \x{ffff}
+Bank0179_Text_Empty_32 =                    \x{ffff}
+Bank0179_Text_Empty_33 =                   \x{ffff}
+Bank0179_Text_Empty_34 =                     \x{ffff}
+Bank0179_Text_Empty_35 =                    \x{ffff}
+Bank0179_Text_Empty_36 =                    \x{ffff}
+Bank0179_Text_Empty_37 =                    \x{ffff}
+Bank0179_Text_Empty_38 =                     \x{ffff}
+Bank0179_Text_Empty_39 =                    \x{ffff}
+Bank0179_Text_Empty_40 =                                                     \x{ffff}
+Bank0179_Text_Empty_41 =                                                         \x{ffff}
+Bank0179_Text_Empty_42 =                                                      \x{ffff}
+Bank0179_Text_Empty_43 =                                                                                            \x{ffff}
+Bank0179_Text_Empty_44 =                                                                                              \x{ffff}
+Bank0179_Text_Empty_45 =                                                                                            \x{ffff}
+Bank0179_Text_Empty_46 =                                                                                              \x{ffff}
+Bank0179_Text_Empty_47 =                                                               \x{ffff}
+Bank0179_Text_Empty_48 =                                                                   \x{ffff}
+Bank0179_Text_Empty_49 =                                                                                                      \x{ffff}
+Bank0179_Text_Empty_50 =                                                                                                          \x{ffff}
+Bank0179_Text_Empty_51 =                                                                                                       \x{ffff}
+Bank0179_Text_Empty_52 =                                                                                                          \x{ffff}
+Bank0179_Text_Empty_53 =                                                                                                      \x{ffff}
+Bank0179_Text_Empty_54 =                                                                                                          \x{ffff}
+Bank0179_Text_Empty_55 =                                                      \x{ffff}
+Bank0179_Text_Empty_56 =                   \x{ffff}
+Bank0179_Text_Empty_57 =                   \x{ffff}
+Bank0179_Text_Empty_58 =                   \x{ffff}
+Bank0179_Text_Empty_59 =                   \x{ffff}
+Bank0179_Text_Empty_60 =                    \x{ffff}
+Bank0179_Text_Empty_61 =            \x{ffff}
+Bank0179_Text_Empty_62 =            \x{ffff}
+Bank0179_Text_Empty_63 =           \x{ffff}
+Bank0179_Text_Empty_64 =           \x{ffff}
+Bank0179_Text_Empty_65 =             \x{ffff}
+Bank0179_Text_Empty_66 =             \x{ffff}
+Bank0179_Text_Empty_67 =          \x{ffff}
+Bank0179_Text_Empty_68 =            \x{ffff}
+Bank0179_Text_Empty_69 =             \x{ffff}
+Bank0179_Text_Empty_70 =              \x{ffff}
+Bank0179_Text_Empty_71 =          \x{ffff}
+Bank0179_Text_Empty_72 =           \x{ffff}
+Bank0179_Text_Empty_73 =         \x{ffff}
+Bank0179_Text_Empty_74 =         \x{ffff}
+Bank0179_Text_Empty_75 =          \x{ffff}
+Bank0179_Text_Empty_76 =         \x{ffff}
+Bank0179_Text_Empty_77 =          \x{ffff}
+Bank0179_Text_Empty_78 =            \x{ffff}
+Bank0179_Text_Empty_79 =          \x{ffff}
+Bank0179_Text_Empty_80 =             \x{ffff}
+Bank0179_Text_Empty_81 =           \x{ffff}
+Bank0179_Text_Empty_82 =            \x{ffff}
+Bank0179_Text_Empty_83 =          \x{ffff}
+Bank0179_Text_Empty_84 =         \x{ffff}
+Bank0179_Text_Empty_85 =             \x{ffff}
+Bank0179_Text_Empty_86 =            \x{ffff}
+Bank0179_Text_Empty_87 =        \x{ffff}
+Bank0179_Text_Empty_88 =             \x{ffff}
+Bank0179_Text_Empty_89 =           \x{ffff}
+Bank0179_Text_Empty_90 =        \x{ffff}
+Bank0179_Text_Empty_91 =             \x{ffff}
+Bank0179_Text_Empty_92 =                                                          \x{ffff}
+Bank0179_Text_Empty_93 =                                                          \x{ffff}
+Bank0179_Text_Empty_94 =                                                                    \x{ffff}
+Bank0179_Text_Empty_95 =                                                                     \x{ffff}
+Bank0179_Text_Empty_96 =                                        \x{ffff}
+Bank0179_Text_Empty_97 =                                             \x{ffff}
+Bank0179_Text_Empty_98 =                                                 \x{ffff}
+Bank0179_Text_Empty_99 =                                         \x{ffff}
+Bank0179_Text_Empty_100 =      \x{ffff}
+Bank0179_Text_Hp = HP
+Bank0179_Text_Attack = Attack
+Bank0179_Text_Defense = Defense
+Bank0179_Text_SpAtk = Sp. Atk
+Bank0179_Text_SpDef = Sp. Def
+Bank0179_Text_Speed = Speed
+Bank0179_Text_Ability = Ability
+Bank0179_Text_Empty_101 = /
+Bank0179_Text_Empty_102 = {0202:0}
+Bank0179_Text_Empty_103 = {0202:0}
+Bank0179_Text_Empty_104 = {0202:0}
+Bank0179_Text_Empty_105 = {0202:0}
+Bank0179_Text_Empty_106 = {0202:0}
+Bank0179_Text_Empty_107 = {0202:0}
+Bank0179_Text_Empty_108 = {0202:0}
+Bank0179_Text_Empty_109 = {0106:0}
+Bank0179_Text_Empty_110 =        \x{ffff}
+Bank0179_Text_Empty_111 =     \x{ffff}
+Bank0179_Text_Empty_112 =       \x{ffff}
+Bank0179_Text_Empty_113 =     \x{ffff}
+Bank0179_Text_Empty_114 =     \x{ffff}
+Bank0179_Text_Empty_115 =     \x{ffff}
+Bank0179_Text_Empty_116 =     \x{ffff}
+Bank0179_Text_Empty_117 =     \x{ffff}
+Bank0179_Text_Empty_118 =     \x{ffff}
+Bank0179_Text_Pp = PP
+Bank0179_Text_Empty_119 = {0201:0}
+Bank0179_Text_Empty_120 =     \x{ffff}
+Bank0179_Text_Empty_121 =     \x{ffff}
+Bank0179_Text_Empty_122 =     \x{ffff}
+Bank0179_Text_Empty_123 =     \x{ffff}
+Bank0179_Text_Empty_124 = {0201:0}
+Bank0179_Text_Empty_125 =     \x{ffff}
+Bank0179_Text_Empty_126 =     \x{ffff}
+Bank0179_Text_Empty_127 =     \x{ffff}
+Bank0179_Text_Empty_128 =     \x{ffff}
+Bank0179_Text_Empty_129 =       \x{ffff}
+Bank0179_Text_Power = POWER
+Bank0179_Text_Accuracy = ACCURACY
+Bank0179_Text_Category = CATEGORY
+Bank0179_Text_Empty_130 = {0202:0}
+Bank0179_Text_Empty_131 = {0202:0}
+Bank0179_Text_Empty_132 =     \x{ffff}
+Bank0179_Text_Empty_133 = --
+Bank0179_Text_Empty_134 = --
+Bank0179_Text_Empty_135 =     \x{ffff}
+Bank0179_Text_HmMovesCantForgotten = HM moves can't be\nforgotten now.
+Bank0179_Text_Empty_136 =        \x{ffff}
+Bank0179_Text_Empty_137 =     \x{ffff}
+Bank0179_Text_Empty_138 =     \x{ffff}
+Bank0179_Text_Empty_139 =         \x{ffff}
+Bank0179_Text_Empty_140 =     \x{ffff}
+Bank0179_Text_Empty_141 =      \x{ffff}
+Bank0179_Text_Empty_142 =     \x{ffff}
+Bank0179_Text_Empty_143 =     \x{ffff}
+Bank0179_Text_Empty_144 =        \x{ffff}
+Bank0179_Text_Empty_145 =                \x{ffff}
+Bank0179_Text_Empty_146 =                \x{ffff}
+Bank0179_Text_Empty_147 =                \x{ffff}
+Bank0179_Text_Empty_148 =                \x{ffff}
+Bank0179_Text_Empty_149 =                 \x{ffff}
+Bank0179_Text_Empty_150 =        \x{ffff}
+Bank0179_Text_Empty_151 =                  \x{ffff}
+Bank0179_Text_Empty_152 =                  \x{ffff}
+Bank0179_Text_Empty_153 =                  \x{ffff}
+Bank0179_Text_Empty_154 =                 \x{ffff}
+Bank0179_Text_Empty_155 =                 \x{ffff}
+Bank0179_Text_Empty_156 =             \x{ffff}
+Bank0179_Text_Empty_157 =                  \x{ffff}
+Bank0179_Text_Empty_158 =       \x{ffff}
+Bank0179_Text_Empty_159 =     \x{ffff}
+Bank0179_Text_Empty_160 =     \x{ffff}
+Bank0179_Text_Empty_161 =        \x{ffff}
+Bank0179_Text_Empty_162 =      \x{ffff}
+Bank0179_Text_Empty_163 =     \x{ffff}
+Bank0179_Text_Empty_164 =     \x{ffff}
+Bank0179_Text_Empty_165 =     \x{ffff}
+Bank0179_Text_Empty_166 =     \x{ffff}
+Bank0179_Text_Empty_167 =     \x{ffff}
+Bank0179_Text_Empty_168 =      \x{ffff}
+Bank0179_Text_Empty_169 =     \x{ffff}
+Bank0179_Text_Empty_170 =     \x{ffff}
+Bank0179_Text_Empty_171 =        \x{ffff}
+Bank0179_Text_Forget = FORGET
+Bank0179_Text_Empty_172 =        \x{ffff}
+Bank0179_Text_Empty_173 =            \x{ffff}
 \pad{98}

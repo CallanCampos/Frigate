@@ -1,0 +1,76 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 76,
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 1,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 9,
+                "z": 11,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": 54,
+            "movement": 2,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 2,
+                "z": 8,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_VIRBANK_CITY",
+            "warp": 7,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 72,
+                "y": 0,
+                "z": 232,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_POKESTAR_STUDIOS",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 1,
+            "grid": {
+                "x": 72,
+                "y": 0,
+                "z": 24,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

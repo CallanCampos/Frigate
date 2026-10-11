@@ -1,31 +1,31 @@
-Loading...\nPlease wait a moment.
-No compatible Game Card is inserted.\nPlease turn off the power and\ninsert a compatible Game Card\nbefore you retry Poké Transfer.{be01}
-Activating Poké Transfer...\nPlease stand by.
-Saving...\nDon't turn off the power.
-The game has been saved.{be02:60}
-Would you like to use\nPoké Transfer again?
-Poké Transfer will close.\nPlease turn off the power.
-There is not enough room\nleft in the PC in the other\nDS system.{be01}
-There aren't six Pokémon in the PC\nBoxes for Poké Transfer to catch.{be01}
-The saved data\ncould not be accessed.{be01}
-Unable to connect\nto the other DS system.{be01}
-Save failed...{be01}
-Pokémon CANNOT be returned\nonce they transfer.{be00}\nTransfer these Pokémon?
-Pokémon were sent back\nwhere they came from.{be01}
-Error reading the save file.\nThere may not be a save file,\nor the save file may be corrupted.{be01}
-No compatible Game Card is inserted.\nPlease turn off the power and\ninsert a compatible Game Card\nbefore you retry Poké Transfer.{be01}
-YES
-NO
-Lv. {0202:0}
-An Egg cannot be caught\nwith Poké Transfer!
-This Pokémon knows a hidden move.\nIt cannot be caught with Poké Transfer.
-This Pokémon cannot be\ncaught with Poké Transfer.
-The six chosen Pokémon will be transferred.
-Oh! This Pichu needs to stay where it is.{be01}\nIt appears to have traveled\nthrough time.{be01}\nIt has been affected by traveling\nso far through time with Celebi.{be01}\nIt'll be very risky to transfer it,\nso it's best for Pichu to stay where it is.
-Held items will be put\nin the Bag. Is that OK?
-When the Bag is full of a certain item, you'll\nlose held items of that kind. Is that OK?
-Would you like to end Poké Transfer?
-Please choose the six Pokémon\nto transfer and slide them\nto the frame to the right.
-Catch all the Pokémon\nbefore time runs out!
-デバッグROM\nDP\x{3000}Y\nPT\x{3000}X\nGS\x{3000}A
+Bank0091_Text_LoadingPleaseWaitMoment = Loading...\nPlease wait a moment.
+Bank0091_Text_NoCompatibleGameCard = No compatible Game Card is inserted.\nPlease turn off the power and\ninsert a compatible Game Card\nbefore you retry Poké Transfer.{be01}
+Bank0091_Text_ActivatingPokeTransferPlease = Activating Poké Transfer...\nPlease stand by.
+Bank0091_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+Bank0091_Text_GameHasBeenSaved = The game has been saved.{be02:60}
+Bank0091_Text_WouldLikeUsePoke = Would you like to use\nPoké Transfer again?
+Bank0091_Text_PokeTransferWillClose = Poké Transfer will close.\nPlease turn off the power.
+Bank0091_Text_ThereNotEnoughRoom = There is not enough room\nleft in the PC in the other\nDS system.{be01}
+Bank0091_Text_ThereArentSixPokemon = There aren't six Pokémon in the PC\nBoxes for Poké Transfer to catch.{be01}
+Bank0091_Text_SavedDataCouldNot = The saved data\ncould not be accessed.{be01}
+Bank0091_Text_UnableConnectOtherDs = Unable to connect\nto the other DS system.{be01}
+Bank0091_Text_SaveFailed = Save failed...{be01}
+Bank0091_Text_PokemonCannotReturnedOnce = Pokémon CANNOT be returned\nonce they transfer.{be00}\nTransfer these Pokémon?
+Bank0091_Text_PokemonWereSentBack = Pokémon were sent back\nwhere they came from.{be01}
+Bank0091_Text_ErrorReadingSaveFile = Error reading the save file.\nThere may not be a save file,\nor the save file may be corrupted.{be01}
+Bank0091_Text_NoCompatibleGameCard_2 = No compatible Game Card is inserted.\nPlease turn off the power and\ninsert a compatible Game Card\nbefore you retry Poké Transfer.{be01}
+Bank0091_Text_Yes = YES
+Bank0091_Text_No = NO
+Bank0091_Text_Lv = Lv. {0202:0}
+Bank0091_Text_EggCannotCaughtPoke = An Egg cannot be caught\nwith Poké Transfer!
+Bank0091_Text_PokemonKnowsHiddenMove = This Pokémon knows a hidden move.\nIt cannot be caught with Poké Transfer.
+Bank0091_Text_PokemonCannotCaughtPoke = This Pokémon cannot be\ncaught with Poké Transfer.
+Bank0091_Text_SixChosenPokemonWill = The six chosen Pokémon will be transferred.
+Bank0091_Text_OhPichuNeedsStay = Oh! This Pichu needs to stay where it is.{be01}\nIt appears to have traveled\nthrough time.{be01}\nIt has been affected by traveling\nso far through time with Celebi.{be01}\nIt'll be very risky to transfer it,\nso it's best for Pichu to stay where it is.
+Bank0091_Text_HeldItemsWillPut = Held items will be put\nin the Bag. Is that OK?
+Bank0091_Text_WhenBagFullCertain = When the Bag is full of a certain item, you'll\nlose held items of that kind. Is that OK?
+Bank0091_Text_WouldLikeEndPoke = Would you like to end Poké Transfer?
+Bank0091_Text_PleaseChooseSixPokemon = Please choose the six Pokémon\nto transfer and slide them\nto the frame to the right.
+Bank0091_Text_CatchAllPokemonBefore = Catch all the Pokémon\nbefore time runs out!
+Bank0091_Text_RomDpYPt = デバッグROM\nDP\x{3000}Y\nPT\x{3000}X\nGS\x{3000}A
 \pad{80}

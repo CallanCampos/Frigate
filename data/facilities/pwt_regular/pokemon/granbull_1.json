@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GRANBULL",
+    "moves": [ "MOVE_METRONOME", "MOVE_ATTRACT", "MOVE_MIMIC", "MOVE_RETURN" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_NAUGHTY",
+    "item": "ITEM_JABOCA_BERRY",
+    "form": 0
+}

@@ -1,0 +1,95 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [
+            [ "SPECIES_BANETTE", 47, 47 ],
+            [ "SPECIES_BANETTE", 47, 47 ],
+            [ "SPECIES_BANETTE", 48, 48 ],
+            [ "SPECIES_GOLURK", 48, 48 ],
+            [ "SPECIES_BANETTE", 49, 49 ],
+            [ "SPECIES_GOLURK", 49, 49 ],
+            [ "SPECIES_BANETTE", 50, 50 ],
+            [ "SPECIES_GOLURK", 50, 50 ],
+            [ "SPECIES_BANETTE", 50, 50 ],
+            [ "SPECIES_GOLURK", 50, 50 ],
+            [ "SPECIES_BANETTE", 50, 50 ],
+            [ "SPECIES_GOLURK", 50, 50 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": {
+            "black2": [
+                [ "SPECIES_BASCULIN", 35, 50 ],
+                [ "SPECIES_MARILL", 35, 50 ],
+                [ "SPECIES_BASCULIN", 40, 50 ],
+                [ "SPECIES_BASCULIN", 40, 50 ],
+                [ "SPECIES_BASCULIN", 40, 50 ]
+            ],
+            "white2": [
+                [ "SPECIES_BASCULIN", 35, 50, 1 ],
+                [ "SPECIES_MARILL", 35, 50 ],
+                [ "SPECIES_BASCULIN", 40, 50, 1 ],
+                [ "SPECIES_BASCULIN", 40, 50, 1 ],
+                [ "SPECIES_BASCULIN", 40, 50, 1 ]
+            ]
+        },
+        "rippling_surf": {
+            "black2": [
+                [ "SPECIES_MARILL", 35, 50 ],
+                [ "SPECIES_BASCULIN", 35, 50, 1 ],
+                [ "SPECIES_BASCULIN", 40, 50, 1 ],
+                [ "SPECIES_AZUMARILL", 40, 50 ],
+                [ "SPECIES_AZUMARILL", 40, 50 ]
+            ],
+            "white2": [
+                [ "SPECIES_MARILL", 35, 50 ],
+                [ "SPECIES_BASCULIN", 35, 50 ],
+                [ "SPECIES_BASCULIN", 40, 50 ],
+                [ "SPECIES_AZUMARILL", 40, 50 ],
+                [ "SPECIES_AZUMARILL", 40, 50 ]
+            ]
+        },
+        "fishing": {
+            "black2": [
+                [ "SPECIES_POLIWAG", 40, 55 ],
+                [ "SPECIES_BASCULIN", 40, 55 ],
+                [ "SPECIES_POLIWAG", 50, 55 ],
+                [ "SPECIES_POLIWAG", 50, 55 ],
+                [ "SPECIES_POLIWAG", 50, 55 ]
+            ],
+            "white2": [
+                [ "SPECIES_POLIWAG", 40, 55 ],
+                [ "SPECIES_BASCULIN", 40, 55, 1 ],
+                [ "SPECIES_POLIWAG", 50, 55 ],
+                [ "SPECIES_POLIWAG", 50, 55 ],
+                [ "SPECIES_POLIWAG", 50, 55 ]
+            ]
+        },
+        "rippling_fishing": {
+            "black2": [
+                [ "SPECIES_POLIWHIRL", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60, 1 ],
+                [ "SPECIES_POLIWHIRL", 50, 60 ],
+                [ "SPECIES_POLIWRATH", 50, 60 ],
+                [ "SPECIES_POLIWRATH", 50, 60 ]
+            ],
+            "white2": [
+                [ "SPECIES_POLIWHIRL", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60 ],
+                [ "SPECIES_POLIWHIRL", 50, 60 ],
+                [ "SPECIES_POLIWRATH", 50, 60 ],
+                [ "SPECIES_POLIWRATH", 50, 60 ]
+            ]
+        }
+    }
+}

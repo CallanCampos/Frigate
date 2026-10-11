@@ -7,6 +7,7 @@
 #include "constants/field_script.h"
 #include "constants/items.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -27,6 +28,7 @@
 #include "gfl/tcb.h"
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
+#include "gfl/wih.h"
 #include "gfl/wm_icon.h"
 #include "nitro/card.h"
 #include "nitro/fs.h"
@@ -52,6 +54,7 @@
 #include "system/text_speed.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
+#include "text/system/startmenu_gfl_net_err_disp_message.h"
 
 // The DS Download Play parent (mb_parent_sys.c): sends a program to another system by DS Download Play and stores the
 // Pokémon it sends back. The Poké Transfer Lab starts it to bring Pokémon over from the Gen 4 games, and the start
@@ -745,8 +748,8 @@ static void MBParent_DrawTopScreen(MBParentWork *wk) {
     GFL_BGSysLoadScr(bg);
     GFL_ArcToolFree(arc);
     window = BmpWin_CreateDynamic(bg, 1, 4, 30, 8, 7, TRUE);
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x66, wk->heapId);
-    strbuf = GFL_MsgDataLoadStrbufNew(msgData, 1);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU_GFL_NET_ERR_DISP_MESSAGE, wk->heapId);
+    strbuf = GFL_MsgDataLoadStrbufNew(msgData, StartmenuGflNetErrDispMessage_Text_CommunicationErrorPleaseTurn);
     GFL_BitmapFill(BmpWin_GetBitmap(window), 7);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(window), 0, 0, strbuf, MBUtilMsg_GetFont(wk->msg), 0x1167);
     BmpWin_FlushChar(window);
@@ -848,12 +851,12 @@ static void MBParent_FreeGameInfo(MBParentWork *wk) {
 }
 
 static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
-    if (func_ov030_02174e58() == WH_SYSSTATE_ERROR || func_ov030_02174e58() == WH_SYSSTATE_FATAL) {
+    if (WH_GetSystemState() == WH_SYSSTATE_ERROR || WH_GetSystemState() == WH_SYSSTATE_FATAL) {
         wk->distributionDone = FALSE;
         wk->wirelessError = TRUE;
-        if (func_ov030_021754a0() == TRUE) {
+        if (WH_Finalize() == TRUE) {
             MBP_FreeBuffers();
-            func_ov030_02175164();
+            WH_Release();
             return TRUE;
         }
         return FALSE;
@@ -862,7 +865,7 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
     case 0:
         sWirelessDone = FALSE;
         wk->wirelessStarted = TRUE;
-        func_ov030_021750f0(wk->heapId, MBParent_OnWirelessDone, 0);
+        WH_Initialize(wk->heapId, MBParent_OnWirelessDone, 0);
         func_0203e76c(240, 0, 0, wk->heapId);
         if (wk->startMenu == FALSE) {
             func_0203e810(FALSE, wk->heapId);
@@ -873,12 +876,12 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         GCTX_HIDSetSoftResetCallback(MBParent_SoftResetCallback, wk);
         break;
     case 1:
-        if (func_ov030_02174e58() == WH_SYSSTATE_IDLE && func_ov030_02174e90() == TRUE) {
+        if (WH_GetSystemState() == WH_SYSSTATE_IDLE && WH_StartMeasureChannel() == TRUE) {
             wk->distributionSeq = 2;
         }
         break;
     case 2:
-        if (func_ov030_02174e58() == WH_SYSSTATE_MEASURECHANNEL) {
+        if (WH_GetSystemState() == WH_SYSSTATE_MEASURECHANNEL) {
             PlayerInfo *playerInfo = GetGameDataPlayerInfo(wk->param->gameData);
 
             MBParent_StartMBP(wk);
@@ -923,14 +926,14 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         break;
     case 6:
         sWirelessDone = FALSE;
-        func_ov030_02175578(MBParent_OnWirelessDone);
+        WH_End(MBParent_OnWirelessDone);
         wk->wirelessStarted = FALSE;
         wk->distributionSeq = 7;
         break;
     case 7:
         if (sWirelessDone == TRUE) {
             GCTX_HIDSetSoftResetCallback(NULL, NULL);
-            func_ov030_02175164();
+            WH_Release();
             return TRUE;
         }
         break;
@@ -948,7 +951,7 @@ static void MBParent_StartMBP(MBParentWork *wk) {
     MBGameRegistry registry = {
         NULL, NULL, NULL, NULL, NULL, MB_PARENT_GGID, 2,
     };
-    u16 channel = func_ov030_02175030();
+    u16 channel = WH_GetMeasureChannel();
 
     sys_memcpy(&registry, &wk->registry, sizeof(MBGameRegistry));
     if (wk->startMenu == FALSE) {
@@ -1113,7 +1116,7 @@ static void MBParent_SoftResetCallback(void *work) {
     }
     if (wk->wirelessStarted == TRUE) {
         sWirelessDone = FALSE;
-        while (func_ov030_02175578(MBParent_OnWirelessDone)) {
+        while (WH_End(MBParent_OnWirelessDone)) {
             irq_waitFor(TRUE, OS_IE_V_BLANK);
         }
         while (sWirelessDone == FALSE) {

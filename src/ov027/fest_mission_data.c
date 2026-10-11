@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/fest_mission_data.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -19,7 +21,7 @@ const u8 data_ov027_021711c0[8] = { 0, 1, 1, 3, 2, 2, 0, 0 };
 FestivalText *getTextFileForFestMissions(HeapID heapId) {
     FestivalText *text = GFL_HeapAllocate(heapId, sizeof(FestivalText), TRUE, "fest_mission_data.c", 0x46);
     text->archive = GFL_ArcSysCreateFileHandle(0x121, heapId);
-    text->message = GFL_MsgSysLoadData(FALSE, 2, 0x24, heapId);
+    text->message = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GET_TEXT_FILE_FOR_FEST_MISSIONS, heapId);
     return text;
 }
 

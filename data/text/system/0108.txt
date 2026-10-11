@@ -1,10 +1,10 @@
-It will forget the saying it knows\nnow. Is that OK?
-Press the A Button, then speak\ninto the microphone.{be01}
-{0102:0} learned a new saying!{be01}
-{0102:0} failed to learn a\nnew saying.{be01}
-         \x{ffff}
-                                \x{ffff}
-Preparing microphone...
-YES
-NO
+Bank0108_Text_WillForgetSayingKnows = It will forget the saying it knows\nnow. Is that OK?
+Bank0108_Text_PressButtonThenSpeak = Press the A Button, then speak\ninto the microphone.{be01}
+Bank0108_Text_LearnedNewSaying = {0102:0} learned a new saying!{be01}
+Bank0108_Text_FailedLearnNewSaying = {0102:0} failed to learn a\nnew saying.{be01}
+Bank0108_Text_Empty =          \x{ffff}
+Bank0108_Text_Empty_2 =                                 \x{ffff}
+Bank0108_Text_PreparingMicrophone = Preparing microphone...
+Bank0108_Text_Yes = YES
+Bank0108_Text_No = NO
 \pad{3c}

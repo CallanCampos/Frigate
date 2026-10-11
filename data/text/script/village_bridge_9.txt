@@ -1,0 +1,4 @@
+VillageBridge9_Text_Behbehbeh = Behbehbeh... ♪
+VillageBridge9_Text_Bwooo = Bwooo! ♪
+VillageBridge9_Text_Eeek = Eeek!{be01}
+VillageBridge9_Text_ImPracticingGetOut = I'm practicing.\nGet out!!{be01}

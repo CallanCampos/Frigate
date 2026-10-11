@@ -2,6 +2,7 @@
 // their targets, and what a mission does when the player enters a zone. The name is descriptive
 #include "types.h"
 #include "field/field.h"
+#include "field/fest_mission_people.h"
 #include "field/festival.h"
 #include "field/rival_select.h"
 #include "nitro/math.h"
@@ -68,7 +69,7 @@ void func_ov012_021683f4(GameSystem *gsys, u16 zoneId) {
         func_ov024_0216f900(entry, gsys, festival, config, zoneId);
         break;
     case 5:
-        func_ov025_0216f900(entry, gsys, festival, config, zoneId);
+        FesMissionPeople_OnZoneEnter(entry, gsys, festival, config, zoneId);
         break;
     }
 }

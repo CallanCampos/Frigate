@@ -1,4 +1,0 @@
-Oh! Both you and your Pokémon\nare full of energy!
-Hmm? Aren't you a bit tired?\nDon't be shy. Take a rest!
-Gellooo.
-\pad{f0}

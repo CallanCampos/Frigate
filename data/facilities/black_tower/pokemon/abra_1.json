@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ABRA",
+    "moves": [ "MOVE_FIRE_PUNCH", "MOVE_THUNDER_PUNCH", "MOVE_POWER_TRICK", "MOVE_BARRIER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_NONE",
+    "form": 0
+}

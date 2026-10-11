@@ -3,3 +3,8 @@
     .ctor       start:0x021f069c end:0x021f069c kind:rodata align:4
     .data       start:0x021f06a0 end:0x021f0720 kind:data align:32
     .bss        start:0x021f0720 end:0x021f0720 kind:bss align:32
+
+src/ov211/mus_comm_func.c:
+    .text       start:0x021ef220 end:0x021f0654
+    .rodata     start:0x021f0654 end:0x021f069c
+    .data       start:0x021f06a0 end:0x021f0720

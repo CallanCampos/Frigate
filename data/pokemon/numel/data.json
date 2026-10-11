@@ -1,0 +1,188 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Numel",
+    "pokedex": {
+        "category": "Numb Pokémon",
+        "entry": "The magma in its body reaches\n2,200 degrees F. Its hump gets smaller\nwhen it uses Fire-type moves.",
+        "height": "2'04\"",
+        "weight": "52.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Numel",
+                "category": "Numb Pokémon",
+                "entry": "Its humped back stores intensely\nhot magma. In rain, the magma\ncools, slowing its movement.",
+                "height": "2'04\"",
+                "weight": "52.9 lbs."
+            },
+            "fr": {
+                "name": "Chamallot",
+                "category": "Pokémon Engourdi",
+                "entry": "Son dos bossu renferme une lave\nbouillonnante. Elle refroidit par\ntemps de pluie, ce qui le ralentit.",
+                "height": "0,7 m",
+                "weight": "24,0 kg"
+            },
+            "de": {
+                "name": "Camaub",
+                "category": "Taubheit",
+                "entry": "In seinem Rücken speichert es sehr\nheißes Magma. Regnet es, kühlt das\nMagma ab und es wird langsamer.",
+                "height": "0,7 m",
+                "weight": "24,0 kg"
+            },
+            "it": {
+                "name": "Numel",
+                "category": "Pokémon Torpore",
+                "entry": "Nella gobba accumula magma. Quando\npiove, il magma si indurisce e il Pokémon\ndiventa più lento.",
+                "height": "0,7 m",
+                "weight": "24,0 kg"
+            },
+            "ko": {
+                "name": "둔타",
+                "category": "둔감포켓몬",
+                "entry": "이글거리는 마그마를 등의\n혹에 모으고 있다. 비를 맞으면\n마그마가 식어 움직임이 둔해진다.",
+                "height": "0.7 m",
+                "weight": "24.0 kg"
+            },
+            "es": {
+                "name": "Numel",
+                "category": "Pokémon Torpe",
+                "entry": "En su joroba almacena magma ardiente\nque se enfría cuando llueve\ny lo ralentiza.",
+                "height": "0,7 m",
+                "weight": "24,0 kg"
+            },
+            "ja": {
+                "name": "ドンメル",
+                "category": "どんかんポケモン",
+                "entry": "しゃくねつの\\x{3000}マグマを\\x{3000}せなかの\nコブに\\x{3000}ためている。あめに\\x{3000}あたると\nマグマが\\x{3000}ひえて\\x{3000}うごきが\\x{3000}にぶる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff14}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 60,
+        "defense": 40,
+        "speed": 35,
+        "special_attack": 65,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_FIRE", "TYPE_GROUND" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_RAWST_BERRY",
+        "rare": "ITEM_RAWST_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_OBLIVIOUS", "ABILITY_SIMPLE" ],
+    "hidden_ability": "ABILITY_OWN_TEMPO",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 61,
+    "height": 7,
+    "weight": 240,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 5, "MOVE_EMBER" ],
+            [ 8, "MOVE_MAGNITUDE" ],
+            [ 12, "MOVE_FOCUS_ENERGY" ],
+            [ 15, "MOVE_FLAME_BURST" ],
+            [ 19, "MOVE_AMNESIA" ],
+            [ 22, "MOVE_LAVA_PLUME" ],
+            [ 26, "MOVE_EARTH_POWER" ],
+            [ 29, "MOVE_CURSE" ],
+            [ 31, "MOVE_TAKE_DOWN" ],
+            [ 36, "MOVE_YAWN" ],
+            [ 40, "MOVE_EARTHQUAKE" ],
+            [ 43, "MOVE_FLAMETHROWER" ],
+            [ 47, "MOVE_DOUBLE_EDGE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_EARTH_POWER",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_AFTER_YOU",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_HOWL",
+            "MOVE_SCARY_FACE",
+            "MOVE_BODY_SLAM",
+            "MOVE_ROLLOUT",
+            "MOVE_DEFENSE_CURL",
+            "MOVE_STOMP",
+            "MOVE_YAWN",
+            "MOVE_ANCIENT_POWER",
+            "MOVE_MUD_BOMB",
+            "MOVE_HEAT_WAVE",
+            "MOVE_STOCKPILE",
+            "MOVE_SWALLOW",
+            "MOVE_SPIT_UP",
+            "MOVE_ENDURE",
+            "MOVE_IRON_HEAD"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 33,
+            "species": "SPECIES_CAMERUPT"
+        }
+    ],
+    "regional_dex_number": 204,
+    "baby_species": "SPECIES_NUMEL"
+}

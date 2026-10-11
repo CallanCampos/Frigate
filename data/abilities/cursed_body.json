@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Cursed Body",
+    "description": "May disable a move used\non the Pokémon."
+}

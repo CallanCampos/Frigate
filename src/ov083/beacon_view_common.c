@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/beacon_view_common.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -94,7 +95,7 @@ BeaconViewMenu *BeaconViewMenu_Create(u8 bg, u8 palette, Font *font, PrintQueue 
 
     menu->heapId = heapId;
     menu->res = AppTaskMenuRes_Create(bg, palette, font, queue, heapId);
-    menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 12, heapId);
+    menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0012, heapId);
     for (i = 0; i < BEACON_VIEW_MENU_STR_MAX; i++) {
         menu->strs[i] = GFL_MsgDataLoadStrbufNew(menu->msgData, i);
     }

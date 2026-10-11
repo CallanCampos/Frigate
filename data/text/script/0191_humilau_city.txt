@@ -1,4 +1,0 @@
-Humilau City was a resort known to\nonly a limited number of people.{be01}\nBut personally, it's more fun\nif many people come to visit the city.
-Wow, seriously?{be01}\nYour {0101:0} can\nuse Surf!{be01}\nCool!\nSeriously, I give mad props to you!{be01}\nYou ride and {0101:0} is ridden...\nThe vibe between you and your Pokémon{be00}\nis insanely awesome!{be01}\n...Me?{be01}\nI sink like a rock, so\nseriously, no thank you{be00}\nto the sea and waves...
-Wow, seriously?\nYour Pokémon can't use Surf{be00}\nat all!{be01}\nYou can't ride the real wave...\nor feel the vibe.{be00}\nSeriously, no thank you!
-\pad{52}

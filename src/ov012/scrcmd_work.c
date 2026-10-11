@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/script_text_banks.h"
 #include "field/field_acmd.h"
 #include "field/field_actor.h"
 #include "field/field_script.h"
@@ -232,7 +234,7 @@ void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 
     sys_memset32(0, menu->descriptions, sizeof(menu->descriptions));
     if (menu->msgData == NULL) {
         menu->ownsMsgData = TRUE;
-        menu->msgData = GFL_MsgSysLoadData(FALSE, 3, 0x19a, env->heapId);
+        menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_0410, env->heapId);
     }
     menu->options = InitListMenuOptionHeap(32, env->heapId);
 }

@@ -1,21 +1,21 @@
-{bd02}A place of never-ending smiles!\n{bd02}Everyone's ideal place to play!\n{bd02}The amusement park!\n\n{bd02}But a threatening shadow looms\n{bd02}over this happy place...\n{bd02}The stage is set for trouble...
-{bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A hero has appeared on the scene!
-{bd02}And that hero's name is...\n\n{bd02}The {0102:0} Kid!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}A place of never-ending smiles!\n{bd02}Everyone's ideal place to play!\n{bd02}The amusement park!\n\n{bd02}But a threatening shadow looms\n{bd02}over this happy place...\n{bd02}The stage is set for trouble...
-{bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A heroine has appeared on the scene!
-{bd02}And that heroine's name is...\n\n{bd02}The {0102:0} Girl!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0267_Text_PlaceNeverEndingSmiles = {bd02}A place of never-ending smiles!\n{bd02}Everyone's ideal place to play!\n{bd02}The amusement park!\n\n{bd02}But a threatening shadow looms\n{bd02}over this happy place...\n{bd02}The stage is set for trouble...
+Bank0267_Text_HoweverItsDarkestJust = {bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A hero has appeared on the scene!
+Bank0267_Text_HerosNameKid = {bd02}And that hero's name is...\n\n{bd02}The {0102:0} Kid!
+Bank0267_Text_Empty = なし
+Bank0267_Text_Empty_2 = なし
+Bank0267_Text_Empty_3 = なし
+Bank0267_Text_Empty_4 = なし
+Bank0267_Text_Empty_5 = なし
+Bank0267_Text_Empty_6 = なし
+Bank0267_Text_Empty_7 = なし
+Bank0267_Text_PlaceNeverEndingSmiles_2 = {bd02}A place of never-ending smiles!\n{bd02}Everyone's ideal place to play!\n{bd02}The amusement park!\n\n{bd02}But a threatening shadow looms\n{bd02}over this happy place...\n{bd02}The stage is set for trouble...
+Bank0267_Text_HoweverItsDarkestJust_2 = {bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A heroine has appeared on the scene!
+Bank0267_Text_HeroinesNameGirl = {bd02}And that heroine's name is...\n\n{bd02}The {0102:0} Girl!
+Bank0267_Text_Empty_8 = なし
+Bank0267_Text_Empty_9 = なし
+Bank0267_Text_Empty_10 = なし
+Bank0267_Text_Empty_11 = なし
+Bank0267_Text_Empty_12 = なし
+Bank0267_Text_Empty_13 = なし
+Bank0267_Text_Empty_14 = なし
+Bank0267_Text_Empty_15 = なし

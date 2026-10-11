@@ -4,6 +4,7 @@
 #include "app/pms_input_view.h"
 #include "app/pmsi_initial_data.h"
 #include "app/pmsi_search.h"
+#include "app/ui/ui_scene.h"
 #include "constants/sound.h"
 #include "gfl/button_man.h"
 #include "gfl/heap.h"
@@ -21,7 +22,6 @@
 // The phrase input: the player writes one word, two words or a sentence, choosing each word from a group of words or
 // from the words of an initial, in a window of words, with the keys or the touch screen. The names are ours, guessed
 
-#define OVERLAY_139 OVERLAY_ID(139)
 
 // Where the input is driven from
 #define KEY_MODE_KEY 0
@@ -200,7 +200,7 @@ BOOL PMSInput_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     switch (*state) {
     case 0:
-        GFL_OvlLoad(OVERLAY_139);
+        GFL_OvlLoad(OVERLAY_APP_UI);
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_PMS_INPUT_SYS, 0x18000);
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_PMS_INPUT, 0x32000);
         wk = PMSInput_ConstructWork(proc, param);
@@ -273,7 +273,7 @@ BOOL PMSInput_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     PMSInput_DestructWork(work, proc);
     GFL_HeapDelete(HEAPID_PMS_INPUT_SYS);
     GFL_HeapDelete(HEAPID_PMS_INPUT);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
     return TRUE;
 }
 

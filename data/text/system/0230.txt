@@ -1,68 +1,68 @@
-Unique Star
-Girlfriend
-Intercom: Ding dong!
-Monica: Argh! Who is it?\nIt's so annoying. Why now?
-Intercom: Ding dong!
-Monica: Tch. So annoying...\nI'm busy...
-Intercom: Ding dong!
-Monica: Argggh! It's really annoying!\nAnnoying, annoying, ANNOYING!
-Monica: You bought another piece of junk!\nEnough is enough!
-{0100:1}: Why do you say that?{be01}\nThis is a very special Poké Ball.{be01}\nIt's a rare Poké Ball that I got\nthrough a top-secret route.{be01}\nSomebody told me this is a terrifying Ball,\ncursed by a Trainer who had a tragic death{be00}\na long time ago...
-Monica: Tch! Why did you buy\nsuch a weird thing?{be01}\nBesides, I'm the one working and earning\nmoney. {0100:1}, you don't even work,{be00}\nbut you think you can go out shopping?!{be01}\nI'm tired of always forgiving you.\nNot this time! Get ready for a fight!
-{0100:1}: Come on, Monica.\nDon't be mad...
-Monica: Whatever!{be01}\n{0100:1}, I'm not your mom!\nI'm not your bank!
-{0100:1}: But you are annoying...
-Monica: Eeeeegh!\nI'll take you down!
-{0100:1}: I'm sorry.
-Monica: Oh no. No!{be01}\nMaking a sorry face like that\nwon't get you off the hook!
-{0100:1}: Ha ha ha!
-Monica: What are you laughing for?\nKnock it off!
-{0100:1}: Monica, don't get so angry!\nYou'll burst a blood vessel.
-Monica: Whatever! Listen, you're not\ngetting away with it this time!{be01}\nWe're gonna battle now, and if I win,\nyou're gonna get rid of{be00}\nall the junk you bought!
-{0100:1}: Good grief...
-Monica: Good grief?!\nThat's my line!{be01}\nYou have no idea what I'm going through!\nIt's your turn to suffer instead of me!
-{0100:1}: Sorry...
-Monica: I'm not listening to sorry anymore!\nNo matter how many times you apologize,{be00}\nI won't forgive you!
-{0100:1}: I don't like you!
-Monica: Arrrggh! I'll make it simple.\nBattle me and win!
-Monica: Pant...\nPant...{be01}\nHave you learned your lesson?
-{0100:1}: Urk... Sorry...\nNow forgive me...
-Monica: Pant...{be01}\nYou give me the strange Poké Ball you\nbought earlier, and then I'll forgive you!
-{0100:1}: Oh, come on...
-Monica: If you have a problem with that,\nI don't mind getting rid of{be00}\nall your other junk, too.
-{0100:1}: I guess I have no choice...\nHere... This is it...{be01}\nHmm...\nHuh?
-Monica: What...what is this?{be01}\nWhy did this Poké Ball open on its own?{be01}\n{0100:1}, are you playing a trick on me?
-{0100:1}: Uh?
-Monica: W-wait!{be01}\nWhat's happening? I'm being sucked in!{be01}\n{0100:1}! Help me!
-{0100:1}: I don't know what to do!\nI don't know what's going on!
-Monica: Eeeeeeeek!
-{0100:1}: What? What?
-{0100:1}: Oh no...
-{0100:1}: She's been sucked into\nthe Poké Ball!
-I can't get enough of rare things,\nand as usual I bought something{be00}\nthat was advertised as very rare...{be01}\nMy girlfriend jumps down my throat as\nusual, and we have a fight, also as usual...{be01}\nThat's how it seemed to be going...{be01}\nBut suddenly, the Poké Ball opened,\nand she was sucked into it...{be01}\nAieee! What am I supposed to do...?
-{0100:1}: Ha ha... Sorry...\nI won...
-Monica: ...
-{0100:1}: Monica, are you OK?
-Monica: What...ever...
-{0100:1}: It can't be helped...{be01}\nWhen it comes to Pokémon battles,\nI'm way better than you.
-Monica: Uh... Waaaaaaah!{be01}\nWhat is this? Really!\nWhat did I do to deserve this?!
-{0100:1}: Say whatever you want, but...
-Monica: Waaaaaah!{be01}\n{0100:1}, I hate you!\nI'm leaving!
-{0100:1}: Don't say that!\nWait a minute! Monica!
-It started with a trivial fight...{be01}\nBut Monica got really mad and walked out...{be01}\nI ran after her, but I can't find\nher anywhere!{be01}\nCould this be the end of our relationship...
-Monica: Argh! What are you doing?\nWhy don't you lose?!
-{0100:1}: That's not how I roll.
-Monica: {0100:1}, it's all your fault,\nbuying this Poké Ball in the first place!{be01}\nGive it here!
-{0100:1}: Wha--! Hey!\nStop that! What are you doing?!
-Monica: This stupid thing...
-{0100:1}: No! Monica!\nThat was expensive!
-Monica: I'm going to smash it to pieces!\nThat'll put an end to this!
-{0100:1}: Wait!\nI'm begging you! Stop!
-Monica: Eek! What is this?\nWhy is this Poké Ball opening{be00}\non its own?!
-{0100:1}: What are you doing?\nDon't open that!
-Monica: I'm not doing it!\nThe thing is opening all by itself!
-{0100:1}: Agh... Huh?\nI'm being...pulled in...side...
-Monica: Eeeeek!\nThe Poké Ball is pulling me in!
-Monica: Eeeeeeeek!
-{0100:1}: Waaaaaaah!
-{0100:1} and Monica...{be01}\nBegan to quarrel...\nWhat seemed like a trivial fight...{be00}\nThey found themselves being pulled into{be00}\nan unusual Poké Ball...{be01}\nCan you see a Poké Ball rolling on\nthe floor in a messy room...?{be01}\nNobody knows what happened\nto them after that...
+Bank0230_Text_UniqueStar = Unique Star
+Bank0230_Text_Girlfriend = Girlfriend
+Bank0230_Text_IntercomDingDong = Intercom: Ding dong!
+Bank0230_Text_MonicaArghWhoIts = Monica: Argh! Who is it?\nIt's so annoying. Why now?
+Bank0230_Text_IntercomDingDong_2 = Intercom: Ding dong!
+Bank0230_Text_MonicaTchAnnoyingIm = Monica: Tch. So annoying...\nI'm busy...
+Bank0230_Text_IntercomDingDong_3 = Intercom: Ding dong!
+Bank0230_Text_MonicaArggghItsReally = Monica: Argggh! It's really annoying!\nAnnoying, annoying, ANNOYING!
+Bank0230_Text_MonicaBoughtAnotherPiece = Monica: You bought another piece of junk!\nEnough is enough!
+Bank0230_Text_WhySayVerySpecial = {0100:1}: Why do you say that?{be01}\nThis is a very special Poké Ball.{be01}\nIt's a rare Poké Ball that I got\nthrough a top-secret route.{be01}\nSomebody told me this is a terrifying Ball,\ncursed by a Trainer who had a tragic death{be00}\na long time ago...
+Bank0230_Text_MonicaTchWhyDid = Monica: Tch! Why did you buy\nsuch a weird thing?{be01}\nBesides, I'm the one working and earning\nmoney. {0100:1}, you don't even work,{be00}\nbut you think you can go out shopping?!{be01}\nI'm tired of always forgiving you.\nNot this time! Get ready for a fight!
+Bank0230_Text_ComeMonicaDontMad = {0100:1}: Come on, Monica.\nDon't be mad...
+Bank0230_Text_MonicaWhateverImNot = Monica: Whatever!{be01}\n{0100:1}, I'm not your mom!\nI'm not your bank!
+Bank0230_Text_ButAnnoying = {0100:1}: But you are annoying...
+Bank0230_Text_MonicaEeeeeghIllTake = Monica: Eeeeegh!\nI'll take you down!
+Bank0230_Text_ImSorry = {0100:1}: I'm sorry.
+Bank0230_Text_MonicaOhNoNo = Monica: Oh no. No!{be01}\nMaking a sorry face like that\nwon't get you off the hook!
+Bank0230_Text_HaHaHa = {0100:1}: Ha ha ha!
+Bank0230_Text_MonicaWhatLaughingKnock = Monica: What are you laughing for?\nKnock it off!
+Bank0230_Text_MonicaDontGetAngry = {0100:1}: Monica, don't get so angry!\nYou'll burst a blood vessel.
+Bank0230_Text_MonicaWhateverListenYoure = Monica: Whatever! Listen, you're not\ngetting away with it this time!{be01}\nWe're gonna battle now, and if I win,\nyou're gonna get rid of{be00}\nall the junk you bought!
+Bank0230_Text_GoodGrief = {0100:1}: Good grief...
+Bank0230_Text_MonicaGoodGriefThats = Monica: Good grief?!\nThat's my line!{be01}\nYou have no idea what I'm going through!\nIt's your turn to suffer instead of me!
+Bank0230_Text_Sorry = {0100:1}: Sorry...
+Bank0230_Text_MonicaImNotListening = Monica: I'm not listening to sorry anymore!\nNo matter how many times you apologize,{be00}\nI won't forgive you!
+Bank0230_Text_DontLike = {0100:1}: I don't like you!
+Bank0230_Text_MonicaArrrgghIllMake = Monica: Arrrggh! I'll make it simple.\nBattle me and win!
+Bank0230_Text_MonicaPantPantHave = Monica: Pant...\nPant...{be01}\nHave you learned your lesson?
+Bank0230_Text_UrkSorryNowForgive = {0100:1}: Urk... Sorry...\nNow forgive me...
+Bank0230_Text_MonicaPantGiveStrange = Monica: Pant...{be01}\nYou give me the strange Poké Ball you\nbought earlier, and then I'll forgive you!
+Bank0230_Text_OhCome = {0100:1}: Oh, come on...
+Bank0230_Text_MonicaIfHaveProblem = Monica: If you have a problem with that,\nI don't mind getting rid of{be00}\nall your other junk, too.
+Bank0230_Text_GuessHaveNoChoice = {0100:1}: I guess I have no choice...\nHere... This is it...{be01}\nHmm...\nHuh?
+Bank0230_Text_MonicaWhatWhatWhy = Monica: What...what is this?{be01}\nWhy did this Poké Ball open on its own?{be01}\n{0100:1}, are you playing a trick on me?
+Bank0230_Text_Uh = {0100:1}: Uh?
+Bank0230_Text_MonicaWWaitWhats = Monica: W-wait!{be01}\nWhat's happening? I'm being sucked in!{be01}\n{0100:1}! Help me!
+Bank0230_Text_DontKnowWhatDont = {0100:1}: I don't know what to do!\nI don't know what's going on!
+Bank0230_Text_MonicaEeeeeeeek = Monica: Eeeeeeeek!
+Bank0230_Text_WhatWhat = {0100:1}: What? What?
+Bank0230_Text_OhNo = {0100:1}: Oh no...
+Bank0230_Text_ShesBeenSuckedInto = {0100:1}: She's been sucked into\nthe Poké Ball!
+Bank0230_Text_CantGetEnoughRare = I can't get enough of rare things,\nand as usual I bought something{be00}\nthat was advertised as very rare...{be01}\nMy girlfriend jumps down my throat as\nusual, and we have a fight, also as usual...{be01}\nThat's how it seemed to be going...{be01}\nBut suddenly, the Poké Ball opened,\nand she was sucked into it...{be01}\nAieee! What am I supposed to do...?
+Bank0230_Text_HaHaSorryWon = {0100:1}: Ha ha... Sorry...\nI won...
+Bank0230_Text_Monica = Monica: ...
+Bank0230_Text_MonicaOk = {0100:1}: Monica, are you OK?
+Bank0230_Text_MonicaWhatEver = Monica: What...ever...
+Bank0230_Text_CantHelpedWhenComes = {0100:1}: It can't be helped...{be01}\nWhen it comes to Pokémon battles,\nI'm way better than you.
+Bank0230_Text_MonicaUhWaaaaaaahWhat = Monica: Uh... Waaaaaaah!{be01}\nWhat is this? Really!\nWhat did I do to deserve this?!
+Bank0230_Text_SayWhateverWantBut = {0100:1}: Say whatever you want, but...
+Bank0230_Text_MonicaWaaaaaahHateIm = Monica: Waaaaaah!{be01}\n{0100:1}, I hate you!\nI'm leaving!
+Bank0230_Text_DontSayWaitMinute = {0100:1}: Don't say that!\nWait a minute! Monica!
+Bank0230_Text_StartedTrivialFightBut = It started with a trivial fight...{be01}\nBut Monica got really mad and walked out...{be01}\nI ran after her, but I can't find\nher anywhere!{be01}\nCould this be the end of our relationship...
+Bank0230_Text_MonicaArghWhatDoing = Monica: Argh! What are you doing?\nWhy don't you lose?!
+Bank0230_Text_ThatsNotHowRoll = {0100:1}: That's not how I roll.
+Bank0230_Text_MonicaItsAllFault = Monica: {0100:1}, it's all your fault,\nbuying this Poké Ball in the first place!{be01}\nGive it here!
+Bank0230_Text_WhaHeyStopWhat = {0100:1}: Wha--! Hey!\nStop that! What are you doing?!
+Bank0230_Text_MonicaStupidThing = Monica: This stupid thing...
+Bank0230_Text_NoMonicaExpensive = {0100:1}: No! Monica!\nThat was expensive!
+Bank0230_Text_MonicaImGoingSmash = Monica: I'm going to smash it to pieces!\nThat'll put an end to this!
+Bank0230_Text_WaitImBeggingStop = {0100:1}: Wait!\nI'm begging you! Stop!
+Bank0230_Text_MonicaEekWhatWhy = Monica: Eek! What is this?\nWhy is this Poké Ball opening{be00}\non its own?!
+Bank0230_Text_WhatDoingDontOpen = {0100:1}: What are you doing?\nDon't open that!
+Bank0230_Text_MonicaImNotDoing = Monica: I'm not doing it!\nThe thing is opening all by itself!
+Bank0230_Text_AghHuhImBeing = {0100:1}: Agh... Huh?\nI'm being...pulled in...side...
+Bank0230_Text_MonicaEeeeekPokeBall = Monica: Eeeeek!\nThe Poké Ball is pulling me in!
+Bank0230_Text_MonicaEeeeeeeek_2 = Monica: Eeeeeeeek!
+Bank0230_Text_Waaaaaaah = {0100:1}: Waaaaaaah!
+Bank0230_Text_MonicaBeganQuarrelWhat = {0100:1} and Monica...{be01}\nBegan to quarrel...\nWhat seemed like a trivial fight...{be00}\nThey found themselves being pulled into{be00}\nan unusual Poké Ball...{be01}\nCan you see a Poké Ball rolling on\nthe floor in a messy room...?{be01}\nNobody knows what happened\nto them after that...

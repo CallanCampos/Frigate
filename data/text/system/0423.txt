@@ -1,34 +1,34 @@
-None
-Anhui
-Beijing
-Chongqing
-Fujian
-Gansu
-Guangdong
-Guangxi
-Guizhou
-Hainan
-Hebei
-Heilongjiang
-Henan
-Hubei
-Hunan
-Jiangsu
-Jiangxi
-Jilin
-Liaoning
-Inner Mongolia
-Ningxia
-Qinghai
-Shaanxi
-Shandong
-Shanghai
-Shanxi
-Sichuan
-Tianjin
-Xinjiang
-Tibet
-Yunnan
-Zhejiang
-Hong Kong
-Macau
+Bank0423_Text_None = None
+Bank0423_Text_Anhui = Anhui
+Bank0423_Text_Beijing = Beijing
+Bank0423_Text_Chongqing = Chongqing
+Bank0423_Text_Fujian = Fujian
+Bank0423_Text_Gansu = Gansu
+Bank0423_Text_Guangdong = Guangdong
+Bank0423_Text_Guangxi = Guangxi
+Bank0423_Text_Guizhou = Guizhou
+Bank0423_Text_Hainan = Hainan
+Bank0423_Text_Hebei = Hebei
+Bank0423_Text_Heilongjiang = Heilongjiang
+Bank0423_Text_Henan = Henan
+Bank0423_Text_Hubei = Hubei
+Bank0423_Text_Hunan = Hunan
+Bank0423_Text_Jiangsu = Jiangsu
+Bank0423_Text_Jiangxi = Jiangxi
+Bank0423_Text_Jilin = Jilin
+Bank0423_Text_Liaoning = Liaoning
+Bank0423_Text_InnerMongolia = Inner Mongolia
+Bank0423_Text_Ningxia = Ningxia
+Bank0423_Text_Qinghai = Qinghai
+Bank0423_Text_Shaanxi = Shaanxi
+Bank0423_Text_Shandong = Shandong
+Bank0423_Text_Shanghai = Shanghai
+Bank0423_Text_Shanxi = Shanxi
+Bank0423_Text_Sichuan = Sichuan
+Bank0423_Text_Tianjin = Tianjin
+Bank0423_Text_Xinjiang = Xinjiang
+Bank0423_Text_Tibet = Tibet
+Bank0423_Text_Yunnan = Yunnan
+Bank0423_Text_Zhejiang = Zhejiang
+Bank0423_Text_HongKong = Hong Kong
+Bank0423_Text_Macau = Macau

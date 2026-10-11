@@ -1,0 +1,127 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Eelektrik",
+    "pokedex": {
+        "category": "EleFish Pokémon",
+        "entry": "It wraps itself around its prey and\nparalyzes it with electricity from the\nround spots on its sides. Then it chomps.",
+        "height": "3'11\"",
+        "weight": "48.5 lbs.",
+        "languages": {
+            "ja": {
+                "category": "でんきうおポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 85,
+        "defense": 70,
+        "speed": 40,
+        "special_attack": 75,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 12,
+    "weight": 220,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 1, "MOVE_THUNDER_WAVE" ],
+            [ 1, "MOVE_SPARK" ],
+            [ 1, "MOVE_CHARGE_BEAM" ],
+            [ 9, "MOVE_BIND" ],
+            [ 19, "MOVE_ACID" ],
+            [ 29, "MOVE_DISCHARGE" ],
+            [ 39, "MOVE_CRUNCH" ],
+            [ 44, "MOVE_THUNDERBOLT" ],
+            [ 49, "MOVE_ACID_SPRAY" ],
+            [ 54, "MOVE_COIL" ],
+            [ 59, "MOVE_WILD_CHARGE" ],
+            [ 64, "MOVE_GASTRO_ACID" ],
+            [ 69, "MOVE_ZAP_CANNON" ],
+            [ 74, "MOVE_THRASH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM57",
+            "TM62",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM91",
+            "TM93"
+        ],
+        "by_tutor": [
+            "MOVE_SUPER_FANG",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_MAGNET_RISE",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_THUNDERSTONE",
+            "species": "SPECIES_EELEKTROSS"
+        }
+    ],
+    "regional_dex_number": 178,
+    "baby_species": "SPECIES_TYNAMO"
+}

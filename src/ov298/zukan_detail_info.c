@@ -1,9 +1,10 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
 #include "app/zukan_detail.h"
 #include "app/zukan_info.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -152,7 +153,7 @@ static BOOL ZukanDetailInfo_Init(ZukanDetailProcSys *sys, int *seq, void *param_
     ZukanDetailInfoParam *param = param_;
     ZukanDetailInfoWork *wk;
 
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_OvlLoad(OVERLAY_ZUKAN_INFO);
     wk = ZukanDetailProcSys_AllocWork(sys, sizeof(ZukanDetailInfoWork), param->heapId);
     sys_memset(wk, 0, sizeof(ZukanDetailInfoWork));
@@ -190,7 +191,7 @@ static BOOL ZukanDetailInfo_Exit(ZukanDetailProcSys *sys, int *seq, void *param_
     GFL_TCBRemove(wk->vblankTcb);
     ZukanDetailProcSys_FreeWork(sys);
     GFL_OvlUnload(OVERLAY_ZUKAN_INFO);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
     return TRUE;
 }
 
@@ -217,9 +218,9 @@ static BOOL ZukanDetailInfo_Main(ZukanDetailProcSys *sys, int *seq, void *param_
 
         *seq = INFO_SEQ_FADE_IN;
         wk->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, param->heapId);
-        wk->msgData[0] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, 464, param->heapId);
-        wk->msgData[1] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, 451, param->heapId);
-        wk->msgData[2] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, 471, param->heapId);
+        wk->msgData[0] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_CATEGORIES, param->heapId);
+        wk->msgData[1] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_HEIGHTS, param->heapId);
+        wk->msgData[2] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEDEX_WEIGHTS, param->heapId);
         for (bg = 0; bg <= 7; bg++) {
             if (bg != 1 && bg != 5) {
                 GFL_BGSysMoveBG(bg, BG_MOVE_SET_X, 0);

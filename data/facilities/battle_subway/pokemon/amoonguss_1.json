@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_AMOONGUSS",
+    "moves": [ "MOVE_GIGA_DRAIN", "MOVE_DOUBLE_TEAM", "MOVE_INGRAIN", "MOVE_SPORE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

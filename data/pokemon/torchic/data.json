@@ -1,0 +1,186 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Torchic",
+    "pokedex": {
+        "category": "Chick Pokémon",
+        "entry": "A fire burns inside, so it feels\nvery warm to hug. It launches\nfireballs of 1,800 degrees F.",
+        "height": "1'04\"",
+        "weight": "5.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Torchic",
+                "category": "Chick Pokémon",
+                "entry": "A fire burns inside, so it feels\nvery warm to hug. It launches\nfireballs of 1,800 degrees F.",
+                "height": "1'04\"",
+                "weight": "5.5 lbs."
+            },
+            "fr": {
+                "name": "Poussifeu",
+                "category": "Pokémon Poussin",
+                "entry": "Ses câlins réchauffent car il renferme\nune fournaise. Il envoie des boules de\nfeu à 1 000 °C.",
+                "height": "0,4 m",
+                "weight": "2,5 kg"
+            },
+            "de": {
+                "name": "Flemmli",
+                "category": "Küken",
+                "entry": "In seinem Inneren lodert\nein Feuer. Es schleudert\n1 000 Grad heiße Feuerbälle.",
+                "height": "0,4 m",
+                "weight": "2,5 kg"
+            },
+            "it": {
+                "name": "Torchic",
+                "category": "Pokémon Pulcino",
+                "entry": "Nel suo corpo brucia una fiamma e\nabbracciandolo si avverte calore.\nLancia palle di fuoco a 1000°C.",
+                "height": "0,4 m",
+                "weight": "2,5 kg"
+            },
+            "ko": {
+                "name": "아차모",
+                "category": "풋내기포켓몬",
+                "entry": "체내에 불꽃이 타오르고 있어\n껴안으면 무척 따뜻하다.\n1000도의 불구슬을 날린다.",
+                "height": "0.4 m",
+                "weight": "2.5 kg"
+            },
+            "es": {
+                "name": "Torchic",
+                "category": "Pokémon Polluelo",
+                "entry": "En su interior arde una llama que\nmantiene su cuerpo caliente.\nTira bolas de fuego a 1000°.",
+                "height": "0,4 m",
+                "weight": "2,5 kg"
+            },
+            "ja": {
+                "name": "アチャモ",
+                "category": "ひよこポケモン",
+                "entry": "たいないで\\x{3000}ほのおが\\x{3000}もえているので\nだきしめると\\x{3000}とても\\x{3000}あたたかい。\n\\x{ff11}\\x{ff10}\\x{ff10}\\x{ff10}どの\\x{3000}ひのたまを\\x{3000}とばす。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 60,
+        "defense": 40,
+        "speed": 45,
+        "special_attack": 70,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_BLAZE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SPEED_BOOST",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 62,
+    "height": 4,
+    "weight": 25,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 7, "MOVE_FOCUS_ENERGY" ],
+            [ 10, "MOVE_EMBER" ],
+            [ 16, "MOVE_PECK" ],
+            [ 19, "MOVE_SAND_ATTACK" ],
+            [ 25, "MOVE_FIRE_SPIN" ],
+            [ 28, "MOVE_QUICK_ATTACK" ],
+            [ 34, "MOVE_SLASH" ],
+            [ 37, "MOVE_MIRROR_MOVE" ],
+            [ 43, "MOVE_FLAMETHROWER" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM65",
+            "TM75",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_FIRE_PLEDGE",
+            "MOVE_BOUNCE",
+            "MOVE_LOW_KICK",
+            "MOVE_LAST_RESORT",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_COUNTER",
+            "MOVE_REVERSAL",
+            "MOVE_ENDURE",
+            "MOVE_SMELLING_SALT",
+            "MOVE_CRUSH_CLAW",
+            "MOVE_BATON_PASS",
+            "MOVE_AGILITY",
+            "MOVE_NIGHT_SLASH",
+            "MOVE_LAST_RESORT",
+            "MOVE_FEINT",
+            "MOVE_FEATHER_DANCE",
+            "MOVE_CURSE",
+            "MOVE_FLAME_BURST",
+            "MOVE_LOW_KICK"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 16,
+            "species": "SPECIES_COMBUSKEN"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TORCHIC"
+}

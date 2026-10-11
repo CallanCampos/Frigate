@@ -62,7 +62,18 @@ typedef struct {
 
 // The player's profile, which the server keeps with their trades
 typedef struct {
-    u8 data[0x64];
+    u8 version;
+    u8 language;
+    u8 country;
+    u8 region;
+    u32 playerId;
+    u16 playerName[8];
+    u32 unk18;
+    u8 unk1C[8];
+    // An e-mail address, which the server confirms (see Dpw_Common_ProfileResult)
+    char mailAddr[56];
+    u32 unk5C;
+    u8 unk60[4];
 } Dpw_Common_Profile;
 
 typedef struct {
@@ -70,8 +81,6 @@ typedef struct {
     int mailAddrAuthResult;
 } Dpw_Common_ProfileResult;
 
-// Fills a profile from the player's
-void func_ov189_0219d504(Dpw_Common_Profile *profile, PlayerInfo *playerInfo);
 // Starts and ends the library, for the player's ID and friend key
 void func_ov189_021a6c84(s32 pid, u64 friendKey, int a2);
 void func_ov189_021a773c(void);

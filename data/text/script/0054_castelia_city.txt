@@ -1,9 +1,0 @@
-I am in charge of development!{be01}\nI'm going to give you this, because you\ncame here for a company tour!{be01}
-If a Pokémon holds a Scope Lens, it has\na better chance to make a critical hit!
-Oh! A company tour?\nAnyway, let's have a battle!{be01}
-What power! I'm moved,\nso I'll give you this present!
-A Quick Ball makes it easier to catch a\nPokémon if you use it at the very{be00}\nbeginning of a battle.
-Did you come for Pokémon practice?\nI'll be happy to help you out!{be01}
-With skills like that,\nyou can get the most out of these!
-A Timer Ball makes it easier to catch\na Pokémon you've been battling{be00}\nfor a long time!
-\pad{54}

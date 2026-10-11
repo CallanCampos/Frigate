@@ -1,0 +1,175 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Staryu",
+    "pokedex": {
+        "category": "Star Shape Pokémon",
+        "entry": "As long as its red core remains,\nit can regenerate its body instantly,\neven if it's torn apart.",
+        "height": "2'07\"",
+        "weight": "76.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Staryu",
+                "category": "Star Shape Pokémon",
+                "entry": "If its body is torn, it can grow\nback if the red core remains.\nThe core flashes at midnight.",
+                "height": "2'07\"",
+                "weight": "76.1 lbs."
+            },
+            "fr": {
+                "name": "Stari",
+                "category": "Pokémon Étoile",
+                "entry": "Même amoché, son corps se régénère\ntant que le noyau rouge est intact.\nLe noyau s'illumine à minuit.",
+                "height": "0,8 m",
+                "weight": "34,5 kg"
+            },
+            "de": {
+                "name": "Sterndu",
+                "category": "Sternform",
+                "entry": "Wird sein Körper verletzt,\nkann es sich regenerieren,\nsofern der rote Kern intakt ist.",
+                "height": "0,8 m",
+                "weight": "34,5 kg"
+            },
+            "it": {
+                "name": "Staryu",
+                "category": "Pokémon Stella",
+                "entry": "Se il corpo è lacerato, si rigenera\nse il nucleo rosso è ancora intatto.\nIl nucleo brilla a mezzanotte.",
+                "height": "0,8 m",
+                "weight": "34,5 kg"
+            },
+            "ko": {
+                "name": "별가사리",
+                "category": "별포켓몬",
+                "entry": "빨간 핵이 있는 한, 몸이\n조각나도 바로 재생한다.\n한밤중에 핵이 반짝거린다.",
+                "height": "0.8 m",
+                "weight": "34.5 kg"
+            },
+            "es": {
+                "name": "Staryu",
+                "category": "Pokémon Estrellada",
+                "entry": "Puede recuperar las extremidades que\npierde si mantiene intacto su núcleo\nrojo, que brilla en la noche.",
+                "height": "0,8 m",
+                "weight": "34,5 kg"
+            },
+            "ja": {
+                "name": "ヒトデマン",
+                "category": "ほしがたポケモン",
+                "entry": "あかい\\x{3000}コアが\\x{3000}あるかぎり\\x{3000}からだが\nちぎれても\\x{3000}すぐに\\x{3000}さいせいする。\nまよなか\\x{3000}コアが\\x{3000}てんめつする。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff14}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 45,
+        "defense": 55,
+        "speed": 85,
+        "special_attack": 70,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 225,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_STARDUST",
+        "rare": "ITEM_STAR_PIECE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_3", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_ILLUMINATE", "ABILITY_NATURAL_CURE" ],
+    "hidden_ability": "ABILITY_ANALYTIC",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 68,
+    "height": 8,
+    "weight": 345,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_HARDEN" ],
+            [ 6, "MOVE_WATER_GUN" ],
+            [ 10, "MOVE_RAPID_SPIN" ],
+            [ 12, "MOVE_RECOVER" ],
+            [ 15, "MOVE_CAMOUFLAGE" ],
+            [ 18, "MOVE_SWIFT" ],
+            [ 22, "MOVE_BUBBLE_BEAM" ],
+            [ 25, "MOVE_MINIMIZE" ],
+            [ 30, "MOVE_GYRO_BALL" ],
+            [ 33, "MOVE_LIGHT_SCREEN" ],
+            [ 36, "MOVE_BRINE" ],
+            [ 40, "MOVE_REFLECT_TYPE" ],
+            [ 43, "MOVE_POWER_GEM" ],
+            [ 48, "MOVE_COSMIC_POWER" ],
+            [ 52, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM29",
+            "TM32",
+            "TM33",
+            "TM42",
+            "TM44",
+            "TM48",
+            "TM55",
+            "TM70",
+            "TM73",
+            "TM74",
+            "TM77",
+            "TM87",
+            "TM90",
+            "TM91",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_WATER_STONE",
+            "species": "SPECIES_STARMIE"
+        }
+    ],
+    "regional_dex_number": 238,
+    "baby_species": "SPECIES_STARYU"
+}

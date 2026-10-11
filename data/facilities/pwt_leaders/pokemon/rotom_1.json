@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ROTOM",
+    "moves": [ "MOVE_SHADOW_BALL", "MOVE_CHARGE_BEAM", "MOVE_SUBSTITUTE", "MOVE_PAIN_SPLIT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_ELECTRIC_GEM",
+    "form": 0
+}

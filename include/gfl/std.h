@@ -20,6 +20,8 @@ void initTableArea(HeapID heapId);
 // Compares size bytes, returning the difference of the first that differ
 s32 GFL_STD_MemCmp(const void *a, const void *b, u32 size);
 u32 GFL_STD_StrLen(const char *str);
+// Copies the string with its terminator, returning dest
+char *func_0207f7a4(char *dest, const char *src);
 // Compares two strings with STD_CompareString, whatever swan's name says
 int _STD_CompareNString(const char *a, const char *b);
 // Seeds the Mersenne Twister of GFL_RandomMT

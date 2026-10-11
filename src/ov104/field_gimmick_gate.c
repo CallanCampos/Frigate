@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/encounter.h"
 #include "field/field.h"
 #include "field/field_environment.h"
@@ -26,6 +28,7 @@
 #include "system/rtc.h"
 #include "system/version.h"
 #include "system/wordset.h"
+#include "text/system/gym_insect.h"
 
 struct GimmickGateMessageList {
     u8 count;
@@ -596,8 +599,8 @@ void func_ov104_021ef43c(GimmickGateWork *work) {
 
     func_ov104_021efa18(work, &list);
     wordSet = GFL_WordSetSystemCreate(4, 0x100, work->heapId);
-    placeMessages = GFL_MsgSysLoadData(0, 2, 0x6d, work->heapId);
-    weatherMessages = GFL_MsgSysLoadData(0, 2, 0x2b, work->heapId);
+    placeMessages = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, work->heapId);
+    weatherMessages = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GYM_INSECT, work->heapId);
     for (i = 0; i < 4; i++) {
         if (list.zones[i] == 0x267) {
             continue;
@@ -606,7 +609,7 @@ void func_ov104_021ef43c(GimmickGateWork *work) {
         placeName = GFL_MsgDataLoadStrbufNew(placeMessages, ZoneData_GetPlaceNameID(list.zones[i]));
         weatherName = GFL_MsgDataLoadStrbufNew(weatherMessages, sWeatherMessages[weather]);
         formatSet = GFL_WordSetSystemCreate(2, 0x100, work->heapId);
-        template = GFL_MsgDataLoadStrbufNew(weatherMessages, 0xc0);
+        template = GFL_MsgDataLoadStrbufNew(weatherMessages, GymInsect_Text_Empty_57);
         formatted = GFL_StrBufCreate(0x40, work->heapId);
         func_0202437c(formatSet, 0, placeName, 0, 1, 0);
         func_0202437c(formatSet, 1, weatherName, 0, 1, 0);
@@ -657,7 +660,7 @@ void func_ov104_021ef5ac(GimmickGateWork *work) {
         return;
     }
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
-    msgData = GFL_MsgSysLoadData(0, 2, 0x6d, work->heapId);
+    msgData = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, work->heapId);
     zoneName = GFL_MsgDataLoadStrbufNew(msgData, ZoneData_GetPlaceNameID(zone));
     func_0202437c(wordSet, 0, zoneName, 0, 1, 0);
     GFL_StrBufFree(zoneName);

@@ -1,21 +1,21 @@
-{bd02}The {0102:0} Kid, the Messenger of\n{bd02}Truths and Ideals,\n{bd02}and Brycen-Man, the Masked Man\n{bd02}of Reality and Phantasm...
-{bd02}The legendary battle\n{bd02}is about to unfold again...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The {0102:0} Girl, the Messenger of\n{bd02}Truths and Ideals,\n{bd02}and Brycen-Man, the Masked Man\n{bd02}of Reality and Phantasm...
-{bd02}The legendary battle\n{bd02}is about to unfold again...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0306_Text_KidMessengerTruthsIdeals = {bd02}The {0102:0} Kid, the Messenger of\n{bd02}Truths and Ideals,\n{bd02}and Brycen-Man, the Masked Man\n{bd02}of Reality and Phantasm...
+Bank0306_Text_LegendaryBattleAboutUnfold = {bd02}The legendary battle\n{bd02}is about to unfold again...
+Bank0306_Text_Empty = なし
+Bank0306_Text_Empty_2 = なし
+Bank0306_Text_Empty_3 = なし
+Bank0306_Text_Empty_4 = なし
+Bank0306_Text_Empty_5 = なし
+Bank0306_Text_Empty_6 = なし
+Bank0306_Text_Empty_7 = なし
+Bank0306_Text_Empty_8 = なし
+Bank0306_Text_GirlMessengerTruthsIdeals = {bd02}The {0102:0} Girl, the Messenger of\n{bd02}Truths and Ideals,\n{bd02}and Brycen-Man, the Masked Man\n{bd02}of Reality and Phantasm...
+Bank0306_Text_LegendaryBattleAboutUnfold_2 = {bd02}The legendary battle\n{bd02}is about to unfold again...
+Bank0306_Text_Empty_9 = なし
+Bank0306_Text_Empty_10 = なし
+Bank0306_Text_Empty_11 = なし
+Bank0306_Text_Empty_12 = なし
+Bank0306_Text_Empty_13 = なし
+Bank0306_Text_Empty_14 = なし
+Bank0306_Text_Empty_15 = なし
+Bank0306_Text_Empty_16 = なし
+Bank0306_Text_Empty_17 = なし

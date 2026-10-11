@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Allison",
+    "class": "TRAINER_CLASS_DOCTOR",
+    "pokemon": [
+        "aipom_1",
+        "yanma_1",
+        "dugtrio_1",
+        "murkrow_1",
+        "ponyta_1",
+        "raticate_1",
+        "emolga_1",
+        "swellow_1",
+        "fearow_1",
+        "liepard_1",
+        "jumpluff_1",
+        "pidgeot_1",
+        "cinccino_1",
+        "raichu_1",
+        "scolipede_1",
+        "electrode_1",
+        "lopunny_1",
+        "froslass_1",
+        "whimsicott_1",
+        "ambipom_1"
+    ]
+}

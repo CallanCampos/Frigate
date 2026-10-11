@@ -1,5 +1,6 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
+#include "app/ui/frame_list.h"
 #include "app/t_download.h"
 #include "app/t_download/t_download_graphic.h"
 #include "app/t_download/t_download_local.h"
@@ -7,6 +8,7 @@
 #include "app/t_download/t_download_util.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
@@ -121,7 +123,7 @@ static void (*sTDownloadModeMains[T_DOWNLOAD_MODE_COUNT])(TDownloadWork *wk) = {
 static BOOL TDownload_Init(GameProc *proc, u32 *state, void *param, void *work) {
     TDownloadWork *wk;
 
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WBT_RECORD, 0x40000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(TDownloadWork), HEAPID_WBT_RECORD);
     sys_memset(wk, 0, sizeof(TDownloadWork));
@@ -130,7 +132,7 @@ static BOOL TDownload_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->graphic = TDownloadGraphic_Create(0, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreate(8, 40, wk->heapId);
-    wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 404, wk->heapId);
+    wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0404, wk->heapId);
     wk->msgData[1] = NULL;
     wk->printQueue = func_02021998(wk->heapId);
     wk->tcbEx = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 32, 32);
@@ -166,7 +168,7 @@ static BOOL TDownload_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     heapId = wk->heapId;
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(heapId);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
     return TRUE;
 }
 
@@ -898,10 +900,10 @@ static void TDownload_InitReceived(TDownloadWork *wk) {
     GFL_BGSysSetBGEnabled(2, FALSE);
     wk->flags &= ~T_DOWNLOAD_FLAG_LIST_PRINTED;
     func_ov326_021a16e8(wk, wk->mode);
-    if (func_ov139_0219b294(wk->list) == FALSE) {
+    if (FrameList_Draw(wk->list) == FALSE) {
         wk->flags |= T_DOWNLOAD_FLAG_LIST_PRINTED;
     }
-    func_ov139_0219ccb0(wk->list, 7);
+    FrameList_SetShownRows(wk->list, 7);
     func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
     func_ov326_021a1a78(wk, FALSE);
     if (wk->listCount <= 6) {
@@ -1025,7 +1027,7 @@ static void TDownload_Received(TDownloadWork *wk) {
         wk->seq = 100;
     case 5:
         if (!(wk->flags & T_DOWNLOAD_FLAG_LIST_PRINTED)) {
-            if (func_ov139_0219b294(wk->list) == FALSE) {
+            if (FrameList_Draw(wk->list) == FALSE) {
                 wk->flags |= T_DOWNLOAD_FLAG_LIST_PRINTED;
                 wk->seq = wk->seqAfterList;
                 GFL_BGSysSetBGEnabled(2, TRUE);

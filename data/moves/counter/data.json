@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Counter",
+    "description": "A retaliation move that counters any\nphysical attack, inflicting double the\ndamage taken.",
+    "type": "TYPE_FIGHTING",
+    "quality": "MOVE_QUALITY_DAMAGE",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 1,
+    "accuracy": 100,
+    "pp": 20,
+    "priority": -5,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_COUNTER",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_DEPENDS",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT" ]
+}

@@ -1,5 +1,0 @@
-A cool mind feels no heat!
-He he he. You're a Trainer, aren't you?\nDon't say anything. Just take this.{be01}
-Let a Pokémon hold a Spell Tag.\nIt powers up Ghost-type moves.{be01}\nOh! You have a Spell Tag!\nWhere in the world did you find it?
-Hmm?\nAre you going to check the volcano, too?{be01}\nThe volcano here is the same kind of\nvolcano as Stark Mountain in the{be00}\nSinnoh region.
-\pad{f8}

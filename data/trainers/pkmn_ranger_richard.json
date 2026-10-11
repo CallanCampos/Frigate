@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Richard",
+    "class": "TRAINER_CLASS_PKMN_RANGER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_PECHA_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_WHIRLIPEDE",
+            "form": 0,
+            "level": 28,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_FOONGUS",
+            "form": 0,
+            "level": 28,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Nature!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Naaatuuure!"
+        },
+        {
+            "type": 15,
+            "text": "If I use this, will my Pokémon\nalso become energetic?{be01}"
+        },
+        {
+            "type": 16,
+            "text": "When we are surrounded by green,\nwe feel more energetic. Don't you think?{be00}\nThank you, Mother Nature! I love you!"
+        }
+    ]
+}

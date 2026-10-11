@@ -18,5 +18,7 @@ struct FieldmapCtrlVTable {
 void *Field_GetController(Field *field);
 void Field_SetController(Field *field, void *controller);
 u32 Field_GetControllerTypeID(Field *field);
+// Sets whether the grid map's controller stops updating
+void FieldmapCtrlGrid_SetUpdateDisable(Field *field, BOOL disable);
 
 #endif // POKEBW2_FIELD_FIELD_CONTROLLER_H

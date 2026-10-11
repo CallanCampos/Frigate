@@ -1,0 +1,135 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Joltik",
+    "pokedex": {
+        "category": "Attaching Pokémon",
+        "entry": "Since it can't generate its own\nelectricity, it sticks onto large-bodied\nPokémon and absorbs static electricity.",
+        "height": "0'04\"",
+        "weight": "1.3 lbs.",
+        "languages": {
+            "ja": {
+                "category": "くっつきポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 47,
+        "defense": 50,
+        "speed": 65,
+        "special_attack": 57,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_BUG", "TYPE_ELECTRIC" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_COMPOUNDEYES", "ABILITY_UNNERVE" ],
+    "hidden_ability": "ABILITY_SWARM",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 64,
+    "height": 1,
+    "weight": 6,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_STRING_SHOT" ],
+            [ 1, "MOVE_LEECH_LIFE" ],
+            [ 1, "MOVE_SPIDER_WEB" ],
+            [ 4, "MOVE_THUNDER_WAVE" ],
+            [ 7, "MOVE_SCREECH" ],
+            [ 12, "MOVE_FURY_CUTTER" ],
+            [ 15, "MOVE_ELECTROWEB" ],
+            [ 18, "MOVE_BUG_BITE" ],
+            [ 23, "MOVE_GASTRO_ACID" ],
+            [ 26, "MOVE_SLASH" ],
+            [ 29, "MOVE_ELECTRO_BALL" ],
+            [ 34, "MOVE_SIGNAL_BEAM" ],
+            [ 37, "MOVE_AGILITY" ],
+            [ 40, "MOVE_SUCKER_PUNCH" ],
+            [ 45, "MOVE_DISCHARGE" ],
+            [ 48, "MOVE_BUG_BUZZ" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM57",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM76",
+            "TM81",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM93",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_MAGNET_RISE",
+            "MOVE_ELECTROWEB",
+            "MOVE_SNORE",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_PIN_MISSILE",
+            "MOVE_POISON_STING",
+            "MOVE_CROSS_POISON",
+            "MOVE_ROCK_CLIMB",
+            "MOVE_PURSUIT",
+            "MOVE_DISABLE",
+            "MOVE_FAINT_ATTACK"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 36,
+            "species": "SPECIES_GALVANTULA"
+        }
+    ],
+    "regional_dex_number": 173,
+    "baby_species": "SPECIES_JOLTIK"
+}

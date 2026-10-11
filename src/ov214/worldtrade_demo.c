@@ -1,5 +1,5 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
 #include "app/pokemon_trade.h"
 #include "constants/pokemon.h"
 #include "demo/shinka_demo.h"
@@ -124,7 +124,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                 evolution->method = method;
                 evolution->unkC = 1;
                 evolution->canCancel = FALSE;
-                GFL_OvlUnload(OVERLAY_139);
+                GFL_OvlUnload(OVERLAY_APP_UI);
                 QueueGameProc(wk->procManager, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, wk->subProcParam);
                 wk->subprocessSeq = 1;
             } else {
@@ -167,7 +167,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                     evolution->method = method;
                     evolution->unkC = 1;
                     evolution->canCancel = FALSE;
-                    GFL_OvlUnload(OVERLAY_139);
+                    GFL_OvlUnload(OVERLAY_APP_UI);
                     QueueGameProc(wk->procManager, OVERLAY_SHINKA_DEMO, &SHINKA_DEMO_PROC_FUNCTIONS, wk->subProcParam);
                     wk->subprocessSeq = 1;
                 } else {
@@ -201,7 +201,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
         }
         Demo_StoreTradedPokemon(wk);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
-        GFL_OvlLoad(OVERLAY_139);
+        GFL_OvlLoad(OVERLAY_APP_UI);
         WorldTrade_SubProcessChange(wk, WORLDTRADE_UPLOAD, UPLOAD_MODE_POKEMON_EVO_SAVE);
         ret = WT_SEQ_FADEOUT;
         break;

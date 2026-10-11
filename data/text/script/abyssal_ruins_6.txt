@@ -1,0 +1,19 @@
+AbyssalRuins6_Text_Gfwvkvctiukghkn = GFWVKVCTIUKGHKN
+AbyssalRuins6_Text_GhknipkxkgegtUkipkvcg = GHKNIPKXKGEGT\nUKIPKVCG
+AbyssalRuins6_Text_NncvpukNkxgtqfqqi = NNCVPUK\nNKXGTQFQQI
+AbyssalRuins6_Text_Ektcdtcdgdvqpqf = EKTCDTCDGDVQPQF
+AbyssalRuins6_Text_Gvucyvqpvuwogpq = GVUCYVQPVUWOGPQ
+AbyssalRuins6_Text_Uwqkegtruknnc = UWQKEGTRUKNNC
+AbyssalRuins6_Text_Utcgvgvcgteutcy = UTCGVGVCGTEUTCY
+AbyssalRuins6_Text_Fggtichkgpkju = FGGTICHKGPKJU
+AbyssalRuins6_Text_LooksLikeCanClimb = It looks like you can climb up here!{be01}\nWill you proceed to the upper floor?
+AbyssalRuins6_Text_LooksLikeCanClimb_2 = It looks like you can climb down here!{be01}\nWill you return to the lower floor?
+AbyssalRuins6_Text_Fevujubshtjfgjm = FEVUJUBSHTJFGJM
+AbyssalRuins6_Text_Fgjmhojwjfdfstjhojubf = FGJMHOJWJFDFSTJHOJUBF
+AbyssalRuins6_Text_Mmbuotjmjwfspepph = MMBUOTJMJWFSPEPPH
+AbyssalRuins6_Text_Djsbcsbcfcupope = DJSBCSBCFCUPOPE
+AbyssalRuins6_Text_Futbxupoutvnfop = FUTBXUPOUTVNFOP
+AbyssalRuins6_Text_Tvpjdfsqtjmmb = TVPJDFSQTJMMB
+AbyssalRuins6_Text_Tsbfufubfsdtsbx = TSBFUFUBFSDTSBX
+AbyssalRuins6_Text_Effshbgjfojit = EFFSHBGJFOJIT
+\pad{c2}

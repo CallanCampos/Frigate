@@ -29,11 +29,6 @@ struct FestMissionEntry {
     u32 missionId;
 };
 
-void func_ov030_02174108(u32 enabled);
-// Whether the Funfest's beacon updates are sent (func_ov030_02174e58 returns 2)
-BOOL func_ov030_02173c08(void);
-// Sends the game's beacon
-void func_ov030_02173780(void);
 void *Field_GetFesGimmick(Field *field);
 BOOL FesGimmick_IsCurrent(void *gimmick, u32 type);
 // Whether the Funfest mission keeps phenomena off the tile
@@ -49,8 +44,6 @@ u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
 void *GetFestMissionCfg(LinkFestival *festival);
 // What missions of type 4 and 5 do when the player enters a zone, from overlays 24 and 25
 void func_ov024_0216f900(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival, FestMissionConfig *config,
-                         u16 zoneId);
-void func_ov025_0216f900(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival, FestMissionConfig *config,
                          u16 zoneId);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
 // mission, a random number below max that the list doesn't have, and the mission's work on entering a zone

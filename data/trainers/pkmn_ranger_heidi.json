@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Heidi",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_MAX_REPEL",
+    "party": [
+        {
+            "species": "SPECIES_MUSHARNA",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DRIFBLIM",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_UMBREON",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I want to drag people here\nand have them enlist as Pokémon Rangers.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Wow! Electrifying!\nYou are so goooood!"
+        },
+        {
+            "type": 15,
+            "text": "To the incredible “Y...O...U.\"{be01}"
+        },
+        {
+            "type": 16,
+            "text": "You! Be a Pokémon Ranger!\nI will give you a good workout!"
+        }
+    ]
+}

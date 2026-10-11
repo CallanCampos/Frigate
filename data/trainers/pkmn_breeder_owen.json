@@ -1,0 +1,79 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Owen",
+    "class": "TRAINER_CLASS_PKMN_BREEDER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_RARE_CANDY",
+    "party": [
+        {
+            "species": "SPECIES_BONSLY",
+            "form": 0,
+            "level": 57,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_WOOPER",
+            "form": 0,
+            "level": 57,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MUNCHLAX",
+            "form": 0,
+            "level": 57,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SANDSHREW",
+            "form": 0,
+            "level": 57,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_WYNAUT",
+            "form": 0,
+            "level": 57,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SPOINK",
+            "form": 0,
+            "level": 57,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "To raise healthy Pokémon, you need\nto keep their minds and bodies active,{be00}\nwatching games and having battles!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "It's so frustrating to lose!\nBut it's also important to learn from it."
+        },
+        {
+            "type": 15,
+            "text": "I just remembered something important.\nCome on now. No holding back!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "You learn more when you lose\nthan when you win!{be00}\nI think it's the same for sports, too."
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Elron",
+    "class": "TRAINER_CLASS_PILOT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ARCHEN",
+            "form": 0,
+            "level": 36,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 36,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Right side clear! Left side clear!{be01}\nBattle flight is ready for takeout!{be01}\nErr... I mean takeoff!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Unfortunately...we are forced to land."
+        },
+        {
+            "type": 2,
+            "text": "How far can you fly in the\nface of strong winds?{be01}\nHigh performance is important for planes,\nbut perhaps feelings are what's{be00}\nimportant for people and Pokémon."
+        }
+    ]
+}

@@ -1,5 +1,0 @@
-How was it?\nFor Pokémon under the ocean,{be00}\nthe world looks like that, doesn't it?
-The path is to see rather than to move.
-My parasol is full of TMs.\nWould you like one?{be01}
-Facade! Facade!\nWhen the user's poisoned, paralyzed,{be00}\nor burned, its attack power doubles!
-It's a sign that explains\nthe Marine Tube.{be01}

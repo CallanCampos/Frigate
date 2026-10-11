@@ -1,0 +1,38 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": 316,
+    "matrix": "MAP_MATRIX_BRIDGE_GATE_2",
+    "scripts": "SCRIPTS_BRIDGE_GATE_2",
+    "text": "SCRIPT_TEXT_BRIDGE_GATE_2",
+    "bgm": {
+        "spring": "SEQ_BGM_R_B_SP",
+        "summer": "SEQ_BGM_GATE",
+        "autumn": "SEQ_BGM_GATE",
+        "winter": "SEQ_BGM_GATE"
+    },
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_SKYARROW_BRIDGE",
+    "place": "PLACE_BRIDGE_GATE",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 2,
+    "battle_bg": 9,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 137,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

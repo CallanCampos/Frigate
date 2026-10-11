@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Kaori",
+    "class": "TRAINER_CLASS_BATTLE_GIRL",
+    "pokemon": [
+        "nidoking_2",
+        "heracross_2",
+        "machamp_2",
+        "gallade_2",
+        "mamoswine_2",
+        "rhyperior_2",
+        "gyarados_2",
+        "electivire_2",
+        "haxorus_2",
+        "arcanine_2"
+    ]
+}

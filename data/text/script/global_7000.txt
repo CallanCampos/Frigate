@@ -1,0 +1,21 @@
+Global7000_Text_Obtained = {0100:0} obtained {ff00:2}{0109:1}{ff00:0}!
+Global7000_Text_Obtained_2 = {0100:0} obtained the {ff00:2}{0109:1}{ff00:0}!
+Global7000_Text_Empty =                           \x{ffff}
+Global7000_Text_Obtained_3 = {0100:0} obtained\n{0109:1} {0107:2}!
+Global7000_Text_Found = {0100:0} found {ff00:2}{0109:1}{ff00:0}!
+Global7000_Text_Found_2 = {0100:0} found {ff00:2}{0109:1}{ff00:0}!
+Global7000_Text_Found_3 = {0100:0} found\n{0109:1} {0107:2}!
+Global7000_Text_TooBadThereNo = Too bad! There is no more room for\n{0109:0}!{be01}
+Global7000_Text_TooBadThereNo_2 = Too bad! There is no more room for\n{0109:0}!
+Global7000_Text_Empty_2 =                                   \x{ffff}
+Global7000_Text_PutCase = {0100:0} put the {0109:1} in the\n{ff00:2}{0112:2}{ff00:0} Case.{be01}
+Global7000_Text_PutCase_2 = {0100:0} put the {0109:1} in the\n{ff00:2}{0112:2}{ff00:0} Case.
+Global7000_Text_Empty_3 =                              \x{ffff}
+Global7000_Text_FindNoteItemPlease = You find a note on the item.{be01}\n“Please make good use of this item on\nyour adventure! Sincerely, {0100:3}"{be01}\nIt looks like {0100:3} hid the item.
+Global7000_Text_TooBadBagFull = Too bad! The Bag is full!\n{0100:0} gave up the hidden item.
+Global7000_Text_Obtained_4 = {0100:0} obtained\n{0202:2} {ff00:2}{0109:1}{ff00:0}!
+Global7000_Text_TooBadTheresNo = Too bad! There's no more\nroom for the {0109:1}!{be00}\nGave up on taking the {0109:1}!
+Global7000_Text_Empty_4 =                                 \x{ffff}
+Global7000_Text_FunfestMissionScoreWent = The Funfest Mission score\nwent up by one!{be01}
+Global7000_Text_Obtained_5 = {0100:0} obtained\n{0200:2} {0109:1}!
+\pad{f8}

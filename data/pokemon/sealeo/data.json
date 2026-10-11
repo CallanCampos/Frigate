@@ -1,0 +1,171 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Sealeo",
+    "pokedex": {
+        "category": "Ball Roll Pokémon",
+        "entry": "Be it Spheal or Poké Ball, it will spin\nany round object on its nose\nwith the greatest of ease.",
+        "height": "3'07\"",
+        "weight": "193.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Sealeo",
+                "category": "Ball Roll Pokémon",
+                "entry": "It habitually spins things on its\nnose. By doing so, it learns\ntextures and odors.",
+                "height": "3'07\"",
+                "weight": "193.1 lbs."
+            },
+            "fr": {
+                "name": "Phogleur",
+                "category": "Pokémon Roule Boule",
+                "entry": "Il fait souvent tourner des objets\nsur son museau pour connaître\nleur odeur et leur texture.",
+                "height": "1,1 m",
+                "weight": "87,6 kg"
+            },
+            "de": {
+                "name": "Seejong",
+                "category": "Spielball",
+                "entry": "Es balanciert Dinge auf seiner Nase.\nDabei lernt es etwas über die\nBeschaffenheit und den Geruch.",
+                "height": "1,1 m",
+                "weight": "87,6 kg"
+            },
+            "it": {
+                "name": "Sealeo",
+                "category": "Pokémon Rotapalla",
+                "entry": "Fa roteare oggetti sul naso per\ncontrollarne l'odore e la consistenza.",
+                "height": "1,1 m",
+                "weight": "87,6 kg"
+            },
+            "ko": {
+                "name": "씨레오",
+                "category": "공돌리기포켓몬",
+                "entry": "무엇이든 코 위에서 돌리는\n버릇을 가지고 있다. 돌리면서\n냄새나 감촉을 기억한다.",
+                "height": "1.1 m",
+                "weight": "87.6 kg"
+            },
+            "es": {
+                "name": "Sealeo",
+                "category": "Pokémon Rodabola",
+                "entry": "Suele hacer girar objetos en su nariz.\nDe esta forma aprende texturas\ny olores.",
+                "height": "1,1 m",
+                "weight": "87,6 kg"
+            },
+            "ja": {
+                "name": "トドグラー",
+                "category": "たままわしポケモン",
+                "entry": "なんでも\\x{3000}はなの\\x{3000}うえで\\x{3000}まわす\nクセを\\x{3000}もつ。まわしながら\\x{3000}においや\nかんしょくを\\x{3000}おぼえるのだ。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff11}\\x{ff4d}",
+                "weight": "\\x{ff18}\\x{ff17}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 60,
+        "defense": 70,
+        "speed": 45,
+        "special_attack": 75,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_ICE", "TYPE_WATER" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_THICK_FAT", "ABILITY_ICE_BODY" ],
+    "hidden_ability": "ABILITY_OBLIVIOUS",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 144,
+    "height": 11,
+    "weight": 876,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POWDER_SNOW" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 1, "MOVE_ENCORE" ],
+            [ 7, "MOVE_ENCORE" ],
+            [ 13, "MOVE_ICE_BALL" ],
+            [ 19, "MOVE_BODY_SLAM" ],
+            [ 25, "MOVE_AURORA_BEAM" ],
+            [ 31, "MOVE_HAIL" ],
+            [ 32, "MOVE_SWAGGER" ],
+            [ 39, "MOVE_REST" ],
+            [ 39, "MOVE_SNORE" ],
+            [ 47, "MOVE_BLIZZARD" ],
+            [ 55, "MOVE_SHEER_COLD" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM78",
+            "TM79",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SUPER_FANG",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 44,
+            "species": "SPECIES_WALREIN"
+        }
+    ],
+    "regional_dex_number": 244,
+    "baby_species": "SPECIES_SPHEAL"
+}

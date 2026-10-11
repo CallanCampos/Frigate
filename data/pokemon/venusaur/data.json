@@ -1,0 +1,177 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Venusaur",
+    "pokedex": {
+        "category": "Seed Pokémon",
+        "entry": "After a rainy day, the flower on\nits back smells stronger. The\nscent attracts other Pokémon.",
+        "height": "6'07\"",
+        "weight": "220.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Venusaur",
+                "category": "Seed Pokémon",
+                "entry": "After a rainy day, the flower on\nits back smells stronger. The\nscent attracts other Pokémon.",
+                "height": "6'07\"",
+                "weight": "220.5 lbs."
+            },
+            "fr": {
+                "name": "Florizarre",
+                "category": "Pokémon Graine",
+                "entry": "Le parfum de sa fleur se fait plus\npénétrant les lendemains de pluie.\nCela appâte les autres Pokémon.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "de": {
+                "name": "Bisaflor",
+                "category": "Samen",
+                "entry": "Nach einem Regentag riecht die\nBlume auf seinem Rücken intensiver.\nDas Aroma zieht andere Pokémon an.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "it": {
+                "name": "Venusaur",
+                "category": "Pokémon Seme",
+                "entry": "Dopo la pioggia, il fiore sul suo dorso\nemana un profumo più intenso e attira\ngli altri Pokémon.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "ko": {
+                "name": "이상해꽃",
+                "category": "씨앗포켓몬",
+                "entry": "비가 내린 다음 날은 등의\n꽃향기가 강해진다. 향기에\n이끌려 포켓몬이 모여든다.",
+                "height": "2.0 m",
+                "weight": "100.0 kg"
+            },
+            "es": {
+                "name": "Venusaur",
+                "category": "Pokémon Semilla",
+                "entry": "Después de un día de lluvia, la flor de\nsu lomo tiene un aroma más potente\ny atrae a otros Pokémon.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "ja": {
+                "name": "フシギバナ",
+                "category": "たねポケモン",
+                "entry": "あめの\\x{3000}ふった\\x{3000}よくじつは\\x{3000}せなかの\nはなの\\x{3000}かおりが\\x{3000}つよまる。かおりに\nさそわれ\\x{3000}ポケモンが\\x{3000}あつまる。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 82,
+        "defense": 83,
+        "speed": 80,
+        "special_attack": 100,
+        "special_defense": 100
+    },
+    "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_OVERGROW", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_CHLOROPHYLL",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 236,
+    "height": 20,
+    "weight": 1000,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_LEECH_SEED" ],
+            [ 1, "MOVE_VINE_WHIP" ],
+            [ 3, "MOVE_GROWL" ],
+            [ 7, "MOVE_LEECH_SEED" ],
+            [ 9, "MOVE_VINE_WHIP" ],
+            [ 13, "MOVE_POISON_POWDER" ],
+            [ 13, "MOVE_SLEEP_POWDER" ],
+            [ 15, "MOVE_TAKE_DOWN" ],
+            [ 20, "MOVE_RAZOR_LEAF" ],
+            [ 23, "MOVE_SWEET_SCENT" ],
+            [ 28, "MOVE_GROWTH" ],
+            [ 31, "MOVE_DOUBLE_EDGE" ],
+            [ 32, "MOVE_PETAL_DANCE" ],
+            [ 39, "MOVE_WORRY_SEED" ],
+            [ 45, "MOVE_SYNTHESIS" ],
+            [ 53, "MOVE_SOLAR_BEAM" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM53",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM78",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_GRASS_PLEDGE",
+            "MOVE_FRENZY_PLANT",
+            "MOVE_SEED_BOMB",
+            "MOVE_BLOCK",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_BULBASAUR"
+}

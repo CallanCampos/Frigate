@@ -1,18 +1,18 @@
-None
-Lower Silesia
-Kuyavia-Pomerania
-Lublin
-Lubusz
-Lodz
-Lesser Poland
-Masovia
-Opole
-Subcarpathia
-Podlachia
-Pomerania
-Silesia
-Holy Cross
-Warmia-Masuria
-Greater Poland
-West Pomerania
+Bank0433_Text_None = None
+Bank0433_Text_LowerSilesia = Lower Silesia
+Bank0433_Text_KuyaviaPomerania = Kuyavia-Pomerania
+Bank0433_Text_Lublin = Lublin
+Bank0433_Text_Lubusz = Lubusz
+Bank0433_Text_Lodz = Lodz
+Bank0433_Text_LesserPoland = Lesser Poland
+Bank0433_Text_Masovia = Masovia
+Bank0433_Text_Opole = Opole
+Bank0433_Text_Subcarpathia = Subcarpathia
+Bank0433_Text_Podlachia = Podlachia
+Bank0433_Text_Pomerania = Pomerania
+Bank0433_Text_Silesia = Silesia
+Bank0433_Text_HolyCross = Holy Cross
+Bank0433_Text_WarmiaMasuria = Warmia-Masuria
+Bank0433_Text_GreaterPoland = Greater Poland
+Bank0433_Text_WestPomerania = West Pomerania
 \pad{d8}

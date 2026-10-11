@@ -1,0 +1,6 @@
+BtlMain10_Text_PokemonSawDreamAppeared = The {0102:0} your Pokémon saw in the\ndream appeared!
+BtlMain10_Text_ComeHere = Come here, {0102:0}!
+BtlMain10_Text_YesHasJoinedParty = Yes!\n{0102:0} has joined your party!
+BtlMain10_Text_WhatWill = What will {0100:0} do?
+BtlMain10_Text_Left = {0100:0} left...
+\pad{18}

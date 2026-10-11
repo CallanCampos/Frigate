@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jonah",
+    "class": "TRAINER_CLASS_LINEBACKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_PROTEIN",
+    "party": [
+        {
+            "species": "SPECIES_FORRETRESS",
+            "form": 0,
+            "level": 64,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I, I...\nI'm not fat, am I?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ripped!"
+        },
+        {
+            "type": 15,
+            "text": "Ripped, I tell you!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I am ripped!\nI am not fat."
+        }
+    ]
+}

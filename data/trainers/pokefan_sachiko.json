@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Sachiko",
+    "class": "TRAINER_CLASS_POKEFAN_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_SUPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 16,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DARUMAKA",
+            "form": 0,
+            "level": 22,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hee hee! Hey, you! Check out\nmy Pokémon before you go!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "What brilliant Pokémon!\nThank you for the battle!"
+        },
+        {
+            "type": 2,
+            "text": "I feel a bit down when I lose,\nbut I also feel that each battle with{be00}\nmy Pokémon strengthens our bond!"
+        }
+    ]
+}

@@ -36,7 +36,7 @@
 
 typedef struct {
     Field *field;
-    void *pdcWork;
+    PdcWork *pdcWork;
     void *returnWork;
     PartyPkm *pkm;
     BtlFieldStatus status;
@@ -289,13 +289,13 @@ static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event
         playerInfo = GetGameDataPlayerInfo(gameData);
         bag = GameData_GetBag(gameData);
         trainerData = getTrainerDataBlkAddress(save);
-        data->pdcWork = func_ov172_021998c0(gameData, data->pkm, &data->status, playerInfo, bag, trainerData,
+        data->pdcWork = PdcWork_Create(gameData, data->pkm, &data->status, playerInfo, bag, trainerData,
                                             getPokedexSaveAddress(save), data->heapId);
-        GSYS_QueueProcAsEvent(event, -1, &data_ov172_0219a53c, data->pdcWork);
+        GSYS_QueueProcAsEvent(event, -1, &PDC_PROC_FUNCTIONS, data->pdcWork);
         (*state)++;
         break;
     case 5:
-        caught = func_ov172_02199918(data->pdcWork);
+        caught = PdcWork_IsCaught(data->pdcWork);
         pkm5 = data->pkm;
         heapId5 = data->heapId;
         check5.species = PokeParty_GetParam(pkm5, PKM_PARAM_SPECIES, NULL);

@@ -1,51 +1,51 @@
-GAME SYNC
-         \x{ffff}
-    \x{ffff}
-Would you like to save the game?
-YES
-NO
-Saving...\nDon't turn off the power.
-Do you want to choose the\nNintendo Wi-Fi Connection settings?
-The Pokémon has been tucked in.\nDon't turn off the power...
-                  \x{ffff}
-Is it OK to wake up this Pokémon?
-The Pokémon is being woken up...\nDon't turn off the power.
-{0102:0} has woken up!
-Please wait a moment...
-{0102:0} fell\nasleep. It's sleeping soundly!
-             \x{ffff}
-Game Sync has run out of energy.\nIt will take one day to recharge it.{be01}\nPlease wait for one day without\nchanging the DS system you're{be00}\nusing, and then use Game Sync again.
-This Pokémon is not dreaming yet.
-             \x{ffff}
-There are no Pokémon in your PC that can\nbe sent to the Pokémon Dream World.
-This Pokémon is dreaming.
-You haven't yet received the\nitems from last time.{be01}\nYou'll lose all the items if you wake this\nPokémon up to receive new items.{be01}\nIs it OK to wake up this Pokémon?\n
-{0102:0} has gained\n{0201:1} level(s).
-C-Gear skin has changed.\nMusical show has changed.\nPokédex skin has changed.
-C-Gear skin has changed.
-Musical show has changed.
-Pokédex skin has changed.
-C-Gear skin has changed.\nMusical show has changed.
-Musical show has changed.\nPokédex skin has changed.
-C-Gear skin has changed.\nPokédex skin has changed.
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13201
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13202
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nplease refer to your Instruction Booklet.\n\nError Code: 13203
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13204
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13205
-This service has been discontinued.\n\nError Code: 13206
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13207
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13208
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13209
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13210
-The server is experiencing high\ntraffic volumes.\nUnable to connect.\nPlease wait a little while and try again.\n\nError Code: 13211
-The server is undergoing maintenance.\nYou can review the details at the\nPokémon Global Link website.\nhttp://www.pokemon-gl.com\n\nError Code: 13212
-You can let your Pokémon play\nin the Pokémon Dream World on the Internet.
-You must set up\nthe Game Sync settings\nto play in the Pokémon Dream World.
-Please read your Instruction Booklet\nfor details about Game Sync settings.
-{0102:0} has woken up!
-There is already a saved game file.\nIt is impossible to save.{be01}\nPlease refer to the Instruction Booklet\nfor details.{be01}\nPress Up on the +Control Pad\n+ SELECT + B Button on the title screen{be00}\nto erase the current saved game file.
-Your Game Sync ID has been issued.\n\nYou can check your Game Sync ID\nin Game Sync Settings on the main menu.{be01}
-Access the Pokémon Global Link website\nat http://www.pokemon-gl.com/\nand complete the setup\nto use all features of Game Sync.\n\nRead the Instruction Booklet\nfor complete details.
-Your PC is full!{be01}\nYou must have one empty place\navailable to wake up the Pokémon.
+Bank0044_Text_GameSync = GAME SYNC
+Bank0044_Text_Empty =          \x{ffff}
+Bank0044_Text_Empty_2 =     \x{ffff}
+Bank0044_Text_WouldLikeSaveGame = Would you like to save the game?
+Bank0044_Text_Yes = YES
+Bank0044_Text_No = NO
+Bank0044_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+Bank0044_Text_WantChooseNintendoWi = Do you want to choose the\nNintendo Wi-Fi Connection settings?
+Bank0044_Text_PokemonHasBeenTucked = The Pokémon has been tucked in.\nDon't turn off the power...
+Bank0044_Text_Empty_3 =                   \x{ffff}
+Bank0044_Text_OkWakeUpPokemon = Is it OK to wake up this Pokémon?
+Bank0044_Text_PokemonBeingWokenUp = The Pokémon is being woken up...\nDon't turn off the power.
+Bank0044_Text_HasWokenUp = {0102:0} has woken up!
+Bank0044_Text_PleaseWaitMoment = Please wait a moment...
+Bank0044_Text_FellAsleepItsSleeping = {0102:0} fell\nasleep. It's sleeping soundly!
+Bank0044_Text_Empty_4 =              \x{ffff}
+Bank0044_Text_GameSyncHasRun = Game Sync has run out of energy.\nIt will take one day to recharge it.{be01}\nPlease wait for one day without\nchanging the DS system you're{be00}\nusing, and then use Game Sync again.
+Bank0044_Text_PokemonNotDreamingYet = This Pokémon is not dreaming yet.
+Bank0044_Text_Empty_5 =              \x{ffff}
+Bank0044_Text_ThereNoPokemonPc = There are no Pokémon in your PC that can\nbe sent to the Pokémon Dream World.
+Bank0044_Text_PokemonDreaming = This Pokémon is dreaming.
+Bank0044_Text_HaventYetReceivedItems = You haven't yet received the\nitems from last time.{be01}\nYou'll lose all the items if you wake this\nPokémon up to receive new items.{be01}\nIs it OK to wake up this Pokémon?\n
+Bank0044_Text_HasGainedLevelS = {0102:0} has gained\n{0201:1} level(s).
+Bank0044_Text_CGearSkinHas = C-Gear skin has changed.\nMusical show has changed.\nPokédex skin has changed.
+Bank0044_Text_CGearSkinHas_2 = C-Gear skin has changed.
+Bank0044_Text_MusicalShowHasChanged = Musical show has changed.
+Bank0044_Text_PokedexSkinHasChanged = Pokédex skin has changed.
+Bank0044_Text_CGearSkinHas_3 = C-Gear skin has changed.\nMusical show has changed.
+Bank0044_Text_MusicalShowHasChanged_2 = Musical show has changed.\nPokédex skin has changed.
+Bank0044_Text_CGearSkinHas_4 = C-Gear skin has changed.\nPokédex skin has changed.
+Bank0044_Text_ErrorOccurredServerPlease = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13201
+Bank0044_Text_ErrorOccurredServerPlease_2 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13202
+Bank0044_Text_CommunicationErrorOccurredPlease = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nplease refer to your Instruction Booklet.\n\nError Code: 13203
+Bank0044_Text_CommunicationErrorOccurredPlease_2 = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13204
+Bank0044_Text_ErrorOccurredServerPlease_3 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13205
+Bank0044_Text_ServiceHasBeenDiscontinued = This service has been discontinued.\n\nError Code: 13206
+Bank0044_Text_CommunicationErrorOccurredPlease_3 = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13207
+Bank0044_Text_ErrorOccurredServerPlease_4 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13208
+Bank0044_Text_CommunicationErrorOccurredPlease_4 = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13209
+Bank0044_Text_ErrorOccurredServerPlease_5 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13210
+Bank0044_Text_ServerExperiencingHighTraffic = The server is experiencing high\ntraffic volumes.\nUnable to connect.\nPlease wait a little while and try again.\n\nError Code: 13211
+Bank0044_Text_ServerUndergoingMaintenanceCan = The server is undergoing maintenance.\nYou can review the details at the\nPokémon Global Link website.\nhttp://www.pokemon-gl.com\n\nError Code: 13212
+Bank0044_Text_CanLetPokemonPlay = You can let your Pokémon play\nin the Pokémon Dream World on the Internet.
+Bank0044_Text_MustSetUpGame = You must set up\nthe Game Sync settings\nto play in the Pokémon Dream World.
+Bank0044_Text_PleaseReadInstructionBooklet = Please read your Instruction Booklet\nfor details about Game Sync settings.
+Bank0044_Text_HasWokenUp_2 = {0102:0} has woken up!
+Bank0044_Text_ThereAlreadySavedGame = There is already a saved game file.\nIt is impossible to save.{be01}\nPlease refer to the Instruction Booklet\nfor details.{be01}\nPress Up on the +Control Pad\n+ SELECT + B Button on the title screen{be00}\nto erase the current saved game file.
+Bank0044_Text_GameSyncIdHas = Your Game Sync ID has been issued.\n\nYou can check your Game Sync ID\nin Game Sync Settings on the main menu.{be01}
+Bank0044_Text_AccessPokemonGlobalLink = Access the Pokémon Global Link website\nat http://www.pokemon-gl.com/\nand complete the setup\nto use all features of Game Sync.\n\nRead the Instruction Booklet\nfor complete details.
+Bank0044_Text_PcFullMustHave = Your PC is full!{be01}\nYou must have one empty place\navailable to wake up the Pokémon.
 \pad{0e}

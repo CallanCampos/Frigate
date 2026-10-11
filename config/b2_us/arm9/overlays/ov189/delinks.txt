@@ -3,3 +3,18 @@
     .ctor       start:0x021acf28 end:0x021acf28 kind:rodata align:4
     .data       start:0x021acf40 end:0x021ae6a0 kind:data align:32
     .bss        start:0x021ae6a0 end:0x021b2f80 kind:bss align:32
+
+src/ov189/nhttp_rap.c:
+    .text       start:0x0219ce80 end:0x0219d410
+    .rodata     start:0x021ac838 end:0x021acc64
+    .data       start:0x021acf40 end:0x021ad028
+    .bss        start:0x021ae6a0 end:0x021ae6a4
+
+src/ov189/nhttp_rap_evilcheck.c:
+    complete
+    .text       start:0x0219d410 end:0x0219d504
+    .data       start:0x021ad028 end:0x021ad110
+
+src/ov189/dpw_profile.c:
+    complete
+    .text       start:0x0219d504 end:0x0219d550

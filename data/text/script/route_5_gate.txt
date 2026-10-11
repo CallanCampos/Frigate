@@ -1,0 +1,1 @@
+Route5Gate_Text_Empty =         \x{ffff}

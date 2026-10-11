@@ -1,21 +1,21 @@
-{bd02}A sea breeze wafts over the pier\n{bd02}where a giant cruise ship is docked.
-{bd02}Passengers hurry on board\n{bd02}in the shining moonlight.
-{bd02}A threatening shadow hides in the crowd.\n\n{bd02}The stage is set for trouble...
-{bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A hero has appeared!
-{bd02}And that hero's name is...\n\n{bd02}The {0102:0} Kid!
-なし
-なし
-なし
-なし
-なし
-{bd02}A sea breeze wafts over the pier\n{bd02}where a giant cruise ship is docked.
-{bd02}Passengers hurry on board\n{bd02}in the shining moonlight.
-{bd02}A threatening shadow hides in the crowd.\n\n{bd02}The stage is set for trouble...
-{bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A heroine has appeared!
-{bd02}And that heroine's name is...\n\n{bd02}The {0102:0} Girl!
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0268_Text_SeaBreezeWaftsOver = {bd02}A sea breeze wafts over the pier\n{bd02}where a giant cruise ship is docked.
+Bank0268_Text_PassengersHurryBoardShining = {bd02}Passengers hurry on board\n{bd02}in the shining moonlight.
+Bank0268_Text_ThreateningShadowHidesCrowd = {bd02}A threatening shadow hides in the crowd.\n\n{bd02}The stage is set for trouble...
+Bank0268_Text_HoweverItsDarkestJust = {bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A hero has appeared!
+Bank0268_Text_HerosNameKid = {bd02}And that hero's name is...\n\n{bd02}The {0102:0} Kid!
+Bank0268_Text_Empty = なし
+Bank0268_Text_Empty_2 = なし
+Bank0268_Text_Empty_3 = なし
+Bank0268_Text_Empty_4 = なし
+Bank0268_Text_Empty_5 = なし
+Bank0268_Text_SeaBreezeWaftsOver_2 = {bd02}A sea breeze wafts over the pier\n{bd02}where a giant cruise ship is docked.
+Bank0268_Text_PassengersHurryBoardShining_2 = {bd02}Passengers hurry on board\n{bd02}in the shining moonlight.
+Bank0268_Text_ThreateningShadowHidesCrowd_2 = {bd02}A threatening shadow hides in the crowd.\n\n{bd02}The stage is set for trouble...
+Bank0268_Text_HoweverItsDarkestJust_2 = {bd02}However!\n\n{bd02}It's darkest just before the dawn!\n\n{bd02}A heroine has appeared!
+Bank0268_Text_HeroinesNameGirl = {bd02}And that heroine's name is...\n\n{bd02}The {0102:0} Girl!
+Bank0268_Text_Empty_6 = なし
+Bank0268_Text_Empty_7 = なし
+Bank0268_Text_Empty_8 = なし
+Bank0268_Text_Empty_9 = なし
+Bank0268_Text_Empty_10 = なし
+Bank0268_Text_Empty_11 = なし

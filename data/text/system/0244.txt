@@ -1,69 +1,69 @@
-Actor
-Assistant
-Assistant: Professor {0100:1}!\nThe test is almost complete!{be01}\nI'm going to turn off the power\nto the F-00!
-Professor {0100:1}: So this day has\nfinally come...
-Assistant: Professor {0100:1}!{be01}\nToday is the day when all our hard\nwork finally pays off!{be01}\nThe birth of an all-new robot, programmed\nto have a human heart...or as close to it{be00}\nas possible!
-{0100:1}: ...
-Assistant: Professor {0100:1}!{be01}\nLet's begin the final test!{be01}\nThis test involves communication with\nhumans and with Pokémon!
-{0100:1}: Very well.\nLet's begin the test.
-Assistant: Activating the F-00 now!\nPlease be careful not to damage it!
-{0100:1}: Quiet, you...\nI know what I'm doing!
-{0100:1}: Excellent.\nIt appears to be moving properly.
-Assistant: OK, let's begin the\nconversational skill test!{be01}\nTry talking to the F-00!
-{0100:1}: I know what to do!
-F-00: ...
-{0100:1}: Good morning.
-F-00: GOOD. MORNING.
-{0100:1}: Come on! Get up!
-F-00: WHAT?\nTOO LOUD. BE QUIET.
-{0100:1}: OK...\nEverything seems to check out!
-F-00: WHO?{be01}\nWHO ARE YOU?
-{0100:1}: My name is {0100:1}.\nI'm a friend!
-F-00: WHAT IS...FRIEND?
-{0100:1}: Someone you like!
-F-00: {0100:1}! FRIEND!
-{0100:1}: Someone you know.
-F-00: SOMEONE I KNOW... SOMEONE I KNOW...
-{0100:1}: I don't really know...
-F-00: YOU DO NOT KNOW.\nI DO NOT KNOW, EITHER.
-{0100:1}: You figure it out!
-F-00: I DO NOT UNDERSTAND...\nWHAT IS FRIEND?
-Assistant: Professor {0100:1}!\nThe F-00 has shut down!{be01}\nThis concludes the test!
-{0100:1}: Indeed...
-Assistant: Congratulations!\nThe test was a complete success!
-{0100:1}: Of course it was.\nA genius like myself doesn't fail.
-Assistant: Of course you don't!{be01}\nRegardless, if we can sell the designs for\nthe F-00, our lab may finally be able to get{be00}\nout of the red! We can finally put an{be00}\nend to this long slump we've been having!{be01}\nWe'll be able to start up all kinds of new\nand exciting research!
-{0100:1}: Hmmm...{be01}\nI don't think so...\nI'm not giving up the F-00 to anyone.{be01}\nI've already disposed of the design data.
-Assistant: What? How could you?!{be01}\nThen...that means this F-00 is the only\none that will ever be made!
-{0100:1}: That's exactly what I'm saying.
-Assistant: How could you...{be01}\nAll this time I spent aiding you\nin your research...for nothing!{be00}\nWhat are we supposed to do?!
-{0100:1}: I won't give up the F-00\nto anyone.{be01}\nI invented it. It's my robot!
-And so I succeeded in inventing the first\never robot to have a heart...{be00}\nI completed the F-00...{be01}\nThe F-00 was the culmination of my years of\nresearch and the crystallization of my{be00}\nhopes and dreams.
-{0100:1}: Why...\nWhy won't you move?
-Assistant: Professor {0100:1}!\nWhat are you doing?!{be01}\nYou've destroyed the F-00!
-{0100:1}: No...\nI went easy on it...
-Assistant: It was just meant to be a test!\nI even warned you to be careful{be00}\nnot to damage the F-00!
-{0100:1}: Ugh...
-Assistant: It's all your fault! All of our\nhard work...for nothing!{be01}\nWhat are we going to do now?!
-{0100:1}: ...Sniffle...\nWahhh! Wahhh!
-Assistant: Oh, pull yourself together.\nCrying won't bring it back.{be01}\nFor someone who is such a genius,\nyou're still just a kid.
-{0100:1}: Wahh...sniffle...
-And so, just before completing\nthe first-ever robot to have a heart,{be00}\nI accidentally destroyed it...{be01}\nI made many more attempts after that\nto create another robot, but none were as{be00}\nmarvelous as my F-00...
-{0100:1}: Hey!\nWhat are you doing, F-00?{be01}\nThe test isn't over yet!\nBe still!
-F-00: I AM BORED.\nBORED OF THIS TEST.{be01}\nTHIS IS NOT FUN.\nI WANT TO HAVE FUN!{be01}\n{0100:1}, GOOD-BYE!
-{0100:1}: Just wait a moment!\nWhere do you think you're going?{be01}\nGoing somewhere to have fun?\nDoes the F-00's programming really allow it{be00}\nto behave so much like a human?
-Assistant: What are you standing there for?\nWe've got to hurry and bring back the F-00!{be01}\nWe're still in the testing phases! There's\nno telling what the F-00 will do out there!{be01}\nWhat are you going to do if it gets involved\nin some kind of accident?!
-Assistant: Come on, Professor!\nWe've got to hurry!
-{0100:1}: Hmmm...
-And so we desperately ran after\nthe F-00...{be01}\nWhen we finally caught up, we saw it\ndestroying everything in its path.{be01}\nThe F-00 found its fun in destroying the\ntown's buildings and cars.{be01}\nEventually the police arrived, and the\nF-00 was destroyed...{be01}\nTaking responsibility for the incident, I\nturned myself in and was arrested.{be01}\nThat was 20 years ago...{be01}\nI still regret that I ever created\nsuch a dangerous and violent robot...
-F-00: IT HURTS...
-Assistant: Professor! What are you doing?!{be01}\nGo easy on the F-00 or you'll end up\ndestroying it!
-{0100:1}: I know, I know...\nIt was just a tiny mistake...
-Assistant: Please be a bit more careful!\nYou know the future of our laboratory{be00}\nhangs in the balance!
-{0100:1}: Oh, be quiet...
-Assistant: Don't tell me to be quiet!\nI only said it because I care about{be00}\neveryone in our lab...
-{0100:1}: Who cares?
-Assistant: You should care, Professor!\nGive me a break! This is just a prototype!{be00}\nIf you aren't careful with it, there's{be00}\nno telling what could happen!
-{0100:1}: I suppose you're right.
-Assistant: I'm counting on you!\nThe F-00 is our lab's only hope!
+Bank0244_Text_Actor = Actor
+Bank0244_Text_Assistant = Assistant
+Bank0244_Text_AssistantProfessorTestAlmost = Assistant: Professor {0100:1}!\nThe test is almost complete!{be01}\nI'm going to turn off the power\nto the F-00!
+Bank0244_Text_ProfessorDayHasFinally = Professor {0100:1}: So this day has\nfinally come...
+Bank0244_Text_AssistantProfessorTodayDay = Assistant: Professor {0100:1}!{be01}\nToday is the day when all our hard\nwork finally pays off!{be01}\nThe birth of an all-new robot, programmed\nto have a human heart...or as close to it{be00}\nas possible!
+Bank0244_Text_Empty = {0100:1}: ...
+Bank0244_Text_AssistantProfessorLetsBegin = Assistant: Professor {0100:1}!{be01}\nLet's begin the final test!{be01}\nThis test involves communication with\nhumans and with Pokémon!
+Bank0244_Text_VeryWellLetsBegin = {0100:1}: Very well.\nLet's begin the test.
+Bank0244_Text_AssistantActivatingF00 = Assistant: Activating the F-00 now!\nPlease be careful not to damage it!
+Bank0244_Text_QuietKnowWhatIm = {0100:1}: Quiet, you...\nI know what I'm doing!
+Bank0244_Text_ExcellentAppearsMovingProperly = {0100:1}: Excellent.\nIt appears to be moving properly.
+Bank0244_Text_AssistantOkLetsBegin = Assistant: OK, let's begin the\nconversational skill test!{be01}\nTry talking to the F-00!
+Bank0244_Text_KnowWhat = {0100:1}: I know what to do!
+Bank0244_Text_F00 = F-00: ...
+Bank0244_Text_GoodMorning = {0100:1}: Good morning.
+Bank0244_Text_F00GoodMorning = F-00: GOOD. MORNING.
+Bank0244_Text_ComeGetUp = {0100:1}: Come on! Get up!
+Bank0244_Text_F00WhatToo = F-00: WHAT?\nTOO LOUD. BE QUIET.
+Bank0244_Text_OkEverythingSeemsCheck = {0100:1}: OK...\nEverything seems to check out!
+Bank0244_Text_F00WhoWho = F-00: WHO?{be01}\nWHO ARE YOU?
+Bank0244_Text_NameImFriend = {0100:1}: My name is {0100:1}.\nI'm a friend!
+Bank0244_Text_F00WhatFriend = F-00: WHAT IS...FRIEND?
+Bank0244_Text_SomeoneLike = {0100:1}: Someone you like!
+Bank0244_Text_F00Friend = F-00: {0100:1}! FRIEND!
+Bank0244_Text_SomeoneKnow = {0100:1}: Someone you know.
+Bank0244_Text_F00SomeoneKnow = F-00: SOMEONE I KNOW... SOMEONE I KNOW...
+Bank0244_Text_DontReallyKnow = {0100:1}: I don't really know...
+Bank0244_Text_F00NotKnow = F-00: YOU DO NOT KNOW.\nI DO NOT KNOW, EITHER.
+Bank0244_Text_FigureOut = {0100:1}: You figure it out!
+Bank0244_Text_F00NotUnderstand = F-00: I DO NOT UNDERSTAND...\nWHAT IS FRIEND?
+Bank0244_Text_AssistantProfessorF00 = Assistant: Professor {0100:1}!\nThe F-00 has shut down!{be01}\nThis concludes the test!
+Bank0244_Text_Indeed = {0100:1}: Indeed...
+Bank0244_Text_AssistantCongratulationsTestComplete = Assistant: Congratulations!\nThe test was a complete success!
+Bank0244_Text_CourseGeniusLikeMyself = {0100:1}: Of course it was.\nA genius like myself doesn't fail.
+Bank0244_Text_AssistantCourseDontRegardless = Assistant: Of course you don't!{be01}\nRegardless, if we can sell the designs for\nthe F-00, our lab may finally be able to get{be00}\nout of the red! We can finally put an{be00}\nend to this long slump we've been having!{be01}\nWe'll be able to start up all kinds of new\nand exciting research!
+Bank0244_Text_HmmmDontThinkIm = {0100:1}: Hmmm...{be01}\nI don't think so...\nI'm not giving up the F-00 to anyone.{be01}\nI've already disposed of the design data.
+Bank0244_Text_AssistantWhatHowCould = Assistant: What? How could you?!{be01}\nThen...that means this F-00 is the only\none that will ever be made!
+Bank0244_Text_ThatsExactlyWhatIm = {0100:1}: That's exactly what I'm saying.
+Bank0244_Text_AssistantHowCouldAll = Assistant: How could you...{be01}\nAll this time I spent aiding you\nin your research...for nothing!{be00}\nWhat are we supposed to do?!
+Bank0244_Text_WontGiveUpF = {0100:1}: I won't give up the F-00\nto anyone.{be01}\nI invented it. It's my robot!
+Bank0244_Text_SucceededInventingFirstEver = And so I succeeded in inventing the first\never robot to have a heart...{be00}\nI completed the F-00...{be01}\nThe F-00 was the culmination of my years of\nresearch and the crystallization of my{be00}\nhopes and dreams.
+Bank0244_Text_WhyWhyWontMove = {0100:1}: Why...\nWhy won't you move?
+Bank0244_Text_AssistantProfessorWhatDoing = Assistant: Professor {0100:1}!\nWhat are you doing?!{be01}\nYou've destroyed the F-00!
+Bank0244_Text_NoWentEasy = {0100:1}: No...\nI went easy on it...
+Bank0244_Text_AssistantJustMeantTest = Assistant: It was just meant to be a test!\nI even warned you to be careful{be00}\nnot to damage the F-00!
+Bank0244_Text_Ugh = {0100:1}: Ugh...
+Bank0244_Text_AssistantItsAllFault = Assistant: It's all your fault! All of our\nhard work...for nothing!{be01}\nWhat are we going to do now?!
+Bank0244_Text_SniffleWahhhWahhh = {0100:1}: ...Sniffle...\nWahhh! Wahhh!
+Bank0244_Text_AssistantOhPullYourself = Assistant: Oh, pull yourself together.\nCrying won't bring it back.{be01}\nFor someone who is such a genius,\nyou're still just a kid.
+Bank0244_Text_WahhSniffle = {0100:1}: Wahh...sniffle...
+Bank0244_Text_JustBeforeCompletingFirst = And so, just before completing\nthe first-ever robot to have a heart,{be00}\nI accidentally destroyed it...{be01}\nI made many more attempts after that\nto create another robot, but none were as{be00}\nmarvelous as my F-00...
+Bank0244_Text_HeyWhatDoingF = {0100:1}: Hey!\nWhat are you doing, F-00?{be01}\nThe test isn't over yet!\nBe still!
+Bank0244_Text_F00AmBored = F-00: I AM BORED.\nBORED OF THIS TEST.{be01}\nTHIS IS NOT FUN.\nI WANT TO HAVE FUN!{be01}\n{0100:1}, GOOD-BYE!
+Bank0244_Text_JustWaitMomentWhere = {0100:1}: Just wait a moment!\nWhere do you think you're going?{be01}\nGoing somewhere to have fun?\nDoes the F-00's programming really allow it{be00}\nto behave so much like a human?
+Bank0244_Text_AssistantWhatStandingThere = Assistant: What are you standing there for?\nWe've got to hurry and bring back the F-00!{be01}\nWe're still in the testing phases! There's\nno telling what the F-00 will do out there!{be01}\nWhat are you going to do if it gets involved\nin some kind of accident?!
+Bank0244_Text_AssistantComeProfessorWeve = Assistant: Come on, Professor!\nWe've got to hurry!
+Bank0244_Text_Hmmm = {0100:1}: Hmmm...
+Bank0244_Text_WeDesperatelyRanAfter = And so we desperately ran after\nthe F-00...{be01}\nWhen we finally caught up, we saw it\ndestroying everything in its path.{be01}\nThe F-00 found its fun in destroying the\ntown's buildings and cars.{be01}\nEventually the police arrived, and the\nF-00 was destroyed...{be01}\nTaking responsibility for the incident, I\nturned myself in and was arrested.{be01}\nThat was 20 years ago...{be01}\nI still regret that I ever created\nsuch a dangerous and violent robot...
+Bank0244_Text_F00Hurts = F-00: IT HURTS...
+Bank0244_Text_AssistantProfessorWhatDoing_2 = Assistant: Professor! What are you doing?!{be01}\nGo easy on the F-00 or you'll end up\ndestroying it!
+Bank0244_Text_KnowKnowJustTiny = {0100:1}: I know, I know...\nIt was just a tiny mistake...
+Bank0244_Text_AssistantPleaseBitMore = Assistant: Please be a bit more careful!\nYou know the future of our laboratory{be00}\nhangs in the balance!
+Bank0244_Text_OhQuiet = {0100:1}: Oh, be quiet...
+Bank0244_Text_AssistantDontTellQuiet = Assistant: Don't tell me to be quiet!\nI only said it because I care about{be00}\neveryone in our lab...
+Bank0244_Text_WhoCares = {0100:1}: Who cares?
+Bank0244_Text_AssistantShouldCareProfessor = Assistant: You should care, Professor!\nGive me a break! This is just a prototype!{be00}\nIf you aren't careful with it, there's{be00}\nno telling what could happen!
+Bank0244_Text_SupposeYoureRight = {0100:1}: I suppose you're right.
+Bank0244_Text_AssistantImCountingF = Assistant: I'm counting on you!\nThe F-00 is our lab's only hope!
 \pad{98}

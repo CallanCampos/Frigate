@@ -8,6 +8,8 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/script_text_banks.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "field/survey.h"
 #include "field/unity_tower.h"
@@ -36,12 +38,12 @@
 #include "system/union_view.h"
 
 // The script message file of the default texts, by trainer ID
-#define MSG_JOIN_AVENUE_DEFAULTS 0x261
+#define MSG_JOIN_AVENUE_DEFAULTS SCRIPT_TEXT_GLOBAL_10685
 #define MSG_JOIN_AVENUE_DEFAULT_GREETING 0x776
 #define MSG_JOIN_AVENUE_DEFAULT_MESSAGE1 0x6ea
 #define MSG_JOIN_AVENUE_DEFAULT_MESSAGE2 0x730
 // The system message file of the avenue's default name, and the script message of its default second name
-#define MSG_JOIN_AVENUE_NAMES 0x6d
+#define MSG_JOIN_AVENUE_NAMES TEXT_BANK_PLACE_NAMES
 #define MSG_JOIN_AVENUE_DEFAULT_NAME 0x79
 #define MSG_JOIN_AVENUE_DEFAULT_NAME2 0xac
 

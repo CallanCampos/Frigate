@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 4,
+    "npc_cache": 24,
+    "area": 74,
+    "matrix": "MAP_MATRIX_BLACK_CITY_GATE",
+    "scripts": "SCRIPTS_BLACK_CITY_GATE",
+    "text": "SCRIPT_TEXT_BLACK_CITY_GATE",
+    "bgm": "SEQ_BGM_GATE",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_BLACK_CITY_GATE",
+    "place": "PLACE_BLACK_CITY_2",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 24,
+    "transition": 0,
+    "battle_bg": 2,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": false,
+    "cam_bound": 226,
+    "name_icon": 15,
+    "easy_level": 0,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

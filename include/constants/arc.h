@@ -129,6 +129,8 @@
 // The Join Avenue's tables, which resort_binary.c loads. Our name, not swan's
 #define ARCID_RESORT_BINARY 244
 // The Pokestar Studios cut-ins' graphics and scripts, which pokewood_cutin.c loads. Our names, not swan's
+// The cast lists of the movies, a file each. Our name
+#define ARCID_POKEWOOD_CAST 272
 #define ARCID_POKEWOOD_CUTIN_GRA 274
 #define ARCID_POKEWOOD_CUTIN_SCRIPT 275
 // Unova Link's graphics (not from swan)

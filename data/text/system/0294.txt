@@ -1,21 +1,21 @@
-{bd02}I ran away to an unpopulated beach\n{bd02}with River and the now-giant Monica...
-{bd02}River was actually a member\n{bd02}of a secret security force...\n\n{bd02}He was trying to dispose\n{bd02}of the cursed Poké Ball...
-{bd02}But what should I do about Monica?\n{bd02}She's still stuck in there!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}I ran away to an unpopulated beach\n{bd02}with River and my now-gigantic sister...
-{bd02}River was actually a member\n{bd02}of a secret security force...\n\n{bd02}He was trying to dispose\n{bd02}of the cursed Poké Ball...
-{bd02}But what should I do about my sister?\n{bd02}She's still stuck in there!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0294_Text_RanAwayUnpopulatedBeach = {bd02}I ran away to an unpopulated beach\n{bd02}with River and the now-giant Monica...
+Bank0294_Text_RiverActuallyMemberSecret = {bd02}River was actually a member\n{bd02}of a secret security force...\n\n{bd02}He was trying to dispose\n{bd02}of the cursed Poké Ball...
+Bank0294_Text_ButWhatShouldAbout = {bd02}But what should I do about Monica?\n{bd02}She's still stuck in there!
+Bank0294_Text_Empty = なし
+Bank0294_Text_Empty_2 = なし
+Bank0294_Text_Empty_3 = なし
+Bank0294_Text_Empty_4 = なし
+Bank0294_Text_Empty_5 = なし
+Bank0294_Text_Empty_6 = なし
+Bank0294_Text_Empty_7 = なし
+Bank0294_Text_RanAwayUnpopulatedBeach_2 = {bd02}I ran away to an unpopulated beach\n{bd02}with River and my now-gigantic sister...
+Bank0294_Text_RiverActuallyMemberSecret_2 = {bd02}River was actually a member\n{bd02}of a secret security force...\n\n{bd02}He was trying to dispose\n{bd02}of the cursed Poké Ball...
+Bank0294_Text_ButWhatShouldAbout_2 = {bd02}But what should I do about my sister?\n{bd02}She's still stuck in there!
+Bank0294_Text_Empty_8 = なし
+Bank0294_Text_Empty_9 = なし
+Bank0294_Text_Empty_10 = なし
+Bank0294_Text_Empty_11 = なし
+Bank0294_Text_Empty_12 = なし
+Bank0294_Text_Empty_13 = なし
+Bank0294_Text_Empty_14 = なし
+Bank0294_Text_Empty_15 = なし

@@ -1,22 +1,22 @@
-{bd02}Ghost Erasers...\n\n\n{bd02}They call each other\n{bd02}by code names...
-{bd02}Dangerous cases and betrayal\n{bd02}are the norm, so real names\n{bd02}are nothing more than a liability...
-{bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 004\n\n{bd02}Code Name: {0102:0}
-{bd02}The Majin of Mayhem\n\n{bd02}was finally resurrected.
-{bd02}The Majin is said to leave\n\n{bd02}nothing but rubble in his wake...
-{bd02}We will make contact\n\n{bd02}with it and defeat it!
-なし
-なし
-なし
-なし
-{bd02}Ghost Erasers...\n\n\n{bd02}They call each other\n{bd02}by code names...
-{bd02}Dangerous cases and betrayal\n{bd02}are the norm, so real names\n{bd02}are nothing more than a liability...
-{bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 004\n\n{bd02}Code Name: {0102:0}
-{bd02}The Majin of Mayhem\n\n{bd02}was finally resurrected.
-{bd02}The Majin is said to leave\n\n{bd02}nothing but rubble in his wake...
-{bd02}We will make contact\n\n{bd02}with it and defeat it!
-なし
-なし
-なし
-なし
-なし
+Bank0305_Text_GhostErasersTheyCall = {bd02}Ghost Erasers...\n\n\n{bd02}They call each other\n{bd02}by code names...
+Bank0305_Text_DangerousCasesBetrayalNorm = {bd02}Dangerous cases and betrayal\n{bd02}are the norm, so real names\n{bd02}are nothing more than a liability...
+Bank0305_Text_GhostEraserCaseFiles = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 004\n\n{bd02}Code Name: {0102:0}
+Bank0305_Text_MajinMayhemFinallyResurrected = {bd02}The Majin of Mayhem\n\n{bd02}was finally resurrected.
+Bank0305_Text_MajinSaidLeaveNothing = {bd02}The Majin is said to leave\n\n{bd02}nothing but rubble in his wake...
+Bank0305_Text_WeWillMakeContact = {bd02}We will make contact\n\n{bd02}with it and defeat it!
+Bank0305_Text_Empty = なし
+Bank0305_Text_Empty_2 = なし
+Bank0305_Text_Empty_3 = なし
+Bank0305_Text_Empty_4 = なし
+Bank0305_Text_GhostErasersTheyCall_2 = {bd02}Ghost Erasers...\n\n\n{bd02}They call each other\n{bd02}by code names...
+Bank0305_Text_DangerousCasesBetrayalNorm_2 = {bd02}Dangerous cases and betrayal\n{bd02}are the norm, so real names\n{bd02}are nothing more than a liability...
+Bank0305_Text_GhostEraserCaseFiles_2 = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 004\n\n{bd02}Code Name: {0102:0}
+Bank0305_Text_MajinMayhemFinallyResurrected_2 = {bd02}The Majin of Mayhem\n\n{bd02}was finally resurrected.
+Bank0305_Text_MajinSaidLeaveNothing_2 = {bd02}The Majin is said to leave\n\n{bd02}nothing but rubble in his wake...
+Bank0305_Text_WeWillMakeContact_2 = {bd02}We will make contact\n\n{bd02}with it and defeat it!
+Bank0305_Text_Empty_5 = なし
+Bank0305_Text_Empty_6 = なし
+Bank0305_Text_Empty_7 = なし
+Bank0305_Text_Empty_8 = なし
+Bank0305_Text_Empty_9 = なし
 \pad{2c}

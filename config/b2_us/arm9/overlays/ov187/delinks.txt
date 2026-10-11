@@ -3,3 +3,14 @@
     .ctor       start:0x021ea040 end:0x021ea040 kind:rodata align:4
     .data       start:0x021ea060 end:0x021ea0a0 kind:data align:32
     .bss        start:0x021ea0a0 end:0x021ea0a0 kind:bss align:32
+
+src/ov187/medal_info_beacon.c:
+    complete
+    .text       start:0x021e8be0 end:0x021e8ec8
+    .data       start:0x021ea060 end:0x021ea08c
+
+src/ov187/medal_info_viewer.c:
+    complete
+    .text       start:0x021e8ec8 end:0x021e9f0c
+    .rodata     start:0x021e9f0c end:0x021ea040
+    .data       start:0x021ea08c end:0x021ea0a0

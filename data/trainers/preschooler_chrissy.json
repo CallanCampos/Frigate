@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Chrissy",
+    "class": "TRAINER_CLASS_PRESCHOOLER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [],
+    "heals": false,
+    "money": 1,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DARUMAKA",
+            "form": 0,
+            "level": 34,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Roar!{be01}\nI'm a Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Quit it!{be01}\nI'm not really a Pokémon!"
+        },
+        {
+            "type": 2,
+            "text": "I hide in the tall grass and pretend\nto be a Pokémon.{be01}\nI'm what you might call a\nmethod actress!"
+        }
+    ]
+}

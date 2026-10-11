@@ -1,7 +1,7 @@
 #include "types.h"
 #include "field/event_wbt.h"
 #include "field/field_script.h"
-#include "field/ov135.h"
+#include "field/wbt_makematch.h"
 #include "field/scrcmd_wbt.h"
 #include "field/wbt.h"
 #include "gfl/overlay.h"
@@ -70,7 +70,7 @@ static BOOL WbtCmd_Create(VM *vm, FieldScriptEnv *env) {
     WbtSystem **sys = func_020179f0(gameData);
 
     *sys = WbtSystem_Create(HEAPID_GAMEEVENT, flag);
-    func_ov135_021efb34(*sys, gameData);
+    WbtMakeMatch_LoadBattleBoxParty(*sys, gameData);
     return FALSE;
 }
 
@@ -109,7 +109,7 @@ static BOOL func_ov055_021e5960(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
 
     func_ov055_021e5e54(sys, gameData);
-    func_ov135_021ef904(sys, gameData);
+    WbtMakeMatch_Make(sys, gameData);
     return FALSE;
 }
 

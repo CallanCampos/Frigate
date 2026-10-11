@@ -1,74 +1,74 @@
-Movie Star
-Masked Man
-Brycen-Man: Mwahaha!{be01}\nFor our final battle, this world\nis way too small...{be00}\nFollow me!
-Brycen-Man: Mwahaha!{be01}\nThis is only the beginning! We'll go up\nto another height of battle!{be00}\nKeep up with me!
-Brycen-Man: Is there anything wrong?\nI am going even higher!{be01}\nI will reach the far end of space!
-Brycen-Man: Mwahaha...{be01}\nThis is as far as my Pokémon party can go...{be01}\nLet us decide our fate,\n{0102:0} Kid!
-Brycen-Man: I can feel it in my body!\nGreat power is filling me now!{be01}\nBrycen-Man, the Masked Man, iiiis back!
-???: Hold it right there!
-Brycen-Man: Mwahaha!\nThis voice... I've been waiting for you...
-???: The Messenger of Truths and Ideals,\nthe {0102:0} Kid enters!{be01}\nLet this be the final battle between us,\nBrycen-Man!
-Brycen-Man: Mwahaha!{be01}\nVery well! Between you and me,\nlet us decide who the truly stronger one is!
-The {0102:0} Kid: I will see it through!
-Brycen-Man: Confident, aren't you?\nBut don't get sassy with me!{be01}\nProve yourself by defeating my entire\ntrusted Pokémon party with one hit each!
-Brycen-Man: Mwahaha!{be01}\nI can say that my condition has\nnever been this good in my entire life!{be01}\nI feel so great, I can almost touch the sky\nif I reach for it!{be01}\nRun for your life or else,\n{0102:0} Kid!
-The {0102:0} Kid: Ha!\nThat's my line.{be00}\nHeroes of justice always prevail!
-Brycen-Man: Mwahaha!{be01}\nI will defeat you and dye this world\nin dark colors!
-The {0102:0} Kid: Bring it on!
-Brycen-Man: Mwahaha!\nMy blood is boiling with excitement...{be00}\nfor the first battle in a long time!
-The {0102:0} Kid: What was that?
-Brycen-Man: Arrgh...{be01}\nWhy did you have to ruin it\nwhen I was getting really into the right{be00}\nmood? You obnoxious little kid...
-Brycen-Man: Mwahaha!\nYou are good, as always. However,{be00}\nmy Pokémon party is in its best{be00}\ncondition today!
-The {0102:0} Kid: As expected!
-Brycen-Man: Mwahaha!{be01}\nCompliments won't get you anything except\nmy dark counterattacks!{be01}\nTake this!\nThe wholehearted attack of a Masked Man!
-The {0102:0} Kid: Whatever!
-Brycen-Man: How dare...{be01}\nWhat happened to your mouth? It's gotten\nquite bad since the last time we met...{be01}\n{0102:0} Kid, you must be entering\nthe rebellious phase.
-The {0102:0} Kid: Pant pant...\nIt's finally...over...
-Brycen-Man: Well...\nI lost...{be01}\nIt seems that I can never\ndefeat you after all...
-The {0102:0} Kid: That's not true!\nIt was a great match!
-Brycen-Man: No matter...{be01}\nIf you are this strong, I just have to\nbecome stronger than you...
-The {0102:0} Kid: ...
-Brycen-Man: Mwahaha!\nI got it! I have an idea!{be01}\nThere is a way to raise the level\nof my dark power even higher!
-The {0102:0} Kid: What?
-Brycen-Man: Mwahaha!\nWhat I need is a black hole!{be01}\nAnything and everything, even light,\ngets sucked into this dark void of energy...{be01}\nMwahaha!\nIt'll suit me well...
-The {0102:0} Kid: Brycen-Man!\nYou are insane...
-Brycen-Man: Mwahaha!\nNow that I know what to do...{be00}\nYou know what they say: “Never hesitate{be00}\nto do what you think is right."{be00}\nOops, I mean “what you think is wrong"!{be01}\nYou see that black hole over there?\nI'll make that mine!{be01}\nBye for now, {0102:0} Kid!\nLook forward to the return of{be00}\nthe Galactic Brycen-Man with his power{be00}\nimproved even further!
-The {0102:0} Kid: Hold on a second!\nWait! Noooo!
-Bring ring ring!
-{0100:1}: Yaawn...
-Waking up to the clock going off,\na little kid named {0100:1},{be00}\naka the {0102:0} Kid,{be00}\nrubbed his sleepy eyes...{be01}\nThe recent peaceful days may be a little\ntoo boring for our hero of justice...
-Brycen-Man: Arrgh...{be01}\nWhat was that pathetic move,\n{0102:0} Kid?{be01}
-The {0102:0} Kid: Oops!\nThat didn't do it, did it?
-Brycen-Man: You...are getting quite rusty,\naren't you?{be01}\nDon't tell me that\nyou've been loafing around{be00}\nwhile I was away!
-The {0102:0} Kid: Er...
-Brycen-Man: Pathetic!\nI can't call you a rival at all!
-The {0102:0} Kid: Don't say that...
-Brycen-Man: Arrgh...{be01}\nYou being weak lowers my\nreputation, too!{be01}\nYou give me no choice...{be01}\nI shall give you the honor\nof being trained by me!{be01}\nCome, {0102:0} Kid!\nI'll take you to my hideout!{be01}\nI will train you until you become\nthe hero of all heroes,{be00}\nthe worthy rival of myself, Brycen-Man!
-The {0102:0} Kid: Nooo!
-Poor {0102:0} Kid!\nHe couldn't defeat the Masked Man{be00}\nBrycen-Man's Pokémon party.{be01}\nHe was led by Brycen-Man to his hideout,\nwhere nightmarishly harsh training awaits...{be01}\nPush yourself, {0102:0} Kid!{be01}\nStrive, {0102:0} Kid!
-The {0102:0} Kid: No!\nHow did I lose to you...?
-Brycen-Man: Arrgh...{be01}\nLook at yourself,\n{0102:0} Kid...{be01}\nTo regard you as my rival\nwas a big mistake. How silly of me...
-The {0102:0} Kid: Arg...\nI did my best...
-Brycen-Man: Sigh... Pathetic!{be01}\nI'm done with you!{be01}\nBattling you would just\nhurt my reputation!{be01}\nI'll just go find someone\nworthy to be my rival!{be01}\nFarewell, {0102:0} Kid!
-The {0102:0} Kid: Don't say that...\nWait up...
-The {0102:0} Kid let down Brycen-Man...{be01}\nA hero with no evil to fight\nis just an ordinary person{be00}\nwith a big imagination.{be01}\nThe story of the {0102:0} Kid\nhas, thus, come to an end...{be01}\nHow disappointing, {0102:0} Kid!{be01}\nFarewell, {0102:0} Kid!
-The {0102:0} Kid: Humph!\nI've done it! All down now!
-Brycen-Man: Mwa!\nMwahaha!{be00}\nMwahahahahahaha!
-The {0102:0} Kid: What's going on?
-Brycen-Man: Impressive!\nThat was an utter defeat for me!{be00}\nYou've made it through!{be01}\nThat is what I'd expect from my son...
-The {0102:0} Kid: What did you say?
-Brycen-Man: ...!{be01}\nI must excuse myself now!\nFarewell, {0102:0} Kid!
-The {0102:0} Kid: Please wait!{be01}\nBrycen-Man!\nAre you...{be00}\nperhaps...my dad?
-Brycen-Man: Wha...\nWhat nonsense!{be01}\nI'd remember it if I had\na son like you!{be01}\nI am a Masked Man!\nThe dark bachelor who goes{be00}\nwell with loneliness and melancholy!
-The {0102:0} Kid: Is that so...\nI believe you...{be01}\nMy mom always told me...\nMy dad left us for his own dream{be00}\nwhen I was just a baby...
-Brycen-Man: ...
-The {0102:0} Kid: My dad couldn't have\nbecome a Masked Man to face me...{be00}\nThat would be too good to be true, right...?{be01}\nI'm sorry...\nBrycen-Man, please leave me now...
-Brycen-Man: ...{be01}\nJust one thing...\nI have something to tell you,{be00}\n{0102:0} Kid...
-The {0102:0} Kid: And that would be...
-Brycen-Man: Little kid...\nThe power you are using for world peace...{be00}\nDon't you forget to use it{be00}\nfor your mom, too...
-The {0102:0} Kid: Brycen-Man...\nWhat are you saying?
-Brycen-Man: I must leave now.\nFarewell, {0102:0} Kid!{be01}\nOr should I call you\n{0100:1}?
-The {0102:0} Kid: How?\nHow do you know my real name?
-Bring ring ring!
-Waking up to the clock going off,\na little kid named {0100:1},{be00}\naka the {0102:0} Kid,{be00}\nrubbed his sleepy eyes...{be01}\nAll those words from Brycen-Man,\nand his true identity...{be00}\nIndeed, all was just a dream...{be01}\nOr perhaps that was little kid\n{0100:1}'s ideals.
+Bank0260_Text_MovieStar = Movie Star
+Bank0260_Text_MaskedMan = Masked Man
+Bank0260_Text_BrycenManMwahahaOur = Brycen-Man: Mwahaha!{be01}\nFor our final battle, this world\nis way too small...{be00}\nFollow me!
+Bank0260_Text_BrycenManMwahahaOnly = Brycen-Man: Mwahaha!{be01}\nThis is only the beginning! We'll go up\nto another height of battle!{be00}\nKeep up with me!
+Bank0260_Text_BrycenManThereAnything = Brycen-Man: Is there anything wrong?\nI am going even higher!{be01}\nI will reach the far end of space!
+Bank0260_Text_BrycenManMwahahaFar = Brycen-Man: Mwahaha...{be01}\nThis is as far as my Pokémon party can go...{be01}\nLet us decide our fate,\n{0102:0} Kid!
+Bank0260_Text_BrycenManCanFeel = Brycen-Man: I can feel it in my body!\nGreat power is filling me now!{be01}\nBrycen-Man, the Masked Man, iiiis back!
+Bank0260_Text_HoldRightThere = ???: Hold it right there!
+Bank0260_Text_BrycenManMwahahaVoice = Brycen-Man: Mwahaha!\nThis voice... I've been waiting for you...
+Bank0260_Text_MessengerTruthsIdealsKid = ???: The Messenger of Truths and Ideals,\nthe {0102:0} Kid enters!{be01}\nLet this be the final battle between us,\nBrycen-Man!
+Bank0260_Text_BrycenManMwahahaVery = Brycen-Man: Mwahaha!{be01}\nVery well! Between you and me,\nlet us decide who the truly stronger one is!
+Bank0260_Text_KidWillSeeThrough = The {0102:0} Kid: I will see it through!
+Bank0260_Text_BrycenManConfidentArent = Brycen-Man: Confident, aren't you?\nBut don't get sassy with me!{be01}\nProve yourself by defeating my entire\ntrusted Pokémon party with one hit each!
+Bank0260_Text_BrycenManMwahahaCan = Brycen-Man: Mwahaha!{be01}\nI can say that my condition has\nnever been this good in my entire life!{be01}\nI feel so great, I can almost touch the sky\nif I reach for it!{be01}\nRun for your life or else,\n{0102:0} Kid!
+Bank0260_Text_KidHaThatsLine = The {0102:0} Kid: Ha!\nThat's my line.{be00}\nHeroes of justice always prevail!
+Bank0260_Text_BrycenManMwahahaWill = Brycen-Man: Mwahaha!{be01}\nI will defeat you and dye this world\nin dark colors!
+Bank0260_Text_KidBring = The {0102:0} Kid: Bring it on!
+Bank0260_Text_BrycenManMwahahaBlood = Brycen-Man: Mwahaha!\nMy blood is boiling with excitement...{be00}\nfor the first battle in a long time!
+Bank0260_Text_KidWhat = The {0102:0} Kid: What was that?
+Bank0260_Text_BrycenManArrghWhy = Brycen-Man: Arrgh...{be01}\nWhy did you have to ruin it\nwhen I was getting really into the right{be00}\nmood? You obnoxious little kid...
+Bank0260_Text_BrycenManMwahahaGood = Brycen-Man: Mwahaha!\nYou are good, as always. However,{be00}\nmy Pokémon party is in its best{be00}\ncondition today!
+Bank0260_Text_KidExpected = The {0102:0} Kid: As expected!
+Bank0260_Text_BrycenManMwahahaCompliments = Brycen-Man: Mwahaha!{be01}\nCompliments won't get you anything except\nmy dark counterattacks!{be01}\nTake this!\nThe wholehearted attack of a Masked Man!
+Bank0260_Text_KidWhatever = The {0102:0} Kid: Whatever!
+Bank0260_Text_BrycenManHowDare = Brycen-Man: How dare...{be01}\nWhat happened to your mouth? It's gotten\nquite bad since the last time we met...{be01}\n{0102:0} Kid, you must be entering\nthe rebellious phase.
+Bank0260_Text_KidPantPantIts = The {0102:0} Kid: Pant pant...\nIt's finally...over...
+Bank0260_Text_BrycenManWellLost = Brycen-Man: Well...\nI lost...{be01}\nIt seems that I can never\ndefeat you after all...
+Bank0260_Text_KidThatsNotTrue = The {0102:0} Kid: That's not true!\nIt was a great match!
+Bank0260_Text_BrycenManNoMatter = Brycen-Man: No matter...{be01}\nIf you are this strong, I just have to\nbecome stronger than you...
+Bank0260_Text_Kid = The {0102:0} Kid: ...
+Bank0260_Text_BrycenManMwahahaGot = Brycen-Man: Mwahaha!\nI got it! I have an idea!{be01}\nThere is a way to raise the level\nof my dark power even higher!
+Bank0260_Text_KidWhat_2 = The {0102:0} Kid: What?
+Bank0260_Text_BrycenManMwahahaWhat = Brycen-Man: Mwahaha!\nWhat I need is a black hole!{be01}\nAnything and everything, even light,\ngets sucked into this dark void of energy...{be01}\nMwahaha!\nIt'll suit me well...
+Bank0260_Text_KidBrycenManInsane = The {0102:0} Kid: Brycen-Man!\nYou are insane...
+Bank0260_Text_BrycenManMwahahaNow = Brycen-Man: Mwahaha!\nNow that I know what to do...{be00}\nYou know what they say: “Never hesitate{be00}\nto do what you think is right."{be00}\nOops, I mean “what you think is wrong"!{be01}\nYou see that black hole over there?\nI'll make that mine!{be01}\nBye for now, {0102:0} Kid!\nLook forward to the return of{be00}\nthe Galactic Brycen-Man with his power{be00}\nimproved even further!
+Bank0260_Text_KidHoldSecondWait = The {0102:0} Kid: Hold on a second!\nWait! Noooo!
+Bank0260_Text_BringRingRing = Bring ring ring!
+Bank0260_Text_Yaawn = {0100:1}: Yaawn...
+Bank0260_Text_WakingUpClockGoing = Waking up to the clock going off,\na little kid named {0100:1},{be00}\naka the {0102:0} Kid,{be00}\nrubbed his sleepy eyes...{be01}\nThe recent peaceful days may be a little\ntoo boring for our hero of justice...
+Bank0260_Text_BrycenManArrghWhat = Brycen-Man: Arrgh...{be01}\nWhat was that pathetic move,\n{0102:0} Kid?{be01}
+Bank0260_Text_KidOopsDidntDid = The {0102:0} Kid: Oops!\nThat didn't do it, did it?
+Bank0260_Text_BrycenManGettingQuite = Brycen-Man: You...are getting quite rusty,\naren't you?{be01}\nDon't tell me that\nyou've been loafing around{be00}\nwhile I was away!
+Bank0260_Text_KidEr = The {0102:0} Kid: Er...
+Bank0260_Text_BrycenManPatheticCant = Brycen-Man: Pathetic!\nI can't call you a rival at all!
+Bank0260_Text_KidDontSay = The {0102:0} Kid: Don't say that...
+Bank0260_Text_BrycenManArrghBeing = Brycen-Man: Arrgh...{be01}\nYou being weak lowers my\nreputation, too!{be01}\nYou give me no choice...{be01}\nI shall give you the honor\nof being trained by me!{be01}\nCome, {0102:0} Kid!\nI'll take you to my hideout!{be01}\nI will train you until you become\nthe hero of all heroes,{be00}\nthe worthy rival of myself, Brycen-Man!
+Bank0260_Text_KidNooo = The {0102:0} Kid: Nooo!
+Bank0260_Text_PoorKidHeCouldnt = Poor {0102:0} Kid!\nHe couldn't defeat the Masked Man{be00}\nBrycen-Man's Pokémon party.{be01}\nHe was led by Brycen-Man to his hideout,\nwhere nightmarishly harsh training awaits...{be01}\nPush yourself, {0102:0} Kid!{be01}\nStrive, {0102:0} Kid!
+Bank0260_Text_KidNoHowDid = The {0102:0} Kid: No!\nHow did I lose to you...?
+Bank0260_Text_BrycenManArrghLook = Brycen-Man: Arrgh...{be01}\nLook at yourself,\n{0102:0} Kid...{be01}\nTo regard you as my rival\nwas a big mistake. How silly of me...
+Bank0260_Text_KidArgDidBest = The {0102:0} Kid: Arg...\nI did my best...
+Bank0260_Text_BrycenManSighPathetic = Brycen-Man: Sigh... Pathetic!{be01}\nI'm done with you!{be01}\nBattling you would just\nhurt my reputation!{be01}\nI'll just go find someone\nworthy to be my rival!{be01}\nFarewell, {0102:0} Kid!
+Bank0260_Text_KidDontSayWait = The {0102:0} Kid: Don't say that...\nWait up...
+Bank0260_Text_KidLetDownBrycen = The {0102:0} Kid let down Brycen-Man...{be01}\nA hero with no evil to fight\nis just an ordinary person{be00}\nwith a big imagination.{be01}\nThe story of the {0102:0} Kid\nhas, thus, come to an end...{be01}\nHow disappointing, {0102:0} Kid!{be01}\nFarewell, {0102:0} Kid!
+Bank0260_Text_KidHumphIveDone = The {0102:0} Kid: Humph!\nI've done it! All down now!
+Bank0260_Text_BrycenManMwaMwahaha = Brycen-Man: Mwa!\nMwahaha!{be00}\nMwahahahahahaha!
+Bank0260_Text_KidWhatsGoing = The {0102:0} Kid: What's going on?
+Bank0260_Text_BrycenManImpressiveUtter = Brycen-Man: Impressive!\nThat was an utter defeat for me!{be00}\nYou've made it through!{be01}\nThat is what I'd expect from my son...
+Bank0260_Text_KidWhatDidSay = The {0102:0} Kid: What did you say?
+Bank0260_Text_BrycenManMustExcuse = Brycen-Man: ...!{be01}\nI must excuse myself now!\nFarewell, {0102:0} Kid!
+Bank0260_Text_KidPleaseWaitBrycen = The {0102:0} Kid: Please wait!{be01}\nBrycen-Man!\nAre you...{be00}\nperhaps...my dad?
+Bank0260_Text_BrycenManWhaWhat = Brycen-Man: Wha...\nWhat nonsense!{be01}\nI'd remember it if I had\na son like you!{be01}\nI am a Masked Man!\nThe dark bachelor who goes{be00}\nwell with loneliness and melancholy!
+Bank0260_Text_KidBelieveMomAlways = The {0102:0} Kid: Is that so...\nI believe you...{be01}\nMy mom always told me...\nMy dad left us for his own dream{be00}\nwhen I was just a baby...
+Bank0260_Text_BrycenMan = Brycen-Man: ...
+Bank0260_Text_KidDadCouldntHave = The {0102:0} Kid: My dad couldn't have\nbecome a Masked Man to face me...{be00}\nThat would be too good to be true, right...?{be01}\nI'm sorry...\nBrycen-Man, please leave me now...
+Bank0260_Text_BrycenManJustOne = Brycen-Man: ...{be01}\nJust one thing...\nI have something to tell you,{be00}\n{0102:0} Kid...
+Bank0260_Text_KidWould = The {0102:0} Kid: And that would be...
+Bank0260_Text_BrycenManLittleKid = Brycen-Man: Little kid...\nThe power you are using for world peace...{be00}\nDon't you forget to use it{be00}\nfor your mom, too...
+Bank0260_Text_KidBrycenManWhat = The {0102:0} Kid: Brycen-Man...\nWhat are you saying?
+Bank0260_Text_BrycenManMustLeave = Brycen-Man: I must leave now.\nFarewell, {0102:0} Kid!{be01}\nOr should I call you\n{0100:1}?
+Bank0260_Text_KidHowHowKnow = The {0102:0} Kid: How?\nHow do you know my real name?
+Bank0260_Text_BringRingRing_2 = Bring ring ring!
+Bank0260_Text_WakingUpClockGoing_2 = Waking up to the clock going off,\na little kid named {0100:1},{be00}\naka the {0102:0} Kid,{be00}\nrubbed his sleepy eyes...{be01}\nAll those words from Brycen-Man,\nand his true identity...{be00}\nIndeed, all was just a dream...{be01}\nOr perhaps that was little kid\n{0100:1}'s ideals.
 \pad{7a}

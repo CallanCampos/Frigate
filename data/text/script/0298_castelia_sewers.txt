@@ -1,6 +1,0 @@
-I'm working on experiments to create\nmedicines from the toxins found in{be00}\nthe sewer system.{be01}\nIf I truly succeed in these experiments,\nI can create a lot of medicines from{be00}\nthe venom of Poison-type Pokémon.{be01}\nWell...\nToday's experiment was...{be01}
-This experiment was OK.{be01}\nI created an Antidote. Here, take it!{be01}
-This experiment was successful!{be01}\nI created a Full Heal. Here, take it!{be01}
-This experiment was\nvery successful!{be01}\nI created a Full Restore. Here, take it!{be01}
-Tomorrow is another day!\nI run my experiments every day.{be01}\nYou're welcome to stop by again\nand see the result!
-\pad{ea}

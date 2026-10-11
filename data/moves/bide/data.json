@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Bide",
+    "description": "The user endures attacks for two\nturns, then strikes back to cause\ndouble the damage taken.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_DAMAGE",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 1,
+    "accuracy": 101,
+    "pp": 10,
+    "priority": 1,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_BIDE",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_USER",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT" ]
+}

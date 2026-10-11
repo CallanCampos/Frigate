@@ -1,4 +1,0 @@
-Oh?{be01}
-{0101:0} hatched from the Egg!
-Would you like to give a nickname to the\nnewly hatched {0101:0}?
-\pad{60}

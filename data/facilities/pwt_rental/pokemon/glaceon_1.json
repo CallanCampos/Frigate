@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GLACEON",
+    "moves": [ "MOVE_ICE_SHARD", "MOVE_BLIZZARD", "MOVE_MIRROR_COAT", "MOVE_HELPING_HAND" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_RASH",
+    "item": "ITEM_QUICK_CLAW",
+    "form": 0
+}

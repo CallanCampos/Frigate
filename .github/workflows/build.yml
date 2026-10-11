@@ -1,0 +1,68 @@
+name: Build
+
+# Builds each version from its base ROM, checks every module and the SHA1, and uploads the progress report that
+# decomp.dev reads, an artifact named <version>_report. The ROMs come from the private pokebw2-roms repository, through a
+# read-only deploy key in the ROMS_DEPLOY_KEY secret. Pull requests from forks get no secrets, so they skip this, and
+# compile.yml still checks that they compile.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.version }}
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [b2_us, w2_us]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Checkout base ROMs
+        uses: actions/checkout@v7
+        with:
+          repository: fuddlesworth/pokebw2-roms
+          ssh-key: ${{ secrets.ROMS_DEPLOY_KEY }}
+          path: roms
+
+      - name: Unpack base ROM
+        run: |
+          mkdir -p orig
+          xz -dc roms/baserom_${{ matrix.version }}.nds.xz > orig/baserom_${{ matrix.version }}.nds
+          rm -rf roms
+
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get install -y ninja-build clang llvm
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Cache tools
+        uses: actions/cache@v6
+        with:
+          path: |
+            tools/wibo
+            tools/objdiff-cli
+            tools/mwccarm
+            tools/dsd
+            tools/dsd.rev
+          key: build-tools-${{ hashFiles('configure.py', 'lib/*/library.toml') }}
+
+      - name: Build
+        run: |
+          python configure.py ${{ matrix.version }}
+          ninja
+          ninja report
+
+      - name: Upload report
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.version }}_report
+          path: build/${{ matrix.version }}/report.json

@@ -1,6 +1,0 @@
-When you've crossed\nall of the bridges in Unova,{be00}\nsomething really cool will appear!{be01}\nIf I spread this rumor, I wonder\nif it'll become an urban legend...
-Some Trainers take a Pokémon\ncalled Rotom into the storeroom{be00}\nof Shopping Mall Nine.{be00}\nI wonder what they're doing...
-Halt!{be01}\nThe Tubeline Bridge is currently\nundergoing a test to see how{be00}\nmany people it can hold!{be01}\nThat's right! I can't let any\nmore people in right now!
-Halt!{be01}\nThe Tubeline Bridge is currently\nundergoing a test to see how{be00}\nmany people it can hold!{be01}\nThat's right! I can't let any\nmore people in right now!{be01}
-The results of the test showed that\n4,934 people can be on the{be00}\nTubeline Bridge at one time.
-\pad{d8}

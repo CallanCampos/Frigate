@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ingo",
+    "class": "TRAINER_CLASS_SUBWAY_BOSS_88",
+    "pokemon": [ "garbodor_1", "crustle_1", "klinklang_3" ],
+    "messages": [
+        "Welcome! I've been waiting for you!{be01}\nLet me introduce myself...\nI am the Subway Boss Ingo.{be01}\nWhat can I see after winning,\nwinning, and winning?{be01}\nWhere is my destination?{be01}\nI've kept thinking, and\nI've learned one thing.{be01}\nThat is, you cannot know what happens\nafter winning without winning.{be01}\nTherefore, I will exert every possible\neffort to battle with you.{be01}\nAll aboard!",
+        "I have won this time, but\nyour talent is very strong!{be01}\nYour tactics...reading...\nYou have great skills.{be01}\nThat's right! I would like to\nbattle you again and again!{be01}\nPlease ride the Battle Subway again soon!",
+        "Bravo!\nExcellent!!{be01}\nI am glad that I fought so hard\nagainst a wonderful Trainer like you.{be01}\nThat's right!\nYou grow stronger by matching yourself{be00}\nagainst a strong opponent.{be01}\nPlease do your best and run\ntoward the destination--{be00}\nan even higher state."
+    ]
+}

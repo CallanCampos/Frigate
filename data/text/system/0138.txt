@@ -1,12 +1,12 @@
-ZANGOOSE
-ZAPCANNON
-ZAPDOS
-ZEBSTRIKA
-ZEKROM
-ZENHEADBUTT
-ZENMODE
-ZIGZAGOON
-ZOROARK
-ZORUA
-ZUBAT
-ZWEILOUS
+Bank0138_Text_Zangoose = ZANGOOSE
+Bank0138_Text_Zapcannon = ZAPCANNON
+Bank0138_Text_Zapdos = ZAPDOS
+Bank0138_Text_Zebstrika = ZEBSTRIKA
+Bank0138_Text_Zekrom = ZEKROM
+Bank0138_Text_Zenheadbutt = ZENHEADBUTT
+Bank0138_Text_Zenmode = ZENMODE
+Bank0138_Text_Zigzagoon = ZIGZAGOON
+Bank0138_Text_Zoroark = ZOROARK
+Bank0138_Text_Zorua = ZORUA
+Bank0138_Text_Zubat = ZUBAT
+Bank0138_Text_Zweilous = ZWEILOUS

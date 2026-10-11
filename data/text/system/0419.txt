@@ -1,26 +1,26 @@
-None
-Buenos Aires
-Ciudad Autónoma de Buenos Aires
-Catamarca
-Chaco
-Chubut
-Córdoba
-Corrientes
-Entre Ríos
-Formosa
-Jujuy
-La Pampa
-La Rioja
-Mendoza
-Misiones
-Neuquén
-Río Negro
-Salta
-San Juan
-San Luis
-Santa Cruz
-Santa Fe
-Santiago del Estero
-Tierra del Fuego
-Tucumán
+Bank0419_Text_None = None
+Bank0419_Text_BuenosAires = Buenos Aires
+Bank0419_Text_CiudadAutNomaDe = Ciudad Autónoma de Buenos Aires
+Bank0419_Text_Catamarca = Catamarca
+Bank0419_Text_Chaco = Chaco
+Bank0419_Text_Chubut = Chubut
+Bank0419_Text_CRdoba = Córdoba
+Bank0419_Text_Corrientes = Corrientes
+Bank0419_Text_EntreROs = Entre Ríos
+Bank0419_Text_Formosa = Formosa
+Bank0419_Text_Jujuy = Jujuy
+Bank0419_Text_LaPampa = La Pampa
+Bank0419_Text_LaRioja = La Rioja
+Bank0419_Text_Mendoza = Mendoza
+Bank0419_Text_Misiones = Misiones
+Bank0419_Text_Neuquen = Neuquén
+Bank0419_Text_RONegro = Río Negro
+Bank0419_Text_Salta = Salta
+Bank0419_Text_SanJuan = San Juan
+Bank0419_Text_SanLuis = San Luis
+Bank0419_Text_SantaCruz = Santa Cruz
+Bank0419_Text_SantaFe = Santa Fe
+Bank0419_Text_SantiagoDelEstero = Santiago del Estero
+Bank0419_Text_TierraDelFuego = Tierra del Fuego
+Bank0419_Text_TucumN = Tucumán
 \pad{c2}

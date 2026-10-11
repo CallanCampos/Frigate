@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Hawk & Dar",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DARMANITAN",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DARMANITAN",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Look!\nMy defense is magnificent!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hawk: It's strange. When professionals\nare playing, it looks so easy...{be01}\nDar: I guess we cannot play\nquite as well as the professionals..."
+        },
+        {
+            "type": 5,
+            "text": "Rock-solid defense!\nThat's a real thrill in football!"
+        },
+        {
+            "type": 6,
+            "text": "DE-fense! DE-fense!"
+        },
+        {
+            "type": 7,
+            "text": "Look!\nMy magnificent offense!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "Offense that smashes in every direction!\nThat's a real thrill in football!"
+        },
+        {
+            "type": 10,
+            "text": "Offffffense!"
+        }
+    ]
+}

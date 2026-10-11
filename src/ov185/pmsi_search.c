@@ -1,6 +1,6 @@
 #include "app/pmsi_search.h"
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/msgsearch.h"
 #include "app/pms_input_data.h"
 #include "app/pmsi_initial_data.h"
 #include "constants/arc.h"
@@ -22,8 +22,8 @@ struct PMSISearch {
     u16 heapId;
     // The names of the words of each initial
     MsgData *msgData[PMSI_INITIAL_COUNT];
-    Ov139Search *search;
-    Ov139SearchResult results[PMSI_SEARCH_RESULT_MAX];
+    MsgSearch *search;
+    MsgSearchResult results[PMSI_SEARCH_RESULT_MAX];
     u16 words[PMSI_SEARCH_RESULT_MAX + 2];
     StrBuf *inputStr;
     u16 input[PMSI_SEARCH_INPUT_MAX + 1];
@@ -53,7 +53,7 @@ PMSISearch *PMSISearch_Create(const PMSInputWork *mwk, const PMSInputData *dwk, 
     for (i = 0; i < PMSI_INITIAL_COUNT; i++) {
         ss->msgData[i] = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, sPMSISearchInitialMsgFiles[i], heapId);
     }
-    ss->search = func_ov139_0219a438(ss->msgData, PMSI_INITIAL_COUNT, ss->heapId);
+    ss->search = MsgSearch_Create(ss->msgData, PMSI_INITIAL_COUNT, ss->heapId);
     ss->inputStr = GFL_StrBufCreate(27, heapId);
     return ss;
 }
@@ -62,7 +62,7 @@ void PMSISearch_Delete(PMSISearch *ss) {
     int i;
 
     GFL_StrBufFree(ss->inputStr);
-    func_ov139_0219a490(ss->search);
+    MsgSearch_Free(ss->search);
     for (i = 0; i < PMSI_INITIAL_COUNT; i++) {
         GFL_MsgDataFree(ss->msgData[i]);
     }
@@ -162,7 +162,7 @@ BOOL PMSISearch_Search(PMSISearch *ss) {
         u16 words[PMSI_SEARCH_RESULT_MAX + 1] = { 0 };
         u32 n;
 
-        n = func_ov139_0219a4a4(ss->search, initial, 0, ss->inputStr, ss->results, PMSI_SEARCH_RESULT_MAX);
+        n = MsgSearch_Find(ss->search, initial, 0, ss->inputStr, ss->results, PMSI_SEARCH_RESULT_MAX);
         for (i = 0; i < n; i++) {
             words[i] = PMSIData_GetInitialWordCode(ss->dwk, initial, ss->results[i].line);
         }

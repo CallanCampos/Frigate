@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": 332,
+    "matrix": "MAP_MATRIX_WELLSPRING_CAVE_2",
+    "scripts": "SCRIPTS_WELLSPRING_CAVE_2",
+    "text": "SCRIPT_TEXT_WELLSPRING_CAVE_2",
+    "bgm": "SEQ_BGM_D_02",
+    "encounters": "ENCOUNTERS_WELLSPRING_CAVE_2",
+    "enc_slot": 4,
+    "parent": "ZONE_WELLSPRING_CAVE",
+    "place": "PLACE_WELLSPRING_CAVE",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 5,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 109,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

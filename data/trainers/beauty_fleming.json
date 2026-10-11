@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Fleming",
+    "class": "TRAINER_CLASS_BEAUTY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 14,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_FLAAFFY",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BLITZLE",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You can't get by with just beauty!\nYou need to be a strong Trainer, too!{be01}\nDon't get captivated by the magnificent\nbeauty of our battling style!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "...Strong and beautiful!\nYou captivated me!"
+        },
+        {
+            "type": 2,
+            "text": "Beauty isn't just about one's\nphysical appearance!{be01}\nYour strength is part of your beauty!\nThat goes for both you and Elesa!"
+        }
+    ]
+}

@@ -23,6 +23,6 @@ void ProfWord_FreeLists(ProfWordLists *lists);
 // Returns TRUE if the name, with its case and kana folded, is in a list; lists may be NULL to read them one at a time
 BOOL ProfWord_Check(ProfWordLists *lists, const u16 *name, HeapID heapId);
 // Returns TRUE if the first len characters of the name hold more than 4 digits, which could be a phone number
-BOOL ProfWord_HasManyDigits(const u16 *name, u32 len);
+BOOL ProfWord_HasManyDigits(const u16 *name, u32 len, HeapID unused);
 
 #endif // POKEBW2_SYSTEM_PROF_WORD_H

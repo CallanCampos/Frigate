@@ -4,6 +4,7 @@
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "demo/intro.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -130,7 +131,7 @@ static void DebugGameStart_DrawCursor(DebugGameStartWork *wk);
 static u32 DebugGameStart_UpdateMenu(DebugGameStartWork *wk);
 static void DebugGameStart_CycleCursorColor(DebugGameStartWork *wk);
 
-// The static data is declared in this order to keep the original layout (tools/scripts/rodata_order.py)
+// The static data is declared in this order to keep the original layout (tools/decomp/rodata_order.py)
 static const TouchRectTable sDebugTouchRects = { {
     { 96, 112, 48, 208 },
     { 128, 144, 48, 208 },
@@ -279,7 +280,7 @@ static BOOL NewGame_Main(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case NEW_GAME_RIVAL_NAME_ENTRY:
         // Hugh
-        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 54, HEAPID_USER);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_START, HEAPID_USER);
         name = GFL_MsgDataLoadStrbufNew(msgData, 25);
         GFL_StrBufCopy(wk->nameEntryParam->name, name);
         GFL_StrBufFree(name);
@@ -559,7 +560,7 @@ static void DebugGameStart_CreateBG(const BGSetup *setup, u8 bg) {
 // The question on the sub screen, and the two answers on the main screen. The messages are those of system message
 // file 363: the questions from 0, and their answers from 5, two to a question
 static void DebugGameStart_CreateWindows(DebugGameStartWork *wk) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 363, HEAPID_DEBUG_GENDER_SELECT);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_START_2, HEAPID_DEBUG_GENDER_SELECT);
     StrBuf *strbuf;
     u8 i;
 

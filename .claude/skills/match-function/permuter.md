@@ -23,7 +23,7 @@ Its Python needs pycparser, toml, capstone, pyelftools and pyyaml, all of which 
 ## Run
 
 ```sh
-.venv/bin/python tools/scripts/permuter_setup.py src/X.c F    # writes build/permuter/F/
+.venv/bin/python tools/decomp/permuter_setup.py src/X.c F    # writes build/permuter/F/
 ```
 
 Then, with `run_in_background`:

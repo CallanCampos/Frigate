@@ -1,108 +1,108 @@
-          \x{ffff}
-Please enter the search criteria.
-           \x{ffff}
-            \x{ffff}
-Please enter the order.
-Please enter the first letter in the name.
-Please enter the type.
-Please enter the form.
-Please enter the color.
-Pokémon found!
-No Pokémon found...
-Searching...
-ORDER
-NAME
-TYPE
-COLOR
-FORM
-Unova Pokédex: Search Mode
-National Pokédex: Search Mode
-    \x{ffff}
-START
-    \x{ffff}
-         \x{ffff}
-    \x{ffff}
-    \x{ffff}
-Number
-A to Z
-Heavy to Light
-Light to Heavy
-Tall to Short
-Short to Tall
-Dark
-Rock
-Psychic
-Fighting
-Grass
-Ice
-Ghost
-Ground
-Electric
-Poison
-Dragon
-Normal
-Steel
-Flying
-Fire
-Water
-Bug
--
-/
-    \x{ffff}
-A
-B
-C
-D
-E
-F
-G
-H
-I
-J
-K
-L
-M
-N
-O
-P
-Q
-R
-S
-T
-U
-V
-W
-X
-Y
-Z
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---
-Red
-Blue
-Yellow
-Green
-Black
-Brown
-Purple
-Gray
-White
-Pink
--
+Bank0479_Text_Empty =           \x{ffff}
+Bank0479_Text_PleaseEnterSearchCriteria = Please enter the search criteria.
+Bank0479_Text_Empty_2 =            \x{ffff}
+Bank0479_Text_Empty_3 =             \x{ffff}
+Bank0479_Text_PleaseEnterOrder = Please enter the order.
+Bank0479_Text_PleaseEnterFirstLetter = Please enter the first letter in the name.
+Bank0479_Text_PleaseEnterType = Please enter the type.
+Bank0479_Text_PleaseEnterForm = Please enter the form.
+Bank0479_Text_PleaseEnterColor = Please enter the color.
+Bank0479_Text_PokemonFound = Pokémon found!
+Bank0479_Text_NoPokemonFound = No Pokémon found...
+Bank0479_Text_Searching = Searching...
+Bank0479_Text_Order = ORDER
+Bank0479_Text_Name = NAME
+Bank0479_Text_Type = TYPE
+Bank0479_Text_Color = COLOR
+Bank0479_Text_Form = FORM
+Bank0479_Text_UnovaPokedexSearchMode = Unova Pokédex: Search Mode
+Bank0479_Text_NationalPokedexSearchMode = National Pokédex: Search Mode
+Bank0479_Text_Empty_4 =     \x{ffff}
+Bank0479_Text_Start = START
+Bank0479_Text_Empty_5 =     \x{ffff}
+Bank0479_Text_Empty_6 =          \x{ffff}
+Bank0479_Text_Empty_7 =     \x{ffff}
+Bank0479_Text_Empty_8 =     \x{ffff}
+Bank0479_Text_Number = Number
+Bank0479_Text_Z = A to Z
+Bank0479_Text_HeavyLight = Heavy to Light
+Bank0479_Text_LightHeavy = Light to Heavy
+Bank0479_Text_TallShort = Tall to Short
+Bank0479_Text_ShortTall = Short to Tall
+Bank0479_Text_Dark = Dark
+Bank0479_Text_Rock = Rock
+Bank0479_Text_Psychic = Psychic
+Bank0479_Text_Fighting = Fighting
+Bank0479_Text_Grass = Grass
+Bank0479_Text_Ice = Ice
+Bank0479_Text_Ghost = Ghost
+Bank0479_Text_Ground = Ground
+Bank0479_Text_Electric = Electric
+Bank0479_Text_Poison = Poison
+Bank0479_Text_Dragon = Dragon
+Bank0479_Text_Normal = Normal
+Bank0479_Text_Steel = Steel
+Bank0479_Text_Flying = Flying
+Bank0479_Text_Fire = Fire
+Bank0479_Text_Water = Water
+Bank0479_Text_Bug = Bug
+Bank0479_Text_Empty_9 = -
+Bank0479_Text_Empty_10 = /
+Bank0479_Text_Empty_11 =     \x{ffff}
+Bank0479_Text_A = A
+Bank0479_Text_B = B
+Bank0479_Text_C = C
+Bank0479_Text_D = D
+Bank0479_Text_E = E
+Bank0479_Text_F = F
+Bank0479_Text_G = G
+Bank0479_Text_H = H
+Bank0479_Text_I = I
+Bank0479_Text_J = J
+Bank0479_Text_K = K
+Bank0479_Text_L = L
+Bank0479_Text_M = M
+Bank0479_Text_N = N
+Bank0479_Text_O = O
+Bank0479_Text_P = P
+Bank0479_Text_Q = Q
+Bank0479_Text_R = R
+Bank0479_Text_S = S
+Bank0479_Text_T = T
+Bank0479_Text_U = U
+Bank0479_Text_V = V
+Bank0479_Text_W = W
+Bank0479_Text_X = X
+Bank0479_Text_Y = Y
+Bank0479_Text_Z_2 = Z
+Bank0479_Text_Empty_12 =
+Bank0479_Text_Empty_13 =
+Bank0479_Text_Empty_14 =
+Bank0479_Text_Empty_15 =
+Bank0479_Text_Empty_16 =
+Bank0479_Text_Empty_17 =
+Bank0479_Text_Empty_18 =
+Bank0479_Text_Empty_19 =
+Bank0479_Text_Empty_20 =
+Bank0479_Text_Empty_21 =
+Bank0479_Text_Empty_22 =
+Bank0479_Text_Empty_23 =
+Bank0479_Text_Empty_24 =
+Bank0479_Text_Empty_25 =
+Bank0479_Text_Empty_26 =
+Bank0479_Text_Empty_27 =
+Bank0479_Text_Empty_28 =
+Bank0479_Text_Empty_29 =
+Bank0479_Text_Empty_30 = --
+Bank0479_Text_Red = Red
+Bank0479_Text_Blue = Blue
+Bank0479_Text_Yellow = Yellow
+Bank0479_Text_Green = Green
+Bank0479_Text_Black = Black
+Bank0479_Text_Brown = Brown
+Bank0479_Text_Purple = Purple
+Bank0479_Text_Gray = Gray
+Bank0479_Text_White = White
+Bank0479_Text_Pink = Pink
+Bank0479_Text_Empty_31 = -
 \pad{da}

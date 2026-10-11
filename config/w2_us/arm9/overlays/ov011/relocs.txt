@@ -2109,6 +2109,7 @@ from:0x0215ca4a kind:thumb_call to:0x0215c36c module:overlay(11)
 from:0x0215ca70 kind:thumb_call to:0x0207acb8 module:main
 from:0x0215ca8e kind:thumb_call_arm to:0x0215cafc module:overlay(11)
 from:0x0215caf4 kind:load to:0x02185044 module:overlay(11)
+from:0x0215cb00 kind:load to:0x02703250 module:ltd_autoload(0)
 from:0x0215cb1c kind:thumb_call_arm to:0x020787d4 module:main
 from:0x0215cb26 kind:thumb_call to:0x0207ae78 module:main
 from:0x0215cb2c kind:load to:0x0218dfbc module:overlay(11)

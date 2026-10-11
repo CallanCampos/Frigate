@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TANGROWTH",
+    "moves": [ "MOVE_LEECH_SEED", "MOVE_INGRAIN", "MOVE_GIGA_DRAIN", "MOVE_TOXIC" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_BIG_ROOT",
+    "form": 0
+}

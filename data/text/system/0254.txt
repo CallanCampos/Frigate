@@ -1,66 +1,66 @@
-Child Star
-Haunted Kid
-{0102:0}: Urk...\nThe air is stagnant.{be01}\nIf I don't end this quickly,\nI myself may be possessed.{be00}\nI must erase this menace!
-Girl: Ahaha!\nIt's fun. So fun.
-Girl: Ahaha!\nThe Majin of Mayhem--so strong!{be00}\nCome on, Majin of Mayhem. Wake up!
-Girl: Ahaha!\nThe genius magician--magnificent!{be00}\nThe genius magician--Arkham!
-Girl: Wellll-come.\nWhaaaaaaat do you want?
-{0102:0}: ...{be01}\n(...Guess I'll see how this plays out...)
-{0102:0}: Rid us of evil spirits!
-Girl: Ahaha!\nSo fun! Let's play.
-{0102:0}: Is your daddy here?
-Girl: Ahaha...\nHe hasn't come back since last night.{be00}\nSo, I'm lonely. Play with me.
-{0102:0}: Is there a water leak?
-Girl: Ahaha... Are you selling something?\nCome on, quit working! Let's play!
-Girl: Listen, I want to tell you a story.\nCan you guess how the story ends?{be01}\nA long, long time ago,\nthere was a malevolent being{be00}\ncalled the Majin of Mayhem.{be01}\nOver and over, this violent majin bent\nhimself on destroying the world.{be01}\nThen a day came when he stopped\ntrying to destroy everything.{be01}\nBut why? Can you guess?
-{0102:0}: ...{be01}\n(...What is she trying to say?...)\n(...Whatever... I'll answer her question...){be00}\n(...That way, she won't get suspicious...)
-{0102:0}: Was he ashamed?
-Girl: Oh. You're a person of high principle.
-{0102:0}: Did someone beat him?
-Girl: Hm. You have a simple outlook.
-{0102:0}: Did he get tired of it?
-Girl: Hurrah! You're a smart one!
-Girl: Listen, I have another story.\nDo you know this one?{be01}\nA long, long time ago,\nthere was a magician{be00}\nwith special powers.{be01}\nThen the magician's friends imprisoned him.\nBut why? Can you guess?
-{0102:0}: ...{be01}\n(...More guessing games?...){be01}\n(...Grr. What's she up to?...)\n(...Guess I have to answer...)
-{0102:0}: Were they bullying him?
-Girl: Hm. You have a simple outlook.
-{0102:0}: Was he a bad guy?
-Girl: Hurrah! You're a smart one!
-{0102:0}: Were they jealous?
-Girl: Ahahaha!\nYou've felt pangs of envy in your heart!
-{0102:0}: Lies! All lies!
-Girl: What?\nHmf. You're a suspicious one.
-{0102:0}: Now! Evil spirit!\nGet out of this child!
-Girl: Ahahahaha.\nYou're a strong one.{be01}\nI've been saving up my power,\nand I'm tired of being in here.{be01}\nIt might be the right time to depart!
-{0102:0}: Who are you?
-Girl: Oops...\nDid I forget to introduce myself properly?{be01}\n...
-{0102:0}: What an odd look...
-Heh heh... Ahahaha!\nMy name is Arkham!{be01}\nI was well known in the world...\nthe world of once upon a time.{be01}\nI'll say it again! Arkham!\nRemember that name!{be00}\nSee ya! Wouldn't want to be ya!{be01}\nHeh...
-{0102:0}: Hey! Wait!
-Addendum to\n“Ghost Eraser Case Files: File No. 002":{be01}\nI succeeded in getting rid of the evil spirit\nthat was possessing the girl.{be01}\nThe girl seems to be recovering steadily.{be01}\nHowever, I failed to capture the evil\nspirit, who identified himself as--Arkham.
-According to my research, records show\nthat the man who tried to reawaken{be00}\nthe majin called the Majin of Mayhem{be00}\nwas the magician named Arkham.{be01}\nI'll maintain my investigation.{be01}\n--Code name: {0102:0}
-Girl: Pfft. Weakness.\nYou're boring me already.{be01}\nI deserve some kind of reward\nfor playing with you.{be01}\nLet me see... Hm hm hm...\nOoh, I know! I deserve to{be00}\ntake over your body--now!
-{0102:0}: Gwaughh...\nUfff... I feel like a lump...of stone.{be00}\nNo strength...in my body...{be00}\nStop...it... Sto-o-o--
-Girl: Oh, come on, perk up.\nSmile on the inside!{be01}\nA weakling like you getting to\nhelp revive the Majin of Mayhem...{be01}\nLucky, lucky you!
-{0102:0}: Gwaughhhh!
-Girl: Tee hee.{be01}\n...
-Addendum to\n“Ghost Eraser Case Files: File No. 002":{be01}\nAfter File No. 002 was received,\nwe lost contact with {0102:0}.{be01}\nThe village investigated by {0102:0} is\ncompletely empty.
-{0102:0}: What happened?\nThe movement has stopped...
-Girl: Thank you for playing with me!\nIt's time to go!{be01}\nYou know what?{be01}\nI have one last favor to ask you.\nCan I take over your body?
-{0102:0}: Gwaaaa...\nMy legs won't obey me...{be00}\nMy arms have no strength...{be00}\nStop...it... Sto-o-o--
-Girl: Oh, come on now...\nThink how lucky you are!{be01}\nYou'll get to be the body of a\nreally great and powerful being!
-{0102:0}: ...
-Girl: Tee hee.{be01}\n...
-Addendum to\n“Ghost Eraser Case Files: File No. 002":{be01}\nWe have had no further contact\nfrom {0102:0}.{be01}\nSome information concerning a look-alike\nhas been reported, but it remains unclear{be00}\nwhether there is a connection to this case.{be01}\nHowever, the look-alike appears to be\nestablishing a suspicious organization.{be00}\nPlease be aware.
-{0102:0}: ...
-Girl: Huh?\nWhat's the matter?{be00}\nYou've got a strange look on your face...
-{0102:0}: ...{be01}\nKid, your lies are beyond obvious.{be01}\nRing down the curtain on your\nlittle performance here...
-Girl: Wh-what?{be01}\nYou knew I was faking?\nUlp... Sorry...
-{0102:0}: Hah.\nIt was obvious from the very start.
-Girl: Oh, really?{be01}\nBut I'm the biggest star in my school!\nEveryone says I'm the best actor ever!{be01}\n...I thought I had you fooled.
-{0102:0}: Can you tell me\nwhy you did this?
-Girl: My dad and mom said I had to help\nget this village on the map...{be00}\nAnd with them, no is not an option.{be01}\nThey wanted to revitalize the village,\nget people excited to visit, and{be00}\nrake in the easy tourist money...{be01}\nWaaaah!\nI was just doing what my parents said!{be01}\nI'm not gonna get in trouble for this, am I?
-{0102:0}: Pssh. Save your tears.\nYou think because you're a kid,{be00}\nyou can get away with pulling{be00}\nthe wool over people's eyes?{be01}\nCall your parents immediately.{be01}\nWe'll finish the rest of this\ndiscussion at our offices!
-Girl: Waaaah! It's too harsh!\nDad! Mom!{be00}\nThis person is mean!
-...{be01}\nAddendum to\n“Ghost Eraser Case Files: File No. 002":{be00}\nThis was a case of a phony phantom.{be01}\nLately, there have been a number of\nfalse reports. Please be aware.{be01}\n--Code name: {0102:0}
+Bank0254_Text_ChildStar = Child Star
+Bank0254_Text_HauntedKid = Haunted Kid
+Bank0254_Text_UrkAirStagnantIf = {0102:0}: Urk...\nThe air is stagnant.{be01}\nIf I don't end this quickly,\nI myself may be possessed.{be00}\nI must erase this menace!
+Bank0254_Text_GirlAhahaItsFun = Girl: Ahaha!\nIt's fun. So fun.
+Bank0254_Text_GirlAhahaMajinMayhem = Girl: Ahaha!\nThe Majin of Mayhem--so strong!{be00}\nCome on, Majin of Mayhem. Wake up!
+Bank0254_Text_GirlAhahaGeniusMagician = Girl: Ahaha!\nThe genius magician--magnificent!{be00}\nThe genius magician--Arkham!
+Bank0254_Text_GirlWellllComeWhaaaaaaat = Girl: Wellll-come.\nWhaaaaaaat do you want?
+Bank0254_Text_GuessIllSeeHow = {0102:0}: ...{be01}\n(...Guess I'll see how this plays out...)
+Bank0254_Text_RidUsEvilSpirits = {0102:0}: Rid us of evil spirits!
+Bank0254_Text_GirlAhahaFunLets = Girl: Ahaha!\nSo fun! Let's play.
+Bank0254_Text_DaddyHere = {0102:0}: Is your daddy here?
+Bank0254_Text_GirlAhahaHeHasnt = Girl: Ahaha...\nHe hasn't come back since last night.{be00}\nSo, I'm lonely. Play with me.
+Bank0254_Text_ThereWaterLeak = {0102:0}: Is there a water leak?
+Bank0254_Text_GirlAhahaSellingSomething = Girl: Ahaha... Are you selling something?\nCome on, quit working! Let's play!
+Bank0254_Text_GirlListenWantTell = Girl: Listen, I want to tell you a story.\nCan you guess how the story ends?{be01}\nA long, long time ago,\nthere was a malevolent being{be00}\ncalled the Majin of Mayhem.{be01}\nOver and over, this violent majin bent\nhimself on destroying the world.{be01}\nThen a day came when he stopped\ntrying to destroy everything.{be01}\nBut why? Can you guess?
+Bank0254_Text_WhatSheTryingSay = {0102:0}: ...{be01}\n(...What is she trying to say?...)\n(...Whatever... I'll answer her question...){be00}\n(...That way, she won't get suspicious...)
+Bank0254_Text_HeAshamed = {0102:0}: Was he ashamed?
+Bank0254_Text_GirlOhYourePerson = Girl: Oh. You're a person of high principle.
+Bank0254_Text_DidSomeoneBeatHim = {0102:0}: Did someone beat him?
+Bank0254_Text_GirlHmHaveSimple = Girl: Hm. You have a simple outlook.
+Bank0254_Text_DidHeGetTired = {0102:0}: Did he get tired of it?
+Bank0254_Text_GirlHurrahYoureSmart = Girl: Hurrah! You're a smart one!
+Bank0254_Text_GirlListenHaveAnother = Girl: Listen, I have another story.\nDo you know this one?{be01}\nA long, long time ago,\nthere was a magician{be00}\nwith special powers.{be01}\nThen the magician's friends imprisoned him.\nBut why? Can you guess?
+Bank0254_Text_MoreGuessingGamesGrr = {0102:0}: ...{be01}\n(...More guessing games?...){be01}\n(...Grr. What's she up to?...)\n(...Guess I have to answer...)
+Bank0254_Text_WereTheyBullyingHim = {0102:0}: Were they bullying him?
+Bank0254_Text_GirlHmHaveSimple_2 = Girl: Hm. You have a simple outlook.
+Bank0254_Text_HeBadGuy = {0102:0}: Was he a bad guy?
+Bank0254_Text_GirlHurrahYoureSmart_2 = Girl: Hurrah! You're a smart one!
+Bank0254_Text_WereTheyJealous = {0102:0}: Were they jealous?
+Bank0254_Text_GirlAhahahaYouveFelt = Girl: Ahahaha!\nYou've felt pangs of envy in your heart!
+Bank0254_Text_LiesAllLies = {0102:0}: Lies! All lies!
+Bank0254_Text_GirlWhatHmfYoure = Girl: What?\nHmf. You're a suspicious one.
+Bank0254_Text_NowEvilSpiritGet = {0102:0}: Now! Evil spirit!\nGet out of this child!
+Bank0254_Text_GirlAhahahahaYoureStrong = Girl: Ahahahaha.\nYou're a strong one.{be01}\nI've been saving up my power,\nand I'm tired of being in here.{be01}\nIt might be the right time to depart!
+Bank0254_Text_Who = {0102:0}: Who are you?
+Bank0254_Text_GirlOopsDidForget = Girl: Oops...\nDid I forget to introduce myself properly?{be01}\n...
+Bank0254_Text_WhatOddLook = {0102:0}: What an odd look...
+Bank0254_Text_HehHehAhahahaName = Heh heh... Ahahaha!\nMy name is Arkham!{be01}\nI was well known in the world...\nthe world of once upon a time.{be01}\nI'll say it again! Arkham!\nRemember that name!{be00}\nSee ya! Wouldn't want to be ya!{be01}\nHeh...
+Bank0254_Text_HeyWait = {0102:0}: Hey! Wait!
+Bank0254_Text_AddendumGhostEraserCase = Addendum to\n“Ghost Eraser Case Files: File No. 002":{be01}\nI succeeded in getting rid of the evil spirit\nthat was possessing the girl.{be01}\nThe girl seems to be recovering steadily.{be01}\nHowever, I failed to capture the evil\nspirit, who identified himself as--Arkham.
+Bank0254_Text_AccordingResearchRecordsShow = According to my research, records show\nthat the man who tried to reawaken{be00}\nthe majin called the Majin of Mayhem{be00}\nwas the magician named Arkham.{be01}\nI'll maintain my investigation.{be01}\n--Code name: {0102:0}
+Bank0254_Text_GirlPfftWeaknessYoure = Girl: Pfft. Weakness.\nYou're boring me already.{be01}\nI deserve some kind of reward\nfor playing with you.{be01}\nLet me see... Hm hm hm...\nOoh, I know! I deserve to{be00}\ntake over your body--now!
+Bank0254_Text_GwaughhUfffFeelLike = {0102:0}: Gwaughh...\nUfff... I feel like a lump...of stone.{be00}\nNo strength...in my body...{be00}\nStop...it... Sto-o-o--
+Bank0254_Text_GirlOhComePerk = Girl: Oh, come on, perk up.\nSmile on the inside!{be01}\nA weakling like you getting to\nhelp revive the Majin of Mayhem...{be01}\nLucky, lucky you!
+Bank0254_Text_Gwaughhhh = {0102:0}: Gwaughhhh!
+Bank0254_Text_GirlTeeHee = Girl: Tee hee.{be01}\n...
+Bank0254_Text_AddendumGhostEraserCase_2 = Addendum to\n“Ghost Eraser Case Files: File No. 002":{be01}\nAfter File No. 002 was received,\nwe lost contact with {0102:0}.{be01}\nThe village investigated by {0102:0} is\ncompletely empty.
+Bank0254_Text_WhatHappenedMovementHas = {0102:0}: What happened?\nThe movement has stopped...
+Bank0254_Text_GirlThankPlayingIts = Girl: Thank you for playing with me!\nIt's time to go!{be01}\nYou know what?{be01}\nI have one last favor to ask you.\nCan I take over your body?
+Bank0254_Text_GwaaaaLegsWontObey = {0102:0}: Gwaaaa...\nMy legs won't obey me...{be00}\nMy arms have no strength...{be00}\nStop...it... Sto-o-o--
+Bank0254_Text_GirlOhComeNow = Girl: Oh, come on now...\nThink how lucky you are!{be01}\nYou'll get to be the body of a\nreally great and powerful being!
+Bank0254_Text_Empty = {0102:0}: ...
+Bank0254_Text_GirlTeeHee_2 = Girl: Tee hee.{be01}\n...
+Bank0254_Text_AddendumGhostEraserCase_3 = Addendum to\n“Ghost Eraser Case Files: File No. 002":{be01}\nWe have had no further contact\nfrom {0102:0}.{be01}\nSome information concerning a look-alike\nhas been reported, but it remains unclear{be00}\nwhether there is a connection to this case.{be01}\nHowever, the look-alike appears to be\nestablishing a suspicious organization.{be00}\nPlease be aware.
+Bank0254_Text_Empty_2 = {0102:0}: ...
+Bank0254_Text_GirlHuhWhatsMatter = Girl: Huh?\nWhat's the matter?{be00}\nYou've got a strange look on your face...
+Bank0254_Text_KidLiesBeyondObvious = {0102:0}: ...{be01}\nKid, your lies are beyond obvious.{be01}\nRing down the curtain on your\nlittle performance here...
+Bank0254_Text_GirlWhWhatKnew = Girl: Wh-what?{be01}\nYou knew I was faking?\nUlp... Sorry...
+Bank0254_Text_HahObviousFromVery = {0102:0}: Hah.\nIt was obvious from the very start.
+Bank0254_Text_GirlOhReallyBut = Girl: Oh, really?{be01}\nBut I'm the biggest star in my school!\nEveryone says I'm the best actor ever!{be01}\n...I thought I had you fooled.
+Bank0254_Text_CanTellWhyDid = {0102:0}: Can you tell me\nwhy you did this?
+Bank0254_Text_GirlDadMomSaid = Girl: My dad and mom said I had to help\nget this village on the map...{be00}\nAnd with them, no is not an option.{be01}\nThey wanted to revitalize the village,\nget people excited to visit, and{be00}\nrake in the easy tourist money...{be01}\nWaaaah!\nI was just doing what my parents said!{be01}\nI'm not gonna get in trouble for this, am I?
+Bank0254_Text_PsshSaveTearsThink = {0102:0}: Pssh. Save your tears.\nYou think because you're a kid,{be00}\nyou can get away with pulling{be00}\nthe wool over people's eyes?{be01}\nCall your parents immediately.{be01}\nWe'll finish the rest of this\ndiscussion at our offices!
+Bank0254_Text_GirlWaaaahItsToo = Girl: Waaaah! It's too harsh!\nDad! Mom!{be00}\nThis person is mean!
+Bank0254_Text_AddendumGhostEraserCase_4 = ...{be01}\nAddendum to\n“Ghost Eraser Case Files: File No. 002":{be00}\nThis was a case of a phony phantom.{be01}\nLately, there have been a number of\nfalse reports. Please be aware.{be01}\n--Code name: {0102:0}
 \pad{78}

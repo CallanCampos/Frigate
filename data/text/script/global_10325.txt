@@ -1,0 +1,16 @@
+Global10325_Text_PokemonTradesHelpConnect = Pokémon Trades help you connect with\nthe world!{be00}\nThe world will be bigger!{be01}\nIf you trade Pokémon with many people,\nyou will be happy!{be01}\nBecause I will give you something good!{be01}\nSo, Trainer, have you traded Pokémon\nwith many people?
+Global10325_Text_HelloTrainerHaveTraded = Hello, Trainer!{be01}\nHave you traded Pokémon with\nmany people?
+Global10325_Text_OhWonderfulThenLet = Oh, wonderful.{be01}\nThen, let me check how many people you\nhave traded Pokémon with.{be01}
+Global10325_Text_Empty = ...{be01}
+Global10325_Text_PleaseTradePokemonMany = Please trade Pokémon with many people!{be01}\nI will give you a present if you do.\nBesides, it's fun!
+Global10325_Text_YouveTradedPokemonWorld = You've traded Pokémon with {0200:0}?\nThe world is bigger than that!{be01}\nPlease trade with your friends or use\nthe Global Trade Station!
+Global10325_Text_ZeroHaventTradedAnybody = Zero? You haven't traded with anybody?!\nBut the world is so big!{be01}\nPlease trade with your friends or use\nthe Global Trade Station!
+Global10325_Text_WowHaveTradedPeople = Wow!\nYou have traded with {0200:0} people!{be01}
+Global10325_Text_WowGreatHaveTraded = Wow! Great!\nYou have traded with {0201:0} people!{be01}
+Global10325_Text_WowImpressiveHaveTraded = Wow! Impressive!\nYou have traded with {0201:0} people!{be01}
+Global10325_Text_WowEcstaticHaveTraded = Wow! Ecstatic!\nYou have traded with {0201:0} people!{be01}
+Global10325_Text_WowSurprisingHaveTraded = Wow! Surprising!\nYou have traded with {0201:0} people!{be01}
+Global10325_Text_WowWonderfulHaveTraded = Wow! Wonderful!\nYou have traded with at least {0201:0} people!{be01}
+Global10325_Text_GreatWillGive = Great!\nI will give this to you!{be01}
+Global10325_Text_ReallyGreatImHappy = You are really great!\nI'm happy, so I will give this to you, too!{be01}
+Global10325_Text_WhatPokemonTradedDoing = What are the Pokémon that I traded\ndoing now?{be01}\nWhat are the people who traded with me\nthinking about now?{be01}\nThinking about those things\nmakes me happy!

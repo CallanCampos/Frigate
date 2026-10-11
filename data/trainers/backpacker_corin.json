@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Corin",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_POOCHYENA",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CUBONE",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_TORKOAL",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I've got lots of items in my backpack!\nI'll use them well to secure victory!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "When you have too many moves and items, you\ncan actually end up a bit overwhelmed..."
+        },
+        {
+            "type": 2,
+            "text": "If you're overwhelmed, throw 'em away!\nYou don't want to be weighed down when{be00}\nyou're traveling.{be00}\nAll you really need is your Pokémon."
+        }
+    ]
+}

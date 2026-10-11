@@ -2,18 +2,9 @@
 #define POKEBW2_SAVE_BAG_H
 
 #include "types.h"
+#include "constants/bag.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
-
-// The bag's pockets, in the order the bag keeps them
-#define BAG_POCKET_ITEMS 0
-#define BAG_POCKET_MEDICINE 1
-#define BAG_POCKET_TMS_HMS 2
-#define BAG_POCKET_BERRIES 3
-#define BAG_POCKET_KEY_ITEMS 4
-// The items the player moved to the Free Space, which stay in their own pockets
-#define BAG_POCKET_FREE_SPACE 5
-#define BAG_POCKET_NONE 6
 
 // An item and its count in a pocket (swan's BagItem)
 struct BagItem {
@@ -41,7 +32,9 @@ void func_0200887c(void *cursor, u16 pocket, s16 *row, s16 *scroll);
 u16 func_02008890(void *cursor);
 void func_02008894(void *cursor, u16 pocket, s16 row, s16 scroll);
 void func_020088a4(void *cursor, u16 pocket);
-// The battle bag's cursor memory: the row and page of a pocket, and the last used item and its pocket
+// The battle bag's cursor memory (0x32 bytes, allocated here): the row and page of a pocket, and the last used item and
+// its pocket
+void *func_02008860(HeapID heapId);
 void func_020088a8(void *cursor, u16 pocket, s16 *row, s16 *page);
 u16 func_020088bc(void *cursor);
 u16 func_020088c0(void *cursor);

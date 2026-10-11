@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lydon",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_FEEBAS",
+            "form": 0,
+            "level": 64,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_FINNEON",
+            "form": 0,
+            "level": 64,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LUMINEON",
+            "form": 0,
+            "level": 64,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Fishermen read the flow of water\nor the flow of a battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The flow of the battle...\nIt's too wild to follow!"
+        },
+        {
+            "type": 2,
+            "text": "The flow of water here on Route 17\nis very wild.{be01}\nIf you don't tap into it well,\nyou cannot go where you want!"
+        }
+    ]
+}

@@ -3,16 +3,15 @@
 
 #include "types.h"
 #include "struct_decls.h"
+#include "field/gimmick_league_caitlin.h"
+#include "field/gimmick_league_champion.h"
 #include "field/gimmick_league_marshal.h"
+#include "field/gimmick_league_shauntal.h"
 
 // The gimmicks of the Pokémon League's rooms, which the League's script plugin (overlay 52) drives. Their sounds use
 // the Elite Four's Japanese names, as SEQ_SE_SW_CATTLEYA_* for Caitlin
 
-// Shauntal's room, zone 140 (overlay 122)
-GameEvent *func_ov122_021eed14(GameSystem *gsys);
-void func_ov122_021eed40(GameSystem *gsys, u16 a1);
-GameEvent *func_ov122_021eedcc(GameSystem *gsys, u16 a1);
-GameEvent *func_ov122_021eedf8(GameSystem *gsys);
+// Shauntal's room, zone 140 (overlay 122), is in field/gimmick_league_shauntal.h
 
 // Grimsley's room, zone 141 (overlay 123)
 void func_ov123_021eed08(GameSystem *gsys, u16 a1);
@@ -20,17 +19,8 @@ void func_ov123_021eed3c(GameSystem *gsys, u16 a1);
 
 // Marshal's room, zone 142 (overlay 124), is in field/gimmick_league_marshal.h
 
-// Caitlin's room, zone 143 (overlay 125)
-void func_ov125_021eed10(GameSystem *gsys, u16 a1);
-GameEvent *func_ov125_021eed4c(GameSystem *gsys);
-void func_ov125_021eed6c(GameSystem *gsys);
-void func_ov125_021eed80(GameSystem *gsys, u16 actorId, u16 a2);
+// Caitlin's room, zone 143 (overlay 125), is in field/gimmick_league_caitlin.h
 
-// The Champion's room, zone 144 (overlay 120)
-GameEvent *func_ov120_021eecf0(GameSystem *gsys);
-GameEvent *func_ov120_021eecf8(GameSystem *gsys);
-void func_ov120_021eed00(GameSystem *gsys, u16 a1);
-void func_ov120_021eed1c(GameSystem *gsys, u16 a1);
-void func_ov120_021eed38(GameSystem *gsys);
+// The Champion's room, zone 144 (overlay 120), is in field/gimmick_league_champion.h
 
 #endif // POKEBW2_FIELD_POKEMON_LEAGUE_GIMMICKS_H

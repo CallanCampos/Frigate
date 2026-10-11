@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ampère",
+    "class": "TRAINER_CLASS_BEAUTY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 14,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BLITZLE",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ELEKID",
+            "form": 0,
+            "level": 27,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "The show is approaching its grand finale,\nbut first I need to check if you've got{be00}\nwhat it takes to stand on the same{be00}\nstage as Elesa!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Such strength and beauty!{be01}\nYou've got what it takes to\nshare the stage with Elesa!"
+        },
+        {
+            "type": 2,
+            "text": "What a fantastically elegant show!{be01}\nThe Pokémon battle between you and\nElesa was absolutely magnificent!{be00}\nI was utterly captivated!"
+        }
+    ]
+}

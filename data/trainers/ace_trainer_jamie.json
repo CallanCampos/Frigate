@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jamie",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DRIFBLIM",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_SHADOW_BALL", "MOVE_PAYBACK", "MOVE_BATON_PASS", "MOVE_STOCKPILE" ]
+        },
+        {
+            "species": "SPECIES_CLAYDOL",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_EARTH_POWER", "MOVE_PSYCHIC", "MOVE_SHADOW_BALL", "MOVE_COSMIC_POWER" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You... Who's brought you this far?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "It's your reliable Pokémon who brought you\nthis far, isn't it?"
+        },
+        {
+            "type": 2,
+            "text": "You know what I think? All people know\nwhat they can do alone, but...{be01}\nThere are a lot of things you can only do\nwith Pokémon, too!"
+        }
+    ]
+}

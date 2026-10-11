@@ -3,3 +3,8 @@
     .ctor       start:0x0219fb84 end:0x0219fb84 kind:rodata align:4
     .data       start:0x0219fba0 end:0x0219fbc0 kind:data align:32
     .bss        start:0x0219fbc0 end:0x0219fbc0 kind:bss align:32
+
+src/ov296/zukan_info.c:
+    .text       start:0x0219d6e0 end:0x0219fa7c
+    .rodata     start:0x0219fa7c end:0x0219fb84
+    .data       start:0x0219fba0 end:0x0219fbc0

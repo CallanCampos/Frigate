@@ -1,0 +1,10 @@
+UndellaTownPokemonCenter_Text_HelloBoyHaveVilla = Hello, boy!{be01}\nDo you have a villa in Undella?\nYou are rich!{be01}\nAs a token of our new acquaintance,\nplease accept this!{be01}
+UndellaTownPokemonCenter_Text_HelloGirlHaveVilla = Hello, girl!{be01}\nDo you have a villa in Undella?\nYou are rich!{be01}\nAs a token of our new acquaintance,\nplease accept this!{be01}
+UndellaTownPokemonCenter_Text_IsntPrismScaleBeautiful = Isn't the Prism Scale beautiful?\nIt may be good to let a Pokémon hold it.
+UndellaTownPokemonCenter_Text_UndellaBaysAbyssalRuins = Undella Bay's Abyssal Ruins\nhave messages carved into the walls...
+UndellaTownPokemonCenter_Text_CanBuyPokeBalls = I can buy the Poké Balls sold here,\nbecause somewhere, somebody{be00}\nis making them.{be01}\nThank you, person I don't know,\nmaking Poké Balls somewhere!
+UndellaTownPokemonCenter_Text_HehHehHeyIf = Heh heh... Hey, you.\nIf someone offered you{be00}\na plain old Sitrus Berry for $1,000,{be00}\nwould you buy it?
+UndellaTownPokemonCenter_Text_HehHehYoureAll = Heh heh...\nYou're all right.{be01}\nWell, whatever. If that's a price\nyou feel you agree with, then great!{be01}\nThat's what shopping's all about, right?{be01}
+UndellaTownPokemonCenter_Text_HehHehFiguredMuch = Heh heh...\nFigured as much.{be01}\nWell, either way is fine. If you don't\nagree with the price, don't buy it...{be01}\nThat's what shopping's all about, right?{be01}
+UndellaTownPokemonCenter_Text_FunfestMissionHasBeen = The Funfest Mission\n“{0140:0}"{be00}\nhas been added to the Entralink.
+UndellaTownPokemonCenter_Text_HehHehWhatsImportant = Heh heh...{be01}\nWhat's important is\nwhether you agree or not!

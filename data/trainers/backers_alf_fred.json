@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Alf & Fred",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SIMISAGE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BISHARP",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "The bases loaded with two outs\nin the bottom of the ninth inning...{be00}\nAfter that... Isn't that obvious?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Alf: Strike!\nGame over! Yes, the end!{be01}\nFred: Ah, my Poké Ball!"
+        },
+        {
+            "type": 5,
+            "text": "A game-winning homer...\nWe always hope for that clutch play!"
+        },
+        {
+            "type": 6,
+            "text": "Striiiiike!!"
+        },
+        {
+            "type": 7,
+            "text": "I don't have a home-run ball,\nbut I do have a Poké Ball!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "I wish I could catch a home-run ball\njust once!"
+        },
+        {
+            "type": 10,
+            "text": "Ball!"
+        }
+    ]
+}

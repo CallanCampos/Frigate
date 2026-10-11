@@ -1,8 +1,0 @@
-Maybe I should go to\nCelestial Tower on Route 7.{be01}\nI have to ring the bell for my Petilil...
-Maybe I should go to\nCelestial Tower on Route 7.{be01}\nI have to ring the bell for\nmy Cottonee...
-Mister!\nHere, have this!{be01}
-Miss!\nHere, have this!{be01}
-Know what? When I gave my Minccino a\nShiny Stone, it evolved and became a{be00}\ndifferent Pokémon!
-Good! Your Pokémon seem to be\nfull of energy!
-Oh, dear! Your Pokémon...\nSomehow, they don't seem well.{be01}\nYou should rest here for a little while.\nYou can't go anywhere when you're not{be00}\nfeeling well.
-\pad{3e}

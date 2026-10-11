@@ -1,0 +1,181 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Snover",
+    "pokedex": {
+        "category": "Frost Tree Pokémon",
+        "entry": "Seemingly curious about people,\nthey gather around footsteps they\nfind on snowy mountains.",
+        "height": "3'03\"",
+        "weight": "111.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Snover",
+                "category": "Frost Tree Pokémon",
+                "entry": "Seemingly curious about people,\nthey gather around footsteps they\nfind on snowy mountains.",
+                "height": "3'03\"",
+                "weight": "111.3 lbs."
+            },
+            "fr": {
+                "name": "Blizzi",
+                "category": "Pokémon Arbregelé",
+                "entry": "Curieux de rencontrer des gens, ils\nse rassemblent autour des traces\nde pas trouvées dans la montagne.",
+                "height": "1,0 m",
+                "weight": "50,5 kg"
+            },
+            "de": {
+                "name": "Shnebedeck",
+                "category": "Frostbaum",
+                "entry": "Neugierig auf Menschen, versammeln\nsie sich bei Fußspuren, die sie auf\nverschneiten Bergen finden.",
+                "height": "1,0 m",
+                "weight": "50,5 kg"
+            },
+            "it": {
+                "name": "Snover",
+                "category": "Pokémon Albergelo",
+                "entry": "Gli uomini lo incuriosiscono molto. Si\nraduna in gruppi attorno alle impronte\nsulle montagne innevate.",
+                "height": "1,0 m",
+                "weight": "50,5 kg"
+            },
+            "ko": {
+                "name": "눈쓰개",
+                "category": "얼음나무포켓몬",
+                "entry": "인간에게 흥미가 있는지\n설산에서 발자국을 발견하면\n그 주변에 모여든다.",
+                "height": "1.0 m",
+                "weight": "50.5 kg"
+            },
+            "es": {
+                "name": "Snover",
+                "category": "Pokémon Árbol Nieve",
+                "entry": "Siente mucha curiosidad por los\nhumanos. Si uno encuentra huellas\nen la nieve, acuden todos a mirar.",
+                "height": "1,0 m",
+                "weight": "50,5 kg"
+            },
+            "ja": {
+                "name": "ユキカブリ",
+                "category": "じゅひょうポケモン",
+                "entry": "にんげんに\\x{3000}きょうみが\\x{3000}あるのか\nゆきやまで\\x{3000}あしあとを\\x{3000}みつけると\nそのまわりに\\x{3000}あつまってくる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 62,
+        "defense": 50,
+        "speed": 40,
+        "special_attack": 62,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_GRASS", "TYPE_ICE" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NEVER_MELT_ICE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_SNOW_WARNING", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SOUNDPROOF",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 67,
+    "height": 10,
+    "weight": 505,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POWDER_SNOW" ],
+            [ 1, "MOVE_LEER" ],
+            [ 5, "MOVE_RAZOR_LEAF" ],
+            [ 9, "MOVE_ICY_WIND" ],
+            [ 13, "MOVE_GRASS_WHISTLE" ],
+            [ 17, "MOVE_SWAGGER" ],
+            [ 21, "MOVE_MIST" ],
+            [ 26, "MOVE_ICE_SHARD" ],
+            [ 31, "MOVE_INGRAIN" ],
+            [ 36, "MOVE_WOOD_HAMMER" ],
+            [ 41, "MOVE_BLIZZARD" ],
+            [ 46, "MOVE_SHEER_COLD" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM70",
+            "TM75",
+            "TM79",
+            "TM86",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_ICE_PUNCH",
+            "MOVE_ICY_WIND",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_ROLE_PLAY",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_LEECH_SEED",
+            "MOVE_MAGICAL_LEAF",
+            "MOVE_SEED_BOMB",
+            "MOVE_GROWTH",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_MIST",
+            "MOVE_STOMP",
+            "MOVE_SKULL_BASH",
+            "MOVE_AVALANCHE",
+            "MOVE_NATURAL_GIFT",
+            "MOVE_BULLET_SEED"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 40,
+            "species": "SPECIES_ABOMASNOW"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SNOVER"
+}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Mummy",
+    "description": "Contact with this Pokémon\nspreads this Ability."
+}

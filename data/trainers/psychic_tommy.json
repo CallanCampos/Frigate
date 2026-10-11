@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tommy",
+    "class": "TRAINER_CLASS_PSYCHIC_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WOOBAT",
+            "form": 0,
+            "level": 22,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_YAMASK",
+            "form": 0,
+            "level": 22,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I will use my supernatural powers to\nhelp my Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Wow! That's amazing!"
+        },
+        {
+            "type": 2,
+            "text": "Drawing out your Pokémon's power\nlike that...{be01}\nI think that is a real\nsupernatural power."
+        }
+    ]
+}

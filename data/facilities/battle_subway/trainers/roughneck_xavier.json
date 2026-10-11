@@ -1,0 +1,43 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Xavier",
+    "class": "TRAINER_CLASS_ROUGHNECK",
+    "pokemon": [
+        "blaziken_1",
+        "infernape_1",
+        "emboar_1",
+        "medicham_1",
+        "breloom_1",
+        "absol_1",
+        "hariyama_1",
+        "skuntank_1",
+        "sawk_1",
+        "throh_1",
+        "shiftry_1",
+        "spiritomb_1",
+        "scrafty_1",
+        "toxicroak_1",
+        "bisharp_1",
+        "poliwrath_1",
+        "heracross_1",
+        "houndoom_1",
+        "drapion_1",
+        "machamp_1",
+        "honchkrow_1",
+        "conkeldurr_1",
+        "krookodile_1",
+        "weavile_1",
+        "zoroark_1",
+        "mandibuzz_1",
+        "gallade_1",
+        "umbreon_1",
+        "lucario_1",
+        "mienshao_3",
+        "tyranitar_1"
+    ],
+    "messages": [
+        "My partner has turned to dust,\nbut his Pokémon is my Pokémon now.",
+        "Are you watching me, my long-lost partner?\nThat Pokémon of yours, we get along...",
+        "He was trash, but now he is eternal,\nlike the stars in the sky... Ah, my partner!"
+    ]
+}

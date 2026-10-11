@@ -1,2 +1,0 @@
-Welcome! Glad to see you here at the\nRotation Battle House.{be01}\nThat's what we would say up until\na few years ago.{be01}\nNow, the Trainers are seeing\nwho's the best at Rotation Battles{be00}\nin the Pokémon World Tournament{be00}\nin Driftveil City!
-Welcome! Glad to see you here at the\nTriple Battle House.{be01}\nThat's what we would say up until\na few years ago.{be01}\nNow, the Trainers are seeing\nwho's the best at Triple Battles{be00}\nin the Pokémon World Tournament{be00}\nin Driftveil City!

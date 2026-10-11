@@ -38,7 +38,7 @@ typedef struct {
 typedef void (*UnionAppMemberCallback)(u8 netId, UnionAppMember *member, void *work);
 
 // Every set of members below is a byte with a bit per net ID
-typedef struct {
+struct UnionApp {
     UnionAppStatus status;
     // Those that are allowed to enter and haven't joined yet
     u8 entering;
@@ -71,34 +71,22 @@ typedef struct {
     UnionAppMemberCallback onJoin;
     UnionAppMemberCallback onLeave;
     void *callbackWork;
-} UnionApp;
-
-// Overlay 28's union system (union_main.c), declared here with only what this file uses until it is decompiled
-typedef struct {
-    u8 unk0[0x14];
-    // The players met, which func_ov028_02170d00 adds to and func_ov028_02170d98 removes from
-    u8 unk14[0x44];
-} UnionSystemUnk2830;
-
-typedef struct {
-    u8 unk0[0x2830];
-    UnionSystemUnk2830 unk2830;
-} UnionSystem;
+};
 
 UnionApp *UnionApp_Create(UnionSystem *sys, HeapID heapId, u8 memberMax, const PlayerInfo *info);
 void UnionApp_Free(UnionApp *app);
-BOOL UnionApp_RequestEntry(UnionApp *app, int netId);
+BOOL UnionApp_RequestEntry(UnionApp *app, u8 netId);
 void UnionApp_Update(UnionApp *app, UnionSystem *sys);
-void UnionApp_Enqueue(UnionApp *app, int netId);
+void UnionApp_Enqueue(UnionApp *app, u8 netId);
 void func_ov069_0217cd5c(UnionApp *app);
 u8 func_ov069_0217cd64(UnionApp *app);
-void UnionApp_RequestSendStatus(UnionApp *app, int netId);
+void UnionApp_RequestSendStatus(UnionApp *app, u8 netId);
 void UnionApp_ReceiveStatus(UnionApp *app, const UnionAppStatus *status);
-void UnionApp_RequestSendProfile(UnionApp *app, int netId);
-void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, int netId, UnionAppMember *member);
+void UnionApp_RequestSendProfile(UnionApp *app, u8 netId);
+void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, u8 netId, UnionAppMember *member);
 BOOL UnionApp_HasMembers(UnionApp *app);
 BOOL UnionApp_AllProfilesReceived(UnionApp *app);
-void UnionApp_ConfirmEntry(UnionApp *app, int netId);
+void UnionApp_ConfirmEntry(UnionApp *app, u8 netId);
 void UnionApp_OnLeave(UnionApp *app, u8 netId);
 u32 UnionApp_GetStatusSize(void);
 void UnionApp_JoinSelf(UnionApp *app);
@@ -109,18 +97,8 @@ void UnionApp_OpenEntry(UnionApp *app);
 void UnionApp_LimitEntry(UnionApp *app, u8 limit);
 void UnionApp_RequestStart(UnionApp *app);
 BOOL UnionApp_IsStarted(UnionApp *app);
-UnionAppMember *UnionApp_GetMember(UnionApp *app, int netId);
+UnionAppMember *UnionApp_GetMember(UnionApp *app, u8 netId);
 u8 UnionApp_GetJoined(UnionApp *app);
 u8 UnionApp_CountJoined(UnionApp *app);
-
-// Overlay 28's functions that this file calls, until union_main.c and union_comm.c are decompiled
-void func_ov028_021704bc(UnionSystem *sys);
-BOOL func_ov028_021704ec(UnionSystem *sys);
-void func_ov028_02170d00(void *macList, const u8 *mac, u32 a2, u8 gender);
-void func_ov028_02170d98(void *macList, const u8 *mac);
-BOOL func_ov028_02171664(u8 netId);
-BOOL func_ov028_02171724(const UnionAppStatus *status, u8 sendTo);
-BOOL func_ov028_0217181c(u8 sendTo, const UnionAppMember *member);
-BOOL func_ov028_0217196c(u8 joined, u8 netId);
 
 #endif // POKEBW2_FIELD_UNION_APP_H

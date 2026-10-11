@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rosalyn",
+    "class": "TRAINER_CLASS_NURSERY_AIDE",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CHANSEY",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LEAVANNY",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hear the cry of my heart!{be01}\n“Everyone, SIT DOWN and SHUT UP!\"{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hah... Hah... Hah... I feel a bit better now\nthat I've let that out."
+        },
+        {
+            "type": 2,
+            "text": "I like kids and Pokémon both, but I'm\njust not that nice!"
+        }
+    ]
+}

@@ -1,0 +1,4 @@
+AnvilleTown3_Text_AnvilleTownPackedWeekends = Anville Town is packed on the weekends.\nEveryone sure loves trains!
+AnvilleTown3_Text_WeekendManyCollectorsGather = On the weekend, many {0109:0}\ncollectors gather here.{be01}\nThey'll trade them for different items.
+AnvilleTown3_Text_OneDayImGoing = One day, I'm going to take the\nSubway Bosses Ingo and Emmet down!
+\pad{5e}

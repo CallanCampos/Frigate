@@ -1,0 +1,195 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Totodile",
+    "pokedex": {
+        "category": "Big Jaw Pokémon",
+        "entry": "It has the habit of biting anything\nwith its developed jaws. Even its\nTrainer needs to be careful.",
+        "height": "2'00\"",
+        "weight": "20.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Totodile",
+                "category": "Big Jaw Pokémon",
+                "entry": "It has the habit of biting anything\nwith its developed jaws. Even its\nTrainer needs to be careful.",
+                "height": "2'00\"",
+                "weight": "20.9 lbs."
+            },
+            "fr": {
+                "name": "Kaiminus",
+                "category": "Pokémon Mâchoire",
+                "entry": "Il broie tout ce qu'il trouve avec\nses mâchoires puissantes. Même\nson Dresseur doit s'en méfier.",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "de": {
+                "name": "Karnimani",
+                "category": "Großmaul",
+                "entry": "Es hat die Angewohnheit, nach allem\nzu schnappen, was es sieht. Selbst\nseine Trainer müssen aufpassen.",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "it": {
+                "name": "Totodile",
+                "category": "Pokémon Mascellone",
+                "entry": "Ha l'abitudine di mordere ogni cosa con\nle potenti mandibole. Neppure il suo\nAllenatore è al sicuro!",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "ko": {
+                "name": "리아코",
+                "category": "큰턱포켓몬",
+                "entry": "발달된 턱을 갖고 있어 무엇이든\n물어버리는 습성이 있다.\n트레이너도 주의가 필요하다.",
+                "height": "0.6 m",
+                "weight": "9.5 kg"
+            },
+            "es": {
+                "name": "Totodile",
+                "category": "Pokémon Fauces",
+                "entry": "Tiene costumbre de morderlo todo\ncon sus poderosas fauces, incluso\nEntrenadores.",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "ja": {
+                "name": "ワニノコ",
+                "category": "おおあごポケモン",
+                "entry": "はったつした\\x{3000}あごを\\x{3000}もち\nなんにでも\\x{3000}かみつく\\x{3000}しゅうせい。\nトレーナーも\\x{3000}ちゅういが\\x{3000}ひつよう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 65,
+        "defense": 64,
+        "speed": 43,
+        "special_attack": 44,
+        "special_defense": 48
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_WATER_1" ],
+    "abilities": [ "ABILITY_TORRENT", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHEER_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 63,
+    "height": 6,
+    "weight": 95,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_LEER" ],
+            [ 6, "MOVE_WATER_GUN" ],
+            [ 8, "MOVE_RAGE" ],
+            [ 13, "MOVE_BITE" ],
+            [ 15, "MOVE_SCARY_FACE" ],
+            [ 20, "MOVE_ICE_FANG" ],
+            [ 22, "MOVE_FLAIL" ],
+            [ 27, "MOVE_CRUNCH" ],
+            [ 29, "MOVE_CHIP_AWAY" ],
+            [ 34, "MOVE_SLASH" ],
+            [ 36, "MOVE_SCREECH" ],
+            [ 41, "MOVE_THRASH" ],
+            [ 43, "MOVE_AQUA_TAIL" ],
+            [ 48, "MOVE_SUPERPOWER" ],
+            [ 50, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM02",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM56",
+            "TM65",
+            "TM75",
+            "TM80",
+            "TM87",
+            "TM90",
+            "HM01",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_WATER_PLEDGE",
+            "MOVE_LOW_KICK",
+            "MOVE_UPROAR",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SPITE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_CRUNCH",
+            "MOVE_THRASH",
+            "MOVE_HYDRO_PUMP",
+            "MOVE_ANCIENT_POWER",
+            "MOVE_MUD_SPORT",
+            "MOVE_WATER_SPORT",
+            "MOVE_ICE_PUNCH",
+            "MOVE_METAL_CLAW",
+            "MOVE_DRAGON_DANCE",
+            "MOVE_AQUA_JET",
+            "MOVE_FAKE_TEARS",
+            "MOVE_BLOCK",
+            "MOVE_WATER_PULSE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 18,
+            "species": "SPECIES_CROCONAW"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TOTODILE"
+}

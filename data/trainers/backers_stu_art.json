@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Stu & Art",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SCRAGGY",
+            "form": 0,
+            "level": 24,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SCRAGGY",
+            "form": 0,
+            "level": 24,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "OK!\nTomorrow will be a home run!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Stu: We lost! Time to walk off...{be01}\nArt: Farewell! You won..."
+        },
+        {
+            "type": 5,
+            "text": "Your Pokémon certainly have\nwhat it takes!"
+        },
+        {
+            "type": 6,
+            "text": "You only have one Pokémon ready for\nbattle? It's more fun with more friends!"
+        },
+        {
+            "type": 7,
+            "text": "Baseball and Pokémon battles\nare dramas that don't need scripts!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "To be a great baseball player, you have\nto be able to hit, play defense, and run!"
+        },
+        {
+            "type": 10,
+            "text": "In the spirit of sportsmanship,\nI must say you'd be at a disadvantage{be00}\nin a two-against-one match!"
+        }
+    ]
+}

@@ -1,4 +1,0 @@
-Hmm? You're a Trainer with quick eyes!\nI'll give you these!{be01}
-Go to many places and\nspeak to many people.{be00}\nThen, good things will happen to you.
-Every Monday, Pokémon fly here\nfrom somewhere.
-If Pokémon are released\nand demonstrate their true skills...{be01}\nWill we be used by Pokémon\nand battle for them someday...?

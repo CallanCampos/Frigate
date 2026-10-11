@@ -1,12 +1,12 @@
-\x{ff22}\x{ff27}\x{ff2d}
-\x{ff2d}\x{ff25}
-\x{ff33}\x{ff25}
-\x{ff30}\x{ff36}
-\x{ff33}\x{ff2f}\x{ff35}\x{ff2e}\x{ff24}\x{3000}\x{ff34}\x{ff25}\x{ff33}\x{ff34}
-\x{ff21}\x{3000}\x{ff30}\x{ff2c}\x{ff21}\x{ff39}
-\x{ff22}\x{3000}\x{ff33}\x{ff34}\x{ff2f}\x{ff30}
-\x{ff38}\x{3000}\x{ff25}\x{ff2e}\x{ff24}
-\x{ff39}\x{3000}\x{ff29}\x{ff2e}\x{ff29}\x{ff34}
-\x{ff30}\x{ff2c}\x{ff21}\x{ff39}\x{ff25}\x{ff32}
-\x{ff2b}\x{ff25}\x{ff39}
-\x{ff34}\x{ff2d}\x{ff30}
+Bank0367_Text_Empty = \x{ff22}\x{ff27}\x{ff2d}
+Bank0367_Text_Empty_2 = \x{ff2d}\x{ff25}
+Bank0367_Text_Empty_3 = \x{ff33}\x{ff25}
+Bank0367_Text_Empty_4 = \x{ff30}\x{ff36}
+Bank0367_Text_Empty_5 = \x{ff33}\x{ff2f}\x{ff35}\x{ff2e}\x{ff24}\x{3000}\x{ff34}\x{ff25}\x{ff33}\x{ff34}
+Bank0367_Text_Empty_6 = \x{ff21}\x{3000}\x{ff30}\x{ff2c}\x{ff21}\x{ff39}
+Bank0367_Text_Empty_7 = \x{ff22}\x{3000}\x{ff33}\x{ff34}\x{ff2f}\x{ff30}
+Bank0367_Text_Empty_8 = \x{ff38}\x{3000}\x{ff25}\x{ff2e}\x{ff24}
+Bank0367_Text_Empty_9 = \x{ff39}\x{3000}\x{ff29}\x{ff2e}\x{ff29}\x{ff34}
+Bank0367_Text_Empty_10 = \x{ff30}\x{ff2c}\x{ff21}\x{ff39}\x{ff25}\x{ff32}
+Bank0367_Text_Empty_11 = \x{ff2b}\x{ff25}\x{ff39}
+Bank0367_Text_Empty_12 = \x{ff34}\x{ff2d}\x{ff30}

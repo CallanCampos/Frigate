@@ -1,5 +1,0 @@
-Wow, you have that great Bag that can\nstore anything!{be00}\nPut this in there, too!{be01}
-Items don't mean anything\nif you don't put them to use!{be01}\nBut they're also fun to collect!{be01}\nDo you use them or collect them?
-Your Pokédex is full of\nweak Pokémon, strong Pokémon,{be00}\ncool Pokémon, cute Pokémon...{be01}\nAt any rate, there sure are lots\nof Pokémon in there!
-The moment my Lillipup evolved into\nHerdier, my eyes started watering.{be01}\nI was just so happy somehow...
-Woo uff!

@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Emmet",
+    "class": "TRAINER_CLASS_SUBWAY_BOSS_88",
+    "pokemon": [ "excadrill_4", "haxorus_4" ],
+    "messages": [
+        "What I do. What I say.\nAlways the same.{be01}\nFollow the rules.\nSafe driving!{be01}\nFollow the schedules.\nEveryone smile!{be01}\nCheck safety.\nEverything's ready!{be01}\nAim for victory!\nAll aboard!",
+        "I am Emmet.{be01}\nWe won, but\nI am not really satisfied.{be01}\nI can tell that you won't give up.\nBecause you will be much, much stronger.{be01}\nThat's why we are waiting\nfor you to come back!",
+        "I am Emmet.{be01}\nWe lost against you again.{be01}\nBut I am satisfied.\nYou are too strong!{be01}\nThe strength you have,\nyour trust in your Pokémon,{be00}\ntheir never-ending support!{be01}\nYep! It was the most fun battle ever!\nPlease come back soon!"
+    ]
+}

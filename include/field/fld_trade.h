@@ -7,23 +7,31 @@
 #include "struct_decls.h"
 
 // Function and type names from swan; member layout reconstructed from the game code.
+// An in-game trade's offer, a file of archive 163 (data/trades/, packed by tools/data/trade_data.py)
 struct FieldTradeOfferData {
-    u32 unk00;
+    // The offer's own number in the archive
+    u32 index;
     u32 species;
-    u32 unk08;
-    u32 unk0c;
-    u32 unk10[6];
-    u32 unk28;
-    u32 unk2c;
-    u32 unk30;
-    u32 unk34;
-    u32 unk38[6];
+    u32 form;
+    u32 level;
+    // 0xff for a random one
+    u32 ivs[6];
+    // The ability's slot, 2 for the hidden ability
+    u32 abilitySlot;
+    // 0xff for a random one
+    u32 nature;
+    // The sex PML_GenPID gives the Pokémon, 0xff for a random one
+    u32 sex;
+    u32 trainerId;
+    u32 contest[5];
+    u32 heldItem;
     u32 trainerGender;
     u32 unk54;
-    u32 unk58;
+    u32 region;
     u32 wantedSpecies;
     u32 wantedSex;
-    u32 unk64;
+    // The lines of the trade names' message file with the Pokémon's nickname and its trainer's name
+    u32 nicknameMessageId;
     u32 nameMessageId;
 };
 

@@ -1,6 +1,0 @@
-#include "asm/evolution.inc"
-
-// SPECIES_SLOWPOKE
-    Evolution EVO_METHOD_LEVEL, 37, SPECIES_SLOWBRO
-    Evolution EVO_METHOD_TRADE_WITH_ITEM, ITEM_KINGS_ROCK, SPECIES_SLOWKING
-    EvolutionsEnd

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Torrent",
+    "description": "Powers up Water-type\nmoves in a pinch."
+}

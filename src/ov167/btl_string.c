@@ -3,6 +3,7 @@
 // BTL_STR module, which does the same.
 
 #include "types.h"
+#include "constants/arc.h"
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_setup.h"
@@ -141,7 +142,7 @@ void func_ov167_021d4c64(BtlMainModule *mainModule, u8 clientId, const BtlPokeCo
         if (mode == 1 && fileId == 0x13) {
             fileId = 0x11;
         }
-        sWork.msgData[i] = GFL_MsgSysLoadData(FALSE, 2, fileId, heapId);
+        sWork.msgData[i] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, fileId, heapId);
     }
     LoadMovieMsgData(mainModule, mode, heapId);
 }

@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "app/gsync/pdwacc_disp.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
 #include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -74,7 +74,7 @@ PdwAccDisp *PdwAccDisp_Create(HeapID heapId) {
     PdwAccDisp *disp = GFL_HeapAllocate(heapId, sizeof(PdwAccDisp), TRUE, "pdwacc_disp.c", 201);
 
     disp->heapId = heapId;
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetDisplayLayout(1);
@@ -134,7 +134,7 @@ void PdwAccDisp_Free(PdwAccDisp *disp) {
     GFL_BGSysSetBGEnabled(5, FALSE);
     GFL_BGSysFree();
     GFL_HeapFree(disp);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
 }
 
 static void PdwAccDisp_CreateBGs(PdwAccDisp *disp) {

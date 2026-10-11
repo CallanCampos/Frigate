@@ -3,6 +3,7 @@
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -32,6 +33,7 @@
 #include "system/mcss.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
+#include "text/system/btl_server_flow_title.h"
 
 // The detail screen's forms page, zukan_detail_form.c by the ROM's own string: the Pokémon's sprite on the top screen
 // in each sex, color and form that the Pokédex has seen, one at a time or two side by side to compare them, with its
@@ -1237,15 +1239,15 @@ static void ZukanDetailForm_CreateText(ZukanDetailFormParam *param, ZukanDetailF
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[i]), 0);
         BmpWin_FlushChar(wk->windows[i]);
     }
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 441, param->heapId);
-    wk->formMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 450, param->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, param->heapId);
+    wk->formMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0450, param->heapId);
     wk->formNameTable = GFL_ArcSysReadHeapNewLZGetLen(ARCID_FORM_NAME_TABLE, 0, FALSE, param->heapId, &size);
 
     bitmap = BmpWin_GetBitmap(wk->windows[WINDOW_LABELS]);
-    strbuf1 = GFL_MsgDataLoadStrbufNew(wk->msgData, 185);
+    strbuf1 = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlServerFlowTitle_Text_FormsSeen);
     func_02021c7c(wk->printQueues[WINDOW_LABELS], bitmap, 0, 1, strbuf1, wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(strbuf1);
-    strbuf2 = GFL_MsgDataLoadStrbufNew(wk->msgData, 186);
+    strbuf2 = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlServerFlowTitle_Text_ShinySeen);
     func_02021c7c(wk->printQueues[WINDOW_LABELS], bitmap, 0, 17, strbuf2, wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(strbuf2);
     wk->flushPending[WINDOW_LABELS] = TRUE;
