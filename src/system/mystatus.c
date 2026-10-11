@@ -97,7 +97,7 @@ u32 getTrainerGender(PlayerInfo *info) {
     return info->gender;
 }
 
-u32 func_02008bf4(PlayerInfo *info) {
+u8 func_02008bf4(PlayerInfo *info) {
     return info->unk1C;
 }
 

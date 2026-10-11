@@ -79,7 +79,7 @@ PlayerState *GameData_GetPlayerState(GameData *gameData);
 void *getTimeSigSaveBlock(GameData *gameData);
 PlayerState *func_020171e8(GameData *gameData, s32 index);
 PokeDexSave *GameData_GetPokedex(GameData *gameData);
-void *func_02017980(GameData *gameData);
+PalPadFriendList *func_02017980(GameData *gameData);
 void *getChatterDataAddress(GameData *gameData);
 // Whether the key item is registered to Y, and registers it or not
 BOOL GameData_IsShortcutRegistered(GameData *gameData, u32 item);
