@@ -177,7 +177,7 @@ static BOOL DupFitting_PickFromList(DupFittingWork *work, DupFittingItemList *li
 static void DupFitting_UpdateHeldItem(DupFittingWork *work, BOOL playSound);
 static void DupFitting_PullOffCopy(DupFittingWork *work);
 static void DupFitting_RaiseHeldItem(DupFittingWork *work);
-static void DupFitting_StartReturn(DupFittingWork *work, BOOL fromWorn);
+static void DupFitting_StartReturn(DupFittingWork *work, BOOL unused);
 static void DupFitting_WearItem(DupFittingWork *work);
 static void DupFitting_ReleaseHeld(DupFittingWork *work);
 static BOOL DupFitting_SelectCategory(DupFittingWork *work);
@@ -188,7 +188,7 @@ static s32 DupFitting_FindNearestEquipPos(DupFittingWork *work, MusItemDraw *dra
 static void DupFitting_UpdateReturning(DupFittingWork *work);
 static void DupFitting_UpdateShadow(DupFittingWork *work);
 static BOOL DupFitting_IsInEllipse(s16 x, s16 y, int radius, f32 xScale);
-static void DupFitting_SortEntries(DupFittingWork *work, s32 category, u16 start);
+static void DupFitting_SortEntries(DupFittingWork *work, u8 category, u16 start);
 static u16 DupFitting_GetSortKey(DupFittingWork *work, DupFittingItemEntry *entry, u8 pos);
 static void DupFitting_UpdateTransition(DupFittingWork *work);
 static u32 DupFitting_UpdateConfirm(DupFittingWork *work);
@@ -214,12 +214,22 @@ static void DupFitting_InitSparkles(DupFittingWork *work);
 static void DupFitting_FreeSparkles(DupFittingWork *work);
 static void DupFitting_UpdateSparkles(DupFittingWork *work);
 static void DupFitting_ShowTouchEffect(DupFittingWork *work);
-static void DupFitting_SlideMessageBGs(DupFittingWork *work);
 static void DupFitting_Trace(DupFittingWork *work, u8 id);
 
 static const BOOL DUP_FITTING_HIDDEN_0 = FALSE;
 static const BOOL DUP_FITTING_HIDDEN_1 = FALSE;
 static const BOOL DUP_FITTING_SHOWN = TRUE;
+
+// The index of the prop on the ring that is "offset" turns past the front of the carousel
+static inline u16 DupFitting_GetRingIndex(DupFittingWork *work, u32 offset) {
+    u32 pos = work->carouselPos + offset;
+    u32 total = work->entryCount * DUP_FITTING_RING_STEP;
+
+    if (pos >= total) {
+        return (pos - total) / DUP_FITTING_RING_STEP;
+    }
+    return pos / DUP_FITTING_RING_STEP;
+}
 
 DupFittingWork *DupFitting_Create(MusicalDressUpParam *param, HeapID heapId) {
     DupFittingWork *work = GFL_HeapAllocate(heapId, sizeof(DupFittingWork), TRUE, "dup_fitting.c", 480);
@@ -259,8 +269,7 @@ DupFittingWork *DupFitting_Create(MusicalDressUpParam *param, HeapID heapId) {
     work->vblankTcb = GFL_VBlankTCBAdd(DupFitting_VBlank, work, 8);
     GFL_WipeSet(WIPE_MODE_SUB_FIRST, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_WHITE, 18, 1, work->heapId);
     work->sndCooldown = 10;
-    DupFitting_SortEntries(work, DUP_FITTING_CATEGORY_ORIGINAL,
-                           (u32)(work->carouselPos + 6 * 0x4000) % (work->entryCount * DUP_FITTING_RING_STEP));
+    DupFitting_SortEntries(work, DUP_FITTING_CATEGORY_ORIGINAL, DupFitting_GetRingIndex(work, 6 * 0x4000));
     work->category = DUP_FITTING_CATEGORY_ORIGINAL;
     work->autoScroll = TRUE;
     work->scrolled = 0;
@@ -287,13 +296,13 @@ void DupFitting_Free(DupFittingWork *work) {
     func_0204c108(work->buttons[0]);
     func_0204c108(work->buttons[1]);
     func_0204c108(work->hand);
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i <= 2; i++) {
         func_0204bcd0(work->clactRes[i]);
     }
-    for (i = 3; i < 6; i++) {
+    for (i = 3; i <= 5; i++) {
         func_0204b98c(work->clactRes[i]);
     }
-    for (i = 6; i < 9; i++) {
+    for (i = 6; i <= 8; i++) {
         func_0204be64(work->clactRes[i]);
     }
     if (work->bmpWin != NULL) {
@@ -321,54 +330,13 @@ void DupFitting_Free(DupFittingWork *work) {
     GFL_HeapFree(work);
 }
 
+static inline void DupFitting_SlideMessageBGs(DupFittingWork *work) {
+    GFL_BGSysMoveBGReq(6, BG_MOVE_SET_X, 128 - work->msgSlide);
+    GFL_BGSysMoveBGReq(5, BG_MOVE_SET_X, work->msgSlide - 128);
+}
+
 u32 DupFitting_Main(DupFittingWork *work) {
     switch (work->state) {
-    case DUP_FITTING_STATE_DEMO:
-        DupFitting_UpdateDemo(work);
-        break;
-    case DUP_FITTING_STATE_DRESS:
-        DupFitting_UpdateDress(work);
-        break;
-    case DUP_FITTING_STATE_CONFIRM_IN:
-        work->transition += 6;
-        if (work->transition >= 192) {
-            DupFitting_PrintMessage(work, Title3_Text_LookOk, NULL);
-            work->transition = 192;
-            work->state = DUP_FITTING_STATE_CONFIRM;
-            work->tilt = 0;
-            work->tiltSpeed = 0;
-            work->rotateAccum = 0;
-        }
-        DupFitting_UpdateTransition(work);
-        break;
-    case DUP_FITTING_STATE_CONFIRM:
-        if (DupFitting_UpdateConfirm(work) == 2) {
-            work->state = DUP_FITTING_STATE_DONE_WAIT;
-            work->confirmTimer = 0;
-            func_0204c124(work->okMark, TRUE);
-        }
-        break;
-    case DUP_FITTING_STATE_WAIT_TIMING:
-        if (func_ov211_021ef99c(work->param->comm, 0x45) == TRUE) {
-            work->state = DUP_FITTING_STATE_WAIT_SOUND;
-        }
-        break;
-    case DUP_FITTING_STATE_WAIT_SOUND:
-        if (func_ov211_021f0240(work->param->comm) == TRUE) {
-            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_WHITE, 18, 1, work->heapId);
-            GFL_SndBGMFadeOut(60);
-            work->state = DUP_FITTING_STATE_FADE_OUT;
-            work->msgClosed = TRUE;
-        }
-        break;
-    case DUP_FITTING_STATE_CONFIRM_OUT:
-        work->transition -= 6;
-        if (work->transition < 0) {
-            work->transition = 0;
-            work->state = DUP_FITTING_STATE_DRESS;
-        }
-        DupFitting_UpdateTransition(work);
-        break;
     case DUP_FITTING_STATE_START:
         GFL_SndSEPlay(SEQ_SE_DECIDE3);
         work->state = DUP_FITTING_STATE_FADE_IN;
@@ -390,6 +358,39 @@ u32 DupFitting_Main(DupFittingWork *work) {
             return 2;
         }
         break;
+    case DUP_FITTING_STATE_DEMO:
+        DupFitting_UpdateDemo(work);
+        break;
+    case DUP_FITTING_STATE_DRESS:
+        DupFitting_UpdateDress(work);
+        break;
+    case DUP_FITTING_STATE_CONFIRM_IN:
+        work->transition += 6;
+        if (work->transition >= 192) {
+            DupFitting_PrintMessage(work, Title3_Text_LookOk, NULL);
+            work->transition = 192;
+            work->state = DUP_FITTING_STATE_CONFIRM;
+            work->tilt = 0;
+            work->tiltSpeed = 0;
+            work->rotateAccum = 0;
+        }
+        DupFitting_UpdateTransition(work);
+        break;
+    case DUP_FITTING_STATE_CONFIRM_OUT:
+        work->transition -= 6;
+        if (work->transition < 0) {
+            work->transition = 0;
+            work->state = DUP_FITTING_STATE_DRESS;
+        }
+        DupFitting_UpdateTransition(work);
+        break;
+    case DUP_FITTING_STATE_CONFIRM:
+        if (DupFitting_UpdateConfirm(work) == 2) {
+            work->state = DUP_FITTING_STATE_DONE_WAIT;
+            work->confirmTimer = 0;
+            func_0204c124(work->okMark, TRUE);
+        }
+        break;
     case DUP_FITTING_STATE_DONE_WAIT:
         work->confirmTimer++;
         DupFitting_UpdateButtons(work);
@@ -405,6 +406,19 @@ u32 DupFitting_Main(DupFittingWork *work) {
                 func_ov211_021ef988(work->param->comm, 0x45);
                 work->state = DUP_FITTING_STATE_WAIT_TIMING;
             }
+        }
+        break;
+    case DUP_FITTING_STATE_WAIT_TIMING:
+        if (func_ov211_021ef99c(work->param->comm, 0x45) == TRUE) {
+            work->state = DUP_FITTING_STATE_WAIT_SOUND;
+        }
+        break;
+    case DUP_FITTING_STATE_WAIT_SOUND:
+        if (func_ov211_021f0240(work->param->comm) == TRUE) {
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_WHITE, 18, 1, work->heapId);
+            GFL_SndBGMFadeOut(60);
+            work->state = DUP_FITTING_STATE_FADE_OUT;
+            work->msgClosed = TRUE;
         }
         break;
     }
@@ -764,12 +778,12 @@ static void DupFitting_InitItems(DupFittingWork *work) {
     work->itemSys = MusItemDraw_InitSystem(work->blact, 0x98, work->heapId);
     items = MusItemDraw_GetItemData(work->itemSys);
     for (n = 0; n < work->entryCount; n++) {
+        void *res;
         NNSGfdTexKey texKey;
         NNSGfdPlttKey plttKey;
         NNSGfdPlttKey dimPlttKey;
         u32 plttSize;
         u32 size;
-        void *res;
         u16 *palette;
         NNSG3dResFileHeader *file;
         NNSG3dResTex *tex;
@@ -812,9 +826,9 @@ static void DupFitting_InitItems(DupFittingWork *work) {
     work->stageList = DupFittingItemList_Create(work->heapId, 128);
     work->wornList = DupFittingItemList_Create(work->heapId, 9);
     work->returnList = DupFittingItemList_Create(work->heapId, 4);
-    for (i = 0; i < DUP_FITTING_RING_PROPS; i++) {
+    for (k = 0; k < DUP_FITTING_RING_PROPS; k++) {
         VecFx32 pos = { 0, 0, 0 };
-        DupFittingItemNode *node = DupFittingItemNode_Create(work->heapId, work->itemSys, &work->entries[i], &pos);
+        DupFittingItemNode *node = DupFittingItemNode_Create(work->heapId, work->itemSys, &work->entries[k], &pos);
 
         DupFittingItemList_AddTail(work->carouselList, node);
         MusItemDraw_SetUseOffset(work->itemSys, DupFittingItemNode_GetDraw(node), FALSE);
@@ -843,10 +857,10 @@ static void DupFitting_InitItems(DupFittingWork *work) {
     work->badgeMaterial = func_0204e614(work->blact, ARCID_MUSICAL_SHOT, 25, 2, 0x22, 32, 32);
     for (i = 0; i < DUP_FITTING_RING_PROPS; i++) {
         VecFx32 pos = { 0, 0, 0 };
+        u32 actor = BlActScene_AddNewActor(work->blact, work->badgeMaterial, FX32_ONE, FX32_ONE, &pos, 31, 0, 0);
 
-        work->badgeActors[i] =
-            BlActScene_AddNewActor(work->blact, work->badgeMaterial, FX32_ONE, FX32_ONE, &pos, 31, 0, 0);
-        BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &DUP_FITTING_HIDDEN_0);
+        work->badgeActors[i] = actor;
+        BlActScene_SetActorHidden(work->blact, actor, &DUP_FITTING_HIDDEN_0);
     }
     work->badgeFrame = 0;
     {
@@ -989,7 +1003,7 @@ static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 a
         VecFx32 vec;
         DupFittingPoint pt;
         s32 pos;
-        s32 idx;
+        u16 idx;
 
         a = (angle + (i << 16) / DUP_FITTING_RING_PROPS) % 0x10000;
         scale = 0;
@@ -1033,12 +1047,12 @@ static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 a
             MusItemDraw_SetVisible(work->itemSys, draw, TRUE);
             DupFittingItemNode_SetScale(node, scale);
         } else if (a < 0x6e00) {
-            scale = ((0x6e00 - a) << 11) / 0x2e00 + 0x800;
+            scale = ((u16)(0x6e00 - a) << 11) / 0x2e00 + 0x800;
             MusItemDraw_SetSize(work->itemSys, draw, scale, scale);
             MusItemDraw_SetVisible(work->itemSys, draw, TRUE);
             DupFittingItemNode_SetScale(node, scale);
         } else if (a < 0x78e0) {
-            scale = ((0x78e0 - a) << 11) / 0xae0;
+            scale = ((u16)(0x78e0 - a) << 11) / 0xae0;
             MusItemDraw_SetSize(work->itemSys, draw, scale, scale);
             MusItemDraw_SetVisible(work->itemSys, draw, TRUE);
             DupFittingItemNode_SetScale(node, scale);
@@ -1158,12 +1172,18 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
         work->hoverPos = DUP_FITTING_EQUIP_NONE;
     }
     if (work->angleSpeed != 0 && ringDragged == FALSE) {
-        u16 angle = work->angle + 0x10000 - work->angleSpeed;
+        s32 angle = work->angle + 0x10000 - work->angleSpeed;
 
+        if (angle < 0) {
+            angle += 0x10000;
+        }
+        if (angle >= 0x10000) {
+            angle -= 0x10000;
+        }
         work->angle = angle;
         DupFitting_UpdateCarousel(work, work->angle, work->angleSpeed, 72, 48);
         if (work->angleSpeed > 128 || work->angleSpeed < -128) {
-            work->angleSpeed = work->angleSpeed * 0.75f;
+            work->angleSpeed *= 0.75f;
         } else {
             work->angleSpeed = 0;
         }
@@ -1208,8 +1228,14 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
     }
     if (work->dragging == TRUE) {
         if (MATH_ABS(delta) > 227 && MATH_ABS(delta) < 0x4000) {
-            u16 angle = work->angle + 0x10000 - delta;
+            s32 angle = work->angle + 0x10000 - delta;
 
+            if (angle < 0) {
+                angle += 0x10000;
+            }
+            if (angle >= 0x10000) {
+                angle -= 0x10000;
+            }
             work->angle = angle;
             DupFitting_UpdateCarousel(work, work->angle, delta, 72, 48);
             if (delta >= 0 && work->angleSpeed > 0 && delta < work->angleSpeed) {
@@ -1231,7 +1257,7 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
                 }
             }
         } else {
-            work->tilt = 0;
+            work->angleSpeed = 0;
         }
     }
     work->dragging = TRUE;
@@ -1257,14 +1283,15 @@ static BOOL DupFitting_PickFromList(DupFittingWork *work, DupFittingItemList *li
 }
 
 static void DupFitting_UpdateHeldItem(DupFittingWork *work, BOOL playSound) {
+    u16 distance = 12;
     VecFx32 vec = { 0, 0, FX32_CONST(70) };
     MusItemDraw *draw;
     s32 oldHover = work->hoverPos;
-    DupFittingPoint touch;
     DupFittingPoint target;
-    u16 distance = 12;
+    DupFittingPoint touch;
     u16 rotation = 0;
-    s16 size[2];
+    s16 scaleX;
+    s16 scaleY;
 
     draw = DupFittingItemNode_GetDraw(work->heldNode);
     touch.x = work->touchX - 128;
@@ -1275,14 +1302,15 @@ static void DupFitting_UpdateHeldItem(DupFittingWork *work, BOOL playSound) {
 
         target.x = (s32)FX_FX32_TO_F32(equip->info.pos.x + equip->info.offset.x) + 128;
         target.y = (s32)FX_FX32_TO_F32(equip->info.pos.y + equip->info.offset.y) + 96;
-        MusItemDraw_SetUseOffset(work->itemSys, draw, TRUE);
         rotation = equip->info.cellRotation;
+        MusItemDraw_SetUseOffset(work->itemSys, draw, TRUE);
         if (MusItemDraw_GetItemFlag7(draw) == TRUE) {
             vec.z = 26 * FX32_ONE;
         }
         if (DupFitting_HasWornInCategory(work, work->hoverPos) == FALSE) {
             work->holdKind = 3;
-            work->holdOrigin = target;
+            work->holdOrigin.x = target.x;
+            work->holdOrigin.y = target.y;
         }
         DupFittingItemNode_SetEquipPos(work->heldNode, work->hoverPos);
         if (oldHover != work->hoverPos && playSound == TRUE) {
@@ -1299,24 +1327,24 @@ static void DupFitting_UpdateHeldItem(DupFittingWork *work, BOOL playSound) {
     MusItemDraw_SetPosition(work->itemSys, draw, &vec);
     DupFittingItemNode_SetPos(work->heldNode, &target);
     MusItemDraw_SetRotation(work->itemSys, DupFittingItemNode_GetDraw(work->heldNode), rotation);
-    MusItemDraw_GetSize(work->itemSys, draw, &size[1], &size[0]);
-    if (size[1] < FX32_ONE || size[0] < FX32_ONE) {
-        size[1] += 0x19a;
-        size[0] += 0x19a;
-        if (size[1] > FX32_ONE) {
-            size[1] = FX32_ONE;
+    MusItemDraw_GetSize(work->itemSys, draw, &scaleX, &scaleY);
+    if (scaleX < FX32_ONE || scaleY < FX32_ONE) {
+        scaleX += 0x19a;
+        scaleY += 0x19a;
+        if (scaleX > FX32_ONE) {
+            scaleX = FX32_ONE;
         }
-        if (size[0] > FX32_ONE) {
-            size[0] = FX32_ONE;
+        if (scaleY > FX32_ONE) {
+            scaleY = FX32_ONE;
         }
-        MusItemDraw_SetSize(work->itemSys, draw, size[1], size[0]);
+        MusItemDraw_SetSize(work->itemSys, draw, scaleX, scaleY);
     }
 }
 
 static void DupFitting_PullOffCopy(DupFittingWork *work) {
+    VecFx32 vec = { 0, 0, FX32_CONST(70) };
     DupFittingItemEntry *entry = DupFittingItemNode_GetEntry(work->heldNode);
     DupFittingPoint touch;
-    VecFx32 vec;
     DupFittingItemNode *node;
     MusItemDraw *srcDraw;
     MusItemDraw *newDraw;
@@ -1325,7 +1353,8 @@ static void DupFitting_PullOffCopy(DupFittingWork *work) {
 
     touch.x = work->touchX;
     touch.y = work->touchY;
-    vec = (VecFx32){ FX32_CONST(work->touchX), FX32_CONST(work->touchY), FX32_CONST(70) };
+    vec.x = FX32_CONST(work->touchX);
+    vec.y = FX32_CONST(work->touchY);
     node = DupFittingItemNode_Create(work->heapId, work->itemSys, entry, &vec);
     DupFittingItemList_AddTail(work->stageList, node);
     DupFittingItemNode_SetPos(node, &touch);
@@ -1366,7 +1395,6 @@ static void DupFitting_RaiseHeldItem(DupFittingWork *work) {
 }
 
 static void DupFitting_StartReturn(DupFittingWork *work, BOOL unused) {
-    VecFx32 vec = { 0, 0, FX32_CONST(70) };
     DupFittingPoint touch;
     DupFittingItemEntry *entry;
     DupFittingItemNode *node;
@@ -1378,6 +1406,8 @@ static void DupFitting_StartReturn(DupFittingWork *work, BOOL unused) {
     entry = DupFittingItemNode_GetEntry(work->heldNode);
     DupFittingItemList_Remove(work->stageList, work->heldNode);
     DupFittingItemList_AddHead(work->returnList, work->heldNode);
+    VecFx32 vec = { 0, 0, FX32_CONST(70) };
+
     touch.x = work->touchX;
     touch.y = work->touchY;
     vec.x = FX32_CONST(work->holdOrigin.x);
@@ -1389,7 +1419,7 @@ static void DupFitting_StartReturn(DupFittingWork *work, BOOL unused) {
     found = NULL;
     for (node = DupFittingItemList_GetHead(work->carouselList); node != NULL && found == NULL;
          node = DupFittingItemNode_GetNext(node)) {
-        if (DupFittingItemNode_GetEntry(node)->itemId == entry->itemId) {
+        if (entry->itemId == DupFittingItemNode_GetEntry(node)->itemId) {
             found = node;
         }
     }
@@ -1416,7 +1446,7 @@ static void DupFitting_WearItem(DupFittingWork *work) {
     DupFittingItemNode_GetDraw(work->heldNode);
     heldDraw = DupFittingItemNode_GetDraw(work->heldNode);
     if (DupFitting_HasWornInCategory(work, work->hoverPos) == TRUE) {
-        u8 category = func_ov210_021ef118(work->hoverPos);
+        s32 category = func_ov210_021ef118(work->hoverPos);
         DupFittingItemNode *other;
 
         for (other = DupFittingItemList_GetHead(work->wornList); other != NULL; other = DupFittingItemNode_GetNext(other)) {
@@ -1427,8 +1457,8 @@ static void DupFitting_WearItem(DupFittingWork *work) {
         if (other != NULL) {
             VecFx32 vec = { 0, 0, FX32_CONST(70) };
             MusItemDraw *otherDraw = DupFittingItemNode_GetDraw(other);
-            s32 offset[2];
             DupFittingPoint pt;
+            s32 offset[2];
             DupFittingPoint *prevPos;
             VecFx32 nodePos;
 
@@ -1461,8 +1491,7 @@ static void DupFitting_WearItem(DupFittingWork *work) {
     DupFittingItemList_AddHead(work->wornList, work->heldNode);
     MusItemDraw_SetSize(work->itemSys, heldDraw, FX32_ONE, FX32_ONE);
     DupFittingItemNode_SetEquipPos(work->heldNode, work->hoverPos);
-    z = 0;
-    for (node = DupFittingItemList_GetHead(work->wornList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
+    for (node = DupFittingItemList_GetHead(work->wornList), z = 0; node != NULL; node = DupFittingItemNode_GetNext(node)) {
         MusItemDraw *nodeDraw = DupFittingItemNode_GetDraw(node);
         VecFx32 nodePos;
         s32 base;
@@ -1497,12 +1526,12 @@ static void DupFitting_ReleaseHeld(DupFittingWork *work) {
         DupFittingItemNode_SetFrames(work->heldNode, 10);
         DupFitting_RaiseHeldItem(work);
     } else if (work->holdKind == 3) {
-        VecFx32 vec = { 0, 0, FX32_CONST(70) };
+        VecFx32 vec;
         MusItemDraw *draw = DupFittingItemNode_GetDraw(work->heldNode);
         s32 pos = DupFittingItemNode_GetEquipPos(work->heldNode);
         MusPokeDrawEquipPos *equip = MusPokeDraw_GetEquipPos(work->poke, pos);
-        DupFittingPoint target;
         DupFittingPoint touch;
+        DupFittingPoint target;
         u16 rotation;
         s32 base;
 
@@ -1531,11 +1560,11 @@ static void DupFitting_ReleaseHeld(DupFittingWork *work) {
         DupFitting_WearItem(work);
         work->hoverPos = DUP_FITTING_EQUIP_NONE;
     } else if (work->holdKind == 1) {
-        VecFx32 vec = { 0, 0, FX32_CONST(70) };
         MusItemDraw *draw;
         DupFittingPoint touch;
 
         DupFittingItemNode_GetOrigin(work->heldNode);
+        VecFx32 vec = { 0, 0, FX32_CONST(70) };
         draw = DupFittingItemNode_GetDraw(work->heldNode);
         DupFittingItemNode_SetPos(work->heldNode, &work->holdOrigin);
         DupFittingItemNode_SetFrames(work->heldNode, 10);
@@ -1557,40 +1586,35 @@ static BOOL DupFitting_SelectCategory(DupFittingWork *work) {
     u16 index;
     s32 category = 0;
     s32 pos;
-    u32 carouselPos;
-    u32 total;
 
-    carouselPos = work->carouselPos + 0x19249;
-    total = work->entryCount * DUP_FITTING_RING_STEP;
-    if (carouselPos >= total) {
-        carouselPos -= total;
-    }
-    index = carouselPos / DUP_FITTING_RING_STEP;
+    index = DupFitting_GetRingIndex(work, 0x19249);
     touch[0] = work->touchX - 128;
     touch[1] = work->touchY - 112;
     pos = DupFitting_FindNearestEquipPos(work, NULL, touch, &distance);
-    if (pos == DUP_FITTING_EQUIP_NONE) {
-        return category;
+    if (pos != DUP_FITTING_EQUIP_NONE) {
+        category = func_ov210_021ef118(pos);
+        if (category == 7) {
+            category = 6;
+        }
+        if (category == work->category) {
+            category = DUP_FITTING_CATEGORY_ORIGINAL;
+            DupFitting_SortEntries(work, DUP_FITTING_CATEGORY_ORIGINAL, index);
+        } else {
+            DupFitting_SortEntries(work, category, index);
+        }
+        work->category = category;
+        DupFitting_PrintCategory(work, work->category);
+        work->autoScroll = TRUE;
+        work->scrolled = 0;
+        work->scrollTarget = work->angle % DUP_FITTING_RING_STEP + 0x10000;
+        if (work->scrollTarget >= 0x10000 && work->scrollTarget <= 0x10002) {
+            work->scrollTarget += DUP_FITTING_RING_STEP;
+        }
+        DupFitting_UpdateCarousel(work, work->angle, 0, 72, 48);
+        GFL_SndSEPlay(SEQ_SE_MSCL_07);
+        return TRUE;
     }
-    category = func_ov210_021ef118(pos);
-    if (category == 7) {
-        category = 6;
-    }
-    if (category == work->category) {
-        category = DUP_FITTING_CATEGORY_ORIGINAL;
-    }
-    DupFitting_SortEntries(work, category, index);
-    work->category = category;
-    DupFitting_PrintCategory(work, work->category);
-    work->autoScroll = TRUE;
-    work->scrolled = 0;
-    work->scrollTarget = work->angle % DUP_FITTING_RING_STEP + 0x10000;
-    if (work->scrollTarget >= 0x10000 && work->scrollTarget <= 0x10002) {
-        work->scrollTarget += DUP_FITTING_RING_STEP;
-    }
-    DupFitting_UpdateCarousel(work, work->angle, 0, 72, 48);
-    GFL_SndSEPlay(SEQ_SE_MSCL_07);
-    return TRUE;
+    return category;
 }
 
 static void DupFitting_UpdateAutoScroll(DupFittingWork *work) {
@@ -1645,7 +1669,7 @@ static void DupFitting_UpdateTilt(DupFittingWork *work) {
 }
 
 static BOOL DupFitting_HasWornInCategory(DupFittingWork *work, s32 pos) {
-    u8 category = func_ov210_021ef118(pos);
+    s32 category = func_ov210_021ef118(pos);
     DupFittingItemNode *node;
 
     for (node = DupFittingItemList_GetHead(work->wornList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
@@ -1659,7 +1683,7 @@ static BOOL DupFitting_HasWornInCategory(DupFittingWork *work, s32 pos) {
 static s32 DupFitting_FindNearestEquipPos(DupFittingWork *work, MusItemDraw *draw, const s32 *pos, u16 *distance) {
     u16 best = *distance * *distance;
     s32 result = DUP_FITTING_EQUIP_NONE;
-    u8 i;
+    s32 i;
 
     for (i = 0; i < 9; i++) {
         BOOL canEquip;
@@ -1691,6 +1715,9 @@ static s32 DupFitting_FindNearestEquipPos(DupFittingWork *work, MusItemDraw *dra
 static void DupFitting_UpdateReturning(DupFittingWork *work) {
     DupFittingItemNode *node;
     BOOL secondList;
+    s32 t;
+    s32 ox;
+    s32 oy;
 
     node = DupFittingItemList_GetHead(work->returnList);
     while (node != NULL) {
@@ -1706,9 +1733,6 @@ static void DupFitting_UpdateReturning(DupFittingWork *work) {
         if (frames != 0) {
             s16 scale = baseScale + (FX32_ONE - baseScale) * frames / 10;
             VecFx32 vec;
-            s32 t;
-            s32 ox;
-            s32 oy;
 
             MusItemDraw_SetSize(work->itemSys, draw, scale, scale);
             MusItemDraw_GetPosition(work->itemSys, draw, &vec);
@@ -1742,10 +1766,6 @@ static void DupFitting_UpdateReturning(DupFittingWork *work) {
             VecFx32 vec;
 
             if (next != 0) {
-                s32 t;
-                s32 ox;
-                s32 oy;
-
                 MusItemDraw_GetPosition(work->itemSys, draw, &vec);
                 t = 10 - next;
                 ox = origin->x;
@@ -1790,17 +1810,21 @@ static BOOL DupFitting_IsInEllipse(s16 x, s16 y, int radius, f32 xScale) {
     return FALSE;
 }
 
-static void DupFitting_SortEntries(DupFittingWork *work, s32 category, u16 start) {
+static void DupFitting_SortEntries(DupFittingWork *work, u8 category, u16 start) {
     u16 i;
-    s32 n;
+    u16 first;
+    u16 best;
+    u16 n;
 
     for (i = 0; i < work->entryCount; i++) {
         work->sorted[(u16)((start + i) % work->entryCount)] = &work->entries[i];
     }
     for (n = 0; n < work->entryCount; n++) {
-        u16 first = (start + n) % work->entryCount;
-        u16 best = first;
-        u16 key = DupFitting_GetSortKey(work, work->sorted[first], category);
+        u16 key;
+
+        first = (start + n) % work->entryCount;
+        best = first;
+        key = DupFitting_GetSortKey(work, work->sorted[first], category);
 
         for (i = n + 1; i < work->entryCount; i++) {
             u16 index = (start + i) % work->entryCount;
@@ -1848,10 +1872,10 @@ static u16 DupFitting_GetSortKey(DupFittingWork *work, DupFittingItemEntry *entr
 static void DupFitting_UpdateTransition(DupFittingWork *work) {
     DupFittingItemNode *node;
     ClActorPos pos;
+    s32 y;
     s32 t = work->transition;
-    u32 radiusY = t * (2.0f / 3.0f) + 48.0f;
 
-    DupFitting_UpdateCarousel(work, work->angle, 0, t + 72, radiusY);
+    DupFitting_UpdateCarousel(work, work->angle, 0, t + 72, t * (2.0f / 3.0f) + 48.0f);
     for (node = DupFittingItemList_GetHead(work->stageList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
         DupFittingPoint *nodePos = DupFittingItemNode_GetPos(node);
         MusItemDraw *draw = DupFittingItemNode_GetDraw(node);
@@ -1871,18 +1895,18 @@ static void DupFitting_UpdateTransition(DupFittingWork *work) {
     }
     GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, -work->transition);
     pos.x = 32;
-    pos.y = 192 - work->transition;
-    if (pos.y >= 64) {
-        pos.y = 64;
+    y = 192 - work->transition;
+    if (y >= 64) {
+        y = 64;
     }
-    pos.y += 160;
+    pos.y = y + 160;
     func_0204c140(work->buttons[0], &pos, CLACT_SURFACE_MAIN);
     pos.x = 224;
-    pos.y = 192 - work->transition;
-    if (pos.y >= 64) {
-        pos.y = 64;
+    y = 192 - work->transition;
+    if (y >= 64) {
+        y = 64;
     }
-    pos.y += 160;
+    pos.y = y + 160;
     func_0204c140(work->buttons[1], &pos, CLACT_SURFACE_MAIN);
 }
 
@@ -1896,14 +1920,13 @@ static u32 DupFitting_UpdateConfirm(DupFittingWork *work) {
 
     func_0203da84(&work->touchX, &work->touchY);
     hit = func_0203da0c(rects);
-    if (hit == TOUCH_RECT_NONE) {
-        DupFitting_UpdateConfirmTouch(work);
-    } else if (hit == 0) {
+    switch (hit) {
+    case 0:
         DupFitting_SaveWornItems(work);
         GFL_SndSEPlay(SEQ_SE_DECIDE3);
         DupFitting_ShowTouchEffect(work);
         return 2;
-    } else if (hit == 1) {
+    case 1: {
         WordSet *wordSet;
 
         work->state = DUP_FITTING_STATE_CONFIRM_OUT;
@@ -1915,6 +1938,11 @@ static u32 DupFitting_UpdateConfirm(DupFittingWork *work) {
         DupFitting_PrintMessage(work, Title3_Text_LetsDressUpProps, wordSet);
         GFL_WordSetSystemFree(wordSet);
         DupFitting_ShowTouchEffect(work);
+        break;
+    }
+    case TOUCH_RECT_NONE:
+        DupFitting_UpdateConfirmTouch(work);
+        break;
     }
     DupFitting_UpdateShadow(work);
     return 0;
@@ -1928,7 +1956,8 @@ static void DupFitting_ResetRotations(DupFittingWork *work) {
         work->param->poke->equips[i].unk2 = 0;
     }
     for (node = DupFittingItemList_GetHead(work->wornList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
-        MusPokeDrawEquipPos *equip = MusPokeDraw_GetEquipPos(work->poke, (u16)DupFittingItemNode_GetEquipPos(node));
+        u16 pos = DupFittingItemNode_GetEquipPos(node);
+        MusPokeDrawEquipPos *equip = MusPokeDraw_GetEquipPos(work->poke, pos);
 
         MusItemDraw_SetRotation(work->itemSys, DupFittingItemNode_GetDraw(node), equip->info.cellRotation);
     }
@@ -2057,9 +2086,10 @@ static void DupFitting_StartDemo(DupFittingWork *work) {
         }
     } while (i != 5);
     if (i == 0) {
-        i = work->entryCount;
+        work->demoItem = work->entryCount - 1;
+    } else {
+        work->demoItem = i - 1;
     }
-    work->demoItem = i - 1;
     work->state = DUP_FITTING_STATE_DEMO;
 }
 
@@ -2280,13 +2310,18 @@ static void DupFitting_PrintCategory(DupFittingWork *work, s32 category) {
 }
 
 static void DupFitting_InitSparkles(DupFittingWork *work) {
+    ClActorSetup sparkle;
     ClActorSetup setup;
     u8 i;
 
     for (i = 0; i < 8; i++) {
-        setup = (ClActorSetup){ 0, 0, 0, 0, 0 };
+        sparkle.x = 0;
+        sparkle.y = 0;
+        sparkle.sequence = 0;
+        sparkle.priority = 0;
+        sparkle.bgPriority = 0;
         work->sparkles[i] = func_0204c040(work->clactUnit, work->clactRes[2], work->clactRes[5], work->clactRes[8],
-                                          &setup, CLACT_SURFACE_SUB, work->heapId);
+                                          &sparkle, CLACT_SURFACE_SUB, work->heapId);
         func_0204c124(work->sparkles[i], TRUE);
         func_0204c520(work->sparkles[i], TRUE);
         func_0204c318(work->sparkles[i], 0);
@@ -2358,9 +2393,4 @@ static void DupFitting_ShowTouchEffect(DupFittingWork *work) {
 }
 
 static void DupFitting_Trace(DupFittingWork *work, u8 id) {
-}
-
-static void DupFitting_SlideMessageBGs(DupFittingWork *work) {
-    GFL_BGSysMoveBGReq(6, BG_MOVE_SET_X, 128 - work->msgSlide);
-    GFL_BGSysMoveBGReq(5, BG_MOVE_SET_X, work->msgSlide - 128);
 }
