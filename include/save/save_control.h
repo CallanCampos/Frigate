@@ -94,11 +94,6 @@ BOOL func_0200b014(void *data, u32 index);
 const u16 *func_0200afe4(void *data, u32 index);
 void func_0200b220(void *data);
 
-// Save block 0x2b, which swan calls ReshZek: the Reshiram or Zekrom fused with Kyurem
-void *getReshZekBlkAddress(SaveControl *save);
-PartyPkm *func_0200afa8(void *reshZek);
-void func_0200afac(void *reshZek, PartyPkm *pkm);
-
 // Save block 0x45, which swan calls the key data. It keeps the Black Tower's and White Treehollow's progress, and the
 // Trainers there that have been defeated (CheckTrainerAlreadyDefeated)
 KeyDataSave *getKeyDataBlkAddress(SaveControl *save);

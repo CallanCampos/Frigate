@@ -481,6 +481,7 @@ typedef struct RailLoader RailLoader;
 typedef struct RailPosition RailPosition;
 typedef struct RailUnit RailUnit;
 typedef struct RecordSave RecordSave;
+typedef struct ReshZekSave ReshZekSave;
 typedef struct Regulation Regulation;
 typedef struct ResearchCommon ResearchCommon;
 typedef struct ResearchData ResearchData;

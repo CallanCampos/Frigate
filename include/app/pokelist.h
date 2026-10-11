@@ -10,6 +10,7 @@
 #include "gfl/particle.h"
 #include "gfl/proc.h"
 #include "gfl/touchpanel.h"
+#include "save/resh_zek.h"
 #include "struct_decls.h"
 #include "system/printsys.h"
 
@@ -32,7 +33,7 @@ typedef struct {
     void *unk08;
     TrainerDataSave *trainerData;
     // The Pokémon fused with Kyurem (getReshZekBlkAddress)
-    void *reshZek;
+    ReshZekSave *reshZek;
     Regulation *regulation;
     void *unk18;
     PokeDexSave *pokedex;
