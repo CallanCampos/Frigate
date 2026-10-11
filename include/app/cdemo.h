@@ -45,7 +45,7 @@ struct CDemoWork {
 u32 CDemo_RunCommand(CDemoWork *work);
 BOOL CDemo_Main(CDemoWork *work);
 void CDemo_ConfigureVRAM(void);
-void CDemo_InitGraphics(void);
+void CDemo_InitGraphics(CDemoWork *work);
 void CDemo_DisableGraphics(void);
 void CDemo_InitScript(CDemoWork *work);
 void CDemo_FreeScript(CDemoWork *work);

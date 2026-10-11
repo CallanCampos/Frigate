@@ -662,11 +662,12 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 264
 
-37 of 45 functions are in source files.
+45 of 45 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `cdemo_main.c` | `0x021998c0`–`0x02199b40` | 16 | complete | string at `0x0219a2c0` |
+| `cdemo_control.c` | `0x02199b40`–`0x02199e9c` | 8 | complete | descriptive |
 | `cdemo_script.c` | `0x02199e9c`–`0x0219a098` | 21 | complete | descriptive |
 
 The interpreter boundary is inferred from its command tables and the single incoming dispatcher call. No filename

@@ -9748,6 +9748,13 @@ overlays/ov264 0x02199aa0 CDemo_FadeInWhite
 overlays/ov264 0x02199acc CDemo_FadeOutWhite
 overlays/ov264 0x02199af8 CDemo_LoadPalette
 overlays/ov264 0x02199b40 CDemo_Main
+overlays/ov264 0x02199b94 CDemo_StateInit
+overlays/ov264 0x02199c08 CDemo_StateExit
+overlays/ov264 0x02199c50 CDemo_StateWaitFade
+overlays/ov264 0x02199c6c CDemo_StateTransition
+overlays/ov264 0x02199c70 CDemo_StateScript
+overlays/ov264 0x02199ca0 CDemo_StateMovie
+overlays/ov264 0x02199e5c CDemo_LoadMovieFrame
 overlays/ov264 0x02199e9c CDemo_RunCommand
 overlays/ov264 0x02199ed0 CDemoCmd_WaitFrames
 overlays/ov264 0x02199ef0 CDemoCmd_FadeInBlack
@@ -9775,6 +9782,8 @@ overlays/ov264 0x0219a0b0 CDEMO_VRAM_CONFIG
 overlays/ov264 0x0219a0e0 CDEMO_SCRIPT_LOGO
 overlays/ov264 0x0219a124 CDEMO_SCRIPT_0
 overlays/ov264 0x0219a170 CDEMO_SCRIPT_1
+overlays/ov264 0x0219a1c4 CDEMO_STATES
+overlays/ov264 0x0219a1dc CDEMO_MOVIES
 overlays/ov264 0x0219a200 CDEMO_COMMANDS
 overlays/ov264 0x0219a250 CDEMO_COMMAND_LENGTHS
 overlays/ov269 0x021ef1e0 BrMusicalSend_ProcInit

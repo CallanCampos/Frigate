@@ -40,7 +40,7 @@ static BOOL CDemo_Exit(GameProc *proc, u32 *state, void *param, void *work) {
 void CDemo_ConfigureVRAM(void) {
     GFL_BGSysSetVRAMBanks(&CDEMO_VRAM_CONFIG);
 }
-void CDemo_InitGraphics(void) {
+void CDemo_InitGraphics(CDemoWork *work) {
     MtxFx22 matrix;
     void *screen;
     gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BG0_AS_2D);
