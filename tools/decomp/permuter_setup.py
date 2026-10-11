@@ -101,7 +101,7 @@ def main():
         f'exec {shlex.quote(str(WIBO))} {shlex.quote(str(compiler))} {flags} -o "$3" "$1"\n'
     )
     (out / "compile.sh").chmod(0o755)
-    objdump = ROOT / "tools" / "scripts" / "permuter_objdump.py"
+    objdump = ROOT / "tools" / "decomp" / "permuter_objdump.py"
     (out / "settings.toml").write_text(
         f'func_name = "{args.function}"\ncompiler_type = "mwcc"\n'
         f'objdump_command = "{sys.executable} {objdump} -drz{"" if thumb else " --arm"}"\n'
