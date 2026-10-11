@@ -2,6 +2,7 @@
 #include "constants/arc.h"
 #include "constants/flags.h"
 #include "constants/sound.h"
+#include "constants/vars.h"
 #include "constants/zones.h"
 #include "dsprot/dsprot.h"
 #include "field/event_3d_demo.h"
@@ -20,6 +21,7 @@
 #include "field/intrude_work.h"
 #include "field/player_state.h"
 #include "field/shaymin_form.h"
+#include "field/union_main.h"
 #include "field/zone.h"
 #include "field/zone_change.h"
 #include "gfl/arc.h"
@@ -985,7 +987,7 @@ GameEventReturnCode EventUnionRoomWarp_Callback(GameEvent *event, u32 *state, vo
         (*state)++;
         break;
     case 2:
-        func_ov028_02170ec8(gsys);
+        UnionMain_Boot(gsys);
         (*state)++;
         break;
     case 3:
@@ -1723,12 +1725,10 @@ void GameData_UpdateEscapeRopeZone(GameData *gameData, const ZoneSpawnInfo *spaw
             GameData_SetEscapeRopeZone(gameData, &escapeRopeSpawn);
         }
     }
-    // Zone 0x9e is part of the Desert Resort
-    if (now->zoneId == 0x9e && GetZoneFlagsEnableEscapeRope(spawn->zoneId)) {
+    if (now->zoneId == ZONE_DESERT_RESORT_2 && GetZoneFlagsEnableEscapeRope(spawn->zoneId)) {
         GameData_SetEscapeRopeZone(gameData, remember);
     }
-    // Zone 0x28 is part of Castelia City
-    if (now->zoneId == 0x28 && spawn->zoneId == ZONE_CASTELIA_SEWERS) {
+    if (now->zoneId == ZONE_CASTELIA_CITY_12 && spawn->zoneId == ZONE_CASTELIA_SEWERS) {
         GameData_SetEscapeRopeZone(gameData, remember);
     }
 }

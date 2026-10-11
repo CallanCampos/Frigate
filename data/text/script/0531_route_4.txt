@@ -1,4 +1,0 @@
-Hi!\nWelcome!{be01}\nWell...\nThere is nothing here.
-You know, on Thursdays,\nsome Pokémon fly here.
-If I'm with a big Pokémon,\neven I look slim!
-\pad{d8}

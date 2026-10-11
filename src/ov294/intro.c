@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "demo/intro.h"
 #include "gfl/msg.h"
 #include "gfl/std.h"
@@ -43,7 +44,7 @@ BOOL IntroProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->param = param;
     wk->graphic = IntroGraphic_Create(1, wk->param->mode, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 85, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_INTRO_BTL_SERVER_FLOW, wk->heapId);
     wk->mcss = IntroMcss_Create(wk->heapId, wk->param->mode);
     wk->g3d = IntroG3d_Create(wk->graphic, wk->param->mode, wk->heapId);
     wk->particle = IntroParticle_Create(wk->graphic, wk->heapId);

@@ -14,22 +14,26 @@
 // A zone the mission places people in
 typedef struct {
     u16 zoneId;
-    u16 unk2;
+    // How many people the mission placed in it
+    u16 count;
     // Whether each person was taken away
     u8 removed[4];
 } FesMissionZone;
 
 // The work of a type 5 mission, kept by the festival (func_02014864)
 typedef struct {
-    u32 unk000;
+    LinkFestival *festival;
     u16 zoneId;
-    u8 unk006;
+    // How many places the current zone has for people
+    u8 placeCount;
     // How many people the current zone has
     u8 actorCount;
     // Where the people can stand
     ZoneBGEntity places[20];
     // The place of each person
-    u8 placeIndex[28];
+    u8 placeIndex[4];
+    // What each person is told by the mission's target: three values, for the actor's user parameters
+    u16 params[4][3];
     FieldActor *actors[4];
     s32 zoneCount;
     FesMissionZone zones[6];
@@ -69,18 +73,6 @@ typedef struct {
     FesMissionWork *work;
     FesMissionQuiz quiz;
 } FesGimmick;
-
-// A type 5 mission's settings, in overlay 25: what was asked of each person, by the person and the question
-typedef struct {
-    u16 values[4][6];
-} FesMissionAnswers;
-
-extern const FesMissionAnswers data_ov025_02170160[];
-
-// Overlay 25's mission functions: the object code of the people, whether the items are on sale, and a zone's entry
-u8 func_ov025_0216fa18(FestMission *mission);
-u16 func_ov025_0216fa28(FesMissionWork *work, FestMission *mission);
-FesMissionZone *func_ov025_0216fa34(FesMissionWork *work, u16 zoneId);
 
 // The festival's total, at most 9999
 int func_02014870(LinkFestival *festival);

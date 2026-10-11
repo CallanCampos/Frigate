@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Bess",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_BESS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WATCHOG",
+            "form": 0,
+            "level": 56,
+            "difficulty": 64,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SHELL_BELL",
+            "moves": [ "MOVE_CRUNCH", "MOVE_HYPER_FANG", "MOVE_LOW_KICK", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_SWOOBAT",
+            "form": 0,
+            "level": 56,
+            "difficulty": 64,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_WISE_GLASSES",
+            "moves": [ "MOVE_PSYCHIC", "MOVE_AIR_SLASH", "MOVE_U_TURN", "MOVE_THUNDER_WAVE" ]
+        },
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 0,
+            "level": 56,
+            "difficulty": 64,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_MYSTIC_WATER",
+            "moves": [ "MOVE_AQUA_JET", "MOVE_DOUBLE_EDGE", "MOVE_ICE_BEAM", "MOVE_SWAGGER" ]
+        }
+    ],
+    "messages": []
+}

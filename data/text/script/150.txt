@@ -1,0 +1,2 @@
+Bank150_Text_PleaseTakeDesignatedPosition = Please take your designated position\nand start the battle.
+\pad{0c}

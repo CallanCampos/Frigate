@@ -1,42 +1,42 @@
-SCENARIO
-SCENE 01
-SCENE 02
-SCENE 03
-SCENE 04
-SCENE 05
-SCENE 06
-SCENE 07
-SCENE 08
-SCENE 09
-SCENE 10
-SCENE 11
-SCENE 12
-SCENE 13
-SCENE 14
-SCENE 15
-SCENE 16
-SCENE 17
-SCENE 18
-SCENE 19
-SCENE 20
-Ensure your attack is on target!\nThe line you choose is important!
-Make sure you hit the foe!
-Ensure your attack is on target!
-Make sure you hit the foe!
-Ensure your attack is on target!
-Make sure you hit the foe!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0322_Text_Scenario = SCENARIO
+Bank0322_Text_Scene01 = SCENE 01
+Bank0322_Text_Scene02 = SCENE 02
+Bank0322_Text_Scene03 = SCENE 03
+Bank0322_Text_Scene04 = SCENE 04
+Bank0322_Text_Scene05 = SCENE 05
+Bank0322_Text_Scene06 = SCENE 06
+Bank0322_Text_Scene07 = SCENE 07
+Bank0322_Text_Scene08 = SCENE 08
+Bank0322_Text_Scene09 = SCENE 09
+Bank0322_Text_Scene10 = SCENE 10
+Bank0322_Text_Scene11 = SCENE 11
+Bank0322_Text_Scene12 = SCENE 12
+Bank0322_Text_Scene13 = SCENE 13
+Bank0322_Text_Scene14 = SCENE 14
+Bank0322_Text_Scene15 = SCENE 15
+Bank0322_Text_Scene16 = SCENE 16
+Bank0322_Text_Scene17 = SCENE 17
+Bank0322_Text_Scene18 = SCENE 18
+Bank0322_Text_Scene19 = SCENE 19
+Bank0322_Text_Scene20 = SCENE 20
+Bank0322_Text_EnsureAttackTargetLine = Ensure your attack is on target!\nThe line you choose is important!
+Bank0322_Text_MakeSureHitFoe = Make sure you hit the foe!
+Bank0322_Text_EnsureAttackTarget = Ensure your attack is on target!
+Bank0322_Text_MakeSureHitFoe_2 = Make sure you hit the foe!
+Bank0322_Text_EnsureAttackTarget_2 = Ensure your attack is on target!
+Bank0322_Text_MakeSureHitFoe_3 = Make sure you hit the foe!
+Bank0322_Text_DeliverDecisiveBlow = Deliver a decisive blow!
+Bank0322_Text_DeliverDecisiveBlow_2 = Deliver a decisive blow!
+Bank0322_Text_DeliverDecisiveBlow_3 = Deliver a decisive blow!
+Bank0322_Text_Empty = なし
+Bank0322_Text_Empty_2 = なし
+Bank0322_Text_Empty_3 = なし
+Bank0322_Text_Empty_4 = なし
+Bank0322_Text_Empty_5 = なし
+Bank0322_Text_Empty_6 = なし
+Bank0322_Text_Empty_7 = なし
+Bank0322_Text_Empty_8 = なし
+Bank0322_Text_Empty_9 = なし
+Bank0322_Text_Empty_10 = なし
+Bank0322_Text_Empty_11 = なし
+Bank0322_Text_Empty_12 = なし

@@ -1,0 +1,15 @@
+Global10405_Text_Cancel = Cancel
+Global10405_Text_1f = 1F
+Global10405_Text_2f = 2F
+Global10405_Text_3f = 3F
+Global10405_Text_7f = 7F
+Global10405_Text_11f = 11F
+Global10405_Text_14f = 14F
+Global10405_Text_19f = 19F
+Global10405_Text_22f = 22F
+Global10405_Text_23f = 23F
+Global10405_Text_25f = 25F
+Global10405_Text_28f = 28F
+Global10405_Text_47f = 47F
+Global10405_Text_55f = 55F
+Global10405_Text_WhichFloorWouldLike = Which floor would you like to go to?

@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_KROOKODILE",
+            "form": 0,
+            "level": 47,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I'm the fighting sweeper!\nI'll clean up garbage like you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oops..."
+        },
+        {
+            "type": 2,
+            "text": "The fact that I let you sneak in here\nmeans I'll probably lose my Pokémon, huh?{be01}\nThe Pokémon we stole with that plan two\nyears ago are running out, after all."
+        }
+    ]
+}

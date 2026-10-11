@@ -3,3 +3,28 @@
     .ctor       start:0x021bfe84 end:0x021bfe84 kind:rodata align:4
     .data       start:0x021bfea0 end:0x021c1ce0 kind:data align:32
     .bss        start:0x021c1ce0 end:0x021c25a0 kind:bss align:32
+
+src/ov260/wifibattlematch_link.c:
+    complete
+    .text       start:0x021b2fc0 end:0x021b30a4
+    .rodata     start:0x021bfd18 end:0x021bfd24
+    .data       start:0x021bfea0 end:0x021bfea8
+
+src/ov260/wifibattlematch_link_random.c:
+    .text       start:0x021b30a4 end:0x021b581c
+    .rodata     start:0x021bfd24 end:0x021bfd30
+
+src/ov260/wifibattlematch_link_competition.c:
+    .text       start:0x021b581c end:0x021b8d08
+    .rodata     start:0x021bfd30 end:0x021bfd3c
+    .data       start:0x021bfea8 end:0x021bfeb0
+
+src/ov260/wifibattlematch_net.c:
+    .text       start:0x021b8d08 end:0x021bc098
+    .rodata     start:0x021bfd3c end:0x021bfd78
+    .data       start:0x021bfeb0 end:0x021c0124
+    .bss        start:0x021c1ce0 end:0x021c1ce8
+
+src/ov260/wifibattlematch_net_fields.c:
+    .text       start:0x021bc098 end:0x021bc258
+    .data       start:0x021c0124 end:0x021c0790

@@ -1,42 +1,42 @@
-SCENARIO
-SCENE 01
-SCENE 02
-SCENE 03
-SCENE 04
-SCENE 05
-SCENE 06
-SCENE 07
-SCENE 08
-SCENE 09
-SCENE 10
-SCENE 11
-SCENE 12
-SCENE 13
-SCENE 14
-SCENE 15
-SCENE 16
-SCENE 17
-SCENE 18
-SCENE 19
-SCENE 20
-The line you choose is important!
-Determine the SFX Prop's type!
-Pay attention to your foe's switches!
-The line you choose is important!
-Pay attention to your foe's switches!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0316_Text_Scenario = SCENARIO
+Bank0316_Text_Scene01 = SCENE 01
+Bank0316_Text_Scene02 = SCENE 02
+Bank0316_Text_Scene03 = SCENE 03
+Bank0316_Text_Scene04 = SCENE 04
+Bank0316_Text_Scene05 = SCENE 05
+Bank0316_Text_Scene06 = SCENE 06
+Bank0316_Text_Scene07 = SCENE 07
+Bank0316_Text_Scene08 = SCENE 08
+Bank0316_Text_Scene09 = SCENE 09
+Bank0316_Text_Scene10 = SCENE 10
+Bank0316_Text_Scene11 = SCENE 11
+Bank0316_Text_Scene12 = SCENE 12
+Bank0316_Text_Scene13 = SCENE 13
+Bank0316_Text_Scene14 = SCENE 14
+Bank0316_Text_Scene15 = SCENE 15
+Bank0316_Text_Scene16 = SCENE 16
+Bank0316_Text_Scene17 = SCENE 17
+Bank0316_Text_Scene18 = SCENE 18
+Bank0316_Text_Scene19 = SCENE 19
+Bank0316_Text_Scene20 = SCENE 20
+Bank0316_Text_LineChooseImportant = The line you choose is important!
+Bank0316_Text_DetermineSfxPropsType = Determine the SFX Prop's type!
+Bank0316_Text_PayAttentionFoesSwitches = Pay attention to your foe's switches!
+Bank0316_Text_LineChooseImportant_2 = The line you choose is important!
+Bank0316_Text_PayAttentionFoesSwitches_2 = Pay attention to your foe's switches!
+Bank0316_Text_DeliverDecisiveBlow = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_2 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_3 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_4 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_5 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_6 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_7 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_8 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_9 = Deliver a decisive blow!
+Bank0316_Text_DeliverDecisiveBlow_10 = Deliver a decisive blow!
+Bank0316_Text_Empty = なし
+Bank0316_Text_Empty_2 = なし
+Bank0316_Text_Empty_3 = なし
+Bank0316_Text_Empty_4 = なし
+Bank0316_Text_Empty_5 = なし
+Bank0316_Text_Empty_6 = なし

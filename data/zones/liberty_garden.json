@@ -1,0 +1,38 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 19,
+    "npc_cache": 15,
+    "area": 86,
+    "matrix": "MAP_MATRIX_OVERWORLD",
+    "scripts": "SCRIPTS_LIBERTY_GARDEN",
+    "text": "SCRIPT_TEXT_LIBERTY_GARDEN",
+    "bgm": {
+        "spring": "SEQ_BGM_R_D_SP",
+        "summer": "SEQ_BGM_R_D_SU",
+        "autumn": "SEQ_BGM_R_D_AU",
+        "winter": "SEQ_BGM_R_D_WI"
+    },
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_LIBERTY_GARDEN",
+    "place": "PLACE_LIBERTY_GARDEN",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 0,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": true,
+    "entralink_warp": true,
+    "cam_bound": 0,
+    "name_icon": 15,
+    "easy_level": 0,
+    "fly": {
+        "x": 302,
+        "y": 0,
+        "z": 756
+    }
+}

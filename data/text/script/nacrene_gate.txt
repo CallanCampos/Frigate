@@ -1,0 +1,10 @@
+NacreneGate_Text_WellHowManyGates = Well, how many gates do you think\nthere are in the Unova region?
+NacreneGate_Text_FriendsFriendSayingPokemon = My friend's friend was saying that\nPokémon Eggs are sometimes discovered{be00}\nat the Day Care on Route 3!
+NacreneGate_Text_CheckingElectricBulletinBoards = Are you checking the electric\nbulletin boards?{be01}\nRight now, news about mass outbreaks\nof Pokémon is really hot!
+NacreneGate_Text_UmExcuseTrainerPokemon = Um... Excuse me...\nTrainer?{be01}\nThis Pokémon Egg was found at the\nDay Care. Would you raise it?
+NacreneGate_Text_PokemonEggFoundDay = This Pokémon Egg was\nfound at the Day Care.{be00}\nWould you raise it?
+NacreneGate_Text_UmPartyFullDont = Um...{be01}\nYour party is full.\nYou don't have room to hold the Egg.
+NacreneGate_Text_OhOkUnderstandIf = Oh... OK.\nI understand.{be01}\nIf you change your mind,\nplease come talk to me again.
+NacreneGate_Text_OhOkPleaseTake = Oh! OK!{be01}\nPlease take good care of this Egg!{be01}
+NacreneGate_Text_ApparentlyPuttingPokemonEggs = Apparently, putting Pokémon Eggs next\nto healthy Pokémon is a good thing.{be01}\nIn other words, walk with the Egg.{be01}\nYou know, the Day Care is on Route 3.\nThey might be able to tell you more.
+NacreneGate_Text_ReceivedEgg = {0100:0} received the Egg!

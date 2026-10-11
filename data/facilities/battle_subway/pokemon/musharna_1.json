@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MUSHARNA",
+    "moves": [ "MOVE_HYPNOSIS", "MOVE_DREAM_EATER", "MOVE_CALM_MIND", "MOVE_HELPING_HAND" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MILD",
+    "item": "ITEM_ZOOM_LENS",
+    "form": 0
+}

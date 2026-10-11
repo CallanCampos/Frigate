@@ -1,0 +1,164 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Cherrim",
+    "pokedex": {
+        "category": "Blossom Pokémon",
+        "entry": "If it senses strong sunlight, it\nopens its folded petals to absorb\nthe sun's rays with its whole body.",
+        "height": "1'08\"",
+        "weight": "20.5 lbs.",
+        "forms": [
+            {
+                "entry": "If it senses strong sunlight, it\nopens its folded petals to absorb\nthe sun's rays with its whole body.",
+                "height": "1'08\"",
+                "weight": "20.5 lbs."
+            }
+        ],
+        "languages": {
+            "en": {
+                "name": "Cherrim",
+                "category": "Blossom Pokémon",
+                "entry": "If it senses strong sunlight, it\nopens its folded petals to absorb\nthe sun's rays with its whole body.",
+                "height": "1'08\"",
+                "weight": "20.5 lbs."
+            },
+            "fr": {
+                "name": "Ceriflor",
+                "category": "Pokémon Floraison",
+                "entry": "Sous un grand soleil, il ouvre\nses pétales pour en absorber\nles rayons.",
+                "height": "0,5 m",
+                "weight": "9,3 kg"
+            },
+            "de": {
+                "name": "Kinoso",
+                "category": "Blüte",
+                "entry": "Spürt es Sonnenlicht, öffnet es\nseine Blütenblätter und nimmt die\nEnergie der Sonnenstrahlen auf.",
+                "height": "0,5 m",
+                "weight": "9,3 kg"
+            },
+            "it": {
+                "name": "Cherrim",
+                "category": "Pokémon Bocciolo",
+                "entry": "Quando splende il sole, ama aprire\ni suoi petali per assorbire i raggi\nsolari con tutto il corpo.",
+                "height": "0,5 m",
+                "weight": "9,3 kg"
+            },
+            "ko": {
+                "name": "체리꼬",
+                "category": "벚꽃포켓몬",
+                "entry": "강한 햇살을 느끼면\n움츠려 있던 꽃잎을 펼쳐\n전신으로 햇빛을 받는다.",
+                "height": "0.5 m",
+                "weight": "9.3 kg"
+            },
+            "es": {
+                "name": "Cherrim",
+                "category": "Pokémon Floración",
+                "entry": "Cuando detecta luz solar fuerte,\ndespliega los pétalos y absorbe\ntodos los rayos posibles.",
+                "height": "0,5 m",
+                "weight": "9,3 kg"
+            },
+            "ja": {
+                "name": "チェリム",
+                "category": "サクラポケモン",
+                "entry": "つよい\\x{3000}ひざしを\\x{3000}かんじとると\nとざしていた\\x{3000}はなびらを\\x{3000}ひろげ\nぜんしんで\\x{3000}にっこうを\\x{3000}あびる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff19}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 60,
+        "defense": 70,
+        "speed": 85,
+        "special_attack": 87,
+        "special_defense": 78
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_MIRACLE_SEED",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FAIRY", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_FLOWER_GIFT", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 2,
+        "sprite_offset": 37
+    },
+    "color": "COLOR_PINK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 158,
+    "height": 5,
+    "weight": 93,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MORNING_SUN" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWTH" ],
+            [ 7, "MOVE_GROWTH" ],
+            [ 10, "MOVE_LEECH_SEED" ],
+            [ 13, "MOVE_HELPING_HAND" ],
+            [ 19, "MOVE_MAGICAL_LEAF" ],
+            [ 22, "MOVE_SUNNY_DAY" ],
+            [ 25, "MOVE_PETAL_DANCE" ],
+            [ 30, "MOVE_WORRY_SEED" ],
+            [ 35, "MOVE_TAKE_DOWN" ],
+            [ 43, "MOVE_SOLAR_BEAM" ],
+            [ 48, "MOVE_LUCKY_CHANT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CHERUBI"
+}

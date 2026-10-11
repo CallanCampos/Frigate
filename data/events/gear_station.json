@@ -1,0 +1,348 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 7,
+            "condition": 0,
+            "direction": 1,
+            "rail": {
+                "component": 2,
+                "front": 4,
+                "side": -3
+            }
+        },
+        {
+            "script": 12,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 3,
+                "front": 1,
+                "side": -4
+            }
+        },
+        {
+            "script": 9,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 1,
+                "front": 10,
+                "side": -4
+            }
+        },
+        {
+            "script": 13,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 1,
+                "front": 4,
+                "side": -4
+            }
+        },
+        {
+            "script": 15,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 0,
+                "front": 13,
+                "side": -4
+            }
+        },
+        {
+            "script": 10,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 0,
+                "front": 0,
+                "side": -4
+            }
+        },
+        {
+            "script": 14,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 0,
+                "front": 6,
+                "side": -4
+            }
+        },
+        {
+            "script": 11,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 2,
+                "front": 9,
+                "side": -4
+            }
+        },
+        {
+            "script": 8,
+            "condition": 0,
+            "direction": 4,
+            "rail": {
+                "component": 3,
+                "front": 7,
+                "side": -4
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 46,
+            "movement": 81,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 2,
+                "height": 4
+            },
+            "rail": {
+                "component": 3,
+                "front": 1,
+                "side": 1
+            }
+        },
+        {
+            "id": 1,
+            "model": 68,
+            "movement": 70,
+            "type": 0,
+            "flag": 0,
+            "script": 1,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 2,
+                "front": 14,
+                "side": 1
+            }
+        },
+        {
+            "id": 2,
+            "model": 68,
+            "movement": 81,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 2,
+                "height": 2
+            },
+            "rail": {
+                "component": 0,
+                "front": 14,
+                "side": 1
+            }
+        },
+        {
+            "id": 3,
+            "model": 10,
+            "movement": 69,
+            "type": 0,
+            "flag": 0,
+            "script": 6,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 0,
+                "front": 6,
+                "side": 2
+            }
+        },
+        {
+            "id": 4,
+            "model": 30,
+            "movement": 69,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0285",
+            "script": 10310,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 3,
+                "front": 13,
+                "side": 3
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_GEAR_STATION_2",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 3,
+                "front": 9,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_3",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 3,
+                "front": 2,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_4",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 1,
+                "front": 12,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_5",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 1,
+                "front": 6,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_6",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 2,
+                "front": 12,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_7",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 0,
+                "front": 3,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_8",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 2,
+                "front": 6,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": "ZONE_GEAR_STATION_9",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "rail": {
+                "component": 0,
+                "front": 9,
+                "side": -4,
+                "front_span": 3,
+                "side_span": 1,
+                "param": 1
+            }
+        },
+        {
+            "zone": 65535,
+            "warp": 65535,
+            "unk4": 3,
+            "transition": 1,
+            "rail": {
+                "component": 5,
+                "front": 0,
+                "side": 0,
+                "front_span": 1,
+                "side_span": 1,
+                "param": 2
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 4,
+            "var": "EVENT_WORK_0x400a",
+            "value": 0,
+            "type": 0,
+            "rail": {
+                "component": 2,
+                "front": 0,
+                "side": -4,
+                "front_span": 1,
+                "side_span": 1
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": [
+        {
+            "type": 1,
+            "conditions": [
+                {
+                    "var": "EVENT_WORK_0x417c",
+                    "value": 1,
+                    "script": 5
+                }
+            ]
+        }
+    ]
+}

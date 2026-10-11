@@ -1,5 +1,6 @@
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "gfl/std.h"
@@ -9,7 +10,7 @@
 // The game's beacon status, kept in GameData: among others, the greeting that the player's beacons send
 
 // The game beacon's messages, and its default greeting ("Hiya!")
-#define MSG_GAME_BEACON 11
+#define MSG_GAME_BEACON TEXT_BANK_GAME_BEACON
 #define MSG_GAME_BEACON_DEFAULT_GREETING 21
 
 #define BEACON_STATUS_GREETING_SIZE 9
@@ -50,7 +51,8 @@ void BeaconStatus_Free(BeaconStatus *status) {
     GFL_HeapFree(status);
 }
 
-void func_0202d7a8(BeaconStatus *status) {
+BeaconStatus *func_0202d7a8(BeaconStatus *status) {
+    return status;
 }
 
 u8 func_0202d7ac(BeaconStatus *status) {

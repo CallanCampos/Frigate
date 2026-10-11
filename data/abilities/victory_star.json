@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Victory Star",
+    "description": "Boosts the accuracy of its\nallies and itself."
+}

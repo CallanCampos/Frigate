@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SKARMORY",
+    "moves": [ "MOVE_SPIKES", "MOVE_STEALTH_ROCK", "MOVE_WHIRLWIND", "MOVE_TOXIC" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_LUM_BERRY",
+    "form": 0
+}

@@ -1,0 +1,32 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rival",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_RIVAL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PIGNITE",
+            "form": 0,
+            "level": 20,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_CHARCOAL"
+        },
+        {
+            "species": "SPECIES_PIDOVE",
+            "form": 0,
+            "level": 18,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_NONE"
+        }
+    ],
+    "messages": []
+}

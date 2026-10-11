@@ -9,8 +9,8 @@
 #include "app/win_record.h"
 #include "field/event_battle.h"
 #include "field/field_event.h"
-#include "field/ov134.h"
-#include "field/ov135.h"
+#include "field/wbt_battle.h"
+#include "field/wbt_makematch.h"
 #include "field/wbt.h"
 #include "gfl/sound.h"
 #include "gfl/std.h"
@@ -77,7 +77,7 @@ static GameEventReturnCode EventWbtPokeSelect_Callback(GameEvent *event, u32 *st
         (*state)++;
         break;
     case 5:
-        func_ov135_021efaa8(work->sys, &work->partyParam);
+        WbtMakeMatch_ReadPick(work->sys, &work->partyParam);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -93,8 +93,8 @@ GameEvent *EventWbtPokeSelect_Create(GameSystem *gsys, void *args) {
     work->gsys = gsys;
     work->field = field;
     work->sys = sys;
-    func_ov135_021efb60(sys, gameData, &work->partyParam);
-    func_ov135_021efbb4(sys, gameData, &work->summaryParam);
+    WbtMakeMatch_SetupPokeList(sys, gameData, &work->partyParam);
+    WbtMakeMatch_SetupPStatus(sys, gameData, &work->summaryParam);
     return event;
 }
 
@@ -146,13 +146,13 @@ static GameEventReturnCode EventWbtBattle_Callback(GameEvent *event, u32 *state,
     switch (*state) {
     case 0:
         field = GSYS_GetField(gsys);
-        work->setup = func_ov134_021f04c0(sys, gsys);
+        work->setup = WbtBattle_SetupBattle(sys, gsys);
         GameEvent_ChainNext(event, func_ov012_02168924(gsys, field, work->setup));
         *state = 1;
         break;
     case 1:
-        func_ov134_021f065c(sys, GSYS_GetGameData(gsys), work->setup);
-        func_ov134_021f05c4(sys, work->setup);
+        WbtBattle_EndBattle(sys, GSYS_GetGameData(gsys), work->setup);
+        WbtBattle_FreeBattle(sys, work->setup);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;

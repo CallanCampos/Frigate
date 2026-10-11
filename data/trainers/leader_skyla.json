@@ -1,0 +1,57 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Skyla",
+    "class": "TRAINER_CLASS_LEADER_SKYLA",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SWOOBAT",
+            "form": 0,
+            "level": 37,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_ACROBATICS", "MOVE_HEART_STAMP", "MOVE_ASSURANCE", "MOVE_ATTRACT" ]
+        },
+        {
+            "species": "SPECIES_SKARMORY",
+            "form": 0,
+            "level": 37,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_AIR_CUTTER", "MOVE_STEEL_WING", "MOVE_FURY_ATTACK", "MOVE_AGILITY" ]
+        },
+        {
+            "species": "SPECIES_SWANNA",
+            "form": 0,
+            "level": 39,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_AIR_SLASH", "MOVE_BUBBLE_BEAM", "MOVE_ROOST", "MOVE_FEATHER_DANCE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "When I think about how you might\nattack, it's like I'm walking on air!"
+        },
+        {
+            "type": 19,
+            "text": "Never give up! To do so is an insult to the\nPokémon who fight for you!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I won't forget this battle!\nI'm glad that I could fight against you!"
+        }
+    ]
+}

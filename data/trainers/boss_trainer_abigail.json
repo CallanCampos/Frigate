@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Abigail",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_ABIGAIL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WATCHOG",
+            "form": 0,
+            "level": 53,
+            "difficulty": 32,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SHELL_BELL",
+            "moves": [ "MOVE_CRUNCH", "MOVE_HYPER_FANG", "MOVE_LOW_KICK", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_WHIRLIPEDE",
+            "form": 0,
+            "level": 53,
+            "difficulty": 32,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_BLACK_SLUDGE",
+            "moves": [ "MOVE_STEAMROLLER", "MOVE_TOXIC_SPIKES", "MOVE_IRON_DEFENSE", "MOVE_PROTECT" ]
+        },
+        {
+            "species": "SPECIES_GOLETT",
+            "form": 0,
+            "level": 53,
+            "difficulty": 32,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_MUSCLE_BAND",
+            "moves": [ "MOVE_MAGNITUDE", "MOVE_ROCK_SLIDE", "MOVE_SHADOW_PUNCH", "MOVE_IRON_DEFENSE" ]
+        }
+    ],
+    "messages": []
+}

@@ -1,22 +1,22 @@
-{bd02}The {0102:0} Ninja escaped\n{bd02}while Mecha Cop was\n{bd02}escorting him to jail!
-{bd02}Soon after, Mecha Cop\n{bd02}received a tip...
-{bd02}The {0102:0} Ninja boldly warned\n{bd02}Mecha Cop of his plans to steal\n{bd02}a secret treasure--the Rainbow Pearl!
-{bd02}Mecha Cop! Hurry and\n{bd02}protect the Rainbow Pearl!
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The {0102:0} Ninja escaped\n{bd02}while Mecha Cop was\n{bd02}escorting her to jail!
-{bd02}Soon after, Mecha Cop\n{bd02}received a tip...
-{bd02}The {0102:0} Ninja boldly warned\n{bd02}Mecha Cop of her plans to steal\n{bd02}a secret treasure--the Rainbow Pearl!
-{bd02}Mecha Cop! Hurry and\n{bd02}protect the Rainbow Pearl!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0271_Text_NinjaEscapedWhileMecha = {bd02}The {0102:0} Ninja escaped\n{bd02}while Mecha Cop was\n{bd02}escorting him to jail!
+Bank0271_Text_SoonAfterMechaCop = {bd02}Soon after, Mecha Cop\n{bd02}received a tip...
+Bank0271_Text_NinjaBoldlyWarnedMecha = {bd02}The {0102:0} Ninja boldly warned\n{bd02}Mecha Cop of his plans to steal\n{bd02}a secret treasure--the Rainbow Pearl!
+Bank0271_Text_MechaCopHurryProtect = {bd02}Mecha Cop! Hurry and\n{bd02}protect the Rainbow Pearl!
+Bank0271_Text_Empty = なし
+Bank0271_Text_Empty_2 = なし
+Bank0271_Text_Empty_3 = なし
+Bank0271_Text_Empty_4 = なし
+Bank0271_Text_Empty_5 = なし
+Bank0271_Text_Empty_6 = なし
+Bank0271_Text_NinjaEscapedWhileMecha_2 = {bd02}The {0102:0} Ninja escaped\n{bd02}while Mecha Cop was\n{bd02}escorting her to jail!
+Bank0271_Text_SoonAfterMechaCop_2 = {bd02}Soon after, Mecha Cop\n{bd02}received a tip...
+Bank0271_Text_NinjaBoldlyWarnedMecha_2 = {bd02}The {0102:0} Ninja boldly warned\n{bd02}Mecha Cop of her plans to steal\n{bd02}a secret treasure--the Rainbow Pearl!
+Bank0271_Text_MechaCopHurryProtect_2 = {bd02}Mecha Cop! Hurry and\n{bd02}protect the Rainbow Pearl!
+Bank0271_Text_Empty_7 = なし
+Bank0271_Text_Empty_8 = なし
+Bank0271_Text_Empty_9 = なし
+Bank0271_Text_Empty_10 = なし
+Bank0271_Text_Empty_11 = なし
+Bank0271_Text_Empty_12 = なし
+Bank0271_Text_Empty_13 = なし
 \pad{60}

@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Derek",
+    "class": "TRAINER_CLASS_DOCTOR",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_HEAL", "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": true,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SWOOBAT",
+            "form": 0,
+            "level": 38,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "People with a strong life force look so\nvibrant and alive!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your life force is positively blinding!\nUgh! What is this?!"
+        },
+        {
+            "type": 13,
+            "text": "All right, here I go!\nLife force to the max!{be01}"
+        },
+        {
+            "type": 14,
+            "text": "You guys push your life force to the max!\nJust keep on pushing boundaries!"
+        }
+    ]
+}

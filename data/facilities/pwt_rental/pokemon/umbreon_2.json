@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_UMBREON",
+    "moves": [ "MOVE_PAYBACK", "MOVE_MOONLIGHT", "MOVE_STORED_POWER", "MOVE_WORK_UP" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_CHOPLE_BERRY",
+    "form": 0
+}

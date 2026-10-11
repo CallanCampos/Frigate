@@ -1,8 +1,13 @@
 --target=armv5te-none-eabi
 -ffreestanding
 -Iinclude
+-Ilib/dpw/include
+-Ilib/dsprot/include
+-Ilib/dwc/include
 -Ilib/nitro/include
 -Ilib/nnsys/include
 -Ilib/spl/include
+-Ilib/twl/include
+-Ibuild/include/generated
 -std=c99
 -DBLACK2

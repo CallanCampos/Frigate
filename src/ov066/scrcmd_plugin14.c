@@ -3,10 +3,10 @@
 #include "field/field_actor.h"
 #include "field/field_script.h"
 #include "field/field_task.h"
+#include "field/gimmick_dragonspiral_tower_9.h"
+#include "field/gimmick_giant_chasm_6.h"
 #include "field/gimmick_league_center.h"
 #include "field/ov112.h"
-#include "field/ov116.h"
-#include "field/ov132.h"
 #include "gfl/graphics.h"
 #include "gfl/gx_layers.h"
 #include "gfl/sound.h"
@@ -14,8 +14,9 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-// Script plugin 14 (overlay 66), commands from 1000, of zones with story events: Kyurem's at the Giant Chasm (zone
-// 213, whose gimmick is overlay 132), and zones 139, 427 and 604, whose gimmicks are overlays 115, 112 and 116
+// Script plugin 14 (overlay 66), commands from 1000, of zones with story events: the release of the Dark Stone's power
+// at the top of Dragonspiral Tower (zone 213, whose gimmick is overlay 132), the Giant Chasm's innermost cave (zone
+// 604, overlay 116), and zones 139 and 427, whose gimmicks are overlays 115 and 112
 
 typedef struct {
     u32 seq;
@@ -25,33 +26,33 @@ typedef struct {
 static BOOL func_ov066_021e5800(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov116_021eedc0(gsys, VM_Read16(vm));
+    GimmickGC6_ShowModel01(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 static BOOL func_ov066_021e5820(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov116_021eee08(gsys, VM_Read16(vm));
+    GimmickGC6_PlayModel01(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 static BOOL func_ov066_021e5840(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov116_021eee3c(gsys, VM_Read16(vm));
+    GimmickGC6_CallStartHover(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 static BOOL func_ov066_021e5860(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov116_021eeeb4(gsys, ScriptReadAny(vm, env) == TRUE);
+    GimmickGC6_PlayModel23(gsys, ScriptReadAny(vm, env) == TRUE);
     return FALSE;
 }
 
 static BOOL func_ov066_021e5888(VM *vm, FieldScriptEnv *env) {
-    func_ov116_021eee68(FieldScriptEnv_GetGameSystem(env));
+    GimmickGC6_HideModel3(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
@@ -140,7 +141,7 @@ static BOOL func_ov066_021e5a1c(VM *vm, FieldScriptEnv *env) {
 
 static BOOL func_ov066_021e5a2c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov132_021eed78(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickDT9_CreateReleaseEvent(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return TRUE;
@@ -170,7 +171,7 @@ static BOOL func_ov066_021e5a54(VM *vm, FieldScriptEnv *env) {
     to.x = x * (16 * FX32_ONE) + 8 * FX32_ONE;
     to.y = y * (FX32_ONE / 2) * 16;
     to.z = z * (16 * FX32_ONE) + 8 * FX32_ONE;
-    event = func_ov132_021eef30(gsys, &from, &to, a4 * (FX32_ONE / 2) * 16, a5);
+    event = GimmickDT9_CreateThrowEvent(gsys, &from, &to, a4 * (FX32_ONE / 2) * 16, a5);
     if (event == NULL) {
         return TRUE;
     }
@@ -188,13 +189,13 @@ static BOOL func_ov066_021e5b00(VM *vm, FieldScriptEnv *env) {
     pos.x = x * (16 * FX32_ONE) + 8 * FX32_ONE;
     pos.y = y * (FX32_ONE / 2) * 16;
     pos.z = z * (16 * FX32_ONE) + 8 * FX32_ONE;
-    func_ov132_021ef004(gsys, &pos);
+    GimmickDT9_PlayThrown(gsys, &pos);
     return FALSE;
 }
 
 static BOOL func_ov066_021e5b50(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov132_021ef09c(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickDT9_CreateWaitThrownDoneEvent(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return TRUE;
@@ -205,7 +206,7 @@ static BOOL func_ov066_021e5b50(VM *vm, FieldScriptEnv *env) {
 
 static BOOL func_ov066_021e5b78(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov132_021ef080(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickDT9_CreateWaitFifthFrameEvent(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return TRUE;

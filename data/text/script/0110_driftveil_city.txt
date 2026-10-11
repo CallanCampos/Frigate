@@ -1,4 +1,0 @@
-Hotels now line Driftveil.{be01}\nI guess Driftveil's heartbreaker,\nCharles, isn't the big attraction now...
-Have you tried this kind of Poké Ball?{be01}
-My Pokémon are very friendly with me,\nand the reason for this is...{be01}\nTa daa! Because I caught them with\nLuxury Balls!
-\pad{42}

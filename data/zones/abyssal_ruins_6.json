@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 24,
+    "area": 340,
+    "matrix": "MAP_MATRIX_ABYSSAL_RUINS_6",
+    "scripts": "SCRIPTS_ABYSSAL_RUINS_6",
+    "text": "SCRIPT_TEXT_ABYSSAL_RUINS_6",
+    "bgm": "SEQ_BGM_DIVING",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_ABYSSAL_RUINS",
+    "place": "PLACE_ABYSSAL_RUINS",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 1,
+    "camera": 34,
+    "transition": 3,
+    "battle_bg": 8,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 248,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

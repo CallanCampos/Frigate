@@ -3,6 +3,7 @@
 #include "app/title.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -288,7 +289,7 @@ static void DeleteSave_FreeBG(void) {
 static void DeleteSave_InitMsg(DeleteSaveWork *wk) {
     wk->langId = GFL_MsgDataGetDefaultLangID();
     GFL_MsgDataSetDefaultLangID(0);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 4, HEAPID_SAVEDATA_DELETE);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_DELETE_SAVE, HEAPID_SAVEDATA_DELETE);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, HEAPID_SAVEDATA_DELETE);
     wk->strbuf = GFL_StrBufCreate(1024, HEAPID_SAVEDATA_DELETE);
     wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_SAVEDATA_DELETE, HEAPID_SAVEDATA_DELETE, 1, 4);

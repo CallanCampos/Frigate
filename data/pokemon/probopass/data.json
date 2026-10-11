@@ -1,0 +1,184 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Probopass",
+    "pokedex": {
+        "category": "Compass Pokémon",
+        "entry": "It freely controls three units\ncalled Mini-Noses using\nmagnetic force.",
+        "height": "4'07\"",
+        "weight": "749.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Probopass",
+                "category": "Compass Pokémon",
+                "entry": "It freely controls three small\nunits called Mini-Noses using\nmagnetic force.",
+                "height": "4'07\"",
+                "weight": "749.6 lbs."
+            },
+            "fr": {
+                "name": "Tarinorme",
+                "category": "Pokémon Boussole",
+                "entry": "Il utilise sa force magnétique pour\ndiriger trois petites unités\nappelées Mini-nez.",
+                "height": "1,4 m",
+                "weight": "340,0 kg"
+            },
+            "de": {
+                "name": "Voluminas",
+                "category": "Kompass",
+                "entry": "Es steuert drei kleine Einheiten\nmithilfe von starkem Magnetismus.\nMan nennt sie Mininasen.",
+                "height": "1,4 m",
+                "weight": "340,0 kg"
+            },
+            "it": {
+                "name": "Probopass",
+                "category": "Pokémon Bussola",
+                "entry": "Controlla tre piccole unità, dette\nMininasi, usando la forza magnetica.",
+                "height": "1,4 m",
+                "weight": "340,0 kg"
+            },
+            "ko": {
+                "name": "대코파스",
+                "category": "콤파스포켓몬",
+                "entry": "꼬마코파스라고 불리는 작은\n3개의 유닛을 자력으로\n자유자재로 조종한다.",
+                "height": "1.4 m",
+                "weight": "340.0 kg"
+            },
+            "es": {
+                "name": "Probopass",
+                "category": "Pokémon Brújula",
+                "entry": "Con el magnetismo que emana,\ncontrola tres pequeñas unidades\nllamadas Mini-Narices.",
+                "height": "1,4 m",
+                "weight": "340,0 kg"
+            },
+            "ja": {
+                "name": "ダイノーズ",
+                "category": "コンパスポケモン",
+                "entry": "チビノーズと\\x{3000}よばれる\\x{3000}ちいさな\n\\x{ff13}つの\\x{3000}ユニットを\\x{3000}じりょくで\nじゆうじざいに\\x{3000}あやつっている。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff14}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 55,
+        "defense": 145,
+        "speed": 40,
+        "special_attack": 75,
+        "special_defense": 150
+    },
+    "types": [ "TYPE_ROCK", "TYPE_STEEL" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_HARD_STONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_MAGNET_PULL" ],
+    "hidden_ability": "ABILITY_SAND_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 184,
+    "height": 14,
+    "weight": 3400,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MAGNET_RISE" ],
+            [ 1, "MOVE_GRAVITY" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_IRON_DEFENSE" ],
+            [ 1, "MOVE_BLOCK" ],
+            [ 1, "MOVE_MAGNET_BOMB" ],
+            [ 4, "MOVE_IRON_DEFENSE" ],
+            [ 8, "MOVE_BLOCK" ],
+            [ 11, "MOVE_MAGNET_BOMB" ],
+            [ 15, "MOVE_THUNDER_WAVE" ],
+            [ 18, "MOVE_ROCK_BLAST" ],
+            [ 22, "MOVE_REST" ],
+            [ 25, "MOVE_SPARK" ],
+            [ 29, "MOVE_ROCK_SLIDE" ],
+            [ 32, "MOVE_POWER_GEM" ],
+            [ 36, "MOVE_SANDSTORM" ],
+            [ 39, "MOVE_DISCHARGE" ],
+            [ 43, "MOVE_EARTH_POWER" ],
+            [ 46, "MOVE_STONE_EDGE" ],
+            [ 50, "MOVE_LOCK_ON" ],
+            [ 50, "MOVE_ZAP_CANNON" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM23",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM68",
+            "TM69",
+            "TM71",
+            "TM72",
+            "TM73",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_GRAVITY",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 165,
+    "baby_species": "SPECIES_NOSEPASS"
+}

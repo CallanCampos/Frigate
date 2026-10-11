@@ -623,7 +623,7 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
         }
     }
     if (wk->type == 2) {
-        func_ov011_021516a0(TRUE);
+        DWCRap_SetMic(TRUE);
     }
     if (front) {
         wk->mcss[side] = func_0201c14c(wk->mcssSys, pkm, 0, x[side], FX32_CONST(-28), 0);
@@ -631,7 +631,7 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
         wk->mcss[side] = func_0201c14c(wk->mcssSys, pkm, 1, x[side], FX32_CONST(-28), 0);
     }
     if (wk->type == 2) {
-        func_ov011_021516a0(FALSE);
+        DWCRap_SetMic(FALSE);
     }
     func_0201c290(wk->mcss[side]);
     MCSS_SetScale(wk->mcss[side], &scale);

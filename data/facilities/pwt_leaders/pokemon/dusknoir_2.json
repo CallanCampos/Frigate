@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DUSKNOIR",
+    "moves": [ "MOVE_SHADOW_SNEAK", "MOVE_CURSE", "MOVE_PAIN_SPLIT", "MOVE_CONFUSE_RAY" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_APICOT_BERRY",
+    "form": 0
+}

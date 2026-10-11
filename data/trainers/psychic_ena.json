@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ena",
+    "class": "TRAINER_CLASS_PSYCHIC_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BALTOY",
+            "form": 0,
+            "level": 32,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_YAMASK",
+            "form": 0,
+            "level": 32,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "It's coming... It's coming!\nThe ancient spiritual power!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The ancient power!\nThe sacred power!"
+        },
+        {
+            "type": 2,
+            "text": "I feel an extraordinary power emanating\nfrom up ahead!{be01}\nYes! It is a power that burns as warm and\nbright as the sun!"
+        }
+    ]
+}

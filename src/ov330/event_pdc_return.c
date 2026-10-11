@@ -4,6 +4,7 @@
 #include "app/name_entry.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "field/player_state.h"
 #include "field/zone.h"
 #include "gfl/heap.h"
@@ -128,7 +129,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
                 slot = 0;
                 BoxSaveAccessor_GetNextFreeBoxSlot(boxes, &box, &slot);
                 wk->box = box;
-                msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x1b9, HEAPID_PDC_RETURN);
+                msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, HEAPID_PDC_RETURN);
                 wk->boxMessage = GFL_MsgDataLoadStrbufNew(
                     msgData,
                     EventWork_FlagGet(GameData_GetEventWork(prm->gameData), FLAG_PDC_RETURN_BOX_MESSAGE) ? 0xb2 : 0xb1);

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_EXEGGUTOR",
+    "moves": [ "MOVE_PSYSHOCK", "MOVE_GRASS_KNOT", "MOVE_LIGHT_SCREEN", "MOVE_SYNTHESIS" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MILD",
+    "item": "ITEM_PETAYA_BERRY",
+    "form": 0
+}

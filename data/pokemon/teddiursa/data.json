@@ -1,0 +1,198 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Teddiursa",
+    "pokedex": {
+        "category": "Little Bear Pokémon",
+        "entry": "It lets honey soak into its paws\nso it can lick them all the time.\nEvery set of paws tastes unique.",
+        "height": "2'00\"",
+        "weight": "19.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Teddiursa",
+                "category": "Little Bear Pokémon",
+                "entry": "It lets honey soak into its paws\nso it can lick them all the time.\nEvery set of paws tastes unique.",
+                "height": "2'00\"",
+                "weight": "19.4 lbs."
+            },
+            "fr": {
+                "name": "Teddiursa",
+                "category": "Pokémon Mini Ours",
+                "entry": "Il baigne ses griffes dans le miel\npour les lécher. Chaque paire\nde pattes a un goût unique.",
+                "height": "0,6 m",
+                "weight": "8,8 kg"
+            },
+            "de": {
+                "name": "Teddiursa",
+                "category": "Kleinbär",
+                "entry": "Es lässt Honig in seine Pranken\neindringen, so dass es immer\nwelchen dabeihat.",
+                "height": "0,6 m",
+                "weight": "8,8 kg"
+            },
+            "it": {
+                "name": "Teddiursa",
+                "category": "Pokémon Orsetto",
+                "entry": "Si impregna le zampe di miele per poterle\nleccare in continuazione. Ogni assaggio\nha un sapore unico.",
+                "height": "0,6 m",
+                "weight": "8,8 kg"
+            },
+            "ko": {
+                "name": "깜지곰",
+                "category": "아기곰포켓몬",
+                "entry": "달콤한 꿀을 손바닥에\n배어들게 해서 항상 핥고 있다.\n깜지곰에 따라 맛이 다르다.",
+                "height": "0.6 m",
+                "weight": "8.8 kg"
+            },
+            "es": {
+                "name": "Teddiursa",
+                "category": "Pokémon Osito",
+                "entry": "Deja que la miel se le pegue a las\ngarras para lamerla más tarde.\nCada una de ellas sabe diferente.",
+                "height": "0,6 m",
+                "weight": "8,8 kg"
+            },
+            "ja": {
+                "name": "ヒメグマ",
+                "category": "こぐまポケモン",
+                "entry": "あまい\\x{3000}ミツを\\x{3000}てのひらに\nしみこませて\\x{3000}いつも\\x{3000}なめている。\nヒメグマによって\\x{3000}あじが\\x{3000}ちがう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff18}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 80,
+        "defense": 50,
+        "speed": 40,
+        "special_attack": 50,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_PICKUP", "ABILITY_QUICK_FEET" ],
+    "hidden_ability": "ABILITY_HONEY_GATHER",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 66,
+    "height": 6,
+    "weight": 88,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_COVET" ],
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_LICK" ],
+            [ 1, "MOVE_FAKE_TEARS" ],
+            [ 8, "MOVE_FURY_SWIPES" ],
+            [ 15, "MOVE_FAINT_ATTACK" ],
+            [ 22, "MOVE_SWEET_SCENT" ],
+            [ 29, "MOVE_SLASH" ],
+            [ 36, "MOVE_CHARM" ],
+            [ 43, "MOVE_REST" ],
+            [ 43, "MOVE_SNORE" ],
+            [ 50, "MOVE_THRASH" ],
+            [ 57, "MOVE_FLING" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM56",
+            "TM65",
+            "TM66",
+            "TM67",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_LAST_RESORT",
+            "MOVE_SUPERPOWER",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_CRUNCH",
+            "MOVE_TAKE_DOWN",
+            "MOVE_SEISMIC_TOSS",
+            "MOVE_COUNTER",
+            "MOVE_METAL_CLAW",
+            "MOVE_FAKE_TEARS",
+            "MOVE_YAWN",
+            "MOVE_SLEEP_TALK",
+            "MOVE_CROSS_CHOP",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_CLOSE_COMBAT",
+            "MOVE_NIGHT_SLASH",
+            "MOVE_BELLY_DRUM",
+            "MOVE_CHIP_AWAY"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_URSARING"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TEDDIURSA"
+}

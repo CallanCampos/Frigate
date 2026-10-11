@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Drought",
+    "description": "Turns the sunlight harsh\nif it is in battle."
+}

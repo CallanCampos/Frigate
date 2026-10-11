@@ -1,0 +1,181 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Magmortar",
+    "pokedex": {
+        "category": "Blast Pokémon",
+        "entry": "When shooting 3,600 degree F fireballs\nfrom its arms, its body takes on a\nwhitish hue from the intense heat.",
+        "height": "5'03\"",
+        "weight": "149.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Magmortar",
+                "category": "Blast Pokémon",
+                "entry": "When launching 3,600 degrees F\nfireballs, its body takes on a\nwhitish hue from the intense heat.",
+                "height": "5'03\"",
+                "weight": "149.9 lbs."
+            },
+            "fr": {
+                "name": "Maganon",
+                "category": "Pokémon Explosion",
+                "entry": "Quand il lance des boules de feu\nà plus de 2 000 °C, son corps\nest comme chauffé à blanc.",
+                "height": "1,6 m",
+                "weight": "68,0 kg"
+            },
+            "de": {
+                "name": "Magbrant",
+                "category": "Detonation",
+                "entry": "Wenn es seine fast 2 000 Grad heißen\nFeuerbälle abfeuert, nimmt sein Körper\neine weißliche Farbe an.",
+                "height": "1,6 m",
+                "weight": "68,0 kg"
+            },
+            "it": {
+                "name": "Magmortar",
+                "category": "Pokémon Esplosivo",
+                "entry": "Spara palle di fuoco di oltre 2000°C e\nil corpo assume una tinta bianca a causa\ndel calore intenso.",
+                "height": "1,6 m",
+                "weight": "68,0 kg"
+            },
+            "ko": {
+                "name": "마그마번",
+                "category": "폭염포켓몬",
+                "entry": "섭씨 2000도의 불구슬을\n쏘아낼 때 마그마번의 몸은\n열 때문에 약간 하얘진다.",
+                "height": "1.6 m",
+                "weight": "68.0 kg"
+            },
+            "es": {
+                "name": "Magmortar",
+                "category": "Pokémon Explosión",
+                "entry": "Cuando lanza sus bolas de fuego a 2000°,\nsu cuerpo adquiere un tono blanquecino\npor el calor.",
+                "height": "1,6 m",
+                "weight": "68,0 kg"
+            },
+            "ja": {
+                "name": "ブーバーン",
+                "category": "ばくえんポケモン",
+                "entry": "せっし\\x{ff12}\\x{ff10}\\x{ff10}\\x{ff10}どの\\x{3000}ひのたまを\nうちだすとき\\x{3000}ブーバーンの\\x{3000}からだは\nねつのため\\x{3000}ほのかに\\x{3000}しろくなる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff18}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 95,
+        "defense": 67,
+        "speed": 83,
+        "special_attack": 125,
+        "special_defense": 95
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 30,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 3,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_MAGMARIZER",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_FLAME_BODY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_VITAL_SPIRIT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 243,
+    "height": 16,
+    "weight": 680,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_THUNDER_PUNCH" ],
+            [ 1, "MOVE_SMOG" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 1, "MOVE_SMOKE_SCREEN" ],
+            [ 5, "MOVE_EMBER" ],
+            [ 8, "MOVE_SMOKE_SCREEN" ],
+            [ 12, "MOVE_FAINT_ATTACK" ],
+            [ 15, "MOVE_FIRE_SPIN" ],
+            [ 19, "MOVE_CLEAR_SMOG" ],
+            [ 22, "MOVE_FLAME_BURST" ],
+            [ 26, "MOVE_CONFUSE_RAY" ],
+            [ 29, "MOVE_FIRE_PUNCH" ],
+            [ 36, "MOVE_LAVA_PLUME" ],
+            [ 42, "MOVE_SUNNY_DAY" ],
+            [ 49, "MOVE_FLAMETHROWER" ],
+            [ 55, "MOVE_FIRE_BLAST" ],
+            [ 62, "MOVE_HYPER_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM26",
+            "TM27",
+            "TM29",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM50",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM68",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_DUAL_CHOP",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 55,
+    "baby_species": "SPECIES_MAGBY"
+}

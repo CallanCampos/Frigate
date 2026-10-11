@@ -1,0 +1,191 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Alakazam",
+    "pokedex": {
+        "category": "Psi Pokémon",
+        "entry": "The spoons clutched in its hands\nare said to have been created by\nits psychic powers.",
+        "height": "4'11\"",
+        "weight": "105.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Alakazam",
+                "category": "Psi Pokémon",
+                "entry": "The spoons clutched in its hands\nare said to have been created by\nits psychic powers.",
+                "height": "4'11\"",
+                "weight": "105.8 lbs."
+            },
+            "fr": {
+                "name": "Alakazam",
+                "category": "Pokémon Psy",
+                "entry": "On dit que les cuillères qu'il tient\nen permanence ont été créées\npar la puissance de son esprit.",
+                "height": "1,5 m",
+                "weight": "48,0 kg"
+            },
+            "de": {
+                "name": "Simsala",
+                "category": "Psi",
+                "entry": "Man sagt, dass es die Löffel in\nseinen Händen durch Psycho-Kräfte\nselbst erzeugt habe.",
+                "height": "1,5 m",
+                "weight": "48,0 kg"
+            },
+            "it": {
+                "name": "Alakazam",
+                "category": "Pokémon Psico",
+                "entry": "Si dice che abbia creato i cucchiai\nche tiene in mano grazie ai suoi\npoteri psichici.",
+                "height": "1,5 m",
+                "weight": "48,0 kg"
+            },
+            "ko": {
+                "name": "후딘",
+                "category": "초능력포켓몬",
+                "entry": "양손에 지니고 있는 숟가락은\n후딘의 초능력으로\n만들어낸 것이라고 전해진다.",
+                "height": "1.5 m",
+                "weight": "48.0 kg"
+            },
+            "es": {
+                "name": "Alakazam",
+                "category": "Pokémon Psi",
+                "entry": "Se dice que creó las cucharas que\nlleva en las manos con sus poderes\npsíquicos.",
+                "height": "1,5 m",
+                "weight": "48,0 kg"
+            },
+            "ja": {
+                "name": "フーディン",
+                "category": "ねんりきポケモン",
+                "entry": "りょうてに\\x{3000}もつ\\x{3000}スプーンは\nフーディンの\\x{3000}ちょうのうりょくで\nうみだしたモノと\\x{3000}いわれている。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff18}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 50,
+        "defense": 45,
+        "speed": 120,
+        "special_attack": 135,
+        "special_defense": 85
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 50,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 3,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_TWISTED_SPOON",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_SYNCHRONIZE", "ABILITY_INNER_FOCUS" ],
+    "hidden_ability": "ABILITY_MAGIC_GUARD",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 221,
+    "height": 15,
+    "weight": 480,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TELEPORT" ],
+            [ 1, "MOVE_KINESIS" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 16, "MOVE_CONFUSION" ],
+            [ 18, "MOVE_DISABLE" ],
+            [ 22, "MOVE_MIRACLE_EYE" ],
+            [ 24, "MOVE_ALLY_SWITCH" ],
+            [ 28, "MOVE_PSYBEAM" ],
+            [ 30, "MOVE_REFLECT" ],
+            [ 34, "MOVE_TELEKINESIS" ],
+            [ 36, "MOVE_RECOVER" ],
+            [ 40, "MOVE_PSYCHO_CUT" ],
+            [ 42, "MOVE_CALM_MIND" ],
+            [ 46, "MOVE_PSYCHIC" ],
+            [ 48, "MOVE_FUTURE_SIGHT" ],
+            [ 52, "MOVE_TRICK" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM51",
+            "TM52",
+            "TM53",
+            "TM56",
+            "TM57",
+            "TM63",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_FOUL_PLAY",
+            "MOVE_GRAVITY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ROLE_PLAY",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_WONDER_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ABRA"
+}

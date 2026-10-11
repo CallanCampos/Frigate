@@ -1,0 +1,2 @@
+Route16_Text_Route16 = Route 16
+Route16_Text_MarvelousBridgeTrulyMarvelous = Marvelous Bridge\nTruly marvelous! And also a bridge!

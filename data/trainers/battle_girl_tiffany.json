@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tiffany",
+    "class": "TRAINER_CLASS_BATTLE_GIRL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GURDURR",
+            "form": 0,
+            "level": 53,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MIENSHAO",
+            "form": 0,
+            "level": 53,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Oh! A person!\nI haven't met another person in so long!{be01}\nYou're a Trainer, aren't you?!\nThen let's battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Huh? Maybe my instincts have grown dull\nafter so long...?"
+        },
+        {
+            "type": 2,
+            "text": "The roads around here are really very\ncomplicated, so hardly anyone ever comes{be00}\nthis way."
+        }
+    ]
+}

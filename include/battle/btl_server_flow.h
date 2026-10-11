@@ -107,7 +107,7 @@ BOOL ServerControl_EscapeSub(BtlServerFlow *handler, BattleMon *mon, u32 flag);
 BOOL ServerControl_CheckMatchup(BtlServerFlow *handler);
 BOOL func_ov167_021abe88(BtlServerFlow *flow, u8 monId);
 BOOL func_ov167_021abeb4(BtlServerFlow *handler, u8 monIndex);
-u32 func_ov167_021abee0(BtlServerFlow *flow, u8 monId);
+s32 func_ov167_021abee0(BtlServerFlow *flow, u8 monId);
 u32 func_ov167_021abf0c(BtlServerFlow *flow);
 void SetMoveEffectIndex(BtlServerFlow *flow, u8 index);
 BOOL func_ov167_021abf28(BtlServerFlow *flow, u32 money, u8 monId);
@@ -388,7 +388,7 @@ u16 ServerEvent_GetAttackPower(BtlServerFlow *flow, BattleMon *attacker, BattleM
                                const BtlFlowMoveParam *param, BOOL critical);
 u16 ServerEvent_GetTargetDefenses(BtlServerFlow *flow, BattleMon *attacker, BattleMon *defender,
                                   const BtlFlowMoveParam *param, BOOL critical);
-u32 ServerEvent_GetWeather(BtlServerFlow *flow);
+u8 ServerEvent_GetWeather(BtlServerFlow *flow);
 BOOL func_ov167_021ae30c(BtlServerFlow *flow);
 fx32 ServerEvent_SameTypeAttackBonus(BtlServerFlow *flow, BattleMon *attacker, u8 type);
 s32 ServerEvent_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 damage, BOOL *forced);

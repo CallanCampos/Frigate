@@ -16,8 +16,10 @@
 #include "battle/btlv.h"
 #include "battle/pokewood_cutin.h"
 #include "constants/abilities.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "gfl/arc.h"
 #include "gfl/graphics.h"
@@ -48,6 +50,7 @@
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/ringtone_sys.h"
+#include "text/system/ability_handlers_btl_main.h"
 
 // The first mon ID of each client
 static const u8 data_ov167_021d6c24[4] = { 0, 12, 6, 18 };
@@ -1113,8 +1116,8 @@ BOOL func_ov167_0219b160(BtlMainModule *mainModule, s32 *state) {
                     func_ov167_0219d72c(&mainModule->trainers[i], mainModule->heapId, info);
                     if (i != mainModule->playerClientId && setup->unkDD_2) {
                         j = 0;
-                        msgData = GFL_MsgSysLoadData(0, 2, 0x65, mainModule->heapId);
-                        strBuf = GFL_MsgDataLoadStrbufNew(msgData, 0x19);
+                        msgData = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, mainModule->heapId);
+                        strBuf = GFL_MsgDataLoadStrbufNew(msgData, AbilityHandlersBtlMain_Text_Kuro);
                         GFL_MsgDataFree(msgData);
                         str = GFL_StrBufGetStringPtr(strBuf);
                         for (; j < 15 && j < GFL_StrBufGetCharCount(strBuf); j++) {
@@ -1124,8 +1127,8 @@ BOOL func_ov167_0219b160(BtlMainModule *mainModule, s32 *state) {
                         GFL_StrBufFree(strBuf);
                         copyTrainerName(mainModule->trainers[i].playerInfo, name);
                         GFL_StrBufFree(mainModule->trainers[i].name);
-                        msgData = GFL_MsgSysLoadData(0, 2, 0x65, mainModule->heapId);
-                        mainModule->trainers[i].name = GFL_MsgDataLoadStrbufNew(msgData, 0x19);
+                        msgData = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, mainModule->heapId);
+                        mainModule->trainers[i].name = GFL_MsgDataLoadStrbufNew(msgData, AbilityHandlersBtlMain_Text_Kuro);
                         GFL_MsgDataFree(msgData);
                     }
                     func_ov167_0219dfa8(mainModule, i, mainModule->trainers[i].playerInfo);

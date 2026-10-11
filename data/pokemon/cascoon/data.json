@@ -1,0 +1,122 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Cascoon",
+    "pokedex": {
+        "category": "Cocoon Pokémon",
+        "entry": "It never forgets any attack it\nendured while in the cocoon.\nAfter evolution, it seeks payback.",
+        "height": "2'04\"",
+        "weight": "25.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Cascoon",
+                "category": "Cocoon Pokémon",
+                "entry": "It never forgets any attack it\nendured while in the cocoon.\nAfter evolution, it seeks payback.",
+                "height": "2'04\"",
+                "weight": "25.4 lbs."
+            },
+            "fr": {
+                "name": "Blindalys",
+                "category": "Pokémon Cocon",
+                "entry": "Rancunier, il n'oublie aucune des\nattaques subies dans le cocon et\nse venge une fois qu'il a évolué.",
+                "height": "0,7 m",
+                "weight": "11,5 kg"
+            },
+            "de": {
+                "name": "Panekon",
+                "category": "Kokon",
+                "entry": "Es vergisst keinen Angriff, den es\nim Kokon erdulden musste. Nach\nder Entwicklung sinnt es auf Rache.",
+                "height": "0,7 m",
+                "weight": "11,5 kg"
+            },
+            "it": {
+                "name": "Cascoon",
+                "category": "Pokémon Bozzolo",
+                "entry": "Non dimentica mai gli attacchi subiti\ndentro il bozzolo. Dopo l'evoluzione\ncerca di vendicarsi.",
+                "height": "0,7 m",
+                "weight": "11,5 kg"
+            },
+            "ko": {
+                "name": "카스쿤",
+                "category": "번데기포켓몬",
+                "entry": "고치에 들어가 있는 사이에\n받은 공격은 진화해도\n잊지 않고 반드시 앙갚음한다.",
+                "height": "0.7 m",
+                "weight": "11.5 kg"
+            },
+            "es": {
+                "name": "Cascoon",
+                "category": "Pokémon Capullo",
+                "entry": "Jamás olvida a quienes lo atacaron\nmientras estaba en su capullo.\nCuando evoluciona, busca venganza.",
+                "height": "0,7 m",
+                "weight": "11,5 kg"
+            },
+            "ja": {
+                "name": "マユルド",
+                "category": "さなぎポケモン",
+                "entry": "マユに\\x{3000}こもっている\\x{3000}あいだに\nうけた\\x{3000}こうげきは\\x{3000}しんかしても\nわすれずに\\x{3000}かならず\\x{3000}しかえしする。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 35,
+        "defense": 55,
+        "speed": 15,
+        "special_attack": 25,
+        "special_defense": 25
+    },
+    "types": [ "TYPE_BUG", "TYPE_BUG" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SHED_SKIN", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHED_SKIN",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 41,
+    "height": 7,
+    "weight": 115,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HARDEN" ],
+            [ 7, "MOVE_HARDEN" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [ "MOVE_BUG_BITE", "MOVE_IRON_DEFENSE", "MOVE_ELECTROWEB" ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 10,
+            "species": "SPECIES_DUSTOX"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WURMPLE"
+}

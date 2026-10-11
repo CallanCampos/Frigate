@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_PARASECT",
+    "moves": [ "MOVE_SPORE", "MOVE_BULLET_SEED", "MOVE_LEECH_SEED", "MOVE_X_SCISSOR" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

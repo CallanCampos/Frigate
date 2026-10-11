@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Wrap",
+    "description": "A long body or vines are used to wrap and\nsqueeze the target for four to five turns.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_DAMAGE_INFLICT",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 15,
+    "accuracy": 90,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_BIND",
+        "chance": 100,
+        "duration": 4,
+        "min_turns": 5,
+        "max_turns": 6
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_BIND_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

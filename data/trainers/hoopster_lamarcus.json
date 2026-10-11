@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lamarcus",
+    "class": "TRAINER_CLASS_HOOPSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_CALCIUM",
+    "party": [
+        {
+            "species": "SPECIES_MASQUERAIN",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BOUFFALANT",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey! Trainer!{be01}\nI will strike you from above.\nMy attack has a height!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "That's right.\nThe Pokémon do the fighting, not me..."
+        },
+        {
+            "type": 15,
+            "text": "How about this one?\nIt's got quite a flavor!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "We always play basketball\nwith Pokémon here!"
+        }
+    ]
+}

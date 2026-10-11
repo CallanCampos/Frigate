@@ -1,0 +1,37 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_PINWHEEL_FOREST_2",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 248,
+                "y": 16,
+                "z": 488,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_2",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "grid": {
+                "x": 328,
+                "y": 16,
+                "z": 408,
+                "width": 1,
+                "height": 2,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

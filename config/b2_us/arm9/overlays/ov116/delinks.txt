@@ -2,3 +2,8 @@
     .rodata     start:0x021ef1bc end:0x021ef2cc kind:rodata align:4
     .ctor       start:0x021ef2cc end:0x021ef2cc kind:rodata align:4
     .bss        start:0x021ef2e0 end:0x021ef2e0 kind:bss align:32
+
+src/ov116/gimmick_giant_chasm_6.c:
+    complete
+    .text       start:0x021eec80 end:0x021ef1bc
+    .rodata     start:0x021ef1bc end:0x021ef2cc

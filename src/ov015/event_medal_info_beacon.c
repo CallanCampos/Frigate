@@ -42,9 +42,9 @@ GameEventReturnCode func_ov015_0216e660(GameEvent *event, u32 *state, void *data
         sys_memset(&work->param, 0, sizeof(work->param));
         work->param.gsys = work->gsys;
         work->param.gameData = work->gameData;
-        work->param.subscreen = work->subscreen;
-        work->param.mode = work->mode;
-        GSYS_QueueProc(gsys, OVERLAY_MEDAL_INFO, &data_ov187_021ea06c, &work->param);
+        work->param.beaconIndex = work->subscreen;
+        work->param.logRow = work->mode;
+        GSYS_QueueProc(gsys, OVERLAY_MEDAL_INFO, &MedalInfoBeacon_ProcFunctions, &work->param);
         (*state)++;
         break;
     case 4:
@@ -58,7 +58,7 @@ GameEventReturnCode func_ov015_0216e660(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 6:
-        if (work->param.unk09) {
+        if (work->param.returnToField) {
             FieldSubscreen_ChangeImm(Field_GetSubscreen(field), 0);
         }
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));

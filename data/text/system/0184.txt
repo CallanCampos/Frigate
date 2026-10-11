@@ -1,59 +1,59 @@
-Movie Star
-Masked Man
-Brycen-Man: Mwahaha!{be01}\nLet me test you and see if you can defeat\nmy improved Pokémon party.
-Crew: Passengers, we are closing the\nboarding procedures. Please proceed.
-Brycen-Man: You, again...{be01}\nDon't be thinking this will turn out\nthe same way as at the amusement park!
-Crew: Passengers, we are departing soon.\nPlease proceed on board.
-Brycen-Man: Arrgh...{be01}\nI better hurry...
-Crew: Passengers, we are departing soon.\nPlease proceed on board.
-Brycen-Man: I don't have much time left!\nHow annoying!
-Crew: Passengers, we are departing now.
-Brycen-Man: Arrgh...{be01}\nNooooo! I missed the ship!
-Brycen-Man: Go, my Pokémon!{be01}\nUnleash your power, and\ndestroy everything in the port!{be01}\nBuy time so I can...
-???: Hold it right there!
-Brycen-Man: Oh no!\nThat familiar voice...
-???: The Messenger of Truths and Ideals,\nThe {0102:0} Kid enters!{be01}\nStop right there again, Brycen-Man!{be01}\nI cannot allow your mischief!
-Brycen-Man: I knew it was you,\n{0102:0} Kid!{be01}\nMwahaha...\nLong time no see...{be01}\nI'd love to cause you pain slowly here, but\nI have no time to play with you today!
-Crew: I repeat.{be01}\nPassengers, we are closing the\nboarding procedures. Please proceed.
-Brycen-Man: Arrgh...\nI don't have time for this...{be01}\n{0102:0} Kid,\nget out of my way!
-The {0102:0} Kid: Out of MY way!
-Brycen-Man: Such a big mouth!{be01}\nVery well, {0102:0} Kid!\nLet me punish you for making me mad!{be01}\nI'll sink you and your Pokémon to the\nbottom of the sea!
-The {0102:0} Kid: Why would I?
-Brycen-Man: Arg! Shut your mouth!\nI have nothing to chat with you about!{be01}\nGet out of my way already!
-The {0102:0} Kid: Bathroom?
-Brycen-Man: Stop messing with me!{be01}\nBrycen-Man, the Masked Man,\nnever goes to the bathroom!
-Crew: Attention, please.{be01}\nThe ship is ready for departure.{be01}\nPassengers, please proceed to the\nnearest counter.
-Brycen-Man: Arrgh...{be01}\nI'm running out of time... The ship...
-The {0102:0} Kid: What's wrong?{be01}\nYou've been acting funny!\nYou must be planning to do something bad!
-Brycen-Man: Silence!{be01}\nI have no words for you!
-The {0102:0} Kid: You want what?
-Brycen-Man: Don't make me repeat it!\nI have nothing to tell you, OK!{be01}\nJust get out of my sight!
-The {0102:0} Kid: Bathroom, right?
-Brycen-Man: You are persistent!\nI don't need to go to the bathroom{be00}\nat this moment!{be01}\nYou underestimate what a Masked Man can do!\nLet me crush you!
-The {0102:0} Kid: So suspicious!
-Brycen-Man: Mwahaha!\nI am a Masked Man!{be00}\nBeing suspicious is part of wearing a mask!{be01}\nHow could a little kid like you even begin\nto understand my great ambition?!
-Whistles: Toot toot toot!
-Brycen-Man: Arrgh...{be01}\nThe ship...\nThe ship has departed...
-The {0102:0} Kid: Brycen-Man!\nYou are so predictable!{be00}\nThe cruise ship is gone!{be01}\nShe departed safely with the\nblack diamond you were after!
-Brycen-Man: Arrgh...{be01}\nI cannot give up yet... Desperate times call\nfor desperate measures!
-The {0102:0} Kid: Brycen-Man!
-Splash!
-The {0102:0} Kid: Really?\nThose were your desperate measures?{be01}\nI don't think you can catch up...
-Brycen-Man: To fulfill my great ambition,\nthe black diamond is absolutely necessary!{be01}\nI must obtain it no matter how many\nsacrifices I have to make.{be00}\nDon't underestimate masked men!{be01}\nFarewell, {0102:0} Kid!
-Brycen-Man, the Masked Man,\ndisappeared into the ocean{be00}\nto go after the luxury liner.{be01}\nWhat is the nature of his terrible ambition?\nWhat makes him go after the black diamond{be00}\nso persistently?{be01}\nWhatever his plan is,\nwe can count on the {0102:0} Kid!{be01}\nGo on, {0102:0} Kid!{be01}\nGood luck, {0102:0} Kid!
-Brycen-Man: This can't be...{be01}\nWith my Pokémon defeated,\nI cannot steal that hidden treasure,{be00}\nthe black diamond, on the cruise ship...
-The {0102:0} Kid: ...What did you say?\nA hidden treasure? A black diamond?
-Brycen-Man: You don't know anything...{be01}\nThe black diamond is a mysterious hidden\ntreasure that multiplies the power of{be00}\nits owner.
-The {0102:0} Kid: A jewel with\nsuch a great power...
-Brycen-Man: That's right!{be01}\nWith the black diamond,\na little kid like you won't be...
-The {0102:0} Kid: Ha ha ha...
-Brycen-Man: What's so funny...?
-The {0102:0} Kid: Ha ha!{be01}\nAre you telling me with this black diamond,\nI'll be an even stronger hero?
-Brycen-Man: Arrgh...\nYou are not thinking about...
-The {0102:0} Kid: Ha ha.{be01}\nSomething just came up.\nSee you!
-Brycen-Man: Wow, wow... Wait!\nAren't you the hero here?
-The {0102:0} Kid defeated\nBrycen-Man, the Masked Man!{be01}\nHearing from him the power of the black\ndiamond, he is now after the cruise ship!{be01}\nCome on, {0102:0} Kid!{be01}\nWake up, {0102:0} Kid!
-Brycen-Man: Mwahaha!\nI am always quite busy.{be01}\nSo being quick is my second nature.\nThat's how a great Masked Man should be!
-{0102:0} Kid: Aiyee!\nThis can't be happening...
-The {0102:0} Kid was\ndefeated by Brycen-Man, the Masked Man...{be01}\nAnd what's worse...{be01}\nBrycen-Man managed to steal the black\ndiamond that was on board the luxury liner,{be00}\nsold it for a fortune to retire,{be00}\nand lived happily ever after.{be01}\nLong story short...{be01}\nToo bad, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
+Bank0184_Text_MovieStar = Movie Star
+Bank0184_Text_MaskedMan = Masked Man
+Bank0184_Text_BrycenManMwahahaLet = Brycen-Man: Mwahaha!{be01}\nLet me test you and see if you can defeat\nmy improved Pokémon party.
+Bank0184_Text_CrewPassengersWeClosing = Crew: Passengers, we are closing the\nboarding procedures. Please proceed.
+Bank0184_Text_BrycenManAgainDont = Brycen-Man: You, again...{be01}\nDon't be thinking this will turn out\nthe same way as at the amusement park!
+Bank0184_Text_CrewPassengersWeDeparting = Crew: Passengers, we are departing soon.\nPlease proceed on board.
+Bank0184_Text_BrycenManArrghBetter = Brycen-Man: Arrgh...{be01}\nI better hurry...
+Bank0184_Text_CrewPassengersWeDeparting_2 = Crew: Passengers, we are departing soon.\nPlease proceed on board.
+Bank0184_Text_BrycenManDontHave = Brycen-Man: I don't have much time left!\nHow annoying!
+Bank0184_Text_CrewPassengersWeDeparting_3 = Crew: Passengers, we are departing now.
+Bank0184_Text_BrycenManArrghNooooo = Brycen-Man: Arrgh...{be01}\nNooooo! I missed the ship!
+Bank0184_Text_BrycenManGoPokemon = Brycen-Man: Go, my Pokémon!{be01}\nUnleash your power, and\ndestroy everything in the port!{be01}\nBuy time so I can...
+Bank0184_Text_HoldRightThere = ???: Hold it right there!
+Bank0184_Text_BrycenManOhNo = Brycen-Man: Oh no!\nThat familiar voice...
+Bank0184_Text_MessengerTruthsIdealsKid = ???: The Messenger of Truths and Ideals,\nThe {0102:0} Kid enters!{be01}\nStop right there again, Brycen-Man!{be01}\nI cannot allow your mischief!
+Bank0184_Text_BrycenManKnewKid = Brycen-Man: I knew it was you,\n{0102:0} Kid!{be01}\nMwahaha...\nLong time no see...{be01}\nI'd love to cause you pain slowly here, but\nI have no time to play with you today!
+Bank0184_Text_CrewRepeatPassengersWe = Crew: I repeat.{be01}\nPassengers, we are closing the\nboarding procedures. Please proceed.
+Bank0184_Text_BrycenManArrghDont = Brycen-Man: Arrgh...\nI don't have time for this...{be01}\n{0102:0} Kid,\nget out of my way!
+Bank0184_Text_KidOutWay = The {0102:0} Kid: Out of MY way!
+Bank0184_Text_BrycenManSuchBig = Brycen-Man: Such a big mouth!{be01}\nVery well, {0102:0} Kid!\nLet me punish you for making me mad!{be01}\nI'll sink you and your Pokémon to the\nbottom of the sea!
+Bank0184_Text_KidWhyWould = The {0102:0} Kid: Why would I?
+Bank0184_Text_BrycenManArgShut = Brycen-Man: Arg! Shut your mouth!\nI have nothing to chat with you about!{be01}\nGet out of my way already!
+Bank0184_Text_KidBathroom = The {0102:0} Kid: Bathroom?
+Bank0184_Text_BrycenManStopMessing = Brycen-Man: Stop messing with me!{be01}\nBrycen-Man, the Masked Man,\nnever goes to the bathroom!
+Bank0184_Text_CrewAttentionPleaseShip = Crew: Attention, please.{be01}\nThe ship is ready for departure.{be01}\nPassengers, please proceed to the\nnearest counter.
+Bank0184_Text_BrycenManArrghIm = Brycen-Man: Arrgh...{be01}\nI'm running out of time... The ship...
+Bank0184_Text_KidWhatsWrongYouve = The {0102:0} Kid: What's wrong?{be01}\nYou've been acting funny!\nYou must be planning to do something bad!
+Bank0184_Text_BrycenManSilenceHave = Brycen-Man: Silence!{be01}\nI have no words for you!
+Bank0184_Text_KidWantWhat = The {0102:0} Kid: You want what?
+Bank0184_Text_BrycenManDontMake = Brycen-Man: Don't make me repeat it!\nI have nothing to tell you, OK!{be01}\nJust get out of my sight!
+Bank0184_Text_KidBathroomRight = The {0102:0} Kid: Bathroom, right?
+Bank0184_Text_BrycenManPersistentDont = Brycen-Man: You are persistent!\nI don't need to go to the bathroom{be00}\nat this moment!{be01}\nYou underestimate what a Masked Man can do!\nLet me crush you!
+Bank0184_Text_KidSuspicious = The {0102:0} Kid: So suspicious!
+Bank0184_Text_BrycenManMwahahaAm = Brycen-Man: Mwahaha!\nI am a Masked Man!{be00}\nBeing suspicious is part of wearing a mask!{be01}\nHow could a little kid like you even begin\nto understand my great ambition?!
+Bank0184_Text_WhistlesTootTootToot = Whistles: Toot toot toot!
+Bank0184_Text_BrycenManArrghShip = Brycen-Man: Arrgh...{be01}\nThe ship...\nThe ship has departed...
+Bank0184_Text_KidBrycenManPredictable = The {0102:0} Kid: Brycen-Man!\nYou are so predictable!{be00}\nThe cruise ship is gone!{be01}\nShe departed safely with the\nblack diamond you were after!
+Bank0184_Text_BrycenManArrghCannot = Brycen-Man: Arrgh...{be01}\nI cannot give up yet... Desperate times call\nfor desperate measures!
+Bank0184_Text_KidBrycenMan = The {0102:0} Kid: Brycen-Man!
+Bank0184_Text_Splash = Splash!
+Bank0184_Text_KidReallyThoseWere = The {0102:0} Kid: Really?\nThose were your desperate measures?{be01}\nI don't think you can catch up...
+Bank0184_Text_BrycenManFulfillGreat = Brycen-Man: To fulfill my great ambition,\nthe black diamond is absolutely necessary!{be01}\nI must obtain it no matter how many\nsacrifices I have to make.{be00}\nDon't underestimate masked men!{be01}\nFarewell, {0102:0} Kid!
+Bank0184_Text_BrycenManMaskedMan = Brycen-Man, the Masked Man,\ndisappeared into the ocean{be00}\nto go after the luxury liner.{be01}\nWhat is the nature of his terrible ambition?\nWhat makes him go after the black diamond{be00}\nso persistently?{be01}\nWhatever his plan is,\nwe can count on the {0102:0} Kid!{be01}\nGo on, {0102:0} Kid!{be01}\nGood luck, {0102:0} Kid!
+Bank0184_Text_BrycenManCantPokemon = Brycen-Man: This can't be...{be01}\nWith my Pokémon defeated,\nI cannot steal that hidden treasure,{be00}\nthe black diamond, on the cruise ship...
+Bank0184_Text_KidWhatDidSay = The {0102:0} Kid: ...What did you say?\nA hidden treasure? A black diamond?
+Bank0184_Text_BrycenManDontKnow = Brycen-Man: You don't know anything...{be01}\nThe black diamond is a mysterious hidden\ntreasure that multiplies the power of{be00}\nits owner.
+Bank0184_Text_KidJewelSuchGreat = The {0102:0} Kid: A jewel with\nsuch a great power...
+Bank0184_Text_BrycenManThatsRight = Brycen-Man: That's right!{be01}\nWith the black diamond,\na little kid like you won't be...
+Bank0184_Text_KidHaHaHa = The {0102:0} Kid: Ha ha ha...
+Bank0184_Text_BrycenManWhatsFunny = Brycen-Man: What's so funny...?
+Bank0184_Text_KidHaHaTelling = The {0102:0} Kid: Ha ha!{be01}\nAre you telling me with this black diamond,\nI'll be an even stronger hero?
+Bank0184_Text_BrycenManArrghNot = Brycen-Man: Arrgh...\nYou are not thinking about...
+Bank0184_Text_KidHaHaSomething = The {0102:0} Kid: Ha ha.{be01}\nSomething just came up.\nSee you!
+Bank0184_Text_BrycenManWowWow = Brycen-Man: Wow, wow... Wait!\nAren't you the hero here?
+Bank0184_Text_KidDefeatedBrycenMan = The {0102:0} Kid defeated\nBrycen-Man, the Masked Man!{be01}\nHearing from him the power of the black\ndiamond, he is now after the cruise ship!{be01}\nCome on, {0102:0} Kid!{be01}\nWake up, {0102:0} Kid!
+Bank0184_Text_BrycenManMwahahaAm_2 = Brycen-Man: Mwahaha!\nI am always quite busy.{be01}\nSo being quick is my second nature.\nThat's how a great Masked Man should be!
+Bank0184_Text_KidAiyeeCantHappening = {0102:0} Kid: Aiyee!\nThis can't be happening...
+Bank0184_Text_KidDefeatedByBrycen = The {0102:0} Kid was\ndefeated by Brycen-Man, the Masked Man...{be01}\nAnd what's worse...{be01}\nBrycen-Man managed to steal the black\ndiamond that was on board the luxury liner,{be00}\nsold it for a fortune to retire,{be00}\nand lived happily ever after.{be01}\nLong story short...{be01}\nToo bad, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
 \pad{ee}

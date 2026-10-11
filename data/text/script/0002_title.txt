@@ -1,8 +1,0 @@
-{bd02}PLAYER: {0100:0}
-{bd02}This document certifies that\n{bd02}you have made the great\n{bd02}achievement of catching all\n{bd02}the Pokémon in the Unova region.
-                                                      \x{ffff}
-{bd02}GAME FREAK\n{bd02}All the staff
-PLAYER: {0100:0}
-{bd03:0}GAME FREAK\n{bd03:0}All the staff
-This document certifies\nthat you have successfully\ncompleted your\nNational Pokédex.
-\pad{62}

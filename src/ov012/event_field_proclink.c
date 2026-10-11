@@ -11,6 +11,8 @@
 #include "field/field_event.h"
 #include "field/field_sound.h"
 #include "field/itemuse_event.h"
+#include "field/mailsys.h"
+#include "field/mailtool.h"
 #include "field/player_action.h"
 #include "field/player_state.h"
 #include "field/zone.h"
@@ -92,7 +94,7 @@ const FieldProcLink FIELD_PROC_LINK_LIST[15] = {
     { OVERLAY_PSTATUS, &PSTATUS_PROC_FUNCTIONS, func_ov012_0215bb70, func_ov012_0215bcf0, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(144), &TOWNMAP_PROC_FUNCTIONS, func_ov012_0215bf8c, func_ov012_0215bff8, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(204), &data_ov189_021ae03c, func_ov012_0215c10c, func_ov012_0215c138, NULL, func_ov012_0215c594 },
-    { OVERLAY_NONE, &data_ov215_021ab01c, func_ov012_0215c160, func_ov012_0215c218, NULL, func_ov012_0215c2c8 },
+    { OVERLAY_NONE, &MAILSYS_PROC_FUNCTIONS, func_ov012_0215c160, func_ov012_0215c218, NULL, func_ov012_0215c2c8 },
     { OVERLAY_ID(284), &SHINKA_DEMO_PROC_FUNCTIONS, script_evo, func_ov012_0215c3a4, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(272), &BR_MAIN_PROC_FUNCTIONS, func_ov012_0215c3d0, func_ov012_0215c3fc, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(259), &data_ov143_021a039c, func_ov012_0215c438, func_ov012_0215c474, NULL, func_ov012_0215c594 },
@@ -378,7 +380,7 @@ void *func_ov012_0215b7d8(FieldAppCallWork *work, s32 appParam, s32 prevAppId, v
         }
     } else if (prevAppId == FIELD_APP_MAIL) {
         GFL_OvlLoad(OVERLAY_ID(215));
-        mailResult = func_ov215_021a76e0(prevParam);
+        mailResult = MailTool_IsWritten(prevParam);
         GFL_OvlUnload(OVERLAY_ID(215));
         if (work->subMode == 0) {
             param->mode = 11;
@@ -887,20 +889,20 @@ void *func_ov012_0215c160(FieldAppCallWork *work, s32 appParam, s32 prevAppId, v
         work->partySlot = partyParam->index;
         work->item = partyParam->item;
         if (partyParam->result == 6) {
-            return func_ov215_021a75a0(gameData, 2, partyParam->index, PML_ItemGetMailID(partyParam->item),
+            return MailTool_CreateWriteParam(gameData, 2, partyParam->index, PML_ItemGetMailID(partyParam->item),
                                        HEAPID_GAMEEVENT);
         }
         work->subMode = 1;
-        return func_ov215_021a7624(gameData, PokeParty_GetPkm(party, partyParam->index), HEAPID_GAMEEVENT);
+        return MailTool_CreatePokemonViewParam(gameData, PokeParty_GetPkm(party, partyParam->index), HEAPID_GAMEEVENT);
     }
     bag = prevParam;
     if (bag->mode == 2) {
-        param = func_ov215_021a75a0(gameData, 2, bag->item, PML_ItemGetMailID(bag->item), HEAPID_GAMEEVENT);
+        param = MailTool_CreateWriteParam(gameData, 2, bag->item, PML_ItemGetMailID(bag->item), HEAPID_GAMEEVENT);
         work->item = bag->item;
         return param;
     }
     work->subMode = 1;
-    return func_ov215_021a7684(gameData, PML_ItemGetMailID(bag->item), HEAPID_GAMEEVENT);
+    return MailTool_CreateItemViewParam(gameData, PML_ItemGetMailID(bag->item), HEAPID_GAMEEVENT);
 }
 
 u32 func_ov012_0215c218(FieldAppCallWork *work, void *param) {
@@ -908,8 +910,8 @@ u32 func_ov012_0215c218(FieldAppCallWork *work, void *param) {
 
     if (work->prevAppId == FIELD_APP_POKELIST) {
         if (work->subMode == 0 || work->subMode == 2) {
-            if (func_ov215_021a76e0(param) == TRUE) {
-                func_ov215_021a76e4(param, PokeParty_GetPkm(GameData_GetParty(gameData), work->partySlot));
+            if (MailTool_IsWritten(param) == TRUE) {
+                MailTool_GiveMail(param, PokeParty_GetPkm(GameData_GetParty(gameData), work->partySlot));
                 work->nextAppId = FIELD_APP_POKELIST;
             } else if (work->subMode == 0) {
                 work->nextAppId = FIELD_APP_BAG;
@@ -923,8 +925,8 @@ u32 func_ov012_0215c218(FieldAppCallWork *work, void *param) {
         return FIELD_APP_RESULT_NEXT;
     } else if (work->prevAppId == FIELD_APP_BAG) {
         if (work->subMode == 2) {
-            if (func_ov215_021a76e0(param) == TRUE) {
-                func_ov215_021a76e4(param, PokeParty_GetPkm(GameData_GetParty(gameData), work->partySlot));
+            if (MailTool_IsWritten(param) == TRUE) {
+                MailTool_GiveMail(param, PokeParty_GetPkm(GameData_GetParty(gameData), work->partySlot));
                 work->nextAppId = FIELD_APP_POKELIST;
             } else {
                 work->nextAppId = FIELD_APP_POKELIST;
@@ -942,7 +944,7 @@ u32 func_ov012_0215c218(FieldAppCallWork *work, void *param) {
 
 void func_ov012_0215c2c8(void *param) {
     GFL_OvlLoad(OVERLAY_ID(215));
-    func_ov215_021a7704(param);
+    MailTool_FreeParam(param);
     GFL_OvlUnload(OVERLAY_ID(215));
 }
 

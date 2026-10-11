@@ -1,8 +1,0 @@
-#include "asm/trainer.inc"
-
-// Boss Trainer Jariel
-    Trainer class=TRAINER_CLASS_BOSS_TRAINER_M_161, party=PARTY_MOVES | PARTY_ITEMS, ai=AI_FLAG_BASIC | AI_FLAG_EVAL_ATTACK | AI_FLAG_EXPERT, money=50
-    PartyMon level=80, species=SPECIES_ZAPDOS, item=ITEM_LIFE_ORB, move1=MOVE_THUNDER, move2=MOVE_HEAT_WAVE, move3=MOVE_DISCHARGE, move4=MOVE_ROOST
-    PartyMon level=80, species=SPECIES_CRESSELIA, item=ITEM_GANLON_BERRY, move1=MOVE_PSYCHIC, move2=MOVE_SUBSTITUTE, move3=MOVE_MOONLIGHT, move4=MOVE_CALM_MIND
-    PartyMon level=80, species=SPECIES_LATIAS, item=ITEM_WHITE_HERB, move1=MOVE_DRACO_METEOR, move2=MOVE_PSYCHIC, move3=MOVE_ICY_WIND, move4=MOVE_THUNDERBOLT
-    PartyEnd

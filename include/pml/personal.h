@@ -18,6 +18,8 @@
 #define PERSONAL_FORM_SPRITE_OFFSET 31
 #define PERSONAL_FORM_COUNT 32
 // Whether the forms only change the palette, as Arceus's do (not from swan)
+// Whether the sprite may be flipped
+#define PERSONAL_SPRITE_FLIP 34
 #define PERSONAL_PALETTE_FORMS 35
 // Not from swan: a flag that keeps the summary screen's sprite from bouncing, and the weight
 #define PERSONAL_NO_BOUNCE 16

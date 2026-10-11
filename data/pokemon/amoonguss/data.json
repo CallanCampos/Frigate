@@ -1,0 +1,120 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Amoonguss",
+    "pokedex": {
+        "category": "Mushroom Pokémon",
+        "entry": "It moves the caps on both arms\nand does a dance to lure prey.\nIt prefers damp places.",
+        "height": "2'00\"",
+        "weight": "23.1 lbs.",
+        "languages": {
+            "ja": {
+                "category": "きのこポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 114,
+        "attack": 85,
+        "defense": 70,
+        "speed": 30,
+        "special_attack": 85,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_TINY_MUSHROOM",
+        "rare": "ITEM_BIG_MUSHROOM",
+        "very_rare": "ITEM_BALM_MUSHROOM"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_EFFECT_SPORE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_REGENERATOR",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 162,
+    "height": 6,
+    "weight": 105,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ABSORB" ],
+            [ 1, "MOVE_GROWTH" ],
+            [ 1, "MOVE_ASTONISH" ],
+            [ 1, "MOVE_BIDE" ],
+            [ 6, "MOVE_GROWTH" ],
+            [ 8, "MOVE_ASTONISH" ],
+            [ 12, "MOVE_BIDE" ],
+            [ 15, "MOVE_MEGA_DRAIN" ],
+            [ 18, "MOVE_INGRAIN" ],
+            [ 20, "MOVE_FAINT_ATTACK" ],
+            [ 24, "MOVE_SWEET_SCENT" ],
+            [ 28, "MOVE_GIGA_DRAIN" ],
+            [ 32, "MOVE_TOXIC" ],
+            [ 35, "MOVE_SYNTHESIS" ],
+            [ 43, "MOVE_CLEAR_SMOG" ],
+            [ 49, "MOVE_SOLAR_BEAM" ],
+            [ 54, "MOVE_RAGE_POWDER" ],
+            [ 62, "MOVE_SPORE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM86",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_FOUL_PLAY",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_WORRY_SEED",
+            "MOVE_AFTER_YOU",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 162,
+    "baby_species": "SPECIES_FOONGUS"
+}

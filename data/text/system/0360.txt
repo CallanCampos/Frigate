@@ -1,22 +1,22 @@
-{bd02} - SURVEY RADAR -
-{bd02}You can poll the opinions\n{bd02}of people near you.
-{bd02}SELECT A SURVEY
-{bd02}CHECK SURVEY RESULTS
-{bd02} - THINGS TO FIND OUT -
-{bd02}Choose from the items below\n{bd02}to start the survey.
-Do you want to ask\npeople about this item?
-CONFIRM
-CANCEL
-{bd02}The survey is starting.
-{bd02}The survey is\n{bd02}not done yet.
-{bd02}Analyzing the results...
-{bd02}- SURVEY REPORT -
-{bd03:10}No. {0201:0}: {0100:1}\n{bd03:10}{0204:2} Ppl.\n{bd03:10}{0204:3}%
-{bd03:10}My answer is\n{bd03:10}{0100:0}
-{bd03:10}Total met today\n{bd03:10}{0203:0} Ppl.
-{bd03:8}Display Mode:\n{bd03:8}People from today
-{bd03:10}Total number\n{bd03:10}{0205:0} Ppl.
-{bd03:8}Display Mode:\n{bd03:8}Total No. of people
-{bd04:0}Updating\n{bd04:0}data...
-{bd02}Check the survey results
+Bank0360_Text_SurveyRadar = {bd02} - SURVEY RADAR -
+Bank0360_Text_CanPollOpinionsPeople = {bd02}You can poll the opinions\n{bd02}of people near you.
+Bank0360_Text_SelectSurvey = {bd02}SELECT A SURVEY
+Bank0360_Text_CheckSurveyResults = {bd02}CHECK SURVEY RESULTS
+Bank0360_Text_ThingsFindOut = {bd02} - THINGS TO FIND OUT -
+Bank0360_Text_ChooseFromItemsBelow = {bd02}Choose from the items below\n{bd02}to start the survey.
+Bank0360_Text_WantAskPeopleAbout = Do you want to ask\npeople about this item?
+Bank0360_Text_Confirm = CONFIRM
+Bank0360_Text_Cancel = CANCEL
+Bank0360_Text_SurveyStarting = {bd02}The survey is starting.
+Bank0360_Text_SurveyNotDoneYet = {bd02}The survey is\n{bd02}not done yet.
+Bank0360_Text_AnalyzingResults = {bd02}Analyzing the results...
+Bank0360_Text_SurveyReport = {bd02}- SURVEY REPORT -
+Bank0360_Text_NoPpl = {bd03:10}No. {0201:0}: {0100:1}\n{bd03:10}{0204:2} Ppl.\n{bd03:10}{0204:3}%
+Bank0360_Text_Answer = {bd03:10}My answer is\n{bd03:10}{0100:0}
+Bank0360_Text_TotalMetTodayPpl = {bd03:10}Total met today\n{bd03:10}{0203:0} Ppl.
+Bank0360_Text_DisplayModePeopleFrom = {bd03:8}Display Mode:\n{bd03:8}People from today
+Bank0360_Text_TotalNumberPpl = {bd03:10}Total number\n{bd03:10}{0205:0} Ppl.
+Bank0360_Text_DisplayModeTotalNo = {bd03:8}Display Mode:\n{bd03:8}Total No. of people
+Bank0360_Text_UpdatingData = {bd04:0}Updating\n{bd04:0}data...
+Bank0360_Text_CheckSurveyResults_2 = {bd02}Check the survey results
 \pad{6a}

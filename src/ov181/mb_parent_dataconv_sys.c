@@ -9,6 +9,7 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "gfl/ui.h"
+#include "gfl/wih.h"
 #include "gfl/wm_icon.h"
 #include "nitro/mb.h"
 #include "nitro/os.h"
@@ -121,11 +122,11 @@ void *MBDataConv_GetReceivedData(MBDataConv *conv) {
 
 static BOOL MBDataConv_Distribute(MBDataConv *conv, u32 *seq) {
     if (conv->wirelessStarted &&
-        (func_ov030_02174e58() == WH_SYSSTATE_ERROR || func_ov030_02174e58() == WH_SYSSTATE_FATAL)) {
+        (WH_GetSystemState() == WH_SYSSTATE_ERROR || WH_GetSystemState() == WH_SYSSTATE_FATAL)) {
         conv->distributed = FALSE;
-        if (func_ov030_021754a0() == TRUE) {
+        if (WH_Finalize() == TRUE) {
             MBP_FreeBuffers();
-            func_ov030_02175164();
+            WH_Release();
             return TRUE;
         }
         return FALSE;
@@ -138,25 +139,25 @@ static BOOL MBDataConv_Distribute(MBDataConv *conv, u32 *seq) {
         conv->distributed = FALSE;
         GFL_OvlLoad(OVERLAY_ID(30));
         sMBDataConvWirelessDone = FALSE;
-        func_ov030_021750f0(conv->heapId, MBDataConv_OnWirelessDone, 0);
+        WH_Initialize(conv->heapId, MBDataConv_OnWirelessDone, 0);
         func_0203e76c(240, 0, 0, conv->heapId);
         func_0203e810(TRUE, conv->heapId);
         GCTX_HIDSetSoftResetCallback(MBDataConv_SoftResetCallback, conv);
         (*seq)++;
         break;
     case 1:
-        if (func_ov030_02174e58() == WH_SYSSTATE_IDLE && func_ov030_02174e90() == TRUE) {
+        if (WH_GetSystemState() == WH_SYSSTATE_IDLE && WH_StartMeasureChannel() == TRUE) {
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov030_02174e58() == WH_SYSSTATE_MEASURECHANNEL) {
+        if (WH_GetSystemState() == WH_SYSSTATE_MEASURECHANNEL) {
             (*seq)++;
         }
         break;
     case 3:
         MBP_Init(conv->heapId, MB_DATACONV_GGID, MB_TGID_AUTO);
-        MBP_Start(conv->registry, func_ov030_02175030());
+        MBP_Start(conv->registry, WH_GetMeasureChannel());
         (*seq)++;
         break;
     case 4:
@@ -173,13 +174,13 @@ static BOOL MBDataConv_Distribute(MBDataConv *conv, u32 *seq) {
         }
         break;
     case 5:
-        func_ov030_02175578(MBDataConv_OnWirelessDone);
+        WH_End(MBDataConv_OnWirelessDone);
         (*seq)++;
         break;
     case 6:
         if (sMBDataConvWirelessDone == TRUE) {
             GCTX_HIDSetSoftResetCallback(NULL, NULL);
-            func_ov030_02175164();
+            WH_Release();
             (*seq)++;
         }
         break;
@@ -351,7 +352,7 @@ static void MBDataConv_SoftResetCallback(void *work) {
     }
     if (conv->wirelessStarted == TRUE) {
         sMBDataConvWirelessDone = FALSE;
-        while (func_ov030_02175578(MBDataConv_OnWirelessDone)) {
+        while (WH_End(MBDataConv_OnWirelessDone)) {
             irq_waitFor(TRUE, OS_IE_V_BLANK);
         }
         while (sMBDataConvWirelessDone == FALSE) {

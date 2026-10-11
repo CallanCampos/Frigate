@@ -23,17 +23,35 @@ typedef struct {
     int (*getInfoSize)(void *work);
     void *(*unk18)(void *work);
     int (*unk1C)(void *work);
+    // Whether a beacon's game is one to join, a BOOL (*)(u8 gameCommandBase, u8 beaconCommandBase, void *work) that the
+    // games give with fewer parameters
     void *unk20;
     void (*unk24)(NetHandle *handle, int a1, void *work);
     void (*unk28)(NetHandle *handle, int a1, void *work);
     void (*unk2C)(void *work);
     void (*unk30)(void *work);
-    u8 unk34[0xc];
+    // 12 bytes that the games' init data zero, the last four of which are a function that dwc_rap.c calls with each
+    // Wi-Fi library error it queues (its code and its second value), and the game's work
+    union {
+        u8 unk34[0xc];
+        struct {
+            u8 unk34_0[8];
+            void (*callback)(int code, int param, void *work);
+        } wifiError;
+    } unk34;
     int (*unk40)(void *work);
     int (*unk44)(void *work);
     // The size of the heap for Wi-Fi
     u32 wifiHeapSize;
-    u8 unk4C[8];
+    // The game's ID in the wireless beacons (gameId, of which the low 16 bits go in them) after four more bytes. The
+    // games' init data give the bytes
+    union {
+        u8 unk4C[8];
+        struct {
+            u32 unk4C_0;
+            u32 gameId;
+        } id;
+    } unk4C;
     HeapID parentHeapId;
     HeapID heapId;
     HeapID wifiHeapId;
@@ -72,30 +90,35 @@ typedef BOOL (*GFLNetSendDoneFunc)(BOOL ok);
 
 typedef struct {
     void (*unk00)(int a0, int a1);
-    void (*init)(HeapID heapId, void *sys, int a2, void *work);
-    void (*unk08)(int a0);
+    // Starts the device; the callback, which the wireless device calls when its helper ends, is NULL from the net
+    BOOL (*init)(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work);
+    BOOL (*unk08)(void (*callback)(BOOL ok));
     // Runs the device each frame with the connected machines, returning a negative error or a status
     int (*update)(u16 connectBits);
     BOOL (*unk10)(int a0, int a1);
-    BOOL (*unk14)(int a0);
-    u8 unk18[0x10];
+    BOOL (*unk14)(void (*callback)(BOOL ok));
+    BOOL (*unk18)(void);
+    BOOL (*unk1C)(void);
+    BOOL (*unk20)(void);
+    BOOL (*unk24)(void);
     // A found beacon's data and MAC address, by index
     void *(*unk28)(int index);
     u8 *(*unk2C)(int index);
-    u8 unk30[8];
+    BOOL (*unk30)(void);
+    BOOL (*unk34)(void);
     BOOL (*unk38)(int a0);
-    void (*setDisconnectCallback)(void (*callback)(int netId));
+    BOOL (*setDisconnectCallback)(void (*callback)(int netId));
     int (*unk40)(int a0, BOOL (*callback)(void));
     BOOL (*unk44)(int a0, int a1);
     int (*unk48)(BOOL a0, const u8 *mac, int a2, int a3, void (*callback)(void));
-    u8 unk4C[4];
+    BOOL (*unk4C)(int a0, int a1, int a2, int a3);
     BOOL (*unk50)(int a0, int a1, int a2);
     BOOL (*unk54)(BOOL a0, int a1);
     BOOL (*unk58)(void);
     BOOL (*unk5C)(u8 *data);
     u8 *(*getRecvData)(int netId);
     BOOL (*send)(u8 *data, int size, int a2, GFLNetSendDoneFunc callback);
-    void (*setRecvCallback)(GFLNetRecvFunc callback);
+    BOOL (*setRecvCallback)(GFLNetRecvFunc callback);
     BOOL (*unk6C)(void);
     BOOL (*isConnected)(void);
     BOOL (*unk74)(void);
@@ -103,10 +126,11 @@ typedef struct {
     int (*getConnectBits)(void);
     int (*getNetId)(void);
     int (*getSignalLevel)(void);
-    BOOL (*isError)(void);
+    int (*isError)(void);
     void (*unk8C)(int a0);
     int (*unk90)(int a0);
-    u8 unk94[8];
+    int (*unk94)(void);
+    int (*unk98)(void);
     void (*unk9C)(void);
     BOOL (*unkA0)(void);
     BOOL (*unkA4)(void);
@@ -177,6 +201,14 @@ void *func_02012908(HeapID heapId, u32 a1);
 void func_02012994(void *work);
 void func_02012a4c(void);
 void GFL_NetErrAbort(void);
+void func_02012050(void);
+// Shows the error screen for an assertion that failed
+void AssertFailErrorDisp(void);
+// The wireless signal level of the DS Download Play, and the record of the best level a scan saw, which it sets and
+// clears
+u16 func_02012ea0(void);
+void func_02012ebc(u8 linkLevel);
+void func_02012edc(void);
 
 // The device table for a GFL_NET_TYPE_*, from outside the library
 const GFLNetDevTable *func_020116c0(int type);
@@ -208,7 +240,8 @@ void func_020429e0(u8 *mac, int index);
 void func_020429e8(void *a0);
 void func_020429f0(void);
 void func_020429f8(void (*callback)(void *work));
-void func_02042a10(void);
+// The argument is unused
+void func_02042a10(int unused);
 void func_02042a1c(int a0);
 void func_02042a30(int mode, int a1, const u8 *mac);
 BOOL func_02042a38(void);
@@ -230,13 +263,14 @@ BOOL func_02042bc4(void);
 BOOL func_02042bd8(NetHandle *handle);
 // Send a command to every machine, or to one; the game's commands wait for the negotiation
 BOOL func_02042be8(NetHandle *handle, int command, u16 size, const void *data);
-BOOL func_02042c18(NetHandle *handle, u32 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
+BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
                    BOOL noCopy);
 BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6, BOOL noCopy);
 BOOL func_02042cfc(void);
 void func_02042d04(NetHandle *handle, u16 timing);
 BOOL func_02042d0c(NetHandle *handle, u16 timing);
-void func_02042d14(u8 gameCommandBase);
+// The second argument is unused
+void func_02042d14(u8 gameCommandBase, u8 unused);
 u8 func_02042d34(void);
 // Whether the net game command base is one of the battle kinds
 BOOL func_02011844(void);
@@ -275,44 +309,5 @@ void func_02042f50(BOOL a0);
 BOOL func_0205b5ec(void);
 int func_0205b250(void);
 void func_0205b198(void);
-
-// From the wireless code in overlay 30: the filter that a scan passes each machine it finds to, with the filter's work
-// (the GFL net work), and how long a parent scans for children
-typedef BOOL (*NetScanFilter)(const void *info, void *work);
-// The game service ID of a beacon the scan found
-u8 func_ov030_02173b78(int index);
-void func_ov030_02175334(NetScanFilter filter);
-void func_ov030_02175658(u16 time);
-
-// wih.c, overlay 30's wireless helper, which grew out of NitroSDK's demo wh.c; the DS Download Play parent uses it to
-// pick a channel and to shut the wireless down. The comments give the wh.c functions these appear to be
-
-// The helper's states (WH_SYSSTATE_*)
-enum {
-    WH_SYSSTATE_STOP,
-    WH_SYSSTATE_IDLE,
-    WH_SYSSTATE_SCANNING,
-    WH_SYSSTATE_BUSY,
-    WH_SYSSTATE_CONNECTED,
-    WH_SYSSTATE_DATASHARING,
-    WH_SYSSTATE_KEYSHARING,
-    WH_SYSSTATE_MEASURECHANNEL,
-    WH_SYSSTATE_CONNECT_FAIL,
-    WH_SYSSTATE_ERROR,
-    WH_SYSSTATE_FATAL,
-};
-
-// Called when the wireless has ended, with whether that succeeded. The callers ignore its result
-typedef BOOL (*WHCallback)(BOOL success);
-
-int func_ov030_02174e58(void);  // WH_GetSystemState
-BOOL func_ov030_02174e90(void); // WH_StartMeasureChannel
-u16 func_ov030_02175030(void);  // WH_GetMeasureChannel
-// Starts the helper with its work on the heap given
-BOOL func_ov030_021750f0(HeapID heapId, WHCallback callback, u32 unused);
-// Frees the helper's work
-void func_ov030_02175164(void);
-BOOL func_ov030_021754a0(void);                // WH_Finalize
-BOOL func_ov030_02175578(WHCallback callback); // WH_End
 
 #endif // POKEBW2_GFL_NET_H

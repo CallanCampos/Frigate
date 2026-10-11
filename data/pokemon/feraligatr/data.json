@@ -1,0 +1,190 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Feraligatr",
+    "pokedex": {
+        "category": "Big Jaw Pokémon",
+        "entry": "It usually moves slowly, but it\ngoes at blinding speed when it\nattacks and bites prey.",
+        "height": "7'07\"",
+        "weight": "195.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Feraligatr",
+                "category": "Big Jaw Pokémon",
+                "entry": "It usually moves slowly, but it\ngoes at blinding speed when it\nattacks and bites prey.",
+                "height": "7'07\"",
+                "weight": "195.8 lbs."
+            },
+            "fr": {
+                "name": "Aligatueur",
+                "category": "Pokémon Mâchoire",
+                "entry": "Ce Pokémon à l'air pataud est\ncapable d'attaquer à la vitesse\nde l'éclair pour mordre sa proie.",
+                "height": "2,3 m",
+                "weight": "88,8 kg"
+            },
+            "de": {
+                "name": "Impergator",
+                "category": "Großmaul",
+                "entry": "Eigentlich bewegt es sich\nlangsam, doch seine Beute\ngreift es blitzschnell an.",
+                "height": "2,3 m",
+                "weight": "88,8 kg"
+            },
+            "it": {
+                "name": "Feraligatr",
+                "category": "Pokémon Mascellone",
+                "entry": "Di solito si muove lentamente, ma quando\nattacca e morde la preda si muove ad una\nvelocità incredibile.",
+                "height": "2,3 m",
+                "weight": "88,8 kg"
+            },
+            "ko": {
+                "name": "장크로다일",
+                "category": "큰턱포켓몬",
+                "entry": "평소에는 느긋하게 움직이지만\n먹이를 물 때에는 눈에 보이지\n않는 엄청난 스피드를 낸다.",
+                "height": "2.3 m",
+                "weight": "88.8 kg"
+            },
+            "es": {
+                "name": "Feraligatr",
+                "category": "Pokémon Fauces",
+                "entry": "Se suele mover lento, pero alcanza\nvelocidades de vértigo al atacar y\nmorder a sus enemigos.",
+                "height": "2,3 m",
+                "weight": "88,8 kg"
+            },
+            "ja": {
+                "name": "オーダイル",
+                "category": "おおあごポケモン",
+                "entry": "ふだんは\\x{3000}ゆっくりとした\\x{3000}うごきだが\nえものに\\x{3000}かみつくときは\nめにも\\x{3000}とまらない\\x{3000}スピードだ。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff18}\\x{ff18}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 85,
+        "attack": 105,
+        "defense": 100,
+        "speed": 78,
+        "special_attack": 79,
+        "special_defense": 83
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_WATER_1" ],
+    "abilities": [ "ABILITY_TORRENT", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHEER_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 239,
+    "height": 23,
+    "weight": 888,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 1, "MOVE_RAGE" ],
+            [ 6, "MOVE_WATER_GUN" ],
+            [ 8, "MOVE_RAGE" ],
+            [ 13, "MOVE_BITE" ],
+            [ 15, "MOVE_SCARY_FACE" ],
+            [ 21, "MOVE_ICE_FANG" ],
+            [ 24, "MOVE_FLAIL" ],
+            [ 30, "MOVE_AGILITY" ],
+            [ 32, "MOVE_CRUNCH" ],
+            [ 37, "MOVE_CHIP_AWAY" ],
+            [ 45, "MOVE_SLASH" ],
+            [ 50, "MOVE_SCREECH" ],
+            [ 58, "MOVE_THRASH" ],
+            [ 63, "MOVE_AQUA_TAIL" ],
+            [ 71, "MOVE_SUPERPOWER" ],
+            [ 76, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM02",
+            "TM05",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM52",
+            "TM55",
+            "TM56",
+            "TM65",
+            "TM68",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM82",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_WATER_PLEDGE",
+            "MOVE_HYDRO_CANNON",
+            "MOVE_LOW_KICK",
+            "MOVE_UPROAR",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SPITE",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TOTODILE"
+}

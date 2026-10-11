@@ -1,8 +1,0 @@
-It's too bad. If you had a Pokémon\nwith you as well, you could compete{be00}\nwith {0100:1} and see who is the{be00}\nbetter Trainer!
-To be honest, I don't want\nmy son to go on a journey.{be00}\nI mean, his goal is...{be01}\nBut there is no parent who doesn't\nwish for his or her child to grow.
-It looks like my son found\nsomething important.{be01}\nIt's all because Pokémon--\nand you--were by his side!
-Someday you will both go on a\njourney with your Pokémon, too!
-{0100:0}...{be01}\nIf {0100:1} loses his way\non the path, or in life really,{be00}\nplease help him, won't you?{be01}\nHe's the kind of person who, well,\nwho lets rage build inside him.
-{0100:0}...{be01}\nIf {0100:1} loses his way\non the path, or in life really,{be00}\nplease help him, won't you?{be01}\nHe's the kind of person who, well,\nwho lets rage build inside him.
-I wonder if she and Liepard will\ngo on a journey together as well...
-\pad{48}

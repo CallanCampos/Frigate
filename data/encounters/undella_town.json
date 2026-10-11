@@ -1,0 +1,64 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": {
+            "black2": [
+                [ "SPECIES_FRILLISH", 25, 40 ],
+                [ "SPECIES_STARYU", 25, 40 ],
+                [ "SPECIES_BASCULIN", 30, 40 ],
+                [ "SPECIES_FRILLISH", 30, 40 ],
+                [ "SPECIES_FRILLISH", 30, 40 ]
+            ],
+            "white2": [
+                [ "SPECIES_FRILLISH", 25, 40 ],
+                [ "SPECIES_STARYU", 25, 40 ],
+                [ "SPECIES_BASCULIN", 30, 40, 1 ],
+                [ "SPECIES_FRILLISH", 30, 40 ],
+                [ "SPECIES_FRILLISH", 30, 40 ]
+            ]
+        },
+        "rippling_surf": {
+            "black2": [
+                [ "SPECIES_STARYU", 25, 40 ],
+                [ "SPECIES_JELLICENT", 25, 40 ],
+                [ "SPECIES_BASCULIN", 30, 40, 1 ],
+                [ "SPECIES_STARMIE", 30, 40 ],
+                [ "SPECIES_STARMIE", 30, 40 ]
+            ],
+            "white2": [
+                [ "SPECIES_STARYU", 25, 40 ],
+                [ "SPECIES_JELLICENT", 25, 40 ],
+                [ "SPECIES_BASCULIN", 30, 40 ],
+                [ "SPECIES_STARMIE", 30, 40 ],
+                [ "SPECIES_STARMIE", 30, 40 ]
+            ]
+        },
+        "fishing": [
+            [ "SPECIES_LUVDISC", 40, 60 ],
+            [ "SPECIES_SHELLDER", 40, 60 ],
+            [ "SPECIES_LUVDISC", 50, 70 ],
+            [ "SPECIES_LUVDISC", 50, 70 ],
+            [ "SPECIES_LUVDISC", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_SHELLDER", 40, 60 ],
+            [ "SPECIES_LUVDISC", 40, 60 ],
+            [ "SPECIES_SHELLDER", 50, 70 ],
+            [ "SPECIES_CLOYSTER", 50, 70 ],
+            [ "SPECIES_CLOYSTER", 50, 70 ]
+        ]
+    }
+}

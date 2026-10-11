@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Desiree",
+    "class": "TRAINER_CLASS_SWIMMER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WAILORD",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Catch this! My Pokémon is huge!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Wow! Impressive Pokémon!\nEven more so than I expected!"
+        },
+        {
+            "type": 2,
+            "text": "Wailord is over 47 feet long,\nbut it still fits inside a Poké Ball!{be00}\nThe power of science sure is incredible!"
+        }
+    ]
+}

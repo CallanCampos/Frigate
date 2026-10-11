@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GOLETT",
+    "moves": [ "MOVE_SHADOW_PUNCH", "MOVE_MAGNITUDE", "MOVE_IRON_DEFENSE", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_LIECHI_BERRY",
+    "form": 0
+}

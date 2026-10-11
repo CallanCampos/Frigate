@@ -2,7 +2,7 @@
 orig/*.nds
 *.nds
 extract/
-build/
+/build/
 
 # Tools downloaded or built by configure
 tools/dsd

@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Evan",
+    "class": "TRAINER_CLASS_PRESCHOOLER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [],
+    "heals": false,
+    "money": 1,
+    "reward": "ITEM_POKE_TOY",
+    "party": [
+        {
+            "species": "SPECIES_MIME_JR",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "When I grow up,\nI will be a pro athlete!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Waaaaah!\nI will never give you my autograph!"
+        },
+        {
+            "type": 15,
+            "text": "It's not my autograph,\nbut I'll give you this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I will practice my autograph\nfor when I go pro!"
+        }
+    ]
+}

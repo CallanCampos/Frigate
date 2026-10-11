@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 24,
+    "area": 332,
+    "matrix": "MAP_MATRIX_SEASIDE_CAVE",
+    "scripts": "SCRIPTS_SEASIDE_CAVE",
+    "text": "SCRIPT_TEXT_SEASIDE_CAVE",
+    "bgm": "SEQ_BGM_D_02",
+    "encounters": "ENCOUNTERS_SEASIDE_CAVE",
+    "enc_slot": 2,
+    "parent": "ZONE_SEASIDE_CAVE",
+    "place": "PLACE_SEASIDE_CAVE",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 4,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 312,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

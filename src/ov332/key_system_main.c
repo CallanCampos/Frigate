@@ -1,7 +1,9 @@
 #include "types.h"
 #include "app/unova_link.h"
 #include "constants/arc.h"
+#include "constants/script_text_banks.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -25,6 +27,7 @@
 #include "system/gf_font.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
+#include "text/script/global_10520.h"
 
 // Unova Link's proc: the BG, actors and windows that every part shares, and the main menu that leads to the Key
 // System, Memory Link and the Nintendo 3DS Link with Pokémon Dream Radar
@@ -324,8 +327,8 @@ void KeySystem_SeqWirelessOff(KeySystemSeq *seq, int *state, void *work) {
     switch (*state) {
     case 0:
         KeySystem_CreateMsgWin(wk, HEAPID_KEY_SYSTEM);
-        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 208, HEAPID_KEY_SYSTEM);
-        str = GFL_MsgDataLoadStrbufNew(msgData, 22);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, HEAPID_KEY_SYSTEM);
+        str = GFL_MsgDataLoadStrbufNew(msgData, Global10520_Text_WirelessCommunicationsTurnedOff);
         KeySystemMsgWin_PrintStr(wk->msgWin, str, KEY_SYSTEM_MSG_STREAM);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
@@ -745,7 +748,7 @@ void KeySystem_Setup(KeySystemWork *wk, HeapID heapId) {
     wk->graphic = KeySystemGraphic_Create(1, heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     wk->printQueue = func_02021998(heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 67, heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_2, heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     wk->strBuf = GFL_StrBufCreate(128, heapId);
     wk->bg = KeySystemBG_Create(heapId);

@@ -1,8 +1,0 @@
-Sandstorms are terrible!{be01}\nBut Rock-, Ground-, and\nSteel-type Pokémon can weather{be00}\na sandstorm without damage.
-Ggggggrrr!
-I want to trade your Petilil\nand my Cottonee!
-Pokémon trade!\nPokémon trade!{be01}\nPokémon come and go\nvia Infrared Connection!{be01}
-They were your Petilil and\nmy Cottonee.{be01}\nBut now they are your Cottonee\nand my Petilil!
-The Pokémon I want is Petilil.
-I see...{be01}\nThen, next time.
-{0102:0}! {0102:0}!\nThe nickname you gave to the Pokémon!

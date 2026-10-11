@@ -1,0 +1,24 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Earwin",
+    "class": "TRAINER_CLASS_WORKER_44",
+    "pokemon": [
+        "jynx_2",
+        "dewgong_2",
+        "froslass_2",
+        "cryogonal_2",
+        "abomasnow_2",
+        "weavile_2",
+        "glaceon_2",
+        "beartic_4",
+        "walrein_2",
+        "mamoswine_2",
+        "lapras_2",
+        "vanilluxe_2"
+    ],
+    "messages": [
+        "I do menial work every single day.\nAm I just a cog in the machine?",
+        "I am well broken in. No snags slow down\nthe smooth running of this machine!",
+        "I may be happier than a person who\ncannot even be a cog in the machine."
+    ]
+}

@@ -3,3 +3,20 @@
     .ctor       start:0x021c5fd4 end:0x021c5fd4 kind:rodata align:4
     .data       start:0x021c5fe0 end:0x021c6060 kind:data align:32
     .bss        start:0x021c6060 end:0x021c6060 kind:bss align:32
+
+src/ov262/wifibattlematch_graphic.c:
+    complete
+    .text       start:0x021c25a0 end:0x021c27dc
+    .rodata     start:0x021c5d38 end:0x021c5ef4
+    .data       start:0x021c5fe0 end:0x021c5ffc
+
+src/ov262/wifibattlematch_view.c:
+    .text       start:0x021c27dc end:0x021c56cc
+    .rodata     start:0x021c5ef4 end:0x021c5fa0
+    .data       start:0x021c5ffc end:0x021c6014
+
+src/ov262/wifibattlematch_util.c:
+    complete
+    .text       start:0x021c56cc end:0x021c5d38
+    .rodata     start:0x021c5fa0 end:0x021c5fd4
+    .data       start:0x021c6014 end:0x021c6060

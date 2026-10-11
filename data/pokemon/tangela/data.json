@@ -1,0 +1,189 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Tangela",
+    "pokedex": {
+        "category": "Vine Pokémon",
+        "entry": "Many writhing vines cover it,\nso its true identity remains unknown.\nThe blue vines grow its whole life long.",
+        "height": "3'03\"",
+        "weight": "77.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Tangela",
+                "category": "Vine Pokémon",
+                "entry": "The blue vines shrouding its body\nare covered in a growth of fine\nhair. It is known to be ticklish.",
+                "height": "3'03\"",
+                "weight": "77.2 lbs."
+            },
+            "fr": {
+                "name": "Saquedeneu",
+                "category": "Pokémon Vigne",
+                "entry": "Il se cache derrière des lianes\nbleues recouvertes d'un fin duvet.\nIl est chatouilleux.",
+                "height": "1,0 m",
+                "weight": "35,0 kg"
+            },
+            "de": {
+                "name": "Tangela",
+                "category": "Ranke",
+                "entry": "Die blauen Ranken an seinem Körper\nsind von feinen Haaren bedeckt.\nEs gilt zudem als kitzlig.",
+                "height": "1,0 m",
+                "weight": "35,0 kg"
+            },
+            "it": {
+                "name": "Tangela",
+                "category": "Pokémon Liana",
+                "entry": "Le liane blu che nascondono il suo\ncorpo sono rivestite di peli sottili.\nSi dice che soffra il solletico.",
+                "height": "1,0 m",
+                "weight": "35,0 kg"
+            },
+            "ko": {
+                "name": "덩쿠리",
+                "category": "넝쿨포켓몬",
+                "entry": "전신을 뒤덮은 파란 덩굴에는\n아주 세밀한 털이 나있어\n만지면 매우 간지럽다.",
+                "height": "1.0 m",
+                "weight": "35.0 kg"
+            },
+            "es": {
+                "name": "Tangela",
+                "category": "Pokémon Enredadera",
+                "entry": "Las lianas azules que envuelven\nsu cuerpo están cubiertas de vello.\nSe dice que tiene cosquillas.",
+                "height": "1,0 m",
+                "weight": "35,0 kg"
+            },
+            "ja": {
+                "name": "モンジャラ",
+                "category": "ツルじょうポケモン",
+                "entry": "ぜんしんを\\x{3000}おおう\\x{3000}あおいツルには\nさらに\\x{3000}こまかな\\x{3000}けがはえていて\nさわると\\x{3000}とても\\x{3000}くすぐったい。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 55,
+        "defense": 115,
+        "speed": 60,
+        "special_attack": 100,
+        "special_defense": 40
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_LEAF_GUARD" ],
+    "hidden_ability": "ABILITY_REGENERATOR",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 87,
+    "height": 10,
+    "weight": 350,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_INGRAIN" ],
+            [ 1, "MOVE_CONSTRICT" ],
+            [ 4, "MOVE_SLEEP_POWDER" ],
+            [ 7, "MOVE_VINE_WHIP" ],
+            [ 10, "MOVE_ABSORB" ],
+            [ 14, "MOVE_POISON_POWDER" ],
+            [ 17, "MOVE_BIND" ],
+            [ 20, "MOVE_GROWTH" ],
+            [ 23, "MOVE_MEGA_DRAIN" ],
+            [ 27, "MOVE_KNOCK_OFF" ],
+            [ 30, "MOVE_STUN_SPORE" ],
+            [ 33, "MOVE_NATURAL_GIFT" ],
+            [ 36, "MOVE_GIGA_DRAIN" ],
+            [ 40, "MOVE_ANCIENT_POWER" ],
+            [ 43, "MOVE_SLAM" ],
+            [ 46, "MOVE_TICKLE" ],
+            [ 49, "MOVE_WRING_OUT" ],
+            [ 53, "MOVE_POWER_WHIP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM33",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM77",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SYNTHESIS",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FLAIL",
+            "MOVE_CONFUSION",
+            "MOVE_MEGA_DRAIN",
+            "MOVE_AMNESIA",
+            "MOVE_LEECH_SEED",
+            "MOVE_NATURE_POWER",
+            "MOVE_ENDEAVOR",
+            "MOVE_LEAF_STORM",
+            "MOVE_POWER_SWAP",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_RAGE_POWDER",
+            "MOVE_NATURAL_GIFT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_KNOWS_MOVE",
+            "param": "MOVE_ANCIENT_POWER",
+            "species": "SPECIES_TANGROWTH"
+        }
+    ],
+    "regional_dex_number": 217,
+    "baby_species": "SPECIES_TANGELA"
+}

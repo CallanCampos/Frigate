@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Heath",
+    "class": "TRAINER_CLASS_DOCTOR",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_HEAL", "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": true,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SEWADDLE",
+            "form": 0,
+            "level": 17,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "As a Doctor, I will be examining your\nPokémon's strength!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh! What's this?\nIt is the very picture of health!"
+        },
+        {
+            "type": 13,
+            "text": "Before you go, let me give your Pokémon\na little booster shot!{be01}"
+        },
+        {
+            "type": 14,
+            "text": "Feel free to drop by anytime your\nPokémon need a little TLC!"
+        }
+    ]
+}

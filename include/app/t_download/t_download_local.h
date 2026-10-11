@@ -2,7 +2,7 @@
 #define POKEBW2_APP_T_DOWNLOAD_T_DOWNLOAD_LOCAL_H
 
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/frame_list.h"
 #include "app/t_download/t_download_graphic.h"
 #include "field/wbt.h"
 #include "gfl/clact.h"
@@ -96,7 +96,7 @@ struct TDownloadWork {
     u16 palFadeTo[16];
     u16 palFadeWork[16];
     u16 textPltt[2][16];
-    Ov139List *list;
+    FrameList *list;
     int listCount;
     // The list's item, cursor and scroll, live in [0] and kept in [2] while the details are shown
     int listPos[3];

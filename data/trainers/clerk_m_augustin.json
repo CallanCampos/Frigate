@@ -1,0 +1,27 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Augustin",
+    "class": "TRAINER_CLASS_CLERK_M_66",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TRANQUILL",
+            "form": 0,
+            "level": 24,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Nice!\nYou're really good!"
+        }
+    ]
+}

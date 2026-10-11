@@ -1,37 +1,37 @@
-    \x{ffff}
-      \x{ffff}
-{0200:0} more needed.
-Up to {0200:0} more allowed.
-Seeking Multi Battle participants!
-Seeking Musical participants!
-Seeking Battle Subway participants!
-{0100:0}{bd05:70}ID: {0204:1}
-Awaiting participating members...\nB Button: Cancel
-When the group is ready:\nA Button: Proceed   B Button: Cancel
-{0100:0} has contacted you.\nAdd to your group?
-Is this group OK?
-Will you cancel Multi Battle?
-Will you cancel the Musical?
-Will you cancel Battle Subway?
-If the leader drops out, the group will\nbe disbanded. Is that OK?
-Multi Battle will be\ncanceled.
-The Musical will be\ncanceled.
-Battle Subway will be\ncanceled.
-                         \x{ffff}
-There are no members.\nMulti Battle will be canceled.
-Please wait.\nB Button: Cancel
-            \x{ffff}
-There appears to be a problem.\nMulti Battle will be canceled.{be02:60}
-There appears to be a problem.\nThe Musical will be canceled.{be02:60}
-There appears to be a problem.\nBattle Subway will be canceled.{be02:60}
-{0201:0}:
-{0201:0}:{0100:1}{bd05:106}ID: {0204:2}
-Choose the Musical you would\nlike to join.
-Choose the Battle Subway you would\nlike to join.
-The members have gathered.\nPlease enter the room.
-{0100:0} refused...{be02:60}
-Awaiting {0100:0}'s response...\nB Button: Cancel
-{0100:0} replied, “OK."
-Please wait.\nB Button: Cancel
-Do you want to leave the group?
-There appears to be a problem...{be02:60}
+Bank0033_Text_Empty =     \x{ffff}
+Bank0033_Text_Empty_2 =       \x{ffff}
+Bank0033_Text_MoreNeeded = {0200:0} more needed.
+Bank0033_Text_UpMoreAllowed = Up to {0200:0} more allowed.
+Bank0033_Text_SeekingMultiBattleParticipants = Seeking Multi Battle participants!
+Bank0033_Text_SeekingMusicalParticipants = Seeking Musical participants!
+Bank0033_Text_SeekingBattleSubwayParticipants = Seeking Battle Subway participants!
+Bank0033_Text_Id = {0100:0}{bd05:70}ID: {0204:1}
+Bank0033_Text_AwaitingParticipatingMembersB = Awaiting participating members...\nB Button: Cancel
+Bank0033_Text_WhenGroupReadyButton = When the group is ready:\nA Button: Proceed   B Button: Cancel
+Bank0033_Text_HasContactedAddGroup = {0100:0} has contacted you.\nAdd to your group?
+Bank0033_Text_GroupOk = Is this group OK?
+Bank0033_Text_WillCancelMultiBattle = Will you cancel Multi Battle?
+Bank0033_Text_WillCancelMusical = Will you cancel the Musical?
+Bank0033_Text_WillCancelBattleSubway = Will you cancel Battle Subway?
+Bank0033_Text_IfLeaderDropsOut = If the leader drops out, the group will\nbe disbanded. Is that OK?
+Bank0033_Text_MultiBattleWillCanceled = Multi Battle will be\ncanceled.
+Bank0033_Text_MusicalWillCanceled = The Musical will be\ncanceled.
+Bank0033_Text_BattleSubwayWillCanceled = Battle Subway will be\ncanceled.
+Bank0033_Text_Empty_3 =                          \x{ffff}
+Bank0033_Text_ThereNoMembersMulti = There are no members.\nMulti Battle will be canceled.
+Bank0033_Text_PleaseWaitBButton = Please wait.\nB Button: Cancel
+Bank0033_Text_Empty_4 =             \x{ffff}
+Bank0033_Text_ThereAppearsProblemMulti = There appears to be a problem.\nMulti Battle will be canceled.{be02:60}
+Bank0033_Text_ThereAppearsProblemMusical = There appears to be a problem.\nThe Musical will be canceled.{be02:60}
+Bank0033_Text_ThereAppearsProblemBattle = There appears to be a problem.\nBattle Subway will be canceled.{be02:60}
+Bank0033_Text_Empty_5 = {0201:0}:
+Bank0033_Text_Id_2 = {0201:0}:{0100:1}{bd05:106}ID: {0204:2}
+Bank0033_Text_ChooseMusicalWouldLike = Choose the Musical you would\nlike to join.
+Bank0033_Text_ChooseBattleSubwayWould = Choose the Battle Subway you would\nlike to join.
+Bank0033_Text_MembersHaveGatheredPlease = The members have gathered.\nPlease enter the room.
+Bank0033_Text_Refused = {0100:0} refused...{be02:60}
+Bank0033_Text_AwaitingSResponseB = Awaiting {0100:0}'s response...\nB Button: Cancel
+Bank0033_Text_RepliedOk = {0100:0} replied, “OK."
+Bank0033_Text_PleaseWaitBButton_2 = Please wait.\nB Button: Cancel
+Bank0033_Text_WantLeaveGroup = Do you want to leave the group?
+Bank0033_Text_ThereAppearsProblem = There appears to be a problem...{be02:60}

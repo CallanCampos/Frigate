@@ -13,7 +13,8 @@
 #include "constants/species.h"
 #include "constants/version.h"
 #include "field/badge_gate.h"
-#include "field/black_tower_gimmick.h"
+#include "field/infinity_dungeon.h"
+#include "field/infinity_dungeon_gimmick.h"
 #include "field/encounter.h"
 #include "field/event_battle.h"
 #include "field/event_battle_lose.h"
@@ -25,6 +26,7 @@
 #include "field/field_map.h"
 #include "field/field_status.h"
 #include "field/game_beacon_set.h"
+#include "field/infinity_dungeon_rooms.h"
 #include "field/player_state.h"
 #include "field/trial_house.h"
 #include "field/zone.h"
@@ -240,7 +242,7 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
         if (func_02018f60(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(field)))) {
             u8 level = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
 
-            setup->fieldSituation.env.terrain = func_ov127_021f0dd8(func_ov127_021ef010(field)) == 0x17 ? 0x12 : 0x13;
+            setup->fieldSituation.env.terrain = func_ov127_021f0dd8(InfinityDungeonGimmick_GetDungeon(field)) == 0x17 ? 0x12 : 0x13;
             setup->fieldSituation.env.bgType = level;
             setup->unkDD_5 = TRUE;
             setup->unkDE_0 = TRUE;

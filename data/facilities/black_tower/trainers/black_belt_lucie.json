@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Lucie",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "pokemon": [
+        "growlithe_1",
+        "cranidos_1",
+        "nidorino_1",
+        "machoke_1",
+        "gurdurr_1",
+        "gabite_1",
+        "dragonair_1",
+        "mightyena_1",
+        "seaking_1",
+        "granbull_1"
+    ]
+}

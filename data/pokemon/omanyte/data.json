@@ -1,0 +1,186 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Omanyte",
+    "pokedex": {
+        "category": "Spiral Pokémon",
+        "entry": "A Pokémon that was resurrected\nfrom a fossil using modern science.\nIt swam in ancient seas.",
+        "height": "1'04\"",
+        "weight": "16.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Omanyte",
+                "category": "Spiral Pokémon",
+                "entry": "A Pokémon that was resurrected\nfrom a fossil using modern science.\nIt swam in ancient seas.",
+                "height": "1'04\"",
+                "weight": "16.5 lbs."
+            },
+            "fr": {
+                "name": "Amonita",
+                "category": "Pokémon Spirale",
+                "entry": "Un Pokémon ramené à la vie par\nla science à partir d'un fossile. Il\npeuplait autrefois les mers.",
+                "height": "0,4 m",
+                "weight": "7,5 kg"
+            },
+            "de": {
+                "name": "Amonitas",
+                "category": "Spirale",
+                "entry": "Dieses Pokémon wurde von der modernen\nWissenschaft aus einem Fossil ge-\nschaffen. Es lebte im urzeitlichen Meer.",
+                "height": "0,4 m",
+                "weight": "7,5 kg"
+            },
+            "it": {
+                "name": "Omanyte",
+                "category": "Pokémon Spirale",
+                "entry": "Pokémon rigenerato da un fossile\ngrazie alla scienza moderna.\nNuotava nei mari ancestrali.",
+                "height": "0,4 m",
+                "weight": "7,5 kg"
+            },
+            "ko": {
+                "name": "암나이트",
+                "category": "소용돌이포켓몬",
+                "entry": "현대의 우수한 과학력으로\n화석에서 부활한 포켓몬이다.\n고대의 바다를 헤엄치고 있었다.",
+                "height": "0.4 m",
+                "weight": "7.5 kg"
+            },
+            "es": {
+                "name": "Omanyte",
+                "category": "Pokémon Espiral",
+                "entry": "Fue recuperado a partir de un fósil\ngracias a la ciencia moderna.\nSolía nadar en antiguos mares.",
+                "height": "0,4 m",
+                "weight": "7,5 kg"
+            },
+            "ja": {
+                "name": "オムナイト",
+                "category": "うずまきポケモン",
+                "entry": "げんだいの\\x{3000}すぐれた\\x{3000}かがくりょくで\nかせきから\\x{3000}ふっかつした\\x{3000}ポケモン。\nこだいの\\x{3000}うみを\\x{3000}およいでいた。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 40,
+        "defense": 100,
+        "speed": 35,
+        "special_attack": 90,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_ROCK", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_SHELL_ARMOR" ],
+    "hidden_ability": "ABILITY_WEAK_ARMOR",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 71,
+    "height": 4,
+    "weight": 75,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CONSTRICT" ],
+            [ 1, "MOVE_WITHDRAW" ],
+            [ 7, "MOVE_BITE" ],
+            [ 10, "MOVE_WATER_GUN" ],
+            [ 16, "MOVE_ROLLOUT" ],
+            [ 19, "MOVE_LEER" ],
+            [ 25, "MOVE_MUD_SHOT" ],
+            [ 28, "MOVE_BRINE" ],
+            [ 34, "MOVE_PROTECT" ],
+            [ 37, "MOVE_ANCIENT_POWER" ],
+            [ 43, "MOVE_TICKLE" ],
+            [ 46, "MOVE_ROCK_BLAST" ],
+            [ 52, "MOVE_SHELL_SMASH" ],
+            [ 55, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM55",
+            "TM69",
+            "TM74",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ICY_WIND",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_BUBBLE_BEAM",
+            "MOVE_AURORA_BEAM",
+            "MOVE_SLAM",
+            "MOVE_SUPERSONIC",
+            "MOVE_HAZE",
+            "MOVE_SPIKES",
+            "MOVE_KNOCK_OFF",
+            "MOVE_WRING_OUT",
+            "MOVE_TOXIC_SPIKES",
+            "MOVE_MUDDY_WATER",
+            "MOVE_BIDE",
+            "MOVE_WATER_PULSE",
+            "MOVE_WHIRLPOOL"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 40,
+            "species": "SPECIES_OMASTAR"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_OMANYTE"
+}

@@ -1,0 +1,25 @@
+AspertiaCityGym_Text_MustChallenger = ???: You must be a challenger!{be01}
+AspertiaCityGym_Text_WelcomeAspertiaCitysPokemon = Welcome to Aspertia City's Pokémon Gym.{be01}\nI'm Cheren, the Gym Leader!{be01}\nHm? Well, maybe I'd better say that I\njust became the Gym Leader!{be01}\nMore importantly, we need to prepare\nbefore welcoming you to the Gym.{be01}
+AspertiaCityGym_Text_WeHaveChallengerTwo = We have a challenger!\nYou two, take your places!{be01}
+AspertiaCityGym_Text_IfCanDefeatThese = If you can defeat these two,\nthen I'll be your opponent!
+AspertiaCityGym_Text_IfWantBattlePlease = If you want to battle me,\nplease defeat those two first, OK?
+AspertiaCityGym_Text_JustFirstGymChallenge = Just as this is your first Gym challenge,\nthis is my first Pokémon battle{be00}\nas a Gym Leader!{be01}\nLet's both do our best and have\na battle we can be proud of!{be01}
+AspertiaCityGym_Text_BattleHasMadeFeel = That battle has made me feel really\nglad you were my first challenger{be00}\nas a Gym Leader...{be01}\nI give you this in honor of the strength\nyou and your Pokémon showed!{be01}
+AspertiaCityGym_Text_ReceivedBasicBadgeFrom = {0100:0} received the\nBasic Badge from Cheren!{be01}
+AspertiaCityGym_Text_HereFirstGymBadge = Here is your first Gym Badge,\nthe Basic Badge!{be00}\nThis is an important milestone!{be01}\nWith this Badge, Pokémon up to Lv. 20\nwill obey you, including traded Pokémon.{be01}\nAnd I want you to take this!{be01}
+AspertiaCityGym_Text_Tm83CanTeachPokemon = TM83 can teach your\nPokémon the move Work Up!{be01}\nWhen you use Work Up\nwhile battling, it raises{be00}\nthe user's Attack and Sp. Atk.{be01}\nBy the way, TMs can be used\nas many times as you want!{be01}
+AspertiaCityGym_Text_UnovaRegionThereEight = In the Unova region, there are eight\nPokémon Gyms and eight Gym Badges!{be01}\nIf you're a Trainer,\nyou could collect all of them!{be01}\nThat will make it easier to fill\nthe pages of the Pokédex as well!{be01}\nYes, two years ago, Pokédex in hand,\nI left on a journey with my friends.
+AspertiaCityGym_Text_CherenShouldDecideWhat = Cheren: You should decide what\nyou're going to do from here out!{be01}\nDon't worry about losing your way--\nyou have Pokémon by your side!
+AspertiaCityGym_Text_CherenSawPotentialMade = Cheren saw potential in me and\nmade me a Trainer in this Gym!{be01}
+AspertiaCityGym_Text_IfCanDefeatGirl = If you can defeat the girl, too,\nyou can challenge the Gym Leader!
+AspertiaCityGym_Text_WowCanChallengeGym = Wow! You can challenge\nthe Gym Leader!
+AspertiaCityGym_Text_ReasonCherenSawPotential = The reason Cheren saw potential\nin me was there was no one else...?{be01}\nNo way! Even if that is the case,\nI just have to get stronger!
+AspertiaCityGym_Text_NowIllShowAll = Now I'll show you all of the\nthings I learned from Cheren!{be01}
+AspertiaCityGym_Text_GuessCanBattleLittle = I guess you can battle a little!\nThink you can beat the other Trainer?
+AspertiaCityGym_Text_OkYourePrettyGood = OK. You're pretty good!\nBut, can you beat Cheren?
+AspertiaCityGym_Text_HaveLearnEvenMore = I have to learn even more\nabout my Pokémon!
+AspertiaCityGym_Text_HelloImClydeGuide = Hello! I'm Clyde, the guide for Trainers\nwho challenge Pokémon Gyms.{be01}\nThank you for taking on the Gym!\nTake this to commemorate{be00}\nyour debut!{be01}
+AspertiaCityGym_Text_PokemonGymsFacilitiesTesting = Pokémon Gyms are facilities\nfor testing Trainers' abilities!{be01}\nPut simply, if you can defeat\nthe Gym Leader, it means{be00}\nyou're a really good Trainer!{be01}
+AspertiaCityGym_Text_IfRunOutPokemon = If you run out of Pokémon that can fight\nduring a Pokémon battle, you lose!{be01}\nSo having a lot of Pokémon with you\nmight work to your advantage!
+AspertiaCityGym_Text_HopeYoullRememberWonderful = I hope you'll remember the wonderful\nmoment in which you received{be00}\nthat Badge forever.
+\pad{e0}

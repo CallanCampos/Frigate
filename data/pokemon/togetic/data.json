@@ -1,0 +1,196 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Togetic",
+    "pokedex": {
+        "category": "Happiness Pokémon",
+        "entry": "To share its happiness, it flies\naround the world seeking kind-\nhearted people.",
+        "height": "2'00\"",
+        "weight": "7.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Togetic",
+                "category": "Happiness Pokémon",
+                "entry": "To share its happiness, it flies\naround the world seeking kind-\nhearted people.",
+                "height": "2'00\"",
+                "weight": "7.1 lbs."
+            },
+            "fr": {
+                "name": "Togetic",
+                "category": "Pokémon Bonheur",
+                "entry": "Il parcourt le monde pour\ndistribuer de la joie aux\nêtres bons.",
+                "height": "0,6 m",
+                "weight": "3,2 kg"
+            },
+            "de": {
+                "name": "Togetic",
+                "category": "Freude",
+                "entry": "Um sein Glück mit anderen zu teilen,\nfliegt es um die Welt auf der Suche\nnach gutherzigen Menschen.",
+                "height": "0,6 m",
+                "weight": "3,2 kg"
+            },
+            "it": {
+                "name": "Togetic",
+                "category": "Pokémon Felicità",
+                "entry": "Vola intorno al mondo in cerca di persone\nbuone e premurose con le quali\ncondividere la sua felicità.",
+                "height": "0,6 m",
+                "weight": "3,2 kg"
+            },
+            "ko": {
+                "name": "토게틱",
+                "category": "행복포켓몬",
+                "entry": "행복을 나눠주기 위해\n마음 착한 사람을 찾아서\n이 세상을 날아다니고 있다.",
+                "height": "0.6 m",
+                "weight": "3.2 kg"
+            },
+            "es": {
+                "name": "Togetic",
+                "category": "Pokémon Felicidad",
+                "entry": "Para compartir su felicidad, vuela\npor el mundo en busca de gente\nde buen corazón.",
+                "height": "0,6 m",
+                "weight": "3,2 kg"
+            },
+            "ja": {
+                "name": "トゲチック",
+                "category": "しあわせポケモン",
+                "entry": "しあわせを\\x{3000}わけあたえるため\nこころやさしい\\x{3000}ひとを\\x{3000}さがしもとめ\nせかいじゅうを\\x{3000}とびまわっている。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 40,
+        "defense": 85,
+        "speed": 40,
+        "special_attack": 80,
+        "special_defense": 105
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 10,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FAIRY" ],
+    "abilities": [ "ABILITY_HUSTLE", "ABILITY_SERENE_GRACE" ],
+    "hidden_ability": "ABILITY_SUPER_LUCK",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 6,
+    "weight": 32,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MAGICAL_LEAF" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_CHARM" ],
+            [ 1, "MOVE_METRONOME" ],
+            [ 1, "MOVE_SWEET_KISS" ],
+            [ 5, "MOVE_METRONOME" ],
+            [ 9, "MOVE_SWEET_KISS" ],
+            [ 13, "MOVE_YAWN" ],
+            [ 17, "MOVE_ENCORE" ],
+            [ 21, "MOVE_FOLLOW_ME" ],
+            [ 25, "MOVE_BESTOW" ],
+            [ 29, "MOVE_WISH" ],
+            [ 33, "MOVE_ANCIENT_POWER" ],
+            [ 37, "MOVE_SAFEGUARD" ],
+            [ 41, "MOVE_BATON_PASS" ],
+            [ 45, "MOVE_DOUBLE_EDGE" ],
+            [ 49, "MOVE_LAST_RESORT" ],
+            [ 53, "MOVE_AFTER_YOU" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM35",
+            "TM38",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM56",
+            "TM59",
+            "TM67",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM83",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_MAGIC_COAT",
+            "MOVE_LAST_RESORT",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HEAL_BELL",
+            "MOVE_TAILWIND",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_ROOST",
+            "MOVE_AFTER_YOU",
+            "MOVE_TRICK",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_SHINY_STONE",
+            "species": "SPECIES_TOGEKISS"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TOGEPI"
+}

@@ -1,0 +1,179 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Abomasnow",
+    "pokedex": {
+        "category": "Frost Tree Pokémon",
+        "entry": "They appear when the snow flowers\nbloom. When the petals fall, they\nretreat to places unknown again.",
+        "height": "7'03\"",
+        "weight": "298.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Abomasnow",
+                "category": "Frost Tree Pokémon",
+                "entry": "They appear when the snow flowers\nbloom. When the petals fall, they\nretreat to places unknown again.",
+                "height": "7'03\"",
+                "weight": "298.7 lbs."
+            },
+            "fr": {
+                "name": "Blizzaroi",
+                "category": "Pokémon Arbregelé",
+                "entry": "Il apparaît quand les fleurs des\nterres enneigées fleurissent et\nse retire quand elles se fanent.",
+                "height": "2,2 m",
+                "weight": "135,5 kg"
+            },
+            "de": {
+                "name": "Rexblisar",
+                "category": "Frostbaum",
+                "entry": "Sie erscheinen beim Blühen der\nSchneeblumen und verschwinden\nwieder, sobald diese verblüht sind.",
+                "height": "2,2 m",
+                "weight": "135,5 kg"
+            },
+            "it": {
+                "name": "Abomasnow",
+                "category": "Pokémon Albergelo",
+                "entry": "Appare quando sbocciano i fiori invernali.\nQuando i petali cadono si ritira in luoghi\nsconosciuti.",
+                "height": "2,2 m",
+                "weight": "135,5 kg"
+            },
+            "ko": {
+                "name": "눈설왕",
+                "category": "얼음나무포켓몬",
+                "entry": "눈꽃이 필 무렵 어디선가\n나타나며 꽃이 지면\n또 어딘가로 모습을 감춘다.",
+                "height": "2.2 m",
+                "weight": "135.5 kg"
+            },
+            "es": {
+                "name": "Abomasnow",
+                "category": "Pokémon Árbol Nieve",
+                "entry": "Aparece con las flores de nieve y\nse retira cuando se les caen los\npétalos. No se sabe adónde va.",
+                "height": "2,2 m",
+                "weight": "135,5 kg"
+            },
+            "ja": {
+                "name": "ユキノオー",
+                "category": "じゅひょうポケモン",
+                "entry": "ゆきのはなが\\x{3000}さくころ\\x{3000}どこからか\nすがたを\\x{3000}あらわし\\x{3000}はながちると\nまた\\x{3000}どこかに\\x{3000}すがたを\\x{3000}かくす。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff13}\\x{ff15}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 92,
+        "defense": 75,
+        "speed": 60,
+        "special_attack": 92,
+        "special_defense": 85
+    },
+    "types": [ "TYPE_GRASS", "TYPE_ICE" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NEVER_MELT_ICE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_SNOW_WARNING", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SOUNDPROOF",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 22,
+    "weight": 1355,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ICE_PUNCH" ],
+            [ 1, "MOVE_POWDER_SNOW" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_RAZOR_LEAF" ],
+            [ 1, "MOVE_ICY_WIND" ],
+            [ 5, "MOVE_RAZOR_LEAF" ],
+            [ 9, "MOVE_ICY_WIND" ],
+            [ 13, "MOVE_GRASS_WHISTLE" ],
+            [ 17, "MOVE_SWAGGER" ],
+            [ 21, "MOVE_MIST" ],
+            [ 26, "MOVE_ICE_SHARD" ],
+            [ 31, "MOVE_INGRAIN" ],
+            [ 36, "MOVE_WOOD_HAMMER" ],
+            [ 47, "MOVE_BLIZZARD" ],
+            [ 58, "MOVE_SHEER_COLD" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM52",
+            "TM53",
+            "TM56",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM78",
+            "TM79",
+            "TM80",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_ICY_WIND",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_ROLE_PLAY",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SNOVER"
+}

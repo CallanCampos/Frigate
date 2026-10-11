@@ -13,13 +13,30 @@
 
 // A Trainer of the tournaments, from arc 247
 typedef struct {
-    u16 unk0;
+    u8 type;
+    u8 gender;
     u16 unk2;
-    u16 unk4;
-    u16 unk6;
+    u8 trainerClass;
+    // Whether the Trainer takes part in tournaments 11, 4, 10, 12, 14, 13 and 15, from bit 0
+    u8 inTournament11 : 1;
+    u8 inTournament4 : 1;
+    u8 inTournament10 : 1;
+    u8 inTournament12 : 1;
+    u8 inTournament14 : 1;
+    u8 inTournament13 : 1;
+    u8 inTournament15 : 1;
+    u8 unk5_7 : 1;
+    // The tournament that only has this Trainer, for tournaments 1 and 5 to 9
+    u8 tournament;
+    // The type the Type Expert Tournament picks the Trainer for, where TYPE_NULL is any
+    u8 expertType;
     u8 unk8_0 : 3;
     u8 unk8_3 : 5;
-    u8 unk9[7];
+    u8 unk9;
+    // The music of the battle against the Trainer and of winning it
+    u16 bgm;
+    u16 winBgm;
+    u16 unkE;
 } WbtTrainer;
 
 typedef struct {
@@ -74,6 +91,59 @@ typedef struct {
     u16 unkAA;
 } WbtDownloadedTournament;
 
+// A Pokémon of a Trainer of a downloaded tournament, which becomes a party Pokémon
+typedef struct {
+    u16 species;
+    u16 nickname[11];
+    u16 item;
+    u8 unk1A_0 : 1;
+    u8 unk1A_1 : 7;
+    // The ability, by its number
+    u8 ability;
+    u8 evs[6];
+    u16 moves[4];
+    // Two bits per move
+    u8 ppUps;
+    u8 nature;
+    struct {
+        u32 hp : 5;
+        u32 attack : 5;
+        u32 defense : 5;
+        u32 speed : 5;
+        u32 spAttack : 5;
+        u32 spDefense : 5;
+        u32 sex : 2;
+    } ivs;
+    u8 form;
+    u8 ball;
+    u8 level;
+    u8 happiness;
+} WbtDownloadedPokemon;
+
+// A Trainer of a downloaded tournament: up to six Pokémon, and four lines of 74 characters that the Trainer says,
+// each unless its message set is 0 a message of that set of the Trainers' messages instead
+typedef struct {
+    WbtDownloadedPokemon pokemon[6];
+    // The Trainer's name and Trainer class name
+    u16 name[16];
+    u16 className[0x16];
+    u16 lines[4][0x4a];
+    u8 unk3D4;
+    u8 messageSets[6];
+    u8 unk3DB;
+    u16 unk3DC;
+    u8 unk3DE[2];
+} WbtDownloadedTrainer;
+
+// A tournament downloaded to the save, with the Trainers of its four rounds
+typedef struct {
+    u8 unk0[0xa];
+    u16 name[0x25];
+    u8 unk54[0x174];
+    WbtDownloadedTournament tournament;
+    WbtDownloadedTrainer trainers[4];
+} WbtDownload;
+
 struct WbtSystem {
     HeapID heapId;
     u8 unk2[2];
@@ -95,22 +165,31 @@ struct WbtSystem {
     WbtMatch matches[7];
     Regulation regulation;
     WbtUnk18A unk18A;
-    u8 unk18E[0x10];
-    u16 downloadedName[0x25];
-    u8 unk1E8[0x174];
-    WbtDownloadedTournament downloaded;
-    u8 unk408[0xfa0];
+    u8 unk18E[2];
+    // Whether the downloaded tournament of the slot unk1D is in the save and its checksum holds
+    BOOL downloadValid;
+    WbtDownload download;
+    // The kind and rank of the seven Trainers a downloaded tournament picks, from the second
+    WbtUnk18A downloadSlots[7];
+    u8 unk13A4[4];
     u8 unk13A8;
     u8 unk13A9[3];
-    void *unk13AC;
+    // The Battle Box's party
+    PokeParty *unk13AC;
     u8 castSlots[6];
-    u8 unk13B6[6];
+    // The Pokémon the party screen showed the summary of, and how it ended
+    u16 listIndex;
+    u16 listResult;
+    u8 unk13BA[2];
     PokeParty *partyBC;
     PokeParty *partyC0;
     PokeParty *partyC4;
     u8 unk13C8[4];
     void *unk13CC;
-    u8 unk13D0[0xc];
+    u8 unk13D0[4];
+    // The texts that the battle shows after winning and after losing
+    StrBuf *unk13D4;
+    StrBuf *unk13D8;
     // One for each round. Tournaments 1 and 10 award their total as Battle Points
     u8 unk13DC[3];
     u8 unk13DF;
@@ -240,7 +319,7 @@ u32 func_ov055_021e6794(u32 tournament);
 BOOL func_ov055_021e67a0(u32 tournament, u32 value);
 u16 func_ov055_021e67b8(u32 tournament);
 // The Battle Points for winning the tournament in the battle style
-u8 func_ov055_021e67cc(u32 tournament, int style);
+u32 func_ov055_021e67cc(u32 tournament, int style);
 u8 func_ov055_021e67e4(u32 index);
 
 // What wbt_setup.c fills in for overlay 326's screens
@@ -288,7 +367,7 @@ WbtPartyFilter *func_ov055_021e6b58(HeapID heapId, u32 tournament);
 void func_ov055_021e6bdc(WbtPartyFilter *filter);
 void func_ov055_021e6bfc(WbtPartyFilter *filter, u16 item);
 void func_ov055_021e6c20(WbtPartyFilter *filter, u16 species);
-void func_ov055_021e6c44(WbtPartyFilter *filter, u16 file);
+void func_ov055_021e6c44(WbtPartyFilter *filter, s16 file);
 // Picks count of the files at random, as the filter allows, and adds them to the filter
 void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files,
                          u32 arcId, u8 count, MATHRandContext32 *rand);

@@ -1,5 +1,0 @@
-You see, practicing is sort of like\neating food every day.{be01}\nUnless it becomes something you do\nwithout thinking about it, you'll never{be00}\nbe great at guitar or with Pokémon.
-Ditto... Everstone...\nNatures... What's the connection?
-I am a poet...\nI write poems.{be01}\nEvery day, I stretch my imagination and\ndevote myself to my creative activity.{be01}\nPeople dream when sleeping, but if a\nPokémon dreams...{be01}\nI cannot even imagine how it would be...
-I am a poet...\nI write poems.{be01}\nEvery day, I stretch my imagination and\ndevote myself to my creative activity.{be01}\nPeople dream when sleeping, but\nif a Pokémon dreams...{be01}\nJust thinking about it fuels\nmy imagination.{be01}\nPokémon probably enjoy sleeping, too!
-\pad{a0}

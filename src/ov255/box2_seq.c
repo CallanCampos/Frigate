@@ -5,7 +5,7 @@
 #include "app/box2_main.h"
 #include "app/box2_obj.h"
 #include "app/box2_ui.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
@@ -339,7 +339,7 @@ BOOL Box2Seq_Main(Box2SysWork *syswk, u32 *seq) {
 }
 
 static int Box2Seq_Init(Box2SysWork *syswk) {
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
@@ -393,7 +393,7 @@ static int Box2Seq_Release(Box2SysWork *syswk) {
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
     return syswk->nextSeq;
 }
 

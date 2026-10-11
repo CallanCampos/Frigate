@@ -1,5 +1,6 @@
 #include "app/comm_tvt/comm_tvt_sys.h"
 #include "types.h"
+#include "constants/arc.h"
 #include "app/comm_tvt.h"
 #include "app/comm_tvt/camera_system.h"
 #include "app/comm_tvt/ctvt_call.h"
@@ -10,6 +11,7 @@
 #include "app/comm_tvt/ctvt_talk.h"
 #include "app/comm_tvt/draw_system.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/field_sound.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -44,6 +46,7 @@
 #include "system/printsys.h"
 #include "system/time_icon.h"
 #include "system/wipe.h"
+#include "text/system/btl_server_flow.h"
 
 // The Xtransceiver's system: the proc, the screens and resources the modes share, and the switch between the modes.
 // The names of the members are printed over their video on the top screen, and a cursor points at the talker
@@ -620,7 +623,7 @@ static void CommTvt_FreeResources(CommTvtWork *sys) {
 
 static void CommTvt_InitMessages(CommTvtWork *sys) {
     sys->font = GFL_FontCreate(23, 0, 0, FALSE, sys->heapId);
-    sys->msgData = GFL_MsgSysLoadData(FALSE, 2, 29, sys->heapId);
+    sys->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW, sys->heapId);
     sys->printQueue = func_020219a8(0x800, sys->heapId);
     GFL_BGSysLoadNCLRDefault(23, 5, 0, 0x140, 0x20, sys->heapId);
     GFL_BGSysLoadNCLRDefault(23, 5, 4, 0x140, 0x20, sys->heapId);
@@ -963,8 +966,8 @@ AppTaskMenu *func_ov257_021aab80(CommTvtWork *sys) {
     AppTaskMenuItem items[2] = { 0 };
     AppTaskMenu *menu;
 
-    items[0].str = GFL_MsgDataLoadStrbufNew(sys->msgData, 34);
-    items[1].str = GFL_MsgDataLoadStrbufNew(sys->msgData, 35);
+    items[0].str = GFL_MsgDataLoadStrbufNew(sys->msgData, BtlServerFlow_Text_Yes);
+    items[1].str = GFL_MsgDataLoadStrbufNew(sys->msgData, BtlServerFlow_Text_No);
     items[0].color = 0x39e3;
     items[1].color = 0x39e3;
     items[0].type = 0;
@@ -988,8 +991,8 @@ AppTaskMenu *func_ov257_021aac08(CommTvtWork *sys, u8 right, u8 bottom) {
     AppTaskMenuItem items[2] = { 0 };
     AppTaskMenu *menu;
 
-    items[0].str = GFL_MsgDataLoadStrbufNew(sys->msgData, 34);
-    items[1].str = GFL_MsgDataLoadStrbufNew(sys->msgData, 35);
+    items[0].str = GFL_MsgDataLoadStrbufNew(sys->msgData, BtlServerFlow_Text_Yes);
+    items[1].str = GFL_MsgDataLoadStrbufNew(sys->msgData, BtlServerFlow_Text_No);
     items[0].color = 0x39e3;
     items[1].color = 0x39e3;
     items[0].type = 0;
@@ -1013,7 +1016,7 @@ AppTaskMenu *func_ov257_021aac98(CommTvtWork *sys, u8 right, u8 bottom) {
     AppTaskMenuItem item = { 0 };
     AppTaskMenu *menu;
 
-    item.str = GFL_MsgDataLoadStrbufNew(sys->msgData, 65);
+    item.str = GFL_MsgDataLoadStrbufNew(sys->msgData, BtlServerFlow_Text_Cancel);
     item.color = 0x39e3;
     item.type = 0;
     init.heapId = sys->heapId;

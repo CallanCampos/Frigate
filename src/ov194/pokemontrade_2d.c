@@ -1,5 +1,6 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
+#include "app/ui/touchbar.h"
 #include "app/pokemon_trade_local.h"
 #include "constants/arc.h"
 #include "constants/items.h"
@@ -168,13 +169,13 @@ static const u32 sNegoIconPosSub[6][2] = {
 };
 
 void func_ov194_021c2a24(PokemonTradeWork *wk) {
-    Ov139TouchBarItem items[] = {
+    TouchBarItem items[] = {
         { 1, { 232, 168 } },
-        { OV139_TOUCHBAR_ICON_CUSTOM, { 28, 168 } },
-        { OV139_TOUCHBAR_ICON_CUSTOM + 1, { 204, 168 } },
-        { OV139_TOUCHBAR_ICON_CUSTOM + 2, { 48, 168 } },
+        { TOUCHBAR_ICON_CUSTOM, { 28, 168 } },
+        { TOUCHBAR_ICON_CUSTOM + 1, { 204, 168 } },
+        { TOUCHBAR_ICON_CUSTOM + 2, { 48, 168 } },
     };
-    Ov139TouchBarSetup setup;
+    TouchBarSetup setup;
 
     sys_memset(&setup, 0, sizeof(setup));
     setup.items = items;
@@ -213,10 +214,10 @@ void func_ov194_021c2a24(PokemonTradeWork *wk) {
     items[3].key = PAD_KEY_RIGHT | PAD_KEY_LEFT;
     items[3].se = SEQ_SE_DECIDE1;
 
-    wk->touchBar = func_ov139_02199aa0(&setup, wk->heapId);
-    func_ov139_02199d18(wk->touchBar, OV139_TOUCHBAR_ICON_CUSTOM + 2, FALSE);
-    func_ov139_02199d18(wk->touchBar, OV139_TOUCHBAR_ICON_CUSTOM + 1, FALSE);
-    func_ov139_02199ce0(wk->touchBar, 2);
+    wk->touchBar = TouchBar_Create(&setup, wk->heapId);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
+    TouchBar_SetPriority(wk->touchBar, 2);
 }
 
 // The colour of a Pokémon's slot, an index into the box palette: none for an empty slot, the species' colour, or the
@@ -1501,7 +1502,7 @@ void func_ov194_021c4b88(PokemonTradeWork *wk) {
 // Shows the icon of a Pokémon's held item, a letter for mail, over a side's panel or, for side 2, the summary
 void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     ResSprite *sprite = &wk->infoIcons[0];
-    Ov139ObjResSetup setup;
+    UIObjResSetup setup;
     int x, y;
     BOOL mail = FALSE;
     u32 item = PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);
@@ -1542,15 +1543,15 @@ void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
         setup.animFile = func_0202d89c(2);
         setup.paletteStart = 0;
         setup.paletteCount = 1;
-        func_ov139_021999c8(&sprite->res, &setup, wk->clactUnit, wk->heapId);
-        sprite->actor = func_ov139_02199a5c(&sprite->res, wk->clactUnit, x, y, mail, wk->heapId);
+        UIObjRes_Load(&sprite->res, &setup, wk->clactUnit, wk->heapId);
+        sprite->actor = UIObjRes_CreateActor(&sprite->res, wk->clactUnit, x, y, mail, wk->heapId);
     }
 }
 
 void func_ov194_021c4cfc(ResSprite *sprite) {
     if (sprite->actor != NULL) {
         func_0204c108(sprite->actor);
-        func_ov139_02199a44(&sprite->res);
+        UIObjRes_Free(&sprite->res);
         sprite->actor = NULL;
     }
 }
@@ -1559,7 +1560,7 @@ void func_ov194_021c4cfc(ResSprite *sprite) {
 // that had it
 void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm *pkm) {
     ResSprite *sprite = &wk->infoIcons[1];
-    Ov139ObjResSetup setup;
+    UIObjResSetup setup;
     BOOL pokerus = pokerusDuration(pkm);
 
     if (sprite->actor != NULL) {
@@ -1591,18 +1592,18 @@ void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm 
     setup.animFile = func_0202d8bc(2);
     setup.paletteStart = 0;
     setup.paletteCount = 1;
-    func_ov139_021999c8(&sprite->res, &setup, wk->clactUnit, wk->heapId);
+    UIObjRes_Load(&sprite->res, &setup, wk->clactUnit, wk->heapId);
     if (summary) {
-        sprite->actor = func_ov139_02199a5c(&sprite->res, wk->clactUnit, 244, 104, 0, wk->heapId);
+        sprite->actor = UIObjRes_CreateActor(&sprite->res, wk->clactUnit, 244, 104, 0, wk->heapId);
     } else {
-        sprite->actor = func_ov139_02199a5c(&sprite->res, wk->clactUnit, side * 128 + 108, 24, 0, wk->heapId);
+        sprite->actor = UIObjRes_CreateActor(&sprite->res, wk->clactUnit, side * 128 + 108, 24, 0, wk->heapId);
     }
 }
 
 // Shows the icon of a Pokémon that had Pokérus over a side's panel
 static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     ResSprite *sprite = &wk->infoIcons[2];
-    Ov139ObjResSetup setup;
+    UIObjResSetup setup;
     BOOL cured = pokeHasPkrs(pkm);
 
     if (cured) {
@@ -1625,8 +1626,8 @@ static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
         setup.animFile = func_0202d950(2);
         setup.paletteStart = 0;
         setup.paletteCount = 1;
-        func_ov139_021999c8(&sprite->res, &setup, wk->clactUnit, wk->heapId);
-        sprite->actor = func_ov139_02199a5c(&sprite->res, wk->clactUnit, side * 128 + 108, 20, 13, wk->heapId);
+        UIObjRes_Load(&sprite->res, &setup, wk->clactUnit, wk->heapId);
+        sprite->actor = UIObjRes_CreateActor(&sprite->res, wk->clactUnit, side * 128 + 108, 20, 13, wk->heapId);
     }
 }
 
@@ -1634,7 +1635,7 @@ static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
 // which show only when set. An egg shows no rare flag
 void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
     u32 marks = PokeParty_GetParam(pkm, PKM_PARAM_MARKINGS, NULL);
-    Ov139ObjResSetup setup;
+    UIObjResSetup setup;
     u32 xs[] = { 25, 26, 27, 28, 29, 30, 20, 21 };
     // The animation of each icon when set and when not, -1 for none
     int anims[][2] = { { 1, 0 }, { 3, 2 }, { 5, 4 }, { 7, 6 }, { 9, 8 }, { 11, 10 }, { 12, -1 }, { 13, -1 } };
@@ -1657,7 +1658,7 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
         marks |= 1 << 7;
     }
     if (!wk->markIcons.loaded) {
-        func_ov139_021999c8(&wk->markIcons.res, &setup, wk->clactUnit, wk->heapId);
+        UIObjRes_Load(&wk->markIcons.res, &setup, wk->clactUnit, wk->heapId);
         wk->markIcons.loaded = TRUE;
     }
     for (i = 0; i < 8; i++) {
@@ -1679,7 +1680,7 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
                 func_0204c124(icon, TRUE);
             }
         } else {
-            icon = wk->markIcons.icons[i] = func_ov139_02199a5c(&wk->markIcons.res, wk->clactUnit, xs[i] * 8, 101,
+            icon = wk->markIcons.icons[i] = UIObjRes_CreateActor(&wk->markIcons.res, wk->clactUnit, xs[i] * 8, 101,
                                                                 anim == -1 ? anims[i][0] : anim, wk->heapId);
             if (anim == -1) {
                 func_0204c124(icon, FALSE);
@@ -1701,7 +1702,7 @@ void func_ov194_021c5060(PokemonTradeWork *wk) {
         }
     }
     if (marks->loaded) {
-        func_ov139_02199a44(&marks->res);
+        UIObjRes_Free(&marks->res);
         marks->loaded = FALSE;
     }
 }

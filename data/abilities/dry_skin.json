@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Dry Skin",
+    "description": "Reduces HP if it is hot.\nWater restores HP."
+}

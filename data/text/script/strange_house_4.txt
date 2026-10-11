@@ -1,0 +1,7 @@
+StrangeHouse4_Text_TherePokemonCalledCresselia = There is a Pokémon called Cresselia\nin the far Sinnoh region.{be01}\nIts wings shine like the crescent moon\nand keep nightmares away.
+StrangeHouse4_Text_TherePokemonCalledDarkrai = There is a Pokémon called Darkrai\nin the far Sinnoh region.{be01}\nTo protect itself, it drives people and\nPokémon away with terrible nightmares.
+StrangeHouse4_Text_TherePokemonCalledDrowzee = There are Pokémon called Drowzee.{be01}\nThey put others to sleep and eat their\ndreams. Eating nightmares can upset{be00}\ntheir stomachs.
+StrangeHouse4_Text_TherePokemonCalledHypno = There are Pokémon called Hypno.{be01}\nEach one carries a pendulum that\nit can swing to make people drowsy.{be01}\nIt has been said that a Hypno once\nhypnotized a child and took it away...
+StrangeHouse4_Text_SomePokemonKnowMove = Some Pokémon know a move called\nDream Eater.{be01}\nWith this move, a Pokémon attacks while\nthe target is asleep and eats its dream.{be01}\nIt restores HP equal to half of\nthe damage inflicted on the target.
+StrangeHouse4_Text_SomePokemonHaveForewarn = Some Pokémon have the Forewarn Ability.{be01}\nA Pokémon with this Ability is alerted to\none of the opposing Pokémon's moves.{be01}\nHigh-power moves will be recognized first.
+StrangeHouse4_Text_LotBooksFromOther = A lot of books from other regions\nare stored on the tall shelf.

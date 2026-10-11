@@ -1,255 +1,255 @@
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-a Pink Barrette
-a Blue Barrette
-a Red Barrette
-a Blue Flower
-a Crimson Scarf
-a Red Flower
-a Big Barrette
-a Headband
-the Square Glasses
-a Striped Barrette
-a Small Barrette
-a Decorative Ribbon
-a Purse
-a Necklace
-a Gorgeous Flower
-a Round Button
-a Green Barrette
-a Straw Hat
-a Snow Crystal
-a Lonely Flower
-a Paintbrush
-a Beret
-a Whisk
-a Ladle
-a Toy Cake
-a Chef's Hat
-a Frying Pan
-a Bib
-a Red Parasol
-a Germ Mask
-a Mallet
-a Colorful Parasol
-a Wrench
-a Lantern
-a Windup Key
-a Helmet
-a Frilly Apron
-a Dressy Tie
-a Lace Cap
-a Scarlet Cape
-a Toy Cutlass
-a Toy Sword
-a Pirate Hat
-a Cowboy Hat
-a Rigid Shield
-the Black Wings
-a Witchy Hat
-the White Wings
-an Umber Belt
-a Horned Helm
-a Trident
-a Magic Wand
-a Red Nose
-a Jester's Cap
-the Googly Specs
-a Crown
-a Black Tie
-a Black Cape
-the Gorgeous Specs
-a Top Hat
-a White Domino Mask
-a White Cape
-a Gentleman's Hat
-a Cane
-a Striped Tie
-a Pocket Watch
-a Bow Tie
-a Tiara
-a Rose
-a Monocle
-a Tie
-a Wig
-a Standing Mike
-a Tambourine
-a Fedora
-a Microphone
-a Maraca
-a Trumpet
-a Laurel Wreath
-a White Pompom
-a Pennant
-a Football
-a Winner's Belt
-a Racket
-an Electric Guitar
-a Toy Fishing Rod
-a Smiley-Face Mask
-a Fake Bellybutton
-a Professor Hat
-a Hula Skirt
-a Thick Book
-a Bouquet
-a Fake Bone
-a Round Mushroom
-a Shuriken
-a Scarlet Hat
-a Big Bag
-a Candy
-a Fluffy Beard
-a Gift Box
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
+Bank0484_Text_Empty =     \x{ffff}
+Bank0484_Text_Empty_2 =     \x{ffff}
+Bank0484_Text_Empty_3 =     \x{ffff}
+Bank0484_Text_PinkBarrette = a Pink Barrette
+Bank0484_Text_BlueBarrette = a Blue Barrette
+Bank0484_Text_RedBarrette = a Red Barrette
+Bank0484_Text_BlueFlower = a Blue Flower
+Bank0484_Text_CrimsonScarf = a Crimson Scarf
+Bank0484_Text_RedFlower = a Red Flower
+Bank0484_Text_BigBarrette = a Big Barrette
+Bank0484_Text_Headband = a Headband
+Bank0484_Text_SquareGlasses = the Square Glasses
+Bank0484_Text_StripedBarrette = a Striped Barrette
+Bank0484_Text_SmallBarrette = a Small Barrette
+Bank0484_Text_DecorativeRibbon = a Decorative Ribbon
+Bank0484_Text_Purse = a Purse
+Bank0484_Text_Necklace = a Necklace
+Bank0484_Text_GorgeousFlower = a Gorgeous Flower
+Bank0484_Text_RoundButton = a Round Button
+Bank0484_Text_GreenBarrette = a Green Barrette
+Bank0484_Text_StrawHat = a Straw Hat
+Bank0484_Text_SnowCrystal = a Snow Crystal
+Bank0484_Text_LonelyFlower = a Lonely Flower
+Bank0484_Text_Paintbrush = a Paintbrush
+Bank0484_Text_Beret = a Beret
+Bank0484_Text_Whisk = a Whisk
+Bank0484_Text_Ladle = a Ladle
+Bank0484_Text_ToyCake = a Toy Cake
+Bank0484_Text_ChefsHat = a Chef's Hat
+Bank0484_Text_FryingPan = a Frying Pan
+Bank0484_Text_Bib = a Bib
+Bank0484_Text_RedParasol = a Red Parasol
+Bank0484_Text_GermMask = a Germ Mask
+Bank0484_Text_Mallet = a Mallet
+Bank0484_Text_ColorfulParasol = a Colorful Parasol
+Bank0484_Text_Wrench = a Wrench
+Bank0484_Text_Lantern = a Lantern
+Bank0484_Text_WindupKey = a Windup Key
+Bank0484_Text_Helmet = a Helmet
+Bank0484_Text_FrillyApron = a Frilly Apron
+Bank0484_Text_DressyTie = a Dressy Tie
+Bank0484_Text_LaceCap = a Lace Cap
+Bank0484_Text_ScarletCape = a Scarlet Cape
+Bank0484_Text_ToyCutlass = a Toy Cutlass
+Bank0484_Text_ToySword = a Toy Sword
+Bank0484_Text_PirateHat = a Pirate Hat
+Bank0484_Text_CowboyHat = a Cowboy Hat
+Bank0484_Text_RigidShield = a Rigid Shield
+Bank0484_Text_BlackWings = the Black Wings
+Bank0484_Text_WitchyHat = a Witchy Hat
+Bank0484_Text_WhiteWings = the White Wings
+Bank0484_Text_UmberBelt = an Umber Belt
+Bank0484_Text_HornedHelm = a Horned Helm
+Bank0484_Text_Trident = a Trident
+Bank0484_Text_MagicWand = a Magic Wand
+Bank0484_Text_RedNose = a Red Nose
+Bank0484_Text_JestersCap = a Jester's Cap
+Bank0484_Text_GooglySpecs = the Googly Specs
+Bank0484_Text_Crown = a Crown
+Bank0484_Text_BlackTie = a Black Tie
+Bank0484_Text_BlackCape = a Black Cape
+Bank0484_Text_GorgeousSpecs = the Gorgeous Specs
+Bank0484_Text_TopHat = a Top Hat
+Bank0484_Text_WhiteDominoMask = a White Domino Mask
+Bank0484_Text_WhiteCape = a White Cape
+Bank0484_Text_GentlemansHat = a Gentleman's Hat
+Bank0484_Text_Cane = a Cane
+Bank0484_Text_StripedTie = a Striped Tie
+Bank0484_Text_PocketWatch = a Pocket Watch
+Bank0484_Text_BowTie = a Bow Tie
+Bank0484_Text_Tiara = a Tiara
+Bank0484_Text_Rose = a Rose
+Bank0484_Text_Monocle = a Monocle
+Bank0484_Text_Tie = a Tie
+Bank0484_Text_Wig = a Wig
+Bank0484_Text_StandingMike = a Standing Mike
+Bank0484_Text_Tambourine = a Tambourine
+Bank0484_Text_Fedora = a Fedora
+Bank0484_Text_Microphone = a Microphone
+Bank0484_Text_Maraca = a Maraca
+Bank0484_Text_Trumpet = a Trumpet
+Bank0484_Text_LaurelWreath = a Laurel Wreath
+Bank0484_Text_WhitePompom = a White Pompom
+Bank0484_Text_Pennant = a Pennant
+Bank0484_Text_Football = a Football
+Bank0484_Text_WinnersBelt = a Winner's Belt
+Bank0484_Text_Racket = a Racket
+Bank0484_Text_ElectricGuitar = an Electric Guitar
+Bank0484_Text_ToyFishingRod = a Toy Fishing Rod
+Bank0484_Text_SmileyFaceMask = a Smiley-Face Mask
+Bank0484_Text_FakeBellybutton = a Fake Bellybutton
+Bank0484_Text_ProfessorHat = a Professor Hat
+Bank0484_Text_HulaSkirt = a Hula Skirt
+Bank0484_Text_ThickBook = a Thick Book
+Bank0484_Text_Bouquet = a Bouquet
+Bank0484_Text_FakeBone = a Fake Bone
+Bank0484_Text_RoundMushroom = a Round Mushroom
+Bank0484_Text_Shuriken = a Shuriken
+Bank0484_Text_ScarletHat = a Scarlet Hat
+Bank0484_Text_BigBag = a Big Bag
+Bank0484_Text_Candy = a Candy
+Bank0484_Text_FluffyBeard = a Fluffy Beard
+Bank0484_Text_GiftBox = a Gift Box
+Bank0484_Text_Empty_4 =     \x{ffff}
+Bank0484_Text_Empty_5 =     \x{ffff}
+Bank0484_Text_Empty_6 =     \x{ffff}
+Bank0484_Text_Empty_7 =     \x{ffff}
+Bank0484_Text_Empty_8 =     \x{ffff}
+Bank0484_Text_Empty_9 =     \x{ffff}
+Bank0484_Text_Empty_10 =     \x{ffff}
+Bank0484_Text_Empty_11 =     \x{ffff}
+Bank0484_Text_Empty_12 =     \x{ffff}
+Bank0484_Text_Empty_13 =     \x{ffff}
+Bank0484_Text_Empty_14 =     \x{ffff}
+Bank0484_Text_Empty_15 =     \x{ffff}
+Bank0484_Text_Empty_16 =     \x{ffff}
+Bank0484_Text_Empty_17 =     \x{ffff}
+Bank0484_Text_Empty_18 =     \x{ffff}
+Bank0484_Text_Empty_19 =     \x{ffff}
+Bank0484_Text_Empty_20 =     \x{ffff}
+Bank0484_Text_Empty_21 =     \x{ffff}
+Bank0484_Text_Empty_22 =     \x{ffff}
+Bank0484_Text_Empty_23 =     \x{ffff}
+Bank0484_Text_Empty_24 =     \x{ffff}
+Bank0484_Text_Empty_25 =     \x{ffff}
+Bank0484_Text_Empty_26 =     \x{ffff}
+Bank0484_Text_Empty_27 =     \x{ffff}
+Bank0484_Text_Empty_28 =     \x{ffff}
+Bank0484_Text_Empty_29 =     \x{ffff}
+Bank0484_Text_Empty_30 =     \x{ffff}
+Bank0484_Text_Empty_31 =     \x{ffff}
+Bank0484_Text_Empty_32 =     \x{ffff}
+Bank0484_Text_Empty_33 =     \x{ffff}
+Bank0484_Text_Empty_34 =     \x{ffff}
+Bank0484_Text_Empty_35 =     \x{ffff}
+Bank0484_Text_Empty_36 =     \x{ffff}
+Bank0484_Text_Empty_37 =     \x{ffff}
+Bank0484_Text_Empty_38 =     \x{ffff}
+Bank0484_Text_Empty_39 =     \x{ffff}
+Bank0484_Text_Empty_40 =     \x{ffff}
+Bank0484_Text_Empty_41 =     \x{ffff}
+Bank0484_Text_Empty_42 =     \x{ffff}
+Bank0484_Text_Empty_43 =     \x{ffff}
+Bank0484_Text_Empty_44 =     \x{ffff}
+Bank0484_Text_Empty_45 =     \x{ffff}
+Bank0484_Text_Empty_46 =     \x{ffff}
+Bank0484_Text_Empty_47 =     \x{ffff}
+Bank0484_Text_Empty_48 =     \x{ffff}
+Bank0484_Text_Empty_49 =     \x{ffff}
+Bank0484_Text_Empty_50 =     \x{ffff}
+Bank0484_Text_Empty_51 =     \x{ffff}
+Bank0484_Text_Empty_52 =     \x{ffff}
+Bank0484_Text_Empty_53 =     \x{ffff}
+Bank0484_Text_Empty_54 =     \x{ffff}
+Bank0484_Text_Empty_55 =     \x{ffff}
+Bank0484_Text_Empty_56 =     \x{ffff}
+Bank0484_Text_Empty_57 =     \x{ffff}
+Bank0484_Text_Empty_58 =     \x{ffff}
+Bank0484_Text_Empty_59 =     \x{ffff}
+Bank0484_Text_Empty_60 =     \x{ffff}
+Bank0484_Text_Empty_61 =     \x{ffff}
+Bank0484_Text_Empty_62 =     \x{ffff}
+Bank0484_Text_Empty_63 =     \x{ffff}
+Bank0484_Text_Empty_64 =     \x{ffff}
+Bank0484_Text_Empty_65 =     \x{ffff}
+Bank0484_Text_Empty_66 =     \x{ffff}
+Bank0484_Text_Empty_67 =     \x{ffff}
+Bank0484_Text_Empty_68 =     \x{ffff}
+Bank0484_Text_Empty_69 =     \x{ffff}
+Bank0484_Text_Empty_70 =     \x{ffff}
+Bank0484_Text_Empty_71 =     \x{ffff}
+Bank0484_Text_Empty_72 =     \x{ffff}
+Bank0484_Text_Empty_73 =     \x{ffff}
+Bank0484_Text_Empty_74 =     \x{ffff}
+Bank0484_Text_Empty_75 =     \x{ffff}
+Bank0484_Text_Empty_76 =     \x{ffff}
+Bank0484_Text_Empty_77 =     \x{ffff}
+Bank0484_Text_Empty_78 =     \x{ffff}
+Bank0484_Text_Empty_79 =     \x{ffff}
+Bank0484_Text_Empty_80 =     \x{ffff}
+Bank0484_Text_Empty_81 =     \x{ffff}
+Bank0484_Text_Empty_82 =     \x{ffff}
+Bank0484_Text_Empty_83 =     \x{ffff}
+Bank0484_Text_Empty_84 =     \x{ffff}
+Bank0484_Text_Empty_85 =     \x{ffff}
+Bank0484_Text_Empty_86 =     \x{ffff}
+Bank0484_Text_Empty_87 =     \x{ffff}
+Bank0484_Text_Empty_88 =     \x{ffff}
+Bank0484_Text_Empty_89 =     \x{ffff}
+Bank0484_Text_Empty_90 =     \x{ffff}
+Bank0484_Text_Empty_91 =     \x{ffff}
+Bank0484_Text_Empty_92 =     \x{ffff}
+Bank0484_Text_Empty_93 =     \x{ffff}
+Bank0484_Text_Empty_94 =     \x{ffff}
+Bank0484_Text_Empty_95 =     \x{ffff}
+Bank0484_Text_Empty_96 =     \x{ffff}
+Bank0484_Text_Empty_97 =     \x{ffff}
+Bank0484_Text_Empty_98 =     \x{ffff}
+Bank0484_Text_Empty_99 =     \x{ffff}
+Bank0484_Text_Empty_100 =     \x{ffff}
+Bank0484_Text_Empty_101 =     \x{ffff}
+Bank0484_Text_Empty_102 =     \x{ffff}
+Bank0484_Text_Empty_103 =     \x{ffff}
+Bank0484_Text_Empty_104 =     \x{ffff}
+Bank0484_Text_Empty_105 =     \x{ffff}
+Bank0484_Text_Empty_106 =     \x{ffff}
+Bank0484_Text_Empty_107 =     \x{ffff}
+Bank0484_Text_Empty_108 =     \x{ffff}
+Bank0484_Text_Empty_109 =     \x{ffff}
+Bank0484_Text_Empty_110 =     \x{ffff}
+Bank0484_Text_Empty_111 =     \x{ffff}
+Bank0484_Text_Empty_112 =     \x{ffff}
+Bank0484_Text_Empty_113 =     \x{ffff}
+Bank0484_Text_Empty_114 =     \x{ffff}
+Bank0484_Text_Empty_115 =     \x{ffff}
+Bank0484_Text_Empty_116 =     \x{ffff}
+Bank0484_Text_Empty_117 =     \x{ffff}
+Bank0484_Text_Empty_118 =     \x{ffff}
+Bank0484_Text_Empty_119 =     \x{ffff}
+Bank0484_Text_Empty_120 =     \x{ffff}
+Bank0484_Text_Empty_121 =     \x{ffff}
+Bank0484_Text_Empty_122 =     \x{ffff}
+Bank0484_Text_Empty_123 =     \x{ffff}
+Bank0484_Text_Empty_124 =     \x{ffff}
+Bank0484_Text_Empty_125 =     \x{ffff}
+Bank0484_Text_Empty_126 =     \x{ffff}
+Bank0484_Text_Empty_127 =     \x{ffff}
+Bank0484_Text_Empty_128 =     \x{ffff}
+Bank0484_Text_Empty_129 =     \x{ffff}
+Bank0484_Text_Empty_130 =     \x{ffff}
+Bank0484_Text_Empty_131 =     \x{ffff}
+Bank0484_Text_Empty_132 =     \x{ffff}
+Bank0484_Text_Empty_133 =     \x{ffff}
+Bank0484_Text_Empty_134 =     \x{ffff}
+Bank0484_Text_Empty_135 =     \x{ffff}
+Bank0484_Text_Empty_136 =     \x{ffff}
+Bank0484_Text_Empty_137 =     \x{ffff}
+Bank0484_Text_Empty_138 =     \x{ffff}
+Bank0484_Text_Empty_139 =     \x{ffff}
+Bank0484_Text_Empty_140 =     \x{ffff}
+Bank0484_Text_Empty_141 =     \x{ffff}
+Bank0484_Text_Empty_142 =     \x{ffff}
+Bank0484_Text_Empty_143 =     \x{ffff}
+Bank0484_Text_Empty_144 =     \x{ffff}
+Bank0484_Text_Empty_145 =     \x{ffff}
+Bank0484_Text_Empty_146 =     \x{ffff}
+Bank0484_Text_Empty_147 =     \x{ffff}
+Bank0484_Text_Empty_148 =     \x{ffff}
+Bank0484_Text_Empty_149 =     \x{ffff}
+Bank0484_Text_Empty_150 =     \x{ffff}
+Bank0484_Text_Empty_151 =     \x{ffff}
+Bank0484_Text_Empty_152 =     \x{ffff}
+Bank0484_Text_Empty_153 =     \x{ffff}
+Bank0484_Text_Empty_154 =     \x{ffff}
+Bank0484_Text_Empty_155 =     \x{ffff}

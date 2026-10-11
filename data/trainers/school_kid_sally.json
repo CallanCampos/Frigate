@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Sally",
+    "class": "TRAINER_CLASS_SCHOOL_KID_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 5,
+    "reward": "ITEM_ULTRA_BALL",
+    "party": [
+        {
+            "species": "SPECIES_LUVDISC",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_FARFETCHD",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LICKITUNG",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "OK, I decided!\nIf I win against you,{be00}\nI will be a Gym Leader!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ummmm...\nMaybe I'm not ready to be a Gym Leader?"
+        },
+        {
+            "type": 15,
+            "text": "You taught me a lot, so please\naccept this as a symbol of my thanks!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I have to consider what I will be\nby trying a lot of things!"
+        }
+    ]
+}

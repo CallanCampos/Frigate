@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ALTARIA",
+    "moves": [ "MOVE_DRAGON_CLAW", "MOVE_PLUCK", "MOVE_MIST", "MOVE_HONE_CLAWS" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_YACHE_BERRY",
+    "form": 0
+}

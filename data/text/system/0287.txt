@@ -1,21 +1,21 @@
-{bd02}The amusement park...\n\n{bd02}This was a special place...\n\n{bd02}For the two of us...
-{bd02}It was where we had our first date...\n\n{bd02}The first time we were alone together...
-{bd02}I professed my love on the Ferris wheel.
-{bd02}Even now, when we're apart...\n\n{bd02}I find myself in the amusement park.
-{bd02}Then...we saw each other there.
-{bd02}For some reason...\n\n{bd02}She challenged me to battle!
-なし
-なし
-なし
-なし
-{bd02}The amusement park...\n\n{bd02}This was a special place...\n\n{bd02}For the two of us...
-{bd02}It was where we had our first date...\n\n{bd02}The first time we were alone together...
-{bd02}I professed my love on the Ferris wheel.
-{bd02}Even now, when we're apart...\n\n{bd02}I find myself in the amusement park.
-{bd02}Then...we saw each other there.
-{bd02}For some reason...\n\n{bd02}He challenged me to battle!
-なし
-なし
-なし
-なし
-なし
+Bank0287_Text_AmusementParkSpecialPlace = {bd02}The amusement park...\n\n{bd02}This was a special place...\n\n{bd02}For the two of us...
+Bank0287_Text_WhereWeHadOur = {bd02}It was where we had our first date...\n\n{bd02}The first time we were alone together...
+Bank0287_Text_ProfessedLoveFerrisWheel = {bd02}I professed my love on the Ferris wheel.
+Bank0287_Text_EvenNowWhenWere = {bd02}Even now, when we're apart...\n\n{bd02}I find myself in the amusement park.
+Bank0287_Text_ThenWeSawEach = {bd02}Then...we saw each other there.
+Bank0287_Text_SomeReasonSheChallenged = {bd02}For some reason...\n\n{bd02}She challenged me to battle!
+Bank0287_Text_Empty = なし
+Bank0287_Text_Empty_2 = なし
+Bank0287_Text_Empty_3 = なし
+Bank0287_Text_Empty_4 = なし
+Bank0287_Text_AmusementParkSpecialPlace_2 = {bd02}The amusement park...\n\n{bd02}This was a special place...\n\n{bd02}For the two of us...
+Bank0287_Text_WhereWeHadOur_2 = {bd02}It was where we had our first date...\n\n{bd02}The first time we were alone together...
+Bank0287_Text_ProfessedLoveFerrisWheel_2 = {bd02}I professed my love on the Ferris wheel.
+Bank0287_Text_EvenNowWhenWere_2 = {bd02}Even now, when we're apart...\n\n{bd02}I find myself in the amusement park.
+Bank0287_Text_ThenWeSawEach_2 = {bd02}Then...we saw each other there.
+Bank0287_Text_SomeReasonHeChallenged = {bd02}For some reason...\n\n{bd02}He challenged me to battle!
+Bank0287_Text_Empty_5 = なし
+Bank0287_Text_Empty_6 = なし
+Bank0287_Text_Empty_7 = なし
+Bank0287_Text_Empty_8 = なし
+Bank0287_Text_Empty_9 = なし

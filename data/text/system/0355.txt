@@ -1,81 +1,81 @@
-The “How Do You Play the Game" Survey
-The “Details about People" Survey
-The “Pokémon Favorites" Survey
-The “Ideals and Values" Survey
-The “Likable People" Survey
-The “Future Goals" Survey
-The “Entertainment" Survey
-The “What If..." Survey
-The “Sports and Pastimes" Survey
-The “More about Pokémon" Survey
-This is a survey about how people play Pokémon\nBlack Version 2 and Pokémon White Version 2.
-This is a survey to find out details\nabout people.
-This is a survey to find out people's\npreferences when it comes to Pokémon.
-This is a survey to find out about the ideals\nand values of people.
-This is a survey to find out about what kinds\nof people are most likable.
-This is a survey to find out what\ngoals people have for the future.
-This is a survey to find out what kinds of\nentertainment people enjoy.
-This is a survey to find out everyone's\nopinions about hypothetical situations.
-This is a survey to find out what kind\nof sports and games people like.
-This is a detailed survey to find out\nmore about what people think of Pokémon.
-Which version do you play?
-Are you male or female?
-Which do you prefer, battle or trade?
-Would you live in the city or country?
-What kind of person do you prefer?
-Which do you wish you had more of?
-Which do you value more in a person?
-What kind of Pokémon do you like best?
-What's your starter Pokémon?
-How do you play with your friends?
-Where would you go with a time machine?
-What's most important to you?
-In the future, what do you want to be?
-Are you a dreamer or a realist?
-What kind of people do you like best?
-What do you like about Pokémon?
-What would you do with magic?
-What would you do with lots of money?
-How long have you played Pokémon?
-What do you do in your spare time?
-What kind of music do you like?
-What kind of TV programs do you like?
-What kind of movies do you like?
-What kinds of games do you like?
-What do you plan to work hard at?
-What's your hobby?
-What kind of job do you have?
-Which Gym Leader do you like best?
-What Pokémon type do you like best?
-How long have you been playing?
-The “Pokémon Black Version 2 or\nPokémon White Version 2" Survey
-The “Gender" Survey
-The “Battle vs. Trade" Survey
-The “Where to Live" Survey
-The “Smart vs. Athletic" Survey
-The “Time vs. Money" Survey
-The “Appearance vs. Substance" Survey
-The “Favorite Kind of Pokémon" Survey
-The “Starter Pokémon" Survey
-The “What Do You Play" Survey
-The “What Era Would You Visit\nwith a Time Machine" Survey
-The “Important People" Survey
-The “In the Future, I Want to Be..." Survey
-The “Dreamer or Realist" Survey
-The “Popular People" Survey
-The “Best Thing about Pokémon" Survey
-The “What Would You Do with Magic" Survey
-The “If You Were Rich" Survey
-The “How Long You Have Been\nPlaying Pokémon" Survey
-The “Leisure Time" Survey
-The “Music" Survey
-The “TV" Survey
-The “Movies" Survey
-The “What's Your\nFavorite Game Genre" Survey
-The “What Do You Plan to Work\nHard At" Survey
-The “Hobbies" Survey
-The “Jobs" Survey
-The “Gym Leaders" Survey
-The “Pokémon Types" Survey
-The “Gameplay Time" Survey
+Bank0355_Text_HowPlayGameSurvey = The “How Do You Play the Game" Survey
+Bank0355_Text_DetailsAboutPeopleSurvey = The “Details about People" Survey
+Bank0355_Text_PokemonFavoritesSurvey = The “Pokémon Favorites" Survey
+Bank0355_Text_IdealsValuesSurvey = The “Ideals and Values" Survey
+Bank0355_Text_LikablePeopleSurvey = The “Likable People" Survey
+Bank0355_Text_FutureGoalsSurvey = The “Future Goals" Survey
+Bank0355_Text_EntertainmentSurvey = The “Entertainment" Survey
+Bank0355_Text_WhatIfSurvey = The “What If..." Survey
+Bank0355_Text_SportsPastimesSurvey = The “Sports and Pastimes" Survey
+Bank0355_Text_MoreAboutPokemonSurvey = The “More about Pokémon" Survey
+Bank0355_Text_SurveyAboutHowPeople = This is a survey about how people play Pokémon\nBlack Version 2 and Pokémon White Version 2.
+Bank0355_Text_SurveyFindOutDetails = This is a survey to find out details\nabout people.
+Bank0355_Text_SurveyFindOutPeoples = This is a survey to find out people's\npreferences when it comes to Pokémon.
+Bank0355_Text_SurveyFindOutAbout = This is a survey to find out about the ideals\nand values of people.
+Bank0355_Text_SurveyFindOutAbout_2 = This is a survey to find out about what kinds\nof people are most likable.
+Bank0355_Text_SurveyFindOutWhat = This is a survey to find out what\ngoals people have for the future.
+Bank0355_Text_SurveyFindOutWhat_2 = This is a survey to find out what kinds of\nentertainment people enjoy.
+Bank0355_Text_SurveyFindOutEveryones = This is a survey to find out everyone's\nopinions about hypothetical situations.
+Bank0355_Text_SurveyFindOutWhat_3 = This is a survey to find out what kind\nof sports and games people like.
+Bank0355_Text_DetailedSurveyFindOut = This is a detailed survey to find out\nmore about what people think of Pokémon.
+Bank0355_Text_WhichVersionPlay = Which version do you play?
+Bank0355_Text_MaleFemale = Are you male or female?
+Bank0355_Text_WhichPreferBattleTrade = Which do you prefer, battle or trade?
+Bank0355_Text_WouldLiveCityCountry = Would you live in the city or country?
+Bank0355_Text_WhatKindPersonPrefer = What kind of person do you prefer?
+Bank0355_Text_WhichWishHadMore = Which do you wish you had more of?
+Bank0355_Text_WhichValueMorePerson = Which do you value more in a person?
+Bank0355_Text_WhatKindPokemonLike = What kind of Pokémon do you like best?
+Bank0355_Text_WhatsStarterPokemon = What's your starter Pokémon?
+Bank0355_Text_HowPlayFriends = How do you play with your friends?
+Bank0355_Text_WhereWouldGoTime = Where would you go with a time machine?
+Bank0355_Text_WhatsMostImportant = What's most important to you?
+Bank0355_Text_FutureWhatWant = In the future, what do you want to be?
+Bank0355_Text_DreamerRealist = Are you a dreamer or a realist?
+Bank0355_Text_WhatKindPeopleLike = What kind of people do you like best?
+Bank0355_Text_WhatLikeAboutPokemon = What do you like about Pokémon?
+Bank0355_Text_WhatWouldMagic = What would you do with magic?
+Bank0355_Text_WhatWouldLotsMoney = What would you do with lots of money?
+Bank0355_Text_HowLongHavePlayed = How long have you played Pokémon?
+Bank0355_Text_WhatSpareTime = What do you do in your spare time?
+Bank0355_Text_WhatKindMusicLike = What kind of music do you like?
+Bank0355_Text_WhatKindTvPrograms = What kind of TV programs do you like?
+Bank0355_Text_WhatKindMoviesLike = What kind of movies do you like?
+Bank0355_Text_WhatKindsGamesLike = What kinds of games do you like?
+Bank0355_Text_WhatPlanWorkHard = What do you plan to work hard at?
+Bank0355_Text_WhatsHobby = What's your hobby?
+Bank0355_Text_WhatKindJobHave = What kind of job do you have?
+Bank0355_Text_WhichGymLeaderLike = Which Gym Leader do you like best?
+Bank0355_Text_WhatPokemonTypeLike = What Pokémon type do you like best?
+Bank0355_Text_HowLongHaveBeen = How long have you been playing?
+Bank0355_Text_PokemonBlackVersion2 = The “Pokémon Black Version 2 or\nPokémon White Version 2" Survey
+Bank0355_Text_GenderSurvey = The “Gender" Survey
+Bank0355_Text_BattleVsTradeSurvey = The “Battle vs. Trade" Survey
+Bank0355_Text_WhereLiveSurvey = The “Where to Live" Survey
+Bank0355_Text_SmartVsAthleticSurvey = The “Smart vs. Athletic" Survey
+Bank0355_Text_TimeVsMoneySurvey = The “Time vs. Money" Survey
+Bank0355_Text_AppearanceVsSubstanceSurvey = The “Appearance vs. Substance" Survey
+Bank0355_Text_FavoriteKindPokemonSurvey = The “Favorite Kind of Pokémon" Survey
+Bank0355_Text_StarterPokemonSurvey = The “Starter Pokémon" Survey
+Bank0355_Text_WhatPlaySurvey = The “What Do You Play" Survey
+Bank0355_Text_WhatEraWouldVisit = The “What Era Would You Visit\nwith a Time Machine" Survey
+Bank0355_Text_ImportantPeopleSurvey = The “Important People" Survey
+Bank0355_Text_FutureWantSurvey = The “In the Future, I Want to Be..." Survey
+Bank0355_Text_DreamerRealistSurvey = The “Dreamer or Realist" Survey
+Bank0355_Text_PopularPeopleSurvey = The “Popular People" Survey
+Bank0355_Text_BestThingAboutPokemon = The “Best Thing about Pokémon" Survey
+Bank0355_Text_WhatWouldMagicSurvey = The “What Would You Do with Magic" Survey
+Bank0355_Text_IfWereRichSurvey = The “If You Were Rich" Survey
+Bank0355_Text_HowLongHaveBeen_2 = The “How Long You Have Been\nPlaying Pokémon" Survey
+Bank0355_Text_LeisureTimeSurvey = The “Leisure Time" Survey
+Bank0355_Text_MusicSurvey = The “Music" Survey
+Bank0355_Text_TvSurvey = The “TV" Survey
+Bank0355_Text_MoviesSurvey = The “Movies" Survey
+Bank0355_Text_WhatsFavoriteGameGenre = The “What's Your\nFavorite Game Genre" Survey
+Bank0355_Text_WhatPlanWorkHard_2 = The “What Do You Plan to Work\nHard At" Survey
+Bank0355_Text_HobbiesSurvey = The “Hobbies" Survey
+Bank0355_Text_JobsSurvey = The “Jobs" Survey
+Bank0355_Text_GymLeadersSurvey = The “Gym Leaders" Survey
+Bank0355_Text_PokemonTypesSurvey = The “Pokémon Types" Survey
+Bank0355_Text_GameplayTimeSurvey = The “Gameplay Time" Survey
 \pad{ec}

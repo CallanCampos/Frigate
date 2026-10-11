@@ -1,7 +1,9 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/moves.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_effect.h"
 #include "field/field_g3dobj.h"
@@ -111,7 +113,7 @@ const WbtTournamentInfo *func_ov036_021c98a4(s32 tournament) {
 
 void LoadPWTTournamentTypeText(HeapID heapId, u32 tournament, StrBuf *strbuf) {
     u16 name = func_ov036_021c98a4(tournament)->name;
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, 0x195, heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_WBT_PARTY, heapId);
 
     if (msgData != NULL) {
         GFL_MsgDataLoadStrbuf(msgData, name, strbuf);

@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "John",
+    "class": "TRAINER_CLASS_HOOPSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_HYPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_STOUTLAND",
+            "form": 0,
+            "level": 47,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 47,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A young Trainer! It's important for the\nyoung to get lots of exercise, isn't it?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "A healthy sweat...\nBoy, I am glad that I am an athlete!"
+        },
+        {
+            "type": 15,
+            "text": "Athletes like me are generous!\nHere, have this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I want a Poké Ball that's\nas big as a basketball!{be01}\nI think it would be more comfortable\nfor the Pokémon inside it."
+        }
+    ]
+}

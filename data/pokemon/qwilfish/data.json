@@ -1,0 +1,182 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Qwilfish",
+    "pokedex": {
+        "category": "Balloon Pokémon",
+        "entry": "It shoots the poison spines on its\nbody in all directions. Its round\nform makes it a poor swimmer.",
+        "height": "1'08\"",
+        "weight": "8.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Qwilfish",
+                "category": "Balloon Pokémon",
+                "entry": "It shoots the poison spines on its\nbody in all directions. Its round\nform makes it a poor swimmer.",
+                "height": "1'08\"",
+                "weight": "8.6 lbs."
+            },
+            "fr": {
+                "name": "Qwilfish",
+                "category": "Pokémon Bouboule",
+                "entry": "Il envoie ses piquants empoisonnés\nà la ronde. Sa forme sphérique en\nfait un piètre nageur.",
+                "height": "0,5 m",
+                "weight": "3,9 kg"
+            },
+            "de": {
+                "name": "Baldorfish",
+                "category": "Ballon",
+                "entry": "Es verschießt die giftigen Stacheln\nseines Körpers in alle Richtungen.\nEs ist kein guter Schwimmer.",
+                "height": "0,5 m",
+                "weight": "3,9 kg"
+            },
+            "it": {
+                "name": "Qwilfish",
+                "category": "Pokémon Pallone",
+                "entry": "Spara i suoi aculei velenosi in tutte\nle direzioni. Essendo un po' tondetto,\nnon è un gran nuotatore.",
+                "height": "0,5 m",
+                "weight": "3,9 kg"
+            },
+            "ko": {
+                "name": "침바루",
+                "category": "풍선포켓몬",
+                "entry": "전신의 독침을\n사방팔방으로 쏘아댄다.\n둥근 몸은 헤엄치는데 서투르다.",
+                "height": "0.5 m",
+                "weight": "3.9 kg"
+            },
+            "es": {
+                "name": "Qwilfish",
+                "category": "Pokémon Globo",
+                "entry": "Lanza púas venenosas en todas\ndirecciones. Debido a su forma\nredonda, es muy mal nadador.",
+                "height": "0,5 m",
+                "weight": "3,9 kg"
+            },
+            "ja": {
+                "name": "ハリーセン",
+                "category": "ふうせんポケモン",
+                "entry": "ぜんしんの\\x{3000}どくバリを\nしほうはっぽうに\\x{3000}うちだす。\nまるい\\x{3000}からだは\\x{3000}およぎが\\x{3000}にがて。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff0e}\\x{ff19}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 95,
+        "defense": 75,
+        "speed": 85,
+        "special_attack": 55,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_WATER", "TYPE_POISON" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_POISON_BARB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_2", "EGG_GROUP_WATER_2" ],
+    "abilities": [ "ABILITY_POISON_POINT", "ABILITY_SWIFT_SWIM" ],
+    "hidden_ability": "ABILITY_INTIMIDATE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 86,
+    "height": 5,
+    "weight": 39,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SPIKES" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_POISON_STING" ],
+            [ 9, "MOVE_HARDEN" ],
+            [ 9, "MOVE_MINIMIZE" ],
+            [ 13, "MOVE_WATER_GUN" ],
+            [ 17, "MOVE_ROLLOUT" ],
+            [ 21, "MOVE_TOXIC_SPIKES" ],
+            [ 25, "MOVE_STOCKPILE" ],
+            [ 25, "MOVE_SPIT_UP" ],
+            [ 29, "MOVE_REVENGE" ],
+            [ 33, "MOVE_BRINE" ],
+            [ 37, "MOVE_PIN_MISSILE" ],
+            [ 41, "MOVE_TAKE_DOWN" ],
+            [ 45, "MOVE_AQUA_TAIL" ],
+            [ 49, "MOVE_POISON_JAB" ],
+            [ 53, "MOVE_DESTINY_BOND" ],
+            [ 57, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM09",
+            "TM10",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM64",
+            "TM66",
+            "TM73",
+            "TM74",
+            "TM84",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FLAIL",
+            "MOVE_HAZE",
+            "MOVE_BUBBLE_BEAM",
+            "MOVE_SUPERSONIC",
+            "MOVE_ASTONISH",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_AQUA_JET",
+            "MOVE_WATER_PULSE",
+            "MOVE_BRINE",
+            "MOVE_ACID_SPRAY"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_QWILFISH"
+}

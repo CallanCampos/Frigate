@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_PRINPLUP",
+    "moves": [ "MOVE_BRINE", "MOVE_BUBBLE_BEAM", "MOVE_METAL_CLAW", "MOVE_DRILL_PECK" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_NAIVE",
+    "item": "ITEM_NONE",
+    "form": 0
+}

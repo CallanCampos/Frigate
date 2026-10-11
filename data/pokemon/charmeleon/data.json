@@ -1,0 +1,176 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Charmeleon",
+    "pokedex": {
+        "category": "Flame Pokémon",
+        "entry": "In the rocky mountains where\nCharmeleon live, their fiery\ntails shine at night like stars.",
+        "height": "3'07\"",
+        "weight": "41.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Charmeleon",
+                "category": "Flame Pokémon",
+                "entry": "In the rocky mountains where\nCharmeleon live, their fiery\ntails shine at night like stars.",
+                "height": "3'07\"",
+                "weight": "41.9 lbs."
+            },
+            "fr": {
+                "name": "Reptincel",
+                "category": "Pokémon Flamme",
+                "entry": "La nuit, la queue ardente du Reptincel\nbrille comme une étoile dans son\nrepaire montagneux.",
+                "height": "1,1 m",
+                "weight": "19,0 kg"
+            },
+            "de": {
+                "name": "Glutexo",
+                "category": "Flamme",
+                "entry": "Glutexo leben in den Bergen.\nDie Flammen auf ihren Schweifspitzen\nleuchten in der Nacht wie Sterne.",
+                "height": "1,1 m",
+                "weight": "19,0 kg"
+            },
+            "it": {
+                "name": "Charmeleon",
+                "category": "Pokémon Fiamma",
+                "entry": "Sui monti rocciosi, sua dimora, la coda\ndi Charmeleon brilla come una stella\nnella notte.",
+                "height": "1,1 m",
+                "weight": "19,0 kg"
+            },
+            "ko": {
+                "name": "리자드",
+                "category": "화염포켓몬",
+                "entry": "리자드가 사는 바위산을\n한밤중에 올려다보면 꼬리의\n불꽃이 별처럼 보인다.",
+                "height": "1.1 m",
+                "weight": "19.0 kg"
+            },
+            "es": {
+                "name": "Charmeleon",
+                "category": "Pokémon Llama",
+                "entry": "En las montañas rocosas donde viven\nlos Charmeleon, sus colas ardientes\nbrillan como estrellas.",
+                "height": "1,1 m",
+                "weight": "19,0 kg"
+            },
+            "ja": {
+                "name": "リザード",
+                "category": "かえんポケモン",
+                "entry": "リザードが\\x{3000}くらす\\x{3000}いわやまを\nよなかに\\x{3000}みあげると\\x{3000}しっぽの\nほのおが\\x{3000}ほしのように\\x{3000}みえる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff11}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff19}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 58,
+        "attack": 64,
+        "defense": 58,
+        "speed": 80,
+        "special_attack": 80,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_DRAGON" ],
+    "abilities": [ "ABILITY_BLAZE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SOLAR_POWER",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 11,
+    "weight": 190,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 7, "MOVE_EMBER" ],
+            [ 10, "MOVE_SMOKE_SCREEN" ],
+            [ 17, "MOVE_DRAGON_RAGE" ],
+            [ 21, "MOVE_SCARY_FACE" ],
+            [ 28, "MOVE_FIRE_FANG" ],
+            [ 32, "MOVE_FLAME_BURST" ],
+            [ 39, "MOVE_SLASH" ],
+            [ 43, "MOVE_FLAMETHROWER" ],
+            [ 50, "MOVE_FIRE_SPIN" ],
+            [ 54, "MOVE_INFERNO" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM02",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM50",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM65",
+            "TM75",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_FIRE_PLEDGE",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 36,
+            "species": "SPECIES_CHARIZARD"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CHARMANDER"
+}

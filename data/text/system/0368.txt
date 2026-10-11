@@ -1,19 +1,19 @@
-{0100:0}
-\cCheren
-\cRoxie
-\cBurgh
-\cElesa
-\cClay
-\cSkyla
-\cDrayden
-\cMarlon
-\cShauntal
-\cGrimsley
-\cMarshal
-\cCaitlin
-\cIris
-{0100:0}
-\cN
-\cColress
-\cGhetsis
-\cBenga
+Bank0368_Text_Empty = {0100:0}
+Bank0368_Text_Cheren = \cCheren
+Bank0368_Text_Roxie = \cRoxie
+Bank0368_Text_Burgh = \cBurgh
+Bank0368_Text_Elesa = \cElesa
+Bank0368_Text_Clay = \cClay
+Bank0368_Text_Skyla = \cSkyla
+Bank0368_Text_Drayden = \cDrayden
+Bank0368_Text_Marlon = \cMarlon
+Bank0368_Text_Shauntal = \cShauntal
+Bank0368_Text_Grimsley = \cGrimsley
+Bank0368_Text_Marshal = \cMarshal
+Bank0368_Text_Caitlin = \cCaitlin
+Bank0368_Text_Iris = \cIris
+Bank0368_Text_Empty_2 = {0100:0}
+Bank0368_Text_N = \cN
+Bank0368_Text_Colress = \cColress
+Bank0368_Text_Ghetsis = \cGhetsis
+Bank0368_Text_Benga = \cBenga

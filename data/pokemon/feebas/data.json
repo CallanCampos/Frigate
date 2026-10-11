@@ -1,0 +1,163 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Feebas",
+    "pokedex": {
+        "category": "Fish Pokémon",
+        "entry": "It is a shabby and ugly Pokémon.\nHowever, it is very hardy and\ncan survive on little water.",
+        "height": "2'00\"",
+        "weight": "16.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Feebas",
+                "category": "Fish Pokémon",
+                "entry": "It is a shabby and ugly Pokémon.\nHowever, it is very hardy and\ncan survive on little water.",
+                "height": "2'00\"",
+                "weight": "16.3 lbs."
+            },
+            "fr": {
+                "name": "Barpau",
+                "category": "Pokémon Poisson",
+                "entry": "Ce Pokémon a peut-être un physique\ndisgracieux, mais il est robuste et\npeut survivre dans très peu d'eau.",
+                "height": "0,6 m",
+                "weight": "7,4 kg"
+            },
+            "de": {
+                "name": "Barschwa",
+                "category": "Fisch",
+                "entry": "Ein schäbiges, ja sogar hässliches\nPokémon. Dafür ist es abgehärtet\nund überlebt mit wenig Wasser.",
+                "height": "0,6 m",
+                "weight": "7,4 kg"
+            },
+            "it": {
+                "name": "Feebas",
+                "category": "Pokémon Pesce",
+                "entry": "È un Pokémon brutto e sciatto. Tuttavia,\nè molto resistente e sopravvive in\npochissima acqua.",
+                "height": "0,6 m",
+                "weight": "7,4 kg"
+            },
+            "ko": {
+                "name": "빈티나",
+                "category": "물고기포켓몬",
+                "entry": "볼품없고 못생긴 포켓몬이지만\n강인한 생명력을 가져\n약간의 물만 있어도 살아남는다.",
+                "height": "0.6 m",
+                "weight": "7.4 kg"
+            },
+            "es": {
+                "name": "Feebas",
+                "category": "Pokémon Pez",
+                "entry": "Su apariencia deja bastante que\ndesear, pero es muy resistente y\npuede sobrevivir con poca agua.",
+                "height": "0,6 m",
+                "weight": "7,4 kg"
+            },
+            "ja": {
+                "name": "ヒンバス",
+                "category": "さかなポケモン",
+                "entry": "みすぼらしく\\x{3000}みにくい\\x{3000}ポケモンだが\nしぶとい\\x{3000}せいめいりょくを\\x{3000}もち\nわずかな\\x{3000}みずだけでも\\x{3000}いきのびる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff0e}\\x{ff14}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 20,
+        "attack": 15,
+        "defense": 20,
+        "speed": 80,
+        "special_attack": 10,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_DRAGON" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_ADAPTABILITY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 40,
+    "height": 6,
+    "weight": 74,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SPLASH" ],
+            [ 15, "MOVE_TACKLE" ],
+            [ 30, "MOVE_FLAIL" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [ "MOVE_ICY_WIND", "MOVE_DRAGON_PULSE", "MOVE_IRON_TAIL", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_MIRROR_COAT",
+            "MOVE_DRAGON_BREATH",
+            "MOVE_MUD_SPORT",
+            "MOVE_HYPNOSIS",
+            "MOVE_CONFUSE_RAY",
+            "MOVE_MIST",
+            "MOVE_HAZE",
+            "MOVE_TICKLE",
+            "MOVE_BRINE",
+            "MOVE_IRON_TAIL",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_CAPTIVATE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_BEAUTY",
+            "param": 170,
+            "species": "SPECIES_MILOTIC"
+        },
+        {
+            "method": "EVO_METHOD_TRADE_WITH_ITEM",
+            "param": "ITEM_PRISM_SCALE",
+            "species": "SPECIES_MILOTIC"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_FEEBAS"
+}

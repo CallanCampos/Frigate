@@ -1,0 +1,170 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Beedrill",
+    "pokedex": {
+        "category": "Poison Bee Pokémon",
+        "entry": "Its best attack involves flying\naround at high speed, striking with\npoison needles, then flying off.",
+        "height": "3'03\"",
+        "weight": "65.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Beedrill",
+                "category": "Poison Bee Pokémon",
+                "entry": "Its best attack involves flying\naround at high speed, striking with\npoison needles, then flying off.",
+                "height": "3'03\"",
+                "weight": "65.0 lbs."
+            },
+            "fr": {
+                "name": "Dardargnan",
+                "category": "Pokémon Guêpoison",
+                "entry": "Il virevolte rapidement autour de\nl'ennemi et frappe de son dard\nempoisonné avant de décamper.",
+                "height": "1,0 m",
+                "weight": "29,5 kg"
+            },
+            "de": {
+                "name": "Bibor",
+                "category": "Giftbiene",
+                "entry": "Sein bester Angriff: Schnell auf den\nGegner zufliegen, mit Giftstacheln\nzustechen und davonfliegen.",
+                "height": "1,0 m",
+                "weight": "29,5 kg"
+            },
+            "it": {
+                "name": "Beedrill",
+                "category": "Pokémon Velenape",
+                "entry": "Vola intorno al nemico ad alta velocità,\nattacca con i pungiglioni avvelenati e\nsi allontana rapido.",
+                "height": "1,0 m",
+                "weight": "29,5 kg"
+            },
+            "ko": {
+                "name": "독침붕",
+                "category": "독벌포켓몬",
+                "entry": "고속으로 날아다니며 독침으로\n공격한 뒤 바로 날아가 버리는\n전법이 특기다.",
+                "height": "1.0 m",
+                "weight": "29.5 kg"
+            },
+            "es": {
+                "name": "Beedrill",
+                "category": "Pokémon Abeja Ven.",
+                "entry": "Atacan volando alrededor del objetivo\ny usando su aguijón venenoso antes\nde huir.",
+                "height": "1,0 m",
+                "weight": "29,5 kg"
+            },
+            "ja": {
+                "name": "スピアー",
+                "category": "どくばちポケモン",
+                "entry": "こうそくで\\x{3000}とびまわり\\x{3000}どくバリで\nこうげきしたあと\\x{3000}すぐに\\x{3000}とびさる\nせんぽうが\\x{3000}とくいわざだ。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 80,
+        "defense": 40,
+        "speed": 75,
+        "special_attack": 45,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_BUG", "TYPE_POISON" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_POISON_BARB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SWARM", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SNIPER",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 10,
+    "weight": 295,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_FURY_ATTACK" ],
+            [ 10, "MOVE_FURY_ATTACK" ],
+            [ 13, "MOVE_FOCUS_ENERGY" ],
+            [ 16, "MOVE_TWINEEDLE" ],
+            [ 19, "MOVE_RAGE" ],
+            [ 22, "MOVE_PURSUIT" ],
+            [ 25, "MOVE_TOXIC_SPIKES" ],
+            [ 28, "MOVE_PIN_MISSILE" ],
+            [ 31, "MOVE_AGILITY" ],
+            [ 34, "MOVE_ASSURANCE" ],
+            [ 37, "MOVE_POISON_JAB" ],
+            [ 40, "MOVE_ENDEAVOR" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM31",
+            "TM32",
+            "TM36",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM54",
+            "TM62",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM76",
+            "TM81",
+            "TM84",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_DRILL_RUN",
+            "MOVE_ELECTROWEB",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WEEDLE"
+}

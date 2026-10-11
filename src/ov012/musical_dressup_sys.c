@@ -1,4 +1,5 @@
 #include "types.h"
+#include "field/dup_fitting.h"
 #include "field/musical.h"
 #include "field/musical_dressup_sys.h"
 #include "gfl/heap.h"
@@ -10,8 +11,8 @@ typedef struct {
     // The copy of the parameter that overlay 208 gets
     MusicalDressUpParam *dressUp;
     // Overlay 208's work
-    void *work;
-    void *result;
+    DupFittingWork *work;
+    u32 result;
     MusicalDressUpParam *param;
 } MusicalDressUpWork;
 
@@ -56,25 +57,25 @@ static BOOL func_ov012_02151ecc(GameProc *proc, u32 *state, void *param, void *w
 
 static BOOL func_ov012_02151efc(GameProc *proc, u32 *state, void *param, void *work) {
     MusicalDressUpWork *wk = work;
-    void *result;
+    u32 result;
 
     switch (*state) {
     case 0:
-        wk->work = func_ov208_021998c0(wk->dressUp, HEAPID_MUSICAL_DRESSUP);
+        wk->work = DupFitting_Create(wk->dressUp, HEAPID_MUSICAL_DRESSUP);
         *state = 1;
         if (wk->param->comm != NULL && func_ov211_021f04a0(wk->param->comm) == TRUE) {
             func_ov211_021f00c8(wk->param->comm);
         }
         break;
     case 1:
-        result = func_ov208_02199b7c(wk->work);
-        if (result != NULL) {
+        result = DupFitting_Main(wk->work);
+        if (result != 0) {
             wk->result = result;
             *state = 2;
         }
         break;
     case 2:
-        func_ov208_02199a54(wk->work);
+        DupFitting_Free(wk->work);
         return TRUE;
     }
     return FALSE;

@@ -365,7 +365,7 @@ from:0x02151d62 kind:thumb_call to:0x020487d4 module:main
 from:0x02151d7a kind:thumb_call to:0x02151b88 module:overlay(12)
 from:0x02151d8e kind:thumb_call to:0x0201736c module:main
 from:0x02151d98 kind:thumb_call to:0x02024464 module:main
-from:0x02151da8 kind:thumb_call to:0x021ef9e0 module:overlays(117,211)
+from:0x02151da8 kind:thumb_call to:0x021ef9e0 module:overlay(211)
 from:0x02151db4 kind:thumb_call to:0x02024484 module:main
 from:0x02151dc2 kind:thumb_call to:0x02151b14 module:overlay(12)
 from:0x02151dca kind:thumb_call to:0x02152634 module:overlay(12)

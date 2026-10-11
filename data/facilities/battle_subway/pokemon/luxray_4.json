@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LUXRAY",
+    "moves": [ "MOVE_THUNDER_FANG", "MOVE_ICE_FANG", "MOVE_LIGHT_SCREEN", "MOVE_THUNDER_WAVE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_AIR_BALLOON",
+    "form": 0
+}

@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Bellevue",
+    "class": "TRAINER_CLASS_NURSE",
+    "pokemon": [
+        "nosepass_1",
+        "onix_1",
+        "graveler_1",
+        "sudowoodo_1",
+        "magcargo_1",
+        "shelgon_1",
+        "metang_1",
+        "marowak_1",
+        "lairon_1",
+        "tangela_1",
+        "forretress_1",
+        "skarmory_1",
+        "torkoal_1",
+        "cofagrigus_1",
+        "durant_1",
+        "golem_1",
+        "ferrothorn_1",
+        "slowbro_1",
+        "weezing_1",
+        "miltank_1"
+    ]
+}

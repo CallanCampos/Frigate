@@ -1,0 +1,6 @@
+RockPeakChamber_Text_PokemonStatueExudesPower = The Pokémon statue that exudes the\npower of rock started moving!{be01}
+RockPeakChamber_Text_ZazaZariZa = Zaza zari za...
+RockPeakChamber_Text_RegirockDisappearedDeepInto = Regirock disappeared deep\ninto the ruins...
+RockPeakChamber_Text_RockPeakChamber = Rock Peak Chamber
+RockPeakChamber_Text_ProtectsPlacePowerRock = It protects this place\nwith the power of rock.
+\pad{50}

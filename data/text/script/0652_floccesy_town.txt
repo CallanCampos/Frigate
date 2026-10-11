@@ -1,5 +1,0 @@
-Here is a little advice!\nKeep a lot of Potions!{be01}\nHere is some more advice!\nKeep a lot of Poké Balls, too!
-Your {0101:0} is male!{be01}\nI wonder what the difference is\nbetween male and female Pokémon.
-Your {0101:0} is female!{be01}\nI wonder what the difference is\nbetween male and female Pokémon.
-Your {0101:0}...\nIts gender is unknown.{be01}\nI wonder what the difference is between\nmale and female Pokémon.
-I read the Help on the PC.\nI feel I became smarter!

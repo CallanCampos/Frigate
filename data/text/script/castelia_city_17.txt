@@ -1,0 +1,6 @@
+CasteliaCity17_Text_OhPokemonTrainerMet = Oh! You are the Pokémon Trainer\nI met at the entrance!{be01}\nYou've come this far. That means\nyou must be quite strong.{be01}\nAre you prepared to face the strongest\nperson in this building?{be01}\nThen, the time has come to challenge\nmy grandson, the company president!{be01}
+CasteliaCity17_Text_IllShowJustHow = I'll show you just how much\nthis Battle Company has researched{be00}\nPokémon and Trainers!{be01}
+CasteliaCity17_Text_LostBecauseWereStrong = I lost...{be01}\nBecause you were strong,\nand I was weak.{be01}\nWe must do even more research\nfor Pokémon and for Trainers!
+CasteliaCity17_Text_ThinkingWhenWinIts = Thinking that when you win\nit's because of your Pokémon{be00}\nand that when you lose{be00}\nit's because of yourself{be00}\nmight make you stronger...{be01}\nBut enjoying yourself\nis much, much more important!
+CasteliaCity17_Text_IfWantMakeWeak = If you want to make a weak\nPokémon stronger, you should{be00}\nuse that Exp. Share.{be01}\nAny Pokémon that holds it receives\nExp. Points, even when it doesn't{be00}\nparticipate in battle!
+CasteliaCity17_Text_DreamPresidentReleaseDevice = My dream as president is to\nrelease a device that lets{be00}\npeople talk to Pokémon!

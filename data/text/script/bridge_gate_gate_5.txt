@@ -1,0 +1,5 @@
+BridgeGateGate5_Text_ImSorryEndedUp = ...I'm sorry.\nI ended up losing my uniform.
+BridgeGateGate5_Text_DidBestChoosePokemon = I did my best to choose a Pokémon\nwho was both cute and strong!
+BridgeGateGate5_Text_MinccinoGrandpaCaughtTail = My Minccino!\nMy grandpa caught it for me!{be00}\nTail Slap is its specialty!
+BridgeGateGate5_Text_Chichino = Chichino! ♪
+\pad{8e}

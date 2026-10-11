@@ -1,0 +1,16 @@
+EventMapchange_Text_HasJoined = {0100:0} has joined.
+EventMapchange_Text_WouldLikeStopDrawing = Would you like to stop drawing?
+EventMapchange_Text_HasLeft = {0100:0} has left.
+EventMapchange_Text_LeaderHasLeftGroup = {0100:0}, the leader, has left.\nThe group will be disbanded.{be02:60}
+EventMapchange_Text_IfLeaderDropsOut = If the leader drops out, the group will\nbe disbanded. Is that OK?
+EventMapchange_Text_ThereNoMembersGroup = There are no members.\nThe group will be disbanded.{be02:60}
+EventMapchange_Text_DrawingSessionEnded = The drawing session was ended.
+EventMapchange_Text_Empty =     \x{ffff}
+EventMapchange_Text_Empty_2 = {0100:0}
+EventMapchange_Text_Empty_3 =               \x{ffff}
+EventMapchange_Text_Empty_4 =              \x{ffff}
+EventMapchange_Text_Empty_5 =                     \x{ffff}
+EventMapchange_Text_Empty_6 =     \x{ffff}
+EventMapchange_Text_JoinedDrawingSession = Joined a drawing session!
+EventMapchange_Text_Yes = YES
+EventMapchange_Text_No = NO

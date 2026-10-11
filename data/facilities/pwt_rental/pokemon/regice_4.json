@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_REGICE",
+    "moves": [ "MOVE_THUNDER", "MOVE_BLIZZARD", "MOVE_FOCUS_BLAST", "MOVE_THUNDER_WAVE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_ZOOM_LENS",
+    "form": 0
+}

@@ -10,6 +10,7 @@
 #include "battle/btlv_finger_cursor.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -35,6 +36,7 @@
 #include "system/printsys.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
+#include "text/system/0001.h"
 
 // The battle bag's entry, task and states (b_bag_main.c, named by the ROM's embedded string): the bag runs one state
 // function a frame, each returning the next state, until state 20 frees everything and sets the parameter's done.
@@ -457,45 +459,45 @@ static int BBagMain_CheckUse(BBagWork *work) {
     BBagParam *param = work->param;
 
     if (param->mode == 1 && param->shooterEnergy < BBagItem_GetShooterCost(param->item)) {
-        GFL_MsgDataLoadStrbuf(work->msgData, 49, work->strBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsNotChargedEnough, work->strBuf);
         BBagBmp_OpenMessage(work);
         work->nextSeq = 0xd;
         return 0xe;
     }
     if (work->pocket == 2) {
         if (param->ballError == 1) {
-            GFL_MsgDataLoadStrbuf(work->msgData, 45, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ThereNoRoomLeft, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 2) {
-            GFL_MsgDataLoadStrbuf(work->msgData, 44, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsNoGoodIts, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 3) {
-            GFL_MsgDataLoadStrbuf(work->msgData, 51, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsImpossibleAimWithout, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 4) {
-            GFL_MsgDataLoadStrbuf(work->msgData, 47, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsNoGoodIts_2, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 5) {
-            GFL_MsgDataLoadStrbuf(work->msgData, 52, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsImpossibleUsePoke, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
     }
     if (param->isWild == FALSE && GetItemParam(param->item, ITEM_PARAM_BATTLE_FUNC, param->heapId) == 3) {
-        GFL_MsgDataLoadStrbuf(work->msgData, 50, work->strBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_JunipersWordsEchoedTheres, work->strBuf);
         BBagBmp_OpenMessage(work);
         work->nextSeq = 0xd;
         return 0xe;
@@ -805,7 +807,7 @@ static void BBagMain_LoadGraphics(BBagWork *work) {
 }
 
 static void BBagMain_InitText(BBagWork *work) {
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 1, work->param->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0001, work->param->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->param->heapId);
     work->printQueue = func_02021998(work->param->heapId);
     work->strBuf = GFL_StrBufCreate(0x200, work->param->heapId);

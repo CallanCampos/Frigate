@@ -2,3 +2,7 @@
     .rodata     start:0x0217003c end:0x02170370 kind:rodata align:4
     .ctor       start:0x02170370 end:0x02170370 kind:rodata align:4
     .bss        start:0x02170380 end:0x02170380 kind:bss align:32
+
+src/ov025/fest_mission_people.c:
+    .text       start:0x0216f940 end:0x0217003c
+    .rodata     start:0x0217003c end:0x02170370

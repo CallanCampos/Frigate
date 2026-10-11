@@ -1,0 +1,189 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Rattata",
+    "pokedex": {
+        "category": "Mouse Pokémon",
+        "entry": "It searches for food all day. It gnaws\non hard objects to wear down its fangs,\nwhich grow constantly during its lifetime.",
+        "height": "1'00\"",
+        "weight": "7.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Rattata",
+                "category": "Mouse Pokémon",
+                "entry": "Cautious in the extreme, its\nhardy vitality lets it live in\nany kind of environment.",
+                "height": "1'00\"",
+                "weight": "7.7 lbs."
+            },
+            "fr": {
+                "name": "Rattata",
+                "category": "Pokémon Souris",
+                "entry": "D'une prudence extrême, sa nature\nrobuste lui permet de s'adapter à\ntous les terrains.",
+                "height": "0,3 m",
+                "weight": "3,5 kg"
+            },
+            "de": {
+                "name": "Rattfratz",
+                "category": "Maus",
+                "entry": "Es strotzt vor Lebenskraft und\nkann in jeder Umgebung leben.\nEs ist extrem vorsichtig.",
+                "height": "0,3 m",
+                "weight": "3,5 kg"
+            },
+            "it": {
+                "name": "Rattata",
+                "category": "Pokémon Topo",
+                "entry": "Un'incredibile vitalità gli permette di\nadattarsi a qualsiasi tipo di habitat.\nÈ estremamente cauto.",
+                "height": "0,3 m",
+                "weight": "3,5 kg"
+            },
+            "ko": {
+                "name": "꼬렛",
+                "category": "쥐포켓몬",
+                "entry": "어떤 장소에도 정착하여\n살아갈 수 있는 생명력이 있다.\n경계심이 매우 강하다.",
+                "height": "0.3 m",
+                "weight": "3.5 kg"
+            },
+            "es": {
+                "name": "Rattata",
+                "category": "Pokémon Ratón",
+                "entry": "Su capacidad de adaptación le\npermite vivir en cualquier lugar.\nEs tremendamente cauteloso.",
+                "height": "0,3 m",
+                "weight": "3,5 kg"
+            },
+            "ja": {
+                "name": "コラッタ",
+                "category": "ねずみポケモン",
+                "entry": "どんな\\x{3000}ばしょにも\\x{3000}すみついて\nいきていける\\x{3000}せいめいりょく。\nけいかいしんが\\x{3000}とても\\x{3000}つよい。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 56,
+        "defense": 35,
+        "speed": 72,
+        "special_attack": 25,
+        "special_defense": 35
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RUN_AWAY", "ABILITY_GUTS" ],
+    "hidden_ability": "ABILITY_HUSTLE",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 51,
+    "height": 3,
+    "weight": 35,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 4, "MOVE_QUICK_ATTACK" ],
+            [ 7, "MOVE_FOCUS_ENERGY" ],
+            [ 10, "MOVE_BITE" ],
+            [ 13, "MOVE_PURSUIT" ],
+            [ 16, "MOVE_HYPER_FANG" ],
+            [ 19, "MOVE_SUCKER_PUNCH" ],
+            [ 22, "MOVE_CRUNCH" ],
+            [ 25, "MOVE_ASSURANCE" ],
+            [ 28, "MOVE_SUPER_FANG" ],
+            [ 31, "MOVE_DOUBLE_EDGE" ],
+            [ 34, "MOVE_ENDEAVOR" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM67",
+            "TM73",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM88",
+            "TM89",
+            "TM90",
+            "TM93",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SUPER_FANG",
+            "MOVE_UPROAR",
+            "MOVE_LAST_RESORT",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_SCREECH",
+            "MOVE_FLAME_WHEEL",
+            "MOVE_FURY_SWIPES",
+            "MOVE_BITE",
+            "MOVE_COUNTER",
+            "MOVE_REVERSAL",
+            "MOVE_UPROAR",
+            "MOVE_LAST_RESORT",
+            "MOVE_ME_FIRST",
+            "MOVE_REVENGE",
+            "MOVE_FINAL_GAMBIT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 20,
+            "species": "SPECIES_RATICATE"
+        }
+    ],
+    "regional_dex_number": 59,
+    "baby_species": "SPECIES_RATTATA"
+}

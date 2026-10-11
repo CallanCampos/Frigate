@@ -1,8 +1,0 @@
-VIEW CATEGORIES
-SHOW ALL
-Please select a category.
-Please select what you want to read.
-{0200:0}/{0200:1}
-                 \x{ffff}
-                 \x{ffff}
-                                                                                                                                                                                            \x{ffff}

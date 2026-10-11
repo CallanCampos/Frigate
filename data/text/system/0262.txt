@@ -1,40 +1,40 @@
-Movie Star
-Masked Man
-Brycen-Man: An amusement park...{be01}\nA place of idle dreams or, perhaps,\nideal dreams...{be01}\nI have no use for either ideals or dreams!
-Brycen-Man: Mwahaha!\nI will end you now, {0102:0}-Man!
-Brycen-Man: Go, my Pokémon!{be01}\nUnleash your power, and destroy everything\nin this amusement park!
-???: Can you hold on, please?
-Brycen-Man: Wh...who are you?
-???: The Messenger of Truths and Ideals,\n{0102:0}-Man enters!{be01}\nHey there, Brycen-Man!{be01}\nIt's not nice to do bad things!
-Park Crowds: Hey, what's going on?\nIs this one of those hero skits?
-Brycen-Man: A single hit to KO my Pokémon...\nYou're pretty good, {0102:0}-Man!{be01}\nDespite that, however...{be01}\nYou will be brought to your knees before me\nwhen I end you with my dark, secret arts!{be01}\nPrepare to be finished!
-{0102:0}-Man: Bring it on!
-Brycen-Man: Well said!{be01}\nMy dark, secret arts enter!\nTake them and be gone!
-{0102:0}-Man: I'm scared!
-Brycen-Man: Mwahaha!\nHow pitiful, {0102:0}-Man!{be01}\nWhy would I waste my secret arts\non someone like you?{be01}\nThis should do it!
-     \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-Brycen-Man: Mwahaha!\nThis is the end for you, {0102:0}-Man!{be01}\nI didn't even have to use\nmy secret arts!{be01}\nNow, just stand in the corner,\nand watch me destroy the amusement park!
-{0102:0}-Man: Yowch!{be01}\nI wasn't hero material after all...
-Brycen-Man: Mwahaha!
-Facing Brycen-Man, the Masked Man,\n{0102:0}-Man lost all{be00}\nhis strength to fight...{be01}\nHowever...{be01}\nNo one will ever forget how he timidly fought\nwith all his might!{be01}\nThank you, {0102:0}-Man!{be01}\nGood-bye, {0102:0}-Man!
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
-       \x{ffff}
+Bank0262_Text_MovieStar = Movie Star
+Bank0262_Text_MaskedMan = Masked Man
+Bank0262_Text_BrycenManAmusementPark = Brycen-Man: An amusement park...{be01}\nA place of idle dreams or, perhaps,\nideal dreams...{be01}\nI have no use for either ideals or dreams!
+Bank0262_Text_BrycenManMwahahaWill = Brycen-Man: Mwahaha!\nI will end you now, {0102:0}-Man!
+Bank0262_Text_BrycenManGoPokemon = Brycen-Man: Go, my Pokémon!{be01}\nUnleash your power, and destroy everything\nin this amusement park!
+Bank0262_Text_CanHoldPlease = ???: Can you hold on, please?
+Bank0262_Text_BrycenManWhWho = Brycen-Man: Wh...who are you?
+Bank0262_Text_MessengerTruthsIdealsMan = ???: The Messenger of Truths and Ideals,\n{0102:0}-Man enters!{be01}\nHey there, Brycen-Man!{be01}\nIt's not nice to do bad things!
+Bank0262_Text_ParkCrowdsHeyWhats = Park Crowds: Hey, what's going on?\nIs this one of those hero skits?
+Bank0262_Text_BrycenManSingleHit = Brycen-Man: A single hit to KO my Pokémon...\nYou're pretty good, {0102:0}-Man!{be01}\nDespite that, however...{be01}\nYou will be brought to your knees before me\nwhen I end you with my dark, secret arts!{be01}\nPrepare to be finished!
+Bank0262_Text_ManBring = {0102:0}-Man: Bring it on!
+Bank0262_Text_BrycenManWellSaid = Brycen-Man: Well said!{be01}\nMy dark, secret arts enter!\nTake them and be gone!
+Bank0262_Text_ManImScared = {0102:0}-Man: I'm scared!
+Bank0262_Text_BrycenManMwahahaHow = Brycen-Man: Mwahaha!\nHow pitiful, {0102:0}-Man!{be01}\nWhy would I waste my secret arts\non someone like you?{be01}\nThis should do it!
+Bank0262_Text_Empty =      \x{ffff}
+Bank0262_Text_Empty_2 =        \x{ffff}
+Bank0262_Text_Empty_3 =        \x{ffff}
+Bank0262_Text_Empty_4 =        \x{ffff}
+Bank0262_Text_Empty_5 =        \x{ffff}
+Bank0262_Text_Empty_6 =        \x{ffff}
+Bank0262_Text_Empty_7 =        \x{ffff}
+Bank0262_Text_Empty_8 =        \x{ffff}
+Bank0262_Text_Empty_9 =        \x{ffff}
+Bank0262_Text_Empty_10 =        \x{ffff}
+Bank0262_Text_Empty_11 =        \x{ffff}
+Bank0262_Text_Empty_12 =        \x{ffff}
+Bank0262_Text_Empty_13 =        \x{ffff}
+Bank0262_Text_Empty_14 =        \x{ffff}
+Bank0262_Text_Empty_15 =        \x{ffff}
+Bank0262_Text_Empty_16 =        \x{ffff}
+Bank0262_Text_Empty_17 =        \x{ffff}
+Bank0262_Text_BrycenManMwahahaEnd = Brycen-Man: Mwahaha!\nThis is the end for you, {0102:0}-Man!{be01}\nI didn't even have to use\nmy secret arts!{be01}\nNow, just stand in the corner,\nand watch me destroy the amusement park!
+Bank0262_Text_ManYowchWasntHero = {0102:0}-Man: Yowch!{be01}\nI wasn't hero material after all...
+Bank0262_Text_BrycenManMwahaha = Brycen-Man: Mwahaha!
+Bank0262_Text_FacingBrycenManMasked = Facing Brycen-Man, the Masked Man,\n{0102:0}-Man lost all{be00}\nhis strength to fight...{be01}\nHowever...{be01}\nNo one will ever forget how he timidly fought\nwith all his might!{be01}\nThank you, {0102:0}-Man!{be01}\nGood-bye, {0102:0}-Man!
+Bank0262_Text_Empty_18 =        \x{ffff}
+Bank0262_Text_Empty_19 =        \x{ffff}
+Bank0262_Text_Empty_20 =        \x{ffff}
+Bank0262_Text_Empty_21 =        \x{ffff}
 \pad{30}

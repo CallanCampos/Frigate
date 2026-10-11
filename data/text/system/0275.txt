@@ -1,22 +1,22 @@
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}As {0100:1} battled\n{bd02}the UFO, the enigmatic\n{bd02}woman E appeared before him.\n\n{bd02}E introduced herself\n{bd02}as a UFO researcher...
-{bd02}Several days after the UFO attack...\n\n\n{bd02}At E's request, {0100:1}\n{bd02}departed for a lonely beach.
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}As {0100:1} battled\n{bd02}the UFO, the enigmatic\n{bd02}woman E appeared before her.\n\n{bd02}E introduced herself\n{bd02}as a UFO researcher...
-{bd02}Several days after the UFO attack...\n\n\n{bd02}At E's request, {0100:1}\n{bd02}departed for a lonely beach.
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0275_Text_UnovaDefenseForceUdf = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0275_Text_StoryTheirValiantStruggle = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0275_Text_BattledUfoEnigmaticWoman = {bd02}As {0100:1} battled\n{bd02}the UFO, the enigmatic\n{bd02}woman E appeared before him.\n\n{bd02}E introduced herself\n{bd02}as a UFO researcher...
+Bank0275_Text_SeveralDaysAfterUfo = {bd02}Several days after the UFO attack...\n\n\n{bd02}At E's request, {0100:1}\n{bd02}departed for a lonely beach.
+Bank0275_Text_Empty = なし
+Bank0275_Text_Empty_2 = なし
+Bank0275_Text_Empty_3 = なし
+Bank0275_Text_Empty_4 = なし
+Bank0275_Text_Empty_5 = なし
+Bank0275_Text_Empty_6 = なし
+Bank0275_Text_UnovaDefenseForceUdf_2 = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0275_Text_StoryTheirValiantStruggle_2 = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0275_Text_BattledUfoEnigmaticWoman_2 = {bd02}As {0100:1} battled\n{bd02}the UFO, the enigmatic\n{bd02}woman E appeared before her.\n\n{bd02}E introduced herself\n{bd02}as a UFO researcher...
+Bank0275_Text_SeveralDaysAfterUfo_2 = {bd02}Several days after the UFO attack...\n\n\n{bd02}At E's request, {0100:1}\n{bd02}departed for a lonely beach.
+Bank0275_Text_Empty_7 = なし
+Bank0275_Text_Empty_8 = なし
+Bank0275_Text_Empty_9 = なし
+Bank0275_Text_Empty_10 = なし
+Bank0275_Text_Empty_11 = なし
+Bank0275_Text_Empty_12 = なし
+Bank0275_Text_Empty_13 = なし
 \pad{f8}

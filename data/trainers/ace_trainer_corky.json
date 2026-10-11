@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Corky",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_TRIPLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SANDSLASH",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_KLINK",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "The magic number is three! You need\nthree healthy Pokémon who can fight!"
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "Behold the destructive force created\nby my three prized Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your combined force as a team is greater\nthan ours!"
+        },
+        {
+            "type": 2,
+            "text": "Perhaps I need to meet my Pokémon head-\non... Then we could be a stronger team!"
+        }
+    ]
+}

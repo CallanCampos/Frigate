@@ -1,9 +1,0 @@
-                                                   \x{ffff}
-                       \x{ffff}
-                                                                \x{ffff}
-                                                                               \x{ffff}
-                                                          \x{ffff}
-Nimbasa City has\nthe Pokémon Musical.{be01}\nI've tried it several times.\nSigh. It never seems to go well.{be01}\nBut I'll keep trying until I get\nthe perfect Props for my Pokémon!
-Trainers and Pokémon make\nan amazing combination!{be01}\nThey were responsible for\nexcavating the ruins on Route 4!
-Trainers and Pokémon make\nan amazing combination!{be01}\nThey were responsible for the row of\nbrand-new buildings on Route 4!
-Route 4 Ahead

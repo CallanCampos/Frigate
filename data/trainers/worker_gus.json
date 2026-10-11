@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Gus",
+    "class": "TRAINER_CLASS_WORKER_26",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GEODUDE",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_STEELIX",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Twist Mountain changes in every season,\nand this old man changes in every battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Go easy on...\na grown-up?!"
+        },
+        {
+            "type": 2,
+            "text": "This old man likes winter.{be01}\nSnow on Twist Mountain...\nhas an indescribable beauty."
+        }
+    ]
+}

@@ -1,0 +1,164 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Doduo",
+    "pokedex": {
+        "category": "Twin Bird Pokémon",
+        "entry": "The brains in its two heads appear\nto communicate emotions to each\nother with a telepathic power.",
+        "height": "4'07\"",
+        "weight": "86.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Doduo",
+                "category": "Twin Bird Pokémon",
+                "entry": "The brains in its two heads appear\nto communicate emotions to each\nother with a telepathic power.",
+                "height": "4'07\"",
+                "weight": "86.4 lbs."
+            },
+            "fr": {
+                "name": "Doduo",
+                "category": "Pokémon Duoiseau",
+                "entry": "Ses deux cerveaux semblent\ncommuniquer leurs émotions\ngrâce à un lien télépathique.",
+                "height": "1,4 m",
+                "weight": "39,2 kg"
+            },
+            "de": {
+                "name": "Dodu",
+                "category": "Duovogel",
+                "entry": "Die Gehirne der beiden Köpfe\nkommunizieren ihre Gefühle\nüber Telepathie.",
+                "height": "1,4 m",
+                "weight": "39,2 kg"
+            },
+            "it": {
+                "name": "Doduo",
+                "category": "Pokémon Biuccello",
+                "entry": "I suoi due cervelli si comunicano\nle emozioni grazie ai poteri telepatici.",
+                "height": "1,4 m",
+                "weight": "39,2 kg"
+            },
+            "ko": {
+                "name": "두두",
+                "category": "쌍둥이새포켓몬",
+                "entry": "두 머리에 각각 존재하는 뇌는\n텔레파시같은 힘으로\n의사를 맞춰나가는 듯하다.",
+                "height": "1.4 m",
+                "weight": "39.2 kg"
+            },
+            "es": {
+                "name": "Doduo",
+                "category": "Pokémon Ave Gemela",
+                "entry": "Parece que los cerebros de sus dos\ncabezas se comunican por telepatía.",
+                "height": "1,4 m",
+                "weight": "39,2 kg"
+            },
+            "ja": {
+                "name": "ドードー",
+                "category": "ふたごどりポケモン",
+                "entry": "\\x{ff12}つの\\x{3000}あたまの\\x{3000}のうみそは\nテレパシーのような\\x{3000}ちからで\nきもちを\\x{3000}つうじあわせているらしい。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff19}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 85,
+        "defense": 45,
+        "speed": 75,
+        "special_attack": 35,
+        "special_defense": 35
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_SHARP_BEAK",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_RUN_AWAY", "ABILITY_EARLY_BIRD" ],
+    "hidden_ability": "ABILITY_TANGLED_FEET",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 62,
+    "height": 14,
+    "weight": 392,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_PECK" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 5, "MOVE_QUICK_ATTACK" ],
+            [ 10, "MOVE_RAGE" ],
+            [ 14, "MOVE_FURY_ATTACK" ],
+            [ 19, "MOVE_PURSUIT" ],
+            [ 23, "MOVE_UPROAR" ],
+            [ 28, "MOVE_ACUPRESSURE" ],
+            [ 32, "MOVE_DOUBLE_HIT" ],
+            [ 37, "MOVE_AGILITY" ],
+            [ 41, "MOVE_DRILL_PECK" ],
+            [ 46, "MOVE_ENDEAVOR" ],
+            [ 50, "MOVE_THRASH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM83",
+            "TM87",
+            "TM88",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [ "MOVE_UPROAR", "MOVE_SNORE", "MOVE_KNOCK_OFF", "MOVE_ROOST", "MOVE_ENDEAVOR", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_QUICK_ATTACK",
+            "MOVE_SUPERSONIC",
+            "MOVE_HAZE",
+            "MOVE_FAINT_ATTACK",
+            "MOVE_FLAIL",
+            "MOVE_ENDEAVOR",
+            "MOVE_MIRROR_MOVE",
+            "MOVE_BRAVE_BIRD",
+            "MOVE_NATURAL_GIFT",
+            "MOVE_ASSURANCE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 31,
+            "species": "SPECIES_DODRIO"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_DODUO"
+}

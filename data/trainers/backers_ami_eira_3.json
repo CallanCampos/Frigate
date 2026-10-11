@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ami & Eira",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SIMIPOUR",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SIMISEAR",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Hey, you!{be01}\nDon't smile at my favorite player.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ami: Argh! We lost,\nand it's your fault.{be01}\nEira: You should try harder.\nDon't drag me down."
+        },
+        {
+            "type": 5,
+            "text": "The only thing we have in common\nis that we like the same team.{be01}\nBut really, isn't that the most\nimportant thing for a fan?"
+        },
+        {
+            "type": 6,
+            "text": "Argh, because of you,\nwe're in a big pinch."
+        },
+        {
+            "type": 7,
+            "text": "Argh, annoying!{be01}\nIt's none of your business\nwho I cheer for.{be01}"
+        },
+        {
+            "type": 9,
+            "text": "Our teamwork is sooooo bad,\nexcept when we cheer during games.{be01}\nBut we really don't care\nabout any time but game time."
+        },
+        {
+            "type": 10,
+            "text": "No way! Argh, we are losing\nbecause you are not really trying!"
+        }
+    ]
+}

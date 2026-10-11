@@ -1,1160 +1,1160 @@
-{0102:0} fainted!
-The wild {0102:0} fainted!
-The foe's {0102:0} fainted!
-{0102:0} recovered\nfrom fainting!
-The wild {0102:0} recovered\nfrom fainting!
-The foe's {0102:0} recovered\nfrom fainting!
-It's super effective on\n{0102:0}!
-It's super effective on\nthe wild {0102:0}!
-It's super effective on\nthe foe's {0102:0}!
-It's super effective on\n{0102:0} and {0102:1}!
-It's super effective on the wild\n{0102:0} and {0102:1}!
-It's super effective on\nthe foe's {0102:0} and {0102:1}!
-It's super effective on {0102:0},\n{0102:1}, and {0102:2}!
-It's super effective on the wild\n{0102:0}, {0102:1}, and {0102:2}!
-It's super effective on the foe's\n{0102:0}, {0102:1}, and {0102:2}!
-It's not very effective on {0102:0}.
-It's not very effective on\nthe wild {0102:0}.
-It's not very effective on\nthe foe's {0102:0}.
-It's not very effective on\n{0102:0} or {0102:1}.
-It's not very effective on the wild\n{0102:0} or {0102:1}.
-It's not very effective on the foe's\n{0102:0} or {0102:1}.
-It's not very effective on {0102:0},\n{0102:1}, or {0102:2}!
-It's not very effective on the wild\n{0102:0}, {0102:1}, or {0102:2}!
-It's not very effective on the foe's\n{0102:0}, {0102:1}, or {0102:2}!
-But it failed to affect\n{0102:0}!
-But it failed to affect\nthe wild {0102:0}!
-But it failed to affect\nthe foe's {0102:0}!
-{0102:0}'s Attack\nrose!
-The wild {0102:0}'s Attack\nrose!
-The foe's {0102:0}'s Attack\nrose!
-{0102:0}'s Defense\nrose!
-The wild {0102:0}'s Defense\nrose!
-The foe's {0102:0}'s Defense\nrose!
-{0102:0}'s Special Attack\nrose!
-The wild {0102:0}'s Special Attack\nrose!
-The foe's {0102:0}'s Special Attack\nrose!
-{0102:0}'s Special Defense\nrose!
-The wild {0102:0}'s Special Defense\nrose!
-The foe's {0102:0}'s Special Defense\nrose!
-{0102:0}'s Speed\nrose!
-The wild {0102:0}'s Speed\nrose!
-The foe's {0102:0}'s Speed\nrose!
-{0102:0}'s accuracy\nrose!
-The wild {0102:0}'s accuracy\nrose!
-The foe's {0102:0}'s accuracy\nrose!
-{0102:0}'s evasiveness\nrose!
-The wild {0102:0}'s evasiveness\nrose!
-The foe's {0102:0}'s evasiveness\nrose!
-{0102:0}'s Attack\nrose sharply!
-The wild {0102:0}'s Attack\nrose sharply!
-The foe's {0102:0}'s Attack\nrose sharply!
-{0102:0}'s Defense\nrose sharply!
-The wild {0102:0}'s Defense\nrose sharply!
-The foe's {0102:0}'s Defense\nrose sharply!
-{0102:0}'s Special Attack\nrose sharply!
-The wild {0102:0}'s Special Attack\nrose sharply!
-The foe's {0102:0}'s Special Attack\nrose sharply!
-{0102:0}'s Special Defense\nrose sharply!
-The wild {0102:0}'s Special Defense\nrose sharply!
-The foe's {0102:0}'s Special Defense\nrose sharply!
-{0102:0}'s Speed\nrose sharply!
-The wild {0102:0}'s Speed\nrose sharply!
-The foe's {0102:0}'s Speed\nrose sharply!
-{0102:0}'s accuracy\nrose sharply!
-The wild {0102:0}'s accuracy\nrose sharply!
-The foe's {0102:0}'s accuracy\nrose sharply!
-{0102:0}'s evasiveness\nrose sharply!
-The wild {0102:0}'s evasiveness\nrose sharply!
-The foe's {0102:0}'s evasiveness\nrose sharply!
-{0102:0}'s Attack\nrose drastically!
-The wild {0102:0}'s Attack\nrose drastically!
-The foe's {0102:0}'s Attack\nrose drastically!
-{0102:0}'s Defense\nrose drastically!
-The wild {0102:0}'s Defense\nrose drastically!
-The foe's {0102:0}'s Defense\nrose drastically!
-{0102:0}'s Special Attack\nrose drastically!
-The wild {0102:0}'s Special Attack\nrose drastically!
-The foe's {0102:0}'s Special Attack\nrose drastically!
-{0102:0}'s Special Defense\nrose drastically!
-The wild {0102:0}'s Special Defense\nrose drastically!
-The foe's {0102:0}'s Special Defense\nrose drastically!
-{0102:0}'s Speed\nrose drastically!
-The wild {0102:0}'s Speed\nrose drastically!
-The foe's {0102:0}'s Speed\nrose drastically!
-{0102:0}'s accuracy\nrose drastically!
-The wild {0102:0}'s accuracy\nrose drastically!
-The foe's {0102:0}'s accuracy\nrose drastically!
-{0102:0}'s evasiveness\nrose drastically!
-The wild {0102:0}'s evasiveness\nrose drastically!
-The foe's {0102:0}'s evasiveness\nrose drastically!
-{0102:0}'s Attack\nfell!
-The wild {0102:0}'s Attack\nfell!
-The foe's {0102:0}'s Attack\nfell!
-{0102:0}'s Defense\nfell!
-The wild {0102:0}'s Defense\nfell!
-The foe's {0102:0}'s Defense\nfell!
-{0102:0}'s Special Attack\nfell!
-The wild {0102:0}'s Special Attack\nfell!
-The foe's {0102:0}'s Special Attack\nfell!
-{0102:0}'s Special Defense\nfell!
-The wild {0102:0}'s Special Defense\nfell!
-The foe's {0102:0}'s Special Defense\nfell!
-{0102:0}'s Speed\nfell!
-The wild {0102:0}'s Speed\nfell!
-The foe's {0102:0}'s Speed\nfell!
-{0102:0}'s accuracy\nfell!
-The wild {0102:0}'s accuracy\nfell!
-The foe's {0102:0}'s accuracy\nfell!
-{0102:0}'s evasiveness\nfell!
-The wild {0102:0}'s evasiveness\nfell!
-The foe's {0102:0}'s evasiveness\nfell!
-{0102:0}'s Attack\nharshly fell!
-The wild {0102:0}'s Attack\nharshly fell!
-The foe's {0102:0}'s Attack\nharshly fell!
-{0102:0}'s Defense\nharshly fell!
-The wild {0102:0}'s Defense\nharshly fell!
-The foe's {0102:0}'s Defense\nharshly fell!
-{0102:0}'s Special Attack\nharshly fell!
-The wild {0102:0}'s Special Attack\nharshly fell!
-The foe's {0102:0}'s Special Attack\nharshly fell!
-{0102:0}'s Special Defense\nharshly fell!
-The wild {0102:0}'s Special Defense\nharshly fell!
-The foe's {0102:0}'s Special Defense\nharshly fell!
-{0102:0}'s Speed\nharshly fell!
-The wild {0102:0}'s Speed\nharshly fell!
-The foe's {0102:0}'s Speed\nharshly fell!
-{0102:0}'s accuracy\nharshly fell!
-The wild {0102:0}'s accuracy\nharshly fell!
-The foe's {0102:0}'s accuracy\nharshly fell!
-{0102:0}'s evasiveness\nharshly fell!
-The wild {0102:0}'s evasiveness\nharshly fell!
-The foe's {0102:0}'s evasiveness\nharshly fell!
-{0102:0}'s Attack\nseverely fell!
-The wild {0102:0}'s Attack\nseverely fell!
-The foe's {0102:0}'s Attack\nseverely fell!
-{0102:0}'s Defense\nseverely fell!
-The wild {0102:0}'s Defense\nseverely fell!
-The foe's {0102:0}'s Defense\nseverely fell!
-{0102:0}'s Special Attack\nseverely fell!
-The wild {0102:0}'s Special Attack\nseverely fell!
-The foe's {0102:0}'s Special Attack\nseverely fell!
-{0102:0}'s Special Defense\nseverely fell!
-The wild {0102:0}'s Special Defense\nseverely fell!
-The foe's {0102:0}'s Special Defense\nseverely fell!
-{0102:0}'s Speed\nseverely fell!
-The wild {0102:0}'s Speed\nseverely fell!
-The foe's {0102:0}'s Speed\nseverely fell!
-{0102:0}'s accuracy\nseverely fell!
-The wild {0102:0}'s accuracy\nseverely fell!
-The foe's {0102:0}'s accuracy\nseverely fell!
-{0102:0}'s evasiveness\nseverely fell!
-The wild {0102:0}'s evasiveness\nseverely fell!
-The foe's {0102:0}'s evasiveness\nseverely fell!
-{0102:0}'s Attack won't\ngo any higher!
-The wild {0102:0}'s Attack\nwon't go any higher!
-The foe's {0102:0}'s Attack\nwon't go any higher!
-{0102:0}'s Defense won't\ngo any higher!
-The wild {0102:0}'s Defense\nwon't go any higher!
-The foe's {0102:0}'s Defense\nwon't go any higher!
-{0102:0}'s Special Attack won't\ngo any higher!
-The wild {0102:0}'s Special Attack\nwon't go any higher!
-The foe's {0102:0}'s Special Attack\nwon't go any higher!
-{0102:0}'s Special Defense won't\ngo any higher!
-The wild {0102:0}'s Special Defense\nwon't go any higher!
-The foe's {0102:0}'s Special Defense\nwon't go any higher!
-{0102:0}'s Speed won't\ngo any higher!
-The wild {0102:0}'s Speed\nwon't go any higher!
-The foe's {0102:0}'s Speed\nwon't go any higher!
-{0102:0}'s accuracy won't\ngo any higher!
-The wild {0102:0}'s accuracy\nwon't go any higher!
-The foe's {0102:0}'s accuracy\nwon't go any higher!
-{0102:0}'s evasiveness won't\ngo any higher!
-The wild {0102:0}'s evasiveness\nwon't go any higher!
-The foe's {0102:0}'s evasiveness\nwon't go any higher!
-{0102:0}'s Attack won't\ngo any lower!
-The wild {0102:0}'s Attack\nwon't go any lower!
-The foe's {0102:0}'s Attack\nwon't go any lower!
-{0102:0}'s Defense won't\ngo any lower!
-The wild {0102:0}'s Defense\nwon't go any lower!
-The foe's {0102:0}'s Defense\nwon't go any lower!
-{0102:0}'s Special Attack won't\ngo any lower!
-The wild {0102:0}'s Special Attack\nwon't go any lower!
-The foe's {0102:0}'s Special Attack\nwon't go any lower!
-{0102:0}'s Special Defense won't\ngo any lower!
-The wild {0102:0}'s Special Defense\nwon't go any lower!
-The foe's {0102:0}'s Special Defense\nwon't go any lower!
-{0102:0}'s Speed won't\ngo any lower!
-The wild {0102:0}'s Speed\nwon't go any lower!
-The foe's {0102:0}'s Speed\nwon't go any lower!
-{0102:0}'s accuracy won't\ngo any lower!
-The wild {0102:0}'s accuracy\nwon't go any lower!
-The foe's {0102:0}'s accuracy\nwon't go any lower!
-{0102:0}'s evasiveness won't\ngo any lower!
-The wild {0102:0}'s evasiveness\nwon't go any lower!
-The foe's {0102:0}'s evasiveness\nwon't go any lower!
-{0102:0}'s stat changes\nwere removed!
-The wild {0102:0}'s stat changes\nwere removed!
-The foe's {0102:0}'s stat changes\nwere removed!
-{0102:0}'s stats\nwere not lowered!
-The wild {0102:0}'s stats\nwere not lowered!
-The foe's {0102:0}'s stats\nwere not lowered!
-{0102:0}'s Attack\nwas not lowered!
-The wild {0102:0}'s Attack\nwas not lowered!
-The foe's {0102:0}'s Attack\nwas not lowered!
-{0102:0}'s Defense\nwas not lowered!
-The wild {0102:0}'s Defense\nwas not lowered!
-The foe's {0102:0}'s Defense\nwas not lowered!
-{0102:0}'s accuracy\nwas not lowered!
-The wild {0102:0}'s accuracy\nwas not lowered!
-The foe's {0102:0}'s accuracy\nwas not lowered!
-It doesn't affect\n{0102:0}...
-It doesn't affect\nthe wild {0102:0}...
-It doesn't affect\nthe foe's {0102:0}...
-{0102:0} avoided\nthe attack!
-The wild {0102:0} avoided\nthe attack!
-The foe's {0102:0} avoided\nthe attack!
-{0102:0} is\nunaffected!
-The wild {0102:0} is\nunaffected!
-The foe's {0102:0} is\nunaffected!
-The {0109:1} weakened the damage\nto {0102:0}!
-The {0109:1} weakened the damage\nto the wild {0102:0}!
-The {0109:1} weakened the damage\nto the foe's {0102:0}!
-{0102:0} transformed!
-The wild {0102:0}\ntransformed!
-The foe's {0102:0}\ntransformed!
-{0102:0} dropped\nits {0109:1}!
-The wild {0102:0} dropped\nits {0109:1}!
-The foe's {0102:0} dropped\nits {0109:1}!
-{0102:0}'s status\nwas restored!
-The wild {0102:0}'s status\nwas restored!
-The foe's {0102:0}'s status\nwas restored!
-{0102:0} moved\nto the center!
-The wild {0102:0} moved\nto the center!
-The foe's {0102:0} moved\nto the center!
-{0102:0}\nwas poisoned!
-The wild {0102:0}\nwas poisoned!
-The foe's {0102:0}\nwas poisoned!
-{0102:0} was badly\npoisoned!
-The wild {0102:0} was badly\npoisoned!
-The foe's {0102:0} was badly\npoisoned!
-{0102:0} was badly\npoisoned by the {0109:1}!
-The wild {0102:0} was badly\npoisoned by the {0109:1}!
-The foe's {0102:0} was badly\npoisoned by the {0109:1}!
-{0102:0} was hurt\nby poison!
-The wild {0102:0} was hurt\nby poison!
-The foe's {0102:0} was hurt\nby poison!
-{0102:0} was cured of its\npoisoning.
-{0102:0} was cured of its\npoisoning.
-{0102:0} was cured of its\npoisoning.
-{0102:0} is already\npoisoned.
-The wild {0102:0} is already\npoisoned.
-The foe's {0102:0} is already\npoisoned.
-{0102:0} cannot\nbe poisoned!
-The wild {0102:0} cannot\nbe poisoned!
-The foe's {0102:0} cannot\nbe poisoned!
-{0102:0} was burned!
-The wild {0102:0}\nwas burned!
-The foe's {0102:0}\nwas burned!
-{0102:0} was burned by {0109:1}!
-The wild {0102:0}\nwas burned by {0109:1}!
-The foe's {0102:0}\nwas burned by {0109:1}!
-{0102:0} was hurt\nby its burn!
-The wild {0102:0} was hurt\nby its burn!
-The foe's {0102:0} was hurt\nby its burn!
-{0102:0}'s burn was healed.
-The wild {0102:0} healed its burn!
-The foe's {0102:0} healed its burn!
-{0102:0} already\nhas a burn.
-The wild {0102:0} already\nhas a burn.
-The foe's {0102:0} already\nhas a burn.
-{0102:0} cannot\nbe burned!
-The wild {0102:0} cannot\nbe burned!
-The foe's {0102:0} cannot\nbe burned!
-{0102:0} is paralyzed!\nIt may be unable to move!
-The wild {0102:0} is paralyzed!\nIt may be unable to move!
-The foe's {0102:0} is paralyzed!\nIt may be unable to move!
-{0102:0} is paralyzed!\nIt can't move!
-The wild {0102:0} is paralyzed!\nIt can't move!
-The foe's {0102:0} is paralyzed!\nIt can't move!
-{0102:0} was cured of\nparalysis.
-The wild {0102:0} was cured of\nparalysis.
-The foe's {0102:0} was cured of\nparalysis.
-{0102:0} is\nalready paralyzed!
-The wild {0102:0} is\nalready paralyzed!
-The foe's {0102:0} is\nalready paralyzed!
-{0102:0} cannot\nbe paralyzed!
-The wild {0102:0} cannot\nbe paralyzed!
-The foe's {0102:0} cannot\nbe paralyzed!
-{0102:0} was\nfrozen solid!
-The wild {0102:0} was\nfrozen solid!
-The foe's {0102:0} was\nfrozen solid!
-{0102:0} is\nfrozen solid!
-The wild {0102:0} is\nfrozen solid!
-The foe's {0102:0} is\nfrozen solid!
-{0102:0} thawed out!
-The wild {0102:0} thawed out!
-The foe's {0102:0} thawed out!
-{0102:0} is\nalready frozen solid!
-The wild {0102:0} is\nalready frozen solid!
-The foe's {0102:0} is\nalready frozen solid!
-{0102:0} cannot be\nfrozen solid!
-The wild {0102:0} cannot be\nfrozen solid!
-The foe's {0102:0} cannot be\nfrozen solid!
-{0102:0}'s {0107:1}\nmelted the ice!
-The wild {0102:0}'s {0107:1}\nmelted the ice!
-The foe's {0102:0}'s {0107:1}\nmelted the ice!
-{0102:0}\nfell asleep!
-The wild {0102:0}\nfell asleep!
-The foe's {0102:0}\nfell asleep!
-{0102:0} is fast\nasleep.
-The wild {0102:0} is fast\nasleep.
-The foe's {0102:0} is fast\nasleep.
-{0102:0} woke up!
-The wild {0102:0}\nwoke up!
-The foe's {0102:0}\nwoke up!
-{0102:0} is\nalready asleep!
-The wild {0102:0} is\nalready asleep!
-The foe's {0102:0} is\nalready asleep!
-{0102:0} stays awake!
-The wild {0102:0} stays awake!
-The foe's {0102:0} stays awake!
-{0102:0} began having\na nightmare!
-The wild {0102:0} began\nhaving a nightmare!
-The foe's {0102:0} began\nhaving a nightmare!
-{0102:0} is locked\nin a nightmare!
-The wild {0102:0} is locked\nin a nightmare!
-The foe's {0102:0} is locked\nin a nightmare!
-{0102:0}\nfell in love!
-The wild {0102:0}\nfell in love!
-The foe's {0102:0}\nfell in love!
-{0102:0}\nfell in love from the {0109:1}!
-The wild {0102:0}\nfell in love from the {0109:1}!
-The foe's {0102:0}\nfell in love from the {0109:1}!
-{0102:0} is in love\nwith {0102:1}!
-The wild {0102:0} is in love\nwith {0102:1}!
-The foe's {0102:0} is in love\nwith {0102:1}!
-{0102:0} is\nimmobilized by love!
-The wild {0102:0} is\nimmobilized by love!
-The foe's {0102:0} is\nimmobilized by love!
-{0102:0} got over its\ninfatuation.
-The wild {0102:0} got over its\ninfatuation.
-The foe's {0102:0} got over its\ninfatuation.
-{0102:0}'s status\nis returned to normal!
-The wild {0102:0}'s status\nis returned to normal!
-The foe's {0102:0}'s status\nis returned to normal!
-{0102:0} became\nconfused!
-The wild {0102:0} became\nconfused!
-The foe's {0102:0} became\nconfused!
-{0102:0} is\nconfused!
-The wild {0102:0} is\nconfused!
-The foe's {0102:0} is\nconfused!
-{0102:0} snapped out of its\nconfusion.
-The wild {0102:0} snapped\nout of confusion!
-The foe's {0102:0} snapped\nout of confusion!
-{0102:0} is\nalready confused!
-The wild {0102:0} is\nalready confused!
-The foe's {0102:0} is\nalready confused!
-{0102:0} doesn't\nbecome confused!
-The wild {0102:0} doesn't\nbecome confused!
-The foe's {0102:0} doesn't\nbecome confused!
-{0102:0} became\nconfused due to fatigue!
-The wild {0102:0} became\nconfused due to fatigue!
-The foe's {0102:0} became\nconfused due to fatigue!
-{0102:0} flinched\nand couldn't move!
-The wild {0102:0} flinched\nand couldn't move!
-The foe's {0102:0} flinched\nand couldn't move!
-{0102:0} lost its\nfocus and couldn't move!
-The wild {0102:0} lost its\nfocus and couldn't move!
-The foe's {0102:0} lost its\nfocus and couldn't move!
-{0102:0} was identified!
-The wild {0102:0} was identified!
-The foe's {0102:0} was identified!
-{0102:0} is hurt\nby {0107:1}!
-The wild {0102:0} is hurt\nby {0107:1}!
-The foe's {0102:0} is hurt\nby {0107:1}!
-{0102:0} was freed\nfrom {0107:1}!
-The wild {0102:0} was freed\nfrom {0107:1}!
-The foe's {0102:0} was freed\nfrom {0107:1}!
-{0102:0} is damaged\nby recoil!
-The wild {0102:0} is damaged\nby recoil!
-The foe's {0102:0} is damaged\nby recoil!
-It traced\n{0102:0}'s {0106:1}!
-It traced the wild\n{0102:0}'s {0106:1}!
-It traced the foe's\n{0102:0}'s {0106:1}!
-A critical hit on {0102:0}!
-A critical hit on the wild {0102:0}!
-A critical hit on the foe's {0102:0}!
-{0102:0}'s HP was restored.
-The wild {0102:0} had its HP restored.
-The foe's {0102:0} had its HP restored.
-{0102:0} restored\n{0107:1}'s PP!
-The wild {0102:0} restored\n{0107:1}'s PP!
-The foe's {0102:0} restored\n{0107:1}'s PP!
-{0102:0} restored all its\nmoves' PP!
-The wild {0102:0} restored all its\nmoves' PP!
-The foe's {0102:0} restored all its\nmoves' PP!
-{0102:0} is buffeted\nby the sandstorm!
-The wild {0102:0} is buffeted\nby the sandstorm!
-The foe's {0102:0} is buffeted\nby the sandstorm!
-{0102:0} is buffeted\nby the hail!
-The wild {0102:0} is buffeted\nby the hail!
-The foe's {0102:0} is buffeted\nby the hail!
-{0102:0}\nis hurt!
-The wild {0102:0}\nis hurt!
-The foe's {0102:0}\nis hurt!
-{0102:0} acquired\n{0106:1}!
-The wild {0102:0} acquired\n{0106:1}!
-The foe's {0102:0} acquired\n{0106:1}!
-{0102:0} floats in the air\nwith its Air Balloon!
-The wild {0102:0} floats in the air\nwith its Air Balloon!
-The foe's {0102:0} floats in the air\nwith its Air Balloon!
-{0102:0}'s Air Balloon\npopped!
-The wild {0102:0}'s Air Balloon\npopped!
-The foe's {0102:0}'s Air Balloon\npopped!
-{0102:0} is switched out\nwith the Eject Button!
-The wild {0102:0} is switched out\nwith the Eject Button!
-The foe's {0102:0} is switched out\nwith the Eject Button!
-{0102:0} held up its Red Card\nagainst {0102:1}!
-{0102:0} held up its Red Card\nagainst the wild {0102:1}!
-{0102:0} held up its Red Card\nagainst the foe's {0102:1}!
-The wild {0102:0} held up its Red Card\nagainst {0102:1}!
-The wild {0102:0} held up its Red Card\nagainst the wild {0102:1}!
-The foe's {0102:0} held up its Red Card\nagainst {0102:1}!
-The foe's {0102:0} held up its Red Card\nagainst the foe's {0102:1}!
-{0102:0} was hurt\nby the Rocky Helmet!
-The wild {0102:0} was hurt\nby the Rocky Helmet!
-The foe's {0102:0} was hurt\nby the Rocky Helmet!
-The power of {0102:0}'s\nFire-type moves rose!
-The power of the wild {0102:0}'s\nFire-type moves rose!
-The power of the foe's {0102:0}'s\nFire-type moves rose!
-{0102:0}\nwas hurt!
-The wild {0102:0}\nwas hurt!
-The foe's {0102:0}\nwas hurt!
-It was alerted to {0102:0}'s\n{0107:1}!
-It was alerted to the wild {0102:0}'s\n{0107:1}!
-It was alerted to the foe's {0102:0}'s\n{0107:1}!
-{0102:0}\nshuddered!
-The wild {0102:0}\nshuddered!
-The foe's {0102:0}\nshuddered!
-{0102:0} frisked its\ntarget and found one {0109:1}!
-The wild {0102:0} frisked its\ntarget and found one {0109:1}!
-The foe's {0102:0} frisked its\ntarget and found one {0109:1}!
-{0102:0}\nbreaks the mold!
-The wild {0102:0}\nbreaks the mold!
-The foe's {0102:0}\nbreaks the mold!
-{0102:0} is\nloafing around!
-The wild {0102:0} is\nloafing around!
-The foe's {0102:0} is\nloafing around!
-{0102:0}\ntook the attack!
-The wild {0102:0}\ntook the attack!
-The foe's {0102:0}\ntook the attack!
-{0102:0} stays awake!
-The wild {0102:0} stays awake!
-The foe's {0102:0} stays awake!
-{0102:0} anchors itself!
-The wild {0102:0} anchors itself!
-The foe's {0102:0} anchors itself!
-{0102:0} sucked up the\nliquid ooze!
-The wild {0102:0} sucked up the\nliquid ooze!
-The foe's {0102:0} sucked up the\nliquid ooze!
-It stole\n{0102:0}'s {0109:1}!
-It stole\nthe wild {0102:0}'s {0109:1}!
-It stole\nthe foe's {0102:0}'s {0109:1}!
-{0102:0}'s Ability\nbecame Mummy!
-The wild {0102:0}'s Ability\nbecame Mummy!
-The foe's {0102:0}'s Ability\nbecame Mummy!
-It bounced back\n{0102:0}'s {0107:1}!
-It bounced back\nthe wild {0102:0}'s {0107:1}!
-It bounced back\nthe foe's {0102:0}'s {0107:1}!
-{0102:0} avoids attacks\nby its ally Pokémon!
-The wild {0102:0} avoids attacks\nby its ally Pokémon!
-The foe's {0102:0} avoids attacks\nby its ally Pokémon!
-It poisoned {0102:0}!
-It poisoned the wild {0102:0}!
-It poisoned the foe's {0102:0}!
-{0102:0} harvested\none {0109:1}!
-The wild {0102:0} harvested\none {0109:1}!
-The foe's {0102:0} harvested\none {0109:1}!
-{0102:0}'s\nillusion wore off!
-The wild {0102:0}'s\nillusion wore off!
-The foe's {0102:0}'s\nillusion wore off!
-{0102:0}\nmaxed its Attack!
-The wild {0102:0}\nmaxed its Attack!
-The foe's {0102:0}\nmaxed its Attack!
-{0102:0}\nis tormented!
-The wild {0102:0}\nis tormented!
-The foe's {0102:0}\nis tormented!
-{0102:0} is exerting\nits pressure!
-The wild {0102:0} is exerting\nits pressure!
-The foe's {0102:0} is exerting\nits pressure!
-{0102:0} found\none {0109:1}!
-The wild {0102:0} found\none {0109:1}!
-The foe's {0102:0} found\none {0109:1}!
-{0102:0}'s item\ncannot be stolen!
-The wild {0102:0}'s item\ncannot be stolen!
-The foe's {0102:0}'s item\ncannot be stolen!
-{0102:0}\ncan't get it going!
-The wild {0102:0}\ncan't get it going!
-The foe's {0102:0}\ncan't get it going!
-{0102:0} finally got\nits act together!
-The wild {0102:0} finally got\nits act together!
-The foe's {0102:0} finally got\nits act together!
-{0102:0} is radiating\na bursting aura!
-The wild {0102:0} is radiating\na bursting aura!
-The foe's {0102:0} is radiating\na bursting aura!
-{0102:0} is radiating\na blazing aura!
-The wild {0102:0} is radiating\na blazing aura!
-The foe's {0102:0} is radiating\na blazing aura!
-{0102:0} swapped\nAbilities with its target!
-The wild {0102:0} swapped\nAbilities with its target!
-The foe's {0102:0} swapped\nAbilities with its target!
-{0102:0} braced\nitself!
-The wild {0102:0} braced\nitself!
-The foe's {0102:0} braced\nitself!
-{0102:0} endured\nthe hit!
-The wild {0102:0} endured\nthe hit!
-The foe's {0102:0} endured\nthe hit!
-{0102:0} protected\nitself!
-The wild {0102:0} protected\nitself!
-The foe's {0102:0} protected\nitself!
-It broke through\n{0102:0}'s protection!
-It broke through the wild\n{0102:0}'s protection!
-It broke through the foe's\n{0102:0}'s protection!
-{0102:0}\nprotected itself!
-The wild {0102:0}\nprotected itself!
-The foe's {0102:0}\nprotected itself!
-{0102:0} fell for\nthe feint!
-The wild {0102:0} fell for\nthe feint!
-The foe's {0102:0} fell for\nthe feint!
-{0102:0} flew\nup high!
-The wild {0102:0} flew\nup high!
-The foe's {0102:0} flew\nup high!
-{0102:0}'s rage\nis building!
-The wild {0102:0}'s rage\nis building!
-The foe's {0102:0}'s rage\nis building!
-{0102:0} hid\nunderwater!
-The wild {0102:0} hid\nunderwater!
-The foe's {0102:0} hid\nunderwater!
-{0102:0} burrowed\nits way under the ground!
-The wild {0102:0} burrowed\nits way under the ground!
-The foe's {0102:0} burrowed\nits way under the ground!
-{0102:0} vanished\ninstantly!
-The wild {0102:0} vanished\ninstantly!
-The foe's {0102:0} vanished\ninstantly!
-{0102:0} sprang up!
-The wild {0102:0} sprang up!
-The foe's {0102:0} sprang up!
-{0102:0} whipped\nup a whirlwind!
-The wild {0102:0} whipped\nup a whirlwind!
-The foe's {0102:0} whipped\nup a whirlwind!
-{0102:0} became\ncloaked in a harsh light!
-The wild {0102:0} became\ncloaked in a harsh light!
-The foe's {0102:0} became\ncloaked in a harsh light!
-{0102:0} absorbed\nlight!
-The wild {0102:0} absorbed\nlight!
-The foe's {0102:0} absorbed\nlight!
-{0102:0} tucked in\nits head!
-The wild {0102:0} tucked in\nits head!
-The foe's {0102:0} tucked in\nits head!
-{0102:0} received\nan encore!
-The wild {0102:0} received\nan encore!
-The foe's {0102:0} received\nan encore!
-{0102:0}'s encore\nended!
-The wild {0102:0}'s encore\nended!
-The foe's {0102:0}'s encore\nended!
-{0102:0}'s Ability\nwas suppressed!
-The wild {0102:0}'s Ability\nwas suppressed!
-The foe's {0102:0}'s Ability\nwas suppressed!
-{0102:0} fell for\nthe taunt!
-The wild {0102:0} fell for\nthe taunt!
-The foe's {0102:0} fell for\nthe taunt!
-{0102:0} can't use\n{0107:1} after the taunt!
-The wild {0102:0} can't use\n{0107:1} after the taunt!
-The foe's {0102:0} can't use\n{0107:1} after the taunt!
-{0102:0}'s taunt\nwore off!
-The wild {0102:0}'s taunt\nwore off!
-The foe's {0102:0}'s taunt\nwore off!
-{0102:0} was subjected\nto torment!
-The wild {0102:0} was subjected\nto torment!
-The foe's {0102:0} was subjected\nto torment!
-{0102:0} can't use the same move\ntwice in a row due to the torment!
-The wild {0102:0} can't use the same move\ntwice in a row due to the torment!
-The foe's {0102:0} can't use the\nsame move twice in a row due to the torment!
-{0102:0}'s torment\nwore off!
-The wild {0102:0}'s torment\nwore off!
-The foe's {0102:0}'s torment\nwore off!
-{0102:0} sealed the\nopponent's move(s)!
-The wild {0102:0} sealed the\nopponent's move(s)!
-The foe's {0102:0} sealed the\nopponent's move(s)!
-{0102:0} can't use\nthe sealed {0107:1}!
-The wild {0102:0} can't use\nthe sealed {0107:1}!
-The foe's {0102:0} can't use\nthe sealed {0107:1}!
-{0102:0}'s {0107:1}\nwas disabled!
-The wild {0102:0}'s\n{0107:1} was disabled!
-The foe's {0102:0}'s\n{0107:1} was disabled!
-{0102:0}'s {0107:1}\nis disabled!
-The wild {0102:0}'s\n{0107:1} is disabled!
-The foe's {0102:0}'s\n{0107:1} is disabled!
-{0102:0} is no\nlonger disabled!
-The wild {0102:0} is no\nlonger disabled!
-The foe's {0102:0} is no\nlonger disabled!
-{0102:0} surrounded\nitself with a veil of water!
-The wild {0102:0} surrounded\nitself with a veil of water!
-The foe's {0102:0} surrounded\nitself with a veil of water!
-Aqua Ring restored\n{0102:0}'s HP!
-Aqua Ring restored\nthe wild {0102:0}'s HP!
-Aqua Ring restored\nthe foe's {0102:0}'s HP!
-{0102:0} was seeded!
-The wild {0102:0}\nwas seeded!
-The foe's {0102:0}\nwas seeded!
-{0102:0}'s health is\nsapped by Leech Seed!
-The wild {0102:0}'s health is\nsapped by Leech Seed!
-The foe's {0102:0}'s health is\nsapped by Leech Seed!
-{0102:0} cut its own HP\nand maximized its Attack!
-The wild {0102:0} cut its own HP\nand maximized its Attack!
-The foe's {0102:0} cut its own HP\nand maximized its Attack!
-{0102:0} is tightening\nits focus!
-The wild {0102:0} is tightening\nits focus!
-The foe's {0102:0} is tightening\nits focus!
-{0102:0} copied\n{0102:1}'s {0106:2}!
-{0102:0} copied the wild\n{0102:1}'s {0106:2}!
-{0102:0} copied the foe's\n{0102:1}'s {0106:2}!
-The wild {0102:0} copied\n{0102:1}'s {0106:2}!
-The wild {0102:0} copied the wild\n{0102:1}'s {0106:2}!
-The foe's {0102:0} copied\n{0102:1}'s {0106:2}!
-The foe's {0102:0} copied the\nfoe's {0102:1}'s {0106:2}!
-{0102:0} is trying\nto take its foe down with it!
-The wild {0102:0} is trying\nto take its foe down with it!
-The foe's {0102:0} is trying\nto take its foe down with it!
-{0102:0} took its attacker\ndown with it!
-The wild {0102:0} took its attacker\ndown with it!
-The foe's {0102:0} took its attacker\ndown with it!
-{0102:0} wants its target\nto bear a grudge!
-The wild {0102:0} wants its target\nto bear a grudge!
-The foe's {0102:0} wants its target\nto bear a grudge!
-{0102:0}'s\n{0107:1} lost all its PP{be00}\ndue to the grudge!
-The wild {0102:0}'s\n{0107:1} lost all its PP{be00}\ndue to the grudge!
-The foe's {0102:0}'s\n{0107:1} lost all its PP{be00}\ndue to the grudge!
-{0102:0} slept and\nbecame healthy!
-The wild {0102:0} slept and\nbecame healthy!
-The foe's {0102:0} slept and\nbecame healthy!
-It reduced the PP of {0102:0}'s\n{0107:1} by {0200:2}!
-It reduced the PP of the wild\n{0102:0}'s {0107:1} by {0200:2}!
-It reduced the PP of the foe's\n{0102:0}'s {0107:1} by {0200:2}!
-{0102:0} transformed\ninto {0102:1}!
-{0102:0} transformed\ninto the wild {0102:1}!
-{0102:0} transformed\ninto the foe's {0102:1}!
-The wild {0102:0} transformed\ninto {0102:1}!
-The wild {0102:0} transformed\ninto the wild {0102:1}!
-The foe's {0102:0} transformed\ninto {0102:1}!
-The foe's {0102:0} transformed\ninto the foe's {0102:1}!
-{0102:0} took aim at\n{0102:1}!
-{0102:0} took aim at\nthe wild {0102:1}!
-{0102:0} took aim at\nthe foe's {0102:1}!
-The wild {0102:0} took aim at\n{0102:1}!
-The wild {0102:0} took aim at\nthe wild {0102:1}!
-The foe's {0102:0} took aim at\n{0102:1}!
-The foe's {0102:0} took aim at\nthe foe's {0102:1}!
-{0102:0} levitated\nwith electromagnetism!
-The wild {0102:0} levitated\nwith electromagnetism!
-The foe's {0102:0} levitated\nwith electromagnetism!
-{0102:0}'s\nelectromagnetism wore off!
-The wild {0102:0}'s\nelectromagnetism wore off!
-The electromagnetism of the foe's\n{0102:0} wore off!
-{0102:0} began\ncharging power!
-The wild {0102:0} began\ncharging power!
-The foe's {0102:0} began\ncharging power!
-{0102:0} grew drowsy!
-The wild {0102:0} grew drowsy!
-The foe's {0102:0} grew drowsy!
-{0102:0} became\nthe center of attention!
-The wild {0102:0} became\nthe center of attention!
-The foe's {0102:0} became\nthe center of attention!
-{0102:0} switched stat\nchanges with the target!
-The wild {0102:0} switched stat\nchanges with the target!
-The foe's {0102:0} switched stat\nchanges with the target!
-{0102:0} switched all\nchanges to its Attack and Sp. Atk{be00}\nwith the target!
-The wild {0102:0} switched all\nchanges to its Attack and Sp. Atk{be00}\nwith the target!
-The foe's {0102:0} switched all\nchanges to its Attack and Sp. Atk{be00}\nwith the target!
-{0102:0} switched all\nchanges to its Defense and Sp. Def{be00}\nwith the target!
-The wild {0102:0} switched all\nchanges to its Defense and Sp. Def{be00}\nwith the target!
-The foe's {0102:0} switched all\nchanges to its Defense and Sp. Def{be00}\nwith the target!
-{0102:0} switched\nitems with its target!
-The wild {0102:0} switched\nitems with its target!
-The foe's {0102:0} switched\nitems with its target!
-{0102:0} obtained\none {0109:1}.
-The wild {0102:0} obtained\none {0109:1}.
-The foe's {0102:0} obtained\none {0109:1}.
-{0102:0} learned\n{0107:1}!
-The wild {0102:0} learned\n{0107:1}!
-The foe's {0102:0} learned\n{0107:1}!
-{0102:0} sketched\n{0107:1}!
-The wild {0102:0} sketched\n{0107:1}!
-The foe's {0102:0} sketched\n{0107:1}!
-{0102:0} became cloaked\nin mystical moonlight!
-The wild {0102:0} became cloaked\nin mystical moonlight!
-The foe's {0102:0} became cloaked\nin mystical moonlight!
-The healing wish came true\nfor {0102:0}!
-The healing wish came true\nfor the wild {0102:0}!
-The healing wish came true\nfor the foe's {0102:0}!
-{0102:0}'s wish\ncame true!
-The wild {0102:0}'s wish\ncame true!
-The foe's {0102:0}'s wish\ncame true!
-{0102:0} caused\nan uproar!
-The wild {0102:0} caused\nan uproar!
-The foe's {0102:0} caused\nan uproar!
-The uproar woke up\nthe {0102:0}!
-The uproar woke up the\nwild {0102:0}!
-The uproar woke up the\nfoe's {0102:0}!
-But the uproar kept\n{0102:0} awake!
-But the uproar kept\nthe wild {0102:0} awake!
-But the uproar kept\nthe foe's {0102:0} awake!
-But {0102:0} can't\nsleep in an uproar!
-But the wild {0102:0} can't\nsleep in an uproar!
-But the foe's {0102:0} can't\nsleep in an uproar!
-{0102:0} is making\nan uproar!
-The wild {0102:0} is making\nan uproar!
-The foe's {0102:0} is making\nan uproar!
-{0102:0}\ncalmed down.
-The wild {0102:0}\ncalmed down.
-The foe's {0102:0}\ncalmed down.
-{0102:0} stockpiled {0200:1}!
-The wild {0102:0} stockpiled {0200:1}!
-The foe's {0102:0} stockpiled {0200:1}!
-{0102:0}'s stockpiled\neffect wore off!
-The wild {0102:0}'s stockpiled\neffect wore off!
-The foe's {0102:0}'s stockpiled\neffect wore off!
-{0102:0} can't use\nitems anymore!
-The wild {0102:0} can't use\nitems anymore!
-The foe's {0102:0} can't use\nitems anymore!
-{0102:0} can use\nitems again!
-The wild {0102:0} can use\nitems again!
-The foe's {0102:0} can use\nitems again!
-{0102:0} found\none {0109:1}!
-The wild {0102:0} found\none {0109:1}!
-The foe's {0102:0} found\none {0109:1}!
-{0102:0} planted its roots!
-The wild {0102:0} planted\nits roots!
-The foe's {0102:0} planted\nits roots!
-{0102:0} absorbed\nnutrients with its roots!
-The wild {0102:0} absorbed\nnutrients with its roots!
-The foe's {0102:0} absorbed\nnutrients with its roots!
-{0102:0} anchored\nitself with its roots!
-The wild {0102:0} anchored\nitself with its roots!
-The foe's {0102:0} anchored\nitself with its roots!
-{0102:0} is storing\nenergy!
-The wild {0102:0} is storing\nenergy!
-The foe's {0102:0} is storing\nenergy!
-{0102:0} unleashed\nenergy!
-The wild {0102:0} unleashed\nenergy!
-The foe's {0102:0} unleashed\nenergy!
-{0102:0} waits for a target\nto make a move!
-The wild {0102:0} waits for\na target to make a move!
-The foe's {0102:0} waits for\na target to make a move!
-{0102:0} snatched\n{0102:1}'s move!
-{0102:0} snatched the wild\n{0102:1}'s move!
-{0102:0} snatched the foe's\n{0102:1}'s move!
-The wild {0102:0} snatched\n{0102:1}'s move!
-The wild {0102:0} snatched\nthe wild {0102:1}'s move!
-The foe's {0102:0} snatched\n{0102:1}'s move!
-The foe's {0102:0} snatched\nthe foe's {0102:1}'s move!
-{0102:0} shrouded\nitself with Magic Coat!
-The wild {0102:0} shrouded\nitself with Magic Coat!
-The foe's {0102:0} shrouded\nitself with Magic Coat!
-{0102:0}\nbounced the {0107:1} back!
-The wild {0102:0}\nbounced the {0107:1} back!
-The foe's {0102:0}\nbounced the {0107:1} back!
-{0102:0} fled\nfrom battle!
-The wild {0102:0} fled\nfrom battle!
-The foe's {0102:0} fled\nfrom battle!
-{0102:0} went back\nto {0100:1}!
-The wild {0102:0} went back\nto {0100:1}!
-The foe's {0102:0} went back\nto {0100:1}!
-{0102:0} switched\nits Attack and Defense!
-The wild {0102:0} switched\nits Attack and Defense!
-The foe's {0102:0} switched\nits Attack and Defense!
-{0102:0} stole and\nate its target's {0109:1}!
-The wild {0102:0} stole and\nate its target's {0109:1}!
-The foe's {0102:0} stole and\nate its target's {0109:1}!
-{0102:0} flung\nits {0109:1}!
-The wild {0102:0} flung\nits {0109:1}!
-The foe's {0102:0} flung\nits {0109:1}!
-{0102:0} blew away\n{0107:1}!
-The wild {0102:0} blew away\n{0107:1}!
-The foe's {0102:0} blew away\n{0107:1}!
-{0102:0} put in\na substitute!
-The wild {0102:0} put in\na substitute!
-The foe's {0102:0} put in\na substitute!
-{0102:0} already\nhas a substitute!
-The wild {0102:0} already\nhas a substitute!
-The foe's {0102:0} already\nhas a substitute!
-The substitute took damage\nfor {0102:0}!
-The substitute took damage\nfor the wild {0102:0}!
-The substitute took damage\nfor the foe's {0102:0}!
-{0102:0}'s\nsubstitute faded!
-The wild {0102:0}'s\nsubstitute faded!
-The foe's {0102:0}'s\nsubstitute faded!
-Wide Guard protected\n{0102:0}!
-Wide Guard protected\nthe wild {0102:0}!
-Wide Guard protected\nthe foe's {0102:0}!
-Quick Guard protected\n{0102:0}!
-Quick Guard protected\nthe wild {0102:0}!
-Quick Guard protected\nthe foe's {0102:0}!
-{0102:0} was squeezed\nby {0102:1}!
-{0102:0} was squeezed\nby the wild {0102:1}!
-{0102:0} was squeezed\nby the foe's {0102:1}!
-The wild {0102:0} was squeezed\nby {0102:1}!
-The wild {0102:0} was squeezed\nby the wild {0102:1}!
-The foe's {0102:0} was squeezed\nby {0102:1}!
-The foe's {0102:0} was squeezed\nby the foe's {0102:1}!
-{0102:0} was wrapped by\n{0102:1}!
-{0102:0} was wrapped\nby the wild {0102:1}!
-{0102:0} was wrapped\nby the foe's {0102:1}!
-The wild {0102:0} was wrapped by\n{0102:1}!
-The wild {0102:0} was wrapped\nby the wild {0102:1}!
-The foe's {0102:0} was wrapped\nby {0102:1}!
-The foe's {0102:0} was wrapped\nby the foe's {0102:1}!
-{0102:1} clamped\n{0102:0}!
-The wild {0102:1} clamped\n{0102:0}!
-The foe's {0102:1} clamped\n{0102:0}!
-{0102:1} clamped\nthe wild {0102:0}!
-The wild {0102:1} clamped\nthe wild {0102:0}!
-{0102:1} clamped\nthe foe's {0102:0}!
-The foe's {0102:1} clamped\nthe foe's {0102:0}!
-{0102:0} became trapped\nin the vortex!
-The wild {0102:0} became trapped\nin the vortex!
-The foe's {0102:0} became trapped\nin the vortex!
-{0102:0} became trapped\nin the fiery vortex!
-The wild {0102:0} became trapped\nin the fiery vortex!
-The foe's {0102:0} became trapped\nin the fiery vortex!
-{0102:0} became\ntrapped by swirling magma!
-The wild {0102:0} became\ntrapped by swirling magma!
-The foe's {0102:0} became\ntrapped by swirling magma!
-{0102:0} became trapped\nby Sand Tomb!
-The wild {0102:0} became trapped\nby Sand Tomb!
-The foe's {0102:0} became trapped\nby Sand Tomb!
-{0102:0} has no\nmoves left!
-The wild {0102:0} has no\nmoves left!
-The foe's {0102:0} has no\nmoves left!
-{0102:0} is protected\nby Safeguard!
-The wild {0102:0} is protected\nby Safeguard!
-The foe's {0102:0} is protected\nby Safeguard!
-{0102:0} is protected\nby the mist!
-The wild {0102:0} is protected\nby the mist!
-The foe's {0102:0} is protected\nby the mist!
-{0102:0} was\ndragged out!
-The wild {0102:0} was\ndragged out!
-The foe's {0102:0} was\ndragged out!
-{0102:0} must\nrecharge!
-The wild {0102:0} must\nrecharge!
-The foe's {0102:0} must\nrecharge!
-{0102:0} is hurt\nby the spikes!
-The wild {0102:0} is hurt\nby the spikes!
-The foe's {0102:0} is hurt\nby the spikes!
-Pointed stones dug into\n{0102:0}!
-Pointed stones dug into\nthe wild {0102:0}!
-Pointed stones dug into\nthe foe's {0102:0}!
-{0102:0} twisted\nthe dimensions!
-The wild {0102:0} twisted\nthe dimensions!
-The foe's {0102:0} twisted\nthe dimensions!
-{0102:0}'s perish count\nfell to {0200:1}!
-The wild {0102:0}'s perish count\nfell to {0200:1}!
-The foe's {0102:0}'s perish count\nfell to {0200:1}!
-{0102:0} became cloaked\nin a freezing light!
-The wild {0102:0} became cloaked\nin a freezing light!
-The foe's {0102:0} became cloaked\nin a freezing light!
-{0102:0} became cloaked\nin freezing air!
-The wild {0102:0} became cloaked\nin freezing air!
-The foe's {0102:0} became cloaked\nin freezing air!
-{0102:0} prevents\nescape with {0106:1}!
-The wild {0102:0} prevents\nescape with {0106:1}!
-The foe's {0102:0} prevents\nescape with {0106:1}!
-{0102:0} can no\nlonger escape!
-The wild {0102:0} can no\nlonger escape!
-The foe's {0102:0} can no\nlonger escape!
-{0102:0}\ncan't escape!
-The wild {0102:0}\ncan't escape!
-The foe's {0102:0}\ncan't escape!
-                           \x{ffff}
-                                \x{ffff}
-                                \x{ffff}
-{0102:0} was prevented\nfrom healing!
-The wild {0102:0} was prevented\nfrom healing!
-The foe's {0102:0} was prevented\nfrom healing!
-{0102:0}'s Heal Block\nwore off!
-The wild {0102:0}'s Heal Block\nwore off!
-The foe's {0102:0}'s Heal Block\nwore off!
-{0102:0} was prevented\nfrom healing due to Heal Block!
-The wild {0102:0} was prevented\nfrom healing due to Heal Block!
-The foe's {0102:0} was prevented\nfrom healing due to Heal Block!
-{0102:0} can't use\n{0107:1} because of Heal Block!
-The wild {0102:0} can't use\n{0107:1} because of Heal Block!
-The foe's {0102:0} can't use\n{0107:1} because of Heal Block!
-{0102:0}'s\nHP is full!
-The wild {0102:0}'s\nHP is full!
-The foe's {0102:0}'s\nHP is full!
-{0102:0} transformed\ninto the {0103:1} type!
-The wild {0102:0} transformed\ninto the {0103:1} type!
-The foe's {0102:0} transformed\ninto the {0103:1} type!
-{0102:0} had its\nenergy drained!
-The wild {0102:0} had its\nenergy drained!
-The foe's {0102:0} had its\nenergy drained!
-{0102:0} kept going\nand crashed!
-The wild {0102:0} kept going\nand crashed!
-The foe's {0102:0} kept going\nand crashed!
-{0102:0}\ncannot use {0107:1}!
-The wild {0102:0}\ncannot use {0107:1}!
-The foe's {0102:0}\ncannot use {0107:1}!
-{0102:0} restored its\nhealth using its {0109:1}!
-The wild {0102:0} restored its\nhealth using its {0109:1}!
-The foe's {0102:0} restored its\nhealth using its {0109:1}!
-{0102:0} restored\n{0107:2}'s PP using its{be00}\n{0109:1}!
-The wild {0102:0} restored\n{0107:2}'s PP using its{be00}\n{0109:1}!
-The foe's {0102:0} restored\n{0107:2}'s PP using its{be00}\n{0109:1}!
-{0102:0} restored\na little HP using its {0109:1}!
-The wild {0102:0} restored\na little HP using its {0109:1}!
-The foe's {0102:0} restored\na little HP using its {0109:1}!
-{0102:0}'s {0109:1}\ncured its poison!
-The wild {0102:0}'s\n{0109:1} cured its poison!
-The foe's {0102:0}'s\n{0109:1} cured its poison!
-{0102:0}'s {0109:1}\ncured its paralysis!
-The wild {0102:0}'s\n{0109:1} cured its paralysis!
-The foe's {0102:0}'s\n{0109:1} cured its paralysis!
-{0102:0}'s {0109:1}\nwoke it up!
-The wild {0102:0}'s {0109:1}\nwoke it up!
-The foe's {0102:0}'s {0109:1}\nwoke it up!
-{0102:0}'s {0109:1}\ndefrosted it!
-The wild {0102:0}'s\n{0109:1} defrosted it!
-The foe's {0102:0}'s\n{0109:1} defrosted it!
-{0102:0}'s {0109:1}\nhealed its burn!
-The wild {0102:0}'s\n{0109:1} healed its burn!
-The foe's {0102:0}'s\n{0109:1} healed its burn!
-{0102:0}'s {0109:1}\nsnapped it out of its confusion!
-The wild {0102:0}'s\n{0109:1} snapped it out of{be00}\nits confusion!
-The foe's {0102:0}'s\n{0109:1} snapped it out of{be00}\nits confusion!
-{0102:0} cured its\ninfatuation status{be00}\nusing its {0109:1}!
-The wild {0102:0} cured its\ninfatuation status{be00}\nusing its {0109:1}!
-The foe's {0102:0} cured its\ninfatuation status{be00}\nusing its {0109:1}!
-The {0109:1} raised\n{0102:0}'s Attack!
-The {0109:1} raised\nthe wild {0102:0}'s Attack!
-The {0109:1} raised\nthe foe's {0102:0}'s Attack!
-The {0109:1} raised\n{0102:0}'s Defense!
-The {0109:1} raised\nthe wild {0102:0}'s Defense!
-The {0109:1} raised\nthe foe's {0102:0}'s Defense!
-The {0109:1} raised\n{0102:0}'s Special Attack!
-The {0109:1} raised\nthe wild {0102:0}'s Special Attack!
-The {0109:1} raised\nthe foe's {0102:0}'s Special Attack!
-The {0109:1} raised\n{0102:0}'s Special Defense!
-The {0109:1} raised\nthe wild {0102:0}'s Special Defense!
-The {0109:1} raised\nthe foe's {0102:0}'s Special Defense!
-The {0109:1} raised\n{0102:0}'s Speed!
-The {0109:1} raised\nthe wild {0102:0}'s Speed!
-The {0109:1} raised\nthe foe's {0102:0}'s Speed!
-The {0109:1} raised\n{0102:0}'s accuracy!
-The {0109:1} raised\nthe wild {0102:0}'s accuracy!
-The {0109:1} raised\nthe foe's {0102:0}'s accuracy!
-The {0109:1} raised\n{0102:0}'s evasiveness!
-The {0109:1} raised\nthe wild {0102:0}'s evasiveness!
-The {0109:1} raised\nthe foe's {0102:0}'s evasiveness!
-The {0109:1} sharply raised\n{0102:0}'s Attack!
-The {0109:1} sharply raised\nthe wild {0102:0}'s Attack!
-The {0109:1} sharply raised\nthe foe's {0102:0}'s Attack!
-The {0109:1} sharply raised\n{0102:0}'s Defense!
-The {0109:1} sharply raised\nthe wild {0102:0}'s Defense!
-The {0109:1} sharply raised\nthe foe's {0102:0}'s Defense!
-The {0109:1} sharply raised\n{0102:0}'s Special Attack!
-The {0109:1} sharply raised\nthe wild {0102:0}'s Special Attack!
-The {0109:1} sharply raised\nthe foe's {0102:0}'s Special Attack!
-The {0109:1} sharply raised\n{0102:0}'s Special Defense!
-The {0109:1} sharply raised\nthe wild {0102:0}'s Special Defense!
-The {0109:1} sharply raised\nthe foe's {0102:0}'s Special Defense!
-The {0109:1} sharply raised\n{0102:0}'s Speed!
-The {0109:1} sharply raised\nthe wild {0102:0}'s Speed!
-The {0109:1} sharply raised\nthe foe's {0102:0}'s Speed!
-The {0109:1} sharply raised\n{0102:0}'s accuracy!
-The {0109:1} sharply raised\nthe wild {0102:0}'s accuracy!
-The {0109:1} sharply raised\nthe foe's {0102:0}'s accuracy!
-The {0109:1} sharply raised\n{0102:0}'s evasiveness!
-The {0109:1} sharply raised\nthe wild {0102:0}'s evasiveness!
-The {0109:1} sharply raised\nthe foe's {0102:0}'s evasiveness!
-The {0109:1} drastically raised\n{0102:0}'s Attack!
-The {0109:1} drastically raised\nthe wild {0102:0}'s Attack!
-The {0109:1} drastically raised\nthe foe's {0102:0}'s Attack!
-The {0109:1} drastically raised\n{0102:0}'s Defense!
-The {0109:1} drastically raised\nthe wild {0102:0}'s Defense!
-The {0109:1} drastically raised\nthe foe's {0102:0}'s Defense!
-The {0109:1} drastically raised\n{0102:0}'s Special Attack!
-The {0109:1} drastically raised\nthe wild {0102:0}'s Special Attack!
-The {0109:1} drastically raised\nthe foe's {0102:0}'s Special Attack!
-The {0109:1} drastically raised\n{0102:0}'s Special Defense!
-The {0109:1} drastically raised\nthe wild {0102:0}'s Special Defense!
-The {0109:1} drastically raised\nthe foe's {0102:0}'s Special Defense!
-The {0109:1} drastically raised\n{0102:0}'s Speed!
-The {0109:1} drastically raised\nthe wild {0102:0}'s Speed!
-The {0109:1} drastically raised\nthe foe's {0102:0}'s Speed!
-The {0109:1} drastically raised\n{0102:0}'s accuracy!
-The {0109:1} drastically raised\nthe wild {0102:0}'s accuracy!
-The {0109:1} drastically raised\nthe foe's {0102:0}'s accuracy!
-The {0109:1} drastically raised\n{0102:0}'s evasiveness!
-The {0109:1} drastically raised\nthe wild {0102:0}'s evasiveness!
-The {0109:1} drastically raised\nthe foe's {0102:0}'s evasiveness!
-{0102:0} used\nthe {0109:1} to get pumped!
-The wild {0102:0} used\nthe {0109:1} to get pumped!
-The foe's {0102:0} used\nthe {0109:1} to get pumped!
-{0102:0} fled\nusing its {0109:1}!
-The wild {0102:0} fled\nusing its {0109:1}!
-The foe's {0102:0} fled\nusing its {0109:1}!
-{0102:0} hung on\nusing its {0109:1}!
-The wild {0102:0} hung on\nusing its {0109:1}!
-The foe's {0102:0} hung on\nusing its {0109:1}!
-{0102:0} restored its\nstatus using its {0109:1}!
-The wild {0102:0} restored its\nstatus using its {0109:1}!
-The foe's {0102:0} restored its\nstatus using its {0109:1}!
-{0102:0} lost\nsome of its HP!
-The wild {0102:0} lost\nsome of its HP!
-The foe's {0102:0} lost\nsome of its HP!
-...But {0102:0}\nis not here!
-...But the wild {0102:0}\nis not here!
-...But the foe's {0102:0}\nis not here!
-...But {0102:0} was not\nholding a usable item!
-...But the wild {0102:0} was not\nholding a usable item!
-...But the foe's {0102:0} was not\nholding a usable item!
-{0102:0} became fully\ncharged due to its {0109:1}!
-The wild {0102:0} became fully\ncharged due to its {0109:1}!
-The foe's {0102:0} became fully\ncharged due to its {0109:1}!
-{0102:0}'s {0109:1}\nlet it move first!
-The wild {0102:0}'s\n{0109:1} let it move first!
-The foe's {0102:0}'s\n{0109:1} let it move first!
-{0102:0} boosted\nthe accuracy of its next move{be00}\nusing its {0109:1}!
-The wild {0102:0} boosted\nthe accuracy of its next move{be00}\nusing its {0109:1}!
-The foe's {0102:0} boosted\nthe accuracy of its next move{be00}\nusing its {0109:1}!
-{0102:0} is hurt by\n{0102:1}'s {0109:2}!
-{0102:0} is hurt by the wild\n{0102:1}'s {0109:2}!
-{0102:0} is hurt by the foe's\n{0102:1}'s {0109:2}!
-The wild {0102:0} is hurt by\n{0102:1}'s {0109:2}!
-The wild {0102:0} is hurt by\nthe wild {0102:1}'s {0109:2}!
-The foe's {0102:0} is hurt by\n{0102:1}'s {0109:2}!
-The foe's {0102:0} is hurt by\nthe foe's {0102:1}'s {0109:2}!
-{0102:0} is hurt\nby its {0109:1}!
-The wild {0102:0} is hurt\nby its {0109:1}!
-The foe's {0102:0} is hurt\nby its {0109:1}!
-{0102:0} is getting\npumped!
-The wild {0102:0} is getting\npumped!
-The foe's {0102:0} is getting\npumped!
-{0102:0} is ready to\nhelp {0102:1}!
-The wild {0102:0} is ready to\nhelp {0102:1}!
-The foe's {0102:0} is ready to\nhelp {0102:1}!
-{0102:0} copied\n{0102:1}'s stat changes!
-The wild {0102:0} copied\n{0102:1}'s stat changes!
-The foe's {0102:0} copied\n{0102:1}'s stat changes!
-{0102:0} knocked off\n{0102:1}'s {0109:2}!
-{0102:0} knocked off the wild\n{0102:1}'s {0109:2}!
-{0102:0} knocked off the foe's\n{0102:1}'s {0109:2}!
-The wild {0102:0} knocked off\n{0102:1}'s {0109:2}!
-The wild {0102:0} knocked off the\nwild {0102:1}'s {0109:2}!
-The foe's {0102:0} knocked off\n{0102:1}'s {0109:2}!
-The foe's {0102:0} knocked off\nthe foe's {0102:1}'s{be00}\n{0109:2}!
-{0102:0} stole\n{0102:1}'s {0109:2}!
-{0102:0} stole the wild\n{0102:1}'s {0109:2}!
-{0102:0} stole the foe's\n{0102:1}'s {0109:2}!
-The wild {0102:0} stole\n{0102:1}'s {0109:2}!
-The wild {0102:0} stole the wild\n{0102:1}'s {0109:2}!
-The foe's {0102:0} stole\n{0102:1}'s {0109:2}!
-The foe's {0102:0} stole the\nfoe's {0102:1}'s {0109:2}!
-{0102:0} cut its own HP\nand laid a curse on {0102:1}!
-{0102:0} cut its own HP\nand laid a curse on the wild {0102:1}!
-{0102:0} cut its own HP\nand laid a curse on the foe's {0102:1}!
-The wild {0102:0} cut its own HP\nand laid a curse on {0102:1}!
-The wild {0102:0} cut its own HP\nand laid a curse on the wild {0102:1}!
-The foe's {0102:0} cut its own HP\nand laid a curse on {0102:1}!
-The foe's {0102:0} cut its own HP\nand laid a curse on the foe's {0102:1}!
-{0102:0} is afflicted\nby the curse!
-The wild {0102:0} is afflicted\nby the curse!
-The foe's {0102:0} is afflicted\nby the curse!
-{0102:0} foresaw\nan attack!
-The wild {0102:0} foresaw\nan attack!
-The foe's {0102:0} foresaw\nan attack!
-{0102:0} chose\nDoom Desire as its destiny!
-The wild {0102:0} chose\nDoom Desire as its destiny!
-The foe's {0102:0} chose\nDoom Desire as its destiny!
-{0102:0} took\nthe {0107:1} attack!
-The wild {0102:0} took\nthe {0107:1} attack!
-The foe's {0102:0} took\nthe {0107:1} attack!
-{0102:0} couldn't stay\nairborne because of gravity!
-The wild {0102:0} couldn't stay\nairborne because of gravity!
-The foe's {0102:0} couldn't stay\nairborne because of gravity!
-{0102:0} can't use\n{0107:1} because of gravity!
-The wild {0102:0} can't use\n{0107:1} because of gravity!
-The foe's {0102:0} can't use\n{0107:1} because of gravity!
-{0102:0}'s type\nchanged to match {0102:1}'s!
-{0102:0}'s type\nchanged to match the wild {0102:1}'s!
-{0102:0}'s type\nchanged to match the foe's {0102:1}'s!
-The wild {0102:0}'s type\nchanged to match {0102:1}'s!
-The wild {0102:0}'s type\nchanged to match the wild {0102:1}'s!
-The foe's {0102:0}'s type\nchanged to match {0102:1}'s!
-The foe's {0102:0}'s type\nchanged to match the foe's {0102:1}'s!
-{0102:0} shared its\npower with the target!
-The wild {0102:0} shared its\npower with the target!
-The foe's {0102:0} shared its\npower with the target!
-{0102:0} shared its\nguard with the target!
-The wild {0102:0} shared its\nguard with the target!
-The foe's {0102:0} shared its\nguard with the target!
-{0102:0} became nimble!
-The wild {0102:0} became nimble!
-The foe's {0102:0} became nimble!
-The bursting flame hit {0102:0}!
-The bursting flame hit the wild {0102:0}!
-The bursting flame hit the foe's {0102:0}!
-{0102:0}'s {0109:1}\nwas burnt up!
-The wild {0102:0}'s {0109:1}\nwas burnt up!
-The foe's {0102:0}'s {0109:1}\nwas burnt up!
-{0102:0} received {0109:2}\nfrom {0102:1}!
-{0102:0} received {0109:2}\nfrom the wild {0102:1}!
-{0102:0} received {0109:2}\nfrom the foe's {0102:1}!
-The wild {0102:0} received {0109:2}\nfrom {0102:1}!
-The wild {0102:0} received {0109:2}\nfrom the wild {0102:1}!
-The foe's {0102:0} received {0109:2}\nfrom {0102:1}!
-The foe's {0102:0} received {0109:2}\nfrom the foe's {0102:1}!
-{0102:0} took\n{0102:1} into the sky!
-{0102:0} took\nthe wild {0102:1} into the sky!
-{0102:0} took\nthe foe's {0102:1} into the sky!
-The wild {0102:0} took\n{0102:1} into the sky!
-The wild {0102:0} took\nthe wild {0102:1} into the sky!
-The foe's {0102:0} took\n{0102:1} into the sky!
-The foe's {0102:0} took\nthe foe's {0102:1} into the sky!
-{0102:0} was freed\nfrom the Sky Drop!
-The wild {0102:0} was freed\nfrom the Sky Drop!
-The foe's {0102:0} was freed\nfrom the Sky Drop!
-{0102:0} fell\nstraight down!
-The wild {0102:0} fell\nstraight down!
-The foe's {0102:0} fell\nstraight down!
-{0102:0}'s move\nwas postponed!
-The wild {0102:0}'s move\nwas postponed!
-The foe's {0102:0}'s move\nwas postponed!
-{0102:0}\ntook the kind offer!
-The wild {0102:0}\ntook the kind offer!
-The foe's {0102:0}\ntook the kind offer!
-{0102:0} and\n{0102:1} switched places!
-The wild {0102:0} and\n{0102:1} switched places!
-The foe's {0102:0} and\n{0102:1} switched places!
-{0102:0} was hurled\ninto the air!
-The wild {0102:0} was hurled\ninto the air!
-The foe's {0102:0} was hurled\ninto the air!
-{0102:0} was freed\nfrom the telekinesis!
-The wild {0102:0} was freed\nfrom the telekinesis!
-The foe's {0102:0} was freed\nfrom the telekinesis!
-{0102:0} is waiting\nfor {0102:1}'s move...
-{0102:0} is waiting\nfor the wild {0102:1}'s move...
-{0102:0} is waiting\nfor the foe's {0102:1}...
-The wild {0102:0} is waiting\nfor {0102:1}'s move...
-The wild {0102:0} is waiting\nfor the wild {0102:1}'s move...
-The foe's {0102:0} is waiting\nfor {0102:1}'s move...
-The foe's {0102:0} is waiting\nfor the foe's {0102:1}'s move...
-It is completely synchronized\nwith {0102:0}!
-It is completely synchronized\nwith the wild {0102:0}!
-It is completely synchronized\nwith the foe's {0102:0}!
-{0102:0} is hurt\nby the sea of fire!
-The wild {0102:0} is hurt\nby the sea of fire!
-The foe's {0102:0} is hurt\nby the sea of fire!
+Bank0018_Text_Fainted = {0102:0} fainted!
+Bank0018_Text_WildFainted = The wild {0102:0} fainted!
+Bank0018_Text_FoesFainted = The foe's {0102:0} fainted!
+Bank0018_Text_RecoveredFromFainting = {0102:0} recovered\nfrom fainting!
+Bank0018_Text_WildRecoveredFromFainting = The wild {0102:0} recovered\nfrom fainting!
+Bank0018_Text_FoesRecoveredFromFainting = The foe's {0102:0} recovered\nfrom fainting!
+Bank0018_Text_ItsSuperEffective = It's super effective on\n{0102:0}!
+Bank0018_Text_ItsSuperEffectiveWild = It's super effective on\nthe wild {0102:0}!
+Bank0018_Text_ItsSuperEffectiveFoes = It's super effective on\nthe foe's {0102:0}!
+Bank0018_Text_ItsSuperEffective_2 = It's super effective on\n{0102:0} and {0102:1}!
+Bank0018_Text_ItsSuperEffectiveWild_2 = It's super effective on the wild\n{0102:0} and {0102:1}!
+Bank0018_Text_ItsSuperEffectiveFoes_2 = It's super effective on\nthe foe's {0102:0} and {0102:1}!
+Bank0018_Text_ItsSuperEffective_3 = It's super effective on {0102:0},\n{0102:1}, and {0102:2}!
+Bank0018_Text_ItsSuperEffectiveWild_3 = It's super effective on the wild\n{0102:0}, {0102:1}, and {0102:2}!
+Bank0018_Text_ItsSuperEffectiveFoes_3 = It's super effective on the foe's\n{0102:0}, {0102:1}, and {0102:2}!
+Bank0018_Text_ItsNotVeryEffective = It's not very effective on {0102:0}.
+Bank0018_Text_ItsNotVeryEffective_2 = It's not very effective on\nthe wild {0102:0}.
+Bank0018_Text_ItsNotVeryEffective_3 = It's not very effective on\nthe foe's {0102:0}.
+Bank0018_Text_ItsNotVeryEffective_4 = It's not very effective on\n{0102:0} or {0102:1}.
+Bank0018_Text_ItsNotVeryEffective_5 = It's not very effective on the wild\n{0102:0} or {0102:1}.
+Bank0018_Text_ItsNotVeryEffective_6 = It's not very effective on the foe's\n{0102:0} or {0102:1}.
+Bank0018_Text_ItsNotVeryEffective_7 = It's not very effective on {0102:0},\n{0102:1}, or {0102:2}!
+Bank0018_Text_ItsNotVeryEffective_8 = It's not very effective on the wild\n{0102:0}, {0102:1}, or {0102:2}!
+Bank0018_Text_ItsNotVeryEffective_9 = It's not very effective on the foe's\n{0102:0}, {0102:1}, or {0102:2}!
+Bank0018_Text_ButFailedAffect = But it failed to affect\n{0102:0}!
+Bank0018_Text_ButFailedAffectWild = But it failed to affect\nthe wild {0102:0}!
+Bank0018_Text_ButFailedAffectFoes = But it failed to affect\nthe foe's {0102:0}!
+Bank0018_Text_SAttackRose = {0102:0}'s Attack\nrose!
+Bank0018_Text_WildSAttackRose = The wild {0102:0}'s Attack\nrose!
+Bank0018_Text_FoesSAttackRose = The foe's {0102:0}'s Attack\nrose!
+Bank0018_Text_SDefenseRose = {0102:0}'s Defense\nrose!
+Bank0018_Text_WildSDefenseRose = The wild {0102:0}'s Defense\nrose!
+Bank0018_Text_FoesSDefenseRose = The foe's {0102:0}'s Defense\nrose!
+Bank0018_Text_SSpecialAttackRose = {0102:0}'s Special Attack\nrose!
+Bank0018_Text_WildSSpecialAttack = The wild {0102:0}'s Special Attack\nrose!
+Bank0018_Text_FoesSSpecialAttack = The foe's {0102:0}'s Special Attack\nrose!
+Bank0018_Text_SSpecialDefenseRose = {0102:0}'s Special Defense\nrose!
+Bank0018_Text_WildSSpecialDefense = The wild {0102:0}'s Special Defense\nrose!
+Bank0018_Text_FoesSSpecialDefense = The foe's {0102:0}'s Special Defense\nrose!
+Bank0018_Text_SSpeedRose = {0102:0}'s Speed\nrose!
+Bank0018_Text_WildSSpeedRose = The wild {0102:0}'s Speed\nrose!
+Bank0018_Text_FoesSSpeedRose = The foe's {0102:0}'s Speed\nrose!
+Bank0018_Text_SAccuracyRose = {0102:0}'s accuracy\nrose!
+Bank0018_Text_WildSAccuracyRose = The wild {0102:0}'s accuracy\nrose!
+Bank0018_Text_FoesSAccuracyRose = The foe's {0102:0}'s accuracy\nrose!
+Bank0018_Text_SEvasivenessRose = {0102:0}'s evasiveness\nrose!
+Bank0018_Text_WildSEvasivenessRose = The wild {0102:0}'s evasiveness\nrose!
+Bank0018_Text_FoesSEvasivenessRose = The foe's {0102:0}'s evasiveness\nrose!
+Bank0018_Text_SAttackRoseSharply = {0102:0}'s Attack\nrose sharply!
+Bank0018_Text_WildSAttackRose_2 = The wild {0102:0}'s Attack\nrose sharply!
+Bank0018_Text_FoesSAttackRose_2 = The foe's {0102:0}'s Attack\nrose sharply!
+Bank0018_Text_SDefenseRoseSharply = {0102:0}'s Defense\nrose sharply!
+Bank0018_Text_WildSDefenseRose_2 = The wild {0102:0}'s Defense\nrose sharply!
+Bank0018_Text_FoesSDefenseRose_2 = The foe's {0102:0}'s Defense\nrose sharply!
+Bank0018_Text_SSpecialAttackRose_2 = {0102:0}'s Special Attack\nrose sharply!
+Bank0018_Text_WildSSpecialAttack_2 = The wild {0102:0}'s Special Attack\nrose sharply!
+Bank0018_Text_FoesSSpecialAttack_2 = The foe's {0102:0}'s Special Attack\nrose sharply!
+Bank0018_Text_SSpecialDefenseRose_2 = {0102:0}'s Special Defense\nrose sharply!
+Bank0018_Text_WildSSpecialDefense_2 = The wild {0102:0}'s Special Defense\nrose sharply!
+Bank0018_Text_FoesSSpecialDefense_2 = The foe's {0102:0}'s Special Defense\nrose sharply!
+Bank0018_Text_SSpeedRoseSharply = {0102:0}'s Speed\nrose sharply!
+Bank0018_Text_WildSSpeedRose_2 = The wild {0102:0}'s Speed\nrose sharply!
+Bank0018_Text_FoesSSpeedRose_2 = The foe's {0102:0}'s Speed\nrose sharply!
+Bank0018_Text_SAccuracyRoseSharply = {0102:0}'s accuracy\nrose sharply!
+Bank0018_Text_WildSAccuracyRose_2 = The wild {0102:0}'s accuracy\nrose sharply!
+Bank0018_Text_FoesSAccuracyRose_2 = The foe's {0102:0}'s accuracy\nrose sharply!
+Bank0018_Text_SEvasivenessRoseSharply = {0102:0}'s evasiveness\nrose sharply!
+Bank0018_Text_WildSEvasivenessRose_2 = The wild {0102:0}'s evasiveness\nrose sharply!
+Bank0018_Text_FoesSEvasivenessRose_2 = The foe's {0102:0}'s evasiveness\nrose sharply!
+Bank0018_Text_SAttackRoseDrastically = {0102:0}'s Attack\nrose drastically!
+Bank0018_Text_WildSAttackRose_3 = The wild {0102:0}'s Attack\nrose drastically!
+Bank0018_Text_FoesSAttackRose_3 = The foe's {0102:0}'s Attack\nrose drastically!
+Bank0018_Text_SDefenseRoseDrastically = {0102:0}'s Defense\nrose drastically!
+Bank0018_Text_WildSDefenseRose_3 = The wild {0102:0}'s Defense\nrose drastically!
+Bank0018_Text_FoesSDefenseRose_3 = The foe's {0102:0}'s Defense\nrose drastically!
+Bank0018_Text_SSpecialAttackRose_3 = {0102:0}'s Special Attack\nrose drastically!
+Bank0018_Text_WildSSpecialAttack_3 = The wild {0102:0}'s Special Attack\nrose drastically!
+Bank0018_Text_FoesSSpecialAttack_3 = The foe's {0102:0}'s Special Attack\nrose drastically!
+Bank0018_Text_SSpecialDefenseRose_3 = {0102:0}'s Special Defense\nrose drastically!
+Bank0018_Text_WildSSpecialDefense_3 = The wild {0102:0}'s Special Defense\nrose drastically!
+Bank0018_Text_FoesSSpecialDefense_3 = The foe's {0102:0}'s Special Defense\nrose drastically!
+Bank0018_Text_SSpeedRoseDrastically = {0102:0}'s Speed\nrose drastically!
+Bank0018_Text_WildSSpeedRose_3 = The wild {0102:0}'s Speed\nrose drastically!
+Bank0018_Text_FoesSSpeedRose_3 = The foe's {0102:0}'s Speed\nrose drastically!
+Bank0018_Text_SAccuracyRoseDrastically = {0102:0}'s accuracy\nrose drastically!
+Bank0018_Text_WildSAccuracyRose_3 = The wild {0102:0}'s accuracy\nrose drastically!
+Bank0018_Text_FoesSAccuracyRose_3 = The foe's {0102:0}'s accuracy\nrose drastically!
+Bank0018_Text_SEvasivenessRoseDrastically = {0102:0}'s evasiveness\nrose drastically!
+Bank0018_Text_WildSEvasivenessRose_3 = The wild {0102:0}'s evasiveness\nrose drastically!
+Bank0018_Text_FoesSEvasivenessRose_3 = The foe's {0102:0}'s evasiveness\nrose drastically!
+Bank0018_Text_SAttackFell = {0102:0}'s Attack\nfell!
+Bank0018_Text_WildSAttackFell = The wild {0102:0}'s Attack\nfell!
+Bank0018_Text_FoesSAttackFell = The foe's {0102:0}'s Attack\nfell!
+Bank0018_Text_SDefenseFell = {0102:0}'s Defense\nfell!
+Bank0018_Text_WildSDefenseFell = The wild {0102:0}'s Defense\nfell!
+Bank0018_Text_FoesSDefenseFell = The foe's {0102:0}'s Defense\nfell!
+Bank0018_Text_SSpecialAttackFell = {0102:0}'s Special Attack\nfell!
+Bank0018_Text_WildSSpecialAttack_4 = The wild {0102:0}'s Special Attack\nfell!
+Bank0018_Text_FoesSSpecialAttack_4 = The foe's {0102:0}'s Special Attack\nfell!
+Bank0018_Text_SSpecialDefenseFell = {0102:0}'s Special Defense\nfell!
+Bank0018_Text_WildSSpecialDefense_4 = The wild {0102:0}'s Special Defense\nfell!
+Bank0018_Text_FoesSSpecialDefense_4 = The foe's {0102:0}'s Special Defense\nfell!
+Bank0018_Text_SSpeedFell = {0102:0}'s Speed\nfell!
+Bank0018_Text_WildSSpeedFell = The wild {0102:0}'s Speed\nfell!
+Bank0018_Text_FoesSSpeedFell = The foe's {0102:0}'s Speed\nfell!
+Bank0018_Text_SAccuracyFell = {0102:0}'s accuracy\nfell!
+Bank0018_Text_WildSAccuracyFell = The wild {0102:0}'s accuracy\nfell!
+Bank0018_Text_FoesSAccuracyFell = The foe's {0102:0}'s accuracy\nfell!
+Bank0018_Text_SEvasivenessFell = {0102:0}'s evasiveness\nfell!
+Bank0018_Text_WildSEvasivenessFell = The wild {0102:0}'s evasiveness\nfell!
+Bank0018_Text_FoesSEvasivenessFell = The foe's {0102:0}'s evasiveness\nfell!
+Bank0018_Text_SAttackHarshlyFell = {0102:0}'s Attack\nharshly fell!
+Bank0018_Text_WildSAttackHarshly = The wild {0102:0}'s Attack\nharshly fell!
+Bank0018_Text_FoesSAttackHarshly = The foe's {0102:0}'s Attack\nharshly fell!
+Bank0018_Text_SDefenseHarshlyFell = {0102:0}'s Defense\nharshly fell!
+Bank0018_Text_WildSDefenseHarshly = The wild {0102:0}'s Defense\nharshly fell!
+Bank0018_Text_FoesSDefenseHarshly = The foe's {0102:0}'s Defense\nharshly fell!
+Bank0018_Text_SSpecialAttackHarshly = {0102:0}'s Special Attack\nharshly fell!
+Bank0018_Text_WildSSpecialAttack_5 = The wild {0102:0}'s Special Attack\nharshly fell!
+Bank0018_Text_FoesSSpecialAttack_5 = The foe's {0102:0}'s Special Attack\nharshly fell!
+Bank0018_Text_SSpecialDefenseHarshly = {0102:0}'s Special Defense\nharshly fell!
+Bank0018_Text_WildSSpecialDefense_5 = The wild {0102:0}'s Special Defense\nharshly fell!
+Bank0018_Text_FoesSSpecialDefense_5 = The foe's {0102:0}'s Special Defense\nharshly fell!
+Bank0018_Text_SSpeedHarshlyFell = {0102:0}'s Speed\nharshly fell!
+Bank0018_Text_WildSSpeedHarshly = The wild {0102:0}'s Speed\nharshly fell!
+Bank0018_Text_FoesSSpeedHarshly = The foe's {0102:0}'s Speed\nharshly fell!
+Bank0018_Text_SAccuracyHarshlyFell = {0102:0}'s accuracy\nharshly fell!
+Bank0018_Text_WildSAccuracyHarshly = The wild {0102:0}'s accuracy\nharshly fell!
+Bank0018_Text_FoesSAccuracyHarshly = The foe's {0102:0}'s accuracy\nharshly fell!
+Bank0018_Text_SEvasivenessHarshlyFell = {0102:0}'s evasiveness\nharshly fell!
+Bank0018_Text_WildSEvasivenessHarshly = The wild {0102:0}'s evasiveness\nharshly fell!
+Bank0018_Text_FoesSEvasivenessHarshly = The foe's {0102:0}'s evasiveness\nharshly fell!
+Bank0018_Text_SAttackSeverelyFell = {0102:0}'s Attack\nseverely fell!
+Bank0018_Text_WildSAttackSeverely = The wild {0102:0}'s Attack\nseverely fell!
+Bank0018_Text_FoesSAttackSeverely = The foe's {0102:0}'s Attack\nseverely fell!
+Bank0018_Text_SDefenseSeverelyFell = {0102:0}'s Defense\nseverely fell!
+Bank0018_Text_WildSDefenseSeverely = The wild {0102:0}'s Defense\nseverely fell!
+Bank0018_Text_FoesSDefenseSeverely = The foe's {0102:0}'s Defense\nseverely fell!
+Bank0018_Text_SSpecialAttackSeverely = {0102:0}'s Special Attack\nseverely fell!
+Bank0018_Text_WildSSpecialAttack_6 = The wild {0102:0}'s Special Attack\nseverely fell!
+Bank0018_Text_FoesSSpecialAttack_6 = The foe's {0102:0}'s Special Attack\nseverely fell!
+Bank0018_Text_SSpecialDefenseSeverely = {0102:0}'s Special Defense\nseverely fell!
+Bank0018_Text_WildSSpecialDefense_6 = The wild {0102:0}'s Special Defense\nseverely fell!
+Bank0018_Text_FoesSSpecialDefense_6 = The foe's {0102:0}'s Special Defense\nseverely fell!
+Bank0018_Text_SSpeedSeverelyFell = {0102:0}'s Speed\nseverely fell!
+Bank0018_Text_WildSSpeedSeverely = The wild {0102:0}'s Speed\nseverely fell!
+Bank0018_Text_FoesSSpeedSeverely = The foe's {0102:0}'s Speed\nseverely fell!
+Bank0018_Text_SAccuracySeverelyFell = {0102:0}'s accuracy\nseverely fell!
+Bank0018_Text_WildSAccuracySeverely = The wild {0102:0}'s accuracy\nseverely fell!
+Bank0018_Text_FoesSAccuracySeverely = The foe's {0102:0}'s accuracy\nseverely fell!
+Bank0018_Text_SEvasivenessSeverelyFell = {0102:0}'s evasiveness\nseverely fell!
+Bank0018_Text_WildSEvasivenessSeverely = The wild {0102:0}'s evasiveness\nseverely fell!
+Bank0018_Text_FoesSEvasivenessSeverely = The foe's {0102:0}'s evasiveness\nseverely fell!
+Bank0018_Text_SAttackWontGo = {0102:0}'s Attack won't\ngo any higher!
+Bank0018_Text_WildSAttackWont = The wild {0102:0}'s Attack\nwon't go any higher!
+Bank0018_Text_FoesSAttackWont = The foe's {0102:0}'s Attack\nwon't go any higher!
+Bank0018_Text_SDefenseWontGo = {0102:0}'s Defense won't\ngo any higher!
+Bank0018_Text_WildSDefenseWont = The wild {0102:0}'s Defense\nwon't go any higher!
+Bank0018_Text_FoesSDefenseWont = The foe's {0102:0}'s Defense\nwon't go any higher!
+Bank0018_Text_SSpecialAttackWont = {0102:0}'s Special Attack won't\ngo any higher!
+Bank0018_Text_WildSSpecialAttack_7 = The wild {0102:0}'s Special Attack\nwon't go any higher!
+Bank0018_Text_FoesSSpecialAttack_7 = The foe's {0102:0}'s Special Attack\nwon't go any higher!
+Bank0018_Text_SSpecialDefenseWont = {0102:0}'s Special Defense won't\ngo any higher!
+Bank0018_Text_WildSSpecialDefense_7 = The wild {0102:0}'s Special Defense\nwon't go any higher!
+Bank0018_Text_FoesSSpecialDefense_7 = The foe's {0102:0}'s Special Defense\nwon't go any higher!
+Bank0018_Text_SSpeedWontGo = {0102:0}'s Speed won't\ngo any higher!
+Bank0018_Text_WildSSpeedWont = The wild {0102:0}'s Speed\nwon't go any higher!
+Bank0018_Text_FoesSSpeedWont = The foe's {0102:0}'s Speed\nwon't go any higher!
+Bank0018_Text_SAccuracyWontGo = {0102:0}'s accuracy won't\ngo any higher!
+Bank0018_Text_WildSAccuracyWont = The wild {0102:0}'s accuracy\nwon't go any higher!
+Bank0018_Text_FoesSAccuracyWont = The foe's {0102:0}'s accuracy\nwon't go any higher!
+Bank0018_Text_SEvasivenessWontGo = {0102:0}'s evasiveness won't\ngo any higher!
+Bank0018_Text_WildSEvasivenessWont = The wild {0102:0}'s evasiveness\nwon't go any higher!
+Bank0018_Text_FoesSEvasivenessWont = The foe's {0102:0}'s evasiveness\nwon't go any higher!
+Bank0018_Text_SAttackWontGo_2 = {0102:0}'s Attack won't\ngo any lower!
+Bank0018_Text_WildSAttackWont_2 = The wild {0102:0}'s Attack\nwon't go any lower!
+Bank0018_Text_FoesSAttackWont_2 = The foe's {0102:0}'s Attack\nwon't go any lower!
+Bank0018_Text_SDefenseWontGo_2 = {0102:0}'s Defense won't\ngo any lower!
+Bank0018_Text_WildSDefenseWont_2 = The wild {0102:0}'s Defense\nwon't go any lower!
+Bank0018_Text_FoesSDefenseWont_2 = The foe's {0102:0}'s Defense\nwon't go any lower!
+Bank0018_Text_SSpecialAttackWont_2 = {0102:0}'s Special Attack won't\ngo any lower!
+Bank0018_Text_WildSSpecialAttack_8 = The wild {0102:0}'s Special Attack\nwon't go any lower!
+Bank0018_Text_FoesSSpecialAttack_8 = The foe's {0102:0}'s Special Attack\nwon't go any lower!
+Bank0018_Text_SSpecialDefenseWont_2 = {0102:0}'s Special Defense won't\ngo any lower!
+Bank0018_Text_WildSSpecialDefense_8 = The wild {0102:0}'s Special Defense\nwon't go any lower!
+Bank0018_Text_FoesSSpecialDefense_8 = The foe's {0102:0}'s Special Defense\nwon't go any lower!
+Bank0018_Text_SSpeedWontGo_2 = {0102:0}'s Speed won't\ngo any lower!
+Bank0018_Text_WildSSpeedWont_2 = The wild {0102:0}'s Speed\nwon't go any lower!
+Bank0018_Text_FoesSSpeedWont_2 = The foe's {0102:0}'s Speed\nwon't go any lower!
+Bank0018_Text_SAccuracyWontGo_2 = {0102:0}'s accuracy won't\ngo any lower!
+Bank0018_Text_WildSAccuracyWont_2 = The wild {0102:0}'s accuracy\nwon't go any lower!
+Bank0018_Text_FoesSAccuracyWont_2 = The foe's {0102:0}'s accuracy\nwon't go any lower!
+Bank0018_Text_SEvasivenessWontGo_2 = {0102:0}'s evasiveness won't\ngo any lower!
+Bank0018_Text_WildSEvasivenessWont_2 = The wild {0102:0}'s evasiveness\nwon't go any lower!
+Bank0018_Text_FoesSEvasivenessWont_2 = The foe's {0102:0}'s evasiveness\nwon't go any lower!
+Bank0018_Text_SStatChangesWere = {0102:0}'s stat changes\nwere removed!
+Bank0018_Text_WildSStatChanges = The wild {0102:0}'s stat changes\nwere removed!
+Bank0018_Text_FoesSStatChanges = The foe's {0102:0}'s stat changes\nwere removed!
+Bank0018_Text_SStatsWereNot = {0102:0}'s stats\nwere not lowered!
+Bank0018_Text_WildSStatsWere = The wild {0102:0}'s stats\nwere not lowered!
+Bank0018_Text_FoesSStatsWere = The foe's {0102:0}'s stats\nwere not lowered!
+Bank0018_Text_SAttackNotLowered = {0102:0}'s Attack\nwas not lowered!
+Bank0018_Text_WildSAttackNot = The wild {0102:0}'s Attack\nwas not lowered!
+Bank0018_Text_FoesSAttackNot = The foe's {0102:0}'s Attack\nwas not lowered!
+Bank0018_Text_SDefenseNotLowered = {0102:0}'s Defense\nwas not lowered!
+Bank0018_Text_WildSDefenseNot = The wild {0102:0}'s Defense\nwas not lowered!
+Bank0018_Text_FoesSDefenseNot = The foe's {0102:0}'s Defense\nwas not lowered!
+Bank0018_Text_SAccuracyNotLowered = {0102:0}'s accuracy\nwas not lowered!
+Bank0018_Text_WildSAccuracyNot = The wild {0102:0}'s accuracy\nwas not lowered!
+Bank0018_Text_FoesSAccuracyNot = The foe's {0102:0}'s accuracy\nwas not lowered!
+Bank0018_Text_DoesntAffect = It doesn't affect\n{0102:0}...
+Bank0018_Text_DoesntAffectWild = It doesn't affect\nthe wild {0102:0}...
+Bank0018_Text_DoesntAffectFoes = It doesn't affect\nthe foe's {0102:0}...
+Bank0018_Text_AvoidedAttack = {0102:0} avoided\nthe attack!
+Bank0018_Text_WildAvoidedAttack = The wild {0102:0} avoided\nthe attack!
+Bank0018_Text_FoesAvoidedAttack = The foe's {0102:0} avoided\nthe attack!
+Bank0018_Text_Unaffected = {0102:0} is\nunaffected!
+Bank0018_Text_WildUnaffected = The wild {0102:0} is\nunaffected!
+Bank0018_Text_FoesUnaffected = The foe's {0102:0} is\nunaffected!
+Bank0018_Text_WeakenedDamage = The {0109:1} weakened the damage\nto {0102:0}!
+Bank0018_Text_WeakenedDamageWild = The {0109:1} weakened the damage\nto the wild {0102:0}!
+Bank0018_Text_WeakenedDamageFoes = The {0109:1} weakened the damage\nto the foe's {0102:0}!
+Bank0018_Text_Transformed = {0102:0} transformed!
+Bank0018_Text_WildTransformed = The wild {0102:0}\ntransformed!
+Bank0018_Text_FoesTransformed = The foe's {0102:0}\ntransformed!
+Bank0018_Text_DroppedIts = {0102:0} dropped\nits {0109:1}!
+Bank0018_Text_WildDroppedIts = The wild {0102:0} dropped\nits {0109:1}!
+Bank0018_Text_FoesDroppedIts = The foe's {0102:0} dropped\nits {0109:1}!
+Bank0018_Text_SStatusRestored = {0102:0}'s status\nwas restored!
+Bank0018_Text_WildSStatusRestored = The wild {0102:0}'s status\nwas restored!
+Bank0018_Text_FoesSStatusRestored = The foe's {0102:0}'s status\nwas restored!
+Bank0018_Text_MovedCenter = {0102:0} moved\nto the center!
+Bank0018_Text_WildMovedCenter = The wild {0102:0} moved\nto the center!
+Bank0018_Text_FoesMovedCenter = The foe's {0102:0} moved\nto the center!
+Bank0018_Text_Poisoned = {0102:0}\nwas poisoned!
+Bank0018_Text_WildPoisoned = The wild {0102:0}\nwas poisoned!
+Bank0018_Text_FoesPoisoned = The foe's {0102:0}\nwas poisoned!
+Bank0018_Text_BadlyPoisoned = {0102:0} was badly\npoisoned!
+Bank0018_Text_WildBadlyPoisoned = The wild {0102:0} was badly\npoisoned!
+Bank0018_Text_FoesBadlyPoisoned = The foe's {0102:0} was badly\npoisoned!
+Bank0018_Text_BadlyPoisonedBy = {0102:0} was badly\npoisoned by the {0109:1}!
+Bank0018_Text_WildBadlyPoisonedBy = The wild {0102:0} was badly\npoisoned by the {0109:1}!
+Bank0018_Text_FoesBadlyPoisonedBy = The foe's {0102:0} was badly\npoisoned by the {0109:1}!
+Bank0018_Text_HurtByPoison = {0102:0} was hurt\nby poison!
+Bank0018_Text_WildHurtByPoison = The wild {0102:0} was hurt\nby poison!
+Bank0018_Text_FoesHurtByPoison = The foe's {0102:0} was hurt\nby poison!
+Bank0018_Text_CuredItsPoisoning = {0102:0} was cured of its\npoisoning.
+Bank0018_Text_CuredItsPoisoning_2 = {0102:0} was cured of its\npoisoning.
+Bank0018_Text_CuredItsPoisoning_3 = {0102:0} was cured of its\npoisoning.
+Bank0018_Text_AlreadyPoisoned = {0102:0} is already\npoisoned.
+Bank0018_Text_WildAlreadyPoisoned = The wild {0102:0} is already\npoisoned.
+Bank0018_Text_FoesAlreadyPoisoned = The foe's {0102:0} is already\npoisoned.
+Bank0018_Text_CannotPoisoned = {0102:0} cannot\nbe poisoned!
+Bank0018_Text_WildCannotPoisoned = The wild {0102:0} cannot\nbe poisoned!
+Bank0018_Text_FoesCannotPoisoned = The foe's {0102:0} cannot\nbe poisoned!
+Bank0018_Text_Burned = {0102:0} was burned!
+Bank0018_Text_WildBurned = The wild {0102:0}\nwas burned!
+Bank0018_Text_FoesBurned = The foe's {0102:0}\nwas burned!
+Bank0018_Text_BurnedBy = {0102:0} was burned by {0109:1}!
+Bank0018_Text_WildBurnedBy = The wild {0102:0}\nwas burned by {0109:1}!
+Bank0018_Text_FoesBurnedBy = The foe's {0102:0}\nwas burned by {0109:1}!
+Bank0018_Text_HurtByItsBurn = {0102:0} was hurt\nby its burn!
+Bank0018_Text_WildHurtByIts = The wild {0102:0} was hurt\nby its burn!
+Bank0018_Text_FoesHurtByIts = The foe's {0102:0} was hurt\nby its burn!
+Bank0018_Text_SBurnHealed = {0102:0}'s burn was healed.
+Bank0018_Text_WildHealedItsBurn = The wild {0102:0} healed its burn!
+Bank0018_Text_FoesHealedItsBurn = The foe's {0102:0} healed its burn!
+Bank0018_Text_AlreadyHasBurn = {0102:0} already\nhas a burn.
+Bank0018_Text_WildAlreadyHasBurn = The wild {0102:0} already\nhas a burn.
+Bank0018_Text_FoesAlreadyHasBurn = The foe's {0102:0} already\nhas a burn.
+Bank0018_Text_CannotBurned = {0102:0} cannot\nbe burned!
+Bank0018_Text_WildCannotBurned = The wild {0102:0} cannot\nbe burned!
+Bank0018_Text_FoesCannotBurned = The foe's {0102:0} cannot\nbe burned!
+Bank0018_Text_ParalyzedMayUnableMove = {0102:0} is paralyzed!\nIt may be unable to move!
+Bank0018_Text_WildParalyzedMayUnable = The wild {0102:0} is paralyzed!\nIt may be unable to move!
+Bank0018_Text_FoesParalyzedMayUnable = The foe's {0102:0} is paralyzed!\nIt may be unable to move!
+Bank0018_Text_ParalyzedCantMove = {0102:0} is paralyzed!\nIt can't move!
+Bank0018_Text_WildParalyzedCantMove = The wild {0102:0} is paralyzed!\nIt can't move!
+Bank0018_Text_FoesParalyzedCantMove = The foe's {0102:0} is paralyzed!\nIt can't move!
+Bank0018_Text_CuredParalysis = {0102:0} was cured of\nparalysis.
+Bank0018_Text_WildCuredParalysis = The wild {0102:0} was cured of\nparalysis.
+Bank0018_Text_FoesCuredParalysis = The foe's {0102:0} was cured of\nparalysis.
+Bank0018_Text_AlreadyParalyzed = {0102:0} is\nalready paralyzed!
+Bank0018_Text_WildAlreadyParalyzed = The wild {0102:0} is\nalready paralyzed!
+Bank0018_Text_FoesAlreadyParalyzed = The foe's {0102:0} is\nalready paralyzed!
+Bank0018_Text_CannotParalyzed = {0102:0} cannot\nbe paralyzed!
+Bank0018_Text_WildCannotParalyzed = The wild {0102:0} cannot\nbe paralyzed!
+Bank0018_Text_FoesCannotParalyzed = The foe's {0102:0} cannot\nbe paralyzed!
+Bank0018_Text_FrozenSolid = {0102:0} was\nfrozen solid!
+Bank0018_Text_WildFrozenSolid = The wild {0102:0} was\nfrozen solid!
+Bank0018_Text_FoesFrozenSolid = The foe's {0102:0} was\nfrozen solid!
+Bank0018_Text_FrozenSolid_2 = {0102:0} is\nfrozen solid!
+Bank0018_Text_WildFrozenSolid_2 = The wild {0102:0} is\nfrozen solid!
+Bank0018_Text_FoesFrozenSolid_2 = The foe's {0102:0} is\nfrozen solid!
+Bank0018_Text_ThawedOut = {0102:0} thawed out!
+Bank0018_Text_WildThawedOut = The wild {0102:0} thawed out!
+Bank0018_Text_FoesThawedOut = The foe's {0102:0} thawed out!
+Bank0018_Text_AlreadyFrozenSolid = {0102:0} is\nalready frozen solid!
+Bank0018_Text_WildAlreadyFrozenSolid = The wild {0102:0} is\nalready frozen solid!
+Bank0018_Text_FoesAlreadyFrozenSolid = The foe's {0102:0} is\nalready frozen solid!
+Bank0018_Text_CannotFrozenSolid = {0102:0} cannot be\nfrozen solid!
+Bank0018_Text_WildCannotFrozenSolid = The wild {0102:0} cannot be\nfrozen solid!
+Bank0018_Text_FoesCannotFrozenSolid = The foe's {0102:0} cannot be\nfrozen solid!
+Bank0018_Text_SMeltedIce = {0102:0}'s {0107:1}\nmelted the ice!
+Bank0018_Text_WildSMeltedIce = The wild {0102:0}'s {0107:1}\nmelted the ice!
+Bank0018_Text_FoesSMeltedIce = The foe's {0102:0}'s {0107:1}\nmelted the ice!
+Bank0018_Text_FellAsleep = {0102:0}\nfell asleep!
+Bank0018_Text_WildFellAsleep = The wild {0102:0}\nfell asleep!
+Bank0018_Text_FoesFellAsleep = The foe's {0102:0}\nfell asleep!
+Bank0018_Text_FastAsleep = {0102:0} is fast\nasleep.
+Bank0018_Text_WildFastAsleep = The wild {0102:0} is fast\nasleep.
+Bank0018_Text_FoesFastAsleep = The foe's {0102:0} is fast\nasleep.
+Bank0018_Text_WokeUp = {0102:0} woke up!
+Bank0018_Text_WildWokeUp = The wild {0102:0}\nwoke up!
+Bank0018_Text_FoesWokeUp = The foe's {0102:0}\nwoke up!
+Bank0018_Text_AlreadyAsleep = {0102:0} is\nalready asleep!
+Bank0018_Text_WildAlreadyAsleep = The wild {0102:0} is\nalready asleep!
+Bank0018_Text_FoesAlreadyAsleep = The foe's {0102:0} is\nalready asleep!
+Bank0018_Text_StaysAwake = {0102:0} stays awake!
+Bank0018_Text_WildStaysAwake = The wild {0102:0} stays awake!
+Bank0018_Text_FoesStaysAwake = The foe's {0102:0} stays awake!
+Bank0018_Text_BeganHavingNightmare = {0102:0} began having\na nightmare!
+Bank0018_Text_WildBeganHavingNightmare = The wild {0102:0} began\nhaving a nightmare!
+Bank0018_Text_FoesBeganHavingNightmare = The foe's {0102:0} began\nhaving a nightmare!
+Bank0018_Text_LockedNightmare = {0102:0} is locked\nin a nightmare!
+Bank0018_Text_WildLockedNightmare = The wild {0102:0} is locked\nin a nightmare!
+Bank0018_Text_FoesLockedNightmare = The foe's {0102:0} is locked\nin a nightmare!
+Bank0018_Text_FellLove = {0102:0}\nfell in love!
+Bank0018_Text_WildFellLove = The wild {0102:0}\nfell in love!
+Bank0018_Text_FoesFellLove = The foe's {0102:0}\nfell in love!
+Bank0018_Text_FellLoveFrom = {0102:0}\nfell in love from the {0109:1}!
+Bank0018_Text_WildFellLoveFrom = The wild {0102:0}\nfell in love from the {0109:1}!
+Bank0018_Text_FoesFellLoveFrom = The foe's {0102:0}\nfell in love from the {0109:1}!
+Bank0018_Text_Love = {0102:0} is in love\nwith {0102:1}!
+Bank0018_Text_WildLove = The wild {0102:0} is in love\nwith {0102:1}!
+Bank0018_Text_FoesLove = The foe's {0102:0} is in love\nwith {0102:1}!
+Bank0018_Text_ImmobilizedByLove = {0102:0} is\nimmobilized by love!
+Bank0018_Text_WildImmobilizedByLove = The wild {0102:0} is\nimmobilized by love!
+Bank0018_Text_FoesImmobilizedByLove = The foe's {0102:0} is\nimmobilized by love!
+Bank0018_Text_GotOverItsInfatuation = {0102:0} got over its\ninfatuation.
+Bank0018_Text_WildGotOverIts = The wild {0102:0} got over its\ninfatuation.
+Bank0018_Text_FoesGotOverIts = The foe's {0102:0} got over its\ninfatuation.
+Bank0018_Text_SStatusReturnedNormal = {0102:0}'s status\nis returned to normal!
+Bank0018_Text_WildSStatusReturned = The wild {0102:0}'s status\nis returned to normal!
+Bank0018_Text_FoesSStatusReturned = The foe's {0102:0}'s status\nis returned to normal!
+Bank0018_Text_BecameConfused = {0102:0} became\nconfused!
+Bank0018_Text_WildBecameConfused = The wild {0102:0} became\nconfused!
+Bank0018_Text_FoesBecameConfused = The foe's {0102:0} became\nconfused!
+Bank0018_Text_Confused = {0102:0} is\nconfused!
+Bank0018_Text_WildConfused = The wild {0102:0} is\nconfused!
+Bank0018_Text_FoesConfused = The foe's {0102:0} is\nconfused!
+Bank0018_Text_SnappedOutItsConfusion = {0102:0} snapped out of its\nconfusion.
+Bank0018_Text_WildSnappedOutConfusion = The wild {0102:0} snapped\nout of confusion!
+Bank0018_Text_FoesSnappedOutConfusion = The foe's {0102:0} snapped\nout of confusion!
+Bank0018_Text_AlreadyConfused = {0102:0} is\nalready confused!
+Bank0018_Text_WildAlreadyConfused = The wild {0102:0} is\nalready confused!
+Bank0018_Text_FoesAlreadyConfused = The foe's {0102:0} is\nalready confused!
+Bank0018_Text_DoesntBecomeConfused = {0102:0} doesn't\nbecome confused!
+Bank0018_Text_WildDoesntBecomeConfused = The wild {0102:0} doesn't\nbecome confused!
+Bank0018_Text_FoesDoesntBecomeConfused = The foe's {0102:0} doesn't\nbecome confused!
+Bank0018_Text_BecameConfusedDueFatigue = {0102:0} became\nconfused due to fatigue!
+Bank0018_Text_WildBecameConfusedDue = The wild {0102:0} became\nconfused due to fatigue!
+Bank0018_Text_FoesBecameConfusedDue = The foe's {0102:0} became\nconfused due to fatigue!
+Bank0018_Text_FlinchedCouldntMove = {0102:0} flinched\nand couldn't move!
+Bank0018_Text_WildFlinchedCouldntMove = The wild {0102:0} flinched\nand couldn't move!
+Bank0018_Text_FoesFlinchedCouldntMove = The foe's {0102:0} flinched\nand couldn't move!
+Bank0018_Text_LostItsFocusCouldnt = {0102:0} lost its\nfocus and couldn't move!
+Bank0018_Text_WildLostItsFocus = The wild {0102:0} lost its\nfocus and couldn't move!
+Bank0018_Text_FoesLostItsFocus = The foe's {0102:0} lost its\nfocus and couldn't move!
+Bank0018_Text_Identified = {0102:0} was identified!
+Bank0018_Text_WildIdentified = The wild {0102:0} was identified!
+Bank0018_Text_FoesIdentified = The foe's {0102:0} was identified!
+Bank0018_Text_HurtBy = {0102:0} is hurt\nby {0107:1}!
+Bank0018_Text_WildHurtBy = The wild {0102:0} is hurt\nby {0107:1}!
+Bank0018_Text_FoesHurtBy = The foe's {0102:0} is hurt\nby {0107:1}!
+Bank0018_Text_FreedFrom = {0102:0} was freed\nfrom {0107:1}!
+Bank0018_Text_WildFreedFrom = The wild {0102:0} was freed\nfrom {0107:1}!
+Bank0018_Text_FoesFreedFrom = The foe's {0102:0} was freed\nfrom {0107:1}!
+Bank0018_Text_DamagedByRecoil = {0102:0} is damaged\nby recoil!
+Bank0018_Text_WildDamagedByRecoil = The wild {0102:0} is damaged\nby recoil!
+Bank0018_Text_FoesDamagedByRecoil = The foe's {0102:0} is damaged\nby recoil!
+Bank0018_Text_TracedS = It traced\n{0102:0}'s {0106:1}!
+Bank0018_Text_TracedWildS = It traced the wild\n{0102:0}'s {0106:1}!
+Bank0018_Text_TracedFoesS = It traced the foe's\n{0102:0}'s {0106:1}!
+Bank0018_Text_CriticalHit = A critical hit on {0102:0}!
+Bank0018_Text_CriticalHitWild = A critical hit on the wild {0102:0}!
+Bank0018_Text_CriticalHitFoes = A critical hit on the foe's {0102:0}!
+Bank0018_Text_SHpRestored = {0102:0}'s HP was restored.
+Bank0018_Text_WildHadItsHp = The wild {0102:0} had its HP restored.
+Bank0018_Text_FoesHadItsHp = The foe's {0102:0} had its HP restored.
+Bank0018_Text_RestoredSPp = {0102:0} restored\n{0107:1}'s PP!
+Bank0018_Text_WildRestoredSPp = The wild {0102:0} restored\n{0107:1}'s PP!
+Bank0018_Text_FoesRestoredSPp = The foe's {0102:0} restored\n{0107:1}'s PP!
+Bank0018_Text_RestoredAllItsMoves = {0102:0} restored all its\nmoves' PP!
+Bank0018_Text_WildRestoredAllIts = The wild {0102:0} restored all its\nmoves' PP!
+Bank0018_Text_FoesRestoredAllIts = The foe's {0102:0} restored all its\nmoves' PP!
+Bank0018_Text_BuffetedBySandstorm = {0102:0} is buffeted\nby the sandstorm!
+Bank0018_Text_WildBuffetedBySandstorm = The wild {0102:0} is buffeted\nby the sandstorm!
+Bank0018_Text_FoesBuffetedBySandstorm = The foe's {0102:0} is buffeted\nby the sandstorm!
+Bank0018_Text_BuffetedByHail = {0102:0} is buffeted\nby the hail!
+Bank0018_Text_WildBuffetedByHail = The wild {0102:0} is buffeted\nby the hail!
+Bank0018_Text_FoesBuffetedByHail = The foe's {0102:0} is buffeted\nby the hail!
+Bank0018_Text_Hurt = {0102:0}\nis hurt!
+Bank0018_Text_WildHurt = The wild {0102:0}\nis hurt!
+Bank0018_Text_FoesHurt = The foe's {0102:0}\nis hurt!
+Bank0018_Text_Acquired = {0102:0} acquired\n{0106:1}!
+Bank0018_Text_WildAcquired = The wild {0102:0} acquired\n{0106:1}!
+Bank0018_Text_FoesAcquired = The foe's {0102:0} acquired\n{0106:1}!
+Bank0018_Text_FloatsAirItsAir = {0102:0} floats in the air\nwith its Air Balloon!
+Bank0018_Text_WildFloatsAirIts = The wild {0102:0} floats in the air\nwith its Air Balloon!
+Bank0018_Text_FoesFloatsAirIts = The foe's {0102:0} floats in the air\nwith its Air Balloon!
+Bank0018_Text_SAirBalloonPopped = {0102:0}'s Air Balloon\npopped!
+Bank0018_Text_WildSAirBalloon = The wild {0102:0}'s Air Balloon\npopped!
+Bank0018_Text_FoesSAirBalloon = The foe's {0102:0}'s Air Balloon\npopped!
+Bank0018_Text_SwitchedOutEjectButton = {0102:0} is switched out\nwith the Eject Button!
+Bank0018_Text_WildSwitchedOutEject = The wild {0102:0} is switched out\nwith the Eject Button!
+Bank0018_Text_FoesSwitchedOutEject = The foe's {0102:0} is switched out\nwith the Eject Button!
+Bank0018_Text_HeldUpItsRed = {0102:0} held up its Red Card\nagainst {0102:1}!
+Bank0018_Text_HeldUpItsRed_2 = {0102:0} held up its Red Card\nagainst the wild {0102:1}!
+Bank0018_Text_HeldUpItsRed_3 = {0102:0} held up its Red Card\nagainst the foe's {0102:1}!
+Bank0018_Text_WildHeldUpIts = The wild {0102:0} held up its Red Card\nagainst {0102:1}!
+Bank0018_Text_WildHeldUpIts_2 = The wild {0102:0} held up its Red Card\nagainst the wild {0102:1}!
+Bank0018_Text_FoesHeldUpIts = The foe's {0102:0} held up its Red Card\nagainst {0102:1}!
+Bank0018_Text_FoesHeldUpIts_2 = The foe's {0102:0} held up its Red Card\nagainst the foe's {0102:1}!
+Bank0018_Text_HurtByRockyHelmet = {0102:0} was hurt\nby the Rocky Helmet!
+Bank0018_Text_WildHurtByRocky = The wild {0102:0} was hurt\nby the Rocky Helmet!
+Bank0018_Text_FoesHurtByRocky = The foe's {0102:0} was hurt\nby the Rocky Helmet!
+Bank0018_Text_PowerSFireType = The power of {0102:0}'s\nFire-type moves rose!
+Bank0018_Text_PowerWildSFire = The power of the wild {0102:0}'s\nFire-type moves rose!
+Bank0018_Text_PowerFoesSFire = The power of the foe's {0102:0}'s\nFire-type moves rose!
+Bank0018_Text_Hurt_2 = {0102:0}\nwas hurt!
+Bank0018_Text_WildHurt_2 = The wild {0102:0}\nwas hurt!
+Bank0018_Text_FoesHurt_2 = The foe's {0102:0}\nwas hurt!
+Bank0018_Text_AlertedS = It was alerted to {0102:0}'s\n{0107:1}!
+Bank0018_Text_AlertedWildS = It was alerted to the wild {0102:0}'s\n{0107:1}!
+Bank0018_Text_AlertedFoesS = It was alerted to the foe's {0102:0}'s\n{0107:1}!
+Bank0018_Text_Shuddered = {0102:0}\nshuddered!
+Bank0018_Text_WildShuddered = The wild {0102:0}\nshuddered!
+Bank0018_Text_FoesShuddered = The foe's {0102:0}\nshuddered!
+Bank0018_Text_FriskedItsTargetFound = {0102:0} frisked its\ntarget and found one {0109:1}!
+Bank0018_Text_WildFriskedItsTarget = The wild {0102:0} frisked its\ntarget and found one {0109:1}!
+Bank0018_Text_FoesFriskedItsTarget = The foe's {0102:0} frisked its\ntarget and found one {0109:1}!
+Bank0018_Text_BreaksMold = {0102:0}\nbreaks the mold!
+Bank0018_Text_WildBreaksMold = The wild {0102:0}\nbreaks the mold!
+Bank0018_Text_FoesBreaksMold = The foe's {0102:0}\nbreaks the mold!
+Bank0018_Text_LoafingAround = {0102:0} is\nloafing around!
+Bank0018_Text_WildLoafingAround = The wild {0102:0} is\nloafing around!
+Bank0018_Text_FoesLoafingAround = The foe's {0102:0} is\nloafing around!
+Bank0018_Text_TookAttack = {0102:0}\ntook the attack!
+Bank0018_Text_WildTookAttack = The wild {0102:0}\ntook the attack!
+Bank0018_Text_FoesTookAttack = The foe's {0102:0}\ntook the attack!
+Bank0018_Text_StaysAwake_2 = {0102:0} stays awake!
+Bank0018_Text_WildStaysAwake_2 = The wild {0102:0} stays awake!
+Bank0018_Text_FoesStaysAwake_2 = The foe's {0102:0} stays awake!
+Bank0018_Text_AnchorsItself = {0102:0} anchors itself!
+Bank0018_Text_WildAnchorsItself = The wild {0102:0} anchors itself!
+Bank0018_Text_FoesAnchorsItself = The foe's {0102:0} anchors itself!
+Bank0018_Text_SuckedUpLiquidOoze = {0102:0} sucked up the\nliquid ooze!
+Bank0018_Text_WildSuckedUpLiquid = The wild {0102:0} sucked up the\nliquid ooze!
+Bank0018_Text_FoesSuckedUpLiquid = The foe's {0102:0} sucked up the\nliquid ooze!
+Bank0018_Text_StoleS = It stole\n{0102:0}'s {0109:1}!
+Bank0018_Text_StoleWildS = It stole\nthe wild {0102:0}'s {0109:1}!
+Bank0018_Text_StoleFoesS = It stole\nthe foe's {0102:0}'s {0109:1}!
+Bank0018_Text_SAbilityBecameMummy = {0102:0}'s Ability\nbecame Mummy!
+Bank0018_Text_WildSAbilityBecame = The wild {0102:0}'s Ability\nbecame Mummy!
+Bank0018_Text_FoesSAbilityBecame = The foe's {0102:0}'s Ability\nbecame Mummy!
+Bank0018_Text_BouncedBackS = It bounced back\n{0102:0}'s {0107:1}!
+Bank0018_Text_BouncedBackWildS = It bounced back\nthe wild {0102:0}'s {0107:1}!
+Bank0018_Text_BouncedBackFoesS = It bounced back\nthe foe's {0102:0}'s {0107:1}!
+Bank0018_Text_AvoidsAttacksByIts = {0102:0} avoids attacks\nby its ally Pokémon!
+Bank0018_Text_WildAvoidsAttacksBy = The wild {0102:0} avoids attacks\nby its ally Pokémon!
+Bank0018_Text_FoesAvoidsAttacksBy = The foe's {0102:0} avoids attacks\nby its ally Pokémon!
+Bank0018_Text_Poisoned_2 = It poisoned {0102:0}!
+Bank0018_Text_PoisonedWild = It poisoned the wild {0102:0}!
+Bank0018_Text_PoisonedFoes = It poisoned the foe's {0102:0}!
+Bank0018_Text_HarvestedOne = {0102:0} harvested\none {0109:1}!
+Bank0018_Text_WildHarvestedOne = The wild {0102:0} harvested\none {0109:1}!
+Bank0018_Text_FoesHarvestedOne = The foe's {0102:0} harvested\none {0109:1}!
+Bank0018_Text_SIllusionWoreOff = {0102:0}'s\nillusion wore off!
+Bank0018_Text_WildSIllusionWore = The wild {0102:0}'s\nillusion wore off!
+Bank0018_Text_FoesSIllusionWore = The foe's {0102:0}'s\nillusion wore off!
+Bank0018_Text_MaxedItsAttack = {0102:0}\nmaxed its Attack!
+Bank0018_Text_WildMaxedItsAttack = The wild {0102:0}\nmaxed its Attack!
+Bank0018_Text_FoesMaxedItsAttack = The foe's {0102:0}\nmaxed its Attack!
+Bank0018_Text_Tormented = {0102:0}\nis tormented!
+Bank0018_Text_WildTormented = The wild {0102:0}\nis tormented!
+Bank0018_Text_FoesTormented = The foe's {0102:0}\nis tormented!
+Bank0018_Text_ExertingItsPressure = {0102:0} is exerting\nits pressure!
+Bank0018_Text_WildExertingItsPressure = The wild {0102:0} is exerting\nits pressure!
+Bank0018_Text_FoesExertingItsPressure = The foe's {0102:0} is exerting\nits pressure!
+Bank0018_Text_FoundOne = {0102:0} found\none {0109:1}!
+Bank0018_Text_WildFoundOne = The wild {0102:0} found\none {0109:1}!
+Bank0018_Text_FoesFoundOne = The foe's {0102:0} found\none {0109:1}!
+Bank0018_Text_SItemCannotStolen = {0102:0}'s item\ncannot be stolen!
+Bank0018_Text_WildSItemCannot = The wild {0102:0}'s item\ncannot be stolen!
+Bank0018_Text_FoesSItemCannot = The foe's {0102:0}'s item\ncannot be stolen!
+Bank0018_Text_CantGetGoing = {0102:0}\ncan't get it going!
+Bank0018_Text_WildCantGetGoing = The wild {0102:0}\ncan't get it going!
+Bank0018_Text_FoesCantGetGoing = The foe's {0102:0}\ncan't get it going!
+Bank0018_Text_FinallyGotItsAct = {0102:0} finally got\nits act together!
+Bank0018_Text_WildFinallyGotIts = The wild {0102:0} finally got\nits act together!
+Bank0018_Text_FoesFinallyGotIts = The foe's {0102:0} finally got\nits act together!
+Bank0018_Text_RadiatingBurstingAura = {0102:0} is radiating\na bursting aura!
+Bank0018_Text_WildRadiatingBurstingAura = The wild {0102:0} is radiating\na bursting aura!
+Bank0018_Text_FoesRadiatingBurstingAura = The foe's {0102:0} is radiating\na bursting aura!
+Bank0018_Text_RadiatingBlazingAura = {0102:0} is radiating\na blazing aura!
+Bank0018_Text_WildRadiatingBlazingAura = The wild {0102:0} is radiating\na blazing aura!
+Bank0018_Text_FoesRadiatingBlazingAura = The foe's {0102:0} is radiating\na blazing aura!
+Bank0018_Text_SwappedAbilitiesItsTarget = {0102:0} swapped\nAbilities with its target!
+Bank0018_Text_WildSwappedAbilitiesIts = The wild {0102:0} swapped\nAbilities with its target!
+Bank0018_Text_FoesSwappedAbilitiesIts = The foe's {0102:0} swapped\nAbilities with its target!
+Bank0018_Text_BracedItself = {0102:0} braced\nitself!
+Bank0018_Text_WildBracedItself = The wild {0102:0} braced\nitself!
+Bank0018_Text_FoesBracedItself = The foe's {0102:0} braced\nitself!
+Bank0018_Text_EnduredHit = {0102:0} endured\nthe hit!
+Bank0018_Text_WildEnduredHit = The wild {0102:0} endured\nthe hit!
+Bank0018_Text_FoesEnduredHit = The foe's {0102:0} endured\nthe hit!
+Bank0018_Text_ProtectedItself = {0102:0} protected\nitself!
+Bank0018_Text_WildProtectedItself = The wild {0102:0} protected\nitself!
+Bank0018_Text_FoesProtectedItself = The foe's {0102:0} protected\nitself!
+Bank0018_Text_BrokeThroughSProtection = It broke through\n{0102:0}'s protection!
+Bank0018_Text_BrokeThroughWildS = It broke through the wild\n{0102:0}'s protection!
+Bank0018_Text_BrokeThroughFoesS = It broke through the foe's\n{0102:0}'s protection!
+Bank0018_Text_ProtectedItself_2 = {0102:0}\nprotected itself!
+Bank0018_Text_WildProtectedItself_2 = The wild {0102:0}\nprotected itself!
+Bank0018_Text_FoesProtectedItself_2 = The foe's {0102:0}\nprotected itself!
+Bank0018_Text_FellFeint = {0102:0} fell for\nthe feint!
+Bank0018_Text_WildFellFeint = The wild {0102:0} fell for\nthe feint!
+Bank0018_Text_FoesFellFeint = The foe's {0102:0} fell for\nthe feint!
+Bank0018_Text_FlewUpHigh = {0102:0} flew\nup high!
+Bank0018_Text_WildFlewUpHigh = The wild {0102:0} flew\nup high!
+Bank0018_Text_FoesFlewUpHigh = The foe's {0102:0} flew\nup high!
+Bank0018_Text_SRageBuilding = {0102:0}'s rage\nis building!
+Bank0018_Text_WildSRageBuilding = The wild {0102:0}'s rage\nis building!
+Bank0018_Text_FoesSRageBuilding = The foe's {0102:0}'s rage\nis building!
+Bank0018_Text_HidUnderwater = {0102:0} hid\nunderwater!
+Bank0018_Text_WildHidUnderwater = The wild {0102:0} hid\nunderwater!
+Bank0018_Text_FoesHidUnderwater = The foe's {0102:0} hid\nunderwater!
+Bank0018_Text_BurrowedItsWayUnder = {0102:0} burrowed\nits way under the ground!
+Bank0018_Text_WildBurrowedItsWay = The wild {0102:0} burrowed\nits way under the ground!
+Bank0018_Text_FoesBurrowedItsWay = The foe's {0102:0} burrowed\nits way under the ground!
+Bank0018_Text_VanishedInstantly = {0102:0} vanished\ninstantly!
+Bank0018_Text_WildVanishedInstantly = The wild {0102:0} vanished\ninstantly!
+Bank0018_Text_FoesVanishedInstantly = The foe's {0102:0} vanished\ninstantly!
+Bank0018_Text_SprangUp = {0102:0} sprang up!
+Bank0018_Text_WildSprangUp = The wild {0102:0} sprang up!
+Bank0018_Text_FoesSprangUp = The foe's {0102:0} sprang up!
+Bank0018_Text_WhippedUpWhirlwind = {0102:0} whipped\nup a whirlwind!
+Bank0018_Text_WildWhippedUpWhirlwind = The wild {0102:0} whipped\nup a whirlwind!
+Bank0018_Text_FoesWhippedUpWhirlwind = The foe's {0102:0} whipped\nup a whirlwind!
+Bank0018_Text_BecameCloakedHarshLight = {0102:0} became\ncloaked in a harsh light!
+Bank0018_Text_WildBecameCloakedHarsh = The wild {0102:0} became\ncloaked in a harsh light!
+Bank0018_Text_FoesBecameCloakedHarsh = The foe's {0102:0} became\ncloaked in a harsh light!
+Bank0018_Text_AbsorbedLight = {0102:0} absorbed\nlight!
+Bank0018_Text_WildAbsorbedLight = The wild {0102:0} absorbed\nlight!
+Bank0018_Text_FoesAbsorbedLight = The foe's {0102:0} absorbed\nlight!
+Bank0018_Text_TuckedItsHead = {0102:0} tucked in\nits head!
+Bank0018_Text_WildTuckedItsHead = The wild {0102:0} tucked in\nits head!
+Bank0018_Text_FoesTuckedItsHead = The foe's {0102:0} tucked in\nits head!
+Bank0018_Text_ReceivedEncore = {0102:0} received\nan encore!
+Bank0018_Text_WildReceivedEncore = The wild {0102:0} received\nan encore!
+Bank0018_Text_FoesReceivedEncore = The foe's {0102:0} received\nan encore!
+Bank0018_Text_SEncoreEnded = {0102:0}'s encore\nended!
+Bank0018_Text_WildSEncoreEnded = The wild {0102:0}'s encore\nended!
+Bank0018_Text_FoesSEncoreEnded = The foe's {0102:0}'s encore\nended!
+Bank0018_Text_SAbilitySuppressed = {0102:0}'s Ability\nwas suppressed!
+Bank0018_Text_WildSAbilitySuppressed = The wild {0102:0}'s Ability\nwas suppressed!
+Bank0018_Text_FoesSAbilitySuppressed = The foe's {0102:0}'s Ability\nwas suppressed!
+Bank0018_Text_FellTaunt = {0102:0} fell for\nthe taunt!
+Bank0018_Text_WildFellTaunt = The wild {0102:0} fell for\nthe taunt!
+Bank0018_Text_FoesFellTaunt = The foe's {0102:0} fell for\nthe taunt!
+Bank0018_Text_CantUseAfterTaunt = {0102:0} can't use\n{0107:1} after the taunt!
+Bank0018_Text_WildCantUseAfter = The wild {0102:0} can't use\n{0107:1} after the taunt!
+Bank0018_Text_FoesCantUseAfter = The foe's {0102:0} can't use\n{0107:1} after the taunt!
+Bank0018_Text_STauntWoreOff = {0102:0}'s taunt\nwore off!
+Bank0018_Text_WildSTauntWore = The wild {0102:0}'s taunt\nwore off!
+Bank0018_Text_FoesSTauntWore = The foe's {0102:0}'s taunt\nwore off!
+Bank0018_Text_SubjectedTorment = {0102:0} was subjected\nto torment!
+Bank0018_Text_WildSubjectedTorment = The wild {0102:0} was subjected\nto torment!
+Bank0018_Text_FoesSubjectedTorment = The foe's {0102:0} was subjected\nto torment!
+Bank0018_Text_CantUseSameMove = {0102:0} can't use the same move\ntwice in a row due to the torment!
+Bank0018_Text_WildCantUseSame = The wild {0102:0} can't use the same move\ntwice in a row due to the torment!
+Bank0018_Text_FoesCantUseSame = The foe's {0102:0} can't use the\nsame move twice in a row due to the torment!
+Bank0018_Text_STormentWoreOff = {0102:0}'s torment\nwore off!
+Bank0018_Text_WildSTormentWore = The wild {0102:0}'s torment\nwore off!
+Bank0018_Text_FoesSTormentWore = The foe's {0102:0}'s torment\nwore off!
+Bank0018_Text_SealedOpponentsMoveS = {0102:0} sealed the\nopponent's move(s)!
+Bank0018_Text_WildSealedOpponentsMove = The wild {0102:0} sealed the\nopponent's move(s)!
+Bank0018_Text_FoesSealedOpponentsMove = The foe's {0102:0} sealed the\nopponent's move(s)!
+Bank0018_Text_CantUseSealed = {0102:0} can't use\nthe sealed {0107:1}!
+Bank0018_Text_WildCantUseSealed = The wild {0102:0} can't use\nthe sealed {0107:1}!
+Bank0018_Text_FoesCantUseSealed = The foe's {0102:0} can't use\nthe sealed {0107:1}!
+Bank0018_Text_SDisabled = {0102:0}'s {0107:1}\nwas disabled!
+Bank0018_Text_WildSDisabled = The wild {0102:0}'s\n{0107:1} was disabled!
+Bank0018_Text_FoesSDisabled = The foe's {0102:0}'s\n{0107:1} was disabled!
+Bank0018_Text_SDisabled_2 = {0102:0}'s {0107:1}\nis disabled!
+Bank0018_Text_WildSDisabled_2 = The wild {0102:0}'s\n{0107:1} is disabled!
+Bank0018_Text_FoesSDisabled_2 = The foe's {0102:0}'s\n{0107:1} is disabled!
+Bank0018_Text_NoLongerDisabled = {0102:0} is no\nlonger disabled!
+Bank0018_Text_WildNoLongerDisabled = The wild {0102:0} is no\nlonger disabled!
+Bank0018_Text_FoesNoLongerDisabled = The foe's {0102:0} is no\nlonger disabled!
+Bank0018_Text_SurroundedItselfVeilWater = {0102:0} surrounded\nitself with a veil of water!
+Bank0018_Text_WildSurroundedItselfVeil = The wild {0102:0} surrounded\nitself with a veil of water!
+Bank0018_Text_FoesSurroundedItselfVeil = The foe's {0102:0} surrounded\nitself with a veil of water!
+Bank0018_Text_AquaRingRestoredS = Aqua Ring restored\n{0102:0}'s HP!
+Bank0018_Text_AquaRingRestoredWild = Aqua Ring restored\nthe wild {0102:0}'s HP!
+Bank0018_Text_AquaRingRestoredFoes = Aqua Ring restored\nthe foe's {0102:0}'s HP!
+Bank0018_Text_Seeded = {0102:0} was seeded!
+Bank0018_Text_WildSeeded = The wild {0102:0}\nwas seeded!
+Bank0018_Text_FoesSeeded = The foe's {0102:0}\nwas seeded!
+Bank0018_Text_SHealthSappedBy = {0102:0}'s health is\nsapped by Leech Seed!
+Bank0018_Text_WildSHealthSapped = The wild {0102:0}'s health is\nsapped by Leech Seed!
+Bank0018_Text_FoesSHealthSapped = The foe's {0102:0}'s health is\nsapped by Leech Seed!
+Bank0018_Text_CutItsOwnHp = {0102:0} cut its own HP\nand maximized its Attack!
+Bank0018_Text_WildCutItsOwn = The wild {0102:0} cut its own HP\nand maximized its Attack!
+Bank0018_Text_FoesCutItsOwn = The foe's {0102:0} cut its own HP\nand maximized its Attack!
+Bank0018_Text_TighteningItsFocus = {0102:0} is tightening\nits focus!
+Bank0018_Text_WildTighteningItsFocus = The wild {0102:0} is tightening\nits focus!
+Bank0018_Text_FoesTighteningItsFocus = The foe's {0102:0} is tightening\nits focus!
+Bank0018_Text_CopiedS = {0102:0} copied\n{0102:1}'s {0106:2}!
+Bank0018_Text_CopiedWildS = {0102:0} copied the wild\n{0102:1}'s {0106:2}!
+Bank0018_Text_CopiedFoesS = {0102:0} copied the foe's\n{0102:1}'s {0106:2}!
+Bank0018_Text_WildCopiedS = The wild {0102:0} copied\n{0102:1}'s {0106:2}!
+Bank0018_Text_WildCopiedWildS = The wild {0102:0} copied the wild\n{0102:1}'s {0106:2}!
+Bank0018_Text_FoesCopiedS = The foe's {0102:0} copied\n{0102:1}'s {0106:2}!
+Bank0018_Text_FoesCopiedFoesS = The foe's {0102:0} copied the\nfoe's {0102:1}'s {0106:2}!
+Bank0018_Text_TryingTakeItsFoe = {0102:0} is trying\nto take its foe down with it!
+Bank0018_Text_WildTryingTakeIts = The wild {0102:0} is trying\nto take its foe down with it!
+Bank0018_Text_FoesTryingTakeIts = The foe's {0102:0} is trying\nto take its foe down with it!
+Bank0018_Text_TookItsAttackerDown = {0102:0} took its attacker\ndown with it!
+Bank0018_Text_WildTookItsAttacker = The wild {0102:0} took its attacker\ndown with it!
+Bank0018_Text_FoesTookItsAttacker = The foe's {0102:0} took its attacker\ndown with it!
+Bank0018_Text_WantsItsTargetBear = {0102:0} wants its target\nto bear a grudge!
+Bank0018_Text_WildWantsItsTarget = The wild {0102:0} wants its target\nto bear a grudge!
+Bank0018_Text_FoesWantsItsTarget = The foe's {0102:0} wants its target\nto bear a grudge!
+Bank0018_Text_SLostAllIts = {0102:0}'s\n{0107:1} lost all its PP{be00}\ndue to the grudge!
+Bank0018_Text_WildSLostAll = The wild {0102:0}'s\n{0107:1} lost all its PP{be00}\ndue to the grudge!
+Bank0018_Text_FoesSLostAll = The foe's {0102:0}'s\n{0107:1} lost all its PP{be00}\ndue to the grudge!
+Bank0018_Text_SleptBecameHealthy = {0102:0} slept and\nbecame healthy!
+Bank0018_Text_WildSleptBecameHealthy = The wild {0102:0} slept and\nbecame healthy!
+Bank0018_Text_FoesSleptBecameHealthy = The foe's {0102:0} slept and\nbecame healthy!
+Bank0018_Text_ReducedPpSBy = It reduced the PP of {0102:0}'s\n{0107:1} by {0200:2}!
+Bank0018_Text_ReducedPpWildS = It reduced the PP of the wild\n{0102:0}'s {0107:1} by {0200:2}!
+Bank0018_Text_ReducedPpFoesS = It reduced the PP of the foe's\n{0102:0}'s {0107:1} by {0200:2}!
+Bank0018_Text_TransformedInto = {0102:0} transformed\ninto {0102:1}!
+Bank0018_Text_TransformedIntoWild = {0102:0} transformed\ninto the wild {0102:1}!
+Bank0018_Text_TransformedIntoFoes = {0102:0} transformed\ninto the foe's {0102:1}!
+Bank0018_Text_WildTransformedInto = The wild {0102:0} transformed\ninto {0102:1}!
+Bank0018_Text_WildTransformedIntoWild = The wild {0102:0} transformed\ninto the wild {0102:1}!
+Bank0018_Text_FoesTransformedInto = The foe's {0102:0} transformed\ninto {0102:1}!
+Bank0018_Text_FoesTransformedIntoFoes = The foe's {0102:0} transformed\ninto the foe's {0102:1}!
+Bank0018_Text_TookAim = {0102:0} took aim at\n{0102:1}!
+Bank0018_Text_TookAimWild = {0102:0} took aim at\nthe wild {0102:1}!
+Bank0018_Text_TookAimFoes = {0102:0} took aim at\nthe foe's {0102:1}!
+Bank0018_Text_WildTookAim = The wild {0102:0} took aim at\n{0102:1}!
+Bank0018_Text_WildTookAimWild = The wild {0102:0} took aim at\nthe wild {0102:1}!
+Bank0018_Text_FoesTookAim = The foe's {0102:0} took aim at\n{0102:1}!
+Bank0018_Text_FoesTookAimFoes = The foe's {0102:0} took aim at\nthe foe's {0102:1}!
+Bank0018_Text_LevitatedElectromagnetism = {0102:0} levitated\nwith electromagnetism!
+Bank0018_Text_WildLevitatedElectromagnetism = The wild {0102:0} levitated\nwith electromagnetism!
+Bank0018_Text_FoesLevitatedElectromagnetism = The foe's {0102:0} levitated\nwith electromagnetism!
+Bank0018_Text_SElectromagnetismWoreOff = {0102:0}'s\nelectromagnetism wore off!
+Bank0018_Text_WildSElectromagnetismWore = The wild {0102:0}'s\nelectromagnetism wore off!
+Bank0018_Text_ElectromagnetismFoesWoreOff = The electromagnetism of the foe's\n{0102:0} wore off!
+Bank0018_Text_BeganChargingPower = {0102:0} began\ncharging power!
+Bank0018_Text_WildBeganChargingPower = The wild {0102:0} began\ncharging power!
+Bank0018_Text_FoesBeganChargingPower = The foe's {0102:0} began\ncharging power!
+Bank0018_Text_GrewDrowsy = {0102:0} grew drowsy!
+Bank0018_Text_WildGrewDrowsy = The wild {0102:0} grew drowsy!
+Bank0018_Text_FoesGrewDrowsy = The foe's {0102:0} grew drowsy!
+Bank0018_Text_BecameCenterAttention = {0102:0} became\nthe center of attention!
+Bank0018_Text_WildBecameCenterAttention = The wild {0102:0} became\nthe center of attention!
+Bank0018_Text_FoesBecameCenterAttention = The foe's {0102:0} became\nthe center of attention!
+Bank0018_Text_SwitchedStatChangesTarget = {0102:0} switched stat\nchanges with the target!
+Bank0018_Text_WildSwitchedStatChanges = The wild {0102:0} switched stat\nchanges with the target!
+Bank0018_Text_FoesSwitchedStatChanges = The foe's {0102:0} switched stat\nchanges with the target!
+Bank0018_Text_SwitchedAllChangesIts = {0102:0} switched all\nchanges to its Attack and Sp. Atk{be00}\nwith the target!
+Bank0018_Text_WildSwitchedAllChanges = The wild {0102:0} switched all\nchanges to its Attack and Sp. Atk{be00}\nwith the target!
+Bank0018_Text_FoesSwitchedAllChanges = The foe's {0102:0} switched all\nchanges to its Attack and Sp. Atk{be00}\nwith the target!
+Bank0018_Text_SwitchedAllChangesIts_2 = {0102:0} switched all\nchanges to its Defense and Sp. Def{be00}\nwith the target!
+Bank0018_Text_WildSwitchedAllChanges_2 = The wild {0102:0} switched all\nchanges to its Defense and Sp. Def{be00}\nwith the target!
+Bank0018_Text_FoesSwitchedAllChanges_2 = The foe's {0102:0} switched all\nchanges to its Defense and Sp. Def{be00}\nwith the target!
+Bank0018_Text_SwitchedItemsItsTarget = {0102:0} switched\nitems with its target!
+Bank0018_Text_WildSwitchedItemsIts = The wild {0102:0} switched\nitems with its target!
+Bank0018_Text_FoesSwitchedItemsIts = The foe's {0102:0} switched\nitems with its target!
+Bank0018_Text_ObtainedOne = {0102:0} obtained\none {0109:1}.
+Bank0018_Text_WildObtainedOne = The wild {0102:0} obtained\none {0109:1}.
+Bank0018_Text_FoesObtainedOne = The foe's {0102:0} obtained\none {0109:1}.
+Bank0018_Text_Learned = {0102:0} learned\n{0107:1}!
+Bank0018_Text_WildLearned = The wild {0102:0} learned\n{0107:1}!
+Bank0018_Text_FoesLearned = The foe's {0102:0} learned\n{0107:1}!
+Bank0018_Text_Sketched = {0102:0} sketched\n{0107:1}!
+Bank0018_Text_WildSketched = The wild {0102:0} sketched\n{0107:1}!
+Bank0018_Text_FoesSketched = The foe's {0102:0} sketched\n{0107:1}!
+Bank0018_Text_BecameCloakedMysticalMoonlight = {0102:0} became cloaked\nin mystical moonlight!
+Bank0018_Text_WildBecameCloakedMystical = The wild {0102:0} became cloaked\nin mystical moonlight!
+Bank0018_Text_FoesBecameCloakedMystical = The foe's {0102:0} became cloaked\nin mystical moonlight!
+Bank0018_Text_HealingWishCameTrue = The healing wish came true\nfor {0102:0}!
+Bank0018_Text_HealingWishCameTrue_2 = The healing wish came true\nfor the wild {0102:0}!
+Bank0018_Text_HealingWishCameTrue_3 = The healing wish came true\nfor the foe's {0102:0}!
+Bank0018_Text_SWishCameTrue = {0102:0}'s wish\ncame true!
+Bank0018_Text_WildSWishCame = The wild {0102:0}'s wish\ncame true!
+Bank0018_Text_FoesSWishCame = The foe's {0102:0}'s wish\ncame true!
+Bank0018_Text_CausedUproar = {0102:0} caused\nan uproar!
+Bank0018_Text_WildCausedUproar = The wild {0102:0} caused\nan uproar!
+Bank0018_Text_FoesCausedUproar = The foe's {0102:0} caused\nan uproar!
+Bank0018_Text_UproarWokeUp = The uproar woke up\nthe {0102:0}!
+Bank0018_Text_UproarWokeUpWild = The uproar woke up the\nwild {0102:0}!
+Bank0018_Text_UproarWokeUpFoes = The uproar woke up the\nfoe's {0102:0}!
+Bank0018_Text_ButUproarKeptAwake = But the uproar kept\n{0102:0} awake!
+Bank0018_Text_ButUproarKeptWild = But the uproar kept\nthe wild {0102:0} awake!
+Bank0018_Text_ButUproarKeptFoes = But the uproar kept\nthe foe's {0102:0} awake!
+Bank0018_Text_ButCantSleepUproar = But {0102:0} can't\nsleep in an uproar!
+Bank0018_Text_ButWildCantSleep = But the wild {0102:0} can't\nsleep in an uproar!
+Bank0018_Text_ButFoesCantSleep = But the foe's {0102:0} can't\nsleep in an uproar!
+Bank0018_Text_MakingUproar = {0102:0} is making\nan uproar!
+Bank0018_Text_WildMakingUproar = The wild {0102:0} is making\nan uproar!
+Bank0018_Text_FoesMakingUproar = The foe's {0102:0} is making\nan uproar!
+Bank0018_Text_CalmedDown = {0102:0}\ncalmed down.
+Bank0018_Text_WildCalmedDown = The wild {0102:0}\ncalmed down.
+Bank0018_Text_FoesCalmedDown = The foe's {0102:0}\ncalmed down.
+Bank0018_Text_Stockpiled = {0102:0} stockpiled {0200:1}!
+Bank0018_Text_WildStockpiled = The wild {0102:0} stockpiled {0200:1}!
+Bank0018_Text_FoesStockpiled = The foe's {0102:0} stockpiled {0200:1}!
+Bank0018_Text_SStockpiledEffectWore = {0102:0}'s stockpiled\neffect wore off!
+Bank0018_Text_WildSStockpiledEffect = The wild {0102:0}'s stockpiled\neffect wore off!
+Bank0018_Text_FoesSStockpiledEffect = The foe's {0102:0}'s stockpiled\neffect wore off!
+Bank0018_Text_CantUseItemsAnymore = {0102:0} can't use\nitems anymore!
+Bank0018_Text_WildCantUseItems = The wild {0102:0} can't use\nitems anymore!
+Bank0018_Text_FoesCantUseItems = The foe's {0102:0} can't use\nitems anymore!
+Bank0018_Text_CanUseItemsAgain = {0102:0} can use\nitems again!
+Bank0018_Text_WildCanUseItems = The wild {0102:0} can use\nitems again!
+Bank0018_Text_FoesCanUseItems = The foe's {0102:0} can use\nitems again!
+Bank0018_Text_FoundOne_2 = {0102:0} found\none {0109:1}!
+Bank0018_Text_WildFoundOne_2 = The wild {0102:0} found\none {0109:1}!
+Bank0018_Text_FoesFoundOne_2 = The foe's {0102:0} found\none {0109:1}!
+Bank0018_Text_PlantedItsRoots = {0102:0} planted its roots!
+Bank0018_Text_WildPlantedItsRoots = The wild {0102:0} planted\nits roots!
+Bank0018_Text_FoesPlantedItsRoots = The foe's {0102:0} planted\nits roots!
+Bank0018_Text_AbsorbedNutrientsItsRoots = {0102:0} absorbed\nnutrients with its roots!
+Bank0018_Text_WildAbsorbedNutrientsIts = The wild {0102:0} absorbed\nnutrients with its roots!
+Bank0018_Text_FoesAbsorbedNutrientsIts = The foe's {0102:0} absorbed\nnutrients with its roots!
+Bank0018_Text_AnchoredItselfItsRoots = {0102:0} anchored\nitself with its roots!
+Bank0018_Text_WildAnchoredItselfIts = The wild {0102:0} anchored\nitself with its roots!
+Bank0018_Text_FoesAnchoredItselfIts = The foe's {0102:0} anchored\nitself with its roots!
+Bank0018_Text_StoringEnergy = {0102:0} is storing\nenergy!
+Bank0018_Text_WildStoringEnergy = The wild {0102:0} is storing\nenergy!
+Bank0018_Text_FoesStoringEnergy = The foe's {0102:0} is storing\nenergy!
+Bank0018_Text_UnleashedEnergy = {0102:0} unleashed\nenergy!
+Bank0018_Text_WildUnleashedEnergy = The wild {0102:0} unleashed\nenergy!
+Bank0018_Text_FoesUnleashedEnergy = The foe's {0102:0} unleashed\nenergy!
+Bank0018_Text_WaitsTargetMakeMove = {0102:0} waits for a target\nto make a move!
+Bank0018_Text_WildWaitsTargetMake = The wild {0102:0} waits for\na target to make a move!
+Bank0018_Text_FoesWaitsTargetMake = The foe's {0102:0} waits for\na target to make a move!
+Bank0018_Text_SnatchedSMove = {0102:0} snatched\n{0102:1}'s move!
+Bank0018_Text_SnatchedWildSMove = {0102:0} snatched the wild\n{0102:1}'s move!
+Bank0018_Text_SnatchedFoesSMove = {0102:0} snatched the foe's\n{0102:1}'s move!
+Bank0018_Text_WildSnatchedSMove = The wild {0102:0} snatched\n{0102:1}'s move!
+Bank0018_Text_WildSnatchedWildS = The wild {0102:0} snatched\nthe wild {0102:1}'s move!
+Bank0018_Text_FoesSnatchedSMove = The foe's {0102:0} snatched\n{0102:1}'s move!
+Bank0018_Text_FoesSnatchedFoesS = The foe's {0102:0} snatched\nthe foe's {0102:1}'s move!
+Bank0018_Text_ShroudedItselfMagicCoat = {0102:0} shrouded\nitself with Magic Coat!
+Bank0018_Text_WildShroudedItselfMagic = The wild {0102:0} shrouded\nitself with Magic Coat!
+Bank0018_Text_FoesShroudedItselfMagic = The foe's {0102:0} shrouded\nitself with Magic Coat!
+Bank0018_Text_BouncedBack = {0102:0}\nbounced the {0107:1} back!
+Bank0018_Text_WildBouncedBack = The wild {0102:0}\nbounced the {0107:1} back!
+Bank0018_Text_FoesBouncedBack = The foe's {0102:0}\nbounced the {0107:1} back!
+Bank0018_Text_FledFromBattle = {0102:0} fled\nfrom battle!
+Bank0018_Text_WildFledFromBattle = The wild {0102:0} fled\nfrom battle!
+Bank0018_Text_FoesFledFromBattle = The foe's {0102:0} fled\nfrom battle!
+Bank0018_Text_WentBack = {0102:0} went back\nto {0100:1}!
+Bank0018_Text_WildWentBack = The wild {0102:0} went back\nto {0100:1}!
+Bank0018_Text_FoesWentBack = The foe's {0102:0} went back\nto {0100:1}!
+Bank0018_Text_SwitchedItsAttackDefense = {0102:0} switched\nits Attack and Defense!
+Bank0018_Text_WildSwitchedItsAttack = The wild {0102:0} switched\nits Attack and Defense!
+Bank0018_Text_FoesSwitchedItsAttack = The foe's {0102:0} switched\nits Attack and Defense!
+Bank0018_Text_StoleAteItsTargets = {0102:0} stole and\nate its target's {0109:1}!
+Bank0018_Text_WildStoleAteIts = The wild {0102:0} stole and\nate its target's {0109:1}!
+Bank0018_Text_FoesStoleAteIts = The foe's {0102:0} stole and\nate its target's {0109:1}!
+Bank0018_Text_FlungIts = {0102:0} flung\nits {0109:1}!
+Bank0018_Text_WildFlungIts = The wild {0102:0} flung\nits {0109:1}!
+Bank0018_Text_FoesFlungIts = The foe's {0102:0} flung\nits {0109:1}!
+Bank0018_Text_BlewAway = {0102:0} blew away\n{0107:1}!
+Bank0018_Text_WildBlewAway = The wild {0102:0} blew away\n{0107:1}!
+Bank0018_Text_FoesBlewAway = The foe's {0102:0} blew away\n{0107:1}!
+Bank0018_Text_PutSubstitute = {0102:0} put in\na substitute!
+Bank0018_Text_WildPutSubstitute = The wild {0102:0} put in\na substitute!
+Bank0018_Text_FoesPutSubstitute = The foe's {0102:0} put in\na substitute!
+Bank0018_Text_AlreadyHasSubstitute = {0102:0} already\nhas a substitute!
+Bank0018_Text_WildAlreadyHasSubstitute = The wild {0102:0} already\nhas a substitute!
+Bank0018_Text_FoesAlreadyHasSubstitute = The foe's {0102:0} already\nhas a substitute!
+Bank0018_Text_SubstituteTookDamage = The substitute took damage\nfor {0102:0}!
+Bank0018_Text_SubstituteTookDamageWild = The substitute took damage\nfor the wild {0102:0}!
+Bank0018_Text_SubstituteTookDamageFoes = The substitute took damage\nfor the foe's {0102:0}!
+Bank0018_Text_SSubstituteFaded = {0102:0}'s\nsubstitute faded!
+Bank0018_Text_WildSSubstituteFaded = The wild {0102:0}'s\nsubstitute faded!
+Bank0018_Text_FoesSSubstituteFaded = The foe's {0102:0}'s\nsubstitute faded!
+Bank0018_Text_WideGuardProtected = Wide Guard protected\n{0102:0}!
+Bank0018_Text_WideGuardProtectedWild = Wide Guard protected\nthe wild {0102:0}!
+Bank0018_Text_WideGuardProtectedFoes = Wide Guard protected\nthe foe's {0102:0}!
+Bank0018_Text_QuickGuardProtected = Quick Guard protected\n{0102:0}!
+Bank0018_Text_QuickGuardProtectedWild = Quick Guard protected\nthe wild {0102:0}!
+Bank0018_Text_QuickGuardProtectedFoes = Quick Guard protected\nthe foe's {0102:0}!
+Bank0018_Text_SqueezedBy = {0102:0} was squeezed\nby {0102:1}!
+Bank0018_Text_SqueezedByWild = {0102:0} was squeezed\nby the wild {0102:1}!
+Bank0018_Text_SqueezedByFoes = {0102:0} was squeezed\nby the foe's {0102:1}!
+Bank0018_Text_WildSqueezedBy = The wild {0102:0} was squeezed\nby {0102:1}!
+Bank0018_Text_WildSqueezedByWild = The wild {0102:0} was squeezed\nby the wild {0102:1}!
+Bank0018_Text_FoesSqueezedBy = The foe's {0102:0} was squeezed\nby {0102:1}!
+Bank0018_Text_FoesSqueezedByFoes = The foe's {0102:0} was squeezed\nby the foe's {0102:1}!
+Bank0018_Text_WrappedBy = {0102:0} was wrapped by\n{0102:1}!
+Bank0018_Text_WrappedByWild = {0102:0} was wrapped\nby the wild {0102:1}!
+Bank0018_Text_WrappedByFoes = {0102:0} was wrapped\nby the foe's {0102:1}!
+Bank0018_Text_WildWrappedBy = The wild {0102:0} was wrapped by\n{0102:1}!
+Bank0018_Text_WildWrappedByWild = The wild {0102:0} was wrapped\nby the wild {0102:1}!
+Bank0018_Text_FoesWrappedBy = The foe's {0102:0} was wrapped\nby {0102:1}!
+Bank0018_Text_FoesWrappedByFoes = The foe's {0102:0} was wrapped\nby the foe's {0102:1}!
+Bank0018_Text_Clamped = {0102:1} clamped\n{0102:0}!
+Bank0018_Text_WildClamped = The wild {0102:1} clamped\n{0102:0}!
+Bank0018_Text_FoesClamped = The foe's {0102:1} clamped\n{0102:0}!
+Bank0018_Text_ClampedWild = {0102:1} clamped\nthe wild {0102:0}!
+Bank0018_Text_WildClampedWild = The wild {0102:1} clamped\nthe wild {0102:0}!
+Bank0018_Text_ClampedFoes = {0102:1} clamped\nthe foe's {0102:0}!
+Bank0018_Text_FoesClampedFoes = The foe's {0102:1} clamped\nthe foe's {0102:0}!
+Bank0018_Text_BecameTrappedVortex = {0102:0} became trapped\nin the vortex!
+Bank0018_Text_WildBecameTrappedVortex = The wild {0102:0} became trapped\nin the vortex!
+Bank0018_Text_FoesBecameTrappedVortex = The foe's {0102:0} became trapped\nin the vortex!
+Bank0018_Text_BecameTrappedFieryVortex = {0102:0} became trapped\nin the fiery vortex!
+Bank0018_Text_WildBecameTrappedFiery = The wild {0102:0} became trapped\nin the fiery vortex!
+Bank0018_Text_FoesBecameTrappedFiery = The foe's {0102:0} became trapped\nin the fiery vortex!
+Bank0018_Text_BecameTrappedBySwirling = {0102:0} became\ntrapped by swirling magma!
+Bank0018_Text_WildBecameTrappedBy = The wild {0102:0} became\ntrapped by swirling magma!
+Bank0018_Text_FoesBecameTrappedBy = The foe's {0102:0} became\ntrapped by swirling magma!
+Bank0018_Text_BecameTrappedBySand = {0102:0} became trapped\nby Sand Tomb!
+Bank0018_Text_WildBecameTrappedBy_2 = The wild {0102:0} became trapped\nby Sand Tomb!
+Bank0018_Text_FoesBecameTrappedBy_2 = The foe's {0102:0} became trapped\nby Sand Tomb!
+Bank0018_Text_HasNoMovesLeft = {0102:0} has no\nmoves left!
+Bank0018_Text_WildHasNoMoves = The wild {0102:0} has no\nmoves left!
+Bank0018_Text_FoesHasNoMoves = The foe's {0102:0} has no\nmoves left!
+Bank0018_Text_ProtectedBySafeguard = {0102:0} is protected\nby Safeguard!
+Bank0018_Text_WildProtectedBySafeguard = The wild {0102:0} is protected\nby Safeguard!
+Bank0018_Text_FoesProtectedBySafeguard = The foe's {0102:0} is protected\nby Safeguard!
+Bank0018_Text_ProtectedByMist = {0102:0} is protected\nby the mist!
+Bank0018_Text_WildProtectedByMist = The wild {0102:0} is protected\nby the mist!
+Bank0018_Text_FoesProtectedByMist = The foe's {0102:0} is protected\nby the mist!
+Bank0018_Text_DraggedOut = {0102:0} was\ndragged out!
+Bank0018_Text_WildDraggedOut = The wild {0102:0} was\ndragged out!
+Bank0018_Text_FoesDraggedOut = The foe's {0102:0} was\ndragged out!
+Bank0018_Text_MustRecharge = {0102:0} must\nrecharge!
+Bank0018_Text_WildMustRecharge = The wild {0102:0} must\nrecharge!
+Bank0018_Text_FoesMustRecharge = The foe's {0102:0} must\nrecharge!
+Bank0018_Text_HurtBySpikes = {0102:0} is hurt\nby the spikes!
+Bank0018_Text_WildHurtBySpikes = The wild {0102:0} is hurt\nby the spikes!
+Bank0018_Text_FoesHurtBySpikes = The foe's {0102:0} is hurt\nby the spikes!
+Bank0018_Text_PointedStonesDugInto = Pointed stones dug into\n{0102:0}!
+Bank0018_Text_PointedStonesDugInto_2 = Pointed stones dug into\nthe wild {0102:0}!
+Bank0018_Text_PointedStonesDugInto_3 = Pointed stones dug into\nthe foe's {0102:0}!
+Bank0018_Text_TwistedDimensions = {0102:0} twisted\nthe dimensions!
+Bank0018_Text_WildTwistedDimensions = The wild {0102:0} twisted\nthe dimensions!
+Bank0018_Text_FoesTwistedDimensions = The foe's {0102:0} twisted\nthe dimensions!
+Bank0018_Text_SPerishCountFell = {0102:0}'s perish count\nfell to {0200:1}!
+Bank0018_Text_WildSPerishCount = The wild {0102:0}'s perish count\nfell to {0200:1}!
+Bank0018_Text_FoesSPerishCount = The foe's {0102:0}'s perish count\nfell to {0200:1}!
+Bank0018_Text_BecameCloakedFreezingLight = {0102:0} became cloaked\nin a freezing light!
+Bank0018_Text_WildBecameCloakedFreezing = The wild {0102:0} became cloaked\nin a freezing light!
+Bank0018_Text_FoesBecameCloakedFreezing = The foe's {0102:0} became cloaked\nin a freezing light!
+Bank0018_Text_BecameCloakedFreezingAir = {0102:0} became cloaked\nin freezing air!
+Bank0018_Text_WildBecameCloakedFreezing_2 = The wild {0102:0} became cloaked\nin freezing air!
+Bank0018_Text_FoesBecameCloakedFreezing_2 = The foe's {0102:0} became cloaked\nin freezing air!
+Bank0018_Text_PreventsEscape = {0102:0} prevents\nescape with {0106:1}!
+Bank0018_Text_WildPreventsEscape = The wild {0102:0} prevents\nescape with {0106:1}!
+Bank0018_Text_FoesPreventsEscape = The foe's {0102:0} prevents\nescape with {0106:1}!
+Bank0018_Text_CanNoLongerEscape = {0102:0} can no\nlonger escape!
+Bank0018_Text_WildCanNoLonger = The wild {0102:0} can no\nlonger escape!
+Bank0018_Text_FoesCanNoLonger = The foe's {0102:0} can no\nlonger escape!
+Bank0018_Text_CantEscape = {0102:0}\ncan't escape!
+Bank0018_Text_WildCantEscape = The wild {0102:0}\ncan't escape!
+Bank0018_Text_FoesCantEscape = The foe's {0102:0}\ncan't escape!
+Bank0018_Text_Empty =                            \x{ffff}
+Bank0018_Text_Empty_2 =                                 \x{ffff}
+Bank0018_Text_Empty_3 =                                 \x{ffff}
+Bank0018_Text_PreventedFromHealing = {0102:0} was prevented\nfrom healing!
+Bank0018_Text_WildPreventedFromHealing = The wild {0102:0} was prevented\nfrom healing!
+Bank0018_Text_FoesPreventedFromHealing = The foe's {0102:0} was prevented\nfrom healing!
+Bank0018_Text_SHealBlockWore = {0102:0}'s Heal Block\nwore off!
+Bank0018_Text_WildSHealBlock = The wild {0102:0}'s Heal Block\nwore off!
+Bank0018_Text_FoesSHealBlock = The foe's {0102:0}'s Heal Block\nwore off!
+Bank0018_Text_PreventedFromHealingDue = {0102:0} was prevented\nfrom healing due to Heal Block!
+Bank0018_Text_WildPreventedFromHealing_2 = The wild {0102:0} was prevented\nfrom healing due to Heal Block!
+Bank0018_Text_FoesPreventedFromHealing_2 = The foe's {0102:0} was prevented\nfrom healing due to Heal Block!
+Bank0018_Text_CantUseBecauseHeal = {0102:0} can't use\n{0107:1} because of Heal Block!
+Bank0018_Text_WildCantUseBecause = The wild {0102:0} can't use\n{0107:1} because of Heal Block!
+Bank0018_Text_FoesCantUseBecause = The foe's {0102:0} can't use\n{0107:1} because of Heal Block!
+Bank0018_Text_SHpFull = {0102:0}'s\nHP is full!
+Bank0018_Text_WildSHpFull = The wild {0102:0}'s\nHP is full!
+Bank0018_Text_FoesSHpFull = The foe's {0102:0}'s\nHP is full!
+Bank0018_Text_TransformedIntoType = {0102:0} transformed\ninto the {0103:1} type!
+Bank0018_Text_WildTransformedIntoType = The wild {0102:0} transformed\ninto the {0103:1} type!
+Bank0018_Text_FoesTransformedIntoType = The foe's {0102:0} transformed\ninto the {0103:1} type!
+Bank0018_Text_HadItsEnergyDrained = {0102:0} had its\nenergy drained!
+Bank0018_Text_WildHadItsEnergy = The wild {0102:0} had its\nenergy drained!
+Bank0018_Text_FoesHadItsEnergy = The foe's {0102:0} had its\nenergy drained!
+Bank0018_Text_KeptGoingCrashed = {0102:0} kept going\nand crashed!
+Bank0018_Text_WildKeptGoingCrashed = The wild {0102:0} kept going\nand crashed!
+Bank0018_Text_FoesKeptGoingCrashed = The foe's {0102:0} kept going\nand crashed!
+Bank0018_Text_CannotUse = {0102:0}\ncannot use {0107:1}!
+Bank0018_Text_WildCannotUse = The wild {0102:0}\ncannot use {0107:1}!
+Bank0018_Text_FoesCannotUse = The foe's {0102:0}\ncannot use {0107:1}!
+Bank0018_Text_RestoredItsHealthUsing = {0102:0} restored its\nhealth using its {0109:1}!
+Bank0018_Text_WildRestoredItsHealth = The wild {0102:0} restored its\nhealth using its {0109:1}!
+Bank0018_Text_FoesRestoredItsHealth = The foe's {0102:0} restored its\nhealth using its {0109:1}!
+Bank0018_Text_RestoredSPpUsing = {0102:0} restored\n{0107:2}'s PP using its{be00}\n{0109:1}!
+Bank0018_Text_WildRestoredSPp_2 = The wild {0102:0} restored\n{0107:2}'s PP using its{be00}\n{0109:1}!
+Bank0018_Text_FoesRestoredSPp_2 = The foe's {0102:0} restored\n{0107:2}'s PP using its{be00}\n{0109:1}!
+Bank0018_Text_RestoredLittleHpUsing = {0102:0} restored\na little HP using its {0109:1}!
+Bank0018_Text_WildRestoredLittleHp = The wild {0102:0} restored\na little HP using its {0109:1}!
+Bank0018_Text_FoesRestoredLittleHp = The foe's {0102:0} restored\na little HP using its {0109:1}!
+Bank0018_Text_SCuredItsPoison = {0102:0}'s {0109:1}\ncured its poison!
+Bank0018_Text_WildSCuredIts = The wild {0102:0}'s\n{0109:1} cured its poison!
+Bank0018_Text_FoesSCuredIts = The foe's {0102:0}'s\n{0109:1} cured its poison!
+Bank0018_Text_SCuredItsParalysis = {0102:0}'s {0109:1}\ncured its paralysis!
+Bank0018_Text_WildSCuredIts_2 = The wild {0102:0}'s\n{0109:1} cured its paralysis!
+Bank0018_Text_FoesSCuredIts_2 = The foe's {0102:0}'s\n{0109:1} cured its paralysis!
+Bank0018_Text_SWokeUp = {0102:0}'s {0109:1}\nwoke it up!
+Bank0018_Text_WildSWokeUp = The wild {0102:0}'s {0109:1}\nwoke it up!
+Bank0018_Text_FoesSWokeUp = The foe's {0102:0}'s {0109:1}\nwoke it up!
+Bank0018_Text_SDefrosted = {0102:0}'s {0109:1}\ndefrosted it!
+Bank0018_Text_WildSDefrosted = The wild {0102:0}'s\n{0109:1} defrosted it!
+Bank0018_Text_FoesSDefrosted = The foe's {0102:0}'s\n{0109:1} defrosted it!
+Bank0018_Text_SHealedItsBurn = {0102:0}'s {0109:1}\nhealed its burn!
+Bank0018_Text_WildSHealedIts = The wild {0102:0}'s\n{0109:1} healed its burn!
+Bank0018_Text_FoesSHealedIts = The foe's {0102:0}'s\n{0109:1} healed its burn!
+Bank0018_Text_SSnappedOutIts = {0102:0}'s {0109:1}\nsnapped it out of its confusion!
+Bank0018_Text_WildSSnappedOut = The wild {0102:0}'s\n{0109:1} snapped it out of{be00}\nits confusion!
+Bank0018_Text_FoesSSnappedOut = The foe's {0102:0}'s\n{0109:1} snapped it out of{be00}\nits confusion!
+Bank0018_Text_CuredItsInfatuationStatus = {0102:0} cured its\ninfatuation status{be00}\nusing its {0109:1}!
+Bank0018_Text_WildCuredItsInfatuation = The wild {0102:0} cured its\ninfatuation status{be00}\nusing its {0109:1}!
+Bank0018_Text_FoesCuredItsInfatuation = The foe's {0102:0} cured its\ninfatuation status{be00}\nusing its {0109:1}!
+Bank0018_Text_RaisedSAttack = The {0109:1} raised\n{0102:0}'s Attack!
+Bank0018_Text_RaisedWildSAttack = The {0109:1} raised\nthe wild {0102:0}'s Attack!
+Bank0018_Text_RaisedFoesSAttack = The {0109:1} raised\nthe foe's {0102:0}'s Attack!
+Bank0018_Text_RaisedSDefense = The {0109:1} raised\n{0102:0}'s Defense!
+Bank0018_Text_RaisedWildSDefense = The {0109:1} raised\nthe wild {0102:0}'s Defense!
+Bank0018_Text_RaisedFoesSDefense = The {0109:1} raised\nthe foe's {0102:0}'s Defense!
+Bank0018_Text_RaisedSSpecialAttack = The {0109:1} raised\n{0102:0}'s Special Attack!
+Bank0018_Text_RaisedWildSSpecial = The {0109:1} raised\nthe wild {0102:0}'s Special Attack!
+Bank0018_Text_RaisedFoesSSpecial = The {0109:1} raised\nthe foe's {0102:0}'s Special Attack!
+Bank0018_Text_RaisedSSpecialDefense = The {0109:1} raised\n{0102:0}'s Special Defense!
+Bank0018_Text_RaisedWildSSpecial_2 = The {0109:1} raised\nthe wild {0102:0}'s Special Defense!
+Bank0018_Text_RaisedFoesSSpecial_2 = The {0109:1} raised\nthe foe's {0102:0}'s Special Defense!
+Bank0018_Text_RaisedSSpeed = The {0109:1} raised\n{0102:0}'s Speed!
+Bank0018_Text_RaisedWildSSpeed = The {0109:1} raised\nthe wild {0102:0}'s Speed!
+Bank0018_Text_RaisedFoesSSpeed = The {0109:1} raised\nthe foe's {0102:0}'s Speed!
+Bank0018_Text_RaisedSAccuracy = The {0109:1} raised\n{0102:0}'s accuracy!
+Bank0018_Text_RaisedWildSAccuracy = The {0109:1} raised\nthe wild {0102:0}'s accuracy!
+Bank0018_Text_RaisedFoesSAccuracy = The {0109:1} raised\nthe foe's {0102:0}'s accuracy!
+Bank0018_Text_RaisedSEvasiveness = The {0109:1} raised\n{0102:0}'s evasiveness!
+Bank0018_Text_RaisedWildSEvasiveness = The {0109:1} raised\nthe wild {0102:0}'s evasiveness!
+Bank0018_Text_RaisedFoesSEvasiveness = The {0109:1} raised\nthe foe's {0102:0}'s evasiveness!
+Bank0018_Text_SharplyRaisedSAttack = The {0109:1} sharply raised\n{0102:0}'s Attack!
+Bank0018_Text_SharplyRaisedWildS = The {0109:1} sharply raised\nthe wild {0102:0}'s Attack!
+Bank0018_Text_SharplyRaisedFoesS = The {0109:1} sharply raised\nthe foe's {0102:0}'s Attack!
+Bank0018_Text_SharplyRaisedSDefense = The {0109:1} sharply raised\n{0102:0}'s Defense!
+Bank0018_Text_SharplyRaisedWildS_2 = The {0109:1} sharply raised\nthe wild {0102:0}'s Defense!
+Bank0018_Text_SharplyRaisedFoesS_2 = The {0109:1} sharply raised\nthe foe's {0102:0}'s Defense!
+Bank0018_Text_SharplyRaisedSSpecial = The {0109:1} sharply raised\n{0102:0}'s Special Attack!
+Bank0018_Text_SharplyRaisedWildS_3 = The {0109:1} sharply raised\nthe wild {0102:0}'s Special Attack!
+Bank0018_Text_SharplyRaisedFoesS_3 = The {0109:1} sharply raised\nthe foe's {0102:0}'s Special Attack!
+Bank0018_Text_SharplyRaisedSSpecial_2 = The {0109:1} sharply raised\n{0102:0}'s Special Defense!
+Bank0018_Text_SharplyRaisedWildS_4 = The {0109:1} sharply raised\nthe wild {0102:0}'s Special Defense!
+Bank0018_Text_SharplyRaisedFoesS_4 = The {0109:1} sharply raised\nthe foe's {0102:0}'s Special Defense!
+Bank0018_Text_SharplyRaisedSSpeed = The {0109:1} sharply raised\n{0102:0}'s Speed!
+Bank0018_Text_SharplyRaisedWildS_5 = The {0109:1} sharply raised\nthe wild {0102:0}'s Speed!
+Bank0018_Text_SharplyRaisedFoesS_5 = The {0109:1} sharply raised\nthe foe's {0102:0}'s Speed!
+Bank0018_Text_SharplyRaisedSAccuracy = The {0109:1} sharply raised\n{0102:0}'s accuracy!
+Bank0018_Text_SharplyRaisedWildS_6 = The {0109:1} sharply raised\nthe wild {0102:0}'s accuracy!
+Bank0018_Text_SharplyRaisedFoesS_6 = The {0109:1} sharply raised\nthe foe's {0102:0}'s accuracy!
+Bank0018_Text_SharplyRaisedSEvasiveness = The {0109:1} sharply raised\n{0102:0}'s evasiveness!
+Bank0018_Text_SharplyRaisedWildS_7 = The {0109:1} sharply raised\nthe wild {0102:0}'s evasiveness!
+Bank0018_Text_SharplyRaisedFoesS_7 = The {0109:1} sharply raised\nthe foe's {0102:0}'s evasiveness!
+Bank0018_Text_DrasticallyRaisedSAttack = The {0109:1} drastically raised\n{0102:0}'s Attack!
+Bank0018_Text_DrasticallyRaisedWildS = The {0109:1} drastically raised\nthe wild {0102:0}'s Attack!
+Bank0018_Text_DrasticallyRaisedFoesS = The {0109:1} drastically raised\nthe foe's {0102:0}'s Attack!
+Bank0018_Text_DrasticallyRaisedSDefense = The {0109:1} drastically raised\n{0102:0}'s Defense!
+Bank0018_Text_DrasticallyRaisedWildS_2 = The {0109:1} drastically raised\nthe wild {0102:0}'s Defense!
+Bank0018_Text_DrasticallyRaisedFoesS_2 = The {0109:1} drastically raised\nthe foe's {0102:0}'s Defense!
+Bank0018_Text_DrasticallyRaisedSSpecial = The {0109:1} drastically raised\n{0102:0}'s Special Attack!
+Bank0018_Text_DrasticallyRaisedWildS_3 = The {0109:1} drastically raised\nthe wild {0102:0}'s Special Attack!
+Bank0018_Text_DrasticallyRaisedFoesS_3 = The {0109:1} drastically raised\nthe foe's {0102:0}'s Special Attack!
+Bank0018_Text_DrasticallyRaisedSSpecial_2 = The {0109:1} drastically raised\n{0102:0}'s Special Defense!
+Bank0018_Text_DrasticallyRaisedWildS_4 = The {0109:1} drastically raised\nthe wild {0102:0}'s Special Defense!
+Bank0018_Text_DrasticallyRaisedFoesS_4 = The {0109:1} drastically raised\nthe foe's {0102:0}'s Special Defense!
+Bank0018_Text_DrasticallyRaisedSSpeed = The {0109:1} drastically raised\n{0102:0}'s Speed!
+Bank0018_Text_DrasticallyRaisedWildS_5 = The {0109:1} drastically raised\nthe wild {0102:0}'s Speed!
+Bank0018_Text_DrasticallyRaisedFoesS_5 = The {0109:1} drastically raised\nthe foe's {0102:0}'s Speed!
+Bank0018_Text_DrasticallyRaisedSAccuracy = The {0109:1} drastically raised\n{0102:0}'s accuracy!
+Bank0018_Text_DrasticallyRaisedWildS_6 = The {0109:1} drastically raised\nthe wild {0102:0}'s accuracy!
+Bank0018_Text_DrasticallyRaisedFoesS_6 = The {0109:1} drastically raised\nthe foe's {0102:0}'s accuracy!
+Bank0018_Text_DrasticallyRaisedSEvasiveness = The {0109:1} drastically raised\n{0102:0}'s evasiveness!
+Bank0018_Text_DrasticallyRaisedWildS_7 = The {0109:1} drastically raised\nthe wild {0102:0}'s evasiveness!
+Bank0018_Text_DrasticallyRaisedFoesS_7 = The {0109:1} drastically raised\nthe foe's {0102:0}'s evasiveness!
+Bank0018_Text_UsedGetPumped = {0102:0} used\nthe {0109:1} to get pumped!
+Bank0018_Text_WildUsedGetPumped = The wild {0102:0} used\nthe {0109:1} to get pumped!
+Bank0018_Text_FoesUsedGetPumped = The foe's {0102:0} used\nthe {0109:1} to get pumped!
+Bank0018_Text_FledUsingIts = {0102:0} fled\nusing its {0109:1}!
+Bank0018_Text_WildFledUsingIts = The wild {0102:0} fled\nusing its {0109:1}!
+Bank0018_Text_FoesFledUsingIts = The foe's {0102:0} fled\nusing its {0109:1}!
+Bank0018_Text_HungUsingIts = {0102:0} hung on\nusing its {0109:1}!
+Bank0018_Text_WildHungUsingIts = The wild {0102:0} hung on\nusing its {0109:1}!
+Bank0018_Text_FoesHungUsingIts = The foe's {0102:0} hung on\nusing its {0109:1}!
+Bank0018_Text_RestoredItsStatusUsing = {0102:0} restored its\nstatus using its {0109:1}!
+Bank0018_Text_WildRestoredItsStatus = The wild {0102:0} restored its\nstatus using its {0109:1}!
+Bank0018_Text_FoesRestoredItsStatus = The foe's {0102:0} restored its\nstatus using its {0109:1}!
+Bank0018_Text_LostSomeItsHp = {0102:0} lost\nsome of its HP!
+Bank0018_Text_WildLostSomeIts = The wild {0102:0} lost\nsome of its HP!
+Bank0018_Text_FoesLostSomeIts = The foe's {0102:0} lost\nsome of its HP!
+Bank0018_Text_ButNotHere = ...But {0102:0}\nis not here!
+Bank0018_Text_ButWildNotHere = ...But the wild {0102:0}\nis not here!
+Bank0018_Text_ButFoesNotHere = ...But the foe's {0102:0}\nis not here!
+Bank0018_Text_ButNotHoldingUsable = ...But {0102:0} was not\nholding a usable item!
+Bank0018_Text_ButWildNotHolding = ...But the wild {0102:0} was not\nholding a usable item!
+Bank0018_Text_ButFoesNotHolding = ...But the foe's {0102:0} was not\nholding a usable item!
+Bank0018_Text_BecameFullyChargedDue = {0102:0} became fully\ncharged due to its {0109:1}!
+Bank0018_Text_WildBecameFullyCharged = The wild {0102:0} became fully\ncharged due to its {0109:1}!
+Bank0018_Text_FoesBecameFullyCharged = The foe's {0102:0} became fully\ncharged due to its {0109:1}!
+Bank0018_Text_SLetMoveFirst = {0102:0}'s {0109:1}\nlet it move first!
+Bank0018_Text_WildSLetMove = The wild {0102:0}'s\n{0109:1} let it move first!
+Bank0018_Text_FoesSLetMove = The foe's {0102:0}'s\n{0109:1} let it move first!
+Bank0018_Text_BoostedAccuracyItsNext = {0102:0} boosted\nthe accuracy of its next move{be00}\nusing its {0109:1}!
+Bank0018_Text_WildBoostedAccuracyIts = The wild {0102:0} boosted\nthe accuracy of its next move{be00}\nusing its {0109:1}!
+Bank0018_Text_FoesBoostedAccuracyIts = The foe's {0102:0} boosted\nthe accuracy of its next move{be00}\nusing its {0109:1}!
+Bank0018_Text_HurtByS = {0102:0} is hurt by\n{0102:1}'s {0109:2}!
+Bank0018_Text_HurtByWildS = {0102:0} is hurt by the wild\n{0102:1}'s {0109:2}!
+Bank0018_Text_HurtByFoesS = {0102:0} is hurt by the foe's\n{0102:1}'s {0109:2}!
+Bank0018_Text_WildHurtByS = The wild {0102:0} is hurt by\n{0102:1}'s {0109:2}!
+Bank0018_Text_WildHurtByWild = The wild {0102:0} is hurt by\nthe wild {0102:1}'s {0109:2}!
+Bank0018_Text_FoesHurtByS = The foe's {0102:0} is hurt by\n{0102:1}'s {0109:2}!
+Bank0018_Text_FoesHurtByFoes = The foe's {0102:0} is hurt by\nthe foe's {0102:1}'s {0109:2}!
+Bank0018_Text_HurtByIts = {0102:0} is hurt\nby its {0109:1}!
+Bank0018_Text_WildHurtByIts_2 = The wild {0102:0} is hurt\nby its {0109:1}!
+Bank0018_Text_FoesHurtByIts_2 = The foe's {0102:0} is hurt\nby its {0109:1}!
+Bank0018_Text_GettingPumped = {0102:0} is getting\npumped!
+Bank0018_Text_WildGettingPumped = The wild {0102:0} is getting\npumped!
+Bank0018_Text_FoesGettingPumped = The foe's {0102:0} is getting\npumped!
+Bank0018_Text_ReadyHelp = {0102:0} is ready to\nhelp {0102:1}!
+Bank0018_Text_WildReadyHelp = The wild {0102:0} is ready to\nhelp {0102:1}!
+Bank0018_Text_FoesReadyHelp = The foe's {0102:0} is ready to\nhelp {0102:1}!
+Bank0018_Text_CopiedSStatChanges = {0102:0} copied\n{0102:1}'s stat changes!
+Bank0018_Text_WildCopiedSStat = The wild {0102:0} copied\n{0102:1}'s stat changes!
+Bank0018_Text_FoesCopiedSStat = The foe's {0102:0} copied\n{0102:1}'s stat changes!
+Bank0018_Text_KnockedOffS = {0102:0} knocked off\n{0102:1}'s {0109:2}!
+Bank0018_Text_KnockedOffWildS = {0102:0} knocked off the wild\n{0102:1}'s {0109:2}!
+Bank0018_Text_KnockedOffFoesS = {0102:0} knocked off the foe's\n{0102:1}'s {0109:2}!
+Bank0018_Text_WildKnockedOffS = The wild {0102:0} knocked off\n{0102:1}'s {0109:2}!
+Bank0018_Text_WildKnockedOffWild = The wild {0102:0} knocked off the\nwild {0102:1}'s {0109:2}!
+Bank0018_Text_FoesKnockedOffS = The foe's {0102:0} knocked off\n{0102:1}'s {0109:2}!
+Bank0018_Text_FoesKnockedOffFoes = The foe's {0102:0} knocked off\nthe foe's {0102:1}'s{be00}\n{0109:2}!
+Bank0018_Text_StoleS_2 = {0102:0} stole\n{0102:1}'s {0109:2}!
+Bank0018_Text_StoleWildS_2 = {0102:0} stole the wild\n{0102:1}'s {0109:2}!
+Bank0018_Text_StoleFoesS_2 = {0102:0} stole the foe's\n{0102:1}'s {0109:2}!
+Bank0018_Text_WildStoleS = The wild {0102:0} stole\n{0102:1}'s {0109:2}!
+Bank0018_Text_WildStoleWildS = The wild {0102:0} stole the wild\n{0102:1}'s {0109:2}!
+Bank0018_Text_FoesStoleS = The foe's {0102:0} stole\n{0102:1}'s {0109:2}!
+Bank0018_Text_FoesStoleFoesS = The foe's {0102:0} stole the\nfoe's {0102:1}'s {0109:2}!
+Bank0018_Text_CutItsOwnHp_2 = {0102:0} cut its own HP\nand laid a curse on {0102:1}!
+Bank0018_Text_CutItsOwnHp_3 = {0102:0} cut its own HP\nand laid a curse on the wild {0102:1}!
+Bank0018_Text_CutItsOwnHp_4 = {0102:0} cut its own HP\nand laid a curse on the foe's {0102:1}!
+Bank0018_Text_WildCutItsOwn_2 = The wild {0102:0} cut its own HP\nand laid a curse on {0102:1}!
+Bank0018_Text_WildCutItsOwn_3 = The wild {0102:0} cut its own HP\nand laid a curse on the wild {0102:1}!
+Bank0018_Text_FoesCutItsOwn_2 = The foe's {0102:0} cut its own HP\nand laid a curse on {0102:1}!
+Bank0018_Text_FoesCutItsOwn_3 = The foe's {0102:0} cut its own HP\nand laid a curse on the foe's {0102:1}!
+Bank0018_Text_AfflictedByCurse = {0102:0} is afflicted\nby the curse!
+Bank0018_Text_WildAfflictedByCurse = The wild {0102:0} is afflicted\nby the curse!
+Bank0018_Text_FoesAfflictedByCurse = The foe's {0102:0} is afflicted\nby the curse!
+Bank0018_Text_ForesawAttack = {0102:0} foresaw\nan attack!
+Bank0018_Text_WildForesawAttack = The wild {0102:0} foresaw\nan attack!
+Bank0018_Text_FoesForesawAttack = The foe's {0102:0} foresaw\nan attack!
+Bank0018_Text_ChoseDoomDesireIts = {0102:0} chose\nDoom Desire as its destiny!
+Bank0018_Text_WildChoseDoomDesire = The wild {0102:0} chose\nDoom Desire as its destiny!
+Bank0018_Text_FoesChoseDoomDesire = The foe's {0102:0} chose\nDoom Desire as its destiny!
+Bank0018_Text_TookAttack_2 = {0102:0} took\nthe {0107:1} attack!
+Bank0018_Text_WildTookAttack_2 = The wild {0102:0} took\nthe {0107:1} attack!
+Bank0018_Text_FoesTookAttack_2 = The foe's {0102:0} took\nthe {0107:1} attack!
+Bank0018_Text_CouldntStayAirborneBecause = {0102:0} couldn't stay\nairborne because of gravity!
+Bank0018_Text_WildCouldntStayAirborne = The wild {0102:0} couldn't stay\nairborne because of gravity!
+Bank0018_Text_FoesCouldntStayAirborne = The foe's {0102:0} couldn't stay\nairborne because of gravity!
+Bank0018_Text_CantUseBecauseGravity = {0102:0} can't use\n{0107:1} because of gravity!
+Bank0018_Text_WildCantUseBecause_2 = The wild {0102:0} can't use\n{0107:1} because of gravity!
+Bank0018_Text_FoesCantUseBecause_2 = The foe's {0102:0} can't use\n{0107:1} because of gravity!
+Bank0018_Text_STypeChangedMatch = {0102:0}'s type\nchanged to match {0102:1}'s!
+Bank0018_Text_STypeChangedMatch_2 = {0102:0}'s type\nchanged to match the wild {0102:1}'s!
+Bank0018_Text_STypeChangedMatch_3 = {0102:0}'s type\nchanged to match the foe's {0102:1}'s!
+Bank0018_Text_WildSTypeChanged = The wild {0102:0}'s type\nchanged to match {0102:1}'s!
+Bank0018_Text_WildSTypeChanged_2 = The wild {0102:0}'s type\nchanged to match the wild {0102:1}'s!
+Bank0018_Text_FoesSTypeChanged = The foe's {0102:0}'s type\nchanged to match {0102:1}'s!
+Bank0018_Text_FoesSTypeChanged_2 = The foe's {0102:0}'s type\nchanged to match the foe's {0102:1}'s!
+Bank0018_Text_SharedItsPowerTarget = {0102:0} shared its\npower with the target!
+Bank0018_Text_WildSharedItsPower = The wild {0102:0} shared its\npower with the target!
+Bank0018_Text_FoesSharedItsPower = The foe's {0102:0} shared its\npower with the target!
+Bank0018_Text_SharedItsGuardTarget = {0102:0} shared its\nguard with the target!
+Bank0018_Text_WildSharedItsGuard = The wild {0102:0} shared its\nguard with the target!
+Bank0018_Text_FoesSharedItsGuard = The foe's {0102:0} shared its\nguard with the target!
+Bank0018_Text_BecameNimble = {0102:0} became nimble!
+Bank0018_Text_WildBecameNimble = The wild {0102:0} became nimble!
+Bank0018_Text_FoesBecameNimble = The foe's {0102:0} became nimble!
+Bank0018_Text_BurstingFlameHit = The bursting flame hit {0102:0}!
+Bank0018_Text_BurstingFlameHitWild = The bursting flame hit the wild {0102:0}!
+Bank0018_Text_BurstingFlameHitFoes = The bursting flame hit the foe's {0102:0}!
+Bank0018_Text_SBurntUp = {0102:0}'s {0109:1}\nwas burnt up!
+Bank0018_Text_WildSBurntUp = The wild {0102:0}'s {0109:1}\nwas burnt up!
+Bank0018_Text_FoesSBurntUp = The foe's {0102:0}'s {0109:1}\nwas burnt up!
+Bank0018_Text_ReceivedFrom = {0102:0} received {0109:2}\nfrom {0102:1}!
+Bank0018_Text_ReceivedFromWild = {0102:0} received {0109:2}\nfrom the wild {0102:1}!
+Bank0018_Text_ReceivedFromFoes = {0102:0} received {0109:2}\nfrom the foe's {0102:1}!
+Bank0018_Text_WildReceivedFrom = The wild {0102:0} received {0109:2}\nfrom {0102:1}!
+Bank0018_Text_WildReceivedFromWild = The wild {0102:0} received {0109:2}\nfrom the wild {0102:1}!
+Bank0018_Text_FoesReceivedFrom = The foe's {0102:0} received {0109:2}\nfrom {0102:1}!
+Bank0018_Text_FoesReceivedFromFoes = The foe's {0102:0} received {0109:2}\nfrom the foe's {0102:1}!
+Bank0018_Text_TookIntoSky = {0102:0} took\n{0102:1} into the sky!
+Bank0018_Text_TookWildIntoSky = {0102:0} took\nthe wild {0102:1} into the sky!
+Bank0018_Text_TookFoesIntoSky = {0102:0} took\nthe foe's {0102:1} into the sky!
+Bank0018_Text_WildTookIntoSky = The wild {0102:0} took\n{0102:1} into the sky!
+Bank0018_Text_WildTookWildInto = The wild {0102:0} took\nthe wild {0102:1} into the sky!
+Bank0018_Text_FoesTookIntoSky = The foe's {0102:0} took\n{0102:1} into the sky!
+Bank0018_Text_FoesTookFoesInto = The foe's {0102:0} took\nthe foe's {0102:1} into the sky!
+Bank0018_Text_FreedFromSkyDrop = {0102:0} was freed\nfrom the Sky Drop!
+Bank0018_Text_WildFreedFromSky = The wild {0102:0} was freed\nfrom the Sky Drop!
+Bank0018_Text_FoesFreedFromSky = The foe's {0102:0} was freed\nfrom the Sky Drop!
+Bank0018_Text_FellStraightDown = {0102:0} fell\nstraight down!
+Bank0018_Text_WildFellStraightDown = The wild {0102:0} fell\nstraight down!
+Bank0018_Text_FoesFellStraightDown = The foe's {0102:0} fell\nstraight down!
+Bank0018_Text_SMovePostponed = {0102:0}'s move\nwas postponed!
+Bank0018_Text_WildSMovePostponed = The wild {0102:0}'s move\nwas postponed!
+Bank0018_Text_FoesSMovePostponed = The foe's {0102:0}'s move\nwas postponed!
+Bank0018_Text_TookKindOffer = {0102:0}\ntook the kind offer!
+Bank0018_Text_WildTookKindOffer = The wild {0102:0}\ntook the kind offer!
+Bank0018_Text_FoesTookKindOffer = The foe's {0102:0}\ntook the kind offer!
+Bank0018_Text_SwitchedPlaces = {0102:0} and\n{0102:1} switched places!
+Bank0018_Text_WildSwitchedPlaces = The wild {0102:0} and\n{0102:1} switched places!
+Bank0018_Text_FoesSwitchedPlaces = The foe's {0102:0} and\n{0102:1} switched places!
+Bank0018_Text_HurledIntoAir = {0102:0} was hurled\ninto the air!
+Bank0018_Text_WildHurledIntoAir = The wild {0102:0} was hurled\ninto the air!
+Bank0018_Text_FoesHurledIntoAir = The foe's {0102:0} was hurled\ninto the air!
+Bank0018_Text_FreedFromTelekinesis = {0102:0} was freed\nfrom the telekinesis!
+Bank0018_Text_WildFreedFromTelekinesis = The wild {0102:0} was freed\nfrom the telekinesis!
+Bank0018_Text_FoesFreedFromTelekinesis = The foe's {0102:0} was freed\nfrom the telekinesis!
+Bank0018_Text_WaitingSMove = {0102:0} is waiting\nfor {0102:1}'s move...
+Bank0018_Text_WaitingWildSMove = {0102:0} is waiting\nfor the wild {0102:1}'s move...
+Bank0018_Text_WaitingFoes = {0102:0} is waiting\nfor the foe's {0102:1}...
+Bank0018_Text_WildWaitingSMove = The wild {0102:0} is waiting\nfor {0102:1}'s move...
+Bank0018_Text_WildWaitingWildS = The wild {0102:0} is waiting\nfor the wild {0102:1}'s move...
+Bank0018_Text_FoesWaitingSMove = The foe's {0102:0} is waiting\nfor {0102:1}'s move...
+Bank0018_Text_FoesWaitingFoesS = The foe's {0102:0} is waiting\nfor the foe's {0102:1}'s move...
+Bank0018_Text_CompletelySynchronized = It is completely synchronized\nwith {0102:0}!
+Bank0018_Text_CompletelySynchronizedWild = It is completely synchronized\nwith the wild {0102:0}!
+Bank0018_Text_CompletelySynchronizedFoes = It is completely synchronized\nwith the foe's {0102:0}!
+Bank0018_Text_HurtBySeaFire = {0102:0} is hurt\nby the sea of fire!
+Bank0018_Text_WildHurtBySea = The wild {0102:0} is hurt\nby the sea of fire!
+Bank0018_Text_FoesHurtBySea = The foe's {0102:0} is hurt\nby the sea of fire!
 \pad{54}

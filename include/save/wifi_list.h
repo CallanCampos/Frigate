@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "dwc/dwc.h"
+#include "gfl/heap.h"
 #include "gfl/str.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
@@ -94,6 +95,9 @@ void func_0200a340(WifiList *wifiList, s32 srcIndex, s32 destIndex);
 void func_0200a3c4(const DWCUserData *userData, DWCFriendData *token);
 void func_0200a3cc(WifiList *wifiList, DWCFriendData *token);
 s32 WifiList_GetMyGSID(WifiList *wifiList);
+// Adds the friend whose 12 bytes of friend data a player gave, with the player's info, to the first free place of the
+// Friend Roster; TRUE if there was one, FALSE if the friend was in it already or it was full. heapId is a scratch heap
+BOOL func_02011b30(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId);
 // Whether the player's DWC user data has a profile and is this console's
 BOOL func_0200a400(WifiList *wifiList);
 WifiList *func_0200a424(SaveControl *save);

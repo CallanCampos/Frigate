@@ -1,5 +1,7 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/script_text_banks.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_script.h"
@@ -52,7 +54,7 @@ static int func_ov059_021e7c08(int value, int others, int change);
 
 BOOL func_ov059_021e58c0(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    ResortPerson *person = func_ov137_021f4690(env, func_ov059_021e7b98(GSYS_GetField(gsys)));
+    ResortPerson *person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(gsys)));
 
     func_ov137_021f10dc(person, 27, 1);
     func_ov137_021f0f84(person, 1);
@@ -64,7 +66,7 @@ BOOL func_ov059_021e58c0(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov059_021e591c(VM *vm, FieldScriptEnv *env) {
     ResortPerson *person =
-        func_ov137_021f4690(env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
+        ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
 
     if (person != NULL) {
         func_ov137_021f10dc(person, 27, 0);
@@ -79,13 +81,13 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(gsys);
     u32 which = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
-    ResortSys *sys = func_ov137_021f4670(field);
-    JoinAvenueInfo *info = func_ov137_021f202c(sys);
-    JoinAvenueOccupants *occupants = func_ov137_021f201c(sys);
+    ResortSys *sys = ResortSys_Get(field);
+    JoinAvenueInfo *info = ResortSys_GetInfo(sys);
+    JoinAvenueOccupants *occupants = ResortSys_GetOccupants(sys);
     ResortPeople *people = func_ov059_021e7b98(field);
-    void *shops = func_ov137_021f1ff8(sys);
-    void *table = func_ov137_021f2000(sys);
-    ResortPerson *person = func_ov137_021f4690(env, people);
+    void *shops = ResortSys_GetShopData(sys);
+    void *table = ResortSys_GetRanks(sys);
+    ResortPerson *person = ResortSys_GetScriptPerson(env, people);
     ResortPersonData *data = NULL;
     GameData *gameData = GSYS_GetGameData(gsys);
     void *unk28;
@@ -93,7 +95,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
 
     GetGameDataPlayerInfo(gameData);
     SaveControl_GetMedalBox(GameData_GetSaveControl(gameData));
-    unk28 = func_ov137_021f200c(sys);
+    unk28 = ResortSys_GetTexts(sys);
     if (person != NULL) {
         data = func_ov137_021f1110(person);
     }
@@ -130,7 +132,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     }
     case 3:
         if (func_ov137_021f10e8(person, 20, NULL) == 0) {
-            *var = func_ov137_021f1878(data, func_ov137_021f2008(sys), func_ov137_021f2000(sys), info);
+            *var = func_ov137_021f1878(data, ResortSys_GetUnk24Table(sys), ResortSys_GetRanks(sys), info);
             func_ov137_021f10dc(person, 20, 1);
         } else {
             *var = 0;
@@ -192,28 +194,28 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 17:
-        *var = func_ov137_021f522c(sys, gameData, 0);
+        *var = ResortSys_HasShopKind(sys, gameData, 0);
         break;
     case 18:
-        *var = func_ov137_021f522c(sys, gameData, 1);
+        *var = ResortSys_HasShopKind(sys, gameData, 1);
         break;
     case 19:
-        *var = func_ov137_021f522c(sys, gameData, 3);
+        *var = ResortSys_HasShopKind(sys, gameData, 3);
         break;
     case 20:
-        *var = func_ov137_021f522c(sys, gameData, 2);
+        *var = ResortSys_HasShopKind(sys, gameData, 2);
         break;
     case 21:
-        *var = func_ov137_021f522c(sys, gameData, 4);
+        *var = ResortSys_HasShopKind(sys, gameData, 4);
         break;
     case 22:
-        *var = func_ov137_021f522c(sys, gameData, 5);
+        *var = ResortSys_HasShopKind(sys, gameData, 5);
         break;
     case 23:
-        *var = func_ov137_021f522c(sys, gameData, 6);
+        *var = ResortSys_HasShopKind(sys, gameData, 6);
         break;
     case 24:
-        *var = func_ov137_021f522c(sys, gameData, 7);
+        *var = ResortSys_HasShopKind(sys, gameData, 7);
         break;
     case 25:
     case 26:
@@ -281,7 +283,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 39:
-        *var = func_ov137_021f44ac(unk28, data, 10);
+        *var = ResortSys_GetTrainerTypeText(unk28, data, 10);
         break;
     case 40:
         *var = func_ov137_021f198c(data);
@@ -348,15 +350,15 @@ BOOL func_ov059_021e5eb0(VM *vm, FieldScriptEnv *env) {
     ResortPeople *people = func_ov059_021e7b98(field);
     HeapID heapId = Field_GetHeapID(field);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
-    ResortSys *sys = func_ov137_021f4670(field);
+    ResortSys *sys = ResortSys_Get(field);
     ResortPersonData *data = NULL;
     GameData *gameData = GSYS_GetGameData(gsys);
-    ResortPerson *person = func_ov137_021f4690(env, people);
+    ResortPerson *person = ResortSys_GetScriptPerson(env, people);
 
     if (person != NULL) {
         data = func_ov137_021f1110(person);
     }
-    *var = func_ov137_021f2040(a0, sys, data, gameData, wordSet, heapId);
+    *var = ResortSys_GetScriptValue(a0, sys, data, gameData, wordSet, heapId);
     return FALSE;
 }
 
@@ -364,12 +366,12 @@ BOOL func_ov059_021e5f38(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u16 mode = VM_Read16(vm);
     u16 *var = ScriptReadVar(vm, env);
-    ResortSys *sys = func_ov137_021f4670(field);
+    ResortSys *sys = ResortSys_Get(field);
     ResortPerson *person;
     ResortPersonData *data;
 
-    func_ov137_021f2018(sys);
-    person = func_ov137_021f4690(env, func_ov059_021e7b98(field));
+    ResortSys_GetSlots(sys);
+    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
     data = func_ov137_021f1110(person);
     switch (mode) {
     case 2: {
@@ -379,7 +381,7 @@ BOOL func_ov059_021e5f38(VM *vm, FieldScriptEnv *env) {
         u16 dir;
         FieldPlayer *player;
 
-        *var = func_ov137_021f46a8(sys, data, 0);
+        *var = ResortSys_MakeData(sys, data, 0);
         player = Field_GetPlayer(field);
         func_ov137_021f0fb8(person);
         func_ov137_021f1020(person, &x, &z, &dir);
@@ -392,10 +394,10 @@ BOOL func_ov059_021e5f38(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 0:
-        *var = func_ov137_021f46a8(sys, data, 0);
+        *var = ResortSys_MakeData(sys, data, 0);
         break;
     case 1:
-        *var = func_ov137_021f46a8(sys, data, 3);
+        *var = ResortSys_MakeData(sys, data, 3);
         break;
     }
     func_ov137_021f10dc(person, 37, 1);
@@ -412,10 +414,10 @@ BOOL func_ov059_021e6014(VM *vm, FieldScriptEnv *env) {
     u16 a1 = ScriptReadAny(vm, env);
     u16 a2 = ScriptReadAny(vm, env);
     u16 a3 = VM_Read16(vm);
-    ResortSys *sys = func_ov137_021f4670(field);
-    ResortPerson *person = func_ov137_021f4690(env, func_ov059_021e7b98(field));
+    ResortSys *sys = ResortSys_Get(field);
+    ResortPerson *person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
 
-    func_ov137_021f33b8(a0, a1, a2, a3, sys, person, wordSet, GSYS_GetGameData(gsys), heapId);
+    ResortSys_SetScriptWord(a0, a1, a2, a3, sys, person, wordSet, GSYS_GetGameData(gsys), heapId);
     return FALSE;
 }
 
@@ -433,11 +435,11 @@ BOOL func_ov059_021e60a4(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetScriptWork(env);
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
-    sys = func_ov137_021f4670(field);
+    sys = ResortSys_Get(field);
     people = func_ov059_021e7b98(field);
-    unk30 = func_ov137_021f2014(sys);
-    func_ov137_021f201c(sys);
-    unk34 = func_ov137_021f2018(sys);
+    unk30 = ResortSys_GetDatas(sys);
+    ResortSys_GetOccupants(sys);
+    unk34 = ResortSys_GetSlots(sys);
     mode = ScriptReadAny(vm, env);
     which = ScriptReadAny(vm, env);
     index = ScriptReadAny(vm, env);
@@ -445,7 +447,7 @@ BOOL func_ov059_021e60a4(VM *vm, FieldScriptEnv *env) {
     data = NULL;
     switch (which) {
     case 255:
-        person = func_ov137_021f4690(env, people);
+        person = ResortSys_GetScriptPerson(env, people);
         data = func_ov137_021f1110(person);
         break;
     case 0:
@@ -479,7 +481,7 @@ BOOL func_ov059_021e619c(VM *vm, FieldScriptEnv *env) {
     u16 value;
 
     FieldScriptEnv_GetScriptWork(env);
-    person = func_ov137_021f4690(env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
+    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     value = func_020363e0(func_ov137_021f0fa8(person), 0);
     func_ov137_021f10dc(person, 19, value);
     return FALSE;
@@ -501,13 +503,13 @@ BOOL func_ov059_021e61d8(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetScriptWork(env);
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
-    sys = func_ov137_021f4670(field);
-    shops = func_ov137_021f1ff8(sys);
-    table = func_ov137_021f2008(sys);
+    sys = ResortSys_Get(field);
+    shops = ResortSys_GetShopData(sys);
+    table = ResortSys_GetUnk24Table(sys);
     index = ScriptReadAny(vm, env);
     var1 = ScriptReadVar(vm, env);
     var2 = ScriptReadVar(vm, env);
-    person = func_ov137_021f4690(env, func_ov059_021e7b98(field));
+    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
     data = func_ov137_021f1110(person);
     *var2 = 0;
     row = ResortShopData_GetGoods(shops, ResortShopData_GetPersonShop(shops, func_ov137_021f0f58(person)), 0);
@@ -649,15 +651,15 @@ BOOL func_ov059_021e64a0(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     field = GSYS_GetField(gsys);
-    sys = func_ov137_021f4670(field);
+    sys = ResortSys_Get(field);
     index = ScriptReadAny(vm, env);
     slot = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
-    person = func_ov137_021f4690(env, func_ov059_021e7b98(field));
+    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
     data = func_ov137_021f1110(person);
     rate = 0;
-    shops = func_ov137_021f1ff8(sys);
-    table = func_ov137_021f2008(sys);
+    shops = ResortSys_GetShopData(sys);
+    table = ResortSys_GetUnk24Table(sys);
     row = ResortShopData_GetGoods(shops, ResortShopData_GetPersonShop(shops, func_ov137_021f0f58(person)), index);
     id = ResortShopData_GetGoodsParam(row, 6);
     ResortShopData_GetGoodsParam(row, 5);
@@ -689,7 +691,7 @@ BOOL func_ov059_021e64a0(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov059_021e65fc(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
-    func_02036448(func_02038470(func_ov137_021f0f58(func_ov137_021f4690(
+    func_02036448(func_02038470(func_ov137_021f0f58(ResortSys_GetScriptPerson(
                       env, func_ov059_021e7b98(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)))))),
                   0, TRUE);
     return FALSE;
@@ -700,7 +702,7 @@ BOOL func_ov059_021e6630(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
-    ResortPerson *person = func_ov137_021f4690(env, func_ov059_021e7b98(GSYS_GetField(gsys)));
+    ResortPerson *person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(gsys)));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u16 amount = ScriptReadAny(vm, env);
     u16 bit = ScriptReadAny(vm, env);
@@ -732,16 +734,16 @@ BOOL func_ov059_021e66d8(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    person = func_ov137_021f4690(env, func_ov059_021e7b98(field));
-    sys = func_ov137_021f4670(field);
-    occupants = func_ov137_021f201c(sys);
+    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    sys = ResortSys_Get(field);
+    occupants = ResortSys_GetOccupants(sys);
     Field_GetHeapID(field);
     index = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
     var2 = ScriptReadVar(vm, env);
     var3 = ScriptReadVar(vm, env);
     var4 = ScriptReadVar(vm, env);
-    *var = func_ov137_021f2fd0(func_ov137_021f1110(person), func_02038860(occupants, index), sys, var2, var3, var4);
+    *var = ResortSys_GetPersonVisit(func_ov137_021f1110(person), func_02038860(occupants, index), sys, var2, var3, var4);
     return FALSE;
 }
 
@@ -759,14 +761,14 @@ BOOL func_ov059_021e6778(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    func_ov137_021f4690(env, func_ov059_021e7b98(field));
-    sys = func_ov137_021f4670(field);
-    occupants = func_ov137_021f201c(sys);
+    ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    sys = ResortSys_Get(field);
+    occupants = ResortSys_GetOccupants(sys);
     index = ScriptReadAny(vm, env);
     a2 = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
     var2 = ScriptReadVar(vm, env);
-    *var = func_ov137_021f3238(func_02038860(occupants, index), sys, a2, var2);
+    *var = ResortSys_AddShopExperience(func_02038860(occupants, index), sys, a2, var2);
     return FALSE;
 }
 
@@ -782,12 +784,12 @@ BOOL func_ov059_021e67f8(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     gameData = FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    func_ov137_021f4690(env, func_ov059_021e7b98(field));
-    sys = func_ov137_021f4670(field);
-    func_ov137_021f201c(sys);
+    ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
+    sys = ResortSys_Get(field);
+    ResortSys_GetOccupants(sys);
     a2 = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
-    *var = func_ov137_021f312c(sys, gameData, a2, ScriptReadVar(vm, env));
+    *var = ResortSys_AddPopularity(sys, gameData, a2, ScriptReadVar(vm, env));
     return FALSE;
 }
 
@@ -795,7 +797,7 @@ BOOL func_ov059_021e6868(VM *vm, FieldScriptEnv *env) {
     JoinAvenueOccupants *occupants;
 
     FieldScriptEnv_GetScriptWork(env);
-    occupants = func_ov137_021f201c(func_ov137_021f4670(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
+    occupants = ResortSys_GetOccupants(ResortSys_Get(GSYS_GetField(FieldScriptEnv_GetGameSystem(env))));
     func_02038a0c(occupants, ScriptReadAny(vm, env));
     return FALSE;
 }
@@ -810,19 +812,19 @@ BOOL func_ov059_021e689c(VM *vm, FieldScriptEnv *env) {
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     people = func_ov059_021e7b98(field);
     unk = func_ov059_021e7bd8(field);
-    person = func_ov137_021f4690(env, people);
+    person = ResortSys_GetScriptPerson(env, people);
     switch (ScriptReadAny(vm, env)) {
     case 0:
-        func_ov137_021f44f8(people, unk, field, person, 0);
+        ResortSys_HideOverlappingActors(people, unk, field, person, 0);
         break;
     case 1:
-        func_ov137_021f44f8(people, unk, field, NULL, 0);
+        ResortSys_HideOverlappingActors(people, unk, field, NULL, 0);
         break;
     case 3:
-        func_ov137_021f44f8(people, unk, field, NULL, 1);
+        ResortSys_HideOverlappingActors(people, unk, field, NULL, 1);
         break;
     case 4:
-        func_ov137_021f44f8(people, unk, field, NULL, 2);
+        ResortSys_HideOverlappingActors(people, unk, field, NULL, 2);
         break;
     case 2:
         func_ov137_021f152c(people);
@@ -851,12 +853,12 @@ BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     field = GSYS_GetField(gsys);
-    sys = func_ov137_021f4670(field);
-    func_ov137_021f202c(sys);
-    data = func_ov137_021f1110(func_ov137_021f4690(env, func_ov059_021e7b98(field)));
-    unk38 = func_ov137_021f2030(sys);
-    unk28 = func_ov137_021f200c(sys);
-    unk30 = func_ov137_021f2014(sys);
+    sys = ResortSys_Get(field);
+    ResortSys_GetInfo(sys);
+    data = func_ov137_021f1110(ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field)));
+    unk38 = ResortSys_GetWork(sys);
+    unk28 = ResortSys_GetTexts(sys);
+    unk30 = ResortSys_GetDatas(sys);
     a2 = ScriptReadAny(vm, env);
     mode = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
@@ -870,12 +872,12 @@ BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
     switch (mode) {
     case 0: {
         ResortPersonData *other = func_ov137_021f1b94(unk30, 0, a2);
-        u16 unk = ResortWork_Get(func_ov137_021f2030(sys), 10);
+        u16 unk = ResortWork_Get(ResortSys_GetWork(sys), 10);
         u32 score;
         u32 value;
         u32 limit;
 
-        func_ov137_021f201c(sys);
+        ResortSys_GetOccupants(sys);
         score = func_ov137_021f199c(other, data, 27, 100);
         if (checkForMidnight(GSYS_GetGameData(gsys))) {
             *var = 1;
@@ -885,18 +887,18 @@ BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
             *var = 1;
             return FALSE;
         }
-        if (!func_ov137_021f5294(sys)) {
+        if (!ResortSys_IsFull(sys)) {
             *var = 1;
             return FALSE;
         }
-        if (!func_ov137_021f4fa4(sys, other, data, &value)) {
+        if (!ResortSys_PickPersonToMeet(sys, other, data, &value)) {
             *var = 1;
             return FALSE;
         }
         if (unk == 0) {
-            limit = func_ov137_021f50f4(sys, other);
+            limit = ResortSys_GetVisitPoints(sys, other);
         } else {
-            limit = func_ov137_021f51a4(sys, other);
+            limit = ResortSys_GetVisitScore(sys, other);
         }
         if (score < limit) {
             *var = 0;
@@ -919,12 +921,12 @@ BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
 
         if (a2 != 0) {
             if (flag) {
-                *var = func_ov137_021f44ac(unk28, data, 15);
+                *var = ResortSys_GetTrainerTypeText(unk28, data, 15);
             } else {
                 *var = 253;
             }
         } else if (flag) {
-            *var = func_ov137_021f44ac(unk28, data, 16);
+            *var = ResortSys_GetTrainerTypeText(unk28, data, 16);
         } else if (unk2 == 0) {
             *var = 256;
         } else {
@@ -933,10 +935,10 @@ BOOL func_ov059_021e6934(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 4:
-        func_ov137_021f4ecc(sys, func_ov137_021f1b94(unk30, 0, a2), data);
+        ResortSys_ChooseVisitGroup(sys, func_ov137_021f1b94(unk30, 0, a2), data);
         break;
     case 5:
-        func_ov137_021f5200(sys, func_ov137_021f1b94(unk30, 0, a2), a2);
+        ResortSys_MarkMet(sys, func_ov137_021f1b94(unk30, 0, a2), a2);
         break;
     }
     return FALSE;
@@ -952,12 +954,12 @@ BOOL func_ov059_021e6b68(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     gameData = FieldScriptEnv_GetGameData(env);
-    sys = func_ov137_021f4670(GSYS_GetField(gsys));
-    info = func_ov137_021f202c(sys);
+    sys = ResortSys_Get(GSYS_GetField(gsys));
+    info = ResortSys_GetInfo(sys);
     var = ScriptReadVar(vm, env);
     *var = FALSE;
     if (JoinAvenue_GetParam(info, 2, 0) >= 100) {
-        u32 result = func_ov137_021f4294(sys, gameData, 100);
+        u32 result = ResortSys_GetUnlockForRank(sys, gameData, 100);
 
         if (result != 0 && result != 8) {
             func_02039064(info, result + 15, 1);
@@ -983,7 +985,7 @@ BOOL func_ov059_021e6c10(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
-    func_ov137_021f10dc(func_ov137_021f4690(env, func_ov059_021e7b98(GSYS_GetField(gsys))), 20, 1);
+    func_ov137_021f10dc(ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(gsys))), 20, 1);
     return FALSE;
 }
 
@@ -1156,7 +1158,7 @@ BOOL func_ov059_021e6f14(VM *vm, FieldScriptEnv *env) {
     wordSet = ScriptWork_GetWordSet(work);
     heapId = Field_GetHeapID(field);
     unk = func_ov059_021e7bd8(field);
-    msgData = GFL_MsgSysLoadData(FALSE, 3, 609, HEAPID_TAIL(heapId));
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
     strbuf = GFL_MsgDataLoadStrbufNew(msgData, func_ov137_021f1d60(unk, id, column + 7));
     func_0202437c(wordSet, index, strbuf, 2, 1, 2);
     GFL_StrBufFree(strbuf);
@@ -1347,7 +1349,7 @@ BOOL func_ov059_021e6fc8(VM *vm, FieldScriptEnv *env) {
     case 19:
     case 20:
         mode -= 13;
-        msgData = GFL_MsgSysLoadData(FALSE, 3, 609, HEAPID_TAIL(heapId));
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
         n = 0;
         for (i = 0; i < 8; i++) {
             u32 target = joinAveTextHandler(person, i + 48, NULL);
@@ -1386,8 +1388,8 @@ BOOL func_ov059_021e742c(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    shops = func_ov137_021f1ff8(func_ov137_021f4670(field));
-    person = func_ov137_021f4690(env, func_ov059_021e7b98(field));
+    shops = ResortSys_GetShopData(ResortSys_Get(field));
+    person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(field));
     row = ResortShopData_GetPersonShop(shops, func_ov137_021f0f58(person));
     index = ScriptReadAny(vm, env);
     mode = ScriptReadAny(vm, env);
@@ -1494,7 +1496,7 @@ BOOL func_ov059_021e7608(VM *vm, FieldScriptEnv *env) {
     occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     info = JoinAvenue_GetInfo(joinAvenue);
     own = func_02038a18(occupants);
-    sys = func_ov137_021f4670(field);
+    sys = ResortSys_Get(field);
     switch (param) {
     case 0:
     case 1:
@@ -1518,10 +1520,10 @@ BOOL func_ov059_021e7608(VM *vm, FieldScriptEnv *env) {
         *var = func_02038a20(own, GetGameDataPlayerInfo(gameData));
         break;
     case 19:
-        *var = func_ov137_021f3344(sys);
+        *var = ResortSys_GetInfoFlag1b(sys);
         break;
     case 20:
-        *var = func_ov137_021f420c(sys, gameData);
+        *var = ResortSys_GetUnlock(sys, gameData);
         break;
     case 22:
         *var = JoinAvenue_GetParam(info, 25, 0);
@@ -1533,10 +1535,10 @@ BOOL func_ov059_021e7608(VM *vm, FieldScriptEnv *env) {
         *var = JoinAvenue_GetParam(info, 5, 0);
         break;
     case 27:
-        *var = func_ov137_021f5294(sys);
+        *var = ResortSys_IsFull(sys);
         break;
     case 28:
-        *var = func_ov137_021f3354(sys);
+        *var = ResortSys_AreAllShopsMaxLevel(sys);
         break;
     }
     return FALSE;
@@ -1596,12 +1598,12 @@ BOOL func_ov059_021e77c4(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     gameData = FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    sys = func_ov137_021f4670(field);
+    sys = ResortSys_Get(field);
     heapId = Field_GetHeapID(field);
     playerInfo = GetGameDataPlayerInfo(gameData);
     a2 = ScriptReadAny(vm, env);
     a3 = ScriptReadAny(vm, env);
-    func_ov137_021f4dbc(sys, playerInfo, a2, a3, heapId);
+    ResortSys_AddEntryOrRecord(sys, playerInfo, a2, a3, heapId);
     if (a3 <= 1) {
         func_ov137_021eef3c(field);
     }
@@ -1614,7 +1616,7 @@ static BOOL func_ov059_021e7834(VM *vm, void *data) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     Field *field = GSYS_GetField(gsys);
-    ResortSys *sys = func_ov137_021f4670(field);
+    ResortSys *sys = ResortSys_Get(field);
     void **ptr = ScriptWork_GetUserHeapPtr(work);
     HeapID heapId = Field_GetHeapID(field);
     ResortRecordsWork *wk = *ptr;
@@ -1623,12 +1625,12 @@ static BOOL func_ov059_021e7834(VM *vm, void *data) {
 
     switch (wk->state) {
     case 0:
-        wk->window = func_ov137_021f3e7c(msgBGSys, heapId);
+        wk->window = ResortRecords_CreateWindow(msgBGSys, heapId);
         wk->state++;
         break;
     case 1:
         ResortWork_UpdateRecords(func_02017b84(gameData), GameData_GetSaveControl(gameData));
-        func_ov137_021f3e98(wk->window, func_ov137_021f201c(sys), msgBGSys, wordSet, gameData, wk->page, heapId);
+        ResortRecords_PrintPage(wk->window, ResortSys_GetOccupants(sys), msgBGSys, wordSet, gameData, wk->page, heapId);
         wk->state++;
         break;
     case 2:
@@ -1681,7 +1683,7 @@ BOOL func_ov059_021e79a4(VM *vm, FieldScriptEnv *env) {
 
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    func_ov137_021f2018(func_ov137_021f4670(field));
+    ResortSys_GetSlots(ResortSys_Get(field));
     heapId = Field_GetHeapID(field);
     ptr = ScriptWork_GetUserHeapPtr(work);
     page = ScriptReadAny(vm, env);
@@ -1709,9 +1711,9 @@ BOOL func_ov059_021e7a28(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    sys = func_ov137_021f4670(field);
+    sys = ResortSys_Get(field);
     people = func_ov059_021e7b98(field);
-    unk30 = func_ov137_021f2014(sys);
+    unk30 = ResortSys_GetDatas(sys);
     zoneId = Field_GetPlayerStateZoneID(field);
     index = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
@@ -1740,7 +1742,7 @@ BOOL func_ov059_021e7ad8(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
-    unk30 = func_ov137_021f2014(func_ov137_021f4670(field));
+    unk30 = ResortSys_GetDatas(ResortSys_Get(field));
     people = func_ov059_021e7b98(field);
     index = ScriptReadAny(vm, env);
     switch (index) {

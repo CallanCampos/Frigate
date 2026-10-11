@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Abraham",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GIGALITH",
+            "form": 0,
+            "level": 55,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_ROCK_BLAST", "MOVE_BULLDOZE", "MOVE_FLASH_CANNON", "MOVE_SANDSTORM" ]
+        },
+        {
+            "species": "SPECIES_SKARMORY",
+            "form": 0,
+            "level": 55,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_STEEL_WING", "MOVE_NIGHT_SLASH", "MOVE_X_SCISSOR", "MOVE_SWORDS_DANCE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I just felt a great wind...\nAre you the one who kicked it up?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This defeat will also be blown far away..."
+        },
+        {
+            "type": 2,
+            "text": "You are the wind.{be01}\nA supple and comforting wind blowing\nthrough Victory Road!"
+        }
+    ]
+}

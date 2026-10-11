@@ -1,0 +1,10 @@
+BtlMain5_Text_SFeelingRanking = {0100:0}'S FEELING RANKING
+BtlMain5_Text_Rank = RANK
+BtlMain5_Text_Name = NAME
+BtlMain5_Text_Score = SCORE
+BtlMain5_Text_Count = COUNT
+BtlMain5_Text_Empty = {0201:0}
+BtlMain5_Text_Empty_2 = {0100:1}
+BtlMain5_Text_Empty_3 = {0202:2}
+BtlMain5_Text_Empty_4 = {0202:3}
+\pad{c4}

@@ -80,7 +80,7 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
     work = GameEvent_GetData(event);
     work->gsys = gsys;
     work->field = field;
-    work->players = &param->players;
+    work->players = &param->players.battle;
     setup = &work->setup;
     switch (category) {
     case 5:

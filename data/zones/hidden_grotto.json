@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": 262,
+    "matrix": "MAP_MATRIX_HIDDEN_GROTTO",
+    "scripts": "SCRIPTS_HIDDEN_GROTTO",
+    "text": "SCRIPT_TEXT_HIDDEN_GROTTO",
+    "bgm": "SEQ_BGM_KEMONOMICHI",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_HIDDEN_GROTTO",
+    "place": "PLACE_HIDDEN_GROTTO",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 1,
+    "battle_bg": 6,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 314,
+    "name_icon": 15,
+    "easy_level": 0,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

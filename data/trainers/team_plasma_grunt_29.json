@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_KROKOROK",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_RATICATE",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hi there! I'm a Pokémon thief by trade!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hmph!\nI missed my chance to grab your Pokémon!"
+        },
+        {
+            "type": 2,
+            "text": "I will continue poaching Pokémon! I've\ngot to be at least a little stronger!"
+        }
+    ]
+}

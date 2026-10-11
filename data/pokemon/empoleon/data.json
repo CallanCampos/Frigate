@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Empoleon",
+    "pokedex": {
+        "category": "Emperor Pokémon",
+        "entry": "If anyone were to hurt its pride,\nit would slash them with wings that\ncan cleave through an ice floe.",
+        "height": "5'07\"",
+        "weight": "186.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Empoleon",
+                "category": "Emperor Pokémon",
+                "entry": "If anyone were to hurt its pride,\nit would slash them with wings that\ncan cleave through an ice floe.",
+                "height": "5'07\"",
+                "weight": "186.3 lbs."
+            },
+            "fr": {
+                "name": "Pingoléon",
+                "category": "Pokémon Empereur",
+                "entry": "S'il voit son honneur bafoué, il\nest capable de faire des ravages\navec ses ailes tranchantes.",
+                "height": "1,7 m",
+                "weight": "84,5 kg"
+            },
+            "de": {
+                "name": "Impoleon",
+                "category": "Kaiser",
+                "entry": "Würde jemand seine Ehre verletzen,\nso würde es mit Flügeln angreifen,\ndie Eis zerschneiden können.",
+                "height": "1,7 m",
+                "weight": "84,5 kg"
+            },
+            "it": {
+                "name": "Empoleon",
+                "category": "Pokémon Imperatore",
+                "entry": "Chi osa ferirlo nell'orgoglio, viene\ncolpito dalle sue ali tanto possenti\nda fendere un banco di ghiaccio.",
+                "height": "1,7 m",
+                "weight": "84,5 kg"
+            },
+            "ko": {
+                "name": "엠페르트",
+                "category": "황제포켓몬",
+                "entry": "프라이드를 건드리는 자는\n유빙까지도 절단하는\n날개로 두 동강을 낸다.",
+                "height": "1.7 m",
+                "weight": "84.5 kg"
+            },
+            "es": {
+                "name": "Empoleon",
+                "category": "Pokémon Emperador",
+                "entry": "Si alguien hiere su orgullo, le desgarra\ncon unas alas que podrían cortar\nun témpano de hielo.",
+                "height": "1,7 m",
+                "weight": "84,5 kg"
+            },
+            "ja": {
+                "name": "エンペルト",
+                "category": "こうていポケモン",
+                "entry": "プライドを\\x{3000}きずつける\\x{3000}ものは\nりゅうひょうをも\\x{3000}せつだんする\nつばさで\\x{3000}まっぷたつに\\x{3000}する。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff18}\\x{ff14}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 84,
+        "attack": 86,
+        "defense": 88,
+        "speed": 60,
+        "special_attack": 111,
+        "special_defense": 101
+    },
+    "types": [ "TYPE_WATER", "TYPE_STEEL" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 3,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_TORRENT", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_DEFIANT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 239,
+    "height": 17,
+    "weight": 845,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_BUBBLE" ],
+            [ 4, "MOVE_GROWL" ],
+            [ 8, "MOVE_BUBBLE" ],
+            [ 11, "MOVE_SWORDS_DANCE" ],
+            [ 15, "MOVE_PECK" ],
+            [ 16, "MOVE_METAL_CLAW" ],
+            [ 19, "MOVE_BUBBLE_BEAM" ],
+            [ 24, "MOVE_SWAGGER" ],
+            [ 28, "MOVE_FURY_ATTACK" ],
+            [ 33, "MOVE_BRINE" ],
+            [ 36, "MOVE_AQUA_JET" ],
+            [ 39, "MOVE_WHIRLPOOL" ],
+            [ 46, "MOVE_MIST" ],
+            [ 52, "MOVE_DRILL_PECK" ],
+            [ 59, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM55",
+            "TM56",
+            "TM60",
+            "TM65",
+            "TM68",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM86",
+            "TM87",
+            "TM88",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_WATER_PLEDGE",
+            "MOVE_HYDRO_CANNON",
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_PIPLUP"
+}

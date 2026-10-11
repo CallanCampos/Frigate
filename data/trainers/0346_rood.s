@@ -1,7 +1,0 @@
-#include "asm/trainer.inc"
-
-// Pkmn Trainer Rood
-    Trainer class=TRAINER_CLASS_PKMN_TRAINER_ROOD, ai=AI_FLAG_BASIC | AI_FLAG_EVAL_ATTACK | AI_FLAG_EXPERT, money=25
-    PartyMon level=27, species=SPECIES_HERDIER, difficulty=100
-    PartyMon level=27, species=SPECIES_SWOOBAT, difficulty=100
-    PartyEnd

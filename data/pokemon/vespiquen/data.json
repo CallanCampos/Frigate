@@ -1,0 +1,169 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Vespiquen",
+    "pokedex": {
+        "category": "Beehive Pokémon",
+        "entry": "It houses its colony in cells in its body\nand releases various pheromones to\nmake those grubs do its bidding.",
+        "height": "3'11\"",
+        "weight": "84.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Vespiquen",
+                "category": "Beehive Pokémon",
+                "entry": "It releases various pheromones\nto make the grubs in its body do\nits bidding while fighting foes.",
+                "height": "3'11\"",
+                "weight": "84.9 lbs."
+            },
+            "fr": {
+                "name": "Apireine",
+                "category": "Pokémon Ruche",
+                "entry": "Ce Pokémon utilise des phéromones\npour donner des ordres de combat\naux larves dans son abdomen.",
+                "height": "1,2 m",
+                "weight": "38,5 kg"
+            },
+            "de": {
+                "name": "Honweisel",
+                "category": "Bienenstock",
+                "entry": "Um anzulocken, verströmt es\nunterschiedliche Botenstoffe,\nwährend es Gegner bekämpft.",
+                "height": "1,2 m",
+                "weight": "38,5 kg"
+            },
+            "it": {
+                "name": "Vespiquen",
+                "category": "Pokémon Alveare",
+                "entry": "Rilascia vari feromoni per farsi obbedire\ndalle larve che trasporta mentre\ncombatte.",
+                "height": "1,2 m",
+                "weight": "38,5 kg"
+            },
+            "ko": {
+                "name": "비퀸",
+                "category": "벌집포켓몬",
+                "entry": "수많은 페로몬을 내어\n몸통에 있는 아기들을\n자유자재로 조종하여 상대랑 싸운다.",
+                "height": "1.2 m",
+                "weight": "38.5 kg"
+            },
+            "es": {
+                "name": "Vespiquen",
+                "category": "Pokémon Colmena",
+                "entry": "Libera feromonas para hacer que\nlas larvas de su panal hagan lo\nque diga cuando combate.",
+                "height": "1,2 m",
+                "weight": "38,5 kg"
+            },
+            "ja": {
+                "name": "ビークイン",
+                "category": "はちのすポケモン",
+                "entry": "さまざまな\\x{3000}フェロモンを\\x{3000}だして\nどうたいに\\x{3000}いる\\x{3000}こどもたちを\nじざいにあやつり\\x{3000}てきとたたかう。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff18}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 80,
+        "defense": 102,
+        "speed": 40,
+        "special_attack": 80,
+        "special_defense": 102
+    },
+    "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_POISON_BARB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_FEMALE_ONLY",
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_PRESSURE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_UNNERVE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 166,
+    "height": 12,
+    "weight": 385,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SWEET_SCENT" ],
+            [ 1, "MOVE_GUST" ],
+            [ 1, "MOVE_POISON_STING" ],
+            [ 1, "MOVE_CONFUSE_RAY" ],
+            [ 5, "MOVE_FURY_CUTTER" ],
+            [ 9, "MOVE_PURSUIT" ],
+            [ 13, "MOVE_FURY_SWIPES" ],
+            [ 17, "MOVE_DEFEND_ORDER" ],
+            [ 21, "MOVE_SLASH" ],
+            [ 25, "MOVE_POWER_GEM" ],
+            [ 29, "MOVE_HEAL_ORDER" ],
+            [ 33, "MOVE_TOXIC" ],
+            [ 37, "MOVE_AIR_SLASH" ],
+            [ 41, "MOVE_CAPTIVATE" ],
+            [ 45, "MOVE_ATTACK_ORDER" ],
+            [ 49, "MOVE_SWAGGER" ],
+            [ 53, "MOVE_DESTINY_BOND" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM56",
+            "TM60",
+            "TM62",
+            "TM68",
+            "TM70",
+            "TM76",
+            "TM81",
+            "TM87",
+            "TM89",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_SNORE",
+            "MOVE_TAILWIND",
+            "MOVE_ROOST",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 143,
+    "baby_species": "SPECIES_COMBEE"
+}

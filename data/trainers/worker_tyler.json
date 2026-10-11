@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tyler",
+    "class": "TRAINER_CLASS_WORKER_26",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_YELLOW_SHARD",
+    "party": [
+        {
+            "species": "SPECIES_MAWILE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_EXCADRILL",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "This air of excitement brings back\nmemories. In those days, I was also...{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "It makes my old wound ache..."
+        },
+        {
+            "type": 15,
+            "text": "My wound aches...{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I may not look like it,\nbut I used to be quite an athlete."
+        }
+    ]
+}

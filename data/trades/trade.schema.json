@@ -1,0 +1,57 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "An in-game trade: data/trades/<trade>.json",
+    "description": "An in-game trade's offer (archive a/1/6/3, FieldTradeOfferData in include/field/fld_trade.h), which EventFieldTrade_CreatePkm makes the Pokémon from. tools/data/trade_data.py packs them in the order of data/constants/trades.txt, and the text takes the names with \\from{trades.names}. A string value is the name of a constant from data/constants/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "nickname", "trainer_name", "species", "form", "level", "ivs", "ability_slot", "nature", "sex", "trainer_id",
+        "contest", "held_item", "trainer_gender", "unk54", "region", "wanted_species", "wanted_sex"
+    ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "nickname": { "type": "string", "description": "The Pokémon's nickname" },
+        "trainer_name": { "type": "string", "description": "Its original trainer's name" },
+        "species": { "type": "string", "x-constant": "SPECIES_", "description": "The species offered" },
+        "form": { "$ref": "#/$defs/u32" },
+        "level": { "$ref": "#/$defs/u32" },
+        "ivs": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "hp", "attack", "defense", "speed", "special_attack", "special_defense" ],
+            "description": "The individual values, null for a random one",
+            "properties": {
+                "hp": { "$ref": "#/$defs/iv" }, "attack": { "$ref": "#/$defs/iv" }, "defense": { "$ref": "#/$defs/iv" },
+                "speed": { "$ref": "#/$defs/iv" }, "special_attack": { "$ref": "#/$defs/iv" },
+                "special_defense": { "$ref": "#/$defs/iv" }
+            }
+        },
+        "ability_slot": { "type": "integer", "minimum": 0, "maximum": 2, "description": "The ability's slot, 2 for the hidden ability" },
+        "nature": {
+            "type": [ "string", "null" ], "x-constant": "NATURE_",
+            "description": "A NATURE_* constant, or null for a random one"
+        },
+        "sex": {
+            "type": [ "string", "null" ], "x-constant": "GENDER_",
+            "description": "The sex PML_GenPID gives the Pokémon, a GENDER_* constant, or null for a random one"
+        },
+        "trainer_id": { "$ref": "#/$defs/u32", "description": "Its original trainer's ID" },
+        "contest": {
+            "type": "object", "additionalProperties": false, "required": [ "cool", "beauty", "cute", "smart", "tough" ],
+            "description": "Its contest conditions",
+            "properties": {
+                "cool": { "$ref": "#/$defs/u32" }, "beauty": { "$ref": "#/$defs/u32" }, "cute": { "$ref": "#/$defs/u32" },
+                "smart": { "$ref": "#/$defs/u32" }, "tough": { "$ref": "#/$defs/u32" }
+            }
+        },
+        "held_item": { "type": "string", "x-constant": "ITEM_" },
+        "trainer_gender": { "type": "string", "x-constant": "GENDER_", "description": "Its original trainer's gender" },
+        "unk54": { "$ref": "#/$defs/u32" },
+        "region": { "$ref": "#/$defs/u32", "description": "Its region (PKM_PARAM_REGION), 2 in every trade of this version" },
+        "wanted_species": { "type": "string", "x-constant": "SPECIES_", "description": "The species asked for" },
+        "wanted_sex": { "type": "string", "x-constant": "GENDER_", "description": "The sex asked for, a GENDER_* constant" }
+    },
+    "$defs": {
+        "u32": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "iv": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 31 }
+    }
+}

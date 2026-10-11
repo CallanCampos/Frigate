@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_NINETALES",
+    "moves": [ "MOVE_FIRE_BLAST", "MOVE_ENERGY_BALL", "MOVE_PSYSHOCK", "MOVE_WILL_O_WISP" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_CHARTI_BERRY",
+    "form": 0
+}

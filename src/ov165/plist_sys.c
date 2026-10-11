@@ -6,6 +6,7 @@
 #include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "field/hidden_event.h"
 #include "field/musical.h"
 #include "field/zone.h"
@@ -614,7 +615,7 @@ static void PokeList_FreeActors(PokeListWork *wk) {
 static void PokeList_InitText(PokeListWork *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, wk->heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0xb2, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_11, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 0x1c0, 0x20, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x1c0, 0x20, wk->heapId);
     wk->printQueue = func_020219a8(0x1800, wk->heapId);

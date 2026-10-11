@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Big Pecks",
+    "description": "Protects the Pokémon from\nDefense-lowering attacks."
+}

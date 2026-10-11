@@ -1,372 +1,372 @@
-BATTLE VIDEOS
-BATTLE SUBWAY
-RANDOM MATCHUP
-CANCEL
-QUIT
-MY VIDEO
-OTHER VIDEOS
-DELETE VIDEOS
-{bd02}{0100:0}'S VIDEO
-EMPTY
-{0203:0}
-Battle
-{bd02}Video no.: {0201:0}-{0204:1}-{0204:2}
-{bd02}Video no.: {0201:0}-{0204:1}-{0204:2} ★
-{bd02}{0100:0}'S PROFILE
-    \x{ffff}
-{bd02}Born in {0180:0}
-{bd02}Location
-{bd02}Trainer's quote
-    \x{ffff}
-      \x{ffff}
-    \x{ffff}
-     \x{ffff}
-{0124:0}
-{0125:0}
-         \x{ffff}
-{0100:0}'S VIDEO
-DELETE MY VIDEO
-DELETE OTHER VIDEOS
-    \x{ffff}
-            \x{ffff}
-SEARCH BY RANKING
-       \x{ffff}
-NEWEST 30
-SEARCH
-SEARCH BY NO.
-SEARCH BY FACILITY
-SEARCH BY POKÉMON
-SEARCH YOUR LOCATION
-LINK BATTLES
-BATTLE SUBWAY
-SEND PHOTO
-VIEW PHOTOS
-SEND
-Please choose the Pokémon you want to see.
-                \x{ffff}
-         \x{ffff}
-    \x{ffff}
-        \x{ffff}
-       \x{ffff}
-    \x{ffff}
-     \x{ffff}
-    \x{ffff}
-    \x{ffff}
-     \x{ffff}
-    \x{ffff}
-    \x{ffff}
-      \x{ffff}
-ABC
-DEF
-GHI
-JKL
-MNO
-PQR
-STU
-VWX
-YZ
-
-           \x{ffff}
-           \x{ffff}
-         \x{ffff}
-       \x{ffff}
-            \x{ffff}
-          \x{ffff}
-           \x{ffff}
-         \x{ffff}
-              \x{ffff}
-         \x{ffff}
-         \x{ffff}
-           \x{ffff}
-         \x{ffff}
-           \x{ffff}
-     \x{ffff}
-         \x{ffff}
-SAVE
-VIEW BATTLE\nVIDEO
-      \x{ffff}
-NEWEST 30 BATTLE VIDEOS
-TOP-RANKED BATTLE VIDEOS\nLINK BATTLE
-TOP-RANKED BATTLE VIDEOS\nBATTLE SUBWAY
-LIST OF BATTLE VIDEOS FROM\nSEARCH RESULTS
-    \x{ffff}
-Where would you like to save\n{0100:0}'s Battle Video?
-       \x{ffff}
-Is it OK to delete\n{0100:0}'s Battle Video?
-VIEW BATTLE VIDEOS
-SEND BATTLE VIDEO
-        \x{ffff}
-       \x{ffff}
-           \x{ffff}
-SEARCH BY FACILITY
-SEARCH BY POKÉMON
-SEARCH YOUR LOCATION
-OK!
-Please enter the Video Number.
-Please choose the facility.
-Please choose the Pokémon.
-Please enter the search criteria.
-You haven't set any search criteria.
-Loading Battle Video...
-There is no matching Battle Video...
-Sending the Battle Video...
-The Battle Video has been sent!
-{bd02}VIEW PROFILE
-{bd02}CLOSE PROFILE
-               \x{ffff}
-Please set the search criteria.
-Undefined
-                  \x{ffff}
-The same Battle Video can't be sent again.\nTouch the Touch Screen to continue.
-You have not registered your location.
-There is no Battle Video to send.
-{0201:0}
-        \x{ffff}
-BATTLE SUBWAY
-             \x{ffff}
-{bd02}SINGLE TRAIN
-{bd02}DOUBLE TRAIN
-{bd02}MULTI TRAIN
-{bd02}Wi-Fi TRAIN
-{bd02}BATTLE SUBWAY
-{bd02}SUPER SINGLE TRAIN
-{bd02}SUPER DOUBLE TRAIN
-{bd02}SUPER MULTI TRAIN
-Please select the Record\nyou want to view.
-PREVIOUS:
-RECORD:
-{bd03:0}{0203:0}
-        \x{ffff}
-Wins
-Multi with Trainer
-Multi with friend
-RANK
-Current Record
-{bd02}Wi-Fi Train Record
-CURRENT:
-{bd02}{0100:0}'S RATING
-{bd02}RATING MODE RECORD
-{bd02}FREE MODE RECORD
-{bd02}Wins
-{bd02}Losses
-{bd03:0}Single:
-{bd03:0}Double:
-{bd03:0}Triple:
-{bd03:0}Rotation:
-{bd03:0}Launcher:
-{bd03:0}{0203:0}
-{bd03:0}{0204:0}
-{bd03:0}Rating
-{bd02}YES
-{bd02}NO
-YES
-NO
-Is it OK to disconnect from\nNintendo Wi-Fi Connection?
-Colosseum Single,\nNo Restrictions
-Colosseum Single,\nFlat
-Colosseum Single,\nNo Restrictions, Launcher On
-Colosseum Single,\nFlat, Launcher On
-Colosseum Double,\nNo Restrictions
-Colosseum Double,\nFlat
-Colosseum Double,\nNo Restrictions, Launcher On
-Colosseum Double,\nFlat, Launcher On
-Colosseum Triple,\nNo Restrictions
-Colosseum Triple,\nFlat
-Colosseum Triple,\nNo Restrictions, Launcher On
-Colosseum Triple,\nFlat, Launcher On
-Colosseum Rotation,\nNo Restrictions
-Colosseum Rotation,\nFlat
-Colosseum Rotation,\nNo Restrictions, Launcher On
-Colosseum Rotation,\nFlat, Launcher On
-Colosseum Multi,\nNo Restrictions
-Colosseum Multi,\nFlat
-Colosseum Multi,\nNo Restrictions, Launcher On
-Colosseum Multi,\nFlat, Launcher On
-Battle Subway,\nSingle
-Battle Subway,\nDouble
-Battle Subway,\nMulti
-Random Matchup, Free\nSingle
-Random Matchup, Free\nDouble
-Random Matchup, Free\nTriple
-Random Matchup, Free\nRotation
-Random Matchup, Free\nLauncher Battle
-Random Matchup, Rating\nSingle
-Random Matchup, Rating\nDouble
-Random Matchup, Rating\nTriple
-Random Matchup, Rating\nRotation
-Random Matchup, Rating\nLauncher Battle
-Competition, Single\nLauncher Off
-Competition, Single\nLauncher On
-Competition, Double\nLauncher Off
-Competition, Double\nLauncher On
-Competition, Triple\nLauncher Off
-Competition, Triple\nLauncher On
-Competition, Rotation\nLauncher Off
-Competition, Rotation\nLauncher On
-01: Colosseum, Single\nLauncher Off
-02: Colosseum, Single\nLauncher On
-03: Colosseum, Double\nLauncher Off
-04: Colosseum, Double\nLauncher On
-05: Colosseum, Triple\nLauncher Off
-06: Colosseum, Triple\nLauncher On
-07: Colosseum, Rotation\nLauncher Off
-08: Colosseum, Rotation\nLauncher On
-09: Colosseum, Multi\nLauncher Off
-10: Colosseum, Multi\nLauncher On
-11: Battle Subway\nSingle
-12: Battle Subway\nDouble
-13: Battle Subway\nMulti
-14: Random Matchup\nSingle
-15: Random Matchup\nDouble
-16: Random Matchup\nTriple
-17: Random Matchup\nRotation
-18: Random Matchup\nLauncher Battle
-19: Battle Competition
-                  \x{ffff}
-                   \x{ffff}
-                  \x{ffff}
-                  \x{ffff}
-{bd02}TAP HERE!
-Is it OK to disconnect from\nNintendo Wi-Fi Connection?
-    \x{ffff}
-Authentication error.\nUnable to connect.
-This data is already registered.\nTouch the Touch Screen to continue.
-There appears to be a problem\nwith the Musical Photo.
-There appears to be a problem with the\nPokémon in the Musical Photo.
-There appears to be a problem\nwith the Profile data.
-An error occurred.\nTouch the Touch Screen to continue.
-    \x{ffff}
-Authentication error.\nUnable to connect.
-There appears to be a problem with the\nchosen Pokémon.
-An error occurred.\nTouch the Touch Screen to continue.
-    \x{ffff}
-                                   \x{ffff}
-              \x{ffff}
-                              \x{ffff}
-                          \x{ffff}
-                      \x{ffff}
-             \x{ffff}
-    \x{ffff}
-                                   \x{ffff}
-                      \x{ffff}
-             \x{ffff}
-    \x{ffff}
-                                   \x{ffff}
-             \x{ffff}
-    \x{ffff}
-                                             \x{ffff}
-                     \x{ffff}
-                              \x{ffff}
-                    \x{ffff}
-             \x{ffff}
-    \x{ffff}
-Authentication error.\nUnable to connect.
-This data is already registered.\nTouch the Touch Screen to continue.
-There appears to be a problem\nwith the Battle Video.
-There appears to be a problem\nwith the Battle Video.
-There appears to be a problem\nwith the Profile data.
-There appears to be a problem with the\nPokémon in the Battle Video.
-An error occurred.\nTouch the Touch Screen to continue.
-    \x{ffff}
-Authentication error.\nUnable to connect.
-There appears to be a problem\nwith the search criteria.
-There appears to be a problem\nwith the search criteria.
-The search failed...
-    \x{ffff}
-Authentication error.\nUnable to connect.
-No matching Battle Videos found...\nTouch the Touch Screen to continue.
-You cannot watch this Battle Video.
-Failed to receive the Battle Video.
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-An error occurred.\nError Code: 10601
-An error occurred.\nError Code: 10602
-An error occurred.\nError Code: 10603
-An error occurred.\nError Code: 10604
-Unable to connect.\nError Code: 10605
-An error occurred.\nError Code: 10606
-Unable to connect.\nError Code: 10607
-An error occurred.\nError Code: 10608
-An error occurred.\nError Code: 10609
-There is no response.\nError Code: 10610
-There is no response.\nError Code: 10611
-There is no response.\nError Code: 10612
-Communication was interrupted.\nError Code: 10613
-Unable to connect.\nError Code: 10614
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-The connection to the server was lost.\nTouch the Touch Screen to continue.
-    \x{ffff}
-    \x{ffff}
-There is nothing saved.\nTouch the Touch Screen to continue.
-              \x{ffff}
-                 \x{ffff}
-                \x{ffff}
-                        \x{ffff}
-                \x{ffff}
-              \x{ffff}
-The saved data could not be deleted...
-The same Battle Video can't be saved again.\nTouch the Touch Screen to continue.
-Saving...\nDon't turn off the power.
-Receiving ranking data...
-Sending save data...
-Save completed.\nTouch the Touch Screen to continue.
-Is it OK to delete\n{0100:0}'s Battle Video?
-Is it really OK to delete this data?
-Deleting data...\nSaving... Don't turn off the power.
-The data was deleted.\nTouch the Touch Screen to continue.
-Sending your Musical Photo...
-Receiving Musical Photo...
-                   \x{ffff}
-                    \x{ffff}
-You have no saved data to send. Participate\nin the event to create save data.
-The same data can't be sent again.\nTouch the Touch Screen to continue.
-Receiving Battle Videos...
-No matching data was found...\nTouch the Touch Screen to continue.
-No matching Musical Photo was found...\nTouch the Touch Screen to continue.
-Your Battle Video was sent.\nVideo no.: {0201:0}-{0204:1}-{0204:2}
-The game will be saved before\nyou can view Battle Videos.
-Deleting data... Saving a lot of\ndata... Don't turn off the power.
-Saving a lot of data...\nDon't turn off the power.
-Saving...\nDon't turn off the power.
-There is no ranking data...\nTouch the Touch Screen to continue.
-Would you like to send\nyour Battle Video?
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-                 \x{ffff}
-                  \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                  \x{ffff}
-                 \x{ffff}
-          \x{ffff}
-         \x{ffff}
-             \x{ffff}
-      \x{ffff}
-      \x{ffff}
-     \x{ffff}
-      \x{ffff}
-          \x{ffff}
-      \x{ffff}
-      \x{ffff}
-         \x{ffff}
-             \x{ffff}
-    \x{ffff}
-    \x{ffff}
-     \x{ffff}
-      \x{ffff}
-Kuro*
+Bank0008_Text_BattleVideos = BATTLE VIDEOS
+Bank0008_Text_BattleSubway = BATTLE SUBWAY
+Bank0008_Text_RandomMatchup = RANDOM MATCHUP
+Bank0008_Text_Cancel = CANCEL
+Bank0008_Text_Quit = QUIT
+Bank0008_Text_Video = MY VIDEO
+Bank0008_Text_OtherVideos = OTHER VIDEOS
+Bank0008_Text_DeleteVideos = DELETE VIDEOS
+Bank0008_Text_SVideo = {bd02}{0100:0}'S VIDEO
+Bank0008_Text_Empty = EMPTY
+Bank0008_Text_Empty_2 = {0203:0}
+Bank0008_Text_Battle = Battle
+Bank0008_Text_VideoNo = {bd02}Video no.: {0201:0}-{0204:1}-{0204:2}
+Bank0008_Text_VideoNo_2 = {bd02}Video no.: {0201:0}-{0204:1}-{0204:2} ★
+Bank0008_Text_SProfile = {bd02}{0100:0}'S PROFILE
+Bank0008_Text_Empty_3 =     \x{ffff}
+Bank0008_Text_Born = {bd02}Born in {0180:0}
+Bank0008_Text_Location = {bd02}Location
+Bank0008_Text_TrainersQuote = {bd02}Trainer's quote
+Bank0008_Text_Empty_4 =     \x{ffff}
+Bank0008_Text_Empty_5 =       \x{ffff}
+Bank0008_Text_Empty_6 =     \x{ffff}
+Bank0008_Text_Empty_7 =      \x{ffff}
+Bank0008_Text_Empty_8 = {0124:0}
+Bank0008_Text_Empty_9 = {0125:0}
+Bank0008_Text_Empty_10 =          \x{ffff}
+Bank0008_Text_SVideo_2 = {0100:0}'S VIDEO
+Bank0008_Text_DeleteVideo = DELETE MY VIDEO
+Bank0008_Text_DeleteOtherVideos = DELETE OTHER VIDEOS
+Bank0008_Text_Empty_11 =     \x{ffff}
+Bank0008_Text_Empty_12 =             \x{ffff}
+Bank0008_Text_SearchByRanking = SEARCH BY RANKING
+Bank0008_Text_Empty_13 =        \x{ffff}
+Bank0008_Text_Newest30 = NEWEST 30
+Bank0008_Text_Search = SEARCH
+Bank0008_Text_SearchByNo = SEARCH BY NO.
+Bank0008_Text_SearchByFacility = SEARCH BY FACILITY
+Bank0008_Text_SearchByPokemon = SEARCH BY POKÉMON
+Bank0008_Text_SearchLocation = SEARCH YOUR LOCATION
+Bank0008_Text_LinkBattles = LINK BATTLES
+Bank0008_Text_BattleSubway_2 = BATTLE SUBWAY
+Bank0008_Text_SendPhoto = SEND PHOTO
+Bank0008_Text_ViewPhotos = VIEW PHOTOS
+Bank0008_Text_Send = SEND
+Bank0008_Text_PleaseChoosePokemonWant = Please choose the Pokémon you want to see.
+Bank0008_Text_Empty_14 =                 \x{ffff}
+Bank0008_Text_Empty_15 =          \x{ffff}
+Bank0008_Text_Empty_16 =     \x{ffff}
+Bank0008_Text_Empty_17 =         \x{ffff}
+Bank0008_Text_Empty_18 =        \x{ffff}
+Bank0008_Text_Empty_19 =     \x{ffff}
+Bank0008_Text_Empty_20 =      \x{ffff}
+Bank0008_Text_Empty_21 =     \x{ffff}
+Bank0008_Text_Empty_22 =     \x{ffff}
+Bank0008_Text_Empty_23 =      \x{ffff}
+Bank0008_Text_Empty_24 =     \x{ffff}
+Bank0008_Text_Empty_25 =     \x{ffff}
+Bank0008_Text_Empty_26 =       \x{ffff}
+Bank0008_Text_Abc = ABC
+Bank0008_Text_Def = DEF
+Bank0008_Text_Ghi = GHI
+Bank0008_Text_Jkl = JKL
+Bank0008_Text_Mno = MNO
+Bank0008_Text_Pqr = PQR
+Bank0008_Text_Stu = STU
+Bank0008_Text_Vwx = VWX
+Bank0008_Text_Yz = YZ
+Bank0008_Text_Empty_27 =
+Bank0008_Text_Empty_28 =            \x{ffff}
+Bank0008_Text_Empty_29 =            \x{ffff}
+Bank0008_Text_Empty_30 =          \x{ffff}
+Bank0008_Text_Empty_31 =        \x{ffff}
+Bank0008_Text_Empty_32 =             \x{ffff}
+Bank0008_Text_Empty_33 =           \x{ffff}
+Bank0008_Text_Empty_34 =            \x{ffff}
+Bank0008_Text_Empty_35 =          \x{ffff}
+Bank0008_Text_Empty_36 =               \x{ffff}
+Bank0008_Text_Empty_37 =          \x{ffff}
+Bank0008_Text_Empty_38 =          \x{ffff}
+Bank0008_Text_Empty_39 =            \x{ffff}
+Bank0008_Text_Empty_40 =          \x{ffff}
+Bank0008_Text_Empty_41 =            \x{ffff}
+Bank0008_Text_Empty_42 =      \x{ffff}
+Bank0008_Text_Empty_43 =          \x{ffff}
+Bank0008_Text_Save = SAVE
+Bank0008_Text_ViewBattleVideo = VIEW BATTLE\nVIDEO
+Bank0008_Text_Empty_44 =       \x{ffff}
+Bank0008_Text_Newest30BattleVideos = NEWEST 30 BATTLE VIDEOS
+Bank0008_Text_TopRankedBattleVideos = TOP-RANKED BATTLE VIDEOS\nLINK BATTLE
+Bank0008_Text_TopRankedBattleVideos_2 = TOP-RANKED BATTLE VIDEOS\nBATTLE SUBWAY
+Bank0008_Text_ListBattleVideosFrom = LIST OF BATTLE VIDEOS FROM\nSEARCH RESULTS
+Bank0008_Text_Empty_45 =     \x{ffff}
+Bank0008_Text_WhereWouldLikeSave = Where would you like to save\n{0100:0}'s Battle Video?
+Bank0008_Text_Empty_46 =        \x{ffff}
+Bank0008_Text_OkDeleteSBattle = Is it OK to delete\n{0100:0}'s Battle Video?
+Bank0008_Text_ViewBattleVideos = VIEW BATTLE VIDEOS
+Bank0008_Text_SendBattleVideo = SEND BATTLE VIDEO
+Bank0008_Text_Empty_47 =         \x{ffff}
+Bank0008_Text_Empty_48 =        \x{ffff}
+Bank0008_Text_Empty_49 =            \x{ffff}
+Bank0008_Text_SearchByFacility_2 = SEARCH BY FACILITY
+Bank0008_Text_SearchByPokemon_2 = SEARCH BY POKÉMON
+Bank0008_Text_SearchLocation_2 = SEARCH YOUR LOCATION
+Bank0008_Text_Ok = OK!
+Bank0008_Text_PleaseEnterVideoNumber = Please enter the Video Number.
+Bank0008_Text_PleaseChooseFacility = Please choose the facility.
+Bank0008_Text_PleaseChoosePokemon = Please choose the Pokémon.
+Bank0008_Text_PleaseEnterSearchCriteria = Please enter the search criteria.
+Bank0008_Text_HaventSetAnySearch = You haven't set any search criteria.
+Bank0008_Text_LoadingBattleVideo = Loading Battle Video...
+Bank0008_Text_ThereNoMatchingBattle = There is no matching Battle Video...
+Bank0008_Text_SendingBattleVideo = Sending the Battle Video...
+Bank0008_Text_BattleVideoHasBeen = The Battle Video has been sent!
+Bank0008_Text_ViewProfile = {bd02}VIEW PROFILE
+Bank0008_Text_CloseProfile = {bd02}CLOSE PROFILE
+Bank0008_Text_Empty_50 =                \x{ffff}
+Bank0008_Text_PleaseSetSearchCriteria = Please set the search criteria.
+Bank0008_Text_Undefined = Undefined
+Bank0008_Text_Empty_51 =                   \x{ffff}
+Bank0008_Text_SameBattleVideoCant = The same Battle Video can't be sent again.\nTouch the Touch Screen to continue.
+Bank0008_Text_HaveNotRegisteredLocation = You have not registered your location.
+Bank0008_Text_ThereNoBattleVideo = There is no Battle Video to send.
+Bank0008_Text_Empty_52 = {0201:0}
+Bank0008_Text_Empty_53 =         \x{ffff}
+Bank0008_Text_BattleSubway_3 = BATTLE SUBWAY
+Bank0008_Text_Empty_54 =              \x{ffff}
+Bank0008_Text_SingleTrain = {bd02}SINGLE TRAIN
+Bank0008_Text_DoubleTrain = {bd02}DOUBLE TRAIN
+Bank0008_Text_MultiTrain = {bd02}MULTI TRAIN
+Bank0008_Text_WiFiTrain = {bd02}Wi-Fi TRAIN
+Bank0008_Text_BattleSubway_4 = {bd02}BATTLE SUBWAY
+Bank0008_Text_SuperSingleTrain = {bd02}SUPER SINGLE TRAIN
+Bank0008_Text_SuperDoubleTrain = {bd02}SUPER DOUBLE TRAIN
+Bank0008_Text_SuperMultiTrain = {bd02}SUPER MULTI TRAIN
+Bank0008_Text_PleaseSelectRecordWant = Please select the Record\nyou want to view.
+Bank0008_Text_Previous = PREVIOUS:
+Bank0008_Text_Record = RECORD:
+Bank0008_Text_Empty_55 = {bd03:0}{0203:0}
+Bank0008_Text_Empty_56 =         \x{ffff}
+Bank0008_Text_Wins = Wins
+Bank0008_Text_MultiTrainer = Multi with Trainer
+Bank0008_Text_MultiFriend = Multi with friend
+Bank0008_Text_Rank = RANK
+Bank0008_Text_CurrentRecord = Current Record
+Bank0008_Text_WiFiTrainRecord = {bd02}Wi-Fi Train Record
+Bank0008_Text_Current = CURRENT:
+Bank0008_Text_SRating = {bd02}{0100:0}'S RATING
+Bank0008_Text_RatingModeRecord = {bd02}RATING MODE RECORD
+Bank0008_Text_FreeModeRecord = {bd02}FREE MODE RECORD
+Bank0008_Text_Wins_2 = {bd02}Wins
+Bank0008_Text_Losses = {bd02}Losses
+Bank0008_Text_Single = {bd03:0}Single:
+Bank0008_Text_Double = {bd03:0}Double:
+Bank0008_Text_Triple = {bd03:0}Triple:
+Bank0008_Text_Rotation = {bd03:0}Rotation:
+Bank0008_Text_Launcher = {bd03:0}Launcher:
+Bank0008_Text_Empty_57 = {bd03:0}{0203:0}
+Bank0008_Text_Empty_58 = {bd03:0}{0204:0}
+Bank0008_Text_Rating = {bd03:0}Rating
+Bank0008_Text_Yes = {bd02}YES
+Bank0008_Text_No = {bd02}NO
+Bank0008_Text_Yes_2 = YES
+Bank0008_Text_No_2 = NO
+Bank0008_Text_OkDisconnectFromNintendo = Is it OK to disconnect from\nNintendo Wi-Fi Connection?
+Bank0008_Text_ColosseumSingleNoRestrictions = Colosseum Single,\nNo Restrictions
+Bank0008_Text_ColosseumSingleFlat = Colosseum Single,\nFlat
+Bank0008_Text_ColosseumSingleNoRestrictions_2 = Colosseum Single,\nNo Restrictions, Launcher On
+Bank0008_Text_ColosseumSingleFlatLauncher = Colosseum Single,\nFlat, Launcher On
+Bank0008_Text_ColosseumDoubleNoRestrictions = Colosseum Double,\nNo Restrictions
+Bank0008_Text_ColosseumDoubleFlat = Colosseum Double,\nFlat
+Bank0008_Text_ColosseumDoubleNoRestrictions_2 = Colosseum Double,\nNo Restrictions, Launcher On
+Bank0008_Text_ColosseumDoubleFlatLauncher = Colosseum Double,\nFlat, Launcher On
+Bank0008_Text_ColosseumTripleNoRestrictions = Colosseum Triple,\nNo Restrictions
+Bank0008_Text_ColosseumTripleFlat = Colosseum Triple,\nFlat
+Bank0008_Text_ColosseumTripleNoRestrictions_2 = Colosseum Triple,\nNo Restrictions, Launcher On
+Bank0008_Text_ColosseumTripleFlatLauncher = Colosseum Triple,\nFlat, Launcher On
+Bank0008_Text_ColosseumRotationNoRestrictions = Colosseum Rotation,\nNo Restrictions
+Bank0008_Text_ColosseumRotationFlat = Colosseum Rotation,\nFlat
+Bank0008_Text_ColosseumRotationNoRestrictions_2 = Colosseum Rotation,\nNo Restrictions, Launcher On
+Bank0008_Text_ColosseumRotationFlatLauncher = Colosseum Rotation,\nFlat, Launcher On
+Bank0008_Text_ColosseumMultiNoRestrictions = Colosseum Multi,\nNo Restrictions
+Bank0008_Text_ColosseumMultiFlat = Colosseum Multi,\nFlat
+Bank0008_Text_ColosseumMultiNoRestrictions_2 = Colosseum Multi,\nNo Restrictions, Launcher On
+Bank0008_Text_ColosseumMultiFlatLauncher = Colosseum Multi,\nFlat, Launcher On
+Bank0008_Text_BattleSubwaySingle = Battle Subway,\nSingle
+Bank0008_Text_BattleSubwayDouble = Battle Subway,\nDouble
+Bank0008_Text_BattleSubwayMulti = Battle Subway,\nMulti
+Bank0008_Text_RandomMatchupFreeSingle = Random Matchup, Free\nSingle
+Bank0008_Text_RandomMatchupFreeDouble = Random Matchup, Free\nDouble
+Bank0008_Text_RandomMatchupFreeTriple = Random Matchup, Free\nTriple
+Bank0008_Text_RandomMatchupFreeRotation = Random Matchup, Free\nRotation
+Bank0008_Text_RandomMatchupFreeLauncher = Random Matchup, Free\nLauncher Battle
+Bank0008_Text_RandomMatchupRatingSingle = Random Matchup, Rating\nSingle
+Bank0008_Text_RandomMatchupRatingDouble = Random Matchup, Rating\nDouble
+Bank0008_Text_RandomMatchupRatingTriple = Random Matchup, Rating\nTriple
+Bank0008_Text_RandomMatchupRatingRotation = Random Matchup, Rating\nRotation
+Bank0008_Text_RandomMatchupRatingLauncher = Random Matchup, Rating\nLauncher Battle
+Bank0008_Text_CompetitionSingleLauncherOff = Competition, Single\nLauncher Off
+Bank0008_Text_CompetitionSingleLauncher = Competition, Single\nLauncher On
+Bank0008_Text_CompetitionDoubleLauncherOff = Competition, Double\nLauncher Off
+Bank0008_Text_CompetitionDoubleLauncher = Competition, Double\nLauncher On
+Bank0008_Text_CompetitionTripleLauncherOff = Competition, Triple\nLauncher Off
+Bank0008_Text_CompetitionTripleLauncher = Competition, Triple\nLauncher On
+Bank0008_Text_CompetitionRotationLauncherOff = Competition, Rotation\nLauncher Off
+Bank0008_Text_CompetitionRotationLauncher = Competition, Rotation\nLauncher On
+Bank0008_Text_01ColosseumSingleLauncher = 01: Colosseum, Single\nLauncher Off
+Bank0008_Text_02ColosseumSingleLauncher = 02: Colosseum, Single\nLauncher On
+Bank0008_Text_03ColosseumDoubleLauncher = 03: Colosseum, Double\nLauncher Off
+Bank0008_Text_04ColosseumDoubleLauncher = 04: Colosseum, Double\nLauncher On
+Bank0008_Text_05ColosseumTripleLauncher = 05: Colosseum, Triple\nLauncher Off
+Bank0008_Text_06ColosseumTripleLauncher = 06: Colosseum, Triple\nLauncher On
+Bank0008_Text_07ColosseumRotationLauncher = 07: Colosseum, Rotation\nLauncher Off
+Bank0008_Text_08ColosseumRotationLauncher = 08: Colosseum, Rotation\nLauncher On
+Bank0008_Text_09ColosseumMultiLauncher = 09: Colosseum, Multi\nLauncher Off
+Bank0008_Text_10ColosseumMultiLauncher = 10: Colosseum, Multi\nLauncher On
+Bank0008_Text_11BattleSubwaySingle = 11: Battle Subway\nSingle
+Bank0008_Text_12BattleSubwayDouble = 12: Battle Subway\nDouble
+Bank0008_Text_13BattleSubwayMulti = 13: Battle Subway\nMulti
+Bank0008_Text_14RandomMatchupSingle = 14: Random Matchup\nSingle
+Bank0008_Text_15RandomMatchupDouble = 15: Random Matchup\nDouble
+Bank0008_Text_16RandomMatchupTriple = 16: Random Matchup\nTriple
+Bank0008_Text_17RandomMatchupRotation = 17: Random Matchup\nRotation
+Bank0008_Text_18RandomMatchupLauncher = 18: Random Matchup\nLauncher Battle
+Bank0008_Text_19BattleCompetition = 19: Battle Competition
+Bank0008_Text_Empty_59 =                   \x{ffff}
+Bank0008_Text_Empty_60 =                    \x{ffff}
+Bank0008_Text_Empty_61 =                   \x{ffff}
+Bank0008_Text_Empty_62 =                   \x{ffff}
+Bank0008_Text_TapHere = {bd02}TAP HERE!
+Bank0008_Text_OkDisconnectFromNintendo_2 = Is it OK to disconnect from\nNintendo Wi-Fi Connection?
+Bank0008_Text_Empty_63 =     \x{ffff}
+Bank0008_Text_AuthenticationErrorUnableConnect = Authentication error.\nUnable to connect.
+Bank0008_Text_DataAlreadyRegisteredTouch = This data is already registered.\nTouch the Touch Screen to continue.
+Bank0008_Text_ThereAppearsProblemMusical = There appears to be a problem\nwith the Musical Photo.
+Bank0008_Text_ThereAppearsProblemPokemon = There appears to be a problem with the\nPokémon in the Musical Photo.
+Bank0008_Text_ThereAppearsProblemProfile = There appears to be a problem\nwith the Profile data.
+Bank0008_Text_ErrorOccurredTouchTouch = An error occurred.\nTouch the Touch Screen to continue.
+Bank0008_Text_Empty_64 =     \x{ffff}
+Bank0008_Text_AuthenticationErrorUnableConnect_2 = Authentication error.\nUnable to connect.
+Bank0008_Text_ThereAppearsProblemChosen = There appears to be a problem with the\nchosen Pokémon.
+Bank0008_Text_ErrorOccurredTouchTouch_2 = An error occurred.\nTouch the Touch Screen to continue.
+Bank0008_Text_Empty_65 =     \x{ffff}
+Bank0008_Text_Empty_66 =                                    \x{ffff}
+Bank0008_Text_Empty_67 =               \x{ffff}
+Bank0008_Text_Empty_68 =                               \x{ffff}
+Bank0008_Text_Empty_69 =                           \x{ffff}
+Bank0008_Text_Empty_70 =                       \x{ffff}
+Bank0008_Text_Empty_71 =              \x{ffff}
+Bank0008_Text_Empty_72 =     \x{ffff}
+Bank0008_Text_Empty_73 =                                    \x{ffff}
+Bank0008_Text_Empty_74 =                       \x{ffff}
+Bank0008_Text_Empty_75 =              \x{ffff}
+Bank0008_Text_Empty_76 =     \x{ffff}
+Bank0008_Text_Empty_77 =                                    \x{ffff}
+Bank0008_Text_Empty_78 =              \x{ffff}
+Bank0008_Text_Empty_79 =     \x{ffff}
+Bank0008_Text_Empty_80 =                                              \x{ffff}
+Bank0008_Text_Empty_81 =                      \x{ffff}
+Bank0008_Text_Empty_82 =                               \x{ffff}
+Bank0008_Text_Empty_83 =                     \x{ffff}
+Bank0008_Text_Empty_84 =              \x{ffff}
+Bank0008_Text_Empty_85 =     \x{ffff}
+Bank0008_Text_AuthenticationErrorUnableConnect_3 = Authentication error.\nUnable to connect.
+Bank0008_Text_DataAlreadyRegisteredTouch_2 = This data is already registered.\nTouch the Touch Screen to continue.
+Bank0008_Text_ThereAppearsProblemBattle = There appears to be a problem\nwith the Battle Video.
+Bank0008_Text_ThereAppearsProblemBattle_2 = There appears to be a problem\nwith the Battle Video.
+Bank0008_Text_ThereAppearsProblemProfile_2 = There appears to be a problem\nwith the Profile data.
+Bank0008_Text_ThereAppearsProblemPokemon_2 = There appears to be a problem with the\nPokémon in the Battle Video.
+Bank0008_Text_ErrorOccurredTouchTouch_3 = An error occurred.\nTouch the Touch Screen to continue.
+Bank0008_Text_Empty_86 =     \x{ffff}
+Bank0008_Text_AuthenticationErrorUnableConnect_4 = Authentication error.\nUnable to connect.
+Bank0008_Text_ThereAppearsProblemSearch = There appears to be a problem\nwith the search criteria.
+Bank0008_Text_ThereAppearsProblemSearch_2 = There appears to be a problem\nwith the search criteria.
+Bank0008_Text_SearchFailed = The search failed...
+Bank0008_Text_Empty_87 =     \x{ffff}
+Bank0008_Text_AuthenticationErrorUnableConnect_5 = Authentication error.\nUnable to connect.
+Bank0008_Text_NoMatchingBattleVideos = No matching Battle Videos found...\nTouch the Touch Screen to continue.
+Bank0008_Text_CannotWatchBattleVideo = You cannot watch this Battle Video.
+Bank0008_Text_FailedReceiveBattleVideo = Failed to receive the Battle Video.
+Bank0008_Text_Empty_88 =     \x{ffff}
+Bank0008_Text_Empty_89 =     \x{ffff}
+Bank0008_Text_Empty_90 =     \x{ffff}
+Bank0008_Text_Empty_91 =     \x{ffff}
+Bank0008_Text_Empty_92 =     \x{ffff}
+Bank0008_Text_ErrorOccurredErrorCode = An error occurred.\nError Code: 10601
+Bank0008_Text_ErrorOccurredErrorCode_2 = An error occurred.\nError Code: 10602
+Bank0008_Text_ErrorOccurredErrorCode_3 = An error occurred.\nError Code: 10603
+Bank0008_Text_ErrorOccurredErrorCode_4 = An error occurred.\nError Code: 10604
+Bank0008_Text_UnableConnectErrorCode = Unable to connect.\nError Code: 10605
+Bank0008_Text_ErrorOccurredErrorCode_5 = An error occurred.\nError Code: 10606
+Bank0008_Text_UnableConnectErrorCode_2 = Unable to connect.\nError Code: 10607
+Bank0008_Text_ErrorOccurredErrorCode_6 = An error occurred.\nError Code: 10608
+Bank0008_Text_ErrorOccurredErrorCode_7 = An error occurred.\nError Code: 10609
+Bank0008_Text_ThereNoResponseError = There is no response.\nError Code: 10610
+Bank0008_Text_ThereNoResponseError_2 = There is no response.\nError Code: 10611
+Bank0008_Text_ThereNoResponseError_3 = There is no response.\nError Code: 10612
+Bank0008_Text_CommunicationInterruptedErrorCode = Communication was interrupted.\nError Code: 10613
+Bank0008_Text_UnableConnectErrorCode_3 = Unable to connect.\nError Code: 10614
+Bank0008_Text_Empty_93 =     \x{ffff}
+Bank0008_Text_Empty_94 =     \x{ffff}
+Bank0008_Text_Empty_95 =     \x{ffff}
+Bank0008_Text_Empty_96 =     \x{ffff}
+Bank0008_Text_Empty_97 =     \x{ffff}
+Bank0008_Text_Empty_98 =     \x{ffff}
+Bank0008_Text_Empty_99 =     \x{ffff}
+Bank0008_Text_ConnectionServerLostTouch = The connection to the server was lost.\nTouch the Touch Screen to continue.
+Bank0008_Text_Empty_100 =     \x{ffff}
+Bank0008_Text_Empty_101 =     \x{ffff}
+Bank0008_Text_ThereNothingSavedTouch = There is nothing saved.\nTouch the Touch Screen to continue.
+Bank0008_Text_Empty_102 =               \x{ffff}
+Bank0008_Text_Empty_103 =                  \x{ffff}
+Bank0008_Text_Empty_104 =                 \x{ffff}
+Bank0008_Text_Empty_105 =                         \x{ffff}
+Bank0008_Text_Empty_106 =                 \x{ffff}
+Bank0008_Text_Empty_107 =               \x{ffff}
+Bank0008_Text_SavedDataCouldNot = The saved data could not be deleted...
+Bank0008_Text_SameBattleVideoCant_2 = The same Battle Video can't be saved again.\nTouch the Touch Screen to continue.
+Bank0008_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+Bank0008_Text_ReceivingRankingData = Receiving ranking data...
+Bank0008_Text_SendingSaveData = Sending save data...
+Bank0008_Text_SaveCompletedTouchTouch = Save completed.\nTouch the Touch Screen to continue.
+Bank0008_Text_OkDeleteSBattle_2 = Is it OK to delete\n{0100:0}'s Battle Video?
+Bank0008_Text_ReallyOkDeleteData = Is it really OK to delete this data?
+Bank0008_Text_DeletingDataSavingDont = Deleting data...\nSaving... Don't turn off the power.
+Bank0008_Text_DataDeletedTouchTouch = The data was deleted.\nTouch the Touch Screen to continue.
+Bank0008_Text_SendingMusicalPhoto = Sending your Musical Photo...
+Bank0008_Text_ReceivingMusicalPhoto = Receiving Musical Photo...
+Bank0008_Text_Empty_108 =                    \x{ffff}
+Bank0008_Text_Empty_109 =                     \x{ffff}
+Bank0008_Text_HaveNoSavedData = You have no saved data to send. Participate\nin the event to create save data.
+Bank0008_Text_SameDataCantSent = The same data can't be sent again.\nTouch the Touch Screen to continue.
+Bank0008_Text_ReceivingBattleVideos = Receiving Battle Videos...
+Bank0008_Text_NoMatchingDataFound = No matching data was found...\nTouch the Touch Screen to continue.
+Bank0008_Text_NoMatchingMusicalPhoto = No matching Musical Photo was found...\nTouch the Touch Screen to continue.
+Bank0008_Text_BattleVideoSentVideo = Your Battle Video was sent.\nVideo no.: {0201:0}-{0204:1}-{0204:2}
+Bank0008_Text_GameWillSavedBefore = The game will be saved before\nyou can view Battle Videos.
+Bank0008_Text_DeletingDataSavingLot = Deleting data... Saving a lot of\ndata... Don't turn off the power.
+Bank0008_Text_SavingLotDataDont = Saving a lot of data...\nDon't turn off the power.
+Bank0008_Text_SavingDontTurnOff_2 = Saving...\nDon't turn off the power.
+Bank0008_Text_ThereNoRankingData = There is no ranking data...\nTouch the Touch Screen to continue.
+Bank0008_Text_WouldLikeSendBattle = Would you like to send\nyour Battle Video?
+Bank0008_Text_Empty_110 =     \x{ffff}
+Bank0008_Text_Empty_111 =     \x{ffff}
+Bank0008_Text_Empty_112 =     \x{ffff}
+Bank0008_Text_Empty_113 =     \x{ffff}
+Bank0008_Text_Empty_114 =     \x{ffff}
+Bank0008_Text_Empty_115 =     \x{ffff}
+Bank0008_Text_Empty_116 =     \x{ffff}
+Bank0008_Text_Empty_117 =     \x{ffff}
+Bank0008_Text_Empty_118 =                  \x{ffff}
+Bank0008_Text_Empty_119 =                   \x{ffff}
+Bank0008_Text_Empty_120 =                  \x{ffff}
+Bank0008_Text_Empty_121 =                  \x{ffff}
+Bank0008_Text_Empty_122 =                   \x{ffff}
+Bank0008_Text_Empty_123 =                  \x{ffff}
+Bank0008_Text_Empty_124 =           \x{ffff}
+Bank0008_Text_Empty_125 =          \x{ffff}
+Bank0008_Text_Empty_126 =              \x{ffff}
+Bank0008_Text_Empty_127 =       \x{ffff}
+Bank0008_Text_Empty_128 =       \x{ffff}
+Bank0008_Text_Empty_129 =      \x{ffff}
+Bank0008_Text_Empty_130 =       \x{ffff}
+Bank0008_Text_Empty_131 =           \x{ffff}
+Bank0008_Text_Empty_132 =       \x{ffff}
+Bank0008_Text_Empty_133 =       \x{ffff}
+Bank0008_Text_Empty_134 =          \x{ffff}
+Bank0008_Text_Empty_135 =              \x{ffff}
+Bank0008_Text_Empty_136 =     \x{ffff}
+Bank0008_Text_Empty_137 =     \x{ffff}
+Bank0008_Text_Empty_138 =      \x{ffff}
+Bank0008_Text_Empty_139 =       \x{ffff}
+Bank0008_Text_Kuro = Kuro*

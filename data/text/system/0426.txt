@@ -1,7 +1,7 @@
-None
-Åland Islands
-Lapland
-East Finland
-South Finland
-Oulu
-West Finland
+Bank0426_Text_None = None
+Bank0426_Text_LandIslands = Åland Islands
+Bank0426_Text_Lapland = Lapland
+Bank0426_Text_EastFinland = East Finland
+Bank0426_Text_SouthFinland = South Finland
+Bank0426_Text_Oulu = Oulu
+Bank0426_Text_WestFinland = West Finland

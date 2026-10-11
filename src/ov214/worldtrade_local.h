@@ -4,7 +4,7 @@
 #include "types.h"
 #include "app/worldtrade.h"
 #include "dpw/dpw_tr.h"
-#include "dpw/nhttp_rap.h"
+#include "gfl/nhttp_rap.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
 #include "gfl/msg.h"

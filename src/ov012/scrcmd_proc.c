@@ -169,7 +169,7 @@ BOOL s0150_CallMailbox(VM *vm, FieldScriptEnv *env) {
     work->resource = mailbox;
     work->data = ScriptReadVar(vm, env);
     ScriptWork_CallEvent(scriptWork, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_MAILBOX,
-                                                                               &data_ov215_021ab158, mailbox,
+                                                                               &MAILBOX_PROC_FUNCTIONS, mailbox,
                                                                                func_ov012_0215767c, work));
     return TRUE;
 }

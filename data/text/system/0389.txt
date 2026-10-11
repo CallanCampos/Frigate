@@ -1,5 +1,5 @@
-{0100:0}!{be01}\nA strange ship was flying toward\nOpelucid City, right?!{be01}
-I saw it, too!\nI'm en route!{be01}
-Cheren! That's Team Plasma's\nship, isn't it?{be01}
-Yes. No doubt about it...{be01}\nAnyway, I'll be arriving\nin just a moment!{be01}
-OK, I'll leave things to you!{be01}\n{0100:0}!\nIf you run into any trouble,{be00}\ncall me!{be01}
+Bank0389_Text_StrangeShipFlyingToward = {0100:0}!{be01}\nA strange ship was flying toward\nOpelucid City, right?!{be01}
+Bank0389_Text_SawTooImEn = I saw it, too!\nI'm en route!{be01}
+Bank0389_Text_CherenThatsTeamPlasmas = Cheren! That's Team Plasma's\nship, isn't it?{be01}
+Bank0389_Text_YesNoDoubtAbout = Yes. No doubt about it...{be01}\nAnyway, I'll be arriving\nin just a moment!{be01}
+Bank0389_Text_OkIllLeaveThings = OK, I'll leave things to you!{be01}\n{0100:0}!\nIf you run into any trouble,{be00}\ncall me!{be01}

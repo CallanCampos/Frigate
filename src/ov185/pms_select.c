@@ -1,10 +1,12 @@
 #include "app/pms_select.h"
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
+#include "app/ui/touchbar.h"
 #include "app/pms_input.h"
 #include "app/pms_select_graphic.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -38,6 +40,7 @@
 #include "system/pms_word.h"
 #include "system/pmsi_param.h"
 #include "system/printsys.h"
+#include "text/system/pms_input.h"
 
 // The phrase select: a list of the saved phrases on plates, from which the trainer card picks its greeting, or opens
 // the phrase input to edit one. Named descriptively, after its graphics' "pms_select_graphic.c". The names are ours
@@ -93,12 +96,12 @@ typedef struct {
     PMSSelectParam *param;
     HeapID heapId;
     ClActor *scrollBar;
-    Ov139ObjRes objRes;
+    UIObjRes objRes;
     SaveControl *save;
     PMSWordSave *wordSave;
     PMSSelectBG bg;
     PMSSelectGraphic *graphic;
-    Ov139TouchBar *touchBar;
+    TouchBar *touchBar;
     Font *font;
     PrintQueue *queue;
     MsgData *msgData;
@@ -145,9 +148,9 @@ static void PMSSelect_FadeColors(u16 *angle, GXRgb *colors, const PMSSelectColor
 static void PMSSelect_BGUpdatePlateFade(PMSSelectBG *bg);
 static void PMSSelect_BGResetPlateFade(PMSSelectBG *bg);
 static void PMSSelect_BGDrawPlateEdge(PMSSelectBG *bg, u32 palette);
-static Ov139TouchBar *PMSSelect_CreateTouchBar(PMSSelectWork *wk, ClActUnit *unit, HeapID heapId);
+static TouchBar *PMSSelect_CreateTouchBar(PMSSelectWork *wk, ClActUnit *unit, HeapID heapId);
 static void PMSSelect_DeleteTouchBar(PMSSelectWork *wk);
-static void PMSSelect_UpdateTouchBar(Ov139TouchBar *touchBar);
+static void PMSSelect_UpdateTouchBar(TouchBar *touchBar);
 static AppTaskMenu *PMSSelect_CreateMenu(AppTaskMenuRes *res, MsgData *msgData, HeapID heapId);
 static void PMSSelect_DeleteMenu(AppTaskMenu *menu);
 static void PMSSelect_UpdateMenu(AppTaskMenu *menu);
@@ -196,7 +199,7 @@ static BOOL PMSSelect_Init(GameProc *proc, u32 *state, void *param, void *work) 
     PMSSelectWork *wk;
     PMSSelectParam *selectParam = param;
 
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
     GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PMS_SELECT, 0x1c000);
@@ -207,7 +210,7 @@ static BOOL PMSSelect_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->wordSave = getDexBlkAddress(selectParam->save);
     wk->param = selectParam;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 159, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PMS_INPUT, wk->heapId);
     wk->queue = func_02021998(wk->heapId);
     wk->procMgr = CreateGameProcManager(wk->heapId);
     wk->prevPos = POS_NONE;
@@ -227,7 +230,7 @@ static BOOL PMSSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_FontFree(wk->font);
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_PMS_SELECT);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
     return TRUE;
 }
 
@@ -321,7 +324,7 @@ static BOOL PMSSelect_Main(GameProc *proc, u32 *state, void *param, void *work) 
         break;
     case SEQ_INPUT_RELEASE:
         PMSSelect_ReleaseScreen(wk);
-        GFL_OvlUnload(OVERLAY_139);
+        GFL_OvlUnload(OVERLAY_APP_UI);
         PMSSelect_SetSeq(state, wk, SEQ_INPUT_CALL);
         return FALSE;
     case SEQ_INPUT_CALL:
@@ -331,7 +334,7 @@ static BOOL PMSSelect_Main(GameProc *proc, u32 *state, void *param, void *work) 
         return FALSE;
     case SEQ_INPUT_RETURN:
         if (running != TRUE && PMSSelect_SeqInputReturn(&wk->subSeq, wk)) {
-            GFL_OvlLoad(OVERLAY_139);
+            GFL_OvlLoad(OVERLAY_APP_UI);
             PMSSelect_SetupScreen(wk);
             PMSSelect_SetSeq(state, wk, SEQ_TOUCHBAR_ON);
         }
@@ -353,7 +356,7 @@ static BOOL PMSSelect_Main(GameProc *proc, u32 *state, void *param, void *work) 
 
 static void PMSSelect_SetupScreen(PMSSelectWork *wk) {
     ClActUnit *unit;
-    Ov139ObjResSetup setup;
+    UIObjResSetup setup;
 
     wk->scrollTouch = FALSE;
     wk->listActive = TRUE;
@@ -382,8 +385,8 @@ static void PMSSelect_SetupScreen(PMSSelectWork *wk) {
     setup.paletteOffset = 0;
     setup.paletteStart = 0;
     setup.paletteCount = 5;
-    func_ov139_021999c8(&wk->objRes, &setup, unit, wk->heapId);
-    wk->scrollBar = func_ov139_02199a5c(&wk->objRes, unit, 240, SCROLL_BAR_TOP, 16, wk->heapId);
+    UIObjRes_Load(&wk->objRes, &setup, unit, wk->heapId);
+    wk->scrollBar = UIObjRes_CreateActor(&wk->objRes, unit, 240, SCROLL_BAR_TOP, 16, wk->heapId);
     func_0204c468(wk->scrollBar, 1);
     func_0204c520(wk->scrollBar, TRUE);
     PMSSelect_BGLoad(&wk->bg, wk->heapId, wk->font, wk->queue, wk->msgData);
@@ -404,7 +407,7 @@ static void PMSSelect_ReleaseScreen(PMSSelectWork *wk) {
         wk->flushPending[i] = FALSE;
     }
     wk->bg.titleFlushPending = FALSE;
-    func_ov139_02199a44(&wk->objRes);
+    UIObjRes_Free(&wk->objRes);
     PMSSelect_DeleteTouchBar(wk);
     AppTaskMenuRes_Free(wk->menuRes);
     PMSSelect_DeleteList(wk);
@@ -536,12 +539,12 @@ static void PMSSelect_BGDrawPlateEdge(PMSSelectBG *bg, u32 palette) {
     GFL_BGSysQueueScrLoad(2);
 }
 
-static Ov139TouchBar *PMSSelect_CreateTouchBar(PMSSelectWork *wk, ClActUnit *unit, HeapID heapId) {
-    Ov139TouchBarSetup setup = { 0 };
-    Ov139TouchBarItem items[] = {
+static TouchBar *PMSSelect_CreateTouchBar(PMSSelectWork *wk, ClActUnit *unit, HeapID heapId) {
+    TouchBarSetup setup = { 0 };
+    TouchBarItem items[] = {
         { 1, { 232, 168 } },
     };
-    Ov139TouchBar *touchBar;
+    TouchBar *touchBar;
 
     setup.items = items;
     setup.count = NELEMS(items);
@@ -550,17 +553,17 @@ static Ov139TouchBar *PMSSelect_CreateTouchBar(PMSSelectWork *wk, ClActUnit *uni
     setup.bgPalette = 14;
     setup.objPalette = 5;
     setup.vramType = CLACT_VRAM_SUB;
-    touchBar = func_ov139_02199aa0(&setup, heapId);
-    func_ov139_02199d48(touchBar, 1, TRUE);
+    touchBar = TouchBar_Create(&setup, heapId);
+    TouchBar_SetIconBgPriority(touchBar, 1, TRUE);
     return touchBar;
 }
 
 static void PMSSelect_DeleteTouchBar(PMSSelectWork *wk) {
-    func_ov139_02199b5c(wk->touchBar);
+    TouchBar_Free(wk->touchBar);
 }
 
-static void PMSSelect_UpdateTouchBar(Ov139TouchBar *touchBar) {
-    func_ov139_02199b90(touchBar);
+static void PMSSelect_UpdateTouchBar(TouchBar *touchBar) {
+    TouchBar_Main(touchBar);
 }
 
 static AppTaskMenu *PMSSelect_CreateMenu(AppTaskMenuRes *res, MsgData *msgData, HeapID heapId) {
@@ -893,7 +896,7 @@ static BOOL PMSSelect_FlushWindow(PrintQueue *queue, BmpWin *window, BOOL *flush
 }
 
 static void PMSSelect_DrawNewPlate(PMSSelectWork *wk, u8 line, u8 index, BOOL active) {
-    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, 17);
+    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, PmsInput_Text_AddNewMessages);
     u16 color;
 
     PMSSelect_BGDrawPlate(&wk->bg, line, 6, active);
@@ -944,7 +947,7 @@ static int PMSSelect_GetTouchedPlate(void) {
 }
 
 static BOOL PMSSelect_SeqTouchBarOn(u32 *seq, PMSSelectWork *wk) {
-    func_ov139_02199c90(wk->touchBar, TRUE);
+    TouchBar_SetVisible(wk->touchBar, TRUE);
     return TRUE;
 }
 
@@ -961,10 +964,10 @@ static BOOL PMSSelect_SeqSelect(u32 *seq, PMSSelectWork *wk) {
         if (!wk->scrollTouch) {
             func_0203d564(wk->touchMode ? TRUE : FALSE);
             PMSSelect_UpdateTouchBar(wk->touchBar);
-            if (func_ov139_02199c30(wk->touchBar) != -1) {
+            if (TouchBar_GetTouched(wk->touchBar) != -1) {
                 wk->listActive = FALSE;
             }
-            touch = func_ov139_02199c08(wk->touchBar);
+            touch = TouchBar_GetDecided(wk->touchBar);
             if (touch != -1) {
                 wk->listActive = TRUE;
             }
@@ -1003,7 +1006,7 @@ static BOOL PMSSelect_SeqSelect(u32 *seq, PMSSelectWork *wk) {
 }
 
 static BOOL PMSSelect_SeqTouchBarOff(u32 *seq, PMSSelectWork *wk) {
-    func_ov139_02199c90(wk->touchBar, FALSE);
+    TouchBar_SetVisible(wk->touchBar, FALSE);
     return TRUE;
 }
 

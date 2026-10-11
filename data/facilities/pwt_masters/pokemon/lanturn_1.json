@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LANTURN",
+    "moves": [ "MOVE_THUNDERBOLT", "MOVE_SCALD", "MOVE_ICE_BEAM", "MOVE_TOXIC" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

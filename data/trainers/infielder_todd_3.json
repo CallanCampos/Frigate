@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Todd",
+    "class": "TRAINER_CLASS_INFIELDER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_SUPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_GURDURR",
+            "form": 0,
+            "level": 34,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My partner and I have been through a\nlot together! Here we go!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I won't let consecutive losses get me down!\nThat's my policy!"
+        },
+        {
+            "type": 15,
+            "text": "This is a token of my appreciation!\nTake it with you!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Don't let losses get you down, either!\nDo things your own way!"
+        }
+    ]
+}

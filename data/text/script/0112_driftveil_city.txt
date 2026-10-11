@@ -1,5 +1,0 @@
-Sometimes you can learn about\nPokémon moves and items{be00}\non TV programs.
-Some Pokémon evolve by trade!{be01}\nCool, right?\nWhy do they evolve?!
-Queak, queak!
-You might be able to learn something\nif you check out battles between people{be00}\nwho are stronger than you.
-\pad{58}

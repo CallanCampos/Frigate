@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_CRESSELIA",
+    "moves": [ "MOVE_PSYCHIC", "MOVE_SUBSTITUTE", "MOVE_TOXIC", "MOVE_TRICK_ROOM" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_BRIGHT_POWDER",
+    "form": 0
+}

@@ -1,0 +1,174 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 293,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0402",
+            "script": 2,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 28,
+                "z": 34,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": 293,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0402",
+            "script": 3,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 28,
+                "z": 33,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": 293,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0402",
+            "script": 5,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 28,
+                "z": 31,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": 293,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0402",
+            "script": 4,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 26,
+                "z": 29,
+                "y": 0
+            }
+        },
+        {
+            "id": 4,
+            "model": 291,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0402",
+            "script": 1,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 27,
+                "z": 34,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_2",
+            "warp": 6,
+            "unk4": 2,
+            "transition": 3,
+            "grid": {
+                "x": 520,
+                "y": 0,
+                "z": 232,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_3",
+            "warp": 0,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 520,
+                "y": 0,
+                "z": 792,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_GIANT_CHASM_4",
+            "warp": 2,
+            "unk4": 4,
+            "transition": 4,
+            "grid": {
+                "x": 360,
+                "y": 0,
+                "z": 472,
+                "width": 1,
+                "height": 3,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE_12",
+            "warp": 2,
+            "unk4": 2,
+            "transition": 3,
+            "grid": {
+                "x": 520,
+                "y": 0,
+                "z": 232,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": [
+        {
+            "type": 4,
+            "script": 6
+        },
+        {
+            "type": 3,
+            "script": 7
+        },
+        {
+            "type": 2,
+            "script": 8
+        }
+    ]
+}

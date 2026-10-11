@@ -107,7 +107,7 @@ u16 func_ov062_021e62a8(PokewoodSystem *sys) {
     return sys->unkD8;
 }
 
-void PokewoodSystem_SetMovie(PokewoodSystem *sys, u16 movie) {
+void PokewoodSystem_SetMovie(PokewoodSystem *sys, int movie) {
     sys->movie = movie;
 }
 
@@ -221,7 +221,7 @@ void Pokewood_CheckMedals(GameData *gameData) {
     }
 }
 
-void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult) {
+void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32 movie) {
     const PokewoodBattleResult *result = battleResult;
     PokeParty *party = result->party;
     PokewoodRecord record;

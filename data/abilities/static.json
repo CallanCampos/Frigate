@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Static",
+    "description": "Contact with the Pokémon\nmay cause paralysis."
+}

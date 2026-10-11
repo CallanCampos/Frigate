@@ -36,8 +36,10 @@ src/ov167/btl_server_cmd.c:
     .bss        start:0x021db024 end:0x021db044
 
 src/ov167/btl_pokeparam.c:
+    complete
     .text       start:0x021ba584 end:0x021bc6bc
     .data       start:0x021daf7c end:0x021daf8c
+    .bss        start:0x021db070 end:0x021db194
 
 src/ov167/battle_event.c:
     complete
@@ -46,6 +48,7 @@ src/ov167/battle_event.c:
     .bss        start:0x021db194 end:0x021dd844
 
 src/ov167/btl_calc.c:
+    complete
     .text       start:0x021bd054 end:0x021bdaf8
     .rodata     start:0x021d74a0 end:0x021d7624
     .data       start:0x021daf94 end:0x021dafa0
@@ -56,14 +59,17 @@ src/ov167/battle_action.c:
     .text       start:0x021bdaf8 end:0x021bdcac
 
 src/ov167/ability_handlers.c:
+    complete
     .text       start:0x021bdcac end:0x021c26ec
     .rodata     start:0x021d7624 end:0x021d83e8
 
 src/ov167/item_handlers.c:
+    complete
     .text       start:0x021c26ec end:0x021c5b04
     .rodata     start:0x021d83e8 end:0x021d9488
 
 src/ov167/move_handlers.c:
+    complete
     .text       start:0x021c5b04 end:0x021cde38
     .rodata     start:0x021d9488 end:0x021da8c4
 

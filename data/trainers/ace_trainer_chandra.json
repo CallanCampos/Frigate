@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Chandra",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DARMANITAN",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_FLARE_BLITZ", "MOVE_SUPERPOWER", "MOVE_THRASH", "MOVE_ROCK_SLIDE" ]
+        },
+        {
+            "species": "SPECIES_TANGROWTH",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_POWER_WHIP", "MOVE_BRICK_BREAK", "MOVE_SLUDGE_BOMB", "MOVE_ROCK_TOMB" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I want to show how much I love Pokémon\nby winning!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I can't show my love for Pokémon if I go\nand lose!"
+        },
+        {
+            "type": 2,
+            "text": "I-I can't express my gratitude toward\nmy Pokémon except by winning.{be01}\nWhat should I do?"
+        }
+    ]
+}

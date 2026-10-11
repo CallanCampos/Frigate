@@ -1,6 +1,8 @@
 // The battle facilities' events: picking the Pokémon to enter, and a Trainer's message in a balloon. The name is a
 // guess after fld_btl_inst_tool.c, which follows it
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
 #include "battle/regulation.h"
@@ -138,7 +140,7 @@ GameEvent *func_ov012_02161e6c(GameSystem *gsys, BSubwayTrainer *trainers, u32 i
         MsgData *msgData;
 
         work->strbuf = GFL_StrBufCreate(0x5c, HEAPID_GAMEEVENT);
-        msgData = GFL_MsgSysLoadData(FALSE, 2, 0x178, HEAPID_GAMEEVENT);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BATTLE_SUBWAY_TRAINER_MESSAGES, HEAPID_GAMEEVENT);
         GFL_MsgDataLoadStrbuf(msgData, trainers->message.id, work->strbuf);
         GFL_MsgDataFree(msgData);
     } else {

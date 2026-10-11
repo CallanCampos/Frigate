@@ -1,5 +1,7 @@
 #include "types.h"
-#include "app/ov174.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
+#include "app/ircbattlematch.h"
 #include "constants/version.h"
 #include "field/event_poke_status.h"
 #include "field/field.h"
@@ -43,7 +45,7 @@ typedef struct {
 typedef struct {
     FieldScriptEnv *env;
     MusicalCommWork *work;
-} MusicalOv174Holder;
+} MusicalIrcMatchHolder;
 
 typedef struct {
     u16 *a0;
@@ -53,7 +55,7 @@ typedef struct {
 
 void func_ov012_02158bfc(ScriptWork *work, GameData *gameData);
 void func_ov012_02158c40(MusicalCommWork *work, GameData *gameData);
-void *func_ov012_02158c6c(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value);
+void func_ov012_02158c6c(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value);
 void func_ov012_02158c78(MusicalCommWork *work);
 GameEventReturnCode func_ov012_02158c8c(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode func_ov012_02158d24(GameEvent *event, u32 *state, void *data);
@@ -417,9 +419,9 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
     case 1:
     case 8:
         if (kind == 1) {
-            msgData = GFL_MsgSysLoadData(FALSE, 2, 0x5d, heapId);
+            msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_13, heapId);
         } else {
-            msgData = GFL_MsgSysLoadData(FALSE, 2, 0x1e4, heapId);
+            msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0484, heapId);
         }
         str = GFL_MsgDataLoadStrbufNew(msgData, arg + 3);
         func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
@@ -432,14 +434,14 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         GFL_StrBufFree(str);
         break;
     case 3:
-        msgData = GFL_MsgSysLoadData(FALSE, 2, 0x60, heapId);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         str = GFL_MsgDataLoadStrbufNew(msgData, arg);
         func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
         GFL_MsgDataFree(msgData);
         break;
     case 4:
-        msgData = GFL_MsgSysLoadData(FALSE, 2, 0x60, heapId);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         str = GFL_MsgDataLoadStrbufNew(msgData, arg + 4);
         func_0202437c(wordSet, wordIndex, str, 0, 1, 2);
         GFL_StrBufFree(str);
@@ -488,7 +490,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         } else {
             messages[2] = order[3] + 4;
         }
-        msgData = GFL_MsgSysLoadData(FALSE, 2, 0x60, heapId);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_S005D_WORD_SET_MUSICAL_INFO, heapId);
         for (i = 0; i < 3; i++) {
             str = GFL_MsgDataLoadStrbufNew(msgData, messages[i]);
             func_0202437c(wordSet, i, str, 0, 1, 2);
@@ -535,7 +537,7 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
     BOOL allowed;
     s32 i;
     PlayerInfo *info;
-    MusicalOv174Holder *holder;
+    MusicalIrcMatchHolder *holder;
 
     ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
@@ -610,21 +612,21 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 18:
-        holder = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GAMEEVENT), sizeof(MusicalOv174Holder), TRUE, "scrcmd_musical.c",
-                                  1004);
+        holder = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GAMEEVENT), sizeof(MusicalIrcMatchHolder), TRUE,
+                                  "scrcmd_musical.c", 1004);
         holder->env = env;
         holder->work = commWork;
         commWork->result = result;
-        commWork->ov174.gameData = gameData;
-        commWork->ov174.unk20 = func_ov211_021f0608(gameData);
-        commWork->ov174.unk24 = 0;
+        commWork->ircMatch.gameData = gameData;
+        commWork->ircMatch.musicalNetInit = func_ov211_021f0608(gameData);
+        commWork->ircMatch.netError = 0;
         if (arg == 0) {
-            commWork->ov174.result = 9;
+            commWork->ircMatch.result = IRCBATTLEMATCH_MODE_MUSICAL_ARG0;
         } else {
-            commWork->ov174.result = 10;
+            commWork->ircMatch.result = IRCBATTLEMATCH_MODE_MUSICAL_ARG1;
         }
-        ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_OV174, &data_ov174_0219f0fc, &commWork->ov174,
-                                                 func_ov012_02158dac, holder));
+        ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
+                                                 &commWork->ircMatch, func_ov012_02158dac, holder));
         return TRUE;
     case 19:
         if (commWork->comm != NULL && lost == TRUE) {
@@ -645,7 +647,7 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
         if (GFL_NetErrCheck()) {
             func_02016b0c(gsys, 1);
             *result = 1;
-        } else if (commWork != NULL && commWork->ov174.unk24 == 1) {
+        } else if (commWork != NULL && commWork->ircMatch.netError == 1) {
             *result = TRUE;
         } else {
             *result = FALSE;
@@ -692,8 +694,8 @@ void func_ov012_02158c40(MusicalCommWork *work, GameData *gameData) {
     func_020179d4(gameData, NULL);
 }
 
-void *func_ov012_02158c6c(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value) {
-    return func_ov211_021ef1e0(HEAPID_GAMEEVENT, gsys, comm, value);
+void func_ov012_02158c6c(MusicalCommWork *work, GameSystem *gsys, GameCommSys *comm, u16 value) {
+    func_ov211_021ef1e0(HEAPID_GAMEEVENT, gsys, comm, value);
 }
 
 void func_ov012_02158c78(MusicalCommWork *work) {
@@ -783,12 +785,13 @@ void func_ov012_02158da0(void *arg) {
 }
 
 void func_ov012_02158dac(void *arg) {
-    MusicalOv174Holder *holder = arg;
+    MusicalIrcMatchHolder *holder = arg;
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(holder->env);
 
     FieldScriptEnv_GetGameData(holder->env);
     GSYS_GetGameCommSystem(gsys);
-    if (holder->work->ov174.result != 12 && holder->work->ov174.result != 13) {
+    if (holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_QUIT
+        && holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_BACK) {
         *holder->work->result = 1;
         func_ov211_021ef3b8(holder->work->comm);
     } else {

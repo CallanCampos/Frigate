@@ -1,7 +1,7 @@
 #include "types.h"
 #include "app/mb_parent.h"
 #include "app/unova_link.h"
-#include "dpw/nhttp_rap.h"
+#include "gfl/nhttp_rap.h"
 #include "dwc/dwc.h"
 #include "gfl/dwc_rap.h"
 #include "gfl/heap.h"
@@ -67,7 +67,7 @@ static void KeySystemNet_Receive(int netId, int size, const void *data, void *wo
 static BOOL KeySystemNet_CanRequest(KeySystemNet *net, u32 request);
 static void KeySystemNet_Stop(KeySystemNet *net);
 static void KeySystemNet_OnError(KeySystemNet *net);
-static void KeySystemNet_OnWifiError(void *work, int a1, int code);
+static void KeySystemNet_OnWifiError(void *work, int a1, int code, int error);
 
 static const NetCommand sKeySystemNetCommands[] = {
     { KeySystemNet_Receive, NULL },
@@ -172,7 +172,7 @@ void KeySystemNet_SetMode(KeySystemNet *net, u32 mode) {
             break;
         case KEY_SYSTEM_NET_MODE_WIFI:
             GFL_OvlLoad(OVERLAY_ID(189));
-            func_ov011_02152040(KeySystemNet_OnWifiError, net);
+            DWCRap_SetErrorFunc(KeySystemNet_OnWifiError, net);
             break;
         }
     }
@@ -611,15 +611,15 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
     case 0:
         net->hasReceived = FALSE;
         request->wifi.result = 0;
-        net->http = func_ov189_0219d1b8(net->heapId, func_02008bdc(GetGameDataPlayerInfo(net->gameData)), net->buffer);
-        func_ov189_0219d3bc(net->http, request->wifi.buffer, request->wifi.size);
-        if (func_ov189_0219d05c(10, request->wifi.id, net->http)) {
+        net->http = NHttpRap_Create(net->heapId, func_02008bdc(GetGameDataPlayerInfo(net->gameData)), net->buffer);
+        NHttpRap_SetAnswerBuffer(net->http, request->wifi.buffer, request->wifi.size);
+        if (NHttpRap_SendRequestWithId(10, request->wifi.id, net->http)) {
             *state = 1;
         }
         net->timer = 0;
         break;
     case 1:
-        if (!func_ov189_0219d0f8(net->http)) {
+        if (!NHttpRap_StartRequest(net->http)) {
             *state = 2;
         } else {
             GFL_ASSERT(0);
@@ -628,7 +628,7 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
         }
         break;
     case 2:
-        status = func_ov189_0219d3a8(net->http);
+        status = NHttpRap_GetStatus(net->http);
         switch (status) {
         case 503:
             net->error = TRUE;
@@ -649,9 +649,9 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
             request->wifi.result = 2;
             *state = 3;
         } else {
-            status = func_ov189_0219d140(net->http);
+            status = NHttpRap_Poll(net->http);
             if (status == 0) {
-                response = func_ov189_0219d1a4(net->http);
+                response = NHttpRap_GetAnswer(net->http);
                 switch (*(int *)response) {
                 case 0:
                     *state = 3;
@@ -689,10 +689,10 @@ static void KeySystemNet_SeqWifiPost(KeySystemSeq *seq, int *state, void *work) 
         }
         break;
     case 3:
-        func_ov189_0219d3cc(net->http);
+        NHttpRap_ResetAnswerBuffer(net->http);
         if (net->http != NULL) {
-            func_ov189_0219d124(net->http);
-            func_ov189_0219d1f0(net->http);
+            NHttpRap_EndRequest(net->http);
+            NHttpRap_Destroy(net->http);
             net->http = NULL;
         }
         KeySystemSeq_Set(seq, KeySystemNet_SeqIdle);
@@ -710,13 +710,13 @@ static void KeySystemNet_SeqWifiGet(KeySystemSeq *seq, int *state, void *work) {
     case 0:
         net->hasReceived = FALSE;
         request->wifiGet.result = 0;
-        net->http = func_ov189_0219d1b8(net->heapId, func_02008bdc(GetGameDataPlayerInfo(net->gameData)), net->buffer);
-        if (func_ov189_0219d010(0, net->http)) {
+        net->http = NHttpRap_Create(net->heapId, func_02008bdc(GetGameDataPlayerInfo(net->gameData)), net->buffer);
+        if (NHttpRap_SendRequest(0, net->http)) {
             *state = 1;
         }
         break;
     case 1:
-        if (!func_ov189_0219d0f8(net->http)) {
+        if (!NHttpRap_StartRequest(net->http)) {
             *state = 2;
         } else {
             request->wifiGet.result = 1;
@@ -724,10 +724,10 @@ static void KeySystemNet_SeqWifiGet(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 2:
-        status = func_ov189_0219d140(net->http);
+        status = NHttpRap_Poll(net->http);
         if (status == 0) {
-            response = func_ov189_0219d1a4(net->http);
-            switch (func_ov189_0219d3a8(net->http)) {
+            response = NHttpRap_GetAnswer(net->http);
+            switch (NHttpRap_GetStatus(net->http)) {
             case 503:
                 net->error = TRUE;
                 net->errorCode = 0x3e;
@@ -763,8 +763,8 @@ static void KeySystemNet_SeqWifiGet(KeySystemSeq *seq, int *state, void *work) {
         break;
     case 3:
         if (net->http != NULL) {
-            func_ov189_0219d124(net->http);
-            func_ov189_0219d1f0(net->http);
+            NHttpRap_EndRequest(net->http);
+            NHttpRap_Destroy(net->http);
             net->http = NULL;
         }
         KeySystemSeq_Set(seq, KeySystemNet_SeqIdle);
@@ -840,10 +840,10 @@ static void KeySystemNet_Stop(KeySystemNet *net) {
         }
         break;
     case KEY_SYSTEM_NET_MODE_WIFI:
-        func_ov011_02152040(NULL, NULL);
+        DWCRap_SetErrorFunc(NULL, NULL);
         if (net->http != NULL) {
-            func_ov189_0219d124(net->http);
-            func_ov189_0219d1f0(net->http);
+            NHttpRap_EndRequest(net->http);
+            NHttpRap_Destroy(net->http);
             net->http = NULL;
         }
         GFL_OvlUnload(OVERLAY_ID(189));
@@ -857,13 +857,13 @@ static void KeySystemNet_OnError(KeySystemNet *net) {
     }
 }
 
-static void KeySystemNet_OnWifiError(void *work, int a1, int code) {
+static void KeySystemNet_OnWifiError(void *work, int a1, int code, int error) {
     KeySystemNet *net = work;
 
     if (code == 3 || code == 6) {
         if (net->http != NULL) {
-            func_ov189_0219d124(net->http);
-            func_ov189_0219d1f0(net->http);
+            NHttpRap_EndRequest(net->http);
+            NHttpRap_Destroy(net->http);
             net->http = NULL;
         }
     }

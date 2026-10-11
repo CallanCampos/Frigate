@@ -1,0 +1,42 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Close Combat",
+    "description": "The user fights the target up close\nwithout guarding itself. It also cuts\nthe user's Defense and Sp. Def.",
+    "type": "TYPE_FIGHTING",
+    "quality": "MOVE_QUALITY_DAMAGE_USER_STAT_CHANGE",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 120,
+    "accuracy": 100,
+    "pp": 5,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_DEF_SPD_DOWN_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [
+        {
+            "stat": "BATTLEMON_DEFENSE_STAGE",
+            "stages": -1,
+            "chance": 100
+        },
+        {
+            "stat": "BATTLEMON_SP_DEFENSE_STAGE",
+            "stages": -1,
+            "chance": 100
+        }
+    ],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

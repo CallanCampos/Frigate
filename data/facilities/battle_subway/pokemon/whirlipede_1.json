@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_WHIRLIPEDE",
+    "moves": [ "MOVE_POISON_TAIL", "MOVE_BUG_BITE", "MOVE_ROLLOUT", "MOVE_DEFENSE_CURL" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_COBA_BERRY",
+    "form": 0
+}

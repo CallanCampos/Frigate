@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LAMPENT",
+    "moves": [ "MOVE_INFERNO", "MOVE_SHADOW_BALL", "MOVE_CONFUSE_RAY", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_ABSORB_BULB",
+    "form": 0
+}

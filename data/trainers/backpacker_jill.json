@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jill",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_OMANYTE",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ANORITH",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SHIELDON",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ARCHEOPS",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hm? You're headed for the Juniper\nPokémon Lab, are you?{be01}\nWon't you have a bit of fun first?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You were not an opponent one could\ndefeat without trying!"
+        },
+        {
+            "type": 2,
+            "text": "I came all the way here wanting to hear\nProfessor Juniper talk!{be01}\nShe was also a Backpacker once, so I bet\nwe'd have a great time swapping tales!"
+        }
+    ]
+}

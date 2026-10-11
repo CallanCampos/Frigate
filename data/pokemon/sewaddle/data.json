@@ -1,0 +1,129 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Sewaddle",
+    "pokedex": {
+        "category": "Sewing Pokémon",
+        "entry": "Since this Pokémon makes its own\nclothes out of leaves, it is a popular\nmascot for fashion designers.",
+        "height": "1'00\"",
+        "weight": "5.5 lbs.",
+        "languages": {
+            "ja": {
+                "category": "さいほうポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 53,
+        "defense": 70,
+        "speed": 42,
+        "special_attack": 40,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_BUG", "TYPE_GRASS" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_MENTAL_HERB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SWARM", "ABILITY_CHLOROPHYLL" ],
+    "hidden_ability": "ABILITY_OVERCOAT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 62,
+    "height": 3,
+    "weight": 25,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_STRING_SHOT" ],
+            [ 8, "MOVE_BUG_BITE" ],
+            [ 15, "MOVE_RAZOR_LEAF" ],
+            [ 22, "MOVE_STRUGGLE_BUG" ],
+            [ 29, "MOVE_ENDURE" ],
+            [ 36, "MOVE_BUG_BUZZ" ],
+            [ 43, "MOVE_FLAIL" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM66",
+            "TM70",
+            "TM76",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_SEED_BOMB",
+            "MOVE_MAGIC_COAT",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ELECTROWEB",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_SILVER_WIND",
+            "MOVE_SCREECH",
+            "MOVE_RAZOR_WIND",
+            "MOVE_MIND_READER",
+            "MOVE_AGILITY",
+            "MOVE_ME_FIRST",
+            "MOVE_BATON_PASS",
+            "MOVE_CAMOUFLAGE",
+            "MOVE_AIR_SLASH"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 20,
+            "species": "SPECIES_SWADLOON"
+        }
+    ],
+    "regional_dex_number": 17,
+    "baby_species": "SPECIES_SEWADDLE"
+}

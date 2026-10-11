@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Bob",
+    "class": "TRAINER_CLASS_LINEBACKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_PROTEIN",
+    "party": [
+        {
+            "species": "SPECIES_SAWK",
+            "form": 0,
+            "level": 62,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_THROH",
+            "form": 0,
+            "level": 62,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_HARIYAMA",
+            "form": 0,
+            "level": 62,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Kids! Please cooperate with the\nspecial training for my Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My block was supposed to guard\nagainst even Steel-type Pokémon..."
+        },
+        {
+            "type": 15,
+            "text": "This gift might be more effective\nthan my block!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Physical therapy is over,\nso we're doing some special training."
+        }
+    ]
+}

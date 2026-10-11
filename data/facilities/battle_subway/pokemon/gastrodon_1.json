@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GASTRODON",
+    "moves": [ "MOVE_RAIN_DANCE", "MOVE_SLUDGE_BOMB", "MOVE_MUDDY_WATER", "MOVE_COUNTER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_GENTLE",
+    "item": "ITEM_DAMP_ROCK",
+    "form": 0
+}

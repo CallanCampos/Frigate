@@ -1,0 +1,176 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 61,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x028f",
+            "script": 1,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 18,
+                "z": 20,
+                "y": 32768
+            }
+        },
+        {
+            "id": 1,
+            "model": 22,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x028f",
+            "script": 2,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 19,
+                "z": 20,
+                "y": 32768
+            }
+        },
+        {
+            "id": 2,
+            "model": 44,
+            "movement": 3,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 1
+            },
+            "grid": {
+                "x": 13,
+                "z": 27,
+                "y": 229376
+            }
+        },
+        {
+            "id": 3,
+            "model": 11,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x028f",
+            "script": 7,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 10,
+                "z": 18,
+                "y": 32768
+            }
+        },
+        {
+            "id": 4,
+            "model": 47,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x028f",
+            "script": 5,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 14,
+                "z": 18,
+                "y": 32768
+            }
+        },
+        {
+            "id": 5,
+            "model": 24,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x028f",
+            "script": 6,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 23,
+                "z": 18,
+                "y": 32768
+            }
+        },
+        {
+            "id": 6,
+            "model": 15,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x028f",
+            "script": 8,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 1
+            },
+            "grid": {
+                "x": 9,
+                "z": 18,
+                "y": 32768
+            }
+        },
+        {
+            "id": 7,
+            "model": 18,
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 4,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 17,
+                "z": 18,
+                "y": 32768
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_NIMBASA_CITY_8",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 248,
+                "y": 56,
+                "z": 472,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

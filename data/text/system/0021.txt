@@ -1,13 +1,13 @@
-{0107:0}
-PP
-{0201:0}/{0201:1}
-{0102:0}⑭
-{0102:0}⑮
-{0102:0}
-{0202:0}
-/
-{0201:0}
-Playback paused...\nPlease wait a moment.
-Data is corrupted.\nPlayback canceled.
-Skipping the video...\nPlease wait a moment.
-Playback stopped...\nPlease wait a moment.
+Bank0021_Text_Empty = {0107:0}
+Bank0021_Text_Pp = PP
+Bank0021_Text_Empty_2 = {0201:0}/{0201:1}
+Bank0021_Text_Empty_3 = {0102:0}⑭
+Bank0021_Text_Empty_4 = {0102:0}⑮
+Bank0021_Text_Empty_5 = {0102:0}
+Bank0021_Text_Empty_6 = {0202:0}
+Bank0021_Text_Empty_7 = /
+Bank0021_Text_Empty_8 = {0201:0}
+Bank0021_Text_PlaybackPausedPleaseWait = Playback paused...\nPlease wait a moment.
+Bank0021_Text_DataCorruptedPlaybackCanceled = Data is corrupted.\nPlayback canceled.
+Bank0021_Text_SkippingVideoPleaseWait = Skipping the video...\nPlease wait a moment.
+Bank0021_Text_PlaybackStoppedPleaseWait = Playback stopped...\nPlease wait a moment.

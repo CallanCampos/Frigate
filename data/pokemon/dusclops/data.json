@@ -1,0 +1,199 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Dusclops",
+    "pokedex": {
+        "category": "Beckon Pokémon",
+        "entry": "It seeks drifting will-o'-the-wisps\nand sucks them into its empty body.\nWhat happens inside is a mystery.",
+        "height": "5'03\"",
+        "weight": "67.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Dusclops",
+                "category": "Beckon Pokémon",
+                "entry": "It seeks drifting will-o'-the-wisps\nand sucks them into its empty body.\nWhat happens inside is a mystery.",
+                "height": "5'03\"",
+                "weight": "67.5 lbs."
+            },
+            "fr": {
+                "name": "Téraclope",
+                "category": "Pokémon Appel",
+                "entry": "Il cherche des feux follets pour\nles avaler. Ce qui se passe alors\ndans son corps est un mystère.",
+                "height": "1,6 m",
+                "weight": "30,6 kg"
+            },
+            "de": {
+                "name": "Zwirrklop",
+                "category": "Wink",
+                "entry": "Sucht dahintreibende Irrlichter und\nsaugt sie in seinen leeren Körper.\nAlles andere ist ein Rätsel.",
+                "height": "1,6 m",
+                "weight": "30,6 kg"
+            },
+            "it": {
+                "name": "Dusclops",
+                "category": "Pokémon Ipnosguardo",
+                "entry": "Va in cerca di fuochi fatui e li risucchia\nnel suo corpo vuoto. Cosa succeda\nall'interno è un mistero.",
+                "height": "1,6 m",
+                "weight": "30,6 kg"
+            },
+            "ko": {
+                "name": "미라몽",
+                "category": "손짓포켓몬",
+                "entry": "떠돌고 있는 도깨비불을 발견하여\n텅 빈 체내로 빨아들인다.\n빨려 들어가서 어떻게 되는가는 비밀.",
+                "height": "1.6 m",
+                "weight": "30.6 kg"
+            },
+            "es": {
+                "name": "Dusclops",
+                "category": "Pokémon Atrayente",
+                "entry": "Busca fuegos fatuos y los absorbe\ncon su cuerpo hueco. Lo que pasa\ndentro luego es un misterio.",
+                "height": "1,6 m",
+                "weight": "30,6 kg"
+            },
+            "ja": {
+                "name": "サマヨール",
+                "category": "てまねきポケモン",
+                "entry": "さまよっている\\x{3000}ひとだまを\\x{3000}みつけ\nからっぽの\\x{3000}たいないに\\x{3000}すいこむ。\nすいこまれて\\x{3000}どうなるかは\\x{3000}なぞ。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 70,
+        "defense": 130,
+        "speed": 25,
+        "special_attack": 60,
+        "special_defense": 130
+    },
+    "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_KASIB_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_PRESSURE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 159,
+    "height": 16,
+    "weight": 306,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_FIRE_PUNCH" ],
+            [ 1, "MOVE_ICE_PUNCH" ],
+            [ 1, "MOVE_THUNDER_PUNCH" ],
+            [ 1, "MOVE_GRAVITY" ],
+            [ 1, "MOVE_BIND" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_NIGHT_SHADE" ],
+            [ 1, "MOVE_DISABLE" ],
+            [ 6, "MOVE_DISABLE" ],
+            [ 9, "MOVE_FORESIGHT" ],
+            [ 14, "MOVE_ASTONISH" ],
+            [ 17, "MOVE_CONFUSE_RAY" ],
+            [ 22, "MOVE_SHADOW_SNEAK" ],
+            [ 25, "MOVE_PURSUIT" ],
+            [ 30, "MOVE_CURSE" ],
+            [ 33, "MOVE_WILL_O_WISP" ],
+            [ 37, "MOVE_SHADOW_PUNCH" ],
+            [ 42, "MOVE_HEX" ],
+            [ 49, "MOVE_MEAN_LOOK" ],
+            [ 58, "MOVE_PAYBACK" ],
+            [ 61, "MOVE_FUTURE_SIGHT" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM56",
+            "TM57",
+            "TM61",
+            "TM63",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM77",
+            "TM78",
+            "TM80",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_GRAVITY",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_WONDER_ROOM",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE_WITH_ITEM",
+            "param": "ITEM_REAPER_CLOTH",
+            "species": "SPECIES_DUSKNOIR"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_DUSKULL"
+}

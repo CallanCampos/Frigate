@@ -1,0 +1,198 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Psyduck",
+    "pokedex": {
+        "category": "Duck Pokémon",
+        "entry": "When headaches stimulate its brain\ncells, which are usually inactive,\nit can use a mysterious power.",
+        "height": "2'07\"",
+        "weight": "43.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Psyduck",
+                "category": "Duck Pokémon",
+                "entry": "Overwhelmed by enigmatic abilities,\nit suffers a constant headache. It\nsometimes uses mysterious powers.",
+                "height": "2'07\"",
+                "weight": "43.2 lbs."
+            },
+            "fr": {
+                "name": "Psykokwak",
+                "category": "Pokémon Canard",
+                "entry": "Ses pouvoirs déconcertants\net mystérieux lui font subir\nde constantes migraines.",
+                "height": "0,8 m",
+                "weight": "19,6 kg"
+            },
+            "de": {
+                "name": "Enton",
+                "category": "Ente",
+                "entry": "Leidet unter stetigem Kopfschmerz,\nausgelöst durch seltsame Kräfte,\ndie es aber auch einsetzen kann.",
+                "height": "0,8 m",
+                "weight": "19,6 kg"
+            },
+            "it": {
+                "name": "Psyduck",
+                "category": "Pokémon Papero",
+                "entry": "Turbato dalle sue abilità enigmatiche,\nsoffre di una costante emicrania.\nA volte usa poteri misteriosi.",
+                "height": "0,8 m",
+                "weight": "19,6 kg"
+            },
+            "ko": {
+                "name": "고라파덕",
+                "category": "오리포켓몬",
+                "entry": "이상한 능력을 주체 못하여\n언제나 두통에 시달리고 있다.\n가끔 이상한 힘을 쓴다.",
+                "height": "0.8 m",
+                "weight": "19.6 kg"
+            },
+            "es": {
+                "name": "Psyduck",
+                "category": "Pokémon Pato",
+                "entry": "Sus grandes habilidades le provocan\nun constante dolor de cabeza.\nA veces usa poderes místicos.",
+                "height": "0,8 m",
+                "weight": "19,6 kg"
+            },
+            "ja": {
+                "name": "コダック",
+                "category": "あひるポケモン",
+                "entry": "ふしぎな\\x{3000}のうりょくを\\x{3000}もてあまし\nいつも\\x{3000}ずつうに\\x{3000}なやまされている。\nたまに\\x{3000}ふしぎなちからを\\x{3000}つかう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff19}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 52,
+        "defense": 48,
+        "speed": 55,
+        "special_attack": 65,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_DAMP", "ABILITY_CLOUD_NINE" ],
+    "hidden_ability": "ABILITY_SWIFT_SWIM",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 64,
+    "height": 8,
+    "weight": 196,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_WATER_SPORT" ],
+            [ 1, "MOVE_SCRATCH" ],
+            [ 4, "MOVE_TAIL_WHIP" ],
+            [ 8, "MOVE_WATER_GUN" ],
+            [ 11, "MOVE_DISABLE" ],
+            [ 15, "MOVE_CONFUSION" ],
+            [ 18, "MOVE_WATER_PULSE" ],
+            [ 22, "MOVE_FURY_SWIPES" ],
+            [ 25, "MOVE_SCREECH" ],
+            [ 29, "MOVE_ZEN_HEADBUTT" ],
+            [ 32, "MOVE_AQUA_TAIL" ],
+            [ 36, "MOVE_SOAK" ],
+            [ 39, "MOVE_PSYCH_UP" ],
+            [ 43, "MOVE_AMNESIA" ],
+            [ 46, "MOVE_HYDRO_PUMP" ],
+            [ 50, "MOVE_WONDER_ROOM" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM29",
+            "TM31",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM56",
+            "TM65",
+            "TM70",
+            "TM77",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_ICE_PUNCH",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_WORRY_SEED",
+            "MOVE_WONDER_ROOM",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_HYPNOSIS",
+            "MOVE_PSYBEAM",
+            "MOVE_FORESIGHT",
+            "MOVE_FUTURE_SIGHT",
+            "MOVE_CROSS_CHOP",
+            "MOVE_REFRESH",
+            "MOVE_CONFUSE_RAY",
+            "MOVE_YAWN",
+            "MOVE_MUD_BOMB",
+            "MOVE_ENCORE",
+            "MOVE_SECRET_POWER",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SYNCHRONOISE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 33,
+            "species": "SPECIES_GOLDUCK"
+        }
+    ],
+    "regional_dex_number": 28,
+    "baby_species": "SPECIES_PSYDUCK"
+}

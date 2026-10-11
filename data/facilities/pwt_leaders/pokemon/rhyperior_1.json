@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_RHYPERIOR",
+    "moves": [ "MOVE_DRILL_RUN", "MOVE_STONE_EDGE", "MOVE_MEGAHORN", "MOVE_HAMMER_ARM" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_LIECHI_BERRY",
+    "form": 0
+}

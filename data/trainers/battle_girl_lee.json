@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lee",
+    "class": "TRAINER_CLASS_BATTLE_GIRL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TYROGUE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MACHOP",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_POLIWRATH",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I test the challenge rock\nwith my fist every day!{be01}\nIt is important to make steady progress,\nlittle by little.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I still have not\ntried hard enough!"
+        },
+        {
+            "type": 2,
+            "text": "I test the challenge rock every day\nwith my Pokémon!{be01}\nWhy don't you check out\nthe challenge rock{be00}\nwith a Fighting-type Pokémon?"
+        }
+    ]
+}

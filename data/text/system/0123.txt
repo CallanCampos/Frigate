@@ -1,30 +1,30 @@
-KABUTO
-KABUTOPS
-KADABRA
-KAKUNA
-KANGASKHAN
-KARATECHOP
-KARRABLAST
-KECLEON
-KEENEYE
-KELDEO
-KIDS
-KINDERGARTEN
-KINESIS
-KINGDRA
-KINGLER
-KIRLIA
-KLANG
-KLINK
-KLINKLANG
-KLUTZ
-KNOCKOFF
-KOFFING
-KRABBY
-KRICKETOT
-KRICKETUNE
-KROKOROK
-KROOKODILE
-KYOGRE
-KYUREM
+Bank0123_Text_Kabuto = KABUTO
+Bank0123_Text_Kabutops = KABUTOPS
+Bank0123_Text_Kadabra = KADABRA
+Bank0123_Text_Kakuna = KAKUNA
+Bank0123_Text_Kangaskhan = KANGASKHAN
+Bank0123_Text_Karatechop = KARATECHOP
+Bank0123_Text_Karrablast = KARRABLAST
+Bank0123_Text_Kecleon = KECLEON
+Bank0123_Text_Keeneye = KEENEYE
+Bank0123_Text_Keldeo = KELDEO
+Bank0123_Text_Kids = KIDS
+Bank0123_Text_Kindergarten = KINDERGARTEN
+Bank0123_Text_Kinesis = KINESIS
+Bank0123_Text_Kingdra = KINGDRA
+Bank0123_Text_Kingler = KINGLER
+Bank0123_Text_Kirlia = KIRLIA
+Bank0123_Text_Klang = KLANG
+Bank0123_Text_Klink = KLINK
+Bank0123_Text_Klinklang = KLINKLANG
+Bank0123_Text_Klutz = KLUTZ
+Bank0123_Text_Knockoff = KNOCKOFF
+Bank0123_Text_Koffing = KOFFING
+Bank0123_Text_Krabby = KRABBY
+Bank0123_Text_Kricketot = KRICKETOT
+Bank0123_Text_Kricketune = KRICKETUNE
+Bank0123_Text_Krokorok = KROKOROK
+Bank0123_Text_Krookodile = KROOKODILE
+Bank0123_Text_Kyogre = KYOGRE
+Bank0123_Text_Kyurem = KYUREM
 \pad{c4}

@@ -1,0 +1,36 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Neagle",
+    "class": "TRAINER_CLASS_POLICEMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HERDIER",
+            "form": 0,
+            "level": 22,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_TACKLE", "MOVE_BITE", "MOVE_ODOR_SLEUTH", "MOVE_WORK_UP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "What's a kid like you doing\nwandering around these parts?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "To have bested an officer like me...\nWhat kind of kid are you?!"
+        },
+        {
+            "type": 2,
+            "text": "An officer's job is to keep patrolling\neven when nothing's going on!"
+        }
+    ]
+}

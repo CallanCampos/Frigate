@@ -1,0 +1,182 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Kabuto",
+    "pokedex": {
+        "category": "Shellfish Pokémon",
+        "entry": "It is thought to have inhabited\nbeaches 300 million years ago.\nIt is protected by a stiff shell.",
+        "height": "1'08\"",
+        "weight": "25.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Kabuto",
+                "category": "Shellfish Pokémon",
+                "entry": "It is thought to have inhabited\nbeaches 300 million years ago.\nIt is protected by a stiff shell.",
+                "height": "1'08\"",
+                "weight": "25.4 lbs."
+            },
+            "fr": {
+                "name": "Kabuto",
+                "category": "Pokémon Carapace",
+                "entry": "On pense qu'il peuplait les plages\nil y a 300 millions d'années. Il est\nprotégé par une coquille robuste.",
+                "height": "0,5 m",
+                "weight": "11,5 kg"
+            },
+            "de": {
+                "name": "Kabuto",
+                "category": "Schaltier",
+                "entry": "Man geht davon aus, dass dieses\nPokémon vor 300 Millionen Jahren\ndie Strände bevölkerte.",
+                "height": "0,5 m",
+                "weight": "11,5 kg"
+            },
+            "it": {
+                "name": "Kabuto",
+                "category": "Pokémon Crostaceo",
+                "entry": "Si ritiene che vivesse sulle spiagge\n300 milioni di anni fa. È protetto da\nuna conchiglia robusta.",
+                "height": "0,5 m",
+                "weight": "11,5 kg"
+            },
+            "ko": {
+                "name": "투구",
+                "category": "껍질포켓몬",
+                "entry": "3억 년 전에 모래 해변에서\n살고 있었던 것으로 추측된다.\n단단한 껍질이 몸을 보호한다.",
+                "height": "0.5 m",
+                "weight": "11.5 kg"
+            },
+            "es": {
+                "name": "Kabuto",
+                "category": "Pokémon Marisco",
+                "entry": "Se cree que habitó las playas hace\n300 millones de años. Se protege\ncon una dura concha.",
+                "height": "0,5 m",
+                "weight": "11,5 kg"
+            },
+            "ja": {
+                "name": "カブト",
+                "category": "こうらポケモン",
+                "entry": "\\x{ff13}おくねんまえの\\x{3000}すなはまで\nくらしていたと\\x{3000}かんがえられている。\nかたい\\x{3000}カラが\\x{3000}みを\\x{3000}まもる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 80,
+        "defense": 90,
+        "speed": 55,
+        "special_attack": 55,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_ROCK", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_BATTLE_ARMOR" ],
+    "hidden_ability": "ABILITY_WEAK_ARMOR",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 71,
+    "height": 5,
+    "weight": 115,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_HARDEN" ],
+            [ 6, "MOVE_ABSORB" ],
+            [ 11, "MOVE_LEER" ],
+            [ 16, "MOVE_MUD_SHOT" ],
+            [ 21, "MOVE_SAND_ATTACK" ],
+            [ 26, "MOVE_ENDURE" ],
+            [ 31, "MOVE_AQUA_JET" ],
+            [ 36, "MOVE_MEGA_DRAIN" ],
+            [ 41, "MOVE_METAL_SOUND" ],
+            [ 46, "MOVE_ANCIENT_POWER" ],
+            [ 51, "MOVE_WRING_OUT" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM55",
+            "TM69",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM05"
+        ],
+        "by_tutor": [
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_BUBBLE_BEAM",
+            "MOVE_AURORA_BEAM",
+            "MOVE_RAPID_SPIN",
+            "MOVE_FLAIL",
+            "MOVE_KNOCK_OFF",
+            "MOVE_CONFUSE_RAY",
+            "MOVE_MUD_SHOT",
+            "MOVE_ICY_WIND",
+            "MOVE_SCREECH",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_FORESIGHT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 40,
+            "species": "SPECIES_KABUTOPS"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_KABUTO"
+}

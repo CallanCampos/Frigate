@@ -1,0 +1,7 @@
+VirbankCity3_Text_PokemonUsedWimpyBut = My Pokémon used to be wimpy,\nbut they've trained in the complex,{be00}\nand now they are very buff!
+VirbankCity3_Text_TrainerJustCasePokemon = Trainer!{be01}\nJust in case your\nPokémon gets burned,{be00}\nplease use this on the Pokémon.{be01}
+VirbankCity3_Text_CausePokemonsHpAttack = 'Cause a Pokémon's HP and Attack stat\ngo down when it's burned.{be01}\nIt'll be in a mess.
+VirbankCity3_Text_ChildrenTeachManyThings = Children teach me many things,\nso they are my teachers.{be00}\nPokémon are your teachers!
+VirbankCity3_Text_ClerksPokeMartsSell = Clerks in Poké Marts\nsell different items!
+VirbankCity3_Text_WhenUseRepelWild = When you use a Repel,\nwild Pokémon won't come out as much!{be00}\nDid you know that?
+VirbankCity3_Text_PokemonJumpsOutBattle = A Pokémon that jumps out in a battle is\nthe Pokémon on the top left in the list.{be01}\nSo have a weak Pokémon\non the top left!{be01}\nWhen a battle starts,\nswitch it to a strong Pokémon!{be00}\nSee? I know a great thing, don't I?

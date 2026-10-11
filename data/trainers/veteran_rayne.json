@@ -1,0 +1,63 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rayne",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MASQUERAIN",
+            "form": 0,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_HYDRO_PUMP", "MOVE_BUG_BUZZ", "MOVE_ICE_BEAM", "MOVE_RAIN_DANCE" ]
+        },
+        {
+            "species": "SPECIES_DRAGONAIR",
+            "form": 0,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_SURF", "MOVE_THUNDER", "MOVE_DRAGON_RUSH", "MOVE_DRAGON_DANCE" ]
+        },
+        {
+            "species": "SPECIES_SLOWBRO",
+            "form": 0,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_PSYSHOCK", "MOVE_SURF", "MOVE_GRASS_KNOT", "MOVE_RAIN_DANCE" ]
+        },
+        {
+            "species": "SPECIES_MAGNEZONE",
+            "form": 0,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_THUNDER", "MOVE_FLASH_CANNON", "MOVE_EXPLOSION", "MOVE_THUNDER_WAVE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I've asked myself if it really is natural\nfor Pokémon to live with people.{be01}\nI still haven't come up with an answer.{be01}\nBut we can still battle together!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "All sorts of feelings are stirred up\nby battling."
+        },
+        {
+            "type": 2,
+            "text": "Lose...and then accept all of the sorrow\nand frustration that comes with the loss.{be01}\nThat's what it means to be a Trainer--\nwhat it means to live with Pokémon."
+        }
+    ]
+}

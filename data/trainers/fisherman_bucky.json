@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Bucky",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_KRABBY",
+            "form": 0,
+            "level": 64,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_QWILFISH",
+            "form": 0,
+            "level": 64,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_KINGLER",
+            "form": 0,
+            "level": 64,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "If I just dangle this fishing line here, it\nlooks like I'm doing something, right?{be01}\nTruth is, I'm not doing a single thing!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I got caught up in it...\nCaught by my own bait..."
+        },
+        {
+            "type": 2,
+            "text": "In fishing, you'll have good days and\nyou'll have bad days.{be01}\nBut hey, losing is the mother of\nall invention!"
+        }
+    ]
+}

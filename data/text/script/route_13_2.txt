@@ -1,0 +1,7 @@
+Route132_Text_PokemonUsedDeliverMail = This Pokémon used to deliver\nMail to everyone!{be01}
+Route132_Text_KnowIllGivePower = I know! I'll give you the Power Lens\nthis Pokémon brought me!{be01}
+Route132_Text_KnowIllGivePower_2 = I know! I'll give you the Power Band\nthis Pokémon brought me!{be01}
+Route132_Text_DoesntMatterPokemonEven = It doesn't matter to this Pokémon even\nif it doesn't battle very well!
+Route132_Text_WreeWreek = Wree wreek!
+Route132_Text_HopeNewWinnerHas = I hope a new winner\nhas emerged in the PWT!
+Route132_Text_IdLikeGoPokestar = I'd like to go to Pokéstar Studios.\nI haven't been there in a while.{be01}\nI'm a fan of Mr. Stu Deeoh.\nI wish he would be in a movie.

@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 13,
+    "npc_cache": 24,
+    "area": 46,
+    "matrix": "MAP_MATRIX_TUBELINE_BRIDGE",
+    "scripts": "SCRIPTS_TUBELINE_BRIDGE",
+    "text": "SCRIPT_TEXT_TUBELINE_BRIDGE",
+    "bgm": "SEQ_BGM_H_03",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_TUBELINE_BRIDGE",
+    "place": "PLACE_TUBELINE_BRIDGE",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 10,
+    "transition": 4,
+    "battle_bg": 2,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": true,
+    "cam_bound": 136,
+    "name_icon": 19,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

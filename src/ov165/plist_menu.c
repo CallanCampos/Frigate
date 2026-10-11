@@ -1,6 +1,7 @@
 #include "app/pokelist.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -234,7 +235,7 @@ static StrBuf *PokeListMenu_GetItemName(PokeListWork *wk, PokeListMenu *menu, in
 
     if (item >= POKELIST_MENU_MOVE1 && item <= POKELIST_MENU_MOVE1 + 3) {
         u32 move = PokeParty_GetParam(wk->pkm, PKM_PARAM_MOVE1 + item - POKELIST_MENU_MOVE1, NULL);
-        MsgData *moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x193, wk->heapId);
+        MsgData *moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, wk->heapId);
 
         str = GFL_MsgDataLoadStrbufNew(moveNames, move);
         GFL_MsgDataFree(moveNames);

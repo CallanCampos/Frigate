@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cleo & Rio",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ROSELIA",
+            "form": 0,
+            "level": 40,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ROSELIA",
+            "form": 0,
+            "level": 40,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Rio and I are of one mind!{be01}\nThat's why you're going to have to\nuse two Pokémon against us!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Cleo: Wow, what a surprise!\nRio: Wow, what a surprise!"
+        },
+        {
+            "type": 5,
+            "text": "I've got to get stronger so\nI can take care of Rio!"
+        },
+        {
+            "type": 6,
+            "text": "You've only got one Pokémon with you?\nYou can't battle both of us like that!"
+        },
+        {
+            "type": 7,
+            "text": "It's so fun to battle alongside Cleo!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "Being able to combine your strength\nwith a great friend in battle is a truly{be00}\namazing thing!"
+        },
+        {
+            "type": 10,
+            "text": "You only have one Pokémon\nthat's ready for battle?{be01}\nToo bad! Two-against-two Pokémon\nbattles are really fun, you know?"
+        }
+    ]
+}

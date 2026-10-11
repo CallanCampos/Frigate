@@ -1,2 +1,0 @@
-It's a subway map of the Unova region.{be01}
-This is the platform for the train to\nAnville Town.

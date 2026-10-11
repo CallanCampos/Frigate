@@ -66,6 +66,8 @@ u8 func_020173ec(GameData *gameData);
 BSubwayScoreData *func_0201795c(GameData *gameData);
 BSubwayScrWork *func_0201794c(GameData *gameData);
 u8 func_02017b8c(GameData *gameData);
+// Adds one to a counter of the game data, to at most 99
+void func_02017b98(GameData *gameData);
 void func_02017bb4(GameData *gameData);
 void func_02017884(GameData *gameData);
 // Starts saving, and runs the save, returning 2 once it ends

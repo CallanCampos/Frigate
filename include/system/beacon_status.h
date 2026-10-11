@@ -9,8 +9,8 @@
 
 BeaconStatus *BeaconStatus_Create(HeapID heapId, HeapID msgHeapId);
 void BeaconStatus_Free(BeaconStatus *status);
-// Does nothing
-void func_0202d7a8(BeaconStatus *status);
+// Returns the status, which the log of received beacons (game_beacon.h's func_02013b80) is at the start of
+BeaconStatus *func_0202d7a8(BeaconStatus *status);
 u8 func_0202d7ac(BeaconStatus *status);
 void func_0202d7b8(BeaconStatus *status, u8 value);
 StrBuf *BeaconStatus_GetGreeting(BeaconStatus *status);

@@ -1,22 +1,22 @@
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}A siren blares loudly\n{bd02}at the UDF headquarters.\n{bd02}It's time to roll out.
-{bd02}A report arrives.\n{bd02}The Titanic Tyranitar has reappeared.\n\n{bd02}The young recruit {0100:1}\n{bd02}hurries to the scene.
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}A siren blares loudly\n{bd02}at the UDF headquarters.\n{bd02}It's time to roll out.
-{bd02}A report arrives.\n{bd02}The Titanic Tyranitar has reappeared.\n\n{bd02}The young recruit {0100:1}\n{bd02}hurries to the scene.
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0280_Text_UnovaDefenseForceUdf = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0280_Text_StoryTheirValiantStruggle = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0280_Text_SirenBlaresLoudlyUdf = {bd02}A siren blares loudly\n{bd02}at the UDF headquarters.\n{bd02}It's time to roll out.
+Bank0280_Text_ReportArrivesTitanicTyranitar = {bd02}A report arrives.\n{bd02}The Titanic Tyranitar has reappeared.\n\n{bd02}The young recruit {0100:1}\n{bd02}hurries to the scene.
+Bank0280_Text_Empty = なし
+Bank0280_Text_Empty_2 = なし
+Bank0280_Text_Empty_3 = なし
+Bank0280_Text_Empty_4 = なし
+Bank0280_Text_Empty_5 = なし
+Bank0280_Text_Empty_6 = なし
+Bank0280_Text_UnovaDefenseForceUdf_2 = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0280_Text_StoryTheirValiantStruggle_2 = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0280_Text_SirenBlaresLoudlyUdf_2 = {bd02}A siren blares loudly\n{bd02}at the UDF headquarters.\n{bd02}It's time to roll out.
+Bank0280_Text_ReportArrivesTitanicTyranitar_2 = {bd02}A report arrives.\n{bd02}The Titanic Tyranitar has reappeared.\n\n{bd02}The young recruit {0100:1}\n{bd02}hurries to the scene.
+Bank0280_Text_Empty_7 = なし
+Bank0280_Text_Empty_8 = なし
+Bank0280_Text_Empty_9 = なし
+Bank0280_Text_Empty_10 = なし
+Bank0280_Text_Empty_11 = なし
+Bank0280_Text_Empty_12 = なし
+Bank0280_Text_Empty_13 = なし
 \pad{74}

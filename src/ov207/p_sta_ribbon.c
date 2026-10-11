@@ -1,5 +1,6 @@
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -105,7 +106,7 @@ PStaRibbonWork *PStaRibbon_Create(PStatusWork *wk) {
 
     ribbon->isShown = FALSE;
     ribbon->seWait = 0;
-    ribbon->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x169, wk->heapId);
+    ribbon->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_RIBBON_NAMES, wk->heapId);
     return ribbon;
 }
 

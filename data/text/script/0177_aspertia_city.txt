@@ -1,6 +1,0 @@
-What kind of relationship do you want\nwith the Pokémon you meet?{be01}\nI'm happy just having them by my side!
-Since Poké Balls were invented,\nanyone can be with Pokémon!{be01}\nWe take it for granted now, but\nif you think about it, it's amazing!
-I want to have a Pokémon battle soon!
-Hey! Is that your Pokémon?\nWhoa! Cool!
-Hey! Is that your Pokémon?\nWhoa! Cool!
-\pad{a4}

@@ -1,6 +1,0 @@
-The legendary Pokémon that\ncreated the Unova region, Reshiram.{be01}
-Reshiram has been registered\nin the Pokédex.
-And the other legendary\nPokémon, Zekrom.{be01}
-Zekrom has been registered\nin the Pokédex.
-If you have these Pokémon,\nit's so easy to control{be00}\nthe Unova region, right?
-\pad{b8}

@@ -1,83 +1,83 @@
-Actress
-Enigma
-E: Well...{be01}\nThe basic functionality\nshouldn't be bad, but...
-E: If this test shows no problem\nwith durability...
-E: Hmm...
-E: OK.\nThe test is almost complete.{be01}\nUse the Zap Cannon to stop the UFO!
-{0100:1}: Um, why do you have a UFO?{be01}\nAnd what are we going to do with it?
-E: Next, I'll test the abilities of\nthe decoy UFO I developed.{be01}\nAre you ready, {0100:1}?
-{0100:1}: What?{be01}\nTest?\nDecoy UFO...?
-E: Save your questions for later.{be01}\nJust follow my instructions.{be01}\nYou have a Pokémon, don't you?
-{0100:1}: Huh?\nFight against the UFO?
-E: Exactly.\nThe UFO is programmed to keep{be00}\nattacking you.
-{0100:1}: Bwuh?\nThat's not dangerous?
-E: Tsk. Of course it's dangerous.\nHow else can you test properly?{be01}\nOh, and let me caution you...{be01}\nThe coating on the frame of this\nUFO has not yet been perfected.{be01}\nDamage from moves other than Zap Cannon\nwill ruin it.{be01}\nSo watch what you're doing! Got it?
-{0100:1}: Got it!
-E: Commence testing.{be01}\nWhen you're ready,\nbegin attacking the UFO!
-{0100:1}: Hmm.{be01}\nThe closer I look at it,\nthe more authentic it looks.{be01}\nIt doesn't seem any different from\na real UFO...
-E: Pay attention, please!{be01}\nNext, we'll test the functionality\nof the shield system...{be01}\nFocus energy from your\nPokémon on the UFO!
-{0100:1}: On it!
-E: Sounds good!\nGive it all you've got!
-{0100:1}: Eh? What?
-E: Why are you so slow?\nQuickly, now. Do as I say!
-{0100:1}: Urk. Don't flip out...
-E: I'm warning you, get focused.\nOr I won't be responsible for{be00}\nwhatever happens...
-E: OK, enough.\nThe test was successful.
-{0100:1}: Phew...\nWhat is this test for, exactly?{be01}\nAnd what's the story of this decoy\nyou mentioned earlier? What's a decoy?
-E: Certain creatures that live in groups\nhave a habit of gathering when they{be00}\nsee others of their kind...{be01}\nSeeing one of them signals to the others\nthat it's safe to gather.{be01}\nThat one is called a decoy.
-{0100:1}: I think I get it.\nBut what does that have to do with--
-E: OK, listen. My research has clearly shown\nthat UFOs begin gathering once a place{be00}\nappears to be safe...
-{0100:1}: You mean, real UFOs will gather\nnext to a decoy UFO because{be00}\nthey think it's safe?
-E: Exactly.\nBut there's more.{be01}\nI'm not going to use the decoy UFO to\nattract ordinary UFOs.{be01}\nWhat I'm looking for is their mothership.
-{0100:1}: Their mothership?
-E: Right.{be01}\nMy objective is to lure the mothership--\nthink of it as the UFO boss.{be01}\nIf we can destroy the mothership,\nthe remaining UFOs will panic and retreat.
-{0100:1}: Sounds like a plan!
-E: Listen up, {0100:1}.{be01}\nI've done the research and development.\nSo, your role in this plan...{be01}\nAs a member of the Unova Defense Force,\nthe destruction of the mothership{be00}\nis up to you!
-{0100:1}: I'm on board!{be01}\nBut, one thing I'm kind of wondering...\nHow do you know so much about UFOs?
-E: What did I say about staying focused?{be01}\nDon't ask questions you don't need\nthe answers to, {0100:1}.{be01}\nYou know your role.\nFocus on making my plan a success!
-E, the mysterious scientist, has provided\na meticulous analysis of the UFOs.{be01}\nE and {0100:1} now undertake a critical\nmission to save humanity from the invaders!
-{0100:1}: Pant...pant...
-E: What seems to be the\nproblem, {0100:1}?{be01}\nThe test is incomplete.\nNow, get on your feet!
-{0100:1}: That's all I've got.\nI'm exhausted.{be01}\nWe don't know for sure that the planet's\nabout to be destroyed, do we?{be01}\nIt should be OK if we rest for a moment.\nUrghhh. So tired.{be00}\nSo hungry and thirsty.
-E: Your weakness surprises me.{be01}\nI may have made a mistake\nthinking I could count on you.
-{0100:1}: Excuse me?!\nYou've got a mean mouth!
-E: Enough!{be01}\nHumanity's survival may be down to a few\nremaining hours.{be01}\nI need to find someone who can do the job!
-{0100:1}: There she goes... Oh, well.{be01}\nThere's no Trainer stronger than me\nanyway. So she'll be back sooner or later.{be01}\nOh, urgghhh...{be01}\nSo tired. Gotta take a break...
-Not realizing that the scientist E had gone\nfor good, {0100:1} fell soundly asleep.{be00}\nZzz... Zzz...{be01}\nHour upon hour passed.{be01}\nWhile {0100:1} snored and drooled, the\nUFOs carried out their attacks unopposed.{be00}\nAnd so, humanity perished...
-{0100:1}: Urgh...urgh...
-E: What's the matter?\nThe test hasn't been completed yet.
-{0100:1}: Wait...{be01}\nI don't have any Pokémon to fight with...
-E: There's no other way, then.{be01}\n{0100:1}--fight the UFO!
-{0100:1}: What?
-E: If you try, you can do it.\nActually, you have to do it!{be01}\nThere's no other choice.\nNow...attack the UFO!
-{0100:1}: Are you crazy?
-E: I'm starting the test now.{be01}\nI won't let you leave until\nwe get the data we need.
-With no Pokémon to help, {0100:1}\ntried to complete the test.{be01}\nBut a test with a human being alone could\nnot produce the data E needed.{be01}\nAs they tried again and again to complete\nthe test, swarms of UFOs descended.{be00}\nAnd so, humanity perished...
-{0100:1}: Oops!\nDid I overdo it?
-E: {0100:1}!
-{0100:1}: Yes?
-E: What have you done?{be01}\nYou've ruined the UFO!
-{0100:1}: Er, sorry.
-E: Were you paying attention\nto what I said?
-{0100:1}: ...Sorry.
-E: The fate of humanity\ndepends on this UFO!{be01}\nThere's no use in saying sorry!
-{0100:1}: ...Sorry.
-E: I don't want to hear you bleating\n“sorry, sorry, sorry." Useless!
-{0100:1}: S-sorry.
-E: I expect you to pay the cost of repairs.
-{0100:1}: Yeah, I guess.
-E: Let's see. Repairing this UFO will cost\napproximately $1,000,000,000.
-{0100:1}: Wha...{be01}\nWhaaaaat?!
-E: I take it that you're unwilling to pay...
-{0100:1}: I can't pay that!
-E: Then, until you can pay off your debt,\nyou'll work as my assistant for free.
-Having carelessly ruined the UFO developed\nby the mysterious scientist E, {0100:1} is{be00}\nsaddled with a debt too huge to ever repay.{be01}\nShe will be at E's beck and call\nfor the rest of her life.
-UFO: Vwwwssssh!
-{0100:1}: What's wrong?\nSomething is wrong with the UFO...
-UFO: Vwwwssssh! Vwwwzzzzt!
-E: Stop, {0100:1}!\nDon't use that move!
-{0100:1}: Huh?
-E: Wait, {0100:1}.{be01}\nNever, ever use that move on the UFO!
-{0100:1}: Got it, got it...\nNo need to get so mad.
-E: Listen and remember.{be01}\nThis UFO is a highly developed machine.\nThat move could cause its control system{be00}\nto malfunction.
-{0100:1}: Got it.{be01}\n(...Hmmm. Seems like the UFO has a\nweak point when it comes to Gravity...)
+Bank0197_Text_Actress = Actress
+Bank0197_Text_Enigma = Enigma
+Bank0197_Text_EWellBasicFunctionality = E: Well...{be01}\nThe basic functionality\nshouldn't be bad, but...
+Bank0197_Text_EIfTestShows = E: If this test shows no problem\nwith durability...
+Bank0197_Text_EHmm = E: Hmm...
+Bank0197_Text_EOkTestAlmost = E: OK.\nThe test is almost complete.{be01}\nUse the Zap Cannon to stop the UFO!
+Bank0197_Text_UmWhyHaveUfo = {0100:1}: Um, why do you have a UFO?{be01}\nAnd what are we going to do with it?
+Bank0197_Text_ENextIllTest = E: Next, I'll test the abilities of\nthe decoy UFO I developed.{be01}\nAre you ready, {0100:1}?
+Bank0197_Text_WhatTestDecoyUfo = {0100:1}: What?{be01}\nTest?\nDecoy UFO...?
+Bank0197_Text_ESaveQuestionsLater = E: Save your questions for later.{be01}\nJust follow my instructions.{be01}\nYou have a Pokémon, don't you?
+Bank0197_Text_HuhFightAgainstUfo = {0100:1}: Huh?\nFight against the UFO?
+Bank0197_Text_EExactlyUfoProgrammed = E: Exactly.\nThe UFO is programmed to keep{be00}\nattacking you.
+Bank0197_Text_BwuhThatsNotDangerous = {0100:1}: Bwuh?\nThat's not dangerous?
+Bank0197_Text_ETskCourseIts = E: Tsk. Of course it's dangerous.\nHow else can you test properly?{be01}\nOh, and let me caution you...{be01}\nThe coating on the frame of this\nUFO has not yet been perfected.{be01}\nDamage from moves other than Zap Cannon\nwill ruin it.{be01}\nSo watch what you're doing! Got it?
+Bank0197_Text_Got = {0100:1}: Got it!
+Bank0197_Text_ECommenceTestingWhen = E: Commence testing.{be01}\nWhen you're ready,\nbegin attacking the UFO!
+Bank0197_Text_HmmCloserLookMore = {0100:1}: Hmm.{be01}\nThe closer I look at it,\nthe more authentic it looks.{be01}\nIt doesn't seem any different from\na real UFO...
+Bank0197_Text_EPayAttentionPlease = E: Pay attention, please!{be01}\nNext, we'll test the functionality\nof the shield system...{be01}\nFocus energy from your\nPokémon on the UFO!
+Bank0197_Text_OnIt = {0100:1}: On it!
+Bank0197_Text_ESoundsGoodGive = E: Sounds good!\nGive it all you've got!
+Bank0197_Text_EhWhat = {0100:1}: Eh? What?
+Bank0197_Text_EWhySlowQuickly = E: Why are you so slow?\nQuickly, now. Do as I say!
+Bank0197_Text_UrkDontFlipOut = {0100:1}: Urk. Don't flip out...
+Bank0197_Text_EImWarningGet = E: I'm warning you, get focused.\nOr I won't be responsible for{be00}\nwhatever happens...
+Bank0197_Text_EOkEnoughTest = E: OK, enough.\nThe test was successful.
+Bank0197_Text_PhewWhatTestExactly = {0100:1}: Phew...\nWhat is this test for, exactly?{be01}\nAnd what's the story of this decoy\nyou mentioned earlier? What's a decoy?
+Bank0197_Text_ECertainCreaturesLive = E: Certain creatures that live in groups\nhave a habit of gathering when they{be00}\nsee others of their kind...{be01}\nSeeing one of them signals to the others\nthat it's safe to gather.{be01}\nThat one is called a decoy.
+Bank0197_Text_ThinkGetButWhat = {0100:1}: I think I get it.\nBut what does that have to do with--
+Bank0197_Text_EOkListenResearch = E: OK, listen. My research has clearly shown\nthat UFOs begin gathering once a place{be00}\nappears to be safe...
+Bank0197_Text_MeanRealUfosWill = {0100:1}: You mean, real UFOs will gather\nnext to a decoy UFO because{be00}\nthey think it's safe?
+Bank0197_Text_EExactlyButTheres = E: Exactly.\nBut there's more.{be01}\nI'm not going to use the decoy UFO to\nattract ordinary UFOs.{be01}\nWhat I'm looking for is their mothership.
+Bank0197_Text_TheirMothership = {0100:1}: Their mothership?
+Bank0197_Text_ERightObjectiveLure = E: Right.{be01}\nMy objective is to lure the mothership--\nthink of it as the UFO boss.{be01}\nIf we can destroy the mothership,\nthe remaining UFOs will panic and retreat.
+Bank0197_Text_SoundsLikePlan = {0100:1}: Sounds like a plan!
+Bank0197_Text_EListenUpIve = E: Listen up, {0100:1}.{be01}\nI've done the research and development.\nSo, your role in this plan...{be01}\nAs a member of the Unova Defense Force,\nthe destruction of the mothership{be00}\nis up to you!
+Bank0197_Text_ImBoardButOne = {0100:1}: I'm on board!{be01}\nBut, one thing I'm kind of wondering...\nHow do you know so much about UFOs?
+Bank0197_Text_EWhatDidSay = E: What did I say about staying focused?{be01}\nDon't ask questions you don't need\nthe answers to, {0100:1}.{be01}\nYou know your role.\nFocus on making my plan a success!
+Bank0197_Text_EMysteriousScientistHas = E, the mysterious scientist, has provided\na meticulous analysis of the UFOs.{be01}\nE and {0100:1} now undertake a critical\nmission to save humanity from the invaders!
+Bank0197_Text_PantPant = {0100:1}: Pant...pant...
+Bank0197_Text_EWhatSeemsProblem = E: What seems to be the\nproblem, {0100:1}?{be01}\nThe test is incomplete.\nNow, get on your feet!
+Bank0197_Text_ThatsAllIveGot = {0100:1}: That's all I've got.\nI'm exhausted.{be01}\nWe don't know for sure that the planet's\nabout to be destroyed, do we?{be01}\nIt should be OK if we rest for a moment.\nUrghhh. So tired.{be00}\nSo hungry and thirsty.
+Bank0197_Text_EWeaknessSurprisesMay = E: Your weakness surprises me.{be01}\nI may have made a mistake\nthinking I could count on you.
+Bank0197_Text_ExcuseYouveGotMean = {0100:1}: Excuse me?!\nYou've got a mean mouth!
+Bank0197_Text_EEnoughHumanitysSurvival = E: Enough!{be01}\nHumanity's survival may be down to a few\nremaining hours.{be01}\nI need to find someone who can do the job!
+Bank0197_Text_ThereSheGoesOh = {0100:1}: There she goes... Oh, well.{be01}\nThere's no Trainer stronger than me\nanyway. So she'll be back sooner or later.{be01}\nOh, urgghhh...{be01}\nSo tired. Gotta take a break...
+Bank0197_Text_NotRealizingScientistE = Not realizing that the scientist E had gone\nfor good, {0100:1} fell soundly asleep.{be00}\nZzz... Zzz...{be01}\nHour upon hour passed.{be01}\nWhile {0100:1} snored and drooled, the\nUFOs carried out their attacks unopposed.{be00}\nAnd so, humanity perished...
+Bank0197_Text_UrghUrgh = {0100:1}: Urgh...urgh...
+Bank0197_Text_EWhatsMatterTest = E: What's the matter?\nThe test hasn't been completed yet.
+Bank0197_Text_WaitDontHaveAny = {0100:1}: Wait...{be01}\nI don't have any Pokémon to fight with...
+Bank0197_Text_ETheresNoOther = E: There's no other way, then.{be01}\n{0100:1}--fight the UFO!
+Bank0197_Text_What = {0100:1}: What?
+Bank0197_Text_EIfTryCan = E: If you try, you can do it.\nActually, you have to do it!{be01}\nThere's no other choice.\nNow...attack the UFO!
+Bank0197_Text_Crazy = {0100:1}: Are you crazy?
+Bank0197_Text_EImStartingTest = E: I'm starting the test now.{be01}\nI won't let you leave until\nwe get the data we need.
+Bank0197_Text_NoPokemonHelpTried = With no Pokémon to help, {0100:1}\ntried to complete the test.{be01}\nBut a test with a human being alone could\nnot produce the data E needed.{be01}\nAs they tried again and again to complete\nthe test, swarms of UFOs descended.{be00}\nAnd so, humanity perished...
+Bank0197_Text_OopsDidOverdo = {0100:1}: Oops!\nDid I overdo it?
+Bank0197_Text_E = E: {0100:1}!
+Bank0197_Text_Yes = {0100:1}: Yes?
+Bank0197_Text_EWhatHaveDone = E: What have you done?{be01}\nYou've ruined the UFO!
+Bank0197_Text_ErSorry = {0100:1}: Er, sorry.
+Bank0197_Text_EWerePayingAttention = E: Were you paying attention\nto what I said?
+Bank0197_Text_Sorry = {0100:1}: ...Sorry.
+Bank0197_Text_EFateHumanityDepends = E: The fate of humanity\ndepends on this UFO!{be01}\nThere's no use in saying sorry!
+Bank0197_Text_Sorry_2 = {0100:1}: ...Sorry.
+Bank0197_Text_EDontWantHear = E: I don't want to hear you bleating\n“sorry, sorry, sorry." Useless!
+Bank0197_Text_SSorry = {0100:1}: S-sorry.
+Bank0197_Text_EExpectPayCost = E: I expect you to pay the cost of repairs.
+Bank0197_Text_YeahGuess = {0100:1}: Yeah, I guess.
+Bank0197_Text_ELetsSeeRepairing = E: Let's see. Repairing this UFO will cost\napproximately $1,000,000,000.
+Bank0197_Text_WhaWhaaaaat = {0100:1}: Wha...{be01}\nWhaaaaat?!
+Bank0197_Text_ETakeYoureUnwilling = E: I take it that you're unwilling to pay...
+Bank0197_Text_CantPay = {0100:1}: I can't pay that!
+Bank0197_Text_EThenUntilCan = E: Then, until you can pay off your debt,\nyou'll work as my assistant for free.
+Bank0197_Text_HavingCarelesslyRuinedUfo = Having carelessly ruined the UFO developed\nby the mysterious scientist E, {0100:1} is{be00}\nsaddled with a debt too huge to ever repay.{be01}\nShe will be at E's beck and call\nfor the rest of her life.
+Bank0197_Text_UfoVwwwssssh = UFO: Vwwwssssh!
+Bank0197_Text_WhatsWrongSomethingWrong = {0100:1}: What's wrong?\nSomething is wrong with the UFO...
+Bank0197_Text_UfoVwwwsssshVwwwzzzzt = UFO: Vwwwssssh! Vwwwzzzzt!
+Bank0197_Text_EStopDontUse = E: Stop, {0100:1}!\nDon't use that move!
+Bank0197_Text_Huh = {0100:1}: Huh?
+Bank0197_Text_EWaitNeverEver = E: Wait, {0100:1}.{be01}\nNever, ever use that move on the UFO!
+Bank0197_Text_GotGotNoNeed = {0100:1}: Got it, got it...\nNo need to get so mad.
+Bank0197_Text_EListenRememberUfo = E: Listen and remember.{be01}\nThis UFO is a highly developed machine.\nThat move could cause its control system{be00}\nto malfunction.
+Bank0197_Text_GotHmmmSeemsLike = {0100:1}: Got it.{be01}\n(...Hmmm. Seems like the UFO has a\nweak point when it comes to Gravity...)
