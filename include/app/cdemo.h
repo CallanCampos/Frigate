@@ -42,6 +42,7 @@ struct CDemoWork {
     BOOL initialized;
 };
 
+u32 CDemo_RunCommand(CDemoWork *work);
 BOOL CDemo_Main(CDemoWork *work);
 void CDemo_ConfigureVRAM(void);
 void CDemo_InitGraphics(void);
