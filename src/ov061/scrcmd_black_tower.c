@@ -1,8 +1,10 @@
 #include "types.h"
-#include "field/black_tower_gimmick.h"
+#include "field/infinity_dungeon.h"
+#include "field/infinity_dungeon_gimmick.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_script.h"
+#include "field/infinity_dungeon_rooms.h"
 #include "gfl/random.h"
 #include "gfl/str.h"
 #include "save/save_control.h"
@@ -34,7 +36,7 @@ static BOOL func_ov061_021e5800(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    func_ov127_021efd60(gsys, func_ov127_021ef010(GSYS_GetField(gsys)));
+    func_ov127_021efd60(gsys, InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys)));
     return FALSE;
 }
 
@@ -45,7 +47,7 @@ static BOOL func_ov061_021e5828(VM *vm, FieldScriptEnv *env) {
     u16 c = ScriptReadAny(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    func_ov127_021ef664(work, gsys, func_ov127_021ef010(GSYS_GetField(gsys)), a, c, b);
+    InfinityDungeonGimmick_CallRoomChange(work, gsys, InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys)), a, c, b);
     return TRUE;
 }
 
@@ -54,7 +56,7 @@ static BOOL func_ov061_021e5888(VM *vm, FieldScriptEnv *env) {
     u16 a = ScriptReadAny(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    func_ov127_021ef6ac(work, gsys, func_ov127_021ef010(GSYS_GetField(gsys)), a);
+    InfinityDungeonGimmick_CallFloorChange(work, gsys, InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys)), a);
     return TRUE;
 }
 
@@ -113,7 +115,7 @@ static BOOL func_ov061_021e59ec(VM *vm, FieldScriptEnv *env) {
     u16 a = ScriptReadAny(vm, env);
     u16 b = ScriptReadAny(vm, env);
 
-    ScriptWork_CallEvent(work, func_ov127_021ef01c(gsys, field, b, a));
+    ScriptWork_CallEvent(work, InfinityDungeonGimmick_CreateDoorEvent(gsys, field, b, a));
     return TRUE;
 }
 
@@ -121,7 +123,7 @@ static BOOL func_ov061_021e5a38(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    ScriptWork_CallEvent(work, func_ov127_021ef050(gsys, GSYS_GetField(gsys)));
+    ScriptWork_CallEvent(work, InfinityDungeonGimmick_CreateMachineEvent(gsys, GSYS_GetField(gsys)));
     return TRUE;
 }
 
@@ -129,7 +131,7 @@ static BOOL func_ov061_021e5a64(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    ScriptWork_CallEvent(work, func_ov127_021ef254(gsys, GSYS_GetField(gsys)));
+    ScriptWork_CallEvent(work, InfinityDungeonGimmick_CreateLiftEvent(gsys, GSYS_GetField(gsys)));
     return TRUE;
 }
 
@@ -167,10 +169,10 @@ static BOOL func_ov061_021e5b40(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env));
     SaveControl *save = GameData_GetSaveControl(gameData);
     u16 objCode = FldAct_GetObjCode(actor);
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u8 index = GetActorUID(actor) - 0xb0;
 
-    *var = func_ov127_021f0358(getKeyDataBlkAddress(save), gimmick, objCode, index);
+    *var = InfinityDungeon_GetNpcScript(getKeyDataBlkAddress(save), dungeon, objCode, index);
     return FALSE;
 }
 
@@ -205,7 +207,7 @@ static BOOL func_ov061_021e5c04(VM *vm, FieldScriptEnv *env) {
     u16 set = ScriptReadAny(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    func_02010354(keyData, func_ov127_021f08b4(func_ov127_021ef010(field), a), set);
+    func_02010354(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a), set);
     return FALSE;
 }
 
@@ -218,27 +220,27 @@ static BOOL func_ov061_021e5c5c(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    *var = func_02010340(keyData, func_ov127_021f08b4(func_ov127_021ef010(field), a));
+    *var = func_02010340(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a));
     return FALSE;
 }
 
 static BOOL func_ov061_021e5cb8(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
     u8 level = func_02010378(getKeyDataBlkAddress(save));
-    u8 unk = func_ov127_021f02e0(gimmick);
+    u8 unk = func_ov127_021f02e0(dungeon);
 
     *var = unk + func_020103a0(level) + 1;
     return FALSE;
 }
 
 static BOOL func_ov061_021e5d0c(VM *vm, FieldScriptEnv *env) {
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0a9c(gimmick->unk150[gimmick->unkA5A].unk0[gimmick->unkA5B].unk0);
+    *var = InfinityDungeon_GetRoomNpcCount(dungeon->floors[dungeon->targetFloor].rooms[dungeon->targetRoom].type);
     return FALSE;
 }
 
@@ -272,28 +274,28 @@ static BOOL func_ov061_021e5dd4(VM *vm, FieldScriptEnv *env) {
 static BOOL func_ov061_021e5e08(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u8 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0e70(gimmick, func_020102d4(getKeyDataBlkAddress(save)), actor);
+    *var = InfinityDungeon_GetTrainerId(dungeon, func_020102d4(getKeyDataBlkAddress(save)), actor);
     return FALSE;
 }
 
 static BOOL func_ov061_021e5e60(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0dd8(gimmick);
+    *var = func_ov127_021f0dd8(dungeon);
     return FALSE;
 }
 
 static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 info = ScriptReadAny(vm, env);
     u16 arg = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
@@ -316,20 +318,20 @@ static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
         *var = func_020102d4(keyData);
         break;
     case 3:
-        *var = func_ov127_021f08e8(gimmick);
+        *var = func_ov127_021f08e8(dungeon);
         break;
     case 4:
         *var = func_020102a4(keyData);
         break;
     case 5:
         unk = func_020102ec(keyData);
-        *var = func_ov127_021f093c(gimmick, func_020102d4(keyData), unk);
+        *var = func_ov127_021f093c(dungeon, func_020102d4(keyData), unk);
         break;
     case 9:
-        *var = gimmick->unkA5E;
+        *var = dungeon->rewardItem;
         break;
     case 10:
-        *var = gimmick->unkA60;
+        *var = dungeon->rewardCount;
         break;
     case 11:
         unk = func_02010274(keyData, 0);
@@ -357,9 +359,9 @@ static const BlackTowerUnkPair sUnkPairs[] = {
 
 static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u8 level = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
-    u32 area = func_ov127_021f0dd8(gimmick);
+    u32 area = func_ov127_021f0dd8(dungeon);
     const BlackTowerUnkPair *pairs = area == 0x17 ? sUnkPairs17 : sUnkPairs;
 
     if (level == 9 && area != AREA_VERSION_UNK) {
@@ -370,12 +372,12 @@ static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env) {
 
 static BOOL func_ov061_021e5fe4(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     u16 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0db4(gimmick, func_020102d4(keyData), actor);
+    *var = func_ov127_021f0db4(dungeon, func_020102d4(keyData), actor);
     return FALSE;
 }
 
@@ -387,9 +389,9 @@ static BOOL func_ov061_021e603c(VM *vm, FieldScriptEnv *env) {
     FieldActor *actor = ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env));
     SaveControl *save = GameData_GetSaveControl(gameData);
     u16 objCode = FldAct_GetObjCode(actor);
-    BlackTowerGimmick *gimmick = func_ov127_021ef010(GSYS_GetField(gsys));
+    InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
 
-    *var = func_ov127_021f03dc(getKeyDataBlkAddress(save), gimmick, objCode, a);
+    *var = func_ov127_021f03dc(getKeyDataBlkAddress(save), dungeon, objCode, a);
     return FALSE;
 }
 

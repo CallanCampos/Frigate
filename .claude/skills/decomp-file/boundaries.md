@@ -25,7 +25,9 @@ Pipe the output through `head` or `grep`; for a big overlay, use the `boundary-s
 - **Statics:** two files' `.bss` statics are addressed from separate bases, which shows a boundary.
 - **Sizes:** MWCC sorts a file's static data by size (`docs/matching.md`, "Static data is sorted by size"), so a run of
   `.rodata` that gets smaller marks a boundary. `btl_server_flow_sub.c`'s 184-byte item effects followed by a 118-byte
-  and a 96-byte table split off `btl_handler_work.c` and `btl_server_cmd.c`, whose users confirmed it.
+  and a 96-byte table split off `btl_handler_work.c` and `btl_server_cmd.c`, whose users confirmed it. It moves `.text`
+  boundaries too: overlay 127's two 8-byte wall tables sit after the gimmick's 128-byte placements, so they start
+  `infinity_dungeon.c`'s run, and the function that reads them (0x021efaf0), with everything after it, is that file's.
 - **Line numbers:** functions that pass `__LINE__` (asserts, and calls like ov167's `PushState`) climb through a file
   and start low again in the next. `btl_server_flow_sub.c` begins where `PushState`'s lines drop from 16185 to 619.
 - **SPL and other library code** may be in reverse order (see `docs/decompiling.md`'s compiler section).

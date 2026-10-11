@@ -3,7 +3,7 @@
 #include "field/event_wbt_wifi.h"
 #include "field/field.h"
 #include "field/field_script.h"
-#include "field/ov135.h"
+#include "field/wbt_makematch.h"
 #include "field/scrcmd_wbt.h"
 #include "field/wbt.h"
 #include "field/zone.h"
@@ -26,7 +26,7 @@ static BSubwayScoreData *func_ov056_021e75c0(FieldScriptEnv *env) {
 BOOL WbtCmd_AwardBattlePoints(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     u16 *var = ScriptReadVar(vm, env);
-    u16 battlePoints = func_ov135_021ef978(sys);
+    u16 battlePoints = WbtMakeMatch_GetBattlePoints(sys);
 
     if (battlePoints != 0) {
         func_0200e318(func_ov056_021e75c0(env), battlePoints);
@@ -69,7 +69,7 @@ BOOL WbtCmd_CheckRegulation(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     Regulation *regulation = func_ov055_021e5f78(sys);
 
-    *var = func_0201f268(regulation, func_ov135_021efb04(sys, FieldScriptEnv_GetGameData(env))) == 0 ? TRUE : FALSE;
+    *var = func_0201f268(regulation, WbtMakeMatch_GetParty(sys, FieldScriptEnv_GetGameData(env))) == 0 ? TRUE : FALSE;
     return FALSE;
 }
 
@@ -204,7 +204,7 @@ BOOL func_ov056_021e79c0(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov135_021ef9e8(sys, gameData);
+    *var = WbtMakeMatch_CountDownloads(sys, gameData);
     return FALSE;
 }
 
@@ -214,7 +214,7 @@ BOOL func_ov056_021e79f0(VM *vm, FieldScriptEnv *env) {
 
     func_ov055_021e5cd0(sys, ScriptReadAny(vm, env));
     if (func_ov055_021e5ca4(sys) == 3) {
-        func_ov135_021efa2c(sys, gameData);
+        WbtMakeMatch_LoadDownload(sys, gameData);
     }
     return FALSE;
 }

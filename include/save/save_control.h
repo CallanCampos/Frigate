@@ -188,6 +188,8 @@ void func_020102f0(KeyDataSave *keyData, u8 value, u32 a2);
 void func_02010300(KeyDataSave *keyData, u32 value);
 void func_02010304(KeyDataSave *keyData, u32 a1, u32 bit, BOOL set);
 void func_02010334(KeyDataSave *keyData, u8 value);
+void func_02010338(KeyDataSave *keyData, u8 value);
+void func_0201033c(KeyDataSave *keyData, u8 value);
 BOOL func_02010340(KeyDataSave *keyData, u32 bit);
 void func_02010354(KeyDataSave *keyData, u32 bit, BOOL set);
 u8 func_02010378(KeyDataSave *keyData);

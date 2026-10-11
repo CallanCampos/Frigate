@@ -136,7 +136,7 @@ u32 func_ov137_021f17fc(u32 kind);
 // Whether a slot of a row is empty, the data in it, and the first empty one (0xffff if none)
 BOOL func_ov137_021f1808(ResortSlots *slots, u32 row, u32 pos);
 ResortPersonData *func_ov137_021f1824(ResortSlots *slots, u32 row, u32 pos);
-u16 func_ov137_021f184c(ResortSlots *slots, u32 row);
+u32 func_ov137_021f184c(ResortSlots *slots, u32 row);
 u16 func_ov137_021f1878(ResortPersonData *data, void *a1, void *a2, JoinAvenueInfo *info);
 ResortPersonData *func_ov137_021f18f0(HeapID heapId, void *person, u32 kind, u16 index);
 void func_ov137_021f1920(ResortPersonData *data);
@@ -144,7 +144,8 @@ void func_ov137_021f1950(ResortPersonData *data);
 BOOL func_ov137_021f195c(ResortPersonData *data);
 u32 func_ov137_021f1968(ResortPersonData *data, JoinAvenuePersonParam param, void *buffer);
 void func_ov137_021f1974(ResortPersonData *data, JoinAvenuePersonParam param, u32 value);
-JoinAvenuePerson *func_ov137_021f1980(ResortPersonData *data);
+// The person, entry or record of the data, by its kind
+void *func_ov137_021f1980(ResortPersonData *data);
 u32 func_ov137_021f1984(ResortPersonData *data);
 u32 func_ov137_021f1988(ResortPersonData *data);
 u32 func_ov137_021f198c(ResortPersonData *data);
@@ -155,7 +156,7 @@ void func_ov137_021f1ac0(ResortPersonData **datas);
 ResortDataIter func_ov137_021f1ae0(ResortPersonData **datas, const u32 *kinds, u32 count);
 // The next data of the kinds, or NULL
 ResortPersonData *func_ov137_021f1b0c(ResortPersonData **datas, ResortDataIter *iter, const u32 *kinds, u32 count);
-// The data of a person, among what func_ov137_021f2014 returns
+// The data of a person, among what ResortSys_GetDatas returns
 ResortPersonData *func_ov137_021f1b6c(ResortPersonData **datas, JoinAvenuePerson *person);
 ResortPersonData *func_ov137_021f1b94(ResortPersonData **datas, u32 kind, u16 index);
 // The same for the scripts' numbering of the kinds: 0 the occupants, 1 the entries, 2 the people of both lists and 3
@@ -179,53 +180,60 @@ u16 func_ov137_021f1d60(ResortNPC *npc, u32 row, u32 column);
 u16 func_ov137_021f1f00(ResortNPC *npc, u32 row);
 
 // resort_sys.c
-ResortSys *func_ov137_021f1f1c(const ResortSysSetup *setup, ResortWork *resortWork, HeapID heapId);
-void func_ov137_021f1fb4(ResortSys *sys);
-void *func_ov137_021f1ff8(ResortSys *sys);
-void *func_ov137_021f2000(ResortSys *sys);
-void *func_ov137_021f2004(ResortSys *sys);
-void *func_ov137_021f2008(ResortSys *sys);
-void *func_ov137_021f200c(ResortSys *sys);
-void *func_ov137_021f2010(ResortSys *sys);
-ResortPersonData **func_ov137_021f2014(ResortSys *sys);
-ResortSlots *func_ov137_021f2018(ResortSys *sys);
-JoinAvenueOccupants *func_ov137_021f201c(ResortSys *sys);
-JoinAvenuePersonList *func_ov137_021f2020(ResortSys *sys);
-JoinAvenuePersonList *func_ov137_021f2024(ResortSys *sys);
-void *func_ov137_021f2028(ResortSys *sys);
-JoinAvenueInfo *func_ov137_021f202c(ResortSys *sys);
-ResortWork *func_ov137_021f2030(ResortSys *sys);
-u16 func_ov137_021f2040(u32 a0, ResortSys *sys, ResortPersonData *data, GameData *gameData, WordSet *wordSet,
+ResortSys *ResortSys_Create(const ResortSysSetup *setup, ResortWork *resortWork, HeapID heapId);
+void ResortSys_Free(ResortSys *sys);
+// The Join Avenue's tables of the system: the shops, and the binaries of its ranks, texts and the like
+ResortShopData *ResortSys_GetShopData(ResortSys *sys);
+ResortBinary *ResortSys_GetRanks(ResortSys *sys);
+ResortBinary *ResortSys_GetUnk20Table(ResortSys *sys);
+ResortBinary *ResortSys_GetUnk24Table(ResortSys *sys);
+ResortBinary *ResortSys_GetTexts(ResortSys *sys);
+ResortBinary *ResortSys_GetShopOpenings(ResortSys *sys);
+ResortPersonData **ResortSys_GetDatas(ResortSys *sys);
+ResortSlots *ResortSys_GetSlots(ResortSys *sys);
+JoinAvenueOccupants *ResortSys_GetOccupants(ResortSys *sys);
+JoinAvenuePersonList *ResortSys_GetList(ResortSys *sys);
+JoinAvenuePersonList *ResortSys_GetList2(ResortSys *sys);
+void *ResortSys_GetEntries(ResortSys *sys);
+JoinAvenueInfo *ResortSys_GetInfo(ResortSys *sys);
+ResortWork *ResortSys_GetWork(ResortSys *sys);
+// The answer to a question of the scripts: a message of SCRIPT_TEXT_GLOBAL_10685 for the person, or a number
+u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, GameData *gameData, WordSet *wordSet,
                         HeapID heapId);
-u16 func_ov137_021f2fd0(ResortPersonData *data, JoinAvenuePerson *person, ResortSys *sys, u16 *a3, u16 *a4,
-                        u16 *a5);
-u16 func_ov137_021f312c(ResortSys *sys, GameData *gameData, u32 a2, u16 *a3);
-u16 func_ov137_021f3238(JoinAvenuePerson *person, ResortSys *sys, u32 a2, u16 *a3);
-u32 func_ov137_021f3344(ResortSys *sys);
-u32 func_ov137_021f3354(ResortSys *sys);
-void func_ov137_021f33b8(u32 a0, u32 a1, u32 a2, u32 a3, ResortSys *sys, ResortPerson *person, WordSet *wordSet,
-                         GameData *gameData, HeapID heapId);
-void *func_ov137_021f3e7c(void *msgBGSys, HeapID heapId);
-void func_ov137_021f3e98(void *a0, JoinAvenueOccupants *occupants, void *msgBGSys, WordSet *wordSet,
-                         GameData *gameData, s16 a5, HeapID heapId);
-u32 func_ov137_021f420c(ResortSys *sys, GameData *gameData);
-void func_ov137_021f4b94(ResortSys *sys, GameData *gameData, void *entry, u32 a3, u32 a4, HeapID heapId);
-u32 func_ov137_021f4294(ResortSys *sys, GameData *gameData, u32 a2);
-u16 func_ov137_021f44ac(void *a0, ResortPersonData *data, u32 a2);
-void func_ov137_021f44f8(ResortPeople *people, void *a1, Field *field, ResortPerson *person, u32 a4);
-ResortSys *func_ov137_021f4670(Field *field);
+BOOL ResortSys_GetPersonVisit(ResortPersonData *data, JoinAvenuePerson *person, ResortSys *sys, u16 *a3, u16 *a4,
+                         u16 *a5);
+// Adds popularity points to the avenue: 0 nothing came of it, 1 a new rank, 2 no more ranks, 3 a new shop, 4 a new
+// rank with new texts, 5 both
+u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 *rank);
+// Adds experience to a person's shop: 0 nothing, 1 a new level, 2 a new level of another kind of shop, 3 the highest
+u32 ResortSys_AddShopExperience(JoinAvenuePerson *person, ResortSys *sys, u32 points, u16 *level);
+u32 ResortSys_GetInfoFlag1b(ResortSys *sys);
+// Whether the occupants' shops are all at the highest level
+BOOL ResortSys_AreAllShopsMaxLevel(ResortSys *sys);
+void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, ResortSys *sys, ResortPerson *person,
+                         WordSet *wordSet, GameData *gameData, HeapID heapId);
+void *ResortRecords_CreateWindow(void *msgBGSys, HeapID heapId);
+void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void *msgBGSys, WordSet *wordSet,
+                         GameData *gameData, u32 page, HeapID heapId);
+u32 ResortSys_GetUnlock(ResortSys *sys, GameData *gameData);
+u32 ResortSys_GetUnlockForRank(ResortSys *sys, GameData *gameData, u32 rank);
+u32 ResortSys_GetTrainerTypeText(ResortBinary *texts, ResortPersonData *data, u32 column);
+void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field *field, ResortPerson *person, u32 mode);
+ResortSys *ResortSys_Get(Field *field);
 // The person of the script's actor
-ResortPerson *func_ov137_021f4690(FieldScriptEnv *env, ResortPeople *people);
-StrBuf *func_ov137_021f4930(void *shops, ResortPersonData *data, u16 a2, HeapID heapId);
-u16 func_ov137_021f46a8(ResortSys *sys, ResortPersonData *data, u32 a2);
-void func_ov137_021f4dbc(ResortSys *sys, PlayerInfo *playerInfo, u32 a2, u32 a3, HeapID heapId);
-void func_ov137_021f4ecc(ResortSys *sys, ResortPersonData *a1, ResortPersonData *data);
-BOOL func_ov137_021f4fa4(ResortSys *sys, ResortPersonData *a1, ResortPersonData *data, u32 *a3);
-u32 func_ov137_021f50f4(ResortSys *sys, ResortPersonData *a1);
-u32 func_ov137_021f51a4(ResortSys *sys, ResortPersonData *a1);
-void func_ov137_021f5200(ResortSys *sys, ResortPersonData *a1, u32 a2);
-u16 func_ov137_021f522c(ResortSys *sys, GameData *gameData, u32 a2);
+ResortPerson *ResortSys_GetScriptPerson(FieldScriptEnv *env, ResortPeople *people);
+u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind);
+StrBuf *ResortSys_FormatShopText(ResortShopData *shops, ResortPersonData *data, u16 shopId, HeapID heapId);
+void ResortSys_MakeShopEntry(ResortSys *sys, GameData *gameData, void *entry, u32 shopKind, u32 salt, HeapID heapId);
+// Adds an entry (mode 1) or a record (mode 3) of a kind of shop
+void ResortSys_AddEntryOrRecord(ResortSys *sys, PlayerInfo *playerInfo, u32 mode, u32 shopKind, HeapID heapId);
+void ResortSys_ChooseVisitGroup(ResortSys *sys, ResortPersonData *a1, ResortPersonData *data);
+BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPersonData *data, u32 *out);
+u32 ResortSys_GetVisitPoints(ResortSys *sys, ResortPersonData *data);
+u32 ResortSys_GetVisitScore(ResortSys *sys, ResortPersonData *data);
+void ResortSys_MarkMet(ResortSys *sys, ResortPersonData *a1, u32 a2);
+u16 ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2);
 // Whether all eight of the avenue's people are there
-BOOL func_ov137_021f5294(ResortSys *sys);
+BOOL ResortSys_IsFull(ResortSys *sys);
 
 #endif // POKEBW2_FIELD_RESORT_H

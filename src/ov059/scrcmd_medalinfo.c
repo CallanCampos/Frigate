@@ -66,5 +66,5 @@ static ResortPerson *func_ov059_021e7d7c(Field *field, FieldScriptEnv *env) {
     } else if (Field_CheckGimmickWorkPassword(field, 1)) {
         people = func_ov137_021eeeac(field);
     }
-    return func_ov137_021f4690(env, people);
+    return ResortSys_GetScriptPerson(env, people);
 }
