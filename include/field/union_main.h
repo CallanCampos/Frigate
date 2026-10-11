@@ -2,6 +2,9 @@
 #define POKEBW2_FIELD_UNION_MAIN_H
 
 #include "types.h"
+#include "app/p_status.h"
+#include "app/pokelist.h"
+#include "field/event_colosseum_battle.h"
 #include "field/union_app.h"
 #include "field/union_comm.h"
 #include "gfl/net_handle.h"
@@ -10,6 +13,21 @@
 
 // union_main.c, overlay 28, which the ROM names: the field side of the Union Room, which boots its communication, runs
 // its commands as field events, and handles the net commands from 0x1400 that its machines send each other
+
+// What overlay 34 allocates as the argument of the commands it starts (UnionSystem's cmdArg)
+// The argument of the commands that run the activity's own proc: it starts with the app
+typedef struct {
+    UnionApp *app;
+    u8 unk04[0x10];
+    u32 unk14;
+} UnionProcParam;
+
+// The argument of the colosseum's party select: the party list, then the summary of a Pokémon in it, and the battle
+typedef struct {
+    PokeListParam list;
+    PStatusParam status;
+    ColosseumBattleParam *battle;
+} UnionColosseumParam;
 
 // Boots the Union Room's communication
 void UnionMain_Boot(GameSystem *gsys);
@@ -87,12 +105,6 @@ BOOL UnionCommand_IsActive(UnionSystem *sys);
 extern const GameProcFunctions data_ov070_0217f910;
 extern const GameProcFunctions data_ov216_021c08d0;
 
-// Overlay 34's Union Room menus, without a header yet
-void func_ov034_02176f4c(UnionSystem *sys, GameData *gameData, Field *field);
-void func_ov034_02177128(UnionSystem *sys, GameData *gameData, Field *field);
-void func_ov034_02177444(UnionSystem *sys);
-void func_ov034_02177528(UnionSystem *sys, Field *field);
-void func_ov034_0217aef4(UnionSystem *sys);
 
 // Overlay 36's, which puts a colosseum player's info into a table of the field's players
 void func_ov036_021c3f34(void *players, u32 netId, const PlayerInfo *info, u8 flag, const u8 *mac);

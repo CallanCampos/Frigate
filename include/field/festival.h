@@ -45,8 +45,6 @@ void *GetFestMissionCfg(LinkFestival *festival);
 // What missions of type 4 and 5 do when the player enters a zone, from overlays 24 and 25
 void func_ov024_0216f900(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival, FestMissionConfig *config,
                          u16 zoneId);
-void func_ov025_0216f900(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival, FestMissionConfig *config,
-                         u16 zoneId);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
 // mission, a random number below max that the list doesn't have, and the mission's work on entering a zone
 u16 func_ov012_02168320(u16 zoneId);

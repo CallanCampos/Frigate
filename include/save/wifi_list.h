@@ -21,6 +21,13 @@ u32 func_0200a4b8(void);
 void func_0200a504(void *block, PlayerInfo *info);
 void func_0200a5cc(void *block);
 
+// Clears the list, with the player's DWC user data
+void initWifi(WifiList *wifiList);
+// A friend's data, of a block of 12 bytes from index 0
+void *func_0200a0e4(WifiList *wifiList, u32 friendIndex);
+// Adds the wins, losses and draws of friend b to friend a, and clears b's, each capped at 9999
+void func_0200a340(WifiList *wifiList, int a, int b);
+
 BOOL func_0200a138(WifiList *list, u32 index);
 u32 func_02009f80(WifiList *list, u32 index, u32 a2);
 void *getPalPadFriendListAddress(SaveControl *save);

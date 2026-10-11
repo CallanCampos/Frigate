@@ -10,9 +10,26 @@
 
 // The name entry, overlay 280
 
-// What the name entry is for
+// What the name entry is for. The mode is also the number of the message that asks for the name (the text bank of
+// namein.c)
+#define NAME_ENTRY_PLAYER 0
 #define NAME_ENTRY_POKEMON 1
+#define NAME_ENTRY_BOX 2
 #define NAME_ENTRY_RIVAL 3
+#define NAME_ENTRY_FRIEND 4
+#define NAME_ENTRY_GREETING 5
+#define NAME_ENTRY_THANKS 6
+#define NAME_ENTRY_PASSERBY_MESSAGE 7
+#define NAME_ENTRY_AVENUE_NAME 8
+#define NAME_ENTRY_AVENUE_TITLE 9
+#define NAME_ENTRY_FAVORITE_PHRASE 10
+// The Plasma Frigate's password
+#define NAME_ENTRY_PLASMA_PASSWORD 11
+#define NAME_ENTRY_GAME_SYNC_ID 12
+#define NAME_ENTRY_IMPRESSED 13
+#define NAME_ENTRY_TRAINER_MESSAGE 14
+#define NAME_ENTRY_HAPPY_MESSAGE 15
+#define NAME_ENTRY_POKEMON_RENAME 16
 
 typedef struct {
     u32 mode;
@@ -21,6 +38,8 @@ typedef struct {
     // The Pokémon's form, and its sex in the high byte
     u16 unk6;
     PartyPkm *pkm;
+    // A StrBuf (as an integer) that the Pokémon name entry formats and prints once the name is given, if not 0, and the
+    // box data and the number of the box, which it names
     u32 unkC;
     u32 unk10;
     u32 unk14;
@@ -32,8 +51,11 @@ typedef struct {
     // The save data that the new game creates in the background
     SaveControlIntr *saveTask;
     TrainerGameInfoSave *gameInfo;
+    // 1 to allow more than 4 digits, 2 to skip the check of profane words
     u32 unk2C;
+    // The save block that a third preset name, for modes that offer some, is read from
     void *unk30;
+    // Set to which preset name (1 to 3) the name that was entered is, if any
     u32 unk34;
 } NameEntryParam;
 
@@ -53,6 +75,10 @@ BOOL func_ov012_02165b0c(NameEntryParam *param);
 BOOL func_ov012_02165b10(NameEntryParam *param, const StrBuf *str);
 // Overlay 12
 void func_ov012_021603ec(StrBuf *name, u8 value);
+
+// The keyboard that each mode last used, a byte of the trainer's info save (not declared in save_control.h)
+u8 func_0200c84c(TrainerGameInfoSave *info, u32 index);
+void func_0200c844(TrainerGameInfoSave *info, u32 index, u8 value);
 
 extern const GameProcFunctions NAME_ENTRY_PROC_FUNCTIONS;
 // The sound sequences that the name entry plays, which the new game loads before it

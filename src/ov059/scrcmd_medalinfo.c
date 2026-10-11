@@ -36,17 +36,17 @@ BOOL func_ov059_021e7c70(VM *vm, FieldScriptEnv *env) {
     param->nameBuf = GFL_StrBufCreate(8, HEAPID_GAMEEVENT);
     GFL_StrBufLoadString(param->nameBuf, name);
     param->name = param->nameBuf;
-    param->unkC = unkC;
+    param->medal = unkC;
     param->year = (date >> 9) & 0x7f;
     param->month = (date >> 5) & 0xf;
     param->day = date & 0x1f;
-    param->unkE = unkE;
-    param->unk10 = unk10;
-    param->unk4 = 1;
-    param->unk0 = 0;
+    param->medalCount = unkE;
+    param->rank = unk10;
+    param->parentHeapId = 1;
+    param->mode = 0;
     param->gameData = gameData;
     param->gsys = gsys;
-    ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_MEDAL_INFO, &data_ov187_021ea060, param,
+    ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_MEDAL_INFO, &MedalInfo_ProcFunctions, param,
                                              func_ov059_021e7d68, param));
     return TRUE;
 }

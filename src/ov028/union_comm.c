@@ -5,6 +5,7 @@
 #include "field/colosseum.h"
 #include "field/comm_player.h"
 #include "field/union_app.h"
+#include "field/union_eff.h"
 #include "field/union_main.h"
 #include "field/unity_tower.h"
 #include "gfl/heap.h"
@@ -113,7 +114,7 @@ UnionSystem *UnionComm_Create(UnionBootParam *param) {
     unisys = GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionSystem), TRUE, "union_comm.c", 137);
     unisys->param = param;
     UnionComm_InitSelf(unisys);
-    unisys->self.changed = TRUE;
+    unisys->situ.changed = TRUE;
     UnionComm_InitVisitors(&unisys->visitorList);
     unisys->alloc.regulation = Regulation_Create(HEAPID_UNION);
     unisys->fieldActive = TRUE;
@@ -286,39 +287,39 @@ void UnionComm_Main(u32 *seq, void *param, void *work) {
         UnionComm_UpdateEntries(unisys);
         UnionComm_UpdateGroup(unisys);
         if (GFL_NetErrCheck() && func_02042bc4() == TRUE) {
-            UnionColosseum *colosseum = unisys->colosseum;
+            UnionColosseum *colosseum = unisys->colosseum_sys;
 
-            if (colosseum != NULL && colosseum->unkC8_0 == 1 && unisys->self.unk01 == 0x2a && !colosseum->unkC8_1) {
+            if (colosseum != NULL && colosseum->unkC8_0 == 1 && unisys->situ.step == 0x2a && !colosseum->unkC8_1) {
                 UnionComm_RequestLink1(unisys);
-                unisys->colosseum->unkC8_1 = TRUE;
+                unisys->colosseum_sys->unkC8_1 = TRUE;
             }
         }
     }
 }
 
 void UnionComm_ActivateGroup(UnionSystem *unisys) {
-    unisys->self.group.active = TRUE;
+    unisys->situ.mycomm.active = TRUE;
 }
 
 static void UnionComm_UpdateGroup(UnionSystem *unisys) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
-    if (!self->group.active) {
+    if (!self->mycomm.active) {
         return;
     }
     if (GFL_NetErrCheck()) {
         return;
     }
-    switch (self->group.step) {
+    switch (self->mycomm.step) {
     case 0:
         if (func_ov028_0217115c() == TRUE) {
-            self->group.step++;
+            self->mycomm.step++;
         }
         break;
     case 1:
-        if (countOneBits(self->group.doneMask) >= func_02042a78()) {
+        if (countOneBits(self->mycomm.doneMask) >= func_02042a78()) {
             func_02042e9c(FALSE);
-            self->group.step++;
+            self->mycomm.step++;
         }
         break;
     case 2:
@@ -327,10 +328,10 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
                 break;
             }
             UnionComm_RequestLink1(unisys);
-            self->group.step++;
+            self->mycomm.step++;
         } else {
             UnionComm_RequestLink1(unisys);
-            self->group.step++;
+            self->mycomm.step++;
         }
         break;
     }
@@ -355,27 +356,27 @@ static void UnionComm_UpdateEntries(UnionSystem *unisys) {
 }
 
 static void UnionComm_UpdateColosseum(UnionSystem *unisys) {
-    if (unisys->colosseum == NULL || !unisys->colosseum->unkC8_0) {
+    if (unisys->colosseum_sys == NULL || !unisys->colosseum_sys->unkC8_0) {
         return;
     }
     if (UnionMain_IsFieldReady(unisys) == TRUE) {
         if (!UnionCommand_IsActive(unisys)) {
-            func_ov012_0216144c(unisys->param->gsys, unisys->colosseum->commPlayer);
-            if (unisys->colosseum->unk17F == 0) {
-                if (func_ov012_021616b0(unisys->colosseum->commPlayer, (CommPlayerStatus *)unisys->colosseum->unk04) == TRUE) {
-                    unisys->colosseum->unk17F = 1;
+            func_ov012_0216144c(unisys->param->gsys, unisys->colosseum_sys->commPlayer);
+            if (unisys->colosseum_sys->unk17F == 0) {
+                if (func_ov012_021616b0(unisys->colosseum_sys->commPlayer, (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
+                    unisys->colosseum_sys->unk17F = 1;
                 }
             }
-            if (unisys->colosseum->unk17F == 1) {
-                if (Colosseum_SendChoice((ColosseumChoice *)unisys->colosseum->unk04) == TRUE) {
-                    unisys->colosseum->unk17F = 0;
+            if (unisys->colosseum_sys->unk17F == 1) {
+                if (Colosseum_SendChoice((ColosseumChoice *)unisys->colosseum_sys->unk04) == TRUE) {
+                    unisys->colosseum_sys->unk17F = 0;
                 }
             }
         }
-        func_ov034_0217be34(unisys->colosseum);
+        UnionEff_UpdateColosseumCommPlayers(unisys->colosseum_sys);
     }
-    func_ov028_02172a1c(unisys->colosseum);
-    func_ov028_02172a50(unisys->colosseum);
+    func_ov028_02172a1c(unisys->colosseum_sys);
+    func_ov028_02172a50(unisys->colosseum_sys);
 }
 
 static void UnionComm_ReceiveBeacons(UnionSystem *unisys) {
@@ -462,22 +463,22 @@ static void *UnionComm_GetBeacon(void *work) {
 }
 
 static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     sys_memset(beacon, 0, sizeof(UnionBeacon));
-    if (self->group.target[3] != NULL) {
+    if (self->mycomm.parent != NULL) {
         if (func_02042bc4() == TRUE) {
             func_0207c33c(beacon->mac);
         } else {
-            sys_memcpy(self->group.target[3]->mac, beacon->mac, 6);
+            sys_memcpy(self->mycomm.parent->mac, beacon->mac, 6);
         }
-    } else if (self->group.target[1] != NULL) {
-        sys_memcpy(self->group.target[1]->mac, beacon->mac, 6);
+    } else if (self->mycomm.unk4 != NULL) {
+        sys_memcpy(self->mycomm.unk4->mac, beacon->mac, 6);
     }
     beacon->memberCount = func_02042a78();
     beacon->version = GAME_VERSION;
     beacon->language = GAME_LANGUAGE;
-    beacon->unk0A = self->unk01;
+    beacon->unk0A = self->step;
     beacon->unk07_5 = self->unk02;
     beacon->activity = self->activity;
     copyName(unisys->param->playerInfo->name, beacon->name, 8);
@@ -492,7 +493,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     beacon->counter = self->counter;
     beacon->country = UnityTowerVisitor_GetCountry(unisys->param->playerInfo);
     beacon->province = UnityTowerVisitor_GetProvince(unisys->param->playerInfo);
-    beacon->memberList = self->group.memberList;
+    beacon->memberList = self->mycomm.memberList;
     func_0200a3cc(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), beacon->unk50);
     if (unisys->alloc.uniapp != NULL) {
         beacon->entryClosed = UnionApp_IsEntryClosed(unisys->alloc.uniapp);
@@ -510,7 +511,7 @@ static int UnionComm_GetBeaconSize(void *work) {
 static BOOL UnionComm_IsBeaconJoinable(u8 gameCommandBase, u8 beaconCommandBase, void *work) {
     UnionSystem *unisys = work;
 
-    if (unisys->self.group.unk46_0 == 1) {
+    if (unisys->situ.mycomm.unk46_0 == 1) {
         if (gameCommandBase == 0x14 || beaconCommandBase == 0x14) {
             return FALSE;
         }
@@ -536,7 +537,7 @@ void UnionComm_ClearBeacons(UnionSystem *unisys) {
 }
 
 void UnionComm_FreeResources(UnionSystem *unisys) {
-    unisys->alloc.unk3540 = NULL;
+    unisys->alloc.cardParam = NULL;
     if (unisys->alloc.my_card != NULL) {
         GFL_HeapFree(unisys->alloc.my_card);
         unisys->alloc.my_card = NULL;
@@ -545,39 +546,39 @@ void UnionComm_FreeResources(UnionSystem *unisys) {
         GFL_HeapFree(unisys->alloc.target_card);
         unisys->alloc.target_card = NULL;
     }
-    if (unisys->alloc.unk353C != NULL) {
-        GFL_HeapFree(unisys->alloc.unk353C);
-        unisys->alloc.unk353C = NULL;
+    if (unisys->alloc.boxParty != NULL) {
+        GFL_HeapFree(unisys->alloc.boxParty);
+        unisys->alloc.boxParty = NULL;
     }
-    if (unisys->alloc.unk3538 != NULL) {
-        GFL_HeapFree(unisys->alloc.unk3538);
-        unisys->alloc.unk3538 = NULL;
+    if (unisys->alloc.partySelect != NULL) {
+        GFL_HeapFree(unisys->alloc.partySelect);
+        unisys->alloc.partySelect = NULL;
     }
     if (unisys->alloc.uniapp != NULL) {
         UnionApp_Free(unisys->alloc.uniapp);
         unisys->alloc.uniapp = NULL;
     }
-    if (unisys->colosseum != NULL) {
-        Colosseum_Free(unisys->colosseum, unisys->param->gsys);
-        unisys->colosseum = NULL;
+    if (unisys->colosseum_sys != NULL) {
+        Colosseum_Free(unisys->colosseum_sys, unisys->param->gsys);
+        unisys->colosseum_sys = NULL;
     }
 }
 
 void UnionComm_SetSelf(UnionSystem *unisys, u32 which, u32 value) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     switch (which) {
     case 0:
-        self->group.target[0] = (UnionBeaconEntry *)value;
+        self->mycomm.target = (UnionBeaconEntry *)value;
         break;
     case 1:
-        self->group.target[1] = (UnionBeaconEntry *)value;
+        self->mycomm.unk4 = (UnionBeaconEntry *)value;
         break;
     case 2:
-        self->group.target[2] = (UnionBeaconEntry *)value;
+        self->mycomm.answer_pc = (UnionBeaconEntry *)value;
         break;
     case 3:
-        self->group.target[3] = (UnionBeaconEntry *)value;
+        self->mycomm.parent = (UnionBeaconEntry *)value;
         break;
     case 4:
         self->activity = value;
@@ -586,13 +587,13 @@ void UnionComm_SetSelf(UnionSystem *unisys, u32 which, u32 value) {
 }
 
 static void UnionComm_InitSelf(UnionSystem *unisys) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     sys_memset(self, 0, sizeof(UnionSelf));
     self->counter = GFL_RandomLC(0xffff);
     self->state = 1;
-    self->unk01 = 2;
-    UnionGroup_Init(unisys, &self->group);
+    self->step = 2;
+    UnionGroup_Init(unisys, &self->mycomm);
 }
 
 void UnionGroup_ResetTargets(UnionGroup *group) {
@@ -673,7 +674,7 @@ static void UnionComm_InitVisitors(UnionVisitorList *list) {
 }
 
 void UnionComm_SetLook(UnionSystem *unisys, const u16 *look) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     self->look[0] = look[0];
     self->look[1] = look[1];
@@ -685,7 +686,7 @@ void UnionComm_SetLook(UnionSystem *unisys, const u16 *look) {
 }
 
 void UnionComm_SetState(UnionSystem *unisys, u8 state) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     self->state = state;
     self->counter++;

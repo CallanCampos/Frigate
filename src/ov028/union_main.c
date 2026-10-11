@@ -17,6 +17,8 @@
 #include "field/field_sound.h"
 #include "field/union_app.h"
 #include "field/union_comm.h"
+#include "field/union_msg.h"
+#include "field/union_oneself.h"
 #include "field/zone.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
@@ -60,20 +62,6 @@ typedef struct {
     Field *field;
     UnionSystem *unisys;
 } UnionCommandEvent;
-
-// The argument of the commands that run the activity's own proc: it starts with the app
-typedef struct {
-    UnionApp *app;
-    u8 unk04[0x10];
-    u32 unk14;
-} UnionProcParam;
-
-// The argument of the colosseum's party select: the party list, then the summary of a Pokémon in it, and the battle
-typedef struct {
-    PokeListParam list;
-    PStatusParam status;
-    ColosseumBattleParam *battle;
-} UnionColosseumParam;
 
 // The net commands, from UNION_NET_CMD_BASE
 #define UNION_NET_CMD_BASE 0x1400
@@ -150,12 +138,12 @@ void UnionMain_Update(GameCommSys *comm, Field *field) {
             return;
         }
         if (UnionMain_IsFieldReady(unisys) == TRUE) {
-            activity = unisys->self.activity;
+            activity = unisys->situ.activity;
             if (activity >= 4 && activity <= 0x17) {
                 if (UnionCommand_IsActive(unisys)) {
                     return;
                 }
-                func_ov034_02177528(unisys, field);
+                UnionOneself_RunStep(unisys, field);
                 return;
             }
             switch (activity) {
@@ -164,9 +152,9 @@ void UnionMain_Update(GameCommSys *comm, Field *field) {
                 if (UnionCommand_IsActive(unisys)) {
                     return;
                 }
-                func_ov034_02177444(unisys);
-                func_ov034_02177528(unisys, field);
-                func_ov034_02176f4c(unisys, unisys->param->gameData, field);
+                UnionOneself_CheckEntries(unisys);
+                UnionOneself_RunStep(unisys, field);
+                UnionOneself_UpdateActors(unisys, unisys->param->gameData, field);
                 break;
             }
         }
@@ -183,14 +171,14 @@ BOOL UnionMain_IsFieldReady(UnionSystem *unisys) {
 
 void UnionMain_OnFieldIn(void *param, void *work, Field *field) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     unisys->fieldActive = TRUE;
     if (unisys->updateDisabled == TRUE) {
         FieldmapCtrlGrid_SetUpdateDisable(field, TRUE);
     }
     if (GetZoneIsUnionRoom(Field_GetPlayerStateZoneID(field)) == TRUE) {
-        func_ov034_02177128(unisys, GSYS_GetGameData(unisys->param->gsys), field);
+        UnionOneself_UpdateMarks(unisys, GSYS_GetGameData(unisys->param->gsys), field);
     }
     if (colosseum != NULL && colosseum->unkC8_0 == TRUE) {
         func_ov012_021615a4(colosseum->commPlayer);
@@ -199,12 +187,12 @@ void UnionMain_OnFieldIn(void *param, void *work, Field *field) {
 
 void UnionMain_OnFieldOut(void *param, void *work, Field *field) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         if (colosseum->unkC9 == 1) {
             Colosseum_Free(colosseum, unisys->param->gsys);
-            unisys->colosseum = NULL;
+            unisys->colosseum_sys = NULL;
         } else if (colosseum->unkC8_0 == TRUE) {
             func_ov012_02161544(colosseum->commPlayer);
         }
@@ -221,11 +209,11 @@ u32 func_ov028_021710b0(UnionSystem *unisys) {
 }
 
 void func_ov028_021710bc(UnionSystem *unisys, u8 value) {
-    unisys->self.unk02 = value;
+    unisys->situ.unk02 = value;
 }
 
 u8 func_ov028_021710c8(UnionSystem *unisys) {
-    return unisys->self.unk02;
+    return unisys->situ.unk02;
 }
 
 BOOL UnionMain_IsIdle(GameSystem *gsys) {
@@ -234,7 +222,7 @@ BOOL UnionMain_IsIdle(GameSystem *gsys) {
     if (unisys == NULL) {
         return FALSE;
     }
-    if ((unisys->self.unk01 == 0 || unisys->self.unk01 == 0x2a) && unisys->updateDisabled == 0) {
+    if ((unisys->situ.step == 0 || unisys->situ.step == 0x2a) && unisys->updateDisabled == 0) {
         return TRUE;
     }
     return FALSE;
@@ -251,7 +239,7 @@ void func_ov028_02171138(int netId, int size, const void *data, void *work, NetH
     UnionSystem *unisys = work;
 
     UnionComm_ActivateGroup(unisys);
-    unisys->self.group.doneMask |= (u8)(1 << netId);
+    unisys->situ.mycomm.doneMask |= (u8)(1 << netId);
 }
 
 BOOL func_ov028_0217115c(void) {
@@ -260,11 +248,11 @@ BOOL func_ov028_0217115c(void) {
 
 void func_ov028_02171170(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
     const u32 *value = data;
 
     if (netId != func_02042a6c(func_02040440())) {
-        self->group.unk19 = *value;
+        self->mycomm.unk19 = *value;
     }
 }
 
@@ -274,11 +262,11 @@ BOOL func_ov028_02171194(u32 value) {
 
 void func_ov028_021711b4(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
     const u32 *value = data;
 
     if (netId != func_02042a6c(func_02040440())) {
-        self->group.unk1A = *value;
+        self->mycomm.unk1A = *value;
     }
 }
 
@@ -288,10 +276,10 @@ BOOL func_ov028_021711d8(u32 value) {
 
 void func_ov028_021711f8(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     if (netId != func_02042a6c(func_02040440())) {
-        sys_memcpy(data, self->group.unk10, 8);
+        sys_memcpy(data, self->mycomm.unk10, 8);
     }
 }
 
@@ -306,11 +294,11 @@ BOOL func_ov028_02171220(void) {
 
 void func_ov028_02171254(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
     const u32 *value = data;
 
     if (netId != func_02042a6c(func_02040440())) {
-        self->group.unk46_2 = *value;
+        self->mycomm.unk46_2 = *value;
     }
 }
 
@@ -322,7 +310,7 @@ void func_ov028_021712ac(int netId, int size, const void *data, void *work, NetH
     UnionSystem *unisys = work;
 
     func_02008b34(data, func_02017378(unisys->param->gameData, netId));
-    unisys->self.group.unk47 |= (u8)(1 << netId);
+    unisys->situ.mycomm.unk47 |= (u8)(1 << netId);
 }
 
 BOOL func_ov028_021712dc(UnionSystem *unisys) {
@@ -332,10 +320,10 @@ BOOL func_ov028_021712dc(UnionSystem *unisys) {
 
 void func_ov028_02171308(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     if (netId != func_02042a6c(func_02040440())) {
-        self->group.recvFlag = 1;
+        self->mycomm.recvFlag = 1;
         sys_memcpy(data, unisys->alloc.target_card, size);
     }
 }
@@ -352,7 +340,7 @@ BOOL func_ov028_02171390(UnionSystem *unisys) {
 
 void func_ov028_021713e0(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
     GameData *gameData = GSYS_GetGameData(unisys->param->gsys);
     u8 mac[8];
 
@@ -366,7 +354,7 @@ void func_ov028_021713e0(int netId, int size, const void *data, void *work, NetH
 
 void func_ov028_0217144c(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
     const u32 *value = data;
 
     if (colosseum == NULL) {
@@ -378,7 +366,7 @@ void func_ov028_0217144c(int netId, int size, const void *data, void *work, NetH
 
 void func_ov028_02171478(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum == NULL) {
         GFL_ASSERT(0);
@@ -579,11 +567,11 @@ BOOL func_ov028_0217196c(u8 sendTo, u8 leftNetId) {
 
 void func_ov028_02171920(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(unisys->param->gameData));
 
     if (netId != func_02042a6c(func_02040440())) {
-        self->group.unk4C = 1;
+        self->mycomm.unk4C = 1;
         JoinAvenuePerson_SetParam((JoinAvenuePerson *)data, JOIN_AVE_PARAM_UNK_26, 3);
         func_02010078(joinAvenue, unisys->param->gameData, (void *)data, TRUE);
     }
@@ -652,7 +640,7 @@ static GameEventReturnCode UnionMain_RunCommand(GameEvent *event, u32 *seq, void
 
     switch (*seq) {
     case 0:
-        func_ov034_0217aef4(unisys);
+        UnionMsg_FreeAll(unisys);
         if (sUnionCommands[subproc->id].startActivity != UNION_ACTIVITY_NONE) {
             UnionComm_SetSelf(unisys, 4, sUnionCommands[subproc->id].startActivity);
         }
@@ -772,7 +760,7 @@ static BOOL UnionCommand_Trade(GameSystem *gsys, UnionSystem *unisys, Field *fie
 
 static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field, void *arg, GameEvent *event,
                              GameEvent **next, u8 *step) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
     UnionProcParam *param;
     GameEvent *chain;
     u32 joined;
@@ -797,7 +785,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
     case 2:
         GFL_OvlLoad(OVERLAY_ID(69));
         unisys->alloc.uniapp = UnionApp_Create(unisys, 3, 5, GetGameDataPlayerInfo(unisys->param->gameData));
-        if (self->group.unk46_1 == 1) {
+        if (self->mycomm.unk46_1 == 1) {
             *step = 5;
         } else {
             (*step)++;
@@ -844,7 +832,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         }
         break;
     case 11:
-        if (self->group.unk46_1 == 1) {
+        if (self->mycomm.unk46_1 == 1) {
             joined = UnionApp_GetJoined(unisys->alloc.uniapp);
             if (UnionMain_SendConfirmProfile(joined, GetGameDataPlayerInfo(unisys->param->gameData)) == TRUE) {
                 UnionApp_JoinSelf(unisys->alloc.uniapp);
@@ -974,7 +962,7 @@ static BOOL UnionCommand_WarpRoom(GameSystem *gsys, UnionSystem *unisys, Field *
 static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field *field, void *arg, GameEvent *event,
                                    GameEvent **next, u8 *step) {
     UnionColosseumParam *param = arg;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
     PStatusParam *status = &param->status;
     ColosseumBattleParam *battle = param->battle;
     u32 selfId = func_02042a6c(func_02040440());
@@ -1104,7 +1092,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             battle->bgm = 0x48a;
         }
         Colosseum_BuildBattlePlayers(colosseum, gsys, &battle->players, 0x41);
-        *next = func_ov012_02152704(gsys, field, unisys->self.activity, battle);
+        *next = func_ov012_02152704(gsys, field, unisys->situ.activity, battle);
         (*step)++;
         break;
     case 13:

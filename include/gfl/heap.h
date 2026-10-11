@@ -69,6 +69,8 @@ enum {
     HEAPID_INTRO = 0x6f,
     HEAPID_FIELD_MENU = 0x70,
     HEAPID_BATTLE_LOAD = 0x76,
+    HEAPID_WIFILOGIN = 0x78,
+    HEAPID_WIFILOGOUT = 0x79,
     HEAPID_CDEMO = 0x7f,
     HEAPID_SAVEDATA_DELETE = 0x81,
     HEAPID_FIELD_CLACT = 0x89,
@@ -81,6 +83,7 @@ enum {
     HEAPID_ZUKAN_DETAIL = 0x95,
     HEAPID_FIELD_SCENEAREA = 0x96,
     HEAPID_BOX_SEARCH = 0x98,
+    HEAPID_MEDAL_INFO = 0x99,
     // Unova Link's (not from swan)
     HEAPID_KEY_SYSTEM = 0x9b,
     // Not from swan: the heap of the Pokémon World Tournament's win record and downloaded tournaments, overlay 326

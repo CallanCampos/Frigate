@@ -76,7 +76,7 @@ static const NetCommand sColosseumCommands[] = {
 
 BOOL Colosseum_CommandBattle(GameSystem *gsys, UnionSystem *unisys, Field *field, void *param, GameEvent *event,
                          GameEvent **next, u8 *step) {
-    UnionSelf *self = &unisys->self;
+    UnionSelf *self = &unisys->situ;
 
     if (*step == 0) {
         *next = func_ov012_02152704(gsys, field, self->activity, param);
@@ -114,7 +114,7 @@ static void Colosseum_RecvNone(int netId, int size, const void *data, void *work
 
 static void Colosseum_RecvMember(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (netId != func_02042a6c(func_02040440()) && colosseum != NULL && colosseum->commPlayer != NULL) {
         sys_memcpy(data, &colosseum->members[netId], size);
@@ -132,7 +132,7 @@ BOOL Colosseum_SendMember(const void *member, BOOL toParent) {
 
 static void Colosseum_RecvCard(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (netId != func_02042a6c(func_02040440()) && colosseum != NULL && colosseum->commPlayer != NULL
         && colosseum->cardCheck[netId] != NULL) {
@@ -151,7 +151,7 @@ BOOL Colosseum_SendCardHead(const TrainerCardData *card) {
 
 static void Colosseum_RecvChoice(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (netId != func_02042a6c(func_02040440()) && colosseum != NULL && colosseum->commPlayer != NULL) {
         Colosseum_StoreChoice(colosseum, netId, data);
@@ -165,7 +165,7 @@ BOOL Colosseum_SendChoice(const ColosseumChoice *choice) {
 
 static void Colosseum_RecvUnk4(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL && colosseum->commPlayer != NULL && func_02042bc4()) {
         Colosseum_Vote(colosseum, netId, *(const u8 *)data);
@@ -180,7 +180,7 @@ BOOL func_ov028_021725c8(UnionColosseum *colosseum) {
 
 static void Colosseum_RecvUnk5(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL && colosseum->commPlayer != NULL) {
         Colosseum_SetUnkDD(colosseum, *(const u32 *)data);
@@ -194,7 +194,7 @@ static BOOL Colosseum_SendUnk5(UnionColosseum *colosseum, u32 netId, u32 value) 
 
 static void Colosseum_RecvParty(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL && colosseum->party[netId] != NULL) {
         sys_memcpy(data, colosseum->party[netId], size);
@@ -211,7 +211,7 @@ BOOL Colosseum_SendParty(const PokeParty *party) {
 
 static void Colosseum_RecvResult(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         sys_memcpy(data, colosseum->unk16C, size);
@@ -225,7 +225,7 @@ BOOL Colosseum_SendResult(const void *result) {
 
 static void Colosseum_RecvUnk8(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         colosseum->unkD4[netId] = TRUE;
@@ -238,7 +238,7 @@ BOOL func_ov028_02172704(void) {
 
 static void Colosseum_RecvUnk9(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         colosseum->unkD8[netId] = TRUE;
@@ -252,7 +252,7 @@ BOOL func_ov028_02172748(void) {
 
 static void Colosseum_RecvUnkA(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         colosseum->unkDF = FALSE;
@@ -265,7 +265,7 @@ static BOOL Colosseum_SendUnkA(u32 netId) {
 
 static void Colosseum_RecvUnkB(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         colosseum->unkCB = TRUE;
@@ -278,7 +278,7 @@ static BOOL Colosseum_SendUnkB(void) {
 
 static void Colosseum_RecvUnkC(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         colosseum->unk171++;
@@ -287,7 +287,7 @@ static void Colosseum_RecvUnkC(int netId, int size, const void *data, void *work
 
 static void Colosseum_RecvUnkD(int netId, int size, const void *data, void *work, NetHandle *handle) {
     UnionSystem *unisys = work;
-    UnionColosseum *colosseum = unisys->colosseum;
+    UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
         colosseum->unk172[netId] = TRUE;

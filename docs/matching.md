@@ -1094,6 +1094,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the list after everything else, so their position among the tables doesn't matter but their order among
   themselves can swap strings of equal size: `mbp.c`'s state names come out in the original's order only with
   `sCWork` declared after `childInfo`.
+- Initialized `.data` statics join the same heapsort as the `.rodata` local initializers, though they land in
+  another section, so their declaration order can reorder the locals' tables. `wifilogin_disp.c`'s sixteen 32-byte
+  `BGSetup` locals came out in the original's order only with the 48-byte `BGSysVRAMConfig` declared before the
+  16-byte `BGSysLCDConfig`; no order of the locals themselves did it. Give `rodata_order.py` the file's other statics
+  too (`V:48 L:16 B0:32@ ...`).
 - Small objects that come after a larger one in the same file, out of size order, may be rows of one array: the PC
   box's `box2_ui.c` has seven cursor tables after a 540-byte one, and they are `sTrayCursorData[3][47]`, three rows
   of equal length that each end in a `TOUCH_RECT_END` entry, with other tables pointing into the rows. Once the sizes

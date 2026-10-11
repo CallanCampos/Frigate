@@ -51,7 +51,8 @@ void BeaconStatus_Free(BeaconStatus *status) {
     GFL_HeapFree(status);
 }
 
-void func_0202d7a8(BeaconStatus *status) {
+BeaconStatus *func_0202d7a8(BeaconStatus *status) {
+    return status;
 }
 
 u8 func_0202d7ac(BeaconStatus *status) {

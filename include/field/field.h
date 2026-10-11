@@ -196,7 +196,7 @@ u32 func_ov036_0218816c(void *window);
 void func_ov036_02187ea0(void *window);
 void *func_ov036_021c3d9c(PlayerInfo *info, Field *field, u32 a2, u32 a3, u32 a4, u32 a5, u32 a6, u32 a7);
 u32 func_ov036_021c3f98(void *obj);
-void func_ov036_021c3eb4(void *obj);
+u8 func_ov036_021c3eb4(void *obj);
 void *func_ov036_021c6574(void *effects, u32 a1, const VecFx32 *pos);
 void func_ov036_021c65a8(void *obj, u16 a1);
 void func_ov036_021c65e8(void *obj, u16 a1);
@@ -311,11 +311,6 @@ void func_ov036_021879c0(void *msgBGSys);
 // which looks like printing and finished
 u32 func_ov036_02188cbc(void *window);
 void func_ov036_021b5180(PlaceName *placeName);
-// Overlay 34, which the Union Room and the Entralink load
-void *func_ov034_0217b768(HeapID heapId);
-void func_ov034_0217b794(void *work);
-void func_ov034_0217b7bc(void *work);
-void func_ov034_0217b7d0(void *work);
 BOOL FieldmapProc_Init(GameProc *proc, int *seq, void *param, void *work);
 BOOL FieldmapProc_Update(GameProc *proc, int *seq, void *param, void *work);
 BOOL FieldmapProc_End(GameProc *proc, int *seq, void *param, void *work);

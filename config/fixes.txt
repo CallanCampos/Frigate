@@ -180,12 +180,12 @@
 . 0x0207e930 add_reloc load,ltd_autoload(0),0x02703cdc
 . 0x0207e934 add_function MIC_StartAutoSampling:thumb:0x1c
 . 0x0207e950 add_function func_0207e950:arm:0x8
-. 0x0207e954 add_reloc load,ltd_autoload(0),0x02703c60
 . 0x0207e954 remove_symbol
+. 0x0207e954 add_reloc load,ltd_autoload(0),0x02703c60
 . 0x0207e958 add_function MIC_StopAutoSampling:thumb:0x18
 . 0x0207e970 add_function func_0207e970:arm:0x8
-. 0x0207e974 remove_symbol
 . 0x0207e974 add_reloc load,ltd_autoload(0),0x02703e90
+. 0x0207e974 remove_symbol
 . 0x0207e978 add_function func_0207e978:thumb:0xa8
 . 0x0208c224 add_label _dadd
 . 0x0208c554 add_label _dsub
@@ -217,6 +217,7 @@
 . 0x02091240 remove_reloc
 . 0x02091244 remove_reloc
 . 0x02091248 remove_reloc
+. 0x02091250 remove_reloc
 . 0x02091260 remove_reloc
 . 0x02091264 remove_reloc
 . 0x02091a94 remove_symbol
@@ -839,6 +840,7 @@ overlays/ov036 0x021d4664 remove_reloc
 overlays/ov036 0x021d4668 remove_reloc
 overlays/ov036 0x021d4920 remove_reloc
 overlays/ov036 0x021d4948 remove_reloc
+overlays/ov036 0x021d4970 remove_reloc
 overlays/ov036 0x021d6f6c remove_symbol
 overlays/ov050 0x021e5e52 reloc_module overlay(36)
 overlays/ov050 0x021e5ed4 reloc_module overlay(36)
@@ -2073,11 +2075,11 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
 overlays/ov310 0x021a7028 add_data data_ov310_021a7028
-overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
-overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
 overlays/ov310 0x021a773c add_data ResearchCommon_Unused
+overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
 overlays/ov311 0x0219d93c reloc_module overlay(139)
 overlays/ov311 0x0219d97c reloc_module overlay(139)
 overlays/ov311 0x0219da74 reloc_module overlay(139)

@@ -44,6 +44,7 @@
 #include "field/resort_mapcreate.h"
 #include "field/scrcmd_ochiba.h"
 #include "field/subscreen.h"
+#include "field/union_eff.h"
 #include "field/union_main.h"
 #include "field/wbt.h"
 #include "field/zone.h"
@@ -317,7 +318,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         FieldEffects_SetLuminanceTable(field->fieldEffects, FieldPalaceSys_GetLuminanceTable(field->palaceSys));
         FieldEffects_Load(field->fieldEffects, STATIC_LOADED_FIELD_EFFECT_IDS, data_ov036_021d0388);
         if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
-            field->unkA0 = func_ov034_0217b768(field->heapId);
+            field->unkA0 = UnionEff_Create(field->heapId);
         }
         break;
     case 4: {
@@ -476,7 +477,7 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     Field_UpdateGimmick(field);
     FieldEffects_Update(field->fieldEffects);
     if (field->unkA0 != NULL) {
-        func_ov034_0217b7bc(field->unkA0);
+        UnionEff_Update(field->unkA0);
     }
     FieldAsyncProcManager_Update(field->asyncProcManager);
     if (field->msgBGSys != NULL) {
@@ -555,7 +556,7 @@ u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
     GameData_SetLastSubscreen(gameData, FieldSubscreen_Free(field->subscreen));
     FieldEffects_Free(field->fieldEffects);
     if (field->unkA0 != NULL) {
-        func_ov034_0217b794(field->unkA0);
+        UnionEff_Free(field->unkA0);
         field->unkA0 = NULL;
     }
     func_ov036_021990d8(field->weatherSystem);
@@ -1323,7 +1324,7 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     BlActSys_Draw(field->actorBlAct, field->g3dCamera, field->g3dLights);
     BlActSys_Draw(field->wildEffectBlAct, field->g3dCamera, field->g3dLights);
     if (field->unkA0 != NULL) {
-        func_ov034_0217b7d0(field->unkA0);
+        UnionEff_Draw(field->unkA0);
     }
     mtx = saved;
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset / 2);

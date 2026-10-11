@@ -3,6 +3,8 @@
 
 #include "types.h"
 #include "battle/regulation.h"
+#include "field/field.h"
+#include "field/trcard_sys.h"
 #include "gfl/heap.h"
 #include "save/join_avenue.h"
 #include "save/player_info.h"
@@ -63,6 +65,22 @@ typedef struct {
     u8 unk60[4];
 } UnionBeacon;
 
+// The field actor of one member of a heard beacon, which overlay 34 runs. Its actor ID is the entry's index << 8 | the
+// member + 0x20
+typedef struct {
+    struct UnionBeaconEntry *entry;
+    u8 look;
+    u8 gender;
+    u8 member; // in entry->beacon.members
+    u8 used;
+    u8 step;
+    u8 nextStep;
+    u8 phase;
+    u8 seq;
+} UnionActorSlot;
+
+#define UNION_ACTOR_MAX 50
+
 // A beacon heard from another machine
 typedef struct UnionBeaconEntry {
     UnionBeacon beacon;
@@ -70,12 +88,17 @@ typedef struct UnionBeaconEntry {
     u8 status; // 1 when new, 2 when heard again
     u8 index;
     u16 timeout; // frames until it is forgotten, reset on each beacon
-    u8 unk6E[0x1e];
+    UnionActorSlot *actor[UNION_MEMBER_MAX];
+    u8 unk84[8];
 } UnionBeaconEntry;
 
 // The players this machine is grouped with
 struct UnionGroup {
-    UnionBeaconEntry *target[4];
+    // The player spoken to, the one who answered, and the parent joined (the names of the third are the ROM's)
+    UnionBeaconEntry *target;
+    UnionBeaconEntry *unk4;
+    UnionBeaconEntry *answer_pc;
+    UnionBeaconEntry *parent;
     u8 unk10[8];
     u8 unk18;
     u8 unk19;
@@ -102,20 +125,28 @@ struct UnionGroup {
 // This machine's state, which its beacon is built from
 typedef struct {
     u8 activity;
-    u8 unk01;
+    u8 step; // 0x2a when idle; the beacon sends it
     u8 unk02;
     u16 look[4];
     u16 counter;
     u8 changed;
     u8 state;
     u8 unk10[4];
-    UnionGroup group;
-    u8 unk64[0x11];
-    u8 unk75;
-    u8 unk76;
-    u8 unk77;
-    u8 mac78[6];
+    UnionGroup mycomm; // the ROM's name
+    u8 ruleSel[4]; // the battle format, two options and the menu kind
+    s32 partyCheck; // the regulation's checks of the party and of the Battle Box
+    s32 boxCheck;
+    s16 wait; // frames
+    s16 result;
+    u8 prevStep;
+    u8 nextStep;
+    u8 phase; // of the step: 0 entering, 1 running, 2 leaving
+    u8 seq;
+    u8 mac78[6]; // the player to show the focus effect on
 } UnionSelf;
+
+// A step of the system, run by overlay 34
+typedef BOOL (*UnionSituFunc)(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 
 // A player seen in the Union Room, by the machine's address
 typedef struct {
@@ -149,13 +180,17 @@ typedef struct {
 struct UnionSystem {
     UnionBootParam *param;
     u8 recvBuf[5][0x800]; // a buffer per net ID
-    WordSet *wordSet;
-    void *unk2808;
-    void *unk280C;
-    void *listMenu;
-    void *unk2814;
-    void *unk2818;
-    u8 unk281C[0xd];
+    // The names of these six are the ROM's, from overlay 34's asserts
+    WordSet *wordset;
+    MsgData *msgdata;
+    void *fld_msgwin_stream;
+    ListMenuUI *fldmenu_func;
+    void *fldmenu_yesno_func;
+    void *fldmsgwin;
+    u32 unk281C;
+    StrBuf *msgbuf; // the message, and with its words set
+    StrBuf *fmtbuf;
+    u8 msgPrinting;
     u8 beaconReady;
     u8 fieldActive;
     u8 entryReply; // 1 when this machine's entry request was accepted, 2 when refused
@@ -163,27 +198,27 @@ struct UnionSystem {
     u8 entryRepliedTo;
     u8 unk282E;
     u8 unk282F;
-    UnionSelf self;
+    UnionSelf situ; // the ROM's name for it
     UnionBeacon beacon;
     UnionBeaconEntry found[UNION_BEACON_ENTRY_MAX];
-    u8 unk2E8C[0x258];
+    UnionActorSlot actors[UNION_ACTOR_MAX];
     UnionVisitorList visitorList;
     // What the system allocates as players meet (the names are the ROM's, from its asserts). The trainer cards are sent
     // whole
     struct {
         UnionApp *uniapp;
         Regulation *regulation;
-        void *unk3534;
-        void *unk3538;
-        void *unk353C;
-        void *unk3540;
-        void *my_card;
-        void *target_card;
+        void *rpm; // the regulation's rules printed, from func_0201f8b4 (the name is the ROM's)
+        void *partySelect;
+        PokeParty *boxParty; // the Battle Box as a party
+        TrainerCardParam *cardParam;
+        TrainerCardData *my_card;
+        TrainerCardData *target_card;
     } alloc;
     JoinAvenuePerson joinPerson;
     UnionSubproc subproc;
-    void *unk3620;
-    UnionColosseum *colosseum;
+    void *cmdArg; // what overlay 34 allocates for the command it starts
+    UnionColosseum *colosseum_sys;
     u8 commState;
     u8 linkState; // 0 when idle, then the steps of UnionComm_UpdateLink's restart of the communication
     u8 linkMode;
@@ -231,8 +266,6 @@ void UnionComm_SetState(UnionSystem *sys, u8 state);
 void UnionComm_SetCommandBase(u32 activity);
 
 // Functions outside this file that it calls, without their own header yet
-// (overlay 34) the colosseum's players, set on the field
-void func_ov034_0217be34(UnionColosseum *colosseum);
 // (main) copies the player's DWC user data
 void func_0200a3cc(WifiList *wifiList, void *dest);
 

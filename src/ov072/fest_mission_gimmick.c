@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/pokemon.h"
 #include "field/fest_mission_gimmick.h"
+#include "field/fest_mission_people.h"
 #include "field/festival.h"
 #include "field/field_actor.h"
 #include "field/zone.h"
@@ -19,7 +20,7 @@ static BOOL func_ov072_021e9058(FesGimmick *gimmick, FesMissionWork *work, int i
 static void func_ov072_021e909c(FesMissionWork *work, int index);
 
 void func_ov072_021e8be0(FesGimmick *gimmick, FesMissionWork *work) {
-    FldActSys_LoadStaticBlact(gimmick->actors, func_ov025_0216fa28(work, gimmick->mission));
+    FldActSys_LoadStaticBlact(gimmick->actors, FesMissionPeople_GetObjCode(work, gimmick->mission));
 }
 
 void func_ov072_021e8bf8(FesGimmick *gimmick, FesMissionWork *work) {
@@ -30,7 +31,7 @@ void func_ov072_021e8bf8(FesGimmick *gimmick, FesMissionWork *work) {
 
 void func_ov072_021e8c08(FesGimmick *gimmick, FesMissionWork *work, u16 zoneId, int index) {
     if (work->actorCount != 0) {
-        func_ov025_0216fa34(work, zoneId)->removed[index] = TRUE;
+        FesMissionPeople_GetZone(work, zoneId)->removed[index] = TRUE;
         SetActorHidden(work->actors[index], TRUE);
         func_ov072_021e909c(work, index);
     }
@@ -40,7 +41,7 @@ BOOL func_ov072_021e8c3c(FesGimmick *gimmick, FesMissionWork *work) {
     BOOL result = TRUE;
     int i;
 
-    if (work->unk006 == 0) {
+    if (work->placeCount == 0) {
         result = FALSE;
     }
     if (work->actorCount != 0) {
@@ -88,13 +89,13 @@ void func_ov072_021e8d08(FesGimmick *gimmick, FieldActor *actor, u16 arg0, u16 a
         *out1 = 0x1a;
         return;
     }
-    answers = &data_ov025_02170160[gimmick->mission->unk0_20];
+    answers = &FesMissionPeople_Answers[gimmick->mission->unk0_20];
     *out0 = answers->values[GetActorUserParam(actor, 0)][arg0];
     *out1 = answers->values[GetActorUserParam(actor, 1)][arg1];
 }
 
 void func_ov072_021e8d70(FesGimmick *gimmick, FieldActor *actor, u16 *item, u16 *price) {
-    u8 onSale = func_ov025_0216fa18(gimmick->mission);
+    u8 onSale = FesMissionPeople_IsOnSale(gimmick->mission);
     int value;
 
     if (gimmick->mission->target != 3) {
@@ -201,7 +202,7 @@ static u16 func_ov072_021e8f24(u16 max, const u16 *list, int count) {
 }
 
 static BOOL func_ov072_021e8f48(FesGimmick *gimmick, FesMissionWork *work) {
-    FesMissionZone *zone = func_ov025_0216fa34(work, work->zoneId);
+    FesMissionZone *zone = FesMissionPeople_GetZone(work, work->zoneId);
     int i;
 
     for (i = 0; i < work->actorCount; i++) {

@@ -2,6 +2,7 @@
 #define POKEBW2_SYSTEM_GAME_BEACON_H
 
 #include "types.h"
+#include "gfl/heap.h"
 #include "save/join_avenue.h"
 #include "struct_decls.h"
 
@@ -256,5 +257,22 @@ void func_0202d6a8(void);
 BOOL func_02013bd4(const GameBeacon *beacon);
 // The beacon's type, or 1 for a type of 0 or of GAME_BEACON_TYPE_MAX or more
 u16 func_02013eac(const GameBeacon *beacon);
+
+// The log of received beacons that BeaconStatus keeps. Copies the beacon at index into dest and its time into time,
+// and returns whether there is one
+BOOL func_02013b44(BeaconStatus *status, GameBeacon *dest, u16 *time, u32 index);
+// How many beacons the log holds
+u8 func_02013b80(BeaconStatus *status);
+// Allocates a beacon, cleared
+GameBeacon *func_02013b8c(HeapID heapId);
+// Whether the beacon's type is one of a distribution, 0x19, 0x1a, 0x1b or 0x32
+BOOL func_02013c88(const GameBeacon *beacon);
+// Loads the beacon's trainer name, 8 characters, into a StrBuf
+void func_02013cac(const GameBeacon *beacon, StrBuf *dest);
+// The beacon's kind, the low 6 bits of its word at 0xc
+u32 func_02013cc0(const GameBeacon *beacon);
+// The medal that the beacon's sender wears last, or 0xff, and how many medals it has
+u8 func_02013dc8(const GameBeacon *beacon);
+u8 func_02013dd0(const GameBeacon *beacon);
 
 #endif // POKEBW2_SYSTEM_GAME_BEACON_H

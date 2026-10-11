@@ -44,6 +44,8 @@ BOOL func_02007da4(BoxSaveAccessor *boxes, u32 set);
 
 // The battle box, save block 0x31
 BattleBoxSave *getBattleBox(SaveControl *save);
+// Clears the flags of the mask in the battle box
+void func_0200c370(BattleBoxSave *battleBox, u16 mask);
 // Allocates a party of the battle box's Pokémon
 PokeParty *convertBoxedPokeSetToParty(BattleBoxSave *battleBox, HeapID heapId);
 // Store the party in the Battle Box

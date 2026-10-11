@@ -21694,7 +21694,6 @@ from:0x021d4900 kind:load to:0x021c95b1 module:overlay(36)
 from:0x021d4904 kind:load to:0x021c95cd module:overlay(36)
 from:0x021d4944 kind:load to:0x02020101 module:main
 from:0x021d4960 kind:load to:0x02020101 module:main
-from:0x021d4970 kind:load to:0x0217000b module:overlay(25)
 from:0x021d4974 kind:load to:0x02020101 module:main
 from:0x021d4994 kind:load to:0x02020101 module:main
 from:0x021d49a8 kind:load to:0x02020101 module:main

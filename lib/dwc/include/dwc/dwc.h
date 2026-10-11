@@ -16,6 +16,11 @@ void func_02058490(void);
 // Starts connecting to the access point; one of the calls that end the connection after a server error; and the
 // connection's state
 void func_ov011_0215dec0(void);
+// Starts the connection to the Nintendo Wi-Fi Connection with the access point's name (an empty one takes the
+// default) and the buffer of the connection, returning FALSE if it could not start
+BOOL func_ov011_0215de44(const char *apName, void *buffer);
+// The connection's state, 3 once connected, ending it after a state from 3 to 5
+int func_ov011_0215dea8(void);
 void func_ov011_0215fb78(void);
 int func_ov011_0215df40(void);
 

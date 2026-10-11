@@ -204,7 +204,7 @@ static void UnionApp_CheckProfileLeft(UnionApp *app, UnionSystem *sys) {
                 app->status.joined &= 0xff ^ bit;
                 app->hasProfile &= 0xff ^ bit;
             }
-            UnionGroup_RemoveMember(&sys->self.group, app->members[i].mac);
+            UnionGroup_RemoveMember(&sys->situ.mycomm, app->members[i].mac);
         }
     }
 }
@@ -219,7 +219,7 @@ static void UnionApp_CheckEnteringLeft(UnionApp *app, UnionSystem *sys) {
             app->entering ^= bit;
             if (app->hasProfile & bit) {
                 app->hasProfile &= 0xff ^ bit;
-                UnionGroup_RemoveMember(&sys->self.group, app->members[i].mac);
+                UnionGroup_RemoveMember(&sys->situ.mycomm, app->members[i].mac);
             }
             if (app->entryMode == UNION_APP_ENTRY_LIMITED && app->entryCount != 0) {
                 app->entryCount--;
@@ -253,12 +253,12 @@ void UnionApp_RequestSendProfile(UnionApp *app, u8 netId) {
 }
 
 void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, u8 netId, UnionAppMember *member) {
-    UnionSelf *self = &sys->self;
+    UnionSelf *self = &sys->situ;
 
     app->members[netId] = *member;
     app->hasProfile |= 1 << netId;
     if (netId != func_02042a6c(func_02040440())) {
-        UnionGroup_AddMember(&self->group, member->mac, func_02008bf4(&member->info), getTrainerGender(&member->info));
+        UnionGroup_AddMember(&self->mycomm, member->mac, func_02008bf4(&member->info), getTrainerGender(&member->info));
     }
 }
 

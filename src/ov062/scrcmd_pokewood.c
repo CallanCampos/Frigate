@@ -90,7 +90,7 @@ static BOOL PokewoodCmd_Create(VM *vm, FieldScriptEnv *env) {
 
     *sys = PokewoodSystem_Create(HEAPID_GAMEEVENT);
     GFL_OvlLoad(OVERLAY_EVENT_POKEWOOD);
-    func_ov023_0216f59c(save, gameData, 0, 0, 0);
+    EventPokewood_UnlockMovies(save, gameData, 0, 0, 0);
     GFL_OvlUnload(OVERLAY_EVENT_POKEWOOD);
     return FALSE;
 }
@@ -113,7 +113,7 @@ static BOOL func_ov062_021e5914(VM *vm, FieldScriptEnv *env) {
     args[1] = ScriptReadAny(vm, env);
     PokewoodSystem_SetResultVar(sys, ScriptReadVar(vm, env));
     ScriptWork_CallEvent(work,
-                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, func_ov023_0216f2dc, args));
+                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateFilmEvent, args));
     return TRUE;
 }
 
@@ -123,7 +123,7 @@ static BOOL func_ov062_021e597c(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     PokewoodSystem *sys = Pokewood_GetSystem(env);
 
-    ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, func_ov023_0216f544, sys));
+    ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateCastSelectEvent, sys));
     PokewoodSystem_SetResultVar(sys, var);
     return TRUE;
 }
@@ -146,7 +146,7 @@ static BOOL func_ov062_021e5a00(VM *vm, FieldScriptEnv *env) {
     PokewoodSystem *sys = Pokewood_GetSystem(env);
 
     ScriptWork_CallEvent(work,
-                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, func_ov023_0216f30c, &arg));
+                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateWatchSlotEvent, &arg));
     PokewoodSystem_SetResultVar(sys, var);
     return TRUE;
 }
@@ -158,7 +158,7 @@ static BOOL func_ov062_021e5a60(VM *vm, FieldScriptEnv *env) {
     PokewoodSystem *sys = Pokewood_GetSystem(env);
 
     ScriptWork_CallEvent(work,
-                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, func_ov023_0216f338, NULL));
+                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateWatchBlockEvent, NULL));
     PokewoodSystem_SetResultVar(sys, NULL);
     return TRUE;
 }
@@ -171,7 +171,7 @@ static BOOL func_ov062_021e5aa8(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     PokewoodSystem **sys = func_02017a04(gameData);
     void *param = func_ov062_021e6680(heapId, gsys, var);
-    GameEvent *event = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, func_ov023_0216f364, param);
+    GameEvent *event = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateMoviePickerEvent, param);
 
     func_ov062_021e66b8(param);
     ScriptWork_CallEvent(work, event);
@@ -186,7 +186,7 @@ static BOOL func_ov062_021e5b14(VM *vm, FieldScriptEnv *env) {
     u16 arg = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
     void *param = func_ov062_021e66c0(heapId, gsys, arg, var);
-    GameEvent *event = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, func_ov023_0216f41c, param);
+    GameEvent *event = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateMenuEvent, param);
 
     func_ov062_021e670c(param);
     ScriptWork_CallEvent(work, event);
@@ -330,7 +330,7 @@ static BOOL func_ov062_021e5de4(VM *vm, FieldScriptEnv *env) {
     if (func_020110ac(save, 0, movie) == TRUE && func_020110ac(save, 3, movie) == FALSE) {
         func_020110d4(save, 3, movie);
         GFL_OvlLoad(OVERLAY_EVENT_POKEWOOD);
-        switch (func_ov023_0216f698(movie)) {
+        switch (EventPokewood_GetUnlockKind(movie)) {
         case 0:
         case 1:
         default:
@@ -446,7 +446,7 @@ static BOOL func_ov062_021e6040(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     PokewoodSystem **sys = func_02017a04(gameData);
     void *param = func_ov062_021e6714(heapId, gsys);
-    GameEvent *event = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, func_ov023_0216f6a4, param);
+    GameEvent *event = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKEWOOD, EventPokewood_CreateScreenEvent, param);
 
     func_ov062_021e674c(param);
     ScriptWork_CallEvent(work, event);
