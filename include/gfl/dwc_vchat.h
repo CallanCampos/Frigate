@@ -3,18 +3,31 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "nitro/mic.h"
 
-// Overlay 29: the Wi-Fi voice chat, whose file the ROM doesn't name
+// dwc_rap_vchat.c, in overlay 29 ahead of Nintendo's voice chat library: the game's side of the Wi-Fi voice chat. The
+// ROM names no file
 
-void func_ov029_021925b4(BOOL a0);
-void func_ov029_0219270c(HeapID heapId, int mode, int a2);
-int func_ov029_021926e4(u8 netId, u8 *data, int size);
-void func_ov029_021928e4(void);
-void func_ov029_02192934(void (*callback)(void));
-void func_ov029_02192948(void);
-void func_ov029_02192a54(int netId);
-void func_ov029_02192ab4(BOOL a0);
-BOOL func_ov029_021929b8(void);
-BOOL func_ov029_021929e0(u32 netIds, int netId);
+// Runs the voice chat a frame; stalled is whether the connection is too slow to send the voice
+void DWCRapVChat_Update(BOOL stalled);
+// Hands a packet that came from a machine to the library, returning whether it was the library's
+BOOL DWCRapVChat_ReceivePacket(int aid, u8 *data, int size);
+// Starts the voice chat in a heap, coded as the library's codec number says, for some machines
+void DWCRapVChat_Start(HeapID heapId, int codec, int count);
+void DWCRapVChat_RequestEnd(void);
+// Sets the function called once the voice chat has ended
+void DWCRapVChat_SetEndCallback(void (*callback)(void));
+void DWCRapVChat_End(void);
+BOOL DWCRapVChat_GetSpeaking(void);
+BOOL DWCRapVChat_AddHeard(u32 netIds, int myNetId);
+BOOL DWCRapVChat_RemoveHeard(int myNetId);
+void DWCRapVChat_SetMuted(BOOL muted);
+
+// Microphone and power calls the file makes, not yet named: starting the microphone's sampling for the DS and for the
+// DSi, stopping it for the DS, and setting the amplifier's gain
+void func_0207e7a0(MICAutoParam *param, void (*callback)(void), int arg);
+void func_0207e904(MICAutoParam *param, void (*callback)(void), int arg);
+void func_0207e8d4(void);
+void func_0207eff4(int gain);
 
 #endif // POKEBW2_GFL_DWC_VCHAT_H

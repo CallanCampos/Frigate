@@ -588,6 +588,47 @@ the original code is linked until they match. The differences are the same in bo
 | `lib/nitro/src/mb/mb_wm.c` | `MB_DisconnectChild` | `0x021a3874` / `0x021a38b4` | +4 bytes (0x130 against the original's 0x12c). Not examined past the first difference yet. |
 | `lib/nitro/src/mb/mb_wm.c` | `MBWm_SendToChildren` | `0x021a39dc` / `0x021a3a1c` | -12 bytes (0xa0 against the original's 0xac). Not examined past the first difference yet. |
 | `lib/nitro/src/mb/mb_wm.c` | `MBWm_GetAttribute` | `0x021a3aa0` / `0x021a3ae0` | 19 bytes, same size. Not examined past the first difference yet. |
+| `lib/dwc/src/vct/vct.c` | `DispatchPacket` | `0x021970cc` / `0x0219710c` | 6 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct.c` | `VCT_Init` | `0x02196eb4` / `0x02196ef4` | 29 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_adpcm.c` | `EncodeAdpcm4` | `0x02192c3c` / `0x02192c7c` | -8 bytes (0x18c against the original's 0x194). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_adpcm.c` | `DecodeAdpcm3` | `0x02192dd0` / `0x02192e10` | -12 bytes (0x488 against the original's 0x494). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_adpcm.c` | `EncodeAdpcm3` | `0x02193264` / `0x021932a4` | -52 bytes (0x4f4 against the original's 0x528). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_adpcm.c` | `DecodeAdpcm2` | `0x0219378c` / `0x021937cc` | 105 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_adpcm.c` | `EncodeAdpcm2` | `0x021939a4` / `0x021939e4` | -4 bytes (0x23c against the original's 0x240). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_adpcm.c` | `VCT_DecodeAdpcm` | `0x02193be4` / `0x02193c24` | 12 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `ReceiveSlot` | `0x021940ac` / `0x021940ec` | -8 bytes (0x23c against the original's 0x244). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `EncodeNextFrame` | `0x021944c0` / `0x02194500` | +24 bytes (0x238 against the original's 0x220). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `EncodeMulaw` | `0x02194d30` / `0x02194d70` | -4 bytes (0xa8 against the original's 0xac). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `FlushAllQueues` | `0x02194f38` / `0x02194f78` | -4 bytes (0x7c against the original's 0x80). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `UpdateTiming` | `0x0219533c` / `0x0219537c` | -16 bytes (0x388 against the original's 0x398). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_InitAudio` | `0x02193cb0` / `0x02193cf0` | 62 bytes, same size. The original reads the frame-size table through one row pointer. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_AttachSession` | `0x02193dbc` / `0x02193dfc` | -8 bytes (0x130 against the original's 0x138). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_DetachSession` | `0x02193ef4` / `0x02193f34` | 18 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_SubmitSamples` | `0x02193fa0` / `0x02193fe0` | -16 bytes (0xfc against the original's 0x10c). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_ReadSamples` | `0x021942f0` / `0x02194330` | -4 bytes (0x118 against the original's 0x11c). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_HandleVoicePacket` | `0x021946e0` / `0x02194720` | +48 bytes (0x214 against the original's 0x1e4). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_DecodeReceived` | `0x021948c4` / `0x02194904` | 13 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_audio.c` | `VCT_SendPending` | `0x02194990` / `0x021949d0` | +4 bytes (0x118 against the original's 0x114). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `SuppressEcho` | `0x02196ba0` / `0x02196be0` | -60 bytes (0x1d0 against the original's 0x20c). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `VCT_InitPacketPool` | `0x02196680` / `0x021966c0` | 51 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `VCT_ResetCapture` | `0x021967c0` / `0x02196800` | 10 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `VCT_UpdateVad` | `0x0219682c` / `0x0219686c` | -8 bytes (0x1c4 against the original's 0x1cc). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `VCT_InitCapture` | `0x021969f8` / `0x02196a38` | -4 bytes (0x24 against the original's 0x28). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `VCT_FilterFrame` | `0x02196a20` / `0x02196a60` | +4 bytes (0xf0 against the original's 0xec). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `VCT_InitEcho` | `0x02196b0c` / `0x02196b4c` | -8 bytes (0x74 against the original's 0x7c). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_dsp.c` | `VCT_MixSamples` | `0x02196dcc` / `0x02196e0c` | 75 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `InitControlPacket` | `0x02195ff0` / `0x02196030` | 16 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `CheckTransition` | `0x0219614c` / `0x0219618c` | 12 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `HandleHostPacket` | `0x02196388` / `0x021963c8` | -12 bytes (0x168 against the original's 0x174). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `SendBroadcast` | `0x02195dc8` / `0x02195e08` | 5 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `GetEvent` | `0x02195f44` / `0x02195f84` | 6 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `ReplyTransition` | `0x0219603c` / `0x0219607c` | 28 bytes, same size. Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `HandleCommand4` | `0x02196578` / `0x021965b8` | -4 bytes (0x104 against the original's 0x108). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `lib/dwc/src/vct/vct_session.c` | `VCT_InitSessions` | `0x02195a5c` / `0x02195a9c` | +8 bytes (0x11c against the original's 0x114). Closest natural C so far: registers and scheduling; not ground further yet. |
+| `src/ov029/dwc_rap_vchat.c` | `RequestVoice` | `0x02192414` / `0x02192454` | 24 bytes, same size. The original saves only r4 and, when VCT_Request fails, releases the session through a second call sequence; ours saves r3-r5. |
+| `src/ov029/dwc_rap_vchat.c` | `AcceptVoice` | `0x02192464` / `0x021924a4` | 41 bytes, same size. The original keeps the work pointer and offset in r4 and r6 and reloads requestSession between VCT_Respond and VCT_AttachSession; ours caches it. |
+| `src/ov029/dwc_rap_vchat.c` | `ManualCallback` | `0x021924a8` / `0x021924e8` | 2 bytes, same size. Only the call to VCT_AttachSession, a bl in ours where the ROM has the linker's blx; it should match once linked. |
+| `src/ov029/dwc_rap_vchat.c` | `DWCRapVChat_Start` | `0x0219270c` / `0x0219274c` | +4 bytes (0x1c4 against the original's 0x1c0). The work pointer and byte count are in swapped registers, and the micParam stores take 4 bytes more. |
 
 ## Matching, but not linkable as is
 

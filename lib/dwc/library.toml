@@ -1,0 +1,32 @@
+# Nintendo's DWC (Wi-Fi Connection), built apart from the game with the game's compiler, dsi/1.1p1. Most of DWC in
+# overlays 189 and 260 is Thumb code, so Thumb is the default here; the voice chat library libVCT (overlay 29, vct/) is
+# ARM code at -O4,p and is set per file below. Probed on libVCT in all of dsi/1.1 to dsi/1.6sp2, 2.0/* and 1.2/*: dsi/1.1
+# to dsi/1.6sp2 compile it alike and best (41 of its first 96 functions matched at dsi/1.1p1, 31 at 2.0/*, 17 at
+# 1.2/sp3 and sp4, 10 at 1.2/base), -O4,s and -O2 match 28 and 27, and -inline made no gain. Other parts that differ
+# take their own file_flags entry.
+compiler = "dsi/1.1p1"
+flags = [
+    "-O4,p",               # Optimize for speed
+    "-proc arm946e",       # ARM9 processor
+    "-thumb",              # Thumb code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char signed",        # char is signed
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]
+
+# libVCT is ARM code; vct.c also reaches its two objects from one base, as -ipa file does
+[file_flags]
+"vct/vct_adpcm.c" = ["-nothumb"]
+"vct/vct_audio.c" = ["-nothumb"]
+"vct/vct_session.c" = ["-nothumb"]
+"vct/vct_dsp.c" = ["-nothumb"]
+"vct/vct.c" = ["-nothumb", "-ipa file"]

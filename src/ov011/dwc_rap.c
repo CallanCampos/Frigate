@@ -627,7 +627,7 @@ static void DWCRap_RecvCallback(u8 aid, u8 *data, int size) {
             _dWork->sendReady = 1;
             return;
         } else {
-            if (func_ov029_021926e4(aid, data, size)) {
+            if (DWCRapVChat_ReceivePacket(aid, data, size)) {
                 return;
             }
             return;
@@ -808,12 +808,12 @@ static u32 DWCRap_Update(void) {
     DWCRap_UpdateFriendStatus();
     if (_dWork->vctActive != 0) {
         if (_dWork->unk794 == 1 && _dWork->unk790 == 1 && _dWork->unk796 == 1) {
-            func_ov029_021925b4(FALSE);
+            DWCRapVChat_Update(FALSE);
         } else {
-            func_ov029_021925b4(TRUE);
+            DWCRapVChat_Update(TRUE);
         }
         if (_dWork->lastConnectBits != func_ov011_02160344() && _dWork->micOn == 0 && _dWork->vctEnabled != 0) {
-            if (func_ov029_021929e0(func_ov011_02160344(), func_ov011_021602c0())) {
+            if (DWCRapVChat_AddHeard(func_ov011_02160344(), func_ov011_021602c0())) {
                 _dWork->lastConnectBits = func_ov011_02160344();
             }
         }
@@ -880,8 +880,8 @@ static void DWCRap_StartVct(HeapID heapId) {
             mode = 4;
             break;
         }
-        func_ov029_0219270c(heapId, mode, 1);
-        func_ov029_02192934(DWCRap_VctEndCallback);
+        DWCRapVChat_Start(heapId, mode, 1);
+        DWCRapVChat_SetEndCallback(DWCRap_VctEndCallback);
         _dWork->vctActive = 1;
     }
 }
@@ -892,7 +892,7 @@ void DWCRap_StartVoiceChat(void) {
 
 void DWCRap_StopVoiceChat(void) {
     if (_dWork->vctActive != 0) {
-        func_ov029_021928e4();
+        DWCRapVChat_RequestEnd();
     }
 }
 
@@ -901,7 +901,7 @@ int DWCRap_IsVoiceChatActive(void) {
 }
 
 void DWCRap_ResetVoiceChat(void) {
-    func_ov029_02192948();
+    DWCRapVChat_End();
     if (_dWork != NULL) {
         _dWork->vctActive = 0;
         _dWork->lastConnectBits = 0;
@@ -911,12 +911,12 @@ void DWCRap_ResetVoiceChat(void) {
 
 void DWCRap_SetMic(BOOL on) {
     if (on) {
-        func_ov029_02192a54(func_ov011_021602c0());
+        DWCRapVChat_RemoveHeard(func_ov011_021602c0());
         _dWork->micOn = TRUE;
     } else {
         _dWork->micOn = FALSE;
     }
-    func_ov029_02192ab4(_dWork->micOn);
+    DWCRapVChat_SetMuted(_dWork->micOn);
 }
 
 // clang-format off
@@ -1056,7 +1056,7 @@ BOOL DWCRap_RequestClose(BOOL a0) {
         case DWCRAP_STATE_CONNECTED:
         case DWCRAP_STATE_CONNECTED_IDLE:
             if (_dWork->vctActive != 0) {
-                func_ov029_021928e4();
+                DWCRapVChat_RequestEnd();
             }
             DWCRap_SetState(DWCRAP_STATE_CLOSED);
             break;
@@ -1246,7 +1246,7 @@ static void DWCRap_ConnectedCallback(int index, void *param) {
 }
 
 BOOL func_ov011_02151de4(void) {
-    return func_ov029_021929b8();
+    return DWCRapVChat_GetSpeaking();
 }
 
 s16 func_ov011_02151dec(void) {
