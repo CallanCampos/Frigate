@@ -376,7 +376,7 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
         GFL_OvlLoad(OVERLAY_ID(139));
         GFL_OvlLoad(OVERLAY_ID(189));
         GFL_OvlLoad(OVERLAY_ID(260));
-        wk->link = func_ov260_021b8cc8(param->unk14, *param->gameData, 0, HEAPID_WIFIBATTLEMATCH_SUBPROC);
+        wk->link = WifiBattleMatchNet_Create(param->unk14, *param->gameData, 0, HEAPID_WIFIBATTLEMATCH_SUBPROC);
         (*state)++;
         break;
     case 3:
@@ -389,12 +389,12 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
         }
         break;
     case 5:
-        if (func_ov260_021bb21c(wk->link, param->party)) {
+        if (WifiBattleMatchNet_SendParty(wk->link, param->party)) {
             (*state)++;
         }
         break;
     case 6:
-        if (func_ov260_021bb25c(wk->link, param->otherParty)) {
+        if (WifiBattleMatchNet_TakeParty(wk->link, param->otherParty)) {
             (*state)++;
         }
         break;
@@ -408,7 +408,7 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
         }
         break;
     case 9:
-        func_ov260_021b8da4(wk->link);
+        WifiBattleMatchNet_Delete(wk->link);
         wk->link = NULL;
         GFL_OvlUnload(OVERLAY_ID(260));
         GFL_OvlUnload(OVERLAY_ID(189));
@@ -430,7 +430,7 @@ static BOOL WifiBattleMatchExchange_MainWifi(WifiBattleMatchExchangeWork *wk, Wi
 
 static void WifiBattleMatchExchange_ExitWifi(WifiBattleMatchExchangeWork *wk, WifiBattleMatchExchangeParam *param) {
     if (wk->link != NULL) {
-        func_ov260_021b8da4(wk->link);
+        WifiBattleMatchNet_Delete(wk->link);
         GFL_OvlUnload(OVERLAY_ID(260));
         GFL_OvlUnload(OVERLAY_ID(189));
         GFL_OvlUnload(OVERLAY_ID(139));

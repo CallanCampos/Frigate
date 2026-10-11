@@ -31,6 +31,8 @@ u32 func_020094cc(GameRecords *records, u32 id, u32 value);
 
 // Clears the flag that is set, with the console's MAC address and the time, while a match is in progress
 void RecordSave_ClearMatchInProgress(RecordSave *record);
+// Sets that flag again, with the console's MAC address and the time
+void func_0200f368(RecordSave *record);
 
 u32 RecordAddOne(GameRecords *records, u32 id);
 u32 RecordGet(GameRecords *records, u32 id);
@@ -60,5 +62,9 @@ void *func_0200f2d0(RecordSave *record);
 void *func_0200f2d8(RecordSave *record);
 u32 func_0200f1d8(void *results, u32 index);
 u16 func_0200e870(void *results, u32 index, u32 field);
+// Sets a field of a result, from 0 to 0xffff
+void func_0200e87c(void *results, u32 index, u32 field, s32 value);
+// Adds 1 to a field of a result, up to 0xffff
+void func_0200e8a0(void *results, u32 index, u32 field);
 
 #endif // POKEBW2_SAVE_RECORDS_H

@@ -73,6 +73,7 @@ enum {
     HEAPID_WIFILOGOUT = 0x79,
     HEAPID_CDEMO = 0x7f,
     HEAPID_SAVEDATA_DELETE = 0x81,
+    HEAPID_PDC = 0x85,
     HEAPID_FIELD_CLACT = 0x89,
     HEAPID_EGG_DEMO = 0x8f,
     // Not from swan: the trade's, in overlay 194's own memory

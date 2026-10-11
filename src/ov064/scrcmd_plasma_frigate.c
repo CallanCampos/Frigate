@@ -4,7 +4,7 @@
 #include "constants/text_banks.h"
 #include "field/field_event.h"
 #include "field/field_script.h"
-#include "field/ov117.h"
+#include "field/gimmick_plasma_frigate.h"
 #include "field/ov119.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -43,7 +43,7 @@ static u8 PlasmaFrigate_GetPasswordIndex(PlayerInfo *playerInfo);
 static BOOL func_ov064_021e5800(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov117_021eed00(gsys, VM_Read16(vm));
+    GameEvent *event = GimmickPlasmaFrigate_CallSwitchEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return FALSE;
@@ -58,21 +58,21 @@ static BOOL func_ov064_021e5838(VM *vm, FieldScriptEnv *env) {
 
     gsys = FieldScriptEnv_GetGameSystem(env);
     a = VM_Read16(vm);
-    func_ov117_021eed24(gsys, a, ScriptReadAny(vm, env) != TRUE);
+    GimmickPlasmaFrigate_SetLightsState(gsys, a, ScriptReadAny(vm, env) != TRUE);
     return FALSE;
 }
 
 static BOOL func_ov064_021e586c(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov117_021eed64(gsys, VM_Read16(vm));
+    GimmickPlasmaFrigate_CallPlayGroupASecond(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 static BOOL func_ov064_021e588c(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov117_021eed88(gsys, VM_Read16(vm));
+    GimmickPlasmaFrigate_CallPlayGroupBSecond(gsys, VM_Read16(vm));
     return FALSE;
 }
 

@@ -33,14 +33,14 @@
 #define STEP_MESSAGE_QUEUE_NUM 4
 
 struct LiveBattleMatchFlow {
-    Ov262Task *task;
-    Ov262Menu *menu;
+    WifiBattleMatchTask *task;
+    WifiBattleMatchMenu *menu;
     u32 menuKind;
     LiveBattleMatchIrc *irc;
-    Ov262Card *playerCard;
-    Ov262PartnerCard *partnerCard;
-    Ov262TeamList *teamList;
-    Ov262LinkIcon *linkIcon;
+    WifiBattleMatchCard *playerCard;
+    WifiBattleMatchPartnerCard *partnerCard;
+    WifiBattleMatchTeamList *teamList;
+    WifiBattleMatchLinkIcon *linkIcon;
     MsgData *msgMain;
     MsgData *msgCard;
     Font *font;
@@ -61,14 +61,14 @@ struct LiveBattleMatchFlow {
     u32 pickIndex;
 };
 
-static void LiveBattleMatchFlow_StepInit(Ov262Task *task, u32 *seq, void *work);
-static void LiveBattleMatchFlow_StepEnd(Ov262Task *task, u32 *seq, void *work);
-static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work);
-static void LiveBattleMatchFlow_StepTeam(Ov262Task *task, u32 *seq, void *work);
-static void LiveBattleMatchFlow_StepMenu(Ov262Task *task, u32 *seq, void *work);
-static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work);
-static void LiveBattleMatchFlow_StepRecord(Ov262Task *task, u32 *seq, void *work);
-static void LiveBattleMatchFlow_StepQuit(Ov262Task *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepInit(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepEnd(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepEntry(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepTeam(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, void *work);
 static void LiveBattleMatchFlow_MenuStart(LiveBattleMatchFlow *wk, u32 kind);
 static void LiveBattleMatchFlow_MenuFree(LiveBattleMatchFlow *wk);
 static s32 LiveBattleMatchFlow_MenuGetSelection(LiveBattleMatchFlow *wk);
@@ -95,11 +95,11 @@ static u32 LiveBattleMatchFlow_GetResultMessageId(LiveBattleMatchFlow *wk);
 static void LiveBattleMatchFlow_PrintResult(LiveBattleMatchFlow *wk);
 
 // Prints a message, and goes to the step that waits for it, after which the task goes to the step next
-static inline void LiveBattleMatchFlow_PrintAndWait(LiveBattleMatchFlow *wk, Ov262Task *task, u32 *seq, u32 msgId,
+static inline void LiveBattleMatchFlow_PrintAndWait(LiveBattleMatchFlow *wk, WifiBattleMatchTask *task, u32 *seq, u32 msgId,
                                                     u32 type, u32 waitSeq, u32 next) {
     LiveBattleMatchFlow_PrintMessage(wk, msgId, type);
     *seq = waitSeq;
-    func_ov262_021c5c88(task, next);
+    WifiBattleMatchTask_SetReturnSeq(task, next);
 }
 
 LiveBattleMatchFlow *LiveBattleMatchFlow_Create(const LiveBattleMatchFlowParam *param, HeapID heapId) {
@@ -109,15 +109,15 @@ LiveBattleMatchFlow *LiveBattleMatchFlow_Create(const LiveBattleMatchFlowParam *
     wk->param = *param;
     wk->heapId = heapId;
     wk->hasVideo = func_0200bb80();
-    func_ov262_021c29c4(wk->param.seq, TRUE, heapId);
+    WifiBattleMatchRes_LoadBG(wk->param.seq, TRUE, heapId);
     wk->wordSet = GFL_WordSetSystemCreate(8, 0x40, heapId);
     wk->msgMain = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PHRASE_INPUT, heapId);
     wk->msgCard = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_FISHING, heapId);
     wk->font = GFL_FontCreate(0x17, 3, 0, 0, heapId);
-    wk->task = func_ov262_021c5c10(wk, LiveBattleMatchFlow_StepInit, heapId);
+    wk->task = WifiBattleMatchTask_Create(wk, LiveBattleMatchFlow_StepInit, heapId);
     wk->irc = LiveBattleMatchIrc_Create(wk->param.gameData, heapId);
-    wk->linkIcon = func_ov262_021c4e44(func_ov262_021c2668(wk->param.net), wk->param.seq, heapId);
-    func_ov262_021c4f30(wk->linkIcon, FALSE);
+    wk->linkIcon = WifiBattleMatchLinkIcon_Create(WifiBattleMatchGraphic_GetClActUnit(wk->param.net), wk->param.seq, heapId);
+    WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
     wk->entry = func_0200b8f4(getTournamentBlockAddress(GameData_GetSaveControl(wk->param.gameData)), 1);
     wk->record = func_0200f2d8(getRecordBlkAddress(GameData_GetSaveControl(wk->param.gameData)));
     wk->party = PokeParty_Create(heapId);
@@ -134,9 +134,9 @@ void LiveBattleMatchFlow_Delete(LiveBattleMatchFlow *wk) {
     }
     LiveBattleMatchFlow_PlayerCardDelete(wk);
     LiveBattleMatchFlow_PartnerCardDelete(wk);
-    func_ov262_021c4f14(wk->linkIcon);
+    WifiBattleMatchLinkIcon_Free(wk->linkIcon);
     LiveBattleMatchIrc_Delete(wk->irc);
-    func_ov262_021c5c4c(wk->task);
+    WifiBattleMatchTask_Free(wk->task);
     GFL_FontFree(wk->font);
     GFL_MsgDataFree(wk->msgCard);
     GFL_MsgDataFree(wk->msgMain);
@@ -145,47 +145,47 @@ void LiveBattleMatchFlow_Delete(LiveBattleMatchFlow *wk) {
 }
 
 void LiveBattleMatchFlow_Main(LiveBattleMatchFlow *wk) {
-    func_ov262_021c5c54(wk->task);
+    WifiBattleMatchTask_Run(wk->task);
     LiveBattleMatchIrc_Main(wk->irc);
-    func_ov262_021c4f2c(wk->linkIcon);
+    WifiBattleMatchLinkIcon_Update(wk->linkIcon);
     if (wk->playerCard != NULL) {
-        func_ov262_021c35e4(wk->playerCard, wk->param.printQueue);
+        WifiBattleMatchCard_Flush(wk->playerCard, wk->param.printQueue);
     }
     if (wk->partnerCard != NULL) {
-        func_ov262_021c4898(wk->partnerCard, wk->param.printQueue);
+        WifiBattleMatchPartnerCard_Flush(wk->partnerCard, wk->param.printQueue);
     }
     if (wk->teamList != NULL) {
-        func_ov262_021c561c(wk->teamList, wk->param.printQueue);
+        WifiBattleMatchTeamList_Flush(wk->teamList, wk->param.printQueue);
     }
 }
 
 u32 LiveBattleMatchFlow_GetResult(LiveBattleMatchFlow *wk) {
-    if (func_ov262_021c5c64(wk->task)) {
+    if (WifiBattleMatchTask_IsEnded(wk->task)) {
         return wk->result;
     }
     return 0;
 }
 
 // Picks the step to start with
-static void LiveBattleMatchFlow_StepInit(Ov262Task *task, u32 *seq, void *work) {
+static void LiveBattleMatchFlow_StepInit(WifiBattleMatchTask *task, u32 *seq, void *work) {
     LiveBattleMatchFlow *wk = work;
 
     switch (wk->param.mode) {
     case 0:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepEntry);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepEntry);
         break;
     case 1:
         if (func_0200b798(wk->entry, 10) == 3) {
-            func_ov262_021c5c74(task, LiveBattleMatchFlow_StepQuit);
+            WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepQuit);
         } else {
-            func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+            WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
         }
         break;
     case 2:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepRecord);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepRecord);
         break;
     case 3:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepQuit);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepQuit);
         break;
     default:
         GFL_ASSERT(0);
@@ -193,12 +193,12 @@ static void LiveBattleMatchFlow_StepInit(Ov262Task *task, u32 *seq, void *work) 
     }
 }
 
-static void LiveBattleMatchFlow_StepEnd(Ov262Task *task, u32 *seq, void *work) {
-    func_ov262_021c5c7c(task);
+static void LiveBattleMatchFlow_StepEnd(WifiBattleMatchTask *task, u32 *seq, void *work) {
+    WifiBattleMatchTask_End(task);
 }
 
 // Starts the flow of a player who has no entry yet, or one who has one that is half done
-static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work) {
+static void LiveBattleMatchFlow_StepEntry(WifiBattleMatchTask *task, u32 *seq, void *work) {
     LiveBattleMatchFlow *wk = work;
     s32 selection;
     u32 status;
@@ -218,10 +218,10 @@ static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work)
             }
             break;
         case 1:
-            func_ov262_021c5c74(task, LiveBattleMatchFlow_StepTeam);
+            WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepTeam);
             break;
         case 2:
-            func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+            WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
             break;
         }
         break;
@@ -289,7 +289,7 @@ static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work)
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 2, TRUE, 31, 13);
         break;
     case 13:
-        func_ov262_021c4f30(wk->linkIcon, TRUE);
+        WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, TRUE);
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 32, FALSE, 31, 14);
         break;
     case 14:
@@ -299,7 +299,7 @@ static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work)
     case 15:
         status = LiveBattleMatchIrc_StepDelivery(wk->irc);
         if (status != 0) {
-            func_ov262_021c4f30(wk->linkIcon, FALSE);
+            WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
             if (status == 1) {
                 *seq = 21;
             } else {
@@ -307,7 +307,7 @@ static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work)
             }
         }
         if (LiveBattleMatchIrc_CheckError(wk->irc) == TRUE) {
-            func_ov262_021c4f30(wk->linkIcon, FALSE);
+            WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
             *seq = 12;
             break;
         }
@@ -327,7 +327,7 @@ static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work)
         }
         break;
     case 18:
-        func_ov262_021c4f30(wk->linkIcon, FALSE);
+        WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 21, TRUE, 31, 19);
         break;
     case 19:
@@ -408,21 +408,21 @@ static void LiveBattleMatchFlow_StepEntry(Ov262Task *task, u32 *seq, void *work)
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 4, TRUE, 31, 30);
         break;
     case 29:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepTeam);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepTeam);
         break;
     case 30:
         LiveBattleMatchFlow_Exit(wk, 1);
         break;
     case 31:
         if (LiveBattleMatchFlow_IsMessageDone(wk)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     }
 }
 
 // Checks the team against the regulation
-static void LiveBattleMatchFlow_StepTeam(Ov262Task *task, u32 *seq, void *work) {
+static void LiveBattleMatchFlow_StepTeam(WifiBattleMatchTask *task, u32 *seq, void *work) {
     LiveBattleMatchFlow *wk = work;
     s32 selection;
 
@@ -595,7 +595,7 @@ static void LiveBattleMatchFlow_StepTeam(Ov262Task *task, u32 *seq, void *work) 
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 11, TRUE, 21, 18);
         break;
     case 18:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
         break;
     case 19: {
         BOOL done = TRUE;
@@ -613,14 +613,14 @@ static void LiveBattleMatchFlow_StepTeam(Ov262Task *task, u32 *seq, void *work) 
         break;
     case 21:
         if (LiveBattleMatchFlow_IsMessageDone(wk)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     }
 }
 
 // The menu of a player who has an entry: to take part in a match, to see the card, to quit
-static void LiveBattleMatchFlow_StepMenu(Ov262Task *task, u32 *seq, void *work) {
+static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, void *work) {
     LiveBattleMatchFlow *wk = work;
     s32 selection;
 
@@ -655,7 +655,7 @@ static void LiveBattleMatchFlow_StepMenu(Ov262Task *task, u32 *seq, void *work) 
         u32 played = func_0200f1d8(wk->record, 0);
 
         if (played >= func_0200b574(regulation, 0x16)) {
-            func_ov262_021c5c74(task, LiveBattleMatchFlow_StepQuit);
+            WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepQuit);
         } else {
             *seq = 5;
         }
@@ -791,26 +791,26 @@ static void LiveBattleMatchFlow_StepMenu(Ov262Task *task, u32 *seq, void *work) 
         LiveBattleMatchFlow_Exit(wk, 4);
         break;
     case 23:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepLink);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepLink);
         break;
     case 24:
         LiveBattleMatchFlow_Exit(wk, 1);
         break;
     case 25:
         if (LiveBattleMatchFlow_IsMessageDone(wk)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     case 26:
         LiveBattleMatchFlow_PrintResult(wk);
         *seq = 25;
-        func_ov262_021c5c88(task, 5);
+        WifiBattleMatchTask_SetReturnSeq(task, 5);
         break;
     }
 }
 
 // Links with the other player over infrared, trades the players' data and teams and shows the players to each other
-static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) {
+static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, void *work) {
     LiveBattleMatchFlow *wk = work;
     s32 selection;
     int linked;
@@ -818,7 +818,7 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
 
     if (LiveBattleMatchIrc_CheckError(wk->irc) == TRUE) {
         wk->param.matchResult->disconnected = TRUE;
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
     }
     switch (*seq) {
     case 0:
@@ -826,12 +826,12 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
         break;
     case 1:
         LiveBattleMatchFlow_PrintMessage(wk, 33, FALSE);
-        func_ov262_021c4f30(wk->linkIcon, TRUE);
+        WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, TRUE);
         GFL_SndSEPlay(SEQ_SE_SYS_102);
         wk->readySent = FALSE;
         wk->readyReceived = FALSE;
         *seq = 40;
-        func_ov262_021c5c88(task, 2);
+        WifiBattleMatchTask_SetReturnSeq(task, 2);
         break;
     case 2:
         if (LiveBattleMatchIrc_ResetLink(wk->irc)) {
@@ -863,7 +863,7 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
         }
         break;
     case 6:
-        func_ov262_021c4f30(wk->linkIcon, FALSE);
+        WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 21, TRUE, 40, 7);
         break;
     case 7:
@@ -878,8 +878,8 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
         LiveBattleMatchFlow_MenuFree(wk);
         switch (selection) {
         case 0:
-            func_ov262_021c4f30(wk->linkIcon, FALSE);
-            func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+            WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
+            WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
             break;
         case 1:
             *seq = 1;
@@ -887,7 +887,7 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
         }
         break;
     case 9:
-        func_ov262_021c4f30(wk->linkIcon, FALSE);
+        WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
         LiveBattleMatchIrc_CancelLink(wk->irc);
         *seq = 10;
         break;
@@ -900,7 +900,7 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 28, TRUE, 40, 12);
         break;
     case 12:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
         break;
     case 13:
         LiveBattleMatchFlow_SetEntryField2(wk->param.playerData, wk);
@@ -922,7 +922,7 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
             wk->readySent = (field12 != 0 || !known);
             *seq = 16;
         } else {
-            func_ov262_021c4f30(wk->linkIcon, FALSE);
+            WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
             GFL_SndStop();
             *seq = 21;
         }
@@ -947,7 +947,7 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
         }
         break;
     case 20:
-        func_ov262_021c4f30(wk->linkIcon, FALSE);
+        WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
         GFL_SndStop();
         if (wk->readyReceived != 0 && wk->readySent != 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_74);
@@ -1040,23 +1040,23 @@ static void LiveBattleMatchFlow_StepLink(Ov262Task *task, u32 *seq, void *work) 
         LiveBattleMatchFlow_Exit(wk, 2);
         break;
     case 39:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
         break;
     case 40:
         if (LiveBattleMatchFlow_IsMessageDone(wk)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     }
 }
 
 // Records how the match went, and shows the player the result
-static void LiveBattleMatchFlow_StepRecord(Ov262Task *task, u32 *seq, void *work) {
+static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, void *work) {
     LiveBattleMatchFlow *wk = work;
 
     if (LiveBattleMatchIrc_CheckError(wk->irc) == TRUE) {
         wk->param.matchResult->disconnected = TRUE;
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
     }
     switch (*seq) {
     case 0: {
@@ -1126,14 +1126,14 @@ static void LiveBattleMatchFlow_StepRecord(Ov262Task *task, u32 *seq, void *work
         break;
     case 8:
         if (LiveBattleMatchFlow_IsMessageDone(wk)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     }
 }
 
 // The flow of a player whose entry has ended
-static void LiveBattleMatchFlow_StepQuit(Ov262Task *task, u32 *seq, void *work) {
+static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, void *work) {
     LiveBattleMatchFlow *wk = work;
     s32 selection;
 
@@ -1243,17 +1243,17 @@ static void LiveBattleMatchFlow_StepQuit(Ov262Task *task, u32 *seq, void *work) 
         LiveBattleMatchFlow_Exit(wk, 1);
         break;
     case 16:
-        func_ov262_021c5c74(task, LiveBattleMatchFlow_StepMenu);
+        WifiBattleMatchTask_SetFunc(task, LiveBattleMatchFlow_StepMenu);
         break;
     case 17:
         if (LiveBattleMatchFlow_IsMessageDone(wk)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     case 18:
         LiveBattleMatchFlow_PrintResult(wk);
         *seq = 17;
-        func_ov262_021c5c88(task, 6);
+        WifiBattleMatchTask_SetReturnSeq(task, 6);
         break;
     }
 }
@@ -1261,30 +1261,30 @@ static void LiveBattleMatchFlow_StepQuit(Ov262Task *task, u32 *seq, void *work) 
 // Shows a menu of kind 0 (yes or no at the right), 1 (the menu of a player with an entry), 2 (the menu of a player whose
 // entry ended) or 3 (yes or no, which can be left)
 static void LiveBattleMatchFlow_MenuStart(LiveBattleMatchFlow *wk, u32 kind) {
-    Ov262MenuParam param;
+    WifiBattleMatchMenuParam param;
     u32 corner;
     u8 height;
     u8 x;
     u8 y;
     u8 width;
 
-    sys_memset(&param, 0, sizeof(Ov262MenuParam));
+    sys_memset(&param, 0, sizeof(WifiBattleMatchMenuParam));
     param.msgData = wk->msgMain;
     param.font = wk->param.font;
     param.printQueue = wk->param.printQueue;
     switch (kind) {
     case 3:
-        param.unk2E = 1;
+        param.cursorRow = 1;
     case 0:
         param.msgIds[0] = 6;
         param.msgIds[1] = 7;
         param.count = 2;
-        param.unk28 = 1;
-        param.unk2C = 1;
+        param.canCancel = 1;
+        param.cancelValue = 1;
         corner = 1;
         break;
     case 1:
-        param.unk28 = 0;
+        param.canCancel = 0;
         if (wk->hasVideo && !wk->param.matchResult->disconnected) {
             param.msgIds[0] = 13;
             param.msgIds[1] = 14;
@@ -1299,7 +1299,7 @@ static void LiveBattleMatchFlow_MenuStart(LiveBattleMatchFlow *wk, u32 kind) {
         corner = 0;
         break;
     case 2:
-        param.unk28 = 0;
+        param.canCancel = 0;
         if (wk->hasVideo && !wk->param.matchResult->disconnected) {
             param.msgIds[0] = 14;
             param.msgIds[1] = 40;
@@ -1312,10 +1312,10 @@ static void LiveBattleMatchFlow_MenuStart(LiveBattleMatchFlow *wk, u32 kind) {
         corner = 0;
         break;
     }
-    param.unk20 = 0;
-    param.unk22 = 15;
-    param.unk24 = 13;
-    param.unk26 = 1;
+    param.bg = 0;
+    param.palette = 15;
+    param.framePalette = 13;
+    param.frameChar = 1;
     switch (corner) {
     case 0:
         width = 28;
@@ -1330,30 +1330,30 @@ static void LiveBattleMatchFlow_MenuStart(LiveBattleMatchFlow *wk, u32 kind) {
         y = 17 - height;
         break;
     }
-    wk->menu = func_ov262_021c5a88(&param, x, y, width, height, wk->heapId);
+    wk->menu = WifiBattleMatchMenu_Create(&param, x, y, width, height, wk->heapId);
     wk->menuKind = kind;
 }
 
 static void LiveBattleMatchFlow_MenuFree(LiveBattleMatchFlow *wk) {
-    func_ov262_021c5ba4(wk->menu);
+    WifiBattleMatchMenu_Free(wk->menu);
 }
 
 static s32 LiveBattleMatchFlow_MenuGetSelection(LiveBattleMatchFlow *wk) {
-    return func_ov262_021c5bd4(wk->menu);
+    return WifiBattleMatchMenu_Update(wk->menu);
 }
 
 static void LiveBattleMatchFlow_PrintMessage(LiveBattleMatchFlow *wk, u32 msgId, u32 type) {
-    func_ov262_021c5888(wk->param.msgBox, wk->msgMain, msgId, type);
+    WifiBattleMatchMsgBox_Print(wk->param.msgBox, wk->msgMain, msgId, type);
 }
 
 static BOOL LiveBattleMatchFlow_IsMessageDone(LiveBattleMatchFlow *wk) {
-    return func_ov262_021c5a1c(wk->param.msgBox);
+    return WifiBattleMatchMsgBox_IsDone(wk->param.msgBox);
 }
 
 // Ends the flow with a result: 1 to 4
 static void LiveBattleMatchFlow_Exit(LiveBattleMatchFlow *wk, u32 result) {
     wk->result = result;
-    func_ov262_021c5c74(wk->task, LiveBattleMatchFlow_StepEnd);
+    WifiBattleMatchTask_SetFunc(wk->task, LiveBattleMatchFlow_StepEnd);
 }
 
 // Three bytes as characters, the first at the top
@@ -1368,22 +1368,22 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         Regulation *regulation = func_0200b530(wk->entry);
         void *records = func_0200b924(getTournamentBlockAddress(save), 1);
         PlayerInfo *info = GetGameDataPlayerInfo(wk->param.gameData);
-        Ov262NetLink *link = func_ov262_021c2668(wk->param.net);
-        Ov262LiveCardInfo card;
+        ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
+        WifiBattleMatchLiveCardInfo card;
 
-        sys_memset(&card, 0, sizeof(Ov262LiveCardInfo));
+        sys_memset(&card, 0, sizeof(WifiBattleMatchLiveCardInfo));
         card.unkA0 = func_0200f1d8(wk->record, 1);
         card.unkA2 = func_0200f1d8(wk->record, 2);
         card.unkA4 = func_0200f1d8(wk->record, 0);
         card.unkA6 = func_0200b574(regulation, 0x16);
-        card.unk9C = func_02008bf4(info);
+        card.look = func_02008bf4(info);
         sys_memcpy(func_0200b794(wk->entry), card.data, sizeof(card.data));
-        card.unk94 = LiveBattleMatchFlow_PackCode(func_0200b798(wk->entry, 4), func_0200b798(wk->entry, 5),
+        card.startDate = LiveBattleMatchFlow_PackCode(func_0200b798(wk->entry, 4), func_0200b798(wk->entry, 5),
                                                   func_0200b798(wk->entry, 6));
-        card.unk98 = LiveBattleMatchFlow_PackCode(func_0200b798(wk->entry, 7), func_0200b798(wk->entry, 8),
+        card.endDate = LiveBattleMatchFlow_PackCode(func_0200b798(wk->entry, 7), func_0200b798(wk->entry, 8),
                                                   func_0200b798(wk->entry, 9));
-        card.unkA8 = func_0200b798(wk->entry, 11);
-        wk->playerCard = func_ov262_021c323c(&card, info, link, wk->param.seq, wk->param.font, wk->param.printQueue,
+        card.variant = func_0200b798(wk->entry, 11);
+        wk->playerCard = WifiBattleMatchLiveCard_Create(&card, info, link, wk->param.seq, wk->param.font, wk->param.printQueue,
                                              wk->msgCard, wk->wordSet, records, 0, wk->heapId);
     }
 }
@@ -1396,67 +1396,67 @@ static void LiveBattleMatchFlow_PlayerCardCreateWait(LiveBattleMatchFlow *wk) {
 
 static void LiveBattleMatchFlow_PlayerCardDelete(LiveBattleMatchFlow *wk) {
     if (wk->playerCard != NULL) {
-        func_ov262_021c33c4(wk->playerCard);
+        WifiBattleMatchLiveCard_Free(wk->playerCard);
         wk->playerCard = NULL;
     }
 }
 
 static BOOL LiveBattleMatchFlow_PlayerCardIsReady(LiveBattleMatchFlow *wk) {
-    return func_ov262_021c35ec(wk->playerCard);
+    return WifiBattleMatchCard_SlideIn(wk->playerCard);
 }
 
 static BOOL LiveBattleMatchFlow_PlayerCardIsDone(LiveBattleMatchFlow *wk) {
-    return func_ov262_021c3720(wk->playerCard);
+    return WifiBattleMatchCard_SlideOut(wk->playerCard);
 }
 
 static void LiveBattleMatchFlow_PlayerCardShow(LiveBattleMatchFlow *wk, u32 a1) {
-    func_ov262_021c33f0(wk->playerCard, a1, wk->msgCard, wk->param.printQueue, wk->param.font, wk->heapId);
+    WifiBattleMatchLiveCard_ShowPage(wk->playerCard, a1, wk->msgCard, wk->param.printQueue, wk->param.font, wk->heapId);
 }
 
 static void LiveBattleMatchFlow_PartnerCardCreate(LiveBattleMatchFlow *wk, LiveBattleMatchPlayerData *data) {
     if (wk->partnerCard == NULL) {
-        Ov262NetLink *link = func_ov262_021c2668(wk->param.net);
+        ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
         u32 field11 = func_0200b798(wk->entry, 11);
 
-        wk->partnerCard = func_ov262_021c4644(data, link, wk->param.seq, wk->param.font, wk->param.printQueue,
+        wk->partnerCard = WifiBattleMatchPartnerCard_Create(data, link, wk->param.seq, wk->param.font, wk->param.printQueue,
                                               wk->msgCard, wk->wordSet, 1, 0, field11, wk->heapId);
     }
 }
 
 static void LiveBattleMatchFlow_PartnerCardDelete(LiveBattleMatchFlow *wk) {
     if (wk->partnerCard != NULL) {
-        func_ov262_021c4834(wk->partnerCard);
+        WifiBattleMatchPartnerCard_Free(wk->partnerCard);
         wk->partnerCard = NULL;
     }
 }
 
 static BOOL LiveBattleMatchFlow_PartnerCardIsDone(LiveBattleMatchFlow *wk) {
-    return func_ov262_021c48a0(wk->partnerCard);
+    return WifiBattleMatchPartnerCard_SlideIn(wk->partnerCard);
 }
 
 static void LiveBattleMatchFlow_TeamListCreate(LiveBattleMatchFlow *wk) {
     if (wk->teamList == NULL) {
-        Ov262NetLink *link = func_ov262_021c2668(wk->param.net);
+        ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
         BattleBoxSave *battleBox = getBattleBox(GameData_GetSaveControl(wk->param.gameData));
 
-        wk->teamList = func_ov262_021c4f60(battleBox, link, wk->param.seq, wk->font, wk->param.printQueue, wk->msgCard,
+        wk->teamList = WifiBattleMatchTeamList_Create(battleBox, link, wk->param.seq, wk->font, wk->param.printQueue, wk->msgCard,
                                            wk->heapId);
     }
 }
 
 static void LiveBattleMatchFlow_TeamListDelete(LiveBattleMatchFlow *wk) {
     if (wk->teamList != NULL) {
-        func_ov262_021c53e0(wk->teamList);
+        WifiBattleMatchTeamList_Free(wk->teamList);
         wk->teamList = NULL;
     }
 }
 
 static BOOL LiveBattleMatchFlow_TeamListIsReady(LiveBattleMatchFlow *wk) {
-    return func_ov262_021c545c(wk->teamList);
+    return WifiBattleMatchTeamList_SlideIn(wk->teamList);
 }
 
 static BOOL LiveBattleMatchFlow_TeamListIsDone(LiveBattleMatchFlow *wk) {
-    return func_ov262_021c5544(wk->teamList);
+    return WifiBattleMatchTeamList_SlideOut(wk->teamList);
 }
 
 // Copies the team of the battle box into dest
@@ -1520,7 +1520,7 @@ static void LiveBattleMatchFlow_PrintResult(LiveBattleMatchFlow *wk) {
     WordSetNumber(wk->wordSet, 2, matchResult->unk0A, 1, 0, TRUE);
     WordSetNumber(wk->wordSet, 3, matchResult->unk08, 1, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, text, format);
-    func_ov262_021c58a4(wk->param.msgBox, text, TRUE);
+    WifiBattleMatchMsgBox_PrintStr(wk->param.msgBox, text, TRUE);
     GFL_StrBufFree(text);
     GFL_StrBufFree(format);
 }

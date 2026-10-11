@@ -5,6 +5,7 @@
 #include "constants/text_banks.h"
 #include "constants/version.h"
 #include "field/delivery_irc.h"
+#include "field/net_devirc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -1321,7 +1322,7 @@ static void IrcBattleMatch_StateWaitNet(IrcBattleMatch *work) {
         switch (work->mode) {
         case IRCBATTLEMATCH_MODE_MUSICAL_ARG0:
         case IRCBATTLEMATCH_MODE_MUSICAL_ARG1:
-            func_ov031_02175a04(IrcBattleMatch_IsSameMusicalGame);
+            NetDevIrc_SetPeerFilter(IrcBattleMatch_IsSameMusicalGame);
             break;
         }
         func_020429a8(IrcBattleMatch_OnMacsKnown, IrcBattleMatch_OnLinkChanged, IrcBattleMatch_OnConnectDone);

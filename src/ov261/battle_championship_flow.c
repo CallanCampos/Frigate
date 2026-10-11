@@ -2,7 +2,6 @@
 #include "types.h"
 #include "app/digitalcardcheck.h"
 #include "app/livebattlematch_flow.h"
-#include "app/ov262_common.h"
 #include "constants/arc.h"
 #include "constants/script_text_banks.h"
 #include "constants/sound.h"
@@ -63,16 +62,16 @@ enum {
 
 typedef struct {
     u16 heapId;
-    Ov262Task *task;
-    Ov262MsgBox *msgBox;
+    WifiBattleMatchTask *task;
+    WifiBattleMatchMsgBox *msgBox;
     Font *font;
     // The Entree Forest's messages
     MsgData *msgData;
     PrintQueue *printQueue;
     u32 unk18;
     u32 unk1C;
-    Ov262Seq *seq;
-    Ov262Net *net;
+    WifiBattleMatchRes *seq;
+    WifiBattleMatchGraphic *net;
     BattleChampionshipFlowParam *param;
     // The menu or the live competition's flow, whichever is running
     void *flow;
@@ -83,18 +82,18 @@ typedef struct {
 // What the menu is given
 typedef struct {
     u32 mode;
-    Ov262MsgBox *msgBox;
+    WifiBattleMatchMsgBox *msgBox;
     Font *font;
     MsgData *msgData;
     PrintQueue *printQueue;
-    Ov262Seq *seq;
-    Ov262Net *net;
+    WifiBattleMatchRes *seq;
+    WifiBattleMatchGraphic *net;
     GameData *gameData;
 } BattleChampionshipMenuParam;
 
 typedef struct {
-    Ov262Task *task;
-    Ov262Menu *list;
+    WifiBattleMatchTask *task;
+    WifiBattleMatchMenu *list;
     u32 listKind;
     // Global script messages
     MsgData *scriptMsgData;
@@ -117,30 +116,30 @@ static void BattleChampionshipFlow_DeleteSeq(BattleChampionshipFlow *wk);
 static void BattleChampionshipFlow_CreateUI(BattleChampionshipFlow *wk);
 static void BattleChampionshipFlow_DeleteUI(BattleChampionshipFlow *wk);
 static void BattleChampionshipFlow_UpdateUI(BattleChampionshipFlow *wk);
-static void BattleChampionshipFlow_TaskDispatch(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_TaskEnd(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_TaskFadeIn(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_TaskFadeOut(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_TaskMenu(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_TaskLive(Ov262Task *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_TaskDispatch(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_TaskEnd(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_TaskFadeIn(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_TaskFadeOut(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_TaskMenu(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_TaskLive(WifiBattleMatchTask *task, u32 *seq, void *work);
 static BattleChampionshipMenu *BattleChampionshipFlow_MenuCreate(const BattleChampionshipMenuParam *param,
                                                                  HeapID heapId);
 static void BattleChampionshipFlow_MenuDelete(BattleChampionshipMenu *menu);
 static void BattleChampionshipFlow_MenuUpdate(BattleChampionshipMenu *menu);
 static u32 BattleChampionshipFlow_MenuGetResult(BattleChampionshipMenu *menu);
-static void BattleChampionshipFlow_MenuTaskStart(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskEnd(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskTop(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskIntro(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskWifi(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskWifiInfo(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskWifiCard(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskLiveCard(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskLive(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskLiveInfo(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskNoWireless(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskWifiEntry(Ov262Task *task, u32 *seq, void *work);
-static void BattleChampionshipFlow_MenuTaskReward(Ov262Task *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskStart(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskEnd(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskTop(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskIntro(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskWifi(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskWifiInfo(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskWifiCard(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskLiveCard(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskLive(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskLiveInfo(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskNoWireless(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskWifiEntry(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32 *seq, void *work);
 static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u32 kind);
 static void BattleChampionshipFlow_MenuCloseList(BattleChampionshipMenu *menu);
 static s32 BattleChampionshipFlow_MenuGetListChoice(BattleChampionshipMenu *menu);
@@ -168,14 +167,14 @@ static BOOL BattleChampionshipFlow_Init(GameProc *proc, u32 *state, void *param,
     BattleChampionshipFlow_CreateNet(wk);
     BattleChampionshipFlow_CreateSeq(wk);
     BattleChampionshipFlow_CreateUI(wk);
-    wk->task = func_ov262_021c5c10(wk, BattleChampionshipFlow_TaskFadeIn, HEAPID_BATTLE_CHAMPIONSHIP_FLOW);
+    wk->task = WifiBattleMatchTask_Create(wk, BattleChampionshipFlow_TaskFadeIn, HEAPID_BATTLE_CHAMPIONSHIP_FLOW);
     return TRUE;
 }
 
 static BOOL BattleChampionshipFlow_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     BattleChampionshipFlow *wk = work;
 
-    func_ov262_021c5c4c(wk->task);
+    WifiBattleMatchTask_Free(wk->task);
     BattleChampionshipFlow_DeleteUI(wk);
     BattleChampionshipFlow_DeleteSeq(wk);
     BattleChampionshipFlow_DeleteNet(wk);
@@ -191,79 +190,79 @@ static BOOL BattleChampionshipFlow_Main(GameProc *proc, u32 *state, void *param,
 
     BattleChampionshipFlow_UpdateNet(wk);
     BattleChampionshipFlow_UpdateUI(wk);
-    func_ov262_021c5c54(wk->task);
-    if (func_ov262_021c5c64(wk->task)) {
+    WifiBattleMatchTask_Run(wk->task);
+    if (WifiBattleMatchTask_IsEnded(wk->task)) {
         return TRUE;
     }
     return FALSE;
 }
 
 static void BattleChampionshipFlow_CreateNet(BattleChampionshipFlow *wk) {
-    wk->net = func_ov262_021c2560(TRUE, wk->heapId);
+    wk->net = WifiBattleMatchGraphic_Create(TRUE, wk->heapId);
 }
 
 static void BattleChampionshipFlow_DeleteNet(BattleChampionshipFlow *wk) {
-    func_ov262_021c2600(wk->net);
+    WifiBattleMatchGraphic_Free(wk->net);
     wk->net = NULL;
 }
 
 static void BattleChampionshipFlow_UpdateNet(BattleChampionshipFlow *wk) {
     if (wk->net != NULL) {
-        func_ov262_021c2654(wk->net);
-        func_ov262_021c2aa0(wk->seq);
+        WifiBattleMatchGraphic_Update(wk->net);
+        WifiBattleMatchRes_Update(wk->seq);
     }
 }
 
 static void BattleChampionshipFlow_CreateSeq(BattleChampionshipFlow *wk) {
-    wk->seq = func_ov262_021c279c(func_ov262_021c2668(wk->net), TRUE, wk->heapId);
+    wk->seq = WifiBattleMatchRes_Create(WifiBattleMatchGraphic_GetClActUnit(wk->net), TRUE, wk->heapId);
 }
 
 static void BattleChampionshipFlow_DeleteSeq(BattleChampionshipFlow *wk) {
-    func_ov262_021c2988(wk->seq);
+    WifiBattleMatchRes_Free(wk->seq);
 }
 
 static void BattleChampionshipFlow_CreateUI(BattleChampionshipFlow *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ENTREE_FOREST, wk->heapId);
     wk->printQueue = func_02021998(wk->heapId);
-    wk->msgBox = func_ov262_021c568c(0, 15, 14, 10, wk->printQueue, wk->font, wk->heapId);
+    wk->msgBox = WifiBattleMatchMsgBox_Create(0, 15, 14, 10, wk->printQueue, wk->font, wk->heapId);
 }
 
 static void BattleChampionshipFlow_DeleteUI(BattleChampionshipFlow *wk) {
-    func_ov262_021c5750(wk->msgBox);
+    WifiBattleMatchMsgBox_Free(wk->msgBox);
     func_02021a18(wk->printQueue);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->font);
 }
 
 static void BattleChampionshipFlow_UpdateUI(BattleChampionshipFlow *wk) {
-    func_ov262_021c57a4(wk->msgBox);
+    WifiBattleMatchMsgBox_Update(wk->msgBox);
     func_02021a3c(wk->printQueue);
 }
 
-static void BattleChampionshipFlow_TaskDispatch(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_TaskDispatch(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipFlow *wk = work;
 
     switch (wk->param->mode) {
     case BATTLE_CHAMPIONSHIP_FLOW_MODE_MENU:
     case BATTLE_CHAMPIONSHIP_FLOW_MODE_REWARD:
     case BATTLE_CHAMPIONSHIP_FLOW_MODE_MENU_2:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskMenu);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskMenu);
         break;
     case BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_JOIN:
     case BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_AFTER_MATCH:
     case BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_QUIT:
     case BATTLE_CHAMPIONSHIP_FLOW_MODE_LIVE_MENU:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskLive);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskLive);
         break;
     }
 }
 
-static void BattleChampionshipFlow_TaskEnd(Ov262Task *task, u32 *seq, void *work) {
-    func_ov262_021c5c7c(task);
+static void BattleChampionshipFlow_TaskEnd(WifiBattleMatchTask *task, u32 *seq, void *work) {
+    WifiBattleMatchTask_End(task);
 }
 
-static void BattleChampionshipFlow_TaskFadeIn(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_TaskFadeIn(WifiBattleMatchTask *task, u32 *seq, void *work) {
     switch (*seq) {
     case 0:
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
@@ -275,7 +274,7 @@ static void BattleChampionshipFlow_TaskFadeIn(Ov262Task *task, u32 *seq, void *w
         }
         break;
     case 2:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskDispatch);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskDispatch);
         break;
     default:
         GFL_ASSERT(0);
@@ -283,7 +282,7 @@ static void BattleChampionshipFlow_TaskFadeIn(Ov262Task *task, u32 *seq, void *w
     }
 }
 
-static void BattleChampionshipFlow_TaskFadeOut(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_TaskFadeOut(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipFlow *wk = work;
     u32 mode;
 
@@ -304,7 +303,7 @@ static void BattleChampionshipFlow_TaskFadeOut(Ov262Task *task, u32 *seq, void *
         }
         break;
     case 2:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskEnd);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskEnd);
         break;
     default:
         GFL_ASSERT(0);
@@ -312,7 +311,7 @@ static void BattleChampionshipFlow_TaskFadeOut(Ov262Task *task, u32 *seq, void *
     }
 }
 
-static void BattleChampionshipFlow_TaskMenu(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_TaskMenu(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipFlow *wk = work;
     BattleChampionshipMenuParam param;
 
@@ -361,16 +360,16 @@ static void BattleChampionshipFlow_TaskMenu(Ov262Task *task, u32 *seq, void *wor
         break;
     case 2:
         BattleChampionshipFlow_MenuDelete(wk->flow);
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskFadeOut);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskFadeOut);
         break;
     case 3:
         BattleChampionshipFlow_MenuDelete(wk->flow);
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskLive);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskLive);
         break;
     }
 }
 
-static void BattleChampionshipFlow_TaskLive(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_TaskLive(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipFlow *wk = work;
     LiveBattleMatchFlowParam param;
 
@@ -428,12 +427,12 @@ static void BattleChampionshipFlow_TaskLive(Ov262Task *task, u32 *seq, void *wor
         break;
     case 2:
         LiveBattleMatchFlow_Delete(wk->flow);
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskFadeOut);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskFadeOut);
         break;
     case 3:
         wk->backToMenu = 1;
         LiveBattleMatchFlow_Delete(wk->flow);
-        func_ov262_021c5c74(task, BattleChampionshipFlow_TaskMenu);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_TaskMenu);
         break;
     }
 }
@@ -449,12 +448,12 @@ static BattleChampionshipMenu *BattleChampionshipFlow_MenuCreate(const BattleCha
     menu->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     menu->strBuf = GFL_StrBufCreate(128, heapId);
     menu->scriptMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, heapId);
-    menu->task = func_ov262_021c5c10(menu, BattleChampionshipFlow_MenuTaskStart, heapId);
+    menu->task = WifiBattleMatchTask_Create(menu, BattleChampionshipFlow_MenuTaskStart, heapId);
     return menu;
 }
 
 static void BattleChampionshipFlow_MenuDelete(BattleChampionshipMenu *menu) {
-    func_ov262_021c5c4c(menu->task);
+    WifiBattleMatchTask_Free(menu->task);
     GFL_MsgDataFree(menu->scriptMsgData);
     GFL_WordSetSystemFree(menu->wordSet);
     GFL_StrBufFree(menu->strBuf);
@@ -462,37 +461,37 @@ static void BattleChampionshipFlow_MenuDelete(BattleChampionshipMenu *menu) {
 }
 
 static void BattleChampionshipFlow_MenuUpdate(BattleChampionshipMenu *menu) {
-    func_ov262_021c5c54(menu->task);
+    WifiBattleMatchTask_Run(menu->task);
 }
 
 static u32 BattleChampionshipFlow_MenuGetResult(BattleChampionshipMenu *menu) {
-    if (func_ov262_021c5c64(menu->task)) {
+    if (WifiBattleMatchTask_IsEnded(menu->task)) {
         return menu->result;
     }
     return MENU_RESULT_NONE;
 }
 
-static void BattleChampionshipFlow_MenuTaskStart(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskStart(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
 
     switch (menu->param.mode) {
     case MENU_MODE_TOP:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskTop);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskTop);
         break;
     case MENU_MODE_REWARD:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskReward);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskReward);
         break;
     case MENU_MODE_LIVE:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskLive);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskLive);
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskEnd(Ov262Task *task, u32 *seq, void *work) {
-    func_ov262_021c5c7c(task);
+static void BattleChampionshipFlow_MenuTaskEnd(WifiBattleMatchTask *task, u32 *seq, void *work) {
+    WifiBattleMatchTask_End(task);
 }
 
-static void BattleChampionshipFlow_MenuTaskTop(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskTop(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
     s32 choice;
 
@@ -515,13 +514,13 @@ static void BattleChampionshipFlow_MenuTaskTop(Ov262Task *task, u32 *seq, void *
         if (choice != -1) {
             switch (choice) {
             case 0:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskWifi);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskWifi);
                 break;
             case 1:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskLive);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskLive);
                 break;
             case 2:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskIntro);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskIntro);
                 break;
             case 3:
                 BattleChampionshipFlow_MenuFinish(menu, MENU_RESULT_EXIT);
@@ -533,7 +532,7 @@ static void BattleChampionshipFlow_MenuTaskTop(Ov262Task *task, u32 *seq, void *
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskIntro(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskIntro(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
 
     switch (*seq) {
@@ -543,13 +542,13 @@ static void BattleChampionshipFlow_MenuTaskIntro(Ov262Task *task, u32 *seq, void
         break;
     case 1:
         if (BattleChampionshipFlow_MenuIsPrinted(menu) == TRUE) {
-            func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskTop);
+            WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskTop);
         }
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskWifi(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskWifi(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
     s32 choice;
 
@@ -573,19 +572,19 @@ static void BattleChampionshipFlow_MenuTaskWifi(Ov262Task *task, u32 *seq, void 
             switch (choice) {
             case 0:
                 if (!isWirelessEnabled()) {
-                    func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskNoWireless);
+                    WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskNoWireless);
                 } else {
-                    func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskWifiEntry);
+                    WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskWifiEntry);
                 }
                 break;
             case 1:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskWifiInfo);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskWifiInfo);
                 break;
             case 2:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskWifiCard);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskWifiCard);
                 break;
             case 3:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskTop);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskTop);
                 break;
             }
             BattleChampionshipFlow_MenuCloseList(menu);
@@ -594,7 +593,7 @@ static void BattleChampionshipFlow_MenuTaskWifi(Ov262Task *task, u32 *seq, void 
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskWifiInfo(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskWifiInfo(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
 
     switch (*seq) {
@@ -604,13 +603,13 @@ static void BattleChampionshipFlow_MenuTaskWifiInfo(Ov262Task *task, u32 *seq, v
         break;
     case 1:
         if (BattleChampionshipFlow_MenuIsPrinted(menu) == TRUE) {
-            func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskWifi);
+            WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskWifi);
         }
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskWifiCard(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskWifiCard(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
     DigitalCardCheckParam param;
 
@@ -636,12 +635,12 @@ static void BattleChampionshipFlow_MenuTaskWifiCard(Ov262Task *task, u32 *seq, v
         break;
     case 2:
         DigitalCardCheck_Delete(menu->cardCheck);
-        func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskWifi);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskWifi);
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskLiveCard(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskLiveCard(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
     DigitalCardCheckParam param;
 
@@ -667,12 +666,12 @@ static void BattleChampionshipFlow_MenuTaskLiveCard(Ov262Task *task, u32 *seq, v
         break;
     case 2:
         DigitalCardCheck_Delete(menu->cardCheck);
-        func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskLive);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskLive);
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskLive(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskLive(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
     s32 choice;
 
@@ -696,20 +695,20 @@ static void BattleChampionshipFlow_MenuTaskLive(Ov262Task *task, u32 *seq, void 
             switch (choice) {
             case 0:
                 if (!isWirelessEnabled()) {
-                    func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskNoWireless);
+                    WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskNoWireless);
                 } else {
                     clearVSPlayer();
                     BattleChampionshipFlow_MenuFinish(menu, MENU_RESULT_LIVE);
                 }
                 break;
             case 1:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskLiveInfo);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskLiveInfo);
                 break;
             case 2:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskLiveCard);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskLiveCard);
                 break;
             case 3:
-                func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskTop);
+                WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskTop);
                 break;
             }
             BattleChampionshipFlow_MenuCloseList(menu);
@@ -718,7 +717,7 @@ static void BattleChampionshipFlow_MenuTaskLive(Ov262Task *task, u32 *seq, void 
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskLiveInfo(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskLiveInfo(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
 
     switch (*seq) {
@@ -728,13 +727,13 @@ static void BattleChampionshipFlow_MenuTaskLiveInfo(Ov262Task *task, u32 *seq, v
         break;
     case 1:
         if (BattleChampionshipFlow_MenuIsPrinted(menu) == TRUE) {
-            func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskLive);
+            WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskLive);
         }
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskNoWireless(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskNoWireless(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
 
     switch (*seq) {
@@ -744,13 +743,13 @@ static void BattleChampionshipFlow_MenuTaskNoWireless(Ov262Task *task, u32 *seq,
         break;
     case 1:
         if (BattleChampionshipFlow_MenuIsPrinted(menu) == TRUE) {
-            func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskTop);
+            WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskTop);
         }
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskWifiEntry(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskWifiEntry(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
     SaveControl *save = GameData_GetSaveControl(menu->param.gameData);
     RecordSave *record = getRecordBlkAddress(save);
@@ -775,7 +774,7 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(Ov262Task *task, u32 *seq, 
         break;
     case 1:
         func_0200f2dc(record);
-        func_ov262_021c5c88(task, 9);
+        WifiBattleMatchTask_SetReturnSeq(task, 9);
         *seq = 6;
         break;
     case 2:
@@ -784,7 +783,7 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(Ov262Task *task, u32 *seq, 
         break;
     case 3:
         if (BattleChampionshipFlow_MenuIsPrinted(menu) == TRUE) {
-            func_ov262_021c5c88(task, 10);
+            WifiBattleMatchTask_SetReturnSeq(task, 10);
             *seq = 6;
         }
         break;
@@ -798,7 +797,7 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(Ov262Task *task, u32 *seq, 
         }
         break;
     case 6:
-        func_ov262_021c5888(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff, 2);
+        WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff, 2);
         *seq = 7;
         break;
     case 7:
@@ -810,7 +809,7 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(Ov262Task *task, u32 *seq, 
         switch (func_02017850(menu->param.gameData)) {
         case 2:
         case 3:
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
             break;
         }
         break;
@@ -819,12 +818,12 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(Ov262Task *task, u32 *seq, 
         BattleChampionshipFlow_MenuFinish(menu, MENU_RESULT_WIFI);
         break;
     case 10:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskTop);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskTop);
         break;
     }
 }
 
-static void BattleChampionshipFlow_MenuTaskReward(Ov262Task *task, u32 *seq, void *work) {
+static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32 *seq, void *work) {
     BattleChampionshipMenu *menu = work;
     RecordSave *record = getRecordBlkAddress(GameData_GetSaveControl(menu->param.gameData));
     StrBuf *text;
@@ -841,7 +840,7 @@ static void BattleChampionshipFlow_MenuTaskReward(Ov262Task *task, u32 *seq, voi
         }
         break;
     case 1:
-        func_ov262_021c5888(menu->param.msgBox, menu->param.msgData,
+        WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData,
                             EntreeForest_Text_RecognizeAchievementBattlePresent, 1);
         *seq = 2;
         break;
@@ -858,13 +857,13 @@ static void BattleChampionshipFlow_MenuTaskReward(Ov262Task *task, u32 *seq, voi
         WordSetNumber(menu->wordSet, 1, func_02017b8c(menu->param.gameData), 2, 0, 1);
         GFL_WordSetFormatStrbuf(menu->wordSet, menu->strBuf, text);
         GFL_StrBufFree(text);
-        func_ov262_021c58a4(menu->param.msgBox, menu->strBuf, 3);
+        WifiBattleMatchMsgBox_PrintStr(menu->param.msgBox, menu->strBuf, 3);
         *seq = 4;
         break;
     case 4:
         if (!GFL_SndBGMIsPlaying()) {
             GFL_SndBGMPop();
-            func_ov262_021c58bc(menu->param.msgBox);
+            WifiBattleMatchMsgBox_EnableKeyCursor(menu->param.msgBox);
             *seq = 5;
         }
         break;
@@ -881,7 +880,7 @@ static void BattleChampionshipFlow_MenuTaskReward(Ov262Task *task, u32 *seq, voi
         }
         break;
     case 6:
-        func_ov262_021c5888(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff, 2);
+        WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff, 2);
         *seq = 7;
         break;
     case 7:
@@ -898,19 +897,19 @@ static void BattleChampionshipFlow_MenuTaskReward(Ov262Task *task, u32 *seq, voi
         }
         break;
     case 9:
-        func_ov262_021c5c74(task, BattleChampionshipFlow_MenuTaskWifi);
+        WifiBattleMatchTask_SetFunc(task, BattleChampionshipFlow_MenuTaskWifi);
         break;
     }
 }
 
 static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u32 kind) {
     void *tournament = getTournamentBlockAddress(GameData_GetSaveControl(menu->param.gameData));
-    Ov262MenuParam param;
+    WifiBattleMatchMenuParam param;
     TournamentEntry *entry;
     u8 x, y, width, height;
     u32 layout;
 
-    sys_memset(&param, 0, sizeof(Ov262MenuParam));
+    sys_memset(&param, 0, sizeof(WifiBattleMatchMenuParam));
     param.msgData = menu->param.msgData;
     param.font = menu->param.font;
     param.printQueue = menu->param.printQueue;
@@ -920,9 +919,9 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
         param.msgIds[3] = 6;
         param.msgIds[0] = 2;
         param.count = 4;
-        param.unk28 = 1;
+        param.canCancel = 1;
         param.msgIds[1] = 3;
-        param.unk2C = 3;
+        param.cancelValue = 3;
         layout = 0;
         break;
     case LIST_WIFI:
@@ -936,8 +935,8 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
         }
         param.msgIds[3] = 6;
         param.count = 4;
-        param.unk28 = 1;
-        param.unk2C = 3;
+        param.canCancel = 1;
+        param.cancelValue = 3;
         layout = 0;
         break;
     case LIST_LIVE_MENU:
@@ -951,8 +950,8 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
         }
         param.msgIds[3] = 6;
         param.count = 4;
-        param.unk28 = 1;
-        param.unk2C = 3;
+        param.canCancel = 1;
+        param.cancelValue = 3;
         layout = 0;
         break;
     case LIST_LIVE:
@@ -960,14 +959,14 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
         param.msgIds[1] = 12;
         layout = 1;
         param.count = 2;
-        param.unk28 = layout;
-        param.unk2C = layout;
+        param.canCancel = layout;
+        param.cancelValue = layout;
         break;
     }
-    param.unk20 = 0;
-    param.unk22 = 15;
-    param.unk24 = 13;
-    param.unk26 = 1;
+    param.bg = 0;
+    param.palette = 15;
+    param.framePalette = 13;
+    param.frameChar = 1;
     switch (layout) {
     case 0:
         width = 28;
@@ -982,31 +981,31 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
         y = 17 - height;
         break;
     }
-    menu->list = func_ov262_021c5a88(&param, x, y, width, height, menu->heapId);
+    menu->list = WifiBattleMatchMenu_Create(&param, x, y, width, height, menu->heapId);
     menu->listKind = kind;
 }
 
 static void BattleChampionshipFlow_MenuCloseList(BattleChampionshipMenu *menu) {
-    func_ov262_021c5ba4(menu->list);
+    WifiBattleMatchMenu_Free(menu->list);
 }
 
 static s32 BattleChampionshipFlow_MenuGetListChoice(BattleChampionshipMenu *menu) {
-    return func_ov262_021c5bd4(menu->list);
+    return WifiBattleMatchMenu_Update(menu->list);
 }
 
 static void BattleChampionshipFlow_MenuPrint(BattleChampionshipMenu *menu, u32 msgId) {
-    func_ov262_021c5888(menu->param.msgBox, menu->param.msgData, msgId, 1);
+    WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, msgId, 1);
 }
 
 static void BattleChampionshipFlow_MenuPrintScript(BattleChampionshipMenu *menu, u32 msgId) {
-    func_ov262_021c5888(menu->param.msgBox, menu->scriptMsgData, msgId, 1);
+    WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->scriptMsgData, msgId, 1);
 }
 
 static BOOL BattleChampionshipFlow_MenuIsPrinted(BattleChampionshipMenu *menu) {
-    return func_ov262_021c5a1c(menu->param.msgBox);
+    return WifiBattleMatchMsgBox_IsDone(menu->param.msgBox);
 }
 
 static void BattleChampionshipFlow_MenuFinish(BattleChampionshipMenu *menu, u32 result) {
     menu->result = result;
-    func_ov262_021c5c74(menu->task, BattleChampionshipFlow_MenuTaskEnd);
+    WifiBattleMatchTask_SetFunc(menu->task, BattleChampionshipFlow_MenuTaskEnd);
 }

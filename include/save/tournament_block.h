@@ -15,6 +15,8 @@ typedef struct {
 } TournamentEntry;
 
 void *getTournamentBlockAddress(SaveControl *save);
+// The CRC16 of the first 0x15e bytes of an entry
+u16 CRC16_350bytes(const void *entry);
 // An entry of the block
 void *func_0200b8f4(void *block, u32 index);
 // An entry's field, and setting it. The Wi-Fi login reads field 2 and field 10 and sets field 10
@@ -27,6 +29,9 @@ void func_0200b830(void *entry, u32 field, u32 value);
 void *func_0200b794(void *entry);
 // The block's other entries, of 0x1e bytes
 void *func_0200b924(void *block, u32 index);
+// A field of the Pokémon number index of such an entry: the species (0), the form (1), whether it holds an item (2)
+// and its gender (3)
+u32 func_0200b934(void *record, u32 field, u8 index);
 // Clears the player's VS data
 void clearVSPlayer(void);
 

@@ -111,7 +111,7 @@ static BOOL func_ov052_021e5964(VM *vm, FieldScriptEnv *env) {
 // Shauntal's room
 static BOOL func_ov052_021e598c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov122_021eed14(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickShauntal_CallModel8Event(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return FALSE;
@@ -125,7 +125,7 @@ static BOOL func_ov052_021e59b4(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov122_021eed40(gsys, VM_Read16(vm));
+    GimmickShauntal_PlayModelFromIndex(gsys, VM_Read16(vm));
     return FALSE;
 }
 
@@ -133,7 +133,7 @@ static BOOL func_ov052_021e59b4(VM *vm, FieldScriptEnv *env) {
 static BOOL func_ov052_021e59dc(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov122_021eedcc(gsys, VM_Read16(vm));
+    GameEvent *event = GimmickShauntal_CallRoomChangeEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return FALSE;
@@ -145,7 +145,7 @@ static BOOL func_ov052_021e59dc(VM *vm, FieldScriptEnv *env) {
 // Shauntal's room
 static BOOL func_ov052_021e5a14(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov122_021eedf8(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickShauntal_CallModels6And9Event(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return FALSE;

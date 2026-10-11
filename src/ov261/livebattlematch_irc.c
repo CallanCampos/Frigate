@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/livebattlematch_irc.h"
 #include "field/delivery_irc.h"
+#include "field/net_devirc.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_command.h"
@@ -145,7 +146,7 @@ int LiveBattleMatchIrc_StepLink(LiveBattleMatchIrc *irc) {
         break;
     case 2:
         func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands, LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
-        func_ov031_02175a04(LiveBattleMatchIrc_OnLinkChanged);
+        NetDevIrc_SetPeerFilter(LiveBattleMatchIrc_OnLinkChanged);
         irc->state = 3;
         break;
     case 3:
@@ -161,10 +162,10 @@ int LiveBattleMatchIrc_StepLink(LiveBattleMatchIrc *irc) {
         }
         break;
     case 5:
-        func_ov031_02175a04(NULL);
+        NetDevIrc_SetPeerFilter(NULL);
         return 1;
     case 6:
-        func_ov031_02175a04(NULL);
+        NetDevIrc_SetPeerFilter(NULL);
         return 2;
     }
     return 0;
@@ -174,7 +175,7 @@ void LiveBattleMatchIrc_CancelLink(LiveBattleMatchIrc *irc) {
     if (irc->state >= 2) {
         func_02040c64(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA);
     }
-    func_ov031_02175a04(NULL);
+    NetDevIrc_SetPeerFilter(NULL);
     irc->state = 0;
 }
 

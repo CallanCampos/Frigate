@@ -1,6 +1,5 @@
 #include "app/digitalcardcheck.h"
 #include "types.h"
-#include "app/ov262_common.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -45,21 +44,21 @@ struct DigitalCardCheck {
     // The messages of the digital card (event_fishing.h's)
     MsgData *msgData;
     WordSet *wordSet;
-    Ov262Card *card;
-    Ov262Menu *menu;
-    Ov262Task *task;
+    WifiBattleMatchCard *card;
+    WifiBattleMatchMenu *menu;
+    WifiBattleMatchTask *task;
     DigitalCardCheckParam param;
     u16 heapId;
 };
 
-static void DigitalCardCheck_TaskStart(Ov262Task *task, u32 *seq, void *work);
-static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work);
-static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work);
-static void DigitalCardCheck_TaskCardType3(Ov262Task *task, u32 *seq, void *work);
-static void DigitalCardCheck_TaskCardType4(Ov262Task *task, u32 *seq, void *work);
-static void DigitalCardCheck_TaskCardType5(Ov262Task *task, u32 *seq, void *work);
-static void DigitalCardCheck_TaskNoCard(Ov262Task *task, u32 *seq, void *work);
-static void DigitalCardCheck_TaskEnd(Ov262Task *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskStart(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskCardType1(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskCardType2(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskCardType3(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskCardType4(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskCardType5(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskNoCard(WifiBattleMatchTask *task, u32 *seq, void *work);
+static void DigitalCardCheck_TaskEnd(WifiBattleMatchTask *task, u32 *seq, void *work);
 static void DigitalCardCheck_CreateCard(DigitalCardCheck *check);
 static void DigitalCardCheck_DeleteCard(DigitalCardCheck *check);
 static BOOL DigitalCardCheck_IsCardReady(DigitalCardCheck *check);
@@ -79,15 +78,15 @@ DigitalCardCheck *DigitalCardCheck_Create(const DigitalCardCheckParam *param, He
     sys_memset(check, 0, sizeof(DigitalCardCheck));
     check->param = *param;
     check->heapId = heapId;
-    func_ov262_021c29c4(check->param.seq, 3, heapId);
+    WifiBattleMatchRes_LoadBG(check->param.seq, 3, heapId);
     check->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_FISHING, heapId);
     check->wordSet = GFL_WordSetSystemCreate(8, 64, heapId);
-    check->task = func_ov262_021c5c10(check, DigitalCardCheck_TaskStart, heapId);
+    check->task = WifiBattleMatchTask_Create(check, DigitalCardCheck_TaskStart, heapId);
     return check;
 }
 
 void DigitalCardCheck_Delete(DigitalCardCheck *check) {
-    func_ov262_021c5c4c(check->task);
+    WifiBattleMatchTask_Free(check->task);
     DigitalCardCheck_DeleteCard(check);
     GFL_WordSetSystemFree(check->wordSet);
     GFL_MsgDataFree(check->msgData);
@@ -95,17 +94,17 @@ void DigitalCardCheck_Delete(DigitalCardCheck *check) {
 }
 
 void DigitalCardCheck_Update(DigitalCardCheck *check) {
-    func_ov262_021c5c54(check->task);
+    WifiBattleMatchTask_Run(check->task);
     if (check->card != NULL) {
-        func_ov262_021c35e4(check->card, check->param.printQueue);
+        WifiBattleMatchCard_Flush(check->card, check->param.printQueue);
     }
 }
 
 BOOL DigitalCardCheck_IsFinished(DigitalCardCheck *check) {
-    return func_ov262_021c5c64(check->task);
+    return WifiBattleMatchTask_IsEnded(check->task);
 }
 
-static void DigitalCardCheck_TaskStart(Ov262Task *task, u32 *seq, void *work) {
+static void DigitalCardCheck_TaskStart(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
     void *entry =
         func_0200b8f4(getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData)), check->param.mode);
@@ -113,21 +112,21 @@ static void DigitalCardCheck_TaskStart(Ov262Task *task, u32 *seq, void *work) {
     u32 cardType = func_0200b798(entry, 10);
 
     if (field2 != 0 && cardType == CARD_TYPE_1) {
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskCardType1);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskCardType1);
     } else if (field2 != 0 && cardType == CARD_TYPE_2) {
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskCardType2);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskCardType2);
     } else if (field2 != 0 && cardType == CARD_TYPE_3) {
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskCardType3);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskCardType3);
     } else if (field2 != 0 && cardType == CARD_TYPE_4) {
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskCardType4);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskCardType4);
     } else if (field2 != 0 && cardType == CARD_TYPE_5) {
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskCardType5);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskCardType5);
     } else {
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskNoCard);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskNoCard);
     }
 }
 
-static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work) {
+static void DigitalCardCheck_TaskCardType1(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
     SaveControl *save;
     BattleBoxSave *box;
@@ -157,7 +156,7 @@ static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work
         DigitalCardCheck_SetBGEnabled(check, 1);
         DigitalCardCheck_Print(check, EventFishing_Text_ParticipatingCompetitionPleaseRegister, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 4);
+        WifiBattleMatchTask_SetReturnSeq(task, 4);
         break;
     case 4:
         DigitalCardCheck_OpenMenu(check, MENU_UNREGISTER_BACK);
@@ -178,7 +177,7 @@ static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work
     case 6:
         DigitalCardCheck_Print(check, EventFishing_Text_OnceUnregisteredWillNot_3, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 7);
+        WifiBattleMatchTask_SetReturnSeq(task, 7);
         break;
     case 7:
         DigitalCardCheck_OpenMenu(check, MENU_YES_NO);
@@ -199,7 +198,7 @@ static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work
     case 9:
         DigitalCardCheck_Print(check, EventFishing_Text_WillUnregisteredSureAbout_2, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 10);
+        WifiBattleMatchTask_SetReturnSeq(task, 10);
         break;
     case 10:
         DigitalCardCheck_OpenMenu(check, MENU_YES_NO);
@@ -220,7 +219,7 @@ static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work
     case 12:
         DigitalCardCheck_Print(check, EventFishing_Text_BeingUnregisteredDontTurn, 2);
         *seq = 19;
-        func_ov262_021c5c88(task, 13);
+        WifiBattleMatchTask_SetReturnSeq(task, 13);
         break;
     case 13:
         save = GameData_GetSaveControl(check->param.gameData);
@@ -245,7 +244,7 @@ static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work
     case 16:
         DigitalCardCheck_Print(check, EventFishing_Text_HaveBeenUnregisteredFrom, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 17);
+        WifiBattleMatchTask_SetReturnSeq(task, 17);
         break;
     case 17:
         if (DigitalCardCheck_IsCardDone(check)) {
@@ -253,17 +252,17 @@ static void DigitalCardCheck_TaskCardType1(Ov262Task *task, u32 *seq, void *work
         }
         break;
     case 18:
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskEnd);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskEnd);
         break;
     case 19:
         if (DigitalCardCheck_IsPrinted(check)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     }
 }
 
-static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work) {
+static void DigitalCardCheck_TaskCardType2(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
     SaveControl *save;
     BattleBoxSave *box;
@@ -293,7 +292,7 @@ static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work
         DigitalCardCheck_SetBGEnabled(check, 1);
         DigitalCardCheck_Print(check, EventFishing_Text_ParticipatingCompetitionBattleBox, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 4);
+        WifiBattleMatchTask_SetReturnSeq(task, 4);
         break;
     case 4:
         DigitalCardCheck_OpenMenu(check, MENU_UNREGISTER_BACK);
@@ -314,7 +313,7 @@ static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work
     case 6:
         DigitalCardCheck_Print(check, EventFishing_Text_OnceUnregisteredWillNot_2, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 7);
+        WifiBattleMatchTask_SetReturnSeq(task, 7);
         break;
     case 7:
         DigitalCardCheck_OpenMenu(check, MENU_YES_NO);
@@ -335,7 +334,7 @@ static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work
     case 9:
         DigitalCardCheck_Print(check, EventFishing_Text_WillUnregisteredSureAbout_2, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 10);
+        WifiBattleMatchTask_SetReturnSeq(task, 10);
         break;
     case 10:
         DigitalCardCheck_OpenMenu(check, MENU_YES_NO);
@@ -356,7 +355,7 @@ static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work
     case 12:
         DigitalCardCheck_Print(check, EventFishing_Text_BeingUnregisteredDontTurn, 2);
         *seq = 19;
-        func_ov262_021c5c88(task, 13);
+        WifiBattleMatchTask_SetReturnSeq(task, 13);
         break;
     case 13:
         save = GameData_GetSaveControl(check->param.gameData);
@@ -381,7 +380,7 @@ static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work
     case 16:
         DigitalCardCheck_Print(check, EventFishing_Text_BattleBoxHasBeen_2, 1);
         *seq = 19;
-        func_ov262_021c5c88(task, 17);
+        WifiBattleMatchTask_SetReturnSeq(task, 17);
         break;
     case 17:
         if (DigitalCardCheck_IsCardDone(check)) {
@@ -389,17 +388,17 @@ static void DigitalCardCheck_TaskCardType2(Ov262Task *task, u32 *seq, void *work
         }
         break;
     case 18:
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskEnd);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskEnd);
         break;
     case 19:
         if (DigitalCardCheck_IsPrinted(check)) {
-            func_ov262_021c5c8c(task);
+            WifiBattleMatchTask_ReturnToSeq(task);
         }
         break;
     }
 }
 
-static void DigitalCardCheck_TaskCardType3(Ov262Task *task, u32 *seq, void *work) {
+static void DigitalCardCheck_TaskCardType3(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
     s32 choice;
 
@@ -451,12 +450,12 @@ static void DigitalCardCheck_TaskCardType3(Ov262Task *task, u32 *seq, void *work
         }
         break;
     case 8:
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskEnd);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskEnd);
         break;
     }
 }
 
-static void DigitalCardCheck_TaskCardType4(Ov262Task *task, u32 *seq, void *work) {
+static void DigitalCardCheck_TaskCardType4(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
     s32 choice;
 
@@ -508,12 +507,12 @@ static void DigitalCardCheck_TaskCardType4(Ov262Task *task, u32 *seq, void *work
         }
         break;
     case 8:
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskEnd);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskEnd);
         break;
     }
 }
 
-static void DigitalCardCheck_TaskCardType5(Ov262Task *task, u32 *seq, void *work) {
+static void DigitalCardCheck_TaskCardType5(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
     s32 choice;
 
@@ -565,12 +564,12 @@ static void DigitalCardCheck_TaskCardType5(Ov262Task *task, u32 *seq, void *work
         }
         break;
     case 8:
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskEnd);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskEnd);
         break;
     }
 }
 
-static void DigitalCardCheck_TaskNoCard(Ov262Task *task, u32 *seq, void *work) {
+static void DigitalCardCheck_TaskNoCard(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
 
     switch (*seq) {
@@ -584,13 +583,13 @@ static void DigitalCardCheck_TaskNoCard(Ov262Task *task, u32 *seq, void *work) {
         }
         break;
     case 2:
-        func_ov262_021c5c74(task, DigitalCardCheck_TaskEnd);
+        WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskEnd);
         break;
     }
 }
 
-static void DigitalCardCheck_TaskEnd(Ov262Task *task, u32 *seq, void *work) {
-    func_ov262_021c5c7c(task);
+static void DigitalCardCheck_TaskEnd(WifiBattleMatchTask *task, u32 *seq, void *work) {
+    WifiBattleMatchTask_End(task);
 }
 
 static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
@@ -601,7 +600,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
     Regulation *regulation;
     RecordSave *record;
     PlayerInfo *playerInfo;
-    Ov262NetLink *link;
+    ClActUnit *link;
 
     if (check->card != NULL) {
         return;
@@ -613,46 +612,46 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
     regulation = func_0200b530(entry);
     record = getRecordBlkAddress(save);
     playerInfo = GetGameDataPlayerInfo(check->param.gameData);
-    link = func_ov262_021c2668(check->param.net);
+    link = WifiBattleMatchGraphic_GetClActUnit(check->param.net);
     if (check->param.mode == DIGITAL_CARD_CHECK_WIFI) {
-        Ov262WifiCardInfo info;
+        WifiBattleMatchWifiCardInfo info;
         void *results;
         u32 first;
 
-        sys_memset(&info, 0, sizeof(Ov262WifiCardInfo));
+        sys_memset(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
         sys_memcpy(func_0200b794(entry), &info, 0x92);
         results = func_0200f2d0(record);
         info.unkA0 = func_0200e870(results, 10, 0);
         first = func_0200e870(results, 10, 1);
         info.unkA4 = first + func_0200e870(results, 10, 2);
-        info.unk9C = func_02008bf4(playerInfo);
-        info.unk94 =
+        info.look = func_02008bf4(playerInfo);
+        info.startDate =
             DigitalCardCheck_PackBytes(func_0200b798(entry, 4), func_0200b798(entry, 5), func_0200b798(entry, 6));
-        info.unk98 =
+        info.endDate =
             DigitalCardCheck_PackBytes(func_0200b798(entry, 7), func_0200b798(entry, 8), func_0200b798(entry, 9));
-        info.unkAA = func_0200b798(entry, 11);
+        info.variant = func_0200b798(entry, 11);
         check->card =
-            func_ov262_021c2e8c(&info, 0, playerInfo, link, check->param.seq, check->param.font,
+            WifiBattleMatchWifiCard_Create(&info, 0, playerInfo, link, check->param.seq, check->param.font,
                                 check->param.printQueue, check->msgData, check->wordSet, cardData, 1, check->heapId);
     } else {
-        Ov262LiveCardInfo info;
+        WifiBattleMatchLiveCardInfo info;
         void *results;
 
-        sys_memset(&info, 0, sizeof(Ov262LiveCardInfo));
+        sys_memset(&info, 0, sizeof(WifiBattleMatchLiveCardInfo));
         sys_memcpy(func_0200b794(entry), &info, 0x92);
         results = func_0200f2d8(record);
         info.unkA0 = func_0200f1d8(results, 1);
         info.unkA2 = func_0200f1d8(results, 2);
         info.unkA4 = func_0200f1d8(results, 0);
         info.unkA6 = func_0200b574(regulation, 0x16);
-        info.unk9C = func_02008bf4(playerInfo);
-        info.unk94 =
+        info.look = func_02008bf4(playerInfo);
+        info.startDate =
             DigitalCardCheck_PackBytes(func_0200b798(entry, 4), func_0200b798(entry, 5), func_0200b798(entry, 6));
-        info.unk98 =
+        info.endDate =
             DigitalCardCheck_PackBytes(func_0200b798(entry, 7), func_0200b798(entry, 8), func_0200b798(entry, 9));
-        info.unkA8 = func_0200b798(entry, 11);
+        info.variant = func_0200b798(entry, 11);
         check->card =
-            func_ov262_021c323c(&info, playerInfo, link, check->param.seq, check->param.font, check->param.printQueue,
+            WifiBattleMatchLiveCard_Create(&info, playerInfo, link, check->param.seq, check->param.font, check->param.printQueue,
                                 check->msgData, check->wordSet, cardData, 1, check->heapId);
     }
     DigitalCardCheck_SetBGEnabled(check, 0);
@@ -661,9 +660,9 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
 static void DigitalCardCheck_DeleteCard(DigitalCardCheck *check) {
     if (check->card != NULL) {
         if (check->param.mode == DIGITAL_CARD_CHECK_WIFI) {
-            func_ov262_021c301c(check->card);
+            WifiBattleMatchWifiCard_Free(check->card);
         } else {
-            func_ov262_021c33c4(check->card);
+            WifiBattleMatchLiveCard_Free(check->card);
         }
         check->card = NULL;
     }
@@ -672,64 +671,64 @@ static void DigitalCardCheck_DeleteCard(DigitalCardCheck *check) {
 }
 
 static BOOL DigitalCardCheck_IsCardReady(DigitalCardCheck *check) {
-    return func_ov262_021c35ec(check->card);
+    return WifiBattleMatchCard_SlideIn(check->card);
 }
 
 static BOOL DigitalCardCheck_IsCardDone(DigitalCardCheck *check) {
-    return func_ov262_021c3720(check->card);
+    return WifiBattleMatchCard_SlideOut(check->card);
 }
 
 static void DigitalCardCheck_ShowCard(DigitalCardCheck *check, u32 page) {
     if (check->param.mode == DIGITAL_CARD_CHECK_WIFI) {
-        func_ov262_021c3048(check->card, page, check->msgData, check->param.printQueue, check->param.font,
+        WifiBattleMatchWifiCard_ShowPage(check->card, page, check->msgData, check->param.printQueue, check->param.font,
                             check->heapId);
     } else {
-        func_ov262_021c33f0(check->card, page, check->msgData, check->param.printQueue, check->param.font,
+        WifiBattleMatchLiveCard_ShowPage(check->card, page, check->msgData, check->param.printQueue, check->param.font,
                             check->heapId);
     }
 }
 
 static void DigitalCardCheck_OpenMenu(DigitalCardCheck *check, u32 kind) {
-    Ov262MenuParam param;
+    WifiBattleMatchMenuParam param;
     u32 layout;
     int x, y, width, height;
 
     if (check->menu != NULL) {
         return;
     }
-    sys_memset(&param, 0, sizeof(Ov262MenuParam));
+    sys_memset(&param, 0, sizeof(WifiBattleMatchMenuParam));
     param.msgData = check->msgData;
     param.font = check->param.font;
     param.printQueue = check->param.printQueue;
-    param.unk20 = 0;
-    param.unk22 = 15;
-    param.unk24 = 13;
-    param.unk26 = 1;
+    param.bg = 0;
+    param.palette = 15;
+    param.framePalette = 13;
+    param.frameChar = 1;
     switch (kind) {
     case MENU_YES_NO:
         param.msgIds[0] = EventFishing_Text_Yes_4;
         param.msgIds[1] = EventFishing_Text_No_4;
         param.count = 2;
-        param.unk28 = 1;
-        param.unk2C = 1;
+        param.canCancel = 1;
+        param.cancelValue = 1;
         layout = 0;
-        param.unk2E = 1;
+        param.cursorRow = 1;
         break;
     case MENU_BACK:
         param.msgIds[0] = EventFishing_Text_Back;
         param.count = 1;
-        param.unk28 = 1;
-        param.unk2C = 0;
+        param.canCancel = 1;
+        param.cancelValue = 0;
         layout = 0;
         break;
     case MENU_UNREGISTER_BACK:
         param.msgIds[0] = EventFishing_Text_Unregister;
         param.msgIds[1] = EventFishing_Text_Back;
         param.count = 2;
-        param.unk28 = 1;
-        param.unk2C = 1;
+        param.canCancel = 1;
+        param.cancelValue = 1;
         layout = 1;
-        param.unk2E = 1;
+        param.cursorRow = 1;
         break;
     }
     switch (layout) {
@@ -746,29 +745,29 @@ static void DigitalCardCheck_OpenMenu(DigitalCardCheck *check, u32 kind) {
         y = 17 - height;
         break;
     }
-    check->menu = func_ov262_021c5a88(&param, x, y, width, height, check->heapId);
+    check->menu = WifiBattleMatchMenu_Create(&param, x, y, width, height, check->heapId);
 }
 
 static void DigitalCardCheck_CloseMenu(DigitalCardCheck *check) {
     if (check->menu != NULL) {
-        func_ov262_021c5ba4(check->menu);
+        WifiBattleMatchMenu_Free(check->menu);
         check->menu = NULL;
     }
 }
 
 static s32 DigitalCardCheck_GetMenuChoice(DigitalCardCheck *check) {
     if (check->menu != NULL) {
-        return func_ov262_021c5bd4(check->menu);
+        return WifiBattleMatchMenu_Update(check->menu);
     }
     return -1;
 }
 
 static void DigitalCardCheck_Print(DigitalCardCheck *check, u32 msgId, u32 style) {
-    func_ov262_021c5888(check->param.msgBox, check->msgData, msgId, style);
+    WifiBattleMatchMsgBox_Print(check->param.msgBox, check->msgData, msgId, style);
 }
 
 static BOOL DigitalCardCheck_IsPrinted(DigitalCardCheck *check) {
-    return func_ov262_021c5a1c(check->param.msgBox);
+    return WifiBattleMatchMsgBox_IsDone(check->param.msgBox);
 }
 
 static void DigitalCardCheck_SetBGEnabled(DigitalCardCheck *check, u32 enabled) {
@@ -776,5 +775,5 @@ static void DigitalCardCheck_SetBGEnabled(DigitalCardCheck *check, u32 enabled) 
 }
 
 static void DigitalCardCheck_ClearMessage(DigitalCardCheck *check) {
-    func_ov262_021c5a48(check->param.msgBox);
+    WifiBattleMatchMsgBox_Clear(check->param.msgBox);
 }

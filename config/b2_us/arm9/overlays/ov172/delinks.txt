@@ -3,3 +3,20 @@
     .ctor       start:0x0219a60c end:0x0219a60c kind:rodata align:4
     .data       start:0x0219a620 end:0x0219a640 kind:data align:32
     .bss        start:0x0219a640 end:0x0219a640 kind:bss align:32
+
+src/ov172/pdc.c:
+    complete
+    .text       start:0x021998c0 end:0x021999a8
+    .rodata     start:0x0219a53c end:0x0219a548
+    .data       start:0x0219a620 end:0x0219a628
+
+src/ov172/pdc_main.c:
+    complete
+    .text       start:0x021999a8 end:0x02199f94
+    .rodata     start:0x0219a548 end:0x0219a5ec
+    .data       start:0x0219a628 end:0x0219a634
+
+src/ov172/pdc_msg.c:
+    .text       start:0x02199f94 end:0x0219a53c
+    .rodata     start:0x0219a5ec end:0x0219a60c
+    .data       start:0x0219a634 end:0x0219a640

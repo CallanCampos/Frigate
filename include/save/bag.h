@@ -32,7 +32,9 @@ void func_0200887c(void *cursor, u16 pocket, s16 *row, s16 *scroll);
 u16 func_02008890(void *cursor);
 void func_02008894(void *cursor, u16 pocket, s16 row, s16 scroll);
 void func_020088a4(void *cursor, u16 pocket);
-// The battle bag's cursor memory: the row and page of a pocket, and the last used item and its pocket
+// The battle bag's cursor memory (0x32 bytes, allocated here): the row and page of a pocket, and the last used item and
+// its pocket
+void *func_02008860(HeapID heapId);
 void func_020088a8(void *cursor, u16 pocket, s16 *row, s16 *page);
 u16 func_020088bc(void *cursor);
 u16 func_020088c0(void *cursor);

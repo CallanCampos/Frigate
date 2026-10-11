@@ -391,6 +391,7 @@ typedef struct JoinAvenueSave JoinAvenueSave;
 typedef struct JoinAvenueVisitor JoinAvenueVisitor;
 typedef struct KeyInfoSave KeyInfoSave;
 typedef struct LinkFestival LinkFestival;
+typedef struct LiveBattleMatchPlayerData LiveBattleMatchPlayerData;
 typedef struct MMSys MMSys;
 typedef struct MailboxProcessData MailboxProcessData;
 typedef struct MapMatrix MapMatrix;

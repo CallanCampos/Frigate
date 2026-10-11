@@ -219,6 +219,8 @@ u32 func_ov036_021ba684(void *list);
 BOOL func_ov036_021ba688(s32 x, s32 z, void *list, u8 index);
 u32 func_ov036_021ba6a4(u8 index, void *list);
 u32 func_ov036_021ba6b0(u8 index, void *list);
+// Sets whether the entry at index is in use, which func_ov036_021ba624 checks before it fills one in
+void func_ov036_021ba6bc(u8 index, BOOL inUse, void *list);
 // The mapper's WFBC work
 void *func_ov036_0218adac(HeapID heapId);
 void func_ov036_0218add0(void *wfbc);

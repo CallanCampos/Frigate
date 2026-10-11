@@ -7,21 +7,193 @@
 #include "struct_decls.h"
 
 // Overlay 260's wifibattlematch_net.c (named by its embedded string): the net part of the Wi-Fi battle competitions.
-// Only the functions that overlay 263's party exchange calls are declared so far, and none has a name yet
+// Its functions have no names yet, only their addresses; what they do is said at each
 
 typedef struct WifiBattleMatchNet WifiBattleMatchNet;
 
-// The proc of the Wi-Fi link, which overlay 290 chains
-extern const GameProcFunctions data_ov260_021bfcd8;
+// What the matching of two players is looking for: the rating, the disconnects, the cup and the number of matches
+typedef struct {
+    s32 rating;
+    s32 disconnects;
+    s32 cup;
+    s32 matches;
+} WifiBattleMatchNetKeys;
 
-WifiBattleMatchNet *func_ov260_021b8cc8(void *a0, GameData *gameData, u32 a2, HeapID heapId);
-void func_ov260_021b8da4(WifiBattleMatchNet *net);
+// The check of a team that the server answers: its status, the result of each Pokémon and the signature
+typedef struct {
+    u8 status;
+    u32 result[6];
+    u8 signature[0x80];
+} WifiBattleMatchNetCheck;
+
+// The fields of the arena's table, by the number that WifiBattleMatchNet_GetArenaFieldName gives their names for
+enum {
+    ARENA_DISCONNECTS_COUNTER = 3,
+    ARENA_COMPLETE_MATCHES_COUNTER = 4,
+    ARENA_NUM_SINGLE_WIN = 9,
+    ARENA_NUM_SINGLE_LOSE = 10,
+    ARENA_NUM_DOUBLE_LOSE = 11,
+    ARENA_NUM_DOUBLE_WIN = 12,
+    ARENA_NUM_ROTATE_WIN = 13,
+    ARENA_NUM_ROTATE_LOSE = 14,
+    ARENA_NUM_TRIPLE_WIN = 15,
+    ARENA_NUM_TRIPLE_LOSE = 16,
+    ARENA_NUM_SHOOTER_WIN = 17,
+    ARENA_NUM_SHOOTER_LOSE = 18,
+    ARENA_ELO_RATING_1V1_SINGLE = 19,
+    ARENA_ELO_RATING_1V1_DOUBLE = 20,
+    ARENA_ELO_RATING_1V1_ROTATE = 21,
+    ARENA_ELO_RATING_1V1_TRIPLE = 22,
+    ARENA_ELO_RATING_1V1_SHOOTER = 23,
+    ARENA_CHEATS_COUNTER = 24,
+    ARENA_ELO_RATING_MAXIMUM_STAT = 25,
+    ARENA_ELO_RATING_MINIMUM_STAT = 26,
+    ARENA_SCORE_WEIGHT_NORMAL = 27,
+    ARENA_FLOOR_MODIFIER = 28,
+    ARENA_INTERMED_MODIFIER = 29,
+    ARENA_ADVANCED_MODIFIER = 30,
+    ARENA_MASTER_MODIFIER = 31,
+    ARENA_RATING_DIFF_HIGH = 32,
+    ARENA_RATING_DIFF_LOW = 33,
+    ARENA_NUM_WINLOSE_COUNTER_MINIMUM_STAT = 34,
+    ARENA_INITIAL_RATING = 35,
+    ARENA_ELO_RATING_1V1_WIFICUP = 36,
+    ARENA_NUM_WIFICUP_WIN = 37,
+    ARENA_NUM_WIFICUP_LOSE = 38,
+    ARENA_CHEATS_WIFICUP_COUNTER = 39,
+    ARENA_DISCONNECTS_WIFICUP_COUNTER = 40,
+};
+
+// The kinds of read that WifiBattleMatchNet_StartRead starts: it fills a WifiBattleMatchNetStats, a WifiBattleMatchNetCupStats,
+// a record ID, the team of the Wi-Fi cup and the date of the last login
+enum {
+    WBM_READ_ARENA,
+    WBM_READ_WIFICUP,
+    WBM_READ_RECORD_ID,
+    WBM_READ_WIFICUP_PARTY,
+    WBM_READ_LAST_LOGIN,
+};
+
+// The kinds of record that WifiBattleMatchNet_StartWrite writes, with the data it takes: the team of the Wi-Fi cup, nothing
+// (the date is the current one), nothing, and a WifiBattleMatchNetRecordData
+enum {
+    WBM_WRITE_WIFICUP,
+    WBM_WRITE_LAST_LOGIN,
+    WBM_WRITE_PROFILE,
+    WBM_WRITE_RECORD_DATA,
+};
+
+// The stats of a player in the arena
+typedef struct {
+    s32 eloRatingDouble;
+    s32 eloRatingRotate;
+    s32 eloRatingShooter;
+    s32 eloRatingSingle;
+    s32 eloRatingTriple;
+    s32 unk14;
+    s32 cheatsCounter;
+    s32 unk1C;
+    s32 disconnectsCounter;
+    s32 numDoubleLose;
+    s32 numDoubleWin;
+    s32 numRotateLose;
+    s32 numRotateWin;
+    s32 numShooterLose;
+    s32 numShooterWin;
+    s32 numSingleLose;
+    s32 numSingleWin;
+    s32 numTripleLose;
+    s32 numTripleWin;
+    s32 initialProfileId;
+    s32 nowProfileId;
+    s32 recordSaveIdx;
+    s32 recordId;
+} WifiBattleMatchNetStats;
+
+// The stats of a player in the Wi-Fi cup, followed by the team that was registered
+typedef struct {
+    s32 cheatsCounter;
+    s32 disconnectsCounter;
+    s32 numWin;
+    s32 numLose;
+    s32 eloRating;
+    s32 recordSaveIdx;
+    u8 party[1];
+} WifiBattleMatchNetCupStats;
+
+// A record that the competition keeps in one of six slots
+typedef struct {
+    u8 data[0x50];
+    u32 slot;
+} WifiBattleMatchNetRecordData;
+
+WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void *loginBuffer, HeapID heapId);
+void WifiBattleMatchNet_Delete(WifiBattleMatchNet *p_wk);
+// Does nothing
+void WifiBattleMatchNet_Nop(WifiBattleMatchNet *p_wk);
+// Starts a timing sync with the number, and checks whether the other machine reached it too
+void WifiBattleMatchNet_StartSync(WifiBattleMatchNet *p_wk, u32 syncId);
+BOOL WifiBattleMatchNet_CheckSync(WifiBattleMatchNet *p_wk);
+// Checks the network's state and the error that was found, returning how it ends (0 for none)
+u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2);
+// Resets the state of the machines that follow; 0 while running, 1 when done and 2 on failure
+void WifiBattleMatchNet_ResetLogin(WifiBattleMatchNet *p_wk);
+u32 WifiBattleMatchNet_LoginMain(WifiBattleMatchNet *p_wk);
+// Sets the match query and its keys for the mode, and the machine that runs it; 0 while it runs, 1 once matched, 2
+// on failure
+void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u32 a3, const WifiBattleMatchNetKeys *keys);
+u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk);
+void WifiBattleMatchNet_CancelMatch(WifiBattleMatchNet *p_wk);
+void WifiBattleMatchNet_ResetEnd(WifiBattleMatchNet *p_wk);
+BOOL WifiBattleMatchNet_EndMain(WifiBattleMatchNet *p_wk);
+BOOL WifiBattleMatchNet_SendCmd2402(WifiBattleMatchNet *p_wk);
+BOOL WifiBattleMatchNet_TakeCmd2402(WifiBattleMatchNet *p_wk);
+BOOL WifiBattleMatchNet_SendPerson(WifiBattleMatchNet *p_wk);
+BOOL WifiBattleMatchNet_TakePerson(WifiBattleMatchNet *p_wk);
+void WifiBattleMatchNet_SetGuest(WifiBattleMatchNet *p_wk, u32 value);
+void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 a3, const u32 *a4, u32 a5);
+u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out);
+u32 WifiBattleMatchNet_GetReceivedValue(WifiBattleMatchNet *p_wk);
+// Reads the table of fields of a kind into out; 0 while it runs, 1 when done and 2 on failure
+void WifiBattleMatchNet_StartRead(WifiBattleMatchNet *p_wk, int recordId, int kind, void *out);
+u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk);
+// Writes a record of a kind; 0 while it runs, 1 when done and 2 on failure
+void WifiBattleMatchNet_StartWrite(WifiBattleMatchNet *p_wk, int kind, void *data);
+u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk);
+void WifiBattleMatchNet_StartCreateRecord(WifiBattleMatchNet *p_wk);
+u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk);
+u32 WifiBattleMatchNet_GetRecordId(WifiBattleMatchNet *p_wk);
+BOOL WifiBattleMatchNet_SendPlayerInfo(WifiBattleMatchNet *p_wk, const void *data);
+BOOL WifiBattleMatchNet_TakePlayerInfo(WifiBattleMatchNet *p_wk, void **out);
 // Sends the team picked, and then is TRUE once it is sent
-BOOL func_ov260_021bb21c(WifiBattleMatchNet *net, PokeParty *party);
+BOOL WifiBattleMatchNet_SendParty(WifiBattleMatchNet *p_wk, PokeParty *party);
 // Copies the other player's team into party, and then is TRUE, once it has arrived
-BOOL func_ov260_021bb25c(WifiBattleMatchNet *net, PokeParty *party);
+BOOL WifiBattleMatchNet_TakeParty(WifiBattleMatchNet *p_wk, PokeParty *party);
+BOOL WifiBattleMatchNet_SendValue4(WifiBattleMatchNet *p_wk, const void *data);
+BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, void *out);
+BOOL WifiBattleMatchNet_SendReportValue(WifiBattleMatchNet *p_wk, const void *data);
+BOOL WifiBattleMatchNet_TakeReportValue(WifiBattleMatchNet *p_wk, u32 *out);
+void WifiBattleMatchNet_InitDownload(WifiBattleMatchNet *p_wk, s32 profileId);
+u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk);
+void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, void *dest);
+void WifiBattleMatchNet_StartAccountRequest(WifiBattleMatchNet *p_wk, HeapID heapId);
+u32 WifiBattleMatchNet_AccountRequestMain(WifiBattleMatchNet *p_wk);
+void WifiBattleMatchNet_GetAccountValues(WifiBattleMatchNet *p_wk, void *out);
+void WifiBattleMatchNet_StartPostRequest(WifiBattleMatchNet *p_wk, const void *in, HeapID heapId);
+u32 WifiBattleMatchNet_PostRequestMain(WifiBattleMatchNet *p_wk);
+void WifiBattleMatchNet_StartNameCheck(WifiBattleMatchNet *p_wk, PlayerInfo *info, u16 a2);
+BOOL WifiBattleMatchNet_NameCheckMain(WifiBattleMatchNet *p_wk, u32 *out);
+void WifiBattleMatchNet_StartPokemonCheck(WifiBattleMatchNet *p_wk, void *data, int kind);
+u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatchNetCheck *out);
+void WifiBattleMatchNet_ShowIcon(WifiBattleMatchNet *p_wk, int a1);
+s32 WifiBattleMatchNet_GetGSID(WifiBattleMatchNet *p_wk);
 
-// Which a Wi-Fi library error of the right range is passed to
-void func_ov260_021bec44(void);
+// wifibattlematch_net_fields.c, which follows: the names of the Sake fields. The first two give the arena's table of
+// them and its length, and the next two the Wi-Fi cup's; the last gives the name of one of the numbered fields
+const char **WifiBattleMatchNet_GetArenaFieldNames(void);
+int WifiBattleMatchNet_GetArenaFieldCount(void);
+const char **WifiBattleMatchNet_GetWifiCupFieldNames(void);
+int WifiBattleMatchNet_GetWifiCupFieldCount(void);
+const char *WifiBattleMatchNet_GetArenaFieldName(int field);
 
 #endif // POKEBW2_APP_WIFIBATTLEMATCH_NET_H

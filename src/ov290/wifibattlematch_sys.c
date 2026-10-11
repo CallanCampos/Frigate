@@ -7,7 +7,7 @@
 #include "app/ov306.h"
 #include "app/wifi_login.h"
 #include "app/wifibattlematch.h"
-#include "app/wifibattlematch_net.h"
+#include "app/wifibattlematch_link.h"
 #include "app/wifibattlematch_subproc.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
@@ -273,7 +273,7 @@ const GameProcFunctions WIFIBATTLEMATCH_PROC_FUNCTIONS = {
 static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
     { OVERLAY_ID(261), &BATTLE_CHAMPIONSHIP_FLOW_PROC_FUNCTIONS, WifiBattleMatchSys_CreateChampionshipParam,
       WifiBattleMatchSys_FinishChampionship },
-    { OVERLAY_ID(260), &data_ov260_021bfcd8, WifiBattleMatchSys_CreateNetParam, WifiBattleMatchSys_FinishNet },
+    { OVERLAY_ID(260), &WIFIBATTLEMATCH_LINK_PROC_FUNCTIONS, WifiBattleMatchSys_CreateNetParam, WifiBattleMatchSys_FinishNet },
     { OVERLAY_ID(263), &WIFIBATTLEMATCH_LIST_PROC_FUNCTIONS, WifiBattleMatchSys_CreateListParam,
       WifiBattleMatchSys_FinishList },
     { OVERLAY_NONE, &sWifiBattleMatchSysBattleProcFunctions, WifiBattleMatchSys_CreateBattleParam, WifiBattleMatchSys_FinishBattle },

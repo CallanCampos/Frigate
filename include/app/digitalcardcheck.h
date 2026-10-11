@@ -2,7 +2,9 @@
 #define POKEBW2_APP_DIGITALCARDCHECK_H
 
 #include "types.h"
-#include "app/ov262_common.h"
+#include "app/wifibattlematch_graphic.h"
+#include "app/wifibattlematch_util.h"
+#include "app/wifibattlematch_view.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
@@ -21,13 +23,13 @@ enum {
 typedef struct {
     // A DIGITAL_CARD_CHECK_*
     u32 mode;
-    Ov262MsgBox *msgBox;
+    WifiBattleMatchMsgBox *msgBox;
     Font *font;
     // The Entree Forest's messages
     MsgData *msgData;
     PrintQueue *printQueue;
-    Ov262Seq *seq;
-    Ov262Net *net;
+    WifiBattleMatchRes *seq;
+    WifiBattleMatchGraphic *net;
     GameData *gameData;
 } DigitalCardCheckParam;
 

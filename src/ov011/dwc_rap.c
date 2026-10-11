@@ -4,8 +4,8 @@
 
 #include "gfl/dwc_rap.h"
 #include "types.h"
-#include "app/wifibattlematch_net.h"
 #include "dwc/dwc.h"
+#include "dwc/gdb.h"
 #include "dwc/nd.h"
 #include "gfl/dwc_rapcommon.h"
 #include "gfl/dwc_vchat.h"

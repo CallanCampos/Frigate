@@ -2,7 +2,9 @@
 #define POKEBW2_APP_LIVEBATTLEMATCH_FLOW_H
 
 #include "types.h"
-#include "app/ov262_common.h"
+#include "app/wifibattlematch_graphic.h"
+#include "app/wifibattlematch_util.h"
+#include "app/wifibattlematch_view.h"
 #include "gfl/heap.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
@@ -15,7 +17,7 @@ typedef struct LiveBattleMatchFlow LiveBattleMatchFlow;
 
 // What the player sends the other player over the link: their trainer info, the last results of the live competition and
 // the team picked, which comes after the LIVEBATTLEMATCH_PLAYER_HEADER_SIZE bytes of this
-typedef struct {
+struct LiveBattleMatchPlayerData {
     PlayerInfo info;
     u8 mac[6];
     u8 unk26[2];
@@ -23,13 +25,13 @@ typedef struct {
     u32 record1;
     u32 record2;
     u32 record0;
-    u8 unk34[4];
+    u32 unk34;
     PMSData sentence;
     // Field 2 of the player's entry in the tournament block, which the two players compare
     u32 entryField2;
     u32 unk44;
     u8 unk48[0x8c];
-} LiveBattleMatchPlayerData;
+};
 
 // What the flow leaves for battle_championship_flow.c's caller to read and the flow to show: how the last match
 // ended, 0 to 4
@@ -48,11 +50,11 @@ typedef struct {
     // 0 to 3: the flow of a player who joins (0), of one who comes back to the menu (1) or after a match (2), or who
     // quits (3)
     u32 mode;
-    Ov262MsgBox *msgBox;
+    WifiBattleMatchMsgBox *msgBox;
     Font *font;
     PrintQueue *printQueue;
-    Ov262Seq *seq;
-    Ov262Net *net;
+    WifiBattleMatchRes *seq;
+    WifiBattleMatchGraphic *net;
     GameData *gameData;
     // The player's data to send, where the other player's goes, and the result of the match (the last three of
     // overlay 290's parameters)
@@ -67,29 +69,6 @@ void LiveBattleMatchFlow_Delete(LiveBattleMatchFlow *flow);
 void LiveBattleMatchFlow_Main(LiveBattleMatchFlow *flow);
 // 0 while the flow runs, then why it ended
 u32 LiveBattleMatchFlow_GetResult(LiveBattleMatchFlow *flow);
-
-// Overlay 262's parts that only livebattlematch_flow.c uses (the digital card is in ov262_common.h): the card of the
-// other player, the list of the team and the icon of the link
-typedef struct Ov262PartnerCard Ov262PartnerCard;
-typedef struct Ov262TeamList Ov262TeamList;
-typedef struct Ov262LinkIcon Ov262LinkIcon;
-
-Ov262PartnerCard *func_ov262_021c4644(const LiveBattleMatchPlayerData *data, Ov262NetLink *link, Ov262Seq *seq,
-                                      Font *font, PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet, u32 a7,
-                                      u32 a8, u32 a9, HeapID heapId);
-void func_ov262_021c4834(Ov262PartnerCard *card);
-void func_ov262_021c4898(Ov262PartnerCard *card, PrintQueue *printQueue);
-BOOL func_ov262_021c48a0(Ov262PartnerCard *card);
-Ov262LinkIcon *func_ov262_021c4e44(Ov262NetLink *link, Ov262Seq *seq, HeapID heapId);
-void func_ov262_021c4f14(Ov262LinkIcon *icon);
-void func_ov262_021c4f2c(Ov262LinkIcon *icon);
-void func_ov262_021c4f30(Ov262LinkIcon *icon, BOOL shown);
-Ov262TeamList *func_ov262_021c4f60(BattleBoxSave *battleBox, Ov262NetLink *link, Ov262Seq *seq, Font *font,
-                                   PrintQueue *printQueue, MsgData *msgData, HeapID heapId);
-void func_ov262_021c53e0(Ov262TeamList *list);
-BOOL func_ov262_021c545c(Ov262TeamList *list);
-BOOL func_ov262_021c5544(Ov262TeamList *list);
-void func_ov262_021c561c(Ov262TeamList *list, PrintQueue *printQueue);
 
 // Functions of the save and battle video code that have no header yet
 // Checks the CRC of a tournament entry
