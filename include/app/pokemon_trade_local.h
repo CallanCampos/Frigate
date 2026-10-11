@@ -87,6 +87,14 @@ typedef struct {
     const VecFx32 *path;
 } TradeMcssMove;
 
+// A fade of the screens' brightness over a number of frames, from one level to another
+typedef struct {
+    s8 frames;
+    s8 frame;
+    s8 start;
+    s8 end;
+} TradeFade;
+
 typedef void (*PokemonTradeState)(PokemonTradeWork *wk);
 
 // Overlay 139's OBJ resources, and the actor made of them
@@ -124,7 +132,9 @@ typedef struct {
 typedef struct {
     ParticleSystem *systems[9];
     void *systemWork[9];
-    u8 unk48[0x48];
+    u8 unk48[0x18];
+    // The size of each of the four Pokémon sprites, as func_0201ab70 gives it
+    VecFx32 spriteSizes[4];
     G3DCurve *cameraPosPath;
     G3DCurve *cameraTargetPath;
     // The paths that the two emitters follow
@@ -133,7 +143,8 @@ typedef struct {
     // Whether the camera's paths have come to their end
     BOOL cameraPosDone;
     BOOL cameraTargetDone;
-    u8 unkB0[4];
+    // The sprite of the demo's scenes
+    ClActor *actor;
     void *resource;
     u8 unkB8[2];
     HeapID heapId;
@@ -240,7 +251,7 @@ struct PokemonTradeWork {
     u8 unk804[0xc];
     G3DCamera *camera;
     u8 unk814[0x4];
-    void *unk818;
+    TradeFade *fade;
     u8 unk81C[0x4];
     // The 3D scene in front of the sprites, and its index in the manager
     G3DManager *sceneMgr;
@@ -256,8 +267,9 @@ struct PokemonTradeWork {
     MCSSSystem *mcssSys;
     MCSS *mcss[4];
     u32 unk854;
-    u8 unk858[0x4];
-    void *unk85C[4];
+    u32 unk858;
+    // The moves of the demo's sprites
+    TradeMcssMove *mcssMoves[4];
     // The BG characters of frames 2, 5 and 7, as GFL_BGSysLoadArcNCGRDynamic returns them
     u32 bg2Chars;
     u32 bg5Chars;
@@ -688,8 +700,8 @@ void func_ov194_021c600c(PokemonTradeWork *wk, int planes);
 
 // The trade demo, overlays 192 and 193
 void func_ov192_021b38cc(PokemonTradeWork *wk);
-void func_ov193_021b37f8(PokemonTradeWork *wk);
-void func_ov193_021b46f8(PokemonTradeWork *wk);
-void func_ov193_021b5c78(PokemonTradeWork *wk);
+void PokemonTradeDemoCommon_Start(PokemonTradeWork *wk);
+void PokemonTradeDemoDown_Start(PokemonTradeWork *wk);
+void PokemonTradeDemoMiddle_Start(PokemonTradeWork *wk);
 
 #endif // POKEBW2_APP_POKEMON_TRADE_LOCAL_H

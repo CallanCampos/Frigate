@@ -97,14 +97,14 @@ void func_02009768(MailData *mail, u16 value) {
     mail->unk1E = value;
 }
 
-PMSData *func_0200976c(MailData *mail, u32 index) {
+PMSData *func_0200976c(MailData *mail, u8 index) {
     if (index < 3) {
         return &mail->message[index];
     }
     return &mail->message[0];
 }
 
-void func_0200977c(MailData *mail, const PMSData *src, u32 index) {
+void func_0200977c(MailData *mail, const PMSData *src, u8 index) {
     if (index < 3) {
         PMSData_Copy(&mail->message[index], src);
     }

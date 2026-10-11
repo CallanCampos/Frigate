@@ -54,5 +54,11 @@ u32 func_0200f308(RecordSave *record);
 u32 func_0200f334(RecordSave *record);
 void func_0200f37c(RecordSave *record, u32 value);
 u8 func_0200f384(RecordSave *record);
+// The parts of the record that the Wi-Fi competition's card reads (6-byte results with halfword fields), and the
+// live competition's (the record itself, with a byte after each result's 6 bytes)
+void *func_0200f2d0(RecordSave *record);
+void *func_0200f2d8(RecordSave *record);
+u32 func_0200f1d8(void *results, u32 index);
+u16 func_0200e870(void *results, u32 index, u32 field);
 
 #endif // POKEBW2_SAVE_RECORDS_H

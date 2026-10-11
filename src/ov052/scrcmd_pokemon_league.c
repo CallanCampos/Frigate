@@ -77,14 +77,14 @@ static BOOL PokemonLeagueCmd_PlayCaitlinAmbience(VM *vm, FieldScriptEnv *env) {
 static BOOL func_ov052_021e590c(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov125_021eed10(gsys, VM_Read16(vm));
+    GimmickCaitlin_PlayModels34Or5(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 // Caitlin's room
 static BOOL func_ov052_021e592c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov125_021eed4c(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickCaitlin_CreateModel1Event(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return FALSE;
@@ -95,7 +95,7 @@ static BOOL func_ov052_021e592c(VM *vm, FieldScriptEnv *env) {
 
 // Caitlin's room
 static BOOL func_ov052_021e5954(VM *vm, FieldScriptEnv *env) {
-    func_ov125_021eed6c(FieldScriptEnv_GetGameSystem(env));
+    GimmickCaitlin_CallPlayModel0(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
@@ -104,7 +104,7 @@ static BOOL func_ov052_021e5964(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 actorId = VM_Read16(vm);
 
-    func_ov125_021eed80(gsys, actorId, VM_Read16(vm));
+    GimmickCaitlin_DropActor(gsys, actorId, VM_Read16(vm));
     return FALSE;
 }
 
@@ -189,7 +189,7 @@ static BOOL func_ov052_021e5a7c(VM *vm, FieldScriptEnv *env) {
 // The Champion's room
 static BOOL func_ov052_021e5aa4(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov120_021eecf0(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickChampion_CallChangeEvent(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return FALSE;
@@ -201,7 +201,7 @@ static BOOL func_ov052_021e5aa4(VM *vm, FieldScriptEnv *env) {
 // The Champion's room
 static BOOL func_ov052_021e5acc(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov120_021eecf8(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = GimmickChampion_CallOpenEvent(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return FALSE;
@@ -214,7 +214,7 @@ static BOOL func_ov052_021e5acc(VM *vm, FieldScriptEnv *env) {
 static BOOL func_ov052_021e5af4(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov120_021eed00(gsys, VM_Read16(vm));
+    GimmickChampion_HideActorShadow(gsys, VM_Read16(vm));
     return FALSE;
 }
 
@@ -222,13 +222,13 @@ static BOOL func_ov052_021e5af4(VM *vm, FieldScriptEnv *env) {
 static BOOL func_ov052_021e5b14(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov120_021eed1c(gsys, VM_Read16(vm));
+    GimmickChampion_ShowActorShadow(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 // The Champion's room
 static BOOL func_ov052_021e5b34(VM *vm, FieldScriptEnv *env) {
-    func_ov120_021eed38(FieldScriptEnv_GetGameSystem(env));
+    GimmickChampion_CallSetOpen(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 

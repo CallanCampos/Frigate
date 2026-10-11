@@ -26,6 +26,8 @@ void func_ov012_0215313c(void *work);
 void func_ov012_02153150(void *work);
 
 // Overlay 31
+// Sets the callback that the infrared link of overlay 31 calls with two values, or NULL for none
+void func_ov031_02175a04(BOOL (*callback)(int a, int b));
 void func_ov031_021759d0(u32 a0);
 BOOL func_ov031_02175d8c(void);
 

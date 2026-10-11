@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "gfl/net.h"
 #include "struct_decls.h"
 
 // The communication work of a show, whose layout only mus_comm_func.c needs
@@ -50,7 +51,7 @@ u32 func_ov211_021f04f0(MusCommWork *comm);
 u32 func_ov211_021f04f8(MusCommWork *comm);
 u8 func_ov211_021f0500(MusCommWork *comm, u8 index, u8 a2);
 // The network init data, which overlay 174 gets as a number
-u32 func_ov211_021f0608(GameData *gameData);
+const GFLNetInitData *func_ov211_021f0608(GameData *gameData);
 // Its GameCommSys callbacks for GAME_COMM_NO_MUSICAL (see game_comm.c)
 void *func_ov211_021ef230(u32 *seq, void *param);
 BOOL func_ov211_021ef288(u32 *seq, void *param, void *work);

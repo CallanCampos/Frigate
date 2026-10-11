@@ -3,6 +3,8 @@
 
 #include "types.h"
 #include "struct_decls.h"
+#include "field/gimmick_league_caitlin.h"
+#include "field/gimmick_league_champion.h"
 #include "field/gimmick_league_marshal.h"
 
 // The gimmicks of the Pokémon League's rooms, which the League's script plugin (overlay 52) drives. Their sounds use
@@ -20,17 +22,8 @@ void func_ov123_021eed3c(GameSystem *gsys, u16 a1);
 
 // Marshal's room, zone 142 (overlay 124), is in field/gimmick_league_marshal.h
 
-// Caitlin's room, zone 143 (overlay 125)
-void func_ov125_021eed10(GameSystem *gsys, u16 a1);
-GameEvent *func_ov125_021eed4c(GameSystem *gsys);
-void func_ov125_021eed6c(GameSystem *gsys);
-void func_ov125_021eed80(GameSystem *gsys, u16 actorId, u16 a2);
+// Caitlin's room, zone 143 (overlay 125), is in field/gimmick_league_caitlin.h
 
-// The Champion's room, zone 144 (overlay 120)
-GameEvent *func_ov120_021eecf0(GameSystem *gsys);
-GameEvent *func_ov120_021eecf8(GameSystem *gsys);
-void func_ov120_021eed00(GameSystem *gsys, u16 a1);
-void func_ov120_021eed1c(GameSystem *gsys, u16 a1);
-void func_ov120_021eed38(GameSystem *gsys);
+// The Champion's room, zone 144 (overlay 120), is in field/gimmick_league_champion.h
 
 #endif // POKEBW2_FIELD_POKEMON_LEAGUE_GIMMICKS_H

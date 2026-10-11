@@ -44,8 +44,8 @@ u8 func_0200975c(const MailData *mail);
 u8 func_02009760(const MailData *mail);
 u16 func_02009764(const MailData *mail);
 void func_02009768(MailData *mail, u16 value);
-PMSData *func_0200976c(MailData *mail, u32 index);
-void func_0200977c(MailData *mail, const PMSData *src, u32 index);
+PMSData *func_0200976c(MailData *mail, u8 index);
+void func_0200977c(MailData *mail, const PMSData *src, u8 index);
 // The save block of mail, and its size
 void *func_02009790(GameData *gameData);
 u32 func_020097a0(void);

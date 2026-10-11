@@ -1474,7 +1474,7 @@ static void func_ov194_021b9454(PokemonTradeWork *wk) {
         if (!PokemonTrade_IsNegoType(wk)) {
             PokemonTrade_SetState(wk, func_ov192_021b38cc);
         } else {
-            PokemonTrade_SetState(wk, func_ov193_021b5c78);
+            PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_Start);
         }
     }
 }
@@ -2723,14 +2723,14 @@ void func_ov194_021bb4b4(PokemonTradeWork *wk) {
     func_ov194_021c2d0c(wk);
     func_ov194_021c2e04(wk);
     func_ov194_021c45a8(wk);
-    if (wk->unk818 != NULL) {
-        GFL_HeapFree(wk->unk818);
-        wk->unk818 = NULL;
+    if (wk->fade != NULL) {
+        GFL_HeapFree(wk->fade);
+        wk->fade = NULL;
     }
     for (i = 0; i < 4; i++) {
-        if (wk->unk85C[i] != NULL) {
-            GFL_HeapFree(wk->unk85C[i]);
-            wk->unk85C[i] = NULL;
+        if (wk->mcssMoves[i] != NULL) {
+            GFL_HeapFree(wk->mcssMoves[i]);
+            wk->mcssMoves[i] = NULL;
         }
     }
 }
@@ -2895,7 +2895,7 @@ static BOOL func_ov194_021bba0c(GameProc *proc, u32 *state, void *param, void *w
     demo->trade.gameData = demo->gameData;
     ret = PokemonTrade_Init(proc, state, &demo->trade, wk, 7);
     func_ov194_021bb938(demo, wk);
-    PokemonTrade_SetState(wk, func_ov193_021b46f8);
+    PokemonTrade_SetState(wk, PokemonTradeDemoDown_Start);
     return ret;
 }
 
@@ -2906,7 +2906,7 @@ static BOOL func_ov194_021bba4c(GameProc *proc, u32 *state, void *param, void *w
     demo->trade.gameData = demo->gameData;
     ret = PokemonTrade_Init(proc, state, &demo->trade, wk, 8);
     func_ov194_021bb938(demo, wk);
-    PokemonTrade_SetState(wk, func_ov193_021b5c78);
+    PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_Start);
     return ret;
 }
 
@@ -2917,7 +2917,7 @@ static BOOL func_ov194_021bba8c(GameProc *proc, u32 *state, void *param, void *w
     demo->trade.gameData = demo->gameData;
     ret = PokemonTrade_Init(proc, state, &demo->trade, wk, 6);
     func_ov194_021bb938(demo, wk);
-    PokemonTrade_SetState(wk, func_ov193_021b37f8);
+    PokemonTrade_SetState(wk, PokemonTradeDemoCommon_Start);
     return ret;
 }
 

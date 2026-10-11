@@ -3,12 +3,16 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "gfl/proc.h"
 #include "struct_decls.h"
 
 // Overlay 260's wifibattlematch_net.c (named by its embedded string): the net part of the Wi-Fi battle competitions.
 // Only the functions that overlay 263's party exchange calls are declared so far, and none has a name yet
 
 typedef struct WifiBattleMatchNet WifiBattleMatchNet;
+
+// The proc of the Wi-Fi link, which overlay 290 chains
+extern const GameProcFunctions data_ov260_021bfcd8;
 
 WifiBattleMatchNet *func_ov260_021b8cc8(void *a0, GameData *gameData, u32 a2, HeapID heapId);
 void func_ov260_021b8da4(WifiBattleMatchNet *net);

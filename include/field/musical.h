@@ -8,7 +8,7 @@
 #include "app/musical/mus_item_data.h"
 #include "app/musical/musical_shot_sys.h"
 #include "app/musical/musical_system.h"
-#include "app/ov174.h"
+#include "app/ircbattlematch.h"
 #include "field/mus_comm_func.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
@@ -23,7 +23,7 @@ struct MusicalCommWork {
     void *comm;
     // Overlay 36's menu
     void *menu;
-    Ov174Param ov174;
+    IrcBattleMatchParam ircMatch;
     u16 *result;
     u16 value;
 };

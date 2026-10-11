@@ -1304,8 +1304,8 @@ void func_ov211_021f05c0(MusCommWork *comm, u8 pos, u8 equip, u32 result) {
     }
 }
 
-u32 func_ov211_021f0608(GameData *gameData) {
-    return (u32)&sMusCommInitData;
+const GFLNetInitData *func_ov211_021f0608(GameData *gameData) {
+    return &sMusCommInitData;
 }
 
 static void MusComm_CheckData(void *data, u32 size, u32 kind) {
