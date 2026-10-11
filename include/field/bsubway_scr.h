@@ -5,7 +5,7 @@
 #include "app/ov306.h"
 #include "battle/btl_setup.h"
 #include "gfl/heap.h"
-#include "app/ov174.h"
+#include "app/ircbattlematch.h"
 #include "gfl/proc.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
@@ -156,7 +156,7 @@ struct BSubwayScrWork {
     u16 unk72A;
     PlayerInfo partner;
     u8 unk74C[0x58];
-    Ov174Param ov174Param;
+    IrcBattleMatchParam ircMatchParam;
     void *allocatedBuffer;
     BtlSetup *btlSetup;
     Ov306Param ov306Param;

@@ -1,9 +1,9 @@
-{0100:0}'s Medal Rally
-Medals received
-Favorite Medal
-{0135:0}
-Received
-{0201:1}/{0201:2}/20{0201:0}
-{0202:0}
-None
+Bank0082_Text_SMedalRally = {0100:0}'s Medal Rally
+Bank0082_Text_MedalsReceived = Medals received
+Bank0082_Text_FavoriteMedal = Favorite Medal
+Bank0082_Text_Empty = {0135:0}
+Bank0082_Text_Received = Received
+Bank0082_Text_20 = {0201:1}/{0201:2}/20{0201:0}
+Bank0082_Text_Empty_2 = {0202:0}
+Bank0082_Text_None = None
 \pad{f0}

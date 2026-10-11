@@ -1,329 +1,329 @@
-Please choose who to call.
-Call
-Calling...
-       \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-I'd like to talk.
-Tell me about evolution.
-Check my Pokédex.
-Good-bye.
-Which Pokémon's evolution do you\nwant to learn about?
-What can I do for you?
-I'd like to talk.
-Something up?
-Good-bye.
-What?
-I'd like to talk.
-Tell me about types.
-Tell me about Abilities.
-Good-bye.
-Which of your Pokémon's types\nshould I explain?
-Which of your Pokémon's Abilities\nshould I explain?
-What would you like to ask?
-I'd like to talk.
-Please look at friendship.
-Please look at effort.
-Good-bye.
-Which of your little darlings do you want\nto see how well you're getting along with?
-You and {0102:1}...\nYou aren't getting along, are you?{be01}\nIt doesn't look like it's having\nfun even when you're together.{be01}
-You and {0102:1}...\nYou aren't getting along, are you?{be01}\nIt's glaring at you with\na look that's kinda scary.{be01}
-You and {0102:1}...\nYou still have room for improvement.{be01}\nHow nice! I mean, you can\nbecome even better friends!{be01}
-You and {0102:1}...\nYou're starting to get to be friends.{be01}\nJust maybe, walking along the same path\nhas made you understand one another.{be01}
-You and {0102:1}...\nYou seem really close!{be01}\nYou look so, so happy!\nIt's enough to make me happy, too!{be01}
-You and {0102:1}...\nYou two sure get along great!{be01}\nIt looks like you are having fun being\ntogether! You seem bright and cheerful!{be01}
-You and {0102:1}...\nWhat great friends you are!{be01}\nIt's so nice how you trust each other!\nIt makes me kinda jealous!{be01}
-Which of your little darlings' efforts\ndo you want to see?
-Your {0102:1}...\nIt seems like it can work a little harder.{be01}
-Your {0102:1}...\nIt has worked really hard, hasn't it?{be01}
-I think it worked particularly hard on its\n{010d:0}!{be01}
-I think it worked particularly hard on its\n{010d:0} and {010d:1}!{be01}
-HP
-Attack
-Defense
-Speed
-Sp. Atk
-Sp. Def
-But I think it worked hard on\nits {010d:0}!{be01}
-But I think it worked hard on\nits {010d:0} and {010d:1}!{be01}
-What's up?
-I'd like to talk.
-{0105:0}?
-Good-bye.
-What do you need, dear?
-I'd like to talk.
-Good-bye.
-    \x{ffff}
-Hi there!{be01}
-How are things going with the Pokédex?{be01}\nSorry, I can't help but ask.\nBe sure to enjoy your journey, though!{be01}
-You get more detailed information\nin the Pokédex by catching Pokémon!{be01}
-Filling up pages in the Pokédex\nis very important, but don't forget...{be01}\nInteracting with Pokémon is a hundred--\neven a thousand--times more important!{be01}
-I'm working with Pokémon Professors\nfrom other regions and trying to solve{be00}\nthe mysteries of Pokémon.{be01}\nEven with their help,\nwe can't find every answer.{be01}\nBut, if we learn things little by little,\nit may leave clues for the researchers{be00}\nwho follow us.{be01}
-What can I do to improve the\nPokédex that will make everyone happy?{be01}
-Looking at you reminds me of when\nI was a Backpacker, and it really{be00}\nmotivates me!{be01}\nThat's right! I also traveled the\nUnova region with a Pokédex!{be01}
-I met your mother\nwhen I was a Backpacker!{be01}\nWe got to talking at the\ncounter in the Pokémon Center,{be00}\nand a huge line formed behind me!{be01}
-I'm sure there are still Pokémon\nthat no one in the world has seen!{be01}\nDoesn't just imagining them make\nyou excited?{be01}
-Dream big!{be01}\nI want to see every\nPokémon in the world!{be01}
-In order to get along with others,\nyou must be understanding and accepting.{be01}\nI mean, Pokémon and people live\nby different rules!{be01}\nIf we just push our expectations on them,\nthere's no way it will go well.{be01}
-OK, then! Take care.\nBye-bye!{be01}
-Yeah?{be01}
-You have to protect what's important\nto you on your own!{be01}
-People who are strong in Pokémon\nbattles aren't automatically right.{be01}\nBut losers don't even have a leg\nto stand on, know what I mean?{be01}
-When it's night\nand everything's quiet...{be01}\nIf you listen carefully,\nyou can hear the footsteps of Pokémon.{be01}\nI really like that.{be01}
-If you believe in yourself\nand have Pokémon by your side,{be00}\neven being lost is fun!{be01}
-I'm thinking about what Pokémon\nI should have to make up for{be00}\nmy other Pokémon's weaknesses.{be01}
-I don't care what the reason is.\nIf you take other people's stuff,{be00}\nyou're nothing more than a dirty thief!{be01}
-I like spending time thinking\nabout how to raise my Pokémon{be00}\nand make them stronger.{be01}
-I guess if I had to pick a trait I prefer,\nI like Pokémon that are fast...{be01}
-Hey, sorry!\nThere's something I want to do right now!{be01}
-Um...\nI don't have much to say right now.{be01}
-See ya!{be01}
-Where am I now?{be01}\nI'm searching every corner of\nCastelia City for Team Plasma!{be01}\nYou haven't found them either, right?\nWe HAVE to find them!{be01}\nGot it?!{be01}
-The sewers, huh...{be01}\nIf Team Plasma's hiding there,\nwe have to find them.{be01}\nOtherwise, I'm sure they'll cause trouble\nfor the Pokémon living there.{be01}
-Thanks for helping back there!{be01}\nI'm going to keep looking for\nTeam Plasma in Castelia City.{be01}\nWhy don't you head to the Pokémon Gym?{be01}
-You won the Insect Badge from\nthe Castelia City Pokémon Gym?{be01}\nWell then, you should go to\nNimbasa City and take on{be00}\nthe Gym Leader there!{be01}
-What do you want?{be01}\nHave you challenged the\nDriftveil City Pokémon Gym yet?{be01}\nIf you haven't yet, just go already!{be01}\nHey, apparently the Gym Leader\nuses Ground-type Pokémon!{be01}
-Clay just told you to participate\nin the Driftveil Tournament, right?{be01}\nI hear the tournament takes place\nto the south of Driftveil City!{be01}
-The Pokémon World Tournament!{be01}\nA Trainer who wins on the first try\nmust be really good!{be01}
-No matter what kind of tournament\nit is, winning's impressive!{be01}
-It's Team Plasma!{be01}\nThere's a suspicious-looking ship\ndocked in the area south of the{be00}\nPokémon World Tournament arena!{be01}\nMeet me there!{be01}
-Hey, how nice!\nWe're having a nice friendly chat!{be00}\nAt a time like this...{be01}\nGet off the Xtransceiver already!{be01}
-Actually...{be01}\nYou're strong enough that\nyou can probably even beat{be00}\nMistralton City's Gym Leader.{be01}\nWell, I've already won my\nJet Badge, though!{be01}
-I've got one word for you...{be01}\nReversal Mountain.{be01}\nOh, wait, that's two words...{be01}
-Are you somewhere near Undella Town now?{be01}\nMaybe I'll go there and battle with you.{be01}\nIt's been a while!{be01}
-Opelucid City's Gym Leader\nwas really tough!{be01}
-Good! You're OK!{be01}\nI'm in Humilau City,\nso I can't get there right away,{be00}\nbut I'm sure you can handle it!{be01}
-I'm looking for Team Plasma,\nbut I can't find a trace of them!{be01}\nGo to Humilau City.\nThe Gym Leader's named Marlon.{be00}\nHurry up and go beat him!{be01}
-Didn't I just tell you?!{be01}\nLet's split up and look\nfor the Plasma Frigate!{be00}\nYou check Route 22!{be01}
-...{be01}\nWhy would you think this would be a good\ntime to chat on the Xtransceiver?!{be01}
-The Pokémon League is\njust past Victory Road.{be01}\nVictory Road itself is\njust beyond Route 23!{be01}
-Hm... So you're on\nVictory Road.{be01}\nThen you're almost to the\nPokémon League!{be01}
-Don't worry about me!{be01}\nYou're at the Pokémon League, right?\nThe only thing you need to think about{be00}\nis winning!{be01}
-I'm in Undella Town.\nIf you're bored, come hang out.{be01}
-I'm in Driftveil City.{be01}\nIf you have time, head over.\nI'll spar with you.{be01}
-I'm still in Driftveil City.{be01}\nYou can just do what you want\nto do, you know?{be01}
-                                                                \x{ffff}
-                                                                             \x{ffff}
-                                                                        \x{ffff}
-                                                                                                       \x{ffff}
-                                                                   \x{ffff}
-                                                                                           \x{ffff}
-                                                                        \x{ffff}
-                                                                                         \x{ffff}
-                                              \x{ffff}
-                                                  \x{ffff}
-                                                       \x{ffff}
-How're things going over there?{be01}\n...{be01}\nReally...\nGive me a hand, then!{be01}\nGo check out Seaside Cave!\nThat's right! The one on Route 21!{be01}\nOK! Counting on you!{be01}
-We're heading down into the Giant Chasm!\nI'm not letting Team Plasma get away!{be01}
-You know the next Pokémon Gym\nafter Nimbasa City is Driftveil City, right?{be01}
-Leave it to me! I won't let Team Plasma\nescape from Nimbasa City!{be01}
-You were a big help back there!\nGuess Driftveil City's next!{be01}
-There was one more Team Plasma member.\nHey, go listen to what he has to say!{be01}
-Brilliant!\nNice work getting the Gym Badge!{be01}
-It's just a rumor, but I heard\nTeam Plasma was in Lacunosa Town...{be01}
-Huh! You even beat Drayden!\nYou're really something!{be01}
-Have you beat Marlon yet?\nDon't keep me waiting too long!{be01}
-They were headed for the\nGiant Chasm, weren't they?{be01}
-Come to the sewers!\nLet's look for Team Plasma!{be01}
-OK! Got it!\nWaiting in the sewer isn't fun!{be01}
-You know Celestial Tower?{be01}\nIt's on Route 7!\nGo train there if you want!{be01}
-It's OK! I won't let Team Plasma\nescape from Lacunosa Town!{be01}\nSo do whatever you need to prepare!{be01}
-I don't mean to brag...{be01}\nBut I'm not such a\nbad Trainer myself!{be01}\nAnd you're even better!{be01}\nAll right! Go and knock around\nthose chumps at the Pokémon League!{be01}
-Oh yeah! I'll come meet you. There's\nsomething I want to talk to you about.{be01}
-Did you like amusement parks?\nI forget...{be01}
-What's up?{be01}
-Listen...{be01}\nMake sure you never run out\nof Poké Balls!{be01}\nYou never know where you'll\nrun into what Pokémon!{be01}\nYou have to be ready and believe\nan opportunity will come your way!{be01}
-The only real defeat in\nPokémon battling is giving up.{be01}\nIf you think about why you lost\nand compensate for it,{be00}\nthe next time you face a challenge,{be00}\nyou'll improve yourself.{be01}\nBut if you don't do anything,\nthere's no way you'll win.{be01}
-Hmm...{be01}\nIt's important to teach people\nmany things about Pokémon,{be00}\nbut what I really want people to know{be00}\nis that being with Pokémon is fun!{be01}
-Truths...\nIdeals...{be01}\nThere are as many of these as there\nare people...{be01}\nI'm sure there are even as many\nas there are people and{be00}\nPokémon together.{be01}\nThat's why you can always say\nthere must be right answers somewhere.{be01}
-I stopped wearing glasses,\nand Bianca is wearing glasses now...{be01}\nI hadn't seen her in a long time,\nand I was sure surprised when I saw that.{be01}
-When I was a kid,\nI did an experiment where I{be00}\nwore a blindfold all of the time.{be01}\nI thought by doing that...\nI could train my senses.{be01}
-Don't you think it's strange that a guy\nlike me is a Gym Leader!{be01}\nOh!\nI'm sorry.{be01}\nDidn't mean to put you\nin an awkward position there.{be01}
-When you don't have self-confidence,\nit's easy to want to fall back on{be00}\na title like “Champion" or something,{be00}\nbut that's really superficial.{be01}
-Even if you have knowledge,\nyou have to have wisdom as well.{be01}\nKnowledge is mere information.\nNow, understanding how to use it,{be00}\nthat is what's really important.{be01}
-You have to check out what you're\ninterested in and confirm it for yourself.{be01}\nIf you only try to understand\neverything on an intellectual level,{be00}\nyou're gonna run into a lot of trouble.{be01}
-Be seeing you.{be01}
-Hellooo!{be01}
-How are things going today?{be01}\nIf everything is going well,\nI'm sure you're having fun!{be01}\nIf it's not great, then I'm\nsure tomorrow will be better!{be01}
-Walking into the tall grass\nto go look for Pokémon{be00}\nnever gets old!{be01}\nI will never forget how\nthat feels as long as I live!{be01}
-I've been reading a ton of books\nwhile helping Professor Juniper,{be00}\nso I started wearing glasses!{be01}\nI think they look pretty good\non me!{be01}
-So when you buy 10 Poké Balls\nat one time...{be01}\nA-MAZ-ing-ly!\nYou get a Premier Ball as well!{be01}\nIsn't that fantastic?!{be01}
-Know what? This just popped into my head,\nbut a friend is always a friend,{be00}\neven when you can't see each{be00}\nother for a long time!{be01}
-Hm... I just remembered something\nthat happened in the past.{be01}\nWell actually, it isn't really the past,\nit was more something that happened{be00}\nreally recently, I guess.{be01}\nI'm talking about when I got my Pokémon\nand the Pokédex and went on my journey!{be01}
-Hey!{be01}\nWould it make you happy if\nPokémon could talk?{be00}\nOr would it cause you problems?{be01}\nI'm always talking to my Pokémon,\nbut I wonder what I would do{be00}\nif they actually replied...{be01}
-The most mysterious thing\nabout Pokémon...{be00}\nis that they stay with people!{be01}\nI'm thinking about making that\nthe theme of my research.{be01}
-So, I've just started my research\ninto Pokémon.{be00}\nActually, I'm still just an assistant.{be01}\nBut it's probably impossible to\nunderstand everything about Pokémon.{be01}\nProfessors know this but still continue\ntheir research.{be00}\nI find that astonishing...{be01}
-...{be01}\nOh! I'm sorry!{be01}\nA Pokémon I'm interested\nin just popped out!{be01}
-See you!{be01}
-Oh!\nYou sound full of energy!{be01}
-Did you find more Pokémon\nto travel with you?{be01}\nJourneys are definitely more\nfun when they're lively!{be01}
-Hmm, I wonder what I should\ndo for dinner tonight...{be01}
-There are many different Pokémon,\nand even the same kind of Pokémon{be00}\nhave individuals with completely{be00}\ndifferent Natures!{be01}\nI wonder what kind of Pokémon is a\nperfect match for you.{be01}
-The first thing you need to do to\ngain a Pokémon's trust is walk with them!{be01}\nBy doing that, they will come to\nknow a lot about you!{be01}
-Don't worry about the house.{be01}\nThe sheets on your bed will be clean\nand washed so they're ready whenever{be00}\nyou come home!{be01}
-If I can be serious for a moment...{be01}\nPokémon have existed since\nbefore you were born, right?{be01}\nYou've never thought to question\nwhy they're there, right?{be01}\nBut isn't questioning what you know\nan important part of being on a journey?{be01}
-Pokémon Center receptionists remember\nTrainers better than you might expect.{be01}\nOf course, they remember the\nPokémon that were with them, too!{be01}
-Have you caught lots of Pokémon?{be01}\nOK, but be sure to have a look at your\nPC Boxes in the Pokémon Center.{be01}\nMaybe there's a Pokémon in there\nwho wants to travel with you!{be01}
-The Pokémon Center is\neveryone's home!{be01}\nYou should just make yourself\nat home like you belong there!{be01}
-Do you have enough money?{be01}\nI just thought I should ask,\nbut a sensible kid like you is OK!{be01}\nStill, don't waste your money!\nYou might not have it when you need it!{be01}
-OK!\nTake care of yourself!{be01}
-Hello!\nIs this {0100:0}?{be01}\n...{be01}
-...Hello!{be01}
-Hello!{be01}
-Hello?{be01}
-...Hello?{be01}\nAh, it must be {0100:0}, right?
-Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
-Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
-Ah, {0100:0}!{be01}\nI'm glad we can talk face-to-face!{be01}
-Oh, sorry I've kept you waiting!{be01}
-...
-You know...
-Well...
-Ahaha!
-It's me!{be01}\nYeah! You picked up my\nXtransceiver!{be01}\nHey, it's a little annoying that we can't\nsee each other's faces, isn't it?{be01}\nWe won't recognize each other\neven if we pass on the street.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-It's me!{be01}\nYeah! You picked up my\nXtransceiver!{be01}\nHey, it's a little annoying that we can't\nsee each other's faces, isn't it?{be01}\nWe won't recognize each other\neven if we pass on the street.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-Excuse the sudden question,\nbut can you guess what my job is?{be01}\nAhaha!\nI guess it's natural you have no idea.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-Excuse the sudden question,\nbut can you guess what my job is?{be01}\nAhaha!\nI guess it's natural you have no idea.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-I'll just think out loud...\nI love {0103:1}-type Pokémon!{be01}\nMany of them look cool, I think.{be01}\n{0100:0},\nI hope you like {0103:1}-type{be00}\nPokémon, too!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-I'll just think out loud...\nI love Electric-type Pokémon!{be01}\nMany of them look cool, I think.{be01}\n{0100:0},\nI hope you like Electric-type{be00}\nPokémon, too!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-{010f:1} is great!\nI was listening to music just now!{be01}\nMusic is wonderful!\nIt gives me energy!{be01}\n{0100:0},\nyour voice would go well with{be00}\n{010f:1}, I think!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-Rock is great!\nI was listening to music just now!{be01}\nMusic is wonderful!\nIt gives me energy!{be01}\nI wonder what your favorite music is.\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-Guess what!\n{010f:1} Pokémon are{be00}\nquite popular among many of my friends!{be01}\n...{be01}\nReally?{be01}\n{010f:1} Pokémon happen\nto be your favorite, too? That's great!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-Guess what!\nCool Pokémon are quite popular among{be00}\nmany of my friends!{be01}\nI would feel great if you liked\ncool Pokémon, too!{be01}\nIt'll mean coolness is the\n“in" thing, you know!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-{010f:1}, for me,\nis a good way to spend the holiday!{be01}\n{0100:0},\nhow do you spend your... Oh!{be01}\nHow rude of me to ask such a question\nof a lady!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-{0100:0}, what will you do on\nyour holiday... Oops!{be01}\nHow rude of me to ask such a question\nof a lady!{be01}\nI'm usually at work, unfortunately.\nThat's why I still haven't picked up{be00}\nmy Xtransceiver from you...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-You know what I had a chance to\ndo recently?{be00}\n{010f:1}!{be01}\n{0100:0}, how about you?\n{010f:1}s?{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-What comes to your mind when you hear the\nidea of communication through Pokémon?{be01}\nTrades or battles?{be01}\n{0100:0},\nI'd like a trade with you{be00}\nif you like to trade Pokémon!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-I'm going to work harder and harder...\nand become a great si...{be01}\nNever mind!\nMy job is top secret!{be01}\nHow about you, {0100:0}?\nThe word “{010f:1}" comes to{be00}\nmy mind for some reason... Am I right?{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-I'm going to work harder and harder...\nand become a great si...{be01}\nNever mind!\nMy job is top secret!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-Here comes a question!{be01}\n{0100:0}, you're a Pokémon Trainer.\nHow many Badges do you have?{be01}\n...{be01}\nGreat!{be01}\nYou have {0200:1} Gym Badges?\nYou're a tough Trainer, aren't you?{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-Actually, I'm off work today!{be01}\nI'd like to pick up my Xtransceiver.\nThe one you've been keeping for me!{be01}\nWill you please come to the Ferris wheel\nin Nimbasa City?{be01}\nOh, if you can, of course!{be01}\nSee you there, {0100:0}!{be01}
-Thank you so much for the other day!{be01}\nI was surprised you were my age!\nI was guessing you would be older{be00}\nthan me by your voice.{be01}\nIt made me a little nervous\non the Xtransceiver, you know?{be01}\nI'm relieved that I can relax\nfrom now on when we talk.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-My hobby is fishing.{be01}\nI'd cast the line wherever\nI have a good hunch.{be01}\nDifferent places have different Pokémon,\nso every fishing experience is a surprise.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I may have said this before, but\nI like Electric-type Pokémon a lot!{be01}\nWhen they give off electricity,\nI feel like I'm energized!{be01}\nDon't you agree they have that\nkind of charm?{be01}\nBesides, there are so many cool Pokémon\namong them!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-Don't you love music?{be01}\nDo you listen to rock often?\nListening to music gives you energy,{be00}\nyou know.{be01}\nI may not look it, but I'm pretty good at\nsinging and that stuff.{be01}\nI'd really like you to listen to me sing\nwhen we have the opportunity.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-{0100:0},\nhave you participated in the{be00}\nPokémon Musical?{be01}\nI've been wanting to play Dress Up by\nputting my Pokémon in a cool outfit and{be00}\nwatch it participate in a musical.{be01}\nIf my Pokémon got fan letters, that\nwould really give it some motivation!{be01}\nAh, I should get back to work now.\nTalk to you later, {0100:0}.{be01}
-My days off?{be01}\nI usually go fishing, I guess.\nTaking some time alone and casting out{be00}\nyour line is a good change of pace.{be01}\nI had gone fishing the day I dropped\nmy Xtransceiver, too!{be01}\nSo you could say fishing helped us meet,\n{0100:0}.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I have my Pokémon battle often.{be01}\nMy job requires me to go to various\nregions, so I'd challenge people there{be00}\nand create some fun memories.{be01}\nI'm not that good at battling, though.{be01}\nAhaha!{be01}\nI'd love to challenge you someday,\n{0100:0}!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I want to become someone cool.{be01}\nI don't mean someone who appears cool.\nI'm talking about substance.{be01}\nI have a long way to go...{be01}\nBut I believe I'll one day become\na person of substance and coolness{be00}\nby working hard at my job.{be01}\nI hope that you'd support me in that.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-My mom and my sister were having\na Pokémon battle the other day.{be01}\nThey were having so much fun!{be01}\nThen my brother started crying,\nsaying he wanted a Pokémon, too.{be00}\nIt took us some time to calm him down.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-Time flies when I talk to you, {0100:0}.\nI must be having the best time!{be01}\nAhaha!\nCalls from you are always welcome!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nHave you seen what they call\nthe dark tall grass?{be01}\n...{be01}\nI see...\nSo high-level Pokémon may jump out at you.{be01}\nI knew it was a dangerous kind of\ntall grass.{be01}\nI should tell my brother and sister\nto be careful, then. Thanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nI want to give my brother a Pokémon.{be01}\n...{be01}\nI guess you're right.\nYou think his first Pokémon should be{be00}\n{0103:1} type?{be00}\nI'll go catch one with my brother soon!{be01}\nThanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nI just made a mistake at work.{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll keep in mind to avoid making\nthe same mistake again.{be01}\nThanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nHave you heard of the Medal Rally?{be01}\n...{be01}\nReally?{be01}\nSounds like a fun event!\nI had no idea.{be01}\nThis strange man caught me off guard\nby giving me these Medals...{be01}\nI'll start collecting them...since you are.{be01}\nThanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nI have trouble battling against Leavanny.{be01}\n...{be01}\nOf course!{be01}\nI'm glad I asked you...{be01}\nI'll have a Fire-type Pokémon battle\nLeavanny next time.{be01}\nWith this strategy,\nthere is no way I'd lose to my sis...{be01}\nNever mind!{be01}\nAhaha!{be01}\nThanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nI had an argument with my mom\nabout my job yesterday...{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll go apologize to my mom.\nI'll stay calm and be sincere.{be01}\nThanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nSomebody gave me a Dowsing Machine\nthe other day and...{be01}\n...{be01}\nOh, I see!{be01}\nThe Dowsing Machine can be used\nin many places.{be01}\nI'll use mine more often from now on.{be01}\nThanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\n...{be01}\nHow do I...{be01}\nHow do I look in this cap?{be01}\n...{be01}\nAhaha!{be01}\nI'm glad I asked you...{be01}\nHey, you're making me blush!{be01}\nThanks, {0100:0}.{be01}
-Umm...\nI hope you can help me with this.{be01}\nI have this person who's really\ngood at what we do at our workplace,{be00}\nand I can't help but feel competitive.{be01}\n...{be01}\nYeah!{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI guess it's not her but my own self\nthat I need to deal with.{be01}\nThanks, {0100:0}.{be01}
-Er...{be01}\nUmm...{be01}\nI'm off work today, so\ncan we meet somewhere?{be01}\nYou've been helping me a lot lately,\nso I'd love to thank you face-to-face.{be01}\n...{be01}\nReally? You can?{be01}\nGreat!{be01}\nCan we meet each other at\nthe Ferris wheel?{be01}\nI'm so looking forward to it,\n{0100:0}!{be01}
-I went on a business trip to the Kanto\nregion the other day.{be01}\nThey let me visit Viridian Forest, and\nI saw Pikachu there.{be01}\nIt's funny that they look so cool just\nby being an Electric type.{be01}\nAhaha!{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went on a business trip to the Johto\nregion the other day.{be01}\nThey have many traditional buildings,\nand they are really mysterious.{be01}\nI managed to go to the Lake of Rage\nfor fishing, too! It was a tiring trip,{be00}\nbut I had a great time!{be01}\nAhaha!{be01}\nOops!{be01}\nI better get back to work!{be01}
-...{be01}\nTee hee.{be01}\n...{be01}\nHaha!{be01}\nOh, sorry!{be01}\nI couldn't help smiling 'cause\nI'm talking to you.{be01}\nAhaha!{be01}\nIt's so much fun talking to you,\n{0100:0}!{be00}\nI wish it would last forever!{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went on a business trip to the Sinnoh\nregion the other day.{be01}\nThe vast wilderness there was\nso breathtaking!{be01}\nI managed to go to Lake Verity to go\nfishing, too!{be01}\nIt was a tiring trip, but I had a\ngreat time!{be01}\nOops!{be01}\nI better get back to work!{be01}
-The stars last night were so\nbeautiful...{be01}\nDid you see them by any chance,\n{0100:0}?{be01}\nI saw lots of shooting stars, too.\nIt really was a pretty night.{be01}\nI saw so many that I managed to\nmake a wish upon one of them.{be01}\nWhat?{be01}\nAhaha!{be01}\nI can't tell you what I wished for.{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went to the Battle Institute in\nNimbasa City to take the Battle Test.{be01}\nI did a little better than the last time!{be01}\nI'll keep trying to get better results!{be01}\nI'd appreciate it if you could tell me\nabout Pokémon battles. Can you?{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went on a business trip to the Hoenn\nregion the other day.{be01}\nThey have many unique towns and cities.\nThey really surprised me!{be01}\nI managed to go to the Meteor Falls\nto go fishing, too!{be01}\nIt was a tiring trip, but I had a\ngreat time!{be01}\nAhaha!{be01}\nOops!{be01}\nI better get back to work!{be01}
-I was using the Dowsing Machine the other\nday and got something really awesome.{be01}\nI gave it to my mom, and she was so happy.{be01}\nI'm glad you told me about the\nDowsing Machine a while ago,{be00}\n{0100:0}!{be01}\nOops!{be01}\nI better get back to work!{be01}
-Oh!{be01}\nSorry, {0100:0}.{be01}\nIt's almost time for work...{be01}\nI have to hang up...{be01}\nSo sorry...{be01}
-I'm on my break right now.\nCouldn't help answering...{be00}\n'cause I wanted to talk to you!{be01}\nIt's voice only, so sorry!{be01}\nAhaha!{be01}\nMy job keeps me busy, and\nI was just about to collapse...{be01}\nBut hearing your voice is\ngiving me energy, {0100:0}!{be01}\nOops!{be01}\nMy break is over.\nI have to go back to work.{be01}
-I found a nice fishing spot\nwith a great view the other day.{be01}\nThat spot may look totally\ndifferent depending on the season.{be01}\nLet's go fishing together\nsometime soon.{be01}\nOops!\nI have to get back to work.{be01}
-I landed a huge Basculin\nthe other day.{be01}\nIt was the biggest one I've ever caught!{be01}\nI really wanted to show it to you,\n{0100:0}.{be01}\nOops!\nI have to get back to work.{be01}
-I was just thinking about you,\n{0100:0}.{be01}\n...What did I just say?{be01}\n...{be01}\nAhaha!{be01}\nEr...\nWell... I have to get back to work now.{be01}
-I've been too busy and\nsleep deprived lately.{be01}\nIf it wasn't you I was talking to,\n{0100:0},{be00}\nI'd have fallen asleep by now.{be01}\nAhaha!{be01}\nOops!\nI have to go back to work.{be01}
-The weather is bearable today, isn't it?{be01}\nI'd go fishing if not for my work...{be01}\nBut I'm OK for now because\nI got to talk to you, {0100:0}.{be01}\nAhaha!{be01}\nOops!\nI have to go back to work.{be01}
-...{be01}\n...?{be01}\n...{be01}\n...??{be01}\n...{be01}\n...???{be01}\n...Can you hear me?{be01}\nOh!{be01}\nThe reception was so bad,\nwasn't it?{be01}\nAhaha!{be01}\nI'm so embarrassed for\nbeing so loud just now.{be01}\nOops!\nI have to get back to work.{be01}
-Stop that!{be01}\nHey!{be01}\nSigh...{be01}\nSorry...{be01}\nThat was my sister and brother\nbothering me...{be01}\nThey seem to get jealous\nwhen I talk to you, {0100:0}.{be01}\nAhaha!{be01}\nThey are usually bratty, but I guess\nthey can be cute sometimes.{be01}\nArg! Hey, I said “stop"!{be01}\nSigh...{be01}\nSorry, {0100:0}.\nIt seems that I have to spend time with{be00}\nthem today...{be01}
-Cough, cough.{be01}\nSorry...\nI got a cold, it seems...{be01}\n...{be01}\nYeah...\nI'm really sorry. Cough... I guess so.{be01}\nI'll stay home\nand rest for now.{be01}\nBut...\nSeeing your face should help{be00}\nme recover sooner, {0100:0}.{be01}\nAhaha!{be01}
-I bought a Soda Pop from this\nvending machine the other day.{be01}\nGuess what!{be01}\nI got an extra as a bonus.{be01}\nIt's great, isn't it?\nHave you got a bonus before, {0100:0}?{be01}\nI would have shared it with you,\nhad we been together then...{be01}\nOops!\nI have to get back to work.{be01}
-Oh, sorry I've kept you wai...\nUh-oh.
-Sorry about last time!{be01}\nThis person from work\nanswered my Xtransceiver by mistake...{be01}\nSorry I wasn't there to answer you\nwhen you took your time to reach me...{be01}\nI guess taking a break when you aren't\nsupposed to gets you sooner or later.{be01}\nHuh?{be01}\nOh, I was just talking to myself.{be01}\nAhaha!{be01}\nOops!\nTime's up.{be00}\nI have to get back to work.{be01}
-...{be01}\nWhat? You want to see me now?{be01}\nHold... Hold on a sec...{be01}\n...{be01}\nYep!\nI think I can make it.{be01}\nHow about meeting up\nat the Ferris wheel in Nimbasa City?{be01}\nI'm sooo looking forward to it,\n{0100:0}!{be01}
-See you later.{be01}
-Good-bye.{be01}
-Bye!{be01}
-Talk to you later.{be01}
-Talk to you soon.{be01}
-Hi...\nIs this {0100:0}?{be01}\n...{be01}
-...Hello?{be01}
-...Hello?{be01}
-...Hello?{be01}
-...Hello?{be01}\nAh, you must be {0100:0}, right?
-Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
-Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
-Ah, {0100:0}!{be01}\nI'm...glad we can talk face-to-face.{be01}
-Oh, sorry I've kept you waiting!{be01}
-...
-You know...
-Well...
-Ahaha!
-Wow, so you're a boy, {0100:0}?{be01}\nIt's a little annoying that we can't\nsee each other, right?{be01}\nJust so you know...{be01}\nI'm a girl.{be01}\nTee hee.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Wow, so you're a boy, {0100:0}?{be01}\nIt's a little annoying that we can't\nsee each other, right?{be01}\nJust so you know...{be01}\nI'm a girl.{be01}\nTee hee.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-{010f:1} is your hobby,\n{0100:0}? I see.{be01}\nThat sounds kind of fun.\nMaybe I should take it up, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-That's your hobby,\n{0100:0}? I see.{be01}\nThat sounds kind of fun.\nMaybe I should take it up, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really?\nSo you like {0103:1}-type Pokémon,{be00}\n{0100:0}?{be01}\nMany of them are cute, aren't they?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really?\nSo you like Pokémon of that type,{be00}\n{0100:0}?{be01}\nMany of them are cute, aren't they?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? So you listen to music often,\n{0100:0}?{be01}\n{010f:1}, did you say?\nI like music, too.{be00}\nIt makes me smile just listening to it.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? So you listen to\nthat kind of music often, {0100:0}?{be01}\nI like music, too.\nIt makes me smile just listening to it.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really?\n{010f:1} Pokémon are{be00}\nyour favorite, {0100:0}?{be01}\n{010f:1} Pokémon are quite\npopular among many of my friends, too!{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really?\nThat's the kind of Pokémon you like,{be00}\n{0100:0}?{be01}\nThose Pokémon are quite\npopular among many of my friends, too!{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? {010f:1} is your way of\nspending the holiday?{be01}\nI wouldn't have guessed that,\n{0100:0}.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? That's your way of\nspending the holiday?{be01}\nI wouldn't have guessed that,\n{0100:0}.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? {010f:1}s? You do\nthose often, {0100:0}?{be01}\nCan we do that when we have a\nchance to? {010f:1}?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? That's how you communicate\nwith your friends through Pokémon?{be01}\nCan we do that when we have a\nchance to?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? {010f:1} is what you\nwant to become, {0100:0}?{be01}\nI think it's wonderful for anyone to have\na dream. I must work hard, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Really? That's what you\nwant to become, {0100:0}?{be01}\nI think it's wonderful for anyone to have\na dream. I must work hard, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
-Great, {0100:0}!{be01}\nYou have {0200:1} Gym Badges?\nYou are a tough Trainer, aren't you?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
-I am off today, so I was thinking\nI could pick up my Xtransceiver.{be00}\nThe one you've been keeping for me...{be01}\nAre you busy, {0100:0}?{be01}\n...{be01}\nReally? You aren't?{be01}\nGood.{be01}\nCan we meet at the Ferris wheel\nin Nimbasa City?{be01}\nI'm looking forward to seeing you there,\n{0100:0}!{be01}
-Thank you for the other day!{be01}\nI was surprised you were my age!\nI was guessing you would be older{be00}\nthan me from your voice.{be01}\nIt made me a little nervous\non the Xtransceiver, you know?{be01}\nI'm kind of relieved that I can relax\nfrom now on when we talk.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-My hobby is cooking.{be01}\nWhen I hear about good food, I go and\ncheck it out for myself.{be01}\nLately, the Casteliacones in Castelia City\nare getting quite popular, so I've been{be00}\nwanting to try one...{be01}\nBut there is a long line every time\nI go there, so I haven't tried it yet.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I like Normal-type Pokémon a lot!{be01}\nThey can become whatever they want\nto be if they work hard.{be01}\nDon't you agree they have that\nkind of charm?{be01}\nBesides, there are so many cute Pokémon\namong them!{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I love music.\nI listen to pop often, I think.{be01}\nListening to music makes you smile,\ndoesn't it?{be01}\nI may not look it, but I'm pretty good at\nsinging and that stuff.{be01}\nI'd like you to listen to me sing when we\nhave the opportunity, if you don't mind.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-{0100:0},\nhave you participated in the{be00}\nPokémon Musical?{be01}\nI've been wanting to play Dress Up with\nmy Pokémon. I'll make it cute and have{be00}\nit participate in a musical.{be01}\nWhen my Pokémon would receive fan\nletters, they'd help keep it motivated.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I usually go for a walk on my days off.\nWalking at my own pace, seeing different{be00}\nthings alone is a good change of pace.{be01}\nI went to Nimbasa City for a walk that day\nand dropped my Xtransceiver.{be01}\nI can say my walking let us meet,\n{0100:0}.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I trade Pokémon often.{be01}\nMy job requires me to go to various\nregions, so I trade with people there{be00}\nfor the memories.{be01}\nI'd love to trade Pokémon with you\nsomeday, you know.{be01}\n...{be01}\n{0100:0}!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-I want to become someone cool.{be01}\nI don't mean someone who appears cool.\nI'm talking about substance.{be01}\nI have a long way to go...{be01}\nBut I believe I'll one day become\nsomeone with cool substance{be00}\nby working hard at my job.{be01}\nI hope...you'd support me.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-My dad and my brother were having\na Pokémon battle the other day.{be01}\nThey were having so much fun!{be01}\nThen my sister started crying,\nsaying she wants a Pokémon, too.{be00}\nTook us some time to calm her down.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-Time flies when I talk to you,\n{0100:0}.{be01}\nI must be having a really good time!{be01}\nAhaha!{be01}\nCalls from you are always\nwelcome, you know.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nHave you seen what they call\ndark tall grass?{be01}\n...{be01}\nI see...{be01}\nSo high-level Pokémon may jump\nout at you...{be01}\nI knew it was a dangerous kind of\ntall grass.{be01}\nI should tell my brother and sister\nto be careful, then.{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI want to give my sister a Pokémon.{be01}\n...{be01}\nI guess you are right.\nYou think her first Pokémon should be{be00}\nof {0103:1} type?{be00}\nI'll go catch one with my sister soon!{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI just made a mistake at work.{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll keep in mind not to make\nthe same mistake twice.{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nHave you heard of the Medal Rally?{be01}\n...{be01}\nReally?{be01}\nSounds like a fun event!\nI had no idea.{be01}\nThis strange man caught me off guard\nby giving me these Medals...{be01}\nI'll start collecting them since you are.{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI have trouble battling against\nmy brother's Leavanny.{be01}\n...{be01}\nOf course!{be01}\nI'm glad I asked you...{be01}\nI'll have a Fire-type Pokémon battle\nLeavanny next time.{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI had an argument with my dad\nabout my job yesterday...{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll go apologize to my dad.\nI'll stay calm and be sincere.{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nSomebody gave me a Dowsing Machine\nthe other day and...{be01}\n...{be01}\nOh, I see!{be01}\nThe Dowsing Machine can be used\nin so many places.{be01}\nI'll use mine often from now on.{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\n...{be01}\nHow do I...{be01}\nHow do I look with this hat?{be01}\n...{be01}\nAhaha!{be01}\nI'm glad I asked you...{be01}\nHey, you are making me blush!{be01}\nThanks, {0100:0}.{be01}
-Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI have this person who's really\ngood at what we do at our workplace,{be00}\nand I can't help but feel so competitive.{be01}\n...{be01}\nYeah!{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI guess it's not him but my own self\nthat I must overcome.{be01}\nThanks, {0100:0}.{be01}
-Er...{be01}\nUmm...{be01}\nI am off today, so\ncan we meet somewhere?{be01}\nYou've been helping me a lot lately,\nso I'd love to thank you face-to-face.{be01}\n...{be01}\nReally? You can?{be01}\nGreat!{be01}\nCan we meet each other at\nthe Ferris wheel?{be01}\nI'm...so looking forward to it,\n{0100:0}!{be01}
-I went on a business trip to the Kanto\nregion the other day.{be01}\nThey let me visit Mt. Moon, and\nI saw Clefairy there.{be01}\nThey were so cute!{be01}\nTee hee!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went on a business trip to the Johto\nregion the other day.{be01}\nThey have many traditional buildings,\nand they are really mysterious.{be01}\nTheir famous RageCandyBar was\nreally good, too!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-...{be01}\nTee hee.{be01}\n...{be01}\nHaha!{be01}\nOh, sorry!{be01}\nI couldn't help smiling 'cause\nI'm talking to you.{be01}\nAhaha!{be01}\nIt's so much fun talking to you,\n{0100:0}!{be00}\nI wish...it would last forever.{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went on a business trip to the Sinnoh\nregion the other day.{be01}\nThe vast wilderness there was so\nbreathtaking!{be01}\nTheir famous Old Gateau was\nreally good, too!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-The stars last night were\nso beautiful...{be01}\nDid you see them by any chance,\n{0100:0}?{be01}\nI saw lots of shooting stars, too.\nIt really was a pretty night.{be01}\nI saw so many that I made\nmany wishes.{be01}\nWhat?{be01}\nAhaha!{be01}\nI can't tell you what I wished for...{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went to the Battle Institute in\nNimbasa City to take the Battle Test.{be01}\nI did a little better than the last time!{be01}\nI'll keep trying to get better results!{be01}\nI'd appreciate it if you could tell me\nabout Pokémon battles, please?{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-I went on a business trip to the Hoenn\nregion the other day.{be01}\nThey have many unique towns and cities.\nThey really surprised me!{be01}\nTheir famous Lava Cookie was\nreally good, too!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-I was using the Dowsing Machine the other\nday and got something really awesome.{be01}\nI gave it to my dad, and he was\nreally pleased.{be01}\nI'm glad you told me about the\nDowsing Machine a while ago,{be00}\n{0100:0}!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
-Oh!{be01}\nSorry, {0100:0}.{be01}\nIt's almost time for work...{be01}\nI have to hang up...{be01}\nSo sorry...{be01}
-I'm on my break right now.\nCouldn't help answering{be00}\n'cause I wanted to talk to you!{be01}\nIt's voice only, sorry!{be01}\nAhaha!{be01}\n...{be01}\nMy job keeps me busy, and\nI was just about to collapse...{be01}\nBut hearing your voice is\ngiving me energy, {0100:0}!{be01}\nOops!{be01}\nMy break is over.\nI have to go back to work.{be01}\nNext time, I want to be looking at\nyour face while we talk.{be01}
-I found a nice walking spot\nwith a wonderful view the other day.{be01}\nThat spot may look totally\ndifferent depending on the season.{be01}\nMaybe we could go for a walk together\nsometime soon...{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
-I found this shop that bakes really\ngood cakes the other day.{be01}\nThey bake things that taste mysterious.\nI've never tasted anything like them.{be01}\nMaybe we could go there together\nsometime soon...{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
-I was just thinking about you,\n{0100:0}.{be01}\n...What did I just say?{be01}\n...{be01}\nAhaha!{be01}\nEr...\nWell... I have to go back to work now.{be01}
-I've been too busy and\nsleep deprived lately.{be01}\nIf it wasn't you I was talking to,\n{0100:0},{be00}\nI'd have fallen asleep by now.{be01}\nAhaha!{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
-The weather is bearable today, isn't it?{be01}\nI'd go for a walk if not for my work...{be01}\nBut I'm OK for now, because\nI got to talk to you, {0100:0}.{be01}\nTee hee!{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
-...{be01}\n...?{be01}\n...{be01}\n...??{be01}\n...{be01}\n...???{be01}\n...Can you hear me?{be01}\nOh!{be01}\nThe reception was so bad,\nwasn't it?{be01}\nAhaha!{be01}\nI'm so embarrassed for\nbeing so loud just now.{be01}\nOops!\nI have to get back to work.{be01}
-Stop that!{be01}\nHey!{be01}\nSigh...{be01}\nSorry...{be01}\nThat was my sister and brother\nbothering me...{be01}\nThey seem to get jealous\nwhen I talk to you, {0100:0}.{be01}\nAhaha!{be01}\nThey are usually bratty, but I guess\nthey can be cute sometimes.{be01}\nArg! Hey, I said “stop"!{be01}\nSigh...{be01}\nSorry, {0100:0}.\nIt seems that I have to spend time with{be00}\nthem today...{be01}
-Cough, cough.{be01}\nSorry...\nI got a cold, it seems...{be01}\n...{be01}\nYeah...\nI'm really sorry. Cough... I guess so.{be01}\nI'll stay home\nand rest for now.{be01}\nBut...\nSeeing your face should help{be00}\nme recover sooner, {0100:0}.{be01}\nAhaha!{be01}
-I bought a Soda Pop from this\nvending machine the other day.{be01}\nGuess what!{be01}\nI got an extra as a bonus.{be01}\nIt's great, isn't it?\nHave you got a bonus before, {0100:0}?{be01}\nI would have shared it with you,\nhad we been together then...{be01}\nOops!\nI have to get back to work.{be01}
-Oh, sorry I've kept you wai...\nUh-oh.
-Sorry about last time!{be01}\nThis person from work\nanswered my Xtransceiver by mistake...{be01}\nSorry I wasn't there to answer you\nwhen you took your time to reach me...{be01}\nI guess taking a break when you aren't\nsupposed to gets you sooner or later.{be01}\nHuh?{be01}\nOh, I was just talking to myself.{be01}\nAhaha!{be01}\nOops!\nTime's up.{be00}\nI have to get back to work.{be01}
-...{be01}\nWhat? You want to see me now?{be01}\nHold... Hold on a sec...{be01}\n...{be01}\nYep!\nI think I can make it.{be01}\nHow about meeting up\nat the Ferris wheel in Nimbasa City?{be01}\nI'm sooo looking forward to it,\n{0100:0}!{be01}
-See you later.{be01}
-Good-bye.{be01}
-Bye!{be01}
-Talk to you later.{be01}
-Talk to you soon.{be01}
+Bank0384_Text_PleaseChooseWhoCall = Please choose who to call.
+Bank0384_Text_Call = Call
+Bank0384_Text_Calling = Calling...
+Bank0384_Text_Empty =        \x{ffff}
+Bank0384_Text_Empty_2 =     \x{ffff}
+Bank0384_Text_Empty_3 =     \x{ffff}
+Bank0384_Text_Empty_4 =     \x{ffff}
+Bank0384_Text_Empty_5 =     \x{ffff}
+Bank0384_Text_Empty_6 =     \x{ffff}
+Bank0384_Text_IdLikeTalk = I'd like to talk.
+Bank0384_Text_TellAboutEvolution = Tell me about evolution.
+Bank0384_Text_CheckPokedex = Check my Pokédex.
+Bank0384_Text_GoodBye = Good-bye.
+Bank0384_Text_WhichPokemonsEvolutionWant = Which Pokémon's evolution do you\nwant to learn about?
+Bank0384_Text_WhatCan = What can I do for you?
+Bank0384_Text_IdLikeTalk_2 = I'd like to talk.
+Bank0384_Text_SomethingUp = Something up?
+Bank0384_Text_GoodBye_2 = Good-bye.
+Bank0384_Text_What = What?
+Bank0384_Text_IdLikeTalk_3 = I'd like to talk.
+Bank0384_Text_TellAboutTypes = Tell me about types.
+Bank0384_Text_TellAboutAbilities = Tell me about Abilities.
+Bank0384_Text_GoodBye_3 = Good-bye.
+Bank0384_Text_WhichPokemonsTypesShould = Which of your Pokémon's types\nshould I explain?
+Bank0384_Text_WhichPokemonsAbilitiesShould = Which of your Pokémon's Abilities\nshould I explain?
+Bank0384_Text_WhatWouldLikeAsk = What would you like to ask?
+Bank0384_Text_IdLikeTalk_4 = I'd like to talk.
+Bank0384_Text_PleaseLookFriendship = Please look at friendship.
+Bank0384_Text_PleaseLookEffort = Please look at effort.
+Bank0384_Text_GoodBye_4 = Good-bye.
+Bank0384_Text_WhichLittleDarlingsWant = Which of your little darlings do you want\nto see how well you're getting along with?
+Bank0384_Text_ArentGettingAlongDoesnt = You and {0102:1}...\nYou aren't getting along, are you?{be01}\nIt doesn't look like it's having\nfun even when you're together.{be01}
+Bank0384_Text_ArentGettingAlongIts = You and {0102:1}...\nYou aren't getting along, are you?{be01}\nIt's glaring at you with\na look that's kinda scary.{be01}
+Bank0384_Text_StillHaveRoomImprovement = You and {0102:1}...\nYou still have room for improvement.{be01}\nHow nice! I mean, you can\nbecome even better friends!{be01}
+Bank0384_Text_YoureStartingGetFriends = You and {0102:1}...\nYou're starting to get to be friends.{be01}\nJust maybe, walking along the same path\nhas made you understand one another.{be01}
+Bank0384_Text_SeemReallyCloseLook = You and {0102:1}...\nYou seem really close!{be01}\nYou look so, so happy!\nIt's enough to make me happy, too!{be01}
+Bank0384_Text_TwoSureGetAlong = You and {0102:1}...\nYou two sure get along great!{be01}\nIt looks like you are having fun being\ntogether! You seem bright and cheerful!{be01}
+Bank0384_Text_WhatGreatFriendsIts = You and {0102:1}...\nWhat great friends you are!{be01}\nIt's so nice how you trust each other!\nIt makes me kinda jealous!{be01}
+Bank0384_Text_WhichLittleDarlingsEfforts = Which of your little darlings' efforts\ndo you want to see?
+Bank0384_Text_SeemsLikeCanWork = Your {0102:1}...\nIt seems like it can work a little harder.{be01}
+Bank0384_Text_HasWorkedReallyHard = Your {0102:1}...\nIt has worked really hard, hasn't it?{be01}
+Bank0384_Text_ThinkWorkedParticularlyHard = I think it worked particularly hard on its\n{010d:0}!{be01}
+Bank0384_Text_ThinkWorkedParticularlyHard_2 = I think it worked particularly hard on its\n{010d:0} and {010d:1}!{be01}
+Bank0384_Text_Hp = HP
+Bank0384_Text_Attack = Attack
+Bank0384_Text_Defense = Defense
+Bank0384_Text_Speed = Speed
+Bank0384_Text_SpAtk = Sp. Atk
+Bank0384_Text_SpDef = Sp. Def
+Bank0384_Text_ButThinkWorkedHard = But I think it worked hard on\nits {010d:0}!{be01}
+Bank0384_Text_ButThinkWorkedHard_2 = But I think it worked hard on\nits {010d:0} and {010d:1}!{be01}
+Bank0384_Text_WhatsUp = What's up?
+Bank0384_Text_IdLikeTalk_5 = I'd like to talk.
+Bank0384_Text_Empty_7 = {0105:0}?
+Bank0384_Text_GoodBye_5 = Good-bye.
+Bank0384_Text_WhatNeedDear = What do you need, dear?
+Bank0384_Text_IdLikeTalk_6 = I'd like to talk.
+Bank0384_Text_GoodBye_6 = Good-bye.
+Bank0384_Text_Empty_8 =     \x{ffff}
+Bank0384_Text_HiThere = Hi there!{be01}
+Bank0384_Text_HowThingsGoingPokedex = How are things going with the Pokédex?{be01}\nSorry, I can't help but ask.\nBe sure to enjoy your journey, though!{be01}
+Bank0384_Text_GetMoreDetailedInformation = You get more detailed information\nin the Pokédex by catching Pokémon!{be01}
+Bank0384_Text_FillingUpPagesPokedex = Filling up pages in the Pokédex\nis very important, but don't forget...{be01}\nInteracting with Pokémon is a hundred--\neven a thousand--times more important!{be01}
+Bank0384_Text_ImWorkingPokemonProfessors = I'm working with Pokémon Professors\nfrom other regions and trying to solve{be00}\nthe mysteries of Pokémon.{be01}\nEven with their help,\nwe can't find every answer.{be01}\nBut, if we learn things little by little,\nit may leave clues for the researchers{be00}\nwho follow us.{be01}
+Bank0384_Text_WhatCanImprovePokedex = What can I do to improve the\nPokédex that will make everyone happy?{be01}
+Bank0384_Text_LookingRemindsWhenBackpacker = Looking at you reminds me of when\nI was a Backpacker, and it really{be00}\nmotivates me!{be01}\nThat's right! I also traveled the\nUnova region with a Pokédex!{be01}
+Bank0384_Text_MetMotherWhenBackpacker = I met your mother\nwhen I was a Backpacker!{be01}\nWe got to talking at the\ncounter in the Pokémon Center,{be00}\nand a huge line formed behind me!{be01}
+Bank0384_Text_ImSureThereStill = I'm sure there are still Pokémon\nthat no one in the world has seen!{be01}\nDoesn't just imagining them make\nyou excited?{be01}
+Bank0384_Text_DreamBigWantSee = Dream big!{be01}\nI want to see every\nPokémon in the world!{be01}
+Bank0384_Text_OrderGetAlongOthers = In order to get along with others,\nyou must be understanding and accepting.{be01}\nI mean, Pokémon and people live\nby different rules!{be01}\nIf we just push our expectations on them,\nthere's no way it will go well.{be01}
+Bank0384_Text_OkThenTakeCare = OK, then! Take care.\nBye-bye!{be01}
+Bank0384_Text_Yeah = Yeah?{be01}
+Bank0384_Text_HaveProtectWhatsImportant = You have to protect what's important\nto you on your own!{be01}
+Bank0384_Text_PeopleWhoStrongPokemon = People who are strong in Pokémon\nbattles aren't automatically right.{be01}\nBut losers don't even have a leg\nto stand on, know what I mean?{be01}
+Bank0384_Text_WhenItsNightEverythings = When it's night\nand everything's quiet...{be01}\nIf you listen carefully,\nyou can hear the footsteps of Pokémon.{be01}\nI really like that.{be01}
+Bank0384_Text_IfBelieveYourselfHave = If you believe in yourself\nand have Pokémon by your side,{be00}\neven being lost is fun!{be01}
+Bank0384_Text_ImThinkingAboutWhat = I'm thinking about what Pokémon\nI should have to make up for{be00}\nmy other Pokémon's weaknesses.{be01}
+Bank0384_Text_DontCareWhatReason = I don't care what the reason is.\nIf you take other people's stuff,{be00}\nyou're nothing more than a dirty thief!{be01}
+Bank0384_Text_LikeSpendingTimeThinking = I like spending time thinking\nabout how to raise my Pokémon{be00}\nand make them stronger.{be01}
+Bank0384_Text_GuessIfHadPick = I guess if I had to pick a trait I prefer,\nI like Pokémon that are fast...{be01}
+Bank0384_Text_HeySorryTheresSomething = Hey, sorry!\nThere's something I want to do right now!{be01}
+Bank0384_Text_UmDontHaveMuch = Um...\nI don't have much to say right now.{be01}
+Bank0384_Text_SeeYa = See ya!{be01}
+Bank0384_Text_WhereAmNowIm = Where am I now?{be01}\nI'm searching every corner of\nCastelia City for Team Plasma!{be01}\nYou haven't found them either, right?\nWe HAVE to find them!{be01}\nGot it?!{be01}
+Bank0384_Text_SewersHuhIfTeam = The sewers, huh...{be01}\nIf Team Plasma's hiding there,\nwe have to find them.{be01}\nOtherwise, I'm sure they'll cause trouble\nfor the Pokémon living there.{be01}
+Bank0384_Text_ThanksHelpingBackThere = Thanks for helping back there!{be01}\nI'm going to keep looking for\nTeam Plasma in Castelia City.{be01}\nWhy don't you head to the Pokémon Gym?{be01}
+Bank0384_Text_WonInsectBadgeFrom = You won the Insect Badge from\nthe Castelia City Pokémon Gym?{be01}\nWell then, you should go to\nNimbasa City and take on{be00}\nthe Gym Leader there!{be01}
+Bank0384_Text_WhatWantHaveChallenged = What do you want?{be01}\nHave you challenged the\nDriftveil City Pokémon Gym yet?{be01}\nIf you haven't yet, just go already!{be01}\nHey, apparently the Gym Leader\nuses Ground-type Pokémon!{be01}
+Bank0384_Text_ClayJustToldParticipate = Clay just told you to participate\nin the Driftveil Tournament, right?{be01}\nI hear the tournament takes place\nto the south of Driftveil City!{be01}
+Bank0384_Text_PokemonWorldTournamentTrainer = The Pokémon World Tournament!{be01}\nA Trainer who wins on the first try\nmust be really good!{be01}
+Bank0384_Text_NoMatterWhatKind = No matter what kind of tournament\nit is, winning's impressive!{be01}
+Bank0384_Text_ItsTeamPlasmaTheres = It's Team Plasma!{be01}\nThere's a suspicious-looking ship\ndocked in the area south of the{be00}\nPokémon World Tournament arena!{be01}\nMeet me there!{be01}
+Bank0384_Text_HeyHowNiceWere = Hey, how nice!\nWe're having a nice friendly chat!{be00}\nAt a time like this...{be01}\nGet off the Xtransceiver already!{be01}
+Bank0384_Text_ActuallyYoureStrongEnough = Actually...{be01}\nYou're strong enough that\nyou can probably even beat{be00}\nMistralton City's Gym Leader.{be01}\nWell, I've already won my\nJet Badge, though!{be01}
+Bank0384_Text_IveGotOneWord = I've got one word for you...{be01}\nReversal Mountain.{be01}\nOh, wait, that's two words...{be01}
+Bank0384_Text_SomewhereNearUndellaTown = Are you somewhere near Undella Town now?{be01}\nMaybe I'll go there and battle with you.{be01}\nIt's been a while!{be01}
+Bank0384_Text_OpelucidCitysGymLeader = Opelucid City's Gym Leader\nwas really tough!{be01}
+Bank0384_Text_GoodYoureOkIm = Good! You're OK!{be01}\nI'm in Humilau City,\nso I can't get there right away,{be00}\nbut I'm sure you can handle it!{be01}
+Bank0384_Text_ImLookingTeamPlasma = I'm looking for Team Plasma,\nbut I can't find a trace of them!{be01}\nGo to Humilau City.\nThe Gym Leader's named Marlon.{be00}\nHurry up and go beat him!{be01}
+Bank0384_Text_DidntJustTellLets = Didn't I just tell you?!{be01}\nLet's split up and look\nfor the Plasma Frigate!{be00}\nYou check Route 22!{be01}
+Bank0384_Text_WhyWouldThinkWould = ...{be01}\nWhy would you think this would be a good\ntime to chat on the Xtransceiver?!{be01}
+Bank0384_Text_PokemonLeagueJustPast = The Pokémon League is\njust past Victory Road.{be01}\nVictory Road itself is\njust beyond Route 23!{be01}
+Bank0384_Text_HmYoureVictoryRoad = Hm... So you're on\nVictory Road.{be01}\nThen you're almost to the\nPokémon League!{be01}
+Bank0384_Text_DontWorryAboutYoure = Don't worry about me!{be01}\nYou're at the Pokémon League, right?\nThe only thing you need to think about{be00}\nis winning!{be01}
+Bank0384_Text_ImUndellaTownIf = I'm in Undella Town.\nIf you're bored, come hang out.{be01}
+Bank0384_Text_ImDriftveilCityIf = I'm in Driftveil City.{be01}\nIf you have time, head over.\nI'll spar with you.{be01}
+Bank0384_Text_ImStillDriftveilCity = I'm still in Driftveil City.{be01}\nYou can just do what you want\nto do, you know?{be01}
+Bank0384_Text_Empty_9 =                                                                 \x{ffff}
+Bank0384_Text_Empty_10 =                                                                              \x{ffff}
+Bank0384_Text_Empty_11 =                                                                         \x{ffff}
+Bank0384_Text_Empty_12 =                                                                                                        \x{ffff}
+Bank0384_Text_Empty_13 =                                                                    \x{ffff}
+Bank0384_Text_Empty_14 =                                                                                            \x{ffff}
+Bank0384_Text_Empty_15 =                                                                         \x{ffff}
+Bank0384_Text_Empty_16 =                                                                                          \x{ffff}
+Bank0384_Text_Empty_17 =                                               \x{ffff}
+Bank0384_Text_Empty_18 =                                                   \x{ffff}
+Bank0384_Text_Empty_19 =                                                        \x{ffff}
+Bank0384_Text_HowreThingsGoingOver = How're things going over there?{be01}\n...{be01}\nReally...\nGive me a hand, then!{be01}\nGo check out Seaside Cave!\nThat's right! The one on Route 21!{be01}\nOK! Counting on you!{be01}
+Bank0384_Text_WereHeadingDownInto = We're heading down into the Giant Chasm!\nI'm not letting Team Plasma get away!{be01}
+Bank0384_Text_KnowNextPokemonGym = You know the next Pokémon Gym\nafter Nimbasa City is Driftveil City, right?{be01}
+Bank0384_Text_LeaveWontLetTeam = Leave it to me! I won't let Team Plasma\nescape from Nimbasa City!{be01}
+Bank0384_Text_WereBigHelpBack = You were a big help back there!\nGuess Driftveil City's next!{be01}
+Bank0384_Text_ThereOneMoreTeam = There was one more Team Plasma member.\nHey, go listen to what he has to say!{be01}
+Bank0384_Text_BrilliantNiceWorkGetting = Brilliant!\nNice work getting the Gym Badge!{be01}
+Bank0384_Text_ItsJustRumorBut = It's just a rumor, but I heard\nTeam Plasma was in Lacunosa Town...{be01}
+Bank0384_Text_HuhEvenBeatDrayden = Huh! You even beat Drayden!\nYou're really something!{be01}
+Bank0384_Text_HaveBeatMarlonYet = Have you beat Marlon yet?\nDon't keep me waiting too long!{be01}
+Bank0384_Text_TheyWereHeadedGiant = They were headed for the\nGiant Chasm, weren't they?{be01}
+Bank0384_Text_ComeSewersLetsLook = Come to the sewers!\nLet's look for Team Plasma!{be01}
+Bank0384_Text_OkGotWaitingSewer = OK! Got it!\nWaiting in the sewer isn't fun!{be01}
+Bank0384_Text_KnowCelestialTowerIts = You know Celestial Tower?{be01}\nIt's on Route 7!\nGo train there if you want!{be01}
+Bank0384_Text_ItsOkWontLet = It's OK! I won't let Team Plasma\nescape from Lacunosa Town!{be01}\nSo do whatever you need to prepare!{be01}
+Bank0384_Text_DontMeanBragBut = I don't mean to brag...{be01}\nBut I'm not such a\nbad Trainer myself!{be01}\nAnd you're even better!{be01}\nAll right! Go and knock around\nthose chumps at the Pokémon League!{be01}
+Bank0384_Text_OhYeahIllCome = Oh yeah! I'll come meet you. There's\nsomething I want to talk to you about.{be01}
+Bank0384_Text_DidLikeAmusementParks = Did you like amusement parks?\nI forget...{be01}
+Bank0384_Text_WhatsUp_2 = What's up?{be01}
+Bank0384_Text_ListenMakeSureNever = Listen...{be01}\nMake sure you never run out\nof Poké Balls!{be01}\nYou never know where you'll\nrun into what Pokémon!{be01}\nYou have to be ready and believe\nan opportunity will come your way!{be01}
+Bank0384_Text_OnlyRealDefeatPokemon = The only real defeat in\nPokémon battling is giving up.{be01}\nIf you think about why you lost\nand compensate for it,{be00}\nthe next time you face a challenge,{be00}\nyou'll improve yourself.{be01}\nBut if you don't do anything,\nthere's no way you'll win.{be01}
+Bank0384_Text_HmmItsImportantTeach = Hmm...{be01}\nIt's important to teach people\nmany things about Pokémon,{be00}\nbut what I really want people to know{be00}\nis that being with Pokémon is fun!{be01}
+Bank0384_Text_TruthsIdealsThereMany = Truths...\nIdeals...{be01}\nThere are as many of these as there\nare people...{be01}\nI'm sure there are even as many\nas there are people and{be00}\nPokémon together.{be01}\nThat's why you can always say\nthere must be right answers somewhere.{be01}
+Bank0384_Text_StoppedWearingGlassesBianca = I stopped wearing glasses,\nand Bianca is wearing glasses now...{be01}\nI hadn't seen her in a long time,\nand I was sure surprised when I saw that.{be01}
+Bank0384_Text_WhenKidDidExperiment = When I was a kid,\nI did an experiment where I{be00}\nwore a blindfold all of the time.{be01}\nI thought by doing that...\nI could train my senses.{be01}
+Bank0384_Text_DontThinkItsStrange = Don't you think it's strange that a guy\nlike me is a Gym Leader!{be01}\nOh!\nI'm sorry.{be01}\nDidn't mean to put you\nin an awkward position there.{be01}
+Bank0384_Text_WhenDontHaveSelf = When you don't have self-confidence,\nit's easy to want to fall back on{be00}\na title like “Champion" or something,{be00}\nbut that's really superficial.{be01}
+Bank0384_Text_EvenIfHaveKnowledge = Even if you have knowledge,\nyou have to have wisdom as well.{be01}\nKnowledge is mere information.\nNow, understanding how to use it,{be00}\nthat is what's really important.{be01}
+Bank0384_Text_HaveCheckOutWhat = You have to check out what you're\ninterested in and confirm it for yourself.{be01}\nIf you only try to understand\neverything on an intellectual level,{be00}\nyou're gonna run into a lot of trouble.{be01}
+Bank0384_Text_Seeing = Be seeing you.{be01}
+Bank0384_Text_Hellooo = Hellooo!{be01}
+Bank0384_Text_HowThingsGoingToday = How are things going today?{be01}\nIf everything is going well,\nI'm sure you're having fun!{be01}\nIf it's not great, then I'm\nsure tomorrow will be better!{be01}
+Bank0384_Text_WalkingIntoTallGrass = Walking into the tall grass\nto go look for Pokémon{be00}\nnever gets old!{be01}\nI will never forget how\nthat feels as long as I live!{be01}
+Bank0384_Text_IveBeenReadingTon = I've been reading a ton of books\nwhile helping Professor Juniper,{be00}\nso I started wearing glasses!{be01}\nI think they look pretty good\non me!{be01}
+Bank0384_Text_WhenBuy10Poke = So when you buy 10 Poké Balls\nat one time...{be01}\nA-MAZ-ing-ly!\nYou get a Premier Ball as well!{be01}\nIsn't that fantastic?!{be01}
+Bank0384_Text_KnowWhatJustPopped = Know what? This just popped into my head,\nbut a friend is always a friend,{be00}\neven when you can't see each{be00}\nother for a long time!{be01}
+Bank0384_Text_HmJustRememberedSomething = Hm... I just remembered something\nthat happened in the past.{be01}\nWell actually, it isn't really the past,\nit was more something that happened{be00}\nreally recently, I guess.{be01}\nI'm talking about when I got my Pokémon\nand the Pokédex and went on my journey!{be01}
+Bank0384_Text_HeyWouldMakeHappy = Hey!{be01}\nWould it make you happy if\nPokémon could talk?{be00}\nOr would it cause you problems?{be01}\nI'm always talking to my Pokémon,\nbut I wonder what I would do{be00}\nif they actually replied...{be01}
+Bank0384_Text_MostMysteriousThingAbout = The most mysterious thing\nabout Pokémon...{be00}\nis that they stay with people!{be01}\nI'm thinking about making that\nthe theme of my research.{be01}
+Bank0384_Text_IveJustStartedResearch = So, I've just started my research\ninto Pokémon.{be00}\nActually, I'm still just an assistant.{be01}\nBut it's probably impossible to\nunderstand everything about Pokémon.{be01}\nProfessors know this but still continue\ntheir research.{be00}\nI find that astonishing...{be01}
+Bank0384_Text_OhImSorryPokemon = ...{be01}\nOh! I'm sorry!{be01}\nA Pokémon I'm interested\nin just popped out!{be01}
+Bank0384_Text_See = See you!{be01}
+Bank0384_Text_OhSoundFullEnergy = Oh!\nYou sound full of energy!{be01}
+Bank0384_Text_DidFindMorePokemon = Did you find more Pokémon\nto travel with you?{be01}\nJourneys are definitely more\nfun when they're lively!{be01}
+Bank0384_Text_HmmWonderWhatShould = Hmm, I wonder what I should\ndo for dinner tonight...{be01}
+Bank0384_Text_ThereManyDifferentPokemon = There are many different Pokémon,\nand even the same kind of Pokémon{be00}\nhave individuals with completely{be00}\ndifferent Natures!{be01}\nI wonder what kind of Pokémon is a\nperfect match for you.{be01}
+Bank0384_Text_FirstThingNeedGain = The first thing you need to do to\ngain a Pokémon's trust is walk with them!{be01}\nBy doing that, they will come to\nknow a lot about you!{be01}
+Bank0384_Text_DontWorryAboutHouse = Don't worry about the house.{be01}\nThe sheets on your bed will be clean\nand washed so they're ready whenever{be00}\nyou come home!{be01}
+Bank0384_Text_IfCanSeriousMoment = If I can be serious for a moment...{be01}\nPokémon have existed since\nbefore you were born, right?{be01}\nYou've never thought to question\nwhy they're there, right?{be01}\nBut isn't questioning what you know\nan important part of being on a journey?{be01}
+Bank0384_Text_PokemonCenterReceptionistsRemember = Pokémon Center receptionists remember\nTrainers better than you might expect.{be01}\nOf course, they remember the\nPokémon that were with them, too!{be01}
+Bank0384_Text_HaveCaughtLotsPokemon = Have you caught lots of Pokémon?{be01}\nOK, but be sure to have a look at your\nPC Boxes in the Pokémon Center.{be01}\nMaybe there's a Pokémon in there\nwho wants to travel with you!{be01}
+Bank0384_Text_PokemonCenterEveryonesHome = The Pokémon Center is\neveryone's home!{be01}\nYou should just make yourself\nat home like you belong there!{be01}
+Bank0384_Text_HaveEnoughMoneyJust = Do you have enough money?{be01}\nI just thought I should ask,\nbut a sensible kid like you is OK!{be01}\nStill, don't waste your money!\nYou might not have it when you need it!{be01}
+Bank0384_Text_OkTakeCareYourself = OK!\nTake care of yourself!{be01}
+Bank0384_Text_Hello = Hello!\nIs this {0100:0}?{be01}\n...{be01}
+Bank0384_Text_Hello_2 = ...Hello!{be01}
+Bank0384_Text_Hello_3 = Hello!{be01}
+Bank0384_Text_Hello_4 = Hello?{be01}
+Bank0384_Text_HelloAhMustRight = ...Hello?{be01}\nAh, it must be {0100:0}, right?
+Bank0384_Text_AhYeahCanTalk = Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
+Bank0384_Text_AhYeahCanTalk_2 = Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
+Bank0384_Text_AhImGladWe = Ah, {0100:0}!{be01}\nI'm glad we can talk face-to-face!{be01}
+Bank0384_Text_OhSorryIveKept = Oh, sorry I've kept you waiting!{be01}
+Bank0384_Text_Empty_20 = ...
+Bank0384_Text_Know = You know...
+Bank0384_Text_Well = Well...
+Bank0384_Text_Ahaha = Ahaha!
+Bank0384_Text_ItsYeahPickedUp = It's me!{be01}\nYeah! You picked up my\nXtransceiver!{be01}\nHey, it's a little annoying that we can't\nsee each other's faces, isn't it?{be01}\nWe won't recognize each other\neven if we pass on the street.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_ItsYeahPickedUp_2 = It's me!{be01}\nYeah! You picked up my\nXtransceiver!{be01}\nHey, it's a little annoying that we can't\nsee each other's faces, isn't it?{be01}\nWe won't recognize each other\neven if we pass on the street.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_ExcuseSuddenQuestionBut = Excuse the sudden question,\nbut can you guess what my job is?{be01}\nAhaha!\nI guess it's natural you have no idea.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_ExcuseSuddenQuestionBut_2 = Excuse the sudden question,\nbut can you guess what my job is?{be01}\nAhaha!\nI guess it's natural you have no idea.{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_IllJustThinkOut = I'll just think out loud...\nI love {0103:1}-type Pokémon!{be01}\nMany of them look cool, I think.{be01}\n{0100:0},\nI hope you like {0103:1}-type{be00}\nPokémon, too!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_IllJustThinkOut_2 = I'll just think out loud...\nI love Electric-type Pokémon!{be01}\nMany of them look cool, I think.{be01}\n{0100:0},\nI hope you like Electric-type{be00}\nPokémon, too!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_GreatListeningMusicJust = {010f:1} is great!\nI was listening to music just now!{be01}\nMusic is wonderful!\nIt gives me energy!{be01}\n{0100:0},\nyour voice would go well with{be00}\n{010f:1}, I think!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_RockGreatListeningMusic = Rock is great!\nI was listening to music just now!{be01}\nMusic is wonderful!\nIt gives me energy!{be01}\nI wonder what your favorite music is.\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_GuessWhatPokemonQuite = Guess what!\n{010f:1} Pokémon are{be00}\nquite popular among many of my friends!{be01}\n...{be01}\nReally?{be01}\n{010f:1} Pokémon happen\nto be your favorite, too? That's great!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_GuessWhatCoolPokemon = Guess what!\nCool Pokémon are quite popular among{be00}\nmany of my friends!{be01}\nI would feel great if you liked\ncool Pokémon, too!{be01}\nIt'll mean coolness is the\n“in" thing, you know!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_GoodWaySpendHoliday = {010f:1}, for me,\nis a good way to spend the holiday!{be01}\n{0100:0},\nhow do you spend your... Oh!{be01}\nHow rude of me to ask such a question\nof a lady!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_WhatWillHolidayOops = {0100:0}, what will you do on\nyour holiday... Oops!{be01}\nHow rude of me to ask such a question\nof a lady!{be01}\nI'm usually at work, unfortunately.\nThat's why I still haven't picked up{be00}\nmy Xtransceiver from you...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_KnowWhatHadChance = You know what I had a chance to\ndo recently?{be00}\n{010f:1}!{be01}\n{0100:0}, how about you?\n{010f:1}s?{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_WhatComesMindWhen = What comes to your mind when you hear the\nidea of communication through Pokémon?{be01}\nTrades or battles?{be01}\n{0100:0},\nI'd like a trade with you{be00}\nif you like to trade Pokémon!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_ImGoingWorkHarder = I'm going to work harder and harder...\nand become a great si...{be01}\nNever mind!\nMy job is top secret!{be01}\nHow about you, {0100:0}?\nThe word “{010f:1}" comes to{be00}\nmy mind for some reason... Am I right?{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_ImGoingWorkHarder_2 = I'm going to work harder and harder...\nand become a great si...{be01}\nNever mind!\nMy job is top secret!{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_HereComesQuestionYoure = Here comes a question!{be01}\n{0100:0}, you're a Pokémon Trainer.\nHow many Badges do you have?{be01}\n...{be01}\nGreat!{be01}\nYou have {0200:1} Gym Badges?\nYou're a tough Trainer, aren't you?{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_ActuallyImOffWork = Actually, I'm off work today!{be01}\nI'd like to pick up my Xtransceiver.\nThe one you've been keeping for me!{be01}\nWill you please come to the Ferris wheel\nin Nimbasa City?{be01}\nOh, if you can, of course!{be01}\nSee you there, {0100:0}!{be01}
+Bank0384_Text_ThankMuchOtherDay = Thank you so much for the other day!{be01}\nI was surprised you were my age!\nI was guessing you would be older{be00}\nthan me by your voice.{be01}\nIt made me a little nervous\non the Xtransceiver, you know?{be01}\nI'm relieved that I can relax\nfrom now on when we talk.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_HobbyFishingIdCast = My hobby is fishing.{be01}\nI'd cast the line wherever\nI have a good hunch.{be01}\nDifferent places have different Pokémon,\nso every fishing experience is a surprise.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_MayHaveSaidBefore = I may have said this before, but\nI like Electric-type Pokémon a lot!{be01}\nWhen they give off electricity,\nI feel like I'm energized!{be01}\nDon't you agree they have that\nkind of charm?{be01}\nBesides, there are so many cool Pokémon\namong them!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_DontLoveMusicListen = Don't you love music?{be01}\nDo you listen to rock often?\nListening to music gives you energy,{be00}\nyou know.{be01}\nI may not look it, but I'm pretty good at\nsinging and that stuff.{be01}\nI'd really like you to listen to me sing\nwhen we have the opportunity.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_HaveParticipatedPokemonMusical = {0100:0},\nhave you participated in the{be00}\nPokémon Musical?{be01}\nI've been wanting to play Dress Up by\nputting my Pokémon in a cool outfit and{be00}\nwatch it participate in a musical.{be01}\nIf my Pokémon got fan letters, that\nwould really give it some motivation!{be01}\nAh, I should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_DaysOffUsuallyGo = My days off?{be01}\nI usually go fishing, I guess.\nTaking some time alone and casting out{be00}\nyour line is a good change of pace.{be01}\nI had gone fishing the day I dropped\nmy Xtransceiver, too!{be01}\nSo you could say fishing helped us meet,\n{0100:0}.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_HavePokemonBattleOften = I have my Pokémon battle often.{be01}\nMy job requires me to go to various\nregions, so I'd challenge people there{be00}\nand create some fun memories.{be01}\nI'm not that good at battling, though.{be01}\nAhaha!{be01}\nI'd love to challenge you someday,\n{0100:0}!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_WantBecomeSomeoneCool = I want to become someone cool.{be01}\nI don't mean someone who appears cool.\nI'm talking about substance.{be01}\nI have a long way to go...{be01}\nBut I believe I'll one day become\na person of substance and coolness{be00}\nby working hard at my job.{be01}\nI hope that you'd support me in that.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_MomSisterWereHaving = My mom and my sister were having\na Pokémon battle the other day.{be01}\nThey were having so much fun!{be01}\nThen my brother started crying,\nsaying he wanted a Pokémon, too.{be00}\nIt took us some time to calm him down.{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_TimeFliesWhenTalk = Time flies when I talk to you, {0100:0}.\nI must be having the best time!{be01}\nAhaha!\nCalls from you are always welcome!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp = Umm...\nI hope you can help me with this.{be01}\nHave you seen what they call\nthe dark tall grass?{be01}\n...{be01}\nI see...\nSo high-level Pokémon may jump out at you.{be01}\nI knew it was a dangerous kind of\ntall grass.{be01}\nI should tell my brother and sister\nto be careful, then. Thanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_2 = Umm...\nI hope you can help me with this.{be01}\nI want to give my brother a Pokémon.{be01}\n...{be01}\nI guess you're right.\nYou think his first Pokémon should be{be00}\n{0103:1} type?{be00}\nI'll go catch one with my brother soon!{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_3 = Umm...\nI hope you can help me with this.{be01}\nI just made a mistake at work.{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll keep in mind to avoid making\nthe same mistake again.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_4 = Umm...\nI hope you can help me with this.{be01}\nHave you heard of the Medal Rally?{be01}\n...{be01}\nReally?{be01}\nSounds like a fun event!\nI had no idea.{be01}\nThis strange man caught me off guard\nby giving me these Medals...{be01}\nI'll start collecting them...since you are.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_5 = Umm...\nI hope you can help me with this.{be01}\nI have trouble battling against Leavanny.{be01}\n...{be01}\nOf course!{be01}\nI'm glad I asked you...{be01}\nI'll have a Fire-type Pokémon battle\nLeavanny next time.{be01}\nWith this strategy,\nthere is no way I'd lose to my sis...{be01}\nNever mind!{be01}\nAhaha!{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_6 = Umm...\nI hope you can help me with this.{be01}\nI had an argument with my mom\nabout my job yesterday...{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll go apologize to my mom.\nI'll stay calm and be sincere.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_7 = Umm...\nI hope you can help me with this.{be01}\nSomebody gave me a Dowsing Machine\nthe other day and...{be01}\n...{be01}\nOh, I see!{be01}\nThe Dowsing Machine can be used\nin many places.{be01}\nI'll use mine more often from now on.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_8 = Umm...\nI hope you can help me with this.{be01}\n...{be01}\nHow do I...{be01}\nHow do I look in this cap?{be01}\n...{be01}\nAhaha!{be01}\nI'm glad I asked you...{be01}\nHey, you're making me blush!{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_9 = Umm...\nI hope you can help me with this.{be01}\nI have this person who's really\ngood at what we do at our workplace,{be00}\nand I can't help but feel competitive.{be01}\n...{be01}\nYeah!{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI guess it's not her but my own self\nthat I need to deal with.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_ErUmmImOff = Er...{be01}\nUmm...{be01}\nI'm off work today, so\ncan we meet somewhere?{be01}\nYou've been helping me a lot lately,\nso I'd love to thank you face-to-face.{be01}\n...{be01}\nReally? You can?{be01}\nGreat!{be01}\nCan we meet each other at\nthe Ferris wheel?{be01}\nI'm so looking forward to it,\n{0100:0}!{be01}
+Bank0384_Text_WentBusinessTripKanto = I went on a business trip to the Kanto\nregion the other day.{be01}\nThey let me visit Viridian Forest, and\nI saw Pikachu there.{be01}\nIt's funny that they look so cool just\nby being an Electric type.{be01}\nAhaha!{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBusinessTripJohto = I went on a business trip to the Johto\nregion the other day.{be01}\nThey have many traditional buildings,\nand they are really mysterious.{be01}\nI managed to go to the Lake of Rage\nfor fishing, too! It was a tiring trip,{be00}\nbut I had a great time!{be01}\nAhaha!{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_TeeHeeHahaOh = ...{be01}\nTee hee.{be01}\n...{be01}\nHaha!{be01}\nOh, sorry!{be01}\nI couldn't help smiling 'cause\nI'm talking to you.{be01}\nAhaha!{be01}\nIt's so much fun talking to you,\n{0100:0}!{be00}\nI wish it would last forever!{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBusinessTripSinnoh = I went on a business trip to the Sinnoh\nregion the other day.{be01}\nThe vast wilderness there was\nso breathtaking!{be01}\nI managed to go to Lake Verity to go\nfishing, too!{be01}\nIt was a tiring trip, but I had a\ngreat time!{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_StarsLastNightWere = The stars last night were so\nbeautiful...{be01}\nDid you see them by any chance,\n{0100:0}?{be01}\nI saw lots of shooting stars, too.\nIt really was a pretty night.{be01}\nI saw so many that I managed to\nmake a wish upon one of them.{be01}\nWhat?{be01}\nAhaha!{be01}\nI can't tell you what I wished for.{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBattleInstituteNimbasa = I went to the Battle Institute in\nNimbasa City to take the Battle Test.{be01}\nI did a little better than the last time!{be01}\nI'll keep trying to get better results!{be01}\nI'd appreciate it if you could tell me\nabout Pokémon battles. Can you?{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBusinessTripHoenn = I went on a business trip to the Hoenn\nregion the other day.{be01}\nThey have many unique towns and cities.\nThey really surprised me!{be01}\nI managed to go to the Meteor Falls\nto go fishing, too!{be01}\nIt was a tiring trip, but I had a\ngreat time!{be01}\nAhaha!{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_UsingDowsingMachineOther = I was using the Dowsing Machine the other\nday and got something really awesome.{be01}\nI gave it to my mom, and she was so happy.{be01}\nI'm glad you told me about the\nDowsing Machine a while ago,{be00}\n{0100:0}!{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_OhSorryItsAlmost = Oh!{be01}\nSorry, {0100:0}.{be01}\nIt's almost time for work...{be01}\nI have to hang up...{be01}\nSo sorry...{be01}
+Bank0384_Text_ImBreakRightNow = I'm on my break right now.\nCouldn't help answering...{be00}\n'cause I wanted to talk to you!{be01}\nIt's voice only, so sorry!{be01}\nAhaha!{be01}\nMy job keeps me busy, and\nI was just about to collapse...{be01}\nBut hearing your voice is\ngiving me energy, {0100:0}!{be01}\nOops!{be01}\nMy break is over.\nI have to go back to work.{be01}
+Bank0384_Text_FoundNiceFishingSpot = I found a nice fishing spot\nwith a great view the other day.{be01}\nThat spot may look totally\ndifferent depending on the season.{be01}\nLet's go fishing together\nsometime soon.{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_LandedHugeBasculinOther = I landed a huge Basculin\nthe other day.{be01}\nIt was the biggest one I've ever caught!{be01}\nI really wanted to show it to you,\n{0100:0}.{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_JustThinkingAboutWhat = I was just thinking about you,\n{0100:0}.{be01}\n...What did I just say?{be01}\n...{be01}\nAhaha!{be01}\nEr...\nWell... I have to get back to work now.{be01}
+Bank0384_Text_IveBeenTooBusy = I've been too busy and\nsleep deprived lately.{be01}\nIf it wasn't you I was talking to,\n{0100:0},{be00}\nI'd have fallen asleep by now.{be01}\nAhaha!{be01}\nOops!\nI have to go back to work.{be01}
+Bank0384_Text_WeatherBearableTodayIsnt = The weather is bearable today, isn't it?{be01}\nI'd go fishing if not for my work...{be01}\nBut I'm OK for now because\nI got to talk to you, {0100:0}.{be01}\nAhaha!{be01}\nOops!\nI have to go back to work.{be01}
+Bank0384_Text_CanHearOhReception = ...{be01}\n...?{be01}\n...{be01}\n...??{be01}\n...{be01}\n...???{be01}\n...Can you hear me?{be01}\nOh!{be01}\nThe reception was so bad,\nwasn't it?{be01}\nAhaha!{be01}\nI'm so embarrassed for\nbeing so loud just now.{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_StopHeySighSorry = Stop that!{be01}\nHey!{be01}\nSigh...{be01}\nSorry...{be01}\nThat was my sister and brother\nbothering me...{be01}\nThey seem to get jealous\nwhen I talk to you, {0100:0}.{be01}\nAhaha!{be01}\nThey are usually bratty, but I guess\nthey can be cute sometimes.{be01}\nArg! Hey, I said “stop"!{be01}\nSigh...{be01}\nSorry, {0100:0}.\nIt seems that I have to spend time with{be00}\nthem today...{be01}
+Bank0384_Text_CoughCoughSorryGot = Cough, cough.{be01}\nSorry...\nI got a cold, it seems...{be01}\n...{be01}\nYeah...\nI'm really sorry. Cough... I guess so.{be01}\nI'll stay home\nand rest for now.{be01}\nBut...\nSeeing your face should help{be00}\nme recover sooner, {0100:0}.{be01}\nAhaha!{be01}
+Bank0384_Text_BoughtSodaPopFrom = I bought a Soda Pop from this\nvending machine the other day.{be01}\nGuess what!{be01}\nI got an extra as a bonus.{be01}\nIt's great, isn't it?\nHave you got a bonus before, {0100:0}?{be01}\nI would have shared it with you,\nhad we been together then...{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_OhSorryIveKept_2 = Oh, sorry I've kept you wai...\nUh-oh.
+Bank0384_Text_SorryAboutLastTime = Sorry about last time!{be01}\nThis person from work\nanswered my Xtransceiver by mistake...{be01}\nSorry I wasn't there to answer you\nwhen you took your time to reach me...{be01}\nI guess taking a break when you aren't\nsupposed to gets you sooner or later.{be01}\nHuh?{be01}\nOh, I was just talking to myself.{be01}\nAhaha!{be01}\nOops!\nTime's up.{be00}\nI have to get back to work.{be01}
+Bank0384_Text_WhatWantSeeNow = ...{be01}\nWhat? You want to see me now?{be01}\nHold... Hold on a sec...{be01}\n...{be01}\nYep!\nI think I can make it.{be01}\nHow about meeting up\nat the Ferris wheel in Nimbasa City?{be01}\nI'm sooo looking forward to it,\n{0100:0}!{be01}
+Bank0384_Text_SeeLater = See you later.{be01}
+Bank0384_Text_GoodBye_7 = Good-bye.{be01}
+Bank0384_Text_Bye = Bye!{be01}
+Bank0384_Text_TalkLater = Talk to you later.{be01}
+Bank0384_Text_TalkSoon = Talk to you soon.{be01}
+Bank0384_Text_Hi = Hi...\nIs this {0100:0}?{be01}\n...{be01}
+Bank0384_Text_Hello_5 = ...Hello?{be01}
+Bank0384_Text_Hello_6 = ...Hello?{be01}
+Bank0384_Text_Hello_7 = ...Hello?{be01}
+Bank0384_Text_HelloAhMustRight_2 = ...Hello?{be01}\nAh, you must be {0100:0}, right?
+Bank0384_Text_AhYeahCanTalk_3 = Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
+Bank0384_Text_AhYeahCanTalk_4 = Ah, {0100:0}!{be01}\nYeah, I can talk right now.{be01}
+Bank0384_Text_AhImGladWe_2 = Ah, {0100:0}!{be01}\nI'm...glad we can talk face-to-face.{be01}
+Bank0384_Text_OhSorryIveKept_3 = Oh, sorry I've kept you waiting!{be01}
+Bank0384_Text_Empty_21 = ...
+Bank0384_Text_Know_2 = You know...
+Bank0384_Text_Well_2 = Well...
+Bank0384_Text_Ahaha_2 = Ahaha!
+Bank0384_Text_WowYoureBoyIts = Wow, so you're a boy, {0100:0}?{be01}\nIt's a little annoying that we can't\nsee each other, right?{be01}\nJust so you know...{be01}\nI'm a girl.{be01}\nTee hee.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_WowYoureBoyIts_2 = Wow, so you're a boy, {0100:0}?{be01}\nIt's a little annoying that we can't\nsee each other, right?{be01}\nJust so you know...{be01}\nI'm a girl.{be01}\nTee hee.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_HobbySeeSoundsKind = {010f:1} is your hobby,\n{0100:0}? I see.{be01}\nThat sounds kind of fun.\nMaybe I should take it up, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ThatsHobbySeeSounds = That's your hobby,\n{0100:0}? I see.{be01}\nThat sounds kind of fun.\nMaybe I should take it up, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyLikeTypePokemon = Really?\nSo you like {0103:1}-type Pokémon,{be00}\n{0100:0}?{be01}\nMany of them are cute, aren't they?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyLikePokemonType = Really?\nSo you like Pokémon of that type,{be00}\n{0100:0}?{be01}\nMany of them are cute, aren't they?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyListenMusicOften = Really? So you listen to music often,\n{0100:0}?{be01}\n{010f:1}, did you say?\nI like music, too.{be00}\nIt makes me smile just listening to it.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyListenKindMusic = Really? So you listen to\nthat kind of music often, {0100:0}?{be01}\nI like music, too.\nIt makes me smile just listening to it.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyPokemonFavoritePokemon = Really?\n{010f:1} Pokémon are{be00}\nyour favorite, {0100:0}?{be01}\n{010f:1} Pokémon are quite\npopular among many of my friends, too!{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyThatsKindPokemon = Really?\nThat's the kind of Pokémon you like,{be00}\n{0100:0}?{be01}\nThose Pokémon are quite\npopular among many of my friends, too!{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyWaySpendingHoliday = Really? {010f:1} is your way of\nspending the holiday?{be01}\nI wouldn't have guessed that,\n{0100:0}.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyThatsWaySpending = Really? That's your way of\nspending the holiday?{be01}\nI wouldn't have guessed that,\n{0100:0}.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallySThoseOften = Really? {010f:1}s? You do\nthose often, {0100:0}?{be01}\nCan we do that when we have a\nchance to? {010f:1}?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyThatsHowCommunicate = Really? That's how you communicate\nwith your friends through Pokémon?{be01}\nCan we do that when we have a\nchance to?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyWhatWantBecome = Really? {010f:1} is what you\nwant to become, {0100:0}?{be01}\nI think it's wonderful for anyone to have\na dream. I must work hard, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_ReallyThatsWhatWant = Really? That's what you\nwant to become, {0100:0}?{be01}\nI think it's wonderful for anyone to have\na dream. I must work hard, too.{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be00}\nTalk to you again.{be01}
+Bank0384_Text_GreatHaveGymBadges = Great, {0100:0}!{be01}\nYou have {0200:1} Gym Badges?\nYou are a tough Trainer, aren't you?{be01}\n...{be01}\nOops!{be01}\nMy colleague is calling me.\nI have to get back to work!{be01}
+Bank0384_Text_AmOffTodayThinking = I am off today, so I was thinking\nI could pick up my Xtransceiver.{be00}\nThe one you've been keeping for me...{be01}\nAre you busy, {0100:0}?{be01}\n...{be01}\nReally? You aren't?{be01}\nGood.{be01}\nCan we meet at the Ferris wheel\nin Nimbasa City?{be01}\nI'm looking forward to seeing you there,\n{0100:0}!{be01}
+Bank0384_Text_ThankOtherDaySurprised = Thank you for the other day!{be01}\nI was surprised you were my age!\nI was guessing you would be older{be00}\nthan me from your voice.{be01}\nIt made me a little nervous\non the Xtransceiver, you know?{be01}\nI'm kind of relieved that I can relax\nfrom now on when we talk.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_HobbyCookingWhenHear = My hobby is cooking.{be01}\nWhen I hear about good food, I go and\ncheck it out for myself.{be01}\nLately, the Casteliacones in Castelia City\nare getting quite popular, so I've been{be00}\nwanting to try one...{be01}\nBut there is a long line every time\nI go there, so I haven't tried it yet.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_LikeNormalTypePokemon = I like Normal-type Pokémon a lot!{be01}\nThey can become whatever they want\nto be if they work hard.{be01}\nDon't you agree they have that\nkind of charm?{be01}\nBesides, there are so many cute Pokémon\namong them!{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_LoveMusicListenPop = I love music.\nI listen to pop often, I think.{be01}\nListening to music makes you smile,\ndoesn't it?{be01}\nI may not look it, but I'm pretty good at\nsinging and that stuff.{be01}\nI'd like you to listen to me sing when we\nhave the opportunity, if you don't mind.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_HaveParticipatedPokemonMusical_2 = {0100:0},\nhave you participated in the{be00}\nPokémon Musical?{be01}\nI've been wanting to play Dress Up with\nmy Pokémon. I'll make it cute and have{be00}\nit participate in a musical.{be01}\nWhen my Pokémon would receive fan\nletters, they'd help keep it motivated.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_UsuallyGoWalkDays = I usually go for a walk on my days off.\nWalking at my own pace, seeing different{be00}\nthings alone is a good change of pace.{be01}\nI went to Nimbasa City for a walk that day\nand dropped my Xtransceiver.{be01}\nI can say my walking let us meet,\n{0100:0}.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_TradePokemonOftenJob = I trade Pokémon often.{be01}\nMy job requires me to go to various\nregions, so I trade with people there{be00}\nfor the memories.{be01}\nI'd love to trade Pokémon with you\nsomeday, you know.{be01}\n...{be01}\n{0100:0}!{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_WantBecomeSomeoneCool_2 = I want to become someone cool.{be01}\nI don't mean someone who appears cool.\nI'm talking about substance.{be01}\nI have a long way to go...{be01}\nBut I believe I'll one day become\nsomeone with cool substance{be00}\nby working hard at my job.{be01}\nI hope...you'd support me.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_DadBrotherWereHaving = My dad and my brother were having\na Pokémon battle the other day.{be01}\nThey were having so much fun!{be01}\nThen my sister started crying,\nsaying she wants a Pokémon, too.{be00}\nTook us some time to calm her down.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_TimeFliesWhenTalk_2 = Time flies when I talk to you,\n{0100:0}.{be01}\nI must be having a really good time!{be01}\nAhaha!{be01}\nCalls from you are always\nwelcome, you know.{be01}\n...{be01}\nI should get back to work now.\nTalk to you later, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_10 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nHave you seen what they call\ndark tall grass?{be01}\n...{be01}\nI see...{be01}\nSo high-level Pokémon may jump\nout at you...{be01}\nI knew it was a dangerous kind of\ntall grass.{be01}\nI should tell my brother and sister\nto be careful, then.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_11 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI want to give my sister a Pokémon.{be01}\n...{be01}\nI guess you are right.\nYou think her first Pokémon should be{be00}\nof {0103:1} type?{be00}\nI'll go catch one with my sister soon!{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_12 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI just made a mistake at work.{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll keep in mind not to make\nthe same mistake twice.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_13 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nHave you heard of the Medal Rally?{be01}\n...{be01}\nReally?{be01}\nSounds like a fun event!\nI had no idea.{be01}\nThis strange man caught me off guard\nby giving me these Medals...{be01}\nI'll start collecting them since you are.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_14 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI have trouble battling against\nmy brother's Leavanny.{be01}\n...{be01}\nOf course!{be01}\nI'm glad I asked you...{be01}\nI'll have a Fire-type Pokémon battle\nLeavanny next time.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_15 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI had an argument with my dad\nabout my job yesterday...{be01}\n...{be01}\nYeah...{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI'll go apologize to my dad.\nI'll stay calm and be sincere.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_16 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nSomebody gave me a Dowsing Machine\nthe other day and...{be01}\n...{be01}\nOh, I see!{be01}\nThe Dowsing Machine can be used\nin so many places.{be01}\nI'll use mine often from now on.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_17 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\n...{be01}\nHow do I...{be01}\nHow do I look with this hat?{be01}\n...{be01}\nAhaha!{be01}\nI'm glad I asked you...{be01}\nHey, you are making me blush!{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_UmmHopeCanHelp_18 = Umm...{be01}\nI hope you can help me\nwith this.{be01}\nI have this person who's really\ngood at what we do at our workplace,{be00}\nand I can't help but feel so competitive.{be01}\n...{be01}\nYeah!{be01}\nI feel better talking to you,\n{0100:0}.{be01}\nI guess it's not him but my own self\nthat I must overcome.{be01}\nThanks, {0100:0}.{be01}
+Bank0384_Text_ErUmmAmOff = Er...{be01}\nUmm...{be01}\nI am off today, so\ncan we meet somewhere?{be01}\nYou've been helping me a lot lately,\nso I'd love to thank you face-to-face.{be01}\n...{be01}\nReally? You can?{be01}\nGreat!{be01}\nCan we meet each other at\nthe Ferris wheel?{be01}\nI'm...so looking forward to it,\n{0100:0}!{be01}
+Bank0384_Text_WentBusinessTripKanto_2 = I went on a business trip to the Kanto\nregion the other day.{be01}\nThey let me visit Mt. Moon, and\nI saw Clefairy there.{be01}\nThey were so cute!{be01}\nTee hee!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBusinessTripJohto_2 = I went on a business trip to the Johto\nregion the other day.{be01}\nThey have many traditional buildings,\nand they are really mysterious.{be01}\nTheir famous RageCandyBar was\nreally good, too!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_TeeHeeHahaOh_2 = ...{be01}\nTee hee.{be01}\n...{be01}\nHaha!{be01}\nOh, sorry!{be01}\nI couldn't help smiling 'cause\nI'm talking to you.{be01}\nAhaha!{be01}\nIt's so much fun talking to you,\n{0100:0}!{be00}\nI wish...it would last forever.{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBusinessTripSinnoh_2 = I went on a business trip to the Sinnoh\nregion the other day.{be01}\nThe vast wilderness there was so\nbreathtaking!{be01}\nTheir famous Old Gateau was\nreally good, too!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_StarsLastNightWere_2 = The stars last night were\nso beautiful...{be01}\nDid you see them by any chance,\n{0100:0}?{be01}\nI saw lots of shooting stars, too.\nIt really was a pretty night.{be01}\nI saw so many that I made\nmany wishes.{be01}\nWhat?{be01}\nAhaha!{be01}\nI can't tell you what I wished for...{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBattleInstituteNimbasa_2 = I went to the Battle Institute in\nNimbasa City to take the Battle Test.{be01}\nI did a little better than the last time!{be01}\nI'll keep trying to get better results!{be01}\nI'd appreciate it if you could tell me\nabout Pokémon battles, please?{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_WentBusinessTripHoenn_2 = I went on a business trip to the Hoenn\nregion the other day.{be01}\nThey have many unique towns and cities.\nThey really surprised me!{be01}\nTheir famous Lava Cookie was\nreally good, too!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_UsingDowsingMachineOther_2 = I was using the Dowsing Machine the other\nday and got something really awesome.{be01}\nI gave it to my dad, and he was\nreally pleased.{be01}\nI'm glad you told me about the\nDowsing Machine a while ago,{be00}\n{0100:0}!{be01}\n...{be01}\nOops!{be01}\nI better get back to work!{be01}
+Bank0384_Text_OhSorryItsAlmost_2 = Oh!{be01}\nSorry, {0100:0}.{be01}\nIt's almost time for work...{be01}\nI have to hang up...{be01}\nSo sorry...{be01}
+Bank0384_Text_ImBreakRightNow_2 = I'm on my break right now.\nCouldn't help answering{be00}\n'cause I wanted to talk to you!{be01}\nIt's voice only, sorry!{be01}\nAhaha!{be01}\n...{be01}\nMy job keeps me busy, and\nI was just about to collapse...{be01}\nBut hearing your voice is\ngiving me energy, {0100:0}!{be01}\nOops!{be01}\nMy break is over.\nI have to go back to work.{be01}\nNext time, I want to be looking at\nyour face while we talk.{be01}
+Bank0384_Text_FoundNiceWalkingSpot = I found a nice walking spot\nwith a wonderful view the other day.{be01}\nThat spot may look totally\ndifferent depending on the season.{be01}\nMaybe we could go for a walk together\nsometime soon...{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_FoundShopBakesReally = I found this shop that bakes really\ngood cakes the other day.{be01}\nThey bake things that taste mysterious.\nI've never tasted anything like them.{be01}\nMaybe we could go there together\nsometime soon...{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_JustThinkingAboutWhat_2 = I was just thinking about you,\n{0100:0}.{be01}\n...What did I just say?{be01}\n...{be01}\nAhaha!{be01}\nEr...\nWell... I have to go back to work now.{be01}
+Bank0384_Text_IveBeenTooBusy_2 = I've been too busy and\nsleep deprived lately.{be01}\nIf it wasn't you I was talking to,\n{0100:0},{be00}\nI'd have fallen asleep by now.{be01}\nAhaha!{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_WeatherBearableTodayIsnt_2 = The weather is bearable today, isn't it?{be01}\nI'd go for a walk if not for my work...{be01}\nBut I'm OK for now, because\nI got to talk to you, {0100:0}.{be01}\nTee hee!{be01}\n...{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_CanHearOhReception_2 = ...{be01}\n...?{be01}\n...{be01}\n...??{be01}\n...{be01}\n...???{be01}\n...Can you hear me?{be01}\nOh!{be01}\nThe reception was so bad,\nwasn't it?{be01}\nAhaha!{be01}\nI'm so embarrassed for\nbeing so loud just now.{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_StopHeySighSorry_2 = Stop that!{be01}\nHey!{be01}\nSigh...{be01}\nSorry...{be01}\nThat was my sister and brother\nbothering me...{be01}\nThey seem to get jealous\nwhen I talk to you, {0100:0}.{be01}\nAhaha!{be01}\nThey are usually bratty, but I guess\nthey can be cute sometimes.{be01}\nArg! Hey, I said “stop"!{be01}\nSigh...{be01}\nSorry, {0100:0}.\nIt seems that I have to spend time with{be00}\nthem today...{be01}
+Bank0384_Text_CoughCoughSorryGot_2 = Cough, cough.{be01}\nSorry...\nI got a cold, it seems...{be01}\n...{be01}\nYeah...\nI'm really sorry. Cough... I guess so.{be01}\nI'll stay home\nand rest for now.{be01}\nBut...\nSeeing your face should help{be00}\nme recover sooner, {0100:0}.{be01}\nAhaha!{be01}
+Bank0384_Text_BoughtSodaPopFrom_2 = I bought a Soda Pop from this\nvending machine the other day.{be01}\nGuess what!{be01}\nI got an extra as a bonus.{be01}\nIt's great, isn't it?\nHave you got a bonus before, {0100:0}?{be01}\nI would have shared it with you,\nhad we been together then...{be01}\nOops!\nI have to get back to work.{be01}
+Bank0384_Text_OhSorryIveKept_4 = Oh, sorry I've kept you wai...\nUh-oh.
+Bank0384_Text_SorryAboutLastTime_2 = Sorry about last time!{be01}\nThis person from work\nanswered my Xtransceiver by mistake...{be01}\nSorry I wasn't there to answer you\nwhen you took your time to reach me...{be01}\nI guess taking a break when you aren't\nsupposed to gets you sooner or later.{be01}\nHuh?{be01}\nOh, I was just talking to myself.{be01}\nAhaha!{be01}\nOops!\nTime's up.{be00}\nI have to get back to work.{be01}
+Bank0384_Text_WhatWantSeeNow_2 = ...{be01}\nWhat? You want to see me now?{be01}\nHold... Hold on a sec...{be01}\n...{be01}\nYep!\nI think I can make it.{be01}\nHow about meeting up\nat the Ferris wheel in Nimbasa City?{be01}\nI'm sooo looking forward to it,\n{0100:0}!{be01}
+Bank0384_Text_SeeLater_2 = See you later.{be01}
+Bank0384_Text_GoodBye_8 = Good-bye.{be01}
+Bank0384_Text_Bye_2 = Bye!{be01}
+Bank0384_Text_TalkLater_2 = Talk to you later.{be01}
+Bank0384_Text_TalkSoon_2 = Talk to you soon.{be01}
 \pad{f0}

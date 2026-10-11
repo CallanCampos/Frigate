@@ -1,0 +1,174 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Skiploom",
+    "pokedex": {
+        "category": "Cottonweed Pokémon",
+        "entry": "It blooms when the weather warms.\nIt floats in the sky to soak up as\nmuch sunlight as possible.",
+        "height": "2'00\"",
+        "weight": "2.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Skiploom",
+                "category": "Cottonweed Pokémon",
+                "entry": "It blooms when the weather warms.\nIt floats in the sky to soak up as\nmuch sunlight as possible.",
+                "height": "2'00\"",
+                "weight": "2.2 lbs."
+            },
+            "fr": {
+                "name": "Floravol",
+                "category": "Pokémon Pissenlit",
+                "entry": "Il fleurit lorsque les températures\nremontent. Il flotte dans le ciel\npour absorber les rayons du soleil.",
+                "height": "0,6 m",
+                "weight": "1,0 kg"
+            },
+            "de": {
+                "name": "Hubelupf",
+                "category": "Löwenzahn",
+                "entry": "Sobald es wärmer wird, blüht es auf.\nEs schwebt am Himmel und nimmt so\nviel Sonnenlicht auf wie möglich.",
+                "height": "0,6 m",
+                "weight": "1,0 kg"
+            },
+            "it": {
+                "name": "Skiploom",
+                "category": "Pokémon Gramigna",
+                "entry": "Il suo fiore sboccia appena l'aria\nsi riscalda. Fluttua nel cielo per\nassorbire l'energia solare.",
+                "height": "0,6 m",
+                "weight": "1,0 kg"
+            },
+            "ko": {
+                "name": "두코",
+                "category": "솜풀포켓몬",
+                "entry": "기온이 높아지면 꽃이 핀다.\n하늘에 떠서 햇살을\n가득 쬐려고 한다.",
+                "height": "0.6 m",
+                "weight": "1.0 kg"
+            },
+            "es": {
+                "name": "Skiploom",
+                "category": "Pokémon Algadón",
+                "entry": "Florece en épocas cálidas. Flota en el\naire para absorber toda la luz solar\nque puede.",
+                "height": "0,6 m",
+                "weight": "1,0 kg"
+            },
+            "ja": {
+                "name": "ポポッコ",
+                "category": "わたくさポケモン",
+                "entry": "きおんが\\x{3000}たかくなると\\x{3000}はなひらく。\nそらに\\x{3000}うかんで\\x{3000}ひざしを\nいっぱい\\x{3000}あびようとする。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 45,
+        "defense": 50,
+        "speed": 80,
+        "special_attack": 45,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_GRASS", "TYPE_FLYING" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FAIRY", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_LEAF_GUARD" ],
+    "hidden_ability": "ABILITY_INFILTRATOR",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 119,
+    "height": 6,
+    "weight": 10,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SPLASH" ],
+            [ 1, "MOVE_SYNTHESIS" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 4, "MOVE_SYNTHESIS" ],
+            [ 7, "MOVE_TAIL_WHIP" ],
+            [ 10, "MOVE_TACKLE" ],
+            [ 12, "MOVE_POISON_POWDER" ],
+            [ 14, "MOVE_STUN_SPORE" ],
+            [ 16, "MOVE_SLEEP_POWDER" ],
+            [ 20, "MOVE_BULLET_SEED" ],
+            [ 24, "MOVE_LEECH_SEED" ],
+            [ 28, "MOVE_MEGA_DRAIN" ],
+            [ 32, "MOVE_ACROBATICS" ],
+            [ 36, "MOVE_RAGE_POWDER" ],
+            [ 40, "MOVE_COTTON_SPORE" ],
+            [ 44, "MOVE_U_TURN" ],
+            [ 48, "MOVE_WORRY_SEED" ],
+            [ 52, "MOVE_GIGA_DRAIN" ],
+            [ 56, "MOVE_BOUNCE" ],
+            [ 60, "MOVE_MEMENTO" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM33",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM62",
+            "TM70",
+            "TM75",
+            "TM77",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_BOUNCE",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 27,
+            "species": "SPECIES_JUMPLUFF"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_HOPPIP"
+}

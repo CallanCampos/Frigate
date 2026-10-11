@@ -1,0 +1,181 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Nosepass",
+    "pokedex": {
+        "category": "Compass Pokémon",
+        "entry": "Its magnetic nose always faces north\nand draws iron objects to its body\nto protect itself better.",
+        "height": "3'03\"",
+        "weight": "213.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Nosepass",
+                "category": "Compass Pokémon",
+                "entry": "When endangered, it may protect\nitself by raising its magnetism and\ndrawing iron objects to its body.",
+                "height": "3'03\"",
+                "weight": "213.8 lbs."
+            },
+            "fr": {
+                "name": "Tarinor",
+                "category": "Pokémon Boussole",
+                "entry": "Face au danger, il se protège en\naugmentant son magnétisme et en\nattirant tout objet métallique.",
+                "height": "1,0 m",
+                "weight": "97,0 kg"
+            },
+            "de": {
+                "name": "Nasgnet",
+                "category": "Kompass",
+                "entry": "Es schützt sich bei Gefahr durch\nGegenstände aus Eisen, die es mit\nerhöhtem Magnetismus an sich zieht.",
+                "height": "1,0 m",
+                "weight": "97,0 kg"
+            },
+            "it": {
+                "name": "Nosepass",
+                "category": "Pokémon Bussola",
+                "entry": "Quando è in pericolo si protegge con\nla sua forza magnetica, attirando\noggetti di ferro su di sé.",
+                "height": "1,0 m",
+                "weight": "97,0 kg"
+            },
+            "ko": {
+                "name": "코코파스",
+                "category": "콤파스포켓몬",
+                "entry": "궁지에 몰리면 자력을 강화하여\n주변에 있는 쇠뭉치를\n끌어들여 몸을 방어하기도 한다.",
+                "height": "1.0 m",
+                "weight": "97.0 kg"
+            },
+            "es": {
+                "name": "Nosepass",
+                "category": "Pokémon Brújula",
+                "entry": "Se protege del peligro aumentando\nsu magnetismo y atrayendo objetos\nde hierro hacia sí.",
+                "height": "1,0 m",
+                "weight": "97,0 kg"
+            },
+            "ja": {
+                "name": "ノズパス",
+                "category": "コンパスポケモン",
+                "entry": "ピンチになると\\x{3000}じりょくを\\x{3000}つよめ\nまわりにある\\x{3000}てつの\\x{3000}かたまりを\nひきよせて\\x{3000}みをまもることも\\x{3000}ある。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff19}\\x{ff17}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 45,
+        "defense": 135,
+        "speed": 30,
+        "special_attack": 45,
+        "special_defense": 90
+    },
+    "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_HARD_STONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_MAGNET_PULL" ],
+    "hidden_ability": "ABILITY_SAND_FORCE",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 75,
+    "height": 10,
+    "weight": 970,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 4, "MOVE_HARDEN" ],
+            [ 8, "MOVE_BLOCK" ],
+            [ 11, "MOVE_ROCK_THROW" ],
+            [ 15, "MOVE_THUNDER_WAVE" ],
+            [ 18, "MOVE_ROCK_BLAST" ],
+            [ 22, "MOVE_REST" ],
+            [ 25, "MOVE_SPARK" ],
+            [ 29, "MOVE_ROCK_SLIDE" ],
+            [ 32, "MOVE_POWER_GEM" ],
+            [ 36, "MOVE_SANDSTORM" ],
+            [ 39, "MOVE_DISCHARGE" ],
+            [ 43, "MOVE_EARTH_POWER" ],
+            [ 46, "MOVE_STONE_EDGE" ],
+            [ 50, "MOVE_LOCK_ON" ],
+            [ 50, "MOVE_ZAP_CANNON" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM21",
+            "TM23",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM69",
+            "TM71",
+            "TM72",
+            "TM73",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_GRAVITY",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [ "MOVE_MAGNITUDE", "MOVE_ROLLOUT", "MOVE_DOUBLE_EDGE", "MOVE_BLOCK", "MOVE_STEALTH_ROCK", "MOVE_ENDURE" ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL_MAGNETIC_FIELD",
+            "param": 0,
+            "species": "SPECIES_PROBOPASS"
+        }
+    ],
+    "regional_dex_number": 164,
+    "baby_species": "SPECIES_NOSEPASS"
+}

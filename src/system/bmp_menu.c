@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
@@ -20,7 +21,7 @@
 // Menus of options in columns, with a cursor, and the yes/no menu made from one
 
 // The yes/no menu's messages
-#define MSG_YESNO 440
+#define MSG_YESNO TEXT_BANK_YES_NO
 #define MSG_YESNO_YES 0
 #define MSG_YESNO_NO 1
 

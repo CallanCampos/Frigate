@@ -1,0 +1,166 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Kricketune",
+    "pokedex": {
+        "category": "Cricket Pokémon",
+        "entry": "There is a village that hosts a\ncontest based on the amazingly\nvariable cries of this Pokémon.",
+        "height": "3'03\"",
+        "weight": "56.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Kricketune",
+                "category": "Cricket Pokémon",
+                "entry": "There is a village that hosts a\ncontest based on the amazingly\nvariable cries of this Pokémon.",
+                "height": "3'03\"",
+                "weight": "56.2 lbs."
+            },
+            "fr": {
+                "name": "Mélokrik",
+                "category": "Pokémon Criquet",
+                "entry": "Ses cris sont tellement variés qu'il\nexiste un village où on organise\ndes concours en leur honneur.",
+                "height": "1,0 m",
+                "weight": "25,5 kg"
+            },
+            "de": {
+                "name": "Zirpeise",
+                "category": "Zirper",
+                "entry": "Es gibt ein Dorf, das basierend auf\nden imposanten Rufen dieses Pokémon\neinen Wettbewerb veranstaltet.",
+                "height": "1,0 m",
+                "weight": "25,5 kg"
+            },
+            "it": {
+                "name": "Kricketune",
+                "category": "Pokémon Grillo",
+                "entry": "C'è un villaggio che organizza una gara\nbasata sulle melodie incredibilmente\nvarie di questo Pokémon.",
+                "height": "1,0 m",
+                "weight": "25,5 kg"
+            },
+            "ko": {
+                "name": "귀뚤톡크",
+                "category": "귀뚜라미포켓몬",
+                "entry": "변화무쌍한 울음소리를 겨루는\n울음소리 비교 놀이를\n즐기는 마을이 있다.",
+                "height": "1.0 m",
+                "weight": "25.5 kg"
+            },
+            "es": {
+                "name": "Kricketune",
+                "category": "Pokémon Grillo",
+                "entry": "Hay un pueblo en el que celebran\nun concurso basado en la increíble\nvariedad de sus gritos.",
+                "height": "1,0 m",
+                "weight": "25,5 kg"
+            },
+            "ja": {
+                "name": "コロトック",
+                "category": "こおろぎポケモン",
+                "entry": "へんげんじざいの\\x{3000}なきごえを\nきそいあわせる\\x{3000}なきくらべ\\x{3000}という\nあそびを\\x{3000}たのしむ\\x{3000}むらがある。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff15}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 77,
+        "attack": 85,
+        "defense": 51,
+        "speed": 65,
+        "special_attack": 55,
+        "special_defense": 51
+    },
+    "types": [ "TYPE_BUG", "TYPE_BUG" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_METRONOME",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SWARM", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TECHNICIAN",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 134,
+    "height": 10,
+    "weight": 255,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_BIDE" ],
+            [ 10, "MOVE_FURY_CUTTER" ],
+            [ 14, "MOVE_LEECH_LIFE" ],
+            [ 18, "MOVE_SING" ],
+            [ 22, "MOVE_FOCUS_ENERGY" ],
+            [ 26, "MOVE_SLASH" ],
+            [ 30, "MOVE_X_SCISSOR" ],
+            [ 34, "MOVE_SCREECH" ],
+            [ 38, "MOVE_TAUNT" ],
+            [ 42, "MOVE_NIGHT_SLASH" ],
+            [ 46, "MOVE_BUG_BUZZ" ],
+            [ 50, "MOVE_PERISH_SONG" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM31",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM54",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM76",
+            "TM81",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_UPROAR",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_HEAL_BELL",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_KRICKETOT"
+}

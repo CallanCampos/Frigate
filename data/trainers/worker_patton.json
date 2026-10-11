@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Patton",
+    "class": "TRAINER_CLASS_WORKER_44",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MACHOKE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ABOMASNOW",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hold up, youngster!\nA battle will help you warm up!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hah! Battling gets me so warm that I'm\neven sweating!"
+        },
+        {
+            "type": 2,
+            "text": "You can feel my face if you don't\nbelieve me. See? Dripping with sweat!"
+        }
+    ]
+}

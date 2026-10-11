@@ -1,22 +1,22 @@
-{bd02}Unable to tolerate\n{bd02}the {0102:0} Ninja's\n{bd02}constant escapes any longer,\n{bd02}the World Police finally\n{bd02}put a plan to capture him into motion.
-{bd02}Then, Mecha Cop's exploits\n{bd02}drove the {0102:0} Ninja\n{bd02}into the heart of Castelia City!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}Unable to tolerate\n{bd02}the {0102:0} Ninja's\n{bd02}constant escapes any longer,\n{bd02}the World Police finally\n{bd02}put a plan to capture her into motion.
-{bd02}Then, Mecha Cop's exploits\n{bd02}drove the {0102:0} Ninja\n{bd02}into the heart of Castelia City!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0273_Text_UnableTolerateNinjasConstant = {bd02}Unable to tolerate\n{bd02}the {0102:0} Ninja's\n{bd02}constant escapes any longer,\n{bd02}the World Police finally\n{bd02}put a plan to capture him into motion.
+Bank0273_Text_ThenMechaCopsExploits = {bd02}Then, Mecha Cop's exploits\n{bd02}drove the {0102:0} Ninja\n{bd02}into the heart of Castelia City!
+Bank0273_Text_Empty = なし
+Bank0273_Text_Empty_2 = なし
+Bank0273_Text_Empty_3 = なし
+Bank0273_Text_Empty_4 = なし
+Bank0273_Text_Empty_5 = なし
+Bank0273_Text_Empty_6 = なし
+Bank0273_Text_Empty_7 = なし
+Bank0273_Text_Empty_8 = なし
+Bank0273_Text_UnableTolerateNinjasConstant_2 = {bd02}Unable to tolerate\n{bd02}the {0102:0} Ninja's\n{bd02}constant escapes any longer,\n{bd02}the World Police finally\n{bd02}put a plan to capture her into motion.
+Bank0273_Text_ThenMechaCopsExploits_2 = {bd02}Then, Mecha Cop's exploits\n{bd02}drove the {0102:0} Ninja\n{bd02}into the heart of Castelia City!
+Bank0273_Text_Empty_9 = なし
+Bank0273_Text_Empty_10 = なし
+Bank0273_Text_Empty_11 = なし
+Bank0273_Text_Empty_12 = なし
+Bank0273_Text_Empty_13 = なし
+Bank0273_Text_Empty_14 = なし
+Bank0273_Text_Empty_15 = なし
+Bank0273_Text_Empty_16 = なし
+Bank0273_Text_Empty_17 = なし
 \pad{b4}

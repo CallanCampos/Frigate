@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Angi",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LOPUNNY",
+            "form": 0,
+            "level": 41,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LAMPENT",
+            "form": 0,
+            "level": 41,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "To battle in a high-up place...{be01}\nThis is the perfect situation for\nan Ace Trainer such as I!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "To tell the truth...\nI'm actually afraid of heights..."
+        },
+        {
+            "type": 2,
+            "text": "Overcoming one's fears is an important\npart of being an Ace Trainer!{be01}\nBut still, I hate being up so high..."
+        }
+    ]
+}

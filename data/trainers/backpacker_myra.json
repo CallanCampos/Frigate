@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Myra",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_VANILLITE",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BOUFFALANT",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I might be lost right now,\nbut I'll battle you anyway!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I don't stand a chance if I\nfight while I'm lost."
+        },
+        {
+            "type": 2,
+            "text": "I still have no idea what this\nplace is like!{be01}\nI never carry a map with me!"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LAPRAS",
+    "moves": [ "MOVE_PERISH_SONG", "MOVE_REST", "MOVE_BODY_SLAM", "MOVE_BLOCK" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

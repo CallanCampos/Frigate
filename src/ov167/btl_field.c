@@ -54,7 +54,7 @@ void func_ov167_021d59a0(u32 weather) {
 }
 
 // Function name from swan.
-u32 GetFieldWeather(void) {
+u8 GetFieldWeather(void) {
     return func_ov167_021d5ad4(&sField);
 }
 

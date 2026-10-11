@@ -1,4 +1,7 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/script_text_banks.h"
+#include "constants/text_banks.h"
 #include "battle/trainer_data.h"
 #include "field/festival.h"
 #include "field/wbt.h"
@@ -252,7 +255,7 @@ void GFL_WordSetLoadStr(WordSet *wordSet, u32 index, const u16 *str) {
 }
 
 void loadCountryToStrbuf(WordSet *wordSet, u32 index, u32 country) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, 0x1b6, wordSet->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF, wordSet->heapId);
 
     if (msgData != NULL) {
         if (country < GFL_MsgDataGetLineCount(msgData)) {
@@ -349,7 +352,7 @@ void loadJobAnswerToStrbuf(WordSet *wordSet, u32 index, u8 job) {
 }
 
 void loadBattleInstituteMsgForDisplay(WordSet *wordSet, u32 index, u32 rank) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 3, 0x295, wordSet->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10440, wordSet->heapId);
 
     GFL_WordSetClearBuf(wordSet, index);
     // BUG: the message data is not freed when the rank is out of range

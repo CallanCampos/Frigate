@@ -1,5 +1,6 @@
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/narc_intro.h"
 #include "constants/sound.h"
 #include "demo/intro.h"
 #include "demo/intro_script.h"
@@ -134,7 +135,15 @@ static void IntroCmd_End(IntroCmd *cmd, u8 slot);
 static const ClActorSetup sObjSetup = { 128, 72, 0, 0, 1 };
 
 // Professor Juniper's sprite
-static const MCSSLoadInfo sProfessorLoadInfo = { ARCID_INTRO, 25, 28, 27, 24, 30, 29, 26, 0 };
+static const MCSSLoadInfo sProfessorLoadInfo = { ARCID_INTRO,
+                                                 NARC_INTRO_PROFESSOR_NCGR,
+                                                 NARC_INTRO_PROFESSOR_NCLR,
+                                                 NARC_INTRO_PROFESSOR_NCER,
+                                                 NARC_INTRO_PROFESSOR_NANR,
+                                                 NARC_INTRO_PROFESSOR_NMCR,
+                                                 NARC_INTRO_PROFESSOR_NMAR,
+                                                 NARC_INTRO_PROFESSOR_BIN,
+                                                 0 };
 
 // INTRO_COND_*
 static IntroCondFunc sConditions[] = {

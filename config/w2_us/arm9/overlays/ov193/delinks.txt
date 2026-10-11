@@ -3,3 +3,28 @@
     .ctor       start:0x021b6a88 end:0x021b6a88 kind:rodata align:4
     .data       start:0x021b6aa0 end:0x021b7440 kind:data align:32
     .bss        start:0x021b7440 end:0x021b7720 kind:bss align:32
+
+src/ov193/pokemontrade_demo_common.c:
+    .text       start:0x021b2fc0 end:0x021b3898
+    .rodata     start:0x021b6a10 end:0x021b6a34
+    .data       start:0x021b6aa0 end:0x021b6d74
+    .bss        start:0x021b7440 end:0x021b7530
+
+src/ov193/pokemontrade_demo_up.c:
+    complete
+    .text       start:0x021b3898 end:0x021b4274
+    .data       start:0x021b6d74 end:0x021b6d8c
+
+src/ov193/pokemontrade_demo_down.c:
+    complete
+    .text       start:0x021b4274 end:0x021b527c
+    .rodata     start:0x021b6a34 end:0x021b6a50
+    .data       start:0x021b6d8c end:0x021b7060
+    .bss        start:0x021b7530 end:0x021b7620
+
+src/ov193/pokemontrade_demo_middle.c:
+    complete
+    .text       start:0x021b527c end:0x021b6a10
+    .rodata     start:0x021b6a50 end:0x021b6a88
+    .data       start:0x021b7060 end:0x021b7440
+    .bss        start:0x021b7620 end:0x021b7720

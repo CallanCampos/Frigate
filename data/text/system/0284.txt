@@ -1,21 +1,21 @@
-{bd02}Professor {0100:1} has\n{bd02}become witness to a world\n{bd02}where Pokémon control people.
-{bd02}He is attacked by a cruel\n{bd02}resident of this world named Ledian.\n{bd02}The capsule of his temporal\n{bd02}transport is taken away.
-{bd02}Ledian plans to exterminate\n{bd02}Professor {0100:1}\n{bd02}in order to silence him.
-{bd02}Can Professor {0100:1}\n{bd02}safely return to his own time?
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}Professor {0100:1} has\n{bd02}become witness to a world\n{bd02}where Pokémon control people.
-{bd02}She is attacked by a cruel\n{bd02}resident of this world named Ledian.\n{bd02}The capsule of her temporal\n{bd02}transport is taken away.
-{bd02}Ledian plans to exterminate\n{bd02}Professor {0100:1}\n{bd02}in order to silence her.
-{bd02}Can Professor {0100:1}\n{bd02}safely return to her own time?
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0284_Text_ProfessorHasBecomeWitness = {bd02}Professor {0100:1} has\n{bd02}become witness to a world\n{bd02}where Pokémon control people.
+Bank0284_Text_HeAttackedByCruel = {bd02}He is attacked by a cruel\n{bd02}resident of this world named Ledian.\n{bd02}The capsule of his temporal\n{bd02}transport is taken away.
+Bank0284_Text_LedianPlansExterminateProfessor = {bd02}Ledian plans to exterminate\n{bd02}Professor {0100:1}\n{bd02}in order to silence him.
+Bank0284_Text_CanProfessorSafelyReturn = {bd02}Can Professor {0100:1}\n{bd02}safely return to his own time?
+Bank0284_Text_Empty = なし
+Bank0284_Text_Empty_2 = なし
+Bank0284_Text_Empty_3 = なし
+Bank0284_Text_Empty_4 = なし
+Bank0284_Text_Empty_5 = なし
+Bank0284_Text_Empty_6 = なし
+Bank0284_Text_ProfessorHasBecomeWitness_2 = {bd02}Professor {0100:1} has\n{bd02}become witness to a world\n{bd02}where Pokémon control people.
+Bank0284_Text_SheAttackedByCruel = {bd02}She is attacked by a cruel\n{bd02}resident of this world named Ledian.\n{bd02}The capsule of her temporal\n{bd02}transport is taken away.
+Bank0284_Text_LedianPlansExterminateProfessor_2 = {bd02}Ledian plans to exterminate\n{bd02}Professor {0100:1}\n{bd02}in order to silence her.
+Bank0284_Text_CanProfessorSafelyReturn_2 = {bd02}Can Professor {0100:1}\n{bd02}safely return to her own time?
+Bank0284_Text_Empty_7 = なし
+Bank0284_Text_Empty_8 = なし
+Bank0284_Text_Empty_9 = なし
+Bank0284_Text_Empty_10 = なし
+Bank0284_Text_Empty_11 = なし
+Bank0284_Text_Empty_12 = なし
+Bank0284_Text_Empty_13 = なし

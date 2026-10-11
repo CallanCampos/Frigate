@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SOLROCK",
+    "moves": [ "MOVE_ZEN_HEADBUTT", "MOVE_ROCK_SLIDE", "MOVE_FIRE_BLAST", "MOVE_TRICK_ROOM" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_LIECHI_BERRY",
+    "form": 0
+}

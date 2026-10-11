@@ -1,3 +1,0 @@
-{bd02}Mic Test
-Say something into\nthe microphone.\nThe Pokémon will start singing\nif it's working.
-BACK

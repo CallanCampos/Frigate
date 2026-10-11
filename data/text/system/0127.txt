@@ -1,26 +1,26 @@
-OBLIVIOUS
-OCTAZOOKA
-OCTILLERY
-ODDISH
-ODORSLEUTH
-OHDEAR
-OHMY
-OHWELL
-OHWOW
-OHYEAH
-OK
-OKTHEN
-OLDMAN
-OMANYTE
-OMASTAR
-OMINOUSWIND
-ONIX
-OOPS
-OPPONENT
-OSHAWOTT
-OUTRAGE
-OVERCOAT
-OVERGROW
-OVERHEAT
-OWNTEMPO
+Bank0127_Text_Oblivious = OBLIVIOUS
+Bank0127_Text_Octazooka = OCTAZOOKA
+Bank0127_Text_Octillery = OCTILLERY
+Bank0127_Text_Oddish = ODDISH
+Bank0127_Text_Odorsleuth = ODORSLEUTH
+Bank0127_Text_Ohdear = OHDEAR
+Bank0127_Text_Ohmy = OHMY
+Bank0127_Text_Ohwell = OHWELL
+Bank0127_Text_Ohwow = OHWOW
+Bank0127_Text_Ohyeah = OHYEAH
+Bank0127_Text_Ok = OK
+Bank0127_Text_Okthen = OKTHEN
+Bank0127_Text_Oldman = OLDMAN
+Bank0127_Text_Omanyte = OMANYTE
+Bank0127_Text_Omastar = OMASTAR
+Bank0127_Text_Ominouswind = OMINOUSWIND
+Bank0127_Text_Onix = ONIX
+Bank0127_Text_Oops = OOPS
+Bank0127_Text_Opponent = OPPONENT
+Bank0127_Text_Oshawott = OSHAWOTT
+Bank0127_Text_Outrage = OUTRAGE
+Bank0127_Text_Overcoat = OVERCOAT
+Bank0127_Text_Overgrow = OVERGROW
+Bank0127_Text_Overheat = OVERHEAT
+Bank0127_Text_Owntempo = OWNTEMPO
 \pad{44}

@@ -2,7 +2,7 @@
 #include "field/field.h"
 #include "field/field_script.h"
 #include "field/gimmick_underground_ruins.h"
-#include "field/ov129.h"
+#include "field/sp_poke_gimmick.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
 #include "system/vm.h"
@@ -40,7 +40,7 @@ static BOOL func_ov068_021e5854(VM *vm, FieldScriptEnv *env) {
 
 static BOOL func_ov068_021e587c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameEvent *event = func_ov129_021ef3c4(FieldScriptEnv_GetGameSystem(env));
+    GameEvent *event = SpPokeGimmick_CallFormEvent(FieldScriptEnv_GetGameSystem(env));
 
     if (event == NULL) {
         return FALSE;
@@ -50,7 +50,7 @@ static BOOL func_ov068_021e587c(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL func_ov068_021e58a4(VM *vm, FieldScriptEnv *env) {
-    func_ov129_021ef3dc(FieldScriptEnv_GetGameSystem(env));
+    SpPokeGimmick_HideActor2(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
@@ -59,15 +59,15 @@ static BOOL func_ov068_021e58b4(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     FieldPlayer *player = Field_GetPlayer(field);
 
-    func_ov129_021ef078(field, ScriptReadAny(vm, env));
+    SpPokeGimmick_StartChase(field, ScriptReadAny(vm, env));
     return FALSE;
 }
 
-// Waits for func_ov129_021ef104 to return TRUE
+// Waits for SpPokeGimmick_IsChaseDone to return TRUE
 static GameEventReturnCode func_ov068_021e58e4(GameEvent *event, u32 *state, void *data) {
     Plugin16WaitData *wait = data;
 
-    if (func_ov129_021ef104(wait->field) == TRUE) {
+    if (SpPokeGimmick_IsChaseDone(wait->field) == TRUE) {
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -91,7 +91,7 @@ static BOOL func_ov068_021e58f8(VM *vm, FieldScriptEnv *env) {
 static BOOL func_ov068_021e5940(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    func_ov129_021ef120(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
+    SpPokeGimmick_DropActor(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
 

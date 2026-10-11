@@ -1,0 +1,20 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Rey",
+    "class": "TRAINER_CLASS_WORKER_44",
+    "pokemon": [
+        "jynx_2",
+        "dewgong_2",
+        "froslass_2",
+        "cryogonal_2",
+        "abomasnow_2",
+        "weavile_2",
+        "glaceon_2",
+        "beartic_4",
+        "walrein_2",
+        "mamoswine_2",
+        "lapras_2",
+        "vanilluxe_2"
+    ],
+    "messages": [ "Welcome!", "Only the winner!\nOnly the winner can celebrate.", "Enough... That's enough..." ]
+}

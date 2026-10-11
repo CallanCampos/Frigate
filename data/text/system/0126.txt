@@ -1,40 +1,40 @@
-NAME
-NAP
-NASTYPLOT
-NATU
-NATURALCURE
-NATURALGIFT
-NATURE
-NATUREPOWER
-NEEDLEARM
-NERVOUS
-NEWS
-NICE
-NIDOKING
-NIDOQUEEN
-NIDORAN♀
-NIDORAN♂
-NIDORINA
-NIDORINO
-NIGHTDAZE
-NIGHTMARE
-NIGHTSHADE
-NIGHTSLASH
-NINCADA
-NINETALES
-NINJASK
-NO
-NO1
-NOCTOWL
-NOEFFECT
-NOGUARD
-NOMATCH
-NOPE
-NOPROBLEM
-NORMAL
-NORMALIZE
-NOSEPASS
-NOWAY
-NUMEL
-NUZLEAF
+Bank0126_Text_Name = NAME
+Bank0126_Text_Nap = NAP
+Bank0126_Text_Nastyplot = NASTYPLOT
+Bank0126_Text_Natu = NATU
+Bank0126_Text_Naturalcure = NATURALCURE
+Bank0126_Text_Naturalgift = NATURALGIFT
+Bank0126_Text_Nature = NATURE
+Bank0126_Text_Naturepower = NATUREPOWER
+Bank0126_Text_Needlearm = NEEDLEARM
+Bank0126_Text_Nervous = NERVOUS
+Bank0126_Text_News = NEWS
+Bank0126_Text_Nice = NICE
+Bank0126_Text_Nidoking = NIDOKING
+Bank0126_Text_Nidoqueen = NIDOQUEEN
+Bank0126_Text_Nidoran = NIDORAN♀
+Bank0126_Text_Nidoran_2 = NIDORAN♂
+Bank0126_Text_Nidorina = NIDORINA
+Bank0126_Text_Nidorino = NIDORINO
+Bank0126_Text_Nightdaze = NIGHTDAZE
+Bank0126_Text_Nightmare = NIGHTMARE
+Bank0126_Text_Nightshade = NIGHTSHADE
+Bank0126_Text_Nightslash = NIGHTSLASH
+Bank0126_Text_Nincada = NINCADA
+Bank0126_Text_Ninetales = NINETALES
+Bank0126_Text_Ninjask = NINJASK
+Bank0126_Text_No = NO
+Bank0126_Text_No1 = NO1
+Bank0126_Text_Noctowl = NOCTOWL
+Bank0126_Text_Noeffect = NOEFFECT
+Bank0126_Text_Noguard = NOGUARD
+Bank0126_Text_Nomatch = NOMATCH
+Bank0126_Text_Nope = NOPE
+Bank0126_Text_Noproblem = NOPROBLEM
+Bank0126_Text_Normal = NORMAL
+Bank0126_Text_Normalize = NORMALIZE
+Bank0126_Text_Nosepass = NOSEPASS
+Bank0126_Text_Noway = NOWAY
+Bank0126_Text_Numel = NUMEL
+Bank0126_Text_Nuzleaf = NUZLEAF
 \pad{aa}

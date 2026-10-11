@@ -11,9 +11,10 @@
 #include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "constants/species.h"
-#include "dpw/nhttp_rap.h"
+#include "gfl/nhttp_rap.h"
 #include "gfl/clact.h"
 #include "gfl/dwc_rap.h"
+#include "gfl/dwc_rapcommon.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/net.h"
@@ -273,7 +274,7 @@ static void GSync_StateSendAnimJump(GSyncWork *wk);
 static void GSync_StateSendAnimIcon(GSyncWork *wk);
 static void GSync_StateSendShowIcon(GSyncWork *wk);
 static void GSync_StateSend(GSyncWork *wk);
-static void GSync_OnDisconnect(void *work, int a1, int code);
+static void GSync_OnDisconnect(void *work, int a1, int code, int error);
 static void GSync_RestoreDreamWorld(GSyncWork *wk);
 static BOOL GSync_PersonExists(GSyncResultPerson *person);
 static void GSync_PersonToPlayerInfo(GSyncResultPerson *person, PlayerInfo *info);
@@ -409,7 +410,7 @@ static void GSync_StateError(GSyncWork *wk) {
     int msgId = wk->error + 29;
 
     if (wk->http != NULL) {
-        func_ov189_0219d124(wk->http);
+        NHttpRap_EndRequest(wk->http);
     }
     if (wk->error == GSYNC_ERROR_DOWNLOAD) {
         msgId = 39;
@@ -563,10 +564,10 @@ static void GSync_StateWaitReceiveSave(GSyncWork *wk) {
 }
 
 static void GSync_StateWaitFinishDownload(GSyncWork *wk) {
-    int status = func_ov189_0219d3a8(wk->http);
+    int status = NHttpRap_GetStatus(wk->http);
 
-    if (!GSync_CheckHttpStatus(wk, status) && func_ov189_0219d140(wk->http) == 0) {
-        func_ov189_0219d1a4(wk->http);
+    if (!GSync_CheckHttpStatus(wk, status) && NHttpRap_Poll(wk->http) == 0) {
+        NHttpRap_GetAnswer(wk->http);
         getDreamWorldStuffAddress(wk->save);
         wk->busy = TRUE;
         GSync_ChangeState(wk, GSync_StateWaitReceiveSave, 711);
@@ -578,11 +579,11 @@ static void GSync_StateFinishDownload(GSyncWork *wk) {
         wk->wait--;
         return;
     }
-    if (func_02042788() && func_ov189_0219d010(GSYNC_REQUEST_DOWNLOAD_FINISH, wk->http)) {
+    if (func_02042788() && NHttpRap_SendRequest(GSYNC_REQUEST_DOWNLOAD_FINISH, wk->http)) {
         wk->request[0] = 1;
         wk->request[1] = 0;
-        func_ov189_021a0854(func_ov189_0219d0ec(wk->http), wk->request, sizeof(wk->request));
-        if (func_ov189_0219d0f8(wk->http) == 0) {
+        func_ov189_021a0854(NHttpRap_GetConnection(wk->http), wk->request, sizeof(wk->request));
+        if (NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitFinishDownload, 743);
         }
     }
@@ -1067,8 +1068,8 @@ static void GSync_StateWaitResult(GSyncWork *wk) {
             wk->progress++;
         }
         GSyncDisp_SetProgress(wk->disp, wk->progress);
-        if (!GSync_CheckHttpStatus(wk, func_ov189_0219d3a8(wk->http)) && func_ov189_0219d140(wk->http) == 0) {
-            GSyncResponse *response = func_ov189_0219d1a4(wk->http);
+        if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
+            GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
             DreamWorldSave *dreamWorld = getDreamWorldStuffAddress(wk->save);
             GSyncResult *result = &response->body.result;
 
@@ -1104,7 +1105,7 @@ static void GSync_StateWaitResult(GSyncWork *wk) {
 
 static void GSync_StateRequestResult(GSyncWork *wk) {
     if (GSync_IsOnline(wk) && !GSync_HasAccountPokemon(wk)) {
-        if (func_ov189_0219d010(GSYNC_REQUEST_DOWNLOAD, wk->http) && func_ov189_0219d0f8(wk->http) == 0) {
+        if (NHttpRap_SendRequest(GSYNC_REQUEST_DOWNLOAD, wk->http) && NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitResult, 1480);
         }
         return;
@@ -1249,11 +1250,11 @@ static void GSync_StateShowId(GSyncWork *wk) {
 
 static void GSync_StateWaitCreate(GSyncWork *wk) {
     if (func_02042788()) {
-        if (!GSync_CheckHttpStatus(wk, func_ov189_0219d3a8(wk->http)) && func_ov189_0219d140(wk->http) == 0) {
+        if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response;
 
             GSyncDisp_DeleteActor(wk->disp, 13);
-            response = func_ov189_0219d1a4(wk->http);
+            response = NHttpRap_GetAnswer(wk->http);
             if (response->status == 2) {
                 GSync_ChangeState(wk, GSync_StateCheckDate, 1799);
             } else if (response->status == 0) {
@@ -1275,11 +1276,11 @@ static void GSync_StateCreate(GSyncWork *wk) {
     void *data;
 
     if (func_02042788()) {
-        if (func_ov189_0219d010(GSYNC_REQUEST_CREATE, wk->http)) {
+        if (NHttpRap_SendRequest(GSYNC_REQUEST_CREATE, wk->http)) {
             data = func_02007454(wk->save, &size);
-            func_ov189_021a0854(func_ov189_0219d0ec(wk->http), data, 0x80000);
+            func_ov189_021a0854(NHttpRap_GetConnection(wk->http), data, 0x80000);
             GSyncDisp_CreateActor(wk->disp, 13);
-            if (func_ov189_0219d0f8(wk->http) == 0) {
+            if (NHttpRap_StartRequest(wk->http) == 0) {
                 GSync_ChangeState(wk, GSync_StateWaitCreate, 1841);
             }
         }
@@ -1372,8 +1373,8 @@ static void GSync_HandleAccount(GSyncWork *wk, u16 status, GSyncResponse *respon
 
 static void GSync_StateWaitAccount(GSyncWork *wk) {
     if (func_02042788()) {
-        if (!GSync_CheckHttpStatus(wk, func_ov189_0219d3a8(wk->http)) && func_ov189_0219d140(wk->http) == 0) {
-            GSyncResponse *response = func_ov189_0219d1a4(wk->http);
+        if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
+            GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
 
             sys_memcpy(&response->body.accountInfo, &wk->param->accountInfo, sizeof(GSyncAccountInfo));
             wk->param->hasAccountInfo = TRUE;
@@ -1388,7 +1389,7 @@ static void GSync_StateRequestAccount(GSyncWork *wk) {
     GSyncMessage_Print(wk->msg, 13);
     GSyncMessage_StartWaitIcon(wk->msg);
     if (func_02042788()) {
-        if (func_ov189_0219d010(GSYNC_REQUEST_PLAY_STATUS, wk->http) && func_ov189_0219d0f8(wk->http) == 0) {
+        if (NHttpRap_SendRequest(GSYNC_REQUEST_PLAY_STATUS, wk->http) && NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitAccount, 2085);
         }
     } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
@@ -1412,8 +1413,8 @@ static void GSync_StateNoPokemon(GSyncWork *wk) {
 
 static void GSync_StateWaitSpeciesFlags(GSyncWork *wk) {
     if (func_02042788()) {
-        if (!GSync_CheckHttpStatus(wk, func_ov189_0219d3a8(wk->http)) && func_ov189_0219d140(wk->http) == 0) {
-            GSyncResponse *response = func_ov189_0219d1a4(wk->http);
+        if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
+            GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
             u32 status = response->status;
 
             if (status == 0 || status == 8) {
@@ -1453,7 +1454,7 @@ static void GSync_StateCheckDate(GSyncWork *wk) {
         return;
     }
     if (func_02042788()) {
-        if (func_ov189_0219d010(GSYNC_REQUEST_SPECIES_FLAGS, wk->http) && func_ov189_0219d0f8(wk->http) == 0) {
+        if (NHttpRap_SendRequest(GSYNC_REQUEST_SPECIES_FLAGS, wk->http) && NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitSpeciesFlags, 2220);
         }
     } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
@@ -1559,8 +1560,8 @@ static void GSync_StateWaitUpload(GSyncWork *wk) {
             wk->progress++;
         }
         GSyncDisp_SetProgress(wk->disp, wk->progress);
-        if (!GSync_CheckHttpStatus(wk, func_ov189_0219d3a8(wk->http)) && func_ov189_0219d140(wk->http) == 0) {
-            GSyncResponse *response = func_ov189_0219d1a4(wk->http);
+        if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
+            GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
 
             if (GSync_IsNewAccount(wk)) {
                 GSyncMessage_ClearInfo(wk->msg);
@@ -1590,13 +1591,13 @@ static void GSync_StateUpload(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg)) {
         wk->frames = 0;
         if (GSync_IsOnline(wk)) {
-            if (func_ov189_0219d010(GSYNC_REQUEST_UPLOAD, wk->http)) {
+            if (NHttpRap_SendRequest(GSYNC_REQUEST_UPLOAD, wk->http)) {
                 void *data = func_02007454(wk->save, &size);
 
-                func_ov189_021a0854(func_ov189_0219d0ec(wk->http), data, 0x80000);
+                func_ov189_021a0854(NHttpRap_GetConnection(wk->http), data, 0x80000);
                 GSyncDisp_SetProgress(wk->disp, 0);
                 wk->progress = 0;
-                if (func_ov189_0219d0f8(wk->http) == 0) {
+                if (NHttpRap_StartRequest(wk->http) == 0) {
                     GSync_ChangeState(wk, GSync_StateWaitUpload, 2505);
                 }
             }
@@ -1679,12 +1680,12 @@ static void GSync_StateSend(GSyncWork *wk) {
     GSync_ChangeState(wk, GSync_StateSendShowIcon, 2673);
 }
 
-static void GSync_OnDisconnect(void *work, int a1, int code) {
+static void GSync_OnDisconnect(void *work, int a1, int code, int error) {
     GSyncWork *wk = work;
 
     if (wk->http != NULL) {
-        func_ov189_0219d124(wk->http);
-        func_ov189_0219d1f0(wk->http);
+        NHttpRap_EndRequest(wk->http);
+        NHttpRap_Destroy(wk->http);
         wk->http = NULL;
     }
 }
@@ -1799,8 +1800,8 @@ static BOOL GSync_ProcInit(GameProc *proc, u32 *state, void *param, void *work) 
             break;
         }
         if (pParent->gsyncResult != GSYNC_RESULT_NO_POKEMON) {
-            wk->http = func_ov189_0219d1b8(HEAPID_GSYNC, profileID, pParent->loginBuffer);
-            func_ov011_02152040(GSync_OnDisconnect, wk);
+            wk->http = NHttpRap_Create(HEAPID_GSYNC, profileID, pParent->loginBuffer);
+            DWCRap_SetErrorFunc(GSync_OnDisconnect, wk);
         }
     }
     wk->disp = GSyncDisp_Create(wk->heapId);
@@ -1819,7 +1820,7 @@ static BOOL GSync_ProcMain(GameProc *proc, u32 *state, void *param, void *work) 
         if (wk->download != NULL) {
             GSyncDownload_Cleanup(wk->download);
         }
-        func_ov189_0219d124(wk->http);
+        NHttpRap_EndRequest(wk->http);
         if (wk->saving) {
             func_02017884(wk->gameData);
             wk->saving = FALSE;
@@ -1830,7 +1831,7 @@ static BOOL GSync_ProcMain(GameProc *proc, u32 *state, void *param, void *work) 
         }
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
         Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
-        func_ov011_02152404(1, 0);
+        DWCRapCommon_CheckError(1, 0);
         wk->param->gsyncResult = GSYNC_RESULT_RETRY_LOGIN;
         return TRUE;
     }
@@ -1881,11 +1882,11 @@ static BOOL GSync_ProcExit(GameProc *proc, u32 *state, void *param, void *work) 
         GFL_HeapFree(wk->unk44);
     }
     if (func_02042788()) {
-        func_ov011_0215205c(NULL, NULL);
+        DWCRap_SetEventFunc(NULL, NULL);
     }
     if (wk->http != NULL) {
-        func_ov189_0219d1f0(wk->http);
-        func_ov011_02152040(NULL, NULL);
+        NHttpRap_Destroy(wk->http);
+        DWCRap_SetErrorFunc(NULL, NULL);
     }
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_GSYNC);

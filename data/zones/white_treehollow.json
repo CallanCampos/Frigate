@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": 368,
+    "matrix": "MAP_MATRIX_WHITE_TREEHOLLOW",
+    "scripts": "SCRIPTS_WHITE_TREEHOLLOW",
+    "text": "SCRIPT_TEXT_WHITE_TREEHOLLOW",
+    "bgm": "SEQ_BGM_MUGEN_lobby_W",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_WHITE_TREEHOLLOW",
+    "place": "PLACE_WHITE_TREEHOLLOW",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 278,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

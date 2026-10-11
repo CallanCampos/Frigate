@@ -1,22 +1,22 @@
-{bd02}Ghost Erasers...\n\n\n{bd02}Their identity remains\n{bd02}shrouded in mystery...
-{bd02}They blend in with ordinary people\n{bd02}and solve cases without people knowing.\n{bd02}That's their style...
-{bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 002\n\n{bd02}Code Name: {0102:0}
-{bd02}There's a report about\n\n{bd02}a possessed girl\n\n{bd02}in a certain village.
-{bd02}Since the spectral activity began,\n\n{bd02}no one has seen this girl.
-{bd02}We will now try to make\n\n{bd02}direct contact for the\n\n{bd02}investigation.
-なし
-なし
-なし
-なし
-{bd02}Ghost Erasers...\n\n\n{bd02}Their identity remains\n{bd02}shrouded in mystery...
-{bd02}They blend in with ordinary people\n{bd02}and solve cases without people knowing.\n{bd02}That's their style...
-{bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 002\n\n{bd02}Code Name: {0102:0}
-{bd02}There's a report about\n\n{bd02}a possessed girl\n\n{bd02}in a certain village.
-{bd02}Since the spectral activity began,\n\n{bd02}no one has seen this girl.
-{bd02}We will now try to make\n\n{bd02}direct contact for the\n\n{bd02}investigation.
-なし
-なし
-なし
-なし
-なし
+Bank0303_Text_GhostErasersTheirIdentity = {bd02}Ghost Erasers...\n\n\n{bd02}Their identity remains\n{bd02}shrouded in mystery...
+Bank0303_Text_TheyBlendOrdinaryPeople = {bd02}They blend in with ordinary people\n{bd02}and solve cases without people knowing.\n{bd02}That's their style...
+Bank0303_Text_GhostEraserCaseFiles = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 002\n\n{bd02}Code Name: {0102:0}
+Bank0303_Text_TheresReportAboutPossessed = {bd02}There's a report about\n\n{bd02}a possessed girl\n\n{bd02}in a certain village.
+Bank0303_Text_SinceSpectralActivityBegan = {bd02}Since the spectral activity began,\n\n{bd02}no one has seen this girl.
+Bank0303_Text_WeWillNowTry = {bd02}We will now try to make\n\n{bd02}direct contact for the\n\n{bd02}investigation.
+Bank0303_Text_Empty = なし
+Bank0303_Text_Empty_2 = なし
+Bank0303_Text_Empty_3 = なし
+Bank0303_Text_Empty_4 = なし
+Bank0303_Text_GhostErasersTheirIdentity_2 = {bd02}Ghost Erasers...\n\n\n{bd02}Their identity remains\n{bd02}shrouded in mystery...
+Bank0303_Text_TheyBlendOrdinaryPeople_2 = {bd02}They blend in with ordinary people\n{bd02}and solve cases without people knowing.\n{bd02}That's their style...
+Bank0303_Text_GhostEraserCaseFiles_2 = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 002\n\n{bd02}Code Name: {0102:0}
+Bank0303_Text_TheresReportAboutPossessed_2 = {bd02}There's a report about\n\n{bd02}a possessed girl\n\n{bd02}in a certain village.
+Bank0303_Text_SinceSpectralActivityBegan_2 = {bd02}Since the spectral activity began,\n\n{bd02}no one has seen this girl.
+Bank0303_Text_WeWillNowTry_2 = {bd02}We will now try to make\n\n{bd02}direct contact for the\n\n{bd02}investigation.
+Bank0303_Text_Empty_5 = なし
+Bank0303_Text_Empty_6 = なし
+Bank0303_Text_Empty_7 = なし
+Bank0303_Text_Empty_8 = なし
+Bank0303_Text_Empty_9 = なし
 \pad{08}

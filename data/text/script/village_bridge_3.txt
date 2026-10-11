@@ -1,0 +1,15 @@
+VillageBridge3_Text_OhYoureNewcomerArent = Oh!\nYou're a newcomer, aren't you?{be01}\nThen, let's battle without saying a word!\nAre you ready?
+VillageBridge3_Text_AllRightWantBake = All right!{be01}\nI want to bake tasty bread\nfor strong Pokémon!{be01}
+VillageBridge3_Text_UhOhThatsFine = Uh-oh... That's fine.\nWhen you change your mind, come back!
+VillageBridge3_Text_LetsBattleWithoutSaying = Let's battle without saying a word!\nAre you ready?
+VillageBridge3_Text_WowWhatTrainerUnderstand = Wow, what a Trainer!{be01}\nYou understand and trust your Pokémon.\nThat's why you got this result!
+VillageBridge3_Text_HaveFavorAskSuch = I have a favor to ask\nof such a wonderful Trainer!{be01}\nI'm planning to bake bread\nwith tons of Honey!{be01}\nWould you show me a Pokémon\nwith the Honey Gather Ability?
+VillageBridge3_Text_WillGatherHoneyThank = This {0101:0}\nwill gather Honey!{be01}\nThank you!\nThis gift is a token of my gratitude!{be01}
+VillageBridge3_Text_WillGatherHoneyThank_2 = This {0101:0}\nwill gather Honey!{be01}\nThank you!\nThis gift is a token of my gratitude!{be01}
+VillageBridge3_Text_BreadWillHaveTons = This bread will have tons of Honey.\nI'll call it Honey Bread!{be01}\nI want to bake it soon, but I'm busy\nmaking Village Sandwiches.
+VillageBridge3_Text_ImTotallyHookedVillage = I'm totally hooked on Village Sandwiches!{be01}\nI come here every day to eat them!
+VillageBridge3_Text_PokemonMakeMostAdorable = Pokémon make the most adorable\nfaces when they bite into sandwiches!
+VillageBridge3_Text_ImHappyAbleEat = I'm so happy to be able to eat\nwith my Pokémon.
+VillageBridge3_Text_MyuMyuweee = Myu myuweee.
+VillageBridge3_Text_SkweeWeep = Skwee weep...
+VillageBridge3_Text_Kroooko = Kroooko!

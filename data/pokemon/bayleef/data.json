@@ -1,0 +1,172 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Bayleef",
+    "pokedex": {
+        "category": "Leaf Pokémon",
+        "entry": "The buds that ring its neck give\noff a spicy aroma that perks\npeople up.",
+        "height": "3'11\"",
+        "weight": "34.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Bayleef",
+                "category": "Leaf Pokémon",
+                "entry": "The buds that ring its neck give\noff a spicy aroma that perks\npeople up.",
+                "height": "3'11\"",
+                "weight": "34.8 lbs."
+            },
+            "fr": {
+                "name": "Macronium",
+                "category": "Pokémon Feuille",
+                "entry": "Le collier de bourgeons à son cou\nrépand un arôme épicé qui vous\ndonne du tonus.",
+                "height": "1,2 m",
+                "weight": "15,8 kg"
+            },
+            "de": {
+                "name": "Lorblatt",
+                "category": "Laub",
+                "entry": "Die Knospen an seinem Hals\ngeben ein würziges Aroma ab,\ndas andere aufheitert.",
+                "height": "1,2 m",
+                "weight": "15,8 kg"
+            },
+            "it": {
+                "name": "Bayleef",
+                "category": "Pokémon Foglia",
+                "entry": "Le foglie attorno al suo collo emanano\nun aroma speziato dall'effetto\nenergizzante.",
+                "height": "1,2 m",
+                "weight": "15,8 kg"
+            },
+            "ko": {
+                "name": "베이리프",
+                "category": "잎사귀포켓몬",
+                "entry": "목 주위의 봉오리로부터 풍기는\n향긋한 향기는 향기를\n맡은 사람을 힘이 나게 한다.",
+                "height": "1.2 m",
+                "weight": "15.8 kg"
+            },
+            "es": {
+                "name": "Bayleef",
+                "category": "Pokémon Hoja",
+                "entry": "Su cuello desprende un dulce aroma\nque anima a quien lo huele.",
+                "height": "1,2 m",
+                "weight": "15,8 kg"
+            },
+            "ja": {
+                "name": "ベイリーフ",
+                "category": "はっぱポケモン",
+                "entry": "くびまわりの\\x{3000}つぼみから\\x{3000}におう\nスパイシーな\\x{3000}かおりは\nかいだ\\x{3000}ひとを\\x{3000}げんきに\\x{3000}させる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 62,
+        "defense": 80,
+        "speed": 60,
+        "special_attack": 63,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_OVERGROW", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_LEAF_GUARD",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 12,
+    "weight": 158,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_RAZOR_LEAF" ],
+            [ 1, "MOVE_POISON_POWDER" ],
+            [ 6, "MOVE_RAZOR_LEAF" ],
+            [ 9, "MOVE_POISON_POWDER" ],
+            [ 12, "MOVE_SYNTHESIS" ],
+            [ 18, "MOVE_REFLECT" ],
+            [ 22, "MOVE_MAGICAL_LEAF" ],
+            [ 26, "MOVE_NATURAL_GIFT" ],
+            [ 32, "MOVE_SWEET_SCENT" ],
+            [ 36, "MOVE_LIGHT_SCREEN" ],
+            [ 40, "MOVE_BODY_SLAM" ],
+            [ 46, "MOVE_SAFEGUARD" ],
+            [ 50, "MOVE_AROMATHERAPY" ],
+            [ 54, "MOVE_SOLAR_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM33",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM53",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_GRASS_PLEDGE",
+            "MOVE_SEED_BOMB",
+            "MOVE_MAGIC_COAT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 32,
+            "species": "SPECIES_MEGANIUM"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CHIKORITA"
+}

@@ -1,35 +1,35 @@
-func_ov189_0219ce80 kind:function(thumb,size=0x10) addr:0x0219ce80
-func_ov189_0219ce90 kind:function(thumb,size=0x10) addr:0x0219ce90
-func_ov189_0219cea0 kind:function(thumb,size=0x14) addr:0x0219cea0
-func_ov189_0219ceb4 kind:function(thumb,size=0xf8) addr:0x0219ceb4
-func_ov189_0219cfac kind:function(thumb,size=0x64) addr:0x0219cfac
-func_ov189_0219d010 kind:function(thumb,size=0x4c) addr:0x0219d010
-func_ov189_0219d05c kind:function(thumb,size=0x90) addr:0x0219d05c
-func_ov189_0219d0ec kind:function(thumb,size=0xc) addr:0x0219d0ec
-func_ov189_0219d0f8 kind:function(thumb,size=0x2c) addr:0x0219d0f8
-func_ov189_0219d124 kind:function(thumb,size=0x1a) addr:0x0219d124
-func_ov189_0219d140 kind:function(thumb,size=0x64) addr:0x0219d140
-func_ov189_0219d1a4 kind:function(thumb,size=0x14) addr:0x0219d1a4
-func_ov189_0219d1b8 kind:function(thumb,size=0x38) addr:0x0219d1b8
-func_ov189_0219d1f0 kind:function(thumb,size=0x12) addr:0x0219d1f0
-func_ov189_0219d204 kind:function(thumb,size=0x54) addr:0x0219d204
-func_ov189_0219d258 kind:function(thumb,size=0x38) addr:0x0219d258
-func_ov189_0219d290 kind:function(thumb,size=0x1e) addr:0x0219d290
-func_ov189_0219d2b0 kind:function(thumb,size=0xd4) addr:0x0219d2b0
-func_ov189_0219d384 kind:function(thumb,size=0x24) addr:0x0219d384
-func_ov189_0219d3a8 kind:function(thumb,size=0x12) addr:0x0219d3a8
-func_ov189_0219d3bc kind:function(thumb,size=0x10) addr:0x0219d3bc
-func_ov189_0219d3cc kind:function(thumb,size=0x18) addr:0x0219d3cc
-func_ov189_0219d3e4 kind:function(thumb,size=0x4) addr:0x0219d3e4
-func_ov189_0219d3e8 kind:function(thumb,size=0x20) addr:0x0219d3e8
-func_ov189_0219d408 kind:function(thumb,size=0x8) addr:0x0219d408
-func_ov189_0219d410 kind:function(thumb,size=0x48) addr:0x0219d410
-func_ov189_0219d458 kind:function(thumb,size=0x28) addr:0x0219d458
-func_ov189_0219d480 kind:function(thumb,size=0x8) addr:0x0219d480
-func_ov189_0219d488 kind:function(thumb,size=0x12) addr:0x0219d488
-func_ov189_0219d49c kind:function(thumb,size=0x60) addr:0x0219d49c
-func_ov189_0219d4fc kind:function(thumb,size=0x8) addr:0x0219d4fc
-func_ov189_0219d504 kind:function(thumb,size=0x4c) addr:0x0219d504
+NHttpRap_Alloc kind:function(thumb,size=0x10) addr:0x0219ce80
+NHttpRap_Free kind:function(thumb,size=0x10) addr:0x0219ce90
+NHttpRap_RequestCallback kind:function(thumb,size=0x14) addr:0x0219cea0
+NHttpRap_CreateRequest kind:function(thumb,size=0xf8) addr:0x0219ceb4
+NHttpRap_BuildUrl kind:function(thumb,size=0x64) addr:0x0219cfac
+NHttpRap_SendRequest kind:function(thumb,size=0x4c) addr:0x0219d010
+NHttpRap_SendRequestWithId kind:function(thumb,size=0x90) addr:0x0219d05c
+NHttpRap_GetConnection kind:function(thumb,size=0xc) addr:0x0219d0ec
+NHttpRap_StartRequest kind:function(thumb,size=0x2c) addr:0x0219d0f8
+NHttpRap_EndRequest kind:function(thumb,size=0x1a) addr:0x0219d124
+NHttpRap_Poll kind:function(thumb,size=0x64) addr:0x0219d140
+NHttpRap_GetAnswer kind:function(thumb,size=0x14) addr:0x0219d1a4
+NHttpRap_Create kind:function(thumb,size=0x38) addr:0x0219d1b8
+NHttpRap_Destroy kind:function(thumb,size=0x12) addr:0x0219d1f0
+NHttpRap_WriteHeader kind:function(thumb,size=0x54) addr:0x0219d204
+NHttpRap_BeginPost kind:function(thumb,size=0x38) addr:0x0219d258
+NHttpRap_AddPostData kind:function(thumb,size=0x1e) addr:0x0219d290
+NHttpRap_SendValidate kind:function(thumb,size=0xd4) addr:0x0219d2b0
+NHttpRap_FreePostData kind:function(thumb,size=0x24) addr:0x0219d384
+NHttpRap_GetStatus kind:function(thumb,size=0x12) addr:0x0219d3a8
+NHttpRap_SetAnswerBuffer kind:function(thumb,size=0x10) addr:0x0219d3bc
+NHttpRap_ResetAnswerBuffer kind:function(thumb,size=0x18) addr:0x0219d3cc
+NHttpRap_GetCheckStatus kind:function(thumb,size=0x4) addr:0x0219d3e4
+NHttpRap_GetCheckResult kind:function(thumb,size=0x20) addr:0x0219d3e8
+NHttpRap_GetCheckSignature kind:function(thumb,size=0x8) addr:0x0219d408
+NHttpRapEvilCheck_Sign kind:function(thumb,size=0x48) addr:0x0219d410
+NHttpRapEvilCheck_AllocArray kind:function(thumb,size=0x28) addr:0x0219d458
+NHttpRapEvilCheck_FreeArray kind:function(thumb,size=0x8) addr:0x0219d480
+NHttpRapEvilCheck_SetElement kind:function(thumb,size=0x12) addr:0x0219d488
+NHttpRapEvilCheck_Alloc kind:function(thumb,size=0x60) addr:0x0219d49c
+NHttpRapEvilCheck_Free kind:function(thumb,size=0x8) addr:0x0219d4fc
+DpwProfile_Fill kind:function(thumb,size=0x4c) addr:0x0219d504
 func_ov189_0219d550 kind:function(thumb,size=0x8) addr:0x0219d550
 func_ov189_0219d558 kind:function(thumb,size=0x8) addr:0x0219d558
 func_ov189_0219d560 kind:function(thumb,size=0x4c) addr:0x0219d560
@@ -534,8 +534,8 @@ data_ov189_021acf20 kind:data(any) addr:0x021acf20
 data_ov189_021acf24 kind:data(any) addr:0x021acf24
 data_ov189_021acf26 kind:data(any) addr:0x021acf26
 data_ov189_021acf27 kind:data(any) addr:0x021acf27
-data_ov189_021acf40 kind:data(any) addr:0x021acf40
-data_ov189_021acf44 kind:data(any) addr:0x021acf44
+sRootCertificates kind:data(any) addr:0x021acf40
+sRequests kind:data(any) addr:0x021acf44
 data_ov189_021acf48 kind:data(any) addr:0x021acf48
 data_ov189_021acf9c kind:data(any) addr:0x021acf9c
 data_ov189_021acfa0 kind:data(any) addr:0x021acfa0
@@ -549,8 +549,8 @@ data_ov189_021acfe8 kind:data(any) addr:0x021acfe8
 data_ov189_021acff0 kind:data(any) addr:0x021acff0
 data_ov189_021acffc kind:data(any) addr:0x021acffc
 data_ov189_021ad008 kind:data(any) addr:0x021ad008
-data_ov189_021ad028 kind:data(any) addr:0x021ad028
-data_ov189_021ad02c kind:data(any) addr:0x021ad02c
+sHeapId kind:data(any) addr:0x021ad028
+sKey kind:data(any) addr:0x021ad02c
 data_ov189_021ad0ac kind:data(any) addr:0x021ad0ac
 data_ov189_021ad0c4 kind:data(any) addr:0x021ad0c4
 data_ov189_021ad0c8 kind:data(any) addr:0x021ad0c8
@@ -800,7 +800,7 @@ data_ov189_021ae645 kind:data(any) addr:0x021ae645 ambiguous
 data_ov189_021ae654 kind:data(any) addr:0x021ae654
 data_ov189_021ae680 kind:data(any) addr:0x021ae680
 data_ov189_021ae684 kind:data(any) addr:0x021ae684
-data_ov189_021ae6a0 kind:bss addr:0x021ae6a0
+sNHttpRap kind:bss addr:0x021ae6a0
 data_ov189_021ae6a4 kind:bss addr:0x021ae6a4
 data_ov189_021ae6c4 kind:bss addr:0x021ae6c4
 data_ov189_021ae6cc kind:bss addr:0x021ae6cc
@@ -867,7 +867,6 @@ data_ov189_021b0681 kind:bss addr:0x021b0681 ambiguous
 data_ov189_021b0905 kind:bss addr:0x021b0905 ambiguous
 data_ov189_021b0d03 kind:bss addr:0x021b0d03 ambiguous
 data_ov189_021b0fdc kind:bss addr:0x021b0fdc ambiguous
-data_ov189_021b2200 kind:bss addr:0x021b2200 ambiguous
 data_ov189_021b26bc kind:bss addr:0x021b26bc ambiguous
 data_ov189_021b2860 kind:bss addr:0x021b2860
 data_ov189_021b2868 kind:bss addr:0x021b2868

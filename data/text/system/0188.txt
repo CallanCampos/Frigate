@@ -1,57 +1,57 @@
-Movie Star
-World Police
-Mecha Cop: Code name, Mecha Cop!\nSéquence d'activation... Action!
-The {0102:0} Ninja: Mecha Cop...\nHe has been modified into a cyborg...{be00}\nIs he a secret agent for the World Police?!
-Mecha Cop: I won't allow a villain like you\nto have the dynamatronic engine!
-The {0102:0} Ninja: Ughh!\nWithout thinking about the surroundings...{be00}\nWhat an attack!
-Mecha Cop: Found an intruder.\nVerifying its biometrics...
-The {0102:0} Ninja: Is that...\na security robot?
-Mecha Cop: Verification complete.{be01}\nThe serial robber,\nthe {0102:0} Ninja.{be00}\nSurrender!
-The {0102:0} Ninja: ...!\nIt's a human cop!{be01}\nIs his entire body reinforced by\nmechanics?
-Mecha Cop: You showed resistance...\nI'll regard it as hostile behavior!{be01}\nThe handcuff launcher!\nApunten, ¡fuego!
-The {0102:0} Ninja: Whoa!\nAll of a sudden, what did you do?
-Mecha Cop: I don't tolerate crimes.\nI'll bring you under control by force!
-The {0102:0} Ninja: What?!\nI only use Pokémon for stealing,{be00}\nbut you use weapons like that!{be00}\nIt's not fair!
-Mecha Cop: Hmm... I see.\nMy justice will be tainted{be00}\nif a villain criticizes me.{be01}\nIn this situation, I should use Pokémon\nand arrest him.
-The {0102:0} Ninja: Such a...\nviolent cop...
-The {0102:0} Ninja: I won't lose!
-Mecha Cop: There's no room for negotiation\nwith the {0102:0} Ninja.{be01}\nFrontalangriff!
-The {0102:0} Ninja: I'll surrender.
-Mecha Cop: Whaat?!\nIt's an unexpected response...{be01}\nUh... A system error?!
-The {0102:0} Ninja: Is your Pokémon\na match for my Pokémon?
-Mecha Cop: Stai zitto!\nJustice prevails--good over evil!
-The {0102:0} Ninja: (...Hmph!\nI'm not such a fool to go head-to-head{be00}\nwith you...){be01}\n(...I'll wait for an opportunity\nand escape...)
-Mecha Cop: The {0102:0} Ninja!{be01}\nI'll make sure to put you in jail\nand make you pay for your crimes!
-The {0102:0} Ninja: Try it!
-The {0102:0} Ninja: Wait!\nI'll quit being a thief.{be00}\nSo, give me some slack!
-Mecha Cop: Mmmm...
-The {0102:0} Ninja: (...Hmph!\nChampion of justice.{be00}\nYou're letting your guard down...){be01}\n(...I'll wait for an opportunity\nand make you into scrap!...)
-Mecha Cop: Lo siento mucho.\nThe data of your breathing and heart rate{be00}\nshows that what you said just now{be00}\nwas a lie.{be01}\nYour punishment will be severe!
-The {0102:0} Ninja: !!
-The {0102:0} Ninja: Ughh!{be01}\nArggghhhhh!
-Mecha Cop: Mission accomplie.{be01}\n{0102:0} Ninja,\nyou didn't lose to me.{be01}\nYou were defeated by law and justice!
-The {0102:0} Ninja: Argh!\nI lost to such a scrap cop...
-The self-proclaimed great thief,\nthe {0102:0} Ninja,{be00}\nwas sent to jail by Mecha Cop.{be01}\nAs long as there is justice in this world,\nevil won't prosper!{be01}\nTake control, Mecha Cop!\nNo mercy, World Police!
-Mecha Cop: Ugh.\nI'm disappointed in myself...
-The {0102:0} Ninja: Hmph!\nI don't know if you're a secret agent{be00}\nor whatever.{be00}\nYou're nothing.{be01}\nThis dynamatronic engine is mine!\nSee ya!
-Mecha Cop: Halt! Warte!\n{0102:0} Ninja!{be01}\nUgh! Smoke that makes\nradar malfunction?
-The {0102:0} Ninja: Mecha Cop!\nYou'll regret that you couldn't catch me{be00}\nfor the rest of your life!
-Mecha Cop: The {0102:0} Ninja!
-The self-proclaimed thief of the century,\nthe {0102:0} Ninja,{be00}\ndisappeared in the veil of darkness{be00}\nwith a daring parting remark.
-Then, a few years later...{be01}\nThe {0102:0} Ninja abused the\ndynamatronic engine and made a fortune.{be01}\nHe became a big shot and is now untouchable,\neven by the World Police...{be01}\nYou must be frustrated, Mecha Cop!\nThe power of money is frightening!
-The {0102:0} Ninja: What?!\nWhat is this sound? Is this a siren?
-Mecha Cop: Oh no. This is not good!
-The {0102:0} Ninja: Mecha Cop!\nWhat's this? Answer me!
-Mecha Cop: In this lab,\nwhen an intruder is found{be00}\nand a certain amount of time passes,{be00}\nthe Destroyer Security System{be00}\nis activated.{be00}\nIt attacks every moving thing{be00}\nwithout discrimination!
-The {0102:0} Ninja: What?!\nDestro... What?
-Mecha Cop: Non! Non!\nDestroyer Security System!
-The {0102:0} Ninja: Is that...?\nWhoa! What is this?!{be00}\nLaser? H-hot!{be01}\nStop! Help!\nPolice!
-Mecha Cop: Whoa! Stop!\nDestroyer Security System!{be00}\nI'm a member of the World Police...
-Thus...{be01}\nThanks to the Destroyer Security System,\nthe dynamatronic engine was freed{be00}\nfrom the evil hands of the self-proclaimed{be00}\nthief of the century, the {0102:0} Ninja.{be01}\nCheers!\nKeep up the good work,{be00}\nDestroyer Security System!
-Mecha Cop: Aww.\nI lost...{be00}\nto such a sneaky thief...
-The {0102:0} Ninja: Hmph!\nLaw? Justice?{be00}\nI don't care!{be01}\nI'll do whatever\nto win and escape!{be01}\nThat's my justice!{be01}\nIf you have a problem with that,\ntry to catch me!
-Mecha Cop: Halt! Stehen geblieben!\n{0102:0} Ninja!{be01}\nOh! This is...a bomb?!
-The {0102:0} Ninja: Heh he he.{be01}\nBlow up with the dynamatronic engine,\nMecha Cop!
-Mecha Cop: You!\nI won't forgive you, {0102:0} Ninja...
-The self-proclaimed thief of the century,\nthe {0102:0} Ninja,{be00}\ndisappeared with the explosion.{be01}\nThanks to his alloy coat,\nMecha Cop was safe,{be00}\nbut he was so ashamed of{be00}\nletting the thief get away{be00}\nthat he looked up at the night sky{be00}\nand wiped his tears...{be01}\nDon't give up, Mecha Cop!\nSuch is life!
+Bank0188_Text_MovieStar = Movie Star
+Bank0188_Text_WorldPolice = World Police
+Bank0188_Text_MechaCopCodeName = Mecha Cop: Code name, Mecha Cop!\nSéquence d'activation... Action!
+Bank0188_Text_NinjaMechaCopHe = The {0102:0} Ninja: Mecha Cop...\nHe has been modified into a cyborg...{be00}\nIs he a secret agent for the World Police?!
+Bank0188_Text_MechaCopWontAllow = Mecha Cop: I won't allow a villain like you\nto have the dynamatronic engine!
+Bank0188_Text_NinjaUghhWithoutThinking = The {0102:0} Ninja: Ughh!\nWithout thinking about the surroundings...{be00}\nWhat an attack!
+Bank0188_Text_MechaCopFoundIntruder = Mecha Cop: Found an intruder.\nVerifying its biometrics...
+Bank0188_Text_NinjaSecurityRobot = The {0102:0} Ninja: Is that...\na security robot?
+Bank0188_Text_MechaCopVerificationComplete = Mecha Cop: Verification complete.{be01}\nThe serial robber,\nthe {0102:0} Ninja.{be00}\nSurrender!
+Bank0188_Text_NinjaItsHumanCop = The {0102:0} Ninja: ...!\nIt's a human cop!{be01}\nIs his entire body reinforced by\nmechanics?
+Bank0188_Text_MechaCopShowedResistance = Mecha Cop: You showed resistance...\nI'll regard it as hostile behavior!{be01}\nThe handcuff launcher!\nApunten, ¡fuego!
+Bank0188_Text_NinjaWhoaAllSudden = The {0102:0} Ninja: Whoa!\nAll of a sudden, what did you do?
+Bank0188_Text_MechaCopDontTolerate = Mecha Cop: I don't tolerate crimes.\nI'll bring you under control by force!
+Bank0188_Text_NinjaWhatOnlyUse = The {0102:0} Ninja: What?!\nI only use Pokémon for stealing,{be00}\nbut you use weapons like that!{be00}\nIt's not fair!
+Bank0188_Text_MechaCopHmmSee = Mecha Cop: Hmm... I see.\nMy justice will be tainted{be00}\nif a villain criticizes me.{be01}\nIn this situation, I should use Pokémon\nand arrest him.
+Bank0188_Text_NinjaSuchViolentCop = The {0102:0} Ninja: Such a...\nviolent cop...
+Bank0188_Text_NinjaWontLose = The {0102:0} Ninja: I won't lose!
+Bank0188_Text_MechaCopTheresNo = Mecha Cop: There's no room for negotiation\nwith the {0102:0} Ninja.{be01}\nFrontalangriff!
+Bank0188_Text_NinjaIllSurrender = The {0102:0} Ninja: I'll surrender.
+Bank0188_Text_MechaCopWhaatIts = Mecha Cop: Whaat?!\nIt's an unexpected response...{be01}\nUh... A system error?!
+Bank0188_Text_NinjaPokemonMatchPokemon = The {0102:0} Ninja: Is your Pokémon\na match for my Pokémon?
+Bank0188_Text_MechaCopStaiZitto = Mecha Cop: Stai zitto!\nJustice prevails--good over evil!
+Bank0188_Text_NinjaHmphImNot = The {0102:0} Ninja: (...Hmph!\nI'm not such a fool to go head-to-head{be00}\nwith you...){be01}\n(...I'll wait for an opportunity\nand escape...)
+Bank0188_Text_MechaCopNinjaIll = Mecha Cop: The {0102:0} Ninja!{be01}\nI'll make sure to put you in jail\nand make you pay for your crimes!
+Bank0188_Text_NinjaTry = The {0102:0} Ninja: Try it!
+Bank0188_Text_NinjaWaitIllQuit = The {0102:0} Ninja: Wait!\nI'll quit being a thief.{be00}\nSo, give me some slack!
+Bank0188_Text_MechaCopMmmm = Mecha Cop: Mmmm...
+Bank0188_Text_NinjaHmphChampionJustice = The {0102:0} Ninja: (...Hmph!\nChampion of justice.{be00}\nYou're letting your guard down...){be01}\n(...I'll wait for an opportunity\nand make you into scrap!...)
+Bank0188_Text_MechaCopLoSiento = Mecha Cop: Lo siento mucho.\nThe data of your breathing and heart rate{be00}\nshows that what you said just now{be00}\nwas a lie.{be01}\nYour punishment will be severe!
+Bank0188_Text_Ninja = The {0102:0} Ninja: !!
+Bank0188_Text_NinjaUghhArggghhhhh = The {0102:0} Ninja: Ughh!{be01}\nArggghhhhh!
+Bank0188_Text_MechaCopMissionAccomplie = Mecha Cop: Mission accomplie.{be01}\n{0102:0} Ninja,\nyou didn't lose to me.{be01}\nYou were defeated by law and justice!
+Bank0188_Text_NinjaArghLostSuch = The {0102:0} Ninja: Argh!\nI lost to such a scrap cop...
+Bank0188_Text_SelfProclaimedGreatThief = The self-proclaimed great thief,\nthe {0102:0} Ninja,{be00}\nwas sent to jail by Mecha Cop.{be01}\nAs long as there is justice in this world,\nevil won't prosper!{be01}\nTake control, Mecha Cop!\nNo mercy, World Police!
+Bank0188_Text_MechaCopUghIm = Mecha Cop: Ugh.\nI'm disappointed in myself...
+Bank0188_Text_NinjaHmphDontKnow = The {0102:0} Ninja: Hmph!\nI don't know if you're a secret agent{be00}\nor whatever.{be00}\nYou're nothing.{be01}\nThis dynamatronic engine is mine!\nSee ya!
+Bank0188_Text_MechaCopHaltWarte = Mecha Cop: Halt! Warte!\n{0102:0} Ninja!{be01}\nUgh! Smoke that makes\nradar malfunction?
+Bank0188_Text_NinjaMechaCopYoull = The {0102:0} Ninja: Mecha Cop!\nYou'll regret that you couldn't catch me{be00}\nfor the rest of your life!
+Bank0188_Text_MechaCopNinja = Mecha Cop: The {0102:0} Ninja!
+Bank0188_Text_SelfProclaimedThiefCentury = The self-proclaimed thief of the century,\nthe {0102:0} Ninja,{be00}\ndisappeared in the veil of darkness{be00}\nwith a daring parting remark.
+Bank0188_Text_ThenFewYearsLater = Then, a few years later...{be01}\nThe {0102:0} Ninja abused the\ndynamatronic engine and made a fortune.{be01}\nHe became a big shot and is now untouchable,\neven by the World Police...{be01}\nYou must be frustrated, Mecha Cop!\nThe power of money is frightening!
+Bank0188_Text_NinjaWhatWhatSound = The {0102:0} Ninja: What?!\nWhat is this sound? Is this a siren?
+Bank0188_Text_MechaCopOhNo = Mecha Cop: Oh no. This is not good!
+Bank0188_Text_NinjaMechaCopWhats = The {0102:0} Ninja: Mecha Cop!\nWhat's this? Answer me!
+Bank0188_Text_MechaCopLabWhen = Mecha Cop: In this lab,\nwhen an intruder is found{be00}\nand a certain amount of time passes,{be00}\nthe Destroyer Security System{be00}\nis activated.{be00}\nIt attacks every moving thing{be00}\nwithout discrimination!
+Bank0188_Text_NinjaWhatDestroWhat = The {0102:0} Ninja: What?!\nDestro... What?
+Bank0188_Text_MechaCopNonNon = Mecha Cop: Non! Non!\nDestroyer Security System!
+Bank0188_Text_NinjaWhoaWhatLaser = The {0102:0} Ninja: Is that...?\nWhoa! What is this?!{be00}\nLaser? H-hot!{be01}\nStop! Help!\nPolice!
+Bank0188_Text_MechaCopWhoaStop = Mecha Cop: Whoa! Stop!\nDestroyer Security System!{be00}\nI'm a member of the World Police...
+Bank0188_Text_ThusThanksDestroyerSecurity = Thus...{be01}\nThanks to the Destroyer Security System,\nthe dynamatronic engine was freed{be00}\nfrom the evil hands of the self-proclaimed{be00}\nthief of the century, the {0102:0} Ninja.{be01}\nCheers!\nKeep up the good work,{be00}\nDestroyer Security System!
+Bank0188_Text_MechaCopAwwLost = Mecha Cop: Aww.\nI lost...{be00}\nto such a sneaky thief...
+Bank0188_Text_NinjaHmphLawJustice = The {0102:0} Ninja: Hmph!\nLaw? Justice?{be00}\nI don't care!{be01}\nI'll do whatever\nto win and escape!{be01}\nThat's my justice!{be01}\nIf you have a problem with that,\ntry to catch me!
+Bank0188_Text_MechaCopHaltStehen = Mecha Cop: Halt! Stehen geblieben!\n{0102:0} Ninja!{be01}\nOh! This is...a bomb?!
+Bank0188_Text_NinjaHehHeHe = The {0102:0} Ninja: Heh he he.{be01}\nBlow up with the dynamatronic engine,\nMecha Cop!
+Bank0188_Text_MechaCopWontForgive = Mecha Cop: You!\nI won't forgive you, {0102:0} Ninja...
+Bank0188_Text_SelfProclaimedThiefCentury_2 = The self-proclaimed thief of the century,\nthe {0102:0} Ninja,{be00}\ndisappeared with the explosion.{be01}\nThanks to his alloy coat,\nMecha Cop was safe,{be00}\nbut he was so ashamed of{be00}\nletting the thief get away{be00}\nthat he looked up at the night sky{be00}\nand wiped his tears...{be01}\nDon't give up, Mecha Cop!\nSuch is life!
 \pad{e0}

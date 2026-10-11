@@ -63,6 +63,10 @@ Same instructions, registers swapped.
 
 - Register allocation follows the declaration order of locals, so try reordering declarations when registers are
   swapped.
+- An array index kept scaled (`i * 4` in a callee-saved register) across a call, where ours recomputes it, can come from
+  an accessor whose index parameter has another type than the caller's counter. `btl_pokeparam.c`'s
+  `CopyBatonPassParams` and `func_ov167_021bb864` match only with their condition accesses through a static inline
+  `GetConditionPtr(mon, BattleConditionID id)`; the same accessor with a `u32 id`, casts and an enum counter don't.
 - How a store is written can move the parameters' registers too: `*result = *partyResult != 0 ? 3 : 0;` swapped two
   pointer parameters' registers in `scrcmd_fld_battle.c`'s `func_ov036_021aec28`, where the same store as an
   `if`/`else` matched.
@@ -281,6 +285,10 @@ Same code, other `sp` offsets or frame size.
   declaration order (`s16 brightness = data->brightness;` before `target` in `BrightnessData_Step`).
 - A constant store written first reserves its register before the parameters are moved, though the scheduler moves
   the store itself later: `data->active = TRUE;` first in `BrightnessData_Init` keeps the shared 1 in r0.
+- The scheduler moves constant loads (`movs r3, #0`) up ahead of loads and stores written before them, so constants
+  loaded earlier in the original than in ours are assigned later in the C. `p_sta_sub.c`'s `PStaSub_TrackGestures`
+  clears its direction and lap flag after computing the circle's `dx` and `dy`, which puts the clears before the
+  swipe's frame count store and loads the circle's start x and y one at a time, as the original does.
 
 - Block-scoped arrays set both the stack order and where their initializers are copied: infowin.c's
   `InfoWin_VBlankTask` matches only with each table declared in the `if` block that uses it.
@@ -569,7 +577,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   known to be 0, as the Battle Subway's loop over its music switches does, has an enum counter. Nor does it move an
   enum local's value into its one use: `btl_rec.c`'s `func_ov167_021d4674` computes a chunk's type from its header
   byte before the chapter bit, as written, only with `BtlRecChunkType type`; an `int type` used once is computed in
-  the `if` that tests it, after the chapter bit.
+  the `if` that tests it, after the chapter bit. A constant loaded once into a callee-saved register (`movs r5, #6`)
+  and copied to each use (`adds r0, r5, #0`) is such a local too, where an integer local gives a `movs #6` at each
+  use: `move_handlers.c`'s `HandlerChatter` holds its confusion status in a `BattleConditionID`. When the values are
+  `#define`s that asm includes share, as `CONDITION_*` are, a count-only enum in a C header gives the type.
+- A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
+  comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
+  so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.
 - A function that returns `-1` or `0` from two branches, `if (f(x)) { return 0; } return -1;`, is folded into a
   computed result (`rsbs`) when it returns an `int`, and keeps both returns when it returns an enum. The field action
   checks of `itemuse_event.c` return such an enum.
@@ -791,7 +805,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `PMSIVWordWin_GetScrollBarLine` has `cmp #0x12; bne next; b zero` from `line = 0` written both as the first arm of
   the inner chain and as the outer `else`.
 - A branch to the very next instruction is left by cross-jumping: two statements that end the same way, such as a
-  store in each case of a switch, share their tail, and the first jumps to it even when it follows.
+  store in each case of a switch, share their tail, and the first jumps to it even when it follows. A call written
+  at the end of both arms of an `if` is merged the same way: `p_sta_sub.c`'s `PStaSub_AnimSwipeX` stores the bounce
+  and calls `PStaSub_SetBounce` in each arm, and the `else` passes the zero left from the vector's initializer; one
+  call after the `if` drops the `b`.
 - MWCC evaluates the operands of `|` in the order they are grouped, so a color built from three computed parts shows
   its grouping: `field_menu.c`'s cursor fade (`func_ov036_021a040c`) computes red, then blue, then green, and only
   matches as `r | ((b << 10) | (g << 5))`, not as `GX_RGB(r, g, b)`.
@@ -950,7 +967,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A random pick in a variable range with no zero check is `u64 value = GFL_RandomMT(); value *= n; value >>= 32;`, as
   `btlv_mcss.c`'s idle task does.
 - Float arithmetic calls MWCC's runtime helpers, such as `_fadd` and `_ffix`, which swan names `__aeabi_*`. When a
-  complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`.
+  complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`, or, when the AEABI
+  name is in use, give it the MWCC name as a second one with `config_fixes.py add-label`, as `_ddiv` and `_dsub` for
+  `btl_pokeparam.c`'s `GetHPRatio`.
 - Float arithmetic on a literal passes the literal first, as in `_fmul(4096.0f, x)` for `x * FX32_ONE`, whatever the
   source order. A constant kept in a local variable, which is reloaded from the literal pool at each use, keeps its
   place in the source instead, so `col * pixels` with `f32 pixels = 96.0f / 18;` passes `col` first. A compound
@@ -996,7 +1015,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `static GXRgb g_FieldEdgeColorTable[8];`, and the overlay 36 gap function at `0x0219a044`, which copies into a
   12-byte object and then tests one of its bytes, matches the same way only with that object `static`.
 - The file's `.data` objects take part in MWCC's size sort that orders `.rodata`: `btlv_mcss.c`'s 3-byte idle-wait
-  array had to be counted before `rodata_order.py` predicted the layout.
+  array had to be counted before `rodata_order.py` predicted the layout. So do its `.bss` statics: the object's
+  symbol table lists them interleaved with the `.rodata` objects by size, and moving a table moves the statics too.
+  `rodata_order.py` doesn't predict such a file, so `btl_client.c` was solved by compiling variants: each table at
+  file scope or inside its one function, and each static at the top, before its first function or inside it. Its
+  `.rodata` and `.bss` are the original's with four tables inside their functions, `sXItems` and `sCureItems` at
+  file scope before theirs, and `sSelectSeq` declared before the first function that uses it.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
@@ -1018,7 +1042,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   it before its definition, as an unused inline function in a header does, even though that code is never emitted.
   `demo/shinka_demo_view.h` reconstructs such accessors for the evolution demo's helix constants. Heapsort is not
   stable, so objects of the same size come out in an order that depends on where every object in the file is declared,
-  and moving one object can reorder others. `tools/scripts/rodata_order.py` predicts the layout for a declaration order
+  and moving one object can reorder others. `tools/decomp/rodata_order.py` predicts the layout for a declaration order
   and tries the orders of the objects given with `--permute`; `intro_graphic.c` matches only with its light setups
   declared after the function whose BG setups are local initializers. Tables of pointers have to be checked by their
   relocations, and two with the same contents only by the code that loads them: `btlv_scu.c`'s four 12-byte
@@ -1026,7 +1050,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the four.
 - A `static const` table declared inside the one function that reads it is listed where that function is, among
   the local initializers, rather than where file-scope data would be. `pokemontrade_nego.c` lays out its menus' item
-  lists in the game's order only with its table of blocking fields declared inside `func_ov194_021bbe60`.
+  lists in the game's order only with its table of blocking fields declared inside `func_ov194_021bbe60`, and
+  `move_handlers.c`'s 226 objects come out as the original's only with its ten value tables, such as
+  `FLAIL_POWER_TABLE`, inside the handlers that read them: declared at file scope, they swap thirteen of the
+  equal-size handler tables.
+- A forward declaration (`static const ItemEventAddEntry sItemEventAddTable[];`) doesn't list an object: it is
+  listed where it is defined. Even a table of 64 bytes or more, with a section of its own, takes part in the sort, so
+  where it is defined moves the equal-size objects around it. `item_handlers.c` defined its 1376-byte table of
+  `EventAdd` functions at the end of the file, after a forward declaration, and 133 of its 171 handler tables came out
+  in another order. Defined after the prototypes at the top, where Game Freak's source evidently had it, all of them
+  are the original's.
 - A struct that is copied from `.rodata` and then has a few fields overwritten with computed values is one local
   initializer with the computed values in its braces. Its template gets a section of its own, while a `static const`
   template assigned to the local compiles to the same code but joins the shared section, so only the module check
@@ -1045,7 +1078,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   identical literal is shared from its first use. An assert's text is the expression as written, spacing included, so
   `GFL_ASSERT(a < (B*C))` needs the game's spacing (`delivery_beacon.c` turns clang-format off for it). In
   `delivery_beacon.c` the game has the asserts' `""` before the file name of an earlier allocation, which no source
-  order tried reproduces: a folded assert or an unused inline creates no literal.
+  order tried reproduces: a folded assert or an unused inline creates no literal. Overlay 28 shows more of it: in
+  `union_main.c` one `""` serves the first two functions' asserts, a second the next twelve, a third the rest, and
+  `colosseum.c` has two, each shared across functions, where MWCC gives every file one. What starts a new one is not
+  known yet; `GFL_ASSERT(0)` stringifies to `"0"`, which is not one of them.
 - String literals are created during code generation, for the references that survive optimization, so they come
   after all of a file's file-scope data, and dead code, unused locals and folded asserts create none. A literal
   laid out earlier than any surviving reference to it points to code the original linker dead-stripped. A file name
@@ -1058,6 +1094,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the list after everything else, so their position among the tables doesn't matter but their order among
   themselves can swap strings of equal size: `mbp.c`'s state names come out in the original's order only with
   `sCWork` declared after `childInfo`.
+- Initialized `.data` statics join the same heapsort as the `.rodata` local initializers, though they land in
+  another section, so their declaration order can reorder the locals' tables. `wifilogin_disp.c`'s sixteen 32-byte
+  `BGSetup` locals came out in the original's order only with the 48-byte `BGSysVRAMConfig` declared before the
+  16-byte `BGSysLCDConfig`; no order of the locals themselves did it. Give `rodata_order.py` the file's other statics
+  too (`V:48 L:16 B0:32@ ...`).
 - Small objects that come after a larger one in the same file, out of size order, may be rows of one array: the PC
   box's `box2_ui.c` has seven cursor tables after a 540-byte one, and they are `sTrayCursorData[3][47]`, three rows
   of equal length that each end in a `TOUCH_RECT_END` entry, with other tables pointing into the rows. Once the sizes
@@ -1089,7 +1130,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
   Medal Rally's `p_sv` does.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
-  a relocation. Mark the literal in the config with `tools/scripts/config_fixes.py overlay-id`.
+  a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.
 - A table one element longer in the ROM than the code needs has a terminator: pml_item.c's `TM_MOVE_LIST` is 101 moves
   and a `MOVE_NONE`. Without it the next object starts 2 bytes early.
 
@@ -1110,6 +1151,6 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Before blaming registers, check every literal argument, mask and field offset against the original: 11 of 18
   leftovers of `btlv_input.c` were a swapped argument pair, a wrong mask width, an 8-byte struct that is 12 in the
   game, a `?:` argument that is two calls, or a missing `case 0: break;`, each read as an allocation difference.
-- When the order of instructions differs and no source change moves it, try `tools/scripts/permuter_setup.py`, which
+- When the order of instructions differs and no source change moves it, try `tools/decomp/permuter_setup.py`, which
   prepares a function for [decomp-permuter](https://github.com/simonlindholm/decomp-permuter). Its result can point to
   a plain change: `GFL_BGSysAllocChar`'s registers only matched with its tile size, a `u8` from a call, in an `int`.

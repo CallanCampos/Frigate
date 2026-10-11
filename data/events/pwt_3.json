@@ -1,0 +1,23 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_PWT_2",
+            "warp": 1,
+            "unk4": 3,
+            "transition": 1,
+            "grid": {
+                "x": 680,
+                "y": 0,
+                "z": 232,
+                "width": 1,
+                "height": 3,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

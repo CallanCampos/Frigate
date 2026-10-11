@@ -1,24 +1,24 @@
-None
-Blekinge
-Dalarna
-Gävleborg
-Gotland
-Halland
-Jamtland
-Jönköping
-Kalmar
-Kronoberg
-Norrbotten
-Oland
-Örebro
-Östergötland
-Skane
-Sodermanland
-Stockholm
-Uppsala
-Varmland
-Vasterbotten
-Västernorrland
-Vastmanland
-Västra Götaland
+Bank0435_Text_None = None
+Bank0435_Text_Blekinge = Blekinge
+Bank0435_Text_Dalarna = Dalarna
+Bank0435_Text_GVleborg = Gävleborg
+Bank0435_Text_Gotland = Gotland
+Bank0435_Text_Halland = Halland
+Bank0435_Text_Jamtland = Jamtland
+Bank0435_Text_JNkPing = Jönköping
+Bank0435_Text_Kalmar = Kalmar
+Bank0435_Text_Kronoberg = Kronoberg
+Bank0435_Text_Norrbotten = Norrbotten
+Bank0435_Text_Oland = Oland
+Bank0435_Text_Rebro = Örebro
+Bank0435_Text_StergTland = Östergötland
+Bank0435_Text_Skane = Skane
+Bank0435_Text_Sodermanland = Sodermanland
+Bank0435_Text_Stockholm = Stockholm
+Bank0435_Text_Uppsala = Uppsala
+Bank0435_Text_Varmland = Varmland
+Bank0435_Text_Vasterbotten = Vasterbotten
+Bank0435_Text_VSternorrland = Västernorrland
+Bank0435_Text_Vastmanland = Vastmanland
+Bank0435_Text_VStraGTaland = Västra Götaland
 \pad{5a}

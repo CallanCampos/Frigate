@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Todd",
+    "class": "TRAINER_CLASS_INFIELDER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_HYPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_GURDURR",
+            "form": 0,
+            "level": 47,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PAWNIARD",
+            "form": 0,
+            "level": 47,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My right shoulder is itching to throw!{be01}\nLet's see if you can catch my super\nfastball, right down the center!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Not even my super fastball was enough!\nWell, at least I can say I gave it my all!"
+        },
+        {
+            "type": 15,
+            "text": "This is a token of my appreciation!\nTake it with you!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Thanks to you, I feel like I can\nbe proud of my fastball!{be01}\nThanks so much!"
+        }
+    ]
+}

@@ -1,33 +1,33 @@
-About “Infrared"
-About “Online"
-About “Online"
-About “Wireless"
-About “Wireless"
-About “Wireless"
-About “Wireless"
-About “Wireless"
-About “Tag Log"
-About “Tag Log"
-About “Survey Radar"
-About “Survey Radar"
-About “Customization"
-About “ON/OFF"
-About “ON/OFF"
-Using infrared, you can battle and trade\nwith a friend in front of you.\nYou can also use the Feeling Check, which\ntells you how compatible you and your\nfriend are, and exchange Friend Codes.
-By pressing the Game Sync button,\nyou can select a Pokémon to make sleep\nand then send your saved data over\nNintendo Wi-Fi Connection.
-You cannot connect to Nintendo Wi-Fi\nConnection without the proper\nsystem settings, even when you are\nable to receive a signal for\nNintendo Wi-Fi Connection.
-DS Wireless Communications\nallow you to use the features below\nwith your nearby friends.\n-Xtransceiver\n-Entralink
-The Xtransceiver allows you to connect\nwith friends you've played with in the\nWi-Fi Club or those you've exchanged\nFriend Codes with using the C-Gear.
-Press the button, and you will be\nsent to the Entralink instantly.
-You can tell how many people\nare in the Union Room around you\nand if wireless distributions\nare available nearby.
-You can also tell who has\nthe C-Gear turned on around you.\nWhen people are nearby,\nit is easier to receive signals for\nthe Tag Log and Survey Radar.
-It displays what people\naround you are doing in real time.\nBy selecting it, you can find out\nmore about them and send\nthem messages.
-Also, when a Funfest Mission\nis being undertaken,\nthe phrase “FUNFEST MISSION!" will be\ndisplayed from right to left.\nYou can participate in the\nFunfest Mission from your Tag Log.
-You can do surveys on people\naround you.\n\nChoose what you want to find out,\nand you can see the daily results,\nas well as the cumulative results.
-When you finish a survey you received\nat the Passerby Analytics HQ,\nthe button starts blinking.\nReport the result to the leader\nin Castelia City.
-Touch the Customization icon, and\nthe buttons will start blinking.\nTouch one of the buttons and drag it\nto change its position.\nAlso, you can touch rings to change\ntheir colors.
-Touch this button to turn\nwireless communications on or off.\n\nOnce you turn it off, the Touch Screen\nturns dark, and wireless communications\nwill be turned off.
-The C-Gear is\nautomatically turned off\nwhen the DS system is closed\nand the battery is low.
-NEXT
-QUIT
-PREVIOUS
+Bank0024_Text_AboutInfrared = About “Infrared"
+Bank0024_Text_AboutOnline = About “Online"
+Bank0024_Text_AboutOnline_2 = About “Online"
+Bank0024_Text_AboutWireless = About “Wireless"
+Bank0024_Text_AboutWireless_2 = About “Wireless"
+Bank0024_Text_AboutWireless_3 = About “Wireless"
+Bank0024_Text_AboutWireless_4 = About “Wireless"
+Bank0024_Text_AboutWireless_5 = About “Wireless"
+Bank0024_Text_AboutTagLog = About “Tag Log"
+Bank0024_Text_AboutTagLog_2 = About “Tag Log"
+Bank0024_Text_AboutSurveyRadar = About “Survey Radar"
+Bank0024_Text_AboutSurveyRadar_2 = About “Survey Radar"
+Bank0024_Text_AboutCustomization = About “Customization"
+Bank0024_Text_AboutOff = About “ON/OFF"
+Bank0024_Text_AboutOff_2 = About “ON/OFF"
+Bank0024_Text_UsingInfraredCanBattle = Using infrared, you can battle and trade\nwith a friend in front of you.\nYou can also use the Feeling Check, which\ntells you how compatible you and your\nfriend are, and exchange Friend Codes.
+Bank0024_Text_ByPressingGameSync = By pressing the Game Sync button,\nyou can select a Pokémon to make sleep\nand then send your saved data over\nNintendo Wi-Fi Connection.
+Bank0024_Text_CannotConnectNintendoWi = You cannot connect to Nintendo Wi-Fi\nConnection without the proper\nsystem settings, even when you are\nable to receive a signal for\nNintendo Wi-Fi Connection.
+Bank0024_Text_DsWirelessCommunicationsAllow = DS Wireless Communications\nallow you to use the features below\nwith your nearby friends.\n-Xtransceiver\n-Entralink
+Bank0024_Text_XtransceiverAllowsConnectFriends = The Xtransceiver allows you to connect\nwith friends you've played with in the\nWi-Fi Club or those you've exchanged\nFriend Codes with using the C-Gear.
+Bank0024_Text_PressButtonWillSent = Press the button, and you will be\nsent to the Entralink instantly.
+Bank0024_Text_CanTellHowMany = You can tell how many people\nare in the Union Room around you\nand if wireless distributions\nare available nearby.
+Bank0024_Text_CanAlsoTellWho = You can also tell who has\nthe C-Gear turned on around you.\nWhen people are nearby,\nit is easier to receive signals for\nthe Tag Log and Survey Radar.
+Bank0024_Text_DisplaysWhatPeopleAround = It displays what people\naround you are doing in real time.\nBy selecting it, you can find out\nmore about them and send\nthem messages.
+Bank0024_Text_AlsoWhenFunfestMission = Also, when a Funfest Mission\nis being undertaken,\nthe phrase “FUNFEST MISSION!" will be\ndisplayed from right to left.\nYou can participate in the\nFunfest Mission from your Tag Log.
+Bank0024_Text_CanSurveysPeopleAround = You can do surveys on people\naround you.\n\nChoose what you want to find out,\nand you can see the daily results,\nas well as the cumulative results.
+Bank0024_Text_WhenFinishSurveyReceived = When you finish a survey you received\nat the Passerby Analytics HQ,\nthe button starts blinking.\nReport the result to the leader\nin Castelia City.
+Bank0024_Text_TouchCustomizationIconButtons = Touch the Customization icon, and\nthe buttons will start blinking.\nTouch one of the buttons and drag it\nto change its position.\nAlso, you can touch rings to change\ntheir colors.
+Bank0024_Text_TouchButtonTurnWireless = Touch this button to turn\nwireless communications on or off.\n\nOnce you turn it off, the Touch Screen\nturns dark, and wireless communications\nwill be turned off.
+Bank0024_Text_CGearAutomaticallyTurned = The C-Gear is\nautomatically turned off\nwhen the DS system is closed\nand the battery is low.
+Bank0024_Text_Next = NEXT
+Bank0024_Text_Quit = QUIT
+Bank0024_Text_Previous = PREVIOUS

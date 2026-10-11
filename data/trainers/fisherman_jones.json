@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jones",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ALOMOMOLA",
+            "form": 0,
+            "level": 40,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Check out my Alomomola! It took\nme 100 Poké Balls to catch it!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I guess the number of Poké Balls I used to\ncatch my Pokémon doesn't mean much in{be00}\na battle..."
+        },
+        {
+            "type": 2,
+            "text": "There are other Alomomola, but I feel\nlike I was destined to be with this one!"
+        }
+    ]
+}

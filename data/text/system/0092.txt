@@ -1,46 +1,46 @@
-Please insert a Pokémon\nDiamond, Pearl, Platinum, HeartGold,\nor SoulSilver Version Game Card in the\nother DS system and turn it on. Then\nselect “Poké Transfer ID: {0204:0}"\nfrom “DS Download Play."
-Sending data to\nthe other DS system.
-Please select Pokémon\nin the other DS system.
-Activating Poké Transfer...
-Testing Poké Transfer...
-Receiving test data...
-Saving...\nDon't turn off the power.
-The game has been saved.{be02:60}
-Poké Transfer will end.{be02:60}
-Will you cancel Poké Transfer?
-Unable to connect to the\nother DS system.{be01}
-Waiting for the other DS system's\ndecision.
-Poké Transfer ID: {0204:0}
-Pokémon Black Version 2\nPoké Transfer Program
-Pokémon White Version 2\nPoké Transfer Program
-               \x{ffff}
-                            \x{ffff}
-                            \x{ffff}
-YES
-NO
-                                                                                                                                                          \x{ffff}
-                            \x{ffff}
-                                                                   \x{ffff}
-                                                                   \x{ffff}
-                                    \x{ffff}
-                                      \x{ffff}
-                               \x{ffff}
-                                  \x{ffff}
-                                 \x{ffff}
-                        \x{ffff}
-                                                                 \x{ffff}
-                                   \x{ffff}
-                                         \x{ffff}
-                                                                       \x{ffff}
-                              \x{ffff}
-                                                \x{ffff}
-                                                                                \x{ffff}
-                        \x{ffff}
-                                   \x{ffff}
-                \x{ffff}
-                       \x{ffff}
-                                                                                          \x{ffff}
-                  \x{ffff}
-                    \x{ffff}
-                                                                                \x{ffff}
+Bank0092_Text_PleaseInsertPokemonDiamond = Please insert a Pokémon\nDiamond, Pearl, Platinum, HeartGold,\nor SoulSilver Version Game Card in the\nother DS system and turn it on. Then\nselect “Poké Transfer ID: {0204:0}"\nfrom “DS Download Play."
+Bank0092_Text_SendingDataOtherDs = Sending data to\nthe other DS system.
+Bank0092_Text_PleaseSelectPokemonOther = Please select Pokémon\nin the other DS system.
+Bank0092_Text_ActivatingPokeTransfer = Activating Poké Transfer...
+Bank0092_Text_TestingPokeTransfer = Testing Poké Transfer...
+Bank0092_Text_ReceivingTestData = Receiving test data...
+Bank0092_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+Bank0092_Text_GameHasBeenSaved = The game has been saved.{be02:60}
+Bank0092_Text_PokeTransferWillEnd = Poké Transfer will end.{be02:60}
+Bank0092_Text_WillCancelPokeTransfer = Will you cancel Poké Transfer?
+Bank0092_Text_UnableConnectOtherDs = Unable to connect to the\nother DS system.{be01}
+Bank0092_Text_WaitingOtherDsSystems = Waiting for the other DS system's\ndecision.
+Bank0092_Text_PokeTransferId = Poké Transfer ID: {0204:0}
+Bank0092_Text_PokemonBlackVersion2 = Pokémon Black Version 2\nPoké Transfer Program
+Bank0092_Text_PokemonWhiteVersion2 = Pokémon White Version 2\nPoké Transfer Program
+Bank0092_Text_Empty =                \x{ffff}
+Bank0092_Text_Empty_2 =                             \x{ffff}
+Bank0092_Text_Empty_3 =                             \x{ffff}
+Bank0092_Text_Yes = YES
+Bank0092_Text_No = NO
+Bank0092_Text_Empty_4 =                                                                                                                                                           \x{ffff}
+Bank0092_Text_Empty_5 =                             \x{ffff}
+Bank0092_Text_Empty_6 =                                                                    \x{ffff}
+Bank0092_Text_Empty_7 =                                                                    \x{ffff}
+Bank0092_Text_Empty_8 =                                     \x{ffff}
+Bank0092_Text_Empty_9 =                                       \x{ffff}
+Bank0092_Text_Empty_10 =                                \x{ffff}
+Bank0092_Text_Empty_11 =                                   \x{ffff}
+Bank0092_Text_Empty_12 =                                  \x{ffff}
+Bank0092_Text_Empty_13 =                         \x{ffff}
+Bank0092_Text_Empty_14 =                                                                  \x{ffff}
+Bank0092_Text_Empty_15 =                                    \x{ffff}
+Bank0092_Text_Empty_16 =                                          \x{ffff}
+Bank0092_Text_Empty_17 =                                                                        \x{ffff}
+Bank0092_Text_Empty_18 =                               \x{ffff}
+Bank0092_Text_Empty_19 =                                                 \x{ffff}
+Bank0092_Text_Empty_20 =                                                                                 \x{ffff}
+Bank0092_Text_Empty_21 =                         \x{ffff}
+Bank0092_Text_Empty_22 =                                    \x{ffff}
+Bank0092_Text_Empty_23 =                 \x{ffff}
+Bank0092_Text_Empty_24 =                        \x{ffff}
+Bank0092_Text_Empty_25 =                                                                                           \x{ffff}
+Bank0092_Text_Empty_26 =                   \x{ffff}
+Bank0092_Text_Empty_27 =                     \x{ffff}
+Bank0092_Text_Empty_28 =                                                                                 \x{ffff}
 \pad{6e}

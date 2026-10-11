@@ -1,6 +1,7 @@
 ---
 name: boundary-scout
 description: Read-only. Proposes the original source files of a pokebw2 module or address range. For each file it gives the range in every section, the name with its evidence (embedded string or descriptive), its placement, which functions can be static, and the add_source_file.py command. Use before decompiling a new overlay or a large stretch of ARM9 main, so the long source_files.py and symbol output stays out of the main context.
+model: haiku
 tools: Bash, Read, Grep, Glob
 ---
 
@@ -12,7 +13,7 @@ file, contiguous in every section and in the same order; names from embedded str
 order.
 
 Method:
-1. `.venv/bin/python tools/scripts/source_files.py MODULE` lists the embedded file names and the functions that use
+1. `.venv/bin/python tools/decomp/source_files.py MODULE` lists the embedded file names and the functions that use
    them. Then `--profile START END` for the range, and `--sections START END` for the data of a candidate file.
    Filter the output with `grep` and `head`; don't dump it whole.
 2. Where a string anchors a file, every function passing it belongs to it, and assert line numbers rise through it.

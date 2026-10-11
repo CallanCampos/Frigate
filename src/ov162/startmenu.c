@@ -11,6 +11,7 @@
 #include "app/wifibattlematch.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -57,6 +58,8 @@
 #include "system/text_speed.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
+#include "text/system/startmenu_fieldmap_ctrl_hybrid.h"
+#include "text/system/wifi_error.h"
 
 // The menu after the title screen. Its items scroll on the main engine's BGs 1 and 2, and the sub engine shows the
 // saved game. Picking an item ends the menu, and its exit starts what the item leads to
@@ -273,7 +276,7 @@ static u32 StartMenu_WipeOut(StartMenuWork *wk, u32 next);
 static u32 StartMenu_StartBlink(StartMenuWork *wk, u32 next);
 static BOOL StartMenu_CheckBrokenSave(StartMenuWork *wk);
 
-// Declared in an order that gives the original layout of the data (tools/scripts/rodata_order.py)
+// Declared in an order that gives the original layout of the data (tools/decomp/rodata_order.py)
 
 static const BGSysVRAMConfig sVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
@@ -1043,7 +1046,7 @@ static void StartMenu_FreeUnk16C(StartMenuWork *wk) {
 }
 
 static void StartMenu_InitMsg(StartMenuWork *wk) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 371, HEAPID_STARTMENU);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU_FIELDMAP_CTRL_HYBRID, HEAPID_STARTMENU);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, HEAPID_STARTMENU);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_STARTMENU);
     wk->printQueue = func_02021998(HEAPID_STARTMENU);
@@ -1083,15 +1086,15 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
                                  sWindowLayouts[i].width, sWindowLayouts[i].height, sWindowLayouts[i].palette, 1);
     }
 
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 0);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Continue);
     PrintWindow_Print(&wk->windows[ITEM_CONTINUE], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
 
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 18);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_SavedGame);
     PrintWindow_Print(&wk->windows[WINDOW_SAVED_GAME], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
 
-    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, 13);
+    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Empty_3);
     copyVarForText(wk->wordSet, 0, wk->playerInfo);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, fmt);
     if (getTrainerGender(wk->playerInfo) == 0) {
@@ -1104,7 +1107,7 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
     GFL_StrBufFree(fmt);
 
     // Where the player saved, or where the player goes next after flag 0x965 is set
-    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, 17);
+    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Empty_7);
     joinAvenue = FALSE;
     InitZoneDataSystem(HEAPID_TAIL(HEAPID_STARTMENU));
     if (EventWork_FlagGet(wk->eventWork, 0x965) == TRUE) {
@@ -1135,7 +1138,7 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
     PrintWindow_Print(&wk->windows[WINDOW_LOCATION], wk->printQueue, 0, 0, wk->strbuf, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(fmt);
 
-    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, 10);
+    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Time);
     time = func_02008de8(wk->save);
     WordSetNumber(wk->wordSet, 0, func_02008cec(time), 3, NUM_PAD_NONE, 1);
     WordSetNumber(wk->wordSet, 1, func_02008cf0(time), 2, NUM_PAD_ZERO, 1);
@@ -1145,7 +1148,7 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
 
     // The Pokédex after flag 0x962 is set
     if (EventWork_FlagGet(wk->eventWork, 0x962) == TRUE) {
-        fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, 11);
+        fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Pokedex);
         WordSetNumber(wk->wordSet, 0, countSeenDexPokes(getPokedexSaveAddress(wk->save), HEAPID_STARTMENU), 3,
                       NUM_PAD_NONE, 1);
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, fmt);
@@ -1154,13 +1157,13 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
         GFL_StrBufFree(fmt);
     }
 
-    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, 12);
+    fmt = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Badges);
     WordSetNumber(wk->wordSet, 0, getBadgeCount(getTrainerGameInfoAddress(wk->save)), 2, NUM_PAD_NONE, 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, fmt);
     PrintWindow_Print(&wk->windows[WINDOW_BADGES], wk->printQueue, 0, 0, wk->strbuf, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(fmt);
 
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 19);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_KeySystemSettings);
     PrintWindow_Print(&wk->windows[WINDOW_KEY_SYSTEM], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
 
@@ -1212,28 +1215,28 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
             GFL_StrBufFree(str);
         }
     }
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 1);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_NewGame);
     PrintWindow_Print(&wk->windows[ITEM_NEW_GAME], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 2);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_MysteryGift);
     PrintWindow_Print(&wk->windows[ITEM_MYSTERY_GIFT], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 4);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_BattleCompetition);
     PrintWindow_Print(&wk->windows[ITEM_BATTLE_COMPETITION], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 5);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_GameSyncSettings);
     PrintWindow_Print(&wk->windows[ITEM_GAME_SYNC_SETTINGS], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 3);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_NintendoWfcSettings);
     PrintWindow_Print(&wk->windows[ITEM_WFC_SETTINGS], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 7);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_MicTest);
     PrintWindow_Print(&wk->windows[ITEM_MIC_TEST], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 6);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Empty);
     PrintWindow_Print(&wk->windows[ITEM_MB_PARENT], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 8);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_UnovaLink);
     PrintWindow_Print(&wk->windows[ITEM_UNOVA_LINK], wk->printQueue, 0, 4, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
 }
@@ -1648,16 +1651,16 @@ static void StartMenu_OpenNewGameWarning(StartMenuWork *wk) {
     StrBuf *str;
 
     wk->notice.window = BmpWin_CreateDynamic(0, 2, 2, 30, 20, 5, 1);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 32);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Warning_2);
     PrintWindow_Print(&wk->notice, wk->printQueue, 0, 0, str, wk->font, PRINT_COLOR(5, 6, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 33);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_TheresAlreadySavedGame);
     PrintWindow_Print(&wk->notice, wk->printQueue, 0, 24, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 34);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_ButtonBeginAdventure);
     PrintWindow_Print(&wk->notice, wk->printQueue, 0, 128, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 35);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_BButtonReturnMenu);
     PrintWindow_Print(&wk->notice, wk->printQueue, 0, 144, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     BmpWin_FlushMap(wk->notice.window);
@@ -1692,10 +1695,10 @@ static void StartMenu_OpenCGearWarning(StartMenuWork *wk) {
     StrBuf *str;
 
     wk->notice.window = BmpWin_CreateDynamic(4, 2, 3, 30, 19, 5, 1);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 30);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_Warning);
     PrintWindow_Print(&wk->notice, wk->printQueue, 0, 0, str, wk->font, PRINT_COLOR(5, 6, 0));
     GFL_StrBufFree(str);
-    str = GFL_MsgDataLoadStrbufNew(wk->msgData, 31);
+    str = GFL_MsgDataLoadStrbufNew(wk->msgData, StartmenuFieldmapCtrlHybrid_Text_CanEnjoyGameIts);
     PrintWindow_Print(&wk->notice, wk->printQueue, 0, 24, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     BmpWin_FlushMap(wk->notice.window);
@@ -1708,11 +1711,11 @@ static void StartMenu_CloseCGearWarning(StartMenuWork *wk) {
 }
 
 static void StartMenu_OpenDSiNotice(StartMenuWork *wk) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 439, HEAPID_TAIL(HEAPID_STARTMENU));
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, HEAPID_TAIL(HEAPID_STARTMENU));
     StrBuf *str;
 
     wk->notice.window = BmpWin_CreateDynamic(0, 2, 2, 30, 20, 5, 1);
-    str = GFL_MsgDataLoadStrbufNew(msgData, 32);
+    str = GFL_MsgDataLoadStrbufNew(msgData, WifiError_Text_PleaseConfigureConnectionSettings);
     PrintWindow_Print(&wk->notice, wk->printQueue, 0, 0, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);

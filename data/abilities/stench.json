@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Stench",
+    "description": "The stench may cause\nthe target to flinch."
+}

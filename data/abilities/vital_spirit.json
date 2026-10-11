@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Vital Spirit",
+    "description": "Prevents the Pokémon\nfrom falling asleep."
+}

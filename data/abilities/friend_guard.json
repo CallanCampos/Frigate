@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Friend Guard",
+    "description": "Reduces damage done\nto allies."
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Orville",
+    "class": "TRAINER_CLASS_JANITOR",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LILLIPUP",
+            "form": 0,
+            "level": 6,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAREEP",
+            "form": 0,
+            "level": 6,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Oh! I haven't seen you before!\nWould you mind sparring with me?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Wow! Astounding! For one so young,\nyou're quite impressive, indeed!"
+        },
+        {
+            "type": 2,
+            "text": "Look carefully around the ranch and on\nthe roads, and you might find items on{be00}\nthe ground!"
+        }
+    ]
+}

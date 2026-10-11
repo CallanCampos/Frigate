@@ -1,9 +1,0 @@
-Welcome, challenger!{be01}
-I've been waiting for this!
-Know what?{be01}\nI really look forward to having\nserious battles with strong Trainers!{be01}\nI mean, come on! The Trainers who\nmake it here are Trainers who desire{be00}\nvictory with every fiber of their being!{be01}\nAnd they are battling alongside\nPokémon that have been through{be00}\ncountless difficult battles!{be01}\nIf I battle with people like that,\nnot only will I get stronger,{be00}\nmy Pokémon will, too!{be01}\nAnd we'll get to know\neach other even better!{be01}\nOK! Brace yourself!{be01}\nI'm Iris, the Pokémon League Champion,\nand I'm going to defeat you!{be01}
-The Trainers who come here\nare Trainers who desire victory{be00}\nwith every fiber of their being!{be01}\nAnd they are battling alongside\nPokémon that have been through{be00}\ncountless difficult battles!{be01}\nIf I battle with people like that,\nnot only will I get stronger,{be00}\nmy Pokémon will, too!{be01}\nAnd we'll get to know\neach other even better!{be01}\nOK! Brace yourself!{be01}\nI'm Iris, the Pokémon League Champion,\nand I'm going to defeat you!{be01}
-Iris: I'm upset I couldn't win!{be01}\nBut you know what?\nMore than that, I'm happy!{be01}\nI mean, come on.\nBy having a serious battle,{be00}\nyou and your Pokémon,{be00}\nand me and my Pokémon,{be00}\nwe all got to know one another{be00}\nbetter than before!{be01}\nYep, we sure did!\nOK, let's go!{be01}
-OK! Go on ahead! Hurry!{be01}
-OK! Go on ahead! Hurry!{be01}
-Whaa?!\nWhere are you going?{be01}
-\pad{d4}

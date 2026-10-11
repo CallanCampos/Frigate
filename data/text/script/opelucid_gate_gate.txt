@@ -1,0 +1,4 @@
+OpelucidGateGate_Text_Empty =                                                \x{ffff}
+OpelucidGateGate_Text_Empty_2 =                                                \x{ffff}
+OpelucidGateGate_Text_Empty_3 =                              \x{ffff}
+\pad{e0}

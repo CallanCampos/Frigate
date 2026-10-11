@@ -1,0 +1,198 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Machop",
+    "pokedex": {
+        "category": "Superpower Pokémon",
+        "entry": "Though small in stature, it is\npowerful enough to easily heft and\nthrow a number of Geodude at once.",
+        "height": "2'07\"",
+        "weight": "43.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Machop",
+                "category": "Superpower Pokémon",
+                "entry": "Though small in stature, it is\npowerful enough to easily heft and\nthrow a number of Geodude at once.",
+                "height": "2'07\"",
+                "weight": "43.0 lbs."
+            },
+            "fr": {
+                "name": "Machoc",
+                "category": "Pokémon Colosse",
+                "entry": "Malgré sa petite taille, sa force\nlui permet de soulever plusieurs\nRacaillou à la fois.",
+                "height": "0,8 m",
+                "weight": "19,5 kg"
+            },
+            "de": {
+                "name": "Machollo",
+                "category": "Kraftprotz",
+                "entry": "Obwohl von kleiner Statur, ist es\nkräftig genug, mehrere Kleinstein\nzu hieven und dann zu werfen.",
+                "height": "0,8 m",
+                "weight": "19,5 kg"
+            },
+            "it": {
+                "name": "Machop",
+                "category": "Pokémon Megaforza",
+                "entry": "Nonostante sia piccolo, riesce a\nsollevare e lanciare più Geodude\ncontemporaneamente.",
+                "height": "0,8 m",
+                "weight": "19,5 kg"
+            },
+            "ko": {
+                "name": "알통몬",
+                "category": "괴력포켓몬",
+                "entry": "작은 몸집이지만 힘이 세다.\n꼬마돌쯤은 몇 마리라도 한꺼번에\n가뿐히 들어올려서 날려버린다.",
+                "height": "0.8 m",
+                "weight": "19.5 kg"
+            },
+            "es": {
+                "name": "Machop",
+                "category": "Pokémon Superpoder",
+                "entry": "No alcanza mucha altura, pero tiene\nfuerza suficiente para levantar y\nderribar a varios Geodude a la vez.",
+                "height": "0,8 m",
+                "weight": "19,5 kg"
+            },
+            "ja": {
+                "name": "ワンリキー",
+                "category": "かいりきポケモン",
+                "entry": "こがらな\\x{3000}からだだけど\\x{3000}ちからもち。\nイシツブテなら\\x{3000}なんびきも\\x{3000}まとめて\nかるがると\\x{3000}もちあげ\\x{3000}なげとばす。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 80,
+        "defense": 50,
+        "speed": 35,
+        "special_attack": 35,
+        "special_defense": 35
+    },
+    "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+    "catch_rate": 180,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_GUTS", "ABILITY_NO_GUARD" ],
+    "hidden_ability": "ABILITY_STEADFAST",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 61,
+    "height": 8,
+    "weight": 195,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LOW_KICK" ],
+            [ 1, "MOVE_LEER" ],
+            [ 7, "MOVE_FOCUS_ENERGY" ],
+            [ 10, "MOVE_KARATE_CHOP" ],
+            [ 13, "MOVE_LOW_SWEEP" ],
+            [ 19, "MOVE_FORESIGHT" ],
+            [ 22, "MOVE_SEISMIC_TOSS" ],
+            [ 25, "MOVE_REVENGE" ],
+            [ 31, "MOVE_VITAL_THROW" ],
+            [ 34, "MOVE_SUBMISSION" ],
+            [ 37, "MOVE_WAKE_UP_SLAP" ],
+            [ 43, "MOVE_CROSS_CHOP" ],
+            [ 46, "MOVE_SCARY_FACE" ],
+            [ 49, "MOVE_DYNAMIC_PUNCH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM66",
+            "TM67",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_DUAL_CHOP",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_SUPERPOWER",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ROLE_PLAY",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_MEDITATE",
+            "MOVE_ROLLING_KICK",
+            "MOVE_ENCORE",
+            "MOVE_SMELLING_SALT",
+            "MOVE_COUNTER",
+            "MOVE_CLOSE_COMBAT",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BULLET_PUNCH",
+            "MOVE_POWER_TRICK",
+            "MOVE_HEAVY_SLAM",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TICKLE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 28,
+            "species": "SPECIES_MACHOKE"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MACHOP"
+}

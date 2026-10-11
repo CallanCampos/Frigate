@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MAROWAK",
+    "moves": [ "MOVE_SUBSTITUTE", "MOVE_DETECT", "MOVE_EARTHQUAKE", "MOVE_SWORDS_DANCE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_SALAC_BERRY",
+    "form": 0
+}

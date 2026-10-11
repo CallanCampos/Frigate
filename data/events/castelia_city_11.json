@@ -1,0 +1,57 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 76,
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 18,
+                "z": 16,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_CASTELIA_CITY",
+            "warp": 16,
+            "unk4": 2,
+            "transition": 36,
+            "grid": {
+                "x": 168,
+                "y": 0,
+                "z": 56,
+                "width": 6,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY",
+            "warp": 3,
+            "unk4": 2,
+            "transition": 36,
+            "grid": {
+                "x": 264,
+                "y": 0,
+                "z": 56,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

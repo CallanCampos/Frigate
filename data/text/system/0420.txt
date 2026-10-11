@@ -1,9 +1,9 @@
-None
-Australian Capital Territory
-New South Wales
-Northern Territory
-Queensland
-South Australia
-Tasmania
-Victoria
-Western Australia
+Bank0420_Text_None = None
+Bank0420_Text_AustralianCapitalTerritory = Australian Capital Territory
+Bank0420_Text_NewSouthWales = New South Wales
+Bank0420_Text_NorthernTerritory = Northern Territory
+Bank0420_Text_Queensland = Queensland
+Bank0420_Text_SouthAustralia = South Australia
+Bank0420_Text_Tasmania = Tasmania
+Bank0420_Text_Victoria = Victoria
+Bank0420_Text_WesternAustralia = Western Australia

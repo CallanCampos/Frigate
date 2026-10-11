@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_CHIMECHO",
+    "moves": [ "MOVE_PSYCHIC", "MOVE_YAWN", "MOVE_LIGHT_SCREEN", "MOVE_REFLECT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_COLBUR_BERRY",
+    "form": 0
+}

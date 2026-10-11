@@ -1,0 +1,93 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_GOTHITA", 21, 21 ],
+                [ "SPECIES_MINCCINO", 21, 21 ],
+                [ "SPECIES_TRUBBISH", 21, 21 ],
+                [ "SPECIES_TRUBBISH", 23, 23 ],
+                [ "SPECIES_LIEPARD", 22, 22 ],
+                [ "SPECIES_LIEPARD", 24, 24 ],
+                [ "SPECIES_MINCCINO", 22, 22 ],
+                [ "SPECIES_GOTHITA", 22, 22 ],
+                [ "SPECIES_MINCCINO", 23, 23 ],
+                [ "SPECIES_GOTHITA", 23, 23 ],
+                [ "SPECIES_MINCCINO", 24, 24 ],
+                [ "SPECIES_GOTHITA", 24, 24 ]
+            ],
+            "white2": [
+                [ "SPECIES_SOLOSIS", 21, 21 ],
+                [ "SPECIES_MINCCINO", 21, 21 ],
+                [ "SPECIES_TRUBBISH", 21, 21 ],
+                [ "SPECIES_MINCCINO", 23, 23 ],
+                [ "SPECIES_LIEPARD", 22, 22 ],
+                [ "SPECIES_LIEPARD", 24, 24 ],
+                [ "SPECIES_TRUBBISH", 22, 22 ],
+                [ "SPECIES_SOLOSIS", 22, 22 ],
+                [ "SPECIES_TRUBBISH", 23, 23 ],
+                [ "SPECIES_SOLOSIS", 23, 23 ],
+                [ "SPECIES_TRUBBISH", 24, 24 ],
+                [ "SPECIES_SOLOSIS", 24, 24 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_GOTHITA", 23, 23 ],
+                [ "SPECIES_MINCCINO", 23, 23 ],
+                [ "SPECIES_TRUBBISH", 23, 23 ],
+                [ "SPECIES_TRUBBISH", 25, 25 ],
+                [ "SPECIES_LIEPARD", 24, 24 ],
+                [ "SPECIES_LIEPARD", 26, 26 ],
+                [ "SPECIES_MINCCINO", 24, 24 ],
+                [ "SPECIES_GOTHITA", 24, 24 ],
+                [ "SPECIES_MINCCINO", 25, 25 ],
+                [ "SPECIES_GOTHITA", 25, 25 ],
+                [ "SPECIES_MINCCINO", 26, 26 ],
+                [ "SPECIES_GOTHITA", 26, 26 ]
+            ],
+            "white2": [
+                [ "SPECIES_SOLOSIS", 23, 23 ],
+                [ "SPECIES_MINCCINO", 23, 23 ],
+                [ "SPECIES_TRUBBISH", 23, 23 ],
+                [ "SPECIES_MINCCINO", 25, 25 ],
+                [ "SPECIES_LIEPARD", 24, 24 ],
+                [ "SPECIES_LIEPARD", 26, 26 ],
+                [ "SPECIES_TRUBBISH", 24, 24 ],
+                [ "SPECIES_SOLOSIS", 24, 24 ],
+                [ "SPECIES_TRUBBISH", 25, 25 ],
+                [ "SPECIES_SOLOSIS", 25, 25 ],
+                [ "SPECIES_TRUBBISH", 26, 26 ],
+                [ "SPECIES_SOLOSIS", 26, 26 ]
+            ]
+        },
+        "shaking_grass": [
+            [ "SPECIES_AUDINO", 21, 21 ],
+            [ "SPECIES_AUDINO", 21, 21 ],
+            [ "SPECIES_EMOLGA", 22, 22 ],
+            [ "SPECIES_AUDINO", 22, 22 ],
+            [ "SPECIES_AUDINO", 23, 23 ],
+            [ "SPECIES_AUDINO", 23, 23 ],
+            [ "SPECIES_AUDINO", 24, 24 ],
+            [ "SPECIES_AUDINO", 24, 24 ],
+            [ "SPECIES_CINCCINO", 24, 24 ],
+            [ "SPECIES_AUDINO", 24, 24 ],
+            [ "SPECIES_CINCCINO", 24, 24 ],
+            [ "SPECIES_AUDINO", 24, 24 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Heatproof",
+    "description": "Weakens the power of\nFire-type moves."
+}

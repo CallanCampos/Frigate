@@ -1,0 +1,4095 @@
+{
+    "$schema": "areas.schema.json",
+    "areas": [
+        {
+            "prop_bundle": 0,
+            "texture_set": 0,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 0,
+            "texture_set": 1,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 0,
+            "texture_set": 2,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 0,
+            "texture_set": 3,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 0,
+            "texture_set": 4,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 0,
+            "texture_set": 5,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 1,
+            "texture_set": 6,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 1,
+            "texture_set": 7,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 1,
+            "texture_set": 8,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 1,
+            "texture_set": 9,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 2,
+            "texture_set": 10,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 2,
+            "texture_set": 11,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 2,
+            "texture_set": 12,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 2,
+            "texture_set": 13,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 3,
+            "texture_set": 14,
+            "srt_animation": 36,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 148,
+            "edge_color_table": 255,
+            "actor_material_color": 0
+        },
+        {
+            "prop_bundle": 3,
+            "texture_set": 15,
+            "srt_animation": 36,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 149,
+            "edge_color_table": 255,
+            "actor_material_color": 0
+        },
+        {
+            "prop_bundle": 3,
+            "texture_set": 16,
+            "srt_animation": 36,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 150,
+            "edge_color_table": 255,
+            "actor_material_color": 0
+        },
+        {
+            "prop_bundle": 3,
+            "texture_set": 17,
+            "srt_animation": 36,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 151,
+            "edge_color_table": 255,
+            "actor_material_color": 0
+        },
+        {
+            "prop_bundle": 4,
+            "texture_set": 18,
+            "srt_animation": 0,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 144,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 4,
+            "texture_set": 19,
+            "srt_animation": 0,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 145,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 4,
+            "texture_set": 20,
+            "srt_animation": 0,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 146,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 4,
+            "texture_set": 21,
+            "srt_animation": 0,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 147,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 5,
+            "texture_set": 22,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 5,
+            "texture_set": 23,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 5,
+            "texture_set": 24,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 5,
+            "texture_set": 25,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 6,
+            "texture_set": 26,
+            "srt_animation": 37,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 6,
+            "texture_set": 27,
+            "srt_animation": 37,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 6,
+            "texture_set": 28,
+            "srt_animation": 37,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 6,
+            "texture_set": 29,
+            "srt_animation": 37,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 7,
+            "texture_set": 30,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 7,
+            "texture_set": 31,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 7,
+            "texture_set": 32,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 7,
+            "texture_set": 33,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 8,
+            "texture_set": 34,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 8,
+            "texture_set": 35,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 8,
+            "texture_set": 36,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 8,
+            "texture_set": 37,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 9,
+            "texture_set": 38,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 9,
+            "texture_set": 39,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 9,
+            "texture_set": 40,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 9,
+            "texture_set": 41,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 10,
+            "texture_set": 42,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 10,
+            "texture_set": 43,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 10,
+            "texture_set": 44,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 10,
+            "texture_set": 45,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 11,
+            "texture_set": 46,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 11,
+            "texture_set": 47,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 11,
+            "texture_set": 48,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 11,
+            "texture_set": 49,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 12,
+            "texture_set": 50,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 12,
+            "texture_set": 51,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 12,
+            "texture_set": 52,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 12,
+            "texture_set": 53,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 13,
+            "texture_set": 54,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 13,
+            "texture_set": 55,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 13,
+            "texture_set": 56,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 13,
+            "texture_set": 57,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 14,
+            "texture_set": 58,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 14,
+            "texture_set": 59,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 14,
+            "texture_set": 60,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 14,
+            "texture_set": 61,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 15,
+            "texture_set": 62,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 15,
+            "texture_set": 63,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 15,
+            "texture_set": 64,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 15,
+            "texture_set": 65,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 16,
+            "texture_set": 66,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 16,
+            "texture_set": 67,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 16,
+            "texture_set": 68,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 16,
+            "texture_set": 69,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 17,
+            "texture_set": 70,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 17,
+            "texture_set": 71,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 17,
+            "texture_set": 72,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 17,
+            "texture_set": 73,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 18,
+            "texture_set": 74,
+            "srt_animation": 39,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 18,
+            "texture_set": 75,
+            "srt_animation": 39,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 18,
+            "texture_set": 76,
+            "srt_animation": 39,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 18,
+            "texture_set": 77,
+            "srt_animation": 39,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 19,
+            "texture_set": 78,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 19,
+            "texture_set": 79,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 19,
+            "texture_set": 80,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 19,
+            "texture_set": 81,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 20,
+            "texture_set": 82,
+            "srt_animation": 40,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 20,
+            "texture_set": 83,
+            "srt_animation": 40,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 20,
+            "texture_set": 84,
+            "srt_animation": 40,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 20,
+            "texture_set": 85,
+            "srt_animation": 40,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 21,
+            "texture_set": 86,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 144,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 21,
+            "texture_set": 87,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 145,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 21,
+            "texture_set": 88,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 146,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 21,
+            "texture_set": 89,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 147,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 22,
+            "texture_set": 90,
+            "srt_animation": 41,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 22,
+            "texture_set": 91,
+            "srt_animation": 41,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 22,
+            "texture_set": 92,
+            "srt_animation": 41,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 22,
+            "texture_set": 93,
+            "srt_animation": 41,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 23,
+            "texture_set": 94,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 144,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 23,
+            "texture_set": 95,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 145,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 23,
+            "texture_set": 96,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 146,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 23,
+            "texture_set": 97,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 147,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 24,
+            "texture_set": 98,
+            "srt_animation": 56,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 24,
+            "texture_set": 99,
+            "srt_animation": 56,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 24,
+            "texture_set": 100,
+            "srt_animation": 56,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 24,
+            "texture_set": 101,
+            "srt_animation": 56,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 25,
+            "texture_set": 102,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 25,
+            "texture_set": 103,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 25,
+            "texture_set": 104,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 25,
+            "texture_set": 105,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 26,
+            "texture_set": 106,
+            "srt_animation": 42,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 156,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 26,
+            "texture_set": 107,
+            "srt_animation": 42,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 157,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 26,
+            "texture_set": 108,
+            "srt_animation": 42,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 158,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 26,
+            "texture_set": 109,
+            "srt_animation": 42,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 159,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 27,
+            "texture_set": 110,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 27,
+            "texture_set": 111,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 27,
+            "texture_set": 112,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 27,
+            "texture_set": 113,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 28,
+            "texture_set": 114,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 28,
+            "texture_set": 115,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 28,
+            "texture_set": 116,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 28,
+            "texture_set": 117,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 29,
+            "texture_set": 118,
+            "srt_animation": 43,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 29,
+            "texture_set": 119,
+            "srt_animation": 43,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 29,
+            "texture_set": 120,
+            "srt_animation": 43,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 29,
+            "texture_set": 121,
+            "srt_animation": 43,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 30,
+            "texture_set": 122,
+            "srt_animation": 44,
+            "pattern_animation": 4,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 30,
+            "texture_set": 123,
+            "srt_animation": 44,
+            "pattern_animation": 4,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 30,
+            "texture_set": 124,
+            "srt_animation": 44,
+            "pattern_animation": 4,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 30,
+            "texture_set": 125,
+            "srt_animation": 44,
+            "pattern_animation": 4,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 31,
+            "texture_set": 126,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 31,
+            "texture_set": 127,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 31,
+            "texture_set": 128,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 31,
+            "texture_set": 129,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 32,
+            "texture_set": 130,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 32,
+            "texture_set": 131,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 32,
+            "texture_set": 132,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 32,
+            "texture_set": 133,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 33,
+            "texture_set": 134,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 160,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 33,
+            "texture_set": 135,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 161,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 33,
+            "texture_set": 136,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 162,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 33,
+            "texture_set": 137,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 163,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 34,
+            "texture_set": 138,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 34,
+            "texture_set": 139,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 34,
+            "texture_set": 140,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 34,
+            "texture_set": 141,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 35,
+            "texture_set": 142,
+            "srt_animation": 45,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 35,
+            "texture_set": 143,
+            "srt_animation": 45,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 35,
+            "texture_set": 144,
+            "srt_animation": 45,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 35,
+            "texture_set": 145,
+            "srt_animation": 45,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 36,
+            "texture_set": 146,
+            "srt_animation": 57,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 188,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 36,
+            "texture_set": 147,
+            "srt_animation": 57,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 188,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 36,
+            "texture_set": 148,
+            "srt_animation": 57,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 188,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 36,
+            "texture_set": 149,
+            "srt_animation": 57,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 188,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 37,
+            "texture_set": 150,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 37,
+            "texture_set": 151,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 37,
+            "texture_set": 152,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 37,
+            "texture_set": 153,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 38,
+            "texture_set": 154,
+            "srt_animation": 1,
+            "pattern_animation": 5,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 38,
+            "texture_set": 155,
+            "srt_animation": 1,
+            "pattern_animation": 5,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 38,
+            "texture_set": 156,
+            "srt_animation": 1,
+            "pattern_animation": 5,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 38,
+            "texture_set": 157,
+            "srt_animation": 1,
+            "pattern_animation": 5,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 39,
+            "texture_set": 158,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 39,
+            "texture_set": 159,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 39,
+            "texture_set": 160,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 39,
+            "texture_set": 161,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 40,
+            "texture_set": 162,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 40,
+            "texture_set": 163,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 40,
+            "texture_set": 164,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 40,
+            "texture_set": 165,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 41,
+            "texture_set": 166,
+            "srt_animation": 2,
+            "pattern_animation": 6,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 41,
+            "texture_set": 167,
+            "srt_animation": 2,
+            "pattern_animation": 6,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 41,
+            "texture_set": 168,
+            "srt_animation": 2,
+            "pattern_animation": 6,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 41,
+            "texture_set": 169,
+            "srt_animation": 2,
+            "pattern_animation": 6,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 42,
+            "texture_set": 170,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 42,
+            "texture_set": 171,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 42,
+            "texture_set": 172,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 42,
+            "texture_set": 173,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 43,
+            "texture_set": 174,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 43,
+            "texture_set": 175,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 43,
+            "texture_set": 176,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 43,
+            "texture_set": 177,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 44,
+            "texture_set": 178,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 44,
+            "texture_set": 179,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 44,
+            "texture_set": 180,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 44,
+            "texture_set": 181,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 45,
+            "texture_set": 182,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 0,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 45,
+            "texture_set": 183,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 1,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 45,
+            "texture_set": 184,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 2,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 45,
+            "texture_set": 185,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 3,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 46,
+            "texture_set": 186,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 144,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 46,
+            "texture_set": 187,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 145,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 46,
+            "texture_set": 188,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 146,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 46,
+            "texture_set": 189,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 147,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 47,
+            "texture_set": 190,
+            "srt_animation": 46,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 47,
+            "texture_set": 191,
+            "srt_animation": 46,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 47,
+            "texture_set": 192,
+            "srt_animation": 46,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 47,
+            "texture_set": 193,
+            "srt_animation": 46,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 48,
+            "texture_set": 194,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 48,
+            "texture_set": 195,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 48,
+            "texture_set": 196,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 48,
+            "texture_set": 197,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 49,
+            "texture_set": 198,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 49,
+            "texture_set": 199,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 49,
+            "texture_set": 200,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 49,
+            "texture_set": 201,
+            "srt_animation": 38,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 50,
+            "texture_set": 202,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 50,
+            "texture_set": 203,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 50,
+            "texture_set": 204,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 50,
+            "texture_set": 205,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 51,
+            "texture_set": 206,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 164,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 51,
+            "texture_set": 207,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 165,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 51,
+            "texture_set": 208,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 166,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 51,
+            "texture_set": 209,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 167,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 52,
+            "texture_set": 210,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 52,
+            "texture_set": 211,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 52,
+            "texture_set": 212,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 52,
+            "texture_set": 213,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 53,
+            "texture_set": 214,
+            "srt_animation": 47,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 53,
+            "texture_set": 215,
+            "srt_animation": 47,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 53,
+            "texture_set": 216,
+            "srt_animation": 47,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 53,
+            "texture_set": 217,
+            "srt_animation": 47,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 54,
+            "texture_set": 218,
+            "srt_animation": 48,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 54,
+            "texture_set": 219,
+            "srt_animation": 48,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 54,
+            "texture_set": 220,
+            "srt_animation": 48,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 54,
+            "texture_set": 221,
+            "srt_animation": 48,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 55,
+            "texture_set": 222,
+            "srt_animation": 49,
+            "pattern_animation": 7,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 55,
+            "texture_set": 223,
+            "srt_animation": 49,
+            "pattern_animation": 7,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 55,
+            "texture_set": 224,
+            "srt_animation": 49,
+            "pattern_animation": 7,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 55,
+            "texture_set": 225,
+            "srt_animation": 49,
+            "pattern_animation": 7,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 56,
+            "texture_set": 226,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 168,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 56,
+            "texture_set": 227,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 169,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 56,
+            "texture_set": 228,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 170,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 56,
+            "texture_set": 229,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 171,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 57,
+            "texture_set": 230,
+            "srt_animation": 50,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 57,
+            "texture_set": 231,
+            "srt_animation": 50,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 57,
+            "texture_set": 232,
+            "srt_animation": 50,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 57,
+            "texture_set": 233,
+            "srt_animation": 50,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 58,
+            "texture_set": 234,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 58,
+            "texture_set": 235,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 58,
+            "texture_set": 236,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 58,
+            "texture_set": 237,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 59,
+            "texture_set": 238,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 59,
+            "texture_set": 239,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 59,
+            "texture_set": 240,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 59,
+            "texture_set": 241,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 60,
+            "texture_set": 242,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 60,
+            "texture_set": 243,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 60,
+            "texture_set": 244,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 60,
+            "texture_set": 245,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 61,
+            "texture_set": 246,
+            "srt_animation": 51,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 152,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 61,
+            "texture_set": 247,
+            "srt_animation": 51,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 153,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 61,
+            "texture_set": 248,
+            "srt_animation": 51,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 154,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 61,
+            "texture_set": 249,
+            "srt_animation": 51,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 155,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 62,
+            "texture_set": 250,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 62,
+            "texture_set": 251,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 62,
+            "texture_set": 252,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 62,
+            "texture_set": 253,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 63,
+            "texture_set": 254,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 63,
+            "texture_set": 255,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 63,
+            "texture_set": 256,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 63,
+            "texture_set": 257,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 64,
+            "texture_set": 258,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 64,
+            "texture_set": 259,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 141,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 64,
+            "texture_set": 260,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 142,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 64,
+            "texture_set": 261,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 143,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 65,
+            "texture_set": 262,
+            "srt_animation": 52,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 172,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 65,
+            "texture_set": 263,
+            "srt_animation": 52,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 173,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 65,
+            "texture_set": 264,
+            "srt_animation": 52,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 174,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 65,
+            "texture_set": 265,
+            "srt_animation": 52,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 175,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 66,
+            "texture_set": 266,
+            "srt_animation": 53,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 176,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 66,
+            "texture_set": 267,
+            "srt_animation": 53,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 177,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 66,
+            "texture_set": 268,
+            "srt_animation": 53,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 178,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 66,
+            "texture_set": 269,
+            "srt_animation": 53,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 179,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 67,
+            "texture_set": 270,
+            "srt_animation": 54,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 176,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 67,
+            "texture_set": 271,
+            "srt_animation": 54,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 177,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 67,
+            "texture_set": 272,
+            "srt_animation": 54,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 178,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 67,
+            "texture_set": 273,
+            "srt_animation": 54,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 179,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 68,
+            "texture_set": 274,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 184,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 68,
+            "texture_set": 275,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 185,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 68,
+            "texture_set": 276,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 186,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 68,
+            "texture_set": 277,
+            "srt_animation": 0,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 187,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 69,
+            "texture_set": 278,
+            "srt_animation": 55,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 180,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 69,
+            "texture_set": 279,
+            "srt_animation": 55,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 181,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 69,
+            "texture_set": 280,
+            "srt_animation": 55,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 182,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 69,
+            "texture_set": 281,
+            "srt_animation": 55,
+            "pattern_animation": 0,
+            "exterior": true,
+            "lights": 183,
+            "edge_color_table": 0,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 0,
+            "texture_set": 282,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 1,
+            "texture_set": 283,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 196,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 2,
+            "texture_set": 284,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 3,
+            "texture_set": 285,
+            "srt_animation": 4,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 4,
+            "texture_set": 286,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 5,
+            "texture_set": 287,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 6,
+            "texture_set": 288,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 7,
+            "texture_set": 289,
+            "srt_animation": 5,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 8,
+            "texture_set": 290,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 9,
+            "texture_set": 291,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 10,
+            "texture_set": 292,
+            "srt_animation": 6,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 4,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 11,
+            "texture_set": 293,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 8,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 12,
+            "texture_set": 294,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 32,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 13,
+            "texture_set": 295,
+            "srt_animation": 7,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 12,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 14,
+            "texture_set": 296,
+            "srt_animation": 3,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 16,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 15,
+            "texture_set": 297,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 16,
+            "texture_set": 298,
+            "srt_animation": 8,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 20,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 17,
+            "texture_set": 299,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 18,
+            "texture_set": 300,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 19,
+            "texture_set": 301,
+            "srt_animation": 9,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 20,
+            "texture_set": 302,
+            "srt_animation": 10,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 108,
+            "edge_color_table": 5,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 21,
+            "texture_set": 303,
+            "srt_animation": 34,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 22,
+            "texture_set": 304,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 112,
+            "edge_color_table": 2,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 23,
+            "texture_set": 305,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 24,
+            "texture_set": 306,
+            "srt_animation": 11,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 25,
+            "texture_set": 307,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 26,
+            "texture_set": 308,
+            "srt_animation": 12,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 116,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 27,
+            "texture_set": 309,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 120,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 28,
+            "texture_set": 310,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 29,
+            "texture_set": 311,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 124,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 30,
+            "texture_set": 312,
+            "srt_animation": 13,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 128,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 31,
+            "texture_set": 313,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 32,
+            "texture_set": 314,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 33,
+            "texture_set": 315,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 116,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 34,
+            "texture_set": 316,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 35,
+            "texture_set": 317,
+            "srt_animation": 32,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 36,
+            "texture_set": 318,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 37,
+            "texture_set": 319,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 24,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 38,
+            "texture_set": 320,
+            "srt_animation": 14,
+            "pattern_animation": 1,
+            "exterior": false,
+            "lights": 28,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 39,
+            "texture_set": 321,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 40,
+            "texture_set": 322,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 41,
+            "texture_set": 323,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 42,
+            "texture_set": 324,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 43,
+            "texture_set": 325,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 44,
+            "texture_set": 326,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 45,
+            "texture_set": 327,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 46,
+            "texture_set": 328,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 47,
+            "texture_set": 329,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 48,
+            "texture_set": 330,
+            "srt_animation": 15,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 49,
+            "texture_set": 331,
+            "srt_animation": 35,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 50,
+            "texture_set": 332,
+            "srt_animation": 16,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 32,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 51,
+            "texture_set": 333,
+            "srt_animation": 17,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 6,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 52,
+            "texture_set": 334,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 53,
+            "texture_set": 335,
+            "srt_animation": 18,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 36,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 54,
+            "texture_set": 336,
+            "srt_animation": 19,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 55,
+            "texture_set": 337,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 56,
+            "texture_set": 338,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 57,
+            "texture_set": 339,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 58,
+            "texture_set": 340,
+            "srt_animation": 33,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 40,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 59,
+            "texture_set": 341,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 60,
+            "texture_set": 342,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 61,
+            "texture_set": 343,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 62,
+            "texture_set": 344,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 63,
+            "texture_set": 345,
+            "srt_animation": 14,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 64,
+            "texture_set": 346,
+            "srt_animation": 20,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 44,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 65,
+            "texture_set": 347,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 48,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 66,
+            "texture_set": 348,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 67,
+            "texture_set": 349,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 68,
+            "texture_set": 350,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 69,
+            "texture_set": 351,
+            "srt_animation": 21,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 70,
+            "texture_set": 352,
+            "srt_animation": 22,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 71,
+            "texture_set": 353,
+            "srt_animation": 23,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 71,
+            "texture_set": 354,
+            "srt_animation": 23,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 71,
+            "texture_set": 355,
+            "srt_animation": 23,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 71,
+            "texture_set": 356,
+            "srt_animation": 23,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 72,
+            "texture_set": 357,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 358,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 52,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 359,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 56,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 360,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 60,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 361,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 64,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 362,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 68,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 363,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 72,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 364,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 76,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 365,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 80,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 366,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 84,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 367,
+            "srt_animation": 24,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 88,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 368,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 369,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 370,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 371,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 372,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 373,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 374,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 375,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 376,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 377,
+            "srt_animation": 25,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 75,
+            "texture_set": 378,
+            "srt_animation": 26,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 76,
+            "texture_set": 379,
+            "srt_animation": 27,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 92,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 77,
+            "texture_set": 380,
+            "srt_animation": 3,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 32,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 78,
+            "texture_set": 381,
+            "srt_animation": 28,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 78,
+            "texture_set": 382,
+            "srt_animation": 28,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 78,
+            "texture_set": 383,
+            "srt_animation": 28,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 78,
+            "texture_set": 384,
+            "srt_animation": 28,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 78,
+            "texture_set": 385,
+            "srt_animation": 28,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 78,
+            "texture_set": 386,
+            "srt_animation": 28,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 79,
+            "texture_set": 387,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 80,
+            "texture_set": 388,
+            "srt_animation": 29,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 96,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 81,
+            "texture_set": 389,
+            "srt_animation": 30,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 100,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 82,
+            "texture_set": 390,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 83,
+            "texture_set": 391,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 2,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 84,
+            "texture_set": 392,
+            "srt_animation": 31,
+            "pattern_animation": 2,
+            "exterior": false,
+            "lights": 104,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 85,
+            "texture_set": 393,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 86,
+            "texture_set": 394,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 136,
+            "edge_color_table": 7,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 87,
+            "texture_set": 395,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 136,
+            "edge_color_table": 7,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 88,
+            "texture_set": 396,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 136,
+            "edge_color_table": 7,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 89,
+            "texture_set": 397,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 136,
+            "edge_color_table": 7,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 90,
+            "texture_set": 398,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 136,
+            "edge_color_table": 7,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 91,
+            "texture_set": 399,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 136,
+            "edge_color_table": 7,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 92,
+            "texture_set": 400,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 136,
+            "edge_color_table": 7,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 93,
+            "texture_set": 401,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": false,
+            "lights": 132,
+            "edge_color_table": 1,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 70,
+            "texture_set": 402,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 132,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 71,
+            "texture_set": 403,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 132,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 72,
+            "texture_set": 404,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 132,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 73,
+            "texture_set": 405,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 132,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 74,
+            "texture_set": 406,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 75,
+            "texture_set": 407,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        },
+        {
+            "prop_bundle": 76,
+            "texture_set": 408,
+            "srt_animation": null,
+            "pattern_animation": null,
+            "exterior": true,
+            "lights": 140,
+            "edge_color_table": 255,
+            "actor_material_color": 1
+        }
+    ]
+}

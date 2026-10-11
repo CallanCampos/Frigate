@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lois",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_CHERI_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_BUDEW",
+            "form": 0,
+            "level": 25,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 1
+        },
+        {
+            "species": "SPECIES_ROSELIA",
+            "form": 0,
+            "level": 25,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 1
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I can feel it in the air...\nThis battle will be electrifying!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "What electrifying strength!\nYou shocked me good!"
+        },
+        {
+            "type": 15,
+            "text": "Give this Berry to your Pokémon!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "If a Pokémon holding a Cheri Berry gets\nhit with paralysis, it will eat the Berry{be00}\nand recover!"
+        }
+    ]
+}

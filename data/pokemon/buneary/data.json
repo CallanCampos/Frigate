@@ -1,0 +1,199 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Buneary",
+    "pokedex": {
+        "category": "Rabbit Pokémon",
+        "entry": "By extending its rolled-up ears\nand striking the ground, it can\nbound so high it surprises itself.",
+        "height": "1'04\"",
+        "weight": "12.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Buneary",
+                "category": "Rabbit Pokémon",
+                "entry": "Its ears are always rolled up. They\ncan be forcefully extended to\nshatter even a large boulder.",
+                "height": "1'04\"",
+                "weight": "12.1 lbs."
+            },
+            "fr": {
+                "name": "Laporeille",
+                "category": "Pokémon Lapin",
+                "entry": "Ses oreilles repliées se déroulent\navec une force capable de briser\nun gros rocher.",
+                "height": "0,4 m",
+                "weight": "5,5 kg"
+            },
+            "de": {
+                "name": "Haspiror",
+                "category": "Hase",
+                "entry": "Seine Ohren sind immer aufgerollt.\nMit ihnen kann es selbst große\nFelsbrocken zertrümmern.",
+                "height": "0,4 m",
+                "weight": "5,5 kg"
+            },
+            "it": {
+                "name": "Buneary",
+                "category": "Pokémon Coniglio",
+                "entry": "Le sue orecchie sono sempre arrotolate.\nPuò estenderle con forza per\ndistruggere qualsiasi cosa.",
+                "height": "0,4 m",
+                "weight": "5,5 kg"
+            },
+            "ko": {
+                "name": "이어롤",
+                "category": "토끼포켓몬",
+                "entry": "항상 말고 있는 귀를\n힘껏 늘리면 커다란\n바위도 간단히 부순다.",
+                "height": "0.4 m",
+                "weight": "5.5 kg"
+            },
+            "es": {
+                "name": "Buneary",
+                "category": "Pokémon Conejo",
+                "entry": "Lleva las orejas enrolladas. Cuando\nlas extiende, golpea con tal fuerza\nque incluso puede romper rocas.",
+                "height": "0,4 m",
+                "weight": "5,5 kg"
+            },
+            "ja": {
+                "name": "ミミロル",
+                "category": "うさぎポケモン",
+                "entry": "いつも\\x{3000}まるめている\\x{3000}みみを\nいきおいよく\\x{3000}のばすと\\x{3000}おおきな\nいわも\\x{3000}かんたんに\\x{3000}こわせる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 66,
+        "defense": 44,
+        "speed": 85,
+        "special_attack": 44,
+        "special_defense": 56
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_PECHA_BERRY",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 0,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_RUN_AWAY", "ABILITY_KLUTZ" ],
+    "hidden_ability": "ABILITY_LIMBER",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 70,
+    "height": 4,
+    "weight": 55,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SPLASH" ],
+            [ 1, "MOVE_POUND" ],
+            [ 1, "MOVE_DEFENSE_CURL" ],
+            [ 1, "MOVE_FORESIGHT" ],
+            [ 6, "MOVE_ENDURE" ],
+            [ 13, "MOVE_FRUSTRATION" ],
+            [ 16, "MOVE_QUICK_ATTACK" ],
+            [ 23, "MOVE_JUMP_KICK" ],
+            [ 26, "MOVE_BATON_PASS" ],
+            [ 33, "MOVE_AGILITY" ],
+            [ 36, "MOVE_DIZZY_PUNCH" ],
+            [ 43, "MOVE_AFTER_YOU" ],
+            [ 46, "MOVE_CHARM" ],
+            [ 53, "MOVE_ENTRAINMENT" ],
+            [ 56, "MOVE_BOUNCE" ],
+            [ 63, "MOVE_HEALING_WISH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM56",
+            "TM57",
+            "TM67",
+            "TM73",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_BOUNCE",
+            "MOVE_LOW_KICK",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_LAST_RESORT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_AFTER_YOU",
+            "MOVE_HELPING_HAND",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FAKE_TEARS",
+            "MOVE_FAKE_OUT",
+            "MOVE_ENCORE",
+            "MOVE_SWEET_KISS",
+            "MOVE_DOUBLE_HIT",
+            "MOVE_LOW_KICK",
+            "MOVE_SKY_UPPERCUT",
+            "MOVE_SWITCHEROO",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_FLAIL",
+            "MOVE_FOCUS_PUNCH",
+            "MOVE_CIRCLE_THROW",
+            "MOVE_COPYCAT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_FRIENDSHIP",
+            "param": 0,
+            "species": "SPECIES_LOPUNNY"
+        }
+    ],
+    "regional_dex_number": 80,
+    "baby_species": "SPECIES_BUNEARY"
+}

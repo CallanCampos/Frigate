@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "John",
+    "class": "TRAINER_CLASS_HOOPSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_SUPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_STOUTLAND",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Young Trainer!\nAre you getting enough exercise?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "After you're done exercising,\ndon't forget to rehydrate yourself!"
+        },
+        {
+            "type": 15,
+            "text": "Here, I'll give you this,\nso sweat with me!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "People lose water from their bodies\nsimply by breathing!{be01}\nThat means that to sweat is to live!"
+        }
+    ]
+}

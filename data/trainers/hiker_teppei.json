@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Teppei",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ARON",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAWILE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Cute Pokémon or tough Pokémon...{be01}\nWhich kind do you go for?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "See, I like the cutely tough ones!"
+        },
+        {
+            "type": 2,
+            "text": "Most people think that Rock- and Steel-\ntype Pokémon are all tough looking.{be01}\nBut there are some cute little round\nones as well, you see!"
+        }
+    ]
+}

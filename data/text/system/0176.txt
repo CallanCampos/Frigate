@@ -1,21 +1,21 @@
-I win!\n{011c:0}!
-I owe my victory\nto {011c:0}!
-{011c:0} is strong,\nisn't it?
-It's {011c:0}\n{011c:1} after all!
-When it comes to {011c:0},\nmy choice is always {011c:1}!
-Victory in a\n{011c:0} battle!
-Yay, {011c:0}!\n{011c:1}!
-Sorry, it's {011c:0}\n{011c:1}.
-{011c:0}!\nThank you!
-The way I feel now is\n{011c:0}!
-{011c:0} sure is\n{011c:1}!
-It's all thanks to\n{011c:0}.
-{011c:0} is the toughest!
-{011c:0}?\nWow, I'm so glad!
-{011c:0}?\nThat sounds good!
-I have no trouble\ndealing with {011c:0}.
-{011c:0} is so much fun.
-Huh?\n{011c:0}?!
-The power of {011c:0}\nis awesome!
-Everyone!\n{011c:0}!
+Bank0176_Text_Win = I win!\n{011c:0}!
+Bank0176_Text_OweVictory = I owe my victory\nto {011c:0}!
+Bank0176_Text_StrongIsnt = {011c:0} is strong,\nisn't it?
+Bank0176_Text_ItsAfterAll = It's {011c:0}\n{011c:1} after all!
+Bank0176_Text_WhenComesChoiceAlways = When it comes to {011c:0},\nmy choice is always {011c:1}!
+Bank0176_Text_VictoryBattle = Victory in a\n{011c:0} battle!
+Bank0176_Text_Yay = Yay, {011c:0}!\n{011c:1}!
+Bank0176_Text_SorryIts = Sorry, it's {011c:0}\n{011c:1}.
+Bank0176_Text_Thank = {011c:0}!\nThank you!
+Bank0176_Text_WayFeelNow = The way I feel now is\n{011c:0}!
+Bank0176_Text_Sure = {011c:0} sure is\n{011c:1}!
+Bank0176_Text_ItsAllThanks = It's all thanks to\n{011c:0}.
+Bank0176_Text_Toughest = {011c:0} is the toughest!
+Bank0176_Text_WowImGlad = {011c:0}?\nWow, I'm so glad!
+Bank0176_Text_SoundsGood = {011c:0}?\nThat sounds good!
+Bank0176_Text_HaveNoTroubleDealing = I have no trouble\ndealing with {011c:0}.
+Bank0176_Text_MuchFun = {011c:0} is so much fun.
+Bank0176_Text_Huh = Huh?\n{011c:0}?!
+Bank0176_Text_PowerAwesome = The power of {011c:0}\nis awesome!
+Bank0176_Text_Everyone = Everyone!\n{011c:0}!
 \pad{46}

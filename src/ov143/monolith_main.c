@@ -10,6 +10,7 @@
 #include "app/monolith/monolith_status.h"
 #include "app/monolith/monolith_top.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -370,10 +371,10 @@ static void Monolith_CreateText(MonolithWork *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, HEAPID_MONOLITH);
     wk->printQueue = func_02021998(HEAPID_MONOLITH);
     wk->wordSet = GFL_WordSetSystemCreate(4, 64, HEAPID_MONOLITH);
-    wk->msgBlank = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 87, HEAPID_MONOLITH);
-    wk->msgPowerNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 263, HEAPID_MONOLITH);
-    wk->msgPowerInfo = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 264, HEAPID_MONOLITH);
-    wk->msgMonolith = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 89, HEAPID_MONOLITH);
+    wk->msgBlank = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_8, HEAPID_MONOLITH);
+    wk->msgPowerNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PASS_POWERS, HEAPID_MONOLITH);
+    wk->msgPowerInfo = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0264, HEAPID_MONOLITH);
+    wk->msgMonolith = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_TITLE, HEAPID_MONOLITH);
 }
 
 static void Monolith_FreeText(MonolithWork *wk) {

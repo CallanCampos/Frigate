@@ -1,241 +1,241 @@
-    \x{ffff}
-Afghanistan
-Albania
-Algeria
-American Samoa
-Andorra
-Angola
-Anguilla
-Antigua and Barbuda
-Argentina
-Armenia
-Aruba
-Australia
-Austria
-Azerbaijan
-Bahamas
-Bahrain
-Bangladesh
-Barbados
-Belarus
-Belgium
-Belize
-Benin
-Bermuda
-Bhutan
-Bolivia
-Bosnia and Herzegovina
-Botswana
-Brazil
-British Virgin Islands
-Brunei Darussalam
-Bulgaria
-Burkina Faso
-Burundi
-Cambodia
-Cameroon
-Canada
-Cape Verde
-Cayman Islands
-Central African Republic
-Chad
-Channel Islands
-Chile
-China
-Christmas Island
-Colombia
-Comoros
-Congo
-Cook Islands
-Costa Rica
-Côte d'Ivoire
-Croatia
-Cuba
-Cyprus
-Czech Republic
-North Korea
-Democratic Republic of the Congo
-Timor-Leste
-Denmark
-Djibouti
-Dominica
-Dominican Republic
-Ecuador
-Egypt
-El Salvador
-Equatorial Guinea
-Eritrea
-Estonia
-Ethiopia
-Falkland Islands
-Faroe Islands
-Fiji
-Finland
-France
-French Guiana
-French Polynesia
-Gabon
-Gambia
-Georgia
-Germany
-Ghana
-Gibraltar
-Greece
-Greenland
-Grenada
-Guadeloupe
-Guam
-Guatemala
-Guinea
-Guinea-Bissau
-Guyana
-Haiti
-Honduras
-Hungary
-Iceland
-India
-Indonesia
-Iran
-Iraq
-Ireland
-Isle of Man
-Israel
-Italy
-Jamaica
-Jan Mayen Island
-Japan
-Jordan
-Kashmir
-Kazakhstan
-Kenya
-Kiribati
-Kuwait
-Kyrgyzstan
-Laos
-Latvia
-Lebanon
-Lesotho
-Liberia
-Libya
-Liechtenstein
-Lithuania
-Luxembourg
-Macedonia (FYROM)
-Madagascar
-Malawi
-Malaysia
-Maldives
-Mali
-Malta
-Marshall Islands
-Martinique
-Mauritania
-Mauritius
-Mayotte
-Mexico
-Micronesia
-Monaco
-Mongolia
-Montenegro
-Morocco
-Mozambique
-Myanmar
-Namibia
-Nauru
-Nepal
-Netherlands
-Netherlands Antilles
-New Caledonia
-New Zealand
-Nicaragua
-Niger
-Nigeria
-Niue
-Norfolk Island
-Northern Mariana Islands
-Norway
-Oman
-Pakistan
-Palau
-Palestine
-Panama
-Papua New Guinea
-Paraguay
-Peru
-Philippines
-Pitcairn Islands
-Poland
-Portugal
-Puerto Rico
-Qatar
-South Korea
-Moldova
-Réunion
-Romania
-Russian Federation
-Rwanda
-Saint Helena
-Saint Kitts and Nevis
-Saint Lucia
-Saint Vincent and the Grenadines
-Saint Pierre and Miquelon
-Samoa
-San Marino
-Sao Tome and Principe
-Saudi Arabia
-Senegal
-Serbia
-Seychelles
-Sierra Leone
-Singapore
-Slovakia
-Slovenia
-Solomon Islands
-Somalia
-South Africa
-Spain
-Sri Lanka
-Sudan
-Suriname
-Swaziland
-Sweden
-Switzerland
-Syria
-Taiwan
-Tajikistan
-Thailand
-Togo
-Tokelau
-Tonga
-Trinidad and Tobago
-Tunisia
-Turkey
-Turkmenistan
-Turks and Caicos Islands
-Tuvalu
-Uganda
-Ukraine
-United Arab Emirates
-United Kingdom
-Tanzania
-United States\nof America
-United States\nVirgin Islands
-Uruguay
-Uzbekistan
-Vanuatu
-Holy See (Vatican City State)
-Venezuela
-Vietnam
-Wallis and Futuna
-Western Sahara
-Yemen
-Zambia
-Zimbabwe
-Please select a floor.
-Will you go to the\n{0124:0} floor?
-YES
-NO
-{0202:2}F
-?
-You selected the current floor.{be01}
-{0202:2}F
+Bank0436_Text_Empty =     \x{ffff}
+Bank0436_Text_Afghanistan = Afghanistan
+Bank0436_Text_Albania = Albania
+Bank0436_Text_Algeria = Algeria
+Bank0436_Text_AmericanSamoa = American Samoa
+Bank0436_Text_Andorra = Andorra
+Bank0436_Text_Angola = Angola
+Bank0436_Text_Anguilla = Anguilla
+Bank0436_Text_AntiguaBarbuda = Antigua and Barbuda
+Bank0436_Text_Argentina = Argentina
+Bank0436_Text_Armenia = Armenia
+Bank0436_Text_Aruba = Aruba
+Bank0436_Text_Australia = Australia
+Bank0436_Text_Austria = Austria
+Bank0436_Text_Azerbaijan = Azerbaijan
+Bank0436_Text_Bahamas = Bahamas
+Bank0436_Text_Bahrain = Bahrain
+Bank0436_Text_Bangladesh = Bangladesh
+Bank0436_Text_Barbados = Barbados
+Bank0436_Text_Belarus = Belarus
+Bank0436_Text_Belgium = Belgium
+Bank0436_Text_Belize = Belize
+Bank0436_Text_Benin = Benin
+Bank0436_Text_Bermuda = Bermuda
+Bank0436_Text_Bhutan = Bhutan
+Bank0436_Text_Bolivia = Bolivia
+Bank0436_Text_BosniaHerzegovina = Bosnia and Herzegovina
+Bank0436_Text_Botswana = Botswana
+Bank0436_Text_Brazil = Brazil
+Bank0436_Text_BritishVirginIslands = British Virgin Islands
+Bank0436_Text_BruneiDarussalam = Brunei Darussalam
+Bank0436_Text_Bulgaria = Bulgaria
+Bank0436_Text_BurkinaFaso = Burkina Faso
+Bank0436_Text_Burundi = Burundi
+Bank0436_Text_Cambodia = Cambodia
+Bank0436_Text_Cameroon = Cameroon
+Bank0436_Text_Canada = Canada
+Bank0436_Text_CapeVerde = Cape Verde
+Bank0436_Text_CaymanIslands = Cayman Islands
+Bank0436_Text_CentralAfricanRepublic = Central African Republic
+Bank0436_Text_Chad = Chad
+Bank0436_Text_ChannelIslands = Channel Islands
+Bank0436_Text_Chile = Chile
+Bank0436_Text_China = China
+Bank0436_Text_ChristmasIsland = Christmas Island
+Bank0436_Text_Colombia = Colombia
+Bank0436_Text_Comoros = Comoros
+Bank0436_Text_Congo = Congo
+Bank0436_Text_CookIslands = Cook Islands
+Bank0436_Text_CostaRica = Costa Rica
+Bank0436_Text_CTeDivoire = Côte d'Ivoire
+Bank0436_Text_Croatia = Croatia
+Bank0436_Text_Cuba = Cuba
+Bank0436_Text_Cyprus = Cyprus
+Bank0436_Text_CzechRepublic = Czech Republic
+Bank0436_Text_NorthKorea = North Korea
+Bank0436_Text_DemocraticRepublicCongo = Democratic Republic of the Congo
+Bank0436_Text_TimorLeste = Timor-Leste
+Bank0436_Text_Denmark = Denmark
+Bank0436_Text_Djibouti = Djibouti
+Bank0436_Text_Dominica = Dominica
+Bank0436_Text_DominicanRepublic = Dominican Republic
+Bank0436_Text_Ecuador = Ecuador
+Bank0436_Text_Egypt = Egypt
+Bank0436_Text_ElSalvador = El Salvador
+Bank0436_Text_EquatorialGuinea = Equatorial Guinea
+Bank0436_Text_Eritrea = Eritrea
+Bank0436_Text_Estonia = Estonia
+Bank0436_Text_Ethiopia = Ethiopia
+Bank0436_Text_FalklandIslands = Falkland Islands
+Bank0436_Text_FaroeIslands = Faroe Islands
+Bank0436_Text_Fiji = Fiji
+Bank0436_Text_Finland = Finland
+Bank0436_Text_France = France
+Bank0436_Text_FrenchGuiana = French Guiana
+Bank0436_Text_FrenchPolynesia = French Polynesia
+Bank0436_Text_Gabon = Gabon
+Bank0436_Text_Gambia = Gambia
+Bank0436_Text_Georgia = Georgia
+Bank0436_Text_Germany = Germany
+Bank0436_Text_Ghana = Ghana
+Bank0436_Text_Gibraltar = Gibraltar
+Bank0436_Text_Greece = Greece
+Bank0436_Text_Greenland = Greenland
+Bank0436_Text_Grenada = Grenada
+Bank0436_Text_Guadeloupe = Guadeloupe
+Bank0436_Text_Guam = Guam
+Bank0436_Text_Guatemala = Guatemala
+Bank0436_Text_Guinea = Guinea
+Bank0436_Text_GuineaBissau = Guinea-Bissau
+Bank0436_Text_Guyana = Guyana
+Bank0436_Text_Haiti = Haiti
+Bank0436_Text_Honduras = Honduras
+Bank0436_Text_Hungary = Hungary
+Bank0436_Text_Iceland = Iceland
+Bank0436_Text_India = India
+Bank0436_Text_Indonesia = Indonesia
+Bank0436_Text_Iran = Iran
+Bank0436_Text_Iraq = Iraq
+Bank0436_Text_Ireland = Ireland
+Bank0436_Text_IsleMan = Isle of Man
+Bank0436_Text_Israel = Israel
+Bank0436_Text_Italy = Italy
+Bank0436_Text_Jamaica = Jamaica
+Bank0436_Text_JanMayenIsland = Jan Mayen Island
+Bank0436_Text_Japan = Japan
+Bank0436_Text_Jordan = Jordan
+Bank0436_Text_Kashmir = Kashmir
+Bank0436_Text_Kazakhstan = Kazakhstan
+Bank0436_Text_Kenya = Kenya
+Bank0436_Text_Kiribati = Kiribati
+Bank0436_Text_Kuwait = Kuwait
+Bank0436_Text_Kyrgyzstan = Kyrgyzstan
+Bank0436_Text_Laos = Laos
+Bank0436_Text_Latvia = Latvia
+Bank0436_Text_Lebanon = Lebanon
+Bank0436_Text_Lesotho = Lesotho
+Bank0436_Text_Liberia = Liberia
+Bank0436_Text_Libya = Libya
+Bank0436_Text_Liechtenstein = Liechtenstein
+Bank0436_Text_Lithuania = Lithuania
+Bank0436_Text_Luxembourg = Luxembourg
+Bank0436_Text_MacedoniaFyrom = Macedonia (FYROM)
+Bank0436_Text_Madagascar = Madagascar
+Bank0436_Text_Malawi = Malawi
+Bank0436_Text_Malaysia = Malaysia
+Bank0436_Text_Maldives = Maldives
+Bank0436_Text_Mali = Mali
+Bank0436_Text_Malta = Malta
+Bank0436_Text_MarshallIslands = Marshall Islands
+Bank0436_Text_Martinique = Martinique
+Bank0436_Text_Mauritania = Mauritania
+Bank0436_Text_Mauritius = Mauritius
+Bank0436_Text_Mayotte = Mayotte
+Bank0436_Text_Mexico = Mexico
+Bank0436_Text_Micronesia = Micronesia
+Bank0436_Text_Monaco = Monaco
+Bank0436_Text_Mongolia = Mongolia
+Bank0436_Text_Montenegro = Montenegro
+Bank0436_Text_Morocco = Morocco
+Bank0436_Text_Mozambique = Mozambique
+Bank0436_Text_Myanmar = Myanmar
+Bank0436_Text_Namibia = Namibia
+Bank0436_Text_Nauru = Nauru
+Bank0436_Text_Nepal = Nepal
+Bank0436_Text_Netherlands = Netherlands
+Bank0436_Text_NetherlandsAntilles = Netherlands Antilles
+Bank0436_Text_NewCaledonia = New Caledonia
+Bank0436_Text_NewZealand = New Zealand
+Bank0436_Text_Nicaragua = Nicaragua
+Bank0436_Text_Niger = Niger
+Bank0436_Text_Nigeria = Nigeria
+Bank0436_Text_Niue = Niue
+Bank0436_Text_NorfolkIsland = Norfolk Island
+Bank0436_Text_NorthernMarianaIslands = Northern Mariana Islands
+Bank0436_Text_Norway = Norway
+Bank0436_Text_Oman = Oman
+Bank0436_Text_Pakistan = Pakistan
+Bank0436_Text_Palau = Palau
+Bank0436_Text_Palestine = Palestine
+Bank0436_Text_Panama = Panama
+Bank0436_Text_PapuaNewGuinea = Papua New Guinea
+Bank0436_Text_Paraguay = Paraguay
+Bank0436_Text_Peru = Peru
+Bank0436_Text_Philippines = Philippines
+Bank0436_Text_PitcairnIslands = Pitcairn Islands
+Bank0436_Text_Poland = Poland
+Bank0436_Text_Portugal = Portugal
+Bank0436_Text_PuertoRico = Puerto Rico
+Bank0436_Text_Qatar = Qatar
+Bank0436_Text_SouthKorea = South Korea
+Bank0436_Text_Moldova = Moldova
+Bank0436_Text_Reunion = Réunion
+Bank0436_Text_Romania = Romania
+Bank0436_Text_RussianFederation = Russian Federation
+Bank0436_Text_Rwanda = Rwanda
+Bank0436_Text_SaintHelena = Saint Helena
+Bank0436_Text_SaintKittsNevis = Saint Kitts and Nevis
+Bank0436_Text_SaintLucia = Saint Lucia
+Bank0436_Text_SaintVincentGrenadines = Saint Vincent and the Grenadines
+Bank0436_Text_SaintPierreMiquelon = Saint Pierre and Miquelon
+Bank0436_Text_Samoa = Samoa
+Bank0436_Text_SanMarino = San Marino
+Bank0436_Text_SaoTomePrincipe = Sao Tome and Principe
+Bank0436_Text_SaudiArabia = Saudi Arabia
+Bank0436_Text_Senegal = Senegal
+Bank0436_Text_Serbia = Serbia
+Bank0436_Text_Seychelles = Seychelles
+Bank0436_Text_SierraLeone = Sierra Leone
+Bank0436_Text_Singapore = Singapore
+Bank0436_Text_Slovakia = Slovakia
+Bank0436_Text_Slovenia = Slovenia
+Bank0436_Text_SolomonIslands = Solomon Islands
+Bank0436_Text_Somalia = Somalia
+Bank0436_Text_SouthAfrica = South Africa
+Bank0436_Text_Spain = Spain
+Bank0436_Text_SriLanka = Sri Lanka
+Bank0436_Text_Sudan = Sudan
+Bank0436_Text_Suriname = Suriname
+Bank0436_Text_Swaziland = Swaziland
+Bank0436_Text_Sweden = Sweden
+Bank0436_Text_Switzerland = Switzerland
+Bank0436_Text_Syria = Syria
+Bank0436_Text_Taiwan = Taiwan
+Bank0436_Text_Tajikistan = Tajikistan
+Bank0436_Text_Thailand = Thailand
+Bank0436_Text_Togo = Togo
+Bank0436_Text_Tokelau = Tokelau
+Bank0436_Text_Tonga = Tonga
+Bank0436_Text_TrinidadTobago = Trinidad and Tobago
+Bank0436_Text_Tunisia = Tunisia
+Bank0436_Text_Turkey = Turkey
+Bank0436_Text_Turkmenistan = Turkmenistan
+Bank0436_Text_TurksCaicosIslands = Turks and Caicos Islands
+Bank0436_Text_Tuvalu = Tuvalu
+Bank0436_Text_Uganda = Uganda
+Bank0436_Text_Ukraine = Ukraine
+Bank0436_Text_UnitedArabEmirates = United Arab Emirates
+Bank0436_Text_UnitedKingdom = United Kingdom
+Bank0436_Text_Tanzania = Tanzania
+Bank0436_Text_UnitedStatesAmerica = United States\nof America
+Bank0436_Text_UnitedStatesVirginIslands = United States\nVirgin Islands
+Bank0436_Text_Uruguay = Uruguay
+Bank0436_Text_Uzbekistan = Uzbekistan
+Bank0436_Text_Vanuatu = Vanuatu
+Bank0436_Text_HolySeeVaticanCity = Holy See (Vatican City State)
+Bank0436_Text_Venezuela = Venezuela
+Bank0436_Text_Vietnam = Vietnam
+Bank0436_Text_WallisFutuna = Wallis and Futuna
+Bank0436_Text_WesternSahara = Western Sahara
+Bank0436_Text_Yemen = Yemen
+Bank0436_Text_Zambia = Zambia
+Bank0436_Text_Zimbabwe = Zimbabwe
+Bank0436_Text_PleaseSelectFloor = Please select a floor.
+Bank0436_Text_WillGoFloor = Will you go to the\n{0124:0} floor?
+Bank0436_Text_Yes = YES
+Bank0436_Text_No = NO
+Bank0436_Text_F = {0202:2}F
+Bank0436_Text_Empty_2 = ?
+Bank0436_Text_SelectedCurrentFloor = You selected the current floor.{be01}
+Bank0436_Text_F_2 = {0202:2}F

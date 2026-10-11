@@ -15,6 +15,7 @@
 #include "gfl/net_handle.h"
 #include "gfl/net_lower_data.h"
 #include "gfl/std.h"
+#include "gfl/wih.h"
 #include "save/player_info.h"
 #include "system/dsi.h"
 #include "system/game_data.h"
@@ -332,7 +333,7 @@ void CtvtComm_Update(CommTvtWork *sys, CtvtComm *comm) {
                 break;
             case CTVT_CONNECT_SCAN:
                 func_02042970();
-                func_ov030_02175334(CtvtComm_FilterInvited);
+                WH_SetScanFilter(CtvtComm_FilterInvited);
                 comm->netState = CTVT_NET_WAIT_CONNECT;
                 break;
             case CTVT_CONNECT_MAC:
@@ -672,7 +673,7 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
 }
 
 static void CtvtComm_SetScanTime(CommTvtWork *sys, CtvtComm *comm) {
-    func_ov030_02175658(5);
+    WH_SetScanTime(5);
 }
 
 static void CtvtComm_UpdateMembers(CommTvtWork *sys, CtvtComm *comm) {
@@ -1255,15 +1256,15 @@ void CtvtComm_QueueGameData(CtvtComm *comm, CtvtGameData data) {
 }
 
 void CtvtComm_ScanInvited(CommTvtWork *sys, CtvtComm *comm) {
-    func_ov030_02175334(CtvtComm_FilterCall);
+    WH_SetScanFilter(CtvtComm_FilterCall);
 }
 
 void CtvtComm_ScanAll(CommTvtWork *sys, CtvtComm *comm) {
-    func_ov030_02175334(CtvtComm_FilterInvited);
+    WH_SetScanFilter(CtvtComm_FilterInvited);
 }
 
 void CtvtComm_ScanNone(CommTvtWork *sys, CtvtComm *comm) {
-    func_ov030_02175334(CtvtComm_FilterNone);
+    WH_SetScanFilter(CtvtComm_FilterNone);
 }
 
 void CtvtComm_ResetSession(CommTvtWork *sys, CtvtComm *comm) {
@@ -1289,7 +1290,7 @@ void CtvtComm_ResetSession(CommTvtWork *sys, CtvtComm *comm) {
     comm->unk3f8 = TRUE;
     comm->sendUnk3f8 = FALSE;
     comm->nextTalker = CTVT_COMM_NONE;
-    func_ov030_02175334(CtvtComm_FilterInvited);
+    WH_SetScanFilter(CtvtComm_FilterInvited);
     CtvtComm_UpdateMembers(sys, comm);
 }
 

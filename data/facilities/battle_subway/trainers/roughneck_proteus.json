@@ -1,0 +1,24 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Proteus",
+    "class": "TRAINER_CLASS_ROUGHNECK",
+    "pokemon": [
+        "cryogonal_3",
+        "bastiodon_3",
+        "rapidash_3",
+        "mamoswine_3",
+        "rhyperior_3",
+        "vanilluxe_3",
+        "whiscash_4",
+        "pinsir_4",
+        "donphan_4",
+        "wailord_4",
+        "gliscor_4",
+        "walrein_4"
+    ],
+    "messages": [
+        "My computer friends said I wouldn't be\ntaken lightly with this look.",
+        "I won, but I was so scared...\nMaybe I am not cut out for this.",
+        "Eeek... I should have played\nwith my computer in my room."
+    ]
+}

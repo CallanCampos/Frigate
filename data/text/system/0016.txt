@@ -1,1681 +1,1681 @@
-!
-!
-!
-{0102:0} used\nPound!
-The wild {0102:0} used\nPound!
-The foe's {0102:0} used\nPound!
-{0102:0} used\nKarate Chop!
-The wild {0102:0} used\nKarate Chop!
-The foe's {0102:0} used\nKarate Chop!
-{0102:0} used\nDoubleSlap!
-The wild {0102:0} used\nDoubleSlap!
-The foe's {0102:0} used\nDoubleSlap!
-{0102:0} used\nComet Punch!
-The wild {0102:0} used\nComet Punch!
-The foe's {0102:0} used\nComet Punch!
-{0102:0} used\nMega Punch!
-The wild {0102:0} used\nMega Punch!
-The foe's {0102:0} used\nMega Punch!
-{0102:0} used\nPay Day!
-The wild {0102:0} used\nPay Day!
-The foe's {0102:0} used\nPay Day!
-{0102:0} used\nFire Punch!
-The wild {0102:0} used\nFire Punch!
-The foe's {0102:0} used\nFire Punch!
-{0102:0} used\nIce Punch!
-The wild {0102:0} used\nIce Punch!
-The foe's {0102:0} used\nIce Punch!
-{0102:0} used\nThunderPunch!
-The wild {0102:0} used\nThunderPunch!
-The foe's {0102:0} used\nThunderPunch!
-{0102:0} used\nScratch!
-The wild {0102:0} used\nScratch!
-The foe's {0102:0} used\nScratch!
-{0102:0} used\nViceGrip!
-The wild {0102:0} used\nViceGrip!
-The foe's {0102:0} used\nViceGrip!
-{0102:0} used\nGuillotine!
-The wild {0102:0} used\nGuillotine!
-The foe's {0102:0} used\nGuillotine!
-{0102:0} used\nRazor Wind!
-The wild {0102:0} used\nRazor Wind!
-The foe's {0102:0} used\nRazor Wind!
-{0102:0} used\nSwords Dance!
-The wild {0102:0} used\nSwords Dance!
-The foe's {0102:0} used\nSwords Dance!
-{0102:0} used\nCut!
-The wild {0102:0} used\nCut!
-The foe's {0102:0} used\nCut!
-{0102:0} used\nGust!
-The wild {0102:0} used\nGust!
-The foe's {0102:0} used\nGust!
-{0102:0} used\nWing Attack!
-The wild {0102:0} used\nWing Attack!
-The foe's {0102:0} used\nWing Attack!
-{0102:0} used\nWhirlwind!
-The wild {0102:0} used\nWhirlwind!
-The foe's {0102:0} used\nWhirlwind!
-{0102:0} used\nFly!
-The wild {0102:0} used\nFly!
-The foe's {0102:0} used\nFly!
-{0102:0} used\nBind!
-The wild {0102:0} used\nBind!
-The foe's {0102:0} used\nBind!
-{0102:0} used\nSlam!
-The wild {0102:0} used\nSlam!
-The foe's {0102:0} used\nSlam!
-{0102:0} used\nVine Whip!
-The wild {0102:0} used\nVine Whip!
-The foe's {0102:0} used\nVine Whip!
-{0102:0} used\nStomp!
-The wild {0102:0} used\nStomp!
-The foe's {0102:0} used\nStomp!
-{0102:0} used\nDouble Kick!
-The wild {0102:0} used\nDouble Kick!
-The foe's {0102:0} used\nDouble Kick!
-{0102:0} used\nMega Kick!
-The wild {0102:0} used\nMega Kick!
-The foe's {0102:0} used\nMega Kick!
-{0102:0} used\nJump Kick!
-The wild {0102:0} used\nJump Kick!
-The foe's {0102:0} used\nJump Kick!
-{0102:0} used\nRolling Kick!
-The wild {0102:0} used\nRolling Kick!
-The foe's {0102:0} used\nRolling Kick!
-{0102:0} used\nSand-Attack!
-The wild {0102:0} used\nSand-Attack!
-The foe's {0102:0} used\nSand-Attack!
-{0102:0} used\nHeadbutt!
-The wild {0102:0} used\nHeadbutt!
-The foe's {0102:0} used\nHeadbutt!
-{0102:0} used\nHorn Attack!
-The wild {0102:0} used\nHorn Attack!
-The foe's {0102:0} used\nHorn Attack!
-{0102:0} used\nFury Attack!
-The wild {0102:0} used\nFury Attack!
-The foe's {0102:0} used\nFury Attack!
-{0102:0} used\nHorn Drill!
-The wild {0102:0} used\nHorn Drill!
-The foe's {0102:0} used\nHorn Drill!
-{0102:0} used\nTackle!
-The wild {0102:0} used\nTackle!
-The foe's {0102:0} used\nTackle!
-{0102:0} used\nBody Slam!
-The wild {0102:0} used\nBody Slam!
-The foe's {0102:0} used\nBody Slam!
-{0102:0} used\nWrap!
-The wild {0102:0} used\nWrap!
-The foe's {0102:0} used\nWrap!
-{0102:0} used\nTake Down!
-The wild {0102:0} used\nTake Down!
-The foe's {0102:0} used\nTake Down!
-{0102:0} used\nThrash!
-The wild {0102:0} used\nThrash!
-The foe's {0102:0} used\nThrash!
-{0102:0} used\nDouble-Edge!
-The wild {0102:0} used\nDouble-Edge!
-The foe's {0102:0} used\nDouble-Edge!
-{0102:0} used\nTail Whip!
-The wild {0102:0} used\nTail Whip!
-The foe's {0102:0} used\nTail Whip!
-{0102:0} used\nPoison Sting!
-The wild {0102:0} used\nPoison Sting!
-The foe's {0102:0} used\nPoison Sting!
-{0102:0} used\nTwineedle!
-The wild {0102:0} used\nTwineedle!
-The foe's {0102:0} used\nTwineedle!
-{0102:0} used\nPin Missile!
-The wild {0102:0} used\nPin Missile!
-The foe's {0102:0} used\nPin Missile!
-{0102:0} used\nLeer!
-The wild {0102:0} used\nLeer!
-The foe's {0102:0} used\nLeer!
-{0102:0} used\nBite!
-The wild {0102:0} used\nBite!
-The foe's {0102:0} used\nBite!
-{0102:0} used\nGrowl!
-The wild {0102:0} used\nGrowl!
-The foe's {0102:0} used\nGrowl!
-{0102:0} used\nRoar!
-The wild {0102:0} used\nRoar!
-The foe's {0102:0} used\nRoar!
-{0102:0} used\nSing!
-The wild {0102:0} used\nSing!
-The foe's {0102:0} used\nSing!
-{0102:0} used\nSupersonic!
-The wild {0102:0} used\nSupersonic!
-The foe's {0102:0} used\nSupersonic!
-{0102:0} used\nSonicBoom!
-The wild {0102:0} used\nSonicBoom!
-The foe's {0102:0} used\nSonicBoom!
-{0102:0} used\nDisable!
-The wild {0102:0} used\nDisable!
-The foe's {0102:0} used\nDisable!
-{0102:0} used\nAcid!
-The wild {0102:0} used\nAcid!
-The foe's {0102:0} used\nAcid!
-{0102:0} used\nEmber!
-The wild {0102:0} used\nEmber!
-The foe's {0102:0} used\nEmber!
-{0102:0} used\nFlamethrower!
-The wild {0102:0} used\nFlamethrower!
-The foe's {0102:0} used\nFlamethrower!
-{0102:0} used\nMist!
-The wild {0102:0} used\nMist!
-The foe's {0102:0} used\nMist!
-{0102:0} used\nWater Gun!
-The wild {0102:0} used\nWater Gun!
-The foe's {0102:0} used\nWater Gun!
-{0102:0} used\nHydro Pump!
-The wild {0102:0} used\nHydro Pump!
-The foe's {0102:0} used\nHydro Pump!
-{0102:0} used\nSurf!
-The wild {0102:0} used\nSurf!
-The foe's {0102:0} used\nSurf!
-{0102:0} used\nIce Beam!
-The wild {0102:0} used\nIce Beam!
-The foe's {0102:0} used\nIce Beam!
-{0102:0} used\nBlizzard!
-The wild {0102:0} used\nBlizzard!
-The foe's {0102:0} used\nBlizzard!
-{0102:0} used\nPsybeam!
-The wild {0102:0} used\nPsybeam!
-The foe's {0102:0} used\nPsybeam!
-{0102:0} used\nBubbleBeam!
-The wild {0102:0} used\nBubbleBeam!
-The foe's {0102:0} used\nBubbleBeam!
-{0102:0} used\nAurora Beam!
-The wild {0102:0} used\nAurora Beam!
-The foe's {0102:0} used\nAurora Beam!
-{0102:0} used\nHyper Beam!
-The wild {0102:0} used\nHyper Beam!
-The foe's {0102:0} used\nHyper Beam!
-{0102:0} used\nPeck!
-The wild {0102:0} used\nPeck!
-The foe's {0102:0} used\nPeck!
-{0102:0} used\nDrill Peck!
-The wild {0102:0} used\nDrill Peck!
-The foe's {0102:0} used\nDrill Peck!
-{0102:0} used\nSubmission!
-The wild {0102:0} used\nSubmission!
-The foe's {0102:0} used\nSubmission!
-{0102:0} used\nLow Kick!
-The wild {0102:0} used\nLow Kick!
-The foe's {0102:0} used\nLow Kick!
-{0102:0} used\nCounter!
-The wild {0102:0} used\nCounter!
-The foe's {0102:0} used\nCounter!
-{0102:0} used\nSeismic Toss!
-The wild {0102:0} used\nSeismic Toss!
-The foe's {0102:0} used\nSeismic Toss!
-{0102:0} used\nStrength!
-The wild {0102:0} used\nStrength!
-The foe's {0102:0} used\nStrength!
-{0102:0} used\nAbsorb!
-The wild {0102:0} used\nAbsorb!
-The foe's {0102:0} used\nAbsorb!
-{0102:0} used\nMega Drain!
-The wild {0102:0} used\nMega Drain!
-The foe's {0102:0} used\nMega Drain!
-{0102:0} used\nLeech Seed!
-The wild {0102:0} used\nLeech Seed!
-The foe's {0102:0} used\nLeech Seed!
-{0102:0} used\nGrowth!
-The wild {0102:0} used\nGrowth!
-The foe's {0102:0} used\nGrowth!
-{0102:0} used\nRazor Leaf!
-The wild {0102:0} used\nRazor Leaf!
-The foe's {0102:0} used\nRazor Leaf!
-{0102:0} used\nSolarBeam!
-The wild {0102:0} used\nSolarBeam!
-The foe's {0102:0} used\nSolarBeam!
-{0102:0} used\nPoisonPowder!
-The wild {0102:0} used\nPoisonPowder!
-The foe's {0102:0} used\nPoisonPowder!
-{0102:0} used\nStun Spore!
-The wild {0102:0} used\nStun Spore!
-The foe's {0102:0} used\nStun Spore!
-{0102:0} used\nSleep Powder!
-The wild {0102:0} used\nSleep Powder!
-The foe's {0102:0} used\nSleep Powder!
-{0102:0} used\nPetal Dance!
-The wild {0102:0} used\nPetal Dance!
-The foe's {0102:0} used\nPetal Dance!
-{0102:0} used\nString Shot!
-The wild {0102:0} used\nString Shot!
-The foe's {0102:0} used\nString Shot!
-{0102:0} used\nDragon Rage!
-The wild {0102:0} used\nDragon Rage!
-The foe's {0102:0} used\nDragon Rage!
-{0102:0} used\nFire Spin!
-The wild {0102:0} used\nFire Spin!
-The foe's {0102:0} used\nFire Spin!
-{0102:0} used\nThunderShock!
-The wild {0102:0} used\nThunderShock!
-The foe's {0102:0} used\nThunderShock!
-{0102:0} used\nThunderbolt!
-The wild {0102:0} used\nThunderbolt!
-The foe's {0102:0} used\nThunderbolt!
-{0102:0} used\nThunder Wave!
-The wild {0102:0} used\nThunder Wave!
-The foe's {0102:0} used\nThunder Wave!
-{0102:0} used\nThunder!
-The wild {0102:0} used\nThunder!
-The foe's {0102:0} used\nThunder!
-{0102:0} used\nRock Throw!
-The wild {0102:0} used\nRock Throw!
-The foe's {0102:0} used\nRock Throw!
-{0102:0} used\nEarthquake!
-The wild {0102:0} used\nEarthquake!
-The foe's {0102:0} used\nEarthquake!
-{0102:0} used\nFissure!
-The wild {0102:0} used\nFissure!
-The foe's {0102:0} used\nFissure!
-{0102:0} used\nDig!
-The wild {0102:0} used\nDig!
-The foe's {0102:0} used\nDig!
-{0102:0} used\nToxic!
-The wild {0102:0} used\nToxic!
-The foe's {0102:0} used\nToxic!
-{0102:0} used\nConfusion!
-The wild {0102:0} used\nConfusion!
-The foe's {0102:0} used\nConfusion!
-{0102:0} used\nPsychic!
-The wild {0102:0} used\nPsychic!
-The foe's {0102:0} used\nPsychic!
-{0102:0} used\nHypnosis!
-The wild {0102:0} used\nHypnosis!
-The foe's {0102:0} used\nHypnosis!
-{0102:0} used\nMeditate!
-The wild {0102:0} used\nMeditate!
-The foe's {0102:0} used\nMeditate!
-{0102:0} used\nAgility!
-The wild {0102:0} used\nAgility!
-The foe's {0102:0} used\nAgility!
-{0102:0} used\nQuick Attack!
-The wild {0102:0} used\nQuick Attack!
-The foe's {0102:0} used\nQuick Attack!
-{0102:0} used\nRage!
-The wild {0102:0} used\nRage!
-The foe's {0102:0} used\nRage!
-{0102:0} used\nTeleport!
-The wild {0102:0} used\nTeleport!
-The foe's {0102:0} used\nTeleport!
-{0102:0} used\nNight Shade!
-The wild {0102:0} used\nNight Shade!
-The foe's {0102:0} used\nNight Shade!
-{0102:0} used\nMimic!
-The wild {0102:0} used\nMimic!
-The foe's {0102:0} used\nMimic!
-{0102:0} used\nScreech!
-The wild {0102:0} used\nScreech!
-The foe's {0102:0} used\nScreech!
-{0102:0} used\nDouble Team!
-The wild {0102:0} used\nDouble Team!
-The foe's {0102:0} used\nDouble Team!
-{0102:0} used\nRecover!
-The wild {0102:0} used\nRecover!
-The foe's {0102:0} used\nRecover!
-{0102:0} used\nHarden!
-The wild {0102:0} used\nHarden!
-The foe's {0102:0} used\nHarden!
-{0102:0} used\nMinimize!
-The wild {0102:0} used\nMinimize!
-The foe's {0102:0} used\nMinimize!
-{0102:0} used\nSmokeScreen!
-The wild {0102:0} used\nSmokeScreen!
-The foe's {0102:0} used\nSmokeScreen!
-{0102:0} used\nConfuse Ray!
-The wild {0102:0} used\nConfuse Ray!
-The foe's {0102:0} used\nConfuse Ray!
-{0102:0} used\nWithdraw!
-The wild {0102:0} used\nWithdraw!
-The foe's {0102:0} used\nWithdraw!
-{0102:0} used\nDefense Curl!
-The wild {0102:0} used\nDefense Curl!
-The foe's {0102:0} used\nDefense Curl!
-{0102:0} used\nBarrier!
-The wild {0102:0} used\nBarrier!
-The foe's {0102:0} used\nBarrier!
-{0102:0} used\nLight Screen!
-The wild {0102:0} used\nLight Screen!
-The foe's {0102:0} used\nLight Screen!
-{0102:0} used\nHaze!
-The wild {0102:0} used\nHaze!
-The foe's {0102:0} used\nHaze!
-{0102:0} used\nReflect!
-The wild {0102:0} used\nReflect!
-The foe's {0102:0} used\nReflect!
-{0102:0} used\nFocus Energy!
-The wild {0102:0} used\nFocus Energy!
-The foe's {0102:0} used\nFocus Energy!
-{0102:0} used\nBide!
-The wild {0102:0} used\nBide!
-The foe's {0102:0} used\nBide!
-{0102:0} used\nMetronome!
-The wild {0102:0} used\nMetronome!
-The foe's {0102:0} used\nMetronome!
-{0102:0} used\nMirror Move!
-The wild {0102:0} used\nMirror Move!
-The foe's {0102:0} used\nMirror Move!
-{0102:0} used\nSelfdestruct!
-The wild {0102:0} used\nSelfdestruct!
-The foe's {0102:0} used\nSelfdestruct!
-{0102:0} used\nEgg Bomb!
-The wild {0102:0} used\nEgg Bomb!
-The foe's {0102:0} used\nEgg Bomb!
-{0102:0} used\nLick!
-The wild {0102:0} used\nLick!
-The foe's {0102:0} used\nLick!
-{0102:0} used\nSmog!
-The wild {0102:0} used\nSmog!
-The foe's {0102:0} used\nSmog!
-{0102:0} used\nSludge!
-The wild {0102:0} used\nSludge!
-The foe's {0102:0} used\nSludge!
-{0102:0} used\nBone Club!
-The wild {0102:0} used\nBone Club!
-The foe's {0102:0} used\nBone Club!
-{0102:0} used\nFire Blast!
-The wild {0102:0} used\nFire Blast!
-The foe's {0102:0} used\nFire Blast!
-{0102:0} used\nWaterfall!
-The wild {0102:0} used\nWaterfall!
-The foe's {0102:0} used\nWaterfall!
-{0102:0} used\nClamp!
-The wild {0102:0} used\nClamp!
-The foe's {0102:0} used\nClamp!
-{0102:0} used\nSwift!
-The wild {0102:0} used\nSwift!
-The foe's {0102:0} used\nSwift!
-{0102:0} used\nSkull Bash!
-The wild {0102:0} used\nSkull Bash!
-The foe's {0102:0} used\nSkull Bash!
-{0102:0} used\nSpike Cannon!
-The wild {0102:0} used\nSpike Cannon!
-The foe's {0102:0} used\nSpike Cannon!
-{0102:0} used\nConstrict!
-The wild {0102:0} used\nConstrict!
-The foe's {0102:0} used\nConstrict!
-{0102:0} used\nAmnesia!
-The wild {0102:0} used\nAmnesia!
-The foe's {0102:0} used\nAmnesia!
-{0102:0} used\nKinesis!
-The wild {0102:0} used\nKinesis!
-The foe's {0102:0} used\nKinesis!
-{0102:0} used\nSoftboiled!
-The wild {0102:0} used\nSoftboiled!
-The foe's {0102:0} used\nSoftboiled!
-{0102:0} used\nHi Jump Kick!
-The wild {0102:0} used\nHi Jump Kick!
-The foe's {0102:0} used\nHi Jump Kick!
-{0102:0} used\nGlare!
-The wild {0102:0} used\nGlare!
-The foe's {0102:0} used\nGlare!
-{0102:0} used\nDream Eater!
-The wild {0102:0} used\nDream Eater!
-The foe's {0102:0} used\nDream Eater!
-{0102:0} used\nPoison Gas!
-The wild {0102:0} used\nPoison Gas!
-The foe's {0102:0} used\nPoison Gas!
-{0102:0} used\nBarrage!
-The wild {0102:0} used\nBarrage!
-The foe's {0102:0} used\nBarrage!
-{0102:0} used\nLeech Life!
-The wild {0102:0} used\nLeech Life!
-The foe's {0102:0} used\nLeech Life!
-{0102:0} used\nLovely Kiss!
-The wild {0102:0} used\nLovely Kiss!
-The foe's {0102:0} used\nLovely Kiss!
-{0102:0} used\nSky Attack!
-The wild {0102:0} used\nSky Attack!
-The foe's {0102:0} used\nSky Attack!
-{0102:0} used\nTransform!
-The wild {0102:0} used\nTransform!
-The foe's {0102:0} used\nTransform!
-{0102:0} used\nBubble!
-The wild {0102:0} used\nBubble!
-The foe's {0102:0} used\nBubble!
-{0102:0} used\nDizzy Punch!
-The wild {0102:0} used\nDizzy Punch!
-The foe's {0102:0} used\nDizzy Punch!
-{0102:0} used\nSpore!
-The wild {0102:0} used\nSpore!
-The foe's {0102:0} used\nSpore!
-{0102:0} used\nFlash!
-The wild {0102:0} used\nFlash!
-The foe's {0102:0} used\nFlash!
-{0102:0} used\nPsywave!
-The wild {0102:0} used\nPsywave!
-The foe's {0102:0} used\nPsywave!
-{0102:0} used\nSplash!
-The wild {0102:0} used\nSplash!
-The foe's {0102:0} used\nSplash!
-{0102:0} used\nAcid Armor!
-The wild {0102:0} used\nAcid Armor!
-The foe's {0102:0} used\nAcid Armor!
-{0102:0} used\nCrabhammer!
-The wild {0102:0} used\nCrabhammer!
-The foe's {0102:0} used\nCrabhammer!
-{0102:0} used\nExplosion!
-The wild {0102:0} used\nExplosion!
-The foe's {0102:0} used\nExplosion!
-{0102:0} used\nFury Swipes!
-The wild {0102:0} used\nFury Swipes!
-The foe's {0102:0} used\nFury Swipes!
-{0102:0} used\nBonemerang!
-The wild {0102:0} used\nBonemerang!
-The foe's {0102:0} used\nBonemerang!
-{0102:0} used\nRest!
-The wild {0102:0} used\nRest!
-The foe's {0102:0} used\nRest!
-{0102:0} used\nRock Slide!
-The wild {0102:0} used\nRock Slide!
-The foe's {0102:0} used\nRock Slide!
-{0102:0} used\nHyper Fang!
-The wild {0102:0} used\nHyper Fang!
-The foe's {0102:0} used\nHyper Fang!
-{0102:0} used\nSharpen!
-The wild {0102:0} used\nSharpen!
-The foe's {0102:0} used\nSharpen!
-{0102:0} used\nConversion!
-The wild {0102:0} used\nConversion!
-The foe's {0102:0} used\nConversion!
-{0102:0} used\nTri Attack!
-The wild {0102:0} used\nTri Attack!
-The foe's {0102:0} used\nTri Attack!
-{0102:0} used\nSuper Fang!
-The wild {0102:0} used\nSuper Fang!
-The foe's {0102:0} used\nSuper Fang!
-{0102:0} used\nSlash!
-The wild {0102:0} used\nSlash!
-The foe's {0102:0} used\nSlash!
-{0102:0} used\nSubstitute!
-The wild {0102:0} used\nSubstitute!
-The foe's {0102:0} used\nSubstitute!
-{0102:0} used\nStruggle!
-The wild {0102:0} used\nStruggle!
-The foe's {0102:0} used\nStruggle!
-{0102:0} used\nSketch!
-The wild {0102:0} used\nSketch!
-The foe's {0102:0} used\nSketch!
-{0102:0} used\nTriple Kick!
-The wild {0102:0} used\nTriple Kick!
-The foe's {0102:0} used\nTriple Kick!
-{0102:0} used\nThief!
-The wild {0102:0} used\nThief!
-The foe's {0102:0} used\nThief!
-{0102:0} used\nSpider Web!
-The wild {0102:0} used\nSpider Web!
-The foe's {0102:0} used\nSpider Web!
-{0102:0} used\nMind Reader!
-The wild {0102:0} used\nMind Reader!
-The foe's {0102:0} used\nMind Reader!
-{0102:0} used\nNightmare!
-The wild {0102:0} used\nNightmare!
-The foe's {0102:0} used\nNightmare!
-{0102:0} used\nFlame Wheel!
-The wild {0102:0} used\nFlame Wheel!
-The foe's {0102:0} used\nFlame Wheel!
-{0102:0} used\nSnore!
-The wild {0102:0} used\nSnore!
-The foe's {0102:0} used\nSnore!
-{0102:0} used\nCurse!
-The wild {0102:0} used\nCurse!
-The foe's {0102:0} used\nCurse!
-{0102:0} used\nFlail!
-The wild {0102:0} used\nFlail!
-The foe's {0102:0} used\nFlail!
-{0102:0} used\nConversion 2!
-The wild {0102:0} used\nConversion 2!
-The foe's {0102:0} used\nConversion 2!
-{0102:0} used\nAeroblast!
-The wild {0102:0} used\nAeroblast!
-The foe's {0102:0} used\nAeroblast!
-{0102:0} used\nCotton Spore!
-The wild {0102:0} used\nCotton Spore!
-The foe's {0102:0} used\nCotton Spore!
-{0102:0} used\nReversal!
-The wild {0102:0} used\nReversal!
-The foe's {0102:0} used\nReversal!
-{0102:0} used\nSpite!
-The wild {0102:0} used\nSpite!
-The foe's {0102:0} used\nSpite!
-{0102:0} used\nPowder Snow!
-The wild {0102:0} used\nPowder Snow!
-The foe's {0102:0} used\nPowder Snow!
-{0102:0} used\nProtect!
-The wild {0102:0} used\nProtect!
-The foe's {0102:0} used\nProtect!
-{0102:0} used\nMach Punch!
-The wild {0102:0} used\nMach Punch!
-The foe's {0102:0} used\nMach Punch!
-{0102:0} used\nScary Face!
-The wild {0102:0} used\nScary Face!
-The foe's {0102:0} used\nScary Face!
-{0102:0} used\nFaint Attack!
-The wild {0102:0} used\nFaint Attack!
-The foe's {0102:0} used\nFaint Attack!
-{0102:0} used\nSweet Kiss!
-The wild {0102:0} used\nSweet Kiss!
-The foe's {0102:0} used\nSweet Kiss!
-{0102:0} used\nBelly Drum!
-The wild {0102:0} used\nBelly Drum!
-The foe's {0102:0} used\nBelly Drum!
-{0102:0} used\nSludge Bomb!
-The wild {0102:0} used\nSludge Bomb!
-The foe's {0102:0} used\nSludge Bomb!
-{0102:0} used\nMud-Slap!
-The wild {0102:0} used\nMud-Slap!
-The foe's {0102:0} used\nMud-Slap!
-{0102:0} used\nOctazooka!
-The wild {0102:0} used\nOctazooka!
-The foe's {0102:0} used\nOctazooka!
-{0102:0} used\nSpikes!
-The wild {0102:0} used\nSpikes!
-The foe's {0102:0} used\nSpikes!
-{0102:0} used\nZap Cannon!
-The wild {0102:0} used\nZap Cannon!
-The foe's {0102:0} used\nZap Cannon!
-{0102:0} used\nForesight!
-The wild {0102:0} used\nForesight!
-The foe's {0102:0} used\nForesight!
-{0102:0} used\nDestiny Bond!
-The wild {0102:0} used\nDestiny Bond!
-The foe's {0102:0} used\nDestiny Bond!
-{0102:0} used\nPerish Song!
-The wild {0102:0} used\nPerish Song!
-The foe's {0102:0} used\nPerish Song!
-{0102:0} used\nIcy Wind!
-The wild {0102:0} used\nIcy Wind!
-The foe's {0102:0} used\nIcy Wind!
-{0102:0} used\nDetect!
-The wild {0102:0} used\nDetect!
-The foe's {0102:0} used\nDetect!
-{0102:0} used\nBone Rush!
-The wild {0102:0} used\nBone Rush!
-The foe's {0102:0} used\nBone Rush!
-{0102:0} used\nLock-On!
-The wild {0102:0} used\nLock-On!
-The foe's {0102:0} used\nLock-On!
-{0102:0} used\nOutrage!
-The wild {0102:0} used\nOutrage!
-The foe's {0102:0} used\nOutrage!
-{0102:0} used\nSandstorm!
-The wild {0102:0} used\nSandstorm!
-The foe's {0102:0} used\nSandstorm!
-{0102:0} used\nGiga Drain!
-The wild {0102:0} used\nGiga Drain!
-The foe's {0102:0} used\nGiga Drain!
-{0102:0} used\nEndure!
-The wild {0102:0} used\nEndure!
-The foe's {0102:0} used\nEndure!
-{0102:0} used\nCharm!
-The wild {0102:0} used\nCharm!
-The foe's {0102:0} used\nCharm!
-{0102:0} used\nRollout!
-The wild {0102:0} used\nRollout!
-The foe's {0102:0} used\nRollout!
-{0102:0} used\nFalse Swipe!
-The wild {0102:0} used\nFalse Swipe!
-The foe's {0102:0} used\nFalse Swipe!
-{0102:0} used\nSwagger!
-The wild {0102:0} used\nSwagger!
-The foe's {0102:0} used\nSwagger!
-{0102:0} used\nMilk Drink!
-The wild {0102:0} used\nMilk Drink!
-The foe's {0102:0} used\nMilk Drink!
-{0102:0} used\nSpark!
-The wild {0102:0} used\nSpark!
-The foe's {0102:0} used\nSpark!
-{0102:0} used\nFury Cutter!
-The wild {0102:0} used\nFury Cutter!
-The foe's {0102:0} used\nFury Cutter!
-{0102:0} used\nSteel Wing!
-The wild {0102:0} used\nSteel Wing!
-The foe's {0102:0} used\nSteel Wing!
-{0102:0} used\nMean Look!
-The wild {0102:0} used\nMean Look!
-The foe's {0102:0} used\nMean Look!
-{0102:0} used\nAttract!
-The wild {0102:0} used\nAttract!
-The foe's {0102:0} used\nAttract!
-{0102:0} used\nSleep Talk!
-The wild {0102:0} used\nSleep Talk!
-The foe's {0102:0} used\nSleep Talk!
-{0102:0} used\nHeal Bell!
-The wild {0102:0} used\nHeal Bell!
-The foe's {0102:0} used\nHeal Bell!
-{0102:0} used\nReturn!
-The wild {0102:0} used\nReturn!
-The foe's {0102:0} used\nReturn!
-{0102:0} used\nPresent!
-The wild {0102:0} used\nPresent!
-The foe's {0102:0} used\nPresent!
-{0102:0} used\nFrustration!
-The wild {0102:0} used\nFrustration!
-The foe's {0102:0} used\nFrustration!
-{0102:0} used\nSafeguard!
-The wild {0102:0} used\nSafeguard!
-The foe's {0102:0} used\nSafeguard!
-{0102:0} used\nPain Split!
-The wild {0102:0} used\nPain Split!
-The foe's {0102:0} used\nPain Split!
-{0102:0} used\nSacred Fire!
-The wild {0102:0} used\nSacred Fire!
-The foe's {0102:0} used\nSacred Fire!
-{0102:0} used\nMagnitude!
-The wild {0102:0} used\nMagnitude!
-The foe's {0102:0} used\nMagnitude!
-{0102:0} used\nDynamicPunch!
-The wild {0102:0} used\nDynamicPunch!
-The foe's {0102:0} used\nDynamicPunch!
-{0102:0} used\nMegahorn!
-The wild {0102:0} used\nMegahorn!
-The foe's {0102:0} used\nMegahorn!
-{0102:0} used\nDragonBreath!
-The wild {0102:0} used\nDragonBreath!
-The foe's {0102:0} used\nDragonBreath!
-{0102:0} used\nBaton Pass!
-The wild {0102:0} used\nBaton Pass!
-The foe's {0102:0} used\nBaton Pass!
-{0102:0} used\nEncore!
-The wild {0102:0} used\nEncore!
-The foe's {0102:0} used\nEncore!
-{0102:0} used\nPursuit!
-The wild {0102:0} used\nPursuit!
-The foe's {0102:0} used\nPursuit!
-{0102:0} used\nRapid Spin!
-The wild {0102:0} used\nRapid Spin!
-The foe's {0102:0} used\nRapid Spin!
-{0102:0} used\nSweet Scent!
-The wild {0102:0} used\nSweet Scent!
-The foe's {0102:0} used\nSweet Scent!
-{0102:0} used\nIron Tail!
-The wild {0102:0} used\nIron Tail!
-The foe's {0102:0} used\nIron Tail!
-{0102:0} used\nMetal Claw!
-The wild {0102:0} used\nMetal Claw!
-The foe's {0102:0} used\nMetal Claw!
-{0102:0} used\nVital Throw!
-The wild {0102:0} used\nVital Throw!
-The foe's {0102:0} used\nVital Throw!
-{0102:0} used\nMorning Sun!
-The wild {0102:0} used\nMorning Sun!
-The foe's {0102:0} used\nMorning Sun!
-{0102:0} used\nSynthesis!
-The wild {0102:0} used\nSynthesis!
-The foe's {0102:0} used\nSynthesis!
-{0102:0} used\nMoonlight!
-The wild {0102:0} used\nMoonlight!
-The foe's {0102:0} used\nMoonlight!
-{0102:0} used\nHidden Power!
-The wild {0102:0} used\nHidden Power!
-The foe's {0102:0} used\nHidden Power!
-{0102:0} used\nCross Chop!
-The wild {0102:0} used\nCross Chop!
-The foe's {0102:0} used\nCross Chop!
-{0102:0} used\nTwister!
-The wild {0102:0} used\nTwister!
-The foe's {0102:0} used\nTwister!
-{0102:0} used\nRain Dance!
-The wild {0102:0} used\nRain Dance!
-The foe's {0102:0} used\nRain Dance!
-{0102:0} used\nSunny Day!
-The wild {0102:0} used\nSunny Day!
-The foe's {0102:0} used\nSunny Day!
-{0102:0} used\nCrunch!
-The wild {0102:0} used\nCrunch!
-The foe's {0102:0} used\nCrunch!
-{0102:0} used\nMirror Coat!
-The wild {0102:0} used\nMirror Coat!
-The foe's {0102:0} used\nMirror Coat!
-{0102:0} used\nPsych Up!
-The wild {0102:0} used\nPsych Up!
-The foe's {0102:0} used\nPsych Up!
-{0102:0} used\nExtremeSpeed!
-The wild {0102:0} used\nExtremeSpeed!
-The foe's {0102:0} used\nExtremeSpeed!
-{0102:0} used\nAncientPower!
-The wild {0102:0} used\nAncientPower!
-The foe's {0102:0} used\nAncientPower!
-{0102:0} used\nShadow Ball!
-The wild {0102:0} used\nShadow Ball!
-The foe's {0102:0} used\nShadow Ball!
-{0102:0} used\nFuture Sight!
-The wild {0102:0} used\nFuture Sight!
-The foe's {0102:0} used\nFuture Sight!
-{0102:0} used\nRock Smash!
-The wild {0102:0} used\nRock Smash!
-The foe's {0102:0} used\nRock Smash!
-{0102:0} used\nWhirlpool!
-The wild {0102:0} used\nWhirlpool!
-The foe's {0102:0} used\nWhirlpool!
-{0102:0} used\nBeat Up!
-The wild {0102:0} used\nBeat Up!
-The foe's {0102:0} used\nBeat Up!
-{0102:0} used\nFake Out!
-The wild {0102:0} used\nFake Out!
-The foe's {0102:0} used\nFake Out!
-{0102:0} used\nUproar!
-The wild {0102:0} used\nUproar!
-The foe's {0102:0} used\nUproar!
-{0102:0} used\nStockpile!
-The wild {0102:0} used\nStockpile!
-The foe's {0102:0} used\nStockpile!
-{0102:0} used\nSpit Up!
-The wild {0102:0} used\nSpit Up!
-The foe's {0102:0} used\nSpit Up!
-{0102:0} used\nSwallow!
-The wild {0102:0} used\nSwallow!
-The foe's {0102:0} used\nSwallow!
-{0102:0} used\nHeat Wave!
-The wild {0102:0} used\nHeat Wave!
-The foe's {0102:0} used\nHeat Wave!
-{0102:0} used\nHail!
-The wild {0102:0} used\nHail!
-The foe's {0102:0} used\nHail!
-{0102:0} used\nTorment!
-The wild {0102:0} used\nTorment!
-The foe's {0102:0} used\nTorment!
-{0102:0} used\nFlatter!
-The wild {0102:0} used\nFlatter!
-The foe's {0102:0} used\nFlatter!
-{0102:0} used\nWill-O-Wisp!
-The wild {0102:0} used\nWill-O-Wisp!
-The foe's {0102:0} used\nWill-O-Wisp!
-{0102:0} used\nMemento!
-The wild {0102:0} used\nMemento!
-The foe's {0102:0} used\nMemento!
-{0102:0} used\nFacade!
-The wild {0102:0} used\nFacade!
-The foe's {0102:0} used\nFacade!
-{0102:0} used\nFocus Punch!
-The wild {0102:0} used\nFocus Punch!
-The foe's {0102:0} used\nFocus Punch!
-{0102:0} used\nSmellingSalt!
-The wild {0102:0} used\nSmellingSalt!
-The foe's {0102:0} used\nSmellingSalt!
-{0102:0} used\nFollow Me!
-The wild {0102:0} used\nFollow Me!
-The foe's {0102:0} used\nFollow Me!
-{0102:0} used\nNature Power!
-The wild {0102:0} used\nNature Power!
-The foe's {0102:0} used\nNature Power!
-{0102:0} used\nCharge!
-The wild {0102:0} used\nCharge!
-The foe's {0102:0} used\nCharge!
-{0102:0} used\nTaunt!
-The wild {0102:0} used\nTaunt!
-The foe's {0102:0} used\nTaunt!
-{0102:0} used\nHelping Hand!
-The wild {0102:0} used\nHelping Hand!
-The foe's {0102:0} used\nHelping Hand!
-{0102:0} used\nTrick!
-The wild {0102:0} used\nTrick!
-The foe's {0102:0} used\nTrick!
-{0102:0} used\nRole Play!
-The wild {0102:0} used\nRole Play!
-The foe's {0102:0} used\nRole Play!
-{0102:0} used\nWish!
-The wild {0102:0} used\nWish!
-The foe's {0102:0} used\nWish!
-{0102:0} used\nAssist!
-The wild {0102:0} used\nAssist!
-The foe's {0102:0} used\nAssist!
-{0102:0} used\nIngrain!
-The wild {0102:0} used\nIngrain!
-The foe's {0102:0} used\nIngrain!
-{0102:0} used\nSuperpower!
-The wild {0102:0} used\nSuperpower!
-The foe's {0102:0} used\nSuperpower!
-{0102:0} used\nMagic Coat!
-The wild {0102:0} used\nMagic Coat!
-The foe's {0102:0} used\nMagic Coat!
-{0102:0} used\nRecycle!
-The wild {0102:0} used\nRecycle!
-The foe's {0102:0} used\nRecycle!
-{0102:0} used\nRevenge!
-The wild {0102:0} used\nRevenge!
-The foe's {0102:0} used\nRevenge!
-{0102:0} used\nBrick Break!
-The wild {0102:0} used\nBrick Break!
-The foe's {0102:0} used\nBrick Break!
-{0102:0} used\nYawn!
-The wild {0102:0} used\nYawn!
-The foe's {0102:0} used\nYawn!
-{0102:0} used\nKnock Off!
-The wild {0102:0} used\nKnock Off!
-The foe's {0102:0} used\nKnock Off!
-{0102:0} used\nEndeavor!
-The wild {0102:0} used\nEndeavor!
-The foe's {0102:0} used\nEndeavor!
-{0102:0} used\nEruption!
-The wild {0102:0} used\nEruption!
-The foe's {0102:0} used\nEruption!
-{0102:0} used\nSkill Swap!
-The wild {0102:0} used\nSkill Swap!
-The foe's {0102:0} used\nSkill Swap!
-{0102:0} used\nImprison!
-The wild {0102:0} used\nImprison!
-The foe's {0102:0} used\nImprison!
-{0102:0} used\nRefresh!
-The wild {0102:0} used\nRefresh!
-The foe's {0102:0} used\nRefresh!
-{0102:0} used\nGrudge!
-The wild {0102:0} used\nGrudge!
-The foe's {0102:0} used\nGrudge!
-{0102:0} used\nSnatch!
-The wild {0102:0} used\nSnatch!
-The foe's {0102:0} used\nSnatch!
-{0102:0} used\nSecret Power!
-The wild {0102:0} used\nSecret Power!
-The foe's {0102:0} used\nSecret Power!
-{0102:0} used\nDive!
-The wild {0102:0} used\nDive!
-The foe's {0102:0} used\nDive!
-{0102:0} used\nArm Thrust!
-The wild {0102:0} used\nArm Thrust!
-The foe's {0102:0} used\nArm Thrust!
-{0102:0} used\nCamouflage!
-The wild {0102:0} used\nCamouflage!
-The foe's {0102:0} used\nCamouflage!
-{0102:0} used\nTail Glow!
-The wild {0102:0} used\nTail Glow!
-The foe's {0102:0} used\nTail Glow!
-{0102:0} used\nLuster Purge!
-The wild {0102:0} used\nLuster Purge!
-The foe's {0102:0} used\nLuster Purge!
-{0102:0} used\nMist Ball!
-The wild {0102:0} used\nMist Ball!
-The foe's {0102:0} used\nMist Ball!
-{0102:0} used\nFeatherDance!
-The wild {0102:0} used\nFeatherDance!
-The foe's {0102:0} used\nFeatherDance!
-{0102:0} used\nTeeter Dance!
-The wild {0102:0} used\nTeeter Dance!
-The foe's {0102:0} used\nTeeter Dance!
-{0102:0} used\nBlaze Kick!
-The wild {0102:0} used\nBlaze Kick!
-The foe's {0102:0} used\nBlaze Kick!
-{0102:0} used\nMud Sport!
-The wild {0102:0} used\nMud Sport!
-The foe's {0102:0} used\nMud Sport!
-{0102:0} used\nIce Ball!
-The wild {0102:0} used\nIce Ball!
-The foe's {0102:0} used\nIce Ball!
-{0102:0} used\nNeedle Arm!
-The wild {0102:0} used\nNeedle Arm!
-The foe's {0102:0} used\nNeedle Arm!
-{0102:0} used\nSlack Off!
-The wild {0102:0} used\nSlack Off!
-The foe's {0102:0} used\nSlack Off!
-{0102:0} used\nHyper Voice!
-The wild {0102:0} used\nHyper Voice!
-The foe's {0102:0} used\nHyper Voice!
-{0102:0} used\nPoison Fang!
-The wild {0102:0} used\nPoison Fang!
-The foe's {0102:0} used\nPoison Fang!
-{0102:0} used\nCrush Claw!
-The wild {0102:0} used\nCrush Claw!
-The foe's {0102:0} used\nCrush Claw!
-{0102:0} used\nBlast Burn!
-The wild {0102:0} used\nBlast Burn!
-The foe's {0102:0} used\nBlast Burn!
-{0102:0} used\nHydro Cannon!
-The wild {0102:0} used\nHydro Cannon!
-The foe's {0102:0} used\nHydro Cannon!
-{0102:0} used\nMeteor Mash!
-The wild {0102:0} used\nMeteor Mash!
-The foe's {0102:0} used\nMeteor Mash!
-{0102:0} used\nAstonish!
-The wild {0102:0} used\nAstonish!
-The foe's {0102:0} used\nAstonish!
-{0102:0} used\nWeather Ball!
-The wild {0102:0} used\nWeather Ball!
-The foe's {0102:0} used\nWeather Ball!
-{0102:0} used\nAromatherapy!
-The wild {0102:0} used\nAromatherapy!
-The foe's {0102:0} used\nAromatherapy!
-{0102:0} used\nFake Tears!
-The wild {0102:0} used\nFake Tears!
-The foe's {0102:0} used\nFake Tears!
-{0102:0} used\nAir Cutter!
-The wild {0102:0} used\nAir Cutter!
-The foe's {0102:0} used\nAir Cutter!
-{0102:0} used\nOverheat!
-The wild {0102:0} used\nOverheat!
-The foe's {0102:0} used\nOverheat!
-{0102:0} used\nOdor Sleuth!
-The wild {0102:0} used\nOdor Sleuth!
-The foe's {0102:0} used\nOdor Sleuth!
-{0102:0} used\nRock Tomb!
-The wild {0102:0} used\nRock Tomb!
-The foe's {0102:0} used\nRock Tomb!
-{0102:0} used\nSilver Wind!
-The wild {0102:0} used\nSilver Wind!
-The foe's {0102:0} used\nSilver Wind!
-{0102:0} used\nMetal Sound!
-The wild {0102:0} used\nMetal Sound!
-The foe's {0102:0} used\nMetal Sound!
-{0102:0} used\nGrassWhistle!
-The wild {0102:0} used\nGrassWhistle!
-The foe's {0102:0} used\nGrassWhistle!
-{0102:0} used\nTickle!
-The wild {0102:0} used\nTickle!
-The foe's {0102:0} used\nTickle!
-{0102:0} used\nCosmic Power!
-The wild {0102:0} used\nCosmic Power!
-The foe's {0102:0} used\nCosmic Power!
-{0102:0} used\nWater Spout!
-The wild {0102:0} used\nWater Spout!
-The foe's {0102:0} used\nWater Spout!
-{0102:0} used\nSignal Beam!
-The wild {0102:0} used\nSignal Beam!
-The foe's {0102:0} used\nSignal Beam!
-{0102:0} used\nShadow Punch!
-The wild {0102:0} used\nShadow Punch!
-The foe's {0102:0} used\nShadow Punch!
-{0102:0} used\nExtrasensory!
-The wild {0102:0} used\nExtrasensory!
-The foe's {0102:0} used\nExtrasensory!
-{0102:0} used\nSky Uppercut!
-The wild {0102:0} used\nSky Uppercut!
-The foe's {0102:0} used\nSky Uppercut!
-{0102:0} used\nSand Tomb!
-The wild {0102:0} used\nSand Tomb!
-The foe's {0102:0} used\nSand Tomb!
-{0102:0} used\nSheer Cold!
-The wild {0102:0} used\nSheer Cold!
-The foe's {0102:0} used\nSheer Cold!
-{0102:0} used\nMuddy Water!
-The wild {0102:0} used\nMuddy Water!
-The foe's {0102:0} used\nMuddy Water!
-{0102:0} used\nBullet Seed!
-The wild {0102:0} used\nBullet Seed!
-The foe's {0102:0} used\nBullet Seed!
-{0102:0} used\nAerial Ace!
-The wild {0102:0} used\nAerial Ace!
-The foe's {0102:0} used\nAerial Ace!
-{0102:0} used\nIcicle Spear!
-The wild {0102:0} used\nIcicle Spear!
-The foe's {0102:0} used\nIcicle Spear!
-{0102:0} used\nIron Defense!
-The wild {0102:0} used\nIron Defense!
-The foe's {0102:0} used\nIron Defense!
-{0102:0} used\nBlock!
-The wild {0102:0} used\nBlock!
-The foe's {0102:0} used\nBlock!
-{0102:0} used\nHowl!
-The wild {0102:0} used\nHowl!
-The foe's {0102:0} used\nHowl!
-{0102:0} used\nDragon Claw!
-The wild {0102:0} used\nDragon Claw!
-The foe's {0102:0} used\nDragon Claw!
-{0102:0} used\nFrenzy Plant!
-The wild {0102:0} used\nFrenzy Plant!
-The foe's {0102:0} used\nFrenzy Plant!
-{0102:0} used\nBulk Up!
-The wild {0102:0} used\nBulk Up!
-The foe's {0102:0} used\nBulk Up!
-{0102:0} used\nBounce!
-The wild {0102:0} used\nBounce!
-The foe's {0102:0} used\nBounce!
-{0102:0} used\nMud Shot!
-The wild {0102:0} used\nMud Shot!
-The foe's {0102:0} used\nMud Shot!
-{0102:0} used\nPoison Tail!
-The wild {0102:0} used\nPoison Tail!
-The foe's {0102:0} used\nPoison Tail!
-{0102:0} used\nCovet!
-The wild {0102:0} used\nCovet!
-The foe's {0102:0} used\nCovet!
-{0102:0} used\nVolt Tackle!
-The wild {0102:0} used\nVolt Tackle!
-The foe's {0102:0} used\nVolt Tackle!
-{0102:0} used\nMagical Leaf!
-The wild {0102:0} used\nMagical Leaf!
-The foe's {0102:0} used\nMagical Leaf!
-{0102:0} used\nWater Sport!
-The wild {0102:0} used\nWater Sport!
-The foe's {0102:0} used\nWater Sport!
-{0102:0} used\nCalm Mind!
-The wild {0102:0} used\nCalm Mind!
-The foe's {0102:0} used\nCalm Mind!
-{0102:0} used\nLeaf Blade!
-The wild {0102:0} used\nLeaf Blade!
-The foe's {0102:0} used\nLeaf Blade!
-{0102:0} used\nDragon Dance!
-The wild {0102:0} used\nDragon Dance!
-The foe's {0102:0} used\nDragon Dance!
-{0102:0} used\nRock Blast!
-The wild {0102:0} used\nRock Blast!
-The foe's {0102:0} used\nRock Blast!
-{0102:0} used\nShock Wave!
-The wild {0102:0} used\nShock Wave!
-The foe's {0102:0} used\nShock Wave!
-{0102:0} used\nWater Pulse!
-The wild {0102:0} used\nWater Pulse!
-The foe's {0102:0} used\nWater Pulse!
-{0102:0} used\nDoom Desire!
-The wild {0102:0} used\nDoom Desire!
-The foe's {0102:0} used\nDoom Desire!
-{0102:0} used\nPsycho Boost!
-The wild {0102:0} used\nPsycho Boost!
-The foe's {0102:0} used\nPsycho Boost!
-{0102:0} used\nRoost!
-The wild {0102:0} used\nRoost!
-The foe's {0102:0} used\nRoost!
-{0102:0} used\nGravity!
-The wild {0102:0} used\nGravity!
-The foe's {0102:0} used\nGravity!
-{0102:0} used\nMiracle Eye!
-The wild {0102:0} used\nMiracle Eye!
-The foe's {0102:0} used\nMiracle Eye!
-{0102:0} used\nWake-Up Slap!
-The wild {0102:0} used\nWake-Up Slap!
-The foe's {0102:0} used\nWake-Up Slap!
-{0102:0} used\nHammer Arm!
-The wild {0102:0} used\nHammer Arm!
-The foe's {0102:0} used\nHammer Arm!
-{0102:0} used\nGyro Ball!
-The wild {0102:0} used\nGyro Ball!
-The foe's {0102:0} used\nGyro Ball!
-{0102:0} used\nHealing Wish!
-The wild {0102:0} used\nHealing Wish!
-The foe's {0102:0} used\nHealing Wish!
-{0102:0} used\nBrine!
-The wild {0102:0} used\nBrine!
-The foe's {0102:0} used\nBrine!
-{0102:0} used\nNatural Gift!
-The wild {0102:0} used\nNatural Gift!
-The foe's {0102:0} used\nNatural Gift!
-{0102:0} used\nFeint!
-The wild {0102:0} used\nFeint!
-The foe's {0102:0} used\nFeint!
-{0102:0} used\nPluck!
-The wild {0102:0} used\nPluck!
-The foe's {0102:0} used\nPluck!
-{0102:0} used\nTailwind!
-The wild {0102:0} used\nTailwind!
-The foe's {0102:0} used\nTailwind!
-{0102:0} used\nAcupressure!
-The wild {0102:0} used\nAcupressure!
-The foe's {0102:0} used\nAcupressure!
-{0102:0} used\nMetal Burst!
-The wild {0102:0} used\nMetal Burst!
-The foe's {0102:0} used\nMetal Burst!
-{0102:0} used\nU-turn!
-The wild {0102:0} used\nU-turn!
-The foe's {0102:0} used\nU-turn!
-{0102:0} used\nClose Combat!
-The wild {0102:0} used\nClose Combat!
-The foe's {0102:0} used\nClose Combat!
-{0102:0} used\nPayback!
-The wild {0102:0} used\nPayback!
-The foe's {0102:0} used\nPayback!
-{0102:0} used\nAssurance!
-The wild {0102:0} used\nAssurance!
-The foe's {0102:0} used\nAssurance!
-{0102:0} used\nEmbargo!
-The wild {0102:0} used\nEmbargo!
-The foe's {0102:0} used\nEmbargo!
-{0102:0} used\nFling!
-The wild {0102:0} used\nFling!
-The foe's {0102:0} used\nFling!
-{0102:0} used\nPsycho Shift!
-The wild {0102:0} used\nPsycho Shift!
-The foe's {0102:0} used\nPsycho Shift!
-{0102:0} used\nTrump Card!
-The wild {0102:0} used\nTrump Card!
-The foe's {0102:0} used\nTrump Card!
-{0102:0} used\nHeal Block!
-The wild {0102:0} used\nHeal Block!
-The foe's {0102:0} used\nHeal Block!
-{0102:0} used\nWring Out!
-The wild {0102:0} used\nWring Out!
-The foe's {0102:0} used\nWring Out!
-{0102:0} used\nPower Trick!
-The wild {0102:0} used\nPower Trick!
-The foe's {0102:0} used\nPower Trick!
-{0102:0} used\nGastro Acid!
-The wild {0102:0} used\nGastro Acid!
-The foe's {0102:0} used\nGastro Acid!
-{0102:0} used\nLucky Chant!
-The wild {0102:0} used\nLucky Chant!
-The foe's {0102:0} used\nLucky Chant!
-{0102:0} used\nMe First!
-The wild {0102:0} used\nMe First!
-The foe's {0102:0} used\nMe First!
-{0102:0} used\nCopycat!
-The wild {0102:0} used\nCopycat!
-The foe's {0102:0} used\nCopycat!
-{0102:0} used\nPower Swap!
-The wild {0102:0} used\nPower Swap!
-The foe's {0102:0} used\nPower Swap!
-{0102:0} used\nGuard Swap!
-The wild {0102:0} used\nGuard Swap!
-The foe's {0102:0} used\nGuard Swap!
-{0102:0} used\nPunishment!
-The wild {0102:0} used\nPunishment!
-The foe's {0102:0} used\nPunishment!
-{0102:0} used\nLast Resort!
-The wild {0102:0} used\nLast Resort!
-The foe's {0102:0} used\nLast Resort!
-{0102:0} used\nWorry Seed!
-The wild {0102:0} used\nWorry Seed!
-The foe's {0102:0} used\nWorry Seed!
-{0102:0} used\nSucker Punch!
-The wild {0102:0} used\nSucker Punch!
-The foe's {0102:0} used\nSucker Punch!
-{0102:0} used\nToxic Spikes!
-The wild {0102:0} used\nToxic Spikes!
-The foe's {0102:0} used\nToxic Spikes!
-{0102:0} used\nHeart Swap!
-The wild {0102:0} used\nHeart Swap!
-The foe's {0102:0} used\nHeart Swap!
-{0102:0} used\nAqua Ring!
-The wild {0102:0} used\nAqua Ring!
-The foe's {0102:0} used\nAqua Ring!
-{0102:0} used\nMagnet Rise!
-The wild {0102:0} used\nMagnet Rise!
-The foe's {0102:0} used\nMagnet Rise!
-{0102:0} used\nFlare Blitz!
-The wild {0102:0} used\nFlare Blitz!
-The foe's {0102:0} used\nFlare Blitz!
-{0102:0} used\nForce Palm!
-The wild {0102:0} used\nForce Palm!
-The foe's {0102:0} used\nForce Palm!
-{0102:0} used\nAura Sphere!
-The wild {0102:0} used\nAura Sphere!
-The foe's {0102:0} used\nAura Sphere!
-{0102:0} used\nRock Polish!
-The wild {0102:0} used\nRock Polish!
-The foe's {0102:0} used\nRock Polish!
-{0102:0} used\nPoison Jab!
-The wild {0102:0} used\nPoison Jab!
-The foe's {0102:0} used\nPoison Jab!
-{0102:0} used\nDark Pulse!
-The wild {0102:0} used\nDark Pulse!
-The foe's {0102:0} used\nDark Pulse!
-{0102:0} used\nNight Slash!
-The wild {0102:0} used\nNight Slash!
-The foe's {0102:0} used\nNight Slash!
-{0102:0} used\nAqua Tail!
-The wild {0102:0} used\nAqua Tail!
-The foe's {0102:0} used\nAqua Tail!
-{0102:0} used\nSeed Bomb!
-The wild {0102:0} used\nSeed Bomb!
-The foe's {0102:0} used\nSeed Bomb!
-{0102:0} used\nAir Slash!
-The wild {0102:0} used\nAir Slash!
-The foe's {0102:0} used\nAir Slash!
-{0102:0} used\nX-Scissor!
-The wild {0102:0} used\nX-Scissor!
-The foe's {0102:0} used\nX-Scissor!
-{0102:0} used\nBug Buzz!
-The wild {0102:0} used\nBug Buzz!
-The foe's {0102:0} used\nBug Buzz!
-{0102:0} used\nDragon Pulse!
-The wild {0102:0} used\nDragon Pulse!
-The foe's {0102:0} used\nDragon Pulse!
-{0102:0} used\nDragon Rush!
-The wild {0102:0} used\nDragon Rush!
-The foe's {0102:0} used\nDragon Rush!
-{0102:0} used\nPower Gem!
-The wild {0102:0} used\nPower Gem!
-The foe's {0102:0} used\nPower Gem!
-{0102:0} used\nDrain Punch!
-The wild {0102:0} used\nDrain Punch!
-The foe's {0102:0} used\nDrain Punch!
-{0102:0} used\nVacuum Wave!
-The wild {0102:0} used\nVacuum Wave!
-The foe's {0102:0} used\nVacuum Wave!
-{0102:0} used\nFocus Blast!
-The wild {0102:0} used\nFocus Blast!
-The foe's {0102:0} used\nFocus Blast!
-{0102:0} used\nEnergy Ball!
-The wild {0102:0} used\nEnergy Ball!
-The foe's {0102:0} used\nEnergy Ball!
-{0102:0} used\nBrave Bird!
-The wild {0102:0} used\nBrave Bird!
-The foe's {0102:0} used\nBrave Bird!
-{0102:0} used\nEarth Power!
-The wild {0102:0} used\nEarth Power!
-The foe's {0102:0} used\nEarth Power!
-{0102:0} used\nSwitcheroo!
-The wild {0102:0} used\nSwitcheroo!
-The foe's {0102:0} used\nSwitcheroo!
-{0102:0} used\nGiga Impact!
-The wild {0102:0} used\nGiga Impact!
-The foe's {0102:0} used\nGiga Impact!
-{0102:0} used\nNasty Plot!
-The wild {0102:0} used\nNasty Plot!
-The foe's {0102:0} used\nNasty Plot!
-{0102:0} used\nBullet Punch!
-The wild {0102:0} used\nBullet Punch!
-The foe's {0102:0} used\nBullet Punch!
-{0102:0} used\nAvalanche!
-The wild {0102:0} used\nAvalanche!
-The foe's {0102:0} used\nAvalanche!
-{0102:0} used\nIce Shard!
-The wild {0102:0} used\nIce Shard!
-The foe's {0102:0} used\nIce Shard!
-{0102:0} used\nShadow Claw!
-The wild {0102:0} used\nShadow Claw!
-The foe's {0102:0} used\nShadow Claw!
-{0102:0} used\nThunder Fang!
-The wild {0102:0} used\nThunder Fang!
-The foe's {0102:0} used\nThunder Fang!
-{0102:0} used\nIce Fang!
-The wild {0102:0} used\nIce Fang!
-The foe's {0102:0} used\nIce Fang!
-{0102:0} used\nFire Fang!
-The wild {0102:0} used\nFire Fang!
-The foe's {0102:0} used\nFire Fang!
-{0102:0} used\nShadow Sneak!
-The wild {0102:0} used\nShadow Sneak!
-The foe's {0102:0} used\nShadow Sneak!
-{0102:0} used\nMud Bomb!
-The wild {0102:0} used\nMud Bomb!
-The foe's {0102:0} used\nMud Bomb!
-{0102:0} used\nPsycho Cut!
-The wild {0102:0} used\nPsycho Cut!
-The foe's {0102:0} used\nPsycho Cut!
-{0102:0} used\nZen Headbutt!
-The wild {0102:0} used\nZen Headbutt!
-The foe's {0102:0} used\nZen Headbutt!
-{0102:0} used\nMirror Shot!
-The wild {0102:0} used\nMirror Shot!
-The foe's {0102:0} used\nMirror Shot!
-{0102:0} used\nFlash Cannon!
-The wild {0102:0} used\nFlash Cannon!
-The foe's {0102:0} used\nFlash Cannon!
-{0102:0} used\nRock Climb!
-The wild {0102:0} used\nRock Climb!
-The foe's {0102:0} used\nRock Climb!
-{0102:0} used\nDefog!
-The wild {0102:0} used\nDefog!
-The foe's {0102:0} used\nDefog!
-{0102:0} used\nTrick Room!
-The wild {0102:0} used\nTrick Room!
-The foe's {0102:0} used\nTrick Room!
-{0102:0} used\nDraco Meteor!
-The wild {0102:0} used\nDraco Meteor!
-The foe's {0102:0} used\nDraco Meteor!
-{0102:0} used\nDischarge!
-The wild {0102:0} used\nDischarge!
-The foe's {0102:0} used\nDischarge!
-{0102:0} used\nLava Plume!
-The wild {0102:0} used\nLava Plume!
-The foe's {0102:0} used\nLava Plume!
-{0102:0} used\nLeaf Storm!
-The wild {0102:0} used\nLeaf Storm!
-The foe's {0102:0} used\nLeaf Storm!
-{0102:0} used\nPower Whip!
-The wild {0102:0} used\nPower Whip!
-The foe's {0102:0} used\nPower Whip!
-{0102:0} used\nRock Wrecker!
-The wild {0102:0} used\nRock Wrecker!
-The foe's {0102:0} used\nRock Wrecker!
-{0102:0} used\nCross Poison!
-The wild {0102:0} used\nCross Poison!
-The foe's {0102:0} used\nCross Poison!
-{0102:0} used\nGunk Shot!
-The wild {0102:0} used\nGunk Shot!
-The foe's {0102:0} used\nGunk Shot!
-{0102:0} used\nIron Head!
-The wild {0102:0} used\nIron Head!
-The foe's {0102:0} used\nIron Head!
-{0102:0} used\nMagnet Bomb!
-The wild {0102:0} used\nMagnet Bomb!
-The foe's {0102:0} used\nMagnet Bomb!
-{0102:0} used\nStone Edge!
-The wild {0102:0} used\nStone Edge!
-The foe's {0102:0} used\nStone Edge!
-{0102:0} used\nCaptivate!
-The wild {0102:0} used\nCaptivate!
-The foe's {0102:0} used\nCaptivate!
-{0102:0} used\nStealth Rock!
-The wild {0102:0} used\nStealth Rock!
-The foe's {0102:0} used\nStealth Rock!
-{0102:0} used\nGrass Knot!
-The wild {0102:0} used\nGrass Knot!
-The foe's {0102:0} used\nGrass Knot!
-{0102:0} used\nChatter!
-The wild {0102:0} used\nChatter!
-The foe's {0102:0} used\nChatter!
-{0102:0} used\nJudgment!
-The wild {0102:0} used\nJudgment!
-The foe's {0102:0} used\nJudgment!
-{0102:0} used\nBug Bite!
-The wild {0102:0} used\nBug Bite!
-The foe's {0102:0} used\nBug Bite!
-{0102:0} used\nCharge Beam!
-The wild {0102:0} used\nCharge Beam!
-The foe's {0102:0} used\nCharge Beam!
-{0102:0} used\nWood Hammer!
-The wild {0102:0} used\nWood Hammer!
-The foe's {0102:0} used\nWood Hammer!
-{0102:0} used\nAqua Jet!
-The wild {0102:0} used\nAqua Jet!
-The foe's {0102:0} used\nAqua Jet!
-{0102:0} used\nAttack Order!
-The wild {0102:0} used\nAttack Order!
-The foe's {0102:0} used\nAttack Order!
-{0102:0} used\nDefend Order!
-The wild {0102:0} used\nDefend Order!
-The foe's {0102:0} used\nDefend Order!
-{0102:0} used\nHeal Order!
-The wild {0102:0} used\nHeal Order!
-The foe's {0102:0} used\nHeal Order!
-{0102:0} used\nHead Smash!
-The wild {0102:0} used\nHead Smash!
-The foe's {0102:0} used\nHead Smash!
-{0102:0} used\nDouble Hit!
-The wild {0102:0} used\nDouble Hit!
-The foe's {0102:0} used\nDouble Hit!
-{0102:0} used\nRoar of Time!
-The wild {0102:0} used\nRoar of Time!
-The foe's {0102:0} used\nRoar of Time!
-{0102:0} used\nSpacial Rend!
-The wild {0102:0} used\nSpacial Rend!
-The foe's {0102:0} used\nSpacial Rend!
-{0102:0} used\nLunar Dance!
-The wild {0102:0} used\nLunar Dance!
-The foe's {0102:0} used\nLunar Dance!
-{0102:0} used\nCrush Grip!
-The wild {0102:0} used\nCrush Grip!
-The foe's {0102:0} used\nCrush Grip!
-{0102:0} used\nMagma Storm!
-The wild {0102:0} used\nMagma Storm!
-The foe's {0102:0} used\nMagma Storm!
-{0102:0} used\nDark Void!
-The wild {0102:0} used\nDark Void!
-The foe's {0102:0} used\nDark Void!
-{0102:0} used\nSeed Flare!
-The wild {0102:0} used\nSeed Flare!
-The foe's {0102:0} used\nSeed Flare!
-{0102:0} used\nOminous Wind!
-The wild {0102:0} used\nOminous Wind!
-The foe's {0102:0} used\nOminous Wind!
-{0102:0} used\nShadow Force!
-The wild {0102:0} used\nShadow Force!
-The foe's {0102:0} used\nShadow Force!
-{0102:0} used\nHone Claws!
-The wild {0102:0} used\nHone Claws!
-The foe's {0102:0} used\nHone Claws!
-{0102:0} used\nWide Guard!
-The wild {0102:0} used\nWide Guard!
-The foe's {0102:0} used\nWide Guard!
-{0102:0} used\nGuard Split!
-The wild {0102:0} used\nGuard Split!
-The foe's {0102:0} used\nGuard Split!
-{0102:0} used\nPower Split!
-The wild {0102:0} used\nPower Split!
-The foe's {0102:0} used\nPower Split!
-{0102:0} used\nWonder Room!
-The wild {0102:0} used\nWonder Room!
-The foe's {0102:0} used\nWonder Room!
-{0102:0} used\nPsyshock!
-The wild {0102:0} used\nPsyshock!
-The foe's {0102:0} used\nPsyshock!
-{0102:0} used\nVenoshock!
-The wild {0102:0} used\nVenoshock!
-The foe's {0102:0} used\nVenoshock!
-{0102:0} used\nAutotomize!
-The wild {0102:0} used\nAutotomize!
-The foe's {0102:0} used\nAutotomize!
-{0102:0} used\nRage Powder!
-The wild {0102:0} used\nRage Powder!
-The foe's {0102:0} used\nRage Powder!
-{0102:0} used\nTelekinesis!
-The wild {0102:0} used\nTelekinesis!
-The foe's {0102:0} used\nTelekinesis!
-{0102:0} used\nMagic Room!
-The wild {0102:0} used\nMagic Room!
-The foe's {0102:0} used\nMagic Room!
-{0102:0} used\nSmack Down!
-The wild {0102:0} used\nSmack Down!
-The foe's {0102:0} used\nSmack Down!
-{0102:0} used\nStorm Throw!
-The wild {0102:0} used\nStorm Throw!
-The foe's {0102:0} used\nStorm Throw!
-{0102:0} used\nFlame Burst!
-The wild {0102:0} used\nFlame Burst!
-The foe's {0102:0} used\nFlame Burst!
-{0102:0} used\nSludge Wave!
-The wild {0102:0} used\nSludge Wave!
-The foe's {0102:0} used\nSludge Wave!
-{0102:0} used\nQuiver Dance!
-The wild {0102:0} used\nQuiver Dance!
-The foe's {0102:0} used\nQuiver Dance!
-{0102:0} used\nHeavy Slam!
-The wild {0102:0} used\nHeavy Slam!
-The foe's {0102:0} used\nHeavy Slam!
-{0102:0} used\nSynchronoise!
-The wild {0102:0} used\nSynchronoise!
-The foe's {0102:0} used\nSynchronoise!
-{0102:0} used\nElectro Ball!
-The wild {0102:0} used\nElectro Ball!
-The foe's {0102:0} used\nElectro Ball!
-{0102:0} used\nSoak!
-The wild {0102:0} used\nSoak!
-The foe's {0102:0} used\nSoak!
-{0102:0} used\nFlame Charge!
-The wild {0102:0} used\nFlame Charge!
-The foe's {0102:0} used\nFlame Charge!
-{0102:0} used\nCoil!
-The wild {0102:0} used\nCoil!
-The foe's {0102:0} used\nCoil!
-{0102:0} used\nLow Sweep!
-The wild {0102:0} used\nLow Sweep!
-The foe's {0102:0} used\nLow Sweep!
-{0102:0} used\nAcid Spray!
-The wild {0102:0} used\nAcid Spray!
-The foe's {0102:0} used\nAcid Spray!
-{0102:0} used\nFoul Play!
-The wild {0102:0} used\nFoul Play!
-The foe's {0102:0} used\nFoul Play!
-{0102:0} used\nSimple Beam!
-The wild {0102:0} used\nSimple Beam!
-The foe's {0102:0} used\nSimple Beam!
-{0102:0} used\nEntrainment!
-The wild {0102:0} used\nEntrainment!
-The foe's {0102:0} used\nEntrainment!
-{0102:0} used\nAfter You!
-The wild {0102:0} used\nAfter You!
-The foe's {0102:0} used\nAfter You!
-{0102:0} used\nRound!
-The wild {0102:0} used\nRound!
-The foe's {0102:0} used\nRound!
-{0102:0} used\nEchoed Voice!
-The wild {0102:0} used\nEchoed Voice!
-The foe's {0102:0} used\nEchoed Voice!
-{0102:0} used\nChip Away!
-The wild {0102:0} used\nChip Away!
-The foe's {0102:0} used\nChip Away!
-{0102:0} used\nClear Smog!
-The wild {0102:0} used\nClear Smog!
-The foe's {0102:0} used\nClear Smog!
-{0102:0} used\nStored Power!
-The wild {0102:0} used\nStored Power!
-The foe's {0102:0} used\nStored Power!
-{0102:0} used\nQuick Guard!
-The wild {0102:0} used\nQuick Guard!
-The foe's {0102:0} used\nQuick Guard!
-{0102:0} used\nAlly Switch!
-The wild {0102:0} used\nAlly Switch!
-The foe's {0102:0} used\nAlly Switch!
-{0102:0} used\nScald!
-The wild {0102:0} used\nScald!
-The foe's {0102:0} used\nScald!
-{0102:0} used\nShell Smash!
-The wild {0102:0} used\nShell Smash!
-The foe's {0102:0} used\nShell Smash!
-{0102:0} used\nHeal Pulse!
-The wild {0102:0} used\nHeal Pulse!
-The foe's {0102:0} used\nHeal Pulse!
-{0102:0} used\nHex!
-The wild {0102:0} used\nHex!
-The foe's {0102:0} used\nHex!
-{0102:0} used\nSky Drop!
-The wild {0102:0} used\nSky Drop!
-The foe's {0102:0} used\nSky Drop!
-{0102:0} used\nShift Gear!
-The wild {0102:0} used\nShift Gear!
-The foe's {0102:0} used\nShift Gear!
-{0102:0} used\nCircle Throw!
-The wild {0102:0} used\nCircle Throw!
-The foe's {0102:0} used\nCircle Throw!
-{0102:0} used\nIncinerate!
-The wild {0102:0} used\nIncinerate!
-The foe's {0102:0} used\nIncinerate!
-{0102:0} used\nQuash!
-The wild {0102:0} used\nQuash!
-The foe's {0102:0} used\nQuash!
-{0102:0} used\nAcrobatics!
-The wild {0102:0} used\nAcrobatics!
-The foe's {0102:0} used\nAcrobatics!
-{0102:0} used\nReflect Type!
-The wild {0102:0} used\nReflect Type!
-The foe's {0102:0} used\nReflect Type!
-{0102:0} used\nRetaliate!
-The wild {0102:0} used\nRetaliate!
-The foe's {0102:0} used\nRetaliate!
-{0102:0} used\nFinal Gambit!
-The wild {0102:0} used\nFinal Gambit!
-The foe's {0102:0} used\nFinal Gambit!
-{0102:0} used\nBestow!
-The wild {0102:0} used\nBestow!
-The foe's {0102:0} used\nBestow!
-{0102:0} used\nInferno!
-The wild {0102:0} used\nInferno!
-The foe's {0102:0} used\nInferno!
-{0102:0} used\nWater Pledge!
-The wild {0102:0} used\nWater Pledge!
-The foe's {0102:0} used\nWater Pledge!
-{0102:0} used\nFire Pledge!
-The wild {0102:0} used\nFire Pledge!
-The foe's {0102:0} used\nFire Pledge!
-{0102:0} used\nGrass Pledge!
-The wild {0102:0} used\nGrass Pledge!
-The foe's {0102:0} used\nGrass Pledge!
-{0102:0} used\nVolt Switch!
-The wild {0102:0} used\nVolt Switch!
-The foe's {0102:0} used\nVolt Switch!
-{0102:0} used\nStruggle Bug!
-The wild {0102:0} used\nStruggle Bug!
-The foe's {0102:0} used\nStruggle Bug!
-{0102:0} used\nBulldoze!
-The wild {0102:0} used\nBulldoze!
-The foe's {0102:0} used\nBulldoze!
-{0102:0} used\nFrost Breath!
-The wild {0102:0} used\nFrost Breath!
-The foe's {0102:0} used\nFrost Breath!
-{0102:0} used\nDragon Tail!
-The wild {0102:0} used\nDragon Tail!
-The foe's {0102:0} used\nDragon Tail!
-{0102:0} used\nWork Up!
-The wild {0102:0} used\nWork Up!
-The foe's {0102:0} used\nWork Up!
-{0102:0} used\nElectroweb!
-The wild {0102:0} used\nElectroweb!
-The foe's {0102:0} used\nElectroweb!
-{0102:0} used\nWild Charge!
-The wild {0102:0} used\nWild Charge!
-The foe's {0102:0} used\nWild Charge!
-{0102:0} used\nDrill Run!
-The wild {0102:0} used\nDrill Run!
-The foe's {0102:0} used\nDrill Run!
-{0102:0} used\nDual Chop!
-The wild {0102:0} used\nDual Chop!
-The foe's {0102:0} used\nDual Chop!
-{0102:0} used\nHeart Stamp!
-The wild {0102:0} used\nHeart Stamp!
-The foe's {0102:0} used\nHeart Stamp!
-{0102:0} used\nHorn Leech!
-The wild {0102:0} used\nHorn Leech!
-The foe's {0102:0} used\nHorn Leech!
-{0102:0} used\nSacred Sword!
-The wild {0102:0} used\nSacred Sword!
-The foe's {0102:0} used\nSacred Sword!
-{0102:0} used\nRazor Shell!
-The wild {0102:0} used\nRazor Shell!
-The foe's {0102:0} used\nRazor Shell!
-{0102:0} used\nHeat Crash!
-The wild {0102:0} used\nHeat Crash!
-The foe's {0102:0} used\nHeat Crash!
-{0102:0} used\nLeaf Tornado!
-The wild {0102:0} used\nLeaf Tornado!
-The foe's {0102:0} used\nLeaf Tornado!
-{0102:0} used\nSteamroller!
-The wild {0102:0} used\nSteamroller!
-The foe's {0102:0} used\nSteamroller!
-{0102:0} used\nCotton Guard!
-The wild {0102:0} used\nCotton Guard!
-The foe's {0102:0} used\nCotton Guard!
-{0102:0} used\nNight Daze!
-The wild {0102:0} used\nNight Daze!
-The foe's {0102:0} used\nNight Daze!
-{0102:0} used\nPsystrike!
-The wild {0102:0} used\nPsystrike!
-The foe's {0102:0} used\nPsystrike!
-{0102:0} used\nTail Slap!
-The wild {0102:0} used\nTail Slap!
-The foe's {0102:0} used\nTail Slap!
-{0102:0} used\nHurricane!
-The wild {0102:0} used\nHurricane!
-The foe's {0102:0} used\nHurricane!
-{0102:0} used\nHead Charge!
-The wild {0102:0} used\nHead Charge!
-The foe's {0102:0} used\nHead Charge!
-{0102:0} used\nGear Grind!
-The wild {0102:0} used\nGear Grind!
-The foe's {0102:0} used\nGear Grind!
-{0102:0} used\nSearing Shot!
-The wild {0102:0} used\nSearing Shot!
-The foe's {0102:0} used\nSearing Shot!
-{0102:0} used\nTechno Blast!
-The wild {0102:0} used\nTechno Blast!
-The foe's {0102:0} used\nTechno Blast!
-{0102:0} used\nRelic Song!
-The wild {0102:0} used\nRelic Song!
-The foe's {0102:0} used\nRelic Song!
-{0102:0} used\nSecret Sword!
-The wild {0102:0} used\nSecret Sword!
-The foe's {0102:0} used\nSecret Sword!
-{0102:0} used\nGlaciate!
-The wild {0102:0} used\nGlaciate!
-The foe's {0102:0} used\nGlaciate!
-{0102:0} used\nBolt Strike!
-The wild {0102:0} used\nBolt Strike!
-The foe's {0102:0} used\nBolt Strike!
-{0102:0} used\nBlue Flare!
-The wild {0102:0} used\nBlue Flare!
-The foe's {0102:0} used\nBlue Flare!
-{0102:0} used\nFiery Dance!
-The wild {0102:0} used\nFiery Dance!
-The foe's {0102:0} used\nFiery Dance!
-{0102:0} used\nFreeze Shock!
-The wild {0102:0} used\nFreeze Shock!
-The foe's {0102:0} used\nFreeze Shock!
-{0102:0} used\nIce Burn!
-The wild {0102:0} used\nIce Burn!
-The foe's {0102:0} used\nIce Burn!
-{0102:0} used\nSnarl!
-The wild {0102:0} used\nSnarl!
-The foe's {0102:0} used\nSnarl!
-{0102:0} used\nIcicle Crash!
-The wild {0102:0} used\nIcicle Crash!
-The foe's {0102:0} used\nIcicle Crash!
-{0102:0} used\nV-create!
-The wild {0102:0} used\nV-create!
-The foe's {0102:0} used\nV-create!
-{0102:0} used\nFusion Flare!
-The wild {0102:0} used\nFusion Flare!
-The foe's {0102:0} used\nFusion Flare!
-{0102:0} used\nFusion Bolt!
-The wild {0102:0} used\nFusion Bolt!
-The foe's {0102:0} used\nFusion Bolt!
+Bank0016_Text_Empty = !
+Bank0016_Text_Empty_2 = !
+Bank0016_Text_Empty_3 = !
+Bank0016_Text_UsedPound = {0102:0} used\nPound!
+Bank0016_Text_WildUsedPound = The wild {0102:0} used\nPound!
+Bank0016_Text_FoesUsedPound = The foe's {0102:0} used\nPound!
+Bank0016_Text_UsedKarateChop = {0102:0} used\nKarate Chop!
+Bank0016_Text_WildUsedKarateChop = The wild {0102:0} used\nKarate Chop!
+Bank0016_Text_FoesUsedKarateChop = The foe's {0102:0} used\nKarate Chop!
+Bank0016_Text_UsedDoubleslap = {0102:0} used\nDoubleSlap!
+Bank0016_Text_WildUsedDoubleslap = The wild {0102:0} used\nDoubleSlap!
+Bank0016_Text_FoesUsedDoubleslap = The foe's {0102:0} used\nDoubleSlap!
+Bank0016_Text_UsedCometPunch = {0102:0} used\nComet Punch!
+Bank0016_Text_WildUsedCometPunch = The wild {0102:0} used\nComet Punch!
+Bank0016_Text_FoesUsedCometPunch = The foe's {0102:0} used\nComet Punch!
+Bank0016_Text_UsedMegaPunch = {0102:0} used\nMega Punch!
+Bank0016_Text_WildUsedMegaPunch = The wild {0102:0} used\nMega Punch!
+Bank0016_Text_FoesUsedMegaPunch = The foe's {0102:0} used\nMega Punch!
+Bank0016_Text_UsedPayDay = {0102:0} used\nPay Day!
+Bank0016_Text_WildUsedPayDay = The wild {0102:0} used\nPay Day!
+Bank0016_Text_FoesUsedPayDay = The foe's {0102:0} used\nPay Day!
+Bank0016_Text_UsedFirePunch = {0102:0} used\nFire Punch!
+Bank0016_Text_WildUsedFirePunch = The wild {0102:0} used\nFire Punch!
+Bank0016_Text_FoesUsedFirePunch = The foe's {0102:0} used\nFire Punch!
+Bank0016_Text_UsedIcePunch = {0102:0} used\nIce Punch!
+Bank0016_Text_WildUsedIcePunch = The wild {0102:0} used\nIce Punch!
+Bank0016_Text_FoesUsedIcePunch = The foe's {0102:0} used\nIce Punch!
+Bank0016_Text_UsedThunderpunch = {0102:0} used\nThunderPunch!
+Bank0016_Text_WildUsedThunderpunch = The wild {0102:0} used\nThunderPunch!
+Bank0016_Text_FoesUsedThunderpunch = The foe's {0102:0} used\nThunderPunch!
+Bank0016_Text_UsedScratch = {0102:0} used\nScratch!
+Bank0016_Text_WildUsedScratch = The wild {0102:0} used\nScratch!
+Bank0016_Text_FoesUsedScratch = The foe's {0102:0} used\nScratch!
+Bank0016_Text_UsedVicegrip = {0102:0} used\nViceGrip!
+Bank0016_Text_WildUsedVicegrip = The wild {0102:0} used\nViceGrip!
+Bank0016_Text_FoesUsedVicegrip = The foe's {0102:0} used\nViceGrip!
+Bank0016_Text_UsedGuillotine = {0102:0} used\nGuillotine!
+Bank0016_Text_WildUsedGuillotine = The wild {0102:0} used\nGuillotine!
+Bank0016_Text_FoesUsedGuillotine = The foe's {0102:0} used\nGuillotine!
+Bank0016_Text_UsedRazorWind = {0102:0} used\nRazor Wind!
+Bank0016_Text_WildUsedRazorWind = The wild {0102:0} used\nRazor Wind!
+Bank0016_Text_FoesUsedRazorWind = The foe's {0102:0} used\nRazor Wind!
+Bank0016_Text_UsedSwordsDance = {0102:0} used\nSwords Dance!
+Bank0016_Text_WildUsedSwordsDance = The wild {0102:0} used\nSwords Dance!
+Bank0016_Text_FoesUsedSwordsDance = The foe's {0102:0} used\nSwords Dance!
+Bank0016_Text_UsedCut = {0102:0} used\nCut!
+Bank0016_Text_WildUsedCut = The wild {0102:0} used\nCut!
+Bank0016_Text_FoesUsedCut = The foe's {0102:0} used\nCut!
+Bank0016_Text_UsedGust = {0102:0} used\nGust!
+Bank0016_Text_WildUsedGust = The wild {0102:0} used\nGust!
+Bank0016_Text_FoesUsedGust = The foe's {0102:0} used\nGust!
+Bank0016_Text_UsedWingAttack = {0102:0} used\nWing Attack!
+Bank0016_Text_WildUsedWingAttack = The wild {0102:0} used\nWing Attack!
+Bank0016_Text_FoesUsedWingAttack = The foe's {0102:0} used\nWing Attack!
+Bank0016_Text_UsedWhirlwind = {0102:0} used\nWhirlwind!
+Bank0016_Text_WildUsedWhirlwind = The wild {0102:0} used\nWhirlwind!
+Bank0016_Text_FoesUsedWhirlwind = The foe's {0102:0} used\nWhirlwind!
+Bank0016_Text_UsedFly = {0102:0} used\nFly!
+Bank0016_Text_WildUsedFly = The wild {0102:0} used\nFly!
+Bank0016_Text_FoesUsedFly = The foe's {0102:0} used\nFly!
+Bank0016_Text_UsedBind = {0102:0} used\nBind!
+Bank0016_Text_WildUsedBind = The wild {0102:0} used\nBind!
+Bank0016_Text_FoesUsedBind = The foe's {0102:0} used\nBind!
+Bank0016_Text_UsedSlam = {0102:0} used\nSlam!
+Bank0016_Text_WildUsedSlam = The wild {0102:0} used\nSlam!
+Bank0016_Text_FoesUsedSlam = The foe's {0102:0} used\nSlam!
+Bank0016_Text_UsedVineWhip = {0102:0} used\nVine Whip!
+Bank0016_Text_WildUsedVineWhip = The wild {0102:0} used\nVine Whip!
+Bank0016_Text_FoesUsedVineWhip = The foe's {0102:0} used\nVine Whip!
+Bank0016_Text_UsedStomp = {0102:0} used\nStomp!
+Bank0016_Text_WildUsedStomp = The wild {0102:0} used\nStomp!
+Bank0016_Text_FoesUsedStomp = The foe's {0102:0} used\nStomp!
+Bank0016_Text_UsedDoubleKick = {0102:0} used\nDouble Kick!
+Bank0016_Text_WildUsedDoubleKick = The wild {0102:0} used\nDouble Kick!
+Bank0016_Text_FoesUsedDoubleKick = The foe's {0102:0} used\nDouble Kick!
+Bank0016_Text_UsedMegaKick = {0102:0} used\nMega Kick!
+Bank0016_Text_WildUsedMegaKick = The wild {0102:0} used\nMega Kick!
+Bank0016_Text_FoesUsedMegaKick = The foe's {0102:0} used\nMega Kick!
+Bank0016_Text_UsedJumpKick = {0102:0} used\nJump Kick!
+Bank0016_Text_WildUsedJumpKick = The wild {0102:0} used\nJump Kick!
+Bank0016_Text_FoesUsedJumpKick = The foe's {0102:0} used\nJump Kick!
+Bank0016_Text_UsedRollingKick = {0102:0} used\nRolling Kick!
+Bank0016_Text_WildUsedRollingKick = The wild {0102:0} used\nRolling Kick!
+Bank0016_Text_FoesUsedRollingKick = The foe's {0102:0} used\nRolling Kick!
+Bank0016_Text_UsedSandAttack = {0102:0} used\nSand-Attack!
+Bank0016_Text_WildUsedSandAttack = The wild {0102:0} used\nSand-Attack!
+Bank0016_Text_FoesUsedSandAttack = The foe's {0102:0} used\nSand-Attack!
+Bank0016_Text_UsedHeadbutt = {0102:0} used\nHeadbutt!
+Bank0016_Text_WildUsedHeadbutt = The wild {0102:0} used\nHeadbutt!
+Bank0016_Text_FoesUsedHeadbutt = The foe's {0102:0} used\nHeadbutt!
+Bank0016_Text_UsedHornAttack = {0102:0} used\nHorn Attack!
+Bank0016_Text_WildUsedHornAttack = The wild {0102:0} used\nHorn Attack!
+Bank0016_Text_FoesUsedHornAttack = The foe's {0102:0} used\nHorn Attack!
+Bank0016_Text_UsedFuryAttack = {0102:0} used\nFury Attack!
+Bank0016_Text_WildUsedFuryAttack = The wild {0102:0} used\nFury Attack!
+Bank0016_Text_FoesUsedFuryAttack = The foe's {0102:0} used\nFury Attack!
+Bank0016_Text_UsedHornDrill = {0102:0} used\nHorn Drill!
+Bank0016_Text_WildUsedHornDrill = The wild {0102:0} used\nHorn Drill!
+Bank0016_Text_FoesUsedHornDrill = The foe's {0102:0} used\nHorn Drill!
+Bank0016_Text_UsedTackle = {0102:0} used\nTackle!
+Bank0016_Text_WildUsedTackle = The wild {0102:0} used\nTackle!
+Bank0016_Text_FoesUsedTackle = The foe's {0102:0} used\nTackle!
+Bank0016_Text_UsedBodySlam = {0102:0} used\nBody Slam!
+Bank0016_Text_WildUsedBodySlam = The wild {0102:0} used\nBody Slam!
+Bank0016_Text_FoesUsedBodySlam = The foe's {0102:0} used\nBody Slam!
+Bank0016_Text_UsedWrap = {0102:0} used\nWrap!
+Bank0016_Text_WildUsedWrap = The wild {0102:0} used\nWrap!
+Bank0016_Text_FoesUsedWrap = The foe's {0102:0} used\nWrap!
+Bank0016_Text_UsedTakeDown = {0102:0} used\nTake Down!
+Bank0016_Text_WildUsedTakeDown = The wild {0102:0} used\nTake Down!
+Bank0016_Text_FoesUsedTakeDown = The foe's {0102:0} used\nTake Down!
+Bank0016_Text_UsedThrash = {0102:0} used\nThrash!
+Bank0016_Text_WildUsedThrash = The wild {0102:0} used\nThrash!
+Bank0016_Text_FoesUsedThrash = The foe's {0102:0} used\nThrash!
+Bank0016_Text_UsedDoubleEdge = {0102:0} used\nDouble-Edge!
+Bank0016_Text_WildUsedDoubleEdge = The wild {0102:0} used\nDouble-Edge!
+Bank0016_Text_FoesUsedDoubleEdge = The foe's {0102:0} used\nDouble-Edge!
+Bank0016_Text_UsedTailWhip = {0102:0} used\nTail Whip!
+Bank0016_Text_WildUsedTailWhip = The wild {0102:0} used\nTail Whip!
+Bank0016_Text_FoesUsedTailWhip = The foe's {0102:0} used\nTail Whip!
+Bank0016_Text_UsedPoisonSting = {0102:0} used\nPoison Sting!
+Bank0016_Text_WildUsedPoisonSting = The wild {0102:0} used\nPoison Sting!
+Bank0016_Text_FoesUsedPoisonSting = The foe's {0102:0} used\nPoison Sting!
+Bank0016_Text_UsedTwineedle = {0102:0} used\nTwineedle!
+Bank0016_Text_WildUsedTwineedle = The wild {0102:0} used\nTwineedle!
+Bank0016_Text_FoesUsedTwineedle = The foe's {0102:0} used\nTwineedle!
+Bank0016_Text_UsedPinMissile = {0102:0} used\nPin Missile!
+Bank0016_Text_WildUsedPinMissile = The wild {0102:0} used\nPin Missile!
+Bank0016_Text_FoesUsedPinMissile = The foe's {0102:0} used\nPin Missile!
+Bank0016_Text_UsedLeer = {0102:0} used\nLeer!
+Bank0016_Text_WildUsedLeer = The wild {0102:0} used\nLeer!
+Bank0016_Text_FoesUsedLeer = The foe's {0102:0} used\nLeer!
+Bank0016_Text_UsedBite = {0102:0} used\nBite!
+Bank0016_Text_WildUsedBite = The wild {0102:0} used\nBite!
+Bank0016_Text_FoesUsedBite = The foe's {0102:0} used\nBite!
+Bank0016_Text_UsedGrowl = {0102:0} used\nGrowl!
+Bank0016_Text_WildUsedGrowl = The wild {0102:0} used\nGrowl!
+Bank0016_Text_FoesUsedGrowl = The foe's {0102:0} used\nGrowl!
+Bank0016_Text_UsedRoar = {0102:0} used\nRoar!
+Bank0016_Text_WildUsedRoar = The wild {0102:0} used\nRoar!
+Bank0016_Text_FoesUsedRoar = The foe's {0102:0} used\nRoar!
+Bank0016_Text_UsedSing = {0102:0} used\nSing!
+Bank0016_Text_WildUsedSing = The wild {0102:0} used\nSing!
+Bank0016_Text_FoesUsedSing = The foe's {0102:0} used\nSing!
+Bank0016_Text_UsedSupersonic = {0102:0} used\nSupersonic!
+Bank0016_Text_WildUsedSupersonic = The wild {0102:0} used\nSupersonic!
+Bank0016_Text_FoesUsedSupersonic = The foe's {0102:0} used\nSupersonic!
+Bank0016_Text_UsedSonicboom = {0102:0} used\nSonicBoom!
+Bank0016_Text_WildUsedSonicboom = The wild {0102:0} used\nSonicBoom!
+Bank0016_Text_FoesUsedSonicboom = The foe's {0102:0} used\nSonicBoom!
+Bank0016_Text_UsedDisable = {0102:0} used\nDisable!
+Bank0016_Text_WildUsedDisable = The wild {0102:0} used\nDisable!
+Bank0016_Text_FoesUsedDisable = The foe's {0102:0} used\nDisable!
+Bank0016_Text_UsedAcid = {0102:0} used\nAcid!
+Bank0016_Text_WildUsedAcid = The wild {0102:0} used\nAcid!
+Bank0016_Text_FoesUsedAcid = The foe's {0102:0} used\nAcid!
+Bank0016_Text_UsedEmber = {0102:0} used\nEmber!
+Bank0016_Text_WildUsedEmber = The wild {0102:0} used\nEmber!
+Bank0016_Text_FoesUsedEmber = The foe's {0102:0} used\nEmber!
+Bank0016_Text_UsedFlamethrower = {0102:0} used\nFlamethrower!
+Bank0016_Text_WildUsedFlamethrower = The wild {0102:0} used\nFlamethrower!
+Bank0016_Text_FoesUsedFlamethrower = The foe's {0102:0} used\nFlamethrower!
+Bank0016_Text_UsedMist = {0102:0} used\nMist!
+Bank0016_Text_WildUsedMist = The wild {0102:0} used\nMist!
+Bank0016_Text_FoesUsedMist = The foe's {0102:0} used\nMist!
+Bank0016_Text_UsedWaterGun = {0102:0} used\nWater Gun!
+Bank0016_Text_WildUsedWaterGun = The wild {0102:0} used\nWater Gun!
+Bank0016_Text_FoesUsedWaterGun = The foe's {0102:0} used\nWater Gun!
+Bank0016_Text_UsedHydroPump = {0102:0} used\nHydro Pump!
+Bank0016_Text_WildUsedHydroPump = The wild {0102:0} used\nHydro Pump!
+Bank0016_Text_FoesUsedHydroPump = The foe's {0102:0} used\nHydro Pump!
+Bank0016_Text_UsedSurf = {0102:0} used\nSurf!
+Bank0016_Text_WildUsedSurf = The wild {0102:0} used\nSurf!
+Bank0016_Text_FoesUsedSurf = The foe's {0102:0} used\nSurf!
+Bank0016_Text_UsedIceBeam = {0102:0} used\nIce Beam!
+Bank0016_Text_WildUsedIceBeam = The wild {0102:0} used\nIce Beam!
+Bank0016_Text_FoesUsedIceBeam = The foe's {0102:0} used\nIce Beam!
+Bank0016_Text_UsedBlizzard = {0102:0} used\nBlizzard!
+Bank0016_Text_WildUsedBlizzard = The wild {0102:0} used\nBlizzard!
+Bank0016_Text_FoesUsedBlizzard = The foe's {0102:0} used\nBlizzard!
+Bank0016_Text_UsedPsybeam = {0102:0} used\nPsybeam!
+Bank0016_Text_WildUsedPsybeam = The wild {0102:0} used\nPsybeam!
+Bank0016_Text_FoesUsedPsybeam = The foe's {0102:0} used\nPsybeam!
+Bank0016_Text_UsedBubblebeam = {0102:0} used\nBubbleBeam!
+Bank0016_Text_WildUsedBubblebeam = The wild {0102:0} used\nBubbleBeam!
+Bank0016_Text_FoesUsedBubblebeam = The foe's {0102:0} used\nBubbleBeam!
+Bank0016_Text_UsedAuroraBeam = {0102:0} used\nAurora Beam!
+Bank0016_Text_WildUsedAuroraBeam = The wild {0102:0} used\nAurora Beam!
+Bank0016_Text_FoesUsedAuroraBeam = The foe's {0102:0} used\nAurora Beam!
+Bank0016_Text_UsedHyperBeam = {0102:0} used\nHyper Beam!
+Bank0016_Text_WildUsedHyperBeam = The wild {0102:0} used\nHyper Beam!
+Bank0016_Text_FoesUsedHyperBeam = The foe's {0102:0} used\nHyper Beam!
+Bank0016_Text_UsedPeck = {0102:0} used\nPeck!
+Bank0016_Text_WildUsedPeck = The wild {0102:0} used\nPeck!
+Bank0016_Text_FoesUsedPeck = The foe's {0102:0} used\nPeck!
+Bank0016_Text_UsedDrillPeck = {0102:0} used\nDrill Peck!
+Bank0016_Text_WildUsedDrillPeck = The wild {0102:0} used\nDrill Peck!
+Bank0016_Text_FoesUsedDrillPeck = The foe's {0102:0} used\nDrill Peck!
+Bank0016_Text_UsedSubmission = {0102:0} used\nSubmission!
+Bank0016_Text_WildUsedSubmission = The wild {0102:0} used\nSubmission!
+Bank0016_Text_FoesUsedSubmission = The foe's {0102:0} used\nSubmission!
+Bank0016_Text_UsedLowKick = {0102:0} used\nLow Kick!
+Bank0016_Text_WildUsedLowKick = The wild {0102:0} used\nLow Kick!
+Bank0016_Text_FoesUsedLowKick = The foe's {0102:0} used\nLow Kick!
+Bank0016_Text_UsedCounter = {0102:0} used\nCounter!
+Bank0016_Text_WildUsedCounter = The wild {0102:0} used\nCounter!
+Bank0016_Text_FoesUsedCounter = The foe's {0102:0} used\nCounter!
+Bank0016_Text_UsedSeismicToss = {0102:0} used\nSeismic Toss!
+Bank0016_Text_WildUsedSeismicToss = The wild {0102:0} used\nSeismic Toss!
+Bank0016_Text_FoesUsedSeismicToss = The foe's {0102:0} used\nSeismic Toss!
+Bank0016_Text_UsedStrength = {0102:0} used\nStrength!
+Bank0016_Text_WildUsedStrength = The wild {0102:0} used\nStrength!
+Bank0016_Text_FoesUsedStrength = The foe's {0102:0} used\nStrength!
+Bank0016_Text_UsedAbsorb = {0102:0} used\nAbsorb!
+Bank0016_Text_WildUsedAbsorb = The wild {0102:0} used\nAbsorb!
+Bank0016_Text_FoesUsedAbsorb = The foe's {0102:0} used\nAbsorb!
+Bank0016_Text_UsedMegaDrain = {0102:0} used\nMega Drain!
+Bank0016_Text_WildUsedMegaDrain = The wild {0102:0} used\nMega Drain!
+Bank0016_Text_FoesUsedMegaDrain = The foe's {0102:0} used\nMega Drain!
+Bank0016_Text_UsedLeechSeed = {0102:0} used\nLeech Seed!
+Bank0016_Text_WildUsedLeechSeed = The wild {0102:0} used\nLeech Seed!
+Bank0016_Text_FoesUsedLeechSeed = The foe's {0102:0} used\nLeech Seed!
+Bank0016_Text_UsedGrowth = {0102:0} used\nGrowth!
+Bank0016_Text_WildUsedGrowth = The wild {0102:0} used\nGrowth!
+Bank0016_Text_FoesUsedGrowth = The foe's {0102:0} used\nGrowth!
+Bank0016_Text_UsedRazorLeaf = {0102:0} used\nRazor Leaf!
+Bank0016_Text_WildUsedRazorLeaf = The wild {0102:0} used\nRazor Leaf!
+Bank0016_Text_FoesUsedRazorLeaf = The foe's {0102:0} used\nRazor Leaf!
+Bank0016_Text_UsedSolarbeam = {0102:0} used\nSolarBeam!
+Bank0016_Text_WildUsedSolarbeam = The wild {0102:0} used\nSolarBeam!
+Bank0016_Text_FoesUsedSolarbeam = The foe's {0102:0} used\nSolarBeam!
+Bank0016_Text_UsedPoisonpowder = {0102:0} used\nPoisonPowder!
+Bank0016_Text_WildUsedPoisonpowder = The wild {0102:0} used\nPoisonPowder!
+Bank0016_Text_FoesUsedPoisonpowder = The foe's {0102:0} used\nPoisonPowder!
+Bank0016_Text_UsedStunSpore = {0102:0} used\nStun Spore!
+Bank0016_Text_WildUsedStunSpore = The wild {0102:0} used\nStun Spore!
+Bank0016_Text_FoesUsedStunSpore = The foe's {0102:0} used\nStun Spore!
+Bank0016_Text_UsedSleepPowder = {0102:0} used\nSleep Powder!
+Bank0016_Text_WildUsedSleepPowder = The wild {0102:0} used\nSleep Powder!
+Bank0016_Text_FoesUsedSleepPowder = The foe's {0102:0} used\nSleep Powder!
+Bank0016_Text_UsedPetalDance = {0102:0} used\nPetal Dance!
+Bank0016_Text_WildUsedPetalDance = The wild {0102:0} used\nPetal Dance!
+Bank0016_Text_FoesUsedPetalDance = The foe's {0102:0} used\nPetal Dance!
+Bank0016_Text_UsedStringShot = {0102:0} used\nString Shot!
+Bank0016_Text_WildUsedStringShot = The wild {0102:0} used\nString Shot!
+Bank0016_Text_FoesUsedStringShot = The foe's {0102:0} used\nString Shot!
+Bank0016_Text_UsedDragonRage = {0102:0} used\nDragon Rage!
+Bank0016_Text_WildUsedDragonRage = The wild {0102:0} used\nDragon Rage!
+Bank0016_Text_FoesUsedDragonRage = The foe's {0102:0} used\nDragon Rage!
+Bank0016_Text_UsedFireSpin = {0102:0} used\nFire Spin!
+Bank0016_Text_WildUsedFireSpin = The wild {0102:0} used\nFire Spin!
+Bank0016_Text_FoesUsedFireSpin = The foe's {0102:0} used\nFire Spin!
+Bank0016_Text_UsedThundershock = {0102:0} used\nThunderShock!
+Bank0016_Text_WildUsedThundershock = The wild {0102:0} used\nThunderShock!
+Bank0016_Text_FoesUsedThundershock = The foe's {0102:0} used\nThunderShock!
+Bank0016_Text_UsedThunderbolt = {0102:0} used\nThunderbolt!
+Bank0016_Text_WildUsedThunderbolt = The wild {0102:0} used\nThunderbolt!
+Bank0016_Text_FoesUsedThunderbolt = The foe's {0102:0} used\nThunderbolt!
+Bank0016_Text_UsedThunderWave = {0102:0} used\nThunder Wave!
+Bank0016_Text_WildUsedThunderWave = The wild {0102:0} used\nThunder Wave!
+Bank0016_Text_FoesUsedThunderWave = The foe's {0102:0} used\nThunder Wave!
+Bank0016_Text_UsedThunder = {0102:0} used\nThunder!
+Bank0016_Text_WildUsedThunder = The wild {0102:0} used\nThunder!
+Bank0016_Text_FoesUsedThunder = The foe's {0102:0} used\nThunder!
+Bank0016_Text_UsedRockThrow = {0102:0} used\nRock Throw!
+Bank0016_Text_WildUsedRockThrow = The wild {0102:0} used\nRock Throw!
+Bank0016_Text_FoesUsedRockThrow = The foe's {0102:0} used\nRock Throw!
+Bank0016_Text_UsedEarthquake = {0102:0} used\nEarthquake!
+Bank0016_Text_WildUsedEarthquake = The wild {0102:0} used\nEarthquake!
+Bank0016_Text_FoesUsedEarthquake = The foe's {0102:0} used\nEarthquake!
+Bank0016_Text_UsedFissure = {0102:0} used\nFissure!
+Bank0016_Text_WildUsedFissure = The wild {0102:0} used\nFissure!
+Bank0016_Text_FoesUsedFissure = The foe's {0102:0} used\nFissure!
+Bank0016_Text_UsedDig = {0102:0} used\nDig!
+Bank0016_Text_WildUsedDig = The wild {0102:0} used\nDig!
+Bank0016_Text_FoesUsedDig = The foe's {0102:0} used\nDig!
+Bank0016_Text_UsedToxic = {0102:0} used\nToxic!
+Bank0016_Text_WildUsedToxic = The wild {0102:0} used\nToxic!
+Bank0016_Text_FoesUsedToxic = The foe's {0102:0} used\nToxic!
+Bank0016_Text_UsedConfusion = {0102:0} used\nConfusion!
+Bank0016_Text_WildUsedConfusion = The wild {0102:0} used\nConfusion!
+Bank0016_Text_FoesUsedConfusion = The foe's {0102:0} used\nConfusion!
+Bank0016_Text_UsedPsychic = {0102:0} used\nPsychic!
+Bank0016_Text_WildUsedPsychic = The wild {0102:0} used\nPsychic!
+Bank0016_Text_FoesUsedPsychic = The foe's {0102:0} used\nPsychic!
+Bank0016_Text_UsedHypnosis = {0102:0} used\nHypnosis!
+Bank0016_Text_WildUsedHypnosis = The wild {0102:0} used\nHypnosis!
+Bank0016_Text_FoesUsedHypnosis = The foe's {0102:0} used\nHypnosis!
+Bank0016_Text_UsedMeditate = {0102:0} used\nMeditate!
+Bank0016_Text_WildUsedMeditate = The wild {0102:0} used\nMeditate!
+Bank0016_Text_FoesUsedMeditate = The foe's {0102:0} used\nMeditate!
+Bank0016_Text_UsedAgility = {0102:0} used\nAgility!
+Bank0016_Text_WildUsedAgility = The wild {0102:0} used\nAgility!
+Bank0016_Text_FoesUsedAgility = The foe's {0102:0} used\nAgility!
+Bank0016_Text_UsedQuickAttack = {0102:0} used\nQuick Attack!
+Bank0016_Text_WildUsedQuickAttack = The wild {0102:0} used\nQuick Attack!
+Bank0016_Text_FoesUsedQuickAttack = The foe's {0102:0} used\nQuick Attack!
+Bank0016_Text_UsedRage = {0102:0} used\nRage!
+Bank0016_Text_WildUsedRage = The wild {0102:0} used\nRage!
+Bank0016_Text_FoesUsedRage = The foe's {0102:0} used\nRage!
+Bank0016_Text_UsedTeleport = {0102:0} used\nTeleport!
+Bank0016_Text_WildUsedTeleport = The wild {0102:0} used\nTeleport!
+Bank0016_Text_FoesUsedTeleport = The foe's {0102:0} used\nTeleport!
+Bank0016_Text_UsedNightShade = {0102:0} used\nNight Shade!
+Bank0016_Text_WildUsedNightShade = The wild {0102:0} used\nNight Shade!
+Bank0016_Text_FoesUsedNightShade = The foe's {0102:0} used\nNight Shade!
+Bank0016_Text_UsedMimic = {0102:0} used\nMimic!
+Bank0016_Text_WildUsedMimic = The wild {0102:0} used\nMimic!
+Bank0016_Text_FoesUsedMimic = The foe's {0102:0} used\nMimic!
+Bank0016_Text_UsedScreech = {0102:0} used\nScreech!
+Bank0016_Text_WildUsedScreech = The wild {0102:0} used\nScreech!
+Bank0016_Text_FoesUsedScreech = The foe's {0102:0} used\nScreech!
+Bank0016_Text_UsedDoubleTeam = {0102:0} used\nDouble Team!
+Bank0016_Text_WildUsedDoubleTeam = The wild {0102:0} used\nDouble Team!
+Bank0016_Text_FoesUsedDoubleTeam = The foe's {0102:0} used\nDouble Team!
+Bank0016_Text_UsedRecover = {0102:0} used\nRecover!
+Bank0016_Text_WildUsedRecover = The wild {0102:0} used\nRecover!
+Bank0016_Text_FoesUsedRecover = The foe's {0102:0} used\nRecover!
+Bank0016_Text_UsedHarden = {0102:0} used\nHarden!
+Bank0016_Text_WildUsedHarden = The wild {0102:0} used\nHarden!
+Bank0016_Text_FoesUsedHarden = The foe's {0102:0} used\nHarden!
+Bank0016_Text_UsedMinimize = {0102:0} used\nMinimize!
+Bank0016_Text_WildUsedMinimize = The wild {0102:0} used\nMinimize!
+Bank0016_Text_FoesUsedMinimize = The foe's {0102:0} used\nMinimize!
+Bank0016_Text_UsedSmokescreen = {0102:0} used\nSmokeScreen!
+Bank0016_Text_WildUsedSmokescreen = The wild {0102:0} used\nSmokeScreen!
+Bank0016_Text_FoesUsedSmokescreen = The foe's {0102:0} used\nSmokeScreen!
+Bank0016_Text_UsedConfuseRay = {0102:0} used\nConfuse Ray!
+Bank0016_Text_WildUsedConfuseRay = The wild {0102:0} used\nConfuse Ray!
+Bank0016_Text_FoesUsedConfuseRay = The foe's {0102:0} used\nConfuse Ray!
+Bank0016_Text_UsedWithdraw = {0102:0} used\nWithdraw!
+Bank0016_Text_WildUsedWithdraw = The wild {0102:0} used\nWithdraw!
+Bank0016_Text_FoesUsedWithdraw = The foe's {0102:0} used\nWithdraw!
+Bank0016_Text_UsedDefenseCurl = {0102:0} used\nDefense Curl!
+Bank0016_Text_WildUsedDefenseCurl = The wild {0102:0} used\nDefense Curl!
+Bank0016_Text_FoesUsedDefenseCurl = The foe's {0102:0} used\nDefense Curl!
+Bank0016_Text_UsedBarrier = {0102:0} used\nBarrier!
+Bank0016_Text_WildUsedBarrier = The wild {0102:0} used\nBarrier!
+Bank0016_Text_FoesUsedBarrier = The foe's {0102:0} used\nBarrier!
+Bank0016_Text_UsedLightScreen = {0102:0} used\nLight Screen!
+Bank0016_Text_WildUsedLightScreen = The wild {0102:0} used\nLight Screen!
+Bank0016_Text_FoesUsedLightScreen = The foe's {0102:0} used\nLight Screen!
+Bank0016_Text_UsedHaze = {0102:0} used\nHaze!
+Bank0016_Text_WildUsedHaze = The wild {0102:0} used\nHaze!
+Bank0016_Text_FoesUsedHaze = The foe's {0102:0} used\nHaze!
+Bank0016_Text_UsedReflect = {0102:0} used\nReflect!
+Bank0016_Text_WildUsedReflect = The wild {0102:0} used\nReflect!
+Bank0016_Text_FoesUsedReflect = The foe's {0102:0} used\nReflect!
+Bank0016_Text_UsedFocusEnergy = {0102:0} used\nFocus Energy!
+Bank0016_Text_WildUsedFocusEnergy = The wild {0102:0} used\nFocus Energy!
+Bank0016_Text_FoesUsedFocusEnergy = The foe's {0102:0} used\nFocus Energy!
+Bank0016_Text_UsedBide = {0102:0} used\nBide!
+Bank0016_Text_WildUsedBide = The wild {0102:0} used\nBide!
+Bank0016_Text_FoesUsedBide = The foe's {0102:0} used\nBide!
+Bank0016_Text_UsedMetronome = {0102:0} used\nMetronome!
+Bank0016_Text_WildUsedMetronome = The wild {0102:0} used\nMetronome!
+Bank0016_Text_FoesUsedMetronome = The foe's {0102:0} used\nMetronome!
+Bank0016_Text_UsedMirrorMove = {0102:0} used\nMirror Move!
+Bank0016_Text_WildUsedMirrorMove = The wild {0102:0} used\nMirror Move!
+Bank0016_Text_FoesUsedMirrorMove = The foe's {0102:0} used\nMirror Move!
+Bank0016_Text_UsedSelfdestruct = {0102:0} used\nSelfdestruct!
+Bank0016_Text_WildUsedSelfdestruct = The wild {0102:0} used\nSelfdestruct!
+Bank0016_Text_FoesUsedSelfdestruct = The foe's {0102:0} used\nSelfdestruct!
+Bank0016_Text_UsedEggBomb = {0102:0} used\nEgg Bomb!
+Bank0016_Text_WildUsedEggBomb = The wild {0102:0} used\nEgg Bomb!
+Bank0016_Text_FoesUsedEggBomb = The foe's {0102:0} used\nEgg Bomb!
+Bank0016_Text_UsedLick = {0102:0} used\nLick!
+Bank0016_Text_WildUsedLick = The wild {0102:0} used\nLick!
+Bank0016_Text_FoesUsedLick = The foe's {0102:0} used\nLick!
+Bank0016_Text_UsedSmog = {0102:0} used\nSmog!
+Bank0016_Text_WildUsedSmog = The wild {0102:0} used\nSmog!
+Bank0016_Text_FoesUsedSmog = The foe's {0102:0} used\nSmog!
+Bank0016_Text_UsedSludge = {0102:0} used\nSludge!
+Bank0016_Text_WildUsedSludge = The wild {0102:0} used\nSludge!
+Bank0016_Text_FoesUsedSludge = The foe's {0102:0} used\nSludge!
+Bank0016_Text_UsedBoneClub = {0102:0} used\nBone Club!
+Bank0016_Text_WildUsedBoneClub = The wild {0102:0} used\nBone Club!
+Bank0016_Text_FoesUsedBoneClub = The foe's {0102:0} used\nBone Club!
+Bank0016_Text_UsedFireBlast = {0102:0} used\nFire Blast!
+Bank0016_Text_WildUsedFireBlast = The wild {0102:0} used\nFire Blast!
+Bank0016_Text_FoesUsedFireBlast = The foe's {0102:0} used\nFire Blast!
+Bank0016_Text_UsedWaterfall = {0102:0} used\nWaterfall!
+Bank0016_Text_WildUsedWaterfall = The wild {0102:0} used\nWaterfall!
+Bank0016_Text_FoesUsedWaterfall = The foe's {0102:0} used\nWaterfall!
+Bank0016_Text_UsedClamp = {0102:0} used\nClamp!
+Bank0016_Text_WildUsedClamp = The wild {0102:0} used\nClamp!
+Bank0016_Text_FoesUsedClamp = The foe's {0102:0} used\nClamp!
+Bank0016_Text_UsedSwift = {0102:0} used\nSwift!
+Bank0016_Text_WildUsedSwift = The wild {0102:0} used\nSwift!
+Bank0016_Text_FoesUsedSwift = The foe's {0102:0} used\nSwift!
+Bank0016_Text_UsedSkullBash = {0102:0} used\nSkull Bash!
+Bank0016_Text_WildUsedSkullBash = The wild {0102:0} used\nSkull Bash!
+Bank0016_Text_FoesUsedSkullBash = The foe's {0102:0} used\nSkull Bash!
+Bank0016_Text_UsedSpikeCannon = {0102:0} used\nSpike Cannon!
+Bank0016_Text_WildUsedSpikeCannon = The wild {0102:0} used\nSpike Cannon!
+Bank0016_Text_FoesUsedSpikeCannon = The foe's {0102:0} used\nSpike Cannon!
+Bank0016_Text_UsedConstrict = {0102:0} used\nConstrict!
+Bank0016_Text_WildUsedConstrict = The wild {0102:0} used\nConstrict!
+Bank0016_Text_FoesUsedConstrict = The foe's {0102:0} used\nConstrict!
+Bank0016_Text_UsedAmnesia = {0102:0} used\nAmnesia!
+Bank0016_Text_WildUsedAmnesia = The wild {0102:0} used\nAmnesia!
+Bank0016_Text_FoesUsedAmnesia = The foe's {0102:0} used\nAmnesia!
+Bank0016_Text_UsedKinesis = {0102:0} used\nKinesis!
+Bank0016_Text_WildUsedKinesis = The wild {0102:0} used\nKinesis!
+Bank0016_Text_FoesUsedKinesis = The foe's {0102:0} used\nKinesis!
+Bank0016_Text_UsedSoftboiled = {0102:0} used\nSoftboiled!
+Bank0016_Text_WildUsedSoftboiled = The wild {0102:0} used\nSoftboiled!
+Bank0016_Text_FoesUsedSoftboiled = The foe's {0102:0} used\nSoftboiled!
+Bank0016_Text_UsedHiJumpKick = {0102:0} used\nHi Jump Kick!
+Bank0016_Text_WildUsedHiJump = The wild {0102:0} used\nHi Jump Kick!
+Bank0016_Text_FoesUsedHiJump = The foe's {0102:0} used\nHi Jump Kick!
+Bank0016_Text_UsedGlare = {0102:0} used\nGlare!
+Bank0016_Text_WildUsedGlare = The wild {0102:0} used\nGlare!
+Bank0016_Text_FoesUsedGlare = The foe's {0102:0} used\nGlare!
+Bank0016_Text_UsedDreamEater = {0102:0} used\nDream Eater!
+Bank0016_Text_WildUsedDreamEater = The wild {0102:0} used\nDream Eater!
+Bank0016_Text_FoesUsedDreamEater = The foe's {0102:0} used\nDream Eater!
+Bank0016_Text_UsedPoisonGas = {0102:0} used\nPoison Gas!
+Bank0016_Text_WildUsedPoisonGas = The wild {0102:0} used\nPoison Gas!
+Bank0016_Text_FoesUsedPoisonGas = The foe's {0102:0} used\nPoison Gas!
+Bank0016_Text_UsedBarrage = {0102:0} used\nBarrage!
+Bank0016_Text_WildUsedBarrage = The wild {0102:0} used\nBarrage!
+Bank0016_Text_FoesUsedBarrage = The foe's {0102:0} used\nBarrage!
+Bank0016_Text_UsedLeechLife = {0102:0} used\nLeech Life!
+Bank0016_Text_WildUsedLeechLife = The wild {0102:0} used\nLeech Life!
+Bank0016_Text_FoesUsedLeechLife = The foe's {0102:0} used\nLeech Life!
+Bank0016_Text_UsedLovelyKiss = {0102:0} used\nLovely Kiss!
+Bank0016_Text_WildUsedLovelyKiss = The wild {0102:0} used\nLovely Kiss!
+Bank0016_Text_FoesUsedLovelyKiss = The foe's {0102:0} used\nLovely Kiss!
+Bank0016_Text_UsedSkyAttack = {0102:0} used\nSky Attack!
+Bank0016_Text_WildUsedSkyAttack = The wild {0102:0} used\nSky Attack!
+Bank0016_Text_FoesUsedSkyAttack = The foe's {0102:0} used\nSky Attack!
+Bank0016_Text_UsedTransform = {0102:0} used\nTransform!
+Bank0016_Text_WildUsedTransform = The wild {0102:0} used\nTransform!
+Bank0016_Text_FoesUsedTransform = The foe's {0102:0} used\nTransform!
+Bank0016_Text_UsedBubble = {0102:0} used\nBubble!
+Bank0016_Text_WildUsedBubble = The wild {0102:0} used\nBubble!
+Bank0016_Text_FoesUsedBubble = The foe's {0102:0} used\nBubble!
+Bank0016_Text_UsedDizzyPunch = {0102:0} used\nDizzy Punch!
+Bank0016_Text_WildUsedDizzyPunch = The wild {0102:0} used\nDizzy Punch!
+Bank0016_Text_FoesUsedDizzyPunch = The foe's {0102:0} used\nDizzy Punch!
+Bank0016_Text_UsedSpore = {0102:0} used\nSpore!
+Bank0016_Text_WildUsedSpore = The wild {0102:0} used\nSpore!
+Bank0016_Text_FoesUsedSpore = The foe's {0102:0} used\nSpore!
+Bank0016_Text_UsedFlash = {0102:0} used\nFlash!
+Bank0016_Text_WildUsedFlash = The wild {0102:0} used\nFlash!
+Bank0016_Text_FoesUsedFlash = The foe's {0102:0} used\nFlash!
+Bank0016_Text_UsedPsywave = {0102:0} used\nPsywave!
+Bank0016_Text_WildUsedPsywave = The wild {0102:0} used\nPsywave!
+Bank0016_Text_FoesUsedPsywave = The foe's {0102:0} used\nPsywave!
+Bank0016_Text_UsedSplash = {0102:0} used\nSplash!
+Bank0016_Text_WildUsedSplash = The wild {0102:0} used\nSplash!
+Bank0016_Text_FoesUsedSplash = The foe's {0102:0} used\nSplash!
+Bank0016_Text_UsedAcidArmor = {0102:0} used\nAcid Armor!
+Bank0016_Text_WildUsedAcidArmor = The wild {0102:0} used\nAcid Armor!
+Bank0016_Text_FoesUsedAcidArmor = The foe's {0102:0} used\nAcid Armor!
+Bank0016_Text_UsedCrabhammer = {0102:0} used\nCrabhammer!
+Bank0016_Text_WildUsedCrabhammer = The wild {0102:0} used\nCrabhammer!
+Bank0016_Text_FoesUsedCrabhammer = The foe's {0102:0} used\nCrabhammer!
+Bank0016_Text_UsedExplosion = {0102:0} used\nExplosion!
+Bank0016_Text_WildUsedExplosion = The wild {0102:0} used\nExplosion!
+Bank0016_Text_FoesUsedExplosion = The foe's {0102:0} used\nExplosion!
+Bank0016_Text_UsedFurySwipes = {0102:0} used\nFury Swipes!
+Bank0016_Text_WildUsedFurySwipes = The wild {0102:0} used\nFury Swipes!
+Bank0016_Text_FoesUsedFurySwipes = The foe's {0102:0} used\nFury Swipes!
+Bank0016_Text_UsedBonemerang = {0102:0} used\nBonemerang!
+Bank0016_Text_WildUsedBonemerang = The wild {0102:0} used\nBonemerang!
+Bank0016_Text_FoesUsedBonemerang = The foe's {0102:0} used\nBonemerang!
+Bank0016_Text_UsedRest = {0102:0} used\nRest!
+Bank0016_Text_WildUsedRest = The wild {0102:0} used\nRest!
+Bank0016_Text_FoesUsedRest = The foe's {0102:0} used\nRest!
+Bank0016_Text_UsedRockSlide = {0102:0} used\nRock Slide!
+Bank0016_Text_WildUsedRockSlide = The wild {0102:0} used\nRock Slide!
+Bank0016_Text_FoesUsedRockSlide = The foe's {0102:0} used\nRock Slide!
+Bank0016_Text_UsedHyperFang = {0102:0} used\nHyper Fang!
+Bank0016_Text_WildUsedHyperFang = The wild {0102:0} used\nHyper Fang!
+Bank0016_Text_FoesUsedHyperFang = The foe's {0102:0} used\nHyper Fang!
+Bank0016_Text_UsedSharpen = {0102:0} used\nSharpen!
+Bank0016_Text_WildUsedSharpen = The wild {0102:0} used\nSharpen!
+Bank0016_Text_FoesUsedSharpen = The foe's {0102:0} used\nSharpen!
+Bank0016_Text_UsedConversion = {0102:0} used\nConversion!
+Bank0016_Text_WildUsedConversion = The wild {0102:0} used\nConversion!
+Bank0016_Text_FoesUsedConversion = The foe's {0102:0} used\nConversion!
+Bank0016_Text_UsedTriAttack = {0102:0} used\nTri Attack!
+Bank0016_Text_WildUsedTriAttack = The wild {0102:0} used\nTri Attack!
+Bank0016_Text_FoesUsedTriAttack = The foe's {0102:0} used\nTri Attack!
+Bank0016_Text_UsedSuperFang = {0102:0} used\nSuper Fang!
+Bank0016_Text_WildUsedSuperFang = The wild {0102:0} used\nSuper Fang!
+Bank0016_Text_FoesUsedSuperFang = The foe's {0102:0} used\nSuper Fang!
+Bank0016_Text_UsedSlash = {0102:0} used\nSlash!
+Bank0016_Text_WildUsedSlash = The wild {0102:0} used\nSlash!
+Bank0016_Text_FoesUsedSlash = The foe's {0102:0} used\nSlash!
+Bank0016_Text_UsedSubstitute = {0102:0} used\nSubstitute!
+Bank0016_Text_WildUsedSubstitute = The wild {0102:0} used\nSubstitute!
+Bank0016_Text_FoesUsedSubstitute = The foe's {0102:0} used\nSubstitute!
+Bank0016_Text_UsedStruggle = {0102:0} used\nStruggle!
+Bank0016_Text_WildUsedStruggle = The wild {0102:0} used\nStruggle!
+Bank0016_Text_FoesUsedStruggle = The foe's {0102:0} used\nStruggle!
+Bank0016_Text_UsedSketch = {0102:0} used\nSketch!
+Bank0016_Text_WildUsedSketch = The wild {0102:0} used\nSketch!
+Bank0016_Text_FoesUsedSketch = The foe's {0102:0} used\nSketch!
+Bank0016_Text_UsedTripleKick = {0102:0} used\nTriple Kick!
+Bank0016_Text_WildUsedTripleKick = The wild {0102:0} used\nTriple Kick!
+Bank0016_Text_FoesUsedTripleKick = The foe's {0102:0} used\nTriple Kick!
+Bank0016_Text_UsedThief = {0102:0} used\nThief!
+Bank0016_Text_WildUsedThief = The wild {0102:0} used\nThief!
+Bank0016_Text_FoesUsedThief = The foe's {0102:0} used\nThief!
+Bank0016_Text_UsedSpiderWeb = {0102:0} used\nSpider Web!
+Bank0016_Text_WildUsedSpiderWeb = The wild {0102:0} used\nSpider Web!
+Bank0016_Text_FoesUsedSpiderWeb = The foe's {0102:0} used\nSpider Web!
+Bank0016_Text_UsedMindReader = {0102:0} used\nMind Reader!
+Bank0016_Text_WildUsedMindReader = The wild {0102:0} used\nMind Reader!
+Bank0016_Text_FoesUsedMindReader = The foe's {0102:0} used\nMind Reader!
+Bank0016_Text_UsedNightmare = {0102:0} used\nNightmare!
+Bank0016_Text_WildUsedNightmare = The wild {0102:0} used\nNightmare!
+Bank0016_Text_FoesUsedNightmare = The foe's {0102:0} used\nNightmare!
+Bank0016_Text_UsedFlameWheel = {0102:0} used\nFlame Wheel!
+Bank0016_Text_WildUsedFlameWheel = The wild {0102:0} used\nFlame Wheel!
+Bank0016_Text_FoesUsedFlameWheel = The foe's {0102:0} used\nFlame Wheel!
+Bank0016_Text_UsedSnore = {0102:0} used\nSnore!
+Bank0016_Text_WildUsedSnore = The wild {0102:0} used\nSnore!
+Bank0016_Text_FoesUsedSnore = The foe's {0102:0} used\nSnore!
+Bank0016_Text_UsedCurse = {0102:0} used\nCurse!
+Bank0016_Text_WildUsedCurse = The wild {0102:0} used\nCurse!
+Bank0016_Text_FoesUsedCurse = The foe's {0102:0} used\nCurse!
+Bank0016_Text_UsedFlail = {0102:0} used\nFlail!
+Bank0016_Text_WildUsedFlail = The wild {0102:0} used\nFlail!
+Bank0016_Text_FoesUsedFlail = The foe's {0102:0} used\nFlail!
+Bank0016_Text_UsedConversion2 = {0102:0} used\nConversion 2!
+Bank0016_Text_WildUsedConversion2 = The wild {0102:0} used\nConversion 2!
+Bank0016_Text_FoesUsedConversion2 = The foe's {0102:0} used\nConversion 2!
+Bank0016_Text_UsedAeroblast = {0102:0} used\nAeroblast!
+Bank0016_Text_WildUsedAeroblast = The wild {0102:0} used\nAeroblast!
+Bank0016_Text_FoesUsedAeroblast = The foe's {0102:0} used\nAeroblast!
+Bank0016_Text_UsedCottonSpore = {0102:0} used\nCotton Spore!
+Bank0016_Text_WildUsedCottonSpore = The wild {0102:0} used\nCotton Spore!
+Bank0016_Text_FoesUsedCottonSpore = The foe's {0102:0} used\nCotton Spore!
+Bank0016_Text_UsedReversal = {0102:0} used\nReversal!
+Bank0016_Text_WildUsedReversal = The wild {0102:0} used\nReversal!
+Bank0016_Text_FoesUsedReversal = The foe's {0102:0} used\nReversal!
+Bank0016_Text_UsedSpite = {0102:0} used\nSpite!
+Bank0016_Text_WildUsedSpite = The wild {0102:0} used\nSpite!
+Bank0016_Text_FoesUsedSpite = The foe's {0102:0} used\nSpite!
+Bank0016_Text_UsedPowderSnow = {0102:0} used\nPowder Snow!
+Bank0016_Text_WildUsedPowderSnow = The wild {0102:0} used\nPowder Snow!
+Bank0016_Text_FoesUsedPowderSnow = The foe's {0102:0} used\nPowder Snow!
+Bank0016_Text_UsedProtect = {0102:0} used\nProtect!
+Bank0016_Text_WildUsedProtect = The wild {0102:0} used\nProtect!
+Bank0016_Text_FoesUsedProtect = The foe's {0102:0} used\nProtect!
+Bank0016_Text_UsedMachPunch = {0102:0} used\nMach Punch!
+Bank0016_Text_WildUsedMachPunch = The wild {0102:0} used\nMach Punch!
+Bank0016_Text_FoesUsedMachPunch = The foe's {0102:0} used\nMach Punch!
+Bank0016_Text_UsedScaryFace = {0102:0} used\nScary Face!
+Bank0016_Text_WildUsedScaryFace = The wild {0102:0} used\nScary Face!
+Bank0016_Text_FoesUsedScaryFace = The foe's {0102:0} used\nScary Face!
+Bank0016_Text_UsedFaintAttack = {0102:0} used\nFaint Attack!
+Bank0016_Text_WildUsedFaintAttack = The wild {0102:0} used\nFaint Attack!
+Bank0016_Text_FoesUsedFaintAttack = The foe's {0102:0} used\nFaint Attack!
+Bank0016_Text_UsedSweetKiss = {0102:0} used\nSweet Kiss!
+Bank0016_Text_WildUsedSweetKiss = The wild {0102:0} used\nSweet Kiss!
+Bank0016_Text_FoesUsedSweetKiss = The foe's {0102:0} used\nSweet Kiss!
+Bank0016_Text_UsedBellyDrum = {0102:0} used\nBelly Drum!
+Bank0016_Text_WildUsedBellyDrum = The wild {0102:0} used\nBelly Drum!
+Bank0016_Text_FoesUsedBellyDrum = The foe's {0102:0} used\nBelly Drum!
+Bank0016_Text_UsedSludgeBomb = {0102:0} used\nSludge Bomb!
+Bank0016_Text_WildUsedSludgeBomb = The wild {0102:0} used\nSludge Bomb!
+Bank0016_Text_FoesUsedSludgeBomb = The foe's {0102:0} used\nSludge Bomb!
+Bank0016_Text_UsedMudSlap = {0102:0} used\nMud-Slap!
+Bank0016_Text_WildUsedMudSlap = The wild {0102:0} used\nMud-Slap!
+Bank0016_Text_FoesUsedMudSlap = The foe's {0102:0} used\nMud-Slap!
+Bank0016_Text_UsedOctazooka = {0102:0} used\nOctazooka!
+Bank0016_Text_WildUsedOctazooka = The wild {0102:0} used\nOctazooka!
+Bank0016_Text_FoesUsedOctazooka = The foe's {0102:0} used\nOctazooka!
+Bank0016_Text_UsedSpikes = {0102:0} used\nSpikes!
+Bank0016_Text_WildUsedSpikes = The wild {0102:0} used\nSpikes!
+Bank0016_Text_FoesUsedSpikes = The foe's {0102:0} used\nSpikes!
+Bank0016_Text_UsedZapCannon = {0102:0} used\nZap Cannon!
+Bank0016_Text_WildUsedZapCannon = The wild {0102:0} used\nZap Cannon!
+Bank0016_Text_FoesUsedZapCannon = The foe's {0102:0} used\nZap Cannon!
+Bank0016_Text_UsedForesight = {0102:0} used\nForesight!
+Bank0016_Text_WildUsedForesight = The wild {0102:0} used\nForesight!
+Bank0016_Text_FoesUsedForesight = The foe's {0102:0} used\nForesight!
+Bank0016_Text_UsedDestinyBond = {0102:0} used\nDestiny Bond!
+Bank0016_Text_WildUsedDestinyBond = The wild {0102:0} used\nDestiny Bond!
+Bank0016_Text_FoesUsedDestinyBond = The foe's {0102:0} used\nDestiny Bond!
+Bank0016_Text_UsedPerishSong = {0102:0} used\nPerish Song!
+Bank0016_Text_WildUsedPerishSong = The wild {0102:0} used\nPerish Song!
+Bank0016_Text_FoesUsedPerishSong = The foe's {0102:0} used\nPerish Song!
+Bank0016_Text_UsedIcyWind = {0102:0} used\nIcy Wind!
+Bank0016_Text_WildUsedIcyWind = The wild {0102:0} used\nIcy Wind!
+Bank0016_Text_FoesUsedIcyWind = The foe's {0102:0} used\nIcy Wind!
+Bank0016_Text_UsedDetect = {0102:0} used\nDetect!
+Bank0016_Text_WildUsedDetect = The wild {0102:0} used\nDetect!
+Bank0016_Text_FoesUsedDetect = The foe's {0102:0} used\nDetect!
+Bank0016_Text_UsedBoneRush = {0102:0} used\nBone Rush!
+Bank0016_Text_WildUsedBoneRush = The wild {0102:0} used\nBone Rush!
+Bank0016_Text_FoesUsedBoneRush = The foe's {0102:0} used\nBone Rush!
+Bank0016_Text_UsedLock = {0102:0} used\nLock-On!
+Bank0016_Text_WildUsedLock = The wild {0102:0} used\nLock-On!
+Bank0016_Text_FoesUsedLock = The foe's {0102:0} used\nLock-On!
+Bank0016_Text_UsedOutrage = {0102:0} used\nOutrage!
+Bank0016_Text_WildUsedOutrage = The wild {0102:0} used\nOutrage!
+Bank0016_Text_FoesUsedOutrage = The foe's {0102:0} used\nOutrage!
+Bank0016_Text_UsedSandstorm = {0102:0} used\nSandstorm!
+Bank0016_Text_WildUsedSandstorm = The wild {0102:0} used\nSandstorm!
+Bank0016_Text_FoesUsedSandstorm = The foe's {0102:0} used\nSandstorm!
+Bank0016_Text_UsedGigaDrain = {0102:0} used\nGiga Drain!
+Bank0016_Text_WildUsedGigaDrain = The wild {0102:0} used\nGiga Drain!
+Bank0016_Text_FoesUsedGigaDrain = The foe's {0102:0} used\nGiga Drain!
+Bank0016_Text_UsedEndure = {0102:0} used\nEndure!
+Bank0016_Text_WildUsedEndure = The wild {0102:0} used\nEndure!
+Bank0016_Text_FoesUsedEndure = The foe's {0102:0} used\nEndure!
+Bank0016_Text_UsedCharm = {0102:0} used\nCharm!
+Bank0016_Text_WildUsedCharm = The wild {0102:0} used\nCharm!
+Bank0016_Text_FoesUsedCharm = The foe's {0102:0} used\nCharm!
+Bank0016_Text_UsedRollout = {0102:0} used\nRollout!
+Bank0016_Text_WildUsedRollout = The wild {0102:0} used\nRollout!
+Bank0016_Text_FoesUsedRollout = The foe's {0102:0} used\nRollout!
+Bank0016_Text_UsedFalseSwipe = {0102:0} used\nFalse Swipe!
+Bank0016_Text_WildUsedFalseSwipe = The wild {0102:0} used\nFalse Swipe!
+Bank0016_Text_FoesUsedFalseSwipe = The foe's {0102:0} used\nFalse Swipe!
+Bank0016_Text_UsedSwagger = {0102:0} used\nSwagger!
+Bank0016_Text_WildUsedSwagger = The wild {0102:0} used\nSwagger!
+Bank0016_Text_FoesUsedSwagger = The foe's {0102:0} used\nSwagger!
+Bank0016_Text_UsedMilkDrink = {0102:0} used\nMilk Drink!
+Bank0016_Text_WildUsedMilkDrink = The wild {0102:0} used\nMilk Drink!
+Bank0016_Text_FoesUsedMilkDrink = The foe's {0102:0} used\nMilk Drink!
+Bank0016_Text_UsedSpark = {0102:0} used\nSpark!
+Bank0016_Text_WildUsedSpark = The wild {0102:0} used\nSpark!
+Bank0016_Text_FoesUsedSpark = The foe's {0102:0} used\nSpark!
+Bank0016_Text_UsedFuryCutter = {0102:0} used\nFury Cutter!
+Bank0016_Text_WildUsedFuryCutter = The wild {0102:0} used\nFury Cutter!
+Bank0016_Text_FoesUsedFuryCutter = The foe's {0102:0} used\nFury Cutter!
+Bank0016_Text_UsedSteelWing = {0102:0} used\nSteel Wing!
+Bank0016_Text_WildUsedSteelWing = The wild {0102:0} used\nSteel Wing!
+Bank0016_Text_FoesUsedSteelWing = The foe's {0102:0} used\nSteel Wing!
+Bank0016_Text_UsedMeanLook = {0102:0} used\nMean Look!
+Bank0016_Text_WildUsedMeanLook = The wild {0102:0} used\nMean Look!
+Bank0016_Text_FoesUsedMeanLook = The foe's {0102:0} used\nMean Look!
+Bank0016_Text_UsedAttract = {0102:0} used\nAttract!
+Bank0016_Text_WildUsedAttract = The wild {0102:0} used\nAttract!
+Bank0016_Text_FoesUsedAttract = The foe's {0102:0} used\nAttract!
+Bank0016_Text_UsedSleepTalk = {0102:0} used\nSleep Talk!
+Bank0016_Text_WildUsedSleepTalk = The wild {0102:0} used\nSleep Talk!
+Bank0016_Text_FoesUsedSleepTalk = The foe's {0102:0} used\nSleep Talk!
+Bank0016_Text_UsedHealBell = {0102:0} used\nHeal Bell!
+Bank0016_Text_WildUsedHealBell = The wild {0102:0} used\nHeal Bell!
+Bank0016_Text_FoesUsedHealBell = The foe's {0102:0} used\nHeal Bell!
+Bank0016_Text_UsedReturn = {0102:0} used\nReturn!
+Bank0016_Text_WildUsedReturn = The wild {0102:0} used\nReturn!
+Bank0016_Text_FoesUsedReturn = The foe's {0102:0} used\nReturn!
+Bank0016_Text_UsedPresent = {0102:0} used\nPresent!
+Bank0016_Text_WildUsedPresent = The wild {0102:0} used\nPresent!
+Bank0016_Text_FoesUsedPresent = The foe's {0102:0} used\nPresent!
+Bank0016_Text_UsedFrustration = {0102:0} used\nFrustration!
+Bank0016_Text_WildUsedFrustration = The wild {0102:0} used\nFrustration!
+Bank0016_Text_FoesUsedFrustration = The foe's {0102:0} used\nFrustration!
+Bank0016_Text_UsedSafeguard = {0102:0} used\nSafeguard!
+Bank0016_Text_WildUsedSafeguard = The wild {0102:0} used\nSafeguard!
+Bank0016_Text_FoesUsedSafeguard = The foe's {0102:0} used\nSafeguard!
+Bank0016_Text_UsedPainSplit = {0102:0} used\nPain Split!
+Bank0016_Text_WildUsedPainSplit = The wild {0102:0} used\nPain Split!
+Bank0016_Text_FoesUsedPainSplit = The foe's {0102:0} used\nPain Split!
+Bank0016_Text_UsedSacredFire = {0102:0} used\nSacred Fire!
+Bank0016_Text_WildUsedSacredFire = The wild {0102:0} used\nSacred Fire!
+Bank0016_Text_FoesUsedSacredFire = The foe's {0102:0} used\nSacred Fire!
+Bank0016_Text_UsedMagnitude = {0102:0} used\nMagnitude!
+Bank0016_Text_WildUsedMagnitude = The wild {0102:0} used\nMagnitude!
+Bank0016_Text_FoesUsedMagnitude = The foe's {0102:0} used\nMagnitude!
+Bank0016_Text_UsedDynamicpunch = {0102:0} used\nDynamicPunch!
+Bank0016_Text_WildUsedDynamicpunch = The wild {0102:0} used\nDynamicPunch!
+Bank0016_Text_FoesUsedDynamicpunch = The foe's {0102:0} used\nDynamicPunch!
+Bank0016_Text_UsedMegahorn = {0102:0} used\nMegahorn!
+Bank0016_Text_WildUsedMegahorn = The wild {0102:0} used\nMegahorn!
+Bank0016_Text_FoesUsedMegahorn = The foe's {0102:0} used\nMegahorn!
+Bank0016_Text_UsedDragonbreath = {0102:0} used\nDragonBreath!
+Bank0016_Text_WildUsedDragonbreath = The wild {0102:0} used\nDragonBreath!
+Bank0016_Text_FoesUsedDragonbreath = The foe's {0102:0} used\nDragonBreath!
+Bank0016_Text_UsedBatonPass = {0102:0} used\nBaton Pass!
+Bank0016_Text_WildUsedBatonPass = The wild {0102:0} used\nBaton Pass!
+Bank0016_Text_FoesUsedBatonPass = The foe's {0102:0} used\nBaton Pass!
+Bank0016_Text_UsedEncore = {0102:0} used\nEncore!
+Bank0016_Text_WildUsedEncore = The wild {0102:0} used\nEncore!
+Bank0016_Text_FoesUsedEncore = The foe's {0102:0} used\nEncore!
+Bank0016_Text_UsedPursuit = {0102:0} used\nPursuit!
+Bank0016_Text_WildUsedPursuit = The wild {0102:0} used\nPursuit!
+Bank0016_Text_FoesUsedPursuit = The foe's {0102:0} used\nPursuit!
+Bank0016_Text_UsedRapidSpin = {0102:0} used\nRapid Spin!
+Bank0016_Text_WildUsedRapidSpin = The wild {0102:0} used\nRapid Spin!
+Bank0016_Text_FoesUsedRapidSpin = The foe's {0102:0} used\nRapid Spin!
+Bank0016_Text_UsedSweetScent = {0102:0} used\nSweet Scent!
+Bank0016_Text_WildUsedSweetScent = The wild {0102:0} used\nSweet Scent!
+Bank0016_Text_FoesUsedSweetScent = The foe's {0102:0} used\nSweet Scent!
+Bank0016_Text_UsedIronTail = {0102:0} used\nIron Tail!
+Bank0016_Text_WildUsedIronTail = The wild {0102:0} used\nIron Tail!
+Bank0016_Text_FoesUsedIronTail = The foe's {0102:0} used\nIron Tail!
+Bank0016_Text_UsedMetalClaw = {0102:0} used\nMetal Claw!
+Bank0016_Text_WildUsedMetalClaw = The wild {0102:0} used\nMetal Claw!
+Bank0016_Text_FoesUsedMetalClaw = The foe's {0102:0} used\nMetal Claw!
+Bank0016_Text_UsedVitalThrow = {0102:0} used\nVital Throw!
+Bank0016_Text_WildUsedVitalThrow = The wild {0102:0} used\nVital Throw!
+Bank0016_Text_FoesUsedVitalThrow = The foe's {0102:0} used\nVital Throw!
+Bank0016_Text_UsedMorningSun = {0102:0} used\nMorning Sun!
+Bank0016_Text_WildUsedMorningSun = The wild {0102:0} used\nMorning Sun!
+Bank0016_Text_FoesUsedMorningSun = The foe's {0102:0} used\nMorning Sun!
+Bank0016_Text_UsedSynthesis = {0102:0} used\nSynthesis!
+Bank0016_Text_WildUsedSynthesis = The wild {0102:0} used\nSynthesis!
+Bank0016_Text_FoesUsedSynthesis = The foe's {0102:0} used\nSynthesis!
+Bank0016_Text_UsedMoonlight = {0102:0} used\nMoonlight!
+Bank0016_Text_WildUsedMoonlight = The wild {0102:0} used\nMoonlight!
+Bank0016_Text_FoesUsedMoonlight = The foe's {0102:0} used\nMoonlight!
+Bank0016_Text_UsedHiddenPower = {0102:0} used\nHidden Power!
+Bank0016_Text_WildUsedHiddenPower = The wild {0102:0} used\nHidden Power!
+Bank0016_Text_FoesUsedHiddenPower = The foe's {0102:0} used\nHidden Power!
+Bank0016_Text_UsedCrossChop = {0102:0} used\nCross Chop!
+Bank0016_Text_WildUsedCrossChop = The wild {0102:0} used\nCross Chop!
+Bank0016_Text_FoesUsedCrossChop = The foe's {0102:0} used\nCross Chop!
+Bank0016_Text_UsedTwister = {0102:0} used\nTwister!
+Bank0016_Text_WildUsedTwister = The wild {0102:0} used\nTwister!
+Bank0016_Text_FoesUsedTwister = The foe's {0102:0} used\nTwister!
+Bank0016_Text_UsedRainDance = {0102:0} used\nRain Dance!
+Bank0016_Text_WildUsedRainDance = The wild {0102:0} used\nRain Dance!
+Bank0016_Text_FoesUsedRainDance = The foe's {0102:0} used\nRain Dance!
+Bank0016_Text_UsedSunnyDay = {0102:0} used\nSunny Day!
+Bank0016_Text_WildUsedSunnyDay = The wild {0102:0} used\nSunny Day!
+Bank0016_Text_FoesUsedSunnyDay = The foe's {0102:0} used\nSunny Day!
+Bank0016_Text_UsedCrunch = {0102:0} used\nCrunch!
+Bank0016_Text_WildUsedCrunch = The wild {0102:0} used\nCrunch!
+Bank0016_Text_FoesUsedCrunch = The foe's {0102:0} used\nCrunch!
+Bank0016_Text_UsedMirrorCoat = {0102:0} used\nMirror Coat!
+Bank0016_Text_WildUsedMirrorCoat = The wild {0102:0} used\nMirror Coat!
+Bank0016_Text_FoesUsedMirrorCoat = The foe's {0102:0} used\nMirror Coat!
+Bank0016_Text_UsedPsychUp = {0102:0} used\nPsych Up!
+Bank0016_Text_WildUsedPsychUp = The wild {0102:0} used\nPsych Up!
+Bank0016_Text_FoesUsedPsychUp = The foe's {0102:0} used\nPsych Up!
+Bank0016_Text_UsedExtremespeed = {0102:0} used\nExtremeSpeed!
+Bank0016_Text_WildUsedExtremespeed = The wild {0102:0} used\nExtremeSpeed!
+Bank0016_Text_FoesUsedExtremespeed = The foe's {0102:0} used\nExtremeSpeed!
+Bank0016_Text_UsedAncientpower = {0102:0} used\nAncientPower!
+Bank0016_Text_WildUsedAncientpower = The wild {0102:0} used\nAncientPower!
+Bank0016_Text_FoesUsedAncientpower = The foe's {0102:0} used\nAncientPower!
+Bank0016_Text_UsedShadowBall = {0102:0} used\nShadow Ball!
+Bank0016_Text_WildUsedShadowBall = The wild {0102:0} used\nShadow Ball!
+Bank0016_Text_FoesUsedShadowBall = The foe's {0102:0} used\nShadow Ball!
+Bank0016_Text_UsedFutureSight = {0102:0} used\nFuture Sight!
+Bank0016_Text_WildUsedFutureSight = The wild {0102:0} used\nFuture Sight!
+Bank0016_Text_FoesUsedFutureSight = The foe's {0102:0} used\nFuture Sight!
+Bank0016_Text_UsedRockSmash = {0102:0} used\nRock Smash!
+Bank0016_Text_WildUsedRockSmash = The wild {0102:0} used\nRock Smash!
+Bank0016_Text_FoesUsedRockSmash = The foe's {0102:0} used\nRock Smash!
+Bank0016_Text_UsedWhirlpool = {0102:0} used\nWhirlpool!
+Bank0016_Text_WildUsedWhirlpool = The wild {0102:0} used\nWhirlpool!
+Bank0016_Text_FoesUsedWhirlpool = The foe's {0102:0} used\nWhirlpool!
+Bank0016_Text_UsedBeatUp = {0102:0} used\nBeat Up!
+Bank0016_Text_WildUsedBeatUp = The wild {0102:0} used\nBeat Up!
+Bank0016_Text_FoesUsedBeatUp = The foe's {0102:0} used\nBeat Up!
+Bank0016_Text_UsedFakeOut = {0102:0} used\nFake Out!
+Bank0016_Text_WildUsedFakeOut = The wild {0102:0} used\nFake Out!
+Bank0016_Text_FoesUsedFakeOut = The foe's {0102:0} used\nFake Out!
+Bank0016_Text_UsedUproar = {0102:0} used\nUproar!
+Bank0016_Text_WildUsedUproar = The wild {0102:0} used\nUproar!
+Bank0016_Text_FoesUsedUproar = The foe's {0102:0} used\nUproar!
+Bank0016_Text_UsedStockpile = {0102:0} used\nStockpile!
+Bank0016_Text_WildUsedStockpile = The wild {0102:0} used\nStockpile!
+Bank0016_Text_FoesUsedStockpile = The foe's {0102:0} used\nStockpile!
+Bank0016_Text_UsedSpitUp = {0102:0} used\nSpit Up!
+Bank0016_Text_WildUsedSpitUp = The wild {0102:0} used\nSpit Up!
+Bank0016_Text_FoesUsedSpitUp = The foe's {0102:0} used\nSpit Up!
+Bank0016_Text_UsedSwallow = {0102:0} used\nSwallow!
+Bank0016_Text_WildUsedSwallow = The wild {0102:0} used\nSwallow!
+Bank0016_Text_FoesUsedSwallow = The foe's {0102:0} used\nSwallow!
+Bank0016_Text_UsedHeatWave = {0102:0} used\nHeat Wave!
+Bank0016_Text_WildUsedHeatWave = The wild {0102:0} used\nHeat Wave!
+Bank0016_Text_FoesUsedHeatWave = The foe's {0102:0} used\nHeat Wave!
+Bank0016_Text_UsedHail = {0102:0} used\nHail!
+Bank0016_Text_WildUsedHail = The wild {0102:0} used\nHail!
+Bank0016_Text_FoesUsedHail = The foe's {0102:0} used\nHail!
+Bank0016_Text_UsedTorment = {0102:0} used\nTorment!
+Bank0016_Text_WildUsedTorment = The wild {0102:0} used\nTorment!
+Bank0016_Text_FoesUsedTorment = The foe's {0102:0} used\nTorment!
+Bank0016_Text_UsedFlatter = {0102:0} used\nFlatter!
+Bank0016_Text_WildUsedFlatter = The wild {0102:0} used\nFlatter!
+Bank0016_Text_FoesUsedFlatter = The foe's {0102:0} used\nFlatter!
+Bank0016_Text_UsedWillOWisp = {0102:0} used\nWill-O-Wisp!
+Bank0016_Text_WildUsedWillO = The wild {0102:0} used\nWill-O-Wisp!
+Bank0016_Text_FoesUsedWillO = The foe's {0102:0} used\nWill-O-Wisp!
+Bank0016_Text_UsedMemento = {0102:0} used\nMemento!
+Bank0016_Text_WildUsedMemento = The wild {0102:0} used\nMemento!
+Bank0016_Text_FoesUsedMemento = The foe's {0102:0} used\nMemento!
+Bank0016_Text_UsedFacade = {0102:0} used\nFacade!
+Bank0016_Text_WildUsedFacade = The wild {0102:0} used\nFacade!
+Bank0016_Text_FoesUsedFacade = The foe's {0102:0} used\nFacade!
+Bank0016_Text_UsedFocusPunch = {0102:0} used\nFocus Punch!
+Bank0016_Text_WildUsedFocusPunch = The wild {0102:0} used\nFocus Punch!
+Bank0016_Text_FoesUsedFocusPunch = The foe's {0102:0} used\nFocus Punch!
+Bank0016_Text_UsedSmellingsalt = {0102:0} used\nSmellingSalt!
+Bank0016_Text_WildUsedSmellingsalt = The wild {0102:0} used\nSmellingSalt!
+Bank0016_Text_FoesUsedSmellingsalt = The foe's {0102:0} used\nSmellingSalt!
+Bank0016_Text_UsedFollow = {0102:0} used\nFollow Me!
+Bank0016_Text_WildUsedFollow = The wild {0102:0} used\nFollow Me!
+Bank0016_Text_FoesUsedFollow = The foe's {0102:0} used\nFollow Me!
+Bank0016_Text_UsedNaturePower = {0102:0} used\nNature Power!
+Bank0016_Text_WildUsedNaturePower = The wild {0102:0} used\nNature Power!
+Bank0016_Text_FoesUsedNaturePower = The foe's {0102:0} used\nNature Power!
+Bank0016_Text_UsedCharge = {0102:0} used\nCharge!
+Bank0016_Text_WildUsedCharge = The wild {0102:0} used\nCharge!
+Bank0016_Text_FoesUsedCharge = The foe's {0102:0} used\nCharge!
+Bank0016_Text_UsedTaunt = {0102:0} used\nTaunt!
+Bank0016_Text_WildUsedTaunt = The wild {0102:0} used\nTaunt!
+Bank0016_Text_FoesUsedTaunt = The foe's {0102:0} used\nTaunt!
+Bank0016_Text_UsedHelpingHand = {0102:0} used\nHelping Hand!
+Bank0016_Text_WildUsedHelpingHand = The wild {0102:0} used\nHelping Hand!
+Bank0016_Text_FoesUsedHelpingHand = The foe's {0102:0} used\nHelping Hand!
+Bank0016_Text_UsedTrick = {0102:0} used\nTrick!
+Bank0016_Text_WildUsedTrick = The wild {0102:0} used\nTrick!
+Bank0016_Text_FoesUsedTrick = The foe's {0102:0} used\nTrick!
+Bank0016_Text_UsedRolePlay = {0102:0} used\nRole Play!
+Bank0016_Text_WildUsedRolePlay = The wild {0102:0} used\nRole Play!
+Bank0016_Text_FoesUsedRolePlay = The foe's {0102:0} used\nRole Play!
+Bank0016_Text_UsedWish = {0102:0} used\nWish!
+Bank0016_Text_WildUsedWish = The wild {0102:0} used\nWish!
+Bank0016_Text_FoesUsedWish = The foe's {0102:0} used\nWish!
+Bank0016_Text_UsedAssist = {0102:0} used\nAssist!
+Bank0016_Text_WildUsedAssist = The wild {0102:0} used\nAssist!
+Bank0016_Text_FoesUsedAssist = The foe's {0102:0} used\nAssist!
+Bank0016_Text_UsedIngrain = {0102:0} used\nIngrain!
+Bank0016_Text_WildUsedIngrain = The wild {0102:0} used\nIngrain!
+Bank0016_Text_FoesUsedIngrain = The foe's {0102:0} used\nIngrain!
+Bank0016_Text_UsedSuperpower = {0102:0} used\nSuperpower!
+Bank0016_Text_WildUsedSuperpower = The wild {0102:0} used\nSuperpower!
+Bank0016_Text_FoesUsedSuperpower = The foe's {0102:0} used\nSuperpower!
+Bank0016_Text_UsedMagicCoat = {0102:0} used\nMagic Coat!
+Bank0016_Text_WildUsedMagicCoat = The wild {0102:0} used\nMagic Coat!
+Bank0016_Text_FoesUsedMagicCoat = The foe's {0102:0} used\nMagic Coat!
+Bank0016_Text_UsedRecycle = {0102:0} used\nRecycle!
+Bank0016_Text_WildUsedRecycle = The wild {0102:0} used\nRecycle!
+Bank0016_Text_FoesUsedRecycle = The foe's {0102:0} used\nRecycle!
+Bank0016_Text_UsedRevenge = {0102:0} used\nRevenge!
+Bank0016_Text_WildUsedRevenge = The wild {0102:0} used\nRevenge!
+Bank0016_Text_FoesUsedRevenge = The foe's {0102:0} used\nRevenge!
+Bank0016_Text_UsedBrickBreak = {0102:0} used\nBrick Break!
+Bank0016_Text_WildUsedBrickBreak = The wild {0102:0} used\nBrick Break!
+Bank0016_Text_FoesUsedBrickBreak = The foe's {0102:0} used\nBrick Break!
+Bank0016_Text_UsedYawn = {0102:0} used\nYawn!
+Bank0016_Text_WildUsedYawn = The wild {0102:0} used\nYawn!
+Bank0016_Text_FoesUsedYawn = The foe's {0102:0} used\nYawn!
+Bank0016_Text_UsedKnockOff = {0102:0} used\nKnock Off!
+Bank0016_Text_WildUsedKnockOff = The wild {0102:0} used\nKnock Off!
+Bank0016_Text_FoesUsedKnockOff = The foe's {0102:0} used\nKnock Off!
+Bank0016_Text_UsedEndeavor = {0102:0} used\nEndeavor!
+Bank0016_Text_WildUsedEndeavor = The wild {0102:0} used\nEndeavor!
+Bank0016_Text_FoesUsedEndeavor = The foe's {0102:0} used\nEndeavor!
+Bank0016_Text_UsedEruption = {0102:0} used\nEruption!
+Bank0016_Text_WildUsedEruption = The wild {0102:0} used\nEruption!
+Bank0016_Text_FoesUsedEruption = The foe's {0102:0} used\nEruption!
+Bank0016_Text_UsedSkillSwap = {0102:0} used\nSkill Swap!
+Bank0016_Text_WildUsedSkillSwap = The wild {0102:0} used\nSkill Swap!
+Bank0016_Text_FoesUsedSkillSwap = The foe's {0102:0} used\nSkill Swap!
+Bank0016_Text_UsedImprison = {0102:0} used\nImprison!
+Bank0016_Text_WildUsedImprison = The wild {0102:0} used\nImprison!
+Bank0016_Text_FoesUsedImprison = The foe's {0102:0} used\nImprison!
+Bank0016_Text_UsedRefresh = {0102:0} used\nRefresh!
+Bank0016_Text_WildUsedRefresh = The wild {0102:0} used\nRefresh!
+Bank0016_Text_FoesUsedRefresh = The foe's {0102:0} used\nRefresh!
+Bank0016_Text_UsedGrudge = {0102:0} used\nGrudge!
+Bank0016_Text_WildUsedGrudge = The wild {0102:0} used\nGrudge!
+Bank0016_Text_FoesUsedGrudge = The foe's {0102:0} used\nGrudge!
+Bank0016_Text_UsedSnatch = {0102:0} used\nSnatch!
+Bank0016_Text_WildUsedSnatch = The wild {0102:0} used\nSnatch!
+Bank0016_Text_FoesUsedSnatch = The foe's {0102:0} used\nSnatch!
+Bank0016_Text_UsedSecretPower = {0102:0} used\nSecret Power!
+Bank0016_Text_WildUsedSecretPower = The wild {0102:0} used\nSecret Power!
+Bank0016_Text_FoesUsedSecretPower = The foe's {0102:0} used\nSecret Power!
+Bank0016_Text_UsedDive = {0102:0} used\nDive!
+Bank0016_Text_WildUsedDive = The wild {0102:0} used\nDive!
+Bank0016_Text_FoesUsedDive = The foe's {0102:0} used\nDive!
+Bank0016_Text_UsedArmThrust = {0102:0} used\nArm Thrust!
+Bank0016_Text_WildUsedArmThrust = The wild {0102:0} used\nArm Thrust!
+Bank0016_Text_FoesUsedArmThrust = The foe's {0102:0} used\nArm Thrust!
+Bank0016_Text_UsedCamouflage = {0102:0} used\nCamouflage!
+Bank0016_Text_WildUsedCamouflage = The wild {0102:0} used\nCamouflage!
+Bank0016_Text_FoesUsedCamouflage = The foe's {0102:0} used\nCamouflage!
+Bank0016_Text_UsedTailGlow = {0102:0} used\nTail Glow!
+Bank0016_Text_WildUsedTailGlow = The wild {0102:0} used\nTail Glow!
+Bank0016_Text_FoesUsedTailGlow = The foe's {0102:0} used\nTail Glow!
+Bank0016_Text_UsedLusterPurge = {0102:0} used\nLuster Purge!
+Bank0016_Text_WildUsedLusterPurge = The wild {0102:0} used\nLuster Purge!
+Bank0016_Text_FoesUsedLusterPurge = The foe's {0102:0} used\nLuster Purge!
+Bank0016_Text_UsedMistBall = {0102:0} used\nMist Ball!
+Bank0016_Text_WildUsedMistBall = The wild {0102:0} used\nMist Ball!
+Bank0016_Text_FoesUsedMistBall = The foe's {0102:0} used\nMist Ball!
+Bank0016_Text_UsedFeatherdance = {0102:0} used\nFeatherDance!
+Bank0016_Text_WildUsedFeatherdance = The wild {0102:0} used\nFeatherDance!
+Bank0016_Text_FoesUsedFeatherdance = The foe's {0102:0} used\nFeatherDance!
+Bank0016_Text_UsedTeeterDance = {0102:0} used\nTeeter Dance!
+Bank0016_Text_WildUsedTeeterDance = The wild {0102:0} used\nTeeter Dance!
+Bank0016_Text_FoesUsedTeeterDance = The foe's {0102:0} used\nTeeter Dance!
+Bank0016_Text_UsedBlazeKick = {0102:0} used\nBlaze Kick!
+Bank0016_Text_WildUsedBlazeKick = The wild {0102:0} used\nBlaze Kick!
+Bank0016_Text_FoesUsedBlazeKick = The foe's {0102:0} used\nBlaze Kick!
+Bank0016_Text_UsedMudSport = {0102:0} used\nMud Sport!
+Bank0016_Text_WildUsedMudSport = The wild {0102:0} used\nMud Sport!
+Bank0016_Text_FoesUsedMudSport = The foe's {0102:0} used\nMud Sport!
+Bank0016_Text_UsedIceBall = {0102:0} used\nIce Ball!
+Bank0016_Text_WildUsedIceBall = The wild {0102:0} used\nIce Ball!
+Bank0016_Text_FoesUsedIceBall = The foe's {0102:0} used\nIce Ball!
+Bank0016_Text_UsedNeedleArm = {0102:0} used\nNeedle Arm!
+Bank0016_Text_WildUsedNeedleArm = The wild {0102:0} used\nNeedle Arm!
+Bank0016_Text_FoesUsedNeedleArm = The foe's {0102:0} used\nNeedle Arm!
+Bank0016_Text_UsedSlackOff = {0102:0} used\nSlack Off!
+Bank0016_Text_WildUsedSlackOff = The wild {0102:0} used\nSlack Off!
+Bank0016_Text_FoesUsedSlackOff = The foe's {0102:0} used\nSlack Off!
+Bank0016_Text_UsedHyperVoice = {0102:0} used\nHyper Voice!
+Bank0016_Text_WildUsedHyperVoice = The wild {0102:0} used\nHyper Voice!
+Bank0016_Text_FoesUsedHyperVoice = The foe's {0102:0} used\nHyper Voice!
+Bank0016_Text_UsedPoisonFang = {0102:0} used\nPoison Fang!
+Bank0016_Text_WildUsedPoisonFang = The wild {0102:0} used\nPoison Fang!
+Bank0016_Text_FoesUsedPoisonFang = The foe's {0102:0} used\nPoison Fang!
+Bank0016_Text_UsedCrushClaw = {0102:0} used\nCrush Claw!
+Bank0016_Text_WildUsedCrushClaw = The wild {0102:0} used\nCrush Claw!
+Bank0016_Text_FoesUsedCrushClaw = The foe's {0102:0} used\nCrush Claw!
+Bank0016_Text_UsedBlastBurn = {0102:0} used\nBlast Burn!
+Bank0016_Text_WildUsedBlastBurn = The wild {0102:0} used\nBlast Burn!
+Bank0016_Text_FoesUsedBlastBurn = The foe's {0102:0} used\nBlast Burn!
+Bank0016_Text_UsedHydroCannon = {0102:0} used\nHydro Cannon!
+Bank0016_Text_WildUsedHydroCannon = The wild {0102:0} used\nHydro Cannon!
+Bank0016_Text_FoesUsedHydroCannon = The foe's {0102:0} used\nHydro Cannon!
+Bank0016_Text_UsedMeteorMash = {0102:0} used\nMeteor Mash!
+Bank0016_Text_WildUsedMeteorMash = The wild {0102:0} used\nMeteor Mash!
+Bank0016_Text_FoesUsedMeteorMash = The foe's {0102:0} used\nMeteor Mash!
+Bank0016_Text_UsedAstonish = {0102:0} used\nAstonish!
+Bank0016_Text_WildUsedAstonish = The wild {0102:0} used\nAstonish!
+Bank0016_Text_FoesUsedAstonish = The foe's {0102:0} used\nAstonish!
+Bank0016_Text_UsedWeatherBall = {0102:0} used\nWeather Ball!
+Bank0016_Text_WildUsedWeatherBall = The wild {0102:0} used\nWeather Ball!
+Bank0016_Text_FoesUsedWeatherBall = The foe's {0102:0} used\nWeather Ball!
+Bank0016_Text_UsedAromatherapy = {0102:0} used\nAromatherapy!
+Bank0016_Text_WildUsedAromatherapy = The wild {0102:0} used\nAromatherapy!
+Bank0016_Text_FoesUsedAromatherapy = The foe's {0102:0} used\nAromatherapy!
+Bank0016_Text_UsedFakeTears = {0102:0} used\nFake Tears!
+Bank0016_Text_WildUsedFakeTears = The wild {0102:0} used\nFake Tears!
+Bank0016_Text_FoesUsedFakeTears = The foe's {0102:0} used\nFake Tears!
+Bank0016_Text_UsedAirCutter = {0102:0} used\nAir Cutter!
+Bank0016_Text_WildUsedAirCutter = The wild {0102:0} used\nAir Cutter!
+Bank0016_Text_FoesUsedAirCutter = The foe's {0102:0} used\nAir Cutter!
+Bank0016_Text_UsedOverheat = {0102:0} used\nOverheat!
+Bank0016_Text_WildUsedOverheat = The wild {0102:0} used\nOverheat!
+Bank0016_Text_FoesUsedOverheat = The foe's {0102:0} used\nOverheat!
+Bank0016_Text_UsedOdorSleuth = {0102:0} used\nOdor Sleuth!
+Bank0016_Text_WildUsedOdorSleuth = The wild {0102:0} used\nOdor Sleuth!
+Bank0016_Text_FoesUsedOdorSleuth = The foe's {0102:0} used\nOdor Sleuth!
+Bank0016_Text_UsedRockTomb = {0102:0} used\nRock Tomb!
+Bank0016_Text_WildUsedRockTomb = The wild {0102:0} used\nRock Tomb!
+Bank0016_Text_FoesUsedRockTomb = The foe's {0102:0} used\nRock Tomb!
+Bank0016_Text_UsedSilverWind = {0102:0} used\nSilver Wind!
+Bank0016_Text_WildUsedSilverWind = The wild {0102:0} used\nSilver Wind!
+Bank0016_Text_FoesUsedSilverWind = The foe's {0102:0} used\nSilver Wind!
+Bank0016_Text_UsedMetalSound = {0102:0} used\nMetal Sound!
+Bank0016_Text_WildUsedMetalSound = The wild {0102:0} used\nMetal Sound!
+Bank0016_Text_FoesUsedMetalSound = The foe's {0102:0} used\nMetal Sound!
+Bank0016_Text_UsedGrasswhistle = {0102:0} used\nGrassWhistle!
+Bank0016_Text_WildUsedGrasswhistle = The wild {0102:0} used\nGrassWhistle!
+Bank0016_Text_FoesUsedGrasswhistle = The foe's {0102:0} used\nGrassWhistle!
+Bank0016_Text_UsedTickle = {0102:0} used\nTickle!
+Bank0016_Text_WildUsedTickle = The wild {0102:0} used\nTickle!
+Bank0016_Text_FoesUsedTickle = The foe's {0102:0} used\nTickle!
+Bank0016_Text_UsedCosmicPower = {0102:0} used\nCosmic Power!
+Bank0016_Text_WildUsedCosmicPower = The wild {0102:0} used\nCosmic Power!
+Bank0016_Text_FoesUsedCosmicPower = The foe's {0102:0} used\nCosmic Power!
+Bank0016_Text_UsedWaterSpout = {0102:0} used\nWater Spout!
+Bank0016_Text_WildUsedWaterSpout = The wild {0102:0} used\nWater Spout!
+Bank0016_Text_FoesUsedWaterSpout = The foe's {0102:0} used\nWater Spout!
+Bank0016_Text_UsedSignalBeam = {0102:0} used\nSignal Beam!
+Bank0016_Text_WildUsedSignalBeam = The wild {0102:0} used\nSignal Beam!
+Bank0016_Text_FoesUsedSignalBeam = The foe's {0102:0} used\nSignal Beam!
+Bank0016_Text_UsedShadowPunch = {0102:0} used\nShadow Punch!
+Bank0016_Text_WildUsedShadowPunch = The wild {0102:0} used\nShadow Punch!
+Bank0016_Text_FoesUsedShadowPunch = The foe's {0102:0} used\nShadow Punch!
+Bank0016_Text_UsedExtrasensory = {0102:0} used\nExtrasensory!
+Bank0016_Text_WildUsedExtrasensory = The wild {0102:0} used\nExtrasensory!
+Bank0016_Text_FoesUsedExtrasensory = The foe's {0102:0} used\nExtrasensory!
+Bank0016_Text_UsedSkyUppercut = {0102:0} used\nSky Uppercut!
+Bank0016_Text_WildUsedSkyUppercut = The wild {0102:0} used\nSky Uppercut!
+Bank0016_Text_FoesUsedSkyUppercut = The foe's {0102:0} used\nSky Uppercut!
+Bank0016_Text_UsedSandTomb = {0102:0} used\nSand Tomb!
+Bank0016_Text_WildUsedSandTomb = The wild {0102:0} used\nSand Tomb!
+Bank0016_Text_FoesUsedSandTomb = The foe's {0102:0} used\nSand Tomb!
+Bank0016_Text_UsedSheerCold = {0102:0} used\nSheer Cold!
+Bank0016_Text_WildUsedSheerCold = The wild {0102:0} used\nSheer Cold!
+Bank0016_Text_FoesUsedSheerCold = The foe's {0102:0} used\nSheer Cold!
+Bank0016_Text_UsedMuddyWater = {0102:0} used\nMuddy Water!
+Bank0016_Text_WildUsedMuddyWater = The wild {0102:0} used\nMuddy Water!
+Bank0016_Text_FoesUsedMuddyWater = The foe's {0102:0} used\nMuddy Water!
+Bank0016_Text_UsedBulletSeed = {0102:0} used\nBullet Seed!
+Bank0016_Text_WildUsedBulletSeed = The wild {0102:0} used\nBullet Seed!
+Bank0016_Text_FoesUsedBulletSeed = The foe's {0102:0} used\nBullet Seed!
+Bank0016_Text_UsedAerialAce = {0102:0} used\nAerial Ace!
+Bank0016_Text_WildUsedAerialAce = The wild {0102:0} used\nAerial Ace!
+Bank0016_Text_FoesUsedAerialAce = The foe's {0102:0} used\nAerial Ace!
+Bank0016_Text_UsedIcicleSpear = {0102:0} used\nIcicle Spear!
+Bank0016_Text_WildUsedIcicleSpear = The wild {0102:0} used\nIcicle Spear!
+Bank0016_Text_FoesUsedIcicleSpear = The foe's {0102:0} used\nIcicle Spear!
+Bank0016_Text_UsedIronDefense = {0102:0} used\nIron Defense!
+Bank0016_Text_WildUsedIronDefense = The wild {0102:0} used\nIron Defense!
+Bank0016_Text_FoesUsedIronDefense = The foe's {0102:0} used\nIron Defense!
+Bank0016_Text_UsedBlock = {0102:0} used\nBlock!
+Bank0016_Text_WildUsedBlock = The wild {0102:0} used\nBlock!
+Bank0016_Text_FoesUsedBlock = The foe's {0102:0} used\nBlock!
+Bank0016_Text_UsedHowl = {0102:0} used\nHowl!
+Bank0016_Text_WildUsedHowl = The wild {0102:0} used\nHowl!
+Bank0016_Text_FoesUsedHowl = The foe's {0102:0} used\nHowl!
+Bank0016_Text_UsedDragonClaw = {0102:0} used\nDragon Claw!
+Bank0016_Text_WildUsedDragonClaw = The wild {0102:0} used\nDragon Claw!
+Bank0016_Text_FoesUsedDragonClaw = The foe's {0102:0} used\nDragon Claw!
+Bank0016_Text_UsedFrenzyPlant = {0102:0} used\nFrenzy Plant!
+Bank0016_Text_WildUsedFrenzyPlant = The wild {0102:0} used\nFrenzy Plant!
+Bank0016_Text_FoesUsedFrenzyPlant = The foe's {0102:0} used\nFrenzy Plant!
+Bank0016_Text_UsedBulkUp = {0102:0} used\nBulk Up!
+Bank0016_Text_WildUsedBulkUp = The wild {0102:0} used\nBulk Up!
+Bank0016_Text_FoesUsedBulkUp = The foe's {0102:0} used\nBulk Up!
+Bank0016_Text_UsedBounce = {0102:0} used\nBounce!
+Bank0016_Text_WildUsedBounce = The wild {0102:0} used\nBounce!
+Bank0016_Text_FoesUsedBounce = The foe's {0102:0} used\nBounce!
+Bank0016_Text_UsedMudShot = {0102:0} used\nMud Shot!
+Bank0016_Text_WildUsedMudShot = The wild {0102:0} used\nMud Shot!
+Bank0016_Text_FoesUsedMudShot = The foe's {0102:0} used\nMud Shot!
+Bank0016_Text_UsedPoisonTail = {0102:0} used\nPoison Tail!
+Bank0016_Text_WildUsedPoisonTail = The wild {0102:0} used\nPoison Tail!
+Bank0016_Text_FoesUsedPoisonTail = The foe's {0102:0} used\nPoison Tail!
+Bank0016_Text_UsedCovet = {0102:0} used\nCovet!
+Bank0016_Text_WildUsedCovet = The wild {0102:0} used\nCovet!
+Bank0016_Text_FoesUsedCovet = The foe's {0102:0} used\nCovet!
+Bank0016_Text_UsedVoltTackle = {0102:0} used\nVolt Tackle!
+Bank0016_Text_WildUsedVoltTackle = The wild {0102:0} used\nVolt Tackle!
+Bank0016_Text_FoesUsedVoltTackle = The foe's {0102:0} used\nVolt Tackle!
+Bank0016_Text_UsedMagicalLeaf = {0102:0} used\nMagical Leaf!
+Bank0016_Text_WildUsedMagicalLeaf = The wild {0102:0} used\nMagical Leaf!
+Bank0016_Text_FoesUsedMagicalLeaf = The foe's {0102:0} used\nMagical Leaf!
+Bank0016_Text_UsedWaterSport = {0102:0} used\nWater Sport!
+Bank0016_Text_WildUsedWaterSport = The wild {0102:0} used\nWater Sport!
+Bank0016_Text_FoesUsedWaterSport = The foe's {0102:0} used\nWater Sport!
+Bank0016_Text_UsedCalmMind = {0102:0} used\nCalm Mind!
+Bank0016_Text_WildUsedCalmMind = The wild {0102:0} used\nCalm Mind!
+Bank0016_Text_FoesUsedCalmMind = The foe's {0102:0} used\nCalm Mind!
+Bank0016_Text_UsedLeafBlade = {0102:0} used\nLeaf Blade!
+Bank0016_Text_WildUsedLeafBlade = The wild {0102:0} used\nLeaf Blade!
+Bank0016_Text_FoesUsedLeafBlade = The foe's {0102:0} used\nLeaf Blade!
+Bank0016_Text_UsedDragonDance = {0102:0} used\nDragon Dance!
+Bank0016_Text_WildUsedDragonDance = The wild {0102:0} used\nDragon Dance!
+Bank0016_Text_FoesUsedDragonDance = The foe's {0102:0} used\nDragon Dance!
+Bank0016_Text_UsedRockBlast = {0102:0} used\nRock Blast!
+Bank0016_Text_WildUsedRockBlast = The wild {0102:0} used\nRock Blast!
+Bank0016_Text_FoesUsedRockBlast = The foe's {0102:0} used\nRock Blast!
+Bank0016_Text_UsedShockWave = {0102:0} used\nShock Wave!
+Bank0016_Text_WildUsedShockWave = The wild {0102:0} used\nShock Wave!
+Bank0016_Text_FoesUsedShockWave = The foe's {0102:0} used\nShock Wave!
+Bank0016_Text_UsedWaterPulse = {0102:0} used\nWater Pulse!
+Bank0016_Text_WildUsedWaterPulse = The wild {0102:0} used\nWater Pulse!
+Bank0016_Text_FoesUsedWaterPulse = The foe's {0102:0} used\nWater Pulse!
+Bank0016_Text_UsedDoomDesire = {0102:0} used\nDoom Desire!
+Bank0016_Text_WildUsedDoomDesire = The wild {0102:0} used\nDoom Desire!
+Bank0016_Text_FoesUsedDoomDesire = The foe's {0102:0} used\nDoom Desire!
+Bank0016_Text_UsedPsychoBoost = {0102:0} used\nPsycho Boost!
+Bank0016_Text_WildUsedPsychoBoost = The wild {0102:0} used\nPsycho Boost!
+Bank0016_Text_FoesUsedPsychoBoost = The foe's {0102:0} used\nPsycho Boost!
+Bank0016_Text_UsedRoost = {0102:0} used\nRoost!
+Bank0016_Text_WildUsedRoost = The wild {0102:0} used\nRoost!
+Bank0016_Text_FoesUsedRoost = The foe's {0102:0} used\nRoost!
+Bank0016_Text_UsedGravity = {0102:0} used\nGravity!
+Bank0016_Text_WildUsedGravity = The wild {0102:0} used\nGravity!
+Bank0016_Text_FoesUsedGravity = The foe's {0102:0} used\nGravity!
+Bank0016_Text_UsedMiracleEye = {0102:0} used\nMiracle Eye!
+Bank0016_Text_WildUsedMiracleEye = The wild {0102:0} used\nMiracle Eye!
+Bank0016_Text_FoesUsedMiracleEye = The foe's {0102:0} used\nMiracle Eye!
+Bank0016_Text_UsedWakeUpSlap = {0102:0} used\nWake-Up Slap!
+Bank0016_Text_WildUsedWakeUp = The wild {0102:0} used\nWake-Up Slap!
+Bank0016_Text_FoesUsedWakeUp = The foe's {0102:0} used\nWake-Up Slap!
+Bank0016_Text_UsedHammerArm = {0102:0} used\nHammer Arm!
+Bank0016_Text_WildUsedHammerArm = The wild {0102:0} used\nHammer Arm!
+Bank0016_Text_FoesUsedHammerArm = The foe's {0102:0} used\nHammer Arm!
+Bank0016_Text_UsedGyroBall = {0102:0} used\nGyro Ball!
+Bank0016_Text_WildUsedGyroBall = The wild {0102:0} used\nGyro Ball!
+Bank0016_Text_FoesUsedGyroBall = The foe's {0102:0} used\nGyro Ball!
+Bank0016_Text_UsedHealingWish = {0102:0} used\nHealing Wish!
+Bank0016_Text_WildUsedHealingWish = The wild {0102:0} used\nHealing Wish!
+Bank0016_Text_FoesUsedHealingWish = The foe's {0102:0} used\nHealing Wish!
+Bank0016_Text_UsedBrine = {0102:0} used\nBrine!
+Bank0016_Text_WildUsedBrine = The wild {0102:0} used\nBrine!
+Bank0016_Text_FoesUsedBrine = The foe's {0102:0} used\nBrine!
+Bank0016_Text_UsedNaturalGift = {0102:0} used\nNatural Gift!
+Bank0016_Text_WildUsedNaturalGift = The wild {0102:0} used\nNatural Gift!
+Bank0016_Text_FoesUsedNaturalGift = The foe's {0102:0} used\nNatural Gift!
+Bank0016_Text_UsedFeint = {0102:0} used\nFeint!
+Bank0016_Text_WildUsedFeint = The wild {0102:0} used\nFeint!
+Bank0016_Text_FoesUsedFeint = The foe's {0102:0} used\nFeint!
+Bank0016_Text_UsedPluck = {0102:0} used\nPluck!
+Bank0016_Text_WildUsedPluck = The wild {0102:0} used\nPluck!
+Bank0016_Text_FoesUsedPluck = The foe's {0102:0} used\nPluck!
+Bank0016_Text_UsedTailwind = {0102:0} used\nTailwind!
+Bank0016_Text_WildUsedTailwind = The wild {0102:0} used\nTailwind!
+Bank0016_Text_FoesUsedTailwind = The foe's {0102:0} used\nTailwind!
+Bank0016_Text_UsedAcupressure = {0102:0} used\nAcupressure!
+Bank0016_Text_WildUsedAcupressure = The wild {0102:0} used\nAcupressure!
+Bank0016_Text_FoesUsedAcupressure = The foe's {0102:0} used\nAcupressure!
+Bank0016_Text_UsedMetalBurst = {0102:0} used\nMetal Burst!
+Bank0016_Text_WildUsedMetalBurst = The wild {0102:0} used\nMetal Burst!
+Bank0016_Text_FoesUsedMetalBurst = The foe's {0102:0} used\nMetal Burst!
+Bank0016_Text_UsedUTurn = {0102:0} used\nU-turn!
+Bank0016_Text_WildUsedUTurn = The wild {0102:0} used\nU-turn!
+Bank0016_Text_FoesUsedUTurn = The foe's {0102:0} used\nU-turn!
+Bank0016_Text_UsedCloseCombat = {0102:0} used\nClose Combat!
+Bank0016_Text_WildUsedCloseCombat = The wild {0102:0} used\nClose Combat!
+Bank0016_Text_FoesUsedCloseCombat = The foe's {0102:0} used\nClose Combat!
+Bank0016_Text_UsedPayback = {0102:0} used\nPayback!
+Bank0016_Text_WildUsedPayback = The wild {0102:0} used\nPayback!
+Bank0016_Text_FoesUsedPayback = The foe's {0102:0} used\nPayback!
+Bank0016_Text_UsedAssurance = {0102:0} used\nAssurance!
+Bank0016_Text_WildUsedAssurance = The wild {0102:0} used\nAssurance!
+Bank0016_Text_FoesUsedAssurance = The foe's {0102:0} used\nAssurance!
+Bank0016_Text_UsedEmbargo = {0102:0} used\nEmbargo!
+Bank0016_Text_WildUsedEmbargo = The wild {0102:0} used\nEmbargo!
+Bank0016_Text_FoesUsedEmbargo = The foe's {0102:0} used\nEmbargo!
+Bank0016_Text_UsedFling = {0102:0} used\nFling!
+Bank0016_Text_WildUsedFling = The wild {0102:0} used\nFling!
+Bank0016_Text_FoesUsedFling = The foe's {0102:0} used\nFling!
+Bank0016_Text_UsedPsychoShift = {0102:0} used\nPsycho Shift!
+Bank0016_Text_WildUsedPsychoShift = The wild {0102:0} used\nPsycho Shift!
+Bank0016_Text_FoesUsedPsychoShift = The foe's {0102:0} used\nPsycho Shift!
+Bank0016_Text_UsedTrumpCard = {0102:0} used\nTrump Card!
+Bank0016_Text_WildUsedTrumpCard = The wild {0102:0} used\nTrump Card!
+Bank0016_Text_FoesUsedTrumpCard = The foe's {0102:0} used\nTrump Card!
+Bank0016_Text_UsedHealBlock = {0102:0} used\nHeal Block!
+Bank0016_Text_WildUsedHealBlock = The wild {0102:0} used\nHeal Block!
+Bank0016_Text_FoesUsedHealBlock = The foe's {0102:0} used\nHeal Block!
+Bank0016_Text_UsedWringOut = {0102:0} used\nWring Out!
+Bank0016_Text_WildUsedWringOut = The wild {0102:0} used\nWring Out!
+Bank0016_Text_FoesUsedWringOut = The foe's {0102:0} used\nWring Out!
+Bank0016_Text_UsedPowerTrick = {0102:0} used\nPower Trick!
+Bank0016_Text_WildUsedPowerTrick = The wild {0102:0} used\nPower Trick!
+Bank0016_Text_FoesUsedPowerTrick = The foe's {0102:0} used\nPower Trick!
+Bank0016_Text_UsedGastroAcid = {0102:0} used\nGastro Acid!
+Bank0016_Text_WildUsedGastroAcid = The wild {0102:0} used\nGastro Acid!
+Bank0016_Text_FoesUsedGastroAcid = The foe's {0102:0} used\nGastro Acid!
+Bank0016_Text_UsedLuckyChant = {0102:0} used\nLucky Chant!
+Bank0016_Text_WildUsedLuckyChant = The wild {0102:0} used\nLucky Chant!
+Bank0016_Text_FoesUsedLuckyChant = The foe's {0102:0} used\nLucky Chant!
+Bank0016_Text_UsedFirst = {0102:0} used\nMe First!
+Bank0016_Text_WildUsedFirst = The wild {0102:0} used\nMe First!
+Bank0016_Text_FoesUsedFirst = The foe's {0102:0} used\nMe First!
+Bank0016_Text_UsedCopycat = {0102:0} used\nCopycat!
+Bank0016_Text_WildUsedCopycat = The wild {0102:0} used\nCopycat!
+Bank0016_Text_FoesUsedCopycat = The foe's {0102:0} used\nCopycat!
+Bank0016_Text_UsedPowerSwap = {0102:0} used\nPower Swap!
+Bank0016_Text_WildUsedPowerSwap = The wild {0102:0} used\nPower Swap!
+Bank0016_Text_FoesUsedPowerSwap = The foe's {0102:0} used\nPower Swap!
+Bank0016_Text_UsedGuardSwap = {0102:0} used\nGuard Swap!
+Bank0016_Text_WildUsedGuardSwap = The wild {0102:0} used\nGuard Swap!
+Bank0016_Text_FoesUsedGuardSwap = The foe's {0102:0} used\nGuard Swap!
+Bank0016_Text_UsedPunishment = {0102:0} used\nPunishment!
+Bank0016_Text_WildUsedPunishment = The wild {0102:0} used\nPunishment!
+Bank0016_Text_FoesUsedPunishment = The foe's {0102:0} used\nPunishment!
+Bank0016_Text_UsedLastResort = {0102:0} used\nLast Resort!
+Bank0016_Text_WildUsedLastResort = The wild {0102:0} used\nLast Resort!
+Bank0016_Text_FoesUsedLastResort = The foe's {0102:0} used\nLast Resort!
+Bank0016_Text_UsedWorrySeed = {0102:0} used\nWorry Seed!
+Bank0016_Text_WildUsedWorrySeed = The wild {0102:0} used\nWorry Seed!
+Bank0016_Text_FoesUsedWorrySeed = The foe's {0102:0} used\nWorry Seed!
+Bank0016_Text_UsedSuckerPunch = {0102:0} used\nSucker Punch!
+Bank0016_Text_WildUsedSuckerPunch = The wild {0102:0} used\nSucker Punch!
+Bank0016_Text_FoesUsedSuckerPunch = The foe's {0102:0} used\nSucker Punch!
+Bank0016_Text_UsedToxicSpikes = {0102:0} used\nToxic Spikes!
+Bank0016_Text_WildUsedToxicSpikes = The wild {0102:0} used\nToxic Spikes!
+Bank0016_Text_FoesUsedToxicSpikes = The foe's {0102:0} used\nToxic Spikes!
+Bank0016_Text_UsedHeartSwap = {0102:0} used\nHeart Swap!
+Bank0016_Text_WildUsedHeartSwap = The wild {0102:0} used\nHeart Swap!
+Bank0016_Text_FoesUsedHeartSwap = The foe's {0102:0} used\nHeart Swap!
+Bank0016_Text_UsedAquaRing = {0102:0} used\nAqua Ring!
+Bank0016_Text_WildUsedAquaRing = The wild {0102:0} used\nAqua Ring!
+Bank0016_Text_FoesUsedAquaRing = The foe's {0102:0} used\nAqua Ring!
+Bank0016_Text_UsedMagnetRise = {0102:0} used\nMagnet Rise!
+Bank0016_Text_WildUsedMagnetRise = The wild {0102:0} used\nMagnet Rise!
+Bank0016_Text_FoesUsedMagnetRise = The foe's {0102:0} used\nMagnet Rise!
+Bank0016_Text_UsedFlareBlitz = {0102:0} used\nFlare Blitz!
+Bank0016_Text_WildUsedFlareBlitz = The wild {0102:0} used\nFlare Blitz!
+Bank0016_Text_FoesUsedFlareBlitz = The foe's {0102:0} used\nFlare Blitz!
+Bank0016_Text_UsedForcePalm = {0102:0} used\nForce Palm!
+Bank0016_Text_WildUsedForcePalm = The wild {0102:0} used\nForce Palm!
+Bank0016_Text_FoesUsedForcePalm = The foe's {0102:0} used\nForce Palm!
+Bank0016_Text_UsedAuraSphere = {0102:0} used\nAura Sphere!
+Bank0016_Text_WildUsedAuraSphere = The wild {0102:0} used\nAura Sphere!
+Bank0016_Text_FoesUsedAuraSphere = The foe's {0102:0} used\nAura Sphere!
+Bank0016_Text_UsedRockPolish = {0102:0} used\nRock Polish!
+Bank0016_Text_WildUsedRockPolish = The wild {0102:0} used\nRock Polish!
+Bank0016_Text_FoesUsedRockPolish = The foe's {0102:0} used\nRock Polish!
+Bank0016_Text_UsedPoisonJab = {0102:0} used\nPoison Jab!
+Bank0016_Text_WildUsedPoisonJab = The wild {0102:0} used\nPoison Jab!
+Bank0016_Text_FoesUsedPoisonJab = The foe's {0102:0} used\nPoison Jab!
+Bank0016_Text_UsedDarkPulse = {0102:0} used\nDark Pulse!
+Bank0016_Text_WildUsedDarkPulse = The wild {0102:0} used\nDark Pulse!
+Bank0016_Text_FoesUsedDarkPulse = The foe's {0102:0} used\nDark Pulse!
+Bank0016_Text_UsedNightSlash = {0102:0} used\nNight Slash!
+Bank0016_Text_WildUsedNightSlash = The wild {0102:0} used\nNight Slash!
+Bank0016_Text_FoesUsedNightSlash = The foe's {0102:0} used\nNight Slash!
+Bank0016_Text_UsedAquaTail = {0102:0} used\nAqua Tail!
+Bank0016_Text_WildUsedAquaTail = The wild {0102:0} used\nAqua Tail!
+Bank0016_Text_FoesUsedAquaTail = The foe's {0102:0} used\nAqua Tail!
+Bank0016_Text_UsedSeedBomb = {0102:0} used\nSeed Bomb!
+Bank0016_Text_WildUsedSeedBomb = The wild {0102:0} used\nSeed Bomb!
+Bank0016_Text_FoesUsedSeedBomb = The foe's {0102:0} used\nSeed Bomb!
+Bank0016_Text_UsedAirSlash = {0102:0} used\nAir Slash!
+Bank0016_Text_WildUsedAirSlash = The wild {0102:0} used\nAir Slash!
+Bank0016_Text_FoesUsedAirSlash = The foe's {0102:0} used\nAir Slash!
+Bank0016_Text_UsedXScissor = {0102:0} used\nX-Scissor!
+Bank0016_Text_WildUsedXScissor = The wild {0102:0} used\nX-Scissor!
+Bank0016_Text_FoesUsedXScissor = The foe's {0102:0} used\nX-Scissor!
+Bank0016_Text_UsedBugBuzz = {0102:0} used\nBug Buzz!
+Bank0016_Text_WildUsedBugBuzz = The wild {0102:0} used\nBug Buzz!
+Bank0016_Text_FoesUsedBugBuzz = The foe's {0102:0} used\nBug Buzz!
+Bank0016_Text_UsedDragonPulse = {0102:0} used\nDragon Pulse!
+Bank0016_Text_WildUsedDragonPulse = The wild {0102:0} used\nDragon Pulse!
+Bank0016_Text_FoesUsedDragonPulse = The foe's {0102:0} used\nDragon Pulse!
+Bank0016_Text_UsedDragonRush = {0102:0} used\nDragon Rush!
+Bank0016_Text_WildUsedDragonRush = The wild {0102:0} used\nDragon Rush!
+Bank0016_Text_FoesUsedDragonRush = The foe's {0102:0} used\nDragon Rush!
+Bank0016_Text_UsedPowerGem = {0102:0} used\nPower Gem!
+Bank0016_Text_WildUsedPowerGem = The wild {0102:0} used\nPower Gem!
+Bank0016_Text_FoesUsedPowerGem = The foe's {0102:0} used\nPower Gem!
+Bank0016_Text_UsedDrainPunch = {0102:0} used\nDrain Punch!
+Bank0016_Text_WildUsedDrainPunch = The wild {0102:0} used\nDrain Punch!
+Bank0016_Text_FoesUsedDrainPunch = The foe's {0102:0} used\nDrain Punch!
+Bank0016_Text_UsedVacuumWave = {0102:0} used\nVacuum Wave!
+Bank0016_Text_WildUsedVacuumWave = The wild {0102:0} used\nVacuum Wave!
+Bank0016_Text_FoesUsedVacuumWave = The foe's {0102:0} used\nVacuum Wave!
+Bank0016_Text_UsedFocusBlast = {0102:0} used\nFocus Blast!
+Bank0016_Text_WildUsedFocusBlast = The wild {0102:0} used\nFocus Blast!
+Bank0016_Text_FoesUsedFocusBlast = The foe's {0102:0} used\nFocus Blast!
+Bank0016_Text_UsedEnergyBall = {0102:0} used\nEnergy Ball!
+Bank0016_Text_WildUsedEnergyBall = The wild {0102:0} used\nEnergy Ball!
+Bank0016_Text_FoesUsedEnergyBall = The foe's {0102:0} used\nEnergy Ball!
+Bank0016_Text_UsedBraveBird = {0102:0} used\nBrave Bird!
+Bank0016_Text_WildUsedBraveBird = The wild {0102:0} used\nBrave Bird!
+Bank0016_Text_FoesUsedBraveBird = The foe's {0102:0} used\nBrave Bird!
+Bank0016_Text_UsedEarthPower = {0102:0} used\nEarth Power!
+Bank0016_Text_WildUsedEarthPower = The wild {0102:0} used\nEarth Power!
+Bank0016_Text_FoesUsedEarthPower = The foe's {0102:0} used\nEarth Power!
+Bank0016_Text_UsedSwitcheroo = {0102:0} used\nSwitcheroo!
+Bank0016_Text_WildUsedSwitcheroo = The wild {0102:0} used\nSwitcheroo!
+Bank0016_Text_FoesUsedSwitcheroo = The foe's {0102:0} used\nSwitcheroo!
+Bank0016_Text_UsedGigaImpact = {0102:0} used\nGiga Impact!
+Bank0016_Text_WildUsedGigaImpact = The wild {0102:0} used\nGiga Impact!
+Bank0016_Text_FoesUsedGigaImpact = The foe's {0102:0} used\nGiga Impact!
+Bank0016_Text_UsedNastyPlot = {0102:0} used\nNasty Plot!
+Bank0016_Text_WildUsedNastyPlot = The wild {0102:0} used\nNasty Plot!
+Bank0016_Text_FoesUsedNastyPlot = The foe's {0102:0} used\nNasty Plot!
+Bank0016_Text_UsedBulletPunch = {0102:0} used\nBullet Punch!
+Bank0016_Text_WildUsedBulletPunch = The wild {0102:0} used\nBullet Punch!
+Bank0016_Text_FoesUsedBulletPunch = The foe's {0102:0} used\nBullet Punch!
+Bank0016_Text_UsedAvalanche = {0102:0} used\nAvalanche!
+Bank0016_Text_WildUsedAvalanche = The wild {0102:0} used\nAvalanche!
+Bank0016_Text_FoesUsedAvalanche = The foe's {0102:0} used\nAvalanche!
+Bank0016_Text_UsedIceShard = {0102:0} used\nIce Shard!
+Bank0016_Text_WildUsedIceShard = The wild {0102:0} used\nIce Shard!
+Bank0016_Text_FoesUsedIceShard = The foe's {0102:0} used\nIce Shard!
+Bank0016_Text_UsedShadowClaw = {0102:0} used\nShadow Claw!
+Bank0016_Text_WildUsedShadowClaw = The wild {0102:0} used\nShadow Claw!
+Bank0016_Text_FoesUsedShadowClaw = The foe's {0102:0} used\nShadow Claw!
+Bank0016_Text_UsedThunderFang = {0102:0} used\nThunder Fang!
+Bank0016_Text_WildUsedThunderFang = The wild {0102:0} used\nThunder Fang!
+Bank0016_Text_FoesUsedThunderFang = The foe's {0102:0} used\nThunder Fang!
+Bank0016_Text_UsedIceFang = {0102:0} used\nIce Fang!
+Bank0016_Text_WildUsedIceFang = The wild {0102:0} used\nIce Fang!
+Bank0016_Text_FoesUsedIceFang = The foe's {0102:0} used\nIce Fang!
+Bank0016_Text_UsedFireFang = {0102:0} used\nFire Fang!
+Bank0016_Text_WildUsedFireFang = The wild {0102:0} used\nFire Fang!
+Bank0016_Text_FoesUsedFireFang = The foe's {0102:0} used\nFire Fang!
+Bank0016_Text_UsedShadowSneak = {0102:0} used\nShadow Sneak!
+Bank0016_Text_WildUsedShadowSneak = The wild {0102:0} used\nShadow Sneak!
+Bank0016_Text_FoesUsedShadowSneak = The foe's {0102:0} used\nShadow Sneak!
+Bank0016_Text_UsedMudBomb = {0102:0} used\nMud Bomb!
+Bank0016_Text_WildUsedMudBomb = The wild {0102:0} used\nMud Bomb!
+Bank0016_Text_FoesUsedMudBomb = The foe's {0102:0} used\nMud Bomb!
+Bank0016_Text_UsedPsychoCut = {0102:0} used\nPsycho Cut!
+Bank0016_Text_WildUsedPsychoCut = The wild {0102:0} used\nPsycho Cut!
+Bank0016_Text_FoesUsedPsychoCut = The foe's {0102:0} used\nPsycho Cut!
+Bank0016_Text_UsedZenHeadbutt = {0102:0} used\nZen Headbutt!
+Bank0016_Text_WildUsedZenHeadbutt = The wild {0102:0} used\nZen Headbutt!
+Bank0016_Text_FoesUsedZenHeadbutt = The foe's {0102:0} used\nZen Headbutt!
+Bank0016_Text_UsedMirrorShot = {0102:0} used\nMirror Shot!
+Bank0016_Text_WildUsedMirrorShot = The wild {0102:0} used\nMirror Shot!
+Bank0016_Text_FoesUsedMirrorShot = The foe's {0102:0} used\nMirror Shot!
+Bank0016_Text_UsedFlashCannon = {0102:0} used\nFlash Cannon!
+Bank0016_Text_WildUsedFlashCannon = The wild {0102:0} used\nFlash Cannon!
+Bank0016_Text_FoesUsedFlashCannon = The foe's {0102:0} used\nFlash Cannon!
+Bank0016_Text_UsedRockClimb = {0102:0} used\nRock Climb!
+Bank0016_Text_WildUsedRockClimb = The wild {0102:0} used\nRock Climb!
+Bank0016_Text_FoesUsedRockClimb = The foe's {0102:0} used\nRock Climb!
+Bank0016_Text_UsedDefog = {0102:0} used\nDefog!
+Bank0016_Text_WildUsedDefog = The wild {0102:0} used\nDefog!
+Bank0016_Text_FoesUsedDefog = The foe's {0102:0} used\nDefog!
+Bank0016_Text_UsedTrickRoom = {0102:0} used\nTrick Room!
+Bank0016_Text_WildUsedTrickRoom = The wild {0102:0} used\nTrick Room!
+Bank0016_Text_FoesUsedTrickRoom = The foe's {0102:0} used\nTrick Room!
+Bank0016_Text_UsedDracoMeteor = {0102:0} used\nDraco Meteor!
+Bank0016_Text_WildUsedDracoMeteor = The wild {0102:0} used\nDraco Meteor!
+Bank0016_Text_FoesUsedDracoMeteor = The foe's {0102:0} used\nDraco Meteor!
+Bank0016_Text_UsedDischarge = {0102:0} used\nDischarge!
+Bank0016_Text_WildUsedDischarge = The wild {0102:0} used\nDischarge!
+Bank0016_Text_FoesUsedDischarge = The foe's {0102:0} used\nDischarge!
+Bank0016_Text_UsedLavaPlume = {0102:0} used\nLava Plume!
+Bank0016_Text_WildUsedLavaPlume = The wild {0102:0} used\nLava Plume!
+Bank0016_Text_FoesUsedLavaPlume = The foe's {0102:0} used\nLava Plume!
+Bank0016_Text_UsedLeafStorm = {0102:0} used\nLeaf Storm!
+Bank0016_Text_WildUsedLeafStorm = The wild {0102:0} used\nLeaf Storm!
+Bank0016_Text_FoesUsedLeafStorm = The foe's {0102:0} used\nLeaf Storm!
+Bank0016_Text_UsedPowerWhip = {0102:0} used\nPower Whip!
+Bank0016_Text_WildUsedPowerWhip = The wild {0102:0} used\nPower Whip!
+Bank0016_Text_FoesUsedPowerWhip = The foe's {0102:0} used\nPower Whip!
+Bank0016_Text_UsedRockWrecker = {0102:0} used\nRock Wrecker!
+Bank0016_Text_WildUsedRockWrecker = The wild {0102:0} used\nRock Wrecker!
+Bank0016_Text_FoesUsedRockWrecker = The foe's {0102:0} used\nRock Wrecker!
+Bank0016_Text_UsedCrossPoison = {0102:0} used\nCross Poison!
+Bank0016_Text_WildUsedCrossPoison = The wild {0102:0} used\nCross Poison!
+Bank0016_Text_FoesUsedCrossPoison = The foe's {0102:0} used\nCross Poison!
+Bank0016_Text_UsedGunkShot = {0102:0} used\nGunk Shot!
+Bank0016_Text_WildUsedGunkShot = The wild {0102:0} used\nGunk Shot!
+Bank0016_Text_FoesUsedGunkShot = The foe's {0102:0} used\nGunk Shot!
+Bank0016_Text_UsedIronHead = {0102:0} used\nIron Head!
+Bank0016_Text_WildUsedIronHead = The wild {0102:0} used\nIron Head!
+Bank0016_Text_FoesUsedIronHead = The foe's {0102:0} used\nIron Head!
+Bank0016_Text_UsedMagnetBomb = {0102:0} used\nMagnet Bomb!
+Bank0016_Text_WildUsedMagnetBomb = The wild {0102:0} used\nMagnet Bomb!
+Bank0016_Text_FoesUsedMagnetBomb = The foe's {0102:0} used\nMagnet Bomb!
+Bank0016_Text_UsedStoneEdge = {0102:0} used\nStone Edge!
+Bank0016_Text_WildUsedStoneEdge = The wild {0102:0} used\nStone Edge!
+Bank0016_Text_FoesUsedStoneEdge = The foe's {0102:0} used\nStone Edge!
+Bank0016_Text_UsedCaptivate = {0102:0} used\nCaptivate!
+Bank0016_Text_WildUsedCaptivate = The wild {0102:0} used\nCaptivate!
+Bank0016_Text_FoesUsedCaptivate = The foe's {0102:0} used\nCaptivate!
+Bank0016_Text_UsedStealthRock = {0102:0} used\nStealth Rock!
+Bank0016_Text_WildUsedStealthRock = The wild {0102:0} used\nStealth Rock!
+Bank0016_Text_FoesUsedStealthRock = The foe's {0102:0} used\nStealth Rock!
+Bank0016_Text_UsedGrassKnot = {0102:0} used\nGrass Knot!
+Bank0016_Text_WildUsedGrassKnot = The wild {0102:0} used\nGrass Knot!
+Bank0016_Text_FoesUsedGrassKnot = The foe's {0102:0} used\nGrass Knot!
+Bank0016_Text_UsedChatter = {0102:0} used\nChatter!
+Bank0016_Text_WildUsedChatter = The wild {0102:0} used\nChatter!
+Bank0016_Text_FoesUsedChatter = The foe's {0102:0} used\nChatter!
+Bank0016_Text_UsedJudgment = {0102:0} used\nJudgment!
+Bank0016_Text_WildUsedJudgment = The wild {0102:0} used\nJudgment!
+Bank0016_Text_FoesUsedJudgment = The foe's {0102:0} used\nJudgment!
+Bank0016_Text_UsedBugBite = {0102:0} used\nBug Bite!
+Bank0016_Text_WildUsedBugBite = The wild {0102:0} used\nBug Bite!
+Bank0016_Text_FoesUsedBugBite = The foe's {0102:0} used\nBug Bite!
+Bank0016_Text_UsedChargeBeam = {0102:0} used\nCharge Beam!
+Bank0016_Text_WildUsedChargeBeam = The wild {0102:0} used\nCharge Beam!
+Bank0016_Text_FoesUsedChargeBeam = The foe's {0102:0} used\nCharge Beam!
+Bank0016_Text_UsedWoodHammer = {0102:0} used\nWood Hammer!
+Bank0016_Text_WildUsedWoodHammer = The wild {0102:0} used\nWood Hammer!
+Bank0016_Text_FoesUsedWoodHammer = The foe's {0102:0} used\nWood Hammer!
+Bank0016_Text_UsedAquaJet = {0102:0} used\nAqua Jet!
+Bank0016_Text_WildUsedAquaJet = The wild {0102:0} used\nAqua Jet!
+Bank0016_Text_FoesUsedAquaJet = The foe's {0102:0} used\nAqua Jet!
+Bank0016_Text_UsedAttackOrder = {0102:0} used\nAttack Order!
+Bank0016_Text_WildUsedAttackOrder = The wild {0102:0} used\nAttack Order!
+Bank0016_Text_FoesUsedAttackOrder = The foe's {0102:0} used\nAttack Order!
+Bank0016_Text_UsedDefendOrder = {0102:0} used\nDefend Order!
+Bank0016_Text_WildUsedDefendOrder = The wild {0102:0} used\nDefend Order!
+Bank0016_Text_FoesUsedDefendOrder = The foe's {0102:0} used\nDefend Order!
+Bank0016_Text_UsedHealOrder = {0102:0} used\nHeal Order!
+Bank0016_Text_WildUsedHealOrder = The wild {0102:0} used\nHeal Order!
+Bank0016_Text_FoesUsedHealOrder = The foe's {0102:0} used\nHeal Order!
+Bank0016_Text_UsedHeadSmash = {0102:0} used\nHead Smash!
+Bank0016_Text_WildUsedHeadSmash = The wild {0102:0} used\nHead Smash!
+Bank0016_Text_FoesUsedHeadSmash = The foe's {0102:0} used\nHead Smash!
+Bank0016_Text_UsedDoubleHit = {0102:0} used\nDouble Hit!
+Bank0016_Text_WildUsedDoubleHit = The wild {0102:0} used\nDouble Hit!
+Bank0016_Text_FoesUsedDoubleHit = The foe's {0102:0} used\nDouble Hit!
+Bank0016_Text_UsedRoarTime = {0102:0} used\nRoar of Time!
+Bank0016_Text_WildUsedRoarTime = The wild {0102:0} used\nRoar of Time!
+Bank0016_Text_FoesUsedRoarTime = The foe's {0102:0} used\nRoar of Time!
+Bank0016_Text_UsedSpacialRend = {0102:0} used\nSpacial Rend!
+Bank0016_Text_WildUsedSpacialRend = The wild {0102:0} used\nSpacial Rend!
+Bank0016_Text_FoesUsedSpacialRend = The foe's {0102:0} used\nSpacial Rend!
+Bank0016_Text_UsedLunarDance = {0102:0} used\nLunar Dance!
+Bank0016_Text_WildUsedLunarDance = The wild {0102:0} used\nLunar Dance!
+Bank0016_Text_FoesUsedLunarDance = The foe's {0102:0} used\nLunar Dance!
+Bank0016_Text_UsedCrushGrip = {0102:0} used\nCrush Grip!
+Bank0016_Text_WildUsedCrushGrip = The wild {0102:0} used\nCrush Grip!
+Bank0016_Text_FoesUsedCrushGrip = The foe's {0102:0} used\nCrush Grip!
+Bank0016_Text_UsedMagmaStorm = {0102:0} used\nMagma Storm!
+Bank0016_Text_WildUsedMagmaStorm = The wild {0102:0} used\nMagma Storm!
+Bank0016_Text_FoesUsedMagmaStorm = The foe's {0102:0} used\nMagma Storm!
+Bank0016_Text_UsedDarkVoid = {0102:0} used\nDark Void!
+Bank0016_Text_WildUsedDarkVoid = The wild {0102:0} used\nDark Void!
+Bank0016_Text_FoesUsedDarkVoid = The foe's {0102:0} used\nDark Void!
+Bank0016_Text_UsedSeedFlare = {0102:0} used\nSeed Flare!
+Bank0016_Text_WildUsedSeedFlare = The wild {0102:0} used\nSeed Flare!
+Bank0016_Text_FoesUsedSeedFlare = The foe's {0102:0} used\nSeed Flare!
+Bank0016_Text_UsedOminousWind = {0102:0} used\nOminous Wind!
+Bank0016_Text_WildUsedOminousWind = The wild {0102:0} used\nOminous Wind!
+Bank0016_Text_FoesUsedOminousWind = The foe's {0102:0} used\nOminous Wind!
+Bank0016_Text_UsedShadowForce = {0102:0} used\nShadow Force!
+Bank0016_Text_WildUsedShadowForce = The wild {0102:0} used\nShadow Force!
+Bank0016_Text_FoesUsedShadowForce = The foe's {0102:0} used\nShadow Force!
+Bank0016_Text_UsedHoneClaws = {0102:0} used\nHone Claws!
+Bank0016_Text_WildUsedHoneClaws = The wild {0102:0} used\nHone Claws!
+Bank0016_Text_FoesUsedHoneClaws = The foe's {0102:0} used\nHone Claws!
+Bank0016_Text_UsedWideGuard = {0102:0} used\nWide Guard!
+Bank0016_Text_WildUsedWideGuard = The wild {0102:0} used\nWide Guard!
+Bank0016_Text_FoesUsedWideGuard = The foe's {0102:0} used\nWide Guard!
+Bank0016_Text_UsedGuardSplit = {0102:0} used\nGuard Split!
+Bank0016_Text_WildUsedGuardSplit = The wild {0102:0} used\nGuard Split!
+Bank0016_Text_FoesUsedGuardSplit = The foe's {0102:0} used\nGuard Split!
+Bank0016_Text_UsedPowerSplit = {0102:0} used\nPower Split!
+Bank0016_Text_WildUsedPowerSplit = The wild {0102:0} used\nPower Split!
+Bank0016_Text_FoesUsedPowerSplit = The foe's {0102:0} used\nPower Split!
+Bank0016_Text_UsedWonderRoom = {0102:0} used\nWonder Room!
+Bank0016_Text_WildUsedWonderRoom = The wild {0102:0} used\nWonder Room!
+Bank0016_Text_FoesUsedWonderRoom = The foe's {0102:0} used\nWonder Room!
+Bank0016_Text_UsedPsyshock = {0102:0} used\nPsyshock!
+Bank0016_Text_WildUsedPsyshock = The wild {0102:0} used\nPsyshock!
+Bank0016_Text_FoesUsedPsyshock = The foe's {0102:0} used\nPsyshock!
+Bank0016_Text_UsedVenoshock = {0102:0} used\nVenoshock!
+Bank0016_Text_WildUsedVenoshock = The wild {0102:0} used\nVenoshock!
+Bank0016_Text_FoesUsedVenoshock = The foe's {0102:0} used\nVenoshock!
+Bank0016_Text_UsedAutotomize = {0102:0} used\nAutotomize!
+Bank0016_Text_WildUsedAutotomize = The wild {0102:0} used\nAutotomize!
+Bank0016_Text_FoesUsedAutotomize = The foe's {0102:0} used\nAutotomize!
+Bank0016_Text_UsedRagePowder = {0102:0} used\nRage Powder!
+Bank0016_Text_WildUsedRagePowder = The wild {0102:0} used\nRage Powder!
+Bank0016_Text_FoesUsedRagePowder = The foe's {0102:0} used\nRage Powder!
+Bank0016_Text_UsedTelekinesis = {0102:0} used\nTelekinesis!
+Bank0016_Text_WildUsedTelekinesis = The wild {0102:0} used\nTelekinesis!
+Bank0016_Text_FoesUsedTelekinesis = The foe's {0102:0} used\nTelekinesis!
+Bank0016_Text_UsedMagicRoom = {0102:0} used\nMagic Room!
+Bank0016_Text_WildUsedMagicRoom = The wild {0102:0} used\nMagic Room!
+Bank0016_Text_FoesUsedMagicRoom = The foe's {0102:0} used\nMagic Room!
+Bank0016_Text_UsedSmackDown = {0102:0} used\nSmack Down!
+Bank0016_Text_WildUsedSmackDown = The wild {0102:0} used\nSmack Down!
+Bank0016_Text_FoesUsedSmackDown = The foe's {0102:0} used\nSmack Down!
+Bank0016_Text_UsedStormThrow = {0102:0} used\nStorm Throw!
+Bank0016_Text_WildUsedStormThrow = The wild {0102:0} used\nStorm Throw!
+Bank0016_Text_FoesUsedStormThrow = The foe's {0102:0} used\nStorm Throw!
+Bank0016_Text_UsedFlameBurst = {0102:0} used\nFlame Burst!
+Bank0016_Text_WildUsedFlameBurst = The wild {0102:0} used\nFlame Burst!
+Bank0016_Text_FoesUsedFlameBurst = The foe's {0102:0} used\nFlame Burst!
+Bank0016_Text_UsedSludgeWave = {0102:0} used\nSludge Wave!
+Bank0016_Text_WildUsedSludgeWave = The wild {0102:0} used\nSludge Wave!
+Bank0016_Text_FoesUsedSludgeWave = The foe's {0102:0} used\nSludge Wave!
+Bank0016_Text_UsedQuiverDance = {0102:0} used\nQuiver Dance!
+Bank0016_Text_WildUsedQuiverDance = The wild {0102:0} used\nQuiver Dance!
+Bank0016_Text_FoesUsedQuiverDance = The foe's {0102:0} used\nQuiver Dance!
+Bank0016_Text_UsedHeavySlam = {0102:0} used\nHeavy Slam!
+Bank0016_Text_WildUsedHeavySlam = The wild {0102:0} used\nHeavy Slam!
+Bank0016_Text_FoesUsedHeavySlam = The foe's {0102:0} used\nHeavy Slam!
+Bank0016_Text_UsedSynchronoise = {0102:0} used\nSynchronoise!
+Bank0016_Text_WildUsedSynchronoise = The wild {0102:0} used\nSynchronoise!
+Bank0016_Text_FoesUsedSynchronoise = The foe's {0102:0} used\nSynchronoise!
+Bank0016_Text_UsedElectroBall = {0102:0} used\nElectro Ball!
+Bank0016_Text_WildUsedElectroBall = The wild {0102:0} used\nElectro Ball!
+Bank0016_Text_FoesUsedElectroBall = The foe's {0102:0} used\nElectro Ball!
+Bank0016_Text_UsedSoak = {0102:0} used\nSoak!
+Bank0016_Text_WildUsedSoak = The wild {0102:0} used\nSoak!
+Bank0016_Text_FoesUsedSoak = The foe's {0102:0} used\nSoak!
+Bank0016_Text_UsedFlameCharge = {0102:0} used\nFlame Charge!
+Bank0016_Text_WildUsedFlameCharge = The wild {0102:0} used\nFlame Charge!
+Bank0016_Text_FoesUsedFlameCharge = The foe's {0102:0} used\nFlame Charge!
+Bank0016_Text_UsedCoil = {0102:0} used\nCoil!
+Bank0016_Text_WildUsedCoil = The wild {0102:0} used\nCoil!
+Bank0016_Text_FoesUsedCoil = The foe's {0102:0} used\nCoil!
+Bank0016_Text_UsedLowSweep = {0102:0} used\nLow Sweep!
+Bank0016_Text_WildUsedLowSweep = The wild {0102:0} used\nLow Sweep!
+Bank0016_Text_FoesUsedLowSweep = The foe's {0102:0} used\nLow Sweep!
+Bank0016_Text_UsedAcidSpray = {0102:0} used\nAcid Spray!
+Bank0016_Text_WildUsedAcidSpray = The wild {0102:0} used\nAcid Spray!
+Bank0016_Text_FoesUsedAcidSpray = The foe's {0102:0} used\nAcid Spray!
+Bank0016_Text_UsedFoulPlay = {0102:0} used\nFoul Play!
+Bank0016_Text_WildUsedFoulPlay = The wild {0102:0} used\nFoul Play!
+Bank0016_Text_FoesUsedFoulPlay = The foe's {0102:0} used\nFoul Play!
+Bank0016_Text_UsedSimpleBeam = {0102:0} used\nSimple Beam!
+Bank0016_Text_WildUsedSimpleBeam = The wild {0102:0} used\nSimple Beam!
+Bank0016_Text_FoesUsedSimpleBeam = The foe's {0102:0} used\nSimple Beam!
+Bank0016_Text_UsedEntrainment = {0102:0} used\nEntrainment!
+Bank0016_Text_WildUsedEntrainment = The wild {0102:0} used\nEntrainment!
+Bank0016_Text_FoesUsedEntrainment = The foe's {0102:0} used\nEntrainment!
+Bank0016_Text_UsedAfter = {0102:0} used\nAfter You!
+Bank0016_Text_WildUsedAfter = The wild {0102:0} used\nAfter You!
+Bank0016_Text_FoesUsedAfter = The foe's {0102:0} used\nAfter You!
+Bank0016_Text_UsedRound = {0102:0} used\nRound!
+Bank0016_Text_WildUsedRound = The wild {0102:0} used\nRound!
+Bank0016_Text_FoesUsedRound = The foe's {0102:0} used\nRound!
+Bank0016_Text_UsedEchoedVoice = {0102:0} used\nEchoed Voice!
+Bank0016_Text_WildUsedEchoedVoice = The wild {0102:0} used\nEchoed Voice!
+Bank0016_Text_FoesUsedEchoedVoice = The foe's {0102:0} used\nEchoed Voice!
+Bank0016_Text_UsedChipAway = {0102:0} used\nChip Away!
+Bank0016_Text_WildUsedChipAway = The wild {0102:0} used\nChip Away!
+Bank0016_Text_FoesUsedChipAway = The foe's {0102:0} used\nChip Away!
+Bank0016_Text_UsedClearSmog = {0102:0} used\nClear Smog!
+Bank0016_Text_WildUsedClearSmog = The wild {0102:0} used\nClear Smog!
+Bank0016_Text_FoesUsedClearSmog = The foe's {0102:0} used\nClear Smog!
+Bank0016_Text_UsedStoredPower = {0102:0} used\nStored Power!
+Bank0016_Text_WildUsedStoredPower = The wild {0102:0} used\nStored Power!
+Bank0016_Text_FoesUsedStoredPower = The foe's {0102:0} used\nStored Power!
+Bank0016_Text_UsedQuickGuard = {0102:0} used\nQuick Guard!
+Bank0016_Text_WildUsedQuickGuard = The wild {0102:0} used\nQuick Guard!
+Bank0016_Text_FoesUsedQuickGuard = The foe's {0102:0} used\nQuick Guard!
+Bank0016_Text_UsedAllySwitch = {0102:0} used\nAlly Switch!
+Bank0016_Text_WildUsedAllySwitch = The wild {0102:0} used\nAlly Switch!
+Bank0016_Text_FoesUsedAllySwitch = The foe's {0102:0} used\nAlly Switch!
+Bank0016_Text_UsedScald = {0102:0} used\nScald!
+Bank0016_Text_WildUsedScald = The wild {0102:0} used\nScald!
+Bank0016_Text_FoesUsedScald = The foe's {0102:0} used\nScald!
+Bank0016_Text_UsedShellSmash = {0102:0} used\nShell Smash!
+Bank0016_Text_WildUsedShellSmash = The wild {0102:0} used\nShell Smash!
+Bank0016_Text_FoesUsedShellSmash = The foe's {0102:0} used\nShell Smash!
+Bank0016_Text_UsedHealPulse = {0102:0} used\nHeal Pulse!
+Bank0016_Text_WildUsedHealPulse = The wild {0102:0} used\nHeal Pulse!
+Bank0016_Text_FoesUsedHealPulse = The foe's {0102:0} used\nHeal Pulse!
+Bank0016_Text_UsedHex = {0102:0} used\nHex!
+Bank0016_Text_WildUsedHex = The wild {0102:0} used\nHex!
+Bank0016_Text_FoesUsedHex = The foe's {0102:0} used\nHex!
+Bank0016_Text_UsedSkyDrop = {0102:0} used\nSky Drop!
+Bank0016_Text_WildUsedSkyDrop = The wild {0102:0} used\nSky Drop!
+Bank0016_Text_FoesUsedSkyDrop = The foe's {0102:0} used\nSky Drop!
+Bank0016_Text_UsedShiftGear = {0102:0} used\nShift Gear!
+Bank0016_Text_WildUsedShiftGear = The wild {0102:0} used\nShift Gear!
+Bank0016_Text_FoesUsedShiftGear = The foe's {0102:0} used\nShift Gear!
+Bank0016_Text_UsedCircleThrow = {0102:0} used\nCircle Throw!
+Bank0016_Text_WildUsedCircleThrow = The wild {0102:0} used\nCircle Throw!
+Bank0016_Text_FoesUsedCircleThrow = The foe's {0102:0} used\nCircle Throw!
+Bank0016_Text_UsedIncinerate = {0102:0} used\nIncinerate!
+Bank0016_Text_WildUsedIncinerate = The wild {0102:0} used\nIncinerate!
+Bank0016_Text_FoesUsedIncinerate = The foe's {0102:0} used\nIncinerate!
+Bank0016_Text_UsedQuash = {0102:0} used\nQuash!
+Bank0016_Text_WildUsedQuash = The wild {0102:0} used\nQuash!
+Bank0016_Text_FoesUsedQuash = The foe's {0102:0} used\nQuash!
+Bank0016_Text_UsedAcrobatics = {0102:0} used\nAcrobatics!
+Bank0016_Text_WildUsedAcrobatics = The wild {0102:0} used\nAcrobatics!
+Bank0016_Text_FoesUsedAcrobatics = The foe's {0102:0} used\nAcrobatics!
+Bank0016_Text_UsedReflectType = {0102:0} used\nReflect Type!
+Bank0016_Text_WildUsedReflectType = The wild {0102:0} used\nReflect Type!
+Bank0016_Text_FoesUsedReflectType = The foe's {0102:0} used\nReflect Type!
+Bank0016_Text_UsedRetaliate = {0102:0} used\nRetaliate!
+Bank0016_Text_WildUsedRetaliate = The wild {0102:0} used\nRetaliate!
+Bank0016_Text_FoesUsedRetaliate = The foe's {0102:0} used\nRetaliate!
+Bank0016_Text_UsedFinalGambit = {0102:0} used\nFinal Gambit!
+Bank0016_Text_WildUsedFinalGambit = The wild {0102:0} used\nFinal Gambit!
+Bank0016_Text_FoesUsedFinalGambit = The foe's {0102:0} used\nFinal Gambit!
+Bank0016_Text_UsedBestow = {0102:0} used\nBestow!
+Bank0016_Text_WildUsedBestow = The wild {0102:0} used\nBestow!
+Bank0016_Text_FoesUsedBestow = The foe's {0102:0} used\nBestow!
+Bank0016_Text_UsedInferno = {0102:0} used\nInferno!
+Bank0016_Text_WildUsedInferno = The wild {0102:0} used\nInferno!
+Bank0016_Text_FoesUsedInferno = The foe's {0102:0} used\nInferno!
+Bank0016_Text_UsedWaterPledge = {0102:0} used\nWater Pledge!
+Bank0016_Text_WildUsedWaterPledge = The wild {0102:0} used\nWater Pledge!
+Bank0016_Text_FoesUsedWaterPledge = The foe's {0102:0} used\nWater Pledge!
+Bank0016_Text_UsedFirePledge = {0102:0} used\nFire Pledge!
+Bank0016_Text_WildUsedFirePledge = The wild {0102:0} used\nFire Pledge!
+Bank0016_Text_FoesUsedFirePledge = The foe's {0102:0} used\nFire Pledge!
+Bank0016_Text_UsedGrassPledge = {0102:0} used\nGrass Pledge!
+Bank0016_Text_WildUsedGrassPledge = The wild {0102:0} used\nGrass Pledge!
+Bank0016_Text_FoesUsedGrassPledge = The foe's {0102:0} used\nGrass Pledge!
+Bank0016_Text_UsedVoltSwitch = {0102:0} used\nVolt Switch!
+Bank0016_Text_WildUsedVoltSwitch = The wild {0102:0} used\nVolt Switch!
+Bank0016_Text_FoesUsedVoltSwitch = The foe's {0102:0} used\nVolt Switch!
+Bank0016_Text_UsedStruggleBug = {0102:0} used\nStruggle Bug!
+Bank0016_Text_WildUsedStruggleBug = The wild {0102:0} used\nStruggle Bug!
+Bank0016_Text_FoesUsedStruggleBug = The foe's {0102:0} used\nStruggle Bug!
+Bank0016_Text_UsedBulldoze = {0102:0} used\nBulldoze!
+Bank0016_Text_WildUsedBulldoze = The wild {0102:0} used\nBulldoze!
+Bank0016_Text_FoesUsedBulldoze = The foe's {0102:0} used\nBulldoze!
+Bank0016_Text_UsedFrostBreath = {0102:0} used\nFrost Breath!
+Bank0016_Text_WildUsedFrostBreath = The wild {0102:0} used\nFrost Breath!
+Bank0016_Text_FoesUsedFrostBreath = The foe's {0102:0} used\nFrost Breath!
+Bank0016_Text_UsedDragonTail = {0102:0} used\nDragon Tail!
+Bank0016_Text_WildUsedDragonTail = The wild {0102:0} used\nDragon Tail!
+Bank0016_Text_FoesUsedDragonTail = The foe's {0102:0} used\nDragon Tail!
+Bank0016_Text_UsedWorkUp = {0102:0} used\nWork Up!
+Bank0016_Text_WildUsedWorkUp = The wild {0102:0} used\nWork Up!
+Bank0016_Text_FoesUsedWorkUp = The foe's {0102:0} used\nWork Up!
+Bank0016_Text_UsedElectroweb = {0102:0} used\nElectroweb!
+Bank0016_Text_WildUsedElectroweb = The wild {0102:0} used\nElectroweb!
+Bank0016_Text_FoesUsedElectroweb = The foe's {0102:0} used\nElectroweb!
+Bank0016_Text_UsedWildCharge = {0102:0} used\nWild Charge!
+Bank0016_Text_WildUsedWildCharge = The wild {0102:0} used\nWild Charge!
+Bank0016_Text_FoesUsedWildCharge = The foe's {0102:0} used\nWild Charge!
+Bank0016_Text_UsedDrillRun = {0102:0} used\nDrill Run!
+Bank0016_Text_WildUsedDrillRun = The wild {0102:0} used\nDrill Run!
+Bank0016_Text_FoesUsedDrillRun = The foe's {0102:0} used\nDrill Run!
+Bank0016_Text_UsedDualChop = {0102:0} used\nDual Chop!
+Bank0016_Text_WildUsedDualChop = The wild {0102:0} used\nDual Chop!
+Bank0016_Text_FoesUsedDualChop = The foe's {0102:0} used\nDual Chop!
+Bank0016_Text_UsedHeartStamp = {0102:0} used\nHeart Stamp!
+Bank0016_Text_WildUsedHeartStamp = The wild {0102:0} used\nHeart Stamp!
+Bank0016_Text_FoesUsedHeartStamp = The foe's {0102:0} used\nHeart Stamp!
+Bank0016_Text_UsedHornLeech = {0102:0} used\nHorn Leech!
+Bank0016_Text_WildUsedHornLeech = The wild {0102:0} used\nHorn Leech!
+Bank0016_Text_FoesUsedHornLeech = The foe's {0102:0} used\nHorn Leech!
+Bank0016_Text_UsedSacredSword = {0102:0} used\nSacred Sword!
+Bank0016_Text_WildUsedSacredSword = The wild {0102:0} used\nSacred Sword!
+Bank0016_Text_FoesUsedSacredSword = The foe's {0102:0} used\nSacred Sword!
+Bank0016_Text_UsedRazorShell = {0102:0} used\nRazor Shell!
+Bank0016_Text_WildUsedRazorShell = The wild {0102:0} used\nRazor Shell!
+Bank0016_Text_FoesUsedRazorShell = The foe's {0102:0} used\nRazor Shell!
+Bank0016_Text_UsedHeatCrash = {0102:0} used\nHeat Crash!
+Bank0016_Text_WildUsedHeatCrash = The wild {0102:0} used\nHeat Crash!
+Bank0016_Text_FoesUsedHeatCrash = The foe's {0102:0} used\nHeat Crash!
+Bank0016_Text_UsedLeafTornado = {0102:0} used\nLeaf Tornado!
+Bank0016_Text_WildUsedLeafTornado = The wild {0102:0} used\nLeaf Tornado!
+Bank0016_Text_FoesUsedLeafTornado = The foe's {0102:0} used\nLeaf Tornado!
+Bank0016_Text_UsedSteamroller = {0102:0} used\nSteamroller!
+Bank0016_Text_WildUsedSteamroller = The wild {0102:0} used\nSteamroller!
+Bank0016_Text_FoesUsedSteamroller = The foe's {0102:0} used\nSteamroller!
+Bank0016_Text_UsedCottonGuard = {0102:0} used\nCotton Guard!
+Bank0016_Text_WildUsedCottonGuard = The wild {0102:0} used\nCotton Guard!
+Bank0016_Text_FoesUsedCottonGuard = The foe's {0102:0} used\nCotton Guard!
+Bank0016_Text_UsedNightDaze = {0102:0} used\nNight Daze!
+Bank0016_Text_WildUsedNightDaze = The wild {0102:0} used\nNight Daze!
+Bank0016_Text_FoesUsedNightDaze = The foe's {0102:0} used\nNight Daze!
+Bank0016_Text_UsedPsystrike = {0102:0} used\nPsystrike!
+Bank0016_Text_WildUsedPsystrike = The wild {0102:0} used\nPsystrike!
+Bank0016_Text_FoesUsedPsystrike = The foe's {0102:0} used\nPsystrike!
+Bank0016_Text_UsedTailSlap = {0102:0} used\nTail Slap!
+Bank0016_Text_WildUsedTailSlap = The wild {0102:0} used\nTail Slap!
+Bank0016_Text_FoesUsedTailSlap = The foe's {0102:0} used\nTail Slap!
+Bank0016_Text_UsedHurricane = {0102:0} used\nHurricane!
+Bank0016_Text_WildUsedHurricane = The wild {0102:0} used\nHurricane!
+Bank0016_Text_FoesUsedHurricane = The foe's {0102:0} used\nHurricane!
+Bank0016_Text_UsedHeadCharge = {0102:0} used\nHead Charge!
+Bank0016_Text_WildUsedHeadCharge = The wild {0102:0} used\nHead Charge!
+Bank0016_Text_FoesUsedHeadCharge = The foe's {0102:0} used\nHead Charge!
+Bank0016_Text_UsedGearGrind = {0102:0} used\nGear Grind!
+Bank0016_Text_WildUsedGearGrind = The wild {0102:0} used\nGear Grind!
+Bank0016_Text_FoesUsedGearGrind = The foe's {0102:0} used\nGear Grind!
+Bank0016_Text_UsedSearingShot = {0102:0} used\nSearing Shot!
+Bank0016_Text_WildUsedSearingShot = The wild {0102:0} used\nSearing Shot!
+Bank0016_Text_FoesUsedSearingShot = The foe's {0102:0} used\nSearing Shot!
+Bank0016_Text_UsedTechnoBlast = {0102:0} used\nTechno Blast!
+Bank0016_Text_WildUsedTechnoBlast = The wild {0102:0} used\nTechno Blast!
+Bank0016_Text_FoesUsedTechnoBlast = The foe's {0102:0} used\nTechno Blast!
+Bank0016_Text_UsedRelicSong = {0102:0} used\nRelic Song!
+Bank0016_Text_WildUsedRelicSong = The wild {0102:0} used\nRelic Song!
+Bank0016_Text_FoesUsedRelicSong = The foe's {0102:0} used\nRelic Song!
+Bank0016_Text_UsedSecretSword = {0102:0} used\nSecret Sword!
+Bank0016_Text_WildUsedSecretSword = The wild {0102:0} used\nSecret Sword!
+Bank0016_Text_FoesUsedSecretSword = The foe's {0102:0} used\nSecret Sword!
+Bank0016_Text_UsedGlaciate = {0102:0} used\nGlaciate!
+Bank0016_Text_WildUsedGlaciate = The wild {0102:0} used\nGlaciate!
+Bank0016_Text_FoesUsedGlaciate = The foe's {0102:0} used\nGlaciate!
+Bank0016_Text_UsedBoltStrike = {0102:0} used\nBolt Strike!
+Bank0016_Text_WildUsedBoltStrike = The wild {0102:0} used\nBolt Strike!
+Bank0016_Text_FoesUsedBoltStrike = The foe's {0102:0} used\nBolt Strike!
+Bank0016_Text_UsedBlueFlare = {0102:0} used\nBlue Flare!
+Bank0016_Text_WildUsedBlueFlare = The wild {0102:0} used\nBlue Flare!
+Bank0016_Text_FoesUsedBlueFlare = The foe's {0102:0} used\nBlue Flare!
+Bank0016_Text_UsedFieryDance = {0102:0} used\nFiery Dance!
+Bank0016_Text_WildUsedFieryDance = The wild {0102:0} used\nFiery Dance!
+Bank0016_Text_FoesUsedFieryDance = The foe's {0102:0} used\nFiery Dance!
+Bank0016_Text_UsedFreezeShock = {0102:0} used\nFreeze Shock!
+Bank0016_Text_WildUsedFreezeShock = The wild {0102:0} used\nFreeze Shock!
+Bank0016_Text_FoesUsedFreezeShock = The foe's {0102:0} used\nFreeze Shock!
+Bank0016_Text_UsedIceBurn = {0102:0} used\nIce Burn!
+Bank0016_Text_WildUsedIceBurn = The wild {0102:0} used\nIce Burn!
+Bank0016_Text_FoesUsedIceBurn = The foe's {0102:0} used\nIce Burn!
+Bank0016_Text_UsedSnarl = {0102:0} used\nSnarl!
+Bank0016_Text_WildUsedSnarl = The wild {0102:0} used\nSnarl!
+Bank0016_Text_FoesUsedSnarl = The foe's {0102:0} used\nSnarl!
+Bank0016_Text_UsedIcicleCrash = {0102:0} used\nIcicle Crash!
+Bank0016_Text_WildUsedIcicleCrash = The wild {0102:0} used\nIcicle Crash!
+Bank0016_Text_FoesUsedIcicleCrash = The foe's {0102:0} used\nIcicle Crash!
+Bank0016_Text_UsedVCreate = {0102:0} used\nV-create!
+Bank0016_Text_WildUsedVCreate = The wild {0102:0} used\nV-create!
+Bank0016_Text_FoesUsedVCreate = The foe's {0102:0} used\nV-create!
+Bank0016_Text_UsedFusionFlare = {0102:0} used\nFusion Flare!
+Bank0016_Text_WildUsedFusionFlare = The wild {0102:0} used\nFusion Flare!
+Bank0016_Text_FoesUsedFusionFlare = The foe's {0102:0} used\nFusion Flare!
+Bank0016_Text_UsedFusionBolt = {0102:0} used\nFusion Bolt!
+Bank0016_Text_WildUsedFusionBolt = The wild {0102:0} used\nFusion Bolt!
+Bank0016_Text_FoesUsedFusionBolt = The foe's {0102:0} used\nFusion Bolt!
 \pad{34}

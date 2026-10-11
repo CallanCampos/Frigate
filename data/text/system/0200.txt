@@ -1,76 +1,76 @@
-Suit Actor
-Mysterious
-Angry Child: Arrggh! UFO!\nGive me back my Pokémon!
-UFO: ...
-Grieving Woman: Stop!\nDon't take my precious Pokémon!
-UFO: ...
-Annoyed Man: You stinking UFO!\nWhat are you going to do{be00}\nwith my Pokémon?!
-UFO: ...
-Captured Man: Ouch!\nHey! Let me go!{be00}\nI'm not a Pokémon!
-UFO: ...
-Whimpering Man: I beg you! Please!\nNot my dearest Pokémon!
-UFO: ...
-Shouting Woman: Enough is enough!\nCan't somebody take care of this UFO!
-UFO: ...
-Elderly Man: Augh!\nThat horrible UFO!
-UFO: ...
-Radio: Attention, attention! All points!\nDo you copy, {0100:1}?{be00}\nReport on the situation status!
-{0100:1}: Copy that!{be01}\nThe UFO has appeared again!\nThis time, it's attacking Pokémon{be00}\nwhile destroying the town!
-Radio: We copy.{be01}\nFirst people, and now Pokémon...\nWhat are they up to?
-{0100:1}: Here's the plan of action.\nI'm depending on E to lure in the{be00}\nmothership with her decoy UFO!
-Radio: We copy.\nOne question, {0100:1}...{be01}\nThe person who identified herself as E...\nCan we trust her?
-{0100:1}: I...don't have an answer.{be01}\nBut since our understanding of the UFO is so\nlimited, we have to go with what we've got.{be01}\nE is certainly mysterious. I suspect...\nBut we have to depend on her right now.
-Radio: C-copy that, {0100:1}.{be01}\nFor now, we'll just have to trust her and\nhope you both succeed!{be01}\nWe are ready to commence the decoy plan.
-{0100:1}: Ready and waiting!
-Fleeing Citizen: Quick, run!\nYou'll be done if the UFO catches you!
-UFO: ...
-{0100:1}: Ugh!\nWhy hasn't E contacted me?
-Radio: ...I heard you.\n{0100:1}, is everything prepared?
-{0100:1}: Is that you, E?\nWhat's your situation?
-Radio: I'll be arriving with the\ndecoy UFO momentarily. But...{be01}\nThere are more people around\nthan I bargained for.{be00}\nNot as many ran away as I expected...{be01}\nIf I meet you there and the mothership\nappears, all those people will be in danger.
-{0100:1}: Oh no!\nIs there anything we can do?
-Radio: I think not.{be01}\nFocus on the mission, not the people.{be01}\nThe mission's success is what's important.\nWe have to accept some collateral damage.
-{0100:1}: Is that so...?
-Radio: ...{be01}\nForget it. I don't expect you to understand\nthe importance of my mission...{be01}\nI'm approaching your position. Get ready!
-{0100:1}: Whatever...
-Radio: Try to understand this, at least.{be01}\nYou can't snap your fingers and change the\nfundamental principles of the universe.{be01}\nWhatever happens, happens...\naccording to the principles.
-{0100:1}: NO!!
-Radio: So emotional.{be01}\n...{be01}\nTch, tch. Do yell a bit louder!\nThat will certainly change how the{be00}\nuniverse works. Not...
-{0100:1}: You're serious--
-Radio: I am completely serious.{be01}\nI will do whatever I have to do.\nNo more, no less.
-{0100:1}: Yay!\nThe UFO is retreating!
-UFO: ...
-Radio: {0100:1}...\nCan you hear me? It's me.
-{0100:1}: E, it's you!\nWe succeeded in protecting everyone{be00}\nfrom the UFO!{be01}\nWhat's your situation?
-Radio: Good news, {0100:1}.{be01}\nJust as I planned, the mothership\nwill soon be landing.
-{0100:1}: The moment we've been\nwaiting for...
-Radio: Ah ha ha ha...{be01}\nWhen the mothership lands, the UFOs'\npower will be amplified many times over.{be01}\nIt will be much easier to exterminate\nthe remaining human beings, too...
-{0100:1}: E.\nWhat...what are you saying?!
-Radio: Don't you get it?\nPoor, silly human...{be01}\nYou've been deceived.
-{0100:1}: ...Human?{be01}\nE...\nWhat in the world are you?
-With the success of the decoy plan,\nthe landing of the mothership,{be00}\nand E's revelation...{be01}\nThe battle between humanity and the UFOs\nnow reaches the final act...{be00}\nAnd the stakes are nothing less than{be00}\nthe future of humanity!
-{0100:1}: Things have gone south.\nMy Pokémon are exhausted.{be01}\nIf this continues, you can forget about\nthe mission!
-Radio: {0100:1}.\nIt's me, E.
-{0100:1}: E!
-Radio: {0100:1}...\nWhat's your situation like?
-{0100:1}: It's bad!\nIf things stay like this,{be00}\nI'll be finished, too!{be01}\nI'm sorry to have to ask, but will you\ncancel the mission and come and rescue me?
-Radio: ...\nI'm sorry, but that's not possible.{be01}\nI was detected by a UFO, and\nthe decoy UFO was attacked...{be00}\nDon't think I...can hold on...much longer...
-{0100:1}: Oh no!
-Radio: Sorry...{be01}\nThe decoy plan was a failure...{be01}\nYou must...{be01}\nGet away...from there...quickly...{be01}\n...
-The decoy UFO was destroyed,\nand E's energy was completely depleted.{be01}\nWith the failure of the decoy plan,\nhumanity lost its battle against the UFOs...{be01}\nAnd the future of humanity reached its\nultimate end...
-Radio: {0100:1}...\nIt's me, E.
-{0100:1}: It's you, E...{be01}\nS-sorry...\nI...can't move...anymore...
-Radio: I understand.{be01}\nThen...\nI'll carry out the rest of my plan alone.{be01}\nWe'll soon see the mothership in the sky...{be01}\nBut, with only my power, we have no chance.\nI'll get inside the decoy UFO, and when{be00}\nthe mothership takes it on board,{be00}\nI'll blow up the decoy UFO and destroy{be00}\nthe mothership from the inside...
-{0100:1}: You're crazy!\nIt will never work!
-Radio: I know.\nBut it's our only hope.
-{0100:1}: But, E, how will you get away?
-Radio: If I put the decoy UFO on autopilot,\nit will be shot down easily by convoy UFOs.{be01}\nI must stay in control of the decoy UFO\nand take it into the mothership myself.{be01}\n...{be01}\nFarewell, {0100:1}.
-{0100:1}: No! E...
-And so, E took over {0100:1}'s mission\nand piloted the decoy UFO into the heart{be00}\nof the mothership.{be01}\nThe explosion--too distant to be heard...{be01}\nDebris from the mothership tumbled\nto the ground.{be00}\n...And all the UFOs vanished from the sky.{be01}\nWith humanity's battle won, people rejoiced.{be01}\nBut... Forever absent from the celebration\nwas the mysterious woman...known as E.
-Child: Waaaaugh!\nMy Pokémon!
-{0100:1}: Oh no...\nI didn't know it was a citizen's Pokémon{be00}\ncaptured by the UFO...
-Child: What have you done!\nYou're from the UFO, aren't you?{be00}\nHorrible alien!
-{0100:1}: No! No!\nI didn't mean to!
-UFO: ...!!
-{0100:1}: Argh!
-A simple mistake by {0100:1} that\nhurt a citizen's Pokémon...{be01}\nIn his shock and dismay, he was vulnerable.\nThe UFOs did not hesitate to strike!{be01}\nWith {0100:1} defeated,\nthe decoy plan failed...{be01}\nHumanity lost its battle against the UFOs...{be01}\nAnd the future of humanity reached its\nultimate end...
+Bank0200_Text_SuitActor = Suit Actor
+Bank0200_Text_Mysterious = Mysterious
+Bank0200_Text_AngryChildArrgghUfo = Angry Child: Arrggh! UFO!\nGive me back my Pokémon!
+Bank0200_Text_Ufo = UFO: ...
+Bank0200_Text_GrievingWomanStopDont = Grieving Woman: Stop!\nDon't take my precious Pokémon!
+Bank0200_Text_Ufo_2 = UFO: ...
+Bank0200_Text_AnnoyedManStinkingUfo = Annoyed Man: You stinking UFO!\nWhat are you going to do{be00}\nwith my Pokémon?!
+Bank0200_Text_Ufo_3 = UFO: ...
+Bank0200_Text_CapturedManOuchHey = Captured Man: Ouch!\nHey! Let me go!{be00}\nI'm not a Pokémon!
+Bank0200_Text_Ufo_4 = UFO: ...
+Bank0200_Text_WhimperingManBegPlease = Whimpering Man: I beg you! Please!\nNot my dearest Pokémon!
+Bank0200_Text_Ufo_5 = UFO: ...
+Bank0200_Text_ShoutingWomanEnoughEnough = Shouting Woman: Enough is enough!\nCan't somebody take care of this UFO!
+Bank0200_Text_Ufo_6 = UFO: ...
+Bank0200_Text_ElderlyManAughHorrible = Elderly Man: Augh!\nThat horrible UFO!
+Bank0200_Text_Ufo_7 = UFO: ...
+Bank0200_Text_RadioAttentionAttentionAll = Radio: Attention, attention! All points!\nDo you copy, {0100:1}?{be00}\nReport on the situation status!
+Bank0200_Text_CopyUfoHasAppeared = {0100:1}: Copy that!{be01}\nThe UFO has appeared again!\nThis time, it's attacking Pokémon{be00}\nwhile destroying the town!
+Bank0200_Text_RadioWeCopyFirst = Radio: We copy.{be01}\nFirst people, and now Pokémon...\nWhat are they up to?
+Bank0200_Text_HeresPlanActionIm = {0100:1}: Here's the plan of action.\nI'm depending on E to lure in the{be00}\nmothership with her decoy UFO!
+Bank0200_Text_RadioWeCopyOne = Radio: We copy.\nOne question, {0100:1}...{be01}\nThe person who identified herself as E...\nCan we trust her?
+Bank0200_Text_DontHaveAnswerBut = {0100:1}: I...don't have an answer.{be01}\nBut since our understanding of the UFO is so\nlimited, we have to go with what we've got.{be01}\nE is certainly mysterious. I suspect...\nBut we have to depend on her right now.
+Bank0200_Text_RadioCCopyNow = Radio: C-copy that, {0100:1}.{be01}\nFor now, we'll just have to trust her and\nhope you both succeed!{be01}\nWe are ready to commence the decoy plan.
+Bank0200_Text_ReadyWaiting = {0100:1}: Ready and waiting!
+Bank0200_Text_FleeingCitizenQuickRun = Fleeing Citizen: Quick, run!\nYou'll be done if the UFO catches you!
+Bank0200_Text_Ufo_8 = UFO: ...
+Bank0200_Text_UghWhyHasntE = {0100:1}: Ugh!\nWhy hasn't E contacted me?
+Bank0200_Text_RadioHeardEverythingPrepared = Radio: ...I heard you.\n{0100:1}, is everything prepared?
+Bank0200_Text_EWhatsSituation = {0100:1}: Is that you, E?\nWhat's your situation?
+Bank0200_Text_RadioIllArrivingDecoy = Radio: I'll be arriving with the\ndecoy UFO momentarily. But...{be01}\nThere are more people around\nthan I bargained for.{be00}\nNot as many ran away as I expected...{be01}\nIf I meet you there and the mothership\nappears, all those people will be in danger.
+Bank0200_Text_OhNoThereAnything = {0100:1}: Oh no!\nIs there anything we can do?
+Bank0200_Text_RadioThinkNotFocus = Radio: I think not.{be01}\nFocus on the mission, not the people.{be01}\nThe mission's success is what's important.\nWe have to accept some collateral damage.
+Bank0200_Text_IsThatSo = {0100:1}: Is that so...?
+Bank0200_Text_RadioForgetDontExpect = Radio: ...{be01}\nForget it. I don't expect you to understand\nthe importance of my mission...{be01}\nI'm approaching your position. Get ready!
+Bank0200_Text_Whatever = {0100:1}: Whatever...
+Bank0200_Text_RadioTryUnderstandLeast = Radio: Try to understand this, at least.{be01}\nYou can't snap your fingers and change the\nfundamental principles of the universe.{be01}\nWhatever happens, happens...\naccording to the principles.
+Bank0200_Text_No = {0100:1}: NO!!
+Bank0200_Text_RadioEmotionalTchTch = Radio: So emotional.{be01}\n...{be01}\nTch, tch. Do yell a bit louder!\nThat will certainly change how the{be00}\nuniverse works. Not...
+Bank0200_Text_YoureSerious = {0100:1}: You're serious--
+Bank0200_Text_RadioAmCompletelySerious = Radio: I am completely serious.{be01}\nI will do whatever I have to do.\nNo more, no less.
+Bank0200_Text_YayUfoRetreating = {0100:1}: Yay!\nThe UFO is retreating!
+Bank0200_Text_Ufo_9 = UFO: ...
+Bank0200_Text_RadioCanHearIts = Radio: {0100:1}...\nCan you hear me? It's me.
+Bank0200_Text_EItsWeSucceeded = {0100:1}: E, it's you!\nWe succeeded in protecting everyone{be00}\nfrom the UFO!{be01}\nWhat's your situation?
+Bank0200_Text_RadioGoodNewsJust = Radio: Good news, {0100:1}.{be01}\nJust as I planned, the mothership\nwill soon be landing.
+Bank0200_Text_MomentWeveBeenWaiting = {0100:1}: The moment we've been\nwaiting for...
+Bank0200_Text_RadioAhHaHa = Radio: Ah ha ha ha...{be01}\nWhen the mothership lands, the UFOs'\npower will be amplified many times over.{be01}\nIt will be much easier to exterminate\nthe remaining human beings, too...
+Bank0200_Text_EWhatWhatSaying = {0100:1}: E.\nWhat...what are you saying?!
+Bank0200_Text_RadioDontGetPoor = Radio: Don't you get it?\nPoor, silly human...{be01}\nYou've been deceived.
+Bank0200_Text_HumanEWhatWorld = {0100:1}: ...Human?{be01}\nE...\nWhat in the world are you?
+Bank0200_Text_SuccessDecoyPlanLanding = With the success of the decoy plan,\nthe landing of the mothership,{be00}\nand E's revelation...{be01}\nThe battle between humanity and the UFOs\nnow reaches the final act...{be00}\nAnd the stakes are nothing less than{be00}\nthe future of humanity!
+Bank0200_Text_ThingsHaveGoneSouth = {0100:1}: Things have gone south.\nMy Pokémon are exhausted.{be01}\nIf this continues, you can forget about\nthe mission!
+Bank0200_Text_RadioItsE = Radio: {0100:1}.\nIt's me, E.
+Bank0200_Text_E = {0100:1}: E!
+Bank0200_Text_RadioWhatsSituationLike = Radio: {0100:1}...\nWhat's your situation like?
+Bank0200_Text_ItsBadIfThings = {0100:1}: It's bad!\nIf things stay like this,{be00}\nI'll be finished, too!{be01}\nI'm sorry to have to ask, but will you\ncancel the mission and come and rescue me?
+Bank0200_Text_RadioImSorryBut = Radio: ...\nI'm sorry, but that's not possible.{be01}\nI was detected by a UFO, and\nthe decoy UFO was attacked...{be00}\nDon't think I...can hold on...much longer...
+Bank0200_Text_OhNo = {0100:1}: Oh no!
+Bank0200_Text_RadioSorryDecoyPlan = Radio: Sorry...{be01}\nThe decoy plan was a failure...{be01}\nYou must...{be01}\nGet away...from there...quickly...{be01}\n...
+Bank0200_Text_DecoyUfoDestroyedEs = The decoy UFO was destroyed,\nand E's energy was completely depleted.{be01}\nWith the failure of the decoy plan,\nhumanity lost its battle against the UFOs...{be01}\nAnd the future of humanity reached its\nultimate end...
+Bank0200_Text_RadioItsE_2 = Radio: {0100:1}...\nIt's me, E.
+Bank0200_Text_ItsESSorry = {0100:1}: It's you, E...{be01}\nS-sorry...\nI...can't move...anymore...
+Bank0200_Text_RadioUnderstandThenIll = Radio: I understand.{be01}\nThen...\nI'll carry out the rest of my plan alone.{be01}\nWe'll soon see the mothership in the sky...{be01}\nBut, with only my power, we have no chance.\nI'll get inside the decoy UFO, and when{be00}\nthe mothership takes it on board,{be00}\nI'll blow up the decoy UFO and destroy{be00}\nthe mothership from the inside...
+Bank0200_Text_YoureCrazyWillNever = {0100:1}: You're crazy!\nIt will never work!
+Bank0200_Text_RadioKnowButIts = Radio: I know.\nBut it's our only hope.
+Bank0200_Text_ButEHowWill = {0100:1}: But, E, how will you get away?
+Bank0200_Text_RadioIfPutDecoy = Radio: If I put the decoy UFO on autopilot,\nit will be shot down easily by convoy UFOs.{be01}\nI must stay in control of the decoy UFO\nand take it into the mothership myself.{be01}\n...{be01}\nFarewell, {0100:1}.
+Bank0200_Text_NoE = {0100:1}: No! E...
+Bank0200_Text_ETookOverS = And so, E took over {0100:1}'s mission\nand piloted the decoy UFO into the heart{be00}\nof the mothership.{be01}\nThe explosion--too distant to be heard...{be01}\nDebris from the mothership tumbled\nto the ground.{be00}\n...And all the UFOs vanished from the sky.{be01}\nWith humanity's battle won, people rejoiced.{be01}\nBut... Forever absent from the celebration\nwas the mysterious woman...known as E.
+Bank0200_Text_ChildWaaaaughPokemon = Child: Waaaaugh!\nMy Pokémon!
+Bank0200_Text_OhNoDidntKnow = {0100:1}: Oh no...\nI didn't know it was a citizen's Pokémon{be00}\ncaptured by the UFO...
+Bank0200_Text_ChildWhatHaveDone = Child: What have you done!\nYou're from the UFO, aren't you?{be00}\nHorrible alien!
+Bank0200_Text_NoNoDidntMean = {0100:1}: No! No!\nI didn't mean to!
+Bank0200_Text_Ufo_10 = UFO: ...!!
+Bank0200_Text_Argh = {0100:1}: Argh!
+Bank0200_Text_SimpleMistakeByHurt = A simple mistake by {0100:1} that\nhurt a citizen's Pokémon...{be01}\nIn his shock and dismay, he was vulnerable.\nThe UFOs did not hesitate to strike!{be01}\nWith {0100:1} defeated,\nthe decoy plan failed...{be01}\nHumanity lost its battle against the UFOs...{be01}\nAnd the future of humanity reached its\nultimate end...

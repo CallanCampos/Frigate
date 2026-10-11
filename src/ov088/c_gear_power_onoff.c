@@ -1,5 +1,6 @@
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/c_gear_power_onoff.h"
 #include "field/subscreen.h"
 #include "gfl/arc.h"
@@ -174,7 +175,7 @@ void CGearPowerOnOff_Update(CGearPowerOnOff *work, BOOL active) {
 static void CGearPowerOnOff_Init(CGearPowerOnOff *work, HeapID heapId) {
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     func_020232d8();
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 25, heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_S019A_CGEAR_CONTROL_WARNING, heapId);
     work->printQueue = func_02021998(heapId);
     CGearPowerOnOff_InitBG(work, heapId);
     CGearPowerOnOff_CreateMenuRes(work, heapId);

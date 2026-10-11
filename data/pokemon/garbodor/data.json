@@ -1,0 +1,127 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Garbodor",
+    "pokedex": {
+        "category": "Trash Heap Pokémon",
+        "entry": "Consuming garbage makes\nnew kinds of poison gases\nand liquids inside their bodies.",
+        "height": "6'03\"",
+        "weight": "236.6 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ゴミすてばポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 95,
+        "defense": 82,
+        "speed": 75,
+        "special_attack": 60,
+        "special_defense": 82
+    },
+    "types": [ "TYPE_POISON", "TYPE_POISON" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_BLACK_SLUDGE",
+        "rare": "ITEM_NUGGET",
+        "very_rare": "ITEM_BIG_NUGGET"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_STENCH", "ABILITY_WEAK_ARMOR" ],
+    "hidden_ability": "ABILITY_AFTERMATH",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 166,
+    "height": 19,
+    "weight": 1073,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POUND" ],
+            [ 1, "MOVE_POISON_GAS" ],
+            [ 1, "MOVE_RECYCLE" ],
+            [ 1, "MOVE_TOXIC_SPIKES" ],
+            [ 3, "MOVE_RECYCLE" ],
+            [ 7, "MOVE_TOXIC_SPIKES" ],
+            [ 12, "MOVE_ACID_SPRAY" ],
+            [ 14, "MOVE_DOUBLE_SLAP" ],
+            [ 18, "MOVE_SLUDGE" ],
+            [ 23, "MOVE_STOCKPILE" ],
+            [ 23, "MOVE_SWALLOW" ],
+            [ 25, "MOVE_BODY_SLAM" ],
+            [ 29, "MOVE_SLUDGE_BOMB" ],
+            [ 34, "MOVE_CLEAR_SMOG" ],
+            [ 39, "MOVE_TOXIC" ],
+            [ 46, "MOVE_AMNESIA" ],
+            [ 54, "MOVE_GUNK_SHOT" ],
+            [ 59, "MOVE_EXPLOSION" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM23",
+            "TM24",
+            "TM27",
+            "TM29",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM64",
+            "TM66",
+            "TM68",
+            "TM69",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_DARK_PULSE",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_SPITE",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 106,
+    "baby_species": "SPECIES_TRUBBISH"
+}

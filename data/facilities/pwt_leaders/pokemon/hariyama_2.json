@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_HARIYAMA",
+    "moves": [ "MOVE_REVERSAL", "MOVE_BULLET_PUNCH", "MOVE_DETECT", "MOVE_BELLY_DRUM" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_CUSTAP_BERRY",
+    "form": 0
+}

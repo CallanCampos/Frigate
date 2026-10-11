@@ -1,21 +1,21 @@
-{bd02}Ace Trainer Barbara\n{bd02}was admired and popular.
-{bd02}{0100:1} had summoned up his courage\n{bd02}and professed his love to her.
-{bd02}But Barbara calmly\n{bd02}sent out her Pokémon\n{bd02}and started a battle...
-{bd02}Almost as if she was testing\n{bd02}{0100:1}...
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}Ace Trainer Camilo\n{bd02}was admired and popular.
-{bd02}{0100:1} had summoned up her courage\n{bd02}and professed her love to him.
-{bd02}But Camilo calmly\n{bd02}sent out his Pokémon\n{bd02}and started a battle...
-{bd02}Almost as if he was testing\n{bd02}{0100:1}...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0286_Text_AceTrainerBarbaraAdmired = {bd02}Ace Trainer Barbara\n{bd02}was admired and popular.
+Bank0286_Text_HadSummonedUpHis = {bd02}{0100:1} had summoned up his courage\n{bd02}and professed his love to her.
+Bank0286_Text_ButBarbaraCalmlySent = {bd02}But Barbara calmly\n{bd02}sent out her Pokémon\n{bd02}and started a battle...
+Bank0286_Text_AlmostIfSheTesting = {bd02}Almost as if she was testing\n{bd02}{0100:1}...
+Bank0286_Text_Empty = なし
+Bank0286_Text_Empty_2 = なし
+Bank0286_Text_Empty_3 = なし
+Bank0286_Text_Empty_4 = なし
+Bank0286_Text_Empty_5 = なし
+Bank0286_Text_Empty_6 = なし
+Bank0286_Text_AceTrainerCamiloAdmired = {bd02}Ace Trainer Camilo\n{bd02}was admired and popular.
+Bank0286_Text_HadSummonedUpHer = {bd02}{0100:1} had summoned up her courage\n{bd02}and professed her love to him.
+Bank0286_Text_ButCamiloCalmlySent = {bd02}But Camilo calmly\n{bd02}sent out his Pokémon\n{bd02}and started a battle...
+Bank0286_Text_AlmostIfHeTesting = {bd02}Almost as if he was testing\n{bd02}{0100:1}...
+Bank0286_Text_Empty_7 = なし
+Bank0286_Text_Empty_8 = なし
+Bank0286_Text_Empty_9 = なし
+Bank0286_Text_Empty_10 = なし
+Bank0286_Text_Empty_11 = なし
+Bank0286_Text_Empty_12 = なし
+Bank0286_Text_Empty_13 = なし

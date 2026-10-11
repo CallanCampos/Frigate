@@ -2,6 +2,7 @@
 // and out. The name is the ROM's own, from GFL_HeapAllocate's file argument
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_menu.h"
 #include "field/player_state.h"
@@ -508,7 +509,7 @@ static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
     FieldMenuItemSetup setup;
     FieldMenuName name;
     FieldMenuName noName = {{'N', 'o', 'N', 'a', 'm', 'e', 0xffff}};
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, 0x26, menu->tmpHeapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOAD_FIELD_MENU_TEXTS, menu->tmpHeapId);
     const u32 *items;
     u8 i;
 

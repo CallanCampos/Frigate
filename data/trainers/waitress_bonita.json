@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Bonita",
+    "class": "TRAINER_CLASS_WAITRESS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_MOOMOO_MILK",
+    "party": [
+        {
+            "species": "SPECIES_PSYDUCK",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LEAFEON",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Cheering makes us\nthirsty. Right?{be01}\nIf you can win against me,\nI'll give you a drink!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The battle made me\neven thirstier!"
+        },
+        {
+            "type": 15,
+            "text": "Here you are.\nI will give you something good!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "At a place like this,\nit's good to drink a lot of water!"
+        }
+    ]
+}

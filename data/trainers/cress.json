@@ -1,0 +1,49 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cress",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_CRESS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 0,
+            "level": 65,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_MUSCLE_BAND",
+            "moves": [ "MOVE_AQUA_TAIL", "MOVE_DOUBLE_EDGE", "MOVE_ICE_BEAM", "MOVE_SWAGGER" ]
+        },
+        {
+            "species": "SPECIES_SLOWKING",
+            "form": 0,
+            "level": 65,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_LEFTOVERS",
+            "moves": [ "MOVE_SCALD", "MOVE_PSYCHIC", "MOVE_FLAMETHROWER", "MOVE_CALM_MIND" ]
+        },
+        {
+            "species": "SPECIES_SIMIPOUR",
+            "form": 0,
+            "level": 67,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_LIFE_ORB",
+            "moves": [ "MOVE_SCALD", "MOVE_ICE_BEAM", "MOVE_CRUNCH", "MOVE_WORK_UP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Cress: Lose? Me?\nI don't believe this!"
+        }
+    ]
+}

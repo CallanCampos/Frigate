@@ -1,0 +1,176 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Ampharos",
+    "pokedex": {
+        "category": "Light Pokémon",
+        "entry": "The tip of its tail shines so brightly it\ncan be used to send sea-navigation\nbeacons to distant foreign shores.",
+        "height": "4'07\"",
+        "weight": "135.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Ampharos",
+                "category": "Light Pokémon",
+                "entry": "The tip of its tail shines brightly.\nIn the olden days, people sent\nsignals using the tail's light.",
+                "height": "4'07\"",
+                "weight": "135.6 lbs."
+            },
+            "fr": {
+                "name": "Pharamp",
+                "category": "Pokémon Lumière",
+                "entry": "Le bout de sa queue brille avec\nintensité. Jadis, on s'en servait\npour envoyer des signaux.",
+                "height": "1,4 m",
+                "weight": "61,5 kg"
+            },
+            "de": {
+                "name": "Ampharos",
+                "category": "Leuchte",
+                "entry": "Seine Schweifspitze leuchtet hell.\nIn alten Zeiten hat man mit seiner\nHilfe Lichtsignale gegeben.",
+                "height": "1,4 m",
+                "weight": "61,5 kg"
+            },
+            "it": {
+                "name": "Ampharos",
+                "category": "Pokémon Luce",
+                "entry": "La punta della sua coda brilla. In\npassato, le persone si inviavano\nsegnali usando la luce della coda.",
+                "height": "1,4 m",
+                "weight": "61,5 kg"
+            },
+            "ko": {
+                "name": "전룡",
+                "category": "라이트포켓몬",
+                "entry": "꼬리 끝에 빛이 반짝인다.\n옛날 사람들은 이 불빛을\n써서 신호를 주고받았다.",
+                "height": "1.4 m",
+                "weight": "61.5 kg"
+            },
+            "es": {
+                "name": "Ampharos",
+                "category": "Pokémon Luz",
+                "entry": "La punta de su cola brilla. Antiguamente\nla gente enviaba señales con ella.",
+                "height": "1,4 m",
+                "weight": "61,5 kg"
+            },
+            "ja": {
+                "name": "デンリュウ",
+                "category": "ライトポケモン",
+                "entry": "しっぽの\\x{3000}さきが\\x{3000}ひかりかがやく。\nむかしの\\x{3000}ひとたちは\\x{3000}その\\x{3000}あかりを\nつかって\\x{3000}あいずを\\x{3000}おくりあった。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 75,
+        "defense": 75,
+        "speed": 55,
+        "special_attack": 115,
+        "special_defense": 90
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 3,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_STATIC", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_PLUS",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 225,
+    "height": 14,
+    "weight": 615,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_FIRE_PUNCH" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_THUNDER_WAVE" ],
+            [ 1, "MOVE_THUNDER_SHOCK" ],
+            [ 4, "MOVE_THUNDER_WAVE" ],
+            [ 8, "MOVE_THUNDER_SHOCK" ],
+            [ 11, "MOVE_COTTON_SPORE" ],
+            [ 16, "MOVE_CHARGE" ],
+            [ 20, "MOVE_TAKE_DOWN" ],
+            [ 25, "MOVE_ELECTRO_BALL" ],
+            [ 29, "MOVE_CONFUSE_RAY" ],
+            [ 30, "MOVE_THUNDER_PUNCH" ],
+            [ 35, "MOVE_POWER_GEM" ],
+            [ 40, "MOVE_DISCHARGE" ],
+            [ 46, "MOVE_COTTON_GUARD" ],
+            [ 51, "MOVE_SIGNAL_BEAM" ],
+            [ 57, "MOVE_LIGHT_SCREEN" ],
+            [ 62, "MOVE_THUNDER" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM31",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM52",
+            "TM56",
+            "TM57",
+            "TM68",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM78",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_AFTER_YOU",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 27,
+    "baby_species": "SPECIES_MAREEP"
+}

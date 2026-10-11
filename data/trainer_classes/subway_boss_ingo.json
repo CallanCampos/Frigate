@@ -1,0 +1,5 @@
+{
+    "$schema": "trainer_class.schema.json",
+    "name": "Subway Boss",
+    "name_with_article": "a Subway Boss"
+}

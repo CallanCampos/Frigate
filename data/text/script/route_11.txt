@@ -1,0 +1,5 @@
+Route11_Text_Kikwaaaa = Kikwaaaa!
+Route11_Text_VirizionRanOffDown = Virizion ran off\ndown the road and vanished...
+Route11_Text_Route11 = Route 11
+Route11_Text_VillageBridgeAhead = Village Bridge Ahead
+\pad{a8}

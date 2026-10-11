@@ -1,0 +1,183 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Magby",
+    "pokedex": {
+        "category": "Live Coal Pokémon",
+        "entry": "It's small, but its body temperature\nis over 1,100 degrees F. Embers escape\nits mouth and nose when it breathes.",
+        "height": "2'04\"",
+        "weight": "47.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Magby",
+                "category": "Live Coal Pokémon",
+                "entry": "Its magma-like blood circulates\nthroughout its body. Its body's\nheat can top 1,100 degrees F.",
+                "height": "2'04\"",
+                "weight": "47.2 lbs."
+            },
+            "fr": {
+                "name": "Magby",
+                "category": "Pokémon Charbon",
+                "entry": "Son sang est chaud comme du magma\net la température de son corps\npeut atteindre 600 °C.",
+                "height": "0,7 m",
+                "weight": "21,4 kg"
+            },
+            "de": {
+                "name": "Magby",
+                "category": "Glutherd",
+                "entry": "Durch seinen Körper fließt\nmagmaartiges Blut. Die Körpertemperatur\nkann auf ca. 600 Grad steigen.",
+                "height": "0,7 m",
+                "weight": "21,4 kg"
+            },
+            "it": {
+                "name": "Magby",
+                "category": "Pokémon Carbonvivo",
+                "entry": "Il suo sangue assomiglia al magma.\nLa sua temperatura corporea raggiunge\ni 600°C.",
+                "height": "0,7 m",
+                "weight": "21,4 kg"
+            },
+            "ko": {
+                "name": "마그비",
+                "category": "불씨포켓몬",
+                "entry": "마그마 같은 혈액이\n체내에 흐르고 있기 때문에\n체온은 600도나 된다.",
+                "height": "0.7 m",
+                "weight": "21.4 kg"
+            },
+            "es": {
+                "name": "Magby",
+                "category": "Pokémon Ascuas",
+                "entry": "Su sangre es como magma y su\ntemperatura corporal puede\nalcanzar los 600°.",
+                "height": "0,7 m",
+                "weight": "21,4 kg"
+            },
+            "ja": {
+                "name": "ブビィ",
+                "category": "ひだねポケモン",
+                "entry": "マグマのような\\x{3000}けつえきが\nたいないに\\x{3000}ながれているため\nたいおんは\\x{3000}\\x{ff16}\\x{ff10}\\x{ff10}どにも\\x{3000}なる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff11}\\x{ff0e}\\x{ff14}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 75,
+        "defense": 37,
+        "speed": 83,
+        "special_attack": 70,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_FLAME_BODY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_VITAL_SPIRIT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 73,
+    "height": 7,
+    "weight": 214,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SMOG" ],
+            [ 1, "MOVE_LEER" ],
+            [ 5, "MOVE_EMBER" ],
+            [ 8, "MOVE_SMOKE_SCREEN" ],
+            [ 12, "MOVE_FAINT_ATTACK" ],
+            [ 15, "MOVE_FIRE_SPIN" ],
+            [ 19, "MOVE_CLEAR_SMOG" ],
+            [ 22, "MOVE_FLAME_BURST" ],
+            [ 26, "MOVE_CONFUSE_RAY" ],
+            [ 29, "MOVE_FIRE_PUNCH" ],
+            [ 33, "MOVE_LAVA_PLUME" ],
+            [ 36, "MOVE_SUNNY_DAY" ],
+            [ 40, "MOVE_FLAMETHROWER" ],
+            [ 43, "MOVE_FIRE_BLAST" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM50",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM87",
+            "TM90",
+            "TM94"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_DUAL_CHOP",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_KARATE_CHOP",
+            "MOVE_MEGA_PUNCH",
+            "MOVE_BARRIER",
+            "MOVE_SCREECH",
+            "MOVE_CROSS_CHOP",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_MACH_PUNCH",
+            "MOVE_DYNAMIC_PUNCH",
+            "MOVE_FLARE_BLITZ",
+            "MOVE_BELLY_DRUM",
+            "MOVE_IRON_TAIL",
+            "MOVE_FOCUS_ENERGY"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_MAGMAR"
+        }
+    ],
+    "regional_dex_number": 53,
+    "baby_species": "SPECIES_MAGBY"
+}

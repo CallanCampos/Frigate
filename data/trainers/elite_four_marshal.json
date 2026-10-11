@@ -1,0 +1,71 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Marshal",
+    "class": "TRAINER_CLASS_ELITE_FOUR_MARSHAL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_THROH",
+            "form": 0,
+            "level": 56,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_STORM_THROW", "MOVE_BULLDOZE", "MOVE_ROCK_TOMB", "MOVE_PAYBACK" ]
+        },
+        {
+            "species": "SPECIES_SAWK",
+            "form": 0,
+            "level": 56,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_BRICK_BREAK", "MOVE_RETALIATE", "MOVE_ROCK_SLIDE", "MOVE_PAYBACK" ]
+        },
+        {
+            "species": "SPECIES_MIENSHAO",
+            "form": 0,
+            "level": 56,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_HI_JUMP_KICK", "MOVE_U_TURN", "MOVE_BOUNCE", "MOVE_RETALIATE" ]
+        },
+        {
+            "species": "SPECIES_CONKELDURR",
+            "form": 0,
+            "level": 58,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_HAMMER_ARM", "MOVE_BULK_UP", "MOVE_STONE_EDGE", "MOVE_RETALIATE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "I can feel it!\nYou and your Pokémon are strong!"
+        },
+        {
+            "type": 19,
+            "text": "This is my final Pokémon!\nIt all comes down to this!"
+        },
+        {
+            "type": 20,
+            "text": "Everything comes down to this next move!\nI'll use the last bit of my strength!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "There is no single strongest Pokémon\nor sole best combination...{be01}\nThat's why it is difficult\nto keep winning.{be01}\nHowever, I think a heart that desires\nstrength and strives to grow{be00}\nstronger is a precious ideal.{be01}\nThat is why I respect you--\nbecause you have these things."
+        }
+    ]
+}

@@ -1,0 +1,4 @@
+DriftveilCity10_Text_IllGiveIllGive = I'll give this to you!\nI'll give you the item Air Balloon!{be01}
+DriftveilCity10_Text_PokemonWhoHasAir = A Pokémon who has an Air Balloon\ncan float!{be01}\nUntil it gets hurt, it can avoid\nGround-type moves.{be01}\nYes!\nI'm a balloon man!
+DriftveilCity10_Text_BalloonBalloonBalloonXtransceiver = Balloon! Balloon! Balloon!\nXtransceiver minigames!{be01}\nMy elegant hobby is\nminigames on the Xtransceiver!
+\pad{94}

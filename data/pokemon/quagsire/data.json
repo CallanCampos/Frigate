@@ -1,0 +1,177 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Quagsire",
+    "pokedex": {
+        "category": "Water Fish Pokémon",
+        "entry": "It has an easygoing nature. It\ndoesn't care if it bumps its head on\nboats and boulders while swimming.",
+        "height": "4'07\"",
+        "weight": "165.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Quagsire",
+                "category": "Water Fish Pokémon",
+                "entry": "It has an easygoing nature. It\ndoesn't care if it bumps its head on\nboats and boulders while swimming.",
+                "height": "4'07\"",
+                "weight": "165.3 lbs."
+            },
+            "fr": {
+                "name": "Maraiste",
+                "category": "Pokémon Poisson",
+                "entry": "De nature placide, il a tendance à\nse cogner la tête contre les récifs\net autres bateaux de passage.",
+                "height": "1,4 m",
+                "weight": "75,0 kg"
+            },
+            "de": {
+                "name": "Morlord",
+                "category": "Fisch",
+                "entry": "Es ist sehr unbekümmert und stört\nsich nicht daran, wenn es während\ndes Schwimmens an etwas stößt.",
+                "height": "1,4 m",
+                "weight": "75,0 kg"
+            },
+            "it": {
+                "name": "Quagsire",
+                "category": "Pokémon Acquapesce",
+                "entry": "È molto tranquillo per natura. Non\nsi scompone se nuotando sbatte\nla testa contro barche e scogli.",
+                "height": "1,4 m",
+                "weight": "75,0 kg"
+            },
+            "ko": {
+                "name": "누오",
+                "category": "수어포켓몬",
+                "entry": "배의 밑바닥이나 물가의 바위에\n머리를 부딪쳐도 신경 쓰지 않고\n헤엄치는 무사태평한 포켓몬이다.",
+                "height": "1.4 m",
+                "weight": "75.0 kg"
+            },
+            "es": {
+                "name": "Quagsire",
+                "category": "Pokémon Pez Agua",
+                "entry": "Es de naturaleza sencilla. Cuando\nnada, se choca de cabeza contra\nbarcos o rocas y no le importa.",
+                "height": "1,4 m",
+                "weight": "75,0 kg"
+            },
+            "ja": {
+                "name": "ヌオー",
+                "category": "みずうおポケモン",
+                "entry": "ふなぞこや\\x{3000}かわのいわに\\x{3000}あたまを\nぶつけまくっても\\x{3000}きにせず\\x{3000}きままに\nおよいでいる\\x{3000}のんきな\\x{3000}ポケモン。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 95,
+        "attack": 85,
+        "defense": 85,
+        "speed": 35,
+        "special_attack": 65,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_WATER", "TYPE_GROUND" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_DAMP", "ABILITY_WATER_ABSORB" ],
+    "hidden_ability": "ABILITY_UNAWARE",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 151,
+    "height": 14,
+    "weight": 750,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_MUD_SPORT" ],
+            [ 5, "MOVE_MUD_SPORT" ],
+            [ 9, "MOVE_MUD_SHOT" ],
+            [ 15, "MOVE_SLAM" ],
+            [ 19, "MOVE_MUD_BOMB" ],
+            [ 24, "MOVE_AMNESIA" ],
+            [ 31, "MOVE_YAWN" ],
+            [ 36, "MOVE_EARTHQUAKE" ],
+            [ 41, "MOVE_RAIN_DANCE" ],
+            [ 48, "MOVE_MIST" ],
+            [ 48, "MOVE_HAZE" ],
+            [ 53, "MOVE_MUDDY_WATER" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM55",
+            "TM56",
+            "TM68",
+            "TM70",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_ICE_PUNCH",
+            "MOVE_EARTH_POWER",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_AFTER_YOU",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WOOPER"
+}

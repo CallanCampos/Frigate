@@ -7,6 +7,7 @@
 #include "app/pmsiv_menu.h"
 #include "app/pmsiv_tool.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -27,7 +28,7 @@
 // ours, guessed
 
 // The message file of the groups' names
-#define PMSIV_CATEGORY_MSG_FILE 158
+#define PMSIV_CATEGORY_MSG_FILE TEXT_BANK_PMS_CATEGORIES
 // The name shown for a group with no word unlocked
 #define PMSIV_CATEGORY_MSG_EMPTY 13
 

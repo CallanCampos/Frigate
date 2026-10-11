@@ -7,7 +7,9 @@
 #include "constants/field_script.h"
 #include "constants/items.h"
 #include "constants/moves.h"
+#include "constants/script_text_banks.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/event_poke_status.h"
 #include "field/field.h"
 #include "field/field_camera.h"
@@ -49,6 +51,7 @@
 #include "system/text_speed.h"
 #include "system/vm.h"
 #include "system/wordset.h"
+#include "text/script/0613.h"
 
 // The command's shop IDs past the Poké Marts', whose items are in file ID + 6 of ARCID_SHOP_ITEMS. The special marts'
 // stock grows with a level that func_02010274 keeps in the key system's data, its value 0 for 0xf7 to 0xfa and 1 for
@@ -756,13 +759,13 @@ static void ShopUI_Init(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subId)
 
 static void ShopUI_LoadCurrencyDispMsg(ShopUIWork *wk, u8 currency) {
     if (currency == SHOP_CURRENCY_SHARDS) {
-        wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 31);
+        wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Shards);
     } else if (currency == SHOP_CURRENCY_BP) {
-        wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 13);
+        wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Bp);
     } else {
-        wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 12);
+        wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Empty_4);
     }
-    wk->ownedLabel = GFL_MsgDataLoadStrbufNew(wk->msgData, 14);
+    wk->ownedLabel = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Empty_5);
 }
 
 static u32 ShopUI_GetBalance(ShopUIWork *wk) {
@@ -1041,7 +1044,7 @@ static void ShopUI_LoadPokeMartItems(ShopUIWork *wk, u32 shopId, u32 fileId, u32
     u32 file;
     int i;
 
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 64, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_NAMES, wk->heapId);
     counts = GFL_ArcSysReadHeapNew(ARCID_SHOP_ITEM_COUNTS, 0, HEAPID_TAIL(wk->heapId));
     if (shopId == SHOP_ID_BADGE_MART) {
         file = BADGE_SHOP_DAT_IDS[badges];
@@ -1072,7 +1075,7 @@ static void ShopUI_LoadPokeMartItems(ShopUIWork *wk, u32 shopId, u32 fileId, u32
 static void ShopUI_LoadBPShopItems(ShopUIWork *wk, u32 index) {
     int count;
     int i = 0;
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 64, wk->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_NAMES, wk->heapId);
     const ShopItem *items = BP_SHOP_ITEMS[index];
 
     count = BP_SHOP_ITEM_COUNTS[index];
@@ -1114,7 +1117,7 @@ static void ShopUI_LoadSpecialPokeMartItems(ShopUIWork *wk, int shopId) {
 
 static void ShopUI_LoadMoveTutorItems(ShopUIWork *wk, u32 tutor) {
     int i = 0;
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 64, wk->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_NAMES, wk->heapId);
     const MoveTutorShopItem *items = MOVE_TUTOR_SHOP_ITEMS[tutor];
     int count = MOVE_TUTOR_SHOP_ITEM_COUNTS[tutor];
 
@@ -1138,13 +1141,13 @@ static void ShopUI_FreeListMenu(ShopUIWork *wk) {
 }
 
 static u32 ShopUI_LoadMsgData(ShopUIWork *wk, u32 shopId) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 613, wk->heapId);
-    wk->itemInfoMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 63, wk->heapId);
-    wk->moveInfoMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 402, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_0613, wk->heapId);
+    wk->itemInfoMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_DESCRIPTIONS, wk->heapId);
+    wk->moveInfoMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_13, wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     wk->message = GFL_StrBufCreate(200, wk->heapId);
     wk->tcbManager = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 32, 32);
-    wk->moveLabelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 29);
+    wk->moveLabelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Empty_13);
     return shopId;
 }
 
@@ -1287,7 +1290,7 @@ static void ShopUI_SetupBmpWin(ShopUIWork *wk) {
         wk->windows[i] =
             BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette, 1);
     }
-    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, 20);
+    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Money);
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->windows[0]), 0, 0, strbuf, wk->font, PRINT_COLOR(15, 2, 15));
     GFL_StrBufFree(strbuf);
     PrintWindow_Init(&wk->printWindow, wk->windows[2]);
@@ -1316,17 +1319,17 @@ static void ShopUI_UpdateMoneyDisp(ShopUIWork *wk) {
     GFLBitmap *bitmap;
 
     if (wk->currency == SHOP_CURRENCY_SHARDS) {
-        format = GFL_MsgDataLoadStrbufNew(wk->msgData, 34);
+        format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_X_2);
         strbuf = GFL_StrBufCreate(10, wk->heapId);
         WordSetNumber(wk->wordSet, 0,
                       BagSave_GetItemCountByID(wk->bag, MOVE_TUTOR_CURRENCY_ITEMS[wk->tutorIndex], wk->heapId), 3,
                       NUM_PAD_SPACE, 1);
     } else if (wk->currency == SHOP_CURRENCY_BP) {
-        format = GFL_MsgDataLoadStrbufNew(wk->msgData, 22);
+        format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Bp_2);
         strbuf = GFL_StrBufCreate(10, wk->heapId);
         WordSetNumber(wk->wordSet, 0, func_0200e354(wk->bsubwayScore), 4, NUM_PAD_SPACE, 1);
     } else {
-        format = GFL_MsgDataLoadStrbufNew(wk->msgData, 21);
+        format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Empty_9);
         strbuf = GFL_StrBufCreate(10, wk->heapId);
         WordSetNumber(wk->wordSet, 0, getCash(wk->trainerCard), 7, NUM_PAD_SPACE, 1);
     }
@@ -1341,7 +1344,7 @@ static void ShopUI_UpdateMoneyDisp(ShopUIWork *wk) {
 
 // How many of the item the bag holds
 static void func_ov036_021ad168(ShopUIWork *wk, u16 item) {
-    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, 23);
+    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Bag);
     StrBuf *strbuf = GFL_StrBufCreate(20, wk->heapId);
     GFLBitmap *bitmap;
 
@@ -1376,7 +1379,7 @@ static void func_ov036_021ad21c(ShopUIWork *wk, u16 item) {
 }
 
 static void ShopUI_UpdateItemAmountDisp(ShopUIWork *wk, u16 amount, u32 price) {
-    StrBuf *amountFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 24);
+    StrBuf *amountFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_X);
     StrBuf *priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, SHOP_UI_CURRENCY_MSGIDS[wk->currency]);
     StrBuf *strbuf = GFL_StrBufCreate(20, wk->heapId);
     GFLBitmap *bitmap = BmpWin_GetBitmap(wk->windows[4]);

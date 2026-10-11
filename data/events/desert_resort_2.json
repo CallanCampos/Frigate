@@ -1,0 +1,703 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 8051,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 56,
+                "y": 35,
+                "z": 24
+            }
+        },
+        {
+            "script": 8052,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 44,
+                "y": 38,
+                "z": 24
+            }
+        },
+        {
+            "script": 8053,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 55,
+                "y": 56,
+                "z": 24
+            }
+        },
+        {
+            "script": 8054,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 65,
+                "y": 65,
+                "z": 0
+            }
+        },
+        {
+            "script": 8055,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 24,
+                "y": 82,
+                "z": 0
+            }
+        },
+        {
+            "script": 8056,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 76,
+                "y": 24,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 14,
+                "y": 84,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 8,
+                "y": 72,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 22,
+                "y": 72,
+                "z": -10
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 12,
+                "y": 79,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 42,
+                "y": 84,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 39,
+                "y": 83,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 29,
+                "y": 79,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 72,
+                "y": 72,
+                "z": 24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 52,
+                "y": 76,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 36,
+                "y": 58,
+                "z": 24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 29,
+                "y": 67,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 26,
+                "y": 56,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 29,
+                "y": 41,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 27,
+                "y": 48,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 24,
+                "y": 43,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 38,
+                "y": 72,
+                "z": -24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 44,
+                "y": 72,
+                "z": -24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 44,
+                "y": 39,
+                "z": 24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 60,
+                "y": 44,
+                "z": -16
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 49,
+                "y": 51,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 83,
+            "movement": 2,
+            "type": 0,
+            "flag": 0,
+            "script": 1,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 75,
+                "z": 48,
+                "y": -98304
+            }
+        },
+        {
+            "id": 1,
+            "model": 183,
+            "movement": 12,
+            "type": 1,
+            "flag": 0,
+            "script": 3668,
+            "direction": "DIR_LEFT",
+            "params": [ 5, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 64,
+                "z": 36,
+                "y": 98304
+            }
+        },
+        {
+            "id": 2,
+            "model": 49,
+            "movement": 17,
+            "type": 1,
+            "flag": 0,
+            "script": 3664,
+            "direction": "DIR_RIGHT",
+            "params": [ 3, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 16,
+                "z": 63,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": 37,
+            "movement": 20,
+            "type": 4,
+            "flag": 0,
+            "script": 3667,
+            "direction": "DIR_DOWN",
+            "params": [ 4, 5, 0 ],
+            "area": {
+                "width": 0,
+                "height": 10
+            },
+            "grid": {
+                "x": 77,
+                "z": 53,
+                "y": 0
+            }
+        },
+        {
+            "id": 4,
+            "model": 36,
+            "movement": 2,
+            "type": 1,
+            "flag": 0,
+            "script": 3666,
+            "direction": "DIR_RIGHT",
+            "params": [ 5, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 63,
+                "z": 75,
+                "y": 0
+            }
+        },
+        {
+            "id": 5,
+            "model": 51,
+            "movement": 13,
+            "type": 1,
+            "flag": 0,
+            "script": 3670,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 81,
+                "z": 74,
+                "y": 0
+            }
+        },
+        {
+            "id": 6,
+            "model": 184,
+            "movement": 40,
+            "type": 6,
+            "flag": 0,
+            "script": 3669,
+            "direction": "DIR_RIGHT",
+            "params": [ 4, 5, 0 ],
+            "area": {
+                "width": 8,
+                "height": 7
+            },
+            "grid": {
+                "x": 23,
+                "z": 32,
+                "y": 0
+            }
+        },
+        {
+            "id": 7,
+            "model": 48,
+            "movement": 39,
+            "type": 1,
+            "flag": 0,
+            "script": 3662,
+            "direction": "DIR_LEFT",
+            "params": [ 3, 0, 0 ],
+            "area": {
+                "width": 2,
+                "height": 6
+            },
+            "grid": {
+                "x": 45,
+                "z": 35,
+                "y": 98304
+            }
+        },
+        {
+            "id": 8,
+            "model": 48,
+            "movement": 9,
+            "type": 1,
+            "flag": 0,
+            "script": 3663,
+            "direction": "DIR_DOWN",
+            "params": [ 5, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 28,
+                "z": 58,
+                "y": 0
+            }
+        },
+        {
+            "id": 9,
+            "model": 49,
+            "movement": 43,
+            "type": 4,
+            "flag": 0,
+            "script": 3665,
+            "direction": "DIR_LEFT",
+            "params": [ 2, 2, 0 ],
+            "area": {
+                "width": 2,
+                "height": 2
+            },
+            "grid": {
+                "x": 56,
+                "z": 57,
+                "y": 98304
+            }
+        },
+        {
+            "id": 10,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0482",
+            "script": 7054,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 24,
+                "z": 56,
+                "y": 0
+            }
+        },
+        {
+            "id": 11,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0483",
+            "script": 7055,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 44,
+                "z": 55,
+                "y": -98304
+            }
+        },
+        {
+            "id": 12,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0484",
+            "script": 7056,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 85,
+                "z": 51,
+                "y": 0
+            }
+        },
+        {
+            "id": 13,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0485",
+            "script": 7057,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 9,
+                "z": 82,
+                "y": 0
+            }
+        },
+        {
+            "id": 14,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0486",
+            "script": 7058,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 44,
+                "z": 86,
+                "y": 0
+            }
+        },
+        {
+            "id": 15,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0487",
+            "script": 7059,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 57,
+                "z": 77,
+                "y": -98304
+            }
+        },
+        {
+            "id": 16,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0488",
+            "script": 7060,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 59,
+                "z": 21,
+                "y": 0
+            }
+        },
+        {
+            "id": 17,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0489",
+            "script": 7061,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 22,
+                "z": 24,
+                "y": 49152
+            }
+        },
+        {
+            "id": 18,
+            "model": 46,
+            "movement": 6,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 77,
+                "z": 79,
+                "y": 0
+            }
+        },
+        {
+            "id": 19,
+            "model": 48,
+            "movement": 3,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 1
+            },
+            "grid": {
+                "x": 33,
+                "z": 47,
+                "y": 0
+            }
+        },
+        {
+            "id": 20,
+            "model": 36,
+            "movement": 3,
+            "type": 0,
+            "flag": 0,
+            "script": 5,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 3,
+                "height": 3
+            },
+            "grid": {
+                "x": 37,
+                "z": 28,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_ROUTE_GATE",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 1320,
+                "y": 0,
+                "z": 1336,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_RELIC_CASTLE",
+            "warp": 2,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 984,
+                "y": 32,
+                "z": 472,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": [
+        {
+            "type": 2,
+            "script": 4
+        }
+    ]
+}

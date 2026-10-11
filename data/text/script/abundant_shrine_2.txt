@@ -1,0 +1,3 @@
+AbundantShrine2_Text_GreatLandorusProtectsLand = It is the Great Landorus that protects\nthis land.{be01}\nWith its help, we are assured of rich soil\nand a prosperous harvest.
+AbundantShrine2_Text_BothPeoplePokemonHave = Both people and Pokémon have to\nwork together to protect{be00}\nabundant land.
+AbundantShrine2_Text_Empty =                                                \x{ffff}

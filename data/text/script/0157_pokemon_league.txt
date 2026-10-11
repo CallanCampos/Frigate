@@ -1,2 +1,0 @@
-Nothing happens!\nIt seems you can't go back until you win.
-\pad{0c}

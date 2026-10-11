@@ -12,20 +12,23 @@ It builds the following ROMs:
 ## Status
 
 Both ROMs rebuild byte for byte from the same source tree, and everything not yet in C is still delinked code.
-<!-- progress -->
-44.00% of the code matches (1,686,276 of 3,832,642 bytes), with 19,838 of 41,672 functions, and 551 of 927 source files are complete.
-<!-- /progress -->
+[decomp.dev](https://decomp.dev/fuddlesworth/pokebw2) tracks the progress of both versions from CI's report on every
+push to main.
 
-![Progress](docs/progress.svg)
+[![Code](https://decomp.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=code&label=Code)](https://decomp.dev/fuddlesworth/pokebw2)
+[![Functions](https://decomp.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=functions&label=Functions)](https://decomp.dev/fuddlesworth/pokebw2)
+[![Files](https://decomp.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=complete_units&label=Complete%20files)](https://decomp.dev/fuddlesworth/pokebw2)
+
+[![Progress](https://decomp.dev/fuddlesworth/pokebw2.svg)](https://decomp.dev/fuddlesworth/pokebw2)
 
 Each rectangle is a source file, or a stretch of code not yet split into files, sized by its code: green when it
-matches, and from grey to blue as it gets closer, as on [decomp.dev](https://decomp.dev). The trainer AI and field
-scripts are built from source, see [Scripts](docs/scripts.md).
+matches, and from grey to blue as it gets closer.
 
 - 41,423 functions found by [dsd](https://github.com/AetiasHax/ds-decomp) in the ARM9, its 344 overlays, ITCM, DTCM, and the two TWL autoloads.
 - 8,152 functions and 573 data symbols have real names, imported from [swan](docs/code-organization.md#names).
 - The DSi-only LTD module in ARM9i is decompressed, analyzed and linked like the other modules. The ARM7i program is
   only extracted (decrypted) and rebuilt.
+- The trainer AI and field scripts are built from source, see [Scripts](docs/scripts.md).
 
 ## Setup
 
@@ -39,7 +42,7 @@ scripts are built from source, see [Scripts](docs/scripts.md).
    `$(brew --prefix llvm)/bin` on the `PATH`.
 
 2. Place your own dumps at `orig/baserom_b2_us.nds` and/or `orig/baserom_w2_us.nds`. They must match the SHA1s above.
-   They are not included and will not be provided. `tools/scripts/verify_dsi_rom.py` checks a dump against the
+   They are not included and will not be provided. `tools/build/verify_dsi_rom.py` checks a dump against the
    digests in its own header.
 
 3. Configure and build. On first run, `configure.py` downloads [wibo](https://github.com/decompals/wibo), objdiff, the
@@ -48,7 +51,8 @@ scripts are built from source, see [Scripts](docs/scripts.md).
    - [`ds-rom`](https://github.com/fuddlesworth/ds-rom/tree/dsi-hybrid): DSi header, digests, modcrypt, TWL autoloads
      and DSi banners.
    - [`ds-decomp`](https://github.com/fuddlesworth/ds-decomp/tree/dsi-hybrid): TWL entrypoint, DS Protect and Thumb
-     jump table fixes, and the ARM9i LTD module.
+     jump table fixes, the ARM9i LTD module with its sections and DSP images, overlays that run from VRAM, `ldr pc`
+     veneers, and overlays linked with a veneer for every call, as the SDK links them.
 
    ```sh
    python3 configure.py
@@ -77,9 +81,9 @@ scripts are built from source, see [Scripts](docs/scripts.md).
 | `src/gfl/`, `src/system/` | Decompiled C of the ARM9 main module, by library like the headers, such as `src/gfl/heap.c` |
 | `lib/<name>/` | Libraries built apart from the game with their own compiler (`library.toml`), headers and sources, such as `lib/spl/` |
 | `include/` | Headers shared by the C code, see [Code organization](docs/code-organization.md) |
-| `data/` | Scripts and data assembled into the ROM's files, see [Game data](docs/data.md) and [Scripts](docs/scripts.md) |
+| `data/` | The game's data as JSON, one file per species, move, trainer, zone and encounter table, the constant lists, the text, and the scripts, all built into the ROM's files; see [Game data](docs/data.md) and [Scripts](docs/scripts.md) |
 | `include/asm/` | Macros for the scripts |
-| `tools/scripts/` | Helper scripts, such as `romdiff.py` to compare two ROMs region by region |
+| `tools/` | Our tools, by job: the build's steps, decompiling, the game data, the text and the scripts; see [tools/README.md](tools/README.md) |
 | `docs/` | The documentation listed below |
 | `CLAUDE.md`, `.claude/` | Rules, skills, agents and hooks for working on the decompilation with Claude Code |
 | `extract/`, `build/` | Generated, never committed |
@@ -88,7 +92,7 @@ scripts are built from source, see [Scripts](docs/scripts.md).
 
 Each of the game's original source files becomes one C file, written from the assembly until every function compiles
 to the original bytes. Matching is checked per function with [objdiff](https://github.com/encounter/objdiff) and
-`tools/scripts/compiler_probe.py`, and the ROMs are rebuilt and checked against their SHA1s by every `ninja`.
+`tools/decomp/compiler_probe.py`, and the ROMs are rebuilt and checked against their SHA1s by every `ninja`.
 `ninja progress` prints how much of the game matches.
 
 ## Documentation
@@ -107,7 +111,9 @@ to the original bytes. Matching is checked per function with [objdiff](https://g
 ## Contributing
 
 Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) has the workflow and the rules. CI compiles every C
-file for both versions; matching is checked locally by `ninja`, since it needs the ROMs.
+file for both versions. On pushes to main and on pull requests from branches of this repository, it also builds both
+ROMs from private copies, checks them byte for byte, and uploads the progress reports that decomp.dev reads. Pull
+requests from forks can't reach the ROMs, so run `ninja` locally before opening one.
 
 ## License
 

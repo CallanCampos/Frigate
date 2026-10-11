@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Bart",
+    "class": "TRAINER_CLASS_SWIMMER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 0,
+            "level": 39,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I've been challenging the Pokémon Gyms\nall across the world!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I couldn't defeat them all, but I learned\na lot at the Gyms and became stronger!"
+        },
+        {
+            "type": 2,
+            "text": "It's fine! I just want to have fun\nwith Pokémon battles!{be01}\nPeople who want nothing but to win should\nkeep trying until they are satisfied."
+        }
+    ]
+}

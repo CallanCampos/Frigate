@@ -1,0 +1,189 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Slaking",
+    "pokedex": {
+        "category": "Lazy Pokémon",
+        "entry": "This Pokémon lives lying on its side.\nIt only rolls over and moves when\nthere is no more grass to eat.",
+        "height": "6'07\"",
+        "weight": "287.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Slaking",
+                "category": "Lazy Pokémon",
+                "entry": "The world's laziest Pokémon. When\nit is lounging, it is actually saving\nenergy for striking back.",
+                "height": "6'07\"",
+                "weight": "287.7 lbs."
+            },
+            "fr": {
+                "name": "Monaflèmit",
+                "category": "Pokémon Fainéant",
+                "entry": "Le Pokémon le plus fainéant du\nmonde. Il s'allonge pour économiser\nses forces et contre-attaquer.",
+                "height": "2,0 m",
+                "weight": "130,5 kg"
+            },
+            "de": {
+                "name": "Letarking",
+                "category": "Müßig",
+                "entry": "Das faulste Pokémon der Welt. Wenn es\nfaulenzt, sammelt es in Wahrheit Energie,\num zuzuschlagen.",
+                "height": "2,0 m",
+                "weight": "130,5 kg"
+            },
+            "it": {
+                "name": "Slaking",
+                "category": "Pokémon Pigrizia",
+                "entry": "Il Pokémon più pigro in assoluto.\nStando disteso, in realtà cerca di\nrisparmiare forze per attaccare.",
+                "height": "2,0 m",
+                "weight": "130,5 kg"
+            },
+            "ko": {
+                "name": "게을킹",
+                "category": "나태함포켓몬",
+                "entry": "세계에서 제일 게으른 포켓몬이다.\n누워 뒹굴기만 하는 것처럼 보여도\n반격할 파워를 모으는 중이다.",
+                "height": "2.0 m",
+                "weight": "130.5 kg"
+            },
+            "es": {
+                "name": "Slaking",
+                "category": "Pokémon Holgazán",
+                "entry": "El Pokémon más perezoso del\nmundo. Si está tumbado, es que\nreúne fuerzas para contraatacar.",
+                "height": "2,0 m",
+                "weight": "130,5 kg"
+            },
+            "ja": {
+                "name": "ケッキング",
+                "category": "ものぐさポケモン",
+                "entry": "せかいいち\\x{3000}ぐうたらな\\x{3000}ポケモン。\nねころがっているだけに\\x{3000}みえるが\nはんげきの\\x{3000}パワーを\\x{3000}ためている。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff13}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 150,
+        "attack": 160,
+        "defense": 100,
+        "speed": 100,
+        "special_attack": 95,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 3,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_TRUANT", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 252,
+    "height": 20,
+    "weight": 1305,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_YAWN" ],
+            [ 1, "MOVE_ENCORE" ],
+            [ 1, "MOVE_SLACK_OFF" ],
+            [ 7, "MOVE_ENCORE" ],
+            [ 13, "MOVE_SLACK_OFF" ],
+            [ 19, "MOVE_FAINT_ATTACK" ],
+            [ 25, "MOVE_AMNESIA" ],
+            [ 31, "MOVE_COVET" ],
+            [ 36, "MOVE_SWAGGER" ],
+            [ 37, "MOVE_CHIP_AWAY" ],
+            [ 43, "MOVE_COUNTER" ],
+            [ 49, "MOVE_FLAIL" ],
+            [ 55, "MOVE_FLING" ],
+            [ 61, "MOVE_PUNISHMENT" ],
+            [ 67, "MOVE_HAMMER_ARM" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM23",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM60",
+            "TM65",
+            "TM67",
+            "TM68",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_LOW_KICK",
+            "MOVE_GUNK_SHOT",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_AFTER_YOU",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 278,
+    "baby_species": "SPECIES_SLAKOTH"
+}

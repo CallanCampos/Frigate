@@ -1,0 +1,23 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_CASTELIA_SEWERS",
+            "warp": 3,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 72,
+                "y": 0,
+                "z": 184,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

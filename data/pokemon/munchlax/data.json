@@ -1,0 +1,204 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Munchlax",
+    "pokedex": {
+        "category": "Big Eater Pokémon",
+        "entry": "In its desperation to gulp down\nfood, it forgets about the food it\nhas hidden under its fur.",
+        "height": "2'00\"",
+        "weight": "231.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Munchlax",
+                "category": "Big Eater Pokémon",
+                "entry": "In its desperation to gulp down\nfood, it forgets about the food it\nhas hidden under its fur.",
+                "height": "2'00\"",
+                "weight": "231.5 lbs."
+            },
+            "fr": {
+                "name": "Goinfrex",
+                "category": "Pokémon Goinfre",
+                "entry": "Obnubilé par sa quête incessante\nde nourriture, il oublie parfois\nqu'il en a caché dans sa fourrure.",
+                "height": "0,6 m",
+                "weight": "105,0 kg"
+            },
+            "de": {
+                "name": "Mampfaxo",
+                "category": "Nimmersatt",
+                "entry": "Es ist so damit beschäftigt, Futter\nhinunterzuschlingen, dass es das\nFutter unter seinem Fell vergisst.",
+                "height": "0,6 m",
+                "weight": "105,0 kg"
+            },
+            "it": {
+                "name": "Munchlax",
+                "category": "Pokémon Ghiottone",
+                "entry": "Il suo insaziabile appetito gli fa spesso\ndimenticare di avere del cibo nascosto\nsotto il pelo.",
+                "height": "0,6 m",
+                "weight": "105,0 kg"
+            },
+            "ko": {
+                "name": "먹고자",
+                "category": "대식가포켓몬",
+                "entry": "먹이를 먹는 데 열중한 나머지\n몸의 털 밑에 숨겨놓은 먹이에\n대한 것은 잊어버리고 만다.",
+                "height": "0.6 m",
+                "weight": "105.0 kg"
+            },
+            "es": {
+                "name": "Munchlax",
+                "category": "Pokémon Comilón",
+                "entry": "En su desesperación por engullir\ncomida, se suele olvidar de la que\nesconde debajo de su pelaje.",
+                "height": "0,6 m",
+                "weight": "105,0 kg"
+            },
+            "ja": {
+                "name": "ゴンベ",
+                "category": "おおぐいポケモン",
+                "entry": "ひっしに\\x{3000}エサを\\x{3000}たべているうちに\nからだの\\x{3000}けのしたに\\x{3000}かくしていた\nエサのことを\\x{3000}わすれてしまうのだ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 135,
+        "attack": 85,
+        "defense": 40,
+        "speed": 5,
+        "special_attack": 40,
+        "special_defense": 85
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 50,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_LEFTOVERS",
+        "rare": "ITEM_LEFTOVERS",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 40,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_PICKUP", "ABILITY_THICK_FAT" ],
+    "hidden_ability": "ABILITY_GLUTTONY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 78,
+    "height": 6,
+    "weight": 1050,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_METRONOME" ],
+            [ 1, "MOVE_ODOR_SLEUTH" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 4, "MOVE_DEFENSE_CURL" ],
+            [ 9, "MOVE_AMNESIA" ],
+            [ 12, "MOVE_LICK" ],
+            [ 17, "MOVE_RECYCLE" ],
+            [ 20, "MOVE_SCREECH" ],
+            [ 25, "MOVE_CHIP_AWAY" ],
+            [ 28, "MOVE_STOCKPILE" ],
+            [ 33, "MOVE_SWALLOW" ],
+            [ 36, "MOVE_BODY_SLAM" ],
+            [ 41, "MOVE_FLING" ],
+            [ 44, "MOVE_ROLLOUT" ],
+            [ 49, "MOVE_NATURAL_GIFT" ],
+            [ 52, "MOVE_SNATCH" ],
+            [ 57, "MOVE_LAST_RESORT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM56",
+            "TM59",
+            "TM67",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_LAST_RESORT",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_AFTER_YOU",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_LICK",
+            "MOVE_CHARM",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_CURSE",
+            "MOVE_WHIRLWIND",
+            "MOVE_PURSUIT",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_COUNTER",
+            "MOVE_NATURAL_GIFT",
+            "MOVE_AFTER_YOU",
+            "MOVE_SELFDESTRUCT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_FRIENDSHIP",
+            "param": 0,
+            "species": "SPECIES_SNORLAX"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MUNCHLAX"
+}

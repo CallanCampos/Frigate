@@ -11,6 +11,7 @@
 #include "field/zone.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
+#include "gfl/net_whpipe.h"
 #include "gfl/overlay.h"
 #include "gfl/std.h"
 #include "gfl/str.h"

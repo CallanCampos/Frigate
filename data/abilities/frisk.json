@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Frisk",
+    "description": "The Pokémon can check\na foe's held item."
+}

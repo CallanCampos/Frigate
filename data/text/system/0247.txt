@@ -1,99 +1,99 @@
-Actor
-Assistant
-{0100:1}: Hey!\nJust what do you think you're doing?!
-Assistant: Professor {0100:1}...{be01}\nNo. You're just {0100:1} to me now.{be01}\nI'm fed up, and I just can't work with\nyou any longer!
-{0100:1}: What do you mean?!
-Assistant: You're just a kid, but you act\nall high and mighty around here.{be01}\nRecently, you've just been playing with that\nrobot and ignoring our research.{be01}\nIf we keep this up, our lab is going to go\nbankrupt, and it's all because of you!{be01}\nThat's why I took the F-00!{be01}\nSince you disposed of the design data, I\nhave no choice but to sell the only F-00 we{be00}\nhave and use that money to save the lab!
-{0100:1}: You can't be serious!\nThe F-00 is mine and mine alone!{be00}\nI won't let you or anyone else sell it!
-Assistant: You're too late.{be01}\nThe F-00 won't listen to your\norders anymore!
-{0100:1}: That's nonsense!
-Assistant: You'll see.{be01}\nThis is what you get for always trying\nto make a fool of me!{be01}\nHey! F-00!{be01}\nCome over here and teach {0100:1}\na lesson!
-{0100:1}: It can't be! F-00!\nDon't you recognize me?
-F-00: ...
-{0100:1}: Something's wrong with F-00!\nWhat did you do to it?!
-Assistant: This robot wouldn't listen to my\norders, so I had no choice...{be01}\nI erased the F-00's memory banks and\nreprogrammed it to obey me!
-{0100:1}: How could you?!{be01}\nThe F-00's programming is\nextremely complex!{be00}\nIt can't be reprogrammed so easily...{be01}\nEspecially not by someone with your\nlimited skills!
-Assistant: There you go again! Always\ntrying to make a fool of me!{be01}\nIt's that awful personality of yours\nthat got you in this position!
-{0100:1}: It's just the truth...
-Assistant: That may be so, but such\nbluntness can hurt people's feelings!{be01}\nYou may be a genius, but you can't\neven understand that simple fact?!
-{0100:1}: You're just jealous...
-Assistant: Maybe I am! But I'll teach\nyou to respect your elders!{be01}\nF-00! Let's do this!\nIt's time to punish {0100:1}!
-{0100:1}: I'm sorry...
-Assistant: It's too late for apologies!{be01}\nDon't think I'll forgive you that easily!
-{0100:1}: It's my fault...
-Assistant: That's right! It's all your fault!{be01}\nI'm a scientist, too, you know?\nIt's not like I wanted to resort{be00}\nto dirty tactics like this!
-{0100:1}: Oh no...{be01}\nIf this keeps up, the F-00 will defeat\nboth {0102:0} and me...
-F-00: ...
-{0100:1}: ...{be01}\nA robot that has been reprogrammed is like\na totally different person, but...
-F-00: ...Beep!{be01}\n{0100:1}, {0100:1}, {0100:1},\n{0100:1}, {0100:1}, {0100:1}...
-{0100:1}: What's happening?!
-F-00: ...Beep ...Bloop ...Beep!
-{0100:1}: Hey! F-00! What's wrong?
-F-00: Beep bloop bop bleep!{be01}\n...
-{0100:1}: Tell me what's wrong!
-F-00: Beep bloop bop bleep beeeep!
-{0100:1}: Are you OK?!
-F-00: Beep...{be01}\nBeep blop boop!
-{0100:1}: Is it broken?!
-F-00: Beep bloop bop beeeeeep!
-{0100:1}: It's gone berserk!
-F-00: Beep bloop bop beeeeeep!
-Assistant: Come on, F-00! Obey my commands!
-{0100:1}: It's no good...\nThe F-00 has lost control...{be01}\nIt won't listen to anyone in this state!{be01}\nIf the F-00 keeps this up, it's going\nto tear itself apart!
-Assistant: What?! We can't let that happen!\nWhat should we do?
-{0100:1}: We've got to stop its CPU,\nwhich functions as its heart...{be01}\nWe need to find a way to stop the F-00's\nCPU without destroying it.
-Assistant: Stop the CPU without destroying\nthe F-00, huh?{be01}\nHmmm...{be01}\nI've got it!{be01}\nI know of a way!
-{0100:1}: What is it?
-Assistant: We've got to freeze it!{be01}\nIf we can freeze the F-00's CPU,\nit should stop!
-{0100:1}: I see...\nNot a bad idea...
-Assistant: {0100:1}... That's the first\ntime you've ever given me a compliment.
-{0100:1}: We've done it!\nWe've stopped the F-00!
-F-00: ...
-{0100:1}: F-00! Are you OK?!
-F-00: ...{be01}\n{0100:1}...
-{0100:1}: What?{be01}\nThe F-00 just said my name, didn't it?\nHow could that be possible?
-F-00: {0100:1}...
-{0100:1}: That's right! It's me, F-00!\nIt's {0100:1}!
-F-00: {0100:1}...
-Assistant: How in the world...{be01}\nHow could something like this occur?!\nThis is completely unscientific!{be01}\nI can't take this anymore!
-{0100:1}: F-00...
-The F-00's memory banks were erased,\nyet it still called my name...{be01}\nIt was a true wonder...{be01}\nHowever, such a happy moment would\nprove to be fleeting.{be01}\nThe time for the F-00 and I to separate\nforever would soon arrive...
-Assistant: Listen up, {0100:1}!\nIt's all your fault!{be01}\nWe're going to sell off this F-00 to the\nhighest bidder and use the money to fund{be00}\nour lab!
-{0100:1}: Wait...\nThe F-00... The F-00 is mine!
-Assistant: Farewell, {0100:1}!
-My assistant had betrayed me.\nMy F-00 was stolen, and I had to leave{be00}\nthe lab alone...{be01}\nAfter that, I quit robotics research and\nnever attempted to create another one.
-F-00: ...
-{0100:1}: F-00...{be01}\nArgh! It's all your fault, you\nworthless assistant!
-Assistant: What are you on about?{be01}\nYou're the one who betrayed us all in the\nfirst place and stopped working to play{be00}\nwith your robot! It's all your fault!
-F-00: Bleep... Bleep...
-{0100:1}: F-00...
-Assistant: Pff!\nYour robot's all busted up!{be01}\nIgnore that worthless hunk of junk and\nlisten to me!
-{0100:1}: Wait a moment...\nThis smell...it's coming from the F-00!
-F-00: Bleep... Beep boop...
-{0100:1}: I thought I smelled\nsomething burning...{be01}\nCould energy be leaking from its battery?
-Assistant: Who cares?!\nIt's not like it's going to move again!{be01}\nGah! Worthless piece of junk!\nI'll shut it up once and for all!
-{0100:1}: No! Stop!
-Assistant: Shut up and stand back!\nI've got fists of fire, you know?
-{0100:1}: Stop!
-After sustaining great damage, the F-00's\nbattery began to leak energy,{be00}\nplacing it in a very delicate state.{be01}\nEven the shock from my weak assistant's\npunch proved to be too great...{be01}\nThe F-00 exploded, blowing us away\nand destroying most of the lab{be00}\nin the process...{be01}\nMy assistant somehow made it out and\nwas taken to the hospital.{be01}\nI, however, remained here, forever\nclinging to the F-00's memory.
-F-00: Beep bloop bop bleep!
-{0100:1}: This is it...\nThe F-00 just won't stop...{be01}\nIt's going to overheat, and its engine\nwill explode!
-F-00: Beep bloop bop bleep!
-{0100:1}: F-00...\nI'm so sorry... You must be in pain...{be00}\nI'll stay with you until the end...
-F-00: Beep bloop bop bleeeeeeep!
-{0100:1}: F-00! What do you think\nyou're doing?!
-F-00: Beep bloop bop bleeeeeeep!
-{0100:1}: Put me down, F-00!\nI told you. I'm going to stay here with you!
-F-00: Beep bloop bop bleeeeeeep!\nGrrrrrr... Bzzzzzz...
-{0100:1}: Hey! Stop it, F-00!\nPut me down!
-Assistant: Ha ha ha...\nHow did things turn out like this?
-{0100:1}: F-00!
-The F-00 picked me up and threw me\nout of the lab.{be01}\nJust moments later...{be01}\nThe F-00's body had reached its limit.\nIt exploded, destroying most of the lab{be00}\nin the process...{be01}\nI barely escaped with my life...{be01}\nTo this day, I wonder if F-00 went berserk\nand didn't know what it was doing or if it{be00}\nreally intended to save me...
-F-00: Beep bloop bop bleep!
-{0100:1}: It's no good...{be01}\nThe energy-absorption system\nis malfunctioning!
-F-00: Bleep! Bloop!
-Assistant: Argh...why?
-{0100:1}: You...{be01}\nJust what kind of new program did you\nput into the F-00?!
-Assistant: ...{be01}\nTo be honest, your code was completely\nincomprehensible to me...{be01}\nEspecially that one formula that started\nwith a K. Total nonsense!{be01}\nThere's no way anyone could make sense\nof such needlessly complex code...{be01}\nSo, I went in and deleted the complicated\nparts of your code and changed it into{be00}\nsomething anyone can understand!{be01}\nI modified your formulas to handle only\nsimple operations... That's all!
-{0100:1}: So that's what you did!{be01}\nThat formula that started with a K was\nthe most important one! It was the formula{be00}\nthat gave the F-00 a humanlike heart!{be01}\nIf you went in and messed it all up, then\nthat explains why the usually calm F-00 is{be00}\nnow going berserk...
-Assistant: You can't be serious...\nThat means it's all my fault!
+Bank0247_Text_Actor = Actor
+Bank0247_Text_Assistant = Assistant
+Bank0247_Text_HeyJustWhatThink = {0100:1}: Hey!\nJust what do you think you're doing?!
+Bank0247_Text_AssistantProfessorNoYoure = Assistant: Professor {0100:1}...{be01}\nNo. You're just {0100:1} to me now.{be01}\nI'm fed up, and I just can't work with\nyou any longer!
+Bank0247_Text_WhatMean = {0100:1}: What do you mean?!
+Bank0247_Text_AssistantYoureJustKid = Assistant: You're just a kid, but you act\nall high and mighty around here.{be01}\nRecently, you've just been playing with that\nrobot and ignoring our research.{be01}\nIf we keep this up, our lab is going to go\nbankrupt, and it's all because of you!{be01}\nThat's why I took the F-00!{be01}\nSince you disposed of the design data, I\nhave no choice but to sell the only F-00 we{be00}\nhave and use that money to save the lab!
+Bank0247_Text_CantSeriousF00 = {0100:1}: You can't be serious!\nThe F-00 is mine and mine alone!{be00}\nI won't let you or anyone else sell it!
+Bank0247_Text_AssistantYoureTooLate = Assistant: You're too late.{be01}\nThe F-00 won't listen to your\norders anymore!
+Bank0247_Text_ThatsNonsense = {0100:1}: That's nonsense!
+Bank0247_Text_AssistantYoullSeeWhat = Assistant: You'll see.{be01}\nThis is what you get for always trying\nto make a fool of me!{be01}\nHey! F-00!{be01}\nCome over here and teach {0100:1}\na lesson!
+Bank0247_Text_CantF00Dont = {0100:1}: It can't be! F-00!\nDon't you recognize me?
+Bank0247_Text_F00 = F-00: ...
+Bank0247_Text_SomethingsWrongF00 = {0100:1}: Something's wrong with F-00!\nWhat did you do to it?!
+Bank0247_Text_AssistantRobotWouldntListen = Assistant: This robot wouldn't listen to my\norders, so I had no choice...{be01}\nI erased the F-00's memory banks and\nreprogrammed it to obey me!
+Bank0247_Text_HowCouldF00s = {0100:1}: How could you?!{be01}\nThe F-00's programming is\nextremely complex!{be00}\nIt can't be reprogrammed so easily...{be01}\nEspecially not by someone with your\nlimited skills!
+Bank0247_Text_AssistantThereGoAgain = Assistant: There you go again! Always\ntrying to make a fool of me!{be01}\nIt's that awful personality of yours\nthat got you in this position!
+Bank0247_Text_ItsJustTruth = {0100:1}: It's just the truth...
+Bank0247_Text_AssistantMayButSuch = Assistant: That may be so, but such\nbluntness can hurt people's feelings!{be01}\nYou may be a genius, but you can't\neven understand that simple fact?!
+Bank0247_Text_YoureJustJealous = {0100:1}: You're just jealous...
+Bank0247_Text_AssistantMaybeAmBut = Assistant: Maybe I am! But I'll teach\nyou to respect your elders!{be01}\nF-00! Let's do this!\nIt's time to punish {0100:1}!
+Bank0247_Text_ImSorry = {0100:1}: I'm sorry...
+Bank0247_Text_AssistantItsTooLate = Assistant: It's too late for apologies!{be01}\nDon't think I'll forgive you that easily!
+Bank0247_Text_ItsFault = {0100:1}: It's my fault...
+Bank0247_Text_AssistantThatsRightIts = Assistant: That's right! It's all your fault!{be01}\nI'm a scientist, too, you know?\nIt's not like I wanted to resort{be00}\nto dirty tactics like this!
+Bank0247_Text_OhNoIfKeeps = {0100:1}: Oh no...{be01}\nIf this keeps up, the F-00 will defeat\nboth {0102:0} and me...
+Bank0247_Text_F00_2 = F-00: ...
+Bank0247_Text_RobotHasBeenReprogrammed = {0100:1}: ...{be01}\nA robot that has been reprogrammed is like\na totally different person, but...
+Bank0247_Text_F00Beep = F-00: ...Beep!{be01}\n{0100:1}, {0100:1}, {0100:1},\n{0100:1}, {0100:1}, {0100:1}...
+Bank0247_Text_WhatsHappening = {0100:1}: What's happening?!
+Bank0247_Text_F00BeepBloop = F-00: ...Beep ...Bloop ...Beep!
+Bank0247_Text_HeyF00Whats = {0100:1}: Hey! F-00! What's wrong?
+Bank0247_Text_F00BeepBloop_2 = F-00: Beep bloop bop bleep!{be01}\n...
+Bank0247_Text_TellWhatsWrong = {0100:1}: Tell me what's wrong!
+Bank0247_Text_F00BeepBloop_3 = F-00: Beep bloop bop bleep beeeep!
+Bank0247_Text_Ok = {0100:1}: Are you OK?!
+Bank0247_Text_F00BeepBeep = F-00: Beep...{be01}\nBeep blop boop!
+Bank0247_Text_Broken = {0100:1}: Is it broken?!
+Bank0247_Text_F00BeepBloop_4 = F-00: Beep bloop bop beeeeeep!
+Bank0247_Text_ItsGoneBerserk = {0100:1}: It's gone berserk!
+Bank0247_Text_F00BeepBloop_5 = F-00: Beep bloop bop beeeeeep!
+Bank0247_Text_AssistantComeF00 = Assistant: Come on, F-00! Obey my commands!
+Bank0247_Text_ItsNoGoodF = {0100:1}: It's no good...\nThe F-00 has lost control...{be01}\nIt won't listen to anyone in this state!{be01}\nIf the F-00 keeps this up, it's going\nto tear itself apart!
+Bank0247_Text_AssistantWhatWeCant = Assistant: What?! We can't let that happen!\nWhat should we do?
+Bank0247_Text_WeveGotStopIts = {0100:1}: We've got to stop its CPU,\nwhich functions as its heart...{be01}\nWe need to find a way to stop the F-00's\nCPU without destroying it.
+Bank0247_Text_AssistantStopCpuWithout = Assistant: Stop the CPU without destroying\nthe F-00, huh?{be01}\nHmmm...{be01}\nI've got it!{be01}\nI know of a way!
+Bank0247_Text_What = {0100:1}: What is it?
+Bank0247_Text_AssistantWeveGotFreeze = Assistant: We've got to freeze it!{be01}\nIf we can freeze the F-00's CPU,\nit should stop!
+Bank0247_Text_SeeNotBadIdea = {0100:1}: I see...\nNot a bad idea...
+Bank0247_Text_AssistantThatsFirstTime = Assistant: {0100:1}... That's the first\ntime you've ever given me a compliment.
+Bank0247_Text_WeveDoneWeveStopped = {0100:1}: We've done it!\nWe've stopped the F-00!
+Bank0247_Text_F00_3 = F-00: ...
+Bank0247_Text_F00Ok = {0100:1}: F-00! Are you OK?!
+Bank0247_Text_F00_4 = F-00: ...{be01}\n{0100:1}...
+Bank0247_Text_WhatF00Just = {0100:1}: What?{be01}\nThe F-00 just said my name, didn't it?\nHow could that be possible?
+Bank0247_Text_F00_5 = F-00: {0100:1}...
+Bank0247_Text_ThatsRightItsF = {0100:1}: That's right! It's me, F-00!\nIt's {0100:1}!
+Bank0247_Text_F00_6 = F-00: {0100:1}...
+Bank0247_Text_AssistantHowWorldHow = Assistant: How in the world...{be01}\nHow could something like this occur?!\nThis is completely unscientific!{be01}\nI can't take this anymore!
+Bank0247_Text_F00_7 = {0100:1}: F-00...
+Bank0247_Text_F00sMemoryBanks = The F-00's memory banks were erased,\nyet it still called my name...{be01}\nIt was a true wonder...{be01}\nHowever, such a happy moment would\nprove to be fleeting.{be01}\nThe time for the F-00 and I to separate\nforever would soon arrive...
+Bank0247_Text_AssistantListenUpIts = Assistant: Listen up, {0100:1}!\nIt's all your fault!{be01}\nWe're going to sell off this F-00 to the\nhighest bidder and use the money to fund{be00}\nour lab!
+Bank0247_Text_WaitF00F = {0100:1}: Wait...\nThe F-00... The F-00 is mine!
+Bank0247_Text_AssistantFarewell = Assistant: Farewell, {0100:1}!
+Bank0247_Text_AssistantHadBetrayedF = My assistant had betrayed me.\nMy F-00 was stolen, and I had to leave{be00}\nthe lab alone...{be01}\nAfter that, I quit robotics research and\nnever attempted to create another one.
+Bank0247_Text_F00_8 = F-00: ...
+Bank0247_Text_F00ArghIts = {0100:1}: F-00...{be01}\nArgh! It's all your fault, you\nworthless assistant!
+Bank0247_Text_AssistantWhatAboutYoure = Assistant: What are you on about?{be01}\nYou're the one who betrayed us all in the\nfirst place and stopped working to play{be00}\nwith your robot! It's all your fault!
+Bank0247_Text_F00BleepBleep = F-00: Bleep... Bleep...
+Bank0247_Text_F00_9 = {0100:1}: F-00...
+Bank0247_Text_AssistantPffRobotsAll = Assistant: Pff!\nYour robot's all busted up!{be01}\nIgnore that worthless hunk of junk and\nlisten to me!
+Bank0247_Text_WaitMomentSmellIts = {0100:1}: Wait a moment...\nThis smell...it's coming from the F-00!
+Bank0247_Text_F00BleepBeep = F-00: Bleep... Beep boop...
+Bank0247_Text_ThoughtSmelledSomethingBurning = {0100:1}: I thought I smelled\nsomething burning...{be01}\nCould energy be leaking from its battery?
+Bank0247_Text_AssistantWhoCaresIts = Assistant: Who cares?!\nIt's not like it's going to move again!{be01}\nGah! Worthless piece of junk!\nI'll shut it up once and for all!
+Bank0247_Text_NoStop = {0100:1}: No! Stop!
+Bank0247_Text_AssistantShutUpStand = Assistant: Shut up and stand back!\nI've got fists of fire, you know?
+Bank0247_Text_Stop = {0100:1}: Stop!
+Bank0247_Text_AfterSustainingGreatDamage = After sustaining great damage, the F-00's\nbattery began to leak energy,{be00}\nplacing it in a very delicate state.{be01}\nEven the shock from my weak assistant's\npunch proved to be too great...{be01}\nThe F-00 exploded, blowing us away\nand destroying most of the lab{be00}\nin the process...{be01}\nMy assistant somehow made it out and\nwas taken to the hospital.{be01}\nI, however, remained here, forever\nclinging to the F-00's memory.
+Bank0247_Text_F00BeepBloop_6 = F-00: Beep bloop bop bleep!
+Bank0247_Text_F00JustWont = {0100:1}: This is it...\nThe F-00 just won't stop...{be01}\nIt's going to overheat, and its engine\nwill explode!
+Bank0247_Text_F00BeepBloop_7 = F-00: Beep bloop bop bleep!
+Bank0247_Text_F00ImSorry = {0100:1}: F-00...\nI'm so sorry... You must be in pain...{be00}\nI'll stay with you until the end...
+Bank0247_Text_F00BeepBloop_8 = F-00: Beep bloop bop bleeeeeeep!
+Bank0247_Text_F00WhatThink = {0100:1}: F-00! What do you think\nyou're doing?!
+Bank0247_Text_F00BeepBloop_9 = F-00: Beep bloop bop bleeeeeeep!
+Bank0247_Text_PutDownF00 = {0100:1}: Put me down, F-00!\nI told you. I'm going to stay here with you!
+Bank0247_Text_F00BeepBloop_10 = F-00: Beep bloop bop bleeeeeeep!\nGrrrrrr... Bzzzzzz...
+Bank0247_Text_HeyStopF00 = {0100:1}: Hey! Stop it, F-00!\nPut me down!
+Bank0247_Text_AssistantHaHaHa = Assistant: Ha ha ha...\nHow did things turn out like this?
+Bank0247_Text_F00_10 = {0100:1}: F-00!
+Bank0247_Text_F00PickedUp = The F-00 picked me up and threw me\nout of the lab.{be01}\nJust moments later...{be01}\nThe F-00's body had reached its limit.\nIt exploded, destroying most of the lab{be00}\nin the process...{be01}\nI barely escaped with my life...{be01}\nTo this day, I wonder if F-00 went berserk\nand didn't know what it was doing or if it{be00}\nreally intended to save me...
+Bank0247_Text_F00BeepBloop_11 = F-00: Beep bloop bop bleep!
+Bank0247_Text_ItsNoGoodEnergy = {0100:1}: It's no good...{be01}\nThe energy-absorption system\nis malfunctioning!
+Bank0247_Text_F00BleepBloop = F-00: Bleep! Bloop!
+Bank0247_Text_AssistantArghWhy = Assistant: Argh...why?
+Bank0247_Text_JustWhatKindNew = {0100:1}: You...{be01}\nJust what kind of new program did you\nput into the F-00?!
+Bank0247_Text_AssistantHonestCodeCompletely = Assistant: ...{be01}\nTo be honest, your code was completely\nincomprehensible to me...{be01}\nEspecially that one formula that started\nwith a K. Total nonsense!{be01}\nThere's no way anyone could make sense\nof such needlessly complex code...{be01}\nSo, I went in and deleted the complicated\nparts of your code and changed it into{be00}\nsomething anyone can understand!{be01}\nI modified your formulas to handle only\nsimple operations... That's all!
+Bank0247_Text_ThatsWhatDidFormula = {0100:1}: So that's what you did!{be01}\nThat formula that started with a K was\nthe most important one! It was the formula{be00}\nthat gave the F-00 a humanlike heart!{be01}\nIf you went in and messed it all up, then\nthat explains why the usually calm F-00 is{be00}\nnow going berserk...
+Bank0247_Text_AssistantCantSeriousMeans = Assistant: You can't be serious...\nThat means it's all my fault!

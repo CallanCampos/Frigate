@@ -10,7 +10,7 @@
 
 // The battle in progress, whose field status btl_field.c keeps
 void func_ov167_021d59a0(u32 weather);
-u32 GetFieldWeather(void);
+u8 GetFieldWeather(void);
 u32 func_ov167_021d59c0(void);
 void FieldStatusSetWeather(u8 weather, u8 duration);
 u8 func_ov167_021d59e4(void);
@@ -37,6 +37,6 @@ void func_ov167_021d5da4(BtlField *field, void (*callback)(u32 effect, BtlServer
 BOOL CheckFieldEffect(BtlField *field, u32 effect);
 
 // btl_server_flow.c's
-u32 GetWeather(BtlServerFlow *serverFlow);
+u8 GetWeather(BtlServerFlow *serverFlow);
 
 #endif // POKEBW2_BATTLE_BTL_FIELD_H

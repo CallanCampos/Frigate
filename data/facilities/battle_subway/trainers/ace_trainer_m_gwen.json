@@ -1,0 +1,30 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Gwen",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "pokemon": [
+        "claydol_1",
+        "mandibuzz_1",
+        "gastrodon_2",
+        "ferrothorn_2",
+        "salamence_2",
+        "granbull_3",
+        "spiritomb_3",
+        "krookodile_3",
+        "lickilicky_3",
+        "blissey_3",
+        "quagsire_4",
+        "staraptor_4",
+        "weezing_4",
+        "tauros_4",
+        "scrafty_4",
+        "gyarados_4",
+        "arcanine_4",
+        "regice_4"
+    ],
+    "messages": [
+        "The lead character of this story...\nI'll tell you who it is!",
+        "The lead character of the story is me!\nYou are just an extra!",
+        "Of course, you are the lead character!"
+    ]
+}

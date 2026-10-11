@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SERVINE",
+    "moves": [ "MOVE_LEAF_BLADE", "MOVE_SLAM", "MOVE_IRON_TAIL", "MOVE_WRAP" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_GRIP_CLAW",
+    "form": 0
+}

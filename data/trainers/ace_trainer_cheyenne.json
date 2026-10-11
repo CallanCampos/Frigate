@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cheyenne",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HEATMOR",
+            "form": 0,
+            "level": 66,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_UMBREON",
+            "form": 0,
+            "level": 66,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MISMAGIUS",
+            "form": 0,
+            "level": 66,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Pokémon and people...\nAnd now you and I...{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Pokémon and people...\nThat's what this world is made up of."
+        },
+        {
+            "type": 2,
+            "text": "A world without Pokémon?\nI can't even imagine such a thing!"
+        }
+    ]
+}

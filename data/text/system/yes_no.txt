@@ -1,0 +1,6 @@
+YesNo_Text_Yes = YES
+YesNo_Text_No = NO
+YesNo_Text_Forget = FORGET
+YesNo_Text_KeepOldMoves = KEEP OLD MOVES!
+YesNo_Text_GiveUp = Give up on {0107:0}!
+YesNo_Text_DontGiveUp = Don't give up on {0107:0}!

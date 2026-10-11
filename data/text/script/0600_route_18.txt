@@ -1,3 +1,0 @@
-Your Pokémon are so energetic!
-Wait! Wait!{be01}\nAren't your Pokémon a bit tired?\nHere, don't be shy! Let them rest!{be01}
-\pad{52}

@@ -1,0 +1,3 @@
+\from{species.pokedex.ja.height}
+\from{species.pokedex.ja.forms.height}
+\pad{e0}

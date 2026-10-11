@@ -1,4 +1,0 @@
-I have several Black Belts,\nso I'll give you one!{be01}
-So the Black Belt, right...\nWhen you have a Pokémon hold it,{be00}\nFighting-type moves are powered up!{be01}\nThese were given to me by my\ngrandma. She used to be a Battle Girl!
-Cuuub!
-\pad{dc}

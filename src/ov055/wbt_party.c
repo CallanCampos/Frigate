@@ -1,7 +1,9 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "field/bsubway_scr.h"
-#include "field/ov134.h"
+#include "field/wbt_battle.h"
 #include "field/wbt.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -13,6 +15,7 @@
 #include "nitro/os.h"
 #include "pml/met_data.h"
 #include "pml/poke_party.h"
+#include "text/system/scrcmd_bsubway_wbt_party.h"
 
 // A Pokémon of the Battle Subway's Pokémon arc
 typedef struct {
@@ -108,7 +111,7 @@ void func_ov055_021e6c20(WbtPartyFilter *filter, u16 species) {
     }
 }
 
-void func_ov055_021e6c44(WbtPartyFilter *filter, u16 file) {
+void func_ov055_021e6c44(WbtPartyFilter *filter, s16 file) {
     int i;
 
     for (i = 0; i < filter->fileCount; i++) {
@@ -335,9 +338,9 @@ void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 pla
     func_ov055_021e6f74(sys, sys->partyC4, 41122, 20, 6, NULL);
     heapId = HEAPID_TAIL(sys->heapId);
     name = GFL_StrBufCreate(14, heapId);
-    msgData = GFL_MsgSysLoadData(FALSE, 2, 405, heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_WBT_PARTY, heapId);
     if (msgData != NULL) {
-        GFL_MsgDataLoadStrbuf(msgData, 18, name);
+        GFL_MsgDataLoadStrbuf(msgData, ScrcmdBsubwayWbtParty_Text_Empty, name);
         GFL_MsgDataFree(msgData);
     }
     for (i = 0; i < 6; i++) {
@@ -354,7 +357,7 @@ void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 pla
 void func_ov055_021e71ec(WbtSystem *sys) {
     u32 count = func_ov055_021e5d7c(sys);
     int n = PokeParty_GetPkmCount(sys->partyBC);
-    u8 a3 = func_ov055_021e5e18(func_ov134_021f0724(sys));
+    u8 a3 = func_ov055_021e5e18(WbtBattle_GetOpponent(sys));
     u16 species[6];
     int i;
 

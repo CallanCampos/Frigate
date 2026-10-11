@@ -1,0 +1,3 @@
+VictoryRoad22_Text_Kwaaaaan = Kwaaaaan!
+VictoryRoad22_Text_Kwaaan = Kwaaan!
+VictoryRoad22_Text_PokemonWontMoveMight = The Pokémon won't move.\nIt might be protecting something...

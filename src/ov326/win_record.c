@@ -1,9 +1,12 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
+#include "app/ui/print_msg.h"
+#include "app/ui/frame_list.h"
 #include "app/win_record.h"
 #include "app/win_record_graphic.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/wbt.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -30,6 +33,7 @@
 #include "system/str_tool.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
+#include "text/system/0411.h"
 
 // The Pokémon World Tournament's win record: the player, their total of wins, and a list of the wins in each
 // tournament that is open. The name is ours, after the ROM's "win_record_graphic.c", which draws it
@@ -128,7 +132,7 @@ typedef struct {
     // The wins of each tournament, in the order of sWinRecordTournaments, and the indexes into it of the list's items
     s16 wins[31];
     s16 items[31];
-    Ov139List *list;
+    FrameList *list;
     // The positions of the cell actors, and the rectangles of the buttons, as x, y, width and height
     s16 *positions;
     s16 (*rects)[4];
@@ -235,8 +239,8 @@ static void WinRecord_InitList(WinRecordWork *wk);
 static u32 WinRecord_UpdateList(WinRecordWork *wk);
 static int WinRecord_ListResult(WinRecordWork *wk, u32 result);
 static void WinRecord_FreeList(WinRecordWork *wk);
-static void WinRecord_ListPrint(void *work, u32 index, PrintWindow *window, s16 y);
-static void WinRecord_ListSelect(void *work, u32 index);
+static void WinRecord_ListPrint(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void WinRecord_ListSelect(void *work, u32 index, BOOL moved);
 static void WinRecord_ListScroll(void *work, s16 delta);
 static void WinRecord_PrintItem(WinRecordWork *wk, u32 index, PrintWindow *window, MsgData *msgData);
 static void WinRecord_PrintItemAt(WinRecordWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData,
@@ -268,7 +272,7 @@ static const WinRecordBGRes sWinRecordBGPltts[] = {
     { 0xff },
 };
 
-static const Ov139ListCallbacks sWinRecordListCallbacks = {
+static const FrameListCallbacks sWinRecordListCallbacks = {
     WinRecord_ListPrint,
     WinRecord_ListSelect,
     WinRecord_ListScroll,
@@ -321,14 +325,14 @@ static const WinRecordWindowData sWinRecordWindows[] = {
 };
 
 // The rows and buttons of a list that doesn't scroll
-static const Ov139ListTouch sWinRecordListTouchRectsNoScroll[] = {
+static const FrameListTouch sWinRecordListTouchRectsNoScroll[] = {
     { { 0x18, 0x2f, 0x08, 0xe8 }, 0 }, { { 0x30, 0x47, 0x08, 0xe8 }, 0 }, { { 0x48, 0x5f, 0x08, 0xe8 }, 0 },
     { { 0x60, 0x77, 0x08, 0xe8 }, 0 }, { { 0x78, 0x8f, 0x08, 0xe8 }, 0 }, { { 0x90, 0xa7, 0x08, 0xe8 }, 0 },
     { { 0xa8, 0xc0, 0x88, 0xa0 }, 4 }, { { 0xa8, 0xc0, 0xa8, 0xc0 }, 5 }, { { TOUCH_RECT_END } },
 };
 
 // The rows, the scroll bar and the buttons
-static const Ov139ListTouch sWinRecordListTouchRects[] = {
+static const FrameListTouch sWinRecordListTouchRects[] = {
     { { 0x18, 0x2f, 0x08, 0xe8 }, 0 }, { { 0x30, 0x47, 0x08, 0xe8 }, 0 },
     { { 0x48, 0x5f, 0x08, 0xe8 }, 0 }, { { 0x60, 0x77, 0x08, 0xe8 }, 0 },
     { { 0x78, 0x8f, 0x08, 0xe8 }, 0 }, { { 0x90, 0xa7, 0x08, 0xe8 }, 0 },
@@ -336,7 +340,7 @@ static const Ov139ListTouch sWinRecordListTouchRects[] = {
     { { 0xa8, 0xc0, 0xa8, 0xc0 }, 5 }, { { TOUCH_RECT_END } },
 };
 
-static const Ov139ListSetup sWinRecordListSetup = {
+static const FrameListSetup sWinRecordListSetup = {
     { 2, 0xff, 1, 3, 28, 3, 1, 0, 26, 3, 2, 24, 12, 8, 6, 4, 3, 2, 16, 0 },
     7,
     1,
@@ -367,7 +371,7 @@ static const s16 sWinRecordTournaments[WIN_RECORD_TOURNAMENT_COUNT] = {
 static BOOL WinRecord_Init(GameProc *proc, u32 *state, void *param, void *work) {
     WinRecordWork *wk;
 
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WBT_RECORD, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WinRecordWork), HEAPID_WBT_RECORD);
     sys_memset(wk, 0, sizeof(WinRecordWork));
@@ -375,7 +379,7 @@ static BOOL WinRecord_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->param = param;
     wk->graphic = WinRecordGraphic_Create(0, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 411, wk->heapId);
+    wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0411, wk->heapId);
     wk->msgData[1] = NULL;
     wk->printQueue = func_02021998(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
@@ -414,7 +418,7 @@ static BOOL WinRecord_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     heapId = wk->heapId;
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(heapId);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
     return TRUE;
 }
 
@@ -504,7 +508,7 @@ static void WinRecord_Seq(WinRecordWork *wk) {
     switch (wk->seq) {
     case WIN_RECORD_SEQ_INIT:
         if (!(wk->flags & WIN_RECORD_FLAG_LIST_PRINTED)) {
-            if (func_ov139_0219b294(wk->list) == FALSE) {
+            if (FrameList_Draw(wk->list) == FALSE) {
                 wk->seq = WIN_RECORD_SEQ_MAIN;
                 wk->flags |= WIN_RECORD_FLAG_LIST_PRINTED;
                 WinRecord_ListInput(wk, FALSE);
@@ -799,7 +803,7 @@ static void WinRecord_InitWindows(WinRecordWork *wk) {
 }
 
 static void WinRecord_Print(WinRecordWork *wk, int window, int x, int y, const StrBuf *strbuf, u32 align, u16 color) {
-    func_ov139_0219a2a4(&wk->windows[window], wk->printQueue, x, y, strbuf, wk->font, color, align);
+    PrintStrAligned(&wk->windows[window], wk->printQueue, x, y, strbuf, wk->font, color, align);
 }
 
 static void WinRecord_ExitWindows(WinRecordWork *wk) {
@@ -826,7 +830,7 @@ static void WinRecord_PrintTotal(WinRecordWork *wk) {
     StrBuf *format;
     StrBuf *number;
 
-    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 34);
+    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], Bank0411_Text_Name);
     WinRecord_Print(wk, 1, 0, 0, strbuf, 0, 0x39e0);
     GFL_StrBufFree(strbuf);
 
@@ -834,14 +838,14 @@ static void WinRecord_PrintTotal(WinRecordWork *wk) {
     textCopy(wk->param->playerInfo->name, name);
     func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
-    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 32);
+    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], Bank0411_Text_Empty_3);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
     WinRecord_Print(wk, 2, 0, 0, strbuf, 0, 0x39e0);
     GFL_StrBufFree(format);
     GFL_StrBufFree(name);
     GFL_StrBufFree(strbuf);
 
-    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 33);
+    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], Bank0411_Text_TotalWins);
     WinRecord_Print(wk, 3, 0, 0, strbuf, 0, 0x39e0);
     GFL_StrBufFree(strbuf);
 
@@ -849,7 +853,7 @@ static void WinRecord_PrintTotal(WinRecordWork *wk) {
     GFL_WordSetFormatNumber(number, wk->totalWins, 4, 1, TRUE);
     func_0202437c(wk->wordSet, 0, number, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
-    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 2);
+    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], Bank0411_Text_Empty_2);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
     WinRecord_Print(wk, 4, 0, 0, strbuf, 0, 0x39e0);
     GFL_StrBufFree(format);
@@ -1049,7 +1053,7 @@ static BOOL WinRecord_IsTournamentShown(WinRecordWork *wk, int tournament) {
 }
 
 static void WinRecord_InitList(WinRecordWork *wk) {
-    Ov139ListSetup setup = sWinRecordListSetup;
+    FrameListSetup setup = sWinRecordListSetup;
     ArcTool *arc;
     int i;
 
@@ -1064,29 +1068,29 @@ static void WinRecord_InitList(WinRecordWork *wk) {
     if (wk->count <= WIN_RECORD_LIST_ROWS) {
         setup.touch = sWinRecordListTouchRectsNoScroll;
     }
-    wk->list = func_ov139_0219af1c(&setup, wk->heapId);
-    func_ov139_0219b1e0(wk->list, arc, 9, FALSE, 0);
-    func_ov139_0219b27c(wk->list, arc, 0, 2, 2);
+    wk->list = FrameList_Create(&setup, wk->heapId);
+    FrameList_LoadScreen(wk->list, arc, 9, FALSE, 0);
+    FrameList_LoadCursorPalette(wk->list, arc, 0, 2, 2);
     GFL_ArcToolFree(arc);
     for (i = 0; i < setup.count; i++) {
-        func_ov139_0219b1b4(wk->list, 0, sWinRecordTournamentNames[wk->items[i]]);
+        FrameList_AddItem(wk->list, 0, sWinRecordTournamentNames[wk->items[i]]);
     }
     wk->flags &= ~WIN_RECORD_FLAG_LIST_PRINTED;
-    if (func_ov139_0219b294(wk->list) == FALSE) {
+    if (FrameList_Draw(wk->list) == FALSE) {
         wk->flags |= WIN_RECORD_FLAG_LIST_PRINTED;
     }
-    func_ov139_0219ccb0(wk->list, 7);
+    FrameList_SetShownRows(wk->list, 7);
 }
 
 static u32 WinRecord_UpdateList(WinRecordWork *wk) {
-    u32 result = OV139_LIST_NONE;
+    u32 result = FRAMELIST_NONE;
 
     if (wk->flags & WIN_RECORD_FLAG_LIST_DONE) {
         return result;
     }
     WinRecord_ListInput(wk, TRUE);
     if (wk->list != NULL) {
-        result = func_ov139_0219b2e0(wk->list);
+        result = FrameList_Main(wk->list);
     }
     if (wk->flags & WIN_RECORD_FLAG_NO_SCROLL) {
         wk->flags |= WIN_RECORD_FLAG_LIST_DONE;
@@ -1129,34 +1133,34 @@ static int WinRecord_ListResult(WinRecordWork *wk, u32 result) {
         break;
     }
     if (handled == TRUE) {
-        func_ov139_0219ccb0(wk->list, 7);
+        FrameList_SetShownRows(wk->list, 7);
     }
     return handled;
 }
 
 static void WinRecord_FreeList(WinRecordWork *wk) {
     if (wk->list != NULL) {
-        func_ov139_0219b138(wk->list);
+        FrameList_Free(wk->list);
         wk->list = NULL;
     }
 }
 
-static void WinRecord_ListPrint(void *work, u32 index, PrintWindow *window, s16 y) {
+static void WinRecord_ListPrint(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     WinRecordWork *wk = work;
 
     WinRecord_PrintItem(wk, index, window, wk->msgData[0]);
 }
 
-static void WinRecord_ListSelect(void *work, u32 index) {
+static void WinRecord_ListSelect(void *work, u32 index, BOOL moved) {
 }
 
 static void WinRecord_ListScroll(void *work, s16 delta) {
 }
 
 static void WinRecord_PrintItem(WinRecordWork *wk, u32 index, PrintWindow *window, MsgData *msgData) {
-    PrintQueue *queue = func_ov139_0219cc18(wk->list);
+    PrintQueue *queue = FrameList_GetPrintQueue(wk->list);
 
-    WinRecord_PrintItemLine(wk, window, queue, msgData, func_ov139_0219cc1c(wk->list, index), index);
+    WinRecord_PrintItemLine(wk, window, queue, msgData, FrameList_GetValue(wk->list, index), index);
 }
 
 static void WinRecord_PrintItemAt(WinRecordWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData,
@@ -1174,7 +1178,7 @@ static void WinRecord_PrintItemAt(WinRecordWork *wk, PrintWindow *window, PrintQ
     GFL_WordSetFormatNumber(number, wk->wins[wk->items[index]], 4, 1, TRUE);
     func_0202437c(wk->wordSet, 0, number, 0, 1, 2);
     strbuf = GFL_StrBufCreate(64, wk->heapId);
-    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 2);
+    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], Bank0411_Text_Empty_2);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
     PrintWindow_Print(window, queue, columns[1], y, strbuf, wk->font, color);
     GFL_StrBufFree(number);
@@ -1192,7 +1196,7 @@ static void WinRecord_UpdateScrollBar(WinRecordWork *wk) {
 
     if (!(wk->flags & WIN_RECORD_FLAG_NO_SCROLL)) {
         func_0204c178(wk->scrollActors[0], &pos, 0);
-        pos.y = func_ov139_0219c324(wk->list, pos.y);
+        pos.y = FrameList_ClampBarPos(wk->list, pos.y);
         if (pos.y < 40) {
             pos.y = 40;
         } else if (pos.y > 152) {
@@ -1223,7 +1227,7 @@ static void WinRecord_ListInput(WinRecordWork *wk, BOOL updated) {
     if (wk->flags & WIN_RECORD_FLAG_NO_SCROLL) {
         if (updated == FALSE) {
             if (GCTX_HIDGetHeldKeys() & (PAD_KEY_LEFT | PAD_KEY_UP)) {
-                func_ov139_0219cc58(wk->list, 0);
+                FrameList_SetCursor(wk->list, 0);
             } else if (GCTX_HIDGetHeldKeys() & (PAD_KEY_RIGHT | PAD_KEY_DOWN)) {
                 pos = wk->count - 1;
                 if (pos < 0) {
@@ -1231,7 +1235,7 @@ static void WinRecord_ListInput(WinRecordWork *wk, BOOL updated) {
                 } else if (pos >= WIN_RECORD_LIST_ROWS) {
                     pos = WIN_RECORD_LIST_ROWS - 1;
                 }
-                func_ov139_0219cc58(wk->list, pos);
+                FrameList_SetCursor(wk->list, pos);
             }
         }
     } else {
@@ -1240,15 +1244,15 @@ static void WinRecord_ListInput(WinRecordWork *wk, BOOL updated) {
         }
         if (updated == FALSE) {
             if (GCTX_HIDGetHeldKeys() & (PAD_KEY_LEFT | PAD_KEY_UP)) {
-                func_ov139_0219cc58(wk->list, 0);
+                FrameList_SetCursor(wk->list, 0);
             } else if (GCTX_HIDGetHeldKeys() & (PAD_KEY_RIGHT | PAD_KEY_DOWN)) {
-                func_ov139_0219cc58(wk->list, WIN_RECORD_LIST_ROWS - 1);
+                FrameList_SetCursor(wk->list, WIN_RECORD_LIST_ROWS - 1);
             }
         } else {
             if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
-                func_ov139_0219cc58(wk->list, 0);
+                FrameList_SetCursor(wk->list, 0);
             } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_DOWN) {
-                func_ov139_0219cc58(wk->list, WIN_RECORD_LIST_ROWS - 1);
+                FrameList_SetCursor(wk->list, WIN_RECORD_LIST_ROWS - 1);
             }
         }
     }

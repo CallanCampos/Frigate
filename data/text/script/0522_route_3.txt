@@ -1,3 +1,0 @@
-Pokémon left in the Day Care\nlearn moves as they grow!{be01}\nSo if you just leave them there,\nthey might forget an important move, yo!
-Pokémon don't evolve while\nthey're being kept at the Day Care!
-\pad{1c}

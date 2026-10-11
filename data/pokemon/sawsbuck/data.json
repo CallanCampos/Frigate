@@ -1,0 +1,145 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Sawsbuck",
+    "pokedex": {
+        "category": "Season Pokémon",
+        "entry": "They migrate according to the seasons,\nso some people call Sawsbuck\nthe harbingers of spring.",
+        "height": "6'03\"",
+        "weight": "203.9 lbs.",
+        "forms": [
+            {
+                "entry": "They migrate according to the seasons,\nso some people call Sawsbuck\nthe harbingers of spring.",
+                "height": "6'03\"",
+                "weight": "203.9 lbs."
+            },
+            {
+                "entry": "They migrate according to the seasons,\nso some people call Sawsbuck\nthe harbingers of spring.",
+                "height": "6'03\"",
+                "weight": "203.9 lbs."
+            },
+            {
+                "entry": "They migrate according to the seasons,\nso some people call Sawsbuck\nthe harbingers of spring.",
+                "height": "6'03\"",
+                "weight": "203.9 lbs."
+            }
+        ],
+        "languages": {
+            "ja": {
+                "category": "きせつポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 100,
+        "defense": 70,
+        "speed": 95,
+        "special_attack": 60,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_GRASS" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_SAP_SIPPER" ],
+    "hidden_ability": "ABILITY_SERENE_GRACE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 4,
+        "sprite_offset": 52
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 166,
+    "height": 19,
+    "weight": 925,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MEGAHORN" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_CAMOUFLAGE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 4, "MOVE_GROWL" ],
+            [ 7, "MOVE_SAND_ATTACK" ],
+            [ 10, "MOVE_DOUBLE_KICK" ],
+            [ 13, "MOVE_LEECH_SEED" ],
+            [ 16, "MOVE_FAINT_ATTACK" ],
+            [ 20, "MOVE_TAKE_DOWN" ],
+            [ 24, "MOVE_JUMP_KICK" ],
+            [ 28, "MOVE_AROMATHERAPY" ],
+            [ 32, "MOVE_ENERGY_BALL" ],
+            [ 36, "MOVE_CHARM" ],
+            [ 37, "MOVE_HORN_LEECH" ],
+            [ 44, "MOVE_NATURE_POWER" ],
+            [ 52, "MOVE_DOUBLE_EDGE" ],
+            [ 60, "MOVE_SOLAR_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM53",
+            "TM67",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM75",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_BOUNCE",
+            "MOVE_LAST_RESORT",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 160,
+    "baby_species": "SPECIES_DEERLING"
+}

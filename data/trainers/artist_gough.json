@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Gough",
+    "class": "TRAINER_CLASS_ARTIST",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SUNFLORA",
+            "form": 0,
+            "level": 42,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A high-level battling technique\nis art in its own way!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your strength cannot be\nput into words!"
+        },
+        {
+            "type": 2,
+            "text": "I'll draw how I want to draw!\nI'll live how I want to live!{be00}\nThat's the best way!"
+        }
+    ]
+}

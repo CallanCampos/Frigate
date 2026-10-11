@@ -191,8 +191,6 @@ static u32 sExpLeft;
 static s32 sExpSeq;
 // Where the search for the moves learned at the new level goes on
 static u32 sLearnIdx;
-// The step the action selection is at
-static s32 sSelectSeq;
 static BattleMonLevelUp sLevelUp;
 
 static BtlClientCmdProc BattleClient_GetCmdProc(BtlClient *client, u32 cmd, u32 *unk01);
@@ -503,8 +501,6 @@ static const BtlStudioTransition sStudioTransitions[7] = {
     { 0x22, { 7, -1, 0, -1, -1 } },
 };
 
-static const u16 sTrainerHintMsgs[4] = { 0x12, 0x11, 0x13, 0x14 };
-
 // A type and the abilities that absorb moves of it, for the AI's switch checks
 typedef struct {
     u8 type;
@@ -552,10 +548,7 @@ typedef struct {
 // The most mons the AI may have left to use the item in each of its four slots
 static const u8 sAIItemMaxMons[4] = { 6, 4, 2, 1 };
 // The points a movie scores for its star's fame
-static const u8 sFameBonus[5] = { 0, 1, 5, 10, 15 };
 // The messages of an escape, by its kind
-static const u16 sEscapeMessages[4] = { 0x3d, 0x3e, 0x3f, 0x40 };
-
 BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, void *netHandle,
                                u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
                                HeapID heapId) {
@@ -1131,6 +1124,9 @@ static void BattleClient_SetSelActProc(BtlClient *client, BOOL (*proc)(BtlClient
 static BOOL BattleClient_RunSelActProc(BtlClient *client) {
     return client->selActProc(client, &client->selActSeq);
 }
+
+// The step the action selection is at
+static s32 sSelectSeq;
 
 static s32 func_ov167_021b2188(void) {
     return sSelectSeq;
@@ -2286,6 +2282,7 @@ static BOOL BattleClient_ActionTrainerHint(BtlClient *client, s32 *seq) {
 }
 
 static BOOL CheckTrainerHintMsg(BtlClient *client, u16 *msgId) {
+    static const u16 sTrainerHintMsgs[4] = { 0x12, 0x11, 0x13, 0x14 };
     if (BtlSetup_GetBattleType(client->mainModule) == 1) {
         u32 i = 0;
         u8 clientId = func_ov167_0219c8b8(client->mainModule, 0);
@@ -4558,11 +4555,6 @@ static const struct {
 };
 
 // The effort values that the effort value command raises, in its arguments' order
-static const u16 sEVParams[] = {
-    PKM_PARAM_EV_HP,     PKM_PARAM_EV_HP + 1, PKM_PARAM_EV_HP + 2,
-    PKM_PARAM_EV_HP + 3, PKM_PARAM_EV_HP + 4, PKM_PARAM_EV_HP + 5,
-};
-
 static BOOL func_ov167_021b6dc4(BtlClient *client, s32 *seq) {
     switch (*seq) {
     case 0:
@@ -5433,6 +5425,10 @@ static BOOL func_ov167_021b7d90(BtlClient *client, s32 *seq, const u32 *args) {
 }
 
 static BOOL BattleClient_ScAddEVs(BtlClient *client, s32 *seq, const u32 *args) {
+    static const u16 sEVParams[] = {
+        PKM_PARAM_EV_HP,     PKM_PARAM_EV_HP + 1, PKM_PARAM_EV_HP + 2,
+        PKM_PARAM_EV_HP + 3, PKM_PARAM_EV_HP + 4, PKM_PARAM_EV_HP + 5,
+    };
     PartyPkm *pkm = GetSrcData(GetPokeParam(client->pokeCon, args[0]));
     u32 i;
 
@@ -5746,6 +5742,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
 }
 
 static BOOL func_ov167_021b83dc(BtlClient *client, s32 *seq, const u32 *args) {
+    static const u16 sEscapeMessages[4] = { 0x3d, 0x3e, 0x3f, 0x40 };
     BattleMon *mon;
     u16 message;
 
@@ -6488,10 +6485,11 @@ static u16 AICheckItemUse(BtlClient *client, BattleMon *mon, BattleParty *party)
     return 0;
 }
 
+static const BtlClientItemStat sXItems[6] = {
+    { 0x1e, 1 }, { 0x1f, 2 }, { 0x20, 3 }, { 0x21, 4 }, { 0x22, 5 }, { 0x23, 6 },
+};
+
 static BOOL IsXItem(u16 item, BattleMon *mon) {
-    static const BtlClientItemStat sXItems[6] = {
-        { 0x1e, 1 }, { 0x1f, 2 }, { 0x20, 3 }, { 0x21, 4 }, { 0x22, 5 }, { 0x23, 6 },
-    };
     u32 i;
 
     for (i = 0; i < NELEMS(sXItems); i++) {
@@ -6505,10 +6503,11 @@ static BOOL IsXItem(u16 item, BattleMon *mon) {
     return FALSE;
 }
 
+static const BtlClientItemCondition sCureItems[7] = {
+    { 0x12, 2 }, { 0x13, 5 }, { 0x14, 4 }, { 0x15, 3 }, { 0x16, 1 }, { 0x17, 6 }, { 0x18, 7 },
+};
+
 static BOOL IsStatusCureItem(u16 item, BattleMon *mon) {
-    static const BtlClientItemCondition sCureItems[7] = {
-        { 0x12, 2 }, { 0x13, 5 }, { 0x14, 4 }, { 0x15, 3 }, { 0x16, 1 }, { 0x17, 6 }, { 0x18, 7 },
-    };
     u32 i;
 
     for (i = 0; i < NELEMS(sCureItems); i++) {
@@ -6770,6 +6769,7 @@ static void func_ov167_021b96e0(BtlvCore *core, BtlClientStudioWork *studio, int
 }
 
 static void func_ov167_021b96f0(BtlClient *client, BtlClientStudioWork *studio, BattleParty *party) {
+    static const u8 sFameBonus[5] = { 0, 1, 5, 10, 15 };
     PartyPkm *pkm = GetSrcData(GetBattleMonFromParty(party, 0));
     int fame;
 

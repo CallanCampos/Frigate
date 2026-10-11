@@ -1,0 +1,171 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Butterfree",
+    "pokedex": {
+        "category": "Butterfly Pokémon",
+        "entry": "It loves the honey of flowers and\ncan locate flower patches that\nhave even tiny amounts of pollen.",
+        "height": "3'07\"",
+        "weight": "70.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Butterfree",
+                "category": "Butterfly Pokémon",
+                "entry": "It loves the honey of flowers and\ncan locate flower patches that\nhave even tiny amounts of pollen.",
+                "height": "3'07\"",
+                "weight": "70.5 lbs."
+            },
+            "fr": {
+                "name": "Papilusion",
+                "category": "Pokémon Papillon",
+                "entry": "Il raffole du nectar des fleurs. Il\nest capable de repérer la plus\npetite quantité de pollen.",
+                "height": "1,1 m",
+                "weight": "32,0 kg"
+            },
+            "de": {
+                "name": "Smettbo",
+                "category": "Falter",
+                "entry": "Es liebt Blütenhonig. Es findet\nselbst Blumen, die sehr wenig\nPollen haben.",
+                "height": "1,1 m",
+                "weight": "32,0 kg"
+            },
+            "it": {
+                "name": "Butterfree",
+                "category": "Pokémon Farfalla",
+                "entry": "Adora il nettare dei fiori e riesce a\nlocalizzare i campi in cui si trova\nanche una minima quantità di polline.",
+                "height": "1,1 m",
+                "weight": "32,0 kg"
+            },
+            "ko": {
+                "name": "버터플",
+                "category": "나비포켓몬",
+                "entry": "꽃의 꿀을 매우 좋아한다.\n약간의 꽃가루만으로 꽃밭이\n있는 장소를 찾아낼 수 있다.",
+                "height": "1.1 m",
+                "weight": "32.0 kg"
+            },
+            "es": {
+                "name": "Butterfree",
+                "category": "Pokémon Mariposa",
+                "entry": "Adora el néctar de las flores.\nPuede localizar hasta las más\npequeñas cantidades de polen.",
+                "height": "1,1 m",
+                "weight": "32,0 kg"
+            },
+            "ja": {
+                "name": "バタフリー",
+                "category": "ちょうちょポケモン",
+                "entry": "はなの\\x{3000}ミツが\\x{3000}だいこうぶつ。\nわずかな\\x{3000}かふんで\\x{3000}はなばたけの\nばしょを\\x{3000}さがしだすことが\\x{3000}できる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff11}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 45,
+        "defense": 50,
+        "speed": 70,
+        "special_attack": 80,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_SILVER_POWDER",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_COMPOUNDEYES", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TINTED_LENS",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 11,
+    "weight": 320,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CONFUSION" ],
+            [ 10, "MOVE_CONFUSION" ],
+            [ 12, "MOVE_POISON_POWDER" ],
+            [ 12, "MOVE_STUN_SPORE" ],
+            [ 12, "MOVE_SLEEP_POWDER" ],
+            [ 16, "MOVE_GUST" ],
+            [ 18, "MOVE_SUPERSONIC" ],
+            [ 22, "MOVE_WHIRLWIND" ],
+            [ 24, "MOVE_PSYBEAM" ],
+            [ 28, "MOVE_SILVER_WIND" ],
+            [ 30, "MOVE_TAILWIND" ],
+            [ 34, "MOVE_RAGE_POWDER" ],
+            [ 36, "MOVE_SAFEGUARD" ],
+            [ 40, "MOVE_CAPTIVATE" ],
+            [ 42, "MOVE_BUG_BUZZ" ],
+            [ 46, "MOVE_QUIVER_DANCE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM62",
+            "TM68",
+            "TM70",
+            "TM76",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM89",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_ELECTROWEB",
+            "MOVE_SNORE",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CATERPIE"
+}

@@ -1,2 +1,0 @@
-Do you enjoy spending time\nin undisturbed nature?{be01}\nOr do you prefer nature sculpted into\na shape that pleases people?{be01}\nWhich suits you better?
-\pad{0c}

@@ -4050,8 +4050,8 @@ void ServerControl_AddCondition(BtlServerFlow *flow, BattleMon *target, BattleMo
     }
 }
 
-u32 ServerEvent_GetWeather(BtlServerFlow *flow) {
-    u32 weather;
+u8 ServerEvent_GetWeather(BtlServerFlow *flow) {
+    u8 weather;
     BOOL suppressed;
 
     BattleEventVar_Push(0x1f33);
@@ -7506,7 +7506,7 @@ BOOL func_ov167_021abd8c(BtlServerFlow *flow, u8 monId) {
     return TRUE;
 }
 
-u32 GetWeather(BtlServerFlow *flow) {
+u8 GetWeather(BtlServerFlow *flow) {
     return ServerEvent_GetWeather(flow);
 }
 
@@ -7570,7 +7570,7 @@ BOOL func_ov167_021abeb4(BtlServerFlow *flow, u8 monId) {
     return FALSE;
 }
 
-u32 func_ov167_021abee0(BtlServerFlow *flow, u8 monId) {
+s32 func_ov167_021abee0(BtlServerFlow *flow, u8 monId) {
     BattleMon *mon;
     fx32 ratio;
     u32 weight;

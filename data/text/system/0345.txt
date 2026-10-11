@@ -1,43 +1,43 @@
-SCENARIO
-SCENE 01
-SCENE 02
-SCENE 03
-SCENE 04
-SCENE 05
-SCENE 06
-SCENE 07
-SCENE 08
-SCENE 09
-SCENE 10
-SCENE 11
-SCENE 12
-SCENE 13
-SCENE 14
-SCENE 15
-SCENE 16
-SCENE 17
-SCENE 18
-SCENE 19
-SCENE 20
-Pay attention to the foe's Ability!\nPay attention to the line you choose!
-Pay attention to the foe's Ability!\nPay attention to the line you choose!
-Pay attention to the foe's Ability!
-Pay attention to the foe's Ability!
-Pay attention to the foe's Ability!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0345_Text_Scenario = SCENARIO
+Bank0345_Text_Scene01 = SCENE 01
+Bank0345_Text_Scene02 = SCENE 02
+Bank0345_Text_Scene03 = SCENE 03
+Bank0345_Text_Scene04 = SCENE 04
+Bank0345_Text_Scene05 = SCENE 05
+Bank0345_Text_Scene06 = SCENE 06
+Bank0345_Text_Scene07 = SCENE 07
+Bank0345_Text_Scene08 = SCENE 08
+Bank0345_Text_Scene09 = SCENE 09
+Bank0345_Text_Scene10 = SCENE 10
+Bank0345_Text_Scene11 = SCENE 11
+Bank0345_Text_Scene12 = SCENE 12
+Bank0345_Text_Scene13 = SCENE 13
+Bank0345_Text_Scene14 = SCENE 14
+Bank0345_Text_Scene15 = SCENE 15
+Bank0345_Text_Scene16 = SCENE 16
+Bank0345_Text_Scene17 = SCENE 17
+Bank0345_Text_Scene18 = SCENE 18
+Bank0345_Text_Scene19 = SCENE 19
+Bank0345_Text_Scene20 = SCENE 20
+Bank0345_Text_PayAttentionFoesAbility = Pay attention to the foe's Ability!\nPay attention to the line you choose!
+Bank0345_Text_PayAttentionFoesAbility_2 = Pay attention to the foe's Ability!\nPay attention to the line you choose!
+Bank0345_Text_PayAttentionFoesAbility_3 = Pay attention to the foe's Ability!
+Bank0345_Text_PayAttentionFoesAbility_4 = Pay attention to the foe's Ability!
+Bank0345_Text_PayAttentionFoesAbility_5 = Pay attention to the foe's Ability!
+Bank0345_Text_Empty = なし
+Bank0345_Text_Empty_2 = なし
+Bank0345_Text_Empty_3 = なし
+Bank0345_Text_Empty_4 = なし
+Bank0345_Text_Empty_5 = なし
+Bank0345_Text_Empty_6 = なし
+Bank0345_Text_Empty_7 = なし
+Bank0345_Text_Empty_8 = なし
+Bank0345_Text_Empty_9 = なし
+Bank0345_Text_Empty_10 = なし
+Bank0345_Text_Empty_11 = なし
+Bank0345_Text_Empty_12 = なし
+Bank0345_Text_Empty_13 = なし
+Bank0345_Text_Empty_14 = なし
+Bank0345_Text_Empty_15 = なし
+Bank0345_Text_Empty_16 = なし
 \pad{28}

@@ -187,7 +187,7 @@ ResortPersonData *func_ov137_021f1824(ResortSlots *slots, u32 row, u32 pos) {
     return func_ov137_021f1b94(slots->datas, kind, index);
 }
 
-u16 func_ov137_021f184c(ResortSlots *slots, u32 row) {
+u32 func_ov137_021f184c(ResortSlots *slots, u32 row) {
     u16 pos;
     for (pos = 0; pos < RESORT_SLOTS; pos++) {
         if (func_ov137_021f1808(slots, row, pos)) {
@@ -246,7 +246,7 @@ void func_ov137_021f1974(ResortPersonData *data, JoinAvenuePersonParam param, u3
     data->funcs->setParam(data->person, param, value);
 }
 
-JoinAvenuePerson *func_ov137_021f1980(ResortPersonData *data) {
+void *func_ov137_021f1980(ResortPersonData *data) {
     return data->person;
 }
 

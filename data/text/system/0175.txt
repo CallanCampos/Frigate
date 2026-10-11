@@ -1,20 +1,20 @@
-Yo!\nI'm {011c:0}.
-Glad to meet you!\nI love {011c:0}!
-Do you like {011c:0}?
-Let's draw! I want to draw\n{011c:0}!
-Let's battle!\nI say {011c:0}!
-I'm a {011c:0} Trainer!\nPlease battle me!
-Let's have a chat!\nHow about {011c:0}?
-Please trade!\nI want a {011c:0}!
-Please trade!\nI'm offering {011c:0}!
-Want to trade {011c:0}?\nHere's a hint: {011c:1}!
-Will you join me\nfor {011c:0}?
-Anyone want to\n{011c:0}?
-I want to {011c:0}\nwith {011c:1}!
-Let's go to {011c:0}\nby {011c:1}!
-OK!
-{011c:0}?\nI got it!
-{011c:0}?\nHold on!
-I don't want to\n{011c:0}...
-That was fun! I hope we can\n{011c:0} again sometime.
-See ya!\n{011c:0}!
+Bank0175_Text_YoIm = Yo!\nI'm {011c:0}.
+Bank0175_Text_GladMeetLove = Glad to meet you!\nI love {011c:0}!
+Bank0175_Text_Like = Do you like {011c:0}?
+Bank0175_Text_LetsDrawWantDraw = Let's draw! I want to draw\n{011c:0}!
+Bank0175_Text_LetsBattleSay = Let's battle!\nI say {011c:0}!
+Bank0175_Text_ImTrainerPleaseBattle = I'm a {011c:0} Trainer!\nPlease battle me!
+Bank0175_Text_LetsHaveChatHow = Let's have a chat!\nHow about {011c:0}?
+Bank0175_Text_PleaseTradeWant = Please trade!\nI want a {011c:0}!
+Bank0175_Text_PleaseTradeImOffering = Please trade!\nI'm offering {011c:0}!
+Bank0175_Text_WantTradeHeresHint = Want to trade {011c:0}?\nHere's a hint: {011c:1}!
+Bank0175_Text_WillJoin = Will you join me\nfor {011c:0}?
+Bank0175_Text_AnyoneWant = Anyone want to\n{011c:0}?
+Bank0175_Text_Want = I want to {011c:0}\nwith {011c:1}!
+Bank0175_Text_LetsGoBy = Let's go to {011c:0}\nby {011c:1}!
+Bank0175_Text_Ok = OK!
+Bank0175_Text_Got = {011c:0}?\nI got it!
+Bank0175_Text_Hold = {011c:0}?\nHold on!
+Bank0175_Text_DontWant = I don't want to\n{011c:0}...
+Bank0175_Text_FunHopeWeCan = That was fun! I hope we can\n{011c:0} again sometime.
+Bank0175_Text_SeeYa = See ya!\n{011c:0}!

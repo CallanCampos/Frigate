@@ -1,0 +1,197 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Cubone",
+    "pokedex": {
+        "category": "Lonely Pokémon",
+        "entry": "When it thinks of its dead mother,\nit cries. Its crying makes the\nskull it wears rattle hollowly.",
+        "height": "1'04\"",
+        "weight": "14.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Cubone",
+                "category": "Lonely Pokémon",
+                "entry": "When it thinks of its dead mother,\nit cries. Its crying makes the\nskull it wears rattle hollowly.",
+                "height": "1'04\"",
+                "weight": "14.3 lbs."
+            },
+            "fr": {
+                "name": "Osselait",
+                "category": "Pokémon Solitaire",
+                "entry": "Il pleure en pensant à sa mère\ndisparue, et ses larmes résonnent\ndans son crâne creux.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "de": {
+                "name": "Tragosso",
+                "category": "Einsam",
+                "entry": "Denkt es an seine verstorbene Mutter,\nweint es, wobei der Schädel\nauf seinem Kopf hohl klingt.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "it": {
+                "name": "Cubone",
+                "category": "Pokémon Solitario",
+                "entry": "Piange pensando alla madre defunta e\ndal teschio che ha in testa proviene\nun rumore sordo e continuo.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "ko": {
+                "name": "탕구리",
+                "category": "고독포켓몬",
+                "entry": "사별한 어머니를 생각하며\n울 때에는 머리에 쓴\n뼈가 달각달각 소리를 낸다.",
+                "height": "0.4 m",
+                "weight": "6.5 kg"
+            },
+            "es": {
+                "name": "Cubone",
+                "category": "Pokémon Solitario",
+                "entry": "Llora cuando se acuerda de su madre\nfallecida. Cuando lo hace, sus llantos\nresuenan en su calavera.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "ja": {
+                "name": "カラカラ",
+                "category": "こどくポケモン",
+                "entry": "しにわかれた\\x{3000}ははおやを\\x{3000}おもいだし\nないてしまうとき\\x{3000}あたまに\\x{3000}かぶった\nホネが\\x{3000}からからと\\x{3000}おとを\\x{3000}たてる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 50,
+        "defense": 95,
+        "speed": 35,
+        "special_attack": 40,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_THICK_CLUB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_ROCK_HEAD", "ABILITY_LIGHTNINGROD" ],
+    "hidden_ability": "ABILITY_BATTLE_ARMOR",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 64,
+    "height": 4,
+    "weight": 65,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 3, "MOVE_TAIL_WHIP" ],
+            [ 7, "MOVE_BONE_CLUB" ],
+            [ 11, "MOVE_HEADBUTT" ],
+            [ 13, "MOVE_LEER" ],
+            [ 17, "MOVE_FOCUS_ENERGY" ],
+            [ 21, "MOVE_BONEMERANG" ],
+            [ 23, "MOVE_RAGE" ],
+            [ 27, "MOVE_FALSE_SWIPE" ],
+            [ 31, "MOVE_THRASH" ],
+            [ 33, "MOVE_FLING" ],
+            [ 37, "MOVE_BONE_RUSH" ],
+            [ 41, "MOVE_ENDEAVOR" ],
+            [ 43, "MOVE_DOUBLE_EDGE" ],
+            [ 47, "MOVE_RETALIATE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM54",
+            "TM56",
+            "TM59",
+            "TM67",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_LOW_KICK",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ICY_WIND",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ENDEAVOR",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_ANCIENT_POWER",
+            "MOVE_BELLY_DRUM",
+            "MOVE_SCREECH",
+            "MOVE_SKULL_BASH",
+            "MOVE_PERISH_SONG",
+            "MOVE_DOUBLE_KICK",
+            "MOVE_IRON_HEAD",
+            "MOVE_DETECT",
+            "MOVE_ENDURE",
+            "MOVE_CHIP_AWAY"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 28,
+            "species": "SPECIES_MAROWAK"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CUBONE"
+}

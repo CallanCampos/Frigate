@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Marian",
+    "class": "TRAINER_CLASS_SOCIALITE",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LOPUNNY",
+            "form": 0,
+            "level": 39,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hello there, young Trainer.\nPlease, battle with me for a spell.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My oh my...\nToo bad. Looks like I lost."
+        },
+        {
+            "type": 2,
+            "text": "When I was young, I traveled all\naround, together with my Pokémon.{be01}\nOh, I was such a tomboy! Ah ha ha!"
+        }
+    ]
+}

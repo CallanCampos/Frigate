@@ -2,7 +2,6 @@
 #define POKEBW2_APP_WIFICLUB_H
 
 #include "types.h"
-#include "app/ov139.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"

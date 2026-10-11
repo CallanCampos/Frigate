@@ -9,6 +9,7 @@
 #include "constants/items.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "demo/shinka_demo.h"
 #include "field/burmy_form.h"
 #include "field/player_state.h"
@@ -202,7 +203,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 slot = 0;
                 BoxSaveAccessor_GetNextFreeBoxSlot(boxes, &box, &slot);
                 wk->box = box;
-                msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x1b9, HEAPID_BATTLE_RETURN);
+                msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, HEAPID_BATTLE_RETURN);
                 wk->boxMessage = GFL_MsgDataLoadStrbufNew(
                     msgData,
                     EventWork_FlagGet(GameData_GetEventWork(prm->gameData), FLAG_BATTLE_RETURN_BOX_MESSAGE) ? 0xb2 : 0xb1);

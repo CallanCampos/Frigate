@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Billy",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GOLURK",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_SHADOW_PUNCH", "MOVE_HEAVY_SLAM", "MOVE_MEGA_PUNCH", "MOVE_BULLDOZE" ]
+        },
+        {
+            "species": "SPECIES_SIGILYPH",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_AIR_SLASH", "MOVE_PSYCHIC", "MOVE_ICE_BEAM", "MOVE_COSMIC_POWER" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Why don't you prove to me how much you\nand your Pokémon are capable of!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You are capable of far more than we are!\nThat has certainly been proven!"
+        },
+        {
+            "type": 2,
+            "text": "There actually wasn't any need to prove\nhow strong we are.{be01}\nI already know how capable my Pokémon\nand I are!"
+        }
+    ]
+}

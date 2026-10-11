@@ -9,8 +9,10 @@
 #include "app/wifi_login.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/script_text_banks.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -274,8 +276,8 @@ static BOOL MysteryProc_Init(GameProc *proc, u32 *state, void *param, void *work
     MysteryActors_Init(&wk->actors, MysteryGraphic_GetClactUnit(wk->graphic), HEAPID_MYSTERY);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_MYSTERY);
     wk->queue = func_02021998(HEAPID_MYSTERY);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x64, HEAPID_MYSTERY);
-    wk->scriptMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 0xd0, HEAPID_MYSTERY);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_14, HEAPID_MYSTERY);
+    wk->scriptMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, HEAPID_MYSTERY);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_MYSTERY);
     wk->seq = MysterySeq_Create(wk, MysterySeq_Start, HEAPID_MYSTERY);
     wk->msgWin = MysteryMsgWin_Create(1, 15, wk->queue, wk->font, HEAPID_MYSTERY);

@@ -1,0 +1,159 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Luxio",
+    "pokedex": {
+        "category": "Spark Pokémon",
+        "entry": "Strong electricity courses through\nthe tips of its sharp claws. A light\nscratch causes fainting in foes.",
+        "height": "2'11\"",
+        "weight": "67.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Luxio",
+                "category": "Spark Pokémon",
+                "entry": "Strong electricity courses through\nthe tips of its sharp claws. A light\nscratch causes fainting in foes.",
+                "height": "2'11\"",
+                "weight": "67.2 lbs."
+            },
+            "fr": {
+                "name": "Luxio",
+                "category": "Pokémon Étincelle",
+                "entry": "Le courant qui circule à la pointe\nde ses griffes est capable de faire\nperdre connaissance à ses proies.",
+                "height": "0,9 m",
+                "weight": "30,5 kg"
+            },
+            "de": {
+                "name": "Luxio",
+                "category": "Funken",
+                "entry": "Durch die Spitzen seiner scharfen\nKrallen strömt Elektrizität. Selbst\nkleine Kratzer verursachen Ohnmacht.",
+                "height": "0,9 m",
+                "weight": "30,5 kg"
+            },
+            "it": {
+                "name": "Luxio",
+                "category": "Pokémon Favilla",
+                "entry": "I suoi artigli rilasciano una forte\ncorrente elettrica e con un solo graffio\nmanda KO i nemici.",
+                "height": "0,9 m",
+                "weight": "30,5 kg"
+            },
+            "ko": {
+                "name": "럭시오",
+                "category": "전광포켓몬",
+                "entry": "날카로운 발톱의 끝에는 강한\n전기가 흐르고 있어서 살짝 스치는\n것만으로 상대를 기절시킨다.",
+                "height": "0.9 m",
+                "weight": "30.5 kg"
+            },
+            "es": {
+                "name": "Luxio",
+                "category": "Pokémon Chispa",
+                "entry": "Por las puntas de sus garras pasa\nuna fuerte corriente eléctrica.\nEl mínimo roce debilita al enemigo.",
+                "height": "0,9 m",
+                "weight": "30,5 kg"
+            },
+            "ja": {
+                "name": "ルクシオ",
+                "category": "でんこうポケモン",
+                "entry": "するどい\\x{3000}ツメの\\x{3000}さきには\\x{3000}つよい\nでんきが\\x{3000}ながれており\\x{3000}ほんのすこし\nかするだけで\\x{3000}あいてをきぜつさせる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 85,
+        "defense": 49,
+        "speed": 60,
+        "special_attack": 60,
+        "special_defense": 49
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 100,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RIVALRY", "ABILITY_INTIMIDATE" ],
+    "hidden_ability": "ABILITY_GUTS",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 127,
+    "height": 9,
+    "weight": 305,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_LEER" ],
+            [ 5, "MOVE_LEER" ],
+            [ 9, "MOVE_CHARGE" ],
+            [ 13, "MOVE_SPARK" ],
+            [ 18, "MOVE_BITE" ],
+            [ 23, "MOVE_ROAR" ],
+            [ 28, "MOVE_SWAGGER" ],
+            [ 33, "MOVE_THUNDER_FANG" ],
+            [ 38, "MOVE_CRUNCH" ],
+            [ 43, "MOVE_SCARY_FACE" ],
+            [ 48, "MOVE_DISCHARGE" ],
+            [ 53, "MOVE_WILD_CHARGE" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM95",
+            "HM04"
+        ],
+        "by_tutor": [ "MOVE_SIGNAL_BEAM", "MOVE_MAGNET_RISE", "MOVE_IRON_TAIL", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_LUXRAY"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SHINX"
+}

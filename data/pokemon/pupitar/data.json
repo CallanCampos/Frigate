@@ -1,0 +1,181 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Pupitar",
+    "pokedex": {
+        "category": "Hard Shell Pokémon",
+        "entry": "This pupa flies around wildly\nby venting with great force the\ngas pressurized inside its body.",
+        "height": "3'11\"",
+        "weight": "335.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Pupitar",
+                "category": "Hard Shell Pokémon",
+                "entry": "Its body is as hard as bedrock.\nBy venting pressurized gas, it can\nlaunch itself like a rocket.",
+                "height": "3'11\"",
+                "weight": "335.1 lbs."
+            },
+            "fr": {
+                "name": "Ymphect",
+                "category": "Pokémon Carapadure",
+                "entry": "Son corps est dur comme la pierre\nsouterraine. Il file comme une\nfusée en expulsant des gaz.",
+                "height": "1,2 m",
+                "weight": "152,0 kg"
+            },
+            "de": {
+                "name": "Pupitar",
+                "category": "Hartschale",
+                "entry": "Sein Körper ist hart wie Fels.\nEs lässt mit Hochdruck Gas ab, um wie\neine Rakete nach oben zu schießen.",
+                "height": "1,2 m",
+                "weight": "152,0 kg"
+            },
+            "it": {
+                "name": "Pupitar",
+                "category": "Pokémon Guscioduro",
+                "entry": "Il suo corpo è duro come la roccia.\nRiesce a muoversi come un razzo\nespellendo gas con tutta forza.",
+                "height": "1,2 m",
+                "weight": "152,0 kg"
+            },
+            "ko": {
+                "name": "데기라스",
+                "category": "탄환포켓몬",
+                "entry": "암반 같은 단단한 몸이다.\n압축한 가스를 분사해서\n마치 로켓같이 날아간다.",
+                "height": "1.2 m",
+                "weight": "152.0 kg"
+            },
+            "es": {
+                "name": "Pupitar",
+                "category": "Pokémon Caparazón",
+                "entry": "Su cuerpo es duro como la roca.\nSe autopropulsa como un cohete\nsoltando los gases de su interior.",
+                "height": "1,2 m",
+                "weight": "152,0 kg"
+            },
+            "ja": {
+                "name": "サナギラス",
+                "category": "だんがんポケモン",
+                "entry": "がんばんのような\\x{3000}かたい\\x{3000}からだ。\nあっしゅくした\\x{3000}ガスを\\x{3000}ふんしゃして\nまるで\\x{3000}ロケットのように\\x{3000}とびだす。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 84,
+        "defense": 70,
+        "speed": 51,
+        "special_attack": 65,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_ROCK", "TYPE_GROUND" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 40,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_SHED_SKIN", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHED_SKIN",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 144,
+    "height": 12,
+    "weight": 1520,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BITE" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_SANDSTORM" ],
+            [ 1, "MOVE_SCREECH" ],
+            [ 5, "MOVE_SANDSTORM" ],
+            [ 10, "MOVE_SCREECH" ],
+            [ 14, "MOVE_CHIP_AWAY" ],
+            [ 19, "MOVE_ROCK_SLIDE" ],
+            [ 23, "MOVE_SCARY_FACE" ],
+            [ 28, "MOVE_THRASH" ],
+            [ 34, "MOVE_DARK_PULSE" ],
+            [ 41, "MOVE_PAYBACK" ],
+            [ 47, "MOVE_CRUNCH" ],
+            [ 54, "MOVE_EARTHQUAKE" ],
+            [ 60, "MOVE_STONE_EDGE" ],
+            [ 67, "MOVE_HYPER_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM66",
+            "TM67",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "TM95"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_UPROAR",
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SUPERPOWER",
+            "MOVE_DARK_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SPITE",
+            "MOVE_OUTRAGE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 55,
+            "species": "SPECIES_TYRANITAR"
+        }
+    ],
+    "regional_dex_number": 293,
+    "baby_species": "SPECIES_LARVITAR"
+}

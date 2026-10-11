@@ -1,6 +1,8 @@
 // The Battle Subway's events: picking the Pokémon to enter, the battle, the trainers' and leaders' messages, and its
 // records screen. The name is descriptive
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "app/ov141.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
@@ -277,7 +279,7 @@ GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, u16 index,
     message = &bsw->trainers[index].message;
     if (message->type == 0xffff) {
         data->strbuf = GFL_StrBufCreate(0x300, HEAPID_GAMEEVENT);
-        msgData = GFL_MsgSysLoadData(FALSE, 2, 0x178, HEAPID_GAMEEVENT);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BATTLE_SUBWAY_TRAINER_MESSAGES, HEAPID_GAMEEVENT);
         messageId = bsw->trainers[index].message.id;
         if (messageId >= 0x3ae) {
             messageId = 0;

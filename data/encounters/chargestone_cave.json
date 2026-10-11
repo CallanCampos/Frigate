@@ -1,0 +1,48 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 1
+        },
+        "grass": [
+            [ "SPECIES_JOLTIK", 25, 25 ],
+            [ "SPECIES_KLINK", 26, 26 ],
+            [ "SPECIES_JOLTIK", 26, 26 ],
+            [ "SPECIES_NOSEPASS", 27, 27 ],
+            [ "SPECIES_FERROSEED", 26, 26 ],
+            [ "SPECIES_FERROSEED", 27, 27 ],
+            [ "SPECIES_JOLTIK", 27, 27 ],
+            [ "SPECIES_BOLDORE", 25, 25 ],
+            [ "SPECIES_JOLTIK", 28, 28 ],
+            [ "SPECIES_KLINK", 28, 28 ],
+            [ "SPECIES_TYNAMO", 28, 28 ],
+            [ "SPECIES_TYNAMO", 28, 28 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [
+            [ "SPECIES_DRILBUR", 25, 25 ],
+            [ "SPECIES_DRILBUR", 25, 25 ],
+            [ "SPECIES_DRILBUR", 26, 26 ],
+            [ "SPECIES_DRILBUR", 26, 26 ],
+            [ "SPECIES_DRILBUR", 27, 27 ],
+            [ "SPECIES_DRILBUR", 27, 27 ],
+            [ "SPECIES_DRILBUR", 28, 28 ],
+            [ "SPECIES_DRILBUR", 28, 28 ],
+            [ "SPECIES_DRILBUR", 28, 28 ],
+            [ "SPECIES_DRILBUR", 28, 28 ],
+            [ "SPECIES_DRILBUR", 28, 28 ],
+            [ "SPECIES_DRILBUR", 28, 28 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

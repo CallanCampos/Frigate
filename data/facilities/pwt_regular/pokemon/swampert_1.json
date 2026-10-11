@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SWAMPERT",
+    "moves": [ "MOVE_MIRROR_COAT", "MOVE_COUNTER", "MOVE_EARTHQUAKE", "MOVE_ROAR" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_SASSY",
+    "item": "ITEM_JABOCA_BERRY",
+    "form": 0
+}

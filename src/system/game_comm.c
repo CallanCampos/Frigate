@@ -2,6 +2,8 @@
 #include "field/field.h"
 #include "field/game_beacon_search.h"
 #include "field/musical.h"
+#include "field/union_comm.h"
+#include "field/union_main.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
@@ -94,13 +96,13 @@ static const GameCommFuncs sGameCommFuncs[GAME_COMM_NO_MAX] = {
     },
     [GAME_COMM_NO_UNK2] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
     [GAME_COMM_NO_UNION] = {
-        func_ov028_021703d0,
-        func_ov028_021703fc,
-        func_ov028_021705cc,
-        func_ov028_02170430,
-        func_ov028_0217046c,
-        func_ov028_02170ffc,
-        func_ov028_0217105c,
+        UnionComm_Init,
+        UnionComm_InitWait,
+        UnionComm_Main,
+        UnionComm_Exit,
+        UnionComm_ExitWait,
+        UnionMain_OnFieldIn,
+        UnionMain_OnFieldOut,
     },
     [GAME_COMM_NO_MUSICAL] = {
         func_ov211_021ef230,

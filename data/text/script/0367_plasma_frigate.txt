@@ -1,5 +1,0 @@
-Helping someone even though the person\ndoesn't ask for help...{be00}\nIt's like, “Who do you think you are?"{be01}\nI don't get it, because I can't tell\nwhether another person is happy or not.
-Nobody has used the beds\nin this room.{be01}\nIf you think I'm lying, take a look,\nthen take a rest!
-The bed looks nice and comfortable.\nWill you take a quick rest?
-{0100:0} hopped into bed and\nfell asleep...{be01}
-{0100:0} and the Pokémon\ntook a nap and regained energy!

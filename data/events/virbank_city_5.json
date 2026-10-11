@@ -1,0 +1,100 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 10,
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 1,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 7,
+                "z": 9,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": 33,
+            "movement": 3,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 1,
+                "height": 1
+            },
+            "grid": {
+                "x": 2,
+                "z": 6,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": 359,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02d3",
+            "script": 3,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 6,
+                "z": 3,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": 291,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02d2",
+            "script": 4,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 6,
+                "z": 5,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_VIRBANK_CITY",
+            "warp": 5,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 88,
+                "y": 0,
+                "z": 184,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

@@ -1,0 +1,22 @@
+Startmenu_Text_Name = NAME:
+Startmenu_Text_Work = WORK:
+Startmenu_Text_Hobby = HOBBY:
+Startmenu_Text_Time = TIME:
+Startmenu_Text_Empty = {010f:0}
+Startmenu_Text_Empty_2 = {010f:0}
+Startmenu_Text_Empty_3 = {bd03:0}{0202:2}:{0201:3}
+Startmenu_Text_From = FROM:
+Startmenu_Text_Empty_4 = {0124:0}\n{0125:1}
+Startmenu_Text_NumberTimesThankedNumber = Number of times thanked:\nNumber of people passed by:
+Startmenu_Text_Empty_5 = {bd03:0}{0204:0}\n{bd03:0}{0204:1}
+Startmenu_Text_Empty_6 =       \x{ffff}
+Startmenu_Text_Empty_7 =          \x{ffff}
+Startmenu_Text_PasserbyTime = Passerby time: {0201:0}:{0201:1}
+Startmenu_Text_PasserbyTime_2 = Passerby time: {0201:0}:{0201:1}
+Startmenu_Text_BattlingWild = Battling a wild {0101:0}
+Startmenu_Text_BattlingSpecialPokemon = Battling a special Pokémon
+Startmenu_Text_Battling = Battling {010e:0} {0100:1}
+Startmenu_Text_BattlingGymLeader = Battling a Gym Leader
+Startmenu_Text_BattlingSpecialTrainer = Battling a special Trainer
+Startmenu_Text_MovingThrough = Moving through {0105:0}
+\pad{2e}

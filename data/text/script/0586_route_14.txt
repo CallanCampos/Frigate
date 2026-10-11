@@ -1,4 +1,0 @@
-Route 14
-Trainer Tips!\n{be01}\nThe maximum number of Boxes is now 24!{be01}\nIn other words, you can store\n720 Pokémon!
-Trainer Tips!\n{be01}\nWhile you are using the Xtransceiver,\npress a direction on the +Control Pad.{be01}\nThe appearance of the screen will\nchange in varied ways!
-\pad{fc}

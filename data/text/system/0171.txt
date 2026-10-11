@@ -1,20 +1,20 @@
-Hello!\n{011c:0}!
-I am {011c:0}!\nI'm pleased to meet you.
-I love {011c:0}!\nI love {011c:1}, too!
-My favorite {011c:0} is\n{011c:1}!
-What's your favorite\n{011c:0}?
-I can do anything for\n{011c:0}!
-Is {011c:0}\n{011c:1}?
-What do you think of\n{011c:0}?
-Do you think {011c:0}\ncan {011c:1}?
-{011c:0} is so\n{011c:1}!
-{011c:0} bothers me.
-After all, it's {011c:0},\nisn't it?
-{011c:0} is the real\n{011c:1}!
-Did you know that {011c:0}\nis {011c:1}?
-{011c:0} is the reason\nfor {011c:1}.
-Have you heard of\n{011c:0}?
-{011c:0} is actually\n{011c:1}.
-Recently, {011c:0}\nseems {011c:1}.
-I wonder if\n{011c:0} is yummy...
-I never miss {011c:0}.\nIt's part of what I do every day.
+Bank0171_Text_Hello = Hello!\n{011c:0}!
+Bank0171_Text_AmImPleasedMeet = I am {011c:0}!\nI'm pleased to meet you.
+Bank0171_Text_LoveLoveToo = I love {011c:0}!\nI love {011c:1}, too!
+Bank0171_Text_Favorite = My favorite {011c:0} is\n{011c:1}!
+Bank0171_Text_WhatsFavorite = What's your favorite\n{011c:0}?
+Bank0171_Text_CanAnything = I can do anything for\n{011c:0}!
+Bank0171_Text_Is = Is {011c:0}\n{011c:1}?
+Bank0171_Text_WhatThink = What do you think of\n{011c:0}?
+Bank0171_Text_ThinkCan = Do you think {011c:0}\ncan {011c:1}?
+Bank0171_Text_IsSo = {011c:0} is so\n{011c:1}!
+Bank0171_Text_Bothers = {011c:0} bothers me.
+Bank0171_Text_AfterAllItsIsnt = After all, it's {011c:0},\nisn't it?
+Bank0171_Text_Real = {011c:0} is the real\n{011c:1}!
+Bank0171_Text_DidKnow = Did you know that {011c:0}\nis {011c:1}?
+Bank0171_Text_Reason = {011c:0} is the reason\nfor {011c:1}.
+Bank0171_Text_HaveHeard = Have you heard of\n{011c:0}?
+Bank0171_Text_Actually = {011c:0} is actually\n{011c:1}.
+Bank0171_Text_RecentlySeems = Recently, {011c:0}\nseems {011c:1}.
+Bank0171_Text_WonderIfYummy = I wonder if\n{011c:0} is yummy...
+Bank0171_Text_NeverMissItsPart = I never miss {011c:0}.\nIt's part of what I do every day.

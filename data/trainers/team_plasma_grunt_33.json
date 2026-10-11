@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_KOFFING",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_AMOONGUSS",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Pokémon Trainers are nothing more than\nrestraints on the legs of their Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "What?! You can actually draw out the power\nof your Pokémon?!"
+        },
+        {
+            "type": 2,
+            "text": "...If Pokémon stay with Trainers, they'll\nbe soft and won't ever be able to draw{be00}\non their true power.{be01}\n...Do you think that is true?"
+        }
+    ]
+}

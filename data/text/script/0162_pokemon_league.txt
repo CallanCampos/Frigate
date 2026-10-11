@@ -1,9 +1,0 @@
-It's me who appeared\nwhen the flower opened up.{be01}\nYou, standing over there...{be01}\nYou look like a Pokémon Trainer\nwith strength and kindness.{be01}\nWhat I look for in my opponent is\nsuperb strength...{be01}\nI'm counting on you!{be01}
-You haven't faced all of the members\nof the Elite Four yet, have you?{be01}\nDon't concern yourself about me.\nGo on ahead.
-Winning is important,\nbut what's more important is{be00}\nwhether I've done better this time.{be01}\nBecause if I can't surpass myself,\nI can't get close to my ideals.{be01}\nI want to improve and win more elegantly,\nso I invite you to be my opponent{be00}\nagain in the future, if you wish.
-Somehow, you managed to defeat the\nentire Elite Four of the Pokémon League.{be01}\nCheck the statue in the center of the\nplaza for the way to the Champion's room.
-It's me who appeared\nwhen the flower opened up.{be01}\nYou who have been waiting...{be01}\nYou look like a Pokémon Trainer\nwith refined strength and{be00}\ndeepened kindness.{be01}\nWhat I look for in my opponent is\nsuperb strength...{be01}\nPlease unleash your power\nto the fullest!{be01}
-Alas! Even with the knowledge and skill\npassed down in my family of Trainers,{be00}\nI still can't win.{be01}\nThe reason I came here in the first place\nwas to encounter Trainers like you...
-When I battle you,\nI can't help but smile...{be01}\nBecause I was able to improve myself,\nand because you're an excellent Trainer.{be01}\nI want to improve and win more elegantly,\nso I invite you to be my opponent{be00}\nagain in the future, if you wish.
-You have defeated the\nPokémon League's Elite Four.{be01}\nYou have earned the right to\nproceed to the Champion's room.{be01}\nMaking an entrance is not the point.{be01}\nOnce you're there, you'll need to\nunleash your power to the fullest!
-\pad{c4}

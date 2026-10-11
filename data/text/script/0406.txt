@@ -1,7 +1,7 @@
-                                                        \x{ffff}
-                                                   \x{ffff}
-                                                   \x{ffff}
-                                                 \x{ffff}
-                   \x{ffff}
-                          \x{ffff}
-                        \x{ffff}
+ScriptBank0406_Text_Empty =                                                         \x{ffff}
+ScriptBank0406_Text_Empty_2 =                                                    \x{ffff}
+ScriptBank0406_Text_Empty_3 =                                                    \x{ffff}
+ScriptBank0406_Text_Empty_4 =                                                  \x{ffff}
+ScriptBank0406_Text_Empty_5 =                    \x{ffff}
+ScriptBank0406_Text_Empty_6 =                           \x{ffff}
+ScriptBank0406_Text_Empty_7 =                         \x{ffff}

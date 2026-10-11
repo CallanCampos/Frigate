@@ -1,22 +1,22 @@
-{bd02}During an argument,\n{bd02}Monica was caught\n{bd02}in a strange Poké Ball\n{bd02}I had bought and brought home...
-{bd02}As I stood there stunned,\n{bd02}a mysterious man appeared.
-{bd02}Oh dear...\n{bd02}It really wasn't a good time for that...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}During an argument,\n{bd02}Monica was caught\n{bd02}in a strange Poké Ball\n{bd02}I had bought and brought home...
-{bd02}As I stood there stunned,\n{bd02}a mysterious man appeared.
-{bd02}Oh dear...\n{bd02}It really wasn't a good time for that...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0292_Text_DuringArgumentMonicaCaught = {bd02}During an argument,\n{bd02}Monica was caught\n{bd02}in a strange Poké Ball\n{bd02}I had bought and brought home...
+Bank0292_Text_StoodThereStunnedMysterious = {bd02}As I stood there stunned,\n{bd02}a mysterious man appeared.
+Bank0292_Text_OhDearReallyWasnt = {bd02}Oh dear...\n{bd02}It really wasn't a good time for that...
+Bank0292_Text_Empty = なし
+Bank0292_Text_Empty_2 = なし
+Bank0292_Text_Empty_3 = なし
+Bank0292_Text_Empty_4 = なし
+Bank0292_Text_Empty_5 = なし
+Bank0292_Text_Empty_6 = なし
+Bank0292_Text_Empty_7 = なし
+Bank0292_Text_DuringArgumentMonicaCaught_2 = {bd02}During an argument,\n{bd02}Monica was caught\n{bd02}in a strange Poké Ball\n{bd02}I had bought and brought home...
+Bank0292_Text_StoodThereStunnedMysterious_2 = {bd02}As I stood there stunned,\n{bd02}a mysterious man appeared.
+Bank0292_Text_OhDearReallyWasnt_2 = {bd02}Oh dear...\n{bd02}It really wasn't a good time for that...
+Bank0292_Text_Empty_8 = なし
+Bank0292_Text_Empty_9 = なし
+Bank0292_Text_Empty_10 = なし
+Bank0292_Text_Empty_11 = なし
+Bank0292_Text_Empty_12 = なし
+Bank0292_Text_Empty_13 = なし
+Bank0292_Text_Empty_14 = なし
+Bank0292_Text_Empty_15 = なし
 \pad{7c}

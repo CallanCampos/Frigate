@@ -1,0 +1,130 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Jellicent",
+    "pokedex": {
+        "category": "Floating Pokémon",
+        "entry": "Its body is mostly seawater.\nIt's said there's a castle of ships\nJellicent have sunk on the seafloor.",
+        "height": "7'03\"",
+        "weight": "297.6 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ふゆうポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 100,
+        "attack": 60,
+        "defense": 70,
+        "speed": 60,
+        "special_attack": 85,
+        "special_defense": 105
+    },
+    "types": [ "TYPE_WATER", "TYPE_GHOST" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_WATER_ABSORB", "ABILITY_CURSED_BODY" ],
+    "hidden_ability": "ABILITY_DAMP",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 168,
+    "height": 22,
+    "weight": 1350,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BUBBLE" ],
+            [ 1, "MOVE_WATER_SPORT" ],
+            [ 1, "MOVE_ABSORB" ],
+            [ 1, "MOVE_NIGHT_SHADE" ],
+            [ 5, "MOVE_ABSORB" ],
+            [ 9, "MOVE_NIGHT_SHADE" ],
+            [ 13, "MOVE_BUBBLE_BEAM" ],
+            [ 17, "MOVE_RECOVER" ],
+            [ 22, "MOVE_WATER_PULSE" ],
+            [ 27, "MOVE_OMINOUS_WIND" ],
+            [ 32, "MOVE_BRINE" ],
+            [ 37, "MOVE_RAIN_DANCE" ],
+            [ 45, "MOVE_HEX" ],
+            [ 53, "MOVE_HYDRO_PUMP" ],
+            [ 61, "MOVE_WRING_OUT" ],
+            [ 69, "MOVE_WATER_SPOUT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM55",
+            "TM61",
+            "TM68",
+            "TM70",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_MAGIC_COAT",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 181,
+    "baby_species": "SPECIES_FRILLISH"
+}

@@ -16,6 +16,7 @@
 #include "gfl/key.h"
 #include "gfl/msg.h"
 #include "gfl/net.h"
+#include "gfl/net_whpipe.h"
 #include "gfl/sound.h"
 #include "gfl/std.h"
 #include "gfl/str.h"

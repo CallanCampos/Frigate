@@ -1,0 +1,6 @@
+Route152_Text_ByAnyChanceHave = By any chance, have you caught a\nPokémon called Rotom?{be01}\nI would be very happy if you would trade\nmy Rotom for your Ditto.
+Route152_Text_HeartBeatingFastOk = My heart is beating so fast!\nOK, let's trade!{be01}
+Route152_Text_ThankVeryMuchPlease = Thank you very much! Please treat my\nRotom with love!{be01}\nI will also take good care of the\nDitto that you traded to me!
+Route152_Text_IdLikeTradeDitto = I'd like to trade for a Ditto...
+Route152_Text_WellIfDontWant = Well, if you don't want to, I understand.{be01}\nBut if you ever change your mind, please\ntrade Pokémon with me!
+Route152_Text_AmGratefulTradedPokemon = I am so grateful that you traded Pokémon\nwith me!{be01}\nI've traded a Rotom and a Ditto\nbefore as well...{be01}\nI guess I just like Ditto!

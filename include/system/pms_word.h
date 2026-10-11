@@ -10,7 +10,8 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except the ones config/names.txt records
 
 // The words that fill sentences (pms_word.c): each is a message of one of the word categories' message files,
-// numbered across the categories in order, and the save block of sentences and language flags
+// numbered across the categories in order and named in constants/pms_words.h, and the save block of sentences and
+// language flags
 
 // No word
 #define PMS_WORD_NULL 0xffff

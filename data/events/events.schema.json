@@ -1,0 +1,173 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A zone's events: data/events/<zone>.json",
+    "description": "The zone's entities file (archive a/1/2/6), which LoadZoneEntities reads: its background events, NPCs, warps, triggers and init scripts. tools/data/event_data.py packs each zone's at the number its header gives as entities (data/zones/). Names and layouts from swan (include/field/zone.h, include/field/field_actor.h). A string value is the name of a constant from data/constants/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "bg_events", "npcs", "warps", "triggers", "init_scripts" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "bg_events": {
+            "type": "array", "maxItems": 255,
+            "description": "Things to interact with that aren't NPCs, such as signs (ZoneBGEntity)",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "script", "condition", "direction" ],
+                "properties": {
+                    "script": { "$ref": "#/$defs/u16", "description": "The script it runs, of the zone's script file" },
+                    "condition": { "$ref": "#/$defs/u16" },
+                    "direction": { "$ref": "#/$defs/u16" },
+                    "grid": { "$ref": "#/$defs/bg_grid" },
+                    "rail": { "$ref": "#/$defs/rail" }
+                }
+            }
+        },
+        "npcs": {
+            "type": "array", "maxItems": 255,
+            "description": "The zone's actors (ZoneNPC), from which the field creates them",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "id", "model", "movement", "type", "flag", "script", "direction", "params", "area" ],
+                "properties": {
+                    "id": { "$ref": "#/$defs/u16", "description": "The NPC's ID in the zone, which scripts use" },
+                    "model": { "$ref": "#/$defs/u16", "description": "Its overworld model" },
+                    "movement": { "$ref": "#/$defs/u16", "description": "How it moves, its move code" },
+                    "type": { "$ref": "#/$defs/u16", "description": "What kind of event it is, such as a trainer" },
+                    "flag": {
+                        "type": [ "string", "integer" ], "x-constant": "EVENT_FLAG_", "x-hex": true, "minimum": 0, "maximum": 65535,
+                        "description": "Its spawn flag (swan's spawnFlag): an EVENT_FLAG_* constant, or the flag's ID in hex, as \"0x03d0\", or 0 for none"
+                    },
+                    "script": { "$ref": "#/$defs/u16", "description": "The script it runs" },
+                    "direction": {
+                        "type": [ "string", "integer" ], "x-constant": "DIR_", "minimum": 0, "maximum": 65535,
+                        "description": "The direction it faces, a DIR_* constant"
+                    },
+                    "params": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/u16" } },
+                    "area": {
+                        "type": "object", "additionalProperties": false, "required": [ "width", "height" ],
+                        "description": "Where it can move",
+                        "properties": { "width": { "$ref": "#/$defs/u16" }, "height": { "$ref": "#/$defs/u16" } }
+                    },
+                    "grid": {
+                        "type": "object", "additionalProperties": false, "required": [ "x", "z", "y" ],
+                        "properties": {
+                            "x": { "$ref": "#/$defs/u16" }, "z": { "$ref": "#/$defs/u16" }, "y": { "$ref": "#/$defs/s32" }
+                        }
+                    },
+                    "rail": { "$ref": "#/$defs/rail" }
+                }
+            }
+        },
+        "warps": {
+            "type": "array", "maxItems": 255,
+            "description": "The zone's warps (ZoneWarp)",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "zone", "warp", "unk4", "transition" ],
+                "properties": {
+                    "zone": {
+                        "type": [ "string", "integer" ], "x-constant": "ZONE_", "minimum": 0, "maximum": 65535,
+                        "description": "The zone it leads to, a ZONE_* constant, or 65535, as five warps have"
+                    },
+                    "warp": { "$ref": "#/$defs/u16", "description": "The warp of that zone it leads to" },
+                    "unk4": { "$ref": "#/$defs/u8" },
+                    "transition": { "$ref": "#/$defs/u8" },
+                    "grid": {
+                        "type": "object", "additionalProperties": false,
+                        "required": [ "x", "y", "z", "width", "height", "unk0a" ],
+                        "properties": {
+                            "x": { "$ref": "#/$defs/u16" }, "y": { "$ref": "#/$defs/u16" }, "z": { "$ref": "#/$defs/u16" },
+                            "width": { "$ref": "#/$defs/u16" }, "height": { "$ref": "#/$defs/u16" },
+                            "unk0a": { "$ref": "#/$defs/u16" }
+                        }
+                    },
+                    "rail": {
+                        "type": "object", "additionalProperties": false,
+                        "required": [ "component", "front", "side", "front_span", "side_span", "param" ],
+                        "properties": {
+                            "component": { "$ref": "#/$defs/u16" }, "front": { "$ref": "#/$defs/u16" },
+                            "side": { "$ref": "#/$defs/s16" }, "front_span": { "$ref": "#/$defs/u16" },
+                            "side_span": { "$ref": "#/$defs/u16" }, "param": { "$ref": "#/$defs/u16" }
+                        }
+                    }
+                }
+            }
+        },
+        "triggers": {
+            "type": "array", "maxItems": 255,
+            "description": "Areas that run a script when stepped on while a variable has a value (ZoneTrigger)",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "script", "var", "value", "type", "unk14" ],
+                "properties": {
+                    "script": { "$ref": "#/$defs/u16" },
+                    "var": { "$ref": "#/$defs/var" },
+                    "value": { "$ref": "#/$defs/u16", "description": "The variable's value that enables it" },
+                    "type": { "$ref": "#/$defs/u16" },
+                    "grid": {
+                        "type": "object", "additionalProperties": false, "required": [ "x", "z", "width", "height", "y" ],
+                        "properties": {
+                            "x": { "$ref": "#/$defs/u16" }, "z": { "$ref": "#/$defs/u16" },
+                            "width": { "$ref": "#/$defs/u16" }, "height": { "$ref": "#/$defs/u16" },
+                            "y": { "$ref": "#/$defs/s16" }
+                        }
+                    },
+                    "rail": {
+                        "type": "object", "additionalProperties": false,
+                        "required": [ "component", "front", "side", "front_span", "side_span" ],
+                        "properties": {
+                            "component": { "$ref": "#/$defs/u16" }, "front": { "$ref": "#/$defs/u16" },
+                            "side": { "$ref": "#/$defs/s16" }, "front_span": { "$ref": "#/$defs/u16" },
+                            "side_span": { "$ref": "#/$defs/u16" }
+                        }
+                    },
+                    "unk14": { "$ref": "#/$defs/u16" }
+                }
+            }
+        },
+        "init_scripts": {
+            "type": "array",
+            "description": "The zone's init scripts, a map script table: a script by its type (when it runs), or, for type 1, conditions, each of which runs its script when its variable has its value",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "type" ],
+                "properties": {
+                    "type": { "$ref": "#/$defs/u16" },
+                    "script": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+                    "conditions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object", "additionalProperties": false, "required": [ "var", "value", "script" ],
+                            "properties": {
+                                "var": { "$ref": "#/$defs/var" },
+                                "value": { "$ref": "#/$defs/u16" },
+                                "script": { "$ref": "#/$defs/u16" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "extra_padding": {
+            "type": "integer", "minimum": 0,
+            "description": "Zero bytes after the init scripts beyond what ends them at a multiple of 4 bytes, which one zone's file has"
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "u16": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "s16": { "type": "integer", "minimum": -32768, "maximum": 32767 },
+        "s32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "var": {
+            "type": [ "string", "integer" ], "x-constant": "EVENT_WORK_", "x-hex": true, "minimum": 0, "maximum": 65535,
+            "description": "An event variable, from 0x4000: an EVENT_WORK_* constant, or its ID in hex, as \"0x4176\"; or a smaller number"
+        },
+        "bg_grid": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "properties": { "x": { "$ref": "#/$defs/s32" }, "y": { "$ref": "#/$defs/s32" }, "z": { "$ref": "#/$defs/s32" } }
+        },
+        "rail": {
+            "type": "object", "additionalProperties": false, "required": [ "component", "front", "side" ],
+            "description": "A position on the zone's rails",
+            "properties": {
+                "component": { "$ref": "#/$defs/u16" }, "front": { "$ref": "#/$defs/u16" }, "side": { "$ref": "#/$defs/s16" }
+            }
+        }
+    }
+}

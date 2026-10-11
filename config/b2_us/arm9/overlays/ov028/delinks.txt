@@ -3,3 +3,18 @@
     .ctor       start:0x02172f14 end:0x02172f14 kind:rodata align:4
     .data       start:0x02172f20 end:0x021730e0 kind:data align:32
     .bss        start:0x021730e0 end:0x021730e0 kind:bss align:32
+
+src/ov028/union_comm.c:
+    .text       start:0x02170340 end:0x02170ec8
+    .rodata     start:0x02172c94 end:0x02172db4
+    .data       start:0x02172f20 end:0x02172f30
+
+src/ov028/union_main.c:
+    .text       start:0x02170ec8 end:0x02172384
+    .rodata     start:0x02172db4 end:0x02172ea4
+    .data       start:0x02172f30 end:0x02173068
+
+src/ov028/colosseum.c:
+    .text       start:0x02172384 end:0x02172c94
+    .rodata     start:0x02172ea4 end:0x02172f14
+    .data       start:0x02173068 end:0x021730e0

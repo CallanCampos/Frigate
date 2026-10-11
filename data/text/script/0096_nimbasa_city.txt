@@ -1,7 +1,0 @@
-Pokémon tennis is wonderful!{be01}\nPlayers are never alone.\nTheir Pokémon are always with them!
-Tennis is all about rackets and balls.\nThere's nothing profound about it.
-I am a ball boy who collects\ntennis balls.{be01}\nYou are a Pokémon Trainer who\ncollects Pokémon.
-To become ball boys,\nwe gotta practice.
-Woowoof!
-Yap!
-\pad{a0}

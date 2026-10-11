@@ -1,66 +1,66 @@
-No one has found a way\nto evolve this Pokémon.{be01}
-This Pokémon evolves when it levels up\nwith high friendship.{be01}
-Level up this Pokémon\nwith high friendship.{be01}\nIt may evolve depending on\nthe time.{be01}
-Level up this Pokémon\nwith high friendship.{be01}\nIt may evolve depending on\nthe time.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}
-This Pokémon evolves when it arrives\nby Link Trade.{be01}
-    \x{ffff}
-This Pokémon may evolve\nwhen you Link Trade it{be00}\nfor a certain Pokémon.{be01}
-    \x{ffff}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of two Pokémon.{be01}\nBut you won't know which one\nuntil it evolves.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of two Pokémon.{be01}\nBut you won't know which one\nuntil it evolves.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nAt that time, if there is an extra space\nin your party, you may find an additional{be00}\nPokémon in your party.{be01}
-Have this Pokémon hold a Prism Scale,\nand Link Trade the Pokémon to evolve it.{be01}
-If this Pokémon is ♂,\nit evolves when you use{be00}\na Dawn Stone on it.{be01}
-If this Pokémon is ♀,\nit evolves when you use{be00}\na Dawn Stone on it.{be01}
-Have this Pokémon hold an Oval Stone,\nand level it up.{be01}\nIt may evolve depending on the time.{be01}
-    \x{ffff}
-    \x{ffff}
-This Pokémon evolves if you have Remoraid\nin your party when you level it up.{be01}
-If this Pokémon is ♂,\nit may evolve when it levels up.{be01}
-If this Pokémon is ♀,\nit may evolve when it levels up.{be01}
-This Pokémon evolves when it levels up\nin a special magnetic field.{be01}
-This Pokémon evolves when it levels up\nin a green place covered in moss.{be01}
-This Pokémon evolves when it levels up\nin a cold place covered with ice.{be01}
-This Pokémon evolves when it levels up\nin a special magnetic field.{be01}
-Have this Pokémon hold an Up-Grade,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a King's Rock,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a DeepSeaScale,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a DeepSeaTooth,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a Metal Coat,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a Dragon Scale,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a Protector,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold an Electirizer,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a Magmarizer,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a Dubious Disc,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a Reaper Cloth,\nand Link Trade the Pokémon to evolve it.{be01}
-Have this Pokémon hold a Razor Fang,\nand level it up.{be01}\nIt may evolve depending on the time.{be01}
-Have this Pokémon hold a Razor Claw,\nand level it up.{be01}\nIt may evolve depending on the time.{be01}
-This Pokémon evolves when you use\na Thunderstone on it.{be01}
-This Pokémon evolves when you use\na Sun Stone on it.{be01}
-This Pokémon evolves when you use\na Moon Stone on it.{be01}
-This Pokémon evolves when you use\na Fire Stone on it.{be01}
-This Pokémon evolves when you use\na Water Stone on it.{be01}
-This Pokémon evolves when you use\na Leaf Stone on it.{be01}
-This Pokémon evolves when you use\na Shiny Stone on it.{be01}
-This Pokémon evolves when you use\na Dusk Stone on it.{be01}
-This Pokémon evolves if it knows Mimic\nwhen you level it up.{be01}
-This Pokémon evolves if it knows Double Hit\nwhen you level it up.{be01}
-This Pokémon evolves if it knows Rollout\nwhen you level it up.{be01}
-This Pokémon evolves if it knows\nAncientPower when you level it up.{be01}
-Use a Leaf Stone or\nSun Stone on this Pokémon.{be01}\nIt evolves into a different Pokémon\ndepending on the stone.{be01}
-This Pokémon evolves when you use\na Water Stone on it.{be01}\nBut if you have this Pokémon hold a\nKing's Rock and Link Trade the Pokémon,{be00}\nit evolves into a different Pokémon.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nAlso, if you have this Pokémon hold a\nKing's Rock and Link Trade the Pokémon,{be00}\nit evolves into a different Pokémon.{be01}
-There are many ways to evolve\nthis Pokémon.{be01}\nWhen you use a Water Stone,\nThunderstone, or Fire Stone on it,{be00}\nit evolves into a different Pokémon{be00}\ndepending on the Stone.{be01}\nWhen this Pokémon levels up with\nhigh friendship, it evolves into a different{be00}\nPokémon depending on the time.{be01}\nMoreover, when it levels up\nin a place covered in moss or{be00}\na place covered with ice, it evolves{be00}\ninto a different Pokémon.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of two Pokémon.{be01}\nBut you won't know which one\nuntil it evolves.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIf it is ♂, you can use a Dawn Stone on it.\nIt will evolve into a different Pokémon.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nAt that time, if there is an extra space\nin your party, you may find an additional{be00}\nPokémon in your party.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIf it is ♀, you can use a Dawn Stone on it.\nIt will evolve into a different Pokémon.{be01}
-This Pokémon may evolve\nwhen you have it hold an item{be00}\nand Link Trade the Pokémon.{be01}\nHave it hold a DeepSeaTooth\nor DeepSeaScale.{be01}\nIt evolves into a different Pokémon\ndepending on the item.{be01}
-This Pokémon may evolve\nwhen it levels up.{be01}\nIt evolves into a different Pokémon\ndepending on its gender.{be01}\nIf it is ♀, the form of the evolved\nPokémon depends on its current form.{be01}
-Hmm...\nLet me tell you two things.{be01}\nFirst of all,\nEggs don't evolve.{be01}\nSecond of all,\nshow it to me after it hatches!{be01}
+Bank0395_Text_NoOneHasFound = No one has found a way\nto evolve this Pokémon.{be01}
+Bank0395_Text_PokemonEvolvesWhenLevels = This Pokémon evolves when it levels up\nwith high friendship.{be01}
+Bank0395_Text_LevelUpPokemonHigh = Level up this Pokémon\nwith high friendship.{be01}\nIt may evolve depending on\nthe time.{be01}
+Bank0395_Text_LevelUpPokemonHigh_2 = Level up this Pokémon\nwith high friendship.{be01}\nIt may evolve depending on\nthe time.{be01}
+Bank0395_Text_PokemonMayEvolveWhen = This Pokémon may evolve\nwhen it levels up.{be01}
+Bank0395_Text_PokemonEvolvesWhenArrives = This Pokémon evolves when it arrives\nby Link Trade.{be01}
+Bank0395_Text_Empty =     \x{ffff}
+Bank0395_Text_PokemonMayEvolveWhen_2 = This Pokémon may evolve\nwhen you Link Trade it{be00}\nfor a certain Pokémon.{be01}
+Bank0395_Text_Empty_2 =     \x{ffff}
+Bank0395_Text_PokemonMayEvolveWhen_3 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_4 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_5 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_6 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of two Pokémon.{be01}\nBut you won't know which one\nuntil it evolves.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_7 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of two Pokémon.{be01}\nBut you won't know which one\nuntil it evolves.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_8 = This Pokémon may evolve\nwhen it levels up.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_9 = This Pokémon may evolve\nwhen it levels up.{be01}\nAt that time, if there is an extra space\nin your party, you may find an additional{be00}\nPokémon in your party.{be01}
+Bank0395_Text_HavePokemonHoldPrism = Have this Pokémon hold a Prism Scale,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_IfPokemonEvolvesWhen = If this Pokémon is ♂,\nit evolves when you use{be00}\na Dawn Stone on it.{be01}
+Bank0395_Text_IfPokemonEvolvesWhen_2 = If this Pokémon is ♀,\nit evolves when you use{be00}\na Dawn Stone on it.{be01}
+Bank0395_Text_HavePokemonHoldOval = Have this Pokémon hold an Oval Stone,\nand level it up.{be01}\nIt may evolve depending on the time.{be01}
+Bank0395_Text_Empty_3 =     \x{ffff}
+Bank0395_Text_Empty_4 =     \x{ffff}
+Bank0395_Text_PokemonEvolvesIfHave = This Pokémon evolves if you have Remoraid\nin your party when you level it up.{be01}
+Bank0395_Text_IfPokemonMayEvolve = If this Pokémon is ♂,\nit may evolve when it levels up.{be01}
+Bank0395_Text_IfPokemonMayEvolve_2 = If this Pokémon is ♀,\nit may evolve when it levels up.{be01}
+Bank0395_Text_PokemonEvolvesWhenLevels_2 = This Pokémon evolves when it levels up\nin a special magnetic field.{be01}
+Bank0395_Text_PokemonEvolvesWhenLevels_3 = This Pokémon evolves when it levels up\nin a green place covered in moss.{be01}
+Bank0395_Text_PokemonEvolvesWhenLevels_4 = This Pokémon evolves when it levels up\nin a cold place covered with ice.{be01}
+Bank0395_Text_PokemonEvolvesWhenLevels_5 = This Pokémon evolves when it levels up\nin a special magnetic field.{be01}
+Bank0395_Text_HavePokemonHoldUp = Have this Pokémon hold an Up-Grade,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldKings = Have this Pokémon hold a King's Rock,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldDeepseascale = Have this Pokémon hold a DeepSeaScale,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldDeepseatooth = Have this Pokémon hold a DeepSeaTooth,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldMetal = Have this Pokémon hold a Metal Coat,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldDragon = Have this Pokémon hold a Dragon Scale,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldProtector = Have this Pokémon hold a Protector,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldElectirizer = Have this Pokémon hold an Electirizer,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldMagmarizer = Have this Pokémon hold a Magmarizer,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldDubious = Have this Pokémon hold a Dubious Disc,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldReaper = Have this Pokémon hold a Reaper Cloth,\nand Link Trade the Pokémon to evolve it.{be01}
+Bank0395_Text_HavePokemonHoldRazor = Have this Pokémon hold a Razor Fang,\nand level it up.{be01}\nIt may evolve depending on the time.{be01}
+Bank0395_Text_HavePokemonHoldRazor_2 = Have this Pokémon hold a Razor Claw,\nand level it up.{be01}\nIt may evolve depending on the time.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse = This Pokémon evolves when you use\na Thunderstone on it.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_2 = This Pokémon evolves when you use\na Sun Stone on it.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_3 = This Pokémon evolves when you use\na Moon Stone on it.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_4 = This Pokémon evolves when you use\na Fire Stone on it.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_5 = This Pokémon evolves when you use\na Water Stone on it.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_6 = This Pokémon evolves when you use\na Leaf Stone on it.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_7 = This Pokémon evolves when you use\na Shiny Stone on it.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_8 = This Pokémon evolves when you use\na Dusk Stone on it.{be01}
+Bank0395_Text_PokemonEvolvesIfKnows = This Pokémon evolves if it knows Mimic\nwhen you level it up.{be01}
+Bank0395_Text_PokemonEvolvesIfKnows_2 = This Pokémon evolves if it knows Double Hit\nwhen you level it up.{be01}
+Bank0395_Text_PokemonEvolvesIfKnows_3 = This Pokémon evolves if it knows Rollout\nwhen you level it up.{be01}
+Bank0395_Text_PokemonEvolvesIfKnows_4 = This Pokémon evolves if it knows\nAncientPower when you level it up.{be01}
+Bank0395_Text_UseLeafStoneSun = Use a Leaf Stone or\nSun Stone on this Pokémon.{be01}\nIt evolves into a different Pokémon\ndepending on the stone.{be01}
+Bank0395_Text_PokemonEvolvesWhenUse_9 = This Pokémon evolves when you use\na Water Stone on it.{be01}\nBut if you have this Pokémon hold a\nKing's Rock and Link Trade the Pokémon,{be00}\nit evolves into a different Pokémon.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_10 = This Pokémon may evolve\nwhen it levels up.{be01}\nAlso, if you have this Pokémon hold a\nKing's Rock and Link Trade the Pokémon,{be00}\nit evolves into a different Pokémon.{be01}
+Bank0395_Text_ThereManyWaysEvolve = There are many ways to evolve\nthis Pokémon.{be01}\nWhen you use a Water Stone,\nThunderstone, or Fire Stone on it,{be00}\nit evolves into a different Pokémon{be00}\ndepending on the Stone.{be01}\nWhen this Pokémon levels up with\nhigh friendship, it evolves into a different{be00}\nPokémon depending on the time.{be01}\nMoreover, when it levels up\nin a place covered in moss or{be00}\na place covered with ice, it evolves{be00}\ninto a different Pokémon.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_11 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of three Pokémon.{be01}\nWhich Pokémon it will evolve into\ndepends on the balance of{be00}\nits Attack and Defense stats.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_12 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt can evolve into one of two Pokémon.{be01}\nBut you won't know which one\nuntil it evolves.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_13 = This Pokémon may evolve\nwhen it levels up.{be01}\nIf it is ♂, you can use a Dawn Stone on it.\nIt will evolve into a different Pokémon.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_14 = This Pokémon may evolve\nwhen it levels up.{be01}\nAt that time, if there is an extra space\nin your party, you may find an additional{be00}\nPokémon in your party.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_15 = This Pokémon may evolve\nwhen it levels up.{be01}\nIf it is ♀, you can use a Dawn Stone on it.\nIt will evolve into a different Pokémon.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_16 = This Pokémon may evolve\nwhen you have it hold an item{be00}\nand Link Trade the Pokémon.{be01}\nHave it hold a DeepSeaTooth\nor DeepSeaScale.{be01}\nIt evolves into a different Pokémon\ndepending on the item.{be01}
+Bank0395_Text_PokemonMayEvolveWhen_17 = This Pokémon may evolve\nwhen it levels up.{be01}\nIt evolves into a different Pokémon\ndepending on its gender.{be01}\nIf it is ♀, the form of the evolved\nPokémon depends on its current form.{be01}
+Bank0395_Text_HmmLetTellTwo = Hmm...\nLet me tell you two things.{be01}\nFirst of all,\nEggs don't evolve.{be01}\nSecond of all,\nshow it to me after it hatches!{be01}

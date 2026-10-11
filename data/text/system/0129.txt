@@ -1,9 +1,9 @@
-QUAGSIRE
-QUASH
-QUICKATTACK
-QUICKFEET
-QUICKGUARD
-QUILAVA
-QUIVERDANCE
-QWILFISH
+Bank0129_Text_Quagsire = QUAGSIRE
+Bank0129_Text_Quash = QUASH
+Bank0129_Text_Quickattack = QUICKATTACK
+Bank0129_Text_Quickfeet = QUICKFEET
+Bank0129_Text_Quickguard = QUICKGUARD
+Bank0129_Text_Quilava = QUILAVA
+Bank0129_Text_Quiverdance = QUIVERDANCE
+Bank0129_Text_Qwilfish = QWILFISH
 \pad{cc}

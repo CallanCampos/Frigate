@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Rattled",
+    "description": "Some move types scare\nit and boost its Speed."
+}

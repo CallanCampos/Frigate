@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Albert",
+    "class": "TRAINER_CLASS_PRESCHOOLER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [],
+    "heals": false,
+    "money": 1,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PSYDUCK",
+            "form": 0,
+            "level": 10,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I'm the strongest Trainer in\nVirbank City's preschool!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I guess I'm not the strongest in the world!"
+        },
+        {
+            "type": 2,
+            "text": "I know! I'll go home and take a nap!\nMom always says that I need to get lots{be00}\nof sleep if I want to be a big kid!"
+        }
+    ]
+}

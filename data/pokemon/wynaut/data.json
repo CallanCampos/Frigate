@@ -1,0 +1,127 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Wynaut",
+    "pokedex": {
+        "category": "Bright Pokémon",
+        "entry": "It grows strong by pushing up\nagainst others en masse.\nIt loves eating sweet fruit.",
+        "height": "2'00\"",
+        "weight": "30.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Wynaut",
+                "category": "Bright Pokémon",
+                "entry": "It grows strong by pushing up\nagainst others en masse.\nIt loves eating sweet fruit.",
+                "height": "2'00\"",
+                "weight": "30.9 lbs."
+            },
+            "fr": {
+                "name": "Okéoké",
+                "category": "Pokémon Ravi",
+                "entry": "Il se muscle en bousculant ses\nsemblables lors de mêlées. Il\nraffole des fruits sucrés.",
+                "height": "0,6 m",
+                "weight": "14,0 kg"
+            },
+            "de": {
+                "name": "Isso",
+                "category": "Strahlekind",
+                "entry": "Es wird stärker, indem es andere\nständig anrempelt. Es liebt Süßigkeiten.",
+                "height": "0,6 m",
+                "weight": "14,0 kg"
+            },
+            "it": {
+                "name": "Wynaut",
+                "category": "Pokémon Brillante",
+                "entry": "Questi Pokémon si allenano in gruppo\ncaricandosi l'un l'altro per rafforzarsi.\nAmano i frutti dolci.",
+                "height": "0,6 m",
+                "weight": "14,0 kg"
+            },
+            "ko": {
+                "name": "마자",
+                "category": "명랑포켓몬",
+                "entry": "동료들과 밀어내기 놀이를 하면서\n인내심이 강한 성격으로 자란다.\n달콤한 과일을 매우 좋아한다.",
+                "height": "0.6 m",
+                "weight": "14.0 kg"
+            },
+            "es": {
+                "name": "Wynaut",
+                "category": "Pokémon Radiante",
+                "entry": "Se fortalecen empujándose unos\na otros en grupos. Les encantan\nlos dulces.",
+                "height": "0,6 m",
+                "weight": "14,0 kg"
+            },
+            "ja": {
+                "name": "ソーナノ",
+                "category": "ほがらかポケモン",
+                "entry": "なかまたちと\\x{3000}おしくらまんじゅうを\nやることで\\x{3000}がまんづよく\\x{3000}そだつ。\nあまい\\x{3000}くだものが\\x{3000}だいこうぶつ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff14}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 95,
+        "attack": 23,
+        "defense": 48,
+        "speed": 23,
+        "special_attack": 23,
+        "special_defense": 48
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 125,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_SHADOW_TAG", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TELEPATHY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 52,
+    "height": 6,
+    "weight": 140,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SPLASH" ],
+            [ 1, "MOVE_CHARM" ],
+            [ 1, "MOVE_ENCORE" ],
+            [ 15, "MOVE_COUNTER" ],
+            [ 15, "MOVE_MIRROR_COAT" ],
+            [ 15, "MOVE_SAFEGUARD" ],
+            [ 15, "MOVE_DESTINY_BOND" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 15,
+            "species": "SPECIES_WOBBUFFET"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WYNAUT"
+}

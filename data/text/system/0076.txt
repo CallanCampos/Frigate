@@ -1,11 +1,11 @@
-Loading...\nPlease wait a moment.
-The game inserted is not compatible.\nTurn off the power, insert a\ncompatible Game Card,\nand try Memory Link again.{be01}
-Memory Link will close.\nPlease turn off the power.
-Load data failed...{be01}
-Unable to connect to the\nother DS system.{be01}
-Memory Link activated!\nCurrently linked to the saved file.\nPlease wait...
-Error reading the save file.\nThere may not be a save file,\nor the save file may be corrupted.{be01}
-    \x{ffff}
-    \x{ffff}
-Memory Link
+Bank0076_Text_LoadingPleaseWaitMoment = Loading...\nPlease wait a moment.
+Bank0076_Text_GameInsertedNotCompatible = The game inserted is not compatible.\nTurn off the power, insert a\ncompatible Game Card,\nand try Memory Link again.{be01}
+Bank0076_Text_MemoryLinkWillClose = Memory Link will close.\nPlease turn off the power.
+Bank0076_Text_LoadDataFailed = Load data failed...{be01}
+Bank0076_Text_UnableConnectOtherDs = Unable to connect to the\nother DS system.{be01}
+Bank0076_Text_MemoryLinkActivatedCurrently = Memory Link activated!\nCurrently linked to the saved file.\nPlease wait...
+Bank0076_Text_ErrorReadingSaveFile = Error reading the save file.\nThere may not be a save file,\nor the save file may be corrupted.{be01}
+Bank0076_Text_Empty =     \x{ffff}
+Bank0076_Text_Empty_2 =     \x{ffff}
+Bank0076_Text_MemoryLink = Memory Link
 \pad{de}

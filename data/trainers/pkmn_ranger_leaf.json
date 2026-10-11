@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Leaf",
+    "class": "TRAINER_CLASS_PKMN_RANGER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_SITRUS_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_DEERLING",
+            "form": 0,
+            "level": 32,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SCOLIPEDE",
+            "form": 0,
+            "level": 32,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Those footsteps I have heard drawing\nnear... I have been waiting for you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I knew as soon as I heard your footfalls\nthat you were a force to be reckoned with!"
+        },
+        {
+            "type": 15,
+            "text": "I had actually been meaning to\ngive you something.{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I was imagining how a Burmy must feel\nwrapped in a cloak of fallen leaves!"
+        }
+    ]
+}

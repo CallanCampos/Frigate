@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Sand Force",
+    "description": "Boosts certain moves'\npower in a sandstorm."
+}

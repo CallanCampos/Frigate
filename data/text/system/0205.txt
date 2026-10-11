@@ -1,69 +1,69 @@
-Comedian
-Working Man
-Man: Whoooa...{be01}\nWhat in the world is this?
-???: Deegeegaan!
-{0100:1}: What's this?
-Radio: What happened, {0100:1}?\nDid something happen?
-{0100:1}: I was patrolling and heard a\nsudden scream, so I came to track down{be00}\nthe source of the disturbance.
-Radio: Then?
-{0100:1}: I found an enormous Tyranitar\nbehaving in an unusually violent manner...{be01}\nNo...{be01}\nThis is not an ordinary Tyranitar...{be01}\nIts entire body is covered with\na metal I've never seen before!
-Radio: Covered in metal, you say?!{be01}\nOK! From now on, we'll call it\nMecha Tyranitar, or MT for short!{be01}\nListen, {0100:1}!\nYou're not far from a residential area!{be01}\nIf MT is being violent there, it could be\nextremely dangerous to the residents!{be01}\nYou have to keep MT away from the town\nat all costs!
-{0100:1}: Roger!
-MT: Deegeega! Deegeega!
-Man: Oh...{be01}\nMotheeer!\nI'm done for!
-{0100:1}: Argh...{be01}\nThat Worker is in my way, and I can't\nlet my Pokémon go all out...
-Radio: Listen, {0100:1}!\nFighting against MT while that Worker{be00}\nis nearby could be very dangerous!{be01}\nLet him get to safety first!\nThat's your priority!
-{0100:1}: Roger!{be01}\nWell...\nSomehow, I have to let the man{be00}\nescape from here...{be01}\nI'll draw MT's attention to me\nand buy him some time...
-{0100:1}: This way! MT!
-MT: Deegeegaga...
-{0100:1}: Ugh... It's scary...
-MT: Deegeegaaaan!
-{0100:1}: Hey, scrap heap!
-MT: Deegeegaaaan!
-{0100:1}: Over here!
-MT: Deegeegaaaan!
-MT: Deegee... Degeegaga...
-{0100:1}: Look! MT is distracted!\nIt's the perfect time to make your escape!
-Man: OK! Thank you!
-MT: Deegeegaaaan!
-{0100:1}: All right! He's gone!{be01}\nNow I can fight against MT\nwithout worrying about him...
-MT: Deegeegaaaan!
-{0100:1}: It seems\nMT is serious about our battle, too.
-MT: Deegeegaaaan!
-{0100:1}: I'll turn you to scrap!
-MT: Deegeegaaaan!
-{0100:1}: I'll be cautious...
-MT: Deegeegaga...
-{0100:1}: Bring it on!
-MT: Deegeegaaaan!
-{0100:1}: Scary...
-MT: Deegeegaga...
-{0100:1}: What a powerful creature!\nMy {0102:0}'s attack{be00}\ndidn't work at all...{be01}\nIt's all over for me! I'm finished!
-MT: Hey, {0100:1}!{be01}\nWhat are you doing?
-{0100:1}: Huh? What?{be01}\nDid MT just speak with the captain's voice?
-MT: This was all a test of your skills!{be01}\nThis MT is a training robot developed\nby the Unova Defense Force!
-{0100:1}: What??
-MT: You were facing a crisis that threatened\nall of Unova, yet you gave up fighting!{be01}\nDo you still call yourself a member of\nthe Unova Defense Force?!{be01}\nCome back to HQ as soon as possible!\nWe're starting your training all over again.{be00}\nI'll train your pitiful guts myself!
-{0100:1}: Oh no...
-MT: Listen, {0100:1}!{be01}\nI'll train you until you won't be able\nto cry or smile for the rest of your life.{be00}\nPrepare yourself!
-{0100:1}: Ha...hahaha...\nI'm in so much trouble...
-MT: Deegeegaaaan!
-{0100:1}: Huff...puff...{be01}\nI can't move...anymore...
-MT: Deegeegaaaan!
-{0100:1}: Huff...puff...\nI...can't...escape...
-Man: Hey!\nAre you all right?
-{0100:1}: Huh... You...\nWhy did...you come back...
-Man: I got a bit nervous earlier.\nThat MT is pretty scary!{be01}\nBut I'm fine now!\nThis time, I'll help you!
-{0100:1}: No... Run...\nA civilian...can't take on MT...{be01}\nHuff... Puff...{be01}\nDon't mind me...\nJust get away...
-Man: I won't be discouraged! If a youngster\nlike you can put up such a good fight...{be01}\nI'm an adult. If I try, I can do it!\nI'll make my mom proud!
-The mechanical monster MT\nwas approaching {0100:1}...{be01}\nAs the situation grew desperate, the Worker\nwho had escaped came back to help...{be01}\nHe got into a truck and drove it straight\ninto MT, causing a huge explosion and{be00}\nblowing smoke!{be01}\nOnly the immovable body of MT\nwas left behind.{be01}\nOn unsteady legs, {0100:1} searched\nthe rubble for the heroic Worker,{be00}\nbut couldn't find him...
-{0100:1}: Yay.\nI managed to beat MT...
-Man: Ahhh! Thank you.\nYou beat such a big monster!{be01}\nWow. You're great!
-{0100:1}: You...\nAre you all right?
-Man: Hehehe.\nDon't underestimate a Worker.{be00}\nWe're the strongest of the strong!
-{0100:1}: Excuse me, but\nlet me ask you a question...{be01}\nThat MT...\nWas it originally your Pokémon?
-Man: Hey, hey! No!\nThat monster isn't mine!{be01}\nI found an abandoned Poké Ball in the\ncorner of the harbor.{be01}\nSo I picked it up and threw it.\nThen, that monster came out!
-{0100:1}: I see...
-Man: But the strange thing is...\nThe place where I picked it up is restricted.{be00}\nIt's for authorized harbor personnel only.
-{0100:1}: All right.\nThank you.{be01}\n...\nMT...{be01}\nThat is not a Pokémon...\nIt's a weapon for destruction...{be01}\nWho could have made such\na dangerous thing?
+Bank0205_Text_Comedian = Comedian
+Bank0205_Text_WorkingMan = Working Man
+Bank0205_Text_ManWhoooaWhatWorld = Man: Whoooa...{be01}\nWhat in the world is this?
+Bank0205_Text_Deegeegaan = ???: Deegeegaan!
+Bank0205_Text_Whats = {0100:1}: What's this?
+Bank0205_Text_RadioWhatHappenedDid = Radio: What happened, {0100:1}?\nDid something happen?
+Bank0205_Text_PatrollingHeardSuddenScream = {0100:1}: I was patrolling and heard a\nsudden scream, so I came to track down{be00}\nthe source of the disturbance.
+Bank0205_Text_RadioThen = Radio: Then?
+Bank0205_Text_FoundEnormousTyranitarBehaving = {0100:1}: I found an enormous Tyranitar\nbehaving in an unusually violent manner...{be01}\nNo...{be01}\nThis is not an ordinary Tyranitar...{be01}\nIts entire body is covered with\na metal I've never seen before!
+Bank0205_Text_RadioCoveredMetalSay = Radio: Covered in metal, you say?!{be01}\nOK! From now on, we'll call it\nMecha Tyranitar, or MT for short!{be01}\nListen, {0100:1}!\nYou're not far from a residential area!{be01}\nIf MT is being violent there, it could be\nextremely dangerous to the residents!{be01}\nYou have to keep MT away from the town\nat all costs!
+Bank0205_Text_Roger = {0100:1}: Roger!
+Bank0205_Text_MtDeegeegaDeegeega = MT: Deegeega! Deegeega!
+Bank0205_Text_ManOhMotheeerIm = Man: Oh...{be01}\nMotheeer!\nI'm done for!
+Bank0205_Text_ArghWorkerWayCant = {0100:1}: Argh...{be01}\nThat Worker is in my way, and I can't\nlet my Pokémon go all out...
+Bank0205_Text_RadioListenFightingAgainst = Radio: Listen, {0100:1}!\nFighting against MT while that Worker{be00}\nis nearby could be very dangerous!{be01}\nLet him get to safety first!\nThat's your priority!
+Bank0205_Text_RogerWellSomehowHave = {0100:1}: Roger!{be01}\nWell...\nSomehow, I have to let the man{be00}\nescape from here...{be01}\nI'll draw MT's attention to me\nand buy him some time...
+Bank0205_Text_WayMt = {0100:1}: This way! MT!
+Bank0205_Text_MtDeegeegaga = MT: Deegeegaga...
+Bank0205_Text_UghItsScary = {0100:1}: Ugh... It's scary...
+Bank0205_Text_MtDeegeegaaaan = MT: Deegeegaaaan!
+Bank0205_Text_HeyScrapHeap = {0100:1}: Hey, scrap heap!
+Bank0205_Text_MtDeegeegaaaan_2 = MT: Deegeegaaaan!
+Bank0205_Text_OverHere = {0100:1}: Over here!
+Bank0205_Text_MtDeegeegaaaan_3 = MT: Deegeegaaaan!
+Bank0205_Text_MtDeegeeDegeegaga = MT: Deegee... Degeegaga...
+Bank0205_Text_LookMtDistractedIts = {0100:1}: Look! MT is distracted!\nIt's the perfect time to make your escape!
+Bank0205_Text_ManOkThank = Man: OK! Thank you!
+Bank0205_Text_MtDeegeegaaaan_4 = MT: Deegeegaaaan!
+Bank0205_Text_AllRightHesGone = {0100:1}: All right! He's gone!{be01}\nNow I can fight against MT\nwithout worrying about him...
+Bank0205_Text_MtDeegeegaaaan_5 = MT: Deegeegaaaan!
+Bank0205_Text_SeemsMtSeriousAbout = {0100:1}: It seems\nMT is serious about our battle, too.
+Bank0205_Text_MtDeegeegaaaan_6 = MT: Deegeegaaaan!
+Bank0205_Text_IllTurnScrap = {0100:1}: I'll turn you to scrap!
+Bank0205_Text_MtDeegeegaaaan_7 = MT: Deegeegaaaan!
+Bank0205_Text_IllCautious = {0100:1}: I'll be cautious...
+Bank0205_Text_MtDeegeegaga_2 = MT: Deegeegaga...
+Bank0205_Text_Bring = {0100:1}: Bring it on!
+Bank0205_Text_MtDeegeegaaaan_8 = MT: Deegeegaaaan!
+Bank0205_Text_Scary = {0100:1}: Scary...
+Bank0205_Text_MtDeegeegaga_3 = MT: Deegeegaga...
+Bank0205_Text_WhatPowerfulCreatureS = {0100:1}: What a powerful creature!\nMy {0102:0}'s attack{be00}\ndidn't work at all...{be01}\nIt's all over for me! I'm finished!
+Bank0205_Text_MtHeyWhatDoing = MT: Hey, {0100:1}!{be01}\nWhat are you doing?
+Bank0205_Text_HuhWhatDidMt = {0100:1}: Huh? What?{be01}\nDid MT just speak with the captain's voice?
+Bank0205_Text_MtAllTestSkills = MT: This was all a test of your skills!{be01}\nThis MT is a training robot developed\nby the Unova Defense Force!
+Bank0205_Text_What = {0100:1}: What??
+Bank0205_Text_MtWereFacingCrisis = MT: You were facing a crisis that threatened\nall of Unova, yet you gave up fighting!{be01}\nDo you still call yourself a member of\nthe Unova Defense Force?!{be01}\nCome back to HQ as soon as possible!\nWe're starting your training all over again.{be00}\nI'll train your pitiful guts myself!
+Bank0205_Text_OhNo = {0100:1}: Oh no...
+Bank0205_Text_MtListenIllTrain = MT: Listen, {0100:1}!{be01}\nI'll train you until you won't be able\nto cry or smile for the rest of your life.{be00}\nPrepare yourself!
+Bank0205_Text_HaHahahaImMuch = {0100:1}: Ha...hahaha...\nI'm in so much trouble...
+Bank0205_Text_MtDeegeegaaaan_9 = MT: Deegeegaaaan!
+Bank0205_Text_HuffPuffCantMove = {0100:1}: Huff...puff...{be01}\nI can't move...anymore...
+Bank0205_Text_MtDeegeegaaaan_10 = MT: Deegeegaaaan!
+Bank0205_Text_HuffPuffCantEscape = {0100:1}: Huff...puff...\nI...can't...escape...
+Bank0205_Text_ManHeyAllRight = Man: Hey!\nAre you all right?
+Bank0205_Text_HuhWhyDidCome = {0100:1}: Huh... You...\nWhy did...you come back...
+Bank0205_Text_ManGotBitNervous = Man: I got a bit nervous earlier.\nThat MT is pretty scary!{be01}\nBut I'm fine now!\nThis time, I'll help you!
+Bank0205_Text_NoRunCivilianCant = {0100:1}: No... Run...\nA civilian...can't take on MT...{be01}\nHuff... Puff...{be01}\nDon't mind me...\nJust get away...
+Bank0205_Text_ManWontDiscouragedIf = Man: I won't be discouraged! If a youngster\nlike you can put up such a good fight...{be01}\nI'm an adult. If I try, I can do it!\nI'll make my mom proud!
+Bank0205_Text_MechanicalMonsterMtApproaching = The mechanical monster MT\nwas approaching {0100:1}...{be01}\nAs the situation grew desperate, the Worker\nwho had escaped came back to help...{be01}\nHe got into a truck and drove it straight\ninto MT, causing a huge explosion and{be00}\nblowing smoke!{be01}\nOnly the immovable body of MT\nwas left behind.{be01}\nOn unsteady legs, {0100:1} searched\nthe rubble for the heroic Worker,{be00}\nbut couldn't find him...
+Bank0205_Text_YayManagedBeatMt = {0100:1}: Yay.\nI managed to beat MT...
+Bank0205_Text_ManAhhhThankBeat = Man: Ahhh! Thank you.\nYou beat such a big monster!{be01}\nWow. You're great!
+Bank0205_Text_AllRight = {0100:1}: You...\nAre you all right?
+Bank0205_Text_ManHeheheDontUnderestimate = Man: Hehehe.\nDon't underestimate a Worker.{be00}\nWe're the strongest of the strong!
+Bank0205_Text_ExcuseButLetAsk = {0100:1}: Excuse me, but\nlet me ask you a question...{be01}\nThat MT...\nWas it originally your Pokémon?
+Bank0205_Text_ManHeyHeyNo = Man: Hey, hey! No!\nThat monster isn't mine!{be01}\nI found an abandoned Poké Ball in the\ncorner of the harbor.{be01}\nSo I picked it up and threw it.\nThen, that monster came out!
+Bank0205_Text_See = {0100:1}: I see...
+Bank0205_Text_ManButStrangeThing = Man: But the strange thing is...\nThe place where I picked it up is restricted.{be00}\nIt's for authorized harbor personnel only.
+Bank0205_Text_AllRightThankMt = {0100:1}: All right.\nThank you.{be01}\n...\nMT...{be01}\nThat is not a Pokémon...\nIt's a weapon for destruction...{be01}\nWho could have made such\na dangerous thing?
 \pad{2c}

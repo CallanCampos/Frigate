@@ -1,12 +1,17 @@
-// Macros for the field scripts, written by tools/scripts/field_script.py inc
+// Macros for the field scripts, written by tools/script/field_script.py inc
 
 #include "constants/abilities.h"
 #include "constants/field_script.h"
+#include "constants/flags.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/trades.h"
+#include "constants/trainers.h"
 #include "constants/types.h"
+#include "constants/vars.h"
+#include "constants/zones.h"
 
     // In .data, which LLVM pads with zeros: in .text, clang 18 pads `.balign 4, 0` with ARM NOPs
     .data

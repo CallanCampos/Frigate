@@ -1,24 +1,24 @@
-None
-Akershus
-Aust-Agder
-Buskerud
-Finnmark
-Hedmark
-Hordaland
-Jan Mayen Island
-Lofoten
-Møre og Romsdal
-Nordland
-Nord-Trøndelag
-Oppland
-Oslo
-Rogaland
-Sogn og Fjordane
-Sør-Trøndelag
-Svalbard
-Telemark
-Troms
-Vest-Agder
-Vestfold
-Østfold
+Bank0432_Text_None = None
+Bank0432_Text_Akershus = Akershus
+Bank0432_Text_AustAgder = Aust-Agder
+Bank0432_Text_Buskerud = Buskerud
+Bank0432_Text_Finnmark = Finnmark
+Bank0432_Text_Hedmark = Hedmark
+Bank0432_Text_Hordaland = Hordaland
+Bank0432_Text_JanMayenIsland = Jan Mayen Island
+Bank0432_Text_Lofoten = Lofoten
+Bank0432_Text_MReOgRomsdal = Møre og Romsdal
+Bank0432_Text_Nordland = Nordland
+Bank0432_Text_NordTrNdelag = Nord-Trøndelag
+Bank0432_Text_Oppland = Oppland
+Bank0432_Text_Oslo = Oslo
+Bank0432_Text_Rogaland = Rogaland
+Bank0432_Text_SognOgFjordane = Sogn og Fjordane
+Bank0432_Text_SRTrNdelag = Sør-Trøndelag
+Bank0432_Text_Svalbard = Svalbard
+Bank0432_Text_Telemark = Telemark
+Bank0432_Text_Troms = Troms
+Bank0432_Text_VestAgder = Vest-Agder
+Bank0432_Text_Vestfold = Vestfold
+Bank0432_Text_Stfold = Østfold
 \pad{7a}

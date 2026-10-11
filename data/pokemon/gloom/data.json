@@ -1,0 +1,172 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Gloom",
+    "pokedex": {
+        "category": "Weed Pokémon",
+        "entry": "The honey it drools from its mouth\nsmells so atrocious, it can curl\nnoses more than a mile away.",
+        "height": "2'07\"",
+        "weight": "19.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Gloom",
+                "category": "Weed Pokémon",
+                "entry": "The honey it drools from its mouth\nsmells so atrocious, it can curl\nnoses more than a mile away.",
+                "height": "2'07\"",
+                "weight": "19.0 lbs."
+            },
+            "fr": {
+                "name": "Ortide",
+                "category": "Pokémon Racine",
+                "entry": "L'odeur du nectar de sa bouche est\nsi répugnante qu'elle agresse les\nnarines à deux kilomètres.",
+                "height": "0,8 m",
+                "weight": "8,6 kg"
+            },
+            "de": {
+                "name": "Duflor",
+                "category": "Unkraut",
+                "entry": "Der Honig, den es abgibt, riecht so\nentsetzlich, dass sich sogar Nasen\nin 2 km Entfernung rümpfen.",
+                "height": "0,8 m",
+                "weight": "8,6 kg"
+            },
+            "it": {
+                "name": "Gloom",
+                "category": "Pokémon Malerba",
+                "entry": "Il fluido che fuoriesce dalla sua bocca\nè così puzzolente che si sente anche\na 2 km di distanza.",
+                "height": "0,8 m",
+                "weight": "8,6 kg"
+            },
+            "ko": {
+                "name": "냄새꼬",
+                "category": "잡초포켓몬",
+                "entry": "입에서 흘러내리는 꿀은\n2km 떨어져 있어도 코가\n비뚤어질 정도의 심한 악취가 난다.",
+                "height": "0.8 m",
+                "weight": "8.6 kg"
+            },
+            "es": {
+                "name": "Gloom",
+                "category": "Pokémon Hierbajo",
+                "entry": "La miel que emana de su boca posee\nun hedor capaz de derribar enemigos\na 2 km de distancia.",
+                "height": "0,8 m",
+                "weight": "8,6 kg"
+            },
+            "ja": {
+                "name": "クサイハナ",
+                "category": "ざっそうポケモン",
+                "entry": "くちから\\x{3000}たれている\\x{3000}ミツは\n\\x{ff12}キロ\\x{3000}はなれていても\\x{3000}はなが\nまがるほど\\x{3000}もうれつに\\x{3000}くさい。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff18}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 65,
+        "defense": 70,
+        "speed": 40,
+        "special_attack": 85,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_STENCH",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 138,
+    "height": 8,
+    "weight": 86,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ABSORB" ],
+            [ 1, "MOVE_SWEET_SCENT" ],
+            [ 1, "MOVE_ACID" ],
+            [ 5, "MOVE_SWEET_SCENT" ],
+            [ 9, "MOVE_ACID" ],
+            [ 13, "MOVE_POISON_POWDER" ],
+            [ 15, "MOVE_STUN_SPORE" ],
+            [ 17, "MOVE_SLEEP_POWDER" ],
+            [ 23, "MOVE_MEGA_DRAIN" ],
+            [ 29, "MOVE_LUCKY_CHANT" ],
+            [ 35, "MOVE_NATURAL_GIFT" ],
+            [ 41, "MOVE_MOONLIGHT" ],
+            [ 47, "MOVE_GIGA_DRAIN" ],
+            [ 53, "MOVE_PETAL_DANCE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM56",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_GASTRO_ACID",
+            "MOVE_WORRY_SEED",
+            "MOVE_AFTER_YOU",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_LEAF_STONE",
+            "species": "SPECIES_VILEPLUME"
+        },
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_SUN_STONE",
+            "species": "SPECIES_BELLOSSOM"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ODDISH"
+}

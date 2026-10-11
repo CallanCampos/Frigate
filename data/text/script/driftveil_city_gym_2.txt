@@ -1,0 +1,5 @@
+DriftveilCityGym2_Text_ClayGoodDancersCrucial = Clay: Good dancers are crucial\nfer puttin' on a good show!{be01}
+DriftveilCityGym2_Text_WelcomeDriftveilPokemonGym = Welcome to the Driftveil Pokémon Gym!{be01}\nIn this Gym, elevators are provided for\nyour use.
+DriftveilCityGym2_Text_PressedSwitchElevator = {0100:0} pressed the\nswitch on the elevator!
+DriftveilCityGym2_Text_DriftveilPokemonGymGym = Driftveil Pokémon Gym{be01}\nGym Leader: Clay\nCertified Trainers:{be00}\n{0100:1}
+DriftveilCityGym2_Text_DriftveilPokemonGymGym_2 = Driftveil Pokémon Gym{be01}\nGym Leader: Clay\nCertified Trainers:{be00}\n{0100:0}, {0100:1}

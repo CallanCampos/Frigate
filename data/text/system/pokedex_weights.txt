@@ -1,0 +1,3 @@
+\from{species.pokedex.weight}
+PokedexWeights_Text_Lbs = ????.? lbs.
+\from{species.pokedex.forms.weight}

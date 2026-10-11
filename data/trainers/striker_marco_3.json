@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Marco",
+    "class": "TRAINER_CLASS_STRIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_SUPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 34,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "When it comes to keeping the ball, leave\nit to me! My dribbling skills are perfect!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Of course...dribbling a Poké Ball\nwon't do any good!"
+        },
+        {
+            "type": 15,
+            "text": "You've got to be technical with\nhow you use items!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Soccer balls and\nPoké Balls..."
+        }
+    ]
+}

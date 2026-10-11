@@ -1,0 +1,7 @@
+IcirrusCity5_Text_WeWereGoingMake = We were going to make more land,\nbut we realized it would cause{be00}\nproblems for Pokémon living in the sea...{be01}\nOh! Don't tell my girlfriend!
+IcirrusCity5_Text_WeTriedExpandOcean = We tried to expand the ocean,\nbut then there would be fewer{be00}\nPokémon that live on land.{be01}\nThat might make the Pokémon in\nthe ocean sad...{be01}\nOh! This is a secret\nfrom my darling boyfriend!
+IcirrusCity5_Text_MightNotLookBut = I might not look it,\nbut I'm the sound designer!{be01}\nI want folks to hear my wonderful music,\nso I'm travelin' all over these parts.{be01}\nHow about givin' my\nfavorite music a listen?{be01}
+IcirrusCity5_Text_WellShucksHaveGood = Well, shucks!\nHave a good listen, then!
+IcirrusCity5_Text_HesLostMusic = He's lost in the music...
+IcirrusCity5_Text_OhNowDontLike = Oh now, don't be like that!\nListen as much as you want!
+\pad{c2}

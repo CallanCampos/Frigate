@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jebediah",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ONIX",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My great loves in life are...\nMountains! Food! Pokémon!{be00}\nBut food deserves to go in there twice!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh, ho ho!\nYou got me!"
+        },
+        {
+            "type": 2,
+            "text": "When you pick the simplest-looking path,\nit often turns out to be a dead end."
+        }
+    ]
+}

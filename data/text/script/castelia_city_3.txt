@@ -1,0 +1,15 @@
+CasteliaCity3_Text_IfYoureLookingGym = If you're looking for the Gym Leader,\nBurgh, he said there might be trouble{be00}\nand then he took off!{be01}\nYou can go look for him if you'd like!{be01}
+CasteliaCity3_Text_HuhBurghVanishedAgain = ???: Huh? Burgh vanished again?{be01}
+CasteliaCity3_Text_ClydeOhHelloIris = Clyde: Oh! Hello, Iris.{be01}\nSomething came up, and Burgh\nisn't here right now.{be01}
+CasteliaCity3_Text_IrisHmmIsntBurgh = Iris: Hmm...{be01}\nIsn't Burgh always vanishing, though?{be01}\nHe always says he's got artist's block\nand just goes wandering out of the Gym.{be01}
+CasteliaCity3_Text_HiThereWhoLooking = Hi there! Who are you?{be01}\n...{be01}\nLooking for Team Plasma?{be01}\nBut Team Plasma disbanded\ntwo years ago!{be01}\nI guess that doesn't matter!\nYou're having problems,{be00}\nso I'll help you out!{be01}
+CasteliaCity3_Text_HmmNowWhereWould = Hmm... Now where would\nsuspicious people go to hide?{be01}
+CasteliaCity3_Text_ThatsMightWhereThey = That's it!\nThat might be where they are!{be01}
+CasteliaCity3_Text_ClydeGoodGriefBurgh = Clyde: Good grief...\nBurgh and Iris are so similar.{be01}\nIt looks like she went around the corner,\ntoward the Pokémon Center.{be01}\nDo you know where the Pokémon Center is?{be01}\nIf you keep following the street\nthat goes around Castelia City,{be00}\nit's right there!
+CasteliaCity3_Text_WhenComesLovingPokemon = When it comes to loving my Pokémon,\nI won't lose to anybody!{be01}\nI hope that gets through\nto my Pokémon...
+CasteliaCity3_Text_IveGotPlentyPotions = I've got plenty of Potions!\nWith them, I'll bet I can{be00}\nbeat the Gym Leader!
+CasteliaCity3_Text_WantingBecomeStrongerPokemon = Wanting to become stronger\nas a Pokémon Trainer is good!{be01}\nYou can have a good time playing with\nPokémon or put them to work instead!
+CasteliaCity3_Text_IfOnlyHadFive = If I only had five Badges,\nI could buy Ultra Balls...
+CasteliaCity3_Text_LittlePalpitoadUtterlyCharming = My little Palpitoad\nis utterly charming!{be01}\nWhen I come home tired,\nit makes me feel better!
+CasteliaCity3_Text_CasteliaCityPokemonGym = Castelia City Pokémon Gym\nLeader: Burgh{be00}\nPremier Insect Artist
+\pad{78}

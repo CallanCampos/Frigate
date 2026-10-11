@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cora",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GRUMPIG",
+            "form": 0,
+            "level": 39,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DRIFBLIM",
+            "form": 0,
+            "level": 39,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Let's train!\nWe'll get stronger with our Pokémon!{be01}\nThen we can challenge the Gyms in places\nlike Opelucid City and Humilau City!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Not yet! I still haven't shared my true\nstrength with you!"
+        },
+        {
+            "type": 2,
+            "text": "My Pokémon are like my really important\nbrothers and sisters.{be01}\nEver since I was born, they've been with\nme, sharing my smiles and tears!"
+        }
+    ]
+}

@@ -25,11 +25,12 @@ which the macros encode relative to the end of the argument. The Load commands s
 and the other comparisons test. Commands that behave differently from Gen 4's have a comment in the macros, and the
 commands that do nothing here are named `DummyNN` after their ID, as pokeplatinum does.
 
-Scripts go through the C preprocessor, so they use the same constants as the C code. `include/constants/` holds
+Scripts go through the C preprocessor, so they use the same constants as the C code. The constant headers hold
 only `#define`s for this reason. The constants come from:
 
-- The game's text, for moves, abilities, items, species and types, by `tools/scripts/make_constants.py`, which reads
-  it with `tools/scripts/msgdata.py`.
+- The lists in `data/constants/`, for moves, abilities, items, species, types, sounds, trainers and zones, which the
+  build turns into headers (see [Constant lists](data.md#constant-lists)). They were written from the game's text by
+  `tools/data/make_constants.py`, which reads it with `tools/text/msgdata.py`.
 - pokeplatinum, for the move effects and held item effects that Gen 4 has, whose IDs this game keeps. Gen 5's move
   effects are named after their first move.
 - The move data, for move categories and the conditions that moves inflict.
@@ -37,19 +38,19 @@ only `#define`s for this reason. The constants come from:
   as pokeplatinum's, its values show which constant is which.
 
 ```sh
-python3 tools/scripts/make_constants.py extract/b2_us/files/a/0/0/2 include/constants
+python3 tools/data/make_constants.py extract/b2_us/files/a/0/0/2 data/constants
 ```
 
 `ninja` assembles each script with `clang`, converts it to a binary with `llvm-objcopy`, packs the binaries with
-`tools/scripts/narc.py` into `build/<version>/files/a/1/6/9`, and checks the archive against the extracted one. The
-ROM is built from `build/<version>/files`, which `tools/scripts/files_tree.py` fills with links to the extracted files,
+`tools/data/narc.py` into `build/<version>/files/a/1/6/9`, and checks the archive against the extracted one. The
+ROM is built from `build/<version>/files`, which `tools/build/files_tree.py` fills with links to the extracted files,
 except for the files built from source. `ARCHIVES` in `configure.py` lists them.
 
-The scripts are source, edited by hand. `tools/scripts/tr_ai_script.py` disassembled them, and writes the macros:
+The scripts are source, edited by hand. `tools/script/tr_ai_script.py` disassembled them, and writes the macros:
 
 ```sh
-python3 tools/scripts/tr_ai_script.py inc include/asm/tr_ai.inc
-python3 tools/scripts/tr_ai_script.py disasm extract/b2_us/files/a/1/6/9 OUTPUT_DIR [--labels NAMES.json]
+python3 tools/script/tr_ai_script.py inc include/asm/tr_ai.inc
+python3 tools/script/tr_ai_script.py disasm extract/b2_us/files/a/1/6/9 OUTPUT_DIR [--labels NAMES.json]
 ```
 
 The disassembler follows the jumps from the start of each script. Bytes it does not reach are decoded as commands
@@ -59,11 +60,13 @@ unless `--labels` gives names.
 
 ## Field scripts
 
-The field scripts, archive `a/0/5/6`, are built from source in `data/field_scripts/NNNN.s`, with the macros in
-`include/asm/field_script.inc`. Both versions have the same archive. It holds a script file and a map script table
-for each zone, and the global scripts, which zones start by their IDs (from 2000 up). A script file starts with the
-offsets of its scripts, followed by the scripts and their movement data. A map script table lists the scripts that
-the zone runs at points such as its loading.
+The field scripts, archive `a/0/5/6`, are built from source in `data/field_scripts/<file>.s`, with the macros in
+`include/asm/field_script.inc`. Both versions have the same archive. It holds a script file and a map script table for
+each zone, and the global scripts, which zones start by their IDs (from 2000 up). A script file starts with the offsets
+of its scripts, followed by the scripts and their movement data. A map script table lists the scripts that the zone runs
+at points such as its loading. A script names the messages it shows by their IDs (see [Text](data.md#text)),
+`MsgPlaceSign 0x8021, BlackCity_Text_...`, and includes the header of their bank, `text/script/<bank>.h`; the comment
+above a command still gives the message.
 
 ```
 L_015C:
@@ -109,11 +112,11 @@ Arguments are written as constants where the handler shows what they are: items,
 and `MSGFILE_SCRIPT` for the script's own text file. Each command that shows a message has its text as a comment,
 from the zone's or the global script's text file in the script message archive (`a/0/0/3`).
 
-The arguments of every command come from its handler. `tools/scripts/field_command_table.py` follows the reads of the
+The arguments of every command come from its handler. `tools/script/field_command_table.py` follows the reads of the
 script in each handler's disassembly: `VM_Read16`, `VM_Read32`, `ScriptReadAny` (a value or a variable),
 `ScriptReadVar`, loads through the VM's pc, and the same in the functions the handler calls with the VM. It follows
 each value read to the functions it is passed to, and a known function such as `BagSave_AddItem` or
-`LoadFieldScriptMessage` tells what the argument is. It writes `tools/scripts/field_commands.json`, and needs
+`LoadFieldScriptMessage` tells what the argument is. It writes `tools/script/field_commands.json`, and needs
 `dsd dis` output in `build/asm`. Every script file decodes with these arguments.
 
 A script file has the plugin of the zones that use it, or else of the zones that start its scripts. A few global
@@ -122,9 +125,9 @@ as bytes. The Join Avenue shop commands swap one of the plugin's overlays, which
 commands, and the disassembler follows that.
 
 ```sh
-python3 tools/scripts/field_command_table.py tools/scripts/field_commands.json
-python3 tools/scripts/field_script.py inc include/asm/field_script.inc
-python3 tools/scripts/field_script.py disasm extract/b2_us OUTPUT_DIR
+python3 tools/script/field_command_table.py tools/script/field_commands.json
+python3 tools/script/field_script.py inc include/asm/field_script.inc
+python3 tools/script/field_script.py disasm extract/b2_us OUTPUT_DIR
 ```
 
 The disassembler follows the code from each script. Bytes it does not reach are decoded as code where it ends

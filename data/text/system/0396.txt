@@ -1,167 +1,167 @@
-
-Stench, huh...{be01}\nPokémon with this Ability can\nsometimes make the target flinch.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when the leading{be00}\nparty member has it.{be01}
-Drizzle, huh...{be01}\nPokémon with this Ability make it rain\nwhen they enter the battle.{be01}
-Speed Boost, huh...{be01}\nThis Ability raises a Pokémon's\nSpeed every turn.{be01}
-Battle Armor, huh...{be01}\nPokémon with this Ability cannot be\nhit critically.{be01}\nSome attacks are supposed to score a\ncritical hit every time, but that won't{be00}\nhappen against Pokémon with this Ability.{be01}
-Sturdy, huh...{be01}\nPokémon with this Ability are protected\nagainst one-hit KO moves.{be01}\nIt also leaves the Pokémon with a tiny bit\nof HP if hit by a move that would knock{be00}\nit out when its HP is full.{be01}
-Damp, huh...{be01}\nWhen a Pokémon with this Ability is\nin battle, no Pokémon can use{be00}\nSelfdestruct or Explosion.{be01}\nWhat's more...{be01}\nThe Aftermath Ability won't trigger.\nYou should remember that, too.{be01}
-Limber, huh...{be01}\nPokémon with this Ability are protected\nagainst the paralysis status condition.{be01}
-Sand Veil, huh...{be01}\nThis Ability doubles a Pokémon's\nevasiveness in sandstorms.{be01}\nAlso, sandstorms don't damage the\nPokémon, regardless of its type.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when it leads your party{be00}\nin a sandstorm.{be01}
-Static, huh...{be01}\nPokémon with this Ability can inflict\nthe paralysis status condition{be00}\nwhen hit with a direct attack.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nElectric-type wild Pokémon when{be00}\nthe leading party member has it.{be01}
-Volt Absorb, huh...{be01}\nPokémon with this Ability do not\ntake damage from Electric-type moves.{be00}\nTheir HP is restored a little instead.{be01}
-Water Absorb, huh...{be01}\nPokémon with this Ability do not\ntake damage from Water-type moves{be00}\nTheir HP is restored a little instead.{be01}
-Oblivious, huh...{be01}\nPokémon with this Ability are protected\nagainst the infatuated status condition.{be01}
-Cloud Nine, huh...{be01}\nWhen a Pokémon with this Ability is\nin battle, it eliminates effects of weather{be00}\non Pokémon.{be01}\nThe weather condition still\nexists, however.{be01}
-Compoundeyes, huh...{be01}\nThis Ability raises a Pokémon's accuracy.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon with held items when{be00}\nthe leading party member has it.{be01}
-Insomnia, huh...{be01}\nA Pokémon with this Ability is immune to the\nsleep status condition, even when its own{be00}\nmove would make it fall asleep.{be01}
-Color Change, huh...{be01}\nA Pokémon with this Ability changes\nits type to match the type of the move{be00}\nthat just hit it.{be01}
-Immunity, huh...{be01}\nPokémon with this Ability are protected\nagainst the poison status condition.{be01}
-Flash Fire, huh...{be01}\nPokémon with this Ability do not\ntake damage from Fire-type moves.{be01}\nInstead, the power of their own\nFire-type moves is increased.{be01}
-Shield Dust, huh...{be01}\nPokémon with this Ability are protected\nfrom additional effects of moves.{be01}
-Own Tempo, huh...{be01}\nPokémon with this Ability are protected\nagainst the confused status condition.{be01}
-Suction Cups, huh...{be01}\nA Pokémon with this Ability nullifies moves\nlike Whirlwind and Roar, which would{be00}\nforce Pokémon to switch out.{be01}\nWhat's more...{be01}\nWhen a Pokémon with this Ability is leading\nyour party, it makes Pokémon bite more{be00}\noften when fishing.{be01}
-Intimidate, huh...{be01}\nA Pokémon with this Ability lowers\nthe opposing Pokémon's Attack{be00}\nwhen it enters battle.{be01}\nWhat's more...{be01}\nWhen a Pokémon with this Ability is leading\nyour party, it lowers the chance{be00}\nto encounter low-level wild Pokémon.{be01}
-Shadow Tag, huh...{be01}\nA Pokémon with this Ability prevents the\nopposing Pokémon from fleeing.{be01}\nThey can't even switch out normally.{be01}\nHowever, if a move's added effect would\nmake them switch out, that still works.{be00}\nThis is something you should remember.{be01}
-Rough Skin, huh...{be01}\nA Pokémon with this Ability reduces the HP\nof an opposing Pokémon that hits it{be00}\nwith a direct attack.{be01}
-Wonder Guard, huh...{be01}\nPokémon with this Ability are\nprotected against damage from{be00}\nall moves that aren't super effective.{be01}\nIt's a very powerful Ability...{be01}\nBut the Pokémon still takes damage\nfrom weather and status conditions.{be01}
-Levitate, huh...{be01}\nPokémon with this Ability are immune\nto all Ground-type moves.{be01}\nOh, I almost forgot about it!{be01}\nThere is an exception to that.\nSand-Attack still hits the target.{be01}
-Effect Spore, huh...{be01}\nPokémon with this Ability can inflict the\npoison, paralysis, or sleep status{be00}\ncondition when hit with a direct attack.{be01}
-Synchronize, huh...{be01}\nWhen a Pokémon with this Ability is\npoisoned, burned, or has paralysis,{be00}\nthe same status condition is passed on to{be00}\nthe Pokémon that caused that condition.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon with the same Nature{be00}\nwhen the leading party member has it.{be01}
-Clear Body, huh...{be01}\nPokémon with this Ability are protected\nagainst stat-lowering moves and Abilities.{be01}\nBut!{be01}\nThe burned status condition still halves\ntheir Attack, and the paralysis status{be00}\ncondition still lowers their Speed to a{be00}\nquarter of what it was.{be01}
-Natural Cure, huh...{be01}\nPokémon with this Ability cure their\nstatus conditions when they switch out.{be01}\nTheir status conditions are also cured\nwhen a battle ends.{be00}\nThat's another thing you should remember.{be01}
-Lightningrod, huh...{be01}\nPokémon with this Ability are immune\nto all Electric-type moves.{be01}\nThat's not all!{be01}\nIts Sp. Atk goes up every time it\ntakes an Electric-type move.{be01}\nThere's more!{be01}\nThis Ability draws Electric-type moves\nto the Pokémon.{be01}\nIt doesn't do any good in a Single Battle,\nbut it should be useful in Double Battles{be00}\nand Triple Battles.{be01}
-Serene Grace, huh...{be01}\nPokémon with this Ability are more likely\nto inflict added effects.{be01}
-Swift Swim, huh...{be01}\nThis Ability doubles a Pokémon's\nSpeed when it's raining.{be01}
-Chlorophyll, huh...{be01}\nPokémon with this Ability double their\nSpeed in sunny weather.{be01}
-Illuminate, huh...{be01}\nWhen a Pokémon with this Ability is leading\nyour party, you're more likely{be00}\nto encounter wild Pokémon.{be01}\nBy the way, its effect in battle\nisn't understood as of yet...{be01}
-Trace, huh...{be01}\nWhen a Pokémon with this Ability enters\nbattle, its Ability changes to match the{be00}\nopposing Pokémon's Ability.{be01}\nIn a battle, being able to tell the\nopponent's Ability can be very useful.{be00}\nYou should remember that.{be01}
-Huge Power, huh...{be01}\nThis Ability doubles a Pokémon's\nAttack stat.{be01}
-Poison Point, huh...{be01}\nPokémon with this Ability can inflict\nthe poison status condition{be00}\nwhen hit with a direct attack.{be01}
-Inner Focus, huh...{be01}\nPokémon with this Ability don't flinch.{be01}
-Magma Armor, huh...{be01}\nThis Ability prevents the frozen\nstatus condition.{be01}\nWhat's more...{be01}\nIt makes Eggs in your party hatch faster.{be01}
-Water Veil, huh...{be01}\nThis Ability prevents the burned\nstatus condition.{be01}
-Magnet Pull, huh...{be01}\nA Pokémon with this Ability prevents\nopposing Steel-type Pokémon from fleeing.{be01}\nThey can't even switch out.{be01}\nHowever, if a move's added effect would\nmake them switch out, that still works.{be00}\nThis is something you should remember.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nSteel-type wild Pokémon{be00}\nwhen the leading party member has it.{be01}
-Soundproof, huh...{be01}\nPokémon with this Ability are protected\nfrom sound-based moves.{be01}\nThey are protected from their allies'\nmoves, too, even helpful ones.{be00}\nSo be careful in Double Battles{be00}\nand Triple Battles.{be01}
-Rain Dish, huh...{be01}\nPokémon with this Ability restore HP\nby a little every turn when it's raining.{be01}
-Sand Stream, huh...{be01}\nA Pokémon with this Ability causes a\nsandstorm when it enters the battle.{be01}
-Pressure, huh...{be01}\nWhen a Pokémon with this Ability is hit by\nan opposing Pokémon's move, the PP{be00}\n(Power Points) of that move are depleted.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nhigh-level wild Pokémon{be00}\nwhen the leading party member has it.{be01}
-Thick Fat, huh...{be01}\nThis Ability halves damage from\nFire- and Ice-type moves.{be01}
-Early Bird, huh...{be01}\nA Pokémon with this Ability\nwakes quickly from the sleep condition.{be01}
-Flame Body, huh...{be01}\nA Pokémon with this Ability can inflict\nthe burned status condition{be00}\nwhen hit with a direct attack.{be01}\nWhat's more...{be01}\nIt makes Eggs in your party\nhatch faster.{be01}
-Run Away, huh...{be01}\nPokémon with this Ability can always\nescape from a battle with a wild Pokémon.{be01}\nIt can even ignore the effects of moves\nand Abilities that normally prevent{be00}\nPokémon from running away.{be01}
-Keen Eye, huh...{be01}\nThis Ability prevents\naccuracy from being lowered.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nlow-level wild Pokémon{be00}\nwhen the leading party member has it.{be01}
-Hyper Cutter, huh...{be01}\nThis Ability prevents\nAttack from being lowered.{be01}
-Pickup, huh...{be01}\nPokémon with this Ability may\npick up the item the opposing Pokémon{be00}\nused that turn at the end of the turn.{be01}\nWhat's more...{be01}\nIt sometimes picks up an item\nafter battle even if it didn't participate.{be01}\nJust so you know...{be01}\nThe higher the Pokémon's level is,\nthe better item it picks up.{be01}\nOne more thing...{be01}\nIf the Pokémon is holding an item already,\nthis Ability does nothing.{be01}
-Truant, huh...{be01}\nPokémon with this Ability can\nuse a move only once every other turn.{be01}\nOne strike to end the battle, so to speak!{be01}\nThat's how you win a battle with\nthis Ability.{be01}
-Hustle, huh...{be01}\nThis Ability raises the Pokémon's\nAttack but lowers its accuracy.{be01}\nThis has no effect on moves that\nare sure hits.{be00}\nYou should remember that.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nhigh-level wild Pokémon{be00}\nwhen the leading party member has it.{be01}
-Cute Charm, huh...{be01}\nPokémon with this Ability can inflict\nthe infatuated status condition{be00}\nwhen hit with a direct attack.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon of the opposite gender.{be01}
-Plus, huh...{be01}\nThis Ability raises the Pokémon's\nSp. Atk when another ally has the Ability{be00}\nPlus or Minus.{be01}\nThis does nothing in a Single Battle,\nbut it can raise each other's Sp. Atk{be00}\nin Double Battles and Triple Battles.{be01}\nActually, it could prove to be very useful\nin Double Battles and Triple Battles.{be01}
-Minus, huh...{be01}\nThis Ability raises the Pokémon's\nSp. Atk when another ally has the Ability{be00}\nMinus or Plus.{be01}\nThis does nothing in a Single Battle,\nbut it can raise each other's Sp. Atk{be00}\nin Double Battles and Triple Battles.{be01}\nActually, it could prove to be very useful\nin Double Battles and Triple Battles.{be01}
-Forecast, huh...{be01}\nThis Ability changes Castform's type.{be01}\nIts type changes to Fire in\nsunny weather,{be00}\nWater in the rain,{be00}\nand Ice in a hailstorm.{be01}
-Sticky Hold, huh...{be01}\nThis Ability prevents the Pokémon's held\nitem from being stolen.{be01}\nWhat's more...{be01}\nIt makes Pokémon bite more often\nwhile fishing when the leading party{be00}\nmember has it.{be01}
-Shed Skin, huh...{be01}\nPokémon with this Ability can cure their\nstatus conditions during a battle.{be01}
-Guts, huh...{be01}\nThis Ability raises the Pokémon's Attack\nwhen it's affected by a status condition.{be01}\nThat's not all!{be01}\nThis effect prevents Attack from being\nhalved by the burned status condition.{be01}\nBe careful, though...\nIt'll still take damage every turn{be00}\nwhen it's burned.{be01}
-Marvel Scale, huh...{be01}\nThis Ability raises the Pokémon's Defense\nwhen it's affected by a status condition.{be01}\nBe careful that this effect does not get\ntriggered by conditions such as the{be00}\nconfused or infatuated status conditions.{be01}
-Liquid Ooze, huh...{be01}\nWhen an opposing Pokémon\nuses an HP-draining move,{be00}\nthis Ability damages the user{be00}\nby half the damage taken instead.{be01}
-Overgrow, huh...{be01}\nThis Ability raises the power of\nGrass-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
-Blaze, huh...{be01}\nThis Ability raises the power of\nFire-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
-Torrent, huh...{be01}\nThis Ability raises the power of\nWater-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
-Swarm, huh...{be01}\nThis Ability raises the power of\nBug-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
-Rock Head, huh...{be01}\nPokémon with this Ability are immune\nto recoil damage from moves.{be01}
-Drought, huh...{be01}\nA Pokémon with this Ability makes\nthe weather sunny{be00}\nwhen it enters the battle.{be01}
-Arena Trap, huh...{be01}\nPokémon with this Ability prevent the\nopposing Pokémon from fleeing unless{be00}\nthey are Flying type or Pokémon{be00}\nwith the Levitate Ability.{be01}\nThey can't even switch out.{be01}\nAlthough, they can still switch out\nby a move's added effect.{be00}\nThis is something you should remember.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
-Vital Spirit, huh...{be01}\nPokémon with this Ability are protected\nagainst the sleep status condition.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nhigh-level wild Pokémon when the leading{be00}\nparty member has it.{be01}
-White Smoke, huh...{be01}\nPokémon with this Ability are protected\nagainst stat-lowering moves and Abilities.{be01}\nBut!{be01}\nThe burned status condition still halves\ntheir Attack, and the paralysis status{be00}\ncondition still lowers their Speed{be00}\nto a quarter of what it was.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
-Pure Power, huh...{be01}\nThis Ability doubles the Pokémon's Attack.{be01}
-Shell Armor, huh...{be01}\nPokémon with this Ability cannot be\nhit critically.{be01}\nSome attacks are supposed to score a\ncritical hit every time, but that won't{be00}\nhappen against Pokémon with this Ability.{be01}
-Air Lock, huh...{be01}\nWhen a Pokémon with this Ability is\nin battle, it eliminates effects of weather{be00}\non Pokémon.{be01}\nThe weather condition still\nexists, however.{be01}
-Tangled Feet, huh...{be01}\nThis Ability raises the Pokémon's\nevasiveness when it's confused.{be01}
-Motor Drive, huh...{be01}\nThis Ability not only nullifies the damage\nbut also raises the Pokémon's Speed{be00}\nwhen it's hit by an Electric-type move.{be01}
-Rivalry, huh...{be01}\nThis Ability raises the power of\nthe Pokémon's move when the target is{be00}\nof the same gender.{be01}\nHowever, if the target is the opposite\ngender, the move's power goes down.{be01}
-Steadfast, huh...{be01}\nThis Ability raises the Pokémon's Speed\nevery time it flinches.{be01}
-Snow Cloak, huh...{be01}\nThe evasiveness of the Pokémon with this\nAbility goes up when it's hailing.{be00}\nWhat's more...{be01}\nIf a Pokémon with this Ability is leading\nthe party in a hailstorm, it lowers the{be00}\nchance to encounter wild Pokémon.{be01}
-Gluttony, huh...{be01}\nA Pokémon with this Ability uses its held\nBerry when its HP is half or less.{be01}
-Anger Point, huh...{be01}\nThis Ability raises the Pokémon's Attack\nto the maximum when hit by a critical hit.{be01}
-Unburden, huh...{be01}\nThis Ability doubles the Pokémon's Speed\nif it loses or consumes a held item.{be01}\nIt won't do a thing if the Pokémon has\nno held item to begin with, though.{be01}
-Heatproof, huh...{be01}\nThis Ability halves damage\nfrom Fire-type moves.{be01}\nYou should remember that\nit also halves damage from burns.{be01}
-Simple, huh...{be01}\nThis Ability doubles the effect of\nstat changes.{be01}\nYou should remember that\nboth stat-raising and stat-lowering{be00}\neffects get doubled.{be01}
-Dry Skin, huh...{be01}\nThis Ability restores HP when\nthe Pokémon is hit by a Water-type move{be00}\nor when it's raining...{be01}\nHowever, the Pokémon receives increased\ndamage from Fire-type moves and takes{be00}\ndamage from sunny weather.{be01}
-Download, huh...{be01}\nWhen the Pokémon enters battle,\nthis Ability raises its Attack{be00}\nif the opposing Pokémon's Defense is lower{be00}\nthan its Sp. Def.{be01}\nIt raises Sp. Atk if the opposing\nPokémon's Sp. Def is lower{be00}\nthan its Defense.{be01}
-Iron Fist, huh...{be01}\nThis Ability increases the power of\nmoves that punch the target.{be01}
-Poison Heal, huh...{be01}\nThis Ability restores HP every turn\nif the Pokémon is inflicted with the{be00}\npoison status condition.{be01}
-Adaptability, huh...{be01}\nWhen the Pokémon uses a move that\nmatches its type, this Ability increases{be00}\nthe power boost.{be01}
-Skill Link, huh...{be01}\nWith this Ability, moves with multiple hits\nwill always strike the maximum number{be00}\nof times.{be01}
-Hydration, huh...{be01}\nThis Ability cures status conditions\nat the end of the turn if it's raining.{be01}
-Solar Power, huh...{be01}\nThis Ability raises Sp. Atk\nin sunny weather, but the Pokémon{be00}\nalso takes damage every turn,{be00}\nso be careful.{be01}
-Quick Feet, huh...{be01}\nThis Ability raises Speed when the Pokémon\nis affected by status conditions.{be01}\nIt nullifies the Speed-lowering\neffect of paralysis as well.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
-Normalize, huh...{be01}\nThis Ability turns all of the Pokémon's\nmoves to Normal-type moves.{be01}
-Sniper, huh...{be01}\nPokémon with this Ability deal a great\namount of damage when delivering{be00}\na critical hit.{be01}
-Magic Guard, huh...{be01}\nPokémon with this Ability do not take\ndamage from anything other than attacks.{be01}
-No Guard, huh...{be01}\nMoves used by or against the Pokémon with\nthis Ability always strike their targets.{be00}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
-Stall, huh...{be01}\nMoves by the Pokémon with this Ability\nare used last in the turn{be00}\nregardless of its Speed.{be01}
-Technician, huh...{be01}\nThis Ability increases the power of\nweaker moves.{be01}
-Leaf Guard, huh...{be01}\nThis Ability protects the Pokémon from\nstatus conditions in sunny weather.{be01}
-Klutz, huh...{be01}\nItems have no effect when held\nby the Pokémon with this Ability.{be01}
-Mold Breaker, huh...{be01}\nA Pokémon with this Ability uses moves on\ntargets regardless of their Abilities.{be01}
-Super Luck, huh...{be01}\nThis Ability heightens the critical-hit\nratio of the Pokémon's moves.{be01}
-Aftermath, huh...{be01}\nThis Ability deals damage to the attacking\nPokémon when a direct attack causes the{be00}\nPokémon to faint.{be01}
-Anticipation, huh...{be01}\nA Pokémon with this Ability will shudder\nif the opposing Pokémon knows a{be00}\nsupereffective move.{be01}\nYou should remember that it also warns\nwhen the opposing Pokémon knows{be00}\na one-hit KO move,{be00}\nSelfdestruct, or Explosion.{be01}
-Forewarn, huh...{be01}\nThis Ability reveals a move an opposing\nPokémon knows when the Pokémon{be00}\nenters battle.{be01}\nBy the way,\nyou should remember that damaging moves{be00}\nwith high power are prioritized.{be01}
-Unaware, huh...{be01}\nThis Ability ignores the stat changes of\nthe opposing Pokémon.{be01}\nBut!{be01}\nIt does not ignore changes to the Speed\nstat, so be careful.{be01}
-Tinted Lens, huh...{be01}\nThis Ability doubles the damage of the\nPokémon's not-very-effective moves.{be01}
-Filter, huh...{be01}\nThis Ability reduces damage from\nsupereffective moves.{be01}
-Slow Start, huh...{be01}\nThis Ability halves Attack and Speed\nfor five turns when the Pokémon{be00}\nenters battle.{be01}\nTo win battles with this Ability, the key is\nto endure the first five turns!{be01}
-Scrappy, huh...{be01}\nThis Ability lets the Pokémon hit\nGhost-type Pokémon with Normal- and{be00}\nFighting-type moves.{be01}
-Storm Drain, huh...{be01}\nPokémon with this Ability do not\ntake damage from Water-type moves.{be01}\nThat's not all!{be01}\nIts Sp. Atk goes up every time it\ntakes a Water-type move.{be01}\nThere's more!{be01}\nThis Ability draws Water-type moves\nto the Pokémon.{be01}\nIt doesn't do any good in Single Battles,\nbut it should be useful in Double Battles{be00}\nand Triple Battles.{be01}
-Ice Body, huh...{be01}\nPokémon with this Ability\nrecover a little bit of HP every turn{be00}\nduring a hailstorm.{be01}
-Solid Rock, huh...{be01}\nPokémon with this Ability\ntake less damage from{be00}\nsupereffective moves.{be01}
-Snow Warning, huh...{be01}\nA Pokémon with this Ability changes the\nweather to hail when it enters a battle.{be01}
-Honey Gather, huh...{be01}\nA Pokémon with this Ability\nwill sometimes be left holding{be00}\nHoney after a battle.{be01}\nIts chance of finding Honey\nincreases with its level,{be00}\nso you should keep that in mind.{be01}
-Frisk, huh...{be01}\nA Pokémon with this Ability\nwill tell you what item{be00}\nan opponent is holding.{be01}
-Reckless, huh...{be01}\nIf a Pokémon with this Ability\nuses a move that has recoil,{be00}\nthe power of that move will increase.{be01}\nDon't forget that this Ability's effect\nalso works on moves that damage{be00}\nthe user when the move misses!{be01}
-Multitype, huh...{be01}\nArceus has this Ability.\nWhen it holds an item called a Plate,{be00}\nits type shifts according to the Plate!{be01}
-Flower Gift, huh...{be01}\nWhen a Cherrim with this Ability\nis in sunny weather, its form changes,{be00}\nand its Attack and Sp. Def stats go up!{be01}\nIn Double and Triple Battles, it also\nmakes its allies' stats increase!{be01}
-Bad Dreams, huh...{be01}\nPokémon with this Ability reduce the HP\nof sleeping Pokémon every turn!{be01}
-Pickpocket, huh...{be01}\nWhen a Pokémon with this Ability\nis hit with a direct attack,{be00}\nit can steal the attacker's held item.{be01}\nWell...{be01}\nIt only works if the attacker is holding\nan item, though.{be01}
-Sheer Force, huh...{be01}\nWhen a Pokémon with this Ability\nuses a move with an additional effect,{be00}\nthe power goes up,{be00}\nbut the additional effect won't work.{be01}
-Contrary, huh...{be01}\nStat changes have the opposite effect\non Pokémon with this Ability!{be01}\nWhen stats should go up, they go down,\nand when they should go down, they go up!{be01}
-Unnerve, huh...{be01}\nWhen a Pokémon with this Ability\nis in battle, the opposing Pokémon{be00}\nwon't be able to eat Berries.{be01}
-Defiant, huh...{be01}\nWhen an opponent lowers the stats\nof a Pokémon with this Ability,{be00}\nits Attack goes way up!{be01}\nBut be careful--if it lowers\nits own stats, the Ability won't work!{be01}
-Defeatist, huh...{be01}\nWhen a Pokémon has this Ability\nand its HP is reduced to half or less,{be00}\nits Attack and Sp. Atk go down.{be01}\nYou absolutely can't afford\nto let these Pokémon's HP go down.{be01}\nI guess that's one good thing\nabout this Ability...{be01}
-Cursed Body, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by an attack, sometimes{be00}\nit will Disable that attack.{be01}
-Healer, huh...{be01}\nPokémon with this Ability sometimes\nheal the status conditions{be00}\nof allies that are battling with it.{be01}\nThey can't heal themselves,\nso it doesn't mean much in Single Battles,{be00}\nbut it's a very useful Ability{be00}\nto have in Double and Triple Battles.{be01}
-Friend Guard, huh...{be01}\nPokémon with this Ability\nreduce damage done to{be00}\nother Pokémon battling with it.{be01}\nIt doesn't reduce damage to itself,\nso it doesn't mean much in Single Battles,{be00}\nbut it's a very useful Ability{be00}\nto have in Double and Triple Battles.{be01}
-Weak Armor, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a physical attack,{be00}\nDefense goes down,{be00}\nbut Speed goes up!{be01}
-Heavy Metal, huh...{be01}\nPokémon with this Ability\nare twice as heavy.{be01}
-Light Metal, huh...{be01}\nPokémon with this Ability\nare half as heavy.{be01}
-Multiscale, huh...{be01}\nWhen a Pokémon with this Ability has\nfull HP, the damage it takes is reduced.{be01}\nRemember, as long as the Pokémon's\nHP is full, the Ability will keep working.{be01}
-Toxic Boost, huh...{be01}\nWhen a Pokémon with this\nAbility is poisoned,{be00}\nit's Attack goes up.{be01}
-Flare Boost, huh...{be01}\nWhen a Pokémon with\nthis Ability is burned,{be00}\nits Sp. Atk goes up.{be01}
-Harvest, huh...{be01}\nPokémon with this Ability sometimes\nrestore the Berry they used.{be01}\nRemember that if the weather\nis sunny, the Berry will always{be00}\nbe restored.{be01}
-Telepathy, huh...{be01}\nPokémon with this Ability\ncan read their allies' minds{be00}\nand avoid collateral damage.{be01}\nIt's not useful in Single Battles,\nbut it's a very important Ability{be00}\nfor Double and Triple Battles.{be01}
-Moody, huh...{be01}\nAt the end of a turn,\nPokémon with this Ability{be00}\nraise one stat sharply{be00}\nand lower another.{be01}
-Overcoat, huh...{be01}\nPokémon with this Ability\naren't damaged by the weather.{be01}
-Poison Touch, huh...{be01}\nWhen Pokémon with this Ability\nland a direct attack,{be00}\nthe target is sometimes poisoned.{be01}
-Regenerator, huh...{be01}\nWhen a Pokémon with this Ability\nis withdrawn from battle,{be00}\nit restores a little of its HP.{be01}
-Big Pecks, huh...{be01}\nThe Defense of Pokémon with this Ability\ncan't be lowered by an opponent.{be01}
-Sand Rush, huh...{be01}\nWhen a Pokémon with this Ability\nis in a sandstorm,{be00}\nits Speed doubles.{be01}\nAlso, it won't be damaged by a\nsandstorm, regardless of its type.{be01}
-Wonder Skin, huh...{be01}\nPokémon with this Ability\nare more likely to dodge status moves.{be01}\nDon't forget, though: if the Pokémon uses\na status move on itself, this Ability{be00}\nwon't work.{be01}
-Analytic, huh...{be01}\nWhen Pokémon with this Ability\nattack last, the power{be00}\nof the move goes up.{be01}
-Illusion, huh...{be01}\nA Pokémon with this Ability\nwill appear in battle disguised{be00}\nas the last Pokémon in your party.{be01}\nBe careful. If it's hit by an attack,\nthe disguise will go away.{be01}
-Imposter, huh...{be01}\nWhen a Pokémon with this Ability\ncomes into battle,{be00}\nit will Transform into its opponent.{be01}\nAnd it's not just looks...\nIt knows its opponent's moves,{be00}\nand some of its stats are the same, too!{be01}
-Infiltrator, huh...{be01}\nPokémon with this Ability can\nget past effects protecting the target{be00}\nand hit it with a move.{be01}
-Mummy, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a direct attack,{be00}\nthe Ability of the attacker{be00}\nwill change to Mummy.{be01}
-Moxie, huh...{be01}\nWhen a Pokémon with this Ability\nknocks out an opponent,{be00}\nits Attack goes up.{be01}
-Justified, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a Dark-type move,{be00}\nits Attack goes up.{be01}
-Rattled, huh...{be01}\nWhen a Pokémon with this Ability is hit\nby a Ghost-, Bug-, or Dark-type move,{be00}\nits Speed goes up.{be01}
-Magic Bounce, huh...{be01}\nPokémon with this Ability\nreflect status moves used on them{be00}\nright back at the user!{be01}\nAnd get this!{be01}\nThe status move does not affect\nthe target!{be01}
-Sap Sipper, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a Grass-type move,{be00}\nits Attack goes up.{be01}\nIt also takes no damage or\nadded effects from those moves.{be01}
-Prankster, huh...{be01}\nPokémon with this Ability can\nuse status moves earlier{be00}\nthan usual.{be01}
-Sand Force, huh...{be01}\nWhen a Pokémon with this Ability\nis in a sandstorm, the power of{be00}\nits Ground-, Rock-, and Steel-type moves{be00}\ngoes up!{be01}
-Iron Barbs, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a direct attack,{be00}\nthe attacker takes damage as well.{be01}
-Zen Mode, huh...{be01}\nA Darmanitan with this Ability\nenters Zen Mode when its HP{be00}\nis reduced to half or less.{be01}\nWhen in Zen Mode, it's a Psychic-\nand Fire-type Pokémon.{be01}\nIts Attack and Speed go down, but its\nDefense, Sp. Atk, and Sp. Def increase!{be01}
-Victory Star, huh...{be01}\nA Pokémon with this Ability\nraises the accuracy{be00}\nof itself and its allies.{be01}
-Turboblaze, huh...{be01}\nPokémon with this Ability can use\nmoves on targets regardless{be00}\nof their Abilities.{be01}
-Teravolt, huh...{be01}\nPokémon with this Ability can use\nmoves on targets regardless{be00}\nof their Abilities.{be01}
-Eggs don't have Abilities!{be01}
+Bank0396_Text_Empty =
+Bank0396_Text_StenchHuhPokemonAbility = Stench, huh...{be01}\nPokémon with this Ability can\nsometimes make the target flinch.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when the leading{be00}\nparty member has it.{be01}
+Bank0396_Text_DrizzleHuhPokemonAbility = Drizzle, huh...{be01}\nPokémon with this Ability make it rain\nwhen they enter the battle.{be01}
+Bank0396_Text_SpeedBoostHuhAbility = Speed Boost, huh...{be01}\nThis Ability raises a Pokémon's\nSpeed every turn.{be01}
+Bank0396_Text_BattleArmorHuhPokemon = Battle Armor, huh...{be01}\nPokémon with this Ability cannot be\nhit critically.{be01}\nSome attacks are supposed to score a\ncritical hit every time, but that won't{be00}\nhappen against Pokémon with this Ability.{be01}
+Bank0396_Text_SturdyHuhPokemonAbility = Sturdy, huh...{be01}\nPokémon with this Ability are protected\nagainst one-hit KO moves.{be01}\nIt also leaves the Pokémon with a tiny bit\nof HP if hit by a move that would knock{be00}\nit out when its HP is full.{be01}
+Bank0396_Text_DampHuhWhenPokemon = Damp, huh...{be01}\nWhen a Pokémon with this Ability is\nin battle, no Pokémon can use{be00}\nSelfdestruct or Explosion.{be01}\nWhat's more...{be01}\nThe Aftermath Ability won't trigger.\nYou should remember that, too.{be01}
+Bank0396_Text_LimberHuhPokemonAbility = Limber, huh...{be01}\nPokémon with this Ability are protected\nagainst the paralysis status condition.{be01}
+Bank0396_Text_SandVeilHuhAbility = Sand Veil, huh...{be01}\nThis Ability doubles a Pokémon's\nevasiveness in sandstorms.{be01}\nAlso, sandstorms don't damage the\nPokémon, regardless of its type.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when it leads your party{be00}\nin a sandstorm.{be01}
+Bank0396_Text_StaticHuhPokemonAbility = Static, huh...{be01}\nPokémon with this Ability can inflict\nthe paralysis status condition{be00}\nwhen hit with a direct attack.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nElectric-type wild Pokémon when{be00}\nthe leading party member has it.{be01}
+Bank0396_Text_VoltAbsorbHuhPokemon = Volt Absorb, huh...{be01}\nPokémon with this Ability do not\ntake damage from Electric-type moves.{be00}\nTheir HP is restored a little instead.{be01}
+Bank0396_Text_WaterAbsorbHuhPokemon = Water Absorb, huh...{be01}\nPokémon with this Ability do not\ntake damage from Water-type moves{be00}\nTheir HP is restored a little instead.{be01}
+Bank0396_Text_ObliviousHuhPokemonAbility = Oblivious, huh...{be01}\nPokémon with this Ability are protected\nagainst the infatuated status condition.{be01}
+Bank0396_Text_CloudNineHuhWhen = Cloud Nine, huh...{be01}\nWhen a Pokémon with this Ability is\nin battle, it eliminates effects of weather{be00}\non Pokémon.{be01}\nThe weather condition still\nexists, however.{be01}
+Bank0396_Text_CompoundeyesHuhAbilityRaises = Compoundeyes, huh...{be01}\nThis Ability raises a Pokémon's accuracy.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon with held items when{be00}\nthe leading party member has it.{be01}
+Bank0396_Text_InsomniaHuhPokemonAbility = Insomnia, huh...{be01}\nA Pokémon with this Ability is immune to the\nsleep status condition, even when its own{be00}\nmove would make it fall asleep.{be01}
+Bank0396_Text_ColorChangeHuhPokemon = Color Change, huh...{be01}\nA Pokémon with this Ability changes\nits type to match the type of the move{be00}\nthat just hit it.{be01}
+Bank0396_Text_ImmunityHuhPokemonAbility = Immunity, huh...{be01}\nPokémon with this Ability are protected\nagainst the poison status condition.{be01}
+Bank0396_Text_FlashFireHuhPokemon = Flash Fire, huh...{be01}\nPokémon with this Ability do not\ntake damage from Fire-type moves.{be01}\nInstead, the power of their own\nFire-type moves is increased.{be01}
+Bank0396_Text_ShieldDustHuhPokemon = Shield Dust, huh...{be01}\nPokémon with this Ability are protected\nfrom additional effects of moves.{be01}
+Bank0396_Text_OwnTempoHuhPokemon = Own Tempo, huh...{be01}\nPokémon with this Ability are protected\nagainst the confused status condition.{be01}
+Bank0396_Text_SuctionCupsHuhPokemon = Suction Cups, huh...{be01}\nA Pokémon with this Ability nullifies moves\nlike Whirlwind and Roar, which would{be00}\nforce Pokémon to switch out.{be01}\nWhat's more...{be01}\nWhen a Pokémon with this Ability is leading\nyour party, it makes Pokémon bite more{be00}\noften when fishing.{be01}
+Bank0396_Text_IntimidateHuhPokemonAbility = Intimidate, huh...{be01}\nA Pokémon with this Ability lowers\nthe opposing Pokémon's Attack{be00}\nwhen it enters battle.{be01}\nWhat's more...{be01}\nWhen a Pokémon with this Ability is leading\nyour party, it lowers the chance{be00}\nto encounter low-level wild Pokémon.{be01}
+Bank0396_Text_ShadowTagHuhPokemon = Shadow Tag, huh...{be01}\nA Pokémon with this Ability prevents the\nopposing Pokémon from fleeing.{be01}\nThey can't even switch out normally.{be01}\nHowever, if a move's added effect would\nmake them switch out, that still works.{be00}\nThis is something you should remember.{be01}
+Bank0396_Text_RoughSkinHuhPokemon = Rough Skin, huh...{be01}\nA Pokémon with this Ability reduces the HP\nof an opposing Pokémon that hits it{be00}\nwith a direct attack.{be01}
+Bank0396_Text_WonderGuardHuhPokemon = Wonder Guard, huh...{be01}\nPokémon with this Ability are\nprotected against damage from{be00}\nall moves that aren't super effective.{be01}\nIt's a very powerful Ability...{be01}\nBut the Pokémon still takes damage\nfrom weather and status conditions.{be01}
+Bank0396_Text_LevitateHuhPokemonAbility = Levitate, huh...{be01}\nPokémon with this Ability are immune\nto all Ground-type moves.{be01}\nOh, I almost forgot about it!{be01}\nThere is an exception to that.\nSand-Attack still hits the target.{be01}
+Bank0396_Text_EffectSporeHuhPokemon = Effect Spore, huh...{be01}\nPokémon with this Ability can inflict the\npoison, paralysis, or sleep status{be00}\ncondition when hit with a direct attack.{be01}
+Bank0396_Text_SynchronizeHuhWhenPokemon = Synchronize, huh...{be01}\nWhen a Pokémon with this Ability is\npoisoned, burned, or has paralysis,{be00}\nthe same status condition is passed on to{be00}\nthe Pokémon that caused that condition.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon with the same Nature{be00}\nwhen the leading party member has it.{be01}
+Bank0396_Text_ClearBodyHuhPokemon = Clear Body, huh...{be01}\nPokémon with this Ability are protected\nagainst stat-lowering moves and Abilities.{be01}\nBut!{be01}\nThe burned status condition still halves\ntheir Attack, and the paralysis status{be00}\ncondition still lowers their Speed to a{be00}\nquarter of what it was.{be01}
+Bank0396_Text_NaturalCureHuhPokemon = Natural Cure, huh...{be01}\nPokémon with this Ability cure their\nstatus conditions when they switch out.{be01}\nTheir status conditions are also cured\nwhen a battle ends.{be00}\nThat's another thing you should remember.{be01}
+Bank0396_Text_LightningrodHuhPokemonAbility = Lightningrod, huh...{be01}\nPokémon with this Ability are immune\nto all Electric-type moves.{be01}\nThat's not all!{be01}\nIts Sp. Atk goes up every time it\ntakes an Electric-type move.{be01}\nThere's more!{be01}\nThis Ability draws Electric-type moves\nto the Pokémon.{be01}\nIt doesn't do any good in a Single Battle,\nbut it should be useful in Double Battles{be00}\nand Triple Battles.{be01}
+Bank0396_Text_SereneGraceHuhPokemon = Serene Grace, huh...{be01}\nPokémon with this Ability are more likely\nto inflict added effects.{be01}
+Bank0396_Text_SwiftSwimHuhAbility = Swift Swim, huh...{be01}\nThis Ability doubles a Pokémon's\nSpeed when it's raining.{be01}
+Bank0396_Text_ChlorophyllHuhPokemonAbility = Chlorophyll, huh...{be01}\nPokémon with this Ability double their\nSpeed in sunny weather.{be01}
+Bank0396_Text_IlluminateHuhWhenPokemon = Illuminate, huh...{be01}\nWhen a Pokémon with this Ability is leading\nyour party, you're more likely{be00}\nto encounter wild Pokémon.{be01}\nBy the way, its effect in battle\nisn't understood as of yet...{be01}
+Bank0396_Text_TraceHuhWhenPokemon = Trace, huh...{be01}\nWhen a Pokémon with this Ability enters\nbattle, its Ability changes to match the{be00}\nopposing Pokémon's Ability.{be01}\nIn a battle, being able to tell the\nopponent's Ability can be very useful.{be00}\nYou should remember that.{be01}
+Bank0396_Text_HugePowerHuhAbility = Huge Power, huh...{be01}\nThis Ability doubles a Pokémon's\nAttack stat.{be01}
+Bank0396_Text_PoisonPointHuhPokemon = Poison Point, huh...{be01}\nPokémon with this Ability can inflict\nthe poison status condition{be00}\nwhen hit with a direct attack.{be01}
+Bank0396_Text_InnerFocusHuhPokemon = Inner Focus, huh...{be01}\nPokémon with this Ability don't flinch.{be01}
+Bank0396_Text_MagmaArmorHuhAbility = Magma Armor, huh...{be01}\nThis Ability prevents the frozen\nstatus condition.{be01}\nWhat's more...{be01}\nIt makes Eggs in your party hatch faster.{be01}
+Bank0396_Text_WaterVeilHuhAbility = Water Veil, huh...{be01}\nThis Ability prevents the burned\nstatus condition.{be01}
+Bank0396_Text_MagnetPullHuhPokemon = Magnet Pull, huh...{be01}\nA Pokémon with this Ability prevents\nopposing Steel-type Pokémon from fleeing.{be01}\nThey can't even switch out.{be01}\nHowever, if a move's added effect would\nmake them switch out, that still works.{be00}\nThis is something you should remember.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nSteel-type wild Pokémon{be00}\nwhen the leading party member has it.{be01}
+Bank0396_Text_SoundproofHuhPokemonAbility = Soundproof, huh...{be01}\nPokémon with this Ability are protected\nfrom sound-based moves.{be01}\nThey are protected from their allies'\nmoves, too, even helpful ones.{be00}\nSo be careful in Double Battles{be00}\nand Triple Battles.{be01}
+Bank0396_Text_RainDishHuhPokemon = Rain Dish, huh...{be01}\nPokémon with this Ability restore HP\nby a little every turn when it's raining.{be01}
+Bank0396_Text_SandStreamHuhPokemon = Sand Stream, huh...{be01}\nA Pokémon with this Ability causes a\nsandstorm when it enters the battle.{be01}
+Bank0396_Text_PressureHuhWhenPokemon = Pressure, huh...{be01}\nWhen a Pokémon with this Ability is hit by\nan opposing Pokémon's move, the PP{be00}\n(Power Points) of that move are depleted.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nhigh-level wild Pokémon{be00}\nwhen the leading party member has it.{be01}
+Bank0396_Text_ThickFatHuhAbility = Thick Fat, huh...{be01}\nThis Ability halves damage from\nFire- and Ice-type moves.{be01}
+Bank0396_Text_EarlyBirdHuhPokemon = Early Bird, huh...{be01}\nA Pokémon with this Ability\nwakes quickly from the sleep condition.{be01}
+Bank0396_Text_FlameBodyHuhPokemon = Flame Body, huh...{be01}\nA Pokémon with this Ability can inflict\nthe burned status condition{be00}\nwhen hit with a direct attack.{be01}\nWhat's more...{be01}\nIt makes Eggs in your party\nhatch faster.{be01}
+Bank0396_Text_RunAwayHuhPokemon = Run Away, huh...{be01}\nPokémon with this Ability can always\nescape from a battle with a wild Pokémon.{be01}\nIt can even ignore the effects of moves\nand Abilities that normally prevent{be00}\nPokémon from running away.{be01}
+Bank0396_Text_KeenEyeHuhAbility = Keen Eye, huh...{be01}\nThis Ability prevents\naccuracy from being lowered.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nlow-level wild Pokémon{be00}\nwhen the leading party member has it.{be01}
+Bank0396_Text_HyperCutterHuhAbility = Hyper Cutter, huh...{be01}\nThis Ability prevents\nAttack from being lowered.{be01}
+Bank0396_Text_PickupHuhPokemonAbility = Pickup, huh...{be01}\nPokémon with this Ability may\npick up the item the opposing Pokémon{be00}\nused that turn at the end of the turn.{be01}\nWhat's more...{be01}\nIt sometimes picks up an item\nafter battle even if it didn't participate.{be01}\nJust so you know...{be01}\nThe higher the Pokémon's level is,\nthe better item it picks up.{be01}\nOne more thing...{be01}\nIf the Pokémon is holding an item already,\nthis Ability does nothing.{be01}
+Bank0396_Text_TruantHuhPokemonAbility = Truant, huh...{be01}\nPokémon with this Ability can\nuse a move only once every other turn.{be01}\nOne strike to end the battle, so to speak!{be01}\nThat's how you win a battle with\nthis Ability.{be01}
+Bank0396_Text_HustleHuhAbilityRaises = Hustle, huh...{be01}\nThis Ability raises the Pokémon's\nAttack but lowers its accuracy.{be01}\nThis has no effect on moves that\nare sure hits.{be00}\nYou should remember that.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nhigh-level wild Pokémon{be00}\nwhen the leading party member has it.{be01}
+Bank0396_Text_CuteCharmHuhPokemon = Cute Charm, huh...{be01}\nPokémon with this Ability can inflict\nthe infatuated status condition{be00}\nwhen hit with a direct attack.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon of the opposite gender.{be01}
+Bank0396_Text_PlusHuhAbilityRaises = Plus, huh...{be01}\nThis Ability raises the Pokémon's\nSp. Atk when another ally has the Ability{be00}\nPlus or Minus.{be01}\nThis does nothing in a Single Battle,\nbut it can raise each other's Sp. Atk{be00}\nin Double Battles and Triple Battles.{be01}\nActually, it could prove to be very useful\nin Double Battles and Triple Battles.{be01}
+Bank0396_Text_MinusHuhAbilityRaises = Minus, huh...{be01}\nThis Ability raises the Pokémon's\nSp. Atk when another ally has the Ability{be00}\nMinus or Plus.{be01}\nThis does nothing in a Single Battle,\nbut it can raise each other's Sp. Atk{be00}\nin Double Battles and Triple Battles.{be01}\nActually, it could prove to be very useful\nin Double Battles and Triple Battles.{be01}
+Bank0396_Text_ForecastHuhAbilityChanges = Forecast, huh...{be01}\nThis Ability changes Castform's type.{be01}\nIts type changes to Fire in\nsunny weather,{be00}\nWater in the rain,{be00}\nand Ice in a hailstorm.{be01}
+Bank0396_Text_StickyHoldHuhAbility = Sticky Hold, huh...{be01}\nThis Ability prevents the Pokémon's held\nitem from being stolen.{be01}\nWhat's more...{be01}\nIt makes Pokémon bite more often\nwhile fishing when the leading party{be00}\nmember has it.{be01}
+Bank0396_Text_ShedSkinHuhPokemon = Shed Skin, huh...{be01}\nPokémon with this Ability can cure their\nstatus conditions during a battle.{be01}
+Bank0396_Text_GutsHuhAbilityRaises = Guts, huh...{be01}\nThis Ability raises the Pokémon's Attack\nwhen it's affected by a status condition.{be01}\nThat's not all!{be01}\nThis effect prevents Attack from being\nhalved by the burned status condition.{be01}\nBe careful, though...\nIt'll still take damage every turn{be00}\nwhen it's burned.{be01}
+Bank0396_Text_MarvelScaleHuhAbility = Marvel Scale, huh...{be01}\nThis Ability raises the Pokémon's Defense\nwhen it's affected by a status condition.{be01}\nBe careful that this effect does not get\ntriggered by conditions such as the{be00}\nconfused or infatuated status conditions.{be01}
+Bank0396_Text_LiquidOozeHuhWhen = Liquid Ooze, huh...{be01}\nWhen an opposing Pokémon\nuses an HP-draining move,{be00}\nthis Ability damages the user{be00}\nby half the damage taken instead.{be01}
+Bank0396_Text_OvergrowHuhAbilityRaises = Overgrow, huh...{be01}\nThis Ability raises the power of\nGrass-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
+Bank0396_Text_BlazeHuhAbilityRaises = Blaze, huh...{be01}\nThis Ability raises the power of\nFire-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
+Bank0396_Text_TorrentHuhAbilityRaises = Torrent, huh...{be01}\nThis Ability raises the power of\nWater-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
+Bank0396_Text_SwarmHuhAbilityRaises = Swarm, huh...{be01}\nThis Ability raises the power of\nBug-type moves when the Pokémon's HP{be00}\nbecomes low.{be01}\nDon't give up even when the Pokémon\nis in a pinch!{be01}
+Bank0396_Text_RockHeadHuhPokemon = Rock Head, huh...{be01}\nPokémon with this Ability are immune\nto recoil damage from moves.{be01}
+Bank0396_Text_DroughtHuhPokemonAbility = Drought, huh...{be01}\nA Pokémon with this Ability makes\nthe weather sunny{be00}\nwhen it enters the battle.{be01}
+Bank0396_Text_ArenaTrapHuhPokemon = Arena Trap, huh...{be01}\nPokémon with this Ability prevent the\nopposing Pokémon from fleeing unless{be00}\nthey are Flying type or Pokémon{be00}\nwith the Levitate Ability.{be01}\nThey can't even switch out.{be01}\nAlthough, they can still switch out\nby a move's added effect.{be00}\nThis is something you should remember.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
+Bank0396_Text_VitalSpiritHuhPokemon = Vital Spirit, huh...{be01}\nPokémon with this Ability are protected\nagainst the sleep status condition.{be01}\nWhat's more...{be01}\nIt raises the chance to encounter\nhigh-level wild Pokémon when the leading{be00}\nparty member has it.{be01}
+Bank0396_Text_WhiteSmokeHuhPokemon = White Smoke, huh...{be01}\nPokémon with this Ability are protected\nagainst stat-lowering moves and Abilities.{be01}\nBut!{be01}\nThe burned status condition still halves\ntheir Attack, and the paralysis status{be00}\ncondition still lowers their Speed{be00}\nto a quarter of what it was.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
+Bank0396_Text_PurePowerHuhAbility = Pure Power, huh...{be01}\nThis Ability doubles the Pokémon's Attack.{be01}
+Bank0396_Text_ShellArmorHuhPokemon = Shell Armor, huh...{be01}\nPokémon with this Ability cannot be\nhit critically.{be01}\nSome attacks are supposed to score a\ncritical hit every time, but that won't{be00}\nhappen against Pokémon with this Ability.{be01}
+Bank0396_Text_AirLockHuhWhen = Air Lock, huh...{be01}\nWhen a Pokémon with this Ability is\nin battle, it eliminates effects of weather{be00}\non Pokémon.{be01}\nThe weather condition still\nexists, however.{be01}
+Bank0396_Text_TangledFeetHuhAbility = Tangled Feet, huh...{be01}\nThis Ability raises the Pokémon's\nevasiveness when it's confused.{be01}
+Bank0396_Text_MotorDriveHuhAbility = Motor Drive, huh...{be01}\nThis Ability not only nullifies the damage\nbut also raises the Pokémon's Speed{be00}\nwhen it's hit by an Electric-type move.{be01}
+Bank0396_Text_RivalryHuhAbilityRaises = Rivalry, huh...{be01}\nThis Ability raises the power of\nthe Pokémon's move when the target is{be00}\nof the same gender.{be01}\nHowever, if the target is the opposite\ngender, the move's power goes down.{be01}
+Bank0396_Text_SteadfastHuhAbilityRaises = Steadfast, huh...{be01}\nThis Ability raises the Pokémon's Speed\nevery time it flinches.{be01}
+Bank0396_Text_SnowCloakHuhEvasiveness = Snow Cloak, huh...{be01}\nThe evasiveness of the Pokémon with this\nAbility goes up when it's hailing.{be00}\nWhat's more...{be01}\nIf a Pokémon with this Ability is leading\nthe party in a hailstorm, it lowers the{be00}\nchance to encounter wild Pokémon.{be01}
+Bank0396_Text_GluttonyHuhPokemonAbility = Gluttony, huh...{be01}\nA Pokémon with this Ability uses its held\nBerry when its HP is half or less.{be01}
+Bank0396_Text_AngerPointHuhAbility = Anger Point, huh...{be01}\nThis Ability raises the Pokémon's Attack\nto the maximum when hit by a critical hit.{be01}
+Bank0396_Text_UnburdenHuhAbilityDoubles = Unburden, huh...{be01}\nThis Ability doubles the Pokémon's Speed\nif it loses or consumes a held item.{be01}\nIt won't do a thing if the Pokémon has\nno held item to begin with, though.{be01}
+Bank0396_Text_HeatproofHuhAbilityHalves = Heatproof, huh...{be01}\nThis Ability halves damage\nfrom Fire-type moves.{be01}\nYou should remember that\nit also halves damage from burns.{be01}
+Bank0396_Text_SimpleHuhAbilityDoubles = Simple, huh...{be01}\nThis Ability doubles the effect of\nstat changes.{be01}\nYou should remember that\nboth stat-raising and stat-lowering{be00}\neffects get doubled.{be01}
+Bank0396_Text_DrySkinHuhAbility = Dry Skin, huh...{be01}\nThis Ability restores HP when\nthe Pokémon is hit by a Water-type move{be00}\nor when it's raining...{be01}\nHowever, the Pokémon receives increased\ndamage from Fire-type moves and takes{be00}\ndamage from sunny weather.{be01}
+Bank0396_Text_DownloadHuhWhenPokemon = Download, huh...{be01}\nWhen the Pokémon enters battle,\nthis Ability raises its Attack{be00}\nif the opposing Pokémon's Defense is lower{be00}\nthan its Sp. Def.{be01}\nIt raises Sp. Atk if the opposing\nPokémon's Sp. Def is lower{be00}\nthan its Defense.{be01}
+Bank0396_Text_IronFistHuhAbility = Iron Fist, huh...{be01}\nThis Ability increases the power of\nmoves that punch the target.{be01}
+Bank0396_Text_PoisonHealHuhAbility = Poison Heal, huh...{be01}\nThis Ability restores HP every turn\nif the Pokémon is inflicted with the{be00}\npoison status condition.{be01}
+Bank0396_Text_AdaptabilityHuhWhenPokemon = Adaptability, huh...{be01}\nWhen the Pokémon uses a move that\nmatches its type, this Ability increases{be00}\nthe power boost.{be01}
+Bank0396_Text_SkillLinkHuhAbility = Skill Link, huh...{be01}\nWith this Ability, moves with multiple hits\nwill always strike the maximum number{be00}\nof times.{be01}
+Bank0396_Text_HydrationHuhAbilityCures = Hydration, huh...{be01}\nThis Ability cures status conditions\nat the end of the turn if it's raining.{be01}
+Bank0396_Text_SolarPowerHuhAbility = Solar Power, huh...{be01}\nThis Ability raises Sp. Atk\nin sunny weather, but the Pokémon{be00}\nalso takes damage every turn,{be00}\nso be careful.{be01}
+Bank0396_Text_QuickFeetHuhAbility = Quick Feet, huh...{be01}\nThis Ability raises Speed when the Pokémon\nis affected by status conditions.{be01}\nIt nullifies the Speed-lowering\neffect of paralysis as well.{be01}\nWhat's more...{be01}\nIt lowers the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
+Bank0396_Text_NormalizeHuhAbilityTurns = Normalize, huh...{be01}\nThis Ability turns all of the Pokémon's\nmoves to Normal-type moves.{be01}
+Bank0396_Text_SniperHuhPokemonAbility = Sniper, huh...{be01}\nPokémon with this Ability deal a great\namount of damage when delivering{be00}\na critical hit.{be01}
+Bank0396_Text_MagicGuardHuhPokemon = Magic Guard, huh...{be01}\nPokémon with this Ability do not take\ndamage from anything other than attacks.{be01}
+Bank0396_Text_NoGuardHuhMoves = No Guard, huh...{be01}\nMoves used by or against the Pokémon with\nthis Ability always strike their targets.{be00}\nWhat's more...{be01}\nIt raises the chance to encounter\nwild Pokémon when the leading party{be00}\nmember has it.{be01}
+Bank0396_Text_StallHuhMovesBy = Stall, huh...{be01}\nMoves by the Pokémon with this Ability\nare used last in the turn{be00}\nregardless of its Speed.{be01}
+Bank0396_Text_TechnicianHuhAbilityIncreases = Technician, huh...{be01}\nThis Ability increases the power of\nweaker moves.{be01}
+Bank0396_Text_LeafGuardHuhAbility = Leaf Guard, huh...{be01}\nThis Ability protects the Pokémon from\nstatus conditions in sunny weather.{be01}
+Bank0396_Text_KlutzHuhItemsHave = Klutz, huh...{be01}\nItems have no effect when held\nby the Pokémon with this Ability.{be01}
+Bank0396_Text_MoldBreakerHuhPokemon = Mold Breaker, huh...{be01}\nA Pokémon with this Ability uses moves on\ntargets regardless of their Abilities.{be01}
+Bank0396_Text_SuperLuckHuhAbility = Super Luck, huh...{be01}\nThis Ability heightens the critical-hit\nratio of the Pokémon's moves.{be01}
+Bank0396_Text_AftermathHuhAbilityDeals = Aftermath, huh...{be01}\nThis Ability deals damage to the attacking\nPokémon when a direct attack causes the{be00}\nPokémon to faint.{be01}
+Bank0396_Text_AnticipationHuhPokemonAbility = Anticipation, huh...{be01}\nA Pokémon with this Ability will shudder\nif the opposing Pokémon knows a{be00}\nsupereffective move.{be01}\nYou should remember that it also warns\nwhen the opposing Pokémon knows{be00}\na one-hit KO move,{be00}\nSelfdestruct, or Explosion.{be01}
+Bank0396_Text_ForewarnHuhAbilityReveals = Forewarn, huh...{be01}\nThis Ability reveals a move an opposing\nPokémon knows when the Pokémon{be00}\nenters battle.{be01}\nBy the way,\nyou should remember that damaging moves{be00}\nwith high power are prioritized.{be01}
+Bank0396_Text_UnawareHuhAbilityIgnores = Unaware, huh...{be01}\nThis Ability ignores the stat changes of\nthe opposing Pokémon.{be01}\nBut!{be01}\nIt does not ignore changes to the Speed\nstat, so be careful.{be01}
+Bank0396_Text_TintedLensHuhAbility = Tinted Lens, huh...{be01}\nThis Ability doubles the damage of the\nPokémon's not-very-effective moves.{be01}
+Bank0396_Text_FilterHuhAbilityReduces = Filter, huh...{be01}\nThis Ability reduces damage from\nsupereffective moves.{be01}
+Bank0396_Text_SlowStartHuhAbility = Slow Start, huh...{be01}\nThis Ability halves Attack and Speed\nfor five turns when the Pokémon{be00}\nenters battle.{be01}\nTo win battles with this Ability, the key is\nto endure the first five turns!{be01}
+Bank0396_Text_ScrappyHuhAbilityLets = Scrappy, huh...{be01}\nThis Ability lets the Pokémon hit\nGhost-type Pokémon with Normal- and{be00}\nFighting-type moves.{be01}
+Bank0396_Text_StormDrainHuhPokemon = Storm Drain, huh...{be01}\nPokémon with this Ability do not\ntake damage from Water-type moves.{be01}\nThat's not all!{be01}\nIts Sp. Atk goes up every time it\ntakes a Water-type move.{be01}\nThere's more!{be01}\nThis Ability draws Water-type moves\nto the Pokémon.{be01}\nIt doesn't do any good in Single Battles,\nbut it should be useful in Double Battles{be00}\nand Triple Battles.{be01}
+Bank0396_Text_IceBodyHuhPokemon = Ice Body, huh...{be01}\nPokémon with this Ability\nrecover a little bit of HP every turn{be00}\nduring a hailstorm.{be01}
+Bank0396_Text_SolidRockHuhPokemon = Solid Rock, huh...{be01}\nPokémon with this Ability\ntake less damage from{be00}\nsupereffective moves.{be01}
+Bank0396_Text_SnowWarningHuhPokemon = Snow Warning, huh...{be01}\nA Pokémon with this Ability changes the\nweather to hail when it enters a battle.{be01}
+Bank0396_Text_HoneyGatherHuhPokemon = Honey Gather, huh...{be01}\nA Pokémon with this Ability\nwill sometimes be left holding{be00}\nHoney after a battle.{be01}\nIts chance of finding Honey\nincreases with its level,{be00}\nso you should keep that in mind.{be01}
+Bank0396_Text_FriskHuhPokemonAbility = Frisk, huh...{be01}\nA Pokémon with this Ability\nwill tell you what item{be00}\nan opponent is holding.{be01}
+Bank0396_Text_RecklessHuhIfPokemon = Reckless, huh...{be01}\nIf a Pokémon with this Ability\nuses a move that has recoil,{be00}\nthe power of that move will increase.{be01}\nDon't forget that this Ability's effect\nalso works on moves that damage{be00}\nthe user when the move misses!{be01}
+Bank0396_Text_MultitypeHuhArceusHas = Multitype, huh...{be01}\nArceus has this Ability.\nWhen it holds an item called a Plate,{be00}\nits type shifts according to the Plate!{be01}
+Bank0396_Text_FlowerGiftHuhWhen = Flower Gift, huh...{be01}\nWhen a Cherrim with this Ability\nis in sunny weather, its form changes,{be00}\nand its Attack and Sp. Def stats go up!{be01}\nIn Double and Triple Battles, it also\nmakes its allies' stats increase!{be01}
+Bank0396_Text_BadDreamsHuhPokemon = Bad Dreams, huh...{be01}\nPokémon with this Ability reduce the HP\nof sleeping Pokémon every turn!{be01}
+Bank0396_Text_PickpocketHuhWhenPokemon = Pickpocket, huh...{be01}\nWhen a Pokémon with this Ability\nis hit with a direct attack,{be00}\nit can steal the attacker's held item.{be01}\nWell...{be01}\nIt only works if the attacker is holding\nan item, though.{be01}
+Bank0396_Text_SheerForceHuhWhen = Sheer Force, huh...{be01}\nWhen a Pokémon with this Ability\nuses a move with an additional effect,{be00}\nthe power goes up,{be00}\nbut the additional effect won't work.{be01}
+Bank0396_Text_ContraryHuhStatChanges = Contrary, huh...{be01}\nStat changes have the opposite effect\non Pokémon with this Ability!{be01}\nWhen stats should go up, they go down,\nand when they should go down, they go up!{be01}
+Bank0396_Text_UnnerveHuhWhenPokemon = Unnerve, huh...{be01}\nWhen a Pokémon with this Ability\nis in battle, the opposing Pokémon{be00}\nwon't be able to eat Berries.{be01}
+Bank0396_Text_DefiantHuhWhenOpponent = Defiant, huh...{be01}\nWhen an opponent lowers the stats\nof a Pokémon with this Ability,{be00}\nits Attack goes way up!{be01}\nBut be careful--if it lowers\nits own stats, the Ability won't work!{be01}
+Bank0396_Text_DefeatistHuhWhenPokemon = Defeatist, huh...{be01}\nWhen a Pokémon has this Ability\nand its HP is reduced to half or less,{be00}\nits Attack and Sp. Atk go down.{be01}\nYou absolutely can't afford\nto let these Pokémon's HP go down.{be01}\nI guess that's one good thing\nabout this Ability...{be01}
+Bank0396_Text_CursedBodyHuhWhen = Cursed Body, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by an attack, sometimes{be00}\nit will Disable that attack.{be01}
+Bank0396_Text_HealerHuhPokemonAbility = Healer, huh...{be01}\nPokémon with this Ability sometimes\nheal the status conditions{be00}\nof allies that are battling with it.{be01}\nThey can't heal themselves,\nso it doesn't mean much in Single Battles,{be00}\nbut it's a very useful Ability{be00}\nto have in Double and Triple Battles.{be01}
+Bank0396_Text_FriendGuardHuhPokemon = Friend Guard, huh...{be01}\nPokémon with this Ability\nreduce damage done to{be00}\nother Pokémon battling with it.{be01}\nIt doesn't reduce damage to itself,\nso it doesn't mean much in Single Battles,{be00}\nbut it's a very useful Ability{be00}\nto have in Double and Triple Battles.{be01}
+Bank0396_Text_WeakArmorHuhWhen = Weak Armor, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a physical attack,{be00}\nDefense goes down,{be00}\nbut Speed goes up!{be01}
+Bank0396_Text_HeavyMetalHuhPokemon = Heavy Metal, huh...{be01}\nPokémon with this Ability\nare twice as heavy.{be01}
+Bank0396_Text_LightMetalHuhPokemon = Light Metal, huh...{be01}\nPokémon with this Ability\nare half as heavy.{be01}
+Bank0396_Text_MultiscaleHuhWhenPokemon = Multiscale, huh...{be01}\nWhen a Pokémon with this Ability has\nfull HP, the damage it takes is reduced.{be01}\nRemember, as long as the Pokémon's\nHP is full, the Ability will keep working.{be01}
+Bank0396_Text_ToxicBoostHuhWhen = Toxic Boost, huh...{be01}\nWhen a Pokémon with this\nAbility is poisoned,{be00}\nit's Attack goes up.{be01}
+Bank0396_Text_FlareBoostHuhWhen = Flare Boost, huh...{be01}\nWhen a Pokémon with\nthis Ability is burned,{be00}\nits Sp. Atk goes up.{be01}
+Bank0396_Text_HarvestHuhPokemonAbility = Harvest, huh...{be01}\nPokémon with this Ability sometimes\nrestore the Berry they used.{be01}\nRemember that if the weather\nis sunny, the Berry will always{be00}\nbe restored.{be01}
+Bank0396_Text_TelepathyHuhPokemonAbility = Telepathy, huh...{be01}\nPokémon with this Ability\ncan read their allies' minds{be00}\nand avoid collateral damage.{be01}\nIt's not useful in Single Battles,\nbut it's a very important Ability{be00}\nfor Double and Triple Battles.{be01}
+Bank0396_Text_MoodyHuhEndTurn = Moody, huh...{be01}\nAt the end of a turn,\nPokémon with this Ability{be00}\nraise one stat sharply{be00}\nand lower another.{be01}
+Bank0396_Text_OvercoatHuhPokemonAbility = Overcoat, huh...{be01}\nPokémon with this Ability\naren't damaged by the weather.{be01}
+Bank0396_Text_PoisonTouchHuhWhen = Poison Touch, huh...{be01}\nWhen Pokémon with this Ability\nland a direct attack,{be00}\nthe target is sometimes poisoned.{be01}
+Bank0396_Text_RegeneratorHuhWhenPokemon = Regenerator, huh...{be01}\nWhen a Pokémon with this Ability\nis withdrawn from battle,{be00}\nit restores a little of its HP.{be01}
+Bank0396_Text_BigPecksHuhDefense = Big Pecks, huh...{be01}\nThe Defense of Pokémon with this Ability\ncan't be lowered by an opponent.{be01}
+Bank0396_Text_SandRushHuhWhen = Sand Rush, huh...{be01}\nWhen a Pokémon with this Ability\nis in a sandstorm,{be00}\nits Speed doubles.{be01}\nAlso, it won't be damaged by a\nsandstorm, regardless of its type.{be01}
+Bank0396_Text_WonderSkinHuhPokemon = Wonder Skin, huh...{be01}\nPokémon with this Ability\nare more likely to dodge status moves.{be01}\nDon't forget, though: if the Pokémon uses\na status move on itself, this Ability{be00}\nwon't work.{be01}
+Bank0396_Text_AnalyticHuhWhenPokemon = Analytic, huh...{be01}\nWhen Pokémon with this Ability\nattack last, the power{be00}\nof the move goes up.{be01}
+Bank0396_Text_IllusionHuhPokemonAbility = Illusion, huh...{be01}\nA Pokémon with this Ability\nwill appear in battle disguised{be00}\nas the last Pokémon in your party.{be01}\nBe careful. If it's hit by an attack,\nthe disguise will go away.{be01}
+Bank0396_Text_ImposterHuhWhenPokemon = Imposter, huh...{be01}\nWhen a Pokémon with this Ability\ncomes into battle,{be00}\nit will Transform into its opponent.{be01}\nAnd it's not just looks...\nIt knows its opponent's moves,{be00}\nand some of its stats are the same, too!{be01}
+Bank0396_Text_InfiltratorHuhPokemonAbility = Infiltrator, huh...{be01}\nPokémon with this Ability can\nget past effects protecting the target{be00}\nand hit it with a move.{be01}
+Bank0396_Text_MummyHuhWhenPokemon = Mummy, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a direct attack,{be00}\nthe Ability of the attacker{be00}\nwill change to Mummy.{be01}
+Bank0396_Text_MoxieHuhWhenPokemon = Moxie, huh...{be01}\nWhen a Pokémon with this Ability\nknocks out an opponent,{be00}\nits Attack goes up.{be01}
+Bank0396_Text_JustifiedHuhWhenPokemon = Justified, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a Dark-type move,{be00}\nits Attack goes up.{be01}
+Bank0396_Text_RattledHuhWhenPokemon = Rattled, huh...{be01}\nWhen a Pokémon with this Ability is hit\nby a Ghost-, Bug-, or Dark-type move,{be00}\nits Speed goes up.{be01}
+Bank0396_Text_MagicBounceHuhPokemon = Magic Bounce, huh...{be01}\nPokémon with this Ability\nreflect status moves used on them{be00}\nright back at the user!{be01}\nAnd get this!{be01}\nThe status move does not affect\nthe target!{be01}
+Bank0396_Text_SapSipperHuhWhen = Sap Sipper, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a Grass-type move,{be00}\nits Attack goes up.{be01}\nIt also takes no damage or\nadded effects from those moves.{be01}
+Bank0396_Text_PranksterHuhPokemonAbility = Prankster, huh...{be01}\nPokémon with this Ability can\nuse status moves earlier{be00}\nthan usual.{be01}
+Bank0396_Text_SandForceHuhWhen = Sand Force, huh...{be01}\nWhen a Pokémon with this Ability\nis in a sandstorm, the power of{be00}\nits Ground-, Rock-, and Steel-type moves{be00}\ngoes up!{be01}
+Bank0396_Text_IronBarbsHuhWhen = Iron Barbs, huh...{be01}\nWhen a Pokémon with this Ability\nis hit by a direct attack,{be00}\nthe attacker takes damage as well.{be01}
+Bank0396_Text_ZenModeHuhDarmanitan = Zen Mode, huh...{be01}\nA Darmanitan with this Ability\nenters Zen Mode when its HP{be00}\nis reduced to half or less.{be01}\nWhen in Zen Mode, it's a Psychic-\nand Fire-type Pokémon.{be01}\nIts Attack and Speed go down, but its\nDefense, Sp. Atk, and Sp. Def increase!{be01}
+Bank0396_Text_VictoryStarHuhPokemon = Victory Star, huh...{be01}\nA Pokémon with this Ability\nraises the accuracy{be00}\nof itself and its allies.{be01}
+Bank0396_Text_TurboblazeHuhPokemonAbility = Turboblaze, huh...{be01}\nPokémon with this Ability can use\nmoves on targets regardless{be00}\nof their Abilities.{be01}
+Bank0396_Text_TeravoltHuhPokemonAbility = Teravolt, huh...{be01}\nPokémon with this Ability can use\nmoves on targets regardless{be00}\nof their Abilities.{be01}
+Bank0396_Text_EggsDontHaveAbilities = Eggs don't have Abilities!{be01}
 \pad{3a}

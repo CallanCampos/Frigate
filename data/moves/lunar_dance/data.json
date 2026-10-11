@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Lunar Dance",
+    "description": "The user faints. In return, the Pokémon\ntaking its place will have its status and\nHP fully restored.",
+    "type": "TYPE_PSYCHIC",
+    "quality": "MOVE_QUALITY_SPECIAL",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 10,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_FAINT_FULL_RESTORE_NEXT_MON",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_USER",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_SNATCH", "MOVE_FLAG_HEAL" ]
+}

@@ -1,22 +1,22 @@
-{bd02}{0100:1} is famous for being\n{bd02}the selfish prince of a faraway land.
-{bd02}On this day as well, the prince turned\n{bd02}his back on the king's words and was\n{bd02}walking the castle grounds late at night.
-{bd02}Suddenly, he noticed\n{bd02}a suspicious white door deep in the\n{bd02}grounds that he hadn't seen before...
-{bd02}Without thinking, Prince {0100:1}\n{bd02}opened that white door.
-{bd02}When he did...
-{bd02}A creepy scene he'd never expected\n{bd02}spread out before his eyes...
-なし
-なし
-なし
-なし
-{bd02}{0100:1} is famous for being\n{bd02}the selfish princess of a faraway land.
-{bd02}On this day as well, the princess turned\n{bd02}her back on the king's words and was\n{bd02}walking the castle grounds late at night.
-{bd02}Suddenly, she noticed\n{bd02}a suspicious white door deep in the\n{bd02}grounds that she hadn't seen before...
-{bd02}Without thinking, Princess {0100:1}\n{bd02}opened that white door.
-{bd02}When she did...
-{bd02}A creepy scene she'd never expected\n{bd02}spread out before her eyes...
-なし
-なし
-なし
-なし
-なし
+Bank0288_Text_FamousBeingSelfishPrince = {bd02}{0100:1} is famous for being\n{bd02}the selfish prince of a faraway land.
+Bank0288_Text_DayWellPrinceTurned = {bd02}On this day as well, the prince turned\n{bd02}his back on the king's words and was\n{bd02}walking the castle grounds late at night.
+Bank0288_Text_SuddenlyHeNoticedSuspicious = {bd02}Suddenly, he noticed\n{bd02}a suspicious white door deep in the\n{bd02}grounds that he hadn't seen before...
+Bank0288_Text_WithoutThinkingPrinceOpened = {bd02}Without thinking, Prince {0100:1}\n{bd02}opened that white door.
+Bank0288_Text_WhenHeDid = {bd02}When he did...
+Bank0288_Text_CreepySceneHedNever = {bd02}A creepy scene he'd never expected\n{bd02}spread out before his eyes...
+Bank0288_Text_Empty = なし
+Bank0288_Text_Empty_2 = なし
+Bank0288_Text_Empty_3 = なし
+Bank0288_Text_Empty_4 = なし
+Bank0288_Text_FamousBeingSelfishPrincess = {bd02}{0100:1} is famous for being\n{bd02}the selfish princess of a faraway land.
+Bank0288_Text_DayWellPrincessTurned = {bd02}On this day as well, the princess turned\n{bd02}her back on the king's words and was\n{bd02}walking the castle grounds late at night.
+Bank0288_Text_SuddenlySheNoticedSuspicious = {bd02}Suddenly, she noticed\n{bd02}a suspicious white door deep in the\n{bd02}grounds that she hadn't seen before...
+Bank0288_Text_WithoutThinkingPrincessOpened = {bd02}Without thinking, Princess {0100:1}\n{bd02}opened that white door.
+Bank0288_Text_WhenSheDid = {bd02}When she did...
+Bank0288_Text_CreepySceneShedNever = {bd02}A creepy scene she'd never expected\n{bd02}spread out before her eyes...
+Bank0288_Text_Empty_5 = なし
+Bank0288_Text_Empty_6 = なし
+Bank0288_Text_Empty_7 = なし
+Bank0288_Text_Empty_8 = なし
+Bank0288_Text_Empty_9 = なし
 \pad{f4}

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rachel",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WOOBAT",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PIDOVE",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "What kind of Pokémon is your\npartner on this journey?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Wow! What an amazing and\nstrong friend you've got!"
+        },
+        {
+            "type": 2,
+            "text": "They say that a good companion makes the\njourney pleasant, but it's really true!{be01}\nWhen you're with Pokémon, the fun factor\njust multiplies, don't you think?"
+        }
+    ]
+}

@@ -878,22 +878,22 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = func_0203ffc4();
         break;
     case 408:
-        sys_memset(&bsw->ov174Param, 0, sizeof(bsw->ov174Param));
-        bsw->ov174Param.gameData = gameData;
-        bsw->ov174Param.result = 11;
-        ScriptWork_CallEvent(
-            work, func_020196d0(gsys, field, OVERLAY_ID(174), &data_ov174_0219f0fc, &bsw->ov174Param, NULL, NULL));
+        sys_memset(&bsw->ircMatchParam, 0, sizeof(bsw->ircMatchParam));
+        bsw->ircMatchParam.gameData = gameData;
+        bsw->ircMatchParam.result = IRCBATTLEMATCH_MODE_BSUBWAY;
+        ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
+                                                 &bsw->ircMatchParam, NULL, NULL));
         result = TRUE;
         break;
     case 409:
-        switch (bsw->ov174Param.result) {
-        case 11:
+        switch (bsw->ircMatchParam.result) {
+        case IRCBATTLEMATCH_MODE_BSUBWAY:
             *retWk = 0;
             break;
-        case 12:
+        case IRCBATTLEMATCH_RESULT_QUIT:
             *retWk = 1;
             break;
-        case 13:
+        case IRCBATTLEMATCH_RESULT_BACK:
             *retWk = 2;
             break;
         default:

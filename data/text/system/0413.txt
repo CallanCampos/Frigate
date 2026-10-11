@@ -1,27 +1,27 @@
-Enter the Train Number (01-{0202:0}).{be01}
-Receiving data for Rank {0201:1},\nTrain Number {0202:0}...
-You may not challenge that Train\nuntil the next update.{be01}
-Data has been received.{be01}
-Cancel your challenge?
-Enter the Rank of the Train\n(01-10) to check your records.{be01}
-Enter the Train Number (01-{0202:0}).{be01}
-Sending your record data...\nDon't turn off the power.
-Your data has been sent.{be01}
-Would you like to cancel your data\ndownload?
-                           \x{ffff}
-                           \x{ffff}
-                 \x{ffff}
-The Wi-Fi Train is currently undergoing\nmaintenance. Please try again later.{be01}\nError code: 13281{be01}
-The Wi-Fi Train is very crowded.\nPlease try again later.{be01}\nError code: 13282{be01}
-The Wi-Fi Train is very crowded.\nPlease try again later.{be01}\nError code: 13261{be01}
-Unable to connect to the Wi-Fi Train.\nReturning to the reception counter.{be01}\nError code: 13262{be01}
-Unable to connect to the Wi-Fi\nTrain.{be01}\nReturning to the reception counter.{be01}\nError code: 13266{be01}
-You were disconnected from the Wi-Fi Train.\nReturning to the reception counter.{be01}\nError code: 13264{be01}
-You were disconnected from the Wi-Fi Train.\nReturning to the reception counter.{be01}\nError code: 13267{be01}
-That number cannot be specified\nfor the Wi-Fi Train.{be01}\nError code: 13263{be01}
-                     \x{ffff}
-Communication error.{be01}\nError code: 13267{be01}
-There appears to be a problem\nwith your Pokémon.{be01}
-                         \x{ffff}
-                        \x{ffff}
-Communicating. Please stand by...
+Bank0413_Text_EnterTrainNumber01 = Enter the Train Number (01-{0202:0}).{be01}
+Bank0413_Text_ReceivingDataRankTrain = Receiving data for Rank {0201:1},\nTrain Number {0202:0}...
+Bank0413_Text_MayNotChallengeTrain = You may not challenge that Train\nuntil the next update.{be01}
+Bank0413_Text_DataHasBeenReceived = Data has been received.{be01}
+Bank0413_Text_CancelChallenge = Cancel your challenge?
+Bank0413_Text_EnterRankTrain01 = Enter the Rank of the Train\n(01-10) to check your records.{be01}
+Bank0413_Text_EnterTrainNumber01_2 = Enter the Train Number (01-{0202:0}).{be01}
+Bank0413_Text_SendingRecordDataDont = Sending your record data...\nDon't turn off the power.
+Bank0413_Text_DataHasBeenSent = Your data has been sent.{be01}
+Bank0413_Text_WouldLikeCancelData = Would you like to cancel your data\ndownload?
+Bank0413_Text_Empty =                            \x{ffff}
+Bank0413_Text_Empty_2 =                            \x{ffff}
+Bank0413_Text_Empty_3 =                  \x{ffff}
+Bank0413_Text_WiFiTrainCurrently = The Wi-Fi Train is currently undergoing\nmaintenance. Please try again later.{be01}\nError code: 13281{be01}
+Bank0413_Text_WiFiTrainVery = The Wi-Fi Train is very crowded.\nPlease try again later.{be01}\nError code: 13282{be01}
+Bank0413_Text_WiFiTrainVery_2 = The Wi-Fi Train is very crowded.\nPlease try again later.{be01}\nError code: 13261{be01}
+Bank0413_Text_UnableConnectWiFi = Unable to connect to the Wi-Fi Train.\nReturning to the reception counter.{be01}\nError code: 13262{be01}
+Bank0413_Text_UnableConnectWiFi_2 = Unable to connect to the Wi-Fi\nTrain.{be01}\nReturning to the reception counter.{be01}\nError code: 13266{be01}
+Bank0413_Text_WereDisconnectedFromWi = You were disconnected from the Wi-Fi Train.\nReturning to the reception counter.{be01}\nError code: 13264{be01}
+Bank0413_Text_WereDisconnectedFromWi_2 = You were disconnected from the Wi-Fi Train.\nReturning to the reception counter.{be01}\nError code: 13267{be01}
+Bank0413_Text_NumberCannotSpecifiedWi = That number cannot be specified\nfor the Wi-Fi Train.{be01}\nError code: 13263{be01}
+Bank0413_Text_Empty_4 =                      \x{ffff}
+Bank0413_Text_CommunicationErrorErrorCode = Communication error.{be01}\nError code: 13267{be01}
+Bank0413_Text_ThereAppearsProblemPokemon = There appears to be a problem\nwith your Pokémon.{be01}
+Bank0413_Text_Empty_5 =                          \x{ffff}
+Bank0413_Text_Empty_6 =                         \x{ffff}
+Bank0413_Text_CommunicatingPleaseStandBy = Communicating. Please stand by...

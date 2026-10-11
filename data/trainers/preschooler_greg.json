@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Greg",
+    "class": "TRAINER_CLASS_PRESCHOOLER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [],
+    "heals": false,
+    "money": 1,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SUNFLORA",
+            "form": 0,
+            "level": 34,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Teacher?{be01}\nOh, you're not Teacher!\nYou're a Trainer!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The tall grass is too...tall!"
+        },
+        {
+            "type": 2,
+            "text": "There's a weird Pokémon hiding in the\nrustling grass!"
+        }
+    ]
+}

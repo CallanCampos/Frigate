@@ -130,9 +130,12 @@ typedef struct {
     u16 unk2;
 } MusicalSaveUnk1E0;
 
+// A prop that the Pokémon wears: its position (10 for none), the prop and its rotation
 typedef struct {
     u8 unk0;
-    u8 unk1[5];
+    u8 unk1;
+    u16 itemId;
+    s16 rotation;
 } MusicalSaveUnk1B0;
 
 MusicalShot *func_0200ad5c(MusicalSave *musical);
@@ -169,6 +172,13 @@ u8 func_0200aefc(MusicalSave *musical);
 // A name of 0x26 characters
 const u16 *func_0200af14(MusicalSave *musical);
 BOOL func_0200ad60(MusicalSave *musical, u8 prop);
+// Whether the prop is flagged
+BOOL func_0200ad9c(MusicalSave *musical, u8 prop);
+void func_0200ad20(MusicalSave *musical);
+void func_0200ae14(MusicalSave *musical);
+// Whether the dressing room has been visited, which func_0200af50 sets
+BOOL func_0200af44(MusicalSave *musical);
+void func_0200af50(MusicalSave *musical, BOOL value);
 
 // Save block 0x2b, which swan calls ReshZek: the Reshiram or Zekrom fused with Kyurem
 void *getReshZekBlkAddress(SaveControl *save);
@@ -190,6 +200,8 @@ void func_020102f0(KeyDataSave *keyData, u8 value, u32 a2);
 void func_02010300(KeyDataSave *keyData, u32 value);
 void func_02010304(KeyDataSave *keyData, u32 a1, u32 bit, BOOL set);
 void func_02010334(KeyDataSave *keyData, u8 value);
+void func_02010338(KeyDataSave *keyData, u8 value);
+void func_0201033c(KeyDataSave *keyData, u8 value);
 BOOL func_02010340(KeyDataSave *keyData, u32 bit);
 void func_02010354(KeyDataSave *keyData, u32 bit, BOOL set);
 u8 func_02010378(KeyDataSave *keyData);

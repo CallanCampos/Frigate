@@ -1,0 +1,6 @@
+PlasmaFrigate9_Text_LegendaryPokemonCreatedUnova = The legendary Pokémon that\ncreated the Unova region, Reshiram.{be01}
+PlasmaFrigate9_Text_ReshiramHasBeenRegistered = Reshiram has been registered\nin the Pokédex.
+PlasmaFrigate9_Text_OtherLegendaryPokemonZekrom = And the other legendary\nPokémon, Zekrom.{be01}
+PlasmaFrigate9_Text_ZekromHasBeenRegistered = Zekrom has been registered\nin the Pokédex.
+PlasmaFrigate9_Text_IfHaveThesePokemon = If you have these Pokémon,\nit's so easy to control{be00}\nthe Unova region, right?
+\pad{b8}

@@ -1,0 +1,202 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Zangoose",
+    "pokedex": {
+        "category": "Cat Ferret Pokémon",
+        "entry": "It's Seviper's archrival. To threaten\nthose it encounters, it fans out\nthe claws on its front paws.",
+        "height": "4'03\"",
+        "weight": "88.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Zangoose",
+                "category": "Cat Ferret Pokémon",
+                "entry": "It has feuded with Seviper for\nmany generations. Its sharp claws\nare its biggest weapons.",
+                "height": "4'03\"",
+                "weight": "88.8 lbs."
+            },
+            "fr": {
+                "name": "Mangriff",
+                "category": "Pokémon Chat Furet",
+                "entry": "C'est le rival de Séviper depuis\ndes générations. Ses griffes\naiguisées sont son meilleur atout.",
+                "height": "1,3 m",
+                "weight": "40,3 kg"
+            },
+            "de": {
+                "name": "Sengo",
+                "category": "Frettkatz",
+                "entry": "Seit Generationen ist es mit\nVipitis verfeindet. Seine scharfen\nKlauen sind seine stärksten Waffen.",
+                "height": "1,3 m",
+                "weight": "40,3 kg"
+            },
+            "it": {
+                "name": "Zangoose",
+                "category": "Pokémon Furogatto",
+                "entry": "Da generazioni, è acerrimo nemico di\nSeviper. Gli artigli aguzzi sono le sue\narmi più potenti.",
+                "height": "1,3 m",
+                "weight": "40,3 kg"
+            },
+            "ko": {
+                "name": "쟝고",
+                "category": "고양이족제비포켓몬",
+                "entry": "몇 대에 걸쳐서\n세비퍼와 싸워왔다.\n날카로운 발톱이 최대의 무기다.",
+                "height": "1.3 m",
+                "weight": "40.3 kg"
+            },
+            "es": {
+                "name": "Zangoose",
+                "category": "Pokémon Gato Hurón",
+                "entry": "Hace muchos años que se enfrenta\na Seviper. Su arma más eficaz son\nsus zarpas afiladas.",
+                "height": "1,3 m",
+                "weight": "40,3 kg"
+            },
+            "ja": {
+                "name": "ザングース",
+                "category": "ネコイタチポケモン",
+                "entry": "なんせだいにも\\x{3000}わたって\nハブネークと\\x{3000}たたかってきた。\nするどい\\x{3000}ツメが\\x{3000}さいだいの\\x{3000}ぶき。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 73,
+        "attack": 115,
+        "defense": 60,
+        "speed": 90,
+        "special_attack": 60,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_QUICK_CLAW",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_IMMUNITY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TOXIC_BOOST",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 160,
+    "height": 13,
+    "weight": 403,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_LEER" ],
+            [ 5, "MOVE_QUICK_ATTACK" ],
+            [ 8, "MOVE_FURY_CUTTER" ],
+            [ 12, "MOVE_PURSUIT" ],
+            [ 15, "MOVE_SLASH" ],
+            [ 19, "MOVE_EMBARGO" ],
+            [ 22, "MOVE_CRUSH_CLAW" ],
+            [ 26, "MOVE_REVENGE" ],
+            [ 29, "MOVE_FALSE_SWIPE" ],
+            [ 33, "MOVE_DETECT" ],
+            [ 36, "MOVE_X_SCISSOR" ],
+            [ 40, "MOVE_TAUNT" ],
+            [ 43, "MOVE_SWORDS_DANCE" ],
+            [ 47, "MOVE_CLOSE_COMBAT" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM54",
+            "TM56",
+            "TM59",
+            "TM63",
+            "TM65",
+            "TM66",
+            "TM67",
+            "TM75",
+            "TM80",
+            "TM81",
+            "TM83",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_LAST_RESORT",
+            "MOVE_ICY_WIND",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FLAIL",
+            "MOVE_DOUBLE_KICK",
+            "MOVE_RAZOR_WIND",
+            "MOVE_COUNTER",
+            "MOVE_CURSE",
+            "MOVE_FURY_SWIPES",
+            "MOVE_NIGHT_SLASH",
+            "MOVE_METAL_CLAW",
+            "MOVE_DOUBLE_HIT",
+            "MOVE_DISABLE",
+            "MOVE_IRON_TAIL",
+            "MOVE_FINAL_GAMBIT",
+            "MOVE_FEINT"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 186,
+    "baby_species": "SPECIES_ZANGOOSE"
+}

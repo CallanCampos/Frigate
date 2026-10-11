@@ -1,0 +1,19 @@
+P2Laboratory2_Text_OhItsJustKid = Oh, it's just a kid...{be01}
+P2Laboratory2_Text_CouldntFactHereMeans = You... It couldn't be...{be01}\nThe fact that you are here means you\ncame to learn about the secret{be00}\nof Genesect!{be01}
+P2Laboratory2_Text_WeTeamPlasmaRevived = We, Team Plasma, revived Genesect from\na Fossil.{be01}\nThen we enhanced the Pokémon with the\npower of science!{be01}
+P2Laboratory2_Text_StrongestPokemonHistory = It is the strongest Pokémon in history!!{be01}
+P2Laboratory2_Text_ButOurLordN = But, our lord N was not interested in\nthis Genesect that was modified by the{be00}\npower of science!{be01}
+P2Laboratory2_Text_ScienceDamagesNaturalBeauty = “Science damages the natural beauty\nof Pokémon! They're perfect beings!"{be01}
+P2Laboratory2_Text_ThatsWhatHeSaid = That's what he said...{be01}\nSo our research was halted, and this\nfacility was closed...{be01}
+P2Laboratory2_Text_HoweverGenesectResearchAll = However!!\nThe Genesect research is all mine!{be01}\nSo if you want to know Genesect's\nsecret, you'll have to beat me in battle!{be01}
+P2Laboratory2_Text_BattleScientist = Battle the Scientist?
+P2Laboratory2_Text_IveLostEverythingForgot = I've lost everything...{be01}\nI forgot my duty as a Scientist is\nto make the world happy.{be01}\nSo, this must be what I get for trying to\nmake a Pokémon into a tool for fighting...{be01}
+P2Laboratory2_Text_ImGoingWashHands = I'm going to wash my hands of this\nGenesect matter...{be01}\nI don't need this anymore...\nI'll give it to you.{be01}
+P2Laboratory2_Text_ThereAnotherOneOther = There was another one in my\nother pocket...{be01}
+P2Laboratory2_Text_ItemJustGaveMade = The item I just gave you was made\nfor Genesect.{be01}\nWhen it holds an item like this, it\nchanges the type of the move called{be00}\nTechno Blast, so it can always have{be00}\nan advantage.{be01}
+P2Laboratory2_Text_ThereSureSomeVery = There sure are some very cowardly\nTrainers, aren't there!
+P2Laboratory2_Text_WantBattle = So you want to battle me?!
+P2Laboratory2_Text_IveGivenAllDrives = I've given you all of the Drives.\nUse them how you wish...
+P2Laboratory2_Text_ThereMemoStuckSide = There is a memo stuck to the\nside of the monitor.{be01}\nRead it?
+P2Laboratory2_Text_LordNApparentlyRejected = “My lord N apparently rejected\nmy research...{be00}\nBut my research is necessary for{be00}\nTeam Plasma to reach its goal...{be00}\nThe strongest Pokémon..."{be01}\nThe rest of the memo is torn and\nimpossible to read.
+\pad{c8}

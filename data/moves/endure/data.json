@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Endure",
+    "description": "The user endures any attack with at least\n1 HP. Its chance of failing rises if it is\nused in succession.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_SPECIAL",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 10,
+    "priority": 4,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_SURVIVE_WITH_1_HP",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_USER",
+    "stat_changes": [],
+    "flags": []
+}

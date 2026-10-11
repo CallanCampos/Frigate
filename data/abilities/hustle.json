@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Hustle",
+    "description": "Boosts the Attack stat,\nbut lowers accuracy."
+}

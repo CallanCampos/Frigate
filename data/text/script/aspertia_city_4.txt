@@ -1,0 +1,10 @@
+AspertiaCity4_Text_DidFindLadyCalled = {0100:0}, did you find\nthat lady called Bianca?{be01}\nI hope you get a Pokémon soon!
+AspertiaCity4_Text_OhTakeCareOnly = Oh, {0100:0}!\nTake care of {0101:1}!{be01}\nOnly Trainers can protect\ntheir own Pokémon!
+AspertiaCity4_Text_WishWishBigBrother = I wish...{be01}\nI wish my big brother could go on a\njourney for his Pokémon, not for me.
+AspertiaCity4_Text_HiWowItsKnow = Hi, {0100:0}!{be01}\nWow! It's {0101:1}!{be01}\nYou know lots of other Pokémon, right?\nCool!
+AspertiaCity4_Text_KnowWhatBigBrother = Know what?\nMy big brother told me something.{be01}\nHe said to talk to the Liepard\ninside the Poké Ball lots and lots,{be00}\nlike I'm doing, until it remembers me!{be01}\nAnd to pet it, even if it's just on\nthe outside of the Poké Ball!
+AspertiaCity4_Text_LookLiepardLooksHappy = {0100:0}!{be01}\nLook!{be01}\nLiepard looks so happy\nwhen I pet its head!
+AspertiaCity4_Text_Preoooww = Preoooww... ♪
+AspertiaCity4_Text_Empty =          \x{ffff}
+AspertiaCity4_Text_ItsMapUnovaRegion = It's a map of the Unova region.
+\pad{3a}

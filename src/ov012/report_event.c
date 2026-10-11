@@ -1,6 +1,9 @@
 // The report: the screen that asks whether to save the game, saves it alongside the field and says so. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/script_text_banks.h"
+#include "constants/text_banks.h"
 #include "field/event_save.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -29,6 +32,8 @@
 #include "system/text_speed.h"
 #include "system/time_icon.h"
 #include "system/wordset.h"
+#include "text/script/global_10520.h"
+#include "text/system/0359.h"
 
 #define SEQ_SE_SAVE 0x558
 #define SEQ_SE_MESSAGE 0x547
@@ -90,7 +95,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         if (FieldSubscreen_IsReady(Field_GetSubscreen(work->field)) == TRUE &&
             func_ov036_02198b04(Field_GetSubscreen(work->field)) == TRUE) {
             work->report = GFL_HeapAllocate(work->heapId, sizeof(ReportWork), FALSE, "report_event.c", 159);
-            work->report->msgData = GFL_MsgSysLoadData(FALSE, 3, 0xd0, work->heapId);
+            work->report->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, work->heapId);
             work->report->strbuf = GFL_StrBufCreate(0x200, work->heapId);
             work->report->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 1, 4);
             work->report->cursor = KeyCursor_Create(0xf, 1, 1, work->heapId);
@@ -182,7 +187,7 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
             func_ov012_02164318(work);
             func_ov012_02164290(work);
             wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
-            str = GFL_MsgDataLoadStrbufNew(work->report->msgData, 5);
+            str = GFL_MsgDataLoadStrbufNew(work->report->msgData, Global10520_Text_SavedGame);
             copyVarForText(wordSet, 0, GetGameDataPlayerInfo(GSYS_GetGameData(work->gameSystem)));
             GFL_WordSetFormatStrbuf(wordSet, work->report->strbuf, str);
             GFL_StrBufFree(str);
@@ -363,12 +368,12 @@ static BOOL func_ov012_02164110(EventSaveWork *work) {
 }
 
 static void func_ov012_02164150(EventSaveWork *work) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, 0x167, work->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0359, work->heapId);
 
-    work->report->items[0].str = GFL_MsgDataLoadStrbufNew(msgData, 8);
+    work->report->items[0].str = GFL_MsgDataLoadStrbufNew(msgData, Bank0359_Text_Yes);
     work->report->items[0].color = 0x39e3;
     work->report->items[0].type = 0;
-    work->report->items[1].str = GFL_MsgDataLoadStrbufNew(msgData, 9);
+    work->report->items[1].str = GFL_MsgDataLoadStrbufNew(msgData, Bank0359_Text_No);
     work->report->items[1].color = 0x39e3;
     work->report->items[1].type = 0;
     GFL_MsgDataFree(msgData);

@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kay & Ali",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DUCKLETT",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DUCKLETT",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Watching athletes practice with Pokémon\nmade me want to have a Pokémon battle.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Kay: Great!\nYou are like a professional!{be01}\nAli: How did you know?"
+        },
+        {
+            "type": 5,
+            "text": "Ohhh... I knew it was difficult\nto fight with Pokémon as well as{be00}\nthe professionals do."
+        },
+        {
+            "type": 6,
+            "text": "We are two!\nWe use two Pokémon, too!"
+        },
+        {
+            "type": 7,
+            "text": "Pokémon do\nwhat I cannot do.{be01}\nYou know how wonderful this is,\ndon't you?{be01}"
+        },
+        {
+            "type": 9,
+            "text": "Even existing sports shine\nwith new appeal{be00}\nwhen they team up with Pokémon!"
+        },
+        {
+            "type": 10,
+            "text": "Aren't you in trouble if you don't have\nmore Pokémon that can fight?"
+        }
+    ]
+}

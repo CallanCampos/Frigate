@@ -11,36 +11,48 @@
 // medal_info_viewer.c
 #define OVERLAY_MEDAL_INFO OVERLAY_ID(187)
 
+// What the screen of a Join Avenue visitor's medals (medal_info_beacon.c's first table) gets
 typedef struct {
-    u32 unk0;
-    u16 unk4;
+    // 0 from the Join Avenue, 1 from the Trainer Card, which adds a button to return to the field
+    u32 mode;
+    // The heap that the screen's own heap is a child of
+    u16 parentHeapId;
     StrBuf *name;
-    u16 unkC;
-    u16 unkE;
-    u8 unk10;
+    u16 medal;
+    u16 medalCount;
+    u8 rank;
     // The date, as the visitor's data packs it
     u8 year;
     u8 month;
     u8 day;
-    u32 unk14;
+    // Set to 1 when the player chose to return to the field
+    u32 result;
     GameSystem *gsys;
     GameData *gameData;
     StrBuf *nameBuf;
 } MedalInfoParam;
 
-extern const GameProcFunctions data_ov187_021ea060;
+// The screen's process, suggested name MedalInfo_ProcFunctions
+extern GameProcFunctions MedalInfo_ProcFunctions;
+// The first table's init function
+BOOL MedalInfo_Init(GameProc *proc, u32 *state, void *param, void *work);
+// The second table's main function
+BOOL MedalInfoBeacon_LogMain(GameProc *proc, u32 *state, void *param, void *work);
 
-// What the screen of the medals of a beacon's sender (medal_info_beacon.c) gets
+// What the screen of the medals of the senders of the beacon log (medal_info_beacon.c's second table) gets
 typedef struct {
     GameSystem *gsys;
     GameData *gameData;
-    u8 subscreen;
-    // Set when the field is to return to the default subscreen
-    u8 unk09;
-    u8 mode;
+    // The beacon of the log that the screen shows first
+    u8 beaconIndex;
+    // Set when the player chose to return to the field
+    u8 returnToField;
+    // The row of the log that the beacon was in; the log is scrolled to keep that beacon in view
+    u8 logRow;
     u8 unk0B;
 } MedalInfoBeaconParam;
 
-extern const GameProcFunctions data_ov187_021ea06c;
+// The beacon log's screen, suggested name MedalInfoBeacon_ProcFunctions
+extern GameProcFunctions MedalInfoBeacon_ProcFunctions;
 
 #endif // POKEBW2_APP_MEDAL_INFO_H

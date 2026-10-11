@@ -1,25 +1,25 @@
-         \x{ffff}
-         \x{ffff}
-Is it OK to create data\nto play Game Sync?
-Creating data...\nPlease wait a moment.
-YES
-NO
-Saving...\nDon't turn off the power.
-Use a computer to access the\nPokémon Global Link website\nand enter the Game Sync ID above\nto set up Game Sync.\n\nhttp://www.pokemon-gl.com
-Your Game Sync ID has been issued.\n\nYou can check your Game Sync ID\nin Game Sync Settings on the main menu.{be01}
-Use a computer to access the\nPokémon Global Link website\nand enter the Game Sync ID above\nto set up Game Sync.\n\nhttp://www.pokemon-gl.com
-Game Sync ID
-The Game Sync ID\nhas been saved.
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13201
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13202
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13203
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13204
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13205
-This service has been discontinued.\n\nError Code: 13206
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13207
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13208
-A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13209
-An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13210
-The server is experiencing high\ntraffic volumes.\nUnable to connect.\nPlease wait a little while and try again.\n\nError Code: 13211
-The server is undergoing maintenance.\n\nThe details can be reviewed at the\nPokémon Global Link website.\n\nhttp://www.pokemon-gl.com\n\nError code: 13212
+Bank0107_Text_Empty =          \x{ffff}
+Bank0107_Text_Empty_2 =          \x{ffff}
+Bank0107_Text_OkCreateDataPlay = Is it OK to create data\nto play Game Sync?
+Bank0107_Text_CreatingDataPleaseWait = Creating data...\nPlease wait a moment.
+Bank0107_Text_Yes = YES
+Bank0107_Text_No = NO
+Bank0107_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+Bank0107_Text_UseComputerAccessPokemon = Use a computer to access the\nPokémon Global Link website\nand enter the Game Sync ID above\nto set up Game Sync.\n\nhttp://www.pokemon-gl.com
+Bank0107_Text_GameSyncIdHas = Your Game Sync ID has been issued.\n\nYou can check your Game Sync ID\nin Game Sync Settings on the main menu.{be01}
+Bank0107_Text_UseComputerAccessPokemon_2 = Use a computer to access the\nPokémon Global Link website\nand enter the Game Sync ID above\nto set up Game Sync.\n\nhttp://www.pokemon-gl.com
+Bank0107_Text_GameSyncId = Game Sync ID
+Bank0107_Text_GameSyncIdHas_2 = The Game Sync ID\nhas been saved.
+Bank0107_Text_ErrorOccurredServerPlease = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13201
+Bank0107_Text_ErrorOccurredServerPlease_2 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13202
+Bank0107_Text_CommunicationErrorOccurredPlease = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13203
+Bank0107_Text_CommunicationErrorOccurredPlease_2 = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13204
+Bank0107_Text_ErrorOccurredServerPlease_3 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13205
+Bank0107_Text_ServiceHasBeenDiscontinued = This service has been discontinued.\n\nError Code: 13206
+Bank0107_Text_CommunicationErrorOccurredPlease_3 = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13207
+Bank0107_Text_ErrorOccurredServerPlease_4 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13208
+Bank0107_Text_CommunicationErrorOccurredPlease_4 = A communication error occurred.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13209
+Bank0107_Text_ErrorOccurredServerPlease_5 = An error occurred on the server.\nPlease try again.\n\nIf this does not solve the problem,\nrefer to your Instruction Booklet.\n\nError Code: 13210
+Bank0107_Text_ServerExperiencingHighTraffic = The server is experiencing high\ntraffic volumes.\nUnable to connect.\nPlease wait a little while and try again.\n\nError Code: 13211
+Bank0107_Text_ServerUndergoingMaintenanceDetails = The server is undergoing maintenance.\n\nThe details can be reviewed at the\nPokémon Global Link website.\n\nhttp://www.pokemon-gl.com\n\nError code: 13212
 \pad{b0}

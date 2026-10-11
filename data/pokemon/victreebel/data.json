@@ -1,0 +1,161 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Victreebel",
+    "pokedex": {
+        "category": "Flycatcher Pokémon",
+        "entry": "It pools in its mouth a fluid with\na honey-like scent, which is really\nan acid that dissolves anything.",
+        "height": "5'07\"",
+        "weight": "34.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Victreebel",
+                "category": "Flycatcher Pokémon",
+                "entry": "It pools in its mouth a fluid with\na honeylike scent, which is really\nan acid that dissolves anything.",
+                "height": "5'07\"",
+                "weight": "34.2 lbs."
+            },
+            "fr": {
+                "name": "Empiflor",
+                "category": "Pokémon Carnivore",
+                "entry": "Sa bouche sécrète un fluide à\nl'odeur de miel, qui s'avère être\nun acide extrêmement corrosif.",
+                "height": "1,7 m",
+                "weight": "15,5 kg"
+            },
+            "de": {
+                "name": "Sarzenia",
+                "category": "Fliegentot",
+                "entry": "In seinem Maul sammelt sich eine\nFlüssigkeit, die nach Honig riecht,\nin Wahrheit aber ätzend ist.",
+                "height": "1,7 m",
+                "weight": "15,5 kg"
+            },
+            "it": {
+                "name": "Victreebel",
+                "category": "Pokémon Moschivoro",
+                "entry": "Tiene in bocca un liquido dall'aroma\nsimile al miele, che in realtà è un\nacido altamente corrosivo.",
+                "height": "1,7 m",
+                "weight": "15,5 kg"
+            },
+            "ko": {
+                "name": "우츠보트",
+                "category": "파리잡이포켓몬",
+                "entry": "꿀같은 향기의 액체를\n입에 모아두고 있지만 그것은\n무엇이든 녹이는 용해액이다.",
+                "height": "1.7 m",
+                "weight": "15.5 kg"
+            },
+            "es": {
+                "name": "Victreebel",
+                "category": "Pokémon Matamoscas",
+                "entry": "Su boca segrega un fluido de olor\nparecido a la miel: un potente ácido\nque disuelve cualquier cosa.",
+                "height": "1,7 m",
+                "weight": "15,5 kg"
+            },
+            "ja": {
+                "name": "ウツボット",
+                "category": "ハエとりポケモン",
+                "entry": "ミツのような\\x{3000}かおりの\\x{3000}えきたいを\nくちに\\x{3000}ためているが\\x{3000}それは\nなんでも\\x{3000}とかす\\x{3000}ようかいえきだ。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 105,
+        "defense": 65,
+        "speed": 70,
+        "special_attack": 100,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 3,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_GLUTTONY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 216,
+    "height": 17,
+    "weight": 155,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_STOCKPILE" ],
+            [ 1, "MOVE_SWALLOW" ],
+            [ 1, "MOVE_SPIT_UP" ],
+            [ 1, "MOVE_VINE_WHIP" ],
+            [ 1, "MOVE_SLEEP_POWDER" ],
+            [ 1, "MOVE_SWEET_SCENT" ],
+            [ 1, "MOVE_RAZOR_LEAF" ],
+            [ 27, "MOVE_LEAF_TORNADO" ],
+            [ 47, "MOVE_LEAF_STORM" ],
+            [ 47, "MOVE_LEAF_BLADE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM33",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SEED_BOMB",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_BELLSPROUT"
+}

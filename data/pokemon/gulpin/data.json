@@ -1,0 +1,180 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Gulpin",
+    "pokedex": {
+        "category": "Stomach Pokémon",
+        "entry": "Almost all its body is its stomach.\nIts harsh digestive juices quickly\ndissolve anything it swallows.",
+        "height": "1'04\"",
+        "weight": "22.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Gulpin",
+                "category": "Stomach Pokémon",
+                "entry": "Almost all its body is its stomach.\nIts harsh digestive juices quickly\ndissolve anything it swallows.",
+                "height": "1'04\"",
+                "weight": "22.7 lbs."
+            },
+            "fr": {
+                "name": "Gloupti",
+                "category": "Pokémon Estomac",
+                "entry": "Il est principalement composé d'un\nestomac dont les sucs digestifs\ndissolvent tout ce qu'il avale.",
+                "height": "0,4 m",
+                "weight": "10,3 kg"
+            },
+            "de": {
+                "name": "Schluppuck",
+                "category": "Magen",
+                "entry": "Sein Körper besteht fast nur aus Magen.\nSeine starken Verdauungssäfte\nzersetzen alles sehr schnell.",
+                "height": "0,4 m",
+                "weight": "10,3 kg"
+            },
+            "it": {
+                "name": "Gulpin",
+                "category": "Pokémon Stomaco",
+                "entry": "La maggior parte del suo corpo è\nstomaco. I suoi succhi gastrici\ndissolvono subito ciò che ingerisce.",
+                "height": "0,4 m",
+                "weight": "10,3 kg"
+            },
+            "ko": {
+                "name": "꼴깍몬",
+                "category": "밥통포켓몬",
+                "entry": "몸 대부분이 위다.\n강력한 위액으로 삼킨\n것을 순식간에 소화한다.",
+                "height": "0.4 m",
+                "weight": "10.3 kg"
+            },
+            "es": {
+                "name": "Gulpin",
+                "category": "Pokémon Estómago",
+                "entry": "Casi todo su cuerpo es estómago.\nSus potentes jugos gástricos\ndisuelven rápido cualquier cosa.",
+                "height": "0,4 m",
+                "weight": "10,3 kg"
+            },
+            "ja": {
+                "name": "ゴクリン",
+                "category": "いぶくろポケモン",
+                "entry": "からだの\\x{3000}ほとんどが\\x{3000}いぶくろ。\nきょうりょくな\\x{3000}いえきで\\x{3000}のみこんだ\nものを\\x{3000}たちまち\\x{3000}しょうかする。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 43,
+        "defense": 53,
+        "speed": 40,
+        "special_attack": 43,
+        "special_defense": 53
+    },
+    "types": [ "TYPE_POISON", "TYPE_POISON" ],
+    "catch_rate": 225,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_BIG_PEARL",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FLUCTUATING",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_LIQUID_OOZE", "ABILITY_STICKY_HOLD" ],
+    "hidden_ability": "ABILITY_GLUTTONY",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 60,
+    "height": 4,
+    "weight": 103,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POUND" ],
+            [ 6, "MOVE_YAWN" ],
+            [ 9, "MOVE_POISON_GAS" ],
+            [ 14, "MOVE_SLUDGE" ],
+            [ 17, "MOVE_AMNESIA" ],
+            [ 23, "MOVE_ENCORE" ],
+            [ 28, "MOVE_TOXIC" ],
+            [ 34, "MOVE_ACID_SPRAY" ],
+            [ 39, "MOVE_STOCKPILE" ],
+            [ 39, "MOVE_SPIT_UP" ],
+            [ 39, "MOVE_SWALLOW" ],
+            [ 44, "MOVE_SLUDGE_BOMB" ],
+            [ 49, "MOVE_GASTRO_ACID" ],
+            [ 54, "MOVE_WRING_OUT" ],
+            [ 59, "MOVE_GUNK_SHOT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_ACID_ARMOR",
+            "MOVE_SMOG",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_CURSE",
+            "MOVE_DESTINY_BOND",
+            "MOVE_MUD_SLAP",
+            "MOVE_GUNK_SHOT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 26,
+            "species": "SPECIES_SWALOT"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_GULPIN"
+}

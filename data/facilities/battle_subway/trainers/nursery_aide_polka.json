@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Polka",
+    "class": "TRAINER_CLASS_NURSERY_AIDE",
+    "pokemon": [ "vaporeon_2", "jolteon_2", "flareon_2", "espeon_2", "umbreon_2", "leafeon_2", "glaceon_2" ],
+    "messages": [
+        "Hey, you!\nI promise I will take it easy on you!",
+        "Heheh... I will take it easy on you. Heh.",
+        "Sometimes even grown-ups want\nsomeone to take care of them."
+    ]
+}

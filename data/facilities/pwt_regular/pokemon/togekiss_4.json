@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TOGEKISS",
+    "moves": [ "MOVE_FOLLOW_ME", "MOVE_THUNDER_WAVE", "MOVE_AIR_SLASH", "MOVE_ENCORE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

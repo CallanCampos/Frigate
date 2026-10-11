@@ -14,6 +14,6 @@ struct MailboxProcessData {
     u32 result;
 };
 
-extern const GameProcFunctions data_ov215_021ab158;
+extern const GameProcFunctions MAILBOX_PROC_FUNCTIONS;
 
 #endif // POKEBW2_APP_MAILBOX_H

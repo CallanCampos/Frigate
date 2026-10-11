@@ -1,14 +1,14 @@
-{0100:0}
-{0100:1}
-Cheren
-Bianca
-Professor
-Mom
-Curtis
-Yancy
-???
-Curtis
-Yancy
-Curtis
-Yancy
-{0100:0}
+Bank0393_Text_Empty = {0100:0}
+Bank0393_Text_Empty_2 = {0100:1}
+Bank0393_Text_Cheren = Cheren
+Bank0393_Text_Bianca = Bianca
+Bank0393_Text_Professor = Professor
+Bank0393_Text_Mom = Mom
+Bank0393_Text_Curtis = Curtis
+Bank0393_Text_Yancy = Yancy
+Bank0393_Text_Empty_3 = ???
+Bank0393_Text_Curtis_2 = Curtis
+Bank0393_Text_Yancy_2 = Yancy
+Bank0393_Text_Curtis_3 = Curtis
+Bank0393_Text_Yancy_3 = Yancy
+Bank0393_Text_Empty_4 = {0100:0}

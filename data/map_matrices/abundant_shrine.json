@@ -1,0 +1,7 @@
+{
+    "$schema": "map_matrix.schema.json",
+    "maps": [
+        [ 522, 523 ],
+        [ 524, 525 ]
+    ]
+}

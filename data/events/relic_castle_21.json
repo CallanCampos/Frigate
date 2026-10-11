@@ -1,0 +1,158 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 6,
+                "y": 2,
+                "z": 24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 3,
+                "y": 3,
+                "z": 16
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 1,
+                "y": 11,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 11,
+                "y": 11,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 3,
+                "y": 8,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 9,
+                "y": 4,
+                "z": 8
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 11,
+                "y": 2,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 1,
+                "y": 2,
+                "z": 4
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 9,
+                "y": 8,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 7,
+                "y": 3,
+                "z": 24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 5,
+                "y": 3,
+                "z": 24
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 7,
+                "y": 5,
+                "z": 8
+            }
+        }
+    ],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_RELIC_CASTLE_16",
+            "warp": 1,
+            "unk4": 3,
+            "transition": 4,
+            "grid": {
+                "x": 200,
+                "y": 0,
+                "z": 120,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_RELIC_PASSAGE_2",
+            "warp": 3,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 88,
+                "y": 0,
+                "z": 248,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

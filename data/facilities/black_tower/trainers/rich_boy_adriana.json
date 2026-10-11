@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Adriana",
+    "class": "TRAINER_CLASS_RICH_BOY",
+    "pokemon": [
+        "pikachu_1",
+        "minccino_1",
+        "pansage_1",
+        "pansear_1",
+        "panpour_1",
+        "stunky_1",
+        "voltorb_1",
+        "staryu_1",
+        "skiploom_1",
+        "staravia_1"
+    ]
+}

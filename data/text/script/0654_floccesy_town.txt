@@ -1,6 +1,0 @@
-Even if you have a lot of them,\nitems never weigh you down, eh?{be01}
-Bags sure are cool.{be01}\nItems in your Bag are automatically\nsorted by type.
-The biggest city in Unova is Castelia!{be01}\nI want to take the ship from Virbank\nand go play there!
-On a sunny day, my Patrat's fur\ngets all fluffy!{be00}\nI can't help wanting to pet it!
-Skuwaaa!
-\pad{b4}

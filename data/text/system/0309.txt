@@ -1,46 +1,46 @@
-Director: Hmm... I have a good\nfeeling about dis scene.
-Director: I've got it!\nI think I'll capture dis scene{be00}\nfrom dis angle.
-Director: I see.\nDat was the correct{be00}\nthing to do in dis place.
-Director: Let's focus here\nand get through dis scene!
-Director: I want acting just like\ndat in da next scene, too!
-Director: Oh!\nLet's keep going like dis!
-Director: I can see dat\nworking for dat line.
-Director: Dat last line...\nIt's passable, I guess.
-Director: Dat last line...\nDat was pretty dreadful.
-Director: What are you doing?\nWe'll run out of film!
-Director: Cut!\nDat might not be bad!
-Director: Cut! Enough!\nDat's it for today!
-Director: Cut! What in tarnation?!\nWere you not expecting dis result?!
-Director: First, check da script--\nin other words, da scenario!
-Director: Got it?\nChecking da script is important!
-Director: Your acting is\nreally coming along!
-Director: I've got it!\nI'll center dis shot on you!
-Director: Oh ho!\nDat works in its own way.
-Director: You used to be a\nsmall fry, but now...
-Director: Dat acting right now!\nYou're getting really good!
-Director: Hmm... I see.\nDis scene is like dat.
-Director: Dat last line\nwas really well acted...
-Director: I think dat\nlast line was fine.
-Director: Dat last line\nreally wasn't too great.
-Director: We're about to wrap up.\nYou already understand dat, right?
-Director: Cut!\nI've got a good feeling about dis film!
-Director: Cut! You're more experienced,\nbut you still have a ways to go...
-Director: Cut!\nI can't really see how dis will turn out...
-Director: You've memorized all\nof your lines, right?
-Director: Go back to basics.\nJust check da script!
-Director: Well done!\nDo you even need my direction anymore?
-Director: I don't have any complaints\nabout da angle you suggest.
-Director: Oh, I see!\nI'm learning from you!
-Director: Your acting...\nIt brings such an intensity to da room.
-Director: When you act, it makes\neveryone else's acting look good, too!
-Director: OK! I'm going to leave dis\nto you and just let da cameras roll!
-Director: Dat last line\nwas really well acted...
-Director: I think dat\nlast line was fine.
-Director: Dat last line\nreally wasn't too great.
-Director: What's wrong?!\nWrap things up cleanly!
-Director: Cut! Leaving things\nto you was da right call!
-Director: Cut! Hm... You have to\nget better. Devote yourself to acting!
-Director: C-cut!\nDis shoot...{be00}\nI just don't get what happened...
-Director: It's a shame, but you\nhave to say what's in da script!
-Director: Were there any places\nin da script you're concerned about?
+Bank0309_Text_DirectorHmmHaveGood = Director: Hmm... I have a good\nfeeling about dis scene.
+Bank0309_Text_DirectorIveGotThink = Director: I've got it!\nI think I'll capture dis scene{be00}\nfrom dis angle.
+Bank0309_Text_DirectorSeeDatCorrect = Director: I see.\nDat was the correct{be00}\nthing to do in dis place.
+Bank0309_Text_DirectorLetsFocusHere = Director: Let's focus here\nand get through dis scene!
+Bank0309_Text_DirectorWantActingJust = Director: I want acting just like\ndat in da next scene, too!
+Bank0309_Text_DirectorOhLetsKeep = Director: Oh!\nLet's keep going like dis!
+Bank0309_Text_DirectorCanSeeDat = Director: I can see dat\nworking for dat line.
+Bank0309_Text_DirectorDatLastLine = Director: Dat last line...\nIt's passable, I guess.
+Bank0309_Text_DirectorDatLastLine_2 = Director: Dat last line...\nDat was pretty dreadful.
+Bank0309_Text_DirectorWhatDoingWell = Director: What are you doing?\nWe'll run out of film!
+Bank0309_Text_DirectorCutDatMight = Director: Cut!\nDat might not be bad!
+Bank0309_Text_DirectorCutEnoughDats = Director: Cut! Enough!\nDat's it for today!
+Bank0309_Text_DirectorCutWhatTarnation = Director: Cut! What in tarnation?!\nWere you not expecting dis result?!
+Bank0309_Text_DirectorFirstCheckDa = Director: First, check da script--\nin other words, da scenario!
+Bank0309_Text_DirectorGotCheckingDa = Director: Got it?\nChecking da script is important!
+Bank0309_Text_DirectorActingReallyComing = Director: Your acting is\nreally coming along!
+Bank0309_Text_DirectorIveGotIll = Director: I've got it!\nI'll center dis shot on you!
+Bank0309_Text_DirectorOhHoDat = Director: Oh ho!\nDat works in its own way.
+Bank0309_Text_DirectorUsedSmallFry = Director: You used to be a\nsmall fry, but now...
+Bank0309_Text_DirectorDatActingRight = Director: Dat acting right now!\nYou're getting really good!
+Bank0309_Text_DirectorHmmSeeDis = Director: Hmm... I see.\nDis scene is like dat.
+Bank0309_Text_DirectorDatLastLine_3 = Director: Dat last line\nwas really well acted...
+Bank0309_Text_DirectorThinkDatLast = Director: I think dat\nlast line was fine.
+Bank0309_Text_DirectorDatLastLine_4 = Director: Dat last line\nreally wasn't too great.
+Bank0309_Text_DirectorWereAboutWrap = Director: We're about to wrap up.\nYou already understand dat, right?
+Bank0309_Text_DirectorCutIveGot = Director: Cut!\nI've got a good feeling about dis film!
+Bank0309_Text_DirectorCutYoureMore = Director: Cut! You're more experienced,\nbut you still have a ways to go...
+Bank0309_Text_DirectorCutCantReally = Director: Cut!\nI can't really see how dis will turn out...
+Bank0309_Text_DirectorYouveMemorizedAll = Director: You've memorized all\nof your lines, right?
+Bank0309_Text_DirectorGoBackBasics = Director: Go back to basics.\nJust check da script!
+Bank0309_Text_DirectorWellDoneEven = Director: Well done!\nDo you even need my direction anymore?
+Bank0309_Text_DirectorDontHaveAny = Director: I don't have any complaints\nabout da angle you suggest.
+Bank0309_Text_DirectorOhSeeIm = Director: Oh, I see!\nI'm learning from you!
+Bank0309_Text_DirectorActingBringsSuch = Director: Your acting...\nIt brings such an intensity to da room.
+Bank0309_Text_DirectorWhenActMakes = Director: When you act, it makes\neveryone else's acting look good, too!
+Bank0309_Text_DirectorOkImGoing = Director: OK! I'm going to leave dis\nto you and just let da cameras roll!
+Bank0309_Text_DirectorDatLastLine_5 = Director: Dat last line\nwas really well acted...
+Bank0309_Text_DirectorThinkDatLast_2 = Director: I think dat\nlast line was fine.
+Bank0309_Text_DirectorDatLastLine_6 = Director: Dat last line\nreally wasn't too great.
+Bank0309_Text_DirectorWhatsWrongWrap = Director: What's wrong?!\nWrap things up cleanly!
+Bank0309_Text_DirectorCutLeavingThings = Director: Cut! Leaving things\nto you was da right call!
+Bank0309_Text_DirectorCutHmHave = Director: Cut! Hm... You have to\nget better. Devote yourself to acting!
+Bank0309_Text_DirectorCCutDis = Director: C-cut!\nDis shoot...{be00}\nI just don't get what happened...
+Bank0309_Text_DirectorItsShameBut = Director: It's a shame, but you\nhave to say what's in da script!
+Bank0309_Text_DirectorWereThereAny = Director: Were there any places\nin da script you're concerned about?
 \pad{8c}

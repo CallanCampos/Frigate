@@ -1,0 +1,164 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Genesect",
+    "pokedex": {
+        "category": "Paleozoic Pokémon",
+        "entry": "This Pokémon existed 300 million years\nago. Team Plasma altered it and\nattached a cannon to its back.",
+        "height": "4'11\"",
+        "weight": "181.9 lbs.",
+        "forms": [
+            {
+                "entry": "This Pokémon existed 300 million years\nago. Team Plasma altered it and\nattached a cannon to its back.",
+                "height": "4'11\"",
+                "weight": "181.9 lbs."
+            },
+            {
+                "entry": "This Pokémon existed 300 million years\nago. Team Plasma altered it and\nattached a cannon to its back.",
+                "height": "4'11\"",
+                "weight": "181.9 lbs."
+            },
+            {
+                "entry": "This Pokémon existed 300 million years\nago. Team Plasma altered it and\nattached a cannon to its back.",
+                "height": "4'11\"",
+                "weight": "181.9 lbs."
+            },
+            {
+                "entry": "This Pokémon existed 300 million years\nago. Team Plasma altered it and\nattached a cannon to its back.",
+                "height": "4'11\"",
+                "weight": "181.9 lbs."
+            }
+        ],
+        "languages": {
+            "ja": {
+                "category": "こせいだいポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 71,
+        "attack": 120,
+        "defense": 95,
+        "speed": 99,
+        "special_attack": 120,
+        "special_defense": 95
+    },
+    "types": [ "TYPE_BUG", "TYPE_STEEL" ],
+    "catch_rate": 3,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 120,
+    "base_friendship": 0,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_DOWNLOAD", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 5,
+        "sprite_offset": 62
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 270,
+    "height": 15,
+    "weight": 825,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TECHNO_BLAST" ],
+            [ 1, "MOVE_QUICK_ATTACK" ],
+            [ 1, "MOVE_MAGNET_RISE" ],
+            [ 1, "MOVE_METAL_CLAW" ],
+            [ 1, "MOVE_SCREECH" ],
+            [ 7, "MOVE_FURY_CUTTER" ],
+            [ 11, "MOVE_LOCK_ON" ],
+            [ 18, "MOVE_FLAME_CHARGE" ],
+            [ 22, "MOVE_MAGNET_BOMB" ],
+            [ 29, "MOVE_SLASH" ],
+            [ 33, "MOVE_METAL_SOUND" ],
+            [ 40, "MOVE_SIGNAL_BEAM" ],
+            [ 44, "MOVE_TRI_ATTACK" ],
+            [ 51, "MOVE_X_SCISSOR" ],
+            [ 55, "MOVE_BUG_BUZZ" ],
+            [ 62, "MOVE_SIMPLE_BEAM" ],
+            [ 66, "MOVE_ZAP_CANNON" ],
+            [ 73, "MOVE_HYPER_BEAM" ],
+            [ 77, "MOVE_SELFDESTRUCT" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM29",
+            "TM32",
+            "TM33",
+            "TM35",
+            "TM40",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM48",
+            "TM53",
+            "TM57",
+            "TM64",
+            "TM65",
+            "TM68",
+            "TM69",
+            "TM70",
+            "TM73",
+            "TM76",
+            "TM81",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM91",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_IRON_HEAD",
+            "MOVE_GUNK_SHOT",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_LAST_RESORT",
+            "MOVE_ELECTROWEB",
+            "MOVE_DARK_PULSE",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 300,
+    "baby_species": "SPECIES_GENESECT"
+}
