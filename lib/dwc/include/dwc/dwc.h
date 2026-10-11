@@ -53,11 +53,6 @@ BOOL func_02057c90(void *userData);
 void func_02057c74(void *userData);
 void func_02057de8(void *userData);
 
-// A friend's data in the DWC library, 12 bytes
-typedef struct {
-    u8 unk0[12];
-} DWCFriendData;
-
 // Asked how well another machine fits a random match, and the function's work
 typedef int (*DWCEvalFunc)(int index, void *work);
 

@@ -1,7 +1,7 @@
 #include "types.h"
 #include "save/wifi_list.h"
 #include "dwc/dwc.h"
-#include "gfl/dwc_rap.h"
+#include "gfl/dwc_rapcommon.h"
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/std.h"
@@ -42,7 +42,7 @@ void initWifi(WifiList *wifiList) {
     GFL_OvlUnload(OVERLAY_ID(27));
     GFL_OvlLoad(OVERLAY_ID(29));
     GFL_OvlLoad(OVERLAY_DWC_RAP);
-    func_ov011_021523cc(&wifiList->myUserData);
+    DWCRapCommon_ResetUserData(&wifiList->myUserData);
     GFL_OvlUnload(OVERLAY_DWC_RAP);
     GFL_OvlUnload(OVERLAY_ID(29));
     GFL_OvlLoad(OVERLAY_ID(12));
