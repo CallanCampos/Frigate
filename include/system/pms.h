@@ -14,6 +14,7 @@
 
 // The C-Gear's phrases, which the save keeps
 void *getCGearDataBlkAddress(SaveControl *save);
+void func_0200ef48(PMSData *phrases);
 void func_0200ef90(void *cgear, u32 index, PMSData *sentence);
 void func_0200efa8(void *cgear, u32 index, const PMSData *sentence);
 // The same block, through the C-Gear's own accessor

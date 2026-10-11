@@ -4,6 +4,12 @@
 #include "types.h"
 #include "struct_decls.h"
 
+// The registered shortcuts, 0xff when a slot is empty
+struct ShortcutSave {
+    u8 ids[0x24];
+}; // size: 0x24
+
+void ShortcutSave_Init(ShortcutSave *shortcutSave);
 ShortcutSave *SaveControl_GetShortcutSave(SaveControl *save);
 // The same block, which SaveControl_GetShortcutSave returns through it
 ShortcutSave *SaveControl_GetShortcutSaveCore(SaveControl *save);
