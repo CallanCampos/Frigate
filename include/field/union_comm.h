@@ -8,6 +8,7 @@
 #include "gfl/heap.h"
 #include "save/join_avenue.h"
 #include "save/player_info.h"
+#include "dwc/dwc.h"
 #include "struct_decls.h"
 
 // union_comm.c, overlay 28, which the ROM names: the Union Room's system work, its GameCommSys callbacks for
@@ -60,7 +61,8 @@ typedef struct {
         UnionMember members[UNION_MEMBER_MAX];
         UnionMemberList memberList;
     };
-    u8 unk50[0xc];
+    // The friend data token of the player, for the Union Room
+    DWCFriendData unk50;
     u32 trainerId;
     u8 unk60[4];
 } UnionBeacon;
@@ -264,9 +266,5 @@ void UnionComm_SetLook(UnionSystem *sys, const u16 *look);
 void UnionComm_SetState(UnionSystem *sys, u8 state);
 // Sets the net game command base for an activity
 void UnionComm_SetCommandBase(u32 activity);
-
-// Functions outside this file that it calls, without their own header yet
-// (main) copies the player's DWC user data
-void func_0200a3cc(WifiList *wifiList, void *dest);
 
 #endif // POKEBW2_FIELD_UNION_COMM_H

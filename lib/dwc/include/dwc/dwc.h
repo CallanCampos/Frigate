@@ -6,10 +6,24 @@
 #include "nitro/rtc.h"
 
 // Nintendo's Wi-Fi Connection library (NitroDWC), in main and overlay 11. The ROM names none of it; what these
-// functions do is read off their callers, and they have no names yet
+// functions do is read off their callers. The account functions carry the SDK's names, chosen from what they do
 
+// The player's account and a friend's, as the save keeps them: DWCAccUserData and DWCAccFriendData of the SDK
+typedef struct DWCUserData {
+    u8 data[0x40];
+} DWCUserData;
+
+typedef struct DWCFriendData {
+    u8 data[0xc];
+} DWCFriendData;
+
+BOOL DWC_IsValidFriendData(const DWCFriendData *friendData);
+BOOL DWC_CheckHasProfile(const DWCUserData *userData);
+BOOL DWC_CheckValidConsole(const DWCUserData *userData);
+s32 DWC_GetGsProfileId(const DWCUserData *userData, const DWCFriendData *friendData);
+void DWC_CreateExchangeToken(const DWCUserData *userData, DWCFriendData *token);
 // The friend key of the player's user data
-u64 func_02057ec4(const void *userData);
+u64 func_02057ec4(const DWCUserData *userData);
 // Clears the error, unless it is 9
 void func_02058490(void);
 
@@ -38,11 +52,6 @@ int func_020584e4(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, i
 BOOL func_02057c90(void *userData);
 void func_02057c74(void *userData);
 void func_02057de8(void *userData);
-
-// A friend's data in the DWC library, 12 bytes
-typedef struct {
-    u8 unk0[12];
-} DWCFriendData;
 
 // Asked how well another machine fits a random match, and the function's work
 typedef int (*DWCEvalFunc)(int index, void *work);

@@ -79,25 +79,47 @@ typedef struct {
 // The save's block of mystery gifts, which mgEncryptData encrypts
 #define SAVE_BLOCK_MYSTERY_GIFT 0x22
 
+#define MG_CARD_MAX 12
+#define MG_CARD_MAX_OUTSIDE 3
+#define MG_ID_MAX 0x800
+
 typedef struct {
     // A bit for each gift ID received
-    u8 receivedFlags[0x100];
-    MysteryGift cards[12];
+    u8 receivedFlags[MG_ID_MAX / 8];
+    MysteryGift cards[MG_CARD_MAX];
     // Kept by mgEncryptData at the end of the data it encrypts
     u16 checksum;
     u16 key;
-} MysteryGiftSaveData;
+} MysteryGiftSaveData; // size: 0xa94
 
 // What mgEncryptData and mgDecryptData encrypt: the save's block, or the gifts kept outside the save (save_outside.c)
 #define MG_DATA_OUTSIDE 0
 #define MG_DATA_SAVE 1
 
+// The mystery gifts the game works on: the save's block, or the gifts outside the save when there is no save yet
+struct MysteryGiftSave {
+    // A MysteryGiftSaveData, or a SaveOutsideGifts for MG_DATA_OUTSIDE
+    void *data;
+    u32 kind;
+    // The card's data outside the save, for MG_DATA_OUTSIDE
+    SaveOutside *outside;
+}; // size: 0xc
+
 void mgEncryptData(void *data, u32 kind);
 void mgDecryptData(void *data, u32 kind);
 
-// Loads the mystery gift save into a new buffer, and frees it. Function name from swan
-MysteryGiftSave *mysteryGiftBlock(SaveControl *save, u32 a1, HeapID heapId);
+// The size of the save's block and its init
+u32 func_0200a5f0(void);
+void func_0200a5f8(MysteryGiftSaveData *data);
+// Whether a card's kind is one of the gifts
+BOOL func_0200a628(u32 kind);
+// Loads the mystery gift save into a new buffer, and frees it. Function name from swan. Mode 1 takes the gifts
+// outside the save when there is no save yet; any other mode takes the save's block
+MysteryGiftSave *mysteryGiftBlock(SaveControl *save, u32 mode, HeapID heapId);
 void func_0200aa54(MysteryGiftSave *save);
+// The same, in a MysteryGiftSave of the caller's
+void func_0200aa74(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapID heapId);
+void func_0200aaec(MysteryGiftSave *save);
 // Copies the card in the slot into gift
 BOOL func_0200a71c(MysteryGiftSave *save, u32 slot, MysteryGift *gift);
 // Whether the slot has a card
@@ -123,7 +145,7 @@ BOOL func_0200a938(const MysteryGiftRecvData *data);
 // Starts and checks the save of the album
 void func_0200a9d4(MysteryGiftSave *save, GameData *gameData);
 u32 func_0200a9f4(MysteryGiftSave *save, GameData *gameData);
-// The number of card slots
+// The number of card slots, and the MG_DATA_* kind
 u32 func_0200aa64(MysteryGiftSave *save);
 u32 func_0200aa6c(MysteryGiftSave *save);
 

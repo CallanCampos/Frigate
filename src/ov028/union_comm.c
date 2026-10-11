@@ -494,7 +494,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     beacon->country = UnityTowerVisitor_GetCountry(unisys->param->playerInfo);
     beacon->province = UnityTowerVisitor_GetProvince(unisys->param->playerInfo);
     beacon->memberList = self->mycomm.memberList;
-    func_0200a3cc(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), beacon->unk50);
+    func_0200a3cc(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), &beacon->unk50);
     if (unisys->alloc.uniapp != NULL) {
         beacon->entryClosed = UnionApp_IsEntryClosed(unisys->alloc.uniapp);
     } else {

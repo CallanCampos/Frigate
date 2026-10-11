@@ -1264,10 +1264,10 @@ from:0x0200a9bc kind:thumb_call_arm to:0x0207894c module:main
 from:0x0200a9c6 kind:thumb_call_arm to:0x0207894c module:main
 from:0x0200a9cc kind:thumb_call to:0x0200ab9c module:main
 from:0x0200a9da kind:thumb_call to:0x0200aa6c module:main
-from:0x0200a9e4 kind:thumb_call to:0x021bec64 module:overlays(167,331)
+from:0x0200a9e4 kind:thumb_call to:0x021bec64 module:overlay(331)
 from:0x0200a9ec kind:thumb_call to:0x0201782c module:main
 from:0x0200a9fa kind:thumb_call to:0x0200aa6c module:main
-from:0x0200aa04 kind:thumb_call to:0x021becd8 module:overlays(260,331)
+from:0x0200aa04 kind:thumb_call to:0x021becd8 module:overlay(331)
 from:0x0200aa16 kind:thumb_call to:0x02017850 module:main
 from:0x0200aa32 kind:thumb_call to:0x0203a228 module:main
 from:0x0200aa3c kind:thumb_call_arm to:0x020787d4 module:main
