@@ -539,6 +539,17 @@ the original code is linked until they match. The differences are the same in bo
 | `src/ov302/zukan_common.c` | `ZukanCommon_BuildHabitatList` | `0x021ad8e0` / `0x021ad920` | Same size, 26 bytes: only the stack slots of the locals (`eventWork`, `arc`, `pokedex`, `index`, `habitatIndex`) differ. Tried: a search over the order of the declarations. |
 | `src/ov302/zukan_common.c` | `ZukanCommon_BuildHabitatSummary` | `0x021adae8` / `0x021adb28` | Same size, 15 bytes: only the stack slots of the locals differ. Tried: a search over the order of the declarations. |
 | `src/ov302/zukan_search_engine.c` | `ZukanSearchEngine_Step` | `0x021adf0c` / `0x021adf4c` | 8 bytes larger: the original reloads `engine->criteria` after each call and keeps `type1` in r7; ours keeps the criteria pointer in r7 and spills `type1`. Tried: a local `criteria` (6 callee-saved registers), a non-const field, grouping the type checks. |
+| `src/ov143/monolith_power_info.c` | `MonolithPowerInfo_Main` | `0x0219d430` / `0x0219d470` | 8 bytes long: the original keeps `work` and `state` in stack slots and the queue and print pointers in `r7` and `r5`. Tried queue and print locals, the flush inline, and casts of `work`. |
+| `src/ov143/monolith_power_info.c` | `MonolithPowerInfo_DrawDescription` | `0x0219d740` / `0x0219d780` | 5 bytes, register choice only (the base in `r1` against `r3`). Tried a getter, a local pointer, the compare swapped and a local level. |
+| `src/ov143/monolith_mission_select.c` | `MonolithMission_Main` | `0x0219daa8` / `0x0219dae8` | 6 bytes short, in the branch layout of state 12's join and the boot check. Tried flattening the end assignment. |
+| `src/ov143/monolith_mission_select.c` | `MonolithMission_CreateLevelButtons` | `0x0219f050` / `0x0219f090` | The original builds the `BmpOamActorSetup` field by field, with no `.rodata` template; assigning the fields gives the right data but the code in another order. |
+| `src/ov143/monolith_mission_select.c` | `MonolithMission_UpdateRows` | `0x0219ecf0` / `0x0219ed30` | 2 bytes: the registers of `i * 32` and `y`. Tried `i * 32 + y` in either order. |
+| `src/ov143/monolith_mission_select.c` | `MonolithMission_Input` | `0x0219e7ec` / `0x0219e82c` | 21 bytes, the order of the row and remainder calculations. |
+| `src/ov143/monolith_mission_select.c` | `MonolithMission_UpdateClearedIcons` | `0x0219efe0` / `0x0219f020` | 2 bytes: the order of `first` and the loop's indexing. |
+| `src/ov143/monolith_mission_select.c` | `MonolithMission_UpdateCheatCode` | `0x0219f4c8` / `0x0219f508` | 4 bytes: the order the key table is loaded in. |
+| `src/ov143/monolith_mission_info.c` | `MonolithMissionInfo_Main` | `0x0219f6fc` / `0x0219f73c` | 0x18 bytes short: the original keeps an `if (*state == 0)` whose branches both return `FALSE`, which MWCC folds in every form tried (`switch` and `if`). |
+| `src/ov143/monolith_mission_info.c` | `MonolithMissionInfo_DrawValue` | `0x0219fac0` / `0x0219fb00` | 11 bytes: registers and order around the `u16` conversions; the mission and level parameters are unused in the original. |
+| `src/ov143/monolith_mission_info.c` | `MonolithMissionInfo_DrawRecords` | `0x0219fc08` / `0x0219fc48` | 4 bytes long: registers and order. |
 
 ## Matching, but not linkable as is
 

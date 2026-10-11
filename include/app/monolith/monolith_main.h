@@ -138,9 +138,4 @@ struct MonolithWork {
     u32 barChar;
 };
 
-// The procs of the screens, in their files
-extern const GameProcFunctions data_ov143_021a0134;
-extern const GameProcFunctions data_ov143_021a01e4;
-extern const GameProcFunctions data_ov143_021a0388;
-
 #endif // POKEBW2_APP_MONOLITH_MONOLITH_MAIN_H

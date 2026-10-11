@@ -38,13 +38,15 @@ u32 PassPower_ApplyLuckyEncProb(u32 row);
 u16 PassPower_ApplyExploring(u16 steps);
 u32 PassPower_ApplyExploringChance(u32 chance);
 // A pass power of the table that PassPowerData_Create reads: the two levels it is unlocked by, White then Black,
-// and its name in message file 263
+// its name in message file 263 and its description in message file 264
 typedef struct {
     u8 level1;
     u8 level2;
-    u8 unk02[2];
+    // A number that the description shows
+    u16 unk02;
     u16 name;
-    u8 unk06[6];
+    u16 info;
+    u8 unk08[4];
 } PassPowerData;
 
 // What func_02017208 returns: the Entralink's two levels, White then Black
