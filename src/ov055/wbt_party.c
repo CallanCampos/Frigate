@@ -3,7 +3,7 @@
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
 #include "field/bsubway_scr.h"
-#include "field/ov134.h"
+#include "field/wbt_battle.h"
 #include "field/wbt.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -111,7 +111,7 @@ void func_ov055_021e6c20(WbtPartyFilter *filter, u16 species) {
     }
 }
 
-void func_ov055_021e6c44(WbtPartyFilter *filter, u16 file) {
+void func_ov055_021e6c44(WbtPartyFilter *filter, s16 file) {
     int i;
 
     for (i = 0; i < filter->fileCount; i++) {
@@ -357,7 +357,7 @@ void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 pla
 void func_ov055_021e71ec(WbtSystem *sys) {
     u32 count = func_ov055_021e5d7c(sys);
     int n = PokeParty_GetPkmCount(sys->partyBC);
-    u8 a3 = func_ov055_021e5e18(func_ov134_021f0724(sys));
+    u8 a3 = func_ov055_021e5e18(WbtBattle_GetOpponent(sys));
     u16 species[6];
     int i;
 

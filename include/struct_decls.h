@@ -65,6 +65,8 @@ typedef struct GameBeaconSystem GameBeaconSystem;
 typedef struct GSyncDisp GSyncDisp;
 typedef struct GSyncDownload GSyncDownload;
 typedef struct GSyncMessage GSyncMessage;
+typedef struct InfinityDungeon InfinityDungeon;
+typedef struct InfinityDungeonRoomChange InfinityDungeonRoomChange;
 typedef struct PdwAccDisp PdwAccDisp;
 typedef struct PdwAccMessage PdwAccMessage;
 typedef struct BagSave BagSave;

@@ -1,10 +1,10 @@
 #include "types.h"
 #include "field/app_call.h"
-#include "field/black_tower_gimmick.h"
 #include "field/event_action_call.h"
 #include "field/event_save.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/inf_dungeon_retire.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "system/game_data.h"
@@ -46,7 +46,7 @@ GameEventReturnCode EventSave_Callback(GameEvent *event, u32 *state, void *data)
 
 void func_ov012_0215c574(FieldAppCallWork *work, s32 appParam) {
     FieldAppCallInput *input = work->input;
-    GameEvent *event = func_ov127_021f1c80(input->gameSystem, input->field, input->screenId, &work->result);
+    GameEvent *event = InfDungeonRetire_CreateEvent(input->gameSystem, input->field, input->screenId, &work->result);
     GameEvent_ChainNext(work->event, event);
 }
 

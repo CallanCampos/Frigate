@@ -1,4 +1,0 @@
-ResortNpc_Text_QuitAreaReturnLobby = Quit this area and return to the lobby?
-ResortNpc_Text_Yes = YES
-ResortNpc_Text_No = NO
-\pad{74}

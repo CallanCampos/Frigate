@@ -589,7 +589,7 @@ u16 func_ov012_02162b28(u32 arcId, u16 file, HeapID heapId) {
     return trainerClass;
 }
 
-u32 func_ov012_02162b38(u16 trainerClass) {
+u32 func_ov012_02162b38(u32 trainerClass) {
     u32 i;
 
     for (i = 0; i < NELEMS(data_ov012_0216d9b4); i++) {

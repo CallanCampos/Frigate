@@ -21,7 +21,7 @@ typedef struct {
 } BSubwayPokemonData;
 
 // What a trainer class gives, for the Trial House and Battle Subway
-u32 func_ov012_02162b38(u16 trainerClass);
+u32 func_ov012_02162b38(u32 trainerClass);
 // Loads the trainer of the file, and count Pokémon for it, none of species and none holding items
 BOOL func_ov012_02162864(BSubwayTrainer *trainer, u16 trainerId, u32 count, const u16 *species, const u16 *items,
                          BSubwayTeamConfig *config, HeapID heapId);

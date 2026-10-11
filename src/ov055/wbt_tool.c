@@ -285,7 +285,7 @@ u16 func_ov055_021e67b8(u32 tournament) {
     return sUnk5Messages[func_ov036_021c98a4(tournament)->unk5];
 }
 
-u8 func_ov055_021e67cc(u32 tournament, int style) {
+u32 func_ov055_021e67cc(u32 tournament, int style) {
     int index = func_ov055_021e647c(style);
 
     return func_ov036_021c98a4(tournament)->battlePoints[index];
