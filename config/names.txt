@@ -18,6 +18,7 @@
 . 0x02008b08 PlayerInfo_GetSize
 . 0x02008dd0 SaveControl_GetPlayerInfo
 . 0x02009a0c DreamWorldSave_IsPokemonAsleep
+. 0x02009c40 setForeignRegionMet
 . 0x0200a3dc WifiList_GetMyGSID
 . 0x0200b488 SaveControl_GetWorldTradeData
 . 0x0200b50c Regulation_Create

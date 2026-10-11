@@ -1115,7 +1115,7 @@ static void Upload_MakeTradeExchangeInfo(WorldTradeWork *wk, PartyPkm *received,
     visitor.receivedSpecies = PokeParty_GetParam(received, PKM_PARAM_SPECIES, NULL);
     visitor.hobby = trData->unk126;
     visitor.unk26_0 = trData->unkF7;
-    visitor.unk25 = trData->unk127;
+    visitor.countryCount = trData->unk127;
     UnityTowerSurvey_RegisterTrade(wk->param->wifihistory, &visitor);
     GFL_HeapFree(visitorInfo);
 

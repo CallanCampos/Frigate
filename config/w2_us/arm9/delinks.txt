@@ -1127,6 +1127,10 @@ src/system/dream_world_savedata.c:
     complete
     .text       start:0x02009930 end:0x02009b5c
 
+src/system/unity_tower_savedata.c:
+    complete
+    .text       start:0x02009b5c end:0x02009ed8
+
 src/system/version.c:
     complete
     .text       start:0x02015878 end:0x0201587c

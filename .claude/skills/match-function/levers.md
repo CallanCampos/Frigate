@@ -233,6 +233,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
 - A loop that runs once is unrolled when its counter and bound have the same signedness; `int i < NELEMS(x)` compares
   unsigned and keeps the loop. (matching.md: "loop that runs once")
+- `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
+  `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
   (matching.md: "inner loop computes"), (matching.md: "preheader")
 - Enum counters keep their guard (see above).
