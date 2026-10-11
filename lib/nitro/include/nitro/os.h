@@ -23,6 +23,8 @@ void cp15_flushDC(const void *addr, u32 size);
 void cp15_invalidateDC(void *addr, u32 size);
 // Writes a range of the data cache back to memory, keeping it cached. NitroSDK's DC_StoreRange
 void cp15_cleanDC(const void *addr, u32 size);
+// Waits until the write buffer is empty
+void cp15_drainWriteBuffer(void);
 
 // The start of DTCM, where the linker places the DTCM module
 extern u32 SDK_AUTOLOAD_DTCM_START[];
@@ -93,6 +95,41 @@ int func_0207f7cc(char *dst, const char *src, int size);
 int func_020800e8(char *dst, const char *fmt, ...);
 // TwlSDK's OS_SpinWaitSysCycles: busy-waits for some cycles of the system clock
 void func_0207c160(u32 cycles);
+
+// The ROM header of the running program, which the card puts at the end of main memory. Only the fields that
+// NitroSDK's multiboot library reads are named
+typedef struct ROMHeader {
+    u8 unk_00[0x12];
+    u8 unitCode;
+    u8 unk_13[0xd];
+    u32 arm9RomOffset;
+    u32 arm9Entry;
+    u32 arm9RamAddr;
+    u32 arm9Size;
+    u32 arm7RomOffset;
+    u32 arm7Entry;
+    u32 arm7RamAddr;
+    u32 arm7Size;
+    u8 unk_40[0x20];
+    u32 unk_60;
+    u8 unk_64[0x1c];
+    u32 romSize;
+    u8 unk_84[0xdc];
+} ROMHeader;
+
+// Gives the ROM header in main memory
+const ROMHeader *rom_get_header(void);
+// The TWL header that the DSi's system puts in main memory
+const void *func_0206eee8(void);
+// A saved copy of 0x88 bytes that the card read after the ROM header
+const void *func_0206fed0(void);
+// An empty function that the program's autoload step calls
+void AutoloadCallback(void);
+// Whether a bit of a word of the shared memory is set, which the other processor sets for a FIFO tag once it is
+// ready for it
+BOOL func_0207ca48(u32 fifoTag, u32 processor);
+// Reads the console's MAC address
+void func_0207c33c(u8 *mac);
 
 // NitroSDK's OS_WaitIrq and OS_IsRunOnTwl, under swan's names
 void irq_waitFor(BOOL clear, u32 interrupts);
@@ -195,6 +232,10 @@ void scheduler_init_thread(OSThread *thread, void (*func)(void *), void *arg, vo
 void scheduler_yield(OSThreadQueue *queue);
 void OS_WakeupThread(OSThreadQueue *queue);
 void scheduler_start_thread(OSThread *thread);
+// Sets and gets a thread's priority, and ends the running thread (which does not return)
+BOOL func_0207a998(OSThread *thread, u32 priority);
+u32 func_0207aa00(const OSThread *thread);
+void scheduler_thread_exit_proc(void);
 // NitroSDK's OS_IsThreadTerminated, under swan's name, and OS_DestroyThread, by its code
 BOOL scheduler_is_thread_ended(const OSThread *thread);
 void func_0207a710(OSThread *thread);

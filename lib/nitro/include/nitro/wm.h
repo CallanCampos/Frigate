@@ -142,12 +142,52 @@ typedef struct {
     u16 linkLevel[16];
 } WMStartScanExCallback;
 
+// What a parent received from one child in a round of the multi-point mode: the length of the data, which is 0xffff if
+// the child sent none, the child's AID, and the data
+typedef struct {
+    u16 length;
+    u16 unk_02;
+    u16 aid;
+    u8 unk_06[4];
+    u8 data[];
+} WMMpRecvData;
+
+// The buffer that the multi-point mode receives into: the number of children it has room for and the size of the room
+// of each
+typedef struct {
+    u8 unk_00[4];
+    u16 count;
+    u16 entrySize;
+    u8 unk_08[2];
+    u8 entries[];
+} WMMpRecvBuf;
+
 // The callback of the start of the multi-point mode
 typedef struct {
     u16 apiid;
     u16 errcode;
     u16 state;
+    u16 padding;
+    WMMpRecvBuf *recvBuf;
 } WMStartMPCallback;
+
+// The callback of a disconnection: the AIDs that are gone
+typedef struct {
+    u16 apiid;
+    u16 errcode;
+    u16 unk_04;
+    u16 unk_06;
+    u16 unk_08;
+    u16 goneAidBitmap;
+} WMDisconnectCallback;
+
+// What the indication callback gets
+typedef struct {
+    u16 apiid;
+    u16 errcode;
+    u16 state;
+    u16 unk_06;
+} WMIndCallback;
 
 // The callback of the child's connection: the parent's answer and the child's AID
 typedef struct {
@@ -209,10 +249,18 @@ int func_020813d0(void *wmBuf, WMCallbackFunc callback, u16 dmaNo, int extra); /
 int func_02081424(WMCallbackFunc callback);                                    // WM_Reset
 int func_02081448(WMCallbackFunc callback);                                    // WM_End
 int func_02081474(WMCallbackFunc callback, WMParentParam *param);              // WM_SetParentParameter
+// The data that a child sent in a round of the multi-point mode, or NULL
+const WMMpRecvData *func_02081040(const WMMpRecvBuf *recvBuf, u16 aid);
+// The calls that start the parent: apiids 8 and 0x19, each with a flag
+int func_02081544(WMCallbackFunc callback, int enable);
+int func_0208252c(WMCallbackFunc callback, int enable);
 int func_02081594(WMCallbackFunc callback);                                    // WM_StartParent
 int func_020815a0(WMCallbackFunc callback);                                    // WM_EndParent
 int func_020815c8(WMCallbackFunc callback, WMScanExParam *param);              // WM_StartScanEx
 int func_020816b4(WMCallbackFunc callback);                                    // WM_EndScan
+// Starts the multi-point mode: like func_0208195c, with five more parameters
+int func_020818f8(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
+                  u16 unk6, u16 unk7, u16 unk8, u16 unk9, u16 unk10);
 // WM_StartConnectEx
 int func_020816dc(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave, u16 authMode);
 int func_02081774(WMCallbackFunc callback, u16 aid); // WM_Disconnect

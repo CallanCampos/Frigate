@@ -105,15 +105,21 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
 
 
 # Files of a library built with other flags than the rest of it, from file_flags in its library.toml: each flag
-# replaces the library's flag of the same option ("-ipa function" replaces "-ipa file")
+# replaces the library's flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb")
 FILE_FLAGS: dict[str, list[str]] = {}
+
+
+def flag_option(flag: str) -> str:
+    """Returns the option a compiler flag sets: its first word, with -thumb and -nothumb as one option."""
+    option = flag.split()[0]
+    return "-thumb" if option == "-nothumb" else option
 
 
 def file_flags(source: Path, flags: list[str]) -> list[str]:
     """Returns the flags of a library's source file: the library's, with the file's own in place of the same options."""
     overrides = FILE_FLAGS.get((ROOT / source).resolve().relative_to(ROOT).as_posix(), [])
-    options = {flag.split()[0] for flag in overrides}
-    return [flag for flag in flags if flag.split()[0] not in options] + overrides
+    options = {flag_option(flag) for flag in overrides}
+    return [flag for flag in flags if flag_option(flag) not in options] + overrides
 
 
 LIBRARIES = load_libraries()

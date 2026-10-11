@@ -7,8 +7,15 @@
 // NitroSDK's file system, under swan's names: FS_InitFile, FS_OpenFile, FS_GetLength, FS_ReadFile, FS_CloseFile,
 // FS_SeekFile, and FS_CreateFileFromMemory, which opens a file over memory
 
+// A file system's archive, such as "rom". Only its name, the first field, is known
+typedef struct FSArchive {
+    char name[4];
+} FSArchive;
+
 typedef struct {
-    u8 data[0x48];
+    u8 unk_00[8];
+    FSArchive *arc;
+    u8 unk_0c[0x3c];
 } FSFile;
 
 void finit(FSFile *file);
@@ -18,12 +25,19 @@ s32 romfs_fread(FSFile *file, void *dest, s32 size);
 BOOL romfs_fclose(FSFile *file);
 BOOL romfs_fseek(FSFile *file, s32 offset, int whence);
 BOOL extfs_fopen(FSFile *file, const void *data, u32 size);
+// The position in the file
+u32 romfs_ftell(FSFile *file);
+// Opens a file that is a range of an archive's data, from start to end
+BOOL fopen_raw(FSFile *file, FSArchive *archive, u32 start, u32 end, int fileId);
+// The archive of a name of the given length, or NULL
+FSArchive *func_0207062c(const char *name, int nameLength);
+// A field of the file: where its data starts in its archive
+u32 func_02072010(const FSFile *file);
 
 #define FS_SEEK_SET 0
 
 // A file by archive and number: NitroSDK's FS_ConvertPathToFileID and FS_OpenFileFast, and FS_OpenFileEx (which
 // opens with a mode), under swan's names
-typedef struct FSArchive FSArchive;
 
 typedef struct FSFileID {
     FSArchive *arc;

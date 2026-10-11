@@ -550,6 +550,44 @@ the original code is linked until they match. The differences are the same in bo
 | `src/ov143/monolith_mission_info.c` | `MonolithMissionInfo_Main` | `0x0219f6fc` / `0x0219f73c` | 0x18 bytes short: the original keeps an `if (*state == 0)` whose branches both return `FALSE`, which MWCC folds in every form tried (`switch` and `if`). |
 | `src/ov143/monolith_mission_info.c` | `MonolithMissionInfo_DrawValue` | `0x0219fac0` / `0x0219fb00` | 11 bytes: registers and order around the `u16` conversions; the mission and level parameters are unused in the original. |
 | `src/ov143/monolith_mission_info.c` | `MonolithMissionInfo_DrawRecords` | `0x0219fc08` / `0x0219fc48` | 4 bytes long: registers and order. |
+| `lib/nitro/src/mb/mb_cache.c` | `MBCache_Read` | `0x021a3b78` / `0x021a3bb8` | +4 bytes (0x60 against the original's 0x5c). The original compares the entry's fields in another order. |
+| `lib/nitro/src/mb/mb_comm.c` | `MBComm_ProcessChildFrame` | `0x021a0dd0` / `0x021a0e10` | -8 bytes (0x308 against the original's 0x310). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_comm.c` | `MBComm_LoadCacheBlock` | `0x021a1290` / `0x021a12d0` | 8 bytes, same size. Registers only: the original keeps the second digest region's end in `r0` and the offset plus size in `r2`, ours the other way round. Tried local sums, inline sums and a precomputed end. |
+| `lib/nitro/src/mb/mb_comm.c` | `MBComm_SendBlock` | `0x021a1344` / `0x021a1384` | 166 bytes, same size. Same size: the registers after the segment lookup (the cache pointer and the table offset) differ. |
+| `lib/nitro/src/mb/mb_comm.c` | `MBComm_AdvanceSendCursor` | `0x021a1600` / `0x021a1640` | +8 bytes (0x74 against the original's 0x6c). The original reads the entry through one address register, ours recomputes it. |
+| `lib/nitro/src/mb/mb_comm.c` | `MBComm_OnWmEvent` | `0x021a0ab8` / `0x021a0af8` | -32 bytes (0x2f8 against the original's 0x318). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_frame.c` | `MBFrame_IsComplete` | `0x021a4000` / `0x021a4040` | +4 bytes (0x44 against the original's 0x40). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_frame.c` | `MBFrame_Store` | `0x021a3f9c` / `0x021a3fdc` | -8 bytes (0x5c against the original's 0x64). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_frame.c` | `MBFrame_Encode` | `0x021a3ea4` / `0x021a3ee4` | -6 bytes (0x46 against the original's 0x4c). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_frame.c` | `MBFrame_Decode` | `0x021a3ef0` / `0x021a3f30` | 136 bytes, same size. Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_gameinfo.c` | `MBGameInfo_Checksum` | `0x021a2040` / `0x021a2080` | -4 bytes (0x2c against the original's 0x30). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_gameinfo.c` | `MBGameInfo_PickRecord` | `0x021a22c8` / `0x021a2308` | -4 bytes (0x6c against the original's 0x70). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_gameinfo.c` | `MBGameInfo_SendFragment` | `0x021a2374` / `0x021a23b4` | -8 bytes (0xf0 against the original's 0xf8). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_gameinfo.c` | `MBGameInfo_SendMembers` | `0x021a2490` / `0x021a24d0` | 289 bytes, same size. Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_gameinfo.c` | `MBGameInfo_Build` | `0x021a2070` / `0x021a20b0` | 83 bytes, same size. Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_gameinfo.c` | `MBGameInfo_Send` | `0x021a226c` / `0x021a22ac` | 31 bytes, same size. Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MBFile_InitSegments` | `0x021a1cb8` / `0x021a1cf8` | -8 bytes (0x48 against the original's 0x50). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MBFile_SetupSegment` | `0x021a1d08` / `0x021a1d48` | -24 bytes (0xe0 against the original's 0xf8). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MBFile_IsRecvArea` | `0x021a1f8c` / `0x021a1fcc` | -8 bytes (0x84 against the original's 0x8c). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MBFile_IsSegmentArea` | `0x021a1f10` / `0x021a1f50` | +8 bytes (0x84 against the original's 0x7c). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MB_ReadSegment` | `0x021a16f0` / `0x021a1730` | +4 bytes (0x3b4 against the original's 0x3b0). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MB_RegisterFile` | `0x021a1af4` / `0x021a1b34` | -48 bytes (0x194 against the original's 0x1c4). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MBFile_BuildLayout` | `0x021a1e00` / `0x021a1e40` | -8 bytes (0x90 against the original's 0x98). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MBFile_LocateBlock` | `0x021a1e98` / `0x021a1ed8` | -8 bytes (0x70 against the original's 0x78). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_segment.c` | `MBComm_FlushAndSend` | `0x021a2018` / `0x021a2058` | +2 bytes (0x28 against the original's 0x26). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_task.c` | `MBTask_ThreadMain` | `0x021a3bd4` / `0x021a3c14` | -28 bytes (0xac against the original's 0xc8). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_task.c` | `MBTask_StartThread` | `0x021a3c9c` / `0x021a3cdc` | 33 bytes, same size. Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_task.c` | `MBTask_Add` | `0x021a3d28` / `0x021a3d68` | -4 bytes (0xe8 against the original's 0xec). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_NextChannel` | `0x021a2654` / `0x021a2694` | -2 bytes (0x40 against the original's 0x42). The original increments the counter before the channel step and narrows the shifted value to 16 bits once more. Tried a `for` and a `do`/`while`. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_CanSend` | `0x021a2698` / `0x021a26d8` | 4 bytes, same size. Registers only: which of two registers holds the work pointer and which a zero. Tried the order of the three `BOOL`s. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_ParentCallback` | `0x021a2754` / `0x021a2794` | -12 bytes (0x4e8 against the original's 0x4f4). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_ChildCallback` | `0x021a2c8c` / `0x021a2ccc` | -148 bytes (0x668 against the original's 0x6fc). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_RandomBeaconPeriod` | `0x021a3388` / `0x021a33c8` | 9 bytes, same size. The original pushes only `r4` and `lr` and keeps the sum in `r1` and the index in `r2`. Tried the declaration order. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_Start` | `0x021a3650` / `0x021a3690` | -8 bytes (0x13c against the original's 0x144). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_wm.c` | `MB_Init` | `0x021a33bc` / `0x021a33fc` | 67 bytes, same size. Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_wm.c` | `MB_DisconnectChild` | `0x021a3874` / `0x021a38b4` | +4 bytes (0x130 against the original's 0x12c). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_SendToChildren` | `0x021a39dc` / `0x021a3a1c` | -12 bytes (0xa0 against the original's 0xac). Not examined past the first difference yet. |
+| `lib/nitro/src/mb/mb_wm.c` | `MBWm_GetAttribute` | `0x021a3aa0` / `0x021a3ae0` | 19 bytes, same size. Not examined past the first difference yet. |
 
 ## Matching, but not linkable as is
 
