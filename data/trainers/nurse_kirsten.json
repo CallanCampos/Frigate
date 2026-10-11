@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kirsten",
+    "class": "TRAINER_CLASS_NURSE",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_HEAL" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_FULL_RESTORE",
+    "party": [
+        {
+            "species": "SPECIES_CHANSEY",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You are energetic!\nI will punish lazy children!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You just don't quit!\nYou are so energetic!"
+        },
+        {
+            "type": 15,
+            "text": "OK! An energetic Trainer!\nTake this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Nurses need plenty of stamina,\nboth day and night!"
+        }
+    ]
+}

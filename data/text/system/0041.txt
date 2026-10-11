@@ -1,7 +1,7 @@
-             \x{ffff}
-    \x{ffff}
-             \x{ffff}
-Saving...\nDon't turn off the power.
-{0100:0} saved the game.
-There is already a saved game file.\nIt is impossible to save.
+Bank0041_Text_Empty =              \x{ffff}
+Bank0041_Text_Empty_2 =     \x{ffff}
+Bank0041_Text_Empty_3 =              \x{ffff}
+Bank0041_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+Bank0041_Text_SavedGame = {0100:0} saved the game.
+Bank0041_Text_ThereAlreadySavedGame = There is already a saved game file.\nIt is impossible to save.
 \pad{ee}

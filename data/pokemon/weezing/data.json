@@ -1,0 +1,163 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Weezing",
+    "pokedex": {
+        "category": "Poison Gas Pokémon",
+        "entry": "Inhaling toxic fumes from trash\nand mixing them inside its body\nlets it spread an even fouler stench.",
+        "height": "3'11\"",
+        "weight": "20.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Weezing",
+                "category": "Poison Gas Pokémon",
+                "entry": "It grows by feeding on gases\nreleased by garbage. Though very\nrare, triplets have been found.",
+                "height": "3'11\"",
+                "weight": "20.9 lbs."
+            },
+            "fr": {
+                "name": "Smogogo",
+                "category": "Pokémon Gaz Mortel",
+                "entry": "Il grandit en absorbant les gaz des\ndétritus. Des triplés existent, bien\nqu'ils soient fort rares.",
+                "height": "1,2 m",
+                "weight": "9,5 kg"
+            },
+            "de": {
+                "name": "Smogmog",
+                "category": "Giftwolke",
+                "entry": "Es wächst, indem es Gase aufnimmt,\ndie aus dem Müll aufsteigen. Selten\nkann man Drillinge von ihnen finden.",
+                "height": "1,2 m",
+                "weight": "9,5 kg"
+            },
+            "it": {
+                "name": "Weezing",
+                "category": "Pokémon Velenuvola",
+                "entry": "Cresce nutrendosi dei gas emanati\ndai rifiuti. Anche se rarissimi, ne\nhanno trovati in gruppi di tre.",
+                "height": "1,2 m",
+                "weight": "9,5 kg"
+            },
+            "ko": {
+                "name": "또도가스",
+                "category": "독가스포켓몬",
+                "entry": "쓰레기에서 발생한 가스를\n먹고 자라게 된다. 극히 드물게\n3개가 이어진 또도가스가 발견된다.",
+                "height": "1.2 m",
+                "weight": "9.5 kg"
+            },
+            "es": {
+                "name": "Weezing",
+                "category": "Pokémon Gas Veneno",
+                "entry": "Crece alimentándose de los gases\nemanados por la basura. Se han\ndado raros casos de trillizos.",
+                "height": "1,2 m",
+                "weight": "9,5 kg"
+            },
+            "ja": {
+                "name": "マタドガス",
+                "category": "どくガスポケモン",
+                "entry": "ゴミから\\x{3000}はっせいする\\x{3000}ガスを\nたべて\\x{3000}おおきくなる。ごくまれに\n\\x{ff13}つごの\\x{3000}マタドガスが\\x{3000}みつかる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 90,
+        "defense": 120,
+        "speed": 60,
+        "special_attack": 85,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_POISON", "TYPE_POISON" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_SMOKE_BALL",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 172,
+    "height": 12,
+    "weight": 95,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POISON_GAS" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_SMOG" ],
+            [ 1, "MOVE_SMOKE_SCREEN" ],
+            [ 4, "MOVE_SMOG" ],
+            [ 7, "MOVE_SMOKE_SCREEN" ],
+            [ 12, "MOVE_ASSURANCE" ],
+            [ 15, "MOVE_CLEAR_SMOG" ],
+            [ 18, "MOVE_SLUDGE" ],
+            [ 23, "MOVE_SELFDESTRUCT" ],
+            [ 26, "MOVE_HAZE" ],
+            [ 29, "MOVE_DOUBLE_HIT" ],
+            [ 34, "MOVE_SLUDGE_BOMB" ],
+            [ 40, "MOVE_EXPLOSION" ],
+            [ 46, "MOVE_DESTINY_BOND" ],
+            [ 54, "MOVE_MEMENTO" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM35",
+            "TM36",
+            "TM38",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM59",
+            "TM61",
+            "TM64",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM74",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [ "MOVE_UPROAR", "MOVE_DARK_PULSE", "MOVE_SNORE", "MOVE_PAIN_SPLIT", "MOVE_SPITE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 47,
+    "baby_species": "SPECIES_KOFFING"
+}

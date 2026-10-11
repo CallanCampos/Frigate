@@ -1,52 +1,52 @@
-Peeks
-Mr. Sal
-Splashy
-Rush
-Panny
-Flyerl
-Burns
-Redbelt
-Rocky
-Damaril
-Seeliet
-Gothie
-Cheena
-Peabean
-Zebrite
-Meezie
-Tuilerie
-Sagz
-Duckie
-Burnape
-Brother
-Peerz
-Oinklot
-Scrub
-Bravo
-Dilly
-Ivee
-Hitalot
-Singey
-Badguy
-Wottson
-Broilin
-Lilli
-Michee
-Gothica
-Bonfire
-Sprink
-Lissner
-Servin
-Quale
-Bigator
-Flare
-Woody
-Virgil
-Ribbito
-Rythear
-Mamma
-Chirina
-Fauna
-Duchess
-Typhoon
+Bank0098_Text_Peeks = Peeks
+Bank0098_Text_MrSal = Mr. Sal
+Bank0098_Text_Splashy = Splashy
+Bank0098_Text_Rush = Rush
+Bank0098_Text_Panny = Panny
+Bank0098_Text_Flyerl = Flyerl
+Bank0098_Text_Burns = Burns
+Bank0098_Text_Redbelt = Redbelt
+Bank0098_Text_Rocky = Rocky
+Bank0098_Text_Damaril = Damaril
+Bank0098_Text_Seeliet = Seeliet
+Bank0098_Text_Gothie = Gothie
+Bank0098_Text_Cheena = Cheena
+Bank0098_Text_Peabean = Peabean
+Bank0098_Text_Zebrite = Zebrite
+Bank0098_Text_Meezie = Meezie
+Bank0098_Text_Tuilerie = Tuilerie
+Bank0098_Text_Sagz = Sagz
+Bank0098_Text_Duckie = Duckie
+Bank0098_Text_Burnape = Burnape
+Bank0098_Text_Brother = Brother
+Bank0098_Text_Peerz = Peerz
+Bank0098_Text_Oinklot = Oinklot
+Bank0098_Text_Scrub = Scrub
+Bank0098_Text_Bravo = Bravo
+Bank0098_Text_Dilly = Dilly
+Bank0098_Text_Ivee = Ivee
+Bank0098_Text_Hitalot = Hitalot
+Bank0098_Text_Singey = Singey
+Bank0098_Text_Badguy = Badguy
+Bank0098_Text_Wottson = Wottson
+Bank0098_Text_Broilin = Broilin
+Bank0098_Text_Lilli = Lilli
+Bank0098_Text_Michee = Michee
+Bank0098_Text_Gothica = Gothica
+Bank0098_Text_Bonfire = Bonfire
+Bank0098_Text_Sprink = Sprink
+Bank0098_Text_Lissner = Lissner
+Bank0098_Text_Servin = Servin
+Bank0098_Text_Quale = Quale
+Bank0098_Text_Bigator = Bigator
+Bank0098_Text_Flare = Flare
+Bank0098_Text_Woody = Woody
+Bank0098_Text_Virgil = Virgil
+Bank0098_Text_Ribbito = Ribbito
+Bank0098_Text_Rythear = Rythear
+Bank0098_Text_Mamma = Mamma
+Bank0098_Text_Chirina = Chirina
+Bank0098_Text_Fauna = Fauna
+Bank0098_Text_Duchess = Duchess
+Bank0098_Text_Typhoon = Typhoon
 \pad{5e}

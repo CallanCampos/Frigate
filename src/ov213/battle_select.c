@@ -4,7 +4,7 @@
 #include "app/pokelist.h"
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
-#include "gfl/dwc_rap.h"
+#include "gfl/dwc_rapcommon.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_command.h"
@@ -172,7 +172,7 @@ static BOOL BattleSelect_Main(GameProc *proc, u32 *state, void *param, void *wor
 
     // Outside the screens, a lost connection ends the selection
     if (func_02042788() && wk->state != 1 && wk->state != 2 && wk->state != 4 && wk->state != 5) {
-        if (func_ov011_02152404(1, 1)) {
+        if (DWCRapCommon_CheckError(1, 1)) {
             select->result = 1;
             return TRUE;
         }

@@ -1,0 +1,189 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Rampardos",
+    "pokedex": {
+        "category": "Head Butt Pokémon",
+        "entry": "If two were to smash their heads\ntogether, their foot-thick skulls\nwould keep them from fainting.",
+        "height": "5'03\"",
+        "weight": "226.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Rampardos",
+                "category": "Head Butt Pokémon",
+                "entry": "If two were to smash their heads\ntogether, their foot-thick skulls\nwould keep them from fainting.",
+                "height": "5'03\"",
+                "weight": "226.0 lbs."
+            },
+            "fr": {
+                "name": "Charkos",
+                "category": "Pokémon Coud'Boule",
+                "entry": "Quand deux Charkos se rentrent\ndedans, leur crâne extrêmement\népais les empêche de s'assommer.",
+                "height": "1,6 m",
+                "weight": "102,5 kg"
+            },
+            "de": {
+                "name": "Rameidon",
+                "category": "Kopfstoß",
+                "entry": "Schlagen zwei von ihnen mit den\nKöpfen zusammen, verhindern ihre\ndicken Schädel eine Ohnmacht.",
+                "height": "1,6 m",
+                "weight": "102,5 kg"
+            },
+            "it": {
+                "name": "Rampardos",
+                "category": "Pokémon Cranioso",
+                "entry": "Anche se si prendono a testate, due\nRampardos non vanno KO perché il loro\ncranio è molto spesso.",
+                "height": "1,6 m",
+                "weight": "102,5 kg"
+            },
+            "ko": {
+                "name": "램펄드",
+                "category": "박치기포켓몬",
+                "entry": "머리로 격렬하게 치고받아도\n두개골은 두께가 30cm나 되기에\n기절하거나 하지 않는다.",
+                "height": "1.6 m",
+                "weight": "102.5 kg"
+            },
+            "es": {
+                "name": "Rampardos",
+                "category": "Pokémon Cabezazo",
+                "entry": "Su cráneo es de 30 cm de grosor.\nSi dos de ellos se dan un cabezazo,\nno les ocurrirá nada.",
+                "height": "1,6 m",
+                "weight": "102,5 kg"
+            },
+            "ja": {
+                "name": "ラムパルド",
+                "category": "ずつきポケモン",
+                "entry": "あたまを\\x{3000}はげしく\\x{3000}ぶつけあっても\nずがいこつは\\x{3000}あつさ\\x{3000}\\x{ff13}\\x{ff10}センチも\nあるので\\x{3000}きぜつ\\x{3000}したりしない。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff12}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 97,
+        "attack": 165,
+        "defense": 60,
+        "speed": 58,
+        "special_attack": 65,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_MOLD_BREAKER", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHEER_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 16,
+    "weight": 1025,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 1, "MOVE_LEER" ],
+            [ 6, "MOVE_FOCUS_ENERGY" ],
+            [ 10, "MOVE_PURSUIT" ],
+            [ 15, "MOVE_TAKE_DOWN" ],
+            [ 19, "MOVE_SCARY_FACE" ],
+            [ 24, "MOVE_ASSURANCE" ],
+            [ 28, "MOVE_CHIP_AWAY" ],
+            [ 30, "MOVE_ENDEAVOR" ],
+            [ 36, "MOVE_ANCIENT_POWER" ],
+            [ 43, "MOVE_ZEN_HEADBUTT" ],
+            [ 51, "MOVE_SCREECH" ],
+            [ 58, "MOVE_HEAD_SMASH" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM66",
+            "TM68",
+            "TM69",
+            "TM71",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM82",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_EARTH_POWER",
+            "MOVE_SUPERPOWER",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SPITE",
+            "MOVE_ENDEAVOR",
+            "MOVE_OUTRAGE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CRANIDOS"
+}

@@ -1,0 +1,182 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Linoone",
+    "pokedex": {
+        "category": "Rushing Pokémon",
+        "entry": "It charges prey at speeds over\n60 mph. However, because it can\nonly run straight, it often fails.",
+        "height": "1'08\"",
+        "weight": "71.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Linoone",
+                "category": "Rushing Pokémon",
+                "entry": "It charges prey at speeds over\n60 mph. However, because it can\nonly run straight, it often fails.",
+                "height": "1'08\"",
+                "weight": "71.6 lbs."
+            },
+            "fr": {
+                "name": "Linéon",
+                "category": "Pokémon Fonceur",
+                "entry": "Il fonce sur sa proie à plus de 100 km/h.\nMais il ne peut pas dévier sa course\net loupe souvent sa cible.",
+                "height": "0,5 m",
+                "weight": "32,5 kg"
+            },
+            "de": {
+                "name": "Geradaks",
+                "category": "Sprinter",
+                "entry": "Es stürzt sich mit 100 km/h auf Beute.\nAber es kann nur geradeaus laufen\nund die Jagd misslingt oft.",
+                "height": "0,5 m",
+                "weight": "32,5 kg"
+            },
+            "it": {
+                "name": "Linoone",
+                "category": "Pokémon Sfrecciante",
+                "entry": "Carica la preda ad una velocità di\n100 km/h. Ma dal momento che va\nsolo dritto, sbaglia spesso.",
+                "height": "0,5 m",
+                "weight": "32,5 kg"
+            },
+            "ko": {
+                "name": "직구리",
+                "category": "돌진포켓몬",
+                "entry": "시속 100km로 먹이를\n덮치지만 똑바로밖에 달릴 수\n없어서 실패할 때도 많다.",
+                "height": "0.5 m",
+                "weight": "32.5 kg"
+            },
+            "es": {
+                "name": "Linoone",
+                "category": "Pokémon Lanzado",
+                "entry": "Carga contra sus enemigos a más\nde 100 km/h. Como solo va en línea\nrecta, falla a menudo.",
+                "height": "0,5 m",
+                "weight": "32,5 kg"
+            },
+            "ja": {
+                "name": "マッスグマ",
+                "category": "とっしんポケモン",
+                "entry": "じそく\\x{ff11}\\x{ff10}\\x{ff10}キロで\\x{3000}えものに\nおそいかかるが\\x{3000}まっすぐにしか\nはしれないので\\x{3000}しっぱいも\\x{3000}おおい。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff12}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 78,
+        "attack": 70,
+        "defense": 61,
+        "speed": 100,
+        "special_attack": 50,
+        "special_defense": 61
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_ORAN_BERRY",
+        "rare": "ITEM_SITRUS_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_PICKUP", "ABILITY_GLUTTONY" ],
+    "hidden_ability": "ABILITY_QUICK_FEET",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 147,
+    "height": 5,
+    "weight": 325,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SWITCHEROO" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 5, "MOVE_TAIL_WHIP" ],
+            [ 9, "MOVE_HEADBUTT" ],
+            [ 13, "MOVE_SAND_ATTACK" ],
+            [ 17, "MOVE_ODOR_SLEUTH" ],
+            [ 23, "MOVE_MUD_SPORT" ],
+            [ 29, "MOVE_FURY_SWIPES" ],
+            [ 35, "MOVE_COVET" ],
+            [ 41, "MOVE_BESTOW" ],
+            [ 47, "MOVE_SLASH" ],
+            [ 53, "MOVE_REST" ],
+            [ 59, "MOVE_BELLY_DRUM" ],
+            [ 65, "MOVE_FLING" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM56",
+            "TM57",
+            "TM65",
+            "TM67",
+            "TM68",
+            "TM73",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SUPER_FANG",
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_LAST_RESORT",
+            "MOVE_ICY_WIND",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ZIGZAGOON"
+}

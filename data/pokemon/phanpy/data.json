@@ -1,0 +1,181 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Phanpy",
+    "pokedex": {
+        "category": "Long Nose Pokémon",
+        "entry": "It is strong despite its compact\nsize. It can easily pick up and\ncarry an adult human on its back.",
+        "height": "1'08\"",
+        "weight": "73.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Phanpy",
+                "category": "Long Nose Pokémon",
+                "entry": "It is strong despite its compact\nsize. It can easily pick up and\ncarry an adult human on its back.",
+                "height": "1'08\"",
+                "weight": "73.9 lbs."
+            },
+            "fr": {
+                "name": "Phanpy",
+                "category": "Pokémon Long-Nez",
+                "entry": "Il est fort malgré son aspect ramassé.\nIl n'a aucun mal à porter un humain\nadulte sur son dos.",
+                "height": "0,5 m",
+                "weight": "33,5 kg"
+            },
+            "de": {
+                "name": "Phanpy",
+                "category": "Langrüssel",
+                "entry": "Trotz seiner geringen Größe ist es\nstark. Es kann einen Erwachsenen\nmühelos auf dem Rücken tragen.",
+                "height": "0,5 m",
+                "weight": "33,5 kg"
+            },
+            "it": {
+                "name": "Phanpy",
+                "category": "Pokémon Nasone",
+                "entry": "Non è molto grande, ma è forte. Può\nsollevare un adulto e trasportarlo\nsul dorso senza fatica.",
+                "height": "0,5 m",
+                "weight": "33,5 kg"
+            },
+            "ko": {
+                "name": "코코리",
+                "category": "긴코포켓몬",
+                "entry": "몸은 작지만 힘이 장사다.\n어른인 사람을 가볍게\n등에 태우고 걸어다닌다.",
+                "height": "0.5 m",
+                "weight": "33.5 kg"
+            },
+            "es": {
+                "name": "Phanpy",
+                "category": "Pokémon Narizotas",
+                "entry": "A pesar de su tamaño reducido,\nes tan fuerte que puede llevar a un\nhumano a su espalda con facilidad.",
+                "height": "0,5 m",
+                "weight": "33,5 kg"
+            },
+            "ja": {
+                "name": "ゴマゾウ",
+                "category": "ながはなポケモン",
+                "entry": "からだは\\x{3000}ちいさいが\\x{3000}ちからもち。\nおとなの\\x{3000}ひとを\\x{3000}かるがると\nせなかに\\x{3000}のせて\\x{3000}あるいてしまう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff13}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 60,
+        "defense": 60,
+        "speed": 40,
+        "special_attack": 40,
+        "special_defense": 40
+    },
+    "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_PASSHO_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_PICKUP", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SAND_VEIL",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 66,
+    "height": 5,
+    "weight": 335,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ODOR_SLEUTH" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_DEFENSE_CURL" ],
+            [ 6, "MOVE_FLAIL" ],
+            [ 10, "MOVE_TAKE_DOWN" ],
+            [ 15, "MOVE_ROLLOUT" ],
+            [ 19, "MOVE_NATURAL_GIFT" ],
+            [ 24, "MOVE_SLAM" ],
+            [ 28, "MOVE_ENDURE" ],
+            [ 33, "MOVE_CHARM" ],
+            [ 37, "MOVE_LAST_RESORT" ],
+            [ 42, "MOVE_DOUBLE_EDGE" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_EARTH_POWER",
+            "MOVE_LAST_RESORT",
+            "MOVE_SUPERPOWER",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ENDEAVOR",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FOCUS_ENERGY",
+            "MOVE_BODY_SLAM",
+            "MOVE_ANCIENT_POWER",
+            "MOVE_SNORE",
+            "MOVE_COUNTER",
+            "MOVE_FISSURE",
+            "MOVE_ENDEAVOR",
+            "MOVE_ICE_SHARD",
+            "MOVE_HEAD_SMASH",
+            "MOVE_MUD_SLAP",
+            "MOVE_HEAVY_SLAM"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 25,
+            "species": "SPECIES_DONPHAN"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_PHANPY"
+}

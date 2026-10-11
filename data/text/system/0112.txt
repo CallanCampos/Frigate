@@ -1,15 +1,15 @@
-\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
-Link Trade
-Link Trade
-Kanto
-Johto
-Hoenn
-Sinnoh
-Distant Land
-\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
-\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
-\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
-\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
-\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
-Entralink
-Pokémon Dream Radar
+Bank0112_Text_Empty = \x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
+Bank0112_Text_LinkTrade = Link Trade
+Bank0112_Text_LinkTrade_2 = Link Trade
+Bank0112_Text_Kanto = Kanto
+Bank0112_Text_Johto = Johto
+Bank0112_Text_Hoenn = Hoenn
+Bank0112_Text_Sinnoh = Sinnoh
+Bank0112_Text_DistantLand = Distant Land
+Bank0112_Text_Empty_2 = \x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
+Bank0112_Text_Empty_3 = \x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
+Bank0112_Text_Empty_4 = \x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
+Bank0112_Text_Empty_5 = \x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
+Bank0112_Text_Empty_6 = \x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}\x{ff0d}
+Bank0112_Text_Entralink = Entralink
+Bank0112_Text_PokemonDreamRadar = Pokémon Dream Radar

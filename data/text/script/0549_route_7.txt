@@ -1,6 +1,0 @@
-The Xtransceiver is ringing.
-{0100:0} picked up the Xtransceiver.{be01}
-If you stand still on the raised walkway,\nyou'll fall off!
-Route 7
-Celestial Tower\nA place of rest for innocent spirits
-Trainer Tips!{be01}\n\nThe number of Exp. Points you get\nafter a battle is based on levels.{be01}\nWhen your Pokémon is weaker than\nits opponent, it will get more.{be01}\nBut if your Pokémon is stronger,\nit won't get as many.

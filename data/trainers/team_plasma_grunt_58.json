@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_RATICATE",
+            "form": 0,
+            "level": 47,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_WATCHOG",
+            "form": 0,
+            "level": 47,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "What's this? You think you can beat me,\nthe one they call queen of Team Plasma?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your face...it really drives me mad!"
+        },
+        {
+            "type": 2,
+            "text": "See, I'm going to take over the world and\nthen make that idiot N pay!{be01}\nThat traitor...\nJust his face makes me so mad!"
+        }
+    ]
+}

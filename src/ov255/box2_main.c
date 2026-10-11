@@ -14,6 +14,7 @@
 #include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -51,6 +52,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
+#include "text/system/btl_pokeparam_box_main_save_init.h"
 
 // The PC box's graphics setup, the moves of Pokémon between the boxes and the party, and the frames and buttons that
 // slide in and out. Names are ours
@@ -417,7 +419,7 @@ void Box2Main_SetBlendAlpha(BOOL enabled) {
 }
 
 void Box2Main_InitMsg(Box2SysWork *syswk) {
-    syswk->app->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 13, HEAPID_BOX2_APP);
+    syswk->app->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_BOX_MAIN_SAVE_INIT, HEAPID_BOX2_APP);
     syswk->app->font = GFL_FontCreate(ARCID_FONT, 0, 1, FALSE, HEAPID_BOX2_APP);
     syswk->app->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, HEAPID_BOX2_APP);
     syswk->app->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_BOX2_APP);
@@ -435,10 +437,10 @@ void Box2Main_ExitMsg(Box2SysWork *syswk) {
 }
 
 void Box2Main_InitYesNo(Box2SysWork *syswk) {
-    syswk->app->yesNoItems[0].str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, 110);
+    syswk->app->yesNoItems[0].str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, BtlPokeparamBoxMainSaveInit_Text_Yes);
     syswk->app->yesNoItems[0].color = 0x39e3;
     syswk->app->yesNoItems[0].type = 0;
-    syswk->app->yesNoItems[1].str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, 111);
+    syswk->app->yesNoItems[1].str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, BtlPokeparamBoxMainSaveInit_Text_No_2);
     syswk->app->yesNoItems[1].color = 0x39e3;
     syswk->app->yesNoItems[1].type = 0;
     syswk->app->yesNoRes = AppTaskMenuRes_Create(0, 8, syswk->app->font, syswk->app->printQueue, HEAPID_BOX2_APP);

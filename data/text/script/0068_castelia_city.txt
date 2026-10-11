@@ -1,9 +1,0 @@
-I am a Pokémon fanatic.\nI am famous in Castelia, too!{be01}\nOh, look!\nYou have a Pokédex!{be01}\nHow many Pokémon\nhave you found so far?{be01}\n...\n{0202:0} Pokémon!{be01}\nIf you have 40 Pokémon or more,\nI'll give you something good!
-I am a Pokémon fanatic.\nI am famous in Castelia, too!{be01}\nOh, look!\nYou have a Pokédex!{be01}\nWell, how many Pokémon\nhave you found so far?{be01}\n...\n{0202:0} Pokémon!{be00}\nThis is quite a Pokédex!{be01}\nI am quite impressed, so\nI will give this to you!{be01}
-Eviolite is great!{be01}\nBoth Defense and Special Defense\nof the Pokémon who holds it will increase!{be01}\nHowever, it's a peculiar stone because\nit's only effective on Pokémon that{be00}\ncan still evolve.
-I've been thinking about starting\na new business...{be01}\nBut it's quite a chore.
-Don't you think a service that teaches\nPokémon moves would be successful?{be01}\nWhat?\nThere are already people who do that?
-What kinds of Abilities do\nyour Pokémon have?
-My Patrat's Ability is Run Away!{be01}\nIt can always get away\nfrom wild Pokémon!
-Squeak!
-Hmmm! Fantastic! Excellent!\nBurgh's paintings are magnificent!

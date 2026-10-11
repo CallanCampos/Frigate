@@ -1,5 +1,6 @@
 #include "types.h"
 #include "field/delivery_irc.h"
+#include "field/net_devirc.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_command.h"
@@ -185,7 +186,7 @@ static void func_ov012_02152c74(void *work) {
 }
 
 static void func_ov012_02152cf4(void *work) {
-    if (func_ov031_02175d8c()) {
+    if (NetDevIrc_IsConnected()) {
         func_02042860(NULL);
     }
     func_ov012_02152c24(work, func_ov012_02152c74, 258);
@@ -201,7 +202,7 @@ static void func_ov012_02152d3c(void *work) {
 
     if (func_02040664(func_02040440(), 35, (u8)pWork->aInit.code)) {
         if (func_02042bc4()) {
-            func_ov031_021759d0(300);
+            NetDevIrc_SetTimeout(300);
             func_ov012_02152c24(pWork, func_ov012_02152cf4, 275);
         } else {
             func_ov012_02152c24(pWork, func_ov012_02152d1c, 278);

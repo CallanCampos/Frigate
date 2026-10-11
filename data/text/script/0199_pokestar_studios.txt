@@ -1,8 +1,0 @@
-The jumpsuit I'm wearing is an essential\npart of creating visual effects!{be01}\nIt may be cutting-edge technology,\nbut it's pretty embarrassing to wear!
-Hey, ya got this, kid?\nWhat we mean by VFX{be00}\nis visual effects.{be01}\nIt's a technology that lets us\nuse computers to process images.{be01}\nIn Pokéstar Studios movies,\nthe effects are really important!
-I'm the screenwriter!{be01}\nI write the scripts that become\nthe movie's stories.{be01}\nFeels like my head is packed\nwith nothing but stories.
-I'm a big guy, but I work with\nsmall movie props.{be01}\nSometimes I even make\nthe items actors use or the{be00}\nfurniture on the sets!
-Hello! I'm the cinematographer.{be01}\nWell, put more simply,\nI'm the cameraman.
-Hey there! I'm the audio engineer!{be01}\nMy job is doing things like\nrecording the actor's lines.{be01}\nMost of Pokéstar Studios'\ndialog is dubbed in later, so right now,{be00}\nI have a bit of time on my hands!
-C'mon... Where could it be?{be01}\nI'm going to get in trouble again\nif I can't find that megaphone!{be01}\nOh, do you work in films?\nI'm working as the AD.{be01}\nI guess you could call the\nAD the assistant director.
-\pad{32}

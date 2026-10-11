@@ -1,99 +1,99 @@
-                     \x{ffff}
-                     \x{ffff}
-                     \x{ffff}
-                     \x{ffff}
-                \x{ffff}
-                \x{ffff}
-                \x{ffff}
-                \x{ffff}
-                     \x{ffff}
-                     \x{ffff}
-                     \x{ffff}
-                     \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                \x{ffff}
-               \x{ffff}
-               \x{ffff}
-               \x{ffff}
-               \x{ffff}
-                \x{ffff}
-                \x{ffff}
-                \x{ffff}
-                \x{ffff}
-                         \x{ffff}
-                       \x{ffff}
-                     \x{ffff}
-                       \x{ffff}
-                                      \x{ffff}
-                               \x{ffff}
-               \x{ffff}
-                \x{ffff}
-                \x{ffff}
-                              \x{ffff}
-                             \x{ffff}
-                 \x{ffff}
-                            \x{ffff}
-                                  \x{ffff}
-                                \x{ffff}
-                                 \x{ffff}
-                                \x{ffff}
-                                 \x{ffff}
-                                          \x{ffff}
-                        \x{ffff}
-                     \x{ffff}
-                      \x{ffff}
-                                    \x{ffff}
-                     \x{ffff}
-                    \x{ffff}
-                     \x{ffff}
-The Funfest Mission will begin soon...\nPlease wait a moment.
-                             \x{ffff}
-                             \x{ffff}
-                             \x{ffff}
-                             \x{ffff}
-                           \x{ffff}
-                             \x{ffff}
-           \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                   \x{ffff}
-                  \x{ffff}
-       \x{ffff}
-        \x{ffff}
-    \x{ffff}
-    \x{ffff}
-                             \x{ffff}
-              \x{ffff}
-                 \x{ffff}
-                  \x{ffff}
-                       \x{ffff}
-                       \x{ffff}
-                       \x{ffff}
-                          \x{ffff}
-                             \x{ffff}
-                             \x{ffff}
-                        \x{ffff}
-                         \x{ffff}
-                               \x{ffff}
-                                             \x{ffff}
-             \x{ffff}
-                               \x{ffff}
-                                                             \x{ffff}
-                                                           \x{ffff}
-                                                          \x{ffff}
-                                                          \x{ffff}
-                                                            \x{ffff}
-                                                            \x{ffff}
-                        \x{ffff}
-                      \x{ffff}
-                    \x{ffff}
-                                               \x{ffff}
+Bank0055_Text_Empty =                      \x{ffff}
+Bank0055_Text_Empty_2 =                      \x{ffff}
+Bank0055_Text_Empty_3 =                      \x{ffff}
+Bank0055_Text_Empty_4 =                      \x{ffff}
+Bank0055_Text_Empty_5 =                 \x{ffff}
+Bank0055_Text_Empty_6 =                 \x{ffff}
+Bank0055_Text_Empty_7 =                 \x{ffff}
+Bank0055_Text_Empty_8 =                 \x{ffff}
+Bank0055_Text_Empty_9 =                      \x{ffff}
+Bank0055_Text_Empty_10 =                      \x{ffff}
+Bank0055_Text_Empty_11 =                      \x{ffff}
+Bank0055_Text_Empty_12 =                      \x{ffff}
+Bank0055_Text_Empty_13 =                    \x{ffff}
+Bank0055_Text_Empty_14 =                    \x{ffff}
+Bank0055_Text_Empty_15 =                    \x{ffff}
+Bank0055_Text_Empty_16 =                    \x{ffff}
+Bank0055_Text_Empty_17 =                    \x{ffff}
+Bank0055_Text_Empty_18 =                    \x{ffff}
+Bank0055_Text_Empty_19 =                    \x{ffff}
+Bank0055_Text_Empty_20 =                    \x{ffff}
+Bank0055_Text_Empty_21 =                 \x{ffff}
+Bank0055_Text_Empty_22 =                \x{ffff}
+Bank0055_Text_Empty_23 =                \x{ffff}
+Bank0055_Text_Empty_24 =                \x{ffff}
+Bank0055_Text_Empty_25 =                \x{ffff}
+Bank0055_Text_Empty_26 =                 \x{ffff}
+Bank0055_Text_Empty_27 =                 \x{ffff}
+Bank0055_Text_Empty_28 =                 \x{ffff}
+Bank0055_Text_Empty_29 =                 \x{ffff}
+Bank0055_Text_Empty_30 =                          \x{ffff}
+Bank0055_Text_Empty_31 =                        \x{ffff}
+Bank0055_Text_Empty_32 =                      \x{ffff}
+Bank0055_Text_Empty_33 =                        \x{ffff}
+Bank0055_Text_Empty_34 =                                       \x{ffff}
+Bank0055_Text_Empty_35 =                                \x{ffff}
+Bank0055_Text_Empty_36 =                \x{ffff}
+Bank0055_Text_Empty_37 =                 \x{ffff}
+Bank0055_Text_Empty_38 =                 \x{ffff}
+Bank0055_Text_Empty_39 =                               \x{ffff}
+Bank0055_Text_Empty_40 =                              \x{ffff}
+Bank0055_Text_Empty_41 =                  \x{ffff}
+Bank0055_Text_Empty_42 =                             \x{ffff}
+Bank0055_Text_Empty_43 =                                   \x{ffff}
+Bank0055_Text_Empty_44 =                                 \x{ffff}
+Bank0055_Text_Empty_45 =                                  \x{ffff}
+Bank0055_Text_Empty_46 =                                 \x{ffff}
+Bank0055_Text_Empty_47 =                                  \x{ffff}
+Bank0055_Text_Empty_48 =                                           \x{ffff}
+Bank0055_Text_Empty_49 =                         \x{ffff}
+Bank0055_Text_Empty_50 =                      \x{ffff}
+Bank0055_Text_Empty_51 =                       \x{ffff}
+Bank0055_Text_Empty_52 =                                     \x{ffff}
+Bank0055_Text_Empty_53 =                      \x{ffff}
+Bank0055_Text_Empty_54 =                     \x{ffff}
+Bank0055_Text_Empty_55 =                      \x{ffff}
+Bank0055_Text_FunfestMissionWillBegin = The Funfest Mission will begin soon...\nPlease wait a moment.
+Bank0055_Text_Empty_56 =                              \x{ffff}
+Bank0055_Text_Empty_57 =                              \x{ffff}
+Bank0055_Text_Empty_58 =                              \x{ffff}
+Bank0055_Text_Empty_59 =                              \x{ffff}
+Bank0055_Text_Empty_60 =                            \x{ffff}
+Bank0055_Text_Empty_61 =                              \x{ffff}
+Bank0055_Text_Empty_62 =            \x{ffff}
+Bank0055_Text_Empty_63 =                    \x{ffff}
+Bank0055_Text_Empty_64 =                    \x{ffff}
+Bank0055_Text_Empty_65 =                    \x{ffff}
+Bank0055_Text_Empty_66 =                    \x{ffff}
+Bank0055_Text_Empty_67 =                   \x{ffff}
+Bank0055_Text_Empty_68 =        \x{ffff}
+Bank0055_Text_Empty_69 =         \x{ffff}
+Bank0055_Text_Empty_70 =     \x{ffff}
+Bank0055_Text_Empty_71 =     \x{ffff}
+Bank0055_Text_Empty_72 =                              \x{ffff}
+Bank0055_Text_Empty_73 =               \x{ffff}
+Bank0055_Text_Empty_74 =                  \x{ffff}
+Bank0055_Text_Empty_75 =                   \x{ffff}
+Bank0055_Text_Empty_76 =                        \x{ffff}
+Bank0055_Text_Empty_77 =                        \x{ffff}
+Bank0055_Text_Empty_78 =                        \x{ffff}
+Bank0055_Text_Empty_79 =                           \x{ffff}
+Bank0055_Text_Empty_80 =                              \x{ffff}
+Bank0055_Text_Empty_81 =                              \x{ffff}
+Bank0055_Text_Empty_82 =                         \x{ffff}
+Bank0055_Text_Empty_83 =                          \x{ffff}
+Bank0055_Text_Empty_84 =                                \x{ffff}
+Bank0055_Text_Empty_85 =                                              \x{ffff}
+Bank0055_Text_Empty_86 =              \x{ffff}
+Bank0055_Text_Empty_87 =                                \x{ffff}
+Bank0055_Text_Empty_88 =                                                              \x{ffff}
+Bank0055_Text_Empty_89 =                                                            \x{ffff}
+Bank0055_Text_Empty_90 =                                                           \x{ffff}
+Bank0055_Text_Empty_91 =                                                           \x{ffff}
+Bank0055_Text_Empty_92 =                                                             \x{ffff}
+Bank0055_Text_Empty_93 =                                                             \x{ffff}
+Bank0055_Text_Empty_94 =                         \x{ffff}
+Bank0055_Text_Empty_95 =                       \x{ffff}
+Bank0055_Text_Empty_96 =                     \x{ffff}
+Bank0055_Text_Empty_97 =                                                \x{ffff}
 \pad{40}

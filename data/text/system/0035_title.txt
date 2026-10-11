@@ -1,7 +1,0 @@
-Let's Dress Up {0102:0}\nwith Props!
-Is this look OK?
-Waiting for other participants\nto Dress Up.
-{010a:0}: A Prop that looks\nnice on the {0131:1}.
-Props that look nice on the {0131:0}\nwere sorted at the beginning.
-The order of Props was\nrestored to the original order.
-You can pull out Props from the list\nand put them on your Pokémon.

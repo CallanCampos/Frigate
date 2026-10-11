@@ -1,24 +1,24 @@
-None
-Aquitaine
-Alsace
-Île-de-France
-Auvergne
-Corse
-Champagne-Ardenne
-Nord-Pas-de-Calais
-Lower Normandy
-Upper Normandy
-Picardy
-Franche-Comté
-Burgundy
-Brittany
-Provence-Alpes-Côte d'Azur
-Pays-de-la-Loire
-Poitou-Charentes
-Midi-Pyrenees
-Languedoc-Roussillon
-Limousin
-Rhône-Alpes
-Lorraine
-Centre
+Bank0427_Text_None = None
+Bank0427_Text_Aquitaine = Aquitaine
+Bank0427_Text_Alsace = Alsace
+Bank0427_Text_LeDeFrance = Île-de-France
+Bank0427_Text_Auvergne = Auvergne
+Bank0427_Text_Corse = Corse
+Bank0427_Text_ChampagneArdenne = Champagne-Ardenne
+Bank0427_Text_NordPasDeCalais = Nord-Pas-de-Calais
+Bank0427_Text_LowerNormandy = Lower Normandy
+Bank0427_Text_UpperNormandy = Upper Normandy
+Bank0427_Text_Picardy = Picardy
+Bank0427_Text_FrancheComte = Franche-Comté
+Bank0427_Text_Burgundy = Burgundy
+Bank0427_Text_Brittany = Brittany
+Bank0427_Text_ProvenceAlpesCTe = Provence-Alpes-Côte d'Azur
+Bank0427_Text_PaysDeLaLoire = Pays-de-la-Loire
+Bank0427_Text_PoitouCharentes = Poitou-Charentes
+Bank0427_Text_MidiPyrenees = Midi-Pyrenees
+Bank0427_Text_LanguedocRoussillon = Languedoc-Roussillon
+Bank0427_Text_Limousin = Limousin
+Bank0427_Text_RhNeAlpes = Rhône-Alpes
+Bank0427_Text_Lorraine = Lorraine
+Bank0427_Text_Centre = Centre
 \pad{f4}

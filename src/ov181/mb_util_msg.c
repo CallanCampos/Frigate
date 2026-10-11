@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/mb_parent/mb_util_msg.h"
 #include "constants/arc.h"
+#include "constants/script_text_banks.h"
 #include "field/talkmsgwin.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -20,6 +21,7 @@
 #include "system/printsys.h"
 #include "system/time_icon.h"
 #include "system/wordset.h"
+#include "text/script/global_10520.h"
 
 // The messages, windows and menus of the DS Download Play parent (mb_util_msg.c): one message window that prints
 // through a stream or a print queue, the yes/no menus, and the frame of the field's talk window when overlay 36 is
@@ -412,7 +414,7 @@ int MBUtilMsg_UpdateConfirm(MBUtilMsg *msg) {
 }
 
 void MBUtilMsg_PrintNoWireless(MBUtilMsg *msg, s32 wait) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 0xd0, msg->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, msg->heapId);
 
     if (msg->stream != NULL) {
         func_020223cc(msg->stream);
@@ -425,7 +427,7 @@ void MBUtilMsg_PrintNoWireless(MBUtilMsg *msg, s32 wait) {
         msg->strbuf = NULL;
     }
     GFL_BitmapFill(BmpWin_GetBitmap(msg->window), 15);
-    msg->strbuf = GFL_MsgDataLoadStrbufNew(msgData, 0x16);
+    msg->strbuf = GFL_MsgDataLoadStrbufNew(msgData, Global10520_Text_WirelessCommunicationsTurnedOff);
     msg->stream = func_02022268(msg->window, 0, 0, msg->strbuf, msg->font, wait, msg->tcbManager, 2, msg->heapId, 15);
     BmpWin_DrawFrame(msg->window, TRUE, 1, 13);
     GFL_MsgDataFree(msgData);

@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Beckett",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WHIMSICOTT",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_GIGA_DRAIN", "MOVE_TAILWIND", "MOVE_POISON_POWDER", "MOVE_U_TURN" ]
+        },
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_AIR_SLASH", "MOVE_QUICK_ATTACK", "MOVE_ROOST", "MOVE_FEATHER_DANCE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "It's not enough for me just to be\ntogether with Pokémon!{be01}\nI want to win!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ugh! How... How...\nHow could you defeat me this utterly?!"
+        },
+        {
+            "type": 2,
+            "text": "It's not enough for me just to be\ntogether with Pokémon! I want to win!{be01}\nBut I do know that some people feel at\nease just by being with their Pokémon..."
+        }
+    ]
+}

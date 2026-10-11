@@ -10,7 +10,7 @@
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except the structs, TRAINER_PARAM_*, PARTY_*,
 // TRAINER_ID_BATTLE_INST_START, TRAINER_SPRITE_BACK and TRAINER_CLASS_SPECIAL_COUNT
 
-// What each party entry holds besides the Pokémon itself, OR'ed together, as in include/asm/trainer.inc
+// What each party entry holds besides the Pokémon itself, OR'ed together, as tools/data/trainer_data.py packs it
 #define PARTY_MOVES 1
 #define PARTY_ITEMS 2
 
@@ -24,7 +24,7 @@
 // the others
 #define TRAINER_CLASS_SPECIAL_COUNT 29
 
-// A trainer's record in ARCID_TRDATA, written by include/asm/trainer.inc
+// A trainer's record in ARCID_TRDATA, packed from data/trainers/ by tools/data/trainer_data.py
 typedef struct {
     u8 partyKind; // PARTY_*
     u8 trainerClass;

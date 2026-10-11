@@ -1,45 +1,45 @@
-Director: OK! Ees not bad!
-Director: Not bad...\nBut, zat was not so cool, hein?
-Director: Concentrate on your acting!\nZees ees a film for everyone, not you!
-Director: Relax! You must relax!
-Director: Be confident!\nSmile! I want ze big smile!
-Director: Make ze eyes more intense!\nLike you're shooting ze beams from zem!
-Director: Tre bien!\nZe line, she was so nice!
-Director: OK...\nZe line, she was nothing special...
-Director: Non! Non!\nNow, what was zat line supposed to be?
-Director: Hurry and finish!\nZe camera, she ees crying!
-Director: Fantastique!\nYour work was so excellent!
-Director: Enough!\nFini!
-Director: Oh, why?\nWhat kind of movie will zees be?
-Director: Checking ze script\nees one of ze basics of acting.
-Director: Check ze script!\nShe's full of hints!
-Director: Ze performance\nwas fantastique! Encore!
-Director: Ees so nice!
-Director: Ees not bad!\nYour smile ees very cute!
-Director: Your face ees charming, no?\nZe people will fall head over heels for you!
-Director: Zat was so nice!\nCool! So cool!
-Director: Hmm... I see...\nZat's your style, hein?
-Director: Excellent!\nZat line, she was excellent!
-Director: Nice!\nZat was a nice line!
-Director: Non...\nZat line was terrible!
-Director: You must finish\nze acting now!
-Director: Magnifique!\nImpressive! Tres bien!
-Director: Non! Zees ees no good!\nEes not like you, hein?
-Director: Oh why, oh why?\nWhat kind of film will zees be?
-Director: Are you finished\nchecking ze script?
-Director: Even if you already know it,\nchecking ze script ees professional, no?
-Director: Brilliant!\nYou are ze shining star, no?
-Director: Magnifique!\nYou are magnifique!
-Director: You are truly one of a kind, no?
-Director: Amazing work!\nYou, you are ze brightest star ever!
-Director: Elegant!\nI am--how you say--moved!
-Director: Ees OK!\nBe confident!
-Director: Cool!\nZat line, she ees so cool!
-Director: Zat line?\nEes zat line, OK?
-Director: Could zees be a mistake?\nZe lines, zey are important, no?
-Director: You must get ze end\nof ze film perfect!
-Director: Perfect!\nNow, you are truly a star!
-Director: It ees missing something, no?\nHow will ze fans respond?
-Director: Incroyable...\nZe film, she ees so strange!
-Director: Did you look at ze scenario?\nIt ees written for your sake, hein?
-Director: Do you like ze script?
+Bank0308_Text_DirectorOkEesNot = Director: OK! Ees not bad!
+Bank0308_Text_DirectorNotBadBut = Director: Not bad...\nBut, zat was not so cool, hein?
+Bank0308_Text_DirectorConcentrateActingZees = Director: Concentrate on your acting!\nZees ees a film for everyone, not you!
+Bank0308_Text_DirectorRelaxMustRelax = Director: Relax! You must relax!
+Bank0308_Text_DirectorConfidentSmileWant = Director: Be confident!\nSmile! I want ze big smile!
+Bank0308_Text_DirectorMakeZeEyes = Director: Make ze eyes more intense!\nLike you're shooting ze beams from zem!
+Bank0308_Text_DirectorTreBienZe = Director: Tre bien!\nZe line, she was so nice!
+Bank0308_Text_DirectorOkZeLine = Director: OK...\nZe line, she was nothing special...
+Bank0308_Text_DirectorNonNonNow = Director: Non! Non!\nNow, what was zat line supposed to be?
+Bank0308_Text_DirectorHurryFinishZe = Director: Hurry and finish!\nZe camera, she ees crying!
+Bank0308_Text_DirectorFantastiqueWorkExcellent = Director: Fantastique!\nYour work was so excellent!
+Bank0308_Text_DirectorEnoughFini = Director: Enough!\nFini!
+Bank0308_Text_DirectorOhWhyWhat = Director: Oh, why?\nWhat kind of movie will zees be?
+Bank0308_Text_DirectorCheckingZeScript = Director: Checking ze script\nees one of ze basics of acting.
+Bank0308_Text_DirectorCheckZeScript = Director: Check ze script!\nShe's full of hints!
+Bank0308_Text_DirectorZePerformanceFantastique = Director: Ze performance\nwas fantastique! Encore!
+Bank0308_Text_DirectorEesNice = Director: Ees so nice!
+Bank0308_Text_DirectorEesNotBad = Director: Ees not bad!\nYour smile ees very cute!
+Bank0308_Text_DirectorFaceEesCharming = Director: Your face ees charming, no?\nZe people will fall head over heels for you!
+Bank0308_Text_DirectorZatNiceCool = Director: Zat was so nice!\nCool! So cool!
+Bank0308_Text_DirectorHmmSeeZats = Director: Hmm... I see...\nZat's your style, hein?
+Bank0308_Text_DirectorExcellentZatLine = Director: Excellent!\nZat line, she was excellent!
+Bank0308_Text_DirectorNiceZatNice = Director: Nice!\nZat was a nice line!
+Bank0308_Text_DirectorNonZatLine = Director: Non...\nZat line was terrible!
+Bank0308_Text_DirectorMustFinishZe = Director: You must finish\nze acting now!
+Bank0308_Text_DirectorMagnifiqueImpressiveTres = Director: Magnifique!\nImpressive! Tres bien!
+Bank0308_Text_DirectorNonZeesEes = Director: Non! Zees ees no good!\nEes not like you, hein?
+Bank0308_Text_DirectorOhWhyOh = Director: Oh why, oh why?\nWhat kind of film will zees be?
+Bank0308_Text_DirectorFinishedCheckingZe = Director: Are you finished\nchecking ze script?
+Bank0308_Text_DirectorEvenIfAlready = Director: Even if you already know it,\nchecking ze script ees professional, no?
+Bank0308_Text_DirectorBrilliantZeShining = Director: Brilliant!\nYou are ze shining star, no?
+Bank0308_Text_DirectorMagnifiqueMagnifique = Director: Magnifique!\nYou are magnifique!
+Bank0308_Text_DirectorTrulyOneKind = Director: You are truly one of a kind, no?
+Bank0308_Text_DirectorAmazingWorkZe = Director: Amazing work!\nYou, you are ze brightest star ever!
+Bank0308_Text_DirectorElegantAmHow = Director: Elegant!\nI am--how you say--moved!
+Bank0308_Text_DirectorEesOkConfident = Director: Ees OK!\nBe confident!
+Bank0308_Text_DirectorCoolZatLine = Director: Cool!\nZat line, she ees so cool!
+Bank0308_Text_DirectorZatLineEes = Director: Zat line?\nEes zat line, OK?
+Bank0308_Text_DirectorCouldZeesMistake = Director: Could zees be a mistake?\nZe lines, zey are important, no?
+Bank0308_Text_DirectorMustGetZe = Director: You must get ze end\nof ze film perfect!
+Bank0308_Text_DirectorPerfectNowTruly = Director: Perfect!\nNow, you are truly a star!
+Bank0308_Text_DirectorEesMissingSomething = Director: It ees missing something, no?\nHow will ze fans respond?
+Bank0308_Text_DirectorIncroyableZeFilm = Director: Incroyable...\nZe film, she ees so strange!
+Bank0308_Text_DirectorDidLookZe = Director: Did you look at ze scenario?\nIt ees written for your sake, hein?
+Bank0308_Text_DirectorLikeZeScript = Director: Do you like ze script?

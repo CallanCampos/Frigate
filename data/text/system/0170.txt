@@ -1,21 +1,21 @@
-You win...\n{011c:0}!
-{011c:0} is\nreally impressive.
-Waaah! {011c:0}!
-I want to go home with\n{011c:0}...
-{011c:0}!\n{011c:1}!
-I see {011c:0}\nright in front of me!
-{011c:0}?\nI didn't see that coming!
-I was confident about\n{011c:0}, too.
-You're {011c:0},\naren't you?
-{011c:0}!\nCan't be anything else but.
-I want to be like {011c:0}!
-It might be\n{011c:0} already...
-I think {011c:0}\nshould do.
-The way I feel now is\n{011c:0}...
-{011c:0} won't work!
-Nothing beats {011c:0}!
-My head's filled with only\n{011c:0} now!
-Is it because {011c:0}\nwas lacking?
-Isn't {011c:0}\n{011c:1}?
-Aww... That's really\n{011c:0}...
+Bank0170_Text_Win = You win...\n{011c:0}!
+Bank0170_Text_ReallyImpressive = {011c:0} is\nreally impressive.
+Bank0170_Text_Waaah = Waaah! {011c:0}!
+Bank0170_Text_WantGoHome = I want to go home with\n{011c:0}...
+Bank0170_Text_Empty = {011c:0}!\n{011c:1}!
+Bank0170_Text_SeeRightFront = I see {011c:0}\nright in front of me!
+Bank0170_Text_DidntSeeComing = {011c:0}?\nI didn't see that coming!
+Bank0170_Text_ConfidentAboutToo = I was confident about\n{011c:0}, too.
+Bank0170_Text_YoureArent = You're {011c:0},\naren't you?
+Bank0170_Text_CantAnythingElseBut = {011c:0}!\nCan't be anything else but.
+Bank0170_Text_WantLike = I want to be like {011c:0}!
+Bank0170_Text_MightAlready = It might be\n{011c:0} already...
+Bank0170_Text_ThinkShould = I think {011c:0}\nshould do.
+Bank0170_Text_WayFeelNow = The way I feel now is\n{011c:0}...
+Bank0170_Text_WontWork = {011c:0} won't work!
+Bank0170_Text_NothingBeats = Nothing beats {011c:0}!
+Bank0170_Text_HeadsFilledOnlyNow = My head's filled with only\n{011c:0} now!
+Bank0170_Text_BecauseLacking = Is it because {011c:0}\nwas lacking?
+Bank0170_Text_Isnt = Isn't {011c:0}\n{011c:1}?
+Bank0170_Text_AwwThatsReally = Aww... That's really\n{011c:0}...
 \pad{70}

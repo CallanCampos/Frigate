@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Olwen",
+    "class": "TRAINER_CLASS_WAITRESS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MINCCINO",
+            "form": 0,
+            "level": 43,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Welcome!{be01}\nWould you like a cold drink\nwith your Pokémon battle?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "That was a wonderful battle.\nBravo!"
+        },
+        {
+            "type": 2,
+            "text": "Invigorating Soda Pop for exhausted\nPokémon after a battle!{be00}\nAvailable in any vending machine!"
+        }
+    ]
+}

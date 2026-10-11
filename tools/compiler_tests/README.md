@@ -1,4 +1,4 @@
-Test inputs for `tools/scripts/compiler_probe.py`:
+Test inputs for `tools/decomp/compiler_probe.py`:
 
 - `main_loops.c` holds six ARM9 main functions that match with every compiler version.
 - `corpus.c` covers common C constructs, for comparing the compiler versions against each other. Only

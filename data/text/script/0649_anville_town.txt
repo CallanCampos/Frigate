@@ -1,4 +1,0 @@
-Anville Town is packed on the weekends.\nEveryone sure loves trains!
-On the weekend, many {0109:0}\ncollectors gather here.{be01}\nThey'll trade them for different items.
-One day, I'm going to take the\nSubway Bosses Ingo and Emmet down!
-\pad{5e}

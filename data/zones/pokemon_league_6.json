@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 15,
+    "npc_cache": 24,
+    "area": 333,
+    "matrix": "MAP_MATRIX_POKEMON_LEAGUE_6",
+    "scripts": "SCRIPTS_POKEMON_LEAGUE_6",
+    "text": "SCRIPT_TEXT_POKEMON_LEAGUE_6",
+    "bgm": "SEQ_BGM_POKEMON_LEAGUE",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_POKEMON_LEAGUE",
+    "place": "PLACE_POKEMON_LEAGUE",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 19,
+    "transition": 1,
+    "battle_bg": 13,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": false,
+    "cam_bound": 65535,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 16,
+        "y": 0,
+        "z": 16
+    }
+}

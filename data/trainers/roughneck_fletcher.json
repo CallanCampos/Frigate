@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Fletcher",
+    "class": "TRAINER_CLASS_ROUGHNECK",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_DUSK_BALL",
+    "party": [
+        {
+            "species": "SPECIES_MIGHTYENA",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SKUNTANK",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CRAWDAUNT",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey, hey, did you see that? Awesome!\nA lot of famous people from TV are here!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Athletes are all coooool.\nI want to be like them."
+        },
+        {
+            "type": 15,
+            "text": "You're so cool! I hope to be like you\nsomeday. Here, have this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Aghhhhh. Why didn't I bring a camera,\nor a notebook for an autograph?"
+        }
+    ]
+}

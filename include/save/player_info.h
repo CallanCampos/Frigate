@@ -35,7 +35,7 @@ u8 TrainerInfo_GetRegion(PlayerInfo *info);
 // The player's GameSpy profile ID
 s32 func_02008bdc(PlayerInfo *info);
 void func_02008be0(PlayerInfo *info, s32 profileId);
-u32 func_02008bf4(PlayerInfo *info);
+u8 func_02008bf4(PlayerInfo *info);
 u32 getIDAsUInt(PlayerInfo *info);
 void setTrainerGender(PlayerInfo *info, u32 gender);
 PlayerInfo *func_02008b0c(u32 heapId);

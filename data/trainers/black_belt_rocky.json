@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rocky",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ROGGENROLA",
+            "form": 0,
+            "level": 44,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_HARD_STONE"
+        },
+        {
+            "species": "SPECIES_ROGGENROLA",
+            "form": 0,
+            "level": 44,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_HARD_STONE"
+        },
+        {
+            "species": "SPECIES_ROGGENROLA",
+            "form": 0,
+            "level": 44,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_HARD_STONE"
+        },
+        {
+            "species": "SPECIES_ROGGENROLA",
+            "form": 0,
+            "level": 44,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_HARD_STONE"
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Strength that goes beyond mere Abilities...\nYou there! You're a real tough one, huh!"
+        }
+    ]
+}

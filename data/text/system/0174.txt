@@ -1,2 +1,2 @@
-{011c:0}
-         \x{ffff}
+Bank0174_Text_Empty = {011c:0}
+Bank0174_Text_Empty_2 =          \x{ffff}

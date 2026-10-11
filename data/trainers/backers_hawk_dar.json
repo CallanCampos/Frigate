@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Hawk & Dar",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DARUMAKA",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DARUMAKA",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Watching a practice makes you feel\nthat you are stronger, too,{be00}\ndoesn't it?{be00}\nSo let's have a battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hawk: ...I could not\ndo it well at all.{be01}\nDar: ...I could not\ndo it right at all."
+        },
+        {
+            "type": 5,
+            "text": "They can do even the hardest things\nas if they were so simple...{be01}\nThat's the great thing\nabout professionals."
+        },
+        {
+            "type": 6,
+            "text": "We cannot have\na one-on-two battle."
+        },
+        {
+            "type": 7,
+            "text": "We were watching various team sports,\nand we wanted to fight as a duo, too!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "Playing as a team is difficult.{be01}\nWe could do more great things\nif we could understand what{be00}\nother people were thinking!"
+        },
+        {
+            "type": 10,
+            "text": "We would like to have\na Pokémon battle as a duo."
+        }
+    ]
+}

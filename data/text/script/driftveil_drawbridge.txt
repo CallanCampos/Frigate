@@ -1,0 +1,11 @@
+DriftveilDrawbridge_Text_SometimesAboveBridgeCan = Sometimes, above the bridge, you can\nsee the shadows of bird Pokémon, right?{be01}\nTheir feathers drift to the ground here!{be01}\nAnd when you try to pick them up,\noccasionally you'll run into a Pokémon.
+DriftveilDrawbridge_Text_FunfestMissionHasBeen = The Funfest Mission\n“{0140:0}"{be00}\nhas been added to the Entralink!
+DriftveilDrawbridge_Text_DriftveilCityFamousDrawbridge = Driftveil City is famous for this\ndrawbridge, the PWT, and of course,{be00}\nthe heartbreaker, Charles.
+DriftveilDrawbridge_Text_DriftveilDrawbridgeItsAlso = The Driftveil Drawbridge...\nIt's also known as the Charizard Bridge!{be01}\nBecause the raised drawbridge looks like\nthe Pokémon called Charizard.{be01}\n...But, I've never seen Charizard,\nso I don't know...
+DriftveilDrawbridge_Text_DriftveilDrawbridgeItsAlso_2 = The Driftveil Drawbridge...\nIt's also known as the Charizard Bridge!{be01}\nBecause the raised drawbridge looks like\nthe Pokémon called Charizard.{be01}\n...But, I've never seen Charizard,\nso I don't know...{be01}\n...What?!\nAre you with Charizard?{be01}
+DriftveilDrawbridge_Text_WowAwesomeYeahThink = Wow! Awesome!\nYeah, I think it looks like Charizard.{be01}\nThanks! As a token of my appreciation,\nplease accept this!{be01}
+DriftveilDrawbridge_Text_WonderIfPeopleWho = I wonder if the people who made\nthis drawbridge were with Charizard.
+DriftveilDrawbridge_Text_PantingPantingImThirsty = {be09:2}Panting... Panting...\nI'm...thirsty...{be01}\nI met you on the Skyarrow Bridge...{be01}\nG-g-give me...\nFresh Water...?{be09:0}
+DriftveilDrawbridge_Text_RefreshedIm100Rehydrated = Refreshed!!{be01}\nI'm 100% rehydrated!\nI feel better now! Thank you!{be01}\nI'll dash to the next bridge!
+DriftveilDrawbridge_Text_ButDontHaveFresh = {be09:2}But... You don't have Fresh Water...\nI appreciate the thought, though...{be09:0}
+DriftveilDrawbridge_Text_ThankWhatOhWithout = {be09:2}Thank...{be01}\nWhat?\nOh...{be01}\nWithout Fresh Water...\nI can't run on bridges anymore.{be09:0}

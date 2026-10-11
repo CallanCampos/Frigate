@@ -1,9 +1,9 @@
-None
-Central Federal District
-Far Eastern Federal District
-Northwestern Federal District
-Volga Federal District
-Siberian Federal District
-Southern Federal District
-Urals Federal District
-North Caucasian Federal District
+Bank0434_Text_None = None
+Bank0434_Text_CentralFederalDistrict = Central Federal District
+Bank0434_Text_FarEasternFederalDistrict = Far Eastern Federal District
+Bank0434_Text_NorthwesternFederalDistrict = Northwestern Federal District
+Bank0434_Text_VolgaFederalDistrict = Volga Federal District
+Bank0434_Text_SiberianFederalDistrict = Siberian Federal District
+Bank0434_Text_SouthernFederalDistrict = Southern Federal District
+Bank0434_Text_UralsFederalDistrict = Urals Federal District
+Bank0434_Text_NorthCaucasianFederalDistrict = North Caucasian Federal District

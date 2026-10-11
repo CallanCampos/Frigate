@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LUDICOLO",
+    "moves": [ "MOVE_RAIN_DANCE", "MOVE_LEECH_SEED", "MOVE_PROTECT", "MOVE_GIGA_DRAIN" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

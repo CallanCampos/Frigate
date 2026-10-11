@@ -1,7 +1,0 @@
-The Pokémon League is a place where you\nboth pursue strength and express it.{be01}\nThe way to express it is simple...{be01}\nYou just have to beat the Elite Four and\nthe Champion!{be01}\nYou can start your challenge by battling\nany of the Elite Four, and if you defeat{be00}\nthem all, you can challenge the Champion!{be01}\nHowever! I warn you, once you start\nyour challenge, there's no turning back.{be01}\nYou must keep battling until you defeat\nthem all...or are defeated yourself.{be01}\nDo you want to go in?
-Once you start your challenge,\nyou cannot leave until you win against all{be00}\nor lose! Do you want to go in?
-Then, proceed!{be01}
-Don't neglect preparation!{be01}\nGo through the entrance there, and\nprepare as much as possible. Make sure{be00}\nyour Pokémon are fully recovered!{be01}
-The Pokémon League is a place where you\nboth pursue strength and express it.{be01}\nThe way to express it is simple...{be01}\nYou just have to beat the Elite Four and\nthe Champion!{be01}\nYou can start your challenge by battling\nany of the Elite Four, and if you defeat{be00}\nthem all, you can challenge the Champion!{be01}\nHowever! I warn you, once you start\nyour challenge, there's no turning back.{be01}\nIf you enter, you must keep battling\nuntil you defeat them all...{be00}\nor are defeated yourself.
-The Pokémon League is every Trainer's\ngreatest challenge!{be01}
-You might want to prepare here.\nBecause if you lose even once,{be00}\nyou have to start all over again!

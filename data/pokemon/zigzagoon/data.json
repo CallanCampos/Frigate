@@ -1,0 +1,190 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Zigzagoon",
+    "pokedex": {
+        "category": "TinyRaccoon Pokémon",
+        "entry": "It walks in zigzag fashion. It is\ngood at finding items in the\ngrass and even in the ground.",
+        "height": "1'04\"",
+        "weight": "38.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Zigzagoon",
+                "category": "TinyRaccoon Pokémon",
+                "entry": "It walks in zigzag fashion. It is\ngood at finding items in the\ngrass and even in the ground.",
+                "height": "1'04\"",
+                "weight": "38.6 lbs."
+            },
+            "fr": {
+                "name": "Zigzaton",
+                "category": "Pokémon Petit Raton",
+                "entry": "Il marche en zigzaguant et n'a\npas son pareil pour trouver des\nobjets dans l'herbe ou sous terre.",
+                "height": "0,4 m",
+                "weight": "17,5 kg"
+            },
+            "de": {
+                "name": "Zigzachs",
+                "category": "Kleindachs",
+                "entry": "Es läuft im Zickzack. Es hat das\nTalent, Items im Gras, aber auch\nim Boden, zu finden.",
+                "height": "0,4 m",
+                "weight": "17,5 kg"
+            },
+            "it": {
+                "name": "Zigzagoon",
+                "category": "Pokémon Procione",
+                "entry": "Avanza a zigzag. È bravo a trovare\nstrumenti nell'erba e sul terreno.",
+                "height": "0,4 m",
+                "weight": "17,5 kg"
+            },
+            "ko": {
+                "name": "지그제구리",
+                "category": "앙증너구리포켓몬",
+                "entry": "지그재그로 걸어서 풀숲이나\n땅에 묻혀 있는 보물을\n찾아내는 것이 특기인 포켓몬이다.",
+                "height": "0.4 m",
+                "weight": "17.5 kg"
+            },
+            "es": {
+                "name": "Zigzagoon",
+                "category": "Pokémon Mapachito",
+                "entry": "Se mueve en zigzag. Se le da bien\nencontrar objetos ocultos en la hierba\ne incluso enterrados.",
+                "height": "0,4 m",
+                "weight": "17,5 kg"
+            },
+            "ja": {
+                "name": "ジグザグマ",
+                "category": "まめだぬきポケモン",
+                "entry": "ジグザグに\\x{3000}あるいて\\x{3000}くさかげや\nじめんに\\x{3000}うまっている\\x{3000}たからものを\nみつけるのが\\x{3000}とくいな\\x{3000}ポケモン。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff17}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 38,
+        "attack": 30,
+        "defense": 41,
+        "speed": 60,
+        "special_attack": 30,
+        "special_defense": 41
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_ORAN_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_PICKUP", "ABILITY_GLUTTONY" ],
+    "hidden_ability": "ABILITY_QUICK_FEET",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 48,
+    "height": 4,
+    "weight": 175,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 5, "MOVE_TAIL_WHIP" ],
+            [ 9, "MOVE_HEADBUTT" ],
+            [ 13, "MOVE_SAND_ATTACK" ],
+            [ 17, "MOVE_ODOR_SLEUTH" ],
+            [ 21, "MOVE_MUD_SPORT" ],
+            [ 25, "MOVE_PIN_MISSILE" ],
+            [ 29, "MOVE_COVET" ],
+            [ 33, "MOVE_BESTOW" ],
+            [ 37, "MOVE_FLAIL" ],
+            [ 41, "MOVE_REST" ],
+            [ 45, "MOVE_BELLY_DRUM" ],
+            [ 49, "MOVE_FLING" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM56",
+            "TM57",
+            "TM67",
+            "TM73",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM03"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SUPER_FANG",
+            "MOVE_SEED_BOMB",
+            "MOVE_GUNK_SHOT",
+            "MOVE_LAST_RESORT",
+            "MOVE_ICY_WIND",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_CHARM",
+            "MOVE_PURSUIT",
+            "MOVE_TICKLE",
+            "MOVE_TRICK",
+            "MOVE_HELPING_HAND",
+            "MOVE_MUD_SLAP",
+            "MOVE_SLEEP_TALK",
+            "MOVE_ROCK_CLIMB",
+            "MOVE_SIMPLE_BEAM"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 20,
+            "species": "SPECIES_LINOONE"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ZIGZAGOON"
+}

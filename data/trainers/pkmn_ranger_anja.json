@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Anja",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_RAWST_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_MAGBY",
+            "form": 0,
+            "level": 23,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Scorching desert!\nA passion for adventure!{be00}\nAnd a heated battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hot! Hot! Hot! Hot!!"
+        },
+        {
+            "type": 15,
+            "text": "Speed is crucial\nto treat a burn!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Whether it is hot or cold,\nthere is no problem if you have passion!"
+        }
+    ]
+}

@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ai & Ciel",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WHIMSICOTT",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LILLIGANT",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 2,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "I love to watch professionals play!\nYaaaay! I won't lose, either!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ai: What?\nDid we lose...?{be01}\nCiel: Ouch... I knew watching a game and\nplaying it are different!"
+        },
+        {
+            "type": 5,
+            "text": "Watching a professional game\nmakes me strangely confident!"
+        },
+        {
+            "type": 6,
+            "text": "Exciting!"
+        },
+        {
+            "type": 7,
+            "text": "I want to move elegantly, too!\nHey! Have a battle with me!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "When professionals are playing,\nit looks so easy..."
+        },
+        {
+            "type": 10,
+            "text": "Thrilling!"
+        }
+    ]
+}

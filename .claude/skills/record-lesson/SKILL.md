@@ -17,7 +17,7 @@ went only to memory, and the docs fell behind. Put each lesson where the next pe
 | Why one function doesn't match, and what was tried | `docs/nonmatching-functions.md` | A row in the existing table format |
 | A build failure and its fix | `.claude/skills/fix-build/SKILL.md` table | Symptom, then cause and fix |
 | A step that was missed or a convention that was broken | The skill that covers that step; a hook (`.claude/hooks/guard.py`) if it must never happen again | An imperative line with the reason |
-| A useful scratchpad script | `tools/scripts/`, with a docstring and usage like the others, and a mention in `docs/decompiling.md` | Commit it as `tools: ...`; the scratchpad is wiped between sessions |
+| A useful scratchpad script | The fitting package of `tools/` ([tools/README.md](../../../tools/README.md)), with a docstring and usage like the others, and a mention in `docs/decompiling.md` | Commit it as `tools: ...`; the scratchpad is wiped between sessions |
 | The workstream's status, plan or the user's choices | The memory file for that workstream | Dates as absolute dates |
 
 ## Prove it first

@@ -1,14 +1,14 @@
-None
-East of England
-East Midlands
-Greater London
-North East England
-North West England
-Northern Ireland
-Scotland
-South East England
-South West England
-Wales
-West Midlands
-Yorkshire and the Humber
+Bank0428_Text_None = None
+Bank0428_Text_EastEngland = East of England
+Bank0428_Text_EastMidlands = East Midlands
+Bank0428_Text_GreaterLondon = Greater London
+Bank0428_Text_NorthEastEngland = North East England
+Bank0428_Text_NorthWestEngland = North West England
+Bank0428_Text_NorthernIreland = Northern Ireland
+Bank0428_Text_Scotland = Scotland
+Bank0428_Text_SouthEastEngland = South East England
+Bank0428_Text_SouthWestEngland = South West England
+Bank0428_Text_Wales = Wales
+Bank0428_Text_WestMidlands = West Midlands
+Bank0428_Text_YorkshireHumber = Yorkshire and the Humber
 \pad{c4}

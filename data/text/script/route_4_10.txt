@@ -1,0 +1,1 @@
+Route410_Text_PeopleSayTheyBrats = People say they are brats,\nbut they are just hanging out.{be00}\nNever judge a book by its cover.

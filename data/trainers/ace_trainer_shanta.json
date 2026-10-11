@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Shanta",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HEATMOR",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_FLAME_BURST", "MOVE_SLASH", "MOVE_BUG_BITE", "MOVE_ROCK_TOMB" ]
+        },
+        {
+            "species": "SPECIES_GALVANTULA",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_CHARGE_BEAM", "MOVE_SIGNAL_BEAM", "MOVE_SLASH", "MOVE_THUNDER_WAVE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Something about you reminds me of that\nTrainer from two years ago...{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Yes, that mix of kindness and power is just\nlike that Trainer!"
+        },
+        {
+            "type": 2,
+            "text": "I wonder where that Trainer is now..."
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VENUSAUR",
+    "moves": [ "MOVE_ROAR", "MOVE_VENOSHOCK", "MOVE_POWER_WHIP", "MOVE_EARTHQUAKE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_MIRACLE_SEED",
+    "form": 0
+}

@@ -1,0 +1,3 @@
+VictoryRoad27_Text_ThanksPokemonIveCollected = Thanks to my Pokémon,\nI've collected eight Gym Badges!{be01}\nBut I'm too afraid to go further.\nI'm stuck at Victory Road.
+VictoryRoad27_Text_FirstAllGoThrough = First of all, go through this long and\ndifficult Victory Road.{be01}\nThen, defeat even one of the\nElite Four.{be01}\nIncrease what you can do little by little,\nand get close to the Champion!
+\pad{02}

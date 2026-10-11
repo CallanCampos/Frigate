@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_CONKELDURR",
+    "moves": [ "MOVE_ROCK_SLIDE", "MOVE_FORCE_PALM", "MOVE_SMELLING_SALT", "MOVE_BULK_UP" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_BLACK_BELT",
+    "form": 0
+}

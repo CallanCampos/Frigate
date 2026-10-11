@@ -1,0 +1,38 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 1,
+    "area": 6,
+    "matrix": "MAP_MATRIX_OVERWORLD",
+    "scripts": "SCRIPTS_ROUTE_3",
+    "text": "SCRIPT_TEXT_ROUTE_3",
+    "bgm": {
+        "spring": "SEQ_BGM_R_B_SP",
+        "summer": "SEQ_BGM_R_B_SU",
+        "autumn": "SEQ_BGM_R_B_AU",
+        "winter": "SEQ_BGM_R_B_WI"
+    },
+    "encounters": "ENCOUNTERS_ROUTE_3",
+    "enc_slot": 1,
+    "parent": "ZONE_ROUTE_3",
+    "place": "PLACE_ROUTE_3",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 0,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": true,
+    "entralink_warp": true,
+    "cam_bound": 0,
+    "name_icon": 31,
+    "easy_level": 5,
+    "fly": {
+        "x": 750,
+        "y": 0,
+        "z": 566
+    }
+}

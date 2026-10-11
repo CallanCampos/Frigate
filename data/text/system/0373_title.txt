@@ -1,3 +1,0 @@
-                \x{ffff}
-                 \x{ffff}
-\pad{38}

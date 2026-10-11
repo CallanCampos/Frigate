@@ -4,7 +4,7 @@
 
 #include "types.h"
 #include "app/gsync/gsync_disp.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
 #include "constants/arc.h"
 #include "constants/species.h"
 #include "gfl/arc.h"
@@ -159,7 +159,7 @@ GSyncDisp *GSyncDisp_Create(HeapID heapId) {
     GSyncDisp *disp = GFL_HeapAllocate(heapId, sizeof(GSyncDisp), TRUE, "gsync_disp.c", 257);
 
     disp->heapId = heapId;
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetDisplayLayout(1);
@@ -232,7 +232,7 @@ void GSyncDisp_Free(GSyncDisp *disp) {
     GFL_BGSysSetBGEnabled(5, FALSE);
     GFL_BGSysFree();
     GFL_HeapFree(disp);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
 }
 
 static void GSyncDisp_CreateBGs(GSyncDisp *disp) {

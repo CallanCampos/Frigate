@@ -1,0 +1,170 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Dewgong",
+    "pokedex": {
+        "category": "Sea Lion Pokémon",
+        "entry": "Its streamlined body has low resistance,\nand it swims around cold oceans at\na speed of eight knots.",
+        "height": "5'07\"",
+        "weight": "264.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Dewgong",
+                "category": "Sea Lion Pokémon",
+                "entry": "In snow, the pure white coat\ncovering its body obscures it from\npredators.",
+                "height": "5'07\"",
+                "weight": "264.6 lbs."
+            },
+            "fr": {
+                "name": "Lamantine",
+                "category": "Pokémon Otarie",
+                "entry": "Son corps est couvert d'un grand\nmanteau blanc qui, dans la neige, le\ndissimule aux yeux des prédateurs.",
+                "height": "1,7 m",
+                "weight": "120,0 kg"
+            },
+            "de": {
+                "name": "Jugong",
+                "category": "Seehund",
+                "entry": "Sein Körper ist mit einem weißen Fell\nbedeckt, das es im Schnee fast\nunsichtbar für Gegner macht.",
+                "height": "1,7 m",
+                "weight": "120,0 kg"
+            },
+            "it": {
+                "name": "Dewgong",
+                "category": "Pokémon Otaria",
+                "entry": "Ha il corpo ricoperto da una pelliccia\nbianca che, sulla neve, lo rende meno\nvisibile ai predatori.",
+                "height": "1,7 m",
+                "weight": "120,0 kg"
+            },
+            "ko": {
+                "name": "쥬레곤",
+                "category": "강치포켓몬",
+                "entry": "전신이 새하얀 털로\n덮여 있기 때문에 눈 속에서는\n천적에 발견되지 않는다.",
+                "height": "1.7 m",
+                "weight": "120.0 kg"
+            },
+            "es": {
+                "name": "Dewgong",
+                "category": "Pokémon León Mar.",
+                "entry": "Está cubierto de un luminoso pelaje\nblanco que lo camufla en la nieve.",
+                "height": "1,7 m",
+                "weight": "120,0 kg"
+            },
+            "ja": {
+                "name": "ジュゴン",
+                "category": "あしかポケモン",
+                "entry": "ぜんしんが\\x{3000}まっしろな\\x{3000}たいもうに\nおおわれているため\\x{3000}ゆきの\\x{3000}なかでは\nてんてきに\\x{3000}みつからないのだ。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff12}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 70,
+        "defense": 80,
+        "speed": 70,
+        "special_attack": 70,
+        "special_defense": 95
+    },
+    "types": [ "TYPE_WATER", "TYPE_ICE" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_THICK_FAT", "ABILITY_HYDRATION" ],
+    "hidden_ability": "ABILITY_ICE_BODY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 166,
+    "height": 17,
+    "weight": 1200,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_SIGNAL_BEAM" ],
+            [ 1, "MOVE_ICY_WIND" ],
+            [ 3, "MOVE_GROWL" ],
+            [ 7, "MOVE_SIGNAL_BEAM" ],
+            [ 11, "MOVE_ICY_WIND" ],
+            [ 13, "MOVE_ENCORE" ],
+            [ 17, "MOVE_ICE_SHARD" ],
+            [ 21, "MOVE_REST" ],
+            [ 23, "MOVE_AQUA_RING" ],
+            [ 27, "MOVE_AURORA_BEAM" ],
+            [ 31, "MOVE_AQUA_JET" ],
+            [ 33, "MOVE_BRINE" ],
+            [ 34, "MOVE_SHEER_COLD" ],
+            [ 39, "MOVE_TAKE_DOWN" ],
+            [ 45, "MOVE_DIVE" ],
+            [ 49, "MOVE_AQUA_TAIL" ],
+            [ 55, "MOVE_ICE_BEAM" ],
+            [ 61, "MOVE_SAFEGUARD" ],
+            [ 65, "MOVE_HAIL" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM56",
+            "TM68",
+            "TM79",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_DRILL_RUN",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 266,
+    "baby_species": "SPECIES_SEEL"
+}

@@ -1,0 +1,29 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Nishino",
+    "class": "TRAINER_CLASS_GAME_FREAK_NISHINO",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_SUPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CLEFAIRY",
+            "form": 0,
+            "level": 16,
+            "difficulty": 0,
+            "gender": 2,
+            "ability": 1,
+            "item": "ITEM_LEFTOVERS",
+            "moves": [ "MOVE_DOUBLE_SLAP", "MOVE_GROWL", "MOVE_ENCORE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ah... I see...\nThat was quite well thought out."
+        }
+    ]
+}

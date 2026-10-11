@@ -1,0 +1,184 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Tropius",
+    "pokedex": {
+        "category": "Fruit Pokémon",
+        "entry": "It flies by flapping its broad leaves\nand gives the sweet, delicious\nfruit around its neck to children.",
+        "height": "6'07\"",
+        "weight": "220.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Tropius",
+                "category": "Fruit Pokémon",
+                "entry": "Delicious fruits grew out from\naround its neck because it always\nate the same kind of fruit.",
+                "height": "6'07\"",
+                "weight": "220.5 lbs."
+            },
+            "fr": {
+                "name": "Tropius",
+                "category": "Pokémon Fruit",
+                "entry": "À force de toujours manger le même\nfruit succulent, il en pousse à la\nbase de son cou.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "de": {
+                "name": "Tropius",
+                "category": "Obst",
+                "entry": "Isst immer dieselbe Art köstlicher\nFrüchte. Mittlerweile wachsen sie\nsogar schon aus seinem Hals.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "it": {
+                "name": "Tropius",
+                "category": "Pokémon Frutto",
+                "entry": "Poiché era solito mangiare frutti\ndeliziosi, questi hanno cominciato\na crescergli attorno al collo.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "ko": {
+                "name": "트로피우스",
+                "category": "후르츠포켓몬",
+                "entry": "항상 같은 과일만 먹었더니\n목 주변에 매우 맛있는\n열매가 열렸다.",
+                "height": "2.0 m",
+                "weight": "100.0 kg"
+            },
+            "es": {
+                "name": "Tropius",
+                "category": "Pokémon Fruto",
+                "entry": "Como solo comía un tipo de fruta,\nal final acabó creciéndole en el\ncuello.",
+                "height": "2,0 m",
+                "weight": "100,0 kg"
+            },
+            "ja": {
+                "name": "トロピウス",
+                "category": "フルーツポケモン",
+                "entry": "いつも\\x{3000}おなじ\\x{3000}くだものばかり\nたべていたら\\x{3000}のどもとに\\x{3000}とても\nおいしい\\x{3000}くだものが\\x{3000}はえてきた。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 99,
+        "attack": 68,
+        "defense": 83,
+        "speed": 51,
+        "special_attack": 72,
+        "special_defense": 87
+    },
+    "types": [ "TYPE_GRASS", "TYPE_FLYING" ],
+    "catch_rate": 200,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_SOLAR_POWER" ],
+    "hidden_ability": "ABILITY_HARVEST",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 161,
+    "height": 20,
+    "weight": 1000,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_GUST" ],
+            [ 7, "MOVE_GROWTH" ],
+            [ 11, "MOVE_RAZOR_LEAF" ],
+            [ 17, "MOVE_STOMP" ],
+            [ 21, "MOVE_SWEET_SCENT" ],
+            [ 27, "MOVE_WHIRLWIND" ],
+            [ 31, "MOVE_MAGICAL_LEAF" ],
+            [ 37, "MOVE_BODY_SLAM" ],
+            [ 41, "MOVE_SYNTHESIS" ],
+            [ 47, "MOVE_LEAF_TORNADO" ],
+            [ 51, "MOVE_AIR_SLASH" ],
+            [ 57, "MOVE_BESTOW" ],
+            [ 61, "MOVE_SOLAR_BEAM" ],
+            [ 67, "MOVE_NATURAL_GIFT" ],
+            [ 71, "MOVE_LEAF_STORM" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM78",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM02",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_WORRY_SEED",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_HEADBUTT",
+            "MOVE_SLAM",
+            "MOVE_RAZOR_WIND",
+            "MOVE_LEECH_SEED",
+            "MOVE_NATURE_POWER",
+            "MOVE_LEAF_STORM",
+            "MOVE_SYNTHESIS",
+            "MOVE_CURSE",
+            "MOVE_LEAF_BLADE",
+            "MOVE_DRAGON_DANCE",
+            "MOVE_BULLET_SEED",
+            "MOVE_NATURAL_GIFT"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 288,
+    "baby_species": "SPECIES_TROPIUS"
+}

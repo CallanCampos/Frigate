@@ -1,5 +1,0 @@
-Oh! Undella Town is right through here!{be01}\nI want to keep looking around\na little bit.{be01}\nWhat do you want to do?\nShould we say bye for now?
-OK, then!{be01}\nI want to do a little more\nresearch about Heatran anyway!{be01}\nThank you for coming with me!\nBe careful on the rest of your journey!{be01}
-OK, then!{be01}\nI want to do a little more research\nabout where Heatran might be!{be01}\nThank you for coming with me!\nBe careful on the rest of your journey!{be01}
-OK! Well, then.\nLet's go look around a little more!{be01}
-Reversal Mountain... I wonder...\nCould a Magma Stone be in there?{be01}\nHave you heard of it?\nThey say a Magma Stone was found{be00}\nin a volcano in the distant Sinnoh region.{be01}\nApparently, it had something to do\nwith Heatran!

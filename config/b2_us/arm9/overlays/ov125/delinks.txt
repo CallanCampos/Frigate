@@ -2,3 +2,8 @@
     .rodata     start:0x021ef234 end:0x021ef3ec kind:rodata align:4
     .ctor       start:0x021ef3ec end:0x021ef3ec kind:rodata align:4
     .bss        start:0x021ef400 end:0x021ef400 kind:bss align:32
+
+src/ov125/gimmick_league_caitlin.c:
+    complete
+    .text       start:0x021eec80 end:0x021ef234
+    .rodata     start:0x021ef234 end:0x021ef3ec

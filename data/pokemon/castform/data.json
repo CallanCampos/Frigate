@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Castform",
+    "pokedex": {
+        "category": "Weather Pokémon",
+        "entry": "Temperature and weather affect its\ncellular structure, so this Pokémon\nchanges form according to the weather.",
+        "height": "1'00\"",
+        "weight": "1.8 lbs.",
+        "forms": [
+            {
+                "entry": "Temperature and weather affect its\ncellular structure, so this Pokémon\nchanges form according to the weather.",
+                "height": "1'00\"",
+                "weight": "1.8 lbs."
+            },
+            {
+                "entry": "Temperature and weather affect its\ncellular structure, so this Pokémon\nchanges form according to the weather.",
+                "height": "1'00\"",
+                "weight": "1.8 lbs."
+            },
+            {
+                "entry": "Temperature and weather affect its\ncellular structure, so this Pokémon\nchanges form according to the weather.",
+                "height": "1'00\"",
+                "weight": "1.8 lbs."
+            }
+        ],
+        "languages": {
+            "en": {
+                "name": "Castform",
+                "category": "Weather Pokémon",
+                "entry": "Its appearance changes with the\nweather. Recently, its molecules\nwere found to be just like water.",
+                "height": "1'00\"",
+                "weight": "1.8 lbs."
+            },
+            "fr": {
+                "name": "Morphéo",
+                "category": "Pokémon Climat",
+                "entry": "Son aspect change avec la météo.\nOn a récemment découvert que ses\nmolécules étaient pareilles à l'eau.",
+                "height": "0,3 m",
+                "weight": "0,8 kg"
+            },
+            "de": {
+                "name": "Formeo",
+                "category": "Wetter",
+                "entry": "Seine Gestalt ändert sich mit dem\nWetter. Vor kurzem entdeckte man,\ndass seine Moleküle wie Wasser sind.",
+                "height": "0,3 m",
+                "weight": "0,8 kg"
+            },
+            "it": {
+                "name": "Castform",
+                "category": "Pokémon Meteo",
+                "entry": "Il suo aspetto varia con il clima.\nRecentemente si è scoperto che\nle sue molecole sono di acqua.",
+                "height": "0,3 m",
+                "weight": "0,8 kg"
+            },
+            "ko": {
+                "name": "캐스퐁",
+                "category": "날씨포켓몬",
+                "entry": "날씨에 따라서 모습이 바뀐다.\n최근 발견된 바에 따르면\n물의 분자와 똑 닮았다고 한다.",
+                "height": "0.3 m",
+                "weight": "0.8 kg"
+            },
+            "es": {
+                "name": "Castform",
+                "category": "Pokémon Clima",
+                "entry": "La meteorología determina su\naspecto. Hace poco se ha sabido\nque sus células son como el agua.",
+                "height": "0,3 m",
+                "weight": "0,8 kg"
+            },
+            "ja": {
+                "name": "ポワルン",
+                "category": "てんきポケモン",
+                "entry": "てんきによって\\x{3000}すがたが\\x{3000}かわる。\nみずの\\x{3000}ぶんしと\\x{3000}そっくりなことが\nさいきんになって\\x{3000}はっけんされた。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 70,
+        "defense": 70,
+        "speed": 70,
+        "special_attack": 70,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_MYSTIC_WATER",
+        "rare": "ITEM_MYSTIC_WATER",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FAIRY", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_FORECAST", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 4,
+        "sprite_offset": 27
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 147,
+    "height": 3,
+    "weight": 8,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 10, "MOVE_WATER_GUN" ],
+            [ 10, "MOVE_EMBER" ],
+            [ 10, "MOVE_POWDER_SNOW" ],
+            [ 15, "MOVE_HEADBUTT" ],
+            [ 20, "MOVE_RAIN_DANCE" ],
+            [ 20, "MOVE_SUNNY_DAY" ],
+            [ 20, "MOVE_HAIL" ],
+            [ 30, "MOVE_WEATHER_BALL" ],
+            [ 40, "MOVE_HYDRO_PUMP" ],
+            [ 40, "MOVE_FIRE_BLAST" ],
+            [ 40, "MOVE_BLIZZARD" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM55",
+            "TM59",
+            "TM67",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM83",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [ "MOVE_LAST_RESORT", "MOVE_ICY_WIND", "MOVE_SNORE", "MOVE_TAILWIND", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_FUTURE_SIGHT",
+            "MOVE_LUCKY_CHANT",
+            "MOVE_DISABLE",
+            "MOVE_AMNESIA",
+            "MOVE_OMINOUS_WIND",
+            "MOVE_HEX",
+            "MOVE_CLEAR_SMOG"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 163,
+    "baby_species": "SPECIES_CASTFORM"
+}

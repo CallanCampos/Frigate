@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/zukan_detail.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -11,6 +12,7 @@
 #include "gfl/str.h"
 #include "gfl/tcb.h"
 #include "system/printsys.h"
+#include "text/system/btl_server_flow_title.h"
 
 // The detail screen's head bar, on BG 5 at the top of the sub screen: the title of the page, which slides in and out
 
@@ -150,7 +152,7 @@ static void ZukanDetailHeadbar_InitBG(ZukanDetailHeadbar *headbar) {
     headbar->charPos = GFL_BGSysLoadCharDynamic(HEADBAR_BG, GFL_BitmapGetPixelData(headbar->bitmap), headbar->charSize);
     loadBGScrToVramByNarcNoReserve(ARCID_ZUKAN_GRA, 38, HEADBAR_BG, 0, headbar->charPos, 0xc0, FALSE, headbar->heapId);
     GFL_BGSysSetScrPaletteNo(HEADBAR_BG, 0, 0, 32, 24, 13);
-    headbar->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 441, headbar->heapId);
+    headbar->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, headbar->heapId);
 }
 
 static void ZukanDetailHeadbar_FreeBG(ZukanDetailHeadbar *headbar) {
@@ -173,7 +175,7 @@ static void ZukanDetailHeadbar_PrintTitle(ZukanDetailHeadbar *headbar) {
         bitmap = GFL_G2DIOLoadBitmap(ARCID_ZUKAN_GRA, 14, FALSE, headbar->heapId);
         GFL_BitmapCopy(bitmap, headbar->bitmap);
         GFL_BitmapFree(bitmap);
-        strbuf = GFL_MsgDataLoadStrbufNew(headbar->msgData, 179 + headbar->title);
+        strbuf = GFL_MsgDataLoadStrbufNew(headbar->msgData, BtlServerFlowTitle_Text_Info + headbar->title);
         func_02021c7c(headbar->printQueue, headbar->bitmap, 24, 5, strbuf, headbar->font, PRINT_COLOR(15, 14, 0));
         GFL_StrBufFree(strbuf);
         headbar->transferPending = TRUE;

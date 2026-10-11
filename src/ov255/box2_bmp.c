@@ -3,10 +3,11 @@
 #include "app/box2_bmp.h"
 #include "app/box2_main.h"
 #include "app/box2_obj.h"
-#include "app/ov139.h"
+#include "app/ui/print_msg.h"
 #include "constants/arc.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -138,7 +139,7 @@ static void func_ov255_021ce0c0(Box2AppWork *app, u32 index, MsgData *msgData, u
 }
 
 static MsgData *func_ov255_021ce130(void) {
-    return GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 14, HEAPID_BOX2_APP);
+    return GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0014, HEAPID_BOX2_APP);
 }
 
 void func_ov255_021ce140(Box2SysWork *syswk) {
@@ -294,7 +295,7 @@ static void func_ov255_021ce6f0(Box2AppWork *app, Box2PokeInfo *info, u32 index)
     u32 i;
 
     GFL_BitmapFill(BmpWin_GetBitmap(app->windows[index].window), 0);
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 403, HEAPID_TAIL(HEAPID_BOX2_APP));
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_TAIL(HEAPID_BOX2_APP));
     if (info->egg == FALSE) {
         for (i = 0; i < 4; i++) {
             func_ov255_021ce068(app, index, msgData, info->waza[i], 0, i * 16, app->font, BOX2_COLOR_NORMAL);
@@ -410,8 +411,8 @@ static void func_ov255_021ce870(Box2SysWork *syswk, u32 index, u32 msgId, u16 fr
     }
 
     str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, msgId);
-    func_ov139_0219a2a4(&syswk->app->windows[index], syswk->app->printQueue, width * 8 / 2, 4, str,
-                        syswk->app->font, color, 2);
+    PrintStrAligned(&syswk->app->windows[index], syswk->app->printQueue, width * 8 / 2, 4, str,
+                        syswk->app->font, color, PRINT_ALIGN_CENTER);
     GFL_StrBufFree(str);
 }
 

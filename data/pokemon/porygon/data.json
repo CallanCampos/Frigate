@@ -1,0 +1,184 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Porygon",
+    "pokedex": {
+        "category": "Virtual Pokémon",
+        "entry": "A man-made Pokémon created using\nadvanced scientific means. It can\nmove freely in cyberspace.",
+        "height": "2'07\"",
+        "weight": "80.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Porygon",
+                "category": "Virtual Pokémon",
+                "entry": "A man-made Pokémon created using\nadvanced scientific means. It can\nmove freely in cyberspace.",
+                "height": "2'07\"",
+                "weight": "80.5 lbs."
+            },
+            "fr": {
+                "name": "Porygon",
+                "category": "Pokémon Virtuel",
+                "entry": "Ce Pokémon créé par des\nscientifiques peut arpenter\nlibrement le cyberespace.",
+                "height": "0,8 m",
+                "weight": "36,5 kg"
+            },
+            "de": {
+                "name": "Porygon",
+                "category": "Virtuell",
+                "entry": "Ein von Menschen erschaffenes Pokémon,\ndas sich frei im künstlichen Raum\nbewegen kann.",
+                "height": "0,8 m",
+                "weight": "36,5 kg"
+            },
+            "it": {
+                "name": "Porygon",
+                "category": "Pokémon Virtuale",
+                "entry": "Un Pokémon creato dall'uomo con\nmetodi scientifici avanzatissimi. Si\nmuove liberamente nel ciberspazio.",
+                "height": "0,8 m",
+                "weight": "36,5 kg"
+            },
+            "ko": {
+                "name": "폴리곤",
+                "category": "가상포켓몬",
+                "entry": "최고의 과학력으로\n만들어진 인공 포켓몬이다.\n전자 공간을 이동할 수 있다.",
+                "height": "0.8 m",
+                "weight": "36.5 kg"
+            },
+            "es": {
+                "name": "Porygon",
+                "category": "Pokémon Virtual",
+                "entry": "Un Pokémon creado por el hombre\ncon avanzados medios tecnológicos.\nPuede viajar por el ciberespacio.",
+                "height": "0,8 m",
+                "weight": "36,5 kg"
+            },
+            "ja": {
+                "name": "ポリゴン",
+                "category": "バーチャルポケモン",
+                "entry": "さいこうの\\x{3000}かがくりょくで\nうみだされた\\x{3000}じんこうの\\x{3000}ポケモン。\nでんしくうかんを\\x{3000}いどうできる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff16}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 60,
+        "defense": 70,
+        "speed": 40,
+        "special_attack": 85,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_TRACE", "ABILITY_DOWNLOAD" ],
+    "hidden_ability": "ABILITY_ANALYTIC",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PINK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 79,
+    "height": 8,
+    "weight": 365,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CONVERSION_2" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_CONVERSION" ],
+            [ 1, "MOVE_SHARPEN" ],
+            [ 7, "MOVE_PSYBEAM" ],
+            [ 12, "MOVE_AGILITY" ],
+            [ 18, "MOVE_RECOVER" ],
+            [ 23, "MOVE_MAGNET_RISE" ],
+            [ 29, "MOVE_SIGNAL_BEAM" ],
+            [ 34, "MOVE_RECYCLE" ],
+            [ 40, "MOVE_DISCHARGE" ],
+            [ 45, "MOVE_LOCK_ON" ],
+            [ 51, "MOVE_TRI_ATTACK" ],
+            [ 56, "MOVE_MAGIC_COAT" ],
+            [ 62, "MOVE_ZAP_CANNON" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_MAGIC_COAT",
+            "MOVE_FOUL_PLAY",
+            "MOVE_GRAVITY",
+            "MOVE_MAGNET_RISE",
+            "MOVE_LAST_RESORT",
+            "MOVE_ELECTROWEB",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_TRICK",
+            "MOVE_WONDER_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE_WITH_ITEM",
+            "param": "ITEM_UP_GRADE",
+            "species": "SPECIES_PORYGON2"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_PORYGON"
+}

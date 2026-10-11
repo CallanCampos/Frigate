@@ -1,0 +1,5 @@
+BridgeGateGate2_Text_WatchPeopleUseRailway = Watch it! People use “railway fan" as\na catchall term, but there are many{be00}\ntypes of railway fans!{be01}\nThere are riding fans, detraining fans,\nstation fans, train-car fans,{be00}\nschedule-table fans, picture-taking fans,{be00}\nrecording fans, and more!{be01}\nDon't go thinking they're all the same!
+BridgeGateGate2_Text_SomeoneLikeWhoChecking = For someone like me, who is checking\nout rail lines all over the world,{be00}\nAnville Town, where you can look at{be00}\nvarious trains, gets pretty high marks!
+BridgeGateGate2_Text_GiantSteelBridgeTowering = A giant steel bridge towering over\nthe road ahead...{be01}\nJust looking at this model of the\nTubeline Bridge fills me with energy!{be01}\nSpeaking of energy...\nI'll give you this!{be01}
+BridgeGateGate2_Text_ItsEnergypowderUsePokemon = It's EnergyPowder!\nUse it on a Pokémon to restore{be00}\nsome of its HP!{be01}\nBut be careful... It's really bitter,\nso it might make your Pokémon unhappy!
+\pad{fc}

@@ -1,0 +1,17 @@
+NimbasaCity3_Text_ThereFootballGameBig = There is a football game in\nBig Stadium now!
+NimbasaCity3_Text_FootballPlayersPracticingBig = Football players are practicing in\nBig Stadium now.{be01}\nPeople can watch them practicing!
+NimbasaCity3_Text_ThereBaseballGameBig = There is a baseball game\nin Big Stadium now!
+NimbasaCity3_Text_InfieldersPracticingBigStadium = Infielders are practicing\nin Big Stadium now.{be01}\nPeople can watch them practicing!
+NimbasaCity3_Text_ThereSoccerGameBig = There is a soccer game\nin Big Stadium now!
+NimbasaCity3_Text_SoccerPlayersPracticingBig = Soccer players are practicing\nin Big Stadium now!{be01}\nPeople can watch them practicing!
+NimbasaCity3_Text_SureLookUpAthletes = You sure look up to athletes when\nyou're a kid.
+NimbasaCity3_Text_ImRaisingSamePokemon = I'm raising the same Pokémon as\nmy favorite athlete's Pokémon.
+NimbasaCity3_Text_WhenThrowPokeBall = When I throw a Poké Ball, I copy the\nthrowing form of a quarterback!
+NimbasaCity3_Text_WhenThrowPokeBall_2 = When I throw a Poké Ball, I copy the form\nof a pitcher!
+NimbasaCity3_Text_WhenThrowPokeBall_3 = When I throw a Poké Ball, I copy the\nthrowing technique of a keeper!
+NimbasaCity3_Text_HaHaAmFootball = Ha ha! I am a football player!{be01}\nI injured my hand, so I can't sign\nautographs! I'm sorry about that.{be01}\nSo, what does the autograph on your\nTrainer Card look like?
+NimbasaCity3_Text_YeahAmInfielderHurt = Yeah! I am an Infielder!{be01}\nI hurt my hand, so I can't write\nan autograph! Sorry!{be01}\nSay, how did you sign your Trainer Card?
+NimbasaCity3_Text_BwaHaHaAm = Bwa ha ha! I am a Striker!{be01}\nMy hand got hurt, so I won't be able\nto sign any autographs! Regrets!{be01}\nWhat does your Trainer Card signature\nlook like?
+NimbasaCity3_Text_AmSorryButCannot = I am sorry.{be01}\nBut you cannot go onto the field\nbecause a game is in progress.
+NimbasaCity3_Text_AmSorryButCannot_2 = I am sorry.{be01}\nBut you cannot go onto the field\nbecause a game is in progress.
+NimbasaCity3_Text_AmSorryButCannot_3 = I am sorry.{be01}\nBut you cannot go onto the field\nbecause a game is in progress.

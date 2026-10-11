@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/script_text_banks.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
@@ -358,8 +360,8 @@ void func_ov137_021eec80(Field *field) {
     sysSetup.list2 = *list2;
     sysSetup.entries = func_02010054(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
-    work->sys = func_ov137_021f1f1c(&sysSetup, unk, heapId);
-    flag = JoinAvenue_GetParam(func_ov137_021f202c(work->sys), 7, NULL);
+    work->sys = ResortSys_Create(&sysSetup, unk, heapId);
+    flag = JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL);
     func_ov137_021f0be4(work->sys, gameData, heapId);
     func_ov137_021f0ae0(work->sys, gameData, heapId);
     unk2 = ResortWork_Get(unk, 8);
@@ -370,15 +372,15 @@ void func_ov137_021eec80(Field *field) {
     sys_memset(&npcSetup, 0, sizeof(ResortNPCSetup));
     npcSetup.mmSys = GameData_GetMMSys(gameData);
     npcSetup.unk4 = 16;
-    npcSetup.info = func_ov137_021f202c(work->sys);
+    npcSetup.info = ResortSys_GetInfo(work->sys);
     npcSetup.zone = func_02039518(Field_GetPlayerStateZoneID(field));
-    npcSetup.table = func_ov137_021f2010(work->sys);
+    npcSetup.table = ResortSys_GetShopOpenings(work->sys);
     work->npc = func_ov137_021f1c24(&npcSetup, heapId);
 
     msgBGSys = Field_GetMsgBGSys(field);
-    datas = func_ov137_021f2014(work->sys);
-    info = func_ov137_021f202c(work->sys);
-    occupants = func_ov137_021f201c(work->sys);
+    datas = ResortSys_GetDatas(work->sys);
+    info = ResortSys_GetInfo(work->sys);
+    occupants = ResortSys_GetOccupants(work->sys);
     if (flag) {
         bubblesEnabled = FALSE;
     }
@@ -387,7 +389,7 @@ void func_ov137_021eec80(Field *field) {
     work->scene = func_ov137_021f0758(heapId, expObj, Field_GetCameraSystem(field));
 
     block = getHollow_RivalBlk(GameData_GetSaveControl(gameData));
-    entries = func_ov137_021f2028(work->sys);
+    entries = ResortSys_GetEntries(work->sys);
     for (i = 0; i < func_02037ed4(entries); i++) {
         void *entry = func_02037f04(entries, i);
         if (!func_02037a90(entry) && (u16)func_02037b38(entry, 3, NULL) == 223) {
@@ -403,7 +405,7 @@ void func_ov137_021eee4c(Field *field) {
     func_ov137_021efe1c(work->bubbles);
     func_ov137_021f1c74(work->npc);
     func_ov137_021f0540(work->people);
-    func_ov137_021f1fb4(work->sys);
+    ResortSys_Free(work->sys);
     Field_DeleteGimmickWorkBlock(field, 1);
 }
 
@@ -1158,7 +1160,7 @@ static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortP
     bubbles->info = info;
     bubbles->occupants = occupants;
     bubbles->enabled = enabled;
-    bubbles->msgData = GFL_MsgSysLoadData(FALSE, 3, 203, heapId);
+    bubbles->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_JOIN_AVENUE, heapId);
     for (i = 0; i < RESORT_BUBBLES; i++) {
         func_ov137_021f022c(&bubbles->bubbles[i], i, heapId);
     }
@@ -1526,9 +1528,9 @@ static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMS
 
     people->sys = sys;
     sys_memset(&watchSetup, 0, sizeof(ResortWatchSetup));
-    watchSetup.list = func_ov137_021f2020(sys);
-    watchSetup.list2 = func_ov137_021f2024(sys);
-    watchSetup.entries = func_ov137_021f2028(sys);
+    watchSetup.list = ResortSys_GetList(sys);
+    watchSetup.list2 = ResortSys_GetList2(sys);
+    watchSetup.entries = ResortSys_GetEntries(sys);
     watchSetup.context = people;
     watchSetup.callback = flag ? func_ov137_021f0720 : func_ov137_021f067c;
     watchSetup.interval = 0;
@@ -1536,15 +1538,15 @@ static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMS
 
     sys_memset(&peopleSetup, 0, sizeof(ResortPeopleSetup));
     peopleSetup.mmSys = mmSys;
-    peopleSetup.slots = func_ov137_021f2018(sys);
-    peopleSetup.datas = func_ov137_021f2014(sys);
+    peopleSetup.slots = ResortSys_GetSlots(sys);
+    peopleSetup.datas = ResortSys_GetDatas(sys);
     peopleSetup.count = 64;
     peopleSetup.zone = 1;
-    peopleSetup.shops = func_ov137_021f1ff8(sys);
-    peopleSetup.unk18 = func_ov137_021f2004(sys);
+    peopleSetup.shops = ResortSys_GetShopData(sys);
+    peopleSetup.unk18 = ResortSys_GetUnk20Table(sys);
     people->people = func_ov137_021f12b4(&peopleSetup, heapId);
-    people->walkers = func_ov137_021ef124(heapId, mmSys, player, func_ov137_021f1ff8(sys), func_ov137_021f2004(sys),
-                                          func_ov137_021f201c(sys));
+    people->walkers = func_ov137_021ef124(heapId, mmSys, player, ResortSys_GetShopData(sys), ResortSys_GetUnk20Table(sys),
+                                          ResortSys_GetOccupants(sys));
     return people;
 }
 
@@ -1598,7 +1600,7 @@ static ResortWalkers *func_ov137_021f05ac(ResortFieldPeople *people) {
 // Moves the occupants' actors to the shops' doors at x 11 or 19, and turns the NPCs to them
 static void func_ov137_021f05b0(ResortFieldPeople *people, ResortSys *sys, ResortNPC *npc) {
     u32 i;
-    ResortPersonData **datas = func_ov137_021f2014(people->sys);
+    ResortPersonData **datas = ResortSys_GetDatas(people->sys);
     ResortDataIter iter = func_ov137_021f1ae0(datas, sWalkerOccupantKinds, 1);
     ResortPersonData *data;
 
@@ -1660,7 +1662,7 @@ static BOOL func_ov137_021f067c(void *context, void *person, u32 a2, u32 event) 
         if (func_ov137_021f1600(people->people, person) == NULL) {
             ResortPersonSource source;
             sys_memset(&source, 0, sizeof(ResortPersonSource));
-            source.data = func_ov137_021f1b6c(func_ov137_021f2014(people->sys), person);
+            source.data = func_ov137_021f1b6c(ResortSys_GetDatas(people->sys), person);
             source.zone = 1;
             func_ov137_021ef250(people->walkers, func_ov137_021f14a8(people->people, &source));
         }
@@ -1829,7 +1831,7 @@ static void func_ov137_021f0ad8(ResortFieldScene *scene) {
 
 // Adds people to the avenue from entries, by the player's progress, the first time
 static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapId) {
-    JoinAvenueInfo *info = func_ov137_021f202c(sys);
+    JoinAvenueInfo *info = ResortSys_GetInfo(sys);
 
     if (JoinAvenue_GetParam(info, 7, NULL) == 0 && JoinAvenue_GetParam(info, 6, NULL) == 0) {
         SaveControl *save = GameData_GetSaveControl(gameData);
@@ -1842,7 +1844,7 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
         u32 added;
         int tries;
 
-        func_ov137_021f2028(sys);
+        ResortSys_GetEntries(sys);
         entry = func_02037a40(HEAPID_TAIL(heapId));
         unk = func_ov012_02169b78(gameData);
         badges = getBadgeCount(getTrainerGameInfoAddress(save));
@@ -1867,7 +1869,7 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
         tries = 0;
         while (added < count) {
             u32 result;
-            func_ov137_021f4b94(sys, gameData, entry, 4, tries, heapId);
+            ResortSys_MakeShopEntry(sys, gameData, entry, 4, tries, heapId);
             result = func_02010078(joinAvenue, gameData, entry, 2);
             if (result == 2) {
                 added++;
@@ -1883,14 +1885,14 @@ static void func_ov137_021f0ae0(ResortSys *sys, GameData *gameData, HeapID heapI
 
 static void func_ov137_021f0be4(ResortSys *sys, GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
-    void *table = func_ov137_021f2000(sys);
-    JoinAvenueInfo *info = func_ov137_021f202c(sys);
+    void *table = ResortSys_GetRanks(sys);
+    JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(save);
     BOOL add = FALSE;
 
     if (EventWork_FlagGet(eventWork, 2400) && JoinAvenue_GetParam(info, 24, NULL) == 0) {
-        void *entries = func_ov137_021f2028(sys);
+        void *entries = ResortSys_GetEntries(sys);
         u32 i;
 
         add = TRUE;
@@ -1907,7 +1909,7 @@ static void func_ov137_021f0be4(ResortSys *sys, GameData *gameData, HeapID heapI
         u16 chance = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, NULL)), 10);
         if (func_020393e4(info, 21, 100) < chance) {
             void *entry = func_02037a40(HEAPID_TAIL(heapId));
-            func_ov137_021f4b94(sys, gameData, entry, 5, 0, heapId);
+            ResortSys_MakeShopEntry(sys, gameData, entry, 5, 0, heapId);
             if (func_02010078(joinAvenue, gameData, entry, 2) == 2) {
                 func_02039064(info, 25, 0);
             }
@@ -1940,19 +1942,19 @@ void func_ov137_021f0d10(Field *field) {
     sysSetup.list2 = NULL;
     sysSetup.entries = func_02010054(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
-    work->sys = func_ov137_021f1f1c(&sysSetup, unk, heapId);
-    if (JoinAvenue_GetParam(func_ov137_021f202c(work->sys), 7, NULL) == 0) {
+    work->sys = ResortSys_Create(&sysSetup, unk, heapId);
+    if (JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL) == 0) {
         fill = TRUE;
     }
 
     sys_memset(&peopleSetup, 0, sizeof(ResortPeopleSetup));
     peopleSetup.mmSys = GameData_GetMMSys(gameData);
-    peopleSetup.slots = func_ov137_021f2018(work->sys);
-    peopleSetup.datas = func_ov137_021f2014(work->sys);
+    peopleSetup.slots = ResortSys_GetSlots(work->sys);
+    peopleSetup.datas = ResortSys_GetDatas(work->sys);
     peopleSetup.count = 16;
     peopleSetup.zone = 2;
-    peopleSetup.shops = func_ov137_021f1ff8(work->sys);
-    peopleSetup.unk18 = func_ov137_021f2004(work->sys);
+    peopleSetup.shops = ResortSys_GetShopData(work->sys);
+    peopleSetup.unk18 = ResortSys_GetUnk20Table(work->sys);
     work->people = func_ov137_021f12b4(&peopleSetup, heapId);
     if (fill) {
         func_ov137_021f1350(work->people);
@@ -1961,9 +1963,9 @@ void func_ov137_021f0d10(Field *field) {
     sys_memset(&npcSetup, 0, sizeof(ResortNPCSetup));
     npcSetup.mmSys = GameData_GetMMSys(gameData);
     npcSetup.unk4 = 16;
-    npcSetup.info = func_ov137_021f202c(work->sys);
+    npcSetup.info = ResortSys_GetInfo(work->sys);
     npcSetup.zone = 2;
-    npcSetup.table = func_ov137_021f2010(work->sys);
+    npcSetup.table = ResortSys_GetShopOpenings(work->sys);
     work->npc = func_ov137_021f1c24(&npcSetup, heapId);
 }
 
@@ -1971,7 +1973,7 @@ void func_ov137_021f0e28(Field *field) {
     ResortFieldWork0 *work = Field_GetGimmickWorkBlock(field, 0);
     func_ov137_021f1c74(work->npc);
     func_ov137_021f1300(work->people);
-    func_ov137_021f1fb4(work->sys);
+    ResortSys_Free(work->sys);
     Field_DeleteGimmickWorkBlock(field, 0);
 }
 

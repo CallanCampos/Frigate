@@ -1,0 +1,69 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 8035,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 682,
+                "y": 175,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 185,
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 2000,
+            "direction": "DIR_DOWN",
+            "params": [ 5, 1, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 751,
+                "z": 286,
+                "y": -327680
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_UNDELLA_TOWN_GATE",
+            "warp": 0,
+            "unk4": 0,
+            "transition": 6,
+            "grid": {
+                "x": 12056,
+                "y": 65456,
+                "z": 4552,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 2000,
+            "var": 6,
+            "value": 0,
+            "type": 6,
+            "grid": {
+                "x": 751,
+                "z": 286,
+                "width": 5,
+                "height": 1,
+                "y": -80
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": []
+}

@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ava & Aya",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MINCCINO",
+            "form": 0,
+            "level": 24,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MINCCINO",
+            "form": 0,
+            "level": 24,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "After watching a football game, we want\nto get rowdy ourselves!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ava: You defeated us so soundly\nthat even I feel refreshed!{be01}\nAya: I cheered as best I could..."
+        },
+        {
+            "type": 5,
+            "text": "Keeping track of wins and losses is\nimportant, but don't lose sight of{be00}\neverything else as a result!"
+        },
+        {
+            "type": 6,
+            "text": "We can't have any teamwork if you've\ngot only one Pokémon ready for battle!"
+        },
+        {
+            "type": 7,
+            "text": "Knowing what a truly heated\nbattle is all about is the key to{be00}\ntruly passionate cheering!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "A fan needs to be 100 percent serious\nabout both battles and cheering!"
+        },
+        {
+            "type": 10,
+            "text": "You can't show off your teamwork if you\nonly have one Pokémon ready for battle!"
+        }
+    ]
+}

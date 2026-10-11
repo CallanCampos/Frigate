@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "pml/species_names.h"
@@ -11,5 +13,5 @@ MsgData *g_PMLSpeciesNamesResident = NULL;
 #pragma explicit_zero_data reset
 
 void PML_SpeciesNamesResidentInit(HeapID heapId) {
-    g_PMLSpeciesNamesResident = GFL_MsgSysLoadData(FALSE, 2, 0x5a, heapId);
+    g_PMLSpeciesNamesResident = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, heapId);
 }

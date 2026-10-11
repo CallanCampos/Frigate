@@ -1,0 +1,21 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Polo",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "pokemon": [
+        "tympole_2",
+        "panpour_2",
+        "ducklett_2",
+        "vanillite_2",
+        "oshawott_2",
+        "frillish_2",
+        "tirtouga_2",
+        "palpitoad_2",
+        "vanillish_2"
+    ],
+    "messages": [
+        "I won't be a Parasol Lady without\na parasol, so I must use it.",
+        "I think it is strange to use\na parasol indoors, though.",
+        "My parasol... My parasol is broken!\nI will be just a Lady."
+    ]
+}

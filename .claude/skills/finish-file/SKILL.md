@@ -8,8 +8,8 @@ description: Close out a pokebw2 source file after its C is written. Probe both 
 ## 1. Probe both versions
 
 ```sh
-.venv/bin/python tools/scripts/compiler_probe.py src/X.c --compilers 1.1p1 --mismatches
-.venv/bin/python tools/scripts/compiler_probe.py src/X.c --compilers 1.1p1 --mismatches --version w2_us
+.venv/bin/python tools/decomp/compiler_probe.py src/X.c --compilers 1.1p1 --mismatches
+.venv/bin/python tools/decomp/compiler_probe.py src/X.c --compilers 1.1p1 --mismatches --version w2_us
 ```
 
 Leave out `--compilers` for library code. Every function that doesn't match in either version needs a row (step 4).
@@ -17,7 +17,7 @@ Leave out `--compilers` for library code. Every function that doesn't match in e
 ## 2. Mark complete, if everything matches
 
 ```sh
-.venv/bin/python tools/scripts/mark_complete.py src/X.c
+.venv/bin/python tools/decomp/mark_complete.py src/X.c
 ```
 
 It refuses while a function the file defines as `static` is referenced from another module. Make that function global
@@ -73,7 +73,7 @@ Every commit goes to `origin/main` at once, so the sessions working in parallel 
    redo only your own change on top. Configs and docs that both sides edited usually need both sets of lines. Files
    that moved (such as `include/nitro/` to `lib/nitro/include/nitro/`) carry your edits to the new place.
    - When one side named functions the other still calls as `func_XXXXXXXX`, run
-     `.venv/bin/python tools/scripts/apply_names.py`, which rewrites every `func_`/`data_` identifier to the name now
+     `.venv/bin/python tools/decomp/apply_names.py`, which rewrites every `func_`/`data_` identifier to the name now
      in `symbols.txt` (`--dry-run` lists them).
    - When one side moved declarations to a new owner header, the other side's files fail with "function has no
      prototype": include the owner header, and point includes of deleted headers at their replacements. If both

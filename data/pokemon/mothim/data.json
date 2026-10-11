@@ -1,0 +1,169 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Mothim",
+    "pokedex": {
+        "category": "Moth Pokémon",
+        "entry": "While it loves floral honey, it won't\ngather any itself. Instead, it\nplots to steal some from Combee.",
+        "height": "2'11\"",
+        "weight": "51.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Mothim",
+                "category": "Moth Pokémon",
+                "entry": "While it loves floral honey, it won't\ngather any itself. Instead, it\nplots to steal some from Combee.",
+                "height": "2'11\"",
+                "weight": "51.4 lbs."
+            },
+            "fr": {
+                "name": "Papilord",
+                "category": "Pokémon Phalène",
+                "entry": "Il adore le nectar des fleurs mais\nn'en récolte pas lui-même.\nIl préfère en voler à un Apitrini.",
+                "height": "0,9 m",
+                "weight": "23,3 kg"
+            },
+            "de": {
+                "name": "Moterpel",
+                "category": "Motte",
+                "entry": "Es liebt Honig, sammelt ihn aber\nnicht, sondern stiehlt den Honig,\nder von Wadribie gesammelt wurde.",
+                "height": "0,9 m",
+                "weight": "23,3 kg"
+            },
+            "it": {
+                "name": "Mothim",
+                "category": "Pokémon Falena",
+                "entry": "Anche se ama il nettare dei fiori, non lo\nraccoglie. Preferisce rubarlo ai Combee.",
+                "height": "0,9 m",
+                "weight": "23,3 kg"
+            },
+            "ko": {
+                "name": "나메일",
+                "category": "나방포켓몬",
+                "entry": "꽃의 꿀을 제일 좋아하지만\n자신은 모으지 않고 세꿀버리로부터\n가로챌 생각만 한다.",
+                "height": "0.9 m",
+                "weight": "23.3 kg"
+            },
+            "es": {
+                "name": "Mothim",
+                "category": "Pokémon Polilla",
+                "entry": "Le gusta la miel de flores, pero no\nle gusta recogerla. Se dedica a\nrobársela a Combee.",
+                "height": "0,9 m",
+                "weight": "23,3 kg"
+            },
+            "ja": {
+                "name": "ガーメイル",
+                "category": "ミノガポケモン",
+                "entry": "はなのミツが\\x{3000}だいすきだが\nじぶんでは\\x{3000}あつめず\\x{3000}ミツハニーから\nよこどり\\x{3000}ばかりを\\x{3000}かんがえている。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff13}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 94,
+        "defense": 50,
+        "speed": 66,
+        "special_attack": 94,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_SILVER_POWDER",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_MALE_ONLY",
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SWARM", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TINTED_LENS",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 148,
+    "height": 9,
+    "weight": 233,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 10, "MOVE_PROTECT" ],
+            [ 15, "MOVE_BUG_BITE" ],
+            [ 20, "MOVE_HIDDEN_POWER" ],
+            [ 23, "MOVE_CONFUSION" ],
+            [ 26, "MOVE_GUST" ],
+            [ 29, "MOVE_POISON_POWDER" ],
+            [ 32, "MOVE_PSYBEAM" ],
+            [ 35, "MOVE_CAMOUFLAGE" ],
+            [ 38, "MOVE_SILVER_WIND" ],
+            [ 41, "MOVE_AIR_SLASH" ],
+            [ 44, "MOVE_PSYCHIC" ],
+            [ 47, "MOVE_BUG_BUZZ" ],
+            [ 50, "MOVE_QUIVER_DANCE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM62",
+            "TM68",
+            "TM70",
+            "TM76",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM89",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_ELECTROWEB",
+            "MOVE_SNORE",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_BURMY"
+}

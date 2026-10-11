@@ -1,0 +1,150 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Gothorita",
+    "pokedex": {
+        "category": "Manipulate Pokémon",
+        "entry": "According to many old tales, it creates\nfriends for itself by controlling\nsleeping children on starry nights.",
+        "height": "2'04\"",
+        "weight": "39.7 lbs.",
+        "languages": {
+            "ja": {
+                "category": "あやつりポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 45,
+        "defense": 70,
+        "speed": 55,
+        "special_attack": 75,
+        "special_defense": 85
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 100,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_PERSIM_BERRY",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 191,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_FRISK", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHADOW_TAG",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 137,
+    "height": 7,
+    "weight": 180,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POUND" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 1, "MOVE_TICKLE" ],
+            [ 1, "MOVE_FAKE_TEARS" ],
+            [ 3, "MOVE_CONFUSION" ],
+            [ 7, "MOVE_TICKLE" ],
+            [ 10, "MOVE_FAKE_TEARS" ],
+            [ 14, "MOVE_DOUBLE_SLAP" ],
+            [ 16, "MOVE_PSYBEAM" ],
+            [ 19, "MOVE_EMBARGO" ],
+            [ 24, "MOVE_FAINT_ATTACK" ],
+            [ 25, "MOVE_PSYSHOCK" ],
+            [ 28, "MOVE_FLATTER" ],
+            [ 31, "MOVE_FUTURE_SIGHT" ],
+            [ 34, "MOVE_HEAL_BLOCK" ],
+            [ 39, "MOVE_PSYCHIC" ],
+            [ 43, "MOVE_TELEKINESIS" ],
+            [ 50, "MOVE_CHARM" ],
+            [ 53, "MOVE_MAGIC_ROOM" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM12",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM24",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM56",
+            "TM57",
+            "TM63",
+            "TM66",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM80",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_FOUL_PLAY",
+            "MOVE_GRAVITY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_HEAL_BELL",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 41,
+            "species": "SPECIES_GOTHITELLE"
+        }
+    ],
+    "regional_dex_number": 137,
+    "baby_species": "SPECIES_GOTHITA"
+}

@@ -1,0 +1,6 @@
+{
+    "$schema": "trainer_class.schema.json",
+    "name": "Winona",
+    "compress_name": true,
+    "name_with_article": "Winona"
+}

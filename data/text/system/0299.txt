@@ -1,21 +1,21 @@
-{bd02}This is a story that starts\n{bd02}with a certain scientist...
-{bd02}With his magnificent mind,\n{bd02}he completed a robot that\n{bd02}people called marvelous...
-{bd02}But he still wasn't satisfied.\n\n{bd02}He continued to tweak the\n{bd02}robot's programming and memory\n{bd02}so it was even closer to being human.
-{bd02}This scientific advancement...\n\n{bd02}It was not for the benefit of mankind...\n\n{bd02}This was his own personal wish...
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}This is a story that starts\n{bd02}with a certain scientist...
-{bd02}With her magnificent mind,\n{bd02}she completed a robot that\n{bd02}people called marvelous...
-{bd02}But she still wasn't satisfied.\n\n{bd02}She continued to tweak the\n{bd02}robot's programming and memory\n{bd02}so it was even closer to being human.
-{bd02}This scientific advancement...\n\n{bd02}It was not for the benefit of mankind...\n\n{bd02}This was her own personal wish...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0299_Text_StoryStartsCertainScientist = {bd02}This is a story that starts\n{bd02}with a certain scientist...
+Bank0299_Text_HisMagnificentMindHe = {bd02}With his magnificent mind,\n{bd02}he completed a robot that\n{bd02}people called marvelous...
+Bank0299_Text_ButHeStillWasnt = {bd02}But he still wasn't satisfied.\n\n{bd02}He continued to tweak the\n{bd02}robot's programming and memory\n{bd02}so it was even closer to being human.
+Bank0299_Text_ScientificAdvancementNotBenefit = {bd02}This scientific advancement...\n\n{bd02}It was not for the benefit of mankind...\n\n{bd02}This was his own personal wish...
+Bank0299_Text_Empty = なし
+Bank0299_Text_Empty_2 = なし
+Bank0299_Text_Empty_3 = なし
+Bank0299_Text_Empty_4 = なし
+Bank0299_Text_Empty_5 = なし
+Bank0299_Text_Empty_6 = なし
+Bank0299_Text_StoryStartsCertainScientist_2 = {bd02}This is a story that starts\n{bd02}with a certain scientist...
+Bank0299_Text_HerMagnificentMindShe = {bd02}With her magnificent mind,\n{bd02}she completed a robot that\n{bd02}people called marvelous...
+Bank0299_Text_ButSheStillWasnt = {bd02}But she still wasn't satisfied.\n\n{bd02}She continued to tweak the\n{bd02}robot's programming and memory\n{bd02}so it was even closer to being human.
+Bank0299_Text_ScientificAdvancementNotBenefit_2 = {bd02}This scientific advancement...\n\n{bd02}It was not for the benefit of mankind...\n\n{bd02}This was her own personal wish...
+Bank0299_Text_Empty_7 = なし
+Bank0299_Text_Empty_8 = なし
+Bank0299_Text_Empty_9 = なし
+Bank0299_Text_Empty_10 = なし
+Bank0299_Text_Empty_11 = なし
+Bank0299_Text_Empty_12 = なし
+Bank0299_Text_Empty_13 = なし

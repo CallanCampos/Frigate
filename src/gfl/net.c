@@ -279,7 +279,7 @@ void func_020429f8(void (*callback)(void *work)) {
     func_02041a30(pNet->aNetInit.heapId, callback, 1);
 }
 
-void func_02042a10(void) {
+void func_02042a10(int unused) {
     GFLNetSys *pNet = func_02042e78();
 
     func_02041dfc();
@@ -425,7 +425,7 @@ BOOL func_02042be8(NetHandle *handle, int command, u16 size, const void *data) {
     return func_0203fafc(command, (u8 *)data, size, 0, func_020401dc(handle), 0xff, FALSE);
 }
 
-BOOL func_02042c18(NetHandle *handle, u32 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
+BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
                    BOOL noCopy) {
     GFLNetInitData *ini = func_02042e84();
     u8 dest = 0xff;
@@ -468,7 +468,7 @@ BOOL func_02042d0c(NetHandle *handle, u16 timing) {
     return func_02040654(handle, timing);
 }
 
-void func_02042d14(u8 gameCommandBase) {
+void func_02042d14(u8 gameCommandBase, u8 unused) {
     GFLNetSys *pNet = func_02042e78();
 
     func_02042e84()->gameCommandBase = gameCommandBase;

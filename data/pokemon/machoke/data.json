@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Machoke",
+    "pokedex": {
+        "category": "Superpower Pokémon",
+        "entry": "It happily carries heavy cargo to\ntoughen up. It willingly does hard\nwork for people.",
+        "height": "4'11\"",
+        "weight": "155.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Machoke",
+                "category": "Superpower Pokémon",
+                "entry": "It happily carries heavy cargo to\ntoughen up. It willingly does hard\nwork for people.",
+                "height": "4'11\"",
+                "weight": "155.4 lbs."
+            },
+            "fr": {
+                "name": "Machopeur",
+                "category": "Pokémon Colosse",
+                "entry": "Il soulève les plus lourdes charges\navec plaisir et facilité. Il donne un\ncoup de main tout en s'entraînant!",
+                "height": "1,5 m",
+                "weight": "70,5 kg"
+            },
+            "de": {
+                "name": "Maschock",
+                "category": "Kraftprotz",
+                "entry": "Es hievt gern schwere Ladung,\num so zu trainieren. Es hilft auch\ngern anderen bei harter Arbeit.",
+                "height": "1,5 m",
+                "weight": "70,5 kg"
+            },
+            "it": {
+                "name": "Machoke",
+                "category": "Pokémon Megaforza",
+                "entry": "Sposta di buon grado carichi pesanti\nper rinforzarsi e gli piace dare\nuna mano alle persone.",
+                "height": "1,5 m",
+                "weight": "70,5 kg"
+            },
+            "ko": {
+                "name": "근육몬",
+                "category": "괴력포켓몬",
+                "entry": "몸을 단련하고자 기분 좋게\n무거운 짐을 날라주기에\n사람을 대신하여 힘을 쓰는 일을 한다.",
+                "height": "1.5 m",
+                "weight": "70.5 kg"
+            },
+            "es": {
+                "name": "Machoke",
+                "category": "Pokémon Superpoder",
+                "entry": "Levanta pesos descomunales para\nmantenerse en forma y usa su fuerza\npara ayudar a las personas.",
+                "height": "1,5 m",
+                "weight": "70,5 kg"
+            },
+            "ja": {
+                "name": "ゴーリキー",
+                "category": "かいりきポケモン",
+                "entry": "からだを\\x{3000}きたえるために\\x{3000}よろこんで\nおもい\\x{3000}にもつを\\x{3000}はこぶので\nひとのかわりに\\x{3000}ちからしごとをする。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 100,
+        "defense": 70,
+        "speed": 45,
+        "special_attack": 50,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_GUTS", "ABILITY_NO_GUARD" ],
+    "hidden_ability": "ABILITY_STEADFAST",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 15,
+    "weight": 705,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LOW_KICK" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_FOCUS_ENERGY" ],
+            [ 1, "MOVE_KARATE_CHOP" ],
+            [ 7, "MOVE_FOCUS_ENERGY" ],
+            [ 10, "MOVE_KARATE_CHOP" ],
+            [ 13, "MOVE_LOW_SWEEP" ],
+            [ 19, "MOVE_FORESIGHT" ],
+            [ 22, "MOVE_SEISMIC_TOSS" ],
+            [ 25, "MOVE_REVENGE" ],
+            [ 32, "MOVE_VITAL_THROW" ],
+            [ 36, "MOVE_SUBMISSION" ],
+            [ 40, "MOVE_WAKE_UP_SLAP" ],
+            [ 44, "MOVE_CROSS_CHOP" ],
+            [ 51, "MOVE_SCARY_FACE" ],
+            [ 55, "MOVE_DYNAMIC_PUNCH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM66",
+            "TM67",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_DUAL_CHOP",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_SUPERPOWER",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ROLE_PLAY",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE",
+            "param": 0,
+            "species": "SPECIES_MACHAMP"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MACHOP"
+}

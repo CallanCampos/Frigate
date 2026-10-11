@@ -1,60 +1,60 @@
-{0105:0}:\nPokémon living in the tall grass.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in the tall grass.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in the tall grass.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in the tall grass.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in the tall grass.
-{0105:0}:\nPokémon living in the sand.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in the sand.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in the sand.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in the sand.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in the sand.
-{0105:0}:\nPokémon living in the swamp.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in the swamp.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in the sand.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in the sand.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in the sand.
-{0105:0}:\nPokémon living in this place.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in this place.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in this place.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in this place.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in this place.
-{0105:0}:\nPokémon you catch while surfing.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon you catch while surfing.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon you catch while surfing.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon you catch while surfing.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon you catch while surfing.
-{0105:0}:\nPokémon you catch by fishing.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon you catch by fishing.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon you catch by fishing.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon you catch by fishing.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon you catch by fishing.
-{0105:0}:\nPokémon living on the land.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living on the land.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living on the land.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living on the land.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living on the land.
-{0105:0}:\nPokémon living at this place.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living at this place.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living at this place.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living at this place.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living at this place.
-{0105:0}:\nNo Pokémon lives here.
-{0105:0} {ff00:1}(Spring){ff00:0}:\nNo Pokémon lives here.
-{0105:0} {ff00:1}(Summer){ff00:0}:\nNo Pokémon lives here.
-{0105:0} {ff00:1}(Autumn){ff00:0}:\nNo Pokémon lives here.
-{0105:0} {ff00:1}(Winter){ff00:0}:\nNo Pokémon lives here.
-           \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-INFO
-{0105:0}
-HABITAT
-UNOVA
-NATIONAL
-                    \x{ffff}
-HABITAT LIST
-When all the Pokémon in that Habitat\nhave been encountered,\nyou'll receive a stamp.\nExplore all of the Unova region!{be01}
-When all the Pokémon in that Habitat\nhave been registered in your Pokédex,\nyou'll receive a Poké Ball stamp.\nCongratulations!{be01}
-{0105:0}:\nYou've registered every Pokémon here.
+Bank0362_Text_PokemonLivingTallGrass = {0105:0}:\nPokémon living in the tall grass.
+Bank0362_Text_SpringPokemonLivingTall = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in the tall grass.
+Bank0362_Text_SummerPokemonLivingTall = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in the tall grass.
+Bank0362_Text_AutumnPokemonLivingTall = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in the tall grass.
+Bank0362_Text_WinterPokemonLivingTall = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in the tall grass.
+Bank0362_Text_PokemonLivingSand = {0105:0}:\nPokémon living in the sand.
+Bank0362_Text_SpringPokemonLivingSand = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in the sand.
+Bank0362_Text_SummerPokemonLivingSand = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in the sand.
+Bank0362_Text_AutumnPokemonLivingSand = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in the sand.
+Bank0362_Text_WinterPokemonLivingSand = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in the sand.
+Bank0362_Text_PokemonLivingSwamp = {0105:0}:\nPokémon living in the swamp.
+Bank0362_Text_SpringPokemonLivingSwamp = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in the swamp.
+Bank0362_Text_SummerPokemonLivingSand_2 = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in the sand.
+Bank0362_Text_AutumnPokemonLivingSand_2 = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in the sand.
+Bank0362_Text_WinterPokemonLivingSand_2 = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in the sand.
+Bank0362_Text_PokemonLivingPlace = {0105:0}:\nPokémon living in this place.
+Bank0362_Text_SpringPokemonLivingPlace = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living in this place.
+Bank0362_Text_SummerPokemonLivingPlace = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living in this place.
+Bank0362_Text_AutumnPokemonLivingPlace = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living in this place.
+Bank0362_Text_WinterPokemonLivingPlace = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living in this place.
+Bank0362_Text_PokemonCatchWhileSurfing = {0105:0}:\nPokémon you catch while surfing.
+Bank0362_Text_SpringPokemonCatchWhile = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon you catch while surfing.
+Bank0362_Text_SummerPokemonCatchWhile = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon you catch while surfing.
+Bank0362_Text_AutumnPokemonCatchWhile = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon you catch while surfing.
+Bank0362_Text_WinterPokemonCatchWhile = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon you catch while surfing.
+Bank0362_Text_PokemonCatchByFishing = {0105:0}:\nPokémon you catch by fishing.
+Bank0362_Text_SpringPokemonCatchBy = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon you catch by fishing.
+Bank0362_Text_SummerPokemonCatchBy = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon you catch by fishing.
+Bank0362_Text_AutumnPokemonCatchBy = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon you catch by fishing.
+Bank0362_Text_WinterPokemonCatchBy = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon you catch by fishing.
+Bank0362_Text_PokemonLivingLand = {0105:0}:\nPokémon living on the land.
+Bank0362_Text_SpringPokemonLivingLand = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living on the land.
+Bank0362_Text_SummerPokemonLivingLand = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living on the land.
+Bank0362_Text_AutumnPokemonLivingLand = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living on the land.
+Bank0362_Text_WinterPokemonLivingLand = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living on the land.
+Bank0362_Text_PokemonLivingPlace_2 = {0105:0}:\nPokémon living at this place.
+Bank0362_Text_SpringPokemonLivingPlace_2 = {0105:0} {ff00:1}(Spring){ff00:0}:\nPokémon living at this place.
+Bank0362_Text_SummerPokemonLivingPlace_2 = {0105:0} {ff00:1}(Summer){ff00:0}:\nPokémon living at this place.
+Bank0362_Text_AutumnPokemonLivingPlace_2 = {0105:0} {ff00:1}(Autumn){ff00:0}:\nPokémon living at this place.
+Bank0362_Text_WinterPokemonLivingPlace_2 = {0105:0} {ff00:1}(Winter){ff00:0}:\nPokémon living at this place.
+Bank0362_Text_NoPokemonLivesHere = {0105:0}:\nNo Pokémon lives here.
+Bank0362_Text_SpringNoPokemonLives = {0105:0} {ff00:1}(Spring){ff00:0}:\nNo Pokémon lives here.
+Bank0362_Text_SummerNoPokemonLives = {0105:0} {ff00:1}(Summer){ff00:0}:\nNo Pokémon lives here.
+Bank0362_Text_AutumnNoPokemonLives = {0105:0} {ff00:1}(Autumn){ff00:0}:\nNo Pokémon lives here.
+Bank0362_Text_WinterNoPokemonLives = {0105:0} {ff00:1}(Winter){ff00:0}:\nNo Pokémon lives here.
+Bank0362_Text_Empty =            \x{ffff}
+Bank0362_Text_Empty_2 =     \x{ffff}
+Bank0362_Text_Empty_3 =     \x{ffff}
+Bank0362_Text_Empty_4 =     \x{ffff}
+Bank0362_Text_Empty_5 =     \x{ffff}
+Bank0362_Text_Info = INFO
+Bank0362_Text_Empty_6 = {0105:0}
+Bank0362_Text_Habitat = HABITAT
+Bank0362_Text_Unova = UNOVA
+Bank0362_Text_National = NATIONAL
+Bank0362_Text_Empty_7 =                     \x{ffff}
+Bank0362_Text_HabitatList = HABITAT LIST
+Bank0362_Text_WhenAllPokemonHabitat = When all the Pokémon in that Habitat\nhave been encountered,\nyou'll receive a stamp.\nExplore all of the Unova region!{be01}
+Bank0362_Text_WhenAllPokemonHabitat_2 = When all the Pokémon in that Habitat\nhave been registered in your Pokédex,\nyou'll receive a Poké Ball stamp.\nCongratulations!{be01}
+Bank0362_Text_YouveRegisteredEveryPokemon = {0105:0}:\nYou've registered every Pokémon here.

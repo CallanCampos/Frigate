@@ -490,7 +490,7 @@ BOOL KeySystemAccelMove_Update(KeySystemAccelMove *move);
 void KeySystemAccelMove_GetPos(const KeySystemAccelMove *move, ClActorPos *pos);
 KeySystemScrollList *KeySystemScrollList_Create(const KeySystemScrollListSetup *setup, HeapID heapId);
 void KeySystemScrollList_Free(KeySystemScrollList *list);
-// Returns the value of the chosen item, or OV139_LIST_NONE
+// Returns the value of the chosen item, or FRAMELIST_NONE
 u32 KeySystemScrollList_Update(KeySystemScrollList *list);
 BOOL KeySystemScrollList_Start(KeySystemScrollList *list);
 void KeySystemScrollList_GetPos(KeySystemScrollList *list, u32 *cursor, u32 *top);

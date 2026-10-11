@@ -1,66 +1,66 @@
-Movie Star
-Strange Lady
-Bellelba: Stop!
-Princess {0100:1}: H-huh?\nWhere could I be?{be00}\nIt feels so strange here...{be01}\nWhat could that white door\nI opened have been, anyway?
-Strange Lady: My, my...{be01}\nIt looks like a weak little child\nwandered through the{be00}\ndoor I set up as a trap.{be01}\nEeee hee hee... Great timing.\nI need a new servant.
-Princess {0100:1}: Hm? Who are you?\nWhy are you in a place like this, woman?{be01}
-Strange Lady: Grr...{be01}\nCalling someone you just met “woman"?\nWhat a rude little brat!{be01}\nHow can you look like that and\nnot know how to address people?
-Princess {0100:1}: What's with you?{be01}\nYa know, lady? I'd really like\nto get out of here soon.{be01}\nI'm the princess of this kingdom, so show\nme how to get back to the castle already!
-Strange Lady: I'm afraid that's impossible.{be01}\nAnd I'm not just some lady.\nI'm the queen of the Land of Enchantment.{be00}\nMy name is Bellelba!
-Princess {0100:1}: How about that...\nQueen of the Land of Enchantment, huh?{be00}\n...{be01}\nWhoooooa! A w-witch!{be01}\nI h-have to hurry back\nthrough that door!
-Bellelba: Weee hee hee... Fool.\nYou can't run away.{be00}\nHave a look behind you.
-Princess {0100:1}: No! No! No!\nA Pokémon is blocking the door!{be01}\nIf one of my servants was here,\nthey'd give it a good wallop, too!
-Bellelba: Ah ha ha!\nCan't you do anything on your own?{be00}\nWhat a pitiful princess!
-Princess {0100:1}: That's right...\nI'm alone right now...{be01}\nI guess if I don't want to be caught,\nthe only thing to do is fight for myself...
-Princess {0100:1}: I've had it with this!\nThose Woobat are getting closer and closer!{be01}\nI have to hurry and...
-Princess {0100:1}: Defeat them!
-Bellelba: Ah ha ha!\nTry if you dare!
-Princess {0100:1}: Catch them!
-Bellelba: Hey!{be01}\nCatching someone else's Pokémon\nis stealing! That's common sense, right?!
-Princess {0100:1}: Use my Pokédex!
-Bellelba: You've got to be kidding...\nWoobat is a Bat Pokémon!{be01}\nAnd just so you know, Swoobat\nis a Courting Pokémon!{be01}\nSigh... Are you that confident?\nOr that stupid?
-Bellelba: You're wasting your time.\nOnce you pass through that door,{be00}\nyou can't go back to your own world.{be01}\nYour destiny is to be caught by me\nand to become my loyal servant.
-Princess {0100:1}: Well...\nThey're even closer than before!{be01}\nI don't want to be a servant!\nMe serving someone else?!{be00}\nThat's impossible!
-Bellelba: Acting tough, are we?\nYou're worth pushing around, aren't you?{be00}\nHah...
-Bellelba: OK!\nWe've almost got you!{be01}\nAre you ready?\nYou'll be in my clutches soon!
-Princess {0100:1}: I won't quit!
-Bellelba: Oh...\nFeeling brave, huh?{be01}\nThat just makes me want\nto make you suffer more!{be01}\nAh ha ha ha ha...
-Princess {0100:1}: I'm done for!
-Bellelba: Oh, how pessimistic.{be01}\nOh, the youth of today give up\nso very easily...{be00}\nWell, time to join me, then!
-Princess {0100:1}: But I'm rich!
-Bellelba: What? Money?\nThat's a weird thing for a brat to say!{be01}\nA-and it's not like I want\nyour money anyway!
-Princess {0100:1}: Oh...\nIf I'd only listened to Father,{be00}\nI wouldn't be in this mess.{be01}\nNo one's going to come save me...\nGuess I have to do something on my own...
-Bellelba: Eee hee hee...\nWhat are you mumbling about?!{be01}\nYou're almost ours now!
-Princess {0100:1}: Oh...\nI wonder if I can win...{be01}\nI don't even care anymore...
-Bellelba: Eee hee hee... Wonderful...\nI'll tell you something interesting.{be01}\nBreathing the air in this world\nsaps your will.{be01}\nI wonder how long you and your Pokémon\nwill have the desire to keep fighting.
-Princess {0100:1}: Sheesh...\nThis...is really stupid...{be00}\nBut...if I don't beat you...{be00}\nI'll be made a servant...
-Bellelba: Not bad at all.\nB-by the way, what was that{be00}\nmoney you were talking about earlier?
-Princess {0100:1}: Ha ha haaa!\nThis is my allowance for ONE week!{be01}\nDon't you want it?\nIf you want to be rich,{be00}\nsend me to my castle now!
-Bellelba: Wh-whaaat?!\nIn one week, you get THIS much{be00}\nmoney for an allowance?!{be01}\nWow! Is my fortune so small?
-Princess {0100:1}: Hee hee...\nPoor peasant...{be00}\nI'm heiress to the throne!{be00}\nOf course there's a difference!
-Bellelba: Gr...{be01}\nI'm going to take your money,\nyour crown, and everything else!
-Bellelba: You're kidding!\nYou're so weak!
-Princess {0100:1}: No...\nI lost...
-Bellelba: Wow...\nWouldn't it be better if you{be00}\ntrained in battle a little bit?
-Princess {0100:1}: Yes...\nYou're exactly right...
-Bellelba: Good grief...\nInstead of getting soft in the castle,{be00}\nhow about going on a journey?{be01}\nWell... Actually, I know this guy--\nhis head is as smooth as a cue ball,{be00}\nand he's really tough.{be00}\nShall I introduce him to you?
-Princess {0100:1}: What? Really?{be01}\nAn older guy? Bald? Tough?\nSounds handsome--just my type!{be01}\nYou don't mind?\nI'd really, really like that!{be01}\nYaaay! Yaaay!\nBald and handsome!
-Bellelba: Wow...{be01}\nI don't want a brat like you\nin my Land of Enchantment...
-So Princess {0100:1}\nset off to train.{be01}\nOr better said, she set off\non a journey to meet the guy.{be01}\nAt any rate, she got out\nof the door safely,{be00}\nso that's probably for the best...
-Princess {0100:1}: Oh, I'm so tired...
-Bellelba: Well now...\nI'm all caught up!{be01}\nAre you ready?
-Princess {0100:1}: Help!\nFather, save me!{be01}\nIf I'd known this was going to happen,\nI'd have listened and behaved better!
-Bellelba: Eee hee heee...\nI knew you were a princess{be00}\nfrom the very beginning.{be01}\nAnd that you are a vapid, foolish princess\nwho doesn't listen to her parents{be00}\nand does nothing more than goof off.{be01}\nI already anticipated\nthat you'd come here.{be01}\nAnd now, that foolish princess\nis going to go missing.{be01}\nWhen that happens, it will cause\nchaos in the country, and a war will begin.
-Princess {0100:1}: What's that about?\nSomething like that would never happen{be00}\nin a kingdom like mine!
-Bellelba: I wonder about that...{be01}\nDo you think people can trust a king\nwho can't protect his heiress,{be00}\neven if it is an idiot like you?{be01}\nI also suspect that your father\nwill get worn out as he tears apart{be00}\neverything looking for you.{be01}\nSome nobleman might take advantage\nof this and take his place.
-Princess {0100:1}: You...\nYou were hired by the nobleman!{be01}\nFather! Father!\n{0100:1} is here!
-Bellelba: That's not going to work.\nI don't think you have time to worry.{be01}\nFrom today on, you're my new servant.{be01}\nLet's go! Get walking!
-The captured Princess {0100:1}\nis said to have worked in Bellelba's mansion{be00}\nuntil she died...{be01}\nAs Bellelba said, the evil nobleman\nstole the throne from the king{be00}\nand the country was destroyed...
-Princess {0100:1}: I did it!\nI defeated the Swoobat!{be00}\nI can escape now...{be01}\nHuh?!
-Princess {0100:1}: Where is it?\nCome on! Where's the exit?{be00}\nWhere is that door?!
-Bellelba: Oh my, didn't I say\nthat escape was impossible?{be01}\nThe door back to your old world\nisn't here anymore!
-Princess {0100:1}: What's that about!\nWhat in the world is going on?
-Bellelba: Good grief you're loud.\nIt would be a lot of trouble if you{be00}\nwent on a rampage and found the real door.{be01}\nFor now, I guess I'll just\nshut you in this Magic Cage...
-Magic Cage: Clank!{be01}\nPrincess {0100:1}: Whaaa!\nLet go of me! Let me out of here!
-The strange lady who calls herself\nthe magic queen, Bellelba,{be00}\nput Princess {0100:1}{be00}\nin a Magic Cage after she'd{be00}\nwandered into this world.{be01}\nCan Princess {0100:1}\nsafely return to her own world?{be01}\nAll we can do is hope\nfor her safe return...
+Bank0223_Text_MovieStar = Movie Star
+Bank0223_Text_StrangeLady = Strange Lady
+Bank0223_Text_BellelbaStop = Bellelba: Stop!
+Bank0223_Text_PrincessHHuhWhere = Princess {0100:1}: H-huh?\nWhere could I be?{be00}\nIt feels so strange here...{be01}\nWhat could that white door\nI opened have been, anyway?
+Bank0223_Text_StrangeLadyLooksLike = Strange Lady: My, my...{be01}\nIt looks like a weak little child\nwandered through the{be00}\ndoor I set up as a trap.{be01}\nEeee hee hee... Great timing.\nI need a new servant.
+Bank0223_Text_PrincessHmWhoWhy = Princess {0100:1}: Hm? Who are you?\nWhy are you in a place like this, woman?{be01}
+Bank0223_Text_StrangeLadyGrrCalling = Strange Lady: Grr...{be01}\nCalling someone you just met “woman"?\nWhat a rude little brat!{be01}\nHow can you look like that and\nnot know how to address people?
+Bank0223_Text_PrincessWhatsYaKnow = Princess {0100:1}: What's with you?{be01}\nYa know, lady? I'd really like\nto get out of here soon.{be01}\nI'm the princess of this kingdom, so show\nme how to get back to the castle already!
+Bank0223_Text_StrangeLadyImAfraid = Strange Lady: I'm afraid that's impossible.{be01}\nAnd I'm not just some lady.\nI'm the queen of the Land of Enchantment.{be00}\nMy name is Bellelba!
+Bank0223_Text_PrincessHowAboutQueen = Princess {0100:1}: How about that...\nQueen of the Land of Enchantment, huh?{be00}\n...{be01}\nWhoooooa! A w-witch!{be01}\nI h-have to hurry back\nthrough that door!
+Bank0223_Text_BellelbaWeeeHeeHee = Bellelba: Weee hee hee... Fool.\nYou can't run away.{be00}\nHave a look behind you.
+Bank0223_Text_PrincessNoNoNo = Princess {0100:1}: No! No! No!\nA Pokémon is blocking the door!{be01}\nIf one of my servants was here,\nthey'd give it a good wallop, too!
+Bank0223_Text_BellelbaAhHaHa = Bellelba: Ah ha ha!\nCan't you do anything on your own?{be00}\nWhat a pitiful princess!
+Bank0223_Text_PrincessThatsRightIm = Princess {0100:1}: That's right...\nI'm alone right now...{be01}\nI guess if I don't want to be caught,\nthe only thing to do is fight for myself...
+Bank0223_Text_PrincessIveHadThose = Princess {0100:1}: I've had it with this!\nThose Woobat are getting closer and closer!{be01}\nI have to hurry and...
+Bank0223_Text_PrincessDefeatThem = Princess {0100:1}: Defeat them!
+Bank0223_Text_BellelbaAhHaHa_2 = Bellelba: Ah ha ha!\nTry if you dare!
+Bank0223_Text_PrincessCatchThem = Princess {0100:1}: Catch them!
+Bank0223_Text_BellelbaHeyCatchingSomeone = Bellelba: Hey!{be01}\nCatching someone else's Pokémon\nis stealing! That's common sense, right?!
+Bank0223_Text_PrincessUsePokedex = Princess {0100:1}: Use my Pokédex!
+Bank0223_Text_BellelbaYouveGotKidding = Bellelba: You've got to be kidding...\nWoobat is a Bat Pokémon!{be01}\nAnd just so you know, Swoobat\nis a Courting Pokémon!{be01}\nSigh... Are you that confident?\nOr that stupid?
+Bank0223_Text_BellelbaYoureWastingTime = Bellelba: You're wasting your time.\nOnce you pass through that door,{be00}\nyou can't go back to your own world.{be01}\nYour destiny is to be caught by me\nand to become my loyal servant.
+Bank0223_Text_PrincessWellTheyreEven = Princess {0100:1}: Well...\nThey're even closer than before!{be01}\nI don't want to be a servant!\nMe serving someone else?!{be00}\nThat's impossible!
+Bank0223_Text_BellelbaActingToughWe = Bellelba: Acting tough, are we?\nYou're worth pushing around, aren't you?{be00}\nHah...
+Bank0223_Text_BellelbaOkWeveAlmost = Bellelba: OK!\nWe've almost got you!{be01}\nAre you ready?\nYou'll be in my clutches soon!
+Bank0223_Text_PrincessWontQuit = Princess {0100:1}: I won't quit!
+Bank0223_Text_BellelbaOhFeelingBrave = Bellelba: Oh...\nFeeling brave, huh?{be01}\nThat just makes me want\nto make you suffer more!{be01}\nAh ha ha ha ha...
+Bank0223_Text_PrincessImDone = Princess {0100:1}: I'm done for!
+Bank0223_Text_BellelbaOhHowPessimistic = Bellelba: Oh, how pessimistic.{be01}\nOh, the youth of today give up\nso very easily...{be00}\nWell, time to join me, then!
+Bank0223_Text_PrincessButImRich = Princess {0100:1}: But I'm rich!
+Bank0223_Text_BellelbaWhatMoneyThats = Bellelba: What? Money?\nThat's a weird thing for a brat to say!{be01}\nA-and it's not like I want\nyour money anyway!
+Bank0223_Text_PrincessOhIfId = Princess {0100:1}: Oh...\nIf I'd only listened to Father,{be00}\nI wouldn't be in this mess.{be01}\nNo one's going to come save me...\nGuess I have to do something on my own...
+Bank0223_Text_BellelbaEeeHeeHee = Bellelba: Eee hee hee...\nWhat are you mumbling about?!{be01}\nYou're almost ours now!
+Bank0223_Text_PrincessOhWonderIf = Princess {0100:1}: Oh...\nI wonder if I can win...{be01}\nI don't even care anymore...
+Bank0223_Text_BellelbaEeeHeeHee_2 = Bellelba: Eee hee hee... Wonderful...\nI'll tell you something interesting.{be01}\nBreathing the air in this world\nsaps your will.{be01}\nI wonder how long you and your Pokémon\nwill have the desire to keep fighting.
+Bank0223_Text_PrincessSheeshReallyStupid = Princess {0100:1}: Sheesh...\nThis...is really stupid...{be00}\nBut...if I don't beat you...{be00}\nI'll be made a servant...
+Bank0223_Text_BellelbaNotBadAll = Bellelba: Not bad at all.\nB-by the way, what was that{be00}\nmoney you were talking about earlier?
+Bank0223_Text_PrincessHaHaHaaa = Princess {0100:1}: Ha ha haaa!\nThis is my allowance for ONE week!{be01}\nDon't you want it?\nIf you want to be rich,{be00}\nsend me to my castle now!
+Bank0223_Text_BellelbaWhWhaaatOne = Bellelba: Wh-whaaat?!\nIn one week, you get THIS much{be00}\nmoney for an allowance?!{be01}\nWow! Is my fortune so small?
+Bank0223_Text_PrincessHeeHeePoor = Princess {0100:1}: Hee hee...\nPoor peasant...{be00}\nI'm heiress to the throne!{be00}\nOf course there's a difference!
+Bank0223_Text_BellelbaGrImGoing = Bellelba: Gr...{be01}\nI'm going to take your money,\nyour crown, and everything else!
+Bank0223_Text_BellelbaYoureKiddingYoure = Bellelba: You're kidding!\nYou're so weak!
+Bank0223_Text_PrincessNoLost = Princess {0100:1}: No...\nI lost...
+Bank0223_Text_BellelbaWowWouldntBetter = Bellelba: Wow...\nWouldn't it be better if you{be00}\ntrained in battle a little bit?
+Bank0223_Text_PrincessYesYoureExactly = Princess {0100:1}: Yes...\nYou're exactly right...
+Bank0223_Text_BellelbaGoodGriefInstead = Bellelba: Good grief...\nInstead of getting soft in the castle,{be00}\nhow about going on a journey?{be01}\nWell... Actually, I know this guy--\nhis head is as smooth as a cue ball,{be00}\nand he's really tough.{be00}\nShall I introduce him to you?
+Bank0223_Text_PrincessWhatReallyOlder = Princess {0100:1}: What? Really?{be01}\nAn older guy? Bald? Tough?\nSounds handsome--just my type!{be01}\nYou don't mind?\nI'd really, really like that!{be01}\nYaaay! Yaaay!\nBald and handsome!
+Bank0223_Text_BellelbaWowDontWant = Bellelba: Wow...{be01}\nI don't want a brat like you\nin my Land of Enchantment...
+Bank0223_Text_PrincessSetOffTrain = So Princess {0100:1}\nset off to train.{be01}\nOr better said, she set off\non a journey to meet the guy.{be01}\nAt any rate, she got out\nof the door safely,{be00}\nso that's probably for the best...
+Bank0223_Text_PrincessOhImTired = Princess {0100:1}: Oh, I'm so tired...
+Bank0223_Text_BellelbaWellNowIm = Bellelba: Well now...\nI'm all caught up!{be01}\nAre you ready?
+Bank0223_Text_PrincessHelpFatherSave = Princess {0100:1}: Help!\nFather, save me!{be01}\nIf I'd known this was going to happen,\nI'd have listened and behaved better!
+Bank0223_Text_BellelbaEeeHeeHeee = Bellelba: Eee hee heee...\nI knew you were a princess{be00}\nfrom the very beginning.{be01}\nAnd that you are a vapid, foolish princess\nwho doesn't listen to her parents{be00}\nand does nothing more than goof off.{be01}\nI already anticipated\nthat you'd come here.{be01}\nAnd now, that foolish princess\nis going to go missing.{be01}\nWhen that happens, it will cause\nchaos in the country, and a war will begin.
+Bank0223_Text_PrincessWhatsAboutSomething = Princess {0100:1}: What's that about?\nSomething like that would never happen{be00}\nin a kingdom like mine!
+Bank0223_Text_BellelbaWonderAboutThink = Bellelba: I wonder about that...{be01}\nDo you think people can trust a king\nwho can't protect his heiress,{be00}\neven if it is an idiot like you?{be01}\nI also suspect that your father\nwill get worn out as he tears apart{be00}\neverything looking for you.{be01}\nSome nobleman might take advantage\nof this and take his place.
+Bank0223_Text_PrincessWereHiredBy = Princess {0100:1}: You...\nYou were hired by the nobleman!{be01}\nFather! Father!\n{0100:1} is here!
+Bank0223_Text_BellelbaThatsNotGoing = Bellelba: That's not going to work.\nI don't think you have time to worry.{be01}\nFrom today on, you're my new servant.{be01}\nLet's go! Get walking!
+Bank0223_Text_CapturedPrincessSaidHave = The captured Princess {0100:1}\nis said to have worked in Bellelba's mansion{be00}\nuntil she died...{be01}\nAs Bellelba said, the evil nobleman\nstole the throne from the king{be00}\nand the country was destroyed...
+Bank0223_Text_PrincessDidDefeatedSwoobat = Princess {0100:1}: I did it!\nI defeated the Swoobat!{be00}\nI can escape now...{be01}\nHuh?!
+Bank0223_Text_PrincessWhereComeWheres = Princess {0100:1}: Where is it?\nCome on! Where's the exit?{be00}\nWhere is that door?!
+Bank0223_Text_BellelbaOhDidntSay = Bellelba: Oh my, didn't I say\nthat escape was impossible?{be01}\nThe door back to your old world\nisn't here anymore!
+Bank0223_Text_PrincessWhatsAboutWhat = Princess {0100:1}: What's that about!\nWhat in the world is going on?
+Bank0223_Text_BellelbaGoodGriefYoure = Bellelba: Good grief you're loud.\nIt would be a lot of trouble if you{be00}\nwent on a rampage and found the real door.{be01}\nFor now, I guess I'll just\nshut you in this Magic Cage...
+Bank0223_Text_MagicCageClankPrincess = Magic Cage: Clank!{be01}\nPrincess {0100:1}: Whaaa!\nLet go of me! Let me out of here!
+Bank0223_Text_StrangeLadyWhoCalls = The strange lady who calls herself\nthe magic queen, Bellelba,{be00}\nput Princess {0100:1}{be00}\nin a Magic Cage after she'd{be00}\nwandered into this world.{be01}\nCan Princess {0100:1}\nsafely return to her own world?{be01}\nAll we can do is hope\nfor her safe return...
 \pad{2e}

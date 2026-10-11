@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Ingrain",
+    "description": "The user lays roots that restore\nits HP on every turn. Because it is\nrooted, it can't switch out.",
+    "type": "TYPE_GRASS",
+    "quality": "MOVE_QUALITY_INFLICT",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_INGRAIN",
+        "chance": 0,
+        "duration": 1,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_GROUND_TRAP_USER_CONTINUOUS_HEAL",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_USER",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_SNATCH" ]
+}

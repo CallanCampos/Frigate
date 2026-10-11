@@ -1,6 +1,7 @@
 #include "app/wfc_user_info_warning.h"
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc_util.h"
 #include "gfl/bmp.h"
 #include "gfl/graphics.h"
@@ -35,7 +36,7 @@
 #define ERROR_WINDOW_GRA_SCRN 2
 
 // The message file of Nintendo Wi-Fi Connection's errors in ARCID_SYSTEM_MESSAGE
-#define MSG_FILE_WIFI_ERROR 439
+#define MSG_FILE_WIFI_ERROR TEXT_BANK_WIFI_ERROR
 
 // The text area: the tiles from FIRST_TEXT_TILE, laid out in rows of the screen from TEXT_TOP, TEXT_LEFT
 #define TILE_SIZE 0x20

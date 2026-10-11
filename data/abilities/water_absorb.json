@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Water Absorb",
+    "description": "Restores HP if hit by a\nWater-type move."
+}

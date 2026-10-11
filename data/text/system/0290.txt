@@ -1,22 +1,22 @@
-{bd02}Thanks to the advice of the Plush Toy,\n{bd02}Prince {0100:1} managed\n{bd02}to conquer the door.\n\n{bd02}He hid the Plush Toy in his pocket\n{bd02}and jumped out of the cage...
-{bd02}However...\n\n{bd02}He had only managed to jump out\n{bd02}of the frying pan into the fire.\n\n{bd02}Bellelba stood glaring\n{bd02}at the prince...
-{bd02}Prince {0100:1} was cornered...
-{bd02}Can the prince escape\n{bd02}from Bellelba and return\n{bd02}to his own world?
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}Thanks to the advice of the Plush Toy,\n{bd02}Princess {0100:1} managed\n{bd02}to conquer the door.\n\n{bd02}She hid the Plush Toy in her pocket\n{bd02}and jumped out of the cage...
-{bd02}However...\n\n{bd02}She had only managed to jump out\n{bd02}of the frying pan into the fire.\n\n{bd02}Bellelba stood glaring\n{bd02}at the princess...
-{bd02}Princess {0100:1} was cornered...
-{bd02}Can the princess escape\n{bd02}from Bellelba and return\n{bd02}to her own world?
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0290_Text_ThanksAdvicePlushToy = {bd02}Thanks to the advice of the Plush Toy,\n{bd02}Prince {0100:1} managed\n{bd02}to conquer the door.\n\n{bd02}He hid the Plush Toy in his pocket\n{bd02}and jumped out of the cage...
+Bank0290_Text_HoweverHeHadOnly = {bd02}However...\n\n{bd02}He had only managed to jump out\n{bd02}of the frying pan into the fire.\n\n{bd02}Bellelba stood glaring\n{bd02}at the prince...
+Bank0290_Text_PrinceCornered = {bd02}Prince {0100:1} was cornered...
+Bank0290_Text_CanPrinceEscapeFrom = {bd02}Can the prince escape\n{bd02}from Bellelba and return\n{bd02}to his own world?
+Bank0290_Text_Empty = なし
+Bank0290_Text_Empty_2 = なし
+Bank0290_Text_Empty_3 = なし
+Bank0290_Text_Empty_4 = なし
+Bank0290_Text_Empty_5 = なし
+Bank0290_Text_Empty_6 = なし
+Bank0290_Text_ThanksAdvicePlushToy_2 = {bd02}Thanks to the advice of the Plush Toy,\n{bd02}Princess {0100:1} managed\n{bd02}to conquer the door.\n\n{bd02}She hid the Plush Toy in her pocket\n{bd02}and jumped out of the cage...
+Bank0290_Text_HoweverSheHadOnly = {bd02}However...\n\n{bd02}She had only managed to jump out\n{bd02}of the frying pan into the fire.\n\n{bd02}Bellelba stood glaring\n{bd02}at the princess...
+Bank0290_Text_PrincessCornered = {bd02}Princess {0100:1} was cornered...
+Bank0290_Text_CanPrincessEscapeFrom = {bd02}Can the princess escape\n{bd02}from Bellelba and return\n{bd02}to her own world?
+Bank0290_Text_Empty_7 = なし
+Bank0290_Text_Empty_8 = なし
+Bank0290_Text_Empty_9 = なし
+Bank0290_Text_Empty_10 = なし
+Bank0290_Text_Empty_11 = なし
+Bank0290_Text_Empty_12 = なし
+Bank0290_Text_Empty_13 = なし
 \pad{44}

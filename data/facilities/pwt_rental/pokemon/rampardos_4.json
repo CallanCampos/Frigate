@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_RAMPARDOS",
+    "moves": [ "MOVE_HEAD_SMASH", "MOVE_EARTHQUAKE", "MOVE_ROCK_SLIDE", "MOVE_PROTECT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_RELAXED",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

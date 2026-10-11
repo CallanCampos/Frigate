@@ -1,6 +1,7 @@
 #include "types.h"
 #include "field/report.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/player_state.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
@@ -331,7 +332,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
     }
 
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 359, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0359, wk->heapId);
     wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     strbuf = GFL_StrBufCreate(0x100, wk->heapId);
     gameData = GSYS_GetGameData(wk->gsys);

@@ -1,9 +1,0 @@
-Why did we put greenhouses\naround the runway, you ask?{be01}\nThat's so we can send freshly picked\nvegetables as fast as possible!
-Why do we make vegetable gardens\naround the runway, you ask?{be01}\nThat's so we can send freshly picked\nvegetables as fast as possible!
-Woooosh! Whooosh!{be01}\nThe wind blows really hard\nin Skyla's Gym!
-Ruuunwaaaay! Ruuunwaaaay!\nA Technical Machine on the ruuuunwaaaay!
-Ruuunwaaaay! Ruuunwaaaay!\nRacing there is so much fun!{be01}\nHey, hey, which Pokémon\nflies the fastest?
-If you have a Gym Badge from Mistralton,\nI'll tell you something cool!
-Wow! A Jet Badge! You won against Skyla!\nOK, I'll tell you something cool!{be01}\nWe left our treasure at the edge of\nthe runway!
-It's TM40, Aerial Ace!{be01}\nWe'll be happy if we gave you\nthe key to victory!
-Kwa!

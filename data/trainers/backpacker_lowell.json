@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lowell",
+    "class": "TRAINER_CLASS_BACKPACKER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SWINUB",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DARMANITAN",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I travel the world because\nI'm looking for danger!{be00}\nAre you dangerous, Trainer?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You're so dangerous that I was in\ndanger of giving up the match!"
+        },
+        {
+            "type": 2,
+            "text": "Why do I seek out danger?{be01}\nBecause it's exciting, that's why!\nIt makes me feel alive!"
+        }
+    ]
+}

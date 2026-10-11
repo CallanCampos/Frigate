@@ -1,5 +1,0 @@
-Clay: Good dancers are crucial\nfer puttin' on a good show!{be01}
-Welcome to the Driftveil Pokémon Gym!{be01}\nIn this Gym, elevators are provided for\nyour use.
-{0100:0} pressed the\nswitch on the elevator!
-Driftveil Pokémon Gym{be01}\nGym Leader: Clay\nCertified Trainers:{be00}\n{0100:1}
-Driftveil Pokémon Gym{be01}\nGym Leader: Clay\nCertified Trainers:{be00}\n{0100:0}, {0100:1}

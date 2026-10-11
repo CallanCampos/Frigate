@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cody",
+    "class": "TRAINER_CLASS_YOUNGSTER",
+    "battle_style": "BTL_STYLE_ROTATION",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_STOUTLAND",
+            "form": 0,
+            "level": 33,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DEERLING",
+            "form": 0,
+            "level": 33,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DEERLING",
+            "form": 0,
+            "level": 33,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "A Rotation Battle is a new kind of battle\nthat uses three Pokémon.{be01}\nPlease prepare at least three Pokémon\nfor battle!"
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "Round and round the rotation goes!{be01}\nCan you keep up without having your\nhead spin? Rotation Battle, begin!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ohhh... My head is spinning!"
+        },
+        {
+            "type": 2,
+            "text": "To have so easily emerged victorious\nfrom a sudden Rotation Battle...{be00}\nYou are cool! Too cool, in fact!"
+        }
+    ]
+}

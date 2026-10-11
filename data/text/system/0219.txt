@@ -1,71 +1,71 @@
-A-list Actor
-Popular Boy
-{0100:1}: No, no way...
-Camilo: Hm...{be01}\n(...Well now, prepare yourself!\nYou're going to feel even worse...){be01}\n(...You'll regret having professed\nyour love to me...)
-Camilo: Gets me off my game...
-{0100:1}: Camilo, your Pokémon\nis really aggressive!
-Camilo: Oh come now.\nAre you afraid of my little Smeargle?{be01}\nA girl like that could\nnever be my sweetie!
-{0100:1}: Please come at me\nwith everything you've got!
-Camilo: So you call me to a place like this,\njust to ask me to go out with you?
-{0100:1}: Um, I...\nFrom the first time I saw you,{be00}\nI couldn't think about anything else!{be01}\nI love you!
-Camilo: Me and you?\nThat joke's not very funny.
-{0100:1}: I'm serious.\nI won't leave until I get an answer!
-Camilo: Hm...{be01}\n(...Oh, what a precocious little princess.\nMakes me want to be a little mean to her...)
-Camilo: How about this, then?\nWant to have a Pokémon battle{be00}\nto test how compatible we are?
-{0100:1}: Y-yes! I'll battle you!
-Camilo: Hm... That's good!{be01}\n(...Heh heh heh... I can't wait...\nSeeing a girl fighting to hold{be00}\nback tears is always moving...)
-Smeargle: Argle! Arrrrg!
-Camilo: OK! Here I come!{be01}\n(...Smeargle's raring to go, too!...){be01}\n(...The girls who've professed their\nlove to me so far...{be00}\nI've made as many cry as there are stars.{be00}\nAnd yet I still haven't found her...{be00}\nMy sweetie...)
-{0100:1}: C-Camilo!\nBefore we start,{be00}\nI have a request!{be00}\nIf I win...
-Camilo: If you win?
-{0100:1}: Marry me!
-Camilo: Whaaaat?!\nMarriage? When you say marriage,{be00}\ndo you mean THAT marriage?{be01}\nYou need to think more of yourself...\nThat's no good! That's seriously bad!
-{0100:1}: Let's go on a date!
-Camilo: What are you saying\nall of a sudden?!{be01}\nA date with me?\nCome back yesterday!
-{0100:1}: C-Camilo...\nYou're so cool...
-Camilo: What?
-{0100:1}: When you don't like what you\nhear, you express your opinion directly!{be01}\nThinking of me like that...\nYou are a wonderful person!
-Camilo: Ah, I see...{be01}\n(...You've GOT to be kidding...\nShe is really tough!{be00}\nNo more Mr. Nice Guy...)
-Camilo: Give it a rest!{be01}\nI don't care about you at all, all right?!
-{0100:1}: So manly...
-Camilo: Aaahhh! C'mon!\nDo you have wax in your ears?!{be00}\nIf I can't make you understand with words,{be00}\nI guess I'll have to use force!
-{0100:1}: Please do!
-Smeargle: Smearrrrrg!
-{0100:1}: I-I'm scared!
-Smeargle: Smearrrg?
-{0100:1}: Noooo!\nI lost!{be01}\nCamilo, you're so strong!\nI didn't stand a chance!
-Camilo: What?\nAre you kissing up to me?{be00}\nThat won't get you{be00}\nanywhere with me at all!
-Camilo: ...{be01}\n(...That's strange...\nWhy don't I feel any malice?...){be01}\n(...She took all of my Pokémon's attacks...\nWhat a big-hearted girl...)
-{0100:1}: Hee hee!
-Camilo: ...{be01}\n(...Sigh... No matter how terrible a thing\nI say, she keeps smiling that smile...){be01}\n(...Huh? Did I start to feel something\nfor her at some point?...)
-{0100:1}: Camilo,\nis something wrong?
-Camilo: If you want to be friends,\nI'll hang out with you!
-Camilo: Hm...{be01}\n(...What is this? It's weird.\nA girl who makes me feel good{be00}\njust by being around me.{be00}\nMy sweetie?!...)
-Just as battles aren't won\nby power alone,{be01}\nthe strongest person doesn't always\nwin in relationships either.
-Turning the other cheek!\nThat's another form love takes!
-{0100:1}: Huff, puff...
-Camilo: Hm. What do you want?\nAre you winded already?{be01}\nI was thinking maybe\nif it was you,{be00}\nbut you're just like the others.{be01}\nYou're not the sweet honey\nI'm looking for...
-{0100:1}: Camilo...\nNo...
-Camilo: I'm sorry,\nbut I'm just not interested{be00}\nin ordinary girls like you...{be01}\nI don't think we'll meet again.\nLet's go, Smeargle!
-Smeargle: Arg! Smearg!
-Just as the results of\nbattle don't follow a set pattern,{be00}\nrelationships between people don't{be00}\nalways go how you would expect.
-Sometimes you must endure\na painful parting because you care!{be00}\nThat's another form love takes!
-Smeargle: Arg... Argle argle...
-Camilo: Tsk. What?\nYou're terrible!{be00}\nBeating up my little Smeargle like that!{be01}\nSeriously! I can't believe you!\nI'm sorry. I never want to see you again.{be00}\nYou're...no good...
-{0100:1}: No good...\nI'm a terrible girl...{be00}\nCamilo, you're so tough!{be01}\nEh heh heh... Eh heh heh heh...{be01}\nThat's what's great about you!
-Just as crazy things happen\nin the world of battling,{be01}\nyou never know what is\ngoing to happen in relationships.
-Some people take painful and\ncruel treatment with joy!{be00}\nThat's another form love takes!
-Camilo: What is it about you?\nI can't figure you out...
-{0100:1}: Hee hee.
-Camilo: Just getting involved won't work.\nTrying to interact with you wears me out...{be00}\nGuess I'll just leave you alone...
-{0100:1}: Hey! No way!\nPay attention to me!
-Smeargle: Smearrrrgle!
-{0100:1}: I won't give up!\nI'll get you to turn my way!
-Just as the results of\nbattle don't follow a set pattern,{be01}\nrelationships between people don't\nalways go how you would expect.
-Even if they won't look your way,\ndon't give up on love!{be00}\nThat's another form love takes!
-Camilo: What was that now?
-{0100:1}: Um... Er...\nIt was...Attract...
-Camilo: Ha ha...{be01}\nYou thought you could change\nmy mind with Attract?{be01}\nThat's unexpected...
-{0100:1}: I'm...\nI'm sorry...
-Camilo: ...
-{0100:1}: Oohhh...
+Bank0219_Text_ListActor = A-list Actor
+Bank0219_Text_PopularBoy = Popular Boy
+Bank0219_Text_NoNoWay = {0100:1}: No, no way...
+Bank0219_Text_CamiloHmWellNow = Camilo: Hm...{be01}\n(...Well now, prepare yourself!\nYou're going to feel even worse...){be01}\n(...You'll regret having professed\nyour love to me...)
+Bank0219_Text_CamiloGetsOffGame = Camilo: Gets me off my game...
+Bank0219_Text_CamiloPokemonReallyAggressive = {0100:1}: Camilo, your Pokémon\nis really aggressive!
+Bank0219_Text_CamiloOhComeNow = Camilo: Oh come now.\nAre you afraid of my little Smeargle?{be01}\nA girl like that could\nnever be my sweetie!
+Bank0219_Text_PleaseComeEverythingYouve = {0100:1}: Please come at me\nwith everything you've got!
+Bank0219_Text_CamiloCallPlaceLike = Camilo: So you call me to a place like this,\njust to ask me to go out with you?
+Bank0219_Text_UmFromFirstTime = {0100:1}: Um, I...\nFrom the first time I saw you,{be00}\nI couldn't think about anything else!{be01}\nI love you!
+Bank0219_Text_CamiloJokesNotVery = Camilo: Me and you?\nThat joke's not very funny.
+Bank0219_Text_ImSeriousWontLeave = {0100:1}: I'm serious.\nI won't leave until I get an answer!
+Bank0219_Text_CamiloHmOhWhat = Camilo: Hm...{be01}\n(...Oh, what a precocious little princess.\nMakes me want to be a little mean to her...)
+Bank0219_Text_CamiloHowAboutThen = Camilo: How about this, then?\nWant to have a Pokémon battle{be00}\nto test how compatible we are?
+Bank0219_Text_YYesIllBattle = {0100:1}: Y-yes! I'll battle you!
+Bank0219_Text_CamiloHmThatsGood = Camilo: Hm... That's good!{be01}\n(...Heh heh heh... I can't wait...\nSeeing a girl fighting to hold{be00}\nback tears is always moving...)
+Bank0219_Text_SmeargleArgleArrrrg = Smeargle: Argle! Arrrrg!
+Bank0219_Text_CamiloOkHereCome = Camilo: OK! Here I come!{be01}\n(...Smeargle's raring to go, too!...){be01}\n(...The girls who've professed their\nlove to me so far...{be00}\nI've made as many cry as there are stars.{be00}\nAnd yet I still haven't found her...{be00}\nMy sweetie...)
+Bank0219_Text_CCamiloBeforeWe = {0100:1}: C-Camilo!\nBefore we start,{be00}\nI have a request!{be00}\nIf I win...
+Bank0219_Text_CamiloIfWin = Camilo: If you win?
+Bank0219_Text_Marry = {0100:1}: Marry me!
+Bank0219_Text_CamiloWhaaaatMarriageWhen = Camilo: Whaaaat?!\nMarriage? When you say marriage,{be00}\ndo you mean THAT marriage?{be01}\nYou need to think more of yourself...\nThat's no good! That's seriously bad!
+Bank0219_Text_LetsGoDate = {0100:1}: Let's go on a date!
+Bank0219_Text_CamiloWhatSayingAll = Camilo: What are you saying\nall of a sudden?!{be01}\nA date with me?\nCome back yesterday!
+Bank0219_Text_CCamiloYoureCool = {0100:1}: C-Camilo...\nYou're so cool...
+Bank0219_Text_CamiloWhat = Camilo: What?
+Bank0219_Text_WhenDontLikeWhat = {0100:1}: When you don't like what you\nhear, you express your opinion directly!{be01}\nThinking of me like that...\nYou are a wonderful person!
+Bank0219_Text_CamiloAhSeeYouve = Camilo: Ah, I see...{be01}\n(...You've GOT to be kidding...\nShe is really tough!{be00}\nNo more Mr. Nice Guy...)
+Bank0219_Text_CamiloGiveRestDont = Camilo: Give it a rest!{be01}\nI don't care about you at all, all right?!
+Bank0219_Text_Manly = {0100:1}: So manly...
+Bank0219_Text_CamiloAaahhhCmonHave = Camilo: Aaahhh! C'mon!\nDo you have wax in your ears?!{be00}\nIf I can't make you understand with words,{be00}\nI guess I'll have to use force!
+Bank0219_Text_Please = {0100:1}: Please do!
+Bank0219_Text_SmeargleSmearrrrrg = Smeargle: Smearrrrrg!
+Bank0219_Text_ImScared = {0100:1}: I-I'm scared!
+Bank0219_Text_SmeargleSmearrrg = Smeargle: Smearrrg?
+Bank0219_Text_NooooLostCamiloYoure = {0100:1}: Noooo!\nI lost!{be01}\nCamilo, you're so strong!\nI didn't stand a chance!
+Bank0219_Text_CamiloWhatKissingUp = Camilo: What?\nAre you kissing up to me?{be00}\nThat won't get you{be00}\nanywhere with me at all!
+Bank0219_Text_CamiloThatsStrangeWhy = Camilo: ...{be01}\n(...That's strange...\nWhy don't I feel any malice?...){be01}\n(...She took all of my Pokémon's attacks...\nWhat a big-hearted girl...)
+Bank0219_Text_HeeHee = {0100:1}: Hee hee!
+Bank0219_Text_CamiloSighNoMatter = Camilo: ...{be01}\n(...Sigh... No matter how terrible a thing\nI say, she keeps smiling that smile...){be01}\n(...Huh? Did I start to feel something\nfor her at some point?...)
+Bank0219_Text_CamiloSomethingWrong = {0100:1}: Camilo,\nis something wrong?
+Bank0219_Text_CamiloIfWantFriends = Camilo: If you want to be friends,\nI'll hang out with you!
+Bank0219_Text_CamiloHmWhatIts = Camilo: Hm...{be01}\n(...What is this? It's weird.\nA girl who makes me feel good{be00}\njust by being around me.{be00}\nMy sweetie?!...)
+Bank0219_Text_JustBattlesArentWon = Just as battles aren't won\nby power alone,{be01}\nthe strongest person doesn't always\nwin in relationships either.
+Bank0219_Text_TurningOtherCheekThats = Turning the other cheek!\nThat's another form love takes!
+Bank0219_Text_HuffPuff = {0100:1}: Huff, puff...
+Bank0219_Text_CamiloHmWhatWant = Camilo: Hm. What do you want?\nAre you winded already?{be01}\nI was thinking maybe\nif it was you,{be00}\nbut you're just like the others.{be01}\nYou're not the sweet honey\nI'm looking for...
+Bank0219_Text_CamiloNo = {0100:1}: Camilo...\nNo...
+Bank0219_Text_CamiloImSorryBut = Camilo: I'm sorry,\nbut I'm just not interested{be00}\nin ordinary girls like you...{be01}\nI don't think we'll meet again.\nLet's go, Smeargle!
+Bank0219_Text_SmeargleArgSmearg = Smeargle: Arg! Smearg!
+Bank0219_Text_JustResultsBattleDont = Just as the results of\nbattle don't follow a set pattern,{be00}\nrelationships between people don't{be00}\nalways go how you would expect.
+Bank0219_Text_SometimesMustEndurePainful = Sometimes you must endure\na painful parting because you care!{be00}\nThat's another form love takes!
+Bank0219_Text_SmeargleArgArgleArgle = Smeargle: Arg... Argle argle...
+Bank0219_Text_CamiloTskWhatYoure = Camilo: Tsk. What?\nYou're terrible!{be00}\nBeating up my little Smeargle like that!{be01}\nSeriously! I can't believe you!\nI'm sorry. I never want to see you again.{be00}\nYou're...no good...
+Bank0219_Text_NoGoodImTerrible = {0100:1}: No good...\nI'm a terrible girl...{be00}\nCamilo, you're so tough!{be01}\nEh heh heh... Eh heh heh heh...{be01}\nThat's what's great about you!
+Bank0219_Text_JustCrazyThingsHappen = Just as crazy things happen\nin the world of battling,{be01}\nyou never know what is\ngoing to happen in relationships.
+Bank0219_Text_SomePeopleTakePainful = Some people take painful and\ncruel treatment with joy!{be00}\nThat's another form love takes!
+Bank0219_Text_CamiloWhatAboutCant = Camilo: What is it about you?\nI can't figure you out...
+Bank0219_Text_HeeHee_2 = {0100:1}: Hee hee.
+Bank0219_Text_CamiloJustGettingInvolved = Camilo: Just getting involved won't work.\nTrying to interact with you wears me out...{be00}\nGuess I'll just leave you alone...
+Bank0219_Text_HeyNoWayPay = {0100:1}: Hey! No way!\nPay attention to me!
+Bank0219_Text_SmeargleSmearrrrgle = Smeargle: Smearrrrgle!
+Bank0219_Text_WontGiveUpIll = {0100:1}: I won't give up!\nI'll get you to turn my way!
+Bank0219_Text_JustResultsBattleDont_2 = Just as the results of\nbattle don't follow a set pattern,{be01}\nrelationships between people don't\nalways go how you would expect.
+Bank0219_Text_EvenIfTheyWont = Even if they won't look your way,\ndon't give up on love!{be00}\nThat's another form love takes!
+Bank0219_Text_CamiloWhatNow = Camilo: What was that now?
+Bank0219_Text_UmErAttract = {0100:1}: Um... Er...\nIt was...Attract...
+Bank0219_Text_CamiloHaHaThought = Camilo: Ha ha...{be01}\nYou thought you could change\nmy mind with Attract?{be01}\nThat's unexpected...
+Bank0219_Text_ImImSorry = {0100:1}: I'm...\nI'm sorry...
+Bank0219_Text_Camilo = Camilo: ...
+Bank0219_Text_Oohhh = {0100:1}: Oohhh...

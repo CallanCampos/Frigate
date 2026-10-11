@@ -1,733 +1,733 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-One form
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Normal
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Normal Forme
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Plant Cloak
-Plant Cloak
-
-
-
-
-
-
-
-Overcast Form
-West Sea
-West Sea
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Rotom
-
-
-
-
-
-
-
-Altered Forme
-
-
-
-
-Land Forme
-Arceus
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Red-Striped Form
-
-
-
-
-Standard Mode
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Spring Form
-Spring Form
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Incarnate Forme
-Incarnate Forme
-
-
-Incarnate Forme
-Kyurem
-Ordinary Form
-Aria Forme
-Genesect
-
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-One form
-Sunny Form
-Rainy Form
-Snowy Form
-Attack Forme
-Defense Forme
-Speed Forme
-Sandy Cloak
-Trash Cloak
-Sandy Cloak
-Trash Cloak
-Sunshine Form
-East Sea
-East Sea
-Heat Rotom
-Wash Rotom
-Frost Rotom
-Fan Rotom
-Mow Rotom
-Origin Forme
-Sky Forme
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Arceus
-Blue-Striped Form
-Zen Mode
-Summer Form
-Autumn Form
-Winter Form
-Summer Form
-Autumn Form
-Winter Form
-Therian Forme
-Therian Forme
-Therian Forme
-White Kyurem
-Black Kyurem
-Resolute Form
-Pirouette Forme
-Genesect
-Genesect
-Genesect
-Genesect
+Bank0450_Text_Empty =
+Bank0450_Text_Empty_2 =
+Bank0450_Text_Empty_3 =
+Bank0450_Text_Empty_4 =
+Bank0450_Text_Empty_5 =
+Bank0450_Text_Empty_6 =
+Bank0450_Text_Empty_7 =
+Bank0450_Text_Empty_8 =
+Bank0450_Text_Empty_9 =
+Bank0450_Text_Empty_10 =
+Bank0450_Text_Empty_11 =
+Bank0450_Text_Empty_12 =
+Bank0450_Text_Empty_13 =
+Bank0450_Text_Empty_14 =
+Bank0450_Text_Empty_15 =
+Bank0450_Text_Empty_16 =
+Bank0450_Text_Empty_17 =
+Bank0450_Text_Empty_18 =
+Bank0450_Text_Empty_19 =
+Bank0450_Text_Empty_20 =
+Bank0450_Text_Empty_21 =
+Bank0450_Text_Empty_22 =
+Bank0450_Text_Empty_23 =
+Bank0450_Text_Empty_24 =
+Bank0450_Text_Empty_25 =
+Bank0450_Text_Empty_26 =
+Bank0450_Text_Empty_27 =
+Bank0450_Text_Empty_28 =
+Bank0450_Text_Empty_29 =
+Bank0450_Text_Empty_30 =
+Bank0450_Text_Empty_31 =
+Bank0450_Text_Empty_32 =
+Bank0450_Text_Empty_33 =
+Bank0450_Text_Empty_34 =
+Bank0450_Text_Empty_35 =
+Bank0450_Text_Empty_36 =
+Bank0450_Text_Empty_37 =
+Bank0450_Text_Empty_38 =
+Bank0450_Text_Empty_39 =
+Bank0450_Text_Empty_40 =
+Bank0450_Text_Empty_41 =
+Bank0450_Text_Empty_42 =
+Bank0450_Text_Empty_43 =
+Bank0450_Text_Empty_44 =
+Bank0450_Text_Empty_45 =
+Bank0450_Text_Empty_46 =
+Bank0450_Text_Empty_47 =
+Bank0450_Text_Empty_48 =
+Bank0450_Text_Empty_49 =
+Bank0450_Text_Empty_50 =
+Bank0450_Text_Empty_51 =
+Bank0450_Text_Empty_52 =
+Bank0450_Text_Empty_53 =
+Bank0450_Text_Empty_54 =
+Bank0450_Text_Empty_55 =
+Bank0450_Text_Empty_56 =
+Bank0450_Text_Empty_57 =
+Bank0450_Text_Empty_58 =
+Bank0450_Text_Empty_59 =
+Bank0450_Text_Empty_60 =
+Bank0450_Text_Empty_61 =
+Bank0450_Text_Empty_62 =
+Bank0450_Text_Empty_63 =
+Bank0450_Text_Empty_64 =
+Bank0450_Text_Empty_65 =
+Bank0450_Text_Empty_66 =
+Bank0450_Text_Empty_67 =
+Bank0450_Text_Empty_68 =
+Bank0450_Text_Empty_69 =
+Bank0450_Text_Empty_70 =
+Bank0450_Text_Empty_71 =
+Bank0450_Text_Empty_72 =
+Bank0450_Text_Empty_73 =
+Bank0450_Text_Empty_74 =
+Bank0450_Text_Empty_75 =
+Bank0450_Text_Empty_76 =
+Bank0450_Text_Empty_77 =
+Bank0450_Text_Empty_78 =
+Bank0450_Text_Empty_79 =
+Bank0450_Text_Empty_80 =
+Bank0450_Text_Empty_81 =
+Bank0450_Text_Empty_82 =
+Bank0450_Text_Empty_83 =
+Bank0450_Text_Empty_84 =
+Bank0450_Text_Empty_85 =
+Bank0450_Text_Empty_86 =
+Bank0450_Text_Empty_87 =
+Bank0450_Text_Empty_88 =
+Bank0450_Text_Empty_89 =
+Bank0450_Text_Empty_90 =
+Bank0450_Text_Empty_91 =
+Bank0450_Text_Empty_92 =
+Bank0450_Text_Empty_93 =
+Bank0450_Text_Empty_94 =
+Bank0450_Text_Empty_95 =
+Bank0450_Text_Empty_96 =
+Bank0450_Text_Empty_97 =
+Bank0450_Text_Empty_98 =
+Bank0450_Text_Empty_99 =
+Bank0450_Text_Empty_100 =
+Bank0450_Text_Empty_101 =
+Bank0450_Text_Empty_102 =
+Bank0450_Text_Empty_103 =
+Bank0450_Text_Empty_104 =
+Bank0450_Text_Empty_105 =
+Bank0450_Text_Empty_106 =
+Bank0450_Text_Empty_107 =
+Bank0450_Text_Empty_108 =
+Bank0450_Text_Empty_109 =
+Bank0450_Text_Empty_110 =
+Bank0450_Text_Empty_111 =
+Bank0450_Text_Empty_112 =
+Bank0450_Text_Empty_113 =
+Bank0450_Text_Empty_114 =
+Bank0450_Text_Empty_115 =
+Bank0450_Text_Empty_116 =
+Bank0450_Text_Empty_117 =
+Bank0450_Text_Empty_118 =
+Bank0450_Text_Empty_119 =
+Bank0450_Text_Empty_120 =
+Bank0450_Text_Empty_121 =
+Bank0450_Text_Empty_122 =
+Bank0450_Text_Empty_123 =
+Bank0450_Text_Empty_124 =
+Bank0450_Text_Empty_125 =
+Bank0450_Text_Empty_126 =
+Bank0450_Text_Empty_127 =
+Bank0450_Text_Empty_128 =
+Bank0450_Text_Empty_129 =
+Bank0450_Text_Empty_130 =
+Bank0450_Text_Empty_131 =
+Bank0450_Text_Empty_132 =
+Bank0450_Text_Empty_133 =
+Bank0450_Text_Empty_134 =
+Bank0450_Text_Empty_135 =
+Bank0450_Text_Empty_136 =
+Bank0450_Text_Empty_137 =
+Bank0450_Text_Empty_138 =
+Bank0450_Text_Empty_139 =
+Bank0450_Text_Empty_140 =
+Bank0450_Text_Empty_141 =
+Bank0450_Text_Empty_142 =
+Bank0450_Text_Empty_143 =
+Bank0450_Text_Empty_144 =
+Bank0450_Text_Empty_145 =
+Bank0450_Text_Empty_146 =
+Bank0450_Text_Empty_147 =
+Bank0450_Text_Empty_148 =
+Bank0450_Text_Empty_149 =
+Bank0450_Text_Empty_150 =
+Bank0450_Text_Empty_151 =
+Bank0450_Text_Empty_152 =
+Bank0450_Text_Empty_153 =
+Bank0450_Text_Empty_154 =
+Bank0450_Text_Empty_155 =
+Bank0450_Text_Empty_156 =
+Bank0450_Text_Empty_157 =
+Bank0450_Text_Empty_158 =
+Bank0450_Text_Empty_159 =
+Bank0450_Text_Empty_160 =
+Bank0450_Text_Empty_161 =
+Bank0450_Text_Empty_162 =
+Bank0450_Text_Empty_163 =
+Bank0450_Text_Empty_164 =
+Bank0450_Text_Empty_165 =
+Bank0450_Text_Empty_166 =
+Bank0450_Text_Empty_167 =
+Bank0450_Text_Empty_168 =
+Bank0450_Text_Empty_169 =
+Bank0450_Text_Empty_170 =
+Bank0450_Text_Empty_171 =
+Bank0450_Text_Empty_172 =
+Bank0450_Text_Empty_173 =
+Bank0450_Text_Empty_174 =
+Bank0450_Text_Empty_175 =
+Bank0450_Text_Empty_176 =
+Bank0450_Text_Empty_177 =
+Bank0450_Text_Empty_178 =
+Bank0450_Text_Empty_179 =
+Bank0450_Text_Empty_180 =
+Bank0450_Text_Empty_181 =
+Bank0450_Text_Empty_182 =
+Bank0450_Text_Empty_183 =
+Bank0450_Text_Empty_184 =
+Bank0450_Text_Empty_185 =
+Bank0450_Text_Empty_186 =
+Bank0450_Text_Empty_187 =
+Bank0450_Text_Empty_188 =
+Bank0450_Text_Empty_189 =
+Bank0450_Text_Empty_190 =
+Bank0450_Text_Empty_191 =
+Bank0450_Text_Empty_192 =
+Bank0450_Text_Empty_193 =
+Bank0450_Text_Empty_194 =
+Bank0450_Text_Empty_195 =
+Bank0450_Text_Empty_196 =
+Bank0450_Text_Empty_197 =
+Bank0450_Text_Empty_198 =
+Bank0450_Text_Empty_199 =
+Bank0450_Text_Empty_200 =
+Bank0450_Text_Empty_201 =
+Bank0450_Text_OneForm = One form
+Bank0450_Text_Empty_202 =
+Bank0450_Text_Empty_203 =
+Bank0450_Text_Empty_204 =
+Bank0450_Text_Empty_205 =
+Bank0450_Text_Empty_206 =
+Bank0450_Text_Empty_207 =
+Bank0450_Text_Empty_208 =
+Bank0450_Text_Empty_209 =
+Bank0450_Text_Empty_210 =
+Bank0450_Text_Empty_211 =
+Bank0450_Text_Empty_212 =
+Bank0450_Text_Empty_213 =
+Bank0450_Text_Empty_214 =
+Bank0450_Text_Empty_215 =
+Bank0450_Text_Empty_216 =
+Bank0450_Text_Empty_217 =
+Bank0450_Text_Empty_218 =
+Bank0450_Text_Empty_219 =
+Bank0450_Text_Empty_220 =
+Bank0450_Text_Empty_221 =
+Bank0450_Text_Empty_222 =
+Bank0450_Text_Empty_223 =
+Bank0450_Text_Empty_224 =
+Bank0450_Text_Empty_225 =
+Bank0450_Text_Empty_226 =
+Bank0450_Text_Empty_227 =
+Bank0450_Text_Empty_228 =
+Bank0450_Text_Empty_229 =
+Bank0450_Text_Empty_230 =
+Bank0450_Text_Empty_231 =
+Bank0450_Text_Empty_232 =
+Bank0450_Text_Empty_233 =
+Bank0450_Text_Empty_234 =
+Bank0450_Text_Empty_235 =
+Bank0450_Text_Empty_236 =
+Bank0450_Text_Empty_237 =
+Bank0450_Text_Empty_238 =
+Bank0450_Text_Empty_239 =
+Bank0450_Text_Empty_240 =
+Bank0450_Text_Empty_241 =
+Bank0450_Text_Empty_242 =
+Bank0450_Text_Empty_243 =
+Bank0450_Text_Empty_244 =
+Bank0450_Text_Empty_245 =
+Bank0450_Text_Empty_246 =
+Bank0450_Text_Empty_247 =
+Bank0450_Text_Empty_248 =
+Bank0450_Text_Empty_249 =
+Bank0450_Text_Empty_250 =
+Bank0450_Text_Empty_251 =
+Bank0450_Text_Empty_252 =
+Bank0450_Text_Empty_253 =
+Bank0450_Text_Empty_254 =
+Bank0450_Text_Empty_255 =
+Bank0450_Text_Empty_256 =
+Bank0450_Text_Empty_257 =
+Bank0450_Text_Empty_258 =
+Bank0450_Text_Empty_259 =
+Bank0450_Text_Empty_260 =
+Bank0450_Text_Empty_261 =
+Bank0450_Text_Empty_262 =
+Bank0450_Text_Empty_263 =
+Bank0450_Text_Empty_264 =
+Bank0450_Text_Empty_265 =
+Bank0450_Text_Empty_266 =
+Bank0450_Text_Empty_267 =
+Bank0450_Text_Empty_268 =
+Bank0450_Text_Empty_269 =
+Bank0450_Text_Empty_270 =
+Bank0450_Text_Empty_271 =
+Bank0450_Text_Empty_272 =
+Bank0450_Text_Empty_273 =
+Bank0450_Text_Empty_274 =
+Bank0450_Text_Empty_275 =
+Bank0450_Text_Empty_276 =
+Bank0450_Text_Empty_277 =
+Bank0450_Text_Empty_278 =
+Bank0450_Text_Empty_279 =
+Bank0450_Text_Empty_280 =
+Bank0450_Text_Empty_281 =
+Bank0450_Text_Empty_282 =
+Bank0450_Text_Empty_283 =
+Bank0450_Text_Empty_284 =
+Bank0450_Text_Empty_285 =
+Bank0450_Text_Empty_286 =
+Bank0450_Text_Empty_287 =
+Bank0450_Text_Empty_288 =
+Bank0450_Text_Empty_289 =
+Bank0450_Text_Empty_290 =
+Bank0450_Text_Empty_291 =
+Bank0450_Text_Empty_292 =
+Bank0450_Text_Empty_293 =
+Bank0450_Text_Empty_294 =
+Bank0450_Text_Empty_295 =
+Bank0450_Text_Empty_296 =
+Bank0450_Text_Empty_297 =
+Bank0450_Text_Empty_298 =
+Bank0450_Text_Empty_299 =
+Bank0450_Text_Empty_300 =
+Bank0450_Text_Empty_301 =
+Bank0450_Text_Empty_302 =
+Bank0450_Text_Empty_303 =
+Bank0450_Text_Empty_304 =
+Bank0450_Text_Empty_305 =
+Bank0450_Text_Empty_306 =
+Bank0450_Text_Empty_307 =
+Bank0450_Text_Empty_308 =
+Bank0450_Text_Empty_309 =
+Bank0450_Text_Empty_310 =
+Bank0450_Text_Empty_311 =
+Bank0450_Text_Empty_312 =
+Bank0450_Text_Empty_313 =
+Bank0450_Text_Empty_314 =
+Bank0450_Text_Empty_315 =
+Bank0450_Text_Empty_316 =
+Bank0450_Text_Empty_317 =
+Bank0450_Text_Empty_318 =
+Bank0450_Text_Empty_319 =
+Bank0450_Text_Empty_320 =
+Bank0450_Text_Empty_321 =
+Bank0450_Text_Empty_322 =
+Bank0450_Text_Empty_323 =
+Bank0450_Text_Empty_324 =
+Bank0450_Text_Empty_325 =
+Bank0450_Text_Empty_326 =
+Bank0450_Text_Empty_327 =
+Bank0450_Text_Empty_328 =
+Bank0450_Text_Empty_329 =
+Bank0450_Text_Empty_330 =
+Bank0450_Text_Empty_331 =
+Bank0450_Text_Empty_332 =
+Bank0450_Text_Empty_333 =
+Bank0450_Text_Empty_334 =
+Bank0450_Text_Empty_335 =
+Bank0450_Text_Empty_336 =
+Bank0450_Text_Empty_337 =
+Bank0450_Text_Empty_338 =
+Bank0450_Text_Empty_339 =
+Bank0450_Text_Empty_340 =
+Bank0450_Text_Empty_341 =
+Bank0450_Text_Empty_342 =
+Bank0450_Text_Empty_343 =
+Bank0450_Text_Empty_344 =
+Bank0450_Text_Empty_345 =
+Bank0450_Text_Empty_346 =
+Bank0450_Text_Empty_347 =
+Bank0450_Text_Empty_348 =
+Bank0450_Text_Empty_349 =
+Bank0450_Text_Empty_350 =
+Bank0450_Text_Normal = Normal
+Bank0450_Text_Empty_351 =
+Bank0450_Text_Empty_352 =
+Bank0450_Text_Empty_353 =
+Bank0450_Text_Empty_354 =
+Bank0450_Text_Empty_355 =
+Bank0450_Text_Empty_356 =
+Bank0450_Text_Empty_357 =
+Bank0450_Text_Empty_358 =
+Bank0450_Text_Empty_359 =
+Bank0450_Text_Empty_360 =
+Bank0450_Text_Empty_361 =
+Bank0450_Text_Empty_362 =
+Bank0450_Text_Empty_363 =
+Bank0450_Text_Empty_364 =
+Bank0450_Text_Empty_365 =
+Bank0450_Text_Empty_366 =
+Bank0450_Text_Empty_367 =
+Bank0450_Text_Empty_368 =
+Bank0450_Text_Empty_369 =
+Bank0450_Text_Empty_370 =
+Bank0450_Text_Empty_371 =
+Bank0450_Text_Empty_372 =
+Bank0450_Text_Empty_373 =
+Bank0450_Text_Empty_374 =
+Bank0450_Text_Empty_375 =
+Bank0450_Text_Empty_376 =
+Bank0450_Text_Empty_377 =
+Bank0450_Text_Empty_378 =
+Bank0450_Text_Empty_379 =
+Bank0450_Text_Empty_380 =
+Bank0450_Text_Empty_381 =
+Bank0450_Text_Empty_382 =
+Bank0450_Text_Empty_383 =
+Bank0450_Text_Empty_384 =
+Bank0450_Text_NormalForme = Normal Forme
+Bank0450_Text_Empty_385 =
+Bank0450_Text_Empty_386 =
+Bank0450_Text_Empty_387 =
+Bank0450_Text_Empty_388 =
+Bank0450_Text_Empty_389 =
+Bank0450_Text_Empty_390 =
+Bank0450_Text_Empty_391 =
+Bank0450_Text_Empty_392 =
+Bank0450_Text_Empty_393 =
+Bank0450_Text_Empty_394 =
+Bank0450_Text_Empty_395 =
+Bank0450_Text_Empty_396 =
+Bank0450_Text_Empty_397 =
+Bank0450_Text_Empty_398 =
+Bank0450_Text_Empty_399 =
+Bank0450_Text_Empty_400 =
+Bank0450_Text_Empty_401 =
+Bank0450_Text_Empty_402 =
+Bank0450_Text_Empty_403 =
+Bank0450_Text_Empty_404 =
+Bank0450_Text_Empty_405 =
+Bank0450_Text_Empty_406 =
+Bank0450_Text_Empty_407 =
+Bank0450_Text_Empty_408 =
+Bank0450_Text_Empty_409 =
+Bank0450_Text_PlantCloak = Plant Cloak
+Bank0450_Text_PlantCloak_2 = Plant Cloak
+Bank0450_Text_Empty_410 =
+Bank0450_Text_Empty_411 =
+Bank0450_Text_Empty_412 =
+Bank0450_Text_Empty_413 =
+Bank0450_Text_Empty_414 =
+Bank0450_Text_Empty_415 =
+Bank0450_Text_Empty_416 =
+Bank0450_Text_OvercastForm = Overcast Form
+Bank0450_Text_WestSea = West Sea
+Bank0450_Text_WestSea_2 = West Sea
+Bank0450_Text_Empty_417 =
+Bank0450_Text_Empty_418 =
+Bank0450_Text_Empty_419 =
+Bank0450_Text_Empty_420 =
+Bank0450_Text_Empty_421 =
+Bank0450_Text_Empty_422 =
+Bank0450_Text_Empty_423 =
+Bank0450_Text_Empty_424 =
+Bank0450_Text_Empty_425 =
+Bank0450_Text_Empty_426 =
+Bank0450_Text_Empty_427 =
+Bank0450_Text_Empty_428 =
+Bank0450_Text_Empty_429 =
+Bank0450_Text_Empty_430 =
+Bank0450_Text_Empty_431 =
+Bank0450_Text_Empty_432 =
+Bank0450_Text_Empty_433 =
+Bank0450_Text_Empty_434 =
+Bank0450_Text_Empty_435 =
+Bank0450_Text_Empty_436 =
+Bank0450_Text_Empty_437 =
+Bank0450_Text_Empty_438 =
+Bank0450_Text_Empty_439 =
+Bank0450_Text_Empty_440 =
+Bank0450_Text_Empty_441 =
+Bank0450_Text_Empty_442 =
+Bank0450_Text_Empty_443 =
+Bank0450_Text_Empty_444 =
+Bank0450_Text_Empty_445 =
+Bank0450_Text_Empty_446 =
+Bank0450_Text_Empty_447 =
+Bank0450_Text_Empty_448 =
+Bank0450_Text_Empty_449 =
+Bank0450_Text_Empty_450 =
+Bank0450_Text_Empty_451 =
+Bank0450_Text_Empty_452 =
+Bank0450_Text_Empty_453 =
+Bank0450_Text_Empty_454 =
+Bank0450_Text_Empty_455 =
+Bank0450_Text_Empty_456 =
+Bank0450_Text_Empty_457 =
+Bank0450_Text_Empty_458 =
+Bank0450_Text_Empty_459 =
+Bank0450_Text_Empty_460 =
+Bank0450_Text_Empty_461 =
+Bank0450_Text_Empty_462 =
+Bank0450_Text_Empty_463 =
+Bank0450_Text_Empty_464 =
+Bank0450_Text_Empty_465 =
+Bank0450_Text_Empty_466 =
+Bank0450_Text_Empty_467 =
+Bank0450_Text_Empty_468 =
+Bank0450_Text_Empty_469 =
+Bank0450_Text_Empty_470 =
+Bank0450_Text_Empty_471 =
+Bank0450_Text_Rotom = Rotom
+Bank0450_Text_Empty_472 =
+Bank0450_Text_Empty_473 =
+Bank0450_Text_Empty_474 =
+Bank0450_Text_Empty_475 =
+Bank0450_Text_Empty_476 =
+Bank0450_Text_Empty_477 =
+Bank0450_Text_Empty_478 =
+Bank0450_Text_AlteredForme = Altered Forme
+Bank0450_Text_Empty_479 =
+Bank0450_Text_Empty_480 =
+Bank0450_Text_Empty_481 =
+Bank0450_Text_Empty_482 =
+Bank0450_Text_LandForme = Land Forme
+Bank0450_Text_Arceus = Arceus
+Bank0450_Text_Empty_483 =
+Bank0450_Text_Empty_484 =
+Bank0450_Text_Empty_485 =
+Bank0450_Text_Empty_486 =
+Bank0450_Text_Empty_487 =
+Bank0450_Text_Empty_488 =
+Bank0450_Text_Empty_489 =
+Bank0450_Text_Empty_490 =
+Bank0450_Text_Empty_491 =
+Bank0450_Text_Empty_492 =
+Bank0450_Text_Empty_493 =
+Bank0450_Text_Empty_494 =
+Bank0450_Text_Empty_495 =
+Bank0450_Text_Empty_496 =
+Bank0450_Text_Empty_497 =
+Bank0450_Text_Empty_498 =
+Bank0450_Text_Empty_499 =
+Bank0450_Text_Empty_500 =
+Bank0450_Text_Empty_501 =
+Bank0450_Text_Empty_502 =
+Bank0450_Text_Empty_503 =
+Bank0450_Text_Empty_504 =
+Bank0450_Text_Empty_505 =
+Bank0450_Text_Empty_506 =
+Bank0450_Text_Empty_507 =
+Bank0450_Text_Empty_508 =
+Bank0450_Text_Empty_509 =
+Bank0450_Text_Empty_510 =
+Bank0450_Text_Empty_511 =
+Bank0450_Text_Empty_512 =
+Bank0450_Text_Empty_513 =
+Bank0450_Text_Empty_514 =
+Bank0450_Text_Empty_515 =
+Bank0450_Text_Empty_516 =
+Bank0450_Text_Empty_517 =
+Bank0450_Text_Empty_518 =
+Bank0450_Text_Empty_519 =
+Bank0450_Text_Empty_520 =
+Bank0450_Text_Empty_521 =
+Bank0450_Text_Empty_522 =
+Bank0450_Text_Empty_523 =
+Bank0450_Text_Empty_524 =
+Bank0450_Text_Empty_525 =
+Bank0450_Text_Empty_526 =
+Bank0450_Text_Empty_527 =
+Bank0450_Text_Empty_528 =
+Bank0450_Text_Empty_529 =
+Bank0450_Text_Empty_530 =
+Bank0450_Text_Empty_531 =
+Bank0450_Text_Empty_532 =
+Bank0450_Text_Empty_533 =
+Bank0450_Text_Empty_534 =
+Bank0450_Text_Empty_535 =
+Bank0450_Text_Empty_536 =
+Bank0450_Text_Empty_537 =
+Bank0450_Text_Empty_538 =
+Bank0450_Text_RedStripedForm = Red-Striped Form
+Bank0450_Text_Empty_539 =
+Bank0450_Text_Empty_540 =
+Bank0450_Text_Empty_541 =
+Bank0450_Text_Empty_542 =
+Bank0450_Text_StandardMode = Standard Mode
+Bank0450_Text_Empty_543 =
+Bank0450_Text_Empty_544 =
+Bank0450_Text_Empty_545 =
+Bank0450_Text_Empty_546 =
+Bank0450_Text_Empty_547 =
+Bank0450_Text_Empty_548 =
+Bank0450_Text_Empty_549 =
+Bank0450_Text_Empty_550 =
+Bank0450_Text_Empty_551 =
+Bank0450_Text_Empty_552 =
+Bank0450_Text_Empty_553 =
+Bank0450_Text_Empty_554 =
+Bank0450_Text_Empty_555 =
+Bank0450_Text_Empty_556 =
+Bank0450_Text_Empty_557 =
+Bank0450_Text_Empty_558 =
+Bank0450_Text_Empty_559 =
+Bank0450_Text_Empty_560 =
+Bank0450_Text_Empty_561 =
+Bank0450_Text_Empty_562 =
+Bank0450_Text_Empty_563 =
+Bank0450_Text_Empty_564 =
+Bank0450_Text_Empty_565 =
+Bank0450_Text_Empty_566 =
+Bank0450_Text_Empty_567 =
+Bank0450_Text_Empty_568 =
+Bank0450_Text_Empty_569 =
+Bank0450_Text_Empty_570 =
+Bank0450_Text_Empty_571 =
+Bank0450_Text_SpringForm = Spring Form
+Bank0450_Text_SpringForm_2 = Spring Form
+Bank0450_Text_Empty_572 =
+Bank0450_Text_Empty_573 =
+Bank0450_Text_Empty_574 =
+Bank0450_Text_Empty_575 =
+Bank0450_Text_Empty_576 =
+Bank0450_Text_Empty_577 =
+Bank0450_Text_Empty_578 =
+Bank0450_Text_Empty_579 =
+Bank0450_Text_Empty_580 =
+Bank0450_Text_Empty_581 =
+Bank0450_Text_Empty_582 =
+Bank0450_Text_Empty_583 =
+Bank0450_Text_Empty_584 =
+Bank0450_Text_Empty_585 =
+Bank0450_Text_Empty_586 =
+Bank0450_Text_Empty_587 =
+Bank0450_Text_Empty_588 =
+Bank0450_Text_Empty_589 =
+Bank0450_Text_Empty_590 =
+Bank0450_Text_Empty_591 =
+Bank0450_Text_Empty_592 =
+Bank0450_Text_Empty_593 =
+Bank0450_Text_Empty_594 =
+Bank0450_Text_Empty_595 =
+Bank0450_Text_Empty_596 =
+Bank0450_Text_Empty_597 =
+Bank0450_Text_Empty_598 =
+Bank0450_Text_Empty_599 =
+Bank0450_Text_Empty_600 =
+Bank0450_Text_Empty_601 =
+Bank0450_Text_Empty_602 =
+Bank0450_Text_Empty_603 =
+Bank0450_Text_Empty_604 =
+Bank0450_Text_Empty_605 =
+Bank0450_Text_Empty_606 =
+Bank0450_Text_Empty_607 =
+Bank0450_Text_Empty_608 =
+Bank0450_Text_Empty_609 =
+Bank0450_Text_Empty_610 =
+Bank0450_Text_Empty_611 =
+Bank0450_Text_Empty_612 =
+Bank0450_Text_Empty_613 =
+Bank0450_Text_Empty_614 =
+Bank0450_Text_Empty_615 =
+Bank0450_Text_Empty_616 =
+Bank0450_Text_Empty_617 =
+Bank0450_Text_Empty_618 =
+Bank0450_Text_Empty_619 =
+Bank0450_Text_Empty_620 =
+Bank0450_Text_Empty_621 =
+Bank0450_Text_Empty_622 =
+Bank0450_Text_Empty_623 =
+Bank0450_Text_Empty_624 =
+Bank0450_Text_Empty_625 =
+Bank0450_Text_IncarnateForme = Incarnate Forme
+Bank0450_Text_IncarnateForme_2 = Incarnate Forme
+Bank0450_Text_Empty_626 =
+Bank0450_Text_Empty_627 =
+Bank0450_Text_IncarnateForme_3 = Incarnate Forme
+Bank0450_Text_Kyurem = Kyurem
+Bank0450_Text_OrdinaryForm = Ordinary Form
+Bank0450_Text_AriaForme = Aria Forme
+Bank0450_Text_Genesect = Genesect
+Bank0450_Text_Empty_628 =
+Bank0450_Text_OneForm_2 = One form
+Bank0450_Text_OneForm_3 = One form
+Bank0450_Text_OneForm_4 = One form
+Bank0450_Text_OneForm_5 = One form
+Bank0450_Text_OneForm_6 = One form
+Bank0450_Text_OneForm_7 = One form
+Bank0450_Text_OneForm_8 = One form
+Bank0450_Text_OneForm_9 = One form
+Bank0450_Text_OneForm_10 = One form
+Bank0450_Text_OneForm_11 = One form
+Bank0450_Text_OneForm_12 = One form
+Bank0450_Text_OneForm_13 = One form
+Bank0450_Text_OneForm_14 = One form
+Bank0450_Text_OneForm_15 = One form
+Bank0450_Text_OneForm_16 = One form
+Bank0450_Text_OneForm_17 = One form
+Bank0450_Text_OneForm_18 = One form
+Bank0450_Text_OneForm_19 = One form
+Bank0450_Text_OneForm_20 = One form
+Bank0450_Text_OneForm_21 = One form
+Bank0450_Text_OneForm_22 = One form
+Bank0450_Text_OneForm_23 = One form
+Bank0450_Text_OneForm_24 = One form
+Bank0450_Text_OneForm_25 = One form
+Bank0450_Text_OneForm_26 = One form
+Bank0450_Text_OneForm_27 = One form
+Bank0450_Text_OneForm_28 = One form
+Bank0450_Text_SunnyForm = Sunny Form
+Bank0450_Text_RainyForm = Rainy Form
+Bank0450_Text_SnowyForm = Snowy Form
+Bank0450_Text_AttackForme = Attack Forme
+Bank0450_Text_DefenseForme = Defense Forme
+Bank0450_Text_SpeedForme = Speed Forme
+Bank0450_Text_SandyCloak = Sandy Cloak
+Bank0450_Text_TrashCloak = Trash Cloak
+Bank0450_Text_SandyCloak_2 = Sandy Cloak
+Bank0450_Text_TrashCloak_2 = Trash Cloak
+Bank0450_Text_SunshineForm = Sunshine Form
+Bank0450_Text_EastSea = East Sea
+Bank0450_Text_EastSea_2 = East Sea
+Bank0450_Text_HeatRotom = Heat Rotom
+Bank0450_Text_WashRotom = Wash Rotom
+Bank0450_Text_FrostRotom = Frost Rotom
+Bank0450_Text_FanRotom = Fan Rotom
+Bank0450_Text_MowRotom = Mow Rotom
+Bank0450_Text_OriginForme = Origin Forme
+Bank0450_Text_SkyForme = Sky Forme
+Bank0450_Text_Arceus_2 = Arceus
+Bank0450_Text_Arceus_3 = Arceus
+Bank0450_Text_Arceus_4 = Arceus
+Bank0450_Text_Arceus_5 = Arceus
+Bank0450_Text_Arceus_6 = Arceus
+Bank0450_Text_Arceus_7 = Arceus
+Bank0450_Text_Arceus_8 = Arceus
+Bank0450_Text_Arceus_9 = Arceus
+Bank0450_Text_Arceus_10 = Arceus
+Bank0450_Text_Arceus_11 = Arceus
+Bank0450_Text_Arceus_12 = Arceus
+Bank0450_Text_Arceus_13 = Arceus
+Bank0450_Text_Arceus_14 = Arceus
+Bank0450_Text_Arceus_15 = Arceus
+Bank0450_Text_Arceus_16 = Arceus
+Bank0450_Text_Arceus_17 = Arceus
+Bank0450_Text_BlueStripedForm = Blue-Striped Form
+Bank0450_Text_ZenMode = Zen Mode
+Bank0450_Text_SummerForm = Summer Form
+Bank0450_Text_AutumnForm = Autumn Form
+Bank0450_Text_WinterForm = Winter Form
+Bank0450_Text_SummerForm_2 = Summer Form
+Bank0450_Text_AutumnForm_2 = Autumn Form
+Bank0450_Text_WinterForm_2 = Winter Form
+Bank0450_Text_TherianForme = Therian Forme
+Bank0450_Text_TherianForme_2 = Therian Forme
+Bank0450_Text_TherianForme_3 = Therian Forme
+Bank0450_Text_WhiteKyurem = White Kyurem
+Bank0450_Text_BlackKyurem = Black Kyurem
+Bank0450_Text_ResoluteForm = Resolute Form
+Bank0450_Text_PirouetteForme = Pirouette Forme
+Bank0450_Text_Genesect_2 = Genesect
+Bank0450_Text_Genesect_3 = Genesect
+Bank0450_Text_Genesect_4 = Genesect
+Bank0450_Text_Genesect_5 = Genesect

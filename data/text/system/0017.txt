@@ -1,221 +1,221 @@
-●●
-A wild {0101:0} appeared!
-Oh! A wild {0101:0} and\n{0101:1} appeared!
-A wild {0101:0} appeared!
-A wild {0101:0} appeared!
-The {0101:0} your Pokémon saw\nin the dream appeared!
-{0101:0} appeared!
-The cameras are rolling on you and\n{010e:0} {0100:1}!{be01}
-You are challenged by\n{0100:0}!{be01}
-You are challenged by\n{010e:0} {0100:1} and{be00}\n{010e:2} {0100:3}!{be01}
-You are challenged by\n{0100:0} and {0100:1}!{be01}
-Here we go, {0102:0}!
-Go! {0102:0} and\n{0102:1}!
-Go! {0102:0},\n{0102:1}, and {0102:2}!
-{010e:0} {0100:1} sent\nout {0102:2}!
-{010e:0} {0100:1} sent out\n{0102:2} and {0102:3}!
-{010e:0} {0100:1} sent out\n{0102:2}, {0102:3},{be00}\nand {0102:4}!
-{0100:0} sent out\n{0102:1}!
-{0100:0} sent out\n{0102:1} and {0102:2}!
-{0100:0} sent out\n{0102:1}, {0102:2},{be00}\nand {0102:3}!
-{010e:0} {0100:1} is\nabout to send in {0102:2}.{be00}\nWill you switch your Pokémon?
-You're in charge, {0102:0}!
-Go for it, {0102:0}!
-Just a little more!\nHang in there, {0102:0}!
-Your foe's weak!\nGet 'em, {0102:0}!
-{0102:0}, switch out!\nCome back!
-{0102:0}, come back!
-{0102:0}, enough!\nGet back!
-{0102:0}, OK!\nCome back!
-{0102:0}, good job!\nGet back!
-{010e:0} {0100:1}\nwithdrew {0102:2}!
-{0100:0}\nwithdrew {0102:1}!
-Hit {0200:0} time(s)!
-{0100:0} used the\n{0109:1}.
-{0100:0} used the\n{0109:1}.
-{010e:0} {0100:1}\nused one {0109:2}!
-{0100:0} launched the {0109:2}\ntoward {0102:1}!
-You cannot use your\nWonder Launcher now!
-{0100:0}'s Pokémon\nrotated to the left!
-{0100:0}'s Pokémon\nrotated to the left!
-{0100:0}'s Pokémon\nrotated to the right!
-{0100:0}'s Pokémon\nrotated to the right!
-{010c:0} gained\n{0206:1} Exp. Points!
-{010c:0} gained a boosted\n{0206:1} Exp. Points!
-Player defeated\n{010e:0} {0100:1}!
-Player beat\n{010e:0} {0100:1}{be00}\nand {010e:2} {0100:3}!
-Player lost against\n{010e:0} {0100:1}!
-Player battled to a draw against\n{010e:0} {0100:1}!
-Player defeated\n{0100:0}!
-Player defeated {0100:0}\nand {0100:1}!
-Player lost against\n{0100:0}!
-Player lost to {0100:0}\nand {0100:1}!
-Player battled to a draw against\n{0100:0}!
-Player battled to a draw against\n{0100:0} and {0100:1}!
-{0100:0} is out of\nusable Pokémon!{be01}
-{0100:0} dropped ${0204:1}\nin panic...
-{0100:0} paid out ${0204:1}\nto the winner...
-{0100:0} blacked out!
-{0100:0} got ${0204:1}\nfor winning!
-{0100:0} picked up\n${0204:1}!
-{010c:0} grew to\nLv. {0202:1}!
-Oh, no!\nThe Pokémon broke free!
-Aww!\nIt appeared to be caught!
-Aargh!\nAlmost had it!
-Shoot!\nIt was so close, too!
-Gotcha!\n{0101:0} was caught!
-{0101:0}'s data was\nadded to the Pokédex.
-The Trainer blocked the Ball!{be01}\nDon't be a thief!
-But it had no effect!
-What should {010c:0}'s next action be?
-What will {0100:0} do?
-{be09:60}But it failed!
-Got away safely!
-Couldn't get away!
-Can't escape!
-The wild {0102:0} fled!
-You can't run during filming!
-Do you want to quit this movie shoot?
-It's super effective!
-It's not very effective...
-It hurt itself in its confusion!
-A critical hit!
-But there was no PP left\nfor the move!
-{0100:0} came to the rescue\nto restore {0102:1}'s health!
-The sunlight turned harsh!
-It started to rain!
-A sandstorm kicked up!
-It started to hail!
-Fog crept up as thick as soup!
-The sunlight faded.
-The rain stopped.
-The sandstorm subsided.
-The hail stopped.
-The fog lifted.
-The effects of weather disappeared.
-The sandstorm rages.
-The hail crashes down.
-It's a one-hit KO!
-The {0109:0} weakened\n{0107:1}'s power!
-The {0109:0} allows the\nuse of only {0107:1}!
-{010c:0} can use only\n{0107:1}!
-All stat changes were eliminated!
-But nothing happened!
-{0102:0}'s\n{0106:1}
-Magnitude 4!
-Magnitude 5!
-Magnitude 6!
-Magnitude 7!
-Magnitude 8!
-Magnitude 9!
-Magnitude 10!
-A bell chimed!
-A soothing aroma wafted\nthrough the area!
-The battlers shared\ntheir pain!
-Fire's power was weakened!
-Electricity's power was weakened!
-The twisted dimensions returned\nto normal!
-Gravity intensified!
-Gravity returned to normal!
-All Pokémon hearing the song\nwill faint in three turns!
-Waggling a finger\nlet it use {0107:0}!
-Nature Power turned into\n{0107:0}!
-Coins were scattered everywhere!
-It was too weak to make\na substitute!
-Reflect raised your team's\nDefense!
-Reflect raised the\nopposing team's Defense!
-Your team's Reflect\nwore off!
-The opposing team's Reflect\nwore off!
-Light Screen raised your team's\nSpecial Defense!
-Light Screen raised\nthe opposing team's Special Defense!
-Your team's Light Screen\nwore off!
-The opposing team's Light Screen\nwore off!
-Your team became cloaked in\na mystical veil!
-The foe's team became\ncloaked in a mystical veil!
-Your team is no longer protected\nby Safeguard!
-The foe's team is no longer protected\nby Safeguard!
-Your team became\nshrouded in mist!
-The foe's team became\nshrouded in mist!
-Your team is no longer protected\nby mist!
-The foe's team is no longer protected\nby mist!
-The tailwind blew from behind\nyour team!
-The tailwind blew from behind\nthe foe's team!
-Your team's tailwind petered out!
-The foe's team's tailwind petered out!
-The Lucky Chant shielded your team\nfrom critical hits!
-The Lucky Chant shielded the opposing team\nfrom critical hits!
-Your team's Lucky Chant wore off!
-The opposing team's Lucky Chant wore off!
-Spikes were scattered all around\nyour team's feet!
-Spikes were scattered all around\nthe feet of the foe's team!
-The spikes disappeared from\naround your team's feet!
-The spikes disappeared from\naround the foe's team's feet!
-Poison spikes were scattered all\naround your team's feet!
-Poison spikes were scattered all\naround the foe's team's feet!
-The poison spikes disappeared\nfrom around your team's feet!
-The poison spikes disappeared\nfrom around the foe's team's feet!
-Pointed stones float in the air\naround your team!
-Pointed stones float in the air\naround your foe's team!
-The pointed stones disappeared\nfrom around your team!
-The pointed stones disappeared\nfrom around the foe's team!
-Wide Guard protected your team!
-Wide Guard protected the foe's team!
-Quick Guard protected your team!
-Quick Guard protected the foe's team!
-A rainbow appeared in the sky\non your team's side!
-A rainbow appeared in the sky\non the foe's team's side!
-The rainbow on your team's side\ndisappeared!
-The rainbow on the foe's team's side\ndisappeared!
-A sea of fire enveloped\nyour team!
-A sea of fire enveloped\nthe foe's team!
-The sea of fire around your team\ndisappeared!
-The sea of fire around the foe's team\ndisappeared!
-A swamp enveloped your team!
-A swamp enveloped the\nfoe's team!
-The swamp around your team\ndisappeared!
-The swamp around the foe's team\ndisappeared!
-Your team is too nervous to\neat Berries!
-The foe's team is too nervous to\neat Berries!
-It created a bizarre area in which\nthe Defense and Sp. Def stats are swapped!
-Wonder Room wore off, and the Defense\nand Sp. Def stats returned to normal!
-It created a bizarre area in which\nPokémon's held items lose their effects!
-Magic Room wore off, and the held items'\neffects returned to normal!
-The {0109:0} strengthened\n{0107:1}'s power!
-The time limit is up!\nThe battle will end!
-The battle is too long.\nPlayback canceled.
-Zen Mode triggered!
-Zen Mode ended!
-The two moves are joined!\nIt's a combined move!
-{010c:0} won't obey!
-{010c:0} is\nloafing around!
-{010c:0} turned away!
-{010c:0} pretended\nnot to notice!
-{010c:0} ignored orders!
-{010c:0} began to nap!
-{010c:0} ignored\norders while asleep!
-Automatic center!
-But it's not where this item\ncan be used!
-Sky Drop won't let {010c:0} go!
-The match was forfeited.
-({0200:0})'s Metronome {0202:1}:{0107:2}
-A wild {0101:0} appeared?!
-SCENE 01
-SCENE 02
-SCENE 03
-SCENE 04
-SCENE 05
-SCENE 06
-SCENE 07
-SCENE 08
-SCENE 09
-SCENE 10
-SCENE 11
-SCENE 12
-SCENE 13
-SCENE 14
-SCENE 15
-SCENE 16
-SCENE 17
-SCENE 18
-SCENE 19
-SCENE 20
+Bank0017_Text_Empty = ●●
+Bank0017_Text_WildAppeared = A wild {0101:0} appeared!
+Bank0017_Text_OhWildAppeared = Oh! A wild {0101:0} and\n{0101:1} appeared!
+Bank0017_Text_WildAppeared_2 = A wild {0101:0} appeared!
+Bank0017_Text_WildAppeared_3 = A wild {0101:0} appeared!
+Bank0017_Text_PokemonSawDreamAppeared = The {0101:0} your Pokémon saw\nin the dream appeared!
+Bank0017_Text_Appeared = {0101:0} appeared!
+Bank0017_Text_CamerasRolling = The cameras are rolling on you and\n{010e:0} {0100:1}!{be01}
+Bank0017_Text_ChallengedBy = You are challenged by\n{0100:0}!{be01}
+Bank0017_Text_ChallengedBy_2 = You are challenged by\n{010e:0} {0100:1} and{be00}\n{010e:2} {0100:3}!{be01}
+Bank0017_Text_ChallengedBy_3 = You are challenged by\n{0100:0} and {0100:1}!{be01}
+Bank0017_Text_HereWeGo = Here we go, {0102:0}!
+Bank0017_Text_Go = Go! {0102:0} and\n{0102:1}!
+Bank0017_Text_Go_2 = Go! {0102:0},\n{0102:1}, and {0102:2}!
+Bank0017_Text_SentOut = {010e:0} {0100:1} sent\nout {0102:2}!
+Bank0017_Text_SentOut_2 = {010e:0} {0100:1} sent out\n{0102:2} and {0102:3}!
+Bank0017_Text_SentOut_3 = {010e:0} {0100:1} sent out\n{0102:2}, {0102:3},{be00}\nand {0102:4}!
+Bank0017_Text_SentOut_4 = {0100:0} sent out\n{0102:1}!
+Bank0017_Text_SentOut_5 = {0100:0} sent out\n{0102:1} and {0102:2}!
+Bank0017_Text_SentOut_6 = {0100:0} sent out\n{0102:1}, {0102:2},{be00}\nand {0102:3}!
+Bank0017_Text_AboutSendWillSwitch = {010e:0} {0100:1} is\nabout to send in {0102:2}.{be00}\nWill you switch your Pokémon?
+Bank0017_Text_YoureCharge = You're in charge, {0102:0}!
+Bank0017_Text_Go_3 = Go for it, {0102:0}!
+Bank0017_Text_JustLittleMoreHang = Just a little more!\nHang in there, {0102:0}!
+Bank0017_Text_FoesWeakGetEm = Your foe's weak!\nGet 'em, {0102:0}!
+Bank0017_Text_SwitchOutComeBack = {0102:0}, switch out!\nCome back!
+Bank0017_Text_ComeBack = {0102:0}, come back!
+Bank0017_Text_EnoughGetBack = {0102:0}, enough!\nGet back!
+Bank0017_Text_OkComeBack = {0102:0}, OK!\nCome back!
+Bank0017_Text_GoodJobGetBack = {0102:0}, good job!\nGet back!
+Bank0017_Text_Withdrew = {010e:0} {0100:1}\nwithdrew {0102:2}!
+Bank0017_Text_Withdrew_2 = {0100:0}\nwithdrew {0102:1}!
+Bank0017_Text_HitTimeS = Hit {0200:0} time(s)!
+Bank0017_Text_Used = {0100:0} used the\n{0109:1}.
+Bank0017_Text_Used_2 = {0100:0} used the\n{0109:1}.
+Bank0017_Text_UsedOne = {010e:0} {0100:1}\nused one {0109:2}!
+Bank0017_Text_LaunchedToward = {0100:0} launched the {0109:2}\ntoward {0102:1}!
+Bank0017_Text_CannotUseWonderLauncher = You cannot use your\nWonder Launcher now!
+Bank0017_Text_SPokemonRotatedLeft = {0100:0}'s Pokémon\nrotated to the left!
+Bank0017_Text_SPokemonRotatedLeft_2 = {0100:0}'s Pokémon\nrotated to the left!
+Bank0017_Text_SPokemonRotatedRight = {0100:0}'s Pokémon\nrotated to the right!
+Bank0017_Text_SPokemonRotatedRight_2 = {0100:0}'s Pokémon\nrotated to the right!
+Bank0017_Text_GainedExpPoints = {010c:0} gained\n{0206:1} Exp. Points!
+Bank0017_Text_GainedBoostedExpPoints = {010c:0} gained a boosted\n{0206:1} Exp. Points!
+Bank0017_Text_PlayerDefeated = Player defeated\n{010e:0} {0100:1}!
+Bank0017_Text_PlayerBeat = Player beat\n{010e:0} {0100:1}{be00}\nand {010e:2} {0100:3}!
+Bank0017_Text_PlayerLostAgainst = Player lost against\n{010e:0} {0100:1}!
+Bank0017_Text_PlayerBattledDrawAgainst = Player battled to a draw against\n{010e:0} {0100:1}!
+Bank0017_Text_PlayerDefeated_2 = Player defeated\n{0100:0}!
+Bank0017_Text_PlayerDefeated_3 = Player defeated {0100:0}\nand {0100:1}!
+Bank0017_Text_PlayerLostAgainst_2 = Player lost against\n{0100:0}!
+Bank0017_Text_PlayerLost = Player lost to {0100:0}\nand {0100:1}!
+Bank0017_Text_PlayerBattledDrawAgainst_2 = Player battled to a draw against\n{0100:0}!
+Bank0017_Text_PlayerBattledDrawAgainst_3 = Player battled to a draw against\n{0100:0} and {0100:1}!
+Bank0017_Text_OutUsablePokemon = {0100:0} is out of\nusable Pokémon!{be01}
+Bank0017_Text_DroppedPanic = {0100:0} dropped ${0204:1}\nin panic...
+Bank0017_Text_PaidOutWinner = {0100:0} paid out ${0204:1}\nto the winner...
+Bank0017_Text_BlackedOut = {0100:0} blacked out!
+Bank0017_Text_GotWinning = {0100:0} got ${0204:1}\nfor winning!
+Bank0017_Text_PickedUp = {0100:0} picked up\n${0204:1}!
+Bank0017_Text_GrewLv = {010c:0} grew to\nLv. {0202:1}!
+Bank0017_Text_OhNoPokemonBroke = Oh, no!\nThe Pokémon broke free!
+Bank0017_Text_AwwAppearedCaught = Aww!\nIt appeared to be caught!
+Bank0017_Text_AarghAlmostHad = Aargh!\nAlmost had it!
+Bank0017_Text_ShootCloseToo = Shoot!\nIt was so close, too!
+Bank0017_Text_GotchaCaught = Gotcha!\n{0101:0} was caught!
+Bank0017_Text_SDataAddedPokedex = {0101:0}'s data was\nadded to the Pokédex.
+Bank0017_Text_TrainerBlockedBallDont = The Trainer blocked the Ball!{be01}\nDon't be a thief!
+Bank0017_Text_ButHadNoEffect = But it had no effect!
+Bank0017_Text_WhatShouldSNext = What should {010c:0}'s next action be?
+Bank0017_Text_WhatWill = What will {0100:0} do?
+Bank0017_Text_ButFailed = {be09:60}But it failed!
+Bank0017_Text_GotAwaySafely = Got away safely!
+Bank0017_Text_CouldntGetAway = Couldn't get away!
+Bank0017_Text_CantEscape = Can't escape!
+Bank0017_Text_WildFled = The wild {0102:0} fled!
+Bank0017_Text_CantRunDuringFilming = You can't run during filming!
+Bank0017_Text_WantQuitMovieShoot = Do you want to quit this movie shoot?
+Bank0017_Text_ItsSuperEffective = It's super effective!
+Bank0017_Text_ItsNotVeryEffective = It's not very effective...
+Bank0017_Text_HurtItselfItsConfusion = It hurt itself in its confusion!
+Bank0017_Text_CriticalHit = A critical hit!
+Bank0017_Text_ButThereNoPp = But there was no PP left\nfor the move!
+Bank0017_Text_CameRescueRestoreS = {0100:0} came to the rescue\nto restore {0102:1}'s health!
+Bank0017_Text_SunlightTurnedHarsh = The sunlight turned harsh!
+Bank0017_Text_StartedRain = It started to rain!
+Bank0017_Text_SandstormKickedUp = A sandstorm kicked up!
+Bank0017_Text_StartedHail = It started to hail!
+Bank0017_Text_FogCreptUpThick = Fog crept up as thick as soup!
+Bank0017_Text_SunlightFaded = The sunlight faded.
+Bank0017_Text_RainStopped = The rain stopped.
+Bank0017_Text_SandstormSubsided = The sandstorm subsided.
+Bank0017_Text_HailStopped = The hail stopped.
+Bank0017_Text_FogLifted = The fog lifted.
+Bank0017_Text_EffectsWeatherDisappeared = The effects of weather disappeared.
+Bank0017_Text_SandstormRages = The sandstorm rages.
+Bank0017_Text_HailCrashesDown = The hail crashes down.
+Bank0017_Text_ItsOneHitKo = It's a one-hit KO!
+Bank0017_Text_WeakenedSPower = The {0109:0} weakened\n{0107:1}'s power!
+Bank0017_Text_AllowsUseOnly = The {0109:0} allows the\nuse of only {0107:1}!
+Bank0017_Text_CanUseOnly = {010c:0} can use only\n{0107:1}!
+Bank0017_Text_AllStatChangesWere = All stat changes were eliminated!
+Bank0017_Text_ButNothingHappened = But nothing happened!
+Bank0017_Text_S = {0102:0}'s\n{0106:1}
+Bank0017_Text_Magnitude4 = Magnitude 4!
+Bank0017_Text_Magnitude5 = Magnitude 5!
+Bank0017_Text_Magnitude6 = Magnitude 6!
+Bank0017_Text_Magnitude7 = Magnitude 7!
+Bank0017_Text_Magnitude8 = Magnitude 8!
+Bank0017_Text_Magnitude9 = Magnitude 9!
+Bank0017_Text_Magnitude10 = Magnitude 10!
+Bank0017_Text_BellChimed = A bell chimed!
+Bank0017_Text_SoothingAromaWaftedThrough = A soothing aroma wafted\nthrough the area!
+Bank0017_Text_BattlersSharedTheirPain = The battlers shared\ntheir pain!
+Bank0017_Text_FiresPowerWeakened = Fire's power was weakened!
+Bank0017_Text_ElectricitysPowerWeakened = Electricity's power was weakened!
+Bank0017_Text_TwistedDimensionsReturnedNormal = The twisted dimensions returned\nto normal!
+Bank0017_Text_GravityIntensified = Gravity intensified!
+Bank0017_Text_GravityReturnedNormal = Gravity returned to normal!
+Bank0017_Text_AllPokemonHearingSong = All Pokémon hearing the song\nwill faint in three turns!
+Bank0017_Text_WagglingFingerLetUse = Waggling a finger\nlet it use {0107:0}!
+Bank0017_Text_NaturePowerTurnedInto = Nature Power turned into\n{0107:0}!
+Bank0017_Text_CoinsWereScatteredEverywhere = Coins were scattered everywhere!
+Bank0017_Text_TooWeakMakeSubstitute = It was too weak to make\na substitute!
+Bank0017_Text_ReflectRaisedTeamsDefense = Reflect raised your team's\nDefense!
+Bank0017_Text_ReflectRaisedOpposingTeams = Reflect raised the\nopposing team's Defense!
+Bank0017_Text_TeamsReflectWoreOff = Your team's Reflect\nwore off!
+Bank0017_Text_OpposingTeamsReflectWore = The opposing team's Reflect\nwore off!
+Bank0017_Text_LightScreenRaisedTeams = Light Screen raised your team's\nSpecial Defense!
+Bank0017_Text_LightScreenRaisedOpposing = Light Screen raised\nthe opposing team's Special Defense!
+Bank0017_Text_TeamsLightScreenWore = Your team's Light Screen\nwore off!
+Bank0017_Text_OpposingTeamsLightScreen = The opposing team's Light Screen\nwore off!
+Bank0017_Text_TeamBecameCloakedMystical = Your team became cloaked in\na mystical veil!
+Bank0017_Text_FoesTeamBecameCloaked = The foe's team became\ncloaked in a mystical veil!
+Bank0017_Text_TeamNoLongerProtected = Your team is no longer protected\nby Safeguard!
+Bank0017_Text_FoesTeamNoLonger = The foe's team is no longer protected\nby Safeguard!
+Bank0017_Text_TeamBecameShroudedMist = Your team became\nshrouded in mist!
+Bank0017_Text_FoesTeamBecameShrouded = The foe's team became\nshrouded in mist!
+Bank0017_Text_TeamNoLongerProtected_2 = Your team is no longer protected\nby mist!
+Bank0017_Text_FoesTeamNoLonger_2 = The foe's team is no longer protected\nby mist!
+Bank0017_Text_TailwindBlewFromBehind = The tailwind blew from behind\nyour team!
+Bank0017_Text_TailwindBlewFromBehind_2 = The tailwind blew from behind\nthe foe's team!
+Bank0017_Text_TeamsTailwindPeteredOut = Your team's tailwind petered out!
+Bank0017_Text_FoesTeamsTailwindPetered = The foe's team's tailwind petered out!
+Bank0017_Text_LuckyChantShieldedTeam = The Lucky Chant shielded your team\nfrom critical hits!
+Bank0017_Text_LuckyChantShieldedOpposing = The Lucky Chant shielded the opposing team\nfrom critical hits!
+Bank0017_Text_TeamsLuckyChantWore = Your team's Lucky Chant wore off!
+Bank0017_Text_OpposingTeamsLuckyChant = The opposing team's Lucky Chant wore off!
+Bank0017_Text_SpikesWereScatteredAll = Spikes were scattered all around\nyour team's feet!
+Bank0017_Text_SpikesWereScatteredAll_2 = Spikes were scattered all around\nthe feet of the foe's team!
+Bank0017_Text_SpikesDisappearedFromAround = The spikes disappeared from\naround your team's feet!
+Bank0017_Text_SpikesDisappearedFromAround_2 = The spikes disappeared from\naround the foe's team's feet!
+Bank0017_Text_PoisonSpikesWereScattered = Poison spikes were scattered all\naround your team's feet!
+Bank0017_Text_PoisonSpikesWereScattered_2 = Poison spikes were scattered all\naround the foe's team's feet!
+Bank0017_Text_PoisonSpikesDisappearedFrom = The poison spikes disappeared\nfrom around your team's feet!
+Bank0017_Text_PoisonSpikesDisappearedFrom_2 = The poison spikes disappeared\nfrom around the foe's team's feet!
+Bank0017_Text_PointedStonesFloatAir = Pointed stones float in the air\naround your team!
+Bank0017_Text_PointedStonesFloatAir_2 = Pointed stones float in the air\naround your foe's team!
+Bank0017_Text_PointedStonesDisappearedFrom = The pointed stones disappeared\nfrom around your team!
+Bank0017_Text_PointedStonesDisappearedFrom_2 = The pointed stones disappeared\nfrom around the foe's team!
+Bank0017_Text_WideGuardProtectedTeam = Wide Guard protected your team!
+Bank0017_Text_WideGuardProtectedFoes = Wide Guard protected the foe's team!
+Bank0017_Text_QuickGuardProtectedTeam = Quick Guard protected your team!
+Bank0017_Text_QuickGuardProtectedFoes = Quick Guard protected the foe's team!
+Bank0017_Text_RainbowAppearedSkyTeams = A rainbow appeared in the sky\non your team's side!
+Bank0017_Text_RainbowAppearedSkyFoes = A rainbow appeared in the sky\non the foe's team's side!
+Bank0017_Text_RainbowTeamsSideDisappeared = The rainbow on your team's side\ndisappeared!
+Bank0017_Text_RainbowFoesTeamsSide = The rainbow on the foe's team's side\ndisappeared!
+Bank0017_Text_SeaFireEnvelopedTeam = A sea of fire enveloped\nyour team!
+Bank0017_Text_SeaFireEnvelopedFoes = A sea of fire enveloped\nthe foe's team!
+Bank0017_Text_SeaFireAroundTeam = The sea of fire around your team\ndisappeared!
+Bank0017_Text_SeaFireAroundFoes = The sea of fire around the foe's team\ndisappeared!
+Bank0017_Text_SwampEnvelopedTeam = A swamp enveloped your team!
+Bank0017_Text_SwampEnvelopedFoesTeam = A swamp enveloped the\nfoe's team!
+Bank0017_Text_SwampAroundTeamDisappeared = The swamp around your team\ndisappeared!
+Bank0017_Text_SwampAroundFoesTeam = The swamp around the foe's team\ndisappeared!
+Bank0017_Text_TeamTooNervousEat = Your team is too nervous to\neat Berries!
+Bank0017_Text_FoesTeamTooNervous = The foe's team is too nervous to\neat Berries!
+Bank0017_Text_CreatedBizarreAreaWhich = It created a bizarre area in which\nthe Defense and Sp. Def stats are swapped!
+Bank0017_Text_WonderRoomWoreOff = Wonder Room wore off, and the Defense\nand Sp. Def stats returned to normal!
+Bank0017_Text_CreatedBizarreAreaWhich_2 = It created a bizarre area in which\nPokémon's held items lose their effects!
+Bank0017_Text_MagicRoomWoreOff = Magic Room wore off, and the held items'\neffects returned to normal!
+Bank0017_Text_StrengthenedSPower = The {0109:0} strengthened\n{0107:1}'s power!
+Bank0017_Text_TimeLimitUpBattle = The time limit is up!\nThe battle will end!
+Bank0017_Text_BattleTooLongPlayback = The battle is too long.\nPlayback canceled.
+Bank0017_Text_ZenModeTriggered = Zen Mode triggered!
+Bank0017_Text_ZenModeEnded = Zen Mode ended!
+Bank0017_Text_TwoMovesJoinedIts = The two moves are joined!\nIt's a combined move!
+Bank0017_Text_WontObey = {010c:0} won't obey!
+Bank0017_Text_LoafingAround = {010c:0} is\nloafing around!
+Bank0017_Text_TurnedAway = {010c:0} turned away!
+Bank0017_Text_PretendedNotNotice = {010c:0} pretended\nnot to notice!
+Bank0017_Text_IgnoredOrders = {010c:0} ignored orders!
+Bank0017_Text_BeganNap = {010c:0} began to nap!
+Bank0017_Text_IgnoredOrdersWhileAsleep = {010c:0} ignored\norders while asleep!
+Bank0017_Text_AutomaticCenter = Automatic center!
+Bank0017_Text_ButItsNotWhere = But it's not where this item\ncan be used!
+Bank0017_Text_SkyDropWontLet = Sky Drop won't let {010c:0} go!
+Bank0017_Text_MatchForfeited = The match was forfeited.
+Bank0017_Text_SMetronome = ({0200:0})'s Metronome {0202:1}:{0107:2}
+Bank0017_Text_WildAppeared_4 = A wild {0101:0} appeared?!
+Bank0017_Text_Scene01 = SCENE 01
+Bank0017_Text_Scene02 = SCENE 02
+Bank0017_Text_Scene03 = SCENE 03
+Bank0017_Text_Scene04 = SCENE 04
+Bank0017_Text_Scene05 = SCENE 05
+Bank0017_Text_Scene06 = SCENE 06
+Bank0017_Text_Scene07 = SCENE 07
+Bank0017_Text_Scene08 = SCENE 08
+Bank0017_Text_Scene09 = SCENE 09
+Bank0017_Text_Scene10 = SCENE 10
+Bank0017_Text_Scene11 = SCENE 11
+Bank0017_Text_Scene12 = SCENE 12
+Bank0017_Text_Scene13 = SCENE 13
+Bank0017_Text_Scene14 = SCENE 14
+Bank0017_Text_Scene15 = SCENE 15
+Bank0017_Text_Scene16 = SCENE 16
+Bank0017_Text_Scene17 = SCENE 17
+Bank0017_Text_Scene18 = SCENE 18
+Bank0017_Text_Scene19 = SCENE 19
+Bank0017_Text_Scene20 = SCENE 20

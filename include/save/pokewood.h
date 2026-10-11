@@ -84,6 +84,10 @@ BOOL func_020107b0(void);
 PokewoodBlock *getPokewoodBlock(void);
 // A field of the loaded movie
 u32 func_020107f0(u32 field, u32 a1);
+// Loads the default movie into the Pokewood block and checks its checksum, whatever the arguments are
+u32 loadPokewoodAndCheck(SaveControl *save, HeapID heapId, u32 slot);
+// Copies the Pokewood block to dest
+void savePokewoodBlk(void *dest);
 // Saves the Pokewood block to a slot, a step each call, with state starting at 0; 2 and 3 are the results once done
 u32 func_020106ec(GameData *gameData, HeapID heapId, u32 slot, u16 *state);
 

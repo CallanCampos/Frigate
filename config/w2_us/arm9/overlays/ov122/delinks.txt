@@ -2,3 +2,8 @@
     .rodata     start:0x021ef920 end:0x021efd14 kind:rodata align:4
     .ctor       start:0x021efd14 end:0x021efd14 kind:rodata align:4
     .bss        start:0x021efd20 end:0x021efd20 kind:bss align:32
+
+src/ov122/gimmick_league_shauntal.c:
+    complete
+    .text       start:0x021eecc0 end:0x021ef920
+    .rodata     start:0x021ef920 end:0x021efd14

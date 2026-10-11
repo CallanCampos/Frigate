@@ -1,98 +1,98 @@
-Actress
-Girlfriend
-{0100:1}: If it's come to this,\nthe only thing left to do is try!
-{0100:1}: Maria!
-Maria: ...?
-{0100:1}: Maria!\nRemember! Please!
-Maria: ...\n{0100:1}?
-{0100:1}: Maria...\nAre you Maria?!
-Maria: ...
-{0100:1}: Wait!\nYou're Maria, right? Mariaaa!
-Smeargle: I'm sorry to bother you while\nyou're agitated, but do you have a moment?
-{0100:1}: Whoa!\nSmeargle talked!
-Smeargle: Oh please...\nThat's a ghost standing in front of you.{be00}\nDon't you think that compared to that,{be00}\na talking Pokémon is pretty tame?
-{0100:1}: A ghost?!\n...{be00}\nThat's right... A year ago...{be00}\nMaria...
-Smeargle: She died!{be01}\nBut Maria became a ghost\nand came here to meet you!{be01}\nThere was a little accident,\nand she lost her memory...
-{0100:1}: Huh?\nGhosts can lose their memories?
-Smeargle: Come now...\nA Pokémon is talking to you!{be01}\nCompared to that, a ghost losing\nits memory isn't that surprising, right?{be01}\nMore importantly, there isn't much\ntime, so to get to the point,{be00}\nplease battle with me and Maria!{be01}\nI'm sure that seeing you in action\nwill bring back Maria's memory!
-{0100:1}: That's crazy...
-Smeargle: Oh! And don't forget to\nprofess your love during the battle!{be01}\nIf you stir her heart with sweet words,\nI'm sure Maria's memory will come{be00}\nback that much more quickly!{be00}\nCome now! Let's start the battle!
-{0100:1}: Maria...{be01}\n(...OK! Well if it's come to this,\nI should just say what I feel!...)
-{0100:1}: I need you!
-Maria: ...
-{0100:1}: I love you!
-Maria: ...Hmm.
-{0100:1}: (...Don't need words...)
-Maria: ...?
-{0100:1}: You're my one and only!
-Maria: ...
-{0100:1}: Maria!\nHey, do you remember?{be00}\nIt's something you loved!
-{0100:1}: Look, it's {0102:0}.
-{0100:1}: Do you remember {0102:0}?\nYou loved it so much!{be01}\nMaria: ...Mmmmm.
-{0100:1}: It's {0100:1}!
-{0100:1}: {0100:1}! The one\nyou were always so sweet to!{be00}\nDon't you remember?{be01}\nMaria: ...?
-{0100:1}: Oh! That's right!\nSince we're here,{be00}\nlet's go there!{be01}\nThat's right... That's the only place!\nAn important place for us!
-{0100:1}: The roller coaster!
-Maria: ...I hate it!
-{0100:1}: The teacups!
-Maria: Mmmm... Nnnnnggh.
-{0100:1}: The haunted house!
-Maria: ...I hate it!
-{0100:1}: The Ferris wheel!
-Maria: Mm... Nnnnggggh.
-{0100:1}: Look! It's Attract!{be01}\n{0100:1}, the guy who fell for you,\nis standing right in front of you!{be01}\nLook, {0102:0}'s here, too!\nMaria, you loved it, right?
-Maria: ...?
-{0100:1}: Come on now! Look carefully!\nYou know {0102:0}, right?
-Maria: ...?
-{0100:1}: Come on! What's wrong!\nIt's me! It's {0100:1}!
-Maria: ...?
-{0100:1}: What's wrong?\nWhy won't you talk!{be01}\nIf you won't say anything,\nI'll grow to hate you!
-Maria: ...?
-{0100:1}: I lied...{be01}\nThere is no way I could\never hate you!{be01}\nI just couldn't!\nI love you!
-Maria: Hmm... Mmmmmrhhhgh!
-{0100:1}: OK...{be01}\n(...I'll decide everything with this!\nI'll throw my whole heart at her!...)
-{0100:1}: Come to my world!
-Maria: ...
-{0100:1}: I love you!
-Maria: Mmm... Mmmmrrgh!
-{0100:1}: I'll give you my life!
-Maria: ...?
-{0100:1}: Let's start over!
-Maria: Mmm... Mmmmrrrgh!
-Maria: ...
-Smeargle: OK! Too bad!\nThis won't work at all, will it?{be01}\nSimply stated, you're too weak.{be01}\nAt this rate, Maria's memory\nwill never come back!
-{0100:1}: Please!\nGive me another chance!
-Smeargle: Well, that's not possible!{be01}\nIf Maria stays in this world too long,\nher body will melt and disappear like snow{be00}\nin the hot sun!{be01}\nWe've already stayed too long,\nso we're done for today!{be01}\nWell, we'll come back tomorrow,\nso try your best then!
-{0100:1}: Wait!\nMaria! Smeargle!{be01}\n...
-Next thing I knew, I was sitting on\na bench in the amusement park alone...{be01}\nWas it a dream?\nWas it real?{be01}\nRegardless, I will be coming back to\nthe amusement park again tomorrow.
-Smeargle: My, my, how unfortunate!\nWe didn't reach a conclusion!{be01}\nThis isn't enough to bring\nMaria's memory back!
-{0100:1}: Please!\nBattle with me again!
-Smeargle: Well, that's not possible!{be01}\nIf Maria stays in this world too long,\nher body will melt and disappear like snow{be00}\nin the hot sun!{be01}\nWe've already stayed too long,\nso we're done for today!{be01}\nWell, we'll come back tomorrow,\nso try your best then!
-{0100:1}: Wait!\nMaria! Smeargle!{be01}\n...
-Next thing I knew, I was sitting on\na bench in the amusement park alone...{be01}\nWas it a dream?\nWas it real?{be01}\nRegardless, I will be coming back to\nthe amusement park again tomorrow.
-Smeargle: Oh, so close!\nWe didn't wrap it up!{be01}\nWell, we'll continue in\nyour dream again tomorrow.
-{0100:1}: My dream?
-Smeargle: That's right!\nYou're dreaming!{be00}\nThis is all happening in a dream!{be01}\nFor starters, you and Maria\nlive together happily in real life!{be01}\nOh! You look like you're about to\noversleep, so Maria's coming to wake you!{be01}\n...
-Voice: {0100:1}! It's morning!{be01}\nVoice: Come on! Time to get up!\nHurry up, or you'll be late!{be01}\n...
-{0100:1}: Huh? What?
-When I opened my eyes,\nI was greeted by Maria's smiling face...{be01}\nBut when I fall asleep, I always\nreturn to that amusement park.{be01}\nA silent Maria is there with Smeargle,\nand a Pokémon battle starts.{be01}\nThen when I wake up,\na healthy Maria is there...{be01}\nThe same things keep\nhappening over and over...
-Which is real?{be01}\nAre they both dreams?\nAre they both real?{be00}\nWell, I guess it doesn't matter...{be01}\nFor me, if Maria is by my side...{be01}\nI'm happy if only that is true...
-{0100:1}: Maria!
-Maria: ...\n...{be00}\n{0100:1}...{be00}\n{0100:1}! {0100:1}!{be00}\nIt's {0100:1}!
-{0100:1}: You remembered!\nOh, Maria, I'm so happy!{be00}\nI'm so happy to see you again!{be01}\nSo what happened?\nHow could you forget me?
-Maria: I came back to this world\nin order to meet you.{be01}\nBut I was shocked by\nhow much you've changed...{be01}\nI don't remember anything\nafter that...{be01}\nI never would've imagined\nyou would turn out like that...
-{0100:1}: I was sad that\nyou weren't here anymore...{be01}\nDid I look that bad?
-Smeargle: ...\n{0100:1}!{be01}\nCould it be your memory has\ngone blank recently, too?{be01}\nIs all you have left vague memories\nof enjoying this amusement park{be00}\nwith Maria?
-{0100:1}: Um...{be01}\n...{be01}\nActually, I don't remember.{be01}\nWhat was I doing?\nAnd yesterday, the day before that...{be00}\nWhy? I can't...{be00}\nI can't remember anything...
-Smeargle: I knew it!{be01}\nYou don't understand\nthe state you're in...{be01}\n{0100:1}... When Maria died,\nyou took your last breath as well.{be00}\nIt was like you were following her...
-{0100:1}: What?\nI'm already dead?
-Smeargle: That's right!{be01}\nYou died a long time ago,\nbut you remained in this world.{be01}\nYou stayed here in the amusement\npark, which is full of happy memories,{be00}\nand wandered around without{be00}\nremembering what happened.{be01}\nBut dead people can't\nstay in this world forever.{be01}\nIf you lose your body and your\nmemory, you won't be yourself anymore!
-{0100:1}: How can this be?\nHow do you know all of this?{be00}\nSmeargle...{be00}\nWhat ARE you?
-Smeargle: I came here at\nMaria's request to rescue{be00}\nyou from wandering.{be01}\nWhen Maria came with me and\nsaw how much you'd changed,{be00}\nshe lost her memory in shock.{be01}\nAnd you, who'd lost your memory,\ngot it back from the shock of{be00}\nseeing Maria again!{be01}\nWell six one way, half a dozen the other.\nOr we're back where we started!{be00}\nYou two are a perfect match!
-{0100:1}: ...\nI see... So that's what happened...
-Maria: {0100:1}...\nLet's go...{be01}\nThis world isn't where we\nshould be anymore...
-{0100:1}: Of course...\nI'll go with you, Maria...{be01}\nI don't know what kind of world it will be.\nIt seems that it will have strange{be00}\nthings, like Pokémon that talk.{be01}\nBut if I'm already dead,\nthere's nothing to fear now.
-Smeargle: It's not scary at all!{be01}\nYou'll love it!\nThere's even an amusement park!
-{0100:1}: Ha ha! I see!{be01}\nBut you know what, if I'm with Maria,\nany place is fine.
-Smeargle: What a hot pair!\nOK! You lovely couple!{be01}\nLet's get going to the world\nthat isn't here!
-And that was how\nMaria and I met again...{be01}\nIt looks like we both died,\nbut my beloved Maria{be00}\nis smiling sweetly next to me...{be00}\nI have no regrets...
+Bank0222_Text_Actress = Actress
+Bank0222_Text_Girlfriend = Girlfriend
+Bank0222_Text_IfItsComeOnly = {0100:1}: If it's come to this,\nthe only thing left to do is try!
+Bank0222_Text_Maria = {0100:1}: Maria!
+Bank0222_Text_Maria_2 = Maria: ...?
+Bank0222_Text_MariaRememberPlease = {0100:1}: Maria!\nRemember! Please!
+Bank0222_Text_Maria_3 = Maria: ...\n{0100:1}?
+Bank0222_Text_MariaMaria = {0100:1}: Maria...\nAre you Maria?!
+Bank0222_Text_Maria_4 = Maria: ...
+Bank0222_Text_WaitYoureMariaRight = {0100:1}: Wait!\nYou're Maria, right? Mariaaa!
+Bank0222_Text_SmeargleImSorryBother = Smeargle: I'm sorry to bother you while\nyou're agitated, but do you have a moment?
+Bank0222_Text_WhoaSmeargleTalked = {0100:1}: Whoa!\nSmeargle talked!
+Bank0222_Text_SmeargleOhPleaseThats = Smeargle: Oh please...\nThat's a ghost standing in front of you.{be00}\nDon't you think that compared to that,{be00}\na talking Pokémon is pretty tame?
+Bank0222_Text_GhostThatsRightYear = {0100:1}: A ghost?!\n...{be00}\nThat's right... A year ago...{be00}\nMaria...
+Bank0222_Text_SmeargleSheDiedBut = Smeargle: She died!{be01}\nBut Maria became a ghost\nand came here to meet you!{be01}\nThere was a little accident,\nand she lost her memory...
+Bank0222_Text_HuhGhostsCanLose = {0100:1}: Huh?\nGhosts can lose their memories?
+Bank0222_Text_SmeargleComeNowPokemon = Smeargle: Come now...\nA Pokémon is talking to you!{be01}\nCompared to that, a ghost losing\nits memory isn't that surprising, right?{be01}\nMore importantly, there isn't much\ntime, so to get to the point,{be00}\nplease battle with me and Maria!{be01}\nI'm sure that seeing you in action\nwill bring back Maria's memory!
+Bank0222_Text_ThatsCrazy = {0100:1}: That's crazy...
+Bank0222_Text_SmeargleOhDontForget = Smeargle: Oh! And don't forget to\nprofess your love during the battle!{be01}\nIf you stir her heart with sweet words,\nI'm sure Maria's memory will come{be00}\nback that much more quickly!{be00}\nCome now! Let's start the battle!
+Bank0222_Text_MariaOkWellIf = {0100:1}: Maria...{be01}\n(...OK! Well if it's come to this,\nI should just say what I feel!...)
+Bank0222_Text_Need = {0100:1}: I need you!
+Bank0222_Text_Maria_5 = Maria: ...
+Bank0222_Text_Love = {0100:1}: I love you!
+Bank0222_Text_MariaHmm = Maria: ...Hmm.
+Bank0222_Text_DontNeedWords = {0100:1}: (...Don't need words...)
+Bank0222_Text_Maria_6 = Maria: ...?
+Bank0222_Text_YoureOneOnly = {0100:1}: You're my one and only!
+Bank0222_Text_Maria_7 = Maria: ...
+Bank0222_Text_MariaHeyRememberIts = {0100:1}: Maria!\nHey, do you remember?{be00}\nIt's something you loved!
+Bank0222_Text_LookIts = {0100:1}: Look, it's {0102:0}.
+Bank0222_Text_RememberLovedMuchMaria = {0100:1}: Do you remember {0102:0}?\nYou loved it so much!{be01}\nMaria: ...Mmmmm.
+Bank0222_Text_Its = {0100:1}: It's {0100:1}!
+Bank0222_Text_OneWereAlwaysSweet = {0100:1}: {0100:1}! The one\nyou were always so sweet to!{be00}\nDon't you remember?{be01}\nMaria: ...?
+Bank0222_Text_OhThatsRightSince = {0100:1}: Oh! That's right!\nSince we're here,{be00}\nlet's go there!{be01}\nThat's right... That's the only place!\nAn important place for us!
+Bank0222_Text_RollerCoaster = {0100:1}: The roller coaster!
+Bank0222_Text_MariaHate = Maria: ...I hate it!
+Bank0222_Text_Teacups = {0100:1}: The teacups!
+Bank0222_Text_MariaMmmmNnnnnggh = Maria: Mmmm... Nnnnnggh.
+Bank0222_Text_HauntedHouse = {0100:1}: The haunted house!
+Bank0222_Text_MariaHate_2 = Maria: ...I hate it!
+Bank0222_Text_FerrisWheel = {0100:1}: The Ferris wheel!
+Bank0222_Text_MariaMmNnnnggggh = Maria: Mm... Nnnnggggh.
+Bank0222_Text_LookItsAttractGuy = {0100:1}: Look! It's Attract!{be01}\n{0100:1}, the guy who fell for you,\nis standing right in front of you!{be01}\nLook, {0102:0}'s here, too!\nMaria, you loved it, right?
+Bank0222_Text_Maria_8 = Maria: ...?
+Bank0222_Text_ComeNowLookCarefully = {0100:1}: Come on now! Look carefully!\nYou know {0102:0}, right?
+Bank0222_Text_Maria_9 = Maria: ...?
+Bank0222_Text_ComeWhatsWrongIts = {0100:1}: Come on! What's wrong!\nIt's me! It's {0100:1}!
+Bank0222_Text_Maria_10 = Maria: ...?
+Bank0222_Text_WhatsWrongWhyWont = {0100:1}: What's wrong?\nWhy won't you talk!{be01}\nIf you won't say anything,\nI'll grow to hate you!
+Bank0222_Text_Maria_11 = Maria: ...?
+Bank0222_Text_LiedThereNoWay = {0100:1}: I lied...{be01}\nThere is no way I could\never hate you!{be01}\nI just couldn't!\nI love you!
+Bank0222_Text_MariaHmmMmmmmrhhhgh = Maria: Hmm... Mmmmmrhhhgh!
+Bank0222_Text_OkIllDecideEverything = {0100:1}: OK...{be01}\n(...I'll decide everything with this!\nI'll throw my whole heart at her!...)
+Bank0222_Text_ComeWorld = {0100:1}: Come to my world!
+Bank0222_Text_Maria_12 = Maria: ...
+Bank0222_Text_Love_2 = {0100:1}: I love you!
+Bank0222_Text_MariaMmmMmmmrrgh = Maria: Mmm... Mmmmrrgh!
+Bank0222_Text_IllGiveLife = {0100:1}: I'll give you my life!
+Bank0222_Text_Maria_13 = Maria: ...?
+Bank0222_Text_LetsStartOver = {0100:1}: Let's start over!
+Bank0222_Text_MariaMmmMmmmrrrgh = Maria: Mmm... Mmmmrrrgh!
+Bank0222_Text_Maria_14 = Maria: ...
+Bank0222_Text_SmeargleOkTooBad = Smeargle: OK! Too bad!\nThis won't work at all, will it?{be01}\nSimply stated, you're too weak.{be01}\nAt this rate, Maria's memory\nwill never come back!
+Bank0222_Text_PleaseGiveAnotherChance = {0100:1}: Please!\nGive me another chance!
+Bank0222_Text_SmeargleWellThatsNot = Smeargle: Well, that's not possible!{be01}\nIf Maria stays in this world too long,\nher body will melt and disappear like snow{be00}\nin the hot sun!{be01}\nWe've already stayed too long,\nso we're done for today!{be01}\nWell, we'll come back tomorrow,\nso try your best then!
+Bank0222_Text_WaitMariaSmeargle = {0100:1}: Wait!\nMaria! Smeargle!{be01}\n...
+Bank0222_Text_NextThingKnewSitting = Next thing I knew, I was sitting on\na bench in the amusement park alone...{be01}\nWas it a dream?\nWas it real?{be01}\nRegardless, I will be coming back to\nthe amusement park again tomorrow.
+Bank0222_Text_SmeargleHowUnfortunateWe = Smeargle: My, my, how unfortunate!\nWe didn't reach a conclusion!{be01}\nThis isn't enough to bring\nMaria's memory back!
+Bank0222_Text_PleaseBattleAgain = {0100:1}: Please!\nBattle with me again!
+Bank0222_Text_SmeargleWellThatsNot_2 = Smeargle: Well, that's not possible!{be01}\nIf Maria stays in this world too long,\nher body will melt and disappear like snow{be00}\nin the hot sun!{be01}\nWe've already stayed too long,\nso we're done for today!{be01}\nWell, we'll come back tomorrow,\nso try your best then!
+Bank0222_Text_WaitMariaSmeargle_2 = {0100:1}: Wait!\nMaria! Smeargle!{be01}\n...
+Bank0222_Text_NextThingKnewSitting_2 = Next thing I knew, I was sitting on\na bench in the amusement park alone...{be01}\nWas it a dream?\nWas it real?{be01}\nRegardless, I will be coming back to\nthe amusement park again tomorrow.
+Bank0222_Text_SmeargleOhCloseWe = Smeargle: Oh, so close!\nWe didn't wrap it up!{be01}\nWell, we'll continue in\nyour dream again tomorrow.
+Bank0222_Text_Dream = {0100:1}: My dream?
+Bank0222_Text_SmeargleThatsRightYoure = Smeargle: That's right!\nYou're dreaming!{be00}\nThis is all happening in a dream!{be01}\nFor starters, you and Maria\nlive together happily in real life!{be01}\nOh! You look like you're about to\noversleep, so Maria's coming to wake you!{be01}\n...
+Bank0222_Text_VoiceItsMorningVoice = Voice: {0100:1}! It's morning!{be01}\nVoice: Come on! Time to get up!\nHurry up, or you'll be late!{be01}\n...
+Bank0222_Text_HuhWhat = {0100:1}: Huh? What?
+Bank0222_Text_WhenOpenedEyesGreeted = When I opened my eyes,\nI was greeted by Maria's smiling face...{be01}\nBut when I fall asleep, I always\nreturn to that amusement park.{be01}\nA silent Maria is there with Smeargle,\nand a Pokémon battle starts.{be01}\nThen when I wake up,\na healthy Maria is there...{be01}\nThe same things keep\nhappening over and over...
+Bank0222_Text_WhichRealTheyBoth = Which is real?{be01}\nAre they both dreams?\nAre they both real?{be00}\nWell, I guess it doesn't matter...{be01}\nFor me, if Maria is by my side...{be01}\nI'm happy if only that is true...
+Bank0222_Text_Maria_15 = {0100:1}: Maria!
+Bank0222_Text_MariaIts = Maria: ...\n...{be00}\n{0100:1}...{be00}\n{0100:1}! {0100:1}!{be00}\nIt's {0100:1}!
+Bank0222_Text_RememberedOhMariaIm = {0100:1}: You remembered!\nOh, Maria, I'm so happy!{be00}\nI'm so happy to see you again!{be01}\nSo what happened?\nHow could you forget me?
+Bank0222_Text_MariaCameBackWorld = Maria: I came back to this world\nin order to meet you.{be01}\nBut I was shocked by\nhow much you've changed...{be01}\nI don't remember anything\nafter that...{be01}\nI never would've imagined\nyou would turn out like that...
+Bank0222_Text_SadWerentHereAnymore = {0100:1}: I was sad that\nyou weren't here anymore...{be01}\nDid I look that bad?
+Bank0222_Text_SmeargleCouldMemoryHas = Smeargle: ...\n{0100:1}!{be01}\nCould it be your memory has\ngone blank recently, too?{be01}\nIs all you have left vague memories\nof enjoying this amusement park{be00}\nwith Maria?
+Bank0222_Text_UmActuallyDontRemember = {0100:1}: Um...{be01}\n...{be01}\nActually, I don't remember.{be01}\nWhat was I doing?\nAnd yesterday, the day before that...{be00}\nWhy? I can't...{be00}\nI can't remember anything...
+Bank0222_Text_SmeargleKnewDontUnderstand = Smeargle: I knew it!{be01}\nYou don't understand\nthe state you're in...{be01}\n{0100:1}... When Maria died,\nyou took your last breath as well.{be00}\nIt was like you were following her...
+Bank0222_Text_WhatImAlreadyDead = {0100:1}: What?\nI'm already dead?
+Bank0222_Text_SmeargleThatsRightDied = Smeargle: That's right!{be01}\nYou died a long time ago,\nbut you remained in this world.{be01}\nYou stayed here in the amusement\npark, which is full of happy memories,{be00}\nand wandered around without{be00}\nremembering what happened.{be01}\nBut dead people can't\nstay in this world forever.{be01}\nIf you lose your body and your\nmemory, you won't be yourself anymore!
+Bank0222_Text_HowCanHowKnow = {0100:1}: How can this be?\nHow do you know all of this?{be00}\nSmeargle...{be00}\nWhat ARE you?
+Bank0222_Text_SmeargleCameHereMarias = Smeargle: I came here at\nMaria's request to rescue{be00}\nyou from wandering.{be01}\nWhen Maria came with me and\nsaw how much you'd changed,{be00}\nshe lost her memory in shock.{be01}\nAnd you, who'd lost your memory,\ngot it back from the shock of{be00}\nseeing Maria again!{be01}\nWell six one way, half a dozen the other.\nOr we're back where we started!{be00}\nYou two are a perfect match!
+Bank0222_Text_SeeThatsWhatHappened = {0100:1}: ...\nI see... So that's what happened...
+Bank0222_Text_MariaLetsGoWorld = Maria: {0100:1}...\nLet's go...{be01}\nThis world isn't where we\nshould be anymore...
+Bank0222_Text_CourseIllGoMaria = {0100:1}: Of course...\nI'll go with you, Maria...{be01}\nI don't know what kind of world it will be.\nIt seems that it will have strange{be00}\nthings, like Pokémon that talk.{be01}\nBut if I'm already dead,\nthere's nothing to fear now.
+Bank0222_Text_SmeargleItsNotScary = Smeargle: It's not scary at all!{be01}\nYou'll love it!\nThere's even an amusement park!
+Bank0222_Text_HaHaSeeBut = {0100:1}: Ha ha! I see!{be01}\nBut you know what, if I'm with Maria,\nany place is fine.
+Bank0222_Text_SmeargleWhatHotPair = Smeargle: What a hot pair!\nOK! You lovely couple!{be01}\nLet's get going to the world\nthat isn't here!
+Bank0222_Text_HowMariaMetAgain = And that was how\nMaria and I met again...{be01}\nIt looks like we both died,\nbut my beloved Maria{be00}\nis smiling sweetly next to me...{be00}\nI have no regrets...

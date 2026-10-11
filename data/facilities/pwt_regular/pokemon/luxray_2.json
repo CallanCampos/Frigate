@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LUXRAY",
+    "moves": [ "MOVE_CHARGE_BEAM", "MOVE_HELPING_HAND", "MOVE_DISCHARGE", "MOVE_ROAR" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_QUICK_CLAW",
+    "form": 0
+}

@@ -37,6 +37,8 @@ enum {
     HEAPID_MUSICAL_DRESSUP = 0x2d,
     HEAPID_MUSICAL = 0x2e,
     HEAPID_DEBUG_GENDER_SELECT = 0x39,
+    // The Union Room's, a child of HEAPID_GAMEEVENT (union_comm.c)
+    HEAPID_UNION = 0x41,
     // Not from swan: the summary screen's heap
     HEAPID_P_STATUS = 0x42,
     // Not from swan: the Global Trade Station's heap
@@ -67,8 +69,11 @@ enum {
     HEAPID_INTRO = 0x6f,
     HEAPID_FIELD_MENU = 0x70,
     HEAPID_BATTLE_LOAD = 0x76,
+    HEAPID_WIFILOGIN = 0x78,
+    HEAPID_WIFILOGOUT = 0x79,
     HEAPID_CDEMO = 0x7f,
     HEAPID_SAVEDATA_DELETE = 0x81,
+    HEAPID_PDC = 0x85,
     HEAPID_FIELD_CLACT = 0x89,
     HEAPID_EGG_DEMO = 0x8f,
     // Not from swan: the trade's, in overlay 194's own memory
@@ -79,6 +84,7 @@ enum {
     HEAPID_ZUKAN_DETAIL = 0x95,
     HEAPID_FIELD_SCENEAREA = 0x96,
     HEAPID_BOX_SEARCH = 0x98,
+    HEAPID_MEDAL_INFO = 0x99,
     // Unova Link's (not from swan)
     HEAPID_KEY_SYSTEM = 0x9b,
     // Not from swan: the heap of the Pokémon World Tournament's win record and downloaded tournaments, overlay 326

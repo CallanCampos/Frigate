@@ -1,0 +1,200 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Kirlia",
+    "pokedex": {
+        "category": "Emotion Pokémon",
+        "entry": "If its Trainer becomes happy, it\noverflows with energy, dancing\njoyously while spinning about.",
+        "height": "2'07\"",
+        "weight": "44.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Kirlia",
+                "category": "Emotion Pokémon",
+                "entry": "If its Trainer becomes happy, it\noverflows with energy, dancing\njoyously while spinning about.",
+                "height": "2'07\"",
+                "weight": "44.5 lbs."
+            },
+            "fr": {
+                "name": "Kirlia",
+                "category": "Pokémon Émotion",
+                "entry": "Quand il sent la joie de son\nDresseur, il se met à danser,\ndébordant d'énergie.",
+                "height": "0,8 m",
+                "weight": "20,2 kg"
+            },
+            "de": {
+                "name": "Kirlia",
+                "category": "Emotion",
+                "entry": "Ist sein Trainer glücklich,\ntanzt es in einem Schwall\nvon Energie fröhlich umher.",
+                "height": "0,8 m",
+                "weight": "20,2 kg"
+            },
+            "it": {
+                "name": "Kirlia",
+                "category": "Pokémon Emozione",
+                "entry": "Quando il suo Allenatore si sente felice,\ntrabocca di energia e inizia a ballare\ngirando su se stesso.",
+                "height": "0,8 m",
+                "weight": "20,2 kg"
+            },
+            "ko": {
+                "name": "킬리아",
+                "category": "감정포켓몬",
+                "entry": "트레이너가 기뻐하면\n킬리아에게 에너지가 넘쳐나서\n기쁜 듯이 빙글빙글 춤춘다.",
+                "height": "0.8 m",
+                "weight": "20.2 kg"
+            },
+            "es": {
+                "name": "Kirlia",
+                "category": "Pokémon Sensorio",
+                "entry": "Si su Entrenador está contento,\nse llena de energía y baila de\nforma alegre dando giros.",
+                "height": "0,8 m",
+                "weight": "20,2 kg"
+            },
+            "ja": {
+                "name": "キルリア",
+                "category": "かんじょうポケモン",
+                "entry": "トレーナーが\\x{3000}よろこぶと\nキルリアに\\x{3000}エネルギーが\\x{3000}みちあふれ\nたのしそうに\\x{3000}くるくると\\x{3000}おどる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff10}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 38,
+        "attack": 35,
+        "defense": 35,
+        "speed": 50,
+        "special_attack": 65,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_SYNCHRONIZE", "ABILITY_TRACE" ],
+    "hidden_ability": "ABILITY_TELEPATHY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 97,
+    "height": 8,
+    "weight": 202,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 1, "MOVE_DOUBLE_TEAM" ],
+            [ 1, "MOVE_TELEPORT" ],
+            [ 6, "MOVE_CONFUSION" ],
+            [ 10, "MOVE_DOUBLE_TEAM" ],
+            [ 12, "MOVE_TELEPORT" ],
+            [ 17, "MOVE_LUCKY_CHANT" ],
+            [ 22, "MOVE_MAGICAL_LEAF" ],
+            [ 25, "MOVE_HEAL_PULSE" ],
+            [ 31, "MOVE_CALM_MIND" ],
+            [ 36, "MOVE_PSYCHIC" ],
+            [ 39, "MOVE_IMPRISON" ],
+            [ 45, "MOVE_FUTURE_SIGHT" ],
+            [ 50, "MOVE_CHARM" ],
+            [ 53, "MOVE_HYPNOSIS" ],
+            [ 59, "MOVE_DREAM_EATER" ],
+            [ 64, "MOVE_STORED_POWER" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM24",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM51",
+            "TM56",
+            "TM57",
+            "TM61",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_WONDER_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_GARDEVOIR"
+        },
+        {
+            "method": "EVO_METHOD_ITEM_MALE",
+            "param": "ITEM_DAWN_STONE",
+            "species": "SPECIES_GALLADE"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_RALTS"
+}

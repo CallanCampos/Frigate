@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": 379,
+    "matrix": "MAP_MATRIX_PLASMA_FRIGATE_10",
+    "scripts": "SCRIPTS_PLASMA_FRIGATE_10",
+    "text": "SCRIPT_TEXT_PLASMA_FRIGATE_10",
+    "bgm": "SEQ_BGM_SW_D_27_L_AJITO",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_PLASMA_FRIGATE",
+    "place": "PLACE_PLASMA_FRIGATE",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 347,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

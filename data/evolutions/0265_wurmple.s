@@ -1,6 +1,0 @@
-#include "asm/evolution.inc"
-
-// SPECIES_WURMPLE
-    Evolution EVO_METHOD_LEVEL_PERSONALITY_LOW, 7, SPECIES_SILCOON
-    Evolution EVO_METHOD_LEVEL_PERSONALITY_HIGH, 7, SPECIES_CASCOON
-    EvolutionsEnd

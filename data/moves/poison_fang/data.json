@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Poison Fang",
+    "description": "The user bites the target with toxic\nfangs. It may also leave the target\nbadly poisoned.",
+    "type": "TYPE_POISON",
+    "quality": "MOVE_QUALITY_DAMAGE_INFLICT",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 50,
+    "accuracy": 100,
+    "pp": 15,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_POISON",
+        "chance": 30,
+        "duration": 1,
+        "min_turns": 15,
+        "max_turns": 15
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_BADLY_POISON_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

@@ -8,6 +8,7 @@
 #include "app/monolith/monolith_tool.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -240,7 +241,7 @@ static BOOL MonolithPower_Init(GameProc *proc, u32 *state, void *param, void *wo
         mpw->prevCursor = MONOLITH_POWER_NONE;
         mpw->prevCursor2 = MONOLITH_POWER_NONE;
         MonolithTool_InitPanels(screen);
-        mpw->msgPowerNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 263, HEAPID_MONOLITH);
+        mpw->msgPowerNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PASS_POWERS, HEAPID_MONOLITH);
         MonolithPower_CreateBGs();
         MonolithPower_LoadGraphics(mpw, screen->work);
         MonolithPower_CreateWindows(mpw, screen->work);

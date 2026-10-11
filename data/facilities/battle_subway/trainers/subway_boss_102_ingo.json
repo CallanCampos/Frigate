@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ingo",
+    "class": "TRAINER_CLASS_SUBWAY_BOSS_102",
+    "pokemon": [ "eelektross_1", "chandelure_3", "excadrill_4", "haxorus_4" ],
+    "messages": [
+        "I am a Subway Boss, Ingo.{be01}\nThe fellow over to the side is\nalso a Subway Boss, Emmet.{be01}\nWill a Multi Battle help us cover\neach other's weakness?{be01}\nOr will you show your\noverwhelming power?{be01}\nI look forward to seeing\nhow well you fight.{be01}\nHowever, it is difficult to win\nunless you and your partner{be00}\nare in total sync.",
+        "We make a good two-car train,\nIngo and Emmet.{be01}\nThis time, we worked together toward\na victory.{be01}\nHowever, your abilities are\nvery impressive.",
+        "Bravo!!{be01}\nWhat you showed us is\na spark as Trainers.{be01}\nHowever, let me say just one thing.{be01}\nWinning against us is a milestone\nin your life.{be01}\nYou can rack up more and more.{be01}\nPlease move on toward an even\ngreater goal!"
+    ]
+}

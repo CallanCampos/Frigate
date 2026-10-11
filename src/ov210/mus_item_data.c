@@ -174,7 +174,7 @@ BOOL func_ov210_021ef104(MusicalItemData *item) {
     return FALSE;
 }
 
-u8 func_ov210_021ef118(u8 pos) {
+s32 func_ov210_021ef118(s32 pos) {
     switch (pos) {
     case 0:
         return 0;

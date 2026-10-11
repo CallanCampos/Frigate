@@ -1,14 +1,14 @@
-None
-Alberta
-British Columbia
-Manitoba
-New Brunswick
-Newfoundland and Labrador
-Northwest Territories
-Nova Scotia
-Nunavut
-Ontario
-Prince Edward Island
-Quebec
-Saskatchewan
-Yukon
+Bank0422_Text_None = None
+Bank0422_Text_Alberta = Alberta
+Bank0422_Text_BritishColumbia = British Columbia
+Bank0422_Text_Manitoba = Manitoba
+Bank0422_Text_NewBrunswick = New Brunswick
+Bank0422_Text_NewfoundlandLabrador = Newfoundland and Labrador
+Bank0422_Text_NorthwestTerritories = Northwest Territories
+Bank0422_Text_NovaScotia = Nova Scotia
+Bank0422_Text_Nunavut = Nunavut
+Bank0422_Text_Ontario = Ontario
+Bank0422_Text_PrinceEdwardIsland = Prince Edward Island
+Bank0422_Text_Quebec = Quebec
+Bank0422_Text_Saskatchewan = Saskatchewan
+Bank0422_Text_Yukon = Yukon

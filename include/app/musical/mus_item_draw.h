@@ -60,7 +60,7 @@ MusItemDraw *MusItemDraw_AddItemWithMaterial(MusItemDrawSys *sys, u16 itemId, u3
 void MusItemDraw_DelItem(MusItemDrawSys *sys, MusItemDraw *item);
 void MusItemDraw_ChangeItem(MusItemDrawSys *sys, MusItemDraw *item, u16 itemId, u16 material);
 // Gives the prop the shadow's palette
-void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item);
+void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, void *texResource);
 // Puts a shadow prop a little behind and below right of its prop
 void MusItemDraw_CopyShadowPos(MusItemDrawSys *sys, MusItemDraw *item, MusItemDraw *shadow);
 void MusItemDraw_SetVisible(MusItemDrawSys *sys, MusItemDraw *item, BOOL visible);

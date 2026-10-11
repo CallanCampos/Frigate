@@ -1,19 +1,19 @@
-None
-Andalusia
-Aragon
-Asturias
-Balearic Islands
-Basque Country
-Canary Islands
-Cantabria
-Castile-La Mancha
-Castile and León
-Catalonia
-Extremadura
-Galicia
-Madrid
-Murcia
-Navarre
-La Rioja
-Valencia
+Bank0425_Text_None = None
+Bank0425_Text_Andalusia = Andalusia
+Bank0425_Text_Aragon = Aragon
+Bank0425_Text_Asturias = Asturias
+Bank0425_Text_BalearicIslands = Balearic Islands
+Bank0425_Text_BasqueCountry = Basque Country
+Bank0425_Text_CanaryIslands = Canary Islands
+Bank0425_Text_Cantabria = Cantabria
+Bank0425_Text_CastileLaMancha = Castile-La Mancha
+Bank0425_Text_CastileLeN = Castile and León
+Bank0425_Text_Catalonia = Catalonia
+Bank0425_Text_Extremadura = Extremadura
+Bank0425_Text_Galicia = Galicia
+Bank0425_Text_Madrid = Madrid
+Bank0425_Text_Murcia = Murcia
+Bank0425_Text_Navarre = Navarre
+Bank0425_Text_LaRioja = La Rioja
+Bank0425_Text_Valencia = Valencia
 \pad{04}

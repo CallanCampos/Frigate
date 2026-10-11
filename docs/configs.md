@@ -8,12 +8,12 @@ what they did so that it survives regenerating them.
 
 dsd sometimes cannot tell which overlay a relocation points to, because many overlays share addresses. It then lists
 every candidate, such as `module:overlays(36,214)`, and the build links to the first one, which gives the right bytes
-but the wrong symbol. `tools/scripts/config_fixes.py` fixes such relocations and other mistakes in both versions, and
+but the wrong symbol. `tools/decomp/config_fixes.py` fixes such relocations and other mistakes in both versions, and
 records them in `config/fixes.txt`:
 
 ```sh
-.venv/bin/python tools/scripts/config_fixes.py reloc-module overlays/ov004 'overlay(214)' 0x0214f6c0
-.venv/bin/python tools/scripts/config_fixes.py overlay-id overlays/ov004 214 0x0214f6bc
+.venv/bin/python tools/decomp/config_fixes.py reloc-module overlays/ov004 'overlay(214)' 0x0214f6c0
+.venv/bin/python tools/decomp/config_fixes.py overlay-id overlays/ov004 214 0x0214f6bc
 ```
 
 It also removes relocations and symbols that are not real (`remove-reloc`, `remove-symbol`), and gives a function a
@@ -26,7 +26,7 @@ so that the object before it does not seem to run on over it.
 that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files:
 
 ```sh
-.venv/bin/python tools/scripts/config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028
+.venv/bin/python tools/decomp/config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028
 ```
 
 A relocation that dsd could not pin to one overlay only links while its symbol is global. When a function becomes
@@ -40,7 +40,7 @@ pointers are fixed from it.
 After improving dsd's analysis, regenerate the configs of both versions and import the names again:
 
 ```sh
-.venv/bin/python tools/scripts/regenerate_configs.py path/to/swan
+.venv/bin/python tools/decomp/regenerate_configs.py path/to/swan
 ```
 
 This keeps the source files listed in each `delinks.txt`, but loses any other manual changes to the configs. It runs
@@ -67,7 +67,28 @@ Black 2 is an NDS/DSi hybrid built with the TWL-SDK, which differs from DS-only 
   the original values, which stay valid as long as the secure area is unchanged.
 - The DSi-only LTD ("limited") module is compressed inside ARM9i and loaded to `0x02700000` in DSi mode. ARM9 main
   calls into it. Extraction splits ARM9i into this module (`dsi/ltd_autoload_0.bin`), and the build links, recompresses
-  and reinserts it.
+  and reinserts it. It has two code regions, which dsd since v0.12.1-dsi.3 lays out as:
+  - `.text`: the module's own ARM code, TwlSDK's DSi libraries.
+  - `.rodata`: two COFF images for the DSi's Teak DSP. dsd gives each a byte-array symbol, so that their words are not
+    taken for pointers.
+  - `.ctor`: the empty static initializer table, a zero, that the autoload list points to.
+  - `.ltdmain`, from the next 32-byte boundary: Thumb code that calls main's SDK through linker veneers, such as the
+    NDMA functions (`MI_IsNDmaBusy` at `0x02768234`). It seems to be the DSi-only code of main's library files. The
+    section's name is a guess, after the SDK's LTDMAIN.
+  - `.data` and `.bss`.
+- Overlay 169 runs from VRAM, at `0x06898020`. Its code is analyzed like any other overlay's since dsd v0.12.1-dsi.3;
+  before, dsd took a branch outside main memory for data and had all of it as `.rodata`.
+
+## Long-branch veneers
+
+A call out of `bl` range, such as from an overlay to overlay 169 or the LTD module, goes through a veneer the linker
+adds after the calling function. The original shares main's veneers among their callers, but gives every call in an
+overlay its own: `HandlerRapidSpin` (`src/ov167/move_handlers.c`) calls `func_ov169_06898cf4` three times and is
+followed by three identical veneers. `mwldarm` does this only for a file listed after its `-overlaygroup` and
+`-overlay` options, which must be how the SDK's response file places each overlay's objects; any other file shares one
+veneer per target with every call in range, even across overlays at the same address. dsd since v0.12.1-dsi.4 writes
+`objects.txt` this way, while the LCF still places the objects. Before, a file that called the same far target twice,
+such as `camera_system.c`, couldn't be completed.
 
 ## Shifting
 
@@ -75,12 +96,12 @@ A mod that changes code sizes moves everything after the change, so it only work
 that moves is a relocation; a pointer that dsd left as a plain number keeps the old address. The matching build can't
 show this, since nothing moves. Two tools check it:
 
-- `tools/scripts/unrelocated_pointers.py` lists the words in the main module and the overlays that point into code or
+- `tools/decomp/unrelocated_pointers.py` lists the words in the main module and the overlays that point into code or
   data that moves without a relocation. Those that point at a symbol are likely pointers; `--list MODULE` shows them
   and `--all` the rest, which are mostly byte tables that happen to look like addresses. A real one gets a relocation
   with `config_fixes.py add-reloc`, such as a pointer into an overlay that dsd couldn't attribute among the overlays
   at that address.
-- `python3 configure.py --shift 0x100` pads the code by that many bytes (`tools/scripts/shift_lcf.py`): in main
+- `python3 configure.py --shift 0x100` pads the code by that many bytes (`tools/build/shift_lcf.py`): in main
   before Game Freak's library, which moves the rest of main and every overlay, and at the start of each overlay's
   code. The ROMs then don't match, and are tested by playing them. Run `configure.py` without it to go back.
 
@@ -90,9 +111,4 @@ addresses, such as `0x02020100`. The words that point at no symbol (`--all`) are
 
 ## Known gaps
 
-- dsd only finds 253 functions in the LTD module's 437 KB. Its layout, with code after the static initializers,
-  does not fit dsd's section heuristics yet.
-- 3 calls, all in the LTD module (`0x02768298`, `0x0276934c` and `0x02769578`), lead to functions dsd did not
-  discover there, and got placeholder symbols (`func_..._unk`). The two in overlay 11 were Thumb functions whose
-  second instruction is a `b`, which dsd before v0.12.1-dsi.2 took for ARM and split (AetiasHax/ds-decomp#81); they
-  are fixed in `config/fixes.txt`, as overlays 167 and 194's were.
+dsd's analysis and linking have no known gaps left in this ROM.

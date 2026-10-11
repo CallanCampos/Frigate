@@ -7,6 +7,7 @@
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -37,6 +38,7 @@
 #include "system/printsys.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
+#include "text/system/egg_demo.h"
 
 // The battle party list's entry, task and states (b_plist_main.c, named by the ROM's embedded string): the list
 // copies the party's data once, then runs one state function a frame, each returning the next state, until state
@@ -323,7 +325,7 @@ static int BPlistMain_SelectItemTarget(BPlistWork *work) {
     BPlistParam *param = work->param;
 
     if (work->pokemon[BPlistMain_GetPartySlot(work, param->partyIndex)].isEgg) {
-        GFL_MsgDataLoadStrbuf(work->msgData, 91, work->strBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, EggDemo_Text_WontHaveAnyEffect, work->strBuf);
         BPlistBmp_OpenMessage(work);
         work->param->partyIndex = 6;
         work->nextSeq = 0x1f;
@@ -1076,7 +1078,7 @@ static void BPlistMain_LoadGraphics(BPlistWork *work) {
 }
 
 static void BPlistMain_InitText(BPlistWork *work) {
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 2, work->param->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EGG_DEMO, work->param->heapId);
     work->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, work->param->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->param->heapId);
     work->printQueue = func_020219a8(0x800, work->param->heapId);
@@ -1384,26 +1386,26 @@ static BOOL BPlistMain_CanSwitch(BPlistWork *work) {
 
     switch (BPlistMain_GetSwitchError(work)) {
     case 1:
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 90);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_CannotDecidePartner);
         break;
     case 2:
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 87);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_HasNoEnergyLeft);
         loadPokemonNicknameToStrbuf(work->wordSet, 0, row->pkm);
         break;
     case 3:
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 86);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_AlreadyBattle);
         loadPokemonNicknameToStrbuf(work->wordSet, 0, row->pkm);
         break;
     case 4:
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 103);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_HasAlreadyBeenSelected);
         loadPokemonNicknameToStrbuf(work->wordSet, 0, row->pkm);
         break;
     case 5:
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 89);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_EggCantBattle);
         break;
     case 6:
         row = &work->pokemon[work->param->unk21];
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 88);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_CantSwitchedOut);
         loadPokemonNicknameToStrbuf(work->wordSet, 0, row->pkm);
         break;
     case 0:
@@ -1595,16 +1597,16 @@ static BOOL BPlistMain_CanPlace(BPlistWork *work) {
     BPlistPokemon *row = &work->pokemon[slot];
 
     if (BPlistMain_IsPartnerSlot(work, slot) == TRUE) {
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 90);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_CannotDecidePartner);
         GFL_WordSetFormatStrbuf(work->wordSet, work->strBuf, str);
         GFL_StrBufFree(str);
         return FALSE;
     }
     if (BPlistMain_IsBattlePos(work, work->param->partyIndex) == FALSE) {
         if (BPlistMain_IsBattlePos(work, slot) == TRUE) {
-            str = GFL_MsgDataLoadStrbufNew(work->msgData, 107);
+            str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_AlreadySwitchedOut);
         } else {
-            str = GFL_MsgDataLoadStrbufNew(work->msgData, 106);
+            str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_CantSwitchedOut_2);
         }
         loadPokemonNicknameToStrbuf(work->wordSet, 0, row->pkm);
         GFL_WordSetFormatStrbuf(work->wordSet, work->strBuf, str);
@@ -1612,14 +1614,14 @@ static BOOL BPlistMain_CanPlace(BPlistWork *work) {
         return FALSE;
     }
     if (BPlistMain_IsChosen(work, work->param->partyIndex) == TRUE) {
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 86);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_AlreadyBattle);
         loadPokemonNicknameToStrbuf(work->wordSet, 0, row->pkm);
         GFL_WordSetFormatStrbuf(work->wordSet, work->strBuf, str);
         GFL_StrBufFree(str);
         return FALSE;
     }
     if (row->hp != 0) {
-        str = GFL_MsgDataLoadStrbufNew(work->msgData, 86);
+        str = GFL_MsgDataLoadStrbufNew(work->msgData, EggDemo_Text_AlreadyBattle);
         loadPokemonNicknameToStrbuf(work->wordSet, 0, row->pkm);
         GFL_WordSetFormatStrbuf(work->wordSet, work->strBuf, str);
         GFL_StrBufFree(str);

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Liquid Ooze",
+    "description": "Damages attackers\nusing any draining move."
+}

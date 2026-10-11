@@ -1,0 +1,78 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 1,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 4,
+                "y": 14,
+                "z": 48
+            }
+        },
+        {
+            "script": 2,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 28,
+                "y": 18,
+                "z": 0
+            }
+        },
+        {
+            "script": 2,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 29,
+                "y": 18,
+                "z": 0
+            }
+        },
+        {
+            "script": 1,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 3,
+                "y": 14,
+                "z": 48
+            }
+        }
+    ],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN",
+            "warp": 6,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 280,
+                "y": 0,
+                "z": 504,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE_2",
+            "warp": 0,
+            "unk4": 4,
+            "transition": 2,
+            "grid": {
+                "x": 104,
+                "y": 0,
+                "z": 328,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

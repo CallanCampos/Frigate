@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Dorothea",
+    "class": "TRAINER_CLASS_BACKPACKER_M",
+    "pokemon": [
+        "jumpluff_1",
+        "pidgeot_1",
+        "cinccino_1",
+        "raichu_1",
+        "scolipede_1",
+        "electrode_1",
+        "lopunny_1",
+        "froslass_1",
+        "whimsicott_1",
+        "ambipom_1"
+    ]
+}

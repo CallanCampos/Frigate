@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 24,
+    "area": 346,
+    "matrix": "MAP_MATRIX_REVERSAL_MOUNTAIN_2",
+    "scripts": "SCRIPTS_REVERSAL_MOUNTAIN_2",
+    "text": "SCRIPT_TEXT_REVERSAL_MOUNTAIN_2",
+    "bgm": "SEQ_BGM_SW_D_24_B",
+    "encounters": "ENCOUNTERS_REVERSAL_MOUNTAIN_2",
+    "enc_slot": 6,
+    "parent": "ZONE_REVERSAL_MOUNTAIN",
+    "place": "PLACE_REVERSAL_MOUNTAIN",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 4,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 322,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

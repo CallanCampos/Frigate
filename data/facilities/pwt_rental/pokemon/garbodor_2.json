@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GARBODOR",
+    "moves": [ "MOVE_GUNK_SHOT", "MOVE_BODY_SLAM", "MOVE_SMACK_DOWN", "MOVE_EXPLOSION" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_QUICK_CLAW",
+    "form": 0
+}

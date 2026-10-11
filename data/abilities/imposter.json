@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Imposter",
+    "description": "It transforms itself into\nthe Pokémon it is facing."
+}

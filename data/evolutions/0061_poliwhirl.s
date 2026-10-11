@@ -1,6 +1,0 @@
-#include "asm/evolution.inc"
-
-// SPECIES_POLIWHIRL
-    Evolution EVO_METHOD_ITEM, ITEM_WATER_STONE, SPECIES_POLIWRATH
-    Evolution EVO_METHOD_TRADE_WITH_ITEM, ITEM_KINGS_ROCK, SPECIES_POLITOED
-    EvolutionsEnd

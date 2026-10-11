@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Oblivious",
+    "description": "Prevents it from\nbecoming infatuated."
+}

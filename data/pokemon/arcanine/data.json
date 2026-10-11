@@ -1,0 +1,164 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Arcanine",
+    "pokedex": {
+        "category": "Legendary Pokémon",
+        "entry": "The sight of it running over 6,200 miles\nin a single day and night has captivated\nmany people.",
+        "height": "6'03\"",
+        "weight": "341.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Arcanine",
+                "category": "Legendary Pokémon",
+                "entry": "Its proud and regal appearance\nhas captured the hearts of\npeople since long ago.",
+                "height": "6'03\"",
+                "weight": "341.7 lbs."
+            },
+            "fr": {
+                "name": "Arcanin",
+                "category": "Pokémon Légendaire",
+                "entry": "Son port altier et son attitude\nfière ont depuis longtemps\nconquis le cœur des hommes.",
+                "height": "1,9 m",
+                "weight": "155,0 kg"
+            },
+            "de": {
+                "name": "Arkani",
+                "category": "Legendär",
+                "entry": "Mit seiner stolzen und königlichen\nErscheinung gewinnt es die Herzen\nder Menschen.",
+                "height": "1,9 m",
+                "weight": "155,0 kg"
+            },
+            "it": {
+                "name": "Arcanine",
+                "category": "Pokémon Leggenda",
+                "entry": "Con il suo aspetto fiero ed elegante, è\nriuscito da tempo a conquistare il cuore\ndella gente.",
+                "height": "1,9 m",
+                "weight": "155,0 kg"
+            },
+            "ko": {
+                "name": "윈디",
+                "category": "전설포켓몬",
+                "entry": "위풍당당한 모습은\n오래전부터 사람들의 마음을\n사로잡아 왔다.",
+                "height": "1.9 m",
+                "weight": "155.0 kg"
+            },
+            "es": {
+                "name": "Arcanine",
+                "category": "Pokémon Legendario",
+                "entry": "Su aspecto regio y orgulloso se\nha ganado el corazón de la gente\nhace tiempo.",
+                "height": "1,9 m",
+                "weight": "155,0 kg"
+            },
+            "ja": {
+                "name": "ウインディ",
+                "category": "でんせつポケモン",
+                "entry": "いふうどうどうとした\\x{3000}すがたは\nふるくから\\x{3000}ひとびとの\\x{3000}こころを\nとりこにしてきた。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 110,
+        "defense": 80,
+        "speed": 95,
+        "special_attack": 100,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_RAWST_BERRY",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_INTIMIDATE", "ABILITY_FLASH_FIRE" ],
+    "hidden_ability": "ABILITY_JUSTIFIED",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 194,
+    "height": 19,
+    "weight": 1550,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_THUNDER_FANG" ],
+            [ 1, "MOVE_BITE" ],
+            [ 1, "MOVE_ROAR" ],
+            [ 1, "MOVE_ODOR_SLEUTH" ],
+            [ 1, "MOVE_FIRE_FANG" ],
+            [ 34, "MOVE_EXTREME_SPEED" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM40",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM67",
+            "TM68",
+            "TM78",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "TM95",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_IRON_HEAD",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HELPING_HAND",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 52,
+    "baby_species": "SPECIES_GROWLITHE"
+}

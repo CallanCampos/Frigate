@@ -1,0 +1,129 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Roggenrola",
+    "pokedex": {
+        "category": "Mantle Pokémon",
+        "entry": "The hexagonal-shaped hole is its ear.\nIt has a tendency to walk in the\ndirection the sound is coming from.",
+        "height": "1'04\"",
+        "weight": "39.7 lbs.",
+        "languages": {
+            "ja": {
+                "category": "マントルポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 75,
+        "defense": 85,
+        "speed": 15,
+        "special_attack": 25,
+        "special_defense": 25
+    },
+    "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_EVERSTONE",
+        "rare": "ITEM_HARD_STONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SAND_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 56,
+    "height": 4,
+    "weight": 180,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 4, "MOVE_HARDEN" ],
+            [ 7, "MOVE_SAND_ATTACK" ],
+            [ 10, "MOVE_HEADBUTT" ],
+            [ 14, "MOVE_ROCK_BLAST" ],
+            [ 17, "MOVE_MUD_SLAP" ],
+            [ 20, "MOVE_IRON_DEFENSE" ],
+            [ 23, "MOVE_SMACK_DOWN" ],
+            [ 27, "MOVE_ROCK_SLIDE" ],
+            [ 30, "MOVE_STEALTH_ROCK" ],
+            [ 33, "MOVE_SANDSTORM" ],
+            [ 36, "MOVE_STONE_EDGE" ],
+            [ 40, "MOVE_EXPLOSION" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM17",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_GRAVITY",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_MAGNITUDE",
+            "MOVE_CURSE",
+            "MOVE_AUTOTOMIZE",
+            "MOVE_ROCK_TOMB",
+            "MOVE_LOCK_ON",
+            "MOVE_HEAVY_SLAM",
+            "MOVE_TAKE_DOWN",
+            "MOVE_GRAVITY"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 25,
+            "species": "SPECIES_BOLDORE"
+        }
+    ],
+    "regional_dex_number": 68,
+    "baby_species": "SPECIES_ROGGENROLA"
+}

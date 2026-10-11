@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "No Guard",
+    "description": "Ensures attacks by or\nagainst the Pokémon land."
+}

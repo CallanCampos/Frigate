@@ -1,0 +1,142 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Heatmor",
+    "pokedex": {
+        "category": "Anteater Pokémon",
+        "entry": "It draws in air through its tail,\ntransforms it into fire, and uses it like\na tongue. It melts Durant and eats them.",
+        "height": "4'07\"",
+        "weight": "127.9 lbs.",
+        "languages": {
+            "ja": {
+                "category": "アリクイポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 85,
+        "attack": 97,
+        "defense": 66,
+        "speed": 65,
+        "special_attack": 105,
+        "special_defense": 66
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_FLAME_ORB"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_GLUTTONY", "ABILITY_FLASH_FIRE" ],
+    "hidden_ability": "ABILITY_WHITE_SMOKE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 169,
+    "height": 14,
+    "weight": 580,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_INCINERATE" ],
+            [ 1, "MOVE_LICK" ],
+            [ 6, "MOVE_ODOR_SLEUTH" ],
+            [ 11, "MOVE_BIND" ],
+            [ 16, "MOVE_FIRE_SPIN" ],
+            [ 21, "MOVE_FURY_SWIPES" ],
+            [ 26, "MOVE_SNATCH" ],
+            [ 31, "MOVE_FLAME_BURST" ],
+            [ 36, "MOVE_BUG_BITE" ],
+            [ 41, "MOVE_SLASH" ],
+            [ 46, "MOVE_AMNESIA" ],
+            [ 51, "MOVE_FLAMETHROWER" ],
+            [ 56, "MOVE_STOCKPILE" ],
+            [ 56, "MOVE_SPIT_UP" ],
+            [ 56, "MOVE_SWALLOW" ],
+            [ 61, "MOVE_INFERNO" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM65",
+            "TM68",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_SUPERPOWER",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_HEAT_WAVE",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_PURSUIT",
+            "MOVE_WRAP",
+            "MOVE_NIGHT_SLASH",
+            "MOVE_CURSE",
+            "MOVE_BODY_SLAM",
+            "MOVE_HEAT_WAVE",
+            "MOVE_FAINT_ATTACK",
+            "MOVE_SUCKER_PUNCH",
+            "MOVE_TICKLE",
+            "MOVE_SLEEP_TALK"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 193,
+    "baby_species": "SPECIES_HEATMOR"
+}

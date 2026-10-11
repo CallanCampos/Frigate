@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 27,
+    "npc_cache": 24,
+    "area": 190,
+    "matrix": "MAP_MATRIX_WHITE_FOREST",
+    "scripts": "SCRIPTS_WHITE_FOREST",
+    "text": "SCRIPT_TEXT_WHITE_FOREST",
+    "bgm": "SEQ_BGM_C_10_W",
+    "encounters": null,
+    "enc_slot": 0,
+    "parent": "ZONE_WHITE_FOREST",
+    "place": "PLACE_WHITE_FOREST",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 24,
+    "transition": 0,
+    "battle_bg": 6,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": true,
+    "entralink_warp": true,
+    "cam_bound": 356,
+    "name_icon": 11,
+    "easy_level": 0,
+    "fly": {
+        "x": 45,
+        "y": 0,
+        "z": 37
+    }
+}

@@ -1,67 +1,67 @@
-Veteran Star
-Assistant
-Strange: Professor {0100:1}!\nPlease be careful!
-Professor {0100:1}: I can't believe\nthat the fate of my research is being{be00}\njeopardized by a pair of glasses!
-Professor {0100:1}: Still...\nThose are some incredibly flashy glasses...
-Strange: That's what makes them great!\nI'm very particular about my glasses!
-Professor {0100:1}: Argh...\nThis isn't good!
-Strange: Professor {0100:1}!\nIf this keeps up, the temporal transport{be00}\nis going to blow!
-Professor {0100:1}: It's finally time!\nTime to venture into the future with my{be00}\nnew invention--the temporal transport!
-Strange: When you first told me to make\nit small enough to fit inside a capsule the{be00}\nsize of a person's hand, I thought you{be00}\nwere asking the impossible, but somehow{be00}\nwe managed to pull it off!{be01}\nI've been looking forward to this moment,\nProfessor {0100:1}!
-Professor {0100:1}: It's time...\nActivate the temporal transport!
-Strange: All that's left is to charge\nup the Pokémon move power...{be01}\nWait! What's this?!
-Professor {0100:1}: What happened?!
-Strange: Professor {0100:1}...\nI hate to say this, but it appears that{be00}\nmy glasses are stuck in part of{be00}\nthe temporal transport!{be01}\nIf we activate it now, it will\ncertainly malfunction!
-Professor {0100:1}: Your glasses?!
-Strange: Perhaps we could use a Pokémon\nmove to dislodge my glasses...{be01}\nProfessor {0100:1}! Please try\nto recover my glasses!
-Professor {0100:1}: Certainly!
-Strange: Thank you so much!\nI knew it wouldn't be a problem for you!{be01}\nPlease get them back. Those glasses are\nvery important to me!
-Professor {0100:1}: Forget it!
-Strange: But Professor, that could\nend up causing serious complications!{be01}\n...Oh no! They're beginning to throw sparks!\nMy glasses!
-Professor {0100:1}: Your mistake!
-Strange: That may be so, but have some\ncompassion, Professor!{be01}\nBesides, it's entirely possible that this\nonly happened due to a flaw in your design!{be00}\nDon't put all the blame on me!{be01}\n...Oh no! The electricity is shorting out!
-Professor {0100:1}: I wonder...\nIs the temporal transport OK?
-Strange: Temporal transport should\nstill be possible!
-Professor {0100:1}: Are you sure?\nI'm a little worried about all that smoke{be00}\ncoming out of it...
-Strange: It should be fine!\nThat's just steam from the{be00}\ncoolant water!
-Professor {0100:1}: Hah!\nSuch minor complications are well within{be00}\nmy expectations!{be01}\nContinue the experiment, Strange!
-Strange: Professor {0100:1}!\nLet's do it! We have the power!
-Professor {0100:1}: I wonder...\nIs the temporal transport OK?
-Strange: I'm getting some very\npeculiar power readings...{be00}\nThis could be extremely dangerous!
-Professor {0100:1}: We should be OK!\nIt wouldn't be an experiment without some{be00}\nrisk taking! It makes it even more exciting!{be01}\nThis will surely be an\nelectrifying experience!
-Strange: The only thing electrifying is\nthis temporal transport! It's discharging{be00}\nlike crazy!
-Professor {0100:1}: I wonder...\nIs the temporal transport OK?
-Strange: Hmm...\nIt looks like the temporal transport may{be00}\nbe overheating. I wouldn't say it's in the{be00}\nmost stable condition...
-Professor {0100:1}: So what?\nNo risk, no reward! I'm burning{be00}\nwith excitement!
-Strange: That's all well and good, but\nwhat will we do if the temporal transport{be00}\ncatches on fire?
-Strange: We've done it, Professor!\nThe temporal transport is functioning{be00}\nproperly! And my glasses are safe and{be00}\nsound, too!{be01}\nIn just moments, a gate into the future\nwill open before us!
-Professor {0100:1}: Excellent!{be01}\nThen I will be on my way to visit\nthe world of the future!{be01}\nI'll bring you a souvenir!\nExpect something cool!
-Strange: I will!{be01}\nPlease, return safely, Professor!
-Professor {0100:1}: Soon now...{be01}\nTemporal transport activation...go!
-Strange: Good luck,\nProfessor {0100:1}!
-And thus, I ventured into the world\nof the future with the time machine{be00}\nI invented myself--the temporal transport!{be01}\nBut...{be01}\nAs I look back on these events,\nI wonder if it might have been better{be00}\nif my experiment had failed...
-Professor {0100:1}: What's this?
-Strange: Professor {0100:1}!\nThe temporal transport system is{be00}\nout of control!
-Professor {0100:1}: Could my\nexperiment have failed?
-Strange: Professor {0100:1}!\nGet away from the temporal transport!{be00}\nIt's going to explode!
-Professor {0100:1}: Aaahhh!
-Strange: Professor!
-Professor {0100:1}: Ugh...argh...
-Strange: Professor! Professor!\nAre you OK?
-Professor {0100:1}: Urghh...\nI can't believe I made it through...{be00}\nWe'll have to start all over now...
-Strange: Uhh...
-Professor {0100:1}: What?\nWhat's the matter?{be01}\nCan't you see? I'm just fine!\nAnnoyed that the experiment failed, but fine{be00}\nall the same. I won't give up so easily!
-Strange: Umm... Professor {0100:1}...{be01}\nYou'd better have a look at this...
-When I gazed into the mirror Strange\nhanded me, I was at a loss for words...{be01}\nThere in the mirror, I saw...not myself,\nbut a very peculiar creature instead.{be01}\nPerhaps it was a side effect of the energy\nthat leaked out of the temporal transport,{be00}\nbut I had somehow become merged with{be00}\nmy {0102:0}, who had been at my side.{be01}\nThis, of course, marked the end\nof my research...
-Strange: Professor {0100:1}!\nThe energy will not stop discharging!{be01}\n...Wait! What's happening?{be01}\nThe temporal transport appears to be\nfunctioning properly...
-Professor {0100:1}: You worry too much!\nIf the temporal transport is functioning,{be00}\nthen there isn't a problem!{be01}\nAnd now it's time for me to venture\ninto the world of the future!{be01}\nOff I go!
-Strange: But, Professor {0100:1}!\nPlease, wait a moment!{be01}\nIt can't be! I'm detecting an eruption of\ntachyon particles!{be01}\nProfessor! You must stop!
-Professor {0100:1}: I care not!{be01}\nTemporal-transport activation...go!
-Strange: Professor, no!\nProfess...or! Stop...now...{be01}\n...
-Ignoring my assistant's pleas, I stepped\ninto the gate, not knowing how soon I would{be00}\ncome to regret it...{be01}\nIt was just as Strange said. The\ntemporal transport was not functioning{be00}\nproperly. Instead of stepping into the{be00}\nfuture, I was warped 100 million years{be00}\ninto the past...
-Not only that, but with the temporal\ntransport broken down, and with no means{be00}\nto fix it in these ancient times, I am stuck{be00}\nforever in the past, unable to return...{be01}\nMaybe it's not so bad to live in a world\nwhere I can see ancient Pokémon, the likes{be00}\nof which I had only seen in Fossil museums...{be00}\nAt least, that's what I keep telling myself.
-Professor {0100:1}: Hmmm...\nI guess it just won't work...{be01}\nHow unfortunate. I heard this move could\ntranscend time.
-Strange: Professor {0100:1}!{be01}\nTrying to bend time and space with a\nPokémon move instead of using the temporal{be00}\ntransport is just shameful! That's not{be00}\nhow a proper scientist should behave!
-Professor {0100:1}: You think so?\nI kind of hoped it would work...
-Strange: Seriously?\nUgh... Just do whatever you want...
+Bank0212_Text_VeteranStar = Veteran Star
+Bank0212_Text_Assistant = Assistant
+Bank0212_Text_StrangeProfessorPleaseCareful = Strange: Professor {0100:1}!\nPlease be careful!
+Bank0212_Text_ProfessorCantBelieveFate = Professor {0100:1}: I can't believe\nthat the fate of my research is being{be00}\njeopardized by a pair of glasses!
+Bank0212_Text_ProfessorStillThoseSome = Professor {0100:1}: Still...\nThose are some incredibly flashy glasses...
+Bank0212_Text_StrangeThatsWhatMakes = Strange: That's what makes them great!\nI'm very particular about my glasses!
+Bank0212_Text_ProfessorArghIsntGood = Professor {0100:1}: Argh...\nThis isn't good!
+Bank0212_Text_StrangeProfessorIfKeeps = Strange: Professor {0100:1}!\nIf this keeps up, the temporal transport{be00}\nis going to blow!
+Bank0212_Text_ProfessorItsFinallyTime = Professor {0100:1}: It's finally time!\nTime to venture into the future with my{be00}\nnew invention--the temporal transport!
+Bank0212_Text_StrangeWhenFirstTold = Strange: When you first told me to make\nit small enough to fit inside a capsule the{be00}\nsize of a person's hand, I thought you{be00}\nwere asking the impossible, but somehow{be00}\nwe managed to pull it off!{be01}\nI've been looking forward to this moment,\nProfessor {0100:1}!
+Bank0212_Text_ProfessorItsTimeActivate = Professor {0100:1}: It's time...\nActivate the temporal transport!
+Bank0212_Text_StrangeAllThatsLeft = Strange: All that's left is to charge\nup the Pokémon move power...{be01}\nWait! What's this?!
+Bank0212_Text_ProfessorWhatHappened = Professor {0100:1}: What happened?!
+Bank0212_Text_StrangeProfessorHateSay = Strange: Professor {0100:1}...\nI hate to say this, but it appears that{be00}\nmy glasses are stuck in part of{be00}\nthe temporal transport!{be01}\nIf we activate it now, it will\ncertainly malfunction!
+Bank0212_Text_ProfessorGlasses = Professor {0100:1}: Your glasses?!
+Bank0212_Text_StrangePerhapsWeCould = Strange: Perhaps we could use a Pokémon\nmove to dislodge my glasses...{be01}\nProfessor {0100:1}! Please try\nto recover my glasses!
+Bank0212_Text_ProfessorCertainly = Professor {0100:1}: Certainly!
+Bank0212_Text_StrangeThankMuchKnew = Strange: Thank you so much!\nI knew it wouldn't be a problem for you!{be01}\nPlease get them back. Those glasses are\nvery important to me!
+Bank0212_Text_ProfessorForget = Professor {0100:1}: Forget it!
+Bank0212_Text_StrangeButProfessorCould = Strange: But Professor, that could\nend up causing serious complications!{be01}\n...Oh no! They're beginning to throw sparks!\nMy glasses!
+Bank0212_Text_ProfessorMistake = Professor {0100:1}: Your mistake!
+Bank0212_Text_StrangeMayButHave = Strange: That may be so, but have some\ncompassion, Professor!{be01}\nBesides, it's entirely possible that this\nonly happened due to a flaw in your design!{be00}\nDon't put all the blame on me!{be01}\n...Oh no! The electricity is shorting out!
+Bank0212_Text_ProfessorWonderTemporalTransport = Professor {0100:1}: I wonder...\nIs the temporal transport OK?
+Bank0212_Text_StrangeTemporalTransportShould = Strange: Temporal transport should\nstill be possible!
+Bank0212_Text_ProfessorSureImLittle = Professor {0100:1}: Are you sure?\nI'm a little worried about all that smoke{be00}\ncoming out of it...
+Bank0212_Text_StrangeShouldFineThats = Strange: It should be fine!\nThat's just steam from the{be00}\ncoolant water!
+Bank0212_Text_ProfessorHahSuchMinor = Professor {0100:1}: Hah!\nSuch minor complications are well within{be00}\nmy expectations!{be01}\nContinue the experiment, Strange!
+Bank0212_Text_StrangeProfessorLetsWe = Strange: Professor {0100:1}!\nLet's do it! We have the power!
+Bank0212_Text_ProfessorWonderTemporalTransport_2 = Professor {0100:1}: I wonder...\nIs the temporal transport OK?
+Bank0212_Text_StrangeImGettingSome = Strange: I'm getting some very\npeculiar power readings...{be00}\nThis could be extremely dangerous!
+Bank0212_Text_ProfessorWeShouldOk = Professor {0100:1}: We should be OK!\nIt wouldn't be an experiment without some{be00}\nrisk taking! It makes it even more exciting!{be01}\nThis will surely be an\nelectrifying experience!
+Bank0212_Text_StrangeOnlyThingElectrifying = Strange: The only thing electrifying is\nthis temporal transport! It's discharging{be00}\nlike crazy!
+Bank0212_Text_ProfessorWonderTemporalTransport_3 = Professor {0100:1}: I wonder...\nIs the temporal transport OK?
+Bank0212_Text_StrangeHmmLooksLike = Strange: Hmm...\nIt looks like the temporal transport may{be00}\nbe overheating. I wouldn't say it's in the{be00}\nmost stable condition...
+Bank0212_Text_ProfessorWhatNoRisk = Professor {0100:1}: So what?\nNo risk, no reward! I'm burning{be00}\nwith excitement!
+Bank0212_Text_StrangeThatsAllWell = Strange: That's all well and good, but\nwhat will we do if the temporal transport{be00}\ncatches on fire?
+Bank0212_Text_StrangeWeveDoneProfessor = Strange: We've done it, Professor!\nThe temporal transport is functioning{be00}\nproperly! And my glasses are safe and{be00}\nsound, too!{be01}\nIn just moments, a gate into the future\nwill open before us!
+Bank0212_Text_ProfessorExcellentThenWill = Professor {0100:1}: Excellent!{be01}\nThen I will be on my way to visit\nthe world of the future!{be01}\nI'll bring you a souvenir!\nExpect something cool!
+Bank0212_Text_StrangeWillPleaseReturn = Strange: I will!{be01}\nPlease, return safely, Professor!
+Bank0212_Text_ProfessorSoonNowTemporal = Professor {0100:1}: Soon now...{be01}\nTemporal transport activation...go!
+Bank0212_Text_StrangeGoodLuckProfessor = Strange: Good luck,\nProfessor {0100:1}!
+Bank0212_Text_ThusVenturedIntoWorld = And thus, I ventured into the world\nof the future with the time machine{be00}\nI invented myself--the temporal transport!{be01}\nBut...{be01}\nAs I look back on these events,\nI wonder if it might have been better{be00}\nif my experiment had failed...
+Bank0212_Text_ProfessorWhats = Professor {0100:1}: What's this?
+Bank0212_Text_StrangeProfessorTemporalTransport = Strange: Professor {0100:1}!\nThe temporal transport system is{be00}\nout of control!
+Bank0212_Text_ProfessorCouldExperimentHave = Professor {0100:1}: Could my\nexperiment have failed?
+Bank0212_Text_StrangeProfessorGetAway = Strange: Professor {0100:1}!\nGet away from the temporal transport!{be00}\nIt's going to explode!
+Bank0212_Text_ProfessorAaahhh = Professor {0100:1}: Aaahhh!
+Bank0212_Text_StrangeProfessor = Strange: Professor!
+Bank0212_Text_ProfessorUghArgh = Professor {0100:1}: Ugh...argh...
+Bank0212_Text_StrangeProfessorProfessorOk = Strange: Professor! Professor!\nAre you OK?
+Bank0212_Text_ProfessorUrghhCantBelieve = Professor {0100:1}: Urghh...\nI can't believe I made it through...{be00}\nWe'll have to start all over now...
+Bank0212_Text_StrangeUhh = Strange: Uhh...
+Bank0212_Text_ProfessorWhatWhatsMatter = Professor {0100:1}: What?\nWhat's the matter?{be01}\nCan't you see? I'm just fine!\nAnnoyed that the experiment failed, but fine{be00}\nall the same. I won't give up so easily!
+Bank0212_Text_StrangeUmmProfessorYoud = Strange: Umm... Professor {0100:1}...{be01}\nYou'd better have a look at this...
+Bank0212_Text_WhenGazedIntoMirror = When I gazed into the mirror Strange\nhanded me, I was at a loss for words...{be01}\nThere in the mirror, I saw...not myself,\nbut a very peculiar creature instead.{be01}\nPerhaps it was a side effect of the energy\nthat leaked out of the temporal transport,{be00}\nbut I had somehow become merged with{be00}\nmy {0102:0}, who had been at my side.{be01}\nThis, of course, marked the end\nof my research...
+Bank0212_Text_StrangeProfessorEnergyWill = Strange: Professor {0100:1}!\nThe energy will not stop discharging!{be01}\n...Wait! What's happening?{be01}\nThe temporal transport appears to be\nfunctioning properly...
+Bank0212_Text_ProfessorWorryTooMuch = Professor {0100:1}: You worry too much!\nIf the temporal transport is functioning,{be00}\nthen there isn't a problem!{be01}\nAnd now it's time for me to venture\ninto the world of the future!{be01}\nOff I go!
+Bank0212_Text_StrangeButProfessorPlease = Strange: But, Professor {0100:1}!\nPlease, wait a moment!{be01}\nIt can't be! I'm detecting an eruption of\ntachyon particles!{be01}\nProfessor! You must stop!
+Bank0212_Text_ProfessorCareNotTemporal = Professor {0100:1}: I care not!{be01}\nTemporal-transport activation...go!
+Bank0212_Text_StrangeProfessorNoProfess = Strange: Professor, no!\nProfess...or! Stop...now...{be01}\n...
+Bank0212_Text_IgnoringAssistantsPleasStepped = Ignoring my assistant's pleas, I stepped\ninto the gate, not knowing how soon I would{be00}\ncome to regret it...{be01}\nIt was just as Strange said. The\ntemporal transport was not functioning{be00}\nproperly. Instead of stepping into the{be00}\nfuture, I was warped 100 million years{be00}\ninto the past...
+Bank0212_Text_NotOnlyButTemporal = Not only that, but with the temporal\ntransport broken down, and with no means{be00}\nto fix it in these ancient times, I am stuck{be00}\nforever in the past, unable to return...{be01}\nMaybe it's not so bad to live in a world\nwhere I can see ancient Pokémon, the likes{be00}\nof which I had only seen in Fossil museums...{be00}\nAt least, that's what I keep telling myself.
+Bank0212_Text_ProfessorHmmmGuessJust = Professor {0100:1}: Hmmm...\nI guess it just won't work...{be01}\nHow unfortunate. I heard this move could\ntranscend time.
+Bank0212_Text_StrangeProfessorTryingBend = Strange: Professor {0100:1}!{be01}\nTrying to bend time and space with a\nPokémon move instead of using the temporal{be00}\ntransport is just shameful! That's not{be00}\nhow a proper scientist should behave!
+Bank0212_Text_ProfessorThinkKindHoped = Professor {0100:1}: You think so?\nI kind of hoped it would work...
+Bank0212_Text_StrangeSeriouslyUghJust = Strange: Seriously?\nUgh... Just do whatever you want...
 \pad{de}

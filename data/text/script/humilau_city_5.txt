@@ -1,0 +1,8 @@
+HumilauCity5_Text_FlatPartStunfiskVery = The flat part of Stunfisk is\nvery charming, isn't it?
+HumilauCity5_Text_FlatPartStunfiskVery_2 = The flat part of Stunfisk is\nvery charming, isn't it?{be01}\nDo you know other Water-type Pokémon\nwith a slender body?
+HumilauCity5_Text_OhHeartShapedPokemon = Oh!\nThe heart-shaped Pokémon!{be01}\nWow! It's called Luvdisc!\nGreat! So slender!
+HumilauCity5_Text_OhBagFullHeart = Oh? Your Bag is full of\nHeart Scales!{be01}\nCome visit me again\nwith Luvdisc!
+HumilauCity5_Text_StunfiskLuvdiscBothHave = Stunfisk and Luvdisc both\nhave slender bodies!{be01}\nBut whether it is vertically slender\nor horizontally slender{be00}\ngives a different impression!
+HumilauCity5_Text_PokemonsNameStartsL = The Pokémon's name starts with “L"\nand it looks like a heart! I think.
+HumilauCity5_Text_IfSleepStunfiskIts = If you sleep on Stunfisk,\nits electricity relaxes the body!
+HumilauCity5_Text_Stuun = Stuun!

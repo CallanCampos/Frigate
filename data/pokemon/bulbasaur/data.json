@@ -1,0 +1,186 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Bulbasaur",
+    "pokedex": {
+        "category": "Seed Pokémon",
+        "entry": "For some time after its birth, it\ngrows by gaining nourishment from\nthe seed on its back.",
+        "height": "2'04\"",
+        "weight": "15.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Bulbasaur",
+                "category": "Seed Pokémon",
+                "entry": "For some time after its birth, it\ngrows by gaining nourishment from\nthe seed on its back.",
+                "height": "2'04\"",
+                "weight": "15.2 lbs."
+            },
+            "fr": {
+                "name": "Bulbizarre",
+                "category": "Pokémon Graine",
+                "entry": "Au matin de sa vie, la graine sur\nson dos lui fournit les éléments\ndont il a besoin pour grandir.",
+                "height": "0,7 m",
+                "weight": "6,9 kg"
+            },
+            "de": {
+                "name": "Bisasam",
+                "category": "Samen",
+                "entry": "Nach der Geburt nimmt es für eine\nWeile Nährstoffe über den Samen\nauf seinem Rücken auf.",
+                "height": "0,7 m",
+                "weight": "6,9 kg"
+            },
+            "it": {
+                "name": "Bulbasaur",
+                "category": "Pokémon Seme",
+                "entry": "Dopo la nascita, cresce traendo\nnutrimento dal seme piantato\nsul suo dorso.",
+                "height": "0,7 m",
+                "weight": "6,9 kg"
+            },
+            "ko": {
+                "name": "이상해씨",
+                "category": "씨앗포켓몬",
+                "entry": "태어나서부터 얼마 동안은\n등의 씨앗으로부터 영양을\n공급받아 크게 성장한다.",
+                "height": "0.7 m",
+                "weight": "6.9 kg"
+            },
+            "es": {
+                "name": "Bulbasaur",
+                "category": "Pokémon Semilla",
+                "entry": "Después de nacer, crece alimentándose\nde la semilla de su lomo.",
+                "height": "0,7 m",
+                "weight": "6,9 kg"
+            },
+            "ja": {
+                "name": "フシギダネ",
+                "category": "たねポケモン",
+                "entry": "うまれてから\\x{3000}しばらくの\\x{3000}あいだは\nせなかの\\x{3000}タネから\\x{3000}えいようを\nもらって\\x{3000}おおきく\\x{3000}そだつ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff0e}\\x{ff19}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 49,
+        "defense": 49,
+        "speed": 45,
+        "special_attack": 65,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_OVERGROW", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_CHLOROPHYLL",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 64,
+    "height": 7,
+    "weight": 69,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 3, "MOVE_GROWL" ],
+            [ 7, "MOVE_LEECH_SEED" ],
+            [ 9, "MOVE_VINE_WHIP" ],
+            [ 13, "MOVE_POISON_POWDER" ],
+            [ 13, "MOVE_SLEEP_POWDER" ],
+            [ 15, "MOVE_TAKE_DOWN" ],
+            [ 19, "MOVE_RAZOR_LEAF" ],
+            [ 21, "MOVE_SWEET_SCENT" ],
+            [ 25, "MOVE_GROWTH" ],
+            [ 27, "MOVE_DOUBLE_EDGE" ],
+            [ 31, "MOVE_WORRY_SEED" ],
+            [ 33, "MOVE_SYNTHESIS" ],
+            [ 37, "MOVE_SEED_BOMB" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM53",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_GRASS_PLEDGE",
+            "MOVE_SEED_BOMB",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_SKULL_BASH",
+            "MOVE_CHARM",
+            "MOVE_PETAL_DANCE",
+            "MOVE_MAGICAL_LEAF",
+            "MOVE_GRASS_WHISTLE",
+            "MOVE_CURSE",
+            "MOVE_INGRAIN",
+            "MOVE_NATURE_POWER",
+            "MOVE_AMNESIA",
+            "MOVE_LEAF_STORM",
+            "MOVE_POWER_WHIP",
+            "MOVE_SLUDGE",
+            "MOVE_ENDURE",
+            "MOVE_GIGA_DRAIN"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 16,
+            "species": "SPECIES_IVYSAUR"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_BULBASAUR"
+}

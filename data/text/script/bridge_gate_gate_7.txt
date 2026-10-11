@@ -1,0 +1,7 @@
+BridgeGateGate7_Text_WhatOhNoElevator = What? Oh no!\nIs the elevator broken?
+BridgeGateGate7_Text_ElevatorWasntBrokenHeard = That elevator wasn't broken.\nI heard a Pokémon called Rotom{be00}\nwas playing a prank!{be01}\nThat's right! Rotom is a Pokémon\nthat can go inside electrical appliances!
+BridgeGateGate7_Text_NoMatterWhatTime = No matter what time or place,\nI have my umbrella at the ready!{be01}\nAn ounce of prevention\nis worth a pound of cure!
+BridgeGateGate7_Text_OhAwesomeJustMade = Oh, awesome! That just made my day!{be01}\nThis vending machine gave me\nan extra drink! For free!{be01}\nI'll share my spoils with you.\nOtherwise, I'll burst with joy!{be01}
+BridgeGateGate7_Text_IfKeepGettingExtra = If I keep getting extra drinks,\nI'll be rich!
+BridgeGateGate7_Text_AwesomeMovedWhatBags = So awesome!{be01}\nI was so moved!{be01}\nWhat?! Your bag's full!
+\pad{4a}

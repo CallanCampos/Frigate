@@ -1,0 +1,35 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": [
+            [ "SPECIES_LITWICK", 27, 27 ],
+            [ "SPECIES_LITWICK", 27, 27 ],
+            [ "SPECIES_LITWICK", 28, 28 ],
+            [ "SPECIES_LITWICK", 28, 28 ],
+            [ "SPECIES_LITWICK", 29, 29 ],
+            [ "SPECIES_LITWICK", 29, 29 ],
+            [ "SPECIES_LITWICK", 30, 30 ],
+            [ "SPECIES_LITWICK", 30, 30 ],
+            [ "SPECIES_LITWICK", 30, 30 ],
+            [ "SPECIES_LITWICK", 30, 30 ],
+            [ "SPECIES_LITWICK", 30, 30 ],
+            [ "SPECIES_LITWICK", 30, 30 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

@@ -1,24 +1,24 @@
-No. of Pokémon
-Pokémon level
-Special Pokémon
-Same Pokémon
-Same items
-Wonder Launcher
-: No Restrictions
-: {0200:0}
-: {0200:0} or more
-: {0200:0} to {0200:1}
-: No Restrictions
-: Becomes {0202:0}
-: Up to {0202:0}
-: {0202:0} and up
-: Becomes {0202:0}-
-: Becomes {0202:0}+
-: Permitted
-: Banned
-: Permitted
-: Banned
-: Permitted
-: Banned
-: On
-: Off
+Bank0356_Text_NoPokemon = No. of Pokémon
+Bank0356_Text_PokemonLevel = Pokémon level
+Bank0356_Text_SpecialPokemon = Special Pokémon
+Bank0356_Text_SamePokemon = Same Pokémon
+Bank0356_Text_SameItems = Same items
+Bank0356_Text_WonderLauncher = Wonder Launcher
+Bank0356_Text_NoRestrictions = : No Restrictions
+Bank0356_Text_Empty = : {0200:0}
+Bank0356_Text_More = : {0200:0} or more
+Bank0356_Text_To = : {0200:0} to {0200:1}
+Bank0356_Text_NoRestrictions_2 = : No Restrictions
+Bank0356_Text_Becomes = : Becomes {0202:0}
+Bank0356_Text_Up = : Up to {0202:0}
+Bank0356_Text_Up_2 = : {0202:0} and up
+Bank0356_Text_Becomes_2 = : Becomes {0202:0}-
+Bank0356_Text_Becomes_3 = : Becomes {0202:0}+
+Bank0356_Text_Permitted = : Permitted
+Bank0356_Text_Banned = : Banned
+Bank0356_Text_Permitted_2 = : Permitted
+Bank0356_Text_Banned_2 = : Banned
+Bank0356_Text_Permitted_3 = : Permitted
+Bank0356_Text_Banned_3 = : Banned
+Bank0356_Text_On = : On
+Bank0356_Text_Off = : Off

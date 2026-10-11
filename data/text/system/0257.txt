@@ -1,108 +1,108 @@
-Big Star
-Haunted Man
-Arkham: Well, well.\nHow long can you endure?
-Arkham: Hey! Majin!\nWhat are you playing at?
-Arkham: Hey, Majin!\nWhat are you thinking about?
-Arkham: Come on! Majin!\nEnd this now!
-Arkham: Hey, Majin...\nWhat do you think you're doing?
-{0102:0}: That's it!
-Majin: La, la, la. ♪
-{0102:0}: This is the Majin...{be01}\nAn aggregate of ominous spirits\nthat has a body...
-Majin: Oh! Ooh!\nYou're {0102:0}!{be00}\nNo... Your real name is{be00}\n{0100:1}! Right?{be01}\nI've heard about you from Arkham.\nYou helped us and brought me back!{be01}\nThank you very much for your help.\nLa la la. ♪
-{0102:0}: He knows my name?\nAnd what's up with this bubbly act?{be00}\nWhat kind of a being is this?
-Majin: I have a feeling that I can\nreally get along with you. La la la. ♪
-{0102:0}: What do you mean?\n(...Is he truly dangerous?...)
-Arkham: Hardy-har ha!\nLong time no see!
-{0102:0}: Arkham...
-Arkham: How do you like the Majin of Mayhem?{be01}\nHe's quite polite, don't you think?\nVery friendly...and funny to boot.{be01}\nWell now, if my memory is correct,\nyou came here to erase the Majin, right?{be00}\nHardy-har. Can you do such a thing?
-Majin: La la la laaa. ♪ La la la laaa. ♪{be01}\nI do like you.\nI feel you'll understand what's in my heart.{be00}\nLa la la laaa. ♪
-{0102:0}: What are you talking about?
-Majin: Please answer my question.\nLa la la laaa. ♪{be01}\nEven if you give me a wrong answer,\nit's OK! I'll just destroy everything!
-Panicking People: Everyone! Look!\nWhat is that monster?!
-Majin: Hmm! Hmm! Hmm!\nAnnoying vermin!{be01}\nCall me a monster, do they?\nI'll destroy them!
-{0102:0}: Hey! Wait!\nI thought you were going to ask me{be00}\na question, right?{be01}\n(...I have to get his attention...)
-Majin: Oh, oh. That's right!\nNow, here's a question!{be01}\nWhat do I hate?
-{0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)\n(...Must answer his question properly...)
-{0102:0}: You hate...lying?
-Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've just gotta dance. ♪\nLaaaa. ♪ La la la laaa. ♪
-{0102:0}: You hate...boredom?
-Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've just gotta dance. ♪\nLaaaa. ♪ La la la laaa. ♪
-{0102:0}: You hate...good things?
-Majin: La la la laaa. ♪\nToo bad! That's not correct!{be01}\nI'm saaaaaaaaaaaaaaad!
-{0102:0}: I don't know!
-Majin: La la la laaa. ♪\nWhat a horrible guess. Not even a guess!{be01}\nI'm saaaaaaaaaaaaaaad!
-Majin: La la la laaa. ♪\nHere's the next question!{be01}\nWhat is my favorite thing?
-{0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)
-{0102:0}: Destroying things!
-Majin: La la la laaa. ♪\nToo bad! That's not correct!{be00}\nOr, I should say...{be01}\nDon't judge me based on my appearance!
-{0102:0}: Sleeping?
-Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I'll have a little nap. ♪\nLa la la. ♪ La la la laaa. ♪
-{0102:0}: Not thinking too hard?
-Majin: La la. ♪\nToo bad! That's not correct!{be00}\nOr, I should say...{be01}\nYou seem to look down on me. Tsk tsk.
-{0102:0}: Dancing?
-Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've gotta boogie! ♪\nLa la la. ♪ La la la laaa. ♪
-Majin: La la la laaa. ♪\nHere's the next question!{be01}\nBut I'm gonna do a little change-up\nfor the next question.{be01}\nThis is it!\nWhat do you think of me?
-{0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)
-{0102:0}: You're vain.
-Majin: Grrrrrrrrroooowrrrrrrrr!\nYou big liar! I am not either!
-{0102:0}: You're lonely.
-Majin: Grrrrrrrrroooowrrrrrrrr!{be01}\nThat's a pretty harsh thing to just\ncome out and say.
-{0102:0}: You're wild.
-Majin: La la la laaa. ♪\nYes! I'm impressed!{be01}\nYou understand my wild charm very well!{be01}\nI'm so happy, I've gotta dance. ♪\nLa la la. ♪ La la la laaa. ♪
-{0102:0}: You are unique.
-Majin: La la la laaa. ♪\nGood point!{be01}\nYou understand the overwhelming\nimmensity of my charm!{be01}\nI'm so happy, I believe I'll take a nap. ♪\nLa la la. ♪ La la la laaa. ♪
-Majin: La la la laaa. ♪\nHere's the next question!{be01}\nBasically, I'm perfect.\nBut if you were forced to say something,{be00}\nwhat am I missing?
-{0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)
-{0102:0}: You're perfect!
-Majin: La la la laaa. ♪{be01}\nIs that so? Then, I'll destroy everything\nelse that is imperfect!
-{0102:0}: Patience!
-Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've gotta dance. ♪\nLa la la. ♪ La la la laaa. ♪
-{0102:0}: Kindness!
-Majin: Grrrrrrrrroooowrrrrrrrr!\nSadness! I'm hurt!{be01}\nTo heal my emotional wounds,\nI may just have to destroy everything!
-{0102:0}: I don't know.
-Majin: La la la laaa. ♪\nWell, I don't know either!{be01}\nThere's nothing that I'm missing!{be01}\nI'm so happy, I'll take a little nap. ♪\nLa la la. ♪ La la la laaa. ♪
-Majin: La la la laaa. ♪\nI was right. I like you!{be01}\nDo you have anything\nthat you want me to do?{be01}\nI'm very generous!\nAsk for anything you want!
-{0102:0}: Wh-what...?\n(...This may be my chance...){be01}\n(...Can I manage to convince him\nto stop the destruction?...)
-{0102:0}: Stop the destruction!
-Majin: Grrrrrrrrroooowrrrrrrrr!\nThat's taboo for the Majin of Mayhem!{be00}\nI'll destroy everything!
-{0102:0}: Disappear!
-Majin: Grrrrrrrrroooowrrrrrrrr!\nMake myself disappear?{be00}\nI shouldn't do such a sad thing.{be00}\nNever, ever!{be01}\nInstead, I'll destroy this world\nand make it disappear!
-{0102:0}: Protect the world!
-Majin: La la la laaa. ♪\nHm? What is it to “protect"?{be01}\nWell, I'll think about it after I'm done\nthrashing around.
-{0102:0}: Show remorse!
-Majin: Grrrrrrrrroooowrrrrrrrr!\nThere's no such word as remorse{be00}\nin my dictionary!{be01}\nWithout hesitation, without looking back,\nI'll just destroy everything!
-Majin: La la la laaa. ♪\nOh! You've got the moves! Dance it!
-{0102:0}: ...
-Majin: La la la laaa. ♪\nYour dance moves remind me of my honey.{be01}\nLa la la. ♪ La la la laaa. ♪ La la la. ♪\nLa la la. ♪ La la la laaa. ♪ La la la. ♪
-{0102:0}: Your honey...\nDo you mean your girlfriend?{be00}\nOr your wife?
-Majin: La la la laaa. ♪ La la la. ♪\nLa la la. ♪ La la la laaa. ♪ La la la. ♪{be01}\nOh, my honey! My honey!\nWhy did you leave me behind?!{be01}\n...{be01}\nAhhhhhhhh... Ahhhhhhhh!\nWaaaaaaaaaaaaaaaaaaah!{be01}\nI remember now!{be01}\nThose vermin betrayed me!\nThose humans trapped my honey!{be01}\nI'll never forgive humans! Never!
-{0102:0}: Is that your reason for\nyour course of endless destruction?
-Majin: Grrrrrrrrroooowrrrrrrrr!\nI'll destroy this loveless world!
-{0102:0}: Sadness...{be01}\nBut whatever he feels his reason to be,\nI can't let him continue on this path.
-{0102:0}: No...\nI'm no match for him.
-Majin: La la la laaa. ♪\nAre you finished already?{be01}\nAfter you leave, I'll be bored again. I'll go\nahead and destroy such a boring world!
-{0102:0}: Stop.
-Arkham: Ahahahaha!{be01}\nAll right! Go for it!\nWhen you're bored, destroy everything!{be00}\nDestroy everything everywhere!
-Roooooooaaaaarrrrrrr!\nWhaaaaaaaaaaaaam!{be01}\nBooooooooooooooom!\nWhaaaaaaaaaaaaam!{be01}\n...
-{0102:0}: N-no.\nI'm no match for him...
-Majin: La la la laaa. ♪\nAre you finished already?{be01}\nAfter you leave, I'll be lonely again.{be01}\nI'll destroy this heartless, empty city!
-{0102:0}: Stop.
-Arkham: Ahahahaha!{be01}\nAll right! Go for it!\nLoneliness, sadness--destroy everything!{be00}\nDestroy everything everywhere!
-Roooooooaaaaarrrrrrr!\nWhaaaaaaaaaaaaam!{be01}\nBooooooooooooooom!\nWhaaaaaaaaaaaaam!{be01}\n...
-{0102:0}: The Majin is acting strange...
-Majin: La la la laaa. ♪\nYou're tough!{be00}\nI was right. I like you!{be01}\n...La la la laaa. ♪\nHm! Hmm! I have an idea!{be01}\nThis time, I'll play by protecting\nthe world rather than destroying it!{be00}\nLet me put it this way, hmm?{be01}\nWe will protect the world, you and me,\nby keeping the whole thing in our hands.
-{0102:0}: You mean we'll take this\nworld under our control?
-Arkham: W-wait! Majin!\nWhat are you talking about?{be01}\nDestruction is everything, right?\nDestroy everything already!
-Majin: Hey, Arkham...\nYou're stubborn and boring!{be01}\nA person in such a rut should\ndisappear already!
-Ssssssrrrrshhhhh!
-Arkham: What are you...saying?\nYeeeeeeeeek!{be01}\n...
-Half a century has passed since then.{be01}\nThe world has been controlled by the\nMajin and me.{be01}\nAs all people fear the Majin's power,\nno one causes any big confrontations{be00}\nor incidents.{be01}\nSometimes the Majin thrashes around\nand causes destruction. But that's it...{be01}\nIt's not so much. All in all, I'd say our\ntaking control has produced an ideal world.
-{0102:0}: Did I defeat him?
-Majin: La la la laaa. ♪\nYou're strong!{be00}\nI'm in a good mood!
-Arkham: It can't be!\nThe Majin lost...
-Majin: I'm a bit sleepy\n'cause I played a lot.{be01}\nYaawn... So sleepy.\nI'm gonna go home and sleep...{be00}\nArkham! Let's go!
-{0102:0}: I did it!
-Arkham: It can't be...\nIt can't be... It can't be...
-Majin: La. ♪ La la. ♪ La la la. ♪\nLa la la. ♪ La la la laaa. ♪ La la la laaa. ♪{be01}\n...
-Addendum to\n“Ghost Eraser Case Files: File No. 004":{be01}\nI defeated the Majin of Mayhem.\nThe Majin fell asleep again. But...{be01}\nThe Majin could wake up again at any time.\nPlease be aware.{be01}\nIf he does return, please remember\nto choose your answers wisely.{be01}\nThe fate of the world may rest upon you.\n--Code name: {0102:0}
+Bank0257_Text_BigStar = Big Star
+Bank0257_Text_HauntedMan = Haunted Man
+Bank0257_Text_ArkhamWellWellHow = Arkham: Well, well.\nHow long can you endure?
+Bank0257_Text_ArkhamHeyMajinWhat = Arkham: Hey! Majin!\nWhat are you playing at?
+Bank0257_Text_ArkhamHeyMajinWhat_2 = Arkham: Hey, Majin!\nWhat are you thinking about?
+Bank0257_Text_ArkhamComeMajinEnd = Arkham: Come on! Majin!\nEnd this now!
+Bank0257_Text_ArkhamHeyMajinWhat_3 = Arkham: Hey, Majin...\nWhat do you think you're doing?
+Bank0257_Text_Thats = {0102:0}: That's it!
+Bank0257_Text_MajinLaLaLa = Majin: La, la, la. ♪
+Bank0257_Text_MajinAggregateOminousSpirits = {0102:0}: This is the Majin...{be01}\nAn aggregate of ominous spirits\nthat has a body...
+Bank0257_Text_MajinOhOohYoure = Majin: Oh! Ooh!\nYou're {0102:0}!{be00}\nNo... Your real name is{be00}\n{0100:1}! Right?{be01}\nI've heard about you from Arkham.\nYou helped us and brought me back!{be01}\nThank you very much for your help.\nLa la la. ♪
+Bank0257_Text_HeKnowsNameWhats = {0102:0}: He knows my name?\nAnd what's up with this bubbly act?{be00}\nWhat kind of a being is this?
+Bank0257_Text_MajinHaveFeelingCan = Majin: I have a feeling that I can\nreally get along with you. La la la. ♪
+Bank0257_Text_WhatMeanHeTruly = {0102:0}: What do you mean?\n(...Is he truly dangerous?...)
+Bank0257_Text_ArkhamHardyHarHa = Arkham: Hardy-har ha!\nLong time no see!
+Bank0257_Text_Arkham = {0102:0}: Arkham...
+Bank0257_Text_ArkhamHowLikeMajin = Arkham: How do you like the Majin of Mayhem?{be01}\nHe's quite polite, don't you think?\nVery friendly...and funny to boot.{be01}\nWell now, if my memory is correct,\nyou came here to erase the Majin, right?{be00}\nHardy-har. Can you do such a thing?
+Bank0257_Text_MajinLaLaLa_2 = Majin: La la la laaa. ♪ La la la laaa. ♪{be01}\nI do like you.\nI feel you'll understand what's in my heart.{be00}\nLa la la laaa. ♪
+Bank0257_Text_WhatTalkingAbout = {0102:0}: What are you talking about?
+Bank0257_Text_MajinPleaseAnswerQuestion = Majin: Please answer my question.\nLa la la laaa. ♪{be01}\nEven if you give me a wrong answer,\nit's OK! I'll just destroy everything!
+Bank0257_Text_PanickingPeopleEveryoneLook = Panicking People: Everyone! Look!\nWhat is that monster?!
+Bank0257_Text_MajinHmmHmmHmm = Majin: Hmm! Hmm! Hmm!\nAnnoying vermin!{be01}\nCall me a monster, do they?\nI'll destroy them!
+Bank0257_Text_HeyWaitThoughtWere = {0102:0}: Hey! Wait!\nI thought you were going to ask me{be00}\na question, right?{be01}\n(...I have to get his attention...)
+Bank0257_Text_MajinOhOhThats = Majin: Oh, oh. That's right!\nNow, here's a question!{be01}\nWhat do I hate?
+Bank0257_Text_LetSeeIfMake = {0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)\n(...Must answer his question properly...)
+Bank0257_Text_HateLying = {0102:0}: You hate...lying?
+Bank0257_Text_MajinLaLaLa_3 = Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've just gotta dance. ♪\nLaaaa. ♪ La la la laaa. ♪
+Bank0257_Text_HateBoredom = {0102:0}: You hate...boredom?
+Bank0257_Text_MajinLaLaLa_4 = Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've just gotta dance. ♪\nLaaaa. ♪ La la la laaa. ♪
+Bank0257_Text_HateGoodThings = {0102:0}: You hate...good things?
+Bank0257_Text_MajinLaLaLa_5 = Majin: La la la laaa. ♪\nToo bad! That's not correct!{be01}\nI'm saaaaaaaaaaaaaaad!
+Bank0257_Text_DontKnow = {0102:0}: I don't know!
+Bank0257_Text_MajinLaLaLa_6 = Majin: La la la laaa. ♪\nWhat a horrible guess. Not even a guess!{be01}\nI'm saaaaaaaaaaaaaaad!
+Bank0257_Text_MajinLaLaLa_7 = Majin: La la la laaa. ♪\nHere's the next question!{be01}\nWhat is my favorite thing?
+Bank0257_Text_LetSeeIfMake_2 = {0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)
+Bank0257_Text_DestroyingThings = {0102:0}: Destroying things!
+Bank0257_Text_MajinLaLaLa_8 = Majin: La la la laaa. ♪\nToo bad! That's not correct!{be00}\nOr, I should say...{be01}\nDon't judge me based on my appearance!
+Bank0257_Text_Sleeping = {0102:0}: Sleeping?
+Bank0257_Text_MajinLaLaLa_9 = Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I'll have a little nap. ♪\nLa la la. ♪ La la la laaa. ♪
+Bank0257_Text_NotThinkingTooHard = {0102:0}: Not thinking too hard?
+Bank0257_Text_MajinLaLaToo = Majin: La la. ♪\nToo bad! That's not correct!{be00}\nOr, I should say...{be01}\nYou seem to look down on me. Tsk tsk.
+Bank0257_Text_Dancing = {0102:0}: Dancing?
+Bank0257_Text_MajinLaLaLa_10 = Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've gotta boogie! ♪\nLa la la. ♪ La la la laaa. ♪
+Bank0257_Text_MajinLaLaLa_11 = Majin: La la la laaa. ♪\nHere's the next question!{be01}\nBut I'm gonna do a little change-up\nfor the next question.{be01}\nThis is it!\nWhat do you think of me?
+Bank0257_Text_LetSeeIfMake_3 = {0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)
+Bank0257_Text_YoureVain = {0102:0}: You're vain.
+Bank0257_Text_MajinGrrrrrrrrroooowrrrrrrrrBigLiar = Majin: Grrrrrrrrroooowrrrrrrrr!\nYou big liar! I am not either!
+Bank0257_Text_YoureLonely = {0102:0}: You're lonely.
+Bank0257_Text_MajinGrrrrrrrrroooowrrrrrrrrThatsPretty = Majin: Grrrrrrrrroooowrrrrrrrr!{be01}\nThat's a pretty harsh thing to just\ncome out and say.
+Bank0257_Text_YoureWild = {0102:0}: You're wild.
+Bank0257_Text_MajinLaLaLa_12 = Majin: La la la laaa. ♪\nYes! I'm impressed!{be01}\nYou understand my wild charm very well!{be01}\nI'm so happy, I've gotta dance. ♪\nLa la la. ♪ La la la laaa. ♪
+Bank0257_Text_Unique = {0102:0}: You are unique.
+Bank0257_Text_MajinLaLaLa_13 = Majin: La la la laaa. ♪\nGood point!{be01}\nYou understand the overwhelming\nimmensity of my charm!{be01}\nI'm so happy, I believe I'll take a nap. ♪\nLa la la. ♪ La la la laaa. ♪
+Bank0257_Text_MajinLaLaLa_14 = Majin: La la la laaa. ♪\nHere's the next question!{be01}\nBasically, I'm perfect.\nBut if you were forced to say something,{be00}\nwhat am I missing?
+Bank0257_Text_LetSeeIfMake_4 = {0102:0}: Let me see...{be01}\n(...If I make him angry, I'll be in danger...)
+Bank0257_Text_YourePerfect = {0102:0}: You're perfect!
+Bank0257_Text_MajinLaLaLa_15 = Majin: La la la laaa. ♪{be01}\nIs that so? Then, I'll destroy everything\nelse that is imperfect!
+Bank0257_Text_Patience = {0102:0}: Patience!
+Bank0257_Text_MajinLaLaLa_16 = Majin: La la la laaa. ♪\nYeeees! That is correct!{be00}\nI'm glad you understand me!{be01}\nI'm so happy, I've gotta dance. ♪\nLa la la. ♪ La la la laaa. ♪
+Bank0257_Text_Kindness = {0102:0}: Kindness!
+Bank0257_Text_MajinGrrrrrrrrroooowrrrrrrrrSadnessIm = Majin: Grrrrrrrrroooowrrrrrrrr!\nSadness! I'm hurt!{be01}\nTo heal my emotional wounds,\nI may just have to destroy everything!
+Bank0257_Text_DontKnow_2 = {0102:0}: I don't know.
+Bank0257_Text_MajinLaLaLa_17 = Majin: La la la laaa. ♪\nWell, I don't know either!{be01}\nThere's nothing that I'm missing!{be01}\nI'm so happy, I'll take a little nap. ♪\nLa la la. ♪ La la la laaa. ♪
+Bank0257_Text_MajinLaLaLa_18 = Majin: La la la laaa. ♪\nI was right. I like you!{be01}\nDo you have anything\nthat you want me to do?{be01}\nI'm very generous!\nAsk for anything you want!
+Bank0257_Text_WhWhatMayChance = {0102:0}: Wh-what...?\n(...This may be my chance...){be01}\n(...Can I manage to convince him\nto stop the destruction?...)
+Bank0257_Text_StopDestruction = {0102:0}: Stop the destruction!
+Bank0257_Text_MajinGrrrrrrrrroooowrrrrrrrrThatsTaboo = Majin: Grrrrrrrrroooowrrrrrrrr!\nThat's taboo for the Majin of Mayhem!{be00}\nI'll destroy everything!
+Bank0257_Text_Disappear = {0102:0}: Disappear!
+Bank0257_Text_MajinGrrrrrrrrroooowrrrrrrrrMakeMyself = Majin: Grrrrrrrrroooowrrrrrrrr!\nMake myself disappear?{be00}\nI shouldn't do such a sad thing.{be00}\nNever, ever!{be01}\nInstead, I'll destroy this world\nand make it disappear!
+Bank0257_Text_ProtectWorld = {0102:0}: Protect the world!
+Bank0257_Text_MajinLaLaLa_19 = Majin: La la la laaa. ♪\nHm? What is it to “protect"?{be01}\nWell, I'll think about it after I'm done\nthrashing around.
+Bank0257_Text_ShowRemorse = {0102:0}: Show remorse!
+Bank0257_Text_MajinGrrrrrrrrroooowrrrrrrrrTheresNo = Majin: Grrrrrrrrroooowrrrrrrrr!\nThere's no such word as remorse{be00}\nin my dictionary!{be01}\nWithout hesitation, without looking back,\nI'll just destroy everything!
+Bank0257_Text_MajinLaLaLa_20 = Majin: La la la laaa. ♪\nOh! You've got the moves! Dance it!
+Bank0257_Text_Empty = {0102:0}: ...
+Bank0257_Text_MajinLaLaLa_21 = Majin: La la la laaa. ♪\nYour dance moves remind me of my honey.{be01}\nLa la la. ♪ La la la laaa. ♪ La la la. ♪\nLa la la. ♪ La la la laaa. ♪ La la la. ♪
+Bank0257_Text_HoneyMeanGirlfriendWife = {0102:0}: Your honey...\nDo you mean your girlfriend?{be00}\nOr your wife?
+Bank0257_Text_MajinLaLaLa_22 = Majin: La la la laaa. ♪ La la la. ♪\nLa la la. ♪ La la la laaa. ♪ La la la. ♪{be01}\nOh, my honey! My honey!\nWhy did you leave me behind?!{be01}\n...{be01}\nAhhhhhhhh... Ahhhhhhhh!\nWaaaaaaaaaaaaaaaaaaah!{be01}\nI remember now!{be01}\nThose vermin betrayed me!\nThose humans trapped my honey!{be01}\nI'll never forgive humans! Never!
+Bank0257_Text_ReasonCourseEndlessDestruction = {0102:0}: Is that your reason for\nyour course of endless destruction?
+Bank0257_Text_MajinGrrrrrrrrroooowrrrrrrrrIllDestroy = Majin: Grrrrrrrrroooowrrrrrrrr!\nI'll destroy this loveless world!
+Bank0257_Text_SadnessButWhateverHe = {0102:0}: Sadness...{be01}\nBut whatever he feels his reason to be,\nI can't let him continue on this path.
+Bank0257_Text_NoImNoMatch = {0102:0}: No...\nI'm no match for him.
+Bank0257_Text_MajinLaLaLa_23 = Majin: La la la laaa. ♪\nAre you finished already?{be01}\nAfter you leave, I'll be bored again. I'll go\nahead and destroy such a boring world!
+Bank0257_Text_Stop = {0102:0}: Stop.
+Bank0257_Text_ArkhamAhahahahaAllRight = Arkham: Ahahahaha!{be01}\nAll right! Go for it!\nWhen you're bored, destroy everything!{be00}\nDestroy everything everywhere!
+Bank0257_Text_RoooooooaaaaarrrrrrrWhaaaaaaaaaaaaamBooooooooooooooomWhaaaaaaaaaaaaam = Roooooooaaaaarrrrrrr!\nWhaaaaaaaaaaaaam!{be01}\nBooooooooooooooom!\nWhaaaaaaaaaaaaam!{be01}\n...
+Bank0257_Text_NNoImNo = {0102:0}: N-no.\nI'm no match for him...
+Bank0257_Text_MajinLaLaLa_24 = Majin: La la la laaa. ♪\nAre you finished already?{be01}\nAfter you leave, I'll be lonely again.{be01}\nI'll destroy this heartless, empty city!
+Bank0257_Text_Stop_2 = {0102:0}: Stop.
+Bank0257_Text_ArkhamAhahahahaAllRight_2 = Arkham: Ahahahaha!{be01}\nAll right! Go for it!\nLoneliness, sadness--destroy everything!{be00}\nDestroy everything everywhere!
+Bank0257_Text_RoooooooaaaaarrrrrrrWhaaaaaaaaaaaaamBooooooooooooooomWhaaaaaaaaaaaaam_2 = Roooooooaaaaarrrrrrr!\nWhaaaaaaaaaaaaam!{be01}\nBooooooooooooooom!\nWhaaaaaaaaaaaaam!{be01}\n...
+Bank0257_Text_MajinActingStrange = {0102:0}: The Majin is acting strange...
+Bank0257_Text_MajinLaLaLa_25 = Majin: La la la laaa. ♪\nYou're tough!{be00}\nI was right. I like you!{be01}\n...La la la laaa. ♪\nHm! Hmm! I have an idea!{be01}\nThis time, I'll play by protecting\nthe world rather than destroying it!{be00}\nLet me put it this way, hmm?{be01}\nWe will protect the world, you and me,\nby keeping the whole thing in our hands.
+Bank0257_Text_MeanWellTakeWorld = {0102:0}: You mean we'll take this\nworld under our control?
+Bank0257_Text_ArkhamWWaitMajin = Arkham: W-wait! Majin!\nWhat are you talking about?{be01}\nDestruction is everything, right?\nDestroy everything already!
+Bank0257_Text_MajinHeyArkhamYoure = Majin: Hey, Arkham...\nYou're stubborn and boring!{be01}\nA person in such a rut should\ndisappear already!
+Bank0257_Text_Ssssssrrrrshhhhh = Ssssssrrrrshhhhh!
+Bank0257_Text_ArkhamWhatSayingYeeeeeeeeek = Arkham: What are you...saying?\nYeeeeeeeeek!{be01}\n...
+Bank0257_Text_HalfCenturyHasPassed = Half a century has passed since then.{be01}\nThe world has been controlled by the\nMajin and me.{be01}\nAs all people fear the Majin's power,\nno one causes any big confrontations{be00}\nor incidents.{be01}\nSometimes the Majin thrashes around\nand causes destruction. But that's it...{be01}\nIt's not so much. All in all, I'd say our\ntaking control has produced an ideal world.
+Bank0257_Text_DidDefeatHim = {0102:0}: Did I defeat him?
+Bank0257_Text_MajinLaLaLa_26 = Majin: La la la laaa. ♪\nYou're strong!{be00}\nI'm in a good mood!
+Bank0257_Text_ArkhamCantMajinLost = Arkham: It can't be!\nThe Majin lost...
+Bank0257_Text_MajinImBitSleepy = Majin: I'm a bit sleepy\n'cause I played a lot.{be01}\nYaawn... So sleepy.\nI'm gonna go home and sleep...{be00}\nArkham! Let's go!
+Bank0257_Text_Did = {0102:0}: I did it!
+Bank0257_Text_ArkhamCantCantCant = Arkham: It can't be...\nIt can't be... It can't be...
+Bank0257_Text_MajinLaLaLa_27 = Majin: La. ♪ La la. ♪ La la la. ♪\nLa la la. ♪ La la la laaa. ♪ La la la laaa. ♪{be01}\n...
+Bank0257_Text_AddendumGhostEraserCase = Addendum to\n“Ghost Eraser Case Files: File No. 004":{be01}\nI defeated the Majin of Mayhem.\nThe Majin fell asleep again. But...{be01}\nThe Majin could wake up again at any time.\nPlease be aware.{be01}\nIf he does return, please remember\nto choose your answers wisely.{be01}\nThe fate of the world may rest upon you.\n--Code name: {0102:0}
 \pad{f2}

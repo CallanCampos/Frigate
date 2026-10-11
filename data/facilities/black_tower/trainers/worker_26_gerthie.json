@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Gerthie",
+    "class": "TRAINER_CLASS_WORKER_26",
+    "pokemon": [
+        "poliwrath_2",
+        "drapion_2",
+        "steelix_2",
+        "gliscor_2",
+        "klinklang_2",
+        "cloyster_2",
+        "hippowdon_2",
+        "leafeon_2",
+        "aggron_2",
+        "tangrowth_2"
+    ]
+}

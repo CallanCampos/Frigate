@@ -4,6 +4,7 @@
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_system.h"
+#include "gfl/net_whpipe.h"
 #include "gfl/std.h"
 #include "gfl/ui.h"
 #include "nitro/os.h"
@@ -213,7 +214,7 @@ static BeaconSearchFound *func_ov012_0215f6c8(BeaconSearchWork *work, int *index
         return NULL;
     }
     if (work->state == 1) {
-        func_02042a10();
+        func_02042a10(0);
         work->state = 2;
         return NULL;
     }

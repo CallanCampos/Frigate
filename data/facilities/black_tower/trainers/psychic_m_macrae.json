@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Macrae",
+    "class": "TRAINER_CLASS_PSYCHIC_M",
+    "pokemon": [
+        "jynx_1",
+        "girafarig_1",
+        "magneton_1",
+        "vileplume_1",
+        "lilligant_1",
+        "heatmor_1",
+        "alakazam_1",
+        "sigilyph_1",
+        "reuniclus_1",
+        "golduck_1"
+    ]
+}

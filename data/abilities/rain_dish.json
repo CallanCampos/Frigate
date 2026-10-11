@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Rain Dish",
+    "description": "The Pokémon gradually\nregains HP in rain."
+}

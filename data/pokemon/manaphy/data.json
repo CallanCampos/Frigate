@@ -1,0 +1,174 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Manaphy",
+    "pokedex": {
+        "category": "Seafaring Pokémon",
+        "entry": "It is born with a wondrous power\nthat lets it bond with any kind of\nPokémon.",
+        "height": "1'00\"",
+        "weight": "3.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Manaphy",
+                "category": "Seafaring Pokémon",
+                "entry": "It is born with a wondrous power\nthat lets it bond with any kind of\nPokémon.",
+                "height": "1'00\"",
+                "weight": "3.1 lbs."
+            },
+            "fr": {
+                "name": "Manaphy",
+                "category": "Pokémon Voyagenmer",
+                "entry": "Il est né avec le pouvoir incroyable\nde créer des liens avec n'importe\nquel Pokémon.",
+                "height": "0,3 m",
+                "weight": "1,4 kg"
+            },
+            "de": {
+                "name": "Manaphy",
+                "category": "Seefahrer",
+                "entry": "Es wird mit einer wundersamen Kraft\ngeboren, die eine Bindung zu jedem\nanderen Pokémon möglich macht.",
+                "height": "0,3 m",
+                "weight": "1,4 kg"
+            },
+            "it": {
+                "name": "Manaphy",
+                "category": "Pokémon Oceandante",
+                "entry": "Dispone di un potere innato che lo fa\nlegare con qualsiasi specie di Pokémon.",
+                "height": "0,3 m",
+                "weight": "1,4 kg"
+            },
+            "ko": {
+                "name": "마나피",
+                "category": "회유포켓몬",
+                "entry": "태어났을 때부터 가지고 있는\n이상한 힘을 쓰면 어떤 포켓몬과도\n마음이 서로 통하게 된다.",
+                "height": "0.3 m",
+                "weight": "1.4 kg"
+            },
+            "es": {
+                "name": "Manaphy",
+                "category": "Pokémon Náutico",
+                "entry": "Nace con un maravilloso poder que\nle permite establecer vínculos con\ncualquier tipo de Pokémon.",
+                "height": "0,3 m",
+                "weight": "1,4 kg"
+            },
+            "ja": {
+                "name": "マナフィ",
+                "category": "かいゆうポケモン",
+                "entry": "うまれたときから\\x{3000}そなわっている\nふしぎな\\x{3000}ちからを\\x{3000}つかうと\\x{3000}どんな\nポケモンとも\\x{3000}こころが\\x{3000}かよいあう。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff14}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 100,
+        "attack": 100,
+        "defense": 100,
+        "speed": 100,
+        "special_attack": 100,
+        "special_defense": 100
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 3,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 3,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 10,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FAIRY" ],
+    "abilities": [ "ABILITY_HYDRATION", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 270,
+    "height": 3,
+    "weight": 14,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TAIL_GLOW" ],
+            [ 1, "MOVE_BUBBLE" ],
+            [ 1, "MOVE_WATER_SPORT" ],
+            [ 9, "MOVE_CHARM" ],
+            [ 16, "MOVE_SUPERSONIC" ],
+            [ 24, "MOVE_BUBBLE_BEAM" ],
+            [ 31, "MOVE_ACID_ARMOR" ],
+            [ 39, "MOVE_WHIRLPOOL" ],
+            [ 46, "MOVE_WATER_PULSE" ],
+            [ 54, "MOVE_AQUA_RING" ],
+            [ 61, "MOVE_DIVE" ],
+            [ 69, "MOVE_RAIN_DANCE" ],
+            [ 76, "MOVE_HEART_SWAP" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM42",
+            "TM44",
+            "TM48",
+            "TM53",
+            "TM55",
+            "TM56",
+            "TM68",
+            "TM70",
+            "TM77",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_UPROAR",
+            "MOVE_LAST_RESORT",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_HEAL_BELL",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MANAPHY"
+}

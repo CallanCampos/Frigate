@@ -11,18 +11,18 @@ on:
 jobs:
   compile:
     name: Compile src/ and lib/
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Cache tools
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             tools/wibo
@@ -31,4 +31,4 @@ jobs:
           key: tools-${{ hashFiles('configure.py', 'lib/*/library.toml') }}
 
       - name: Compile
-        run: python tools/scripts/compile_all.py
+        run: python tools/decomp/compile_all.py

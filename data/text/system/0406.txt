@@ -1,34 +1,34 @@
-The {013b:0}\n{013c:1}{be01}
-These are the Pokémon Trainers\nwho entered this tournament!{be01}
-The {013b:0}\nstarts now!{be01}
-Let's move on to the next battle!{be01}
-Which Trainer will win the\n{013b:0}?{be01}
-The first round...\n{0100:0} vs. {0100:1}!{be01}
-The second round...\n{0100:0} vs. {0100:1}!{be01}
-The final round...\n{0100:0} vs. {0100:1}!{be01}
-That was a lopsided battle!\nThe winner is {0100:0}!{be01}
-It was a totally one-sided game!\n{0100:0} won the battle!{be01}
-The opponent couldn't do much at all.\nThe winner is {0100:0}!{be01}
-{0100:0} was never in any danger.\nIt was an extremely easy victory!{be01}
-An overwhelming victory\nfor {0100:0}!{be01}
-The winner of this thrilling game\nis {0100:0}!{be01}
-What an intense battle! The winner of this\nheated battle is {0100:0}!{be01}
-Was {0100:0} slightly better\nthan the opponent? Congratulations!{be01}
-{0100:0} pulled away from\nthe persistent opponent and won!{be01}
-The one who won the breathtaking battle\nis {0100:0}!{be01}
-What a clash of wills! {0100:0}\nhas slightly surpassed the opponent!{be01}
-The battle could have gone either way.\nBut the winner is {0100:0}!{be01}
-They were evenly matched! The one who\nmoved a step ahead was {0100:0}!{be01}
-It was a jaw-dropping seesaw match!\nThe winner is {0100:0}!{be01}
-What a suspenseful match!\nThe winner is {0100:0}!{be01}
-I'm so happy I got to see this battle!\nBig applause for {0100:0}!{be01}
-{0100:0} won! Now we know how\nstrong Trainers and Pokémon can become!{be01}
-Is this the showdown at the summit?\n{0100:0}. Who is this person?!{be01}
-What a tremendous battle!\nThe survivor is {0100:0}!{be01}
-This battle will go down in history!\n{0100:0}'s name will be renowned!{be01}
-What a come-from-behind victory!\n{0100:0} beat the opponent!{be01}
-Give a big cheer to {0100:0}, who\ndefied all predictions and seized the win!{be01}
-{0100:0} turned the tide\nand won! Well done, {0100:0}!{be01}
-The goddess of victory smiled at\n{0100:0}. It was a glorious victory!{be01}
-The tough Trainer, cool in a pinch but hot\nas fire, is none other than {0100:0}!{be01}
+Bank0406_Text_The = The {013b:0}\n{013c:1}{be01}
+Bank0406_Text_ThesePokemonTrainersWho = These are the Pokémon Trainers\nwho entered this tournament!{be01}
+Bank0406_Text_StartsNow = The {013b:0}\nstarts now!{be01}
+Bank0406_Text_LetsMoveNextBattle = Let's move on to the next battle!{be01}
+Bank0406_Text_WhichTrainerWillWin = Which Trainer will win the\n{013b:0}?{be01}
+Bank0406_Text_FirstRoundVs = The first round...\n{0100:0} vs. {0100:1}!{be01}
+Bank0406_Text_SecondRoundVs = The second round...\n{0100:0} vs. {0100:1}!{be01}
+Bank0406_Text_FinalRoundVs = The final round...\n{0100:0} vs. {0100:1}!{be01}
+Bank0406_Text_LopsidedBattleWinner = That was a lopsided battle!\nThe winner is {0100:0}!{be01}
+Bank0406_Text_TotallyOneSidedGame = It was a totally one-sided game!\n{0100:0} won the battle!{be01}
+Bank0406_Text_OpponentCouldntMuchAll = The opponent couldn't do much at all.\nThe winner is {0100:0}!{be01}
+Bank0406_Text_NeverAnyDangerExtremely = {0100:0} was never in any danger.\nIt was an extremely easy victory!{be01}
+Bank0406_Text_OverwhelmingVictory = An overwhelming victory\nfor {0100:0}!{be01}
+Bank0406_Text_WinnerThrillingGame = The winner of this thrilling game\nis {0100:0}!{be01}
+Bank0406_Text_WhatIntenseBattleWinner = What an intense battle! The winner of this\nheated battle is {0100:0}!{be01}
+Bank0406_Text_SlightlyBetterThanOpponent = Was {0100:0} slightly better\nthan the opponent? Congratulations!{be01}
+Bank0406_Text_PulledAwayFromPersistent = {0100:0} pulled away from\nthe persistent opponent and won!{be01}
+Bank0406_Text_OneWhoWonBreathtaking = The one who won the breathtaking battle\nis {0100:0}!{be01}
+Bank0406_Text_WhatClashWillsHas = What a clash of wills! {0100:0}\nhas slightly surpassed the opponent!{be01}
+Bank0406_Text_BattleCouldHaveGone = The battle could have gone either way.\nBut the winner is {0100:0}!{be01}
+Bank0406_Text_TheyWereEvenlyMatched = They were evenly matched! The one who\nmoved a step ahead was {0100:0}!{be01}
+Bank0406_Text_JawDroppingSeesawMatch = It was a jaw-dropping seesaw match!\nThe winner is {0100:0}!{be01}
+Bank0406_Text_WhatSuspensefulMatchWinner = What a suspenseful match!\nThe winner is {0100:0}!{be01}
+Bank0406_Text_ImHappyGotSee = I'm so happy I got to see this battle!\nBig applause for {0100:0}!{be01}
+Bank0406_Text_WonNowWeKnow = {0100:0} won! Now we know how\nstrong Trainers and Pokémon can become!{be01}
+Bank0406_Text_ShowdownSummitWhoPerson = Is this the showdown at the summit?\n{0100:0}. Who is this person?!{be01}
+Bank0406_Text_WhatTremendousBattleSurvivor = What a tremendous battle!\nThe survivor is {0100:0}!{be01}
+Bank0406_Text_BattleWillGoDown = This battle will go down in history!\n{0100:0}'s name will be renowned!{be01}
+Bank0406_Text_WhatComeFromBehind = What a come-from-behind victory!\n{0100:0} beat the opponent!{be01}
+Bank0406_Text_GiveBigCheerWho = Give a big cheer to {0100:0}, who\ndefied all predictions and seized the win!{be01}
+Bank0406_Text_TurnedTideWonWell = {0100:0} turned the tide\nand won! Well done, {0100:0}!{be01}
+Bank0406_Text_GoddessVictorySmiledGlorious = The goddess of victory smiled at\n{0100:0}. It was a glorious victory!{be01}
+Bank0406_Text_ToughTrainerCoolPinch = The tough Trainer, cool in a pinch but hot\nas fire, is none other than {0100:0}!{be01}
 \pad{a2}

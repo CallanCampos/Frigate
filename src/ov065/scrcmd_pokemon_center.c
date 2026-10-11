@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/flags.h"
 #include "constants/pokemon.h"
 #include "field/field_actor.h"
 #include "field/field_script.h"
@@ -174,9 +175,23 @@ static const struct {
     u16 medal;
     u16 flag;
 } sMedalsByFlag[] = {
-    { 0x60, 0x9ad }, { 0x5b, 0x9ab }, { 0x79, 0x9ad }, { 0x7a, 0x9ad }, { 0x7b, 0x9ad }, { 0x75, 0x9ad },
-    { 0x81, 0x9ad }, { 0x84, 0x9ac }, { 0xa7, 0x9ad }, { 0xa8, 0x9ad }, { 0xac, 0x9ad }, { 0x92, 0x9a1 },
-    { 0x94, 0x9a2 }, { 0x96, 0x9a1 }, { 0x96, 0x9a2 }, { 0xad, 0x9ad }, { 0x83, 0x9ad },
+    { 0x60, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x5b, EVENT_FLAG_ARRIVED_NACRENE_CITY },
+    { 0x79, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x7a, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x7b, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x75, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x81, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x84, EVENT_FLAG_ARRIVED_CASTELIA_CITY },
+    { 0xa7, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0xa8, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0xac, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x92, 0x9a1 },
+    { 0x94, 0x9a2 },
+    { 0x96, 0x9a1 },
+    { 0x96, 0x9a2 },
+    { 0xad, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
+    { 0x83, EVENT_FLAG_ARRIVED_NIMBASA_CITY },
 };
 
 // The save keeps its original name, p_sv, which the assertion's string gives
@@ -708,8 +723,18 @@ static BOOL func_ov065_021e63a8(MedalCheckContext *ctx, GameData *gameData, u32 
 
 static BOOL func_ov065_021e63dc(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     const u32 flags[] = {
-        0x9b8, 0x9bb, 0x9b9, 0x9a5, 0x9ac, 0x9b6, 0x9a6, 0x9ad, 0x9ae, 0x9a7, 0x9af, 0x9bc,
-        0x9b5, 0x9b2, 0x9b1, 0x9ba, 0x9e2, 0x9b3, 0x9b0, 0x9ab, 0x9aa, 0x9a9, 0x9a8, 0x9b4,
+        EVENT_FLAG_ARRIVED_ASPERTIA_CITY,   EVENT_FLAG_ARRIVED_FLOCCESY_TOWN,
+        EVENT_FLAG_ARRIVED_VIRBANK_CITY,    EVENT_FLAG_ARRIVED_POKESTAR_STUDIOS,
+        EVENT_FLAG_ARRIVED_CASTELIA_CITY,   EVENT_FLAG_ARRIVED_UNITY_TOWER,
+        EVENT_FLAG_ARRIVED_JOIN_AVENUE,     EVENT_FLAG_ARRIVED_NIMBASA_CITY,
+        EVENT_FLAG_ARRIVED_DRIFTVEIL_CITY,  EVENT_FLAG_ARRIVED_PWT,
+        EVENT_FLAG_ARRIVED_MISTRALTON_CITY, EVENT_FLAG_ARRIVED_LENTIMAS_TOWN,
+        EVENT_FLAG_ARRIVED_UNDELLA_TOWN,    EVENT_FLAG_ARRIVED_LACUNOSA_TOWN,
+        EVENT_FLAG_ARRIVED_OPELUCID_CITY,   EVENT_FLAG_ARRIVED_HUMILAU_CITY,
+        EVENT_FLAG_ARRIVED_VICTORY_ROAD,    EVENT_FLAG_ARRIVED_POKEMON_LEAGUE,
+        EVENT_FLAG_ARRIVED_ICIRRUS_CITY,    EVENT_FLAG_ARRIVED_NACRENE_CITY,
+        EVENT_FLAG_ARRIVED_STRIATON_CITY,   EVENT_FLAG_ARRIVED_ACCUMULA_TOWN,
+        EVENT_FLAG_ARRIVED_NUVEMA_TOWN,     EVENT_FLAG_ARRIVED_BLACK_CITY_WHITE_FOREST,
     };
 
     return PokemonCenter_MeetsThreshold(func_ov065_021e64d8(flags, GameData_GetEventWork(gameData), NELEMS(flags)),

@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Relic Song",
+    "description": "The user sings an ancient song and attacks\nby appealing to the hearts of those\nlistening. It may also induce sleep.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_DAMAGE_INFLICT",
+    "category": "MOVE_CATEGORY_SPECIAL",
+    "power": 75,
+    "accuracy": 100,
+    "pp": 10,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_SLEEP",
+        "chance": 10,
+        "duration": 2,
+        "min_turns": 2,
+        "max_turns": 4
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_RELIC_SONG",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_ADJACENT_FOES",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE", "MOVE_FLAG_SOUND" ]
+}

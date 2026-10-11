@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Emmet",
+    "class": "TRAINER_CLASS_SUBWAY_BOSS_88",
+    "pokemon": [ "garbodor_1", "klinklang_3" ],
+    "messages": [
+        "Follow the rules.\nSafe driving!{be01}\nFollow the schedule.\nEverybody smile!{be01}\nCheck safety.\nEverything's ready!{be01}\nAim for victory!\nAll aboard!",
+        "I am Emmet.{be01}\nI won together with Ingo.{be01}\nBut if we fight again,\nwe won't know what to expect.{be01}\nThat's why we are waiting\nfor you to come back!",
+        "I am Emmet.{be01}\nI lost together with Ingo.{be01}\nYour combination is\nthe best--perfect!{be00}\nYou're verrrrry strong Trainers.{be01}\nYup! It was so much fun!"
+    ]
+}

@@ -1,0 +1,28 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jerome",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_RIOLU",
+            "form": 0,
+            "level": 11,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_QUICK_ATTACK", "MOVE_FORESIGHT", "MOVE_ENDURE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Why was I so conceited as to think I could\nshow you anything?"
+        }
+    ]
+}

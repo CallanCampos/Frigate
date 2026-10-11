@@ -36,10 +36,13 @@ GameData *GSYS_GetGameData(GameSystem *gsys);
 LinkFestival *GSYS_GetLinkFestival(GameSystem *gsys);
 BOOL GSYS_GetProcMgrState(GameSystem *gsys);
 BOOL GSYS_GetEventRunningFlag(GameSystem *gsys);
+// Whether an event is running
+BOOL GSYS_CheckNowEvent(GameSystem *gsys);
 void GSYS_QueueProc(GameSystem *gsys, s32 overlayId, const GameProcFunctions *functions, void *param);
 void GSYS_QueueProcAsEvent(GameEvent *event, s32 overlayId, const GameProcFunctions *functions, void *param);
 BOOL GSYS_TryBootGameComm(GameSystem *gsys);
 void func_02016b0c(GameSystem *gsys, u32 a1);
+u8 func_02016b14(GameSystem *gsys);
 void func_02016b24(GameSystem *gsys, u32 value);
 u8 func_02016b2c(GameSystem *gsys);
 u32 func_02016b34(GameSystem *gsys);

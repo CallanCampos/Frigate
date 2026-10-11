@@ -1,0 +1,35 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 2
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [
+            [ "SPECIES_SWANNA", 54, 54 ],
+            [ "SPECIES_SWANNA", 54, 54 ],
+            [ "SPECIES_SWANNA", 55, 55 ],
+            [ "SPECIES_SWANNA", 55, 55 ],
+            [ "SPECIES_SWANNA", 56, 56 ],
+            [ "SPECIES_SWANNA", 56, 56 ],
+            [ "SPECIES_SWANNA", 57, 57 ],
+            [ "SPECIES_SWANNA", 57, 57 ],
+            [ "SPECIES_SWANNA", 57, 57 ],
+            [ "SPECIES_SWANNA", 57, 57 ],
+            [ "SPECIES_SWANNA", 57, 57 ],
+            [ "SPECIES_SWANNA", 57, 57 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

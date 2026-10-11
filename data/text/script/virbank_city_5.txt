@@ -1,0 +1,11 @@
+VirbankCity5_Text_YoureGoingCasteliaCity = {0100:1}: You're going\nto Castelia City, right?
+VirbankCity5_Text_ImGoingLookTeam = I'm going to look for Team Plasma!\nI can't forgive those guys!{be01}
+VirbankCity5_Text_HeyCaptainShowUs = Hey, captain!\nShow us that ship you're so proud of!{be01}
+VirbankCity5_Text_ReallySomethingStillNeed = Really?{be01}\nSomething you still need to take care of?\nGo deal with it, then.{be01}\nYou know that even after we go to\nCastelia City, you can come{be00}\nback to Virbank anytime, right?
+VirbankCity5_Text_WhatCanShallWe = What can I do for you?\nShall we set sail for Castelia City?
+VirbankCity5_Text_CoursePleaseStepWay = Of course!\nPlease, step this way!{be01}
+VirbankCity5_Text_OkThenPleaseCome = OK then! Please come talk to me\nwhenever you'd like to board!
+VirbankCity5_Text_ShipCasteliaCityLeaves = The ship to Castelia City\nleaves from here!{be01}\nIt can even cross seas that are too\nrough for Pokémon to get through!
+VirbankCity5_Text_IfWantCaptainHes = If you want the captain,\nhe's in Pokéstar Studios!{be01}\nHis daughter, Roxie, is both a\nGym Leader and a band leader, you know.{be01}\nNot wanting to be outdone, he said he\nneeds to be a captain and an actor!
+VirbankCity5_Text_LifeOwnYoureFree = Your life is your own.{be01}\nYou're free to work hard at one thing\nor try many different things!
+\pad{ba}

@@ -1,0 +1,182 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Hoppip",
+    "pokedex": {
+        "category": "Cottonweed Pokémon",
+        "entry": "It drifts on winds. It is said that\nwhen Hoppip gather in fields and\nmountains, spring is on the way.",
+        "height": "1'04\"",
+        "weight": "1.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Hoppip",
+                "category": "Cottonweed Pokémon",
+                "entry": "It drifts on winds. It is said that\nwhen Hoppip gather in fields and\nmountains, spring is on the way.",
+                "height": "1'04\"",
+                "weight": "1.1 lbs."
+            },
+            "fr": {
+                "name": "Granivol",
+                "category": "Pokémon Pissenlit",
+                "entry": "Il dérive avec le vent. Sa présence\nen nombre dans les champs et les\nmontagnes annonce le printemps.",
+                "height": "0,4 m",
+                "weight": "0,5 kg"
+            },
+            "de": {
+                "name": "Hoppspross",
+                "category": "Löwenzahn",
+                "entry": "Es reitet auf dem Wind. Man sagt,\nwenn sich Hoppspross versammeln,\nkommt der Frühling bald.",
+                "height": "0,4 m",
+                "weight": "0,5 kg"
+            },
+            "it": {
+                "name": "Hoppip",
+                "category": "Pokémon Gramigna",
+                "entry": "Giunge sospinto dai venti. Si dice che\nquando Hoppip appare su campi e monti,\nla primavera sia in arrivo.",
+                "height": "0,4 m",
+                "weight": "0,5 kg"
+            },
+            "ko": {
+                "name": "통통코",
+                "category": "솜풀포켓몬",
+                "entry": "바람에 날려 떠다닌다.\n산과 들에 통통코가 모여들면\n봄이 찾아온다고 전해진다.",
+                "height": "0.4 m",
+                "weight": "0.5 kg"
+            },
+            "es": {
+                "name": "Hoppip",
+                "category": "Pokémon Algadón",
+                "entry": "Flotan en el aire. Se dice que, cuando\nlos Hoppip se reúnen, es que\nla primavera está al caer.",
+                "height": "0,4 m",
+                "weight": "0,5 kg"
+            },
+            "ja": {
+                "name": "ハネッコ",
+                "category": "わたくさポケモン",
+                "entry": "かぜに\\x{3000}ながされて\\x{3000}ただよう。\nのやまに\\x{3000}ハネッコが\\x{3000}あつまりだすと\nはるが\\x{3000}おとずれると\\x{3000}いわれている。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 35,
+        "defense": 40,
+        "speed": 50,
+        "special_attack": 35,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_GRASS", "TYPE_FLYING" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FAIRY", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_LEAF_GUARD" ],
+    "hidden_ability": "ABILITY_INFILTRATOR",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PINK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 50,
+    "height": 4,
+    "weight": 5,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SPLASH" ],
+            [ 4, "MOVE_SYNTHESIS" ],
+            [ 7, "MOVE_TAIL_WHIP" ],
+            [ 10, "MOVE_TACKLE" ],
+            [ 12, "MOVE_POISON_POWDER" ],
+            [ 14, "MOVE_STUN_SPORE" ],
+            [ 16, "MOVE_SLEEP_POWDER" ],
+            [ 19, "MOVE_BULLET_SEED" ],
+            [ 22, "MOVE_LEECH_SEED" ],
+            [ 25, "MOVE_MEGA_DRAIN" ],
+            [ 28, "MOVE_ACROBATICS" ],
+            [ 31, "MOVE_RAGE_POWDER" ],
+            [ 34, "MOVE_COTTON_SPORE" ],
+            [ 37, "MOVE_U_TURN" ],
+            [ 40, "MOVE_WORRY_SEED" ],
+            [ 43, "MOVE_GIGA_DRAIN" ],
+            [ 46, "MOVE_BOUNCE" ],
+            [ 49, "MOVE_MEMENTO" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM33",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM62",
+            "TM70",
+            "TM75",
+            "TM77",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_BOUNCE",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_CONFUSION",
+            "MOVE_ENCORE",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_AMNESIA",
+            "MOVE_HELPING_HAND",
+            "MOVE_AROMATHERAPY",
+            "MOVE_WORRY_SEED",
+            "MOVE_COTTON_GUARD",
+            "MOVE_SEED_BOMB",
+            "MOVE_ENDURE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 18,
+            "species": "SPECIES_SKIPLOOM"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_HOPPIP"
+}

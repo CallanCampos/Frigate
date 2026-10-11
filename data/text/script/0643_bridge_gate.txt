@@ -1,7 +1,0 @@
-The Marine Tube is just ahead.{be01}\nBut please wait for a little bit longer.\nJust a little bit...
-The Marine Tube is ahead!\nPlease enjoy the stunning scenery!
-Sorry, I'll be finished with the cleaning\nsoon. Please wait until then!{be01}
-The Marine Tube.{be01}\nIt's an undersea tunnel, so to speak.\nDo you know how such tunnels are made?{be01}\nIt's quite simple!\nThey're built on land{be00}\nand then sunk into the sea!{be01}\nWithout Pokémon, the construction\nwould've been impossible.
-I moved here just to be the first person\nto go through the Marine Tube.
-It's a sign that explains\nthe Marine Tube.{be01}
-\pad{6a}

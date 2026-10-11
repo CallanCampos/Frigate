@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Dan",
+    "class": "TRAINER_CLASS_LINEBACKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_SUPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_DARUMAKA",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GURDURR",
+            "form": 0,
+            "level": 33,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "POWER!!{be01}\nIf you have power that nobody can beat,\nyou can win both Pokémon battles{be00}\nand football games!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I...still don't have enough power?"
+        },
+        {
+            "type": 15,
+            "text": "I may still not have enough power,\nbut I'm not short on kindness!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Mmmm... Maybe I should\ntrain more..."
+        }
+    ]
+}

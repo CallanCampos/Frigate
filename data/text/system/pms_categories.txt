@@ -1,0 +1,15 @@
+PmsCategories_Text_Pokemon = POKÉMON
+PmsCategories_Text_Stats = STATS
+PmsCategories_Text_Move = MOVE
+PmsCategories_Text_Trainer = TRAINER
+PmsCategories_Text_Union = UNION
+PmsCategories_Text_Greetings = GREETINGS
+PmsCategories_Text_People = PEOPLE
+PmsCategories_Text_Lifestyle = LIFESTYLE
+PmsCategories_Text_Feelings = FEELINGS
+PmsCategories_Text_Animated = ANIMATED
+PmsCategories_Text_Term = TERM
+PmsCategories_Text_Connection = CONNECTION
+PmsCategories_Text_Voice = VOICE
+PmsCategories_Text_Empty = ???
+PmsCategories_Text_Empty_2 =     \x{ffff}

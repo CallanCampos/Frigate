@@ -1,7 +1,7 @@
-Please enter the Friend Code.
-Enter\nTrain Number (01-{0201:0})
-Enter\nRank (01-{0201:0})
-BACK
-OK
-There is no such Train Number.\nPlease enter a number up to {0201:0}.
-There is no such Rank.\nPlease enter a number up to {0201:0}.
+Bank0028_Text_PleaseEnterFriendCode = Please enter the Friend Code.
+Bank0028_Text_EnterTrainNumber01 = Enter\nTrain Number (01-{0201:0})
+Bank0028_Text_EnterRank01 = Enter\nRank (01-{0201:0})
+Bank0028_Text_Back = BACK
+Bank0028_Text_Ok = OK
+Bank0028_Text_ThereNoSuchTrain = There is no such Train Number.\nPlease enter a number up to {0201:0}.
+Bank0028_Text_ThereNoSuchRank = There is no such Rank.\nPlease enter a number up to {0201:0}.

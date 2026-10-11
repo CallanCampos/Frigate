@@ -1,0 +1,186 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Flygon",
+    "pokedex": {
+        "category": "Mystic Pokémon",
+        "entry": "Known as “The Desert Spirit,\"\nthis Pokémon hides in the sandstorms\nit causes by beating its wings.",
+        "height": "6'07\"",
+        "weight": "180.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Flygon",
+                "category": "Mystic Pokémon",
+                "entry": "It whips up sandstorms with\npowerful flaps of its wings. It is\nknown as “The Desert Spirit.\"",
+                "height": "6'07\"",
+                "weight": "180.8 lbs."
+            },
+            "fr": {
+                "name": "Libégon",
+                "category": "Pokémon Mystique",
+                "entry": "Son puissant battement d'ailes\nprovoque des tempêtes de sable.\nOn l'appelle “esprit du désert\".",
+                "height": "2,0 m",
+                "weight": "82,0 kg"
+            },
+            "de": {
+                "name": "Libelldra",
+                "category": "Mystik",
+                "entry": "Mit mächtigem Flügelschlag ver-\nursacht es einen Sandsturm. Es wird\n„Geist der Wüste“ genannt.",
+                "height": "2,0 m",
+                "weight": "82,0 kg"
+            },
+            "it": {
+                "name": "Flygon",
+                "category": "Pokémon Magico",
+                "entry": "Genera tempeste di sabbia con il battito\ndelle ali. È detto anche “Spirito\nprimordiale del deserto\".",
+                "height": "2,0 m",
+                "weight": "82,0 kg"
+            },
+            "ko": {
+                "name": "플라이곤",
+                "category": "혼령포켓몬",
+                "entry": "강렬한 날개를 쳐서\n모래바람을 일으킨다.\n사막의 정령이라고 불린다.",
+                "height": "2.0 m",
+                "weight": "82.0 kg"
+            },
+            "es": {
+                "name": "Flygon",
+                "category": "Pokémon Místico",
+                "entry": "Levanta tormentas de arena con\nsus alas. Se le conoce como\nel Alma del Desierto.",
+                "height": "2,0 m",
+                "weight": "82,0 kg"
+            },
+            "ja": {
+                "name": "フライゴン",
+                "category": "せいれいポケモン",
+                "entry": "きょうれつな\\x{3000}ハネの\\x{3000}はばたきで\nすなあらしを\\x{3000}おこす。\nさばくのせいれい\\x{3000}と\\x{3000}よばれる。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff18}\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 100,
+        "defense": 80,
+        "speed": 100,
+        "special_attack": 80,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_GROUND", "TYPE_DRAGON" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_LEVITATE" ],
+    "hidden_ability": "ABILITY_LEVITATE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 234,
+    "height": 20,
+    "weight": 820,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SONIC_BOOM" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 1, "MOVE_FAINT_ATTACK" ],
+            [ 1, "MOVE_SAND_TOMB" ],
+            [ 4, "MOVE_SAND_ATTACK" ],
+            [ 7, "MOVE_FAINT_ATTACK" ],
+            [ 10, "MOVE_SAND_TOMB" ],
+            [ 13, "MOVE_MUD_SLAP" ],
+            [ 17, "MOVE_BIDE" ],
+            [ 21, "MOVE_BULLDOZE" ],
+            [ 25, "MOVE_ROCK_SLIDE" ],
+            [ 29, "MOVE_SUPERSONIC" ],
+            [ 34, "MOVE_SCREECH" ],
+            [ 35, "MOVE_DRAGON_BREATH" ],
+            [ 39, "MOVE_EARTH_POWER" ],
+            [ 44, "MOVE_SANDSTORM" ],
+            [ 45, "MOVE_DRAGON_TAIL" ],
+            [ 49, "MOVE_HYPER_BEAM" ],
+            [ 55, "MOVE_DRAGON_CLAW" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM02",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM59",
+            "TM68",
+            "TM71",
+            "TM76",
+            "TM78",
+            "TM80",
+            "TM82",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM94",
+            "HM02",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_DRACO_METEOR",
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_EARTH_POWER",
+            "MOVE_SUPERPOWER",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 123,
+    "baby_species": "SPECIES_TRAPINCH"
+}

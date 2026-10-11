@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Wren",
+    "class": "TRAINER_CLASS_CLERK_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_ULTRA_BALL",
+    "party": [
+        {
+            "species": "SPECIES_CHERUBI",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SUNFLORA",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CHERRIM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My darling is working here.\nHow about that? Are you envious?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My darling is seriously the best.\nHe puts athletes to shame."
+        },
+        {
+            "type": 15,
+            "text": "Here, I'll show the greatness\nof my darling to you!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "My darling is a Janitor!\nHe cleans this entire big place{be00}\nby himself every day. Cool, huh?{be00}\nNobody else can do what he does."
+        }
+    ]
+}

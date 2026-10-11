@@ -1,0 +1,13 @@
+NimbasaCity8_Text_ThereTennisMatchSmall = There is a tennis match\nin Small Court now!
+NimbasaCity8_Text_TennisPlayersPracticingSmall = Tennis players are practicing\nin Small Court now!{be01}\nPeople can watch them practicing!
+NimbasaCity8_Text_ThereBasketballGameSmall = There is a basketball game\nin Small Court now!
+NimbasaCity8_Text_BasketballPlayersPracticingSmall = Basketball players are practicing\nin Small Court now!{be01}\nPeople can watch them practicing!
+NimbasaCity8_Text_WeLoveSportsWatching = We love sports.\nWatching games is great, but we enjoy{be00}\nwatching practices, too!
+NimbasaCity8_Text_NewStylesBasketballTennis = New styles of basketball and tennis\ncreated by people and Pokémon...{be00}\nThese may be advanced forms of sports.
+NimbasaCity8_Text_IfSpeakAthletesDuring = If you speak to athletes during a\npractice, they may challenge you to a{be00}\nPokémon battle!
+NimbasaCity8_Text_FirstRankSmashersWaiting = First-rank Smashers are waiting for you\nin the court with their Pokémon!
+NimbasaCity8_Text_FirstRankHoopstersWaiting = First-rank Hoopsters are waiting for you\nin the court with their Pokémon!
+NimbasaCity8_Text_AmSorryButCannot = I am sorry.{be01}\nBut you cannot enter the court\nbecause a game is in progress.
+NimbasaCity8_Text_AmSorryButCannot_2 = I am sorry.{be01}\nBut you cannot enter the court\nbecause a game is in progress.
+NimbasaCity8_Text_AmSorryButCannot_3 = I am sorry.{be01}\nBut you cannot enter the court\nbecause a game is in progress.
+\pad{10}

@@ -1,4 +1,6 @@
 #include "field/union_app.h"
+#include "field/union_comm.h"
+#include "field/union_main.h"
 #include "types.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
@@ -41,7 +43,7 @@ void UnionApp_Free(UnionApp *app) {
     GFL_HeapFree(app);
 }
 
-BOOL UnionApp_RequestEntry(UnionApp *app, int netId) {
+BOOL UnionApp_RequestEntry(UnionApp *app, u8 netId) {
     u32 joined;
 
     if (app->entryMode == UNION_APP_ENTRY_CLOSED) {
@@ -69,13 +71,13 @@ void UnionApp_Update(UnionApp *app, UnionSystem *sys) {
         return;
     }
     if (app->startRequested == TRUE) {
-        func_ov028_021704bc(sys);
+        UnionComm_RequestLink1(sys);
         app->startRequested = FALSE;
         app->starting = TRUE;
         return;
     }
     if (app->starting == TRUE) {
-        if (!func_ov028_021704ec(sys)) {
+        if (!UnionComm_IsLinkRequested(sys)) {
             app->starting = FALSE;
             app->started = TRUE;
         }
@@ -202,7 +204,7 @@ static void UnionApp_CheckProfileLeft(UnionApp *app, UnionSystem *sys) {
                 app->status.joined &= 0xff ^ bit;
                 app->hasProfile &= 0xff ^ bit;
             }
-            func_ov028_02170d98(sys->unk2830.unk14, app->members[i].mac);
+            UnionGroup_RemoveMember(&sys->situ.mycomm, app->members[i].mac);
         }
     }
 }
@@ -217,7 +219,7 @@ static void UnionApp_CheckEnteringLeft(UnionApp *app, UnionSystem *sys) {
             app->entering ^= bit;
             if (app->hasProfile & bit) {
                 app->hasProfile &= 0xff ^ bit;
-                func_ov028_02170d98(sys->unk2830.unk14, app->members[i].mac);
+                UnionGroup_RemoveMember(&sys->situ.mycomm, app->members[i].mac);
             }
             if (app->entryMode == UNION_APP_ENTRY_LIMITED && app->entryCount != 0) {
                 app->entryCount--;
@@ -226,7 +228,7 @@ static void UnionApp_CheckEnteringLeft(UnionApp *app, UnionSystem *sys) {
     }
 }
 
-void UnionApp_Enqueue(UnionApp *app, int netId) {
+void UnionApp_Enqueue(UnionApp *app, u8 netId) {
     app->queued |= 1 << netId;
 }
 
@@ -238,7 +240,7 @@ u8 func_ov069_0217cd64(UnionApp *app) {
     return app->unk12;
 }
 
-void UnionApp_RequestSendStatus(UnionApp *app, int netId) {
+void UnionApp_RequestSendStatus(UnionApp *app, u8 netId) {
     app->statusSendTo |= 1 << netId;
 }
 
@@ -246,17 +248,17 @@ void UnionApp_ReceiveStatus(UnionApp *app, const UnionAppStatus *status) {
     sys_memcpy(status, &app->status, sizeof(UnionAppStatus));
 }
 
-void UnionApp_RequestSendProfile(UnionApp *app, int netId) {
+void UnionApp_RequestSendProfile(UnionApp *app, u8 netId) {
     app->profileSendTo |= 1 << netId;
 }
 
-void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, int netId, UnionAppMember *member) {
-    UnionSystemUnk2830 *unk2830 = &sys->unk2830;
+void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, u8 netId, UnionAppMember *member) {
+    UnionSelf *self = &sys->situ;
 
     app->members[netId] = *member;
     app->hasProfile |= 1 << netId;
     if (netId != func_02042a6c(func_02040440())) {
-        func_ov028_02170d00(unk2830->unk14, member->mac, func_02008bf4(&member->info), getTrainerGender(&member->info));
+        UnionGroup_AddMember(&self->mycomm, member->mac, func_02008bf4(&member->info), getTrainerGender(&member->info));
     }
 }
 
@@ -280,7 +282,7 @@ BOOL UnionApp_AllProfilesReceived(UnionApp *app) {
     return TRUE;
 }
 
-void UnionApp_ConfirmEntry(UnionApp *app, int netId) {
+void UnionApp_ConfirmEntry(UnionApp *app, u8 netId) {
     if (func_02042bc4() == TRUE) {
         int bit = 1 << netId;
 
@@ -363,7 +365,7 @@ BOOL UnionApp_IsStarted(UnionApp *app) {
     return app->started;
 }
 
-UnionAppMember *UnionApp_GetMember(UnionApp *app, int netId) {
+UnionAppMember *UnionApp_GetMember(UnionApp *app, u8 netId) {
     int bit = 1 << netId;
 
     if (!(app->hasProfile & bit) || !(app->status.joined & bit)) {

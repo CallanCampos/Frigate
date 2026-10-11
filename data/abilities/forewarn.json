@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Forewarn",
+    "description": "Determines what moves\na foe has."
+}

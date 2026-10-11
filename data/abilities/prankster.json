@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Prankster",
+    "description": "Gives priority to a\nstatus move."
+}

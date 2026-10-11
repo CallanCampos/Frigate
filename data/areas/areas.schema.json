@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "The areas: data/areas/areas.json",
+    "description": "The area records (file a/0/1/3, AreaData in include/system/area_data.h), which name the graphics zones share; a zone's header names its area by its number, and an area with seasons has a record per season after it (AreaData_Create). tools/data/area_data.py packs them in order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "areas" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "areas": {
+            "type": "array",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "prop_bundle", "texture_set", "srt_animation", "pattern_animation", "exterior", "lights", "edge_color_table", "actor_material_color" ],
+                "properties": {
+                    "prop_bundle": { "$ref": "#/$defs/u16", "description": "The area's props, a file of ARCID_AREA_BMDATA_EXT or ARCID_AREA_BMDATA_INT" },
+                    "texture_set": { "$ref": "#/$defs/u16" },
+                    "srt_animation": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 254, "description": "null for none (AREA_ANM_NONE)" },
+                    "pattern_animation": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 254, "description": "null for none (AREA_ANM_NONE)" },
+                    "exterior": { "type": "boolean", "description": "Whether the area is outdoors, which picks the props' archive" },
+                    "lights": { "$ref": "#/$defs/u8" },
+                    "edge_color_table": { "$ref": "#/$defs/u8" },
+                    "actor_material_color": { "$ref": "#/$defs/u8" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "u16": { "type": "integer", "minimum": 0, "maximum": 65535 }
+    }
+}

@@ -1,22 +1,22 @@
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}The daily patrol...\n{bd02}This is one of a UDF officer's\n{bd02}most important duties...
-{bd02}During his patrol of the shore,\n{bd02}a scream echoed from the docks...\n\n{bd02}The young recruit {0100:1}\n{bd02}hurried to the scene.
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}The daily patrol...\n{bd02}This is one of a UDF officer's\n{bd02}most important duties...
-{bd02}During her patrol of the shore,\n{bd02}a scream echoed from the docks...\n\n{bd02}The young recruit {0100:1}\n{bd02}hurried to the scene.
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0279_Text_UnovaDefenseForceUdf = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0279_Text_StoryTheirValiantStruggle = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0279_Text_DailyPatrolOneUdf = {bd02}The daily patrol...\n{bd02}This is one of a UDF officer's\n{bd02}most important duties...
+Bank0279_Text_DuringHisPatrolShore = {bd02}During his patrol of the shore,\n{bd02}a scream echoed from the docks...\n\n{bd02}The young recruit {0100:1}\n{bd02}hurried to the scene.
+Bank0279_Text_Empty = なし
+Bank0279_Text_Empty_2 = なし
+Bank0279_Text_Empty_3 = なし
+Bank0279_Text_Empty_4 = なし
+Bank0279_Text_Empty_5 = なし
+Bank0279_Text_Empty_6 = なし
+Bank0279_Text_UnovaDefenseForceUdf_2 = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0279_Text_StoryTheirValiantStruggle_2 = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0279_Text_DailyPatrolOneUdf_2 = {bd02}The daily patrol...\n{bd02}This is one of a UDF officer's\n{bd02}most important duties...
+Bank0279_Text_DuringHerPatrolShore = {bd02}During her patrol of the shore,\n{bd02}a scream echoed from the docks...\n\n{bd02}The young recruit {0100:1}\n{bd02}hurried to the scene.
+Bank0279_Text_Empty_7 = なし
+Bank0279_Text_Empty_8 = なし
+Bank0279_Text_Empty_9 = なし
+Bank0279_Text_Empty_10 = なし
+Bank0279_Text_Empty_11 = なし
+Bank0279_Text_Empty_12 = なし
+Bank0279_Text_Empty_13 = なし
 \pad{b4}

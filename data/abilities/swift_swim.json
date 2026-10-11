@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Swift Swim",
+    "description": "Boosts the Pokémon's\nSpeed in rain."
+}

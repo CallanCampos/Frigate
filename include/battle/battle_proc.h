@@ -24,7 +24,7 @@ typedef struct {
 typedef struct {
     BattlePlayer players[4];
     u32 result;
-    u32 unk44;
+    u32 unk44; // 3 when every player has a party, else 1 (Colosseum_BuildBattlePlayers)
     u32 rule;
     u32 unk4C;
 } BattlePlayers;

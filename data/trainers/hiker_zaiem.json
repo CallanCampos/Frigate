@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Zaiem",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HIPPOWDON",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_RHYDON",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAROWAK",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "We feel filled with power when we're\nsurrounded by our beloved stone!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh stones!\nThis can't be stooone!"
+        },
+        {
+            "type": 2,
+            "text": "I'm not the only one who gets excited by\nall this stone--my Pokémon do, too!"
+        }
+    ]
+}

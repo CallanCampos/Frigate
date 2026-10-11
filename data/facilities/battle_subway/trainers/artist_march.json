@@ -1,0 +1,24 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "March",
+    "class": "TRAINER_CLASS_ARTIST",
+    "pokemon": [
+        "forretress_2",
+        "spiritomb_2",
+        "drifblim_2",
+        "claydol_2",
+        "bronzong_2",
+        "porygon2_2",
+        "starmie_2",
+        "klinklang_2",
+        "probopass_2",
+        "magnezone_2",
+        "porygon_z_2",
+        "metagross_2"
+    ],
+    "messages": [
+        "Our job is hard,\n'cause it's such physical work.",
+        "My work gave me these great muscles.",
+        "Don't underestimate the power of kids.\nLike I did with you!"
+    ]
+}

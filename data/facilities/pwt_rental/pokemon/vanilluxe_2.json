@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VANILLUXE",
+    "moves": [ "MOVE_AVALANCHE", "MOVE_ICE_SHARD", "MOVE_NATURAL_GIFT", "MOVE_GIGA_IMPACT" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_OCCA_BERRY",
+    "form": 0
+}

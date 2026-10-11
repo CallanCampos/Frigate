@@ -1,8 +1,10 @@
 // The battle facilities' tools: their trainers, Pokémon and battles, for the Battle Subway and the Trial House.
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/arc.h"
 #include "battle/btl_setup.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "field/battle_facility.h"
 #include "field/bsubway_scr.h"
 #include "field/field.h"
@@ -348,7 +350,7 @@ u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pi
     }
     pkm->ability = ability;
     pkm->happiness = happiness;
-    msgData = GFL_MsgSysLoadData(FALSE, 2, 0x5a, heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, heapId);
     GFL_MsgDataLoadRawStr(msgData, pkm->species, pkm->nickname, NELEMS(pkm->nickname));
     GFL_MsgDataFree(msgData);
     return personality;
@@ -447,7 +449,7 @@ BOOL func_ov012_02162864(BSubwayTrainer *trainer, u16 trainerId, u32 count, cons
 }
 
 void *func_ov012_021628c0(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16 msgFile, HeapID heapId) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, msgFile, heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, msgFile, heapId);
     u16 *trainerData;
     StrBuf *name;
 
@@ -587,7 +589,7 @@ u16 func_ov012_02162b28(u32 arcId, u16 file, HeapID heapId) {
     return trainerClass;
 }
 
-u32 func_ov012_02162b38(u16 trainerClass) {
+u32 func_ov012_02162b38(u32 trainerClass) {
     u32 i;
 
     for (i = 0; i < NELEMS(data_ov012_0216d9b4); i++) {

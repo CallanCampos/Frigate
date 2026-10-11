@@ -1,8 +1,0 @@
-       \x{ffff}
-Hey, Trainer!\nThe move I recommend for you{be00}\nis none other than Bug Bite!{be01}\nWhen Bug Bite hits a target,\nyou can steal any Berry it's holding{be00}\nand use the effect for yourself!{be01}\nIf the user steals an Oran Berry\nor a Sitrus Berry, the user will not only{be00}\ndo damage, but it will heal itself as well!{be01}\nIt's doubly effective!
-Hey, Trainer!\nThe move I recommend for you{be00}\nis none other than Covet!{be01}\nWhen a Pokémon hits a target\nwith Covet, it can steal the{be00}\nitem the target is holding!{be01}\nIf you steal a held item from a\nwild Pokémon, that item becomes{be00}\nyours when the battle ends!
-Hey, Trainer!\nThe move I recommend for you{be00}\nis none other than Super Fang!{be01}\nSuper Fang halves the target's HP!{be01}\nThe user can do a consistent amount\nof damage even if it has low Attack{be00}\nor the target has high Defense!
-Hey, Trainer!\nThe move I recommend for you{be00}\nis none other than Low Kick!{be01}\nThe heavier the target,\nthe more damage Low Kick does!{be01}\nIt's a Fighting-type move,\nso it works well against{be00}\nRock- and Steel-type Pokémon,{be00}\nwhich are often heavy!
-Hey, Trainer!\nThe move I recommend for you{be00}\nis none other than Uproar!{be01}\nUproar does damage for\nthree turns after one use!{be01}\nA Pokémon that's in an uproar\ncan't use any other moves,{be00}\nand no Pokémon in battle can sleep!{be01}\nWhether that's an advantage or\ndisadvantage is up to you!
-Welcome to the Driftveil Chateau Hotel.\nWe're currently all booked up,{be00}\nbut feel free to enjoy the ambiance.
-\pad{dc}

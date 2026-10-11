@@ -1,21 +1,21 @@
-{bd02}A mysterious man named River\n{bd02}stole the Poké Ball with Monica in it,\n{bd02}and he ran away...
-{bd02}When I took off after him,\n{bd02}I saw something that\n{bd02}I could not believe...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}A mysterious man named River\n{bd02}stole the Poké Ball with my sister in it,\n{bd02}and he ran away...
-{bd02}When I took off after him,\n{bd02}I saw something that\n{bd02}I could not believe...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0293_Text_MysteriousManNamedRiver = {bd02}A mysterious man named River\n{bd02}stole the Poké Ball with Monica in it,\n{bd02}and he ran away...
+Bank0293_Text_WhenTookOffAfter = {bd02}When I took off after him,\n{bd02}I saw something that\n{bd02}I could not believe...
+Bank0293_Text_Empty = なし
+Bank0293_Text_Empty_2 = なし
+Bank0293_Text_Empty_3 = なし
+Bank0293_Text_Empty_4 = なし
+Bank0293_Text_Empty_5 = なし
+Bank0293_Text_Empty_6 = なし
+Bank0293_Text_Empty_7 = なし
+Bank0293_Text_Empty_8 = なし
+Bank0293_Text_MysteriousManNamedRiver_2 = {bd02}A mysterious man named River\n{bd02}stole the Poké Ball with my sister in it,\n{bd02}and he ran away...
+Bank0293_Text_WhenTookOffAfter_2 = {bd02}When I took off after him,\n{bd02}I saw something that\n{bd02}I could not believe...
+Bank0293_Text_Empty_9 = なし
+Bank0293_Text_Empty_10 = なし
+Bank0293_Text_Empty_11 = なし
+Bank0293_Text_Empty_12 = なし
+Bank0293_Text_Empty_13 = なし
+Bank0293_Text_Empty_14 = なし
+Bank0293_Text_Empty_15 = なし
+Bank0293_Text_Empty_16 = なし
+Bank0293_Text_Empty_17 = なし

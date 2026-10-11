@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Cross Poison",
+    "description": "A slashing attack with a poisonous blade\nthat may also leave the target poisoned.\nCritical hits land more easily.",
+    "type": "TYPE_POISON",
+    "quality": "MOVE_QUALITY_DAMAGE_INFLICT",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 70,
+    "accuracy": 100,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_POISON",
+        "chance": 10,
+        "duration": 1,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 1,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_HIGH_CRITICAL_POISON_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

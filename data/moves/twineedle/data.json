@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Twineedle",
+    "description": "The user damages the target twice in\nsuccession by jabbing it with two spikes.\nIt may also poison the target.",
+    "type": "TYPE_BUG",
+    "quality": "MOVE_QUALITY_DAMAGE_INFLICT",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 25,
+    "accuracy": 100,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 2,
+        "max": 2
+    },
+    "inflicts": {
+        "condition": "CONDITION_POISON",
+        "chance": 20,
+        "duration": 1,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_POISON_MULTI_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

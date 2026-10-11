@@ -105,6 +105,7 @@ void FieldCamera_SetTransformType(FieldCamera *camera, u32 type);
 void FieldCamera_LoadDefaults(FieldCamera *camera);
 void FieldCamera_DisableDelay(FieldCamera *camera);
 void FieldCamera_SetDefaultsIndex(FieldCamera *camera, u32 index);
+u32 FieldCamera_GetDefaultsIndex(FieldCamera *camera);
 void FieldCamera_EnableDelay(FieldCamera *camera);
 // Whether the camera has a delay it can finish
 BOOL FieldCamera_SupportsDelay(FieldCamera *camera);

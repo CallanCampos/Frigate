@@ -1,14 +1,17 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "constants/arc.h"
+#include "app/ui/touchbar.h"
 #include "app/pokemon_trade_local.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
 #include "gfl/dwc_rap.h"
+#include "gfl/dwc_rapcommon.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"
@@ -95,7 +98,7 @@ static void func_ov194_021bdb1c(PokemonTradeWork *wk);
 static void func_ov194_021bdb64(PokemonTradeWork *wk);
 static void func_ov194_021bdba8(PokemonTradeWork *wk);
 static void func_ov194_021bdc50(PokemonTradeWork *wk);
-static void func_ov194_021bdca4(void *work, int a1, int code);
+static void func_ov194_021bdca4(void *work, int a1, int code, int error);
 static void func_ov194_021bdcc4(PokemonTradeWork *wk);
 static void func_ov194_021bde60(PokemonTradeWork *wk);
 static void func_ov194_021bdf10(PokemonTradeWork *wk);
@@ -501,7 +504,7 @@ static void func_ov194_021bc7f8(PokemonTradeWork *wk) {
 static void func_ov194_021bc87c(PokemonTradeWork *wk) {
     u32 items[] = { 3, 5 };
     func_ov194_021c0214(wk, items, NELEMS(items));
-    func_ov139_02199d18(wk->touchBar, 1, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, 1, FALSE);
     PokemonTrade_SetState(wk, func_ov194_021bc7f8);
 }
 
@@ -678,7 +681,7 @@ static void func_ov194_021bccd0(PokemonTradeWork *wk) {
         u32 items[] = { 4, 5 };
         func_ov194_021c0214(wk, items, NELEMS(items));
         GFL_BGSysSetEnabledBGsA(0x1f);
-        func_ov139_02199d18(wk->touchBar, 1, FALSE);
+        TouchBar_SetIconVisible(wk->touchBar, 1, FALSE);
         PokemonTrade_SetState(wk, func_ov194_021bcc7c);
     }
 }
@@ -846,13 +849,13 @@ static void func_ov194_021bd190(PokemonTradeWork *wk) {
     if (!GFL_WipeIsFinished()) {
         return;
     }
-    func_ov139_02199b90(wk->touchBar);
-    if (func_ov139_02199c08(wk->touchBar) == 1) {
+    TouchBar_Main(wk->touchBar);
+    if (TouchBar_GetDecided(wk->touchBar) == 1) {
         GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
         PokemonTrade_SetState(wk, func_ov194_021bd06c);
         return;
     }
-    if (func_ov139_02199c30(wk->touchBar) != -1) {
+    if (TouchBar_GetTouched(wk->touchBar) != -1) {
         return;
     }
     index = func_0203da0c(sNegoPkmRects);
@@ -914,7 +917,7 @@ static void func_ov194_021bd36c(PokemonTradeWork *wk) {
             break;
         case 1:
             GFL_WipeSet(3, 0, 0, 0, 6, 1, wk->heapId);
-            func_ov139_02199d08(wk->touchBar, 1, FALSE);
+            TouchBar_SetIconActive(wk->touchBar, 1, FALSE);
             PokemonTrade_SetState(wk, func_ov194_021bd2c0);
             break;
         case 2:
@@ -930,7 +933,7 @@ static void func_ov194_021bd36c(PokemonTradeWork *wk) {
 static void func_ov194_021bd414(PokemonTradeWork *wk) {
     u32 items[] = { 4, 3, 5 };
     func_ov194_021c0214(wk, items, NELEMS(items));
-    func_ov139_02199d18(wk->touchBar, 1, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, 1, FALSE);
     PokemonTrade_SetState(wk, func_ov194_021bd36c);
 }
 
@@ -970,7 +973,7 @@ static BOOL func_ov194_021bd4fc(PokemonTradeWork *wk, int index) {
             if (pkm != NULL && PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
                 wk->cursor = index;
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
-                func_ov139_02199d18(wk->touchBar, 1, FALSE);
+                TouchBar_SetIconVisible(wk->touchBar, 1, FALSE);
                 if (side != 0) {
                     PokemonTrade_SetState(wk, func_ov194_021bc87c);
                 } else {
@@ -1058,16 +1061,16 @@ static void func_ov194_021bd790(PokemonTradeWork *wk) {
 
 static void func_ov194_021bd7cc(PokemonTradeWork *wk) {
     int index;
-    func_ov139_02199b90(wk->touchBar);
-    if (func_ov139_02199c08(wk->touchBar) == 1) {
+    TouchBar_Main(wk->touchBar);
+    if (TouchBar_GetDecided(wk->touchBar) == 1) {
         GFL_MsgDataLoadStrbuf(wk->msgData, 149, wk->strbuf);
         func_ov194_021bfe28(wk);
-        func_ov139_02199d08(wk->touchBar, 1, FALSE);
+        TouchBar_SetIconActive(wk->touchBar, 1, FALSE);
         func_ov194_021bbe30(wk);
         PokemonTrade_SetState(wk, func_ov194_021bd790);
         return;
     }
-    if (func_ov139_02199c30(wk->touchBar) != -1) {
+    if (TouchBar_GetTouched(wk->touchBar) != -1) {
         return;
     }
     index = func_0203da0c(sNegoPkmRects);
@@ -1158,8 +1161,8 @@ static void func_ov194_021bda48(PokemonTradeWork *wk) {
     func_ov194_021bc2d0(wk, 1);
     GFL_BGSysFillScrAsync(6, 0);
     func_0204c124(wk->actors[2], FALSE);
-    func_ov139_02199d18(wk->touchBar, 1, TRUE);
-    func_ov139_02199d08(wk->touchBar, 1, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, 1, TRUE);
+    TouchBar_SetIconActive(wk->touchBar, 1, FALSE);
     func_ov194_021c12ec(wk, 6);
     wk->unk108C = 0;
     wk->unk1084 = 1;
@@ -1230,19 +1233,19 @@ static void func_ov194_021bdc50(PokemonTradeWork *wk) {
     if (func_02042be8(handle, TRADE_NET_CMD_CHECK_RESULT, 1, &wk->checkResult)) {
         func_02040624(func_02040440(), 0x15, 8);
         if (wk->type == 2) {
-            func_ov011_021516a0(FALSE);
+            DWCRap_SetMic(FALSE);
         }
         PokemonTrade_SetState(wk, func_ov194_021bdba8);
     }
 }
 
-static void func_ov194_021bdca4(void *work, int a1, int code) {
+static void func_ov194_021bdca4(void *work, int a1, int code, int error) {
     PokemonTradeWork *wk = work;
     if (wk->unk0 != NULL) {
-        func_ov189_0219d124(wk->unk0);
-        func_ov189_0219d1f0(wk->unk0);
+        NHttpRap_EndRequest(wk->unk0);
+        NHttpRap_Destroy(wk->unk0);
         wk->unk0 = NULL;
-        func_ov011_02152158();
+        DWCRapCommon_EndSubHeap();
     }
 }
 
@@ -1251,18 +1254,18 @@ static void func_ov194_021bdcc4(PokemonTradeWork *wk) {
     int i;
     u8 count = 0;
     void *response;
-    int status = func_ov189_0219d3a8(wk->unk0);
-    int result = func_ov189_0219d140(wk->unk0);
+    int status = NHttpRap_GetStatus(wk->unk0);
+    int result = NHttpRap_Poll(wk->unk0);
     if (result == 0 && status == 200) {
-        response = func_ov189_0219d1a4(wk->unk0);
-        wk->checkResult = func_ov189_0219d3e4(response);
+        response = NHttpRap_GetAnswer(wk->unk0);
+        wk->checkResult = NHttpRap_GetCheckStatus(response);
         if (wk->checkResult == 1 && wk->unk109A == 0) {
             for (i = 0; i < 3; i++) {
                 if (func_ov194_021b774c((u8 *)wk->negoPkm[1][i])) {
                     PartyPkm *pkm = wk->negoPkm[1][i];
-                    if (func_ov189_0219d3e8(response, count)) {
+                    if (NHttpRap_GetCheckResult(response, count)) {
                         u32 item = PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);
-                        MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, 101, wk->heapId);
+                        MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, wk->heapId);
                         StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, MSG_INVALID_PKM_TRAINER);
                         GFL_MsgDataFree(msgData);
                         if (PML_ItemIsMail(item)) {
@@ -1304,15 +1307,15 @@ static void func_ov194_021bdcc4(PokemonTradeWork *wk) {
             break;
         }
         wk->checkResult = error;
-        func_ov189_0219d124(wk->unk0);
+        NHttpRap_EndRequest(wk->unk0);
         PokemonTrade_SetState(wk, func_ov194_021bdc50);
     }
     if (wk->unk0 != NULL) {
-        func_ov189_0219d384(wk->unk0);
-        func_ov189_0219d1f0(wk->unk0);
+        NHttpRap_FreePostData(wk->unk0);
+        NHttpRap_Destroy(wk->unk0);
         wk->unk0 = NULL;
-        func_ov011_02152158();
-        func_ov011_02152040(NULL, NULL);
+        DWCRapCommon_EndSubHeap();
+        DWCRap_SetErrorFunc(NULL, NULL);
     }
 }
 
@@ -1320,22 +1323,22 @@ static void func_ov194_021bdcc4(PokemonTradeWork *wk) {
 static void func_ov194_021bde60(PokemonTradeWork *wk) {
     int i;
     int count = 0;
-    func_ov011_021520a0(13, 0x10000, wk->heapId);
-    wk->unk0 = func_ov189_0219d1b8(wk->heapId, func_02008bdc(wk->myInfo), wk->param->buffer);
-    func_ov011_02152040(func_ov194_021bdca4, wk);
+    DWCRapCommon_SetSubHeap(13, 0x10000, wk->heapId);
+    wk->unk0 = NHttpRap_Create(wk->heapId, func_02008bdc(wk->myInfo), wk->param->buffer);
+    DWCRap_SetErrorFunc(func_ov194_021bdca4, wk);
     for (i = 0; i < 3; i++) {
         if (func_ov194_021b774c((u8 *)wk->negoPkm[1][i])) {
             count++;
         }
     }
-    func_ov189_0219d258(wk->unk0, wk->heapId, PokeParty_GetPkmRawSize() * count, 2);
+    NHttpRap_BeginPost(wk->unk0, wk->heapId, PokeParty_GetPkmRawSize() * count, 2);
     for (i = 0; i < 3; i++) {
         if (func_ov194_021b774c((u8 *)wk->negoPkm[1][i])) {
-            func_ov189_0219d290(wk->unk0, wk->negoPkm[1][i], PokeParty_GetPkmRawSize());
+            NHttpRap_AddPostData(wk->unk0, wk->negoPkm[1][i], PokeParty_GetPkmRawSize());
         }
     }
-    func_ov189_0219d2b0(wk->unk0);
-    func_ov189_0219d0f8(wk->unk0);
+    NHttpRap_SendValidate(wk->unk0);
+    NHttpRap_StartRequest(wk->unk0);
     PokemonTrade_SetState(wk, func_ov194_021bdcc4);
 }
 
@@ -1358,7 +1361,7 @@ static void func_ov194_021bdf10(PokemonTradeWork *wk) {
 static void func_ov194_021bdf70(PokemonTradeWork *wk) {
     GFL_WipeSet(4, 0, 0, 0, 6, 1, wk->heapId);
     if (wk->type == 2) {
-        func_ov011_021516a0(TRUE);
+        DWCRap_SetMic(TRUE);
     }
     PokemonTrade_SetState(wk, func_ov194_021bdf10);
 }
@@ -1518,7 +1521,7 @@ static void func_ov194_021be344(PokemonTradeWork *wk) {
 void func_ov194_021be380(PokemonTradeWork *wk) {
     GFL_MsgDataLoadStrbuf(wk->msgData, 136, wk->strbuf);
     func_ov194_021bfe28(wk);
-    func_ov139_02199d08(wk->touchBar, 1, FALSE);
+    TouchBar_SetIconActive(wk->touchBar, 1, FALSE);
     PokemonTrade_SetState(wk, func_ov194_021be344);
     func_ov194_021c14b0(wk);
 }

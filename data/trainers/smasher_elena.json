@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Elena",
+    "class": "TRAINER_CLASS_SMASHER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_POTION",
+    "party": [
+        {
+            "species": "SPECIES_BLITZLE",
+            "form": 0,
+            "level": 26,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "An elegant Smasher\nhas an elegant battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "E-e-even though I lost,\nI won't panic."
+        },
+        {
+            "type": 15,
+            "text": "I panicked!\nHere, I'll give you this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Because I am a lady, I won't\nbe chagrined at losing the battle!"
+        }
+    ]
+}

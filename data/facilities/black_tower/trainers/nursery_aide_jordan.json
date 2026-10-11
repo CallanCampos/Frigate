@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Jordan",
+    "class": "TRAINER_CLASS_NURSERY_AIDE",
+    "pokemon": [
+        "wooper_1",
+        "makuhita_1",
+        "whismur_1",
+        "marill_1",
+        "bidoof_1",
+        "hoothoot_1",
+        "jigglypuff_1",
+        "spheal_1",
+        "munna_1",
+        "shroomish_1",
+        "snorunt_1",
+        "gulpin_1",
+        "tepig_1",
+        "slowpoke_1",
+        "clefairy_1",
+        "grimer_1",
+        "shellos_1",
+        "chinchou_1",
+        "phanpy_1",
+        "drifloon_1"
+    ]
+}

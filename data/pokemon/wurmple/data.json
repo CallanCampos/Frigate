@@ -1,0 +1,129 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Wurmple",
+    "pokedex": {
+        "category": "Worm Pokémon",
+        "entry": "Often targeted by bird Pokémon,\nit desperately resists by releasing\npoison from its tail spikes.",
+        "height": "1'00\"",
+        "weight": "7.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Wurmple",
+                "category": "Worm Pokémon",
+                "entry": "Often targeted by bird Pokémon,\nit desperately resists by releasing\npoison from its tail spikes.",
+                "height": "1'00\"",
+                "weight": "7.9 lbs."
+            },
+            "fr": {
+                "name": "Chenipotte",
+                "category": "Pokémon Ver",
+                "entry": "Cible favorite des Pokémon Oiseaux,\nil tente de se protéger avec ses\népines venimeuses.",
+                "height": "0,3 m",
+                "weight": "3,6 kg"
+            },
+            "de": {
+                "name": "Waumpel",
+                "category": "Wurm",
+                "entry": "Es wird oft von Vogel-Pokémon\nangegriffen, wehrt sich aber mit\nGift aus seinen Schwanzspitzen.",
+                "height": "0,3 m",
+                "weight": "3,6 kg"
+            },
+            "it": {
+                "name": "Wurmple",
+                "category": "Pokémon Baco",
+                "entry": "Viene spesso attaccato dai Pokémon\nuccello. Si difende emettendo veleno\ndagli aculei che ha sulla coda.",
+                "height": "0,3 m",
+                "weight": "3,6 kg"
+            },
+            "ko": {
+                "name": "개무소",
+                "category": "애벌레포켓몬",
+                "entry": "새 포켓몬에게 자주 표적이 되지만\n엉덩이의 가시에서 독을 내서\n필사적으로 저항한다.",
+                "height": "0.3 m",
+                "weight": "3.6 kg"
+            },
+            "es": {
+                "name": "Wurmple",
+                "category": "Pokémon Gusano",
+                "entry": "Es el blanco favorito de muchos\nPokémon pájaro. Se defiende con\nel veneno de las púas de su cola.",
+                "height": "0,3 m",
+                "weight": "3,6 kg"
+            },
+            "ja": {
+                "name": "ケムッソ",
+                "category": "いもむしポケモン",
+                "entry": "とりポケモンに\\x{3000}よく\\x{3000}ねらわれるが\nおしりの\\x{3000}トゲから\\x{3000}どくをだし\nひっしになって\\x{3000}ていこうする。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 45,
+        "defense": 35,
+        "speed": 20,
+        "special_attack": 20,
+        "special_defense": 30
+    },
+    "types": [ "TYPE_BUG", "TYPE_BUG" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SHIELD_DUST", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_RUN_AWAY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 39,
+    "height": 3,
+    "weight": 36,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_STRING_SHOT" ],
+            [ 5, "MOVE_POISON_STING" ],
+            [ 15, "MOVE_BUG_BITE" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [ "MOVE_BUG_BITE", "MOVE_ELECTROWEB", "MOVE_SNORE" ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL_PERSONALITY_LOW",
+            "param": 7,
+            "species": "SPECIES_SILCOON"
+        },
+        {
+            "method": "EVO_METHOD_LEVEL_PERSONALITY_HIGH",
+            "param": 7,
+            "species": "SPECIES_CASCOON"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WURMPLE"
+}

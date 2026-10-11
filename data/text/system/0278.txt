@@ -1,21 +1,21 @@
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}Along the coastline,\n{bd02}a mysterious giant organism\n{bd02}suddenly appeared...
-{bd02}To find out its true identity,\n{bd02}the young recruit {0100:1}\n{bd02}hurried to the scene.
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
-{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}Along the coastline,\n{bd02}a mysterious giant organism\n{bd02}suddenly appeared...
-{bd02}To find out its true identity,\n{bd02}the young recruit {0100:1}\n{bd02}hurried to the scene.
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0278_Text_UnovaDefenseForceUdf = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0278_Text_StoryTheirValiantStruggle = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0278_Text_AlongCoastlineMysteriousGiant = {bd02}Along the coastline,\n{bd02}a mysterious giant organism\n{bd02}suddenly appeared...
+Bank0278_Text_FindOutItsTrue = {bd02}To find out its true identity,\n{bd02}the young recruit {0100:1}\n{bd02}hurried to the scene.
+Bank0278_Text_Empty = なし
+Bank0278_Text_Empty_2 = なし
+Bank0278_Text_Empty_3 = なし
+Bank0278_Text_Empty_4 = なし
+Bank0278_Text_Empty_5 = なし
+Bank0278_Text_Empty_6 = なし
+Bank0278_Text_UnovaDefenseForceUdf_2 = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+Bank0278_Text_StoryTheirValiantStruggle_2 = {bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0278_Text_AlongCoastlineMysteriousGiant_2 = {bd02}Along the coastline,\n{bd02}a mysterious giant organism\n{bd02}suddenly appeared...
+Bank0278_Text_FindOutItsTrue_2 = {bd02}To find out its true identity,\n{bd02}the young recruit {0100:1}\n{bd02}hurried to the scene.
+Bank0278_Text_Empty_7 = なし
+Bank0278_Text_Empty_8 = なし
+Bank0278_Text_Empty_9 = なし
+Bank0278_Text_Empty_10 = なし
+Bank0278_Text_Empty_11 = なし
+Bank0278_Text_Empty_12 = なし
+Bank0278_Text_Empty_13 = なし

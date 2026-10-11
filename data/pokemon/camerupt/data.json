@@ -1,0 +1,177 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Camerupt",
+    "pokedex": {
+        "category": "Eruption Pokémon",
+        "entry": "The volcanoes on its back have a\nmajor eruption every 10 years--or\nwhenever it becomes really angry.",
+        "height": "6'03\"",
+        "weight": "485.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Camerupt",
+                "category": "Eruption Pokémon",
+                "entry": "It has volcanoes on its back. If\nmagma builds up in its body, it\nshudders, then erupts violently.",
+                "height": "6'03\"",
+                "weight": "485.0 lbs."
+            },
+            "fr": {
+                "name": "Camérupt",
+                "category": "Pokémon Éruption",
+                "entry": "Il porte des volcans sur son dos.\nQuand le magma remonte, il\nfrissonne et entre en éruption.",
+                "height": "1,9 m",
+                "weight": "220,0 kg"
+            },
+            "de": {
+                "name": "Camerupt",
+                "category": "Ausbruch",
+                "entry": "Auf seinem Rücken befinden sich Vulkane.\nMagma bildet sich in seinem Körper, das\nirgendwann ausbricht.",
+                "height": "1,9 m",
+                "weight": "220,0 kg"
+            },
+            "it": {
+                "name": "Camerupt",
+                "category": "Pokémon Eruzione",
+                "entry": "Ha dei vulcani sul dorso. Se il magma nel\nsuo corpo aumenta, trema e poi erutta\nviolentemente.",
+                "height": "1,9 m",
+                "weight": "220,0 kg"
+            },
+            "ko": {
+                "name": "폭타",
+                "category": "분화포켓몬",
+                "entry": "등에 화산을 가진 포켓몬이다.\n체내의 마그마가 불어나면\n흔들린 뒤에 대폭발을 한다.",
+                "height": "1.9 m",
+                "weight": "220.0 kg"
+            },
+            "es": {
+                "name": "Camerupt",
+                "category": "Pokémon Erupción",
+                "entry": "Tiene volcanes en el lomo. Si el\nmagma se acumula en su cuerpo,\nse sacude y estalla con violencia.",
+                "height": "1,9 m",
+                "weight": "220,0 kg"
+            },
+            "ja": {
+                "name": "バクーダ",
+                "category": "ふんかポケモン",
+                "entry": "せなかに\\x{3000}かざんを\\x{3000}もつ\\x{3000}ポケモン。\nたいないの\\x{3000}マグマが\\x{3000}ふえると\nふるえた\\x{3000}あとに\\x{3000}だいばくはつする。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff12}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 100,
+        "defense": 70,
+        "speed": 40,
+        "special_attack": 105,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_FIRE", "TYPE_GROUND" ],
+    "catch_rate": 150,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_RAWST_BERRY",
+        "rare": "ITEM_RAWST_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_MAGMA_ARMOR", "ABILITY_SOLID_ROCK" ],
+    "hidden_ability": "ABILITY_ANGER_POINT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 161,
+    "height": 19,
+    "weight": 2200,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 1, "MOVE_MAGNITUDE" ],
+            [ 5, "MOVE_EMBER" ],
+            [ 8, "MOVE_MAGNITUDE" ],
+            [ 12, "MOVE_FOCUS_ENERGY" ],
+            [ 15, "MOVE_FLAME_BURST" ],
+            [ 19, "MOVE_AMNESIA" ],
+            [ 22, "MOVE_LAVA_PLUME" ],
+            [ 26, "MOVE_EARTH_POWER" ],
+            [ 29, "MOVE_CURSE" ],
+            [ 31, "MOVE_TAKE_DOWN" ],
+            [ 33, "MOVE_ROCK_SLIDE" ],
+            [ 39, "MOVE_YAWN" ],
+            [ 46, "MOVE_EARTHQUAKE" ],
+            [ 52, "MOVE_ERUPTION" ],
+            [ 59, "MOVE_FISSURE" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM64",
+            "TM68",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_EARTH_POWER",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_AFTER_YOU",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 205,
+    "baby_species": "SPECIES_NUMEL"
+}

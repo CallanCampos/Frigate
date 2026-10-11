@@ -1,81 +1,81 @@
-Suit Actor
-Future Being
-Professor {0100:1}: Could this be...{be01}\n(...Is this the future?...)
-Ledian: Hmm... What's this?\nYou're a strange-looking Human.{be01}\nYou look kind of like a Scientist, but\nI've never seen your type before.
-Professor {0100:1}: It's a person...\nI'd better try not to do too much damage...
-Ledian: That dumb Human is holding back.\nIt doesn't want to hurt another of its{be00}\nown kind.{be01}\nHmph. Such a common trait among\nthe weaker species. How foolish.
-Professor {0100:1}: Are you telling\nme you don't care?{be01}\nYou wouldn't mind hurting another Pokémon?
-Ledian: How could you obey a Human\nlike that? Such disgraceful Pokémon!{be00}\nI'll eliminate you all!
-Professor {0100:1}: I don't need\nto defeat the people you're controlling{be00}\nto protect my Pokémon!
-Ledian: That's enough talk from you!{be01}\nIs that the Scientist Ability?\nRunning your mouth?
-Ledian: Stop right there, Human!
-Professor {0100:1}: A Pokémon?!
-Ledian: It's not often that we get\nwild Humans showing up in town...{be01}\nThey're dangerous and need to be\neliminated quickly!
-Professor {0100:1}: A talking Pokémon?\nDid it just release a person from that Ball?!{be01}\nWhat's going on here?{be01}\nIt's like everything is backward!
-Ledian: Huh?\nHumans using Pokémon?{be00}\nWhat is this madness?
-Professor {0100:1}: Wait!\nTell me what's going on here!
-Ledian: What's going on?{be01}\nHere's how things work here: you lowly\nHumans go into these Human Balls, and then{be00}\nyou do as your Trainer Pokémon commands!{be01}\nWild Humans who won't go into the Balls\nare to be eliminated! It's simple!
-Professor {0100:1}: What?\nIn the world of the future, Pokémon{be00}\ncatch people?!
-Ledian: The future? Are you trying to tell\nme that you come from the past?
-Professor {0100:1}: Well...{be01}\n(...Should I tell this Pokémon about\nhow I traveled through time?{be00}\nIt probably won't believe me...)
-Ledian: Or are you just a dirty lying Human?{be01}\nLying is cowardice! Cowardice is a crime!\nYou must be eliminated!
-Professor {0100:1}: Help!
-Ledian: Begging for your life, are you?\nWhat a pathetic Human! I think I'll take{be00}\nmy time eliminating you!{be01}\nCome out, Black Belt! Teach this\ncowardly Human a lesson!
-Professor {0100:1}: Can we talk?
-Ledian: Talk? Why should a Pokémon\ntalk to a pathetic Human like you?{be00}\nHow ridiculous!
-Professor {0100:1}: I'm not lying!
-Ledian: How could that be true?\nYou must be lying. Lying is a crime.{be00}\nCriminals must be eliminated.{be00}\nBlack Belt, take care of this liar!
-Ledian: What's wrong, Human?\nYou can't even fight back?
-Professor {0100:1}: I don't want\nto fight! Stop this!
-Ledian: If you don't want to fight,\nyou'd better release that {0102:0}!
-Professor {0100:1}: I can't do that...
-Ledian: I didn't think so!{be01}\nHumans are so weak. You've only got\ntwo arms, and you can't even fly!{be01}\nPokémon must make great bodyguards\nfor you Humans. Or do you treat them{be00}\nmore like tools for your own convenience?
-Professor {0100:1}: That's not true!\nPokémon are my friends!
-Ledian: A likely story.{be01}\nAnyway, Humans like you are simply tools\nfor us Pokémon.{be01}\nYou're just toys who battle each other for\nour enjoyment! It doesn't matter if you{be00}\nbreak--there are plenty of replacements!
-Professor {0100:1}: That's terrible...
-Black Belt: You...\nHuman who use Pokémon...{be00}\nYou understand me?
-Professor {0100:1}: You can speak?
-Black Belt: Stuck in Ball...\nTreated like thing...{be01}\nNot talk ever. Not talk good.\nBut must talk you...{be01}\nYou say you from past.\nI believe.
-Professor {0100:1}: Thank you...\nI appreciate it!
-Black Belt: Long ago. Bug Pokémon get\nstrong. Evolution Stone make strong.{be00}\nThey take over.{be00}\nE-lim-i-nate many human...
-Professor {0100:1}: What?!\nWhat's an Evolution Stone?
-Black Belt: Evolution Stone...\nMake Bug Pokémon very smart...{be00}\nPokémon strong and smart...{be00}\nNo chance for human...
-Professor {0100:1}: I never\nimagined the future could be like this...
-Ledian: Black Belt! Silence!\nStop yapping with that other Human!{be01}\nYou're nothing more than a tool!\nDo as I say or face the consequences!
-Professor {0100:1}: I'm only telling\nthe truth! Please, believe me!
-Ledian: Even with the superior technology\nof the Bug-type Pokémon, we haven't been{be00}\nable to achieve time travel. There's no way{be00}\na mere Human could have done so!
-Professor {0100:1}: But I did! I came\nhere on a time machine of my own invention!
-Ledian: You're just lying to save yourself.\nIt's rare to see a Human as clever as you.{be00}\nThat makes you dangerous.{be01}\nI'd better eliminate you for good measure!
-Professor {0100:1}: That's not fair!
-Ledian: Come on, Black Belt!\nHurry up and eliminate this scum.{be01}\nI'm done wasting my time talking to\nthis dirty Human!
-Ledian: How did you do that?!\nYou protected your Pokémon without{be00}\nhurting my Black Belt!{be01}\nHmm...{be01}\nInteresting. You are an unusual Human.\nOK, I'll spare you from elimination.{be00}\nI'll also believe your wild story.{be01}\nBut first...{be01}\nSit still and let me catch you!
-Professor {0100:1}: No!\nWhat's this? Some kind of string?{be01}\nGet it off me! Untie this string now!\nLet me go!
-Professor {0100:1}: Ack!\nThe more I try to break free, the more{be00}\nstuck I get...{be01}\nThe powerful sticky string of a\nBug-type Pokémon...
-Professor {0100:1}: Please!\nI don't mean to harm any of you!{be00}\nYou've had your fun!{be00}\nI just want to get back to my own time!
-Ledian: You think so?{be01}\nUnfortunately for you, I'll be the\njudge of when I've had my fun...
-Professor {0100:1}: What more\ndo you want from me?
-Ledian: Hee hee hee...{be01}\n(...We couldn't make a time machine with\nour own technology, but if I could get my{be00}\nappendages on this Human's time machine,{be00}\nI'd be a hero...)
-Professor {0100:1}: Come on!\nSay something!
-Ledian: OK, then...{be01}\n(...If I can capture Humans from all the\ndifferent eras, we Bug-type Pokémon will{be00}\nprosper even more...)
-Professor {0100:1}: Stop!\nGet away from my Bag!
-Ledian: What's all this junk?\nDirt and rocks... Plant seeds...{be00}\nIt's just a bunch of garbage!{be01}\nHmm... What's this?\nLooks like a Human Ball.{be01}\nSomething's different, though...{be01}\nI've got it! Could this be...
-Professor {0100:1}: Oh no...\nNot the temporal transport...
-Ledian: Bingo! So, this is your time machine.\nTemporal transport, you called it?{be01}\nImpressive to have fit it into a capsule\nthis small...
-And so Ledian captured me and seized\nmy temporal transport.{be01}\nHowever, I would not give up so easily.\nNot while I still needed to deliver these{be00}\nprecious research samples back to my own{be00}\ntime... I had to keep fighting.
-Professor {0100:1}: Argh... Urgh...
-Ledian: Stupid, pathetic, helpless Human...\nI'm starting to feel sorry for you, so I'll{be00}\nlet you go...{be01}\nEntertain me by scampering away like the\ncowardly fool you are.
-Professor {0100:1}: Eeek!
-Ledian: Constantly eliminating Humans\nlike you gets old after a while...{be01}\nSo I need to mix things up for a change of\npace, or else I'd get bored with my toys!
-Somehow, I made it away with my life.\nAfterward, I had to lie low by hiding inside{be00}\ncaves and patches of tall grass in order to{be00}\navoid the gaze of Pokémon who aimed to{be00}\ndefeat or capture humans like me...
-Sometimes I stop to think about the\nPokémon of my own time...how they must{be00}\nfeel if they don't want to be caught...{be01}\nI'm in a constant state of fear and\nunease, with never a moment's rest.{be00}\nThis life is only pain and struggle...
-Professor {0100:1}: Ack! I went too far!
-Ledian: What's this?\nYou've broken my Black Belt!{be01}\nOh well, no great loss... I'll just have\nto go catch another Human...
-Professor {0100:1}: Oh... Oh no...\nIt was an accident!{be00}\nHow could I have done such a thing{be00}\nto a fellow human...
-Ledian: You toys break too easily.\nHey, I know! I'll just catch you{be00}\nto replace that one! Human Ball, go!
-I passed out from the shock of defeating\na fellow human. Ledian caught me, and{be00}\nI became one of her Humans.{be01}\nAnd then...
-Ledian: {0100:1}, I choose you!\nHurry up and eliminate that Human!
-Professor {0100:1}: Groaarr!
-Ledian: Good job, {0100:1}!{be01}\nHee hee hee... You've grown quite\nstrong, indeed!{be00}\nI'll treat you to a special grooming today!
-Ledian could be very cruel, but she also\ncould be nice to Humans who pleased her.{be01}\nOver time, I gradually became more and\nmore loyal to Ledian...to the point that{be00}\nI would do anything to assist her...
-A world where Humans are used and\ncontrolled by Pokémon...{be01}\nIf this is the reality of the future,\nI have no choice but to accept it.{be01}\nSometimes I wonder what became of\n{0102:0}, who was my Pokémon{be00}\nin our own time...{be01}\nAre you out there having grand adventures\nas a Trainer Pokémon?
+Bank0213_Text_SuitActor = Suit Actor
+Bank0213_Text_FutureBeing = Future Being
+Bank0213_Text_ProfessorCouldFuture = Professor {0100:1}: Could this be...{be01}\n(...Is this the future?...)
+Bank0213_Text_LedianHmmWhatsYoure = Ledian: Hmm... What's this?\nYou're a strange-looking Human.{be01}\nYou look kind of like a Scientist, but\nI've never seen your type before.
+Bank0213_Text_ProfessorItsPersonId = Professor {0100:1}: It's a person...\nI'd better try not to do too much damage...
+Bank0213_Text_LedianDumbHumanHolding = Ledian: That dumb Human is holding back.\nIt doesn't want to hurt another of its{be00}\nown kind.{be01}\nHmph. Such a common trait among\nthe weaker species. How foolish.
+Bank0213_Text_ProfessorTellingDontCare = Professor {0100:1}: Are you telling\nme you don't care?{be01}\nYou wouldn't mind hurting another Pokémon?
+Bank0213_Text_LedianHowCouldObey = Ledian: How could you obey a Human\nlike that? Such disgraceful Pokémon!{be00}\nI'll eliminate you all!
+Bank0213_Text_ProfessorDontNeedDefeat = Professor {0100:1}: I don't need\nto defeat the people you're controlling{be00}\nto protect my Pokémon!
+Bank0213_Text_LedianThatsEnoughTalk = Ledian: That's enough talk from you!{be01}\nIs that the Scientist Ability?\nRunning your mouth?
+Bank0213_Text_LedianStopRightThere = Ledian: Stop right there, Human!
+Bank0213_Text_ProfessorPokemon = Professor {0100:1}: A Pokémon?!
+Bank0213_Text_LedianItsNotOften = Ledian: It's not often that we get\nwild Humans showing up in town...{be01}\nThey're dangerous and need to be\neliminated quickly!
+Bank0213_Text_ProfessorTalkingPokemonDid = Professor {0100:1}: A talking Pokémon?\nDid it just release a person from that Ball?!{be01}\nWhat's going on here?{be01}\nIt's like everything is backward!
+Bank0213_Text_LedianHuhHumansUsing = Ledian: Huh?\nHumans using Pokémon?{be00}\nWhat is this madness?
+Bank0213_Text_ProfessorWaitTellWhats = Professor {0100:1}: Wait!\nTell me what's going on here!
+Bank0213_Text_LedianWhatsGoingHeres = Ledian: What's going on?{be01}\nHere's how things work here: you lowly\nHumans go into these Human Balls, and then{be00}\nyou do as your Trainer Pokémon commands!{be01}\nWild Humans who won't go into the Balls\nare to be eliminated! It's simple!
+Bank0213_Text_ProfessorWhatWorldFuture = Professor {0100:1}: What?\nIn the world of the future, Pokémon{be00}\ncatch people?!
+Bank0213_Text_LedianFutureTryingTell = Ledian: The future? Are you trying to tell\nme that you come from the past?
+Bank0213_Text_ProfessorWellShouldTell = Professor {0100:1}: Well...{be01}\n(...Should I tell this Pokémon about\nhow I traveled through time?{be00}\nIt probably won't believe me...)
+Bank0213_Text_LedianJustDirtyLying = Ledian: Or are you just a dirty lying Human?{be01}\nLying is cowardice! Cowardice is a crime!\nYou must be eliminated!
+Bank0213_Text_ProfessorHelp = Professor {0100:1}: Help!
+Bank0213_Text_LedianBeggingLifeWhat = Ledian: Begging for your life, are you?\nWhat a pathetic Human! I think I'll take{be00}\nmy time eliminating you!{be01}\nCome out, Black Belt! Teach this\ncowardly Human a lesson!
+Bank0213_Text_ProfessorCanWeTalk = Professor {0100:1}: Can we talk?
+Bank0213_Text_LedianTalkWhyShould = Ledian: Talk? Why should a Pokémon\ntalk to a pathetic Human like you?{be00}\nHow ridiculous!
+Bank0213_Text_ProfessorImNotLying = Professor {0100:1}: I'm not lying!
+Bank0213_Text_LedianHowCouldTrue = Ledian: How could that be true?\nYou must be lying. Lying is a crime.{be00}\nCriminals must be eliminated.{be00}\nBlack Belt, take care of this liar!
+Bank0213_Text_LedianWhatsWrongHuman = Ledian: What's wrong, Human?\nYou can't even fight back?
+Bank0213_Text_ProfessorDontWantFight = Professor {0100:1}: I don't want\nto fight! Stop this!
+Bank0213_Text_LedianIfDontWant = Ledian: If you don't want to fight,\nyou'd better release that {0102:0}!
+Bank0213_Text_ProfessorCant = Professor {0100:1}: I can't do that...
+Bank0213_Text_LedianDidntThinkHumans = Ledian: I didn't think so!{be01}\nHumans are so weak. You've only got\ntwo arms, and you can't even fly!{be01}\nPokémon must make great bodyguards\nfor you Humans. Or do you treat them{be00}\nmore like tools for your own convenience?
+Bank0213_Text_ProfessorThatsNotTrue = Professor {0100:1}: That's not true!\nPokémon are my friends!
+Bank0213_Text_LedianLikelyStoryAnyway = Ledian: A likely story.{be01}\nAnyway, Humans like you are simply tools\nfor us Pokémon.{be01}\nYou're just toys who battle each other for\nour enjoyment! It doesn't matter if you{be00}\nbreak--there are plenty of replacements!
+Bank0213_Text_ProfessorThatsTerrible = Professor {0100:1}: That's terrible...
+Bank0213_Text_BlackBeltHumanWho = Black Belt: You...\nHuman who use Pokémon...{be00}\nYou understand me?
+Bank0213_Text_ProfessorCanSpeak = Professor {0100:1}: You can speak?
+Bank0213_Text_BlackBeltStuckBall = Black Belt: Stuck in Ball...\nTreated like thing...{be01}\nNot talk ever. Not talk good.\nBut must talk you...{be01}\nYou say you from past.\nI believe.
+Bank0213_Text_ProfessorThankAppreciate = Professor {0100:1}: Thank you...\nI appreciate it!
+Bank0213_Text_BlackBeltLongAgo = Black Belt: Long ago. Bug Pokémon get\nstrong. Evolution Stone make strong.{be00}\nThey take over.{be00}\nE-lim-i-nate many human...
+Bank0213_Text_ProfessorWhatWhatsEvolution = Professor {0100:1}: What?!\nWhat's an Evolution Stone?
+Bank0213_Text_BlackBeltEvolutionStone = Black Belt: Evolution Stone...\nMake Bug Pokémon very smart...{be00}\nPokémon strong and smart...{be00}\nNo chance for human...
+Bank0213_Text_ProfessorNeverImaginedFuture = Professor {0100:1}: I never\nimagined the future could be like this...
+Bank0213_Text_LedianBlackBeltSilence = Ledian: Black Belt! Silence!\nStop yapping with that other Human!{be01}\nYou're nothing more than a tool!\nDo as I say or face the consequences!
+Bank0213_Text_ProfessorImOnlyTelling = Professor {0100:1}: I'm only telling\nthe truth! Please, believe me!
+Bank0213_Text_LedianEvenSuperiorTechnology = Ledian: Even with the superior technology\nof the Bug-type Pokémon, we haven't been{be00}\nable to achieve time travel. There's no way{be00}\na mere Human could have done so!
+Bank0213_Text_ProfessorButDidCame = Professor {0100:1}: But I did! I came\nhere on a time machine of my own invention!
+Bank0213_Text_LedianYoureJustLying = Ledian: You're just lying to save yourself.\nIt's rare to see a Human as clever as you.{be00}\nThat makes you dangerous.{be01}\nI'd better eliminate you for good measure!
+Bank0213_Text_ProfessorThatsNotFair = Professor {0100:1}: That's not fair!
+Bank0213_Text_LedianComeBlackBelt = Ledian: Come on, Black Belt!\nHurry up and eliminate this scum.{be01}\nI'm done wasting my time talking to\nthis dirty Human!
+Bank0213_Text_LedianHowDidProtected = Ledian: How did you do that?!\nYou protected your Pokémon without{be00}\nhurting my Black Belt!{be01}\nHmm...{be01}\nInteresting. You are an unusual Human.\nOK, I'll spare you from elimination.{be00}\nI'll also believe your wild story.{be01}\nBut first...{be01}\nSit still and let me catch you!
+Bank0213_Text_ProfessorNoWhatsSome = Professor {0100:1}: No!\nWhat's this? Some kind of string?{be01}\nGet it off me! Untie this string now!\nLet me go!
+Bank0213_Text_ProfessorAckMoreTry = Professor {0100:1}: Ack!\nThe more I try to break free, the more{be00}\nstuck I get...{be01}\nThe powerful sticky string of a\nBug-type Pokémon...
+Bank0213_Text_ProfessorPleaseDontMean = Professor {0100:1}: Please!\nI don't mean to harm any of you!{be00}\nYou've had your fun!{be00}\nI just want to get back to my own time!
+Bank0213_Text_LedianThinkUnfortunatelyIll = Ledian: You think so?{be01}\nUnfortunately for you, I'll be the\njudge of when I've had my fun...
+Bank0213_Text_ProfessorWhatMoreWant = Professor {0100:1}: What more\ndo you want from me?
+Bank0213_Text_LedianHeeHeeHee = Ledian: Hee hee hee...{be01}\n(...We couldn't make a time machine with\nour own technology, but if I could get my{be00}\nappendages on this Human's time machine,{be00}\nI'd be a hero...)
+Bank0213_Text_ProfessorComeSaySomething = Professor {0100:1}: Come on!\nSay something!
+Bank0213_Text_LedianOkThenIf = Ledian: OK, then...{be01}\n(...If I can capture Humans from all the\ndifferent eras, we Bug-type Pokémon will{be00}\nprosper even more...)
+Bank0213_Text_ProfessorStopGetAway = Professor {0100:1}: Stop!\nGet away from my Bag!
+Bank0213_Text_LedianWhatsAllJunk = Ledian: What's all this junk?\nDirt and rocks... Plant seeds...{be00}\nIt's just a bunch of garbage!{be01}\nHmm... What's this?\nLooks like a Human Ball.{be01}\nSomething's different, though...{be01}\nI've got it! Could this be...
+Bank0213_Text_ProfessorOhNoNot = Professor {0100:1}: Oh no...\nNot the temporal transport...
+Bank0213_Text_LedianBingoTimeMachine = Ledian: Bingo! So, this is your time machine.\nTemporal transport, you called it?{be01}\nImpressive to have fit it into a capsule\nthis small...
+Bank0213_Text_LedianCapturedSeizedTemporal = And so Ledian captured me and seized\nmy temporal transport.{be01}\nHowever, I would not give up so easily.\nNot while I still needed to deliver these{be00}\nprecious research samples back to my own{be00}\ntime... I had to keep fighting.
+Bank0213_Text_ProfessorArghUrgh = Professor {0100:1}: Argh... Urgh...
+Bank0213_Text_LedianStupidPatheticHelpless = Ledian: Stupid, pathetic, helpless Human...\nI'm starting to feel sorry for you, so I'll{be00}\nlet you go...{be01}\nEntertain me by scampering away like the\ncowardly fool you are.
+Bank0213_Text_ProfessorEeek = Professor {0100:1}: Eeek!
+Bank0213_Text_LedianConstantlyEliminatingHumans = Ledian: Constantly eliminating Humans\nlike you gets old after a while...{be01}\nSo I need to mix things up for a change of\npace, or else I'd get bored with my toys!
+Bank0213_Text_SomehowMadeAwayLife = Somehow, I made it away with my life.\nAfterward, I had to lie low by hiding inside{be00}\ncaves and patches of tall grass in order to{be00}\navoid the gaze of Pokémon who aimed to{be00}\ndefeat or capture humans like me...
+Bank0213_Text_SometimesStopThinkAbout = Sometimes I stop to think about the\nPokémon of my own time...how they must{be00}\nfeel if they don't want to be caught...{be01}\nI'm in a constant state of fear and\nunease, with never a moment's rest.{be00}\nThis life is only pain and struggle...
+Bank0213_Text_ProfessorAckWentToo = Professor {0100:1}: Ack! I went too far!
+Bank0213_Text_LedianWhatsYouveBroken = Ledian: What's this?\nYou've broken my Black Belt!{be01}\nOh well, no great loss... I'll just have\nto go catch another Human...
+Bank0213_Text_ProfessorOhOhNo = Professor {0100:1}: Oh... Oh no...\nIt was an accident!{be00}\nHow could I have done such a thing{be00}\nto a fellow human...
+Bank0213_Text_LedianToysBreakToo = Ledian: You toys break too easily.\nHey, I know! I'll just catch you{be00}\nto replace that one! Human Ball, go!
+Bank0213_Text_PassedOutFromShock = I passed out from the shock of defeating\na fellow human. Ledian caught me, and{be00}\nI became one of her Humans.{be01}\nAnd then...
+Bank0213_Text_LedianChooseHurryUp = Ledian: {0100:1}, I choose you!\nHurry up and eliminate that Human!
+Bank0213_Text_ProfessorGroaarr = Professor {0100:1}: Groaarr!
+Bank0213_Text_LedianGoodJobHee = Ledian: Good job, {0100:1}!{be01}\nHee hee hee... You've grown quite\nstrong, indeed!{be00}\nI'll treat you to a special grooming today!
+Bank0213_Text_LedianCouldVeryCruel = Ledian could be very cruel, but she also\ncould be nice to Humans who pleased her.{be01}\nOver time, I gradually became more and\nmore loyal to Ledian...to the point that{be00}\nI would do anything to assist her...
+Bank0213_Text_WorldWhereHumansUsed = A world where Humans are used and\ncontrolled by Pokémon...{be01}\nIf this is the reality of the future,\nI have no choice but to accept it.{be01}\nSometimes I wonder what became of\n{0102:0}, who was my Pokémon{be00}\nin our own time...{be01}\nAre you out there having grand adventures\nas a Trainer Pokémon?
 \pad{a6}

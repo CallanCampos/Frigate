@@ -1,5 +1,0 @@
-Words are engraved on the statue:{be01}\n“Four great warriors form\n this Pokémon League.{be01}\n To the southwest is one who\n does not fear the Ghost type.{be01}\n To the southeast is one who\n channels the power of the Fighting type.{be01}\n To the northwest is one who\n has mastered the Dark type.{be01}\n To the northeast is one who\n knows the mind of the Psychic type.{be01}\n If you can defeat these warriors with\n your courage and wisdom,{be00}\n you shall be led to the summit,{be00}\n where the strongest Champion awaits."
-                          \x{ffff}
-                             \x{ffff}
-                                                          \x{ffff}
-                                         \x{ffff}

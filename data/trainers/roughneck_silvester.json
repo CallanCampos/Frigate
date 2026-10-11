@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Silvester",
+    "class": "TRAINER_CLASS_ROUGHNECK",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DARUMAKA",
+            "form": 0,
+            "level": 22,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My shiny head is a reflection\nof my fighting spirit!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My shine is set to blind!"
+        },
+        {
+            "type": 2,
+            "text": "My dumb little brother decided to follow\nin my footsteps and become a bad dude.{be01}\nI really wanted him to grow up\nand live respectably, though..."
+        }
+    ]
+}

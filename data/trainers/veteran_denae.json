@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Denae",
+    "class": "TRAINER_CLASS_VETERAN_F",
+    "battle_style": "BTL_STYLE_ROTATION",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DRUDDIGON",
+            "form": 0,
+            "level": 44,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 1
+        },
+        {
+            "species": "SPECIES_FRAXURE",
+            "form": 0,
+            "level": 44,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_AXEW",
+            "form": 0,
+            "level": 44,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The Pokémon you picked...\nThey supported each other well."
+        }
+    ]
+}

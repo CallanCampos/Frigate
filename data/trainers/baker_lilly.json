@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lilly",
+    "class": "TRAINER_CLASS_BAKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_MOOMOO_MILK",
+    "party": [
+        {
+            "species": "SPECIES_TORKOAL",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MILTANK",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I bet athletes are not satisfied\nwith their games.{be01}\nThat's how I feel\nwhen I watch them.{be01}\nThe reason? If you win against me,\nI will tell you why!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Are you pleased with your victory?\nOr are you unsatisfied?"
+        },
+        {
+            "type": 15,
+            "text": "This Moomoo Milk is tasty\nand so very satisfying!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "No matter how great their play is,\nthere is always a greater play.{be01}\nI am never satisfied with my bread,\neven though I bake it very well.{be01}\nI always want to make the next\nloaf even more delicious!"
+        }
+    ]
+}

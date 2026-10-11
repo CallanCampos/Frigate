@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Flynn",
+    "class": "TRAINER_CLASS_PILOT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SWOOBAT",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Strong winds, right?{be01}\nIt represents the strength of us\nand our Gym Leader!{be01}\nThis is a Pokémon Gym! Let's have\nus a Pokémon battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I felt some intense pressure coming\nfrom you and your Pokémon!"
+        },
+        {
+            "type": 2,
+            "text": "I'll give you some advice.{be01}\nIf the floor is colored differently and\nyou're surrounded by walls, you probably{be00}\nwon't get blown away by the wind."
+        }
+    ]
+}

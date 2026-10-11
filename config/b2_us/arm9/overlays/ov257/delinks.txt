@@ -5,6 +5,7 @@
     .bss        start:0x021b3d60 end:0x021b79e0 kind:bss align:32
 
 src/ov257/camera_system.c:
+    complete
     .text       start:0x021998c0 end:0x0219a350
     .data       start:0x021b25a0 end:0x021b25b0
     .bss        start:0x021b3d60 end:0x021b3d64

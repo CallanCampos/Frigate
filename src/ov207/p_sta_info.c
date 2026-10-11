@@ -1,6 +1,7 @@
 #include "constants/arc.h"
 #include "constants/met_locations.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -84,7 +85,7 @@ void PStaInfo_LoadResources(PStatusWork *wk, PStaInfoWork *info, ArcTool *arc) {
     info->screens[1].file = GFL_G2DIOReadNSCRArc(arc, 74, FALSE, &info->screens[1].screen, wk->heapId);
     info->screens[2].file = GFL_G2DIOReadNSCRArc(arc, 66, FALSE, &info->screens[2].screen, wk->heapId);
     info->screens[3].file = GFL_G2DIOReadNSCRArc(arc, 67, FALSE, &info->screens[3].screen, wk->heapId);
-    info->msgData[INFO_MSG_MEMO] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x17c, wk->heapId);
+    info->msgData[INFO_MSG_MEMO] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MEMO, wk->heapId);
     info->msgData[INFO_MSG_PLACES_UNOVA] =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, PLACE_FILE_UNOVA, wk->heapId);
     info->msgData[INFO_MSG_PLACES_SPECIAL] =

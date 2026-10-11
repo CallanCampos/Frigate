@@ -1,0 +1,35 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A battle facility's trainer: data/facilities/<facility>/trainers/<trainer>.json",
+    "description": "A trainer of a facility's trainers archive: its class and the sets it picks its Pokémon from, with its name and messages, which the text takes. tools/data/facility_data.py packs them in the order of the facility's order.json. A string value is the name of a constant from data/constants/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "pokemon" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "name": {
+            "type": "string",
+            "description": "The trainer's name. The trainers with names come first; the facility's last trainers may have none"
+        },
+        "class": {
+            "type": [ "string", "integer" ], "x-constant": "TRAINER_CLASS_", "minimum": 0, "maximum": 65535,
+            "description": "The trainer's class. A Pokémon World Tournament trainer has unk0 instead"
+        },
+        "unk0": {
+            "type": "integer", "minimum": 0, "maximum": 65535,
+            "description": "In the Pokémon World Tournament's pools, the field the other facilities have the class in: 2 for every trainer but the first; the tournaments' trainers come from elsewhere"
+        },
+        "pokemon": {
+            "type": "array", "items": { "type": "string" },
+            "description": "The sets the trainer picks its Pokémon from, by name, of the facility's pokemon/"
+        },
+        "single_set": {
+            "type": "string",
+            "description": "For the Pokémon World Tournament's trainers, the one set the trainer brings when the entrant's unk0_7 is set (func_ov134_021f0258), from the pool's first archive"
+        },
+        "messages": {
+            "type": "array", "items": { "type": "string" },
+            "description": "What the trainer says, with their line breaks: as many as the facility has for each trainer, for the trainers with names"
+        }
+    }
+}

@@ -760,7 +760,7 @@ data_ov293_021a83a9_w2_us kind:data(any) addr:0x021a83a9 ambiguous
 data_ov293_021a8455_w2_us kind:data(any) addr:0x021a8455 ambiguous
 data_ov293_021a84c5_w2_us kind:data(any) addr:0x021a84c5 ambiguous
 data_ov293_021a8541_w2_us kind:data(any) addr:0x021a8541 ambiguous
-data_ov293_021a8565_w2_us kind:data(any) addr:0x021a8565 ambiguous
+data_ov293_021a8525 kind:data(any) addr:0x021a8565 ambiguous
 data_ov293_021a85bd_w2_us kind:data(any) addr:0x021a85bd ambiguous
 data_ov293_021a860d_w2_us kind:data(any) addr:0x021a860d ambiguous
 data_ov293_021a8635_w2_us kind:data(any) addr:0x021a8635 ambiguous

@@ -1,9 +1,10 @@
 #include "types.h"
 #include "app/name_entry.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/field_event.h"
 #include "field/field_script.h"
-#include "field/ov117.h"
+#include "field/gimmick_plasma_frigate.h"
 #include "field/ov119.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -42,7 +43,7 @@ static u8 PlasmaFrigate_GetPasswordIndex(PlayerInfo *playerInfo);
 static BOOL func_ov064_021e5800(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov117_021eed00(gsys, VM_Read16(vm));
+    GameEvent *event = GimmickPlasmaFrigate_CallSwitchEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return FALSE;
@@ -57,21 +58,21 @@ static BOOL func_ov064_021e5838(VM *vm, FieldScriptEnv *env) {
 
     gsys = FieldScriptEnv_GetGameSystem(env);
     a = VM_Read16(vm);
-    func_ov117_021eed24(gsys, a, ScriptReadAny(vm, env) != TRUE);
+    GimmickPlasmaFrigate_SetLightsState(gsys, a, ScriptReadAny(vm, env) != TRUE);
     return FALSE;
 }
 
 static BOOL func_ov064_021e586c(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov117_021eed64(gsys, VM_Read16(vm));
+    GimmickPlasmaFrigate_CallPlayGroupASecond(gsys, VM_Read16(vm));
     return FALSE;
 }
 
 static BOOL func_ov064_021e588c(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov117_021eed88(gsys, VM_Read16(vm));
+    GimmickPlasmaFrigate_CallPlayGroupBSecond(gsys, VM_Read16(vm));
     return FALSE;
 }
 
@@ -170,7 +171,7 @@ static void PlasmaFrigate_CheckPassword(PlasmaFrigatePassword *wk, NameEntryPara
         *wk->result = FALSE;
         return;
     }
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 48, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_PLASMA_FRIGATE_SCRCMD_BSUBWAY, wk->heapId);
     password = GFL_MsgDataLoadStrbufNew(msgData, PlasmaFrigate_GetPasswordIndex(wk->playerInfo));
     if (GFL_StrBufCmpIgnoreAccents(nameEntry->name, password) == TRUE) {
         *wk->result = TRUE;

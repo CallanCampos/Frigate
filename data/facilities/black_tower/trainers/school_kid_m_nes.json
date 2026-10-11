@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Nes",
+    "class": "TRAINER_CLASS_SCHOOL_KID_M",
+    "pokemon": [
+        "bellossom_1",
+        "ludicolo_1",
+        "gothitelle_1",
+        "cradily_1",
+        "politoed_1",
+        "claydol_1",
+        "tentacruel_1",
+        "umbreon_1",
+        "blastoise_1",
+        "milotic_1"
+    ]
+}

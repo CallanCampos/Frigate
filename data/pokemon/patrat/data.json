@@ -1,0 +1,136 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Patrat",
+    "pokedex": {
+        "category": "Scout Pokémon",
+        "entry": "Extremely cautious, one of them\nwill always be on the lookout, but it\nwon't notice a foe coming from behind.",
+        "height": "1'08\"",
+        "weight": "25.6 lbs.",
+        "languages": {
+            "ja": {
+                "category": "みはりポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 55,
+        "defense": 39,
+        "speed": 42,
+        "special_attack": 35,
+        "special_defense": 39
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RUN_AWAY", "ABILITY_KEEN_EYE" ],
+    "hidden_ability": "ABILITY_ANALYTIC",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 51,
+    "height": 5,
+    "weight": 116,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 3, "MOVE_LEER" ],
+            [ 6, "MOVE_BITE" ],
+            [ 8, "MOVE_BIDE" ],
+            [ 11, "MOVE_DETECT" ],
+            [ 13, "MOVE_SAND_ATTACK" ],
+            [ 16, "MOVE_CRUNCH" ],
+            [ 18, "MOVE_HYPNOSIS" ],
+            [ 21, "MOVE_SUPER_FANG" ],
+            [ 23, "MOVE_AFTER_YOU" ],
+            [ 26, "MOVE_WORK_UP" ],
+            [ 28, "MOVE_HYPER_FANG" ],
+            [ 31, "MOVE_MEAN_LOOK" ],
+            [ 33, "MOVE_BATON_PASS" ],
+            [ 36, "MOVE_SLAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM56",
+            "TM67",
+            "TM75",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SUPER_FANG",
+            "MOVE_SEED_BOMB",
+            "MOVE_LOW_KICK",
+            "MOVE_GUNK_SHOT",
+            "MOVE_LAST_RESORT",
+            "MOVE_AQUA_TAIL",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_AFTER_YOU",
+            "MOVE_HELPING_HAND",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_FORESIGHT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SCREECH",
+            "MOVE_ASSURANCE",
+            "MOVE_PURSUIT",
+            "MOVE_REVENGE",
+            "MOVE_FLAIL"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 20,
+            "species": "SPECIES_WATCHOG"
+        }
+    ],
+    "regional_dex_number": 10,
+    "baby_species": "SPECIES_PATRAT"
+}

@@ -99,17 +99,8 @@ extern const GameProcFunctions data_ov012_0216dd78;
 extern const GameProcFunctions data_ov140_0219eecc;
 extern const GameProcFunctions TOWNMAP_PROC_FUNCTIONS;
 extern const GameProcFunctions data_ov189_021ae03c;
-extern const GameProcFunctions data_ov215_021ab01c;
 extern const GameProcFunctions data_ov143_021a039c;
 extern const GameProcFunctions data_ov145_021a0fe0;
-
-// Overlay 215, the mail
-void *func_ov215_021a75a0(GameData *gameData, u32 a1, u8 partySlot, u32 mailId, HeapID heapId);
-void *func_ov215_021a7624(GameData *gameData, PartyPkm *pkm, HeapID heapId);
-void *func_ov215_021a7684(GameData *gameData, u32 mailId, HeapID heapId);
-BOOL func_ov215_021a76e0(void *param);
-void func_ov215_021a76e4(void *param, PartyPkm *pkm);
-void func_ov215_021a7704(void *param);
 
 // Overlay 12: the trainer card's param, whose canEdit is FALSE in the Union Room
 void *func_ov012_02169b04(GameData *gameData, HeapID heapId, BOOL canEdit);

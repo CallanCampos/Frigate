@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Hydration",
+    "description": "Heals status problems if\nit is raining."
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SCRAGGY",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Intruder sighted!{be01}\nI'll have you know that the Pokémon I'm\nabout to use was stolen from a child!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "...What a weak Pokémon.\nI'll just have to go steal some better ones!"
+        },
+        {
+            "type": 2,
+            "text": "If we steal Pokémon, the number of\nTrainers in the world will go down.{be00}\nThen we won't have any more enemies!"
+        }
+    ]
+}

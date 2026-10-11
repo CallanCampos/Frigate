@@ -1,18 +1,18 @@
-The mission will begin...\nPlease wait a moment.
-The mission is over.{be01}
-Summary of the Funfest Mission...{be01}
-You retired from the mission.{be01}
-The connection has been lost, and\nthe Funfest Mission will be ended.{be01}
-Unable to participate.{be01}\nYou may not be able to join the mission\nwhen the time limit is short.
-It's a mission you can't participate in.{be01}\nYou may not be able to join the mission\nwhen the time limit is short.
-You cannot participate\nin this mission yet.{be01}\nThe more you progress in your adventure,\nthe more missions you'll be able to play.
-{bd02}“{0140:0}"
-                   \x{ffff}
-                    \x{ffff}
-Time remaining: {bd03:16}{0203:2} min. {0201:3} sec.
-Time remaining: {bd03:16}{0201:3} sec.
-Target: {bd03:16}{0203:4}
-Target: {bd03:16}{0203:4}
-Target: {bd03:16}{0203:4}
-Target: {bd03:16}{0203:4}
-Target: {bd03:16}{0203:4}
+ScriptBank0412_Text_MissionWillBeginPlease = The mission will begin...\nPlease wait a moment.
+ScriptBank0412_Text_MissionOver = The mission is over.{be01}
+ScriptBank0412_Text_SummaryFunfestMission = Summary of the Funfest Mission...{be01}
+ScriptBank0412_Text_RetiredFromMission = You retired from the mission.{be01}
+ScriptBank0412_Text_ConnectionHasBeenLost = The connection has been lost, and\nthe Funfest Mission will be ended.{be01}
+ScriptBank0412_Text_UnableParticipateMayNot = Unable to participate.{be01}\nYou may not be able to join the mission\nwhen the time limit is short.
+ScriptBank0412_Text_ItsMissionCantParticipate = It's a mission you can't participate in.{be01}\nYou may not be able to join the mission\nwhen the time limit is short.
+ScriptBank0412_Text_CannotParticipateMissionYet = You cannot participate\nin this mission yet.{be01}\nThe more you progress in your adventure,\nthe more missions you'll be able to play.
+ScriptBank0412_Text_Empty = {bd02}“{0140:0}"
+ScriptBank0412_Text_Empty_2 =                    \x{ffff}
+ScriptBank0412_Text_Empty_3 =                     \x{ffff}
+ScriptBank0412_Text_TimeRemainingMinSec = Time remaining: {bd03:16}{0203:2} min. {0201:3} sec.
+ScriptBank0412_Text_TimeRemainingSec = Time remaining: {bd03:16}{0201:3} sec.
+ScriptBank0412_Text_Target = Target: {bd03:16}{0203:4}
+ScriptBank0412_Text_Target_2 = Target: {bd03:16}{0203:4}
+ScriptBank0412_Text_Target_3 = Target: {bd03:16}{0203:4}
+ScriptBank0412_Text_Target_4 = Target: {bd03:16}{0203:4}
+ScriptBank0412_Text_Target_5 = Target: {bd03:16}{0203:4}

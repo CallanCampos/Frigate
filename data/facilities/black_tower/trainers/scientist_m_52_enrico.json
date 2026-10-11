@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Enrico",
+    "class": "TRAINER_CLASS_SCIENTIST_M_52",
+    "pokemon": [
+        "flaaffy_1",
+        "lampent_1",
+        "beautifly_1",
+        "porygon_1",
+        "vanillish_1",
+        "kadabra_1",
+        "roselia_1",
+        "haunter_1",
+        "prinplup_1",
+        "sunflora_1"
+    ]
+}

@@ -1,0 +1,6 @@
+{
+    "$schema": "../../facility.schema.json",
+    "unk0": 2,
+    "pokemon": [ "simisear_3", "heatmor_2", "darmanitan_2", "chandelure_2", "houndoom_3", "flareon_4" ],
+    "single_set": "watchog_2"
+}

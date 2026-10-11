@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Motor Drive",
+    "description": "Raises Speed if hit by an\nElectric-type move."
+}

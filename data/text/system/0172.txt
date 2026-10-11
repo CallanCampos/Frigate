@@ -1,22 +1,22 @@
-Glad to meet you!\nI am {011c:0}!
-I'm a {011c:0}-loving\n{011c:1} Trainer.
-Let's {011c:0} sometime.\nKeep in touch!
-{011c:0} is the best!\nI love it!
-It's great because it's\n{011c:0}. Don't you agree?
-Tell me your favorite\n{011c:0}.
-Hi!\nDo you know {011c:0}?
-It's very {011c:0}\nand {011c:1}!
-Let's {011c:0} soon!
-Thank you for taking your time\nwith {011c:0}.
-It was so {011c:0}.\nI was moved!
-What do you think of\n{011c:0}?
-It's {011c:0},\nif you ask me.
-It bothers us, doesn't it?\nI'm talking about {011c:0}.
-Do you know what\nthey call {011c:0}?
-This {011c:0} is\nsurprisingly {011c:1}!
-{011c:0} sure is something.\nYou should try it!
-Thank you for taking your time\nwith {011c:0}.
-{011c:0} is\n{011c:1}, don't you think?
-That means {011c:0}.\nThanks!
-We should {011c:0} together\nagain. {011c:1}!
+Bank0172_Text_GladMeetAm = Glad to meet you!\nI am {011c:0}!
+Bank0172_Text_ImLovingTrainer = I'm a {011c:0}-loving\n{011c:1} Trainer.
+Bank0172_Text_LetsSometimeKeepTouch = Let's {011c:0} sometime.\nKeep in touch!
+Bank0172_Text_BestLove = {011c:0} is the best!\nI love it!
+Bank0172_Text_ItsGreatBecauseIts = It's great because it's\n{011c:0}. Don't you agree?
+Bank0172_Text_TellFavorite = Tell me your favorite\n{011c:0}.
+Bank0172_Text_HiKnow = Hi!\nDo you know {011c:0}?
+Bank0172_Text_ItsVery = It's very {011c:0}\nand {011c:1}!
+Bank0172_Text_LetsSoon = Let's {011c:0} soon!
+Bank0172_Text_ThankTakingTime = Thank you for taking your time\nwith {011c:0}.
+Bank0172_Text_Moved = It was so {011c:0}.\nI was moved!
+Bank0172_Text_WhatThink = What do you think of\n{011c:0}?
+Bank0172_Text_ItsIfAsk = It's {011c:0},\nif you ask me.
+Bank0172_Text_BothersUsDoesntIm = It bothers us, doesn't it?\nI'm talking about {011c:0}.
+Bank0172_Text_KnowWhatTheyCall = Do you know what\nthey call {011c:0}?
+Bank0172_Text_Surprisingly = This {011c:0} is\nsurprisingly {011c:1}!
+Bank0172_Text_SureSomethingShouldTry = {011c:0} sure is something.\nYou should try it!
+Bank0172_Text_ThankTakingTime_2 = Thank you for taking your time\nwith {011c:0}.
+Bank0172_Text_DontThink = {011c:0} is\n{011c:1}, don't you think?
+Bank0172_Text_MeansThanks = That means {011c:0}.\nThanks!
+Bank0172_Text_WeShouldTogetherAgain = We should {011c:0} together\nagain. {011c:1}!
 \pad{b8}

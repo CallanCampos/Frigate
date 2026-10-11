@@ -1,5 +1,0 @@
-What is this place?\nIt feels very strange.{be01}\nCould this be the place where\nReversal Mountain started from--{be00}\nthe lair of the Pokémon Heatran?{be01}
-Heatran is a Pokémon with\nmagma-like blood flowing through it!{be01}
-The Magma Stone is reacting\nto something...{be00}\nWill you set it down here?
-Gwogobo gwobobobo!
-Heatran vanished into the\ndepths of the volcano...

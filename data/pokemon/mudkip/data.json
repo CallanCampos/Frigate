@@ -1,0 +1,188 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Mudkip",
+    "pokedex": {
+        "category": "Mud Fish Pokémon",
+        "entry": "To alert it, the fin on its head\nsenses the flow of water. It has\nthe strength to heft boulders.",
+        "height": "1'04\"",
+        "weight": "16.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Mudkip",
+                "category": "Mud Fish Pokémon",
+                "entry": "To alert it, the fin on its head\nsenses the flow of water. It has\nthe strength to heft boulders.",
+                "height": "1'04\"",
+                "weight": "16.8 lbs."
+            },
+            "fr": {
+                "name": "Gobou",
+                "category": "Pokémon Poissonboue",
+                "entry": "Il analyse le courant grâce à la\nnageoire sur sa tête. Il est assez\nfort pour soulever des rochers.",
+                "height": "0,4 m",
+                "weight": "7,6 kg"
+            },
+            "de": {
+                "name": "Hydropi",
+                "category": "Lehmhüpfer",
+                "entry": "Die Flosse auf seinem Kopf prüft\ndie Strömung des Wassers. Dieses\nPokémon kann Felsen heben.",
+                "height": "0,4 m",
+                "weight": "7,6 kg"
+            },
+            "it": {
+                "name": "Mudkip",
+                "category": "Pokémon Fango Pesce",
+                "entry": "Con la pinna sulla testa percepisce\ni movimenti dell'acqua e sta in guardia.\nRiesce a sollevare rocce.",
+                "height": "0,4 m",
+                "weight": "7,6 kg"
+            },
+            "ko": {
+                "name": "물짱이",
+                "category": "늪물고기포켓몬",
+                "entry": "머리의 지느러미로 물의 흐름을\n느껴 주위의 상황을 파악한다.\n바위를 들어올릴 정도로 힘이 세다.",
+                "height": "0.4 m",
+                "weight": "7.6 kg"
+            },
+            "es": {
+                "name": "Mudkip",
+                "category": "Pokémon Pez Lodo",
+                "entry": "La aleta de su cabeza detecta las\ncorrientes de agua y los peligros.\nTiene fuerza para levantar rocas.",
+                "height": "0,4 m",
+                "weight": "7,6 kg"
+            },
+            "ja": {
+                "name": "ミズゴロウ",
+                "category": "ぬまうおポケモン",
+                "entry": "あたまの\\x{3000}ひれで\\x{3000}みずの\\x{3000}ながれを\nかんじて\\x{3000}まわりの\\x{3000}ようすを\\x{3000}しる。\nいわを\\x{3000}もちあげる\\x{3000}ちからもち。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 70,
+        "defense": 50,
+        "speed": 40,
+        "special_attack": 50,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_WATER_1" ],
+    "abilities": [ "ABILITY_TORRENT", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_DAMP",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 62,
+    "height": 4,
+    "weight": 76,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 6, "MOVE_MUD_SLAP" ],
+            [ 10, "MOVE_WATER_GUN" ],
+            [ 15, "MOVE_BIDE" ],
+            [ 19, "MOVE_FORESIGHT" ],
+            [ 24, "MOVE_MUD_SPORT" ],
+            [ 28, "MOVE_TAKE_DOWN" ],
+            [ 33, "MOVE_WHIRLPOOL" ],
+            [ 37, "MOVE_PROTECT" ],
+            [ 42, "MOVE_HYDRO_PUMP" ],
+            [ 46, "MOVE_ENDEAVOR" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM34",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM55",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_WATER_PLEDGE",
+            "MOVE_LOW_KICK",
+            "MOVE_EARTH_POWER",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_REFRESH",
+            "MOVE_UPROAR",
+            "MOVE_CURSE",
+            "MOVE_STOMP",
+            "MOVE_ICE_BALL",
+            "MOVE_MIRROR_COAT",
+            "MOVE_COUNTER",
+            "MOVE_ANCIENT_POWER",
+            "MOVE_WHIRLPOOL",
+            "MOVE_BITE",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_MUD_BOMB",
+            "MOVE_YAWN",
+            "MOVE_SLUDGE",
+            "MOVE_AVALANCHE",
+            "MOVE_WIDE_GUARD"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 16,
+            "species": "SPECIES_MARSHTOMP"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MUDKIP"
+}

@@ -2,6 +2,7 @@
 #include "constants/moves.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -500,12 +501,12 @@ static void PStaSkill_PrintStatValues(PStatusWork *wk, PStaSkillWork *skill) {
 
     PStatus_PrintToWindow(wk, skill->windows[7], 0x74, 5, 1, PRINT_COLOR(15, 2, 0));
     ability = PokeParty_GetParam(pkm, PKM_PARAM_ABILITY, NULL);
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x177, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_DESCRIPTIONS, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, ability);
     func_02021c7c(wk->printQueue, BmpWin_GetBitmap(skill->windows[7]), 5, 17, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x176, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_NAMES, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, ability);
     func_02021c7c(wk->printQueue, BmpWin_GetBitmap(skill->windows[7]), 65, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
@@ -588,7 +589,7 @@ static void PStaSkill_PrintMoveDetail(PStatusWork *wk, PStaSkillWork *skill) {
         PStatus_PrintFormattedToWindow(wk, skill->windows[10], wordSet, 0x97, 81, 1, PRINT_COLOR(1, 2, 0));
         GFL_WordSetSystemFree(wordSet);
     }
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x192, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_13, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, move);
     func_02021c7c(wk->printQueue, BmpWin_GetBitmap(skill->windows[11]), 1, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);
@@ -1244,7 +1245,7 @@ static void PStaSkill_LoadPlate(PStatusWork *wk, PStaSkillWork *skill, SkillPlat
         maxPp = pp = PML_MoveGetParam(move, MOVE_PARAM_PP);
     }
     plate->bitmap = GFL_BitmapCreate(11, 4, 32, wk->heapId);
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x193, wk->heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, wk->heapId);
     str = GFL_MsgDataLoadStrbufNew(msgData, move);
     func_02021c7c(wk->printQueue, plate->bitmap, 3, 2, str, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(str);

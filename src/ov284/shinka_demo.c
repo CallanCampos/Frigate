@@ -1,5 +1,6 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
+#include "app/ui/yesno_menu.h"
 #include "app/p_status.h"
 #include "battle/b_app_tool.h"
 #include "battle/b_plist_main.h"
@@ -8,6 +9,7 @@
 #include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "demo/shinka_demo.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -527,11 +529,11 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             wk->state = SHINKA_DEMO_WAIT_FORGET_ANSWER;
             ShinkaDemo_SetMenuChoices(wk, wk->menuMsgData, 2, WORD_NONE, NULL, WORD_NONE, NULL, wk->menuMsgData, 3,
                                       WORD_NONE, NULL, WORD_NONE, NULL);
-            func_ov139_0219a8bc(wk->menu, wk->choices[0], wk->choices[1]);
+            TwoChoiceMenu_Open(wk->menu, wk->choices[0], wk->choices[1]);
         }
         break;
     case SHINKA_DEMO_WAIT_FORGET_ANSWER:
-        result = func_ov139_0219ae78(wk->menu);
+        result = TwoChoiceMenu_GetResult(wk->menu);
         if (result == TWO_CHOICE_MENU_NONE) {
             break;
         }
@@ -546,7 +548,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
         } else if (result == TWO_CHOICE_MENU_SECOND) {
             wk->state = SHINKA_DEMO_GIVE_UP;
         }
-        func_ov139_0219aaa4(wk->menu);
+        TwoChoiceMenu_Close(wk->menu);
         break;
     case SHINKA_DEMO_WAIT_FADE_OV207:
         if (GFL_FadeIsRunning() == FALSE) {
@@ -600,7 +602,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
     case SHINKA_DEMO_WAIT_FADE_OV287:
         if (GFL_FadeIsRunning() == FALSE) {
             wk->state = SHINKA_DEMO_OV287;
-            func_ov139_0219a864(wk->menu);
+            TwoChoiceMenu_Free(wk->menu);
             wk->menu = NULL;
             ShinkaDemoGraphic_FreeSubBG(wk->graphic);
             wk->usingKeys = func_0203d554() == FALSE;
@@ -651,7 +653,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             wk->tcbBuffer = NULL;
             wk->paletteFade = NULL;
             ShinkaDemoGraphic_InitSubBG(wk->graphic);
-            wk->menu = func_ov139_0219a584(wk->heapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic),
+            wk->menu = TwoChoiceMenu_Create(wk->heapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic),
                                            wk->font, wk->printQueue, 0);
             func_02042ba8(0, wk->heapId);
             GFL_FadeSet(2, 16, 0, 0);
@@ -720,11 +722,11 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             wk->state = SHINKA_DEMO_WAIT_GIVE_UP_ANSWER;
             ShinkaDemo_SetMenuChoices(wk, wk->menuMsgData, 4, WORD_MOVE, &wk->move, WORD_NONE, NULL, wk->menuMsgData, 5,
                                       WORD_MOVE, &wk->move, WORD_NONE, NULL);
-            func_ov139_0219a8bc(wk->menu, wk->choices[0], wk->choices[1]);
+            TwoChoiceMenu_Open(wk->menu, wk->choices[0], wk->choices[1]);
         }
         break;
     case SHINKA_DEMO_WAIT_GIVE_UP_ANSWER:
-        result = func_ov139_0219ae78(wk->menu);
+        result = TwoChoiceMenu_GetResult(wk->menu);
         if (result == TWO_CHOICE_MENU_NONE) {
             break;
         }
@@ -734,7 +736,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
         } else if (result == TWO_CHOICE_MENU_SECOND) {
             wk->state = SHINKA_DEMO_PRINT_WANTS_MOVE;
         }
-        func_ov139_0219aaa4(wk->menu);
+        TwoChoiceMenu_Close(wk->menu);
         break;
     case SHINKA_DEMO_WAIT_NOT_LEARNED:
         if (ShinkaDemo_IsPrintDone(wk)) {
@@ -769,7 +771,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
     ShinkaDemo_UpdateBGM(param, wk);
     if (wk->state != SHINKA_DEMO_OV207 && wk->state != SHINKA_DEMO_OV207_END) {
         if (wk->menu != NULL) {
-            func_ov139_0219ab40(wk->menu);
+            TwoChoiceMenu_Main(wk->menu);
         }
         ShinkaDemo_UpdateMsg(param, wk);
         func_02021a3c(wk->printQueue);
@@ -789,7 +791,7 @@ static void ShinkaDemo_InitGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_SHINKA_DEMO_GRAPHIC, 0x70000);
     wk->graphicHeapId = HEAPID_SHINKA_DEMO_GRAPHIC;
-    GFL_OvlLoad(OVERLAY_139);
+    GFL_OvlLoad(OVERLAY_APP_UI);
     for (i = 0; i <= 7; i++) {
         GFL_BGSysSetBGEnabled(i, FALSE);
     }
@@ -848,7 +850,7 @@ static void ShinkaDemo_FreeGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
     GFL_FontFree(wk->font);
     ShinkaDemoGraphic_FreeSubBG(wk->graphic);
     ShinkaDemoGraphic_Free(wk->graphic);
-    GFL_OvlUnload(OVERLAY_139);
+    GFL_OvlUnload(OVERLAY_APP_UI);
     GFL_HeapDelete(HEAPID_SHINKA_DEMO_GRAPHIC);
 }
 
@@ -1110,8 +1112,8 @@ static void ShinkaDemo_InitMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     BmpWin_FlushMap(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     wk->frameChars = LoadCursorImageEndOfHeap(1, 2, 0, wk->graphicHeapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 364, wk->graphicHeapId);
-    wk->moveMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 401, wk->graphicHeapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO, wk->graphicHeapId);
+    wk->moveMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO_BTL_MAIN, wk->graphicHeapId);
     wk->tcbExManager = GFL_TCBExMgrCreate(wk->graphicHeapId, wk->graphicHeapId, 1, 0);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     wk->message = NULL;
@@ -1243,15 +1245,15 @@ static void ShinkaDemo_ShowWindow(ShinkaDemoParam *param, ShinkaDemoWork *wk, BO
 }
 
 static void ShinkaDemo_InitMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
-    wk->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 440, wk->graphicHeapId);
-    wk->menu = func_ov139_0219a584(wk->graphicHeapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->font,
+    wk->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_YES_NO, wk->graphicHeapId);
+    wk->menu = TwoChoiceMenu_Create(wk->graphicHeapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->font,
                                    wk->printQueue, 0);
     wk->choices[0] = NULL;
     wk->choices[1] = NULL;
 }
 
 static void ShinkaDemo_FreeMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
-    func_ov139_0219a864(wk->menu);
+    TwoChoiceMenu_Free(wk->menu);
     wk->menu = NULL;
     if (wk->choices[0] != NULL) {
         GFL_StrBufFree(wk->choices[0]);

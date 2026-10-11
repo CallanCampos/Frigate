@@ -1,65 +1,65 @@
-Movie Star
-World Police
-Radio: HQ to Mecha Cop.\nHQ to Mecha Cop.{be00}\nArrest the criminal{be00}\nas soon as possible.
-Radio: HQ to Mecha Cop.\nHQ to Mecha Cop.{be00}\nWe have dispatched riot police.{be00}\nCooperate with them, and{be00}\ncarry out the mission.
-Mecha Cop: Riot police have arrived...
-The {0102:0} Ninja: All I want\nis to run through town tonight{be00}\nwith {0102:0}.{be00}\nJust for the thrill of it!
-Mecha Cop: The Birdlime Machine Gun!\nApunten, ¡fuego!
-The {0102:0} Ninja: Whoa!\nA-again?{be01}\nYou used a weapon again!\nYou're doing it on purpose, aren't you?
-Mecha Cop: Argh, sorry about that.\nI just wanted to try it out.
-The {0102:0} Ninja: (...A guy like that\nis a champion of justice...){be00}\n(...How appalling...)
-Mecha Cop: I've got you cornered,\n{0102:0} Ninja!{be00}\nSurrender!
-The {0102:0} Ninja: Argh...sigh...{be01}\nHey, Mecha Cop...\nYeah, you got me.{be00}\nSo will you grant my last request?
-Mecha Cop: Well, what is it?
-The {0102:0} Ninja: Battle me!
-Mecha Cop: In recognition of you as\nmy archenemy, {0102:0} Ninja...{be01}\nChallenge accepted!\nLet's battle!{be00}\nSéquence d'activation... Action!
-The {0102:0} Ninja: Let me go!
-Mecha Cop: Even if she is a villain,\nreaching out to her{be00}\nif she asks for help...{be01}\n...may also be justice...
-The {0102:0} Ninja: Ready to rock,\nMecha Cop?
-Mecha Cop: Bring it!\nThis battle is for keeps!
-The {0102:0} Ninja: Heh!\nIt's been a long time since{be00}\nI've had so much fun battling!
-Mecha Cop: I labeled every criminal a villain.\nOnce someone has a label slapped on them,{be00}\nthat label becomes a signpost of how to{be00}\ntreat them. Thinking about it...{be01}\nOnce I labeled you a villain, I no longer\ntreated you like a fellow human being.{be01}\nBut criminals are still human beings.\nTheir crimes may be unforgivable, but{be00}\ntheir human dignity must still be respected,{be00}\nor there would be no way to tell the{be00}\ndifference between justice and injustice.
-The {0102:0} Ninja: ...\nMecha Cop...?
-Mecha Cop: Justice...\nReal justice, that I can believe in...
-The {0102:0} Ninja: Mecha Cop...\nBy any chance, are you taking it easy on me?
-Mecha Cop: Time will be the judge of that...
-The {0102:0} Ninja: Get hold of yourself!\nYou represent the World Police,{be00}\nand I'm a thief, a criminal, a villain!{be00}\nWe...are...enemies!
-Mecha Cop: {0102:0} Ninja.\nOur battles have made me question{be00}\nthe definition of justice...{be01}\nAs a secret detective, I'm a failure.\nThe last thing that I can do for you is...
-The {0102:0} Ninja: Get a grip, crybaby!\nMy archenemy, Mecha Cop,{be00}\nwouldn't show himself to be a pushover!
-Mecha Cop: Protecting justice...{be01}\n...A concept I no longer believe in.\nNothing really matters anymore...
-Mecha Cop: I was trapped in a mechanical\nframework of justice.{be00}\nYou've woken me up.{be00}\n{0102:0} Ninja...
-The {0102:0} Ninja: Gulp...\nWhat are you trying to say?
-Mecha Cop: But you are a thief.\nI cannot forgive your crimes...{be01}\nBut...if you pay for your crimes,\nthen, together, we...
-The {0102:0} Ninja: Say no more!
-The {0102:0} Ninja: Wait...\nWhat do you mean--nothing matters anymore?
-Mecha Cop: Justice, evil...\nA robot can't tell the difference.{be01}\nPush my buttons, and I recite the\ncode of the World Police.
-The {0102:0} Ninja: You...\nYou've changed...
-Mecha Cop: Changed?\nWhat do you mean?{be01}\nAll I've ever been is a cog in the wheel,\na mouthpiece for the World Police...{be01}\nAn antiseptic,\nunemotional{be00}\nrobot.
-Riot Police: Calling all members!\nApprehend the {0102:0} Ninja immediately!
-Mecha Cop: Wait.\nShe won't run away anymore...{be00}\nRight? The...{0102:0}...Ninja...
-The {0102:0} Ninja: Tee hee hee.\nI lost, Mecha Cop...
-Mecha Cop: Mission accomplie.{be01}\nNow, {0102:0} Ninja,\nit's time for you to pay for your crimes.{be00}\nReady to turn over a new leaf...?
-The {0102:0} Ninja: ...{be01}\n...\nThanks...
-Thus, the {0102:0} Ninja, who escaped\nprison so many times before, went to prison{be00}\nat the hands of Mecha Cop.{be01}\nAnd the {0102:0} Ninja never again\nattempted escape...so they say...
-Then, several years later...{be01}\nThe secret detective, Mecha Cop,\nwho protects citizens from crime,{be01}\nhas a new partner at his side.\nA partner by the name of...The {0102:0}!{be01}\nListen to your human side, Mecha Cop!\nCondemn the crime, not the criminal.
-Mecha Cop: I lost. I failed.\nSchluss, aus, finito!{be00}\nGo! Run! Get away!
-The {0102:0} Ninja: Mecha Cop!\nI'm disappointed in you.
-Mecha Cop: After all, I'm just...\n...a cyborg.{be00}\nI lost my heart a long time ago.{be01}\nWhat...?\n...{be00}\nTears, idle tears...{be00}\nI know not what they mean...
-Thus, The {0102:0} Ninja, who escaped\nfrom prison so many times before...escaped{be00}\nfrom Mecha Cop's grasp once again.{be01}\nSoon after, Mecha Cop left the World Police,{be01}\nand The {0102:0} Ninja\nceased her life of thievery.{be01}\nIs this what you wanted, Mecha Cop?\nSomeday, your heart will{be00}\ntell itself what to do.
-The {0102:0} Ninja: Sweet freedom!\nAs for the World Police--so predictable!{be01}\nNo matter how many secret detectives\nyou send after me,{be00}\nyou can't catch me!
-Riot Police: There she is! Stop her!
-The {0102:0} Ninja: Farewell,\nladies and gentlemen of the World Police!
-Riot Police: Wha... Amazing!\nShe flew! How did she do that?
-Mecha Cop: {0102:0} Ninja!\nWait! ...Wait!
-The {0102:0} Ninja, who escaped\nfrom prison so many times before...{be00}\nescaped from Mecha Cop's grasp once more.
-Fifty years pass...{be01}\nThe spry {0102:0} Ninja\nis still running, and Mecha Cop, nearly ready{be00}\nfor the scrap heap, is still chasing her,{be00}\nand running...and escaping...{be00}\nand chasing...and...{be01}\nTake a break already, Mecha Cop!\nSomebody, make them stop!
-Riot Police: Woot!\nWe'll catch the {0102:0} Ninja!
-The {0102:0} Ninja: I think not...\nI'll never be captured by the likes of you...
-Mecha Cop: Stop!\nEven when facing a villain,{be01}\nit's not fair to interrupt a\none-on-one Pokémon battle!{be00}\nFor shame!
-Riot Police: We're sorry,\nMecha Cop...
-The {0102:0} Ninja: Heh! No kidding!\nEverybody wants a free pass to get{be00}\naway with unfair things like that.{be01}\nAfter all, what you call justice is...
-The {0102:0} Ninja: Obsolete.
-Mecha Cop: That's not true!{be01}\nWhenever, wherever, and whoever\nmakes the effort to do the right thing--{be00}\nhe or she can be a champion of justice!{be01}\n{0102:0} Ninja!\nKnow what? You're no exception yourself.
-The {0102:0} Ninja: Old fashioned.
-Mecha Cop: Wh-what?\nA simple trench coat over a metal body--{be00}\nI'm as fashion forward as I can get.{be01}\nYou're the one in need of a\ncostume intervention, {0102:0} Ninja!
+Bank0193_Text_MovieStar = Movie Star
+Bank0193_Text_WorldPolice = World Police
+Bank0193_Text_RadioHqMechaCop = Radio: HQ to Mecha Cop.\nHQ to Mecha Cop.{be00}\nArrest the criminal{be00}\nas soon as possible.
+Bank0193_Text_RadioHqMechaCop_2 = Radio: HQ to Mecha Cop.\nHQ to Mecha Cop.{be00}\nWe have dispatched riot police.{be00}\nCooperate with them, and{be00}\ncarry out the mission.
+Bank0193_Text_MechaCopRiotPolice = Mecha Cop: Riot police have arrived...
+Bank0193_Text_NinjaAllWantRun = The {0102:0} Ninja: All I want\nis to run through town tonight{be00}\nwith {0102:0}.{be00}\nJust for the thrill of it!
+Bank0193_Text_MechaCopBirdlimeMachine = Mecha Cop: The Birdlime Machine Gun!\nApunten, ¡fuego!
+Bank0193_Text_NinjaWhoaAgainUsed = The {0102:0} Ninja: Whoa!\nA-again?{be01}\nYou used a weapon again!\nYou're doing it on purpose, aren't you?
+Bank0193_Text_MechaCopArghSorry = Mecha Cop: Argh, sorry about that.\nI just wanted to try it out.
+Bank0193_Text_NinjaGuyLikeChampion = The {0102:0} Ninja: (...A guy like that\nis a champion of justice...){be00}\n(...How appalling...)
+Bank0193_Text_MechaCopIveGot = Mecha Cop: I've got you cornered,\n{0102:0} Ninja!{be00}\nSurrender!
+Bank0193_Text_NinjaArghSighHey = The {0102:0} Ninja: Argh...sigh...{be01}\nHey, Mecha Cop...\nYeah, you got me.{be00}\nSo will you grant my last request?
+Bank0193_Text_MechaCopWellWhat = Mecha Cop: Well, what is it?
+Bank0193_Text_NinjaBattle = The {0102:0} Ninja: Battle me!
+Bank0193_Text_MechaCopRecognitionArchenemy = Mecha Cop: In recognition of you as\nmy archenemy, {0102:0} Ninja...{be01}\nChallenge accepted!\nLet's battle!{be00}\nSéquence d'activation... Action!
+Bank0193_Text_NinjaLetGo = The {0102:0} Ninja: Let me go!
+Bank0193_Text_MechaCopEvenIf = Mecha Cop: Even if she is a villain,\nreaching out to her{be00}\nif she asks for help...{be01}\n...may also be justice...
+Bank0193_Text_NinjaReadyRockMecha = The {0102:0} Ninja: Ready to rock,\nMecha Cop?
+Bank0193_Text_MechaCopBringBattle = Mecha Cop: Bring it!\nThis battle is for keeps!
+Bank0193_Text_NinjaHehItsBeen = The {0102:0} Ninja: Heh!\nIt's been a long time since{be00}\nI've had so much fun battling!
+Bank0193_Text_MechaCopLabeledEvery = Mecha Cop: I labeled every criminal a villain.\nOnce someone has a label slapped on them,{be00}\nthat label becomes a signpost of how to{be00}\ntreat them. Thinking about it...{be01}\nOnce I labeled you a villain, I no longer\ntreated you like a fellow human being.{be01}\nBut criminals are still human beings.\nTheir crimes may be unforgivable, but{be00}\ntheir human dignity must still be respected,{be00}\nor there would be no way to tell the{be00}\ndifference between justice and injustice.
+Bank0193_Text_NinjaMechaCop = The {0102:0} Ninja: ...\nMecha Cop...?
+Bank0193_Text_MechaCopJusticeReal = Mecha Cop: Justice...\nReal justice, that I can believe in...
+Bank0193_Text_NinjaMechaCopBy = The {0102:0} Ninja: Mecha Cop...\nBy any chance, are you taking it easy on me?
+Bank0193_Text_MechaCopTimeWill = Mecha Cop: Time will be the judge of that...
+Bank0193_Text_NinjaGetHoldYourself = The {0102:0} Ninja: Get hold of yourself!\nYou represent the World Police,{be00}\nand I'm a thief, a criminal, a villain!{be00}\nWe...are...enemies!
+Bank0193_Text_MechaCopNinjaOur = Mecha Cop: {0102:0} Ninja.\nOur battles have made me question{be00}\nthe definition of justice...{be01}\nAs a secret detective, I'm a failure.\nThe last thing that I can do for you is...
+Bank0193_Text_NinjaGetGripCrybaby = The {0102:0} Ninja: Get a grip, crybaby!\nMy archenemy, Mecha Cop,{be00}\nwouldn't show himself to be a pushover!
+Bank0193_Text_MechaCopProtectingJustice = Mecha Cop: Protecting justice...{be01}\n...A concept I no longer believe in.\nNothing really matters anymore...
+Bank0193_Text_MechaCopTrappedMechanical = Mecha Cop: I was trapped in a mechanical\nframework of justice.{be00}\nYou've woken me up.{be00}\n{0102:0} Ninja...
+Bank0193_Text_NinjaGulpWhatTrying = The {0102:0} Ninja: Gulp...\nWhat are you trying to say?
+Bank0193_Text_MechaCopButThief = Mecha Cop: But you are a thief.\nI cannot forgive your crimes...{be01}\nBut...if you pay for your crimes,\nthen, together, we...
+Bank0193_Text_NinjaSayNoMore = The {0102:0} Ninja: Say no more!
+Bank0193_Text_NinjaWaitWhatMean = The {0102:0} Ninja: Wait...\nWhat do you mean--nothing matters anymore?
+Bank0193_Text_MechaCopJusticeEvil = Mecha Cop: Justice, evil...\nA robot can't tell the difference.{be01}\nPush my buttons, and I recite the\ncode of the World Police.
+Bank0193_Text_NinjaYouveChanged = The {0102:0} Ninja: You...\nYou've changed...
+Bank0193_Text_MechaCopChangedWhat = Mecha Cop: Changed?\nWhat do you mean?{be01}\nAll I've ever been is a cog in the wheel,\na mouthpiece for the World Police...{be01}\nAn antiseptic,\nunemotional{be00}\nrobot.
+Bank0193_Text_RiotPoliceCallingAll = Riot Police: Calling all members!\nApprehend the {0102:0} Ninja immediately!
+Bank0193_Text_MechaCopWaitShe = Mecha Cop: Wait.\nShe won't run away anymore...{be00}\nRight? The...{0102:0}...Ninja...
+Bank0193_Text_NinjaTeeHeeHee = The {0102:0} Ninja: Tee hee hee.\nI lost, Mecha Cop...
+Bank0193_Text_MechaCopMissionAccomplie = Mecha Cop: Mission accomplie.{be01}\nNow, {0102:0} Ninja,\nit's time for you to pay for your crimes.{be00}\nReady to turn over a new leaf...?
+Bank0193_Text_NinjaThanks = The {0102:0} Ninja: ...{be01}\n...\nThanks...
+Bank0193_Text_ThusNinjaWhoEscaped = Thus, the {0102:0} Ninja, who escaped\nprison so many times before, went to prison{be00}\nat the hands of Mecha Cop.{be01}\nAnd the {0102:0} Ninja never again\nattempted escape...so they say...
+Bank0193_Text_ThenSeveralYearsLater = Then, several years later...{be01}\nThe secret detective, Mecha Cop,\nwho protects citizens from crime,{be01}\nhas a new partner at his side.\nA partner by the name of...The {0102:0}!{be01}\nListen to your human side, Mecha Cop!\nCondemn the crime, not the criminal.
+Bank0193_Text_MechaCopLostFailed = Mecha Cop: I lost. I failed.\nSchluss, aus, finito!{be00}\nGo! Run! Get away!
+Bank0193_Text_NinjaMechaCopIm = The {0102:0} Ninja: Mecha Cop!\nI'm disappointed in you.
+Bank0193_Text_MechaCopAfterAll = Mecha Cop: After all, I'm just...\n...a cyborg.{be00}\nI lost my heart a long time ago.{be01}\nWhat...?\n...{be00}\nTears, idle tears...{be00}\nI know not what they mean...
+Bank0193_Text_ThusNinjaWhoEscaped_2 = Thus, The {0102:0} Ninja, who escaped\nfrom prison so many times before...escaped{be00}\nfrom Mecha Cop's grasp once again.{be01}\nSoon after, Mecha Cop left the World Police,{be01}\nand The {0102:0} Ninja\nceased her life of thievery.{be01}\nIs this what you wanted, Mecha Cop?\nSomeday, your heart will{be00}\ntell itself what to do.
+Bank0193_Text_NinjaSweetFreedomWorld = The {0102:0} Ninja: Sweet freedom!\nAs for the World Police--so predictable!{be01}\nNo matter how many secret detectives\nyou send after me,{be00}\nyou can't catch me!
+Bank0193_Text_RiotPoliceThereShe = Riot Police: There she is! Stop her!
+Bank0193_Text_NinjaFarewellLadiesGentlemen = The {0102:0} Ninja: Farewell,\nladies and gentlemen of the World Police!
+Bank0193_Text_RiotPoliceWhaAmazing = Riot Police: Wha... Amazing!\nShe flew! How did she do that?
+Bank0193_Text_MechaCopNinjaWait = Mecha Cop: {0102:0} Ninja!\nWait! ...Wait!
+Bank0193_Text_NinjaWhoEscapedFrom = The {0102:0} Ninja, who escaped\nfrom prison so many times before...{be00}\nescaped from Mecha Cop's grasp once more.
+Bank0193_Text_FiftyYearsPassSpry = Fifty years pass...{be01}\nThe spry {0102:0} Ninja\nis still running, and Mecha Cop, nearly ready{be00}\nfor the scrap heap, is still chasing her,{be00}\nand running...and escaping...{be00}\nand chasing...and...{be01}\nTake a break already, Mecha Cop!\nSomebody, make them stop!
+Bank0193_Text_RiotPoliceWootWell = Riot Police: Woot!\nWe'll catch the {0102:0} Ninja!
+Bank0193_Text_NinjaThinkNotIll = The {0102:0} Ninja: I think not...\nI'll never be captured by the likes of you...
+Bank0193_Text_MechaCopStopEven = Mecha Cop: Stop!\nEven when facing a villain,{be01}\nit's not fair to interrupt a\none-on-one Pokémon battle!{be00}\nFor shame!
+Bank0193_Text_RiotPoliceWereSorry = Riot Police: We're sorry,\nMecha Cop...
+Bank0193_Text_NinjaHehNoKidding = The {0102:0} Ninja: Heh! No kidding!\nEverybody wants a free pass to get{be00}\naway with unfair things like that.{be01}\nAfter all, what you call justice is...
+Bank0193_Text_NinjaObsolete = The {0102:0} Ninja: Obsolete.
+Bank0193_Text_MechaCopThatsNot = Mecha Cop: That's not true!{be01}\nWhenever, wherever, and whoever\nmakes the effort to do the right thing--{be00}\nhe or she can be a champion of justice!{be01}\n{0102:0} Ninja!\nKnow what? You're no exception yourself.
+Bank0193_Text_NinjaOldFashioned = The {0102:0} Ninja: Old fashioned.
+Bank0193_Text_MechaCopWhWhat = Mecha Cop: Wh-what?\nA simple trench coat over a metal body--{be00}\nI'm as fashion forward as I can get.{be01}\nYou're the one in need of a\ncostume intervention, {0102:0} Ninja!
 \pad{42}

@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Shuckle",
+    "pokedex": {
+        "category": "Mold Pokémon",
+        "entry": "The berries stored in its\nvaselike shell eventually\nbecome a thick, pulpy juice.",
+        "height": "2'00\"",
+        "weight": "45.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Shuckle",
+                "category": "Mold Pokémon",
+                "entry": "It stores berries in its shell.\nThe berries eventually ferment to\nbecome delicious juices.",
+                "height": "2'00\"",
+                "weight": "45.2 lbs."
+            },
+            "fr": {
+                "name": "Caratroc",
+                "category": "Pokémon Pourri",
+                "entry": "Il stocke des Baies sous sa\ncarapace. Elles fermentent et\nproduisent des jus délicieux.",
+                "height": "0,6 m",
+                "weight": "20,5 kg"
+            },
+            "de": {
+                "name": "Pottrott",
+                "category": "Schimmel",
+                "entry": "In seiner Schale bewahrt es\nBeeren auf. Diese fermentieren\nzu einem leckeren Saft.",
+                "height": "0,6 m",
+                "weight": "20,5 kg"
+            },
+            "it": {
+                "name": "Shuckle",
+                "category": "Pokémon Muffa",
+                "entry": "Conserva nel guscio delle bacche che,\nquando fermentano, si trasformano\nin un succo delizioso.",
+                "height": "0,6 m",
+                "weight": "20,5 kg"
+            },
+            "ko": {
+                "name": "단단지",
+                "category": "발효포켓몬",
+                "entry": "등껍질 속에 나무열매를 모은다.\n그 사이 열매는 발효해서\n맛있는 주스가 된다.",
+                "height": "0.6 m",
+                "weight": "20.5 kg"
+            },
+            "es": {
+                "name": "Shuckle",
+                "category": "Pokémon Moho",
+                "entry": "Almacena bayas en su caparazón,\nque más tarde fermentan para\nproducir deliciosos zumos.",
+                "height": "0,6 m",
+                "weight": "20,5 kg"
+            },
+            "ja": {
+                "name": "ツボツボ",
+                "category": "はっこうポケモン",
+                "entry": "こうらの\\x{3000}なかに\\x{3000}きのみを\\x{3000}ためる。\nそのうち\\x{3000}きのみは\\x{3000}はっこうして\nおいしい\\x{3000}ジュースに\\x{3000}なるのだ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 20,
+        "attack": 10,
+        "defense": 230,
+        "speed": 5,
+        "special_attack": 10,
+        "special_defense": 230
+    },
+    "types": [ "TYPE_BUG", "TYPE_ROCK" ],
+    "catch_rate": 190,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_BERRY_JUICE",
+        "rare": "ITEM_BERRY_JUICE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_GLUTTONY" ],
+    "hidden_ability": "ABILITY_CONTRARY",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 177,
+    "height": 6,
+    "weight": 205,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_WITHDRAW" ],
+            [ 1, "MOVE_CONSTRICT" ],
+            [ 1, "MOVE_BIDE" ],
+            [ 1, "MOVE_ROLLOUT" ],
+            [ 5, "MOVE_ENCORE" ],
+            [ 9, "MOVE_WRAP" ],
+            [ 12, "MOVE_STRUGGLE_BUG" ],
+            [ 16, "MOVE_SAFEGUARD" ],
+            [ 20, "MOVE_REST" ],
+            [ 23, "MOVE_ROCK_THROW" ],
+            [ 27, "MOVE_GASTRO_ACID" ],
+            [ 31, "MOVE_POWER_TRICK" ],
+            [ 34, "MOVE_SHELL_SMASH" ],
+            [ 38, "MOVE_ROCK_SLIDE" ],
+            [ 42, "MOVE_BUG_BITE" ],
+            [ 45, "MOVE_POWER_SPLIT" ],
+            [ 45, "MOVE_GUARD_SPLIT" ],
+            [ 49, "MOVE_STONE_EDGE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM69",
+            "TM70",
+            "TM71",
+            "TM74",
+            "TM76",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_EARTH_POWER",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_GASTRO_ACID",
+            "MOVE_AFTER_YOU",
+            "MOVE_HELPING_HAND",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_SWEET_SCENT",
+            "MOVE_KNOCK_OFF",
+            "MOVE_HELPING_HAND",
+            "MOVE_ACUPRESSURE",
+            "MOVE_SAND_TOMB",
+            "MOVE_MUD_SLAP",
+            "MOVE_ACID",
+            "MOVE_ROCK_BLAST",
+            "MOVE_FINAL_GAMBIT"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 232,
+    "baby_species": "SPECIES_SHUCKLE"
+}

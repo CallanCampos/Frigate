@@ -7,6 +7,7 @@
 #include "field/field_event.h"
 #include "field/field_sound.h"
 #include "gfl/net.h"
+#include "gfl/net_whpipe.h"
 #include "gfl/std.h"
 #include "save/save_control.h"
 #include "system/game_comm.h"

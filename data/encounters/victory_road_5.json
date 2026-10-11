@@ -1,0 +1,48 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 1
+        },
+        "grass": [
+            [ "SPECIES_BOLDORE", 41, 41 ],
+            [ "SPECIES_BOLDORE", 41, 41 ],
+            [ "SPECIES_BOLDORE", 42, 42 ],
+            [ "SPECIES_BOLDORE", 42, 42 ],
+            [ "SPECIES_BOLDORE", 43, 43 ],
+            [ "SPECIES_ONIX", 43, 43 ],
+            [ "SPECIES_BOLDORE", 44, 44 ],
+            [ "SPECIES_ONIX", 44, 44 ],
+            [ "SPECIES_BOLDORE", 44, 44 ],
+            [ "SPECIES_ONIX", 44, 44 ],
+            [ "SPECIES_BOLDORE", 44, 44 ],
+            [ "SPECIES_ONIX", 44, 44 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [
+            [ "SPECIES_EXCADRILL", 41, 41 ],
+            [ "SPECIES_ONIX", 41, 41 ],
+            [ "SPECIES_EXCADRILL", 42, 42 ],
+            [ "SPECIES_EXCADRILL", 42, 42 ],
+            [ "SPECIES_EXCADRILL", 43, 43 ],
+            [ "SPECIES_EXCADRILL", 43, 43 ],
+            [ "SPECIES_EXCADRILL", 44, 44 ],
+            [ "SPECIES_EXCADRILL", 44, 44 ],
+            [ "SPECIES_EXCADRILL", 44, 44 ],
+            [ "SPECIES_EXCADRILL", 44, 44 ],
+            [ "SPECIES_EXCADRILL", 44, 44 ],
+            [ "SPECIES_EXCADRILL", 44, 44 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

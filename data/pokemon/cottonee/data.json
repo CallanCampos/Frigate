@@ -1,0 +1,132 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Cottonee",
+    "pokedex": {
+        "category": "Cotton Puff Pokémon",
+        "entry": "Perhaps because they feel more at ease\nin a group, they stick to others they\nfind. They end up looking like a cloud.",
+        "height": "1'00\"",
+        "weight": "1.3 lbs.",
+        "languages": {
+            "ja": {
+                "category": "わたたまポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 27,
+        "defense": 60,
+        "speed": 66,
+        "special_attack": 37,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_FAIRY" ],
+    "abilities": [ "ABILITY_PRANKSTER", "ABILITY_INFILTRATOR" ],
+    "hidden_ability": "ABILITY_CHLOROPHYLL",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 56,
+    "height": 3,
+    "weight": 6,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ABSORB" ],
+            [ 4, "MOVE_GROWTH" ],
+            [ 8, "MOVE_LEECH_SEED" ],
+            [ 10, "MOVE_STUN_SPORE" ],
+            [ 13, "MOVE_MEGA_DRAIN" ],
+            [ 17, "MOVE_COTTON_SPORE" ],
+            [ 19, "MOVE_RAZOR_LEAF" ],
+            [ 22, "MOVE_POISON_POWDER" ],
+            [ 26, "MOVE_GIGA_DRAIN" ],
+            [ 28, "MOVE_CHARM" ],
+            [ 31, "MOVE_HELPING_HAND" ],
+            [ 35, "MOVE_ENERGY_BALL" ],
+            [ 37, "MOVE_COTTON_GUARD" ],
+            [ 40, "MOVE_SUNNY_DAY" ],
+            [ 44, "MOVE_ENDEAVOR" ],
+            [ 46, "MOVE_SOLAR_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM70",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SEED_BOMB",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_HELPING_HAND",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_NATURAL_GIFT",
+            "MOVE_ENCORE",
+            "MOVE_TICKLE",
+            "MOVE_FAKE_TEARS",
+            "MOVE_GRASS_WHISTLE",
+            "MOVE_MEMENTO",
+            "MOVE_BEAT_UP",
+            "MOVE_SWITCHEROO",
+            "MOVE_WORRY_SEED"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_SUN_STONE",
+            "species": "SPECIES_WHIMSICOTT"
+        }
+    ],
+    "regional_dex_number": 82,
+    "baby_species": "SPECIES_COTTONEE"
+}

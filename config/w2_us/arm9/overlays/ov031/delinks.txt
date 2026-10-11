@@ -2,3 +2,24 @@
     .ctor       start:0x02176668 end:0x02176668 kind:rodata align:4
     .data       start:0x02176680 end:0x021767e0 kind:data align:32
     .bss        start:0x021767e0 end:0x02176b40 kind:bss align:32
+
+src/ov031/net_devirc.c:
+    complete
+    .text       start:0x02175840 end:0x0217595c
+    .data       start:0x02176680 end:0x0217674c
+
+src/ov031/net_irc.c:
+    complete
+    .text       start:0x0217595c end:0x02175f70
+    .data       start:0x0217674c end:0x021767c4
+    .bss        start:0x021767e0 end:0x021768c8
+
+src/ov031/irc_link.c:
+    .text       start:0x02175f70 end:0x021763c4
+    .data       start:0x021767c4 end:0x021767c8
+    .bss        start:0x021768c8 end:0x021769b0
+
+src/ov031/irc_spi.c:
+    .text       start:0x021763c4 end:0x02176668
+    .data       start:0x021767c8 end:0x021767e0
+    .bss        start:0x021769b0 end:0x02176b40

@@ -1,6 +1,0 @@
-YES
-NO
-FORGET
-KEEP OLD MOVES!
-Give up on {0107:0}!
-Don't give up on {0107:0}!

@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/comm_tvt.h"
 #include "app/pokemon_trade.h"
+#include "app/ui/ui_scene.h"
 #include "app/wifi_login.h"
 #include "app/wificlub.h"
 #include "battle/battle_proc.h"
@@ -299,7 +300,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         break;
     case 11:
         GFL_OvlLoad(OVERLAY_WIFICLUB_MAIN);
-        GFL_OvlLoad(OVERLAY_139);
+        GFL_OvlLoad(OVERLAY_APP_UI);
         func_ov173_021a6240(wk->club->buffer);
         if (wk->btlSetup != NULL) {
             BtlSetup_Free(wk->btlSetup);
@@ -315,7 +316,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
             EventWifiClub_ResetForLogin(wk);
         }
         wk->battleMode = sWifiClubModes[wk->club->mode].battleMode;
-        GFL_OvlUnload(OVERLAY_139);
+        GFL_OvlUnload(OVERLAY_APP_UI);
         GFL_OvlUnload(OVERLAY_WIFICLUB_MAIN);
         break;
     case 13:

@@ -1,0 +1,180 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Krabby",
+    "pokedex": {
+        "category": "River Crab Pokémon",
+        "entry": "It lives in burrows dug on sandy\nbeaches. Its pincers fully grow\nback if they are broken in battle.",
+        "height": "1'04\"",
+        "weight": "14.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Krabby",
+                "category": "River Crab Pokémon",
+                "entry": "It lives in burrows dug on sandy\nbeaches. Its pincers fully grow\nback if they are broken in battle.",
+                "height": "1'04\"",
+                "weight": "14.3 lbs."
+            },
+            "fr": {
+                "name": "Krabby",
+                "category": "Pokémon Doux Crabe",
+                "entry": "Il creuse son terrier sur des plages\nsablonneuses. Ses pinces repoussent\nsi on les brise.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "de": {
+                "name": "Krabby",
+                "category": "Krabbe",
+                "entry": "Es lebt in Höhlen am Strand.\nSeine Scheren wachsen nach,\nwenn es sie im Kampf verliert.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "it": {
+                "name": "Krabby",
+                "category": "Pokémon Granchio",
+                "entry": "Vive in buche scavate sulle spiagge\nsabbiose. Le sue chele ricrescono\nse si spezzano nella lotta.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "ko": {
+                "name": "크랩",
+                "category": "게포켓몬",
+                "entry": "모래 해변에 구멍을 파서 산다.\n집게는 싸울 때 떨어져 나가도\n다시 자라나 원래대로 돌아온다.",
+                "height": "0.4 m",
+                "weight": "6.5 kg"
+            },
+            "es": {
+                "name": "Krabby",
+                "category": "Pokémon Cangrejo",
+                "entry": "Vive en madrigueras excavadas en playas\narenosas. Sus pinzas vuelven a crecer\nsi se rompen.",
+                "height": "0,4 m",
+                "weight": "6,5 kg"
+            },
+            "ja": {
+                "name": "クラブ",
+                "category": "さわがにポケモン",
+                "entry": "すなはまに\\x{3000}あなを\\x{3000}ほって\\x{3000}くらす。\nハサミは\\x{3000}たたかいで\\x{3000}とれても\nまた\\x{3000}はえてきて\\x{3000}もとどおり。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 105,
+        "defense": 90,
+        "speed": 50,
+        "special_attack": 25,
+        "special_defense": 25
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 225,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_3", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_HYPER_CUTTER", "ABILITY_SHELL_ARMOR" ],
+    "hidden_ability": "ABILITY_SHEER_FORCE",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 65,
+    "height": 4,
+    "weight": 65,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MUD_SPORT" ],
+            [ 1, "MOVE_BUBBLE" ],
+            [ 5, "MOVE_VICE_GRIP" ],
+            [ 9, "MOVE_LEER" ],
+            [ 11, "MOVE_HARDEN" ],
+            [ 15, "MOVE_BUBBLE_BEAM" ],
+            [ 19, "MOVE_MUD_SHOT" ],
+            [ 21, "MOVE_METAL_CLAW" ],
+            [ 25, "MOVE_STOMP" ],
+            [ 29, "MOVE_PROTECT" ],
+            [ 31, "MOVE_GUILLOTINE" ],
+            [ 35, "MOVE_SLAM" ],
+            [ 39, "MOVE_BRINE" ],
+            [ 41, "MOVE_CRABHAMMER" ],
+            [ 45, "MOVE_FLAIL" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM54",
+            "TM55",
+            "TM56",
+            "TM75",
+            "TM80",
+            "TM81",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM04",
+            "HM06"
+        ],
+        "by_tutor": [ "MOVE_IRON_DEFENSE", "MOVE_SUPERPOWER", "MOVE_ICY_WIND", "MOVE_SNORE", "MOVE_KNOCK_OFF", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_HAZE",
+            "MOVE_AMNESIA",
+            "MOVE_FLAIL",
+            "MOVE_SLAM",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TICKLE",
+            "MOVE_ANCIENT_POWER",
+            "MOVE_AGILITY",
+            "MOVE_ENDURE",
+            "MOVE_CHIP_AWAY",
+            "MOVE_BIDE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 28,
+            "species": "SPECIES_KINGLER"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_KRABBY"
+}

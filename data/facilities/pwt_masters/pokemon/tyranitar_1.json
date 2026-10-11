@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TYRANITAR",
+    "moves": [ "MOVE_STONE_EDGE", "MOVE_PAYBACK", "MOVE_THUNDER_PUNCH", "MOVE_ICE_PUNCH" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_CHOPLE_BERRY",
+    "form": 0
+}

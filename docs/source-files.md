@@ -1,11 +1,11 @@
 # Source files
 
 Each source file is one of the game's original files, as [Code organization](code-organization.md) describes. This lists the
-files of every overlay that has some, with the evidence for their names. `tools/scripts/source_files.py --markdown`
+files of every overlay that has some, with the evidence for their names. `tools/decomp/source_files.py --markdown`
 prints the tables below from the configs and the ROM:
 
 - **Boundaries.** The linker placed one object per original file, so a file's `.text`, `.rodata`, `.data` and `.bss`
-  are each one range, in the same order in every section. `tools/scripts/source_files.py OVERLAY` lists the file names
+  are each one range, in the same order in every section. `tools/decomp/source_files.py OVERLAY` lists the file names
   embedded in the overlay and where they are used, and `--profile START END` scores each function boundary by whether
   the data references on both sides stay in file order and how many calls cross it. A boundary between two embedded
   names is where both scores are lowest; a boundary without a name nearby comes from the data order alone.
@@ -645,7 +645,7 @@ prints the tables below from the configs and the ROM:
 | `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | partial | descriptive |
 | `btl_pokeparam.c` | `0x021ba584`–`0x021bc6bc` | 154 | partial | string at `0x021daf7c` |
 | `battle_event.c` | `0x021bc6bc`–`0x021bd054` | 46 | partial | descriptive |
-| `btl_calc.c` | `0x021bd054`–`0x021bdaf8` | 58 | partial | string at `0x021daf94` |
+| `btl_calc.c` | `0x021bd054`–`0x021bdaf8` | 58 | complete | string at `0x021daf94` |
 | `battle_action.c` | `0x021bdaf8`–`0x021bdcac` | 17 | complete | descriptive |
 | `ability_handlers.c` | `0x021bdcac`–`0x021c26ec` | 442 | partial | descriptive |
 | `battle_condition.c` | `0x021ce158`–`0x021ce520` | 20 | complete | descriptive |

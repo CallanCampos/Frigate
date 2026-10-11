@@ -1,22 +1,22 @@
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...\n\n{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}The young recruit {0100:1}\n{bd02}met a mysterious woman\n{bd02}who called herself\n{bd02}the Titanic Tyranitar King...
-{bd02}The woman warned of a danger\n{bd02}approaching Unova and asked\n{bd02}{0100:1} to protect the entire world.
-{bd02}The night with an ominous full moon,\n{bd02}the night from the premonition,\n{bd02}had arrived...\n\n{bd02}Nervously, {0100:1}\n{bd02}rushed to the scene...
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...\n\n{bd02}This is the story of\n{bd02}their valiant struggle...
-{bd02}The young recruit {0100:1}\n{bd02}met a mysterious woman\n{bd02}who called herself\n{bd02}the Titanic Tyranitar King...
-{bd02}The woman warned of a danger\n{bd02}approaching Unova and asked\n{bd02}{0100:1} to protect the entire world.
-{bd02}The night with an ominous full moon,\n{bd02}the night from the premonition,\n{bd02}had arrived...\n\n{bd02}Nervously, {0100:1}\n{bd02}rushed to the scene...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0281_Text_UnovaDefenseForceUdf = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...\n\n{bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0281_Text_YoungRecruitMetMysterious = {bd02}The young recruit {0100:1}\n{bd02}met a mysterious woman\n{bd02}who called herself\n{bd02}the Titanic Tyranitar King...
+Bank0281_Text_WomanWarnedDangerApproaching = {bd02}The woman warned of a danger\n{bd02}approaching Unova and asked\n{bd02}{0100:1} to protect the entire world.
+Bank0281_Text_NightOminousFullMoon = {bd02}The night with an ominous full moon,\n{bd02}the night from the premonition,\n{bd02}had arrived...\n\n{bd02}Nervously, {0100:1}\n{bd02}rushed to the scene...
+Bank0281_Text_Empty = なし
+Bank0281_Text_Empty_2 = なし
+Bank0281_Text_Empty_3 = なし
+Bank0281_Text_Empty_4 = なし
+Bank0281_Text_Empty_5 = なし
+Bank0281_Text_Empty_6 = なし
+Bank0281_Text_UnovaDefenseForceUdf_2 = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...\n\n{bd02}This is the story of\n{bd02}their valiant struggle...
+Bank0281_Text_YoungRecruitMetMysterious_2 = {bd02}The young recruit {0100:1}\n{bd02}met a mysterious woman\n{bd02}who called herself\n{bd02}the Titanic Tyranitar King...
+Bank0281_Text_WomanWarnedDangerApproaching_2 = {bd02}The woman warned of a danger\n{bd02}approaching Unova and asked\n{bd02}{0100:1} to protect the entire world.
+Bank0281_Text_NightOminousFullMoon_2 = {bd02}The night with an ominous full moon,\n{bd02}the night from the premonition,\n{bd02}had arrived...\n\n{bd02}Nervously, {0100:1}\n{bd02}rushed to the scene...
+Bank0281_Text_Empty_7 = なし
+Bank0281_Text_Empty_8 = なし
+Bank0281_Text_Empty_9 = なし
+Bank0281_Text_Empty_10 = なし
+Bank0281_Text_Empty_11 = なし
+Bank0281_Text_Empty_12 = なし
+Bank0281_Text_Empty_13 = なし
 \pad{dc}

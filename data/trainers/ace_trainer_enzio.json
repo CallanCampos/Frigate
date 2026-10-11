@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Enzio",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 0,
+            "level": 46,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 1,
+            "level": 46,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_AZUMARILL",
+            "form": 0,
+            "level": 46,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "To be as clear as water...\nThat is the style that I seek!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "When I lose, I feel as if I\nmight just disappear..."
+        },
+        {
+            "type": 2,
+            "text": "I may have been the one to lose, but\nI'm still going to go ahead and say it...{be01}\nYou should definitely seek a style,\nbut everyone has his or her own style!"
+        }
+    ]
+}

@@ -1,52 +1,52 @@
-None
-Alabama
-Alaska
-Arizona
-Arkansas
-California
-Colorado
-Connecticut
-Delaware
-Florida
-Georgia
-Hawaii
-Idaho
-Illinois
-Indiana
-Iowa
-Kansas
-Kentucky
-Louisiana
-Maine
-Maryland
-Massachusetts
-Michigan
-Minnesota
-Mississippi
-Missouri
-Montana
-Nebraska
-Nevada
-New Hampshire
-New Jersey
-New Mexico
-New York
-North Carolina
-North Dakota
-Ohio
-Oklahoma
-Oregon
-Pennsylvania
-Rhode Island
-South Carolina
-South Dakota
-Tennessee
-Texas
-Utah
-Vermont
-Virginia
-Washington
-Washington, DC
-West Virginia
-Wisconsin
-Wyoming
+Bank0437_Text_None = None
+Bank0437_Text_Alabama = Alabama
+Bank0437_Text_Alaska = Alaska
+Bank0437_Text_Arizona = Arizona
+Bank0437_Text_Arkansas = Arkansas
+Bank0437_Text_California = California
+Bank0437_Text_Colorado = Colorado
+Bank0437_Text_Connecticut = Connecticut
+Bank0437_Text_Delaware = Delaware
+Bank0437_Text_Florida = Florida
+Bank0437_Text_Georgia = Georgia
+Bank0437_Text_Hawaii = Hawaii
+Bank0437_Text_Idaho = Idaho
+Bank0437_Text_Illinois = Illinois
+Bank0437_Text_Indiana = Indiana
+Bank0437_Text_Iowa = Iowa
+Bank0437_Text_Kansas = Kansas
+Bank0437_Text_Kentucky = Kentucky
+Bank0437_Text_Louisiana = Louisiana
+Bank0437_Text_Maine = Maine
+Bank0437_Text_Maryland = Maryland
+Bank0437_Text_Massachusetts = Massachusetts
+Bank0437_Text_Michigan = Michigan
+Bank0437_Text_Minnesota = Minnesota
+Bank0437_Text_Mississippi = Mississippi
+Bank0437_Text_Missouri = Missouri
+Bank0437_Text_Montana = Montana
+Bank0437_Text_Nebraska = Nebraska
+Bank0437_Text_Nevada = Nevada
+Bank0437_Text_NewHampshire = New Hampshire
+Bank0437_Text_NewJersey = New Jersey
+Bank0437_Text_NewMexico = New Mexico
+Bank0437_Text_NewYork = New York
+Bank0437_Text_NorthCarolina = North Carolina
+Bank0437_Text_NorthDakota = North Dakota
+Bank0437_Text_Ohio = Ohio
+Bank0437_Text_Oklahoma = Oklahoma
+Bank0437_Text_Oregon = Oregon
+Bank0437_Text_Pennsylvania = Pennsylvania
+Bank0437_Text_RhodeIsland = Rhode Island
+Bank0437_Text_SouthCarolina = South Carolina
+Bank0437_Text_SouthDakota = South Dakota
+Bank0437_Text_Tennessee = Tennessee
+Bank0437_Text_Texas = Texas
+Bank0437_Text_Utah = Utah
+Bank0437_Text_Vermont = Vermont
+Bank0437_Text_Virginia = Virginia
+Bank0437_Text_Washington = Washington
+Bank0437_Text_WashingtonDc = Washington, DC
+Bank0437_Text_WestVirginia = West Virginia
+Bank0437_Text_Wisconsin = Wisconsin
+Bank0437_Text_Wyoming = Wyoming
