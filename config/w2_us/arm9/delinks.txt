@@ -1105,3 +1105,7 @@ src/system/timesig_savedata.c:
 src/system/adventure_savedata.c:
     complete
     .text       start:0x020092c8 end:0x020093d0
+
+src/system/dream_world_savedata.c:
+    complete
+    .text       start:0x02009930 end:0x02009b5c
