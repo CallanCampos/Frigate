@@ -3,3 +3,14 @@
     .ctor       start:0x0219db78 end:0x0219db78 kind:rodata align:4
     .data       start:0x0219db80 end:0x0219dbc0 kind:data align:32
     .bss        start:0x0219dbc0 end:0x0219dbc0 kind:bss align:32
+
+src/ov314/chihou_zukan_award.c:
+    .text       start:0x0219ce80 end:0x0219d6a4
+    .rodata     start:0x0219da10 end:0x0219da80
+    .data       start:0x0219db80 end:0x0219db98
+
+src/ov314/chihou_zukan_award_graphic.c:
+    complete
+    .text       start:0x0219d6a4 end:0x0219da10
+    .rodata     start:0x0219da80 end:0x0219db78
+    .data       start:0x0219db98 end:0x0219dbc0

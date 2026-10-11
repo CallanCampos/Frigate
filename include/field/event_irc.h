@@ -11,8 +11,6 @@
 
 // The infrared menu, in overlay 36
 extern const GameProcFunctions IRC_MENU_PROC;
-// Overlay 175's screen
-extern const GameProcFunctions data_ov175_0219ac6c;
 
 void setPartyLv50(PokeParty *party);
 void battleBoxToLv50Party(BOOL useBattleBox, EventIRCWork *work);

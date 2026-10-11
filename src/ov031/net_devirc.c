@@ -34,7 +34,7 @@ static void NetDevIrc_SetPeerFilterSlot(void *filter);
 static BOOL NetDevIrc_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work) {
     GFLNetInitData *init = func_02042e84();
 
-    NetIrc_Init(*(u32 *)func_02042e84()->unk68, init->gameCommandBase);
+    NetIrc_Init(func_02042e84()->unk68.word, init->gameCommandBase);
     NetIrc_SetInitialized();
     return TRUE;
 }

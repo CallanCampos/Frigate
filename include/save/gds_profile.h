@@ -7,6 +7,9 @@
 
 // gds_profile.c: the profile of the player that a battle video or a musical photo sent to the Global Link carries
 
+// A new profile, with its fields cleared, and the function that frees it
+GdsProfile *func_0200de34(HeapID heapId);
+void func_0200de60(GdsProfile *profile);
 // Fills the profile from the player's game data
 void func_0200de68(GdsProfile *profile, GameData *gameData);
 // A new string with the player's name

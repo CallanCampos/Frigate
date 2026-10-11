@@ -190,6 +190,14 @@ u16 FestRecords_AddJoined(void *records);
 u16 func_02010e50(void *a0);
 u8 func_02010e78(void *a0);
 u16 func_02010e94(void *a0);
+// A Funfest mission's record in func_02010dec's block, by the mission's index, which is 0 for an index past the
+// missions: a 14-bit count, another count, the highest level cleared (0 to 4) and whether the mission is new, which
+// func_02010fc0 clears
+u16 func_02010ebc(void *records, u8 mission);
+u16 func_02010f14(void *records, u8 mission);
+u8 func_02010f6c(void *records, u8 mission);
+BOOL func_02010fb0(void *records, u8 mission);
+void func_02010fc0(void *records, u8 mission);
 KeyInfoSave *getKeyInfoSaveBlk(SaveControl *save);
 // Whether a key system key is unlocked
 BOOL func_020104c4(KeyInfoSave *keyInfo, u32 key);

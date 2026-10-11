@@ -10,6 +10,7 @@ typedef enum {
     MIC_RESULT_SUCCESS,
 } MICResult;
 
+#define MIC_SAMPLING_TYPE_8BIT 0
 #define MIC_SAMPLING_TYPE_SIGNED_12BIT 3
 // 8180 Hz, in ARM7 clocks
 #define MIC_SAMPLING_RATE_8180 0x1001

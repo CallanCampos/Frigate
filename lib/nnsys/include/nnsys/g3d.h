@@ -438,6 +438,7 @@ void NNS_G3DResMdlSetMatAlpha(NNSG3dResMdl *mdl, u32 matId, u32 alpha);
 // The alpha of every material of a model resource, from 0 to 31 (NitroSystem's NNS_G3dMdlSetMdlAlphaAll)
 void func_02068410(NNSG3dResMdl *mdl, int alpha);
 // Turns fog on or off for every material of a model resource
+void NNS_G3dMdlSetMdlFogEnableFlag(NNSG3dResMdl *mdl, int matID, BOOL enable);
 void NNS_G3dMdlSetMdlFogEnableFlagAll(NNSG3dResMdl *mdl, BOOL enable);
 
 // NitroSystem's NNS_G3dWorldPosToScrPos: where a point of the world is on the screen

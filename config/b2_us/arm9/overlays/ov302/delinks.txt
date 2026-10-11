@@ -3,3 +3,19 @@
     .ctor       start:0x021ae58c end:0x021ae58c kind:rodata align:4
     .data       start:0x021ae5a0 end:0x021ae5e0 kind:data align:32
     .bss        start:0x021ae5e0 end:0x021ae5e0 kind:bss align:32
+
+src/ov302/zukan.c:
+    complete
+    .text       start:0x021acee0 end:0x021ad624
+    .rodata     start:0x021ae3dc end:0x021ae41c
+    .data       start:0x021ae5a0 end:0x021ae5a8
+
+src/ov302/zukan_common.c:
+    .text       start:0x021ad624 end:0x021adecc
+    .rodata     start:0x021ae41c end:0x021ae574
+    .data       start:0x021ae5a8 end:0x021ae5b8
+
+src/ov302/zukan_search_engine.c:
+    .text       start:0x021adecc end:0x021ae3dc
+    .rodata     start:0x021ae574 end:0x021ae58c
+    .data       start:0x021ae5b8 end:0x021ae5e0

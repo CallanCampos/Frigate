@@ -25,3 +25,13 @@ src/ov326/t_download_graphic.c:
     .text       start:0x021a2afc end:0x021a2d40
     .rodata     start:0x021a34ec end:0x021a36a8
     .data       start:0x021a375c end:0x021a3780
+
+src/ov326/t_download_util.c:
+    .text       start:0x021a0a84 end:0x021a24ac
+    .rodata     start:0x021a3178 end:0x021a34d4
+    .data       start:0x021a36f8 end:0x021a3748
+
+src/ov326/t_download_save.c:
+    .text       start:0x021a24ac end:0x021a2afc
+    .rodata     start:0x021a34d4 end:0x021a34ec
+    .data       start:0x021a3748 end:0x021a375c

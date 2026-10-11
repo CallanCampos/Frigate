@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/irc_compatible.h"
 #include "app/ircbattlematch.h"
 #include "app/pokemon_trade.h"
 #include "battle/battle_proc.h"
@@ -448,7 +449,7 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
         break;
     case 26:
         work->ov175Param = work->gsys;
-        GSYS_QueueProc(gsys, OVERLAY_ID(175), &data_ov175_0219ac6c, &work->ov175Param);
+        GSYS_QueueProc(gsys, OVERLAY_ID(175), &IRC_COMPATIBLE_PROC_FUNCTIONS, &work->ov175Param);
         (*state)++;
         break;
     case 27:

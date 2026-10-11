@@ -6,7 +6,6 @@
 // The script IDs of the hidden items, and the event flags that hide them once they are found
 #define HIDDEN_ITEM_SCRIPT_START 8000
 #define HIDDEN_ITEM_SCRIPT_END 8799
-#define HIDDEN_ITEM_FLAG_START 0xb04
 #define HIDDEN_ITEM_COUNT 213
 
 static const HiddenItem HIDDEN_ITEMS[HIDDEN_ITEM_COUNT] = {

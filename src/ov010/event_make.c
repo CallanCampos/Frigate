@@ -96,15 +96,15 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case 4:
         if (battle->setup->fieldSituation.unk19 <= 1) {
-            procWork->ov171Param.unk08 = 0;
+            procWork->ov171Param.flipped = 0;
             procWork->ov171Param.party0 = battle->players->players[0].party;
             procWork->ov171Param.party1 = battle->players->players[1].party;
         } else {
-            procWork->ov171Param.unk08 = 1;
+            procWork->ov171Param.flipped = 1;
             procWork->ov171Param.party0 = battle->players->players[1].party;
             procWork->ov171Param.party1 = battle->players->players[0].party;
         }
-        QueueGameProc(procWork->manager, OVERLAY_ID(171), &data_ov171_021deaec, &procWork->ov171Param);
+        QueueGameProc(procWork->manager, OVERLAY_ID(171), &VS_MULTI_LIST_PROC_FUNCTIONS, &procWork->ov171Param);
         *state = 5;
         break;
     case 5:

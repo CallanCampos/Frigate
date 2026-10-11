@@ -18,8 +18,7 @@ void EventPokewood_UnlockMovies(PokewoodSave *save, GameData *gameData, u32 movi
 // How the movie unlocks, 1 to 7, or 0 for none
 u8 EventPokewood_GetUnlockKind(u32 movie);
 
-// The screens of overlays 321 to 325 that the events put up, which are not decompiled yet
-extern const GameProcFunctions data_ov321_0219e018;
+// The screens of overlays 322 to 325 that the events put up, which are not decompiled yet
 extern const GameProcFunctions data_ov322_021a0834;
 extern const GameProcFunctions data_ov323_0219ea60;
 extern const GameProcFunctions data_ov324_0219f698;

@@ -3,3 +3,9 @@
     .ctor       start:0x0219e15c end:0x0219e15c kind:rodata align:4
     .data       start:0x0219e160 end:0x0219e1a0 kind:data align:32
     .bss        start:0x0219e1a0 end:0x0219e1a0 kind:bss align:32
+
+src/ov141/bsubway_records.c:
+    complete
+    .text       start:0x0219cec0 end:0x0219dea8
+    .rodata     start:0x0219dea8 end:0x0219e15c
+    .data       start:0x0219e160 end:0x0219e1a0

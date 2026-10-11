@@ -45,6 +45,71 @@ enum {
 #define T_DOWNLOAD_OBJ_COUNT 9
 #define T_DOWNLOAD_BUTTON_COUNT 6
 
+// The buttons, the cell actors of the T_DOWNLOAD_ACTOR_BUTTON kind
+enum {
+    T_DOWNLOAD_BUTTON_UP,
+    T_DOWNLOAD_BUTTON_DOWN,
+    T_DOWNLOAD_BUTTON_RETURN,
+    T_DOWNLOAD_BUTTON_X,
+    T_DOWNLOAD_BUTTON_TAB_UP,
+    T_DOWNLOAD_BUTTON_TAB_DOWN,
+};
+
+// The windows: the first nine are in every screen, the rest in the screens of their own
+#define T_DOWNLOAD_WINDOW_TITLE 6
+#define T_DOWNLOAD_WINDOW_MESSAGE 8
+#define T_DOWNLOAD_WINDOW_DETAIL 9
+#define T_DOWNLOAD_WINDOW_DETAIL_COUNT 5
+#define T_DOWNLOAD_WINDOW_SLOT 14
+
+// The bits of the work's objFlags. The first six are the buttons whose pressed animation is playing
+#define T_DOWNLOAD_OBJ_FLAG_BUTTONS 0x3f
+#define T_DOWNLOAD_OBJ_FLAG_NO 0x40
+#define T_DOWNLOAD_OBJ_FLAG_YES 0x80
+// The yes/no answer, either button
+#define T_DOWNLOAD_OBJ_FLAG_RESULT (T_DOWNLOAD_OBJ_FLAG_NO | T_DOWNLOAD_OBJ_FLAG_YES)
+#define T_DOWNLOAD_OBJ_FLAG_LIST_MOVED 0x8000
+// The background's palette is being faded
+#define T_DOWNLOAD_OBJ_FLAG_PALETTE_ANIM 0x10000
+// The cursor is shown, as the keys moved it last
+#define T_DOWNLOAD_OBJ_FLAG_CURSOR_KEYS 0x20000
+
+// The bits of the work's saveFlags
+#define T_DOWNLOAD_SAVE_FLAG_SAVING 0x1
+#define T_DOWNLOAD_SAVE_FLAG_SLOT_SHIFT 4
+
+// A tournament, as the save and the download keep it. Only what the screens read is named
+#define T_DOWNLOAD_NAME_LENGTH 37
+#define T_DOWNLOAD_AUTHOR_LENGTH 75
+#define T_DOWNLOAD_TEXT_LENGTH 111
+#define T_DOWNLOAD_SPECIES_BYTES 82
+#define T_DOWNLOAD_ITEM_BYTES 76
+
+typedef struct {
+    u32 kind;
+    u8 unk4[3];
+    // 2 for a tournament that can be used
+    u8 state;
+    u16 id;
+    u16 name[T_DOWNLOAD_NAME_LENGTH];
+    u16 author[T_DOWNLOAD_AUTHOR_LENGTH];
+    u16 text[T_DOWNLOAD_TEXT_LENGTH];
+    u8 unk1C8[8];
+    // A bit for each species, item and move the tournament uses
+    u8 species[T_DOWNLOAD_SPECIES_BYTES];
+    u8 items[T_DOWNLOAD_ITEM_BYTES];
+    u8 unk26E;
+    // Bits 0 and 1 are the rules
+    u8 rules;
+    u8 unk270[2];
+    u16 move;
+    u8 unk274[0x1210 - 0x274];
+    // getCRC16 of everything before it
+    u32 crc;
+} TDownloadTournament;
+
+#define T_DOWNLOAD_TOURNAMENT_SIZE 0x1214
+
 struct TDownloadWork {
     HeapID heapId;
     // The cell resources: the touch bar's characters, palette and cells, then the screen's own
@@ -109,9 +174,9 @@ struct TDownloadWork {
     int page[T_DOWNLOAD_TABS];
     s16 *objPos;
     void *unk284;
-    void *record;
-    void *savedData[T_DOWNLOAD_SAVE_SLOTS];
-    void *receivedData[T_DOWNLOAD_RECEIVED_MAX];
+    TDownloadTournament *record;
+    TDownloadTournament *savedData[T_DOWNLOAD_SAVE_SLOTS];
+    TDownloadTournament *receivedData[T_DOWNLOAD_RECEIVED_MAX];
 };
 
 #endif // POKEBW2_APP_T_DOWNLOAD_T_DOWNLOAD_LOCAL_H

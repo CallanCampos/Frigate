@@ -25,8 +25,4 @@ typedef struct {
 
 extern const GameProcFunctions ZUKAN_OPEN_PROC_FUNCTIONS;
 
-// zukan_common.c of overlay 302, which has no header yet: wipes in and out of the Pokédex's screens
-void func_ov302_021ad78c(HeapID heapId);
-void func_ov302_021ad7a8(HeapID heapId);
-
 #endif // POKEBW2_APP_ZUKAN_OPEN_H

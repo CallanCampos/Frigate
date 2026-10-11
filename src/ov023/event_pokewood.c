@@ -3,6 +3,7 @@
 // GFL_HeapAllocate's file argument.
 // Function and data names are our own: swan names none of this overlay.
 #include "types.h"
+#include "app/pkwd_count.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
 #include "battle/btl_setup.h"
@@ -89,14 +90,6 @@ typedef struct {
     s16 unk2a;
     s16 unk2c;
 } PokewoodMovieFile;
-
-// The parameters of the title card, whose screen is overlay 321
-typedef struct {
-    u32 unk0;
-    u32 movie;
-    StrBuf *title;
-    u32 gender;
-} PokewoodTitleParam;
 
 // The parameters of the screen before the battle, overlay 324, whose first result is the grade of the cast
 typedef struct {
@@ -616,7 +609,7 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
         break;
     case 2:
         EventPokewood_InitTitleParam(&param->title, wk->setup);
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(321), &data_ov321_0219e018, &param->title);
+        GSYS_QueueProcAsEvent(event, OVERLAY_PKWD_COUNT, &PKWD_COUNT_PROC_FUNCTIONS, &param->title);
         (*state)++;
         break;
     case 3:

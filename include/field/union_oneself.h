@@ -92,7 +92,7 @@ void UnionOneself_SetUpdateDisabled(UnionSystem *unisys, Field *field, u8 disabl
 // (main) whether the trainer ID is one in the rival data
 BOOL func_0200f770(RivalDataSave *rival, u32 trainerId);
 // (overlay 36) adds the player of a beacon heard to the visitors the field shows
-void func_ov036_021b445c(UnionSystem *unisys, UnionBeaconEntry *entry, const void *a2, const void *a3);
+void func_ov036_021b445c(UnionSystem *unisys, UnionBeaconEntry *entry, const u16 *look, u8 state);
 // (overlay 36) sets the callbacks that add and remove a colosseum player to the screen the object stands for
 void *func_ov036_021c3f1c(void *obj, UnionSystem *unisys, void (*add)(UnionSystem *, PlayerInfo *, const u8 *),
                           void (*remove)(UnionSystem *, int, const u8 *));

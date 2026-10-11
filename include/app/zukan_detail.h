@@ -425,11 +425,6 @@ extern const ZukanDetailProcFuncs ZUKAN_DETAIL_MAP_PROC_FUNCS;
 
 void ZukanDetailMap_InitParam(ZukanDetailMapParam *param, HeapID heapId);
 
-// From overlay 302, the Pokédex's list, which stays loaded: a glowing blend's coefficient, which goes from 1 to 15
-// and back with the cosine of a phase. func_ov302_021adec0 starts it, and func_ov302_021ade74 steps it
-void func_ov302_021ade74(u16 *phase, int *ev);
-void func_ov302_021adec0(u16 *phase, int *ev);
-
 // zukan_detail_voice.c: the Pokémon's cry
 
 typedef struct {

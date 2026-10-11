@@ -3,3 +3,13 @@
     .ctor       start:0x0219ddec end:0x0219ddec kind:rodata align:4
     .data       start:0x0219de00 end:0x0219de20 kind:data align:32
     .bss        start:0x0219de20 end:0x0219de20 kind:bss align:32
+
+src/ov313/th_award.c:
+    .text       start:0x0219cec0 end:0x0219d9e8
+    .rodata     start:0x0219dc24 end:0x0219dd0c
+
+src/ov313/th_award_graphic.c:
+    complete
+    .text       start:0x0219d9e8 end:0x0219dc24
+    .rodata     start:0x0219dd0c end:0x0219ddec
+    .data       start:0x0219de00 end:0x0219de20

@@ -668,9 +668,9 @@ static void UnionComm_InitVisitors(UnionVisitorList *list) {
     for (i = 0; i < UNION_VISITOR_MAX; i++) {
         sys_memset(list->visitors[i].mac, 0xff, 6);
     }
-    list->unk43C = -1;
-    list->unk440 = -1;
-    list->unk444 = -1;
+    list->count = -1;
+    list->viewEnd = -1;
+    list->drawnEnd = -1;
 }
 
 void UnionComm_SetLook(UnionSystem *unisys, const u16 *look) {

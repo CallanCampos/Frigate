@@ -41,7 +41,12 @@ void MedalBox_IncrementRank(MedalBox *box);
 // These functions come from a later file than the medal box's, which has no header yet
 void *func_02010cb8(SaveControl *save);
 void func_02010d70(void *data, u16 zone);
-void func_02010d80(void *data, u8 season);
+u16 func_02010d78(void *data);
+void func_02010d80(void *data, u32 season);
+u8 func_02010d88(void *data);
 void func_02010d90(void *data, u8 type);
+u8 func_02010d98(void *data);
+// What the player has done of a habitat's kind of habitat
+u8 func_02010cc4(void *data, u8 habitat, u8 type);
 
 #endif // POKEBW2_SAVE_MEDAL_BOX_H

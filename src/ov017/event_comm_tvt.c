@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/comm_tvt.h"
+#include "app/comm_tvt_field.h"
 #include "field/event_comm_tvt.h"
 #include "field/field_event.h"
 #include "gfl/overlay.h"
@@ -41,7 +42,7 @@ GameEventReturnCode func_ov017_0216e660(GameEvent *event, u32 *state, void *data
     case 2:
         (*state)++;
     case 3:
-        GSYS_QueueProc(gsys, OVERLAY_COMM_TVT_FIELD_APP, &data_ov198_021b44a4, work);
+        GSYS_QueueProc(gsys, OVERLAY_COMM_TVT_FIELD_APP, &COMM_TVT_FIELD_PROC_FUNCTIONS, work);
         (*state)++;
         break;
     case 4:

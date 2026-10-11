@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/zukan_common.h"
 #include "app/zukan_open.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
@@ -326,7 +327,7 @@ static u32 ZukanOpen_StepSetup(ZukanOpenWork *work) {
     func_02042ba8(TRUE, HEAPID_ZUKAN_OPEN);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     ZukanOpen_AddVBlank(work);
-    func_ov302_021ad78c(HEAPID_ZUKAN_OPEN);
+    ZukanCommon_WipeIn(HEAPID_ZUKAN_OPEN);
     return STEP_WAIT_WIPE_IN;
 }
 
@@ -371,13 +372,13 @@ static u32 ZukanOpen_StepWaitInput(ZukanOpenWork *work) {
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         func_0203d564(FALSE);
         work->param->result = ZUKAN_OPEN_RESULT_BACK;
-        func_ov302_021ad7a8(HEAPID_ZUKAN_OPEN);
+        ZukanCommon_WipeOut(HEAPID_ZUKAN_OPEN);
         return STEP_WAIT_WIPE_OUT;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
         func_0203d564(FALSE);
         work->param->result = ZUKAN_OPEN_RESULT_CLOSE;
-        func_ov302_021ad7a8(HEAPID_ZUKAN_OPEN);
+        ZukanCommon_WipeOut(HEAPID_ZUKAN_OPEN);
         return STEP_WAIT_WIPE_OUT;
     }
     return STEP_WAIT_INPUT;

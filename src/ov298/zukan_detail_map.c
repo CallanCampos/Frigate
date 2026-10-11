@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/townmap.h"
 #include "app/townmap/townmap_data.h"
+#include "app/zukan_common.h"
 #include "app/zukan_detail.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
@@ -2280,11 +2281,11 @@ static void ZukanDetailMap_ClearHighlight(ZukanDetailMapWork *wk) {
 
 static void ZukanDetailMap_UpdateGlow(ZukanDetailMapWork *wk) {
     gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, ALL_PLANES, wk->glowEv, 16 - wk->glowEv);
-    func_ov302_021ade74(&wk->glowPhase, &wk->glowEv);
+    ZukanCommon_StepGlow(&wk->glowPhase, &wk->glowEv);
 }
 
 static void ZukanDetailMap_StartGlow(ZukanDetailMapWork *wk) {
-    func_ov302_021adec0(&wk->glowPhase, &wk->glowEv);
+    ZukanCommon_StartGlow(&wk->glowPhase, &wk->glowEv);
     gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, ALL_PLANES, wk->glowEv, 16 - wk->glowEv);
 }
 

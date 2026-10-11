@@ -123,7 +123,7 @@ static BOOL BrCore_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
 
     if (wk->param->mainParam->mode != BR_MODE_BROWSE) {
         wk->net =
-            func_ov271_021f6224(wk->param->mainParam->gameData, wk->param->mainParam->unk8, HEAPID_BATTLE_RECORDER);
+            BrNet_Init(wk->param->mainParam->gameData, wk->param->mainParam->unk8, HEAPID_BATTLE_RECORDER);
     } else {
         GFL_OvlLoad(OVERLAY_ID(201));
     }
@@ -158,10 +158,10 @@ static BOOL BrCore_ProcExit(GameProc *proc, u32 *state, void *param, void *work)
     }
 
     if (wk->net != NULL) {
-        if (func_ov271_021f66f8(wk->net)) {
+        if (BrNet_IsFailed(wk->net)) {
             wk->param->mainParam->result = 2;
         }
-        func_ov271_021f6300(wk->net);
+        BrNet_Exit(wk->net);
         wk->net = NULL;
     } else {
         GFL_OvlUnload(OVERLAY_ID(201));
@@ -206,7 +206,7 @@ static BOOL BrCore_ProcMain(GameProc *proc, u32 *state, void *param, void *work)
         BrProcSys_Main(wk->procSys);
         BrGraphic_Main(wk->graphic);
         if (wk->net != NULL) {
-            func_ov271_021f6348(wk->net);
+            BrNet_Main(wk->net);
         }
         if (BrProcSys_IsEnd(wk->procSys)) {
             *state = 4;

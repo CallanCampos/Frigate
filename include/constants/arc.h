@@ -69,6 +69,8 @@
 #define ARCID_TRTBLOFS 90
 #define ARCID_TRDATA 91
 #define ARCID_TRPOKE 92
+// The graphics of the compatibility result (irc_compat_result.c). Our name, not swan's
+#define ARCID_IRC_COMPAT 93
 // The Global Trade Station's 2D graphics (not from swan)
 #define ARCID_WORLDTRADE 95
 #define ARCID_CALENDAR 96
@@ -117,12 +119,22 @@
 #define ARCID_TPOKE 208
 // The Marine Tube board's graphics on the main screen (marine_tube_board.c). Our name, not swan's
 #define ARCID_MARINE_TUBE_BOARD 297
+// The Pokédex diplomas' graphics (chihou_zukan_award.c and zenkoku_zukan_award.c). Our name, not swan's
+#define ARCID_ZUKAN_AWARD 199
+// The graphics of the Battle Subway's records screen (bsubway_records.c). Our name, not swan's
+#define ARCID_BSUBWAY_RECORDS 196
+// The Trial House results screen's graphics (th_award.c). Our name, not swan's
+#define ARCID_TH_AWARD 198
 // The subway map's graphics on the main screen (subway_map.c). Our name, not swan's
 #define ARCID_SUBWAY_MAP 203
 // The graphics of the "THE END" picture after the credits (the_end.c). Our name, not swan's
 #define ARCID_THE_END 215
 // The Research Radar's graphics. Our name, not swan's
 #define ARCID_RESEARCH_RADAR 189
+// The Union Room's touch screen, union_subdisp.c. Our name, not swan's
+#define ARCID_UNION_SUBDISP 88
+// The Dowsing MCHN's graphics and map of the hidden items around the player. Our name, not swan's
+#define ARCID_DOWSING 192
 // The graphics that many apps share, such as the touch bar, which getUINarcIdx returns. Our name, not swan's
 #define ARCID_APP_MENU_COMMON 82
 // The lists of words that names may not contain, compressed and encrypted
@@ -137,6 +149,8 @@
 // The Pokestar Studios cut-ins' graphics and scripts, which pokewood_cutin.c loads. Our names, not swan's
 // The cast lists of the movies, a file each. Our name
 #define ARCID_POKEWOOD_CAST 272
+// The graphics of the movie's opening, which pkwd_count.c loads
+#define ARCID_PKWD_COUNT 271
 #define ARCID_POKEWOOD_CUTIN_GRA 274
 #define ARCID_POKEWOOD_CUTIN_SCRIPT 275
 // Unova Link's graphics (not from swan)

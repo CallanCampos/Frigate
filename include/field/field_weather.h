@@ -72,6 +72,7 @@ void *func_ov036_02199c5c(WeatherObj *obj);
 ClActor *func_ov036_02199c64(WeatherObj *obj);
 void func_ov036_02199c6c(WeatherObj *obj, ClActorPos *pos);
 void func_ov036_02199c80(WeatherObj *obj, const ClActorPos *pos);
+void func_ov036_02199cf0(WeatherObj *obj, const ClActorPos *pos);
 
 // Overlay 74
 extern WeatherData SUNNY_WEATHER;

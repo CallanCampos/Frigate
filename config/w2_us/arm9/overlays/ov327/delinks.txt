@@ -3,3 +3,20 @@
     .ctor       start:0x021b7348 end:0x021b7348 kind:rodata align:4
     .data       start:0x021b7360 end:0x021b7400 kind:data align:32
     .bss        start:0x021b7400 end:0x021b7400 kind:bss align:32
+
+src/ov327/wbt_download_sys.c:
+    complete
+    .text       start:0x021b5dc0 end:0x021b60e4
+    .rodata     start:0x021b7114 end:0x021b7160
+    .data       start:0x021b7360 end:0x021b7394
+
+src/ov327/wbt_download_net_graphic.c:
+    complete
+    .text       start:0x021b60e4 end:0x021b6330
+    .rodata     start:0x021b7160 end:0x021b733c
+    .data       start:0x021b7394 end:0x021b73b0
+
+src/ov327/wbt_download_net_util.c:
+    .text       start:0x021b6330 end:0x021b7114
+    .rodata     start:0x021b733c end:0x021b7348
+    .data       start:0x021b73b0 end:0x021b7400

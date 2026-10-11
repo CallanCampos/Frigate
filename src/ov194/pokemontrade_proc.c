@@ -1472,7 +1472,7 @@ static void func_ov194_021b9454(PokemonTradeWork *wk) {
     if (!PokemonTrade_IsNetwork(wk) || func_02042be8(func_02040440(), TRADE_NET_CMD_UNK3, 1, &side)) {
         GXS_SetVisibleWnd(GX_WNDMASK_NONE);
         if (!PokemonTrade_IsNegoType(wk)) {
-            PokemonTrade_SetState(wk, func_ov192_021b38cc);
+            PokemonTrade_SetState(wk, PokemonTradeIrcDemo_Start);
         } else {
             PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_Start);
         }
@@ -2884,7 +2884,7 @@ static BOOL func_ov194_021bb9cc(GameProc *proc, u32 *state, void *param, void *w
     demo->trade.gameData = demo->gameData;
     ret = PokemonTrade_Init(proc, state, &demo->trade, wk, 4);
     func_ov194_021bb938(demo, wk);
-    PokemonTrade_SetState(wk, func_ov192_021b38cc);
+    PokemonTrade_SetState(wk, PokemonTradeIrcDemo_Start);
     return ret;
 }
 

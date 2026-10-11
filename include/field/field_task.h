@@ -19,6 +19,8 @@ void *FieldTask_GetData(FieldTask *task);
 void FieldTaskManager_AddTask(FieldTaskManager *mgr, FieldTask *task, u32 a2);
 FieldTask *FieldActorSpinTask_CreatePlayerAccel(Field *field, u32 duration, u32 direction);
 FieldTask *FieldActorSpinTask_CreatePlayer(Field *field, u32 duration, u32 direction);
+// Moves the player to pos over duration frames
+FieldTask *FieldPlayerMoveTask_Create(Field *field, u32 duration, const VecFx32 *pos);
 FieldTask *FieldActorMoveTask_CreatePlayer(Field *field, u32 duration, const VecFx32 *offset);
 FieldTask *FieldActorSpinTask_Create(Field *field, u32 duration, u32 direction, FieldActor *actor);
 // Moves the actor by offset, or to pos, over duration frames

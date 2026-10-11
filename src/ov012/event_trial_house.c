@@ -1,7 +1,7 @@
 // The Trial House's events: picking the Pokémon to enter, the battle, its statistics and the results screen. Function
 // names from swan; the file's name is descriptive
 #include "types.h"
-#include "app/ov313.h"
+#include "app/th_award.h"
 #include "battle/btl_setup.h"
 #include "constants/pokemon.h"
 #include "field/battle_facility.h"
@@ -38,7 +38,7 @@ typedef struct {
 typedef struct {
     GameSystem *gsys;
     Field *field;
-    Ov313Param param;
+    ThAwardParam param;
 } TrialHouseResultsData;
 
 static GameEventReturnCode func_ov012_02162ccc(GameEvent *event, u32 *state, void *work);
@@ -145,8 +145,8 @@ GameEvent *func_ov012_02162eb4(GameSystem *gsys, u32 a1, u32 a2) {
     data->field = GSYS_GetField(gsys);
     data->param.gender = getTrainerGender(GetGameDataPlayerInfo(gameData));
     data->param.save = func_0200f1b8(GameData_GetSaveControl(gameData));
-    data->param.unk08 = a1;
-    data->param.unk0C = a2;
+    data->param.downloaded = a1;
+    data->param.playJingle = a2;
     return event;
 }
 
@@ -155,7 +155,7 @@ static GameEventReturnCode func_ov012_02162f08(GameEvent *event, u32 *state, voi
 
     switch (*state) {
     case 0:
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(313), &data_ov313_0219dc6c, &data->param);
+        GSYS_QueueProcAsEvent(event, OVERLAY_TH_AWARD, &TH_AWARD_PROC_FUNCTIONS, &data->param);
         (*state)++;
         break;
     case 1:

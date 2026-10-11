@@ -1,10 +1,12 @@
 #include "types.h"
 #include "app/bag.h"
+#include "app/chihou_zukan_award.h"
 #include "app/mailbox.h"
 #include "app/marine_tube_board.h"
 #include "app/monolith.h"
 #include "app/psel.h"
 #include "app/subway_map.h"
+#include "app/zenkoku_zukan_award.h"
 #include "app/zukan_award.h"
 #include "field/entree_forest.h"
 #include "field/event_3d_demo.h"
@@ -298,13 +300,13 @@ BOOL s0151_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
         award = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanAwardParam), TRUE, "scrcmd_proc.c", 546);
         award->gameData = gameData;
         award->unk04 = value;
-        CreateScrCmdOverlayProcess(vm, env, OVERLAY_CHIHOU_ZUKAN_AWARD, &data_ov314_0219da74, award, NULL, NULL);
+        CreateScrCmdOverlayProcess(vm, env, OVERLAY_CHIHOU_ZUKAN_AWARD, &CHIHOU_ZUKAN_AWARD_PROC_FUNCTIONS, award, NULL, NULL);
         break;
     case 1:
         award = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanAwardParam), TRUE, "scrcmd_proc.c", 554);
         award->gameData = gameData;
         award->unk04 = value;
-        CreateScrCmdOverlayProcess(vm, env, OVERLAY_ZENKOKU_ZUKAN_AWARD, &data_ov315_0219db20, award, NULL, NULL);
+        CreateScrCmdOverlayProcess(vm, env, OVERLAY_ZENKOKU_ZUKAN_AWARD, &ZENKOKU_ZUKAN_AWARD_PROC_FUNCTIONS, award, NULL, NULL);
         break;
     case 2:
         subwayMap = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(SubwayMapParam), TRUE, "scrcmd_proc.c", 563);

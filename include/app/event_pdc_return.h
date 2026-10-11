@@ -16,24 +16,6 @@
 // The Pokémon was seen but not caught
 #define PDC_RESULT_SEEN 2
 
-// The parameter of overlay 297's Pokédex registration (zukan_toroku.c), which belongs in its own header once that
-// overlay is decompiled
-typedef struct {
-    // 0 for a species caught for the first time
-    u32 mode;
-    PartyPkm *pkm;
-    BOOL nationalDex;
-    // The message about the box the Pokémon goes to, or NULL when it joins the party
-    StrBuf *boxMessage;
-    BoxSaveAccessor *boxes;
-    u32 box;
-    GameData *gameData;
-    // TRUE when the player chose to give the Pokémon a nickname
-    u32 nickname;
-} ZukanTorokuParam;
-
-extern const GameProcFunctions data_ov297_021f4e38;
-
 typedef struct {
     GameData *gameData;
     // PDC_RESULT_*

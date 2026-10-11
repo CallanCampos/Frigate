@@ -3,6 +3,7 @@
 #include "app/battle_recorder.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
+#include "app/zukan.h"
 #include "constants/pokemon.h"
 #include "demo/shinka_demo.h"
 #include "field/app_call.h"
@@ -32,15 +33,6 @@
 #include "system/game_system.h"
 
 // The params of the apps that no header describes yet
-
-// The Pokédex
-typedef struct {
-    GameData *gameData;
-    PokeDexSave *pokedex;
-    PlayerInfo *playerInfo;
-    u16 species;
-    u16 result;
-} ZukanParam;
 
 // The trainer card, which func_ov012_02169b04 allocates
 typedef struct {
@@ -85,7 +77,7 @@ typedef struct {
 
 const FieldProcLink FIELD_PROC_LINK_LIST[15] = {
     { OVERLAY_ID(165), &POKELIST_PROC_FUNCTIONS, func_ov012_0215b7d8, func_ov012_0215b9cc, NULL, func_ov012_0215c594 },
-    { OVERLAY_ID(302), &data_ov189_021ae3dc, func_ov012_0215bad4, func_ov012_0215bb44, NULL, func_ov012_0215c594 },
+    { OVERLAY_ID(302), &ZUKAN_PROC_FUNCTIONS, func_ov012_0215bad4, func_ov012_0215bb44, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(142), &BAG_PROC_FUNCTIONS, func_ov012_0215bd48, func_ov012_0215bdd0, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(186), &data_ov012_0216dd78, func_ov012_0215bef4, func_ov012_0215bf58, NULL, func_ov012_0215c594 },
     { 0, NULL, NULL, NULL, func_ov012_0215c0dc, func_ov012_0215c594 },
@@ -486,9 +478,9 @@ void *func_ov012_0215bad4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, v
     sound = GameData_GetFieldSoundSystem(param->gameData);
     FieldSnd_DuckVolume(sound, GameSystem_GetISS(work->input->gameSystem));
     if (appParam != -1) {
-        param->species = appParam;
+        param->start = appParam;
     } else {
-        param->species = 0;
+        param->start = 0;
     }
     return param;
 }

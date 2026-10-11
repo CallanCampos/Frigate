@@ -1056,7 +1056,7 @@ BOOL func_ov167_021cfb40(BtlvCore *core) {
         if (func_ov169_06899dfc(core->unk1C4)) {
             func_ov169_06899e24(core->unk1C4);
             GFL_OvlLoad(OVERLAY_ID(289));
-            func_ov289_021f4440(&core->ov289);
+            BChoiceMain_Start(&core->ov289);
             core->subSeq = 3;
         }
         break;

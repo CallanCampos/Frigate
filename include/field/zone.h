@@ -198,6 +198,8 @@ BOOL GetZoneFlagsEnableEscapeRope(u16 zoneId);
 BOOL GetZoneFlagsEnableEntralinkWarp(u16 zoneId);
 BOOL GetZoneFlagsEnableFlyFrom(u16 zoneId);
 BOOL GetZoneIsEntralinkAny(u16 zoneId);
+// Whether the zone is the Hidden Grotto's
+BOOL GetZoneIsHiddenGroto(u16 zoneId);
 ZoneTrigger *FindCollidingZoneTriggerAtLocation(EventData *eventData, EventWork *eventWork, const VecFx32 *position);
 ZoneTrigger *FindTriggerAtPosGrid(EventData *eventData, EventWork *eventWork, const VecFx32 *position, u32 direction);
 ZoneTrigger *FindTriggerAtPosRail(EventData *eventData, EventWork *eventWork, const RailPosition *position);

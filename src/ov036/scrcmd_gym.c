@@ -3,9 +3,11 @@
 #include "types.h"
 #include "field/field_script.h"
 #include "field/field_sound.h"
+#include "field/gym_driftveil.h"
 #include "field/gym_driftveil_lift.h"
 #include "field/gym_gimmick.h"
 #include "field/gym_icirrus.h"
+#include "field/gym_opelucid.h"
 #include "field/gym_virbank.h"
 #include "field/scrcmd_gym.h"
 #include "system/game_data.h"
@@ -91,7 +93,7 @@ BOOL func_ov036_021aae88(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a1 = VM_Read16(vm);
     u16 a2 = VM_Read16(vm);
-    GameEvent *event = func_ov096_021eeddc(gsys, a1, a2);
+    GameEvent *event = DriftveilGym_CreateElevatorEvent(gsys, a1, a2);
 
     if (event == NULL) {
         return TRUE;
@@ -118,7 +120,7 @@ BOOL func_ov036_021aaec8(VM *vm, FieldScriptEnv *env) {
         a2 = TRUE;
         break;
     }
-    event = func_ov096_021eedf0(gsys, a1, a2);
+    event = DriftveilGym_CreateFreightEvent(gsys, a1, a2);
     if (event == NULL) {
         return TRUE;
     }
@@ -156,7 +158,7 @@ BOOL func_ov036_021aaf1c(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov036_021aaf78(VM *vm, FieldScriptEnv *env) {
-    func_ov096_021eee04(FieldScriptEnv_GetGameSystem(env));
+    DriftveilGym_PrepareFreight(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
@@ -219,7 +221,7 @@ BOOL func_ov036_021ab074(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab094(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov099_021ef144(gsys, VM_Read16(vm));
+    GameEvent *event = GymOpelucid_CreateMoveEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return TRUE;
@@ -231,7 +233,7 @@ BOOL func_ov036_021ab094(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab0cc(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov099_021ef210(gsys, VM_Read16(vm));
+    GameEvent *event = GymOpelucid_CreateButtonEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return TRUE;
@@ -241,17 +243,17 @@ BOOL func_ov036_021ab0cc(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov036_021ab104(VM *vm, FieldScriptEnv *env) {
-    func_ov099_021ef168(FieldScriptEnv_GetGameSystem(env));
+    GymOpelucid_RefreshVars(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 BOOL func_ov036_021ab114(VM *vm, FieldScriptEnv *env) {
-    func_ov099_021efb70(FieldScriptEnv_GetGameSystem(env));
+    GymOpelucid_FreeHeap(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 
 BOOL func_ov036_021ab124(VM *vm, FieldScriptEnv *env) {
-    func_ov099_021efb8c(FieldScriptEnv_GetGameSystem(env));
+    GymOpelucid_CreateHeap(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }
 

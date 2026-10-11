@@ -10,13 +10,18 @@
 typedef struct {
     // The item's flag, from HIDDEN_ITEM_FLAG_START
     u16 index;
-    u8 unk2;
+    // Whether the Dowsing MCHN finds it from the neighboring zones of the outdoor map
+    u8 outdoors;
     // Whether the item comes back after it is found
     u8 respawn;
-    u16 unk4;
-    u16 unk6;
-    u16 unk8;
+    u16 zoneId;
+    // Its position in the map
+    u16 x;
+    u16 z;
 } HiddenItem;
+
+// The event flag of the first hidden item, which HiddenItem.index is added to
+#define HIDDEN_ITEM_FLAG_START 0xb04
 
 u16 GetHiddenItemNoBySCRID(u16 scrId);
 u16 GetHiddenItemEventFlagNoBySCRID(u16 scrId);

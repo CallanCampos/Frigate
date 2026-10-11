@@ -3,3 +3,13 @@
     .ctor       start:0x0219e284 end:0x0219e284 kind:rodata align:4
     .data       start:0x0219e2a0 end:0x0219e2c0 kind:data align:32
     .bss        start:0x0219e2c0 end:0x0219e2c0 kind:bss align:32
+
+src/ov321/pkwd_count.c:
+    .text       start:0x0219ce80 end:0x0219dc04
+    .rodata     start:0x0219de5c end:0x0219e0c8
+
+src/ov321/pkwd_count_graphic.c:
+    complete
+    .text       start:0x0219dc04 end:0x0219de5c
+    .rodata     start:0x0219e0c8 end:0x0219e284
+    .data       start:0x0219e2a0 end:0x0219e2c0

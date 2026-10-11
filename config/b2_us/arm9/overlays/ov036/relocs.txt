@@ -5860,7 +5860,7 @@ from:0x02198a06 kind:thumb_call to:0x0203ce0c module:main
 from:0x02198a0c kind:thumb_call to:0x0203ce0c module:main
 from:0x02198a12 kind:thumb_call to:0x021804bc module:overlay(36)
 from:0x02198a18 kind:thumb_call to:0x021eae60 module:overlays(84,85)
-from:0x02198a2c kind:thumb_call to:0x021eae8c module:overlays(82,85)
+from:0x02198a2c kind:thumb_call to:0x021eae8c module:overlay(85)
 from:0x02198a32 kind:thumb_call to:0x0203cdc8 module:main
 from:0x02198a38 kind:thumb_call to:0x0203cdc8 module:main
 from:0x02198a50 kind:load to:0x021eae95 module:overlays(85,86)

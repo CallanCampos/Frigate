@@ -4,6 +4,7 @@
 #include "types.h"
 #include "gfl/overlay.h"
 #include "app/ov306.h"
+#include "battle/vs_multi_list.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
 
@@ -44,11 +45,7 @@ typedef struct {
 typedef struct {
     GameProcManager *manager;
     // What overlay 171 gets
-    struct {
-        PokeParty *party0;
-        PokeParty *party1;
-        u32 unk08;
-    } ov171Param;
+    VsMultiListParam ov171Param;
     BOOL ov167Loaded;
     BOOL commandsSet;
     BOOL vsPlayerLoaded;
@@ -57,7 +54,6 @@ typedef struct {
 extern const GameProcFunctions data_ov010_0215039c;
 // The battle system's proc
 extern const GameProcFunctions data_ov167_021d6ce0;
-extern const GameProcFunctions data_ov171_021deaec;
 extern const GameProcFunctions data_ov305_0219e990;
 
 BOOL func_ov010_0214ff00(GameProc *proc, u32 *state, void *param, void *work);

@@ -3,7 +3,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
-#include "app/ov141.h"
+#include "app/bsubway_records.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
 #include "battle/battle_proc.h"
@@ -66,7 +66,7 @@ typedef struct {
 typedef struct {
     Field *field;
     GameSystem *gsys;
-    Ov141Param param;
+    BSubwayRecordsParam param;
 } BSubwayRecordsData;
 
 typedef struct {
@@ -308,10 +308,10 @@ static GameEventReturnCode func_ov012_02166230(GameEvent *event, u32 *state, voi
     case 0:
         data->param.gameData = GSYS_GetGameData(data->gsys);
         bsubwaySave = func_02017968(data->param.gameData);
-        data->param.unk04 = func_0200e7d8(bsubwaySave);
-        data->param.unk08 = func_0200e7e4(bsubwaySave);
+        data->param.rank = func_0200e7d8(bsubwaySave);
+        data->param.trainNumber = func_0200e7e4(bsubwaySave);
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(data->gsys, data->field, OVERLAY_ID(141),
-                                                                         &data_ov141_0219df2c, &data->param));
+                                                                         &BSUBWAY_RECORDS_PROC_FUNCTIONS, &data->param));
         (*state)++;
         break;
     case 1:

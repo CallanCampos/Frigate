@@ -2,6 +2,7 @@
 #include "types.h"
 #include "app/event_pdc_return.h"
 #include "app/name_entry.h"
+#include "app/zukan_toroku.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
@@ -156,7 +157,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
             } else {
                 wk->zukan.mode = 1;
             }
-            QueueGameProc(wk->procManager, OVERLAY_ID(297), &data_ov297_021f4e38, &wk->zukan);
+            QueueGameProc(wk->procManager, OVERLAY_ID(297), &ZUKAN_TOROKU_PROC_FUNCTIONS, &wk->zukan);
             (*state)++;
         } else {
             if (prm->result == PDC_RESULT_SEEN) {

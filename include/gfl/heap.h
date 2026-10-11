@@ -37,6 +37,8 @@ enum {
     HEAPID_MUSICAL_DRESSUP = 0x2d,
     HEAPID_MUSICAL = 0x2e,
     HEAPID_DEBUG_GENDER_SELECT = 0x39,
+    // Not from swan: the compatibility result's, overlay 179
+    HEAPID_IRC_COMPAT = 0x3c,
     // The Union Room's, a child of HEAPID_GAMEEVENT (union_comm.c)
     HEAPID_UNION = 0x41,
     // Not from swan: the summary screen's heap
@@ -64,19 +66,29 @@ enum {
     HEAPID_GAMESYNC = 0x67,
     // The evolution demo's graphics, which it frees while another screen runs
     HEAPID_SHINKA_DEMO_GRAPHIC = 0x68,
+    // Not from swan: the Pokédex's heap, overlay 302
+    HEAPID_ZUKAN = 0x69,
+    // Not from swan: the Pokédex registration's heap, overlay 297
+    HEAPID_ZUKAN_TOROKU = 0x6a,
     HEAPID_DEMO3D = 0x6c,
     // Not from swan: the Xtransceiver's heap, and the heap of its camera
     HEAPID_COMM_TVT = 0x6d,
     HEAPID_CTVT_CAMERA = 0x6e,
     HEAPID_INTRO = 0x6f,
     HEAPID_FIELD_MENU = 0x70,
+    // Not from swan: the heap of the multi battle's list of both teams (overlay 171)
+    HEAPID_VS_MULTI_LIST = 0x71,
     HEAPID_BATTLE_LOAD = 0x76,
     HEAPID_WIFILOGIN = 0x78,
     HEAPID_WIFILOGOUT = 0x79,
     // Not from swan: the Pokédex opening's
     HEAPID_ZUKAN_OPEN = 0x7e,
     HEAPID_CDEMO = 0x7f,
+    // Not from swan: the heap of the Battle Subway's records screen (overlay 141)
+    HEAPID_BSUBWAY_RECORDS = 0x80,
     HEAPID_SAVEDATA_DELETE = 0x81,
+    // Not from swan: the heap of the diplomas, overlays 313 to 315
+    HEAPID_AWARD = 0x83,
     HEAPID_PDC = 0x85,
     // Not from swan: the heap of the "THE END" picture (overlay 267) and of the subway map (overlay 317), which never run
     // together
@@ -95,10 +107,17 @@ enum {
     HEAPID_FIELD_SCENEAREA = 0x96,
     HEAPID_BOX_SEARCH = 0x98,
     HEAPID_MEDAL_INFO = 0x99,
+    // Not from swan: the heap of the Pokéstar Studios movie's opening, overlay 321
+    HEAPID_PKWD_COUNT = 0x9a,
     // Unova Link's (not from swan)
     HEAPID_KEY_SYSTEM = 0x9b,
+    // Not from swan: the Opelucid City gym's, overlay 99
+    HEAPID_GYM_OPELUCID = 0x9c,
     // Not from swan: the heap of the Pokémon World Tournament's win record and downloaded tournaments, overlay 326
     HEAPID_WBT_RECORD = 0x9e,
+    // Not from swan: the tournament download's, overlay 327: the process's own and the one of its Wi-Fi download
+    HEAPID_WBT_DOWNLOAD = 0xa2,
+    HEAPID_WBT_DOWNLOAD_NET = 0xa3,
     // Not from swan: the Marine Tube board's
     HEAPID_MARINE_TUBE_BOARD = 0xa8,
 };

@@ -275,6 +275,7 @@ static inline void G2_SetOBJColorMode(GXOamAttr *oam, int color) {
 // Shows VRAM D, where the display capture can write, instead of the main engine's output
 #define GX_DISPMODE_VRAM_D 0xe
 #define GX_BGMODE_0 0
+#define GX_BGMODE_1 1
 #define GX_BGMODE_3 3
 #define GX_BGMODE_5 5
 #define GX_BG0_AS_2D 0
@@ -743,6 +744,15 @@ static inline void G2S_SetWnd1InsidePlane(int wnd, BOOL effect) {
         tmp |= G2_WND_EFFECT << REG_G2_WININ_WIN1IN_SHIFT;
     }
     reg_G2S_DB_WININ = (u16)tmp;
+}
+
+static inline void G2S_SetWndOBJInsidePlane(int wnd, BOOL effect) {
+    u32 tmp = (reg_G2S_DB_WINOUT & ~REG_G2_WINOUT_OBJWININ_MASK) | (wnd << REG_G2_WINOUT_OBJWININ_SHIFT);
+
+    if (effect) {
+        tmp |= G2_WND_EFFECT << REG_G2_WINOUT_OBJWININ_SHIFT;
+    }
+    reg_G2S_DB_WINOUT = (u16)tmp;
 }
 
 static inline void G2S_SetWndOutsidePlane(int wnd, BOOL effect) {

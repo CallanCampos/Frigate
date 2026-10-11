@@ -6,6 +6,7 @@
 #include "gfl/g3d.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
+#include "field/field_task.h"
 
 // An event camera animation's target and what it animates. Names and layouts from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
@@ -126,6 +127,29 @@ void FieldCameraAnm_SetReturnAnimation(FieldCamera *camera, const FieldEvCameraA
 void FieldCameraAnm_SetLoadDefaultsAnimation(FieldCamera *camera, u16 frames);
 BOOL FieldCamera_IsAnimating(FieldCamera *camera);
 void FieldCameraAnm_EVCameraEnd(FieldCamera *camera);
+// How the camera shakes: the size of the shake along the screen's axes, how many times it weakens, and how many
+// frames each step lasts. Our layout, from the task's code
+typedef struct {
+    s16 amplitudeX;
+    s16 amplitudeY;
+    u8 steps;
+    u8 pad5;
+    s16 unk6;
+    s16 unk8;
+    u16 unkA;
+    u16 unkC;
+    u16 unkE;
+    u8 unk10;
+    u8 pad11[3];
+    u32 period;
+    u32 unk18;
+    s16 delay;
+    u8 mode;
+    u8 pad1F;
+} FieldCameraShakeSetup;
+
+// Shakes the camera; the task ends when the shake does
+FieldTask *FieldCameraShakeTask_Create(Field *field, const FieldCameraShakeSetup *setup);
 // Tasks that move the camera's zoom over frames: this one by a distance from its current zoom
 void FieldCameraZoomTCB_Create(Field *field, u32 frames, fx32 distance);
 void func_ov036_021c05d4(Field *field, u32 frames, fx32 distance);

@@ -166,7 +166,7 @@ from:0x0216f086 kind:thumb_call to:0x020110d4 module:main
 from:0x0216f08c kind:thumb_call to:0x021e6424 module:overlay(62)
 from:0x0216f0ac kind:thumb_call to:0x0216f5dc module:overlay(23)
 from:0x0216f0b2 kind:thumb_call to:0x0216ed40 module:overlay(23)
-from:0x0216f0c8 kind:load to:0x0219e058 module:overlays(141,321)
+from:0x0216f0c8 kind:load to:0x0219e058 module:overlay(321)
 from:0x0216f0d0 kind:load to:0x0219f6d8 module:overlays(324,325)
 from:0x0216f0dc kind:load to:0x021d6d20 module:overlays(36,167)
 from:0x0216f0e0 kind:load to:0x0219f6e4 module:overlays(324,325)

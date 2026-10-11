@@ -3,7 +3,6 @@
 
 #include "types.h"
 #include "gfl/overlay.h"
-#include "gfl/proc.h"
 #include "struct_decls.h"
 
 // The Pokédex diplomas: the regional one, overlay 314 (chihou_zukan_award.c), and the national one, overlay 315
@@ -13,10 +12,8 @@
 
 typedef struct {
     GameData *gameData;
+    // Whether the diploma is shown again, without its jingle and its slide in
     u32 unk04;
 } ZukanAwardParam;
-
-extern const GameProcFunctions data_ov314_0219da74;
-extern const GameProcFunctions data_ov315_0219db20;
 
 #endif // POKEBW2_APP_ZUKAN_AWARD_H

@@ -56,11 +56,6 @@
 #define T_DOWNLOAD_FLAG_TAB 0x800000
 #define T_DOWNLOAD_FLAG_LIST_PRINTED 0x1000000
 
-// The bits of the work's objFlags
-#define T_DOWNLOAD_OBJ_FLAG_RESULT 0xc0
-#define T_DOWNLOAD_OBJ_FLAG_YES 0x80
-#define T_DOWNLOAD_OBJ_FLAG_LIST_MOVED 0x8000
-
 // How a button was pressed
 #define T_DOWNLOAD_INPUT_KEY 1
 #define T_DOWNLOAD_INPUT_TOUCH 2
@@ -150,7 +145,7 @@ static BOOL TDownload_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     int i;
 
     TDownload_ExitWork(wk);
-    func_ov326_021a2580(wk);
+    TDownloadSave_FreeSaved(wk);
     KeyCursor_Free(wk->keyCursor);
     AppTaskMenuRes_Free(wk->taskMenuRes);
     for (i = 0; i < 2; i++) {
@@ -159,7 +154,7 @@ static BOOL TDownload_Exit(GameProc *proc, u32 *state, void *param, void *work) 
             wk->msgData[i] = NULL;
         }
     }
-    func_ov326_021a2864(wk);
+    TDownloadSave_FreeWaitIcon(wk);
     func_02021a18(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_FontFree(wk->font);
@@ -198,7 +193,7 @@ static BOOL TDownload_Main(GameProc *proc, u32 *state, void *param, void *work) 
     }
     TDownload_Update(wk);
     GFL_TCBExMgrUpdate(wk->tcbEx);
-    func_ov326_021a2850(wk);
+    TDownloadSave_UpdateWaitIcon(wk);
     TDownload_FlushWindows(wk);
     TDownloadGraphic_Main(wk->graphic);
     TDownloadGraphic_Begin3D(wk->graphic);
@@ -249,13 +244,13 @@ static void TDownload_InitWork(TDownloadWork *wk) {
     for (i = 0; i < T_DOWNLOAD_RECEIVED_MAX; i++) {
         wk->receivedData[i] = NULL;
     }
-    wk->slotCount = func_ov326_021a24ac(wk);
-    wk->slotPos = func_ov326_021a2a44(wk, 0);
+    wk->slotCount = TDownloadSave_LoadSaved(wk);
+    wk->slotPos = TDownloadSave_FindSlot(wk, 0);
     wk->receivedCount = 0;
     if (wk->mode == T_DOWNLOAD_MODE_RECEIVED) {
-        wk->receivedCount = func_ov326_021a25a4(wk);
+        wk->receivedCount = TDownloadSave_LoadDownloaded(wk);
     }
-    func_ov326_021a0a88(wk);
+    TDownloadUtil_Init(wk);
     AppPrintsysCommon_Init(&wk->printWait, 6);
     wk->keyCursor = KeyCursor_Create(15, TRUE, TRUE, wk->heapId);
     TDownload_InitMode(wk);
@@ -263,8 +258,8 @@ static void TDownload_InitWork(TDownloadWork *wk) {
 
 static void TDownload_Update(TDownloadWork *wk) {
     TDownload_RunMode(wk);
-    func_ov326_021a1508(wk);
-    func_ov326_021a0a84(wk);
+    TDownloadUtil_ScrollBG(wk);
+    TDownloadUtil_Nop(wk);
 }
 
 static void TDownload_ExitWork(TDownloadWork *wk) {
@@ -288,7 +283,7 @@ static void TDownload_ExitWork(TDownloadWork *wk) {
             *wk->param->unk10 = 0;
         }
     }
-    func_ov326_021a1898(wk);
+    TDownloadUtil_FreeList(wk);
     for (i = 0; i < T_DOWNLOAD_RECEIVED_MAX; i++) {
         if (wk->receivedData[i] != NULL) {
             GFL_HeapFree(wk->receivedData[i]);
@@ -299,7 +294,7 @@ static void TDownload_ExitWork(TDownloadWork *wk) {
     if (wk->unk284 != NULL) {
         GFL_HeapFree(wk->unk284);
     }
-    func_ov326_021a0ac8(wk);
+    TDownloadUtil_Exit(wk);
 }
 
 static void TDownload_InitMode(TDownloadWork *wk) {
@@ -341,25 +336,25 @@ static void TDownload_InitSelect(TDownloadWork *wk) {
     }
     for (i = 0; i < wk->listCount; i++) {
         if (wk->saveFlags & (1 << (i + 4))) {
-            func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, TRUE);
+            TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, TRUE);
         }
     }
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
-    func_ov326_021a20b4(wk, wk->mode, 0);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
+    TDownloadUtil_PrintTitle(wk, wk->mode, 0);
     if (wk->flags & T_DOWNLOAD_FLAG_NO_SAVED) {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
     } else {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
-        func_ov326_021a1a10(wk, 1, wk->slotPos);
-        func_ov326_021a1a78(wk, FALSE);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
+        TDownloadUtil_MoveCursor(wk, 1, wk->slotPos);
+        TDownloadUtil_SetCursorKeys(wk, FALSE);
     }
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, FALSE);
-    func_ov326_021a0d4c(wk, wk->mode);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, FALSE);
+    TDownloadUtil_InitModeWindows(wk, wk->mode);
     for (i = 0; i < wk->listCount; i++) {
         if (wk->saveFlags & (1 << (i + 4))) {
-            func_ov326_021a21d0(wk, 0, i);
+            TDownloadUtil_PrintSlotName(wk, 0, i);
         }
     }
     if (wk->flags & T_DOWNLOAD_FLAG_NO_SAVED) {
@@ -367,14 +362,14 @@ static void TDownload_InitSelect(TDownloadWork *wk) {
         return;
     }
     if (!(wk->flags & T_DOWNLOAD_FLAG_SELECT_SHOWN)) {
-        func_ov326_021a1388(wk, 8, 0, TRUE);
-        func_ov326_021a2138(wk, TRUE);
-        func_ov326_021a2194(wk, TRUE);
+        TDownloadUtil_PrintMessage(wk, 8, 0, TRUE);
+        TDownloadUtil_DimScreen(wk, TRUE);
+        TDownloadUtil_PauseActors(wk, TRUE);
         wk->seq = 10;
         wk->flags |= T_DOWNLOAD_FLAG_SELECT_SHOWN;
     }
-    func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
-    func_ov326_021a1544(wk, 0, wk->slotPos);
+    TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
+    TDownloadUtil_PrintSlotInfo(wk, 0, wk->slotPos);
 }
 
 static void TDownload_SelectMain(TDownloadWork *wk) {
@@ -383,8 +378,8 @@ static void TDownload_SelectMain(TDownloadWork *wk) {
             TDownload_SelectKeys(wk);
         }
         if (wk->flags & T_DOWNLOAD_FLAG_SELECT_MOVED) {
-            func_ov326_021a1a10(wk, 1, wk->slotPos);
-            func_ov326_021a1544(wk, 0, wk->slotPos);
+            TDownloadUtil_MoveCursor(wk, 1, wk->slotPos);
+            TDownloadUtil_PrintSlotInfo(wk, 0, wk->slotPos);
             wk->flags &= ~T_DOWNLOAD_FLAG_SELECT_MOVED;
         }
     }
@@ -397,7 +392,7 @@ static BOOL TDownload_SelectTouch(TDownloadWork *wk) {
     int input = 0;
     BOOL moved = FALSE;
 
-    touched = func_ov326_021a2114(wk, FALSE, wk->mode);
+    touched = TDownloadUtil_GetTouch(wk, FALSE, wk->mode);
     if (touched == 3 || touched == 4 || touched == 5) {
         slot = touched - 3;
         if (wk->saveFlags & (1 << (slot + 4))) {
@@ -407,20 +402,20 @@ static BOOL TDownload_SelectTouch(TDownloadWork *wk) {
         }
     }
     if (moved == FALSE && touched == 0) {
-        func_ov326_021a14d4(wk, 3, 0);
+        TDownloadUtil_PressButton(wk, 3, 0);
         input = T_DOWNLOAD_INPUT_TOUCH;
         func_0203d564(TRUE);
     }
     if (moved == TRUE) {
         wk->flags |= T_DOWNLOAD_FLAG_SELECT_MOVED;
-        func_ov326_021a1a78(wk, TRUE);
+        TDownloadUtil_SetCursorKeys(wk, TRUE);
         wk->seq = 130;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         func_0203d564(TRUE);
     }
     if (input != 0) {
         result = TRUE;
-        func_ov326_021a2298(wk, FALSE, TRUE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, FALSE, TRUE, FALSE);
         wk->seq = 110;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
     }
@@ -436,40 +431,40 @@ static BOOL TDownload_SelectKeys(TDownloadWork *wk) {
 
     if (func_0203d554() == TRUE) {
         if (GCTX_HIDGetPressedKeys()) {
-            func_ov326_021a2298(wk, TRUE, input, input);
+            TDownloadUtil_UpdateCursorMode(wk, TRUE, input, input);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
         done = TRUE;
     }
     if (done == FALSE) {
         if (GCTX_HIDGetTypedKeys() & PAD_KEY_UP) {
-            pos = func_ov326_021a2a98(wk, FALSE, wk->slotPos);
+            pos = TDownloadSave_NextSlot(wk, FALSE, wk->slotPos);
             if (pos != wk->slotPos) {
                 moved = TRUE;
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
             wk->slotPos = pos;
         } else if (GCTX_HIDGetTypedKeys() & PAD_KEY_DOWN) {
-            pos = func_ov326_021a2a98(wk, TRUE, wk->slotPos);
+            pos = TDownloadSave_NextSlot(wk, TRUE, wk->slotPos);
             if (pos != wk->slotPos) {
                 moved = TRUE;
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
             wk->slotPos = pos;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-            func_ov326_021a1a78(wk, TRUE);
+            TDownloadUtil_SetCursorKeys(wk, TRUE);
             wk->seq = 130;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             func_0203d564(FALSE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-            func_ov326_021a14d4(wk, 3, 0);
+            TDownloadUtil_PressButton(wk, 3, 0);
             input = T_DOWNLOAD_INPUT_KEY;
-            func_ov326_021a2298(wk, TRUE, FALSE, FALSE);
+            TDownloadUtil_UpdateCursorMode(wk, TRUE, FALSE, FALSE);
         }
     }
     if (moved == TRUE) {
         wk->flags |= T_DOWNLOAD_FLAG_SELECT_MOVED;
-        func_ov326_021a2298(wk, TRUE, FALSE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, TRUE, FALSE, FALSE);
     }
     if (input == T_DOWNLOAD_INPUT_KEY) {
         result = TRUE;
@@ -484,10 +479,10 @@ static BOOL TDownload_WaitInput(TDownloadWork *wk) {
 
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
         result = TRUE;
-        func_ov326_021a2298(wk, TRUE, FALSE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, TRUE, FALSE, FALSE);
     } else if (func_0203da48() == TRUE) {
         result = TRUE;
-        func_ov326_021a2298(wk, FALSE, TRUE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, FALSE, TRUE, FALSE);
     }
     return result;
 }
@@ -500,71 +495,71 @@ static void TDownload_Select(TDownloadWork *wk) {
     case 0:
         wk->seq = 100;
     case 10:
-        if (func_ov326_021a1338(wk) == FALSE) {
-            func_ov326_021a1370(wk, TRUE);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
-            func_ov326_021a20b4(wk, wk->mode, 0);
+        if (TDownloadUtil_UpdateMessage(wk) == FALSE) {
+            TDownloadUtil_ClearMessage(wk, TRUE);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
+            TDownloadUtil_PrintTitle(wk, wk->mode, 0);
             wk->seq = 100;
-            func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
         }
         break;
     case 100:
         TDownload_SelectMain(wk);
         break;
     case 110:
-        if (func_ov326_021a23d4(wk, 0) == TRUE) {
+        if (TDownloadUtil_IsButtonDone(wk, 0) == TRUE) {
             wk->seq = T_DOWNLOAD_SEQ_END;
         }
         break;
     case 120:
-        if (func_ov326_021a23d4(wk, 1) == TRUE) {
+        if (TDownloadUtil_IsButtonDone(wk, 1) == TRUE) {
             wk->objFlags |= T_DOWNLOAD_OBJ_FLAG_LIST_MOVED;
             wk->seq = 100;
         }
         break;
     case 130:
         if (func_02021c0c(wk->printQueue) == TRUE) {
-            func_ov326_021a2298(wk, FALSE, FALSE, TRUE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
         break;
     case 200:
-        if (func_ov326_021a1134(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
-            func_ov326_021a1388(wk, 7, 1, FALSE);
-            func_ov326_021a1188(wk, 0);
-            func_ov326_021a2138(wk, TRUE);
-            func_ov326_021a2194(wk, TRUE);
+        if (TDownloadUtil_IsActorAnimating(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
+            TDownloadUtil_PrintMessage(wk, 7, 1, FALSE);
+            TDownloadUtil_InitTaskMenu(wk, 0);
+            TDownloadUtil_DimScreen(wk, TRUE);
+            TDownloadUtil_PauseActors(wk, TRUE);
             wk->seq = 210;
         }
         break;
     case 210:
-        result = func_ov326_021a128c(wk);
+        result = TDownloadUtil_UpdateTaskMenu(wk);
         if (result != -1) {
-            func_ov326_021a1274(wk);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
+            TDownloadUtil_FreeTaskMenu(wk);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
             if (result == 0) {
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = T_DOWNLOAD_SEQ_END;
                 wk->flags |= T_DOWNLOAD_FLAG_SELECTED;
             } else if (result == 1) {
                 wk->seq = 300;
-                func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+                TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
                 for (i = 0; i < 3; i++) {
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
                 }
             } else {
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = 100;
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1a78(wk, FALSE);
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_SetCursorKeys(wk, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         break;
     case 300:
-        func_ov326_021a1370(wk, FALSE);
+        TDownloadUtil_ClearMessage(wk, FALSE);
         wk->returnMode = wk->mode;
         TDownload_ExitSelect(wk);
         wk->seq = 0;
@@ -573,7 +568,7 @@ static void TDownload_Select(TDownloadWork *wk) {
         break;
     case 500:
         if (TDownload_WaitInput(wk) == TRUE) {
-            func_ov326_021a14d4(wk, 3, 0);
+            TDownloadUtil_PressButton(wk, 3, 0);
             wk->seq = 110;
         }
         break;
@@ -586,9 +581,9 @@ static void TDownload_ExitSelect(TDownloadWork *wk) {
     int i;
 
     for (i = 0; i < 3; i++) {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
     }
-    func_ov326_021a0da4(wk, wk->mode);
+    TDownloadUtil_ExitModeWindows(wk, wk->mode);
 }
 
 static void TDownload_InitDetail(TDownloadWork *wk) {
@@ -596,32 +591,32 @@ static void TDownload_InitDetail(TDownloadWork *wk) {
 
     GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, 0);
     for (i = 0; i < 3; i++) {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 3, TRUE);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 3, TRUE);
     }
-    func_ov326_021a2298(wk, FALSE, FALSE, TRUE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
-    func_ov326_021a0b84(wk, wk->mode);
-    func_ov326_021a1c0c(wk, TRUE);
-    func_ov326_021a0d4c(wk, wk->mode);
+    TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
+    TDownloadUtil_LoadModeBG(wk, wk->mode);
+    TDownloadUtil_SetPaletteAnim(wk, TRUE);
+    TDownloadUtil_InitModeWindows(wk, wk->mode);
     wk->tab = 0;
     wk->flags |= T_DOWNLOAD_FLAG_REDRAW;
     wk->flags |= T_DOWNLOAD_FLAG_TAB;
     wk->palAnimCount = 0x8000;
     if (wk->returnMode == T_DOWNLOAD_MODE_RECEIVED) {
-        func_ov326_021a1f34(wk, 1, wk->listPos[2]);
-        func_ov326_021a1cf8(wk, 1, wk->listPos[2], wk->tab);
+        TDownloadUtil_CountDetails(wk, 1, wk->listPos[2]);
+        TDownloadUtil_PrintDetails(wk, 1, wk->listPos[2], wk->tab);
     } else if (wk->returnMode == T_DOWNLOAD_MODE_SELECT) {
-        func_ov326_021a1f34(wk, 0, wk->slotPos);
-        func_ov326_021a1cf8(wk, 0, wk->slotPos, wk->tab);
+        TDownloadUtil_CountDetails(wk, 0, wk->slotPos);
+        TDownloadUtil_PrintDetails(wk, 0, wk->slotPos, wk->tab);
     } else {
-        func_ov326_021a1f34(wk, 0, wk->slotCursor);
-        func_ov326_021a1cf8(wk, 0, wk->slotCursor, wk->tab);
+        TDownloadUtil_CountDetails(wk, 0, wk->slotCursor);
+        TDownloadUtil_PrintDetails(wk, 0, wk->slotCursor, wk->tab);
     }
-    func_ov326_021a20b4(wk, wk->mode, 0);
-    func_ov326_021a2350(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
+    TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+    TDownloadUtil_UpdateArrows(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
 }
 
 static void TDownload_DetailMain(TDownloadWork *wk) {
@@ -631,17 +626,17 @@ static void TDownload_DetailMain(TDownloadWork *wk) {
         }
         if (wk->flags & T_DOWNLOAD_FLAG_REDRAW) {
             if (wk->returnMode == T_DOWNLOAD_MODE_RECEIVED) {
-                func_ov326_021a1cf8(wk, 1, wk->listPos[2], wk->tab);
+                TDownloadUtil_PrintDetails(wk, 1, wk->listPos[2], wk->tab);
             } else if (wk->returnMode == T_DOWNLOAD_MODE_SELECT) {
-                func_ov326_021a1cf8(wk, 0, wk->slotPos, wk->tab);
+                TDownloadUtil_PrintDetails(wk, 0, wk->slotPos, wk->tab);
             } else {
-                func_ov326_021a1cf8(wk, 0, wk->slotCursor, wk->tab);
+                TDownloadUtil_PrintDetails(wk, 0, wk->slotCursor, wk->tab);
             }
             if (wk->flags & T_DOWNLOAD_FLAG_TAB) {
-                func_ov326_021a1c34(wk, wk->tab);
+                TDownloadUtil_SetTab(wk, wk->tab);
                 wk->flags &= ~T_DOWNLOAD_FLAG_TAB;
             }
-            func_ov326_021a1c78(wk, wk->tab);
+            TDownloadUtil_ShowPageButtons(wk, wk->tab);
             wk->flags &= ~T_DOWNLOAD_FLAG_ONE_PAGE;
             if (wk->pageCount[wk->tab] == 1) {
                 wk->flags |= T_DOWNLOAD_FLAG_ONE_PAGE;
@@ -649,7 +644,7 @@ static void TDownload_DetailMain(TDownloadWork *wk) {
             wk->flags &= ~T_DOWNLOAD_FLAG_REDRAW;
         }
         if (wk->flags & T_DOWNLOAD_FLAG_PAGE) {
-            func_ov326_021a20b4(wk, wk->mode, wk->tab);
+            TDownloadUtil_PrintTitle(wk, wk->mode, wk->tab);
             wk->flags &= ~T_DOWNLOAD_FLAG_PAGE;
         }
     }
@@ -660,12 +655,12 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
     BOOL result = FALSE;
     int button = 0;
     int page = wk->page[wk->tab];
-    int touched = func_ov326_021a2114(wk, FALSE, wk->mode);
-    int held = func_ov326_021a2114(wk, TRUE, wk->mode);
+    int touched = TDownloadUtil_GetTouch(wk, FALSE, wk->mode);
+    int held = TDownloadUtil_GetTouch(wk, TRUE, wk->mode);
     int newPage;
 
     if (touched == 1) {
-        func_ov326_021a14d4(wk, 3, 0);
+        TDownloadUtil_PressButton(wk, 3, 0);
         button = 1;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         func_0203d564(TRUE);
@@ -675,7 +670,7 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
             if (wk->page[wk->tab] <= 0) {
                 wk->page[wk->tab] = 0;
             }
-            func_ov326_021a14d4(wk, 5, 0);
+            TDownloadUtil_PressButton(wk, 5, 0);
             button = 2;
             input = 1;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -687,7 +682,7 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
             if (wk->page[wk->tab] >= wk->pageCount[wk->tab] - 1) {
                 wk->page[wk->tab] = wk->pageCount[wk->tab] - 1;
             }
-            func_ov326_021a14d4(wk, 4, 0);
+            TDownloadUtil_PressButton(wk, 4, 0);
             button = 3;
             input = 1;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -718,17 +713,17 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
         }
     }
     if (input == 1) {
-        func_ov326_021a2028(wk, wk->tab, wk->page[wk->tab], FALSE);
+        TDownloadUtil_UpdatePageBar(wk, wk->tab, wk->page[wk->tab], FALSE);
         wk->flags |= T_DOWNLOAD_FLAG_REDRAW;
         wk->flags |= T_DOWNLOAD_FLAG_PAGE;
-        func_ov326_021a2350(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
+        TDownloadUtil_UpdateArrows(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
     } else if (input == 2) {
-        func_ov326_021a2028(wk, wk->tab, 0, TRUE);
-        newPage = func_ov326_021a1fec(wk, wk->tab);
+        TDownloadUtil_UpdatePageBar(wk, wk->tab, 0, TRUE);
+        newPage = TDownloadUtil_GetTouchedPage(wk, wk->tab);
         if (newPage != -1 && newPage != page) {
             wk->page[wk->tab] = newPage;
             wk->flags |= T_DOWNLOAD_FLAG_REDRAW;
-            func_ov326_021a2350(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
+            TDownloadUtil_UpdateArrows(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
             GFL_SndSEPlay(SEQ_SE_SYS_06);
         }
     }
@@ -752,7 +747,7 @@ static BOOL TDownload_DetailKeys(TDownloadWork *wk) {
     int input = 0;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_ov326_021a14d4(wk, 3, 0);
+        TDownloadUtil_PressButton(wk, 3, 0);
         button = 1;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
     } else if (GCTX_HIDGetTypedKeys() & PAD_KEY_LEFT) {
@@ -775,7 +770,7 @@ static BOOL TDownload_DetailKeys(TDownloadWork *wk) {
             if (wk->page[wk->tab] <= 0) {
                 wk->page[wk->tab] = 0;
             }
-            func_ov326_021a14d4(wk, 5, 0);
+            TDownloadUtil_PressButton(wk, 5, 0);
             button = 2;
             input = 2;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -786,7 +781,7 @@ static BOOL TDownload_DetailKeys(TDownloadWork *wk) {
             if (wk->page[wk->tab] >= wk->pageCount[wk->tab] - 1) {
                 wk->page[wk->tab] = wk->pageCount[wk->tab] - 1;
             }
-            func_ov326_021a14d4(wk, 4, 0);
+            TDownloadUtil_PressButton(wk, 4, 0);
             button = 3;
             input = 2;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -805,13 +800,13 @@ static BOOL TDownload_DetailKeys(TDownloadWork *wk) {
         }
     }
     if (input != 0) {
-        func_ov326_021a2028(wk, wk->tab, wk->page[wk->tab], FALSE);
+        TDownloadUtil_UpdatePageBar(wk, wk->tab, wk->page[wk->tab], FALSE);
         wk->flags |= T_DOWNLOAD_FLAG_REDRAW;
         if (input == 1) {
             wk->flags |= T_DOWNLOAD_FLAG_PAGE;
         }
         if (input == 1 || input == 3) {
-            func_ov326_021a2350(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
+            TDownloadUtil_UpdateArrows(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
         }
     }
     if (button != 0) {
@@ -838,33 +833,33 @@ static void TDownload_Detail(TDownloadWork *wk) {
         TDownload_DetailMain(wk);
         break;
     case 110:
-        if (func_ov326_021a23d4(wk, 0) == TRUE) {
+        if (TDownloadUtil_IsButtonDone(wk, 0) == TRUE) {
             if (wk->returnMode == -1) {
                 wk->seq = T_DOWNLOAD_SEQ_END;
             } else {
                 wk->seq = 300;
                 for (i = 0; i < 3; i++) {
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 3, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 3, FALSE);
                 }
-                func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 5, FALSE);
-                func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 4, FALSE);
+                TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 5, FALSE);
+                TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 4, FALSE);
             }
         }
         break;
     case 120:
-        if (func_ov326_021a23d4(wk, 1) == TRUE) {
+        if (TDownloadUtil_IsButtonDone(wk, 1) == TRUE) {
             wk->seq = 100;
-            func_ov326_021a2350(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
+            TDownloadUtil_UpdateArrows(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
         }
         break;
     case 130:
-        if (func_ov326_021a23d4(wk, 1) == TRUE) {
+        if (TDownloadUtil_IsButtonDone(wk, 1) == TRUE) {
             wk->seq = 100;
-            func_ov326_021a2350(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
+            TDownloadUtil_UpdateArrows(wk, 1, 0, wk->pageCount[wk->tab] - 1, wk->page[wk->tab]);
         }
         break;
     case 300:
-        func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
         TDownload_ExitDetail(wk);
         wk->seq = 0;
         wk->mode = wk->returnMode;
@@ -874,22 +869,22 @@ static void TDownload_Detail(TDownloadWork *wk) {
     case T_DOWNLOAD_SEQ_END:
         break;
     }
-    func_ov326_021a1b00(wk);
+    TDownloadUtil_AnimatePalette(wk);
 }
 
 static void TDownload_ExitDetail(TDownloadWork *wk) {
     int i;
 
-    func_ov326_021a1c0c(wk, FALSE);
+    TDownloadUtil_SetPaletteAnim(wk, FALSE);
     for (i = 0; i < 3; i++) {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 3, FALSE);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 3, FALSE);
     }
-    func_ov326_021a0da4(wk, wk->mode);
+    TDownloadUtil_ExitModeWindows(wk, wk->mode);
     GFL_BGSysClearBG(2);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, TRUE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, TRUE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 5, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 4, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, TRUE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, TRUE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 5, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 4, FALSE);
 }
 
 static void TDownload_InitReceived(TDownloadWork *wk) {
@@ -899,43 +894,43 @@ static void TDownload_InitReceived(TDownloadWork *wk) {
     wk->listScroll[0] = wk->listScroll[2];
     GFL_BGSysSetBGEnabled(2, FALSE);
     wk->flags &= ~T_DOWNLOAD_FLAG_LIST_PRINTED;
-    func_ov326_021a16e8(wk, wk->mode);
+    TDownloadUtil_InitList(wk, wk->mode);
     if (FrameList_Draw(wk->list) == FALSE) {
         wk->flags |= T_DOWNLOAD_FLAG_LIST_PRINTED;
     }
     FrameList_SetShownRows(wk->list, 7);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
-    func_ov326_021a1a78(wk, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
+    TDownloadUtil_SetCursorKeys(wk, FALSE);
     if (wk->listCount <= 6) {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
     } else {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 0, TRUE);
-        func_ov326_021a1cb4(wk);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 0, TRUE);
+        TDownloadUtil_ClampScrollBar(wk);
     }
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, TRUE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, TRUE);
-    func_ov326_021a2350(wk, 0, 0, wk->listCount - 1, wk->listPos[0]);
-    func_ov326_021a1a10(wk, 0, wk->listCursor[0]);
-    func_ov326_021a20b4(wk, wk->mode, 0);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
-    func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
-    func_ov326_021a1544(wk, 1, wk->listPos[0]);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, TRUE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, TRUE);
+    TDownloadUtil_UpdateArrows(wk, 0, 0, wk->listCount - 1, wk->listPos[0]);
+    TDownloadUtil_MoveCursor(wk, 0, wk->listCursor[0]);
+    TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
+    TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
+    TDownloadUtil_PrintSlotInfo(wk, 1, wk->listPos[0]);
     wk->seq = 5;
     wk->seqAfterList = 100;
     if (!(wk->flags & T_DOWNLOAD_FLAG_RECEIVED_SHOWN)) {
-        func_ov326_021a1388(wk, 8, 5, TRUE);
-        func_ov326_021a2138(wk, TRUE);
-        func_ov326_021a2194(wk, TRUE);
+        TDownloadUtil_PrintMessage(wk, 8, 5, TRUE);
+        TDownloadUtil_DimScreen(wk, TRUE);
+        TDownloadUtil_PauseActors(wk, TRUE);
         wk->seqAfterList = 10;
         wk->flags |= T_DOWNLOAD_FLAG_RECEIVED_SHOWN;
     }
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
     if (wk->flags & T_DOWNLOAD_FLAG_LIST_PRINTED) {
         wk->seq = wk->seqAfterList;
         GFL_BGSysSetBGEnabled(2, TRUE);
         if (func_0203d554() == FALSE) {
-            func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
-            func_ov326_021a1a10(wk, 0, wk->listCursor[0]);
+            TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
+            TDownloadUtil_MoveCursor(wk, 0, wk->listCursor[0]);
         }
     }
 }
@@ -946,19 +941,19 @@ static void TDownload_ReceivedMain(TDownloadWork *wk) {
 
     if (func_02021c0c(wk->printQueue)) {
         if (func_0203d554() == TRUE && GCTX_HIDGetPressedKeys()) {
-            func_ov326_021a2298(wk, FALSE, FALSE, TRUE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
-        result = func_ov326_021a17e4(wk, func_ov326_021a17c8(wk));
+        result = TDownloadUtil_ListResult(wk, TDownloadUtil_UpdateList(wk));
         if (result != 0) {
             handled = TRUE;
             if (result != 2) {
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         if (result == 2) {
             handled = TRUE;
-            func_ov326_021a1a78(wk, TRUE);
+            TDownloadUtil_SetCursorKeys(wk, TRUE);
             wk->seq = 130;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
         } else if (result == 3) {
@@ -970,12 +965,12 @@ static void TDownload_ReceivedMain(TDownloadWork *wk) {
             TDownload_ReceivedKeys(wk);
         }
         if (wk->objFlags & T_DOWNLOAD_OBJ_FLAG_LIST_MOVED) {
-            func_ov326_021a1544(wk, 1, wk->listPos[0]);
-            func_ov326_021a1a10(wk, 0, wk->listCursor[0]);
-            func_ov326_021a2350(wk, 0, 0, wk->listCount - 1, wk->listPos[0]);
+            TDownloadUtil_PrintSlotInfo(wk, 1, wk->listPos[0]);
+            TDownloadUtil_MoveCursor(wk, 0, wk->listCursor[0]);
+            TDownloadUtil_UpdateArrows(wk, 0, 0, wk->listCount - 1, wk->listPos[0]);
             wk->objFlags &= ~T_DOWNLOAD_OBJ_FLAG_LIST_MOVED;
         }
-        func_ov326_021a1cb4(wk);
+        TDownloadUtil_ClampScrollBar(wk);
     }
 }
 
@@ -983,8 +978,8 @@ static BOOL TDownload_ReceivedTouch(TDownloadWork *wk) {
     BOOL pressed = FALSE;
     BOOL result = FALSE;
 
-    if (func_ov326_021a2114(wk, FALSE, wk->mode) == 1) {
-        func_ov326_021a14d4(wk, 3, 0);
+    if (TDownloadUtil_GetTouch(wk, FALSE, wk->mode) == 1) {
+        TDownloadUtil_PressButton(wk, 3, 0);
         pressed = TRUE;
         func_0203d564(TRUE);
     }
@@ -992,7 +987,7 @@ static BOOL TDownload_ReceivedTouch(TDownloadWork *wk) {
         wk->seq = 110;
         result = TRUE;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_ov326_021a2298(wk, FALSE, TRUE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, FALSE, TRUE, FALSE);
     }
     return result;
 }
@@ -1002,12 +997,12 @@ static BOOL TDownload_ReceivedKeys(TDownloadWork *wk) {
     BOOL result = FALSE;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_ov326_021a14d4(wk, 3, 0);
+        TDownloadUtil_PressButton(wk, 3, 0);
         button = 1;
     }
     if (button != 0) {
         result = TRUE;
-        func_ov326_021a2298(wk, TRUE, FALSE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, TRUE, FALSE, FALSE);
         if (button == 1) {
             wk->seq = 110;
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -1032,8 +1027,8 @@ static void TDownload_Received(TDownloadWork *wk) {
                 wk->seq = wk->seqAfterList;
                 GFL_BGSysSetBGEnabled(2, TRUE);
                 if (func_0203d554() == FALSE) {
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
-                    func_ov326_021a1a10(wk, 0, wk->listCursor[0]);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
+                    TDownloadUtil_MoveCursor(wk, 0, wk->listCursor[0]);
                 }
             }
         } else {
@@ -1041,126 +1036,126 @@ static void TDownload_Received(TDownloadWork *wk) {
         }
         break;
     case 10:
-        if (func_ov326_021a1338(wk) == FALSE) {
-            func_ov326_021a1370(wk, TRUE);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
-            func_ov326_021a20b4(wk, wk->mode, 0);
+        if (TDownloadUtil_UpdateMessage(wk) == FALSE) {
+            TDownloadUtil_ClearMessage(wk, TRUE);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
+            TDownloadUtil_PrintTitle(wk, wk->mode, 0);
             wk->seq = 100;
-            func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
         }
         break;
     case 100:
         TDownload_ReceivedMain(wk);
         break;
     case 110:
-        if (func_ov326_021a23d4(wk, 0) == TRUE) {
-            func_ov326_021a1388(wk, 7, 7, FALSE);
-            func_ov326_021a1188(wk, 2);
-            func_ov326_021a2138(wk, TRUE);
-            func_ov326_021a2194(wk, TRUE);
+        if (TDownloadUtil_IsButtonDone(wk, 0) == TRUE) {
+            TDownloadUtil_PrintMessage(wk, 7, 7, FALSE);
+            TDownloadUtil_InitTaskMenu(wk, 2);
+            TDownloadUtil_DimScreen(wk, TRUE);
+            TDownloadUtil_PauseActors(wk, TRUE);
             wk->seq = 115;
         }
         break;
     case 115:
-        result = func_ov326_021a128c(wk);
+        result = TDownloadUtil_UpdateTaskMenu(wk);
         if (result != -1) {
-            func_ov326_021a1274(wk);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
+            TDownloadUtil_FreeTaskMenu(wk);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
             if (result == 0) {
                 wk->seq = T_DOWNLOAD_SEQ_END;
             } else {
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = 100;
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1a78(wk, FALSE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_SetCursorKeys(wk, FALSE);
                 wk->objFlags &= ~T_DOWNLOAD_OBJ_FLAG_RESULT;
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         break;
     case 120:
-        if (func_ov326_021a17c8(wk) == -1 && func_ov326_021a23d4(wk, 1) == TRUE) {
-            func_ov326_021a2350(wk, 0, 0, wk->listCount - 1, wk->listPos[0]);
+        if (TDownloadUtil_UpdateList(wk) == -1 && TDownloadUtil_IsButtonDone(wk, 1) == TRUE) {
+            TDownloadUtil_UpdateArrows(wk, 0, 0, wk->listCount - 1, wk->listPos[0]);
             wk->seq = 100;
         }
         break;
     case 130:
         if (func_02021c0c(wk->printQueue) == TRUE) {
-            func_ov326_021a2298(wk, FALSE, FALSE, TRUE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
         break;
     case 200:
-        if (func_ov326_021a1134(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
-            func_ov326_021a1388(wk, 7, 2, FALSE);
-            func_ov326_021a1188(wk, 1);
-            func_ov326_021a2138(wk, TRUE);
-            func_ov326_021a2194(wk, TRUE);
+        if (TDownloadUtil_IsActorAnimating(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
+            TDownloadUtil_PrintMessage(wk, 7, 2, FALSE);
+            TDownloadUtil_InitTaskMenu(wk, 1);
+            TDownloadUtil_DimScreen(wk, TRUE);
+            TDownloadUtil_PauseActors(wk, TRUE);
             wk->seq = 210;
         }
         break;
     case 210:
-        result = func_ov326_021a128c(wk);
+        result = TDownloadUtil_UpdateTaskMenu(wk);
         if (result != -1) {
-            func_ov326_021a1274(wk);
+            TDownloadUtil_FreeTaskMenu(wk);
             if (result == 0) {
-                if (func_ov326_021a2888(wk, wk->listPos[0]) == TRUE) {
-                    func_ov326_021a1370(wk, TRUE);
-                    func_ov326_021a20b4(wk, wk->mode, 0);
+                if (TDownloadSave_IsSaved(wk, wk->listPos[0]) == TRUE) {
+                    TDownloadUtil_ClearMessage(wk, TRUE);
+                    TDownloadUtil_PrintTitle(wk, wk->mode, 0);
                     wk->seq = 230;
-                } else if (func_ov326_021a287c(wk) == -1) {
-                    func_ov326_021a2138(wk, FALSE);
-                    func_ov326_021a2194(wk, FALSE);
+                } else if (TDownloadSave_FindFreeSlot(wk) == -1) {
+                    TDownloadUtil_DimScreen(wk, FALSE);
+                    TDownloadUtil_PauseActors(wk, FALSE);
                     wk->seq = 400;
-                    func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
+                    TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
                     wk->slotCursor = 0;
                 } else {
-                    func_ov326_021a2194(wk, FALSE);
+                    TDownloadUtil_PauseActors(wk, FALSE);
                     wk->seq = 400;
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
                     wk->flags |= T_DOWNLOAD_FLAG_SAVED_FULL;
                 }
             } else if (result == 1) {
-                func_ov326_021a2138(wk, FALSE);
-                func_ov326_021a2194(wk, FALSE);
+                TDownloadUtil_DimScreen(wk, FALSE);
+                TDownloadUtil_PauseActors(wk, FALSE);
                 wk->seq = 300;
-                func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+                TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
             } else {
-                func_ov326_021a2138(wk, FALSE);
-                func_ov326_021a2194(wk, FALSE);
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_DimScreen(wk, FALSE);
+                TDownloadUtil_PauseActors(wk, FALSE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = 100;
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1a78(wk, FALSE);
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_SetCursorKeys(wk, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         break;
     case 230:
-        if (func_ov326_021a1134(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
-            func_ov326_021a1388(wk, 8, 6, TRUE);
-            func_ov326_021a2138(wk, TRUE);
-            func_ov326_021a2194(wk, TRUE);
+        if (TDownloadUtil_IsActorAnimating(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
+            TDownloadUtil_PrintMessage(wk, 8, 6, TRUE);
+            TDownloadUtil_DimScreen(wk, TRUE);
+            TDownloadUtil_PauseActors(wk, TRUE);
             wk->seq = 240;
         }
         break;
     case 240:
-        if (func_ov326_021a1338(wk) == FALSE) {
-            func_ov326_021a1370(wk, TRUE);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
-            func_ov326_021a20b4(wk, wk->mode, 0);
+        if (TDownloadUtil_UpdateMessage(wk) == FALSE) {
+            TDownloadUtil_ClearMessage(wk, TRUE);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
+            TDownloadUtil_PrintTitle(wk, wk->mode, 0);
             wk->seq = 100;
-            func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
         }
         break;
     case 300:
-        func_ov326_021a1370(wk, FALSE);
+        TDownloadUtil_ClearMessage(wk, FALSE);
         wk->returnMode = wk->mode;
         TDownload_ExitReceived(wk);
         wk->seq = 0;
@@ -1168,7 +1163,7 @@ static void TDownload_Received(TDownloadWork *wk) {
         TDownload_InitMode(wk);
         break;
     case 400:
-        func_ov326_021a1370(wk, TRUE);
+        TDownloadUtil_ClearMessage(wk, TRUE);
         wk->returnMode = wk->mode;
         TDownload_ExitReceived(wk);
         wk->seq = 0;
@@ -1181,7 +1176,7 @@ static void TDownload_Received(TDownloadWork *wk) {
 }
 
 static void TDownload_ExitReceived(TDownloadWork *wk) {
-    func_ov326_021a1898(wk);
+    TDownloadUtil_FreeList(wk);
     GFL_BGSysClearBG(2);
     wk->listPos[2] = wk->listPos[0];
     wk->listCursor[2] = wk->listCursor[0];
@@ -1197,40 +1192,40 @@ static void TDownload_InitSaved(TDownloadWork *wk) {
     if (wk->listCount == 0) {
         wk->flags |= T_DOWNLOAD_FLAG_NO_SAVED;
     }
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, FALSE);
-    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, FALSE);
-    func_ov326_021a0d4c(wk, wk->mode);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 0, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 2, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 0, FALSE);
+    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_BUTTON, 1, FALSE);
+    TDownloadUtil_InitModeWindows(wk, wk->mode);
     for (i = 0; i < wk->listCount; i++) {
         if (wk->saveFlags & (1 << (i + 4))) {
-            func_ov326_021a21d0(wk, 0, i);
-            func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, TRUE);
+            TDownloadUtil_PrintSlotName(wk, 0, i);
+            TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, TRUE);
         }
     }
     if (!(wk->flags & T_DOWNLOAD_FLAG_NO_SAVED)) {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
-        func_ov326_021a1a10(wk, 1, wk->slotCursor);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, TRUE);
+        TDownloadUtil_MoveCursor(wk, 1, wk->slotCursor);
         if (!(wk->flags & T_DOWNLOAD_FLAG_SAVED_FULL)) {
-            func_ov326_021a1544(wk, 0, wk->slotCursor);
+            TDownloadUtil_PrintSlotInfo(wk, 0, wk->slotCursor);
         }
     }
-    func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+    TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
     wk->seq = 100;
     if (!(wk->flags & T_DOWNLOAD_FLAG_DELETED)) {
         if (!(wk->flags & T_DOWNLOAD_FLAG_SAVED_FULL)) {
-            func_ov326_021a1388(wk, 8, 9, TRUE);
-            func_ov326_021a215c(wk, TRUE);
-            func_ov326_021a2194(wk, TRUE);
+            TDownloadUtil_PrintMessage(wk, 8, 9, TRUE);
+            TDownloadUtil_DimScreenUpload(wk, TRUE);
+            TDownloadUtil_PauseActors(wk, TRUE);
             wk->seq = 10;
         } else {
-            func_ov326_021a1388(wk, 8, 11, FALSE);
-            func_ov326_021a2194(wk, TRUE);
+            TDownloadUtil_PrintMessage(wk, 8, 11, FALSE);
+            TDownloadUtil_PauseActors(wk, TRUE);
             wk->seq = 405;
-            func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+            TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
         }
     }
-    func_ov326_021a20b4(wk, wk->mode, 0);
+    TDownloadUtil_PrintTitle(wk, wk->mode, 0);
     wk->flags &= ~T_DOWNLOAD_FLAG_DELETED;
 }
 
@@ -1240,8 +1235,8 @@ static void TDownload_SavedMain(TDownloadWork *wk) {
             TDownload_SavedKeys(wk);
         }
         if (wk->flags & T_DOWNLOAD_FLAG_SAVED_MOVED) {
-            func_ov326_021a1a10(wk, 1, wk->slotCursor);
-            func_ov326_021a1544(wk, 0, wk->slotCursor);
+            TDownloadUtil_MoveCursor(wk, 1, wk->slotCursor);
+            TDownloadUtil_PrintSlotInfo(wk, 0, wk->slotCursor);
             wk->flags &= ~T_DOWNLOAD_FLAG_SAVED_MOVED;
         }
     }
@@ -1254,7 +1249,7 @@ static BOOL TDownload_SavedTouch(TDownloadWork *wk) {
     BOOL result = FALSE;
     BOOL moved = FALSE;
 
-    touched = func_ov326_021a2114(wk, FALSE, wk->mode);
+    touched = TDownloadUtil_GetTouch(wk, FALSE, wk->mode);
     if (touched == 3 || touched == 4 || touched == 5) {
         slot = touched - 3;
         if (wk->saveFlags & (1 << (slot + 4))) {
@@ -1264,13 +1259,13 @@ static BOOL TDownload_SavedTouch(TDownloadWork *wk) {
         }
     }
     if (moved == FALSE && touched == 0) {
-        func_ov326_021a14d4(wk, 3, 0);
+        TDownloadUtil_PressButton(wk, 3, 0);
         input = T_DOWNLOAD_INPUT_TOUCH;
         func_0203d564(TRUE);
     }
     if (moved == TRUE) {
         wk->flags |= T_DOWNLOAD_FLAG_SAVED_MOVED;
-        func_ov326_021a1a78(wk, TRUE);
+        TDownloadUtil_SetCursorKeys(wk, TRUE);
         wk->seq = 130;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         func_0203d564(TRUE);
@@ -1279,7 +1274,7 @@ static BOOL TDownload_SavedTouch(TDownloadWork *wk) {
         result = TRUE;
         wk->seq = 110;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_ov326_021a2298(wk, FALSE, TRUE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, FALSE, TRUE, FALSE);
     }
     return result;
 }
@@ -1293,45 +1288,45 @@ static BOOL TDownload_SavedKeys(TDownloadWork *wk) {
 
     if (func_0203d554() == TRUE) {
         if (GCTX_HIDGetPressedKeys()) {
-            func_ov326_021a2298(wk, TRUE, input, input);
+            TDownloadUtil_UpdateCursorMode(wk, TRUE, input, input);
             GFL_SndSEPlay(SEQ_SE_SELECT1);
         }
         done = TRUE;
     }
     if (done == FALSE) {
         if (GCTX_HIDGetTypedKeys() & PAD_KEY_UP) {
-            pos = func_ov326_021a2a98(wk, FALSE, wk->slotCursor);
+            pos = TDownloadSave_NextSlot(wk, FALSE, wk->slotCursor);
             if (pos != wk->slotCursor) {
                 moved = TRUE;
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
             wk->slotCursor = pos;
         } else if (GCTX_HIDGetTypedKeys() & PAD_KEY_DOWN) {
-            pos = func_ov326_021a2a98(wk, TRUE, wk->slotCursor);
+            pos = TDownloadSave_NextSlot(wk, TRUE, wk->slotCursor);
             if (pos != wk->slotCursor) {
                 moved = TRUE;
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
             wk->slotCursor = pos;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-            func_ov326_021a1a78(wk, TRUE);
+            TDownloadUtil_SetCursorKeys(wk, TRUE);
             wk->seq = 130;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             func_0203d564(FALSE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-            func_ov326_021a14d4(wk, 3, 0);
+            TDownloadUtil_PressButton(wk, 3, 0);
             input = T_DOWNLOAD_INPUT_KEY;
         }
     }
     if (moved == TRUE) {
         wk->flags |= T_DOWNLOAD_FLAG_SAVED_MOVED;
-        func_ov326_021a2298(wk, TRUE, FALSE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, TRUE, FALSE, FALSE);
     }
     if (input == T_DOWNLOAD_INPUT_KEY) {
         result = TRUE;
         wk->seq = 110;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_ov326_021a2298(wk, TRUE, FALSE, FALSE);
+        TDownloadUtil_UpdateCursorMode(wk, TRUE, FALSE, FALSE);
     }
     return result;
 }
@@ -1344,163 +1339,163 @@ static void TDownload_Saved(TDownloadWork *wk) {
     case 0:
         wk->seq = 100;
     case 10:
-        if (func_ov326_021a1338(wk) == FALSE) {
-            func_ov326_021a1370(wk, TRUE);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
-            func_ov326_021a20b4(wk, wk->mode, 0);
+        if (TDownloadUtil_UpdateMessage(wk) == FALSE) {
+            TDownloadUtil_ClearMessage(wk, TRUE);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
+            TDownloadUtil_PrintTitle(wk, wk->mode, 0);
             wk->seq = 100;
-            func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
         }
         break;
     case 100:
         TDownload_SavedMain(wk);
         break;
     case 110:
-        if (func_ov326_021a23d4(wk, 0) == TRUE) {
+        if (TDownloadUtil_IsButtonDone(wk, 0) == TRUE) {
             if (wk->flags & T_DOWNLOAD_FLAG_SAVED) {
                 wk->seq = 300;
-                func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+                TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
                 for (i = 0; i < 3; i++) {
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
                 }
             } else {
-                func_ov326_021a1388(wk, 7, 8, FALSE);
-                func_ov326_021a1188(wk, 2);
-                func_ov326_021a2138(wk, TRUE);
-                func_ov326_021a2194(wk, TRUE);
+                TDownloadUtil_PrintMessage(wk, 7, 8, FALSE);
+                TDownloadUtil_InitTaskMenu(wk, 2);
+                TDownloadUtil_DimScreen(wk, TRUE);
+                TDownloadUtil_PauseActors(wk, TRUE);
                 wk->seq = 115;
             }
         }
         break;
     case 115:
-        result = func_ov326_021a128c(wk);
+        result = TDownloadUtil_UpdateTaskMenu(wk);
         if (result != -1) {
-            func_ov326_021a1274(wk);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
+            TDownloadUtil_FreeTaskMenu(wk);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
             if (result == 0) {
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 if (wk->returnMode == -1) {
                     wk->seq = T_DOWNLOAD_SEQ_END;
                 } else {
                     wk->seq = 300;
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
                     for (i = 0; i < 3; i++) {
-                        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
+                        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
                     }
                 }
                 wk->flags &= ~(T_DOWNLOAD_FLAG_SAVED_FULL | T_DOWNLOAD_FLAG_SAVED);
             } else {
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = 100;
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1a78(wk, FALSE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_SetCursorKeys(wk, FALSE);
                 wk->objFlags &= ~T_DOWNLOAD_OBJ_FLAG_RESULT;
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         break;
     case 120:
-        if (func_ov326_021a23d4(wk, 1) == TRUE) {
+        if (TDownloadUtil_IsButtonDone(wk, 1) == TRUE) {
             wk->objFlags |= T_DOWNLOAD_OBJ_FLAG_LIST_MOVED;
             wk->seq = 100;
         }
         break;
     case 130:
         if (func_02021c0c(wk->printQueue) == TRUE) {
-            func_ov326_021a2298(wk, FALSE, FALSE, TRUE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, TRUE);
             wk->seq = 200;
         }
         break;
     case 200:
-        if (func_ov326_021a1134(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
+        if (TDownloadUtil_IsActorAnimating(wk, T_DOWNLOAD_ACTOR_OBJ, 2) == FALSE) {
             if (!(wk->flags & T_DOWNLOAD_FLAG_SAVED)) {
-                func_ov326_021a1388(wk, 7, 3, FALSE);
-                func_ov326_021a1188(wk, 2);
-                func_ov326_021a2138(wk, TRUE);
-                func_ov326_021a2194(wk, TRUE);
+                TDownloadUtil_PrintMessage(wk, 7, 3, FALSE);
+                TDownloadUtil_InitTaskMenu(wk, 2);
+                TDownloadUtil_DimScreen(wk, TRUE);
+                TDownloadUtil_PauseActors(wk, TRUE);
                 wk->seq = 210;
             } else {
-                func_ov326_021a1388(wk, 7, 2, FALSE);
-                func_ov326_021a1188(wk, 3);
-                func_ov326_021a2138(wk, TRUE);
-                func_ov326_021a2194(wk, TRUE);
+                TDownloadUtil_PrintMessage(wk, 7, 2, FALSE);
+                TDownloadUtil_InitTaskMenu(wk, 3);
+                TDownloadUtil_DimScreen(wk, TRUE);
+                TDownloadUtil_PauseActors(wk, TRUE);
                 wk->seq = 220;
             }
         }
         break;
     case 210:
-        result = func_ov326_021a128c(wk);
+        result = TDownloadUtil_UpdateTaskMenu(wk);
         if (result != -1) {
-            func_ov326_021a1274(wk);
+            TDownloadUtil_FreeTaskMenu(wk);
             if (result == 0) {
-                func_ov326_021a1388(wk, 7, 4, FALSE);
-                func_ov326_021a1188(wk, 2);
+                TDownloadUtil_PrintMessage(wk, 7, 4, FALSE);
+                TDownloadUtil_InitTaskMenu(wk, 2);
                 wk->seq = 240;
             } else {
-                func_ov326_021a2138(wk, FALSE);
-                func_ov326_021a2194(wk, FALSE);
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_DimScreen(wk, FALSE);
+                TDownloadUtil_PauseActors(wk, FALSE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = 100;
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1a78(wk, FALSE);
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_SetCursorKeys(wk, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         break;
     case 220:
-        result = func_ov326_021a128c(wk);
+        result = TDownloadUtil_UpdateTaskMenu(wk);
         if (result != -1) {
-            func_ov326_021a1274(wk);
+            TDownloadUtil_FreeTaskMenu(wk);
             if (result == 0) {
-                func_ov326_021a1370(wk, TRUE);
-                func_ov326_021a2138(wk, FALSE);
-                func_ov326_021a2194(wk, FALSE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
+                TDownloadUtil_DimScreen(wk, FALSE);
+                TDownloadUtil_PauseActors(wk, FALSE);
                 wk->seq = 310;
                 wk->flags |= T_DOWNLOAD_FLAG_DELETED;
-                func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
+                TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, 2, FALSE);
                 for (i = 0; i < 3; i++) {
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
                 }
             } else {
-                func_ov326_021a2138(wk, FALSE);
-                func_ov326_021a2194(wk, FALSE);
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_DimScreen(wk, FALSE);
+                TDownloadUtil_PauseActors(wk, FALSE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = 100;
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1a78(wk, FALSE);
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_SetCursorKeys(wk, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         break;
     case 240:
-        result = func_ov326_021a128c(wk);
+        result = TDownloadUtil_UpdateTaskMenu(wk);
         if (result != -1) {
-            func_ov326_021a1274(wk);
+            TDownloadUtil_FreeTaskMenu(wk);
             if (result == 0) {
                 for (i = 0; i < 6; i++) {
-                    func_ov326_021a0d2c(wk, i);
+                    TDownloadUtil_ClearWindow(wk, i);
                 }
-                func_ov326_021a1370(wk, TRUE);
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1388(wk, 8, 10, TRUE);
-                func_ov326_021a2194(wk, TRUE);
-                func_ov326_021a2470(wk, 1, wk->slotCursor);
+                TDownloadUtil_ClearMessage(wk, TRUE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_PrintMessage(wk, 8, 10, TRUE);
+                TDownloadUtil_PauseActors(wk, TRUE);
+                TDownloadUtil_ShowSlot(wk, 1, wk->slotCursor);
                 wk->seq = 400;
             } else {
-                func_ov326_021a2138(wk, FALSE);
-                func_ov326_021a2194(wk, FALSE);
-                func_ov326_021a1370(wk, TRUE);
+                TDownloadUtil_DimScreen(wk, FALSE);
+                TDownloadUtil_PauseActors(wk, FALSE);
+                TDownloadUtil_ClearMessage(wk, TRUE);
                 wk->seq = 100;
-                func_ov326_021a20b4(wk, wk->mode, 0);
-                func_ov326_021a1a78(wk, FALSE);
-                func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+                TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+                TDownloadUtil_SetCursorKeys(wk, FALSE);
+                TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
             }
         }
         break;
     case 300:
-        func_ov326_021a1370(wk, FALSE);
+        TDownloadUtil_ClearMessage(wk, FALSE);
         wk->returnMode = wk->mode;
         TDownload_ExitSaved(wk);
         wk->seq = 0;
@@ -1509,7 +1504,7 @@ static void TDownload_Saved(TDownloadWork *wk) {
         wk->flags &= ~(T_DOWNLOAD_FLAG_SAVED_FULL | T_DOWNLOAD_FLAG_SAVED);
         break;
     case 310:
-        func_ov326_021a1370(wk, FALSE);
+        TDownloadUtil_ClearMessage(wk, FALSE);
         wk->returnMode = wk->mode;
         TDownload_ExitSaved(wk);
         wk->seq = 0;
@@ -1518,55 +1513,55 @@ static void TDownload_Saved(TDownloadWork *wk) {
         wk->flags &= ~T_DOWNLOAD_FLAG_SAVED_FULL;
         break;
     case 400:
-        if (func_ov326_021a1338(wk) == FALSE) {
-            func_ov326_021a1388(wk, 8, 11, FALSE);
+        if (TDownloadUtil_UpdateMessage(wk) == FALSE) {
+            TDownloadUtil_PrintMessage(wk, 8, 11, FALSE);
             wk->seq = 410;
         }
         break;
     case 405:
         if (func_02021c0c(wk->printQueue)) {
-            func_ov326_021a2734(wk, wk->listPos[2], func_ov326_021a287c(wk));
-            func_ov326_021a2828(wk);
+            TDownloadSave_StartSave(wk, wk->listPos[2], TDownloadSave_FindFreeSlot(wk));
+            TDownloadSave_CreateWaitIcon(wk);
             wk->seq = 500;
         }
         break;
     case 410:
         if (func_02021c0c(wk->printQueue)) {
-            func_ov326_021a2734(wk, wk->listPos[2], wk->slotCursor);
-            func_ov326_021a2828(wk);
+            TDownloadSave_StartSave(wk, wk->listPos[2], wk->slotCursor);
+            TDownloadSave_CreateWaitIcon(wk);
             wk->seq = 500;
         }
         break;
     case 500:
-        if (func_ov326_021a27c0(wk) == FALSE) {
+        if (TDownloadSave_UpdateSave(wk) == FALSE) {
             wk->listCount = wk->lastSlot + 1;
             wk->slotCursor = wk->copyDest;
-            func_ov326_021a2864(wk);
-            func_ov326_021a1388(wk, 8, 12, TRUE);
+            TDownloadSave_FreeWaitIcon(wk);
+            TDownloadUtil_PrintMessage(wk, 8, 12, TRUE);
             wk->seq = 510;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            func_ov326_021a2470(wk, 0, wk->slotCursor);
+            TDownloadUtil_ShowSlot(wk, 0, wk->slotCursor);
             for (i = 0; i < wk->listCount; i++) {
                 if (wk->saveFlags & (1 << (i + 4))) {
-                    func_ov326_021a21d0(wk, 0, i);
-                    func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, TRUE);
+                    TDownloadUtil_PrintSlotName(wk, 0, i);
+                    TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, TRUE);
                 }
             }
-            func_ov326_021a1a10(wk, 1, wk->slotCursor);
-            func_ov326_021a2194(wk, TRUE);
-            func_ov326_021a1544(wk, 0, wk->slotCursor);
+            TDownloadUtil_MoveCursor(wk, 1, wk->slotCursor);
+            TDownloadUtil_PauseActors(wk, TRUE);
+            TDownloadUtil_PrintSlotInfo(wk, 0, wk->slotCursor);
         }
         break;
     case 510:
-        if (func_ov326_021a1338(wk) == FALSE) {
-            func_ov326_021a1370(wk, TRUE);
-            func_ov326_021a2138(wk, FALSE);
-            func_ov326_021a2194(wk, FALSE);
-            func_ov326_021a20b4(wk, wk->mode, 0);
-            func_ov326_021a1a78(wk, FALSE);
+        if (TDownloadUtil_UpdateMessage(wk) == FALSE) {
+            TDownloadUtil_ClearMessage(wk, TRUE);
+            TDownloadUtil_DimScreen(wk, FALSE);
+            TDownloadUtil_PauseActors(wk, FALSE);
+            TDownloadUtil_PrintTitle(wk, wk->mode, 0);
+            TDownloadUtil_SetCursorKeys(wk, FALSE);
             wk->seq = 100;
             wk->flags |= T_DOWNLOAD_FLAG_SAVED;
-            func_ov326_021a2298(wk, FALSE, FALSE, FALSE);
+            TDownloadUtil_UpdateCursorMode(wk, FALSE, FALSE, FALSE);
         }
         break;
     case T_DOWNLOAD_SEQ_END:
@@ -1578,7 +1573,7 @@ static void TDownload_ExitSaved(TDownloadWork *wk) {
     int i;
 
     for (i = 0; i < 3; i++) {
-        func_ov326_021a1104(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
+        TDownloadUtil_SetActorVisible(wk, T_DOWNLOAD_ACTOR_OBJ, i + 6, FALSE);
     }
-    func_ov326_021a0da4(wk, wk->mode);
+    TDownloadUtil_ExitModeWindows(wk, wk->mode);
 }

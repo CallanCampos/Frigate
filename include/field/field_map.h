@@ -89,6 +89,8 @@ void GimmickState_SetID(GimmickState *gimmick, u16 gimmickId);
 u32 GimmickState_GetID(GimmickState *gimmick);
 // The state of the zone's gimmick that the save keeps. The ID is not checked
 void *GimmickState_GetUserData(GimmickState *gimmick, u32 gimmickId);
+// The area of the gimmick state after the user data, for flags. The ID is not checked
+void *func_0200bac8(GimmickState *gimmick, u32 gimmickId);
 MapMatrix *InitMapMatrix(HeapID heapId);
 void MapMatrix_Load(MapMatrix *matrix, u16 matrixId, u16 zoneId, HeapID heapId);
 void ProcessMapMatrix(MapMatrix *matrix, MapMatrixFileHeader *data, u32 matrixId, u16 zoneId);

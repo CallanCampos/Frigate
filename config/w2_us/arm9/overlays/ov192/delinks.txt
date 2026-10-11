@@ -3,3 +3,15 @@
     .ctor       start:0x021b3f94 end:0x021b3f94 kind:rodata align:4
     .data       start:0x021b3fa0 end:0x021b4380 kind:data align:32
     .bss        start:0x021b4380 end:0x021b4480 kind:bss align:32
+
+src/ov192/pokemontrade_demo_common_irc.c:
+    complete
+    .text       start:0x021b2fc0 end:0x021b3978
+    .rodata     start:0x021b3f60 end:0x021b3f94
+    .data       start:0x021b3fa0 end:0x021b434c
+    .bss        start:0x021b4380 end:0x021b4480
+
+src/ov192/pokemontrade_ircdemo.c:
+    complete
+    .text       start:0x021b3978 end:0x021b3f60
+    .data       start:0x021b434c end:0x021b4380

@@ -14,8 +14,13 @@ void givePlayerPokedex(PokeDexSave *pokedex);
 u32 func_0200d1dc(PokeDexSave *pokedex);
 // Which Pokédex the detail screen counts: 0 the regional one, 1 the national one, 2 the national one once obtained
 u32 func_0200d1f8(PokeDexSave *pokedex);
+// Sets which Pokédex the detail screen counts, with func_0200d1f8's values
+void func_0200d1e4(PokeDexSave *pokedex, u32 mode);
 BOOL PokeDex_IsCaught(PokeDexSave *pokedex, u16 species);
 BOOL PokeDex_IsSeen(PokeDexSave *pokedex, u16 species);
+// The species that the Pokédex's list was last on, and sets it
+void func_0200d200(PokeDexSave *pokedex, u16 species);
+u16 func_0200d214(PokeDexSave *pokedex);
 // Sets the sex, shininess and form that the Pokédex shows of a species
 void addToDex(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form);
 // The forms of a species, 1 for one without any

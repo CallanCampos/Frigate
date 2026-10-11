@@ -132,7 +132,8 @@ typedef struct {
 typedef struct {
     ParticleSystem *systems[9];
     void *systemWork[9];
-    u8 unk48[0x18];
+    // The sizes of the two sprites that the infrared trade's scene scales
+    VecFx32 ircSpriteSizes[2];
     // The size of each of the four Pokémon sprites, as func_0201ab70 gives it
     VecFx32 spriteSizes[4];
     G3DCurve *cameraPosPath;
@@ -699,7 +700,7 @@ void func_ov194_021c5ff4(PokemonTradeWork *wk, int planes);
 void func_ov194_021c600c(PokemonTradeWork *wk, int planes);
 
 // The trade demo, overlays 192 and 193
-void func_ov192_021b38cc(PokemonTradeWork *wk);
+void PokemonTradeIrcDemo_Start(PokemonTradeWork *wk);
 void PokemonTradeDemoCommon_Start(PokemonTradeWork *wk);
 void PokemonTradeDemoDown_Start(PokemonTradeWork *wk);
 void PokemonTradeDemoMiddle_Start(PokemonTradeWork *wk);

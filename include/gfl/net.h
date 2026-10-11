@@ -71,7 +71,11 @@ typedef struct {
     u8 unk66;
     // The high byte of the game's commands
     u8 gameCommandBase;
-    u8 unk68[4];
+    // Four bytes that the games give, which overlay 175 sets as one word
+    union {
+        u8 bytes[4];
+        u32 word;
+    } unk68;
     u16 unk6C;
     u16 unk6E;
 } GFLNetInitData;

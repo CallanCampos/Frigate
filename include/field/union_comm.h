@@ -8,6 +8,7 @@
 #include "gfl/heap.h"
 #include "save/join_avenue.h"
 #include "save/player_info.h"
+#include "system/pms_data.h"
 #include "dwc/dwc.h"
 #include "struct_decls.h"
 
@@ -150,22 +151,40 @@ typedef struct {
 // A step of the system, run by overlay 34
 typedef BOOL (*UnionSituFunc)(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 
-// A player seen in the Union Room, by the machine's address
+// A line of the Union Room's chat: what a player said, as the touch screen shows it, in a ring of lines
 typedef struct {
-    u8 unk00[0x1a];
-    u8 mac[6];
-    u8 unk20[4];
+    u16 name[8];
+    // What the player said, when kind is UNION_CHAT_KIND_SENTENCE
+    PMSData sentence;
+    u16 unk18;
+    u8 mac[6]; // of the player, who is looked up by it
+    u8 gender;
+    u8 kind; // UNION_CHAT_KIND_*
+    u8 subKind; // 0, or 1 for a friend and 2 for another player
+    u8 unk23;
 } UnionVisitor;
+
+// What a line of the chat says: the player's sentence, or that it entered the Union Room, or what the player wants to do
+#define UNION_CHAT_KIND_SENTENCE 0
+#define UNION_CHAT_KIND_ENTERED 1
+#define UNION_CHAT_KIND_BATTLE 2
+#define UNION_CHAT_KIND_TRADE 3
+#define UNION_CHAT_KIND_DRAW 4
+#define UNION_CHAT_KIND_SPIN_TRADE 5
 
 #define UNION_VISITOR_MAX 30
 
 typedef struct {
     UnionVisitor visitors[UNION_VISITOR_MAX];
     u8 unk438[4];
-    s32 unk43C;
-    s32 unk440;
-    s32 unk444;
+    // How many lines were added, the newest line the touch screen shows at its bottom, and the one it showed before
+    s32 count;
+    s32 viewEnd;
+    s32 drawnEnd;
 } UnionVisitorList;
+
+// The line of the ring that the index calls for, or NULL if it is empty
+UnionVisitor *func_ov036_021b4620(UnionVisitorList *list, u32 index);
 
 // The command the system is running: a row of union_main.c's sUnionCommands, or UNION_SUBPROC_ID_NULL
 typedef struct {

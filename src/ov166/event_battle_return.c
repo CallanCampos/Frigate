@@ -3,6 +3,7 @@
 #include "app/event_battle_return.h"
 #include "app/event_pdc_return.h"
 #include "app/name_entry.h"
+#include "app/zukan_toroku.h"
 #include "battle/btl_setup.h"
 #include "constants/abilities.h"
 #include "constants/arc.h"
@@ -234,7 +235,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             } else {
                 wk->zukan.mode = 1;
             }
-            QueueGameProc(wk->procManager, OVERLAY_ID(297), &data_ov297_021f4e38, &wk->zukan);
+            QueueGameProc(wk->procManager, OVERLAY_ID(297), &ZUKAN_TOROKU_PROC_FUNCTIONS, &wk->zukan);
             (*state)++;
         } else {
             *state = 4;

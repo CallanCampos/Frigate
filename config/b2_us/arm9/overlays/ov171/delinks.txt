@@ -3,3 +3,9 @@
     .ctor       start:0x021deda8 end:0x021deda8 kind:rodata align:4
     .data       start:0x021dedc0 end:0x021dede0 kind:data align:32
     .bss        start:0x021dede0 end:0x021dede0 kind:bss align:32
+
+src/ov171/vs_multi_list.c:
+    complete
+    .text       start:0x021dda60 end:0x021deaec
+    .rodata     start:0x021deaec end:0x021deda8
+    .data       start:0x021dedc0 end:0x021dede0

@@ -94,7 +94,6 @@ typedef struct {
 extern const FieldProcLink FIELD_PROC_LINK_LIST[15];
 
 // The procs of FIELD_PROC_LINK_LIST's apps that no header declares yet
-extern const GameProcFunctions data_ov189_021ae3dc;
 extern const GameProcFunctions data_ov012_0216dd78;
 extern const GameProcFunctions data_ov140_0219eecc;
 extern const GameProcFunctions TOWNMAP_PROC_FUNCTIONS;

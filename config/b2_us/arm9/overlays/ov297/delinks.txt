@@ -3,3 +3,20 @@
     .ctor       start:0x021f4f98 end:0x021f4f98 kind:rodata align:4
     .data       start:0x021f4fa0 end:0x021f4fe0 kind:data align:32
     .bss        start:0x021f4fe0 end:0x021f4fe0 kind:bss align:32
+
+src/ov297/zukan_toroku.c:
+    complete
+    .text       start:0x021f4260 end:0x021f4638
+    .rodata     start:0x021f4e38 end:0x021f4e44
+
+src/ov297/zukan_toroku_graphic.c:
+    complete
+    .text       start:0x021f4638 end:0x021f487c
+    .rodata     start:0x021f4e44 end:0x021f4f50
+    .data       start:0x021f4fa0 end:0x021f4fb8
+
+src/ov297/zukan_nickname.c:
+    complete
+    .text       start:0x021f487c end:0x021f4e38
+    .rodata     start:0x021f4f50 end:0x021f4f98
+    .data       start:0x021f4fb8 end:0x021f4fe0
