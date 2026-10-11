@@ -7,6 +7,7 @@
 #include "gfl/heap.h"
 #include "gfl/str.h"
 #include "save/download_data.h"
+#include "save/musical_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/game_system.h"

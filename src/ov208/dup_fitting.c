@@ -34,6 +34,7 @@
 #include "nitro/os.h"
 #include "nnsys/g3d.h"
 #include "nnsys/gfd.h"
+#include "save/musical_savedata.h"
 #include "save/save_control.h"
 #include "system/bmp_winframe.h"
 #include "system/gf_font.h"

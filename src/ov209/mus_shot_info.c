@@ -21,6 +21,7 @@
 #include "gfl/tcbl.h"
 #include "gfl/touchpanel.h"
 #include "nitro/gx.h"
+#include "save/musical_savedata.h"
 #include "save/save_control.h"
 #include "system/app_menu_common.h"
 #include "system/app_taskmenu.h"

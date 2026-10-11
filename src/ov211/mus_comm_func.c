@@ -1,4 +1,5 @@
 #include "field/mus_comm_func.h"
+#include "save/musical_savedata.h"
 #include "types.h"
 #include "app/musical/musical_system.h"
 #include "constants/sound.h"

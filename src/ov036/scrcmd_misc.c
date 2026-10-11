@@ -17,6 +17,7 @@
 #include "nitro/fx.h"
 #include "nitro/os.h"
 #include "save/bag.h"
+#include "save/musical_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/game_system.h"

@@ -18,6 +18,7 @@
 #include "gfl/str.h"
 #include "pml/poke_party.h"
 #include "save/dream_world.h"
+#include "save/musical_savedata.h"
 #include "save/player_info.h"
 #include "save/save_control.h"
 #include "system/game_comm.h"

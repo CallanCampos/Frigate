@@ -5,6 +5,7 @@
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
+#include "save/musical_savedata.h"
 #include "save/save_control.h"
 
 typedef struct {

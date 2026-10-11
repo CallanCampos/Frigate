@@ -13,6 +13,7 @@
 #include "save/bsubway_save.h"
 #include "save/event_work.h"
 #include "save/medal_box.h"
+#include "save/musical_savedata.h"
 #include "save/pokedex.h"
 #include "save/records.h"
 #include "save/save_control.h"
