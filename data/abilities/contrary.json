@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Contrary",
+    "description": "Makes stat changes have\nan opposite effect."
+}

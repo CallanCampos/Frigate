@@ -25,7 +25,7 @@ long `source_files.py` output stays out of this context.
 
 ```sh
 tools/dsd dis -c config/b2_us/arm9/config.yaml -a build/asm --overlay 33    # or --main; once per module
-.venv/bin/python tools/scripts/show_func.py FUNC_A FUNC_B                  # never cat the .s file
+.venv/bin/python tools/decomp/show_func.py FUNC_A FUNC_B                  # never cat the .s file
 ```
 
 The asm uses the current symbol names, so run `dsd dis` again after renaming. Read functions a few at a time, in the
@@ -38,7 +38,16 @@ order you write them.
   header and update the callers; never declare it again locally.
 - Structs: when a work struct or a struct shared by several functions has no layout yet, let the `struct-recovery`
   agent derive it from every access. Small, file-local works can be read off directly.
-- Constants: `include/constants/` holds items, moves, species and so on, plus `HEAPID_*` and the like.
+- Constants: items, moves, species, types, sounds, trainer classes, trainers, zones, wild encounter tables, event flags
+  and event variables are lists in `data/constants/`, which the build turns into `constants/*.h` headers; add a
+  missing one to its list, never to a header, and rename one with `rename_constant.py`, as when a numbered zone turns
+  out to be a named room. A member of an archive that the code loads by number goes in `narc_<archive>.txt` once the
+  code shows what it is (see `docs/data.md`, Constant lists). `include/constants/` holds the hand-written ones,
+  `HEAPID_*` and the like.
+  A message file is a `TEXT_BANK_*` (system messages) or `SCRIPT_TEXT_*` (script messages), never its number:
+  `GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_NAMES, heapId)`.
+  A message is its ID from the bank's header, `text/system/<bank>.h`, never its line number:
+  `GFL_MsgDataLoadStrbufNew(msgData, YesNo_Text_Yes)`.
 
 ## 4. Write the C
 
@@ -65,7 +74,7 @@ perfect function.
 ## 5. Probe
 
 ```sh
-.venv/bin/python tools/scripts/compiler_probe.py src/ov033/x.c --compilers 1.1p1 --mismatches
+.venv/bin/python tools/decomp/compiler_probe.py src/ov033/x.c --compilers 1.1p1 --mismatches
 ```
 
 Library code built with another compiler, such as SPL with `1.2/base` (`lib/spl/library.toml`), gets its
@@ -79,7 +88,7 @@ file.
 ## 6. Register
 
 ```sh
-.venv/bin/python tools/scripts/add_source_file.py src/ov033/x.c overlays/ov033 .text:0x...-0x... .rodata:... .data:... --incomplete
+.venv/bin/python tools/decomp/add_source_file.py src/ov033/x.c overlays/ov033 .text:0x...-0x... .rodata:... .data:... --incomplete
 ```
 
 Leave out `--incomplete` only when everything matches; `mark_complete.py` is safer later (see finish-file). Run

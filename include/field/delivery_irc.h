@@ -25,8 +25,4 @@ u8 func_ov012_02153130(void *work);
 void func_ov012_0215313c(void *work);
 void func_ov012_02153150(void *work);
 
-// Overlay 31
-void func_ov031_021759d0(u32 a0);
-BOOL func_ov031_02175d8c(void);
-
 #endif // POKEBW2_FIELD_DELIVERY_IRC_H

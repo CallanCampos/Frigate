@@ -1,21 +1,21 @@
-{bd02}The shroud of night covers the corner.\n{bd02}A threatening shadow runs\n{bd02}through the city streets!
-{bd02}Good and evil...\n{bd02}Light and shadow...
-{bd02}The time for the final battle\n{bd02}is now...
-{bd02}Brycen-Man...\n{bd02}The {0102:0} Kid...\n{bd02}Who will prevail?
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}The shroud of night covers the corner.\n{bd02}A threatening shadow runs\n{bd02}through the city streets!
-{bd02}Good and evil...\n{bd02}Light and shadow...
-{bd02}The time for the final battle\n{bd02}is now...
-{bd02}Brycen-Man...\n{bd02}The {0102:0} Girl...\n{bd02}Who will prevail?
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0269_Text_ShroudNightCoversCorner = {bd02}The shroud of night covers the corner.\n{bd02}A threatening shadow runs\n{bd02}through the city streets!
+Bank0269_Text_GoodEvilLightShadow = {bd02}Good and evil...\n{bd02}Light and shadow...
+Bank0269_Text_TimeFinalBattleNow = {bd02}The time for the final battle\n{bd02}is now...
+Bank0269_Text_BrycenManKidWho = {bd02}Brycen-Man...\n{bd02}The {0102:0} Kid...\n{bd02}Who will prevail?
+Bank0269_Text_Empty = なし
+Bank0269_Text_Empty_2 = なし
+Bank0269_Text_Empty_3 = なし
+Bank0269_Text_Empty_4 = なし
+Bank0269_Text_Empty_5 = なし
+Bank0269_Text_Empty_6 = なし
+Bank0269_Text_ShroudNightCoversCorner_2 = {bd02}The shroud of night covers the corner.\n{bd02}A threatening shadow runs\n{bd02}through the city streets!
+Bank0269_Text_GoodEvilLightShadow_2 = {bd02}Good and evil...\n{bd02}Light and shadow...
+Bank0269_Text_TimeFinalBattleNow_2 = {bd02}The time for the final battle\n{bd02}is now...
+Bank0269_Text_BrycenManGirlWho = {bd02}Brycen-Man...\n{bd02}The {0102:0} Girl...\n{bd02}Who will prevail?
+Bank0269_Text_Empty_7 = なし
+Bank0269_Text_Empty_8 = なし
+Bank0269_Text_Empty_9 = なし
+Bank0269_Text_Empty_10 = なし
+Bank0269_Text_Empty_11 = なし
+Bank0269_Text_Empty_12 = なし
+Bank0269_Text_Empty_13 = なし

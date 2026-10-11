@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Pure Power",
+    "description": "Raises the Pokémon's\nAttack stat."
+}

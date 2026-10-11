@@ -1,0 +1,37 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Constrict",
+    "description": "The target is attacked with long, creeping\ntentacles or vines.\nIt may also lower the target's Speed stat.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_DAMAGE_LOWER_TARGET_STATS",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 10,
+    "accuracy": 100,
+    "pp": 35,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_LOWER_SPEED_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [
+        {
+            "stat": "BATTLEMON_SPEED_STAGE",
+            "stages": -1,
+            "chance": 10
+        }
+    ],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

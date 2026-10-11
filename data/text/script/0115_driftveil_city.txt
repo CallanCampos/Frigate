@@ -1,4 +1,0 @@
-I gave the Pokémon a nickname!\nI also let it hold an item!{be00}\nSo, please take good care of it!
-Great! We can trade Pokémon using\nwireless communications{be00}\neven when we're apart!
-He's trading Pokémon right after\nhe came to a foreign place...{be01}\nChildren have the gift to make friends.
-\pad{82}

@@ -1,38 +1,38 @@
-Movie Star
-Masked Man
-Brycen-Man: The amusement park...\nIt is merely a moment of a dream...{be01}\nIt is the shape people's ideals\nhave taken...{be01}\nI have no use for such ideals...
-Brycen-Man: Mwahaha!\nI will end you now, {0102:0} Kid!
-Brycen-Man: Go, my Pokémon!\nUnleash your power!{be01}\nDestroy everything in this amusement park!
-???: Hold it right there!
-Brycen-Man: Wh-who are you?
-???: The Messenger of Truths and Ideals,\nThe {0102:0} Kid enters!{be01}\nStop right there, Brycen-Man!{be01}\nI cannot allow your mischief!
-Park Crowds: Hey, what's going on?\nIs this one of those hero skits?
-Brycen-Man: A single hit to KO\nmy Pokémon...{be00}\nYou're pretty good, {0102:0} Kid!{be01}\nDespite that, however...{be01}\nYou will get down on your knees before me\nwhen I end you with my dark, secret arts!{be01}\nPrepare to be finished!
-The {0102:0} Kid: Bring it on!
-Brycen-Man: Well said!{be01}\nMy dark, secret arts enter!\nTake them and be gone!
-The {0102:0} Kid: I'm scared!
-Brycen-Man: Mwahaha!\nHow pitiful, {0102:0} Kid!{be01}\nWhy would I waste my secret arts\non someone like you?{be01}\nThis should do it!
-Brycen-Man: Mwahaha!{be01}\nThat's your Pokémon's best shot?\nHow disappointing!{be01}\nI'm done play battling with you,\nlittle kid!{be01}\nEnough! I must go now!
-The {0102:0} Kid: This isn't how\nit's supposed to go...
-Masked Man Brycen-Man walked\nright through the {0102:0} Kid...{be01}\nHe played such an insignificant role\nin this incident.{be01}\nNo wonder nobody wants to find out\nwho he is...{be01}\nHaving said that...{be01}\nThank you, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
-Brycen-Man: Arrgh...{be01}\nBraving my secret arts to take out\nmy Pokémon with one hit...
-The {0102:0} Kid: Don't you get it,\nBrycen-Man?!{be01}\nThis is an amusement park filled with the\nideals of people!{be01}\nBe on your best behavior and go home!
-Brycen-Man: Very well.\nI shall pull back today.{be01}\nYou may be the Messenger of\nTruths and Ideals.{be00}\nBut I am Brycen-Man, the Masked Man of{be00}\nReality and Phantasm.{be01}\nMark my words, {0102:0} Kid.
-Park Crowds: Wow, he's\nso cool!{be00}\nI love the {0102:0} Kid!
-The {0102:0} Kid:\nBrycen-Man, the Masked Man...{be00}\nWhat is he planning to do...?
-Teaching Brycen-Man, the Masked Man,\na lesson, the {0102:0} Kid saved{be00}\nthe amusement park.{be01}\nHaving spoken in a daring tone,\nBrycen-Man disappeared into thin air...{be01}\nTo protect the truths and ideals of Unova,\ngo on, {0102:0} Kid!{be01}\nFight on, {0102:0} Kid!
-Brycen-Man: Mwahaha!\nHow silly of you, {0102:0} Kid.{be01}\nYou just missed the only chance\nyou had to defeat me!{be01}\nGo ahead and look around!
-Park Crowds: Did you see that?\nLook at him go! He's so cool!{be00}\nI love Brycen-Man, the Masked Man!
-Brycen-Man: Mwahaha!\nThe crowds are so mesmerized by me!{be01}\nPeople don't want a pitiful hero like you.\nThey need a man in a mask like me!
-The {0102:0} Kid: No way...
-It was too much to witness people cheering\nfor Brycen-Man, the Masked Man{be00}\nof Reality and Phantasm.{be01}\nThe {0102:0} Kid lost all\nhis strength to fight...{be01}\nCruel is the nature of battles...{be01}\nThe split-second decisions determined\nhis fate as a hero.{be01}\nToo bad, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
-Brycen-Man: Arrgh...{be01}\nFor me to lose to a pathetic little kid\nlike you...{be01}\nHow humiliating...\nI will settle this before too long...
-The {0102:0} Kid: ...Br-Brycen-Man!{be01}\nEr... Heroes are always...strong\nand cool...{be00}\nWe never lose!{be01}\nSo, why don't you...just go now!
-Teaching Brycen-Man, the Masked Man,\na lesson, the {0102:0} Kid saved{be00}\nthe amusement park.{be01}\nBut he has the weakness of being too timid!{be01}\nThis is a huge problem in a hero!{be01}\nTo protect the truths and ideals of Unova,\nfight on, {0102:0} Kid!{be01}\nDon't wimp out, {0102:0} Kid!
-Brycen-Man: Mwahaha!\nThis is the end for you, {0102:0} Kid!{be01}\nI didn't even have to use\nmy secret arts!{be01}\nNow, just stand in the corner,\nand watch me destroy the amusement park!
-The {0102:0} Kid: Wah...\nI wasn't hero material after all...
-Facing Brycen-Man, the Masked Man,\nthe {0102:0} Kid lost all{be00}\nhis strength to fight...{be01}\nHowever...{be01}\nNo one will ever forget how he overcame\nhis fear and fought with all his might!{be01}\nThank you, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
-The {0102:0} Kid: Oh no!\nThe attack missed...
-Brycen-Man: Arrgh...{be01}\nYou can't even use a move right?\nAre you really supposed to be a hero?{be01}\nYou just lowered my dark can-do spirit\nby a lot!{be01}\nI can't be doing this! Enough is enough!\nI'll return to my hideout!
-The {0102:0} Kid: Er...\nWait! Wait a second!
-Facing Brycen-Man, the Masked Man,\nthe {0102:0} Kid couldn't even{be00}\nattack correctly.{be01}\nAs a hero, he made crucial and\nembarrassing mistakes...{be00}\nIt was too much to witness his failure.{be00}\nBrycen-Man lost all his will to fight...{be01}\nToo bad, Brycen-Man!{be01}\nFight on, Brycen-Man!
+Bank0182_Text_MovieStar = Movie Star
+Bank0182_Text_MaskedMan = Masked Man
+Bank0182_Text_BrycenManAmusementPark = Brycen-Man: The amusement park...\nIt is merely a moment of a dream...{be01}\nIt is the shape people's ideals\nhave taken...{be01}\nI have no use for such ideals...
+Bank0182_Text_BrycenManMwahahaWill = Brycen-Man: Mwahaha!\nI will end you now, {0102:0} Kid!
+Bank0182_Text_BrycenManGoPokemon = Brycen-Man: Go, my Pokémon!\nUnleash your power!{be01}\nDestroy everything in this amusement park!
+Bank0182_Text_HoldRightThere = ???: Hold it right there!
+Bank0182_Text_BrycenManWhWho = Brycen-Man: Wh-who are you?
+Bank0182_Text_MessengerTruthsIdealsKid = ???: The Messenger of Truths and Ideals,\nThe {0102:0} Kid enters!{be01}\nStop right there, Brycen-Man!{be01}\nI cannot allow your mischief!
+Bank0182_Text_ParkCrowdsHeyWhats = Park Crowds: Hey, what's going on?\nIs this one of those hero skits?
+Bank0182_Text_BrycenManSingleHit = Brycen-Man: A single hit to KO\nmy Pokémon...{be00}\nYou're pretty good, {0102:0} Kid!{be01}\nDespite that, however...{be01}\nYou will get down on your knees before me\nwhen I end you with my dark, secret arts!{be01}\nPrepare to be finished!
+Bank0182_Text_KidBring = The {0102:0} Kid: Bring it on!
+Bank0182_Text_BrycenManWellSaid = Brycen-Man: Well said!{be01}\nMy dark, secret arts enter!\nTake them and be gone!
+Bank0182_Text_KidImScared = The {0102:0} Kid: I'm scared!
+Bank0182_Text_BrycenManMwahahaHow = Brycen-Man: Mwahaha!\nHow pitiful, {0102:0} Kid!{be01}\nWhy would I waste my secret arts\non someone like you?{be01}\nThis should do it!
+Bank0182_Text_BrycenManMwahahaThats = Brycen-Man: Mwahaha!{be01}\nThat's your Pokémon's best shot?\nHow disappointing!{be01}\nI'm done play battling with you,\nlittle kid!{be01}\nEnough! I must go now!
+Bank0182_Text_KidIsntHowIts = The {0102:0} Kid: This isn't how\nit's supposed to go...
+Bank0182_Text_MaskedManBrycenMan = Masked Man Brycen-Man walked\nright through the {0102:0} Kid...{be01}\nHe played such an insignificant role\nin this incident.{be01}\nNo wonder nobody wants to find out\nwho he is...{be01}\nHaving said that...{be01}\nThank you, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
+Bank0182_Text_BrycenManArrghBraving = Brycen-Man: Arrgh...{be01}\nBraving my secret arts to take out\nmy Pokémon with one hit...
+Bank0182_Text_KidDontGetBrycen = The {0102:0} Kid: Don't you get it,\nBrycen-Man?!{be01}\nThis is an amusement park filled with the\nideals of people!{be01}\nBe on your best behavior and go home!
+Bank0182_Text_BrycenManVeryWell = Brycen-Man: Very well.\nI shall pull back today.{be01}\nYou may be the Messenger of\nTruths and Ideals.{be00}\nBut I am Brycen-Man, the Masked Man of{be00}\nReality and Phantasm.{be01}\nMark my words, {0102:0} Kid.
+Bank0182_Text_ParkCrowdsWowHes = Park Crowds: Wow, he's\nso cool!{be00}\nI love the {0102:0} Kid!
+Bank0182_Text_KidBrycenManMasked = The {0102:0} Kid:\nBrycen-Man, the Masked Man...{be00}\nWhat is he planning to do...?
+Bank0182_Text_TeachingBrycenManMasked = Teaching Brycen-Man, the Masked Man,\na lesson, the {0102:0} Kid saved{be00}\nthe amusement park.{be01}\nHaving spoken in a daring tone,\nBrycen-Man disappeared into thin air...{be01}\nTo protect the truths and ideals of Unova,\ngo on, {0102:0} Kid!{be01}\nFight on, {0102:0} Kid!
+Bank0182_Text_BrycenManMwahahaHow_2 = Brycen-Man: Mwahaha!\nHow silly of you, {0102:0} Kid.{be01}\nYou just missed the only chance\nyou had to defeat me!{be01}\nGo ahead and look around!
+Bank0182_Text_ParkCrowdsDidSee = Park Crowds: Did you see that?\nLook at him go! He's so cool!{be00}\nI love Brycen-Man, the Masked Man!
+Bank0182_Text_BrycenManMwahahaCrowds = Brycen-Man: Mwahaha!\nThe crowds are so mesmerized by me!{be01}\nPeople don't want a pitiful hero like you.\nThey need a man in a mask like me!
+Bank0182_Text_KidNoWay = The {0102:0} Kid: No way...
+Bank0182_Text_TooMuchWitnessPeople = It was too much to witness people cheering\nfor Brycen-Man, the Masked Man{be00}\nof Reality and Phantasm.{be01}\nThe {0102:0} Kid lost all\nhis strength to fight...{be01}\nCruel is the nature of battles...{be01}\nThe split-second decisions determined\nhis fate as a hero.{be01}\nToo bad, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
+Bank0182_Text_BrycenManArrghLose = Brycen-Man: Arrgh...{be01}\nFor me to lose to a pathetic little kid\nlike you...{be01}\nHow humiliating...\nI will settle this before too long...
+Bank0182_Text_KidBrBrycenMan = The {0102:0} Kid: ...Br-Brycen-Man!{be01}\nEr... Heroes are always...strong\nand cool...{be00}\nWe never lose!{be01}\nSo, why don't you...just go now!
+Bank0182_Text_TeachingBrycenManMasked_2 = Teaching Brycen-Man, the Masked Man,\na lesson, the {0102:0} Kid saved{be00}\nthe amusement park.{be01}\nBut he has the weakness of being too timid!{be01}\nThis is a huge problem in a hero!{be01}\nTo protect the truths and ideals of Unova,\nfight on, {0102:0} Kid!{be01}\nDon't wimp out, {0102:0} Kid!
+Bank0182_Text_BrycenManMwahahaEnd = Brycen-Man: Mwahaha!\nThis is the end for you, {0102:0} Kid!{be01}\nI didn't even have to use\nmy secret arts!{be01}\nNow, just stand in the corner,\nand watch me destroy the amusement park!
+Bank0182_Text_KidWahWasntHero = The {0102:0} Kid: Wah...\nI wasn't hero material after all...
+Bank0182_Text_FacingBrycenManMasked = Facing Brycen-Man, the Masked Man,\nthe {0102:0} Kid lost all{be00}\nhis strength to fight...{be01}\nHowever...{be01}\nNo one will ever forget how he overcame\nhis fear and fought with all his might!{be01}\nThank you, {0102:0} Kid!{be01}\nGood-bye, {0102:0} Kid!
+Bank0182_Text_KidOhNoAttack = The {0102:0} Kid: Oh no!\nThe attack missed...
+Bank0182_Text_BrycenManArrghCant = Brycen-Man: Arrgh...{be01}\nYou can't even use a move right?\nAre you really supposed to be a hero?{be01}\nYou just lowered my dark can-do spirit\nby a lot!{be01}\nI can't be doing this! Enough is enough!\nI'll return to my hideout!
+Bank0182_Text_KidErWaitWait = The {0102:0} Kid: Er...\nWait! Wait a second!
+Bank0182_Text_FacingBrycenManMasked_2 = Facing Brycen-Man, the Masked Man,\nthe {0102:0} Kid couldn't even{be00}\nattack correctly.{be01}\nAs a hero, he made crucial and\nembarrassing mistakes...{be00}\nIt was too much to witness his failure.{be00}\nBrycen-Man lost all his will to fight...{be01}\nToo bad, Brycen-Man!{be01}\nFight on, Brycen-Man!

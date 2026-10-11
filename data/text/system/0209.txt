@@ -1,89 +1,89 @@
-Veteran Star
-Strange Man
-???: Bagoogeeegooo!
-{0100:1}: MT...\nIt really appeared...
-Man: Ahem. Who are you?
-{0100:1}: Excuse me?\nWhat are you doing over there?
-Man: My name is Serizawa.\nI am the owner of this land.{be01}\nWhatever I do here\nis none of your business.{be01}\nNow, as I asked, who are you?
-{0100:1}: I'm {0100:1}!\nI'm a member of the Unova Defense Force.{be01}\nMr. Serizawa, right?\nIs the MT yours?
-Serizawa: The Unova Defense Force...{be01}\nI see. So you're the one.\nWell, you certainly came in at the right time.{be01}\nYou interrupted my plans.\nOn top of that, you destroyed my MT.{be00}\nNow I must return the favor.
-{0100:1}: What?!
-Serizawa: Muahaha.{be01}\nToday's machine has been\nspecially prepared just for you.{be01}\nYou can call it MT2.{be01}\nIt's been powered up significantly.\nCan you stop it?
-{0100:1}: Hey!\nAre you looking for a fight?{be01}\n(...Could this be the villain that the\nTitanic Tyranitar King warned me about?...)
-MT2: Bagoogeeegooon!
-Serizawa: Your interference was\nmost unfortunate.{be01}\nIf that foolish Worker had used MT properly,\nwe could have destroyed the town...
-{0100:1}: The MT\nthat appeared before...{be00}\nThat was also your work?{be01}\nDestroying the town...\nWhy? What do you gain from that?
-Serizawa: Ha. It's simple, really.{be01}\nI wanted to test MT's power. And I was very\neager to know the limits of what it could do.{be00}\nTo feel its strength...{be01}\nWhen you raise a strong Pokémon,\nyou want to make it fight, too, right?{be01}\nWhat I'm doing is the same thing.
-{0100:1}: Sure, that makes sense.
-Serizawa: You understand? Excellent.\nThen, I'll test MT2's power on you as well!
-{0100:1}: No! It's different!
-Serizawa: What's the difference?{be01}\nThe way I see it, training your Pokémon\nin battle is no different from{be00}\ntesting the power of my MT.
-{0100:1}: Uh...
-Serizawa: Ha ha ha! What's the matter?\nCan't defend your argument?{be01}\nDoes that mean you agree with me?
-Radio: Can you hear me, {0100:1}?
-{0100:1}: Yes!
-Radio: The metal that covers MT2's body\nis extremely resistant!{be01}\nWe can't expect to cause any damage\nwith regular attacks!
-Serizawa: Ha ha ha!\nYou'll never defeat me!
-Radio: We're analyzing the metal...\nZzt...{be01}\n{0100:1}, hang in there\nuntil...zzt...zzt...
-Serizawa: What did you expect?{be01}\nI know that you Unova Defense Force\nmeddlers communicate by radio.
-{0100:1}: The signal's jammed...
-Serizawa: Ha. You see?\nMy MT2 is highly efficient.
-{0100:1}: What do I do now?
-Serizawa: Ha! Sorry, but I play to win.\nAnd my MT2 is made for winning.
-{0100:1}: Sneaky!
-Serizawa: Ha! I'll take that as a compliment!
-{0100:1}: Aaargh!
-Serizawa: Come now! You're giving yourself\na bad name.{be01}\nA member of the Unova Defense Force\nisn't supposed to get emotional, right?
-{0100:1}: (...I can't even\ncommunicate with HQ...){be01}\n(...What should I do?...)
-Serizawa: Ha ha ha...\nWhat will you do now, missy?
-???: {0100:1}...\nCan you hear me, {0100:1}?
-{0100:1}: What? Who's that?\nYour voice sounds familiar...
-???: It's me...\nThe Titanic Tyranitar King...{be01}\nI'm using the last of my energy\nto speak directly into your mind...
-{0100:1}: !!
-Tyranitar King: {0100:1}...\nThe machine...MT2...{be01}\nIt's protecting its weak point\nwith its Ability...{be01}\nYou must take away its Ability...
-{0100:1}: Its Ability?
-Tyranitar King: I'm counting\non you, {0100:1}...{be01}\nBecause I cannot...\nyou must protect this world...{be01}\n...
-{0100:1}: Titanic Tyranitar King...
-Serizawa: Ha! Have you lost your senses?\nYou've started muttering to yourself!
-{0100:1}: Ugh... Is this the end?
-Serizawa: Ha ha ha!{be01}\nWhat do you think, {0100:1}?\nMy MT2! Isn't it a spectacular machine?
-{0100:1}: When it comes to this...\nThe Unova Defense Force...{be00}\nThe last resort...
-Serizawa: Eh? What?\nAre you still planning to do something?
-{0100:1}: Here I go...\nElectrode... Weezing...{be01}\nI choose you...
-Serizawa: What?!
-{0100:1}: At all costs...\nI have to stop MT2...
-Serizawa: Wait!{be01}\nWhat are you thinking? Stop!\nStop this at once!
-{0100:1}: Here we go!\nElectrode!{be00}\nWeezing!{be00}\nSimultaneous Explosion!
-Serizawa: Stop! I command you! Nooooo!
-{0100:1}: Huff...puff...
-Serizawa: No more battling!\nWe've had enough!{be01}\n{0100:1}...\nCould we talk instead?
-{0100:1}: Huff... Puff...\nWhat do you mean, talk?
-Serizawa: Allow me to explain.{be01}\nYou have such power. Why limit yourself?\nUsing that strength just for protection...{be00}\nFrankly, it's a waste of your talent.{be01}\nWhy don't you come work for me instead?
-{0100:1}: What are you talking about?\nI'm a member of the Unova Defense Force!
-Serizawa: I'll make it worth your while.{be01}\nWhat's your salary? What does the\nUnova Defense Force pay you?{be01}\nI'll double it. No, quadruple it.\nNo...I'll go even higher.{be00}\nI'll pay you 50 times what they do!
-{0100:1}: F-fifty times?!\nBut...but...
-Serizawa: That's not enough for you?{be01}\nFine! One hundred times your current\nsalary. That's my final offer!
-{0100:1}: A hundred times what I make\nnow? A hundred! That's so many zeros...{be01}\nI just don't know if I can accept...
-Serizawa: Still not satisfied with\nmy generous offer?{be01}\nVery well, then. I suppose you'd rather\nbe destroyed by my MT2.{be00}\nAlong with all your Pokémon.
-{0100:1}: N-no, no, I'll take it!{be01}\nYou've got a deal, Mr. Serizawa!\nOne hundred times my salary, please!
-Serizawa: Ha ha ha! Excellent!\nThen we have an agreement.{be01}\nI have high hopes for you, {0100:1}.\nYou will go far in my organization.
-{0100:1}: Serizawa!\nThis is it! Give up!
-Serizawa: Arrogant fool! You think\nyou can get the better of me?{be01}\nI have money to burn!\nI can easily buy a far better MT{be00}\nthan this old hunk of junk!
-{0100:1}: What a despicable man...
-Serizawa: I'll destroy you\nwith a new MT!{be01}\nI'll make you regret defying me!\nListen and remember!
-{0100:1}: Wait! Wait a minute!
-Radio: Hey! Respond!\nRespond, {0100:1}!
-{0100:1}: Yes! Chief!
-Radio: Finally, I got through!{be01}\nI've been able to listen to what's going on\nover there but couldn't reach you.{be01}\nBut from what I've heard, you seem\nto be OK, {0100:1}.
-{0100:1}: Yes!\nMT2 is completely shut down.{be01}\nThe mission is complete!{be01}\nBut that villain Serizawa, who was\ncontrolling MT2, got away!
-Radio: He won't get far. What we heard over\nthe radio proved his wrongdoing.{be01}\nWe're tracking him down now. He'll soon be\narrested, and all his assets will be{be00}\nconfiscated. He won't have two coins{be00}\nto rub together, much less buy a new MT!{be01}\nGood work, {0100:1}!\nReturn to HQ!
-{0100:1}: Roger!
-Titanic Tyranitar King...\nThanks to you, Unova was saved.{be01}\nYou've been the guardian\nof the Unova region...
-MT2: Bagoogeeegooo!
-Serizawa: Ha! What is this? Really?\nThat attack was just weak!{be01}\nDefeating my MT2 is just a dream\nif that's all you can do!
-{0100:1}: Ugh...\nMT2 is a lot tougher than MT...{be01}\nBut how did he manage to get\nsuch a dangerous machine?{be01}\nHe didn't develop MT by himself,\ndid he?
-Serizawa: Fwa ha ha ha!\nThat's not my area of expertise.{be00}\nBut I didn't have to create it.{be01}\nAfter all, my MT isn't the only one...
-{0100:1}: What?!
-Serizawa: Ah ha ha. Was that not\nwhat you expected?{be01}\nThese MTs are for sale.\nThere's a whole series of them.{be01}\nThey're quite popular and quite simple\nto obtain...for those who have the cash.{be00}\nAnd the connections.
-{0100:1}: It can't be...\nWho makes them? And why?
-Serizawa: Think about it. People can be\nmaniacs about all sorts of things.{be01}\nThere are destruction maniacs who love\nto destroy things. Me, for instance!{be01}\nAnd fortunately for me, there are\nmachine maniacs who love to build{be00}\nwonderfully destructive devices like MT!
+Bank0209_Text_VeteranStar = Veteran Star
+Bank0209_Text_StrangeMan = Strange Man
+Bank0209_Text_Bagoogeeegooo = ???: Bagoogeeegooo!
+Bank0209_Text_MtReallyAppeared = {0100:1}: MT...\nIt really appeared...
+Bank0209_Text_ManAhemWho = Man: Ahem. Who are you?
+Bank0209_Text_ExcuseWhatDoingOver = {0100:1}: Excuse me?\nWhat are you doing over there?
+Bank0209_Text_ManNameSerizawaAm = Man: My name is Serizawa.\nI am the owner of this land.{be01}\nWhatever I do here\nis none of your business.{be01}\nNow, as I asked, who are you?
+Bank0209_Text_ImImMemberUnova = {0100:1}: I'm {0100:1}!\nI'm a member of the Unova Defense Force.{be01}\nMr. Serizawa, right?\nIs the MT yours?
+Bank0209_Text_SerizawaUnovaDefenseForce = Serizawa: The Unova Defense Force...{be01}\nI see. So you're the one.\nWell, you certainly came in at the right time.{be01}\nYou interrupted my plans.\nOn top of that, you destroyed my MT.{be00}\nNow I must return the favor.
+Bank0209_Text_What = {0100:1}: What?!
+Bank0209_Text_SerizawaMuahahaTodaysMachine = Serizawa: Muahaha.{be01}\nToday's machine has been\nspecially prepared just for you.{be01}\nYou can call it MT2.{be01}\nIt's been powered up significantly.\nCan you stop it?
+Bank0209_Text_HeyLookingFightCould = {0100:1}: Hey!\nAre you looking for a fight?{be01}\n(...Could this be the villain that the\nTitanic Tyranitar King warned me about?...)
+Bank0209_Text_Mt2Bagoogeeegooon = MT2: Bagoogeeegooon!
+Bank0209_Text_SerizawaInterferenceMostUnfortunate = Serizawa: Your interference was\nmost unfortunate.{be01}\nIf that foolish Worker had used MT properly,\nwe could have destroyed the town...
+Bank0209_Text_MtAppearedBeforeAlso = {0100:1}: The MT\nthat appeared before...{be00}\nThat was also your work?{be01}\nDestroying the town...\nWhy? What do you gain from that?
+Bank0209_Text_SerizawaHaItsSimple = Serizawa: Ha. It's simple, really.{be01}\nI wanted to test MT's power. And I was very\neager to know the limits of what it could do.{be00}\nTo feel its strength...{be01}\nWhen you raise a strong Pokémon,\nyou want to make it fight, too, right?{be01}\nWhat I'm doing is the same thing.
+Bank0209_Text_SureMakesSense = {0100:1}: Sure, that makes sense.
+Bank0209_Text_SerizawaUnderstandExcellentThen = Serizawa: You understand? Excellent.\nThen, I'll test MT2's power on you as well!
+Bank0209_Text_NoItsDifferent = {0100:1}: No! It's different!
+Bank0209_Text_SerizawaWhatsDifferenceWay = Serizawa: What's the difference?{be01}\nThe way I see it, training your Pokémon\nin battle is no different from{be00}\ntesting the power of my MT.
+Bank0209_Text_Uh = {0100:1}: Uh...
+Bank0209_Text_SerizawaHaHaHa = Serizawa: Ha ha ha! What's the matter?\nCan't defend your argument?{be01}\nDoes that mean you agree with me?
+Bank0209_Text_RadioCanHear = Radio: Can you hear me, {0100:1}?
+Bank0209_Text_Yes = {0100:1}: Yes!
+Bank0209_Text_RadioMetalCoversMt2s = Radio: The metal that covers MT2's body\nis extremely resistant!{be01}\nWe can't expect to cause any damage\nwith regular attacks!
+Bank0209_Text_SerizawaHaHaHa_2 = Serizawa: Ha ha ha!\nYou'll never defeat me!
+Bank0209_Text_RadioWereAnalyzingMetal = Radio: We're analyzing the metal...\nZzt...{be01}\n{0100:1}, hang in there\nuntil...zzt...zzt...
+Bank0209_Text_SerizawaWhatDidExpect = Serizawa: What did you expect?{be01}\nI know that you Unova Defense Force\nmeddlers communicate by radio.
+Bank0209_Text_SignalsJammed = {0100:1}: The signal's jammed...
+Bank0209_Text_SerizawaHaSeeMt2 = Serizawa: Ha. You see?\nMy MT2 is highly efficient.
+Bank0209_Text_WhatNow = {0100:1}: What do I do now?
+Bank0209_Text_SerizawaHaSorryBut = Serizawa: Ha! Sorry, but I play to win.\nAnd my MT2 is made for winning.
+Bank0209_Text_Sneaky = {0100:1}: Sneaky!
+Bank0209_Text_SerizawaHaIllTake = Serizawa: Ha! I'll take that as a compliment!
+Bank0209_Text_Aaargh = {0100:1}: Aaargh!
+Bank0209_Text_SerizawaComeNowYoure = Serizawa: Come now! You're giving yourself\na bad name.{be01}\nA member of the Unova Defense Force\nisn't supposed to get emotional, right?
+Bank0209_Text_CantEvenCommunicateHq = {0100:1}: (...I can't even\ncommunicate with HQ...){be01}\n(...What should I do?...)
+Bank0209_Text_SerizawaHaHaHa_3 = Serizawa: Ha ha ha...\nWhat will you do now, missy?
+Bank0209_Text_CanHear = ???: {0100:1}...\nCan you hear me, {0100:1}?
+Bank0209_Text_WhatWhosVoiceSounds = {0100:1}: What? Who's that?\nYour voice sounds familiar...
+Bank0209_Text_ItsTitanicTyranitarKing = ???: It's me...\nThe Titanic Tyranitar King...{be01}\nI'm using the last of my energy\nto speak directly into your mind...
+Bank0209_Text_Empty = {0100:1}: !!
+Bank0209_Text_TyranitarKingMachineMt2 = Tyranitar King: {0100:1}...\nThe machine...MT2...{be01}\nIt's protecting its weak point\nwith its Ability...{be01}\nYou must take away its Ability...
+Bank0209_Text_ItsAbility = {0100:1}: Its Ability?
+Bank0209_Text_TyranitarKingImCounting = Tyranitar King: I'm counting\non you, {0100:1}...{be01}\nBecause I cannot...\nyou must protect this world...{be01}\n...
+Bank0209_Text_TitanicTyranitarKing = {0100:1}: Titanic Tyranitar King...
+Bank0209_Text_SerizawaHaHaveLost = Serizawa: Ha! Have you lost your senses?\nYou've started muttering to yourself!
+Bank0209_Text_UghEnd = {0100:1}: Ugh... Is this the end?
+Bank0209_Text_SerizawaHaHaHa_4 = Serizawa: Ha ha ha!{be01}\nWhat do you think, {0100:1}?\nMy MT2! Isn't it a spectacular machine?
+Bank0209_Text_WhenComesUnovaDefense = {0100:1}: When it comes to this...\nThe Unova Defense Force...{be00}\nThe last resort...
+Bank0209_Text_SerizawaEhWhatStill = Serizawa: Eh? What?\nAre you still planning to do something?
+Bank0209_Text_HereGoElectrodeWeezing = {0100:1}: Here I go...\nElectrode... Weezing...{be01}\nI choose you...
+Bank0209_Text_SerizawaWhat = Serizawa: What?!
+Bank0209_Text_AllCostsHaveStop = {0100:1}: At all costs...\nI have to stop MT2...
+Bank0209_Text_SerizawaWaitWhatThinking = Serizawa: Wait!{be01}\nWhat are you thinking? Stop!\nStop this at once!
+Bank0209_Text_HereWeGoElectrode = {0100:1}: Here we go!\nElectrode!{be00}\nWeezing!{be00}\nSimultaneous Explosion!
+Bank0209_Text_SerizawaStopCommandNooooo = Serizawa: Stop! I command you! Nooooo!
+Bank0209_Text_HuffPuff = {0100:1}: Huff...puff...
+Bank0209_Text_SerizawaNoMoreBattling = Serizawa: No more battling!\nWe've had enough!{be01}\n{0100:1}...\nCould we talk instead?
+Bank0209_Text_HuffPuffWhatMean = {0100:1}: Huff... Puff...\nWhat do you mean, talk?
+Bank0209_Text_SerizawaAllowExplainHave = Serizawa: Allow me to explain.{be01}\nYou have such power. Why limit yourself?\nUsing that strength just for protection...{be00}\nFrankly, it's a waste of your talent.{be01}\nWhy don't you come work for me instead?
+Bank0209_Text_WhatTalkingAboutIm = {0100:1}: What are you talking about?\nI'm a member of the Unova Defense Force!
+Bank0209_Text_SerizawaIllMakeWorth = Serizawa: I'll make it worth your while.{be01}\nWhat's your salary? What does the\nUnova Defense Force pay you?{be01}\nI'll double it. No, quadruple it.\nNo...I'll go even higher.{be00}\nI'll pay you 50 times what they do!
+Bank0209_Text_FFiftyTimesBut = {0100:1}: F-fifty times?!\nBut...but...
+Bank0209_Text_SerizawaThatsNotEnough = Serizawa: That's not enough for you?{be01}\nFine! One hundred times your current\nsalary. That's my final offer!
+Bank0209_Text_HundredTimesWhatMake = {0100:1}: A hundred times what I make\nnow? A hundred! That's so many zeros...{be01}\nI just don't know if I can accept...
+Bank0209_Text_SerizawaStillNotSatisfied = Serizawa: Still not satisfied with\nmy generous offer?{be01}\nVery well, then. I suppose you'd rather\nbe destroyed by my MT2.{be00}\nAlong with all your Pokémon.
+Bank0209_Text_NNoNoIll = {0100:1}: N-no, no, I'll take it!{be01}\nYou've got a deal, Mr. Serizawa!\nOne hundred times my salary, please!
+Bank0209_Text_SerizawaHaHaHa_5 = Serizawa: Ha ha ha! Excellent!\nThen we have an agreement.{be01}\nI have high hopes for you, {0100:1}.\nYou will go far in my organization.
+Bank0209_Text_SerizawaGiveUp = {0100:1}: Serizawa!\nThis is it! Give up!
+Bank0209_Text_SerizawaArrogantFoolThink = Serizawa: Arrogant fool! You think\nyou can get the better of me?{be01}\nI have money to burn!\nI can easily buy a far better MT{be00}\nthan this old hunk of junk!
+Bank0209_Text_WhatDespicableMan = {0100:1}: What a despicable man...
+Bank0209_Text_SerizawaIllDestroyNew = Serizawa: I'll destroy you\nwith a new MT!{be01}\nI'll make you regret defying me!\nListen and remember!
+Bank0209_Text_WaitWaitMinute = {0100:1}: Wait! Wait a minute!
+Bank0209_Text_RadioHeyRespondRespond = Radio: Hey! Respond!\nRespond, {0100:1}!
+Bank0209_Text_YesChief = {0100:1}: Yes! Chief!
+Bank0209_Text_RadioFinallyGotThrough = Radio: Finally, I got through!{be01}\nI've been able to listen to what's going on\nover there but couldn't reach you.{be01}\nBut from what I've heard, you seem\nto be OK, {0100:1}.
+Bank0209_Text_YesMt2CompletelyShut = {0100:1}: Yes!\nMT2 is completely shut down.{be01}\nThe mission is complete!{be01}\nBut that villain Serizawa, who was\ncontrolling MT2, got away!
+Bank0209_Text_RadioHeWontGet = Radio: He won't get far. What we heard over\nthe radio proved his wrongdoing.{be01}\nWe're tracking him down now. He'll soon be\narrested, and all his assets will be{be00}\nconfiscated. He won't have two coins{be00}\nto rub together, much less buy a new MT!{be01}\nGood work, {0100:1}!\nReturn to HQ!
+Bank0209_Text_Roger = {0100:1}: Roger!
+Bank0209_Text_TitanicTyranitarKingThanks = Titanic Tyranitar King...\nThanks to you, Unova was saved.{be01}\nYou've been the guardian\nof the Unova region...
+Bank0209_Text_Mt2Bagoogeeegooo = MT2: Bagoogeeegooo!
+Bank0209_Text_SerizawaHaWhatReally = Serizawa: Ha! What is this? Really?\nThat attack was just weak!{be01}\nDefeating my MT2 is just a dream\nif that's all you can do!
+Bank0209_Text_UghMt2LotTougher = {0100:1}: Ugh...\nMT2 is a lot tougher than MT...{be01}\nBut how did he manage to get\nsuch a dangerous machine?{be01}\nHe didn't develop MT by himself,\ndid he?
+Bank0209_Text_SerizawaFwaHaHa = Serizawa: Fwa ha ha ha!\nThat's not my area of expertise.{be00}\nBut I didn't have to create it.{be01}\nAfter all, my MT isn't the only one...
+Bank0209_Text_What_2 = {0100:1}: What?!
+Bank0209_Text_SerizawaAhHaHa = Serizawa: Ah ha ha. Was that not\nwhat you expected?{be01}\nThese MTs are for sale.\nThere's a whole series of them.{be01}\nThey're quite popular and quite simple\nto obtain...for those who have the cash.{be00}\nAnd the connections.
+Bank0209_Text_CantWhoMakesThem = {0100:1}: It can't be...\nWho makes them? And why?
+Bank0209_Text_SerizawaThinkAboutPeople = Serizawa: Think about it. People can be\nmaniacs about all sorts of things.{be01}\nThere are destruction maniacs who love\nto destroy things. Me, for instance!{be01}\nAnd fortunately for me, there are\nmachine maniacs who love to build{be00}\nwonderfully destructive devices like MT!

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Harvest",
+    "description": "May create another\nBerry after one is used."
+}

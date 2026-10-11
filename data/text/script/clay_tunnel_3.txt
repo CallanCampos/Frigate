@@ -1,0 +1,4 @@
+ClayTunnel3_Text_OhTrainerWantRide = Oh, Trainer!\nWant to ride this mining cart?
+ClayTunnel3_Text_OhLetsGoBy = Oh!\nLet's go by mining cart!{be01}
+ClayTunnel3_Text_OhAnytimeYoudLike = Oh! Anytime you'd like to ride it,\ntalk to me!
+\pad{b4}

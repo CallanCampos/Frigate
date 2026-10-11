@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Clear Body",
+    "description": "Prevents other Pokémon\nfrom lowering its stats."
+}

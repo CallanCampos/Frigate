@@ -57,7 +57,7 @@ static u32 func_ov255_021d3408(const CursorMoveData *data, u32 count);
 static u32 func_ov255_021d3468(const CursorMoveData *data, u32 count, u32 x, u32 y);
 
 // MWCC sorts a file's data by size, in an order that depends on where each object is declared; the objects of the same
-// size are declared in the order that lays them out as in the ROM (tools/scripts/rodata_order.py)
+// size are declared in the order that lays them out as in the ROM (tools/decomp/rodata_order.py)
 
 // The end of a table of touch rectangles
 static const TouchRect sTouchRectEnd = { TOUCH_RECT_END, 0, 0, 0 };

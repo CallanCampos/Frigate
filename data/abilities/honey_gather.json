@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Honey Gather",
+    "description": "The Pokémon may gather\nHoney from somewhere."
+}

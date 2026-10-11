@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Blizzard",
+    "description": "A howling blizzard is summoned to strike\nthe opposing team. It may also freeze\nthem solid.",
+    "type": "TYPE_ICE",
+    "quality": "MOVE_QUALITY_DAMAGE_INFLICT",
+    "category": "MOVE_CATEGORY_SPECIAL",
+    "power": 120,
+    "accuracy": 70,
+    "pp": 5,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_FREEZE",
+        "chance": 10,
+        "duration": 1,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_BLIZZARD",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_ADJACENT_FOES",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

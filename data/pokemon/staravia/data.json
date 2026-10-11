@@ -1,0 +1,156 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Staravia",
+    "pokedex": {
+        "category": "Starling Pokémon",
+        "entry": "Recognizing their own weakness,\nthey always live in a group. When\nalone, a Staravia cries noisily.",
+        "height": "2'00\"",
+        "weight": "34.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Staravia",
+                "category": "Starling Pokémon",
+                "entry": "Recognizing their own weakness,\nthey always live in a group. When\nalone, a Staravia cries noisily.",
+                "height": "2'00\"",
+                "weight": "34.2 lbs."
+            },
+            "fr": {
+                "name": "Étourvol",
+                "category": "Pokémon Étourneau",
+                "entry": "Conscient de sa propre faiblesse,\nil vit toujours en groupe, piaillant\nbruyamment quand il est seul.",
+                "height": "0,6 m",
+                "weight": "15,5 kg"
+            },
+            "de": {
+                "name": "Staravia",
+                "category": "Star",
+                "entry": "Staravia verbergen ihre Schwäche\nin Gruppen. Sind sie allein, kann man\nsie an ihren lauten Rufen erkennen.",
+                "height": "0,6 m",
+                "weight": "15,5 kg"
+            },
+            "it": {
+                "name": "Staravia",
+                "category": "Pokémon Storno",
+                "entry": "Conscio della propria debolezza, vive\nin gruppo. Quando è da solo, Staravia\nemette forti versi.",
+                "height": "0,6 m",
+                "weight": "15,5 kg"
+            },
+            "ko": {
+                "name": "찌르버드",
+                "category": "찌르레기포켓몬",
+                "entry": "자신의 약함을 잘 알고 있기에\n항상 무리를 지어 살고 있다.\n혼자가 되면 요란하게 운다.",
+                "height": "0.6 m",
+                "weight": "15.5 kg"
+            },
+            "es": {
+                "name": "Staravia",
+                "category": "Pokémon Estornino",
+                "entry": "Son conscientes de su debilidad, así\nque siempre viven en grupo. Si se\nencuentran solos, lloran a gritos.",
+                "height": "0,6 m",
+                "weight": "15,5 kg"
+            },
+            "ja": {
+                "name": "ムクバード",
+                "category": "むくどりポケモン",
+                "entry": "じぶんの\\x{3000}よわさを\\x{3000}わきまえており\nいつも\\x{3000}むれで\\x{3000}くらしている。\nいっぴきになると\\x{3000}やかましく\\x{3000}なく。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 75,
+        "defense": 50,
+        "speed": 80,
+        "special_attack": 40,
+        "special_defense": 40
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_YACHE_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_INTIMIDATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_RECKLESS",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 119,
+    "height": 6,
+    "weight": 155,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_QUICK_ATTACK" ],
+            [ 5, "MOVE_QUICK_ATTACK" ],
+            [ 9, "MOVE_WING_ATTACK" ],
+            [ 13, "MOVE_DOUBLE_TEAM" ],
+            [ 18, "MOVE_ENDEAVOR" ],
+            [ 23, "MOVE_WHIRLWIND" ],
+            [ 28, "MOVE_AERIAL_ACE" ],
+            [ 33, "MOVE_TAKE_DOWN" ],
+            [ 38, "MOVE_AGILITY" ],
+            [ 43, "MOVE_BRAVE_BIRD" ],
+            [ 48, "MOVE_FINAL_GAMBIT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM67",
+            "TM83",
+            "TM87",
+            "TM88",
+            "TM89",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [ "MOVE_SNORE", "MOVE_HEAT_WAVE", "MOVE_TAILWIND", "MOVE_ROOST", "MOVE_ENDEAVOR", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 34,
+            "species": "SPECIES_STARAPTOR"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_STARLY"
+}

@@ -1,0 +1,181 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Lairon",
+    "pokedex": {
+        "category": "Iron Armor Pokémon",
+        "entry": "Lairon fight over territory,\nand when their steel bodies\ncollide, sparks fly.",
+        "height": "2'11\"",
+        "weight": "264.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Lairon",
+                "category": "Iron Armor Pokémon",
+                "entry": "For food, it digs up iron ore. It\nsmashes its steely body against\nothers to fight over territory.",
+                "height": "2'11\"",
+                "weight": "264.6 lbs."
+            },
+            "fr": {
+                "name": "Galegon",
+                "category": "Pokémon Armurfer",
+                "entry": "Il se nourrit du minerai de fer qu'il\nfore. Il défend son territoire en\nchargeant avec son corps d'acier.",
+                "height": "0,9 m",
+                "weight": "120,0 kg"
+            },
+            "de": {
+                "name": "Stollrak",
+                "category": "Eisenpanzer",
+                "entry": "Es ernährt sich von Eisenerz.\nUm sein Revier zu sichern, setzt\nes seinen harten Körper ein.",
+                "height": "0,9 m",
+                "weight": "120,0 kg"
+            },
+            "it": {
+                "name": "Lairon",
+                "category": "Pokémon Corazza",
+                "entry": "Scava per cercare ferro, di cui si nutre.\nSi schianta contro gli altri nella lotta\nper il territorio.",
+                "height": "0,9 m",
+                "weight": "120,0 kg"
+            },
+            "ko": {
+                "name": "갱도라",
+                "category": "철갑옷포켓몬",
+                "entry": "철광석을 파내어 먹는다.\n강철의 몸을 서로 부딪치며\n영역 싸움을 하는 습성이 있다.",
+                "height": "0.9 m",
+                "weight": "120.0 kg"
+            },
+            "es": {
+                "name": "Lairon",
+                "category": "Pokémon Cor. Férrea",
+                "entry": "Extrae hierro para alimentarse\ny usa su cuerpo de acero para\nluchar y conseguir territorio.",
+                "height": "0,9 m",
+                "weight": "120,0 kg"
+            },
+            "ja": {
+                "name": "コドラ",
+                "category": "てつヨロイポケモン",
+                "entry": "てっこうせきを\\x{3000}ほりだして\\x{3000}たべる。\nはがねの\\x{3000}からだを\\x{3000}ぶつけあって\nなわばりあらそいをする\\x{3000}しゅうせい。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff12}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 90,
+        "defense": 140,
+        "speed": 40,
+        "special_attack": 50,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_STEEL", "TYPE_ROCK" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_HARD_STONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 35,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_ROCK_HEAD" ],
+    "hidden_ability": "ABILITY_HEAVY_METAL",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 151,
+    "height": 9,
+    "weight": 1200,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_HARDEN" ],
+            [ 1, "MOVE_MUD_SLAP" ],
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 4, "MOVE_MUD_SLAP" ],
+            [ 8, "MOVE_HEADBUTT" ],
+            [ 11, "MOVE_METAL_CLAW" ],
+            [ 15, "MOVE_IRON_DEFENSE" ],
+            [ 18, "MOVE_ROAR" ],
+            [ 22, "MOVE_TAKE_DOWN" ],
+            [ 25, "MOVE_IRON_HEAD" ],
+            [ 29, "MOVE_PROTECT" ],
+            [ 34, "MOVE_METAL_SOUND" ],
+            [ 40, "MOVE_IRON_TAIL" ],
+            [ 45, "MOVE_AUTOTOMIZE" ],
+            [ 51, "MOVE_HEAVY_SLAM" ],
+            [ 56, "MOVE_DOUBLE_EDGE" ],
+            [ 62, "MOVE_METAL_BURST" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM65",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_UPROAR",
+            "MOVE_EARTH_POWER",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SUPERPOWER",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SPITE",
+            "MOVE_ENDEAVOR",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 42,
+            "species": "SPECIES_AGGRON"
+        }
+    ],
+    "regional_dex_number": 167,
+    "baby_species": "SPECIES_ARON"
+}

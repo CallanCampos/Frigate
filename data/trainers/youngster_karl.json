@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Karl",
+    "class": "TRAINER_CLASS_YOUNGSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SANDSLASH",
+            "form": 0,
+            "level": 42,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I just keep running around!\nI've got the whole field to myself!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I know... I know...\nI shouldn't take it all for myself."
+        },
+        {
+            "type": 2,
+            "text": "I ran around a ton and got the\nHeavy Walker Medal!"
+        }
+    ]
+}

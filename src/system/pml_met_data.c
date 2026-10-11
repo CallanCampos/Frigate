@@ -2,6 +2,7 @@
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "field/zone.h"
 #include "gfl/msg.h"
@@ -15,7 +16,7 @@
 // PokeParty_SetupMetData: the ROM has no string for it
 
 // The message file of the memo texts in ARCID_SYSTEM_MESSAGE, and N's name in it
-#define MSG_FILE_MEMO 0x17c
+#define MSG_FILE_MEMO TEXT_BANK_MEMO
 #define MEMO_N_NAME 0x5c
 
 // The Trainer ID of N's Pokémon

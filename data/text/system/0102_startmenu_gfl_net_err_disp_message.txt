@@ -1,3 +1,0 @@
-Communication error.
-Communication error.\nPlease turn off the power.
-\pad{3e}

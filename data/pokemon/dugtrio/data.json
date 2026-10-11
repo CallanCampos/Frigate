@@ -1,0 +1,164 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Dugtrio",
+    "pokedex": {
+        "category": "Mole Pokémon",
+        "entry": "Its three heads move alternately,\ndriving it through tough soil to\ndepths of over 60 miles.",
+        "height": "2'04\"",
+        "weight": "73.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Dugtrio",
+                "category": "Mole Pokémon",
+                "entry": "Its three heads move alternately,\ndriving it through tough soil to\ndepths of over 60 miles.",
+                "height": "2'04\"",
+                "weight": "73.4 lbs."
+            },
+            "fr": {
+                "name": "Triopikeur",
+                "category": "Pokémon Taupe",
+                "entry": "Ses trois têtes creusent le sol à\ntour de rôle. Il peut atteindre des\nprofondeurs de 100 kilomètres.",
+                "height": "0,7 m",
+                "weight": "33,3 kg"
+            },
+            "de": {
+                "name": "Digdri",
+                "category": "Maulwurf",
+                "entry": "Die drei Köpfe bewegen sich abwechselnd,\num sich durch harte Erde in Tiefen von\nbis zu 100 km zu graben.",
+                "height": "0,7 m",
+                "weight": "33,3 kg"
+            },
+            "it": {
+                "name": "Dugtrio",
+                "category": "Pokémon Talpa",
+                "entry": "Le sue tre teste si muovono a turno\nper scavare nel duro suolo fino ad\nuna profondità di 100 km.",
+                "height": "0,7 m",
+                "weight": "33,3 kg"
+            },
+            "ko": {
+                "name": "닥트리오",
+                "category": "두더지포켓몬",
+                "entry": "3개의 머리가 교차하며 움직여서\n아무리 딱딱한 지층이라도\n지하 100km까지 파들어 간다.",
+                "height": "0.7 m",
+                "weight": "33.3 kg"
+            },
+            "es": {
+                "name": "Dugtrio",
+                "category": "Pokémon Topo",
+                "entry": "Sus tres cabezas se mueven por turnos\npara excavar la tierra a una profundidad\nde unos 100 km.",
+                "height": "0,7 m",
+                "weight": "33,3 kg"
+            },
+            "ja": {
+                "name": "ダグトリオ",
+                "category": "もぐらポケモン",
+                "entry": "\\x{ff13}つの\\x{3000}あたまが\\x{3000}たがいちがいに\nうごいて\\x{3000}どんなに\\x{3000}かたい\\x{3000}ちそうも\nちか\\x{ff11}\\x{ff10}\\x{ff10}キロまで\\x{3000}ほりすすむ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff13}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 80,
+        "defense": 50,
+        "speed": 120,
+        "special_attack": 50,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_GROUND", "TYPE_GROUND" ],
+    "catch_rate": 50,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": true,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_SOFT_SAND",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_SAND_VEIL", "ABILITY_ARENA_TRAP" ],
+    "hidden_ability": "ABILITY_SAND_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 7,
+    "weight": 333,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_NIGHT_SLASH" ],
+            [ 1, "MOVE_TRI_ATTACK" ],
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 4, "MOVE_GROWL" ],
+            [ 7, "MOVE_ASTONISH" ],
+            [ 12, "MOVE_MUD_SLAP" ],
+            [ 15, "MOVE_MAGNITUDE" ],
+            [ 18, "MOVE_BULLDOZE" ],
+            [ 23, "MOVE_SUCKER_PUNCH" ],
+            [ 26, "MOVE_SAND_TOMB" ],
+            [ 28, "MOVE_MUD_BOMB" ],
+            [ 33, "MOVE_EARTH_POWER" ],
+            [ 40, "MOVE_DIG" ],
+            [ 45, "MOVE_SLASH" ],
+            [ 50, "MOVE_EARTHQUAKE" ],
+            [ 57, "MOVE_FISSURE" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM37",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM65",
+            "TM68",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [ "MOVE_UPROAR", "MOVE_EARTH_POWER", "MOVE_SNORE", "MOVE_STEALTH_ROCK", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_DIGLETT"
+}

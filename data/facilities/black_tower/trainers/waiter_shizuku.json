@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Shizuku",
+    "class": "TRAINER_CLASS_WAITER",
+    "pokemon": [
+        "hitmonchan_1",
+        "hitmontop_1",
+        "mr_mime_1",
+        "grumpig_1",
+        "dewgong_1",
+        "jellicent_1",
+        "hypno_1",
+        "cryogonal_1",
+        "slowking_1",
+        "altaria_1"
+    ]
+}

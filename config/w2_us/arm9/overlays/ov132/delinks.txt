@@ -2,3 +2,8 @@
     .rodata     start:0x021ef204 end:0x021ef338 kind:rodata align:4
     .ctor       start:0x021ef338 end:0x021ef338 kind:rodata align:4
     .bss        start:0x021ef340 end:0x021ef340 kind:bss align:32
+
+src/ov132/gimmick_dragonspiral_tower_9.c:
+    complete
+    .text       start:0x021eecc0 end:0x021ef204
+    .rodata     start:0x021ef204 end:0x021ef338

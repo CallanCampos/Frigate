@@ -6,6 +6,7 @@
 #include "app/pmsiv_menu.h"
 #include "app/pmsiv_wordwin.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -33,7 +34,7 @@
 #define PMSIV_COMMAND_MAX 4
 
 // The message file of the phrase input's texts
-#define PMSIV_MSG_FILE 159
+#define PMSIV_MSG_FILE TEXT_BANK_PMS_INPUT
 
 struct PMSInputView {
     TCB *mainTask;

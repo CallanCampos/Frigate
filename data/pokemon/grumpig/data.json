@@ -1,0 +1,192 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Grumpig",
+    "pokedex": {
+        "category": "Manipulate Pokémon",
+        "entry": "It uses black pearls to amplify its\npsychic power. It does a strange\ndance to control foes' minds.",
+        "height": "2'11\"",
+        "weight": "157.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Grumpig",
+                "category": "Manipulate Pokémon",
+                "entry": "It uses black pearls to amplify its\npsycho-power. It does an odd\ndance to gain control over foes.",
+                "height": "2'11\"",
+                "weight": "157.6 lbs."
+            },
+            "fr": {
+                "name": "Groret",
+                "category": "Pokémon Magouilleur",
+                "entry": "Les perles noires amplifient ses\npouvoirs psy. Sa danse étrange lui\npermet de contrôler ses ennemis.",
+                "height": "0,9 m",
+                "weight": "71,5 kg"
+            },
+            "de": {
+                "name": "Groink",
+                "category": "Manipulator",
+                "entry": "Mit schwarzen Perlen verstärkt es\nseine Psycho-Kräfte. Mit einem\nTanz kontrolliert es seine Gegner.",
+                "height": "0,9 m",
+                "weight": "71,5 kg"
+            },
+            "it": {
+                "name": "Grumpig",
+                "category": "Pokémon Raggiro",
+                "entry": "Usa perle nere per amplificare i suoi\npoteri psichici. Con una danza acquisisce\ncontrollo sul nemico.",
+                "height": "0,9 m",
+                "weight": "71,5 kg"
+            },
+            "ko": {
+                "name": "피그킹",
+                "category": "조작포켓몬",
+                "entry": "흑진주로 사이코 파워를\n증폭시킨다. 이상한 스텝으로\n상대의 마음을 조종한다.",
+                "height": "0.9 m",
+                "weight": "71.5 kg"
+            },
+            "es": {
+                "name": "Grumpig",
+                "category": "Pokémon Manipulador",
+                "entry": "Usa perlas negras para potenciar\nsus poderes psíquicos. Con su\nraro baile controla a los rivales.",
+                "height": "0,9 m",
+                "weight": "71,5 kg"
+            },
+            "ja": {
+                "name": "ブーピッグ",
+                "category": "あやつりポケモン",
+                "entry": "くろしんじゅで\\x{3000}サイコパワーを\nぞうふくさせる。ふしぎな\\x{3000}ステップで\nあいての\\x{3000}こころを\\x{3000}あやつる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 45,
+        "defense": 65,
+        "speed": 80,
+        "special_attack": 90,
+        "special_defense": 110
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_PERSIM_BERRY",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_THICK_FAT", "ABILITY_OWN_TEMPO" ],
+    "hidden_ability": "ABILITY_GLUTTONY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 165,
+    "height": 9,
+    "weight": 715,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SPLASH" ],
+            [ 1, "MOVE_PSYWAVE" ],
+            [ 1, "MOVE_ODOR_SLEUTH" ],
+            [ 1, "MOVE_PSYBEAM" ],
+            [ 7, "MOVE_PSYWAVE" ],
+            [ 10, "MOVE_ODOR_SLEUTH" ],
+            [ 14, "MOVE_PSYBEAM" ],
+            [ 15, "MOVE_PSYCH_UP" ],
+            [ 18, "MOVE_CONFUSE_RAY" ],
+            [ 21, "MOVE_MAGIC_COAT" ],
+            [ 26, "MOVE_ZEN_HEADBUTT" ],
+            [ 29, "MOVE_REST" ],
+            [ 29, "MOVE_SNORE" ],
+            [ 35, "MOVE_POWER_GEM" ],
+            [ 42, "MOVE_PSYSHOCK" ],
+            [ 46, "MOVE_PAYBACK" ],
+            [ 52, "MOVE_PSYCHIC" ],
+            [ 60, "MOVE_BOUNCE" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM53",
+            "TM56",
+            "TM57",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM78",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_HEAL_BELL",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_TRICK",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 207,
+    "baby_species": "SPECIES_SPOINK"
+}

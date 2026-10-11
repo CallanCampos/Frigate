@@ -1,4 +1,0 @@
-Oh, Trainer!\nWant to ride this mining cart?
-Oh!\nLet's go by mining cart!{be01}
-Oh! Anytime you'd like to ride it,\ntalk to me!
-\pad{b4}

@@ -1,0 +1,129 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Excadrill",
+    "pokedex": {
+        "category": "Subterrene Pokémon",
+        "entry": "Forming a drill with its steel claws\nand head, it can bore through a steel\nplate, no matter how thick it is.",
+        "height": "2'04\"",
+        "weight": "89.1 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ちていポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 110,
+        "attack": 135,
+        "defense": 60,
+        "speed": 88,
+        "special_attack": 50,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_GROUND", "TYPE_STEEL" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_SAND_RUSH", "ABILITY_SAND_FORCE" ],
+    "hidden_ability": "ABILITY_MOLD_BREAKER",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 178,
+    "height": 7,
+    "weight": 404,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_MUD_SPORT" ],
+            [ 1, "MOVE_RAPID_SPIN" ],
+            [ 1, "MOVE_MUD_SLAP" ],
+            [ 5, "MOVE_RAPID_SPIN" ],
+            [ 8, "MOVE_MUD_SLAP" ],
+            [ 12, "MOVE_FURY_SWIPES" ],
+            [ 15, "MOVE_METAL_CLAW" ],
+            [ 19, "MOVE_DIG" ],
+            [ 22, "MOVE_HONE_CLAWS" ],
+            [ 26, "MOVE_SLASH" ],
+            [ 29, "MOVE_ROCK_SLIDE" ],
+            [ 31, "MOVE_HORN_DRILL" ],
+            [ 36, "MOVE_EARTHQUAKE" ],
+            [ 42, "MOVE_SWORDS_DANCE" ],
+            [ 49, "MOVE_SANDSTORM" ],
+            [ 55, "MOVE_DRILL_RUN" ],
+            [ 62, "MOVE_FISSURE" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM36",
+            "TM37",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM65",
+            "TM68",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM81",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_DRILL_RUN",
+            "MOVE_EARTH_POWER",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 77,
+    "baby_species": "SPECIES_DRILBUR"
+}

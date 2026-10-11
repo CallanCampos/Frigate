@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Horton",
+    "class": "TRAINER_CLASS_ARTIST",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SIGILYPH",
+            "form": 0,
+            "level": 25,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Art is explosions! Life forces\ncolliding together!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh, I just got whitewashed!"
+        },
+        {
+            "type": 2,
+            "text": "Boom!{be01}\nColors collide to form new colors!"
+        }
+    ]
+}

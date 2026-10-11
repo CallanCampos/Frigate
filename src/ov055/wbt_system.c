@@ -1,5 +1,5 @@
 #include "types.h"
-#include "field/ov135.h"
+#include "field/wbt_makematch.h"
 #include "field/wbt.h"
 #include "gfl/heap.h"
 #include "gfl/random.h"
@@ -146,7 +146,7 @@ WbtEntrant *func_ov055_021e5d28(WbtSystem *sys) {
 
 void func_ov055_021e5d44(WbtSystem *sys, u32 tournament, StrBuf *strbuf) {
     if (tournament == 3) {
-        GFL_StrBufLoadFixedString(strbuf, sys->downloadedName, NELEMS(sys->downloadedName));
+        GFL_StrBufLoadFixedString(strbuf, sys->download.name, NELEMS(sys->download.name));
     } else {
         LoadPWTTournamentTypeText(sys->heapId, tournament, strbuf);
     }
@@ -229,7 +229,7 @@ void func_ov055_021e5e54(WbtSystem *sys, GameData *gameData) {
     u8 slot;
 
     PokeParty_Init(party);
-    src = func_ov135_021efb04(sys, gameData);
+    src = WbtMakeMatch_GetParty(sys, gameData);
     heapId = HEAPID_TAIL(sys->heapId);
     copy = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), FALSE, "wbt_system.c", 468);
     n = 0;
@@ -284,7 +284,7 @@ u8 func_ov055_021e5f38(WbtSystem *sys) {
 
 Regulation *func_ov055_021e5f78(WbtSystem *sys) {
     if (sys->tournament == 3) {
-        WbtDownloadedTournament *downloaded = &sys->downloaded;
+        WbtDownloadedTournament *downloaded = &sys->download.tournament;
         int i;
 
         sys_memset(&sys->regulation, 0, sizeof(sys->regulation));
@@ -328,8 +328,8 @@ WbtUnk18A *func_ov055_021e6024(WbtSystem *sys) {
     case 3:
         break;
     case 4:
-        type = sys->downloaded.unkA9;
-        value = sys->downloaded.unkAA;
+        type = sys->download.tournament.unkA9;
+        value = sys->download.tournament.unkAA;
         break;
     }
     sys->unk18A.type = type;

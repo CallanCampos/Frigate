@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LAPRAS",
+    "moves": [ "MOVE_SURF", "MOVE_ICE_BEAM", "MOVE_REST", "MOVE_SLEEP_TALK" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_MYSTIC_WATER",
+    "form": 0
+}

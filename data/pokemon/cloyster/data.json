@@ -1,0 +1,148 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Cloyster",
+    "pokedex": {
+        "category": "Bivalve Pokémon",
+        "entry": "It fights by keeping its shell\ntightly shut for protection and\nby shooting spikes to repel foes.",
+        "height": "4'11\"",
+        "weight": "292.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Cloyster",
+                "category": "Bivalve Pokémon",
+                "entry": "It fights by keeping its shell\ntightly shut for protection and\nby shooting spikes to repel foes.",
+                "height": "4'11\"",
+                "weight": "292.1 lbs."
+            },
+            "fr": {
+                "name": "Crustabri",
+                "category": "Pokémon Bivalve",
+                "entry": "Il se défend en fermant sa coquille\net projette des piquants qui\nrepoussent ses agresseurs.",
+                "height": "1,5 m",
+                "weight": "132,5 kg"
+            },
+            "de": {
+                "name": "Austos",
+                "category": "Muschel",
+                "entry": "Im Kampf schließt es seine Schale,\num sich zu schützen. Es schießt mit\nStacheln auf seine Gegner.",
+                "height": "1,5 m",
+                "weight": "132,5 kg"
+            },
+            "it": {
+                "name": "Cloyster",
+                "category": "Pokémon Bivalve",
+                "entry": "Quando lotta si protegge tenendo\nla conchiglia chiusa e spara punte\nper respingere i nemici.",
+                "height": "1,5 m",
+                "weight": "132,5 kg"
+            },
+            "ko": {
+                "name": "파르셀",
+                "category": "두조개포켓몬",
+                "entry": "껍질을 잘 닫아 몸을\n보호하면서 가시를 날려\n상대를 물리치는 전법을 쓴다.",
+                "height": "1.5 m",
+                "weight": "132.5 kg"
+            },
+            "es": {
+                "name": "Cloyster",
+                "category": "Pokémon Bivalvo",
+                "entry": "En la lucha se protege cerrando\nsu concha y lanzando pinchos\na sus oponentes.",
+                "height": "1,5 m",
+                "weight": "132,5 kg"
+            },
+            "ja": {
+                "name": "パルシェン",
+                "category": "\\x{ff12}まいがいポケモン",
+                "entry": "カラを\\x{3000}しっかりと\\x{3000}とじて\\x{3000}みを\nまもりながら\\x{3000}トゲを\\x{3000}とばして\nてきを\\x{3000}げきたいする\\x{3000}せんぽう。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff13}\\x{ff12}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 95,
+        "defense": 180,
+        "speed": 70,
+        "special_attack": 85,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_WATER", "TYPE_ICE" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_PEARL",
+        "rare": "ITEM_BIG_PEARL",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_3", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_SHELL_ARMOR", "ABILITY_SKILL_LINK" ],
+    "hidden_ability": "ABILITY_OVERCOAT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 184,
+    "height": 15,
+    "weight": 1325,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TOXIC_SPIKES" ],
+            [ 1, "MOVE_WITHDRAW" ],
+            [ 1, "MOVE_SUPERSONIC" ],
+            [ 1, "MOVE_PROTECT" ],
+            [ 1, "MOVE_AURORA_BEAM" ],
+            [ 13, "MOVE_SPIKE_CANNON" ],
+            [ 28, "MOVE_SPIKES" ],
+            [ 52, "MOVE_ICICLE_CRASH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM66",
+            "TM68",
+            "TM79",
+            "TM84",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM06"
+        ],
+        "by_tutor": [ "MOVE_SIGNAL_BEAM", "MOVE_IRON_DEFENSE", "MOVE_ICY_WIND", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SHELLDER"
+}

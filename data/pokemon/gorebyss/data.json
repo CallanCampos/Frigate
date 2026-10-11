@@ -1,0 +1,161 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Gorebyss",
+    "pokedex": {
+        "category": "South Sea Pokémon",
+        "entry": "It lives at the bottom of the sea.\nIn the springtime, its pink body\nturns more vivid for some reason.",
+        "height": "5'11\"",
+        "weight": "49.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Gorebyss",
+                "category": "South Sea Pokémon",
+                "entry": "It lives at the bottom of the sea.\nIn the springtime, its pink body\nturns more vivid for some reason.",
+                "height": "5'11\"",
+                "weight": "49.8 lbs."
+            },
+            "fr": {
+                "name": "Rosabyss",
+                "category": "Pokémon Mer du Sud",
+                "entry": "Au printemps, son corps rose se\nfait plus vif sans que l'on sache\npourquoi. Il vit au fond de la mer.",
+                "height": "1,8 m",
+                "weight": "22,6 kg"
+            },
+            "de": {
+                "name": "Saganabyss",
+                "category": "Südsee",
+                "entry": "Es lebt auf dem Grund des Meeres.\nIm Frühling wirkt die Farbe seines\nKörpers viel kräftiger.",
+                "height": "1,8 m",
+                "weight": "22,6 kg"
+            },
+            "it": {
+                "name": "Gorebyss",
+                "category": "Pokémon Sudmarino",
+                "entry": "Vive sui fondali marini. In primavera\nil suo corpo rosato diventa più vivido\nper chissà quale motivo.",
+                "height": "1,8 m",
+                "weight": "22,6 kg"
+            },
+            "ko": {
+                "name": "분홍장이",
+                "category": "남해포켓몬",
+                "entry": "바다의 밑바닥에 살고 있지만\n봄이 되면 몸의 분홍색이\n웬일인지 선명하게 물든다.",
+                "height": "1.8 m",
+                "weight": "22.6 kg"
+            },
+            "es": {
+                "name": "Gorebyss",
+                "category": "Pokémon Mar Del Sur",
+                "entry": "Vive en el fondo del mar. En\nprimavera, su cuerpo rosado\nadquiere colores más vivos.",
+                "height": "1,8 m",
+                "weight": "22,6 kg"
+            },
+            "ja": {
+                "name": "サクラビス",
+                "category": "なんかいポケモン",
+                "entry": "うみの\\x{3000}そこで\\x{3000}くらしているが\nはるになると\\x{3000}からだの\\x{3000}ピンクいろが\nなぜか\\x{3000}あざやかに\\x{3000}いろづく。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff12}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 84,
+        "defense": 105,
+        "speed": 52,
+        "special_attack": 114,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_DEEP_SEA_SCALE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_1" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_HYDRATION",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PINK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 170,
+    "height": 18,
+    "weight": 226,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_WHIRLPOOL" ],
+            [ 6, "MOVE_CONFUSION" ],
+            [ 10, "MOVE_AGILITY" ],
+            [ 15, "MOVE_WATER_PULSE" ],
+            [ 19, "MOVE_AMNESIA" ],
+            [ 24, "MOVE_AQUA_RING" ],
+            [ 28, "MOVE_CAPTIVATE" ],
+            [ 33, "MOVE_BATON_PASS" ],
+            [ 37, "MOVE_DIVE" ],
+            [ 42, "MOVE_PSYCHIC" ],
+            [ 46, "MOVE_AQUA_TAIL" ],
+            [ 51, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM68",
+            "TM77",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CLAMPERL"
+}

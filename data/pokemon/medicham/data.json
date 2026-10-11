@@ -1,0 +1,193 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Medicham",
+    "pokedex": {
+        "category": "Meditate Pokémon",
+        "entry": "It gains the ability to see the aura\nof its opponents by honing its mind\nthrough starvation.",
+        "height": "4'03\"",
+        "weight": "69.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Medicham",
+                "category": "Meditate Pokémon",
+                "entry": "It gains the ability to see the aura\nof its opponents by honing its mind\nthrough starvation.",
+                "height": "4'03\"",
+                "weight": "69.4 lbs."
+            },
+            "fr": {
+                "name": "Charmina",
+                "category": "Pokémon Méditation",
+                "entry": "Le jeûne lui permet de concentrer\nson esprit au point de déceler\nl'aura de ses adversaires.",
+                "height": "1,3 m",
+                "weight": "31,5 kg"
+            },
+            "de": {
+                "name": "Meditalis",
+                "category": "Meditation",
+                "entry": "Es kann die Aura seines Gegners\nerkennen, indem es durch Hungern\nseinen Geist schärft.",
+                "height": "1,3 m",
+                "weight": "31,5 kg"
+            },
+            "it": {
+                "name": "Medicham",
+                "category": "Pokémon Meditazione",
+                "entry": "Riesce a percepire l'aura dei nemici\nallenando la sua mente tramite il digiuno.",
+                "height": "1,3 m",
+                "weight": "31,5 kg"
+            },
+            "ko": {
+                "name": "요가램",
+                "category": "명상포켓몬",
+                "entry": "아무것도 먹지 않고 한결같이\n정신을 맑게 닦으면\n상대의 오라가 보이게 된다.",
+                "height": "1.3 m",
+                "weight": "31.5 kg"
+            },
+            "es": {
+                "name": "Medicham",
+                "category": "Pokémon Meditador",
+                "entry": "Cuando ayuna, adquiere la habilidad\nde ver el aura de sus adversarios.",
+                "height": "1,3 m",
+                "weight": "31,5 kg"
+            },
+            "ja": {
+                "name": "チャーレム",
+                "category": "めいそうポケモン",
+                "entry": "なにも\\x{3000}たべずに\\x{3000}ただひたすらに\nせいしんを\\x{3000}とぎすませると\nあいてのオーラが\\x{3000}みえるようになる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 60,
+        "defense": 75,
+        "speed": 80,
+        "special_attack": 60,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_FIGHTING", "TYPE_PSYCHIC" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_PURE_POWER", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_TELEPATHY",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 144,
+    "height": 13,
+    "weight": 315,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_FIRE_PUNCH" ],
+            [ 1, "MOVE_THUNDER_PUNCH" ],
+            [ 1, "MOVE_ICE_PUNCH" ],
+            [ 1, "MOVE_BIDE" ],
+            [ 1, "MOVE_MEDITATE" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 1, "MOVE_DETECT" ],
+            [ 4, "MOVE_MEDITATE" ],
+            [ 8, "MOVE_CONFUSION" ],
+            [ 11, "MOVE_DETECT" ],
+            [ 15, "MOVE_HIDDEN_POWER" ],
+            [ 18, "MOVE_MIND_READER" ],
+            [ 22, "MOVE_FEINT" ],
+            [ 25, "MOVE_CALM_MIND" ],
+            [ 29, "MOVE_FORCE_PALM" ],
+            [ 32, "MOVE_HI_JUMP_KICK" ],
+            [ 36, "MOVE_PSYCH_UP" ],
+            [ 42, "MOVE_ACUPRESSURE" ],
+            [ 49, "MOVE_POWER_TRICK" ],
+            [ 55, "MOVE_REVERSAL" ],
+            [ 62, "MOVE_RECOVER" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM53",
+            "TM56",
+            "TM67",
+            "TM68",
+            "TM70",
+            "TM77",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MEDITITE"
+}

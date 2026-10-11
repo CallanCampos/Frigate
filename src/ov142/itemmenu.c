@@ -1,10 +1,12 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "app/itemmenu.h"
 #include "app/bag.h"
 #include "app/bag_item.h"
 #include "app/itemmenu_disp.h"
 #include "constants/items.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/player_action.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
@@ -42,6 +44,7 @@
 #include "system/printsys.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
+#include "text/system/btl_main.h"
 
 // The bag (itemmenu.c): its proc, the item list and its menus
 
@@ -609,14 +612,14 @@ static void ItemMenu_StateUseRepel(ItemMenuWork *work) {
             EncountSave_SetRepelSteps(encount, steps);
             func_0200ddf0(encount, work->item);
             ItemMenu_SubItem(work, 1);
-            GFL_MsgDataLoadStrbuf(work->msgData, 63, work->strbuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_Used, work->strbuf);
             copyVarForText(work->wordSet, 0, work->playerInfo);
             ItemMenu_SetItemName(work, 1, work->item);
             GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
             ItemMenuDisp_ShowMessage(work, TRUE);
             GFL_SndSEPlay(SEQ_SE_SYS_92);
         } else {
-            GFL_MsgDataLoadStrbuf(work->msgData, 64, work->strbuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SinceRepelsEffectsStill, work->strbuf);
             GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
             ItemMenuDisp_ShowMessage(work, TRUE);
         }
@@ -640,7 +643,7 @@ static void ItemMenu_StateWaitMessage(ItemMenuWork *work) {
 
 static void ItemMenu_StateUseLightStone(ItemMenuWork *work) {
     if (work->item == ITEM_LIGHT_STONE || work->item == ITEM_DARK_STONE) {
-        GFL_MsgDataLoadStrbuf(work->msgData, 56, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_JunipersWordsEchoedTheres, work->strbuf);
         copyVarForText(work->wordSet, 0, work->playerInfo);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         ItemMenuDisp_ShowMessage(work, TRUE);
@@ -819,7 +822,7 @@ static void ItemMenu_StateItemMenu(ItemMenuWork *work) {
                 work->result = 11;
                 ItemMenu_SetState(work, NULL);
             } else {
-                GFL_MsgDataLoadStrbuf(work->msgData, 57, work->strbuf);
+                GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_CantDismountBikeHere, work->strbuf);
                 copyVarForText(work->wordSet, 0, work->playerInfo);
                 GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
                 ItemMenu_SetState(work, ItemMenu_StateShowMessage);
@@ -900,7 +903,7 @@ static void ItemMenu_StateSelectItem(ItemMenuWork *work) {
             ItemMenu_SetState(work, NULL);
             return;
         }
-        GFL_MsgDataLoadStrbuf(work->msgData, 47, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_CantHeld, work->strbuf);
         ItemMenu_SetItemName(work, 0, work->item);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         ItemMenuDisp_ShowMessageNow(work);
@@ -1093,7 +1096,7 @@ static void ItemMenu_StateTMAskBootUp(ItemMenuWork *work) {
 static void ItemMenu_StateTMShowMove(ItemMenuWork *work) {
     if (GFL_SndPlayerIsActiveAny() != TRUE
         && ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
-        GFL_MsgDataLoadStrbuf(work->msgData, 62, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_ContainedTeachPokemon, work->strbuf);
         loadMoveNameToStrbuf(work->wordSet, 0, PML_ItemGetTMWazaID(work->item));
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         ItemMenuDisp_ShowMessage(work, TRUE);
@@ -1111,9 +1114,9 @@ static void ItemMenu_StateTMBootUpSound(ItemMenuWork *work) {
 // Boots up a TM or HM
 static void ItemMenu_StateUseTM(ItemMenuWork *work) {
     if (PML_ItemGetHMID(work->item) == 0xff) {
-        GFL_MsgDataLoadStrbuf(work->msgData, 60, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_BootedUpTm, work->expandBuf);
     } else {
-        GFL_MsgDataLoadStrbuf(work->msgData, 61, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_BootedUpHm, work->expandBuf);
     }
     ItemMenuDisp_ShowMessage(work, TRUE);
     ItemMenu_SetState(work, ItemMenu_StateTMBootUpSound);
@@ -1150,7 +1153,7 @@ static void ItemMenu_StateTossConfirm(ItemMenuWork *work) {
         if (pos == 0) {
             GFL_SndSEPlay(SEQ_SE_SYS_08);
             ItemMenu_SubItem(work, work->quantity);
-            GFL_MsgDataLoadStrbuf(work->msgData, 54, work->strbuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_ThrewAway, work->strbuf);
             ItemMenu_SetItemText(work, 0, work->item, work->quantity > 1, FALSE);
             WordSetNumber(work->wordSet, 1, work->quantity, 3, 0, TRUE);
             GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
@@ -1176,7 +1179,7 @@ static void ItemMenu_StateTossAsk(ItemMenuWork *work) {
 static void ItemMenu_StateToss(ItemMenuWork *work) {
     work->quantity = 1;
     ItemMenu_ShowQuantity(work, 1);
-    GFL_MsgDataLoadStrbuf(work->msgData, 53, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_ThrowAwayHowMany, work->strbuf);
     ItemMenu_SetItemText(work, 0, work->item, TRUE, FALSE);
     GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
     ItemMenuDisp_ShowMessageNow(work);
@@ -1201,7 +1204,7 @@ static void ItemMenu_StateTossQuantity(ItemMenuWork *work) {
         if (result == 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             ItemMenu_HideQuantity(work);
-            GFL_MsgDataLoadStrbuf(work->msgData, 55, work->strbuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_OkThrowAway, work->strbuf);
             ItemMenu_SetItemText(work, 0, work->item, work->quantity > 1, FALSE);
             WordSetNumber(work->wordSet, 1, work->quantity, 3, 0, TRUE);
             GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
@@ -1224,7 +1227,7 @@ static void ItemMenu_StateSell(ItemMenuWork *work) {
     important = GetItemParam(work->item, ITEM_PARAM_IMPORTANT, work->heapId);
     if (price == 0 || important != 0) {
         ItemMenuDisp_SetButtonsActive(work, FALSE);
-        GFL_MsgDataLoadStrbuf(work->msgData, 77, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_OhNoCantBuy, work->strbuf);
         ItemMenu_SetItemName(work, 0, work->item);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         ItemMenuDisp_ShowMessageNow(work);
@@ -1240,7 +1243,7 @@ static void ItemMenu_StateSell(ItemMenuWork *work) {
         return;
     }
     ItemMenu_ShowQuantity(work, 2);
-    GFL_MsgDataLoadStrbuf(work->msgData, 78, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_HowManyWillSell, work->strbuf);
     ItemMenu_SetItemName(work, 0, work->item);
     GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
     ItemMenuDisp_ShowMessageNow(work);
@@ -1279,7 +1282,7 @@ static void ItemMenu_StateSellAsk(ItemMenuWork *work) {
 
     ItemMenuDisp_OpenYesNoMenu(work);
     price = ItemMenu_GetSellPrice(work->item, work->quantity, work->heapId);
-    GFL_MsgDataLoadStrbuf(work->msgData, 79, work->strbuf);
+    GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_CanPayWouldOk, work->strbuf);
     WordSetNumber(work->wordSet, 0, price, 7, 0, TRUE);
     GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
     ItemMenuDisp_ShowMessageNow(work);
@@ -1301,7 +1304,7 @@ static void ItemMenu_StateSellConfirm(ItemMenuWork *work) {
             addCashToTotal(getTrainerCardDataBlkAddress(work->gameData), price);
             GFL_SndSEPlay(SEQ_SE_SYS_22);
             ItemMenuDisp_DrawMoney(work);
-            GFL_MsgDataLoadStrbuf(work->msgData, 80, work->strbuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_TurnedOverReceived, work->strbuf);
             ItemMenu_SetItemText(work, 0, work->item, work->quantity > 1, FALSE);
             WordSetNumber(work->wordSet, 1, price, 7, 0, TRUE);
             GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
@@ -1496,12 +1499,12 @@ static void ItemMenu_StateMoveFreeSpace(ItemMenuWork *work) {
     BOOL plural = ItemMenu_GetSlot(work, ItemMenu_GetCursorIndex(work))->count == 1 ? FALSE : TRUE;
 
     if (inFreeSpace == FALSE) {
-        GFL_MsgDataLoadStrbuf(work->msgData, 149, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_Moved, work->strbuf);
         ItemMenu_SetItemText(work, 1, work->item, plural, FALSE);
         ItemMenu_SetPocketName(work, 0, BAG_POCKET_FREE_SPACE);
         BagItemList_Add(&work->itemList, work->item, pocket);
     } else {
-        GFL_MsgDataLoadStrbuf(work->msgData, 150, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_Returned, work->strbuf);
         ItemMenu_SetItemText(work, 1, work->item, plural, FALSE);
         ItemMenu_SetPocketName(work, 0, pocket);
         BagItemList_Remove(&work->itemList, ItemMenu_GetCursorIndex(work), TRUE);
@@ -2185,7 +2188,7 @@ static BOOL ItemMenuProc_Init(GameProc *proc, u32 *state, void *param, void *dat
         }
         func_02008894(work->cursor, pocket, row, scroll);
     }
-    work->msgData = GFL_MsgSysLoadData(FALSE, 2, 6, work->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN, work->heapId);
     work->strbuf = GFL_StrBufCreate(200, work->heapId);
     work->expandBuf = GFL_StrBufCreate(200, work->heapId);
     work->tempBuf = GFL_StrBufCreate(64, work->heapId);
@@ -2457,7 +2460,7 @@ static void ItemMenu_StateOpenSortMenu(ItemMenuWork *work) {
     if (func_0204c560(work->sortButton) == FALSE) {
         func_0204c488(work->sortButton, 0);
         func_0204c520(work->scrollBar, FALSE);
-        GFL_MsgDataLoadStrbuf(work->msgData, 151, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_HowWantSortItems, work->expandBuf);
         ItemMenuDisp_ShowMessage(work, FALSE);
         ItemMenuDisp_SetButtonsActive(work, FALSE);
         ItemMenu_OpenSortMenu(work);
@@ -2563,22 +2566,22 @@ static void ItemMenu_StateSortMenu(ItemMenuWork *work) {
 static void ItemMenu_StateSortDone(ItemMenuWork *work) {
     switch (work->sortType) {
     case 0:
-        GFL_MsgDataLoadStrbuf(work->msgData, 140, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SortedItemsByType, work->expandBuf);
         break;
     case 1:
-        GFL_MsgDataLoadStrbuf(work->msgData, 158, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SortedItemsByNumber, work->expandBuf);
         break;
     case 2:
-        GFL_MsgDataLoadStrbuf(work->msgData, 141, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SortedItemsByName, work->expandBuf);
         break;
     case 3:
-        GFL_MsgDataLoadStrbuf(work->msgData, 142, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SortedItemsFromMost, work->expandBuf);
         break;
     case 4:
-        GFL_MsgDataLoadStrbuf(work->msgData, 143, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SortedItemsFromFewest, work->expandBuf);
         break;
     default:
-        GFL_MsgDataLoadStrbuf(work->msgData, 151, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_HowWantSortItems, work->expandBuf);
         break;
     }
     ItemMenuDisp_ShowMessage(work, FALSE);
@@ -2589,42 +2592,42 @@ static void ItemMenu_StateSortDone(ItemMenuWork *work) {
 static void ItemMenu_StateFilterDone(ItemMenuWork *work) {
     switch (work->freeSpaceFilter) {
     case BAG_ITEM_FILTER_ALL:
-        GFL_MsgDataLoadStrbuf(work->msgData, 157, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_NumberItemTypesFound_2, work->strbuf);
         WordSetNumber(work->wordSet, 1, ItemMenu_GetItemCount(work), 3, 0, TRUE);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         break;
     case BAG_ITEM_FILTER_ITEMS:
-        GFL_MsgDataLoadStrbuf(work->msgData, 148, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_NumberItemTypesFound, work->strbuf);
         WordSetNumber(work->wordSet, 1, ItemMenu_GetItemCount(work), 3, 0, TRUE);
         ItemMenu_SetPocketName(work, 0, BAG_POCKET_ITEMS);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         break;
     case BAG_ITEM_FILTER_MEDICINE:
-        GFL_MsgDataLoadStrbuf(work->msgData, 148, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_NumberItemTypesFound, work->strbuf);
         WordSetNumber(work->wordSet, 1, ItemMenu_GetItemCount(work), 3, 0, TRUE);
         ItemMenu_SetPocketName(work, 0, BAG_POCKET_MEDICINE);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         break;
     case BAG_ITEM_FILTER_TMS_HMS:
-        GFL_MsgDataLoadStrbuf(work->msgData, 148, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_NumberItemTypesFound, work->strbuf);
         WordSetNumber(work->wordSet, 1, ItemMenu_GetItemCount(work), 3, 0, TRUE);
         ItemMenu_SetPocketName(work, 0, BAG_POCKET_TMS_HMS);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         break;
     case BAG_ITEM_FILTER_BERRIES:
-        GFL_MsgDataLoadStrbuf(work->msgData, 148, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_NumberItemTypesFound, work->strbuf);
         WordSetNumber(work->wordSet, 1, ItemMenu_GetItemCount(work), 3, 0, TRUE);
         ItemMenu_SetPocketName(work, 0, BAG_POCKET_BERRIES);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         break;
     case BAG_ITEM_FILTER_KEY_ITEMS:
-        GFL_MsgDataLoadStrbuf(work->msgData, 148, work->strbuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_NumberItemTypesFound, work->strbuf);
         WordSetNumber(work->wordSet, 1, ItemMenu_GetItemCount(work), 3, 0, TRUE);
         ItemMenu_SetPocketName(work, 0, BAG_POCKET_KEY_ITEMS);
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
         break;
     default:
-        GFL_MsgDataLoadStrbuf(work->msgData, 151, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_HowWantSortItems, work->expandBuf);
         break;
     }
     ItemMenuDisp_ShowMessage(work, FALSE);
@@ -2636,7 +2639,7 @@ static void ItemMenu_StateOpenFilterMenu(ItemMenuWork *work) {
     if (func_0204c560(work->filterButton) == FALSE) {
         func_0204c488(work->filterButton, 2);
         func_0204c520(work->scrollBar, FALSE);
-        GFL_MsgDataLoadStrbuf(work->msgData, 147, work->expandBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_SelectTypeItemWant, work->expandBuf);
         ItemMenuDisp_ShowMessage(work, FALSE);
         ItemMenuDisp_SetButtonsActive(work, FALSE);
         ItemMenu_OpenFilterMenu(work);

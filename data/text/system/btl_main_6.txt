@@ -1,0 +1,17 @@
+BtlMain6_Text_FeelingCheckResultsShow = The Feeling Check results for\nyou and {0100:0} show that...
+BtlMain6_Text_Results = RESULTS
+BtlMain6_Text_TouchingScreenIncorrectlyPlease = You are touching the screen incorrectly.\nPlease play according to the guide.
+BtlMain6_Text_FeelingsRankCloseEnough = Your feelings are at Rank I!\nClose enough to say a friendly hello.
+BtlMain6_Text_FeelingsRankHHave = Your feelings are at Rank H!\nYou have an interest in each other.
+BtlMain6_Text_FeelingsRankGClose = Your feelings are at Rank G!\nClose enough to go for a walk together.
+BtlMain6_Text_FeelingsRankFProbably = Your feelings are at Rank F!\nYou probably have nicknames for each other.
+BtlMain6_Text_FeelingsRankEClose = Your feelings are at Rank E!\nYou are as close as best friends.
+BtlMain6_Text_FeelingsRankDClose = Your feelings are at Rank D!\nClose enough to make good-night calls.
+BtlMain6_Text_FeelingsRankCClose = Your feelings are at Rank C!\nClose enough for traveling together.
+BtlMain6_Text_FeelingsRankBEverybodys = Your feelings are at Rank B!\nEverybody's quite envious of you two.
+BtlMain6_Text_FeelingsRankEmotionallyUnited = Your feelings are at Rank A!\nYou are emotionally united.
+BtlMain6_Text_FeelingsRankSUndoubtedly = Your feelings are at Rank S!\nUndoubtedly a fated pair!
+BtlMain6_Text_PutMedicineCase = {0100:0} put the {0200:2} {0109:1}\nin the {ff00:2}Medicine{ff00:0} Case.
+BtlMain6_Text_PutMedicineCase_2 = {0100:0} put the {0200:2} {0109:1}\nin the {ff00:2}Medicine{ff00:0} Case.
+BtlMain6_Text_TooBadBagFull = Too bad!\nThe Bag is full...
+\pad{86}

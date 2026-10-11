@@ -1,0 +1,59 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 30,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [
+            [ "SPECIES_RATTATA", 14, 14 ],
+            [ "SPECIES_ZUBAT", 14, 14 ],
+            [ "SPECIES_RATTATA", 15, 15 ],
+            [ "SPECIES_ZUBAT", 15, 15 ],
+            [ "SPECIES_RATTATA", 16, 16 ],
+            [ "SPECIES_ZUBAT", 16, 16 ],
+            [ "SPECIES_GRIMER", 15, 15 ],
+            [ "SPECIES_GRIMER", 17, 17 ],
+            [ "SPECIES_RATTATA", 17, 17 ],
+            [ "SPECIES_ZUBAT", 17, 17 ],
+            [ "SPECIES_RATTATA", 17, 17 ],
+            [ "SPECIES_ZUBAT", 17, 17 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [
+            [ "SPECIES_GRIMER", 5, 15 ],
+            [ "SPECIES_GRIMER", 5, 15 ],
+            [ "SPECIES_GRIMER", 5, 15 ],
+            [ "SPECIES_GRIMER", 5, 15 ],
+            [ "SPECIES_GRIMER", 5, 15 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_GRIMER", 5, 20 ],
+            [ "SPECIES_GRIMER", 5, 20 ],
+            [ "SPECIES_GRIMER", 5, 20 ],
+            [ "SPECIES_MUK", 5, 20 ],
+            [ "SPECIES_MUK", 5, 20 ]
+        ],
+        "fishing": [
+            [ "SPECIES_GRIMER", 40, 60 ],
+            [ "SPECIES_GRIMER", 40, 60 ],
+            [ "SPECIES_GRIMER", 50, 70 ],
+            [ "SPECIES_GRIMER", 50, 70 ],
+            [ "SPECIES_GRIMER", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_GRIMER", 40, 60 ],
+            [ "SPECIES_GRIMER", 40, 60 ],
+            [ "SPECIES_MUK", 50, 70 ],
+            [ "SPECIES_MUK", 50, 70 ],
+            [ "SPECIES_MUK", 50, 70 ]
+        ]
+    }
+}

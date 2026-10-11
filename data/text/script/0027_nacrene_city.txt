@@ -1,6 +1,0 @@
-       \x{ffff}
-I'm thinking about becoming\nLoblolly's apprentice!
-Loblolly's furniture is the finest around!\nIt's like furniture out of a dream.
-She said, even if I'm clumsy,\nif I keep at it, I can make furniture!
-I'm surrounded by furniture I admire!\nNow THIS is a dream world!
-\pad{cc}

@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 14,
+    "npc_cache": 24,
+    "area": 323,
+    "matrix": "MAP_MATRIX_CELESTIAL_TOWER_4",
+    "scripts": "SCRIPTS_CELESTIAL_TOWER_4",
+    "text": "SCRIPT_TEXT_CELESTIAL_TOWER_4",
+    "bgm": "SEQ_BGM_D_05",
+    "encounters": "ENCOUNTERS_CELESTIAL_TOWER_2",
+    "enc_slot": 5,
+    "parent": "ZONE_CELESTIAL_TOWER_2",
+    "place": "PLACE_CELESTIAL_TOWER",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 33,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": false,
+    "cam_bound": 65535,
+    "name_icon": 15,
+    "easy_level": 3,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

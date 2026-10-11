@@ -1,0 +1,206 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Snubbull",
+    "pokedex": {
+        "category": "Fairy Pokémon",
+        "entry": "Small Pokémon flee from its scary\nface. It is, however, considered\nby women to be cute.",
+        "height": "2'00\"",
+        "weight": "17.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Snubbull",
+                "category": "Fairy Pokémon",
+                "entry": "Small Pokémon flee from its scary\nface. It is, however, considered\nby women to be cute.",
+                "height": "2'00\"",
+                "weight": "17.2 lbs."
+            },
+            "fr": {
+                "name": "Snubbull",
+                "category": "Pokémon Fée",
+                "entry": "Son visage horrible fait fuir les\npetits Pokémon. Par contre, les\nfemmes le trouvent mignon.",
+                "height": "0,6 m",
+                "weight": "7,8 kg"
+            },
+            "de": {
+                "name": "Snubbull",
+                "category": "Fee",
+                "entry": "Kleine Pokémon fliehen beim Anblick\nseines Gesichts. Frauen aber finden\nes niedlich.",
+                "height": "0,6 m",
+                "weight": "7,8 kg"
+            },
+            "it": {
+                "name": "Snubbull",
+                "category": "Pokémon Fata",
+                "entry": "I Pokémon più piccoli fuggono alla\nvista della sua faccia terrificante.\nMa le donne lo trovano carino.",
+                "height": "0,6 m",
+                "weight": "7,8 kg"
+            },
+            "ko": {
+                "name": "블루",
+                "category": "요정포켓몬",
+                "entry": "작은 포켓몬이 도망칠 정도의\n무서운 얼굴이 반대로 귀엽다며\n여성에게 인기가 있는 포켓몬이다.",
+                "height": "0.6 m",
+                "weight": "7.8 kg"
+            },
+            "es": {
+                "name": "Snubbull",
+                "category": "Pokémon Hada",
+                "entry": "Los Pokémon pequeños huyen al\nver su cara agresiva. No obstante,\npara muchas féminas es mono.",
+                "height": "0,6 m",
+                "weight": "7,8 kg"
+            },
+            "ja": {
+                "name": "ブルー",
+                "category": "ようせいポケモン",
+                "entry": "ちいさな\\x{3000}ポケモンが\\x{3000}にげだすほどの\nこわいかおが\\x{3000}ぎゃくに\\x{3000}かわいいと\nじょせいに\\x{3000}にんきの\\x{3000}ポケモン。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 80,
+        "defense": 50,
+        "speed": 30,
+        "special_attack": 40,
+        "special_defense": 40
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 191,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FAIRY" ],
+    "abilities": [ "ABILITY_INTIMIDATE", "ABILITY_RUN_AWAY" ],
+    "hidden_ability": "ABILITY_RATTLED",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PINK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 60,
+    "height": 6,
+    "weight": 78,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ICE_FANG" ],
+            [ 1, "MOVE_FIRE_FANG" ],
+            [ 1, "MOVE_THUNDER_FANG" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_SCARY_FACE" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_CHARM" ],
+            [ 7, "MOVE_BITE" ],
+            [ 13, "MOVE_LICK" ],
+            [ 19, "MOVE_HEADBUTT" ],
+            [ 25, "MOVE_ROAR" ],
+            [ 31, "MOVE_RAGE" ],
+            [ 37, "MOVE_TAKE_DOWN" ],
+            [ 43, "MOVE_PAYBACK" ],
+            [ 49, "MOVE_CRUNCH" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM35",
+            "TM36",
+            "TM38",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM50",
+            "TM56",
+            "TM59",
+            "TM66",
+            "TM67",
+            "TM73",
+            "TM78",
+            "TM83",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "TM95",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SUPER_FANG",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_LAST_RESORT",
+            "MOVE_SUPERPOWER",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_METRONOME",
+            "MOVE_FAINT_ATTACK",
+            "MOVE_PRESENT",
+            "MOVE_CRUNCH",
+            "MOVE_HEAL_BELL",
+            "MOVE_SNORE",
+            "MOVE_SMELLING_SALT",
+            "MOVE_CLOSE_COMBAT",
+            "MOVE_ICE_FANG",
+            "MOVE_FIRE_FANG",
+            "MOVE_THUNDER_FANG",
+            "MOVE_FOCUS_PUNCH",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_MIMIC"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 23,
+            "species": "SPECIES_GRANBULL"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SNUBBULL"
+}

@@ -1,0 +1,1355 @@
+{
+    "$schema": "../lights.schema.json",
+    "periods": [
+        {
+            "end": {
+                "hour": 4,
+                "minutes": 0
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 11,
+                        "green": 11,
+                        "blue": 16
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3548,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 17,
+                        "green": 12,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 8,
+                        "green": 3,
+                        "blue": 18
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 2,
+                        "green": 3,
+                        "blue": 3
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "ambient": {
+                "red": 10,
+                "green": 10,
+                "blue": 10
+            },
+            "specular": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "emission": {
+                "red": 8,
+                "green": 8,
+                "blue": 11
+            },
+            "fog": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            },
+            "clear": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            }
+        },
+        {
+            "end": {
+                "hour": 0,
+                "minutes": 0
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 11,
+                        "green": 11,
+                        "blue": 16
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3548,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 17,
+                        "green": 12,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 8,
+                        "green": 3,
+                        "blue": 18
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 2,
+                        "green": 3,
+                        "blue": 3
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "ambient": {
+                "red": 10,
+                "green": 10,
+                "blue": 10
+            },
+            "specular": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "emission": {
+                "red": 8,
+                "green": 8,
+                "blue": 11
+            },
+            "fog": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            },
+            "clear": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            }
+        },
+        {
+            "end": {
+                "hour": 0,
+                "minutes": 30
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 12,
+                        "green": 12,
+                        "blue": 18
+                    },
+                    "direction": {
+                        "x": -1934,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 17,
+                        "green": 12,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 8,
+                        "green": 9,
+                        "blue": 19
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 2,
+                        "green": 3,
+                        "blue": 3
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 10,
+                "green": 10,
+                "blue": 14
+            },
+            "ambient": {
+                "red": 13,
+                "green": 13,
+                "blue": 13
+            },
+            "specular": {
+                "red": 8,
+                "green": 8,
+                "blue": 14
+            },
+            "emission": {
+                "red": 10,
+                "green": 10,
+                "blue": 12
+            },
+            "fog": {
+                "red": 8,
+                "green": 9,
+                "blue": 19
+            },
+            "clear": {
+                "red": 8,
+                "green": 9,
+                "blue": 19
+            }
+        },
+        {
+            "end": {
+                "hour": 0,
+                "minutes": 60
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 12,
+                        "green": 12,
+                        "blue": 22
+                    },
+                    "direction": {
+                        "x": -1934,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 17,
+                        "green": 12,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 8,
+                        "green": 9,
+                        "blue": 19
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 2,
+                        "green": 3,
+                        "blue": 3
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 11,
+                "green": 11,
+                "blue": 13
+            },
+            "ambient": {
+                "red": 10,
+                "green": 10,
+                "blue": 10
+            },
+            "specular": {
+                "red": 10,
+                "green": 10,
+                "blue": 14
+            },
+            "emission": {
+                "red": 13,
+                "green": 13,
+                "blue": 14
+            },
+            "fog": {
+                "red": 8,
+                "green": 9,
+                "blue": 19
+            },
+            "clear": {
+                "red": 8,
+                "green": 9,
+                "blue": 19
+            }
+        },
+        {
+            "end": {
+                "hour": 0,
+                "minutes": 240
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 15,
+                        "green": 15,
+                        "blue": 22
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 3,
+                        "green": 4,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 8,
+                        "green": 9,
+                        "blue": 19
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 3,
+                        "green": 4,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 12,
+                "green": 12,
+                "blue": 12
+            },
+            "ambient": {
+                "red": 8,
+                "green": 8,
+                "blue": 8
+            },
+            "specular": {
+                "red": 12,
+                "green": 12,
+                "blue": 14
+            },
+            "emission": {
+                "red": 14,
+                "green": 14,
+                "blue": 18
+            },
+            "fog": {
+                "red": 8,
+                "green": 9,
+                "blue": 19
+            },
+            "clear": {
+                "red": 8,
+                "green": 9,
+                "blue": 19
+            }
+        },
+        {
+            "end": {
+                "hour": 1,
+                "minutes": 90
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 18,
+                        "green": 18,
+                        "blue": 21
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 3,
+                        "green": 4,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 24,
+                        "blue": 30
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 3,
+                        "green": 4,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 13,
+                "green": 13,
+                "blue": 13
+            },
+            "ambient": {
+                "red": 9,
+                "green": 9,
+                "blue": 9
+            },
+            "specular": {
+                "red": 14,
+                "green": 14,
+                "blue": 15
+            },
+            "emission": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "fog": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            },
+            "clear": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            }
+        },
+        {
+            "end": {
+                "hour": 1,
+                "minutes": 120
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 22,
+                        "green": 22,
+                        "blue": 20
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 3,
+                        "green": 4,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 24,
+                        "blue": 30
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 3,
+                        "green": 4,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 15,
+                "green": 15,
+                "blue": 15
+            },
+            "ambient": {
+                "red": 9,
+                "green": 11,
+                "blue": 11
+            },
+            "specular": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "emission": {
+                "red": 14,
+                "green": 14,
+                "blue": 14
+            },
+            "fog": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            },
+            "clear": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            }
+        },
+        {
+            "end": {
+                "hour": 2,
+                "minutes": -90
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 24,
+                        "green": 22,
+                        "blue": 20
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 5,
+                        "green": 5,
+                        "blue": 6
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 24,
+                        "blue": 30
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 5,
+                        "green": 5,
+                        "blue": 6
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "ambient": {
+                "red": 10,
+                "green": 12,
+                "blue": 12
+            },
+            "specular": {
+                "red": 18,
+                "green": 18,
+                "blue": 18
+            },
+            "emission": {
+                "red": 14,
+                "green": 14,
+                "blue": 14
+            },
+            "fog": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            },
+            "clear": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            }
+        },
+        {
+            "end": {
+                "hour": 2,
+                "minutes": -60
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 22,
+                        "green": 20,
+                        "blue": 18
+                    },
+                    "direction": {
+                        "x": -1934,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 7,
+                        "green": 6,
+                        "blue": 7
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 24,
+                        "blue": 30
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 7,
+                        "green": 6,
+                        "blue": 7
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 15,
+                "green": 15,
+                "blue": 15
+            },
+            "ambient": {
+                "red": 11,
+                "green": 12,
+                "blue": 12
+            },
+            "specular": {
+                "red": 17,
+                "green": 17,
+                "blue": 17
+            },
+            "emission": {
+                "red": 13,
+                "green": 13,
+                "blue": 13
+            },
+            "fog": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            },
+            "clear": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            }
+        },
+        {
+            "end": {
+                "hour": 2,
+                "minutes": 0
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 20,
+                        "green": 18,
+                        "blue": 16
+                    },
+                    "direction": {
+                        "x": -1934,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 11,
+                        "green": 7,
+                        "blue": 7
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 24,
+                        "blue": 30
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 11,
+                        "green": 7,
+                        "blue": 7
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 15,
+                "green": 15,
+                "blue": 15
+            },
+            "ambient": {
+                "red": 11,
+                "green": 12,
+                "blue": 12
+            },
+            "specular": {
+                "red": 17,
+                "green": 17,
+                "blue": 17
+            },
+            "emission": {
+                "red": 12,
+                "green": 11,
+                "blue": 11
+            },
+            "fog": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            },
+            "clear": {
+                "red": 16,
+                "green": 24,
+                "blue": 30
+            }
+        },
+        {
+            "end": {
+                "hour": 2,
+                "minutes": 60
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 19,
+                        "green": 16,
+                        "blue": 12
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 7,
+                        "blue": 0
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 31,
+                        "green": 24,
+                        "blue": 15
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 7,
+                        "blue": 0
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 15,
+                "green": 15,
+                "blue": 15
+            },
+            "ambient": {
+                "red": 11,
+                "green": 12,
+                "blue": 12
+            },
+            "specular": {
+                "red": 17,
+                "green": 17,
+                "blue": 17
+            },
+            "emission": {
+                "red": 8,
+                "green": 8,
+                "blue": 7
+            },
+            "fog": {
+                "red": 31,
+                "green": 24,
+                "blue": 15
+            },
+            "clear": {
+                "red": 31,
+                "green": 24,
+                "blue": 15
+            }
+        },
+        {
+            "end": {
+                "hour": 2,
+                "minutes": 90
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 17,
+                        "green": 13,
+                        "blue": 10
+                    },
+                    "direction": {
+                        "x": -1934,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 14,
+                        "green": 6,
+                        "blue": 0
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 31,
+                        "green": 24,
+                        "blue": 15
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 14,
+                        "green": 6,
+                        "blue": 0
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 14,
+                "green": 14,
+                "blue": 14
+            },
+            "ambient": {
+                "red": 12,
+                "green": 12,
+                "blue": 12
+            },
+            "specular": {
+                "red": 16,
+                "green": 16,
+                "blue": 16
+            },
+            "emission": {
+                "red": 9,
+                "green": 7,
+                "blue": 7
+            },
+            "fog": {
+                "red": 31,
+                "green": 24,
+                "blue": 15
+            },
+            "clear": {
+                "red": 31,
+                "green": 24,
+                "blue": 15
+            }
+        },
+        {
+            "end": {
+                "hour": 3,
+                "minutes": 0
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 16,
+                        "green": 13,
+                        "blue": 10
+                    },
+                    "direction": {
+                        "x": -1934,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 14,
+                        "green": 7,
+                        "blue": 0
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 31,
+                        "green": 24,
+                        "blue": 15
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 14,
+                        "green": 7,
+                        "blue": 0
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 14,
+                "green": 14,
+                "blue": 14
+            },
+            "ambient": {
+                "red": 12,
+                "green": 12,
+                "blue": 12
+            },
+            "specular": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "emission": {
+                "red": 9,
+                "green": 8,
+                "blue": 7
+            },
+            "fog": {
+                "red": 31,
+                "green": 24,
+                "blue": 15
+            },
+            "clear": {
+                "red": 31,
+                "green": 24,
+                "blue": 15
+            }
+        },
+        {
+            "end": {
+                "hour": 3,
+                "minutes": 60
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 11,
+                        "green": 12,
+                        "blue": 15
+                    },
+                    "direction": {
+                        "x": -1934,
+                        "y": -3584,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 17,
+                        "green": 12,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 8,
+                        "green": 3,
+                        "blue": 18
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 2,
+                        "green": 3,
+                        "blue": 3
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 14,
+                "green": 14,
+                "blue": 14
+            },
+            "ambient": {
+                "red": 12,
+                "green": 12,
+                "blue": 12
+            },
+            "specular": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "emission": {
+                "red": 8,
+                "green": 8,
+                "blue": 9
+            },
+            "fog": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            },
+            "clear": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            }
+        },
+        {
+            "end": {
+                "hour": 3,
+                "minutes": 180
+            },
+            "lights": [
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 11,
+                        "green": 11,
+                        "blue": 16
+                    },
+                    "direction": {
+                        "x": -1914,
+                        "y": -3548,
+                        "z": -296
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 17,
+                        "green": 12,
+                        "blue": 5
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 8,
+                        "green": 3,
+                        "blue": 18
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                },
+                {
+                    "enabled": true,
+                    "color": {
+                        "red": 2,
+                        "green": 3,
+                        "blue": 3
+                    },
+                    "direction": {
+                        "x": 0,
+                        "y": 4096,
+                        "z": 0
+                    }
+                }
+            ],
+            "diffuse": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "ambient": {
+                "red": 10,
+                "green": 10,
+                "blue": 10
+            },
+            "specular": {
+                "red": 14,
+                "green": 14,
+                "blue": 16
+            },
+            "emission": {
+                "red": 8,
+                "green": 8,
+                "blue": 11
+            },
+            "fog": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            },
+            "clear": {
+                "red": 8,
+                "green": 3,
+                "blue": 18
+            }
+        }
+    ]
+}

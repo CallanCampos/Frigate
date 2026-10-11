@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 11,
+    "npc_cache": 24,
+    "area": 30,
+    "matrix": "MAP_MATRIX_DRIFTVEIL_DRAWBRIDGE",
+    "scripts": "SCRIPTS_DRIFTVEIL_DRAWBRIDGE",
+    "text": "SCRIPT_TEXT_DRIFTVEIL_DRAWBRIDGE",
+    "bgm": "SEQ_BGM_H_02",
+    "encounters": "ENCOUNTERS_DRIFTVEIL_DRAWBRIDGE",
+    "enc_slot": 0,
+    "parent": "ZONE_DRIFTVEIL_DRAWBRIDGE",
+    "place": "PLACE_DRIFTVEIL_DRAWBRIDGE",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 9,
+    "transition": 4,
+    "battle_bg": 2,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": false,
+    "entralink_warp": true,
+    "cam_bound": 430,
+    "name_icon": 19,
+    "easy_level": 2,
+    "fly": {
+        "x": 20,
+        "y": 0,
+        "z": 48
+    }
+}

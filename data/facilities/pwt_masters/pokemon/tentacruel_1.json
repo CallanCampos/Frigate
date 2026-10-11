@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TENTACRUEL",
+    "moves": [ "MOVE_SLUDGE_BOMB", "MOVE_SCALD", "MOVE_ICE_BEAM", "MOVE_REST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

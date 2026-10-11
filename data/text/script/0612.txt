@@ -1,7 +1,0 @@
-Click!{be01}\nThe sound reverberates.
-A dull sound came from far away.
-A dull sound echoed.
-The dull sound is close!
-It's a torrent of water!
-The wall moved, and you can proceed now!
-\pad{48}

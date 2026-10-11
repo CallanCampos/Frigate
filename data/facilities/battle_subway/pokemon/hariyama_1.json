@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_HARIYAMA",
+    "moves": [ "MOVE_FEINT", "MOVE_FAKE_OUT", "MOVE_SMACK_DOWN", "MOVE_VITAL_THROW" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_KINGS_ROCK",
+    "form": 0
+}

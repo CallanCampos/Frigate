@@ -1,43 +1,43 @@
-SCENARIO
-SCENE 01
-SCENE 02
-SCENE 03
-SCENE 04
-SCENE 05
-SCENE 06
-SCENE 07
-SCENE 08
-SCENE 09
-SCENE 10
-SCENE 11
-SCENE 12
-SCENE 13
-SCENE 14
-SCENE 15
-SCENE 16
-SCENE 17
-SCENE 18
-SCENE 19
-SCENE 20
-Raise your foe's stats!
-Use a move with low power!
-Use a move with low power!
-Use a move with low power!
-Use a move with low power!
-Move after your foe!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-Throw the battle!
-なし
+Bank0320_Text_Scenario = SCENARIO
+Bank0320_Text_Scene01 = SCENE 01
+Bank0320_Text_Scene02 = SCENE 02
+Bank0320_Text_Scene03 = SCENE 03
+Bank0320_Text_Scene04 = SCENE 04
+Bank0320_Text_Scene05 = SCENE 05
+Bank0320_Text_Scene06 = SCENE 06
+Bank0320_Text_Scene07 = SCENE 07
+Bank0320_Text_Scene08 = SCENE 08
+Bank0320_Text_Scene09 = SCENE 09
+Bank0320_Text_Scene10 = SCENE 10
+Bank0320_Text_Scene11 = SCENE 11
+Bank0320_Text_Scene12 = SCENE 12
+Bank0320_Text_Scene13 = SCENE 13
+Bank0320_Text_Scene14 = SCENE 14
+Bank0320_Text_Scene15 = SCENE 15
+Bank0320_Text_Scene16 = SCENE 16
+Bank0320_Text_Scene17 = SCENE 17
+Bank0320_Text_Scene18 = SCENE 18
+Bank0320_Text_Scene19 = SCENE 19
+Bank0320_Text_Scene20 = SCENE 20
+Bank0320_Text_RaiseFoesStats = Raise your foe's stats!
+Bank0320_Text_UseMoveLowPower = Use a move with low power!
+Bank0320_Text_UseMoveLowPower_2 = Use a move with low power!
+Bank0320_Text_UseMoveLowPower_3 = Use a move with low power!
+Bank0320_Text_UseMoveLowPower_4 = Use a move with low power!
+Bank0320_Text_MoveAfterFoe = Move after your foe!
+Bank0320_Text_ThrowBattle = Throw the battle!
+Bank0320_Text_ThrowBattle_2 = Throw the battle!
+Bank0320_Text_ThrowBattle_3 = Throw the battle!
+Bank0320_Text_ThrowBattle_4 = Throw the battle!
+Bank0320_Text_ThrowBattle_5 = Throw the battle!
+Bank0320_Text_ThrowBattle_6 = Throw the battle!
+Bank0320_Text_ThrowBattle_7 = Throw the battle!
+Bank0320_Text_ThrowBattle_8 = Throw the battle!
+Bank0320_Text_ThrowBattle_9 = Throw the battle!
+Bank0320_Text_ThrowBattle_10 = Throw the battle!
+Bank0320_Text_ThrowBattle_11 = Throw the battle!
+Bank0320_Text_ThrowBattle_12 = Throw the battle!
+Bank0320_Text_ThrowBattle_13 = Throw the battle!
+Bank0320_Text_ThrowBattle_14 = Throw the battle!
+Bank0320_Text_Empty = なし
 \pad{f8}

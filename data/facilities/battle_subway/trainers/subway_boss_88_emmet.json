@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Emmet",
+    "class": "TRAINER_CLASS_SUBWAY_BOSS_88",
+    "pokemon": [ "chandelure_3", "excadrill_4", "haxorus_4" ],
+    "messages": [
+        "I am Emmet.{be01}\nI am a Subway Boss.{be01}\nI like Double Battles.{be01}\nI like combinations of\ntwo Pokémon.{be01}\nAnd I like winning\nmore than anything else.{be01}\nSo let's start a great battle\nin which every Pokémon uses{be00}\nvarious moves.",
+        "I am Emmet.{be01}\nI won against you.{be01}\nBut I think I just got lucky.{be01}\nIn a Double Battle, if you misread one thing,\nthe rest will be totally different.{be01}\nYou know.\nPlease win 20 battles in a row, and{be00}\nfight with me!",
+        "I am Emmet.{be01}\nI lost against you.{be01}\nBecause you are the strongest Trainer\nI've fought lately.{be00}\nYou're a verrrrry strong Trainer!{be01}\nYup! It was fun!\nRide the trains some more!"
+    ]
+}

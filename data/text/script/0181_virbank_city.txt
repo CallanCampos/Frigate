@@ -1,7 +1,0 @@
-This is a Pokémon Gym, and\nit's also a rock club!{be01}\nThe Gym Leader and the others\nare practicing inside, but please{be00}\nfeel free to challenge all of them!{be01}\nOh! You'll need to stay hydrated.\nHere you go!{be01}
-The Trainers in this Pokémon Gym\nall use Poison-type Pokémon!{be01}\nGrass- and Bug-type attacks\ndon't work well against Poison types,{be00}\nso be careful!{be01}\nAlso, if your Pokémon are poisoned,\ntheir HP will keep decreasing. Watch out!{be01}\nAnd you should know that Poison-type\nPokémon can't be poisoned!
-The shining Gym Badge is important\nbecause you and your Pokémon{be00}\nwon it together!{be00}\nPlease remember that always!
-Virbank City Pokémon Gym{be01}\nLeader: Roxie\nCertified Trainers:
-Virbank City Pokémon Gym{be01}\nLeader: Roxie\nCertified Trainers:{be00}\n{0100:0}
-Virbank City Pokémon Gym{be01}\nLeader: Roxie\nCertified Trainers:{be00}\n{0100:0}, {0100:1}
-I can sing!\nWanted: The rest of a band!

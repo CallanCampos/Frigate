@@ -1,17 +1,17 @@
-UGH
-UMBREON
-UNAWARE
-UNBELIEVABLE
-UNBURDEN
-UNCLE
-UNFEZANT
-UNION
-UNIQUE
-UNNERVE
-UNOWN
-UPROAR
-URGH
-URSARING
-USELESS
-UTURN
-UXIE
+Bank0133_Text_Ugh = UGH
+Bank0133_Text_Umbreon = UMBREON
+Bank0133_Text_Unaware = UNAWARE
+Bank0133_Text_Unbelievable = UNBELIEVABLE
+Bank0133_Text_Unburden = UNBURDEN
+Bank0133_Text_Uncle = UNCLE
+Bank0133_Text_Unfezant = UNFEZANT
+Bank0133_Text_Union = UNION
+Bank0133_Text_Unique = UNIQUE
+Bank0133_Text_Unnerve = UNNERVE
+Bank0133_Text_Unown = UNOWN
+Bank0133_Text_Uproar = UPROAR
+Bank0133_Text_Urgh = URGH
+Bank0133_Text_Ursaring = URSARING
+Bank0133_Text_Useless = USELESS
+Bank0133_Text_Uturn = UTURN
+Bank0133_Text_Uxie = UXIE

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_COBALION",
+    "moves": [ "MOVE_FOCUS_BLAST", "MOVE_FLASH_CANNON", "MOVE_CALM_MIND", "MOVE_REST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

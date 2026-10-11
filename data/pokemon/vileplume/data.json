@@ -1,0 +1,155 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Vileplume",
+    "pokedex": {
+        "category": "Flower Pokémon",
+        "entry": "Its petals are the largest in the\nworld. As it walks, it scatters\nextremely allergenic pollen.",
+        "height": "3'11\"",
+        "weight": "41.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Vileplume",
+                "category": "Flower Pokémon",
+                "entry": "Its petals are the largest in the\nworld. As it walks, it scatters\nextremely allergenic pollen.",
+                "height": "3'11\"",
+                "weight": "41.0 lbs."
+            },
+            "fr": {
+                "name": "Rafflesia",
+                "category": "Pokémon Fleur",
+                "entry": "Ses pétales sont les plus grands\ndu monde. Il marche en répandant\nun pollen extrêmement allergène.",
+                "height": "1,2 m",
+                "weight": "18,6 kg"
+            },
+            "de": {
+                "name": "Giflor",
+                "category": "Blume",
+                "entry": "Es besitzt die größten Blätter der Welt.\nEs verteilt beim Gehen Pollen, die\nschreckliche Allergien auslösen.",
+                "height": "1,2 m",
+                "weight": "18,6 kg"
+            },
+            "it": {
+                "name": "Vileplume",
+                "category": "Pokémon Fiore",
+                "entry": "I suoi petali sono i più grandi al mondo.\nMentre cammina diffonde un polline che\ncausa allergie.",
+                "height": "1,2 m",
+                "weight": "18,6 kg"
+            },
+            "ko": {
+                "name": "라플레시아",
+                "category": "꽃포켓몬",
+                "entry": "세계에서 꽃잎이 제일 크다.\n심한 알레르기를 일으킬\n독 꽃가루를 흩뿌리며 걷는다.",
+                "height": "1.2 m",
+                "weight": "18.6 kg"
+            },
+            "es": {
+                "name": "Vileplume",
+                "category": "Pokémon Flor",
+                "entry": "Sus pétalos son los más grandes del\nmundo. Cuando anda, desprende\nun terrible polen alergénico.",
+                "height": "1,2 m",
+                "weight": "18,6 kg"
+            },
+            "ja": {
+                "name": "ラフレシア",
+                "category": "フラワーポケモン",
+                "entry": "はなびらの\\x{3000}おおきさは\\x{3000}せかいいち。\nひどい\\x{3000}アレルギーを\\x{3000}ひきおこす\nどくかふんを\\x{3000}ばらまいて\\x{3000}あるく。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff18}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 80,
+        "defense": 85,
+        "speed": 50,
+        "special_attack": 100,
+        "special_defense": 90
+    },
+    "types": [ "TYPE_GRASS", "TYPE_POISON" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 3,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_EFFECT_SPORE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 216,
+    "height": 12,
+    "weight": 186,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_MEGA_DRAIN" ],
+            [ 1, "MOVE_AROMATHERAPY" ],
+            [ 1, "MOVE_STUN_SPORE" ],
+            [ 1, "MOVE_POISON_POWDER" ],
+            [ 53, "MOVE_PETAL_DANCE" ],
+            [ 65, "MOVE_SOLAR_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM56",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_GASTRO_ACID",
+            "MOVE_WORRY_SEED",
+            "MOVE_AFTER_YOU",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ODDISH"
+}

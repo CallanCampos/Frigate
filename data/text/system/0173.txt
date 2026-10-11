@@ -1,20 +1,20 @@
-Please!\n{011c:0}
-Go! {011c:0}!
-I'll battle with\n{011c:0}!
-{011c:0} is\n{011c:1}, right?
-{011c:0}, I'm going\nwith {011c:1}!
-In comes {011c:0}.
-Watch my {011c:0} power\ntake care of {011c:1}!
-Now {011c:0}\nbegins!
-I'll show you my\n{011c:0} strategy!
-I'll shock you with\n{011c:0}!
-{011c:0}, I see...\nGo, {011c:1}!
-Ta-da!\nHere comes {011c:0}!
-I don't think I'll\never lose to {011c:0}!
-{011c:0}!\n{011c:1} is here!
-Good luck,\n{011c:0}!
-Behold my {011c:0}\n{011c:1}!
-The power of {011c:0}!\nLet me show you!
-You'll choose {011c:0}\nif I choose {011c:1}, right?
-I beg you, {011c:0}.\nPlease go with {011c:1}!
-May {011c:0} safely\nland on {011c:1}!
+Bank0173_Text_Please = Please!\n{011c:0}
+Bank0173_Text_Go = Go! {011c:0}!
+Bank0173_Text_IllBattle = I'll battle with\n{011c:0}!
+Bank0173_Text_Right = {011c:0} is\n{011c:1}, right?
+Bank0173_Text_ImGoing = {011c:0}, I'm going\nwith {011c:1}!
+Bank0173_Text_Comes = In comes {011c:0}.
+Bank0173_Text_WatchPowerTakeCare = Watch my {011c:0} power\ntake care of {011c:1}!
+Bank0173_Text_NowBegins = Now {011c:0}\nbegins!
+Bank0173_Text_IllShowStrategy = I'll show you my\n{011c:0} strategy!
+Bank0173_Text_IllShock = I'll shock you with\n{011c:0}!
+Bank0173_Text_SeeGo = {011c:0}, I see...\nGo, {011c:1}!
+Bank0173_Text_TaDaHereComes = Ta-da!\nHere comes {011c:0}!
+Bank0173_Text_DontThinkIllEver = I don't think I'll\never lose to {011c:0}!
+Bank0173_Text_Here = {011c:0}!\n{011c:1} is here!
+Bank0173_Text_GoodLuck = Good luck,\n{011c:0}!
+Bank0173_Text_Behold = Behold my {011c:0}\n{011c:1}!
+Bank0173_Text_PowerLetShow = The power of {011c:0}!\nLet me show you!
+Bank0173_Text_YoullChooseIfChoose = You'll choose {011c:0}\nif I choose {011c:1}, right?
+Bank0173_Text_BegPleaseGo = I beg you, {011c:0}.\nPlease go with {011c:1}!
+Bank0173_Text_MaySafelyLand = May {011c:0} safely\nland on {011c:1}!

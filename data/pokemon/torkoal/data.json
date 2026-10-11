@@ -1,0 +1,182 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Torkoal",
+    "pokedex": {
+        "category": "Coal Pokémon",
+        "entry": "It burns coal inside its shell for\nenergy. It blows out black soot if\nit is endangered.",
+        "height": "1'08\"",
+        "weight": "177.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Torkoal",
+                "category": "Coal Pokémon",
+                "entry": "It burns coal inside its shell for\nenergy. It blows out black soot if\nit is endangered.",
+                "height": "1'08\"",
+                "weight": "177.2 lbs."
+            },
+            "fr": {
+                "name": "Chartor",
+                "category": "Pokémon Charbon",
+                "entry": "Il tire son énergie du charbon qu'il\nbrûle dans sa carapace et crache\nde la suie noire en cas de danger.",
+                "height": "0,5 m",
+                "weight": "80,4 kg"
+            },
+            "de": {
+                "name": "Qurtel",
+                "category": "Kohle",
+                "entry": "In seinem Panzer verbrennt es\nKohle und gewinnt daraus Energie.\nBei Gefahr sondert es Ruß ab.",
+                "height": "0,5 m",
+                "weight": "80,4 kg"
+            },
+            "it": {
+                "name": "Torkoal",
+                "category": "Pokémon Carbone",
+                "entry": "Genera energia bruciando carbone\nall'interno della corazza. Se è in\npericolo, emette fuliggine scura.",
+                "height": "0,5 m",
+                "weight": "80,4 kg"
+            },
+            "ko": {
+                "name": "코터스",
+                "category": "석탄포켓몬",
+                "entry": "등껍질 속에 석탄을 태워서\n에너지로 사용한다. 위급할\n때는 까만 그을음을 뿜어낸다.",
+                "height": "0.5 m",
+                "weight": "80.4 kg"
+            },
+            "es": {
+                "name": "Torkoal",
+                "category": "Pokémon Carbón",
+                "entry": "Quema carbón en su caparazón\npara obtener energía. Si le atacan,\necha un denso humo negro.",
+                "height": "0,5 m",
+                "weight": "80,4 kg"
+            },
+            "ja": {
+                "name": "コータス",
+                "category": "せきたんポケモン",
+                "entry": "こうらの\\x{3000}なかで\\x{3000}せきたんを\\x{3000}もやし\nエネルギーに\\x{3000}している。ピンチの\nときは\\x{3000}くろい\\x{3000}ススを\\x{3000}ふきだす。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff18}\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 85,
+        "defense": 140,
+        "speed": 20,
+        "special_attack": 85,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_WHITE_SMOKE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHELL_ARMOR",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 165,
+    "height": 5,
+    "weight": 804,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_EMBER" ],
+            [ 4, "MOVE_SMOG" ],
+            [ 7, "MOVE_WITHDRAW" ],
+            [ 12, "MOVE_CURSE" ],
+            [ 17, "MOVE_FIRE_SPIN" ],
+            [ 20, "MOVE_SMOKE_SCREEN" ],
+            [ 23, "MOVE_RAPID_SPIN" ],
+            [ 28, "MOVE_FLAMETHROWER" ],
+            [ 33, "MOVE_BODY_SLAM" ],
+            [ 36, "MOVE_PROTECT" ],
+            [ 39, "MOVE_LAVA_PLUME" ],
+            [ 44, "MOVE_IRON_DEFENSE" ],
+            [ 49, "MOVE_AMNESIA" ],
+            [ 52, "MOVE_FLAIL" ],
+            [ 55, "MOVE_HEAT_WAVE" ],
+            [ 60, "MOVE_INFERNO" ],
+            [ 65, "MOVE_SHELL_SMASH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM35",
+            "TM36",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM64",
+            "TM68",
+            "TM71",
+            "TM74",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_EARTH_POWER",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_AFTER_YOU",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_ERUPTION",
+            "MOVE_ENDURE",
+            "MOVE_SLEEP_TALK",
+            "MOVE_YAWN",
+            "MOVE_FISSURE",
+            "MOVE_SKULL_BASH",
+            "MOVE_FLAME_BURST",
+            "MOVE_CLEAR_SMOG"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TORKOAL"
+}

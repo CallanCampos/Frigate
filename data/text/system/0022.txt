@@ -1,14 +1,14 @@
-C-Gear
-Infrared
-Wireless
-Game Sync
-Trade
-Battle
-Friend Code
-Trainer Card
-C-Gear>Infrared
-C-Gear>Infrared>Battle
-C-Gear>Infrared>Trade
-C-Gear>Game Sync
-C-Gear>Wireless
+Bank0022_Text_CGear = C-Gear
+Bank0022_Text_Infrared = Infrared
+Bank0022_Text_Wireless = Wireless
+Bank0022_Text_GameSync = Game Sync
+Bank0022_Text_Trade = Trade
+Bank0022_Text_Battle = Battle
+Bank0022_Text_FriendCode = Friend Code
+Bank0022_Text_TrainerCard = Trainer Card
+Bank0022_Text_CGearInfrared = C-Gear>Infrared
+Bank0022_Text_CGearInfraredBattle = C-Gear>Infrared>Battle
+Bank0022_Text_CGearInfraredTrade = C-Gear>Infrared>Trade
+Bank0022_Text_CGearGameSync = C-Gear>Game Sync
+Bank0022_Text_CGearWireless = C-Gear>Wireless
 \pad{9a}

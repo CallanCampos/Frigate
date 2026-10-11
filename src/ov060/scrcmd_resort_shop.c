@@ -1,6 +1,8 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/items.h"
+#include "constants/script_text_banks.h"
+#include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
@@ -41,6 +43,7 @@
 #include "system/text_speed.h"
 #include "system/vm.h"
 #include "system/wordset.h"
+#include "text/script/scrcmd_resort_shop.h"
 
 // The Join Avenue's shops (plugin 8's command 1000 while this overlay takes overlay 59's place). The command opens a
 // menu over the field: mode 0 is a shop's items, mode 1 the four records, and mode 2 the order of the records (sub
@@ -354,7 +357,7 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(gsys);
     void **ptr = ScriptWork_GetUserHeapPtr(FieldScriptEnv_GetScriptWork(env));
     void *msgBGSys = Field_GetMsgBGSys(field);
-    ResortSys *sys = func_ov137_021f4670(field);
+    ResortSys *sys = ResortSys_Get(field);
     ResortShop *shop = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ResortShop), TRUE, "scrcmd_resort_shop.c", 375);
 
     *ptr = shop;
@@ -368,17 +371,17 @@ BOOL func_ov060_021e58c0(VM *vm, FieldScriptEnv *env) {
     shop->work.vars[2] = var2;
     shop->work.vars[3] = var3;
     shop->work.vars[4] = var4;
-    shop->work.shops = func_ov137_021f1ff8(sys);
-    shop->work.table = func_ov137_021f2008(sys);
-    shop->work.occupants = func_ov137_021f201c(sys);
-    shop->work.datas = func_ov137_021f2014(sys);
-    shop->work.info = func_ov137_021f202c(sys);
+    shop->work.shops = ResortSys_GetShopData(sys);
+    shop->work.table = ResortSys_GetUnk24Table(sys);
+    shop->work.occupants = ResortSys_GetOccupants(sys);
+    shop->work.datas = ResortSys_GetDatas(sys);
+    shop->work.info = ResortSys_GetInfo(sys);
     shop->work.sys = sys;
     shop->work.cameraMode = cameraMode;
     shop->work.people = func_ov060_021e7ecc(field);
     shop->work.npc = func_ov060_021e7efc(field);
     shop->gsys = gsys;
-    shop->work.person = func_ov137_021f4690(env, shop->work.people);
+    shop->work.person = ResortSys_GetScriptPerson(env, shop->work.people);
     if (JoinAvenue_GetParam(shop->work.info, 13, 0) != 0) {
         shop->work.unk300 = TRUE;
     } else {
@@ -519,8 +522,8 @@ static void func_ov060_021e5d34(GameSystem *gsys, ResortShopWork *wk, u8 mode, u
 }
 
 static void func_ov060_021e5d60(ResortShopWork *wk) {
-    wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 13);
-    wk->boughtLabel = GFL_MsgDataLoadStrbufNew(wk->msgData, 14);
+    wk->priceFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty);
+    wk->boughtLabel = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_2);
 }
 
 static u32 func_ov060_021e5d84(ResortShopWork *wk) {
@@ -1000,9 +1003,9 @@ static void func_ov060_021e688c(ResortShopWork *wk, u8 mode, u8 subMode) {
     MsgData *itemDescriptions;
     int n = 0;
 
-    itemNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 64, wk->heapId);
-    scriptMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 609, wk->heapId);
-    itemDescriptions = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 63, wk->heapId);
+    itemNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_NAMES, wk->heapId);
+    scriptMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, wk->heapId);
+    itemDescriptions = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_DESCRIPTIONS, wk->heapId);
     count = ResortShopData_GetGoodsCount(wk->shops, wk->row);
     wk->options = ListMenuCore_CreateOptionList(count + 1, wk->heapId);
     for (i = 0; i < count; i++) {
@@ -1075,7 +1078,7 @@ static void func_ov060_021e6a28(ResortShopWork *wk, u8 mode, u8 subMode) {
         a = func_020385a8(record, 21, NULL);
         b = func_020385a8(record, 22, NULL);
         c = func_020385a8(record, 23, NULL);
-        labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 35);
+        labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_10);
         descriptionFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, n + 37);
         gender = func_020385a8(record, 2, NULL);
         func_020385a8(record, 4, name);
@@ -1149,7 +1152,7 @@ static void func_ov060_021e6d94(ResortShopWork *wk, u8 mode, u8 subMode) {
     wk->options = ListMenuCore_CreateOptionList(wk->entryCount + 1, wk->heapId);
     for (i = 0; i < wk->entryCount; i++) {
         void *record = wk->entries[i].person;
-        StrBuf *labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, 35);
+        StrBuf *labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_10);
         StrBuf *descriptionFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, i + 37);
         u8 gender = func_020385a8(record, 2, NULL);
         u16 a = func_020385a8(record, 21, NULL);
@@ -1216,7 +1219,7 @@ static void func_ov060_021e70e0(ResortShopWork *wk) {
 }
 
 static u8 func_ov060_021e7128(ResortShopWork *wk, u8 mode) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 610, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_SCRCMD_RESORT_SHOP, wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreate(8, 64, wk->heapId);
     wk->message = GFL_StrBufCreate(200, wk->heapId);
     wk->tcbManager = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 32, 32);
@@ -1385,7 +1388,7 @@ static void func_ov060_021e76d0(ResortShopWork *wk) {
 }
 
 static void func_ov060_021e7750(ResortShopWork *wk) {
-    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, 26);
+    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Money);
 
     GFL_TextRendererDrawToBitmapEx(BmpWin_GetBitmap(wk->windows[0]), 0, 0, strbuf, wk->font, PRINT_COLOR(15, 2, 15));
     GFL_StrBufFree(strbuf);
@@ -1404,7 +1407,7 @@ static void func_ov060_021e77a8(ResortShopWork *wk) {
 
 // The player's money
 static void func_ov060_021e77d4(ResortShopWork *wk) {
-    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, 27);
+    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_6);
     StrBuf *strbuf = GFL_StrBufCreate(10, wk->heapId);
     GFLBitmap *bitmap;
 
@@ -1420,7 +1423,7 @@ static void func_ov060_021e77d4(ResortShopWork *wk) {
 
 // How many of the item the bag holds
 static void func_ov060_021e786c(ResortShopWork *wk, u16 item) {
-    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, 29);
+    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Bag);
     StrBuf *strbuf = GFL_StrBufCreate(20, wk->heapId);
     GFLBitmap *bitmap;
 
@@ -1683,7 +1686,7 @@ static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person)
     void *flags = func_02038470(person);
     StrBuf *strbuf = GFL_StrBufCreate(128, wk->heapId);
     u16 shop = ResortShopData_GetShopParam(ResortShopData_GetPersonShop(wk->shops, person), 0);
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 609, HEAPID_TAIL(wk->heapId));
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(wk->heapId));
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, shop + 42);
     u16 a = joinAveTextHandler(person, 21, NULL);
     u16 b = joinAveTextHandler(person, 22, NULL);
@@ -1709,9 +1712,9 @@ static void func_ov060_021e8190(ResortShopWork *wk, ResortPersonData *data, u32 
     JoinAvenuePerson *person = func_ov137_021f1980(data);
     u16 flag = func_020363e0(func_02038470(person), 0);
     StrBuf *label = GFL_StrBufCreate(64, wk->heapId);
-    StrBuf *name = func_ov137_021f4930(wk->shops, data, flag, wk->heapId);
+    StrBuf *name = ResortSys_FormatShopText(wk->shops, data, flag, wk->heapId);
     StrBuf *description = func_ov060_021e8040(wk, person);
-    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, 36);
+    StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_11);
     u8 gender = joinAveTextHandler(person, 2, NULL);
 
     WordSetNumber(wk->wordSet, 1, index + 1, 1, NUM_PAD_NONE, 1);
@@ -1905,13 +1908,13 @@ static void func_ov060_021e8720(ArcTool *handle, u16 objCode, u8 *texture, u16 *
 }
 
 // A price with the avenue's discount, which grows with its rank up to 39 and is 40% from rank 40, 75% more with
-// func_ov137_021f3344, and rounded to 10
+// ResortSys_GetInfoFlag1b, and rounded to 10
 static u32 func_ov060_021e8758(ResortShopWork *wk, u32 price) {
     fx32 rate;
     u32 rank;
     u32 discount;
 
-    if (func_ov137_021f3344(wk->sys)) {
+    if (ResortSys_GetInfoFlag1b(wk->sys)) {
         rate = FX32_CONST(1.75);
     } else {
         rate = FX32_ONE;
@@ -2004,7 +2007,7 @@ static BOOL func_ov060_021e8924(ResortShop *shop, Field *field, int *seq) {
         break;
     case 2:
         func_ov060_021e8804(shop, field, shop->work.cameraMode);
-        func_ov137_021f44f8(shop->work.people, shop->work.npc, field, shop->work.person, 0);
+        ResortSys_HideOverlappingActors(shop->work.people, shop->work.npc, field, shop->work.person, 0);
         (*seq)++;
         break;
     case 3:

@@ -1,36 +1,36 @@
-     \x{ffff}
-Number of wins
-{0203:0}
-Normal
-Fire
-Water
-Grass
-Electric
-Ice
-Fighting
-Poison
-Ground
-Flying
-Psychic
-Bug
-Rock
-Ghost
-Dragon
-Dark
-Steel
-Driftveil
-Unova
-Kanto
-Johto
-Hoenn
-Sinnoh
-World
-Champions
-Rental
-Rental Master
-Mix
-Mix Master
-{0100:0}
-Total wins
-Name
+Bank0411_Text_Empty =      \x{ffff}
+Bank0411_Text_NumberWins = Number of wins
+Bank0411_Text_Empty_2 = {0203:0}
+Bank0411_Text_Normal = Normal
+Bank0411_Text_Fire = Fire
+Bank0411_Text_Water = Water
+Bank0411_Text_Grass = Grass
+Bank0411_Text_Electric = Electric
+Bank0411_Text_Ice = Ice
+Bank0411_Text_Fighting = Fighting
+Bank0411_Text_Poison = Poison
+Bank0411_Text_Ground = Ground
+Bank0411_Text_Flying = Flying
+Bank0411_Text_Psychic = Psychic
+Bank0411_Text_Bug = Bug
+Bank0411_Text_Rock = Rock
+Bank0411_Text_Ghost = Ghost
+Bank0411_Text_Dragon = Dragon
+Bank0411_Text_Dark = Dark
+Bank0411_Text_Steel = Steel
+Bank0411_Text_Driftveil = Driftveil
+Bank0411_Text_Unova = Unova
+Bank0411_Text_Kanto = Kanto
+Bank0411_Text_Johto = Johto
+Bank0411_Text_Hoenn = Hoenn
+Bank0411_Text_Sinnoh = Sinnoh
+Bank0411_Text_World = World
+Bank0411_Text_Champions = Champions
+Bank0411_Text_Rental = Rental
+Bank0411_Text_RentalMaster = Rental Master
+Bank0411_Text_Mix = Mix
+Bank0411_Text_MixMaster = Mix Master
+Bank0411_Text_Empty_3 = {0100:0}
+Bank0411_Text_TotalWins = Total wins
+Bank0411_Text_Name = Name
 \pad{04}

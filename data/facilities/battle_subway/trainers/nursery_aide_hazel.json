@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Hazel",
+    "class": "TRAINER_CLASS_NURSERY_AIDE",
+    "pokemon": [
+        "venusaur_2",
+        "charizard_2",
+        "blastoise_2",
+        "meganium_2",
+        "typhlosion_2",
+        "feraligatr_2",
+        "sceptile_2",
+        "blaziken_2",
+        "swampert_2",
+        "torterra_2",
+        "infernape_2",
+        "empoleon_2",
+        "serperior_2",
+        "emboar_2",
+        "samurott_2"
+    ],
+    "messages": [
+        "Raising Pokémon and raising kids.\nBoth are very hard.",
+        "When my Pokémon do well like this,\nI forget my everyday troubles.",
+        "Even I raise them with tender care,\nbecause I am their Trainer..."
+    ]
+}

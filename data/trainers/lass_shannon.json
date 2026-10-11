@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Shannon",
+    "class": "TRAINER_CLASS_LASS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_VULPIX",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_FLAREON",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "See my extraordinarily pretty Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ahh! Its fire has been weakened?!"
+        },
+        {
+            "type": 2,
+            "text": "When you feel a Pokémon breathing, you\ncan really feel how alive they are!"
+        }
+    ]
+}

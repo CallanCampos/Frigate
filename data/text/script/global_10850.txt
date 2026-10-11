@@ -1,0 +1,17 @@
+Global10850_Text_Empty =                                                                                                                                                                                                                                                                                                                                             \x{ffff}
+Global10850_Text_Empty_2 =                                                                                                                                                                                                                                                   \x{ffff}
+Global10850_Text_Empty_3 =                                                                                                                                                                                                  \x{ffff}
+Global10850_Text_Empty_4 =                                                                                                                                                                                       \x{ffff}
+Global10850_Text_Empty_5 =                                                                            \x{ffff}
+Global10850_Text_Empty_6 =                                                                                    \x{ffff}
+Global10850_Text_Empty_7 =                                                                                      \x{ffff}
+Global10850_Text_Empty_8 =                                                                                        \x{ffff}
+Global10850_Text_Empty_9 =                                                                                     \x{ffff}
+Global10850_Text_Empty_10 =                                                                                     \x{ffff}
+Global10850_Text_Empty_11 =                                                                                 \x{ffff}
+Global10850_Text_Empty_12 =                                                                                     \x{ffff}
+Global10850_Text_Empty_13 =                                                                      \x{ffff}
+Global10850_Text_Empty_14 =                                                                                      \x{ffff}
+Global10850_Text_Empty_15 =                                                                             \x{ffff}
+Global10850_Text_Empty_16 =                                                                                      \x{ffff}
+Global10850_Text_Empty_17 =                                                                                         \x{ffff}

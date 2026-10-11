@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Poison Heal",
+    "description": "Restores HP if the\nPokémon is poisoned."
+}

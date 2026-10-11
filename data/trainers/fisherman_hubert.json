@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Hubert",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 0,
+            "level": 17,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You've been caught by a powerful hook,\nwhich is me!{be01}\nI'll have a battle with you using\nmy freshly caught Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I just can't help but flop about!\nFlip flop flip flop flip!"
+        },
+        {
+            "type": 2,
+            "text": "I like to think that I'm not catching\nPokémon against their will, but that{be00}\nthey cling to my hook because they{be00}\nwant to battle me!"
+        }
+    ]
+}

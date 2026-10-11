@@ -1,0 +1,72 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 1,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 1
+        },
+        "grass": [
+            [ "SPECIES_WOOBAT", 34, 34 ],
+            [ "SPECIES_GOLDUCK", 34, 34 ],
+            [ "SPECIES_SEEL", 35, 35 ],
+            [ "SPECIES_BOLDORE", 35, 35 ],
+            [ "SPECIES_WOOBAT", 35, 35 ],
+            [ "SPECIES_GOLDUCK", 35, 35 ],
+            [ "SPECIES_TYNAMO", 37, 37 ],
+            [ "SPECIES_BOLDORE", 37, 37 ],
+            [ "SPECIES_GOLDUCK", 36, 36 ],
+            [ "SPECIES_WOOBAT", 36, 36 ],
+            [ "SPECIES_GOLDUCK", 36, 36 ],
+            [ "SPECIES_WOOBAT", 36, 36 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [
+            [ "SPECIES_EXCADRILL", 34, 34 ],
+            [ "SPECIES_EXCADRILL", 34, 34 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ],
+            [ "SPECIES_EXCADRILL", 35, 35 ],
+            [ "SPECIES_EXCADRILL", 36, 36 ],
+            [ "SPECIES_EXCADRILL", 36, 36 ],
+            [ "SPECIES_EXCADRILL", 37, 37 ],
+            [ "SPECIES_EXCADRILL", 37, 37 ],
+            [ "SPECIES_EXCADRILL", 37, 37 ],
+            [ "SPECIES_EXCADRILL", 37, 37 ],
+            [ "SPECIES_EXCADRILL", 37, 37 ],
+            [ "SPECIES_EXCADRILL", 37, 37 ]
+        ],
+        "surf": [
+            [ "SPECIES_FRILLISH", 25, 40 ],
+            [ "SPECIES_SEEL", 25, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_SEEL", 25, 40 ],
+            [ "SPECIES_JELLICENT", 25, 40 ],
+            [ "SPECIES_DEWGONG", 30, 40 ],
+            [ "SPECIES_DEWGONG", 30, 40 ],
+            [ "SPECIES_DEWGONG", 30, 40 ]
+        ],
+        "fishing": [
+            [ "SPECIES_LUVDISC", 40, 60 ],
+            [ "SPECIES_SHELLDER", 40, 60 ],
+            [ "SPECIES_LUVDISC", 50, 70 ],
+            [ "SPECIES_LUVDISC", 50, 70 ],
+            [ "SPECIES_LUVDISC", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_SHELLDER", 40, 60 ],
+            [ "SPECIES_LUVDISC", 40, 60 ],
+            [ "SPECIES_SHELLDER", 50, 70 ],
+            [ "SPECIES_CLOYSTER", 50, 70 ],
+            [ "SPECIES_CLOYSTER", 50, 70 ]
+        ]
+    }
+}

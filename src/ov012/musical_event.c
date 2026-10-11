@@ -1,5 +1,7 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "field/event_mapchange.h"
 #include "field/event_sound.h"
@@ -522,7 +524,7 @@ static void func_ov012_02151384(MusicalEventWork *work) {
             sys_memcpy(info, shot->pokes[pos].name, sizeof(shot->pokes[pos].name));
         } else {
             msgId = func_ov012_02152634(work->program, func_ov012_02151b14(work, func_ov012_02151b88(work, pos)));
-            msgData = GFL_MsgSysLoadData(FALSE, 2, 0x61, HEAPID_GAMEEVENT);
+            msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_9, HEAPID_GAMEEVENT);
             str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
             GFL_StrBufStoreString(str, shot->pokes[pos].name, 8);
             GFL_StrBufFree(str);
@@ -942,7 +944,7 @@ void func_ov012_02151cd4(MusicalEventWork *work, u8 pos, WordSet *wordSet, u32 w
     }
     if (!done) {
         msgId = func_ov012_02152634(work->program, func_ov012_02151b14(work, index));
-        msgData = GFL_MsgSysLoadData(FALSE, 2, 0x61, HEAPID_GAMEEVENT);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_9, HEAPID_GAMEEVENT);
         name = GFL_MsgDataLoadStrbufNew(msgData, msgId);
         func_0202437c(wordSet, wordIndex, name, 0, 1, 2);
         GFL_StrBufFree(name);
@@ -971,7 +973,7 @@ void func_ov012_02151d6c(MusicalEventWork *work, u8 pos, WordSet *wordSet, u32 w
     }
     if (!done) {
         msgId = func_ov012_02152634(work->program, func_ov012_02151b14(work, index));
-        msgData = GFL_MsgSysLoadData(FALSE, 2, 0x62, HEAPID_GAMEEVENT);
+        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0098, HEAPID_GAMEEVENT);
         name = GFL_MsgDataLoadStrbufNew(msgData, msgId);
         func_0202437c(wordSet, wordIndex, name, 0, 1, 2);
         GFL_StrBufFree(name);

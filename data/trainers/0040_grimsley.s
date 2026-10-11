@@ -1,9 +1,0 @@
-#include "asm/trainer.inc"
-
-// Elite Four Grimsley
-    Trainer class=TRAINER_CLASS_ELITE_FOUR_GRIMSLEY, party=PARTY_MOVES | PARTY_ITEMS, item1=ITEM_FULL_RESTORE, ai=AI_FLAG_BASIC | AI_FLAG_EVAL_ATTACK | AI_FLAG_EXPERT, money=30
-    PartyMon level=56, species=SPECIES_LIEPARD, difficulty=200, gender=2, ability=1, move1=MOVE_NIGHT_SLASH, move2=MOVE_FAKE_OUT, move3=MOVE_AERIAL_ACE, move4=MOVE_ATTRACT
-    PartyMon level=56, species=SPECIES_SCRAFTY, difficulty=200, ability=2, move1=MOVE_CRUNCH, move2=MOVE_BRICK_BREAK, move3=MOVE_POISON_JAB, move4=MOVE_ROCK_TOMB
-    PartyMon level=56, species=SPECIES_KROOKODILE, difficulty=200, ability=1, move1=MOVE_CRUNCH, move2=MOVE_DRAGON_CLAW, move3=MOVE_EARTHQUAKE, move4=MOVE_ROCK_TOMB
-    PartyMon level=58, species=SPECIES_BISHARP, difficulty=250, ability=1, item=ITEM_SITRUS_BERRY, move1=MOVE_NIGHT_SLASH, move2=MOVE_X_SCISSOR, move3=MOVE_METAL_CLAW, move4=MOVE_AERIAL_ACE
-    PartyEnd

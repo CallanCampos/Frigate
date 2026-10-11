@@ -1,0 +1,123 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Weedle",
+    "pokedex": {
+        "category": "Hairy Bug Pokémon",
+        "entry": "It eats its weight in leaves every\nday. It fends off attackers with\nthe needle on its head.",
+        "height": "1'00\"",
+        "weight": "7.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Weedle",
+                "category": "Hairy Bug Pokémon",
+                "entry": "It eats its weight in leaves every\nday. It fends off attackers with\nthe needle on its head.",
+                "height": "1'00\"",
+                "weight": "7.1 lbs."
+            },
+            "fr": {
+                "name": "Aspicot",
+                "category": "Pokémon Insectopic",
+                "entry": "Il mange chaque jour son poids en\nfeuilles. Il utilise l'aiguillon sur sa\ntête pour repousser l'ennemi.",
+                "height": "0,3 m",
+                "weight": "3,2 kg"
+            },
+            "de": {
+                "name": "Hornliu",
+                "category": "Raupe",
+                "entry": "Es frisst täglich sein Gewicht in\nBlättern. Die Nadel auf seinem Kopf\ndient der Verteidigung.",
+                "height": "0,3 m",
+                "weight": "3,2 kg"
+            },
+            "it": {
+                "name": "Weedle",
+                "category": "Pokémon Millepiedi",
+                "entry": "Divora ogni giorno una quantità di foglie\npari al suo peso. Respinge i nemici con\nl'aculeo sulla testa.",
+                "height": "0,3 m",
+                "weight": "3,2 kg"
+            },
+            "ko": {
+                "name": "뿔충이",
+                "category": "송충이포켓몬",
+                "entry": "매일 자신과 똑같은 무게의\n잎사귀를 먹는다. 머리의 침으로\n달려드는 상대를 물리친다.",
+                "height": "0.3 m",
+                "weight": "3.2 kg"
+            },
+            "es": {
+                "name": "Weedle",
+                "category": "Pokémon Oruga",
+                "entry": "Come el equivalente a su peso en\nhojas todos los días. Se defiende\ncon el aguijón de su cabeza.",
+                "height": "0,3 m",
+                "weight": "3,2 kg"
+            },
+            "ja": {
+                "name": "ビードル",
+                "category": "けむしポケモン",
+                "entry": "まいにち\\x{3000}じぶんと\\x{3000}おなじ\\x{3000}おもさの\nはっぱを\\x{3000}たべる。あたまの\\x{3000}ハリで\nおそってきた\\x{3000}てきを\\x{3000}げきたい。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 35,
+        "defense": 30,
+        "speed": 50,
+        "special_attack": 20,
+        "special_defense": 20
+    },
+    "types": [ "TYPE_BUG", "TYPE_POISON" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SHIELD_DUST", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_RUN_AWAY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 39,
+    "height": 3,
+    "weight": 32,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POISON_STING" ],
+            [ 1, "MOVE_STRING_SHOT" ],
+            [ 15, "MOVE_BUG_BITE" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [ "MOVE_BUG_BITE", "MOVE_ELECTROWEB" ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 7,
+            "species": "SPECIES_KAKUNA"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WEEDLE"
+}

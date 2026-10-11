@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LUNATONE",
+    "moves": [ "MOVE_DREAM_EATER", "MOVE_HYPNOSIS", "MOVE_ICE_BEAM", "MOVE_COSMIC_POWER" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_QUIET",
+    "item": "ITEM_PETAYA_BERRY",
+    "form": 0
+}

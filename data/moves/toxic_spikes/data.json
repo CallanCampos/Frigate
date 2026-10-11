@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Toxic Spikes",
+    "description": "The user lays a trap of poison spikes at\nthe opponent's feet. They poison\nopponents that switch into battle.",
+    "type": "TYPE_POISON",
+    "quality": "MOVE_QUALITY_SIDE",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_TOXIC_SPIKES",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_FOE_SIDE",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_REFLECTABLE" ]
+}

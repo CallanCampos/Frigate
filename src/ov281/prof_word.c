@@ -103,7 +103,7 @@ static BOOL ProfWord_Compare(const u16 *name, const u16 *word) {
     return FALSE;
 }
 
-BOOL ProfWord_HasManyDigits(const u16 *name, u32 len) {
+BOOL ProfWord_HasManyDigits(const u16 *name, u32 len, HeapID unused) {
     u16 buf[PROF_WORD_LEN] = { 0 };
     int digits = 0;
     int i;

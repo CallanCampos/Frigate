@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Bronzor",
+    "pokedex": {
+        "category": "Bronze Pokémon",
+        "entry": "They are found in ancient tombs.\nThe patterns on their backs are\nsaid to be imbued with mysterious power.",
+        "height": "1'08\"",
+        "weight": "133.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Bronzor",
+                "category": "Bronze Pokémon",
+                "entry": "There are researchers who believe\nthis Pokémon reflected like a mirror\nin the distant past.",
+                "height": "1'08\"",
+                "weight": "133.4 lbs."
+            },
+            "fr": {
+                "name": "Archéomire",
+                "category": "Pokémon Bronze",
+                "entry": "Certains scientifiques soutiennent\nque ce Pokémon était jadis aussi\nréfléchissant qu'un miroir.",
+                "height": "0,5 m",
+                "weight": "60,5 kg"
+            },
+            "de": {
+                "name": "Bronzel",
+                "category": "Bronze",
+                "entry": "Manche Forscher glauben, dass\ndieses Pokémon in der Vergangenheit\nwie ein Spiegel reflektierte.",
+                "height": "0,5 m",
+                "weight": "60,5 kg"
+            },
+            "it": {
+                "name": "Bronzor",
+                "category": "Pokémon Bronzo",
+                "entry": "Secondo alcuni ricercatori, in passato\nquesto Pokémon rifletteva come\nuno specchio.",
+                "height": "0,5 m",
+                "weight": "60,5 kg"
+            },
+            "ko": {
+                "name": "동미러",
+                "category": "청동포켓몬",
+                "entry": "오랜 옛날의 동미러는\n거울처럼 반사하고 있었다고\n생각하는 연구자도 있다.",
+                "height": "0.5 m",
+                "weight": "60.5 kg"
+            },
+            "es": {
+                "name": "Bronzor",
+                "category": "Pokémon Bronce",
+                "entry": "Algunos investigadores creen\nque, antiguamente, este Pokémon\nreflejaba las cosas como un espejo.",
+                "height": "0,5 m",
+                "weight": "60,5 kg"
+            },
+            "ja": {
+                "name": "ドーミラー",
+                "category": "せいどうポケモン",
+                "entry": "おおむかしの\\x{3000}ドーミラーは\nかがみのように\\x{3000}はんしゃしていたと\nかんがえる\\x{3000}けんきゅうかも\\x{3000}いる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 57,
+        "attack": 24,
+        "defense": 86,
+        "speed": 23,
+        "special_attack": 24,
+        "special_defense": 86
+    },
+    "types": [ "TYPE_STEEL", "TYPE_PSYCHIC" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_METAL_COAT",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_HEATPROOF" ],
+    "hidden_ability": "ABILITY_HEAVY_METAL",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 60,
+    "height": 5,
+    "weight": 605,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 5, "MOVE_HYPNOSIS" ],
+            [ 9, "MOVE_IMPRISON" ],
+            [ 11, "MOVE_CONFUSE_RAY" ],
+            [ 15, "MOVE_PSYWAVE" ],
+            [ 19, "MOVE_IRON_DEFENSE" ],
+            [ 21, "MOVE_FAINT_ATTACK" ],
+            [ 25, "MOVE_SAFEGUARD" ],
+            [ 29, "MOVE_FUTURE_SIGHT" ],
+            [ 31, "MOVE_METAL_SOUND" ],
+            [ 35, "MOVE_GYRO_BALL" ],
+            [ 39, "MOVE_EXTRASENSORY" ],
+            [ 41, "MOVE_PAYBACK" ],
+            [ 45, "MOVE_HEAL_BLOCK" ],
+            [ 49, "MOVE_HEAVY_SLAM" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM48",
+            "TM57",
+            "TM66",
+            "TM69",
+            "TM70",
+            "TM74",
+            "TM77",
+            "TM78",
+            "TM80",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_GRAVITY",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_TRICK",
+            "MOVE_WONDER_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 33,
+            "species": "SPECIES_BRONZONG"
+        }
+    ],
+    "regional_dex_number": 250,
+    "baby_species": "SPECIES_BRONZOR"
+}

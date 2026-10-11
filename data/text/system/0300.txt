@@ -1,21 +1,21 @@
-{bd02}This is a story that starts\n{bd02}with a certain inventor...
-{bd02}The child inventor\n{bd02}became too busy\n{bd02}playing with F-00\n{bd02}and eventually\n{bd02}stopped working...
-{bd02}What he couldn't imagine\n{bd02}was how other people\n{bd02}would see his behavior.\n\n{bd02}And as a result,\n{bd02}tragedy occurred...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}This is a story that starts\n{bd02}with a certain inventor...
-{bd02}The child inventor\n{bd02}became too busy\n{bd02}playing with F-00\n{bd02}and eventually\n{bd02}stopped working...
-{bd02}What she couldn't imagine\n{bd02}was how other people\n{bd02}would see her behavior.\n\n{bd02}And as a result,\n{bd02}tragedy occurred...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0300_Text_StoryStartsCertainInventor = {bd02}This is a story that starts\n{bd02}with a certain inventor...
+Bank0300_Text_ChildInventorBecameToo = {bd02}The child inventor\n{bd02}became too busy\n{bd02}playing with F-00\n{bd02}and eventually\n{bd02}stopped working...
+Bank0300_Text_WhatHeCouldntImagine = {bd02}What he couldn't imagine\n{bd02}was how other people\n{bd02}would see his behavior.\n\n{bd02}And as a result,\n{bd02}tragedy occurred...
+Bank0300_Text_Empty = なし
+Bank0300_Text_Empty_2 = なし
+Bank0300_Text_Empty_3 = なし
+Bank0300_Text_Empty_4 = なし
+Bank0300_Text_Empty_5 = なし
+Bank0300_Text_Empty_6 = なし
+Bank0300_Text_Empty_7 = なし
+Bank0300_Text_StoryStartsCertainInventor_2 = {bd02}This is a story that starts\n{bd02}with a certain inventor...
+Bank0300_Text_ChildInventorBecameToo_2 = {bd02}The child inventor\n{bd02}became too busy\n{bd02}playing with F-00\n{bd02}and eventually\n{bd02}stopped working...
+Bank0300_Text_WhatSheCouldntImagine = {bd02}What she couldn't imagine\n{bd02}was how other people\n{bd02}would see her behavior.\n\n{bd02}And as a result,\n{bd02}tragedy occurred...
+Bank0300_Text_Empty_8 = なし
+Bank0300_Text_Empty_9 = なし
+Bank0300_Text_Empty_10 = なし
+Bank0300_Text_Empty_11 = なし
+Bank0300_Text_Empty_12 = なし
+Bank0300_Text_Empty_13 = なし
+Bank0300_Text_Empty_14 = なし
+Bank0300_Text_Empty_15 = なし

@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Freira",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_FREIRA",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PORYGON_Z",
+            "form": 0,
+            "level": 68,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_PETAYA_BERRY",
+            "moves": [ "MOVE_PSYCHIC", "MOVE_THUNDERBOLT", "MOVE_ICE_BEAM", "MOVE_CONVERSION" ]
+        },
+        {
+            "species": "SPECIES_BRELOOM",
+            "form": 0,
+            "level": 68,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_TOXIC_ORB",
+            "moves": [ "MOVE_MACH_PUNCH", "MOVE_STONE_EDGE", "MOVE_FOCUS_PUNCH", "MOVE_SPORE" ]
+        },
+        {
+            "species": "SPECIES_ARMALDO",
+            "form": 0,
+            "level": 68,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_CHOICE_BAND",
+            "moves": [ "MOVE_X_SCISSOR", "MOVE_AQUA_TAIL", "MOVE_EARTHQUAKE", "MOVE_STONE_EDGE" ]
+        }
+    ],
+    "messages": []
+}

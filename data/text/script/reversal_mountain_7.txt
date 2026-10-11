@@ -1,0 +1,5 @@
+ReversalMountain7_Text_OhUndellaTownRight = Oh! Undella Town is right through here!\nI want to keep looking around a bit more.{be01}\nWhat do you want to do?\nShould we say bye for now?
+ReversalMountain7_Text_OkThenWantLittle = OK, then! I want to do a little more\nresearch about Heatran anyway!{be01}\nThank you for coming with me!\nBe careful on the rest of your journey!{be01}
+ReversalMountain7_Text_OkThenWantLittle_2 = OK, then!{be01}\nI want to do a little more research\nabout where Heatran might be!{be01}\nThank you for coming with me!\nBe careful on the rest of your journey!{be01}
+ReversalMountain7_Text_OkThenLetsLook = OK! Then, let's look around a bit more!{be01}
+ReversalMountain7_Text_ReversalMountainWonderCould = Reversal Mountain... I wonder...\nCould a Magma Stone be in there?{be01}\nHave you heard of it?\nThey say a Magma Stone was found{be00}\nin a volcano in the distant Sinnoh region.{be01}\nApparently, it had something\nto do with Heatran!

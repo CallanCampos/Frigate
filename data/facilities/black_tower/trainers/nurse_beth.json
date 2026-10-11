@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Beth",
+    "class": "TRAINER_CLASS_NURSE",
+    "pokemon": [
+        "growlithe_1",
+        "cranidos_1",
+        "nidorino_1",
+        "machoke_1",
+        "gurdurr_1",
+        "gabite_1",
+        "dragonair_1",
+        "mightyena_1",
+        "seaking_1",
+        "granbull_1",
+        "hitmonlee_1",
+        "sawk_1",
+        "staraptor_1",
+        "shiftry_1",
+        "darmanitan_1",
+        "golurk_1",
+        "beartic_1",
+        "stoutland_1",
+        "leavanny_1",
+        "rampardos_1"
+    ]
+}

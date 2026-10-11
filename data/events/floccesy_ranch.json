@@ -1,0 +1,34 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 1,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 145,
+                "y": 630,
+                "z": 32
+            }
+        }
+    ],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_FLOCCESY_RANCH_2",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 2264,
+                "y": 32,
+                "z": 10072,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

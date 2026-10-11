@@ -3,6 +3,7 @@
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_command.h"
+#include "gfl/net_whpipe.h"
 #include "gfl/std.h"
 
 // A beacon of the data

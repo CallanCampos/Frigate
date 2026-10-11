@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Combusken",
+    "pokedex": {
+        "category": "Young Fowl Pokémon",
+        "entry": "Its kicking mastery lets it loose\n10 kicks per second. It emits\nsharp cries to intimidate foes.",
+        "height": "2'11\"",
+        "weight": "43.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Combusken",
+                "category": "Young Fowl Pokémon",
+                "entry": "Its kicking mastery lets it loose\n10 kicks per second. It emits\nsharp cries to intimidate foes.",
+                "height": "2'11\"",
+                "weight": "43.0 lbs."
+            },
+            "fr": {
+                "name": "Galifeu",
+                "category": "Pokémon Poulet",
+                "entry": "Ce maître du coup de pied peut donner\n10 coups par seconde. Ses cris aigus\nintimident l'ennemi.",
+                "height": "0,9 m",
+                "weight": "19,5 kg"
+            },
+            "de": {
+                "name": "Jungglut",
+                "category": "Kleinhahn",
+                "entry": "Es kann 10 Tritte pro Sekunde austeilen.\nEs gibt schrille Schreie von sich,\num Gegner einzuschüchtern.",
+                "height": "0,9 m",
+                "weight": "19,5 kg"
+            },
+            "it": {
+                "name": "Combusken",
+                "category": "Pokémon Rampollo",
+                "entry": "Possiede l'abilità di sferrare anche\n10 calci al secondo. Emette urla\nstrazianti per intimorire i nemici.",
+                "height": "0,9 m",
+                "weight": "19,5 kg"
+            },
+            "ko": {
+                "name": "영치코",
+                "category": "꼬마닭포켓몬",
+                "entry": "1초에 킥을 10번 날릴 정도로\n발을 사용하는 기술에 능하다.\n날카로운 울음소리로 위협한다.",
+                "height": "0.9 m",
+                "weight": "19.5 kg"
+            },
+            "es": {
+                "name": "Combusken",
+                "category": "Pokémon Ave Corral",
+                "entry": "Su habilidad le permite dar diez patadas\npor segundo. Lanza potentes gritos\npara intimidar.",
+                "height": "0,9 m",
+                "weight": "19,5 kg"
+            },
+            "ja": {
+                "name": "ワカシャモ",
+                "category": "わかどりポケモン",
+                "entry": "\\x{ff11}びょうかんに\\x{3000}キックを\\x{3000}\\x{ff11}\\x{ff10}ぱつ\nくりだす\\x{3000}あしわざの\\x{3000}もちぬし。\nするどい\\x{3000}なきごえで\\x{3000}いかくする。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 85,
+        "defense": 60,
+        "speed": 55,
+        "special_attack": 85,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIGHTING" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_BLAZE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SPEED_BOOST",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 9,
+    "weight": 195,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_FOCUS_ENERGY" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 7, "MOVE_FOCUS_ENERGY" ],
+            [ 13, "MOVE_EMBER" ],
+            [ 16, "MOVE_DOUBLE_KICK" ],
+            [ 17, "MOVE_PECK" ],
+            [ 21, "MOVE_SAND_ATTACK" ],
+            [ 28, "MOVE_BULK_UP" ],
+            [ 32, "MOVE_QUICK_ATTACK" ],
+            [ 39, "MOVE_SLASH" ],
+            [ 43, "MOVE_MIRROR_MOVE" ],
+            [ 50, "MOVE_SKY_UPPERCUT" ],
+            [ 54, "MOVE_FLARE_BLITZ" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM47",
+            "TM48",
+            "TM49",
+            "TM50",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM65",
+            "TM75",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_FIRE_PLEDGE",
+            "MOVE_DUAL_CHOP",
+            "MOVE_BOUNCE",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_LAST_RESORT",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 36,
+            "species": "SPECIES_BLAZIKEN"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TORCHIC"
+}

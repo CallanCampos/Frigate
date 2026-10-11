@@ -1,0 +1,64 @@
+// nhttp_rap_evilcheck.c: signs data for the server's check of Pokémon, with a key and a heap of its own. The name is
+// the ROM's own; the functions' names are ours
+
+#include "gfl/nhttp_rap_evilcheck.h"
+#include "types.h"
+#include "dwc/crypt.h"
+#include "gfl/heap.h"
+#include "gfl/std.h"
+
+#define HEAPID_NONE 0xffff
+
+static void *NHttpRapEvilCheck_Alloc(u32 size);
+static void NHttpRapEvilCheck_Free(void *ptr);
+
+static HeapID sHeapId = HEAPID_NONE;
+static u8 sKey[128] = {
+    0xd9, 0x87, 0xd4, 0x65, 0xe4, 0xee, 0xae, 0x58, 0x2d, 0x01, 0x73, 0x15, 0xf0, 0x0e, 0xa3, 0x40, 0x0c, 0x51, 0x0b,
+    0x2e, 0x51, 0xe1, 0x5d, 0x77, 0xd0, 0x3a, 0xdc, 0xb2, 0x5c, 0x83, 0x01, 0x71, 0xf5, 0x69, 0xfb, 0xd2, 0x6a, 0x78,
+    0xdc, 0x69, 0x69, 0x4d, 0xdd, 0x2c, 0xef, 0xa4, 0xa9, 0xaa, 0xd1, 0xa0, 0xd9, 0xaa, 0x99, 0x70, 0x5b, 0xf0, 0x80,
+    0x38, 0xf5, 0x77, 0x64, 0xee, 0xa5, 0xab, 0x7d, 0x6a, 0x38, 0x38, 0x67, 0x8a, 0xec, 0x26, 0x2e, 0x95, 0x2a, 0x1c,
+    0xdb, 0xb8, 0xe2, 0xff, 0x68, 0xdc, 0x93, 0x2e, 0x7f, 0x8e, 0x3a, 0xec, 0xd1, 0xfe, 0x52, 0x82, 0xea, 0xca, 0x41,
+    0x61, 0xc2, 0x20, 0x3f, 0xf0, 0x98, 0xf7, 0x9d, 0x67, 0x35, 0xe6, 0x44, 0x14, 0xe1, 0x85, 0xfb, 0xb3, 0xec, 0x04,
+    0x3d, 0x83, 0x8d, 0x9b, 0x4b, 0x19, 0x07, 0x23, 0x31, 0xc3, 0xf7, 0x98, 0x57, 0xe5,
+};
+
+int NHttpRapEvilCheck_Sign(const void *data, u32 size, u32 count, void *signature, HeapID heapId) {
+    int result;
+
+    sHeapId = heapId;
+    func_ov189_021a9778(NHttpRapEvilCheck_Alloc, NHttpRapEvilCheck_Free, 0);
+    result = func_ov189_021a96cc(data, size * count, signature, sKey);
+    sHeapId = HEAPID_NONE;
+    return result;
+}
+
+void *NHttpRapEvilCheck_AllocArray(u32 size, u32 count, HeapID heapId) {
+    u32 total = count * size;
+    void *ptr = GFL_HeapAllocate(heapId, total, FALSE, "nhttp_rap_evilcheck.c", 0xb9);
+
+    sys_memset(ptr, 0, total);
+    return ptr;
+}
+
+void NHttpRapEvilCheck_FreeArray(void *ptr) {
+    GFL_HeapFree(ptr);
+}
+
+void NHttpRapEvilCheck_SetElement(void *array, const void *element, u32 size, u32 index) {
+    sys_memcpy(element, (u8 *)array + size * index, size);
+}
+
+static void *NHttpRapEvilCheck_Alloc(u32 size) {
+    void *ptr;
+
+    GFL_ASSERT_MSG(sHeapId != HEAPID_NONE,
+                   "heapID\x82\xf0\x90\xdd\x92\xe8\x82\xb5\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\n");
+    ptr = GFL_HeapAllocate(sHeapId, size, FALSE, "nhttp_rap_evilcheck.c", 0xe9);
+    GFL_ASSERT_MSG(ptr != NULL, "CRYPT alloc failed!! size=%d =restHeap%d \n", size, GFL_HeapGetFreeSize(sHeapId));
+    return ptr;
+}
+
+static void NHttpRapEvilCheck_Free(void *ptr) {
+    GFL_HeapFree(ptr);
+}

@@ -1,62 +1,62 @@
-Fine Actor
-Mystery Man
-River: You're quite stubborn...
-{0100:1}: Arrrgh!\nPlease give up already!
-River: Why do you care?{be01}\nFor you, it's just some kind of Poké Ball.
-???: Excuse me...
-{0100:1}: Who are you?
-???: My name is River.{be01}\nI sold you a Poké Ball the other day.{be01}\nDo you have a minute?
-{0100:1}: Er...{be01}\nI'm sorry.\nI'm busy right now.
-River: I see.\nThen I'll get right to the point.{be01}\nThat Poké Ball I sold you...{be01}\nI need you to give it back.
-{0100:1}: Uh, why?
-River: ...{be01}\nThere was a small slipup, that's all.\nMind you, I'm not asking to get it{be00}\nback for free.{be01}\nI'll pay whatever price you want.
-{0100:1}: Well, er...\nI'm sorry. I can't give it back.
-River: Truly?\nI'm sorry you won't agree to give it back.{be01}\nSadly, I have to get it from you anyway...\nBy force, if I have to!
-{0100:1}: Huh?
-River: Again, sorry...{be01}\nIt's not your fault, but I have no choice.
-{0100:1}: Huh? You mean--violence?
-River: I know, I know, and I'm sorry.\nBut it just cannot be helped...
-{0100:1}: No way!\nWhat have I done to deserve this?
-River: Apologies all over again...{be01}\nBut...\nI must get that Poké Ball back at any cost!
-{0100:1}: That's totally unfair!\nBesides, no matter how much you want it,{be00}\nthe Poké Ball was...
-River: W-was? What happened?{be01}\nDid you...\nHave you...used that Poké Ball already?!
-{0100:1}: Well...er...
-River: No matter.{be01}\nWhatever happened,\nI'll get that Poké Ball back!
-{0100:1}: It opened all by itself!
-River: Opened all by itself...\nThat's what I was afraid of...
-{0100:1}: It wasn't me!
-River: What are you talking about?\nThere's no one else here.{be01}\nNow stop making trouble and\ngive the Poké Ball back to me!
-{0100:1}: Never mind! No way!
-River: Talk, don't talk... I don't care!\nBut I'm getting that Poké Ball back!
-River: Urk...\nYou're quite good...
-{0100:1}: Hfff, hfff...{be01}\nWhew! Enough!{be01}\nI can't give you the Poké Ball back!{be01}\nSo please leave now!
-River: I am sorry, but I cannot leave.{be01}\nI wish I didn't have to go this far, but...
-Wham!
-{0100:1}: Eek!
-River: I apologize.{be01}\nBut I cannot permit the existence of\nthis Poké Ball to be made public!
-...I was attacked by a man\nwho identified himself as River...{be01}\nI lost consciousness...{be01}\n...When I regained consciousness,\nthe man had disappeared{be00}\nand the Poké Ball was gone.{be01}\nOn the table in its place, there was\na pile of money I'd never seen before...{be01}\nMonica's inside the Poké Ball...\nOh, what will happen to her?
-River: Apologies.\nI didn't want to get rough with you, but...
-{0100:1}: Hfff, pfff... Hfff, pfff...
-River: Sorry, but I must take the Poké Ball.
-{0100:1}: Wait!\nMy girlfriend is inside the Poké Ball!
-River: Heh.\nWhat are you talking about?{be01}\nI don't have time for jokes.{be01}\nExcuse me, if you please.
-{0100:1}: Agh! Hurry!\nI have to catch up with him!
-The man who identified himself as River\ntook the Poké Ball by force.{be01}\nMonica is inside the Poké Ball!\nI have to catch up with him right away!
-{0100:1}: Hfff, pfff... Hfff, pfff...
-River: Heh heh...{be01}\nYou continue to challenge me,\nand you're not afraid of me...{be01}\nI'm impressed.\nBut...{be01}\nIt's just a Poké Ball to you, right?\nNot to mention the money I offered!{be01}\nWhy are you going to these lengths\nto keep this Poké Ball?
-{0100:1}: Hfff, pfff... Hfff, pfff...{be01}\nI have to!\nInside the Poké Ball is Monica!{be01}\nMy girlfriend is trapped inside\nthat strange Poké Ball!{be01}
-River: Your girlfriend?
-{0100:1}: Yes, my girlfriend! That's why\nI can't let you have the Poké Ball!
-River: Heh.{be01}\nIt's touching that you can treasure a\nPokémon as much as you would a girlfriend.{be01}\nI like that.\nI respect your feelings.
-{0100:1}: Wha...?
-River: Heh.\nSweet. Here, you keep the Poké Ball.{be01}\nYou can live happily ever after\nwith your Pokémon...
-{0100:1}: But...er...
-River: Heh heh.{be01}\nYou don't have to thank me.\nBe happy with your “girlfriend"...
-{0100:1}: Er...\nThat's not what I...
-The man identified as River, who had\nsuddenly appeared, left just as suddenly,{be00}\nhaving misunderstood my words...{be01}\nAlone once more, I tried to open the\nstrange Poké Ball and rescue my girlfriend.{be01}\nBut it would not open,\nno matter how hard I tried.{be01}\nOh, Monica, my darling...{be01}\nWhat will happen to you?
-{0100:1}: Argh! What is this?\nKnock it off!
-River: Sorry.\nBut I have my reasons...{be01}\nI can't afford to be picky\nabout my methods.
-{0100:1}: What do you mean?
-River: Never mind.{be01}\nWhat matters is getting the Poké Ball back.
-{0100:1}: Thief!
-River: Me? A thief?!{be01}\nYou're not a very good judge of character!
+Bank0232_Text_FineActor = Fine Actor
+Bank0232_Text_MysteryMan = Mystery Man
+Bank0232_Text_RiverYoureQuiteStubborn = River: You're quite stubborn...
+Bank0232_Text_ArrrghPleaseGiveUp = {0100:1}: Arrrgh!\nPlease give up already!
+Bank0232_Text_RiverWhyCareIts = River: Why do you care?{be01}\nFor you, it's just some kind of Poké Ball.
+Bank0232_Text_Excuse = ???: Excuse me...
+Bank0232_Text_Who = {0100:1}: Who are you?
+Bank0232_Text_NameRiverSoldPoke = ???: My name is River.{be01}\nI sold you a Poké Ball the other day.{be01}\nDo you have a minute?
+Bank0232_Text_ErImSorryIm = {0100:1}: Er...{be01}\nI'm sorry.\nI'm busy right now.
+Bank0232_Text_RiverSeeThenIll = River: I see.\nThen I'll get right to the point.{be01}\nThat Poké Ball I sold you...{be01}\nI need you to give it back.
+Bank0232_Text_UhWhy = {0100:1}: Uh, why?
+Bank0232_Text_RiverThereSmallSlipup = River: ...{be01}\nThere was a small slipup, that's all.\nMind you, I'm not asking to get it{be00}\nback for free.{be01}\nI'll pay whatever price you want.
+Bank0232_Text_WellErImSorry = {0100:1}: Well, er...\nI'm sorry. I can't give it back.
+Bank0232_Text_RiverTrulyImSorry = River: Truly?\nI'm sorry you won't agree to give it back.{be01}\nSadly, I have to get it from you anyway...\nBy force, if I have to!
+Bank0232_Text_Huh = {0100:1}: Huh?
+Bank0232_Text_RiverAgainSorryIts = River: Again, sorry...{be01}\nIt's not your fault, but I have no choice.
+Bank0232_Text_HuhMeanViolence = {0100:1}: Huh? You mean--violence?
+Bank0232_Text_RiverKnowKnowIm = River: I know, I know, and I'm sorry.\nBut it just cannot be helped...
+Bank0232_Text_NoWayWhatHave = {0100:1}: No way!\nWhat have I done to deserve this?
+Bank0232_Text_RiverApologiesAllOver = River: Apologies all over again...{be01}\nBut...\nI must get that Poké Ball back at any cost!
+Bank0232_Text_ThatsTotallyUnfairBesides = {0100:1}: That's totally unfair!\nBesides, no matter how much you want it,{be00}\nthe Poké Ball was...
+Bank0232_Text_RiverWWhatHappened = River: W-was? What happened?{be01}\nDid you...\nHave you...used that Poké Ball already?!
+Bank0232_Text_WellEr = {0100:1}: Well...er...
+Bank0232_Text_RiverNoMatterWhatever = River: No matter.{be01}\nWhatever happened,\nI'll get that Poké Ball back!
+Bank0232_Text_OpenedAllByItself = {0100:1}: It opened all by itself!
+Bank0232_Text_RiverOpenedAllBy = River: Opened all by itself...\nThat's what I was afraid of...
+Bank0232_Text_Wasnt = {0100:1}: It wasn't me!
+Bank0232_Text_RiverWhatTalkingAbout = River: What are you talking about?\nThere's no one else here.{be01}\nNow stop making trouble and\ngive the Poké Ball back to me!
+Bank0232_Text_NeverMindNoWay = {0100:1}: Never mind! No way!
+Bank0232_Text_RiverTalkDontTalk = River: Talk, don't talk... I don't care!\nBut I'm getting that Poké Ball back!
+Bank0232_Text_RiverUrkYoureQuite = River: Urk...\nYou're quite good...
+Bank0232_Text_HfffHfffWhewEnough = {0100:1}: Hfff, hfff...{be01}\nWhew! Enough!{be01}\nI can't give you the Poké Ball back!{be01}\nSo please leave now!
+Bank0232_Text_RiverAmSorryBut = River: I am sorry, but I cannot leave.{be01}\nI wish I didn't have to go this far, but...
+Bank0232_Text_Wham = Wham!
+Bank0232_Text_Eek = {0100:1}: Eek!
+Bank0232_Text_RiverApologizeButCannot = River: I apologize.{be01}\nBut I cannot permit the existence of\nthis Poké Ball to be made public!
+Bank0232_Text_AttackedByManWho = ...I was attacked by a man\nwho identified himself as River...{be01}\nI lost consciousness...{be01}\n...When I regained consciousness,\nthe man had disappeared{be00}\nand the Poké Ball was gone.{be01}\nOn the table in its place, there was\na pile of money I'd never seen before...{be01}\nMonica's inside the Poké Ball...\nOh, what will happen to her?
+Bank0232_Text_RiverApologiesDidntWant = River: Apologies.\nI didn't want to get rough with you, but...
+Bank0232_Text_HfffPfffHfffPfff = {0100:1}: Hfff, pfff... Hfff, pfff...
+Bank0232_Text_RiverSorryButMust = River: Sorry, but I must take the Poké Ball.
+Bank0232_Text_WaitGirlfriendInsidePoke = {0100:1}: Wait!\nMy girlfriend is inside the Poké Ball!
+Bank0232_Text_RiverHehWhatTalking = River: Heh.\nWhat are you talking about?{be01}\nI don't have time for jokes.{be01}\nExcuse me, if you please.
+Bank0232_Text_AghHurryHaveCatch = {0100:1}: Agh! Hurry!\nI have to catch up with him!
+Bank0232_Text_ManWhoIdentifiedHimself = The man who identified himself as River\ntook the Poké Ball by force.{be01}\nMonica is inside the Poké Ball!\nI have to catch up with him right away!
+Bank0232_Text_HfffPfffHfffPfff_2 = {0100:1}: Hfff, pfff... Hfff, pfff...
+Bank0232_Text_RiverHehHehContinue = River: Heh heh...{be01}\nYou continue to challenge me,\nand you're not afraid of me...{be01}\nI'm impressed.\nBut...{be01}\nIt's just a Poké Ball to you, right?\nNot to mention the money I offered!{be01}\nWhy are you going to these lengths\nto keep this Poké Ball?
+Bank0232_Text_HfffPfffHfffPfff_3 = {0100:1}: Hfff, pfff... Hfff, pfff...{be01}\nI have to!\nInside the Poké Ball is Monica!{be01}\nMy girlfriend is trapped inside\nthat strange Poké Ball!{be01}
+Bank0232_Text_RiverGirlfriend = River: Your girlfriend?
+Bank0232_Text_YesGirlfriendThatsWhy = {0100:1}: Yes, my girlfriend! That's why\nI can't let you have the Poké Ball!
+Bank0232_Text_RiverHehItsTouching = River: Heh.{be01}\nIt's touching that you can treasure a\nPokémon as much as you would a girlfriend.{be01}\nI like that.\nI respect your feelings.
+Bank0232_Text_Wha = {0100:1}: Wha...?
+Bank0232_Text_RiverHehSweetHere = River: Heh.\nSweet. Here, you keep the Poké Ball.{be01}\nYou can live happily ever after\nwith your Pokémon...
+Bank0232_Text_ButEr = {0100:1}: But...er...
+Bank0232_Text_RiverHehHehDont = River: Heh heh.{be01}\nYou don't have to thank me.\nBe happy with your “girlfriend"...
+Bank0232_Text_ErThatsNotWhat = {0100:1}: Er...\nThat's not what I...
+Bank0232_Text_ManIdentifiedRiverWho = The man identified as River, who had\nsuddenly appeared, left just as suddenly,{be00}\nhaving misunderstood my words...{be01}\nAlone once more, I tried to open the\nstrange Poké Ball and rescue my girlfriend.{be01}\nBut it would not open,\nno matter how hard I tried.{be01}\nOh, Monica, my darling...{be01}\nWhat will happen to you?
+Bank0232_Text_ArghWhatKnockOff = {0100:1}: Argh! What is this?\nKnock it off!
+Bank0232_Text_RiverSorryButHave = River: Sorry.\nBut I have my reasons...{be01}\nI can't afford to be picky\nabout my methods.
+Bank0232_Text_WhatMean = {0100:1}: What do you mean?
+Bank0232_Text_RiverNeverMindWhat = River: Never mind.{be01}\nWhat matters is getting the Poké Ball back.
+Bank0232_Text_Thief = {0100:1}: Thief!
+Bank0232_Text_RiverThiefYoureNot = River: Me? A thief?!{be01}\nYou're not a very good judge of character!

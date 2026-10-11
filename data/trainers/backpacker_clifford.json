@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Clifford",
+    "class": "TRAINER_CLASS_BACKPACKER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SANDILE",
+            "form": 0,
+            "level": 16,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_BITE", "MOVE_SAND_TOMB", "MOVE_TORMENT", "MOVE_RAGE" ]
+        },
+        {
+            "species": "SPECIES_HERDIER",
+            "form": 0,
+            "level": 16,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_TACKLE", "MOVE_BITE", "MOVE_ODOR_SLEUTH", "MOVE_WORK_UP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey there! Trainer!\nLet's battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Thank you! This will prove to be\na great memory of my journey!"
+        },
+        {
+            "type": 2,
+            "text": "Stick up a thumb to stop a car.\nMake eye contact to stop a Trainer."
+        }
+    ]
+}

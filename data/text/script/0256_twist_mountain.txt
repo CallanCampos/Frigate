@@ -1,6 +1,0 @@
-I'm Marshal, one of the Elite Four!{be01}\nYou look like you're a\nPokémon Trainer with potential,{be00}\nbut I can't let you into Twist Mountain!{be01}\nThe inside collapsed,\nand you can't get through!
-{0100:0}!{be01}\nOh, I see! So, you travel all around\nlike this and toughen yourself up, then.
-Well, I suppose you have\nmany battles ahead of you.{be01}\nPokémon battles as a Pokémon Trainer.{be01}\nBattles about how you\nshould live your life...{be01}\nYou'll lose sometimes,\nbut I think what matters{be00}\nis that you do things your own way.{be01}\nIf you surpass what you've done before,\nyou have bested yourself.
-Well then. I'll be waiting for\nyour challenge at the Pokémon League!{be01}
-Twist Mountain ahead.\nWatch out for wild Pokémon.
-\pad{42}

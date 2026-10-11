@@ -1,0 +1,283 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 3,
+                "y": 47,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 23,
+                "y": 8,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 9,
+                "y": 6,
+                "z": -48
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 40,
+                "y": 10,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 56,
+                "y": 8,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 50,
+                "y": 53,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 35,
+                "y": 60,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 110,
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x053d",
+            "script": 7241,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 60,
+                "z": 8,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": 155,
+            "movement": 42,
+            "type": 1,
+            "flag": 0,
+            "script": 3525,
+            "direction": "DIR_DOWN",
+            "params": [ 1, 0, 0 ],
+            "area": {
+                "width": 2,
+                "height": 4
+            },
+            "grid": {
+                "x": 44,
+                "z": 56,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": 33,
+            "movement": 16,
+            "type": 1,
+            "flag": 0,
+            "script": 3533,
+            "direction": "DIR_LEFT",
+            "params": [ 2, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 59,
+                "z": 43,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": 155,
+            "movement": 15,
+            "type": 1,
+            "flag": 0,
+            "script": 3526,
+            "direction": "DIR_DOWN",
+            "params": [ 5, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 50,
+                "z": 5,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN",
+            "warp": 0,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 72,
+                "y": 0,
+                "z": 984,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "grid": {
+                "x": 280,
+                "y": 0,
+                "z": 776,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "warp": 1,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 584,
+                "y": 0,
+                "z": 808,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "warp": 2,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 792,
+                "y": 0,
+                "z": 760,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "warp": 3,
+            "unk4": 4,
+            "transition": 4,
+            "grid": {
+                "x": 856,
+                "y": 0,
+                "z": 584,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "warp": 4,
+            "unk4": 4,
+            "transition": 4,
+            "grid": {
+                "x": 552,
+                "y": 0,
+                "z": 72,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_4",
+            "warp": 5,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 776,
+                "y": 65488,
+                "z": 296,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_4",
+            "warp": 6,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 120,
+                "y": 65488,
+                "z": 88,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN_2",
+            "warp": 15,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 360,
+                "y": 0,
+                "z": 280,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

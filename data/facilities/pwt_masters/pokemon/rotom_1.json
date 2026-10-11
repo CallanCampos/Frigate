@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ROTOM",
+    "moves": [ "MOVE_TRICK", "MOVE_OVERHEAT", "MOVE_THUNDERBOLT", "MOVE_PAIN_SPLIT" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_FLAME_ORB",
+    "form": 1
+}

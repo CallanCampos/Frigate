@@ -1,0 +1,193 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Dusknoir",
+    "pokedex": {
+        "category": "Gripper Pokémon",
+        "entry": "It is said to take lost spirits\ninto its pliant body and guide\nthem home.",
+        "height": "7'03\"",
+        "weight": "235.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Dusknoir",
+                "category": "Gripper Pokémon",
+                "entry": "It is said to take lost spirits\ninto its pliant body and guide\nthem home.",
+                "height": "7'03\"",
+                "weight": "235.0 lbs."
+            },
+            "fr": {
+                "name": "Noctunoir",
+                "category": "Pokémon Mainpince",
+                "entry": "Son corps se replie sur lui-même\npour emprisonner les esprits\nperdus et les ramener chez eux.",
+                "height": "2,2 m",
+                "weight": "106,6 kg"
+            },
+            "de": {
+                "name": "Zwirrfinst",
+                "category": "Greifer",
+                "entry": "Man sagt, dass es verlorene\nSeelen in seinem biegsamen\nKörper nach Hause geleite.",
+                "height": "2,2 m",
+                "weight": "106,6 kg"
+            },
+            "it": {
+                "name": "Dusknoir",
+                "category": "Pokémon Pinza",
+                "entry": "Si dice che accolga gli spiriti smarriti\nnel suo corpo flessibile per riportarli\na casa.",
+                "height": "2,2 m",
+                "weight": "106,6 kg"
+            },
+            "ko": {
+                "name": "야느와르몽",
+                "category": "움켜쥠포켓몬",
+                "entry": "탄력 있는 몸 안에\n갈 곳 없는 영혼을 가두어\n저승으로 데려간다고 전해진다.",
+                "height": "2.2 m",
+                "weight": "106.6 kg"
+            },
+            "es": {
+                "name": "Dusknoir",
+                "category": "Pokémon Grilletes",
+                "entry": "Se dice que recoge en su cuerpo\nflexible a los espíritus extraviados\ny los guía hasta casa.",
+                "height": "2,2 m",
+                "weight": "106,6 kg"
+            },
+            "ja": {
+                "name": "ヨノワール",
+                "category": "てづかみポケモン",
+                "entry": "だんりょくのある\\x{3000}からだの\\x{3000}なかに\nいきばのない\\x{3000}たましいを\\x{3000}とりこんで\nあのよに\\x{3000}つれていくと\\x{3000}いわれる。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff16}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 100,
+        "defense": 135,
+        "speed": 45,
+        "special_attack": 65,
+        "special_defense": 135
+    },
+    "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_KASIB_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_PRESSURE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 236,
+    "height": 22,
+    "weight": 1066,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_FIRE_PUNCH" ],
+            [ 1, "MOVE_ICE_PUNCH" ],
+            [ 1, "MOVE_THUNDER_PUNCH" ],
+            [ 1, "MOVE_GRAVITY" ],
+            [ 1, "MOVE_BIND" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_NIGHT_SHADE" ],
+            [ 1, "MOVE_DISABLE" ],
+            [ 6, "MOVE_DISABLE" ],
+            [ 9, "MOVE_FORESIGHT" ],
+            [ 14, "MOVE_ASTONISH" ],
+            [ 17, "MOVE_CONFUSE_RAY" ],
+            [ 22, "MOVE_SHADOW_SNEAK" ],
+            [ 25, "MOVE_PURSUIT" ],
+            [ 30, "MOVE_CURSE" ],
+            [ 33, "MOVE_WILL_O_WISP" ],
+            [ 37, "MOVE_SHADOW_PUNCH" ],
+            [ 42, "MOVE_HEX" ],
+            [ 49, "MOVE_MEAN_LOOK" ],
+            [ 58, "MOVE_PAYBACK" ],
+            [ 61, "MOVE_FUTURE_SIGHT" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM57",
+            "TM61",
+            "TM63",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM77",
+            "TM78",
+            "TM80",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_GRAVITY",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_DUSKULL"
+}

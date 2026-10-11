@@ -380,7 +380,7 @@ MUS_SHOT_INFO_RETURN_RECT kind:data(any) addr:0x021c2d60
 MUS_SHOT_INFO_BG4_SETUP kind:data(any) addr:0x021c2d68
 MUS_SHOT_INFO_BG6_SETUP kind:data(any) addr:0x021c2d88
 MUS_SHOT_INFO_BG7_SETUP kind:data(any) addr:0x021c2da8
-data_ov209_021c2d88 kind:data(any) addr:0x021c2dc8
+MUS_ITEM_DRAW_UNUSED_0 kind:data(any) addr:0x021c2dc8
 MUS_ITEM_DRAW_UNUSED_1 kind:data(any) addr:0x021c2dcc
 MUS_ITEM_DRAW_SHOW kind:data(any) addr:0x021c2dd0
 MUSICAL_MCSS_ORTHO_TARGET kind:data(any) addr:0x021c2dd4
@@ -388,7 +388,7 @@ MUSICAL_MCSS_ORTHO_POS kind:data(any) addr:0x021c2de0
 MUSICAL_MCSS_ORTHO_UP kind:data(any) addr:0x021c2dec
 STA_ACT_OBJ_SHOW kind:data(any) addr:0x021c2df8
 STA_ACT_POKE_ITEM_SE kind:data(any) addr:0x021c2dfc
-data_ov209_021c2dd0 kind:data(any) addr:0x021c2e10
+STA_ACTING_UNUSED kind:data(any) addr:0x021c2e10
 STA_ACTING_CAMERA_UP kind:data(any) addr:0x021c2e14
 STA_ACTING_CAMERA_TARGET kind:data(any) addr:0x021c2e20
 STA_ACTING_CAMERA_POS kind:data(any) addr:0x021c2e2c

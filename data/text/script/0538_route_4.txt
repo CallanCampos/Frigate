@@ -1,8 +1,0 @@
-I'm very particular about a\nPokémon's Speed!
-I'm very particular about a\nPokémon's Attack!
-That's why... You!{be01}\nDo you have a Pokémon whose Attack\nstat is the same as or higher than {0202:1}?
-Your {0101:0}!\nI like its Attack stat!{be01}\nI'm so happy, so I'll give you this!{be01}
-Your {0101:0}!\nIt truly has the Attack stat I like!{be01}\nI'm very happy!\nI'll give you lots of these!{be01}
-Various Attacks. ♪\nVarious Pokémon. ♪{be01}\nI don't know why, but I feel happy!\nCome back again tomorrow.
-That's quite all right! Good things about\nPokémon are not just Attack stats.{be01}\nBut, today I just feel like meeting\na Pokémon whose Attack stat is{be00}\nhigher than {0202:1}.
-\pad{e6}

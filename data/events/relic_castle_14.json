@@ -1,0 +1,8 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [],
+    "triggers": [],
+    "init_scripts": []
+}

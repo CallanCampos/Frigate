@@ -1,11 +1,11 @@
-JELLICENT
-JIGGLYPUFF
-JIRACHI
-JOB
-JOLTEON
-JOLTIK
-JUDGMENT
-JUMPKICK
-JUMPLUFF
-JUSTIFIED
-JYNX
+Bank0122_Text_Jellicent = JELLICENT
+Bank0122_Text_Jigglypuff = JIGGLYPUFF
+Bank0122_Text_Jirachi = JIRACHI
+Bank0122_Text_Job = JOB
+Bank0122_Text_Jolteon = JOLTEON
+Bank0122_Text_Joltik = JOLTIK
+Bank0122_Text_Judgment = JUDGMENT
+Bank0122_Text_Jumpkick = JUMPKICK
+Bank0122_Text_Jumpluff = JUMPLUFF
+Bank0122_Text_Justified = JUSTIFIED
+Bank0122_Text_Jynx = JYNX

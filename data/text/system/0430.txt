@@ -1,21 +1,21 @@
-None
-Abruzzo
-Basilicata
-Calabria
-Campania
-Emilia-Romagna
-Friuli-Venezia Giulia
-Lazio
-Liguria
-Lombardy
-Marche
-Molise
-Piedmont
-Apulia
-Sardinia
-Sicily
-Tuscany
-Trentino-Alto Adige
-Umbria
-Valle d'Aosta
-Veneto
+Bank0430_Text_None = None
+Bank0430_Text_Abruzzo = Abruzzo
+Bank0430_Text_Basilicata = Basilicata
+Bank0430_Text_Calabria = Calabria
+Bank0430_Text_Campania = Campania
+Bank0430_Text_EmiliaRomagna = Emilia-Romagna
+Bank0430_Text_FriuliVeneziaGiulia = Friuli-Venezia Giulia
+Bank0430_Text_Lazio = Lazio
+Bank0430_Text_Liguria = Liguria
+Bank0430_Text_Lombardy = Lombardy
+Bank0430_Text_Marche = Marche
+Bank0430_Text_Molise = Molise
+Bank0430_Text_Piedmont = Piedmont
+Bank0430_Text_Apulia = Apulia
+Bank0430_Text_Sardinia = Sardinia
+Bank0430_Text_Sicily = Sicily
+Bank0430_Text_Tuscany = Tuscany
+Bank0430_Text_TrentinoAltoAdige = Trentino-Alto Adige
+Bank0430_Text_Umbria = Umbria
+Bank0430_Text_ValleDaosta = Valle d'Aosta
+Bank0430_Text_Veneto = Veneto

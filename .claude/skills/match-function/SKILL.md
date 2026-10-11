@@ -11,7 +11,7 @@ source looks like, and the permuter only points at them.
 ## 1. Triage: what kind of difference
 
 ```sh
-.venv/bin/python tools/scripts/compiler_probe.py src/X.c --compilers 1.1p1 --functions F --show-diff 1.1p1 --align
+.venv/bin/python tools/decomp/compiler_probe.py src/X.c --compilers 1.1p1 --functions F --show-diff 1.1p1 --align
 ```
 
 Leave out `--compilers` for library code with its own compiler. Classify by what `--align` shows:
@@ -35,7 +35,7 @@ section for the class, not the whole file.
 For registers and stack slots, see where MWCC put each variable instead of guessing:
 
 ```sh
-.venv/bin/python tools/scripts/locals.py src/X.c F      # register or sp+offset of every param and local, by line
+.venv/bin/python tools/decomp/locals.py src/X.c F      # register or sp+offset of every param and local, by line
 ```
 
 Compare it with the original's use of each register or slot in the asm, and move the one variable that is off.
@@ -45,7 +45,7 @@ Compare it with the original's use of each register or slot in the asm, and move
 Write 3 to 10 respellings at once in a scratchpad file, separated by lines of `=====`, and score them:
 
 ```sh
-.venv/bin/python tools/scripts/try_variants.py src/X.c F --score /path/to/scratchpad/F_variants.c
+.venv/bin/python tools/decomp/try_variants.py src/X.c F --score /path/to/scratchpad/F_variants.c
 ```
 
 It keeps the first variant that matches, and otherwise restores the file. `--score` counts differing aligned lines,

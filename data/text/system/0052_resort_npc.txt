@@ -1,4 +1,0 @@
-Quit this area and return to the lobby?
-YES
-NO
-\pad{74}

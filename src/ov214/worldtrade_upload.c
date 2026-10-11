@@ -2,9 +2,10 @@
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "constants/version.h"
 #include "dpw/dpw_tr.h"
-#include "dpw/nhttp_rap.h"
+#include "gfl/nhttp_rap.h"
 #include "dwc/dwc.h"
 #include "field/unity_tower.h"
 #include "gfl/arc_util.h"
@@ -468,63 +469,63 @@ static int Upload_SubSeqEvilCheckStart(WorldTradeWork *wk) {
                                                       wk->uploadPokemonData.localCode, wk->uploadPokemonData.langCode);
     wk->uploadPokemonData.localCode = Country_GetValidRegion(wk->uploadPokemonData.countryCode, wk->uploadPokemonData.localCode,
                                                     wk->uploadPokemonData.langCode);
-    wk->evilCheck = func_ov189_0219d1b8(HEAPID_WORLDTRADE, func_02008bdc(wk->param->mystatus), wk->wifiLoginBuffer);
-    func_ov189_0219d258(wk->evilCheck, HEAPID_WORLDTRADE, PokeParty_GetPkmRawSize(), 1);
-    func_ov189_0219d290(wk->evilCheck, pkm, PokeParty_GetPkmRawSize());
-    ret = func_ov189_0219d2b0(wk->evilCheck);
+    wk->evilCheck = NHttpRap_Create(HEAPID_WORLDTRADE, func_02008bdc(wk->param->mystatus), wk->wifiLoginBuffer);
+    NHttpRap_BeginPost(wk->evilCheck, HEAPID_WORLDTRADE, PokeParty_GetPkmRawSize(), 1);
+    NHttpRap_AddPostData(wk->evilCheck, pkm, PokeParty_GetPkmRawSize());
+    ret = NHttpRap_SendValidate(wk->evilCheck);
     GFL_ASSERT(ret);
-    ret = func_ov189_0219d0f8(wk->evilCheck) == 0;
+    ret = NHttpRap_StartRequest(wk->evilCheck) == 0;
     GFL_ASSERT(ret);
     wk->subprocessSeq = UPLOAD_SEQ_EVIL_CHECK_RESULT;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
-    int status = func_ov189_0219d3a8(wk->evilCheck);
-    int ret = func_ov189_0219d140(wk->evilCheck);
+    int status = NHttpRap_GetStatus(wk->evilCheck);
+    int ret = NHttpRap_Poll(wk->evilCheck);
 
     if (ret == 0) {
-        void *body = func_ov189_0219d1a4(wk->evilCheck);
+        void *body = NHttpRap_GetAnswer(wk->evilCheck);
 
         switch (status) {
         case HTTP_STATUS_BAD_REQUEST:
             func_020120f0(0x41);
             GFL_NetErrShow(0);
-            func_ov189_0219d124(wk->evilCheck);
-            func_ov189_0219d384(wk->evilCheck);
-            func_ov189_0219d1f0(wk->evilCheck);
+            NHttpRap_EndRequest(wk->evilCheck);
+            NHttpRap_FreePostData(wk->evilCheck);
+            NHttpRap_Destroy(wk->evilCheck);
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_END;
             return WT_SEQ_MAIN;
         case HTTP_STATUS_UNAUTHORIZED:
             func_020120f0(0x42);
             GFL_NetErrShow(0);
-            func_ov189_0219d124(wk->evilCheck);
-            func_ov189_0219d384(wk->evilCheck);
-            func_ov189_0219d1f0(wk->evilCheck);
+            NHttpRap_EndRequest(wk->evilCheck);
+            NHttpRap_FreePostData(wk->evilCheck);
+            NHttpRap_Destroy(wk->evilCheck);
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_END;
             return WT_SEQ_MAIN;
         case HTTP_STATUS_REQUEST_TIMEOUT:
             func_020120f0(0x44);
             GFL_NetErrShow(0);
-            func_ov189_0219d124(wk->evilCheck);
-            func_ov189_0219d384(wk->evilCheck);
-            func_ov189_0219d1f0(wk->evilCheck);
+            NHttpRap_EndRequest(wk->evilCheck);
+            NHttpRap_FreePostData(wk->evilCheck);
+            NHttpRap_Destroy(wk->evilCheck);
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_END;
             return WT_SEQ_MAIN;
         default:
             func_020120f0(0x43);
             GFL_NetErrShow(0);
-            func_ov189_0219d124(wk->evilCheck);
-            func_ov189_0219d384(wk->evilCheck);
-            func_ov189_0219d1f0(wk->evilCheck);
+            NHttpRap_EndRequest(wk->evilCheck);
+            NHttpRap_FreePostData(wk->evilCheck);
+            NHttpRap_Destroy(wk->evilCheck);
             wk->subprocessSeq = UPLOAD_SEQ_ERROR_END;
             return WT_SEQ_MAIN;
         case HTTP_STATUS_OK:
-            wk->evilCheckStatus = func_ov189_0219d3e4(body);
-            wk->evilCheckResult = func_ov189_0219d3e8(body, 0);
-            sys_memcpy(func_ov189_0219d408(body, 1), wk->evilCheckSign, sizeof(wk->evilCheckSign));
-            func_ov189_0219d384(wk->evilCheck);
-            func_ov189_0219d1f0(wk->evilCheck);
+            wk->evilCheckStatus = NHttpRap_GetCheckStatus(body);
+            wk->evilCheckResult = NHttpRap_GetCheckResult(body, 0);
+            sys_memcpy(NHttpRap_GetCheckSignature(body, 1), wk->evilCheckSign, sizeof(wk->evilCheckSign));
+            NHttpRap_FreePostData(wk->evilCheck);
+            NHttpRap_Destroy(wk->evilCheck);
             if (wk->evilCheckStatus == 0) {
                 if (wk->evilCheckResult == 0) {
                     wk->subprocessSeq = UPLOAD_SEQ_NAME_CHECK_START;
@@ -550,8 +551,8 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
     } else if (ret != 15) {
         wk->connectErrorNo = -15;
         wk->subprocessSeq = UPLOAD_SEQ_ERROR_MESSAGE;
-        func_ov189_0219d384(wk->evilCheck);
-        func_ov189_0219d1f0(wk->evilCheck);
+        NHttpRap_FreePostData(wk->evilCheck);
+        NHttpRap_Destroy(wk->evilCheck);
         func_02012154();
         func_020424e4();
         func_02012144();
@@ -598,7 +599,7 @@ static int Upload_SubSeqNameCheckWait(WorldTradeWork *wk) {
         if (bad) {
             // A bad name is replaced with the version's default
             u16 *dest = wk->uploadPokemonData.name;
-            MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x65, HEAPID_WORLDTRADE);
+            MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_WORLDTRADE);
             StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, DEFAULT_NAME_MSG);
             const u16 *src;
             int i;
@@ -1624,7 +1625,7 @@ static BOOL Upload_DuplicateCheck(WorldTradeWork *wk) {
 // Replaces the original trainer's name, on the Pokémon and its mail, with the version's default, and resets the
 // nickname
 static void Upload_ReplaceBadName(PartyPkm *pkm, HeapID heapId) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x65, HEAPID_TAIL(heapId));
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_TAIL(heapId));
     StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, DEFAULT_NAME_MSG);
 
     GFL_MsgDataFree(msgData);

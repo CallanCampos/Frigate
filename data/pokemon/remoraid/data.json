@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Remoraid",
+    "pokedex": {
+        "category": "Jet Pokémon",
+        "entry": "The water they shoot from their mouths\ncan hit moving prey from more than\n300 feet away.",
+        "height": "2'00\"",
+        "weight": "26.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Remoraid",
+                "category": "Jet Pokémon",
+                "entry": "It forcefully squirts water. The\nwater jet never misses prey even\nif the Remoraid is deep in the sea.",
+                "height": "2'00\"",
+                "weight": "26.5 lbs."
+            },
+            "fr": {
+                "name": "Rémoraid",
+                "category": "Pokémon Jet",
+                "entry": "Son puissant jet d'eau ne manque\njamais sa cible, même quand il est\nau fond de l'eau.",
+                "height": "0,6 m",
+                "weight": "12,0 kg"
+            },
+            "de": {
+                "name": "Remoraid",
+                "category": "Hochdruck",
+                "entry": "Sein starker Wasserstrahl verfehlt\nseine Gegner auch dann nicht,\nwenn das Remoraid unter Wasser ist.",
+                "height": "0,6 m",
+                "weight": "12,0 kg"
+            },
+            "it": {
+                "name": "Remoraid",
+                "category": "Pokémon Jet",
+                "entry": "Emette potenti getti d'acqua che non\nmancano mai il bersaglio, anche quando\nRemoraid è sott'acqua.",
+                "height": "0,6 m",
+                "weight": "12,0 kg"
+            },
+            "ko": {
+                "name": "총어",
+                "category": "분사포켓몬",
+                "entry": "입에서 힘차게 뿜어내는\n물은 깊은 바닷속에서라도\n목표로 삼은 먹이를 반드시 맞힌다.",
+                "height": "0.6 m",
+                "weight": "12.0 kg"
+            },
+            "es": {
+                "name": "Remoraid",
+                "category": "Pokémon Reactor",
+                "entry": "Escupe potentes chorros de agua\nque siempre dan en el blanco,\nincluso en la profundidad del mar.",
+                "height": "0,6 m",
+                "weight": "12,0 kg"
+            },
+            "ja": {
+                "name": "テッポウオ",
+                "category": "ふんしゃポケモン",
+                "entry": "くちから\\x{3000}いきおいよく\\x{3000}ふきだす\nみずは\\x{3000}ふかい\\x{3000}うみのなか\\x{3000}からでも\nねらった\\x{3000}えものに\\x{3000}かならずあたる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 65,
+        "defense": 35,
+        "speed": 65,
+        "special_attack": 65,
+        "special_defense": 35
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_2" ],
+    "abilities": [ "ABILITY_HUSTLE", "ABILITY_SNIPER" ],
+    "hidden_ability": "ABILITY_MOODY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 60,
+    "height": 6,
+    "weight": 120,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 6, "MOVE_LOCK_ON" ],
+            [ 10, "MOVE_PSYBEAM" ],
+            [ 14, "MOVE_AURORA_BEAM" ],
+            [ 18, "MOVE_BUBBLE_BEAM" ],
+            [ 22, "MOVE_FOCUS_ENERGY" ],
+            [ 26, "MOVE_WATER_PULSE" ],
+            [ 30, "MOVE_SIGNAL_BEAM" ],
+            [ 34, "MOVE_ICE_BEAM" ],
+            [ 38, "MOVE_BULLET_SEED" ],
+            [ 42, "MOVE_HYDRO_PUMP" ],
+            [ 46, "MOVE_HYPER_BEAM" ],
+            [ 50, "MOVE_SOAK" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM27",
+            "TM29",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM55",
+            "TM57",
+            "TM59",
+            "TM73",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_SEED_BOMB",
+            "MOVE_BOUNCE",
+            "MOVE_GUNK_SHOT",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_AURORA_BEAM",
+            "MOVE_OCTAZOOKA",
+            "MOVE_SUPERSONIC",
+            "MOVE_HAZE",
+            "MOVE_SCREECH",
+            "MOVE_ROCK_BLAST",
+            "MOVE_SNORE",
+            "MOVE_FLAIL",
+            "MOVE_WATER_SPOUT",
+            "MOVE_MUD_SHOT",
+            "MOVE_SWIFT",
+            "MOVE_ACID_SPRAY",
+            "MOVE_WATER_PULSE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 25,
+            "species": "SPECIES_OCTILLERY"
+        }
+    ],
+    "regional_dex_number": 235,
+    "baby_species": "SPECIES_REMORAID"
+}

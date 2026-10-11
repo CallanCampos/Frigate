@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kat & Phae",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_STOUTLAND",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 1
+        },
+        {
+            "species": "SPECIES_BOUFFALANT",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 1
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "If you win, I will tell you\nwhy I like basketball!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Kat: Come on!{be01}\nPhae: Look! Even though we lost,\nthe ball is still spinning!"
+        },
+        {
+            "type": 5,
+            "text": "When you are watching basketball,\nit reminds you of fruit in a basket,{be00}\nand it looks delicious. Right?"
+        },
+        {
+            "type": 6,
+            "text": "Basketball... No, no. For a battle,\nyou need to have two Pokémon."
+        },
+        {
+            "type": 7,
+            "text": "My special skill is that I can\nspin a ball on my finger.{be00}\nI can spin it forever!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "I want to have Poké Balls\nwith the same designs as{be00}\nthe balls used in sports!"
+        },
+        {
+            "type": 10,
+            "text": "Basketball... No, no. For a battle,\nyou need to have two Pokémon."
+        }
+    ]
+}

@@ -1,18 +1,18 @@
-None
-Baden-Württemberg
-Bayern
-Berlin
-Brandenburg
-Bremen
-Hamburg
-Hesse
-Mecklenburg-West Pomerania
-Lower Saxony
-North Rhine-Westphalia
-Rhineland-Palatinate
-Saarland
-Saxony
-Saxony-Anhalt
-Schleswig-Holstein
-Thuringia
+Bank0424_Text_None = None
+Bank0424_Text_BadenWRttemberg = Baden-Württemberg
+Bank0424_Text_Bayern = Bayern
+Bank0424_Text_Berlin = Berlin
+Bank0424_Text_Brandenburg = Brandenburg
+Bank0424_Text_Bremen = Bremen
+Bank0424_Text_Hamburg = Hamburg
+Bank0424_Text_Hesse = Hesse
+Bank0424_Text_MecklenburgWestPomerania = Mecklenburg-West Pomerania
+Bank0424_Text_LowerSaxony = Lower Saxony
+Bank0424_Text_NorthRhineWestphalia = North Rhine-Westphalia
+Bank0424_Text_RhinelandPalatinate = Rhineland-Palatinate
+Bank0424_Text_Saarland = Saarland
+Bank0424_Text_Saxony = Saxony
+Bank0424_Text_SaxonyAnhalt = Saxony-Anhalt
+Bank0424_Text_SchleswigHolstein = Schleswig-Holstein
+Bank0424_Text_Thuringia = Thuringia
 \pad{22}

@@ -3,6 +3,7 @@
 #include "app/pms_input.h"
 #include "app/pms_input_view.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -22,7 +23,7 @@
 // names are ours, guessed
 
 // The message file of the phrase input's texts
-#define PMSIV_MENU_MSG_FILE 159
+#define PMSIV_MENU_MSG_FILE TEXT_BANK_PMS_INPUT
 
 // The sentence type buttons, and the button that goes back from the categories
 #define PMSIV_MENU_TYPE_BUTTON_COUNT 8

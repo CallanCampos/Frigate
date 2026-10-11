@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Dwayne",
+    "class": "TRAINER_CLASS_PKMN_RANGER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_SITRUS_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_WEEPINBELL",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 1
+        },
+        {
+            "species": "SPECIES_LUXRAY",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_URSARING",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Melding into the wild landscape...\nThat's what a Pokémon Ranger does!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I am such a weakling!\nI will disappear back into the wilderness!"
+        },
+        {
+            "type": 15,
+            "text": "I'm sure you can fully\nutilize this.{be01}"
+        },
+        {
+            "type": 16,
+            "text": "If you blend into the wilderness too well,\nyou won't be noticed by Pokémon,{be00}\nlet alone by people."
+        }
+    ]
+}

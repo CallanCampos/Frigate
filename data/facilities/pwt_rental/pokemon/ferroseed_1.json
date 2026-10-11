@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_FERROSEED",
+    "moves": [ "MOVE_METAL_CLAW", "MOVE_POISON_JAB", "MOVE_IRON_DEFENSE", "MOVE_INGRAIN" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_HARDY",
+    "item": "ITEM_ROCKY_HELMET",
+    "form": 0
+}

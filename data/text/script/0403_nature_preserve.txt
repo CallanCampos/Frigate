@@ -1,6 +1,0 @@
-Gwaooooogh!
-The dark Haxorus vanished\ninto the preserve...
-It's a hop, skip, and a jump by my plane!\nWant to go back to Mistralton City?
-OK! Let's hit the runway!{be01}
-Roger!\nTalk to me when you're ready!
-\pad{78}

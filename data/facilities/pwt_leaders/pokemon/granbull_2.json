@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GRANBULL",
+    "moves": [ "MOVE_DOUBLE_EDGE", "MOVE_ROAR", "MOVE_CRUNCH", "MOVE_SLUDGE_BOMB" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_LUM_BERRY",
+    "form": 0
+}

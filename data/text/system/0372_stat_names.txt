@@ -1,9 +1,0 @@
-HP
-Attack
-Defense
-Speed
-Sp. Atk
-Sp. Def
-       \x{ffff}
-     \x{ffff}
-      \x{ffff}

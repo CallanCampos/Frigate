@@ -3,3 +3,19 @@
     .ctor       start:0x021ddba0 end:0x021ddba0 kind:rodata align:4
     .data       start:0x021ddbc0 end:0x021ddc00 kind:data align:32
     .bss        start:0x021ddc00 end:0x021ddc00 kind:bss align:32
+
+src/ov280/namein_graphic.c:
+    complete
+    .text       start:0x021dd2cc end:0x021dd508
+    .rodata     start:0x021dd9e4 end:0x021ddba0
+    .data       start:0x021ddbc4 end:0x021ddbd8
+
+src/ov280/namein_data.c:
+    complete
+    .text       start:0x021dd508 end:0x021dd924
+    .data       start:0x021ddbd8 end:0x021ddc00
+
+src/ov280/namein.c:
+    .text       start:0x021d9720 end:0x021dd2cc
+    .rodata     start:0x021dd924 end:0x021dd9e4
+    .data       start:0x021ddbc0 end:0x021ddbc4

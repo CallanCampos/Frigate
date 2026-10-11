@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_PROBOPASS",
+    "moves": [ "MOVE_POWER_GEM", "MOVE_FLASH_CANNON", "MOVE_THUNDER_WAVE", "MOVE_SANDSTORM" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_SHUCA_BERRY",
+    "form": 0
+}

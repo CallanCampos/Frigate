@@ -1,0 +1,21 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Jaguar",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "pokemon": [
+        "tympole_2",
+        "panpour_2",
+        "ducklett_2",
+        "vanillite_2",
+        "oshawott_2",
+        "frillish_2",
+        "tirtouga_2",
+        "palpitoad_2",
+        "vanillish_2"
+    ],
+    "messages": [
+        "Oh, I kin tell yer rilly sumpthin'.",
+        "I knew it. You rilly ARE sumpthin'.",
+        "Like always, the big one done got away."
+    ]
+}

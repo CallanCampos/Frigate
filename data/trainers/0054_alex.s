@@ -1,8 +1,0 @@
-#include "asm/trainer.inc"
-
-// Infielder Alex
-    Trainer class=TRAINER_CLASS_INFIELDER, ai=AI_FLAG_BASIC | AI_FLAG_EVAL_ATTACK | AI_FLAG_EXPERT, money=25, reward=ITEM_SUPER_POTION
-    PartyMon level=32, species=SPECIES_PANSAGE, difficulty=100
-    PartyMon level=32, species=SPECIES_PANSEAR, difficulty=100
-    PartyMon level=32, species=SPECIES_PANPOUR, difficulty=100
-    PartyEnd

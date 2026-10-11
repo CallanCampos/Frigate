@@ -1,0 +1,186 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Piplup",
+    "pokedex": {
+        "category": "Penguin Pokémon",
+        "entry": "A poor walker, it often falls down.\nHowever, its strong pride makes it\npuff up its chest without a care.",
+        "height": "1'04\"",
+        "weight": "11.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Piplup",
+                "category": "Penguin Pokémon",
+                "entry": "A poor walker, it often falls down.\nHowever, its strong pride makes it\npuff up its chest without a care.",
+                "height": "1'04\"",
+                "weight": "11.5 lbs."
+            },
+            "fr": {
+                "name": "Tiplouf",
+                "category": "Pokémon Pingouin",
+                "entry": "Malgré sa démarche maladroite et\nses pertes d'équilibre, il bombe\ntoujours fièrement le torse.",
+                "height": "0,4 m",
+                "weight": "5,2 kg"
+            },
+            "de": {
+                "name": "Plinfa",
+                "category": "Pinguin",
+                "entry": "Es fällt leider oft hin. Allerdings\nist es sehr stolz und so rappelt es\nsich immer wieder ohne Sorge auf.",
+                "height": "0,4 m",
+                "weight": "5,2 kg"
+            },
+            "it": {
+                "name": "Piplup",
+                "category": "Pokémon Pinguino",
+                "entry": "Quando cammina risulta goffo e cade\nspesso. Poiché è molto orgoglioso,\ncontinua come se nulla fosse.",
+                "height": "0,4 m",
+                "weight": "5,2 kg"
+            },
+            "ko": {
+                "name": "팽도리",
+                "category": "펭귄포켓몬",
+                "entry": "걷는 것이 서툴러서 넘어질 때도\n있지만 프라이드가 높은 팽도리는\n신경 쓰지 않고 당당하게 가슴을 편다.",
+                "height": "0.4 m",
+                "weight": "5.2 kg"
+            },
+            "es": {
+                "name": "Piplup",
+                "category": "Pokémon Pingüino",
+                "entry": "No se le da bien lo de andar, se cae\nmucho. Pero su orgullo le hace\nsacar pecho como si nada.",
+                "height": "0,4 m",
+                "weight": "5,2 kg"
+            },
+            "ja": {
+                "name": "ポッチャマ",
+                "category": "ペンギンポケモン",
+                "entry": "あるくのは\\x{3000}にがてで\\x{3000}こけたりするが\nポッチャマの\\x{3000}プライドは\\x{3000}たかく\nきにせず\\x{3000}どうどうと\\x{3000}むねを\\x{3000}はる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 53,
+        "attack": 51,
+        "defense": 53,
+        "speed": 40,
+        "special_attack": 61,
+        "special_defense": 56
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_TORRENT", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_DEFIANT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 63,
+    "height": 4,
+    "weight": 52,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POUND" ],
+            [ 4, "MOVE_GROWL" ],
+            [ 8, "MOVE_BUBBLE" ],
+            [ 11, "MOVE_WATER_SPORT" ],
+            [ 15, "MOVE_PECK" ],
+            [ 18, "MOVE_BUBBLE_BEAM" ],
+            [ 22, "MOVE_BIDE" ],
+            [ 25, "MOVE_FURY_ATTACK" ],
+            [ 29, "MOVE_BRINE" ],
+            [ 32, "MOVE_WHIRLPOOL" ],
+            [ 36, "MOVE_MIST" ],
+            [ 39, "MOVE_DRILL_PECK" ],
+            [ 43, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM55",
+            "TM56",
+            "TM60",
+            "TM86",
+            "TM87",
+            "TM88",
+            "TM90",
+            "HM01",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_WATER_PLEDGE",
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_DOUBLE_HIT",
+            "MOVE_SUPERSONIC",
+            "MOVE_YAWN",
+            "MOVE_MUD_SPORT",
+            "MOVE_MUD_SLAP",
+            "MOVE_SNORE",
+            "MOVE_FLAIL",
+            "MOVE_AGILITY",
+            "MOVE_AQUA_RING",
+            "MOVE_HYDRO_PUMP",
+            "MOVE_FEATHER_DANCE",
+            "MOVE_BIDE",
+            "MOVE_ICY_WIND"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 16,
+            "species": "SPECIES_PRINPLUP"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_PIPLUP"
+}

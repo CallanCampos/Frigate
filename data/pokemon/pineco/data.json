@@ -1,0 +1,186 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Pineco",
+    "pokedex": {
+        "category": "Bagworm Pokémon",
+        "entry": "It looks just like a pinecone.\nIts shell protects it from bird\nPokémon that peck it by mistake.",
+        "height": "2'00\"",
+        "weight": "15.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Pineco",
+                "category": "Bagworm Pokémon",
+                "entry": "It looks just like a pinecone.\nIts shell protects it from bird\nPokémon that peck it by mistake.",
+                "height": "2'00\"",
+                "weight": "15.9 lbs."
+            },
+            "fr": {
+                "name": "Pomdepik",
+                "category": "Pokémon Ver Caché",
+                "entry": "Il ressemble à une pomme de pin.\nSa carapace le protège des Pokémon\nOiseaux qui le picorent par erreur.",
+                "height": "0,6 m",
+                "weight": "7,2 kg"
+            },
+            "de": {
+                "name": "Tannza",
+                "category": "Beutelwurm",
+                "entry": "Es sieht aus wie ein Tannenzapfen.\nSeine Schale schützt es vor Vogel-\nPokémon, die an ihm picken wollen.",
+                "height": "0,6 m",
+                "weight": "7,2 kg"
+            },
+            "it": {
+                "name": "Pineco",
+                "category": "Pokémon Larva",
+                "entry": "Ha l'aspetto di una pigna. Il suo guscio\nlo protegge dai Pokémon uccello che lo\nbeccano per errore.",
+                "height": "0,6 m",
+                "weight": "7,2 kg"
+            },
+            "ko": {
+                "name": "피콘",
+                "category": "도롱이벌레포켓몬",
+                "entry": "나무열매와 똑 닮았다. 실수로\n새 포켓몬에게 쪼이기도 하지만\n단단한 껍질이 몸을 보호하고 있다.",
+                "height": "0.6 m",
+                "weight": "7.2 kg"
+            },
+            "es": {
+                "name": "Pineco",
+                "category": "Pokémon Larva",
+                "entry": "Es como una piña piñonera. Su\ncoraza lo protege de los pájaros\nque lo picotean por error.",
+                "height": "0,6 m",
+                "weight": "7,2 kg"
+            },
+            "ja": {
+                "name": "クヌギダマ",
+                "category": "みのむしポケモン",
+                "entry": "きのみに\\x{3000}そっくり。まちがわれて\nとりポケモンに\\x{3000}つつかれてしまうが\nかたい\\x{3000}カラで\\x{3000}まもられている。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 65,
+        "defense": 90,
+        "speed": 15,
+        "special_attack": 35,
+        "special_defense": 35
+    },
+    "types": [ "TYPE_BUG", "TYPE_BUG" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_OVERCOAT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 58,
+    "height": 6,
+    "weight": 72,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_PROTECT" ],
+            [ 6, "MOVE_SELFDESTRUCT" ],
+            [ 9, "MOVE_BUG_BITE" ],
+            [ 12, "MOVE_TAKE_DOWN" ],
+            [ 17, "MOVE_RAPID_SPIN" ],
+            [ 20, "MOVE_BIDE" ],
+            [ 23, "MOVE_NATURAL_GIFT" ],
+            [ 28, "MOVE_SPIKES" ],
+            [ 31, "MOVE_PAYBACK" ],
+            [ 34, "MOVE_EXPLOSION" ],
+            [ 39, "MOVE_IRON_DEFENSE" ],
+            [ 42, "MOVE_GYRO_BALL" ],
+            [ 45, "MOVE_DOUBLE_EDGE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM33",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM66",
+            "TM74",
+            "TM76",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_DRILL_RUN",
+            "MOVE_GRAVITY",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_PIN_MISSILE",
+            "MOVE_FLAIL",
+            "MOVE_SWIFT",
+            "MOVE_COUNTER",
+            "MOVE_SAND_TOMB",
+            "MOVE_REVENGE",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_TOXIC_SPIKES",
+            "MOVE_POWER_TRICK",
+            "MOVE_ENDURE",
+            "MOVE_STEALTH_ROCK"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 31,
+            "species": "SPECIES_FORRETRESS"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_PINECO"
+}

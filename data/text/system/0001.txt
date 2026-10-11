@@ -1,53 +1,53 @@
-HP/PP
-RESTORE
-STATUS
-RESTORE
-     \x{ffff}
-    \x{ffff}
-BATTLE ITEMS
-POKÉ BALLS
-LAST USED ITEM
-{0109:0}
-x{0202:0}
-{0109:0}
-x{0202:0}
-{0109:0}
-x{0202:0}
-{0109:0}
-x{0202:0}
-{0109:0}
-x{0202:0}
-{0109:0}
-x{0202:0}
-    \x{ffff}
-HP/PP
-RESTORE
-STATUS
-RESTORE
-POKÉ BALLS
-BATTLE ITEMS
-/
-{0200:0}
-{0200:0}
-USE
-    \x{ffff}
-     \x{ffff}
-              \x{ffff}
-              \x{ffff}
-             \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                 \x{ffff}
-                    \x{ffff}
-           \x{ffff}
-It's no good! It's impossible to aim\nwhen there are two Pokémon!
-There is no room left in the PC!
-                         \x{ffff}
-It's no good! It's impossible to aim\nat a Pokémon that's not in sight!
-                               \x{ffff}
-It's not charged enough.
-Juniper's words echoed...\nThere's a time and{be00}\nplace for everything! But not now.
-It's impossible to aim\nwithout being focused!
-It's impossible to use Poké Balls\nbecause of the device Ghetsis developed!
+Bank0001_Text_HpPp = HP/PP
+Bank0001_Text_Restore = RESTORE
+Bank0001_Text_Status = STATUS
+Bank0001_Text_Restore_2 = RESTORE
+Bank0001_Text_Empty =      \x{ffff}
+Bank0001_Text_Empty_2 =     \x{ffff}
+Bank0001_Text_BattleItems = BATTLE ITEMS
+Bank0001_Text_PokeBalls = POKÉ BALLS
+Bank0001_Text_LastUsedItem = LAST USED ITEM
+Bank0001_Text_Empty_3 = {0109:0}
+Bank0001_Text_X = x{0202:0}
+Bank0001_Text_Empty_4 = {0109:0}
+Bank0001_Text_X_2 = x{0202:0}
+Bank0001_Text_Empty_5 = {0109:0}
+Bank0001_Text_X_3 = x{0202:0}
+Bank0001_Text_Empty_6 = {0109:0}
+Bank0001_Text_X_4 = x{0202:0}
+Bank0001_Text_Empty_7 = {0109:0}
+Bank0001_Text_X_5 = x{0202:0}
+Bank0001_Text_Empty_8 = {0109:0}
+Bank0001_Text_X_6 = x{0202:0}
+Bank0001_Text_Empty_9 =     \x{ffff}
+Bank0001_Text_HpPp_2 = HP/PP
+Bank0001_Text_Restore_3 = RESTORE
+Bank0001_Text_Status_2 = STATUS
+Bank0001_Text_Restore_4 = RESTORE
+Bank0001_Text_PokeBalls_2 = POKÉ BALLS
+Bank0001_Text_BattleItems_2 = BATTLE ITEMS
+Bank0001_Text_Empty_10 = /
+Bank0001_Text_Empty_11 = {0200:0}
+Bank0001_Text_Empty_12 = {0200:0}
+Bank0001_Text_Use = USE
+Bank0001_Text_Empty_13 =     \x{ffff}
+Bank0001_Text_Empty_14 =      \x{ffff}
+Bank0001_Text_Empty_15 =               \x{ffff}
+Bank0001_Text_Empty_16 =               \x{ffff}
+Bank0001_Text_Empty_17 =              \x{ffff}
+Bank0001_Text_Empty_18 =                  \x{ffff}
+Bank0001_Text_Empty_19 =                  \x{ffff}
+Bank0001_Text_Empty_20 =                  \x{ffff}
+Bank0001_Text_Empty_21 =                  \x{ffff}
+Bank0001_Text_Empty_22 =                  \x{ffff}
+Bank0001_Text_Empty_23 =                     \x{ffff}
+Bank0001_Text_Empty_24 =            \x{ffff}
+Bank0001_Text_ItsNoGoodIts = It's no good! It's impossible to aim\nwhen there are two Pokémon!
+Bank0001_Text_ThereNoRoomLeft = There is no room left in the PC!
+Bank0001_Text_Empty_25 =                          \x{ffff}
+Bank0001_Text_ItsNoGoodIts_2 = It's no good! It's impossible to aim\nat a Pokémon that's not in sight!
+Bank0001_Text_Empty_26 =                                \x{ffff}
+Bank0001_Text_ItsNotChargedEnough = It's not charged enough.
+Bank0001_Text_JunipersWordsEchoedTheres = Juniper's words echoed...\nThere's a time and{be00}\nplace for everything! But not now.
+Bank0001_Text_ItsImpossibleAimWithout = It's impossible to aim\nwithout being focused!
+Bank0001_Text_ItsImpossibleUsePoke = It's impossible to use Poké Balls\nbecause of the device Ghetsis developed!

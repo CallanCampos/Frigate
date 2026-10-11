@@ -1,0 +1,12 @@
+AbyssalRuins8_Text_IrspeHixeijihKrmo = IRSPE③HIXEIJIH\nKRMO
+AbyssalRuins8_Text_CehermKrmohirmsn = CEHERM\nKRMOHIRMSN④
+AbyssalRuins8_Text_WkrmifHippegKrmo = WKRMIF⑤HIPPEG\nKRMO
+AbyssalRuins8_Text_IvyxyjhreitslWmkrmo = IVYXYJHREITSL\nWMKRMO
+AbyssalRuins8_Text_Krmoxeivkilx = ⑥KRMOXEIVKILX
+AbyssalRuins8_Text_LooksLikeCanClimb = It looks like you can climb down here!{be01}\nWill you return to the lower floor?
+AbyssalRuins8_Text_HqrodGhwdhihgjqln = HQROD●●●●●GHWDHIHGJQLN
+AbyssalRuins8_Text_Bdgdqljqlnghqlrm = BDGDQLJQLNGHQLRM●●●●●
+AbyssalRuins8_Text_VjqlheGhoodfjqln = VJQLHE●●●●●GHOODFJQLN
+AbyssalRuins8_Text_Huxwxigqdhsrkvljqln = HUXWXIGQDHSRKVLJQLN
+AbyssalRuins8_Text_Jqlnwdhujhkw = ●●●●●●●●JQLNWDHUJHKW
+\pad{60}

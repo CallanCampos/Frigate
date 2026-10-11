@@ -1,15 +1,15 @@
-YAAAH
-YAHOO
-YAMASK
-YANMA
-YANMEGA
-YAWN
-YAY
-YEAH
-YEAHYEAH
-YEP
-YES
-YESTERDAY
-YO
-YOU
+Bank0137_Text_Yaaah = YAAAH
+Bank0137_Text_Yahoo = YAHOO
+Bank0137_Text_Yamask = YAMASK
+Bank0137_Text_Yanma = YANMA
+Bank0137_Text_Yanmega = YANMEGA
+Bank0137_Text_Yawn = YAWN
+Bank0137_Text_Yay = YAY
+Bank0137_Text_Yeah = YEAH
+Bank0137_Text_Yeahyeah = YEAHYEAH
+Bank0137_Text_Yep = YEP
+Bank0137_Text_Yes = YES
+Bank0137_Text_Yesterday = YESTERDAY
+Bank0137_Text_Yo = YO
+Bank0137_Text_You = YOU
 \pad{0e}

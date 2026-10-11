@@ -1,44 +1,44 @@
-Movie Star
-World Police
-The {0102:0} Ninja: Hmph!\nTry it!
-Mecha Cop: Uh... What...?\nI can't move...
-Mecha Cop: My body is creaking...\nThis is not good... I have to do something...
-Mecha Cop: The serial robber,\nthe {0102:0} Ninja.{be00}\nSurrender!
-The {0102:0} Ninja: Mecha Cop!\nYou've completely fallen for my trap!
-Mecha Cop: What do you mean?!\n{0102:0} Ninja!
-The {0102:0} Ninja: I'm not interested in\nthe Rainbow Pearl at all!{be01}\nThe tip that I gave you, the one where\nI said that I would steal the pearl,{be00}\nwas a trap to lure you to come here!
-Mecha Cop: You...\nYou tricked me!{be01}\nDu mieser Verbrecher!
-The {0102:0} Ninja: Tee hee hee...\nThe sand of this beach{be00}\nis magnetized and{be00}\nmakes mechanics malfunction!{be01}\nOn top of that, a salty breeze is blowing!\nI look forward to your cyborg body{be00}\ngetting rusty!
-Mecha Cop: In that case...\nI just have to arrest you again{be00}\nbefore this body gets rusty!
-Mecha Cop: Wh-what?\nWhy does Sawk have a Toxic Orb?{be00}\nYou! I won't forgive you!{be01}\nAlloy Net!\nApunten, ¡fuego!
-The {0102:0} Ninja: Tee hee hee!\nI swapped items while you were{be00}\nnot watching.{be00}\nWhoa!{be01}\nYou...used a weapon again...
-Mecha Cop: Argh...\nI'm disappointed in myself.{be01}\nI got upset, and without thinking,\nI used...
-The {0102:0} Ninja: Huff... Puff...{be01}\nTee hee hee. You're panicking!\nAre you having a hard time? Mecha Cop!{be00}\nGive up before it's too late.{be01}\nSurrender!\n...Right? Tee hee hee...
-Mecha Cop: My justice is unshakable,\nno matter what the circumstances.{be01}\nPrépare-toi!
-The {0102:0} Ninja: Stop bluffing!
-Mecha Cop: It's a model answer\nfor villains.{be01}\nIt's worth defeating you!
-The {0102:0} Ninja: Cool!
-Mecha Cop: If you have an impulse\nto admire justice,{be00}\nsurrender without resistance!
-The {0102:0} Ninja: Eeeek!\nI thought the strategy this time{be00}\nwas perfect...{be01}\nArghh!\nThis...scrap!
-Mecha Cop: {0102:0} Ninja,\nyou're underestimating justice!
-The {0102:0} Ninja: Tsk!
-Mecha Cop: To protect law and justice,\nI could be infinitely cruel!{be00}\nThat's the real World Police!{be01}\nMission accomplie.
-The vengeful one, the {0102:0} Ninja,\nwas put in jail once again{be00}\nat the hands of Mecha Cop.{be01}\nAs long as there is justice in this world,\nevil will never prosper!{be01}\nInvestigate special cases, Mecha Cop!\nThe absolutely invincible World Police!
-Mecha Cop: Ugh...\nI'm disappointed in myself...
-The {0102:0} Ninja: At last,\nI beat Mecha Cop!{be01}\nNow I can steal as many treasures\nas I want!
-Mecha Cop: Wait!\n{0102:0} Ninja!{be01}\nNext time... Next time\nI'll put you in jail for sure!
-The {0102:0} Ninja: Hmph!\nCatch me if you can!{be01}\nCome! Come here!
-Mecha Cop: You little!\nWaaait!
-Mecha Cop couldn't catch\nthe {0102:0} Ninja this time.{be01}\nHe's been acting strange ever since he met\nthe {0102:0} Ninja...{be01}\nMecha Cop, what's wrong?\nDoes he look like he's enjoying it a bit?
-Mecha Cop: Wh-what is this...?
-The {0102:0} Ninja: Tee hee!\nHow do you feel, Mecha Cop?!{be01}\nYour body's gotten rusty, and\nyou don't seem to be able to move.
-Mecha Cop: Uh...\nIn this case...{be00}\nFinal Police Solution 2.0...{be01}\nFire!\nJustice explosion!
-The {0102:0} Ninja: What?\nAre you trying to beat me even if{be00}\nit means sacrificing yourself...?!
-Mecha Cop: I...won't...tolerate...evil...
-The {0102:0} Ninja: Gulp...\nHe's unconscious but still standing...{be01}\nWhat tenacity!
-Until the last second before\nhis functions shut down,{be00}\nthe secret detective, Mecha Cop,{be00}\nhated evil as much as he loved justice.{be01}\nKnow this!\nAs long as there is evil in this world,{be00}\njustice will rise again!{be01}\nCome back, Mecha Cop!\nThe cyborg body is unbreakable!
-Mecha Cop: Uh...\nMy justice{be00}\nis not enough...?!
-The {0102:0} Ninja: Hmph!\nYou can't even catch one thief like me,{be00}\nand you're claiming that{be00}\nyou're a champion of justice?{be01}\nI was a fool to have believed you--\neven a little bit.
-Mecha Cop: I...\nWas I abandoned by justice?{be01}\nI don't know what to believe anymore!
-The secret detective, Mecha Cop,\nlost his belief in justice after{be00}\nfailing in the mission.{be00}\nHe left the World Police...and...{be00}\nSeveral months later...{be01}\nThe biggest enemy of the World Police\nwas the very same Mecha Cop--{be00}\nlost to the side of evil!{be01}\nGet it together, Mecha Cop!\nEverybody makes mistakes!
+Bank0189_Text_MovieStar = Movie Star
+Bank0189_Text_WorldPolice = World Police
+Bank0189_Text_NinjaHmphTry = The {0102:0} Ninja: Hmph!\nTry it!
+Bank0189_Text_MechaCopUhWhat = Mecha Cop: Uh... What...?\nI can't move...
+Bank0189_Text_MechaCopBodyCreaking = Mecha Cop: My body is creaking...\nThis is not good... I have to do something...
+Bank0189_Text_MechaCopSerialRobber = Mecha Cop: The serial robber,\nthe {0102:0} Ninja.{be00}\nSurrender!
+Bank0189_Text_NinjaMechaCopYouve = The {0102:0} Ninja: Mecha Cop!\nYou've completely fallen for my trap!
+Bank0189_Text_MechaCopWhatMean = Mecha Cop: What do you mean?!\n{0102:0} Ninja!
+Bank0189_Text_NinjaImNotInterested = The {0102:0} Ninja: I'm not interested in\nthe Rainbow Pearl at all!{be01}\nThe tip that I gave you, the one where\nI said that I would steal the pearl,{be00}\nwas a trap to lure you to come here!
+Bank0189_Text_MechaCopTrickedDu = Mecha Cop: You...\nYou tricked me!{be01}\nDu mieser Verbrecher!
+Bank0189_Text_NinjaTeeHeeHee = The {0102:0} Ninja: Tee hee hee...\nThe sand of this beach{be00}\nis magnetized and{be00}\nmakes mechanics malfunction!{be01}\nOn top of that, a salty breeze is blowing!\nI look forward to your cyborg body{be00}\ngetting rusty!
+Bank0189_Text_MechaCopCaseJust = Mecha Cop: In that case...\nI just have to arrest you again{be00}\nbefore this body gets rusty!
+Bank0189_Text_MechaCopWhWhat = Mecha Cop: Wh-what?\nWhy does Sawk have a Toxic Orb?{be00}\nYou! I won't forgive you!{be01}\nAlloy Net!\nApunten, ¡fuego!
+Bank0189_Text_NinjaTeeHeeHee_2 = The {0102:0} Ninja: Tee hee hee!\nI swapped items while you were{be00}\nnot watching.{be00}\nWhoa!{be01}\nYou...used a weapon again...
+Bank0189_Text_MechaCopArghIm = Mecha Cop: Argh...\nI'm disappointed in myself.{be01}\nI got upset, and without thinking,\nI used...
+Bank0189_Text_NinjaHuffPuffTee = The {0102:0} Ninja: Huff... Puff...{be01}\nTee hee hee. You're panicking!\nAre you having a hard time? Mecha Cop!{be00}\nGive up before it's too late.{be01}\nSurrender!\n...Right? Tee hee hee...
+Bank0189_Text_MechaCopJusticeUnshakable = Mecha Cop: My justice is unshakable,\nno matter what the circumstances.{be01}\nPrépare-toi!
+Bank0189_Text_NinjaStopBluffing = The {0102:0} Ninja: Stop bluffing!
+Bank0189_Text_MechaCopItsModel = Mecha Cop: It's a model answer\nfor villains.{be01}\nIt's worth defeating you!
+Bank0189_Text_NinjaCool = The {0102:0} Ninja: Cool!
+Bank0189_Text_MechaCopIfHave = Mecha Cop: If you have an impulse\nto admire justice,{be00}\nsurrender without resistance!
+Bank0189_Text_NinjaEeeekThoughtStrategy = The {0102:0} Ninja: Eeeek!\nI thought the strategy this time{be00}\nwas perfect...{be01}\nArghh!\nThis...scrap!
+Bank0189_Text_MechaCopNinjaYoure = Mecha Cop: {0102:0} Ninja,\nyou're underestimating justice!
+Bank0189_Text_NinjaTsk = The {0102:0} Ninja: Tsk!
+Bank0189_Text_MechaCopProtectLaw = Mecha Cop: To protect law and justice,\nI could be infinitely cruel!{be00}\nThat's the real World Police!{be01}\nMission accomplie.
+Bank0189_Text_VengefulOneNinjaPut = The vengeful one, the {0102:0} Ninja,\nwas put in jail once again{be00}\nat the hands of Mecha Cop.{be01}\nAs long as there is justice in this world,\nevil will never prosper!{be01}\nInvestigate special cases, Mecha Cop!\nThe absolutely invincible World Police!
+Bank0189_Text_MechaCopUghIm = Mecha Cop: Ugh...\nI'm disappointed in myself...
+Bank0189_Text_NinjaLastBeatMecha = The {0102:0} Ninja: At last,\nI beat Mecha Cop!{be01}\nNow I can steal as many treasures\nas I want!
+Bank0189_Text_MechaCopWaitNinja = Mecha Cop: Wait!\n{0102:0} Ninja!{be01}\nNext time... Next time\nI'll put you in jail for sure!
+Bank0189_Text_NinjaHmphCatchIf = The {0102:0} Ninja: Hmph!\nCatch me if you can!{be01}\nCome! Come here!
+Bank0189_Text_MechaCopLittleWaaait = Mecha Cop: You little!\nWaaait!
+Bank0189_Text_MechaCopCouldntCatch = Mecha Cop couldn't catch\nthe {0102:0} Ninja this time.{be01}\nHe's been acting strange ever since he met\nthe {0102:0} Ninja...{be01}\nMecha Cop, what's wrong?\nDoes he look like he's enjoying it a bit?
+Bank0189_Text_MechaCopWhWhat_2 = Mecha Cop: Wh-what is this...?
+Bank0189_Text_NinjaTeeHeeHow = The {0102:0} Ninja: Tee hee!\nHow do you feel, Mecha Cop?!{be01}\nYour body's gotten rusty, and\nyou don't seem to be able to move.
+Bank0189_Text_MechaCopUhCase = Mecha Cop: Uh...\nIn this case...{be00}\nFinal Police Solution 2.0...{be01}\nFire!\nJustice explosion!
+Bank0189_Text_NinjaWhatTryingBeat = The {0102:0} Ninja: What?\nAre you trying to beat me even if{be00}\nit means sacrificing yourself...?!
+Bank0189_Text_MechaCopWontTolerate = Mecha Cop: I...won't...tolerate...evil...
+Bank0189_Text_NinjaGulpHesUnconscious = The {0102:0} Ninja: Gulp...\nHe's unconscious but still standing...{be01}\nWhat tenacity!
+Bank0189_Text_UntilLastSecondBefore = Until the last second before\nhis functions shut down,{be00}\nthe secret detective, Mecha Cop,{be00}\nhated evil as much as he loved justice.{be01}\nKnow this!\nAs long as there is evil in this world,{be00}\njustice will rise again!{be01}\nCome back, Mecha Cop!\nThe cyborg body is unbreakable!
+Bank0189_Text_MechaCopUhJustice = Mecha Cop: Uh...\nMy justice{be00}\nis not enough...?!
+Bank0189_Text_NinjaHmphCantEven = The {0102:0} Ninja: Hmph!\nYou can't even catch one thief like me,{be00}\nand you're claiming that{be00}\nyou're a champion of justice?{be01}\nI was a fool to have believed you--\neven a little bit.
+Bank0189_Text_MechaCopAbandonedBy = Mecha Cop: I...\nWas I abandoned by justice?{be01}\nI don't know what to believe anymore!
+Bank0189_Text_SecretDetectiveMechaCop = The secret detective, Mecha Cop,\nlost his belief in justice after{be00}\nfailing in the mission.{be00}\nHe left the World Police...and...{be00}\nSeveral months later...{be01}\nThe biggest enemy of the World Police\nwas the very same Mecha Cop--{be00}\nlost to the side of evil!{be01}\nGet it together, Mecha Cop!\nEverybody makes mistakes!
 \pad{e2}

@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tim",
+    "class": "TRAINER_CLASS_SWIMMER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SEALEO",
+            "form": 0,
+            "level": 39,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "We spend our lives swimming!\nOf course we battle while swimming, too!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I lost. But I'm still cool, because not many\npeople can say they battled while swimming!"
+        },
+        {
+            "type": 2,
+            "text": "My Pokémon and I saw it\nwith our own eyes!{be01}\nI'm talking about the ancient ruins at\nthe bottom of the sea near Undella Town!"
+        }
+    ]
+}

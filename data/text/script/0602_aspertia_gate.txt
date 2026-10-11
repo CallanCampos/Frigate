@@ -1,8 +1,0 @@
-Hey! {0100:0}!\nYou can't go without...{be01}\n...Oh?{be01}
-You're with {0101:1}!{be01}\nOK. This is a going-away gift!\nDon't be shy. Take it.{be01}
-When Pokémon get hurt, take it easy\nand go to a Pokémon Center.
-{0100:0},\nhow is your journey?
-Hmm...\nI see. I see!{be01}
-I love to read news and information\nabout the city displayed{be00}\non the electric bulletin board{be00}\non the wall!
-Remember that?{be01}\nThe day you passed this gate\nwith your Pokémon for the first time.
-\pad{fc}

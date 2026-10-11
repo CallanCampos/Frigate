@@ -2,18 +2,13 @@
 #define POKEBW2_FIELD_FIELD_ACTOR_H
 
 #include "types.h"
+#include "constants/directions.h"
 #include "gfl/heap.h"
 #include "gfl/blact.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
 #include "system/game_event.h"
 #include "field/zone.h"
-
-// The directions that actors face and move in
-#define DIR_UP 0
-#define DIR_DOWN 1
-#define DIR_LEFT 2
-#define DIR_RIGHT 3
 
 // A position on the grid of 16-unit tiles. The game copies it as 8 bytes, with a field after z
 typedef struct {

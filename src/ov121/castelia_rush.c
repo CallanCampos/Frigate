@@ -3,6 +3,8 @@
 // talk to the player, and speech balloons of message file 209 pop up at random places of the bottom screen. The ROM
 // embeds no name for this file, so its name is a guess after swan's name of its process, CASTELIA_RUSH_PROC_DEF
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/script_text_banks.h"
 #include "field/castelia_rush.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -691,7 +693,7 @@ static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, void *msgB
 
     balloons->timer = 0;
     balloons->interval = rand % config->intervals[dayPeriod] + BALLOON_FRAMES;
-    balloons->msgData = GFL_MsgSysLoadData(FALSE, 3, 209, heapId);
+    balloons->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10350, heapId);
     balloons->msgBGSys = msgBGSys;
     balloons->next = rand % BALLOON_COUNT;
     for (i = 0; i < BALLOON_COUNT; i++) {

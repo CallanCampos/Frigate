@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Nitza",
+    "class": "TRAINER_CLASS_PSYCHIC_F",
+    "pokemon": [
+        "slugma_1",
+        "cherubi_1",
+        "litwick_1",
+        "kirlia_1",
+        "mareep_1",
+        "budew_1",
+        "petilil_1",
+        "chingling_1",
+        "solosis_1",
+        "horsea_1",
+        "remoraid_1",
+        "numel_1",
+        "vanillite_1",
+        "abra_1",
+        "gastly_1",
+        "psyduck_1",
+        "natu_1",
+        "magnemite_1",
+        "houndour_1",
+        "cacnea_1"
+    ]
+}

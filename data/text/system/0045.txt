@@ -1,48 +1,48 @@
-{bd02}TRADE WITH ANYONE
-{bd02}TRADE RENDEZVOUS
-TRADE WANTED
-LEVEL
-Lv. 1 through 49
-Lv. 50
-Lv. 51 through 100
-Any kind
-COOL
-CUTE
-SCARY
-STRANGE
-ANY KIND
-TRADE SEARCH
-Searching for the right person\nto trade with...
-CANCEL
-Getting information from the other person...
-A trade partner has been found!
-SEARCH
-Please select who you wish\nto trade with.
-Please press “SEARCH" when you've\nchosen the desired trade conditions.
-       \x{ffff}
-                        \x{ffff}
-WANT
-HAVE
-YES
-NO
-YES
-{0100:0} {bd03:1}ID: {0204:1}\n{0124:2}
-You have no one to Rendezvous with...
-SELECT FOR RENDEZVOUS
-Will you Rendezvous with this person?
-Please select how your trade\npartner is chosen.
-CANCEL
-{0124:0}\n{0125:1}
-GREETINGS
-{bd03:1}{0204:0}
-{bd02}{0100:0}
-              \x{ffff}
-The trade will be started.
-{bd03:1}NO. OF TRADES
-LOCATION
-Is it OK to disconnect from\nNintendo Wi-Fi Connection?
-You need at least two Pokémon\nif you want to trade!
-RENDEZVOUS WITH ANY
-Will you trade with someone\nyou have traded with before?
-       \x{ffff}
-        \x{ffff}
+Bank0045_Text_TradeAnyone = {bd02}TRADE WITH ANYONE
+Bank0045_Text_TradeRendezvous = {bd02}TRADE RENDEZVOUS
+Bank0045_Text_TradeWanted = TRADE WANTED
+Bank0045_Text_Level = LEVEL
+Bank0045_Text_Lv1Through49 = Lv. 1 through 49
+Bank0045_Text_Lv50 = Lv. 50
+Bank0045_Text_Lv51Through100 = Lv. 51 through 100
+Bank0045_Text_AnyKind = Any kind
+Bank0045_Text_Cool = COOL
+Bank0045_Text_Cute = CUTE
+Bank0045_Text_Scary = SCARY
+Bank0045_Text_Strange = STRANGE
+Bank0045_Text_AnyKind_2 = ANY KIND
+Bank0045_Text_TradeSearch = TRADE SEARCH
+Bank0045_Text_SearchingRightPersonTrade = Searching for the right person\nto trade with...
+Bank0045_Text_Cancel = CANCEL
+Bank0045_Text_GettingInformationFromOther = Getting information from the other person...
+Bank0045_Text_TradePartnerHasBeen = A trade partner has been found!
+Bank0045_Text_Search = SEARCH
+Bank0045_Text_PleaseSelectWhoWish = Please select who you wish\nto trade with.
+Bank0045_Text_PleasePressSearchWhen = Please press “SEARCH" when you've\nchosen the desired trade conditions.
+Bank0045_Text_Empty =        \x{ffff}
+Bank0045_Text_Empty_2 =                         \x{ffff}
+Bank0045_Text_Want = WANT
+Bank0045_Text_Have = HAVE
+Bank0045_Text_Yes = YES
+Bank0045_Text_No = NO
+Bank0045_Text_Yes_2 = YES
+Bank0045_Text_Id = {0100:0} {bd03:1}ID: {0204:1}\n{0124:2}
+Bank0045_Text_HaveNoOneRendezvous = You have no one to Rendezvous with...
+Bank0045_Text_SelectRendezvous = SELECT FOR RENDEZVOUS
+Bank0045_Text_WillRendezvousPerson = Will you Rendezvous with this person?
+Bank0045_Text_PleaseSelectHowTrade = Please select how your trade\npartner is chosen.
+Bank0045_Text_Cancel_2 = CANCEL
+Bank0045_Text_Empty_3 = {0124:0}\n{0125:1}
+Bank0045_Text_Greetings = GREETINGS
+Bank0045_Text_Empty_4 = {bd03:1}{0204:0}
+Bank0045_Text_Empty_5 = {bd02}{0100:0}
+Bank0045_Text_Empty_6 =               \x{ffff}
+Bank0045_Text_TradeWillStarted = The trade will be started.
+Bank0045_Text_NoTrades = {bd03:1}NO. OF TRADES
+Bank0045_Text_Location = LOCATION
+Bank0045_Text_OkDisconnectFromNintendo = Is it OK to disconnect from\nNintendo Wi-Fi Connection?
+Bank0045_Text_NeedLeastTwoPokemon = You need at least two Pokémon\nif you want to trade!
+Bank0045_Text_RendezvousAny = RENDEZVOUS WITH ANY
+Bank0045_Text_WillTradeSomeoneHave = Will you trade with someone\nyou have traded with before?
+Bank0045_Text_Empty_7 =        \x{ffff}
+Bank0045_Text_Empty_8 =         \x{ffff}

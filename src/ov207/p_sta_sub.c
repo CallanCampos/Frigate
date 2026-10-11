@@ -553,17 +553,18 @@ static BOOL PStaSub_CheckGesture(PStatusWork *wk, PStaSubWork *sub, PStaSubGestu
 static BOOL PStaSub_AnimSwipeX(PStatusWork *wk, PStaSubWork *sub) {
     VecFx32 pos = { FX32_CONST(216), FX32_CONST(72), 0 };
     VecFx32 offset = { 0, 0, 0 };
-    fx32 bounce = 0;
     s16 sin;
     u8 width;
     int dist;
 
     if (sub->noBounce == FALSE) {
         sin = FX_SinIdx((u16)(sub->animFrame * 0x8000 / 15));
-        bounce = sin * 16 + FX32_CONST(wk->happiness >> 6);
+        offset.y = sin * 16 + FX32_CONST(wk->happiness >> 6);
+        PStaSub_SetBounce(wk, sub, offset.y);
+    } else {
+        offset.y = 0;
+        PStaSub_SetBounce(wk, sub, offset.y);
     }
-    offset.y = bounce;
-    PStaSub_SetBounce(wk, sub, offset.y);
     width = (wk->happiness >> 6) + 16;
     dist = sub->animFrame * width / 15;
     switch (sub->animStep) {
@@ -794,12 +795,12 @@ static void PStaSub_TrackGestures(PStatusWork *wk, PStaSubWork *sub) {
     if (dx > 16 || dx < -16 || sub->swipeY.frames > 20) {
         PStaSub_ResetGesture(&sub->swipeY, x, y);
     }
-    dir = PSTA_SUB_DIR_NONE;
-    lap = FALSE;
     sub->swipeY.frames++;
 
     dx = x - sub->circle.startX;
     dy = y - sub->circle.startY;
+    dir = PSTA_SUB_DIR_NONE;
+    lap = FALSE;
     if (dx > 16) {
         dir = PSTA_SUB_DIR_RIGHT;
     } else if (dx < -16) {

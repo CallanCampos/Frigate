@@ -1,7 +1,8 @@
 #include "types.h"
 #include "field/event_wbt.h"
 #include "field/field_script.h"
-#include "field/ov134.h"
+#include "field/wbt_battle.h"
+#include "field/wbt_stadium_gimmick.h"
 #include "field/scrcmd_wbt.h"
 #include "field/wbt.h"
 #include "gfl/overlay.h"
@@ -34,7 +35,7 @@ BOOL func_ov057_021e760c(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov134_021f0748(sys);
+    *var = WbtBattle_GetOpponentObjCode(sys);
     return FALSE;
 }
 
@@ -47,7 +48,7 @@ BOOL func_ov057_021e7630(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     StrBuf *text = ScriptWork_GetAltStrBuf(work);
 
-    func_ov134_021f08b8(sys, message, text);
+    WbtBattle_LoadOpponentLine(sys, message, text);
     func_ov057_021e75c0(env, wordSet, 1);
     GFL_WordSetFormatStrbuf(wordSet, strbuf, text);
     return func_ov036_021a8eb4(vm, env, strbuf, value, 0, 0);
@@ -74,7 +75,7 @@ BOOL func_ov057_021e770c(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     StrBuf *text = ScriptWork_GetAltStrBuf(work);
 
-    func_ov134_021f08b8(sys, 7, text);
+    WbtBattle_LoadOpponentLine(sys, 7, text);
     func_ov057_021e75c0(env, wordSet, 1);
     GFL_WordSetFormatStrbuf(wordSet, strbuf, text);
     return loadMsgBox(vm, env, strbuf, 0, value);
@@ -86,10 +87,10 @@ BOOL func_ov057_021e777c(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     WbtSystem *sys = func_ov055_021e5800(env);
     u8 index = VM_Read8(vm);
-    u32 unk = func_ov134_021f0738(sys);
+    u32 unk = WbtBattle_GetOpponentFlag(sys);
     StrBuf *strbuf = ScriptWork_GetAltStrBuf(work);
 
-    func_ov134_021f0754(sys, strbuf);
+    WbtBattle_GetOpponentName(sys, strbuf);
     func_0202437c(wordSet, index, strbuf, unk, 1, 2);
     return FALSE;
 }
@@ -98,7 +99,7 @@ BOOL func_ov057_021e777c(VM *vm, FieldScriptEnv *env) {
 BOOL WbtCmd_MakeOpponentParty(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     WbtSystem *sys = func_ov055_021e5800(env);
-    WbtEntrant *opponent = func_ov134_021f0724(sys);
+    WbtEntrant *opponent = WbtBattle_GetOpponent(sys);
 
     switch (func_ov055_021e5ca4(sys)) {
     case 12:
@@ -106,7 +107,7 @@ BOOL WbtCmd_MakeOpponentParty(VM *vm, FieldScriptEnv *env) {
         func_ov055_021e71ec(sys);
         break;
     default:
-        func_ov134_021f03cc(sys, gsys, opponent);
+        WbtBattle_MakeOpponentParty(sys, gsys, opponent);
         break;
     }
     return FALSE;
@@ -116,7 +117,7 @@ BOOL func_ov057_021e7814(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     u16 round = func_ov055_021e5cc4(sys);
     u16 *var = ScriptReadVar(vm, env);
-    u8 value = func_ov134_021f062c(sys, round);
+    u8 value = WbtBattle_GetRoundRemaining(sys, round);
 
     if (value == func_ov055_021e5d7c(sys)) {
         value = 0xff;
@@ -127,30 +128,30 @@ BOOL func_ov057_021e7814(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov057_021e7850(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
-    void *work = func_ov134_021efdc8(env, sys);
+    void *work = WbtBattle_CreatePartyList(env, sys);
 
     func_ov055_021e5cfc(sys, work);
-    func_ov134_021efe24(work);
+    WbtBattle_ShowPartyList(work);
     return FALSE;
 }
 
 BOOL func_ov057_021e7878(VM *vm, FieldScriptEnv *env) {
     void *work = func_ov055_021e5d08(func_ov055_021e5800(env));
 
-    func_ov134_021efeec(work);
-    func_ov134_021eff04(work);
+    WbtBattle_ClosePartyList(work);
+    WbtBattle_FreePartyList(work);
     return FALSE;
 }
 
 BOOL func_ov057_021e7894(VM *vm, FieldScriptEnv *env) {
-    func_ov134_021efd14(func_ov055_021e5800(env));
+    WbtBattle_ResetPicks(func_ov055_021e5800(env));
     return FALSE;
 }
 
 BOOL func_ov057_021e78a4(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
 
-    func_ov134_021efd54(sys, ScriptReadAny(vm, env));
+    WbtBattle_RandomPick(sys, ScriptReadAny(vm, env));
     return FALSE;
 }
 
@@ -158,16 +159,16 @@ BOOL func_ov057_021e78c8(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     u16 index = ScriptReadAny(vm, env);
 
-    func_ov134_021efd48(sys, index, ScriptReadAny(vm, env));
+    WbtBattle_SetPick(sys, index, ScriptReadAny(vm, env));
     return FALSE;
 }
 
-// Puts the species of one of the Pokémon that func_ov134_021efdbc picks in a word of the script's WordSet
+// Puts the species of one of the Pokémon that WbtBattle_GetPick picks in a word of the script's WordSet
 BOOL func_ov057_021e78fc(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     u8 index = VM_Read8(vm);
     u16 which = ScriptReadAny(vm, env);
-    u8 slot = func_ov134_021efdbc(sys, which);
+    u8 slot = WbtBattle_GetPick(sys, which);
     PokeParty *party;
 
     if (which <= 1) {
@@ -187,8 +188,8 @@ BOOL func_ov057_021e7948(VM *vm, FieldScriptEnv *env) {
     StrBuf *text = ScriptWork_GetAltStrBuf(work);
     int count = func_ov055_021e5d7c(sys);
     PokeParty *party = func_ov055_021e5d74(sys);
-    u8 picked1 = func_ov134_021efdbc(sys, 2);
-    u8 picked2 = func_ov134_021efdbc(sys, 3);
+    u8 picked1 = WbtBattle_GetPick(sys, 2);
+    u8 picked2 = WbtBattle_GetPick(sys, 3);
     int i;
     u32 message;
     u16 value;
@@ -211,7 +212,7 @@ BOOL func_ov057_021e79e8(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL func_ov057_021e79ec(VM *vm, FieldScriptEnv *env) {
-    func_ov134_021efc60(func_ov055_021e5800(env));
+    WbtBattle_SwapPickedPokemon(func_ov055_021e5800(env));
     return FALSE;
 }
 
@@ -236,13 +237,13 @@ BOOL func_ov057_021e79fc(VM *vm, FieldScriptEnv *env) {
     field = GSYS_GetField(gsys);
     sys = func_ov055_021e5800(env);
     mode = ScriptReadAny(vm, env);
-    opponentUnk = func_ov055_021e5e2c(func_ov134_021f0724(sys));
+    opponentUnk = func_ov055_021e5e2c(WbtBattle_GetOpponent(sys));
     playerUnk = func_ov055_021e5e2c(func_ov055_021e5d28(sys));
     switch (mode) {
     case 0:
         name = ScriptWork_GetAltStrBuf(work);
         strbuf = GFL_StrBufCreate(16, heapId);
-        func_ov134_021f0754(sys, strbuf);
+        WbtBattle_GetOpponentName(sys, strbuf);
         GFL_StrBufClear(name);
         GFL_StrBufUncompress(name, strbuf);
         GFL_StrBufFree(strbuf);
@@ -261,7 +262,7 @@ BOOL func_ov057_021e79fc(VM *vm, FieldScriptEnv *env) {
     case 2:
         name = ScriptWork_GetAltStrBuf(work);
         strbuf = GFL_StrBufCreate(16, heapId);
-        func_ov134_021f0754(sys, strbuf);
+        WbtBattle_GetOpponentName(sys, strbuf);
         GFL_StrBufClear(name);
         GFL_StrBufUncompress(name, strbuf);
         GFL_StrBufFree(strbuf);
@@ -275,7 +276,7 @@ BOOL func_ov057_021e79fc(VM *vm, FieldScriptEnv *env) {
         playerUnk = 0;
         break;
     }
-    func_ov134_021eecf0(field, mode, name, playerName, opponentUnk, playerUnk);
+    WbtStadiumGimmick_SetNames(field, mode, name, playerName, opponentUnk, playerUnk);
     if (playerName != NULL) {
         GFL_StrBufFree(playerName);
     }
@@ -292,7 +293,7 @@ BOOL func_ov057_021e7b20(VM *vm, FieldScriptEnv *env) {
     field = GSYS_GetField(gsys);
     func_ov055_021e5800(env);
     value = ScriptReadAny(vm, env);
-    func_ov134_021eeda0(field, value);
+    WbtStadiumGimmick_ShowPortraits(field, value);
     return FALSE;
 }
 
@@ -304,12 +305,12 @@ BOOL func_ov057_021e7b60(VM *vm, FieldScriptEnv *env) {
     if (a1 >= 21) {
         return FALSE;
     }
-    func_ov134_021eedfc(field, a1, a2);
+    WbtStadiumGimmick_LoadPortraitScene(field, a1, a2);
     return FALSE;
 }
 
 BOOL func_ov057_021e7ba0(VM *vm, FieldScriptEnv *env) {
-    func_ov134_021eef78(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
+    WbtStadiumGimmick_PlayIntro(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     return FALSE;
 }
 
@@ -318,7 +319,7 @@ BOOL func_ov057_021e7bb4(VM *vm, FieldScriptEnv *env) {
     u8 a1 = ScriptReadAny(vm, env);
     u8 a2 = ScriptReadAny(vm, env);
 
-    func_ov134_021eefdc(field, a1, a2);
+    WbtStadiumGimmick_SwitchLights(field, a1, a2);
     return FALSE;
 }
 
@@ -326,6 +327,6 @@ BOOL func_ov057_021e7bec(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     u8 value = ScriptReadAny(vm, env);
 
-    func_ov134_021ef034(field, value);
+    WbtStadiumGimmick_PlayCrowd(field, value);
     return FALSE;
 }

@@ -211,6 +211,7 @@ src/ov012/scrcmd_ndemo.c:
     .text       start:0x0215f440 end:0x0215f55c
 
 src/ov012/game_beacon_search.c:
+    complete
     .text       start:0x0215f55c end:0x0215f958
     .rodata     start:0x0216d6a8 end:0x0216d718
     .data       start:0x0216e2b8 end:0x0216e2d0

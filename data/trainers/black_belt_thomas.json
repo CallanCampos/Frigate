@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Thomas",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SAWK",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BRELOOM",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CONKELDURR",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Just three more people!{be01}\nI won't leave this spot till I win against\nthree more people!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Whoa!\nYour Pokémon were amazing!!"
+        },
+        {
+            "type": 2,
+            "text": "Heh! If beating an opponent is also a kind\nof strength then...{be01}\nI guess sticking to something you've\ndecided to do is also a kind of strength!"
+        }
+    ]
+}

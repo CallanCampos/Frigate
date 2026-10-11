@@ -1,0 +1,180 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Bagon",
+    "pokedex": {
+        "category": "Rock Head Pokémon",
+        "entry": "Dreaming of one day flying, it\npractices by leaping off cliffs\nevery day.",
+        "height": "2'00\"",
+        "weight": "92.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Bagon",
+                "category": "Rock Head Pokémon",
+                "entry": "Dreaming of one day flying, it\npractices by leaping off cliffs\nevery day.",
+                "height": "2'00\"",
+                "weight": "92.8 lbs."
+            },
+            "fr": {
+                "name": "Draby",
+                "category": "Pokémon Tête de Roc",
+                "entry": "Il rêve de pouvoir voler un jour.\nPour l'heure, il s'entraîne en\nsautant du haut des falaises.",
+                "height": "0,6 m",
+                "weight": "42,1 kg"
+            },
+            "de": {
+                "name": "Kindwurm",
+                "category": "Steinhaupt",
+                "entry": "Es träumt davon, eines Tages\nfliegen zu können und springt daher\njeden Tag von hohen Klippen.",
+                "height": "0,6 m",
+                "weight": "42,1 kg"
+            },
+            "it": {
+                "name": "Bagon",
+                "category": "Pokémon Rocciotesta",
+                "entry": "Sogna di poter volare un giorno e,\npertanto, si allena regolarmente\ngettandosi da alture.",
+                "height": "0,6 m",
+                "weight": "42,1 kg"
+            },
+            "ko": {
+                "name": "아공이",
+                "category": "돌머리포켓몬",
+                "entry": "넓은 하늘을 나는 것을 꿈꾸며\n매일 나는 연습을 하려고\n절벽에서 뛰어내린다.",
+                "height": "0.6 m",
+                "weight": "42.1 kg"
+            },
+            "es": {
+                "name": "Bagon",
+                "category": "Pokémon Cabeza Roca",
+                "entry": "Sueña con volar algún día, por lo que\nsiempre practica saltando desde\nacantilados.",
+                "height": "0,6 m",
+                "weight": "42,1 kg"
+            },
+            "ja": {
+                "name": "タツベイ",
+                "category": "いしあたまポケモン",
+                "entry": "おおぞらを\\x{3000}とぶことを\\x{3000}ゆめみて\nまいにち\\x{3000}とぶ\\x{3000}れんしゅうのために\nがけから\\x{3000}とびおりている。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff12}\\x{ff0e}\\x{ff11}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 75,
+        "defense": 60,
+        "speed": 50,
+        "special_attack": 40,
+        "special_defense": 30
+    },
+    "types": [ "TYPE_DRAGON", "TYPE_DRAGON" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_DRAGON_FANG",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 40,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_DRAGON", "EGG_GROUP_DRAGON" ],
+    "abilities": [ "ABILITY_ROCK_HEAD", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHEER_FORCE",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 60,
+    "height": 6,
+    "weight": 421,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_RAGE" ],
+            [ 5, "MOVE_BITE" ],
+            [ 10, "MOVE_LEER" ],
+            [ 16, "MOVE_HEADBUTT" ],
+            [ 20, "MOVE_FOCUS_ENERGY" ],
+            [ 25, "MOVE_EMBER" ],
+            [ 31, "MOVE_DRAGON_BREATH" ],
+            [ 35, "MOVE_ZEN_HEADBUTT" ],
+            [ 40, "MOVE_SCARY_FACE" ],
+            [ 46, "MOVE_CRUNCH" ],
+            [ 50, "MOVE_DRAGON_CLAW" ],
+            [ 55, "MOVE_DOUBLE_EDGE" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM02",
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM59",
+            "TM65",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_DRACO_METEOR",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_HYDRO_PUMP",
+            "MOVE_THRASH",
+            "MOVE_DRAGON_RAGE",
+            "MOVE_TWISTER",
+            "MOVE_DRAGON_DANCE",
+            "MOVE_FIRE_FANG",
+            "MOVE_DRAGON_RUSH",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_ENDURE",
+            "MOVE_DEFENSE_CURL"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_SHELGON"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_BAGON"
+}

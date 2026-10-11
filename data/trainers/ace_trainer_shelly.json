@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Shelly",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SWOOBAT",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_PSYCHIC", "MOVE_ACROBATICS", "MOVE_ENERGY_BALL", "MOVE_U_TURN" ]
+        },
+        {
+            "species": "SPECIES_LILLIGANT",
+            "form": 0,
+            "level": 55,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_PETAL_DANCE", "MOVE_QUIVER_DANCE", "MOVE_TEETER_DANCE", "MOVE_SYNTHESIS" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Our unity won't be bested by anyone!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "We couldn't win...\nBut that's all right."
+        },
+        {
+            "type": 2,
+            "text": "My Pokémon was once stolen by\nTeam Plasma.{be01}\nI'm just so grateful that we can be\ntogether like this now."
+        }
+    ]
+}

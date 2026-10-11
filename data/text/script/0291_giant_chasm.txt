@@ -1,4 +1,0 @@
-Rood: Oh! You're safe!\nI'm so glad!{be01}\nAs for Team Plasma's ship,\na man in a white lab coat appeared.{be01}\nHe said that a Trainer had given\nhim the answer he'd been seeking,{be00}\nand, as thanks, he would disband{be00}\nTeam Plasma...{be01}\nThen he said, “Farewell! Walk a just path\nwith Pokémon!" and he flew the ship away.{be00}\nSo everything has been resolved.{be01}\nWe were even able to confirm\nthat Lord N is safe.
-I'm in no position to say anything.\nIn the past, I stole Pokémon, too.
-I wonder if that guy who ran off\nhad figured something out...
-\pad{ce}

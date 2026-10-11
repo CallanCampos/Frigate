@@ -233,7 +233,7 @@ void MusItemDraw_ChangeItem(MusItemDrawSys *sys, MusItemDraw *item, u16 itemId, 
     item->update = TRUE;
 }
 
-void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item) {
+void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, void *texResource) {
     if (item->shadow == FALSE) {
         u32 plttAddr;
         NNSGfdPlttKey plttKey;

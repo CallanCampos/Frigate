@@ -1,22 +1,22 @@
-{bd02}After being arrested by Mecha Cop again,\n{bd02}the {0102:0} Ninja made a\n{bd02}daring escape from prison.
-{bd02}And then, in order to defeat his rival,\n{bd02}Mecha Cop, the {0102:0} Ninja\n{bd02}put a dastardly plan into motion.
-{bd02}The {0102:0} Ninja's claw\n{bd02}is closing in on Mecha Cop's sister!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}After being arrested by Mecha Cop again,\n{bd02}the {0102:0} Ninja made a\n{bd02}daring escape from prison.
-{bd02}And then, in order to defeat her rival,\n{bd02}Mecha Cop, the {0102:0} Ninja\n{bd02}put a dastardly plan into motion.
-{bd02}The {0102:0} Ninja's claw\n{bd02}is closing in on Mecha Cop's sister!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0272_Text_AfterBeingArrestedBy = {bd02}After being arrested by Mecha Cop again,\n{bd02}the {0102:0} Ninja made a\n{bd02}daring escape from prison.
+Bank0272_Text_ThenOrderDefeatHis = {bd02}And then, in order to defeat his rival,\n{bd02}Mecha Cop, the {0102:0} Ninja\n{bd02}put a dastardly plan into motion.
+Bank0272_Text_NinjasClawClosingMecha = {bd02}The {0102:0} Ninja's claw\n{bd02}is closing in on Mecha Cop's sister!
+Bank0272_Text_Empty = なし
+Bank0272_Text_Empty_2 = なし
+Bank0272_Text_Empty_3 = なし
+Bank0272_Text_Empty_4 = なし
+Bank0272_Text_Empty_5 = なし
+Bank0272_Text_Empty_6 = なし
+Bank0272_Text_Empty_7 = なし
+Bank0272_Text_AfterBeingArrestedBy_2 = {bd02}After being arrested by Mecha Cop again,\n{bd02}the {0102:0} Ninja made a\n{bd02}daring escape from prison.
+Bank0272_Text_ThenOrderDefeatHer = {bd02}And then, in order to defeat her rival,\n{bd02}Mecha Cop, the {0102:0} Ninja\n{bd02}put a dastardly plan into motion.
+Bank0272_Text_NinjasClawClosingMecha_2 = {bd02}The {0102:0} Ninja's claw\n{bd02}is closing in on Mecha Cop's sister!
+Bank0272_Text_Empty_8 = なし
+Bank0272_Text_Empty_9 = なし
+Bank0272_Text_Empty_10 = なし
+Bank0272_Text_Empty_11 = なし
+Bank0272_Text_Empty_12 = なし
+Bank0272_Text_Empty_13 = なし
+Bank0272_Text_Empty_14 = なし
+Bank0272_Text_Empty_15 = なし
 \pad{44}

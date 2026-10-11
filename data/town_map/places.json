@@ -1,0 +1,3116 @@
+{
+    "$schema": "places.schema.json",
+    "places": [
+        {
+            "zone": "ZONE_NUVEMA_TOWN",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 232,
+                "y": 158
+            },
+            "cursor": {
+                "x": 232,
+                "y": 158
+            },
+            "hit": {
+                "start": {
+                    "x": 232,
+                    "y": 154
+                },
+                "end": {
+                    "x": 232,
+                    "y": 162
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_NUVEMA_TOWN",
+            "shown_by": null,
+            "description": "TownMap_Text_RuralTownWhoseSea",
+            "landmarks": [ "TownMap_Text_JuniperPokemonLab" ],
+            "area": {
+                "animation": 0,
+                "x": 224,
+                "y": 150
+            }
+        },
+        {
+            "zone": "ZONE_ACCUMULA_TOWN",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 232,
+                "y": 138
+            },
+            "cursor": {
+                "x": 232,
+                "y": 138
+            },
+            "hit": {
+                "start": {
+                    "x": 232,
+                    "y": 134
+                },
+                "end": {
+                    "x": 232,
+                    "y": 142
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_ACCUMULA_TOWN",
+            "shown_by": null,
+            "description": "TownMap_Text_TownOffersGreatViews",
+            "landmarks": [ "TownMap_Text_PokemonCenter" ],
+            "area": {
+                "animation": 0,
+                "x": 224,
+                "y": 129
+            }
+        },
+        {
+            "zone": "ZONE_STRIATON_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 228,
+                "y": 118
+            },
+            "cursor": {
+                "x": 228,
+                "y": 118
+            },
+            "hit": {
+                "start": {
+                    "x": 228,
+                    "y": 114
+                },
+                "end": {
+                    "x": 228,
+                    "y": 122
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_STRIATON_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_EntryStairsBuiltMemory",
+            "landmarks": [ "TownMap_Text_StriatonRestaurant", "TownMap_Text_PokemonCenter_2", "TownMap_Text_TrainersSchool" ],
+            "area": {
+                "animation": 0,
+                "x": 221,
+                "y": 110
+            }
+        },
+        {
+            "zone": "ZONE_NACRENE_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 203,
+                "y": 118
+            },
+            "cursor": {
+                "x": 203,
+                "y": 118
+            },
+            "hit": {
+                "start": {
+                    "x": 203,
+                    "y": 114
+                },
+                "end": {
+                    "x": 203,
+                    "y": 122
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_NACRENE_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_CityEstablishedRestoredStorehouses",
+            "landmarks": [
+                "TownMap_Text_NacreneMuseum",
+                "TownMap_Text_PokemonCenter_3",
+                "TownMap_Text_CafeWarehouse",
+                "TownMap_Text_MoveTutor"
+            ],
+            "area": {
+                "animation": 0,
+                "x": 195,
+                "y": 109
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 132,
+                "y": 130
+            },
+            "cursor": {
+                "x": 132,
+                "y": 130
+            },
+            "hit": {
+                "start": {
+                    "x": 132,
+                    "y": 126
+                },
+                "end": {
+                    "x": 132,
+                    "y": 134
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_CASTELIA_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_BigCitySkyscrapersPiercing",
+            "landmarks": [
+                "TownMap_Text_CasteliaCityGym",
+                "TownMap_Text_PokemonCenter_4",
+                "TownMap_Text_RoyalUnova",
+                "TownMap_Text_PasserbyAnalytics",
+                "TownMap_Text_MedalOffice",
+                "TownMap_Text_NameRatingServices"
+            ],
+            "area": {
+                "animation": 0,
+                "x": 125,
+                "y": 121
+            }
+        },
+        {
+            "zone": "ZONE_NIMBASA_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 132,
+                "y": 91
+            },
+            "cursor": {
+                "x": 132,
+                "y": 91
+            },
+            "hit": {
+                "start": {
+                    "x": 132,
+                    "y": 87
+                },
+                "end": {
+                    "x": 132,
+                    "y": 95
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_NIMBASA_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_BustlingCityEntertainmentMany",
+            "landmarks": [
+                "TownMap_Text_NimbasaCityGym",
+                "TownMap_Text_PokemonCenter_5",
+                "TownMap_Text_MusicalTheater",
+                "TownMap_Text_BattleSubway",
+                "TownMap_Text_BigStadium",
+                "TownMap_Text_SmallCourt"
+            ],
+            "area": {
+                "animation": 0,
+                "x": 124,
+                "y": 83
+            }
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 74,
+                "y": 91
+            },
+            "cursor": {
+                "x": 74,
+                "y": 91
+            },
+            "hit": {
+                "start": {
+                    "x": 74,
+                    "y": 87
+                },
+                "end": {
+                    "x": 74,
+                    "y": 95
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_DRIFTVEIL_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_PortTownDistributingMany",
+            "landmarks": [
+                "TownMap_Text_DriftveilCityGym",
+                "TownMap_Text_PokemonCenter_6",
+                "TownMap_Text_DriftveilMarket",
+                "TownMap_Text_MoveTutor_2"
+            ],
+            "area": {
+                "animation": 0,
+                "x": 66,
+                "y": 83
+            }
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 40,
+                "y": 67
+            },
+            "cursor": {
+                "x": 40,
+                "y": 67
+            },
+            "hit": {
+                "start": {
+                    "x": 40,
+                    "y": 63
+                },
+                "end": {
+                    "x": 40,
+                    "y": 71
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_MISTRALTON_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_VegetablesGrownByRunway",
+            "landmarks": [
+                "TownMap_Text_MistraltonCityGym",
+                "TownMap_Text_PokemonCenter_7",
+                "TownMap_Text_CargoService",
+                "TownMap_Text_TmCollector"
+            ],
+            "area": {
+                "animation": 0,
+                "x": 32,
+                "y": 59
+            }
+        },
+        {
+            "zone": "ZONE_ICIRRUS_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 74,
+                "y": 43
+            },
+            "cursor": {
+                "x": 74,
+                "y": 43
+            },
+            "hit": {
+                "start": {
+                    "x": 74,
+                    "y": 39
+                },
+                "end": {
+                    "x": 74,
+                    "y": 47
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_ICIRRUS_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_WinterCityCoveredSnow",
+            "landmarks": [ "TownMap_Text_PokemonCenter_8", "TownMap_Text_PokemonFanClub" ],
+            "area": {
+                "animation": 0,
+                "x": 66,
+                "y": 35
+            }
+        },
+        {
+            "zone": "ZONE_OPELUCID_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 132,
+                "y": 43
+            },
+            "cursor": {
+                "x": 132,
+                "y": 43
+            },
+            "hit": {
+                "start": {
+                    "x": 132,
+                    "y": 39
+                },
+                "end": {
+                    "x": 132,
+                    "y": 47
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_OPELUCID_CITY",
+            "shown_by": null,
+            "description": {
+                "black2": "TownMap_Text_ConvenientCityRapidChange",
+                "white2": "TownMap_Text_CityRespectsHistoryValues"
+            },
+            "landmarks": [ "TownMap_Text_OpelucidCityGym", "TownMap_Text_PokemonCenter_9" ],
+            "area": {
+                "animation": 0,
+                "x": 124,
+                "y": 35
+            }
+        },
+        {
+            "zone": "ZONE_POKEMON_LEAGUE",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 170,
+                "y": 15
+            },
+            "cursor": {
+                "x": 170,
+                "y": 15
+            },
+            "hit": {
+                "start": {
+                    "x": 170,
+                    "y": 11
+                },
+                "end": {
+                    "x": 170,
+                    "y": 19
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_POKEMON_LEAGUE",
+            "shown_by": null,
+            "description": "TownMap_Text_OnlyTrainersWhoWin",
+            "landmarks": [ "TownMap_Text_PokemonCenter_10" ],
+            "area": {
+                "animation": 0,
+                "x": 162,
+                "y": 7
+            }
+        },
+        {
+            "zone": "ZONE_LACUNOSA_TOWN",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 190,
+                "y": 43
+            },
+            "cursor": {
+                "x": 190,
+                "y": 43
+            },
+            "hit": {
+                "start": {
+                    "x": 190,
+                    "y": 39
+                },
+                "end": {
+                    "x": 190,
+                    "y": 47
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_LACUNOSA_TOWN",
+            "shown_by": null,
+            "description": "TownMap_Text_TownWhereAllHonor",
+            "landmarks": [ "TownMap_Text_PokemonCenter_11" ],
+            "area": {
+                "animation": 0,
+                "x": 182,
+                "y": 35
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_TOWN",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 224,
+                "y": 67
+            },
+            "cursor": {
+                "x": 224,
+                "y": 67
+            },
+            "hit": {
+                "start": {
+                    "x": 224,
+                    "y": 63
+                },
+                "end": {
+                    "x": 224,
+                    "y": 71
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_UNDELLA_TOWN",
+            "shown_by": null,
+            "description": "TownMap_Text_SummerRetreatBeachFull",
+            "landmarks": [ "TownMap_Text_PokemonCenter_12", "TownMap_Text_CaitlinsVilla" ],
+            "area": {
+                "animation": 0,
+                "x": 216,
+                "y": 59
+            }
+        },
+        {
+            "zone": "ZONE_ANVILLE_TOWN",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 7,
+                "y": 30
+            },
+            "cursor": {
+                "x": 7,
+                "y": 30
+            },
+            "hit": {
+                "start": {
+                    "x": 7,
+                    "y": 26
+                },
+                "end": {
+                    "x": 7,
+                    "y": 34
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_CityRailYardWhere",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": -1,
+                "y": 22
+            }
+        },
+        {
+            "zone": "ZONE_BLACK_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 190,
+                "y": 91
+            },
+            "cursor": {
+                "x": 190,
+                "y": 91
+            },
+            "hit": {
+                "start": {
+                    "x": 190,
+                    "y": 87
+                },
+                "end": {
+                    "x": 190,
+                    "y": 95
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_BLACK_CITY_WHITE_FOREST",
+            "shown_by": null,
+            "description": "TownMap_Text_ModernCityOngoingDevelopment",
+            "landmarks": [ "TownMap_Text_PokemonCenter_13", "TownMap_Text_BlackTower" ],
+            "area": {
+                "animation": 0,
+                "x": 183,
+                "y": 83
+            }
+        },
+        {
+            "zone": "ZONE_WHITE_FOREST",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 190,
+                "y": 91
+            },
+            "cursor": {
+                "x": 190,
+                "y": 91
+            },
+            "hit": {
+                "start": {
+                    "x": 190,
+                    "y": 87
+                },
+                "end": {
+                    "x": 190,
+                    "y": 95
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_BLACK_CITY_WHITE_FOREST",
+            "shown_by": null,
+            "description": "TownMap_Text_PlaceNaturesBountyAttracts",
+            "landmarks": [ "TownMap_Text_PokemonCenter_14", "TownMap_Text_WhiteTreehollow" ],
+            "area": {
+                "animation": 0,
+                "x": 183,
+                "y": 83
+            }
+        },
+        {
+            "zone": "ZONE_UNITY_TOWER",
+            "type": 5,
+            "radius": 12,
+            "position": {
+                "x": 99,
+                "y": 157
+            },
+            "cursor": {
+                "x": 99,
+                "y": 157
+            },
+            "hit": {
+                "start": {
+                    "x": 99,
+                    "y": 153
+                },
+                "end": {
+                    "x": 99,
+                    "y": 161
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_UNITY_TOWER",
+            "shown_by": "TOWNMAP_FLAG_UNITY_TOWER_VISITED",
+            "description": "TownMap_Text_SkyscraperWherePeopleFrom",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 91,
+                "y": 148
+            }
+        },
+        {
+            "zone": "ZONE_ENTRALINK",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 132,
+                "y": 67
+            },
+            "cursor": {
+                "x": 132,
+                "y": 67
+            },
+            "hit": {
+                "start": {
+                    "x": 132,
+                    "y": 63
+                },
+                "end": {
+                    "x": 132,
+                    "y": 71
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_MiddleUnovaRegionPlace",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 124,
+                "y": 59
+            }
+        },
+        {
+            "zone": "ZONE_POKE_TRANSFER_LAB",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 177,
+                "y": 84
+            },
+            "cursor": {
+                "x": 177,
+                "y": 84
+            },
+            "hit": {
+                "start": {
+                    "x": 177,
+                    "y": 80
+                },
+                "end": {
+                    "x": 177,
+                    "y": 88
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_FacilityStudyPokemonFrom",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 170,
+                "y": 75
+            }
+        },
+        {
+            "zone": "ZONE_DREAMYARD",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 239,
+                "y": 118
+            },
+            "cursor": {
+                "x": 239,
+                "y": 118
+            },
+            "hit": {
+                "start": {
+                    "x": 239,
+                    "y": 114
+                },
+                "end": {
+                    "x": 239,
+                    "y": 122
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_PlantSiteUsedPlayground",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 232,
+                "y": 109
+            }
+        },
+        {
+            "zone": "ZONE_PINWHEEL_FOREST",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 194,
+                "y": 125
+            },
+            "cursor": {
+                "x": 194,
+                "y": 125
+            },
+            "hit": {
+                "start": {
+                    "x": 194,
+                    "y": 121
+                },
+                "end": {
+                    "x": 194,
+                    "y": 129
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_CanGoThroughHollows",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 186,
+                "y": 118
+            }
+        },
+        {
+            "zone": "ZONE_DESERT_RESORT",
+            "type": 1,
+            "radius": 6,
+            "position": {
+                "x": 124,
+                "y": 104
+            },
+            "cursor": {
+                "x": 124,
+                "y": 104
+            },
+            "hit": {
+                "start": {
+                    "x": 124,
+                    "y": 101
+                },
+                "end": {
+                    "x": 124,
+                    "y": 107
+                },
+                "radius": 6
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": {
+                "black2": "TownMap_Text_PopularPlaceTouristsBut_2",
+                "white2": "TownMap_Text_PopularPlaceTouristsBut"
+            },
+            "landmarks": [],
+            "area": {
+                "animation": 11,
+                "x": 116,
+                "y": 100
+            }
+        },
+        {
+            "zone": "ZONE_RELIC_CASTLE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 115,
+                "y": 104
+            },
+            "cursor": {
+                "x": 115,
+                "y": 104
+            },
+            "hit": {
+                "start": {
+                    "x": 115,
+                    "y": 100
+                },
+                "end": {
+                    "x": 115,
+                    "y": 108
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": {
+                "black2": "TownMap_Text_AncientRuinsGloriousHistory_2",
+                "white2": "TownMap_Text_AncientRuinsGloriousHistory"
+            },
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 107,
+                "y": 96
+            }
+        },
+        {
+            "zone": "ZONE_PWT",
+            "type": 3,
+            "radius": 12,
+            "position": {
+                "x": 77,
+                "y": 103
+            },
+            "cursor": {
+                "x": 77,
+                "y": 103
+            },
+            "hit": {
+                "start": {
+                    "x": 77,
+                    "y": 99
+                },
+                "end": {
+                    "x": 77,
+                    "y": 107
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_PWT",
+            "shown_by": null,
+            "description": "TownMap_Text_TrainersWhoProudTheir",
+            "landmarks": [ "TownMap_Text_MoveReminder", "TownMap_Text_MoveDeleter", "TownMap_Text_MoveTutor_3" ],
+            "area": {
+                "animation": 1,
+                "x": 67,
+                "y": 95
+            }
+        },
+        {
+            "zone": "ZONE_CHARGESTONE_CAVE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 42,
+                "y": 80
+            },
+            "cursor": {
+                "x": 42,
+                "y": 80
+            },
+            "hit": {
+                "start": {
+                    "x": 42,
+                    "y": 76
+                },
+                "end": {
+                    "x": 42,
+                    "y": 84
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_CaveWhereElectricallyCharged",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 34,
+                "y": 72
+            }
+        },
+        {
+            "zone": "ZONE_TWIST_MOUNTAIN",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 72,
+                "y": 55
+            },
+            "cursor": {
+                "x": 72,
+                "y": 55
+            },
+            "hit": {
+                "start": {
+                    "x": 72,
+                    "y": 51
+                },
+                "end": {
+                    "x": 72,
+                    "y": 59
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_HasReputationMineLittered",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 65,
+                "y": 47
+            }
+        },
+        {
+            "zone": "ZONE_DRAGONSPIRAL_TOWER",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 66,
+                "y": 31
+            },
+            "cursor": {
+                "x": 66,
+                "y": 31
+            },
+            "hit": {
+                "start": {
+                    "x": 66,
+                    "y": 27
+                },
+                "end": {
+                    "x": 66,
+                    "y": 35
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_OldestTowerUnovaRegion",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 58,
+                "y": 23
+            }
+        },
+        {
+            "zone": "ZONE_GIANT_CHASM",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 208,
+                "y": 36
+            },
+            "cursor": {
+                "x": 208,
+                "y": 36
+            },
+            "hit": {
+                "start": {
+                    "x": 208,
+                    "y": 32
+                },
+                "end": {
+                    "x": 208,
+                    "y": 40
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_LegendSaysIfApproach",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 200,
+                "y": 28
+            }
+        },
+        {
+            "zone": "ZONE_LIBERTY_GARDEN",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 74,
+                "y": 145
+            },
+            "cursor": {
+                "x": 74,
+                "y": 145
+            },
+            "hit": {
+                "start": {
+                    "x": 74,
+                    "y": 141
+                },
+                "end": {
+                    "x": 74,
+                    "y": 149
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_IslandSymbolHopeWorld",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 66,
+                "y": 137
+            }
+        },
+        {
+            "zone": "ZONE_P2_LABORATORY",
+            "type": 2,
+            "radius": 6,
+            "position": {
+                "x": 214,
+                "y": 151
+            },
+            "cursor": {
+                "x": 214,
+                "y": 151
+            },
+            "hit": {
+                "start": {
+                    "x": 214,
+                    "y": 148
+                },
+                "end": {
+                    "x": 214,
+                    "y": 154
+                },
+                "radius": 6
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_TeamPlasmasSecretLab",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 206,
+                "y": 143
+            }
+        },
+        {
+            "zone": "ZONE_WELLSPRING_CAVE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 215,
+                "y": 110
+            },
+            "cursor": {
+                "x": 215,
+                "y": 110
+            },
+            "hit": {
+                "start": {
+                    "x": 215,
+                    "y": 106
+                },
+                "end": {
+                    "x": 215,
+                    "y": 114
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_UnderwaterPoolGrewFrom",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 207,
+                "y": 101
+            }
+        },
+        {
+            "zone": "ZONE_MISTRALTON_CAVE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 64,
+                "y": 71
+            },
+            "cursor": {
+                "x": 64,
+                "y": 71
+            },
+            "hit": {
+                "start": {
+                    "x": 64,
+                    "y": 67
+                },
+                "end": {
+                    "x": 64,
+                    "y": 75
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_ForgottenCaveSealedHints",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 56,
+                "y": 63
+            }
+        },
+        {
+            "zone": "ZONE_CELESTIAL_TOWER_2",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 54,
+                "y": 50
+            },
+            "cursor": {
+                "x": 54,
+                "y": 50
+            },
+            "hit": {
+                "start": {
+                    "x": 54,
+                    "y": 46
+                },
+                "end": {
+                    "x": 54,
+                    "y": 54
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_TallTowerLargeBell",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 46,
+                "y": 41
+            }
+        },
+        {
+            "zone": "ZONE_MOOR_OF_ICIRRUS",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 88,
+                "y": 36
+            },
+            "cursor": {
+                "x": 88,
+                "y": 36
+            },
+            "hit": {
+                "start": {
+                    "x": 88,
+                    "y": 32
+                },
+                "end": {
+                    "x": 88,
+                    "y": 40
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_TheySayWaterCollecting",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 80,
+                "y": 27
+            }
+        },
+        {
+            "zone": "ZONE_ABUNDANT_SHRINE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 197,
+                "y": 77
+            },
+            "cursor": {
+                "x": 197,
+                "y": 77
+            },
+            "hit": {
+                "start": {
+                    "x": 197,
+                    "y": 73
+                },
+                "end": {
+                    "x": 197,
+                    "y": 81
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_PeopleOnceLivedVillage",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 190,
+                "y": 68
+            }
+        },
+        {
+            "zone": "ZONE_UNDELLA_BAY",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 230,
+                "y": 61
+            },
+            "cursor": {
+                "x": 230,
+                "y": 61
+            },
+            "hit": {
+                "start": {
+                    "x": 230,
+                    "y": 57
+                },
+                "end": {
+                    "x": 230,
+                    "y": 65
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_WorldFamousSeaShining",
+            "landmarks": [],
+            "area": {
+                "animation": 21,
+                "x": 225,
+                "y": 50
+            }
+        },
+        {
+            "zone": "ZONE_LOSTLORN_FOREST",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 146,
+                "y": 84
+            },
+            "cursor": {
+                "x": 146,
+                "y": 84
+            },
+            "hit": {
+                "start": {
+                    "x": 146,
+                    "y": 80
+                },
+                "end": {
+                    "x": 146,
+                    "y": 88
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_OnceKnownPlaceWhere",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 139,
+                "y": 75
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_1",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 232,
+                "y": 148
+            },
+            "cursor": {
+                "x": 232,
+                "y": 148
+            },
+            "hit": {
+                "start": {
+                    "x": 232,
+                    "y": 144
+                },
+                "end": {
+                    "x": 232,
+                    "y": 152
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_SmallRoadByShore",
+            "landmarks": [],
+            "area": {
+                "animation": 8,
+                "x": 228,
+                "y": 144
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_2",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 231,
+                "y": 127
+            },
+            "cursor": {
+                "x": 231,
+                "y": 127
+            },
+            "hit": {
+                "start": {
+                    "x": 231,
+                    "y": 123
+                },
+                "end": {
+                    "x": 231,
+                    "y": 131
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_PastoralRoadWhereTrainers",
+            "landmarks": [],
+            "area": {
+                "animation": 8,
+                "x": 227,
+                "y": 124
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_3",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 214,
+                "y": 118
+            },
+            "cursor": {
+                "x": 214,
+                "y": 118
+            },
+            "hit": {
+                "start": {
+                    "x": 214,
+                    "y": 114
+                },
+                "end": {
+                    "x": 214,
+                    "y": 122
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_LongWindingRoadLots",
+            "landmarks": [ "TownMap_Text_PokemonDayCare" ],
+            "area": {
+                "animation": 12,
+                "x": 204,
+                "y": 114
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_4",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 132,
+                "y": 117
+            },
+            "cursor": {
+                "x": 132,
+                "y": 117
+            },
+            "hit": {
+                "start": {
+                    "x": 132,
+                    "y": 113
+                },
+                "end": {
+                    "x": 132,
+                    "y": 121
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": {
+                "black2": "TownMap_Text_RouteOnceCoveredSand",
+                "white2": "TownMap_Text_DevelopmentSuspendedAfterRuins"
+            },
+            "landmarks": [],
+            "area": {
+                "animation": 6,
+                "x": 128,
+                "y": 99
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_5",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 118,
+                "y": 91
+            },
+            "cursor": {
+                "x": 118,
+                "y": 91
+            },
+            "hit": {
+                "start": {
+                    "x": 118,
+                    "y": 87
+                },
+                "end": {
+                    "x": 118,
+                    "y": 95
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_BusyRoadWherePerformers",
+            "landmarks": [],
+            "area": {
+                "animation": 15,
+                "x": 111,
+                "y": 87
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_6",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 57,
+                "y": 80
+            },
+            "cursor": {
+                "x": 57,
+                "y": 80
+            },
+            "hit": {
+                "start": {
+                    "x": 57,
+                    "y": 76
+                },
+                "end": {
+                    "x": 57,
+                    "y": 84
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_RoadManyTreesNature",
+            "landmarks": [ "TownMap_Text_SeasonResearchLab" ],
+            "area": {
+                "animation": 3,
+                "x": 45,
+                "y": 66
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_7",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 57,
+                "y": 55
+            },
+            "cursor": {
+                "x": 57,
+                "y": 55
+            },
+            "hit": {
+                "start": {
+                    "x": 57,
+                    "y": 51
+                },
+                "end": {
+                    "x": 57,
+                    "y": 59
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_RaisedWalkwaysHelpAvoid",
+            "landmarks": [],
+            "area": {
+                "animation": 2,
+                "x": 45,
+                "y": 43
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_8",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 87,
+                "y": 44
+            },
+            "cursor": {
+                "x": 87,
+                "y": 44
+            },
+            "hit": {
+                "start": {
+                    "x": 87,
+                    "y": 40
+                },
+                "end": {
+                    "x": 87,
+                    "y": 48
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_RainsLotHereMarshy",
+            "landmarks": [],
+            "area": {
+                "animation": 11,
+                "x": 78,
+                "y": 39
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_9",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 120,
+                "y": 44
+            },
+            "cursor": {
+                "x": 120,
+                "y": 44
+            },
+            "hit": {
+                "start": {
+                    "x": 120,
+                    "y": 40
+                },
+                "end": {
+                    "x": 120,
+                    "y": 48
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_PavedRoadAttractsThose",
+            "landmarks": [ "TownMap_Text_ShoppingMallNine" ],
+            "area": {
+                "animation": 15,
+                "x": 111,
+                "y": 39
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_11",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 143,
+                "y": 43
+            },
+            "cursor": {
+                "x": 143,
+                "y": 43
+            },
+            "hit": {
+                "start": {
+                    "x": 143,
+                    "y": 39
+                },
+                "end": {
+                    "x": 143,
+                    "y": 47
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_LimpidStreamsCarvedBeautiful",
+            "landmarks": [],
+            "area": {
+                "animation": 11,
+                "x": 136,
+                "y": 39
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_12",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 177,
+                "y": 42
+            },
+            "cursor": {
+                "x": 177,
+                "y": 42
+            },
+            "hit": {
+                "start": {
+                    "x": 177,
+                    "y": 38
+                },
+                "end": {
+                    "x": 177,
+                    "y": 46
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_PlaceFunWhereIts",
+            "landmarks": [],
+            "area": {
+                "animation": 15,
+                "x": 169,
+                "y": 39
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_13",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 206,
+                "y": 54
+            },
+            "cursor": {
+                "x": 206,
+                "y": 54
+            },
+            "hit": {
+                "start": {
+                    "x": 206,
+                    "y": 50
+                },
+                "end": {
+                    "x": 206,
+                    "y": 58
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_SeasideRouteFamousSandbars",
+            "landmarks": [],
+            "area": {
+                "animation": 3,
+                "x": 195,
+                "y": 43
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_14",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 207,
+                "y": 80
+            },
+            "cursor": {
+                "x": 207,
+                "y": 80
+            },
+            "hit": {
+                "start": {
+                    "x": 207,
+                    "y": 76
+                },
+                "end": {
+                    "x": 207,
+                    "y": 84
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_RoadCoveredMistFrom",
+            "landmarks": [],
+            "area": {
+                "animation": 2,
+                "x": 196,
+                "y": 67
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_15",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 176,
+                "y": 91
+            },
+            "cursor": {
+                "x": 176,
+                "y": 91
+            },
+            "hit": {
+                "start": {
+                    "x": 176,
+                    "y": 87
+                },
+                "end": {
+                    "x": 176,
+                    "y": 95
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_RoadWhoseSharpCliffs",
+            "landmarks": [],
+            "area": {
+                "animation": 15,
+                "x": 169,
+                "y": 87
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_16",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 144,
+                "y": 92
+            },
+            "cursor": {
+                "x": 144,
+                "y": 92
+            },
+            "hit": {
+                "start": {
+                    "x": 144,
+                    "y": 88
+                },
+                "end": {
+                    "x": 144,
+                    "y": 96
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_ManyWhoVisitNimbasa",
+            "landmarks": [],
+            "area": {
+                "animation": 11,
+                "x": 136,
+                "y": 87
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_17",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 216,
+                "y": 159
+            },
+            "cursor": {
+                "x": 216,
+                "y": 159
+            },
+            "hit": {
+                "start": {
+                    "x": 216,
+                    "y": 155
+                },
+                "end": {
+                    "x": 216,
+                    "y": 163
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_FastCurrentHereMakes",
+            "landmarks": [],
+            "area": {
+                "animation": 15,
+                "x": 210,
+                "y": 154
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_18",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 204,
+                "y": 159
+            },
+            "cursor": {
+                "x": 204,
+                "y": 159
+            },
+            "hit": {
+                "start": {
+                    "x": 204,
+                    "y": 155
+                },
+                "end": {
+                    "x": 204,
+                    "y": 163
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_SomeResearchersBelieveOnce",
+            "landmarks": [],
+            "area": {
+                "animation": 11,
+                "x": 197,
+                "y": 154
+            }
+        },
+        {
+            "zone": "ZONE_SKYARROW_BRIDGE",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 163,
+                "y": 121
+            },
+            "cursor": {
+                "x": 163,
+                "y": 121
+            },
+            "hit": {
+                "start": {
+                    "x": 163,
+                    "y": 117
+                },
+                "end": {
+                    "x": 163,
+                    "y": 125
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_BiggestLongestBridgeUnova",
+            "landmarks": [],
+            "area": {
+                "animation": 14,
+                "x": 140,
+                "y": 115
+            }
+        },
+        {
+            "zone": "ZONE_DRIFTVEIL_DRAWBRIDGE",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 103,
+                "y": 89
+            },
+            "cursor": {
+                "x": 103,
+                "y": 89
+            },
+            "hit": {
+                "start": {
+                    "x": 103,
+                    "y": 85
+                },
+                "end": {
+                    "x": 103,
+                    "y": 93
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_DrawbridgeRaisesLowersDepending",
+            "landmarks": [],
+            "area": {
+                "animation": 13,
+                "x": 81,
+                "y": 86
+            }
+        },
+        {
+            "zone": "ZONE_TUBELINE_BRIDGE",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 104,
+                "y": 41
+            },
+            "cursor": {
+                "x": 104,
+                "y": 41
+            },
+            "hit": {
+                "start": {
+                    "x": 104,
+                    "y": 37
+                },
+                "end": {
+                    "x": 104,
+                    "y": 45
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_SturdySteelBridgeWont",
+            "landmarks": [],
+            "area": {
+                "animation": 10,
+                "x": 91,
+                "y": 38
+            }
+        },
+        {
+            "zone": "ZONE_VILLAGE_BRIDGE",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 161,
+                "y": 41
+            },
+            "cursor": {
+                "x": 161,
+                "y": 41
+            },
+            "hit": {
+                "start": {
+                    "x": 161,
+                    "y": 37
+                },
+                "end": {
+                    "x": 161,
+                    "y": 45
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_OldBridgeSettlersUnova",
+            "landmarks": [],
+            "area": {
+                "animation": 10,
+                "x": 148,
+                "y": 38
+            }
+        },
+        {
+            "zone": "ZONE_MARVELOUS_BRIDGE",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 159,
+                "y": 89
+            },
+            "cursor": {
+                "x": 159,
+                "y": 89
+            },
+            "hit": {
+                "start": {
+                    "x": 159,
+                    "y": 85
+                },
+                "end": {
+                    "x": 159,
+                    "y": 93
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_MostAdvancedBridgeUnova",
+            "landmarks": [],
+            "area": {
+                "animation": 10,
+                "x": 148,
+                "y": 86
+            }
+        },
+        {
+            "zone": "ZONE_ASPERTIA_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 14,
+                "y": 153
+            },
+            "cursor": {
+                "x": 14,
+                "y": 153
+            },
+            "hit": {
+                "start": {
+                    "x": 14,
+                    "y": 149
+                },
+                "end": {
+                    "x": 14,
+                    "y": 157
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_ASPERTIA_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_CityFootHighMountains",
+            "landmarks": [ "TownMap_Text_AspertiaCityGym", "TownMap_Text_TrainersSchool_2", "TownMap_Text_PokemonCenter_15" ],
+            "area": {
+                "animation": 0,
+                "x": 6,
+                "y": 145
+            }
+        },
+        {
+            "zone": "ZONE_FLOCCESY_TOWN",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 33,
+                "y": 127
+            },
+            "cursor": {
+                "x": 33,
+                "y": 127
+            },
+            "hit": {
+                "start": {
+                    "x": 33,
+                    "y": 123
+                },
+                "end": {
+                    "x": 33,
+                    "y": 131
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_FLOCCESY_TOWN",
+            "shown_by": null,
+            "description": "TownMap_Text_TownFamousClockTower",
+            "landmarks": [ "TownMap_Text_PokemonCenter_18" ],
+            "area": {
+                "animation": 0,
+                "x": 25,
+                "y": 119
+            }
+        },
+        {
+            "zone": "ZONE_VIRBANK_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 69,
+                "y": 127
+            },
+            "cursor": {
+                "x": 69,
+                "y": 127
+            },
+            "hit": {
+                "start": {
+                    "x": 69,
+                    "y": 123
+                },
+                "end": {
+                    "x": 69,
+                    "y": 131
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_VIRBANK_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_CityOftenCoveredBy",
+            "landmarks": [ "TownMap_Text_VirbankCityGym", "TownMap_Text_PokemonCenter_16" ],
+            "area": {
+                "animation": 0,
+                "x": 61,
+                "y": 119
+            }
+        },
+        {
+            "zone": "ZONE_LENTIMAS_TOWN",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 187,
+                "y": 67
+            },
+            "cursor": {
+                "x": 187,
+                "y": 67
+            },
+            "hit": {
+                "start": {
+                    "x": 187,
+                    "y": 63
+                },
+                "end": {
+                    "x": 187,
+                    "y": 71
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_LENTIMAS_TOWN",
+            "shown_by": null,
+            "description": "TownMap_Text_TownBoastsPorcelainPottery",
+            "landmarks": [ "TownMap_Text_PokemonCenter_19", "TownMap_Text_MoveTutor_4" ],
+            "area": {
+                "animation": 0,
+                "x": 179,
+                "y": 59
+            }
+        },
+        {
+            "zone": "ZONE_HUMILAU_CITY",
+            "type": 0,
+            "radius": 12,
+            "position": {
+                "x": 235,
+                "y": 36
+            },
+            "cursor": {
+                "x": 235,
+                "y": 36
+            },
+            "hit": {
+                "start": {
+                    "x": 235,
+                    "y": 32
+                },
+                "end": {
+                    "x": 235,
+                    "y": 40
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_HUMILAU_CITY",
+            "shown_by": null,
+            "description": "TownMap_Text_ResortCityWhereBuildings",
+            "landmarks": [ "TownMap_Text_HumilauCityGym", "TownMap_Text_PokemonCenter_17", "TownMap_Text_MoveTutor_5" ],
+            "area": {
+                "animation": 0,
+                "x": 227,
+                "y": 28
+            }
+        },
+        {
+            "zone": "ZONE_POKESTAR_STUDIOS",
+            "type": 3,
+            "radius": 12,
+            "position": {
+                "x": 64,
+                "y": 115
+            },
+            "cursor": {
+                "x": 64,
+                "y": 115
+            },
+            "hit": {
+                "start": {
+                    "x": 64,
+                    "y": 111
+                },
+                "end": {
+                    "x": 64,
+                    "y": 119
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_POKESTAR_STUDIOS",
+            "shown_by": null,
+            "description": "TownMap_Text_PokestarStudiosWhereGreat",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 56,
+                "y": 107
+            }
+        },
+        {
+            "zone": "ZONE_JOIN_AVENUE",
+            "type": 3,
+            "radius": 12,
+            "position": {
+                "x": 132,
+                "y": 104
+            },
+            "cursor": {
+                "x": 132,
+                "y": 104
+            },
+            "hit": {
+                "start": {
+                    "x": 132,
+                    "y": 100
+                },
+                "end": {
+                    "x": 132,
+                    "y": 108
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_JOIN_AVENUE",
+            "shown_by": null,
+            "description": "TownMap_Text_BigAvenueKeepsDeveloping",
+            "landmarks": [
+                "TownMap_Text_CurrentAvenueRank",
+                "TownMap_Text_RecommendedInvited",
+                "TownMap_Text_CurrentVisitors",
+                "TownMap_Text_Empty_2",
+                "TownMap_Text_Empty_3",
+                "TownMap_Text_Empty_4"
+            ],
+            "area": {
+                "animation": 1,
+                "x": 124,
+                "y": 96
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_19",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 12,
+                "y": 135
+            },
+            "cursor": {
+                "x": 12,
+                "y": 135
+            },
+            "hit": {
+                "start": {
+                    "x": 12,
+                    "y": 131
+                },
+                "end": {
+                    "x": 12,
+                    "y": 139
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_PathFormedFootMountains",
+            "landmarks": [],
+            "area": {
+                "animation": 16,
+                "x": 11,
+                "y": 124
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_20",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 51,
+                "y": 129
+            },
+            "cursor": {
+                "x": 51,
+                "y": 129
+            },
+            "hit": {
+                "start": {
+                    "x": 51,
+                    "y": 125
+                },
+                "end": {
+                    "x": 51,
+                    "y": 133
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_AutumnFallenLeavesAccumulate",
+            "landmarks": [],
+            "area": {
+                "animation": 17,
+                "x": 39,
+                "y": 123
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_21",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 234,
+                "y": 48
+            },
+            "cursor": {
+                "x": 234,
+                "y": 48
+            },
+            "hit": {
+                "start": {
+                    "x": 234,
+                    "y": 44
+                },
+                "end": {
+                    "x": 234,
+                    "y": 52
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_ManyRocksMakeSwimming",
+            "landmarks": [],
+            "area": {
+                "animation": 18,
+                "x": 230,
+                "y": 42
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_22",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 219,
+                "y": 36
+            },
+            "cursor": {
+                "x": 219,
+                "y": 36
+            },
+            "hit": {
+                "start": {
+                    "x": 219,
+                    "y": 32
+                },
+                "end": {
+                    "x": 219,
+                    "y": 40
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_LotUpsDownsLedges",
+            "landmarks": [],
+            "area": {
+                "animation": 19,
+                "x": 208,
+                "y": 32
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_SEWERS",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 156,
+                "y": 143
+            },
+            "cursor": {
+                "x": 156,
+                "y": 143
+            },
+            "hit": {
+                "start": {
+                    "x": 156,
+                    "y": 139
+                },
+                "end": {
+                    "x": 156,
+                    "y": 147
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_IronBarsAroundExits",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 148,
+                "y": 135
+            }
+        },
+        {
+            "zone": "ZONE_FLOCCESY_RANCH",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 41,
+                "y": 118
+            },
+            "cursor": {
+                "x": 41,
+                "y": 118
+            },
+            "hit": {
+                "start": {
+                    "x": 41,
+                    "y": 114
+                },
+                "end": {
+                    "x": 41,
+                    "y": 122
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_BeforeLongAreaBecame",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 33,
+                "y": 110
+            }
+        },
+        {
+            "zone": "ZONE_VIRBANK_COMPLEX",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 64,
+                "y": 138
+            },
+            "cursor": {
+                "x": 64,
+                "y": 138
+            },
+            "hit": {
+                "start": {
+                    "x": 64,
+                    "y": 134
+                },
+                "end": {
+                    "x": 64,
+                    "y": 142
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_ComplexDesignedPokemonCan",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 56,
+                "y": 130
+            }
+        },
+        {
+            "zone": "ZONE_REVERSAL_MOUNTAIN",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 206,
+                "y": 67
+            },
+            "cursor": {
+                "x": 206,
+                "y": 67
+            },
+            "hit": {
+                "start": {
+                    "x": 206,
+                    "y": 63
+                },
+                "end": {
+                    "x": 206,
+                    "y": 71
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": {
+                "black2": "TownMap_Text_VolcanoGrabsHeadlinesIts",
+                "white2": "TownMap_Text_VolcanoRecordHugeEruption"
+            },
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 198,
+                "y": 59
+            }
+        },
+        {
+            "zone": "ZONE_STRANGE_HOUSE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 198,
+                "y": 59
+            },
+            "cursor": {
+                "x": 198,
+                "y": 59
+            },
+            "hit": {
+                "start": {
+                    "x": 198,
+                    "y": 55
+                },
+                "end": {
+                    "x": 198,
+                    "y": 63
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_HouseKnownSadIncident",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 190,
+                "y": 51
+            }
+        },
+        {
+            "zone": "ZONE_ROUTE_23",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 195,
+                "y": 30
+            },
+            "cursor": {
+                "x": 195,
+                "y": 30
+            },
+            "hit": {
+                "start": {
+                    "x": 195,
+                    "y": 26
+                },
+                "end": {
+                    "x": 195,
+                    "y": 34
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_MountainPathNoReturn",
+            "landmarks": [],
+            "area": {
+                "animation": 20,
+                "x": 184,
+                "y": 7
+            }
+        },
+        {
+            "zone": "ZONE_VICTORY_ROAD",
+            "type": 3,
+            "radius": 12,
+            "position": {
+                "x": 184,
+                "y": 16
+            },
+            "cursor": {
+                "x": 184,
+                "y": 16
+            },
+            "hit": {
+                "start": {
+                    "x": 184,
+                    "y": 12
+                },
+                "end": {
+                    "x": 184,
+                    "y": 20
+                },
+                "radius": 8
+            },
+            "fly": true,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": "EVENT_FLAG_ARRIVED_VICTORY_ROAD",
+            "shown_by": null,
+            "description": "TownMap_Text_TheseForkingPathsLast_2",
+            "landmarks": [ "TownMap_Text_PokemonCenter_20" ],
+            "area": {
+                "animation": 1,
+                "x": 176,
+                "y": 8
+            }
+        },
+        {
+            "zone": "ZONE_RELIC_PASSAGE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 105,
+                "y": 118
+            },
+            "cursor": {
+                "x": 105,
+                "y": 118
+            },
+            "hit": {
+                "start": {
+                    "x": 105,
+                    "y": 114
+                },
+                "end": {
+                    "x": 105,
+                    "y": 122
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_RecentlyDiscoveredPassageLeads",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 97,
+                "y": 110
+            }
+        },
+        {
+            "zone": "ZONE_SEASIDE_CAVE",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 235,
+                "y": 53
+            },
+            "cursor": {
+                "x": 235,
+                "y": 53
+            },
+            "hit": {
+                "start": {
+                    "x": 235,
+                    "y": 49
+                },
+                "end": {
+                    "x": 235,
+                    "y": 57
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_RockBecamePassableDue",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 227,
+                "y": 45
+            }
+        },
+        {
+            "zone": "ZONE_CLAY_TUNNEL",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 72,
+                "y": 77
+            },
+            "cursor": {
+                "x": 72,
+                "y": 77
+            },
+            "hit": {
+                "start": {
+                    "x": 72,
+                    "y": 73
+                },
+                "end": {
+                    "x": 72,
+                    "y": 81
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_TunnelCreatedByClays",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 64,
+                "y": 69
+            }
+        },
+        {
+            "zone": "ZONE_CAVE_OF_BEING",
+            "type": 2,
+            "radius": 12,
+            "position": {
+                "x": 41,
+                "y": 138
+            },
+            "cursor": {
+                "x": 41,
+                "y": 138
+            },
+            "hit": {
+                "start": {
+                    "x": 41,
+                    "y": 134
+                },
+                "end": {
+                    "x": 41,
+                    "y": 142
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_TheySayDeepestPart",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 33,
+                "y": 130
+            }
+        },
+        {
+            "zone": "ZONE_MARINE_TUBE",
+            "type": 1,
+            "radius": 12,
+            "position": {
+                "x": 251,
+                "y": 53
+            },
+            "cursor": {
+                "x": 251,
+                "y": 53
+            },
+            "hit": {
+                "start": {
+                    "x": 251,
+                    "y": 49
+                },
+                "end": {
+                    "x": 251,
+                    "y": 57
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": null,
+            "description": "TownMap_Text_UnderseaTunnelBuiltUsing",
+            "landmarks": [],
+            "area": {
+                "animation": 10,
+                "x": 244,
+                "y": 45
+            }
+        },
+        {
+            "zone": "ZONE_NS_CASTLE",
+            "type": 4,
+            "radius": 12,
+            "position": {
+                "x": 182,
+                "y": 6
+            },
+            "cursor": {
+                "x": 182,
+                "y": 6
+            },
+            "hit": {
+                "start": {
+                    "x": 182,
+                    "y": 2
+                },
+                "end": {
+                    "x": 182,
+                    "y": 10
+                },
+                "radius": 8
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": "EVENT_FLAG_TOWN_MAP_NS_CASTLE",
+            "description": "TownMap_Text_OnceAppearedPastBase",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 175,
+                "y": -3
+            }
+        },
+        {
+            "zone": "ZONE_PLASMA_FRIGATE",
+            "type": 4,
+            "radius": 6,
+            "position": {
+                "x": 222,
+                "y": 151
+            },
+            "cursor": {
+                "x": 222,
+                "y": 151
+            },
+            "hit": {
+                "start": {
+                    "x": 222,
+                    "y": 148
+                },
+                "end": {
+                    "x": 222,
+                    "y": 154
+                },
+                "radius": 6
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": "TOWNMAP_FLAG_PLASMA_FRIGATE",
+            "description": "TownMap_Text_MysteriousBlackSailingVessel",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 206,
+                "y": 143
+            }
+        },
+        {
+            "zone": "ZONE_ABYSSAL_RUINS",
+            "type": 4,
+            "radius": 6,
+            "position": {
+                "x": 242,
+                "y": 63
+            },
+            "cursor": {
+                "x": 242,
+                "y": 63
+            },
+            "hit": {
+                "start": {
+                    "x": 242,
+                    "y": 60
+                },
+                "end": {
+                    "x": 242,
+                    "y": 66
+                },
+                "radius": 6
+            },
+            "fly": false,
+            "unk13": 0,
+            "unk14": 0,
+            "arrival_flag": null,
+            "shown_by": "EVENT_FLAG_TOWN_MAP_ABYSSAL_RUINS",
+            "description": "TownMap_Text_AncientTombSaidResting",
+            "landmarks": [],
+            "area": {
+                "animation": 1,
+                "x": 233,
+                "y": 55
+            }
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LUXRAY",
+    "moves": [ "MOVE_WILD_CHARGE", "MOVE_CRUNCH", "MOVE_CAPTIVATE", "MOVE_SWAGGER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_MAGNET",
+    "form": 0
+}

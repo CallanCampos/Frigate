@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SHUCKLE",
+    "moves": [ "MOVE_POWER_SPLIT", "MOVE_ENCORE", "MOVE_GASTRO_ACID", "MOVE_SAND_TOMB" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_BINDING_BAND",
+    "form": 0
+}

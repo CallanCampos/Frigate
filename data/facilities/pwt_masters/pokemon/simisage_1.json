@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SIMISAGE",
+    "moves": [ "MOVE_SEED_BOMB", "MOVE_LOW_KICK", "MOVE_ACROBATICS", "MOVE_CRUNCH" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_NAIVE",
+    "item": "ITEM_GRASS_GEM",
+    "form": 0
+}

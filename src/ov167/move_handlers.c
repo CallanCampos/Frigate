@@ -26,9 +26,6 @@ typedef struct MoveEventAddEntry {
     const BattleEventHandlerEntry *(*eventAdd)(u32 *numHandlers);
 } MoveEventAddEntry;
 
-// Defined at the end of the file
-static const MoveEventAddEntry sMoveEventAddTable[0x102];
-
 static BOOL DoesMoveEventExist(u8 monId, u16 move, u8 *found);
 static void RemoveHandlerForce(u8 monId, u16 move);
 static const BattleEventHandlerEntry *EventAddConversion(u32 *priority);
@@ -602,6 +599,267 @@ static void HandlerWaterPledgeTypeMatch(BattleEventItem *item, BtlServerFlow *fl
 static void HandlerWaterPledgePower(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerWaterPledgeChangeEffect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 static void HandlerWaterPledgeFieldEffect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+
+static const MoveEventAddEntry sMoveEventAddTable[] = {
+    { MOVE_CONVERSION, EventAddConversion },
+    { MOVE_CAMOUFLAGE, EventAddCamouflage },
+    { MOVE_HAZE, EventAddHaze },
+    { MOVE_DREAM_EATER, EventAddDreamEater },
+    { MOVE_TRI_ATTACK, EventAddTriAttack },
+    { MOVE_SECRET_POWER, EventAddSecretPower },
+    { MOVE_CHATTER, EventAddChatter },
+    { MOVE_SUPER_FANG, EventAddSuperFang },
+    { MOVE_DRAGON_RAGE, EventAddDragonRage },
+    { MOVE_SEISMIC_TOSS, EventAddSeismicToss },
+    { MOVE_NIGHT_SHADE, EventAddSeismicToss },
+    { MOVE_PSYWAVE, EventAddPsywave },
+    { MOVE_SNORE, EventAddSnore },
+    { MOVE_LAST_RESORT, EventAddLastResort },
+    { MOVE_FLAIL, EventAddFlail },
+    { MOVE_REVERSAL, EventAddFlail },
+    { MOVE_FALSE_SWIPE, EventAddFalseSwipe },
+    { MOVE_SPIDER_WEB, EventAddSpiderWeb },
+    { MOVE_MEAN_LOOK, EventAddSpiderWeb },
+    { MOVE_BLOCK, EventAddSpiderWeb },
+    { MOVE_ENDURE, EventAddEndure },
+    { MOVE_SONIC_BOOM, EventAddSonicBoom },
+    { MOVE_FAKE_OUT, EventAddFakeOut },
+    { MOVE_ENDEAVOR, EventAddEndeavor },
+    { MOVE_ERUPTION, EventAddEruption },
+    { MOVE_WATER_SPOUT, EventAddEruption },
+    { MOVE_REFRESH, EventAddRefresh },
+    { MOVE_MORNING_SUN, EventAddMorningSun },
+    { MOVE_MOONLIGHT, EventAddMorningSun },
+    { MOVE_SYNTHESIS, EventAddMorningSun },
+    { MOVE_WRING_OUT, EventAddCrushGrip },
+    { MOVE_CRUSH_GRIP, EventAddCrushGrip },
+    { MOVE_WEATHER_BALL, EventAddWeatherBall },
+    { MOVE_PROTECT, EventAddProtect },
+    { MOVE_DETECT, EventAddProtect },
+    { MOVE_SPLASH, EventAddSplash },
+    { MOVE_CURSE, EventAddCurse },
+    { MOVE_THRASH, EventAddThrash },
+    { MOVE_UPROAR, EventAddUproar },
+    { MOVE_PETAL_DANCE, EventAddThrash },
+    { MOVE_OUTRAGE, EventAddThrash },
+    { MOVE_BRINE, EventAddBrine },
+    { MOVE_WAKE_UP_SLAP, EventAddWakeUpSlap },
+    { MOVE_SMELLING_SALT, EventAddSmellingSalts },
+    { MOVE_ACUPRESSURE, EventAddAcupressure },
+    { MOVE_TRUMP_CARD, EventAddTrumpCard },
+    { MOVE_FLY, EventAddFly },
+    { MOVE_BOUNCE, EventAddBounce },
+    { MOVE_DIVE, EventAddDive },
+    { MOVE_DIG, EventAddDig },
+    { MOVE_SOLAR_BEAM, EventAddSolarBeam },
+    { MOVE_RAZOR_WIND, EventAddRazorWind },
+    { MOVE_SKY_ATTACK, EventAddSkyAttack },
+    { MOVE_SKULL_BASH, EventAddSkullBash },
+    { MOVE_ENCORE, EventAddEncore },
+    { MOVE_TWISTER, EventAddTwister },
+    { MOVE_GUST, EventAddTwister },
+    { MOVE_EARTHQUAKE, EventAddEarthquake },
+    { MOVE_SURF, EventAddSurf },
+    { MOVE_SKY_UPPERCUT, EventAddSkyUppercut },
+    { MOVE_MAGNITUDE, EventAddMagnitude },
+    { MOVE_FEINT, EventAddFeint },
+    { MOVE_SHADOW_FORCE, EventAddShadowForce },
+    { MOVE_STRUGGLE, EventAddStruggle },
+    { MOVE_PUNISHMENT, EventAddPunishment },
+    { MOVE_TAUNT, EventAddTaunt },
+    { MOVE_CAPTIVATE, EventAddCaptivate },
+    { MOVE_BELLY_DRUM, EventBellyDrum },
+    { MOVE_DESTINY_BOND, EventAddDestinyBond },
+    { MOVE_FACADE, EventAddFacade },
+    { MOVE_PAYBACK, EventAddPayback },
+    { MOVE_HIDDEN_POWER, EventAddHiddenPower },
+    { MOVE_MINIMIZE, EventAddMinimize },
+    { MOVE_DEFENSE_CURL, EventAddDefenseCurl },
+    { MOVE_STOMP, EventAddStomp },
+    { MOVE_NIGHTMARE, EventAddNightmare },
+    { MOVE_SUCKER_PUNCH, EventAddSuckerPunch },
+    { MOVE_ROLLOUT, EventAddRollout },
+    { MOVE_ICE_BALL, EventAddRollout },
+    { MOVE_AROMATHERAPY, EventAddAromatherapy },
+    { MOVE_HEAL_BELL, EventAddHealBell },
+    { MOVE_MEMENTO, EventAddMemento },
+    { MOVE_SPITE, EventAddSpite },
+    { MOVE_REST, EventAddRest },
+    { MOVE_LOCK_ON, EventAddLockOn },
+    { MOVE_MIND_READER, EventAddLockOn },
+    { MOVE_REFLECT, EventAddReflect },
+    { MOVE_LIGHT_SCREEN, EventAddLightScreen },
+    { MOVE_SAFEGUARD, EventAddSafeguard },
+    { MOVE_MIST, EventAddMist },
+    { MOVE_TAILWIND, EventAddTailwind },
+    { MOVE_RETURN, EventAddReturn },
+    { MOVE_FRUSTRATION, EventAddFrustration },
+    { MOVE_PRESENT, EventAddPresent },
+    { MOVE_TORMENT, EventAddTorment },
+    { MOVE_IMPRISON, EventAddImprison },
+    { MOVE_GRAVITY, EventAddGravity },
+    { MOVE_GRUDGE, EventAddGrudge },
+    { MOVE_HELPING_HAND, EventAddHelpingHand },
+    { MOVE_GASTRO_ACID, EventAddGastroAcid },
+    { MOVE_ROLE_PLAY, EventAddRolePlay },
+    { MOVE_SPIKES, EventAddSpikes },
+    { MOVE_TOXIC_SPIKES, EventAddToxicSpikes },
+    { MOVE_STEALTH_ROCK, EventAddStealthRock },
+    { MOVE_ROOST, EventAddRoost },
+    { MOVE_MAGNET_RISE, EventAddMagnetRise },
+    { MOVE_FURY_CUTTER, EventAddFuryCutter },
+    { MOVE_PSYCHO_SHIFT, EventAddPsychoShift },
+    { MOVE_ASSURANCE, EventAddAssurance },
+    { MOVE_CONVERSION_2, EventAddConversion2 },
+    { MOVE_COUNTER, EventAddCounter },
+    { MOVE_MIRROR_COAT, EventAddMirrorCoat },
+    { MOVE_METAL_BURST, EventAddMetalBurst },
+    { MOVE_REVENGE, EventAddRevenge },
+    { MOVE_AVALANCHE, EventAddRevenge },
+    { MOVE_TRIPLE_KICK, EventAddTripleKick },
+    { MOVE_GYRO_BALL, EventAddGyroBall },
+    { MOVE_PAIN_SPLIT, EventAddPainSplit },
+    { MOVE_FOLLOW_ME, EventAddFollowMe },
+    { MOVE_WORRY_SEED, EventAddWorrySeed },
+    { MOVE_THUNDER_WAVE, EventAddThunderWave },
+    { MOVE_PSYCH_UP, EventAddPsychUp },
+    { MOVE_HEART_SWAP, EventAddHeartSwap },
+    { MOVE_POWER_SWAP, EventAddPowerSwap },
+    { MOVE_GUARD_SWAP, EventAddGuardSwap },
+    { MOVE_ATTRACT, EventAddAttract },
+    { MOVE_JUDGMENT, EventAddJudgement },
+    { MOVE_NATURAL_GIFT, EventAddNaturalGift },
+    { MOVE_KNOCK_OFF, EventAddKnockOff },
+    { MOVE_DISABLE, EventAddDisable },
+    { MOVE_THIEF, EventAddThief },
+    { MOVE_COVET, EventAddThief },
+    { MOVE_TRICK, EventAddTrick },
+    { MOVE_SWITCHEROO, EventAddTrick },
+    { MOVE_MIMIC, EventAddMimic },
+    { MOVE_SKETCH, EventAddSketch },
+    { MOVE_JUMP_KICK, EventJumpKickAdd },
+    { MOVE_HI_JUMP_KICK, EventJumpKickAdd },
+    { MOVE_DEFOG, EventAddDefog },
+    { MOVE_BRICK_BREAK, EventAddBrickBreak },
+    { MOVE_TRICK_ROOM, EventAddTrickRoom },
+    { MOVE_WATER_SPORT, EventAddWaterSport },
+    { MOVE_MUD_SPORT, EventAddMudSport },
+    { MOVE_CHARGE, EventAddCharge },
+    { MOVE_PERISH_SONG, EventAddPerishSong },
+    { MOVE_LEECH_SEED, EventAddLeechSeed },
+    { MOVE_BEAT_UP, EventAddBeatUp },
+    { MOVE_AQUA_RING, EventAddAquaRing },
+    { MOVE_LUNAR_DANCE, EventAddLunarDance },
+    { MOVE_HEALING_WISH, EventAddHealingWish },
+    { MOVE_METRONOME, EventAddMetronome },
+    { MOVE_NATURE_POWER, EventAddNaturePower },
+    { MOVE_ASSIST, EventAddAssist },
+    { MOVE_MIRROR_MOVE, EventAddMirrorMove },
+    { MOVE_ME_FIRST, EventAddMeFirst },
+    { MOVE_COPYCAT, EventAddCopycat },
+    { MOVE_SLEEP_TALK, EventAddSleepTalk },
+    { MOVE_LOW_KICK, EventAddLowKick },
+    { MOVE_GRASS_KNOT, EventAddLowKick },
+    { MOVE_FOCUS_PUNCH, EventAddFocusPunch },
+    { MOVE_STOCKPILE, EventAddStockpile },
+    { MOVE_SPIT_UP, EventAddSpitUp },
+    { MOVE_SWALLOW, EventAddSwallow },
+    { MOVE_FUTURE_SIGHT, EventAddFutureSight },
+    { MOVE_DOOM_DESIRE, EventAddDoomDesire },
+    { MOVE_RECYCLE, EventAddRecycle },
+    { MOVE_PURSUIT, EventAddPursuit },
+    { MOVE_PAY_DAY, EventAddPayDay },
+    { MOVE_BIDE, EventAddBide },
+    { MOVE_SNATCH, EventAddSnatch },
+    { MOVE_MAGIC_COAT, EventAddMagicCoat },
+    { MOVE_TELEPORT, EventAddTeleport },
+    { MOVE_U_TURN, EventAddUturn },
+    { MOVE_BATON_PASS, EventAddBatonPass },
+    { MOVE_PLUCK, EventAddPluck },
+    { MOVE_BUG_BITE, EventAddPluck },
+    { MOVE_FLING, EventAddFling },
+    { MOVE_WRAP, EventAddBind },
+    { MOVE_BIND, EventAddBind },
+    { MOVE_FIRE_SPIN, EventAddBind },
+    { MOVE_CLAMP, EventAddBind },
+    { MOVE_SAND_TOMB, EventAddBind },
+    { MOVE_MAGMA_STORM, EventAddBind },
+    { MOVE_WHIRLPOOL, EventAddWhirlpool },
+    { MOVE_RAPID_SPIN, EventAddRapidSpin },
+    { MOVE_WHIRLWIND, EventAddRapidSpin },
+    { MOVE_POWER_TRICK, EventAddPowerTrick },
+    { MOVE_TRANSFORM, EventAddTransform },
+    { MOVE_EXPLOSION, EventAddExplosion },
+    { MOVE_SELFDESTRUCT, EventAddExplosion },
+    { MOVE_FOCUS_ENERGY, EventAddFocusEnergy },
+    { MOVE_RAGE, EventAddRage },
+    { MOVE_ANCIENT_POWER, EventAddAncientPower },
+    { MOVE_OMINOUS_WIND, EventAddAncientPower },
+    { MOVE_SILVER_WIND, EventAddAncientPower },
+    { MOVE_THUNDER, EventAddThunder },
+    { MOVE_BLIZZARD, EventAddBlizzard },
+    { MOVE_WISH, EventAddWish },
+    { MOVE_LUCKY_CHANT, EventAddLuckyChant },
+    { MOVE_FORESIGHT, EventAddForesight },
+    { MOVE_ODOR_SLEUTH, EventAddForesight },
+    { MOVE_MIRACLE_EYE, EventAddMiracleEye },
+    { MOVE_GROWTH, EventAddGrowth },
+    { MOVE_VENOSHOCK, EventAddVenoshock },
+    { MOVE_RAGE_POWDER, EventAddFollowMe },
+    { MOVE_SOAK, EventAddSoak },
+    { MOVE_SIMPLE_BEAM, EventAddSimpleBeam },
+    { MOVE_ENTRAINMENT, EventAddEntrainment },
+    { MOVE_CLEAR_SMOG, EventAddClearSmog },
+    { MOVE_STORED_POWER, EventAddStoredPower },
+    { MOVE_SHELL_SMASH, EventAddShellSmash },
+    { MOVE_HEX, EventAddHex },
+    { MOVE_ACROBATICS, EventAddAcrobatics },
+    { MOVE_VOLT_SWITCH, EventAddUturn },
+    { MOVE_WIDE_GUARD, EventAddWideGuard },
+    { MOVE_REFLECT_TYPE, EventAddReflectType },
+    { MOVE_POWER_SPLIT, EventAddPowerSplit },
+    { MOVE_GUARD_SPLIT, EventAddGuardSplit },
+    { MOVE_AUTOTOMIZE, EventAddAutotomize },
+    { MOVE_HEAVY_SLAM, EventAddHeavySlam },
+    { MOVE_HEAT_CRASH, EventAddHeavySlam },
+    { MOVE_WONDER_ROOM, EventAddWonderRoom },
+    { MOVE_MAGIC_ROOM, EventAddMagicRoom },
+    { MOVE_PSYSHOCK, EventAddPsyshock },
+    { MOVE_PSYSTRIKE, EventAddPsyshock },
+    { MOVE_FLAME_BURST, EventAddFlameBurst },
+    { MOVE_ELECTRO_BALL, EventAddElectroBall },
+    { MOVE_SYNCHRONOISE, EventAddSynchronoise },
+    { MOVE_CHIP_AWAY, EventAddChipAway },
+    { MOVE_SACRED_SWORD, EventAddChipAway },
+    { MOVE_ECHOED_VOICE, EventAddEchoedVoice },
+    { MOVE_INCINERATE, EventAddIncinerate },
+    { MOVE_BESTOW, EventAddBestow },
+    { MOVE_CIRCLE_THROW, EventAddCircleThrow },
+    { MOVE_DRAGON_TAIL, EventAddCircleThrow },
+    { MOVE_RETALIATE, EventAddRetaliate },
+    { MOVE_FOUL_PLAY, EventAddFoulPlay },
+    { MOVE_SMACK_DOWN, EventAddSmackDown },
+    { MOVE_FINAL_GAMBIT, EventAddFinalGambit },
+    { MOVE_AFTER_YOU, EventAddAfterYou },
+    { MOVE_QUASH, EventAddQuash },
+    { MOVE_ROUND, EventAddRound },
+    { MOVE_QUICK_GUARD, EventAddQuickGuard },
+    { MOVE_ALLY_SWITCH, EventAddAllySwitch },
+    { MOVE_TELEKINESIS, EventAddTelekinesis },
+    { MOVE_SKY_DROP, EventAddSkyDrop },
+    { MOVE_STEAMROLLER, EventAddStomp },
+    { MOVE_HURRICANE, EventAddThunder },
+    { MOVE_SECRET_SWORD, EventAddPsyshock },
+    { MOVE_RELIC_SONG, EventAddRelicSong },
+    { MOVE_TECHNO_BLAST, EventAddTechnoBlast },
+    { MOVE_FREEZE_SHOCK, EventAddFreezeShock },
+    { MOVE_ICE_BURN, EventAddFreezeShock },
+    { MOVE_WATER_PLEDGE, EventAddWaterPledge },
+    { MOVE_FIRE_PLEDGE, EventAddWaterPledge },
+    { MOVE_GRASS_PLEDGE, EventAddWaterPledge },
+    { MOVE_FUSION_FLARE, EventAddFusionFlare },
+    { MOVE_FUSION_BOLT, EventAddFusionFlare },
+};
 
 // Doesn't match: the original keeps the status in a register, which MWCC does for an enum-typed local (see the
 // report); a u32 local is folded into each use.
@@ -1445,9 +1703,8 @@ static const BattleEventHandlerEntry *EventAddTriAttack(u32 *priority) {
 }
 
 // Paralysis, burn and freeze
-static const u32 sTriAttackStatuses[3] = { 1, 4, 3 };
-
 static void HandlerTriAttack(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const u32 sTriAttackStatuses[3] = { 1, 4, 3 };
     u32 status;
     BattleCondition condition;
 
@@ -1592,7 +1849,7 @@ static const BattleEventHandlerEntry *EventAddChatter(u32 *priority) {
 static void HandlerChatter(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
     BattleMon *mon;
     u8 volume;
-    u32 status;
+    BattleConditionID status;
     u32 chance;
     BattleCondition condition;
 
@@ -1601,7 +1858,7 @@ static void HandlerChatter(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
         if (GetBattleMonSpecies(mon) == 0x1b9) {
             volume = func_ov167_021aba18(flow, monId);
             if (volume != 0) {
-                status = 6;
+                status = CONDITION_CONFUSION;
                 GetSrcData(mon);
                 if (volume > 2) {
                     chance = 30;
@@ -2900,10 +3157,6 @@ typedef struct FlailPowerEntry {
     u16 power;
 } FlailPowerEntry;
 
-static const FlailPowerEntry FLAIL_POWER_TABLE[] = {
-    { 1, 200 }, { 4, 150 }, { 9, 100 }, { 16, 80 }, { 32, 40 }, { 48, 20 },
-};
-
 static const BattleEventHandlerEntry sHandlersFlail[] = {
     { 0x37, HandlerFlail },
 };
@@ -2914,6 +3167,9 @@ static const BattleEventHandlerEntry *EventAddFlail(u32 *priority) {
 }
 
 static void HandlerFlail(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const FlailPowerEntry FLAIL_POWER_TABLE[] = {
+        { 1, 200 }, { 4, 150 }, { 9, 100 }, { 16, 80 }, { 32, 40 }, { 48, 20 },
+    };
     BattleMon *mon;
     s32 hp;
     s32 maxHp;
@@ -3218,8 +3474,6 @@ static void HandlerPresentPower(BattleEventItem *item, BtlServerFlow *flow, u8 m
 }
 
 // Trump Card's power for the PP left after it is used
-static const u16 sTrumpCardPower[] = { 200, 80, 60, 50, 40 };
-
 static const BattleEventHandlerEntry sHandlersTrumpCard[] = {
     { 0x37, HandlerTrumpCard },
 };
@@ -3230,6 +3484,7 @@ static const BattleEventHandlerEntry *EventAddTrumpCard(u32 *priority) {
 }
 
 static void HandlerTrumpCard(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const u16 sTrumpCardPower[] = { 200, 80, 60, 50, 40 };
     BattleMon *mon;
     u8 slot;
     u8 pp;
@@ -3252,8 +3507,6 @@ static void HandlerTrumpCard(BattleEventItem *item, BtlServerFlow *flow, u8 monI
 }
 
 // The stat stages whose raises Punishment counts
-static const u32 sPunishmentStats[] = { 1, 2, 3, 4, 5, 6, 7 };
-
 static const BattleEventHandlerEntry sHandlersPunishment[] = {
     { 0x37, HandlerPunishment },
 };
@@ -3264,6 +3517,7 @@ static const BattleEventHandlerEntry *EventAddPunishment(u32 *priority) {
 }
 
 static void HandlerPunishment(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const u32 sPunishmentStats[] = { 1, 2, 3, 4, 5, 6, 7 };
     BattleMon *target;
     u32 i;
     u32 count;
@@ -3951,10 +4205,6 @@ typedef struct MagnitudeEntry {
     u8 power;
 } MagnitudeEntry;
 
-static const MagnitudeEntry MAGNITUDE_POWER_TABLE[] = {
-    { 5, 10 }, { 15, 30 }, { 35, 50 }, { 65, 70 }, { 85, 90 }, { 95, 110 }, { 100, 150 },
-};
-
 static const BattleEventHandlerEntry sHandlersMagnitude[] = {
     { 0x99, HandlerEarthquakeDigCheck },
     { 0x47, HandlerEarthquakeDamage },
@@ -3968,6 +4218,9 @@ static const BattleEventHandlerEntry *EventAddMagnitude(u32 *priority) {
 }
 
 static void HandlerMagnitudeEffect(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const MagnitudeEntry MAGNITUDE_POWER_TABLE[] = {
+        { 5, 10 }, { 15, 30 }, { 35, 50 }, { 65, 70 }, { 85, 90 }, { 95, 110 }, { 100, 150 },
+    };
     u8 rand;
     u8 i;
     BattleHandlerMessageParam *param;
@@ -4087,11 +4340,7 @@ static void HandlerEndureTurnCheck(BattleEventItem *item, BtlServerFlow *flow, u
 }
 
 // Protect, Detect, Endure, Wide Guard and Quick Guard
-static const u16 sProtectMoves[] = { 182, 197, 203, 469, 501 };
-
 // Protecting again succeeds one time in n, n by how many protections in a row came before
-static const u8 sProtectFailChance[] = { 1, 2, 4, 8, 16, 32, 64, 128, 0, 0 };
-
 static const BattleEventHandlerEntry sHandlersProtect[] = {
     { 0x03, HandlerProtectStart },
     { 0x1f, HandlerProtectCheckFail },
@@ -4105,6 +4354,7 @@ static const BattleEventHandlerEntry *EventAddProtect(u32 *priority) {
 }
 
 static void HandlerProtectStart(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const u16 sProtectMoves[] = { 182, 197, 203, 469, 501 };
     u16 move;
     u32 i;
     BattleHandlerSetCounterParam *param;
@@ -4125,6 +4375,7 @@ static void HandlerProtectStart(BattleEventItem *item, BtlServerFlow *flow, u8 m
 }
 
 static void HandlerProtectCheckFail(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const u8 sProtectFailChance[] = { 1, 2, 4, 8, 16, 32, 64, 128, 0, 0 };
     u8 count;
 
     if (BattleEventVar_GetValue(2) == monId) {
@@ -4580,8 +4831,6 @@ static void HandlerFeintResetProtectCounter(BattleEventItem *item, BtlServerFlow
 }
 
 // The stats Acupressure picks one of to raise
-static const u32 sAcupressureStats[] = { 1, 2, 5, 3, 4, 6, 7 };
-
 static const BattleEventHandlerEntry sHandlersAcupressure[] = {
     { 0xa0, HandlerAcupressure },
 };
@@ -4592,6 +4841,7 @@ static const BattleEventHandlerEntry *EventAddAcupressure(u32 *priority) {
 }
 
 static void HandlerAcupressure(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const u32 sAcupressureStats[] = { 1, 2, 5, 3, 4, 6, 7 };
     u8 targetId;
     BattleMon *target;
     u8 count;
@@ -7240,8 +7490,8 @@ static const BattleEventHandlerEntry *EventAddStoredPower(u32 *priority) {
 }
 
 // The stats whose raised stages add to Stored Power's power
-static const u8 sStoredPowerStats[] = { 1, 2, 5, 3, 4, 6, 7 };
 static void HandlerStoredPower(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
+    static const u8 sStoredPowerStats[] = { 1, 2, 5, 3, 4, 6, 7 };
     BattleMon *mon;
     int total;
     u32 i;
@@ -8405,12 +8655,13 @@ typedef struct PledgeCombo {
     u16 move2;
     u32 effect;
 } PledgeCombo;
-static const PledgeCombo sPledgeCombos[] = {
-    { MOVE_WATER_PLEDGE, MOVE_FIRE_PLEDGE, 1 },
-    { MOVE_GRASS_PLEDGE, MOVE_FIRE_PLEDGE, 2 },
-    { MOVE_WATER_PLEDGE, MOVE_GRASS_PLEDGE, 3 },
-};
+
 static u32 func_ov167_021cdbc4(u16 move, u16 partnerMove) {
+    static const PledgeCombo sPledgeCombos[] = {
+        { MOVE_WATER_PLEDGE, MOVE_FIRE_PLEDGE, 1 },
+        { MOVE_GRASS_PLEDGE, MOVE_FIRE_PLEDGE, 2 },
+        { MOVE_WATER_PLEDGE, MOVE_GRASS_PLEDGE, 3 },
+    };
     u32 i;
 
     for (i = 0; i < NELEMS(sPledgeCombos); i++) {
@@ -8569,264 +8820,3 @@ static void HandlerWaterPledgeFieldEffect(BattleEventItem *item, BtlServerFlow *
         }
     }
 }
-
-static const MoveEventAddEntry sMoveEventAddTable[] = {
-    { MOVE_CONVERSION, EventAddConversion },
-    { MOVE_CAMOUFLAGE, EventAddCamouflage },
-    { MOVE_HAZE, EventAddHaze },
-    { MOVE_DREAM_EATER, EventAddDreamEater },
-    { MOVE_TRI_ATTACK, EventAddTriAttack },
-    { MOVE_SECRET_POWER, EventAddSecretPower },
-    { MOVE_CHATTER, EventAddChatter },
-    { MOVE_SUPER_FANG, EventAddSuperFang },
-    { MOVE_DRAGON_RAGE, EventAddDragonRage },
-    { MOVE_SEISMIC_TOSS, EventAddSeismicToss },
-    { MOVE_NIGHT_SHADE, EventAddSeismicToss },
-    { MOVE_PSYWAVE, EventAddPsywave },
-    { MOVE_SNORE, EventAddSnore },
-    { MOVE_LAST_RESORT, EventAddLastResort },
-    { MOVE_FLAIL, EventAddFlail },
-    { MOVE_REVERSAL, EventAddFlail },
-    { MOVE_FALSE_SWIPE, EventAddFalseSwipe },
-    { MOVE_SPIDER_WEB, EventAddSpiderWeb },
-    { MOVE_MEAN_LOOK, EventAddSpiderWeb },
-    { MOVE_BLOCK, EventAddSpiderWeb },
-    { MOVE_ENDURE, EventAddEndure },
-    { MOVE_SONIC_BOOM, EventAddSonicBoom },
-    { MOVE_FAKE_OUT, EventAddFakeOut },
-    { MOVE_ENDEAVOR, EventAddEndeavor },
-    { MOVE_ERUPTION, EventAddEruption },
-    { MOVE_WATER_SPOUT, EventAddEruption },
-    { MOVE_REFRESH, EventAddRefresh },
-    { MOVE_MORNING_SUN, EventAddMorningSun },
-    { MOVE_MOONLIGHT, EventAddMorningSun },
-    { MOVE_SYNTHESIS, EventAddMorningSun },
-    { MOVE_WRING_OUT, EventAddCrushGrip },
-    { MOVE_CRUSH_GRIP, EventAddCrushGrip },
-    { MOVE_WEATHER_BALL, EventAddWeatherBall },
-    { MOVE_PROTECT, EventAddProtect },
-    { MOVE_DETECT, EventAddProtect },
-    { MOVE_SPLASH, EventAddSplash },
-    { MOVE_CURSE, EventAddCurse },
-    { MOVE_THRASH, EventAddThrash },
-    { MOVE_UPROAR, EventAddUproar },
-    { MOVE_PETAL_DANCE, EventAddThrash },
-    { MOVE_OUTRAGE, EventAddThrash },
-    { MOVE_BRINE, EventAddBrine },
-    { MOVE_WAKE_UP_SLAP, EventAddWakeUpSlap },
-    { MOVE_SMELLING_SALT, EventAddSmellingSalts },
-    { MOVE_ACUPRESSURE, EventAddAcupressure },
-    { MOVE_TRUMP_CARD, EventAddTrumpCard },
-    { MOVE_FLY, EventAddFly },
-    { MOVE_BOUNCE, EventAddBounce },
-    { MOVE_DIVE, EventAddDive },
-    { MOVE_DIG, EventAddDig },
-    { MOVE_SOLAR_BEAM, EventAddSolarBeam },
-    { MOVE_RAZOR_WIND, EventAddRazorWind },
-    { MOVE_SKY_ATTACK, EventAddSkyAttack },
-    { MOVE_SKULL_BASH, EventAddSkullBash },
-    { MOVE_ENCORE, EventAddEncore },
-    { MOVE_TWISTER, EventAddTwister },
-    { MOVE_GUST, EventAddTwister },
-    { MOVE_EARTHQUAKE, EventAddEarthquake },
-    { MOVE_SURF, EventAddSurf },
-    { MOVE_SKY_UPPERCUT, EventAddSkyUppercut },
-    { MOVE_MAGNITUDE, EventAddMagnitude },
-    { MOVE_FEINT, EventAddFeint },
-    { MOVE_SHADOW_FORCE, EventAddShadowForce },
-    { MOVE_STRUGGLE, EventAddStruggle },
-    { MOVE_PUNISHMENT, EventAddPunishment },
-    { MOVE_TAUNT, EventAddTaunt },
-    { MOVE_CAPTIVATE, EventAddCaptivate },
-    { MOVE_BELLY_DRUM, EventBellyDrum },
-    { MOVE_DESTINY_BOND, EventAddDestinyBond },
-    { MOVE_FACADE, EventAddFacade },
-    { MOVE_PAYBACK, EventAddPayback },
-    { MOVE_HIDDEN_POWER, EventAddHiddenPower },
-    { MOVE_MINIMIZE, EventAddMinimize },
-    { MOVE_DEFENSE_CURL, EventAddDefenseCurl },
-    { MOVE_STOMP, EventAddStomp },
-    { MOVE_NIGHTMARE, EventAddNightmare },
-    { MOVE_SUCKER_PUNCH, EventAddSuckerPunch },
-    { MOVE_ROLLOUT, EventAddRollout },
-    { MOVE_ICE_BALL, EventAddRollout },
-    { MOVE_AROMATHERAPY, EventAddAromatherapy },
-    { MOVE_HEAL_BELL, EventAddHealBell },
-    { MOVE_MEMENTO, EventAddMemento },
-    { MOVE_SPITE, EventAddSpite },
-    { MOVE_REST, EventAddRest },
-    { MOVE_LOCK_ON, EventAddLockOn },
-    { MOVE_MIND_READER, EventAddLockOn },
-    { MOVE_REFLECT, EventAddReflect },
-    { MOVE_LIGHT_SCREEN, EventAddLightScreen },
-    { MOVE_SAFEGUARD, EventAddSafeguard },
-    { MOVE_MIST, EventAddMist },
-    { MOVE_TAILWIND, EventAddTailwind },
-    { MOVE_RETURN, EventAddReturn },
-    { MOVE_FRUSTRATION, EventAddFrustration },
-    { MOVE_PRESENT, EventAddPresent },
-    { MOVE_TORMENT, EventAddTorment },
-    { MOVE_IMPRISON, EventAddImprison },
-    { MOVE_GRAVITY, EventAddGravity },
-    { MOVE_GRUDGE, EventAddGrudge },
-    { MOVE_HELPING_HAND, EventAddHelpingHand },
-    { MOVE_GASTRO_ACID, EventAddGastroAcid },
-    { MOVE_ROLE_PLAY, EventAddRolePlay },
-    { MOVE_SPIKES, EventAddSpikes },
-    { MOVE_TOXIC_SPIKES, EventAddToxicSpikes },
-    { MOVE_STEALTH_ROCK, EventAddStealthRock },
-    { MOVE_ROOST, EventAddRoost },
-    { MOVE_MAGNET_RISE, EventAddMagnetRise },
-    { MOVE_FURY_CUTTER, EventAddFuryCutter },
-    { MOVE_PSYCHO_SHIFT, EventAddPsychoShift },
-    { MOVE_ASSURANCE, EventAddAssurance },
-    { MOVE_CONVERSION_2, EventAddConversion2 },
-    { MOVE_COUNTER, EventAddCounter },
-    { MOVE_MIRROR_COAT, EventAddMirrorCoat },
-    { MOVE_METAL_BURST, EventAddMetalBurst },
-    { MOVE_REVENGE, EventAddRevenge },
-    { MOVE_AVALANCHE, EventAddRevenge },
-    { MOVE_TRIPLE_KICK, EventAddTripleKick },
-    { MOVE_GYRO_BALL, EventAddGyroBall },
-    { MOVE_PAIN_SPLIT, EventAddPainSplit },
-    { MOVE_FOLLOW_ME, EventAddFollowMe },
-    { MOVE_WORRY_SEED, EventAddWorrySeed },
-    { MOVE_THUNDER_WAVE, EventAddThunderWave },
-    { MOVE_PSYCH_UP, EventAddPsychUp },
-    { MOVE_HEART_SWAP, EventAddHeartSwap },
-    { MOVE_POWER_SWAP, EventAddPowerSwap },
-    { MOVE_GUARD_SWAP, EventAddGuardSwap },
-    { MOVE_ATTRACT, EventAddAttract },
-    { MOVE_JUDGMENT, EventAddJudgement },
-    { MOVE_NATURAL_GIFT, EventAddNaturalGift },
-    { MOVE_KNOCK_OFF, EventAddKnockOff },
-    { MOVE_DISABLE, EventAddDisable },
-    { MOVE_THIEF, EventAddThief },
-    { MOVE_COVET, EventAddThief },
-    { MOVE_TRICK, EventAddTrick },
-    { MOVE_SWITCHEROO, EventAddTrick },
-    { MOVE_MIMIC, EventAddMimic },
-    { MOVE_SKETCH, EventAddSketch },
-    { MOVE_JUMP_KICK, EventJumpKickAdd },
-    { MOVE_HI_JUMP_KICK, EventJumpKickAdd },
-    { MOVE_DEFOG, EventAddDefog },
-    { MOVE_BRICK_BREAK, EventAddBrickBreak },
-    { MOVE_TRICK_ROOM, EventAddTrickRoom },
-    { MOVE_WATER_SPORT, EventAddWaterSport },
-    { MOVE_MUD_SPORT, EventAddMudSport },
-    { MOVE_CHARGE, EventAddCharge },
-    { MOVE_PERISH_SONG, EventAddPerishSong },
-    { MOVE_LEECH_SEED, EventAddLeechSeed },
-    { MOVE_BEAT_UP, EventAddBeatUp },
-    { MOVE_AQUA_RING, EventAddAquaRing },
-    { MOVE_LUNAR_DANCE, EventAddLunarDance },
-    { MOVE_HEALING_WISH, EventAddHealingWish },
-    { MOVE_METRONOME, EventAddMetronome },
-    { MOVE_NATURE_POWER, EventAddNaturePower },
-    { MOVE_ASSIST, EventAddAssist },
-    { MOVE_MIRROR_MOVE, EventAddMirrorMove },
-    { MOVE_ME_FIRST, EventAddMeFirst },
-    { MOVE_COPYCAT, EventAddCopycat },
-    { MOVE_SLEEP_TALK, EventAddSleepTalk },
-    { MOVE_LOW_KICK, EventAddLowKick },
-    { MOVE_GRASS_KNOT, EventAddLowKick },
-    { MOVE_FOCUS_PUNCH, EventAddFocusPunch },
-    { MOVE_STOCKPILE, EventAddStockpile },
-    { MOVE_SPIT_UP, EventAddSpitUp },
-    { MOVE_SWALLOW, EventAddSwallow },
-    { MOVE_FUTURE_SIGHT, EventAddFutureSight },
-    { MOVE_DOOM_DESIRE, EventAddDoomDesire },
-    { MOVE_RECYCLE, EventAddRecycle },
-    { MOVE_PURSUIT, EventAddPursuit },
-    { MOVE_PAY_DAY, EventAddPayDay },
-    { MOVE_BIDE, EventAddBide },
-    { MOVE_SNATCH, EventAddSnatch },
-    { MOVE_MAGIC_COAT, EventAddMagicCoat },
-    { MOVE_TELEPORT, EventAddTeleport },
-    { MOVE_U_TURN, EventAddUturn },
-    { MOVE_BATON_PASS, EventAddBatonPass },
-    { MOVE_PLUCK, EventAddPluck },
-    { MOVE_BUG_BITE, EventAddPluck },
-    { MOVE_FLING, EventAddFling },
-    { MOVE_WRAP, EventAddBind },
-    { MOVE_BIND, EventAddBind },
-    { MOVE_FIRE_SPIN, EventAddBind },
-    { MOVE_CLAMP, EventAddBind },
-    { MOVE_SAND_TOMB, EventAddBind },
-    { MOVE_MAGMA_STORM, EventAddBind },
-    { MOVE_WHIRLPOOL, EventAddWhirlpool },
-    { MOVE_RAPID_SPIN, EventAddRapidSpin },
-    { MOVE_WHIRLWIND, EventAddRapidSpin },
-    { MOVE_POWER_TRICK, EventAddPowerTrick },
-    { MOVE_TRANSFORM, EventAddTransform },
-    { MOVE_EXPLOSION, EventAddExplosion },
-    { MOVE_SELFDESTRUCT, EventAddExplosion },
-    { MOVE_FOCUS_ENERGY, EventAddFocusEnergy },
-    { MOVE_RAGE, EventAddRage },
-    { MOVE_ANCIENT_POWER, EventAddAncientPower },
-    { MOVE_OMINOUS_WIND, EventAddAncientPower },
-    { MOVE_SILVER_WIND, EventAddAncientPower },
-    { MOVE_THUNDER, EventAddThunder },
-    { MOVE_BLIZZARD, EventAddBlizzard },
-    { MOVE_WISH, EventAddWish },
-    { MOVE_LUCKY_CHANT, EventAddLuckyChant },
-    { MOVE_FORESIGHT, EventAddForesight },
-    { MOVE_ODOR_SLEUTH, EventAddForesight },
-    { MOVE_MIRACLE_EYE, EventAddMiracleEye },
-    { MOVE_GROWTH, EventAddGrowth },
-    { MOVE_VENOSHOCK, EventAddVenoshock },
-    { MOVE_RAGE_POWDER, EventAddFollowMe },
-    { MOVE_SOAK, EventAddSoak },
-    { MOVE_SIMPLE_BEAM, EventAddSimpleBeam },
-    { MOVE_ENTRAINMENT, EventAddEntrainment },
-    { MOVE_CLEAR_SMOG, EventAddClearSmog },
-    { MOVE_STORED_POWER, EventAddStoredPower },
-    { MOVE_SHELL_SMASH, EventAddShellSmash },
-    { MOVE_HEX, EventAddHex },
-    { MOVE_ACROBATICS, EventAddAcrobatics },
-    { MOVE_VOLT_SWITCH, EventAddUturn },
-    { MOVE_WIDE_GUARD, EventAddWideGuard },
-    { MOVE_REFLECT_TYPE, EventAddReflectType },
-    { MOVE_POWER_SPLIT, EventAddPowerSplit },
-    { MOVE_GUARD_SPLIT, EventAddGuardSplit },
-    { MOVE_AUTOTOMIZE, EventAddAutotomize },
-    { MOVE_HEAVY_SLAM, EventAddHeavySlam },
-    { MOVE_HEAT_CRASH, EventAddHeavySlam },
-    { MOVE_WONDER_ROOM, EventAddWonderRoom },
-    { MOVE_MAGIC_ROOM, EventAddMagicRoom },
-    { MOVE_PSYSHOCK, EventAddPsyshock },
-    { MOVE_PSYSTRIKE, EventAddPsyshock },
-    { MOVE_FLAME_BURST, EventAddFlameBurst },
-    { MOVE_ELECTRO_BALL, EventAddElectroBall },
-    { MOVE_SYNCHRONOISE, EventAddSynchronoise },
-    { MOVE_CHIP_AWAY, EventAddChipAway },
-    { MOVE_SACRED_SWORD, EventAddChipAway },
-    { MOVE_ECHOED_VOICE, EventAddEchoedVoice },
-    { MOVE_INCINERATE, EventAddIncinerate },
-    { MOVE_BESTOW, EventAddBestow },
-    { MOVE_CIRCLE_THROW, EventAddCircleThrow },
-    { MOVE_DRAGON_TAIL, EventAddCircleThrow },
-    { MOVE_RETALIATE, EventAddRetaliate },
-    { MOVE_FOUL_PLAY, EventAddFoulPlay },
-    { MOVE_SMACK_DOWN, EventAddSmackDown },
-    { MOVE_FINAL_GAMBIT, EventAddFinalGambit },
-    { MOVE_AFTER_YOU, EventAddAfterYou },
-    { MOVE_QUASH, EventAddQuash },
-    { MOVE_ROUND, EventAddRound },
-    { MOVE_QUICK_GUARD, EventAddQuickGuard },
-    { MOVE_ALLY_SWITCH, EventAddAllySwitch },
-    { MOVE_TELEKINESIS, EventAddTelekinesis },
-    { MOVE_SKY_DROP, EventAddSkyDrop },
-    { MOVE_STEAMROLLER, EventAddStomp },
-    { MOVE_HURRICANE, EventAddThunder },
-    { MOVE_SECRET_SWORD, EventAddPsyshock },
-    { MOVE_RELIC_SONG, EventAddRelicSong },
-    { MOVE_TECHNO_BLAST, EventAddTechnoBlast },
-    { MOVE_FREEZE_SHOCK, EventAddFreezeShock },
-    { MOVE_ICE_BURN, EventAddFreezeShock },
-    { MOVE_WATER_PLEDGE, EventAddWaterPledge },
-    { MOVE_FIRE_PLEDGE, EventAddWaterPledge },
-    { MOVE_GRASS_PLEDGE, EventAddWaterPledge },
-    { MOVE_FUSION_FLARE, EventAddFusionFlare },
-    { MOVE_FUSION_BOLT, EventAddFusionFlare },
-};

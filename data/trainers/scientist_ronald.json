@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ronald",
+    "class": "TRAINER_CLASS_SCIENTIST_M_52",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_X_ATTACK" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MAGNETON",
+            "form": 0,
+            "level": 30,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "This cave is full of rocks\ngenerating electricity!{be00}\nThe electricity is charging me up!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Yowch, a lightning spark!"
+        },
+        {
+            "type": 2,
+            "text": "The sources of my energy are\nmy precious Pokémon!{be00}\nThis has been scientifically proven!!"
+        }
+    ]
+}

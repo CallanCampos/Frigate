@@ -1,0 +1,3 @@
+CelestialTower4_Text_NotHearingPealBell = Not hearing the peal of the bell\nmeans no happily ever after...{be00}\nIf we keep it from ringing,{be00}\nthen those two will never find happiness.{be01}\nThat's why I can't let you\ngo one step further!{be01}
+CelestialTower4_Text_PeopleWhoDontGive = People who don't give any love\nshouldn't ask for any...{be00}\nfrom people or Pokémon.
+\pad{98}

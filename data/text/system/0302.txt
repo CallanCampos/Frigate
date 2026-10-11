@@ -1,22 +1,22 @@
-{bd02}Ghost Erasers...\n\n\n{bd02}They're a secret organization\n{bd02}that specializes in mysterious\n{bd02}cases and supernatural phenomena\n{bd02}the police cannot solve...
-{bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 001\n\n{bd02}Code Name: {0102:0}
-{bd02}A request from\n\n{bd02}a certain village\n\n{bd02}regarding ghosts.
-{bd02}Several people there\n\n{bd02}reportedly witnessed ghosts\n\n{bd02}over a period of several days.
-{bd02}Some people were even\n\n{bd02}said to have been\n\n{bd02}possessed by ghosts.
-{bd02}Now, the investigation\n\n{bd02}will commence in the\n\n{bd02}graveyard where several\n\n{bd02}people reportedly saw ghosts.
-なし
-なし
-なし
-なし
-{bd02}Ghost Erasers...\n\n\n{bd02}They're a secret organization\n{bd02}that specializes in mysterious\n{bd02}cases and supernatural phenomena\n{bd02}the police cannot solve...
-{bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 001\n\n{bd02}Code Name: {0102:0}
-{bd02}A request from\n\n{bd02}a certain village\n\n{bd02}regarding ghosts.
-{bd02}Several people there\n\n{bd02}reportedly witnessed ghosts\n\n{bd02}over a period of several days.
-{bd02}Some people were even\n\n{bd02}said to have been\n\n{bd02}possessed by ghosts.
-{bd02}Now, the investigation\n\n{bd02}will commence in the\n\n{bd02}graveyard where several\n\n{bd02}people reportedly saw ghosts.
-なし
-なし
-なし
-なし
-なし
+Bank0302_Text_GhostErasersTheyreSecret = {bd02}Ghost Erasers...\n\n\n{bd02}They're a secret organization\n{bd02}that specializes in mysterious\n{bd02}cases and supernatural phenomena\n{bd02}the police cannot solve...
+Bank0302_Text_GhostEraserCaseFiles = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 001\n\n{bd02}Code Name: {0102:0}
+Bank0302_Text_RequestFromCertainVillage = {bd02}A request from\n\n{bd02}a certain village\n\n{bd02}regarding ghosts.
+Bank0302_Text_SeveralPeopleThereReportedly = {bd02}Several people there\n\n{bd02}reportedly witnessed ghosts\n\n{bd02}over a period of several days.
+Bank0302_Text_SomePeopleWereEven = {bd02}Some people were even\n\n{bd02}said to have been\n\n{bd02}possessed by ghosts.
+Bank0302_Text_NowInvestigationWillCommence = {bd02}Now, the investigation\n\n{bd02}will commence in the\n\n{bd02}graveyard where several\n\n{bd02}people reportedly saw ghosts.
+Bank0302_Text_Empty = なし
+Bank0302_Text_Empty_2 = なし
+Bank0302_Text_Empty_3 = なし
+Bank0302_Text_Empty_4 = なし
+Bank0302_Text_GhostErasersTheyreSecret_2 = {bd02}Ghost Erasers...\n\n\n{bd02}They're a secret organization\n{bd02}that specializes in mysterious\n{bd02}cases and supernatural phenomena\n{bd02}the police cannot solve...
+Bank0302_Text_GhostEraserCaseFiles_2 = {bd02}Ghost Eraser Case Files\n\n{bd02}Case No. 001\n\n{bd02}Code Name: {0102:0}
+Bank0302_Text_RequestFromCertainVillage_2 = {bd02}A request from\n\n{bd02}a certain village\n\n{bd02}regarding ghosts.
+Bank0302_Text_SeveralPeopleThereReportedly_2 = {bd02}Several people there\n\n{bd02}reportedly witnessed ghosts\n\n{bd02}over a period of several days.
+Bank0302_Text_SomePeopleWereEven_2 = {bd02}Some people were even\n\n{bd02}said to have been\n\n{bd02}possessed by ghosts.
+Bank0302_Text_NowInvestigationWillCommence_2 = {bd02}Now, the investigation\n\n{bd02}will commence in the\n\n{bd02}graveyard where several\n\n{bd02}people reportedly saw ghosts.
+Bank0302_Text_Empty_5 = なし
+Bank0302_Text_Empty_6 = なし
+Bank0302_Text_Empty_7 = なし
+Bank0302_Text_Empty_8 = なし
+Bank0302_Text_Empty_9 = なし
 \pad{90}

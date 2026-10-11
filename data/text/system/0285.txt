@@ -1,22 +1,22 @@
-{bd02}When eyes meet,\n{bd02}a battle begins.\n\n{bd02}This is the rule of Trainers.
-{bd02}When eyes meet,\n{bd02}love begins.\n\n{bd02}This is the rule of love.
-{bd02}This is the love story of how certain\n{bd02}Trainers were brought together\n{bd02}by their Pokémon.
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}When eyes meet,\n{bd02}a battle begins.\n\n{bd02}This is the rule of Trainers.
-{bd02}When eyes meet,\n{bd02}love begins.\n\n{bd02}This is the rule of love.
-{bd02}This is the love story of how certain\n{bd02}Trainers were brought together\n{bd02}by their Pokémon.
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0285_Text_WhenEyesMeetBattle = {bd02}When eyes meet,\n{bd02}a battle begins.\n\n{bd02}This is the rule of Trainers.
+Bank0285_Text_WhenEyesMeetLove = {bd02}When eyes meet,\n{bd02}love begins.\n\n{bd02}This is the rule of love.
+Bank0285_Text_LoveStoryHowCertain = {bd02}This is the love story of how certain\n{bd02}Trainers were brought together\n{bd02}by their Pokémon.
+Bank0285_Text_Empty = なし
+Bank0285_Text_Empty_2 = なし
+Bank0285_Text_Empty_3 = なし
+Bank0285_Text_Empty_4 = なし
+Bank0285_Text_Empty_5 = なし
+Bank0285_Text_Empty_6 = なし
+Bank0285_Text_Empty_7 = なし
+Bank0285_Text_WhenEyesMeetBattle_2 = {bd02}When eyes meet,\n{bd02}a battle begins.\n\n{bd02}This is the rule of Trainers.
+Bank0285_Text_WhenEyesMeetLove_2 = {bd02}When eyes meet,\n{bd02}love begins.\n\n{bd02}This is the rule of love.
+Bank0285_Text_LoveStoryHowCertain_2 = {bd02}This is the love story of how certain\n{bd02}Trainers were brought together\n{bd02}by their Pokémon.
+Bank0285_Text_Empty_8 = なし
+Bank0285_Text_Empty_9 = なし
+Bank0285_Text_Empty_10 = なし
+Bank0285_Text_Empty_11 = なし
+Bank0285_Text_Empty_12 = なし
+Bank0285_Text_Empty_13 = なし
+Bank0285_Text_Empty_14 = なし
+Bank0285_Text_Empty_15 = なし
 \pad{a8}

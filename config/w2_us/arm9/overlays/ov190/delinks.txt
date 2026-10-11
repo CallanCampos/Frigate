@@ -3,3 +3,25 @@
     .ctor       start:0x021b5308 end:0x021b5308 kind:rodata align:4
     .data       start:0x021b5320 end:0x021b5440 kind:data align:32
     .bss        start:0x021b5440 end:0x021b5460 kind:bss align:32
+
+src/ov190/wifilogin.c:
+    .text       start:0x021b2fc0 end:0x021b3ac0
+    .rodata     start:0x021b50e0 end:0x021b50f4
+    .data       start:0x021b5320 end:0x021b53b8
+    .bss        start:0x021b5440 end:0x021b5460
+
+src/ov190/wifilogin_disp.c:
+    complete
+    .text       start:0x021b3ac0 end:0x021b470c
+    .rodata     start:0x021b50f4 end:0x021b52f4
+    .data       start:0x021b53b8 end:0x021b540c
+
+src/ov190/wifilogin_message.c:
+    .text       start:0x021b470c end:0x021b4de4
+    .rodata     start:0x021b52f4 end:0x021b52fc
+    .data       start:0x021b540c end:0x021b5440
+
+src/ov190/wifilogout.c:
+    complete
+    .text       start:0x021b4de4 end:0x021b50e0
+    .rodata     start:0x021b52fc end:0x021b5308

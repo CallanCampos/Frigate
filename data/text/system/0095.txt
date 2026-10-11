@@ -1,12 +1,12 @@
-        \x{ffff}
-       \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-      \x{ffff}
-      \x{ffff}
-      \x{ffff}
-      \x{ffff}
-                           \x{ffff}
-                             \x{ffff}
+Bank0095_Text_Empty =         \x{ffff}
+Bank0095_Text_Empty_2 =        \x{ffff}
+Bank0095_Text_Empty_3 =     \x{ffff}
+Bank0095_Text_Empty_4 =     \x{ffff}
+Bank0095_Text_Empty_5 =     \x{ffff}
+Bank0095_Text_Empty_6 =       \x{ffff}
+Bank0095_Text_Empty_7 =       \x{ffff}
+Bank0095_Text_Empty_8 =       \x{ffff}
+Bank0095_Text_Empty_9 =       \x{ffff}
+Bank0095_Text_Empty_10 =                            \x{ffff}
+Bank0095_Text_Empty_11 =                              \x{ffff}
 \pad{20}

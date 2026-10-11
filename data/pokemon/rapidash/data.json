@@ -1,0 +1,168 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Rapidash",
+    "pokedex": {
+        "category": "Fire Horse Pokémon",
+        "entry": "When at an all-out gallop, its\nblazing mane sparkles, enhancing\nits beautiful appearance.",
+        "height": "5'07\"",
+        "weight": "209.4 lbs.",
+        "languages": {
+            "en": {
+                "name": "Rapidash",
+                "category": "Fire Horse Pokémon",
+                "entry": "When at an all-out gallop, its\nblazing mane sparkles, enhancing\nits beautiful appearance.",
+                "height": "5'07\"",
+                "weight": "209.4 lbs."
+            },
+            "fr": {
+                "name": "Galopa",
+                "category": "Pokémon Cheval Feu",
+                "entry": "Au grand galop, sa crinière de feu\ndisperse au vent une myriade\nd'étincelles ardentes.",
+                "height": "1,7 m",
+                "weight": "95,0 kg"
+            },
+            "de": {
+                "name": "Gallopa",
+                "category": "Feuerpferd",
+                "entry": "In vollem Galopp funkelt seine\nleuchtende Mähne, was wiederum\nseine Schönheit unterstreicht.",
+                "height": "1,7 m",
+                "weight": "95,0 kg"
+            },
+            "it": {
+                "name": "Rapidash",
+                "category": "Pokémon Cavalfuoco",
+                "entry": "Quando galoppa, la sua criniera ardente\nbrilla, rendendo il suo aspetto ancora\npiù straordinario.",
+                "height": "1,7 m",
+                "weight": "95,0 kg"
+            },
+            "ko": {
+                "name": "날쌩마",
+                "category": "불의말포켓몬",
+                "entry": "전력으로 달릴 때는\n타오르는 갈기에서 빛이 나\n한층 더 아름답게 보인다.",
+                "height": "1.7 m",
+                "weight": "95.0 kg"
+            },
+            "es": {
+                "name": "Rapidash",
+                "category": "Pokémon Caballo F.",
+                "entry": "Cuando galopa, su ardiente crin\ncentellea y le da un aspecto\naún más impresionante.",
+                "height": "1,7 m",
+                "weight": "95,0 kg"
+            },
+            "ja": {
+                "name": "ギャロップ",
+                "category": "ひのうまポケモン",
+                "entry": "ぜんりょくで\\x{3000}かけぬけるとき\nもえる\\x{3000}たてがみが\\x{3000}きらめいて\nよりいっそう\\x{3000}うつくしく\\x{3000}みえる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff19}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 100,
+        "defense": 70,
+        "speed": 105,
+        "special_attack": 80,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_SHUCA_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RUN_AWAY", "ABILITY_FLASH_FIRE" ],
+    "hidden_ability": "ABILITY_FLAME_BODY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 175,
+    "height": 17,
+    "weight": 950,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POISON_JAB" ],
+            [ 1, "MOVE_MEGAHORN" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_QUICK_ATTACK" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 4, "MOVE_TAIL_WHIP" ],
+            [ 9, "MOVE_EMBER" ],
+            [ 13, "MOVE_FLAME_WHEEL" ],
+            [ 17, "MOVE_STOMP" ],
+            [ 21, "MOVE_FLAME_CHARGE" ],
+            [ 25, "MOVE_FIRE_SPIN" ],
+            [ 29, "MOVE_TAKE_DOWN" ],
+            [ 33, "MOVE_INFERNO" ],
+            [ 37, "MOVE_AGILITY" ],
+            [ 40, "MOVE_FURY_ATTACK" ],
+            [ 41, "MOVE_FIRE_BLAST" ],
+            [ 45, "MOVE_BOUNCE" ],
+            [ 49, "MOVE_FLARE_BLITZ" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM68",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM93",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_DRILL_RUN",
+            "MOVE_BOUNCE",
+            "MOVE_LOW_KICK",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_PONYTA"
+}

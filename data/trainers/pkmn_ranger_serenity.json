@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Serenity",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_PECHA_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_TRUBBISH",
+            "form": 0,
+            "level": 26,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "We are totally in sync!{be01}\nUsing our amazing connection,\nI will teach you all about Rangers!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "In fact, we learned\nall about you!"
+        },
+        {
+            "type": 15,
+            "text": "Do you know this Berry?{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Listen carefully...{be01}\nYou may hear the sound\nof breathing Pokémon and plants."
+        }
+    ]
+}

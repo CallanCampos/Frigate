@@ -1,8 +1,0 @@
-{0201:1}/{0201:2}/{0201:0}
-              \x{ffff}
-              \x{ffff}
-Do you want to display your Musical Photo\nin the Musical Theater?
-YES
-NO
-Awaiting others' decisions.\nPlease wait...
-\pad{2c}

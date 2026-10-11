@@ -1,5 +1,7 @@
 #include "app/comm_tvt/ctvt_game_cam.h"
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "app/comm_tvt/camera_system.h"
 #include "app/comm_tvt/comm_tvt_sys.h"
 #include "app/comm_tvt/ctvt_game.h"
@@ -226,7 +228,7 @@ CtvtGameCamTask *CtvtGameCam_StartTask(CtvtGameCam *cam, HeapID heapId) {
     task->heapId = heapId;
     task->font = GFL_FontCreate(23, 0, 0, FALSE, heapId);
     task->printQueue = func_020219a8(0x800, heapId);
-    task->msgData = GFL_MsgSysLoadData(FALSE, 2, 29, heapId);
+    task->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW, heapId);
     task->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     task->graphic = CtvtGameCamGraphic_Create(1, heapId);
     CtvtGameCam_LoadBG(heapId);

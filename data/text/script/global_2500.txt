@@ -1,0 +1,11 @@
+Global2500_Text_ItsLinedPokemonPicture = It's lined with Pokémon picture books.
+Global2500_Text_TheseBooksPokemonRead = Are these books for Pokémon\nto read?
+Global2500_Text_ItsChockFullPokemon = It's chock full of Pokémon books and\nphoto collections.
+Global2500_Text_ThereLotsPokemonMagazines = There are lots of Pokémon magazines!{be01}\n“Pokémon Pal"\n“Pokémon Handbook"{be00}\n“Adorable Pokémon"
+Global2500_Text_TrashCanEmpty = The trash can is empty.
+Global2500_Text_ShelvesJammedVibrantPokemon = The shelves are jammed with vibrant\nPokémon goods.
+Global2500_Text_LooksLikeCabinetFull = It looks like a cabinet full of\nPokémon goods.
+Global2500_Text_GoodsArrangedShelvesVery = Goods are arranged on the shelves in a\nvery orderly fashion.
+Global2500_Text_Empty =                                \x{ffff}
+Global2500_Text_Empty_2 =                                 \x{ffff}
+\pad{ca}

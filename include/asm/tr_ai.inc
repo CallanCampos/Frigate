@@ -1,4 +1,4 @@
-// Macros for the trainer AI scripts, written by tools/scripts/tr_ai_script.py inc
+// Macros for the trainer AI scripts, written by tools/script/tr_ai_script.py inc
 
 #include "constants/abilities.h"
 #include "constants/battle.h"

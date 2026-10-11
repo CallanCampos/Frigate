@@ -1,9 +1,11 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/ui_scene.h"
+#include "app/ui/touchbar.h"
 #include "app/pokemon_trade_local.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/text_banks.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -33,6 +35,7 @@
 #include "system/text_speed.h"
 #include "system/time_icon.h"
 #include "system/wordset.h"
+#include "text/system/ability_handlers_3.h"
 
 // The trade's messages, menus and the panels that describe a Pokémon: its name, level, stats, moves and icons. The
 // ROM names no file between pokemontrade_save.c and pokemontrade_3d.c, so the name is descriptive
@@ -68,14 +71,14 @@ static void func_ov194_021bfba4(ResSprite *sprite) {
     if (sprite->actor != NULL) {
         func_0204c108(sprite->actor);
         sprite->actor = NULL;
-        func_ov139_02199a44(&sprite->res);
+        UIObjRes_Free(&sprite->res);
     }
 }
 
 // A type icon of the Pokémon: its first type (0) or its second (1)
 static void func_ov194_021bfbc0(ResSprite *sprite, PartyPkm *pkm, int index, ClActUnit *unit, int x, int y,
                                 u32 vramType, HeapID heapId) {
-    Ov139ObjResSetup param;
+    UIObjResSetup param;
     u8 type = PokeParty_GetParam(pkm, PKM_PARAM_TYPE1 + index, NULL);
     param.vramType = vramType;
     param.flags = 0;
@@ -87,8 +90,8 @@ static void func_ov194_021bfbc0(ResSprite *sprite, PartyPkm *pkm, int index, ClA
     param.paletteOffset = 8;
     param.paletteStart = 0;
     param.paletteCount = 3;
-    func_ov139_021999c8(&sprite->res, &param, unit, heapId);
-    sprite->actor = func_ov139_02199a5c(&sprite->res, unit, x, y, 0, heapId);
+    UIObjRes_Load(&sprite->res, &param, unit, heapId);
+    sprite->actor = UIObjRes_CreateActor(&sprite->res, unit, x, y, 0, heapId);
     func_0204c378(sprite->actor, func_0202d7e8(type), 1);
 }
 
@@ -96,14 +99,14 @@ static void func_ov194_021bfc50(ResSprite *sprite) {
     if (sprite->actor != NULL) {
         func_0204c108(sprite->actor);
         sprite->actor = NULL;
-        func_ov139_02199a44(&sprite->res);
+        UIObjRes_Free(&sprite->res);
     }
 }
 
 // The icon of the Poké Ball the Pokémon was caught in
 static void func_ov194_021bfc6c(ResSprite *sprite, PartyPkm *pkm, ClActUnit *unit, int x, int y, u32 vramType,
                                 HeapID heapId, u32 plttOffset) {
-    Ov139ObjResSetup param;
+    UIObjResSetup param;
     u32 ball = PokeParty_GetParam(pkm, PKM_PARAM_POKEBALL, NULL);
     func_ov194_021bfc50(sprite);
     param.vramType = vramType;
@@ -116,8 +119,8 @@ static void func_ov194_021bfc6c(ResSprite *sprite, PartyPkm *pkm, ClActUnit *uni
     param.paletteOffset = plttOffset;
     param.paletteStart = 0;
     param.paletteCount = 1;
-    func_ov139_021999c8(&sprite->res, &param, unit, heapId);
-    sprite->actor = func_ov139_02199a5c(&sprite->res, unit, x, y, 0, heapId);
+    UIObjRes_Load(&sprite->res, &param, unit, heapId);
+    sprite->actor = UIObjRes_CreateActor(&sprite->res, unit, x, y, 0, heapId);
 }
 
 // Opens the message window with wk->strbuf, printed a character at a time or all at once
@@ -192,7 +195,7 @@ void func_ov194_021bfe9c(PokemonTradeWork *wk) {
 
 void func_ov194_021bfedc(PokemonTradeWork *wk) {
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, 2, 177, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_3, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->drawStr = GFL_StrBufCreate(128, wk->heapId);
     wk->drawTemplate = GFL_StrBufCreate(128, wk->heapId);
@@ -313,15 +316,15 @@ static void func_ov194_021c0234(PartyPkm *pkm, GFLBitmap *bitmap, int x, int y, 
                                 PokemonTradeWork *wk) {
     if (!isEgg) {
         if (speciesName) {
-            GFL_MsgDataLoadStrbuf(wk->msgData, 28, wk->drawTemplate);
+            GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_16, wk->drawTemplate);
             setPartyPokemonSpeciesNameToStrbuf(wk->wordSet, 0, pkm);
         } else {
-            GFL_MsgDataLoadStrbuf(wk->msgData, 29, wk->drawTemplate);
+            GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_17, wk->drawTemplate);
             loadPokemonNicknameToStrbuf(wk->wordSet, 0, pkm);
         }
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
     } else {
-        GFL_MsgDataLoadStrbuf(wk->msgData, 106, wk->drawStr);
+        GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Egg, wk->drawStr);
     }
     GFL_TextRendererDrawToBitmap(bitmap, x, y, wk->drawStr, wk->font);
 }
@@ -336,10 +339,10 @@ static void func_ov194_021c02e0(PartyPkm *pkm, GFLBitmap *bitmap, int x, int y, 
             GFL_HeapFree(table);
         }
         if (number == 999) {
-            GFL_MsgDataLoadStrbuf(wk->msgData, 163, wk->drawStr);
+            GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_52, wk->drawStr);
         } else {
             WordSetNumber(wk->wordSet, 1, number, 3, 1, TRUE);
-            GFL_MsgDataLoadStrbuf(wk->msgData, 27, wk->drawTemplate);
+            GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_No_2, wk->drawTemplate);
             GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
         }
         GFL_TextRendererDrawToBitmap(bitmap, x, y, wk->drawStr, wk->font);
@@ -349,7 +352,7 @@ static void func_ov194_021c02e0(PartyPkm *pkm, GFLBitmap *bitmap, int x, int y, 
 // The species's name
 static void func_ov194_021c0398(PartyPkm *pkm, GFLBitmap *bitmap, int x, int y, BOOL isEgg, PokemonTradeWork *wk) {
     if (!isEgg) {
-        GFL_MsgDataLoadStrbuf(wk->msgData, 28, wk->drawTemplate);
+        GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_16, wk->drawTemplate);
         setPartyPokemonSpeciesNameToStrbuf(wk->wordSet, 0, pkm);
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
         GFL_TextRendererDrawToBitmap(bitmap, x, y, wk->drawStr, wk->font);
@@ -360,7 +363,7 @@ static void func_ov194_021c0398(PartyPkm *pkm, GFLBitmap *bitmap, int x, int y, 
 static void func_ov194_021c03fc(PartyPkm *pkm, GFLBitmap *bitmap, int x, int y, PokemonTradeWork *wk) {
     // The species is read and left unused
     PokeParty_GetParam(pkm, PKM_PARAM_LEGAL_SPECIES, NULL);
-    GFL_MsgDataLoadStrbuf(wk->msgData, 18, wk->drawTemplate);
+    GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Lv, wk->drawTemplate);
     WordSetNumber(wk->wordSet, 0, PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL), 3, 1, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
     GFL_TextRendererDrawToBitmap(bitmap, x, y, wk->drawStr, wk->font);
@@ -412,7 +415,7 @@ static void func_ov194_021c051c(PartyPkm *pkm, BmpWin *window, int x, int y, Pok
 // The held item
 static void func_ov194_021c057c(PartyPkm *pkm, BmpWin *window, int x, int y, PokemonTradeWork *wk) {
     u32 item;
-    GFL_MsgDataLoadStrbuf(wk->msgData, 43, wk->drawTemplate);
+    GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_23, wk->drawTemplate);
     item = PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);
     if (item != 0) {
         loadItemNameToStrbuf(wk->wordSet, 0, item);
@@ -424,7 +427,7 @@ static void func_ov194_021c057c(PartyPkm *pkm, BmpWin *window, int x, int y, Pok
 // The HP and the maximum
 static void func_ov194_021c05ec(PartyPkm *pkm, BmpWin *window, int x, int y, PokemonTradeWork *wk) {
     u32 hp, maxHp;
-    GFL_MsgDataLoadStrbuf(wk->msgData, 39, wk->drawTemplate);
+    GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_19, wk->drawTemplate);
     hp = PokeParty_GetParam(pkm, PKM_PARAM_HP, NULL);
     maxHp = PokeParty_GetParam(pkm, PKM_PARAM_MAX_HP, NULL);
     WordSetNumber(wk->wordSet, 0, hp, 3, 1, TRUE);
@@ -438,7 +441,7 @@ static void func_ov194_021c0684(PartyPkm *pkm, BmpWin *window, int x, int y, Pok
     int i = 0;
     u32 params[] = { PKM_PARAM_ATTACK, PKM_PARAM_DEFENSE, PKM_PARAM_SP_ATTACK, PKM_PARAM_SP_DEFENSE, PKM_PARAM_SPEED };
     for (; i < 5; i++) {
-        GFL_MsgDataLoadStrbuf(wk->msgData, 40, wk->drawTemplate);
+        GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_20, wk->drawTemplate);
         WordSetNumber(wk->wordSet, 0, PokeParty_GetParam(pkm, params[i], NULL), 3, 1, TRUE);
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), x, y + i * 16, wk->drawStr, wk->font);
@@ -447,7 +450,7 @@ static void func_ov194_021c0684(PartyPkm *pkm, BmpWin *window, int x, int y, Pok
 
 // The label of the moves
 static void func_ov194_021c0750(PartyPkm *pkm, BmpWin *window, int x, int y, PokemonTradeWork *wk) {
-    GFL_MsgDataLoadStrbuf(wk->msgData, 44, wk->drawStr);
+    GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_MovesLearned, wk->drawStr);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), x, y, wk->drawStr, wk->font);
 }
 
@@ -457,7 +460,7 @@ static void func_ov194_021c0790(PartyPkm *pkm, BmpWin *window, int x, int y, Pok
     for (i = 0; i < 4; i++) {
         u32 move = PokeParty_GetParam(pkm, PKM_PARAM_MOVE1 + i, NULL);
         if (move != 0) {
-            GFL_MsgDataLoadStrbuf(wk->msgData, 45, wk->drawTemplate);
+            GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_24, wk->drawTemplate);
             loadMoveNameToStrbuf(wk->wordSet, 0, move);
             GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
             GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), x, y + i * 16, wk->drawStr, wk->font);
@@ -467,7 +470,7 @@ static void func_ov194_021c0790(PartyPkm *pkm, BmpWin *window, int x, int y, Pok
 
 // The nature
 static void func_ov194_021c0848(PartyPkm *pkm, BmpWin *window, int x, int y, PokemonTradeWork *wk) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, 27, wk->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_NATURES, wk->heapId);
     GFL_MsgDataLoadStrbuf(msgData, PokeParty_GetNature(pkm), wk->drawStr);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), x, y, wk->drawStr, wk->font);
     GFL_MsgDataFree(msgData);
@@ -475,7 +478,7 @@ static void func_ov194_021c0848(PartyPkm *pkm, BmpWin *window, int x, int y, Pok
 
 // The ability
 static void func_ov194_021c08ac(PartyPkm *pkm, BmpWin *window, int x, int y, PokemonTradeWork *wk) {
-    GFL_MsgDataLoadStrbuf(wk->msgData, 42, wk->drawTemplate);
+    GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_22, wk->drawTemplate);
     loadAbilityNameToStrbuf(wk->wordSet, 0, PokeParty_GetParam(pkm, PKM_PARAM_ABILITY, NULL));
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), x, y, wk->drawStr, wk->font);
@@ -564,7 +567,7 @@ void func_ov194_021c0b6c(PokemonTradeWork *wk, PartyPkm *pkm) {
         wk->unk11F9 = 1;
         GFL_VBlankTCBAdd(func_ov194_021c189c, wk, 0);
     }
-    func_ov139_02199d18(wk->touchBar, 1, TRUE);
+    TouchBar_SetIconVisible(wk->touchBar, 1, TRUE);
 }
 
 // The page of the Pokémon's summary on the lower screen: its stats (0) or its moves (1)
@@ -606,10 +609,10 @@ void func_ov194_021c0c04(PokemonTradeWork *wk, int page, PartyPkm *pkm) {
         if (!isEgg) {
             func_ov194_021c0750(pkm, wk->summaryWindow, 8, 0, wk);
             func_ov194_021c0790(pkm, wk->summaryWindow, 16, 16, wk);
-            GFL_MsgDataLoadStrbuf(wk->msgData, 36, wk->drawStr);
+            GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Nature, wk->drawStr);
             GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->summaryWindow), 8, 80, wk->drawStr, wk->font);
             func_ov194_021c0848(pkm, wk->summaryWindow, 16, 96, wk);
-            GFL_MsgDataLoadStrbuf(wk->msgData, 37, wk->drawStr);
+            GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Ability, wk->drawStr);
             GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(wk->summaryWindow), 8, 112, wk->drawStr, wk->font);
             func_ov194_021c08ac(pkm, wk->summaryWindow, 16, 128, wk);
         }
@@ -751,7 +754,7 @@ void func_ov194_021c12ec(PokemonTradeWork *wk, u32 a1) {
     infos[1] = wk->myInfo;
     GFL_TextRndUpdateColorIndexLUT(15, 2, 0);
     for (i = 0; i < 2; i++) {
-        GFL_MsgDataLoadStrbuf(wk->msgData, 129, wk->drawTemplate);
+        GFL_MsgDataLoadStrbuf(wk->msgData, AbilityHandlers3_Text_Empty_51, wk->drawTemplate);
         copyVarForText(wk->wordSet, 0, infos[i]);
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->drawStr, wk->drawTemplate);
         GFL_TextRendererDrawToBitmap(wk->negoBitmaps[i * 4], 0, 0, wk->drawStr, wk->font);
@@ -853,7 +856,7 @@ AppTaskMenuWin *func_ov194_021c1788(PokemonTradeWork *wk, u32 msg) {
     wk->menuWin = AppTaskMenuWin_CreateEx(wk->taskMenuRes, &wk->menuItems[0], 8, 21, 16, 3, 0, 1, wk->heapId);
     GFL_StrBufFree(wk->menuItems[0].str);
     func_0204c124(wk->actors[2], FALSE);
-    func_ov139_02199d18(wk->touchBar, 8, FALSE);
+    TouchBar_SetIconVisible(wk->touchBar, 8, FALSE);
     return wk->menuWin;
 }
 
@@ -866,7 +869,7 @@ void func_ov194_021c1820(PokemonTradeWork *wk, BOOL showActor, BOOL showButton) 
         func_0204c124(wk->actors[2], TRUE);
     }
     if (showButton) {
-        func_ov139_02199d18(wk->touchBar, 8, func_ov194_021bc098(wk));
+        TouchBar_SetIconVisible(wk->touchBar, 8, func_ov194_021bc098(wk));
     }
     if (wk->menuWin != NULL) {
         AppTaskMenuWin_Free(wk->menuWin);

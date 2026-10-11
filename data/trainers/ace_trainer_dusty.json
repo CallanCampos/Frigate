@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Dusty",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ROTOM",
+            "form": 0,
+            "level": 64,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_DISCHARGE", "MOVE_SHADOW_BALL", "MOVE_THUNDER_WAVE", "MOVE_REFLECT" ]
+        },
+        {
+            "species": "SPECIES_WEEZING",
+            "form": 0,
+            "level": 64,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_SLUDGE_BOMB", "MOVE_FIRE_BLAST", "MOVE_MEMENTO", "MOVE_WILL_O_WISP" ]
+        },
+        {
+            "species": "SPECIES_GENGAR",
+            "form": 0,
+            "level": 64,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_SHADOW_BALL", "MOVE_DARK_PULSE", "MOVE_FOCUS_BLAST", "MOVE_WILL_O_WISP" ]
+        },
+        {
+            "species": "SPECIES_EELEKTROSS",
+            "form": 0,
+            "level": 64,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_WILD_CHARGE", "MOVE_DRAGON_CLAW", "MOVE_GASTRO_ACID", "MOVE_COIL" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "And I was so excited, too..."
+        }
+    ]
+}

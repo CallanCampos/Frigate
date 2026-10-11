@@ -1,0 +1,19 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 8029,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 157,
+                "y": 404,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [],
+    "warps": [],
+    "triggers": [],
+    "init_scripts": []
+}

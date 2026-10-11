@@ -1,18 +1,18 @@
-ENTRALINK
-XTRANSCEIVER
-Union Room
-{0201:0} Ppl
-Wireless Distribution
-YES
-NO
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-                              \x{ffff}
-                     \x{ffff}
-C-Gear Detected
-    \x{ffff}
-    \x{ffff}
-            \x{ffff}
-               \x{ffff}
-            \x{ffff}
+Bank0026_Text_Entralink = ENTRALINK
+Bank0026_Text_Xtransceiver = XTRANSCEIVER
+Bank0026_Text_UnionRoom = Union Room
+Bank0026_Text_Ppl = {0201:0} Ppl
+Bank0026_Text_WirelessDistribution = Wireless Distribution
+Bank0026_Text_Yes = YES
+Bank0026_Text_No = NO
+Bank0026_Text_Empty =     \x{ffff}
+Bank0026_Text_Empty_2 =     \x{ffff}
+Bank0026_Text_Empty_3 =     \x{ffff}
+Bank0026_Text_Empty_4 =                               \x{ffff}
+Bank0026_Text_Empty_5 =                      \x{ffff}
+Bank0026_Text_CGearDetected = C-Gear Detected
+Bank0026_Text_Empty_6 =     \x{ffff}
+Bank0026_Text_Empty_7 =     \x{ffff}
+Bank0026_Text_Empty_8 =             \x{ffff}
+Bank0026_Text_Empty_9 =                \x{ffff}
+Bank0026_Text_Empty_10 =             \x{ffff}

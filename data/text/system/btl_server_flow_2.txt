@@ -1,0 +1,18 @@
+BtlServerFlow2_Text_Mailbox = MAILBOX
+BtlServerFlow2_Text_Empty =     \x{ffff}
+BtlServerFlow2_Text_Empty_2 =     \x{ffff}
+BtlServerFlow2_Text_Cancel = CANCEL
+BtlServerFlow2_Text_Close = CLOSE
+BtlServerFlow2_Text_Read = READ
+BtlServerFlow2_Text_Erase = ERASE
+BtlServerFlow2_Text_Give = GIVE
+BtlServerFlow2_Text_Cancel_2 = CANCEL
+BtlServerFlow2_Text_WhatWouldLikeS = What would you like to do with\n{0100:0}'s Mail?
+BtlServerFlow2_Text_MessageWillLostOk = The message will be lost.\nIs that OK?
+BtlServerFlow2_Text_MessageErased = The message was erased.
+BtlServerFlow2_Text_LetPokemonHoldMail = Let a Pokémon hold this Mail?
+BtlServerFlow2_Text_MailsMessageErasedPut = The Mail's message was erased,\nand it was put in the Bag.
+BtlServerFlow2_Text_BagFullMailDiscarded = Your Bag is full...\nThe Mail was discarded.
+BtlServerFlow2_Text_Yes = YES
+BtlServerFlow2_Text_No = NO
+\pad{e0}

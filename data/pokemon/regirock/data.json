@@ -1,0 +1,177 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Regirock",
+    "pokedex": {
+        "category": "Rock Peak Pokémon",
+        "entry": "Its entire body is made of rock.\nIf any part chips off in battle, it\nattaches rocks to repair itself.",
+        "height": "5'07\"",
+        "weight": "507.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Regirock",
+                "category": "Rock Peak Pokémon",
+                "entry": "Its entire body is made of rock.\nIf any part chips off in battle, it\nattaches rocks to repair itself.",
+                "height": "5'07\"",
+                "weight": "507.1 lbs."
+            },
+            "fr": {
+                "name": "Regirock",
+                "category": "Pokémon Pic Rocheux",
+                "entry": "Tout son corps est fait de roche.\nS'il s'ébrèche au combat, il utilise\ndes pierres pour le réparer.",
+                "height": "1,7 m",
+                "weight": "230,0 kg"
+            },
+            "de": {
+                "name": "Regirock",
+                "category": "Steingipfel",
+                "entry": "Sein Körper besteht aus Stein. Bricht\nim Kampf etwas heraus, wird es durch\nStein wieder ersetzt.",
+                "height": "1,7 m",
+                "weight": "230,0 kg"
+            },
+            "it": {
+                "name": "Regirock",
+                "category": "Pokémon Picco",
+                "entry": "È formato interamente da rocce.\nSe si staccano nella lotta, ne cerca\naltre per sostituirle.",
+                "height": "1,7 m",
+                "weight": "230,0 kg"
+            },
+            "ko": {
+                "name": "레지락",
+                "category": "바위산포켓몬",
+                "entry": "전신이 바위로 되어 있다.\n싸움으로 몸이 깨어져도\n바위를 붙여서 치료해 버린다.",
+                "height": "1.7 m",
+                "weight": "230.0 kg"
+            },
+            "es": {
+                "name": "Regirock",
+                "category": "Pokémon Pico Roca",
+                "entry": "Su cuerpo está hecho de roca.\nSi se astilla durante el combate,\nemplea piedras para repararlo.",
+                "height": "1,7 m",
+                "weight": "230,0 kg"
+            },
+            "ja": {
+                "name": "レジロック",
+                "category": "いわやまポケモン",
+                "entry": "ぜんしんが\\x{3000}いわで\\x{3000}できている。\nたたかいで\\x{3000}からだが\\x{3000}かけても\nいわを\\x{3000}くっつけて\\x{3000}なおしてしまう。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff13}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 100,
+        "defense": 200,
+        "speed": 50,
+        "special_attack": 50,
+        "special_defense": 100
+    },
+    "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+    "catch_rate": 3,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 3,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 80,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_CLEAR_BODY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_STURDY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 261,
+    "height": 17,
+    "weight": 2300,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_EXPLOSION" ],
+            [ 1, "MOVE_STOMP" ],
+            [ 9, "MOVE_ROCK_THROW" ],
+            [ 17, "MOVE_CURSE" ],
+            [ 25, "MOVE_SUPERPOWER" ],
+            [ 33, "MOVE_ANCIENT_POWER" ],
+            [ 41, "MOVE_IRON_DEFENSE" ],
+            [ 49, "MOVE_CHARGE_BEAM" ],
+            [ 57, "MOVE_LOCK_ON" ],
+            [ 65, "MOVE_ZAP_CANNON" ],
+            [ 73, "MOVE_STONE_EDGE" ],
+            [ 81, "MOVE_HAMMER_ARM" ],
+            [ 89, "MOVE_HYPER_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM23",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM57",
+            "TM64",
+            "TM68",
+            "TM69",
+            "TM71",
+            "TM73",
+            "TM77",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_GRAVITY",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SUPERPOWER",
+            "MOVE_SNORE",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_REGIROCK"
+}

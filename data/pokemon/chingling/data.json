@@ -1,0 +1,188 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Chingling",
+    "pokedex": {
+        "category": "Bell Pokémon",
+        "entry": "There is an orb inside its mouth.\nWhen it hops, the orb bounces all\nover and makes a ringing sound.",
+        "height": "0'08\"",
+        "weight": "1.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Chingling",
+                "category": "Bell Pokémon",
+                "entry": "There is an orb inside its mouth.\nWhen it hops, the orb bounces all\nover and makes a ringing sound.",
+                "height": "0'08\"",
+                "weight": "1.3 lbs."
+            },
+            "fr": {
+                "name": "Korillon",
+                "category": "Pokémon Clochette",
+                "entry": "Quand il sautille, l'orbe qu'il a\ndans la bouche s'agite et tinte\ncomme une cloche.",
+                "height": "0,2 m",
+                "weight": "0,6 kg"
+            },
+            "de": {
+                "name": "Klingplim",
+                "category": "Glöckchen",
+                "entry": "In seinem Maul befindet sich\neine Kugel, die beim Hopsen ein\nklingelndes Geräusch erzeugt.",
+                "height": "0,2 m",
+                "weight": "0,6 kg"
+            },
+            "it": {
+                "name": "Chingling",
+                "category": "Pokémon Sonaglio",
+                "entry": "Ha una sfera nella gola. Quando saltella,\nla sfera si muove emettendo dei trilli.",
+                "height": "0,2 m",
+                "weight": "0,6 kg"
+            },
+            "ko": {
+                "name": "랑딸랑",
+                "category": "방울포켓몬",
+                "entry": "뛰어오르면 입 안에 있는\n구슬이 사방에 반사되어\n방울 같은 음색을 만들어 낸다.",
+                "height": "0.2 m",
+                "weight": "0.6 kg"
+            },
+            "es": {
+                "name": "Chingling",
+                "category": "Pokémon Campana",
+                "entry": "Tiene una esfera en la boca.\nCuando salta, la esfera rebota\ny emite un zumbido.",
+                "height": "0,2 m",
+                "weight": "0,6 kg"
+            },
+            "ja": {
+                "name": "リーシャン",
+                "category": "すずポケモン",
+                "entry": "とびはねると\\x{3000}くちのなかにある\nたまが\\x{3000}あちこちに\\x{3000}はんしゃして\nすずのような\\x{3000}ねいろと\\x{3000}なる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 30,
+        "defense": 50,
+        "speed": 45,
+        "special_attack": 65,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 120,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_COLBUR_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 57,
+    "height": 2,
+    "weight": 6,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_WRAP" ],
+            [ 6, "MOVE_GROWL" ],
+            [ 9, "MOVE_ASTONISH" ],
+            [ 14, "MOVE_CONFUSION" ],
+            [ 17, "MOVE_UPROAR" ],
+            [ 22, "MOVE_LAST_RESORT" ],
+            [ 25, "MOVE_ENTRAINMENT" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM57",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_LAST_RESORT",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_HEAL_BELL",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": [
+            "MOVE_DISABLE",
+            "MOVE_CURSE",
+            "MOVE_HYPNOSIS",
+            "MOVE_WISH",
+            "MOVE_FUTURE_SIGHT",
+            "MOVE_RECOVER",
+            "MOVE_STORED_POWER",
+            "MOVE_SKILL_SWAP"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_FRIENDSHIP_NIGHT",
+            "param": 0,
+            "species": "SPECIES_CHIMECHO"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CHINGLING"
+}

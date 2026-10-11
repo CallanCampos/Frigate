@@ -1,51 +1,51 @@
-None
-Hokkaido (Sapporo)
-Hokkaido (Hakodate)
-Hokkaido (Wakkanai)
-Hokkaido (Kushiro)
-Aomori
-Iwate
-Miyagi
-Akita
-Yamagata
-Fukushima
-Ibaraki
-Tochigi
-Gunma
-Saitama
-Chiba
-Tokyo
-Kanagawa
-Niigata
-Toyama
-Ishikawa
-Fukui
-Yamanashi
-Nagano
-Gifu
-Shizuoka
-Aichi
-Mie
-Shiga
-Kyoto
-Osaka
-Hyogo
-Nara
-Wakayama
-Tottori
-Shimane
-Okayama
-Hiroshima
-Yamaguchi
-Tokushima
-Kagawa
-Ehime
-Kochi
-Fukuoka
-Saga
-Nagasaki
-Kumamoto
-Oita
-Miyazaki
-Kagoshima
-Okinawa
+Bank0431_Text_None = None
+Bank0431_Text_HokkaidoSapporo = Hokkaido (Sapporo)
+Bank0431_Text_HokkaidoHakodate = Hokkaido (Hakodate)
+Bank0431_Text_HokkaidoWakkanai = Hokkaido (Wakkanai)
+Bank0431_Text_HokkaidoKushiro = Hokkaido (Kushiro)
+Bank0431_Text_Aomori = Aomori
+Bank0431_Text_Iwate = Iwate
+Bank0431_Text_Miyagi = Miyagi
+Bank0431_Text_Akita = Akita
+Bank0431_Text_Yamagata = Yamagata
+Bank0431_Text_Fukushima = Fukushima
+Bank0431_Text_Ibaraki = Ibaraki
+Bank0431_Text_Tochigi = Tochigi
+Bank0431_Text_Gunma = Gunma
+Bank0431_Text_Saitama = Saitama
+Bank0431_Text_Chiba = Chiba
+Bank0431_Text_Tokyo = Tokyo
+Bank0431_Text_Kanagawa = Kanagawa
+Bank0431_Text_Niigata = Niigata
+Bank0431_Text_Toyama = Toyama
+Bank0431_Text_Ishikawa = Ishikawa
+Bank0431_Text_Fukui = Fukui
+Bank0431_Text_Yamanashi = Yamanashi
+Bank0431_Text_Nagano = Nagano
+Bank0431_Text_Gifu = Gifu
+Bank0431_Text_Shizuoka = Shizuoka
+Bank0431_Text_Aichi = Aichi
+Bank0431_Text_Mie = Mie
+Bank0431_Text_Shiga = Shiga
+Bank0431_Text_Kyoto = Kyoto
+Bank0431_Text_Osaka = Osaka
+Bank0431_Text_Hyogo = Hyogo
+Bank0431_Text_Nara = Nara
+Bank0431_Text_Wakayama = Wakayama
+Bank0431_Text_Tottori = Tottori
+Bank0431_Text_Shimane = Shimane
+Bank0431_Text_Okayama = Okayama
+Bank0431_Text_Hiroshima = Hiroshima
+Bank0431_Text_Yamaguchi = Yamaguchi
+Bank0431_Text_Tokushima = Tokushima
+Bank0431_Text_Kagawa = Kagawa
+Bank0431_Text_Ehime = Ehime
+Bank0431_Text_Kochi = Kochi
+Bank0431_Text_Fukuoka = Fukuoka
+Bank0431_Text_Saga = Saga
+Bank0431_Text_Nagasaki = Nagasaki
+Bank0431_Text_Kumamoto = Kumamoto
+Bank0431_Text_Oita = Oita
+Bank0431_Text_Miyazaki = Miyazaki
+Bank0431_Text_Kagoshima = Kagoshima
+Bank0431_Text_Okinawa = Okinawa

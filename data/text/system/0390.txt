@@ -1,8 +1,8 @@
-Hi there, {0100:0}!\nI'm Professor Juniper!{be01}\nBianca told me you accepted\nthe Pokédex!{be00}\nThank you so much!{be01}\nThanks to you, we will all know more about\nPokémon and be able to get along with{be00}\nthem even better!{be01}
-Hi, Professor Juniper!\nIt's really interesting over here!{be01}\nThere are sooo many Pokémon we\ncouldn't prove were here two years ago!{be01}
-Thank you for going\nso far for this errand, Bianca.{be01}\nAnd, Cheren, how are you enjoying\nbeing a Gym Leader?{be01}
-Professor Juniper, it's been a long time.\nI'm glad you're doing so well.{be01}\nThe Gym Leader position\nis very tough...{be01}\nIf I had my usual partners...{be01}
-Oh, Cheren...{be01}\nHaving battles that come down to the wire\nwill make you a Gym Leader who deepens{be00}\nthe bonds between your challengers{be00}\nand their Pokémon, right?{be01}
-It'll be fine!{be01}\nCheren's a new Gym Leader,\nI'm an Assistant Pokémon Professor,{be00}\nand {0100:0} is a new Trainer,{be00}\nbut we always have Pokémon by our sides!{be01}
-That's right, Bianca!{be01}\nOur world is a world where\nwe live with Pokémon.{be01}\nEveryone!\nKeep that in mind as you pursue{be00}\nyour dreams with your Pokémon!{be01}\nParticularly you, {0100:0}!\nThe Pokédex may be important, but...{be01}\nFirst, enjoy your journey with your\nPokémon to your heart's content!{be01}
+Bank0390_Text_HiThereImProfessor = Hi there, {0100:0}!\nI'm Professor Juniper!{be01}\nBianca told me you accepted\nthe Pokédex!{be00}\nThank you so much!{be01}\nThanks to you, we will all know more about\nPokémon and be able to get along with{be00}\nthem even better!{be01}
+Bank0390_Text_HiProfessorJuniperIts = Hi, Professor Juniper!\nIt's really interesting over here!{be01}\nThere are sooo many Pokémon we\ncouldn't prove were here two years ago!{be01}
+Bank0390_Text_ThankGoingFarErrand = Thank you for going\nso far for this errand, Bianca.{be01}\nAnd, Cheren, how are you enjoying\nbeing a Gym Leader?{be01}
+Bank0390_Text_ProfessorJuniperItsBeen = Professor Juniper, it's been a long time.\nI'm glad you're doing so well.{be01}\nThe Gym Leader position\nis very tough...{be01}\nIf I had my usual partners...{be01}
+Bank0390_Text_OhCherenHavingBattles = Oh, Cheren...{be01}\nHaving battles that come down to the wire\nwill make you a Gym Leader who deepens{be00}\nthe bonds between your challengers{be00}\nand their Pokémon, right?{be01}
+Bank0390_Text_ItllFineCherensNew = It'll be fine!{be01}\nCheren's a new Gym Leader,\nI'm an Assistant Pokémon Professor,{be00}\nand {0100:0} is a new Trainer,{be00}\nbut we always have Pokémon by our sides!{be01}
+Bank0390_Text_ThatsRightBiancaOur = That's right, Bianca!{be01}\nOur world is a world where\nwe live with Pokémon.{be01}\nEveryone!\nKeep that in mind as you pursue{be00}\nyour dreams with your Pokémon!{be01}\nParticularly you, {0100:0}!\nThe Pokédex may be important, but...{be01}\nFirst, enjoy your journey with your\nPokémon to your heart's content!{be01}
 \pad{92}

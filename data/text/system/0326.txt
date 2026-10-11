@@ -1,42 +1,42 @@
-SCENARIO
-SCENE 01
-SCENE 02
-SCENE 03
-SCENE 04
-SCENE 05
-SCENE 06
-SCENE 07
-SCENE 08
-SCENE 09
-SCENE 10
-SCENE 11
-SCENE 12
-SCENE 13
-SCENE 14
-SCENE 15
-SCENE 16
-SCENE 17
-SCENE 18
-SCENE 19
-SCENE 20
-The line you choose is important!
-Use the weather!
-The line you choose is important!\nDon't be afraid to make sacrifices!
-Use a move the foe's type is weak to!
-Use a move the foe's type is weak to!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-Deliver a decisive blow!
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0326_Text_Scenario = SCENARIO
+Bank0326_Text_Scene01 = SCENE 01
+Bank0326_Text_Scene02 = SCENE 02
+Bank0326_Text_Scene03 = SCENE 03
+Bank0326_Text_Scene04 = SCENE 04
+Bank0326_Text_Scene05 = SCENE 05
+Bank0326_Text_Scene06 = SCENE 06
+Bank0326_Text_Scene07 = SCENE 07
+Bank0326_Text_Scene08 = SCENE 08
+Bank0326_Text_Scene09 = SCENE 09
+Bank0326_Text_Scene10 = SCENE 10
+Bank0326_Text_Scene11 = SCENE 11
+Bank0326_Text_Scene12 = SCENE 12
+Bank0326_Text_Scene13 = SCENE 13
+Bank0326_Text_Scene14 = SCENE 14
+Bank0326_Text_Scene15 = SCENE 15
+Bank0326_Text_Scene16 = SCENE 16
+Bank0326_Text_Scene17 = SCENE 17
+Bank0326_Text_Scene18 = SCENE 18
+Bank0326_Text_Scene19 = SCENE 19
+Bank0326_Text_Scene20 = SCENE 20
+Bank0326_Text_LineChooseImportant = The line you choose is important!
+Bank0326_Text_UseWeather = Use the weather!
+Bank0326_Text_LineChooseImportantDont = The line you choose is important!\nDon't be afraid to make sacrifices!
+Bank0326_Text_UseMoveFoesType = Use a move the foe's type is weak to!
+Bank0326_Text_UseMoveFoesType_2 = Use a move the foe's type is weak to!
+Bank0326_Text_DeliverDecisiveBlow = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_2 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_3 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_4 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_5 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_6 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_7 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_8 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_9 = Deliver a decisive blow!
+Bank0326_Text_DeliverDecisiveBlow_10 = Deliver a decisive blow!
+Bank0326_Text_Empty = なし
+Bank0326_Text_Empty_2 = なし
+Bank0326_Text_Empty_3 = なし
+Bank0326_Text_Empty_4 = なし
+Bank0326_Text_Empty_5 = なし
+Bank0326_Text_Empty_6 = なし

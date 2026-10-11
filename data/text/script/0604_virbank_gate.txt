@@ -1,6 +1,0 @@
-Hello!\nOh, you...{be01}
-You are with one Pokémon!\nYou love {0101:0} very much, right?{be01}\nBut are you OK?\nYou'll be in trouble when you encounter{be00}\nPokémon that {0101:0} is weak against.{be01}\nHere! I'll give you these,\nso you can have more Pokémon.{be01}
-You are with {0200:1} Pokémon.{be01}\nBut if you have more Pokémon,\nyour journey should be even more fun!{be01}\nHere! I'll give you these,\nso why don't you catch more Pokémon?{be01}
-You know what they say.\nCheerful company shortens the miles!
-Do you know about Audino, the Pokémon\nwho hide in rustling grass?{be01}\nI wonder why Audino give other Pokémon\nso many Exp. Points.
-When we walk, grass rustles!\nIt's Pokémon hide-and-seek!

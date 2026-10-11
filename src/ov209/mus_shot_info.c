@@ -2,6 +2,7 @@
 #include "app/musical/mus_shot_info.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/musical.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -29,6 +30,7 @@
 #include "system/text_speed.h"
 #include "system/time_icon.h"
 #include "system/wipe.h"
+#include "text/system/btl_pokeparam_2.h"
 
 // Overlay 209's mus_shot_info.c: the touch screen under a musical's photo. Right after a musical it asks whether to
 // keep the photo, replacing the one in the save; otherwise it waits for the return button
@@ -325,7 +327,7 @@ static void MusShotInfo_InitMessage(MusShotInfo *info) {
     BmpWin_FlushMap(info->msgWin);
     GFL_BGSysLoadScr(4);
     info->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, info->heapId);
-    info->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 99, info->heapId);
+    info->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_2, info->heapId);
     LoadSysMsgBox(4, 1, 11, 0, info->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x140, 0x20, info->heapId);
     func_020232d8();
@@ -388,8 +390,8 @@ static void MusShotInfo_CreateMenu(MusShotInfo *info) {
     AppTaskMenuItem items[2];
     AppTaskMenuInit init;
 
-    items[0].str = GFL_MsgDataLoadStrbufNew(info->msgData, 4);
-    items[1].str = GFL_MsgDataLoadStrbufNew(info->msgData, 5);
+    items[0].str = GFL_MsgDataLoadStrbufNew(info->msgData, BtlPokeparam2_Text_Yes);
+    items[1].str = GFL_MsgDataLoadStrbufNew(info->msgData, BtlPokeparam2_Text_No);
     items[0].color = PRINT_COLOR(14, 15, 0);
     items[1].color = PRINT_COLOR(14, 15, 0);
     items[0].type = 0;

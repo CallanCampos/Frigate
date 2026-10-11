@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Brent",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_BRENT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 56,
+            "difficulty": 64,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SCOPE_LENS",
+            "moves": [ "MOVE_AIR_CUTTER", "MOVE_STEEL_WING", "MOVE_QUICK_ATTACK", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_EELEKTRIK",
+            "form": 0,
+            "level": 56,
+            "difficulty": 64,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_WISE_GLASSES",
+            "moves": [ "MOVE_DISCHARGE", "MOVE_CRUNCH", "MOVE_SIGNAL_BEAM", "MOVE_THUNDER_WAVE" ]
+        },
+        {
+            "species": "SPECIES_AUDINO",
+            "form": 0,
+            "level": 56,
+            "difficulty": 64,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_EXPERT_BELT",
+            "moves": [ "MOVE_ICE_BEAM", "MOVE_THUNDERBOLT", "MOVE_FLAMETHROWER", "MOVE_ATTRACT" ]
+        }
+    ],
+    "messages": []
+}

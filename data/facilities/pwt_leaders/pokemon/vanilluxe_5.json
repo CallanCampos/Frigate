@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VANILLUXE",
+    "moves": [ "MOVE_TAUNT", "MOVE_ICE_BEAM", "MOVE_ACID_ARMOR", "MOVE_MIRROR_COAT" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

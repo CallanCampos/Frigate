@@ -1,0 +1,13 @@
+BtlMain4_Text_Empty =                                \x{ffff}
+BtlMain4_Text_Empty_2 =                             \x{ffff}
+BtlMain4_Text_YouveCreatedInfraredConnection = You've created an Infrared Connection!
+BtlMain4_Text_CreateInfraredConnectionStart = Create an Infrared Connection to start\nthe Feeling Check with someone.
+BtlMain4_Text_CheckingPleaseMaintainInfrared = Checking...\nPlease maintain the Infrared Connection.
+BtlMain4_Text_TapMenuTouchScreen = Tap the menu in the Touch Screen\nto begin!
+BtlMain4_Text_BeginCheck = BEGIN CHECK
+BtlMain4_Text_Ranking = RANKING
+BtlMain4_Text_Cancel = CANCEL
+BtlMain4_Text_Back = BACK
+BtlMain4_Text_FeelingCheck = FEELING CHECK
+BtlMain4_Text_Empty_3 =                     \x{ffff}
+\pad{da}

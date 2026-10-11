@@ -2,6 +2,7 @@
 #include "app/name_entry.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
+#include "constants/script_text_banks.h"
 #include "constants/sound.h"
 #include "demo/egg_demo.h"
 #include "field/player_state.h"
@@ -607,7 +608,7 @@ static void EggDemo_InitMsg(EggDemoParam *param, EggDemoWork *wk) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->window), 15);
     BmpWin_FlushChar(wk->window);
     wk->frameChars = LoadCursorImageEndOfHeap(1, 2, 0, wk->heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, 408, wk->heapId);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2250, wk->heapId);
     wk->tcbManager = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 1, 0);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     GFL_BGSysQueueScrLoad(1);

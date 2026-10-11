@@ -1,13 +1,13 @@
-You will communicate with your opponent\nvia Infrared Connection.{be01}\nPlease face your Game Card\nat your opponent's Game Card{be00}\nand press the A Button.
-The selected tournaments do not match.
-An opponent has been found!
-The battle will be started.\nPlease press the A Button.
-You won.
-You lost.
-It's a draw.
-Communicating.
-Participate in the Wi-Fi Competition
-Participate in a Live Competition
-Check your Digital Player ID
-EXIT
+Bank0057_Text_WillCommunicateOpponentVia = You will communicate with your opponent\nvia Infrared Connection.{be01}\nPlease face your Game Card\nat your opponent's Game Card{be00}\nand press the A Button.
+Bank0057_Text_SelectedTournamentsNotMatch = The selected tournaments do not match.
+Bank0057_Text_OpponentHasBeenFound = An opponent has been found!
+Bank0057_Text_BattleWillStartedPlease = The battle will be started.\nPlease press the A Button.
+Bank0057_Text_Won = You won.
+Bank0057_Text_Lost = You lost.
+Bank0057_Text_ItsDraw = It's a draw.
+Bank0057_Text_Communicating = Communicating.
+Bank0057_Text_ParticipateWiFiCompetition = Participate in the Wi-Fi Competition
+Bank0057_Text_ParticipateLiveCompetition = Participate in a Live Competition
+Bank0057_Text_CheckDigitalPlayerId = Check your Digital Player ID
+Bank0057_Text_Exit = EXIT
 \pad{ac}

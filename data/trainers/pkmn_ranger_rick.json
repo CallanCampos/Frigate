@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rick",
+    "class": "TRAINER_CLASS_PKMN_RANGER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_LUM_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_VIGOROTH",
+            "form": 0,
+            "level": 64,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_STANTLER",
+            "form": 0,
+            "level": 64,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_VICTREEBEL",
+            "form": 0,
+            "level": 64,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I am not running now,\nbut I usually barrel through{be00}\nas quickly as I can!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I have not crossed\nthe finish line of victory!"
+        },
+        {
+            "type": 15,
+            "text": "I'm going to use this little rest\nto give you this present!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Run and run in cities\nand on mountain paths!{be01}\nRun, and feel the world around you\nwith your whole being!"
+        }
+    ]
+}

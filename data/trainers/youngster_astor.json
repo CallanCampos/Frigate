@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Astor",
+    "class": "TRAINER_CLASS_YOUNGSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PALPITOAD",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CROAGUNK",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_VAPOREON",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My Pokémon are gonna steam you out!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "We haven't lost in terms of dampness...\nI'm gonna keep believing that!"
+        },
+        {
+            "type": 2,
+            "text": "It sure is great to be all sodden.{be01}\nWho was the one who got to decide that\nbright, airy places are best?"
+        }
+    ]
+}

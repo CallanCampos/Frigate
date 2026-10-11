@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Mai",
+    "class": "TRAINER_CLASS_LASS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SHELMET",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SLUGMA",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GASTRODON",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Is that a Pokédex?!{be01}\nI'd love it if you would show me\nlots of different kinds of Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "...!\nI've never seen a Pokémon like that."
+        },
+        {
+            "type": 2,
+            "text": "Hmm... I wonder if I would meet some new\nPokémon if I went to the swamp?"
+        }
+    ]
+}

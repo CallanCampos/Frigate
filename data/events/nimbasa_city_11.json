@@ -1,0 +1,276 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": 133,
+            "movement": 0,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x0286",
+            "script": 3071,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 8,
+                "z": 20,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": 133,
+            "movement": 0,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x0287",
+            "script": 3072,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 13,
+                "z": 16,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": 133,
+            "movement": 0,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x0288",
+            "script": 3068,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 8,
+                "z": 12,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": 20,
+            "movement": 0,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x0289",
+            "script": 3078,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 11,
+                "z": 20,
+                "y": 0
+            }
+        },
+        {
+            "id": 4,
+            "model": 22,
+            "movement": 0,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x028a",
+            "script": 3087,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 8,
+                "z": 15,
+                "y": 0
+            }
+        },
+        {
+            "id": 5,
+            "model": 163,
+            "movement": 3,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x028b",
+            "script": 3097,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 13,
+                "z": 12,
+                "y": 0
+            }
+        },
+        {
+            "id": 6,
+            "model": 164,
+            "movement": 3,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x028c",
+            "script": 3097,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 11,
+                "z": 14,
+                "y": 0
+            }
+        },
+        {
+            "id": 7,
+            "model": 165,
+            "movement": 2,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x028d",
+            "script": 3097,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 7,
+                "z": 17,
+                "y": 0
+            }
+        },
+        {
+            "id": 8,
+            "model": 133,
+            "movement": 11,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 19,
+                "z": 16,
+                "y": 0
+            }
+        },
+        {
+            "id": 9,
+            "model": 133,
+            "movement": 38,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 2,
+                "height": 4
+            },
+            "grid": {
+                "x": 23,
+                "z": 14,
+                "y": 0
+            }
+        },
+        {
+            "id": 10,
+            "model": 20,
+            "movement": 0,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x0289",
+            "script": 5078,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 11,
+                "z": 21,
+                "y": 0
+            }
+        },
+        {
+            "id": 11,
+            "model": 22,
+            "movement": 0,
+            "type": 1,
+            "flag": "EVENT_FLAG_0x028a",
+            "script": 5087,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 9,
+                "z": 15,
+                "y": 0
+            }
+        },
+        {
+            "id": 12,
+            "model": 314,
+            "movement": 20,
+            "type": 0,
+            "flag": 0,
+            "script": 4,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 5
+            },
+            "grid": {
+                "x": 21,
+                "z": 18,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_NIMBASA_CITY_8",
+            "warp": 2,
+            "unk4": 0,
+            "transition": 5,
+            "grid": {
+                "x": 104,
+                "y": 0,
+                "z": 408,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": [
+        {
+            "type": 2,
+            "script": 1
+        }
+    ]
+}

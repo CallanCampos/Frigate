@@ -1,0 +1,160 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Electrode",
+    "pokedex": {
+        "category": "Ball Pokémon",
+        "entry": "It is known to drift on winds if it\nis bloated to bursting with stored\nelectricity.",
+        "height": "3'11\"",
+        "weight": "146.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Electrode",
+                "category": "Ball Pokémon",
+                "entry": "It is known to drift on winds if it\nis bloated to bursting with stored\nelectricity.",
+                "height": "3'11\"",
+                "weight": "146.8 lbs."
+            },
+            "fr": {
+                "name": "Électrode",
+                "category": "Pokémon Balle",
+                "entry": "Il se laisse porter par les vents\nlorsque son corps est gonflé\nd'électricité à en éclater.",
+                "height": "1,2 m",
+                "weight": "66,6 kg"
+            },
+            "de": {
+                "name": "Lektrobal",
+                "category": "Ball",
+                "entry": "Es lässt sich vom Wind treiben,\nwenn es so voller Elektrizität ist,\ndass es fast explodiert.",
+                "height": "1,2 m",
+                "weight": "66,6 kg"
+            },
+            "it": {
+                "name": "Electrode",
+                "category": "Pokémon Ball",
+                "entry": "Quando ha accumulato elettricità fino\nquasi a scoppiare, si fa trasportare\ndal vento.",
+                "height": "1,2 m",
+                "weight": "66,6 kg"
+            },
+            "ko": {
+                "name": "붐볼",
+                "category": "볼포켓몬",
+                "entry": "전기 에너지를 너무 모아서\n팽팽히 부풀어오른 붐볼이\n바람에 날려오는 경우가 있다.",
+                "height": "1.2 m",
+                "weight": "66.6 kg"
+            },
+            "es": {
+                "name": "Electrode",
+                "category": "Pokémon Bola",
+                "entry": "Se lo lleva el viento si se hincha\ncon la electricidad que almacena.",
+                "height": "1,2 m",
+                "weight": "66,6 kg"
+            },
+            "ja": {
+                "name": "マルマイン",
+                "category": "ボールポケモン",
+                "entry": "でんきエネルギーを\\x{3000}ためすぎて\nぱんぱんに\\x{3000}ふくらんだ\\x{3000}マルマインが\nかぜに\\x{3000}ながされてくることが\\x{3000}ある。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff16}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 50,
+        "defense": 70,
+        "speed": 140,
+        "special_attack": 80,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_SOUNDPROOF", "ABILITY_STATIC" ],
+    "hidden_ability": "ABILITY_AFTERMATH",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 168,
+    "height": 12,
+    "weight": 666,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CHARGE" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_SONIC_BOOM" ],
+            [ 1, "MOVE_SPARK" ],
+            [ 5, "MOVE_TACKLE" ],
+            [ 8, "MOVE_SONIC_BOOM" ],
+            [ 12, "MOVE_SPARK" ],
+            [ 15, "MOVE_ROLLOUT" ],
+            [ 19, "MOVE_SCREECH" ],
+            [ 22, "MOVE_CHARGE_BEAM" ],
+            [ 26, "MOVE_LIGHT_SCREEN" ],
+            [ 29, "MOVE_ELECTRO_BALL" ],
+            [ 35, "MOVE_SELFDESTRUCT" ],
+            [ 40, "MOVE_SWIFT" ],
+            [ 46, "MOVE_MAGNET_RISE" ],
+            [ 51, "MOVE_GYRO_BALL" ],
+            [ 57, "MOVE_EXPLOSION" ],
+            [ 62, "MOVE_MIRROR_COAT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM12",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM64",
+            "TM68",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM74",
+            "TM87",
+            "TM90",
+            "TM93"
+        ],
+        "by_tutor": [ "MOVE_SIGNAL_BEAM", "MOVE_MAGIC_COAT", "MOVE_FOUL_PLAY", "MOVE_MAGNET_RISE", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_VOLTORB"
+}

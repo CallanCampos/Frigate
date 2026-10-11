@@ -1,8 +1,8 @@
-In Party
-Battle Box
-Cancel
-Please select whether to use your\nparty Pokémon or your Battle Box.
-L{0202:0}
-{ff00:2}⑭{ff00:0}
-{ff00:1}⑮{ff00:0}
+Bank0104_Text_Party = In Party
+Bank0104_Text_BattleBox = Battle Box
+Bank0104_Text_Cancel = Cancel
+Bank0104_Text_PleaseSelectWhetherUse = Please select whether to use your\nparty Pokémon or your Battle Box.
+Bank0104_Text_L = L{0202:0}
+Bank0104_Text_Empty = {ff00:2}⑭{ff00:0}
+Bank0104_Text_Empty_2 = {ff00:1}⑮{ff00:0}
 \pad{1a}

@@ -1,28 +1,28 @@
-None
-Acre
-Rondônia
-Alagoas
-Amapá
-Amazonas
-Bahia
-Ceará
-Federal District
-Espírito Santo
-Goias
-Maranhão
-Mato Grosso
-Mato Grosso do Sul
-Minas Gerais
-Pará
-Paraíba
-Paraná
-Pernambuco
-Piauí
-Rio de Janeiro
-Rio Grande do Sul
-Rio Grande do Norte
-Roraima
-Santa Catarina
-São Paulo
-Sergipe
-Tocantins
+Bank0421_Text_None = None
+Bank0421_Text_Acre = Acre
+Bank0421_Text_RondNia = Rondônia
+Bank0421_Text_Alagoas = Alagoas
+Bank0421_Text_Amap = Amapá
+Bank0421_Text_Amazonas = Amazonas
+Bank0421_Text_Bahia = Bahia
+Bank0421_Text_Cear = Ceará
+Bank0421_Text_FederalDistrict = Federal District
+Bank0421_Text_EspRitoSanto = Espírito Santo
+Bank0421_Text_Goias = Goias
+Bank0421_Text_MaranhO = Maranhão
+Bank0421_Text_MatoGrosso = Mato Grosso
+Bank0421_Text_MatoGrossoSul = Mato Grosso do Sul
+Bank0421_Text_MinasGerais = Minas Gerais
+Bank0421_Text_Par = Pará
+Bank0421_Text_ParaBa = Paraíba
+Bank0421_Text_Paran = Paraná
+Bank0421_Text_Pernambuco = Pernambuco
+Bank0421_Text_Piau = Piauí
+Bank0421_Text_RioDeJaneiro = Rio de Janeiro
+Bank0421_Text_RioGrandeSul = Rio Grande do Sul
+Bank0421_Text_RioGrandeNorte = Rio Grande do Norte
+Bank0421_Text_Roraima = Roraima
+Bank0421_Text_SantaCatarina = Santa Catarina
+Bank0421_Text_SOPaulo = São Paulo
+Bank0421_Text_Sergipe = Sergipe
+Bank0421_Text_Tocantins = Tocantins

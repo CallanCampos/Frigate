@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 10,
+    "npc_cache": 24,
+    "area": 304,
+    "matrix": "MAP_MATRIX_NIMBASA_CITY_GYM",
+    "scripts": "SCRIPTS_NIMBASA_CITY_GYM",
+    "text": "SCRIPT_TEXT_NIMBASA_CITY_GYM",
+    "bgm": "SEQ_BGM_ERECTRIC_GYM_01",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_NIMBASA_CITY",
+    "place": "PLACE_NIMBASA_CITY",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 38,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 65535,
+    "name_icon": 15,
+    "easy_level": 2,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

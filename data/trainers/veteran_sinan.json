@@ -1,0 +1,54 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Sinan",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LUDICOLO",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_ENERGY_BALL", "MOVE_ICE_BEAM", "MOVE_HYDRO_PUMP", "MOVE_FAKE_OUT" ]
+        },
+        {
+            "species": "SPECIES_ELECTIVIRE",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_THUNDER", "MOVE_EARTHQUAKE", "MOVE_ROCK_SLIDE", "MOVE_THUNDER_WAVE" ]
+        },
+        {
+            "species": "SPECIES_FORRETRESS",
+            "form": 0,
+            "level": 64,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_GYRO_BALL", "MOVE_SOLAR_BEAM", "MOVE_PAYBACK", "MOVE_DOUBLE_EDGE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I came here because this place feels\nquite nostalgic to me...{be01}\nBut now I'd rather battle with you than\nstroll down memory lane!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I see... So that's it.\nI used to also be that focused long ago."
+        },
+        {
+            "type": 2,
+            "text": "I am reminded of my childhood and chasing\ninnocently after Bug-type Pokémon...{be01}\nIt was that day, in this very place, that\nI started on the path to “Trainerhood.\""
+        }
+    ]
+}

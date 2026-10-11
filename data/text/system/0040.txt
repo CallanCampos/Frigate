@@ -1,62 +1,62 @@
-Objective {0203:0}
-Objective {0203:0}
-Objective {0203:0}
-Objective {0203:0}
-Objective {0203:0}
-{bd03:0}Participants {0202:0}
-Use the {0110:1}\nthat {0100:0} activated?
-Said\n“{011c:0}."
-Quit the Funfest Mission?
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-    \x{ffff}
-{bd03:0}Score {0203:0}
-started a mission!
-joined the mission!
-went to {0105:0}.
-is battling with {0101:0}!
-defeated {0101:0}!
-caught {0101:0}!
-escaped from the battle!
-is battling with a Trainer!
-defeated a Trainer!
-was defeated!
-used {0109:0}!
-picked up {0109:0}!
-used {0107:0}!
-is shopping...
-used a Pass Power!
-rode the Ferris wheel!
-checked a signboard.
-received an Egg!
-defeated {0101:0}!
-caught {0101:0}!
-defeated {0101:0}!
-caught {0101:0}!
-found {0109:0}!
-rang the bell!
-found {0109:0}!
-found {0109:0}!
-hatched {0101:0}!
-reeled in {0101:0}!
-found {0101:0}!
-helped a lost child!
-gave {0109:0}.
-traded items!
-bought {0109:0}!
-won in rock-paper-scissors!
-answered the quiz correctly!
-helped someone train!
-received {0109:0}!
-answered the quiz correctly!
-doesn't have enough money!
-lost in rock-paper-scissors!
-answered the quiz incorrectly!
-{0101:0} fainted.
-{0101:0}'s HP is low!
-{0101:0}'s PP is low!
-{011c:0}
-                   \x{ffff}
-               \x{ffff}
+Bank0040_Text_Objective = Objective {0203:0}
+Bank0040_Text_Objective_2 = Objective {0203:0}
+Bank0040_Text_Objective_3 = Objective {0203:0}
+Bank0040_Text_Objective_4 = Objective {0203:0}
+Bank0040_Text_Objective_5 = Objective {0203:0}
+Bank0040_Text_Participants = {bd03:0}Participants {0202:0}
+Bank0040_Text_UseActivated = Use the {0110:1}\nthat {0100:0} activated?
+Bank0040_Text_Said = Said\n“{011c:0}."
+Bank0040_Text_QuitFunfestMission = Quit the Funfest Mission?
+Bank0040_Text_Empty =     \x{ffff}
+Bank0040_Text_Empty_2 =     \x{ffff}
+Bank0040_Text_Empty_3 =     \x{ffff}
+Bank0040_Text_Empty_4 =     \x{ffff}
+Bank0040_Text_Empty_5 =     \x{ffff}
+Bank0040_Text_Score = {bd03:0}Score {0203:0}
+Bank0040_Text_StartedMission = started a mission!
+Bank0040_Text_JoinedMission = joined the mission!
+Bank0040_Text_Went = went to {0105:0}.
+Bank0040_Text_Battling = is battling with {0101:0}!
+Bank0040_Text_Defeated = defeated {0101:0}!
+Bank0040_Text_Caught = caught {0101:0}!
+Bank0040_Text_EscapedFromBattle = escaped from the battle!
+Bank0040_Text_BattlingTrainer = is battling with a Trainer!
+Bank0040_Text_DefeatedTrainer = defeated a Trainer!
+Bank0040_Text_Defeated_2 = was defeated!
+Bank0040_Text_Used = used {0109:0}!
+Bank0040_Text_PickedUp = picked up {0109:0}!
+Bank0040_Text_Used_2 = used {0107:0}!
+Bank0040_Text_Shopping = is shopping...
+Bank0040_Text_UsedPassPower = used a Pass Power!
+Bank0040_Text_RodeFerrisWheel = rode the Ferris wheel!
+Bank0040_Text_CheckedSignboard = checked a signboard.
+Bank0040_Text_ReceivedEgg = received an Egg!
+Bank0040_Text_Defeated_3 = defeated {0101:0}!
+Bank0040_Text_Caught_2 = caught {0101:0}!
+Bank0040_Text_Defeated_4 = defeated {0101:0}!
+Bank0040_Text_Caught_3 = caught {0101:0}!
+Bank0040_Text_Found = found {0109:0}!
+Bank0040_Text_RangBell = rang the bell!
+Bank0040_Text_Found_2 = found {0109:0}!
+Bank0040_Text_Found_3 = found {0109:0}!
+Bank0040_Text_Hatched = hatched {0101:0}!
+Bank0040_Text_Reeled = reeled in {0101:0}!
+Bank0040_Text_Found_4 = found {0101:0}!
+Bank0040_Text_HelpedLostChild = helped a lost child!
+Bank0040_Text_Gave = gave {0109:0}.
+Bank0040_Text_TradedItems = traded items!
+Bank0040_Text_Bought = bought {0109:0}!
+Bank0040_Text_WonRockPaperScissors = won in rock-paper-scissors!
+Bank0040_Text_AnsweredQuizCorrectly = answered the quiz correctly!
+Bank0040_Text_HelpedSomeoneTrain = helped someone train!
+Bank0040_Text_Received = received {0109:0}!
+Bank0040_Text_AnsweredQuizCorrectly_2 = answered the quiz correctly!
+Bank0040_Text_DoesntHaveEnoughMoney = doesn't have enough money!
+Bank0040_Text_LostRockPaperScissors = lost in rock-paper-scissors!
+Bank0040_Text_AnsweredQuizIncorrectly = answered the quiz incorrectly!
+Bank0040_Text_Fainted = {0101:0} fainted.
+Bank0040_Text_SHpLow = {0101:0}'s HP is low!
+Bank0040_Text_SPpLow = {0101:0}'s PP is low!
+Bank0040_Text_Empty_6 = {011c:0}
+Bank0040_Text_Empty_7 =                    \x{ffff}
+Bank0040_Text_Empty_8 =                \x{ffff}

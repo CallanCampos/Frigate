@@ -1,8 +1,0 @@
-Hey, hey, hey!\nDo you know the Pokémon called Mantine?{be01}\nIf you have one, trade my Tangrowth\nfor your Mantine. OK?
-Pretty good!\nOK. Let's trade Pokémon!{be01}
-Hey, hey, hey! The Tangrowth\nI gave you is awesome, isn't it?{be01}\nI got your Mantine,\nand I feel awesome, too!
-No, no, no. What I want is\na Mantine.
-OK. That's fine. But if you change your\nmind, let's trade Pokémon!
-Whoever trades will be my best friend\nafter trading Pokémon!
-I've come to give fashion tips to\nmy boyfriend...
-\pad{9e}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Forecast",
+    "description": "Castform transforms with\nthe weather."
+}

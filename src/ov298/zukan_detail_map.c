@@ -4,6 +4,7 @@
 #include "app/zukan_detail.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
+#include "constants/text_banks.h"
 #include "field/player_state.h"
 #include "field/townmap_util.h"
 #include "field/zone.h"
@@ -36,6 +37,7 @@
 #include "system/game_data.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
+#include "text/system/btl_server_flow_title.h"
 
 // The detail screen's habitat map page, which the ROM does not name: the town map on the main screen with the areas
 // where the Pokémon lives in each season, and a cursor to pick a place for the Pokédex's habitat list
@@ -1093,8 +1095,8 @@ static void ZukanDetailMap_CreateWindows(ZukanDetailMapParam *param, ZukanDetail
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[i]), 0);
         BmpWin_FlushChar(wk->windows[i]);
     }
-    wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 441, param->heapId);
-    wk->msgData[1] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 109, param->heapId);
+    wk->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, param->heapId);
+    wk->msgData[1] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, param->heapId);
 }
 
 static void ZukanDetailMap_FreeWindows(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
@@ -1965,7 +1967,7 @@ static void ZukanDetailMap_LoadPokemon(ZukanDetailMapParam *param, ZukanDetailMa
     func_02021c44(wk->printQueues[WINDOW_NAME]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_NAME]), 0);
     wordSet = GFL_WordSetSystemCreateDefault(param->heapId);
-    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 190);
+    format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], BtlServerFlowTitle_Text_SArea);
     name = GFL_StrBufCreate(64, param->heapId);
     WordSet_LoadSpeciesName(wordSet, 0, species);
     GFL_WordSetFormatStrbuf(wordSet, name, format);
@@ -2083,7 +2085,7 @@ static void ZukanDetailMap_FreeHabitat(ZukanHabitat *habitat) {
 }
 
 static void ZukanDetailMap_PrintSeason(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common) {
-    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 191 + wk->season);
+    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], BtlServerFlowTitle_Text_Spring + wk->season);
     u16 width = GFL_FontGetBlockWidth(strbuf, wk->font, 0);
     int windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_SEASON]));
     u16 x = (windowWidth - width) / 2;
@@ -2145,7 +2147,7 @@ static void ZukanDetailMap_ShowAreas(ZukanDetailMapParam *param, ZukanDetailMapW
 
     if (wk->found == FALSE) {
         if (!unknownShown) {
-            StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 128);
+            StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], BtlServerFlowTitle_Text_AreaUnknown);
             u16 width = GFL_FontGetBlockWidth(strbuf, wk->font, 0);
             int windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_UNKNOWN]));
             u16 x = (windowWidth - width) / 2;
@@ -2174,7 +2176,7 @@ static void ZukanDetailMap_ShowAreas(ZukanDetailMapParam *param, ZukanDetailMapW
 
 static void ZukanDetailMap_PrintButton(ZukanDetailMapParam *param, ZukanDetailMapWork *wk, ZukanDetailCommon *common,
                                        BOOL active) {
-    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 210);
+    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData[0], BtlServerFlowTitle_Text_ViewDetails);
 
     if (active == TRUE) {
         func_02021c7c(wk->printQueues[WINDOW_BUTTON], BmpWin_GetBitmap(wk->windows[WINDOW_BUTTON]), 0, 5, strbuf,

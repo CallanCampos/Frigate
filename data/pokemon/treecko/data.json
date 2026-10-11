@@ -1,0 +1,191 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Treecko",
+    "pokedex": {
+        "category": "Wood Gecko Pokémon",
+        "entry": "The soles of its feet are covered\nby countless tiny spikes, enabling\nit to walk on walls and ceilings.",
+        "height": "1'08\"",
+        "weight": "11.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Treecko",
+                "category": "Wood Gecko Pokémon",
+                "entry": "The soles of its feet are covered\nby countless tiny spikes, enabling\nit to walk on walls and ceilings.",
+                "height": "1'08\"",
+                "weight": "11.0 lbs."
+            },
+            "fr": {
+                "name": "Arcko",
+                "category": "Pokémon Bois Gecko",
+                "entry": "Ses plantes de pieds sont couvertes\nd'épines lui permettant de marcher\nau mur et au plafond.",
+                "height": "0,5 m",
+                "weight": "5,0 kg"
+            },
+            "de": {
+                "name": "Geckarbor",
+                "category": "Waldgecko",
+                "entry": "Seine Fußsohlen sind mit kleinen\nStacheln bedeckt, so dass es\nan Wänden und Decken Halt findet.",
+                "height": "0,5 m",
+                "weight": "5,0 kg"
+            },
+            "it": {
+                "name": "Treecko",
+                "category": "Pokémon Legnogeco",
+                "entry": "Le piante dei suoi piedi sono piene di\nuncini che gli permettono di camminare\nsu muri e soffitti.",
+                "height": "0,5 m",
+                "weight": "5,0 kg"
+            },
+            "ko": {
+                "name": "나무지기",
+                "category": "숲도마뱀포켓몬",
+                "entry": "발바닥에는 작은 가시가\n많이 달렸기 때문에 벽이나\n천장을 걸을 수 있다.",
+                "height": "0.5 m",
+                "weight": "5.0 kg"
+            },
+            "es": {
+                "name": "Treecko",
+                "category": "Pokémon Geco Bosque",
+                "entry": "Las plantas de sus pies tienen\npúas diminutas que le permiten\nandar por paredes y techos.",
+                "height": "0,5 m",
+                "weight": "5,0 kg"
+            },
+            "ja": {
+                "name": "キモリ",
+                "category": "もりトカゲポケモン",
+                "entry": "あしの\\x{3000}うらには\\x{3000}ちいさな\\x{3000}トゲが\nたくさん\\x{3000}ついているので\\x{3000}かべや\nてんじょうを\\x{3000}あるくことが\\x{3000}できる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 45,
+        "defense": 35,
+        "speed": 70,
+        "special_attack": 65,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_DRAGON" ],
+    "abilities": [ "ABILITY_OVERGROW", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_UNBURDEN",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 62,
+    "height": 5,
+    "weight": 50,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POUND" ],
+            [ 1, "MOVE_LEER" ],
+            [ 6, "MOVE_ABSORB" ],
+            [ 11, "MOVE_QUICK_ATTACK" ],
+            [ 16, "MOVE_PURSUIT" ],
+            [ 21, "MOVE_SCREECH" ],
+            [ 26, "MOVE_MEGA_DRAIN" ],
+            [ 31, "MOVE_AGILITY" ],
+            [ 36, "MOVE_SLAM" ],
+            [ 41, "MOVE_DETECT" ],
+            [ 46, "MOVE_GIGA_DRAIN" ],
+            [ 51, "MOVE_ENERGY_BALL" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM56",
+            "TM62",
+            "TM70",
+            "TM75",
+            "TM80",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_GRASS_PLEDGE",
+            "MOVE_SEED_BOMB",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_WORRY_SEED",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_CRUNCH",
+            "MOVE_MUD_SPORT",
+            "MOVE_ENDEAVOR",
+            "MOVE_LEECH_SEED",
+            "MOVE_DRAGON_BREATH",
+            "MOVE_CRUSH_CLAW",
+            "MOVE_WORRY_SEED",
+            "MOVE_DOUBLE_KICK",
+            "MOVE_GRASS_WHISTLE",
+            "MOVE_SYNTHESIS",
+            "MOVE_MAGICAL_LEAF",
+            "MOVE_LEAF_STORM",
+            "MOVE_RAZOR_WIND",
+            "MOVE_BULLET_SEED",
+            "MOVE_NATURAL_GIFT"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 16,
+            "species": "SPECIES_GROVYLE"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TREECKO"
+}

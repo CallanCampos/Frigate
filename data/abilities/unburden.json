@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Unburden",
+    "description": "Raises Speed if a held\nitem is used."
+}

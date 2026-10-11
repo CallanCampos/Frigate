@@ -1104,22 +1104,29 @@ void SetMoveCondition(BattleMon *mon, u32 condition, BattleCondition value) {
     mon->core.conditionCounters[condition] = 0;
 }
 
+// The Pokémon's condition of the given ID
+static inline BattleCondition *GetConditionPtr(BattleMon *mon, BattleConditionID id) {
+    return &mon->core.conditions[id];
+}
+
 BOOL func_ov167_021bb864(BattleMon *mon, u32 index, BattleCondition *prev, BOOL *cured) {
     u8 turns;
+    BattleCondition cond;
 
     if (index == 2 || index == 6) {
         return FALSE;
     }
-    if (mon->core.conditions[index].common.type != 0) {
-        turns = func_ov167_021ce33c(mon->core.conditions[index]);
+    if (GetConditionPtr(mon, index)->common.type != 0) {
+        turns = func_ov167_021ce33c(*GetConditionPtr(mon, index));
+        cond = *GetConditionPtr(mon, index);
         if (prev != NULL) {
-            *prev = mon->core.conditions[index];
+            *prev = cond;
         }
         if (cured != NULL) {
             *cured = FALSE;
         }
-        if (index == 0x1b && !MoveIsUsable(mon, Condition_GetParam(mon->core.conditions[index]))) {
-            mon->core.conditions[index] = ZeroConditionTurns();
+        if (index == 0x1b && !MoveIsUsable(mon, Condition_GetParam(cond))) {
+            *GetConditionPtr(mon, index) = ZeroConditionTurns();
             mon->core.conditionCounters[index] = 0;
             if (cured != NULL) {
                 *cured = TRUE;
@@ -1128,14 +1135,14 @@ BOOL func_ov167_021bb864(BattleMon *mon, u32 index, BattleCondition *prev, BOOL 
         if (turns != 0) {
             mon->core.conditionCounters[index]++;
             if (mon->core.conditionCounters[index] >= turns) {
-                mon->core.conditions[index] = ZeroConditionTurns();
+                *GetConditionPtr(mon, index) = ZeroConditionTurns();
                 mon->core.conditionCounters[index] = 0;
                 if (cured != NULL) {
                     *cured = TRUE;
                 }
             }
-        } else if (mon->core.conditions[index].common.type == 1) {
-            u32 max = mon->core.conditions[index].common.turns;
+        } else if (GetConditionPtr(mon, index)->common.type == 1) {
+            u32 max = GetConditionPtr(mon, index)->common.turns;
 
             if (max != 0 && mon->core.conditionCounters[index] < max) {
                 mon->core.conditionCounters[index]++;
@@ -1386,8 +1393,8 @@ void CopyBatonPassParams(BattleMon *target, BattleMon *source) {
     target->statStages = source->statStages;
     target->substituteHP = source->substituteHP;
     for (i = 0; i < 36; i++) {
-        if (source->core.conditions[i].common.type != 0 && func_ov169_0689c9f0(i)) {
-            target->core.conditions[i] = source->core.conditions[i];
+        if (GetConditionPtr(source, i)->common.type != 0 && func_ov169_0689c9f0(i)) {
+            *GetConditionPtr(target, i) = *GetConditionPtr(source, i);
             target->core.conditionCounters[i] = source->core.conditionCounters[i];
         }
     }

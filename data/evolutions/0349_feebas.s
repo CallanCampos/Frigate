@@ -1,6 +1,0 @@
-#include "asm/evolution.inc"
-
-// SPECIES_FEEBAS
-    Evolution EVO_METHOD_BEAUTY, 170, SPECIES_MILOTIC
-    Evolution EVO_METHOD_TRADE_WITH_ITEM, ITEM_PRISM_SCALE, SPECIES_MILOTIC
-    EvolutionsEnd

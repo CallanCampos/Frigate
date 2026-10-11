@@ -1,2417 +1,2417 @@
-dmy
-PV001
-PV
-PV-END
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-BGM-DUMMY
-BGM-SILENCE-FIELD
-BGM-SILENCE-DUNGEON
-BGM-TITLE
-BGM-TITLE01
-BGM-OPENING-TITLE-B
-BGM-OPENING-TITLE-W
-BGM-POKEMON-THEME
-BGM-STARTING
-BGM-STARTING2
-BGM-SHINKA
-BGM-KOUKAN
-BGM-BICYCLE
-BGM-NAMINORI
-BGM-DIVING
-BGM-E-DENDOUIRI
-BGM-ENDING
-BGM-ENDING2
-BGM-T-01
-BGM-T-02
-BGM-T-03
-BGM-T-04
-BGM-T-05-SP
-BGM-T-05-SU
-BGM-T-05-AU
-BGM-T-05-WI
-BGM-C-01
-BGM-C-02
-BGM-C-03
-BGM-C-04
-BGM-SW-C-5-NEW
-BGM-C-06
-BGM-C-07
-BGM-C-08-B
-BGM-C-08-W
-BGM-C-10-B
-BGM-C-10-W
-BGM-R-A
-BGM-R-B-SP
-BGM-R-B-SU
-BGM-R-B-AU
-BGM-R-B-WI
-BGM-R-C-SP
-BGM-R-C-SU
-BGM-R-C-AU
-BGM-R-C-WI
-BGM-R-D-SP
-BGM-R-D-SU
-BGM-R-D-AU
-BGM-R-D-WI
-BGM-R-E-SP
-BGM-R-E-SU
-BGM-R-E-AU
-BGM-R-E-WI
-BGM-R-F
-BGM-H-01
-BGM-H-02
-BGM-H-03
-BGM-H-04
-BGM-H-05
-BGM-POKECEN
-BGM-FS
-BGM-GYM
-BGM-GROUND-GYM-01
-BGM-LABO
-BGM-GATE
-BGM-GEAR-STATION
-BGM-BATTLE-SUBWAY
-BGM-PALPARK
-BGM-PLEASURE-BOAT
-BGM-PALACE
-BGM-UNITED-NATIONS
-BGM-POKEMON-LEAGUE
-BGM-POKEMON-LEAGUE2
-BGM-SW-D-N-CASTLE
-BGM-D-01
-BGM-D-02
-BGM-D-03
-BGM-D-04
-BGM-D-05
-BGM-D-06
-BGM-D-CHAMPROAD
-BGM-MUGEN-lobby-B
-BGM-MUGEN-lobby-W
-BGM-MUGEN-D-B
-BGM-MUGEN-D-W
-BGM-E-TSURETEKE2
-BGM-E-CHEREN
-BGM-E-BERU
-BGM-E-DOCTOR
-BGM-E-DOCTOR2
-BGM-E-N-SWAN
-BGM-E-SAGE
-BGM-E-NEW-G-CIS
-BGM-E-INISHIE
-BGM-E-EMOTION
-BGM-ERECTRIC-GYM-01
-BGM-ERECTRIC-GYM-02
-BGM-INSECT-GYM-01
-BGM-POISONE-GYM-00
-BGM-POISONE-GYM-01
-BGM-E-CHAMPION
-BGM-SW-DEMO-OPENING
-BGM-E-KANRANSYA
-BGM-SW-C-12
-BGM-SW-C-13
-BGM-SW-C-14
-BGM-MSL-FIELD
-BGM-MSL-DRESSUP
-BGM-MSL-BEFORE
-BGM-MSL-01
-BGM-MSL-02
-BGM-MSL-03
-BGM-MSL-04
-BGM-EYE-01
-BGM-EYE-02
-BGM-EYE-03
-BGM-EYE-04
-BGM-EYE-05
-BGM-EYE-06
-BGM-EYE-07
-BGM-EYE-08
-BGM-EYE-09
-BGM-EYE-10
-BGM-EYE-11
-BGM-EYE-12
-BGM-EYE-13
-BGM-EYE-NEO-PLASMA
-BGM-VS-NORAPOKE
-BGM-VS-TSUYOPOKE
-BGM-VS-TRAINER
-BGM-VS-SUBWAY-TRAINER
-BGM-VS-GYMLEADER
-BGM-VS-RIVAL
-BGM-VS-DPLEGEND
-BGM-VS-SHITENNO
-BGM-VS-CHAMP
-BGM-VS-SWAN-N
-BGM-VS-UMA
-BGM-VS-REGI
-BGM-VS-SHIN
-BGM-VS-MU
-BGM-VS-RAI
-BGM-VS-MOVEPOKE
-BGM-VS-SETPOKE
-BGM-VS-SHIRONA
-BGM-BATTLEPINCH
-BGM-BATTLESUPERIOR
-BGM-WIN1
-BGM-WIN2
-BGM-WIN3
-BGM-WIN4
-BGM-WIN5
-BGM-WIFI-ACCESS
-BGM-WIFI-PRESENT
-BGM-GAME-SYNC
-BGM-GLTERMINAL
-BGM-GURUGURU
-BGM-GTS
-BGM-WCS
-BGM-E-SHIRONA
-BGM-VS-TRAINER-M
-BGM-VS-TRAINER-S
-BGM-VS-WCS
-BGM-VS-TRAINER-WIFI
-BGM-WIN6
-BGM-E-LEGEND-BORN-B
-BGM-E-LEGEND-BORN-W
-BGM-SW-D-N-ROOM
-BGM-E-EPIROGUE
-BGM-E-EPIROGUE-W
-BGM-GF-LOGO
-BGM-MSL-DL-01
-BGM-MSL-DL-02
-BGM-MSL-DL-03
-BGM-MSL-DL-04
-BGM-SW-R-19-SP
-BGM-SW-R-19-SU
-BGM-SW-R-19-AU
-BGM-SW-R-19-WI
-BGM-SW-R-22-SP
-BGM-SW-R-22-SU
-BGM-SW-R-22-AU
-BGM-SW-R-22-WI
-BGM-SW-R-23
-BGM-SW-KAZAN
-BGM-SW-T-06
-BGM-SW-T-07
-BGM-SW-D-22
-BGM-SW-D-23
-BGM-SW-D-GESUI
-BGM-SW-D-24-W
-BGM-SW-D-24-B
-BGM-SW-D-25
-BGM-SW-D-27-F-AJITO
-BGM-SW-D-27-L-AJITO
-BGM-SW-D-27-G-AJITO
-BGM-SW-D-REGI
-BGM-SW-D-UMA
-BGM-SW-H-06
-BGM-WBT-LOBBY
-BGM-WBT-GROUND
-BGM-WBT-FANFARE
-BGM-PW-LAND
-BGM-PW-FILMING
-BGM-PW-SCENARIO-01-F
-BGM-PW-SCENARIO-01-L
-BGM-PW-SCENARIO-02-F
-BGM-PW-SCENARIO-02-L
-BGM-PW-SCENARIO-03-F
-BGM-PW-SCENARIO-03-L
-BGM-PW-SCENARIO-04-F
-BGM-PW-SCENARIO-04-L
-BGM-PW-SCENARIO-05-F
-BGM-PW-SCENARIO-05-L
-BGM-PW-SCENARIO-06-F
-BGM-PW-SCENARIO-06-L
-BGM-PW-SCENARIO-07-F
-BGM-PW-SCENARIO-07-L
-BGM-PW-SCENARIO-08-F
-BGM-FLIGHT-GYM-01
-BGM-WATER-GYM-01
-BGM-DRAGON-GYM-01
-BGM-LCG-01
-BGM-LCG-02
-BGM-DATA-CONV
-BGM-REZO-RIZO
-BGM-FES
-BGM-SW-DEMO-SHIP
-BGM-SW-DEMO-FLIGHT
-BGM-SW-DEMO-UNION-00
-BGM-SW-DEMO-UNION-01
-BGM-SW-DEMO-UNION-02
-BGM-SW-DEMO-UNION-03B
-BGM-SW-DEMO-UNION-03W
-BGM-SW-DEMO-AJITO-SHIP
-BGM-SW-DEMO-FRIGATE
-BGM-E-HUE
-BGM-E-ACHROMA
-BGM-DARK-TRINITY
-BGM-E-7-SAGE
-BGM-E-C08-ICE
-BGM-E-EPILOGUE
-BGM-EYE-DANCER
-BGM-EYE-CLOWN
-BGM-VS-RG-LEADER
-BGM-VS-RG-CHAMP
-BGM-VS-GS-LEADER
-BGM-VS-GS-CHAMP
-BGM-VS-RS-LEADER
-BGM-VS-RS-CHAMP
-BGM-VS-DP-LEADER
-BGM-VS-DP-CHAMP
-BGM-VS-BW-CHAMP
-BGM-VS-WBT
-BGM-VS-KYURAMU
-BGM-VS-KYUROMU
-BGM-VS-NEO-PLASMA
-BGM-VS-ACHROMA
-BGM-VS-NEW-G-CIS
-BGM-VS-IRIS
-BGM-VS-BANJIROU
-BGM-VS-HUE
-BGM-WIN-WBT
-BGM-KEMONOMICHI
-BGM-JAPARADE
-BGM-E-PLASMA
-BGM-VS-ELITE-PLASMA
-BGM-THEEND
-BGM-EV-GIANTHOLE-01
-BGM-EV-GIANTHOLE-02
-BGM-EV-GIANTHOLE-03
-BGM-END
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-dmy
-ME-ASA
-ME-LVUP
-ME-ITEM
-ME-KEYITEM
-ME-POKEGET
-ME-SHINKAOME
-ME-BADGE
-ME-WAZA
-ME-ACCE
-ME-WASURE
-ME-KINOMI
-ME-HYOUKA1
-ME-HYOUKA2
-ME-HYOUKA3
-ME-HYOUKA4
-ME-HYOUKA5
-ME-HYOUKA6
-ME-TAMAGO-GET
-ME-BPGET
-ME-AISHOU-H
-ME-AISHOU-M
-ME-AISHOU-L
-ME-AISHOU-KIDOU
-ME-MISSION-START
-ME-MISSION-CLEAR
-ME-MISSION-FAILED
-ME-ITEM-MYSTERY
-ME-CALL
-ME-QUIZ
-ME-DEL-POWER
-ME-02
-ME-LCG-01
-ME-LCG-02
-ME-LCG-03
-ME-LCG-04
-ME-MD-FAN01
-ME-MD-FAN03
-ME-MD-FAN04
-ME-KEY-OPEN
-ME-OTAMARO
-ME-AVENUE-01
-ME-AVENUE-02
-ME-AVENUE-03
-ME-CALL-LONG
-ME-ZUKAN-01
-ME-ZUKAN-02
-ME-POKEWOOD
-ME-END
-dmy
-dmy
-DUMMY
-MESSAGE
-SELECT1
-SELECT2
-SELECT3
-SELECT4
-DECIDE1
-DECIDE2
-DECIDE3
-DECIDE4
-DECIDE5
-CANCEL1
-CANCEL2
-CANCEL3
-OPEN1
-OPEN2
-CLOSE1
-BEEP
-SAVE
-KAIDAN
-WALL-HIT
-PC-ON
-PC-LOGIN
-PC-LOGOFF
-DANSA
-BICYCLE
-DUMMY5
-BC01
-BC02
-KOUKA-H
-KOUKA-M
-KOUKA-L
-NAGERU
-BOWA2
-BOWA1
-BOWA3
-NIGERU
-KON
-DEAD
-EXP
-EXPMAX
-RECOVERY
-TB-START
-TB-KON
-TB-KARA
-SHOOTER
-GETTING
-HINSHI
-TOUJOU-LARGE
-TOUJOU-MID
-TOUJOU-SMALL
-ROTATION-S
-ROTATION-B
-TRIPLE-S
-NAGERU2
-DUMMY29
-DUMMY30
-W055-01
-W055-04
-W055-05
-W075-01
-W075-02
-W075-03
-W075-04
-W075-05
-W075-06
-W157-01
-W157-02
-W157-03
-W157-04
-W001-01
-W002-01
-W003-01
-W010-01
-W011-01
-W307-01
-W307-02
-W307-03
-W307-04
-W307-05
-W006-01
-W006-02
-W006-03
-W006-04
-W014-01
-W014-02
-W014-03
-W015-01
-W017-01
-W018-01
-W018-02
-W020-01
-W022-01
-W022-02
-W026-01
-W027-01
-W028-01
-W028-02
-W029-01
-W043-01
-W048-01
-W048-02
-W051-01
-W051-02
-W051-03
-W054-01
-W074-01
-W077-01
-W077-02
-W088-01
-W088-02
-W095-01
-W095-02
-W099-01
-W099-02
-W102-01
-W102-02
-W103-01
-W111-01
-W111-02
-W112-01
-W112-02
-W113-01
-W113-02
-W116-01
-W121-01
-W122-01
-W122-02
-W123-01
-W123-02
-W124-01
-W129-01
-W129-03
-W129-04
-W165-01
-W179-01
-W179-02
-W179-03
-W181-01
-W216-01
-W216-02
-W225-01
-W225-02
-W227-01
-W227-02
-W235-01
-W235-03
-W239-01
-W239-02
-W240-01
-W253-01
-W253-02
-W260-01
-W281-01
-W295-01
-W295-02
-W298-01
-W310-01
-W310-02
-W319-01
-W319-02
-W323-01
-W320-01
-W331-01
-W348-02
-W363-01
-W368-01
-W377-01
-W377-02
-W399-01
-W401-01
-W465-01
-W009-01
-W047-01
-W050-01
-W187-01
-W012-01
-W039-01
-W044-01
-W061-01
-W146-01
-W155-01
-W155-02
-W195-01
-W199-01
-W464-01
-W464-02
-W306-01
-W019-01
-W042-01
-W215-01
-W215-02
-W274-01
-W289-01
-PASA1
-PASA2
-BE-SE-01
-BE-SE-02
-BE-SE-03
-BE-SE-04
-BE-SE-05
-BE-SE-06
-BE-SE-07
-BE-SE-08
-BE-SE-09
-BE-SE-10
-BE-SE-11
-BE-SE-12
-BE-SE-13
-BE-SE-14
-BE-SE-015
-BE-SE-016
-BE-SE-017
-BE-SE-018
-BE-SE-019
-BE-SE-020
-BE-SE-021
-BE-SE-022
-BE-SE-023
-BE-SE-024
-MSCL-01
-MSCL-02
-MSCL-03
-MSCL-04
-MSCL-05
-MSCL-06
-MSCL-07
-MSCL-08
-MSCL-09
-MSCL-10
-MSCL-11
-MSCL-12
-MSCL-13
-MSCL-14
-MSCL-15
-MSCL-16
-MSCL-17
-MSCL-18
-MSCL-19
-SHINKA-W025
-SHINKA-W060C
-SHINKA-W062
-SHINKA-W080
-SYS-73
-SYS-74
-SYS-75
-FLD-123
-SYS-76
-SYS-77
-SYS-78
-SYS-01
-SYS-02
-SYS-03
-SYS-04
-SYS-05
-SYS-06
-SYS-07
-SYS-08
-SYS-09
-SYS-10
-SYS-11
-SYS-12
-SYS-13
-SYS-14
-SYS-15
-SYS-16
-SYS-17
-SYS-18
-SYS-19
-SYS-20
-SYS-21
-SYS-22
-SYS-23
-SYS-24
-SYS-25
-SYS-26
-SYS-27
-SYS-28
-SYS-29
-SYS-30
-SYS-31
-SYS-32
-SYS-33
-SYS-34
-SYS-35
-SYS-36
-SYS-37
-SYS-38
-SYS-39
-SYS-40
-SYS-41
-SYS-42
-SYS-43
-SYS-44
-SYS-45
-SYS-46
-SYS-47
-SYS-48
-SYS-49
-SYS-50
-FLD-01
-FLD-02
-FLD-03
-FLD-04
-FLD-05
-FLD-06
-FLD-07
-FLD-08
-FLD-09
-FLD-10
-FLD-11
-FLD-12
-FLD-13
-FLD-14
-FLD-15
-FLD-16
-FLD-17
-FLD-18
-FLD-19
-FLD-20
-FLD-21
-FLD-22
-FLD-23
-FLD-24
-FLD-25
-FLD-26
-FLD-27
-FLD-28
-FLD-29
-FLD-30
-FLD-31
-FLD-32
-FLD-33
-FLD-34
-FLD-35
-FLD-36
-FLD-37
-FLD-38
-FLD-39
-FLD-40
-FLD-41
-FLD-42
-FLD-43
-FLD-44
-FLD-45
-FLD-46
-FLD-47
-FLD-48
-FLD-49
-FLD-50
-W008-01
-W012-02
-W016-01
-W023-01
-W032-01
-W034-01
-W063-01
-W063-02
-W096-01
-W100-01
-W084-01
-W269-01
-W269-02
-W278-01
-W321-01
-W452-01
-W063-03
-W059-01
-W077-03
-W008-02
-W044-02
-W100-02
-W125-01
-W142-01
-W148-01
-W163-01
-W175-01
-W188-01
-W194-01
-W208-01
-FLD-51
-FLD-52
-FLD-53
-FLD-54
-FLD-55
-FLD-56
-FLD-57
-FLD-58
-FLD-59
-FLD-60
-FLD-61
-FLD-62
-FLD-63
-FLD-64
-FLD-65
-FLD-66
-FLD-67
-FLD-68
-FLD-69
-FLD-70
-FLD-71
-FLD-72
-FLD-73
-FLD-74
-FLD-75
-FLD-76
-FLD-77
-FLD-78
-FLD-79
-FLD-80
-FLD-81
-FLD-82
-FLD-83
-FLD-84
-FLD-85
-DMY-097
-LVUP
-FLD-86
-FLD-87
-FLD-88
-FLD-89
-FLD-90
-FLD-91
-FLD-92
-FLD-93
-FLD-94
-FLD-95
-W213-01
-W227-03
-W254-04
-W234-HIKARI
-W288-ONNEN
-W357-JIRORI
-W379-POWER
-W381-OMAJINAI
-W396-HADOKEN
-W445-YUUWAKU
-W343-HOSHIGARI
-FLD-96
-FLD-97
-BREC-01
-BREC-02
-BREC-03
-BREC-04
-BREC-05
-BREC-06
-BREC-07
-BREC-08
-BE-SE-025
-BE-SE-026
-BE-SE-027
-BE-SE-028
-BE-SE-029
-BE-SE-030
-BE-SE-031
-BE-SE-032
-BE-SE-033
-BE-SE-034
-BE-SE-035
-BE-SE-036
-BE-SE-037
-BE-SE-038
-BE-SE-039
-BE-SE-040
-BE-SE-041
-W221-NOISE
-W229-KIIN
-W245-JUMP
-W245-BUCKL
-W250-UZUSHIO
-W258-ARARE
-W300-PITYA
-FLD-98
-FLD-99
-FLD-101
-W259-BOSO
-W259-PAKIP
-W275-PIRA
-SYS-51
-SYS-52
-SYS-53
-SYS-54
-SYS-55
-SYS-56
-SYS-57
-SYS-58
-SYS-59
-SYS-60
-SYS-61
-SYS-62
-SYS-63
-SYS-64
-SYS-65
-SYS-66
-SYS-67
-SYS-68
-FLD-102
-FLD-103
-W255-BU
-W288-DORO
-SYS-69
-SYS-70
-SYS-71
-SYS-72
-FLD-104
-FLD-105
-FLD-106
-FLD-107
-FLD-108
-FLD-109
-FLD-110
-FLD-111
-FLD-112
-FLD-113
-FLD-114
-FLD-115
-W255-MOMOMO
-W288-HYUU
-W312-HARP
-W319-SWARD
-W300-BESYO
-W322-COSMO
-W325-BUNN
-W350-PASU
-W454-MUSHI
-W360-MOMOMON
-W437-NOISEHIT
-FLD-116
-FLD-117
-FLD-118
-FLD-119
-W448-ONPU
-W065-DODODO
-W470-WA
-W307-EXP
-W474-GUTSU
-W474-DOKU
-FLD-120
-FLD-121
-FLD-122
-SYS-79
-FLD-124
-FLD-125
-FLD-126
-FLD-127
-FLD-128
-FLD-129
-SYS-80
-SYS-81
-SYS-82
-SYS-83
-FLD-130
-SYS-84
-W532-SASU
-W532-CHU
-W540-KYUN
-FLD-131
-FLD-132
-FLD-133
-FLD-134
-FLD-135
-FLD-136
-FLD-137
-FLD-138
-FLD-139
-W547-INIMELO
-SYS-85
-FLD-140
-FLD-141
-W542-BOUFU
-W554-PAKIN
-FLD-142
-FLD-143
-FLD-144
-TDEMO-001
-TDEMO-002
-TDEMO-003
-TDEMO-004
-TDEMO-005
-TDEMO-006
-TDEMO-007
-TDEMO-008
-TDEMO-009
-TDEMO-010
-TDEMO-011
-SYS-86
-SYS-87
-FLD-145
-FLD-146
-SYS-88
-SYS-89
-W556-FUUN
-NDEMO-01
-NDEMO-02
-W556-KAZE
-DDEMO-01
-DDEMO-02A
-DDEMO-02B
-DDEMO-03
-DDEMO-04
-SYS-90
-FLD-147
-FLD-148
-EDEMO-01
-EDEMO-02
-SDEMO-01
-SDEMO-02
-FLD-149
-FLD-150
-EDEMO-03
-MSCL-20
-MSCL-21
-W063-BEEMB
-W281-AKUBI
-W248-TIKIRIN
-W411-HAAA
-EDEMO-04
-EDEMO-05
-FLD-151
-SYS-91
-BDEMO-01
-BDEMO-02
-BDEMO-03
-BDEMO-04
-FLD-152
-SDEMO-03
-LBDEMO-01
-LBDEMO-02
-LBDEMO-03
-LBDEMO-04
-LBDEMO-05
-LBDEMO-06
-LBDEMO-07
-LBDEMO-08
-LBDEMO-09
-FLD-153
-FLD-154
-FLD-155
-FLD-156
-FLD-157
-FLD-158
-FLD-159
-FLD-160
-FLD-161
-FLD-162
-FLD-163
-SYS-92
-FLD-164
-SYS-93
-FLD-165
-SYS-94
-SYS-95
-SYS-96
-SYS-97
-SYS-98
-FLD-166
-VDEMO-01
-VDEMO-02
-SYS-99
-BGDEMO-01
-BGDEMO-02
-SHDEMO-01
-SHDEMO-02
-SHDEMO-03
-SHDEMO-04
-SHDEMO-05
-NDEMO-03
-ARDEMO-01
-SYS-100
-RIZDEMO-01
-FLD-167
-FLD-168
-FLD-169
-FLD-170
-VDEMO-03
-RIZDEMO-02
-FLD-171
-FLD-172
-FLD-173
-END-01
-FLD-174
-END-02
-W156-BABBLE2
-FLD-175
-ZORO-01
-BE-SE-04R
-TOUJOU-INTRO
-END-03
-OPEN-01
-OPEN-02
-OPEN-03
-END-04
-END-05
-SW-MDUN-BL-06
-MEET-02
-MEET-03
-MEET-04
-WCS-01
-WCS-02
-WCS-03
-WCS-04
-LCDEMO-01
-LCDEMO-02
-SYS-101
-END-06
-END-07
-LOGO-01
-LOGO-02
-LOGO-03
-FLD-176
-SYS-102
-DECIDE6
-GYM-E01
-GYM-E02
-GYM-E03
-GYM-E04
-GYM-M01
-GYM-M02
-GYM-M03
-GYM-M04
-GYM-M05
-GYM-M06
-GYM-H01
-GYM-H02
-GYM-H03
-GYM-H04
-GYM-H05
-GYM-H06
-GYM-H07
-GYM-H08
-LCG-01
-LCG-02
-LCG-03
-LCG-04
-LCG-05
-LCG-06
-LCG-07
-LCG-08
-LCG-09
-LCG-10
-LCG-11
-MD-01
-MD-02
-MD-03
-MD-04
-SW-WBT-01
-SW-WBT-02
-SW-WBT-03
-SW-WBT-04
-SW-WBT-05
-SW-WBT-06
-SW-WBT-07
-SW-WBT-09
-SW-WBT-10
-SW-WBT-11
-SW-WBT-12
-SW-WBT-13
-SW-WBT-15
-SW-WBT-16
-SW-WBT-17
-SW-WBT-18
-SW-WBT-19
-SW-WBT-20
-SW-WBT-21
-SW-WBT-22
-SW-FES-01
-SW-FES-02
-SW-FES-03
-SW-FES-04
-SW-FES-05
-SW-FES-06
-SW-FES-07
-SW-FES-08
-SW-FES-09
-SW-FES-10
-SW-FES-11
-SW-FES-12
-SW-FES-13
-SW-FES-14
-SW-FES-15
-SW-FES-16
-SW-MDUN-BL-01
-SW-MDUN-BL-02
-SW-MDUN-BL-03
-SW-MDUN-BL-04
-SW-MDUN-BL-05
-SW-MDUN-WH-01
-SW-MDUN-WH-02
-SW-MDUN-WH-03
-SW-MDUN-WH-04
-SW-MDUN-WH-05
-SW-MDUN-BL-07
-SW-MDUN-WH-07
-SW-CARD-01
-SW-CARD-02
-SW-CARD-03
-SW-CARD-04
-SW-CARD-05
-SW-CARD-06
-SW-CARD-07
-SW-CARD-08
-SW-CARD-09
-SW-CARD-10
-SW-CARD-11
-SW-CARD-12
-SW-CARD-13
-SW-CARD-14
-SW-CARD-15
-SW-CARD-16
-SW-CARD-17
-SW-CARD-18
-SW-CARD-19
-SW-CARD-20
-SW-CARD-21
-SW-CARD-22
-SW-GRGYM-01
-SW-GRGYM-02
-SW-NPOKE
-SW-KYUREM-01
-SW-KYUREM-02
-SW-KYUREM-03
-SW-KYUREM-04
-SW-MIZUGYM-01
-SW-MIZUGYM-02
-OCHIBA-01
-OCHIBA-02
-SW-ZKN-KAIHOU
-SW-LC-NO
-SW-GEEMA-01
-SW-GEEMA-02
-SW-GEEMA-03
-SW-GEEMA-04
-SW-DRGGYM-01
-SW-DRGGYM-02
-SW-DRGGYM-03
-SW-DRGGYM-04
-SW-DRGGYM-05
-SW-DRGGYM-06
-SW-DRGGYM-07
-SW-CATTLEYA-01
-SW-CATTLEYA-02
-SW-CATTLEYA-03
-SW-SHIKIMI-01
-SW-SHIKIMI-02
-SW-SHIKIMI-03
-SW-SHIKIMI-04
-SW-SHIKIMI-05
-SW-SHIKIMI-06
-SW-RENBU-01
-SW-RENBU-02
-SW-RENBU-03
-SW-RENBU-04
-SW-RENBU-05
-SW-BCG-01
-SW-BCG-02
-SW-BCG-03
-SW-BCG-04
-SW-BCG-05
-SW-BCG-06
-SW-BCG-07
-SW-KEYSYS-01
-SW-KEYSYS-02
-SW-KEYSYS-03
-SW-KEYSYS-04
-SW-PLAZMASHIP-01
-SW-PLAZMASHIP-02
-SW-PLAZMASHIP-03
-SW-PLAZMASHIP-04
-SW-PLAZMASHIP-05
-SW-PLAZMASHIP-06
-SW-PLAZMASHIP-07
-SW-PLAZMASHIP-08
-SW-PLAZMASHIP-09
-SW-PLAZMASHIP-10
-SW-ZUKANSTUMP-01
-SW-YACONROAD-01
-SW-RELIC-01
-SW-RELIC-02
-SW-RELIC-03
-SW-CHAMPIRIS-01
-SW-CHAMPIRIS-02
-SW-CHAMPIRIS-03
-SW-CHAMPIRIS-04
-SW-CHAMPIRIS-05
-SW-CHAMPIRIS-06
-SW-PKWOOD-01
-SW-PKWOOD-02
-SW-PKWOOD-03
-SW-STARPOKE
-SW-PKWOOD-AUD-01
-SW-PKWOOD-AUD-02
-SW-PKWOOD-AUD-03
-SW-PKWOOD-AUD-04
-SW-PKWOOD-AUD-05
-SW-PKWOOD-AUD-06
-SW-PKWOOD-AUD-07
-SW-PKWOOD-AUD-08
-SW-PKWOOD-AUD-09
-SW-PKWOOD-AUD-10
-SW-PKWOOD-AUD-11
-SW-PKWOOD-AUD-12
-SW-PKWOOD-AUD-13
-SW-PKWOOD-AUD-14
-SW-PKWOOD-AUD-15
-SW-PKWOOD-AUD-16
-SW-BELLBOX-01
-SW-BELLBOX-02
-SW-BELLBOX-03
-SW-MEDALGET
-SW-MEDALGET-02
-SW-JA-EXP
-SW-JA-01
-SW-JA-02
-SW-SHIZUI
-SW-KOBALON-01
-SW-KOBALON-02
-SW-SOURYU-RUMBLE
-SW-TOROS-FORM
-SW-KERTIO-FORM-01
-SW-KERTIO-FORM-02
-SW-KERTIO-FORM-03
-SW-KERTIO-FORM-04
-SW-KERTIO-FORM-05
-SW-KERTIO-FORM-06
-SW-GHETSIS-STICK-01
-SW-GHETSIS-STICK-02
-SW-CI-VSCHAMP-01
-SW-CI-VSCHAMP-02
-SW-CI-VSCHAMP-03
-SW-CI-VSCHAMP-04
-SW-CI-WBT-01
-SW-CI-WBT-02
-SW-CI-WBT-03
-SW-CI-WBT-04
-SW-CI-PKWOOD-01
-SW-CI-PKWOOD-02
-SW-CI-PKWOOD-03
-SW-GIANTHOLE-01
-SW-GIANTHOLE-02
-SW-GIANTHOLE-03
-SW-GIANTHOLE-04
-SW-GIANTHOLE-05
-SW-GIANTHOLE-06
-SW-GIANTHOLE-07-1
-SW-GIANTHOLE-07-2
-SW-GIANTHOLE-07-3
-SW-GIANTHOLE-07-4
-SW-GIANTHOLE-08-1
-SW-GIANTHOLE-08-2
-SW-GIANTHOLE-08-3
-SW-GIANTHOLE-08-4
-SW-GIANTHOLE-09
-SW-GIANTHOLE-10
-SW-KUSABI-IN-01
-SW-KUSABI-IN-02
-SW-KUSABI-IN-03
-SW-KUSABI-IN-04
-SW-KUSABI-IN-05
-SW-KUSABI-IN-06
-SW-KUSABI-IN-07
-SW-KUSABI-IN-08
-SW-KUSABI-IN-09
-SW-KUSABI-IN-10
-SW-KUSABI-IN-11
-SW-KUSABI-IN-12
-SW-KUSABI-IN-13
-SW-TACHIWAKI-01
-SW-TACHIWAKI-02
-SW-TACHIWAKI-03
-SW-AIRPLANE-01
-SW-AIRPLANE-02-L
-SW-AIRPLANE-02-R
-SW-AIRPLANE-03
-SW-FRIGATE-01
-SW-FRIGATE-02
-SW-FRIGATE-03
-SW-FRIGATE-04
-SW-FRIGATE-05
-SW-FRIGATE-06
-SW-FRIGATE-07
-SW-FRIGATE-08
-SW-FRIGATE-09
-SW-FRIGATE-10
-SW-FRIGATE-11
-SW-FRIGATE-12
-SW-FRIGATE-13
-SW-FRIGATE-14
-SW-FRIGATE-15
-SW-FRIGATE-16
-SW-FRIGATE-17
-SW-FRIGATE-18
-SW-SOURYUCITY-01
-SW-SOURYUCITY-02
-SW-SOURYUCITY-03
-SW-SOURYUCITY-04
-SW-SOURYUCITY-05
-SW-SOURYUCITY-06
-SW-SOURYUCITY-07
-SW-SOURYUCITY-08
-SW-SOURYUCITY-09
-SW-SOURYUCITY-10
-SW-SOURYUCITY-11
-SW-SOURYUCITY-12
-SW-SOURYUCITY-13
-SW-SOURYUCITY-14
-SW-SOURYUCITY-15
-SW-SOURYUCITY-16
-SW-SOURYUCITY-17
-SW-SOURYUCITY-18
-SW-KYUREON-00-01
-SW-KYUREON-00-02a
-SW-KYUREON-00-02b
-SW-KYUREON-00-02c
-SW-KYUREON-00-02d
-SW-KYUREON-00-03a
-SW-KYUREON-00-03b
-SW-KYUREON-01-01
-SW-KYUREON-01-01b
-SW-KYUREON-01-02a
-SW-KYUREON-01-02b
-SW-KYUREON-01-03
-SW-KYUREON-01-04
-SW-KYUREON-01-05
-SW-KYUREON-01-06
-SW-KYUREON-01-07
-SW-KYUREON-01-07b
-SW-KYUREON-01-08
-SW-KYUREON-01-09
-SW-KYUREON-01-10
-SW-KYUREON-01-11
-SW-KYUREON-01-12
-SW-KYUREON-01-13
-SW-KYUREON-01-14b
-SW-KYUREON-01-14w
-SW-KYUREON-01-15
-SW-KYUREON-01-16
-SW-KYUREON-02-01
-SW-KYUREON-02-02
-SW-KYUREON-02-03
-SW-KYUREON-02-04
-SW-KYUREON-02-05
-SW-KYUREON-02-06
-SW-KYUREON-02-06w
-SW-KYUREON-02-07
-SW-KYUREON-02-08
-SW-KYUREON-02-09
-SW-KYUREON-02-10
-SW-KYUREON-03-01
-SW-KYUREON-03-02
-SW-KYUREON-03-03
-SW-KYUREON-03-04
-SW-KYUREON-03-05
-SW-KYUREON-03-06b
-SW-KYUREON-03-06w
-SW-KYUREON-03-07b
-SW-KYUREON-03-07w
-SW-ENDING-01
-SW-ENDING-02
-SW-ENDING-03
-SW-CYGNUS-01
-SW-CYGNUS-02
-SW-CYGNUS-03
-DMY-390
-DMY-391
-DP-SELECT
-END
+Bank0366_Text_Dmy = dmy
+Bank0366_Text_Pv001 = PV001
+Bank0366_Text_Pv = PV
+Bank0366_Text_PvEnd = PV-END
+Bank0366_Text_Dmy_2 = dmy
+Bank0366_Text_Dmy_3 = dmy
+Bank0366_Text_Dmy_4 = dmy
+Bank0366_Text_Dmy_5 = dmy
+Bank0366_Text_Dmy_6 = dmy
+Bank0366_Text_Dmy_7 = dmy
+Bank0366_Text_Dmy_8 = dmy
+Bank0366_Text_Dmy_9 = dmy
+Bank0366_Text_Dmy_10 = dmy
+Bank0366_Text_Dmy_11 = dmy
+Bank0366_Text_Dmy_12 = dmy
+Bank0366_Text_Dmy_13 = dmy
+Bank0366_Text_Dmy_14 = dmy
+Bank0366_Text_Dmy_15 = dmy
+Bank0366_Text_Dmy_16 = dmy
+Bank0366_Text_Dmy_17 = dmy
+Bank0366_Text_Dmy_18 = dmy
+Bank0366_Text_Dmy_19 = dmy
+Bank0366_Text_Dmy_20 = dmy
+Bank0366_Text_Dmy_21 = dmy
+Bank0366_Text_Dmy_22 = dmy
+Bank0366_Text_Dmy_23 = dmy
+Bank0366_Text_Dmy_24 = dmy
+Bank0366_Text_Dmy_25 = dmy
+Bank0366_Text_Dmy_26 = dmy
+Bank0366_Text_Dmy_27 = dmy
+Bank0366_Text_Dmy_28 = dmy
+Bank0366_Text_Dmy_29 = dmy
+Bank0366_Text_Dmy_30 = dmy
+Bank0366_Text_Dmy_31 = dmy
+Bank0366_Text_Dmy_32 = dmy
+Bank0366_Text_Dmy_33 = dmy
+Bank0366_Text_Dmy_34 = dmy
+Bank0366_Text_Dmy_35 = dmy
+Bank0366_Text_Dmy_36 = dmy
+Bank0366_Text_Dmy_37 = dmy
+Bank0366_Text_Dmy_38 = dmy
+Bank0366_Text_Dmy_39 = dmy
+Bank0366_Text_Dmy_40 = dmy
+Bank0366_Text_Dmy_41 = dmy
+Bank0366_Text_Dmy_42 = dmy
+Bank0366_Text_Dmy_43 = dmy
+Bank0366_Text_Dmy_44 = dmy
+Bank0366_Text_Dmy_45 = dmy
+Bank0366_Text_Dmy_46 = dmy
+Bank0366_Text_Dmy_47 = dmy
+Bank0366_Text_Dmy_48 = dmy
+Bank0366_Text_Dmy_49 = dmy
+Bank0366_Text_Dmy_50 = dmy
+Bank0366_Text_Dmy_51 = dmy
+Bank0366_Text_Dmy_52 = dmy
+Bank0366_Text_Dmy_53 = dmy
+Bank0366_Text_Dmy_54 = dmy
+Bank0366_Text_Dmy_55 = dmy
+Bank0366_Text_Dmy_56 = dmy
+Bank0366_Text_Dmy_57 = dmy
+Bank0366_Text_Dmy_58 = dmy
+Bank0366_Text_Dmy_59 = dmy
+Bank0366_Text_Dmy_60 = dmy
+Bank0366_Text_Dmy_61 = dmy
+Bank0366_Text_Dmy_62 = dmy
+Bank0366_Text_Dmy_63 = dmy
+Bank0366_Text_Dmy_64 = dmy
+Bank0366_Text_Dmy_65 = dmy
+Bank0366_Text_Dmy_66 = dmy
+Bank0366_Text_Dmy_67 = dmy
+Bank0366_Text_Dmy_68 = dmy
+Bank0366_Text_Dmy_69 = dmy
+Bank0366_Text_Dmy_70 = dmy
+Bank0366_Text_Dmy_71 = dmy
+Bank0366_Text_Dmy_72 = dmy
+Bank0366_Text_Dmy_73 = dmy
+Bank0366_Text_Dmy_74 = dmy
+Bank0366_Text_Dmy_75 = dmy
+Bank0366_Text_Dmy_76 = dmy
+Bank0366_Text_Dmy_77 = dmy
+Bank0366_Text_Dmy_78 = dmy
+Bank0366_Text_Dmy_79 = dmy
+Bank0366_Text_Dmy_80 = dmy
+Bank0366_Text_Dmy_81 = dmy
+Bank0366_Text_Dmy_82 = dmy
+Bank0366_Text_Dmy_83 = dmy
+Bank0366_Text_Dmy_84 = dmy
+Bank0366_Text_Dmy_85 = dmy
+Bank0366_Text_Dmy_86 = dmy
+Bank0366_Text_Dmy_87 = dmy
+Bank0366_Text_Dmy_88 = dmy
+Bank0366_Text_Dmy_89 = dmy
+Bank0366_Text_Dmy_90 = dmy
+Bank0366_Text_Dmy_91 = dmy
+Bank0366_Text_Dmy_92 = dmy
+Bank0366_Text_Dmy_93 = dmy
+Bank0366_Text_Dmy_94 = dmy
+Bank0366_Text_Dmy_95 = dmy
+Bank0366_Text_Dmy_96 = dmy
+Bank0366_Text_Dmy_97 = dmy
+Bank0366_Text_Dmy_98 = dmy
+Bank0366_Text_Dmy_99 = dmy
+Bank0366_Text_Dmy_100 = dmy
+Bank0366_Text_Dmy_101 = dmy
+Bank0366_Text_Dmy_102 = dmy
+Bank0366_Text_Dmy_103 = dmy
+Bank0366_Text_Dmy_104 = dmy
+Bank0366_Text_Dmy_105 = dmy
+Bank0366_Text_Dmy_106 = dmy
+Bank0366_Text_Dmy_107 = dmy
+Bank0366_Text_Dmy_108 = dmy
+Bank0366_Text_Dmy_109 = dmy
+Bank0366_Text_Dmy_110 = dmy
+Bank0366_Text_Dmy_111 = dmy
+Bank0366_Text_Dmy_112 = dmy
+Bank0366_Text_Dmy_113 = dmy
+Bank0366_Text_Dmy_114 = dmy
+Bank0366_Text_Dmy_115 = dmy
+Bank0366_Text_Dmy_116 = dmy
+Bank0366_Text_Dmy_117 = dmy
+Bank0366_Text_Dmy_118 = dmy
+Bank0366_Text_Dmy_119 = dmy
+Bank0366_Text_Dmy_120 = dmy
+Bank0366_Text_Dmy_121 = dmy
+Bank0366_Text_Dmy_122 = dmy
+Bank0366_Text_Dmy_123 = dmy
+Bank0366_Text_Dmy_124 = dmy
+Bank0366_Text_Dmy_125 = dmy
+Bank0366_Text_Dmy_126 = dmy
+Bank0366_Text_Dmy_127 = dmy
+Bank0366_Text_Dmy_128 = dmy
+Bank0366_Text_Dmy_129 = dmy
+Bank0366_Text_Dmy_130 = dmy
+Bank0366_Text_Dmy_131 = dmy
+Bank0366_Text_Dmy_132 = dmy
+Bank0366_Text_Dmy_133 = dmy
+Bank0366_Text_Dmy_134 = dmy
+Bank0366_Text_Dmy_135 = dmy
+Bank0366_Text_Dmy_136 = dmy
+Bank0366_Text_Dmy_137 = dmy
+Bank0366_Text_Dmy_138 = dmy
+Bank0366_Text_Dmy_139 = dmy
+Bank0366_Text_Dmy_140 = dmy
+Bank0366_Text_Dmy_141 = dmy
+Bank0366_Text_Dmy_142 = dmy
+Bank0366_Text_Dmy_143 = dmy
+Bank0366_Text_Dmy_144 = dmy
+Bank0366_Text_Dmy_145 = dmy
+Bank0366_Text_Dmy_146 = dmy
+Bank0366_Text_Dmy_147 = dmy
+Bank0366_Text_Dmy_148 = dmy
+Bank0366_Text_Dmy_149 = dmy
+Bank0366_Text_Dmy_150 = dmy
+Bank0366_Text_Dmy_151 = dmy
+Bank0366_Text_Dmy_152 = dmy
+Bank0366_Text_Dmy_153 = dmy
+Bank0366_Text_Dmy_154 = dmy
+Bank0366_Text_Dmy_155 = dmy
+Bank0366_Text_Dmy_156 = dmy
+Bank0366_Text_Dmy_157 = dmy
+Bank0366_Text_Dmy_158 = dmy
+Bank0366_Text_Dmy_159 = dmy
+Bank0366_Text_Dmy_160 = dmy
+Bank0366_Text_Dmy_161 = dmy
+Bank0366_Text_Dmy_162 = dmy
+Bank0366_Text_Dmy_163 = dmy
+Bank0366_Text_Dmy_164 = dmy
+Bank0366_Text_Dmy_165 = dmy
+Bank0366_Text_Dmy_166 = dmy
+Bank0366_Text_Dmy_167 = dmy
+Bank0366_Text_Dmy_168 = dmy
+Bank0366_Text_Dmy_169 = dmy
+Bank0366_Text_Dmy_170 = dmy
+Bank0366_Text_Dmy_171 = dmy
+Bank0366_Text_Dmy_172 = dmy
+Bank0366_Text_Dmy_173 = dmy
+Bank0366_Text_Dmy_174 = dmy
+Bank0366_Text_Dmy_175 = dmy
+Bank0366_Text_Dmy_176 = dmy
+Bank0366_Text_Dmy_177 = dmy
+Bank0366_Text_Dmy_178 = dmy
+Bank0366_Text_Dmy_179 = dmy
+Bank0366_Text_Dmy_180 = dmy
+Bank0366_Text_Dmy_181 = dmy
+Bank0366_Text_Dmy_182 = dmy
+Bank0366_Text_Dmy_183 = dmy
+Bank0366_Text_Dmy_184 = dmy
+Bank0366_Text_Dmy_185 = dmy
+Bank0366_Text_Dmy_186 = dmy
+Bank0366_Text_Dmy_187 = dmy
+Bank0366_Text_Dmy_188 = dmy
+Bank0366_Text_Dmy_189 = dmy
+Bank0366_Text_Dmy_190 = dmy
+Bank0366_Text_Dmy_191 = dmy
+Bank0366_Text_Dmy_192 = dmy
+Bank0366_Text_Dmy_193 = dmy
+Bank0366_Text_Dmy_194 = dmy
+Bank0366_Text_Dmy_195 = dmy
+Bank0366_Text_Dmy_196 = dmy
+Bank0366_Text_Dmy_197 = dmy
+Bank0366_Text_Dmy_198 = dmy
+Bank0366_Text_Dmy_199 = dmy
+Bank0366_Text_Dmy_200 = dmy
+Bank0366_Text_Dmy_201 = dmy
+Bank0366_Text_Dmy_202 = dmy
+Bank0366_Text_Dmy_203 = dmy
+Bank0366_Text_Dmy_204 = dmy
+Bank0366_Text_Dmy_205 = dmy
+Bank0366_Text_Dmy_206 = dmy
+Bank0366_Text_Dmy_207 = dmy
+Bank0366_Text_Dmy_208 = dmy
+Bank0366_Text_Dmy_209 = dmy
+Bank0366_Text_Dmy_210 = dmy
+Bank0366_Text_Dmy_211 = dmy
+Bank0366_Text_Dmy_212 = dmy
+Bank0366_Text_Dmy_213 = dmy
+Bank0366_Text_Dmy_214 = dmy
+Bank0366_Text_Dmy_215 = dmy
+Bank0366_Text_Dmy_216 = dmy
+Bank0366_Text_Dmy_217 = dmy
+Bank0366_Text_Dmy_218 = dmy
+Bank0366_Text_Dmy_219 = dmy
+Bank0366_Text_Dmy_220 = dmy
+Bank0366_Text_Dmy_221 = dmy
+Bank0366_Text_Dmy_222 = dmy
+Bank0366_Text_Dmy_223 = dmy
+Bank0366_Text_Dmy_224 = dmy
+Bank0366_Text_Dmy_225 = dmy
+Bank0366_Text_Dmy_226 = dmy
+Bank0366_Text_Dmy_227 = dmy
+Bank0366_Text_Dmy_228 = dmy
+Bank0366_Text_Dmy_229 = dmy
+Bank0366_Text_Dmy_230 = dmy
+Bank0366_Text_Dmy_231 = dmy
+Bank0366_Text_Dmy_232 = dmy
+Bank0366_Text_Dmy_233 = dmy
+Bank0366_Text_Dmy_234 = dmy
+Bank0366_Text_Dmy_235 = dmy
+Bank0366_Text_Dmy_236 = dmy
+Bank0366_Text_Dmy_237 = dmy
+Bank0366_Text_Dmy_238 = dmy
+Bank0366_Text_Dmy_239 = dmy
+Bank0366_Text_Dmy_240 = dmy
+Bank0366_Text_Dmy_241 = dmy
+Bank0366_Text_Dmy_242 = dmy
+Bank0366_Text_Dmy_243 = dmy
+Bank0366_Text_Dmy_244 = dmy
+Bank0366_Text_Dmy_245 = dmy
+Bank0366_Text_Dmy_246 = dmy
+Bank0366_Text_Dmy_247 = dmy
+Bank0366_Text_Dmy_248 = dmy
+Bank0366_Text_Dmy_249 = dmy
+Bank0366_Text_Dmy_250 = dmy
+Bank0366_Text_Dmy_251 = dmy
+Bank0366_Text_Dmy_252 = dmy
+Bank0366_Text_Dmy_253 = dmy
+Bank0366_Text_Dmy_254 = dmy
+Bank0366_Text_Dmy_255 = dmy
+Bank0366_Text_Dmy_256 = dmy
+Bank0366_Text_Dmy_257 = dmy
+Bank0366_Text_Dmy_258 = dmy
+Bank0366_Text_Dmy_259 = dmy
+Bank0366_Text_Dmy_260 = dmy
+Bank0366_Text_Dmy_261 = dmy
+Bank0366_Text_Dmy_262 = dmy
+Bank0366_Text_Dmy_263 = dmy
+Bank0366_Text_Dmy_264 = dmy
+Bank0366_Text_Dmy_265 = dmy
+Bank0366_Text_Dmy_266 = dmy
+Bank0366_Text_Dmy_267 = dmy
+Bank0366_Text_Dmy_268 = dmy
+Bank0366_Text_Dmy_269 = dmy
+Bank0366_Text_Dmy_270 = dmy
+Bank0366_Text_Dmy_271 = dmy
+Bank0366_Text_Dmy_272 = dmy
+Bank0366_Text_Dmy_273 = dmy
+Bank0366_Text_Dmy_274 = dmy
+Bank0366_Text_Dmy_275 = dmy
+Bank0366_Text_Dmy_276 = dmy
+Bank0366_Text_Dmy_277 = dmy
+Bank0366_Text_Dmy_278 = dmy
+Bank0366_Text_Dmy_279 = dmy
+Bank0366_Text_Dmy_280 = dmy
+Bank0366_Text_Dmy_281 = dmy
+Bank0366_Text_Dmy_282 = dmy
+Bank0366_Text_Dmy_283 = dmy
+Bank0366_Text_Dmy_284 = dmy
+Bank0366_Text_Dmy_285 = dmy
+Bank0366_Text_Dmy_286 = dmy
+Bank0366_Text_Dmy_287 = dmy
+Bank0366_Text_Dmy_288 = dmy
+Bank0366_Text_Dmy_289 = dmy
+Bank0366_Text_Dmy_290 = dmy
+Bank0366_Text_Dmy_291 = dmy
+Bank0366_Text_Dmy_292 = dmy
+Bank0366_Text_Dmy_293 = dmy
+Bank0366_Text_Dmy_294 = dmy
+Bank0366_Text_Dmy_295 = dmy
+Bank0366_Text_Dmy_296 = dmy
+Bank0366_Text_Dmy_297 = dmy
+Bank0366_Text_Dmy_298 = dmy
+Bank0366_Text_Dmy_299 = dmy
+Bank0366_Text_Dmy_300 = dmy
+Bank0366_Text_Dmy_301 = dmy
+Bank0366_Text_Dmy_302 = dmy
+Bank0366_Text_Dmy_303 = dmy
+Bank0366_Text_Dmy_304 = dmy
+Bank0366_Text_Dmy_305 = dmy
+Bank0366_Text_Dmy_306 = dmy
+Bank0366_Text_Dmy_307 = dmy
+Bank0366_Text_Dmy_308 = dmy
+Bank0366_Text_Dmy_309 = dmy
+Bank0366_Text_Dmy_310 = dmy
+Bank0366_Text_Dmy_311 = dmy
+Bank0366_Text_Dmy_312 = dmy
+Bank0366_Text_Dmy_313 = dmy
+Bank0366_Text_Dmy_314 = dmy
+Bank0366_Text_Dmy_315 = dmy
+Bank0366_Text_Dmy_316 = dmy
+Bank0366_Text_Dmy_317 = dmy
+Bank0366_Text_Dmy_318 = dmy
+Bank0366_Text_Dmy_319 = dmy
+Bank0366_Text_Dmy_320 = dmy
+Bank0366_Text_Dmy_321 = dmy
+Bank0366_Text_Dmy_322 = dmy
+Bank0366_Text_Dmy_323 = dmy
+Bank0366_Text_Dmy_324 = dmy
+Bank0366_Text_Dmy_325 = dmy
+Bank0366_Text_Dmy_326 = dmy
+Bank0366_Text_Dmy_327 = dmy
+Bank0366_Text_Dmy_328 = dmy
+Bank0366_Text_Dmy_329 = dmy
+Bank0366_Text_Dmy_330 = dmy
+Bank0366_Text_Dmy_331 = dmy
+Bank0366_Text_Dmy_332 = dmy
+Bank0366_Text_Dmy_333 = dmy
+Bank0366_Text_Dmy_334 = dmy
+Bank0366_Text_Dmy_335 = dmy
+Bank0366_Text_Dmy_336 = dmy
+Bank0366_Text_Dmy_337 = dmy
+Bank0366_Text_Dmy_338 = dmy
+Bank0366_Text_Dmy_339 = dmy
+Bank0366_Text_Dmy_340 = dmy
+Bank0366_Text_Dmy_341 = dmy
+Bank0366_Text_Dmy_342 = dmy
+Bank0366_Text_Dmy_343 = dmy
+Bank0366_Text_Dmy_344 = dmy
+Bank0366_Text_Dmy_345 = dmy
+Bank0366_Text_Dmy_346 = dmy
+Bank0366_Text_Dmy_347 = dmy
+Bank0366_Text_Dmy_348 = dmy
+Bank0366_Text_Dmy_349 = dmy
+Bank0366_Text_Dmy_350 = dmy
+Bank0366_Text_Dmy_351 = dmy
+Bank0366_Text_Dmy_352 = dmy
+Bank0366_Text_Dmy_353 = dmy
+Bank0366_Text_Dmy_354 = dmy
+Bank0366_Text_Dmy_355 = dmy
+Bank0366_Text_Dmy_356 = dmy
+Bank0366_Text_Dmy_357 = dmy
+Bank0366_Text_Dmy_358 = dmy
+Bank0366_Text_Dmy_359 = dmy
+Bank0366_Text_Dmy_360 = dmy
+Bank0366_Text_Dmy_361 = dmy
+Bank0366_Text_Dmy_362 = dmy
+Bank0366_Text_Dmy_363 = dmy
+Bank0366_Text_Dmy_364 = dmy
+Bank0366_Text_Dmy_365 = dmy
+Bank0366_Text_Dmy_366 = dmy
+Bank0366_Text_Dmy_367 = dmy
+Bank0366_Text_Dmy_368 = dmy
+Bank0366_Text_Dmy_369 = dmy
+Bank0366_Text_Dmy_370 = dmy
+Bank0366_Text_Dmy_371 = dmy
+Bank0366_Text_Dmy_372 = dmy
+Bank0366_Text_Dmy_373 = dmy
+Bank0366_Text_Dmy_374 = dmy
+Bank0366_Text_Dmy_375 = dmy
+Bank0366_Text_Dmy_376 = dmy
+Bank0366_Text_Dmy_377 = dmy
+Bank0366_Text_Dmy_378 = dmy
+Bank0366_Text_Dmy_379 = dmy
+Bank0366_Text_Dmy_380 = dmy
+Bank0366_Text_Dmy_381 = dmy
+Bank0366_Text_Dmy_382 = dmy
+Bank0366_Text_Dmy_383 = dmy
+Bank0366_Text_Dmy_384 = dmy
+Bank0366_Text_Dmy_385 = dmy
+Bank0366_Text_Dmy_386 = dmy
+Bank0366_Text_Dmy_387 = dmy
+Bank0366_Text_Dmy_388 = dmy
+Bank0366_Text_Dmy_389 = dmy
+Bank0366_Text_Dmy_390 = dmy
+Bank0366_Text_Dmy_391 = dmy
+Bank0366_Text_Dmy_392 = dmy
+Bank0366_Text_Dmy_393 = dmy
+Bank0366_Text_Dmy_394 = dmy
+Bank0366_Text_Dmy_395 = dmy
+Bank0366_Text_Dmy_396 = dmy
+Bank0366_Text_Dmy_397 = dmy
+Bank0366_Text_Dmy_398 = dmy
+Bank0366_Text_Dmy_399 = dmy
+Bank0366_Text_Dmy_400 = dmy
+Bank0366_Text_Dmy_401 = dmy
+Bank0366_Text_Dmy_402 = dmy
+Bank0366_Text_Dmy_403 = dmy
+Bank0366_Text_Dmy_404 = dmy
+Bank0366_Text_Dmy_405 = dmy
+Bank0366_Text_Dmy_406 = dmy
+Bank0366_Text_Dmy_407 = dmy
+Bank0366_Text_Dmy_408 = dmy
+Bank0366_Text_Dmy_409 = dmy
+Bank0366_Text_Dmy_410 = dmy
+Bank0366_Text_Dmy_411 = dmy
+Bank0366_Text_Dmy_412 = dmy
+Bank0366_Text_Dmy_413 = dmy
+Bank0366_Text_Dmy_414 = dmy
+Bank0366_Text_Dmy_415 = dmy
+Bank0366_Text_Dmy_416 = dmy
+Bank0366_Text_Dmy_417 = dmy
+Bank0366_Text_Dmy_418 = dmy
+Bank0366_Text_Dmy_419 = dmy
+Bank0366_Text_Dmy_420 = dmy
+Bank0366_Text_Dmy_421 = dmy
+Bank0366_Text_Dmy_422 = dmy
+Bank0366_Text_Dmy_423 = dmy
+Bank0366_Text_Dmy_424 = dmy
+Bank0366_Text_Dmy_425 = dmy
+Bank0366_Text_Dmy_426 = dmy
+Bank0366_Text_Dmy_427 = dmy
+Bank0366_Text_Dmy_428 = dmy
+Bank0366_Text_Dmy_429 = dmy
+Bank0366_Text_Dmy_430 = dmy
+Bank0366_Text_Dmy_431 = dmy
+Bank0366_Text_Dmy_432 = dmy
+Bank0366_Text_Dmy_433 = dmy
+Bank0366_Text_Dmy_434 = dmy
+Bank0366_Text_Dmy_435 = dmy
+Bank0366_Text_Dmy_436 = dmy
+Bank0366_Text_Dmy_437 = dmy
+Bank0366_Text_Dmy_438 = dmy
+Bank0366_Text_Dmy_439 = dmy
+Bank0366_Text_Dmy_440 = dmy
+Bank0366_Text_Dmy_441 = dmy
+Bank0366_Text_Dmy_442 = dmy
+Bank0366_Text_Dmy_443 = dmy
+Bank0366_Text_Dmy_444 = dmy
+Bank0366_Text_Dmy_445 = dmy
+Bank0366_Text_Dmy_446 = dmy
+Bank0366_Text_Dmy_447 = dmy
+Bank0366_Text_Dmy_448 = dmy
+Bank0366_Text_Dmy_449 = dmy
+Bank0366_Text_Dmy_450 = dmy
+Bank0366_Text_Dmy_451 = dmy
+Bank0366_Text_Dmy_452 = dmy
+Bank0366_Text_Dmy_453 = dmy
+Bank0366_Text_Dmy_454 = dmy
+Bank0366_Text_Dmy_455 = dmy
+Bank0366_Text_Dmy_456 = dmy
+Bank0366_Text_Dmy_457 = dmy
+Bank0366_Text_Dmy_458 = dmy
+Bank0366_Text_Dmy_459 = dmy
+Bank0366_Text_Dmy_460 = dmy
+Bank0366_Text_Dmy_461 = dmy
+Bank0366_Text_Dmy_462 = dmy
+Bank0366_Text_Dmy_463 = dmy
+Bank0366_Text_Dmy_464 = dmy
+Bank0366_Text_Dmy_465 = dmy
+Bank0366_Text_Dmy_466 = dmy
+Bank0366_Text_Dmy_467 = dmy
+Bank0366_Text_Dmy_468 = dmy
+Bank0366_Text_Dmy_469 = dmy
+Bank0366_Text_Dmy_470 = dmy
+Bank0366_Text_Dmy_471 = dmy
+Bank0366_Text_Dmy_472 = dmy
+Bank0366_Text_Dmy_473 = dmy
+Bank0366_Text_Dmy_474 = dmy
+Bank0366_Text_Dmy_475 = dmy
+Bank0366_Text_Dmy_476 = dmy
+Bank0366_Text_Dmy_477 = dmy
+Bank0366_Text_Dmy_478 = dmy
+Bank0366_Text_Dmy_479 = dmy
+Bank0366_Text_Dmy_480 = dmy
+Bank0366_Text_Dmy_481 = dmy
+Bank0366_Text_Dmy_482 = dmy
+Bank0366_Text_Dmy_483 = dmy
+Bank0366_Text_Dmy_484 = dmy
+Bank0366_Text_Dmy_485 = dmy
+Bank0366_Text_Dmy_486 = dmy
+Bank0366_Text_Dmy_487 = dmy
+Bank0366_Text_Dmy_488 = dmy
+Bank0366_Text_Dmy_489 = dmy
+Bank0366_Text_Dmy_490 = dmy
+Bank0366_Text_Dmy_491 = dmy
+Bank0366_Text_Dmy_492 = dmy
+Bank0366_Text_Dmy_493 = dmy
+Bank0366_Text_Dmy_494 = dmy
+Bank0366_Text_Dmy_495 = dmy
+Bank0366_Text_Dmy_496 = dmy
+Bank0366_Text_Dmy_497 = dmy
+Bank0366_Text_Dmy_498 = dmy
+Bank0366_Text_Dmy_499 = dmy
+Bank0366_Text_Dmy_500 = dmy
+Bank0366_Text_Dmy_501 = dmy
+Bank0366_Text_Dmy_502 = dmy
+Bank0366_Text_Dmy_503 = dmy
+Bank0366_Text_Dmy_504 = dmy
+Bank0366_Text_Dmy_505 = dmy
+Bank0366_Text_Dmy_506 = dmy
+Bank0366_Text_Dmy_507 = dmy
+Bank0366_Text_Dmy_508 = dmy
+Bank0366_Text_Dmy_509 = dmy
+Bank0366_Text_Dmy_510 = dmy
+Bank0366_Text_Dmy_511 = dmy
+Bank0366_Text_Dmy_512 = dmy
+Bank0366_Text_Dmy_513 = dmy
+Bank0366_Text_Dmy_514 = dmy
+Bank0366_Text_Dmy_515 = dmy
+Bank0366_Text_Dmy_516 = dmy
+Bank0366_Text_Dmy_517 = dmy
+Bank0366_Text_Dmy_518 = dmy
+Bank0366_Text_Dmy_519 = dmy
+Bank0366_Text_Dmy_520 = dmy
+Bank0366_Text_Dmy_521 = dmy
+Bank0366_Text_Dmy_522 = dmy
+Bank0366_Text_Dmy_523 = dmy
+Bank0366_Text_Dmy_524 = dmy
+Bank0366_Text_Dmy_525 = dmy
+Bank0366_Text_Dmy_526 = dmy
+Bank0366_Text_Dmy_527 = dmy
+Bank0366_Text_Dmy_528 = dmy
+Bank0366_Text_Dmy_529 = dmy
+Bank0366_Text_Dmy_530 = dmy
+Bank0366_Text_Dmy_531 = dmy
+Bank0366_Text_Dmy_532 = dmy
+Bank0366_Text_Dmy_533 = dmy
+Bank0366_Text_Dmy_534 = dmy
+Bank0366_Text_Dmy_535 = dmy
+Bank0366_Text_Dmy_536 = dmy
+Bank0366_Text_Dmy_537 = dmy
+Bank0366_Text_Dmy_538 = dmy
+Bank0366_Text_Dmy_539 = dmy
+Bank0366_Text_Dmy_540 = dmy
+Bank0366_Text_Dmy_541 = dmy
+Bank0366_Text_Dmy_542 = dmy
+Bank0366_Text_Dmy_543 = dmy
+Bank0366_Text_Dmy_544 = dmy
+Bank0366_Text_Dmy_545 = dmy
+Bank0366_Text_Dmy_546 = dmy
+Bank0366_Text_Dmy_547 = dmy
+Bank0366_Text_Dmy_548 = dmy
+Bank0366_Text_Dmy_549 = dmy
+Bank0366_Text_Dmy_550 = dmy
+Bank0366_Text_Dmy_551 = dmy
+Bank0366_Text_Dmy_552 = dmy
+Bank0366_Text_Dmy_553 = dmy
+Bank0366_Text_Dmy_554 = dmy
+Bank0366_Text_Dmy_555 = dmy
+Bank0366_Text_Dmy_556 = dmy
+Bank0366_Text_Dmy_557 = dmy
+Bank0366_Text_Dmy_558 = dmy
+Bank0366_Text_Dmy_559 = dmy
+Bank0366_Text_Dmy_560 = dmy
+Bank0366_Text_Dmy_561 = dmy
+Bank0366_Text_Dmy_562 = dmy
+Bank0366_Text_Dmy_563 = dmy
+Bank0366_Text_Dmy_564 = dmy
+Bank0366_Text_Dmy_565 = dmy
+Bank0366_Text_Dmy_566 = dmy
+Bank0366_Text_Dmy_567 = dmy
+Bank0366_Text_Dmy_568 = dmy
+Bank0366_Text_Dmy_569 = dmy
+Bank0366_Text_Dmy_570 = dmy
+Bank0366_Text_Dmy_571 = dmy
+Bank0366_Text_Dmy_572 = dmy
+Bank0366_Text_Dmy_573 = dmy
+Bank0366_Text_Dmy_574 = dmy
+Bank0366_Text_Dmy_575 = dmy
+Bank0366_Text_Dmy_576 = dmy
+Bank0366_Text_Dmy_577 = dmy
+Bank0366_Text_Dmy_578 = dmy
+Bank0366_Text_Dmy_579 = dmy
+Bank0366_Text_Dmy_580 = dmy
+Bank0366_Text_Dmy_581 = dmy
+Bank0366_Text_Dmy_582 = dmy
+Bank0366_Text_Dmy_583 = dmy
+Bank0366_Text_Dmy_584 = dmy
+Bank0366_Text_Dmy_585 = dmy
+Bank0366_Text_Dmy_586 = dmy
+Bank0366_Text_Dmy_587 = dmy
+Bank0366_Text_Dmy_588 = dmy
+Bank0366_Text_Dmy_589 = dmy
+Bank0366_Text_Dmy_590 = dmy
+Bank0366_Text_Dmy_591 = dmy
+Bank0366_Text_Dmy_592 = dmy
+Bank0366_Text_Dmy_593 = dmy
+Bank0366_Text_Dmy_594 = dmy
+Bank0366_Text_Dmy_595 = dmy
+Bank0366_Text_Dmy_596 = dmy
+Bank0366_Text_Dmy_597 = dmy
+Bank0366_Text_Dmy_598 = dmy
+Bank0366_Text_Dmy_599 = dmy
+Bank0366_Text_Dmy_600 = dmy
+Bank0366_Text_Dmy_601 = dmy
+Bank0366_Text_Dmy_602 = dmy
+Bank0366_Text_Dmy_603 = dmy
+Bank0366_Text_Dmy_604 = dmy
+Bank0366_Text_Dmy_605 = dmy
+Bank0366_Text_Dmy_606 = dmy
+Bank0366_Text_Dmy_607 = dmy
+Bank0366_Text_Dmy_608 = dmy
+Bank0366_Text_Dmy_609 = dmy
+Bank0366_Text_Dmy_610 = dmy
+Bank0366_Text_Dmy_611 = dmy
+Bank0366_Text_Dmy_612 = dmy
+Bank0366_Text_Dmy_613 = dmy
+Bank0366_Text_Dmy_614 = dmy
+Bank0366_Text_Dmy_615 = dmy
+Bank0366_Text_Dmy_616 = dmy
+Bank0366_Text_Dmy_617 = dmy
+Bank0366_Text_Dmy_618 = dmy
+Bank0366_Text_Dmy_619 = dmy
+Bank0366_Text_Dmy_620 = dmy
+Bank0366_Text_Dmy_621 = dmy
+Bank0366_Text_Dmy_622 = dmy
+Bank0366_Text_Dmy_623 = dmy
+Bank0366_Text_Dmy_624 = dmy
+Bank0366_Text_Dmy_625 = dmy
+Bank0366_Text_Dmy_626 = dmy
+Bank0366_Text_Dmy_627 = dmy
+Bank0366_Text_Dmy_628 = dmy
+Bank0366_Text_Dmy_629 = dmy
+Bank0366_Text_Dmy_630 = dmy
+Bank0366_Text_Dmy_631 = dmy
+Bank0366_Text_Dmy_632 = dmy
+Bank0366_Text_Dmy_633 = dmy
+Bank0366_Text_Dmy_634 = dmy
+Bank0366_Text_Dmy_635 = dmy
+Bank0366_Text_Dmy_636 = dmy
+Bank0366_Text_Dmy_637 = dmy
+Bank0366_Text_Dmy_638 = dmy
+Bank0366_Text_Dmy_639 = dmy
+Bank0366_Text_Dmy_640 = dmy
+Bank0366_Text_Dmy_641 = dmy
+Bank0366_Text_Dmy_642 = dmy
+Bank0366_Text_Dmy_643 = dmy
+Bank0366_Text_Dmy_644 = dmy
+Bank0366_Text_Dmy_645 = dmy
+Bank0366_Text_Dmy_646 = dmy
+Bank0366_Text_Dmy_647 = dmy
+Bank0366_Text_Dmy_648 = dmy
+Bank0366_Text_Dmy_649 = dmy
+Bank0366_Text_Dmy_650 = dmy
+Bank0366_Text_Dmy_651 = dmy
+Bank0366_Text_Dmy_652 = dmy
+Bank0366_Text_Dmy_653 = dmy
+Bank0366_Text_Dmy_654 = dmy
+Bank0366_Text_Dmy_655 = dmy
+Bank0366_Text_Dmy_656 = dmy
+Bank0366_Text_Dmy_657 = dmy
+Bank0366_Text_Dmy_658 = dmy
+Bank0366_Text_Dmy_659 = dmy
+Bank0366_Text_Dmy_660 = dmy
+Bank0366_Text_Dmy_661 = dmy
+Bank0366_Text_Dmy_662 = dmy
+Bank0366_Text_Dmy_663 = dmy
+Bank0366_Text_Dmy_664 = dmy
+Bank0366_Text_Dmy_665 = dmy
+Bank0366_Text_Dmy_666 = dmy
+Bank0366_Text_Dmy_667 = dmy
+Bank0366_Text_Dmy_668 = dmy
+Bank0366_Text_Dmy_669 = dmy
+Bank0366_Text_Dmy_670 = dmy
+Bank0366_Text_Dmy_671 = dmy
+Bank0366_Text_Dmy_672 = dmy
+Bank0366_Text_Dmy_673 = dmy
+Bank0366_Text_Dmy_674 = dmy
+Bank0366_Text_Dmy_675 = dmy
+Bank0366_Text_Dmy_676 = dmy
+Bank0366_Text_Dmy_677 = dmy
+Bank0366_Text_Dmy_678 = dmy
+Bank0366_Text_Dmy_679 = dmy
+Bank0366_Text_Dmy_680 = dmy
+Bank0366_Text_Dmy_681 = dmy
+Bank0366_Text_Dmy_682 = dmy
+Bank0366_Text_Dmy_683 = dmy
+Bank0366_Text_Dmy_684 = dmy
+Bank0366_Text_Dmy_685 = dmy
+Bank0366_Text_Dmy_686 = dmy
+Bank0366_Text_Dmy_687 = dmy
+Bank0366_Text_Dmy_688 = dmy
+Bank0366_Text_Dmy_689 = dmy
+Bank0366_Text_Dmy_690 = dmy
+Bank0366_Text_Dmy_691 = dmy
+Bank0366_Text_Dmy_692 = dmy
+Bank0366_Text_Dmy_693 = dmy
+Bank0366_Text_Dmy_694 = dmy
+Bank0366_Text_Dmy_695 = dmy
+Bank0366_Text_Dmy_696 = dmy
+Bank0366_Text_Dmy_697 = dmy
+Bank0366_Text_Dmy_698 = dmy
+Bank0366_Text_Dmy_699 = dmy
+Bank0366_Text_Dmy_700 = dmy
+Bank0366_Text_Dmy_701 = dmy
+Bank0366_Text_Dmy_702 = dmy
+Bank0366_Text_Dmy_703 = dmy
+Bank0366_Text_Dmy_704 = dmy
+Bank0366_Text_Dmy_705 = dmy
+Bank0366_Text_Dmy_706 = dmy
+Bank0366_Text_Dmy_707 = dmy
+Bank0366_Text_Dmy_708 = dmy
+Bank0366_Text_Dmy_709 = dmy
+Bank0366_Text_Dmy_710 = dmy
+Bank0366_Text_Dmy_711 = dmy
+Bank0366_Text_Dmy_712 = dmy
+Bank0366_Text_Dmy_713 = dmy
+Bank0366_Text_Dmy_714 = dmy
+Bank0366_Text_Dmy_715 = dmy
+Bank0366_Text_Dmy_716 = dmy
+Bank0366_Text_Dmy_717 = dmy
+Bank0366_Text_Dmy_718 = dmy
+Bank0366_Text_Dmy_719 = dmy
+Bank0366_Text_Dmy_720 = dmy
+Bank0366_Text_Dmy_721 = dmy
+Bank0366_Text_Dmy_722 = dmy
+Bank0366_Text_Dmy_723 = dmy
+Bank0366_Text_Dmy_724 = dmy
+Bank0366_Text_Dmy_725 = dmy
+Bank0366_Text_Dmy_726 = dmy
+Bank0366_Text_Dmy_727 = dmy
+Bank0366_Text_Dmy_728 = dmy
+Bank0366_Text_Dmy_729 = dmy
+Bank0366_Text_Dmy_730 = dmy
+Bank0366_Text_Dmy_731 = dmy
+Bank0366_Text_Dmy_732 = dmy
+Bank0366_Text_Dmy_733 = dmy
+Bank0366_Text_Dmy_734 = dmy
+Bank0366_Text_Dmy_735 = dmy
+Bank0366_Text_Dmy_736 = dmy
+Bank0366_Text_Dmy_737 = dmy
+Bank0366_Text_Dmy_738 = dmy
+Bank0366_Text_Dmy_739 = dmy
+Bank0366_Text_Dmy_740 = dmy
+Bank0366_Text_Dmy_741 = dmy
+Bank0366_Text_Dmy_742 = dmy
+Bank0366_Text_Dmy_743 = dmy
+Bank0366_Text_Dmy_744 = dmy
+Bank0366_Text_Dmy_745 = dmy
+Bank0366_Text_Dmy_746 = dmy
+Bank0366_Text_Dmy_747 = dmy
+Bank0366_Text_Dmy_748 = dmy
+Bank0366_Text_Dmy_749 = dmy
+Bank0366_Text_Dmy_750 = dmy
+Bank0366_Text_Dmy_751 = dmy
+Bank0366_Text_Dmy_752 = dmy
+Bank0366_Text_Dmy_753 = dmy
+Bank0366_Text_Dmy_754 = dmy
+Bank0366_Text_Dmy_755 = dmy
+Bank0366_Text_Dmy_756 = dmy
+Bank0366_Text_Dmy_757 = dmy
+Bank0366_Text_Dmy_758 = dmy
+Bank0366_Text_Dmy_759 = dmy
+Bank0366_Text_Dmy_760 = dmy
+Bank0366_Text_Dmy_761 = dmy
+Bank0366_Text_Dmy_762 = dmy
+Bank0366_Text_Dmy_763 = dmy
+Bank0366_Text_Dmy_764 = dmy
+Bank0366_Text_Dmy_765 = dmy
+Bank0366_Text_Dmy_766 = dmy
+Bank0366_Text_Dmy_767 = dmy
+Bank0366_Text_Dmy_768 = dmy
+Bank0366_Text_Dmy_769 = dmy
+Bank0366_Text_Dmy_770 = dmy
+Bank0366_Text_Dmy_771 = dmy
+Bank0366_Text_Dmy_772 = dmy
+Bank0366_Text_Dmy_773 = dmy
+Bank0366_Text_Dmy_774 = dmy
+Bank0366_Text_Dmy_775 = dmy
+Bank0366_Text_Dmy_776 = dmy
+Bank0366_Text_Dmy_777 = dmy
+Bank0366_Text_Dmy_778 = dmy
+Bank0366_Text_Dmy_779 = dmy
+Bank0366_Text_Dmy_780 = dmy
+Bank0366_Text_Dmy_781 = dmy
+Bank0366_Text_Dmy_782 = dmy
+Bank0366_Text_Dmy_783 = dmy
+Bank0366_Text_Dmy_784 = dmy
+Bank0366_Text_Dmy_785 = dmy
+Bank0366_Text_Dmy_786 = dmy
+Bank0366_Text_Dmy_787 = dmy
+Bank0366_Text_Dmy_788 = dmy
+Bank0366_Text_Dmy_789 = dmy
+Bank0366_Text_Dmy_790 = dmy
+Bank0366_Text_Dmy_791 = dmy
+Bank0366_Text_Dmy_792 = dmy
+Bank0366_Text_Dmy_793 = dmy
+Bank0366_Text_Dmy_794 = dmy
+Bank0366_Text_Dmy_795 = dmy
+Bank0366_Text_Dmy_796 = dmy
+Bank0366_Text_Dmy_797 = dmy
+Bank0366_Text_Dmy_798 = dmy
+Bank0366_Text_Dmy_799 = dmy
+Bank0366_Text_Dmy_800 = dmy
+Bank0366_Text_Dmy_801 = dmy
+Bank0366_Text_Dmy_802 = dmy
+Bank0366_Text_Dmy_803 = dmy
+Bank0366_Text_Dmy_804 = dmy
+Bank0366_Text_Dmy_805 = dmy
+Bank0366_Text_Dmy_806 = dmy
+Bank0366_Text_Dmy_807 = dmy
+Bank0366_Text_Dmy_808 = dmy
+Bank0366_Text_Dmy_809 = dmy
+Bank0366_Text_Dmy_810 = dmy
+Bank0366_Text_Dmy_811 = dmy
+Bank0366_Text_Dmy_812 = dmy
+Bank0366_Text_Dmy_813 = dmy
+Bank0366_Text_Dmy_814 = dmy
+Bank0366_Text_Dmy_815 = dmy
+Bank0366_Text_Dmy_816 = dmy
+Bank0366_Text_Dmy_817 = dmy
+Bank0366_Text_Dmy_818 = dmy
+Bank0366_Text_Dmy_819 = dmy
+Bank0366_Text_Dmy_820 = dmy
+Bank0366_Text_Dmy_821 = dmy
+Bank0366_Text_Dmy_822 = dmy
+Bank0366_Text_Dmy_823 = dmy
+Bank0366_Text_Dmy_824 = dmy
+Bank0366_Text_Dmy_825 = dmy
+Bank0366_Text_Dmy_826 = dmy
+Bank0366_Text_Dmy_827 = dmy
+Bank0366_Text_Dmy_828 = dmy
+Bank0366_Text_Dmy_829 = dmy
+Bank0366_Text_Dmy_830 = dmy
+Bank0366_Text_Dmy_831 = dmy
+Bank0366_Text_Dmy_832 = dmy
+Bank0366_Text_Dmy_833 = dmy
+Bank0366_Text_Dmy_834 = dmy
+Bank0366_Text_Dmy_835 = dmy
+Bank0366_Text_Dmy_836 = dmy
+Bank0366_Text_Dmy_837 = dmy
+Bank0366_Text_Dmy_838 = dmy
+Bank0366_Text_Dmy_839 = dmy
+Bank0366_Text_Dmy_840 = dmy
+Bank0366_Text_Dmy_841 = dmy
+Bank0366_Text_Dmy_842 = dmy
+Bank0366_Text_Dmy_843 = dmy
+Bank0366_Text_Dmy_844 = dmy
+Bank0366_Text_Dmy_845 = dmy
+Bank0366_Text_Dmy_846 = dmy
+Bank0366_Text_Dmy_847 = dmy
+Bank0366_Text_Dmy_848 = dmy
+Bank0366_Text_Dmy_849 = dmy
+Bank0366_Text_Dmy_850 = dmy
+Bank0366_Text_Dmy_851 = dmy
+Bank0366_Text_Dmy_852 = dmy
+Bank0366_Text_Dmy_853 = dmy
+Bank0366_Text_Dmy_854 = dmy
+Bank0366_Text_Dmy_855 = dmy
+Bank0366_Text_Dmy_856 = dmy
+Bank0366_Text_Dmy_857 = dmy
+Bank0366_Text_Dmy_858 = dmy
+Bank0366_Text_Dmy_859 = dmy
+Bank0366_Text_Dmy_860 = dmy
+Bank0366_Text_Dmy_861 = dmy
+Bank0366_Text_Dmy_862 = dmy
+Bank0366_Text_Dmy_863 = dmy
+Bank0366_Text_Dmy_864 = dmy
+Bank0366_Text_Dmy_865 = dmy
+Bank0366_Text_Dmy_866 = dmy
+Bank0366_Text_Dmy_867 = dmy
+Bank0366_Text_Dmy_868 = dmy
+Bank0366_Text_Dmy_869 = dmy
+Bank0366_Text_Dmy_870 = dmy
+Bank0366_Text_Dmy_871 = dmy
+Bank0366_Text_Dmy_872 = dmy
+Bank0366_Text_Dmy_873 = dmy
+Bank0366_Text_Dmy_874 = dmy
+Bank0366_Text_Dmy_875 = dmy
+Bank0366_Text_Dmy_876 = dmy
+Bank0366_Text_Dmy_877 = dmy
+Bank0366_Text_Dmy_878 = dmy
+Bank0366_Text_Dmy_879 = dmy
+Bank0366_Text_Dmy_880 = dmy
+Bank0366_Text_Dmy_881 = dmy
+Bank0366_Text_Dmy_882 = dmy
+Bank0366_Text_Dmy_883 = dmy
+Bank0366_Text_Dmy_884 = dmy
+Bank0366_Text_Dmy_885 = dmy
+Bank0366_Text_Dmy_886 = dmy
+Bank0366_Text_Dmy_887 = dmy
+Bank0366_Text_Dmy_888 = dmy
+Bank0366_Text_Dmy_889 = dmy
+Bank0366_Text_Dmy_890 = dmy
+Bank0366_Text_Dmy_891 = dmy
+Bank0366_Text_Dmy_892 = dmy
+Bank0366_Text_Dmy_893 = dmy
+Bank0366_Text_Dmy_894 = dmy
+Bank0366_Text_Dmy_895 = dmy
+Bank0366_Text_Dmy_896 = dmy
+Bank0366_Text_Dmy_897 = dmy
+Bank0366_Text_Dmy_898 = dmy
+Bank0366_Text_Dmy_899 = dmy
+Bank0366_Text_Dmy_900 = dmy
+Bank0366_Text_Dmy_901 = dmy
+Bank0366_Text_Dmy_902 = dmy
+Bank0366_Text_Dmy_903 = dmy
+Bank0366_Text_Dmy_904 = dmy
+Bank0366_Text_Dmy_905 = dmy
+Bank0366_Text_Dmy_906 = dmy
+Bank0366_Text_Dmy_907 = dmy
+Bank0366_Text_Dmy_908 = dmy
+Bank0366_Text_Dmy_909 = dmy
+Bank0366_Text_Dmy_910 = dmy
+Bank0366_Text_Dmy_911 = dmy
+Bank0366_Text_Dmy_912 = dmy
+Bank0366_Text_Dmy_913 = dmy
+Bank0366_Text_Dmy_914 = dmy
+Bank0366_Text_Dmy_915 = dmy
+Bank0366_Text_Dmy_916 = dmy
+Bank0366_Text_Dmy_917 = dmy
+Bank0366_Text_Dmy_918 = dmy
+Bank0366_Text_Dmy_919 = dmy
+Bank0366_Text_Dmy_920 = dmy
+Bank0366_Text_Dmy_921 = dmy
+Bank0366_Text_Dmy_922 = dmy
+Bank0366_Text_Dmy_923 = dmy
+Bank0366_Text_Dmy_924 = dmy
+Bank0366_Text_Dmy_925 = dmy
+Bank0366_Text_Dmy_926 = dmy
+Bank0366_Text_Dmy_927 = dmy
+Bank0366_Text_Dmy_928 = dmy
+Bank0366_Text_Dmy_929 = dmy
+Bank0366_Text_Dmy_930 = dmy
+Bank0366_Text_Dmy_931 = dmy
+Bank0366_Text_Dmy_932 = dmy
+Bank0366_Text_Dmy_933 = dmy
+Bank0366_Text_Dmy_934 = dmy
+Bank0366_Text_Dmy_935 = dmy
+Bank0366_Text_Dmy_936 = dmy
+Bank0366_Text_Dmy_937 = dmy
+Bank0366_Text_Dmy_938 = dmy
+Bank0366_Text_Dmy_939 = dmy
+Bank0366_Text_Dmy_940 = dmy
+Bank0366_Text_Dmy_941 = dmy
+Bank0366_Text_Dmy_942 = dmy
+Bank0366_Text_Dmy_943 = dmy
+Bank0366_Text_Dmy_944 = dmy
+Bank0366_Text_Dmy_945 = dmy
+Bank0366_Text_Dmy_946 = dmy
+Bank0366_Text_Dmy_947 = dmy
+Bank0366_Text_Dmy_948 = dmy
+Bank0366_Text_Dmy_949 = dmy
+Bank0366_Text_Dmy_950 = dmy
+Bank0366_Text_Dmy_951 = dmy
+Bank0366_Text_Dmy_952 = dmy
+Bank0366_Text_Dmy_953 = dmy
+Bank0366_Text_Dmy_954 = dmy
+Bank0366_Text_Dmy_955 = dmy
+Bank0366_Text_Dmy_956 = dmy
+Bank0366_Text_Dmy_957 = dmy
+Bank0366_Text_Dmy_958 = dmy
+Bank0366_Text_Dmy_959 = dmy
+Bank0366_Text_Dmy_960 = dmy
+Bank0366_Text_Dmy_961 = dmy
+Bank0366_Text_Dmy_962 = dmy
+Bank0366_Text_Dmy_963 = dmy
+Bank0366_Text_Dmy_964 = dmy
+Bank0366_Text_Dmy_965 = dmy
+Bank0366_Text_Dmy_966 = dmy
+Bank0366_Text_Dmy_967 = dmy
+Bank0366_Text_Dmy_968 = dmy
+Bank0366_Text_Dmy_969 = dmy
+Bank0366_Text_Dmy_970 = dmy
+Bank0366_Text_Dmy_971 = dmy
+Bank0366_Text_Dmy_972 = dmy
+Bank0366_Text_Dmy_973 = dmy
+Bank0366_Text_Dmy_974 = dmy
+Bank0366_Text_Dmy_975 = dmy
+Bank0366_Text_Dmy_976 = dmy
+Bank0366_Text_Dmy_977 = dmy
+Bank0366_Text_Dmy_978 = dmy
+Bank0366_Text_Dmy_979 = dmy
+Bank0366_Text_Dmy_980 = dmy
+Bank0366_Text_Dmy_981 = dmy
+Bank0366_Text_Dmy_982 = dmy
+Bank0366_Text_Dmy_983 = dmy
+Bank0366_Text_Dmy_984 = dmy
+Bank0366_Text_Dmy_985 = dmy
+Bank0366_Text_Dmy_986 = dmy
+Bank0366_Text_Dmy_987 = dmy
+Bank0366_Text_Dmy_988 = dmy
+Bank0366_Text_Dmy_989 = dmy
+Bank0366_Text_Dmy_990 = dmy
+Bank0366_Text_Dmy_991 = dmy
+Bank0366_Text_Dmy_992 = dmy
+Bank0366_Text_Dmy_993 = dmy
+Bank0366_Text_Dmy_994 = dmy
+Bank0366_Text_Dmy_995 = dmy
+Bank0366_Text_Dmy_996 = dmy
+Bank0366_Text_Dmy_997 = dmy
+Bank0366_Text_BgmDummy = BGM-DUMMY
+Bank0366_Text_BgmSilenceField = BGM-SILENCE-FIELD
+Bank0366_Text_BgmSilenceDungeon = BGM-SILENCE-DUNGEON
+Bank0366_Text_BgmTitle = BGM-TITLE
+Bank0366_Text_BgmTitle01 = BGM-TITLE01
+Bank0366_Text_BgmOpeningTitleB = BGM-OPENING-TITLE-B
+Bank0366_Text_BgmOpeningTitleW = BGM-OPENING-TITLE-W
+Bank0366_Text_BgmPokemonTheme = BGM-POKEMON-THEME
+Bank0366_Text_BgmStarting = BGM-STARTING
+Bank0366_Text_BgmStarting2 = BGM-STARTING2
+Bank0366_Text_BgmShinka = BGM-SHINKA
+Bank0366_Text_BgmKoukan = BGM-KOUKAN
+Bank0366_Text_BgmBicycle = BGM-BICYCLE
+Bank0366_Text_BgmNaminori = BGM-NAMINORI
+Bank0366_Text_BgmDiving = BGM-DIVING
+Bank0366_Text_BgmEDendouiri = BGM-E-DENDOUIRI
+Bank0366_Text_BgmEnding = BGM-ENDING
+Bank0366_Text_BgmEnding2 = BGM-ENDING2
+Bank0366_Text_BgmT01 = BGM-T-01
+Bank0366_Text_BgmT02 = BGM-T-02
+Bank0366_Text_BgmT03 = BGM-T-03
+Bank0366_Text_BgmT04 = BGM-T-04
+Bank0366_Text_BgmT05Sp = BGM-T-05-SP
+Bank0366_Text_BgmT05Su = BGM-T-05-SU
+Bank0366_Text_BgmT05Au = BGM-T-05-AU
+Bank0366_Text_BgmT05Wi = BGM-T-05-WI
+Bank0366_Text_BgmC01 = BGM-C-01
+Bank0366_Text_BgmC02 = BGM-C-02
+Bank0366_Text_BgmC03 = BGM-C-03
+Bank0366_Text_BgmC04 = BGM-C-04
+Bank0366_Text_BgmSwC5 = BGM-SW-C-5-NEW
+Bank0366_Text_BgmC06 = BGM-C-06
+Bank0366_Text_BgmC07 = BGM-C-07
+Bank0366_Text_BgmC08B = BGM-C-08-B
+Bank0366_Text_BgmC08W = BGM-C-08-W
+Bank0366_Text_BgmC10B = BGM-C-10-B
+Bank0366_Text_BgmC10W = BGM-C-10-W
+Bank0366_Text_BgmR = BGM-R-A
+Bank0366_Text_BgmRBSp = BGM-R-B-SP
+Bank0366_Text_BgmRBSu = BGM-R-B-SU
+Bank0366_Text_BgmRBAu = BGM-R-B-AU
+Bank0366_Text_BgmRBWi = BGM-R-B-WI
+Bank0366_Text_BgmRCSp = BGM-R-C-SP
+Bank0366_Text_BgmRCSu = BGM-R-C-SU
+Bank0366_Text_BgmRCAu = BGM-R-C-AU
+Bank0366_Text_BgmRCWi = BGM-R-C-WI
+Bank0366_Text_BgmRDSp = BGM-R-D-SP
+Bank0366_Text_BgmRDSu = BGM-R-D-SU
+Bank0366_Text_BgmRDAu = BGM-R-D-AU
+Bank0366_Text_BgmRDWi = BGM-R-D-WI
+Bank0366_Text_BgmRESp = BGM-R-E-SP
+Bank0366_Text_BgmRESu = BGM-R-E-SU
+Bank0366_Text_BgmREAu = BGM-R-E-AU
+Bank0366_Text_BgmREWi = BGM-R-E-WI
+Bank0366_Text_BgmRF = BGM-R-F
+Bank0366_Text_BgmH01 = BGM-H-01
+Bank0366_Text_BgmH02 = BGM-H-02
+Bank0366_Text_BgmH03 = BGM-H-03
+Bank0366_Text_BgmH04 = BGM-H-04
+Bank0366_Text_BgmH05 = BGM-H-05
+Bank0366_Text_BgmPokecen = BGM-POKECEN
+Bank0366_Text_BgmFs = BGM-FS
+Bank0366_Text_BgmGym = BGM-GYM
+Bank0366_Text_BgmGroundGym01 = BGM-GROUND-GYM-01
+Bank0366_Text_BgmLabo = BGM-LABO
+Bank0366_Text_BgmGate = BGM-GATE
+Bank0366_Text_BgmGearStation = BGM-GEAR-STATION
+Bank0366_Text_BgmBattleSubway = BGM-BATTLE-SUBWAY
+Bank0366_Text_BgmPalpark = BGM-PALPARK
+Bank0366_Text_BgmPleasureBoat = BGM-PLEASURE-BOAT
+Bank0366_Text_BgmPalace = BGM-PALACE
+Bank0366_Text_BgmUnitedNations = BGM-UNITED-NATIONS
+Bank0366_Text_BgmPokemonLeague = BGM-POKEMON-LEAGUE
+Bank0366_Text_BgmPokemonLeague2 = BGM-POKEMON-LEAGUE2
+Bank0366_Text_BgmSwDN = BGM-SW-D-N-CASTLE
+Bank0366_Text_BgmD01 = BGM-D-01
+Bank0366_Text_BgmD02 = BGM-D-02
+Bank0366_Text_BgmD03 = BGM-D-03
+Bank0366_Text_BgmD04 = BGM-D-04
+Bank0366_Text_BgmD05 = BGM-D-05
+Bank0366_Text_BgmD06 = BGM-D-06
+Bank0366_Text_BgmDChamproad = BGM-D-CHAMPROAD
+Bank0366_Text_BgmMugenLobbyB = BGM-MUGEN-lobby-B
+Bank0366_Text_BgmMugenLobbyW = BGM-MUGEN-lobby-W
+Bank0366_Text_BgmMugenDB = BGM-MUGEN-D-B
+Bank0366_Text_BgmMugenDW = BGM-MUGEN-D-W
+Bank0366_Text_BgmETsureteke2 = BGM-E-TSURETEKE2
+Bank0366_Text_BgmECheren = BGM-E-CHEREN
+Bank0366_Text_BgmEBeru = BGM-E-BERU
+Bank0366_Text_BgmEDoctor = BGM-E-DOCTOR
+Bank0366_Text_BgmEDoctor2 = BGM-E-DOCTOR2
+Bank0366_Text_BgmENSwan = BGM-E-N-SWAN
+Bank0366_Text_BgmESage = BGM-E-SAGE
+Bank0366_Text_BgmENewG = BGM-E-NEW-G-CIS
+Bank0366_Text_BgmEInishie = BGM-E-INISHIE
+Bank0366_Text_BgmEEmotion = BGM-E-EMOTION
+Bank0366_Text_BgmErectricGym01 = BGM-ERECTRIC-GYM-01
+Bank0366_Text_BgmErectricGym02 = BGM-ERECTRIC-GYM-02
+Bank0366_Text_BgmInsectGym01 = BGM-INSECT-GYM-01
+Bank0366_Text_BgmPoisoneGym00 = BGM-POISONE-GYM-00
+Bank0366_Text_BgmPoisoneGym01 = BGM-POISONE-GYM-01
+Bank0366_Text_BgmEChampion = BGM-E-CHAMPION
+Bank0366_Text_BgmSwDemoOpening = BGM-SW-DEMO-OPENING
+Bank0366_Text_BgmEKanransya = BGM-E-KANRANSYA
+Bank0366_Text_BgmSwC12 = BGM-SW-C-12
+Bank0366_Text_BgmSwC13 = BGM-SW-C-13
+Bank0366_Text_BgmSwC14 = BGM-SW-C-14
+Bank0366_Text_BgmMslField = BGM-MSL-FIELD
+Bank0366_Text_BgmMslDressup = BGM-MSL-DRESSUP
+Bank0366_Text_BgmMslBefore = BGM-MSL-BEFORE
+Bank0366_Text_BgmMsl01 = BGM-MSL-01
+Bank0366_Text_BgmMsl02 = BGM-MSL-02
+Bank0366_Text_BgmMsl03 = BGM-MSL-03
+Bank0366_Text_BgmMsl04 = BGM-MSL-04
+Bank0366_Text_BgmEye01 = BGM-EYE-01
+Bank0366_Text_BgmEye02 = BGM-EYE-02
+Bank0366_Text_BgmEye03 = BGM-EYE-03
+Bank0366_Text_BgmEye04 = BGM-EYE-04
+Bank0366_Text_BgmEye05 = BGM-EYE-05
+Bank0366_Text_BgmEye06 = BGM-EYE-06
+Bank0366_Text_BgmEye07 = BGM-EYE-07
+Bank0366_Text_BgmEye08 = BGM-EYE-08
+Bank0366_Text_BgmEye09 = BGM-EYE-09
+Bank0366_Text_BgmEye10 = BGM-EYE-10
+Bank0366_Text_BgmEye11 = BGM-EYE-11
+Bank0366_Text_BgmEye12 = BGM-EYE-12
+Bank0366_Text_BgmEye13 = BGM-EYE-13
+Bank0366_Text_BgmEyeNeoPlasma = BGM-EYE-NEO-PLASMA
+Bank0366_Text_BgmVsNorapoke = BGM-VS-NORAPOKE
+Bank0366_Text_BgmVsTsuyopoke = BGM-VS-TSUYOPOKE
+Bank0366_Text_BgmVsTrainer = BGM-VS-TRAINER
+Bank0366_Text_BgmVsSubwayTrainer = BGM-VS-SUBWAY-TRAINER
+Bank0366_Text_BgmVsGymleader = BGM-VS-GYMLEADER
+Bank0366_Text_BgmVsRival = BGM-VS-RIVAL
+Bank0366_Text_BgmVsDplegend = BGM-VS-DPLEGEND
+Bank0366_Text_BgmVsShitenno = BGM-VS-SHITENNO
+Bank0366_Text_BgmVsChamp = BGM-VS-CHAMP
+Bank0366_Text_BgmVsSwanN = BGM-VS-SWAN-N
+Bank0366_Text_BgmVsUma = BGM-VS-UMA
+Bank0366_Text_BgmVsRegi = BGM-VS-REGI
+Bank0366_Text_BgmVsShin = BGM-VS-SHIN
+Bank0366_Text_BgmVsMu = BGM-VS-MU
+Bank0366_Text_BgmVsRai = BGM-VS-RAI
+Bank0366_Text_BgmVsMovepoke = BGM-VS-MOVEPOKE
+Bank0366_Text_BgmVsSetpoke = BGM-VS-SETPOKE
+Bank0366_Text_BgmVsShirona = BGM-VS-SHIRONA
+Bank0366_Text_BgmBattlepinch = BGM-BATTLEPINCH
+Bank0366_Text_BgmBattlesuperior = BGM-BATTLESUPERIOR
+Bank0366_Text_BgmWin1 = BGM-WIN1
+Bank0366_Text_BgmWin2 = BGM-WIN2
+Bank0366_Text_BgmWin3 = BGM-WIN3
+Bank0366_Text_BgmWin4 = BGM-WIN4
+Bank0366_Text_BgmWin5 = BGM-WIN5
+Bank0366_Text_BgmWifiAccess = BGM-WIFI-ACCESS
+Bank0366_Text_BgmWifiPresent = BGM-WIFI-PRESENT
+Bank0366_Text_BgmGameSync = BGM-GAME-SYNC
+Bank0366_Text_BgmGlterminal = BGM-GLTERMINAL
+Bank0366_Text_BgmGuruguru = BGM-GURUGURU
+Bank0366_Text_BgmGts = BGM-GTS
+Bank0366_Text_BgmWcs = BGM-WCS
+Bank0366_Text_BgmEShirona = BGM-E-SHIRONA
+Bank0366_Text_BgmVsTrainerM = BGM-VS-TRAINER-M
+Bank0366_Text_BgmVsTrainerS = BGM-VS-TRAINER-S
+Bank0366_Text_BgmVsWcs = BGM-VS-WCS
+Bank0366_Text_BgmVsTrainerWifi = BGM-VS-TRAINER-WIFI
+Bank0366_Text_BgmWin6 = BGM-WIN6
+Bank0366_Text_BgmELegendBorn = BGM-E-LEGEND-BORN-B
+Bank0366_Text_BgmELegendBorn_2 = BGM-E-LEGEND-BORN-W
+Bank0366_Text_BgmSwDN_2 = BGM-SW-D-N-ROOM
+Bank0366_Text_BgmEEpirogue = BGM-E-EPIROGUE
+Bank0366_Text_BgmEEpirogueW = BGM-E-EPIROGUE-W
+Bank0366_Text_BgmGfLogo = BGM-GF-LOGO
+Bank0366_Text_BgmMslDl01 = BGM-MSL-DL-01
+Bank0366_Text_BgmMslDl02 = BGM-MSL-DL-02
+Bank0366_Text_BgmMslDl03 = BGM-MSL-DL-03
+Bank0366_Text_BgmMslDl04 = BGM-MSL-DL-04
+Bank0366_Text_BgmSwR19 = BGM-SW-R-19-SP
+Bank0366_Text_BgmSwR19_2 = BGM-SW-R-19-SU
+Bank0366_Text_BgmSwR19_3 = BGM-SW-R-19-AU
+Bank0366_Text_BgmSwR19_4 = BGM-SW-R-19-WI
+Bank0366_Text_BgmSwR22 = BGM-SW-R-22-SP
+Bank0366_Text_BgmSwR22_2 = BGM-SW-R-22-SU
+Bank0366_Text_BgmSwR22_3 = BGM-SW-R-22-AU
+Bank0366_Text_BgmSwR22_4 = BGM-SW-R-22-WI
+Bank0366_Text_BgmSwR23 = BGM-SW-R-23
+Bank0366_Text_BgmSwKazan = BGM-SW-KAZAN
+Bank0366_Text_BgmSwT06 = BGM-SW-T-06
+Bank0366_Text_BgmSwT07 = BGM-SW-T-07
+Bank0366_Text_BgmSwD22 = BGM-SW-D-22
+Bank0366_Text_BgmSwD23 = BGM-SW-D-23
+Bank0366_Text_BgmSwDGesui = BGM-SW-D-GESUI
+Bank0366_Text_BgmSwD24 = BGM-SW-D-24-W
+Bank0366_Text_BgmSwD24_2 = BGM-SW-D-24-B
+Bank0366_Text_BgmSwD25 = BGM-SW-D-25
+Bank0366_Text_BgmSwD27 = BGM-SW-D-27-F-AJITO
+Bank0366_Text_BgmSwD27_2 = BGM-SW-D-27-L-AJITO
+Bank0366_Text_BgmSwD27_3 = BGM-SW-D-27-G-AJITO
+Bank0366_Text_BgmSwDRegi = BGM-SW-D-REGI
+Bank0366_Text_BgmSwDUma = BGM-SW-D-UMA
+Bank0366_Text_BgmSwH06 = BGM-SW-H-06
+Bank0366_Text_BgmWbtLobby = BGM-WBT-LOBBY
+Bank0366_Text_BgmWbtGround = BGM-WBT-GROUND
+Bank0366_Text_BgmWbtFanfare = BGM-WBT-FANFARE
+Bank0366_Text_BgmPwLand = BGM-PW-LAND
+Bank0366_Text_BgmPwFilming = BGM-PW-FILMING
+Bank0366_Text_BgmPwScenario01 = BGM-PW-SCENARIO-01-F
+Bank0366_Text_BgmPwScenario01_2 = BGM-PW-SCENARIO-01-L
+Bank0366_Text_BgmPwScenario02 = BGM-PW-SCENARIO-02-F
+Bank0366_Text_BgmPwScenario02_2 = BGM-PW-SCENARIO-02-L
+Bank0366_Text_BgmPwScenario03 = BGM-PW-SCENARIO-03-F
+Bank0366_Text_BgmPwScenario03_2 = BGM-PW-SCENARIO-03-L
+Bank0366_Text_BgmPwScenario04 = BGM-PW-SCENARIO-04-F
+Bank0366_Text_BgmPwScenario04_2 = BGM-PW-SCENARIO-04-L
+Bank0366_Text_BgmPwScenario05 = BGM-PW-SCENARIO-05-F
+Bank0366_Text_BgmPwScenario05_2 = BGM-PW-SCENARIO-05-L
+Bank0366_Text_BgmPwScenario06 = BGM-PW-SCENARIO-06-F
+Bank0366_Text_BgmPwScenario06_2 = BGM-PW-SCENARIO-06-L
+Bank0366_Text_BgmPwScenario07 = BGM-PW-SCENARIO-07-F
+Bank0366_Text_BgmPwScenario07_2 = BGM-PW-SCENARIO-07-L
+Bank0366_Text_BgmPwScenario08 = BGM-PW-SCENARIO-08-F
+Bank0366_Text_BgmFlightGym01 = BGM-FLIGHT-GYM-01
+Bank0366_Text_BgmWaterGym01 = BGM-WATER-GYM-01
+Bank0366_Text_BgmDragonGym01 = BGM-DRAGON-GYM-01
+Bank0366_Text_BgmLcg01 = BGM-LCG-01
+Bank0366_Text_BgmLcg02 = BGM-LCG-02
+Bank0366_Text_BgmDataConv = BGM-DATA-CONV
+Bank0366_Text_BgmRezoRizo = BGM-REZO-RIZO
+Bank0366_Text_BgmFes = BGM-FES
+Bank0366_Text_BgmSwDemoShip = BGM-SW-DEMO-SHIP
+Bank0366_Text_BgmSwDemoFlight = BGM-SW-DEMO-FLIGHT
+Bank0366_Text_BgmSwDemoUnion = BGM-SW-DEMO-UNION-00
+Bank0366_Text_BgmSwDemoUnion_2 = BGM-SW-DEMO-UNION-01
+Bank0366_Text_BgmSwDemoUnion_3 = BGM-SW-DEMO-UNION-02
+Bank0366_Text_BgmSwDemoUnion_4 = BGM-SW-DEMO-UNION-03B
+Bank0366_Text_BgmSwDemoUnion_5 = BGM-SW-DEMO-UNION-03W
+Bank0366_Text_BgmSwDemoAjito = BGM-SW-DEMO-AJITO-SHIP
+Bank0366_Text_BgmSwDemoFrigate = BGM-SW-DEMO-FRIGATE
+Bank0366_Text_BgmEHue = BGM-E-HUE
+Bank0366_Text_BgmEAchroma = BGM-E-ACHROMA
+Bank0366_Text_BgmDarkTrinity = BGM-DARK-TRINITY
+Bank0366_Text_BgmE7Sage = BGM-E-7-SAGE
+Bank0366_Text_BgmEC08Ice = BGM-E-C08-ICE
+Bank0366_Text_BgmEEpilogue = BGM-E-EPILOGUE
+Bank0366_Text_BgmEyeDancer = BGM-EYE-DANCER
+Bank0366_Text_BgmEyeClown = BGM-EYE-CLOWN
+Bank0366_Text_BgmVsRgLeader = BGM-VS-RG-LEADER
+Bank0366_Text_BgmVsRgChamp = BGM-VS-RG-CHAMP
+Bank0366_Text_BgmVsGsLeader = BGM-VS-GS-LEADER
+Bank0366_Text_BgmVsGsChamp = BGM-VS-GS-CHAMP
+Bank0366_Text_BgmVsRsLeader = BGM-VS-RS-LEADER
+Bank0366_Text_BgmVsRsChamp = BGM-VS-RS-CHAMP
+Bank0366_Text_BgmVsDpLeader = BGM-VS-DP-LEADER
+Bank0366_Text_BgmVsDpChamp = BGM-VS-DP-CHAMP
+Bank0366_Text_BgmVsBwChamp = BGM-VS-BW-CHAMP
+Bank0366_Text_BgmVsWbt = BGM-VS-WBT
+Bank0366_Text_BgmVsKyuramu = BGM-VS-KYURAMU
+Bank0366_Text_BgmVsKyuromu = BGM-VS-KYUROMU
+Bank0366_Text_BgmVsNeoPlasma = BGM-VS-NEO-PLASMA
+Bank0366_Text_BgmVsAchroma = BGM-VS-ACHROMA
+Bank0366_Text_BgmVsNewG = BGM-VS-NEW-G-CIS
+Bank0366_Text_BgmVsIris = BGM-VS-IRIS
+Bank0366_Text_BgmVsBanjirou = BGM-VS-BANJIROU
+Bank0366_Text_BgmVsHue = BGM-VS-HUE
+Bank0366_Text_BgmWinWbt = BGM-WIN-WBT
+Bank0366_Text_BgmKemonomichi = BGM-KEMONOMICHI
+Bank0366_Text_BgmJaparade = BGM-JAPARADE
+Bank0366_Text_BgmEPlasma = BGM-E-PLASMA
+Bank0366_Text_BgmVsElitePlasma = BGM-VS-ELITE-PLASMA
+Bank0366_Text_BgmTheend = BGM-THEEND
+Bank0366_Text_BgmEvGianthole01 = BGM-EV-GIANTHOLE-01
+Bank0366_Text_BgmEvGianthole02 = BGM-EV-GIANTHOLE-02
+Bank0366_Text_BgmEvGianthole03 = BGM-EV-GIANTHOLE-03
+Bank0366_Text_BgmEnd = BGM-END
+Bank0366_Text_Dmy_998 = dmy
+Bank0366_Text_Dmy_999 = dmy
+Bank0366_Text_Dmy_1000 = dmy
+Bank0366_Text_Dmy_1001 = dmy
+Bank0366_Text_Dmy_1002 = dmy
+Bank0366_Text_Dmy_1003 = dmy
+Bank0366_Text_Dmy_1004 = dmy
+Bank0366_Text_Dmy_1005 = dmy
+Bank0366_Text_Dmy_1006 = dmy
+Bank0366_Text_Dmy_1007 = dmy
+Bank0366_Text_Dmy_1008 = dmy
+Bank0366_Text_Dmy_1009 = dmy
+Bank0366_Text_Dmy_1010 = dmy
+Bank0366_Text_Dmy_1011 = dmy
+Bank0366_Text_Dmy_1012 = dmy
+Bank0366_Text_Dmy_1013 = dmy
+Bank0366_Text_Dmy_1014 = dmy
+Bank0366_Text_Dmy_1015 = dmy
+Bank0366_Text_Dmy_1016 = dmy
+Bank0366_Text_Dmy_1017 = dmy
+Bank0366_Text_Dmy_1018 = dmy
+Bank0366_Text_Dmy_1019 = dmy
+Bank0366_Text_Dmy_1020 = dmy
+Bank0366_Text_Dmy_1021 = dmy
+Bank0366_Text_Dmy_1022 = dmy
+Bank0366_Text_Dmy_1023 = dmy
+Bank0366_Text_Dmy_1024 = dmy
+Bank0366_Text_Asa = ME-ASA
+Bank0366_Text_Lvup = ME-LVUP
+Bank0366_Text_Item = ME-ITEM
+Bank0366_Text_Keyitem = ME-KEYITEM
+Bank0366_Text_Pokeget = ME-POKEGET
+Bank0366_Text_Shinkaome = ME-SHINKAOME
+Bank0366_Text_Badge = ME-BADGE
+Bank0366_Text_Waza = ME-WAZA
+Bank0366_Text_Acce = ME-ACCE
+Bank0366_Text_Wasure = ME-WASURE
+Bank0366_Text_Kinomi = ME-KINOMI
+Bank0366_Text_Hyouka1 = ME-HYOUKA1
+Bank0366_Text_Hyouka2 = ME-HYOUKA2
+Bank0366_Text_Hyouka3 = ME-HYOUKA3
+Bank0366_Text_Hyouka4 = ME-HYOUKA4
+Bank0366_Text_Hyouka5 = ME-HYOUKA5
+Bank0366_Text_Hyouka6 = ME-HYOUKA6
+Bank0366_Text_TamagoGet = ME-TAMAGO-GET
+Bank0366_Text_Bpget = ME-BPGET
+Bank0366_Text_AishouH = ME-AISHOU-H
+Bank0366_Text_AishouM = ME-AISHOU-M
+Bank0366_Text_AishouL = ME-AISHOU-L
+Bank0366_Text_AishouKidou = ME-AISHOU-KIDOU
+Bank0366_Text_MissionStart = ME-MISSION-START
+Bank0366_Text_MissionClear = ME-MISSION-CLEAR
+Bank0366_Text_MissionFailed = ME-MISSION-FAILED
+Bank0366_Text_ItemMystery = ME-ITEM-MYSTERY
+Bank0366_Text_Call = ME-CALL
+Bank0366_Text_Quiz = ME-QUIZ
+Bank0366_Text_DelPower = ME-DEL-POWER
+Bank0366_Text_02 = ME-02
+Bank0366_Text_Lcg01 = ME-LCG-01
+Bank0366_Text_Lcg02 = ME-LCG-02
+Bank0366_Text_Lcg03 = ME-LCG-03
+Bank0366_Text_Lcg04 = ME-LCG-04
+Bank0366_Text_MdFan01 = ME-MD-FAN01
+Bank0366_Text_MdFan03 = ME-MD-FAN03
+Bank0366_Text_MdFan04 = ME-MD-FAN04
+Bank0366_Text_KeyOpen = ME-KEY-OPEN
+Bank0366_Text_Otamaro = ME-OTAMARO
+Bank0366_Text_Avenue01 = ME-AVENUE-01
+Bank0366_Text_Avenue02 = ME-AVENUE-02
+Bank0366_Text_Avenue03 = ME-AVENUE-03
+Bank0366_Text_CallLong = ME-CALL-LONG
+Bank0366_Text_Zukan01 = ME-ZUKAN-01
+Bank0366_Text_Zukan02 = ME-ZUKAN-02
+Bank0366_Text_Pokewood = ME-POKEWOOD
+Bank0366_Text_End = ME-END
+Bank0366_Text_Dmy_1025 = dmy
+Bank0366_Text_Dmy_1026 = dmy
+Bank0366_Text_Dummy = DUMMY
+Bank0366_Text_Message = MESSAGE
+Bank0366_Text_Select1 = SELECT1
+Bank0366_Text_Select2 = SELECT2
+Bank0366_Text_Select3 = SELECT3
+Bank0366_Text_Select4 = SELECT4
+Bank0366_Text_Decide1 = DECIDE1
+Bank0366_Text_Decide2 = DECIDE2
+Bank0366_Text_Decide3 = DECIDE3
+Bank0366_Text_Decide4 = DECIDE4
+Bank0366_Text_Decide5 = DECIDE5
+Bank0366_Text_Cancel1 = CANCEL1
+Bank0366_Text_Cancel2 = CANCEL2
+Bank0366_Text_Cancel3 = CANCEL3
+Bank0366_Text_Open1 = OPEN1
+Bank0366_Text_Open2 = OPEN2
+Bank0366_Text_Close1 = CLOSE1
+Bank0366_Text_Beep = BEEP
+Bank0366_Text_Save = SAVE
+Bank0366_Text_Kaidan = KAIDAN
+Bank0366_Text_WallHit = WALL-HIT
+Bank0366_Text_Pc = PC-ON
+Bank0366_Text_PcLogin = PC-LOGIN
+Bank0366_Text_PcLogoff = PC-LOGOFF
+Bank0366_Text_Dansa = DANSA
+Bank0366_Text_Bicycle = BICYCLE
+Bank0366_Text_Dummy5 = DUMMY5
+Bank0366_Text_Bc01 = BC01
+Bank0366_Text_Bc02 = BC02
+Bank0366_Text_KoukaH = KOUKA-H
+Bank0366_Text_KoukaM = KOUKA-M
+Bank0366_Text_KoukaL = KOUKA-L
+Bank0366_Text_Nageru = NAGERU
+Bank0366_Text_Bowa2 = BOWA2
+Bank0366_Text_Bowa1 = BOWA1
+Bank0366_Text_Bowa3 = BOWA3
+Bank0366_Text_Nigeru = NIGERU
+Bank0366_Text_Kon = KON
+Bank0366_Text_Dead = DEAD
+Bank0366_Text_Exp = EXP
+Bank0366_Text_Expmax = EXPMAX
+Bank0366_Text_Recovery = RECOVERY
+Bank0366_Text_TbStart = TB-START
+Bank0366_Text_TbKon = TB-KON
+Bank0366_Text_TbKara = TB-KARA
+Bank0366_Text_Shooter = SHOOTER
+Bank0366_Text_Getting = GETTING
+Bank0366_Text_Hinshi = HINSHI
+Bank0366_Text_ToujouLarge = TOUJOU-LARGE
+Bank0366_Text_ToujouMid = TOUJOU-MID
+Bank0366_Text_ToujouSmall = TOUJOU-SMALL
+Bank0366_Text_RotationS = ROTATION-S
+Bank0366_Text_RotationB = ROTATION-B
+Bank0366_Text_TripleS = TRIPLE-S
+Bank0366_Text_Nageru2 = NAGERU2
+Bank0366_Text_Dummy29 = DUMMY29
+Bank0366_Text_Dummy30 = DUMMY30
+Bank0366_Text_W05501 = W055-01
+Bank0366_Text_W05504 = W055-04
+Bank0366_Text_W05505 = W055-05
+Bank0366_Text_W07501 = W075-01
+Bank0366_Text_W07502 = W075-02
+Bank0366_Text_W07503 = W075-03
+Bank0366_Text_W07504 = W075-04
+Bank0366_Text_W07505 = W075-05
+Bank0366_Text_W07506 = W075-06
+Bank0366_Text_W15701 = W157-01
+Bank0366_Text_W15702 = W157-02
+Bank0366_Text_W15703 = W157-03
+Bank0366_Text_W15704 = W157-04
+Bank0366_Text_W00101 = W001-01
+Bank0366_Text_W00201 = W002-01
+Bank0366_Text_W00301 = W003-01
+Bank0366_Text_W01001 = W010-01
+Bank0366_Text_W01101 = W011-01
+Bank0366_Text_W30701 = W307-01
+Bank0366_Text_W30702 = W307-02
+Bank0366_Text_W30703 = W307-03
+Bank0366_Text_W30704 = W307-04
+Bank0366_Text_W30705 = W307-05
+Bank0366_Text_W00601 = W006-01
+Bank0366_Text_W00602 = W006-02
+Bank0366_Text_W00603 = W006-03
+Bank0366_Text_W00604 = W006-04
+Bank0366_Text_W01401 = W014-01
+Bank0366_Text_W01402 = W014-02
+Bank0366_Text_W01403 = W014-03
+Bank0366_Text_W01501 = W015-01
+Bank0366_Text_W01701 = W017-01
+Bank0366_Text_W01801 = W018-01
+Bank0366_Text_W01802 = W018-02
+Bank0366_Text_W02001 = W020-01
+Bank0366_Text_W02201 = W022-01
+Bank0366_Text_W02202 = W022-02
+Bank0366_Text_W02601 = W026-01
+Bank0366_Text_W02701 = W027-01
+Bank0366_Text_W02801 = W028-01
+Bank0366_Text_W02802 = W028-02
+Bank0366_Text_W02901 = W029-01
+Bank0366_Text_W04301 = W043-01
+Bank0366_Text_W04801 = W048-01
+Bank0366_Text_W04802 = W048-02
+Bank0366_Text_W05101 = W051-01
+Bank0366_Text_W05102 = W051-02
+Bank0366_Text_W05103 = W051-03
+Bank0366_Text_W05401 = W054-01
+Bank0366_Text_W07401 = W074-01
+Bank0366_Text_W07701 = W077-01
+Bank0366_Text_W07702 = W077-02
+Bank0366_Text_W08801 = W088-01
+Bank0366_Text_W08802 = W088-02
+Bank0366_Text_W09501 = W095-01
+Bank0366_Text_W09502 = W095-02
+Bank0366_Text_W09901 = W099-01
+Bank0366_Text_W09902 = W099-02
+Bank0366_Text_W10201 = W102-01
+Bank0366_Text_W10202 = W102-02
+Bank0366_Text_W10301 = W103-01
+Bank0366_Text_W11101 = W111-01
+Bank0366_Text_W11102 = W111-02
+Bank0366_Text_W11201 = W112-01
+Bank0366_Text_W11202 = W112-02
+Bank0366_Text_W11301 = W113-01
+Bank0366_Text_W11302 = W113-02
+Bank0366_Text_W11601 = W116-01
+Bank0366_Text_W12101 = W121-01
+Bank0366_Text_W12201 = W122-01
+Bank0366_Text_W12202 = W122-02
+Bank0366_Text_W12301 = W123-01
+Bank0366_Text_W12302 = W123-02
+Bank0366_Text_W12401 = W124-01
+Bank0366_Text_W12901 = W129-01
+Bank0366_Text_W12903 = W129-03
+Bank0366_Text_W12904 = W129-04
+Bank0366_Text_W16501 = W165-01
+Bank0366_Text_W17901 = W179-01
+Bank0366_Text_W17902 = W179-02
+Bank0366_Text_W17903 = W179-03
+Bank0366_Text_W18101 = W181-01
+Bank0366_Text_W21601 = W216-01
+Bank0366_Text_W21602 = W216-02
+Bank0366_Text_W22501 = W225-01
+Bank0366_Text_W22502 = W225-02
+Bank0366_Text_W22701 = W227-01
+Bank0366_Text_W22702 = W227-02
+Bank0366_Text_W23501 = W235-01
+Bank0366_Text_W23503 = W235-03
+Bank0366_Text_W23901 = W239-01
+Bank0366_Text_W23902 = W239-02
+Bank0366_Text_W24001 = W240-01
+Bank0366_Text_W25301 = W253-01
+Bank0366_Text_W25302 = W253-02
+Bank0366_Text_W26001 = W260-01
+Bank0366_Text_W28101 = W281-01
+Bank0366_Text_W29501 = W295-01
+Bank0366_Text_W29502 = W295-02
+Bank0366_Text_W29801 = W298-01
+Bank0366_Text_W31001 = W310-01
+Bank0366_Text_W31002 = W310-02
+Bank0366_Text_W31901 = W319-01
+Bank0366_Text_W31902 = W319-02
+Bank0366_Text_W32301 = W323-01
+Bank0366_Text_W32001 = W320-01
+Bank0366_Text_W33101 = W331-01
+Bank0366_Text_W34802 = W348-02
+Bank0366_Text_W36301 = W363-01
+Bank0366_Text_W36801 = W368-01
+Bank0366_Text_W37701 = W377-01
+Bank0366_Text_W37702 = W377-02
+Bank0366_Text_W39901 = W399-01
+Bank0366_Text_W40101 = W401-01
+Bank0366_Text_W46501 = W465-01
+Bank0366_Text_W00901 = W009-01
+Bank0366_Text_W04701 = W047-01
+Bank0366_Text_W05001 = W050-01
+Bank0366_Text_W18701 = W187-01
+Bank0366_Text_W01201 = W012-01
+Bank0366_Text_W03901 = W039-01
+Bank0366_Text_W04401 = W044-01
+Bank0366_Text_W06101 = W061-01
+Bank0366_Text_W14601 = W146-01
+Bank0366_Text_W15501 = W155-01
+Bank0366_Text_W15502 = W155-02
+Bank0366_Text_W19501 = W195-01
+Bank0366_Text_W19901 = W199-01
+Bank0366_Text_W46401 = W464-01
+Bank0366_Text_W46402 = W464-02
+Bank0366_Text_W30601 = W306-01
+Bank0366_Text_W01901 = W019-01
+Bank0366_Text_W04201 = W042-01
+Bank0366_Text_W21501 = W215-01
+Bank0366_Text_W21502 = W215-02
+Bank0366_Text_W27401 = W274-01
+Bank0366_Text_W28901 = W289-01
+Bank0366_Text_Pasa1 = PASA1
+Bank0366_Text_Pasa2 = PASA2
+Bank0366_Text_Se01 = BE-SE-01
+Bank0366_Text_Se02 = BE-SE-02
+Bank0366_Text_Se03 = BE-SE-03
+Bank0366_Text_Se04 = BE-SE-04
+Bank0366_Text_Se05 = BE-SE-05
+Bank0366_Text_Se06 = BE-SE-06
+Bank0366_Text_Se07 = BE-SE-07
+Bank0366_Text_Se08 = BE-SE-08
+Bank0366_Text_Se09 = BE-SE-09
+Bank0366_Text_Se10 = BE-SE-10
+Bank0366_Text_Se11 = BE-SE-11
+Bank0366_Text_Se12 = BE-SE-12
+Bank0366_Text_Se13 = BE-SE-13
+Bank0366_Text_Se14 = BE-SE-14
+Bank0366_Text_Se015 = BE-SE-015
+Bank0366_Text_Se016 = BE-SE-016
+Bank0366_Text_Se017 = BE-SE-017
+Bank0366_Text_Se018 = BE-SE-018
+Bank0366_Text_Se019 = BE-SE-019
+Bank0366_Text_Se020 = BE-SE-020
+Bank0366_Text_Se021 = BE-SE-021
+Bank0366_Text_Se022 = BE-SE-022
+Bank0366_Text_Se023 = BE-SE-023
+Bank0366_Text_Se024 = BE-SE-024
+Bank0366_Text_Mscl01 = MSCL-01
+Bank0366_Text_Mscl02 = MSCL-02
+Bank0366_Text_Mscl03 = MSCL-03
+Bank0366_Text_Mscl04 = MSCL-04
+Bank0366_Text_Mscl05 = MSCL-05
+Bank0366_Text_Mscl06 = MSCL-06
+Bank0366_Text_Mscl07 = MSCL-07
+Bank0366_Text_Mscl08 = MSCL-08
+Bank0366_Text_Mscl09 = MSCL-09
+Bank0366_Text_Mscl10 = MSCL-10
+Bank0366_Text_Mscl11 = MSCL-11
+Bank0366_Text_Mscl12 = MSCL-12
+Bank0366_Text_Mscl13 = MSCL-13
+Bank0366_Text_Mscl14 = MSCL-14
+Bank0366_Text_Mscl15 = MSCL-15
+Bank0366_Text_Mscl16 = MSCL-16
+Bank0366_Text_Mscl17 = MSCL-17
+Bank0366_Text_Mscl18 = MSCL-18
+Bank0366_Text_Mscl19 = MSCL-19
+Bank0366_Text_ShinkaW025 = SHINKA-W025
+Bank0366_Text_ShinkaW060c = SHINKA-W060C
+Bank0366_Text_ShinkaW062 = SHINKA-W062
+Bank0366_Text_ShinkaW080 = SHINKA-W080
+Bank0366_Text_Sys73 = SYS-73
+Bank0366_Text_Sys74 = SYS-74
+Bank0366_Text_Sys75 = SYS-75
+Bank0366_Text_Fld123 = FLD-123
+Bank0366_Text_Sys76 = SYS-76
+Bank0366_Text_Sys77 = SYS-77
+Bank0366_Text_Sys78 = SYS-78
+Bank0366_Text_Sys01 = SYS-01
+Bank0366_Text_Sys02 = SYS-02
+Bank0366_Text_Sys03 = SYS-03
+Bank0366_Text_Sys04 = SYS-04
+Bank0366_Text_Sys05 = SYS-05
+Bank0366_Text_Sys06 = SYS-06
+Bank0366_Text_Sys07 = SYS-07
+Bank0366_Text_Sys08 = SYS-08
+Bank0366_Text_Sys09 = SYS-09
+Bank0366_Text_Sys10 = SYS-10
+Bank0366_Text_Sys11 = SYS-11
+Bank0366_Text_Sys12 = SYS-12
+Bank0366_Text_Sys13 = SYS-13
+Bank0366_Text_Sys14 = SYS-14
+Bank0366_Text_Sys15 = SYS-15
+Bank0366_Text_Sys16 = SYS-16
+Bank0366_Text_Sys17 = SYS-17
+Bank0366_Text_Sys18 = SYS-18
+Bank0366_Text_Sys19 = SYS-19
+Bank0366_Text_Sys20 = SYS-20
+Bank0366_Text_Sys21 = SYS-21
+Bank0366_Text_Sys22 = SYS-22
+Bank0366_Text_Sys23 = SYS-23
+Bank0366_Text_Sys24 = SYS-24
+Bank0366_Text_Sys25 = SYS-25
+Bank0366_Text_Sys26 = SYS-26
+Bank0366_Text_Sys27 = SYS-27
+Bank0366_Text_Sys28 = SYS-28
+Bank0366_Text_Sys29 = SYS-29
+Bank0366_Text_Sys30 = SYS-30
+Bank0366_Text_Sys31 = SYS-31
+Bank0366_Text_Sys32 = SYS-32
+Bank0366_Text_Sys33 = SYS-33
+Bank0366_Text_Sys34 = SYS-34
+Bank0366_Text_Sys35 = SYS-35
+Bank0366_Text_Sys36 = SYS-36
+Bank0366_Text_Sys37 = SYS-37
+Bank0366_Text_Sys38 = SYS-38
+Bank0366_Text_Sys39 = SYS-39
+Bank0366_Text_Sys40 = SYS-40
+Bank0366_Text_Sys41 = SYS-41
+Bank0366_Text_Sys42 = SYS-42
+Bank0366_Text_Sys43 = SYS-43
+Bank0366_Text_Sys44 = SYS-44
+Bank0366_Text_Sys45 = SYS-45
+Bank0366_Text_Sys46 = SYS-46
+Bank0366_Text_Sys47 = SYS-47
+Bank0366_Text_Sys48 = SYS-48
+Bank0366_Text_Sys49 = SYS-49
+Bank0366_Text_Sys50 = SYS-50
+Bank0366_Text_Fld01 = FLD-01
+Bank0366_Text_Fld02 = FLD-02
+Bank0366_Text_Fld03 = FLD-03
+Bank0366_Text_Fld04 = FLD-04
+Bank0366_Text_Fld05 = FLD-05
+Bank0366_Text_Fld06 = FLD-06
+Bank0366_Text_Fld07 = FLD-07
+Bank0366_Text_Fld08 = FLD-08
+Bank0366_Text_Fld09 = FLD-09
+Bank0366_Text_Fld10 = FLD-10
+Bank0366_Text_Fld11 = FLD-11
+Bank0366_Text_Fld12 = FLD-12
+Bank0366_Text_Fld13 = FLD-13
+Bank0366_Text_Fld14 = FLD-14
+Bank0366_Text_Fld15 = FLD-15
+Bank0366_Text_Fld16 = FLD-16
+Bank0366_Text_Fld17 = FLD-17
+Bank0366_Text_Fld18 = FLD-18
+Bank0366_Text_Fld19 = FLD-19
+Bank0366_Text_Fld20 = FLD-20
+Bank0366_Text_Fld21 = FLD-21
+Bank0366_Text_Fld22 = FLD-22
+Bank0366_Text_Fld23 = FLD-23
+Bank0366_Text_Fld24 = FLD-24
+Bank0366_Text_Fld25 = FLD-25
+Bank0366_Text_Fld26 = FLD-26
+Bank0366_Text_Fld27 = FLD-27
+Bank0366_Text_Fld28 = FLD-28
+Bank0366_Text_Fld29 = FLD-29
+Bank0366_Text_Fld30 = FLD-30
+Bank0366_Text_Fld31 = FLD-31
+Bank0366_Text_Fld32 = FLD-32
+Bank0366_Text_Fld33 = FLD-33
+Bank0366_Text_Fld34 = FLD-34
+Bank0366_Text_Fld35 = FLD-35
+Bank0366_Text_Fld36 = FLD-36
+Bank0366_Text_Fld37 = FLD-37
+Bank0366_Text_Fld38 = FLD-38
+Bank0366_Text_Fld39 = FLD-39
+Bank0366_Text_Fld40 = FLD-40
+Bank0366_Text_Fld41 = FLD-41
+Bank0366_Text_Fld42 = FLD-42
+Bank0366_Text_Fld43 = FLD-43
+Bank0366_Text_Fld44 = FLD-44
+Bank0366_Text_Fld45 = FLD-45
+Bank0366_Text_Fld46 = FLD-46
+Bank0366_Text_Fld47 = FLD-47
+Bank0366_Text_Fld48 = FLD-48
+Bank0366_Text_Fld49 = FLD-49
+Bank0366_Text_Fld50 = FLD-50
+Bank0366_Text_W00801 = W008-01
+Bank0366_Text_W01202 = W012-02
+Bank0366_Text_W01601 = W016-01
+Bank0366_Text_W02301 = W023-01
+Bank0366_Text_W03201 = W032-01
+Bank0366_Text_W03401 = W034-01
+Bank0366_Text_W06301 = W063-01
+Bank0366_Text_W06302 = W063-02
+Bank0366_Text_W09601 = W096-01
+Bank0366_Text_W10001 = W100-01
+Bank0366_Text_W08401 = W084-01
+Bank0366_Text_W26901 = W269-01
+Bank0366_Text_W26902 = W269-02
+Bank0366_Text_W27801 = W278-01
+Bank0366_Text_W32101 = W321-01
+Bank0366_Text_W45201 = W452-01
+Bank0366_Text_W06303 = W063-03
+Bank0366_Text_W05901 = W059-01
+Bank0366_Text_W07703 = W077-03
+Bank0366_Text_W00802 = W008-02
+Bank0366_Text_W04402 = W044-02
+Bank0366_Text_W10002 = W100-02
+Bank0366_Text_W12501 = W125-01
+Bank0366_Text_W14201 = W142-01
+Bank0366_Text_W14801 = W148-01
+Bank0366_Text_W16301 = W163-01
+Bank0366_Text_W17501 = W175-01
+Bank0366_Text_W18801 = W188-01
+Bank0366_Text_W19401 = W194-01
+Bank0366_Text_W20801 = W208-01
+Bank0366_Text_Fld51 = FLD-51
+Bank0366_Text_Fld52 = FLD-52
+Bank0366_Text_Fld53 = FLD-53
+Bank0366_Text_Fld54 = FLD-54
+Bank0366_Text_Fld55 = FLD-55
+Bank0366_Text_Fld56 = FLD-56
+Bank0366_Text_Fld57 = FLD-57
+Bank0366_Text_Fld58 = FLD-58
+Bank0366_Text_Fld59 = FLD-59
+Bank0366_Text_Fld60 = FLD-60
+Bank0366_Text_Fld61 = FLD-61
+Bank0366_Text_Fld62 = FLD-62
+Bank0366_Text_Fld63 = FLD-63
+Bank0366_Text_Fld64 = FLD-64
+Bank0366_Text_Fld65 = FLD-65
+Bank0366_Text_Fld66 = FLD-66
+Bank0366_Text_Fld67 = FLD-67
+Bank0366_Text_Fld68 = FLD-68
+Bank0366_Text_Fld69 = FLD-69
+Bank0366_Text_Fld70 = FLD-70
+Bank0366_Text_Fld71 = FLD-71
+Bank0366_Text_Fld72 = FLD-72
+Bank0366_Text_Fld73 = FLD-73
+Bank0366_Text_Fld74 = FLD-74
+Bank0366_Text_Fld75 = FLD-75
+Bank0366_Text_Fld76 = FLD-76
+Bank0366_Text_Fld77 = FLD-77
+Bank0366_Text_Fld78 = FLD-78
+Bank0366_Text_Fld79 = FLD-79
+Bank0366_Text_Fld80 = FLD-80
+Bank0366_Text_Fld81 = FLD-81
+Bank0366_Text_Fld82 = FLD-82
+Bank0366_Text_Fld83 = FLD-83
+Bank0366_Text_Fld84 = FLD-84
+Bank0366_Text_Fld85 = FLD-85
+Bank0366_Text_Dmy097 = DMY-097
+Bank0366_Text_Lvup_2 = LVUP
+Bank0366_Text_Fld86 = FLD-86
+Bank0366_Text_Fld87 = FLD-87
+Bank0366_Text_Fld88 = FLD-88
+Bank0366_Text_Fld89 = FLD-89
+Bank0366_Text_Fld90 = FLD-90
+Bank0366_Text_Fld91 = FLD-91
+Bank0366_Text_Fld92 = FLD-92
+Bank0366_Text_Fld93 = FLD-93
+Bank0366_Text_Fld94 = FLD-94
+Bank0366_Text_Fld95 = FLD-95
+Bank0366_Text_W21301 = W213-01
+Bank0366_Text_W22703 = W227-03
+Bank0366_Text_W25404 = W254-04
+Bank0366_Text_W234Hikari = W234-HIKARI
+Bank0366_Text_W288Onnen = W288-ONNEN
+Bank0366_Text_W357Jirori = W357-JIRORI
+Bank0366_Text_W379Power = W379-POWER
+Bank0366_Text_W381Omajinai = W381-OMAJINAI
+Bank0366_Text_W396Hadoken = W396-HADOKEN
+Bank0366_Text_W445Yuuwaku = W445-YUUWAKU
+Bank0366_Text_W343Hoshigari = W343-HOSHIGARI
+Bank0366_Text_Fld96 = FLD-96
+Bank0366_Text_Fld97 = FLD-97
+Bank0366_Text_Brec01 = BREC-01
+Bank0366_Text_Brec02 = BREC-02
+Bank0366_Text_Brec03 = BREC-03
+Bank0366_Text_Brec04 = BREC-04
+Bank0366_Text_Brec05 = BREC-05
+Bank0366_Text_Brec06 = BREC-06
+Bank0366_Text_Brec07 = BREC-07
+Bank0366_Text_Brec08 = BREC-08
+Bank0366_Text_Se025 = BE-SE-025
+Bank0366_Text_Se026 = BE-SE-026
+Bank0366_Text_Se027 = BE-SE-027
+Bank0366_Text_Se028 = BE-SE-028
+Bank0366_Text_Se029 = BE-SE-029
+Bank0366_Text_Se030 = BE-SE-030
+Bank0366_Text_Se031 = BE-SE-031
+Bank0366_Text_Se032 = BE-SE-032
+Bank0366_Text_Se033 = BE-SE-033
+Bank0366_Text_Se034 = BE-SE-034
+Bank0366_Text_Se035 = BE-SE-035
+Bank0366_Text_Se036 = BE-SE-036
+Bank0366_Text_Se037 = BE-SE-037
+Bank0366_Text_Se038 = BE-SE-038
+Bank0366_Text_Se039 = BE-SE-039
+Bank0366_Text_Se040 = BE-SE-040
+Bank0366_Text_Se041 = BE-SE-041
+Bank0366_Text_W221Noise = W221-NOISE
+Bank0366_Text_W229Kiin = W229-KIIN
+Bank0366_Text_W245Jump = W245-JUMP
+Bank0366_Text_W245Buckl = W245-BUCKL
+Bank0366_Text_W250Uzushio = W250-UZUSHIO
+Bank0366_Text_W258Arare = W258-ARARE
+Bank0366_Text_W300Pitya = W300-PITYA
+Bank0366_Text_Fld98 = FLD-98
+Bank0366_Text_Fld99 = FLD-99
+Bank0366_Text_Fld101 = FLD-101
+Bank0366_Text_W259Boso = W259-BOSO
+Bank0366_Text_W259Pakip = W259-PAKIP
+Bank0366_Text_W275Pira = W275-PIRA
+Bank0366_Text_Sys51 = SYS-51
+Bank0366_Text_Sys52 = SYS-52
+Bank0366_Text_Sys53 = SYS-53
+Bank0366_Text_Sys54 = SYS-54
+Bank0366_Text_Sys55 = SYS-55
+Bank0366_Text_Sys56 = SYS-56
+Bank0366_Text_Sys57 = SYS-57
+Bank0366_Text_Sys58 = SYS-58
+Bank0366_Text_Sys59 = SYS-59
+Bank0366_Text_Sys60 = SYS-60
+Bank0366_Text_Sys61 = SYS-61
+Bank0366_Text_Sys62 = SYS-62
+Bank0366_Text_Sys63 = SYS-63
+Bank0366_Text_Sys64 = SYS-64
+Bank0366_Text_Sys65 = SYS-65
+Bank0366_Text_Sys66 = SYS-66
+Bank0366_Text_Sys67 = SYS-67
+Bank0366_Text_Sys68 = SYS-68
+Bank0366_Text_Fld102 = FLD-102
+Bank0366_Text_Fld103 = FLD-103
+Bank0366_Text_W255Bu = W255-BU
+Bank0366_Text_W288Doro = W288-DORO
+Bank0366_Text_Sys69 = SYS-69
+Bank0366_Text_Sys70 = SYS-70
+Bank0366_Text_Sys71 = SYS-71
+Bank0366_Text_Sys72 = SYS-72
+Bank0366_Text_Fld104 = FLD-104
+Bank0366_Text_Fld105 = FLD-105
+Bank0366_Text_Fld106 = FLD-106
+Bank0366_Text_Fld107 = FLD-107
+Bank0366_Text_Fld108 = FLD-108
+Bank0366_Text_Fld109 = FLD-109
+Bank0366_Text_Fld110 = FLD-110
+Bank0366_Text_Fld111 = FLD-111
+Bank0366_Text_Fld112 = FLD-112
+Bank0366_Text_Fld113 = FLD-113
+Bank0366_Text_Fld114 = FLD-114
+Bank0366_Text_Fld115 = FLD-115
+Bank0366_Text_W255Momomo = W255-MOMOMO
+Bank0366_Text_W288Hyuu = W288-HYUU
+Bank0366_Text_W312Harp = W312-HARP
+Bank0366_Text_W319Sward = W319-SWARD
+Bank0366_Text_W300Besyo = W300-BESYO
+Bank0366_Text_W322Cosmo = W322-COSMO
+Bank0366_Text_W325Bunn = W325-BUNN
+Bank0366_Text_W350Pasu = W350-PASU
+Bank0366_Text_W454Mushi = W454-MUSHI
+Bank0366_Text_W360Momomon = W360-MOMOMON
+Bank0366_Text_W437Noisehit = W437-NOISEHIT
+Bank0366_Text_Fld116 = FLD-116
+Bank0366_Text_Fld117 = FLD-117
+Bank0366_Text_Fld118 = FLD-118
+Bank0366_Text_Fld119 = FLD-119
+Bank0366_Text_W448Onpu = W448-ONPU
+Bank0366_Text_W065Dododo = W065-DODODO
+Bank0366_Text_W470Wa = W470-WA
+Bank0366_Text_W307Exp = W307-EXP
+Bank0366_Text_W474Gutsu = W474-GUTSU
+Bank0366_Text_W474Doku = W474-DOKU
+Bank0366_Text_Fld120 = FLD-120
+Bank0366_Text_Fld121 = FLD-121
+Bank0366_Text_Fld122 = FLD-122
+Bank0366_Text_Sys79 = SYS-79
+Bank0366_Text_Fld124 = FLD-124
+Bank0366_Text_Fld125 = FLD-125
+Bank0366_Text_Fld126 = FLD-126
+Bank0366_Text_Fld127 = FLD-127
+Bank0366_Text_Fld128 = FLD-128
+Bank0366_Text_Fld129 = FLD-129
+Bank0366_Text_Sys80 = SYS-80
+Bank0366_Text_Sys81 = SYS-81
+Bank0366_Text_Sys82 = SYS-82
+Bank0366_Text_Sys83 = SYS-83
+Bank0366_Text_Fld130 = FLD-130
+Bank0366_Text_Sys84 = SYS-84
+Bank0366_Text_W532Sasu = W532-SASU
+Bank0366_Text_W532Chu = W532-CHU
+Bank0366_Text_W540Kyun = W540-KYUN
+Bank0366_Text_Fld131 = FLD-131
+Bank0366_Text_Fld132 = FLD-132
+Bank0366_Text_Fld133 = FLD-133
+Bank0366_Text_Fld134 = FLD-134
+Bank0366_Text_Fld135 = FLD-135
+Bank0366_Text_Fld136 = FLD-136
+Bank0366_Text_Fld137 = FLD-137
+Bank0366_Text_Fld138 = FLD-138
+Bank0366_Text_Fld139 = FLD-139
+Bank0366_Text_W547Inimelo = W547-INIMELO
+Bank0366_Text_Sys85 = SYS-85
+Bank0366_Text_Fld140 = FLD-140
+Bank0366_Text_Fld141 = FLD-141
+Bank0366_Text_W542Boufu = W542-BOUFU
+Bank0366_Text_W554Pakin = W554-PAKIN
+Bank0366_Text_Fld142 = FLD-142
+Bank0366_Text_Fld143 = FLD-143
+Bank0366_Text_Fld144 = FLD-144
+Bank0366_Text_Tdemo001 = TDEMO-001
+Bank0366_Text_Tdemo002 = TDEMO-002
+Bank0366_Text_Tdemo003 = TDEMO-003
+Bank0366_Text_Tdemo004 = TDEMO-004
+Bank0366_Text_Tdemo005 = TDEMO-005
+Bank0366_Text_Tdemo006 = TDEMO-006
+Bank0366_Text_Tdemo007 = TDEMO-007
+Bank0366_Text_Tdemo008 = TDEMO-008
+Bank0366_Text_Tdemo009 = TDEMO-009
+Bank0366_Text_Tdemo010 = TDEMO-010
+Bank0366_Text_Tdemo011 = TDEMO-011
+Bank0366_Text_Sys86 = SYS-86
+Bank0366_Text_Sys87 = SYS-87
+Bank0366_Text_Fld145 = FLD-145
+Bank0366_Text_Fld146 = FLD-146
+Bank0366_Text_Sys88 = SYS-88
+Bank0366_Text_Sys89 = SYS-89
+Bank0366_Text_W556Fuun = W556-FUUN
+Bank0366_Text_Ndemo01 = NDEMO-01
+Bank0366_Text_Ndemo02 = NDEMO-02
+Bank0366_Text_W556Kaze = W556-KAZE
+Bank0366_Text_Ddemo01 = DDEMO-01
+Bank0366_Text_Ddemo02a = DDEMO-02A
+Bank0366_Text_Ddemo02b = DDEMO-02B
+Bank0366_Text_Ddemo03 = DDEMO-03
+Bank0366_Text_Ddemo04 = DDEMO-04
+Bank0366_Text_Sys90 = SYS-90
+Bank0366_Text_Fld147 = FLD-147
+Bank0366_Text_Fld148 = FLD-148
+Bank0366_Text_Edemo01 = EDEMO-01
+Bank0366_Text_Edemo02 = EDEMO-02
+Bank0366_Text_Sdemo01 = SDEMO-01
+Bank0366_Text_Sdemo02 = SDEMO-02
+Bank0366_Text_Fld149 = FLD-149
+Bank0366_Text_Fld150 = FLD-150
+Bank0366_Text_Edemo03 = EDEMO-03
+Bank0366_Text_Mscl20 = MSCL-20
+Bank0366_Text_Mscl21 = MSCL-21
+Bank0366_Text_W063Beemb = W063-BEEMB
+Bank0366_Text_W281Akubi = W281-AKUBI
+Bank0366_Text_W248Tikirin = W248-TIKIRIN
+Bank0366_Text_W411Haaa = W411-HAAA
+Bank0366_Text_Edemo04 = EDEMO-04
+Bank0366_Text_Edemo05 = EDEMO-05
+Bank0366_Text_Fld151 = FLD-151
+Bank0366_Text_Sys91 = SYS-91
+Bank0366_Text_Bdemo01 = BDEMO-01
+Bank0366_Text_Bdemo02 = BDEMO-02
+Bank0366_Text_Bdemo03 = BDEMO-03
+Bank0366_Text_Bdemo04 = BDEMO-04
+Bank0366_Text_Fld152 = FLD-152
+Bank0366_Text_Sdemo03 = SDEMO-03
+Bank0366_Text_Lbdemo01 = LBDEMO-01
+Bank0366_Text_Lbdemo02 = LBDEMO-02
+Bank0366_Text_Lbdemo03 = LBDEMO-03
+Bank0366_Text_Lbdemo04 = LBDEMO-04
+Bank0366_Text_Lbdemo05 = LBDEMO-05
+Bank0366_Text_Lbdemo06 = LBDEMO-06
+Bank0366_Text_Lbdemo07 = LBDEMO-07
+Bank0366_Text_Lbdemo08 = LBDEMO-08
+Bank0366_Text_Lbdemo09 = LBDEMO-09
+Bank0366_Text_Fld153 = FLD-153
+Bank0366_Text_Fld154 = FLD-154
+Bank0366_Text_Fld155 = FLD-155
+Bank0366_Text_Fld156 = FLD-156
+Bank0366_Text_Fld157 = FLD-157
+Bank0366_Text_Fld158 = FLD-158
+Bank0366_Text_Fld159 = FLD-159
+Bank0366_Text_Fld160 = FLD-160
+Bank0366_Text_Fld161 = FLD-161
+Bank0366_Text_Fld162 = FLD-162
+Bank0366_Text_Fld163 = FLD-163
+Bank0366_Text_Sys92 = SYS-92
+Bank0366_Text_Fld164 = FLD-164
+Bank0366_Text_Sys93 = SYS-93
+Bank0366_Text_Fld165 = FLD-165
+Bank0366_Text_Sys94 = SYS-94
+Bank0366_Text_Sys95 = SYS-95
+Bank0366_Text_Sys96 = SYS-96
+Bank0366_Text_Sys97 = SYS-97
+Bank0366_Text_Sys98 = SYS-98
+Bank0366_Text_Fld166 = FLD-166
+Bank0366_Text_Vdemo01 = VDEMO-01
+Bank0366_Text_Vdemo02 = VDEMO-02
+Bank0366_Text_Sys99 = SYS-99
+Bank0366_Text_Bgdemo01 = BGDEMO-01
+Bank0366_Text_Bgdemo02 = BGDEMO-02
+Bank0366_Text_Shdemo01 = SHDEMO-01
+Bank0366_Text_Shdemo02 = SHDEMO-02
+Bank0366_Text_Shdemo03 = SHDEMO-03
+Bank0366_Text_Shdemo04 = SHDEMO-04
+Bank0366_Text_Shdemo05 = SHDEMO-05
+Bank0366_Text_Ndemo03 = NDEMO-03
+Bank0366_Text_Ardemo01 = ARDEMO-01
+Bank0366_Text_Sys100 = SYS-100
+Bank0366_Text_Rizdemo01 = RIZDEMO-01
+Bank0366_Text_Fld167 = FLD-167
+Bank0366_Text_Fld168 = FLD-168
+Bank0366_Text_Fld169 = FLD-169
+Bank0366_Text_Fld170 = FLD-170
+Bank0366_Text_Vdemo03 = VDEMO-03
+Bank0366_Text_Rizdemo02 = RIZDEMO-02
+Bank0366_Text_Fld171 = FLD-171
+Bank0366_Text_Fld172 = FLD-172
+Bank0366_Text_Fld173 = FLD-173
+Bank0366_Text_End01 = END-01
+Bank0366_Text_Fld174 = FLD-174
+Bank0366_Text_End02 = END-02
+Bank0366_Text_W156Babble2 = W156-BABBLE2
+Bank0366_Text_Fld175 = FLD-175
+Bank0366_Text_Zoro01 = ZORO-01
+Bank0366_Text_Se04r = BE-SE-04R
+Bank0366_Text_ToujouIntro = TOUJOU-INTRO
+Bank0366_Text_End03 = END-03
+Bank0366_Text_Open01 = OPEN-01
+Bank0366_Text_Open02 = OPEN-02
+Bank0366_Text_Open03 = OPEN-03
+Bank0366_Text_End04 = END-04
+Bank0366_Text_End05 = END-05
+Bank0366_Text_SwMdunBl06 = SW-MDUN-BL-06
+Bank0366_Text_Meet02 = MEET-02
+Bank0366_Text_Meet03 = MEET-03
+Bank0366_Text_Meet04 = MEET-04
+Bank0366_Text_Wcs01 = WCS-01
+Bank0366_Text_Wcs02 = WCS-02
+Bank0366_Text_Wcs03 = WCS-03
+Bank0366_Text_Wcs04 = WCS-04
+Bank0366_Text_Lcdemo01 = LCDEMO-01
+Bank0366_Text_Lcdemo02 = LCDEMO-02
+Bank0366_Text_Sys101 = SYS-101
+Bank0366_Text_End06 = END-06
+Bank0366_Text_End07 = END-07
+Bank0366_Text_Logo01 = LOGO-01
+Bank0366_Text_Logo02 = LOGO-02
+Bank0366_Text_Logo03 = LOGO-03
+Bank0366_Text_Fld176 = FLD-176
+Bank0366_Text_Sys102 = SYS-102
+Bank0366_Text_Decide6 = DECIDE6
+Bank0366_Text_GymE01 = GYM-E01
+Bank0366_Text_GymE02 = GYM-E02
+Bank0366_Text_GymE03 = GYM-E03
+Bank0366_Text_GymE04 = GYM-E04
+Bank0366_Text_GymM01 = GYM-M01
+Bank0366_Text_GymM02 = GYM-M02
+Bank0366_Text_GymM03 = GYM-M03
+Bank0366_Text_GymM04 = GYM-M04
+Bank0366_Text_GymM05 = GYM-M05
+Bank0366_Text_GymM06 = GYM-M06
+Bank0366_Text_GymH01 = GYM-H01
+Bank0366_Text_GymH02 = GYM-H02
+Bank0366_Text_GymH03 = GYM-H03
+Bank0366_Text_GymH04 = GYM-H04
+Bank0366_Text_GymH05 = GYM-H05
+Bank0366_Text_GymH06 = GYM-H06
+Bank0366_Text_GymH07 = GYM-H07
+Bank0366_Text_GymH08 = GYM-H08
+Bank0366_Text_Lcg01_2 = LCG-01
+Bank0366_Text_Lcg02_2 = LCG-02
+Bank0366_Text_Lcg03_2 = LCG-03
+Bank0366_Text_Lcg04_2 = LCG-04
+Bank0366_Text_Lcg05 = LCG-05
+Bank0366_Text_Lcg06 = LCG-06
+Bank0366_Text_Lcg07 = LCG-07
+Bank0366_Text_Lcg08 = LCG-08
+Bank0366_Text_Lcg09 = LCG-09
+Bank0366_Text_Lcg10 = LCG-10
+Bank0366_Text_Lcg11 = LCG-11
+Bank0366_Text_Md01 = MD-01
+Bank0366_Text_Md02 = MD-02
+Bank0366_Text_Md03 = MD-03
+Bank0366_Text_Md04 = MD-04
+Bank0366_Text_SwWbt01 = SW-WBT-01
+Bank0366_Text_SwWbt02 = SW-WBT-02
+Bank0366_Text_SwWbt03 = SW-WBT-03
+Bank0366_Text_SwWbt04 = SW-WBT-04
+Bank0366_Text_SwWbt05 = SW-WBT-05
+Bank0366_Text_SwWbt06 = SW-WBT-06
+Bank0366_Text_SwWbt07 = SW-WBT-07
+Bank0366_Text_SwWbt09 = SW-WBT-09
+Bank0366_Text_SwWbt10 = SW-WBT-10
+Bank0366_Text_SwWbt11 = SW-WBT-11
+Bank0366_Text_SwWbt12 = SW-WBT-12
+Bank0366_Text_SwWbt13 = SW-WBT-13
+Bank0366_Text_SwWbt15 = SW-WBT-15
+Bank0366_Text_SwWbt16 = SW-WBT-16
+Bank0366_Text_SwWbt17 = SW-WBT-17
+Bank0366_Text_SwWbt18 = SW-WBT-18
+Bank0366_Text_SwWbt19 = SW-WBT-19
+Bank0366_Text_SwWbt20 = SW-WBT-20
+Bank0366_Text_SwWbt21 = SW-WBT-21
+Bank0366_Text_SwWbt22 = SW-WBT-22
+Bank0366_Text_SwFes01 = SW-FES-01
+Bank0366_Text_SwFes02 = SW-FES-02
+Bank0366_Text_SwFes03 = SW-FES-03
+Bank0366_Text_SwFes04 = SW-FES-04
+Bank0366_Text_SwFes05 = SW-FES-05
+Bank0366_Text_SwFes06 = SW-FES-06
+Bank0366_Text_SwFes07 = SW-FES-07
+Bank0366_Text_SwFes08 = SW-FES-08
+Bank0366_Text_SwFes09 = SW-FES-09
+Bank0366_Text_SwFes10 = SW-FES-10
+Bank0366_Text_SwFes11 = SW-FES-11
+Bank0366_Text_SwFes12 = SW-FES-12
+Bank0366_Text_SwFes13 = SW-FES-13
+Bank0366_Text_SwFes14 = SW-FES-14
+Bank0366_Text_SwFes15 = SW-FES-15
+Bank0366_Text_SwFes16 = SW-FES-16
+Bank0366_Text_SwMdunBl01 = SW-MDUN-BL-01
+Bank0366_Text_SwMdunBl02 = SW-MDUN-BL-02
+Bank0366_Text_SwMdunBl03 = SW-MDUN-BL-03
+Bank0366_Text_SwMdunBl04 = SW-MDUN-BL-04
+Bank0366_Text_SwMdunBl05 = SW-MDUN-BL-05
+Bank0366_Text_SwMdunWh01 = SW-MDUN-WH-01
+Bank0366_Text_SwMdunWh02 = SW-MDUN-WH-02
+Bank0366_Text_SwMdunWh03 = SW-MDUN-WH-03
+Bank0366_Text_SwMdunWh04 = SW-MDUN-WH-04
+Bank0366_Text_SwMdunWh05 = SW-MDUN-WH-05
+Bank0366_Text_SwMdunBl07 = SW-MDUN-BL-07
+Bank0366_Text_SwMdunWh07 = SW-MDUN-WH-07
+Bank0366_Text_SwCard01 = SW-CARD-01
+Bank0366_Text_SwCard02 = SW-CARD-02
+Bank0366_Text_SwCard03 = SW-CARD-03
+Bank0366_Text_SwCard04 = SW-CARD-04
+Bank0366_Text_SwCard05 = SW-CARD-05
+Bank0366_Text_SwCard06 = SW-CARD-06
+Bank0366_Text_SwCard07 = SW-CARD-07
+Bank0366_Text_SwCard08 = SW-CARD-08
+Bank0366_Text_SwCard09 = SW-CARD-09
+Bank0366_Text_SwCard10 = SW-CARD-10
+Bank0366_Text_SwCard11 = SW-CARD-11
+Bank0366_Text_SwCard12 = SW-CARD-12
+Bank0366_Text_SwCard13 = SW-CARD-13
+Bank0366_Text_SwCard14 = SW-CARD-14
+Bank0366_Text_SwCard15 = SW-CARD-15
+Bank0366_Text_SwCard16 = SW-CARD-16
+Bank0366_Text_SwCard17 = SW-CARD-17
+Bank0366_Text_SwCard18 = SW-CARD-18
+Bank0366_Text_SwCard19 = SW-CARD-19
+Bank0366_Text_SwCard20 = SW-CARD-20
+Bank0366_Text_SwCard21 = SW-CARD-21
+Bank0366_Text_SwCard22 = SW-CARD-22
+Bank0366_Text_SwGrgym01 = SW-GRGYM-01
+Bank0366_Text_SwGrgym02 = SW-GRGYM-02
+Bank0366_Text_SwNpoke = SW-NPOKE
+Bank0366_Text_SwKyurem01 = SW-KYUREM-01
+Bank0366_Text_SwKyurem02 = SW-KYUREM-02
+Bank0366_Text_SwKyurem03 = SW-KYUREM-03
+Bank0366_Text_SwKyurem04 = SW-KYUREM-04
+Bank0366_Text_SwMizugym01 = SW-MIZUGYM-01
+Bank0366_Text_SwMizugym02 = SW-MIZUGYM-02
+Bank0366_Text_Ochiba01 = OCHIBA-01
+Bank0366_Text_Ochiba02 = OCHIBA-02
+Bank0366_Text_SwZknKaihou = SW-ZKN-KAIHOU
+Bank0366_Text_SwLcNo = SW-LC-NO
+Bank0366_Text_SwGeema01 = SW-GEEMA-01
+Bank0366_Text_SwGeema02 = SW-GEEMA-02
+Bank0366_Text_SwGeema03 = SW-GEEMA-03
+Bank0366_Text_SwGeema04 = SW-GEEMA-04
+Bank0366_Text_SwDrggym01 = SW-DRGGYM-01
+Bank0366_Text_SwDrggym02 = SW-DRGGYM-02
+Bank0366_Text_SwDrggym03 = SW-DRGGYM-03
+Bank0366_Text_SwDrggym04 = SW-DRGGYM-04
+Bank0366_Text_SwDrggym05 = SW-DRGGYM-05
+Bank0366_Text_SwDrggym06 = SW-DRGGYM-06
+Bank0366_Text_SwDrggym07 = SW-DRGGYM-07
+Bank0366_Text_SwCattleya01 = SW-CATTLEYA-01
+Bank0366_Text_SwCattleya02 = SW-CATTLEYA-02
+Bank0366_Text_SwCattleya03 = SW-CATTLEYA-03
+Bank0366_Text_SwShikimi01 = SW-SHIKIMI-01
+Bank0366_Text_SwShikimi02 = SW-SHIKIMI-02
+Bank0366_Text_SwShikimi03 = SW-SHIKIMI-03
+Bank0366_Text_SwShikimi04 = SW-SHIKIMI-04
+Bank0366_Text_SwShikimi05 = SW-SHIKIMI-05
+Bank0366_Text_SwShikimi06 = SW-SHIKIMI-06
+Bank0366_Text_SwRenbu01 = SW-RENBU-01
+Bank0366_Text_SwRenbu02 = SW-RENBU-02
+Bank0366_Text_SwRenbu03 = SW-RENBU-03
+Bank0366_Text_SwRenbu04 = SW-RENBU-04
+Bank0366_Text_SwRenbu05 = SW-RENBU-05
+Bank0366_Text_SwBcg01 = SW-BCG-01
+Bank0366_Text_SwBcg02 = SW-BCG-02
+Bank0366_Text_SwBcg03 = SW-BCG-03
+Bank0366_Text_SwBcg04 = SW-BCG-04
+Bank0366_Text_SwBcg05 = SW-BCG-05
+Bank0366_Text_SwBcg06 = SW-BCG-06
+Bank0366_Text_SwBcg07 = SW-BCG-07
+Bank0366_Text_SwKeysys01 = SW-KEYSYS-01
+Bank0366_Text_SwKeysys02 = SW-KEYSYS-02
+Bank0366_Text_SwKeysys03 = SW-KEYSYS-03
+Bank0366_Text_SwKeysys04 = SW-KEYSYS-04
+Bank0366_Text_SwPlazmaship01 = SW-PLAZMASHIP-01
+Bank0366_Text_SwPlazmaship02 = SW-PLAZMASHIP-02
+Bank0366_Text_SwPlazmaship03 = SW-PLAZMASHIP-03
+Bank0366_Text_SwPlazmaship04 = SW-PLAZMASHIP-04
+Bank0366_Text_SwPlazmaship05 = SW-PLAZMASHIP-05
+Bank0366_Text_SwPlazmaship06 = SW-PLAZMASHIP-06
+Bank0366_Text_SwPlazmaship07 = SW-PLAZMASHIP-07
+Bank0366_Text_SwPlazmaship08 = SW-PLAZMASHIP-08
+Bank0366_Text_SwPlazmaship09 = SW-PLAZMASHIP-09
+Bank0366_Text_SwPlazmaship10 = SW-PLAZMASHIP-10
+Bank0366_Text_SwZukanstump01 = SW-ZUKANSTUMP-01
+Bank0366_Text_SwYaconroad01 = SW-YACONROAD-01
+Bank0366_Text_SwRelic01 = SW-RELIC-01
+Bank0366_Text_SwRelic02 = SW-RELIC-02
+Bank0366_Text_SwRelic03 = SW-RELIC-03
+Bank0366_Text_SwChampiris01 = SW-CHAMPIRIS-01
+Bank0366_Text_SwChampiris02 = SW-CHAMPIRIS-02
+Bank0366_Text_SwChampiris03 = SW-CHAMPIRIS-03
+Bank0366_Text_SwChampiris04 = SW-CHAMPIRIS-04
+Bank0366_Text_SwChampiris05 = SW-CHAMPIRIS-05
+Bank0366_Text_SwChampiris06 = SW-CHAMPIRIS-06
+Bank0366_Text_SwPkwood01 = SW-PKWOOD-01
+Bank0366_Text_SwPkwood02 = SW-PKWOOD-02
+Bank0366_Text_SwPkwood03 = SW-PKWOOD-03
+Bank0366_Text_SwStarpoke = SW-STARPOKE
+Bank0366_Text_SwPkwoodAud01 = SW-PKWOOD-AUD-01
+Bank0366_Text_SwPkwoodAud02 = SW-PKWOOD-AUD-02
+Bank0366_Text_SwPkwoodAud03 = SW-PKWOOD-AUD-03
+Bank0366_Text_SwPkwoodAud04 = SW-PKWOOD-AUD-04
+Bank0366_Text_SwPkwoodAud05 = SW-PKWOOD-AUD-05
+Bank0366_Text_SwPkwoodAud06 = SW-PKWOOD-AUD-06
+Bank0366_Text_SwPkwoodAud07 = SW-PKWOOD-AUD-07
+Bank0366_Text_SwPkwoodAud08 = SW-PKWOOD-AUD-08
+Bank0366_Text_SwPkwoodAud09 = SW-PKWOOD-AUD-09
+Bank0366_Text_SwPkwoodAud10 = SW-PKWOOD-AUD-10
+Bank0366_Text_SwPkwoodAud11 = SW-PKWOOD-AUD-11
+Bank0366_Text_SwPkwoodAud12 = SW-PKWOOD-AUD-12
+Bank0366_Text_SwPkwoodAud13 = SW-PKWOOD-AUD-13
+Bank0366_Text_SwPkwoodAud14 = SW-PKWOOD-AUD-14
+Bank0366_Text_SwPkwoodAud15 = SW-PKWOOD-AUD-15
+Bank0366_Text_SwPkwoodAud16 = SW-PKWOOD-AUD-16
+Bank0366_Text_SwBellbox01 = SW-BELLBOX-01
+Bank0366_Text_SwBellbox02 = SW-BELLBOX-02
+Bank0366_Text_SwBellbox03 = SW-BELLBOX-03
+Bank0366_Text_SwMedalget = SW-MEDALGET
+Bank0366_Text_SwMedalget02 = SW-MEDALGET-02
+Bank0366_Text_SwJaExp = SW-JA-EXP
+Bank0366_Text_SwJa01 = SW-JA-01
+Bank0366_Text_SwJa02 = SW-JA-02
+Bank0366_Text_SwShizui = SW-SHIZUI
+Bank0366_Text_SwKobalon01 = SW-KOBALON-01
+Bank0366_Text_SwKobalon02 = SW-KOBALON-02
+Bank0366_Text_SwSouryuRumble = SW-SOURYU-RUMBLE
+Bank0366_Text_SwTorosForm = SW-TOROS-FORM
+Bank0366_Text_SwKertioForm01 = SW-KERTIO-FORM-01
+Bank0366_Text_SwKertioForm02 = SW-KERTIO-FORM-02
+Bank0366_Text_SwKertioForm03 = SW-KERTIO-FORM-03
+Bank0366_Text_SwKertioForm04 = SW-KERTIO-FORM-04
+Bank0366_Text_SwKertioForm05 = SW-KERTIO-FORM-05
+Bank0366_Text_SwKertioForm06 = SW-KERTIO-FORM-06
+Bank0366_Text_SwGhetsisStick01 = SW-GHETSIS-STICK-01
+Bank0366_Text_SwGhetsisStick02 = SW-GHETSIS-STICK-02
+Bank0366_Text_SwCiVschamp01 = SW-CI-VSCHAMP-01
+Bank0366_Text_SwCiVschamp02 = SW-CI-VSCHAMP-02
+Bank0366_Text_SwCiVschamp03 = SW-CI-VSCHAMP-03
+Bank0366_Text_SwCiVschamp04 = SW-CI-VSCHAMP-04
+Bank0366_Text_SwCiWbt01 = SW-CI-WBT-01
+Bank0366_Text_SwCiWbt02 = SW-CI-WBT-02
+Bank0366_Text_SwCiWbt03 = SW-CI-WBT-03
+Bank0366_Text_SwCiWbt04 = SW-CI-WBT-04
+Bank0366_Text_SwCiPkwood01 = SW-CI-PKWOOD-01
+Bank0366_Text_SwCiPkwood02 = SW-CI-PKWOOD-02
+Bank0366_Text_SwCiPkwood03 = SW-CI-PKWOOD-03
+Bank0366_Text_SwGianthole01 = SW-GIANTHOLE-01
+Bank0366_Text_SwGianthole02 = SW-GIANTHOLE-02
+Bank0366_Text_SwGianthole03 = SW-GIANTHOLE-03
+Bank0366_Text_SwGianthole04 = SW-GIANTHOLE-04
+Bank0366_Text_SwGianthole05 = SW-GIANTHOLE-05
+Bank0366_Text_SwGianthole06 = SW-GIANTHOLE-06
+Bank0366_Text_SwGianthole071 = SW-GIANTHOLE-07-1
+Bank0366_Text_SwGianthole072 = SW-GIANTHOLE-07-2
+Bank0366_Text_SwGianthole073 = SW-GIANTHOLE-07-3
+Bank0366_Text_SwGianthole074 = SW-GIANTHOLE-07-4
+Bank0366_Text_SwGianthole081 = SW-GIANTHOLE-08-1
+Bank0366_Text_SwGianthole082 = SW-GIANTHOLE-08-2
+Bank0366_Text_SwGianthole083 = SW-GIANTHOLE-08-3
+Bank0366_Text_SwGianthole084 = SW-GIANTHOLE-08-4
+Bank0366_Text_SwGianthole09 = SW-GIANTHOLE-09
+Bank0366_Text_SwGianthole10 = SW-GIANTHOLE-10
+Bank0366_Text_SwKusabi01 = SW-KUSABI-IN-01
+Bank0366_Text_SwKusabi02 = SW-KUSABI-IN-02
+Bank0366_Text_SwKusabi03 = SW-KUSABI-IN-03
+Bank0366_Text_SwKusabi04 = SW-KUSABI-IN-04
+Bank0366_Text_SwKusabi05 = SW-KUSABI-IN-05
+Bank0366_Text_SwKusabi06 = SW-KUSABI-IN-06
+Bank0366_Text_SwKusabi07 = SW-KUSABI-IN-07
+Bank0366_Text_SwKusabi08 = SW-KUSABI-IN-08
+Bank0366_Text_SwKusabi09 = SW-KUSABI-IN-09
+Bank0366_Text_SwKusabi10 = SW-KUSABI-IN-10
+Bank0366_Text_SwKusabi11 = SW-KUSABI-IN-11
+Bank0366_Text_SwKusabi12 = SW-KUSABI-IN-12
+Bank0366_Text_SwKusabi13 = SW-KUSABI-IN-13
+Bank0366_Text_SwTachiwaki01 = SW-TACHIWAKI-01
+Bank0366_Text_SwTachiwaki02 = SW-TACHIWAKI-02
+Bank0366_Text_SwTachiwaki03 = SW-TACHIWAKI-03
+Bank0366_Text_SwAirplane01 = SW-AIRPLANE-01
+Bank0366_Text_SwAirplane02L = SW-AIRPLANE-02-L
+Bank0366_Text_SwAirplane02R = SW-AIRPLANE-02-R
+Bank0366_Text_SwAirplane03 = SW-AIRPLANE-03
+Bank0366_Text_SwFrigate01 = SW-FRIGATE-01
+Bank0366_Text_SwFrigate02 = SW-FRIGATE-02
+Bank0366_Text_SwFrigate03 = SW-FRIGATE-03
+Bank0366_Text_SwFrigate04 = SW-FRIGATE-04
+Bank0366_Text_SwFrigate05 = SW-FRIGATE-05
+Bank0366_Text_SwFrigate06 = SW-FRIGATE-06
+Bank0366_Text_SwFrigate07 = SW-FRIGATE-07
+Bank0366_Text_SwFrigate08 = SW-FRIGATE-08
+Bank0366_Text_SwFrigate09 = SW-FRIGATE-09
+Bank0366_Text_SwFrigate10 = SW-FRIGATE-10
+Bank0366_Text_SwFrigate11 = SW-FRIGATE-11
+Bank0366_Text_SwFrigate12 = SW-FRIGATE-12
+Bank0366_Text_SwFrigate13 = SW-FRIGATE-13
+Bank0366_Text_SwFrigate14 = SW-FRIGATE-14
+Bank0366_Text_SwFrigate15 = SW-FRIGATE-15
+Bank0366_Text_SwFrigate16 = SW-FRIGATE-16
+Bank0366_Text_SwFrigate17 = SW-FRIGATE-17
+Bank0366_Text_SwFrigate18 = SW-FRIGATE-18
+Bank0366_Text_SwSouryucity01 = SW-SOURYUCITY-01
+Bank0366_Text_SwSouryucity02 = SW-SOURYUCITY-02
+Bank0366_Text_SwSouryucity03 = SW-SOURYUCITY-03
+Bank0366_Text_SwSouryucity04 = SW-SOURYUCITY-04
+Bank0366_Text_SwSouryucity05 = SW-SOURYUCITY-05
+Bank0366_Text_SwSouryucity06 = SW-SOURYUCITY-06
+Bank0366_Text_SwSouryucity07 = SW-SOURYUCITY-07
+Bank0366_Text_SwSouryucity08 = SW-SOURYUCITY-08
+Bank0366_Text_SwSouryucity09 = SW-SOURYUCITY-09
+Bank0366_Text_SwSouryucity10 = SW-SOURYUCITY-10
+Bank0366_Text_SwSouryucity11 = SW-SOURYUCITY-11
+Bank0366_Text_SwSouryucity12 = SW-SOURYUCITY-12
+Bank0366_Text_SwSouryucity13 = SW-SOURYUCITY-13
+Bank0366_Text_SwSouryucity14 = SW-SOURYUCITY-14
+Bank0366_Text_SwSouryucity15 = SW-SOURYUCITY-15
+Bank0366_Text_SwSouryucity16 = SW-SOURYUCITY-16
+Bank0366_Text_SwSouryucity17 = SW-SOURYUCITY-17
+Bank0366_Text_SwSouryucity18 = SW-SOURYUCITY-18
+Bank0366_Text_SwKyureon0001 = SW-KYUREON-00-01
+Bank0366_Text_SwKyureon0002a = SW-KYUREON-00-02a
+Bank0366_Text_SwKyureon0002b = SW-KYUREON-00-02b
+Bank0366_Text_SwKyureon0002c = SW-KYUREON-00-02c
+Bank0366_Text_SwKyureon0002d = SW-KYUREON-00-02d
+Bank0366_Text_SwKyureon0003a = SW-KYUREON-00-03a
+Bank0366_Text_SwKyureon0003b = SW-KYUREON-00-03b
+Bank0366_Text_SwKyureon0101 = SW-KYUREON-01-01
+Bank0366_Text_SwKyureon0101b = SW-KYUREON-01-01b
+Bank0366_Text_SwKyureon0102a = SW-KYUREON-01-02a
+Bank0366_Text_SwKyureon0102b = SW-KYUREON-01-02b
+Bank0366_Text_SwKyureon0103 = SW-KYUREON-01-03
+Bank0366_Text_SwKyureon0104 = SW-KYUREON-01-04
+Bank0366_Text_SwKyureon0105 = SW-KYUREON-01-05
+Bank0366_Text_SwKyureon0106 = SW-KYUREON-01-06
+Bank0366_Text_SwKyureon0107 = SW-KYUREON-01-07
+Bank0366_Text_SwKyureon0107b = SW-KYUREON-01-07b
+Bank0366_Text_SwKyureon0108 = SW-KYUREON-01-08
+Bank0366_Text_SwKyureon0109 = SW-KYUREON-01-09
+Bank0366_Text_SwKyureon0110 = SW-KYUREON-01-10
+Bank0366_Text_SwKyureon0111 = SW-KYUREON-01-11
+Bank0366_Text_SwKyureon0112 = SW-KYUREON-01-12
+Bank0366_Text_SwKyureon0113 = SW-KYUREON-01-13
+Bank0366_Text_SwKyureon0114b = SW-KYUREON-01-14b
+Bank0366_Text_SwKyureon0114w = SW-KYUREON-01-14w
+Bank0366_Text_SwKyureon0115 = SW-KYUREON-01-15
+Bank0366_Text_SwKyureon0116 = SW-KYUREON-01-16
+Bank0366_Text_SwKyureon0201 = SW-KYUREON-02-01
+Bank0366_Text_SwKyureon0202 = SW-KYUREON-02-02
+Bank0366_Text_SwKyureon0203 = SW-KYUREON-02-03
+Bank0366_Text_SwKyureon0204 = SW-KYUREON-02-04
+Bank0366_Text_SwKyureon0205 = SW-KYUREON-02-05
+Bank0366_Text_SwKyureon0206 = SW-KYUREON-02-06
+Bank0366_Text_SwKyureon0206w = SW-KYUREON-02-06w
+Bank0366_Text_SwKyureon0207 = SW-KYUREON-02-07
+Bank0366_Text_SwKyureon0208 = SW-KYUREON-02-08
+Bank0366_Text_SwKyureon0209 = SW-KYUREON-02-09
+Bank0366_Text_SwKyureon0210 = SW-KYUREON-02-10
+Bank0366_Text_SwKyureon0301 = SW-KYUREON-03-01
+Bank0366_Text_SwKyureon0302 = SW-KYUREON-03-02
+Bank0366_Text_SwKyureon0303 = SW-KYUREON-03-03
+Bank0366_Text_SwKyureon0304 = SW-KYUREON-03-04
+Bank0366_Text_SwKyureon0305 = SW-KYUREON-03-05
+Bank0366_Text_SwKyureon0306b = SW-KYUREON-03-06b
+Bank0366_Text_SwKyureon0306w = SW-KYUREON-03-06w
+Bank0366_Text_SwKyureon0307b = SW-KYUREON-03-07b
+Bank0366_Text_SwKyureon0307w = SW-KYUREON-03-07w
+Bank0366_Text_SwEnding01 = SW-ENDING-01
+Bank0366_Text_SwEnding02 = SW-ENDING-02
+Bank0366_Text_SwEnding03 = SW-ENDING-03
+Bank0366_Text_SwCygnus01 = SW-CYGNUS-01
+Bank0366_Text_SwCygnus02 = SW-CYGNUS-02
+Bank0366_Text_SwCygnus03 = SW-CYGNUS-03
+Bank0366_Text_Dmy390 = DMY-390
+Bank0366_Text_Dmy391 = DMY-391
+Bank0366_Text_DpSelect = DP-SELECT
+Bank0366_Text_End_2 = END
 \pad{1a}

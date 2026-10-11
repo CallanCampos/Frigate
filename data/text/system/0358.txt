@@ -1,6 +1,6 @@
-     \x{ffff}
-NO RESTRICTIONS
-STANDARD
-RANDOM MATCHUP
-BATTLE SUBWAY
-FLAT RULES
+Bank0358_Text_Empty =      \x{ffff}
+Bank0358_Text_NoRestrictions = NO RESTRICTIONS
+Bank0358_Text_Standard = STANDARD
+Bank0358_Text_RandomMatchup = RANDOM MATCHUP
+Bank0358_Text_BattleSubway = BATTLE SUBWAY
+Bank0358_Text_FlatRules = FLAT RULES

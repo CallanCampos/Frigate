@@ -1,6 +1,0 @@
-#include "asm/evolution.inc"
-
-// SPECIES_GLOOM
-    Evolution EVO_METHOD_ITEM, ITEM_LEAF_STONE, SPECIES_VILEPLUME
-    Evolution EVO_METHOD_ITEM, ITEM_SUN_STONE, SPECIES_BELLOSSOM
-    EvolutionsEnd

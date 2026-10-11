@@ -1,0 +1,77 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Colress",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_COLRESS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MAGNETON",
+            "form": 0,
+            "level": 50,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_EVIOLITE",
+            "moves": [ "MOVE_VOLT_SWITCH", "MOVE_FLASH_CANNON", "MOVE_TRI_ATTACK", "MOVE_THUNDER_WAVE" ]
+        },
+        {
+            "species": "SPECIES_METANG",
+            "form": 0,
+            "level": 50,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_METEOR_MASH", "MOVE_ZEN_HEADBUTT", "MOVE_ROCK_SLIDE", "MOVE_AGILITY" ]
+        },
+        {
+            "species": "SPECIES_BEHEEYEM",
+            "form": 0,
+            "level": 50,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_PSYCHIC", "MOVE_ENERGY_BALL", "MOVE_CALM_MIND", "MOVE_RECOVER" ]
+        },
+        {
+            "species": "SPECIES_MAGNEZONE",
+            "form": 0,
+            "level": 50,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_DISCHARGE", "MOVE_FLASH_CANNON", "MOVE_EXPLOSION", "MOVE_THUNDER_WAVE" ]
+        },
+        {
+            "species": "SPECIES_KLINKLANG",
+            "form": 0,
+            "level": 52,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_AIR_BALLOON",
+            "moves": [ "MOVE_GEAR_GRIND", "MOVE_THUNDERBOLT", "MOVE_GIGA_IMPACT", "MOVE_SHIFT_GEAR" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "Come on! More!\nBring out your Pokémon's power!"
+        },
+        {
+            "type": 19,
+            "text": "I'm more psyched than I've ever been!\nI can still go on!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "So this is what it means to draw forth the\npower hidden in your Pokémon!"
+        }
+    ]
+}

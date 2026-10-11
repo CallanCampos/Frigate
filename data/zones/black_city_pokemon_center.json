@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": 283,
+    "matrix": "MAP_MATRIX_BLACK_CITY_POKEMON_CENTER",
+    "scripts": "SCRIPTS_BLACK_CITY_POKEMON_CENTER",
+    "text": "SCRIPT_TEXT_BLACK_CITY_POKEMON_CENTER",
+    "bgm": "SEQ_BGM_POKECEN",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_BLACK_CITY",
+    "place": "PLACE_BLACK_CITY",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 3,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 13,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

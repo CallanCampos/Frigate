@@ -1,0 +1,38 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 9,
+    "area": 42,
+    "matrix": "MAP_MATRIX_OVERWORLD",
+    "scripts": "SCRIPTS_DRAGONSPIRAL_TOWER",
+    "text": "SCRIPT_TEXT_DRAGONSPIRAL_TOWER",
+    "bgm": {
+        "spring": "SEQ_BGM_R_D_SP",
+        "summer": "SEQ_BGM_R_D_SU",
+        "autumn": "SEQ_BGM_R_D_AU",
+        "winter": "SEQ_BGM_R_D_WI"
+    },
+    "encounters": "ENCOUNTERS_DRAGONSPIRAL_TOWER",
+    "enc_slot": 6,
+    "parent": "ZONE_DRAGONSPIRAL_TOWER",
+    "place": "PLACE_DRAGONSPIRAL_TOWER",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 1,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": true,
+    "entralink_warp": true,
+    "cam_bound": 0,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 175,
+        "y": 0,
+        "z": 151
+    }
+}

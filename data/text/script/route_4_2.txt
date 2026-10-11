@@ -1,0 +1,7 @@
+Route42_Text_ImVeryParticularAbout = I'm very particular about\nthe Speed of Pokémon!
+Route42_Text_ThatsWhyImWondering = That's why I'm wondering if you\nhave any Pokémon with a Speed{be00}\nof {0202:1} or greater with you!
+Route42_Text_FastJustLikeLike = Your {0101:0} is fast!\nJust like I like them!{be01}\nThat makes me really happy,\nso I'll give you this!{be01}
+Route42_Text_DefinitelyHasSpeedLike = Your {0101:0} definitely\nhas the Speed that I like!{be01}\nI'm really really happy,\nso I'll give you these!{be01}
+Route42_Text_ThereManyDifferentPokemon = There are many different Pokémon\nwith many different Speeds! ♪{be01}\nIf you'd like, please come\nvisit me again tomorrow, OK?
+Route42_Text_DontWorryTheresMore = Don't worry! There's more to\nPokémon than Speed.{be01}\nBut, today, I'd sure like to see\na Pokémon with Speed greater than {0202:1}!
+Route42_Text_ImVeryParticularAbout_2 = I'm very particular about\nPokémon's Attack stat!

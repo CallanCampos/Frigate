@@ -1,21 +1,21 @@
-{bd02}In a quiet laboratory,\n{bd02}a solitary ninja aims to steal\n{bd02}an unbelievably amazing invention--\n{bd02}the dynamatronic engine!
-{bd02}But little does he know\n{bd02}someone is waiting for him inside:\n{bd02}a living, breathing justice machine!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}In a quiet laboratory,\n{bd02}a solitary ninja aims to steal\n{bd02}an unbelievably amazing invention--\n{bd02}the dynamatronic engine!
-{bd02}But little does she know\n{bd02}someone is waiting for her inside:\n{bd02}a living, breathing justice machine!
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0270_Text_QuietLaboratorySolitaryNinja = {bd02}In a quiet laboratory,\n{bd02}a solitary ninja aims to steal\n{bd02}an unbelievably amazing invention--\n{bd02}the dynamatronic engine!
+Bank0270_Text_ButLittleDoesHe = {bd02}But little does he know\n{bd02}someone is waiting for him inside:\n{bd02}a living, breathing justice machine!
+Bank0270_Text_Empty = なし
+Bank0270_Text_Empty_2 = なし
+Bank0270_Text_Empty_3 = なし
+Bank0270_Text_Empty_4 = なし
+Bank0270_Text_Empty_5 = なし
+Bank0270_Text_Empty_6 = なし
+Bank0270_Text_Empty_7 = なし
+Bank0270_Text_Empty_8 = なし
+Bank0270_Text_QuietLaboratorySolitaryNinja_2 = {bd02}In a quiet laboratory,\n{bd02}a solitary ninja aims to steal\n{bd02}an unbelievably amazing invention--\n{bd02}the dynamatronic engine!
+Bank0270_Text_ButLittleDoesShe = {bd02}But little does she know\n{bd02}someone is waiting for her inside:\n{bd02}a living, breathing justice machine!
+Bank0270_Text_Empty_9 = なし
+Bank0270_Text_Empty_10 = なし
+Bank0270_Text_Empty_11 = なし
+Bank0270_Text_Empty_12 = なし
+Bank0270_Text_Empty_13 = なし
+Bank0270_Text_Empty_14 = なし
+Bank0270_Text_Empty_15 = なし
+Bank0270_Text_Empty_16 = なし
+Bank0270_Text_Empty_17 = なし

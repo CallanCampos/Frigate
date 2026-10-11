@@ -1,22 +1,22 @@
-{bd02}This is a story that starts\n{bd02}with a certain inventor...
-{bd02}His assistant betrayed him and\n{bd02}changed F-00's programming and memory,\n{bd02}which caused it to go wild...
-{bd02}Its life as a robot\n{bd02}appeared to be near an end...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-{bd02}This is a story that starts\n{bd02}with a certain inventor...
-{bd02}Her assistant betrayed her and\n{bd02}changed F-00's programming and memory,\n{bd02}which caused it to go wild...
-{bd02}Its life as a robot\n{bd02}appeared to be near an end...
-なし
-なし
-なし
-なし
-なし
-なし
-なし
-なし
+Bank0301_Text_StoryStartsCertainInventor = {bd02}This is a story that starts\n{bd02}with a certain inventor...
+Bank0301_Text_HisAssistantBetrayedHim = {bd02}His assistant betrayed him and\n{bd02}changed F-00's programming and memory,\n{bd02}which caused it to go wild...
+Bank0301_Text_ItsLifeRobotAppeared = {bd02}Its life as a robot\n{bd02}appeared to be near an end...
+Bank0301_Text_Empty = なし
+Bank0301_Text_Empty_2 = なし
+Bank0301_Text_Empty_3 = なし
+Bank0301_Text_Empty_4 = なし
+Bank0301_Text_Empty_5 = なし
+Bank0301_Text_Empty_6 = なし
+Bank0301_Text_Empty_7 = なし
+Bank0301_Text_StoryStartsCertainInventor_2 = {bd02}This is a story that starts\n{bd02}with a certain inventor...
+Bank0301_Text_HerAssistantBetrayedHer = {bd02}Her assistant betrayed her and\n{bd02}changed F-00's programming and memory,\n{bd02}which caused it to go wild...
+Bank0301_Text_ItsLifeRobotAppeared_2 = {bd02}Its life as a robot\n{bd02}appeared to be near an end...
+Bank0301_Text_Empty_8 = なし
+Bank0301_Text_Empty_9 = なし
+Bank0301_Text_Empty_10 = なし
+Bank0301_Text_Empty_11 = なし
+Bank0301_Text_Empty_12 = なし
+Bank0301_Text_Empty_13 = なし
+Bank0301_Text_Empty_14 = なし
+Bank0301_Text_Empty_15 = なし
 \pad{88}

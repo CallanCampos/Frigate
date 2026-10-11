@@ -2,6 +2,7 @@
 #include "constants/arc.h"
 #include "constants/items.h"
 #include "constants/moves.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -19,8 +20,8 @@
 #define ICON_RETURN_PLTT 0x400
 
 // The item names' and descriptions' message files in ARCID_SYSTEM_MESSAGE
-#define MSG_ITEM_DESCRIPTIONS 63
-#define MSG_ITEM_NAMES 64
+#define MSG_ITEM_DESCRIPTIONS TEXT_BANK_ITEM_DESCRIPTIONS
+#define MSG_ITEM_NAMES TEXT_BANK_ITEM_NAMES
 
 // Where the HMs and TM93 to TM95 are in TM_MOVE_LIST
 #define TM_INDEX_HM01 92

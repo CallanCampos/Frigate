@@ -1,54 +1,54 @@
-Celebrity
-Little Sis
-The {0102:0} Ninja: Well, well.\nSuch a cute Pokémon you've got there.
-Pollyanna: I won't lose!
-Pollyanna: Hang on, Sewaddle!
-Pollyanna: Now!
-The {0102:0} Ninja: Tsk...\nYou're quite good.
-Pollyanna: I won't go easy on you!
-The {0102:0} Ninja: Tsk!\nThis girl also uses Pokémon?!
-Pollyanna: Oh, you're the one\nmy big brother was talking about--{be00}\na petty thief, the {0102:0} Ninja.
-The {0102:0} Ninja: So what?{be01}\nNow I'll capture you!
-Pollyanna: I have to warn you--\nI'm pretty strong.{be00}\n'Cause I've been training{be00}\nwith my big brother.
-The {0102:0} Ninja: Heh!\nThis is not child's play!
-Pollyanna: I'll beat you\nand show my big brother{be00}\nhow cool I am!
-Pollyanna: I can stop you with one hit\nusing defense skills I learned{be00}\nfrom my big brother.{be01}\nPolice judo! Hyah!
-The {0102:0} Ninja: Eeeek!\nYou are good... Or...{be00}\nYou're just better than I expected...{be01}\nAnyway, you--\nYou should battle with Pokémon!
-Pollyanna: Oops...I forgot.{be01}\nI got upset, and without thinking,\nI used...{be01}\nHumph! I've also learned strategies\nfor Pokémon battles{be00}\nfrom my brother!
-The {0102:0} Ninja: I see...
-Pollyanna: Don't underestimate me!{be01}\nOh? But...\nHow do I do that?
-The {0102:0} Ninja: Bring it!
-Pollyanna: I'll show you the results\nof my special training!
-The {0102:0} Ninja: Oh, really?\nCheck your ego at the door!
-Pollyanna: Check your own ego!{be01}\nMy brother told me\njustice always prevails!
-The {0102:0} Ninja: That's incorrect...\nThe winner is always right, even if it is{be00}\nthe villain.{be00}\nThat's reality!
-Pollyanna: That's a lie!
-The {0102:0} Ninja: You'll see.
-Pollyanna: My brother is right!\nI'll prove it to you!
-The {0102:0} Ninja: Heh heh heh...
-Pollyanna: Wh-what?\nI don't understand!{be01}\nCan you be telling the truth? My brother...
-The {0102:0} Ninja: Eeeek!\nI lost to such a starry-eyed girl...
-Pollyanna: See? Justice prevails!\nMy brother was right!
-The {0102:0} Ninja failed in her attempt\nto capture Pollyanna. On the contrary,{be00}\nPollyanna captured her and turned{be00}\nher over to the World Police.{be01}\nAs long as there is justice in this world,\nevil will never prosper!{be01}\nCongratulations on making a great citizen's\narrest, Pollyanna! Rise and fight, citizen!
-Pollyanna: Aaaah! It can't be...\nIt's not fair that I didn't win{be00}\nwhen I'm doing the right thing!
-The {0102:0} Ninja: That's right.\nHonesty doesn't pay.{be00}\nThat's the kind of dirty world it is.{be00}\nNo one can keep their hands clean.
-Pollyanna: Uh-oh, m-my... She is cool.\nI shouldn't feel this way...{be00}\nBut I can't help it...
-Pollyanna lost to the {0102:0} Ninja\nand, to her own surprise, felt a surge of{be00}\nadmiration for evil!{be01}\nYou're in trouble, Mecha Cop!\nYour little sister is at a very difficult age!
-Pollyanna: No, oh no...\nWith my feelings mixed up like this,{be00}\nmy big brother will hate me...
-The {0102:0} Ninja: Hate you?{be01}\nYou're brother and sister, right?\nWhy would he hate you for having feelings?
-Pollyanna: My brother's justice\nis my justice!{be01}\nIf I can't win against you, then\nto my brother, that means I'm evil, too!
-The {0102:0} Ninja: Tsk...\nI'm sorry for you.{be01}\nAs I always thought,\nthere is no good in justice, either...
-Pollyanna: I'm s-sorry...\nSorry...{be00}\nSorry...{be00}\n...
-In pursuit of an ideal of justice,\nPollyanna got caught up in fear--{be00}\nfear of making mistakes.{be01}\nMecha Cop might have missed\na key factor in training his{be00}\nlittle sister. Forgotten? Feelings...{be01}\nTake care of your family, Mecha Cop!\nTrain hard, but leave room for feelings!
-Pollyanna: This can't be happening...\nAfter all my special training with my{be00}\nbrother, I lost... It can't be true...
-The {0102:0} Ninja: Heh heh heh!\nWith you as bait, I'll lure Mecha Cop{be00}\nto his utter defeat!{be01}\nAnd, at that moment, what you two\ncall...justice...will crumble!
-Pollyanna: Stop! Let me go!\nMy brother! Help me!
-The {0102:0} Ninja,\nafter successfully capturing Pollyanna,{be00}\ncornered Mecha Cop and overpowered him.
-But, several years later...{be01}\nPollyanna, driven by vengeance\nagainst the {0102:0} Ninja,{be00}\nbecame a secret detective{be00}\nof the World Police.{be01}\nReborn as a reinforced cyborg female cop,\nshe became Mecha Cop Woman.{be01}\nEven the score, Mecha Cop Woman!\nMake her pay the price for the sake of{be00}\njustice and the World Police!
-Pollyanna: What?\n(...This can't be right. False Swipe?...){be01}\n(...Is she holding back so that her Pokémon\nwon't beat Sewaddle?...){be01}\n(...){be01}\n(...Could she truly be kindhearted?...)
-The {0102:0} Ninja: Now, come\nalong quietly.{be00}\nThere's no point in getting yourself hurt...
-Pollyanna: (...Come to think of it...)\n(...Back then, my brother was so kind...){be01}\n(...He was brutally injured while protecting\nme...saved me from being hit by a truck...){be01}\n(...Despite it all, to keep working as a cop,\nhe allowed himself to be surgically{be00}\nreinforced with cyborg components...)
-Pollyanna: Oh... How strange...\nSuddenly, she looks like{be00}\na sweet person...{be01}\nAnd... And... The {0102:0} Ninja\nis kind of good looking, too...
-The {0102:0} Ninja: Don't worry. Follow\nmy instructions, and you won't get hurt.
-Pollyanna: Captured...my heart...{be01}\nBut, oh, I can't feel this way!\nI'm Mecha Cop's little sister!{be00}\nI have to be strong!{be01}\nPol in Pollyanna is the same as\nPol in Police!
+Bank0191_Text_Celebrity = Celebrity
+Bank0191_Text_LittleSis = Little Sis
+Bank0191_Text_NinjaWellWellSuch = The {0102:0} Ninja: Well, well.\nSuch a cute Pokémon you've got there.
+Bank0191_Text_PollyannaWontLose = Pollyanna: I won't lose!
+Bank0191_Text_PollyannaHangSewaddle = Pollyanna: Hang on, Sewaddle!
+Bank0191_Text_PollyannaNow = Pollyanna: Now!
+Bank0191_Text_NinjaTskYoureQuite = The {0102:0} Ninja: Tsk...\nYou're quite good.
+Bank0191_Text_PollyannaWontGoEasy = Pollyanna: I won't go easy on you!
+Bank0191_Text_NinjaTskGirlAlso = The {0102:0} Ninja: Tsk!\nThis girl also uses Pokémon?!
+Bank0191_Text_PollyannaOhYoureOne = Pollyanna: Oh, you're the one\nmy big brother was talking about--{be00}\na petty thief, the {0102:0} Ninja.
+Bank0191_Text_NinjaWhatNowIll = The {0102:0} Ninja: So what?{be01}\nNow I'll capture you!
+Bank0191_Text_PollyannaHaveWarnIm = Pollyanna: I have to warn you--\nI'm pretty strong.{be00}\n'Cause I've been training{be00}\nwith my big brother.
+Bank0191_Text_NinjaHehNotChilds = The {0102:0} Ninja: Heh!\nThis is not child's play!
+Bank0191_Text_PollyannaIllBeatShow = Pollyanna: I'll beat you\nand show my big brother{be00}\nhow cool I am!
+Bank0191_Text_PollyannaCanStopOne = Pollyanna: I can stop you with one hit\nusing defense skills I learned{be00}\nfrom my big brother.{be01}\nPolice judo! Hyah!
+Bank0191_Text_NinjaEeeekGoodYoure = The {0102:0} Ninja: Eeeek!\nYou are good... Or...{be00}\nYou're just better than I expected...{be01}\nAnyway, you--\nYou should battle with Pokémon!
+Bank0191_Text_PollyannaOopsForgotGot = Pollyanna: Oops...I forgot.{be01}\nI got upset, and without thinking,\nI used...{be01}\nHumph! I've also learned strategies\nfor Pokémon battles{be00}\nfrom my brother!
+Bank0191_Text_NinjaSee = The {0102:0} Ninja: I see...
+Bank0191_Text_PollyannaDontUnderestimateOh = Pollyanna: Don't underestimate me!{be01}\nOh? But...\nHow do I do that?
+Bank0191_Text_NinjaBring = The {0102:0} Ninja: Bring it!
+Bank0191_Text_PollyannaIllShowResults = Pollyanna: I'll show you the results\nof my special training!
+Bank0191_Text_NinjaOhReallyCheck = The {0102:0} Ninja: Oh, really?\nCheck your ego at the door!
+Bank0191_Text_PollyannaCheckOwnEgo = Pollyanna: Check your own ego!{be01}\nMy brother told me\njustice always prevails!
+Bank0191_Text_NinjaThatsIncorrectWinner = The {0102:0} Ninja: That's incorrect...\nThe winner is always right, even if it is{be00}\nthe villain.{be00}\nThat's reality!
+Bank0191_Text_PollyannaThatsLie = Pollyanna: That's a lie!
+Bank0191_Text_NinjaYoullSee = The {0102:0} Ninja: You'll see.
+Bank0191_Text_PollyannaBrotherRightIll = Pollyanna: My brother is right!\nI'll prove it to you!
+Bank0191_Text_NinjaHehHehHeh = The {0102:0} Ninja: Heh heh heh...
+Bank0191_Text_PollyannaWhWhatDont = Pollyanna: Wh-what?\nI don't understand!{be01}\nCan you be telling the truth? My brother...
+Bank0191_Text_NinjaEeeekLostSuch = The {0102:0} Ninja: Eeeek!\nI lost to such a starry-eyed girl...
+Bank0191_Text_PollyannaSeeJusticePrevails = Pollyanna: See? Justice prevails!\nMy brother was right!
+Bank0191_Text_NinjaFailedHerAttempt = The {0102:0} Ninja failed in her attempt\nto capture Pollyanna. On the contrary,{be00}\nPollyanna captured her and turned{be00}\nher over to the World Police.{be01}\nAs long as there is justice in this world,\nevil will never prosper!{be01}\nCongratulations on making a great citizen's\narrest, Pollyanna! Rise and fight, citizen!
+Bank0191_Text_PollyannaAaaahCantIts = Pollyanna: Aaaah! It can't be...\nIt's not fair that I didn't win{be00}\nwhen I'm doing the right thing!
+Bank0191_Text_NinjaThatsRightHonesty = The {0102:0} Ninja: That's right.\nHonesty doesn't pay.{be00}\nThat's the kind of dirty world it is.{be00}\nNo one can keep their hands clean.
+Bank0191_Text_PollyannaUhOhM = Pollyanna: Uh-oh, m-my... She is cool.\nI shouldn't feel this way...{be00}\nBut I can't help it...
+Bank0191_Text_PollyannaLostNinjaHer = Pollyanna lost to the {0102:0} Ninja\nand, to her own surprise, felt a surge of{be00}\nadmiration for evil!{be01}\nYou're in trouble, Mecha Cop!\nYour little sister is at a very difficult age!
+Bank0191_Text_PollyannaNoOhNo = Pollyanna: No, oh no...\nWith my feelings mixed up like this,{be00}\nmy big brother will hate me...
+Bank0191_Text_NinjaHateYoureBrother = The {0102:0} Ninja: Hate you?{be01}\nYou're brother and sister, right?\nWhy would he hate you for having feelings?
+Bank0191_Text_PollyannaBrothersJusticeJustice = Pollyanna: My brother's justice\nis my justice!{be01}\nIf I can't win against you, then\nto my brother, that means I'm evil, too!
+Bank0191_Text_NinjaTskImSorry = The {0102:0} Ninja: Tsk...\nI'm sorry for you.{be01}\nAs I always thought,\nthere is no good in justice, either...
+Bank0191_Text_PollyannaImSSorry = Pollyanna: I'm s-sorry...\nSorry...{be00}\nSorry...{be00}\n...
+Bank0191_Text_PursuitIdealJusticePollyanna = In pursuit of an ideal of justice,\nPollyanna got caught up in fear--{be00}\nfear of making mistakes.{be01}\nMecha Cop might have missed\na key factor in training his{be00}\nlittle sister. Forgotten? Feelings...{be01}\nTake care of your family, Mecha Cop!\nTrain hard, but leave room for feelings!
+Bank0191_Text_PollyannaCantHappeningAfter = Pollyanna: This can't be happening...\nAfter all my special training with my{be00}\nbrother, I lost... It can't be true...
+Bank0191_Text_NinjaHehHehHeh_2 = The {0102:0} Ninja: Heh heh heh!\nWith you as bait, I'll lure Mecha Cop{be00}\nto his utter defeat!{be01}\nAnd, at that moment, what you two\ncall...justice...will crumble!
+Bank0191_Text_PollyannaStopLetGo = Pollyanna: Stop! Let me go!\nMy brother! Help me!
+Bank0191_Text_NinjaAfterSuccessfullyCapturing = The {0102:0} Ninja,\nafter successfully capturing Pollyanna,{be00}\ncornered Mecha Cop and overpowered him.
+Bank0191_Text_ButSeveralYearsLater = But, several years later...{be01}\nPollyanna, driven by vengeance\nagainst the {0102:0} Ninja,{be00}\nbecame a secret detective{be00}\nof the World Police.{be01}\nReborn as a reinforced cyborg female cop,\nshe became Mecha Cop Woman.{be01}\nEven the score, Mecha Cop Woman!\nMake her pay the price for the sake of{be00}\njustice and the World Police!
+Bank0191_Text_PollyannaWhatCantRight = Pollyanna: What?\n(...This can't be right. False Swipe?...){be01}\n(...Is she holding back so that her Pokémon\nwon't beat Sewaddle?...){be01}\n(...){be01}\n(...Could she truly be kindhearted?...)
+Bank0191_Text_NinjaNowComeAlong = The {0102:0} Ninja: Now, come\nalong quietly.{be00}\nThere's no point in getting yourself hurt...
+Bank0191_Text_PollyannaComeThinkBack = Pollyanna: (...Come to think of it...)\n(...Back then, my brother was so kind...){be01}\n(...He was brutally injured while protecting\nme...saved me from being hit by a truck...){be01}\n(...Despite it all, to keep working as a cop,\nhe allowed himself to be surgically{be00}\nreinforced with cyborg components...)
+Bank0191_Text_PollyannaOhHowStrange = Pollyanna: Oh... How strange...\nSuddenly, she looks like{be00}\na sweet person...{be01}\nAnd... And... The {0102:0} Ninja\nis kind of good looking, too...
+Bank0191_Text_NinjaDontWorryFollow = The {0102:0} Ninja: Don't worry. Follow\nmy instructions, and you won't get hurt.
+Bank0191_Text_PollyannaCapturedHeartBut = Pollyanna: Captured...my heart...{be01}\nBut, oh, I can't feel this way!\nI'm Mecha Cop's little sister!{be00}\nI have to be strong!{be01}\nPol in Pollyanna is the same as\nPol in Police!
 \pad{3a}

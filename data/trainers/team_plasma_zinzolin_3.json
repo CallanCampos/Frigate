@@ -1,0 +1,46 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Zinzolin",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_ZINZOLIN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 45,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CRYOGONAL",
+            "form": 0,
+            "level": 46,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_ICE_BEAM", "MOVE_REFLECT", "MOVE_SLASH", "MOVE_CONFUSE_RAY" ]
+        },
+        {
+            "species": "SPECIES_CRYOGONAL",
+            "form": 0,
+            "level": 46,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_ICE_BEAM", "MOVE_LIGHT_SCREEN", "MOVE_SLASH", "MOVE_CONFUSE_RAY" ]
+        },
+        {
+            "species": "SPECIES_WEAVILE",
+            "form": 0,
+            "level": 48,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_SLASH", "MOVE_ICE_SHARD", "MOVE_METAL_CLAW" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Have you gotten even stronger than you\nwere in Lacunosa Town?{be00}\nHow, in such a brief amount of time..."
+        }
+    ]
+}

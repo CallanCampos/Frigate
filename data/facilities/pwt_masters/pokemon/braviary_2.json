@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BRAVIARY",
+    "moves": [ "MOVE_SKY_ATTACK", "MOVE_SUPERPOWER", "MOVE_U_TURN", "MOVE_TAILWIND" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_POWER_HERB",
+    "form": 0
+}

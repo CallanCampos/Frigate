@@ -1,5 +1,5 @@
 #include "types.h"
-#include "app/ov139.h"
+#include "app/ui/frame_list.h"
 #include "app/unova_link.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
@@ -137,7 +137,7 @@ struct KeySystemOamText {
 };
 
 struct KeySystemScrollList {
-    Ov139List *list;
+    FrameList *list;
     KeySystemScrollListSetup setup;
     StrBuf *str;
     BOOL started;
@@ -156,24 +156,24 @@ static void KeySystemMsgWin_SetPaletteNo(KeySystemMsgWin *win, u8 palette);
 static void KeySystem_CalcTextPos(u32 align, const KeySystemPos *pos, GFLBitmap *bitmap, const StrBuf *str, Font *font,
                                   KeySystemPos *out);
 static KeySystemSeqEntry *KeySystemSeq_GetEntry(KeySystemSeq *seq, int index);
-static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *printWindow, s16 y);
-static void KeySystemScrollList_Select(void *work, u32 index);
+static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *printWindow, s16 y, BOOL firstBG);
+static void KeySystemScrollList_Select(void *work, u32 index, BOOL moved);
 static void KeySystemScrollList_Scroll(void *work, s16 delta);
 static void KeySystem_BlendColor(u32 type, u16 *dest, u16 angle, u8 palette, u8 index, u16 from, u16 to);
 
 const u8 data_ov332_021c8d64[4] = { 10, 21, 0, 0 };
 
-static const Ov139ListTouch sScrollListTouch[] = {
+static const FrameListTouch sScrollListTouch[] = {
     { { TOUCH_RECT_END, 0, 0, 0 }, 0 },
 };
 
-static const Ov139ListCallbacks sScrollListCallbacks = {
+static const FrameListCallbacks sScrollListCallbacks = {
     KeySystemScrollList_PrintItem,
     KeySystemScrollList_Select,
     KeySystemScrollList_Scroll,
 };
 
-static const Ov139ListSetup sScrollListSetup = {
+static const FrameListSetup sScrollListSetup = {
     { 0, 0xff, 2, 4, 28, 5, 1, 1, 26, 2, 0, 20, 20, 10, 8, 5, 4, 0, 1, 0 }, 0, 1, 0, 0, 0, sScrollListTouch, NULL, NULL,
 };
 
@@ -1011,52 +1011,52 @@ void KeySystemAccelMove_GetPos(const KeySystemAccelMove *move, ClActorPos *pos) 
 
 KeySystemScrollList *KeySystemScrollList_Create(const KeySystemScrollListSetup *setup, HeapID heapId) {
     KeySystemScrollList *list = GFL_HeapAllocate(heapId, sizeof(KeySystemScrollList), TRUE, "key_system_util.c", 2128);
-    Ov139ListSetup listSetup;
+    FrameListSetup listSetup;
     ArcTool *arc;
     u32 i;
 
     list->str = GFL_StrBufCreate(128, heapId);
     list->setup = *setup;
     listSetup = sScrollListSetup;
-    listSetup.unk0[0] = setup->bg;
-    listSetup.unk0[10] = setup->palette;
-    listSetup.unk0[17] = setup->palette + 1;
+    listSetup.layout.bg = setup->bg;
+    listSetup.layout.windowPalette = setup->palette;
+    listSetup.layout.palette = setup->palette + 1;
     listSetup.count = setup->count;
     listSetup.cursorPos = setup->cursor;
-    listSetup.unk19 = 4;
+    listSetup.visibleRows = 4;
     listSetup.scroll = 0;
     listSetup.work = list;
     listSetup.callbacks = &sScrollListCallbacks;
-    list->list = func_ov139_0219af1c(&listSetup, heapId);
-    func_ov139_0219ccc8(list->list, 193);
+    list->list = FrameList_Create(&listSetup, heapId);
+    FrameList_SetKeyMask(list->list, 193);
     arc = GFL_ArcSysCreateFileHandle(ARCID_KEY_SYSTEM, heapId);
-    func_ov139_0219b21c(list->list, arc, 12, FALSE, 0, setup->unkA8, setup->palette);
-    func_ov139_0219b27c(list->list, arc, 1, 1, 2);
+    FrameList_LoadScreenPalette(list->list, arc, 12, FALSE, 0, setup->unkA8, setup->palette);
+    FrameList_LoadCursorPalette(list->list, arc, 1, 1, 2);
     GFL_ArcToolFree(arc);
     for (i = 0; i < setup->count; i++) {
-        func_ov139_0219b1b4(list->list, 0, i);
+        FrameList_AddItem(list->list, 0, i);
     }
     return list;
 }
 
 void KeySystemScrollList_Free(KeySystemScrollList *list) {
-    func_ov139_0219b138(list->list);
+    FrameList_Free(list->list);
     GFL_StrBufFree(list->str);
     GFL_BGSysMoveBG(list->setup.bg, 3, 0);
     GFL_HeapFree(list);
 }
 
 u32 KeySystemScrollList_Update(KeySystemScrollList *list) {
-    u32 result = func_ov139_0219b2e0(list->list);
+    u32 result = FrameList_Main(list->list);
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         result = list->setup.values[list->setup.count - 1];
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
     } else if (result >= (u32)-16) {
-        result = OV139_LIST_NONE;
+        result = FRAMELIST_NONE;
     } else {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        result = list->setup.values[func_ov139_0219cc28(list->list)];
+        result = list->setup.values[FrameList_GetSelected(list->list)];
     }
     return result;
 }
@@ -1065,10 +1065,10 @@ BOOL KeySystemScrollList_Start(KeySystemScrollList *list) {
     if (list->started) {
         return TRUE;
     }
-    if (!func_ov139_0219b294(list->list)) {
-        func_ov139_0219cc58(list->list, list->setup.cursor);
-        if (func_ov139_0219cc44(list->list)) {
-            func_ov139_0219ccd0(list->list, list->setup.unkAC);
+    if (!FrameList_Draw(list->list)) {
+        FrameList_SetCursor(list->list, list->setup.cursor);
+        if (FrameList_CanScrollDown(list->list)) {
+            FrameList_ScrollBlocking(list->list, list->setup.unkAC);
         }
         list->started = TRUE;
         return TRUE;
@@ -1078,16 +1078,16 @@ BOOL KeySystemScrollList_Start(KeySystemScrollList *list) {
 
 void KeySystemScrollList_GetPos(KeySystemScrollList *list, u32 *cursor, u32 *top) {
     if (cursor != NULL) {
-        *cursor = func_ov139_0219cc34(list->list);
+        *cursor = FrameList_GetCursor(list->list);
     }
     if (top != NULL) {
-        *top = func_ov139_0219cc3c(list->list);
+        *top = FrameList_GetScroll(list->list);
     }
 }
 
-static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *printWindow, s16 y) {
+static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *printWindow, s16 y, BOOL firstBG) {
     KeySystemScrollList *list = work;
-    PrintQueue *queue = func_ov139_0219cc18(list->list);
+    PrintQueue *queue = FrameList_GetPrintQueue(list->list);
     ClActorPos pos;
 
     GFL_MsgDataLoadStrbuf(list->setup.msgData, list->setup.msgIds[index], list->str);
@@ -1099,14 +1099,14 @@ static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *pr
         func_0204c124(list->setup.icons[index], TRUE);
     }
     if (list->setup.arrowUp != NULL) {
-        if (func_ov139_0219cc3c(list->list) != 0) {
+        if (FrameList_GetScroll(list->list) != 0) {
             func_0204c124(list->setup.arrowUp, TRUE);
         } else {
             func_0204c124(list->setup.arrowUp, FALSE);
         }
     }
     if (list->setup.arrowDown != NULL) {
-        if (func_ov139_0219cc44(list->list)) {
+        if (FrameList_CanScrollDown(list->list)) {
             func_0204c124(list->setup.arrowDown, TRUE);
         } else {
             func_0204c124(list->setup.arrowDown, FALSE);
@@ -1114,7 +1114,7 @@ static void KeySystemScrollList_PrintItem(void *work, u32 index, PrintWindow *pr
     }
 }
 
-static void KeySystemScrollList_Select(void *work, u32 index) {
+static void KeySystemScrollList_Select(void *work, u32 index, BOOL moved) {
 }
 
 static void KeySystemScrollList_Scroll(void *work, s16 delta) {
@@ -1134,11 +1134,11 @@ static void KeySystemScrollList_Scroll(void *work, s16 delta) {
             }
         }
     }
-    top = func_ov139_0219cc3c(list->list);
+    top = FrameList_GetScroll(list->list);
     y = top * 5;
     if (delta < 0) {
         GFL_BGSysFillScrArea(list->setup.bg, 0, 0, y, 32, 4, BGSYS_FILL_KEEP_PALETTE);
-    } else if (delta > 0 && top != 0 && func_ov139_0219cd0c(list->list) == 1) {
+    } else if (delta > 0 && top != 0 && FrameList_GetScrollFrames(list->list) == 1) {
         GFL_BGSysFillScrArea(list->setup.bg, 0, 0, y, 32, 4, BGSYS_FILL_KEEP_PALETTE);
     }
 }

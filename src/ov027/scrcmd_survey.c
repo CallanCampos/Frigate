@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/script_text_banks.h"
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_script.h"
@@ -391,7 +393,7 @@ void func_ov027_02170884(SurveyTextWork *work, GameSystem *gsys) {
 }
 
 void getSurveyText(SurveyTextWork *work) {
-    work->message = GFL_MsgSysLoadData(FALSE, 3, 0x33, work->heapId);
+    work->message = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_CASTELIA_CITY_13, work->heapId);
 }
 
 void func_ov027_021708d0(SurveyTextWork *work) {

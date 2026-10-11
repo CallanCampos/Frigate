@@ -1,0 +1,136 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Ferroseed",
+    "pokedex": {
+        "category": "Thorn Seed Pokémon",
+        "entry": "It absorbs the iron it finds in the\nrock while clinging to the ceiling.\nIt shoots spikes when in danger.",
+        "height": "2'00\"",
+        "weight": "41.4 lbs.",
+        "languages": {
+            "ja": {
+                "category": "とげのみポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 44,
+        "attack": 50,
+        "defense": 91,
+        "speed": 10,
+        "special_attack": 24,
+        "special_defense": 86
+    },
+    "types": [ "TYPE_GRASS", "TYPE_STEEL" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_STICKY_BARB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_IRON_BARBS", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 61,
+    "height": 6,
+    "weight": 188,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_HARDEN" ],
+            [ 6, "MOVE_ROLLOUT" ],
+            [ 9, "MOVE_CURSE" ],
+            [ 14, "MOVE_METAL_CLAW" ],
+            [ 18, "MOVE_PIN_MISSILE" ],
+            [ 21, "MOVE_GYRO_BALL" ],
+            [ 26, "MOVE_IRON_DEFENSE" ],
+            [ 30, "MOVE_MIRROR_SHOT" ],
+            [ 35, "MOVE_INGRAIN" ],
+            [ 38, "MOVE_SELFDESTRUCT" ],
+            [ 43, "MOVE_IRON_HEAD" ],
+            [ 47, "MOVE_PAYBACK" ],
+            [ 52, "MOVE_FLASH_CANNON" ],
+            [ 55, "MOVE_EXPLOSION" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM48",
+            "TM53",
+            "TM64",
+            "TM66",
+            "TM69",
+            "TM70",
+            "TM73",
+            "TM74",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_SEED_BOMB",
+            "MOVE_GRAVITY",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_ENDEAVOR",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_BULLET_SEED",
+            "MOVE_LEECH_SEED",
+            "MOVE_SPIKES",
+            "MOVE_WORRY_SEED",
+            "MOVE_SEED_BOMB",
+            "MOVE_GRAVITY",
+            "MOVE_ROCK_CLIMB",
+            "MOVE_STEALTH_ROCK"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 40,
+            "species": "SPECIES_FERROTHORN"
+        }
+    ],
+    "regional_dex_number": 175,
+    "baby_species": "SPECIES_FERROSEED"
+}

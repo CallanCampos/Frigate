@@ -377,7 +377,7 @@ static u32 func_ov012_02169668(TrainerCardSysWork *wk) {
     wk->medal.year = wk->param->data->medalYear;
     wk->medal.month = wk->param->data->medalMonth;
     wk->medal.day = wk->param->data->medalDay;
-    QueueGameProc(wk->procMgr, OVERLAY_ID(187), &data_ov187_021ea060, &wk->medal);
+    QueueGameProc(wk->procMgr, OVERLAY_ID(187), &MedalInfo_ProcFunctions, &wk->medal);
     return TRCARD_SEQ_MEDAL_WAIT;
 }
 

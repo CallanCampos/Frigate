@@ -1,69 +1,69 @@
-Fine Actor
-Mystery Man
-Surprised Citizen: Whoooooooooa!
-River: I never imagined this...
-Frightened Citizen: Eeeeeeek!\nA gigantic female monster!
-Panicked Citizen: Hey! Hurry up!\nOtherwise, she'll stomp on you!
-River: Oh...my...
-{0100:1}: Hey!\nWhat's going on?!
-River: I'm the one to ask YOU that question!{be01}\nDid you put a human being\nin this Poké Ball?!{be01}\nThis Poké Ball is cursed!{be01}\nIt's an extremely dangerous Poké Ball!\nThis spells disaster{be00}\nfor humans and Pokémon!
-{0100:1}: That Poké Ball opened\non its own!{be00}\nI didn't do anything!{be01}\nNow hurry and put Monica\nback in the Poké Ball!
-River: I'm trying!\nBut I can't control the Poké Ball!
-{0100:1}: What?!
-River: She's panicking!\nWe have to stop her first.{be00}\nOtherwise, it's too dangerous.{be01}\nYou're her boyfriend, right?\nCan you stop her somehow?
-{0100:1}: But... How?
-River: It doesn't matter how!\nDo what you need to do!{be00}\nTalk to her and make her feel safe!
-{0100:1}: That's impossible!
-River: Well, do something!\nShe matters to you, doesn't she?
-Monica: Yeeeeek!{be01}\nWhat's happening?!
-{0100:1}: (...Monica...)\n(...Somehow, I have to calm her down...)
-Monica: Where am I?\nWhy is this happening?
-{0100:1}: Calm down!
-Monica: Yeeeeek!\nSomebody, help me!
-{0100:1}: She's huge...
-Monica: Hey! Who said that?\nDon't be rude!
-Monica: Why are all the buildings small?\nWhy are all the people so tiny?
-{0100:1}: (...I'm in trouble...)\n(...First, I have to get her attention...)
-Monica: What? Why?\nWhat happened to me?
-{0100:1}: It's me, {0100:1}!
-Monica: Is that {0100:1}'s voice?\nWhere are you? {0100:1}!
-{0100:1}: Nice weather up there?
-Monica: Grrr!\nWhere are you hiding, {0100:1}?{be01}\nDon't you dare make fun of me!
-{0100:1}: Monica!
-Monica: {0100:1}...
-{0100:1}: (...Monica...)\n(...Finally, she noticed me...)
-Monica: {0100:1}...\nTee...hee hee...{be00}\nWhen I saw your face, {0100:1}...{be00}\nWhat a relief...{be00}\nI'm so...tired...
-{0100:1}: Monica...
-River: Well, well...\nShe went back to the Poké Ball.{be00}\nShe's calmed down for now.
-{0100:1}: Wait!\nIs Monica OK?!
-River: Probably...\nI never dreamed this could happen...
-{0100:1}: Mr. River!\nWhat should I do?
-River: Well...\nIt's definitely too dangerous to stay here.{be01}\nFor now, let's go somewhere deserted.
-{0100:1}: Wait a minute, Mr. River!
-When Monica appeared out of\nthe cursed Poké Ball...{be01}\nFor some reason, she'd grown to\nthe size of a building!{be01}\nShe was panicking and running amok,\nbut I managed to stop her.{be01}\nBut with her giant-sized body...{be01}\nWhat am I gonna do?!
-Monica: Sob...
-{0100:1}: Hey...\nAre you feeling better? ...Calmer?
-Monica: I've had enough!
-{0100:1}: Monica?
-Monica: This is it!{be01}\nEverybody!\nEnough is enough!
-River: Ack!\nIs she going to get up again?{be01}\nUh-oh! Look out!\nRun! Quick!
-{0100:1}: (...Monica...)\n(...How did we get in this awful fix?...)
-Monica roared like thunder and\ndestroyed the entire area.{be01}\nHer rage never ended. She rampaged across\nthe world, from one end to the other.{be01}\nEvery region of the world was alerted\nto this critical situation.{be01}\nThey did their best to stop her,\nbut, one after another, they failed...{be01}\nCivilization...smashed to rubble...by\nthe ferocious anger of a giant woman.
-{0100:1}: Pant... Pant...\nMonica, stop! I beg you.
-Monica: Ah... {0100:1}.\nWhat have I done?{be01}\nSo...sorry...\nSob...
-{0100:1}: Monica...
-Monica: {0100:1}!
-{0100:1}: Oh, Monica...{be01}\nSob...\nI'm helpless.{be01}\n...{be01}\nIf only I could help you somehow...
-River: Hey! Are you all right?\nSteady on... Hang in there!
-{0100:1}: ...
-I couldn't stand against Monica's power.{be01}\nI fell to the ground. Seeing me,\nMonica burst into hysterical tears.{be01}\nHer tears poured over me\nalmost like rain...{be01}\nIt was a gentle, comfortable feeling,\nand slowly my eyes began to close...
-Monica: Yeeek! Hot! Hot!\nIs someone playing a trick on me?{be01}\nThese are brand-new stockings,\nso quit it! They'll burn!
-{0100:1}: Uh...\nThat was my Pokémon's{be00}\nmost powerful attack...
-River: This is unbelievable!\nIt seemed like she'd taken some damage,{be00}\nbut she's not even hurt...{be01}\nShe was attacked by a move so strong\nthat some people call it legendary,{be00}\nbut all it did was singe her stockings!{be01}\nShe is incredibly dangerous...
-Monica: Yeek! That tickles!\nIs someone playing a trick on me?{be01}\nStop messing around!\nThese are brand-new stockings, and{be00}\nI don't want to get a run in them already!
-{0100:1}: Uh...\nThat was my Pokémon's{be00}\nmost powerful attack...
-River: This is unbelievable!\nIt seemed like she'd taken some damage,{be00}\nbut she's not even hurt...{be01}\nShe was attacked by a move so strong\nthat some people call it legendary,{be00}\nbut all it did was put a run in her stocking!{be01}\nShe is incredibly dangerous...
-Monica: Yeek! Cold! Cold!\nIs someone playing a trick on me?{be01}\nStop messing around,\n'cause these stockings are thin!{be00}\nI'll get frostbite!
-{0100:1}: Uh...\nThat was my Pokémon's{be00}\nmost powerful attack...
-River: This is unbelievable!\nIt seemed like she'd taken some damage,{be00}\nbut she's not even hurt...{be01}\nShe was attacked by a move so strong that\nsome people call it legendary, but all it did{be00}\nwas make her whine about thin stockings!{be01}\nShe is incredibly dangerous...
+Bank0234_Text_FineActor = Fine Actor
+Bank0234_Text_MysteryMan = Mystery Man
+Bank0234_Text_SurprisedCitizenWhoooooooooa = Surprised Citizen: Whoooooooooa!
+Bank0234_Text_RiverNeverImagined = River: I never imagined this...
+Bank0234_Text_FrightenedCitizenEeeeeeekGigantic = Frightened Citizen: Eeeeeeek!\nA gigantic female monster!
+Bank0234_Text_PanickedCitizenHeyHurry = Panicked Citizen: Hey! Hurry up!\nOtherwise, she'll stomp on you!
+Bank0234_Text_RiverOh = River: Oh...my...
+Bank0234_Text_HeyWhatsGoing = {0100:1}: Hey!\nWhat's going on?!
+Bank0234_Text_RiverImOneAsk = River: I'm the one to ask YOU that question!{be01}\nDid you put a human being\nin this Poké Ball?!{be01}\nThis Poké Ball is cursed!{be01}\nIt's an extremely dangerous Poké Ball!\nThis spells disaster{be00}\nfor humans and Pokémon!
+Bank0234_Text_PokeBallOpenedIts = {0100:1}: That Poké Ball opened\non its own!{be00}\nI didn't do anything!{be01}\nNow hurry and put Monica\nback in the Poké Ball!
+Bank0234_Text_RiverImTryingBut = River: I'm trying!\nBut I can't control the Poké Ball!
+Bank0234_Text_What = {0100:1}: What?!
+Bank0234_Text_RiverShesPanickingWe = River: She's panicking!\nWe have to stop her first.{be00}\nOtherwise, it's too dangerous.{be01}\nYou're her boyfriend, right?\nCan you stop her somehow?
+Bank0234_Text_ButHow = {0100:1}: But... How?
+Bank0234_Text_RiverDoesntMatterHow = River: It doesn't matter how!\nDo what you need to do!{be00}\nTalk to her and make her feel safe!
+Bank0234_Text_ThatsImpossible = {0100:1}: That's impossible!
+Bank0234_Text_RiverWellSomethingShe = River: Well, do something!\nShe matters to you, doesn't she?
+Bank0234_Text_MonicaYeeeeekWhatsHappening = Monica: Yeeeeek!{be01}\nWhat's happening?!
+Bank0234_Text_MonicaSomehowHaveCalm = {0100:1}: (...Monica...)\n(...Somehow, I have to calm her down...)
+Bank0234_Text_MonicaWhereAmWhy = Monica: Where am I?\nWhy is this happening?
+Bank0234_Text_CalmDown = {0100:1}: Calm down!
+Bank0234_Text_MonicaYeeeeekSomebodyHelp = Monica: Yeeeeek!\nSomebody, help me!
+Bank0234_Text_ShesHuge = {0100:1}: She's huge...
+Bank0234_Text_MonicaHeyWhoSaid = Monica: Hey! Who said that?\nDon't be rude!
+Bank0234_Text_MonicaWhyAllBuildings = Monica: Why are all the buildings small?\nWhy are all the people so tiny?
+Bank0234_Text_ImTroubleFirstHave = {0100:1}: (...I'm in trouble...)\n(...First, I have to get her attention...)
+Bank0234_Text_MonicaWhatWhyWhat = Monica: What? Why?\nWhat happened to me?
+Bank0234_Text_Its = {0100:1}: It's me, {0100:1}!
+Bank0234_Text_MonicaSVoiceWhere = Monica: Is that {0100:1}'s voice?\nWhere are you? {0100:1}!
+Bank0234_Text_NiceWeatherUpThere = {0100:1}: Nice weather up there?
+Bank0234_Text_MonicaGrrrWhereHiding = Monica: Grrr!\nWhere are you hiding, {0100:1}?{be01}\nDon't you dare make fun of me!
+Bank0234_Text_Monica = {0100:1}: Monica!
+Bank0234_Text_Monica_2 = Monica: {0100:1}...
+Bank0234_Text_MonicaFinallySheNoticed = {0100:1}: (...Monica...)\n(...Finally, she noticed me...)
+Bank0234_Text_MonicaTeeHeeHee = Monica: {0100:1}...\nTee...hee hee...{be00}\nWhen I saw your face, {0100:1}...{be00}\nWhat a relief...{be00}\nI'm so...tired...
+Bank0234_Text_Monica_3 = {0100:1}: Monica...
+Bank0234_Text_RiverWellWellShe = River: Well, well...\nShe went back to the Poké Ball.{be00}\nShe's calmed down for now.
+Bank0234_Text_WaitMonicaOk = {0100:1}: Wait!\nIs Monica OK?!
+Bank0234_Text_RiverProbablyNeverDreamed = River: Probably...\nI never dreamed this could happen...
+Bank0234_Text_MrRiverWhatShould = {0100:1}: Mr. River!\nWhat should I do?
+Bank0234_Text_RiverWellItsDefinitely = River: Well...\nIt's definitely too dangerous to stay here.{be01}\nFor now, let's go somewhere deserted.
+Bank0234_Text_WaitMinuteMrRiver = {0100:1}: Wait a minute, Mr. River!
+Bank0234_Text_WhenMonicaAppearedOut = When Monica appeared out of\nthe cursed Poké Ball...{be01}\nFor some reason, she'd grown to\nthe size of a building!{be01}\nShe was panicking and running amok,\nbut I managed to stop her.{be01}\nBut with her giant-sized body...{be01}\nWhat am I gonna do?!
+Bank0234_Text_MonicaSob = Monica: Sob...
+Bank0234_Text_HeyFeelingBetterCalmer = {0100:1}: Hey...\nAre you feeling better? ...Calmer?
+Bank0234_Text_MonicaIveHadEnough = Monica: I've had enough!
+Bank0234_Text_Monica_4 = {0100:1}: Monica?
+Bank0234_Text_MonicaEverybodyEnoughEnough = Monica: This is it!{be01}\nEverybody!\nEnough is enough!
+Bank0234_Text_RiverAckSheGoing = River: Ack!\nIs she going to get up again?{be01}\nUh-oh! Look out!\nRun! Quick!
+Bank0234_Text_MonicaHowDidWe = {0100:1}: (...Monica...)\n(...How did we get in this awful fix?...)
+Bank0234_Text_MonicaRoaredLikeThunder = Monica roared like thunder and\ndestroyed the entire area.{be01}\nHer rage never ended. She rampaged across\nthe world, from one end to the other.{be01}\nEvery region of the world was alerted\nto this critical situation.{be01}\nThey did their best to stop her,\nbut, one after another, they failed...{be01}\nCivilization...smashed to rubble...by\nthe ferocious anger of a giant woman.
+Bank0234_Text_PantPantMonicaStop = {0100:1}: Pant... Pant...\nMonica, stop! I beg you.
+Bank0234_Text_MonicaAhWhatHave = Monica: Ah... {0100:1}.\nWhat have I done?{be01}\nSo...sorry...\nSob...
+Bank0234_Text_Monica_5 = {0100:1}: Monica...
+Bank0234_Text_Monica_6 = Monica: {0100:1}!
+Bank0234_Text_OhMonicaSobIm = {0100:1}: Oh, Monica...{be01}\nSob...\nI'm helpless.{be01}\n...{be01}\nIf only I could help you somehow...
+Bank0234_Text_RiverHeyAllRight = River: Hey! Are you all right?\nSteady on... Hang in there!
+Bank0234_Text_Empty = {0100:1}: ...
+Bank0234_Text_CouldntStandAgainstMonicas = I couldn't stand against Monica's power.{be01}\nI fell to the ground. Seeing me,\nMonica burst into hysterical tears.{be01}\nHer tears poured over me\nalmost like rain...{be01}\nIt was a gentle, comfortable feeling,\nand slowly my eyes began to close...
+Bank0234_Text_MonicaYeeekHotHot = Monica: Yeeek! Hot! Hot!\nIs someone playing a trick on me?{be01}\nThese are brand-new stockings,\nso quit it! They'll burn!
+Bank0234_Text_UhPokemonsMostPowerful = {0100:1}: Uh...\nThat was my Pokémon's{be00}\nmost powerful attack...
+Bank0234_Text_RiverUnbelievableSeemedLike = River: This is unbelievable!\nIt seemed like she'd taken some damage,{be00}\nbut she's not even hurt...{be01}\nShe was attacked by a move so strong\nthat some people call it legendary,{be00}\nbut all it did was singe her stockings!{be01}\nShe is incredibly dangerous...
+Bank0234_Text_MonicaYeekTicklesSomeone = Monica: Yeek! That tickles!\nIs someone playing a trick on me?{be01}\nStop messing around!\nThese are brand-new stockings, and{be00}\nI don't want to get a run in them already!
+Bank0234_Text_UhPokemonsMostPowerful_2 = {0100:1}: Uh...\nThat was my Pokémon's{be00}\nmost powerful attack...
+Bank0234_Text_RiverUnbelievableSeemedLike_2 = River: This is unbelievable!\nIt seemed like she'd taken some damage,{be00}\nbut she's not even hurt...{be01}\nShe was attacked by a move so strong\nthat some people call it legendary,{be00}\nbut all it did was put a run in her stocking!{be01}\nShe is incredibly dangerous...
+Bank0234_Text_MonicaYeekColdCold = Monica: Yeek! Cold! Cold!\nIs someone playing a trick on me?{be01}\nStop messing around,\n'cause these stockings are thin!{be00}\nI'll get frostbite!
+Bank0234_Text_UhPokemonsMostPowerful_3 = {0100:1}: Uh...\nThat was my Pokémon's{be00}\nmost powerful attack...
+Bank0234_Text_RiverUnbelievableSeemedLike_3 = River: This is unbelievable!\nIt seemed like she'd taken some damage,{be00}\nbut she's not even hurt...{be01}\nShe was attacked by a move so strong that\nsome people call it legendary, but all it did{be00}\nwas make her whine about thin stockings!{be01}\nShe is incredibly dangerous...
 \pad{de}

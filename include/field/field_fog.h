@@ -8,6 +8,7 @@
 
 // The field's fog, which takes effect when flushed
 void FieldFog_SetEnabled(FieldFog *fog, BOOL enabled);
+BOOL FieldFog_IsEnabled(FieldFog *fog);
 void FieldFog_SetAlphaMode(FieldFog *fog, u32 alphaMode);
 void FieldFog_SetAlpha(FieldFog *fog, u32 alpha);
 void FieldFog_SetDepthShift(FieldFog *fog, u32 depthShift);

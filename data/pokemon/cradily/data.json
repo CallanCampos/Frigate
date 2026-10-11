@@ -1,0 +1,175 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Cradily",
+    "pokedex": {
+        "category": "Barnacle Pokémon",
+        "entry": "It lives in the shallows of warm\nseas. When the tide goes out, it\ndigs up prey from beaches.",
+        "height": "4'11\"",
+        "weight": "133.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Cradily",
+                "category": "Barnacle Pokémon",
+                "entry": "It lives in the shallows of warm\nseas. When the tide goes out, it\ndigs up prey from beaches.",
+                "height": "4'11\"",
+                "weight": "133.2 lbs."
+            },
+            "fr": {
+                "name": "Vacilys",
+                "category": "Pokémon Bernacle",
+                "entry": "Vit dans les hauts-fonds des mers\nchaudes. Il déterre sa proie du\nsable quand la marée se retire.",
+                "height": "1,5 m",
+                "weight": "60,4 kg"
+            },
+            "de": {
+                "name": "Wielie",
+                "category": "Rankfüßer",
+                "entry": "Es lebt in seichten Stellen warmer Meere.\nBei Ebbe sucht es im Sand nach Beute.",
+                "height": "1,5 m",
+                "weight": "60,4 kg"
+            },
+            "it": {
+                "name": "Cradily",
+                "category": "Pokémon Lepade",
+                "entry": "Vive in acque poco profonde nei mari\ncaldi. Con la bassa marea, scava sulla\nriva in cerca di prede.",
+                "height": "1,5 m",
+                "weight": "60,4 kg"
+            },
+            "ko": {
+                "name": "릴리요",
+                "category": "바위단지포켓몬",
+                "entry": "따뜻한 바다의 얕은 곳에 있다.\n바닷물이 빠지면 모래 해변에\n숨어 있는 먹이를 파내어 먹는다.",
+                "height": "1.5 m",
+                "weight": "60.4 kg"
+            },
+            "es": {
+                "name": "Cradily",
+                "category": "Pokémon Percebe",
+                "entry": "Vive en el fondo de los mares de aguas\ntempladas. Emerge para cazar cuando\nbaja la marea.",
+                "height": "1,5 m",
+                "weight": "60,4 kg"
+            },
+            "ja": {
+                "name": "ユレイドル",
+                "category": "いわつぼポケモン",
+                "entry": "あたたかい\\x{3000}うみの\\x{3000}あさせに\\x{3000}いる。\nしおが\\x{3000}ひくと\\x{3000}すなはまに\\x{3000}もぐった\nえものを\\x{3000}ほりだして\\x{3000}たべる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 86,
+        "attack": 81,
+        "defense": 97,
+        "speed": 43,
+        "special_attack": 81,
+        "special_defense": 107
+    },
+    "types": [ "TYPE_ROCK", "TYPE_GRASS" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_BIG_ROOT",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_WATER_3", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_SUCTION_CUPS", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_STORM_DRAIN",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 15,
+    "weight": 604,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ASTONISH" ],
+            [ 1, "MOVE_CONSTRICT" ],
+            [ 1, "MOVE_ACID" ],
+            [ 1, "MOVE_INGRAIN" ],
+            [ 8, "MOVE_ACID" ],
+            [ 15, "MOVE_INGRAIN" ],
+            [ 22, "MOVE_CONFUSE_RAY" ],
+            [ 29, "MOVE_AMNESIA" ],
+            [ 36, "MOVE_ANCIENT_POWER" ],
+            [ 46, "MOVE_GASTRO_ACID" ],
+            [ 56, "MOVE_ENERGY_BALL" ],
+            [ 66, "MOVE_STOCKPILE" ],
+            [ 66, "MOVE_SPIT_UP" ],
+            [ 66, "MOVE_SWALLOW" ],
+            [ 76, "MOVE_WRING_OUT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM34",
+            "TM36",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM68",
+            "TM69",
+            "TM70",
+            "TM71",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_GASTRO_ACID",
+            "MOVE_WORRY_SEED",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_LILEEP"
+}

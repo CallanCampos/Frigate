@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_FERROTHORN",
+    "moves": [ "MOVE_REST", "MOVE_PAYBACK", "MOVE_GYRO_BALL", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

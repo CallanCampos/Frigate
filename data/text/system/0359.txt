@@ -1,11 +1,11 @@
-{0100:0}'s Data
-{0201:1}/{0201:2}/20{0201:0}
-{0201:0}:{0201:1}
-{0105:0}
-Gym Badges: {0201:0}
-Pokédex: {0202:0}
-Time: {0202:0}:{0201:1}
-{bd02}Last saved on {0201:1}/{0201:2}/20{0201:0} at {0201:3}:{0201:4}
-YES
-NO
+Bank0359_Text_SData = {0100:0}'s Data
+Bank0359_Text_20 = {0201:1}/{0201:2}/20{0201:0}
+Bank0359_Text_Empty = {0201:0}:{0201:1}
+Bank0359_Text_Empty_2 = {0105:0}
+Bank0359_Text_GymBadges = Gym Badges: {0201:0}
+Bank0359_Text_Pokedex = Pokédex: {0202:0}
+Bank0359_Text_Time = Time: {0202:0}:{0201:1}
+Bank0359_Text_LastSaved20 = {bd02}Last saved on {0201:1}/{0201:2}/20{0201:0} at {0201:3}:{0201:4}
+Bank0359_Text_Yes = YES
+Bank0359_Text_No = NO
 \pad{70}

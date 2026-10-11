@@ -1106,6 +1106,19 @@ src/system/adventure_savedata.c:
     complete
     .text       start:0x020092c8 end:0x020093d0
 
+src/system/trainer_card_savedata.c:
+    complete
+    .text       start:0x020093d0 end:0x02009414
+
+src/system/record.c:
+    complete
+    .text       start:0x02009414 end:0x0200965c
+    .rodata     start:0x0208f7b8 end:0x0208f7e4
+    .data       start:0x0209a0fc end:0x0209a1a4
+
+src/system/mail.c:
+    .text       start:0x0200965c end:0x02009854
+
 src/system/dream_world_savedata.c:
     complete
     .text       start:0x02009930 end:0x02009b5c

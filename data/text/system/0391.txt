@@ -1,1 +1,1 @@
-{0100:0}!\nWhere are you?{be00}\nUndella Town?{be01}\nGot it!{be01}\nFrom there, go through the Marine Tube,\nand come straight to Humilau City!{be01}
+Bank0391_Text_WhereUndellaTownGot = {0100:0}!\nWhere are you?{be00}\nUndella Town?{be01}\nGot it!{be01}\nFrom there, go through the Marine Tube,\nand come straight to Humilau City!{be01}

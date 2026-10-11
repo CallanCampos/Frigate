@@ -1,0 +1,1 @@
+Route12Gate_Text_Empty =         \x{ffff}

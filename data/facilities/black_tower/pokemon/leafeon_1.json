@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_LEAFEON",
+    "moves": [ "MOVE_LEAF_BLADE", "MOVE_GIGA_DRAIN", "MOVE_SUBSTITUTE", "MOVE_YAWN" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_NAIVE",
+    "item": "ITEM_LIECHI_BERRY",
+    "form": 0
+}
