@@ -642,6 +642,9 @@ the original code is linked until they match. The differences are the same in bo
 | `lib/dsprot/src/dsprot_run_multi.c` | `DSProt_RunChecks4` | `0x0218078c` / `0x021807cc` | As `DSProt_RunChecks1`. |
 | `lib/dsprot/src/dsprot_detect_multi.c` | `DSProt_CheckFlashcartA` | `0x021811ac` / `0x021811ec` | 0x780 against the original's 0x764, as `DSProt_CheckFlashcart`: the card registers' base is built from `1 << 26` in each inlined card read. |
 | `lib/dsprot/src/dsprot_detect_multi.c` | `DSProt_CheckFlashcartB` | `0x02181958` / `0x02181998` | As `DSProt_CheckFlashcartA`. |
+| `src/ov176/irc_compat_menu.c` | `IrcCompatMenuButtons_Update` | `0x0219bde4` / `0x0219be24` | 8 bytes short (0xcc against 0xd4): the original keeps `bg` in `r4` and spills the `u8` flash phase `(frame / 4) % 2` and the flash palette to the stack; ours keeps the phase in `r6` and spills `bg`. Tried `int` and `u8` for the phase, `>> 2`, an `if`/`else` for the palette, declaration orders, and x, y, width and height locals (that part matches in `Reset`). |
+| `src/ov176/irc_compat_menu.c` | `IrcCompatMenuHeart_Update` | `0x0219c034` / `0x0219c074` | 4 bytes long (0x86 against 0x82): the original loads `frame` straight into `r0` for `abs * frame / duration`; ours loads it into `r1` and moves it, and the start and sign registers alternate (`r6`/`r7`, `r7`/`r6`) in the original. Tried an inline helper with and without `frame` as a parameter, the operand order of `*`, locals for the distance and `u32` distances. |
+| `src/ov177/irc_sync_check.c` | `IrcSyncCheck_CompareTraces` | `0x0219c6c0` / `0x0219c700` | 52 bytes, same size, registers only: the original keeps `i` in `r1`, the total in `r3` and the difference in `r0`; ours uses `r0`, `r1` and `r2` and spills the parameters in another order. Tried four declaration orders of `i`, the total and the start locals, and the operand order of the two `abs` sums. |
 
 ## Matching, but not linkable as is
 

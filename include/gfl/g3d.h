@@ -179,6 +179,11 @@ NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(void *animation);
 G3DActor *GFL_G3DActorCreate(G3DModel *model, void **animations, int count);
 void GFL_G3DActorFree(G3DActor *actor);
 
+// NitroSystem's NNS_G3dScrPosToWorldLine: the near and far ends of the line in the world that a screen position is on
+void func_02067fa0(int x, int y, VecFx32 *nearPos, VecFx32 *farPos);
+// Sets the polygon ID of every material of a model
+void func_020683ec(NNSG3dResMdl *model, u32 polygonId);
+
 G3DLight *GFL_G3DLightCreate(const LightSetupList *setup, HeapID heapId);
 void GFL_G3DLightFree(G3DLight *lights);
 void GFL_G3DLightFlush(G3DLight *lights);
