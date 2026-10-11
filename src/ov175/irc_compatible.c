@@ -2,6 +2,8 @@
 #include "app/compatible_irc_sys.h"
 #include "app/irc_compat_menu.h"
 #include "app/irc_compatible.h"
+#include "app/irc_ranking.h"
+#include "app/irc_rhythm_check.h"
 #include "app/irc_sync_check.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
@@ -109,9 +111,9 @@ const GameProcFunctions IRC_COMPATIBLE_PROC_FUNCTIONS = {
 static const IrcCompatibleSubProcDef sIrcCompatibleSubProcs[SUB_PROC_COUNT] = {
     { OVERLAY_ID(176), &IRC_COMPAT_MENU_PROC_FUNCTIONS, IrcCompatible_CreateParam0, IrcCompatible_FreeParam0 },
     { OVERLAY_ID(177), &IRC_SYNC_CHECK_PROC_FUNCTIONS, IrcCompatible_CreateParam1, IrcCompatible_FreeParam1 },
-    { OVERLAY_ID(178), &data_ov178_0219c768, IrcCompatible_CreateParam2, IrcCompatible_FreeParam2 },
+    { OVERLAY_ID(178), &IRC_RHYTHM_CHECK_PROC_FUNCTIONS, IrcCompatible_CreateParam2, IrcCompatible_FreeParam2 },
     { OVERLAY_ID(179), &IRC_COMPAT_RESULT_PROC_FUNCTIONS, IrcCompatible_CreateParam3, IrcCompatible_FreeParam3 },
-    { OVERLAY_ID(180), &data_ov180_0219cc4c, IrcCompatible_CreateParam4, IrcCompatible_FreeParam4 },
+    { OVERLAY_ID(180), &IRC_RANKING_PROC_FUNCTIONS, IrcCompatible_CreateParam4, IrcCompatible_FreeParam4 },
 };
 
 static BOOL IrcCompatible_Init(GameProc *proc, u32 *state, void *param, void *work) {

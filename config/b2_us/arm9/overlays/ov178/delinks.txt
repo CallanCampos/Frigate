@@ -2,3 +2,8 @@
     .rodata     start:0x0219c6e4 end:0x0219c854 kind:rodata align:4
     .ctor       start:0x0219c854 end:0x0219c854 kind:rodata align:4
     .bss        start:0x0219c860 end:0x0219c860 kind:bss align:32
+
+src/ov178/irc_rhythm_check.c:
+    complete
+    .text       start:0x0219ad20 end:0x0219c6e4
+    .rodata     start:0x0219c6e4 end:0x0219c854

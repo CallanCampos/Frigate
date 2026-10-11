@@ -58,6 +58,8 @@
 #define ARCID_AREA_ANIME_PAT 69
 #define ARCID_TRSPRITE_FRONT 71
 #define ARCID_TRSPRITE_BACK 72
+// The graphics of the compatibility checker's ranking (irc_ranking.c). Our name, not swan's
+#define ARCID_IRC_RANKING 76
 // The summary screen's graphics
 #define ARCID_P_STATUS 77
 #define ARCID_RAIL_HEADERS 78

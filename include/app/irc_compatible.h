@@ -59,8 +59,6 @@ typedef struct {
 } IrcCompatibleParam4;
 
 // The screens' procs, in overlays 176 to 180. Their owners' headers declare them once the overlays are done
-extern const GameProcFunctions data_ov178_0219c768;
 extern const GameProcFunctions IRC_COMPAT_RESULT_PROC_FUNCTIONS;
-extern const GameProcFunctions data_ov180_0219cc4c;
 
 #endif // POKEBW2_APP_IRC_COMPATIBLE_H
