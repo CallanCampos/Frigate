@@ -74,8 +74,8 @@ int Sc_Shutdown(void) {
 }
 
 static void Sc_ReleaseUrls(void) {
-    func_ov189_021a1178(Auth_GetUrl());
-    func_ov189_021a1178(ScClient_GetUrl());
+    DWCi_RemoveGHTTPRootCA(Auth_GetUrl());
+    DWCi_RemoveGHTTPRootCA(ScClient_GetUrl());
 }
 
 int Sc_Update(void) {
@@ -267,7 +267,7 @@ static void Sc_OnLogin(int status, AuthResult *result, void *userData) {
         } else {
             func_020584cc(0x14, Sc_GetErrorCode(1, 7));
         }
-        func_ov189_021a13a0(status);
+        DWCi_HandleGHTTPError(status);
     } else if (result->error != 0) {
         Sc_Printf(803, "Failed on player login, Login result: %d\n", result->error);
         Sc_SetAuthError(result->error);

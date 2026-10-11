@@ -91,27 +91,27 @@ static BOOL NHttpRap_CreateRequest(u32 index, NHttpRap *rap) {
     int handle;
     int result;
 
-    handle = func_ov189_021a0e1c(rap->url, sRequests[index].method, rap->answer, rap->answerSize,
+    handle = NHTTPCreateConnection(rap->url, sRequests[index].method, rap->answer, rap->answerSize,
                                  NHttpRap_RequestCallback, rap);
     GFL_ASSERT(handle);
     if (handle == 0) {
         return FALSE;
     }
     rap->connection = handle;
-    result = func_ov189_021a09ec(handle, sRootCertificates, 1);
+    result = NHTTPSetRootCA(handle, sRootCertificates, 1);
     if (result < 0) {
         GFL_ASSERT_MSG(0, " NHTTP_SetRootCA(%d)\n", result);
         return FALSE;
     }
-    if (func_ov189_021a07bc(handle, "Accept", "*/*") != 0) {
+    if (NHTTPAddHeaderField(handle, "Accept", "*/*") != 0) {
         GFL_ASSERT(0);
         return FALSE;
     }
-    if (func_ov189_021a07bc(handle, "User-Agent", "Nintendo-DS") != 0) {
+    if (NHTTPAddHeaderField(handle, "User-Agent", "Nintendo-DS") != 0) {
         GFL_ASSERT(0);
         return FALSE;
     }
-    if (func_ov189_021a0954(handle, "pokemon", "2Phfv9MY") != 0) {
+    if (NHTTPSetBasicAuthorization(handle, "pokemon", "2Phfv9MY") != 0) {
         GFL_ASSERT(0);
         return FALSE;
     }
@@ -129,7 +129,7 @@ static void NHttpRap_BuildUrl(NHttpRap *rap, u32 index) {
 }
 
 BOOL NHttpRap_SendRequest(u32 index, NHttpRap *rap) {
-    if (func_ov189_021a076c(NHttpRap_Alloc, NHttpRap_Free, 12) != 0) {
+    if (NHTTPStartup(NHttpRap_Alloc, NHttpRap_Free, 12) != 0) {
         GFL_ASSERT(0);
         return FALSE;
     }
@@ -141,7 +141,7 @@ BOOL NHttpRap_SendRequest(u32 index, NHttpRap *rap) {
 }
 
 BOOL NHttpRap_SendRequestWithId(u32 index, u32 id, NHttpRap *rap) {
-    if (func_ov189_021a076c(NHttpRap_Alloc, NHttpRap_Free, 12) != 0) {
+    if (NHTTPStartup(NHttpRap_Alloc, NHttpRap_Free, 12) != 0) {
         GFL_ASSERT(0);
         return FALSE;
     }
@@ -169,7 +169,7 @@ int NHttpRap_StartRequest(NHttpRap *rap) {
     int error;
 
     if (rap != NULL) {
-        error = func_ov189_021a0fe4(rap->connection);
+        error = NHTTPStartConnection(rap->connection);
         if (error != 0) {
             func_020424ac(error, 2, error, 0x3f6);
             return error;
@@ -181,9 +181,9 @@ int NHttpRap_StartRequest(NHttpRap *rap) {
 
 void NHttpRap_EndRequest(NHttpRap *rap) {
     if (rap != NULL && rap->connection != 0) {
-        func_ov189_021a0edc(rap->connection);
+        NHTTPDestroyConnection(rap->connection);
         rap->connection = 0;
-        func_ov189_021a07a0();
+        NHTTPCleanup();
     }
 }
 
@@ -191,7 +191,7 @@ int NHttpRap_Poll(NHttpRap *rap) {
     int state;
     int received;
     int size;
-    int answerSize;
+    char *header;
     int error;
 
     if (rap == NULL) {
@@ -200,13 +200,13 @@ int NHttpRap_Poll(NHttpRap *rap) {
     if (rap->connection == 0) {
         return 0;
     }
-    state = func_ov189_021a10f4(rap->connection);
+    state = NHTTPGetConnectionError(rap->connection);
     if (state == 15) {
-        func_ov189_021a1114(rap->connection, &received, &size);
+        NHTTPGetProgress(rap->connection, &received, &size);
     } else {
-        error = func_ov189_021a10f4(rap->connection);
+        error = NHTTPGetConnectionError(rap->connection);
         if (error == 0) {
-            func_ov189_021a08cc(rap->connection, &answerSize);
+            NHTTPGetHeaderAll(rap->connection, &header);
         } else {
             func_020424ac(error, 2, error, 0x3f6);
         }
@@ -280,28 +280,28 @@ BOOL NHttpRap_SendValidate(NHttpRap *rap) {
     if (rap == NULL) {
         return FALSE;
     }
-    if (func_ov189_021a076c(NHttpRap_Alloc, NHttpRap_Free, 12) != 0) {
+    if (NHTTPStartup(NHttpRap_Alloc, NHttpRap_Free, 12) != 0) {
         GFL_ASSERT(0);
         return FALSE;
     }
     sys_memset(rap->url, 0, 4);
     func_0207f7a4(rap->url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].url);
     request =
-        func_ov189_021a0e1c(sRequests[NHTTP_RAP_REQUEST_VALIDATE].url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].method,
+        NHTTPCreateConnection(sRequests[NHTTP_RAP_REQUEST_VALIDATE].url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].method,
                             rap->answer, rap->answerSize, NHttpRap_RequestCallback, NULL);
     if (request == 0) {
-        int error = func_ov189_021a07b0();
+        int error = NHTTPGetError();
 
         GFL_ASSERT_MSG(request != 0, "Connection\x82\xaaNULL!, error=%d\n", error);
         return FALSE;
     }
     rap->connection = request;
-    result = func_ov189_021a09ec(request, sRootCertificates, 1);
+    result = NHTTPSetRootCA(request, sRootCertificates, 1);
     if (result < 0) {
         GFL_ASSERT_MSG(0, " NHTTP_SetRootCA(%d)\n", result);
         return FALSE;
     }
-    func_ov189_021a0854(request, rap->data, rap->size);
+    NHTTPSetPostDataRaw(request, rap->data, rap->size);
     return TRUE;
 }
 
@@ -318,7 +318,7 @@ void NHttpRap_FreePostData(NHttpRap *rap) {
 
 int NHttpRap_GetStatus(NHttpRap *rap) {
     if (rap != NULL) {
-        return func_ov189_021a0900(rap->connection);
+        return NHTTPGetResultCode(rap->connection);
     }
     return 0;
 }

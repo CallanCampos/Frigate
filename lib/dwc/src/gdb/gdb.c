@@ -156,7 +156,7 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
     Sake_SetGame(sGdb.sake, data_ov011_021917bc, gameId, data_ov011_021918bc);
     Sake_SetLoginTicket(sGdb.sake, ((const GdbUserData *)userData)->profileId, &ticket);
     Gdb_SetUrls(server);
-    func_ov189_021a118c(0);
+    DWC_InitGHTTP(0);
     sGdb.state = GDB_STATE_IDLE;
     sGdb.result = 0;
     sGdb.operation = 0;
@@ -202,13 +202,13 @@ int Gdb_Cancel(void) {
         Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
         break;
     case GDB_OPERATION_DOWNLOAD_FILE:
-        Gdb_Printf(385, "cancel ghttp. state[%d]\n", func_ov189_021a3014(sGdbRequests[sGdb.requestIndex].request));
-        func_ov189_021a2ff4(sGdbRequests[sGdb.requestIndex].request);
+        Gdb_Printf(385, "cancel ghttp. state[%d]\n", ghttpGetState(sGdbRequests[sGdb.requestIndex].request));
+        ghttpCancelRequest(sGdbRequests[sGdb.requestIndex].request);
         break;
     case GDB_OPERATION_UPLOAD_FILE:
         Gdb_Printf(392, "cancel ghttp. state[%d]\n",
-                   func_ov189_021a3014(sGdbRequests[sGdb.requestIndex].u.delete.table));
-        func_ov189_021a2ff4(sGdbRequests[sGdb.requestIndex].u.delete.table);
+                   ghttpGetState(sGdbRequests[sGdb.requestIndex].u.delete.table));
+        ghttpCancelRequest(sGdbRequests[sGdb.requestIndex].u.delete.table);
         break;
     default:
         Gdb_Printf(399, "illegal process[%d].\n", sGdb.operation);
@@ -228,7 +228,7 @@ int Gdb_Shutdown(void) {
     }
     Gdb_ReleaseUrls();
     sGdb.state = GDB_STATE_OFF;
-    func_ov189_021a11a4();
+    DWC_ShutdownGHTTP();
     Sake_Free(sGdb.sake);
     Gdb_RunLibrary();
     return 0;
@@ -238,18 +238,18 @@ static void Gdb_ReleaseUrls(void) {
     char uploadUrl[128];
     char downloadUrl[128];
 
-    func_ov189_021a1178(gSakeStorageUrl);
+    DWCi_RemoveGHTTPRootCA(gSakeStorageUrl);
     Sake_GetUploadUrl(sGdb.sake, uploadUrl);
-    func_ov189_021a1178(uploadUrl);
+    DWCi_RemoveGHTTPRootCA(uploadUrl);
     Sake_GetDownloadUrl(sGdb.sake, 1, downloadUrl);
-    func_ov189_021a1178(downloadUrl);
+    DWCi_RemoveGHTTPRootCA(downloadUrl);
 }
 
 void Gdb_Update(void) {
     if (func_ov011_0216c9f4() != 2) {
         func_ov011_0216c910(0);
     }
-    func_ov189_021a11cc();
+    DWC_ProcessGHTTP();
 }
 
 int Gdb_GetState(void) {
@@ -692,25 +692,25 @@ static void Gdb_SetUrls(int server) {
     case 1:
         func_0207a2c0(gSakeStorageUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(gSakeStorageUrl);
+        DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         func_0207a2c0(uploadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(uploadUrl);
+        DWCi_SetGHTTPRootCA(uploadUrl);
         func_0207a2c0(downloadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(downloadUrl);
+        DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     case 0:
     default:
         func_0207a2c0(gSakeStorageUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(gSakeStorageUrl);
+        DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         func_0207a2c0(uploadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(uploadUrl);
+        DWCi_SetGHTTPRootCA(uploadUrl);
         func_0207a2c0(downloadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(downloadUrl);
+        DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     }
     Sake_SetUploadUrl(sGdb.sake, uploadUrl);

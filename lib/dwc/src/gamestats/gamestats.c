@@ -280,7 +280,7 @@ void Gamestats_Start(int server, const char *key) {
     modulus = strtoul(strncpy(digits, key + 0x24, 8), NULL, 16);
     hashKey = strtoul(strncpy(digits, key + 0x2c, 8), NULL, 16);
     Configure(key + 0x34, secret, multiplier, increment, modulus, hashKey);
-    func_ov189_021a118c(0);
+    DWC_InitGHTTP(0);
     sClient.state = 3;
     sClient.active = TRUE;
 }
@@ -301,7 +301,7 @@ int Gamestats_Poll(void) {
     case 8:
         break;
     case 4:
-        sClient.request = func_ov189_021a1264(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
+        sClient.request = DWC_GetGHTTPData(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
         if (sClient.request >= 0) {
             sClient.state = 5;
         } else {
@@ -309,12 +309,12 @@ int Gamestats_Poll(void) {
         }
         break;
     case 5:
-        if (!func_ov189_021a11cc()) {
+        if (!DWC_ProcessGHTTP()) {
             SetFailed();
         }
         break;
     case 6:
-        sClient.request = func_ov189_021a1264(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
+        sClient.request = DWC_GetGHTTPData(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
         if (sClient.request >= 0) {
             sClient.state = 7;
         } else {
@@ -322,7 +322,7 @@ int Gamestats_Poll(void) {
         }
         break;
     case 7:
-        if (!func_ov189_021a11cc()) {
+        if (!DWC_ProcessGHTTP()) {
             SetFailed();
         }
         break;
@@ -335,7 +335,7 @@ int Gamestats_Poll(void) {
 
 void Gamestats_Abort(void) {
     if (sClient.request >= 0) {
-        func_ov189_021a1378(sClient.request);
+        DWC_CancelGHTTPRequest(sClient.request);
     }
     sClient.state = 0;
 }
@@ -351,7 +351,7 @@ void Gamestats_Close(void) {
             sClient.answerSize = 0;
             sClient.answer = NULL;
         }
-        func_ov189_021a11a4();
+        DWC_ShutdownGHTTP();
         sClient.state = 2;
         sClient.active = FALSE;
     }

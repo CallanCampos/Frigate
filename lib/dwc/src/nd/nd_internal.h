@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+#include "dwc/nhttp.h"
 #include "nitro/os.h"
 
 // What nd.c calls outside itself, none of it with a name in the ROM: the Wi-Fi library's allocator and error in the main
@@ -45,16 +46,8 @@ u32 strlen(const char *s);
 char *strncpy(char *dest, const char *src, u32 size);
 int strncmp(const char *a, const char *b, u32 size);
 
-// Overlay 189's front half: the numbers of the text, and the HTTP client's requests
-int func_ov189_0219db50(const char *text, int size);
-int func_ov189_0219dbb0(char *dest, u32 value);
-void func_ov189_021a0790(void (*callback)(void));
-int func_ov189_021a081c(int request, const char *name, const char *value);
-int func_ov189_021a08a0(int request, const char *name, char **value);
-int func_ov189_021a092c(int request, int value);
-int func_ov189_021a102c(int request);
-int func_ov189_021a1060(int request);
-int func_ov189_021a1080(int request, char **body, int *size);
-void *func_ov189_021a10c0(int request);
+// Overlay 189's front half: the numbers of a text (the HTTP client's own functions are in dwc/nhttp.h)
+int NHTTPi_strToInt(const char *text, int size);
+int NHTTPi_intToStr(char *dest, u32 value);
 
 #endif // POKEBW2_DWC_ND_INTERNAL_H

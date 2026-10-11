@@ -2507,7 +2507,7 @@ u32 WifiBattleMatchNet_PostRequestMain(WifiBattleMatchNet *p_wk) {
     switch (p_wk->state) {
     case 0:
         if (NHttpRap_SendRequest(6, p_nhttp)) {
-            func_ov189_021a0854(NHttpRap_GetConnection(p_wk->p_nhttp), &p_wk->postData, sizeof(p_wk->postData));
+            NHTTPSetPostDataRaw(NHttpRap_GetConnection(p_wk->p_nhttp), &p_wk->postData, sizeof(p_wk->postData));
             p_wk->state = 1;
         }
         break;

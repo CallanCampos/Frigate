@@ -100,20 +100,20 @@ void ScClient_SetServers(int server) {
         func_0207a2c0(sCompetitionUrl, 128,
                       "https://%s.secure2.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(sCompetitionUrl);
+        DWCi_SetGHTTPRootCA(sCompetitionUrl);
         func_0207a2c0(gAuthUrl, 128, "https://%s.secure2.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(gAuthUrl);
+        DWCi_SetGHTTPRootCA(gAuthUrl);
         break;
     case 0:
     default:
         func_0207a2c0(sCompetitionUrl, 128,
                       "https://%s.secure.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(sCompetitionUrl);
+        DWCi_SetGHTTPRootCA(sCompetitionUrl);
         func_0207a2c0(gAuthUrl, 128, "https://%s.secure.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
                       data_ov011_021917bc);
-        func_ov189_021a1160(gAuthUrl);
+        DWCi_SetGHTTPRootCA(gAuthUrl);
         break;
     }
 }
@@ -795,7 +795,7 @@ static void ScClient_OnReportIntention(int status, int unused, SoapReader *reade
 static void ScClient_PutReportForm(void *form, void *userData) {
     ScClient *client = userData;
 
-    func_ov189_021a3148(form, "report", client->report, client->reportSize, "report", "application/bin");
+    ghttpPostAddFileFromMemory(form, "report", client->report, client->reportSize, "report", "application/bin");
 }
 
 static int ScClient_PostReport(ScClient *client, int gameId, const char *csid, const char *ccid, ScReport *report,

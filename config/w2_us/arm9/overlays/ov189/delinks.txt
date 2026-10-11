@@ -46,3 +46,95 @@ lib/dwc/src/crypt/crypt.c:
     .rodata     start:0x021acee4 end:0x021acf68
     .data       start:0x021ae6c4 end:0x021ae6e0
     .bss        start:0x021b2fac end:0x021b2fc0
+
+lib/dwc/src/nhttp/nhttp_os.c:
+    .text       start:0x0219d590 end:0x0219d64c
+
+lib/dwc/src/nhttp/nhttp_socket.c:
+    .text       start:0x0219d64c end:0x0219d994
+    .bss        start:0x021ae6e4 end:0x021ae704
+
+lib/dwc/src/nhttp/nhttp_stdlib.c:
+    .text       start:0x0219d994 end:0x0219ddd4
+    .rodata     start:0x021acca4 end:0x021accc8
+    .data       start:0x021ad150 end:0x021ad194
+
+lib/dwc/src/nhttp/nhttp_bgnend.c:
+    .text       start:0x0219ddd4 end:0x0219df40
+
+lib/dwc/src/nhttp/nhttp_control.c:
+    .text       start:0x0219df40 end:0x0219e118
+    .rodata     start:0x021accc8 end:0x021acce0
+
+lib/dwc/src/nhttp/nhttp_list.c:
+    .text       start:0x0219e118 end:0x0219e238
+
+lib/dwc/src/nhttp/nhttp_recvbuf.c:
+    .text       start:0x0219e238 end:0x0219e578
+
+lib/dwc/src/nhttp/nhttp_request.c:
+    .text       start:0x0219e578 end:0x0219ea54
+    .data       start:0x021ad194 end:0x021ad1a8
+
+lib/dwc/src/nhttp/nhttp_response.c:
+    .text       start:0x0219ea54 end:0x0219ec64
+    .data       start:0x021ad1a8 end:0x021ad1b8
+
+lib/dwc/src/nhttp/d_nhttp.c:
+    .text       start:0x021a07ac end:0x021a0a78
+    .data       start:0x021ad2d0 end:0x021ad2d4
+
+lib/dwc/src/nhttp/d_nhttp_private.c:
+    .text       start:0x021a0e5c end:0x021a11a0
+
+lib/dwc/src/ghttp/dwc_ghttp.c:
+    .text       start:0x021a11a0 end:0x021a158c
+    .data       start:0x021ad2d4 end:0x021ad2e0
+    .bss        start:0x021b28a0 end:0x021b28a8
+
+lib/dwc/src/ghttp/ghttpBuffer.c:
+    .text       start:0x021a158c end:0x021a19c0
+    .data       start:0x021ad2e0 end:0x021ad32c
+
+lib/dwc/src/ghttp/ghttpCallbacks.c:
+    .text       start:0x021a19c0 end:0x021a1a84
+    .data       start:0x021ad32c end:0x021ad340
+
+lib/dwc/src/ghttp/ghttpCommon.c:
+    .text       start:0x021a1a84 end:0x021a1e4c
+    .data       start:0x021ad340 end:0x021ad3b4
+    .bss        start:0x021b28a8 end:0x021b28b0
+
+lib/dwc/src/ghttp/ghttpConnection.c:
+    .text       start:0x021a1e4c end:0x021a2418
+    .data       start:0x021ad3b4 end:0x021ad40c
+    .bss        start:0x021b28b0 end:0x021b28c0
+
+lib/dwc/src/ghttp/ghttpMain.c:
+    .text       start:0x021a2c90 end:0x021a30b4
+    .data       start:0x021adb08 end:0x021adb1c
+    .bss        start:0x021b28e4 end:0x021b28e8
+
+lib/dwc/src/ghttp/ghttpPost.c:
+    .text       start:0x021a30b4 end:0x021a4154
+    .rodata     start:0x021acdb4 end:0x021acdb8
+    .data       start:0x021adb1c end:0x021add70
+
+lib/dwc/src/ghttp/ghttpProcess.c:
+    .text       start:0x021a4154 end:0x021a54f4
+    .rodata     start:0x021acdb8 end:0x021acdc4
+    .data       start:0x021add70 end:0x021ae0dc
+
+lib/dwc/src/nhttp/nhttp_thread.c:
+    .text       start:0x0219ec64 end:0x021a07ac
+    .rodata     start:0x021acce0 end:0x021acdb4
+    .data       start:0x021ad1b8 end:0x021ad2d0
+
+lib/dwc/src/nhttp/d_nhttp_common.c:
+    .text       start:0x021a0a78 end:0x021a0e5c
+    .bss        start:0x021ae704 end:0x021b2880
+
+lib/dwc/src/ghttp/ghttpEncryption.c:
+    .text       start:0x021a2418 end:0x021a2c90
+    .data       start:0x021ad40c end:0x021adb08
+    .bss        start:0x021b28c0 end:0x021b28e4

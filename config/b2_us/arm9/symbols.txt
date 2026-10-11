@@ -7642,8 +7642,8 @@ __convert_to_newlines kind:function(arm,size=0x4) addr:0x02082bb8
 __prep_buffer kind:function(arm,size=0x28) addr:0x02082bbc
 __load_buffer kind:function(arm,size=0x8c) addr:0x02082be4
 __flush_buffer kind:function(arm,size=0x84) addr:0x02082c70
-setvbuf kind:function(arm,size=0x100) addr:0x02082cf4
-fread kind:function(arm,size=0x314) addr:0x02082df4
+fread kind:function(arm,size=0x100) addr:0x02082cf4
+__fread kind:function(arm,size=0x314) addr:0x02082df4
 fclose kind:function(arm,size=0x74) addr:0x02083108
 fflush kind:function(arm,size=0xe4) addr:0x0208317c
 __msl_strnicmp kind:function(arm,size=0x7c) addr:0x02083260
@@ -7689,7 +7689,7 @@ strcat kind:function(arm,size=0x30) addr:0x02085ed0
 strcmp kind:function(arm,size=0x114) addr:0x02085f00
 strncmp kind:function(arm,size=0x34) addr:0x02086014
 strchr kind:function(arm,size=0x38) addr:0x02086048
-strspn kind:function(arm,size=0xc0) addr:0x02086080
+strcspn kind:function(arm,size=0xc0) addr:0x02086080
 strstr kind:function(arm,size=0x6c) addr:0x02086140
 __strtold kind:function(arm,size=0xf18) addr:0x020861ac
 strtod kind:function(arm,size=0x88) addr:0x020870c4
@@ -8182,7 +8182,7 @@ VOLUME_DB_TABLE kind:data(any) addr:0x0209888c
 data_0209898c kind:data(any) addr:0x0209898c
 data_02098c60 kind:data(any) addr:0x02098c60
 ascii_char kind:data(any) addr:0x02098ce0
-nibbleArray kind:data(any) addr:0x02098d60
+__ctype_map kind:data(any) addr:0x02098d60
 data_02098e60 kind:data(any) addr:0x02098e60
 data_02098e68 kind:data(any) addr:0x02098e68
 data_02098e74 kind:data(any) addr:0x02098e74

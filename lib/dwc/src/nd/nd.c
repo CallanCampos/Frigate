@@ -656,7 +656,7 @@ static BOOL Setup(NHttpAllocFunc alloc, NHttpFreeFunc free, const char *url, con
             sNdContext.gameCodeParam[Base64Encode(sNdContext.gameCodeParam, gameCode, 4)] = '\0';
             sNdPasswordParam[Base64Encode(sNdPasswordParam, password, 16)] = '\0';
             if (InitRequestLock() && InitAttrLock()) {
-                if (func_ov189_021a076c(alloc, free, 17) != -1) {
+                if (NHTTPStartup(alloc, free, 17) != -1) {
                     sNdContext.hasApInfo = MakeApInfoParam(sNdApInfoParam);
                     sNdContext.running = TRUE;
                     return TRUE;
@@ -693,7 +693,7 @@ static void BeginCleanup(void (*onCleanedUp)(void)) {
     sNdContext.running = FALSE;
     sNdContext.onCleanedUp = onCleanedUp;
     ReleaseRequest(sNdContext.request);
-    func_ov189_021a0790(OnCleanedUp);
+    NHTTPCleanupAsync(OnCleanedUp);
 }
 
 // Destroys a request; the answer is FALSE when it could not
@@ -702,8 +702,8 @@ static BOOL ReleaseRequest(int request) {
 
     LockAttr();
     if (request != 0) {
-        func_ov189_021a1060(request);
-        if (func_ov189_021a0edc(request) != 0) {
+        NHTTPGetConnectionState(request);
+        if (NHTTPDestroyConnection(request) != 0) {
             result = FALSE;
         } else {
             request = 0;
@@ -767,7 +767,7 @@ static BOOL CancelRequest(void) {
         LockAttr();
         request = sNdContext.request;
         UnlockAttr();
-        if (func_ov189_021a102c(request) == 0) {
+        if (NHTTPCancelConnection(request) == 0) {
             canceled = TRUE;
         }
         return canceled;
@@ -861,7 +861,7 @@ static int OnHttpEvent(int request, int event, void *arg) {
     DWCNdCallback callback;
     int error;
 
-    task = func_ov189_021a10c0(request);
+    task = NHTTPGetUserParam(request);
     kind = task->kind;
     callback = task->callback;
     waiter = task->waiter;
@@ -869,9 +869,9 @@ static int OnHttpEvent(int request, int event, void *arg) {
 
     switch (event) {
     case NHTTP_EVENT_ANSWER:
-        if (func_ov189_021a10f4(request) == 8) {
+        if (NHTTPGetConnectionError(request) == 8) {
             error = DWC_ND_ERROR_CANCELED;
-        } else if (func_ov189_021a08a0(request, "HTTPSTATUSCODE", &statusText) != 3) {
+        } else if (NHTTPGetHeaderField(request, "HTTPSTATUSCODE", &statusText) != 3) {
             error = DWC_ND_ERROR_HTTP;
         } else {
             int result = DWC_ND_ERROR_HTTP;
@@ -885,7 +885,7 @@ static int OnHttpEvent(int request, int event, void *arg) {
                 int valueLength;
                 BOOL isCode = FALSE;
 
-                length = func_ov189_021a1080(request, &body, &bodySize);
+                length = NHTTPGetBodyBuffer(request, &body, &bodySize);
                 if (length < 0) {
                     error = result;
                 } else {
@@ -1027,7 +1027,7 @@ static BOOL CreateRequest(NdTask **taskOut, int *requestOut, const char *action,
     if (!ReleaseRequest(sNdContext.request)) {
         return FALSE;
     }
-    request = func_ov189_021a0e1c(sNdContext.url, 1, buffer, bufferSize, OnHttpEvent, task);
+    request = NHTTPCreateConnection(sNdContext.url, 1, buffer, bufferSize, OnHttpEvent, task);
     if (request == 0) {
         EndRequest();
         FreeTask(task);
@@ -1036,46 +1036,46 @@ static BOOL CreateRequest(NdTask **taskOut, int *requestOut, const char *action,
     }
     *taskOut = task;
     *requestOut = request;
-    if (func_ov189_021a09ec(request, sNdCertificates, 1) == -1) {
+    if (NHTTPSetRootCA(request, sNdCertificates, 1) == -1) {
         goto fail;
     }
-    if (func_ov189_021a092c(request, 0) == -1) {
+    if (NHTTPSetVerifyOption(request, 0) == -1) {
         goto fail;
     }
-    if (func_ov189_021a07bc(request, "User-Agent", sNdUserAgent) == -1) {
+    if (NHTTPAddHeaderField(request, "User-Agent", sNdUserAgent) == -1) {
         goto fail;
     }
-    if (func_ov189_021a081c(request, "gamecd", sNdContext.gameCodeParam) == -1) {
+    if (NHTTPAddPostDataAscii(request, "gamecd", sNdContext.gameCodeParam) == -1) {
         goto fail;
     }
-    if (func_ov189_021a081c(request, "rhgamecd", sNdContext.rhGameCodeParam) == -1) {
+    if (NHTTPAddPostDataAscii(request, "rhgamecd", sNdContext.rhGameCodeParam) == -1) {
         goto fail;
     }
-    if (func_ov189_021a081c(request, "passwd", sNdPasswordParam) == -1) {
+    if (NHTTPAddPostDataAscii(request, "passwd", sNdPasswordParam) == -1) {
         goto fail;
     }
-    if (func_ov189_021a081c(request, "token", sNdContext.token) == -1) {
+    if (NHTTPAddPostDataAscii(request, "token", sNdContext.token) == -1) {
         goto fail;
     }
-    if (func_ov189_021a081c(request, "userid", sNdUserIdParam) == -1) {
+    if (NHTTPAddPostDataAscii(request, "userid", sNdUserIdParam) == -1) {
         goto fail;
     }
-    if (func_ov189_021a081c(request, "macadr", sNdMacParam) == -1) {
+    if (NHTTPAddPostDataAscii(request, "macadr", sNdMacParam) == -1) {
         goto fail;
     }
-    if (func_ov189_021a081c(request, "action", action) == -1) {
+    if (NHTTPAddPostDataAscii(request, "action", action) == -1) {
         goto fail;
     }
-    if (sNdContext.attrs[0] != NULL && func_ov189_021a081c(request, "attr1", sNdContext.attrs[0]) == -1) {
+    if (sNdContext.attrs[0] != NULL && NHTTPAddPostDataAscii(request, "attr1", sNdContext.attrs[0]) == -1) {
         goto fail;
     }
-    if (sNdContext.attrs[1] != NULL && func_ov189_021a081c(request, "attr2", sNdContext.attrs[1]) == -1) {
+    if (sNdContext.attrs[1] != NULL && NHTTPAddPostDataAscii(request, "attr2", sNdContext.attrs[1]) == -1) {
         goto fail;
     }
-    if (sNdContext.attrs[2] != NULL && func_ov189_021a081c(request, "attr3", sNdContext.attrs[2]) == -1) {
+    if (sNdContext.attrs[2] != NULL && NHTTPAddPostDataAscii(request, "attr3", sNdContext.attrs[2]) == -1) {
         goto fail;
     }
-    if (sNdContext.hasApInfo && func_ov189_021a081c(request, "apinfo", sNdApInfoParam) == -1) {
+    if (sNdContext.hasApInfo && NHTTPAddPostDataAscii(request, "apinfo", sNdApInfoParam) == -1) {
         goto fail;
     }
     if (logData != NULL) {
@@ -1088,7 +1088,7 @@ static BOOL CreateRequest(NdTask **taskOut, int *requestOut, const char *action,
         }
         MemZero(sNdLogDataParam, 0x59);
         Base64Encode(sNdLogDataParam, logData, length);
-        if (func_ov189_021a081c(request, "optionallogdata", sNdLogDataParam) == -1) {
+        if (NHTTPAddPostDataAscii(request, "optionallogdata", sNdLogDataParam) == -1) {
             goto fail;
         }
     }
@@ -1124,7 +1124,7 @@ fail:
 // Sends the request, and keeps it as the one that is running
 static BOOL NdSendRequest(NdTask *task, int request) {
     LockAttr();
-    if (func_ov189_021a0fe4(request) != 0) {
+    if (NHTTPStartConnection(request) != 0) {
         SetWifiError(DWC_ND_ERROR_HTTP, 0);
         UnlockAttr();
         return FALSE;
@@ -1177,8 +1177,8 @@ static BOOL RequestFileList(DWCNdFileInfo *files, u32 offset, u32 count) {
         sNdContext.free(buffer);
         return FALSE;
     }
-    if (func_ov189_021a081c(request, "offset", offsetParam) != -1
-        && func_ov189_021a081c(request, "num", countParam) != -1) {
+    if (NHTTPAddPostDataAscii(request, "offset", offsetParam) != -1
+        && NHTTPAddPostDataAscii(request, "num", countParam) != -1) {
         task->kind = DWC_ND_CBREASON_GETFILELIST;
         task->target.files = files;
         task->offsetParam = offsetParam;
@@ -1234,7 +1234,7 @@ static BOOL RequestFile(DWCNdFileInfo *file, void *buffer, u32 size, const char 
     }
     if (paramSize > 0) {
         nameParam[Base64Encode(nameParam, file->fileName, nameLength)] = '\0';
-        if (func_ov189_021a081c(request, "contents", nameParam) == -1) {
+        if (NHTTPAddPostDataAscii(request, "contents", nameParam) == -1) {
             goto fail;
         }
     }
@@ -1258,7 +1258,7 @@ static BOOL GetRequestProgress(u32 *received, u32 *total) {
     if (!sNdContext.running) {
         return FALSE;
     }
-    if (func_ov189_021a1114(sNdContext.request, (int *)received, (int *)total) == 0) {
+    if (NHTTPGetProgress(sNdContext.request, (int *)received, (int *)total) == 0) {
         return TRUE;
     }
     return FALSE;
@@ -1268,7 +1268,7 @@ static BOOL GetRequestProgress(u32 *received, u32 *total) {
 static BOOL ParseNumberAnswer(int request, NdTask *task) {
     char *body;
     int size;
-    int length = func_ov189_021a1080(request, &body, &size);
+    int length = NHTTPGetBodyBuffer(request, &body, &size);
 
     if (length >= 0) {
         *task->target.number = ParseInt(body, length);
@@ -1284,7 +1284,7 @@ static BOOL ParseNumberAnswer(int request, NdTask *task) {
 static BOOL CheckFileAnswer(int request, NdTask *task) {
     char *body;
     int size;
-    int length = func_ov189_021a1080(request, &body, &size);
+    int length = NHTTPGetBodyBuffer(request, &body, &size);
 
     if (length == task->count) {
         return TRUE;
@@ -1308,10 +1308,10 @@ static BOOL ParseFileListAnswer(int request, NdTask *task) {
     DWCNdFileInfo *files;
 
     MemZero(task->target.files, sizeof(DWCNdFileInfo) * task->count);
-    if (func_ov189_021a08a0(request, "Content-Length", &header) > 0 && header[0] == '0' && header[1] == '\0') {
+    if (NHTTPGetHeaderField(request, "Content-Length", &header) > 0 && header[0] == '0' && header[1] == '\0') {
         return TRUE;
     }
-    length = func_ov189_021a1080(request, &body, &bodySize);
+    length = NHTTPGetBodyBuffer(request, &body, &bodySize);
     if (length <= 0) {
         goto done;
     }
@@ -1520,11 +1520,11 @@ static void MemCopy(void *dest, const void *src, int size) {
 }
 
 static int ParseInt(const char *text, int size) {
-    return func_ov189_0219db50(text, size);
+    return NHTTPi_strToInt(text, size);
 }
 
 static int FormatInt(char *dest, u32 value) {
-    return func_ov189_0219dbb0(dest, value);
+    return NHTTPi_intToStr(dest, value);
 }
 
 // Writes a number of up to 17 digits, with zeros in front to make minDigits of them

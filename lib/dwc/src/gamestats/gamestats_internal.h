@@ -31,15 +31,15 @@ void func_ov011_0216e878(const void *src, char *dest, int size, int alphabet);
 
 // The front half of overlay 189: the HTTP client of the game statistics
 // Starts and ends the client, and runs it once; the first starts one more user of it
-BOOL func_ov189_021a118c(int unused);
-BOOL func_ov189_021a11a4(void);
-BOOL func_ov189_021a11cc(void);
+BOOL DWC_InitGHTTP(int unused);
+BOOL DWC_ShutdownGHTTP(void);
+BOOL DWC_ProcessGHTTP(void);
 // The callback with the answer, its size and the status, and the one when the request has been sent
 typedef void (*GamestatsAnsweredFunc)(char *data, int size, int status, void *arg);
 typedef void (*GamestatsSentFunc)(void);
 // Starts a request for the URL and returns its number, or a negative number
-int func_ov189_021a1264(const char *url, int a1, int a2, GamestatsSentFunc sent, GamestatsAnsweredFunc answered, void *arg);
+int DWC_GetGHTTPData(const char *url, int a1, int a2, GamestatsSentFunc sent, GamestatsAnsweredFunc answered, void *arg);
 // Cancels a request
-void func_ov189_021a1378(int request);
+void DWC_CancelGHTTPRequest(int request);
 
 #endif // POKEBW2_DWC_GAMESTATS_INTERNAL_H

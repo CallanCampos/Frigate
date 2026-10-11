@@ -269,7 +269,7 @@ static void PdwAcc_StateCreate(PdwAccWork *wk) {
         if (NHttpRap_SendRequest(PDWACC_REQUEST_CREATE, wk->http)) {
             void *data = func_02007454(wk->save, &size);
 
-            func_ov189_021a0854(NHttpRap_GetConnection(wk->http), data, 0x80000);
+            NHTTPSetPostDataRaw(NHttpRap_GetConnection(wk->http), data, 0x80000);
             if (NHttpRap_StartRequest(wk->http) == 0) {
                 PdwAcc_ChangeState(wk, PdwAcc_StateWaitCreate, 502);
             }
