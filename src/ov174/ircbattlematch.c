@@ -701,11 +701,11 @@ static void IrcBattleMatch_StateSendMac(IrcBattleMatch *work) {
 }
 
 static void IrcBattleMatch_StateSendFriendData(IrcBattleMatch *work) {
-    u8 data[12];
+    DWCFriendData data;
 
     if (work->mode == IRCBATTLEMATCH_MODE_FRIEND) {
-        func_0200a3c4(GameData_GetWifiList(work->param->gameData), data);
-        if (func_02042be8(func_02040440(), IRCMATCH_CMD_FRIEND_DATA, sizeof(data), data)) {
+        func_0200a3c4(&GameData_GetWifiList(work->param->gameData)->myUserData, &data);
+        if (func_02042be8(func_02040440(), IRCMATCH_CMD_FRIEND_DATA, sizeof(data), &data)) {
             func_02040624(func_02040440(), IRCMATCH_TIMING_FRIEND_DATA, IRCMATCH_TIMING_GROUP);
             IrcBattleMatch_SetState(work, IrcBattleMatch_StateSendMac);
             if (work->menu != NULL) {

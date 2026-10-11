@@ -19,6 +19,7 @@
 #include "gfl/sound.h"
 #include "gfl/std.h"
 #include "gfl/touchpanel.h"
+#include "save/musical_savedata.h"
 #include "save/save_control.h"
 #include "system/bmp_oam.h"
 #include "system/game_data.h"

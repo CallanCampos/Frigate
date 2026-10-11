@@ -15,6 +15,7 @@
 #include "gfl/str.h"
 #include "nitro/rtc.h"
 #include "save/adventure.h"
+#include "save/c_gear_savedata.h"
 #include "save/event_work.h"
 #include "save/high_link.h"
 #include "save/join_avenue.h"

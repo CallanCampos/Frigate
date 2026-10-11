@@ -13,9 +13,11 @@
 #include "save/encounter.h"
 #include "save/event_work.h"
 #include "save/join_avenue.h"
+#include "save/musical_savedata.h"
 #include "save/records.h"
 #include "save/save_control.h"
 #include "save/trainer_card.h"
+#include "save/trainer_log.h"
 #include "system/game_data.h"
 #include "system/rtc.h"
 

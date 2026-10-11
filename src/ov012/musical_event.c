@@ -24,6 +24,7 @@
 #include "gfl/str.h"
 #include "nitro/rtc.h"
 #include "pml/poke_party.h"
+#include "save/musical_savedata.h"
 #include "save/player_info.h"
 #include "save/records.h"
 #include "save/save_control.h"

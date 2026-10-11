@@ -220,7 +220,7 @@ static void func_ov194_021bedfc(PokemonTradeWork *wk) {
         profile.receivedSpecies = PokeParty_GetParam(received, PKM_PARAM_SPECIES, NULL);
     }
     profile.hobby = getPlayerSurveys(survey);
-    profile.unk25 = func_02009ca0(survey);
+    profile.countryCount = func_02009ca0(survey);
     profile.unk26_0 = func_02009d28(survey);
     if (PokemonTrade_IsNetwork(wk)) {
         if (func_02042be8(func_02040440(), TRADE_NET_CMD_UNK12, sizeof(profile), &profile)) {

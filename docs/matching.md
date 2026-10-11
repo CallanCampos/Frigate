@@ -685,6 +685,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`BmpMenuList_CycleCursor`).
 - A bit-table lookup with an unsigned `lsr #5` for the index and a signed modulo for the bit is
   `table[item / (sizeof(u32) * 8)] & (1 << (item % 32))`; `item >> 5` gives `asr` (pml_item.c).
+- A `u8` parameter divided with `asr`/`ror` (signed `/ 4` and `% 4`) while its callers pass a `u8` with no
+  conversion is a `u8` parameter copied to an `s32` local first: `s32 r = region;` in unity_tower_savedata.c's
+  `func_02009ba4` and `func_02009be0`. Declaring the parameter `int` or `s8` matches the function but moves the
+  callers' argument loads (`Upload_WifiHistoryDataSet`) or masks a `u8` passed on (`func_02009b84`); a plain `u8`
+  used directly divides with `lsr`.
 - A result computed into the parameter's own callee-saved register comes from a compound assignment to the parameter
   (`item -= ITEM_TM93 - TM_INDEX_TM93;` in `PML_ItemGetTMWazaID`); `item = item - X` or a new local computes into r0.
 

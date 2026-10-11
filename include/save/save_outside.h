@@ -10,12 +10,11 @@
 // mystery gift cards, in two copies, and the key system's data. The game reads it when it creates the save, and
 // a new game takes the gifts and keys from it
 
-typedef struct SaveOutside SaveOutside;
-
-// The mystery gifts kept outside the save, laid out like the start of MysteryGiftSave and encrypted the same way
+// The mystery gifts kept outside the save, laid out like the start of MysteryGiftSaveData and encrypted the same
+// way
 typedef struct {
-    u8 receivedFlags[0x100];
-    MysteryGift cards[3];
+    u8 receivedFlags[MG_ID_MAX / 8];
+    MysteryGift cards[MG_CARD_MAX_OUTSIDE];
     u16 checksum;
     u16 key;
 } SaveOutsideGifts;
