@@ -660,6 +660,14 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `tr_ai.c` | `0x0217f600`–`0x02181c74` | 161 | complete | string at `0x02181ea0` |
 
+### Overlay 264
+
+16 of 45 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `cdemo_main.c` | `0x021998c0`–`0x02199b40` | 16 | complete | string at `0x0219a2c0` |
+
 ### Overlay 279
 
 4 of 4 functions are in source files.
