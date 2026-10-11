@@ -36,8 +36,8 @@ int func_ov189_021a09ec(int request, void *certificates, int count);
 // Creates a request for a URL with a method (0 to get, 1 to post) and the buffer that receives the answer, and
 // returns it, 0 when it failed
 int func_ov189_021a0e1c(const char *url, int method, void *buffer, u32 bufferSize, NHttpCallback callback, void *arg);
-// Destroys a request
-void func_ov189_021a0edc(int request);
+// Destroys a request; nonzero when it could not, negative for an unknown one
+int func_ov189_021a0edc(int request);
 // Sends a request, returning negative when it failed
 int func_ov189_021a0fe4(int request);
 // A request's state: 0 once its answer is complete, 15 while it is receiving, negative for an unknown request

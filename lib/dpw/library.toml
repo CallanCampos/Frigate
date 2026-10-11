@@ -1,0 +1,20 @@
+# The Global Trade Station's and the Battle Subway's Wi-Fi library (dpw), in overlay 189. It is ARM code, unlike the DWC
+# code beside it (Thumb), and was compiled with the same compiler and flags as NitroSDK (dsi/1.1p1, -O4,p)
+compiler = "dsi/1.1p1"
+flags = [
+    "-O4,p",               # Optimize for speed
+    "-proc arm946e",       # ARM9 processor
+    "-nothumb",            # ARM code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char signed",        # char is signed
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]

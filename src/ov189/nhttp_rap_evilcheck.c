@@ -27,8 +27,8 @@ int NHttpRapEvilCheck_Sign(const void *data, u32 size, u32 count, void *signatur
     int result;
 
     sHeapId = heapId;
-    func_ov189_021a9778(NHttpRapEvilCheck_Alloc, NHttpRapEvilCheck_Free, 0);
-    result = func_ov189_021a96cc(data, size * count, signature, sKey);
+    Crypt_SetAllocator(NHttpRapEvilCheck_Alloc, NHttpRapEvilCheck_Free, 0);
+    result = Crypt_VerifySignature(data, size * count, signature, sKey);
     sHeapId = HEAPID_NONE;
     return result;
 }

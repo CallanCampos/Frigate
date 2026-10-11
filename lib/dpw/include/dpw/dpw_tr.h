@@ -4,9 +4,9 @@
 #include "types.h"
 #include "struct_decls.h"
 
-// The Global Trade Station's server library in overlay 189. The ROM names none of it; the header and the type and
-// field names are guesses after the trade library (dpw_tr) of Nintendo's Wi-Fi SDK, which this one appears to be.
-// Its functions have no names yet
+// The Global Trade Station's server library in overlay 189. The ROM has no strings of this library's own (only the
+// server's pages, "/web/worldexchange/*.asp"), so the DpwTr_ names of its functions, the header's name and the type and
+// field names are guesses, the functions' after the pages they ask for
 
 // What a player looks for, or wants for the Pokémon they deposit
 typedef struct {
@@ -82,32 +82,32 @@ typedef struct {
 } Dpw_Common_ProfileResult;
 
 // Starts and ends the library, for the player's ID and friend key
-void func_ov189_021a6c84(s32 pid, u64 friendKey, int a2);
-void func_ov189_021a773c(void);
+void DpwTr_Init(s32 pid, u64 friendKey, int a2);
+void DpwTr_End(void);
 // Runs the library's requests, every frame
-void func_ov189_021a6d00(void);
+void DpwTr_Process(void);
 // Whether the last request has ended, and its result
-BOOL func_ov189_021a7750(void);
-s32 func_ov189_021a778c(void);
+BOOL DpwTr_IsFinished(void);
+s32 DpwTr_GetResult(void);
 // Requests the server's state, and sends the player's profile
-void func_ov189_021a7e84(void);
-void func_ov189_021a7efc(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *result);
+void DpwTr_GetServerState(void);
+void DpwTr_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *result);
 // Searches the server for up to maxNum Pokémon, without and with a country
-void func_ov189_021a7bfc(const Dpw_Tr_PokemonSearchData *search, s32 maxNum, Dpw_Tr_Data *result);
-void func_ov189_021a7ca8(const Dpw_Tr_PokemonSearchDataEx *search, Dpw_Tr_Data *result);
+void DpwTr_Search(const Dpw_Tr_PokemonSearchData *search, s32 maxNum, Dpw_Tr_Data *result);
+void DpwTr_SearchEx(const Dpw_Tr_PokemonSearchDataEx *search, Dpw_Tr_Data *result);
 // Deposits a Pokémon with its signature, and ends the deposit
-void func_ov189_021a779c(Dpw_Tr_Data *data, const void *sign, u32 size);
-void func_ov189_021a7854(void);
+void DpwTr_Upload(Dpw_Tr_Data *data, const void *sign, u32 size);
+void DpwTr_UploadFinish(void);
 // Asks for the player's deposited Pokémon, and whether it was traded
-void func_ov189_021a78e0(Dpw_Tr_Data *result);
-void func_ov189_021a7960(Dpw_Tr_Data *result);
+void DpwTr_Download(Dpw_Tr_Data *result);
+void DpwTr_GetTradeResult(Dpw_Tr_Data *result);
 // End the taking back of a traded Pokémon, and of a deposited one
-void func_ov189_021a79e0(void);
-void func_ov189_021a7a5c(void);
+void DpwTr_DeleteFinish(void);
+void DpwTr_ReturnFinish(void);
 // Cancels the request
-void func_ov189_021a7ad4(void);
+void DpwTr_Cancel(void);
 // Trades for the Pokémon of the given ID, and ends the trade
-void func_ov189_021a7d4c(s32 id, Dpw_Tr_Data *upload, Dpw_Tr_Data *result, const void *sign, u32 size);
-void func_ov189_021a7df8(void);
+void DpwTr_Exchange(s32 id, Dpw_Tr_Data *upload, Dpw_Tr_Data *result, const void *sign, u32 size);
+void DpwTr_ExchangeFinish(void);
 
 #endif // POKEBW2_DPW_DPW_TR_H

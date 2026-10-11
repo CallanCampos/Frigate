@@ -30,3 +30,5 @@ flags = [
 "vct/vct_session.c" = ["-nothumb"]
 "vct/vct_dsp.c" = ["-nothumb"]
 "vct/vct.c" = ["-nothumb", "-ipa file"]
+# The signature check (overlay 189) is ARM code like NitroSDK's
+"crypt/crypt.c" = ["-nothumb"]

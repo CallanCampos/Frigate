@@ -112,7 +112,7 @@ static void *MysteryNet_GetInfo(void *work);
 static int MysteryNet_GetInfoSize(void *work);
 static BOOL MysteryNet_IsSameInfo(u32 a, u32 b);
 static void MysteryNet_OnExit(void *work);
-static void MysteryNet_OnNdEvent(u32 reason, u32 error);
+static void MysteryNet_OnNdEvent(u32 reason, u32 error, int serverError);
 static void MysteryNet_SetNdDone(void);
 static u32 Mystery_ParseHex(const char *str);
 static BOOL Mystery_IsZero(const u32 *data, u32 size);
@@ -572,7 +572,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
         download->selected = 0;
         download->buffer = net->buffer;
         net->result = MYSTERY_NET_RECV_NONE;
-        if (!func_ov189_021a5674(MysteryNet_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
+        if (!DWC_NdInitAsync(MysteryNet_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
             net->result = MYSTERY_NET_RECV_ERROR;
             *state = 9;
             return;
@@ -586,7 +586,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
             MysteryNetDownload_Cleanup(download, 3, state, 7, 7);
             return;
         }
-        if (!func_ov189_021a5830("MYSTERY_E", "", "")) {
+        if (!DWC_NdSetAttr("MYSTERY_E", "", "")) {
             net->result = MYSTERY_NET_RECV_ERROR;
             MysteryNetDownload_Cleanup(download, 4, state, 9, 9);
             return;
@@ -594,7 +594,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
         *state = 3;
         break;
     case 3:
-        if (!func_ov189_021a5850(download->files, 0, MYSTERY_NET_FILE_MAX)) {
+        if (!DWC_NdGetFileListAsync(download->files, 0, MYSTERY_NET_FILE_MAX)) {
             net->result = MYSTERY_NET_RECV_ERROR;
             MysteryNetDownload_Cleanup(download, 4, state, 9, 9);
             return;
@@ -651,7 +651,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
         *state = 5;
         break;
     case 5:
-        if (!func_ov189_021a58c8(&download->files[download->selected], download->buffer, MYSTERY_NET_BUFFER_SIZE)) {
+        if (!DWC_NdGetFileAsync(&download->files[download->selected], download->buffer, MYSTERY_NET_BUFFER_SIZE)) {
             net->result = MYSTERY_NET_RECV_ERROR;
             MysteryNetDownload_Cleanup(download, 4, state, 9, 9);
             return;
@@ -663,7 +663,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
         *state = 6;
         break;
     case 6:
-        func_ov189_021a5768();
+        NdReportResults();
         if (download->timeout++ > 7200) {
             func_020424ac(0, 0, 0, 1013);
             net->result = MYSTERY_NET_RECV_ERROR;
@@ -675,7 +675,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
                 MysteryNetDownload_Cleanup(download, 3, state, 7, 7);
                 return;
             }
-            if (func_ov189_021a5980(&download->received, &download->contentLength) == TRUE) {
+            if (DWC_NdGetProgress(&download->received, &download->contentLength) == TRUE) {
                 u32 percent = download->received * 100 / download->contentLength;
 
                 if (download->percent != percent) {
@@ -694,7 +694,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
         }
         break;
     case 7:
-        func_ov189_021a5938();
+        DWC_NdCancelAsync();
         *state = 8;
         break;
     case 8:
@@ -706,7 +706,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
         MysteryNetSeq_SetNext(seq, MysteryNet_WifiEnd);
         break;
     case DOWNLOAD_WAIT:
-        func_ov189_021a5768();
+        NdReportResults();
         if (download->timeout++ > 7200) {
             func_020424ac(0, 0, 0, 1013);
             net->result = MYSTERY_NET_RECV_ERROR;
@@ -727,7 +727,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
         }
         break;
     case DOWNLOAD_WAIT_CLEANUP:
-        func_ov189_021a5768();
+        NdReportResults();
         if (download->timeout++ > 7200) {
             func_020424ac(0, 0, 0, 1013);
             *state = download->nextState;
@@ -783,7 +783,7 @@ static void MysteryNetDownload_Cleanup(MysteryNetDownload *download, u32 error, 
     download->nextState = nextState;
     download->timeout = 0;
     *state = DOWNLOAD_WAIT_CLEANUP;
-    if (!func_ov189_021a57dc()) {
+    if (!DWC_NdCleanupAsync()) {
         *state = failState;
     }
 }
@@ -839,7 +839,7 @@ static void MysteryNet_OnExit(void *work) {
     net->exited = TRUE;
 }
 
-static void MysteryNet_OnNdEvent(u32 reason, u32 error) {
+static void MysteryNet_OnNdEvent(u32 reason, u32 error, int serverError) {
     sNdState.ready = TRUE;
     sNdState.error = error;
     MysteryNet_SetNdDone();

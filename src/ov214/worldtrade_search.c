@@ -774,7 +774,7 @@ static int Search_SubSeqSearchCheck(WorldTradeWork *wk) {
 
 static int Search_SubSeqServerQuery(WorldTradeWork *wk) {
     if (wk->countryCode == 0) {
-        func_ov189_021a7bfc(&wk->search, SEARCH_POKE_MAX, wk->downloadPokemonData);
+        DpwTr_Search(&wk->search, SEARCH_POKE_MAX, wk->downloadPokemonData);
     } else {
         Dpw_Tr_PokemonSearchDataEx searchEx;
 
@@ -786,7 +786,7 @@ static int Search_SubSeqServerQuery(WorldTradeWork *wk) {
         searchEx.unused = wk->search.unused;
         searchEx.maxNum = SEARCH_POKE_MAX;
         searchEx.countryCode = wk->countryCode;
-        func_ov189_021a7ca8(&searchEx, wk->downloadPokemonData);
+        DpwTr_SearchEx(&searchEx, wk->downloadPokemonData);
     }
     wk->searchBackup = wk->search;
     wk->searchBackupCountryCode = wk->countryCode;
@@ -799,8 +799,8 @@ static int Search_SubSeqServerQuery(WorldTradeWork *wk) {
 static int Search_SubSeqServerResult(WorldTradeWork *wk) {
     s32 result;
 
-    if (func_ov189_021a7750()) {
-        result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        result = DpwTr_GetResult();
         wk->timeoutCount = 0;
         switch (result) {
         case 0:
@@ -982,7 +982,7 @@ static int Search_SubSeqEnd(WorldTradeWork *wk) {
 }
 
 static int Search_SubSeqEndToEnter(WorldTradeWork *wk) {
-    func_ov189_021a773c();
+    DpwTr_End();
     WorldTrade_TimeIconDel(wk);
     GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
     wk->subprocessSeq = SEARCH_SEQ_START;

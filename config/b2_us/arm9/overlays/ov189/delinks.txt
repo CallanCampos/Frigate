@@ -18,3 +18,31 @@ src/ov189/nhttp_rap_evilcheck.c:
 src/ov189/dpw_profile.c:
     complete
     .text       start:0x0219d504 end:0x0219d550
+
+lib/dwc/src/nd/nd.c:
+    .text       start:0x021a54b4 end:0x021a6c84
+    .rodata     start:0x021acd84 end:0x021ace78
+    .data       start:0x021ae09c end:0x021ae28c
+    .bss        start:0x021b28a8 end:0x021b2a68
+
+lib/dpw/src/dpw_tr.c:
+    .text       start:0x021a6c84 end:0x021a8010
+    .data       start:0x021ae28c end:0x021ae428
+    .bss        start:0x021b2a68 end:0x021b2c3c
+
+lib/dpw/src/dpw_battle_tower.c:
+    .text       start:0x021a8010 end:0x021a893c
+    .data       start:0x021ae428 end:0x021ae4fc
+    .bss        start:0x021b2c3c end:0x021b2f68
+
+lib/dwc/src/gamestats/gamestats.c:
+    .text       start:0x021a893c end:0x021a90f0
+    .rodata     start:0x021ace78 end:0x021acea4
+    .data       start:0x021ae4fc end:0x021ae684
+    .bss        start:0x021b2f68 end:0x021b2f6c
+
+lib/dwc/src/crypt/crypt.c:
+    .text       start:0x021a90f0 end:0x021ac838
+    .rodata     start:0x021acea4 end:0x021acf28
+    .data       start:0x021ae684 end:0x021ae6a0
+    .bss        start:0x021b2f6c end:0x021b2f80

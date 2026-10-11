@@ -122,4 +122,9 @@ void func_ov011_02168bd8(DWCRecvFunc func, int a1);
 void func_ov011_02160150(DWCClosedFunc func, int a1);
 void func_ov011_02168c00(DWCTimeoutFunc func, int a1);
 
+// Overlay 11's, used with the matching keys: adds a key with a value that is read when the match runs, and reads
+// a candidate's key
+u8 func_ov011_02160e10(u8 keyId, const char *key, const int *valueSrc);
+int func_ov011_02160f98(int index, const char *key, int defaultValue);
+
 #endif // POKEBW2_DWC_DWC_H

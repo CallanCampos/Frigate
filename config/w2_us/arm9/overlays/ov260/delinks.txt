@@ -28,3 +28,52 @@ src/ov260/wifibattlematch_net.c:
 src/ov260/wifibattlematch_net_fields.c:
     .text       start:0x021bc098 end:0x021bc258
     .data       start:0x021c0124 end:0x021c0790
+
+lib/dwc/src/sake/sake.c:
+    complete
+    .text       start:0x021bc258 end:0x021bc53c
+    .data       start:0x021c0790 end:0x021c0860
+    .bss        start:0x021c1ce8 end:0x021c1de8
+
+lib/dwc/src/sake/sake_error.c:
+    complete
+    .text       start:0x021bc53c end:0x021bc804
+    .data       start:0x021c0860 end:0x021c09d0
+
+lib/dwc/src/sake/sake_post.c:
+    complete
+    .text       start:0x021bc804 end:0x021bc86c
+    .data       start:0x021c09d0 end:0x021c0a18
+    .bss        start:0x021c1de8 end:0x021c1e68
+
+lib/dwc/src/sake/sake_storage.c:
+    complete
+    .text       start:0x021bc86c end:0x021bcc44
+    .data       start:0x021c0a18 end:0x021c0cb4
+
+lib/dwc/src/sake/sake_records.c:
+    complete
+    .text       start:0x021bcc44 end:0x021bd47c
+    .data       start:0x021c0cb4 end:0x021c109c
+
+lib/dwc/src/sc/dwc_sc.c:
+    complete
+    .text       start:0x021bd47c end:0x021bda5c
+    .data       start:0x021c109c end:0x021c113c
+    .bss        start:0x021c1e68 end:0x021c2414
+
+lib/dwc/src/sc/dwc_competition.c:
+    .text       start:0x021bda5c end:0x021beae0
+    .data       start:0x021c113c end:0x021c1554
+    .bss        start:0x021c2414 end:0x021c2494
+
+lib/dwc/src/gdb/gdb.c:
+    .text       start:0x021beae0 end:0x021bf67c
+    .data       start:0x021c1554 end:0x021c1af8
+    .bss        start:0x021c2494 end:0x021c251c
+
+lib/dwc/src/auth/dwc_auth.c:
+    .text       start:0x021bf67c end:0x021bfd18
+    .rodata     start:0x021bfd78 end:0x021bfe84
+    .data       start:0x021c1af8 end:0x021c1ce0
+    .bss        start:0x021c251c end:0x021c25a0

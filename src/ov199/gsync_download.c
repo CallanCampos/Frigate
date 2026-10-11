@@ -31,13 +31,13 @@ struct GSyncDownload {
     BOOL timedOut;
 };
 
-static void GSyncDownload_OnNdEvent(u32 reason, u32 error);
+static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError);
 static u32 GSyncDownload_OnDwcEvent(void *work, int a1, int event, int a3);
 static BOOL GSyncDownload_UpdateTimer(GSyncDownload *dl);
 
 static GSyncDownload *_pDLWork;
 
-static void GSyncDownload_OnNdEvent(u32 reason, u32 error) {
+static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
     switch (error) {
     case DWC_ND_ERROR_NONE:
         break;
@@ -46,7 +46,7 @@ static void GSyncDownload_OnNdEvent(u32 reason, u32 error) {
     case DWC_ND_ERROR_CANCELED:
         _pDLWork->cancelled = TRUE;
         break;
-    case DWC_ND_ERROR_FATAL:
+    case ND_ERROR_FATAL:
         func_02011d20();
         break;
     }
@@ -80,7 +80,7 @@ void *GSyncDownload_GetBuffer(GSyncDownload *dl) {
 static u32 GSyncDownload_OnDwcEvent(void *work, int a1, int event, int a3) {
     GSyncDownload *dl = work;
 
-    if (!dl->cleanedUp && func_ov189_021a57dc()) {
+    if (!dl->cleanedUp && DWC_NdCleanupAsync()) {
         dl->cleanedUp = TRUE;
     }
     if (!dl->done) {
@@ -91,7 +91,7 @@ static u32 GSyncDownload_OnDwcEvent(void *work, int a1, int event, int a3) {
 
 BOOL GSyncDownload_Init(GSyncDownload *dl) {
     dl->done = FALSE;
-    if (!func_ov189_021a5674(GSyncDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
+    if (!DWC_NdInitAsync(GSyncDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
         return FALSE;
     }
     DWCRap_SetEventFunc(GSyncDownload_OnDwcEvent, dl);
@@ -121,7 +121,7 @@ BOOL GSyncDownload_SetAttr(GSyncDownload *dl, const char *attr1, int attr2) {
 
     dl->done = FALSE;
     OS_SNPrintf(buf, sizeof(buf), "%d", attr2);
-    if (func_ov189_021a5830(attr1, buf, "")) {
+    if (DWC_NdSetAttr(attr1, buf, "")) {
         result = TRUE;
     }
     return result;
@@ -141,7 +141,7 @@ static BOOL GSyncDownload_UpdateTimer(GSyncDownload *dl) {
         dl->timer++;
         if (dl->timer > GSYNC_DOWNLOAD_TIMEOUT) {
             dl->timedOut = TRUE;
-            if (!func_ov189_021a5938()) {
+            if (!DWC_NdCancelAsync()) {
                 dl->cancelled = TRUE;
             }
             return FALSE;
@@ -156,7 +156,7 @@ BOOL GSyncDownload_GetFileList(GSyncDownload *dl) {
     dl->done = FALSE;
     dl->timer = 1;
     dl->timedOut = FALSE;
-    if (!func_ov189_021a5850(&dl->file, 0, 1)) {
+    if (!DWC_NdGetFileListAsync(&dl->file, 0, 1)) {
         result = FALSE;
     }
     return result;
@@ -168,7 +168,7 @@ BOOL GSyncDownload_GetFile(GSyncDownload *dl) {
     dl->done = FALSE;
     dl->timer = 1;
     dl->timedOut = FALSE;
-    if (!func_ov189_021a58c8(&dl->file, dl->buffer, dl->bufferSize + GSYNC_DOWNLOAD_BUFFER_EXTRA)) {
+    if (!DWC_NdGetFileAsync(&dl->file, dl->buffer, dl->bufferSize + GSYNC_DOWNLOAD_BUFFER_EXTRA)) {
         result = FALSE;
     }
     return result;
@@ -177,7 +177,7 @@ BOOL GSyncDownload_GetFile(GSyncDownload *dl) {
 BOOL GSyncDownload_Cleanup(GSyncDownload *dl) {
     if (!dl->cleanedUp) {
         dl->done = FALSE;
-        if (!func_ov189_021a57dc()) {
+        if (!DWC_NdCleanupAsync()) {
             return FALSE;
         }
     }
@@ -186,7 +186,7 @@ BOOL GSyncDownload_Cleanup(GSyncDownload *dl) {
 
 void GSyncDownload_Main(GSyncDownload *dl) {
     if (GSyncDownload_UpdateTimer(dl)) {
-        func_ov189_021a5768();
+        NdReportResults();
     }
 }
 

@@ -171,12 +171,12 @@ static int Enter_DpwTrInit(WorldTradeWork *wk) {
 
     func_02008be0(wk->param->mystatus, WifiList_GetMyGSID(wk->param->wifilist));
     pid = func_02008bdc(wk->param->mystatus);
-    func_ov189_021a6c84(pid, func_02057ec4(userData), 0);
+    DpwTr_Init(pid, func_02057ec4(userData), 0);
     return TRUE;
 }
 
 static int Enter_ServerStart(WorldTradeWork *wk) {
-    func_ov189_021a7e84();
+    DpwTr_GetServerState();
     wk->timeoutCount = 0;
     return TRUE;
 }
@@ -184,9 +184,9 @@ static int Enter_ServerStart(WorldTradeWork *wk) {
 static int Enter_ServerResult(WorldTradeWork *wk) {
     s32 result;
 
-    func_ov189_021a6d00();
-    if (func_ov189_021a7750()) {
-        result = func_ov189_021a778c();
+    DpwTr_Process();
+    if (DpwTr_IsFinished()) {
+        result = DpwTr_GetResult();
         wk->timeoutCount = 0;
         switch (result) {
         case 0:
@@ -233,7 +233,7 @@ static int Enter_ServerResult(WorldTradeWork *wk) {
 
 static int Enter_ProfileStart(WorldTradeWork *wk) {
     DpwProfile_Fill(&wk->dcProfile, wk->param->mystatus);
-    func_ov189_021a7efc(&wk->dcProfile, &wk->dcProfileResult);
+    DpwTr_SetProfile(&wk->dcProfile, &wk->dcProfileResult);
     wk->timeoutCount = 0;
     return TRUE;
 }
@@ -241,9 +241,9 @@ static int Enter_ProfileStart(WorldTradeWork *wk) {
 static int Enter_ProfileResult(WorldTradeWork *wk) {
     s32 result;
 
-    func_ov189_021a6d00();
-    if (func_ov189_021a7750()) {
-        result = func_ov189_021a778c();
+    DpwTr_Process();
+    if (DpwTr_IsFinished()) {
+        result = DpwTr_GetResult();
         wk->timeoutCount = 0;
         switch (result) {
         case 0:
@@ -462,7 +462,7 @@ static int Enter_LoginCallback(void *msgWork, void *data) {
 }
 
 static int Enter_LogoutCallback(void *msgWork, void *data) {
-    func_ov189_021a773c();
+    DpwTr_End();
     return 0;
 }
 
@@ -551,7 +551,7 @@ static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
         wk->localSeq++;
         break;
     case 3:
-        func_ov189_021a773c();
+        DpwTr_End();
         func_ov011_0215fb78();
         func_0205b198();
         wk->localSeq++;

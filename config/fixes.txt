@@ -1491,6 +1491,8 @@ overlays/ov186 0x021acee0 remove_reloc
 overlays/ov186 0x021acffc remove_reloc
 overlays/ov186 0x021ad008 remove_reloc
 overlays/ov186 0x021ad3c8 remove_reloc
+overlays/ov189 0x021acd84 add_data sBase64Pad
+overlays/ov189 0x021acd85 add_data sActionCount
 overlays/ov190 0x021b5308 reloc_module overlay(184)
 overlays/ov191 0x021b5c2a reloc_module overlay(189)
 overlays/ov194 0x021b76f6 reloc_module overlay(139)
@@ -1916,6 +1918,9 @@ overlays/ov260 0x021bb7d2 reloc_module overlay(189)
 overlays/ov260 0x021bb902 reloc_module overlay(189)
 overlays/ov260 0x021bb962 reloc_module overlay(189)
 overlays/ov260 0x021bbba6 reloc_module overlay(189)
+overlays/ov260 0x021c0adc add_data sDeleteRecordType
+overlays/ov260 0x021c0ddc add_data sGetRandomRecordsType
+overlays/ov260 0x021c0e04 add_data sSearchRecordsType
 overlays/ov261 0x02176bdc reloc_module overlay(262)
 overlays/ov261 0x02176c04 reloc_module overlay(262)
 overlays/ov261 0x021779a4 reloc_module overlay(262)
@@ -2084,11 +2089,11 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
-overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
-overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
+overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a773c add_data ResearchCommon_Unused
+overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
+overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
 overlays/ov311 0x0219d93c reloc_module overlay(139)
 overlays/ov311 0x0219d97c reloc_module overlay(139)
 overlays/ov311 0x0219da74 reloc_module overlay(139)

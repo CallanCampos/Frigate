@@ -83,7 +83,7 @@ static void NetCommonDownload_FreeSession(NetCommonDownloadSession *session);
 static void NetCommonDownload_Wait(NetCommonDownloadSession *session, u32 *state, u32 nextState);
 static void NetCommonDownload_Cleanup(NetCommonDownloadSession *session, u32 error, u32 *state, u32 nextState,
                                       u32 failState);
-static void NetCommonDownload_OnNdEvent(u32 reason, u32 error);
+static void NetCommonDownload_OnNdEvent(u32 reason, u32 error, int serverError);
 static BOOL NetCommonDownload_IsZero(const u32 *data, u32 size);
 
 static const u8 sModeCommands[2][5] = {
@@ -235,7 +235,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         DWCRap_SetEventFunc(NetCommonDownload_OnDwcEvent, session);
         NetCommonDownload_AllocFileList(session, args, download->param.heapId);
         download->status = NET_COMMON_DOWNLOAD_STATUS_NONE;
-        if (!func_ov189_021a5674(NetCommonDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
+        if (!DWC_NdInitAsync(NetCommonDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             *state = 9;
             break;
@@ -249,7 +249,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
             NetCommonDownload_Cleanup(session, 3, state, 7, 7);
             break;
         }
-        if (!func_ov189_021a5830(args->attr1, args->attr2, args->attr3)) {
+        if (!DWC_NdSetAttr(args->attr1, args->attr2, args->attr3)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             NetCommonDownload_Cleanup(session, 4, state, 9, 9);
             break;
@@ -257,7 +257,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         *state = 3;
         break;
     case 3:
-        if (!func_ov189_021a5850(session->files, 0, args->fileCount)) {
+        if (!DWC_NdGetFileListAsync(session->files, 0, args->fileCount)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             NetCommonDownload_Cleanup(session, 4, state, 9, 9);
             break;
@@ -291,7 +291,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         *state = 5;
         break;
     case 5:
-        if (!func_ov189_021a58c8(&session->files[session->selected], download->data,
+        if (!DWC_NdGetFileAsync(&session->files[session->selected], download->data,
                                  session->files[session->selected].size)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             NetCommonDownload_Cleanup(session, 4, state, 9, 9);
@@ -304,7 +304,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         *state = 6;
         break;
     case 6:
-        func_ov189_021a5768();
+        NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             func_020424ac(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
@@ -316,7 +316,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
                 NetCommonDownload_Cleanup(session, 3, state, 7, 7);
                 break;
             }
-            if (func_ov189_021a5980(&session->received, &session->contentLength) == TRUE) {
+            if (DWC_NdGetProgress(&session->received, &session->contentLength) == TRUE) {
                 u32 percent = session->received * 100 / session->contentLength;
 
                 if (session->percent != percent) {
@@ -335,7 +335,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         }
         break;
     case 7:
-        func_ov189_021a5938();
+        DWC_NdCancelAsync();
         *state = 8;
         break;
     case 8:
@@ -347,7 +347,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         session->initialized = FALSE;
         return TRUE;
     case DOWNLOAD_WAIT:
-        func_ov189_021a5768();
+        NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             func_020424ac(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
@@ -368,7 +368,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         }
         break;
     case DOWNLOAD_WAIT_CLEANUP:
-        func_ov189_021a5768();
+        NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             func_020424ac(0, 0, 0, 1013);
             *state = session->nextState;
@@ -396,7 +396,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
         DWCRap_SetEventFunc(NetCommonDownload_OnDwcEvent, session);
         NetCommonDownload_AllocFile(session, args, download->param.heapId);
         download->status = NET_COMMON_DOWNLOAD_STATUS_NONE;
-        if (!func_ov189_021a5674(NetCommonDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
+        if (!DWC_NdInitAsync(NetCommonDownload_OnNdEvent, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             *state = 6;
             break;
@@ -410,7 +410,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
             NetCommonDownload_Cleanup(session, 3, state, 4, 4);
             break;
         }
-        if (!func_ov189_021a5830("", "", "")) {
+        if (!DWC_NdSetAttr("", "", "")) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             NetCommonDownload_Cleanup(session, 4, state, 6, 6);
             break;
@@ -418,7 +418,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
         *state = 2;
         break;
     case 2:
-        if (!func_ov189_021a58c8(session->files, download->data, session->files->size)) {
+        if (!DWC_NdGetFileAsync(session->files, download->data, session->files->size)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             NetCommonDownload_Cleanup(session, 4, state, 6, 6);
             break;
@@ -430,7 +430,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
         *state = 3;
         break;
     case 3:
-        func_ov189_021a5768();
+        NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             func_020424ac(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
@@ -442,7 +442,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
                 NetCommonDownload_Cleanup(session, 3, state, 4, 4);
                 break;
             }
-            if (func_ov189_021a5980(&session->received, &session->contentLength) == TRUE) {
+            if (DWC_NdGetProgress(&session->received, &session->contentLength) == TRUE) {
                 u32 percent = session->received * 100 / session->contentLength;
 
                 if (session->percent != percent) {
@@ -461,7 +461,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
         }
         break;
     case 4:
-        func_ov189_021a5938();
+        DWC_NdCancelAsync();
         *state = 5;
         break;
     case 5:
@@ -473,7 +473,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
         session->initialized = FALSE;
         return TRUE;
     case DOWNLOAD_WAIT:
-        func_ov189_021a5768();
+        NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             func_020424ac(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
@@ -494,7 +494,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
         }
         break;
     case DOWNLOAD_WAIT_CLEANUP:
-        func_ov189_021a5768();
+        NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
             func_020424ac(0, 0, 0, 1013);
             *state = session->nextState;
@@ -631,12 +631,12 @@ static void NetCommonDownload_Cleanup(NetCommonDownloadSession *session, u32 err
     session->nextState = nextState;
     session->timeout = 0;
     *state = DOWNLOAD_WAIT_CLEANUP;
-    if (!func_ov189_021a57dc()) {
+    if (!DWC_NdCleanupAsync()) {
         *state = failState;
     }
 }
 
-static void NetCommonDownload_OnNdEvent(u32 reason, u32 error) {
+static void NetCommonDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
     sNdState.ready = TRUE;
     sNdState.done = TRUE;
     sNdState.error = error;

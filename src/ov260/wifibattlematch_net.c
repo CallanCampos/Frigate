@@ -82,8 +82,8 @@ typedef struct {
 
 // What a player offers in a match, which is sent to the other player whole
 typedef struct {
-    u32 unk0;
-    void *connection;
+    const AuthCertificate *certificate;
+    ScReport *connection;
     u8 unk8[0x28];
     u8 unk30[0x28];
     u8 unk58[0x10];
@@ -92,7 +92,7 @@ typedef struct {
 // What overlay 290 shares with this file: the player's ID in the Sake database, the player's side and the other
 // player's
 typedef struct {
-    u32 sake_recordID;
+    s32 sake_recordID;
     WifiBattleMatchNetInfo mine;
     WifiBattleMatchNetInfo theirs;
 } WifiBattleMatchNetData;
@@ -271,7 +271,7 @@ static u32 WifiBattleMatchNet_GetHttpResultMessage(u32 result);
 static void WifiBattleMatchNet_StartDownloadWait(WifiBattleMatchNet *p_wk, u32 nextState);
 static void WifiBattleMatchNet_StartDownloadEnd(WifiBattleMatchNet *p_wk, u32 nextState);
 static void WifiBattleMatchNet_StartDownloadCancel(WifiBattleMatchNet *p_wk, u32 nextState);
-static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error);
+static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error, int serverError);
 static u32 WifiBattleMatchNet_GetDwcResult(u32 code);
 static u32 WifiBattleMatchNet_GetGdbResult(u32 code, u32 subCode1, u32 subCode2);
 static u32 WifiBattleMatchNet_GetTimeoutResult(u32 code);
@@ -888,7 +888,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
     case 4:
         p_wk->counter = 0;
         p_wk->gdbOpen = TRUE;
-        err = func_ov260_021bd43c(0xb5f);
+        err = Sc_Startup(0xb5f, 0);
         if (err != 0) {
             WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 1937);
             WifiBattleMatchNet_EndRequests(p_wk);
@@ -897,7 +897,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         p_wk->state = 5;
         break;
     case 5:
-        err = func_ov260_021bd85c(&p_wk->p_data->mine);
+        err = Sc_GetCertificate(&p_wk->p_data->mine.certificate);
         if (err != 0) {
             WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 1953);
             WifiBattleMatchNet_EndRequests(p_wk);
@@ -908,7 +908,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
     case 6:
         if (func_02042bc4() || p_wk->flag164 != 0) {
             p_wk->counter++;
-            err = func_ov260_021bd57c(WifiBattleMatchNet_OnRequestDone, 100, p_wk);
+            err = Sc_CreateSession(WifiBattleMatchNet_OnRequestDone, 100, p_wk);
             p_wk->requestSent = TRUE;
             if (err != 0) {
                 WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 1971);
@@ -923,7 +923,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         break;
     case 7:
         if (p_wk->counter == 0) {
-            sys_memcpy(func_ov260_021bd6c0(), p_wk->p_data->mine.unk8, 0x28);
+            sys_memcpy(Sc_GetSessionId(), p_wk->p_data->mine.unk8, 0x28);
             p_wk->state = 8;
         } else {
             if (p_wk->timer++ > 3600) {
@@ -931,7 +931,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
                 WifiBattleMatchNet_EndRequests(p_wk);
                 return 2;
             }
-            func_ov260_021bd554();
+            Sc_Update();
             if (p_wk->errorCode != 0) {
                 WifiBattleMatchNet_SetDwcError(&p_wk->error, p_wk->errorCode, 2007);
                 WifiBattleMatchNet_EndRequests(p_wk);
@@ -943,7 +943,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         if (p_wk->flag164 != 0) {
             p_wk->state = 11;
         } else {
-            sys_memcpy(func_ov260_021bd6d0(), p_wk->p_data->mine.unk30, 0x28);
+            sys_memcpy(Sc_GetConnectionId(), p_wk->p_data->mine.unk30, 0x28);
             func_02040624(func_02040440(), 1, 0x24);
             p_wk->state = 9;
         }
@@ -960,8 +960,8 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
             }
         } else if (p_wk->flagInfoReceived != 0 || p_wk->flag164 != 0) {
             p_wk->flagInfoReceived = 0;
-            err = func_ov260_021bd698(p_wk->p_data->theirs.unk8);
-            sys_memcpy(func_ov260_021bd6c0(), p_wk->p_data->mine.unk8, 0x28);
+            err = Sc_SetSessionId(p_wk->p_data->theirs.unk8);
+            sys_memcpy(Sc_GetSessionId(), p_wk->p_data->mine.unk8, 0x28);
             if (err != 0) {
                 WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 2061);
                 WifiBattleMatchNet_EndRequests(p_wk);
@@ -972,7 +972,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         break;
     case 11:
         p_wk->counter++;
-        err = func_ov260_021bd5d4(p_wk->unk1ac, WifiBattleMatchNet_OnRequestDoneWithData, 100, p_wk);
+        err = Sc_SetReportIntention(p_wk->unk1ac, WifiBattleMatchNet_OnRequestDoneWithData, 100, p_wk);
         if (err != 0) {
             WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 2077);
             WifiBattleMatchNet_EndRequests(p_wk);
@@ -990,7 +990,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
                 WifiBattleMatchNet_EndRequests(p_wk);
                 return 2;
             }
-            func_ov260_021bd554();
+            Sc_Update();
             if (p_wk->errorCode != 0) {
                 WifiBattleMatchNet_SetDwcError(&p_wk->error, p_wk->errorCode, 2106);
                 WifiBattleMatchNet_EndRequests(p_wk);
@@ -1059,7 +1059,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         break;
     case 20:
         p_wk->counter++;
-        err = func_ov260_021bd634(p_wk->p_data->mine.connection, p_wk->unk1ac, WifiBattleMatchNet_OnRequestDone2, 100,
+        err = Sc_SubmitReport(p_wk->p_data->mine.connection, p_wk->unk1ac, WifiBattleMatchNet_OnRequestDone2, 100,
                                   p_wk);
         if (err != 0) {
             WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 2236);
@@ -1078,7 +1078,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
                 WifiBattleMatchNet_EndRequests(p_wk);
                 return 2;
             }
-            func_ov260_021bd554();
+            Sc_Update();
             if (p_wk->errorCode != 0) {
                 WifiBattleMatchNet_SetDwcError(&p_wk->error, p_wk->errorCode, 2264);
                 WifiBattleMatchNet_EndRequests(p_wk);
@@ -1124,7 +1124,7 @@ static void WifiBattleMatchNet_OnRequestDoneWithData(int error, void *work) {
     WifiBattleMatchNetData *p_data = p_wk->p_data;
 
     if (error == 0) {
-        sys_memcpy(func_ov260_021bd6d0(), p_data->mine.unk30, 0x28);
+        sys_memcpy(Sc_GetConnectionId(), p_data->mine.unk30, 0x28);
     } else {
         p_wk->errorCode = error;
     }
@@ -1143,10 +1143,10 @@ static void WifiBattleMatchNet_OnRequestDone2(int error, void *work) {
 static void WifiBattleMatchNet_EndRequests(WifiBattleMatchNet *p_wk) {
     if (p_wk->gdbOpen == 1) {
         if (p_wk->state > 0x13) {
-            func_ov260_021bd838(p_wk->p_data->mine.connection);
+            Sc_FreeReport(p_wk->p_data->mine.connection);
         }
         if (p_wk->state >= 4) {
-            func_ov260_021bd4f4();
+            Sc_Shutdown();
         }
         p_wk->gdbOpen = 0;
     }
@@ -1158,19 +1158,19 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
     int err;
     int resultMode;
 
-    err = func_ov260_021bd6e0(1, 2, 0, &info->connection);
+    err = Sc_CreateReport(1, 2, 0, &info->connection);
     if (err != 0) {
         return err;
     }
-    err = func_ov260_021bd718(info->connection);
+    err = Sc_BeginGame(info->connection);
     if (err != 0) {
         return err;
     }
-    err = func_ov260_021bd738(info->connection);
+    err = Sc_BeginPlayers(info->connection);
     if (err != 0) {
         return err;
     }
-    err = func_ov260_021bd778(info->connection);
+    err = Sc_BeginGroup(info->connection);
     if (err != 0) {
         return err;
     }
@@ -1194,7 +1194,7 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
             break;
         }
     }
-    err = func_ov260_021bd798(info->connection, 0, info->unk30, 0, resultMode, info->unk0, info->unk58);
+    err = Sc_SetPlayer(info->connection, 0, info->unk30, 0, resultMode, info->certificate, info->unk58);
     if (err != 0) {
         return err;
     }
@@ -1202,7 +1202,7 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
     if (err != 0) {
         return err;
     }
-    err = func_ov260_021bd778(info->connection);
+    err = Sc_BeginGroup(info->connection);
     if (err != 0) {
         return err;
     }
@@ -1231,7 +1231,7 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
                 break;
             }
         }
-        err = func_ov260_021bd798(info->connection, 1, theirs->unk30, 0, theirsMode, theirs->unk0, theirs->unk58);
+        err = Sc_SetPlayer(info->connection, 1, theirs->unk30, 0, theirsMode, theirs->certificate, theirs->unk58);
         if (err != 0) {
             return err;
         }
@@ -1240,14 +1240,14 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
             return err;
         }
     }
-    err = func_ov260_021bd758(info->connection);
+    err = Sc_BeginTeams(info->connection);
     if (err != 0) {
         return err;
     }
     if (a5 != 0) {
-        return func_ov260_021bd7cc(info->connection, a3, 1);
+        return Sc_FinishReport(info->connection, a3, 1);
     }
-    return func_ov260_021bd7cc(info->connection, a3, 0);
+    return Sc_FinishReport(info->connection, a3, 0);
 }
 
 static int WifiBattleMatchNet_SetBattleResult(WifiBattleMatchNetInfo *info, WifiBattleMatchNetParam *param, int isMine,
@@ -1297,80 +1297,80 @@ static int WifiBattleMatchNet_SetBattleResult(WifiBattleMatchNetInfo *info, Wifi
     switch (param->format) {
     case 0:
         if (skip == 0) {
-            err = func_ov260_021bd814(info->connection, 0xf, 1);
+            err = Sc_AddByte(info->connection, 0xf, 1);
             if (err != 0) {
                 return err;
             }
         }
-        err = func_ov260_021bd7f0(info->connection, 5, win);
+        err = Sc_AddInt(info->connection, 5, win);
         if (err != 0) {
             return err;
         }
-        err = func_ov260_021bd7f0(info->connection, 6, lose);
+        err = Sc_AddInt(info->connection, 6, lose);
         if (err != 0) {
             return err;
         }
         break;
     case 1:
         if (skip == 0) {
-            err = func_ov260_021bd814(info->connection, 0x10, 1);
+            err = Sc_AddByte(info->connection, 0x10, 1);
             if (err != 0) {
                 return err;
             }
         }
-        err = func_ov260_021bd7f0(info->connection, 8, win);
+        err = Sc_AddInt(info->connection, 8, win);
         if (err != 0) {
             return err;
         }
-        err = func_ov260_021bd7f0(info->connection, 7, lose);
+        err = Sc_AddInt(info->connection, 7, lose);
         if (err != 0) {
             return err;
         }
         break;
     case 2:
         if (skip == 0) {
-            err = func_ov260_021bd814(info->connection, 0x12, 1);
+            err = Sc_AddByte(info->connection, 0x12, 1);
             if (err != 0) {
                 return err;
             }
         }
-        err = func_ov260_021bd7f0(info->connection, 0xb, win);
+        err = Sc_AddInt(info->connection, 0xb, win);
         if (err != 0) {
             return err;
         }
-        err = func_ov260_021bd7f0(info->connection, 0xc, lose);
+        err = Sc_AddInt(info->connection, 0xc, lose);
         if (err != 0) {
             return err;
         }
         break;
     case 3:
         if (skip == 0) {
-            err = func_ov260_021bd814(info->connection, 0x11, 1);
+            err = Sc_AddByte(info->connection, 0x11, 1);
             if (err != 0) {
                 return err;
             }
         }
-        err = func_ov260_021bd7f0(info->connection, 9, win);
+        err = Sc_AddInt(info->connection, 9, win);
         if (err != 0) {
             return err;
         }
-        err = func_ov260_021bd7f0(info->connection, 0xa, lose);
+        err = Sc_AddInt(info->connection, 0xa, lose);
         if (err != 0) {
             return err;
         }
         break;
     case 4:
         if (skip == 0) {
-            err = func_ov260_021bd814(info->connection, 0x13, 1);
+            err = Sc_AddByte(info->connection, 0x13, 1);
             if (err != 0) {
                 return err;
             }
         }
-        err = func_ov260_021bd7f0(info->connection, 0xd, win);
+        err = Sc_AddInt(info->connection, 0xd, win);
         if (err != 0) {
             return err;
         }
-        err = func_ov260_021bd7f0(info->connection, 0xe, lose);
+        err = Sc_AddInt(info->connection, 0xe, lose);
         if (err != 0) {
             return err;
         }
@@ -1379,11 +1379,11 @@ static int WifiBattleMatchNet_SetBattleResult(WifiBattleMatchNetInfo *info, Wifi
         GFL_ASSERT(0);
         break;
     }
-    err = func_ov260_021bd7f0(info->connection, 0x14, draw != 0);
+    err = Sc_AddInt(info->connection, 0x14, draw != 0);
     if (err != 0) {
         return err;
     }
-    return func_ov260_021bd7f0(info->connection, 0x1b, -1);
+    return Sc_AddInt(info->connection, 0x1b, -1);
 }
 
 static int WifiBattleMatchNet_SetCupBattleResult(WifiBattleMatchNetInfo *info, WifiBattleMatchNetParam *param,
@@ -1431,44 +1431,44 @@ static int WifiBattleMatchNet_SetCupBattleResult(WifiBattleMatchNetInfo *info, W
         lose ^= 1;
     }
     if (skip == 0) {
-        err = func_ov260_021bd814(info->connection, 0x15, 1);
+        err = Sc_AddByte(info->connection, 0x15, 1);
         if (err != 0) {
             return err;
         }
     }
-    err = func_ov260_021bd7f0(info->connection, 0x16, win);
+    err = Sc_AddInt(info->connection, 0x16, win);
     if (err != 0) {
         return err;
     }
-    err = func_ov260_021bd7f0(info->connection, 0x17, lose);
+    err = Sc_AddInt(info->connection, 0x17, lose);
     if (err != 0) {
         return err;
     }
-    err = func_ov260_021bd7f0(info->connection, 0x18, draw != 0);
+    err = Sc_AddInt(info->connection, 0x18, draw != 0);
     if (err != 0) {
         return err;
     }
-    return func_ov260_021bd7f0(info->connection, 0x1c, -1);
+    return Sc_AddInt(info->connection, 0x1c, -1);
 }
 
 static int WifiBattleMatchNet_SetFlag1A(WifiBattleMatchNetInfo *info, WifiBattleMatchNetParam *param, int isMine,
                                         int a3) {
-    return func_ov260_021bd7f0(info->connection, 0x1a, 1);
+    return Sc_AddInt(info->connection, 0x1a, 1);
 }
 
 static int WifiBattleMatchNet_SetFlag19(WifiBattleMatchNetInfo *info, WifiBattleMatchNetParam *param, int isMine,
                                         int a3) {
-    return func_ov260_021bd7f0(info->connection, 0x19, 1);
+    return Sc_AddInt(info->connection, 0x19, 1);
 }
 
 static int WifiBattleMatchNet_SetNoRating1B(WifiBattleMatchNetInfo *info, WifiBattleMatchNetParam *param, int isMine,
                                             int a3) {
-    return func_ov260_021bd7f0(info->connection, 0x1b, -1);
+    return Sc_AddInt(info->connection, 0x1b, -1);
 }
 
 static int WifiBattleMatchNet_SetNoRating1C(WifiBattleMatchNetInfo *info, WifiBattleMatchNetParam *param, int isMine,
                                             int a3) {
-    return func_ov260_021bd7f0(info->connection, 0x1c, -1);
+    return Sc_AddInt(info->connection, 0x1c, -1);
 }
 
 static void WifiBattleMatchNet_OnInfoReceived(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1595,7 +1595,7 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
 
     switch (p_wk->state) {
     case 0:
-        err = func_ov260_021beaa0(0xb5f, p_wk->unk0, 0);
+        err = Gdb_Startup(0xb5f, p_wk->unk0, 0);
         if (err != 0) {
             WifiBattleMatchNet_SetGdbError(&p_wk->error, err, 3674);
             WifiBattleMatchNet_EndGdb(p_wk);
@@ -1606,10 +1606,10 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
     case 1:
         GFL_ASSERT(p_wk->table_name_num < WBM_GDB_FIELD_TABLE_MAX);
         if (p_wk->recordIdArg == -1) {
-            err = func_ov260_021bee30(WBM_GDB_TABLE_NAME, p_wk->tableNames, p_wk->table_name_num,
+            err = Gdb_GetMyRecords(WBM_GDB_TABLE_NAME, p_wk->tableNames, p_wk->table_name_num,
                                       WifiBattleMatchNet_OnRecords, p_wk);
         } else {
-            err = func_ov260_021beec0(WBM_GDB_TABLE_NAME, &p_wk->recordIdArg, 1, p_wk->tableNames, p_wk->table_name_num,
+            err = Gdb_GetSpecificRecords(WBM_GDB_TABLE_NAME, &p_wk->recordIdArg, 1, p_wk->tableNames, p_wk->table_name_num,
                                       WifiBattleMatchNet_OnRecords, p_wk);
         }
         if (err != 0) {
@@ -1625,8 +1625,8 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
             WifiBattleMatchNet_SetTimeoutError(&p_wk->error, 1, 3714);
             p_wk->state = 6;
         } else {
-            func_ov260_021becd4();
-            err = func_ov260_021becec();
+            Gdb_Update();
+            err = Gdb_GetState();
             if (err == 0 || err == 4) {
                 WifiBattleMatchNet_SetGdbSubError1(&p_wk->error, err, 3729);
                 p_wk->state = 6;
@@ -1636,7 +1636,7 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 3:
-        err = func_ov260_021bed04();
+        err = Gdb_GetResult();
         if (err == 0) {
             WifiBattleMatchNet_SetGdbSubError2(&p_wk->error, err, 3748);
             p_wk->state = 6;
@@ -1655,7 +1655,7 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
     case 5:
         return 1;
     case 6:
-        err = func_ov260_021beb5c();
+        err = Gdb_Cancel();
         if (err == 0) {
             p_wk->timer = 0;
             p_wk->state = 7;
@@ -1671,8 +1671,8 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
             WifiBattleMatchNet_EndGdb(p_wk);
             return 2;
         }
-        func_ov260_021becd4();
-        err = func_ov260_021becec();
+        Gdb_Update();
+        err = Gdb_GetState();
         if (err == 0 || err == 4) {
             WifiBattleMatchNet_EndGdb(p_wk);
             return 2;
@@ -1688,7 +1688,7 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
 }
 
 static void WifiBattleMatchNet_EndGdb(WifiBattleMatchNet *p_wk) {
-    func_ov260_021bec44();
+    Gdb_Shutdown();
 }
 
 static void WifiBattleMatchNet_BuildProfileRecord(WifiBattleMatchNet *p_wk) {
@@ -1916,7 +1916,7 @@ u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk) {
 
     switch (p_wk->state) {
     case 0:
-        err = func_ov260_021beaa0(0xb5f, p_wk->unk0, 0);
+        err = Gdb_Startup(0xb5f, p_wk->unk0, 0);
         if (err != 0) {
             WifiBattleMatchNet_SetGdbError(&p_wk->error, err, 4556);
             WifiBattleMatchNet_EndGdb(p_wk);
@@ -1926,7 +1926,7 @@ u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk) {
         break;
     case 1:
         GFL_ASSERT(p_wk->table_name_num < WBM_GDB_FIELD_TABLE_MAX);
-        err = func_ov260_021beda0(WBM_GDB_TABLE_NAME, p_wk->p_data->sake_recordID, p_wk->record, p_wk->table_name_num);
+        err = Gdb_UpdateRecord(WBM_GDB_TABLE_NAME, p_wk->p_data->sake_recordID, p_wk->record, p_wk->table_name_num);
         if (err != 0) {
             WifiBattleMatchNet_SetGdbError(&p_wk->error, err, 4569);
             WifiBattleMatchNet_EndGdb(p_wk);
@@ -1940,8 +1940,8 @@ u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk) {
             WifiBattleMatchNet_SetTimeoutError(&p_wk->error, 1, 4582);
             p_wk->state = 6;
         } else {
-            func_ov260_021becd4();
-            err = func_ov260_021becec();
+            Gdb_Update();
+            err = Gdb_GetState();
             if (err == 0 || err == 4) {
                 WifiBattleMatchNet_SetGdbSubError1(&p_wk->error, err, 4593);
                 p_wk->state = 6;
@@ -1951,7 +1951,7 @@ u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 3:
-        err = func_ov260_021bed04();
+        err = Gdb_GetResult();
         if (err == 0) {
             WifiBattleMatchNet_SetGdbSubError2(&p_wk->error, err, 4612);
             p_wk->state = 6;
@@ -1970,7 +1970,7 @@ u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk) {
     case 5:
         return 1;
     case 6:
-        err = func_ov260_021beb5c();
+        err = Gdb_Cancel();
         if (err == 0) {
             p_wk->timer = 0;
             p_wk->state = 7;
@@ -1986,8 +1986,8 @@ u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk) {
             WifiBattleMatchNet_EndGdb(p_wk);
             return 2;
         }
-        func_ov260_021becd4();
-        err = func_ov260_021becec();
+        Gdb_Update();
+        err = Gdb_GetState();
         if (err == 0 || err == 4) {
             WifiBattleMatchNet_EndGdb(p_wk);
             return 2;
@@ -2012,7 +2012,7 @@ u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk) {
 
     switch (p_wk->state) {
     case 0:
-        err = func_ov260_021beaa0(0xb5f, p_wk->unk0, 0);
+        err = Gdb_Startup(0xb5f, p_wk->unk0, 0);
         if (err != 0) {
             WifiBattleMatchNet_SetGdbError(&p_wk->error, err, 4736);
             return 2;
@@ -2020,7 +2020,8 @@ u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk) {
         p_wk->state = 1;
         break;
     case 1:
-        err = func_ov260_021bed10(WBM_GDB_TABLE_NAME, p_wk->record, p_wk->table_name_num, p_wk->p_data);
+        err = Gdb_CreateRecord(WBM_GDB_TABLE_NAME, p_wk->record, p_wk->table_name_num,
+                                   &p_wk->p_data->sake_recordID);
         if (err != 0) {
             WifiBattleMatchNet_SetGdbError(&p_wk->error, err, 4750);
             return 2;
@@ -2033,8 +2034,8 @@ u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk) {
             WifiBattleMatchNet_SetTimeoutError(&p_wk->error, 1, 4762);
             p_wk->state = 4;
         } else {
-            func_ov260_021becd4();
-            err = func_ov260_021becec();
+            Gdb_Update();
+            err = Gdb_GetState();
             if (err == 0 || err == 4) {
                 WifiBattleMatchNet_SetGdbSubError1(&p_wk->error, err, 4774);
                 p_wk->state = 4;
@@ -2044,7 +2045,7 @@ u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 3:
-        err = func_ov260_021bed04();
+        err = Gdb_GetResult();
         if (err == 0) {
             WifiBattleMatchNet_SetGdbSubError2(&p_wk->error, err, 4794);
             p_wk->state = 4;
@@ -2061,7 +2062,7 @@ u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 4:
-        err = func_ov260_021beb5c();
+        err = Gdb_Cancel();
         if (err == 0) {
             p_wk->timer = 0;
             p_wk->state = 5;
@@ -2077,8 +2078,8 @@ u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk) {
             WifiBattleMatchNet_EndGdb(p_wk);
             return 2;
         }
-        func_ov260_021becd4();
-        err = func_ov260_021becec();
+        Gdb_Update();
+        err = Gdb_GetState();
         if (err == 0 || err == 4) {
             WifiBattleMatchNet_EndGdb(p_wk);
             return 2;
@@ -2172,21 +2173,21 @@ void WifiBattleMatchNet_InitDownload(WifiBattleMatchNet *p_wk, s32 profileId) {
 u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
     switch (p_wk->state) {
     case 0:
-        if (!func_ov189_021a5674(WifiBattleMatchNet_OnDownload, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
+        if (!DWC_NdInitAsync(WifiBattleMatchNet_OnDownload, "IRAO", "WX9x7Zh6J3aBC4zQ")) {
             return 3;
         }
         p_wk->downloading = TRUE;
         WifiBattleMatchNet_StartDownloadWait(p_wk, 1);
         break;
     case 1:
-        if (!func_ov189_021a5830("REGCARD_E", p_wk->downloadAttr, "")) {
+        if (!DWC_NdSetAttr("REGCARD_E", p_wk->downloadAttr, "")) {
             WifiBattleMatchNet_StartDownloadEnd(p_wk, 8);
         } else {
             p_wk->state = 2;
         }
         break;
     case 2:
-        if (!func_ov189_021a5850(&p_wk->downloadFile, 0, 1)) {
+        if (!DWC_NdGetFileListAsync(&p_wk->downloadFile, 0, 1)) {
             WifiBattleMatchNet_StartDownloadEnd(p_wk, 8);
         } else {
             WifiBattleMatchNet_StartDownloadWait(p_wk, 3);
@@ -2194,14 +2195,14 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
         break;
     case 3:
         if (!WifiBattleMatchNet_IsAllZero((const u32 *)&p_wk->downloadFile, sizeof(DWCNdFileInfo))) {
-            if (!func_ov189_021a58c8(&p_wk->downloadFile, p_wk->downloadBuffer, sizeof(p_wk->downloadBuffer))) {
+            if (!DWC_NdGetFileAsync(&p_wk->downloadFile, p_wk->downloadBuffer, sizeof(p_wk->downloadBuffer))) {
                 WifiBattleMatchNet_StartDownloadEnd(p_wk, 8);
             } else {
                 sDownload.done = 0;
                 sDownload.code = 0;
                 p_wk->state = 4;
             }
-        } else if (!func_ov189_021a57dc()) {
+        } else if (!DWC_NdCleanupAsync()) {
             p_wk->downloading = FALSE;
             return 2;
         } else {
@@ -2209,13 +2210,13 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 4:
-        func_ov189_021a5768();
+        NdReportResults();
         if (p_wk->timer++ > 7200) {
             func_020424ac(0, 0, 0, 0x3f7);
             WifiBattleMatchNet_StartDownloadCancel(p_wk, 8);
         }
         if (sDownload.done == 0) {
-            if (func_ov189_021a5980(&p_wk->downloadReceived, &p_wk->downloadSize) == 1) {
+            if (DWC_NdGetProgress(&p_wk->downloadReceived, &p_wk->downloadSize) == 1) {
                 u32 percent = p_wk->downloadReceived * 100 / p_wk->downloadSize;
 
                 if (p_wk->downloadPercent != percent) {
@@ -2223,13 +2224,13 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
                 }
             }
         } else if (sDownload.code != 0) {
-            if (sDownload.code == DWC_ND_ERROR_FATAL) {
+            if (sDownload.code == ND_ERROR_FATAL) {
                 GFL_NetErrAbort();
             } else {
                 WifiBattleMatchNet_StartDownloadEnd(p_wk, 8);
             }
         } else {
-            if (!func_ov189_021a57dc()) {
+            if (!DWC_NdCleanupAsync()) {
                 p_wk->downloading = FALSE;
                 return 3;
             }
@@ -2253,13 +2254,13 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
         p_wk->downloading = FALSE;
         return 3;
     case 100:
-        func_ov189_021a5768();
+        NdReportResults();
         if (p_wk->timer++ > 7200) {
             func_020424ac(0, 0, 0, 0x3f7);
             WifiBattleMatchNet_StartDownloadCancel(p_wk, 8);
         }
         if (sDownload.code != 0) {
-            if (sDownload.code == DWC_ND_ERROR_FATAL) {
+            if (sDownload.code == ND_ERROR_FATAL) {
                 GFL_NetErrAbort();
             } else {
                 WifiBattleMatchNet_StartDownloadEnd(p_wk, 8);
@@ -2273,14 +2274,14 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
         }
         break;
     case 200:
-        func_ov189_021a5768();
+        NdReportResults();
         if (sDownload.done2 != 0) {
             sDownload.done2 = 0;
             p_wk->state = p_wk->resumeState;
         }
         break;
     case 300:
-        func_ov189_021a5768();
+        NdReportResults();
         if (sDownload.done != 0) {
             sDownload.done = 0;
             WifiBattleMatchNet_StartDownloadEnd(p_wk, p_wk->resumeState);
@@ -2367,7 +2368,7 @@ static void WifiBattleMatchNet_StartDownloadEnd(WifiBattleMatchNet *p_wk, u32 ne
     sDownload.code = 0;
     p_wk->resumeState = nextState;
     p_wk->state = 200;
-    if (!func_ov189_021a57dc()) {
+    if (!DWC_NdCleanupAsync()) {
         p_wk->resumeState = nextState;
     }
 }
@@ -2377,23 +2378,23 @@ static void WifiBattleMatchNet_StartDownloadCancel(WifiBattleMatchNet *p_wk, u32
     sDownload.code = 0;
     p_wk->resumeState = nextState;
     p_wk->state = 300;
-    if (!func_ov189_021a5938()) {
+    if (!DWC_NdCancelAsync()) {
         p_wk->resumeState = nextState;
     }
 }
 
-static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error) {
+static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error, int serverError) {
     switch (error) {
     case DWC_ND_ERROR_NONE:
     case DWC_ND_ERROR_ALLOC:
     case DWC_ND_ERROR_BUSY:
     case DWC_ND_ERROR_HTTP:
     case DWC_ND_ERROR_BUFFULL:
-    case DWC_ND_ERROR_PARAM:
+    case ND_ERROR_BAD_PARAMETER:
     case DWC_ND_ERROR_DLSERVER:
         break;
     case DWC_ND_ERROR_CANCELED:
-    case DWC_ND_ERROR_FATAL:
+    case ND_ERROR_FATAL:
         GFL_NetErrAbort();
         break;
     }

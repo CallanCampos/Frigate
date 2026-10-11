@@ -705,7 +705,7 @@ static u32 DWCRap_HandleError(void) {
             break;
         case 2:
             if (code <= -40000 && code >= -41999) {
-                func_ov260_021bec44();
+                Gdb_Shutdown();
             }
             if (_dWork != NULL && _dWork->state == DWCRAP_STATE_ERROR) {
                 DWCRap_SetState(DWCRAP_STATE_READY);
@@ -713,11 +713,11 @@ static u32 DWCRap_HandleError(void) {
             break;
         case 4:
             if (code <= -40000 && code >= -41999) {
-                func_ov260_021bec44();
+                Gdb_Shutdown();
             }
             break;
         case 5:
-            func_ov189_021a57dc();
+            DWC_NdCleanupAsync();
             break;
         case 3:
         case 6:

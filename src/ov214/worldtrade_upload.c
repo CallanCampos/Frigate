@@ -625,7 +625,7 @@ static int Upload_SubSeqNameCheckWait(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqUploadStart(WorldTradeWork *wk) {
-    func_ov189_021a779c(&wk->uploadPokemonData, wk->evilCheckSign, sizeof(wk->evilCheckSign));
+    DpwTr_Upload(&wk->uploadPokemonData, wk->evilCheckSign, sizeof(wk->evilCheckSign));
     wk->subprocessSeq = UPLOAD_SEQ_UPLOAD_RESULT;
     wk->timeoutCount = 0;
     Upload_SetSaveNextSequence(wk, UPLOAD_SEQ_UPLOAD_FINISH, UPLOAD_SEQ_UPLOAD_SUCCESS_MESSAGE);
@@ -633,8 +633,8 @@ static int Upload_SubSeqUploadStart(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqUploadResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -687,7 +687,7 @@ static int Upload_SubSeqUploadResult(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqUploadFinish(WorldTradeWork *wk) {
-    func_ov189_021a7854();
+    DpwTr_UploadFinish();
     wk->subprocessSeq = UPLOAD_SEQ_UPLOAD_FINISH_RESULT;
     wk->timeoutCount = 0;
     wk->depositFlag = 1;
@@ -695,8 +695,8 @@ static int Upload_SubSeqUploadFinish(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqUploadFinishResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -728,7 +728,7 @@ static int Upload_SubSeqUploadFinishResult(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqDownloadStart(WorldTradeWork *wk) {
-    func_ov189_021a78e0(&wk->uploadPokemonData);
+    DpwTr_Download(&wk->uploadPokemonData);
     wk->subprocessSeq = UPLOAD_SEQ_DOWNLOAD_RESULT;
     wk->timeoutCount = 0;
     Upload_SetSaveNextSequence(wk, UPLOAD_SEQ_DOWNLOAD_FINISH, UPLOAD_SEQ_DOWNLOAD_SUCCESS_MESSAGE);
@@ -736,8 +736,8 @@ static int Upload_SubSeqDownloadStart(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -790,15 +790,15 @@ static int Upload_SubSeqDownloadResult(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqDownloadFinish(WorldTradeWork *wk) {
-    func_ov189_021a7a5c();
+    DpwTr_ReturnFinish();
     wk->subprocessSeq = UPLOAD_SEQ_DOWNLOAD_FINISH_RESULT;
     wk->timeoutCount = 0;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqDownloadFinishResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -827,7 +827,7 @@ static int Upload_SubSeqDownloadFinishResult(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqExchangeStart(WorldTradeWork *wk) {
-    func_ov189_021a7d4c(wk->downloadPokemonData[wk->touchTrainerPos].id, &wk->uploadPokemonData,
+    DpwTr_Exchange(wk->downloadPokemonData[wk->touchTrainerPos].id, &wk->uploadPokemonData,
                         &wk->exchangePokemonData, wk->evilCheckSign, sizeof(wk->evilCheckSign));
     Upload_SetSaveNextSequence(wk, UPLOAD_SEQ_EXCHANGE_FINISH, UPLOAD_SEQ_EXCHANGE_SUCCESS_MESSAGE);
     wk->subprocessSeq = UPLOAD_SEQ_EXCHANGE_RESULT;
@@ -836,8 +836,8 @@ static int Upload_SubSeqExchangeStart(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqExchangeResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -888,15 +888,15 @@ static int Upload_SubSeqExchangeResult(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqExchangeFinish(WorldTradeWork *wk) {
-    func_ov189_021a7df8();
+    DpwTr_ExchangeFinish();
     wk->subprocessSeq = UPLOAD_SEQ_EXCHANGE_FINISH_RESULT;
     wk->timeoutCount = 0;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqExchangeFinishResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -923,15 +923,15 @@ static int Upload_SubSeqExchangeFinishResult(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqServerTradeCheck(WorldTradeWork *wk) {
-    func_ov189_021a7960(&wk->uploadPokemonData);
+    DpwTr_GetTradeResult(&wk->uploadPokemonData);
     wk->subprocessSeq = UPLOAD_SEQ_SERVER_TRADE_CHECK_RESULT;
     wk->timeoutCount = 0;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -1018,15 +1018,15 @@ static int Upload_SubSeqServerTradeCheckEnd(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqServerDownload(WorldTradeWork *wk) {
-    func_ov189_021a78e0(&wk->uploadPokemonData);
+    DpwTr_Download(&wk->uploadPokemonData);
     wk->subprocessSeq = UPLOAD_SEQ_SERVER_DOWNLOAD_RESULT;
     wk->timeoutCount = 0;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqServerDownloadResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -1139,14 +1139,14 @@ static void Upload_MakeTradeExchangeInfo(WorldTradeWork *wk, PartyPkm *received,
 
 static int Upload_SubSeqCancel(WorldTradeWork *wk) {
     wk->timeoutCount = 0;
-    func_ov189_021a7ad4();
+    DpwTr_Cancel();
     wk->subprocessSeq = UPLOAD_SEQ_CANCEL_WAIT;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqCancelWait(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        switch (func_ov189_021a778c()) {
+    if (DpwTr_IsFinished()) {
+        switch (DpwTr_GetResult()) {
         case -12:
             wk->subprocessSeq = UPLOAD_SEQ_SERVER_SERVICE_END;
             break;
@@ -1166,7 +1166,7 @@ static int Upload_SubSeqCancelWait(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqServerServiceEnd(WorldTradeWork *wk) {
-    func_ov189_021a773c();
+    DpwTr_End();
     WorldTrade_TimeIconDel(wk);
     GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
     wk->subprocessSeq = UPLOAD_SEQ_START;
@@ -1185,15 +1185,15 @@ static int Upload_SubSeqDownloadExStart(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqDownloadExFinish(WorldTradeWork *wk) {
-    func_ov189_021a79e0();
+    DpwTr_DeleteFinish();
     wk->subprocessSeq = UPLOAD_SEQ_DOWNLOAD_EX_FINISH_RESULT;
     wk->timeoutCount = 0;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqDownloadExFinishResult(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -1259,15 +1259,15 @@ static int Upload_SubSeqDownloadExSuccessMessage(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqServerPokeDelete(WorldTradeWork *wk) {
-    func_ov189_021a7a5c();
+    DpwTr_ReturnFinish();
     wk->subprocessSeq = UPLOAD_SEQ_SERVER_POKE_DELETE_WAIT;
     wk->timeoutCount = 0;
     return WT_SEQ_MAIN;
 }
 
 static int Upload_SubSeqServerPokeDeleteWait(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
-        s32 result = func_ov189_021a778c();
+    if (DpwTr_IsFinished()) {
+        s32 result = DpwTr_GetResult();
 
         wk->timeoutCount = 0;
         switch (result) {
@@ -1371,7 +1371,7 @@ static void Upload_PrintError(WorldTradeWork *wk) {
 
 static int Upload_SubSeqErrorMessage(WorldTradeWork *wk) {
     Upload_PrintError(wk);
-    if (func_ov189_021a7750()) {
+    if (DpwTr_IsFinished()) {
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_SERVER_SERVICE_END);
     } else {
         WorldTrade_SetNextSeq(wk, UPLOAD_SEQ_MES_WAIT, UPLOAD_SEQ_CANCEL);
@@ -1382,7 +1382,7 @@ static int Upload_SubSeqErrorMessage(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqErrorEnd(WorldTradeWork *wk) {
-    if (func_ov189_021a7750()) {
+    if (DpwTr_IsFinished()) {
         wk->subprocessSeq = UPLOAD_SEQ_SERVER_SERVICE_END;
     } else {
         wk->subprocessSeq = UPLOAD_SEQ_CANCEL;

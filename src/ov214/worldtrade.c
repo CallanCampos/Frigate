@@ -114,7 +114,7 @@ static BOOL WorldTradeProc_Main(GameProc *proc, u32 *state, void *param, void *w
         func_0205b5ec();
         func_0203e7f8(WorldTrade_WifiLinkLevel());
     }
-    func_ov189_021a6d00();
+    DpwTr_Process();
     wk->procResult = GFL_ProcMgrUpdate(wk->procManager);
     GFL_TCBMgrUpdate(wk->tcbManager);
     WorldTrade_PrintMain(&wk->print);
