@@ -1126,3 +1126,6 @@ src/system/musical_savedata.c:
 src/system/resh_zek_savedata.c:
     complete
     .text       start:0x0200af74 end:0x0200afbc
+
+src/system/trainer_log_savedata.c:
+    .text       start:0x0200afbc end:0x0200b488

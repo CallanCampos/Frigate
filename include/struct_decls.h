@@ -543,6 +543,8 @@ typedef struct TrainerGameInfoSave TrainerCardSave;
 typedef struct TrainerClashSlot TrainerClashSlot;
 typedef struct TimeSigSave TimeSigSave;
 typedef struct TrainerDataSave TrainerDataSave;
+typedef struct TrainerLogEntry TrainerLogEntry;
+typedef struct TrainerLogSave TrainerLogSave;
 typedef struct TrainerGameInfoSave TrainerGameInfoSave;
 typedef struct TrialHouseWork TrialHouseWork;
 typedef struct TrialHouseEventData TrialHouseEventData;

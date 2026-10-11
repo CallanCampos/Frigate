@@ -19,6 +19,7 @@
 #include "save/bag.h"
 #include "save/musical_savedata.h"
 #include "save/save_control.h"
+#include "save/trainer_log.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
 #include "system/vm.h"
@@ -75,7 +76,7 @@ BOOL s0134_CasteliaRushInit(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021afcfc(VM *vm, FieldScriptEnv *env) {
     OSOwnerInfo ownerInfo;
     u16 wordIndex;
-    void *data;
+    TrainerLogSave *data;
     RTCDate *date;
     u32 index;
     u32 article;

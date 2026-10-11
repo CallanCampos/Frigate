@@ -17,6 +17,7 @@
 #include "save/records.h"
 #include "save/save_control.h"
 #include "save/trainer_card.h"
+#include "save/trainer_log.h"
 #include "system/game_data.h"
 #include "system/rtc.h"
 

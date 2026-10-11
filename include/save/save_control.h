@@ -85,14 +85,6 @@ u32 func_0200be50(GameData *gameData, u32 a1, u32 a2, u32 a3, u32 a4, u16 *a5, u
 u32 func_0200c1d0(u8 a0);
 void func_0200c1f0(void);
 void func_0200c200(void);
-void *func_0200afbc(SaveControl *save);
-// The block of func_0200afbc: 30 entries of 0x1c bytes, each starting with a name. The number of entries in use, the
-// entry of a birthday and date, whether an entry is flagged, and an entry
-u32 func_0200afc8(void *data);
-u32 func_0200b05c(void *data, u8 month, u8 day, RTCDate *date);
-BOOL func_0200b014(void *data, u32 index);
-const u16 *func_0200afe4(void *data, u32 index);
-void func_0200b220(void *data);
 
 // Save block 0x45, which swan calls the key data. It keeps the Black Tower's and White Treehollow's progress, and the
 // Trainers there that have been defeated (CheckTrainerAlreadyDefeated)
