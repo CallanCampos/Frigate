@@ -1117,7 +1117,9 @@ src/system/record.c:
     .data       start:0x0209a0bc end:0x0209a164
 
 src/system/mail.c:
+    complete
     .text       start:0x0200965c end:0x02009854
+    .data       start:0x0209a164 end:0x0209a16c
 
 src/system/version.c:
     complete
