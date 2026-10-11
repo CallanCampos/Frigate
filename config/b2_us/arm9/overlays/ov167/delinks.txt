@@ -36,8 +36,10 @@ src/ov167/btl_server_cmd.c:
     .bss        start:0x021db024 end:0x021db044
 
 src/ov167/btl_pokeparam.c:
+    complete
     .text       start:0x021ba584 end:0x021bc6bc
     .data       start:0x021daf7c end:0x021daf8c
+    .bss        start:0x021db070 end:0x021db194
 
 src/ov167/battle_event.c:
     complete

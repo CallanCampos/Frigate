@@ -176,21 +176,24 @@
 . 0x0207ba60 add_reloc load,main,0x0207b9e8,0x50
 . 0x0207e79c add_reloc load,main,0x0207e979
 . 0x0207e92c add_function func_0207e92c:arm:0x8
-. 0x0207e930 add_reloc load,ltd_autoload(0),0x02703cdc
 . 0x0207e930 remove_symbol
+. 0x0207e930 add_reloc load,ltd_autoload(0),0x02703cdc
 . 0x0207e934 add_function MIC_StartAutoSampling:thumb:0x1c
 . 0x0207e950 add_function func_0207e950:arm:0x8
-. 0x0207e954 remove_symbol
 . 0x0207e954 add_reloc load,ltd_autoload(0),0x02703c60
+. 0x0207e954 remove_symbol
 . 0x0207e958 add_function MIC_StopAutoSampling:thumb:0x18
 . 0x0207e970 add_function func_0207e970:arm:0x8
-. 0x0207e974 add_reloc load,ltd_autoload(0),0x02703e90
 . 0x0207e974 remove_symbol
+. 0x0207e974 add_reloc load,ltd_autoload(0),0x02703e90
 . 0x0207e978 add_function func_0207e978:thumb:0xa8
 . 0x0208c224 add_label _dadd
+. 0x0208c554 add_label _dsub
 . 0x0208c908 add_label _dmul
 . 0x0208cc6c add_label _d2f
 . 0x0208cd70 add_label _dflt
+. 0x0208cdb0 add_label _dfltu
+. 0x0208ce84 add_label _dgr
 . 0x0208d2f0 add_label _f2d
 . 0x0208d374 add_label _fflt
 . 0x0208d414 add_label _ll_sdiv
@@ -200,6 +203,7 @@
 . 0x0208d868 add_label _u32_div_f
 . 0x0208da80 add_label _ffixu
 . 0x0208dac0 add_label _dfix
+. 0x0208e798 add_label _ddiv
 . 0x0208f7c8 remove_reloc
 . 0x0208f980 remove_reloc
 . 0x0208fed8 remove_reloc
@@ -1269,6 +1273,7 @@ overlays/ov167 0x021ce664 overlay_id 170
 overlays/ov167 0x021d6ee4 remove_reloc
 overlays/ov167 0x021da9ec remove_reloc
 overlays/ov167 0x021daa0c remove_reloc
+overlays/ov167 0x021db070 add_section src/ov167/btl_pokeparam.c:.bss:0x124
 overlays/ov168 0x021dec6e reloc_module overlay(167)
 overlays/ov168 0x021decee reloc_module overlay(167)
 overlays/ov168 0x021ded42 reloc_module overlay(167)
@@ -2068,11 +2073,11 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
-overlays/ov310 0x021a773c add_data ResearchCommon_Unused
-overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
+overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov311 0x0219d93c reloc_module overlay(139)
 overlays/ov311 0x0219d97c reloc_module overlay(139)
 overlays/ov311 0x0219da74 reloc_module overlay(139)

@@ -63,6 +63,10 @@ Same instructions, registers swapped.
 
 - Register allocation follows the declaration order of locals, so try reordering declarations when registers are
   swapped.
+- An array index kept scaled (`i * 4` in a callee-saved register) across a call, where ours recomputes it, can come from
+  an accessor whose index parameter has another type than the caller's counter. `btl_pokeparam.c`'s
+  `CopyBatonPassParams` and `func_ov167_021bb864` match only with their condition accesses through a static inline
+  `GetConditionPtr(mon, BattleConditionID id)`; the same accessor with a `u32 id`, casts and an enum counter don't.
 - How a store is written can move the parameters' registers too: `*result = *partyResult != 0 ? 3 : 0;` swapped two
   pointer parameters' registers in `scrcmd_fld_battle.c`'s `func_ov036_021aec28`, where the same store as an
   `if`/`else` matched.
@@ -281,6 +285,10 @@ Same code, other `sp` offsets or frame size.
   declaration order (`s16 brightness = data->brightness;` before `target` in `BrightnessData_Step`).
 - A constant store written first reserves its register before the parameters are moved, though the scheduler moves
   the store itself later: `data->active = TRUE;` first in `BrightnessData_Init` keeps the shared 1 in r0.
+- The scheduler moves constant loads (`movs r3, #0`) up ahead of loads and stores written before them, so constants
+  loaded earlier in the original than in ours are assigned later in the C. `p_sta_sub.c`'s `PStaSub_TrackGestures`
+  clears its direction and lap flag after computing the circle's `dx` and `dy`, which puts the clears before the
+  swipe's frame count store and loads the circle's start x and y one at a time, as the original does.
 
 - Block-scoped arrays set both the stack order and where their initializers are copied: infowin.c's
   `InfoWin_VBlankTask` matches only with each table declared in the `if` block that uses it.
@@ -797,7 +805,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `PMSIVWordWin_GetScrollBarLine` has `cmp #0x12; bne next; b zero` from `line = 0` written both as the first arm of
   the inner chain and as the outer `else`.
 - A branch to the very next instruction is left by cross-jumping: two statements that end the same way, such as a
-  store in each case of a switch, share their tail, and the first jumps to it even when it follows.
+  store in each case of a switch, share their tail, and the first jumps to it even when it follows. A call written
+  at the end of both arms of an `if` is merged the same way: `p_sta_sub.c`'s `PStaSub_AnimSwipeX` stores the bounce
+  and calls `PStaSub_SetBounce` in each arm, and the `else` passes the zero left from the vector's initializer; one
+  call after the `if` drops the `b`.
 - MWCC evaluates the operands of `|` in the order they are grouped, so a color built from three computed parts shows
   its grouping: `field_menu.c`'s cursor fade (`func_ov036_021a040c`) computes red, then blue, then green, and only
   matches as `r | ((b << 10) | (g << 5))`, not as `GX_RGB(r, g, b)`.
@@ -956,7 +967,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A random pick in a variable range with no zero check is `u64 value = GFL_RandomMT(); value *= n; value >>= 32;`, as
   `btlv_mcss.c`'s idle task does.
 - Float arithmetic calls MWCC's runtime helpers, such as `_fadd` and `_ffix`, which swan names `__aeabi_*`. When a
-  complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`.
+  complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`, or, when the AEABI
+  name is in use, give it the MWCC name as a second one with `config_fixes.py add-label`, as `_ddiv` and `_dsub` for
+  `btl_pokeparam.c`'s `GetHPRatio`.
 - Float arithmetic on a literal passes the literal first, as in `_fmul(4096.0f, x)` for `x * FX32_ONE`, whatever the
   source order. A constant kept in a local variable, which is reloaded from the literal pool at each use, keeps its
   place in the source instead, so `col * pixels` with `f32 pixels = 96.0f / 18;` passes `col` first. A compound
@@ -1002,7 +1015,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `static GXRgb g_FieldEdgeColorTable[8];`, and the overlay 36 gap function at `0x0219a044`, which copies into a
   12-byte object and then tests one of its bytes, matches the same way only with that object `static`.
 - The file's `.data` objects take part in MWCC's size sort that orders `.rodata`: `btlv_mcss.c`'s 3-byte idle-wait
-  array had to be counted before `rodata_order.py` predicted the layout.
+  array had to be counted before `rodata_order.py` predicted the layout. So do its `.bss` statics: the object's
+  symbol table lists them interleaved with the `.rodata` objects by size, and moving a table moves the statics too.
+  `rodata_order.py` doesn't predict such a file, so `btl_client.c` was solved by compiling variants: each table at
+  file scope or inside its one function, and each static at the top, before its first function or inside it. Its
+  `.rodata` and `.bss` are the original's with four tables inside their functions, `sXItems` and `sCureItems` at
+  file scope before theirs, and `sSelectSeq` declared before the first function that uses it.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM

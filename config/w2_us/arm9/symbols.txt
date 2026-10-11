@@ -7738,6 +7738,7 @@ strcmpi kind:function(arm,size=0xc) addr:0x0208c244
 __aeabi_dadd kind:function(arm,size=0x318) addr:0x0208c250
 _dadd kind:label(arm) addr:0x0208c250
 doubleSub kind:function(arm,size=0x3b4) addr:0x0208c580
+_dsub kind:label(arm) addr:0x0208c580
 __aeabi_dmul kind:function(arm,size=0x364) addr:0x0208c934
 _dmul kind:label(arm) addr:0x0208c934
 __aeabi_d2f kind:function(arm,size=0x104) addr:0x0208cc98
@@ -7745,8 +7746,10 @@ _d2f kind:label(arm) addr:0x0208cc98
 __aeabi_i2d kind:function(arm,size=0x40) addr:0x0208cd9c
 _dflt kind:label(arm) addr:0x0208cd9c
 __aeabi_ui2d kind:function(arm,size=0x3c) addr:0x0208cddc
+_dfltu kind:label(arm) addr:0x0208cddc
 __aeabi_dcmpge kind:function(arm,size=0x98) addr:0x0208ce18
 __aeabi_dcmpgt kind:function(arm,size=0x98) addr:0x0208ceb0
+_dgr kind:label(arm) addr:0x0208ceb0
 __aeabi_dcmple kind:function(arm,size=0xa4) addr:0x0208cf48
 __aeabi_dcmplt kind:function(arm,size=0x9c) addr:0x0208cfec
 __aeabi_dcmpeq kind:function(arm,size=0x8c) addr:0x0208d088
@@ -7786,6 +7789,7 @@ func_0208e130 kind:function(arm,size=0x8) addr:0x0208e15c
 _fsub kind:function(arm,size=0x278) addr:0x0208e170
 _fdiv kind:function(arm,size=0x3b8) addr:0x0208e3f4
 __aeabi_ddiv kind:function(arm,size=0x544) addr:0x0208e7c4
+_ddiv kind:label(arm) addr:0x0208e7c4
 func_0208ecdc kind:function(arm,size=0x4) addr:0x0208ed08
 __register_atexit kind:function(arm,size=0x4c) addr:0x0208ed0c
 __TRK_write_console kind:function(arm,size=0x4) addr:0x0208ed58
