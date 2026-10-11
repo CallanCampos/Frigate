@@ -3,3 +3,8 @@
     .ctor       start:0x021ea740 end:0x021ea740 kind:rodata align:4
     .data       start:0x021ea760 end:0x021ea860 kind:data align:32
     .bss        start:0x021ea860 end:0x021ea860 kind:bss align:32
+
+src/ov076/weather_rain.c:
+    .text       start:0x021e90c0 end:0x021ea674
+    .rodata     start:0x021ea674 end:0x021ea740
+    .data       start:0x021ea760 end:0x021ea860

@@ -227,6 +227,7 @@ void func_ov036_0218add0(void *wfbc);
 void func_ov036_0218ade0(void *wfbc, CityState *city, BOOL isOther, HeapID heapId);
 void FieldSubscreen_ChangeImm(FieldSubscreen *subscreen, u32 mode);
 BOOL FieldTaskManager_IsIdle(FieldTaskManager *taskManager);
+u32 FieldTaskManager_GetActiveTaskCount(FieldTaskManager *taskManager);
 MMSys *Field_GetActorSystem(Field *field);
 FieldCamera *Field_GetCameraSystem(Field *field);
 NoGridMapper *Field_GetNoGridMapper(Field *field);

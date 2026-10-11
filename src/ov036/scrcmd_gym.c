@@ -7,6 +7,7 @@
 #include "field/gym_driftveil_lift.h"
 #include "field/gym_gimmick.h"
 #include "field/gym_icirrus.h"
+#include "field/gym_mistralton.h"
 #include "field/gym_opelucid.h"
 #include "field/gym_virbank.h"
 #include "field/scrcmd_gym.h"
@@ -173,7 +174,7 @@ BOOL func_ov036_021aafa8(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
-    GameEvent *event = func_ov094_021eeef8(gsys, VM_Read16(vm));
+    GameEvent *event = GymMistralton_StartCannon(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return TRUE;

@@ -713,6 +713,10 @@ the original code is linked until they match. The differences are the same in bo
 | `lib/dwc/src/crypt/crypt.c` | `CryptReduce` | `0x021ab7e4` / `0x021ab824` | size 0x278/0x274; register allocation and the shape of the loops: the original is the compiler's output for a bignum library whose C we only approximate (the same word loops are `asm` functions that match). |
 | `lib/dwc/src/crypt/crypt.c` | `ReadAsn1` | `0x021a9240` / `0x021a9280` | size 0xbc/0xb8; register allocation and the shape of the loops: the original is the compiler's output for a bignum library whose C we only approximate (the same word loops are `asm` functions that match). |
 | `lib/dwc/src/crypt/crypt.c` | `ExtractDigest` | `0x021a9548` / `0x021a9588` | size 0x110/0x10c; register allocation and the shape of the loops: the original is the compiler's output for a bignum library whose C we only approximate (the same word loops are `asm` functions that match). |
+| `src/ov076/weather_rain.c` | `GustDriven_Move` | `0x021e9e50` / `0x021e9e90` | 4 bytes long (0xbe against 0xba): the original saves `r7`, keeps `pos` in the pushed slot and loads `speedX` before `data->x`. Tried `dx`/`dy` locals, a `windX` local, a combined `+=` and the field-wise forms. |
+| `src/ov094/gym_mistralton.c` | `Mistralton_SetStage` | `0x021ef198` / `0x021ef1d8` | 10 bytes, same size: in stage 2 the original stores the count before `frames = 0` and sets the actor after the hide call's arguments. Tried every order of the four statements. |
+| `src/ov094/gym_mistralton.c` | `MistraltonBobTask_Run` | `0x021ef098` / `0x021ef0d8` | 16 bytes, same size: the original has `frame` in `r6` and `period` in `r7`; the stack slots match. Tried 48 declaration orders. |
+| `src/ov094/gym_mistralton.c` | `Mistralton_LoadScene` | `0x021efdb8` / `0x021efdf8` | 8 bytes long (0x334 against 0x32c): the zero registers and the `i`/`j` counters sit in other registers (`r7`/`r4` in the original); the array copies are in place. Tried 120 declaration orders and `u8 i = 0, j = 0`. |
 
 ## Matching, but not linkable as is
 
@@ -731,6 +735,10 @@ the original code is linked until they match. The differences are the same in bo
   linked complete they fail the module check: the literal pool of `dsprot_cipher_multi.c`'s still-delinked code at
   `0x02180270` / `0x021802b0`, words of a code address plus 0x2200, then resolves to 0x2200 plus small offsets. They
   stay incomplete until those address-plus-0x2200 references link.
+
+- `src/ov094/gym_mistralton.c`'s `.rodata` is the right size (0x15c4) but 32 bytes differ: equal-size 4- and 16-byte
+  objects tie in another order than the original's, and no declaration order found (by `rodata_order.py`, over the
+  animation lists, the local initializers and the 4-byte `sEndFrames` at `0x021f0234` / `0x021f0274`) gives it.
 
 ## Keeping this list current
 
