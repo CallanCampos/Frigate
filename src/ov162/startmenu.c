@@ -35,6 +35,7 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/os.h"
+#include "save/c_gear_savedata.h"
 #include "save/dream_world.h"
 #include "save/event_work.h"
 #include "save/join_avenue.h"
@@ -164,7 +165,7 @@ typedef struct {
     SaveControl *save;
     PlayerInfo *playerInfo;
     TrainerGameInfoSave *gameInfo;
-    void *unkC;
+    CGearSettings *unkC;
     EventWork *eventWork;
     KeyInfoSave *keyInfo;
     TCB *vblankTask;

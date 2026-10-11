@@ -194,6 +194,8 @@ typedef struct CalcHitResult CalcHitResult;
 typedef struct CalcSphere CalcSphere;
 typedef struct CameraSystem CameraSystem;
 typedef struct CasteliaRush CasteliaRush;
+typedef struct CGearSave CGearSave;
+typedef struct CGearSettings CGearSettings;
 typedef struct CGearShutdownData CGearShutdownData;
 typedef struct ChatotEventWork ChatotEventWork;
 typedef struct CircleGraph CircleGraph;

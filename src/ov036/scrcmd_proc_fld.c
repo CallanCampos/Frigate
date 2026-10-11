@@ -21,6 +21,7 @@
 #include "field/zone.h"
 #include "gfl/heap.h"
 #include "save/box.h"
+#include "save/c_gear_savedata.h"
 #include "save/pokedex.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
@@ -168,7 +169,7 @@ BOOL s0156_CallGameClear(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL s0197_CGearPowerOn(VM *vm, FieldScriptEnv *env) {
-    void *cgear = func_02009918(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
+    CGearSettings *cgear = func_02009918(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     u16 bootComm = ScriptReadAny(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);

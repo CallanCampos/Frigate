@@ -42,6 +42,8 @@ void func_02007324(SaveControl *save);
 TrainerGameInfoSave *getTrainerGameInfoAddress(SaveControl *save);
 u16 func_0200c96c(TrainerGameInfoSave *info);
 void func_0200c974(TrainerGameInfoSave *info, u32 value);
+// The name at the end of the C-Gear block, its init and its getter
+void func_020114a8(u16 *name);
 void *func_020114f0(SaveControl *save);
 const u16 *func_0200c93c(TrainerGameInfoSave *info);
 void func_0200c940(TrainerGameInfoSave *info, StrBuf *name);
@@ -266,15 +268,6 @@ DreamRadarSave *GetDreamRadarSaveBlock(SaveControl *save);
 JoinAvenueSave *SaveControl_GetJoinAvenue(SaveControl *save);
 EventWork *getConstDataBlock(SaveControl *save);
 PokeDexSave *getPokedexSaveAddress(SaveControl *save);
-// A byte of this block, at 7, tells the start menu whether to ask about the C-Gear
-void *func_02009918(SaveControl *save);
-// Mark the downloaded C-Gear skin as there, and keep its CRC
-void func_020098cc(void *block, u8 valid);
-void func_020098d4(void *block, u16 crc);
-void func_020098bc(void *cgear, u8 value);
-// The same block, from the game data
-void *func_02009924(GameData *gameData);
-u8 func_020098c0(void *a0);
 PokeParty *SaveControl_GetPokePartySave(SaveControl *save);
 WorldTradeData *SaveControl_GetWorldTradeData(SaveControl *save);
 DreamWorldSave *getDreamWorldStuffAddress(SaveControl *save);

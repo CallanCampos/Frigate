@@ -1119,9 +1119,14 @@ src/system/record.c:
 src/system/mail.c:
     complete
     .text       start:0x0200965c end:0x02009854
-    .data       start:0x0209a1a4 end:0x0209a1ac
+src/system/c_gear_savedata.c:
+    complete
+    .text       start:0x02009854 end:0x02009930
 
 src/system/version.c:
     complete
     .text       start:0x02015878 end:0x0201587c
     .rodata     start:0x0208ffa8 end:0x0208ffb0
+
+    .data       start:0x0209a1a4 end:0x0209a1ac
+

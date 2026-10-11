@@ -32,6 +32,7 @@
 #include "pml/poke_party.h"
 #include "save/adventure.h"
 #include "save/box.h"
+#include "save/c_gear_savedata.h"
 #include "save/dream_world.h"
 #include "save/join_avenue.h"
 #include "save/medal_box.h"
