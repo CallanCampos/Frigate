@@ -9,6 +9,10 @@
 // The first process of the game: the boot screens, the Game Freak logo, the opening and the title screen, over and
 // over. The file's name is a guess, from what it does: the ROM has no string for it
 
+// The demos of overlay 264
+#define CDEMO_GF_LOGO 0
+#define CDEMO_OPENING 2
+
 static BOOL StartMenuEventInit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL StartMenuEventTick(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL StartMenuEventEnd(GameProc *proc, u32 *state, void *param, void *work);
