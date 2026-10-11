@@ -58,3 +58,23 @@ lib/dsprot/src/dsprot_stub_check.c:
     complete
     .text       start:0x021a33fc end:0x021a37b0
     .ctor       start:0x021a4ccc end:0x021a4cd0
+
+lib/dsprot/src/dsprot_decrypt.c:
+    complete
+    .text       start:0x021a37b0 end:0x021a3ab0
+    .rodata     start:0x021a4c9c end:0x021a4ca4
+    .ctor       start:0x021a4cd0 end:0x021a4cd4
+    .bss        start:0x021a4d44 end:0x021a4d60
+
+lib/dsprot/src/dsprot_detect.c:
+    .text       start:0x021a3ab0 end:0x021a4484
+    .rodata     start:0x021a4ca4 end:0x021a4cac
+    .ctor       start:0x021a4cd4 end:0x021a4cd8
+
+lib/dsprot/src/dsprot_cipher_entry.c:
+    .rodata     start:0x021a4cac end:0x021a4cb4
+
+lib/dsprot/src/dsprot_cipher.c:
+    .text       start:0x021a4484 end:0x021a49dc
+    .rodata     start:0x021a4cb4 end:0x021a4cc8
+    .ctor       start:0x021a4cd8 end:0x021a4cdc

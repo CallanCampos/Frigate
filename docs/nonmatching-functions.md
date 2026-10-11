@@ -629,6 +629,10 @@ the original code is linked until they match. The differences are the same in bo
 | `src/ov029/dwc_rap_vchat.c` | `AcceptVoice` | `0x02192464` / `0x021924a4` | 41 bytes, same size. The original keeps the work pointer and offset in r4 and r6 and reloads requestSession between VCT_Respond and VCT_AttachSession; ours caches it. |
 | `src/ov029/dwc_rap_vchat.c` | `ManualCallback` | `0x021924a8` / `0x021924e8` | 2 bytes, same size. Only the call to VCT_AttachSession, a bl in ours where the ROM has the linker's blx; it should match once linked. |
 | `src/ov029/dwc_rap_vchat.c` | `DWCRapVChat_Start` | `0x0219270c` / `0x0219274c` | +4 bytes (0x1c4 against the original's 0x1c0). The work pointer and byte count are in swapped registers, and the micParam stores take 4 bytes more. |
+| `lib/dsprot/src/dsprot_detect.c` | `DSProt_CheckFlashcart` | `0x021a3c0c` / `0x021a3c4c` | 0x6c4 against the original's 0x6ac: the original builds the card registers' base from `1 << 26` inside each of the three inlined card reads. A base pointer local made it larger (0x6fc). |
+| `lib/dsprot/src/dsprot_cipher.c` | `DSProt_Rc4Init` | `0x021a44c0` / `0x021a4500` | 0x88 against the original's 0x8c: registers and statement order. Tried declaration orders and loop shapes. |
+| `lib/dsprot/src/dsprot_cipher.c` | `DSProt_EncryptCode` | `0x021a45a4` / `0x021a45e4` | Same size, registers only: the original has the sum in `r5` and `i` in `r4`. |
+| `lib/dsprot/src/dsprot_cipher.c` | `DSProt_DecryptCode` | `0x021a46ec` / `0x021a472c` | 0x1c0 against the original's 0x1b4: the original spills `src`, `size` and the running sum to the stack, so it keeps more values live than ours. |
 
 ## Matching, but not linkable as is
 
