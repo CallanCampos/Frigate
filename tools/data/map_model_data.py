@@ -22,6 +22,7 @@ import tempfile
 from pathlib import Path
 
 from narc import read_narc, write_narc
+from map_texture_data import read_png, resources
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -110,6 +111,16 @@ def write_glb(path, doc, binary):
             + struct.pack("<II", len(encoded), GLB_JSON) + encoded
             + struct.pack("<II", len(binary), GLB_BIN) + binary)
     path.write_bytes(data)
+
+
+def canonical_texture_name(filename, names):
+    stem = Path(filename).stem
+    if stem in names:
+        return filename
+    matches = [name for name in names if name.replace(".", "_") == stem]
+    if len(matches) != 1:
+        raise ValueError(f"cannot identify Nitro texture for {filename}")
+    return matches[0] + ".png"
 
 
 def prop_section(chunk):
@@ -691,6 +702,8 @@ def export(apicula, output):
     for entry in models(ROOT / "data/map_models"):
         chunk_id, name, texture_id = entry["chunk"], entry["name"], entry["texture_set"]
         nitro = model_bytes(archive[chunk_id])
+        texture_names = ({item["name"]: item for item in resources(textures[texture_id])[0]}
+                         if texture_id is not None else {})
         model_dir = output / f"{chunk_id:04d}"
         model_dir.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory() as temporary:
@@ -710,9 +723,12 @@ def export(apicula, output):
                         raise ValueError(f"{chunk_id}: unexpected texture without a texture set")
                     texture_dir = texture_root / f"{texture_id:03d}"
                     texture_dir.mkdir(parents=True, exist_ok=True)
-                    target = texture_dir / path.name
+                    canonical = canonical_texture_name(path.name, texture_names)
+                    target = texture_dir / canonical
                     if target.exists():
-                        if target.read_bytes() != path.read_bytes():
+                        texture = texture_names[Path(canonical).stem]
+                        if read_png(target, texture["width"], texture["height"]) != read_png(
+                                path, texture["width"], texture["height"]):
                             raise ValueError(f"{chunk_id}: {target} differs across models")
                     else:
                         shutil.copyfile(path, target)
@@ -723,7 +739,8 @@ def export(apicula, output):
         if texture_id is not None:
             for picture in document.get("images", []):
                 if "uri" in picture:
-                    picture["uri"] = f"../../map_texture_sets/{texture_id:03d}/{picture['uri']}"
+                    canonical = canonical_texture_name(picture["uri"], texture_names)
+                    picture["uri"] = f"../../map_texture_sets/{texture_id:03d}/{canonical}"
         add_prop_nodes(document, archive[chunk_id])
         write_glb(model_dir / "model.glb", document, (model_dir / "model.bin").read_bytes())
         (model_dir / "model.gltf").unlink()

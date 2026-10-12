@@ -542,7 +542,8 @@ This is closer to [pokeemerald's per-map directories](https://github.com/pret/po
 than to [pokeplatinum's numbered binary map data](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/data).
 Like [pokeplatinum's separate texture sets](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/texture_sets),
 shared texture resources belong in separate directories. `data/map_texture_sets/<set>/` holds editable color PNGs
-for all 409 texture sets. Each set's `nitro.json` records the original resource hash and palette association for the
+for all 409 texture sets. GLB image paths point to these same PNGs, including resource names containing dots.
+Each set's `nitro.json` records the original resource hash and palette association for the
 packer; it is build metadata, not a color source. Edit the PNG in Blender or an image editor. The build packs it back
 into `a/0/1/4` and checks the original archive against both ROMs. PNGs must be 8-bit RGB or RGBA and retain their
 dimensions. Nitro supports limited colors and alpha precision, so the packer quantizes edited colors to RGB555 and
@@ -588,8 +589,8 @@ quantized to the DS's five-bit channels. Texture bindings and other Nitro materi
 resource data.
 Some Nitro commands reuse a previous vertex axis or encode a small relative difference; edits outside those ranges
 fail with an error. Topology and collision still come from the extracted ROM. These
-need their own source and packing support before map graphics are fully editable. Some texture previews referenced by
-glTF models are embedded in a model rather than in the shared texture archive; those still need a model texture packer.
+need their own source and packing support before map graphics are fully editable. Every map model contains only an
+`MDL0` block; its textures come from the shared texture archive.
 
 ## Map matrices, areas and lights
 
