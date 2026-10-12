@@ -305,7 +305,7 @@ from:0x021fcd62 kind:thumb_call to:0x02040664 module:main
 from:0x021fcd70 kind:thumb_call to:0x02042788 module:main
 from:0x021fcd78 kind:thumb_call to:0x02042e84 module:main
 from:0x021fcec0 kind:thumb_call to:0x0203a988 module:main
-from:0x021fcef0 kind:load to:0x0219e990 module:overlays(305,311,323)
+from:0x021fcef0 kind:load to:0x0219e990 module:overlay(305)
 from:0x021fcef8 kind:load to:0x021d7448 module:overlays(36,167,255)
 from:0x021fcefc kind:load to:0x021d6ce0 module:overlays(36,167)
 from:0x021fcf08 kind:thumb_call to:0x020120dc module:main

@@ -72,7 +72,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         } else {
             battle->players->unk44 = 3;
         }
-        QueueGameProc(procWork->manager, OVERLAY_ID(305), &data_ov305_0219e990, battle->players);
+        QueueGameProc(procWork->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
         *state = 1;
         break;
     case 1:
@@ -217,7 +217,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
             *state = 16;
             break;
         }
-        QueueGameProc(procWork->manager, OVERLAY_ID(305), &data_ov305_0219e990, battle->players);
+        QueueGameProc(procWork->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
         *state = 14;
         break;
     case 14:
