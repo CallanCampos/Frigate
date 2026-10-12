@@ -194,6 +194,12 @@ Same instructions, registers swapped.
   stays in the call's `r0` through its narrowing, and the loop counter's zero takes `r1`; the single expression
   `entry = BmpWin_GetCharPos(win) | (15 << 12);` moves it to `r1` and the zero to `r0`
   (`chihou_zukan_award.c`'s `ChihouZukanAward_InitBackdrop`).
+- An integer `+` of a local and a temporary puts the local first whatever the source order, and a pointer `+` puts
+  the pointer first. `adds r1, r7, r1` with the size in `r7` and the running address in `r1` is therefore integer
+  arithmetic on the address: `musical_system.c`'s `MusicalSystem_LoadProgramData` sets its second and third sound
+  pointers with `(void *)((u32)work->sound[0] + size0)` and `(void *)((u32)work->sound[0] + size0 + size1)`, the
+  second reusing the first's sum, as `btlv_gauge.c` writes its offsets. `(u8 *)work->sound[1] + size1` gives
+  `adds r1, r1, r7`.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -320,6 +326,11 @@ Same code, other `sp` offsets or frame size.
   register is loaded. When the original loads a member's offset into `r6` or `r7` early and indexes from it, the
   source had such a pointer: the bag's `ItemMenuDisp_DrawQuantity`, `ItemMenuDisp_ShowMessage` and
   `ItemMenuDisp_DrawTMInfo` only match with one, and it also stopped MWCC from holding a zero for the stack arguments.
+- A pointer local to a struct field whose offset is beyond the store's immediate range is kept as the base register
+  plus the offset in a stack slot, and the store through it is `str r6, [r5, r0]`. The slot is written at entry from
+  another offset the function already holds (`adds r0, r4, #0; str r0, [sp, #0x18]; adds r0, #0xc; str r0, [sp, #0x18]`).
+  `psel.c`'s `PselText_PrintType` declares `BOOL *done = &wk->winDone[2];` right after `BmpWin *win = wk->win[2];` and
+  ends with `*done = FALSE;`; the plain `wk->winDone[2] = FALSE;` rebuilds the constant and has no slot, 8 bytes shorter.
 
 ## Instruction order
 
@@ -514,6 +525,13 @@ Same instructions, scheduled in another order.
   ldr r0, [sp, #0x18]; ldr r2, =SHINKA_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
   needs `CheckEvolveSpecies` to return `u16`, or the call's result is narrowed. It is not aliasing: taking the
   local's address, moving it into a local struct or retyping the pointee's fields leaves the `u32` hoist in place.
+- One constant register feeds a stack argument and a register argument of the same value, so an extra `mov` into
+  an argument register beside an equal constant is a wrong argument, not scheduling: `th_award.c`'s
+  `ThAward_InitRankIcons` loads file 1, and with file 0 it had one `mov r1, r6` too many at the same size.
+- A variable reused by a second block of the same shape changes how that block's arguments are scheduled, with the
+  registers unchanged: `ThAward_InitText` measures its points text into a `pointsWidth` of its own, which lets the
+  width's reload move above the stack argument's store, where reusing `kindWidth` kept it below. In the same
+  function two address locals set in one branch are spilled in statement order (`record` before `name`).
 
 ## An instruction too many or too few
 
@@ -977,6 +995,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A ternary, an `if`/`else` on the value alone and an inline abs all give other code.
 - A call left unmerged in one arm while both arms jump to one store means the store is written at the end of both
   arms, not once after the `if` (`PkwdSelectScreen_PrintMovie`).
+- Two calls to one function in the two arms of an `if`/`else` are merged into one `bl` in every plain spelling
+  (ternary argument, nested `if`, locals, `break`s). They stay apart when one arm's `bl` is already the join of an
+  inner `if`/`else` and the code after it is written in both outer arms: the label on that `bl` stops the merge.
+  `config_panel.c`'s `ConfigPanelAppBar_Main` plays its sound with an inner
+  `if (button == BUTTON_QUIT) { cancel } else { decide }` and has `update = TRUE; appBar->decided = TRUE;` at the end
+  of both arms of the outer `if`, and likewise `AppTaskMenuWin_SetActive(wins[button ^ 1], FALSE)` at the end of
+  both arms of `if (appBar->decided)`, which gives the `1` a register shared with the arm's `TRUE`.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
