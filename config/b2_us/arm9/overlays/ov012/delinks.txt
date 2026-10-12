@@ -236,6 +236,7 @@ src/ov012/scrcmd_unity_tower.c:
     .text       start:0x02160b80 end:0x02160dc8
 
 src/ov012/building_enter_effect.c:
+    complete
     .text       start:0x02160dc8 end:0x02160eb4
     .data       start:0x0216e2e0 end:0x0216e2e4
     .bss        start:0x0216e644 end:0x0216e660
