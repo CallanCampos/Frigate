@@ -1,0 +1,21 @@
+# The Global Data Server client (poke_net), at the end of overlay 201 after the game's gds_rap.c. It is ARM code,
+# unlike the game's code beside it (Thumb), and reaches each of its statics through a literal of its own, so it was
+# compiled apart from the game: with the same compiler and flags as NitroSDK (dsi/1.1p1, -O4,p), like dpw
+compiler = "dsi/1.1p1"
+flags = [
+    "-O4,p",               # Optimize for speed
+    "-proc arm946e",       # ARM9 processor
+    "-nothumb",            # ARM code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char signed",        # char is signed
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]

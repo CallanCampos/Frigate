@@ -16,7 +16,7 @@
 // A movie's best result, which the save keeps for each movie
 typedef struct {
     s32 score;
-    // func_02021204 of each Pokémon of the cast: its species, form and sex
+    // PokeIcon_PackSpecies of each Pokémon of the cast: its species, form and sex
     u16 cast[6];
     // Set once the movie has a record, and whether that record was beaten and func_0201117c has not seen it yet
     u8 hasRecord;

@@ -1609,8 +1609,8 @@ static void ZukanDetailForm_Turn(ZukanDetailFormParam *param, ZukanDetailFormWor
 static void ZukanDetailForm_LoadIconResources(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,
                                               ZukanDetailCommon *common) {
     wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, param->heapId);
-    wk->iconPalette = func_0204bc48(wk->iconArc, func_02021114(), CLACT_VRAM_SUB, 0, param->heapId);
-    wk->iconCellAnims = func_0204bde0(wk->iconArc, func_02021154(), getOBJTileMapping_SubEng(), param->heapId);
+    wk->iconPalette = func_0204bc48(wk->iconArc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, param->heapId);
+    wk->iconCellAnims = func_0204bde0(wk->iconArc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
 }
 
 static void ZukanDetailForm_FreeIconResources(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,
@@ -1633,7 +1633,7 @@ static ClActor *ZukanDetailForm_CreateIcon(ArcTool *arc, u32 *chars, u32 palette
     *chars = func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
     actor = func_0204c040(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
     func_0204c520(actor, FALSE);
-    func_0204c378(actor, func_02021034(species, form, sex, egg), 0);
+    func_0204c378(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     func_0204c318(actor, 0);
     return actor;
 }

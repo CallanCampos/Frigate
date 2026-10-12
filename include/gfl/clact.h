@@ -221,8 +221,4 @@ void func_0204c5b0(ClActor *actor, const ClActorCallback *callback);
 void func_0204c5bc(ClActor *actor);
 void func_0204c5c8(ClActor *actor, BOOL a1);
 
-// Loads a texture of a model file, width by height tiles, into the actor's characters and palette
-void func_020164e8(ClActor *actor, u32 arcId, u16 fileId, u8 texture, u16 width, u16 height, u32 a6, u32 a7,
-                   HeapID heapId);
-
 #endif // POKEBW2_GFL_CLACT_H

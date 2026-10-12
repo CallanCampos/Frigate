@@ -65,7 +65,7 @@ void func_ov062_021e61e8(PokewoodSystem *sys, GameData *gameData, PokeListParam 
     PokewoodMovie *movie;
 
     PokeListParam_Setup(param, gameData, 0x16, GameData_GetParty(gameData));
-    func_0201f744(POKEWOOD_REGULATION, &sys->regulation);
+    PokeRegulation_Load(POKEWOOD_REGULATION, &sys->regulation);
     movie = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_MOVIE, sys->movie, HEAPID_GAMEEVENT);
     sys->regulation.unk2 = movie->castCount;
     sys->regulation.unk3 = movie->castCount;
@@ -236,8 +236,8 @@ void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32
         pkm = PokeParty_GetPkm(party, i);
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
-        record.cast[i] = func_02021204(species, form, PokeParty_GetParam(pkm, 0x6e, NULL));
-        if (func_0201f010(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL)) >= 2) {
+        record.cast[i] = PokeIcon_PackSpecies(species, form, PokeParty_GetParam(pkm, 0x6e, NULL));
+        if (PML_GetPokestarFameLevel(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL)) >= 2) {
             record.famousCast |= (u8)(1 << i);
         }
     }

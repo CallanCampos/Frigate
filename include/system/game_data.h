@@ -59,8 +59,10 @@ void GameData_UpdateTime(GameData *gameData, u32 seconds);
 // The levels that unlock the pass powers, which func_0200c5dc and func_0200c5e0 read
 void *func_02017208(GameData *gameData);
 u16 func_02017220(GameData *gameData);
+// The C-Gear power request, which GameData_SaveCGearPowerRequest puts aside
+u8 func_02017404(GameData *gameData);
 void func_0201740c(GameData *gameData, u8 value);
-// The item the field menu last had selected, which func_0201740c sets
+// A byte of the game data, which func_020173f8 sets
 u8 func_020173ec(GameData *gameData);
 // Save block 0x39, the Battle Subway's scores
 BSubwayScoreData *func_0201795c(GameData *gameData);
@@ -82,7 +84,6 @@ void *getTimeSigSaveBlock(GameData *gameData);
 PlayerState *func_020171e8(GameData *gameData, s32 index);
 PokeDexSave *GameData_GetPokedex(GameData *gameData);
 PalPadFriendList *func_02017980(GameData *gameData);
-void *getChatterDataAddress(GameData *gameData);
 // Whether the key item is registered to Y, and registers it or not
 BOOL GameData_IsShortcutRegistered(GameData *gameData, u32 item);
 void GameData_SetKeyItemRegistration(GameData *gameData, u32 item, BOOL registered);
@@ -128,6 +129,8 @@ u32 GameData_GetLastBtlResult(GameData *gameData);
 void GameData_SetLensFlareRequested(GameData *gameData, BOOL requested);
 // Whether a Funfest mission is running, which plays its BGM everywhere (a guess from that use)
 BOOL func_02017b34(GameData *gameData);
+// Sets whether a Funfest mission is running
+void func_02017b40(GameData *gameData, BOOL flag);
 u32 GameData_GetLensFlareEntryIdx(GameData *gameData);
 void func_020173f8(GameData *gameData, u8 value);
 void GameData_SetLensFlareEntryIdx(GameData *gameData, u32 index);
@@ -136,6 +139,7 @@ ZoneSpawnInfo *GetGameDataNowSpawnZone(GameData *gameData);
 PlayerInfo *GetGameDataPlayerInfo(GameData *gameData);
 MapMatrix *GetMapMatrixSystem(GameData *gameData);
 ZoneSpawnInfo *GetOutboundWarpRememberSpawnInfo(GameData *gameData);
+void SetGameDataOutboundWarpRememberInfo(GameData *gameData, ZoneSpawnInfo *spawn);
 u16 GetReturnLocationIdx(GameData *gameData);
 void SetCurrentTeleportOrDeathZone(GameData *gameData, u16 respawnLocation);
 void SetGameDataNowSpawnZone(GameData *gameData, ZoneSpawnInfo *spawn);
@@ -181,6 +185,23 @@ TrialHouseWork **GetTrialHouseWkPPtr(GameData *gameData);
 FieldFollowWk *GetFieldFollowerCfg(GameData *gameData);
 void GameData_ResetSkipFrame(GameData *gameData);
 void GameData_Set30FPSMode(GameData *gameData, BOOL enable);
+u8 GameData_Is30FPSSkipFrame(GameData *gameData);
+BOOL GameData_Is30FPSMode(GameData *gameData);
+u32 getCurrentStepTotal(GameData *gameData);
+void setCurrentStepTotal(GameData *gameData, u32 stepTotal);
+// A byte of the game data, which overlay 169 uses
+void func_020174bc(GameData *gameData, u8 value);
+u8 func_020174c8(GameData *gameData);
+// Sets the option that func_02017614 returns
+void func_0201762c(GameData *gameData, BOOL flag);
+// Save block 0x40
+void *func_020179c8(GameData *gameData);
+// Draws three different values of fifteen at random, and whether a value is one of the three
+void func_02017a78(GameData *gameData);
+BOOL func_02017af0(GameData *gameData, u32 value);
+// A byte of the game data, 0xff at first, which overlay 145 uses
+void func_02017b4c(GameData *gameData, u8 value);
+u8 func_02017b58(GameData *gameData);
 u8 func_02017b70(GameData *gameData);
 CityState *func_0201722c(GameData *gameData, u32 index);
 

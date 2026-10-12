@@ -853,7 +853,7 @@ static void UnionOneself_FreeBoxParty(PokeParty *party) {
 }
 
 static void UnionOneself_SetRegulation(UnionSystem *unisys, u32 activity) {
-    func_0201f744(UnionOneself_GetRegulationFile(activity), unisys->alloc.regulation);
+    PokeRegulation_Load(UnionOneself_GetRegulationFile(activity), unisys->alloc.regulation);
     if (UnionOneself_IsDoubleActivity(activity) == TRUE) {
         Regulation_SetParam(unisys->alloc.regulation, 13, 1);
     } else {
@@ -863,7 +863,7 @@ static void UnionOneself_SetRegulation(UnionSystem *unisys, u32 activity) {
 
 static u32 UnionOneself_CheckPartyRegulation(UnionSystem *unisys, u32 *result) {
     *result = 0;
-    return func_0201f424(unisys->alloc.regulation, GameData_GetParty(unisys->param->gameData), result);
+    return PokeRegulation_CheckParty(unisys->alloc.regulation, GameData_GetParty(unisys->param->gameData), result);
 }
 
 static u32 UnionOneself_CheckBoxRegulation(UnionSystem *unisys, u32 *result) {
@@ -872,7 +872,7 @@ static u32 UnionOneself_CheckBoxRegulation(UnionSystem *unisys, u32 *result) {
 
     *result = 0;
     if (party != NULL) {
-        ret = func_0201f424(unisys->alloc.regulation, party, result);
+        ret = PokeRegulation_CheckParty(unisys->alloc.regulation, party, result);
         UnionOneself_FreeBoxParty(party);
     } else {
         *result = -1;
@@ -3019,7 +3019,7 @@ static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, 
             break;
         }
         }
-        func_0201f63c(unisys->alloc.regulation, clsys->party[netId]);
+        PokeRegulation_ApplyLevelToParty(unisys->alloc.regulation, clsys->party[netId]);
         (*seq)++;
         break;
     case 1:

@@ -159,10 +159,10 @@ void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
         break;
     }
 
-    func_020186b0(wk->btlSetup, 1);
-    func_02017d30(wk->btlSetup, wk->club->regulation, HEAPID_GAMEEVENT);
-    func_0201f63c(wk->club->regulation, wk->club->parties[0]);
-    func_0201f63c(wk->club->regulation, wk->club->parties[1]);
+    BtlSetup_AllocRecBuffer(wk->btlSetup, 1);
+    BtlSetup_ApplyRegulation(wk->btlSetup, wk->club->regulation, HEAPID_GAMEEVENT);
+    PokeRegulation_ApplyLevelToParty(wk->club->regulation, wk->club->parties[0]);
+    PokeRegulation_ApplyLevelToParty(wk->club->regulation, wk->club->parties[1]);
     wk->btlSetup->records = GameData_GetRecords(GSYS_GetGameData(wk->gsys));
 }
 
@@ -186,7 +186,7 @@ void EventWifiClub_SetupBattleSelect(EventWifiClub *wk, GameData *gameData, u32 
 }
 
 void EventWifiClub_SetBattleParty(EventWifiClub *wk, GameData *gameData, u32 unused) {
-    func_02017cfc(wk->btlSetup, wk->party, 0);
+    BtlSetup_SetParty(wk->btlSetup, wk->party, 0);
 }
 
 // Resets the volume before logging in again

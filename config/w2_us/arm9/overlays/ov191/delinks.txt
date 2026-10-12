@@ -3,3 +3,15 @@
     .ctor       start:0x021b7354 end:0x021b7354 kind:rodata align:4
     .data       start:0x021b7360 end:0x021b73c0 kind:data align:32
     .bss        start:0x021b73c0 end:0x021b73c0 kind:bss align:32
+
+src/ov191/wifi_bsubway.c:
+    complete
+    .text       start:0x021b5460 end:0x021b7020
+    .rodata     start:0x021b71a8 end:0x021b71b4
+    .data       start:0x021b7360 end:0x021b738c
+
+src/ov191/wifi_bsubway_graphic.c:
+    complete
+    .text       start:0x021b7020 end:0x021b71a8
+    .rodata     start:0x021b71b4 end:0x021b7354
+    .data       start:0x021b738c end:0x021b73c0

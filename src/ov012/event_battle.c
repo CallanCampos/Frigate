@@ -504,7 +504,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
     }
     if (seed % 0x1933 != 0) {
         GFL_VBlankTCBAdd(get_mt, NULL, 0x7f);
-        data_021410f8++;
+        g_AntiPiracyTaskCount++;
     }
     return GAMEEVENT_CONTINUE;
 }

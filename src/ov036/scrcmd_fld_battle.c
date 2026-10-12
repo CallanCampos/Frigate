@@ -61,7 +61,7 @@ BOOL func_ov036_021aea8c(VM *vm, FieldScriptEnv *env) {
     u16 regulationId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
-    Regulation *regulation = func_0201f734(regulationId, heapId);
+    Regulation *regulation = PokeRegulation_LoadNew(regulationId, heapId);
     GameEvent *event = func_ov036_021aebf0(gsys, regulationId == 20 || regulationId == 21 || regulationId == 22,
                                            regulation, result, heapId);
 
@@ -77,7 +77,7 @@ static u16 func_ov036_021aeb0c(GameData *gameData, WordSet *wordSet, u16 regulat
     u16 i;
     u16 *species;
     u16 count = 0;
-    Regulation *regulation = func_0201f734(regulationId, heapId);
+    Regulation *regulation = PokeRegulation_LoadNew(regulationId, heapId);
 
     species = func_ov036_021aeb64(regulation, gameData, &count, heapId);
     for (i = 0; i < count; i++) {
@@ -132,18 +132,18 @@ static BOOL func_ov036_021aec28(GameSystem *gsys, u32 a1, Regulation *regulation
     party = GameData_GetParty(gameData);
     *result = TEAM_SELECT_NONE;
     if (a1) {
-        *partyResult = func_0201f268(regulation, party);
+        *partyResult = PokeRegulation_CheckPartyCanEnter(regulation, party);
     } else {
-        *partyResult = func_0201f424(regulation, party, &unk);
+        *partyResult = PokeRegulation_CheckParty(regulation, party, &unk);
     }
     battleBox = getBattleBox(GameData_GetSaveControl(gameData));
     if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
         unk = 0;
         battleBoxParty = convertBoxedPokeSetToParty(battleBox, heapId);
         if (a1) {
-            *battleBoxResult = func_0201f268(regulation, battleBoxParty);
+            *battleBoxResult = PokeRegulation_CheckPartyCanEnter(regulation, battleBoxParty);
         } else {
-            *battleBoxResult = func_0201f424(regulation, battleBoxParty, &unk);
+            *battleBoxResult = PokeRegulation_CheckParty(regulation, battleBoxParty, &unk);
         }
         if (battleBoxParty != NULL) {
             GFL_HeapFree(battleBoxParty);

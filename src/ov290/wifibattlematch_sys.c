@@ -280,7 +280,7 @@ static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
     { OVERLAY_ID(190), &WIFILOGIN_PROC_FUNCTIONS, WifiBattleMatchSys_CreateLoginParam, WifiBattleMatchSys_FinishLogin },
     { OVERLAY_ID(263), &WIFIBATTLEMATCH_EXCHANGE_PROC_FUNCTIONS, WifiBattleMatchSys_CreateExchangeParam,
       WifiBattleMatchSys_FinishExchange },
-    { OVERLAY_ID(306), &data_ov306_0219ed40, WifiBattleMatchSys_CreateResultParam, WifiBattleMatchSys_FinishResult },
+    { OVERLAY_ID(306), &BtlRecSelProcFunctions, WifiBattleMatchSys_CreateResultParam, WifiBattleMatchSys_FinishResult },
     { OVERLAY_ID(190), &WIFILOGOUT_PROC_FUNCTIONS, WifiBattleMatchSys_CreateLogoutParam,
       WifiBattleMatchSys_FinishLogout },
     { OVERLAY_NONE, &data_ov167_021d6ce0, WifiBattleMatchSys_CreateReplayParam, WifiBattleMatchSys_FinishReplay },
@@ -573,7 +573,7 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
             GFL_ASSERT(0);
             break;
         }
-        param->regulation = func_0201f734(fileId, heapId);
+        param->regulation = PokeRegulation_LoadNew(fileId, heapId);
     } else if (sys->mode == 0) {
         param->regulation =
             func_0200b530(TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 0));
@@ -586,11 +586,11 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
     param->selected = sys->party;
     param->gameData = sys->param.gameData;
     PokeParty_Copy((PokeParty *)sys->player->partyData, sys->pickParty);
-    func_0201f63c(param->regulation, sys->pickParty);
+    PokeRegulation_ApplyLevelToParty(param->regulation, sys->pickParty);
     param->party = sys->pickParty;
     otherPlayer = sys->otherPlayer;
     PokeParty_Copy((PokeParty *)otherPlayer->partyData, sys->otherPickParty);
-    func_0201f63c(param->regulation, sys->otherPickParty);
+    PokeRegulation_ApplyLevelToParty(param->regulation, sys->otherPickParty);
     param->otherName = GetPlayerName(&otherPlayer->info);
     param->otherParty = sys->otherPickParty;
     param->otherGender = getTrainerGender(&otherPlayer->info);
@@ -689,7 +689,7 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
             BtlSetup_SetNetTriple(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
             break;
         }
-        regulation = func_0201f734(fileId, heapId);
+        regulation = PokeRegulation_LoadNew(fileId, heapId);
         ownsRegulation = TRUE;
     } else if (sys->mode == 0) {
         regulation = func_0200b530(TournamentBlock_GetEntry(tournament, 0));
@@ -781,12 +781,12 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
             param->players->unk50 = 1;
         }
     }
-    func_02017cfc(param->setup, sys->party, 0);
-    func_02017d30(param->setup, regulation, HEAPID_TAIL(heapId));
+    BtlSetup_SetParty(param->setup, sys->party, 0);
+    BtlSetup_ApplyRegulation(param->setup, regulation, HEAPID_TAIL(heapId));
     if (sys->unk8AC) {
         param->setup->unkDD_2 = 1;
     }
-    func_020186b0(param->setup, heapId);
+    BtlSetup_AllocRecBuffer(param->setup, heapId);
     GFL_OvlUnload(OVERLAY_ID(167));
     if (ownsRegulation) {
         GFL_HeapFree(regulation);
@@ -825,7 +825,7 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
                                            value, setup, &sys->battleResult, 0);
         }
     } else if (sys->mode == 2) {
-        regulation = func_0201f734(sys->param.unk4 + 0xf, HEAPID_WIFIBATTLEMATCH);
+        regulation = PokeRegulation_LoadNew(sys->param.unk4 + 0xf, HEAPID_WIFIBATTLEMATCH);
         if (result == 0) {
             WifiBattleMatchSys_BuildReport(&sys->report, sys->party, sys->otherParty, sys->otherPlayer, regulation, 0,
                                            setup, &sys->battleResult, 2);
@@ -1062,7 +1062,7 @@ static void *WifiBattleMatchSys_CreateReplayParam(WifiBattleMatchChain *chain, H
     sys_memset(setup, 0, sizeof(BtlSetup));
     GFL_OvlLoad(OVERLAY_ID(167));
     BtlSetup_Reset(setup);
-    func_02018540(setup, sys->param.gameData, heapId);
+    BtlSetup_InitForRecord(setup, sys->param.gameData, heapId);
     GFL_OvlUnload(OVERLAY_ID(167));
     func_0200c1f0();
     BattleRecTool_LoadSetup(setup, 0, heapId);
@@ -1078,7 +1078,7 @@ static BOOL WifiBattleMatchSys_FinishReplay(WifiBattleMatchChain *chain, void *p
 
     func_02005d8c();
     GFL_HeapFree(setup->unk34[0]);
-    func_020185b4(setup);
+    BtlSetup_FreeForRecord(setup);
     GFL_HeapFree(setup);
     GFL_OvlUnload(OVERLAY_ID(167));
     WifiBattleMatchSys_ChainSetNext(chain, STEP_CHAMPIONSHIP);
@@ -1344,7 +1344,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
     case 0:
         GFL_SndBGMPlay(battle->setup->fieldSituation.bgm, SND_CHANNEL_MASK_ALL);
         battle->players->base.unk44 = 1;
-        QueueGameProc(wk->manager, OVERLAY_ID(305), &data_ov305_0219e990, battle->players);
+        QueueGameProc(wk->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
         running = 2;
         *state = 1;
         break;
@@ -1485,7 +1485,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             }
         }
         if (queue) {
-            QueueGameProc(wk->manager, OVERLAY_ID(305), &data_ov305_0219e990, battle->players);
+            QueueGameProc(wk->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
             running = 2;
             *state = 12;
         }

@@ -87,11 +87,11 @@ from:0x0219d3ca kind:thumb_call_arm to:0x0208da4c module:main
 from:0x0219d3d2 kind:thumb_call to:0x0219ce80 module:overlay(316)
 from:0x0219d3d8 kind:thumb_call to:0x0219f8b4 module:overlay(316)
 from:0x0219d3de kind:thumb_call to:0x020162a4 module:main
-from:0x0219d3ec kind:load to:0x0219fb14 module:overlay(316)
+from:0x0219d3ec kind:load to:0x0219fb10 add:0x4 module:overlay(316)
 from:0x0219d40c kind:thumb_call to:0x02015c48 module:main
 from:0x0219d412 kind:thumb_call to:0x0219f8b4 module:overlay(316)
 from:0x0219d418 kind:thumb_call to:0x020162a4 module:main
-from:0x0219d424 kind:load to:0x0219fb16 module:overlay(316)
+from:0x0219d424 kind:load to:0x0219fb10 add:0x6 module:overlay(316)
 from:0x0219d452 kind:thumb_call to:0x0204a5c0 module:main
 from:0x0219d458 kind:thumb_call to:0x02049970 module:main
 from:0x0219d466 kind:thumb_call to:0x02049994 module:main
@@ -306,7 +306,7 @@ from:0x0219e1f6 kind:thumb_call to:0x0219e218 module:overlay(316)
 from:0x0219e212 kind:thumb_call to:0x0204c140 module:main
 from:0x0219e23a kind:thumb_call to:0x0204c140 module:main
 from:0x0219e244 kind:load to:0x0219fa9a module:overlay(316)
-from:0x0219e248 kind:load to:0x0219fa9b module:overlay(316)
+from:0x0219e248 kind:load to:0x0219fa9a add:0x1 module:overlay(316)
 from:0x0219e260 kind:thumb_call to:0x0203a1fc module:main
 from:0x0219e27a kind:thumb_call to:0x02045320 module:main
 from:0x0219e286 kind:thumb_call to:0x02045320 module:main
@@ -601,7 +601,7 @@ from:0x0219f57c kind:thumb_call to:0x0219d3f0 module:overlay(316)
 from:0x0219f596 kind:thumb_call to:0x0219e90c module:overlay(316)
 from:0x0219f5b6 kind:thumb_call to:0x0219e824 module:overlay(316)
 from:0x0219f5d2 kind:thumb_call to:0x020069f4 module:main
-from:0x0219f5f0 kind:load to:0x0219fb18 module:overlay(316)
+from:0x0219f5f0 kind:load to:0x0219fb10 add:0x8 module:overlay(316)
 from:0x0219f5f4 kind:load to:0x0219fa94 module:overlay(316)
 from:0x0219f5fe kind:thumb_call to:0x0219d3f0 module:overlay(316)
 from:0x0219f604 kind:thumb_call to:0x0219d4e4 module:overlay(316)

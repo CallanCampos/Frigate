@@ -21301,8 +21301,6 @@ from:0x021d0868 kind:load to:0x021a630d module:overlay(36)
 from:0x021d086c kind:load to:0x021a6381 module:overlay(36)
 from:0x021d0870 kind:load to:0x021a63a9 module:overlay(36)
 from:0x021d0874 kind:load to:0x021a63c5 module:overlay(36)
-from:0x021d0958 kind:load to:0x02090101 module:main
-from:0x021d0964 kind:load to:0x02090301 module:main
 from:0x021d1018 kind:load to:0x021b3fc9 module:overlay(36)
 from:0x021d101c kind:load to:0x021b3ff5 module:overlay(36)
 from:0x021d1020 kind:load to:0x021b3ff9 module:overlay(36)

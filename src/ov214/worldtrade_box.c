@@ -1034,7 +1034,7 @@ static void Box_TransPokeIconCharaPal(int species, int form, int sex, int egg, i
     sys_memcpy32_fast(charData->rawData, pbuf->chars, 0x200);
     pbuf->charOffset = (no * 16 + 28) * 32;
     pbuf->icon = icon;
-    pbuf->palette = func_02021034(species, form, sex, egg) + 5;
+    pbuf->palette = PokeIcon_GetPalette(species, form, sex, egg) + 5;
     GFL_HeapFree(file);
 }
 

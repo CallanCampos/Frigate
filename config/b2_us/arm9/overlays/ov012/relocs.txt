@@ -7743,7 +7743,6 @@ from:0x0216ce2c kind:load to:0x0215f109 module:overlay(12)
 from:0x0216ce38 kind:load to:0x0215f109 module:overlay(12)
 from:0x0216ce3c kind:load to:0x0215f109 module:overlay(12)
 from:0x0216ce40 kind:load to:0x0215f109 module:overlay(12)
-from:0x0216d1ac kind:load to:0x02140000 module:main
 from:0x0216d1fc kind:load to:0x021b0000 module:overlays(189,257)
 from:0x0216d210 kind:load to:0x021b0000 module:overlays(189,257)
 from:0x0216d6c0 kind:load to:0x0215f7e9 module:overlay(12)

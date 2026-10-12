@@ -21,7 +21,7 @@
 // as its Trainer; 1 an in-game trade; 2 hatched, an egg of the player's keeping where it was received as its egg's
 // place; 5 an egg received at placeName; 6 a link trade, at placeName; 7 one of N's Pokémon. 3 and 4 change nothing
 void PokeParty_SetupMetData(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo, u16 placeName, HeapID heapId);
-void PML_UtilSetupMetData(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo, u16 placeName, HeapID heapId);
+void PML_UtilSetupMetData(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo, u32 placeName, HeapID heapId);
 // Sets the date the Pokémon was met to today
 void setMetCurrentDateTime(BoxPkm *pkm);
 // Marks the Pokémon as met in a fateful encounter, at the location and on the date

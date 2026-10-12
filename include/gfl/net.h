@@ -182,26 +182,36 @@ BOOL func_02040dd4(int command);
 void *func_02040de8(int command, int netId, int size);
 BOOL func_02040c94(int netId);
 
+// net_err.c: the network error screen. The error's code is its message in TEXT_BANK_WIFI_ERROR
+// Creates the network's heap, and the buffers the error screen saves the display in
+void GFL_NetHeapInit(void);
+void GFL_NetErrInit(u32 heapId);
+// Finds the network's error, each frame
+void func_02011c78(void);
+// What the game is to do about the network's error, if there is one: 1 to go on, 2 to end the connection
 BOOL GFL_NetErrCheck(void);
 void GFL_NetErrMarkShown(void);
-// Sets the network error and shows it
-void func_02011d04(u32 error);
-void GFL_NetErrShow(u32 a0);
+BOOL GFL_NetErrShow(u32 a0);
+// Shows the fatal error screen for a Wi-Fi error with the message given
+void func_02011d04(u32 message);
 // GFL_NetErrShow(1)
 void func_02011d20(void);
-// Shows the error with the code given
-void func_02011d04(u32 code);
-// Records the error with the code given, to show it
-void func_020120f0(u32 code);
-// The error code for a server's result
+// Records a Wi-Fi error with the message given, to show it
+void func_020120f0(u32 message);
+// The message for a server's result
 u32 func_02011d2c(int result);
+// Whether func_02011de0 leaves the screens dark, for the caller to set the brightness with func_02011da4
+void func_02011d8c(BOOL keepDark);
+void func_02011d98(void);
+void func_02011da4(void);
+// Shows the error screen until A or B is pressed, with the wireless icon
 void func_02011de0(void);
 // Whether the error was handled, after shutting the connection down
 BOOL func_02012154(void);
 void func_02012144(void);
 // The state of the wireless connections, as bits: 0x2 a local wireless one, 0x3c the signal, 0x3c0 Wi-Fi
 u32 func_02012be4(WifiList *wifiList);
-void *func_02012908(HeapID heapId, u32 a1);
+void *func_02012908(int num, HeapID heapId);
 void func_02012994(void *work);
 void func_02012a4c(void);
 void GFL_NetErrAbort(void);
@@ -270,7 +280,7 @@ BOOL func_02042be8(NetHandle *handle, int command, u16 size, const void *data);
 BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
                    BOOL noCopy);
 BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6, BOOL noCopy);
-BOOL func_02042cfc(void);
+BOOL func_02042cfc(NetHandle *handle);
 void func_02042d04(NetHandle *handle, u16 timing);
 BOOL func_02042d0c(NetHandle *handle, u16 timing);
 // The second argument is unused

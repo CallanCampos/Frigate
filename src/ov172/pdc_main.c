@@ -124,7 +124,7 @@ PdcMain *PdcMain_Create(PdcWork *pdc, HeapID heapId) {
     work->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 0x40, 0x80);
     work->pkm = PdcWork_GetPkm(pdc);
     work->msg = PdcMsg_Create(work->font, &PdcWork_GetTrainerData(pdc)->config, work->tcbManager, work->heapId);
-    work->bagCursor = func_02008860(work->heapId);
+    work->bagCursor = BagCursor_Create(work->heapId);
     PdcMain_SetProc(work, PdcMain_ProcIntro);
     return work;
 }

@@ -263,7 +263,7 @@ static BOOL Rain_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
     if (work->timer > 0) {
         if (--work->timer == 0) {
             func_ov036_02199958(task, 8, 0x7f5f, RAIN_FADE_IN_FRAMES, arg);
-            func_ov036_02199734(task, WEATHER_SOUND_TYPE, func_020198f0(2));
+            func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(2));
             func_ov036_02199be8(task, SEQ_SE_FLD_32);
         }
     } else if (func_ov036_021999dc(task) && done) {
@@ -280,7 +280,7 @@ static BOOL Rain_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     func_ov036_0219990c(task, 8, 0x7f5f, arg);
     func_ov036_02199880(task, Rain_AddDrops, 20, 10, 1, heapId);
     func_ov036_02199be8(task, SEQ_SE_FLD_32);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, func_020198f0(2));
+    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(2));
     return TRUE;
 }
 
@@ -422,7 +422,7 @@ static BOOL Thunder_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
 
     switch (work->state) {
     case 0:
-        func_ov036_02199734(task, WEATHER_SOUND_TYPE, func_020198f0(6));
+        func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(6));
         work->state++;
         work->timer = RAIN_FADE_IN_FRAMES;
         break;
@@ -476,7 +476,7 @@ static BOOL Thunder_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     func_ov036_0219990c(task, 9, 0x7f80, arg);
     func_ov036_02199880(task, Thunder_AddDrops, 20, 5, 1, heapId);
     func_ov036_02199be8(task, SEQ_SE_FLD_31);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, func_020198f0(6));
+    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(6));
     func_ov036_0219978c(task, 1, 0);
     return TRUE;
 }
@@ -606,7 +606,7 @@ static BOOL GustyRain_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
 
     switch (work->state) {
     case 0:
-        func_ov036_02199734(task, WEATHER_SOUND_TYPE, func_020198f0(7));
+        func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(7));
         work->timer = RAIN_FADE_IN_FRAMES;
         work->state++;
         break;
@@ -645,7 +645,7 @@ static BOOL GustyRain_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     func_ov036_02199be8(task, SEQ_SE_FLD_31);
     Gust_StartLull(task, work, arg, FALSE);
     func_ov036_0219978c(task, 1, 0);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, func_020198f0(7));
+    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(7));
     return TRUE;
 }
 

@@ -39,6 +39,7 @@
 #include "system/bmp_oam.h"
 #include "system/bmp_winframe.h"
 #include "system/gf_font.h"
+#include "system/nsbtx_to_clwk.h"
 #include "system/poke_icon.h"
 #include "system/printsys.h"
 #include "system/prof_word.h"
@@ -2748,9 +2749,9 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
             hasLabel = FALSE;
         }
         arcId = ARCID_POKEICON;
-        paletteFile = func_02021114();
+        paletteFile = PokeIcon_GetPaletteFile();
         charsFile = PokeParty_GetIconIndex(species, (u8)form, sex, FALSE);
-        cellFile = func_0202111c();
+        cellFile = PokeIcon_GetCellFile_Main();
         animFile = getOBJTileMapping_MainEng();
         x = 30;
         y = 20;
@@ -2794,13 +2795,13 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
     switch (type) {
     case ICON_TYPE_PLAYER:
         if (species == 0) {
-            func_020164e8(icon->actor, 48, 209, 3, 4, 4, 0, 0, heapId);
+            NsbtxToClwk_LoadTexture(icon->actor, 48, 209, 3, 4, 4, 0, 0, heapId);
         } else {
-            func_020164e8(icon->actor, 48, 218, 3, 4, 4, 0, 0, heapId);
+            NsbtxToClwk_LoadTexture(icon->actor, 48, 218, 3, 4, 4, 0, 0, heapId);
         }
         break;
     case ICON_TYPE_RIVAL:
-        func_020164e8(icon->actor, 48, 48 + 221, 3, 4, 4, 0, 0, heapId);
+        NsbtxToClwk_LoadTexture(icon->actor, 48, 48 + 221, 3, 4, 4, 0, 0, heapId);
         break;
     case ICON_TYPE_FRIEND:
         func_0204c378(icon->actor, 0, TRUE);
@@ -2808,7 +2809,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
     case ICON_TYPE_POKEMON:
     case ICON_TYPE_POKEMON_NO_LABEL:
         func_0204c488(icon->actor, 1);
-        func_0204c378(icon->actor, func_02021034(species, (u8)form, (form & 0xff00) >> 8, FALSE), FALSE);
+        func_0204c378(icon->actor, PokeIcon_GetPalette(species, (u8)form, (form & 0xff00) >> 8, FALSE), FALSE);
         break;
     case ICON_TYPE_KEY:
         func_0204c488(icon->actor, 5);

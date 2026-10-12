@@ -241,7 +241,7 @@ static BOOL Flake_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
     if (work->timer > 0) {
         if (--work->timer == 0) {
             func_ov036_02199958(task, 8, 0x7f5f, 0x5a, arg);
-            func_ov036_02199734(task, WEATHER_SOUND_TYPE, func_020198f0(1));
+            func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(1));
         }
     } else if (func_ov036_021999dc(task) && fading) {
         return TRUE;
@@ -259,7 +259,7 @@ static BOOL Flake_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     work->done = 0;
     func_ov036_0219990c(task, 8, 0x7f5f, arg);
     func_ov036_02199880(task, Flake_Add, 20, 1, 18, heapId);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, func_020198f0(1));
+    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(1));
     return TRUE;
 }
 
@@ -397,7 +397,7 @@ static BOOL Blizzard_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
     if (work->timer > 0) {
         if (--work->timer == 0) {
             func_ov036_02199958(task, 4, 0x7b18, 0x5a, arg);
-            func_ov036_02199734(task, WEATHER_SOUND_TYPE, func_020198f0(4));
+            func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(4));
         }
     } else if (func_ov036_021999dc(task) && fading) {
         func_ov036_0219978c(task, 1, 0);
@@ -417,7 +417,7 @@ static BOOL Blizzard_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     work->scrollY = 0;
     func_ov036_02199880(task, Blizzard_AddFlakes, 20, 2, 2, heapId);
     func_ov036_0219978c(task, 1, 0);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, func_020198f0(4));
+    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(4));
     return TRUE;
 }
 
@@ -580,7 +580,7 @@ static BOOL Flutter_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
     if (work->timer > 0) {
         if (--work->timer == 0) {
             func_ov036_02199958(task, 9, 0x7f80, 0x3c, arg);
-            func_ov036_02199734(task, WEATHER_SOUND_TYPE, func_020198f0(5));
+            func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(5));
         }
     } else if (func_ov036_021999dc(task) && fading) {
         return TRUE;
@@ -595,7 +595,7 @@ static BOOL Flutter_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     func_ov036_02199824(task, 1, 1, 1, 1, -4, 2, 1, Flutter_AddFlakes);
     func_ov036_0219990c(task, 9, 0x7f80, arg);
     func_ov036_02199880(task, Flutter_AddFlakes, 20, 10, 1, heapId);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, func_020198f0(5));
+    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(5));
     return TRUE;
 }
 
@@ -754,7 +754,7 @@ static BOOL Speck_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
     if (work->timer == 0) {
         work->timer--;
         func_ov036_02199958(task, 8, 0x7f57, 0x5a, arg);
-        func_ov036_02199734(task, WEATHER_SOUND_TYPE, func_020198f0(8));
+        func_ov036_02199734(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(8));
     } else if (func_ov036_021999dc(task) && fading) {
         return TRUE;
     }
@@ -768,7 +768,7 @@ static BOOL Speck_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     func_ov036_02199824(task, 20, 2, 20, 2, -2, 4, 2, Speck_Add);
     func_ov036_0219990c(task, 8, 0x7f57, arg);
     func_ov036_02199880(task, Speck_Add, 20, 10, 1, heapId);
-    func_ov036_02199740(task, WEATHER_SOUND_TYPE, func_020198f0(8));
+    func_ov036_02199740(task, WEATHER_SOUND_TYPE, FieldLightStatus_GetWeatherLight(8));
     return TRUE;
 }
 

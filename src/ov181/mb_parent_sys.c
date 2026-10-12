@@ -479,7 +479,7 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         break;
     case MB_PARENT_STATE_SEND_BOX_SPACE:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
-            u16 space = func_02007a38(GameData_GetBoxSaveAccessor(wk->param->gameData));
+            u16 space = BoxSaveAccessor_CountEmptySlots(GameData_GetBoxSaveAccessor(wk->param->gameData));
 
             if (MBComm_SendCommand(wk->comm, MB_COMM_CMD_BOX_SPACE, space) == TRUE) {
                 MBUtilMsg_Print(wk->msg, 0xb, func_02017bcc());
@@ -1290,7 +1290,7 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
         wk->answer = MBUtilMsg_UpdateConfirm(wk->msg);
         if (wk->answer == 1) {
             u16 count = MBComm_GetResultCount(wk->comm);
-            u16 space = func_02007a38(GameData_GetBoxSaveAccessor(wk->param->gameData));
+            u16 space = BoxSaveAccessor_CountEmptySlots(GameData_GetBoxSaveAccessor(wk->param->gameData));
 
             MBUtilMsg_ForgetConfirm(wk->msg);
             if (space < count) {

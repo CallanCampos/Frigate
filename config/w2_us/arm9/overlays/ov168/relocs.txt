@@ -383,7 +383,7 @@ from:0x021df888 kind:load to:0x021f4280 module:overlay(168)
 from:0x021df88c kind:load to:0x021e6e99 module:overlay(168)
 from:0x021df8a2 kind:thumb_call to:0x021e7b64 module:overlay(168)
 from:0x021df8c8 kind:load to:0x021f4280 module:overlay(168)
-from:0x021df8f6 kind:thumb_call to:0x0219d9bc module:overlays(167,189,309,319,320)
+from:0x021df8f6 kind:thumb_call to:0x0219d9bc module:overlay(167)
 from:0x021df8fa kind:thumb_call to:0x02008bf0 module:main
 from:0x021df910 kind:thumb_call to:0x0219d978 module:overlays(165,167,306,313)
 from:0x021df938 kind:thumb_call to:0x021e0324 module:overlay(168)

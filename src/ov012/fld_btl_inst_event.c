@@ -64,7 +64,7 @@ GameEvent *func_ov012_02161c88(GameSystem *gsys, u32 a1, u32 mode, u32 regulatio
     work->entered = entered;
     partyParam = &work->partyParam;
     PokeListParam_Setup(partyParam, GSYS_GetGameData(gsys), mode, party);
-    func_0201f744(regulationId, &work->regulation);
+    PokeRegulation_Load(regulationId, &work->regulation);
     partyParam->regulation = &work->regulation;
     partyParam->unk48 = a1;
     summaryParam = &work->summaryParam;

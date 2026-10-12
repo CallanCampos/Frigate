@@ -16,7 +16,7 @@ static const u16 sScoreUnk[] = { 8, 13, 18, 23, 28 };
 static void func_ov055_021e695c(HeapID heapId, GameData *gameData, WbtSetupEntrant *dest, const WbtEntrant *entrant);
 static void func_ov055_021e69b0(WbtSystem *sys, WbtSetup *setup);
 static u8 func_ov055_021e6a14(u32 index);
-static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, u16 *unk4);
+static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4);
 
 WbtSetup *func_ov055_021e67f4(HeapID heapId, GameSystem *gsys) {
     WbtSetup *setup = GFL_HeapAllocate(heapId, sizeof(WbtSetup), TRUE, "wbt_setup.c", 57);
@@ -118,7 +118,7 @@ static u8 func_ov055_021e6a14(u32 index) {
     return data_ov036_021cf1c8[index].unk0[1]->unk0_0;
 }
 
-static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, u16 *unk4) {
+static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4) {
     FieldActorConfig record;
     u32 offset = GetIndexOfObjID(objCode) * sizeof(FieldActorConfig) + 4;
 

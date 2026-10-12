@@ -2,6 +2,7 @@
 #define POKEBW2_FIELD_EVENT_POKEWOOD_H
 
 #include "types.h"
+#include "app/pkwd_selectscreen.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
@@ -20,7 +21,6 @@ u8 EventPokewood_GetUnlockKind(u32 movie);
 
 // The screens of overlays 322 to 325 that the events put up, which are not decompiled yet
 extern const GameProcFunctions data_ov322_021a0834;
-extern const GameProcFunctions data_ov323_0219ea60;
 extern const GameProcFunctions data_ov324_0219f698;
 extern const GameProcFunctions data_ov324_0219f6a4;
 extern const GameProcFunctions data_ov325_0219f47c;

@@ -621,8 +621,9 @@ static u32 FieldEncount_GenPID(EncountManager *manager, void *personal, WildPkmP
     u32 sex = 2;
     u32 shiny;
     u32 pid;
+    u8 sexRatio = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
 
-    if (isGenderlessOrSetGender(PML_PersonalGetParam(personal, 0x14)) != TRUE) {
+    if (isGenderlessOrSetGender(sexRatio) != TRUE) {
         if (manager->cuteCharm) {
             if (manager->leadSex == 0) {
                 sex = 1;

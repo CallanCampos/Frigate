@@ -384,7 +384,7 @@ static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, H
     status.bgId = 9;
     status.terrain = 14;
     BtlSetup_SetTrainer1v1Single(setup, gameData, &status, 0, heapId);
-    func_020186b0(setup, heapId);
+    BtlSetup_AllocRecBuffer(setup, heapId);
     EventPokewood_SetupMovieTrainer(movie, POKEWOOD_KIND_FILM, setup->trainers[1], playerInfo, heapId);
     EventPokewood_CreateCastParty(playerInfo, setup->party[1], heapId, movie, 1);
     setup->unk34[0] = GetGameDataPlayerInfo(gameData);
@@ -421,7 +421,7 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
     if (func_02010644(GameData_GetSaveControl(gameData), heapId, slot) == 1) {
         setup = BtlSetup_Create(heapId);
         BtlSetup_Reset(setup);
-        func_02018540(setup, gameData, heapId);
+        BtlSetup_InitForRecord(setup, gameData, heapId);
         func_0200c1f0();
         movie = func_020107f0(0, 0);
         BattleRecTool_LoadSetup(setup, 1, heapId);
@@ -439,7 +439,7 @@ static BtlSetup *EventPokewood_LoadBlockSetup(GameSystem *gsys, Field *field, He
     loadPokewoodAndCheck(GameData_GetSaveControl(gameData), heapId, 0);
     setup = BtlSetup_Create(heapId);
     BtlSetup_Reset(setup);
-    func_02018540(setup, gameData, heapId);
+    BtlSetup_InitForRecord(setup, gameData, heapId);
     func_0200c1f0();
     BattleRecTool_LoadSetup(setup, 1, heapId);
     func_0200c200();
@@ -515,7 +515,7 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
 static void EventPokewood_FreeSetup(BtlSetup *setup) {
     if (setup->unkDD_3 == 2) {
         GFL_HeapFree(setup->unk34[0]);
-        func_020185b4(setup);
+        BtlSetup_FreeForRecord(setup);
     }
     BtlSetup_Free(setup);
 }
@@ -896,7 +896,7 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
     switch (*state) {
     case 0:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(323),
-                                                                         &data_ov323_0219ea60, &wk->param));
+                                                                         &PKWD_SELECTSCREEN_PROC_FUNCTIONS, &wk->param));
         *state = 1;
         break;
     case 1:

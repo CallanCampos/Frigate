@@ -254,9 +254,9 @@ u32 BagItemList_CountShown(BagItemList *list, u32 pocket) {
     u32 slots;
     u32 i;
 
-    func_0200891c(list->bag, list->inBag);
+    BagSave_GetOwnedItemFlags(list->bag, list->inBag);
     if (pocket != BAG_POCKET_FREE_SPACE) {
-        items = func_0200896c(list->bag, pocket, &slots);
+        items = BagSave_GetPocketItems(list->bag, pocket, &slots);
         for (i = 0; i < slots; i++) {
             if (items[i].item != ITEM_NONE && list->inBag[items[i].item]
                 && !BagSave_IsItemFreeSpaceBit(list->bag, items[i].item)) {

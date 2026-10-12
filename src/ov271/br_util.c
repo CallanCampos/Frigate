@@ -783,8 +783,8 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
             ArcTool *handle = GFL_ArcSysCreateFileHandle(7, tailHeapId);
             ClActorSetup setup;
 
-            p_wk->pokeIconPlt = func_0204bc48(handle, func_02021114(), CLACT_VRAM_MAIN, 0x80, tailHeapId);
-            p_wk->pokeIconCel = func_0204bde0(handle, func_0202111c(), getOBJTileMapping_MainEng(), tailHeapId);
+            p_wk->pokeIconPlt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, tailHeapId);
+            p_wk->pokeIconCel = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), tailHeapId);
             p_wk->pokeIconChr = func_0204b81c(handle, PokeParty_GetIconIndex(species, form, gender, egg), FALSE,
                                               CLACT_VRAM_MAIN, tailHeapId);
             GFL_ArcToolFree(handle);
@@ -795,7 +795,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
             setup.sequence = 1;
             p_wk->pokeIcon = func_0204c040(unit, p_wk->pokeIconChr, p_wk->pokeIconPlt, p_wk->pokeIconCel, &setup,
                                            CLACT_SURFACE_MAIN, heapId);
-            func_0204c378(p_wk->pokeIcon, func_02021034(species, form, gender, egg), 0);
+            func_0204c378(p_wk->pokeIcon, PokeIcon_GetPalette(species, form, gender, egg), 0);
             func_0204c318(p_wk->pokeIcon, TRUE);
         }
     }

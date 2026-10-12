@@ -49,7 +49,7 @@ func_ov205_021b9214 kind:function(thumb,size=0xd0) addr:0x021b9254
 func_ov205_021b92e4 kind:function(thumb,size=0x52) addr:0x021b9324
 func_ov205_021b9338 kind:function(thumb,size=0x98) addr:0x021b9378
 func_ov205_021b93d0 kind:function(thumb,size=0x1a) addr:0x021b9410
-data_ov205_021b93ec kind:data(any) addr:0x021b942c ambiguous
+CODEIN_PROC_FUNCTIONS kind:data(any) addr:0x021b942c ambiguous
 data_ov205_021b93f8 kind:data(any) addr:0x021b9438
 data_ov205_021b9458 kind:data(any) addr:0x021b9498
 data_ov205_021b94d8 kind:data(any) addr:0x021b9518

@@ -1012,7 +1012,7 @@ BOOL Box2Main_PokeItemFormChange(Box2SysWork *syswk, BoxPkm *pkm) {
     } else if (species == SPECIES_GENESECT) {
         item = PML_PkmGetParam(pkm, PKM_PARAM_ITEM, NULL);
         form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
-        newForm = func_0201ef8c(item);
+        newForm = PML_ItemGetGenesectDriveForme(item);
         if (form != newForm) {
             PokeChangeForme(syswk, pkm, newForm);
         }
@@ -5067,7 +5067,7 @@ static void PokeDataRangeMoveBox(Box2SysWork *syswk, u32 getPos, u32 putPos) {
     }
     for (i = 0; i < BOX2_TRAY_POKE_MAX; i++) {
         if (pkms[i] != NULL) {
-            func_02007d84(pkms[i]);
+            BoxSaveAccessor_FreePkmCopy(pkms[i]);
         }
     }
 }

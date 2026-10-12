@@ -652,8 +652,8 @@ static void PokeList_LoadResources(PokeListWork *wk) {
     GFL_ArcToolFree(arc);
 
     iconArc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
-    wk->clResources[CL_RES_PLTT(6)] = func_0204bc48(iconArc, func_02021114(), 0, 0xc0, wk->heapId);
-    wk->clResources[CL_RES_CELL(7)] = func_0204bde0(iconArc, func_0202111c(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->clResources[CL_RES_PLTT(6)] = func_0204bc48(iconArc, PokeIcon_GetPaletteFile(), 0, 0xc0, wk->heapId);
+    wk->clResources[CL_RES_CELL(7)] = func_0204bde0(iconArc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(iconArc);
 
     commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
@@ -1554,7 +1554,7 @@ static void func_ov165_0219c20c(PokeListWork *wk) {
                 picked[entry] = i + 1;
             }
         }
-        result = func_0201f1e8(regulation, wk->param->party, picked);
+        result = PokeRegulation_CheckPicked(regulation, wk->param->party, picked);
         if (regulation->unk2 > wk->enteredCount) {
             PokeList_ShowMessage(wk, regulation->unk2 + 0x60, TRUE, PokeList_MessageDoneSelect);
             GFL_SndSEPlay(SEQ_SE_BEEP);
@@ -2928,7 +2928,7 @@ void PokeList_TimeUp(PokeListWork *wk) {
                 wk->param->picked[i] = 0;
             }
             regulation = wk->param->regulation;
-            if (func_0201f97c(regulation, wk->param->party, wk->param->picked) == 0) {
+            if (PokeRegulation_PickTeam(regulation, wk->param->party, wk->param->picked) == 0) {
                 for (i = 0; i < 6; i++) {
                     wk->param->picked[i] = 0;
                 }
@@ -2944,7 +2944,7 @@ static void PokeList_LearnMove(PokeListWork *wk, PartyPkm *pkm) {
     if (wk->param->mode == 5 || wk->param->mode == 8) {
         PokeParty_LearnMove(pkm, wk->param->move);
     } else {
-        func_0201d268(pkm, wk->param->move);
+        PokeParty_LearnMoveTutor(pkm, wk->param->move);
     }
 }
 
@@ -2952,7 +2952,7 @@ static void PokeList_SetMove(PokeListWork *wk, PartyPkm *pkm, u8 slot) {
     if (wk->param->mode == 5 || wk->param->mode == 8) {
         PokeParty_SetMove(pkm, wk->param->move, slot);
     } else {
-        func_0201d2d0(pkm, wk->param->move, slot);
+        PokeParty_SetMoveKeepPP(pkm, wk->param->move, slot);
     }
 }
 
