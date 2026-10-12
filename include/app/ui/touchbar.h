@@ -67,7 +67,7 @@ TouchBar *TouchBar_Create(const TouchBarSetup *setup, HeapID heapId);
 void TouchBar_Free(TouchBar *bar);
 void TouchBar_Main(TouchBar *bar);
 // The icon whose touch animation has ended, or -1 when none
-u32 TouchBar_GetDecided(TouchBar *bar);
+int TouchBar_GetDecided(TouchBar *bar);
 // The icon being touched, or -1 when none
 u32 TouchBar_GetTouched(TouchBar *bar);
 // Whether an icon is being touched
