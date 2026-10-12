@@ -945,6 +945,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A ternary, an `if`/`else` on the value alone and an inline abs all give other code.
 - A call left unmerged in one arm while both arms jump to one store means the store is written at the end of both
   arms, not once after the `if` (`PkwdSelectScreen_PrintMovie`).
+- Two calls to one function in the two arms of an `if`/`else` are merged into one `bl` in every plain spelling
+  (ternary argument, nested `if`, locals, `break`s). They stay apart when one arm's `bl` is already the join of an
+  inner `if`/`else` and the code after it is written in both outer arms: the label on that `bl` stops the merge.
+  `config_panel.c`'s `ConfigPanelAppBar_Main` plays its sound with an inner
+  `if (button == BUTTON_QUIT) { cancel } else { decide }` and has `update = TRUE; appBar->decided = TRUE;` at the end
+  of both arms of the outer `if`, and likewise `AppTaskMenuWin_SetActive(wins[button ^ 1], FALSE)` at the end of
+  both arms of `if (appBar->decided)`, which gives the `1` a register shared with the arm's `TRUE`.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle

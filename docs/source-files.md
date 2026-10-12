@@ -1224,7 +1224,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `config_panel.c` | `0x0219ce80`–`0x0219ee3c` | 89 | partial | descriptive |
+| `config_panel.c` | `0x0219ce80`–`0x0219ee3c` | 89 | complete | descriptive |
 
 ### Overlay 141
 
