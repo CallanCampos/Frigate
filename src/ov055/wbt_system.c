@@ -303,7 +303,7 @@ Regulation *func_ov055_021e5f78(WbtSystem *sys) {
         }
         sys->regulation.unkBA = downloaded->unkA7;
     } else {
-        func_0201f744(func_ov055_021e5f38(sys), &sys->regulation);
+        PokeRegulation_Load(func_ov055_021e5f38(sys), &sys->regulation);
         if (sys->tournament == 11 || sys->tournament == 4) {
             sys->regulation.unk4 = 25;
         }

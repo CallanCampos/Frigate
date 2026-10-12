@@ -1187,7 +1187,7 @@ static void MailBox_LoadActorResources(MailBoxView *view) {
     for (i = 0; i <= 2; i++) {
         view->chars[i] = func_0204b81c(arc, func_0202d894(), FALSE, TRUE, HEAPID_MAILBOX_VIEW);
     }
-    view->palettes[0] = func_0204bba0(arc, func_02021114(), 1, 0, HEAPID_MAILBOX_VIEW);
+    view->palettes[0] = func_0204bba0(arc, PokeIcon_GetPaletteFile(), 1, 0, HEAPID_MAILBOX_VIEW);
     view->cellAnims[0] = func_0204bde0(arc, func_0202d898(0), func_0202d89c(0), HEAPID_MAILBOX_VIEW);
     GFL_ArcToolFree(arc);
 }

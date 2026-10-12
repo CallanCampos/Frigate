@@ -88,7 +88,5 @@ void func_0200f1e0(void *record, u32 index, int amount);
 void func_0200f218(void *record, u32 place, const u8 *mac);
 void func_0200f238(void *record, u32 place, u32 byte, u8 value);
 BOOL func_0200f254(void *record, const u8 *mac);
-// Whether a Pokémon of the party has its parameters 0xa9 and 0x4c both at 1 (the regulation is not used)
-BOOL func_0201f6e8(Regulation *regulation, PokeParty *party);
 
 #endif // POKEBW2_APP_LIVEBATTLEMATCH_FLOW_H

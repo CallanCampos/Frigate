@@ -674,14 +674,14 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
 
         *retWk = 0;
         useBattleBox = BSubwayPlayData_GetData(playData, 10, NULL);
-        regulation = func_0201f734(func_ov050_021e6f60(mode), HEAPID_GAMEEVENT);
+        regulation = PokeRegulation_LoadNew(func_ov050_021e6f60(mode), HEAPID_GAMEEVENT);
         if (useBattleBox == TRUE) {
             party = convertBoxedPokeSetToParty(getBattleBox(save), HEAPID_GAMEEVENT);
             checked = party;
         } else {
             checked = GameData_GetParty(gameData);
         }
-        check = func_0201f268(regulation, checked);
+        check = PokeRegulation_CheckPartyCanEnter(regulation, checked);
         GFL_HeapFree(regulation);
         if (party != NULL) {
             GFL_HeapFree(party);
@@ -750,7 +750,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
             bsw->ov306Param.unk14 = BSUBWAY_COUNT_MAX;
         }
         ScriptWork_CallEvent(
-            work, func_020196d0(gsys, field, OVERLAY_ID(306), &data_ov306_0219ed40, &bsw->ov306Param, NULL, NULL));
+            work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(306), &data_ov306_0219ed40, &bsw->ov306Param, NULL, NULL));
         result = TRUE;
         break;
     case 349:
@@ -881,7 +881,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         sys_memset(&bsw->ircMatchParam, 0, sizeof(bsw->ircMatchParam));
         bsw->ircMatchParam.gameData = gameData;
         bsw->ircMatchParam.result = IRCBATTLEMATCH_MODE_BSUBWAY;
-        ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
+        ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
                                                  &bsw->ircMatchParam, NULL, NULL));
         result = TRUE;
         break;

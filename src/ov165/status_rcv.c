@@ -580,6 +580,6 @@ static BOOL StatusRcv_ChangeFriendship(PartyPkm *pkm, s32 friendship, s32 add, u
     if (friendship == 0 && add < 0) {
         return FALSE;
     }
-    func_02020c8c(pkm, item, zoneId, heapId);
+    FriendshipManagerCalcItem(pkm, item, zoneId, heapId);
     return TRUE;
 }

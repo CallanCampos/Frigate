@@ -2,6 +2,7 @@
 #define POKEBW2_BATTLE_BTL_SETUP_H
 
 #include "types.h"
+#include "battle/regulation.h"
 #include "gfl/heap.h"
 #include "nitro/math.h"
 #include "save/config.h"
@@ -186,8 +187,6 @@ void ResetBtlFieldStatus(BtlFieldStatus *status);
 void BtlSetup_InitForRecord(BtlSetup *setup, GameData *gameData, HeapID heapId);
 void BtlSetup_FreeForRecord(BtlSetup *setup);
 void BtlSetup_AllocRecBuffer(BtlSetup *setup, HeapID heapId);
-void func_0201f63c(Regulation *regulation, PokeParty *party);
-void func_0201f6a0(Regulation *regulation, PokeParty *party, HeapID heapId);
 void func_0200bb24(HeapID heapId);
 void freeVSPlayerBlkClearPtr(void);
 

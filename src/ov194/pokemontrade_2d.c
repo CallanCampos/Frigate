@@ -557,8 +557,8 @@ void func_ov194_021c3480(PokemonTradeWork *wk) {
     int i, j;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
 
-    wk->objRes[TRADE_OBJRES_PLTT_ICON] = func_0204bc48(arc, func_02021114(), CLACT_VRAM_SUB, 0x60, wk->heapId);
-    wk->objRes[TRADE_OBJRES_CELL_ICON] = func_0204bde0(arc, func_02021154(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->objRes[TRADE_OBJRES_PLTT_ICON] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x60, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CELL_ICON] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
     for (i = 0; i < ICON_COLUMNS; i++) {
         for (j = 0; j < COLUMN_ROWS; j++) {
             setup.x = 0;
@@ -794,7 +794,7 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
                            0x200);
             }
             func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
-            func_0204c378(wk->icons[index][i], func_020210c0(pkm), CLACT_VRAM_SUB);
+            func_0204c378(wk->icons[index][i], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
             func_0204c520(wk->icons[index][i], FALSE);
             func_0204c124(wk->icons[index][i], TRUE);
         }
@@ -952,7 +952,7 @@ void func_ov194_021c3e9c(PokemonTradeWork *wk, int box) {
             }
             pkm = PokemonTrade_GetBoxPkm(wk->boxes, box, i, wk);
             if (pkm != NULL) {
-                icon = func_02020f40(pkm);
+                icon = PokeIcon_GetFileOfPkm(pkm);
             } else {
                 icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
             }
@@ -1377,8 +1377,8 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     pkm0 = func_0201d624(PokemonTrade_GetPkm(wk, 0));
     pkm1 = func_0201d624(PokemonTrade_GetPkm(wk, 1));
-    wk->objRes[TRADE_OBJRES_CHAR_ICON0] = func_0204b81c(arc, func_02020f40(pkm0), FALSE, CLACT_VRAM_SUB, wk->heapId);
-    wk->objRes[TRADE_OBJRES_CHAR_ICON1] = func_0204b81c(arc, func_02020f40(pkm1), FALSE, CLACT_VRAM_SUB, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CHAR_ICON0] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm0), FALSE, CLACT_VRAM_SUB, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CHAR_ICON1] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm1), FALSE, CLACT_VRAM_SUB, wk->heapId);
     iconSetup.x = 96;
     iconSetup.y = 12;
     iconSetup.sequence = 0;
@@ -1389,14 +1389,14 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
                       wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
     func_0204c520(wk->actors[5], FALSE);
     func_0204c124(wk->actors[5], TRUE);
-    func_0204c378(wk->actors[5], func_020210c0(pkm0), CLACT_VRAM_SUB);
+    func_0204c378(wk->actors[5], PokeIcon_GetPaletteOfPkm(pkm0), CLACT_VRAM_SUB);
     iconSetup.x = 160;
     wk->actors[6] =
         func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_ICON1], wk->objRes[TRADE_OBJRES_PLTT_ICON],
                       wk->objRes[TRADE_OBJRES_CELL_ICON], &iconSetup, CLACT_VRAM_SUB, wk->heapId);
     func_0204c520(wk->actors[6], FALSE);
     func_0204c124(wk->actors[6], TRUE);
-    func_0204c378(wk->actors[6], func_020210c0(pkm1), CLACT_VRAM_SUB);
+    func_0204c378(wk->actors[6], PokeIcon_GetPaletteOfPkm(pkm1), CLACT_VRAM_SUB);
     GFL_ArcToolFree(arc);
 }
 
@@ -1751,11 +1751,11 @@ void func_ov194_021c5138(PokemonTradeWork *wk, int side, int index, PartyPkm *pk
     setup.sequence = 1;
     setup.priority = 16;
     setup.bgPriority = 1;
-    wk->negoIconChars[side][index] = func_0204b81c(arc, func_02020f40(boxPkm), FALSE, vramType, wk->heapId);
+    wk->negoIconChars[side][index] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(boxPkm), FALSE, vramType, wk->heapId);
     wk->negoIcons[side][index] =
         func_0204c040(wk->clactUnit, wk->negoIconChars[side][index], wk->objRes[TRADE_OBJRES_PLTT_NEGO],
                       wk->objRes[TRADE_OBJRES_CELL_NEGO], &setup, vramType, wk->heapId);
-    func_0204c378(wk->negoIcons[side][index], func_020210c0(boxPkm), CLACT_VRAM_SUB);
+    func_0204c378(wk->negoIcons[side][index], PokeIcon_GetPaletteOfPkm(boxPkm), CLACT_VRAM_SUB);
     func_0204c520(wk->negoIcons[side][index], FALSE);
     func_0204c124(wk->negoIcons[side][index], visible);
     GFL_ArcToolFree(arc);
@@ -1801,7 +1801,7 @@ void func_ov194_021c52e0(PokemonTradeWork *wk, int column, int row, int x, int y
     setup.bgPriority = 0;
     wk->actors[9] = func_0204c040(wk->clactUnit, wk->iconChars[column][row], wk->objRes[TRADE_OBJRES_PLTT_ICON],
                                   wk->objRes[TRADE_OBJRES_CELL_ICON], &setup, CLACT_VRAM_SUB, wk->heapId);
-    func_0204c378(wk->actors[9], func_020210c0(pkm), CLACT_VRAM_SUB);
+    func_0204c378(wk->actors[9], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
 }
 
 // Lets the carried icon go: it flies on in the direction the stylus moved it and curves off to the upper left

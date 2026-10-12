@@ -116,8 +116,8 @@ void BtlSetup_ApplyRegulation(BtlSetup *setup, Regulation *regulation, HeapID he
     }
     for (i = 0; i < 4; i++) {
         if (setup->party[i] != NULL) {
-            func_0201f6a0(regulation, setup->party[i], heapId);
-            func_0201f63c(regulation, setup->party[i]);
+            PokeRegulation_ApplyNicknamesToParty(regulation, setup->party[i], heapId);
+            PokeRegulation_ApplyLevelToParty(regulation, setup->party[i]);
         }
     }
 }

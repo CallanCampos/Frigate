@@ -180,7 +180,7 @@ static void PokeListBattle_LoadResources(PokeListWork *wk) {
     GFL_ArcToolFree(commonArc);
 
     iconArc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
-    wk->clResources[CL_RES_PLTT(7)] = func_0204bc48(iconArc, func_02021114(), 1, 0xc0, wk->heapId);
+    wk->clResources[CL_RES_PLTT(7)] = func_0204bc48(iconArc, PokeIcon_GetPaletteFile(), 1, 0xc0, wk->heapId);
     GFL_ArcToolFree(iconArc);
     sys_memcpy16((void *)(HW_DB_BG_PLTT + 0x40), wk->timerBaseColors, sizeof(wk->timerBaseColors));
 }
@@ -262,9 +262,9 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
     ClActorSetup iconSetup;
     ClActorSetup itemSetup;
 
-    partnerPkm->iconChars = func_0204b81c(arc, func_02020f40(boxPkm), FALSE, 1, wk->heapId);
+    partnerPkm->iconChars = func_0204b81c(arc, PokeIcon_GetFileOfPkm(boxPkm), FALSE, 1, wk->heapId);
     GFL_ArcToolFree(arc);
-    palette = func_020210c0(boxPkm);
+    palette = PokeIcon_GetPaletteOfPkm(boxPkm);
     iconSetup.x = x + 16;
     iconSetup.y = y + 8;
     iconSetup.sequence = 1;

@@ -415,11 +415,11 @@ BtlSetup *WbtBattle_SetupBattle(WbtSystem *sys, GameSystem *gsys) {
     BtlSetup *setup = BtlSetup_SetTrainerRental(gsys, sys->partyBC, mode);
 
     if (func_ov055_021e5ca4(sys) != 11) {
-        func_0201f63c(func_ov055_021e5f78(sys), setup->party[0]);
+        PokeRegulation_ApplyLevelToParty(func_ov055_021e5f78(sys), setup->party[0]);
     }
     WbtBattle_SetBattleTrainer(setup->trainers[1], opponent);
     PokeParty_Copy(sys->partyC0, setup->party[1]);
-    func_0201f63c(func_ov055_021e5f78(sys), setup->party[1]);
+    PokeRegulation_ApplyLevelToParty(func_ov055_021e5f78(sys), setup->party[1]);
     setup->trainerNames[1] = opponent->unkC;
     sys->unk13D4 = GFL_StrBufCreate(0x130, sys->heapId);
     sys->unk13D8 = GFL_StrBufCreate(0x130, sys->heapId);

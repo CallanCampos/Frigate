@@ -1067,8 +1067,8 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     ClActorSetup itemSetup;
     int i;
 
-    card->iconPalette = func_0204bc48(arc, func_02021114(), card->surface, card->iconPaletteSlot << 5, HEAPID_TAIL(heapId));
-    card->iconCells = func_0204bde0(arc, func_0202111c(), getOBJTileMapping_MainEng(), heapId);
+    card->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), card->surface, card->iconPaletteSlot << 5, HEAPID_TAIL(heapId));
+    card->iconCells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
         u16 species = TournamentTeam_GetField(records, 0, i);
         u8 form = TournamentTeam_GetField(records, 1, i);
@@ -1102,7 +1102,7 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
             setup.x = i * 32 + 288;
             card->actors[i] = func_0204c040(unit, card->iconChars[i], card->iconPalette, card->iconCells, &setup,
                                             card->surface, heapId);
-            func_0204c378(card->actors[i], func_02021034(species, form, gender, FALSE), 0);
+            func_0204c378(card->actors[i], PokeIcon_GetPalette(species, form, gender, FALSE), 0);
             if (hasItem) {
                 itemSetup = setup;
                 itemSetup.x += 12;
@@ -1603,14 +1603,14 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     sys_memset(list, 0, sizeof(WifiBattleMatchTeamList));
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_WIFIBATTLEMATCH, 7, 2, 0, 0, FALSE, HEAPID_TAIL(heapId));
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    list->palette = func_0204bc48(arc, func_02021114(), CLACT_VRAM_MAIN, 160, HEAPID_TAIL(heapId));
-    list->cells = func_0204bde0(arc, func_0202111c(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
+    list->palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 160, HEAPID_TAIL(heapId));
+    list->cells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
             list->chars[i] =
-                func_0204b81c(arc, func_02020f40(func_0201d624(pkm)), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
+                func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(pkm)), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
         }
     }
     GFL_ArcToolFree(arc);
@@ -1632,7 +1632,7 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
             setup.x = i * 40 + 24;
             list->actors[i] = func_0204c040(unit, list->chars[i], list->palette, list->cells, &setup, CLACT_VRAM_MAIN,
                                             heapId);
-            func_0204c378(list->actors[i], func_020210c0(func_0201d624(pkm)), 0);
+            func_0204c378(list->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), 0);
             if (PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL)) {
                 itemSetup = setup;
                 itemSetup.x += 12;

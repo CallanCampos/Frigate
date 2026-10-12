@@ -18,6 +18,7 @@
 #include "battle/btlv_mcss.h"
 #include "battle/btlv_stage.h"
 #include "battle/btlv_timer.h"
+#include "field/field_light_status.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
 #include "gfl/g3d.h"
@@ -104,7 +105,7 @@ typedef struct {
     u8 unk2A[2];
 } BtlvEffectBgData;
 
-// The colors func_02019804 fills in. The frame of BtlvEffect_Init gives them 4 more bytes, which nothing reads
+// The colors FieldLightStatus_Get fills in. The frame of BtlvEffect_Init gives them 4 more bytes, which nothing reads
 typedef struct {
     GXRgb colors[8];
     u32 unk10;
@@ -242,7 +243,7 @@ BtlvEffectSetup *BtlvEffect_CreateSetup(BtlMainModule *mainModule, BtlvScu *scu,
 
 // NONMATCHING: 34 bytes. The seasonal test is `cmp r0, #0` where the game has `lsls r0, r0, #1` (only
 // `seasonal * 2` gives that; s8, BOOL8, bitfields and a u16 of both flags don't), and the arguments of
-// BtlvStage_Create and func_02019804 are scheduled differently: ours loads two of func_02019804's before the stack
+// BtlvStage_Create and FieldLightStatus_Get are scheduled differently: ours loads two of FieldLightStatus_Get's before the stack
 // arguments are stored, and stores BtlvStage_Create's unk before heapId (prototype types, a local env pointer and the
 // season's type change nothing)
 void BtlvEffect_Init(const BtlvEffectSetup *setup, Font *font, HeapID heapId) {
@@ -290,7 +291,7 @@ void BtlvEffect_Init(const BtlvEffectSetup *setup, Font *font, HeapID heapId) {
         Light light;
         BtlvEffectLightColors colors;
 
-        func_02019804(setup->fieldEnv.zoneId, setup->fieldEnv.hour, setup->fieldEnv.minute, setup->fieldEnv.weather,
+        FieldLightStatus_Get(setup->fieldEnv.zoneId, setup->fieldEnv.hour, setup->fieldEnv.minute, setup->fieldEnv.weather,
                       setup->fieldEnv.season, colors.colors, sBtlvEffect->heapId);
         light.color = colors.colors[0];
         light.direction.x = 0;

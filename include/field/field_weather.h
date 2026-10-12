@@ -29,8 +29,8 @@ typedef struct {
     void (*objFunc)(WeatherObj *obj);
 } WeatherData;
 
-// Main: an entry of the u16 table at data_02090124, which the weather overlays pass as a sound
-u16 func_020198f0(u32 index);
+// Main: an entry of the u16 table at sWeatherLightIds, which the weather overlays pass as a sound
+u16 FieldLightStatus_GetWeatherLight(u32 index);
 
 // Overlay 36
 // The index of the camera's defaults

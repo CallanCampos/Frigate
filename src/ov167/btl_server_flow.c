@@ -3798,7 +3798,7 @@ u32 ServerEvent_CheckMoveAddCondition(BtlServerFlow *flow, u16 move, BattleMon *
     u8 failed;
 
     condition = PML_MoveGetParam(move, 0xb);
-    param = func_020214b0(move);
+    param = PML_MoveGetConditionParam(move);
     chance = PML_MoveGetParam(move, 0xc);
     func_ov167_021bd484(param, attacker, &result);
     BattleEventVar_Push(0x1d8c);
@@ -3839,7 +3839,7 @@ void ServerControl_SimpleCondition(BtlServerFlow *flow, u16 move, BattleMon *mon
     BattleMon *target;
 
     condition = PML_MoveGetParam(move, 0xb);
-    param = func_020214b0(move);
+    param = PML_MoveGetConditionParam(move);
     success = FALSE;
     if (func_ov169_0689cec0(targets)) {
         func_ov169_0689ce0c(targets);
@@ -4310,7 +4310,7 @@ void func_ov167_021a6c34(BtlServerFlow *flow, const BtlFlowMoveParam *param, Bat
     BattleMon *target;
 
     condition = PML_MoveGetParam(param->move, 0xb);
-    conditionParam = func_020214b0(param->move);
+    conditionParam = PML_MoveGetConditionParam(param->move);
     func_ov167_021bd484(conditionParam, mon, &value);
     func_ov169_0689ce0c(targets);
     while ((target = func_ov169_0689ce14(targets)) != NULL) {
@@ -7454,7 +7454,7 @@ BOOL CheckEvolution(BtlServerFlow *flow, u8 monId) {
 
     species = GetBattleMonSpecies(GetPokeParam(flow->pokeCon, monId));
     for (i = 0; i < 7; i++) {
-        if (func_02020bf0(flow->unk4A4, species, 0, i)) {
+        if (getEvolutionInfoParam(flow->unk4A4, species, 0, i)) {
             return TRUE;
         }
     }

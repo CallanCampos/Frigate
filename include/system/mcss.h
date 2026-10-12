@@ -29,9 +29,25 @@ typedef struct {
 // Called with the callback's parameter and the animation's frame
 typedef void (*MCSSAnimationCallback)(u32 param, fx32 frame);
 
-// The colors of a zone's light at a time of day and in a weather and season: the four lights' and then four of the
-// materials'. From the code before mcss.c, whose file is unknown
-void func_02019804(u32 zoneId, u32 hour, u32 minute, u32 weather, u32 season, GXRgb *colors, HeapID heapId);
+// A sprite's characters and palette on their way to VRAM, which a task loads in the V-blank. A palette that the
+// system blends has no files: its palette data and colors are allocated
+typedef struct {
+    NNSG2dCharacterData *chars;
+    NNSG2dPaletteData *pltt;
+    NNSG2dImageProxy *imageProxy;
+    NNSG2dImagePaletteProxy *plttProxy;
+    void *charFile;
+    void *plttFile;
+    u32 charAddr;
+    u32 plttAddr;
+    MCSSSystem *system;
+    MCSS *mcss;
+    // Whether the task runs in the system's task manager, and not in the V-blank's
+    BOOL inTcbMgr;
+} MCSSLoad;
+
+// Called with a sprite's files read and not yet loaded, to change its characters. Returning TRUE removes the callback
+typedef BOOL (*MCSSLoadCallback)(const MCSSLoadInfo *info, MCSSLoad *load, u32 work);
 
 MCSSSystem *MCSSSys_Create(u32 capacity, HeapID heapId);
 void MCSSSys_Free(MCSSSystem *system);
@@ -47,6 +63,7 @@ void func_0201aadc(MCSSSystem *system);
 void func_02019b98(MCSSSystem *system, u32 arcId);
 void func_02019bb4(MCSSSystem *system);
 void func_02019bcc(MCSSSystem *system, TCBManager *tcbMgr);
+void MCSSSys_SetLoadCallback(MCSSSystem *system, MCSSLoadCallback callback, u32 work);
 void func_02019bd8(MCSSSystem *system, MCSS *mcss, const MCSSLoadInfo *info);
 // Where the sprites' character and palette data go: each sprite's is at these offsets plus 0x4000 and 0x20 bytes per
 // slot
@@ -55,12 +72,12 @@ void func_0201af00(MCSSSystem *system, u32 paletteOffset);
 void func_0201af9c(MCSSSystem *system, u32 offset);
 
 void MCSS_GetPosition(MCSS *mcss, VecFx32 *position);
-void MCSS_SetPosition(MCSS *mcss, const VecFx32 *position);
-void MCSS_SetScale(MCSS *mcss, const VecFx32 *scale);
-void func_0201abb8(MCSS *mcss, const VecFx32 *a1);
-void func_0201ac0c(MCSS *mcss, const VecFx32 *a1);
+void MCSS_SetPosition(MCSS *mcss, VecFx32 *position);
+void MCSS_SetScale(MCSS *mcss, VecFx32 *scale);
+void func_0201abb8(MCSS *mcss, VecFx32 *a1);
+void func_0201ac0c(MCSS *mcss, VecFx32 *a1);
 void func_0201ac5c(MCSS *mcss, u16 a1);
-void func_0201ac70(MCSS *mcss, const VecFx32 *a1);
+void func_0201ac70(MCSS *mcss, VecFx32 *a1);
 void func_0201ac8c(MCSS *mcss);
 void func_0201ac9c(MCSS *mcss);
 void MCSS_PauseAnimation(MCSS *mcss);
@@ -80,7 +97,7 @@ void func_0201ae2c(MCSS *mcss, u8 startLevel, u8 endLevel, s32 wait, u32 color);
 BOOL func_0201aee8(MCSS *mcss);
 void func_0201aecc(MCSS *mcss, u32 a1);
 void func_0201aeb0(MCSS *mcss, u32 a1);
-void func_0201ab54(MCSS *mcss, const VecFx32 *a1);
+void func_0201ab54(MCSS *mcss, VecFx32 *a1);
 u16 func_0201ade8(MCSS *mcss);
 u16 func_0201ade0(MCSS *mcss);
 s16 func_0201adf0(MCSS *mcss);
@@ -100,7 +117,7 @@ void func_0201aba0(MCSS *mcss, VecFx32 *out);
 void func_0201abd4(MCSS *mcss, VecFx32 *out);
 void func_0201abf0(MCSS *mcss, const VecFx32 *in);
 void func_0201ac28(MCSS *mcss, VecFx32 *out);
-void func_0201ac40(MCSS *mcss, const VecFx32 *in);
+void func_0201ac40(MCSS *mcss, VecFx32 *in);
 void func_0201ac64(MCSS *mcss, u16 value);
 void func_0201acb0(MCSS *mcss);
 BOOL func_0201acd4(MCSS *mcss);
@@ -119,23 +136,25 @@ u8 func_0201af44(MCSS *mcss);
 void func_0201af54(MCSSSystem *system, MCSS *mcss, int level);
 void func_0201afa0(MCSS *mcss, fx32 speed);
 u16 func_0201afa8(MCSS *mcss);
-void func_0201afb0(MCSSSystem *system, MCSS *mcss, u8 evy, GXRgb color);
+void func_0201afb0(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color);
 void func_0201b128(MCSSSystem *system, MCSS *mcss);
 void func_0201b270(MCSS *mcss, BOOL flag);
 void func_0201b28c(MCSSSystem *system, u32 value);
 void func_0201b290(MCSSSystem *system, BOOL flag);
-// The files of a Pokémon's sprite, with a5 and a6 as GetPokemonPaletteDataNo takes them
-void SetupPokemonLoaderFSTool(u32 species, u32 form, u32 sex, BOOL rare, u32 a6, MCSSLoadInfo *info, u32 a5);
+// The rest is mcss_tool.c's, which fills in the files of a Pokémon's or a trainer's sprite
+
+// The files of a Pokémon's sprite, with dir and egg as GetPokemonPaletteDataNo takes them
+void SetupPokemonLoaderFSTool(u32 species, u32 form, u32 sex, BOOL rare, BOOL egg, MCSSLoadInfo *info, u32 dir);
 // The files of a trainer's sprite, from the front or the back
 void GetTrainerSpriteResIDs(u32 trainerType, MCSSLoadInfo *info, BOOL back);
 // Draws a Spinda's spots for its personality on the next sprite added
 void func_0201c188(MCSSSystem *system, u32 personality);
 // Draws a Spinda's spots for its personality on a sprite's characters
-void func_0201c1b4(void *chars, u32 personality);
+void MCSS_DrawSpindaSpots(void *chars, u32 personality);
 // Adds the sprite of a party Pokémon
-MCSS *func_0201c14c(MCSSSystem *system, PartyPkm *pkm, u32 a2, fx32 x, fx32 y, fx32 z);
+MCSS *func_0201c14c(MCSSSystem *system, PartyPkm *pkm, u32 dir, fx32 x, fx32 y, fx32 z);
 
 // SetupPokemonLoaderByBoxData for a party Pokémon
-void func_0201bfdc(PartyPkm *pkm, MCSSLoadInfo *info, u32 a2);
+void func_0201bfdc(PartyPkm *pkm, MCSSLoadInfo *info, u32 dir);
 
 #endif // POKEBW2_SYSTEM_MCSS_H

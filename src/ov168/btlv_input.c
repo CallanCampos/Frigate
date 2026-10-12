@@ -2777,8 +2777,8 @@ static void BtlvInput_CreatePartyIcons(BtlvInput *work, const BtlvInputCommandPa
         return;
     }
     arc = GFL_ArcSysCreateFileHandle(7, HEAPID_TAIL(work->heapId));
-    work->iconCellAnims = func_0204bde0(arc, func_02021154(), getOBJTileMapping_SubEng(), work->heapId);
-    work->iconPalette = func_0204bc48(arc, func_02021114(), 1, 0x160, work->heapId);
+    work->iconCellAnims = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), work->heapId);
+    work->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 1, 0x160, work->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, (u16)(func_0204bdc0(work->iconPalette, TRUE) >> 1), 0x60);
     G2S_SetWnd0Position(1, 0, 0, 0);
     G2S_SetWnd1Position(1, 0, 0, 0);
@@ -2812,7 +2812,7 @@ static void BtlvInput_CreatePartyIcons(BtlvInput *work, const BtlvInputCommandPa
             G2S_SetWnd1Position(x - 16, y - 16, x + 16, y + 16);
         }
         func_0204c378(work->iconActors[i].actor,
-                      func_02021034(param->species[i], param->forms[i], param->sexes[i], FALSE), 0);
+                      PokeIcon_GetPalette(param->species[i], param->forms[i], param->sexes[i], FALSE), 0);
     }
     GFL_ArcToolFree(arc);
 }

@@ -793,8 +793,8 @@ static void IrcRankingList_Init(IrcRankingList *list, u8 bg1, u8 bg2, u8 bg5, u8
     list->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     IrcRankingScreens_Init(&list->screens, bg, heapId);
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    list->iconPalettes[0] = func_0204bc48(arc, func_02021114(), CLACT_VRAM_MAIN, 0x20, heapId);
-    list->iconPalettes[1] = func_0204bc48(arc, func_02021114(), CLACT_VRAM_SUB, 0x20, heapId);
+    list->iconPalettes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x20, heapId);
+    list->iconPalettes[1] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x20, heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < IrcRankingData_GetCount(ranking); i++) {
         IrcRankingRow_Init(&list->rows[i], &ranking->entries[i], unit, list->iconPalettes[0], list->iconPalettes[1],
@@ -1038,7 +1038,7 @@ static void IrcRankingRow_Init(IrcRankingRow *row, IrcRankingEntry *entry, ClAct
     GFL_StrBufFree(valueFormat);
     GFL_StrBufFree(rankFormat);
     iconFile = PokeParty_GetIconIndex(entry->species, entry->form, entry->sex, entry->isEgg);
-    iconCells = func_0202111c();
+    iconCells = PokeIcon_GetCellFile_Main();
     iconAnims = getOBJTileMapping_MainEng();
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
     row->iconChars = func_0204b81c(arc, iconFile, FALSE, CLACT_VRAM_BOTH, heapId);
@@ -1057,7 +1057,7 @@ static void IrcRankingRow_Init(IrcRankingRow *row, IrcRankingEntry *entry, ClAct
         row->iconY[i] = setup.y;
         row->icons[i] = func_0204c040(unit, row->iconChars, i == 0 ? mainPalette : subPalette, row->iconCellAnims,
                                       &setup, i, heapId);
-        func_0204c378(row->icons[i], func_02021034(entry->species, entry->form, entry->sex, entry->isEgg), FALSE);
+        func_0204c378(row->icons[i], PokeIcon_GetPalette(entry->species, entry->form, entry->sex, entry->isEgg), FALSE);
         if (setup.y > -16 && setup.y < 208) {
             func_0204c124(row->icons[i], TRUE);
         } else {

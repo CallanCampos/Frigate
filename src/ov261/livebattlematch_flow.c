@@ -501,8 +501,8 @@ static void LiveBattleMatchFlow_StepTeam(WifiBattleMatchTask *task, u32 *seq, vo
             *seq = 11;
             break;
         }
-        problem = func_0201f424(regulation, wk->party, &wk->pickFlags);
-        if (func_0201f6e8(regulation, wk->party)) {
+        problem = PokeRegulation_CheckParty(regulation, wk->party, &wk->pickFlags);
+        if (PokeRegulation_PartyHasEgg(regulation, wk->party)) {
             wk->pickFlags |= 0x20;
             problem = 5;
         }

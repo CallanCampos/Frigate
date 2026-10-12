@@ -434,7 +434,7 @@ static void MysteryCardView_LoadGraphics(MysteryCardView *view, HeapID heapId) {
     GFL_BGSysFillChar(2, 0, 1, 0);
     LoadSysMsgBox(0, 1, 13, 0, heapId);
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    view->pokeIconPalette = func_0204bc48(arc, func_02021114(), 0, 0x180, heapId);
+    view->pokeIconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 0, 0x180, heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < CARDS_PER_PAGE * 2; i++) {
         if (i >= CARDS_PER_PAGE) {
@@ -856,7 +856,7 @@ static ArcTool *MysteryCard_OpenIconArc(MysteryCard *card, HeapID heapId) {
 static u32 MysteryCard_GetIconPaletteFile(MysteryCard *card) {
     switch (MysteryCard_GetKind(card)) {
     case 1:
-        return func_02021114();
+        return PokeIcon_GetPaletteFile();
     case 2:
         return GetItemGraphicsDatID(MysteryCard_GetGift(card)->value, 2);
     default:
@@ -869,7 +869,7 @@ static u32 MysteryCard_GetPokeIconPalette(MysteryCard *card) {
     if (MysteryCard_GetKind(card) == 1) {
         MysteryGiftPokemon *poke = (MysteryGiftPokemon *)MysteryCard_GetGift(card);
 
-        return func_02021034(poke->species, poke->form, poke->gender, poke->isEgg);
+        return PokeIcon_GetPalette(poke->species, poke->form, poke->gender, poke->isEgg);
     }
     return 0;
 }
@@ -893,7 +893,7 @@ static u32 MysteryCard_GetIconCharFile(MysteryCard *card) {
 static u32 MysteryCard_GetIconCellFile(MysteryCard *card) {
     switch (MysteryCard_GetKind(card)) {
     case 1:
-        return func_0202111c();
+        return PokeIcon_GetCellFile_Main();
     case 2:
         return 1;
     default:

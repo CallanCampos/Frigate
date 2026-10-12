@@ -9,7 +9,7 @@
 // union_msg.c, overlay 34, which the ROM names: the Union Room's messages, menus and their tables. Names are not
 // swan's. The first functions are lookups of message IDs, by gender, language or a random pick
 
-// The rules of a regulation printed (func_0201f8b4): its message data and, for each of the six rules, the name of the
+// The rules of a regulation printed (PokeRegulation_CreatePrintMsg): its message data and, for each of the six rules, the name of the
 // rule and its value. alloc.rpm of the system holds one
 typedef struct {
     MsgData *msgData;
@@ -19,8 +19,8 @@ typedef struct {
 } RegulationRulesText;
 
 // Main code that overlay 34 is the only user of yet
-void *func_0201f8b4(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL battleType);
-void func_0201f950(void *rulesText);
+void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL battleType);
+void PokeRegulation_FreePrintMsg(void *rulesText);
 StrBuf *makeStrbufLoadBattleTypeText(Regulation *regulation, HeapID heapId);
 
 // Overlay 36's windows and menus that overlay 34 uses and field.h doesn't declare yet

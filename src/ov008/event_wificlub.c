@@ -161,8 +161,8 @@ void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
 
     BtlSetup_AllocRecBuffer(wk->btlSetup, 1);
     BtlSetup_ApplyRegulation(wk->btlSetup, wk->club->regulation, HEAPID_GAMEEVENT);
-    func_0201f63c(wk->club->regulation, wk->club->parties[0]);
-    func_0201f63c(wk->club->regulation, wk->club->parties[1]);
+    PokeRegulation_ApplyLevelToParty(wk->club->regulation, wk->club->parties[0]);
+    PokeRegulation_ApplyLevelToParty(wk->club->regulation, wk->club->parties[1]);
     wk->btlSetup->records = GameData_GetRecords(GSYS_GetGameData(wk->gsys));
 }
 

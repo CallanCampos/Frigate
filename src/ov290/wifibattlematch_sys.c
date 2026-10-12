@@ -573,7 +573,7 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
             GFL_ASSERT(0);
             break;
         }
-        param->regulation = func_0201f734(fileId, heapId);
+        param->regulation = PokeRegulation_LoadNew(fileId, heapId);
     } else if (sys->mode == 0) {
         param->regulation =
             func_0200b530(TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 0));
@@ -586,11 +586,11 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
     param->selected = sys->party;
     param->gameData = sys->param.gameData;
     PokeParty_Copy((PokeParty *)sys->player->partyData, sys->pickParty);
-    func_0201f63c(param->regulation, sys->pickParty);
+    PokeRegulation_ApplyLevelToParty(param->regulation, sys->pickParty);
     param->party = sys->pickParty;
     otherPlayer = sys->otherPlayer;
     PokeParty_Copy((PokeParty *)otherPlayer->partyData, sys->otherPickParty);
-    func_0201f63c(param->regulation, sys->otherPickParty);
+    PokeRegulation_ApplyLevelToParty(param->regulation, sys->otherPickParty);
     param->otherName = GetPlayerName(&otherPlayer->info);
     param->otherParty = sys->otherPickParty;
     param->otherGender = getTrainerGender(&otherPlayer->info);
@@ -689,7 +689,7 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
             BtlSetup_SetNetTriple(param->setup, sys->param.gameData, func_02040440(), 2, heapId);
             break;
         }
-        regulation = func_0201f734(fileId, heapId);
+        regulation = PokeRegulation_LoadNew(fileId, heapId);
         ownsRegulation = TRUE;
     } else if (sys->mode == 0) {
         regulation = func_0200b530(TournamentBlock_GetEntry(tournament, 0));
@@ -825,7 +825,7 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
                                            value, setup, &sys->battleResult, 0);
         }
     } else if (sys->mode == 2) {
-        regulation = func_0201f734(sys->param.unk4 + 0xf, HEAPID_WIFIBATTLEMATCH);
+        regulation = PokeRegulation_LoadNew(sys->param.unk4 + 0xf, HEAPID_WIFIBATTLEMATCH);
         if (result == 0) {
             WifiBattleMatchSys_BuildReport(&sys->report, sys->party, sys->otherParty, sys->otherPlayer, regulation, 0,
                                            setup, &sys->battleResult, 2);

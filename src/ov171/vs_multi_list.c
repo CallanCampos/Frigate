@@ -597,14 +597,14 @@ static void VsMultiList_LoadObjRes(VsMultiListWork *wk) {
         u16 icon;
 
         if (wk->pkm[i] != NULL) {
-            icon = func_02020f40(func_0201d624(wk->pkm[i]));
+            icon = PokeIcon_GetFileOfPkm(func_0201d624(wk->pkm[i]));
         } else {
             icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
         }
         charRes[i] = func_0204b81c(arc, icon, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
     }
-    wk->palRes[0] = func_0204bc48(arc, func_02021114(), CLACT_VRAM_MAIN, 0, HEAPID_VS_MULTI_LIST);
-    wk->cellRes[0] = func_0204bde0(arc, func_02021154(), getOBJTileMapping_SubEng(), HEAPID_VS_MULTI_LIST);
+    wk->palRes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0, HEAPID_VS_MULTI_LIST);
+    wk->cellRes[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), HEAPID_VS_MULTI_LIST);
     GFL_ArcToolFree(arc);
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), BG_HEAP);
     wk->charRes[7] = func_0204b81c(uiArc, 12, FALSE, CLACT_VRAM_MAIN, HEAPID_VS_MULTI_LIST);
@@ -652,7 +652,7 @@ static void VsMultiList_CreateActors(VsMultiListWork *wk) {
             u16 item;
 
             func_0204c520(wk->actors[i], TRUE);
-            func_0204c378(wk->actors[i], func_020210c0(func_0201d624(wk->pkm[i])), TRUE);
+            func_0204c378(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(wk->pkm[i])), TRUE);
             item = PokeParty_GetParam(wk->pkm[i], PKM_PARAM_ITEM, NULL);
             if (item == 0) {
                 func_0204c124(wk->actors[i + 6], FALSE);

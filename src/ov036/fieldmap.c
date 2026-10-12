@@ -1178,7 +1178,7 @@ void Field_LoadWFBC(GameData *gameData, Field *field, u32 zoneId) {
     FieldStatus *status = GameData_GetFieldStatus(gameData);
 
     if (IsZoneBlackCityOrWhiteForestLobby(field->zoneId)) {
-        BOOL isOther = func_02019314(status);
+        BOOL isOther = FieldStatus_GetInLinkedWorld(status);
         CityState *city;
 
         if (isOther == FALSE) {

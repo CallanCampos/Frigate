@@ -111,7 +111,7 @@ BOOL func_ov012_021580c4(VM *vm, FieldScriptEnv *env) {
     holder->param->shot = func_0200ad5c(save);
     holder->param->loadComm = TRUE;
     holder->param->loadData = TRUE;
-    ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_ID(209), &MUSICAL_SHOT_PROC_FUNCTIONS, holder->param,
+    ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(209), &MUSICAL_SHOT_PROC_FUNCTIONS, holder->param,
                                              func_ov012_02158da0, holder));
     return TRUE;
 }
@@ -626,7 +626,7 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
         } else {
             commWork->ircMatch.result = IRCBATTLEMATCH_MODE_MUSICAL_ARG1;
         }
-        ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
+        ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
                                                  &commWork->ircMatch, func_ov012_02158dac, holder));
         return TRUE;
     case 19:
