@@ -11,6 +11,10 @@ First read `CLAUDE.md`, then `.claude/skills/match-function/SKILL.md`, and follo
 batches, stop rules. Read the section of `.claude/skills/match-function/levers.md` that fits the class of difference,
 not the whole file. Use `tools/decomp/locals.py` for register and stack slot differences.
 
+Before editing an overlay file, confirm the caller supplied the URL of its claimed overlay issue. If not, perform
+the claim check in `.claude/skills/decomp-file/SKILL.md` step 0 yourself. Work under the caller's existing claim
+without posting another one. If you claimed it yourself, include the issue URL in your report to the caller.
+
 Limits:
 - Change only the given function in the given source file, plus `static inline` helpers right above it if a variant
   needs one. Don't edit headers, configs, docs or other files. If a header change (a prototype's type, a `const`) is

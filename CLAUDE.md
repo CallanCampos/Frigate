@@ -38,6 +38,13 @@ a rule here changes, change it there too.
 - **Keep going.** Continue in file order and commit each file as it is done. Don't end a turn with a menu when the next
   step is obvious. Ask only real decisions, such as placement with no evidence or a change of scope. Answer any message
   the user sends mid-turn.
+- **Claim an overlay before working on it.** For any overlay decompilation or matching work, find its open
+  `[Decomp] Overlay NNN` GitHub issue and read its comments before editing or delegating edits. If someone has an
+  active claim in a comment, choose another overlay; if the user specified that overlay, tell them it is claimed.
+  Otherwise comment `Claiming overlay NNN for decompilation` with the file or range you will start with, recheck
+  the comments for a concurrent earlier claim, then proceed. A claim stays active until its author explicitly
+  releases it in a comment or the issue closes. Release your claim when leaving the overlay unfinished. See the
+  `decomp-file` skill for the commands. This applies to direct `match-function` work too.
 - **Learn.** A trick that worked and isn't in `docs/matching.md` goes there, with an example. See the `record-lesson` skill.
 
 ## Environment

@@ -91,4 +91,6 @@ intended, stop and ask the user.
 ## 8. Report and continue
 
 Tell the user in one or two lines: the file, N of M matching, the rows added or removed, and the commit. Then start
-the next file with `decomp-file`, without asking unless something real is blocked.
+the next file with `decomp-file`, without asking unless something real is blocked. Keep the same overlay claim while
+continuing within it. If leaving an unfinished overlay, release the claim in its issue comment. If the entire
+overlay is complete, close its issue after publishing the verified commit.
