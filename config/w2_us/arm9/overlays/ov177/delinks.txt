@@ -4,5 +4,6 @@
     .bss        start:0x0219cc00 end:0x0219cc00 kind:bss align:32
 
 src/ov177/irc_sync_check.c:
+    complete
     .text       start:0x0219ad60 end:0x0219ca18
     .rodata     start:0x0219ca18 end:0x0219cbf0

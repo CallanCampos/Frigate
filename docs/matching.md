@@ -185,6 +185,17 @@ Same instructions, registers swapped.
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
   and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
   loop without the `NULL` test, matches with plain indexing.
+- A loop-invariant field read through a `const` pointer parameter, which the original keeps in `ip`, `r7` or a stack
+  slot across the loop, can be a load MWCC hoisted itself. Written as a local before the loop it keeps the same
+  copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:
+  `irc_sync_check.c`'s `IrcSyncCheck_CompareTraces` matches with `own[i].x - ownStart->x` in the loop, and was 52
+  bytes off with `int ownStartX = ownStart[0].x;` above it.
+- An integer `+` of a local and a temporary puts the local first whatever the source order, and a pointer `+` puts
+  the pointer first. `adds r1, r7, r1` with the size in `r7` and the running address in `r1` is therefore integer
+  arithmetic on the address: `musical_system.c`'s `MusicalSystem_LoadProgramData` sets its second and third sound
+  pointers with `(void *)((u32)work->sound[0] + size0)` and `(void *)((u32)work->sound[0] + size0 + size1)`, the
+  second reusing the first's sum, as `btlv_gauge.c` writes its offsets. `(u8 *)work->sound[1] + size1` gives
+  `adds r1, r1, r7`.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -311,6 +322,11 @@ Same code, other `sp` offsets or frame size.
   register is loaded. When the original loads a member's offset into `r6` or `r7` early and indexes from it, the
   source had such a pointer: the bag's `ItemMenuDisp_DrawQuantity`, `ItemMenuDisp_ShowMessage` and
   `ItemMenuDisp_DrawTMInfo` only match with one, and it also stopped MWCC from holding a zero for the stack arguments.
+- A pointer local to a struct field whose offset is beyond the store's immediate range is kept as the base register
+  plus the offset in a stack slot, and the store through it is `str r6, [r5, r0]`. The slot is written at entry from
+  another offset the function already holds (`adds r0, r4, #0; str r0, [sp, #0x18]; adds r0, #0xc; str r0, [sp, #0x18]`).
+  `psel.c`'s `PselText_PrintType` declares `BOOL *done = &wk->winDone[2];` right after `BmpWin *win = wk->win[2];` and
+  ends with `*done = FALSE;`; the plain `wk->winDone[2] = FALSE;` rebuilds the constant and has no slot, 8 bytes shorter.
 - A halfword local whose address is passed, stored through the register that is then the argument
   (`add r0, sp, #4; add r0, #2; strh r6, [r0]`), is a one-element array with an initializer, `u16 black[1] = { 0 };`,
   as `game_clear_save.c`'s `GameClearSave_Main` passes to `gfxUploadStdPaletteBGB`. A scalar `u16 black = 0;` with
@@ -439,6 +455,9 @@ Same instructions, scheduled in another order.
   written after that call: overlay 185's `CountupGreetings` stores `n`'s zero before calling
   `PMSWord_GetWordNumByGmmId` only with `n = 0;` after `first` and `last` are computed. Written before the call, it is
   stored after the call's result and built in `r0`; the next function, `CountupPokemon`, sets it right after its call.
+- The same holds for a flag: `oekaki.c`'s `Oekaki_UpdateTouch` sets `endPressed = TRUE;` after
+  `Oekaki_PrintMessage(...)` in both arms of its End button case. The store to `[sp]` is hoisted above the call
+  either way, built in `r1` when the statement follows the call and in `r0` when it precedes it.
 - A field of a local struct that a call fills is loaded before the next call only when the source reads it there: the
   Pokédex forms page copies `targetX = target.x;` between `ZukanDetailForm_GetSpritePosF32(..., &target)` and
   `MCSS_GetPosition`.
@@ -501,6 +520,18 @@ Same instructions, scheduled in another order.
   the way: `poke_tool.c`'s `fillDataForHatchedEgg` stored `heapId` to the stack too early until `placeName` was a
   `u32` in it, in `PML_UtilSetupMetData`'s prototype and in that function's static helper. When a caller differs
   only in such an order, widen the callee's parameter and follow it down.
+- A `u32` local's reload from its stack slot is hoisted above a store through a pointer, and a `u16` local's is
+  not: `event_battle_return.c`'s `EventBattleReturn_Main` sets up the evolution demo with `str r7, [r3, #4];
+  ldr r0, [sp, #0x18]; ldr r2, =SHINKA_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
+  needs `CheckEvolveSpecies` to return `u16`, or the call's result is narrowed. It is not aliasing: taking the
+  local's address, moving it into a local struct or retyping the pointee's fields leaves the `u32` hoist in place.
+- One constant register feeds a stack argument and a register argument of the same value, so an extra `mov` into
+  an argument register beside an equal constant is a wrong argument, not scheduling: `th_award.c`'s
+  `ThAward_InitRankIcons` loads file 1, and with file 0 it had one `mov r1, r6` too many at the same size.
+- A variable reused by a second block of the same shape changes how that block's arguments are scheduled, with the
+  registers unchanged: `ThAward_InitText` measures its points text into a `pointsWidth` of its own, which lets the
+  width's reload move above the stack argument's store, where reusing `kindWidth` kept it below. In the same
+  function two address locals set in one branch are spilled in statement order (`record` before `name`).
 
 ## An instruction too many or too few
 
@@ -789,6 +820,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   narrow in the other order.
 - `FX32_ONE` is an `int` constant in `nitro/fx.h` but a `long` in the SDK. Where a product of it is passed on,
   the type shows: `oekaki.c`'s `Oekaki_CreateActors` matches only with the sub surface's Y as `256 * 0x1000L`.
+- Two identical expressions are merged into one spilled value, even across calls and loops. Where the original
+  computes the value twice, the two sites differ in type: `pleasure_boat_rooms.c`'s `PleasureBoat_SetUpRooms` draws
+  `NELEMS(sPeople) - (trainerCount + 2)` people, which is unsigned through `sizeof`, and later loops to the signed
+  `PLEASURE_BOAT_ROOM_COUNT - (trainerCount + 2)`; with both as `15 - (trainerCount + 2)` the difference is computed
+  once and kept at `sp+4`.
+- An array element written through a local index, `boat->rooms[room].field` with `u32 room = picker.order[slot];`,
+  folds each field's offset into its store; a `PleasureBoatRoom *room` pointer keeps the base and the scaled index
+  in registers and spills more (the same function's frame fell from 0x7c to 0x6c). The index must be a local when
+  the array it comes from has had its address taken, or every store forces a reload of it.
 
 ## Branches and block layout
 
@@ -846,6 +886,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A test that branches past an unconditional jump, `bne next; b hide`, where `||` would give one `beq hide`, is the
   first copy of a body written twice in an `if`/`else if` chain and replaced by a jump to the second:
   `func_ov194_021c4ec0` hides a marking icon with `if (anim == -1) { hide } else if (isEgg && i == 6) { hide }`.
+- A 0 or 1 argument built directly in `r1` to `r3` across branches, where any local for it takes a callee-saved
+  register and shifts the others, is an inlined helper whose branches return the constants. Its
+  `if (x) { return 0; } return 1;` tail gives `movs r1, #0; cmp; bne; movs r1, #1`, and its `if`/`else` of returns
+  the `beq; b` layout. `pokemontrade_demo_common.c`'s `PokemonTradeDemoCommon_InitSide` passes
+  `PokemonTradeDemoCommon_GetSide(wk, partner)` to `PokemonTrade_GetPkm`; an `int side` local, nested ternaries and
+  an inline with a result local all build the 1 first or move the registers.
 - A `bne` over a `b` into another branch's call, `cmp r0, #0; bne x; b call; x: cmp r7, #0; beq call; mov r6, #1;
   call:`, is the call written in both branches: overlay 185's `PMSIView_CmdWordWinToCategory` matches only with
   `if (mode == 0) { f(flag); } else { if (search) { flag = TRUE; } f(flag); }`. Writing the call once after the `if`
@@ -949,6 +995,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A ternary, an `if`/`else` on the value alone and an inline abs all give other code.
 - A call left unmerged in one arm while both arms jump to one store means the store is written at the end of both
   arms, not once after the `if` (`PkwdSelectScreen_PrintMovie`).
+- Two calls to one function in the two arms of an `if`/`else` are merged into one `bl` in every plain spelling
+  (ternary argument, nested `if`, locals, `break`s). They stay apart when one arm's `bl` is already the join of an
+  inner `if`/`else` and the code after it is written in both outer arms: the label on that `bl` stops the merge.
+  `config_panel.c`'s `ConfigPanelAppBar_Main` plays its sound with an inner
+  `if (button == BUTTON_QUIT) { cancel } else { decide }` and has `update = TRUE; appBar->decided = TRUE;` at the end
+  of both arms of the outer `if`, and likewise `AppTaskMenuWin_SetActive(wins[button ^ 1], FALSE)` at the end of
+  both arms of `if (appBar->decided)`, which gives the `1` a register shared with the arm's `TRUE`.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
@@ -1229,6 +1282,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   after a file's larger tables, is the next file's first object: the 4 bytes at 0x021a773c in overlay 310 can't end
   `research_graph.c`, whose tables are larger, and as `research_common.c`'s global `ResearchCommon_Unused` they take
   a section of their own ahead of that file's 8-byte table, as the ROM has them.
+- A small table that sits among a file's other small `static const` tables but that no code loads from was a
+  referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
+  of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven
+  values in case order, and the switch reading `sTrainerCounts[0]` to `[6]` compiles to the same `movs` while keeping
+  the table. Its place among the packed tables is not definition order: defined between the room tables it came out
+  one early, defined first it is where the ROM has it.
 - `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
   Medal Rally's `p_sv` does.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry

@@ -5,6 +5,7 @@
     .bss        start:0x0219d6e0 end:0x0219d6e0 kind:bss align:32
 
 src/ov166/event_battle_return.c:
+    complete
     .text       start:0x0219ce80 end:0x0219d650
     .rodata     start:0x0219d650 end:0x0219d6ac
     .data       start:0x0219d6c0 end:0x0219d6e0
