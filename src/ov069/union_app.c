@@ -374,7 +374,7 @@ UnionAppMember *UnionApp_GetMember(UnionApp *app, u8 netId) {
     return &app->members[netId];
 }
 
-u8 UnionApp_GetJoined(UnionApp *app) {
+u32 UnionApp_GetJoined(UnionApp *app) {
     return app->status.joined;
 }
 

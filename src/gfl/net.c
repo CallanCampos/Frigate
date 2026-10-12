@@ -456,7 +456,7 @@ BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const voi
     return func_0203fafc(command, (u8 *)data, size, a5, func_020401dc(handle), dest, noCopy);
 }
 
-BOOL func_02042cfc(void) {
+BOOL func_02042cfc(NetHandle *handle) {
     return func_020400f0();
 }
 

@@ -632,7 +632,7 @@ static BOOL CommTvtField_OnButton(u32 button, CommTvtFieldWork *wk) {
     switch (button) {
     case 0:
     case 3:
-        wk->param->exitArgument = func_ov012_02153658();
+        wk->param->exitArgument = func_ov012_02153658(comm);
         wk->mode = 0;
         GFL_SndSEPlay(SEQ_SE_SYS_69);
         CommTvtField_SetFuncLine(wk, CommTvtField_StartPress, 964);
@@ -676,7 +676,7 @@ static void CommTvtField_UpdateStatus(CommTvtFieldWork *wk) {
     BOOL changed = FALSE;
     int newIndex = 0;
     GameCommSys *comm = GSYS_GetGameCommSystem(wk->gsys);
-    u32 state = func_ov012_02153658();
+    u32 state = func_ov012_02153658(comm);
 
     if (wk->unk374 == 0) {
         newIndex = 0;
@@ -773,8 +773,7 @@ static void CommTvtField_InitMessage(CommTvtFieldWork *wk) {
 }
 
 static void CommTvtField_AnimateIcon(CommTvtFieldWork *wk) {
-    GSYS_GetGameCommSystem(wk->gsys);
-    switch (func_ov012_02153658()) {
+    switch (func_ov012_02153658(GSYS_GetGameCommSystem(wk->gsys))) {
     case 0:
     case 1:
         if (func_0204c4a0(wk->actors[0]) == 20) {
