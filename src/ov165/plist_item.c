@@ -249,7 +249,7 @@ void PokeList_UpdateArceusForm(PokeListWork *wk, PartyPkm *pkm, u16 item) {
 void PokeList_UpdateGenesectForm(PokeListWork *wk, PartyPkm *pkm, u16 item) {
     if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) == SPECIES_GENESECT) {
         u32 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
-        u32 driveForm = func_0201ef8c(item);
+        u32 driveForm = PML_ItemGetGenesectDriveForme(item);
 
         if (form != driveForm) {
             PokeParty_ChangeForme(pkm, driveForm);
@@ -528,7 +528,7 @@ void PokeList_UpdateLevelUp(PokeListWork *wk) {
         }
         break;
     case 6: {
-        u16 move = func_0201d358(wk->pkm, &wk->param->learnIndex, wk->heapId);
+        u16 move = PokeParty_LearnNextLevelMove(wk->pkm, &wk->param->learnIndex, wk->heapId);
 
         PokeListMessage_Close(wk, wk->message);
         if (move == 0) {

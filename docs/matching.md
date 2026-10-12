@@ -479,6 +479,10 @@ Same instructions, scheduled in another order.
   live) was the xor written inside the loop, `if ((keyInfo->difficulty ^ keyInfo->seed) == UNOVA_LINK_DIFFICULTY_KEYS[i])` in
   `key_info.c`'s `GetGameDifficulty`, not a local computed before it. That file's setters matched only with the
   table's constant read into a local first: `u32 value = sUnlockKeys[key]; keyInfo->unlocked[key] = value ^ keyInfo->seed;`.
+- A call's stack argument is stored after its register arguments are loaded only when no argument is narrowed on
+  the way: `poke_tool.c`'s `fillDataForHatchedEgg` stored `heapId` to the stack too early until `placeName` was a
+  `u32` in it, in `PML_UtilSetupMetData`'s prototype and in that function's static helper. When a caller differs
+  only in such an order, widen the callee's parameter and follow it down.
 
 ## An instruction too many or too few
 
@@ -894,6 +898,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Nested tests that end in the same call can come from a nested `if` whose inner `if` has no `else`: the bag's item menu
   calls `func_0202d384` with `if (pocket != FREE_SPACE) { if (pocket != KEY_ITEMS) f(); } else if (...) f();`, which
   puts the Free Space's test after the other two; an `if`/`else if` chain or a `switch` puts it first.
+- `x == 0 || x == 254 || x == 255` becomes a range test (`subs r0, #0xfe; cmp r0, #1; bhi`) only on a 32-bit `x`:
+  on a `u8`, 255 is the type's maximum and the test is `cmp r0, #0xfe; blo`. `poke_personal.c`'s
+  `isGenderlessOrSetGender` was 2 bytes short with a `u8` parameter, and its three callers in `poke_tool.c`, which
+  pass the ratio unnarrowed, showed the parameter is a `u32`.
 
 ## Loops
 
@@ -933,6 +941,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A loop guard kept as an unsigned compare (`cmp r3, #4; bhs`) came from an enum counter tested against
   `NELEMS(table)`, whose `sizeof` makes the comparison unsigned; the enum's own bound gives `bge`. `symbol_save.c`'s
   `getKindOfSlot` loops `for (i = SYMBOL_KIND_KEEP_LARGE; i < NELEMS(sSlotRanges); i++)`.
+- A loop over an array of small structs read through by-value inline getters matches only when each getter takes
+  `learnset[i]` itself: `poke_tool.c`'s learnset loops (`PML_UtilPkmSetDefaultMoves`, `PokeParty_LearnNextLevelMove`)
+  lose the copy the original makes for `GetMove` when the element is first put in an `entry` local.
 
 ## Switches
 
@@ -979,6 +990,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   no `default:` returns on an out-of-range value with no code for it, as `btlv_input.c`'s target-to-moves task does.
 - Two equality tests that branch away with `beq; beq; b`, with each body after, are a `switch` on those two values, as
   `btlv_input.c`'s PP colour pick is a `switch (pp)`. An `if`/`else if` tests each before its body.
+- When several cases end in the same `mov r4, r0; b end`, MWCC keeps one copy of that tail and which case owns it
+  follows the source: `poke_tool.c`'s `PML_PkmGetParamCore` had the tail in its level case, one instruction away from
+  the original for 258 bytes, until the max PP case, `if (move != 0) { result = ... }`, got its explicit
+  `else { result = 0; }`.
 
 ## Floats and runtime helpers
 

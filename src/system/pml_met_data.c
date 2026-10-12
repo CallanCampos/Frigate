@@ -25,7 +25,7 @@
 // The index of the place name a location of a file uses when it is out of the file
 #define PLACE_NAME_FALLBACK 2
 
-static void PML_UtilSetNPokemonMetData(BoxPkm *pkm, u16 placeName, HeapID heapId);
+static void PML_UtilSetNPokemonMetData(BoxPkm *pkm, u32 placeName, HeapID heapId);
 static void PML_PkmClearMetParams(BoxPkm *pkm, BOOL isMet);
 static void PML_PkmSetMetParams(BoxPkm *pkm, u32 location, BOOL isMet);
 static void PML_PkmSetMetParamsEx(BoxPkm *pkm, u32 location, u32 year, u32 month, u32 day, BOOL isMet);
@@ -39,7 +39,7 @@ void PokeParty_SetupMetData(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo, u16
     PML_UtilSetupMetData(func_0201d620(pkm), kind, playerInfo, placeName, heapId);
 }
 
-void PML_UtilSetupMetData(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo, u16 placeName, HeapID heapId) {
+void PML_UtilSetupMetData(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo, u32 placeName, HeapID heapId) {
     BOOL wasEncrypted = PML_PkmDecrypt(pkm);
 
     switch (kind) {
@@ -108,7 +108,7 @@ void setDreamRadarPokeMetInfo(BoxPkm *pkm) {
     PML_PkmSyncOriginGame(pkm);
 }
 
-static void PML_UtilSetNPokemonMetData(BoxPkm *pkm, u16 placeName, HeapID heapId) {
+static void PML_UtilSetNPokemonMetData(BoxPkm *pkm, u32 placeName, HeapID heapId) {
     MsgData *msgData;
     StrBuf *name;
 

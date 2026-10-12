@@ -382,6 +382,16 @@
 . 0x0201bb3c MCSS_MakeMosaic
 . 0x0201bea4 MCSS_MulVecMtx44
 . 0x0201c1b4 MCSS_DrawSpindaSpots
+. 0x0201d268 PokeParty_LearnMoveTutor
+. 0x0201d270 PML_PkmLearnMoveTutor
+. 0x0201d2d0 PokeParty_SetMoveKeepPP
+. 0x0201d2d8 PML_PkmSetMoveKeepPP
+. 0x0201d358 PokeParty_LearnNextLevelMove
+. 0x0201eb78 PML_PkmAddParam
+. 0x0201ecc8 addClampedU8
+. 0x0201ef8c PML_ItemGetGenesectDriveForme
+. 0x0201efe4 PML_PkmGetSpriteForme
+. 0x0201f010 PML_GetPokestarFameLevel
 . 0x0201f09c checkPokemon
 . 0x0201f14c PokeRegulation_CheckPokemonExtraRule
 . 0x0201f1e8 PokeRegulation_CheckPicked
@@ -1954,6 +1964,7 @@
 . 0x020901e0 sMcssSpindaSpot1
 . 0x0209024c sMcssSpindaSpot0
 . 0x020902b8 sMcssSpindaSpot3
+. 0x02090350 sSharedSpriteFormSpecies
 . 0x020904fc sExtraRuleMoves
 . 0x02090502 sNationalLegendaries
 . 0x0209051c sPrintMsgValueFuncs
@@ -2097,6 +2108,7 @@
 . 0x02141078 _localWork
 . 0x021410f8 g_AntiPiracyTaskCount
 . 0x02141114 sTempFlags
+. 0x021411ec sDefaultMovesLearnset
 . 0x021413f0 sMoveDataCache
 . 0x021413f4 sMoveData
 . 0x02141664 sWipe

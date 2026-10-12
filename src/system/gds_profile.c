@@ -108,7 +108,7 @@ u32 GdsProfile_GetForm(GdsProfile *profile) {
     if (profile->species >= GDS_PROFILE_SPECIES_END) {
         return 0;
     }
-    return func_0201efe4(profile->species, profile->form);
+    return PML_PkmGetSpriteForme(profile->species, profile->form);
 }
 
 u32 GdsProfile_GetGender(GdsProfile *profile) {

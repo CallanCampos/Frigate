@@ -501,7 +501,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
         wk->learnIndex = 0;
         break;
     case SHINKA_DEMO_LEARN_MOVE:
-        wk->move = func_0201d358(wk->pkm, &wk->learnIndex, wk->heapId);
+        wk->move = PokeParty_LearnNextLevelMove(wk->pkm, &wk->learnIndex, wk->heapId);
         if (wk->move == 0) {
             wk->state = SHINKA_DEMO_END;
         } else if (wk->move != 0xfffe) {
