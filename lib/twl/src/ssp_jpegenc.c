@@ -748,7 +748,7 @@ static BOOL JpegEnc_Sign(u8 *data, u32 size) {
     if (hw_isDSi()) {
         func_027076c4();
     }
-    if (func_02707ba4(signature, data, size) != TRUE) {
+    if (func_02707a8c(signature, data, size) != TRUE) {
         return FALSE;
     }
     sys_memcpy(signature, &data[offset], SSP_SIGNATURE_SIZE);

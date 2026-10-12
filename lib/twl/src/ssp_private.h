@@ -10,9 +10,11 @@
 #define SSP_SIGNATURE_SIZE 0x1c
 
 // The signature functions, in the LTD autoload, which keep their default names until it is analyzed. The first sets
-// up the ARM7's side once; the second signs data, whose signature block is zeroed, into sig, and returns 1 on success
+// up the ARM7's side once. The second signs data, whose signature block is zeroed, writing the signature into sig; the
+// third computes the same signature and compares it with sig. Both return 1 on success
 void func_027076c4(void);
-int func_02707ba4(u8 *sig, const u8 *data, u32 size);
+int func_02707a8c(u8 *sig, const u8 *data, u32 size);
+int func_02707ba4(const u8 *sig, const u8 *data, u32 size);
 
 // ssp_exifdec.c
 // Whether SSP_StartJpegDecoder checks the signature of a JPEG
