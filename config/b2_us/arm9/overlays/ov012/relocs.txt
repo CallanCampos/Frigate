@@ -2763,7 +2763,7 @@ from:0x0215a430 kind:thumb_call to:0x02019200 module:main
 from:0x0215a44c kind:overlay_id to:265
 from:0x0215a450 kind:load to:0x0219b7d0 module:overlay(265)
 from:0x0215a454 kind:overlay_id to:266
-from:0x0215a458 kind:load to:0x0219e518 module:overlay(266)
+from:0x0215a458 kind:load to:0x0219e518 module:overlays(266,311)
 from:0x0215a45c kind:overlay_id to:332
 from:0x0215a460 kind:load to:0x021c8b64 module:overlays(194,332)
 from:0x0215a464 kind:overlay_id to:295
