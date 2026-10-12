@@ -160,5 +160,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_WURMPLE"
+    "baby_species": "SPECIES_WURMPLE",
+    "cry_volume": 120
 }

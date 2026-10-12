@@ -167,5 +167,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_BARBOACH"
+    "baby_species": "SPECIES_BARBOACH",
+    "cry_volume": 120
 }

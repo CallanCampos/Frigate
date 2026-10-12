@@ -129,5 +129,6 @@
         }
     ],
     "regional_dex_number": 8,
-    "baby_species": "SPECIES_OSHAWOTT"
+    "baby_species": "SPECIES_OSHAWOTT",
+    "cry_volume": 120
 }

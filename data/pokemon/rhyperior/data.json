@@ -196,5 +196,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_RHYHORN"
+    "baby_species": "SPECIES_RHYHORN",
+    "cry_volume": 120
 }

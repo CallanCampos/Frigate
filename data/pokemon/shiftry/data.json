@@ -174,5 +174,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SEEDOT"
+    "baby_species": "SPECIES_SEEDOT",
+    "cry_volume": 120
 }

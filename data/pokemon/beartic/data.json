@@ -135,5 +135,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 196,
-    "baby_species": "SPECIES_CUBCHOO"
+    "baby_species": "SPECIES_CUBCHOO",
+    "cry_volume": 120
 }

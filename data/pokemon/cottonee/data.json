@@ -128,5 +128,6 @@
         }
     ],
     "regional_dex_number": 82,
-    "baby_species": "SPECIES_COTTONEE"
+    "baby_species": "SPECIES_COTTONEE",
+    "cry_volume": 110
 }

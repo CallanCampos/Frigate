@@ -118,5 +118,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 87,
-    "baby_species": "SPECIES_MUNNA"
+    "baby_species": "SPECIES_MUNNA",
+    "cry_volume": 125
 }

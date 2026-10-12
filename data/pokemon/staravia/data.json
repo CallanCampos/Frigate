@@ -152,5 +152,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_STARLY"
+    "baby_species": "SPECIES_STARLY",
+    "cry_volume": 120
 }

@@ -181,5 +181,6 @@
         }
     ],
     "regional_dex_number": 250,
-    "baby_species": "SPECIES_BRONZOR"
+    "baby_species": "SPECIES_BRONZOR",
+    "cry_volume": 120
 }

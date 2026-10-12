@@ -176,5 +176,6 @@
         }
     ],
     "regional_dex_number": 49,
-    "baby_species": "SPECIES_MAGNEMITE"
+    "baby_species": "SPECIES_MAGNEMITE",
+    "cry_volume": 110
 }

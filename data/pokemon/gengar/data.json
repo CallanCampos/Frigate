@@ -189,5 +189,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_GASTLY"
+    "baby_species": "SPECIES_GASTLY",
+    "cry_volume": 110
 }

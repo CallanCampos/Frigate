@@ -182,5 +182,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 58,
-    "baby_species": "SPECIES_ELEKID"
+    "baby_species": "SPECIES_ELEKID",
+    "cry_volume": 120
 }

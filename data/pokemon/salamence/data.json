@@ -179,5 +179,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_BAGON"
+    "baby_species": "SPECIES_BAGON",
+    "cry_volume": 120
 }

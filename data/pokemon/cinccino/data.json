@@ -116,5 +116,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 108,
-    "baby_species": "SPECIES_MINCCINO"
+    "baby_species": "SPECIES_MINCCINO",
+    "cry_volume": 120
 }

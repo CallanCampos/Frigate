@@ -133,5 +133,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 176,
-    "baby_species": "SPECIES_FERROSEED"
+    "baby_species": "SPECIES_FERROSEED",
+    "cry_volume": 120
 }

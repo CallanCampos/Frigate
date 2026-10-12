@@ -125,5 +125,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 179,
-    "baby_species": "SPECIES_TYNAMO"
+    "baby_species": "SPECIES_TYNAMO",
+    "cry_volume": 120
 }

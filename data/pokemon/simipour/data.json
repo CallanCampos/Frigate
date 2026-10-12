@@ -126,5 +126,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 42,
-    "baby_species": "SPECIES_PANPOUR"
+    "baby_species": "SPECIES_PANPOUR",
+    "cry_volume": 127
 }

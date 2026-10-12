@@ -214,5 +214,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_DEOXYS"
+    "baby_species": "SPECIES_DEOXYS",
+    "cry_volume": 120
 }

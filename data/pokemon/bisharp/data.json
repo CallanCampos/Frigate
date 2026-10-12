@@ -142,5 +142,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 224,
-    "baby_species": "SPECIES_PAWNIARD"
+    "baby_species": "SPECIES_PAWNIARD",
+    "cry_volume": 120
 }

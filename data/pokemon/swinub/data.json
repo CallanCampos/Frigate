@@ -181,5 +181,6 @@
         }
     ],
     "regional_dex_number": 258,
-    "baby_species": "SPECIES_SWINUB"
+    "baby_species": "SPECIES_SWINUB",
+    "cry_volume": 115
 }

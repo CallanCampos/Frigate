@@ -132,5 +132,6 @@
         }
     ],
     "regional_dex_number": 10,
-    "baby_species": "SPECIES_PATRAT"
+    "baby_species": "SPECIES_PATRAT",
+    "cry_volume": 120
 }

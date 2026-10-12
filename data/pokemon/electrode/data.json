@@ -156,5 +156,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_VOLTORB"
+    "baby_species": "SPECIES_VOLTORB",
+    "cry_volume": 100
 }

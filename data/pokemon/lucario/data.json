@@ -187,5 +187,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 34,
-    "baby_species": "SPECIES_RIOLU"
+    "baby_species": "SPECIES_RIOLU",
+    "cry_volume": 120
 }

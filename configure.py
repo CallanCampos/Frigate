@@ -156,6 +156,10 @@ DATA_PACKS = [
     # Species data, level-up moves, evolutions, baby species, experience tables and egg moves
     ("tools/data/species_data.py", "data/pokemon",
      ["a/0/1/6", "a/0/1/8", "a/0/1/9", "a/0/2/0", "a/0/1/7", "a/1/2/4"], False),
+    ("tools/data/pokemon_graphics.py", "data/pokemon",
+     ["a/0/0/4", "a/0/0/7", "a/0/5/1", "a/1/6/5", "a/2/2/9"], True),
+    ("tools/data/pokemon_cries.py", "data/pokemon",
+     ["swan_sound_data.sdat", "a/1/9/1"], True),
     ("tools/data/move_data.py", "data/moves", ["a/0/2/1"], False),  # Move data
     ("tools/data/item_data.py", "data/items", ["a/0/2/4"], False),  # Item data
     # Trainers, their parties, and the table of their messages with its offsets
@@ -432,6 +436,10 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         dependencies = [script, *DATA_PACK_TOOLS, *constant_sources]
         if script == "tools/data/field_prop_model_data.py":
             dependencies.append("tools/data/map_model_data.py")
+        if script == "tools/data/pokemon_graphics.py":
+            dependencies.extend(["tools/data/nitro_2d.py", "src/system/poke_icon.c"])
+        if script == "tools/data/pokemon_cries.py":
+            dependencies.append("tools/data/pokemon_graphics.py")
         n.build(outputs, "data_pack", sources, implicit=dependencies,
                 order_only=[files_ok], variables={"script": script, "dir": data_dir, "game": game})
         for path, archive in zip(paths, outputs):

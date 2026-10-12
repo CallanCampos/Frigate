@@ -162,5 +162,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ARTICUNO"
+    "baby_species": "SPECIES_ARTICUNO",
+    "cry_volume": 123
 }

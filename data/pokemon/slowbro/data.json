@@ -196,5 +196,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SLOWPOKE"
+    "baby_species": "SPECIES_SLOWPOKE",
+    "cry_volume": 110
 }

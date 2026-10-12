@@ -189,5 +189,6 @@
         }
     ],
     "regional_dex_number": 210,
-    "baby_species": "SPECIES_SHUPPET"
+    "baby_species": "SPECIES_SHUPPET",
+    "cry_volume": 120
 }

@@ -198,5 +198,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 186,
-    "baby_species": "SPECIES_ZANGOOSE"
+    "baby_species": "SPECIES_ZANGOOSE",
+    "cry_volume": 120
 }

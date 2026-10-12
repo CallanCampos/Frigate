@@ -145,5 +145,6 @@
         }
     ],
     "regional_dex_number": 86,
-    "baby_species": "SPECIES_MUNNA"
+    "baby_species": "SPECIES_MUNNA",
+    "cry_volume": 120
 }

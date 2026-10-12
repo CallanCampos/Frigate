@@ -173,5 +173,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 289,
-    "baby_species": "SPECIES_CARNIVINE"
+    "baby_species": "SPECIES_CARNIVINE",
+    "cry_volume": 120
 }

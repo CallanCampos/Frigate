@@ -186,5 +186,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_TOTODILE"
+    "baby_species": "SPECIES_TOTODILE",
+    "cry_volume": 110
 }

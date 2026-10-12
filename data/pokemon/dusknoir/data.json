@@ -189,5 +189,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_DUSKULL"
+    "baby_species": "SPECIES_DUSKULL",
+    "cry_volume": 120
 }

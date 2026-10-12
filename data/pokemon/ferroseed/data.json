@@ -132,5 +132,6 @@
         }
     ],
     "regional_dex_number": 175,
-    "baby_species": "SPECIES_FERROSEED"
+    "baby_species": "SPECIES_FERROSEED",
+    "cry_volume": 120
 }

@@ -127,5 +127,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 226,
-    "baby_species": "SPECIES_TERRAKION"
+    "baby_species": "SPECIES_TERRAKION",
+    "cry_volume": 125
 }

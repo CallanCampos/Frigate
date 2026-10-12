@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SPIRITOMB"
+    "baby_species": "SPECIES_SPIRITOMB",
+    "cry_volume": 120
 }
