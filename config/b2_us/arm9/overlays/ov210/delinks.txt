@@ -4,6 +4,7 @@
     .bss        start:0x021ef1e0 end:0x021ef1e0 kind:bss align:32
 
 src/ov210/musical_system.c:
+    complete
     .text       start:0x021eec80 end:0x021eef38
     .data       start:0x021ef1a0 end:0x021ef1b4
 
