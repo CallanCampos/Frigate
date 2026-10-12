@@ -7,7 +7,9 @@
 
 // Saving the game on two machines at once (net_save.c)
 
-// Starts the save, calling func with work once the save is written
+// Starts the save
+NetSave *func_02012ee4(HeapID heapId, GameData *gameData);
+// Starts the save, calling func with work each frame while the save is written
 NetSave *func_02012f1c(HeapID heapId, GameData *gameData, void (*func)(void *work), void *work);
 // Whether the save has ended
 BOOL func_02012f5c(NetSave *save);

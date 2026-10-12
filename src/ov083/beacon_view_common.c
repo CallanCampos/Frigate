@@ -211,7 +211,7 @@ BOOL BeaconView_WaitTimerOrTouch(u8 *timer, u8 bg) {
 }
 
 u32 func_ov083_021eab38(const GameBeacon *beacon) {
-    int type = func_02013eac(beacon);
+    int type = GameBeacon_GetType(beacon);
 
     if (type == 0 || type >= 60) {
         return 22;
