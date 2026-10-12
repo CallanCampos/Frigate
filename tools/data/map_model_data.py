@@ -32,7 +32,7 @@ GLB_JSON = 0x4e4f534a
 GLB_BIN = 0x004e4942
 PROP_NAME = re.compile(r"bw2_prop_(\d+)_id_(\d+)(?:\.\d+)?$")
 PROP_OFFSETS = {b"WB": (12, 16), b"GC": (16, 20), b"NG": (8, 12), b"RD": (12, 16)}
-GPU_PARAMS = {0x00: 0, 0x20: 1, 0x21: 1, 0x22: 1, 0x23: 2, 0x24: 1,
+GPU_PARAMS = {0x00: 0, 0x14: 1, 0x1b: 3, 0x20: 1, 0x21: 1, 0x22: 1, 0x23: 2, 0x24: 1,
               0x25: 1, 0x26: 1, 0x27: 1, 0x28: 1, 0x40: 1, 0x41: 0}
 SBC_PARAMS = {0x00: 0, 0x01: 0, 0x02: 2, 0x03: 1, 0x04: 1, 0x05: 1,
               0x06: 3, 0x07: 1, 0x08: 1, 0x0b: 0, 0x0c: 2, 0x0d: 2,
@@ -362,9 +362,13 @@ def draw_calls(data, model):
     while True:
         op = data[cursor]
         cursor += 1
-        if op not in SBC_PARAMS:
+        if op == 0x09:
+            length = 2 + 3 * data[cursor + 1]
+        elif op in SBC_PARAMS:
+            length = SBC_PARAMS[op]
+        else:
             raise ValueError(f"unsupported Nitro render opcode {op:#x}")
-        params = data[cursor:cursor + SBC_PARAMS[op]]
+        params = data[cursor:cursor + length]
         cursor += len(params)
         if op in (0x04, 0x24, 0x44):
             material = params[0]
@@ -444,11 +448,12 @@ def patch_materials(chunk, doc, primitives, name):
         if double_sided != bool(polygon & (1 << 6)):
             polygon = (polygon | (1 << 6)) if double_sided else (polygon & ~(1 << 6))
         struct.pack_into("<I", data, entry + 12, polygon)
-        emission = material.get("emissiveFactor", [0, 0, 0])
-        if len(emission) != 3:
-            raise ValueError(f"{name}: invalid GLB emissive color")
-        if any(abs(a - b) > 0.00001 for a, b in zip(emission, color5(spe_emi >> 16))):
-            spe_emi = (spe_emi & 0x8000ffff) | (pack_color5(emission, name) << 16)
+        if "emissiveFactor" in material:
+            emission = material["emissiveFactor"]
+            if len(emission) != 3:
+                raise ValueError(f"{name}: invalid GLB emissive color")
+            if any(abs(a - b) > 0.00001 for a, b in zip(emission, color5(spe_emi >> 16))):
+                spe_emi = (spe_emi & 0x8000ffff) | (pack_color5(emission, name) << 16)
             struct.pack_into("<I", data, entry + 8, spe_emi)
     return bytes(data)
 
@@ -570,7 +575,8 @@ def rebuild_pairing_tables(chunk, requested_textures, requested_palettes, name):
     return bytearray(data[:insertion] + payload + data[insertion:]), changed[0], changed[1]
 
 
-def patch_material_bindings(chunk, doc, primitives, texture_blob, name, binary=None):
+def patch_material_bindings(chunk, doc, primitives, texture_blob, name, binary=None,
+                            texture_directory=None):
     if texture_blob is None:
         if any("baseColorTexture" in material.get("pbrMetallicRoughness", {})
                for material in doc.get("materials", [])):
@@ -624,7 +630,11 @@ def patch_material_bindings(chunk, doc, primitives, texture_blob, name, binary=N
                                   f"{name}: {texture_name}")
             original_pixels = decode(texture_blob, texture, palette)
             if embedded != original_pixels:
-                raise ValueError(f"{name}: embedded {texture_name} image changed; save edits to its shared PNG")
+                shared = (texture_directory / f"{texture_name}.png"
+                          if texture_directory is not None else None)
+                if shared is None or not shared.exists() or embedded != read_png(
+                        shared, texture["width"], texture["height"]):
+                    raise ValueError(f"{name}: embedded {texture_name} image changed; save edits to its shared PNG")
         if material_id in wanted_textures and wanted_textures[material_id] != texture_name:
             raise ValueError(f"{name}: one Nitro material has conflicting GLB textures")
         wanted_textures[material_id] = texture_name
@@ -1146,7 +1156,8 @@ def main():
             texture_id = entry.get("texture_preview")
         bound, _ = patch_material_bindings(
             original, doc, primitives, texture_archive[texture_id] if texture_id is not None else None,
-            name, binary)
+            name, binary, ROOT / "data/map_texture_sets" / f"{texture_id:03d}"
+            if texture_id is not None else None)
         if entry["texture_set"] is None and bound != original:
             raise ValueError(f"{name}: texture bindings need an unambiguous map texture set")
         fallback_errors = ("triangle count changed", "triangle topology or shared vertex changed",

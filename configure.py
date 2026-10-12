@@ -166,6 +166,8 @@ DATA_PACKS = [
     ("tools/data/trade_data.py", "data/trades", ["a/1/6/3"], False),  # In-game trades
     ("tools/data/map_matrix_data.py", "data/map_matrices", ["a/0/0/9"], False),  # Map matrices
     ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True),  # Map model glTF sources
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/exterior", ["a/2/2/5"], True),
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/interior", ["a/2/2/6"], True),
     ("tools/data/map_texture_data.py", "data/map_texture_sets", ["a/0/1/4"], True),  # Map texture PNG sources
     ("tools/data/map_texture_data.py", "data/field_prop_textures/exterior", ["a/1/7/4"], True),
     ("tools/data/map_texture_data.py", "data/field_prop_textures/interior", ["a/1/7/5"], True),
@@ -194,6 +196,7 @@ DATA_PACKS = [
 # tutor bits (tools/data/species_data.py)
 DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/data/gen_constants.py", "tools/data/narc.py",
                    "tools/data/map_terrain_data.py", "tools/data/map_texture_data.py",
+                   "tools/data/map_model_data.py",
                    "tools/data/nitro_dictionary.py",
                    "tools/text/text_sources.py", "tools/text/text_data.py", "tools/text/msgdata.py",
                    "src/ov036/scrcmd_shop.c", "tools/data/facility_data.py", "tools/data/make_constants.py"]

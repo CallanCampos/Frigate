@@ -12,10 +12,10 @@ exactly what the ROM holds. The sources come in three kinds:
   is adding its constant and its file; the build notices new, removed and renamed files by itself.
 - **Assembly**, for the field and trainer AI scripts, which are code more than data, as pret keeps them: one source
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
-- **glTF 2.0**, for map models under `data/map_models/<chunk>/`. Their mesh positions are packed back into the
-  map archive's Nitro display lists. The remaining fields come from the extracted ROM.
-- **PNG**, for map textures under `data/map_texture_sets/<set>/`. The packer converts edited pixels to the set's
-  original Nitro texture format.
+- **glTF 2.0**, for map models under `data/map_models/<chunk>/` and field prop models under
+  `data/field_prop_models/`. Their editable mesh and material data is packed back into Nitro models.
+- **PNG**, for map textures under `data/map_texture_sets/<set>/` and field prop textures under
+  `data/field_prop_textures/`. The packer converts edited pixels to each set's original Nitro texture format.
 
 The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
 by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
@@ -34,6 +34,7 @@ which documents the format and can write them again.
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
 | `a/0/0/8` | `data/map_models/<chunk>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
+| `a/2/2/5`, `a/2/2/6` | `data/field_prop_models/{exterior,interior}/<bundle>/<model>/` (glTF 2.0) | Field prop models | `tools/data/field_prop_model_data.py` |
 | `a/1/7/4` | `data/field_prop_textures/exterior/<set>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
 | `a/1/7/5` | `data/field_prop_textures/interior/<set>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
 | `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
@@ -608,7 +609,8 @@ quantized to the DS's five-bit channels. For models with a confirmed texture set
 coordinates. Clearing the texture slot removes its binding. The packer rebuilds Nitro's name-search dictionary when
 the new texture was not already listed by the model. Blender may embed preview images when exporting a GLB; the
 packer resolves those by image name. Texture pixels are sourced from the shared PNGs, so save pixel edits there.
-The packer rejects changed embedded pixels instead of silently ignoring them.
+The packer accepts embedded pixel edits when the matching shared PNG is saved, and rejects unsaved
+embedded edits instead of silently ignoring them.
 Other Nitro material settings retain their original values.
 Adding material slots or draw calls is not yet supported. Every map model contains only an
 `MDL0` block; its textures come from the shared texture archive.
@@ -620,6 +622,15 @@ area's texture set number. Editing a PNG repacks its original Nitro texture and 
 The texture size, pixel format and shared palette capacity still constrain edits. The PNGs can be
 re-exported with `tools/data/map_texture_data.py extract OUTPUT_DIR a/1/7/4` or `a/1/7/5`.
 
+All 163 exterior and interior field prop bundles have an editable GLB for each of their 6,331 models.
+The bundle number is the area's `prop_bundle`; the model directory is its index in that bundle.
+The bundle's `manifest.json` records the in-game resource ID and model name. Editing geometry,
+UVs, material colors and texture bindings uses the same Nitro conversion as map models.
+The prop's resource information and animations retain their original Nitro bytes. Models can be
+re-exported with `tools/data/field_prop_model_data.py extract APICULA OUTPUT_DIR`.
+An unchanged Blender export of a prop also repacks byte for byte; adding a face to a prop model
+changes only its bundle, and the rebuilt model loads in Apicula.
+
 ## Map matrices, areas and lights
 
 A zone's header names its map matrix, `data/map_matrices/<matrix>.json` (`a/0/0/9`), by its constant in
@@ -630,7 +641,7 @@ row stays on one line, so the file reads as the grid.
 
 Each area is `data/areas/<number>.json`, numbered from `000` in record order. These are the records of `a/0/1/3`
 (`AreaData`), which name the graphics that zones share: their props, textures, animations (null for none), lights and
-colors, by the numbers of files that aren't built from source yet. A zone's header names its area by its number, and
+colors, by their file numbers. A zone's header names its area by its number, and
 an area with seasons has a record per season after it. `data/areas/area.schema.json` describes one record and
 `tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
 

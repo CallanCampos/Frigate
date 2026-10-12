@@ -65,7 +65,7 @@ def palette_for(texture, palettes, index):
     name = texture["name"]
     exceptions = {
         "h04_stair": "stair", "tg_stair": "stair", "warp01": "gtswarp_r",
-        "warp02": "gtswarp_b", "warp03": "gtswarp_g", "warp04_g": "warp04_pl",
+        "warp02": "gtswarp_b", "warp03": "gtswarp_g", "warp04_g": "warp_g",
         "c3_bayblock3": "bayblock", "c3test_block3_b": "c34",
         "c3test_block4_b": "block4", "c3test_block6_b": "c3_block6",
         "c3test_block_b": "c3test_block_pl", "pc_kabe1": "pckabe1",

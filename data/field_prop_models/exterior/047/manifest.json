@@ -1,0 +1,275 @@
+{
+  "bundle_sha256": "f961bf2fb20028c62458b1a35ff4f5854e9854ec29ed84b22a58f7dde6961278",
+  "models": [
+    {
+      "index": 0,
+      "res_id": 0,
+      "name": "pc_01"
+    },
+    {
+      "index": 1,
+      "res_id": 1,
+      "name": "gate_01"
+    },
+    {
+      "index": 2,
+      "res_id": 21,
+      "name": "rock_01"
+    },
+    {
+      "index": 3,
+      "res_id": 24,
+      "name": "fountain_01"
+    },
+    {
+      "index": 4,
+      "res_id": 25,
+      "name": "o_chair_01"
+    },
+    {
+      "index": 5,
+      "res_id": 26,
+      "name": "o_parasol_01"
+    },
+    {
+      "index": 6,
+      "res_id": 27,
+      "name": "o_table_01"
+    },
+    {
+      "index": 7,
+      "res_id": 54,
+      "name": "searock_01"
+    },
+    {
+      "index": 8,
+      "res_id": 55,
+      "name": "searock_02"
+    },
+    {
+      "index": 9,
+      "res_id": 69,
+      "name": "plant_01"
+    },
+    {
+      "index": 10,
+      "res_id": 93,
+      "name": "door_pc"
+    },
+    {
+      "index": 11,
+      "res_id": 101,
+      "name": "door01"
+    },
+    {
+      "index": 12,
+      "res_id": 103,
+      "name": "c0101"
+    },
+    {
+      "index": 13,
+      "res_id": 112,
+      "name": "thouse_01"
+    },
+    {
+      "index": 14,
+      "res_id": 134,
+      "name": "cart_01"
+    },
+    {
+      "index": 15,
+      "res_id": 151,
+      "name": "sign01"
+    },
+    {
+      "index": 16,
+      "res_id": 152,
+      "name": "sign02"
+    },
+    {
+      "index": 17,
+      "res_id": 153,
+      "name": "sign03"
+    },
+    {
+      "index": 18,
+      "res_id": 154,
+      "name": "sign04"
+    },
+    {
+      "index": 19,
+      "res_id": 155,
+      "name": "out_vender01"
+    },
+    {
+      "index": 20,
+      "res_id": 156,
+      "name": "out_dust01"
+    },
+    {
+      "index": 21,
+      "res_id": 190,
+      "name": "outwarp01"
+    },
+    {
+      "index": 22,
+      "res_id": 191,
+      "name": "outwarp02"
+    },
+    {
+      "index": 23,
+      "res_id": 192,
+      "name": "outwarp03"
+    },
+    {
+      "index": 24,
+      "res_id": 258,
+      "name": "rock_02"
+    },
+    {
+      "index": 25,
+      "res_id": 259,
+      "name": "door_normal01"
+    },
+    {
+      "index": 26,
+      "res_id": 260,
+      "name": "door_normal02"
+    },
+    {
+      "index": 27,
+      "res_id": 261,
+      "name": "door_normal03"
+    },
+    {
+      "index": 28,
+      "res_id": 80,
+      "name": "wf_tree_01"
+    },
+    {
+      "index": 29,
+      "res_id": 81,
+      "name": "wf_tree_02"
+    },
+    {
+      "index": 30,
+      "res_id": 82,
+      "name": "wf_tree_03"
+    },
+    {
+      "index": 31,
+      "res_id": 83,
+      "name": "wf_tree_04"
+    },
+    {
+      "index": 32,
+      "res_id": 84,
+      "name": "wf_tree_05"
+    },
+    {
+      "index": 33,
+      "res_id": 85,
+      "name": "wf_tree_06"
+    },
+    {
+      "index": 34,
+      "res_id": 86,
+      "name": "wf_tree_07"
+    },
+    {
+      "index": 35,
+      "res_id": 87,
+      "name": "wf_tree_08"
+    },
+    {
+      "index": 36,
+      "res_id": 220,
+      "name": "wf_grass_01_01"
+    },
+    {
+      "index": 37,
+      "res_id": 221,
+      "name": "wf_grass_01_02"
+    },
+    {
+      "index": 38,
+      "res_id": 222,
+      "name": "wf_grass_01_03"
+    },
+    {
+      "index": 39,
+      "res_id": 223,
+      "name": "wf_grass_01_04"
+    },
+    {
+      "index": 40,
+      "res_id": 224,
+      "name": "wf_grass_01_05"
+    },
+    {
+      "index": 41,
+      "res_id": 225,
+      "name": "wf_grass_02_01"
+    },
+    {
+      "index": 42,
+      "res_id": 226,
+      "name": "wf_grass_02_02"
+    },
+    {
+      "index": 43,
+      "res_id": 227,
+      "name": "wf_grass_02_03"
+    },
+    {
+      "index": 44,
+      "res_id": 228,
+      "name": "wf_grass_02_04"
+    },
+    {
+      "index": 45,
+      "res_id": 229,
+      "name": "wf_grass_02_05"
+    },
+    {
+      "index": 46,
+      "res_id": 230,
+      "name": "wf_ground_01"
+    },
+    {
+      "index": 47,
+      "res_id": 231,
+      "name": "wf_ground_02"
+    },
+    {
+      "index": 48,
+      "res_id": 232,
+      "name": "wf_lake_01"
+    },
+    {
+      "index": 49,
+      "res_id": 233,
+      "name": "wf_lake_02"
+    },
+    {
+      "index": 50,
+      "res_id": 255,
+      "name": "wf_house01"
+    },
+    {
+      "index": 51,
+      "res_id": 418,
+      "name": "wf_tree_s1"
+    },
+    {
+      "index": 52,
+      "res_id": 419,
+      "name": "wf_shop_s1"
+    },
+    {
+      "index": 53,
+      "res_id": 420,
+      "name": "wf_mugen_s1"
+    }
+  ]
+}

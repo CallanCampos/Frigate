@@ -1,0 +1,200 @@
+{
+  "bundle_sha256": "3032f3ff25afc7aba239efb096a70ce407efe222343a1a1af601b94c13310bee",
+  "models": [
+    {
+      "index": 0,
+      "res_id": 0,
+      "name": "pc01"
+    },
+    {
+      "index": 1,
+      "res_id": 1,
+      "name": "mat01"
+    },
+    {
+      "index": 2,
+      "res_id": 2,
+      "name": "tv01"
+    },
+    {
+      "index": 3,
+      "res_id": 3,
+      "name": "stair_u01"
+    },
+    {
+      "index": 4,
+      "res_id": 4,
+      "name": "stair_d01"
+    },
+    {
+      "index": 5,
+      "res_id": 5,
+      "name": "table01"
+    },
+    {
+      "index": 6,
+      "res_id": 8,
+      "name": "chair01"
+    },
+    {
+      "index": 7,
+      "res_id": 11,
+      "name": "shelf01"
+    },
+    {
+      "index": 8,
+      "res_id": 12,
+      "name": "shelf02"
+    },
+    {
+      "index": 9,
+      "res_id": 14,
+      "name": "shelf04"
+    },
+    {
+      "index": 10,
+      "res_id": 15,
+      "name": "shelf05"
+    },
+    {
+      "index": 11,
+      "res_id": 16,
+      "name": "bed01"
+    },
+    {
+      "index": 12,
+      "res_id": 17,
+      "name": "sink01"
+    },
+    {
+      "index": 13,
+      "res_id": 18,
+      "name": "ref01"
+    },
+    {
+      "index": 14,
+      "res_id": 19,
+      "name": "plant01"
+    },
+    {
+      "index": 15,
+      "res_id": 20,
+      "name": "dust01"
+    },
+    {
+      "index": 16,
+      "res_id": 22,
+      "name": "poster01"
+    },
+    {
+      "index": 17,
+      "res_id": 25,
+      "name": "win01"
+    },
+    {
+      "index": 18,
+      "res_id": 30,
+      "name": "pcdesk01"
+    },
+    {
+      "index": 19,
+      "res_id": 33,
+      "name": "desk01"
+    },
+    {
+      "index": 20,
+      "res_id": 35,
+      "name": "vase01"
+    },
+    {
+      "index": 21,
+      "res_id": 38,
+      "name": "cashier01"
+    },
+    {
+      "index": 22,
+      "res_id": 39,
+      "name": "drock01"
+    },
+    {
+      "index": 23,
+      "res_id": 40,
+      "name": "drock02"
+    },
+    {
+      "index": 24,
+      "res_id": 74,
+      "name": "desk02"
+    },
+    {
+      "index": 25,
+      "res_id": 77,
+      "name": "art01"
+    },
+    {
+      "index": 26,
+      "res_id": 79,
+      "name": "object02"
+    },
+    {
+      "index": 27,
+      "res_id": 84,
+      "name": "d0stair_u01"
+    },
+    {
+      "index": 28,
+      "res_id": 85,
+      "name": "d0stair_d01"
+    },
+    {
+      "index": 29,
+      "res_id": 86,
+      "name": "in_vender01"
+    },
+    {
+      "index": 30,
+      "res_id": 92,
+      "name": "box01"
+    },
+    {
+      "index": 31,
+      "res_id": 93,
+      "name": "box02"
+    },
+    {
+      "index": 32,
+      "res_id": 94,
+      "name": "chushion01"
+    },
+    {
+      "index": 33,
+      "res_id": 95,
+      "name": "chushion02"
+    },
+    {
+      "index": 34,
+      "res_id": 106,
+      "name": "warp01"
+    },
+    {
+      "index": 35,
+      "res_id": 107,
+      "name": "warp02"
+    },
+    {
+      "index": 36,
+      "res_id": 108,
+      "name": "warp03"
+    },
+    {
+      "index": 37,
+      "res_id": 126,
+      "name": "shelf06"
+    },
+    {
+      "index": 38,
+      "res_id": 219,
+      "name": "sd06_obj_01"
+    }
+  ]
+}
