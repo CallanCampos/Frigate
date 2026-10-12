@@ -185,6 +185,11 @@ Same instructions, registers swapped.
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
   and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
   loop without the `NULL` test, matches with plain indexing.
+- A scalar declared before a local array with an initializer is allocated ahead of the initializer's copy and the
+  parameters' copies; declared after it, it takes the register right after the counter. `zukan_area_list.c`'s
+  `ZukanAreaList_GetMarkKind` has `u8 next;` and its enum counter `i` ahead of `u32 kinds[3] = { ... }`, which puts
+  `next` in `r3` and the loop's temporary in `r1`. The counter is initialized from `next` (`for (i = next; ...)`), and
+  the test before the first pass, which an enum counter keeps, is on `next`'s register.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
