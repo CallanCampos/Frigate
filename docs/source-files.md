@@ -2550,7 +2550,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zenkoku_zukan_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | partial | string at `0x0219dc40` |
+| `zenkoku_zukan_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | complete | string at `0x0219dc40` |
 | `zenkoku_zukan_award_graphic.c` | `0x0219d73c`–`0x0219daa8` | 17 | complete | string at `0x0219dc58` |
 
 ### Overlay 316

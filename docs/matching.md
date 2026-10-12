@@ -540,6 +540,11 @@ Same instructions, scheduled in another order.
   registers unchanged: `ThAward_InitText` measures its points text into a `pointsWidth` of its own, which lets the
   width's reload move above the stack argument's store, where reusing `kindWidth` kept it below. In the same
   function two address locals set in one branch are spilled in statement order (`record` before `name`).
+- A pointer reused by later blocks of the same shape changes their registers: `zenkoku_zukan_award.c`'s
+  `ZenkokuZukanAward_InitText` prints its three blocks through three `StrBuf *` locals (`strbuf`, `certifies`,
+  `staff`), declared together ahead of `wordSet`. One `strbuf` for
+  all three stays in `r4`, the width takes `r6`, and the print colour is then shared across the last two prints
+  where the original builds it again for each.
 
 ## An instruction too many or too few
 
