@@ -1174,6 +1174,7 @@ overlays/ov092 0x021f0001 remove_symbol
 overlays/ov092 0x021f0086 remove_symbol
 overlays/ov092 0x021f0105 remove_symbol
 overlays/ov092 0x021f021e remove_symbol
+overlays/ov098 0x021eeec2 reloc_module overlay(36)
 overlays/ov121 0x021efb94 remove_reloc
 overlays/ov128 0x021eefd4 reloc_addend 0x1000
 overlays/ov128 0x021eefe0 remove_reloc
