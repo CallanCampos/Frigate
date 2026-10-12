@@ -515,6 +515,7 @@ typedef struct ScriptWork ScriptWork;
 typedef struct ScriptOverlayWork ScriptOverlayWork;
 typedef struct ScriptPluginEntry ScriptPluginEntry;
 typedef struct ScriptSubwork ScriptSubwork;
+typedef struct ShortcutMenuApp ShortcutMenuApp;
 typedef struct ShortcutMenuWork ShortcutMenuWork;
 typedef struct ShortcutSave ShortcutSave;
 typedef struct StaActAudience StaActAudience;
