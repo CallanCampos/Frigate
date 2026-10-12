@@ -5,14 +5,53 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-// The pass power in each of the three slots, or HIGH_LINK_POWER_NONE
+// Block 0x35, the Entralink's save (high_link_savedata.c, a guessed name; the block's name is swan's)
+
+#define HIGH_LINK_POWER_MAX 3
 #define HIGH_LINK_POWER_NONE 0x30
-u32 func_0200c678(HighLinkSave *save, int index);
+
+// What func_02017208 returns: the Entralink's two levels, White then Black
+typedef struct {
+    u8 unk00[0xc];
+    u16 level1;
+    u16 level2;
+} PassPowerLevel;
+
+struct HighLinkSave {
+    PassPowerLevel levels;
+    u8 unk10[0x190];
+    // The pass power in each of the three slots, or HIGH_LINK_POWER_NONE
+    u8 powers[HIGH_LINK_POWER_MAX];
+    u8 padding1A3;
+    // A bit for each special pass power received, numbered by PassPower_GetSPowerBaseID
+    u8 specialFlags[2];
+    u8 unk1A6[6];
+    // The play time counted by HighLinkSave_CountPlaySeconds
+    u64 seconds;
+};
+
+// The block's size and its initial state; swan's names for them are misnomers
+u32 getSizeofProbabilityTable(void);
+void probability(HighLinkSave *save);
+void setupProbabilityTable(PassPowerLevel *levels);
+// Add to the White and the Black level, up to 999, and return how much was added
+int HighLinkSave_AddWhiteLevel(PassPowerLevel *levels, int add);
+int HighLinkSave_AddBlackLevel(PassPowerLevel *levels, int add);
+// Copies the levels into the save, and out of it
+void func_0200c638(SaveControl *save, const PassPowerLevel *levels);
+void func_0200c650(SaveControl *save, PassPowerLevel *levels);
 // Puts a pass power in one of the three slots
-void func_0200c668(HighLinkSave *save, u32 passPower, int index);
-u32 func_0200c6a0(HighLinkSave *save, u32 id);
-// Copies two bytes of the save into dest
+void HighLinkSave_SetPassPower(HighLinkSave *save, u32 passPower, int index);
+// The pass power in a slot, or HIGH_LINK_POWER_NONE; a slot with an invalid one is cleared
+u32 HighLinkSave_GetPassPower(HighLinkSave *save, int index);
+// Sets the flag of a special pass power
+void HighLinkSave_SetSpecialPowerFlag(HighLinkSave *save, u32 id);
+// Copies the two bytes of the special pass powers' flags into dest
 void func_0200c6d8(HighLinkSave *save, u8 *dest, u32 a2);
+// Counts play time in seconds: mode 0 starts the count, 1 adds the time since the start to the save's total and
+// 2 returns the total as it would be. Returns the total
+u64 HighLinkSave_CountPlaySeconds(HighLinkSave *save, PlayTime *playTime, u32 mode);
+BOOL PassPower_IsIDInvalid(u32 passPower);
 BOOL PassPower_IsIDValid(u32 passPower);
 // Starts a pass power, bought with Pass Orbs when paid is set
 void PassPower_Activate(u32 passPower, void *data, u32 paid);
@@ -48,13 +87,6 @@ typedef struct {
     u16 info;
     u8 unk08[4];
 } PassPowerData;
-
-// What func_02017208 returns: the Entralink's two levels, White then Black
-typedef struct {
-    u8 unk00[0xc];
-    u16 level1;
-    u16 level2;
-} PassPowerLevel;
 
 // The pass powers' table, read from its archive
 void *PassPowerData_Create(HeapID heapId);

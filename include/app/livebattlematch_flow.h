@@ -72,16 +72,15 @@ u32 LiveBattleMatchFlow_GetResult(LiveBattleMatchFlow *flow);
 
 // Functions of the save and battle video code that have no header yet
 // Checks the CRC of a tournament entry
-BOOL func_0200b8c8(void *entry);
+BOOL TournamentEntry_CheckCRC(void *entry);
 // Copies an entry into the block
-void func_0200b900(void *block, u32 index, const void *entry);
+void TournamentBlock_SetEntry(void *block, u32 index, const void *entry);
 // Clears an entry of the block's other entries, which are 0x1e bytes
-void func_0200b918(void *record);
+void TournamentTeam_Clear(void *record);
 // Fills an entry of the block's other entries with the team's species and moves
-void func_0200b9c4(void *record, PokeParty *party);
+void TournamentTeam_SetFromParty(void *record, PokeParty *party);
 // Whether the battle video that is loaded is whole
 BOOL func_0200bb80(void);
-void func_0200c360(BattleBoxSave *battleBox, u16 mask);
 // The live competition's record: clears it and gives it this console's address, adds to a result by an amount, gets and
 // sets the 6-byte address of a result by its place and a byte after it, and whether an address is among the results
 void func_0200f1c4(void *record);

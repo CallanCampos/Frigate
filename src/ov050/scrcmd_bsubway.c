@@ -353,7 +353,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         BattleBoxSave *battleBox = getBattleBox(save);
 
         *retWk = FALSE;
-        if (func_0200c340(battleBox) == TRUE) {
+        if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
             *retWk = TRUE;
         }
         break;

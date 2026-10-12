@@ -752,7 +752,7 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
             break;
         }
     }
-    str = func_0200c93c(info);
+    str = TrainerGameInfo_GetGreeting(info);
     for (i = 0; i < 8; i++) {
         beacon->greeting[i] = str[i];
         if (terminator == str[i]) {
@@ -956,7 +956,7 @@ void GameBeaconSys_UpdateGreeting(void) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(GameData_GetSaveControl(GameBeaconSys->gameData));
     u16 terminator = GFL_StrBufGetTerminator();
-    const u16 *greeting = func_0200c93c(info);
+    const u16 *greeting = TrainerGameInfo_GetGreeting(info);
     int i;
 
     for (i = 0; i < 8; i++) {

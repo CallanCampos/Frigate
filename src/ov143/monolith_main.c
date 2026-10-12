@@ -471,7 +471,7 @@ static void Monolith_UpdateScene(MonolithParam *param) {
 
     if (*scene == MONOLITH_SCENE_FIRST_POWER) {
         for (i = 0; i < 3; i++) {
-            if (func_0200c678(highLink, i) != HIGH_LINK_POWER_NONE) {
+            if (HighLinkSave_GetPassPower(highLink, i) != HIGH_LINK_POWER_NONE) {
                 found = TRUE;
                 break;
             }

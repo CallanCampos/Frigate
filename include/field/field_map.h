@@ -5,6 +5,7 @@
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
+#include "save/gimmick_savedata.h"
 
 struct MapMatrix {
     u16 heapId;
@@ -84,13 +85,6 @@ extern const MapReplaceEvent EVENT_MAP_REPLACE_TABLE[];
 extern const char data_ov012_0216e1c4[];
 extern const char data_ov012_0216e1d4[];
 
-void GimmickState_Reset(GimmickState *gimmick);
-void GimmickState_SetID(GimmickState *gimmick, u16 gimmickId);
-u32 GimmickState_GetID(GimmickState *gimmick);
-// The state of the zone's gimmick that the save keeps. The ID is not checked
-void *GimmickState_GetUserData(GimmickState *gimmick, u32 gimmickId);
-// The area of the gimmick state after the user data, for flags. The ID is not checked
-void *func_0200bac8(GimmickState *gimmick, u32 gimmickId);
 MapMatrix *InitMapMatrix(HeapID heapId);
 void MapMatrix_Load(MapMatrix *matrix, u16 matrixId, u16 zoneId, HeapID heapId);
 void ProcessMapMatrix(MapMatrix *matrix, MapMatrixFileHeader *data, u32 matrixId, u16 zoneId);

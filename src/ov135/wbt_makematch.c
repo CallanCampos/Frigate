@@ -750,7 +750,7 @@ PokeParty *WbtMakeMatch_GetParty(WbtSystem *sys, GameData *gameData) {
 void WbtMakeMatch_LoadBattleBoxParty(WbtSystem *sys, GameData *gameData) {
     BattleBoxSave *battleBox = getBattleBox(GameData_GetSaveControl(gameData));
 
-    if (func_0200c340(battleBox)) {
+    if (BattleBoxSave_HasPkm(battleBox)) {
         sys->unk13AC = convertBoxedPokeSetToParty(battleBox, sys->heapId);
     }
 }

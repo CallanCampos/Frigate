@@ -3020,10 +3020,10 @@ static StrBuf *NameEntry_LoadPresetName(NameEntryParam *param, u32 which, HeapID
 
     switch (which) {
     case 0:
-        GFL_StrBufLoadString(buf, func_0200c93c(param->gameInfo));
+        GFL_StrBufLoadString(buf, TrainerGameInfo_GetGreeting(param->gameInfo));
         break;
     case 1:
-        GFL_StrBufLoadString(buf, func_0200c954(param->gameInfo));
+        GFL_StrBufLoadString(buf, TrainerGameInfo_GetThanks(param->gameInfo));
         break;
     case 2:
         GFL_StrBufLoadString(buf, func_0201150c(param->unk30));
@@ -3096,10 +3096,10 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
         for (i = 0; i <= 2; i++) {
             switch (i) {
             case 0:
-                GFL_StrBufLoadString(preset, func_0200c93c(work->param->gameInfo));
+                GFL_StrBufLoadString(preset, TrainerGameInfo_GetGreeting(work->param->gameInfo));
                 break;
             case 1:
-                GFL_StrBufLoadString(preset, func_0200c954(work->param->gameInfo));
+                GFL_StrBufLoadString(preset, TrainerGameInfo_GetThanks(work->param->gameInfo));
                 break;
             case 2:
                 GFL_StrBufLoadString(preset, func_0201150c(work->param->unk30));

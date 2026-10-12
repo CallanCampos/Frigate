@@ -64,7 +64,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
     case DEMO_MODE_DOWNLOAD_EX:
         param->recvPkm = wk->uploadPokemonData.isTrade ? (PartyPkm *)wk->uploadPokemonData.postData
                                                        : func_0200b4d0(wk->param->worldtrade_data);
-        func_0200b4b8(wk->param->worldtrade_data, wk->sentPokemon);
+        WorldTradeData_GetPkm(wk->param->worldtrade_data, wk->sentPokemon);
         param->sendPkm = wk->sentPokemon;
         param->partnerStatus = wk->partnerStatus = WorldTrade_MakePartnerStatus(&wk->uploadPokemonData);
         procs = &data_ov194_021c63d0;
@@ -139,7 +139,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
 
             pkm = Demo_GetTradePokemon(wk, wk->subProcessMode);
             sent = WorldTrade_AllocPartyPkm(HEAPID_WORLDTRADE);
-            func_0200b4b8(wk->param->worldtrade_data, sent);
+            WorldTradeData_GetPkm(wk->param->worldtrade_data, sent);
             if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) != PokeParty_GetParam(sent, PKM_PARAM_SPECIES, NULL) ||
                 PokeParty_GetParam(pkm, PKM_PARAM_PID, NULL) != PokeParty_GetParam(sent, PKM_PARAM_PID, NULL)) {
                 PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);

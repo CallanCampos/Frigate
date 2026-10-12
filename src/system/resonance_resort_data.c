@@ -282,7 +282,7 @@ static void JoinAvenueProfile_SetFromGameData(JoinAvenueProfile *profile, GameDa
 
     sys_memset(profile, 0, sizeof(JoinAvenueProfile));
     JoinAvenueProfile_SetFromPlayerInfo(profile, GetGameDataPlayerInfo(gameData));
-    sys_memcpy(func_0200c93c(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))), profile->greeting,
+    sys_memcpy(TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))), profile->greeting,
                sizeof(profile->greeting));
     answers = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(gameData)));
     profile->job = func_0200ec3c(answers, 26);

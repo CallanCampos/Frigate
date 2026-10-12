@@ -137,7 +137,7 @@ static BOOL func_ov036_021aec28(GameSystem *gsys, u32 a1, Regulation *regulation
         *partyResult = func_0201f424(regulation, party, &unk);
     }
     battleBox = getBattleBox(GameData_GetSaveControl(gameData));
-    if (func_0200c340(battleBox) == TRUE) {
+    if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
         unk = 0;
         battleBoxParty = convertBoxedPokeSetToParty(battleBox, heapId);
         if (a1) {
@@ -180,7 +180,7 @@ static GameEvent *func_ov036_021aecf8(GameSystem *gsys, u32 partyResult, u32 bat
     PokeParty *party = GameData_GetParty(gameData);
     BattleBoxSave *battleBox = getBattleBox(GameData_GetSaveControl(gameData));
 
-    if (func_0200c340(battleBox) == TRUE) {
+    if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
         u8 partyOk;
 
         battleBoxParty = convertBoxedPokeSetToParty(battleBox, heapId);

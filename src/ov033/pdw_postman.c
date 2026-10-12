@@ -550,7 +550,7 @@ BOOL func_ov033_02178274(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
 }
 
 void func_ov033_02178278(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
-    func_0200c6a0(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)), gift->value);
+    HighLinkSave_SetSpecialPowerFlag(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)), gift->value);
 }
 
 u32 func_ov033_02178290(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {

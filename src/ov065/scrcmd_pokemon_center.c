@@ -365,7 +365,7 @@ static BOOL PokemonCenter_CheckBoxes(MedalCheckContext *ctx, GameData *gameData,
                 }
             }
         }
-        if (func_0200c340(battleBox) == TRUE) {
+        if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
             for (slot = 0; slot < 6; slot++) {
                 func_ov065_021e5d1c(getBoxSlotAddress(battleBox, 0, slot), ctx);
             }

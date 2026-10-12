@@ -925,7 +925,7 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
         layout = 0;
         break;
     case LIST_WIFI:
-        entry = func_0200b8f4(tournament, 0);
+        entry = TournamentBlock_GetEntry(tournament, 0);
         param.msgIds[0] = 7;
         param.msgIds[1] = 5;
         if (entry->unk15B == 1 || entry->unk15B == 2) {
@@ -940,7 +940,7 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
         layout = 0;
         break;
     case LIST_LIVE_MENU:
-        entry = func_0200b8f4(tournament, 1);
+        entry = TournamentBlock_GetEntry(tournament, 1);
         param.msgIds[0] = 7;
         param.msgIds[1] = 5;
         if (entry->unk15B == 1 || entry->unk15B == 2) {

@@ -455,7 +455,7 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
     case MONOLITH_POWER_SEQ_UNUSED_SAVE:
         if (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             MonolithPower_ClearMessage(mpw);
-            func_0200c668(getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
+            HighLinkSave_SetPassPower(getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
                           mpw->ids[mpw->selected], 0);
             comm = GSYS_GetGameCommSystem(screen->param->gsys);
             func_0202bf68(comm, func_020175cc(GSYS_GetGameData(screen->param->gsys)), screen->param->netId);
@@ -1102,7 +1102,7 @@ static void MonolithPower_LoadEquipped(MonolithScreenParam *screen, MonolithPowe
         screen->state->equipped[i] = HIGH_LINK_POWER_NONE;
     }
     for (i = 0; i < 3; i++) {
-        screen->state->equipped[i] = func_0200c678(highLink, i);
+        screen->state->equipped[i] = HighLinkSave_GetPassPower(highLink, i);
     }
     for (j = 0; j < 3; j++) {
         passPower = screen->state->equipped[j];
@@ -1124,7 +1124,7 @@ static void MonolithPower_SaveEquipped(MonolithScreenParam *screen, MonolithPowe
     int i;
 
     for (i = 0; i < 3; i++) {
-        func_0200c668(highLink, screen->state->equipped[i], i);
+        HighLinkSave_SetPassPower(highLink, screen->state->equipped[i], i);
     }
     KeyCursor_Free(mpw->keyCursor);
 }

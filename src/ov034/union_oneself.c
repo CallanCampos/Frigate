@@ -841,7 +841,7 @@ static BOOL UnionOneself_IsBattleActivity(u32 activity) {
 static PokeParty *UnionOneself_CreateBoxParty(UnionSystem *unisys) {
     BattleBoxSave *battleBox = getBattleBox(GameData_GetSaveControl(unisys->param->gameData));
 
-    if (func_0200c340(battleBox) == FALSE) {
+    if (BattleBoxSave_HasPkm(battleBox) == FALSE) {
         return NULL;
     }
     return convertBoxedPokeSetToParty(battleBox, HEAPID_UNION);
@@ -2863,7 +2863,7 @@ static BOOL UnionOneself_StepPartySelectRun(UnionSystem *unisys, UnionSelf *situ
         (*seq)++;
         // fallthrough
     case 1:
-        if (func_0200c340(getBattleBox(GameData_GetSaveControl(unisys->param->gameData))) == TRUE) {
+        if (BattleBoxSave_HasPkm(getBattleBox(GameData_GetSaveControl(unisys->param->gameData))) == TRUE) {
             (*seq)++;
         } else {
             clsys->unk17C[1] = 0;

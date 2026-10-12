@@ -37,6 +37,7 @@
 #include "pml/poke_party.h"
 #include "save/adventure.h"
 #include "save/dream_world.h"
+#include "save/high_link.h"
 #include "save/event_work.h"
 #include "save/join_avenue.h"
 #include "save/key_info.h"
@@ -1183,7 +1184,7 @@ GameEvent *EventEntralinkWarpIn_Create(GameSystem *gsys, u16 zoneId, const VecFx
 
     EventEntralinkWarp_CreateReturnLocation(&returnSpawn, field);
     GameData_SetEntralinkParentSpawnInfo(gameData, &returnSpawn);
-    func_0200c6f0(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)), func_02017a40(gameData), 0);
+    HighLinkSave_CountPlaySeconds(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)), func_02017a40(gameData), 0);
     CreateZoneChangeData(&spawn, zoneId, ConvDirToWarpDir(0), spawnPos.x, spawnPos.y, spawnPos.z);
     return EventEntralinkWarpIn_CreateCore(gsys, field, &spawn, a3, 0);
 }

@@ -118,7 +118,7 @@ BOOL s014F_CallPC(VM *vm, FieldScriptEnv *env) {
         BattleBoxSave *battleBox = getBattleBox(save);
 
         param->party = convertBoxedPokeSetToParty(battleBox, HEAPID_GAMEEVENT);
-        param->unk14 = func_0200c394(battleBox, 3);
+        param->unk14 = BattleBoxSave_CheckFlags(battleBox, 3);
     }
     callWork = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PCCallWork), FALSE, "scrcmd_proc_fld.c", 150);
     callWork->gameData = gameData;

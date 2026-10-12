@@ -43,7 +43,7 @@ void func_ov014_0216e660(PassPowerParam *param, void *argument, GameSystem *gsys
     highLink = getHighLinkBlockAddress(save);
     param->highLinkCount = 0;
     for (i = 0; i < 3; i++) {
-        u32 id = func_0200c678(highLink, i);
+        u32 id = HighLinkSave_GetPassPower(highLink, i);
         if (id != 0x30) {
             param->highLinkIds[param->highLinkCount++] = id;
         }

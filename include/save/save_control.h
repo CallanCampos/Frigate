@@ -49,10 +49,10 @@ void func_0200c974(TrainerGameInfoSave *info, u32 value);
 // The name at the end of the C-Gear block, its init and its getter
 void func_020114a8(u16 *name);
 void *func_020114f0(SaveControl *save);
-const u16 *func_0200c93c(TrainerGameInfoSave *info);
-void func_0200c940(TrainerGameInfoSave *info, StrBuf *name);
-const u16 *func_0200c954(TrainerGameInfoSave *info);
-void func_0200c958(TrainerGameInfoSave *info, StrBuf *name);
+const u16 *TrainerGameInfo_GetGreeting(TrainerGameInfoSave *info);
+void TrainerGameInfo_SetGreeting(TrainerGameInfoSave *info, StrBuf *name);
+const u16 *TrainerGameInfo_GetThanks(TrainerGameInfoSave *info);
+void TrainerGameInfo_SetThanks(TrainerGameInfoSave *info, StrBuf *name);
 void func_020114fc(void *saveBlock, StrBuf *name);
 const u16 *func_0201150c(void *saveBlock);
 u16 func_0200ca7c(TrainerGameInfoSave *info);
@@ -66,9 +66,9 @@ void TrainerGameInfo_SetPalParkHighScore(TrainerGameInfoSave *info, u32 score);
 u8 TrainerGameInfo_GetPalParkResult(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetPalParkResult(TrainerGameInfoSave *info, u8 result);
 u32 getCash(TrainerGameInfoSave *info);
-void addCashToTotal(TrainerGameInfoSave *info, u32 amount);
+u32 addCashToTotal(TrainerGameInfoSave *info, u32 amount);
 // Stops at 0
-void subCashFromTotal(TrainerGameInfoSave *info, u32 amount);
+u32 subCashFromTotal(TrainerGameInfoSave *info, u32 amount);
 
 // The area NPC data, which keeps the symbol encounters of the Entree Forest, encrypted
 AreaNPCSave *getAreaNPCData(SaveControl *save);
@@ -86,8 +86,8 @@ void func_0200ea40(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u32 form, 
 
 // Returns a pointer to one of the save's blocks
 void *SaveControl_GetBlockPtr(SaveControl *save, u32 block);
-u32 func_0200bcf8(SaveControl *save, u32 a1, void *a2, u32 a3);
-u32 func_0200be50(GameData *gameData, u32 a1, u32 a2, u32 a3, u32 a4, u16 *a5, u16 *a6);
+u32 func_0200bcf8(SaveControl *save, HeapID a1, void *a2, u32 a3);
+u32 func_0200be50(GameData *gameData, HeapID a1, u32 a2, u32 a3, u32 a4, u16 *a5, u16 *a6);
 u32 func_0200c1d0(u8 a0);
 void func_0200c1f0(void);
 void func_0200c200(void);
@@ -167,6 +167,7 @@ void func_020074e8(SaveControl *save, u32 value);
 // Used to delete the save data: func_020074ec tells whether a block is in the save, and func_020076a4 clears it
 void func_020074ac(SaveControl *save);
 BOOL func_020074ec(SaveControl *save, u32 block, HeapID heapId);
+void func_020075b8(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size);
 void func_020076a4(SaveControl *save, u32 block, HeapID heapId);
 void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *save, u32 block);
 void func_02011558(HeapID heapId);

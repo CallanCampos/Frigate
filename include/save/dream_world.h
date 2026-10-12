@@ -92,6 +92,5 @@ void func_020113c4(void *data, u32 seed, u32 received);
 BOOL func_020115fc(u32 word);
 u32 func_0201167c(u32 word);
 void func_02011624(u32 word, u16 *species, u8 *form, u8 *sex);
-void func_0200c6f0(HighLinkSave *highLink, PlayTime *playTime, u32 a2);
 
 #endif // POKEBW2_SAVE_DREAM_WORLD_H
