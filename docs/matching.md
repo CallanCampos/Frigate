@@ -435,6 +435,9 @@ Same instructions, scheduled in another order.
   written after that call: overlay 185's `CountupGreetings` stores `n`'s zero before calling
   `PMSWord_GetWordNumByGmmId` only with `n = 0;` after `first` and `last` are computed. Written before the call, it is
   stored after the call's result and built in `r0`; the next function, `CountupPokemon`, sets it right after its call.
+- The same holds for a flag: `oekaki.c`'s `Oekaki_UpdateTouch` sets `endPressed = TRUE;` after
+  `Oekaki_PrintMessage(...)` in both arms of its End button case. The store to `[sp]` is hoisted above the call
+  either way, built in `r1` when the statement follows the call and in `r0` when it precedes it.
 - A field of a local struct that a call fills is loaded before the next call only when the source reads it there: the
   Pokédex forms page copies `targetX = target.x;` between `ZukanDetailForm_GetSpritePosF32(..., &target)` and
   `MCSS_GetPosition`.
