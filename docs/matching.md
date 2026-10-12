@@ -181,6 +181,11 @@ Same instructions, registers swapped.
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
   and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
   loop without the `NULL` test, matches with plain indexing.
+- A loop-invariant field read through a `const` pointer parameter, which the original keeps in `ip`, `r7` or a stack
+  slot across the loop, can be a load MWCC hoisted itself. Written as a local before the loop it keeps the same
+  copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:
+  `irc_sync_check.c`'s `IrcSyncCheck_CompareTraces` matches with `own[i].x - ownStart->x` in the loop, and was 52
+  bytes off with `int ownStartX = ownStart[0].x;` above it.
 
 ## Stack slots
 
