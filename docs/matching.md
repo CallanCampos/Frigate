@@ -8,6 +8,13 @@ tools that show the differences.
 
 ## Registers
 
+- A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
+  taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
+  (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
+  difference late in r7.
+- A value passed to a `static inline` stays in a register across the inline's stores, where a field read again at
+  each use (`cb->aid`) is reloaded after each store: multiboot's `MBComm_OnWmEvent` (`mb_comm.c`) matches with its
+  disconnect step as an inline taking the aid.
 - A loop that walks on from a parameter reuses the parameter as its cursor, with the start kept in a local
   (`int start = pos;`), as `b_plist_main.c`'s `BPlistMain_GetNextPos` does; a separate counter swaps the registers.
 - A `const` pointer parameter lets MWCC keep a value loaded through it across a store through another pointer; the
@@ -489,6 +496,17 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
+  `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
+  task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
+  with it `MBTask_ThreadMain` and `MBTask_Add` match.
+- A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
+  `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
+  is the parent's and child's shared part, which the parent's code casts to its extension (`MB_PARENT_WORK`), and
+  `MB_DisconnectChild` (`mb_wm.c`) only matches through it.
+- A narrowing missing after an `if`/`else` that assigns a `u16` in both branches comes from a conditional expression:
+  `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `MBWm_NextChannel`
+  (`mb_wm.c`) needed.
 - On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
   load's offset from the shared base, where the same address in a named local, or the element written `a[n + k]`,
   is computed again. `snd_arc_loader.c`'s `LoadSingleWave` reads a wave's file offset and the next one's as
@@ -569,6 +587,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A value narrowed again after it is clamped was clamped with a conditional expression, whose `int` result is
   narrowed when it is stored back: the Pokédex cry page writes `sample = MATH_CLAMP(sample, -500, 500);` for an `s16`
   sample, where an `if`/`else if` chain assigning the bounds leaves no narrowing.
+- The same goes for an argument: a conditional expression passed to a `u16` parameter is narrowed before the call,
+  while a `u16` local assigned a constant in each arm of an `if`/`else` is not. `un_select.c`'s `UnSelect_ListRun`
+  passes its next step to `UIScene_SetNext` this way.
 - A comparison right after a `u16` narrowing that isn't done in `u16` arithmetic (`subs r0, r1, #6; cmp #1; bhi`
   rather than `subs; adds; lsl/lsr #16; cmp`) compares the narrowed value as an `int`: `zone_weather.c`'s
   `UpdateWeatherToDefault` keeps `int nowWeather = (u16)GetNowWeather(gameData);` for its `== 6 || == 7` test.
@@ -917,6 +938,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
+  stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
+  the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -965,6 +989,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `*result = N; break;` in every case makes later cases branch to an earlier case's `b`, a branch to a branch. A local
   set in each case and stored once after the switch gives direct branches: `scrcmd_fldmmdl.c`'s `s0078`.
 - Switch cases are laid out in source order, not by value, so the layout shows the order the cases were written in.
+- A jump table that takes `-1` in with the other cases (`adds r0, #1; cmp r0, #6; bhi`) switches on a signed value.
+  On a `u32`, `case -1:` is `0xffffffff` and is compared on its own before the table. `un_select.c`'s
+  `UnSelect_ListRun` matched once `TouchBar_GetDecided`, which returns -1 when nothing is touched, returned `int`.
 - A switch's comparison tree and jump tables depend on every case value, including cases with no code: the Battle
   Subway's command switch only splits its values as the game does with an empty `case 102:` inside its first jump
   table, and empty cases that sit between others still get a comparison.
@@ -1179,6 +1206,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A table one element longer in the ROM than the code needs has a terminator: pml_item.c's `TM_MOVE_LIST` is 101 moves
   and a `MOVE_NONE`. Without it the next object starts 2 bytes early.
 
+- MWCC doesn't pad a `.bss` section to its alignment: a 16-byte array declared `ATTRIBUTE_ALIGN(32)` at the end of a
+  file's `.bss` leaves the section 0x30 bytes long, not 0x40. When the next file's `.bss` starts 16 bytes later in the
+  ROM, the aligned buffer is larger than its use: the LTD's `photo_sign.c` sizes its random buffer, which the ARM7
+  writes, to a whole 32-byte cache line though each fill uses 16. Aligning the next file's object instead gave the
+  right size but changed how its code addresses it.
 - Sections start 4-aligned at link time (`ALIGNALL(4)` in the LCF), whatever their own alignment: pms_data.c's
   12-entry `u16` initializer after 0x16 bytes of shared `.rodata` sits at +0x18, not +0x16.
 - The same small table in the `.rodata` of several files of one overlay, each file with its own copy of the same

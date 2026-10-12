@@ -8,6 +8,9 @@ description: Get one pokebw2 function that is already written in C to match the 
 The aim is the C that Game Freak wrote. A match through unnatural C is not a match: the levers below are what real
 source looks like, and the permuter only points at them.
 
+For direct work on an overlay function, complete the overlay issue claim in `decomp-file` step 0 before editing the
+source or starting a `function-matcher` agent. A matcher working under the caller's claim does not claim again.
+
 ## 1. Triage: what kind of difference
 
 ```sh

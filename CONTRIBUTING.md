@@ -12,8 +12,14 @@ follows; [the docs](README.md#documentation) have the details.
    rebuilds and diffs each function as you edit.
 3. Pick something to work on. [Source files](docs/source-files.md) lists every overlay's original files and the
    [progress map on decomp.dev](https://decomp.dev/fuddlesworth/pokebw2) shows what is left. [Nonmatching functions](docs/nonmatching-functions.md) lists
-   functions already in C that don't match yet, each with what was tried, if you like a puzzle. Opening an issue or
-   a draft PR for a file you are taking avoids two people doing the same one.
+   functions already in C that don't match yet, each with what was tried, if you like a puzzle. Before starting
+   overlay work, find its open `[Decomp] Overlay NNN` issue and read the comments. If nobody has claimed it, comment
+   that you are claiming it and what file or range you are starting with; then recheck for a concurrent claim.
+   Treat a claim as active until its author releases it or the issue closes. Release yours if you leave the overlay
+   unfinished. If someone already has it, choose another overlay or coordinate with them first. After each published
+   overlay change, comment on the issue with the file or range, matching progress, commit and remaining work. When
+   every original range is covered and every file is complete in both versions, verify both ROMs, add a final progress
+   comment and close the issue.
 
 ## Decompiling a file
 
@@ -70,7 +76,9 @@ and naming of the code around yours.
 - Subjects like the history's: `Decompile btl_server_flow.c's HP recovery`, `Complete event_shortcut_menu.c`,
   `Match func_ov012_0215c160`, `tools: <what>`. The body says how many functions match, which mismatches are
   documented, and the reason for any guessed name.
-- A PR states that `ninja` passes with both ROMs matching. Keep PRs to one topic so they are easy to review.
+- A PR states that `ninja` passes with both ROMs matching. Keep PRs to one topic so they are easy to review. A PR may
+  cover only part of an overlay or original file; completion is not required for a regular PR. Use a draft PR only
+  while the changes are not ready for review, and leave the overlay issue open until the whole overlay is complete.
 
 ## Claude Code
 

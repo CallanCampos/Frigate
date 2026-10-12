@@ -12,6 +12,10 @@ First read `CLAUDE.md`, then follow `.claude/skills/decomp-file/SKILL.md` steps 
 for the file you are given. Read `docs/matching.md` only for the lever a mismatch needs, and
 `.claude/skills/match-function/levers.md` only for the section that fits.
 
+Before editing an overlay file, confirm the caller supplied the URL of its claimed overlay issue. If not, perform
+the claim check in `.claude/skills/decomp-file/SKILL.md` step 0 yourself. Work under the caller's existing claim
+without posting another one. If you claimed it yourself, include the issue URL in your report to the caller.
+
 Limits:
 - Edit only the given source file and the headers the prompt says you own. A wrong prototype in another header is
   reported, not fixed. Add a missing constant to its list in `data/constants/` only if the prompt allows it.

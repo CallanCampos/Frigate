@@ -165,6 +165,12 @@ DATA_PACKS = [
     ("tools/data/zone_data.py", "data/zones", ["a/0/1/2"], False, ["data/events"]),
     ("tools/data/trade_data.py", "data/trades", ["a/1/6/3"], False),  # In-game trades
     ("tools/data/map_matrix_data.py", "data/map_matrices", ["a/0/0/9"], False),  # Map matrices
+    ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True),  # Map model glTF sources
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/exterior", ["a/2/2/5"], True),
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/interior", ["a/2/2/6"], True),
+    ("tools/data/map_texture_data.py", "data/map_texture_sets", ["a/0/1/4"], True),  # Map texture PNG sources
+    ("tools/data/map_texture_data.py", "data/field_prop_textures/exterior", ["a/1/7/4"], True),
+    ("tools/data/map_texture_data.py", "data/field_prop_textures/interior", ["a/1/7/5"], True),
     ("tools/data/area_data.py", "data/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
     ("tools/data/light_data.py", "data/lights", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
     # The town map's places, whose texts are messages of town_map.txt
@@ -189,6 +195,8 @@ DATA_PACKS = [
 # What every packer reads besides its data: the scripts, and the move tutors' tables, which name the species data's
 # tutor bits (tools/data/species_data.py)
 DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/data/gen_constants.py", "tools/data/narc.py",
+                   "tools/data/map_terrain_data.py", "tools/data/map_texture_data.py",
+                   "tools/data/nitro_dictionary.py",
                    "tools/text/text_sources.py", "tools/text/text_data.py", "tools/text/msgdata.py",
                    "src/ov036/scrcmd_shop.c", "tools/data/facility_data.py", "tools/data/make_constants.py"]
 
@@ -421,7 +429,10 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         sources = sorted(str(p.relative_to(ROOT)) for d in [data_dir, *(other_dirs[0] if other_dirs else [])]
                          for p in ([ROOT / d] if (ROOT / d).is_file() else (ROOT / d).rglob("*")) if p.is_file())
         game = VERSIONS[version]["defines"][0].lower() if per_version else ""
-        n.build(outputs, "data_pack", sources, implicit=[script, *DATA_PACK_TOOLS, *constant_sources],
+        dependencies = [script, *DATA_PACK_TOOLS, *constant_sources]
+        if script == "tools/data/field_prop_model_data.py":
+            dependencies.append("tools/data/map_model_data.py")
+        n.build(outputs, "data_pack", sources, implicit=dependencies,
                 order_only=[files_ok], variables={"script": script, "dir": data_dir, "game": game})
         for path, archive in zip(paths, outputs):
             archive_ok = stamp_dir / "files" / f"{path.replace('/', '_')}.ok"

@@ -337,9 +337,9 @@ BOOL WH_ChildConnectAuto(u16 mode, const u8 *mac, u16 channel) {
 
     WH_ChangeSysState(WH_SYSSTATE_SCANNING);
     if (mac != NULL) {
-        _pWmInfo->sScanParam.bssid[2] = bssid[2];
-        _pWmInfo->sScanParam.bssid[1] = bssid[1];
-        _pWmInfo->sScanParam.bssid[0] = bssid[0];
+        ((u16 *)_pWmInfo->sScanParam.bssid)[2] = bssid[2];
+        ((u16 *)_pWmInfo->sScanParam.bssid)[1] = bssid[1];
+        ((u16 *)_pWmInfo->sScanParam.bssid)[0] = bssid[0];
     } else {
         sys_memset(_pWmInfo->sScanParam.bssid, 0xff, 6);
     }
@@ -366,9 +366,9 @@ BOOL WH_StartScan(WHScanCallback callback, const u8 *mac, u16 channel) {
     _pWmInfo->sAutoConnect = 0;
     _pWmInfo->sScanCount = 0;
     if (mac != NULL) {
-        _pWmInfo->sScanParam.bssid[2] = bssid[2];
-        _pWmInfo->sScanParam.bssid[1] = bssid[1];
-        _pWmInfo->sScanParam.bssid[0] = bssid[0];
+        ((u16 *)_pWmInfo->sScanParam.bssid)[2] = bssid[2];
+        ((u16 *)_pWmInfo->sScanParam.bssid)[1] = bssid[1];
+        ((u16 *)_pWmInfo->sScanParam.bssid)[0] = bssid[0];
     } else {
         sys_memset(_pWmInfo->sScanParam.bssid, 0xff, 6);
     }

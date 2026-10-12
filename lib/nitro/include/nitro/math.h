@@ -63,5 +63,7 @@ u16 MATH_CalcCRC16CCITT(const MATHCRC16Table *table, const void *data, u32 size)
 void MATH_SHA1Init(MATHSHA1Context *context);
 void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size);
 void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest);
+// The SHA-1 digest of size bytes, through the three above (MATH_CalcSHA1's code)
+void func_02077720(u8 *digest, const void *data, u32 size);
 
 #endif // POKEBW2_NITRO_MATH_H

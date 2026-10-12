@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": 10,
+    "texture_set": 292,
+    "srt_animation": 6,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 4,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""The areas in data/areas/areas.json: dump writes it from the ROM once, and pack builds the file (a/0/1/3) from it,
-which the build does.
+"""The areas in data/areas/<number>.json: dump writes them from the ROM once, and pack builds the file (a/0/1/3)
+from them, which the build does.
 
     area_data.py dump extract/b2_us/files data/areas
     area_data.py pack data/areas FILE
 
 The file is an array of 10-byte records (AreaData), in order: a zone's header names its area by its number, and an area
-with seasons has a record per season after it. areas.schema.json describes the fields.
+with seasons has a record per season after it. area.schema.json describes the fields.
 """
 import argparse
 import struct
@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.data.datajson import DataError, load, load_schema, write  # noqa: E402
+from tools.data.datajson import DataError, label, load, load_schema, write  # noqa: E402
 
 RECORD = struct.Struct("<HHBBBBBB")
 NO_ANIMATION = 0xFF  # AREA_ANM_NONE
@@ -26,23 +26,25 @@ def dump(files: Path, output: Path):
     data = (files / "a/0/1/3").read_bytes()
     if len(data) % RECORD.size:
         sys.exit("the file isn't whole records")
-    areas = []
-    for values in RECORD.iter_unpack(data):
+    for i, values in enumerate(RECORD.iter_unpack(data)):
         area = dict(zip(FIELDS, values))
         for key in ("srt_animation", "pattern_animation"):
             area[key] = None if area[key] == NO_ANIMATION else area[key]
         if area["exterior"] > 1:
             sys.exit("an area's exterior isn't 0 or 1")
         area["exterior"] = bool(area["exterior"])
-        areas.append(area)
-    write(output / "areas.json", {"$schema": "areas.schema.json", "areas": areas})
-    print(f"wrote {len(areas)} areas to {output}")
+        write(output / f"{i:03d}.json", {"$schema": "area.schema.json", **area})
+    print(f"wrote {len(data) // RECORD.size} areas to {output}")
 
 
 def pack(root: Path, output: Path):
-    areas = load(root / "areas.json", load_schema(root / "areas.schema.json"))["areas"]
+    schema = load_schema(root / "area.schema.json")
+    paths = sorted(path for path in root.glob("*.json") if not path.name.endswith(".schema.json"))
+    if [path.name for path in paths] != [f"{i:03d}.json" for i in range(len(paths))]:
+        raise DataError(f"{label(root)}: areas must be numbered from 000 without gaps")
     data = b""
-    for area in areas:
+    for path in paths:
+        area = load(path, schema)
         values = dict(area)
         for key in ("srt_animation", "pattern_animation"):
             values[key] = NO_ANIMATION if values[key] is None else values[key]

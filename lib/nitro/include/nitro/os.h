@@ -28,6 +28,11 @@ void cp15_invalidateDC(void *addr, u32 size);
 void cp15_cleanDC(const void *addr, u32 size);
 // Waits until the write buffer is empty
 void cp15_drainWriteBuffer(void);
+// Writes the whole data cache back to memory and discards it. NitroSDK's DC_FlushAll
+void cp15_invalidateDCAll(void);
+// Discards a range of the instruction cache, or all of it. NitroSDK's IC_InvalidateRange and IC_InvalidateAll
+void cp15_invalidateIC(void *addr, u32 size);
+void cp15_invalidateICAll(void);
 
 // The start of DTCM, where the linker places the DTCM module
 extern u32 SDK_AUTOLOAD_DTCM_START[];
@@ -218,6 +223,11 @@ typedef struct OSMessageQueue {
     s32 usedCount;
 } OSMessageQueue;
 
+#define OS_MESSAGE_BLOCK 1
+
+// Sets up a queue that holds count messages in the array, by OS_InitMessageQueue's code
+void func_0207acc4(OSMessageQueue *queue, OSMessage *messages, s32 count);
+BOOL OS_SendMessage(OSMessageQueue *queue, OSMessage message, s32 flags);
 BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags);
 
 // NitroSDK's threads, under swan's names: OS_CreateThread, whose stack is its top, OS_SleepThread, which sleeps on
@@ -242,6 +252,32 @@ void scheduler_thread_exit_proc(void);
 // NitroSDK's OS_IsThreadTerminated, under swan's name, and OS_DestroyThread, by its code
 BOOL scheduler_is_thread_ended(const OSThread *thread);
 void func_0207a710(OSThread *thread);
+// NitroSDK's OS_JoinThread, by its code: waits for a thread's end
+void func_0207a800(OSThread *thread);
+
+// The scheduler's state, which swan names g_IsThreadSwitchRequested: the thread that runs is its second word
+extern struct {
+    int unk_00;
+    OSThread *current;
+} g_IsThreadSwitchRequested;
+
+// NitroSDK's events, by their code: a word of flags, and the threads waiting for some of them to be set
+typedef struct OSEvent {
+    vu32 flag;
+    OSThreadQueue queue;
+} OSEvent;
+
+// Whether func_0207c800 waits for all the flags of its pattern or for any of them
+#define OS_EVENT_MODE_AND 0
+#define OS_EVENT_MODE_OR 1
+
+// Clears an event's flags and its queue (OS_InitEvent's code)
+void func_0207c7f4(OSEvent *event);
+// Sleeps until all or any (mode) of the flags of pattern are set, then clears the flags of clearBits and returns the
+// flags that were set (OS_WaitEventEx's code)
+u32 func_0207c800(OSEvent *event, u32 pattern, u32 mode, u32 clearBits);
+// Sets flags and wakes the threads waiting on the event (OS_SignalEvent's code)
+void func_0207c864(OSEvent *event, u32 setPattern);
 
 // NitroSDK's mutexes, which a thread may lock again; OS_LockMutex sleeps until the mutex is free
 typedef struct OSMutexLink {

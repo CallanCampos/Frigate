@@ -3,7 +3,7 @@
 The game keeps most of its data in NARC archives under `files/a/`, one numbered file per entry. The archives that are
 built from source have their sources in `data/`, and the build packs each archive from them and checks that it matches
 the original, so editing an entry is as easy as editing its file, and the matching build proves that the sources say
-exactly what the ROM holds. The sources come in two kinds:
+exactly what the ROM holds. The sources come in three kinds:
 
 - **JSON data**, as pokeplatinum's `res/`: one file per entity, such as `data/pokemon/bulbasaur/data.json`, with a
   JSON schema beside it that documents every field and that editors use for completion and checking. A script packs
@@ -12,10 +12,14 @@ exactly what the ROM holds. The sources come in two kinds:
   is adding its constant and its file; the build notices new, removed and renamed files by itself.
 - **Assembly**, for the field and trainer AI scripts, which are code more than data, as pret keeps them: one source
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
+- **glTF 2.0**, for map models under `data/map_models/<chunk>/` and field prop models under
+  `data/field_prop_models/`. Their editable mesh and material data is packed back into Nitro models.
+- **PNG**, for map textures under `data/map_texture_sets/<set>/` and field prop textures under
+  `data/field_prop_textures/`. The packer converts edited pixels to each set's original Nitro texture format.
 
-Both use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON by name, the assembly
-through the C preprocessor. Each archive has a script that wrote its sources from the original, which documents the
-format and can write them again.
+The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
+by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
+which documents the format and can write them again.
 
 | Archive | Sources | Contents | Script |
 | --- | --- | --- | --- |
@@ -29,7 +33,12 @@ format and can write them again.
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
-| `a/0/1/3` | `data/areas/areas.json` | Area records | `tools/data/area_data.py` |
+| `a/0/0/8` | `data/map_models/<chunk>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
+| `a/2/2/5`, `a/2/2/6` | `data/field_prop_models/{exterior,interior}/<bundle>/<model>/` (glTF 2.0) | Field prop models | `tools/data/field_prop_model_data.py` |
+| `a/1/7/4` | `data/field_prop_textures/exterior/<set>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
+| `a/1/7/5` | `data/field_prop_textures/interior/<set>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
+| `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
+| `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
@@ -529,6 +538,106 @@ Unlike a regular trainer (see [Trainers](#trainers)), a facility trainer has no 
 its sets at random, and the facility sets the level and IVs. The sets are a pool that many trainers share, which is why
 they are files of their own that trainers name.
 
+## Map model sources
+
+Field graphics directories use a location or resource name followed by `__<archive-id>` to distinguish
+assets that share a name. For example, `nacrene_city_6_m_whouse01_00_00__0834` is a house model.
+Names come from map matrices and zone-to-area references where possible; shared resources use `shared_`.
+Run `.venv/bin/python tools/data/find_graphics.py nacrene_city_7` (or another `data/zones/` filename)
+to see the map model, map texture set, prop bundle and prop textures used by that zone.
+This is closer to [pokeemerald's per-map directories](https://github.com/pret/pokeemerald/tree/master/data/maps)
+than to [pokeplatinum's numbered binary map data](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/data).
+Like [pokeplatinum's separate texture sets](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/texture_sets),
+shared texture resources belong in separate directories. `data/map_texture_sets/<location>__<set>/` holds editable color PNGs
+for all 409 texture sets. GLB image paths point to these same PNGs, including resource names containing dots.
+The packer reads the original Nitro resource to recover its texture format and palette association. Edit the PNG
+in Blender or an image editor. The build packs it back
+into `a/0/1/4` and checks the original archive against both ROMs. PNGs must be 8-bit RGB or RGBA and retain their
+dimensions. Nitro supports limited colors and alpha precision, so the packer quantizes edited colors to RGB555 and
+rejects a set when its shared
+palette cannot hold the edited colors. Textures that share the same encoded texels must remain compatible.
+
+`data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and a confirmed
+`texture_set` when the map-to-area relationship or resource names identify one. Where several sets contain every
+texture and palette name used by a model, `texture_preview` selects one representative set for Blender viewing.
+Each chunk has its own named directory containing `model.glb` and terrain CSVs; texture PNGs are shared by texture set.
+The binary glTF (`.glb`) holds the model geometry and its buffer in one file and opens directly in Blender.
+The archive ID suffix keeps maps distinct even when embedded model names repeat. For example, chunk 0103 is a
+four-vertex ground plane; chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices and ten materials.
+The packer reconstructs scene transforms from the GLB and original Nitro model. Seven unusual prop models retain
+their original position baselines in their bundle manifests because their transforms cannot yet be reconstructed. The packer
+also stores each prop GLB's export hash there so repacking one edited model does not reprocess all 6,331 models.
+These fields are generated conversion metadata; edits belong in the GLB or PNG. The packer
+derives the original triangle and vertex order from Nitro commands, so a Blender export can reindex vertices while
+the packer still maps edits to the right commands.
+
+The same GLB contains a Blender empty for each placed field prop, named `bw2_prop_NNNN_id_XXXXX`. Move or rotate
+these empties to edit prop placements; duplicate or delete them to add or remove placements. The five-digit ID in the
+name selects the prop resource. They must stay at the scene root and cannot be scaled. The packer writes their
+position, Y rotation, ID and count back into each map chunk's prop section.
+
+Collision terrain lives alongside each GLB as `terrain_0.csv` and, for the 60 two-layer `GC` chunks,
+`terrain_1.csv`. The eight `RD` chunks store two plane normals and heights directly in each tile row. Other
+chunks use a shape, slope-table index, height-table index and tile type per cell; their split-plane records live in
+`terrain_<layer>_splits.csv`. The `x` and `z` columns identify cells in row order. These are editable integer
+sources, including for the one 64×64 chunk. The packer checks every value and writes it into the original terrain
+section. Slope and height indices refer to the game's tables in `src/ov036/field_map_chunk_height.c`; the split
+file's `index` is the value in a split tile's `offset` column. Add a row to that file and set a tile's shape to `2`
+with its `offset` pointing to the new row to create a split tile. The packer updates the following section offsets
+when the split count changes. Terrain grid dimensions remain fixed by the map chunk layout.
+
+The archive has 1,065 chunks (`WB`, `GC`, `NG` or `RD`), each with one `BMD0` model, and the archive is identical in
+Black 2 and White 2. All 1,065 models roundtrip through the position converter without edits: 1,007 map directly to
+Nitro vertices, while 58 use scene node transforms that the packer reverses when writing positions. For the latter,
+the converter checks each vertex against the exported baseline before enabling edits.
+Of the 1,065 models, 695 have a confirmed texture set, 346 have a representative preview, and 24 name resources
+absent from every shared map texture set. GLBs for 1,036 models reference editable shared PNGs; five models with a
+confirmed set have no matching image in the GLB. A preview is for viewing and geometry edits; binding a material to
+a different texture needs a confirmed set because the runtime set varies by area.
+
+The build reads each GLB `POSITION` and `TEXCOORD_0` accessor and the exposed material settings, writes representable
+values into the original Nitro resource, packs `a/0/0/8` and checks it against both ROMs. An unchanged Blender export of
+the house reproduces the archive byte for byte; editing one house vertex or UV changes only chunk 834. The export
+can be repeated with
+`tools/data/map_model_data.py extract APICULA OUTPUT_DIR`, using an installed
+[Apicula](https://github.com/scurest/apicula) executable; the build itself needs only Python.
+
+The packer keeps original Nitro draw commands when Blender edits fit their encoding. When face count, vertex sharing
+or coordinate-command limits change, it re-encodes the GLB triangles as Nitro GPU commands, preserving each model's
+existing draw calls and material slots. This also permits UVs on a shape that originally had none. New vertices must
+fit Nitro's 16-bit fixed-point position and UV ranges. Models with scene transforms use their GLB joint assignments
+to recover local vertex positions; blended skin weights are unsupported by this map model format.
+Apply the mesh object's transforms in Blender before exporting. The packer rejects an extra mesh object or an
+unapplied object transform so no visible geometry edits are silently omitted.
+UV edits use Nitro's 1/16-texel coordinate precision and each material's texture dimensions and transform.
+GLB material base color, opacity, emission and double-sided settings also pack into Nitro. Color and opacity are
+quantized to the DS's five-bit channels. For models with a confirmed texture set, changing a material's
+`baseColorTexture` to a PNG from that set updates Nitro's texture and palette bindings, material dimensions and UV
+coordinates. Clearing the texture slot removes its binding. The packer rebuilds Nitro's name-search dictionary when
+the new texture was not already listed by the model. Blender may embed preview images when exporting a GLB; the
+packer resolves those by image name. Texture pixels are sourced from the shared PNGs, so save pixel edits there.
+The packer accepts embedded pixel edits when the matching shared PNG is saved, and rejects unsaved
+embedded edits instead of silently ignoring them.
+Other Nitro material settings retain their original values.
+Adding material slots or draw calls is not yet supported. Every map model contains only an
+`MDL0` block; its textures come from the shared texture archive.
+
+The exterior and interior field props use separate texture archives. Their PNGs live under
+`data/field_prop_textures/exterior/` and `data/field_prop_textures/interior/`, each grouped by the
+area's texture set number. Editing a PNG repacks its original Nitro texture and shared palette;
+the original Nitro archive supplies the format and palette mapping needed for a byte-matching build.
+The texture size, pixel format and shared palette capacity still constrain edits. The PNGs can be
+re-exported with `tools/data/map_texture_data.py extract OUTPUT_DIR a/1/7/4` or `a/1/7/5`.
+
+All 163 exterior and interior field prop bundles have an editable GLB for each of their 6,331 models.
+The bundle ID suffix is the area's `prop_bundle`; the model directory's suffix is its index in that bundle.
+The bundle's `manifest.json` records the in-game resource ID and model name. Editing geometry,
+UVs, material colors and texture bindings uses the same Nitro conversion as map models.
+The prop's resource information and animations retain their original Nitro bytes. Models can be
+re-exported with `tools/data/field_prop_model_data.py extract APICULA OUTPUT_DIR`.
+An unchanged Blender export of a prop also repacks byte for byte; adding a face to a prop model
+changes only its bundle, and the rebuilt model loads in Apicula.
+
 ## Map matrices, areas and lights
 
 A zone's header names its map matrix, `data/map_matrices/<matrix>.json` (`a/0/0/9`), by its constant in
@@ -537,10 +646,11 @@ A zone's header names its map matrix, `data/map_matrices/<matrix>.json` (`a/0/0/
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
 
-The areas, `data/areas/areas.json`, are the records of `a/0/1/3` (`AreaData`), which name the graphics that zones
-share: their props, textures, animations (null for none), lights and colors, by the numbers of files that aren't built
-from source yet. A zone's header names its area by its number, and an area with seasons has a record per season after
-it. `tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
+Each area is `data/areas/<number>.json`, numbered from `000` in record order. These are the records of `a/0/1/3`
+(`AreaData`), which name the graphics that zones share: their props, textures, animations (null for none), lights and
+colors, by their file numbers. A zone's header names its area by its number, and
+an area with seasons has a record per season after it. `data/areas/area.schema.json` describes one record and
+`tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
 
 An area's lights are a lighting set, `data/lights/field/<n>.json` (`a/0/6/0`, `ARCID_LIGHTS_FIELD`), by its number;
 the battles' are `data/lights/battle/<n>.json` (`a/0/6/1`). A set is the periods of the day, which
@@ -551,10 +661,11 @@ packs them, and both versions have the same sets.
 
 ## Town map
 
-The town map's places, `data/town_map/places.json` (`a/0/8/5`), are the table that the town map, the Pokédex's habitat
-map and a beacon's details read by `TOWNMAP_PARAM_*` (`include/app/townmap/townmap_data.h`): for each place, in the
-order the code numbers them, its zone, kind, where its marker, cursor and touch area are, whether the player can fly
-there, the flags that let them and that show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
+The town map's places, `data/town_map/<zone>.json` (`a/0/8/5`), form the table that the town map, the Pokédex's habitat
+map and a beacon's details read by `TOWNMAP_PARAM_*` (`include/app/townmap/townmap_data.h`). Each file is named after
+its zone constant, and `data/town_map/order.json` gives the order the code numbers them. Each place has its zone,
+kind, where its marker, cursor and touch area are, whether the player can fly there, the flags that let them and that
+show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
 `constants/town_map.h`), its area on the habitat map, and its description and landmarks, messages of
 `data/text/system/town_map.txt` by ID. The versions differ only in a few descriptions, which then give one per version:
 
@@ -563,7 +674,7 @@ there, the flags that let them and that show it (an event flag, or a `TOWNMAP_FL
 "landmarks": ["TownMap_Text_OpelucidCityGym", "TownMap_Text_PokemonCenter_9"],
 ```
 
-`tools/data/town_map_data.py` packs it for each version.
+`data/town_map/place.schema.json` describes each file, and `tools/data/town_map_data.py` packs them for each version.
 
 ## Zone events
 

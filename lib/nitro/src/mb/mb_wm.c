@@ -65,11 +65,7 @@ static int MBWm_NextChannel(WMScanExParam *param) {
             break;
         }
         i++;
-        if (channel == 0) {
-            channel = 1;
-        } else {
-            channel = channel << 1;
-        }
+        channel = (channel == 0) ? 1 : channel << 1;
     } while (i < 16);
     return 1;
 }
@@ -77,18 +73,17 @@ static int MBWm_NextChannel(WMScanExParam *param) {
 // Whether frames may go out: the multi-point mode runs, nothing is on its way, the end has not been asked for and a
 // child is connected
 static BOOL MBWm_CanSend(void) {
-    MBWmWork *work = sWmWork;
-    BOOL running = FALSE;
-    BOOL idle = FALSE;
     BOOL ready = FALSE;
+    BOOL idle = FALSE;
+    BOOL running = FALSE;
 
-    if (work->mpStarted == 1 && work->sending == 0) {
+    if (sWmWork->mpStarted == 1 && sWmWork->sending == 0) {
         running = TRUE;
     }
-    if (running && work->ending == 0) {
+    if (running && sWmWork->ending == 0) {
         idle = TRUE;
     }
-    if (idle && work->connectedMask != 0) {
+    if (idle && sWmWork->connectedMask != 0) {
         ready = TRUE;
     }
     return ready;
@@ -226,15 +221,12 @@ static void MBWm_ParentCallback(void *arg) {
         }
     }
     case MB_WM_API_SET_MP_DATA: {
-        MBCommWork *work = gMBCommWork;
-        MBWmWork *wm;
-
-        if (work->multiChild != 0) {
-            int children = 0;
-            int i;
+        if (MB_PARENT_WORK->multiChild != 0) {
+            u32 i;
+            u32 children = 0;
 
             for (i = 0; i < 15; i++) {
-                if (work->childState[i] != 0) {
+                if (MB_PARENT_WORK->childState[i] != 0) {
                     children++;
                     if (children >= 2) {
                         break;
@@ -245,20 +237,19 @@ static void MBWm_ParentCallback(void *arg) {
                 func_0207c160(0x1964);
             }
         }
-        wm = sWmWork;
-        wm->sending = 0;
+        sWmWork->sending = 0;
         if (cb->errcode == 0) {
-            wm->commCallback(MB_WM_EVENT_MP_SENT_OK, arg);
-            if (wm->ending == 0) {
-                wm->commCallback(MB_WM_EVENT_MP_READY, NULL);
+            sWmWork->commCallback(MB_WM_EVENT_MP_SENT_OK, arg);
+            if (sWmWork->ending == 0) {
+                sWmWork->commCallback(MB_WM_EVENT_MP_READY, NULL);
                 return;
             }
         } else if (cb->errcode == 0xa) {
-            wm->commCallback(MB_WM_EVENT_MP_SEND_BUSY, arg);
+            sWmWork->commCallback(MB_WM_EVENT_MP_SEND_BUSY, arg);
         } else {
-            wm->commCallback(MB_WM_EVENT_MP_SEND_FAILED, arg);
-            if (wm->ending == 0) {
-                wm->commCallback(MB_WM_EVENT_MP_READY, NULL);
+            sWmWork->commCallback(MB_WM_EVENT_MP_SEND_FAILED, arg);
+            if (sWmWork->ending == 0) {
+                sWmWork->commCallback(MB_WM_EVENT_MP_READY, NULL);
                 return;
             }
         }
@@ -321,9 +312,9 @@ static void MBWm_ParentCallback(void *arg) {
         case 0x14:
         case 0x15:
         case 0x17:
-            return;
+            break;
         }
-        return;
+        break;
     }
     default:
         sWmWork->commCallback(MB_WM_EVENT_WM_ERROR, arg);
@@ -378,9 +369,12 @@ static void MBWm_ChildCallback(void *arg) {
         if (sScanParam.maxChannelTime == 0) {
             sScanParam.maxChannelTime = 200;
         }
-        sScanParam.bssid[0] = 0xffff;
-        sScanParam.bssid[1] = 0xffff;
-        sScanParam.bssid[2] = 0xffff;
+        sScanParam.bssid[0] = 0xff;
+        sScanParam.bssid[1] = 0xff;
+        sScanParam.bssid[2] = 0xff;
+        sScanParam.bssid[3] = 0xff;
+        sScanParam.bssid[4] = 0xff;
+        sScanParam.bssid[5] = 0xff;
         sScanParam.scanType = 1;
         sScanParam.ssidLength = 0;
         work->scanning = 1;
@@ -615,20 +609,19 @@ static void MBWm_ChildCallback(void *arg) {
 // A number from 0 to 19 that depends on the console's address and the time
 static int MBWm_RandomBeaconPeriod(void) {
     u8 mac[6];
-    int i;
     u32 sum;
+    int i;
 
-    sum = 0;
     func_0207c33c(mac);
-    for (i = 0; i < 6; i++) {
+    for (i = 0, sum = 0; i < 6; i++) {
         sum += mac[i];
     }
     return (sum + MB_TIME_SEED) * 7 % 20;
 }
 
 int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
-    MBWmWork *wmWork = (MBWmWork *)(((u32)work + 0x1f) & ~0x1f);
-    MBCommWork *commWork = (MBCommWork *)(((u32)wmWork + sizeof(MBWmWork) + 0x1f) & ~0x1f);
+    MBWmWork *wmWork;
+    MBCommWork *commWork;
     u32 irq;
     u16 *name;
     int i;
@@ -636,6 +629,8 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     if (gMBCommWork != NULL && gMBCommWork->initialized != 0) {
         return MB_ERRCODE_INVALID_STATE;
     }
+    wmWork = (MBWmWork *)(((u32)work + 0x1f) & ~0x1f);
+    commWork = (MBCommWork *)(((u32)wmWork + sizeof(MBWmWork) + 0x1f) & ~0x1f);
     if (tgid == MB_TGID_AUTO) {
         tgid = func_020812b8();
     }
@@ -649,7 +644,7 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     sWmWork = wmWork;
     gMBCommWork = commWork;
     MI_CpuClear32(wmWork, sizeof(MBWmWork));
-    MI_CpuClear16(commWork, offsetof(MBCommWork, childUser));
+    MI_CpuClear16(commWork, sizeof(MBCommWork));
     name = wmWork->userName;
     for (i = 0; i < user->nameLength; i++) {
         *name++ = user->name[i];
@@ -664,9 +659,9 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
         sWmConfig.name++;
         *name++ = c;
     }
-    sys_memcpy(user, &commWork->parentUser, sizeof(MBUserInfo));
+    sys_memcpy(user, &commWork->user, sizeof(MBUserInfo));
     if (user->nameLength < MB_USER_NAME_LENGTH) {
-        commWork->parentUser.name[user->nameLength] = 0;
+        commWork->user.name[user->nameLength] = 0;
     }
     wmWork->parentSendSize = 0x100;
     wmWork->childSendSize = 8;
@@ -750,39 +745,37 @@ static int MBWm_StartInit(void) {
 
 // Sets the library's work up for a parent on a channel and starts the wireless manager
 static int MBWm_Start(int channel) {
-    u32 irq = CPU_IRQDisable();
     MBCommPStateCallback callback;
-    MBWmWork *wm;
+    u32 irq = CPU_IRQDisable();
     int result;
     int i;
 
     sWmWork->parentParam.channel = channel;
-    sWmBuf = (void *)(((u32)gMBCommWork + sizeof(MBCommWork) + 0x1f) & ~0x1f);
-    callback = gMBCommWork->callback;
-    MI_CpuClear16(&gMBCommWork->childUser, sizeof(MBCommWork) - offsetof(MBCommWork, childUser));
+    sWmBuf = (void *)(((u32)gMBCommWork + sizeof(MBCommParentWork) + 0x1f) & ~0x1f);
+    callback = MB_PARENT_WORK->callback;
+    MI_CpuClear16(&MB_PARENT_WORK->childUser, sizeof(MBCommParentWork) - sizeof(MBCommWork));
     MB_CommSetParentStateCallback(callback);
     gMBCommWork->blockSize = sWmWork->parentSendSize - 6;
     MBFrame_SetPayloadSize(sWmWork->childSendSize);
-    MBFrame_SetBuffer(&gMBCommWork->fragmentBuf);
+    MBFrame_SetBuffer(&MB_PARENT_WORK->fragmentBuf);
     for (i = 0; i < 15; i++) {
-        gMBCommWork->childState[i] = 0;
-        gMBCommWork->childFile[i] = -1;
+        MB_PARENT_WORK->childState[i] = 0;
+        MB_PARENT_WORK->childFile[i] = -1;
     }
-    gMBCommWork->fileCount = 0;
-    MI_CpuClear16(gMBCommWork->files, sizeof(gMBCommWork->files));
-    sys_memset(gMBCommWork->response, 0, sizeof(gMBCommWork->response));
+    MB_PARENT_WORK->fileCount = 0;
+    MI_CpuClear16(MB_PARENT_WORK->files, sizeof(MB_PARENT_WORK->files));
+    sys_memset(MB_PARENT_WORK->response, 0, sizeof(MB_PARENT_WORK->response));
     sWmWork->mode = 1;
     sWmWork->commCallback = MBComm_OnWmEvent;
     sWmWork->wmCallback = MBWm_ParentCallback;
-    wm = sWmWork;
-    wm->parentParam.parentMaxSize = wm->parentSendSize;
-    wm->sendBufSize = (wm->parentParam.parentMaxSize + 0x23) & ~0x1f;
-    wm->parentParam.childMaxSize = wm->childSendSize;
-    wm->recvBufSize = (((wm->parentParam.childMaxSize + 0xe) * 15 + 0x29) & ~0x1f) * 2;
+    sWmWork->parentParam.parentMaxSize = sWmWork->parentSendSize;
+    sWmWork->sendBufSize = (sWmWork->parentParam.parentMaxSize + 0x23) & ~0x1f;
+    sWmWork->parentParam.childMaxSize = sWmWork->childSendSize;
+    sWmWork->recvBufSize = (((sWmWork->parentParam.childMaxSize + 0xe) * 15 + 0x29) & ~0x1f) * 2;
     MBGameInfo_Init();
     result = MBWm_StartInit();
     CPU_SetIRQMask(irq);
-    gMBCommWork->multiChild = func_0207ca48(15, 1);
+    MB_PARENT_WORK->multiChild = func_0207ca48(15, 1);
     return result;
 }
 
@@ -839,29 +832,17 @@ void MB_End(void) {
 void MB_DisconnectChild(u16 aid) {
     func_02081774(MBWm_ParentCallback, aid);
     if (aid != 0 && aid < 16) {
-        MBCommWork *work;
-
-        gMBCommWork->childUnk148a[aid - 1] = 0;
-        sys_memset(&gMBCommWork->childRequestGgid[aid - 1], 0, sizeof(u32));
-        sys_memset(&gMBCommWork->childUser[aid - 1], 0, sizeof(MBUserInfo));
+        MB_PARENT_WORK->childUnk148a[aid - 1] = 0;
+        sys_memset(&MB_PARENT_WORK->childRequestGgid[aid - 1], 0, sizeof(u32));
+        sys_memset(&MB_PARENT_WORK->childUser[aid - 1], 0, sizeof(MBUserInfo));
         MBFrame_ClearChild(aid);
-        gMBCommWork->response[aid - 1] = 0;
-        work = gMBCommWork;
-        if (work->childFile[aid - 1] != -1) {
-            MBCommFile *file = &work->files[(u8)work->childFile[aid - 1]];
-            u16 bit = 1 << aid;
-
-            file->memberMask &= (u16)~bit;
-            file->changedMask |= bit;
-            work->childFile[aid - 1] = -1;
-            file->downloadMask &= (u16)~bit;
+        MB_PARENT_WORK->response[aid - 1] = 0;
+        MBComm_LeaveFile(aid);
+        if (MB_PARENT_WORK->childBitmap & (1 << aid)) {
+            MB_PARENT_WORK->childCount--;
+            MB_PARENT_WORK->childBitmap &= ~(1 << aid);
         }
-        work = gMBCommWork;
-        if (work->childBitmap & (1 << aid)) {
-            work->childCount--;
-            work->childBitmap &= (u16)~(1 << aid);
-        }
-        gMBCommWork->childState[aid - 1] = 0;
+        MB_PARENT_WORK->childState[aid - 1] = 0;
     }
 }
 
@@ -877,7 +858,9 @@ static int MBWm_SetMPData(WMCallbackFunc callback, const void *data, u16 size, u
 }
 
 // Sends a frame to the children in a bitmap with the wireless manager. Gives 1 when it cannot be sent now
-int MBWm_SendToChildren(const void *data, u16 size, u16 aidBitmap) {
+int MBWm_SendToChildren(const void *data, u32 size, u32 aidBitmap) {
+    u16 length = size;
+    u16 bitmap = aidBitmap;
     MBWmWork *work = sWmWork;
     int result;
 
@@ -885,13 +868,8 @@ int MBWm_SendToChildren(const void *data, u16 size, u16 aidBitmap) {
         return 1;
     }
     switch (work->mode) {
-    case 1: {
-        u16 unused = 0;
-
-        if (work->mpFreq == 0) {
-            unused = 1000;
-        }
-        result = MBWm_SetMPData(work->wmCallback, data, size, unused, aidBitmap);
+    case 1:
+        result = MBWm_SetMPData(work->wmCallback, data, length, work->mpFreq == 0 ? 1000 : 0, bitmap);
         if (result == WM_ERRCODE_OPERATING) {
             sWmWork->sending = 1;
         }
@@ -899,9 +877,8 @@ int MBWm_SendToChildren(const void *data, u16 size, u16 aidBitmap) {
             return 0;
         }
         return result;
-    }
     case 2:
-        result = MBWm_SetMPData(MBWm_ChildCallback, data, size, 0, aidBitmap);
+        result = MBWm_SetMPData(MBWm_ChildCallback, data, length, 0, bitmap);
         if (result == WM_ERRCODE_OPERATING) {
             sWmWork->sending = 1;
         }
@@ -924,28 +901,8 @@ u16 MBWm_GetTgid(void) {
 
 // The attributes of the parent's beacon, from its flags
 u8 MBWm_GetAttribute(void) {
-    MBWmWork *work = sWmWork;
-    u32 multiBoot = 2;
-    u32 entry;
-    u32 keyShare;
-    u32 cs;
-
-    if (work->parentParam.multiBootFlag == 0) {
-        multiBoot = 0;
-    }
-    entry = 1;
-    if (work->parentParam.entryFlag == 0) {
-        entry = 0;
-    }
-    keyShare = 4;
-    if (work->parentParam.KS_Flag == 0) {
-        keyShare = 0;
-    }
-    cs = 8;
-    if (work->parentParam.CS_Flag == 0) {
-        cs = 0;
-    }
-    return entry | multiBoot | keyShare | cs;
+    return (u8)((sWmWork->parentParam.entryFlag ? 1 : 0) | (sWmWork->parentParam.multiBootFlag ? 2 : 0) |
+                (sWmWork->parentParam.KS_Flag ? 4 : 0) | (sWmWork->parentParam.CS_Flag ? 8 : 0));
 }
 
 BOOL MBWm_IsStarted(void) {

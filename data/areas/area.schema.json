@@ -1,0 +1,73 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "An area record",
+    "description": "One AreaData record of a/0/1/3 (include/system/area_data.h), named by its numeric index. It selects the graphics shared by zones; seasonal records follow their base area (AreaData_Create). tools/data/area_data.py packs the files in index order.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "prop_bundle",
+        "texture_set",
+        "srt_animation",
+        "pattern_animation",
+        "exterior",
+        "lights",
+        "edge_color_table",
+        "actor_material_color"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "prop_bundle": {
+            "$ref": "#/$defs/u16",
+            "description": "The area's props, a file of ARCID_AREA_BMDATA_EXT or ARCID_AREA_BMDATA_INT"
+        },
+        "texture_set": {
+            "$ref": "#/$defs/u16"
+        },
+        "srt_animation": {
+            "type": [
+                "integer",
+                "null"
+            ],
+            "minimum": 0,
+            "maximum": 254,
+            "description": "null for none (AREA_ANM_NONE)"
+        },
+        "pattern_animation": {
+            "type": [
+                "integer",
+                "null"
+            ],
+            "minimum": 0,
+            "maximum": 254,
+            "description": "null for none (AREA_ANM_NONE)"
+        },
+        "exterior": {
+            "type": "boolean",
+            "description": "Whether the area is outdoors, which picks the props' archive"
+        },
+        "lights": {
+            "$ref": "#/$defs/u8"
+        },
+        "edge_color_table": {
+            "$ref": "#/$defs/u8"
+        },
+        "actor_material_color": {
+            "$ref": "#/$defs/u8"
+        }
+    },
+    "$defs": {
+        "u8": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+        },
+        "u16": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+        }
+    }
+}

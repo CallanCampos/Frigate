@@ -4,3 +4,18 @@
     .ltdmain    start:0x027674a0 end:0x0276ae98 kind:code align:32
     .data       start:0x0276ae98 end:0x0276aee0 kind:data align:8
     .bss        start:0x0276aee0 end:0x0276dde0 kind:bss align:32
+
+lib/twl/src/photo_sign_client.c:
+    complete
+    .text       start:0x02707628 end:0x02707870
+    .bss        start:0x0276dd4c end:0x0276dd80
+
+lib/twl/src/photo_sign.c:
+    complete
+    .text       start:0x02707870 end:0x02707cac
+    .bss        start:0x0276dd80 end:0x0276ddc0
+
+lib/twl/src/photo_sign_util.c:
+    complete
+    .text       start:0x02707cac end:0x02707fcc
+    .bss        start:0x0276ddc0 end:0x0276dde0

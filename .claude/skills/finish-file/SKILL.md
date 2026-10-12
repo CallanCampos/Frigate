@@ -66,6 +66,10 @@ specifies.
 
 ## 7. Publish
 
+For a PR workflow, a review-ready change may cover only part of a file or overlay. Do not require a draft PR just
+because the decompilation is incomplete; use draft status only while the submitted change itself needs more work.
+Keep the overlay issue open until the entire overlay is complete.
+
 Every commit goes to `origin/main` at once, so the sessions working in parallel stay close to one another:
 
 1. `git fetch origin && git merge origin/main`, in a worktree into its own branch.
@@ -90,5 +94,17 @@ intended, stop and ask the user.
 
 ## 8. Report and continue
 
-Tell the user in one or two lines: the file, N of M matching, the rows added or removed, and the commit. Then start
-the next file with `decomp-file`, without asking unless something real is blocked.
+After the verified commit is pushed, comment on the claimed `[Decomp] Overlay NNN` issue for every overlay changed by
+the commit. State the file or range, N of M functions matching, files newly marked complete, the published commit
+SHA or URL, and what remains. This gives partial work a history; do not wait for the overlay to be complete. Use
+`gh issue comment NUMBER --repo fuddlesworth/pokebw2 --body '...'`.
+
+If the overlay is now 100%, check both versions' `delinks.txt`: all original code and data ranges are covered by the
+recovered source files and every file is marked `complete`. After the published commit's `ninja` has verified both
+ROM SHA1s, post a final progress comment stating completion and close the issue with
+`gh issue close NUMBER --repo fuddlesworth/pokebw2 --reason completed`. Leave it open if any file or range remains.
+If leaving an unfinished overlay, comment that you release your claim.
+
+Tell the user in one or two lines: the file, N of M matching, the rows added or removed, the commit, and the issue
+update. Then start the next file with `decomp-file`, without asking unless something real is blocked. Keep the same
+overlay claim while continuing within it.

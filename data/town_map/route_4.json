@@ -1,0 +1,40 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_ROUTE_4",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 132,
+        "y": 117
+    },
+    "cursor": {
+        "x": 132,
+        "y": 117
+    },
+    "hit": {
+        "start": {
+            "x": 132,
+            "y": 113
+        },
+        "end": {
+            "x": 132,
+            "y": 121
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": {
+        "black2": "TownMap_Text_RouteOnceCoveredSand",
+        "white2": "TownMap_Text_DevelopmentSuspendedAfterRuins"
+    },
+    "landmarks": [],
+    "area": {
+        "animation": 6,
+        "x": 128,
+        "y": 99
+    }
+}

@@ -746,9 +746,9 @@ static BOOL JpegEnc_Sign(u8 *data, u32 size) {
     }
     sys_memset(&data[offset], 0, SSP_SIGNATURE_SIZE);
     if (hw_isDSi()) {
-        func_027076c4();
+        PhotoSign_Init();
     }
-    if (func_02707ba4(signature, data, size) != TRUE) {
+    if (PhotoSign_Sign(signature, data, size) != TRUE) {
         return FALSE;
     }
     sys_memcpy(signature, &data[offset], SSP_SIGNATURE_SIZE);
