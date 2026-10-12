@@ -5,6 +5,7 @@
     .bss        start:0x021f05e0 end:0x021f05e0 kind:bss align:32
 
 src/ov117/gimmick_plasma_frigate.c:
+    complete
     .text       start:0x021eecc0 end:0x021efd2c
     .rodata     start:0x021efd2c end:0x021f0590
     .data       start:0x021f05a0 end:0x021f05e0

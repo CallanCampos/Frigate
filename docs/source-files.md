@@ -1033,7 +1033,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_plasma_frigate.c` | `0x021eec80`–`0x021efd00` | 55 | partial | descriptive |
+| `gimmick_plasma_frigate.c` | `0x021eec80`–`0x021efd00` | 55 | complete | descriptive |
 
 ### Overlay 118
 
