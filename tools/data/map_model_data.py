@@ -4,8 +4,8 @@
 Usage: map_model_data.py extract APICULA OUTPUT_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
 
-Mesh positions are editable for direct models and per-shape translations. The
-original Nitro resource supplies command order, materials and other map data.
+Mesh positions are editable for all models through direct, translated or skinned
+coordinates. The original Nitro resource supplies command order and materials.
 """
 
 import hashlib
@@ -68,7 +68,8 @@ def accessor_values(doc, directory, accessor_index):
     if "sparse" in accessor:
         raise ValueError("sparse glTF accessors are unsupported")
     fmt = {(5121, "SCALAR"): "B", (5123, "SCALAR"): "H",
-           (5125, "SCALAR"): "I", (5126, "VEC3"): "3f"}.get(
+           (5125, "SCALAR"): "I", (5126, "VEC3"): "3f",
+           (5121, "VEC4"): "4B", (5123, "VEC4"): "4H"}.get(
                (accessor["componentType"], accessor["type"]))
     if fmt is None:
         raise ValueError("unsupported glTF accessor format")
@@ -99,6 +100,43 @@ def mesh_primitives(directory, name):
     return doc, primitives
 
 
+def inverse_joint_position(doc, joint, position):
+    if len(doc.get("skins", [])) != 1:
+        raise ValueError("expected one glTF skin")
+    nodes = doc["nodes"]
+    parents = {}
+    for parent, node in enumerate(nodes):
+        for child in node.get("children", []):
+            parents[child] = parent
+    index = doc["skins"][0]["joints"][joint]
+    path = []
+    while True:
+        path.append(nodes[index])
+        if index not in parents:
+            break
+        index = parents[index]
+    point = list(position)
+    for node in reversed(path):
+        if "matrix" in node:
+            raise ValueError("glTF matrix node transforms are unsupported")
+        translation = node.get("translation", (0, 0, 0))
+        point = [point[i] - translation[i] for i in range(3)]
+        x, y, z, w = node.get("rotation", (0, 0, 0, 1))
+        # Apply the inverse quaternion, then inverse scale (TRS order).
+        u = (-x, -y, -z)
+        cross = (u[1] * point[2] - u[2] * point[1],
+                 u[2] * point[0] - u[0] * point[2],
+                 u[0] * point[1] - u[1] * point[0])
+        doubled = [2 * item for item in cross]
+        cross_again = (u[1] * doubled[2] - u[2] * doubled[1],
+                       u[2] * doubled[0] - u[0] * doubled[2],
+                       u[0] * doubled[1] - u[1] * doubled[0])
+        point = [point[i] + w * doubled[i] + cross_again[i] for i in range(3)]
+        scale = node.get("scale", (1, 1, 1))
+        point = [point[i] / scale[i] for i in range(3)]
+    return tuple(point)
+
+
 def positions_from_gltf(directory, name, nitro):
     mapping = json.loads((directory / "nitro.json").read_text())
     if mapping["nitro_sha256"] != hashlib.sha256(nitro).hexdigest():
@@ -117,9 +155,14 @@ def positions_from_gltf(directory, name, nitro):
     if len(primitives) != len(original_index_sets):
         raise ValueError(f"{name}: primitive count changed")
     positions = [None] * len(baseline)
+    joints = [None] * len(baseline)
     for prim, original_indices in zip(primitives, original_index_sets):
         current_indices = [item[0] for item in accessor_values(doc, directory, prim["indices"])]
         current_positions = accessor_values(doc, directory, prim["attributes"]["POSITION"])
+        current_joints = (accessor_values(doc, directory, prim["attributes"]["JOINTS_0"])
+                          if not mapping["direct"] and "JOINTS_0" in prim["attributes"] else None)
+        current_weights = (accessor_values(doc, directory, prim["attributes"]["WEIGHTS_0"])
+                           if not mapping["direct"] and "WEIGHTS_0" in prim["attributes"] else None)
         if len(current_indices) != len(original_indices):
             raise ValueError(f"{name}: triangle count changed")
         for original, current in zip(original_indices, current_indices):
@@ -130,10 +173,33 @@ def positions_from_gltf(directory, name, nitro):
             if old is not None and any(abs(a - b) > 0.001 for a, b in zip(old, value)):
                 raise ValueError(f"{name}: triangle topology or shared vertex changed")
             positions[original] = value
+            if current_joints is not None and current_weights is not None:
+                if current_weights[current] != (255, 0, 0, 0):
+                    raise ValueError(f"{name}: blended skin weights are unsupported")
+                joint = current_joints[current][0]
+                if joints[original] is not None and joints[original] != joint:
+                    raise ValueError(f"{name}: shared vertex has multiple joints")
+                joints[original] = joint
     result = [value if value is not None else original
               for value, original in zip(positions, baseline)]
     if mapping["direct"]:
         return result, True
+    if all(joint is not None for joint in joints):
+        try:
+            restored = [inverse_joint_position(doc, joint, value)
+                        for joint, value in zip(joints, baseline)]
+            if all(all(abs(a - b) <= 0.001 for a, b in zip(actual, original))
+                   for actual, original in zip(restored, raw_positions)):
+                adjusted = []
+                for actual, original, raw, joint in zip(result, baseline, raw_positions, joints):
+                    if all(abs(a - b) < 0.000001 for a, b in zip(actual, original)):
+                        adjusted.append(raw)
+                    else:
+                        local = inverse_joint_position(doc, joint, actual)
+                        adjusted.append(tuple(round(axis * 4096) / 4096 for axis in local))
+                return adjusted, True
+        except (KeyError, IndexError, ValueError, ZeroDivisionError):
+            pass
     # Apicula bakes the scene graph into the glTF positions. A translation that
     # is constant across a Nitro shape can be inverted without changing the
     # display-list commands or the shape's local coordinate system.

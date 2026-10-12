@@ -551,9 +551,9 @@ model hash and whether its glTF positions map directly to Nitro commands. The pa
 derives the original triangle and vertex order from those commands, so a Blender export can reindex vertices while
 the packer still maps edits to the right commands.
 The archive has 1,065 chunks (`WB`, `GC`, `NG` or `RD`), each with one `BMD0` model, and the archive is identical in
-Black 2 and White 2. An archive-wide no-edit trial roundtripped 1,007 models through the current position converter;
-50 more models have a per-shape translation that the packer reverses when writing positions. The remaining eight have
-more complex transforms: their glTF files are useful for viewing, but the packer rejects position edits to them.
+Black 2 and White 2. All 1,065 models roundtrip through the position converter without edits: 1,007 map directly to
+Nitro vertices, while 58 use scene node transforms that the packer reverses when writing positions. For the latter,
+the converter checks each vertex against the exported baseline before enabling edits.
 Of the 1,065 models, 646 reference previews from an identified texture set; other entries have no single unambiguous
 texture assignment in the current manifest.
 
@@ -563,8 +563,8 @@ archive byte for byte; editing one house vertex changes only chunk 834. The expo
 `tools/data/map_model_data.py extract APICULA OUTPUT_DIR`, using an installed
 [Apicula](https://github.com/scurest/apicula) executable; the build itself needs only Python.
 
-The current converter supports position edits for direct models and models with per-shape translations, within the
-existing command encoding and triangle correspondence.
+The current converter supports position edits for all models within the existing command encoding and triangle
+correspondence.
 Some Nitro commands reuse a previous vertex axis or encode a small relative difference; edits outside those ranges
 fail with an error. The shared PNGs are viewing previews; topology, UVs, material parameters, textures, collision and
 props still come from the extracted ROM. These need their own source and packing support before map graphics are fully
