@@ -227,17 +227,13 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         *state = 15;
         break;
     case 15:
-        if (battle->setup->unkB0 != 0) {
-            if (func_0200c1d0(battle->setup->unkAD)) {
-                saved = TRUE;
-            } else {
-                saved = FALSE;
-            }
-        } else {
+        if (battle->setup->unkB0 == NULL) {
             saved = FALSE;
+        } else {
+            saved = func_0200c1d0(battle->setup->unkAD) ? TRUE : FALSE;
         }
-        battle->ov306Param.unk4 = saved;
         battle->ov306Param.gameData = battle->gameData;
+        battle->ov306Param.unk4 = saved;
         battle->ov306Param.unk8 = 1;
         battle->ov306Param.unkC = 1;
         battle->ov306Param.unk10 = battle->rule;

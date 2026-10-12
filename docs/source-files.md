@@ -86,7 +86,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | partial | descriptive |
+| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | complete | descriptive |
 
 ### Overlay 11
 
