@@ -171,7 +171,7 @@ prints the tables below from the configs and the ROM:
 | `shaymin_form.c` | `0x02164330`–`0x02164490` | 4 | complete | descriptive |
 | `scrcmd_trial_house.c` | `0x02164490`–`0x02164838` | 16 | complete | descriptive |
 | `scrcmd_actor_move.c` | `0x02164838`–`0x021649ec` | 4 | complete | descriptive |
-| `season_form.c` | `0x021649ec`–`0x02164ae0` | 1 | partial | descriptive |
+| `season_form.c` | `0x021649ec`–`0x02164ae0` | 1 | complete | descriptive |
 | `scrcmd_entree_forest.c` | `0x02164ae0`–`0x021652cc` | 16 | complete | descriptive |
 | `survey.c` | `0x021652cc`–`0x02165598` | 14 | complete | descriptive |
 | `scrcmd_sp_poke_gimmick.c` | `0x02165598`–`0x0216598c` | 8 | complete | descriptive |
@@ -415,7 +415,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 36
 
-1506 of 4339 functions are in source files. Embedded names without a file yet: `comm_entry_menu.c`, `ctalkmsgwin.c`, `enceff.c`, `entrance_camera.c`, `fes_gimmick.c`, `field_3dbg.c`, `field_bbd_color.c`, `field_camera.c`, `field_camera_anime.c`, `field_comm_actor.c`, `field_fade.c`, `field_flash.c`, `field_fmission_info.c`, `field_fog.c`, `field_g3dobj.c`, `field_light.c`, `field_msgbg.c`, `field_place_name.c`, `field_player_core.c`, `field_player_grid_event.c`, `field_player_nogrid.c`, `field_rail.c`, `field_rail_loader.c`, `field_saveanime.c`, `field_subscreen.c`, `field_task.c`, `field_task_manager.c`, `field_wfbc.c`, `field_zonefog.c`, `fieldmap_ctrl_grid.c`, `fieldmap_ctrl_nogrid_work.c`, `fieldmap_tcb_camera_zoom.c`, `fieldskill_mapeff.c`, `fld3d_ci.c`, `fld_exp_obj.c`, `fld_particle.c`, `fld_wipe_3dobj.c`, `fldeff_btrain.c`, `fldeff_bubble.c`, `fldeff_d06denki.c`, `fldeff_hide.c`, `fldeff_iaigiri.c`, `fldeff_ochiba.c`, `fldeff_reflect.c`, `fldeff_ripple.c`, `fldeff_splash.c`, `fldmmdl_acmd.c`, `fldmmdl_blact.c`, `fldmmdl_g3dobj.c`, `height_ex.c`, `ircbattlemenu.c`, `land_data_patch.c`, `party_select_list.c`, `place_name_letter.c`, `pleasure_boat.c`, `scrcmd_pokemon_fld.c`, `shortcut_menu.c`, `sodateya.c`, `weather.c`, `weather_task.c`.
+1530 of 4339 functions are in source files. Embedded names without a file yet: `comm_entry_menu.c`, `ctalkmsgwin.c`, `enceff.c`, `entrance_camera.c`, `fes_gimmick.c`, `field_3dbg.c`, `field_bbd_color.c`, `field_camera.c`, `field_camera_anime.c`, `field_comm_actor.c`, `field_fade.c`, `field_flash.c`, `field_fmission_info.c`, `field_fog.c`, `field_g3dobj.c`, `field_light.c`, `field_msgbg.c`, `field_place_name.c`, `field_player_core.c`, `field_player_grid_event.c`, `field_player_nogrid.c`, `field_rail.c`, `field_rail_loader.c`, `field_saveanime.c`, `field_subscreen.c`, `field_task.c`, `field_task_manager.c`, `field_wfbc.c`, `field_zonefog.c`, `fieldmap_ctrl_grid.c`, `fieldmap_ctrl_nogrid_work.c`, `fieldmap_tcb_camera_zoom.c`, `fieldskill_mapeff.c`, `fld3d_ci.c`, `fld_exp_obj.c`, `fld_particle.c`, `fld_wipe_3dobj.c`, `fldeff_btrain.c`, `fldeff_bubble.c`, `fldeff_d06denki.c`, `fldeff_hide.c`, `fldeff_iaigiri.c`, `fldeff_ochiba.c`, `fldeff_reflect.c`, `fldeff_ripple.c`, `fldeff_splash.c`, `fldmmdl_acmd.c`, `fldmmdl_blact.c`, `fldmmdl_g3dobj.c`, `height_ex.c`, `ircbattlemenu.c`, `land_data_patch.c`, `party_select_list.c`, `place_name_letter.c`, `pleasure_boat.c`, `scrcmd_pokemon_fld.c`, `sodateya.c`, `weather.c`, `weather_task.c`.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -474,6 +474,7 @@ prints the tables below from the configs and the ROM:
 | `fieldmap_func.c` | `0x021b427c`–`0x021b445c` | 9 | complete | string at `0x021d5290` |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
+| `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | partial | descriptive |
 | `field_map_chunk_height.c` | `0x021c7028`–`0x021c71d4` | 1 | complete | descriptive |
 | `scrcmd_medal.c` | `0x021c7b38`–`0x021c7fd8` | 13 | partial | descriptive |
