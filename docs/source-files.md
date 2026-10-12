@@ -2559,7 +2559,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `psel.c` | `0x0219ce80`–`0x0219f6d0` | 80 | partial | string at `0x0219fe00` |
+| `psel.c` | `0x0219ce80`–`0x0219f6d0` | 80 | complete | string at `0x0219fe00` |
 | `psel_graphic.c` | `0x0219f6d0`–`0x0219fa84` | 23 | complete | string at `0x0219fe08` |
 
 ### Overlay 317
