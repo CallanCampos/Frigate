@@ -379,6 +379,66 @@ def material_uv_transform(data, model, material_index):
     return width, height, scale
 
 
+def color5(word):
+    return [(word >> shift & 31) / 31 for shift in (0, 5, 10)]
+
+
+def pack_color5(values, name):
+    if len(values) != 3 or any(not math.isfinite(value) or not 0 <= value <= 1 for value in values):
+        raise ValueError(f"{name}: material color must have three values from 0 to 1")
+    return sum(round(value * 31) << shift for value, shift in zip(values, (0, 5, 10)))
+
+
+def patch_materials(chunk, doc, primitives, name):
+    data = bytearray(chunk)
+    model_start = u32(data, 4)
+    block = model_start + u32(data, model_start + 16)
+    model = block + dictionary_offsets(data, block + 8)[0]
+    material_dict = model + u32(data, model + 8)
+    entries = [material_dict + offset for offset in dictionary_offsets(data, material_dict + 4)]
+    calls = draw_calls(data, model)
+    if len(calls) != len(primitives):
+        raise ValueError(f"{name}: Nitro and GLB draw call counts differ")
+    mapping = {}
+    for (_, original), primitive in zip(calls, primitives):
+        current = primitive.get("material")
+        if current is None or current >= len(doc.get("materials", [])):
+            raise ValueError(f"{name}: GLB material is missing")
+        if original in mapping and mapping[original] != current:
+            raise ValueError(f"{name}: one Nitro material maps to multiple GLB materials")
+        mapping[original] = current
+    for original, current in mapping.items():
+        entry = entries[original]
+        material = doc["materials"][current]
+        dif_amb = u32(data, entry + 4)
+        spe_emi = u32(data, entry + 8)
+        polygon = u32(data, entry + 12)
+        pbr = material.get("pbrMetallicRoughness", {})
+        factor = pbr.get("baseColorFactor", [1, 1, 1, 1])
+        if len(factor) != 4 or any(not math.isfinite(value) or not 0 <= value <= 1 for value in factor):
+            raise ValueError(f"{name}: invalid GLB base color factor")
+        baseline_rgb = [1, 1, 1] if dif_amb & 0x8000 else color5(dif_amb)
+        if any(abs(a - b) > 0.00001 for a, b in zip(factor[:3], baseline_rgb)):
+            dif_amb = (dif_amb & 0xffff0000) | pack_color5(factor[:3], name)
+            struct.pack_into("<I", data, entry + 4, dif_amb)
+        baseline_alpha = ((polygon >> 16) & 31) / 31
+        if abs(factor[3] - baseline_alpha) > 0.00001:
+            polygon = (polygon & ~(31 << 16)) | (round(factor[3] * 31) << 16)
+        double_sided = material.get("doubleSided", False)
+        if not isinstance(double_sided, bool):
+            raise ValueError(f"{name}: GLB doubleSided must be a boolean")
+        if double_sided != bool(polygon & (1 << 6)):
+            polygon = (polygon | (1 << 6)) if double_sided else (polygon & ~(1 << 6))
+        struct.pack_into("<I", data, entry + 12, polygon)
+        emission = material.get("emissiveFactor", [0, 0, 0])
+        if len(emission) != 3:
+            raise ValueError(f"{name}: invalid GLB emissive color")
+        if any(abs(a - b) > 0.00001 for a, b in zip(emission, color5(spe_emi >> 16))):
+            spe_emi = (spe_emi & 0x8000ffff) | (pack_color5(emission, name) << 16)
+            struct.pack_into("<I", data, entry + 8, spe_emi)
+    return bytes(data)
+
+
 def encode(value, bits, fraction):
     scaled = round(value * (1 << fraction))
     if abs(value * (1 << fraction) - scaled) > 0.001:
@@ -723,6 +783,7 @@ def main():
         if direct:
             archive[chunk_id] = patch_model(archive[chunk_id], positions, name)
         archive[chunk_id] = patch_uvs(archive[chunk_id], doc, primitives, binary, name)
+        archive[chunk_id] = patch_materials(archive[chunk_id], doc, primitives, name)
         archive[chunk_id] = patch_props(archive[chunk_id], doc)
     dest = Path(output)
     dest.parent.mkdir(parents=True, exist_ok=True)
