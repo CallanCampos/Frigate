@@ -2301,7 +2301,7 @@ from:0x02158c9c kind:thumb_call to:0x020179d4 module:main
 from:0x02158ca4 kind:overlay_id to:211
 from:0x02158ca8 kind:overlay_id to:210
 from:0x02158cb0 kind:thumb_call to:0x021ef220 module:overlay(211)
-from:0x02158cc2 kind:thumb_call to:0x021ef260 module:overlays(117,211)
+from:0x02158cc2 kind:thumb_call to:0x021ef260 module:overlay(211)
 from:0x02158cd4 kind:thumb_call to:0x02016ed8 module:main
 from:0x02158cd8 kind:thumb_call to:0x02016ad8 module:main
 from:0x02158cfc kind:thumb_call to:0x02016d68 module:main

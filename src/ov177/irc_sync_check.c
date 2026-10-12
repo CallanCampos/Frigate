@@ -902,11 +902,6 @@ static void IrcSyncCheckWindow_PrintMsgPlayer(IrcSyncCheckWindow *win, IrcSyncCh
     PrintWindow_PrintNoColor(&win->printWindow, queue, x, y, win->strbuf, font);
 }
 
-static void IrcSyncCheckWindow_Clear(IrcSyncCheckWindow *win) {
-    GFL_BitmapFill(BmpWin_GetBitmap(win->window), win->color);
-    BmpWin_FlushChar(win->window);
-}
-
 // Prints a message with the other player's name in it, if there is a link
 static void IrcSyncCheck_PrintMsgNamed(IrcSyncCheckWindow *win, IrcSyncCheckWork *wk, u32 msgId) {
     if (wk->param->gsys != NULL) {
@@ -914,6 +909,11 @@ static void IrcSyncCheck_PrintMsgNamed(IrcSyncCheckWindow *win, IrcSyncCheckWork
     } else {
         IrcSyncCheckWindow_PrintMsg(win, &wk->text, msgId, 0, 0);
     }
+}
+
+static void IrcSyncCheckWindow_Clear(IrcSyncCheckWindow *win) {
+    GFL_BitmapFill(BmpWin_GetBitmap(win->window), win->color);
+    BmpWin_FlushChar(win->window);
 }
 
 static void IrcSyncCheck_SetStep(IrcSyncCheckWork *wk, IrcSyncCheckStepFunc step) {
@@ -1427,16 +1427,12 @@ static u8 IrcSyncCheck_CompareTraces(const IrcSyncPoint *ownStart, const IrcSync
                                      const IrcSyncPoint *peerStart, const IrcSyncPoint *peer) {
     int i;
     u32 total = 0;
-    int ownStartX = ownStart[0].x;
-    int ownStartY = ownStart[0].y;
-    int peerStartX = peerStart[0].x;
-    int peerStartY = peerStart[0].y;
 
     for (i = 1; i < TRACE_POINT_COUNT; i++) {
-        int ownDx = own[i].x - ownStartX;
-        int ownDy = own[i].y - ownStartY;
-        int peerDx = peer[i].x - peerStartX;
-        int peerDy = peer[i].y - peerStartY;
+        int ownDx = own[i].x - ownStart->x;
+        int ownDy = own[i].y - ownStart->y;
+        int peerDx = peer[i].x - peerStart->x;
+        int peerDy = peer[i].y - peerStart->y;
         u32 ownDistance;
         u32 peerDistance;
         u16 difference;
