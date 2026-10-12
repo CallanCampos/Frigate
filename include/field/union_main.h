@@ -103,7 +103,7 @@ BOOL UnionCommand_IsActive(UnionSystem *sys);
 
 // The procs of the activities that run in the Union Room, in overlays 70 and 216
 extern const GameProcFunctions data_ov070_0217f910;
-extern const GameProcFunctions data_ov216_021c08d0;
+extern const GameProcFunctions GURU2_PROC_FUNCTIONS;
 
 
 // Overlay 36's, which puts a colosseum player's info into a table of the field's players

@@ -3,3 +3,24 @@
     .ctor       start:0x021c1134 end:0x021c1134 kind:rodata align:4
     .data       start:0x021c1140 end:0x021c11c0 kind:data align:32
     .bss        start:0x021c11c0 end:0x021c11c0 kind:bss align:32
+
+src/ov216/guru2.c:
+    complete
+    .text       start:0x021bb740 end:0x021bb9c4
+    .rodata     start:0x021c0910 end:0x021c094c
+    .data       start:0x021c1140 end:0x021c1148
+
+src/ov216/guru2_comm.c:
+    complete
+    .text       start:0x021bb9c4 end:0x021bbcd8
+    .rodata     start:0x021c094c end:0x021c09cc
+    .data       start:0x021c1148 end:0x021c1158
+
+src/ov216/guru2_receipt.c:
+    .text       start:0x021bbcd8 end:0x021bd6e0
+    .rodata     start:0x021c09cc end:0x021c0b74
+
+src/ov216/guru2_main.c:
+    .text       start:0x021bd6e0 end:0x021c0910
+    .rodata     start:0x021c0b74 end:0x021c1134
+    .data       start:0x021c1158 end:0x021c11c0
