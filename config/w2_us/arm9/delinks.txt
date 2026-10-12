@@ -745,6 +745,7 @@ src/system/resort_layout.c:
     .rodata     start:0x02092d00 end:0x02092f78
 
 lib/nitro/src/crypto/rc4.c:
+    complete
     .text       start:0x020399b4 end:0x02039aac
 
 lib/nnsys/src/fnd/list.c:
