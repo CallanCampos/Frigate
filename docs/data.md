@@ -596,8 +596,10 @@ fit Nitro's 16-bit fixed-point position and UV ranges. Models with scene transfo
 to recover local vertex positions; blended skin weights are unsupported by this map model format.
 UV edits use Nitro's 1/16-texel coordinate precision and each material's texture dimensions and transform.
 GLB material base color, opacity, emission and double-sided settings also pack into Nitro. Color and opacity are
-quantized to the DS's five-bit channels. Texture bindings and other Nitro material settings still use the original
-resource data.
+quantized to the DS's five-bit channels. For models with a selected texture set, changing a material's
+`baseColorTexture` to a PNG from that set updates Nitro's texture and palette bindings, material dimensions and UV
+coordinates. Clearing the texture slot removes its binding. The packer rebuilds Nitro's name-search dictionary when
+the new texture was not already listed by the model. Other Nitro material settings retain their original values.
 Adding material slots or draw calls is not yet supported. Every map model contains only an
 `MDL0` block; its textures come from the shared texture archive.
 

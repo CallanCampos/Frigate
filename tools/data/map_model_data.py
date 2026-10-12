@@ -22,8 +22,9 @@ import tempfile
 from pathlib import Path
 
 from narc import read_narc, write_narc
-from map_texture_data import read_png, resources
+from map_texture_data import palette_for, read_png, resources
 from map_terrain_data import export_terrains, patch_terrains
+from nitro_dictionary import build_dictionary, replace_names
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -450,6 +451,192 @@ def patch_materials(chunk, doc, primitives, name):
             spe_emi = (spe_emi & 0x8000ffff) | (pack_color5(emission, name) << 16)
             struct.pack_into("<I", data, entry + 8, spe_emi)
     return bytes(data)
+
+
+def pairing_entries(data, material_dict, field):
+    dictionary = material_dict + struct.unpack_from("<H", data, material_dict + field)[0]
+    count = data[dictionary + 1]
+    header = dictionary + 12 + 4 * count
+    if struct.unpack_from("<H", data, header)[0] != 4:
+        raise ValueError("expected four-byte material binding records")
+    names = header + 4 + 4 * count
+    entries = []
+    for index in range(count):
+        offset, size, flag = struct.unpack_from("<HBB", data, header + 4 + 4 * index)
+        name = data[names + 16 * index:names + 16 * (index + 1)].split(b"\0")[0].decode("ascii")
+        entries.append((name, list(data[material_dict + offset:material_dict + offset + size]),
+                        header + 4 + 4 * index, offset, flag))
+    return dictionary, entries
+
+
+def patch_pairings(data, material_dict, field, requested, name):
+    dictionary, entries = pairing_entries(data, material_dict, field)
+    owners = {material: binding for binding, ids, _, _, _ in entries for material in ids}
+    changes = {material: binding for material, binding in requested.items()
+               if owners.get(material) != binding}
+    if not changes:
+        return set()
+    if any(binding is None for binding in changes.values()):
+        raise ValueError(f"{name}: binding removal needs a rebuilt table")
+    if any(material not in owners for material in changes):
+        raise ValueError(f"{name}: cannot add a binding to a previously unbound material")
+    grouped = {binding: [material for material in ids if material not in changes]
+               for binding, ids, _, _, _ in entries}
+    for material, binding in changes.items():
+        grouped.setdefault(binding, []).append(material)
+    names = [entry[0] for entry in entries]
+    for binding in changes.values():
+        if binding in names:
+            continue
+        available = next((index for index, old in enumerate(names) if not grouped[old]
+                          and old not in changes.values()), None)
+        if available is None:
+            raise ValueError(f"{name}: no free Nitro binding entry for {binding}")
+        names[available] = binding
+    used = sorted((offset for _, ids, _, offset, _ in entries if ids))
+    if not used:
+        raise ValueError(f"{name}: model has no material binding list")
+    base = used[0]
+    cursor = base
+    for binding, (_, original_ids, record, _, flag) in zip(names, entries):
+        ids = sorted(grouped[binding])
+        if len(ids) > 255 or cursor > 65535:
+            raise ValueError(f"{name}: Nitro binding list exceeds its field range")
+        struct.pack_into("<HBB", data, record, cursor, len(ids), flag)
+        data[material_dict + cursor:material_dict + cursor + len(ids)] = bytes(ids)
+        cursor += len(ids)
+    if cursor != base + sum(len(ids) for _, ids, _, _, _ in entries):
+        raise ValueError(f"{name}: material binding count changed")
+    if names != [entry[0] for entry in entries]:
+        replace_names(data, dictionary, names)
+    return set(changes)
+
+
+def rebuild_pairing_tables(chunk, requested_textures, requested_palettes, name):
+    data = bytearray(chunk)
+    model_start = u32(data, 4)
+    nitro_length = u32(data, model_start + 8)
+    block = model_start + u32(data, model_start + 16)
+    model = block + dictionary_offsets(data, block + 8)[0]
+    material_dict = model + u32(data, model + 8)
+    insertion = model + u32(data, model + 12)
+    tables = []
+    changed = []
+    for field, requested in ((0, requested_textures), (2, requested_palettes)):
+        _, entries = pairing_entries(data, material_dict, field)
+        owners = {material: binding for binding, ids, _, _, _ in entries for material in ids}
+        changes = {material for material, binding in requested.items() if owners.get(material) != binding}
+        groups = {binding: [material for material in ids if material not in changes]
+                  for binding, ids, _, _, _ in entries}
+        for material in changes:
+            if requested[material] is not None:
+                groups.setdefault(requested[material], []).append(material)
+        names = [entry[0] for entry in entries if groups[entry[0]]]
+        names += [binding for binding in requested.values() if binding not in names and groups.get(binding)]
+        names = list(dict.fromkeys(names))
+        tables.append((names, groups))
+        changed.append(changes)
+    relative = insertion - material_dict
+    dictionary_sizes = [16 + 24 * len(names) for names, _ in tables]
+    list_cursor = relative + sum(dictionary_sizes)
+    dictionaries = []
+    lists = bytearray()
+    for names, groups in tables:
+        records = []
+        for binding in names:
+            ids = sorted(groups[binding])
+            if len(ids) > 255 or list_cursor > 65535:
+                raise ValueError(f"{name}: material binding table exceeds Nitro offset range")
+            records.append(struct.pack("<HBB", list_cursor, len(ids), 0))
+            lists.extend(ids)
+            list_cursor += len(ids)
+        dictionaries.append(build_dictionary(names, records))
+    payload = b"".join(dictionaries) + lists
+    payload += b"\0" * (-len(payload) % 4)
+    if relative + len(dictionaries[0]) > 65535:
+        raise ValueError(f"{name}: material binding dictionary exceeds Nitro offset range")
+    struct.pack_into("<HH", data, material_dict, relative, relative + len(dictionaries[0]))
+    delta = len(payload)
+    for field in (4, 8, 12, 16):
+        offset = u32(data, model + field)
+        if offset and model + offset >= insertion:
+            struct.pack_into("<I", data, model + field, offset + delta)
+    struct.pack_into("<I", data, model, u32(data, model) + delta)
+    struct.pack_into("<I", data, block + 4, u32(data, block + 4) + delta)
+    struct.pack_into("<I", data, model_start + 8, nitro_length + delta)
+    for field in {b"WB": (8, 12, 16), b"GC": (8, 12, 16, 20),
+                  b"NG": (8, 12), b"RD": (8, 12, 16)}[bytes(data[:2])]:
+        struct.pack_into("<I", data, field, u32(data, field) + delta)
+    return bytearray(data[:insertion] + payload + data[insertion:]), changed[0], changed[1]
+
+
+def patch_material_bindings(chunk, doc, primitives, texture_blob, name):
+    if texture_blob is None:
+        if any("baseColorTexture" in material.get("pbrMetallicRoughness", {})
+               for material in doc.get("materials", [])):
+            raise ValueError(f"{name}: map has no selected texture set for GLB texture assignment")
+        return chunk, False
+    textures, palettes = resources(texture_blob)
+    by_name = {texture["name"]: (index, texture) for index, texture in enumerate(textures)}
+    data = bytearray(chunk)
+    model_start = u32(data, 4)
+    block = model_start + u32(data, model_start + 16)
+    model = block + dictionary_offsets(data, block + 8)[0]
+    material_dict = model + u32(data, model + 8)
+    entries = [material_dict + offset for offset in dictionary_offsets(data, material_dict + 4)]
+    original_textures = {material: binding for binding, ids, _, _, _ in
+                         pairing_entries(data, material_dict, 0)[1] for material in ids}
+    calls = draw_calls(data, model)
+    if len(calls) != len(primitives):
+        raise ValueError(f"{name}: GLB draw call count changed")
+    wanted_textures = {}
+    wanted_palettes = {}
+    for (_, material_id), primitive in zip(calls, primitives):
+        current = primitive.get("material")
+        if current is None or current >= len(doc.get("materials", [])):
+            raise ValueError(f"{name}: GLB material is missing")
+        pbr = doc["materials"][current].get("pbrMetallicRoughness", {})
+        binding = pbr.get("baseColorTexture")
+        if binding is None:
+            if original_textures.get(material_id) in by_name:
+                wanted_textures[material_id] = None
+                wanted_palettes[material_id] = None
+            continue
+        texture_index = binding["index"]
+        image_index = doc["textures"][texture_index]["source"]
+        image = doc["images"][image_index]
+        if "uri" not in image:
+            raise ValueError(f"{name}: texture assignment needs an external PNG URI")
+        texture_name = Path(canonical_texture_name(Path(image["uri"]).name, by_name)).stem
+        index, texture = by_name[texture_name]
+        palette = palette_for(texture, palettes, index)
+        if material_id in wanted_textures and wanted_textures[material_id] != texture_name:
+            raise ValueError(f"{name}: one Nitro material has conflicting GLB textures")
+        wanted_textures[material_id] = texture_name
+        wanted_palettes[material_id] = palette["name"]
+    try:
+        changed_tex = patch_pairings(data, material_dict, 0, wanted_textures, name)
+        changed_pal = patch_pairings(data, material_dict, 2, wanted_palettes, name)
+    except ValueError as error:
+        if not any(reason in str(error) for reason in
+                   ("no free Nitro binding entry", "previously unbound material", "no material binding list",
+                    "binding removal needs a rebuilt table")):
+            raise
+        data, changed_tex, changed_pal = rebuild_pairing_tables(
+            chunk, wanted_textures, wanted_palettes, name)
+    if changed_tex:
+        for material_id in changed_tex:
+            texture_name = wanted_textures[material_id]
+            entry = entries[material_id]
+            original = u32(data, entry + 20)
+            if texture_name is None:
+                struct.pack_into("<I", data, entry + 20, original & ~(7 << 26))
+            else:
+                texture = by_name[texture_name][1]
+                struct.pack_into("<HH", data, entry + 32, texture["width"], texture["height"])
+                struct.pack_into("<I", data, entry + 20,
+                                 (original & ~0x3ff00000) | (texture["params"] & 0x3ff00000))
+    return bytes(data), bool(changed_tex or changed_pal)
 
 
 def encode(value, bits, fraction):
@@ -924,6 +1111,7 @@ def main():
     version = {"black2": "b2_us", "white2": "w2_us"}[game]
     source = ROOT / "extract" / version / "files/a/0/0/8"
     archive = read_narc(source.read_bytes())
+    texture_archive = read_narc((ROOT / "extract" / version / "files/a/0/1/4").read_bytes())
     for entry in models(Path(directory)):
         chunk_id, name = entry["chunk"], entry["name"]
         model_dir = Path(directory) / f"{chunk_id:04d}"
@@ -932,6 +1120,9 @@ def main():
         if mapping["nitro_sha256"] != hashlib.sha256(model_bytes(original)).hexdigest():
             raise ValueError(f"{name}: Nitro model differs from the GLB mapping")
         doc, primitives, binary = mesh_primitives(model_dir, name)
+        texture_id = entry["texture_set"]
+        bound, _ = patch_material_bindings(
+            original, doc, primitives, texture_archive[texture_id] if texture_id is not None else None, name)
         fallback_errors = ("triangle count changed", "triangle topology or shared vertex changed",
                            "one Nitro vertex has multiple edited UVs", "vertices sharing a Nitro UV command",
                            "this shape has no Nitro texture commands", "this UV has no editable Nitro texture command",
@@ -939,12 +1130,12 @@ def main():
                            "vertex coordinate is not representable", "vertex coordinate exceeds Nitro command range")
         try:
             positions, direct, _ = positions_from_gltf(model_dir, name, model_bytes(original))
-            edited = patch_model(original, positions, name) if direct else original
+            edited = patch_model(bound, positions, name) if direct else bound
             edited = patch_uvs(edited, doc, primitives, binary, name)
         except ValueError as error:
             if not any(reason in str(error) for reason in fallback_errors):
                 raise
-            edited = rebuild_topology(original, doc, primitives, binary, mapping, name)
+            edited = rebuild_topology(bound, doc, primitives, binary, mapping, name)
         archive[chunk_id] = edited
         archive[chunk_id] = patch_materials(archive[chunk_id], doc, primitives, name)
         archive[chunk_id] = patch_terrains(archive[chunk_id], Path(directory) / f"{chunk_id:04d}")
