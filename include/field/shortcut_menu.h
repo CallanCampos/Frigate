@@ -34,7 +34,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
 
 void func_ov036_02187834(void);
 void func_ov036_02187888(void);
-void *func_ov036_021bedd8(GameData *gameData, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
+void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID heapId, u32 unused);
 void func_ov036_021bf004(void *app);
 u32 func_ov036_021bf198(void *app);
 void func_ov036_021bf088(void *app);
@@ -42,5 +42,7 @@ void func_ov036_021bf1ac(void *app);
 void func_ov036_021bf1d0(void *app);
 BOOL func_ov036_021bf1e4(void *app);
 u32 func_ov036_021bf1f8(void *app, u32 *item);
+// Puts the field back through a subprocess of overlay 0x118, then finishes
+GameEvent *func_ov036_021bf890(GameSystem *gsys, Field *field, void *param, BOOL transition);
 
 #endif // POKEBW2_FIELD_SHORTCUT_MENU_H
