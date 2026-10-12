@@ -9,6 +9,9 @@
 // WbtSetup of field/wbt.h
 #define OVERLAY_WBT_LIST OVERLAY_ID(320)
 
+// Not from swan: the screen's heap
+#define HEAPID_WBT_LIST 0x9d
+
 extern const GameProcFunctions WBT_LIST_PROC_FUNCTIONS;
 
 #endif // POKEBW2_APP_WBT_LIST_H

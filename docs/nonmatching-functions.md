@@ -801,6 +801,9 @@ the original code is linked until they match. The differences are the same in bo
 | `src/ov079/c_gear_sw.c` | `CGearSw_BlinkLampTwice` | `0x021eaf6c` / `0x021eafac` | 4 bytes long, as `CGearSw_BlinkLampFast`. |
 | `src/ov079/c_gear_sw.c` | `CGearSw_BlinkLampQuick` | `0x021eafa0` / `0x021eafe0` | 4 bytes long, as `CGearSw_BlinkLampFast`. |
 | `src/ov079/c_gear_sw.c` | `CGearSw_LightLamp` | `0x021eafd4` / `0x021eb014` | 4 bytes long, as `CGearSw_BlinkLampFast`. |
+| `src/ov320/wbt_list.c` | `WbtList_PrintMessage` | `0x0219dfe8` / `0x0219e028` | Same size, 4 bytes: the store of the first entrant name's last stack argument and the `mov r2, r5` after it are swapped. `u32`/`u8` and reordered `first`/`second` tried. |
+| `src/ov320/wbt_list.c` | `WbtList_SetPaletteGray` | `0x0219dc5c` / `0x0219dc9c` | 75 bytes, registers: the original keeps `palette` in r7 and `work` on the stack and computes `palette << 5` again after the loop; ours keeps `work` and a stack copy of the shift. Flat and two-dimensional palette arrays, a flat loop index and a `u32` counter tried. |
+| `src/ov320/wbt_list.c` | `WbtList_ShowLine` | `0x0219e2e0` / `0x0219e320` | 8 bytes long: the original indexes the line table flat (`line * 8 + side * 4`, in `u16`s) but reads the flags through a second literal at table+2 with the same scaled index; ours adds 1 to the index. A struct table, `[6][2][4]`, `[12][4]` and flat with inline or `u32` index tried; only `[12][4]` folds the +2, with the wrong scaling. |
 
 ## Matching, but not linkable as is
 

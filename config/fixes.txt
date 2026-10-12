@@ -496,6 +496,7 @@ overlays/ov008 0x0214fd10 overlay_id 257
 overlays/ov008 0x0214fd14 reloc_module overlay(257)
 overlays/ov009 0x0214f60c overlay_id 191
 overlays/ov009 0x0214f610 reloc_module overlay(191)
+overlays/ov010 0x021502fc reloc_module overlay(306)
 overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x021722c4 remove_reloc
@@ -1419,6 +1420,7 @@ overlays/ov168 0x021dec6e reloc_module overlay(167)
 overlays/ov168 0x021decee reloc_module overlay(167)
 overlays/ov168 0x021ded42 reloc_module overlay(167)
 overlays/ov168 0x021df09a reloc_module overlay(167)
+overlays/ov168 0x021df8b6 reloc_module overlay(167)
 overlays/ov168 0x021e5e2c reloc_addend 0x4c
 overlays/ov168 0x021e5e30 reloc_addend 0x8
 overlays/ov168 0x021eaf72 reloc_module overlay(167)
@@ -2243,6 +2245,7 @@ overlays/ov288 0x021f716c remove_reloc
 overlays/ov288 0x021f7178 remove_reloc
 overlays/ov290 0x021fcfb4 reloc_module overlay(263)
 overlays/ov290 0x021fcfe4 reloc_module overlay(263)
+overlays/ov290 0x021fcff4 reloc_module overlay(306)
 overlays/ov294 0x021a210c reloc_addend 0x380
 overlays/ov294 0x021a21a4 reloc_addend 0x380
 overlays/ov294 0x021a277e reloc_module overlay(162)
@@ -2250,6 +2253,7 @@ overlays/ov294 0x021a27c2 reloc_module overlay(162)
 overlays/ov294 0x021a27d2 reloc_module overlay(162)
 overlays/ov294 0x021a27f8 reloc_module overlay(162)
 overlays/ov294 0x021a282e reloc_module overlay(162)
+overlays/ov297 0x021f4382 reloc_module overlay(296)
 overlays/ov297 0x021f4f50 add_data ZUKAN_NICKNAME_UNUSED_BUTTON_FLAGS
 overlays/ov298 0x021a0aa8 reloc_addend 0x380
 overlays/ov298 0x021a2564 overlay_id 139
@@ -2296,9 +2300,9 @@ overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
 overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
-overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
-overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a773c add_data ResearchCommon_Unused
+overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
 overlays/ov311 0x0219d93c reloc_module overlay(139)
 overlays/ov311 0x0219d97c reloc_module overlay(139)
 overlays/ov311 0x0219da74 reloc_module overlay(139)
@@ -2317,6 +2321,18 @@ overlays/ov316 0x0219fb16 remove_symbol
 overlays/ov316 0x0219fb18 remove_symbol
 overlays/ov317 0x0219d4ac reloc_addend 0x380
 overlays/ov319 0x0219f8d0 remove_reloc
+overlays/ov320 0x0219e2a4 reloc_addend 2
+overlays/ov320 0x0219e2a8 reloc_addend 3
+overlays/ov320 0x0219e2ac reloc_addend 1
+overlays/ov320 0x0219e374 reloc_addend 2
+overlays/ov320 0x0219edb4 add_data sWbtListTitleX
+overlays/ov320 0x0219edb8 add_data sWbtListColumnX
+overlays/ov320 0x0219edc1 remove_symbol
+overlays/ov320 0x0219edc2 remove_symbol
+overlays/ov320 0x0219edc3 remove_symbol
+overlays/ov320 0x0219ee96 remove_symbol
+overlays/ov320 0x0219eecc remove_symbol
+overlays/ov320 0x0219f0fc remove_symbol
 overlays/ov321 0x0219de5c add_data sPkwdCountTitleMessageBase
 overlays/ov322 0x0219fbf8 reloc_module overlay(139)
 overlays/ov325 0x0219ec1c reloc_module overlay(139)
@@ -2328,6 +2344,10 @@ overlays/ov326 0x0219e218 reloc_module overlay(139)
 overlays/ov326 0x0219e22e reloc_module overlay(139)
 overlays/ov326 0x021a3178 add_data data_ov326_021a3178
 overlays/ov327 0x021b6964 reloc_module overlay(196)
+overlays/ov328 0x0219ec58 add_data sGPowerAppMessages
+overlays/ov328 0x0219ed40 remove_symbol
+overlays/ov328 0x0219ee40 remove_symbol
+overlays/ov328 0x0219eecc remove_symbol
 overlays/ov330 0x0219d1a4 overlay_id 297
 overlays/ov330 0x0219d1ac overlay_id 280
 overlays/ov332 0x021bf940 reloc_module overlay(331)
