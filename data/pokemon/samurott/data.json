@@ -133,5 +133,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 9,
-    "baby_species": "SPECIES_OSHAWOTT"
+    "baby_species": "SPECIES_OSHAWOTT",
+    "cry_volume": 110
 }

@@ -205,5 +205,6 @@
         }
     ],
     "regional_dex_number": 290,
-    "baby_species": "SPECIES_CROAGUNK"
+    "baby_species": "SPECIES_CROAGUNK",
+    "cry_volume": 120
 }

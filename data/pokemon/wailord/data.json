@@ -168,5 +168,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 241,
-    "baby_species": "SPECIES_WAILMER"
+    "baby_species": "SPECIES_WAILMER",
+    "cry_volume": 120
 }

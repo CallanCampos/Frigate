@@ -145,5 +145,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 6,
-    "baby_species": "SPECIES_TEPIG"
+    "baby_species": "SPECIES_TEPIG",
+    "cry_volume": 120
 }

@@ -304,5 +304,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ARCEUS"
+    "baby_species": "SPECIES_ARCEUS",
+    "cry_volume": 120
 }

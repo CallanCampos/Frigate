@@ -123,5 +123,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 172,
-    "baby_species": "SPECIES_LARVESTA"
+    "baby_species": "SPECIES_LARVESTA",
+    "cry_volume": 120
 }

@@ -172,5 +172,6 @@
         }
     ],
     "regional_dex_number": 149,
-    "baby_species": "SPECIES_BUIZEL"
+    "baby_species": "SPECIES_BUIZEL",
+    "cry_volume": 120
 }

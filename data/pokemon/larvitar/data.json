@@ -188,5 +188,6 @@
         }
     ],
     "regional_dex_number": 292,
-    "baby_species": "SPECIES_LARVITAR"
+    "baby_species": "SPECIES_LARVITAR",
+    "cry_volume": 110
 }

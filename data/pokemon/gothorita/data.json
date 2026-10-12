@@ -146,5 +146,6 @@
         }
     ],
     "regional_dex_number": 137,
-    "baby_species": "SPECIES_GOTHITA"
+    "baby_species": "SPECIES_GOTHITA",
+    "cry_volume": 110
 }

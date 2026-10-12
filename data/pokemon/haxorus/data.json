@@ -138,5 +138,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 185,
-    "baby_species": "SPECIES_AXEW"
+    "baby_species": "SPECIES_AXEW",
+    "cry_volume": 120
 }

@@ -180,5 +180,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 288,
-    "baby_species": "SPECIES_TROPIUS"
+    "baby_species": "SPECIES_TROPIUS",
+    "cry_volume": 120
 }

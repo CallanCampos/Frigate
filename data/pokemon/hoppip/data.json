@@ -178,5 +178,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_HOPPIP"
+    "baby_species": "SPECIES_HOPPIP",
+    "cry_volume": 110
 }

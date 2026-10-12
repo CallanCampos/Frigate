@@ -128,5 +128,6 @@
         }
     ],
     "regional_dex_number": 180,
-    "baby_species": "SPECIES_FRILLISH"
+    "baby_species": "SPECIES_FRILLISH",
+    "cry_volume": 110
 }

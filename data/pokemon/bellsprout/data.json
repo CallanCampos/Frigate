@@ -177,5 +177,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_BELLSPROUT"
+    "baby_species": "SPECIES_BELLSPROUT",
+    "cry_volume": 110
 }

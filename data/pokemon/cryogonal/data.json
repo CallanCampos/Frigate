@@ -117,5 +117,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 197,
-    "baby_species": "SPECIES_CRYOGONAL"
+    "baby_species": "SPECIES_CRYOGONAL",
+    "cry_volume": 116
 }

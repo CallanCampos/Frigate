@@ -180,5 +180,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_PINECO"
+    "baby_species": "SPECIES_PINECO",
+    "cry_volume": 110
 }

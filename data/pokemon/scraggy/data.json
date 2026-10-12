@@ -158,5 +158,6 @@
         }
     ],
     "regional_dex_number": 117,
-    "baby_species": "SPECIES_SCRAGGY"
+    "baby_species": "SPECIES_SCRAGGY",
+    "cry_volume": 120
 }

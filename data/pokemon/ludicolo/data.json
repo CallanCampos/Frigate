@@ -165,5 +165,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_LOTAD"
+    "baby_species": "SPECIES_LOTAD",
+    "cry_volume": 125
 }

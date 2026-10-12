@@ -11,6 +11,6 @@
 
 // work is the match board's work, which the handlers get
 void WifiP2PMatchNet_CommandInit(void *work);
-void WifiP2PMatchNet_CommandExit(void);
+void WifiP2PMatchNet_CommandExit(void *work);
 
 #endif // POKEBW2_APP_WIFI_P2PMATCH_NET_H

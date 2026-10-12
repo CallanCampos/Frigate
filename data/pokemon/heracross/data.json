@@ -183,5 +183,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 145,
-    "baby_species": "SPECIES_HERACROSS"
+    "baby_species": "SPECIES_HERACROSS",
+    "cry_volume": 110
 }

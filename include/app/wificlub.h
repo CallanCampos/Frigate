@@ -20,7 +20,14 @@ typedef struct {
     PokeParty *parties[2];
     Regulation *regulation;
     u8 unk20;
-    u8 unk21[0x25];
+    // The battle the players chose: its mode (single, double, triple, rotation) and its rule (no restrictions, flat)
+    u8 battleMode;
+    u8 battleRule;
+    u8 unk23;
+    // Each friend's call counter (WIFI_STATUS_GetCallCounter) when the player last answered a call of that friend
+    u8 callCounter[0x20];
+    // Whether each machine of the connection uses voice chat, by net ID
+    u8 vchat[2];
     u8 unk46;
     // The friend's index in the friend list, plus 1
     u8 friendIndex;
@@ -30,7 +37,5 @@ typedef struct {
 } WifiClubData;
 
 extern const GameProcFunctions WIFICLUB_PROC_FUNCTIONS;
-
-void WIFI_STATUS_SetMyMac(void *buffer);
 
 #endif // POKEBW2_APP_WIFICLUB_H

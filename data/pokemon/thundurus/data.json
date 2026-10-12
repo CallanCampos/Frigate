@@ -142,5 +142,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 199,
-    "baby_species": "SPECIES_THUNDURUS"
+    "baby_species": "SPECIES_THUNDURUS",
+    "cry_volume": 125
 }

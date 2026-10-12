@@ -198,5 +198,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 35,
-    "baby_species": "SPECIES_DUNSPARCE"
+    "baby_species": "SPECIES_DUNSPARCE",
+    "cry_volume": 110
 }

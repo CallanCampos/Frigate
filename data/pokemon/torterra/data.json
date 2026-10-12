@@ -178,5 +178,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_TURTWIG"
+    "baby_species": "SPECIES_TURTWIG",
+    "cry_volume": 120
 }

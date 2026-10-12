@@ -116,5 +116,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 162,
-    "baby_species": "SPECIES_FOONGUS"
+    "baby_species": "SPECIES_FOONGUS",
+    "cry_volume": 120
 }

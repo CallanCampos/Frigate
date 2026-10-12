@@ -186,5 +186,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_WHISMUR"
+    "baby_species": "SPECIES_WHISMUR",
+    "cry_volume": 120
 }

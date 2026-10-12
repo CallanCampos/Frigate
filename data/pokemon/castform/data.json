@@ -181,5 +181,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 163,
-    "baby_species": "SPECIES_CASTFORM"
+    "baby_species": "SPECIES_CASTFORM",
+    "cry_volume": 120
 }

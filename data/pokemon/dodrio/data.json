@@ -159,5 +159,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_DODUO"
+    "baby_species": "SPECIES_DODUO",
+    "cry_volume": 110
 }

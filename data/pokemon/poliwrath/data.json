@@ -157,5 +157,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_POLIWAG"
+    "baby_species": "SPECIES_POLIWAG",
+    "cry_volume": 125
 }

@@ -170,5 +170,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CYNDAQUIL"
+    "baby_species": "SPECIES_CYNDAQUIL",
+    "cry_volume": 110
 }

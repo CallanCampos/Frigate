@@ -184,5 +184,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 283,
-    "baby_species": "SPECIES_IGGLYBUFF"
+    "baby_species": "SPECIES_IGGLYBUFF",
+    "cry_volume": 110
 }

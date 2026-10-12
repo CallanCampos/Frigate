@@ -185,5 +185,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CRANIDOS"
+    "baby_species": "SPECIES_CRANIDOS",
+    "cry_volume": 120
 }

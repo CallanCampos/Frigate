@@ -171,5 +171,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ELECTRIKE"
+    "baby_species": "SPECIES_ELECTRIKE",
+    "cry_volume": 120
 }

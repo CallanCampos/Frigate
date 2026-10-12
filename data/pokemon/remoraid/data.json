@@ -181,5 +181,6 @@
         }
     ],
     "regional_dex_number": 235,
-    "baby_species": "SPECIES_REMORAID"
+    "baby_species": "SPECIES_REMORAID",
+    "cry_volume": 110
 }

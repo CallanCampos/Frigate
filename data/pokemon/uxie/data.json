@@ -184,5 +184,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_UXIE"
+    "baby_species": "SPECIES_UXIE",
+    "cry_volume": 120
 }

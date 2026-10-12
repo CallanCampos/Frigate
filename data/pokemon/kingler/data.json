@@ -164,5 +164,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_KRABBY"
+    "baby_species": "SPECIES_KRABBY",
+    "cry_volume": 110
 }

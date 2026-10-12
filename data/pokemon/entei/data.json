@@ -162,5 +162,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ENTEI"
+    "baby_species": "SPECIES_ENTEI",
+    "cry_volume": 110
 }

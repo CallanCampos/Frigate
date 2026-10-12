@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ROTOM"
+    "baby_species": "SPECIES_ROTOM",
+    "cry_volume": 120
 }
