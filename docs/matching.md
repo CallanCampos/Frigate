@@ -190,6 +190,14 @@ Same instructions, registers swapped.
   copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:
   `irc_sync_check.c`'s `IrcSyncCheck_CompareTraces` matches with `own[i].x - ownStart->x` in the loop, and was 52
   bytes off with `int ownStartX = ownStart[0].x;` above it.
+- A variable assigned in a branch before that branch's call is live across the call and takes a callee-saved
+  register in every branch; assigned after the call it sits in `r0` per branch and is copied at the join.
+  `fest_mission_sparkle_place.c`'s `FestSparklePlace_AddZone` has `index = 5;` before its `sys_memcpy`
+  (`movs r6, #5; blx sys_memcpy`), which also puts `index * 12` in `r7`.
+- A struct copied as a loop of halfwords (`movs r1, #0xa; ldrh; strh; subs; bne`) is a 2-aligned type, with no member
+  wider than 2 bytes. `ZoneBGEntity` holds its `s32` grid coordinates as `u16 grid[6]`, read through a cast, which is
+  also why overlay 12's readers only matched through pointer locals; with it `FestSparklePlace_PickPlaces` and
+  `FesMissionPeople_PickPlaces` copy their entities as the original does.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.

@@ -70,9 +70,9 @@ void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
 static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work, FestMission *mission, u16 zoneId,
                                         MATHRandContext32 *rand) {
     int count;
-    ZoneBGEntity *entity;
     u32 picked[8];
     int i;
+    ZoneBGEntity *entity;
     int level;
     u8 pattern;
 
@@ -165,8 +165,8 @@ static void FestSparklePlace_AddZone(FestSparkleWork *work, u16 zoneId) {
         if (index < 6) {
             work->zoneCount = index + 1;
         } else {
-            sys_memcpy(&work->zones[1], &work->zones[0], sizeof(work->zones) - sizeof(work->zones[0]));
             index = 5;
+            sys_memcpy(&work->zones[1], &work->zones[0], sizeof(work->zones) - sizeof(work->zones[0]));
         }
     } else {
         index = 0;

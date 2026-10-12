@@ -532,7 +532,7 @@ void SetBGEntityLocation(EventData *data, u32 index, u16 x, u16 z, u16 y) {
         entities = data->entities;
         entity = &entities[index];
         if (entity->isRail == 0) {
-            coords = &entity->pos.grid.x;
+            coords = (s32 *)entity->pos.grid;
             coords[0] = x;
             coords[1] = y;
             coords[2] = z << 4;
@@ -760,7 +760,7 @@ void func_ov012_0215d88c(const ZoneBGEntity *entity, VecFx32 *position) {
     s32 y;
     s32 z;
 
-    coords = &entity->pos.grid.x;
+    coords = (const s32 *)entity->pos.grid;
     z = coords[1] << 16;
     x = coords[0] << 16;
     y = coords[2] << 12;
@@ -780,7 +780,7 @@ BOOL CheckBGPositionMatchGrid(const ZoneBGEntity *entity, const VecFx32 *positio
         return FALSE;
     }
     zRaw = position->z;
-    coords = &entity->pos.grid.x;
+    coords = (const s32 *)entity->pos.grid;
     z = (zRaw >> 4) / 4096;
     x = (position->x >> 4) / 4096;
     y = position->y >> 12;
@@ -794,7 +794,7 @@ void func_ov012_0215d8fc(const ZoneBGEntity *entity, RailPosition *position) {
     u32 direction;
     const u16 *values;
 
-    values = (const u16 *)&entity->pos.rail;
+    values = &entity->pos.rail.componentId;
     switch (entity->direction) {
     case 0:
         direction = 1;
@@ -825,7 +825,7 @@ BOOL CheckBGPositionMatchRail(const ZoneBGEntity *entity, const RailPosition *po
     if (entity->isRail == 0) {
         return FALSE;
     }
-    values = (const u16 *)&entity->pos.rail;
+    values = &entity->pos.rail.componentId;
     if (values[0] == position->componentId && values[1] == position->posFront && (s16)values[2] == position->posSide) {
         return TRUE;
     }

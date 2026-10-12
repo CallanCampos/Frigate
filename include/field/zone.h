@@ -65,22 +65,21 @@ struct ZoneWarpRailPosition {
     u16 param;
 };
 
-// Field names from swan's ZoneFurniture.
+// Field names from swan's ZoneFurniture. The struct is halfword-aligned (the festival missions copy it as a loop
+// of 10 halfwords), so a grid entity's s32 x, y and z are read through a cast of its position.
 struct ZoneBGEntity {
     u16 scrId;
     u16 condition;
     u16 direction;
     u16 isRail;
     union {
-        struct {
-            s32 x;
-            s32 y;
-            s32 z;
-        } grid;
+        // s32 x, y and z
+        u16 grid[6];
         struct {
             u16 componentId;
             u16 posFront;
-            s16 posSide;
+            // Signed; read through a cast where its sign matters
+            u16 posSide;
         } rail;
     } pos;
 };
