@@ -129,21 +129,24 @@ void EncEffGrid_Draw(EncEffGrid *grid) {
         VecFx32 trans = { 0, 0, 0 };
         VecFx32 scale = sCellScale;
         MtxFx33 rot;
+        fx32 s, t;
         s32 count = grid->columns * grid->rows;
         s32 width = 32 / grid->columns * 8;
         s32 height = 24 / grid->rows * 8;
         s32 i;
-        fx32 s, t;
 
         scale.x = (width / 8) * FX32_ONE;
         scale.y = (height / 8) * FX32_ONE;
         for (i = 0; i < count; i++) {
             EncEffCell *cell = &grid->cells[i];
+            s32 column, row;
 
             G3_PushMtx();
+            column = i % grid->columns;
+            row = i / grid->columns;
             trans = cell->pos;
-            s = (i % grid->columns * width) * FX32_ONE;
-            t = (i / grid->columns * height) * FX32_ONE;
+            s = column * width * FX32_ONE;
+            t = row * height * FX32_ONE;
             G3_Translate(trans.x, trans.y, trans.z);
             G3_Scale(scale.x, scale.y, scale.z);
             MAT3_RotationY(&rot, FX_SinIdx(cell->offset), FX_CosIdx(cell->offset));

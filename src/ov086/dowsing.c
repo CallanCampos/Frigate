@@ -358,7 +358,6 @@ void Dowsing_Free(DowsingWork *work) {
 }
 
 void Dowsing_Update(DowsingWork *work, BOOL active) {
-    DowsingHit best;
     MapMatrix *matrix;
     GameSystem *gsys;
     s32 playerX;
@@ -368,12 +367,12 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
     BOOL zoneIsMatrix0;
     u16 i;
     u16 count;
-    s32 bestDistance;
-    u16 bestIndex;
     s32 minX;
     s32 maxX;
     s32 minZ;
     s32 maxZ;
+    s32 bestDistance;
+    u16 bestIndex;
     VecFx32 *pos;
     s32 x;
     s32 z;
@@ -410,11 +409,11 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
     }
 
     minX = playerX - SEARCH_LEFT;
-    best.type = HIT_NONE;
     maxX = playerX + SEARCH_RIGHT;
     minZ = playerZ - SEARCH_TOP;
     maxZ = playerZ + SEARCH_BOTTOM;
     DowsingHit hit = { HIT_NONE, NULL };
+    DowsingHit best = { HIT_NONE, NULL };
     bestDistance = -1;
 
     if (work->searchRestart) {
@@ -494,8 +493,8 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
         if (work->signal == SIGNAL_CLOSEST) {
             BOOL start = FALSE;
             if (!work->soundOn) {
-                work->soundOn = TRUE;
                 start = TRUE;
+                work->soundOn = TRUE;
             } else if (work->soundTimer == 6) {
                 if (!GFL_SndPlayerIsActive(work->soundPlayer)) {
                     work->soundTimer--;
@@ -530,7 +529,7 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
                     newX = work->hit.item->x;
                     newZ = work->hit.item->z;
                 }
-                if (oldX != newX || oldZ != newZ || work->prevSignal != work->signal) {
+                if ((oldX != newX || oldZ != newZ) && work->prevSignal != work->signal) {
                     changed = TRUE;
                 }
             } else {
