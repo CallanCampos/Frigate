@@ -1050,6 +1050,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   follows the source: `poke_tool.c`'s `PML_PkmGetParamCore` had the tail in its level case, one instruction away from
   the original for 258 bytes, until the max PP case, `if (move != 0) { result = ... }`, got its explicit
   `else { result = 0; }`.
+- A `goto` from one case into another's tail makes the shared block a region of its own: an address or offset that
+  is live across the switch is built again there (`movs r0, #0x91; lsls r0, r0, #2` where the original has
+  `subs r0, #8` from the offset it still holds), and the temporaries at the switch's head take other registers, so
+  the diff reads as registers only. Two cases with the same tail were written out in full and merged by MWCC:
+  `ircbattlematch.c`'s `IrcBattleMatch_StateStartNet` matches with both musical cases complete, and with its last
+  three mode tests as a `switch` in the blocks' order rather than an `if` chain.
 
 ## Floats and runtime helpers
 
