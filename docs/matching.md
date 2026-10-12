@@ -160,6 +160,10 @@ Same instructions, registers swapped.
   a `ClActor **`, where `call->rows[i].frame = CtvtCall_CreateActor(...)` computes the address after the call.
 - Two loops that reuse one counter and both spill it share its stack slots in the order MWCC splits the variable,
   not in declaration order; giving the second loop a counter of its own, as `pos` in the same function, moves it.
+- A pair of values computed twice and spilled to two different slots is two pairs of variables, and the second pair
+  repeats the first's declaration order. `gimmick_passing_vehicles.c`'s `func_ov128_021eeec8` takes the sine and
+  cosine of 90 and then of 270 degrees: one reused `cos, sin` pair gave the second cosine `r7` and spilled the sine,
+  `fx32 cos; fx32 sin; fx32 cos2; fx32 sin2;` matches, and `sin, cos, sin2, cos2` is further off.
 - Variables declared in an inner block are allocated apart from the function's variables of the same name: in
   `ShinkaDemoPieces_Move`, the branch that moves a piece home declares its own `dx` and `dz`, which live on the stack
   while the other branches keep theirs in registers.
@@ -714,6 +718,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A ternary argument `f(c ? 1 : 0)` compiles to the select form (`movs r0, #1; cmp; beq; movs r0, #0`). A branchy
   original (`bne`; `movs #1`; `b`; `movs #0`) is an `if`/`else` with a call in each branch, as `CtvtTalk_UpdateMain`
   calls `func_0203d564(TRUE)` or `func_0203d564(FALSE)`.
+- A flag set with `b = TRUE; if (*p != 0) { b = FALSE; }` is live before `*p` is loaded, so `b` and `p` need two
+  registers, and a spilled flag is stored twice. `b = (*p == 0) ? TRUE : FALSE;` reads `*p` first, takes `p`'s
+  register (`ldrh r0, [r7]; movs r7, #1; ...; movs r7, #0`) and stores a spilled flag once at the join. A function
+  can mix the two: `gym_virbank.c`'s `func_ov100_021eee4c` has the first of its four flags as `TRUE` plus `if` (its
+  `movs r5, #1` is in the prologue) and the other three as ternaries; one spelling for all four leaves a pointer
+  spilled and the frame larger.
 - A ternary store `*p = c ? a : b` computes the address once and stores after the branches; an `if`/`else` with a
   store in each branch computes the address in each, as `Bitmap_Scroll16` does.
 - Parenthesized offsets change the code: `pixels + (dst + 4)` adds the offsets and indexes once, `pixels + dst + 4`
@@ -941,6 +951,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A ternary, an `if`/`else` on the value alone and an inline abs all give other code.
 - A call left unmerged in one arm while both arms jump to one store means the store is written at the end of both
   arms, not once after the `if` (`PkwdSelectScreen_PrintMovie`).
+- `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
+  `b`, is a constant arm written first and a select in the `else`:
+  `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
+  event has it. With the test turned round (`p != NULL` first) the constant arm cannot jump into the select's tail,
+  and `&&` builds the constant before the call. The stores after it were also in the order of the asm's loads
+  (`ldr r0, [r4]; str r1, [r4, #0x1c]; str r0, [r4, #0x18]` is `param.gameData = battle->gameData;` and then
+  `param.unk4 = saved;`), which alone took 4 bytes off.
 
 ## Loops
 
@@ -1039,6 +1056,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   follows the source: `poke_tool.c`'s `PML_PkmGetParamCore` had the tail in its level case, one instruction away from
   the original for 258 bytes, until the max PP case, `if (move != 0) { result = ... }`, got its explicit
   `else { result = 0; }`.
+- A `goto` from one case into another's tail makes the shared block a region of its own: an address or offset that
+  is live across the switch is built again there (`movs r0, #0x91; lsls r0, r0, #2` where the original has
+  `subs r0, #8` from the offset it still holds), and the temporaries at the switch's head take other registers, so
+  the diff reads as registers only. Two cases with the same tail were written out in full and merged by MWCC:
+  `ircbattlematch.c`'s `IrcBattleMatch_StateStartNet` matches with both musical cases complete, and with its last
+  three mode tests as a `switch` in the blocks' order rather than an `if` chain.
 
 ## Floats and runtime helpers
 

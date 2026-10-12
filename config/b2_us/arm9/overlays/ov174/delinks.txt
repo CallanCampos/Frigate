@@ -5,6 +5,7 @@
     .bss        start:0x0219f320 end:0x0219f320 kind:bss align:32
 
 src/ov174/ircbattlematch.c:
+    complete
     .text       start:0x0219ce80 end:0x0219f0b4
     .rodata     start:0x0219f0b4 end:0x0219f240
     .data       start:0x0219f260 end:0x0219f320
