@@ -1,12 +1,12 @@
 #include "types.h"
 #include "constants/directions.h"
 #include "constants/sound.h"
-#include "field/gimmick_roller_coaster.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_exp_obj.h"
 #include "field/field_script.h"
 #include "field/field_sound.h"
+#include "field/gimmick_roller_coaster.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -207,8 +207,14 @@ static const VecFx32 sCarOrigins[CAR_COUNT] = {
 
 // The frames at which a car on each path stops at a station
 static const fx32 sStationFrames[PATH_COUNT][STATIONS_PER_PATH] = {
-    { 0, FX32_CONST(40) }, { 0, FX32_CONST(65) }, { 0, 0 }, { 0, FX32_CONST(124) },
-    { 0, 0 },              { 0, FX32_CONST(126) }, { 0, 0 }, { 0, FX32_CONST(138) },
+    { 0, FX32_CONST(40) },
+    { 0, FX32_CONST(65) },
+    { 0, 0 },
+    { 0, FX32_CONST(124) },
+    { 0, 0 },
+    { 0, FX32_CONST(126) },
+    { 0, 0 },
+    { 0, FX32_CONST(138) },
 };
 
 // The last frame of each car's path at which its switch still changes the path
@@ -227,7 +233,8 @@ static inline void RollerCoaster_ShowSwitchState(FieldExpObjSystem *expObj, u8 a
     FieldExpObj_SetAnm(expObj, 0, actor, state, TRUE);
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(expObj, 0, actor, 0), FALSE);
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(expObj, 0, actor, 1), FALSE);
-    FieldExpObj_SetAnmFrame(expObj, 0, actor, state, func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, state)));
+    FieldExpObj_SetAnmFrame(expObj, 0, actor, state,
+                            func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, state)));
 }
 
 // How far a car moves along its path in a frame
@@ -359,10 +366,9 @@ static void RollerCoaster_Task(TCB *task, void *data) {
                 if (work->ridePath != NO_PATH && work->ridePath / 2 == i && work->ridePath != work->paths[i]) {
                     work->ridePath = work->paths[i];
                     GFL_G3DCurveFree(work->curve);
-                    work->curve = GFL_G3DCurveCreateToLoadBufferEntire(HEAPID_TAIL(HEAPID_FIELDMAP),
-                                                                       ARCID_ROLLER_COASTER,
-                                                                       sRideCurves[work->ridePath],
-                                                                       work->curveBuffer, sizeof(work->curveBuffer));
+                    work->curve = GFL_G3DCurveCreateToLoadBufferEntire(
+                        HEAPID_TAIL(HEAPID_FIELDMAP), ARCID_ROLLER_COASTER, sRideCurves[work->ridePath],
+                        work->curveBuffer, sizeof(work->curveBuffer));
                 }
                 work->pendingSwitch[i] = FALSE;
             }
@@ -436,7 +442,8 @@ void RollerCoaster_Update(Field *field) {
 
     expObj = Field_GetExpObjSystem(field);
     work = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
-    save = GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
+    save = GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))),
+                                    GIMMICK_STATE_ID);
     FieldExpObj_StepAllAnimations(expObj);
     for (i = 0; i < CAR_COUNT; i++) {
         u8 anm = work->paths[i] + 1;
@@ -501,8 +508,8 @@ static GameEventReturnCode RollerCoaster_SwitchEvent(GameEvent *event, u32 *stat
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     RollerCoasterWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
-    RollerCoasterSave *save =
-        GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
+    RollerCoasterSave *save = GimmickState_GetUserData(
+        GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
 
     switch (*state) {
     case 0: {
@@ -556,8 +563,8 @@ static GameEventReturnCode RollerCoaster_SwitchEvent(GameEvent *event, u32 *stat
 
 GameEvent *RollerCoaster_CheckRide(GameSystem *gsys) {
     Field *field = GSYS_GetField(gsys);
-    RollerCoasterSave *save =
-        GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
+    RollerCoasterSave *save = GimmickState_GetUserData(
+        GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
     RollerCoasterWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
     FieldPlayer *player = Field_GetPlayer(field);
     VecFx32 pos;
@@ -586,9 +593,8 @@ GameEvent *RollerCoaster_CheckRide(GameSystem *gsys) {
 }
 
 void RollerCoaster_SetCarIntroSeen(GameSystem *gsys, u16 car) {
-    RollerCoasterSave *save =
-        GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(GSYS_GetField(gsys)))),
-                                 GIMMICK_STATE_ID);
+    RollerCoasterSave *save = GimmickState_GetUserData(
+        GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(GSYS_GetField(gsys)))), GIMMICK_STATE_ID);
 
     RollerCoaster_SetIntroSeen(save, car);
 }
@@ -854,8 +860,8 @@ static GameEventReturnCode RollerCoaster_IntroEvent(GameEvent *event, u32 *state
 
 static void RollerCoaster_ToggleSwitch(Field *field, FieldExpObjSystem *expObj) {
     RollerCoasterWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
-    RollerCoasterSave *save =
-        GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
+    RollerCoasterSave *save = GimmickState_GetUserData(
+        GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
     s8 switchId = work->switchId;
     u8 oldSwitch;
 

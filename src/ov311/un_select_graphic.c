@@ -134,8 +134,7 @@ static void UnSelectGraphic_G3DInit(void) {
 }
 
 UnSelectGraphic *UnSelectGraphic_Create(u32 layout, HeapID heapId) {
-    UnSelectGraphic *graphic =
-        GFL_HeapAllocate(heapId, sizeof(UnSelectGraphic), FALSE, "un_select_graphic.c", 436);
+    UnSelectGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(UnSelectGraphic), FALSE, "un_select_graphic.c", 436);
 
     sys_memset(graphic, 0, sizeof(UnSelectGraphic));
     G2_BlendNone();
@@ -194,8 +193,7 @@ static void UnSelectBG_Init(UnSelectBG *bg, HeapID heapId) {
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sUnSelectLCDConfig);
     for (i = 0; i < NELEMS(sUnSelectBGSetups); i++) {
-        GFL_BGSysCreateBG(sUnSelectBGSetups[i].bg, &sUnSelectBGSetups[i].setup,
-                          sUnSelectBGSetups[i].mode);
+        GFL_BGSysCreateBG(sUnSelectBGSetups[i].bg, &sUnSelectBGSetups[i].setup, sUnSelectBGSetups[i].mode);
         GFL_BGSysClearBG(sUnSelectBGSetups[i].bg);
         GFL_BGSysSetBGEnabled(sUnSelectBGSetups[i].bg, sUnSelectBGSetups[i].enabled);
     }

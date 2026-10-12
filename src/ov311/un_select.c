@@ -1,10 +1,10 @@
 #include "types.h"
-#include "app/un_select.h"
-#include "app/un_select_graphic.h"
 #include "app/ui/frame_list.h"
 #include "app/ui/print_msg.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
+#include "app/un_select.h"
+#include "app/un_select_graphic.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -223,14 +223,10 @@ const GameProcFunctions UN_SELECT_PROC_FUNCTIONS = {
 
 // The rows of the list, the scroll bar and the buttons that scroll by a page
 static const FrameListTouch sUnSelectListTouch[] = {
-    { { 0, 39, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 40, 79, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 80, 119, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 120, 159, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 8, 160, 240, 255 }, FRAMELIST_TOUCH_BAR },
-    { { 168, 191, 16, 39 }, FRAMELIST_TOUCH_PAGE_UP },
-    { { 168, 191, 80, 103 }, FRAMELIST_TOUCH_PAGE_DOWN },
-    { { TOUCH_RECT_END } },
+    { { 0, 39, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },   { { 40, 79, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
+    { { 80, 119, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE }, { { 120, 159, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
+    { { 8, 160, 240, 255 }, FRAMELIST_TOUCH_BAR },         { { 168, 191, 16, 39 }, FRAMELIST_TOUCH_PAGE_UP },
+    { { 168, 191, 80, 103 }, FRAMELIST_TOUCH_PAGE_DOWN },  { { TOUCH_RECT_END } },
 };
 
 // The country of each floor, from the top floor down
@@ -449,14 +445,14 @@ static void UnSelect_UpdateMenu(AppTaskMenu *menu) {
 // Darkens the lower screen's BGs behind the message, and brightens them again
 static void UnSelect_StartDim(void) {
     BrightnessController_Reset(1);
-    BrightnessController_StartTransition(8, -8, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                                                       GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD, 1);
+    BrightnessController_StartTransition(
+        8, -8, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD, 1);
 }
 
 static void UnSelect_StartUndim(void) {
     BrightnessController_Reset(1);
-    BrightnessController_StartTransition(8, 0, -8, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                                                       GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD, 1);
+    BrightnessController_StartTransition(
+        8, 0, -8, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD, 1);
 }
 
 static UnSelectMsg *UnSelectMsg_Create(HeapID heapId) {
@@ -542,7 +538,8 @@ static BOOL UnSelectMsg_Wait(UnSelectMsg *msg) {
             msg->stream = NULL;
             return TRUE;
         case 1:
-            if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B || func_0203da48()) {
+            if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B ||
+                func_0203da48()) {
                 func_020223bc(msg->stream);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             }

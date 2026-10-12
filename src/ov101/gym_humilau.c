@@ -205,27 +205,31 @@ static const G3DSceneSetup sGymHumilauSceneSetup = {
 };
 
 static const HumilauGymRide sRides[RIDE_COUNT] = {
-    { 5, 10, DIR_RIGHT, 3 },  { 9, 10, DIR_LEFT, 3 },   { 10, 11, DIR_DOWN, 15 }, { 16, 11, DIR_DOWN, 51 },
-    { 22, 11, DIR_DOWN, 12 }, { 25, 11, DIR_DOWN, 3 },  { 25, 15, DIR_UP, 3 },    { 5, 19, DIR_RIGHT, 6 },
-    { 12, 19, DIR_LEFT, 6 },  { 7, 21, DIR_UP, 12 },    { 8, 22, DIR_RIGHT, 15 }, { 24, 22, DIR_LEFT, 15 },
-    { 22, 24, DIR_UP, 12 },   { 10, 27, DIR_UP, 15 },   { 6, 29, DIR_DOWN, 9 },   { 4, 31, DIR_RIGHT, 19 },
-    { 24, 31, DIR_LEFT, 19 }, { 9, 35, DIR_DOWN, 3 },   { 25, 35, DIR_DOWN, 3 },  { 4, 37, DIR_RIGHT, 22 },
-    { 6, 39, DIR_UP, 9 },     { 9, 39, DIR_UP, 3 },     { 25, 39, DIR_UP, 3 },    { 19, 47, DIR_DOWN, 6 },
-    { 25, 47, DIR_DOWN, 3 },  { 14, 49, DIR_RIGHT, 12 }, { 25, 51, DIR_UP, 3 },   { 19, 54, DIR_UP, 6 },
-    { 13, 56, DIR_DOWN, 6 },  { 25, 56, DIR_DOWN, 3 },  { 5, 58, DIR_RIGHT, 21 }, { 25, 60, DIR_UP, 3 },
-    { 13, 63, DIR_UP, 6 },    { 16, 63, DIR_UP, 51 },   { 5, 64, DIR_RIGHT, 6 },  { 12, 64, DIR_LEFT, 6 },
+    { 5, 10, DIR_RIGHT, 3 },  { 9, 10, DIR_LEFT, 3 },    { 10, 11, DIR_DOWN, 15 }, { 16, 11, DIR_DOWN, 51 },
+    { 22, 11, DIR_DOWN, 12 }, { 25, 11, DIR_DOWN, 3 },   { 25, 15, DIR_UP, 3 },    { 5, 19, DIR_RIGHT, 6 },
+    { 12, 19, DIR_LEFT, 6 },  { 7, 21, DIR_UP, 12 },     { 8, 22, DIR_RIGHT, 15 }, { 24, 22, DIR_LEFT, 15 },
+    { 22, 24, DIR_UP, 12 },   { 10, 27, DIR_UP, 15 },    { 6, 29, DIR_DOWN, 9 },   { 4, 31, DIR_RIGHT, 19 },
+    { 24, 31, DIR_LEFT, 19 }, { 9, 35, DIR_DOWN, 3 },    { 25, 35, DIR_DOWN, 3 },  { 4, 37, DIR_RIGHT, 22 },
+    { 6, 39, DIR_UP, 9 },     { 9, 39, DIR_UP, 3 },      { 25, 39, DIR_UP, 3 },    { 19, 47, DIR_DOWN, 6 },
+    { 25, 47, DIR_DOWN, 3 },  { 14, 49, DIR_RIGHT, 12 }, { 25, 51, DIR_UP, 3 },    { 19, 54, DIR_UP, 6 },
+    { 13, 56, DIR_DOWN, 6 },  { 25, 56, DIR_DOWN, 3 },   { 5, 58, DIR_RIGHT, 21 }, { 25, 60, DIR_UP, 3 },
+    { 13, 63, DIR_UP, 6 },    { 16, 63, DIR_UP, 51 },    { 5, 64, DIR_RIGHT, 6 },  { 12, 64, DIR_LEFT, 6 },
     { 5, 13, DIR_RIGHT, 21 },
 };
 
 static const G3DSceneResourceSetup sGymHumilauResources[25] = {
-    { ARCID_GYM_HUMILAU, 0, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 2, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 1, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 6, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 7, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 8, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 3, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 4, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 5, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 9, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 10, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 11, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 12, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 13, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 14, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 15, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 16, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 17, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 22, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 23, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 24, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 18, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 19, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 20, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 0, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 2, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 1, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 6, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 7, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 8, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 3, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 4, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 5, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 9, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 10, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 11, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 12, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 13, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 14, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 15, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 16, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 17, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 22, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 23, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 24, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 18, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 19, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 20, G3D_SCENE_RES_ARCSYS },
     { ARCID_GYM_HUMILAU, 21, G3D_SCENE_RES_ARCSYS },
 };
 
@@ -257,7 +261,8 @@ static const G3DSceneActorSetup sGymHumilauActors[23] = {
 
 void GymHumilau_Init(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
-    HumilauGymWork *work = Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(HumilauGymWork));
+    HumilauGymWork *work =
+        Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(HumilauGymWork));
 
     work->expObj = Field_GetExpObjSystem(field);
     work->field = field;
@@ -387,7 +392,8 @@ void GymHumilau_PlayLeaderWaves(GameSystem *gsys) {
 }
 
 static void GymHumilau_SetupObjects(HumilauGymWork *work) {
-    BOOL shortcutUsed = GymHumilau_IsShortcutUsed(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(work->field))));
+    BOOL shortcutUsed =
+        GymHumilau_IsShortcutUsed(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(work->field))));
     u8 i = 0;
     u8 actor;
     u16 splash;
@@ -681,7 +687,8 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         GymHumilauState_SetSlot(work->state, 0, ev->platform);
         GymHumilauState_SetSaved(work->state);
         if (ev->ride == RIDE_SHORTCUT) {
-            GymHumilau_SetShortcutUsed(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(ev->field))), TRUE);
+            GymHumilau_SetShortcutUsed(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(ev->field))),
+                                       TRUE);
         }
         *state = 10;
         // fallthrough
@@ -1087,7 +1094,8 @@ static void GymHumilau_PlaySplash(HumilauGymRideEvent *ev, int kind) {
     case SPLASH_HIT: {
         VecFx32 half;
 
-        VEC_Subtract(&FieldExpObj_GetActorMatrixPtr(expObj, 0, ev->hitPlatform)->translation, &platform->translation, &half);
+        VEC_Subtract(&FieldExpObj_GetActorMatrixPtr(expObj, 0, ev->hitPlatform)->translation, &platform->translation,
+                     &half);
         vecfx_div(&half, FX32_CONST(2), &half);
         VEC_Add(&platform->translation, &half, &splash->translation);
         splash->translation.y = PLATFORM_Y;

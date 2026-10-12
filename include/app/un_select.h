@@ -2,9 +2,9 @@
 #define POKEBW2_APP_UN_SELECT_H
 
 #include "types.h"
+#include "field/unity_tower.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
-#include "field/unity_tower.h"
 
 // The Unity Tower's floor select, overlay 311: un_select.c, and un_select_graphic.c (app/un_select_graphic.h), which
 // the ROM names. Each floor of the tower is a country; the floors of the countries whose visitors the player has met

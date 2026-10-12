@@ -291,15 +291,14 @@ static const StaffRollSeqFunc sStaffRollSeqFuncs[] = {
 };
 
 static const StaffRollCmdFunc sCmdFuncs[] = {
-    StaffRollCmd_Line,        StaffRollCmd_FadeIn, StaffRollCmd_FadeOut, StaffRollCmd_ScrollStart,
-    StaffRollCmd_ScrollStop,  StaffRollCmd_End,    StaffRollCmd_Yield,   StaffRollCmd_LineAt,
-    StaffRollCmd_Picture,     StaffRollCmd_LastPicture,
+    StaffRollCmd_Line, StaffRollCmd_FadeIn, StaffRollCmd_FadeOut, StaffRollCmd_ScrollStart, StaffRollCmd_ScrollStop,
+    StaffRollCmd_End,  StaffRollCmd_Yield,  StaffRollCmd_LineAt,  StaffRollCmd_Picture,     StaffRollCmd_LastPicture,
 };
 
 static const BGSysVRAMConfig sStaffRollVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_0123_E, GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_0123_H,
-    GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,      GX_VRAM_SUB_OBJEXTPLTT_NONE,
-    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_32K, GX_OBJVRAMMODE_CHAR_1D_32K,
+    GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE,  GX_VRAM_SUB_OBJ_128_D,      GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,     GX_OBJVRAMMODE_CHAR_1D_32K, GX_OBJVRAMMODE_CHAR_1D_32K,
 };
 
 static BOOL StaffRoll_Init(GameProc *proc, u32 *state, void *param, void *work) {
@@ -547,14 +546,36 @@ static void StaffRoll_InitBG(void) {
         GFL_BGSysSetLCDConfig(&lcdConfig);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x0000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf800),
+                          GX_BG_CHARBASE(0x0000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(1, &setup, BGMODE_TEXT);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0xf000),
-                          GX_BG_CHARBASE(0x10000), 0x10000, GX_BG_EXTPLTT_01, 1, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_256,
+                          GX_BG_SCRBASE(0xf000),
+                          GX_BG_CHARBASE(0x10000),
+                          0x10000,
+                          GX_BG_EXTPLTT_01,
+                          1,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
         MtxFx22 mtx;
 
         GFL_BGSysCreateBG(3, &setup, BGMODE_EXTENDED);
@@ -562,20 +583,53 @@ static void StaffRoll_InitBG(void) {
         GFL_BGSysSetBGTransform(3, &mtx, 128, 96);
     }
     {
-        BGSetup setup = { 0, 0, 0x1000, 0, BGRES_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0xc000),
-                          GX_BG_CHARBASE(0x10000), 0x8000, GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x1000,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_256,
+                          GX_BG_SCRBASE(0xc000),
+                          GX_BG_CHARBASE(0x10000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          2,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(0, &setup, BGMODE_TEXT);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x0000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf800),
+                          GX_BG_CHARBASE(0x0000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(5, &setup, BGMODE_TEXT);
     }
     {
-        BGSetup setup = { 0, 0, 0x1000, 0, BGRES_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0xc000),
-                          GX_BG_CHARBASE(0x10000), 0x8000, GX_BG_EXTPLTT_23, 2, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x1000,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_256,
+                          GX_BG_SCRBASE(0xc000),
+                          GX_BG_CHARBASE(0x10000),
+                          0x8000,
+                          GX_BG_EXTPLTT_23,
+                          2,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
     }
@@ -740,8 +794,8 @@ static void StaffRoll_DrawNextLineBitmap(StaffRollWork *work) {
 
 // Copies the next pair of lines below the bottom screen, from where it scrolls up
 static void StaffRoll_ShowLineBitmap(StaffRollWork *work) {
-    GFL_BitmapCopyArea(work->lineBitmaps[work->shownLineBitmaps].bitmap, BmpWin_GetBitmap(work->bottomWindow), 0, 0,
-                       0, 192, 256, 16, 0);
+    GFL_BitmapCopyArea(work->lineBitmaps[work->shownLineBitmaps].bitmap, BmpWin_GetBitmap(work->bottomWindow), 0, 0, 0,
+                       192, 256, 16, 0);
 }
 
 static void StaffRoll_LoadLines(StaffRollWork *work) {
@@ -1110,8 +1164,7 @@ static void StaffRollPicture_Update(StaffRollWork *work, StaffRollPicture *pictu
         picture->state = PICTURE_LOAD_CHAR;
         return;
     case PICTURE_LAST_START:
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ,
-                                 FADE_BRIGHTNESS(16));
+        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, FADE_BRIGHTNESS(16));
         func_0204c124(work->clact.actor, TRUE);
         func_0204c56c(work->clact.actor);
         picture->state = PICTURE_LOAD_CHAR;
