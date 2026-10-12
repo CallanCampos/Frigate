@@ -60,5 +60,6 @@ lib/nitro/src/mb/mb_task.c:
     .bss        start:0x021a4944 end:0x021a4948
 
 lib/nitro/src/mb/mb_frame.c:
+    complete
     .text       start:0x021a3e84 end:0x021a4080
     .bss        start:0x021a4948 end:0x021a4960

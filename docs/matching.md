@@ -8,6 +8,10 @@ tools that show the differences.
 
 ## Registers
 
+- A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
+  taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
+  (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
+  difference late in r7.
 - A value passed to a `static inline` stays in a register across the inline's stores, where a field read again at
   each use (`cb->aid`) is reloaded after each store: multiboot's `MBComm_OnWmEvent` (`mb_comm.c`) matches with its
   disconnect step as an inline taking the aid.
