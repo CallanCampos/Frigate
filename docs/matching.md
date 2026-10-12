@@ -311,6 +311,11 @@ Same code, other `sp` offsets or frame size.
   register is loaded. When the original loads a member's offset into `r6` or `r7` early and indexes from it, the
   source had such a pointer: the bag's `ItemMenuDisp_DrawQuantity`, `ItemMenuDisp_ShowMessage` and
   `ItemMenuDisp_DrawTMInfo` only match with one, and it also stopped MWCC from holding a zero for the stack arguments.
+- A pointer local to a struct field whose offset is beyond the store's immediate range is kept as the base register
+  plus the offset in a stack slot, and the store through it is `str r6, [r5, r0]`. The slot is written at entry from
+  another offset the function already holds (`adds r0, r4, #0; str r0, [sp, #0x18]; adds r0, #0xc; str r0, [sp, #0x18]`).
+  `psel.c`'s `PselText_PrintType` declares `BOOL *done = &wk->winDone[2];` right after `BmpWin *win = wk->win[2];` and
+  ends with `*done = FALSE;`; the plain `wk->winDone[2] = FALSE;` rebuilds the constant and has no slot, 8 bytes shorter.
 
 ## Instruction order
 
