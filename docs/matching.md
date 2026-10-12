@@ -181,6 +181,12 @@ Same instructions, registers swapped.
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
   and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
   loop without the `NULL` test, matches with plain indexing.
+- An integer `+` of a local and a temporary puts the local first whatever the source order, and a pointer `+` puts
+  the pointer first. `adds r1, r7, r1` with the size in `r7` and the running address in `r1` is therefore integer
+  arithmetic on the address: `musical_system.c`'s `MusicalSystem_LoadProgramData` sets its second and third sound
+  pointers with `(void *)((u32)work->sound[0] + size0)` and `(void *)((u32)work->sound[0] + size0 + size1)`, the
+  second reusing the first's sum, as `btlv_gauge.c` writes its offsets. `(u8 *)work->sound[1] + size1` gives
+  `adds r1, r1, r7`.
 
 ## Stack slots
 
