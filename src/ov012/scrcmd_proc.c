@@ -331,7 +331,7 @@ BOOL s0153_callPoke3Select(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PselParam), TRUE, "scrcmd_proc.c", 597);
     param->result = result;
-    CreateScrCmdOverlayProcess(vm, env, OVERLAY_PSEL, &data_ov316_0219fba4, param, NULL, NULL);
+    CreateScrCmdOverlayProcess(vm, env, OVERLAY_PSEL, &PselProcFunctions, param, NULL, NULL);
     return TRUE;
 }
 

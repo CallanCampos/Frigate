@@ -784,6 +784,7 @@ the original code is linked until they match. The differences are the same in bo
 ## Matching, but not linkable as is
 
 - `src/ov207/p_sta_sub.c`'s functions all match, but its `.rodata` can't be completed yet. It starts with an 8-byte
+| `src/ov316/psel.c` | `PselText_PrintType` | `0x0219e824` / `0x0219e864` | 8 bytes shorter (0xe0/0xe8): the original keeps the offset of `wk->winDone[2]` (0x248) in a stack slot written at entry with MWCC's hoisting pattern (`str; adds #0xc; str`), and loads it for the final store, where ours rebuilds the constant (`movs #0x92; lsls #2`); the frame is `push {r4-r7,lr}; sub sp, #0x1c` against ours `push {r3-r7,lr}; sub sp, #0x18`. The rest is identical. The pattern suggests a loop or an inlined helper around the store. Tried: a static inline setter taking the window index, `u8`/`u32`/`const u8` index locals shared with `wk->win[idx]`, a `BOOL *` to the flag, pointers to both arrays, a one-pass `for` around the store, and two orders of the `win`/`y` declarations. |
   object at `0x021bafc0` / `0x021bb000` (`7f 00 00 18 00 90 01 00`) that nothing references: a `static const` of it
   is dropped, while a global (`const u8 PStaSub_Unused[8]`) keeps a section of its own. With it, `rodata_order.py`'s
   model predicts the linked layout exactly when the named tables are listed before the 21 local initializers, which
