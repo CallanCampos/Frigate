@@ -190,6 +190,10 @@ Same instructions, registers swapped.
   copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:
   `irc_sync_check.c`'s `IrcSyncCheck_CompareTraces` matches with `own[i].x - ownStart->x` in the loop, and was 52
   bytes off with `int ownStartX = ownStart[0].x;` above it.
+- A subtraction feeding a multiply, computed into its second operand's register and then copied to `r0`
+  (`subs r1, r1, r0; adds r0, r1, #0; muls r0, r5`) with the first operand spilled after the `subs`, is a named
+  local: `sp_poke_event.c`'s inline `SpPokeEvent_Lerp` is `fx32 d = b - a; return a + d * step / steps;`. The unnamed
+  `a + (b - a) * step / steps` spills `a` first and subtracts into `r0`, 2 bytes shorter at each use.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.

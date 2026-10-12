@@ -1133,8 +1133,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `sp_poke_gimmick.c` | `0x021eec80`–`0x021ef834` | 31 | partial | string at `0x021f0120` |
-| `sp_poke_event.c` | `0x021ef834`–`0x021efccc` | 9 | partial | descriptive |
+| `sp_poke_gimmick.c` | `0x021eec80`–`0x021ef834` | 31 | complete | string at `0x021f0120` |
+| `sp_poke_event.c` | `0x021ef834`–`0x021efccc` | 9 | complete | descriptive |
 
 ### Overlay 130
 

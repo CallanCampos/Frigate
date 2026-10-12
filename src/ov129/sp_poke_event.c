@@ -95,7 +95,8 @@ GameEvent *SpPokeEvent_CreateWaitAnimEnd(GameSystem *gsys, u16 a1) {
 
 // The value that is step of steps of the way from a to b
 static inline fx32 SpPokeEvent_Lerp(fx32 a, fx32 b, int step, int steps) {
-    return a + (b - a) * step / steps;
+    fx32 d = b - a;
+    return a + d * step / steps;
 }
 
 // Moves the Pokémon a step along the line from the start to the end, raised by an arc that peaks half way
