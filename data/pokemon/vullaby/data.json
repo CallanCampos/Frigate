@@ -130,5 +130,6 @@
         }
     ],
     "regional_dex_number": 111,
-    "baby_species": "SPECIES_VULLABY"
+    "baby_species": "SPECIES_VULLABY",
+    "cry_volume": 125
 }

@@ -177,5 +177,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_PHANPY"
+    "baby_species": "SPECIES_PHANPY",
+    "cry_volume": 110
 }

@@ -113,5 +113,6 @@
         }
     ],
     "regional_dex_number": 43,
-    "baby_species": "SPECIES_VENIPEDE"
+    "baby_species": "SPECIES_VENIPEDE",
+    "cry_volume": 120
 }

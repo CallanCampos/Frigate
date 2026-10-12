@@ -138,5 +138,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 193,
-    "baby_species": "SPECIES_HEATMOR"
+    "baby_species": "SPECIES_HEATMOR",
+    "cry_volume": 120
 }

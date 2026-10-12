@@ -141,5 +141,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 67,
-    "baby_species": "SPECIES_WOOBAT"
+    "baby_species": "SPECIES_WOOBAT",
+    "cry_volume": 110
 }

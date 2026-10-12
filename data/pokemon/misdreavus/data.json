@@ -195,5 +195,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MISDREAVUS"
+    "baby_species": "SPECIES_MISDREAVUS",
+    "cry_volume": 110
 }

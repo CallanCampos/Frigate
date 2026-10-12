@@ -126,5 +126,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 194,
-    "baby_species": "SPECIES_DURANT"
+    "baby_species": "SPECIES_DURANT",
+    "cry_volume": 120
 }

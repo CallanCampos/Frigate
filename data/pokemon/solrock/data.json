@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 215,
-    "baby_species": "SPECIES_SOLROCK"
+    "baby_species": "SPECIES_SOLROCK",
+    "cry_volume": 120
 }

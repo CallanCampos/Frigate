@@ -166,5 +166,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 266,
-    "baby_species": "SPECIES_SEEL"
+    "baby_species": "SPECIES_SEEL",
+    "cry_volume": 110
 }

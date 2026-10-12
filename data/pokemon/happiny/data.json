@@ -180,5 +180,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_HAPPINY"
+    "baby_species": "SPECIES_HAPPINY",
+    "cry_volume": 120
 }

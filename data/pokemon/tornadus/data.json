@@ -139,5 +139,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 198,
-    "baby_species": "SPECIES_TORNADUS"
+    "baby_species": "SPECIES_TORNADUS",
+    "cry_volume": 125
 }

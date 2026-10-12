@@ -162,5 +162,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_FEEBAS"
+    "baby_species": "SPECIES_FEEBAS",
+    "cry_volume": 120
 }

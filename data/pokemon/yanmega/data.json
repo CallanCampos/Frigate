@@ -165,5 +165,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 287,
-    "baby_species": "SPECIES_YANMA"
+    "baby_species": "SPECIES_YANMA",
+    "cry_volume": 120
 }

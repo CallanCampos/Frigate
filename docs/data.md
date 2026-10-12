@@ -12,10 +12,12 @@ exactly what the ROM holds. The sources come in three kinds:
   is adding its constant and its file; the build notices new, removed and renamed files by itself.
 - **Assembly**, for the field and trainer AI scripts, which are code more than data, as pret keeps them: one source
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
-- **glTF 2.0**, for map models under `data/map_models/<chunk>/` and field prop models under
+- **glTF 2.0**, for map models under `data/map_models/<name>__<chunk>/` and field prop models under
   `data/field_prop_models/`. Their editable mesh and material data is packed back into Nitro models.
-- **PNG**, for map textures under `data/map_texture_sets/<set>/` and field prop textures under
+- **PNG**, for map textures under `data/map_texture_sets/<name>__<set>/` and field prop textures under
   `data/field_prop_textures/`. The packer converts edited pixels to each set's original Nitro texture format.
+- **Indexed PNG, JASC palettes, and WAV**, for each Pokémon's battle sprites, icons, footprints, and cries under
+  `data/pokemon/<species>/`. Nitro cell and animation resources remain as separate binary files next to the images.
 
 The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
 by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
@@ -28,6 +30,8 @@ which documents the format and can write them again.
 | `a/0/1/2` | `data/zones/` (JSON) | Zone headers | `tools/data/zone_data.py` |
 | `a/0/1/6`, `a/0/1/8`, `a/0/1/9`, `a/0/2/0`, `a/1/2/4` | `data/pokemon/` (JSON) | Species data, level-up moves, evolutions, baby species, egg moves | `tools/data/species_data.py` |
 | `a/0/1/7` | `data/pokemon/growth_rates.csv` | Experience tables of the growth rates | `tools/data/species_data.py` |
+| `a/0/0/4`, `a/0/0/7`, `a/0/5/1`, `a/1/6/5`, `a/2/2/9` | `data/pokemon/<species>/` (PNG, palette, Nitro animation files) | Battle sprites, icons, musical sprites, and footprints | `tools/data/pokemon_graphics.py` |
+| `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `data.json` (`cry_volume`) | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
 | `a/0/2/1` | `data/moves/` (JSON) | Move data | `tools/data/move_data.py` |
 | `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
@@ -279,7 +283,37 @@ Pokédex shows them, which are text the game keeps apart from the record's numbe
 they can't be computed from them); its alternate forms' (`forms`, one for each form after the first, Unown's and Arceus'
 too); and `languages`, the text the game keeps in English, French, German, Italian, Korean, Spanish and Japanese for the
 species up to Arceus, which a Pokémon from a game in that language shows, with Giratina's and Shaymin's alternate forms'
-sizes, and the Japanese category of every species. Its sprites and cry aren't built from source yet.
+sizes, and the Japanese category of every species. Existing species' graphics and cries are built from the files
+beside `data.json`.
+
+### Pokémon graphics and cries
+
+Each species folder now keeps its battle graphics, icon, footprint, and cry next to its gameplay data, following the
+per-species organization used by [pokeemerald expansion](https://github.com/rh-hideout/pokeemerald-expansion/tree/master/graphics/pokemon).
+`front_single.png` and `back_single.png` assemble the game's four OBJ blocks into a 96×96 sprite.
+`front.png` and `back.png` are 256×128 linear texture atlases for the animated sprite; their pieces are positioned
+by the Nitro cell and multi-cell animation data. Optional female variants have `_female` in their names. The indexed PNGs carry the
+original 4-bit color indices, while `normal.pal` and `shiny.pal` are the palettes used by the game. Edit palette
+colors in the JASC `.pal` file; the PNG palette is for viewing in an image editor. The game assembles characters
+into sprites using the adjacent `*_cells.ncer` and `*_animations.nanr.lz11` Nitro resources, so a raw PNG sheet can look
+fragmented. Those resources are preserved as separate source files and can be replaced with edited Nitro data.
+
+`icon.png` is a 32×64 two-frame icon, using a bank in
+`data/pokemon/shared/icon_palettes.pal`; the code in `src/system/poke_icon.c` picks the bank.
+`footprint.png` is a 16×32 character sheet and uses `data/pokemon/shared/footprint_palette.pal`.
+The older musical sprite archive has its own `musical/` subfolder. Files identical to the regular sprite are omitted
+there; the packer uses the regular file for those entries. Sprite forms have `form_<n>/` folders under their
+species. Eggs and currently unidentified reserved graphics slots are kept under `egg/` and `extra_graphics/` so no
+archive entries are dropped.
+
+`cry.wav` is mono PCM8 at the game's sample rate; the packer also accepts mono PCM16 edits and different lengths.
+`cry_volume` in each species' `data.json` is the game's 0–127 playback volume. Eggs and reserved cry slots use a
+small `data.json` beside their `cry.wav`. Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
+volume.
+The other sounds in `swan_sound_data.sdat` retain their original data. Extract the graphics again with
+`.venv/bin/python tools/data/pokemon_graphics.py extract data/pokemon` and the cries with
+`.venv/bin/python tools/data/pokemon_cries.py extract data/pokemon`; the build packs them automatically.
+An unchanged source set reproduces all seven original graphics and sound archives byte for byte.
 
 ## Moves
 

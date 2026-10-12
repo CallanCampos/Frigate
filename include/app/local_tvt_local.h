@@ -357,4 +357,39 @@ void LocalTvtMenu_Main(LocalTvtMenu *menu);
 BOOL LocalTvtMenu_IsEnd(LocalTvtMenu *menu);
 u32 LocalTvtMenu_GetSelected(LocalTvtMenu *menu);
 
+// The touch bar of the lower screen with its return button, which the B button presses as well
+typedef struct LocalTvtReturnBar LocalTvtReturnBar;
+
+LocalTvtReturnBar *LocalTvtReturnBar_Create(ClActUnit *unit, HeapID heapId);
+void LocalTvtReturnBar_Free(LocalTvtReturnBar *bar);
+void LocalTvtReturnBar_Main(LocalTvtReturnBar *bar);
+BOOL LocalTvtReturnBar_IsPressed(LocalTvtReturnBar *bar);
+// Whether the button's animation of being pressed is over
+BOOL LocalTvtReturnBar_IsAnimEnd(LocalTvtReturnBar *bar);
+
+// The input of a list by the keys or the touch screen, whichever the player used last. The cursor shows only with
+// the keys
+typedef struct LocalTvtKeyTouch LocalTvtKeyTouch;
+
+// What the callbacks of the input return
+enum {
+    LOCAL_TVT_INPUT_NONE,
+    // The cursor moved, or the touch only picked an entry
+    LOCAL_TVT_INPUT_MOVE,
+    LOCAL_TVT_INPUT_DECIDE,
+};
+
+typedef struct {
+    void *work;
+    int (*touch)(void *work);
+    int (*key)(void *work);
+    // Draws the list with or without its cursor
+    void (*draw)(void *work, BOOL touchMode);
+} LocalTvtKeyTouchSetup;
+
+LocalTvtKeyTouch *LocalTvtKeyTouch_Create(const LocalTvtKeyTouchSetup *setup, HeapID heapId);
+void LocalTvtKeyTouch_Free(LocalTvtKeyTouch *input);
+void LocalTvtKeyTouch_Main(LocalTvtKeyTouch *input);
+BOOL LocalTvtKeyTouch_IsDecided(LocalTvtKeyTouch *input);
+
 #endif // POKEBW2_APP_LOCAL_TVT_LOCAL_H

@@ -114,5 +114,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_WYNAUT"
+    "baby_species": "SPECIES_WYNAUT",
+    "cry_volume": 110
 }

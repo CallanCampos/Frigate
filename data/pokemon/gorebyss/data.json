@@ -157,5 +157,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CLAMPERL"
+    "baby_species": "SPECIES_CLAMPERL",
+    "cry_volume": 120
 }

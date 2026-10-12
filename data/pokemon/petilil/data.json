@@ -128,5 +128,6 @@
         }
     ],
     "regional_dex_number": 84,
-    "baby_species": "SPECIES_PETILIL"
+    "baby_species": "SPECIES_PETILIL",
+    "cry_volume": 120
 }

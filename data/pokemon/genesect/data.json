@@ -160,5 +160,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 300,
-    "baby_species": "SPECIES_GENESECT"
+    "baby_species": "SPECIES_GENESECT",
+    "cry_volume": 120
 }

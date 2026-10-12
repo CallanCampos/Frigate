@@ -165,5 +165,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 143,
-    "baby_species": "SPECIES_COMBEE"
+    "baby_species": "SPECIES_COMBEE",
+    "cry_volume": 120
 }

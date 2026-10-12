@@ -173,5 +173,6 @@
         }
     ],
     "regional_dex_number": 25,
-    "baby_species": "SPECIES_MAREEP"
+    "baby_species": "SPECIES_MAREEP",
+    "cry_volume": 110
 }

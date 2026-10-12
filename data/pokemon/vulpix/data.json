@@ -187,5 +187,6 @@
         }
     ],
     "regional_dex_number": 248,
-    "baby_species": "SPECIES_VULPIX"
+    "baby_species": "SPECIES_VULPIX",
+    "cry_volume": 110
 }

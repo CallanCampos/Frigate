@@ -143,5 +143,6 @@
         }
     ],
     "regional_dex_number": 151,
-    "baby_species": "SPECIES_ZORUA"
+    "baby_species": "SPECIES_ZORUA",
+    "cry_volume": 123
 }

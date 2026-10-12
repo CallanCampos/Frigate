@@ -113,5 +113,6 @@
         }
     ],
     "regional_dex_number": 18,
-    "baby_species": "SPECIES_SEWADDLE"
+    "baby_species": "SPECIES_SEWADDLE",
+    "cry_volume": 120
 }

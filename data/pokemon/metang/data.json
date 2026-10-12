@@ -186,5 +186,6 @@
         }
     ],
     "regional_dex_number": 263,
-    "baby_species": "SPECIES_BELDUM"
+    "baby_species": "SPECIES_BELDUM",
+    "cry_volume": 120
 }

@@ -199,5 +199,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_DRATINI"
+    "baby_species": "SPECIES_DRATINI",
+    "cry_volume": 110
 }

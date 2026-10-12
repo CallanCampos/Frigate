@@ -187,5 +187,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_JIRACHI"
+    "baby_species": "SPECIES_JIRACHI",
+    "cry_volume": 120
 }

@@ -123,5 +123,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 106,
-    "baby_species": "SPECIES_TRUBBISH"
+    "baby_species": "SPECIES_TRUBBISH",
+    "cry_volume": 113
 }

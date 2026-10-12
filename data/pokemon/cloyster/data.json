@@ -144,5 +144,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SHELLDER"
+    "baby_species": "SPECIES_SHELLDER",
+    "cry_volume": 110
 }

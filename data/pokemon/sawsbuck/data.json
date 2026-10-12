@@ -141,5 +141,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 160,
-    "baby_species": "SPECIES_DEERLING"
+    "baby_species": "SPECIES_DEERLING",
+    "cry_volume": 120
 }

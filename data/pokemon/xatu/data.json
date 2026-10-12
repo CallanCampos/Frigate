@@ -180,5 +180,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_NATU"
+    "baby_species": "SPECIES_NATU",
+    "cry_volume": 110
 }

@@ -176,5 +176,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_BIDOOF"
+    "baby_species": "SPECIES_BIDOOF",
+    "cry_volume": 120
 }

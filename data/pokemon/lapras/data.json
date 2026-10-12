@@ -187,5 +187,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 242,
-    "baby_species": "SPECIES_LAPRAS"
+    "baby_species": "SPECIES_LAPRAS",
+    "cry_volume": 110
 }

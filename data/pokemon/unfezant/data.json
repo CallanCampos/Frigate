@@ -115,5 +115,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 16,
-    "baby_species": "SPECIES_PIDOVE"
+    "baby_species": "SPECIES_PIDOVE",
+    "cry_volume": 97
 }

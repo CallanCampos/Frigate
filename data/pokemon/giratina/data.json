@@ -232,5 +232,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_GIRATINA"
+    "baby_species": "SPECIES_GIRATINA",
+    "cry_volume": 120
 }

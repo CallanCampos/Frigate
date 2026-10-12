@@ -128,5 +128,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 225,
-    "baby_species": "SPECIES_COBALION"
+    "baby_species": "SPECIES_COBALION",
+    "cry_volume": 120
 }

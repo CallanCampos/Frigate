@@ -126,5 +126,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 119,
-    "baby_species": "SPECIES_MARACTUS"
+    "baby_species": "SPECIES_MARACTUS",
+    "cry_volume": 120
 }

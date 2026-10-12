@@ -139,5 +139,6 @@
         }
     ],
     "regional_dex_number": 126,
-    "baby_species": "SPECIES_TIRTOUGA"
+    "baby_species": "SPECIES_TIRTOUGA",
+    "cry_volume": 120
 }

@@ -177,6 +177,6 @@ void GFL_BGSysUpdate(void);
 // or a list of indexes that ends with 0xffff for 256 colors, which loops forever unless the first is a match
 BOOL GFL_BGSysIsPixelOfColor(u8 bg, u16 x, u16 y, const u16 *colors);
 // Sets the map entry of a tile of a BG's screen buffer
-void GFL_BGSysSetScrTile(u8 bg, u32 x, u32 y, u16 map);
+void GFL_BGSysSetScrTile(u32 bg, u32 x, u32 y, u16 map);
 
 #endif // POKEBW2_GFL_BG_SYS_H
