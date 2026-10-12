@@ -12,6 +12,8 @@ exactly what the ROM holds. The sources come in two kinds:
   is adding its constant and its file; the build notices new, removed and renamed files by itself.
 - **Assembly**, for the field and trainer AI scripts, which are code more than data, as pret keeps them: one source
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
+- **glTF 2.0**, for the first map model pilot. Its mesh positions are packed back into the map archive's Nitro model
+  display list. The remaining fields come from the extracted ROM during this pilot.
 
 Both use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON by name, the assembly
 through the C preprocessor. Each archive has a script that wrote its sources from the original, which documents the
@@ -29,6 +31,7 @@ format and can write them again.
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
+| `a/0/0/8` | `data/map_models/` (glTF 2.0) | Map chunk 103 model pilot | `tools/data/map_model_data.py` |
 | `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
@@ -528,6 +531,21 @@ facility data.
 Unlike a regular trainer (see [Trainers](#trainers)), a facility trainer has no party of its own: the game picks some of
 its sets at random, and the facility sets the level and IVs. The sets are a pool that many trainers share, which is why
 they are files of their own that trainers name.
+
+## Map model pilot
+
+`data/map_models/map_outgrass.gltf` and its `.bin` buffer are a glTF 2.0 export of model 0 in map chunk 103 of
+`a/0/0/8`. The build reads its `POSITION` accessor and writes the four vertices into the existing Nitro display
+list, then packs the archive and checks it against both ROMs. Changing a representable vertex position changes the
+packed archive; the matching ROM check naturally fails until the change is intended and accounted for.
+The export can be repeated with `tools/data/map_model_data.py extract APICULA OUTPUT_DIR`, using an installed
+[Apicula](https://github.com/scurest/apicula) executable; the build itself needs only Python.
+
+This pilot supports position edits within the original command encoding only. Its Nitro commands omit some vertex
+axes by reusing the previous value; an edit to such an axis fails with an error. Keep the four vertices in their
+original order. The glTF includes a PNG from area texture set 0 for viewing. Topology, UVs, material parameters,
+textures, other models and the map's collision and props still come from the extracted ROM. The converter must grow
+before those parts can be edited through glTF.
 
 ## Map matrices, areas and lights
 

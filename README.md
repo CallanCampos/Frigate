@@ -81,7 +81,7 @@ matches, and from grey to blue as it gets closer.
 | `src/gfl/`, `src/system/` | Decompiled C of the ARM9 main module, by library like the headers, such as `src/gfl/heap.c` |
 | `lib/<name>/` | Libraries built apart from the game with their own compiler (`library.toml`), headers and sources, such as `lib/spl/` |
 | `include/` | Headers shared by the C code, see [Code organization](docs/code-organization.md) |
-| `data/` | The game's data as JSON, one file per species, move, trainer, zone and encounter table, the constant lists, the text, and the scripts, all built into the ROM's files; see [Game data](docs/data.md) and [Scripts](docs/scripts.md) |
+| `data/` | The game's data as JSON, one file per species, move, trainer, zone and encounter table, a glTF map model pilot, the constant lists, the text, and the scripts, all built into the ROM's files; see [Game data](docs/data.md) and [Scripts](docs/scripts.md) |
 | `include/asm/` | Macros for the scripts |
 | `tools/` | Our tools, by job: the build's steps, decompiling, the game data, the text and the scripts; see [tools/README.md](tools/README.md) |
 | `docs/` | The documentation listed below |
