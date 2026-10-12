@@ -807,6 +807,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   folds each field's offset into its store; a `PleasureBoatRoom *room` pointer keeps the base and the scaled index
   in registers and spills more (the same function's frame fell from 0x7c to 0x6c). The index must be a local when
   the array it comes from has had its address taken, or every store forces a reload of it.
+- `(a + c1) + c2` is folded to `a + (c1 + c2)` through locals, inline helpers, `const` objects and operand orders,
+  unless the sum is signed and the last constant unsigned. `gym_driftveil.c`'s `DriftveilGym_InitObjects` adds
+  `TILE(6)` and then `HALF_TILE` in two `adds`, which needs `#define HALF_TILE (1u << 15)`; with `(1 << 15)` they
+  fold into one `0x68000` and the function is 12 bytes short.
 
 ## Branches and block layout
 
