@@ -133,6 +133,8 @@
 #define ARCID_THE_END 215
 // The Research Radar's graphics. Our name, not swan's
 #define ARCID_RESEARCH_RADAR 189
+// The Unity Tower's floor select's graphics (un_select.c). Our name, not swan's
+#define ARCID_UN_SELECT 190
 // The Union Room's touch screen, union_subdisp.c. Our name, not swan's
 #define ARCID_UNION_SUBDISP 88
 // The Dowsing MCHN's graphics and map of the hidden items around the player. Our name, not swan's

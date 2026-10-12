@@ -81,6 +81,8 @@ enum {
     HEAPID_BATTLE_LOAD = 0x76,
     HEAPID_WIFILOGIN = 0x78,
     HEAPID_WIFILOGOUT = 0x79,
+    // Not from swan: the Unity Tower's floor select, overlay 311
+    HEAPID_UN_SELECT = 0x7a,
     // Not from swan: the Pokédex opening's
     HEAPID_ZUKAN_OPEN = 0x7e,
     HEAPID_CDEMO = 0x7f,
