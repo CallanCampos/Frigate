@@ -23,6 +23,7 @@ from pathlib import Path
 
 from narc import read_narc, write_narc
 from map_texture_data import read_png, resources
+from map_terrain_data import export_terrains, patch_terrains
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -765,6 +766,7 @@ def export(apicula, output):
         if not direct:
             mapping["positions"] = positions
         (model_dir / "nitro.json").write_text(json.dumps(mapping, indent=2) + "\n")
+        export_terrains(archive[chunk_id], model_dir)
 
 
 def main():
@@ -801,6 +803,7 @@ def main():
             archive[chunk_id] = patch_model(archive[chunk_id], positions, name)
         archive[chunk_id] = patch_uvs(archive[chunk_id], doc, primitives, binary, name)
         archive[chunk_id] = patch_materials(archive[chunk_id], doc, primitives, name)
+        archive[chunk_id] = patch_terrains(archive[chunk_id], Path(directory) / f"{chunk_id:04d}")
         archive[chunk_id] = patch_props(archive[chunk_id], doc)
     dest = Path(output)
     dest.parent.mkdir(parents=True, exist_ok=True)

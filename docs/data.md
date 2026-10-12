@@ -566,6 +566,15 @@ these empties to edit prop placements; duplicate or delete them to add or remove
 name selects the prop resource. They must stay at the scene root and cannot be scaled. The packer writes their
 position, Y rotation, ID and count back into each map chunk's prop section.
 
+Collision terrain lives alongside each GLB as `terrain_0.csv` and, for the 60 two-layer `GC` chunks,
+`terrain_1.csv`. The eight `RD` chunks store two plane normals and heights directly in each tile row. Other
+chunks use a shape, slope-table index, height-table index and tile type per cell; their split-plane records live in
+`terrain_<layer>_splits.csv`. The `x` and `z` columns identify cells in row order. These are editable integer
+sources, including for the one 64×64 chunk. The packer checks every value and writes it into the original terrain
+section. Slope and height indices refer to the game's tables in `src/ov036/field_map_chunk_height.c`; the split
+file's `index` is the value in a split tile's `offset` column. Changing a tile's shape to split requires an
+existing split record. The current packer keeps each terrain section's dimensions and split count fixed.
+
 The archive has 1,065 chunks (`WB`, `GC`, `NG` or `RD`), each with one `BMD0` model, and the archive is identical in
 Black 2 and White 2. All 1,065 models roundtrip through the position converter without edits: 1,007 map directly to
 Nitro vertices, while 58 use scene node transforms that the packer reverses when writing positions. For the latter,
@@ -588,8 +597,8 @@ GLB material base color, opacity, emission and double-sided settings also pack i
 quantized to the DS's five-bit channels. Texture bindings and other Nitro material settings still use the original
 resource data.
 Some Nitro commands reuse a previous vertex axis or encode a small relative difference; edits outside those ranges
-fail with an error. Topology and collision still come from the extracted ROM. These
-need their own source and packing support before map graphics are fully editable. Every map model contains only an
+fail with an error. Mesh topology still comes from the extracted ROM and needs its own packing support before map
+graphics are fully editable. Every map model contains only an
 `MDL0` block; its textures come from the shared texture archive.
 
 ## Map matrices, areas and lights
