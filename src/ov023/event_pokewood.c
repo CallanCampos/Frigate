@@ -230,8 +230,8 @@ void EventPokewood_CreateCastParty(PlayerInfo *playerInfo, PokeParty *dest, Heap
     pkm = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), TRUE, "event_pokewood.c", 156);
     file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_CAST, movie, heapId);
     count = file->count[side];
-    first = 0;
     PokeParty_InitCore(party, count);
+    first = 0;
     if (side == 1) {
         first = file->count[0];
     }
