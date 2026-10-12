@@ -2338,7 +2338,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `game_clear_save.c` | `0x0219ce80`–`0x0219d460` | 13 | partial | descriptive |
+| `game_clear_save.c` | `0x0219ce80`–`0x0219d460` | 13 | complete | descriptive |
 | `battle_lose_message.c` | `0x0219d460`–`0x0219d704` | 6 | complete | descriptive |
 
 ### Overlay 296

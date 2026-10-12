@@ -311,6 +311,10 @@ Same code, other `sp` offsets or frame size.
   register is loaded. When the original loads a member's offset into `r6` or `r7` early and indexes from it, the
   source had such a pointer: the bag's `ItemMenuDisp_DrawQuantity`, `ItemMenuDisp_ShowMessage` and
   `ItemMenuDisp_DrawTMInfo` only match with one, and it also stopped MWCC from holding a zero for the stack arguments.
+- A halfword local whose address is passed, stored through the register that is then the argument
+  (`add r0, sp, #4; add r0, #2; strh r6, [r0]`), is a one-element array with an initializer, `u16 black[1] = { 0 };`,
+  as `game_clear_save.c`'s `GameClearSave_Main` passes to `gfxUploadStdPaletteBGB`. A scalar `u16 black = 0;` with
+  `&black` stores at base plus offset and computes the address a second time.
 
 ## Instruction order
 
@@ -952,6 +956,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   and `&&` builds the constant before the call. The stores after it were also in the order of the asm's loads
   (`ldr r0, [r4]; str r1, [r4, #0x1c]; str r0, [r4, #0x18]` is `param.gameData = battle->gameData;` and then
   `param.unk4 = saved;`), which alone took 4 bytes off.
+- Two `b` trampolines to one merged tail are two copies of the tail in the source. The free-blocks state of
+  `GameClearSave_Main` has `(*state)++; break;` inside the `if`, after the inner `if (!save->blocksFreed) { break; }`,
+  and again after the `if`; one shared copy after the `if` puts all three branches on one `b`.
 
 ## Loops
 
