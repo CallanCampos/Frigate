@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export the map model archive to binary glTF 2.0 and pack positions back into Nitro.
+"""Export the map model archive to binary glTF 2.0 and pack positions and UVs back into Nitro.
 
 Usage: map_model_data.py extract APICULA OUTPUT_DIR
        map_model_data.py migrate SOURCE_DIR
@@ -7,7 +7,7 @@ Usage: map_model_data.py extract APICULA OUTPUT_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
 
 Mesh positions are editable for all models through direct, translated or skinned
-coordinates. The original Nitro resource supplies command order and materials.
+coordinates. Texture coordinates use the original Nitro draw commands and materials.
 """
 
 import hashlib
@@ -180,7 +180,7 @@ def accessor_values(doc, binary, accessor_index):
     if "sparse" in accessor:
         raise ValueError("sparse glTF accessors are unsupported")
     fmt = {(5121, "SCALAR"): "B", (5123, "SCALAR"): "H",
-           (5125, "SCALAR"): "I", (5126, "VEC3"): "3f",
+           (5125, "SCALAR"): "I", (5126, "VEC2"): "2f", (5126, "VEC3"): "3f",
            (5121, "VEC4"): "4B", (5123, "VEC4"): "4H"}.get(
                (accessor["componentType"], accessor["type"]))
     if fmt is None:
@@ -293,7 +293,7 @@ def positions_from_gltf(directory, name, nitro):
     result = [value if value is not None else original
               for value, original in zip(positions, baseline)]
     if mapping["direct"]:
-        return result, True
+        return result, True, (doc, primitives, binary)
     if all(joint is not None for joint in joints):
         try:
             restored = [inverse_joint_position(doc, joint, value)
@@ -307,7 +307,7 @@ def positions_from_gltf(directory, name, nitro):
                     else:
                         local = inverse_joint_position(doc, joint, actual)
                         adjusted.append(tuple(round(axis * 4096) / 4096 for axis in local))
-                return adjusted, True
+                return adjusted, True, (doc, primitives, binary)
         except (KeyError, IndexError, ValueError, ZeroDivisionError):
             pass
     # Apicula bakes the scene graph into the glTF positions. A translation that
@@ -331,15 +331,20 @@ def positions_from_gltf(directory, name, nitro):
                 if any(any(abs(a - b) > 0.001 for a, b in zip(actual, original))
                        for actual, original in zip(result, baseline)):
                     raise ValueError(f"{name}: this model's transform is not yet editable")
-                return result, False
+                return result, False, (doc, primitives, binary)
             translated.append(tuple(result[item][axis] - delta[axis] for axis in range(3)))
         cursor += count
-    return translated, True
+    return translated, True, (doc, primitives, binary)
 
 
 def draw_order(data, model):
+    return [shape for shape, _ in draw_calls(data, model)]
+
+
+def draw_calls(data, model):
     cursor = model + u32(data, model + 4)
-    order = []
+    calls = []
+    material = 0
     while True:
         op = data[cursor]
         cursor += 1
@@ -347,10 +352,31 @@ def draw_order(data, model):
             raise ValueError(f"unsupported Nitro render opcode {op:#x}")
         params = data[cursor:cursor + SBC_PARAMS[op]]
         cursor += len(params)
+        if op in (0x04, 0x24, 0x44):
+            material = params[0]
         if op == 0x05:
-            order.append(params[0])
+            calls.append((params[0], material))
         if op == 0x01:
-            return order
+            return calls
+
+
+def material_uv_transform(data, model, material_index):
+    material_dict = model + u32(data, model + 8)
+    offsets = dictionary_offsets(data, material_dict + 4)
+    if material_index >= len(offsets):
+        raise ValueError("Nitro draw call uses an invalid material")
+    entry = material_dict + offsets[material_index]
+    width, height = struct.unpack_from("<HH", data, entry + 32)
+    if not width or not height:
+        raise ValueError("Nitro material has zero texture dimensions")
+    flags = struct.unpack_from("<H", data, entry + 30)[0] & 15
+    # Apicula applies the two stored scale components for this material form.
+    # Its other matrix forms currently export with an identity texture matrix.
+    if flags == 13:
+        scale = tuple(value / 4096 for value in struct.unpack_from("<ii", data, entry + 44))
+    else:
+        scale = (1.0, 1.0)
+    return width, height, scale
 
 
 def encode(value, bits, fraction):
@@ -487,6 +513,84 @@ def patch_display_list(data, start, end, positions, vertex, scale):
     return vertex
 
 
+def patch_uvs(chunk, doc, primitives, binary, name):
+    data = bytearray(chunk)
+    model_start = u32(data, 4)
+    block = model_start + u32(data, model_start + 16)
+    model = block + dictionary_offsets(data, block + 8)[0]
+    shape_dict = model + u32(data, model + 12)
+    shapes = [shape_dict + offset for offset in dictionary_offsets(data, shape_dict)]
+    calls = draw_calls(data, model)
+    if len(calls) != len(primitives):
+        raise ValueError(f"{name}: Nitro and GLB draw call counts differ")
+    _, index_sets = canonical_indices(data, shapes, [shape for shape, _ in calls])
+    first_vertex = 0
+    for (shape_index, material_index), primitive, original_indices in zip(calls, primitives, index_sets):
+        shape = shapes[shape_index]
+        start = shape + u32(data, shape + 8)
+        end = start + u32(data, shape + 12)
+        current = (0, 0)
+        command = None
+        vertices = []
+        for op, cursor in gpu_commands(data, start, end):
+            if op == 0x22:
+                word = u32(data, cursor)
+                current = (signed(word & 65535, 16), signed(word >> 16, 16))
+                command = cursor
+            elif op in (0x23, 0x24, 0x25, 0x26, 0x27, 0x28):
+                vertices.append((current, command))
+        if "TEXCOORD_0" not in primitive["attributes"]:
+            if any(cursor is not None for _, cursor in vertices):
+                raise ValueError(f"{name}: GLB UV accessor is missing")
+            first_vertex += len(vertices)
+            continue
+        glb_uvs = accessor_values(doc, binary, primitive["attributes"]["TEXCOORD_0"])
+        indices = [item[0] for item in accessor_values(doc, binary, primitive["indices"])]
+        if len(indices) != len(original_indices):
+            raise ValueError(f"{name}: GLB triangle count changed")
+        desired = {}
+        for original, current_index in zip(original_indices, indices):
+            if current_index >= len(glb_uvs):
+                raise ValueError(f"{name}: GLB UV index out of range")
+            local = original - first_vertex
+            value = glb_uvs[current_index]
+            if local in desired and any(abs(a - b) > 0.00001 for a, b in zip(desired[local], value)):
+                raise ValueError(f"{name}: one Nitro vertex has multiple edited UVs")
+            desired[local] = value
+        if all(cursor is None for _, cursor in vertices):
+            if any(abs(value[0]) > 0.00001 or abs(value[1] - 1) > 0.00001
+                   for value in desired.values()):
+                raise ValueError(f"{name}: this shape has no Nitro texture commands")
+            first_vertex += len(vertices)
+            continue
+        width, height, scale = material_uv_transform(data, model, material_index)
+        writes = {}
+        for local, value in desired.items():
+            raw, cursor = vertices[local]
+            baseline = ((raw[0] * scale[0] / (16 * width), raw[1] * scale[1] / (16 * height))
+                        if cursor is not None else (0, 1))
+            if all(abs(a - b) <= 0.00001 for a, b in zip(value, baseline)):
+                target = raw
+            else:
+                if cursor is None or not all(scale):
+                    raise ValueError(f"{name}: this UV has no editable Nitro texture command")
+                target = (round(value[0] * width * 16 / scale[0]),
+                          round(value[1] * height * 16 / scale[1]))
+                if any(not -32768 <= coordinate <= 32767 for coordinate in target):
+                    raise ValueError(f"{name}: edited UV exceeds Nitro coordinate range")
+            if cursor is not None:
+                if cursor in writes and writes[cursor] != target:
+                    raise ValueError(f"{name}: vertices sharing a Nitro UV command need the same UV")
+                writes[cursor] = target
+            elif target != raw:
+                raise ValueError(f"{name}: UV before the first Nitro texture command cannot change")
+        for cursor, (u, v) in writes.items():
+            if (u, v) != (signed(u32(data, cursor) & 65535, 16), signed(u32(data, cursor) >> 16, 16)):
+                struct.pack_into("<I", data, cursor, (u & 65535) | ((v & 65535) << 16))
+        first_vertex += len(vertices)
+    return bytes(data)
+
+
 def patch_model(chunk, positions, name):
     data = bytearray(chunk)
     model_start = u32(data, 4)
@@ -614,11 +718,11 @@ def main():
     archive = read_narc(source.read_bytes())
     for entry in models(Path(directory)):
         chunk_id, name = entry["chunk"], entry["name"]
-        positions, direct = positions_from_gltf(Path(directory) / f"{chunk_id:04d}",
-                                                name, model_bytes(archive[chunk_id]))
+        positions, direct, (doc, primitives, binary) = positions_from_gltf(
+            Path(directory) / f"{chunk_id:04d}", name, model_bytes(archive[chunk_id]))
         if direct:
             archive[chunk_id] = patch_model(archive[chunk_id], positions, name)
-        doc, _ = read_glb(Path(directory) / f"{chunk_id:04d}" / "model.glb")
+        archive[chunk_id] = patch_uvs(archive[chunk_id], doc, primitives, binary, name)
         archive[chunk_id] = patch_props(archive[chunk_id], doc)
     dest = Path(output)
     dest.parent.mkdir(parents=True, exist_ok=True)

@@ -572,16 +572,19 @@ the converter checks each vertex against the exported baseline before enabling e
 Of the 1,065 models, 646 reference PNGs from an identified texture set; other entries have no single unambiguous
 texture assignment in the current manifest.
 
-The build reads each glTF `POSITION` accessor, writes representable positions into the original Nitro command
-sequence, packs `a/0/0/8` and checks it against both ROMs. An unchanged Blender export of the house reproduces the
-archive byte for byte; editing one house vertex changes only chunk 834. The export can be repeated with
+The build reads each GLB `POSITION` and `TEXCOORD_0` accessor, writes representable positions and UVs into the
+original Nitro command sequence, packs `a/0/0/8` and checks it against both ROMs. An unchanged Blender export of
+the house reproduces the archive byte for byte; editing one house vertex or UV changes only chunk 834. The export
+can be repeated with
 `tools/data/map_model_data.py extract APICULA OUTPUT_DIR`, using an installed
 [Apicula](https://github.com/scurest/apicula) executable; the build itself needs only Python.
 
 The current converter supports position edits for all models within the existing command encoding and triangle
-correspondence.
+correspondence. UV edits use Nitro's 1/16-texel coordinate precision and each material's texture dimensions and
+transform. Vertices that share one Nitro texture-coordinate command must keep the same UV; a shape without such a
+command cannot gain UVs through this converter.
 Some Nitro commands reuse a previous vertex axis or encode a small relative difference; edits outside those ranges
-fail with an error. Topology, UVs, material parameters and collision still come from the extracted ROM. These
+fail with an error. Topology, material parameters and collision still come from the extracted ROM. These
 need their own source and packing support before map graphics are fully editable. Some texture previews referenced by
 glTF models are embedded in a model rather than in the shared texture archive; those still need a model texture packer.
 
