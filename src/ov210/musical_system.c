@@ -129,8 +129,8 @@ void MusicalSystem_LoadProgramData(Ov210Work *work, SaveControl *save, GameData 
     soundData = GFL_HeapAllocate(heapId, work->soundDataSize, TRUE, "musical_system.c", 266);
     work->soundData = soundData;
     work->sound[0] = soundData + 3;
-    work->sound[1] = (u8 *)work->sound[0] + size0;
-    work->sound[2] = (u8 *)work->sound[1] + size1;
+    work->sound[1] = (void *)((u32)work->sound[0] + size0);
+    work->sound[2] = (void *)((u32)work->sound[0] + size0 + size1);
     soundData[0] = size0;
     soundData[1] = size1;
     soundData[2] = size2;

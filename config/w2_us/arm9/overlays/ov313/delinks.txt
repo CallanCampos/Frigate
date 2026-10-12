@@ -5,6 +5,7 @@
     .bss        start:0x0219de20 end:0x0219de20 kind:bss align:32
 
 src/ov313/th_award.c:
+    complete
     .text       start:0x0219cec0 end:0x0219d9e8
     .rodata     start:0x0219dc24 end:0x0219dd0c
 
