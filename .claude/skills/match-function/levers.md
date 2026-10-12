@@ -186,6 +186,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An object's address loaded from two literals in one function, where ours keeps one in a register: the object is a
   `static` of the file. (matching.md: "gets two literals")
 
+- A `u16` argument narrowed before a call where the original passes one of two constants unnarrowed: a `u16` local
+  set in an `if`/`else`, not a conditional expression. (matching.md: "The same goes for an argument")
+
 ## Branches and block layout
 
 - Returns of `-1` and `0` folded into one computed result (`rsbs`, `mvns`) where the original keeps two returns: the
@@ -254,6 +257,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 ## Switches
 
 - Cases are laid out in source order, not by value. (matching.md: "Switch cases are laid out in source order")
+- `case -1:` tested on its own before a jump table the original folds it into (`adds r0, #1; cmp`): the switch is on
+  a `u32`; make the value (or the function returning it) signed. (matching.md: "takes `-1` in")
 - The comparison tree and jump tables depend on every case value, including empty cases. (matching.md: "comparison tree")
 - A case that ends in the same code as another is merged into it. (matching.md: "ends in the same code as another")
 - Cases that load some of a call's arguments, then branch to the shared rest and the call: every argument was a

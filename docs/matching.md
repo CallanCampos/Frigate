@@ -566,6 +566,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A value narrowed again after it is clamped was clamped with a conditional expression, whose `int` result is
   narrowed when it is stored back: the Pokédex cry page writes `sample = MATH_CLAMP(sample, -500, 500);` for an `s16`
   sample, where an `if`/`else if` chain assigning the bounds leaves no narrowing.
+- The same goes for an argument: a conditional expression passed to a `u16` parameter is narrowed before the call,
+  while a `u16` local assigned a constant in each arm of an `if`/`else` is not. `un_select.c`'s `UnSelect_ListRun`
+  passes its next step to `UIScene_SetNext` this way.
 - A comparison right after a `u16` narrowing that isn't done in `u16` arithmetic (`subs r0, r1, #6; cmp #1; bhi`
   rather than `subs; adds; lsl/lsr #16; cmp`) compares the narrowed value as an `int`: `zone_weather.c`'s
   `UpdateWeatherToDefault` keeps `int nowWeather = (u16)GetNowWeather(gameData);` for its `== 6 || == 7` test.
@@ -962,6 +965,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `*result = N; break;` in every case makes later cases branch to an earlier case's `b`, a branch to a branch. A local
   set in each case and stored once after the switch gives direct branches: `scrcmd_fldmmdl.c`'s `s0078`.
 - Switch cases are laid out in source order, not by value, so the layout shows the order the cases were written in.
+- A jump table that takes `-1` in with the other cases (`adds r0, #1; cmp r0, #6; bhi`) switches on a signed value.
+  On a `u32`, `case -1:` is `0xffffffff` and is compared on its own before the table. `un_select.c`'s
+  `UnSelect_ListRun` matched once `TouchBar_GetDecided`, which returns -1 when nothing is touched, returned `int`.
 - A switch's comparison tree and jump tables depend on every case value, including cases with no code: the Battle
   Subway's command switch only splits its values as the game does with an empty `case 102:` inside its first jump
   table, and empty cases that sit between others still get a comparison.

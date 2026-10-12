@@ -149,7 +149,7 @@ void TouchBar_Main(TouchBar *bar) {
     }
 }
 
-u32 TouchBar_GetDecided(TouchBar *bar) {
+int TouchBar_GetDecided(TouchBar *bar) {
     if (bar->state == TOUCHBAR_STATE_DONE && bar->selected != -1) {
         return TouchBarIcon_GetId(&bar->icons[bar->selected]);
     }
