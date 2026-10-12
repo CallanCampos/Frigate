@@ -325,7 +325,10 @@ static BOOL ConfigPanel_Exit(GameProc *proc, u32 *state, void *param, void *work
 static BOOL ConfigPanel_Main(GameProc *proc, u32 *state, void *param, void *work);
 static void ConfigPanelGraphic_Init(ConfigPanelGraphic *graphic, HeapID heapId);
 static void ConfigPanelGraphic_Exit(ConfigPanelGraphic *graphic);
-static void ConfigPanelGraphic_Main(ConfigPanelGraphic *graphic);
+// Not static: overlay 169's data has two words equal to this function's address that dsd took for relocations
+// (`overlays(140,167,...)`, really overlay 167's), and config_fixes.py can't resolve them in White 2, so the symbol
+// must exist for the link.
+void ConfigPanelGraphic_Main(ConfigPanelGraphic *graphic);
 static ClActor *ConfigPanelGraphic_GetActor(ConfigPanelGraphic *graphic, u32 index);
 static ClActUnit *ConfigPanelGraphic_GetUnit(ConfigPanelGraphic *graphic);
 static BmpWin *ConfigPanelGraphic_GetWindow(ConfigPanelGraphic *graphic, u32 index);
@@ -586,7 +589,7 @@ static void ConfigPanelGraphic_Exit(ConfigPanelGraphic *graphic) {
     sys_memset(graphic, 0, sizeof(ConfigPanelGraphic));
 }
 
-static void ConfigPanelGraphic_Main(ConfigPanelGraphic *graphic) {
+void ConfigPanelGraphic_Main(ConfigPanelGraphic *graphic) {
     ConfigPanelObj_Main(&graphic->obj);
     ConfigPanelBg_Main(&graphic->bg);
 }
@@ -1118,13 +1121,19 @@ static void ConfigPanelAppBar_Main(ConfigPanelAppBar *appBar, ConfigPanelUi *ui,
         break;
     case INPUT_DECIDE:
         if (appBar->button != BUTTON_NONE) {
-            GFL_SndSEPlay(appBar->button == BUTTON_QUIT ? SEQ_SE_CANCEL1 : SEQ_SE_DECIDE1);
+            if (appBar->button == BUTTON_QUIT) {
+                GFL_SndSEPlay(SEQ_SE_CANCEL1);
+            } else {
+                GFL_SndSEPlay(SEQ_SE_DECIDE1);
+            }
+            update = TRUE;
+            appBar->decided = TRUE;
         } else {
             appBar->button = BUTTON_CONFIRM;
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
+            update = TRUE;
+            appBar->decided = TRUE;
         }
-        update = TRUE;
-        appBar->decided = TRUE;
         break;
     case INPUT_CANCEL:
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -1142,10 +1151,11 @@ static void ConfigPanelAppBar_Main(ConfigPanelAppBar *appBar, ConfigPanelUi *ui,
             if (appBar->decided) {
                 AppTaskMenuWin_SetActive(appBar->wins[appBar->button], FALSE);
                 AppTaskMenuWin_SetFlashing(appBar->wins[appBar->button], TRUE);
+                AppTaskMenuWin_SetActive(appBar->wins[appBar->button ^ 1], FALSE);
             } else {
                 AppTaskMenuWin_SetActive(appBar->wins[appBar->button], TRUE);
+                AppTaskMenuWin_SetActive(appBar->wins[appBar->button ^ 1], FALSE);
             }
-            AppTaskMenuWin_SetActive(appBar->wins[appBar->button ^ 1], FALSE);
         }
     }
 
