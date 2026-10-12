@@ -555,18 +555,21 @@ set selected for viewing when the map-to-area relationship identifies one. Each 
 model geometry and its buffer in one file and opens directly in Blender. The numbered layout keeps maps distinct
 even when embedded model names repeat. For example, chunk 0103 is a four-vertex ground plane;
 chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices and ten materials. `nitro.json` records the
-model hash and whether its glTF positions map directly to Nitro commands. The packer
+original model hash, whether its GLB positions map directly to Nitro commands, and baseline positions for models
+whose scene transforms need reversing. It is packer metadata, not an editable graphics source. The packer
 derives the original triangle and vertex order from those commands, so a Blender export can reindex vertices while
 the packer still maps edits to the right commands.
+
 The same GLB contains a Blender empty for each placed field prop, named `bw2_prop_NNNN_id_XXXXX`. Move or rotate
 these empties to edit prop placements; duplicate or delete them to add or remove placements. The five-digit ID in the
 name selects the prop resource. They must stay at the scene root and cannot be scaled. The packer writes their
 position, Y rotation, ID and count back into each map chunk's prop section.
+
 The archive has 1,065 chunks (`WB`, `GC`, `NG` or `RD`), each with one `BMD0` model, and the archive is identical in
 Black 2 and White 2. All 1,065 models roundtrip through the position converter without edits: 1,007 map directly to
 Nitro vertices, while 58 use scene node transforms that the packer reverses when writing positions. For the latter,
 the converter checks each vertex against the exported baseline before enabling edits.
-Of the 1,065 models, 646 reference previews from an identified texture set; other entries have no single unambiguous
+Of the 1,065 models, 646 reference PNGs from an identified texture set; other entries have no single unambiguous
 texture assignment in the current manifest.
 
 The build reads each glTF `POSITION` accessor, writes representable positions into the original Nitro command
