@@ -53,6 +53,10 @@ def load_modules(version: str) -> dict[str, tuple[Path, int]]:
     for overlay in overlays:
         path = extract / "arm9_overlays" / overlay["file_name"]
         modules[str(config / "overlays" / f"ov{overlay['id']:03d}")] = (path, overlay["base_address"])
+    # The DSi-only LTD module, which TwlSDK's libraries are linked into
+    for path in sorted((extract / "dsi").glob("ltd_autoload_*.yaml")):
+        info = yaml.safe_load(path.read_text())
+        modules[str(config / path.stem)] = (path.with_suffix(".bin"), info["base_address"])
     return modules
 
 
