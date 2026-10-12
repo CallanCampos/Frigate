@@ -567,6 +567,7 @@ overlays/ov012 0x02158c3c overlay_id 211
 overlays/ov012 0x02158c64 overlay_id 211
 overlays/ov012 0x02158c68 overlay_id 210
 overlays/ov012 0x02158c70 reloc_module overlay(211)
+overlays/ov012 0x02158c82 reloc_module overlay(211)
 overlays/ov012 0x0215970c reloc_module overlay(36)
 overlays/ov012 0x0215a44c overlay_id 265
 overlays/ov012 0x0215a454 overlay_id 266

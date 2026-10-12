@@ -651,7 +651,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `oekaki_comm.c` | `0x0217cfc0`–`0x0217d34c` | 12 | complete | descriptive |
-| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | partial | string at `0x0217fd38` |
+| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | complete | string at `0x0217fd38` |
 
 ### Overlay 71
 
@@ -808,7 +808,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pleasure_boat_rooms.c` | `0x021eec80`–`0x021ef054` | 7 | partial | descriptive |
+| `pleasure_boat_rooms.c` | `0x021eec80`–`0x021ef054` | 7 | complete | descriptive |
 
 ### Overlay 90
 
@@ -1033,7 +1033,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_plasma_frigate.c` | `0x021eec80`–`0x021efd00` | 55 | partial | descriptive |
+| `gimmick_plasma_frigate.c` | `0x021eec80`–`0x021efd00` | 55 | complete | descriptive |
 
 ### Overlay 118
 
@@ -1423,7 +1423,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_battle_return.c` | `0x0219ce80`–`0x0219d650` | 10 | partial | string at `0x0219d6c0` |
+| `event_battle_return.c` | `0x0219ce80`–`0x0219d650` | 10 | complete | string at `0x0219d6c0` |
 
 ### Overlay 167
 
@@ -1548,7 +1548,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_sync_check.c` | `0x0219ad20`–`0x0219c9d8` | 79 | partial | descriptive |
+| `irc_sync_check.c` | `0x0219ad20`–`0x0219c9d8` | 79 | complete | descriptive |
 
 ### Overlay 178
 
@@ -1712,7 +1712,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pokemontrade_demo_common.c` | `0x021b2f80`–`0x021b3858` | 20 | partial | string at `0x021b6d18` |
+| `pokemontrade_demo_common.c` | `0x021b2f80`–`0x021b3858` | 20 | complete | string at `0x021b6d18` |
 | `pokemontrade_demo_up.c` | `0x021b3858`–`0x021b4234` | 4 | complete | string at `0x021b6d34` |
 | `pokemontrade_demo_down.c` | `0x021b4234`–`0x021b523c` | 20 | complete | string at `0x021b7004` |
 | `pokemontrade_demo_middle.c` | `0x021b523c`–`0x021b69d0` | 27 | complete | string at `0x021b73cc` |
