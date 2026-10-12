@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Export two map models to glTF 2.0 and pack their positions back into Nitro.
+"""Export the map model archive to glTF 2.0 and pack positions back into Nitro.
 
 Usage: map_model_data.py extract APICULA OUTPUT_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
 
-Only mesh positions are editable in this pilot. The original Nitro resource
-supplies the command order, material data and the rest of each map chunk.
+Mesh positions are editable for direct models and per-shape translations. The
+original Nitro resource supplies command order, materials and other map data.
 """
 
 import hashlib
@@ -38,8 +38,8 @@ def models(directory):
     if manifest["archive"] != "a/0/0/8":
         raise ValueError("unexpected map model archive")
     entries = manifest["models"]
-    if [entry["chunk"] for entry in entries] != sorted({entry["chunk"] for entry in entries}):
-        raise ValueError("map model chunks must be unique and in archive order")
+    if [entry["chunk"] for entry in entries] != list(range(1065)):
+        raise ValueError("map model manifest must contain all 1,065 chunks in archive order")
     return entries
 
 
@@ -103,11 +103,21 @@ def positions_from_gltf(directory, name, nitro):
     mapping = json.loads((directory / "nitro.json").read_text())
     if mapping["nitro_sha256"] != hashlib.sha256(nitro).hexdigest():
         raise ValueError(f"{name}: Nitro model differs from the glTF mapping")
+    block = u32(nitro, 16)
+    model = block + dictionary_offsets(nitro, block + 8)[0]
+    shape_dict = model + u32(nitro, model + 12)
+    shapes = [shape_dict + offset for offset in dictionary_offsets(nitro, shape_dict)]
+    order = draw_order(nitro, model)
+    vertex_count, original_index_sets = canonical_indices(nitro, shapes, order)
+    raw_positions = decoded_positions(nitro, shapes, order, u32(nitro, model + 28) / 4096)
+    baseline = raw_positions if mapping["direct"] else mapping["positions"]
+    if vertex_count != len(baseline):
+        raise ValueError(f"{name}: vertex count differs from Nitro")
     doc, primitives = mesh_primitives(directory, name)
-    if len(primitives) != len(mapping["indices"]):
+    if len(primitives) != len(original_index_sets):
         raise ValueError(f"{name}: primitive count changed")
-    positions = [None] * len(mapping["positions"])
-    for prim, original_indices in zip(primitives, mapping["indices"]):
+    positions = [None] * len(baseline)
+    for prim, original_indices in zip(primitives, original_index_sets):
         current_indices = [item[0] for item in accessor_values(doc, directory, prim["indices"])]
         current_positions = accessor_values(doc, directory, prim["attributes"]["POSITION"])
         if len(current_indices) != len(original_indices):
@@ -120,8 +130,35 @@ def positions_from_gltf(directory, name, nitro):
             if old is not None and any(abs(a - b) > 0.001 for a, b in zip(old, value)):
                 raise ValueError(f"{name}: triangle topology or shared vertex changed")
             positions[original] = value
-    return [value if value is not None else original
-            for value, original in zip(positions, mapping["positions"])]
+    result = [value if value is not None else original
+              for value, original in zip(positions, baseline)]
+    if mapping["direct"]:
+        return result, True
+    # Apicula bakes the scene graph into the glTF positions. A translation that
+    # is constant across a Nitro shape can be inverted without changing the
+    # display-list commands or the shape's local coordinate system.
+    translated = []
+    cursor = 0
+    for index in order:
+        shape = shapes[index]
+        start = shape + u32(nitro, shape + 8)
+        end = start + u32(nitro, shape + 12)
+        count = sum(op in (0x23, 0x24, 0x25, 0x26, 0x27, 0x28)
+                    for op, _ in gpu_commands(nitro, start, end))
+        if count == 0:
+            continue
+        delta = tuple(baseline[cursor][axis] - raw_positions[cursor][axis]
+                      for axis in range(3))
+        for item in range(cursor, cursor + count):
+            if any(abs(baseline[item][axis] - raw_positions[item][axis] - delta[axis]) > 0.001
+                   for axis in range(3)):
+                if any(any(abs(a - b) > 0.001 for a, b in zip(actual, original))
+                       for actual, original in zip(result, baseline)):
+                    raise ValueError(f"{name}: this model's transform is not yet editable")
+                return result, False
+            translated.append(tuple(result[item][axis] - delta[axis] for axis in range(3)))
+        cursor += count
+    return translated, True
 
 
 def draw_order(data, model):
@@ -149,8 +186,7 @@ def encode(value, bits, fraction):
     return scaled & ((1 << bits) - 1)
 
 
-def patch_display_list(data, start, end, positions, vertex, scale):
-    current = [0.0, 0.0, 0.0]
+def gpu_commands(data, start, end):
     cursor = start
     while cursor < end:
         if cursor + 4 > end:
@@ -163,33 +199,115 @@ def patch_display_list(data, start, end, positions, vertex, scale):
             count = GPU_PARAMS[op]
             if cursor + 4 * count > end:
                 raise ValueError("truncated Nitro display list parameters")
-            if op in (0x23, 0x24, 0x25, 0x26, 0x27, 0x28):
-                if vertex >= len(positions):
-                    raise ValueError("more Nitro vertices than glTF positions")
-                target = [v / scale for v in positions[vertex]]
-                word = u32(data, cursor)
-                if op == 0x23:
-                    first = encode(target[0], 16, 12) | (encode(target[1], 16, 12) << 16)
-                    second = (u32(data, cursor + 4) & 0xffff0000) | encode(target[2], 16, 12)
-                    struct.pack_into("<II", data, cursor, first, second)
-                elif op == 0x24:
-                    word = (word & 0xc0000000) | sum(encode(target[i], 10, 6) << (10 * i)
-                                                       for i in range(3))
-                    struct.pack_into("<I", data, cursor, word)
-                elif op == 0x28:
-                    word = (word & 0xc0000000) | sum(encode(target[i] - current[i], 10, 12) << (10 * i)
-                                                       for i in range(3))
-                    struct.pack_into("<I", data, cursor, word)
-                else:
-                    axes = {0x25: (0, 1), 0x26: (0, 2), 0x27: (1, 2)}[op]
-                    omitted = ({0, 1, 2} - set(axes)).pop()
-                    if abs(target[omitted] - current[omitted]) > 0.0001:
-                        raise ValueError(f"vertex {vertex} changes an axis omitted by Nitro opcode {op:#x}")
-                    word = encode(target[axes[0]], 16, 12) | (encode(target[axes[1]], 16, 12) << 16)
-                    struct.pack_into("<I", data, cursor, word)
-                current = target
-                vertex += 1
+            yield op, cursor
             cursor += 4 * count
+
+
+def canonical_indices(data, shapes, order):
+    vertex = 0
+    all_indices = []
+    for index in order:
+        shape = shapes[index]
+        start = shape + u32(data, shape + 8)
+        end = start + u32(data, shape + 12)
+        indices = []
+        first = vertex
+        primitive_type = None
+
+        def finish():
+            if primitive_type == 0:
+                for i in range(first, vertex - 2, 3):
+                    indices.extend((i, i + 1, i + 2))
+            elif primitive_type == 1:
+                for i in range(first, vertex - 3, 4):
+                    indices.extend((i, i + 1, i + 2, i, i + 2, i + 3))
+            elif primitive_type == 2:
+                for i in range(first, vertex - 2):
+                    indices.extend((i, i + 1, i + 2) if (i - first) % 2 == 0 else (i, i + 2, i + 1))
+            elif primitive_type == 3:
+                for i in range(first, vertex - 3, 2):
+                    indices.extend((i, i + 1, i + 3, i, i + 3, i + 2))
+
+        for op, cursor in gpu_commands(data, start, end):
+            if op == 0x40:
+                finish()
+                primitive_type = u32(data, cursor) & 3
+                first = vertex
+            elif op == 0x41:
+                finish()
+                primitive_type = None
+                first = vertex
+            elif op in (0x23, 0x24, 0x25, 0x26, 0x27, 0x28):
+                vertex += 1
+        finish()
+        all_indices.append(indices)
+    return vertex, all_indices
+
+
+def signed(value, bits):
+    return (value ^ (1 << (bits - 1))) - (1 << (bits - 1))
+
+
+def decoded_positions(data, shapes, order, scale):
+    positions = []
+    for index in order:
+        shape = shapes[index]
+        start = shape + u32(data, shape + 8)
+        end = start + u32(data, shape + 12)
+        current = [0.0, 0.0, 0.0]
+        for op, cursor in gpu_commands(data, start, end):
+            if op == 0x23:
+                a, b = struct.unpack_from("<II", data, cursor)
+                current = [signed(a & 0xffff, 16) / 4096,
+                           signed(a >> 16, 16) / 4096,
+                           signed(b & 0xffff, 16) / 4096]
+            elif op == 0x24:
+                word = u32(data, cursor)
+                current = [signed((word >> (10 * i)) & 0x3ff, 10) / 64 for i in range(3)]
+            elif op in (0x25, 0x26, 0x27):
+                word = u32(data, cursor)
+                axes = {0x25: (0, 1), 0x26: (0, 2), 0x27: (1, 2)}[op]
+                current[axes[0]] = signed(word & 0xffff, 16) / 4096
+                current[axes[1]] = signed(word >> 16, 16) / 4096
+            elif op == 0x28:
+                word = u32(data, cursor)
+                current = [current[i] + signed((word >> (10 * i)) & 0x3ff, 10) / 4096
+                           for i in range(3)]
+            else:
+                continue
+            positions.append(tuple(value * scale for value in current))
+    return positions
+
+
+def patch_display_list(data, start, end, positions, vertex, scale):
+    current = [0.0, 0.0, 0.0]
+    for op, cursor in gpu_commands(data, start, end):
+        if op in (0x23, 0x24, 0x25, 0x26, 0x27, 0x28):
+            if vertex >= len(positions):
+                raise ValueError("more Nitro vertices than glTF positions")
+            target = [v / scale for v in positions[vertex]]
+            word = u32(data, cursor)
+            if op == 0x23:
+                first = encode(target[0], 16, 12) | (encode(target[1], 16, 12) << 16)
+                second = (u32(data, cursor + 4) & 0xffff0000) | encode(target[2], 16, 12)
+                struct.pack_into("<II", data, cursor, first, second)
+            elif op == 0x24:
+                word = (word & 0xc0000000) | sum(encode(target[i], 10, 6) << (10 * i)
+                                                   for i in range(3))
+                struct.pack_into("<I", data, cursor, word)
+            elif op == 0x28:
+                word = (word & 0xc0000000) | sum(encode(target[i] - current[i], 10, 12) << (10 * i)
+                                                   for i in range(3))
+                struct.pack_into("<I", data, cursor, word)
+            else:
+                axes = {0x25: (0, 1), 0x26: (0, 2), 0x27: (1, 2)}[op]
+                omitted = ({0, 1, 2} - set(axes)).pop()
+                if abs(target[omitted] - current[omitted]) > 0.0001:
+                    raise ValueError(f"vertex {vertex} changes an axis omitted by Nitro opcode {op:#x}")
+                word = encode(target[axes[0]], 16, 12) | (encode(target[axes[1]], 16, 12) << 16)
+                struct.pack_into("<I", data, cursor, word)
+            current = target
+            vertex += 1
     return vertex
 
 
@@ -203,7 +321,7 @@ def patch_model(chunk, positions, name):
         raise ValueError("missing MDL0 block")
     offsets = dictionary_offsets(data, block + 8)
     if len(offsets) != 1:
-        raise ValueError("pilot requires a single model per chunk")
+        raise ValueError("expected a single model per map chunk")
     model = block + offsets[0]
     model_name = data[block + 32:block + 48].split(b"\0")[0].decode("ascii")
     if model_name != name:
@@ -213,7 +331,7 @@ def patch_model(chunk, positions, name):
     shapes = [shape_dict + offset for offset in dictionary_offsets(data, shape_dict)]
     order = draw_order(data, model)
     if sorted(order) != list(range(len(shapes))):
-        raise ValueError("pilot requires each Nitro shape to be drawn once")
+        raise ValueError("expected each Nitro shape to be drawn once")
     vertex = 0
     for index in order:
         shape = shapes[index]
@@ -229,6 +347,7 @@ def export(apicula, output):
     archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
     textures = read_narc((ROOT / "extract/b2_us/files/a/0/1/4").read_bytes())
     output.mkdir(parents=True, exist_ok=True)
+    texture_root = output.parent / "map_texture_sets"
     for entry in models(ROOT / "data/map_models"):
         chunk_id, name, texture_id = entry["chunk"], entry["name"], entry["texture_set"]
         nitro = model_bytes(archive[chunk_id])
@@ -236,25 +355,57 @@ def export(apicula, output):
         model_dir.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory() as temporary:
             model_path = Path(temporary) / f"chunk_{chunk_id:04d}.nsbmd"
-            texture_path = Path(temporary) / f"area_{texture_id:03d}.nsbtx"
             converted = Path(temporary) / "converted"
             model_path.write_bytes(nitro)
-            texture_path.write_bytes(textures[texture_id])
-            subprocess.run([apicula, "convert", str(model_path), str(texture_path),
-                            "-o", str(converted), "-f", "gltf"], check=True)
+            inputs = [str(model_path)]
+            if texture_id is not None:
+                texture_path = Path(temporary) / f"area_{texture_id:03d}.nsbtx"
+                texture_path.write_bytes(textures[texture_id])
+                inputs.append(str(texture_path))
+            subprocess.run([apicula, "convert", *inputs, "-o", str(converted), "-f", "gltf"],
+                           check=True, capture_output=True)
             for path in converted.iterdir():
-                target = "model.gltf" if path.suffix == ".gltf" else "model.bin" if path.suffix == ".bin" else path.name
-                shutil.copyfile(path, model_dir / target)
+                if path.suffix == ".png":
+                    if texture_id is None:
+                        raise ValueError(f"{chunk_id}: unexpected texture without a texture set")
+                    texture_dir = texture_root / f"{texture_id:03d}"
+                    texture_dir.mkdir(parents=True, exist_ok=True)
+                    target = texture_dir / path.name
+                    if target.exists():
+                        if target.read_bytes() != path.read_bytes():
+                            raise ValueError(f"{chunk_id}: {target} differs across models")
+                    else:
+                        shutil.copyfile(path, target)
+                else:
+                    target = "model.gltf" if path.suffix == ".gltf" else "model.bin" if path.suffix == ".bin" else path.name
+                    shutil.copyfile(path, model_dir / target)
         document = json.loads((model_dir / "model.gltf").read_text())
         for buffer in document["buffers"]:
             buffer["uri"] = "model.bin"
+        if texture_id is not None:
+            for picture in document.get("images", []):
+                if "uri" in picture:
+                    picture["uri"] = f"../../map_texture_sets/{texture_id:03d}/{picture['uri']}"
         (model_dir / "model.gltf").write_text(json.dumps(document, indent=2) + "\n")
         doc, primitives = mesh_primitives(model_dir, name)
         positions = accessor_values(doc, model_dir, primitives[0]["attributes"]["POSITION"])
-        indices = [[item[0] for item in accessor_values(doc, model_dir, prim["indices"])]
-                   for prim in primitives]
-        mapping = {"nitro_sha256": hashlib.sha256(nitro).hexdigest(),
-                   "positions": positions, "indices": indices}
+        block = u32(nitro, 16)
+        model = block + dictionary_offsets(nitro, block + 8)[0]
+        shape_dict = model + u32(nitro, model + 12)
+        shapes = [shape_dict + offset for offset in dictionary_offsets(nitro, shape_dict)]
+        direct_positions = decoded_positions(nitro, shapes, draw_order(nitro, model),
+                                             u32(nitro, model + 28) / 4096)
+        direct = len(positions) == len(direct_positions) and all(
+            all(abs(a - b) < 0.001 for a, b in zip(actual, raw))
+            for actual, raw in zip(positions, direct_positions))
+        if direct:
+            try:
+                direct = patch_model(archive[chunk_id], positions, name) == archive[chunk_id]
+            except ValueError:
+                direct = False
+        mapping = {"nitro_sha256": hashlib.sha256(nitro).hexdigest(), "direct": direct}
+        if not direct:
+            mapping["positions"] = positions
         (model_dir / "nitro.json").write_text(json.dumps(mapping, indent=2) + "\n")
 
 
@@ -270,9 +421,10 @@ def main():
     archive = read_narc(source.read_bytes())
     for entry in models(Path(directory)):
         chunk_id, name = entry["chunk"], entry["name"]
-        positions = positions_from_gltf(Path(directory) / f"{chunk_id:04d}",
-                                        name, model_bytes(archive[chunk_id]))
-        archive[chunk_id] = patch_model(archive[chunk_id], positions, name)
+        positions, direct = positions_from_gltf(Path(directory) / f"{chunk_id:04d}",
+                                                name, model_bytes(archive[chunk_id]))
+        if direct:
+            archive[chunk_id] = patch_model(archive[chunk_id], positions, name)
     dest = Path(output)
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.unlink(missing_ok=True)

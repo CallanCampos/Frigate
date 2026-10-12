@@ -3,7 +3,7 @@
 The game keeps most of its data in NARC archives under `files/a/`, one numbered file per entry. The archives that are
 built from source have their sources in `data/`, and the build packs each archive from them and checks that it matches
 the original, so editing an entry is as easy as editing its file, and the matching build proves that the sources say
-exactly what the ROM holds. The sources come in two kinds:
+exactly what the ROM holds. The sources come in three kinds:
 
 - **JSON data**, as pokeplatinum's `res/`: one file per entity, such as `data/pokemon/bulbasaur/data.json`, with a
   JSON schema beside it that documents every field and that editors use for completion and checking. A script packs
@@ -13,11 +13,11 @@ exactly what the ROM holds. The sources come in two kinds:
 - **Assembly**, for the field and trainer AI scripts, which are code more than data, as pret keeps them: one source
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
 - **glTF 2.0**, for map models under `data/map_models/<chunk>/`. Their mesh positions are packed back into the
-  map archive's Nitro display lists. The remaining fields come from the extracted ROM during this pilot.
+  map archive's Nitro display lists. The remaining fields come from the extracted ROM.
 
-Both use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON by name, the assembly
-through the C preprocessor. Each archive has a script that wrote its sources from the original, which documents the
-format and can write them again.
+The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
+by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
+which documents the format and can write them again.
 
 | Archive | Sources | Contents | Script |
 | --- | --- | --- | --- |
@@ -31,7 +31,7 @@ format and can write them again.
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
-| `a/0/0/8` | `data/map_models/<chunk>/` (glTF 2.0) | Map model pilot: chunks 103 and 834 | `tools/data/map_model_data.py` |
+| `a/0/0/8` | `data/map_models/<chunk>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
 | `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
@@ -534,15 +534,28 @@ they are files of their own that trainers name.
 
 ## Map model sources
 
-`data/map_models/manifest.json` lists the map chunks converted so far, in archive order, and the texture set used to
-view each model. Each chunk has its own numbered directory: `model.gltf`, `model.bin`, `nitro.json` and PNG previews.
-Chunk 0103 is a four-vertex ground plane; chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices,
-ten materials and textures from area 288. The per-chunk layout keeps maps distinct even when embedded model names
-repeat. `nitro.json` records the original vertex and triangle correspondence and a hash of the Nitro model; this
-lets a Blender export reindex its vertices while the packer still maps edits to the right display-list commands.
+The numbered layout follows the archive's stable chunk IDs while giving each map model its own editable directory.
+This is closer to [pokeemerald's per-map directories](https://github.com/pret/pokeemerald/tree/master/data/maps)
+than to [pokeplatinum's numbered binary map data](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/data).
+Like [pokeplatinum's separate texture sets](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/texture_sets),
+shared texture resources belong in separate directories. `data/map_texture_sets/<set>/` currently holds PNG previews
+for the 119 identified texture sets. They are referenced by the glTF files, but are not packed into the ROM until a
+Nitro texture encoder is implemented.
+
+`data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and the texture
+set selected for viewing when the map-to-area relationship identifies one. Each chunk has its own numbered directory:
+`model.gltf`, `model.bin` and `nitro.json`; texture previews are shared by texture-set number. The numbered layout
+keeps maps distinct even when embedded model names repeat. For example, chunk 0103 is a four-vertex ground plane;
+chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices and ten materials. `nitro.json` records the
+model hash and whether its glTF positions map directly to Nitro commands. The packer
+derives the original triangle and vertex order from those commands, so a Blender export can reindex vertices while
+the packer still maps edits to the right commands.
 The archive has 1,065 chunks (`WB`, `GC`, `NG` or `RD`), each with one `BMD0` model, and the archive is identical in
 Black 2 and White 2. An archive-wide no-edit trial roundtripped 1,007 models through the current position converter;
-the other 58 need transform or precision handling before they can be added to the manifest.
+50 more models have a per-shape translation that the packer reverses when writing positions. The remaining eight have
+more complex transforms: their glTF files are useful for viewing, but the packer rejects position edits to them.
+Of the 1,065 models, 646 reference previews from an identified texture set; other entries have no single unambiguous
+texture assignment in the current manifest.
 
 The build reads each glTF `POSITION` accessor, writes representable positions into the original Nitro command
 sequence, packs `a/0/0/8` and checks it against both ROMs. An unchanged Blender export of the house reproduces the
@@ -550,11 +563,12 @@ archive byte for byte; editing one house vertex changes only chunk 834. The expo
 `tools/data/map_model_data.py extract APICULA OUTPUT_DIR`, using an installed
 [Apicula](https://github.com/scurest/apicula) executable; the build itself needs only Python.
 
-The current converter supports position edits within the existing command encoding and triangle correspondence.
+The current converter supports position edits for direct models and models with per-shape translations, within the
+existing command encoding and triangle correspondence.
 Some Nitro commands reuse a previous vertex axis or encode a small relative difference; edits outside those ranges
-fail with an error. The PNGs are viewing previews. Topology, UVs, material parameters, textures, other models,
-collision and props still come from the extracted ROM. These need their own source and packing support before the
-map graphics archive is fully editable.
+fail with an error. The shared PNGs are viewing previews; topology, UVs, material parameters, textures, collision and
+props still come from the extracted ROM. These need their own source and packing support before map graphics are fully
+editable.
 
 ## Map matrices, areas and lights
 

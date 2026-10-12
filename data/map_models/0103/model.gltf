@@ -177,7 +177,7 @@
   ],
   "images": [
     {
-      "uri": "grass01ax.png"
+      "uri": "../../map_texture_sets/000/grass01ax.png"
     }
   ],
   "textures": [

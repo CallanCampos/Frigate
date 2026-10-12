@@ -366,34 +366,34 @@
   ],
   "images": [
     {
-      "uri": "black.png"
+      "uri": "../../map_texture_sets/288/black.png"
     },
     {
-      "uri": "chip_ent.png"
+      "uri": "../../map_texture_sets/288/chip_ent.png"
     },
     {
-      "uri": "m_whouse01.png"
+      "uri": "../../map_texture_sets/288/m_whouse01.png"
     },
     {
-      "uri": "m_whouse02.png"
+      "uri": "../../map_texture_sets/288/m_whouse02.png"
     },
     {
-      "uri": "m_whouse03.png"
+      "uri": "../../map_texture_sets/288/m_whouse03.png"
     },
     {
-      "uri": "m_whouse04.png"
+      "uri": "../../map_texture_sets/288/m_whouse04.png"
     },
     {
-      "uri": "m_whouse05.png"
+      "uri": "../../map_texture_sets/288/m_whouse05.png"
     },
     {
-      "uri": "m_whouse06.png"
+      "uri": "../../map_texture_sets/288/m_whouse06.png"
     },
     {
-      "uri": "m_whouse07.png"
+      "uri": "../../map_texture_sets/288/m_whouse07.png"
     },
     {
-      "uri": "m_whouse08.png"
+      "uri": "../../map_texture_sets/288/m_whouse08.png"
     }
   ],
   "textures": [
