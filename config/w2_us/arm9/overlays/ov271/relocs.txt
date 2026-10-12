@@ -1319,7 +1319,7 @@ from:0x021f6660 kind:thumb_call to:0x020120f0 module:main
 from:0x021f6668 kind:thumb_call to:0x02006280 module:main
 from:0x021f6670 kind:thumb_call to:0x02006280 module:main
 from:0x021f6678 kind:thumb_call to:0x02006280 module:main
-from:0x021f66b4 kind:thumb_call to:0x021b6110 module:overlays(182,195,201)
+from:0x021f66b4 kind:thumb_call to:0x021b6110 module:overlay(201)
 from:0x021f6700 kind:thumb_call to:0x02152444 module:overlay(11)
 from:0x021f6712 kind:thumb_call to:0x02006280 module:main
 from:0x021f671a kind:thumb_call to:0x02006280 module:main

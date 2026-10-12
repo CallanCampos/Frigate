@@ -29,7 +29,7 @@ from:0x021b3226 kind:thumb_call to:0x021c29f4 module:overlays(36,194,332)
 from:0x021b3246 kind:thumb_call to:0x021b3010 module:overlay(192)
 from:0x021b325c kind:thumb_call to:0x021b3010 module:overlay(192)
 from:0x021b3262 kind:thumb_call to:0x021c2074 module:overlay(194)
-from:0x021b3268 kind:thumb_call to:0x021b77c4 module:overlays(194,205)
+from:0x021b3268 kind:thumb_call to:0x021b77c4 module:overlay(194)
 from:0x021b3270 kind:thumb_call to:0x0204046c module:main
 from:0x021b3278 kind:thumb_call to:0x02040650 module:main
 from:0x021b3280 kind:thumb_call to:0x021b7c24 module:overlay(194)

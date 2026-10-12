@@ -684,7 +684,8 @@ from:0x021ac752 kind:thumb_call to:0x02165ae8 module:overlay(12)
 from:0x021ac758 kind:thumb_call to:0x0203ce0c module:main
 from:0x021ac760 kind:thumb_call to:0x021a9d40 module:overlay(204)
 from:0x021ac778 kind:load to:0x021dd940 module:overlays(36,167,280)
-from:0x021ac780 kind:load to:0x021b93ec module:overlays(201,205)
+from:0x021ac77c kind:overlay_id to:205
+from:0x021ac780 kind:load to:0x021b93ec module:overlay(205)
 from:0x021ac790 kind:thumb_call to:0x02017934 module:main
 from:0x021ac794 kind:thumb_call to:0x0200c838 module:main
 from:0x021ac79c kind:thumb_call to:0x02017238 module:main

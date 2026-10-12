@@ -8555,7 +8555,7 @@ from:0x0203632e kind:thumb_call to:0x0203a938 module:main
 from:0x02036346 kind:thumb_call to:0x0203a938 module:main
 from:0x02036356 kind:thumb_call to:0x0203a938 module:main
 from:0x02036360 kind:overlay_id to:162
-from:0x02036364 kind:load to:0x021a19e4 module:overlays(162,308)
+from:0x02036364 kind:load to:0x021a19e4 module:overlay(162)
 from:0x02036368 kind:load to:0x0214180c module:main
 from:0x0203636c kind:load to:0x02141808 module:main
 from:0x02036370 kind:overlay_id to:264

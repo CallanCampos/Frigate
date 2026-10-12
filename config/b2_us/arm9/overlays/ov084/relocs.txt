@@ -49,14 +49,19 @@ from:0x021eb152 kind:thumb_call to:0x02014d40 module:main
 from:0x021eb160 kind:thumb_call_arm to:0x020787a8 module:main
 from:0x021eb18a kind:thumb_call to:0x02016ea0 module:main
 from:0x021eb1b2 kind:thumb_call to:0x021eaf68 module:overlay(84)
-from:0x021eb1c0 kind:load to:0x0216e771 module:overlays(13,15,18)
-from:0x021eb1c8 kind:load to:0x0216e771 module:overlays(13,15,18)
+from:0x021eb1bc kind:overlay_id to:13
+from:0x021eb1c0 kind:load to:0x0216e771 module:overlay(13)
+from:0x021eb1c4 kind:overlay_id to:15
+from:0x021eb1c8 kind:load to:0x0216e771 module:overlay(15)
+from:0x021eb1cc kind:overlay_id to:14
 from:0x021eb1d0 kind:load to:0x0216e8ad module:overlay(14)
-from:0x021eb1d8 kind:load to:0x021f59e1 module:overlays(146,148,149,155,156,157,281)
-from:0x021eb1dc kind:load to:0x021f5b01 module:overlays(146,156)
-from:0x021eb1e4 kind:load to:0x021f59e1 module:overlays(146,148,149,155,156,157,281)
-from:0x021eb1e8 kind:load to:0x021f5a29 module:overlays(146,157,286)
-from:0x021eb1ec kind:load to:0x021f5aa5 module:overlays(149,157)
+from:0x021eb1d4 kind:overlay_id to:156
+from:0x021eb1d8 kind:load to:0x021f59e1 module:overlay(156)
+from:0x021eb1dc kind:load to:0x021f5b01 module:overlay(156)
+from:0x021eb1e0 kind:overlay_id to:157
+from:0x021eb1e4 kind:load to:0x021f59e1 module:overlay(157)
+from:0x021eb1e8 kind:load to:0x021f5a29 module:overlay(157)
+from:0x021eb1ec kind:load to:0x021f5aa5 module:overlay(157)
 from:0x021eb202 kind:thumb_call to:0x02016cb4 module:main
 from:0x021eb208 kind:thumb_call to:0x02016edc module:main
 from:0x021eb228 kind:load to:0x021eb22d module:overlay(84)
@@ -152,9 +157,9 @@ from:0x021eb752 kind:thumb_call to:0x02044c98 module:main
 from:0x021eb75a kind:thumb_call to:0x02044c98 module:main
 from:0x021eb762 kind:thumb_call to:0x02044c98 module:main
 from:0x021eb76c kind:load to:0x021eeb74 module:overlay(84)
-from:0x021eb770 kind:load to:0x021eeb94 module:overlay(84)
-from:0x021eb774 kind:load to:0x021eebb4 module:overlay(84)
-from:0x021eb778 kind:load to:0x021eebd4 module:overlay(84)
+from:0x021eb770 kind:load to:0x021eeb74 add:0x20 module:overlay(84)
+from:0x021eb774 kind:load to:0x021eeb74 add:0x40 module:overlay(84)
+from:0x021eb778 kind:load to:0x021eeb74 add:0x60 module:overlay(84)
 from:0x021eb78c kind:thumb_call to:0x02044c98 module:main
 from:0x021eb794 kind:thumb_call to:0x02044c98 module:main
 from:0x021eb79c kind:thumb_call to:0x02044c98 module:main
@@ -640,7 +645,7 @@ from:0x021ede8c kind:thumb_call_arm to:0x020787a8 module:main
 from:0x021edeb6 kind:thumb_call to:0x02013a78 module:main
 from:0x021edec2 kind:thumb_call to:0x021ed490 module:overlay(84)
 from:0x021edee6 kind:thumb_call to:0x0202d7b8 module:main
-from:0x021edef2 kind:thumb_call to:0x021ea88c module:overlays(83,86,168)
+from:0x021edef2 kind:thumb_call to:0x021ea88c module:overlay(83)
 from:0x021edef8 kind:thumb_call to:0x021ed2b0 module:overlay(84)
 from:0x021edefe kind:thumb_call to:0x021ea860 module:overlay(83)
 from:0x021edf10 kind:load to:0x021edf19 module:overlay(84)
@@ -649,7 +654,7 @@ from:0x021edf88 kind:thumb_call to:0x02013b44 module:main
 from:0x021edf9a kind:thumb_call to:0x021ed45c module:overlay(84)
 from:0x021edfae kind:thumb_call to:0x021ed748 module:overlay(84)
 from:0x021edfb6 kind:thumb_call to:0x021ed380 module:overlay(84)
-from:0x021edfda kind:thumb_call to:0x021ea88c module:overlays(83,86,168)
+from:0x021edfda kind:thumb_call to:0x021ea88c module:overlay(83)
 from:0x021edfec kind:thumb_call to:0x0203a870 module:main
 from:0x021edffe kind:thumb_call to:0x02013eac module:main
 from:0x021ee016 kind:thumb_call to:0x020140e0 module:main
@@ -695,7 +700,7 @@ from:0x021ee280 kind:load to:0x021ee285 module:overlay(84)
 from:0x021ee2be kind:thumb_call to:0x021ed168 module:overlay(84)
 from:0x021ee2ce kind:thumb_call to:0x021ed190 module:overlay(84)
 from:0x021ee2e6 kind:thumb_call to:0x021eada0 module:overlay(83)
-from:0x021ee2fa kind:thumb_call to:0x021ea88c module:overlays(83,86,168)
+from:0x021ee2fa kind:thumb_call to:0x021ea88c module:overlay(83)
 from:0x021ee304 kind:thumb_call to:0x021ea968 module:overlay(83)
 from:0x021ee30a kind:thumb_call to:0x021ed260 module:overlay(84)
 from:0x021ee312 kind:thumb_call to:0x021ed27c module:overlay(84)
@@ -710,7 +715,7 @@ from:0x021ee3c0 kind:thumb_call to:0x021ed208 module:overlay(84)
 from:0x021ee3c8 kind:thumb_call to:0x021ed27c module:overlay(84)
 from:0x021ee3d8 kind:thumb_call to:0x021eada0 module:overlay(83)
 from:0x021ee3ec kind:thumb_call to:0x021eca40 module:overlay(84)
-from:0x021ee3f6 kind:thumb_call to:0x021ea88c module:overlays(83,86,168)
+from:0x021ee3f6 kind:thumb_call to:0x021ea88c module:overlay(83)
 from:0x021ee404 kind:thumb_call to:0x0203a870 module:main
 from:0x021ee40c kind:load to:0x021eebf4 module:overlay(84)
 from:0x021ee422 kind:thumb_call to:0x0203a888 module:main
@@ -725,7 +730,7 @@ from:0x021ee490 kind:load to:0x021ee495 module:overlay(84)
 from:0x021ee4d2 kind:thumb_call to:0x021ed168 module:overlay(84)
 from:0x021ee4e2 kind:thumb_call to:0x021ed190 module:overlay(84)
 from:0x021ee4fa kind:thumb_call to:0x021eada0 module:overlay(83)
-from:0x021ee50e kind:thumb_call to:0x021ea88c module:overlays(83,86,168)
+from:0x021ee50e kind:thumb_call to:0x021ea88c module:overlay(83)
 from:0x021ee518 kind:thumb_call to:0x021ea968 module:overlay(83)
 from:0x021ee51e kind:thumb_call to:0x021ed260 module:overlay(84)
 from:0x021ee526 kind:thumb_call to:0x021ed27c module:overlay(84)
@@ -743,7 +748,7 @@ from:0x021ee64c kind:thumb_call to:0x021ed208 module:overlay(84)
 from:0x021ee654 kind:thumb_call to:0x021ed27c module:overlay(84)
 from:0x021ee664 kind:thumb_call to:0x021eada0 module:overlay(83)
 from:0x021ee678 kind:thumb_call to:0x021eca40 module:overlay(84)
-from:0x021ee682 kind:thumb_call to:0x021ea88c module:overlays(83,86,168)
+from:0x021ee682 kind:thumb_call to:0x021ea88c module:overlay(83)
 from:0x021ee690 kind:thumb_call to:0x0203a870 module:main
 from:0x021ee6a0 kind:thumb_call to:0x02017394 module:main
 from:0x021ee6a8 kind:thumb_call to:0x02014e3c module:main

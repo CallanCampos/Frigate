@@ -1121,7 +1121,7 @@ static void KeySystemScrollList_Scroll(void *work, s16 delta) {
     KeySystemScrollList *list = work;
     u32 i;
     ClActorPos pos;
-    s16 top;
+    int top;
     int y;
 
     for (i = 0; i < list->setup.count; i++) {

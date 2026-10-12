@@ -80,12 +80,12 @@ from:0x021ef1b4 kind:thumb_call to:0x020061b8 module:main
 from:0x021ef1c0 kind:thumb_call to:0x0202edc8 module:main
 from:0x021ef1c6 kind:thumb_call to:0x020061a8 module:main
 from:0x021ef1cc kind:thumb_call to:0x0206be70 module:main
-from:0x021ef1de kind:thumb_call to:0x021b8558 module:overlays(36,197)
+from:0x021ef1de kind:thumb_call to:0x021b8558 module:overlay(36)
 from:0x021ef1e8 kind:thumb_call to:0x021efe74 module:overlay(102)
 from:0x021ef1f4 kind:thumb_call to:0x021b8520 module:overlays(36,194,197)
 from:0x021ef208 kind:thumb_call to:0x0202ee00 module:main
 from:0x021ef20c kind:thumb_call to:0x02006280 module:main
-from:0x021ef25a kind:thumb_call to:0x021b8558 module:overlays(36,197)
+from:0x021ef25a kind:thumb_call to:0x021b8558 module:overlay(36)
 from:0x021ef26c kind:thumb_call to:0x02015d20 module:main
 from:0x021ef298 kind:thumb_call to:0x02180530 module:overlay(36)
 from:0x021ef29e kind:thumb_call to:0x0219a6b0 module:overlay(36)

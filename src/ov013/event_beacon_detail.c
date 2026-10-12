@@ -44,7 +44,7 @@ GameEventReturnCode func_ov013_0216e660(GameEvent *event, u32 *state, void *data
         work->param.gameData = work->gameData;
         work->param.subscreen = work->subscreen;
         work->param.mode = work->mode;
-        GSYS_QueueProc(gsys, OVERLAY_BEACON_DETAIL, &data_ov308_021a17dc, &work->param);
+        GSYS_QueueProc(gsys, OVERLAY_BEACON_DETAIL, &BeaconDetail_ProcFunctions, &work->param);
         (*state)++;
         break;
     case 4:

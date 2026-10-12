@@ -13,10 +13,11 @@ struct FestivalEventParam {
     GameData *gameData;
     u32 mode;
     LinkFestival *festival;
-    void *missionConfig;
+    FestMissionConfig *missionConfig;
     void *saveBlock;
 };
 
-extern const GameProcFunctions data_ov309_021a01d0;
+// The Funfest mission screen (fmission_app.c): mode 0 shows the running mission, mode 1 ends it and shows its result
+extern const GameProcFunctions FMISSION_APP_PROC_FUNCTIONS;
 
 #endif // POKEBW2_APP_FESTIVAL_H

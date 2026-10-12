@@ -3,3 +3,24 @@
     .ctor       start:0x021a06cc end:0x021a06cc kind:rodata align:4
     .data       start:0x021a06e0 end:0x021a0740 kind:data align:32
     .bss        start:0x021a0740 end:0x021a0740 kind:bss align:32
+
+src/ov309/fmission_app.c:
+    .text       start:0x0219ce80 end:0x0219e938
+    .rodata     start:0x021a014c end:0x021a01dc
+    .data       start:0x021a06e0 end:0x021a06f0
+
+src/ov309/fmission_app_gra.c:
+    complete
+    .text       start:0x0219e938 end:0x0219ecd8
+    .rodata     start:0x021a01dc end:0x021a03dc
+    .data       start:0x021a06f0 end:0x021a0704
+
+src/ov309/fmission_app_draw.c:
+    .text       start:0x0219ecd8 end:0x0219fbc0
+    .rodata     start:0x021a03dc end:0x021a06a4
+    .data       start:0x021a0704 end:0x021a0720
+
+src/ov309/fmission_log_accessor_fapp.c:
+    .text       start:0x0219fbc0 end:0x021a014c
+    .rodata     start:0x021a06a4 end:0x021a06cc
+    .data       start:0x021a0720 end:0x021a0740

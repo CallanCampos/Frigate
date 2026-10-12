@@ -160,9 +160,9 @@ from:0x021ef600 kind:load to:0x021efe7c module:overlay(99)
 from:0x021ef604 kind:load to:0x021efbfc module:overlay(99)
 from:0x021ef60c kind:load to:0x021efc7c module:overlay(99)
 from:0x021ef610 kind:load to:0x021efc70 module:overlay(99)
-from:0x021ef62c kind:thumb_call to:0x021b8520 module:overlays(36,205)
+from:0x021ef62c kind:thumb_call to:0x021b8520 module:overlay(36)
 from:0x021ef64e kind:thumb_call to:0x02015c10 module:main
-from:0x021ef672 kind:thumb_call to:0x021b8520 module:overlays(36,205)
+from:0x021ef672 kind:thumb_call to:0x021b8520 module:overlay(36)
 from:0x021ef69c kind:thumb_call to:0x021b84a8 module:overlays(36,260)
 from:0x021ef6a2 kind:thumb_call to:0x021b84e8 module:overlay(36)
 from:0x021ef6da kind:thumb_call to:0x02015d20 module:main

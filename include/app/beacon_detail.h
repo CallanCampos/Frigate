@@ -19,6 +19,6 @@ typedef struct {
     u8 unk0B;
 } BeaconDetailParam;
 
-extern const GameProcFunctions data_ov308_021a17dc;
+extern const GameProcFunctions BeaconDetail_ProcFunctions;
 
 #endif // POKEBW2_APP_BEACON_DETAIL_H
