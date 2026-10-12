@@ -2541,7 +2541,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | partial | string at `0x0219db80` |
+| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | complete | string at `0x0219db80` |
 | `chihou_zukan_award_graphic.c` | `0x0219d6a4`–`0x0219da10` | 17 | complete | string at `0x0219db98` |
 
 ### Overlay 315
