@@ -165,46 +165,6 @@ static const u32 sPanelPairs[14][2] = {
     { 7, 0xff }, { 8, 0xff }, { 9, 0xff }, { 10, 0xff }, { 13, 0xff }, { 14, 0xff }, { 15, 0xff },
 };
 
-static const ModelPlacement sPanelPlacements[PANEL_COUNT] = {
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 0 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 2 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 3 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 1 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 0 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 2 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 3 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 1 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 0 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 2 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 3 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 1 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 0 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 2 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 3 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 1 },
-};
-
-static const ModelPlacement sIndicatorPlacements[INDICATOR_COUNT] = {
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(600) }, 1 },
-    { { FX32_CONST(24), FX32_CONST(-48), FX32_CONST(712) }, 3 },
-    { { FX32_CONST(24), FX32_CONST(-48), FX32_CONST(824) }, 3 },
-    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(936) }, 0 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(600) }, 1 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 0 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 2 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 3 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 1 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 0 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 2 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 3 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 1 },
-    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(936) }, 0 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(600) }, 1 },
-    { { FX32_CONST(472), FX32_CONST(-48), FX32_CONST(712) }, 2 },
-    { { FX32_CONST(472), FX32_CONST(-48), FX32_CONST(824) }, 2 },
-    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(936) }, 0 },
-};
-
 static const G3DSceneResourceSetup sResources[18] = {
     { GIMMICK_ARCID, 0, 0 },  { GIMMICK_ARCID, 1, 0 },  { GIMMICK_ARCID, 2, 0 },  { GIMMICK_ARCID, 3, 0 },
     { GIMMICK_ARCID, 4, 0 },  { GIMMICK_ARCID, 5, 0 },  { GIMMICK_ARCID, 6, 0 },  { GIMMICK_ARCID, 7, 0 },
@@ -268,6 +228,46 @@ static const G3DSceneActorSetup sActors[54] = {
     { 14, 0, 14, 0, sEffectBAnimations, NELEMS(sEffectBAnimations) },
     { 14, 0, 14, 0, sEffectBAnimations, NELEMS(sEffectBAnimations) },
     { 14, 0, 14, 0, sEffectBAnimations, NELEMS(sEffectBAnimations) },
+};
+
+static const ModelPlacement sPanelPlacements[PANEL_COUNT] = {
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 0 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 2 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 3 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(712) }, 1 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 0 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 2 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 3 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(824) }, 1 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 0 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 2 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 3 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(712) }, 1 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 0 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 2 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 3 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(824) }, 1 },
+};
+
+static const ModelPlacement sIndicatorPlacements[INDICATOR_COUNT] = {
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(600) }, 1 },
+    { { FX32_CONST(24), FX32_CONST(-48), FX32_CONST(712) }, 3 },
+    { { FX32_CONST(24), FX32_CONST(-48), FX32_CONST(824) }, 3 },
+    { { FX32_CONST(136), FX32_CONST(-48), FX32_CONST(936) }, 0 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(600) }, 1 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 0 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 2 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 3 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(712) }, 1 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 0 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 2 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 3 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(824) }, 1 },
+    { { FX32_CONST(248), FX32_CONST(-48), FX32_CONST(936) }, 0 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(600) }, 1 },
+    { { FX32_CONST(472), FX32_CONST(-48), FX32_CONST(712) }, 2 },
+    { { FX32_CONST(472), FX32_CONST(-48), FX32_CONST(824) }, 2 },
+    { { FX32_CONST(360), FX32_CONST(-48), FX32_CONST(936) }, 0 },
 };
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
