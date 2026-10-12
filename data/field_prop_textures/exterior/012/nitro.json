@@ -1,0 +1,375 @@
+{
+  "nitro_sha256": "137a403400bdb20735b54d83bfebc304c86ee9847e99a9574116c1528ba68927",
+  "textures": [
+    {
+      "name": "h_kage",
+      "kind": 1,
+      "palette_offset": 87768
+    },
+    {
+      "name": "pc_kabe02",
+      "kind": 3,
+      "palette_offset": 87784
+    },
+    {
+      "name": "pc_win1",
+      "kind": 3,
+      "palette_offset": 87816
+    },
+    {
+      "name": "gate_1",
+      "kind": 3,
+      "palette_offset": 87848
+    },
+    {
+      "name": "gate_4",
+      "kind": 3,
+      "palette_offset": 87880
+    },
+    {
+      "name": "rock01",
+      "kind": 3,
+      "palette_offset": 87912
+    },
+    {
+      "name": "fou_01",
+      "kind": 1,
+      "palette_offset": 87944
+    },
+    {
+      "name": "fou_02",
+      "kind": 3,
+      "palette_offset": 87976
+    },
+    {
+      "name": "isu",
+      "kind": 3,
+      "palette_offset": 88008
+    },
+    {
+      "name": "kasa",
+      "kind": 3,
+      "palette_offset": 88040
+    },
+    {
+      "name": "table",
+      "kind": 3,
+      "palette_offset": 88008
+    },
+    {
+      "name": "searock1.1",
+      "kind": 3,
+      "palette_offset": 88056
+    },
+    {
+      "name": "searock1.2",
+      "kind": 3,
+      "palette_offset": 88056
+    },
+    {
+      "name": "searock1.3",
+      "kind": 3,
+      "palette_offset": 88056
+    },
+    {
+      "name": "searock1.4",
+      "kind": 3,
+      "palette_offset": 88056
+    },
+    {
+      "name": "plant_tex2",
+      "kind": 2,
+      "palette_offset": 88088
+    },
+    {
+      "name": "plant_tex4",
+      "kind": 3,
+      "palette_offset": 88104
+    },
+    {
+      "name": "door_pc",
+      "kind": 3,
+      "palette_offset": 88136
+    },
+    {
+      "name": "h_mado",
+      "kind": 2,
+      "palette_offset": 88168
+    },
+    {
+      "name": "tex001",
+      "kind": 3,
+      "palette_offset": 88184
+    },
+    {
+      "name": "tex002",
+      "kind": 3,
+      "palette_offset": 88200
+    },
+    {
+      "name": "r34_door1",
+      "kind": 3,
+      "palette_offset": 88232
+    },
+    {
+      "name": "thous_t1",
+      "kind": 3,
+      "palette_offset": 88264
+    },
+    {
+      "name": "cart_t1",
+      "kind": 3,
+      "palette_offset": 88296
+    },
+    {
+      "name": "c8b_001a",
+      "kind": 3,
+      "palette_offset": 88328
+    },
+    {
+      "name": "c8b_001b",
+      "kind": 3,
+      "palette_offset": 88360
+    },
+    {
+      "name": "c8b_001c",
+      "kind": 3,
+      "palette_offset": 88392
+    },
+    {
+      "name": "c8w_001",
+      "kind": 2,
+      "palette_offset": 88424
+    },
+    {
+      "name": "c8_buil02b1",
+      "kind": 3,
+      "palette_offset": 88440
+    },
+    {
+      "name": "c8_buil02w1",
+      "kind": 3,
+      "palette_offset": 88472
+    },
+    {
+      "name": "c8_buil03b1",
+      "kind": 3,
+      "palette_offset": 88504
+    },
+    {
+      "name": "c8_buil03w1",
+      "kind": 3,
+      "palette_offset": 88472
+    },
+    {
+      "name": "c8_buil04b1",
+      "kind": 3,
+      "palette_offset": 88504
+    },
+    {
+      "name": "c8_buil04w1",
+      "kind": 3,
+      "palette_offset": 88472
+    },
+    {
+      "name": "c8g_b_kao",
+      "kind": 3,
+      "palette_offset": 88536
+    },
+    {
+      "name": "c8g_b_kubi",
+      "kind": 3,
+      "palette_offset": 88568
+    },
+    {
+      "name": "c8g_b_tou",
+      "kind": 3,
+      "palette_offset": 88600
+    },
+    {
+      "name": "c8_buil05b",
+      "kind": 3,
+      "palette_offset": 88632
+    },
+    {
+      "name": "c8_buil05w",
+      "kind": 3,
+      "palette_offset": 88664
+    },
+    {
+      "name": "sign01a",
+      "kind": 3,
+      "palette_offset": 88696
+    },
+    {
+      "name": "sign02a",
+      "kind": 2,
+      "palette_offset": 88728
+    },
+    {
+      "name": "sign03a",
+      "kind": 3,
+      "palette_offset": 88744
+    },
+    {
+      "name": "sign04a",
+      "kind": 2,
+      "palette_offset": 88776
+    },
+    {
+      "name": "jihan_01",
+      "kind": 3,
+      "palette_offset": 88792
+    },
+    {
+      "name": "out_dust01",
+      "kind": 3,
+      "palette_offset": 88824
+    },
+    {
+      "name": "warp03",
+      "kind": 3,
+      "palette_offset": 88840
+    },
+    {
+      "name": "warp_g",
+      "kind": 2,
+      "palette_offset": 88872
+    },
+    {
+      "name": "warp02",
+      "kind": 3,
+      "palette_offset": 88888
+    },
+    {
+      "name": "warp_b",
+      "kind": 2,
+      "palette_offset": 88920
+    },
+    {
+      "name": "warp01",
+      "kind": 3,
+      "palette_offset": 88936
+    },
+    {
+      "name": "door_n_01",
+      "kind": 2,
+      "palette_offset": 88968
+    },
+    {
+      "name": "door_n_02",
+      "kind": 3,
+      "palette_offset": 88984
+    },
+    {
+      "name": "door_n_03",
+      "kind": 3,
+      "palette_offset": 89000
+    },
+    {
+      "name": "c8_door_b",
+      "kind": 3,
+      "palette_offset": 89016
+    },
+    {
+      "name": "c8lb_001a",
+      "kind": 3,
+      "palette_offset": 89032
+    },
+    {
+      "name": "c8lb_001b",
+      "kind": 3,
+      "palette_offset": 89064
+    },
+    {
+      "name": "c8lb_001c",
+      "kind": 3,
+      "palette_offset": 89096
+    },
+    {
+      "name": "c8lb_bigice01",
+      "kind": 6,
+      "palette_offset": 89128
+    },
+    {
+      "name": "c8lb_bigice03",
+      "kind": 6,
+      "palette_offset": 89128
+    },
+    {
+      "name": "c8lb_ice01_a",
+      "kind": 4,
+      "palette_offset": 89144
+    },
+    {
+      "name": "c8_lbuildw_01",
+      "kind": 2,
+      "palette_offset": 89176
+    },
+    {
+      "name": "c8_lbuil02b1",
+      "kind": 3,
+      "palette_offset": 89192
+    },
+    {
+      "name": "c8_lbuil02w1",
+      "kind": 3,
+      "palette_offset": 89224
+    },
+    {
+      "name": "c8_lbuil03b1",
+      "kind": 3,
+      "palette_offset": 89256
+    },
+    {
+      "name": "c8_lbuil03w1",
+      "kind": 3,
+      "palette_offset": 89288
+    },
+    {
+      "name": "c8_lbuil04b1",
+      "kind": 3,
+      "palette_offset": 89320
+    },
+    {
+      "name": "c8_lbuil04w1",
+      "kind": 3,
+      "palette_offset": 89352
+    },
+    {
+      "name": "c8lb_buil05b",
+      "kind": 3,
+      "palette_offset": 89384
+    },
+    {
+      "name": "c8_lbuil05w",
+      "kind": 3,
+      "palette_offset": 89416
+    },
+    {
+      "name": "c8g_lb_kao",
+      "kind": 3,
+      "palette_offset": 89448
+    },
+    {
+      "name": "c8g_lb_kubi",
+      "kind": 4,
+      "palette_offset": 89480
+    },
+    {
+      "name": "c8g_lb_tou",
+      "kind": 4,
+      "palette_offset": 89528
+    },
+    {
+      "name": "c8lb_bigice02",
+      "kind": 3,
+      "palette_offset": 89560
+    },
+    {
+      "name": "c8lb_bigice04",
+      "kind": 6,
+      "palette_offset": 89128
+    }
+  ]
+}

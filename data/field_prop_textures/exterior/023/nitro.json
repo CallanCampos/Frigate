@@ -1,0 +1,275 @@
+{
+  "nitro_sha256": "765db1935b0948f8b3fd82a836404f31b55859347dd8e7f427e95f10d73b363d",
+  "textures": [
+    {
+      "name": "h_kage",
+      "kind": 1,
+      "palette_offset": 27768
+    },
+    {
+      "name": "pc_kabe02",
+      "kind": 3,
+      "palette_offset": 27784
+    },
+    {
+      "name": "pc_win1",
+      "kind": 3,
+      "palette_offset": 27816
+    },
+    {
+      "name": "gate_1",
+      "kind": 3,
+      "palette_offset": 27848
+    },
+    {
+      "name": "gate_4",
+      "kind": 3,
+      "palette_offset": 27880
+    },
+    {
+      "name": "rock01",
+      "kind": 3,
+      "palette_offset": 27912
+    },
+    {
+      "name": "fou_01",
+      "kind": 1,
+      "palette_offset": 27944
+    },
+    {
+      "name": "fou_02",
+      "kind": 3,
+      "palette_offset": 27976
+    },
+    {
+      "name": "isu",
+      "kind": 3,
+      "palette_offset": 28008
+    },
+    {
+      "name": "kasa",
+      "kind": 3,
+      "palette_offset": 28040
+    },
+    {
+      "name": "table",
+      "kind": 3,
+      "palette_offset": 28008
+    },
+    {
+      "name": "searock1.1",
+      "kind": 3,
+      "palette_offset": 28056
+    },
+    {
+      "name": "searock1.2",
+      "kind": 3,
+      "palette_offset": 28056
+    },
+    {
+      "name": "searock1.3",
+      "kind": 3,
+      "palette_offset": 28056
+    },
+    {
+      "name": "searock1.4",
+      "kind": 3,
+      "palette_offset": 28056
+    },
+    {
+      "name": "plant_tex2",
+      "kind": 2,
+      "palette_offset": 28088
+    },
+    {
+      "name": "plant_tex4",
+      "kind": 3,
+      "palette_offset": 28104
+    },
+    {
+      "name": "door_pc",
+      "kind": 3,
+      "palette_offset": 28136
+    },
+    {
+      "name": "r34_door1",
+      "kind": 3,
+      "palette_offset": 28168
+    },
+    {
+      "name": "h_mado",
+      "kind": 2,
+      "palette_offset": 28200
+    },
+    {
+      "name": "thous_t1",
+      "kind": 3,
+      "palette_offset": 28216
+    },
+    {
+      "name": "cart_t1",
+      "kind": 3,
+      "palette_offset": 28248
+    },
+    {
+      "name": "sign01a",
+      "kind": 3,
+      "palette_offset": 28280
+    },
+    {
+      "name": "sign02a",
+      "kind": 2,
+      "palette_offset": 28312
+    },
+    {
+      "name": "sign03a",
+      "kind": 3,
+      "palette_offset": 28328
+    },
+    {
+      "name": "sign04a",
+      "kind": 2,
+      "palette_offset": 28360
+    },
+    {
+      "name": "jihan_01",
+      "kind": 3,
+      "palette_offset": 28376
+    },
+    {
+      "name": "out_dust01",
+      "kind": 3,
+      "palette_offset": 28408
+    },
+    {
+      "name": "warp03",
+      "kind": 3,
+      "palette_offset": 28424
+    },
+    {
+      "name": "warp_g",
+      "kind": 2,
+      "palette_offset": 28456
+    },
+    {
+      "name": "warp02",
+      "kind": 3,
+      "palette_offset": 28472
+    },
+    {
+      "name": "warp_b",
+      "kind": 2,
+      "palette_offset": 28504
+    },
+    {
+      "name": "warp01",
+      "kind": 3,
+      "palette_offset": 28520
+    },
+    {
+      "name": "c03_slamp02",
+      "kind": 6,
+      "palette_offset": 28552
+    },
+    {
+      "name": "c03_slampkg",
+      "kind": 1,
+      "palette_offset": 27768
+    },
+    {
+      "name": "c3_ramp",
+      "kind": 3,
+      "palette_offset": 28568
+    },
+    {
+      "name": "white",
+      "kind": 2,
+      "palette_offset": 28584
+    },
+    {
+      "name": "c03_foun_01",
+      "kind": 3,
+      "palette_offset": 28600
+    },
+    {
+      "name": "c03_foun_02",
+      "kind": 3,
+      "palette_offset": 28616
+    },
+    {
+      "name": "c03_foun_03",
+      "kind": 6,
+      "palette_offset": 28600
+    },
+    {
+      "name": "c3_line",
+      "kind": 3,
+      "palette_offset": 28632
+    },
+    {
+      "name": "c3_yuka2",
+      "kind": 2,
+      "palette_offset": 28648
+    },
+    {
+      "name": "c3bay_yuka1",
+      "kind": 3,
+      "palette_offset": 28664
+    },
+    {
+      "name": "c3_gymbuil10",
+      "kind": 6,
+      "palette_offset": 28680
+    },
+    {
+      "name": "c3_gymbuil2",
+      "kind": 3,
+      "palette_offset": 28696
+    },
+    {
+      "name": "c3_gymbuil3",
+      "kind": 4,
+      "palette_offset": 28728
+    },
+    {
+      "name": "c3_gymbuil4",
+      "kind": 3,
+      "palette_offset": 28776
+    },
+    {
+      "name": "c3_gymbuil6",
+      "kind": 3,
+      "palette_offset": 28808
+    },
+    {
+      "name": "c3_gymbuil7",
+      "kind": 4,
+      "palette_offset": 28824
+    },
+    {
+      "name": "c3_gymobj",
+      "kind": 3,
+      "palette_offset": 28872
+    },
+    {
+      "name": "w_gra",
+      "kind": 6,
+      "palette_offset": 28904
+    },
+    {
+      "name": "door_n_01",
+      "kind": 2,
+      "palette_offset": 28920
+    },
+    {
+      "name": "door_n_02",
+      "kind": 3,
+      "palette_offset": 28936
+    },
+    {
+      "name": "door_n_03",
+      "kind": 3,
+      "palette_offset": 28952
+    }
+  ]
+}

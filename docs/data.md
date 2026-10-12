@@ -34,6 +34,8 @@ which documents the format and can write them again.
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
 | `a/0/0/8` | `data/map_models/<chunk>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
+| `a/1/7/4` | `data/field_prop_textures/exterior/<set>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
+| `a/1/7/5` | `data/field_prop_textures/interior/<set>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
 | `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
 | `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
@@ -610,6 +612,13 @@ The packer rejects changed embedded pixels instead of silently ignoring them.
 Other Nitro material settings retain their original values.
 Adding material slots or draw calls is not yet supported. Every map model contains only an
 `MDL0` block; its textures come from the shared texture archive.
+
+The exterior and interior field props use separate texture archives. Their PNGs live under
+`data/field_prop_textures/exterior/` and `data/field_prop_textures/interior/`, each grouped by the
+area's texture set number. Editing a PNG repacks its original Nitro texture and shared palette;
+`nitro.json` records the original format and palette mapping needed for a byte-matching build.
+The texture size, pixel format and shared palette capacity still constrain edits. The PNGs can be
+re-exported with `tools/data/map_texture_data.py extract OUTPUT_DIR a/1/7/4` or `a/1/7/5`.
 
 ## Map matrices, areas and lights
 

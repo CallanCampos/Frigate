@@ -1,0 +1,245 @@
+{
+  "nitro_sha256": "ec0ecb4250d893ffde8013c5befdf421043afd725d4a109a0d2991aaad0b3be3",
+  "textures": [
+    {
+      "name": "h_kage",
+      "kind": 1,
+      "palette_offset": 14896
+    },
+    {
+      "name": "idr_pc01",
+      "kind": 3,
+      "palette_offset": 14912
+    },
+    {
+      "name": "idr_pc02",
+      "kind": 3,
+      "palette_offset": 14944
+    },
+    {
+      "name": "idr_mat01",
+      "kind": 3,
+      "palette_offset": 14976
+    },
+    {
+      "name": "idr_tv01",
+      "kind": 3,
+      "palette_offset": 14992
+    },
+    {
+      "name": "idr_stair_u01",
+      "kind": 3,
+      "palette_offset": 15024
+    },
+    {
+      "name": "idr_table01",
+      "kind": 3,
+      "palette_offset": 15056
+    },
+    {
+      "name": "in40_isu",
+      "kind": 3,
+      "palette_offset": 15088
+    },
+    {
+      "name": "in40_kage",
+      "kind": 1,
+      "palette_offset": 14896
+    },
+    {
+      "name": "idr_shelf01",
+      "kind": 3,
+      "palette_offset": 15120
+    },
+    {
+      "name": "idr_shelf02",
+      "kind": 3,
+      "palette_offset": 15152
+    },
+    {
+      "name": "idr_shelf04",
+      "kind": 2,
+      "palette_offset": 15168
+    },
+    {
+      "name": "hh_shelf",
+      "kind": 3,
+      "palette_offset": 15184
+    },
+    {
+      "name": "idr_bed01",
+      "kind": 3,
+      "palette_offset": 15216
+    },
+    {
+      "name": "idr_sink01",
+      "kind": 4,
+      "palette_offset": 15248
+    },
+    {
+      "name": "idr_ref01",
+      "kind": 3,
+      "palette_offset": 15296
+    },
+    {
+      "name": "idr_plant01",
+      "kind": 3,
+      "palette_offset": 15312
+    },
+    {
+      "name": "hh_dust01",
+      "kind": 3,
+      "palette_offset": 15344
+    },
+    {
+      "name": "idr_poster01",
+      "kind": 3,
+      "palette_offset": 15360
+    },
+    {
+      "name": "h_mado",
+      "kind": 2,
+      "palette_offset": 15376
+    },
+    {
+      "name": "idr_win01",
+      "kind": 2,
+      "palette_offset": 15392
+    },
+    {
+      "name": "desk_book01",
+      "kind": 3,
+      "palette_offset": 15408
+    },
+    {
+      "name": "desk_book02",
+      "kind": 3,
+      "palette_offset": 15424
+    },
+    {
+      "name": "pc_desk01",
+      "kind": 3,
+      "palette_offset": 15456
+    },
+    {
+      "name": "pc_desk01_pc",
+      "kind": 3,
+      "palette_offset": 15440
+    },
+    {
+      "name": "desk01",
+      "kind": 3,
+      "palette_offset": 15488
+    },
+    {
+      "name": "kabin",
+      "kind": 3,
+      "palette_offset": 15520
+    },
+    {
+      "name": "cashier01",
+      "kind": 3,
+      "palette_offset": 15552
+    },
+    {
+      "name": "drock01",
+      "kind": 3,
+      "palette_offset": 15568
+    },
+    {
+      "name": "desk02a",
+      "kind": 3,
+      "palette_offset": 15584
+    },
+    {
+      "name": "art01a",
+      "kind": 3,
+      "palette_offset": 15616
+    },
+    {
+      "name": "gym_obj1",
+      "kind": 3,
+      "palette_offset": 15648
+    },
+    {
+      "name": "gym_obj2",
+      "kind": 2,
+      "palette_offset": 15664
+    },
+    {
+      "name": "d0stair_u01",
+      "kind": 3,
+      "palette_offset": 15680
+    },
+    {
+      "name": "d0stair_d01",
+      "kind": 3,
+      "palette_offset": 15712
+    },
+    {
+      "name": "jihan_01",
+      "kind": 3,
+      "palette_offset": 15744
+    },
+    {
+      "name": "r_box01",
+      "kind": 2,
+      "palette_offset": 15776
+    },
+    {
+      "name": "box02",
+      "kind": 3,
+      "palette_offset": 15792
+    },
+    {
+      "name": "chushion01a",
+      "kind": 3,
+      "palette_offset": 15824
+    },
+    {
+      "name": "chushion02a",
+      "kind": 3,
+      "palette_offset": 15840
+    },
+    {
+      "name": "warp03",
+      "kind": 3,
+      "palette_offset": 15856
+    },
+    {
+      "name": "warp_g",
+      "kind": 2,
+      "palette_offset": 15888
+    },
+    {
+      "name": "warp02",
+      "kind": 3,
+      "palette_offset": 15904
+    },
+    {
+      "name": "warp_b",
+      "kind": 2,
+      "palette_offset": 15936
+    },
+    {
+      "name": "warp01",
+      "kind": 3,
+      "palette_offset": 15952
+    },
+    {
+      "name": "shelf06",
+      "kind": 3,
+      "palette_offset": 15984
+    },
+    {
+      "name": "cabin_door",
+      "kind": 3,
+      "palette_offset": 16000
+    },
+    {
+      "name": "cabin_door_r",
+      "kind": 3,
+      "palette_offset": 16016
+    }
+  ]
+}

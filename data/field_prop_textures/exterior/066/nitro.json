@@ -1,0 +1,350 @@
+{
+  "nitro_sha256": "2da39e4a6dd30bbb6962221e0d00b3f97af90998f7d667131b9bbc4d03ec4caf",
+  "textures": [
+    {
+      "name": "h_kage",
+      "kind": 1,
+      "palette_offset": 72916
+    },
+    {
+      "name": "pc_kabe02",
+      "kind": 3,
+      "palette_offset": 72932
+    },
+    {
+      "name": "pc_win1",
+      "kind": 3,
+      "palette_offset": 72964
+    },
+    {
+      "name": "gate_1",
+      "kind": 3,
+      "palette_offset": 72996
+    },
+    {
+      "name": "gate_4",
+      "kind": 3,
+      "palette_offset": 73028
+    },
+    {
+      "name": "rock01",
+      "kind": 3,
+      "palette_offset": 73060
+    },
+    {
+      "name": "fou_01",
+      "kind": 1,
+      "palette_offset": 73092
+    },
+    {
+      "name": "fou_02",
+      "kind": 3,
+      "palette_offset": 73124
+    },
+    {
+      "name": "isu",
+      "kind": 3,
+      "palette_offset": 73156
+    },
+    {
+      "name": "kasa",
+      "kind": 3,
+      "palette_offset": 73188
+    },
+    {
+      "name": "table",
+      "kind": 3,
+      "palette_offset": 73156
+    },
+    {
+      "name": "searock1.1",
+      "kind": 3,
+      "palette_offset": 73204
+    },
+    {
+      "name": "searock1.2",
+      "kind": 3,
+      "palette_offset": 73204
+    },
+    {
+      "name": "searock1.3",
+      "kind": 3,
+      "palette_offset": 73204
+    },
+    {
+      "name": "searock1.4",
+      "kind": 3,
+      "palette_offset": 73204
+    },
+    {
+      "name": "plant_tex2",
+      "kind": 2,
+      "palette_offset": 73236
+    },
+    {
+      "name": "plant_tex4",
+      "kind": 3,
+      "palette_offset": 73252
+    },
+    {
+      "name": "door_pc",
+      "kind": 3,
+      "palette_offset": 73284
+    },
+    {
+      "name": "h_mado",
+      "kind": 2,
+      "palette_offset": 73316
+    },
+    {
+      "name": "tex001",
+      "kind": 3,
+      "palette_offset": 73332
+    },
+    {
+      "name": "tex002",
+      "kind": 3,
+      "palette_offset": 73348
+    },
+    {
+      "name": "mall_01a",
+      "kind": 3,
+      "palette_offset": 73380
+    },
+    {
+      "name": "mall_01b",
+      "kind": 3,
+      "palette_offset": 73412
+    },
+    {
+      "name": "r34_door1",
+      "kind": 3,
+      "palette_offset": 73444
+    },
+    {
+      "name": "thous_t1",
+      "kind": 3,
+      "palette_offset": 73476
+    },
+    {
+      "name": "cart_t1",
+      "kind": 3,
+      "palette_offset": 73508
+    },
+    {
+      "name": "c8b_001a",
+      "kind": 3,
+      "palette_offset": 73540
+    },
+    {
+      "name": "c8b_001b",
+      "kind": 3,
+      "palette_offset": 73572
+    },
+    {
+      "name": "c8b_001c",
+      "kind": 3,
+      "palette_offset": 73604
+    },
+    {
+      "name": "c8_buil02b1",
+      "kind": 3,
+      "palette_offset": 73636
+    },
+    {
+      "name": "c8_buil03b1",
+      "kind": 3,
+      "palette_offset": 73668
+    },
+    {
+      "name": "c8_buil04b1",
+      "kind": 3,
+      "palette_offset": 73668
+    },
+    {
+      "name": "c8g_b_kao",
+      "kind": 3,
+      "palette_offset": 73700
+    },
+    {
+      "name": "c8g_b_kubi",
+      "kind": 3,
+      "palette_offset": 73732
+    },
+    {
+      "name": "c8g_b_tou",
+      "kind": 3,
+      "palette_offset": 73764
+    },
+    {
+      "name": "c8_buil05b",
+      "kind": 3,
+      "palette_offset": 73796
+    },
+    {
+      "name": "h03_gate01",
+      "kind": 3,
+      "palette_offset": 73828
+    },
+    {
+      "name": "sign01a",
+      "kind": 3,
+      "palette_offset": 73860
+    },
+    {
+      "name": "sign02a",
+      "kind": 2,
+      "palette_offset": 73892
+    },
+    {
+      "name": "sign03a",
+      "kind": 3,
+      "palette_offset": 73908
+    },
+    {
+      "name": "sign04a",
+      "kind": 2,
+      "palette_offset": 73940
+    },
+    {
+      "name": "jihan_01",
+      "kind": 3,
+      "palette_offset": 73956
+    },
+    {
+      "name": "out_dust01",
+      "kind": 3,
+      "palette_offset": 73988
+    },
+    {
+      "name": "warp03",
+      "kind": 3,
+      "palette_offset": 74004
+    },
+    {
+      "name": "warp_g",
+      "kind": 2,
+      "palette_offset": 74036
+    },
+    {
+      "name": "warp02",
+      "kind": 3,
+      "palette_offset": 74052
+    },
+    {
+      "name": "warp_b",
+      "kind": 2,
+      "palette_offset": 74084
+    },
+    {
+      "name": "warp01",
+      "kind": 3,
+      "palette_offset": 74100
+    },
+    {
+      "name": "door_n_01",
+      "kind": 2,
+      "palette_offset": 74132
+    },
+    {
+      "name": "door_n_02",
+      "kind": 3,
+      "palette_offset": 74148
+    },
+    {
+      "name": "door_n_03",
+      "kind": 3,
+      "palette_offset": 74164
+    },
+    {
+      "name": "c8_door_b",
+      "kind": 3,
+      "palette_offset": 74180
+    },
+    {
+      "name": "c8lb_001a",
+      "kind": 3,
+      "palette_offset": 74196
+    },
+    {
+      "name": "c8lb_001b",
+      "kind": 3,
+      "palette_offset": 74228
+    },
+    {
+      "name": "c8lb_001c",
+      "kind": 3,
+      "palette_offset": 74260
+    },
+    {
+      "name": "c8lb_bigice01",
+      "kind": 6,
+      "palette_offset": 74292
+    },
+    {
+      "name": "c8lb_bigice03",
+      "kind": 6,
+      "palette_offset": 74292
+    },
+    {
+      "name": "c8lb_ice01_a",
+      "kind": 4,
+      "palette_offset": 74308
+    },
+    {
+      "name": "c8_lbuil02b1",
+      "kind": 3,
+      "palette_offset": 74340
+    },
+    {
+      "name": "c8_lbuil03b1",
+      "kind": 3,
+      "palette_offset": 74372
+    },
+    {
+      "name": "c8_lbuil04b1",
+      "kind": 3,
+      "palette_offset": 74404
+    },
+    {
+      "name": "c8lb_buil05b",
+      "kind": 3,
+      "palette_offset": 74436
+    },
+    {
+      "name": "c8g_lb_kao",
+      "kind": 3,
+      "palette_offset": 74468
+    },
+    {
+      "name": "c8g_lb_kubi",
+      "kind": 4,
+      "palette_offset": 74500
+    },
+    {
+      "name": "c8g_lb_tou",
+      "kind": 4,
+      "palette_offset": 74548
+    },
+    {
+      "name": "c8lb_bigice02",
+      "kind": 3,
+      "palette_offset": 74580
+    },
+    {
+      "name": "c8lb_bigice04",
+      "kind": 6,
+      "palette_offset": 74292
+    },
+    {
+      "name": "icepc_kabe02",
+      "kind": 3,
+      "palette_offset": 74612
+    },
+    {
+      "name": "icepc_win1",
+      "kind": 3,
+      "palette_offset": 74644
+    }
+  ]
+}

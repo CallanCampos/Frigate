@@ -65,6 +65,7 @@ def palette_for(texture, palettes, index):
     name = texture["name"]
     exceptions = {
         "h04_stair": "stair", "tg_stair": "stair", "warp01": "gtswarp_r",
+        "warp02": "gtswarp_b", "warp03": "gtswarp_g", "warp04_g": "warp04_pl",
         "c3_bayblock3": "bayblock", "c3test_block3_b": "c34",
         "c3test_block4_b": "block4", "c3test_block6_b": "c3_block6",
         "c3test_block_b": "c3test_block_pl", "pc_kabe1": "pckabe1",
@@ -72,8 +73,16 @@ def palette_for(texture, palettes, index):
         "clsm01": "m_pc17", "clsm02": "m_pc21", "clsm03": "m_pc16",
         "clsm04": "m_pc15",
     }
-    return (by_name.get(name + "_pl") or by_name.get(name)
-            or by_name.get(exceptions.get(name)) or palettes[index])
+    if name.startswith(("pc_meka03.", "in38_meka03.")):
+        name = "pc_meka03"
+    elif name.startswith("machin0."):
+        name = "machine"
+    palette = by_name.get(name + "_pl") or by_name.get(name) or by_name.get(exceptions.get(name))
+    if palette is not None:
+        return palette
+    if index >= len(palettes):
+        raise ValueError(f"no Nitro palette for texture {name}")
+    return palettes[index]
 
 
 def rgba555(color, alpha=31):
@@ -223,10 +232,12 @@ def palette_segments(blob, palettes):
             for offset, following in zip(offsets, offsets[1:] + [end])]
 
 
-def export(directory):
-    archive = read_narc((ROOT / "extract/b2_us/files/a/0/1/4").read_bytes())
+def export(directory, archive_name="a/0/1/4"):
+    if archive_name not in ("a/0/1/4", "a/1/7/4", "a/1/7/5"):
+        raise ValueError(f"unsupported field texture archive {archive_name}")
+    archive = read_narc((ROOT / "extract/b2_us/files" / archive_name).read_bytes())
     directory.mkdir(parents=True, exist_ok=True)
-    (directory / "manifest.json").write_text(json.dumps({"archive": "a/0/1/4", "sets": len(archive)}, indent=2) + "\n")
+    (directory / "manifest.json").write_text(json.dumps({"archive": archive_name, "sets": len(archive)}, indent=2) + "\n")
     for set_id, blob in enumerate(archive):
         textures, palettes = resources(blob)
         folder = directory / f"{set_id:03d}"
@@ -302,11 +313,16 @@ def encode_palette_group(blob, members, start, end):
 
 def pack(directory, game, output):
     version = {"black2": "b2_us", "white2": "w2_us"}[game]
-    archive_path = ROOT / "extract" / version / "files/a/0/1/4"
-    archive = read_narc(archive_path.read_bytes())
     manifest = json.loads((directory / "manifest.json").read_text())
-    if manifest != {"archive": "a/0/1/4", "sets": len(archive)}:
-        raise ValueError("map texture set manifest differs from the Nitro archive")
+    archive_name = manifest["archive"]
+    if archive_name not in ("a/0/1/4", "a/1/7/4", "a/1/7/5"):
+        raise ValueError(f"unsupported field texture archive {archive_name}")
+    if not Path(output).as_posix().endswith("/" + archive_name):
+        raise ValueError(f"output {output} does not name {archive_name}")
+    archive_path = ROOT / "extract" / version / "files" / archive_name
+    archive = read_narc(archive_path.read_bytes())
+    if manifest != {"archive": archive_name, "sets": len(archive)}:
+        raise ValueError("field texture set manifest differs from the Nitro archive")
     result = []
     for set_id, original in enumerate(archive):
         blob = bytearray(original)
@@ -365,10 +381,12 @@ def pack(directory, game, output):
 def main():
     if len(sys.argv) == 3 and sys.argv[1] == "extract":
         export(Path(sys.argv[2]))
+    elif len(sys.argv) == 4 and sys.argv[1] == "extract":
+        export(Path(sys.argv[2]), sys.argv[3])
     elif len(sys.argv) == 5 and sys.argv[1] == "pack":
         pack(Path(sys.argv[2]), sys.argv[3], sys.argv[4])
     else:
-        raise SystemExit(__doc__ + "\nextract OUTPUT_DIR\npack SOURCE_DIR black2|white2 OUTPUT")
+        raise SystemExit(__doc__ + "\nextract OUTPUT_DIR [ARCHIVE]\npack SOURCE_DIR black2|white2 OUTPUT")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,340 @@
+{
+  "nitro_sha256": "78f630f31868cde5c808d96da778643ad23a95ce2796307eb209d3cd8483fd84",
+  "textures": [
+    {
+      "name": "h_kage",
+      "kind": 1,
+      "palette_offset": 20364
+    },
+    {
+      "name": "idr_pc01",
+      "kind": 3,
+      "palette_offset": 20380
+    },
+    {
+      "name": "idr_pc02",
+      "kind": 3,
+      "palette_offset": 20412
+    },
+    {
+      "name": "idr_mat01",
+      "kind": 3,
+      "palette_offset": 20444
+    },
+    {
+      "name": "idr_tv01",
+      "kind": 3,
+      "palette_offset": 20460
+    },
+    {
+      "name": "idr_stair_u01",
+      "kind": 3,
+      "palette_offset": 20492
+    },
+    {
+      "name": "idr_table01",
+      "kind": 3,
+      "palette_offset": 20524
+    },
+    {
+      "name": "in40_isu",
+      "kind": 3,
+      "palette_offset": 20556
+    },
+    {
+      "name": "in40_kage",
+      "kind": 1,
+      "palette_offset": 20364
+    },
+    {
+      "name": "idr_shelf01",
+      "kind": 3,
+      "palette_offset": 20588
+    },
+    {
+      "name": "idr_shelf02",
+      "kind": 3,
+      "palette_offset": 20620
+    },
+    {
+      "name": "idr_shelf04",
+      "kind": 2,
+      "palette_offset": 20636
+    },
+    {
+      "name": "hh_shelf",
+      "kind": 3,
+      "palette_offset": 20652
+    },
+    {
+      "name": "idr_bed01",
+      "kind": 3,
+      "palette_offset": 20684
+    },
+    {
+      "name": "idr_sink01",
+      "kind": 4,
+      "palette_offset": 20716
+    },
+    {
+      "name": "idr_ref01",
+      "kind": 3,
+      "palette_offset": 20764
+    },
+    {
+      "name": "idr_plant01",
+      "kind": 3,
+      "palette_offset": 20780
+    },
+    {
+      "name": "hh_dust01",
+      "kind": 3,
+      "palette_offset": 20812
+    },
+    {
+      "name": "idr_poster01",
+      "kind": 3,
+      "palette_offset": 20828
+    },
+    {
+      "name": "h_mado",
+      "kind": 2,
+      "palette_offset": 20844
+    },
+    {
+      "name": "idr_win01",
+      "kind": 2,
+      "palette_offset": 20860
+    },
+    {
+      "name": "desk_book01",
+      "kind": 3,
+      "palette_offset": 20876
+    },
+    {
+      "name": "desk_book02",
+      "kind": 3,
+      "palette_offset": 20892
+    },
+    {
+      "name": "pc_desk01",
+      "kind": 3,
+      "palette_offset": 20924
+    },
+    {
+      "name": "pc_desk01_pc",
+      "kind": 3,
+      "palette_offset": 20908
+    },
+    {
+      "name": "desk01",
+      "kind": 3,
+      "palette_offset": 20956
+    },
+    {
+      "name": "kabin",
+      "kind": 3,
+      "palette_offset": 20988
+    },
+    {
+      "name": "cashier01",
+      "kind": 3,
+      "palette_offset": 21020
+    },
+    {
+      "name": "drock01",
+      "kind": 3,
+      "palette_offset": 21036
+    },
+    {
+      "name": "desk02a",
+      "kind": 3,
+      "palette_offset": 21052
+    },
+    {
+      "name": "art01a",
+      "kind": 3,
+      "palette_offset": 21084
+    },
+    {
+      "name": "gym_obj1",
+      "kind": 3,
+      "palette_offset": 21116
+    },
+    {
+      "name": "gym_obj2",
+      "kind": 2,
+      "palette_offset": 21132
+    },
+    {
+      "name": "d0stair_u01",
+      "kind": 3,
+      "palette_offset": 21148
+    },
+    {
+      "name": "d0stair_d01",
+      "kind": 3,
+      "palette_offset": 21180
+    },
+    {
+      "name": "jihan_01",
+      "kind": 3,
+      "palette_offset": 21212
+    },
+    {
+      "name": "r_box01",
+      "kind": 2,
+      "palette_offset": 21244
+    },
+    {
+      "name": "box02",
+      "kind": 3,
+      "palette_offset": 21260
+    },
+    {
+      "name": "chushion01a",
+      "kind": 3,
+      "palette_offset": 21292
+    },
+    {
+      "name": "chushion02a",
+      "kind": 3,
+      "palette_offset": 21308
+    },
+    {
+      "name": "warp03",
+      "kind": 3,
+      "palette_offset": 21324
+    },
+    {
+      "name": "warp_g",
+      "kind": 2,
+      "palette_offset": 21356
+    },
+    {
+      "name": "warp02",
+      "kind": 3,
+      "palette_offset": 21372
+    },
+    {
+      "name": "warp_b",
+      "kind": 2,
+      "palette_offset": 21404
+    },
+    {
+      "name": "warp01",
+      "kind": 3,
+      "palette_offset": 21420
+    },
+    {
+      "name": "shelf06",
+      "kind": 3,
+      "palette_offset": 21452
+    },
+    {
+      "name": "biri02.1",
+      "kind": 3,
+      "palette_offset": 21468
+    },
+    {
+      "name": "biri02.2",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri02.3",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri02.4",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri02.5",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri02.6",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri03.1",
+      "kind": 3,
+      "palette_offset": 21468
+    },
+    {
+      "name": "biri03.2",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri03.3",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri03.4",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri03.5",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "biri03.6",
+      "kind": 2,
+      "palette_offset": 21484
+    },
+    {
+      "name": "d6_deniwa01",
+      "kind": 3,
+      "palette_offset": 21500
+    },
+    {
+      "name": "d6_deniwa02",
+      "kind": 3,
+      "palette_offset": 21516
+    },
+    {
+      "name": "d6_deniwa03",
+      "kind": 3,
+      "palette_offset": 21548
+    },
+    {
+      "name": "d6hikari_01",
+      "kind": 1,
+      "palette_offset": 21580
+    },
+    {
+      "name": "d6hikari_02",
+      "kind": 1,
+      "palette_offset": 21580
+    },
+    {
+      "name": "d6kage_01",
+      "kind": 1,
+      "palette_offset": 21580
+    },
+    {
+      "name": "d6light_1",
+      "kind": 1,
+      "palette_offset": 21580
+    },
+    {
+      "name": "fishi_s",
+      "kind": 3,
+      "palette_offset": 21596
+    },
+    {
+      "name": "fishii_big.1",
+      "kind": 3,
+      "palette_offset": 21612
+    }
+  ]
+}
