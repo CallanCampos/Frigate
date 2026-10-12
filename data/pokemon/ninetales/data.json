@@ -159,5 +159,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 249,
-    "baby_species": "SPECIES_VULPIX"
+    "baby_species": "SPECIES_VULPIX",
+    "cry_volume": 110
 }

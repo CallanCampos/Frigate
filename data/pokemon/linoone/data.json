@@ -178,5 +178,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ZIGZAGOON"
+    "baby_species": "SPECIES_ZIGZAGOON",
+    "cry_volume": 120
 }

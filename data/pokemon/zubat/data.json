@@ -181,5 +181,6 @@
         }
     ],
     "regional_dex_number": 61,
-    "baby_species": "SPECIES_ZUBAT"
+    "baby_species": "SPECIES_ZUBAT",
+    "cry_volume": 110
 }

@@ -140,5 +140,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 152,
-    "baby_species": "SPECIES_ZORUA"
+    "baby_species": "SPECIES_ZORUA",
+    "cry_volume": 120
 }

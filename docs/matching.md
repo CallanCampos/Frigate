@@ -181,6 +181,9 @@ Same instructions, registers swapped.
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
   and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
   loop without the `NULL` test, matches with plain indexing.
+- A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
+  `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
+  every caller's narrowing with the definition before trusting a prototype written from one of them.
 
 ## Stack slots
 
@@ -772,10 +775,6 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   narrow in the other order.
 - `FX32_ONE` is an `int` constant in `nitro/fx.h` but a `long` in the SDK. Where a product of it is passed on,
   the type shows: `oekaki.c`'s `Oekaki_CreateActors` matches only with the sub surface's Y as `256 * 0x1000L`.
-
-## Branches and block layout
-
-- When both branches of an `if`/`else` give a local a constant, MWCC emits the then-value, branches over the else
 - Two identical expressions are merged into one spilled value, even across calls and loops. Where the original
   computes the value twice, the two sites differ in type: `pleasure_boat_rooms.c`'s `PleasureBoat_SetUpRooms` draws
   `NELEMS(sPeople) - (trainerCount + 2)` people, which is unsigned through `sizeof`, and later loops to the signed
@@ -785,6 +784,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   folds each field's offset into its store; a `PleasureBoatRoom *room` pointer keeps the base and the scaled index
   in registers and spills more (the same function's frame fell from 0x7c to 0x6c). The index must be a local when
   the array it comes from has had its address taken, or every store forces a reload of it.
+
+## Branches and block layout
+
+- When both branches of an `if`/`else` give a local a constant, MWCC emits the then-value, branches over the else
   value on the condition, and the else-value last, so the condition's direction decides which constant comes first:
   `b_bag_anm.c`'s button animation needs `if (button >= 10) palette = 2; else palette = 5;`, and `< 10`, a ternary
   or a default followed by an `if` all fail.
@@ -1205,16 +1208,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   after a file's larger tables, is the next file's first object: the 4 bytes at 0x021a773c in overlay 310 can't end
   `research_graph.c`, whose tables are larger, and as `research_common.c`'s global `ResearchCommon_Unused` they take
   a section of their own ahead of that file's 8-byte table, as the ROM has them.
-- `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
-  Medal Rally's `p_sv` does.
-- Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
-  a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.
 - A small table that sits among a file's other small `static const` tables but that no code loads from was a
   referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
   of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven
   values in case order, and the switch reading `sTrainerCounts[0]` to `[6]` compiles to the same `movs` while keeping
   the table. Its place among the packed tables is not definition order: defined between the room tables it came out
   one early, defined first it is where the ROM has it.
+- `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
+  Medal Rally's `p_sv` does.
+- Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
+  a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.
 - A table one element longer in the ROM than the code needs has a terminator: pml_item.c's `TM_MOVE_LIST` is 101 moves
   and a `MOVE_NONE`. Without it the next object starts 2 bytes early.
 
@@ -1237,6 +1240,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `const` on a pointer parameter lets MWCC hoist loads through it above later byte stores: the hit tests of
   `beacon_view.c` match only with a non-const `BeaconViewTouch *`, and the accessors of
   `fmission_log_accessor_fv.c` only with non-const entries.
+- A 2-aligned object right after a 2-byte constant that nothing reads shows both are in the shared section: the
+  constant is a global that unemitted code reads, not an unreferenced static, which would get a section of its own
+  and push the next one to a 4-byte boundary (`wifi_p2pmatch.c`'s `64 00` at the start of its `.rodata`).
+- When a file's equal-size tables and local initializers don't fall into the ROM's order with every table at the
+  top, each object can go either at the top or right before its first user; searching those placements with
+  `rodata_order.py`'s model found `wifi_p2pmatch.c`'s 39 objects in seconds. Functions that reach `.data` through
+  one section-relative anchor (`ldr =first; str [r, #n]`) need the `.data` objects defined in ROM order as well.
 
 ## When nothing moves it
 

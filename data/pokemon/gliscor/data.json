@@ -189,5 +189,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 222,
-    "baby_species": "SPECIES_GLIGAR"
+    "baby_species": "SPECIES_GLIGAR",
+    "cry_volume": 120
 }

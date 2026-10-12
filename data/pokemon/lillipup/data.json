@@ -131,5 +131,6 @@
         }
     ],
     "regional_dex_number": 22,
-    "baby_species": "SPECIES_LILLIPUP"
+    "baby_species": "SPECIES_LILLIPUP",
+    "cry_volume": 110
 }

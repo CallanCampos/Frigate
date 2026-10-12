@@ -182,5 +182,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 29,
-    "baby_species": "SPECIES_PSYDUCK"
+    "baby_species": "SPECIES_PSYDUCK",
+    "cry_volume": 110
 }

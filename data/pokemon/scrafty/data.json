@@ -146,5 +146,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 118,
-    "baby_species": "SPECIES_SCRAGGY"
+    "baby_species": "SPECIES_SCRAGGY",
+    "cry_volume": 120
 }

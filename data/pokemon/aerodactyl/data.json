@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_AERODACTYL"
+    "baby_species": "SPECIES_AERODACTYL",
+    "cry_volume": 110
 }

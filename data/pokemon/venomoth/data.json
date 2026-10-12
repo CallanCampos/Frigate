@@ -166,5 +166,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_VENONAT"
+    "baby_species": "SPECIES_VENONAT",
+    "cry_volume": 110
 }

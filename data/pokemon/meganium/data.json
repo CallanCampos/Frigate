@@ -170,5 +170,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CHIKORITA"
+    "baby_species": "SPECIES_CHIKORITA",
+    "cry_volume": 110
 }

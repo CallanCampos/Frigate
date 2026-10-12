@@ -125,5 +125,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 77,
-    "baby_species": "SPECIES_DRILBUR"
+    "baby_species": "SPECIES_DRILBUR",
+    "cry_volume": 120
 }

@@ -22,7 +22,7 @@ void WIFI_STATUS_SetGameMode(WIFI_STATUS *status, u8 gameMode) {
     status->gameMode = gameMode;
 }
 
-BOOL WIFI_STATUS_GetVChatStatus(const WIFI_STATUS *status) {
+u8 WIFI_STATUS_GetVChatStatus(const WIFI_STATUS *status) {
     return status->vchatStatus;
 }
 

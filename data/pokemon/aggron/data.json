@@ -202,5 +202,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 168,
-    "baby_species": "SPECIES_ARON"
+    "baby_species": "SPECIES_ARON",
+    "cry_volume": 120
 }

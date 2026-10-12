@@ -127,5 +127,6 @@
         }
     ],
     "regional_dex_number": 171,
-    "baby_species": "SPECIES_LARVESTA"
+    "baby_species": "SPECIES_LARVESTA",
+    "cry_volume": 125
 }

@@ -139,5 +139,6 @@
         }
     ],
     "regional_dex_number": 140,
-    "baby_species": "SPECIES_SOLOSIS"
+    "baby_species": "SPECIES_SOLOSIS",
+    "cry_volume": 120
 }

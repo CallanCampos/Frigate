@@ -114,5 +114,6 @@
         }
     ],
     "regional_dex_number": 157,
-    "baby_species": "SPECIES_SHELMET"
+    "baby_species": "SPECIES_SHELMET",
+    "cry_volume": 120
 }

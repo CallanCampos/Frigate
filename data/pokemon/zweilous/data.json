@@ -128,5 +128,6 @@
         }
     ],
     "regional_dex_number": 274,
-    "baby_species": "SPECIES_DEINO"
+    "baby_species": "SPECIES_DEINO",
+    "cry_volume": 120
 }

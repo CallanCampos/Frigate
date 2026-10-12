@@ -187,5 +187,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ABRA"
+    "baby_species": "SPECIES_ABRA",
+    "cry_volume": 110
 }

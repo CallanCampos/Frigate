@@ -132,5 +132,6 @@
         }
     ],
     "regional_dex_number": 195,
-    "baby_species": "SPECIES_CUBCHOO"
+    "baby_species": "SPECIES_CUBCHOO",
+    "cry_volume": 120
 }

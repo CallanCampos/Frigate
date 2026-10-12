@@ -168,5 +168,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MURKROW"
+    "baby_species": "SPECIES_MURKROW",
+    "cry_volume": 120
 }

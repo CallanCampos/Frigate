@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 209,
-    "baby_species": "SPECIES_DRIFLOON"
+    "baby_species": "SPECIES_DRIFLOON",
+    "cry_volume": 127
 }

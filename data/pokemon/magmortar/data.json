@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 55,
-    "baby_species": "SPECIES_MAGBY"
+    "baby_species": "SPECIES_MAGBY",
+    "cry_volume": 120
 }

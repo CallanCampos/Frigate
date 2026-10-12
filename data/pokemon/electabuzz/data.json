@@ -177,5 +177,6 @@
         }
     ],
     "regional_dex_number": 57,
-    "baby_species": "SPECIES_ELEKID"
+    "baby_species": "SPECIES_ELEKID",
+    "cry_volume": 105
 }

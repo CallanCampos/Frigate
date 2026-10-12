@@ -168,5 +168,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_HOOTHOOT"
+    "baby_species": "SPECIES_HOOTHOOT",
+    "cry_volume": 110
 }

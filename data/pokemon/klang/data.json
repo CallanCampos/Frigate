@@ -121,5 +121,6 @@
         }
     ],
     "regional_dex_number": 131,
-    "baby_species": "SPECIES_KLINK"
+    "baby_species": "SPECIES_KLINK",
+    "cry_volume": 120
 }

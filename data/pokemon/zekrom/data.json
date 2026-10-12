@@ -137,5 +137,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 296,
-    "baby_species": "SPECIES_ZEKROM"
+    "baby_species": "SPECIES_ZEKROM",
+    "cry_volume": 120
 }

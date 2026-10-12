@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CACNEA"
+    "baby_species": "SPECIES_CACNEA",
+    "cry_volume": 120
 }

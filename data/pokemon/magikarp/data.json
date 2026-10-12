@@ -119,5 +119,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MAGIKARP"
+    "baby_species": "SPECIES_MAGIKARP",
+    "cry_volume": 110
 }

@@ -178,5 +178,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 65,
-    "baby_species": "SPECIES_GRIMER"
+    "baby_species": "SPECIES_GRIMER",
+    "cry_volume": 110
 }

@@ -116,5 +116,6 @@
         }
     ],
     "regional_dex_number": 109,
-    "baby_species": "SPECIES_RUFFLET"
+    "baby_species": "SPECIES_RUFFLET",
+    "cry_volume": 120
 }

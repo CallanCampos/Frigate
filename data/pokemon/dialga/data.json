@@ -185,5 +185,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_DIALGA"
+    "baby_species": "SPECIES_DIALGA",
+    "cry_volume": 125
 }

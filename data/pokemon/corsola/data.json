@@ -187,5 +187,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 237,
-    "baby_species": "SPECIES_CORSOLA"
+    "baby_species": "SPECIES_CORSOLA",
+    "cry_volume": 110
 }

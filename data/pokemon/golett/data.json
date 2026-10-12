@@ -135,5 +135,6 @@
         }
     ],
     "regional_dex_number": 271,
-    "baby_species": "SPECIES_GOLETT"
+    "baby_species": "SPECIES_GOLETT",
+    "cry_volume": 120
 }

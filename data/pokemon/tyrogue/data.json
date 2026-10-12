@@ -176,5 +176,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_TYROGUE"
+    "baby_species": "SPECIES_TYROGUE",
+    "cry_volume": 110
 }

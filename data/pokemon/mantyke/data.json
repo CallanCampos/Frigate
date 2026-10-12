@@ -169,5 +169,6 @@
         }
     ],
     "regional_dex_number": 233,
-    "baby_species": "SPECIES_MANTYKE"
+    "baby_species": "SPECIES_MANTYKE",
+    "cry_volume": 120
 }

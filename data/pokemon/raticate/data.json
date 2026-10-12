@@ -176,5 +176,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 60,
-    "baby_species": "SPECIES_RATTATA"
+    "baby_species": "SPECIES_RATTATA",
+    "cry_volume": 110
 }

@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SNUBBULL"
+    "baby_species": "SPECIES_SNUBBULL",
+    "cry_volume": 110
 }

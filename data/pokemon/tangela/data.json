@@ -185,5 +185,6 @@
         }
     ],
     "regional_dex_number": 217,
-    "baby_species": "SPECIES_TANGELA"
+    "baby_species": "SPECIES_TANGELA",
+    "cry_volume": 110
 }

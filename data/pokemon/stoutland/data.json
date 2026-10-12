@@ -125,5 +125,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 24,
-    "baby_species": "SPECIES_LILLIPUP"
+    "baby_species": "SPECIES_LILLIPUP",
+    "cry_volume": 120
 }

@@ -177,5 +177,6 @@
         }
     ],
     "regional_dex_number": 164,
-    "baby_species": "SPECIES_NOSEPASS"
+    "baby_species": "SPECIES_NOSEPASS",
+    "cry_volume": 120
 }

@@ -182,5 +182,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_OMANYTE"
+    "baby_species": "SPECIES_OMANYTE",
+    "cry_volume": 110
 }

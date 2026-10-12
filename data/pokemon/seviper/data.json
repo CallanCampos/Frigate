@@ -181,5 +181,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 187,
-    "baby_species": "SPECIES_SEVIPER"
+    "baby_species": "SPECIES_SEVIPER",
+    "cry_volume": 120
 }

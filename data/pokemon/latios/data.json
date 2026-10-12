@@ -193,5 +193,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_LATIOS"
+    "baby_species": "SPECIES_LATIOS",
+    "cry_volume": 120
 }
