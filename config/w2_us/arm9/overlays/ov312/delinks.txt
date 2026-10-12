@@ -2,3 +2,8 @@
     .rodata     start:0x0217ebdc end:0x0217eda8 kind:rodata align:4
     .ctor       start:0x0217eda8 end:0x0217eda8 kind:rodata align:4
     .bss        start:0x0217edc0 end:0x0217edc0 kind:bss align:32
+
+src/ov312/geonet.c:
+    complete
+    .text       start:0x0217c980 end:0x0217ebdc
+    .rodata     start:0x0217ebdc end:0x0217eda8

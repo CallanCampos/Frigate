@@ -301,7 +301,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
     case 11:
         GFL_OvlLoad(OVERLAY_WIFICLUB_MAIN);
         GFL_OvlLoad(OVERLAY_APP_UI);
-        func_ov173_021a6240(wk->club->buffer);
+        WIFI_STATUS_SetMyMac(wk->club->buffer);
         if (wk->btlSetup != NULL) {
             BtlSetup_Free(wk->btlSetup);
             wk->btlSetup = NULL;

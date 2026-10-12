@@ -34,7 +34,7 @@ GameEventReturnCode func_ov033_02179e28(GameEvent *event, u32 *state, void *data
     switch (*state) {
     case 0:
         next =
-            EventFieldSubprocessTransition_Create(work->gsys, work->field, 0x13f, &data_ov319_0219f6f8, work->subwork);
+            EventFieldSubprocessTransition_Create(work->gsys, work->field, 0x13f, &gManualProcFunctions, work->subwork);
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;

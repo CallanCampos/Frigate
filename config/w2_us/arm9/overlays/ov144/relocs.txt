@@ -178,7 +178,7 @@ from:0x0219d928 kind:thumb_call to:0x0204c58c module:main
 from:0x0219d932 kind:thumb_call to:0x0204c4cc module:main
 from:0x0219d942 kind:thumb_call to:0x0204c4b4 module:main
 from:0x0219d956 kind:thumb_call to:0x02199c48 module:overlays(36,139,167,264)
-from:0x0219d970 kind:load to:0x02199c99 module:overlays(139,258)
+from:0x0219d970 kind:load to:0x02199c99 module:overlay(139)
 from:0x0219d982 kind:thumb_call_arm to:0x020787d4 module:main
 from:0x0219d99a kind:thumb_call to:0x0204c16c module:main
 from:0x0219d9a6 kind:thumb_call to:0x0204c16c module:main

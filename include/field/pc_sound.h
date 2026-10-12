@@ -23,6 +23,6 @@ GameEvent *func_ov033_02179b24(GameEvent *parent, GameSystem *gsys, Field *field
 GameEvent *func_ov033_02179868(GameSystem *gsys, u16 option, u16 *result);
 GameEventReturnCode func_ov033_021798a0(GameEvent *event, u32 *state, void *data);
 
-extern const GameProcFunctions data_ov182_021bd8e4;
+extern const GameProcFunctions DENDOU_PC_PROC_FUNCTIONS;
 
 #endif // POKEBW2_FIELD_PC_SOUND_H

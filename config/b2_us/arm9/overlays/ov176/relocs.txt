@@ -205,7 +205,7 @@ from:0x0219b794 kind:thumb_call to:0x02006254 module:main
 from:0x0219b79e kind:thumb_call to:0x0219aa60 module:overlay(175)
 from:0x0219b7ac kind:thumb_call to:0x02199a14 module:overlays(36,175)
 from:0x0219b7c8 kind:thumb_call to:0x0219b5bc module:overlay(176)
-from:0x0219b7d6 kind:thumb_call to:0x02199a6c module:overlays(175,259)
+from:0x0219b7d6 kind:thumb_call to:0x02199a6c module:overlay(175)
 from:0x0219b7ea kind:thumb_call to:0x02199d28 module:overlays(139,175)
 from:0x0219b7fa kind:thumb_call to:0x02199d3c module:overlay(175)
 from:0x0219b806 kind:thumb_call to:0x02016ad8 module:main

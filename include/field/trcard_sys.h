@@ -126,9 +126,9 @@ u8 func_ov012_02169c10(TrainerCardData *data);
 extern const GameProcFunctions data_ov012_0216dd6c;
 
 // Overlay 186, the trainer card screen
-BOOL func_ov186_021a75a0(GameProc *proc, u32 *state, void *param, void *work);
-BOOL func_ov186_021a7864(GameProc *proc, u32 *state, void *param, void *work);
-BOOL func_ov186_021a7a20(GameProc *proc, u32 *state, void *param, void *work);
-extern const GameProcFunctions data_ov186_021ad288;
+BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work);
+BOOL TrainerCard_Main(GameProc *proc, u32 *state, void *param, void *work);
+BOOL TrainerCard_Exit(GameProc *proc, u32 *state, void *param, void *work);
+extern const GameProcFunctions BADGE_VIEW_PROC_FUNCTIONS;
 
 #endif // POKEBW2_FIELD_TRCARD_SYS_H

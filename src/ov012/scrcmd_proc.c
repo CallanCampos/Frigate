@@ -221,14 +221,14 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     data = func_ov012_02169c7c(HEAPID_GAMEEVENT);
     data->pkm = pkm;
     data->playerInfo = playerInfo;
-    data->unk08 = NULL;
+    data->trainerData = NULL;
     data->gsys = gsys;
     data->moves = moves;
-    data->unk19 = 1;
+    data->mode = MOVE_REMINDER_MODE_REMEMBER;
     work = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ScriptProcCallbackWork), FALSE, "scrcmd_proc.c", 411);
     work->resource = data;
     work->data = result;
-    ScriptWork_CallEvent(scriptWork, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_MOVE_REMINDER, &data_ov258_0219b9a8, data,
+    ScriptWork_CallEvent(scriptWork, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_MOVE_REMINDER, &WazaOshieProcFunctions, data,
                                                    func_ov012_02157728, work));
     return TRUE;
 }

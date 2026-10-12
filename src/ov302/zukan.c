@@ -118,10 +118,10 @@ typedef struct {
 
 typedef u32 (*ZukanStateFunc)(ZukanWork *work);
 
-extern const GameProcFunctions data_ov299_021a25c8;
+extern const GameProcFunctions ZukanList_ProcFunctions;
 extern const GameProcFunctions ZukanSearch_ProcFunctions;
-extern const GameProcFunctions data_ov303_021a32d8;
-extern const GameProcFunctions data_ov304_021a1dac;
+extern const GameProcFunctions ZukanHabitat_ProcFunctions;
+extern const GameProcFunctions ZukanAreaList_ProcFunctions;
 
 static BOOL Zukan_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Zukan_Main(GameProc *proc, u32 *state, void *param, void *work);
@@ -299,7 +299,7 @@ static u32 Zukan_StateList(ZukanWork *work) {
         list->list = work->list;
         list->count = work->count;
     }
-    QueueGameProc(work->procManager, OVERLAY_ID(299), &data_ov299_021a25c8, work->subParam);
+    QueueGameProc(work->procManager, OVERLAY_ID(299), &ZukanList_ProcFunctions, work->subParam);
     return Zukan_SetNextState(work, STATE_AFTER_LIST);
 }
 
@@ -476,7 +476,7 @@ static u32 Zukan_StateHabitat(ZukanWork *work) {
     } else {
         ZukanCommon_BuildHabitatList(habitat, habitatList, FALSE);
     }
-    QueueGameProc(work->procManager, OVERLAY_ID(303), &data_ov303_021a32d8, habitatList);
+    QueueGameProc(work->procManager, OVERLAY_ID(303), &ZukanHabitat_ProcFunctions, habitatList);
     return Zukan_SetNextState(work, STATE_AFTER_HABITAT);
 }
 
@@ -531,7 +531,7 @@ static u32 Zukan_StateAwards(ZukanWork *work) {
     Zukan_FreeList(work);
     Zukan_FreeHabitatList(work);
     ZukanCommon_BuildHabitatSummary(habitat, summary);
-    QueueGameProc(work->procManager, OVERLAY_ID(304), &data_ov304_021a1dac, summary);
+    QueueGameProc(work->procManager, OVERLAY_ID(304), &ZukanAreaList_ProcFunctions, summary);
     return Zukan_SetNextState(work, STATE_AFTER_AWARDS);
 }
 

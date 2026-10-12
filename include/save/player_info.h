@@ -53,6 +53,6 @@ void func_02008bf8(PlayerInfo *info, u8 value);
 u8 TrainerInfo_GetRegion(PlayerInfo *info);
 void func_02008c00(PlayerInfo *info, u8 value);
 void func_02008c08(PlayerInfo *info, u8 value);
-void func_02008c14(PlayerInfo *info, u8 a1, u8 a2);
+void func_02008c14(PlayerInfo *info, int a1, int a2);
 
 #endif // POKEBW2_SAVE_PLAYER_INFO_H

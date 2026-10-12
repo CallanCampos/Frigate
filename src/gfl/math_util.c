@@ -21,11 +21,11 @@ fx16 func_02044330(u16 degrees) {
     return FX_CosIdx(degrees * 0xffff / 360);
 }
 
-fx16 func_02044360(int degrees) {
+fx16 func_02044360(u16 degrees) {
     return FX_SinIdx(degrees % 360 * 0xffff / 360);
 }
 
-fx16 func_02044388(int degrees) {
+fx16 func_02044388(u16 degrees) {
     return FX_CosIdx(degrees % 360 * 0xffff / 360);
 }
 

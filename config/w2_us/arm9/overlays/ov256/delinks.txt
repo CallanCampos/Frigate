@@ -2,3 +2,31 @@
     .rodata     start:0x021bd924 end:0x021bdc18 kind:rodata align:4
     .ctor       start:0x021bdc18 end:0x021bdc18 kind:rodata align:4
     .bss        start:0x021bdc20 end:0x021bdc20 kind:bss align:32
+
+src/ov256/dendou_pc.c:
+    complete
+    .text       start:0x021bb740 end:0x021bb798
+    .rodata     start:0x021bd924 end:0x021bd930
+
+src/ov256/dpc_main.c:
+    complete
+    .text       start:0x021bb798 end:0x021bbd50
+    .rodata     start:0x021bd930 end:0x021bda30
+
+src/ov256/dpc_seq.c:
+    complete
+    .text       start:0x021bbd50 end:0x021bc754
+    .rodata     start:0x021bda30 end:0x021bda68
+
+src/ov256/dpc_bmp.c:
+    complete
+    .text       start:0x021bc754 end:0x021bcec8
+
+src/ov256/dpc_obj.c:
+    .text       start:0x021bcec8 end:0x021bd788
+    .rodata     start:0x021bda68 end:0x021bdc04
+
+src/ov256/dpc_ui.c:
+    complete
+    .text       start:0x021bd788 end:0x021bd924
+    .rodata     start:0x021bdc04 end:0x021bdc18

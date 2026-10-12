@@ -95,10 +95,8 @@ extern const FieldProcLink FIELD_PROC_LINK_LIST[15];
 
 // The procs of FIELD_PROC_LINK_LIST's apps that no header declares yet
 extern const GameProcFunctions data_ov012_0216dd78;
-extern const GameProcFunctions data_ov140_0219eecc;
+extern const GameProcFunctions CONFIG_PANEL_PROC_FUNCTIONS;
 extern const GameProcFunctions TOWNMAP_PROC_FUNCTIONS;
-extern const GameProcFunctions data_ov189_021ae03c;
-extern const GameProcFunctions data_ov143_021a039c;
 extern const GameProcFunctions MEDALBOX_PROC_FUNCTIONS;
 
 // Overlay 12: the trainer card's param, whose canEdit is FALSE in the Union Room

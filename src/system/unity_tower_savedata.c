@@ -26,12 +26,12 @@ UnityTowerSurveySave *getUnityTower_SurveySaveBlkAddrress(SaveControl *save) {
 }
 
 // Makes the player's own country and region, recorded as UNITY_TOWER_REGION_OWN
-void func_02009b84(UnityTowerSurveySave *save, PlayerInfo *info, u8 country, u8 region) {
+void func_02009b84(UnityTowerSurveySave *save, PlayerInfo *info, int country, int region) {
     func_02008c14(info, country, region);
     func_02009be0(save, country, region, UNITY_TOWER_REGION_OWN);
 }
 
-u32 func_02009ba4(UnityTowerSurveySave *save, u8 country, u8 region) {
+u32 func_02009ba4(UnityTowerSurveySave *save, int country, int region) {
     s32 r = region;
     if (country == COUNTRY_NONE) {
         return UNITY_TOWER_REGION_NONE;
@@ -39,7 +39,7 @@ u32 func_02009ba4(UnityTowerSurveySave *save, u8 country, u8 region) {
     return (save->regions[r / 4 + (country - 1) * 16] >> ((r % 4) * 2)) & 3;
 }
 
-void func_02009be0(UnityTowerSurveySave *save, u8 country, u8 region, u32 state) {
+void func_02009be0(UnityTowerSurveySave *save, int country, int region, u32 state) {
     s32 r = region;
     u8 *byte;
     u32 shift;

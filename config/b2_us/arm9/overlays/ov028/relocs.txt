@@ -326,7 +326,7 @@ from:0x02171ccc kind:thumb_call to:0x02016d68 module:main
 from:0x02171cdc kind:thumb_call to:0x020193a4 module:main
 from:0x02171ce4 kind:thumb_call to:0x0203ce0c module:main
 from:0x02171cec kind:thumb_call to:0x0201736c module:main
-from:0x02171cfa kind:thumb_call to:0x0217c940 module:overlays(35,69,253,312,338)
+from:0x02171cfa kind:thumb_call to:0x0217c940 module:overlay(69)
 from:0x02171d1c kind:thumb_call to:0x02040440 module:main
 from:0x02171d24 kind:thumb_call to:0x02040624 module:main
 from:0x02171d2a kind:thumb_call to:0x02040440 module:main

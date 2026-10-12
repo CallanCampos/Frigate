@@ -21,7 +21,7 @@ void *func_02010cb8(SaveControl *save) {
     return MedalBox_GetHabitatList(SaveControl_GetMedalBox(save));
 }
 
-u8 func_02010cc4(void *data, u8 habitat, u8 type) {
+u8 func_02010cc4(void *data, u8 habitat, u32 type) {
     ZukanHabitatSave *save = data;
 
     switch (type) {
@@ -35,15 +35,15 @@ u8 func_02010cc4(void *data, u8 habitat, u8 type) {
     return 0;
 }
 
-BOOL func_02010cfc(ZukanHabitatSave *save, u32 habitat) {
+BOOL func_02010cfc(ZukanHabitatSave *save, u8 habitat) {
     return save->habitats[habitat].flag;
 }
 
-void func_02010d08(ZukanHabitatSave *save, u32 habitat) {
+void func_02010d08(ZukanHabitatSave *save, u8 habitat) {
     save->habitats[habitat].flag = TRUE;
 }
 
-void func_02010d14(ZukanHabitatSave *save, u32 habitat, u32 type, u32 value) {
+void func_02010d14(ZukanHabitatSave *save, u8 habitat, u32 type, u32 value) {
     switch (type) {
     case ZUKAN_HABITAT_TYPE_0:
         save->habitats[habitat].type0 = (u8)value;
@@ -81,7 +81,7 @@ u8 func_02010d88(void *data) {
     return save->season;
 }
 
-void func_02010d90(void *data, u8 type) {
+void func_02010d90(void *data, u16 type) {
     ZukanHabitatSave *save = data;
 
     save->type = type;

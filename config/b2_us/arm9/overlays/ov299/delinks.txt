@@ -2,3 +2,32 @@
     .rodata     start:0x021a25c8 end:0x021a29f4 kind:rodata align:4
     .ctor       start:0x021a29f4 end:0x021a29f4 kind:rodata align:4
     .bss        start:0x021a2a00 end:0x021a2a00 kind:bss align:32
+
+src/ov299/zukanlist.c:
+    complete
+    .text       start:0x0219fbc0 end:0x0219fc14
+    .rodata     start:0x021a25c8 end:0x021a25d4
+
+src/ov299/zknlist_main.c:
+    .text       start:0x0219fc14 end:0x021a05dc
+    .rodata     start:0x021a25d4 end:0x021a27a0
+
+src/ov299/zknlist_seq.c:
+    complete
+    .text       start:0x021a05dc end:0x021a0ec0
+    .rodata     start:0x021a27a0 end:0x021a27c4
+
+src/ov299/zknlist_bmp.c:
+    complete
+    .text       start:0x021a0ec0 end:0x021a13f0
+    .rodata     start:0x021a27c4 end:0x021a27e8
+
+src/ov299/zknlist_obj.c:
+    complete
+    .text       start:0x021a13f0 end:0x021a23a4
+    .rodata     start:0x021a27e8 end:0x021a296c
+
+src/ov299/zknlist_ui.c:
+    complete
+    .text       start:0x021a23a4 end:0x021a25c8
+    .rodata     start:0x021a296c end:0x021a29f4

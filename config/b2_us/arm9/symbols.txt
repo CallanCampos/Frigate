@@ -7766,7 +7766,7 @@ mod64Signed kind:function(arm,size=0x1c0) addr:0x0208d404
 _ll_sdiv kind:label(arm) addr:0x0208d414
 __aeabi_uldivmod kind:function(arm,size=0x48) addr:0x0208d5c4
 _ll_udiv kind:label(arm) addr:0x0208d5c4
-.L_0208d5d0 kind:label(arm) addr:0x0208d5d0
+_ull_mod kind:label(arm) addr:0x0208d5d0
 _ull_mul kind:function(arm,size=0x20) addr:0x0208d60c
 _ll_mul kind:label(arm) addr:0x0208d60c
 __aeabi_llsl kind:function(arm,size=0x30) addr:0x0208d62c
@@ -8131,8 +8131,6 @@ data_02094548 kind:data(any) addr:0x02094548
 FS_COMMAND_DEFAULT kind:data(any) addr:0x02094588
 FS_VTABLE_BASE kind:data(any) addr:0x020945bc
 FX_SIN_COS_TABLE kind:data(any) addr:0x020946bc
-data_020947fc kind:data(any) addr:0x020947fc
-data_0209497c kind:data(any) addr:0x0209497c
 data_02094bfc kind:data(any) addr:0x02094bfc
 data_020955bc kind:data(any) addr:0x020955bc
 data_020955fc kind:data(any) addr:0x020955fc
