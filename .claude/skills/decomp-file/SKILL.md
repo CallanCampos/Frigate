@@ -14,6 +14,25 @@ One original file per pass, committed when done, then on to the next in address 
   leave them alone. Check whether you are in a worktree (`git worktree list`).
 - The workstream's memory file says what was done last and what is next. The next file is the one after the last
   committed file in address order, unless the user named one. Don't ask which file to do.
+- Before changing an overlay file or assigning it to a writing agent, claim the overlay issue as described below.
+  Read-only scouting can happen first to identify the overlay. The caller claims once for the overlay; agents
+  working under that claim do not post separate claims.
+
+### Claim the overlay
+
+For overlay `ov033`, find the exact open issue title `[Decomp] Overlay 033` in
+`gh issue list --repo fuddlesworth/pokebw2 --state open --label decompilation --limit 500 --json number,title`.
+Read its comments with `gh issue view NUMBER --repo fuddlesworth/pokebw2 --comments`. An explicit claim, including
+ordinary wording such as "I'm working on this", counts until that commenter releases it or the issue closes. If
+another active claim exists, leave this overlay alone and pick the next unclaimed one. When the user named this
+overlay, report the claim instead of silently switching. If the issue is missing or GitHub cannot be checked, stop
+before editing the overlay and report that the claim could not be checked.
+
+If unclaimed, post `Claiming overlay 033 for decompilation; starting with FILE_OR_RANGE` with
+`gh issue comment NUMBER --repo fuddlesworth/pokebw2 --body '...'`. Read the comments again immediately. If another
+claim was posted first, comment that you withdraw yours and switch overlays (or report the conflict for a named
+overlay). Keep the issue URL in the workstream's memory. Comment `Releasing my claim on overlay 033` when you stop
+working on it before completion; an overlay completed in full can have its issue closed instead.
 
 ## 1. Boundaries, name and place
 
