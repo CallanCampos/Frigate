@@ -186,7 +186,7 @@ static void BattleSelect_SetupPokeList(BattleSelectParam *param, BattleSelectWor
 
     GameData_GetSaveControl(param->gameData);
     PokeListParam_Setup(pokeList, param->gameData, 0x1a, param->party);
-    func_0201f63c(regulation, pokeList->party);
+    PokeRegulation_ApplyLevelToParty(regulation, pokeList->party);
     pokeList->regulation = regulation;
     switch (regulation->unkBA) {
     case 0:

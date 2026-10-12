@@ -597,7 +597,7 @@ static void MusicalMcss_Load(MusicalMcssSys *sys, int index, MCSSLoadInfo *info,
     load->charFile = GFL_G2DIOReadBGNCGR(info->arcId, info->character, TRUE, &load->chars, mcss->heapId);
     load->plttFile = GFL_G2DIOReadNCLR(info->arcId, info->palette, &load->pltt, mcss->heapId);
     if (info->bin == MUSICAL_POKEGRA_SPINDA_BIN) {
-        func_0201c1b4(load->chars->rawData, info->unk20);
+        MCSS_DrawSpindaSpots(load->chars->rawData, info->unk20);
     }
     if (atVBlank == TRUE) {
         GFL_VBlankTCBAdd(MusicalMcss_LoadTask, load, 0);

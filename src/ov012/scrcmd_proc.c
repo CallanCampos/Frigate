@@ -228,7 +228,7 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     work = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ScriptProcCallbackWork), FALSE, "scrcmd_proc.c", 411);
     work->resource = data;
     work->data = result;
-    ScriptWork_CallEvent(scriptWork, func_020196d0(gsys, field, OVERLAY_MOVE_REMINDER, &data_ov258_0219b9a8, data,
+    ScriptWork_CallEvent(scriptWork, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_MOVE_REMINDER, &data_ov258_0219b9a8, data,
                                                    func_ov012_02157728, work));
     return TRUE;
 }

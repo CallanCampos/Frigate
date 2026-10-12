@@ -993,7 +993,6 @@ from:0x021adeb6 kind:thumb_call to:0x0204b98c module:main
 from:0x021adebe kind:thumb_call to:0x0204bcd0 module:main
 from:0x021adec8 kind:thumb_call to:0x0204be64 module:main
 from:0x021aded0 kind:thumb_call to:0x0204c108 module:main
-from:0x021adee4 kind:load to:0x02090505 module:main
 from:0x021adefc kind:load to:0x021b0501 module:overlays(189,257)
 from:0x021ae03c kind:load to:0x021a9b61 module:overlay(204)
 from:0x021ae040 kind:load to:0x021a9be9 module:overlay(204)

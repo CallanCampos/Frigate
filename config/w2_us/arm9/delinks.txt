@@ -1474,3 +1474,85 @@ src/system/zonedata.c:
     .rodata     start:0x0209009c end:0x0209014c
     .data       start:0x0209a388 end:0x0209a3c0
     .bss        start:0x02141150 end:0x02141154
+
+src/system/zone_spawn.c:
+    complete
+    .text       start:0x02018fe8 end:0x020191c0
+
+src/system/event_work.c:
+    complete
+    .text       start:0x020191c0 end:0x02019310
+    .bss        start:0x02141154 end:0x0214115c
+
+src/system/field_dir.c:
+    complete
+    .text       start:0x02019310 end:0x0201931c
+    .rodata     start:0x0209014c end:0x02090150
+
+src/system/field_status.c:
+    complete
+    .text       start:0x0201931c end:0x0201937c
+    .data       start:0x0209a3c0 end:0x0209a3d0
+
+src/system/field_event.c:
+    complete
+    .text       start:0x0201937c end:0x02019830
+
+src/system/field_light_status.c:
+    complete
+    .text       start:0x02019830 end:0x02019a14
+    .rodata     start:0x02090150 end:0x0209018c
+
+src/system/mcss.c:
+    .text       start:0x02019a14 end:0x0201c008
+    .rodata     start:0x0209018c end:0x020901a4
+    .data       start:0x0209a3d0 end:0x0209a3d8
+
+src/system/mcss_tool.c:
+    complete
+    .text       start:0x0201c008 end:0x0201c2d8
+    .rodata     start:0x020901a4 end:0x0209037c
+    .data       start:0x0209a3d8 end:0x0209a3e8
+
+src/system/poke_regulation.c:
+    .text       start:0x0201f0a8 end:0x0201fd24
+    .rodata     start:0x02090520 end:0x02090560
+    .data       start:0x0209a3f4 end:0x0209a408
+
+src/system/pokeparty.c:
+    .text       start:0x0201fd24 end:0x02020234
+    .data       start:0x0209a408 end:0x0209a414
+
+src/system/poke_personal.c:
+    .text       start:0x02020234 end:0x0202053c
+    .data       start:0x0209a414 end:0x0209a424
+    .bss        start:0x02141428 end:0x02141430
+
+src/system/pokerus.c:
+    complete
+    .text       start:0x0202053c end:0x020207b4
+
+src/system/shinka_check.c:
+    complete
+    .text       start:0x020207b4 end:0x02020ca4
+    .data       start:0x0209a424 end:0x0209a444
+
+src/system/poke_friendship.c:
+    complete
+    .text       start:0x02020ca4 end:0x02020e24
+    .rodata     start:0x02090560 end:0x02090578
+
+src/system/poke_recover.c:
+    complete
+    .text       start:0x02020e24 end:0x02020f6c
+
+src/system/poke_icon.c:
+    complete
+    .text       start:0x02020f6c end:0x020212ac
+    .rodata     start:0x02090578 end:0x0209086c
+
+src/system/waza_tool.c:
+    complete
+    .text       start:0x020212ac end:0x020219a0
+    .data       start:0x0209a444 end:0x0209a450
+    .bss        start:0x02141430 end:0x02141458

@@ -506,7 +506,7 @@ static void GSyncDisp_DeleteActors(GSyncDisp *disp) {
 static void GSyncDisp_LoadPokeIconRes(GSyncDisp *disp) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, disp->heapId);
 
-    disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON] = func_0204bc48(arc, func_02021114(), CLACT_VRAM_BOTH, 0, disp->heapId);
+    disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_BOTH, 0, disp->heapId);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC, disp->heapId);
     disp->res[GSYNC_DISP_RES_CELL_POKE_ICON] = func_0204bde0(arc, 14, 27, disp->heapId);
@@ -520,7 +520,7 @@ void GSyncDisp_CreatePokeIcon(GSyncDisp *disp, BoxPkm *pkm, u32 surface) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, disp->heapId);
 
     disp->res[GSYNC_DISP_RES_CHAR_POKE_ICON] =
-        func_0204b81c(arc, func_02020f40(pkm), FALSE, CLACT_VRAM_BOTH, disp->heapId);
+        func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm), FALSE, CLACT_VRAM_BOTH, disp->heapId);
     if (surface == CLACT_SURFACE_MAIN) {
         setup.x = x[1];
         setup.y = y[1];
@@ -536,7 +536,7 @@ void GSyncDisp_CreatePokeIcon(GSyncDisp *disp, BoxPkm *pkm, u32 surface) {
                       disp->res[GSYNC_DISP_RES_CELL_POKE_ICON], &setup, surface, disp->heapId);
     func_0204c520(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], FALSE);
     func_0204c124(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
-    func_0204c378(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], func_020210c0(pkm), 1);
+    func_0204c378(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], PokeIcon_GetPaletteOfPkm(pkm), 1);
     GFL_ArcToolFree(arc);
 }
 
@@ -838,7 +838,7 @@ void GSyncDisp_LoadFloatGraphics(GSyncDisp *disp) {
         if (species != SPECIES_NONE) {
             int sex = disp->floats[index].sex;
             u32 form = PML_PkmSanitizeForme(species, disp->floats[index].form);
-            u32 paletteNum = func_02021034(species, form, sex, FALSE);
+            u32 paletteNum = PokeIcon_GetPalette(species, form, sex, FALSE);
             u16 icon = PokeParty_GetIconIndex(species, form, sex, FALSE);
 
             file = GFL_ArcToolReadHeapNew(iconArc, icon, disp->heapId);

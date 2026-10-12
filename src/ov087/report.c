@@ -474,11 +474,11 @@ static void Report_CreateActors(ReportScreen *wk) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     for (i = 0; i < count; i++) {
-        wk->chars[i] = func_0204b81c(arc, func_02020f40(func_0201d624(PokeParty_GetPkm(party, i))), FALSE,
+        wk->chars[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(PokeParty_GetPkm(party, i))), FALSE,
                                      CLACT_VRAM_SUB, wk->heapId);
     }
-    wk->palettes[0] = func_0204bc48(arc, func_02021114(), CLACT_VRAM_SUB, 0, wk->heapId);
-    wk->cellAnims[0] = func_0204bde0(arc, func_0202111c(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->palettes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
+    wk->cellAnims[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(193, wk->heapId);
@@ -495,7 +495,7 @@ static void Report_CreateActors(ReportScreen *wk) {
                                       CLACT_SURFACE_SUB, wk->heapId);
         func_0204c124(wk->actors[i], FALSE);
         setup.x += 32;
-        func_0204c378(wk->actors[i], func_020210c0(func_0201d624(pkm)), TRUE);
+        func_0204c378(wk->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), TRUE);
     }
 
     setup = sReportActorSetups[1];

@@ -380,8 +380,8 @@ static void func_ov255_021cf84c(Box2AppWork *app) {
 static void func_ov255_021cf8b8(Box2AppWork *app) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_BOX2_APP);
 
-    app->palRes[0] = func_0204bc48(arc, func_02021118(), CLACT_VRAM_MAIN, 0x60, HEAPID_BOX2_APP);
-    app->cellRes[0] = func_0204bde0(arc, func_0202111c(), getOBJTileMapping_MainEng(), HEAPID_BOX2_APP);
+    app->palRes[0] = func_0204bc48(arc, PokeIcon_GetAltPaletteFile(), CLACT_VRAM_MAIN, 0x60, HEAPID_BOX2_APP);
+    app->cellRes[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_BOX2_APP);
     GFL_ArcToolFree(arc);
 }
 
@@ -404,7 +404,7 @@ static void func_ov255_021cf904(Box2AppWork *app) {
 }
 
 static void *func_ov255_021cf9a4(Box2AppWork *app, BoxPkm *pkm, NNSG2dCharacterData **chr) {
-    return GFL_G2DIOReadOBJNCGRArc(app->pokeIconArc, func_02020f40(pkm), FALSE, chr, HEAPID_BOX2_APP);
+    return GFL_G2DIOReadOBJNCGRArc(app->pokeIconArc, PokeIcon_GetFileOfPkm(pkm), FALSE, chr, HEAPID_BOX2_APP);
 }
 
 void func_ov255_021cf9c8(Box2SysWork *syswk, u32 tray) {
@@ -481,7 +481,7 @@ static BOOL func_ov255_021cfa9c(Box2SearchParam *search, BoxPkm *pkm) {
 
 static u32 func_ov255_021cfba0(Box2SysWork *syswk, BoxPkm *pkm) {
     if (func_ov255_021cfa9c(&syswk->search, pkm)) {
-        return func_020210c0(pkm);
+        return PokeIcon_GetPaletteOfPkm(pkm);
     }
     return 3;
 }

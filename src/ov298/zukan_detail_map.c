@@ -1229,8 +1229,8 @@ static void ZukanDetailMap_LoadIconResources(ZukanDetailMapParam *param, ZukanDe
                                              ZukanDetailCommon *common) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, param->heapId);
 
-    wk->iconPalette = func_0204bc48(arc, func_02021114(), CLACT_VRAM_SUB, 0, param->heapId);
-    wk->iconCellAnims = func_0204bde0(arc, func_02021154(), getOBJTileMapping_SubEng(), param->heapId);
+    wk->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, param->heapId);
+    wk->iconCellAnims = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -1254,7 +1254,7 @@ static ClActor *ZukanDetailMap_CreateIcon(u32 *chars, u32 palette, u32 cellAnims
     *chars = func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, egg), FALSE, CLACT_VRAM_SUB, heapId);
     actor = func_0204c040(unit, *chars, palette, cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
     func_0204c520(actor, FALSE);
-    func_0204c378(actor, func_02021034(species, form, sex, egg), 0);
+    func_0204c378(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     func_0204c318(actor, 0);
     GFL_ArcToolFree(arc);
     return actor;

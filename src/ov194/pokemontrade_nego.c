@@ -338,8 +338,8 @@ void func_ov194_021bc29c(PokemonTradeWork *wk, int side, int index) {
 void func_ov194_021bc2d0(PokemonTradeWork *wk, u32 vram) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
     u16 offset = vram == 1 ? 0x60 : 0;
-    wk->objRes[TRADE_OBJRES_PLTT_NEGO] = func_0204bc48(arc, func_02021114(), vram, offset, wk->heapId);
-    wk->objRes[TRADE_OBJRES_CELL_NEGO] = func_0204bde0(arc, func_02021154(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->objRes[TRADE_OBJRES_PLTT_NEGO] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), vram, offset, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CELL_NEGO] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(arc);
 }
 

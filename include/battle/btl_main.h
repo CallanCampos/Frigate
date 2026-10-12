@@ -376,7 +376,7 @@ void *func_ov167_0219db00(BtlMainModule *mainModule);
 BOOL func_ov167_0219db08(BtlMainModule *mainModule);
 BOOL func_ov167_0219db28(BtlMainModule *mainModule);
 void func_ov167_0219db64(BtlMainModule *mainModule, BattleMon *mon);
-void func_ov167_0219db7c(BtlMainModule *mainModule, BattleMon *mon, u32 value);
+void func_ov167_0219db7c(BtlMainModule *mainModule, BattleMon *mon, u16 item);
 void func_ov167_0219dc00(BtlMainModule *mainModule, BattleMon *mon);
 void func_ov167_0219dc10(BtlMainModule *mainModule);
 BOOL func_ov167_0219de6c(BtlMainModule *mainModule);

@@ -351,12 +351,12 @@ void LoadZoneFlyPosToVecFx32(u16 zoneId, VecFx32 *position) {
     position->z = header->flyZ << (FX32_SHIFT + 4);
 }
 
-void LoadZoneFlyPosRailCoords(u16 zoneId, ZoneFlyRailPosition *position) {
+void LoadZoneFlyPosRailCoords(u16 zoneId, VecFx32 *position) {
     ZoneHeader *header = ZoneData_GetHeader(zoneId);
 
-    position->componentId = header->flyX;
-    position->posFront = header->flyY;
-    position->posSide = header->flyZ;
+    position->x = header->flyX;
+    position->y = header->flyY;
+    position->z = header->flyZ;
 }
 
 u32 ZoneData_GetObjectProjectionMatrixType(u16 zoneId) {

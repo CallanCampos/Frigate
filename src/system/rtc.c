@@ -50,14 +50,14 @@ static const u8 day_part[SEASON_COUNT][24] = {
     },
 };
 
-u16 GetRealTimeDayPeriod(u8 season) {
+u16 GetRealTimeDayPeriod(int season) {
     RTCTime time;
 
     RTC_GetCachedTime(&time);
     return GetDayPeriod(season, time.hour);
 }
 
-u16 GetDayPeriod(u8 season, u32 hour) {
+u16 GetDayPeriod(int season, u32 hour) {
     return day_part[season][hour];
 }
 
@@ -65,7 +65,7 @@ u8 GetLightChangeHoursForSeasons(u32 season, u32 period) {
     return LIGHT_CHANGE_HOURS[season][period];
 }
 
-BOOL IsDayPeriodNight(u8 season) {
+BOOL IsDayPeriodNight(int season) {
     switch (GetRealTimeDayPeriod(season)) {
     case DAY_PERIOD_NIGHT:
     case DAY_PERIOD_MIDNIGHT:

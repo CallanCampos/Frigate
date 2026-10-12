@@ -80,18 +80,83 @@ u32 Regulation_GetParam(Regulation *regulation, u32 param);
 // Whether a bit of one of the regulation's bit arrays is set
 BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index);
 void func_0200b760(Regulation *regulation, RegulationUnkAC *out);
-// Reads a regulation from arc 106
-void func_0201f744(u32 fileId, Regulation *regulation);
-// Allocates a regulation read from arc 106
-Regulation *func_0201f734(u32 fileId, HeapID heapId);
+// poke_regulation.c, which the ROM names: checks of Pokémon and parties against a regulation. Names are not swan's
+
+// What a party fails a regulation by, which PokeRegulation_CheckPicked, PokeRegulation_CheckPartyCanEnter and PokeRegulation_CheckParty return
+enum {
+    REGULATION_RESULT_OK,
+    // The levels of the Pokémon add up to more than the regulation allows
+    REGULATION_RESULT_LEVEL_TOTAL,
+    REGULATION_RESULT_SAME_SPECIES,
+    REGULATION_RESULT_SAME_ITEM,
+    // Too few Pokémon
+    REGULATION_RESULT_COUNT,
+    // A Pokémon the regulation doesn't allow
+    REGULATION_RESULT_POKEMON,
+    REGULATION_RESULT_6,
+    // The Pokémon the regulation asks for is missing
+    REGULATION_RESULT_REQUIRED
+};
+
+// Every reason a Pokémon or a party fails a regulation, as bits
+enum {
+    REGULATION_FAIL_COUNT = 1 << 0,
+    REGULATION_FAIL_LEVEL = 1 << 1,
+    REGULATION_FAIL_SPECIES = 1 << 2,
+    REGULATION_FAIL_SAME_SPECIES = 1 << 3,
+    REGULATION_FAIL_SAME_ITEM = 1 << 4,
+    REGULATION_FAIL_EGG = 1 << 5,
+    REGULATION_FAIL_ITEM = 1 << 6,
+    REGULATION_FAIL_REQUIRED = 1 << 7,
+    REGULATION_FAIL_LEVEL_TOTAL = 1 << 8,
+    REGULATION_FAIL_MOVE = 1 << 9,
+    REGULATION_FAIL_TYPE = 1 << 10
+};
+
+// A rule on top of a regulation, for PokeRegulation_CheckPokemonExtraRule
+typedef struct {
+    // The type a Pokémon must have, or TYPE_NULL
+    u8 type;
+    // Whether Metronome, Torment and Transform are banned
+    u8 banMoves;
+    // A banned move, or MOVE_NONE
+    u16 move;
+} RegulationExtraRule;
+
+// The rules of a regulation as text: the message data and, for each of the six rules, its name and its value
+typedef struct {
+    MsgData *msgData;
+    StrBuf *rule[6];
+    StrBuf *value[6];
+    // Whether the Wonder Launcher is on
+    u8 launcher;
+} RegulationPrintMsg;
+
+// Checks a Pokémon against the regulation and the extra rule, returning the REGULATION_FAIL_* bits, 0 if it may join
+u32 PokeRegulation_CheckPokemonExtraRule(Regulation *regulation, RegulationExtraRule *rule, PartyPkm *pkm);
 // Checks the Pokémon picked from a party, by their slots from 1, against the regulation
-// Checks a Pokémon against the regulation, returning 0 if it may join
-u32 func_0201f14c(Regulation *regulation, void *a1, PartyPkm *pkm);
-u32 func_0201f1e8(Regulation *regulation, PokeParty *party, const u8 *picked);
-u32 func_0201f268(Regulation *regulation, PokeParty *party);
-u32 func_0201f424(Regulation *regulation, PokeParty *party, u32 *a2);
-// Picks Pokémon of a party that the regulation allows, by their slots from 1, and returns how many it picked
-u32 func_0201f97c(Regulation *regulation, PokeParty *party, u8 *picked);
+u32 PokeRegulation_CheckPicked(Regulation *regulation, PokeParty *party, const u8 *picked);
+// Whether a team that the regulation allows can be picked from the party: REGULATION_RESULT_OK,
+// REGULATION_RESULT_COUNT or REGULATION_RESULT_LEVEL_TOTAL
+u32 PokeRegulation_CheckPartyCanEnter(Regulation *regulation, PokeParty *party);
+// Checks a whole party against the regulation, setting the REGULATION_FAIL_* bits of every reason it fails by
+u32 PokeRegulation_CheckParty(Regulation *regulation, PokeParty *party, u32 *flags);
+// Sets the level of the party's Pokémon that the regulation changes the level of
+void PokeRegulation_ApplyLevelToParty(Regulation *regulation, PokeParty *party);
+// Gives the party's Pokémon their species' names unless the regulation allows nicknames
+void PokeRegulation_ApplyNicknamesToParty(Regulation *regulation, PokeParty *party, HeapID heapId);
+// Whether the party has an egg
+BOOL PokeRegulation_PartyHasEgg(Regulation *regulation, PokeParty *party);
+// Allocates a regulation read from arc 106
+Regulation *PokeRegulation_LoadNew(u32 fileId, HeapID heapId);
+// Reads a regulation from arc 106
+void PokeRegulation_Load(u32 fileId, Regulation *regulation);
+// The regulation's rules as text (a RegulationPrintMsg). launcher is used when the regulation leaves the Wonder
+// Launcher to the players
+void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, HeapID heapId, BOOL launcher);
+void PokeRegulation_FreePrintMsg(void *printMsg);
+// Picks Pokémon of a party that the regulation allows, by their slots from 1, and returns whether it found a team
+BOOL PokeRegulation_PickTeam(Regulation *regulation, PokeParty *party, u8 *picked);
 // Values out of the parameter's range are ignored
 void Regulation_SetParam(Regulation *regulation, u32 param, int value);
 

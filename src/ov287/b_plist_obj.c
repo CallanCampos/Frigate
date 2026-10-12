@@ -139,14 +139,14 @@ static void BPlistObj_LoadPokeIconRes(BPlistWork *wk) {
         BPlistPokemon *pkm = &wk->pokemon[i];
         u32 file;
         if (pkm->species != 0) {
-            file = func_02020f40(func_0201d624(pkm->pkm));
+            file = PokeIcon_GetFileOfPkm(func_0201d624(pkm->pkm));
         } else {
             file = PokeParty_GetIconIndex(0, 0, 0, FALSE);
         }
         wk->charRes[i] = func_0204b81c(arc, file, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
     }
-    wk->plttRes[0] = func_0204bc48(arc, func_02021114(), CLACT_VRAM_SUB, 0, wk->param->heapId);
-    wk->cellRes[0] = func_0204bde0(arc, func_02021154(), getOBJTileMapping_SubEng(), wk->param->heapId);
+    wk->plttRes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->param->heapId);
+    wk->cellRes[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -255,7 +255,7 @@ static void BPlistObj_SetPokeIconPalettes(BPlistWork *wk) {
         if (wk->pokemon[i].species != 0) {
             func_0204c378(
                 wk->pokeIcons[i],
-                func_02021034(wk->pokemon[i].species, wk->pokemon[i].form, wk->pokemon[i].sex, wk->pokemon[i].isEgg),
+                PokeIcon_GetPalette(wk->pokemon[i].species, wk->pokemon[i].form, wk->pokemon[i].sex, wk->pokemon[i].isEgg),
                 1);
         }
     }

@@ -385,11 +385,11 @@ static void ThAward_InitIcons(ThAwardWork *wk) {
         form = record->pokemon[i].form;
         sex = record->pokemon[i].sex;
         if (i == 0) {
-            wk->icons[i].palette = func_0204bc48(arc, func_02021114(), 0, 0x20, wk->heapId);
+            wk->icons[i].palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 0, 0x20, wk->heapId);
         }
         wk->icons[i].chars =
             func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE, 0, wk->heapId);
-        wk->icons[i].cellAnims = func_0204bde0(arc, func_0202111c(), getOBJTileMapping_MainEng(), wk->heapId);
+        wk->icons[i].cellAnims = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
         sys_memset(&setup, 0, sizeof(setup));
         setup.x = positions[i].x;
         setup.y = positions[i].y;
@@ -397,7 +397,7 @@ static void ThAward_InitIcons(ThAwardWork *wk) {
                                           wk->icons[0].palette, wk->icons[i].cellAnims, &setup, 0, wk->heapId);
         func_0204c488(wk->iconActors[i], 1);
         func_0204c520(wk->iconActors[i], FALSE);
-        func_0204c378(wk->iconActors[i], func_02021034(species, form, sex, FALSE), 0);
+        func_0204c378(wk->iconActors[i], PokeIcon_GetPalette(species, form, sex, FALSE), 0);
     }
     GFL_ArcToolFree(arc);
 }

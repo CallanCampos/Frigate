@@ -24,7 +24,7 @@ typedef union {
 struct ZoneSpawnInfo {
     u32 changeType;
     s16 zoneId;
-    u16 warpId;
+    s16 warpId;
     s16 warpDir;
     u16 posWeightBits;
     BOOL isRail;
@@ -123,12 +123,6 @@ struct ZoneWarp {
     } pos;
 };
 
-// Where Fly lands in a zone with rails, as LoadZoneFlyPosRailCoords gives it
-typedef struct {
-    s32 componentId;
-    s32 posFront;
-    s32 posSide;
-} ZoneFlyRailPosition;
 
 extern const RespawnZoneInfo RESPAWN_ZONE_INFO[82];
 // Tables of zonedata.c that no code of the ROM reads
@@ -195,7 +189,7 @@ u16 CalcWarpTransferAddend(u32 posWeightBits, u32 warpDirection, BOOL isRail, u3
 void CreateZoneChangeData(ZoneSpawnInfo *spawn, u32 zoneId, s16 warpDir, s32 x, s32 y, s32 z);
 void CreateZoneChangeDataRail(ZoneSpawnInfo *spawn, u16 zoneId, s16 warpDir, u16 componentId, u16 posFront,
                               s16 posSide);
-void SetupZoneSpawnInfoWarp(ZoneSpawnInfo *spawn, u16 zoneId, u16 warpId, u32 direction);
+void SetupZoneSpawnInfoWarp(ZoneSpawnInfo *spawn, u16 zoneId, u16 warpId, u32 posWeightBits);
 void SetupWarpParamByWarp(ZoneWarp *warp, ZoneSpawnInfo *spawn, u32 direction);
 u32 GetInTransitionTypeBetweenZones(u16 fromZone, u16 toZone);
 BOOL GetIsZoneMatrix0(u16 zoneId);
@@ -290,7 +284,7 @@ u32 GetZoneStaticLightDataIndex(u16 zoneId);
 u16 GetCameraIDForZone(u16 zoneId);
 // The position Fly lands at
 void LoadZoneFlyPosToVecFx32(u16 zoneId, VecFx32 *position);
-void LoadZoneFlyPosRailCoords(u16 zoneId, ZoneFlyRailPosition *position);
+void LoadZoneFlyPosRailCoords(u16 zoneId, VecFx32 *position);
 // Whether Fly lands on a rail in the zone
 BOOL IsZonesWithRailsArrayHasZoneID(u16 zoneId);
 // Whether the zone is one of the Battle Subway's two
@@ -301,7 +295,7 @@ u32 GetZoneLocNameDispType(u16 zoneId);
 u32 GetZoneEasyChallengeModeLevelAdjust(u16 zoneId);
 u16 GetZoneNameIcon(u16 zoneId);
 u32 GetMapTransitionEffectType(u16 zoneId);
-void GetPlayerZoneStateWPos(ZoneSpawnInfo *spawn, VecFx32 *pos);
+void GetPlayerZoneStateWPos(const ZoneSpawnInfo *spawn, VecFx32 *pos);
 void SetPlayerZoneStateWPos(ZoneSpawnInfo *spawn, const VecFx32 *pos);
 
 #endif // POKEBW2_FIELD_ZONE_H

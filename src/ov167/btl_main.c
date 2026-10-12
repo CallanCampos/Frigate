@@ -3295,7 +3295,7 @@ void func_ov167_0219db64(BtlMainModule *mainModule, BattleMon *mon) {
     func_ov167_0219f2c0(mainModule->server, mon);
 }
 
-void func_ov167_0219db7c(BtlMainModule *mainModule, BattleMon *mon, u32 value) {
+void func_ov167_0219db7c(BtlMainModule *mainModule, BattleMon *mon, u16 item) {
     u8 monId;
     const BattleMon *param1;
     const BattleMon *param2;
@@ -3309,8 +3309,8 @@ void func_ov167_0219db7c(BtlMainModule *mainModule, BattleMon *mon, u32 value) {
     src1 = GetSrcData(param1);
     src2 = GetSrcData(param2);
     field = GetFieldEffectData(mainModule);
-    func_02020c8c(src1, value, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
-    func_02020c8c(src2, value, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
+    FriendshipManagerCalcItem(src1, item, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
+    FriendshipManagerCalcItem(src2, item, field->env.zoneId, HEAPID_TAIL(mainModule->heapId));
 }
 
 void func_ov167_0219dc00(BtlMainModule *mainModule, BattleMon *mon) {
@@ -3345,7 +3345,7 @@ void func_ov167_0219dc10(BtlMainModule *mainModule) {
         func_ov167_0219d07c(&mainModule->pokeCons[1], mainModule, mainModule->playerClientId);
         party = func_ov167_0219d138(&mainModule->pokeCons[1], mainModule->playerClientId);
         if (mainModule->setup->battleType == 1 && func_ov167_021bd788(func_ov167_0219d938(mainModule, 1))) {
-            func_02020cf0(party, GetFieldEffectData(mainModule)->env.zoneId, HEAPID_TAIL(mainModule->heapId));
+            FriendshipManagerCalcParty(party, GetFieldEffectData(mainModule)->env.zoneId, HEAPID_TAIL(mainModule->heapId));
         }
         if (mainModule->setup->battleType == 1) {
             count = PokeParty_GetPkmCount(party);

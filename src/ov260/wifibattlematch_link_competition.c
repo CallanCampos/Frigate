@@ -1032,8 +1032,8 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
         }
         invalidFlags = 0;
         regulation = func_0200b530(link->entry);
-        invalid = func_0201f424(regulation, (PokeParty *)player->partyData, &invalidFlags);
-        otherInvalid = func_0201f6e8(regulation, (PokeParty *)player->partyData);
+        invalid = PokeRegulation_CheckParty(regulation, (PokeParty *)player->partyData, &invalidFlags);
+        otherInvalid = PokeRegulation_PartyHasEgg(regulation, (PokeParty *)player->partyData);
         if (invalid == 0 && otherInvalid == 0) {
             *seq = 15;
         } else {
@@ -1597,7 +1597,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
     case 16:
         flags = 0;
         regulation = func_0200b530(link->entry);
-        if (func_0201f424(regulation, (PokeParty *)param->otherPlayer->partyData, &flags) == 0) {
+        if (PokeRegulation_CheckParty(regulation, (PokeParty *)param->otherPlayer->partyData, &flags) == 0) {
             *seq = 17;
         } else {
             link->unkE4++;

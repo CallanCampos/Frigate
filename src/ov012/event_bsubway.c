@@ -212,7 +212,7 @@ GameEvent *func_ov012_02165f70(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental)
         break;
     }
     PokeListParam_Setup(partyParam, gameData, 0x16, party);
-    partyParam->regulation = func_0201f734(regulationId, HEAPID_GAMEEVENT);
+    partyParam->regulation = PokeRegulation_LoadNew(regulationId, HEAPID_GAMEEVENT);
     partyParam->unk48 = mode;
     InitSummaryParam(data, party, gameData);
     return event;

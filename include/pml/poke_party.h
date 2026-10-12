@@ -44,6 +44,16 @@ struct PartyPkm {
     u32 unkD8;
 };
 
+// The party: its Pokémon, and a flag of each slot
+#define PARTY_SIZE 6
+
+struct PokeParty {
+    s32 capacity;
+    s32 count;
+    PartyPkm pkms[PARTY_SIZE];
+    u8 slotExists;
+};
+
 // The four blocks of a Pokémon's data, which PML_PkmGetParamBlockCore finds
 typedef struct {
     u16 species;
@@ -130,11 +140,11 @@ void PokeParty_CreatePkm(PartyPkm *pkm, u16 species, u16 level, u64 trainerId, s
 void PokeParty_SetHiddenAbil(PartyPkm *pkm, u32 species, u32 form);
 void PokeParty_SetDefaultMoves(PartyPkm *pkm);
 void FriendshipManagerCalc(PartyPkm *pkm, u32 reason, u16 zoneId, u16 heapId);
-void func_02020c8c(PartyPkm *pkm, u32 value, u16 zoneId, HeapID heapId);
+void FriendshipManagerCalcItem(PartyPkm *pkm, u16 item, u16 zoneId, HeapID heapId);
 // Whether a move's PP is below its maximum, and restoring amount of it
-BOOL PokeParty_CheckPPNeedsReplenish(PartyPkm *pkm, u32 slot);
+u8 PokeParty_CheckPPNeedsReplenish(PartyPkm *pkm, u32 slot);
 BOOL PokeParty_AddPP(PartyPkm *pkm, u32 slot, u32 amount);
-void func_02020cf0(PokeParty *party, u16 zoneId, HeapID heapId);
+void FriendshipManagerCalcParty(PokeParty *party, u16 zoneId, HeapID heapId);
 // Read and write a field of a Pokémon, PKM_PARAM_*. Fields that are not numbers go through the buffer
 // A field of a Pokémon, PKM_PARAM_*. The functions take it as an enum, swan's PkmField, and MWCC doesn't share a sum
 // that makes one between two calls, as it would an integer
@@ -200,7 +210,7 @@ void copyPartyPkm(const PartyPkm *src, PartyPkm *dest);
 // Resets the nickname to the species' name
 void setNicknameToNick(PartyPkm *pkm);
 u32 PML_UtilDerivePkmSex(u16 species, u16 form, u32 pid);
-void copyPkmIntoPartyBlk(PokeParty *party, u32 index, const PartyPkm *pkm);
+void copyPkmIntoPartyBlk(PokeParty *party, u32 index, PartyPkm *pkm);
 // Changes a Pokémon into another species, as evolution does
 void setChangedPkmSpecies(PartyPkm *pkm, u32 species);
 // Hatches an egg, recording where and by whom
@@ -218,7 +228,6 @@ u32 getExpForPkm_Wrapper(PartyPkm *pkm);
 // Whether a Pokémon can learn the TM or HM of the number PML_ItemGetTMBitMask gives
 BOOL canPkmLearnTM_Wrapper(PartyPkm *pkm, u8 tm);
 void setLevel(PartyPkm *pkm, u32 level);
-u32 PokeParty_GetLevel(PartyPkm *pkm);
 // Gives a Pokémon of the party Pokérus at random
 void pokerusHandler(PokeParty *party);
 // Counts down the Pokérus of the party's Pokémon by days
@@ -228,23 +237,20 @@ void pokerusSpread(PokeParty *party);
 void PokeParty_SetNature(PartyPkm *pkm, u32 nature);
 void setPkmBattleData(PartyPkm *pkm, u32 param, u32 value);
 // A Pokémon's icon in ARCID_POKEICON: its characters' file and its palette
-u32 func_02020f40(BoxPkm *pkm);
-u32 func_020210c0(BoxPkm *pkm);
+u32 PokeIcon_GetFileOfPkm(BoxPkm *pkm);
+u32 PokeIcon_GetPaletteOfPkm(BoxPkm *pkm);
 // The files of the icons' palette, cells and animations in ARCID_POKEICON
-u32 func_02021118(void);
-u32 func_0202111c(void);
+u32 PokeIcon_GetAltPaletteFile(void);
+u32 PokeIcon_GetCellFile_Main(void);
 u32 getOBJTileMapping_MainEng(void);
 // A species with its form and sex in one u16
-// The palette of a Pokémon's icon
-u32 func_020210c0(BoxPkm *pkm);
 // The icons' palette and cell files, for the OBJ mapping in use
-u32 func_02021114(void);
-u32 func_02021154(void);
-u32 getOBJTileMapping_MainEng(void);
-u16 func_02021204(u32 species, u32 form, u32 sex);
+u32 PokeIcon_GetPaletteFile(void);
+u32 PokeIcon_GetCellFile_Sub(void);
+u16 PokeIcon_PackSpecies(u32 species, u32 form, u32 sex);
 // A Pokémon icon's character file in its archive, and its palette
 u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg);
-u32 func_02021034(u32 species, u32 form, u32 sex, BOOL egg);
+u32 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
 // The level, 0 to 4, of a Pokémon's Pokéstar fame
 int func_0201f010(u8 fame);
 PartyPkm *PokeParty_GetPkm(PokeParty *party, u32 index);
@@ -263,18 +269,18 @@ int countAllEggsInParty(PokeParty *party);
 int countSanityEggsInParty(PokeParty *party);
 int PokeParty_GetCapacity(PokeParty *party);
 BOOL PokeParty_AddPkm(PokeParty *party, PartyPkm *pkm);
-void PokeParty_SwapPkms(PokeParty *party, u32 indexA, u32 indexB, HeapID heapId);
-void PokeParty_RemovePkm(PokeParty *party, u32 index);
-void PokeParty_SwapPkms(PokeParty *party, u32 index1, u32 index2, HeapID heapId);
+// Both return a constant: TRUE for the removal, FALSE for the swap
+BOOL PokeParty_RemovePkm(PokeParty *party, u32 index);
+BOOL PokeParty_SwapPkms(PokeParty *party, u32 indexA, u32 indexB, HeapID heapId);
 // Reorders the party: order[i] is the index of the Pokémon that goes to position i
 void func_0201fff8(PokeParty *party, u32 *order, HeapID heapId);
 void PokeParty_RecoverAll(PokeParty *party);
-// A Pokémon's icon in archive 7: its file, and the palette of the file func_02021114 returns that it uses. The cells
-// and animations depend on the sub engine's OBJ VRAM mapping: func_02021154 and getOBJTileMapping_SubEng return them
+// A Pokémon's icon in archive 7: its file, and the palette of the file PokeIcon_GetPaletteFile returns that it uses. The cells
+// and animations depend on the sub engine's OBJ VRAM mapping: PokeIcon_GetCellFile_Sub and getOBJTileMapping_SubEng return them
 u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg);
-u32 func_02021034(u32 species, u32 form, u32 sex, BOOL egg);
-u32 func_02021114(void);
-u32 func_02021154(void);
+u32 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
+u32 PokeIcon_GetPaletteFile(void);
+u32 PokeIcon_GetCellFile_Sub(void);
 u32 getOBJTileMapping_SubEng(void);
 void PokeParty_ChangeForme(PartyPkm *pkm, u16 forme);
 // The form of Arceus for a plate, and of Genesect for a drive
@@ -312,6 +318,7 @@ void setNicknameToNick(PartyPkm *pkm);
 BOOL hasPokemonChangedForm(BoxPkm *pkm);
 // The number of Pokémon in the party that can battle: not fainted and not eggs
 int countActivePkms(PokeParty *party);
+BOOL CheckSpeciesInParty(PokeParty *party, u32 species);
 PartyPkm *PokeParty_NewPkm(u16 species, u16 level, u32 trainerId, u32 a3, s32 a4, u64 pid, HeapID heapId);
 void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 season);
 
