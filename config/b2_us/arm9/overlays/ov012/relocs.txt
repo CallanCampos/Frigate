@@ -2506,7 +2506,7 @@ from:0x021596f6 kind:thumb_call to:0x02017394 module:main
 from:0x021596fc kind:thumb_call to:0x020175b4 module:main
 from:0x02159704 kind:thumb_call to:0x02016af0 module:main
 from:0x02159708 kind:thumb_call to:0x021812b0 module:overlay(36)
-from:0x0215970c kind:thumb_call to:0x021c1dd4 module:overlays(36,268)
+from:0x0215970c kind:thumb_call to:0x021c1dd4 module:overlay(36)
 from:0x02159714 kind:thumb_call to:0x02016af0 module:main
 from:0x02159718 kind:thumb_call to:0x021804c0 module:overlay(36)
 from:0x0215973a kind:thumb_call to:0x02153684 module:overlay(12)

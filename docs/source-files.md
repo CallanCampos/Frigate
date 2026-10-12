@@ -2026,7 +2026,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 259
 
-217 of 318 functions are in source files. Embedded names without a file yet: `local_tvt_callselect.c`, `local_tvt_util.c`.
+318 of 318 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -2036,6 +2036,8 @@ prints the tables below from the configs and the ROM:
 | `local_tvt_callmode.c` | `0x0219ac00`–`0x0219b3f4` | 16 | complete | string at `0x021a097c` |
 | `local_tvt_graphic.c` | `0x0219b3f4`–`0x0219b630` | 14 | complete | string at `0x021a0994` |
 | `local_tvt_message.c` | `0x0219b630`–`0x0219be0c` | 29 | complete | string at `0x021a09a8` |
+| `local_tvt_util.c` | `0x0219be0c`–`0x0219d558` | 51 | partial | string at `0x021a09bc` |
+| `local_tvt_callselect.c` | `0x0219d558`–`0x0219e3f0` | 50 | complete | string at `0x021a09d0` |
 | `local_tvt_calldata.c` | `0x0219e3f0`–`0x0219e70c` | 23 | complete | string at `0x021a09e8` |
 | `local_tvt_person.c` | `0x0219e70c`–`0x0219e908` | 8 | complete | string at `0x021a0a00` |
 | `local_tvt_person_support.c` | `0x0219e908`–`0x0219ee18` | 8 | complete | string at `0x021a0a14` |
@@ -2135,7 +2137,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 268
 
-59 of 191 functions are in source files. Embedded names without a file yet: `br_codein.c`.
+191 of 191 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -2143,6 +2145,16 @@ prints the tables below from the configs and the ROM:
 | `br_menu_proc.c` | `0x021ba4f8`–`0x021ba7a0` | 4 | complete | descriptive |
 | `br_record_proc.c` | `0x021ba7a0`–`0x021bc1e0` | 30 | complete | descriptive |
 | `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | partial | descriptive |
+| `br_rndmatch_proc.c` | `0x021bd02c`–`0x021bd804` | 11 | complete | descriptive |
+| `br_bvrank_proc.c` | `0x021bd804`–`0x021be790` | 20 | partial | descriptive |
+| `br_bvsearch_proc.c` | `0x021be790`–`0x021bf37c` | 19 | complete | descriptive |
+| `br_codein_proc.c` | `0x021bf37c`–`0x021bf540` | 3 | complete | descriptive |
+| `br_codein.c` | `0x021bf540`–`0x021bf6b8` | 8 | complete | string at `0x021c284c` |
+| `br_codein_disp.c` | `0x021bf6b8`–`0x021c004c` | 18 | complete | descriptive |
+| `br_codein_pv.c` | `0x021c004c`–`0x021c0afc` | 16 | complete | descriptive |
+| `br_bvsend_proc.c` | `0x021c0afc`–`0x021c0ea4` | 6 | complete | descriptive |
+| `br_bvdelete_proc.c` | `0x021c0ea4`–`0x021c13f8` | 11 | complete | descriptive |
+| `br_bvsave_proc.c` | `0x021c13f8`–`0x021c20e8` | 20 | partial | descriptive |
 
 ### Overlay 269
 
