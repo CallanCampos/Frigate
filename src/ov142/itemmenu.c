@@ -610,7 +610,7 @@ static void ItemMenu_StateUseRepel(ItemMenuWork *work) {
             u8 steps = GetItemParam(work->item, ITEM_PARAM_HOLD_PARAM, work->heapId);
 
             EncountSave_SetRepelSteps(encount, steps);
-            func_0200ddf0(encount, work->item);
+            EncountSave_SetUsedRepelItemID(encount, work->item);
             ItemMenu_SubItem(work, 1);
             GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_Used, work->strbuf);
             copyVarForText(work->wordSet, 0, work->playerInfo);

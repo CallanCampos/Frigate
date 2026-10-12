@@ -1197,3 +1197,42 @@ src/system/regulation.c:
 src/system/gimmick_savedata.c:
     complete
     .text       start:0x0200ba84 end:0x0200bb00
+
+src/system/encounter_savedata.c:
+    complete
+    .text       start:0x0200dcec end:0x0200de34
+
+src/system/gds_profile.c:
+    .text       start:0x0200de34 end:0x0200e0f0
+    .data       start:0x0209a1bc end:0x0209a1cc
+
+src/system/bsubway_savedata.c:
+    complete
+    .text       start:0x0200e0f0 end:0x0200e864
+    .data       start:0x0209a1cc end:0x0209a1e0
+
+src/system/rndmatch_savedata.c:
+    complete
+    .text       start:0x0200e864 end:0x0200e8bc
+
+src/system/musical_dist_save.c:
+    .text       start:0x0200cc94 end:0x0200ce50
+    .data       start:0x0209a1a8 end:0x0209a1bc
+
+src/system/cgear_picture_save.c:
+    complete
+    .text       start:0x0200ce50 end:0x0200ce8c
+
+src/system/pokedex.c:
+    .text       start:0x0200ce8c end:0x0200dcec
+    .rodata     start:0x0208f80c end:0x0208f974
+
+src/system/symbol_save.c:
+    complete
+    .text       start:0x0200e8bc end:0x0200ec00
+    .rodata     start:0x0208f974 end:0x0208f984
+    .data       start:0x0209a1e0 end:0x0209a1f0
+
+src/system/survey_savedata.c:
+    complete
+    .text       start:0x0200ec00 end:0x0200ee20

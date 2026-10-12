@@ -29,7 +29,7 @@ BOOL WbtCmd_AwardBattlePoints(VM *vm, FieldScriptEnv *env) {
     u16 battlePoints = WbtMakeMatch_GetBattlePoints(sys);
 
     if (battlePoints != 0) {
-        func_0200e318(func_ov056_021e75c0(env), battlePoints);
+        BSubwayScoreData_AddBattlePoints(func_ov056_021e75c0(env), battlePoints);
         RecordAdd(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))), 0x21,
                   battlePoints);
     }

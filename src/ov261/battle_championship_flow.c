@@ -871,7 +871,7 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         if (BattleChampionshipFlow_MenuIsPrinted(menu) == TRUE) {
             score = func_0201795c(menu->param.gameData);
             points = func_02017b8c(menu->param.gameData);
-            func_0200e318(score, points);
+            BSubwayScoreData_AddBattlePoints(score, points);
             func_02017bb4(menu->param.gameData);
             if (points != 0) {
                 RecordAdd(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(menu->param.gameData)), 0x21, points);

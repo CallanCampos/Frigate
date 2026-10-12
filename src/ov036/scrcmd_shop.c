@@ -773,7 +773,7 @@ static u32 ShopUI_GetBalance(ShopUIWork *wk) {
         return BagSave_GetItemCountByID(wk->bag, MOVE_TUTOR_CURRENCY_ITEMS[wk->tutorIndex], wk->heapId);
     }
     if (wk->currency == SHOP_CURRENCY_BP) {
-        return func_0200e354(wk->bsubwayScore);
+        return BSubwayScoreData_GetBattlePoints(wk->bsubwayScore);
     }
     return getCash(wk->trainerCard);
 }
@@ -889,7 +889,7 @@ static void ShopUI_SpendMoney(ShopUIWork *wk, u32 amount) {
         subCashFromTotal(wk->trainerCard, amount);
         RecordAdd(wk->records, 22, amount);
     } else {
-        func_0200e330(wk->bsubwayScore, amount);
+        BSubwayScoreData_SubBattlePoints(wk->bsubwayScore, amount);
         RecordAdd(wk->records, 34, amount);
     }
     RecordAddOne(wk->records, 21);
@@ -1327,7 +1327,7 @@ static void ShopUI_UpdateMoneyDisp(ShopUIWork *wk) {
     } else if (wk->currency == SHOP_CURRENCY_BP) {
         format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Bp_2);
         strbuf = GFL_StrBufCreate(10, wk->heapId);
-        WordSetNumber(wk->wordSet, 0, func_0200e354(wk->bsubwayScore), 4, NUM_PAD_SPACE, 1);
+        WordSetNumber(wk->wordSet, 0, BSubwayScoreData_GetBattlePoints(wk->bsubwayScore), 4, NUM_PAD_SPACE, 1);
     } else {
         format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0613_Text_Empty_9);
         strbuf = GFL_StrBufCreate(10, wk->heapId);

@@ -61,10 +61,10 @@ u8 func_0200f384(RecordSave *record);
 void *func_0200f2d0(RecordSave *record);
 void *func_0200f2d8(RecordSave *record);
 u32 func_0200f1d8(void *results, u32 index);
-u16 func_0200e870(void *results, u32 index, u32 field);
+u16 RndMatchData_GetParam(void *results, u32 index, u32 field);
 // Sets a field of a result, from 0 to 0xffff
-void func_0200e87c(void *results, u32 index, u32 field, s32 value);
+void RndMatchData_SetParam(void *results, u32 index, u32 field, s32 value);
 // Adds 1 to a field of a result, up to 0xffff
-void func_0200e8a0(void *results, u32 index, u32 field);
+void RndMatchData_IncParam(void *results, u32 index, u32 field);
 
 #endif // POKEBW2_SAVE_RECORDS_H

@@ -23,7 +23,7 @@ u32 func_ov012_0216127c(AreaNPCSave *npcData) {
     u8 value;
 
     func_0200e904(npcData);
-    value = npcData->unk849;
+    value = npcData->deepestArea;
     decryptNpcData(npcData);
     return value;
 }

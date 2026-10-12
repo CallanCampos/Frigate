@@ -818,9 +818,9 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         sys_memcpy(&link->serverEntry, link->entry, sizeof(link->serverEntry));
         BattleBoxSave_ClearFlags(battleBox, 1);
         TournamentEntry_SetField(link->entry, 10, 1);
-        func_0200e87c(param->record, 10, 0, 0);
-        func_0200e87c(param->record, 10, 1, 0);
-        func_0200e87c(param->record, 10, 2, 0);
+        RndMatchData_SetParam(param->record, 10, 0, 0);
+        RndMatchData_SetParam(param->record, 10, 1, 0);
+        RndMatchData_SetParam(param->record, 10, 2, 0);
         TournamentTeam_Clear(previous);
         func_0201782c(param->param->gameData);
         *seq = 44;
@@ -869,7 +869,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 49:
-        if (link->param->unk34->unk10 != func_0200e870(param->record, 10, 0)) {
+        if (link->param->unk34->unk10 != RndMatchData_GetParam(param->record, 10, 0)) {
             *seq = 50;
         } else {
             *seq = 55;
@@ -2751,9 +2751,9 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     info.endDate =
         WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
     info.look = func_02008bf4(playerInfo);
-    info.unkA0 = func_0200e870(link->param->record, 10, 0);
-    first = func_0200e870(link->param->record, 10, 1);
-    info.unkA4 = first + func_0200e870(link->param->record, 10, 2);
+    info.unkA0 = RndMatchData_GetParam(link->param->record, 10, 0);
+    first = RndMatchData_GetParam(link->param->record, 10, 1);
+    info.unkA4 = first + RndMatchData_GetParam(link->param->record, 10, 2);
     info.variant = TournamentEntry_GetField(entry, 11);
     if (info.unkA4 == 0 && info.unkA0 == 0) {
         info.unkA0 = 1500;
@@ -3080,13 +3080,13 @@ static BOOL WifiBattleMatchLink_CompetitionUpdateRecord(WifiBattleMatchLinkCompe
                                                         WifiBattleMatchLinkRanking *ranking) {
     BOOL changed = FALSE;
 
-    if (ranking->unk10 != func_0200e870(link->param->record, 10, 0) ||
-        ranking->unk8 != func_0200e870(link->param->record, 10, 1) ||
-        ranking->unkC != func_0200e870(link->param->record, 10, 2)) {
+    if (ranking->unk10 != RndMatchData_GetParam(link->param->record, 10, 0) ||
+        ranking->unk8 != RndMatchData_GetParam(link->param->record, 10, 1) ||
+        ranking->unkC != RndMatchData_GetParam(link->param->record, 10, 2)) {
         changed = TRUE;
     }
-    func_0200e87c(link->param->record, 10, 0, ranking->unk10);
-    func_0200e87c(link->param->record, 10, 1, ranking->unk8);
-    func_0200e87c(link->param->record, 10, 2, ranking->unkC);
+    RndMatchData_SetParam(link->param->record, 10, 0, ranking->unk10);
+    RndMatchData_SetParam(link->param->record, 10, 1, ranking->unk8);
+    RndMatchData_SetParam(link->param->record, 10, 2, ranking->unkC);
     return changed;
 }

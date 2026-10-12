@@ -74,7 +74,7 @@ u32 subCashFromTotal(TrainerGameInfoSave *info, u32 amount);
 AreaNPCSave *getAreaNPCData(SaveControl *save);
 void decryptNpcData(AreaNPCSave *npcData);
 void func_0200e904(AreaNPCSave *npcData);
-u16 func_0200e9fc(AreaNPCSave *npcData, u32 kind);
+u32 func_0200e9fc(AreaNPCSave *npcData, u32 kind);
 u32 func_0200ea1c(u32 index);
 void func_0200ea24(AreaNPCSave *npcData, u32 index);
 // Whether the Entree Forest Pokémon, packed as EntreeForestPokemon is, is valid, checking its form when check is set
@@ -82,7 +82,7 @@ BOOL func_0200eb54(SaveControl *save, u32 *pokemon, HeapID heapId, BOOL check);
 void func_0200eb14(AreaNPCSave *npcData, u16 index);
 // Puts a Pokémon from the Dream World in the Entree Forest: its species, a2, sex and form, a5 below 9, and size 2 for
 // a big overworld sprite or 3
-void func_0200ea40(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u32 form, u32 a5, u32 size);
+void func_0200ea40(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8 form, u8 a5, u32 size);
 
 // Returns a pointer to one of the save's blocks
 void *SaveControl_GetBlockPtr(SaveControl *save, u32 block);
@@ -168,6 +168,8 @@ void func_020074e8(SaveControl *save, u32 value);
 void func_020074ac(SaveControl *save);
 BOOL func_020074ec(SaveControl *save, u32 block, HeapID heapId);
 void func_020075b8(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size);
+// Reads one of the two copies of a block from the card
+BOOL func_020074c4(SaveControl *save, u32 block, u32 copy, void *dest, u32 size);
 void func_020076a4(SaveControl *save, u32 block, HeapID heapId);
 void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *save, u32 block);
 void func_02011558(HeapID heapId);

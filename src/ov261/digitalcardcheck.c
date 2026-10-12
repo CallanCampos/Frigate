@@ -621,9 +621,9 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         sys_memset(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
         sys_memcpy(func_0200b794(entry), &info, 0x92);
         results = func_0200f2d0(record);
-        info.unkA0 = func_0200e870(results, 10, 0);
-        first = func_0200e870(results, 10, 1);
-        info.unkA4 = first + func_0200e870(results, 10, 2);
+        info.unkA0 = RndMatchData_GetParam(results, 10, 0);
+        first = RndMatchData_GetParam(results, 10, 1);
+        info.unkA4 = first + RndMatchData_GetParam(results, 10, 2);
         info.look = func_02008bf4(playerInfo);
         info.startDate =
             DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));

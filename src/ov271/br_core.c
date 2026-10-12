@@ -369,7 +369,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
         func_0200bc9c(GameData_GetSaveControl(gameData), HEAPID_BATTLE_RECORDER_SYS, &result, p->mode);
         if (result == 1) {
             if (p->mode == BR_RECORD_MODE_MINE) {
-                func_0200de68(getVSPlayerAllocation(), gameData);
+                GdsProfile_SetFromGameData(getVSPlayerAllocation(), gameData);
             }
         } else {
             GFL_ASSERT(0);
@@ -645,11 +645,11 @@ static void BrCore_LoadRecordInfo(BrRecordInfo *info, BOOL keepLoaded, GameData 
                 GdsProfile *profile = getVSPlayerAllocation();
 
                 if (i == 0) {
-                    func_0200de68(profile, gameData);
+                    GdsProfile_SetFromGameData(profile, gameData);
                 }
                 info->isValid[i] = TRUE;
-                info->name[i] = func_0200df68(profile, HEAPID_BATTLE_RECORDER_SYS);
-                info->sex[i] = func_0200df84(profile);
+                info->name[i] = GdsProfile_CreateNameStrBuf(profile, HEAPID_BATTLE_RECORDER_SYS);
+                info->sex[i] = GdsProfile_GetSex(profile);
                 info->videoNumber[i] = func_0200c124(func_0200c0c0(), 4, 0);
             }
         }
