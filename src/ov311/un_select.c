@@ -351,7 +351,7 @@ static void UnSelect_LoadBG(UnSelectWork *wk, HeapID heapId) {
     for (i = 0; i < UN_SELECT_FLOOR_COUNT; i++) {
         // Each floor is two rows of pixels, four floors to a tile
         int floor = UN_SELECT_FLOOR_COUNT - 1 - i;
-        u8 *chars = (i < 50 ? upperChars : lowerChars)->rawData;
+        u8 *chars = i < 50 ? upperChars->rawData : lowerChars->rawData;
 
         if (!wk->visited[i]) {
             u8 tile = floor / 4;
@@ -677,11 +677,8 @@ static UnSelectWork *UnSelect_Setup(GameProc *proc, UnSelectParam *param) {
         }
     }
     for (i = 0; i < UNITY_TOWER_VISITOR_MAX; i++) {
-        if (param->visitorCountries[i] != 0) {
-            wk->visitorFloors[i] = UnSelect_FindCountry(param->visitorCountries[i]);
-        } else {
-            wk->visitorFloors[i] = UN_SELECT_NO_FLOOR;
-        }
+        wk->visitorFloors[i] =
+            param->visitorCountries[i] != 0 ? UnSelect_FindCountry(param->visitorCountries[i]) : UN_SELECT_NO_FLOOR;
     }
     GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
     GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
@@ -729,10 +726,13 @@ static BOOL UnSelect_ListRun(UIScene *scene, void *param) {
     UnSelectWork *wk = param;
     BOOL pageScrolled;
     int selected;
+    u16 next;
 
     wk->pageScrolled = FALSE;
     pageScrolled = FALSE;
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_L) || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_R)) {
+    if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_L) {
+        pageScrolled = TRUE;
+    } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_R) {
         pageScrolled = TRUE;
     }
     if (pageScrolled) {
@@ -742,21 +742,29 @@ static BOOL UnSelect_ListRun(UIScene *scene, void *param) {
         selected = FrameList_GetSelected(wk->list);
         if (wk->visited[selected] == TRUE) {
             wk->selected = selected;
-            FrameList_SetRowPalette(wk->list, FrameList_GetCursor(wk->list), 3);
+            FrameList_SetRowPalette(wk->list, (u16)FrameList_GetCursor(wk->list), 3);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            UIScene_SetNext(scene, wk->param->floor == UN_SELECT_FLOOR(selected) ? UN_SELECT_STEP_SAME_FLOOR
-                                                                                 : UN_SELECT_STEP_CONFIRM);
+            if (wk->param->floor == UN_SELECT_FLOOR(selected)) {
+                next = UN_SELECT_STEP_SAME_FLOOR;
+            } else {
+                next = UN_SELECT_STEP_CONFIRM;
+            }
+            UIScene_SetNext(scene, next);
             return TRUE;
         }
     }
     UnSelect_UpdateTouchBar(wk->touchBar);
     switch (TouchBar_GetDecided(wk->touchBar)) {
     case -1:
+    case 0:
         break;
     case 1:
         UnSelect_SetResult(wk, UN_SELECT_RESULT_CANCEL);
         UIScene_SetNext(scene, UI_SCENE_END);
         return TRUE;
+    case 2:
+    case 3:
+    case 4:
     case 5:
         break;
     }
