@@ -1,0 +1,220 @@
+{
+  "nitro_sha256": "c72bdd7dea74170471466ecf4f6145de74ebd91e1a9325d477b962f98a7b06b6",
+  "textures": [
+    {
+      "name": "chip_counter",
+      "kind": 2,
+      "palette_offset": 20412
+    },
+    {
+      "name": "chip_ent",
+      "kind": 2,
+      "palette_offset": 20428
+    },
+    {
+      "name": "chip_kabe",
+      "kind": 2,
+      "palette_offset": 20460
+    },
+    {
+      "name": "chip_kabe2",
+      "kind": 2,
+      "palette_offset": 20444
+    },
+    {
+      "name": "chip_mat",
+      "kind": 2,
+      "palette_offset": 20476
+    },
+    {
+      "name": "chip_yuka",
+      "kind": 2,
+      "palette_offset": 20508
+    },
+    {
+      "name": "chip_yuka2",
+      "kind": 2,
+      "palette_offset": 20492
+    },
+    {
+      "name": "d0_miz",
+      "kind": 3,
+      "palette_offset": 20524
+    },
+    {
+      "name": "d0_mizgiwa",
+      "kind": 3,
+      "palette_offset": 20540
+    },
+    {
+      "name": "d0_mizkado",
+      "kind": 3,
+      "palette_offset": 20556
+    },
+    {
+      "name": "d0ana_001",
+      "kind": 3,
+      "palette_offset": 20572
+    },
+    {
+      "name": "d0ana_002",
+      "kind": 3,
+      "palette_offset": 20604
+    },
+    {
+      "name": "d0dan_001",
+      "kind": 1,
+      "palette_offset": 20636
+    },
+    {
+      "name": "d0gake_001",
+      "kind": 3,
+      "palette_offset": 20668
+    },
+    {
+      "name": "d0gake_002",
+      "kind": 3,
+      "palette_offset": 20700
+    },
+    {
+      "name": "d0gake_003",
+      "kind": 3,
+      "palette_offset": 20732
+    },
+    {
+      "name": "d0kaidan_01",
+      "kind": 3,
+      "palette_offset": 20764
+    },
+    {
+      "name": "d0yuka_001",
+      "kind": 3,
+      "palette_offset": 20780
+    },
+    {
+      "name": "d0yuka_002",
+      "kind": 3,
+      "palette_offset": 20796
+    },
+    {
+      "name": "d_hashi01",
+      "kind": 3,
+      "palette_offset": 20828
+    },
+    {
+      "name": "in06inseki_1",
+      "kind": 3,
+      "palette_offset": 20860
+    },
+    {
+      "name": "in6_desk01",
+      "kind": 3,
+      "palette_offset": 20892
+    },
+    {
+      "name": "in6_kaidan",
+      "kind": 3,
+      "palette_offset": 20924
+    },
+    {
+      "name": "in6case_01",
+      "kind": 1,
+      "palette_offset": 20956
+    },
+    {
+      "name": "in6case_02",
+      "kind": 3,
+      "palette_offset": 20988
+    },
+    {
+      "name": "in6case_03",
+      "kind": 3,
+      "palette_offset": 21020
+    },
+    {
+      "name": "in6hashira_1",
+      "kind": 3,
+      "palette_offset": 21036
+    },
+    {
+      "name": "in6hone_1",
+      "kind": 3,
+      "palette_offset": 21068
+    },
+    {
+      "name": "in6isu_2",
+      "kind": 3,
+      "palette_offset": 21100
+    },
+    {
+      "name": "in6ita_2",
+      "kind": 3,
+      "palette_offset": 21116
+    },
+    {
+      "name": "in6kabe_01",
+      "kind": 3,
+      "palette_offset": 21132
+    },
+    {
+      "name": "in6kabe_02",
+      "kind": 4,
+      "palette_offset": 21164
+    },
+    {
+      "name": "in6kage_01",
+      "kind": 1,
+      "palette_offset": 21196
+    },
+    {
+      "name": "in6kamen_1",
+      "kind": 3,
+      "palette_offset": 21212
+    },
+    {
+      "name": "in6kami_1",
+      "kind": 3,
+      "palette_offset": 21244
+    },
+    {
+      "name": "in6kami_2",
+      "kind": 3,
+      "palette_offset": 21276
+    },
+    {
+      "name": "in6kseki_5",
+      "kind": 3,
+      "palette_offset": 21308
+    },
+    {
+      "name": "in6light_02",
+      "kind": 6,
+      "palette_offset": 21340
+    },
+    {
+      "name": "in6yuka_01",
+      "kind": 3,
+      "palette_offset": 21372
+    },
+    {
+      "name": "in6yuka_01_2",
+      "kind": 3,
+      "palette_offset": 21356
+    },
+    {
+      "name": "in6yuka_02",
+      "kind": 3,
+      "palette_offset": 21388
+    },
+    {
+      "name": "in6yuka_03",
+      "kind": 3,
+      "palette_offset": 21404
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 21420
+    }
+  ]
+}

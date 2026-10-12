@@ -1,0 +1,220 @@
+{
+  "nitro_sha256": "ea409c75a08855837082c638b47cd636a3a3faed3608a7c8e6f7762513b937d1",
+  "textures": [
+    {
+      "name": "chip_counter",
+      "kind": 2,
+      "palette_offset": 26044
+    },
+    {
+      "name": "chip_ent",
+      "kind": 2,
+      "palette_offset": 26060
+    },
+    {
+      "name": "chip_kabe",
+      "kind": 2,
+      "palette_offset": 26092
+    },
+    {
+      "name": "chip_kabe2",
+      "kind": 2,
+      "palette_offset": 26076
+    },
+    {
+      "name": "chip_mat",
+      "kind": 2,
+      "palette_offset": 26108
+    },
+    {
+      "name": "chip_yuka",
+      "kind": 2,
+      "palette_offset": 26140
+    },
+    {
+      "name": "chip_yuka2",
+      "kind": 2,
+      "palette_offset": 26124
+    },
+    {
+      "name": "d0_miz",
+      "kind": 3,
+      "palette_offset": 26156
+    },
+    {
+      "name": "d0_mizgiwa",
+      "kind": 3,
+      "palette_offset": 26172
+    },
+    {
+      "name": "d0_mizkado",
+      "kind": 3,
+      "palette_offset": 26188
+    },
+    {
+      "name": "d0ana_001",
+      "kind": 3,
+      "palette_offset": 26204
+    },
+    {
+      "name": "d0ana_002",
+      "kind": 3,
+      "palette_offset": 26236
+    },
+    {
+      "name": "d0dan_001",
+      "kind": 1,
+      "palette_offset": 26268
+    },
+    {
+      "name": "d0gake_001",
+      "kind": 3,
+      "palette_offset": 26300
+    },
+    {
+      "name": "d0gake_002",
+      "kind": 3,
+      "palette_offset": 26332
+    },
+    {
+      "name": "d0gake_003",
+      "kind": 3,
+      "palette_offset": 26364
+    },
+    {
+      "name": "d0kaidan_01",
+      "kind": 3,
+      "palette_offset": 26396
+    },
+    {
+      "name": "d0yuka_001",
+      "kind": 3,
+      "palette_offset": 26412
+    },
+    {
+      "name": "d0yuka_002",
+      "kind": 3,
+      "palette_offset": 26428
+    },
+    {
+      "name": "d_hashi01",
+      "kind": 3,
+      "palette_offset": 26460
+    },
+    {
+      "name": "ifloor0_01",
+      "kind": 2,
+      "palette_offset": 26492
+    },
+    {
+      "name": "in09_hako1",
+      "kind": 3,
+      "palette_offset": 26508
+    },
+    {
+      "name": "in09_kabe1",
+      "kind": 3,
+      "palette_offset": 26540
+    },
+    {
+      "name": "in09_kabe2",
+      "kind": 4,
+      "palette_offset": 26572
+    },
+    {
+      "name": "in09_kabe3",
+      "kind": 4,
+      "palette_offset": 26604
+    },
+    {
+      "name": "in09_light1",
+      "kind": 6,
+      "palette_offset": 26636
+    },
+    {
+      "name": "in09_simi1",
+      "kind": 3,
+      "palette_offset": 26652
+    },
+    {
+      "name": "in09_stair_1",
+      "kind": 3,
+      "palette_offset": 26668
+    },
+    {
+      "name": "in09_tutu1",
+      "kind": 4,
+      "palette_offset": 26684
+    },
+    {
+      "name": "in09_yuka1",
+      "kind": 3,
+      "palette_offset": 26748
+    },
+    {
+      "name": "in09_yuka2",
+      "kind": 3,
+      "palette_offset": 26764
+    },
+    {
+      "name": "in09_yuka3",
+      "kind": 3,
+      "palette_offset": 26796
+    },
+    {
+      "name": "in09_yuka4",
+      "kind": 3,
+      "palette_offset": 26796
+    },
+    {
+      "name": "in9kusa_1",
+      "kind": 3,
+      "palette_offset": 26828
+    },
+    {
+      "name": "in9kusa_2",
+      "kind": 3,
+      "palette_offset": 26860
+    },
+    {
+      "name": "in9kusa_3",
+      "kind": 6,
+      "palette_offset": 26876
+    },
+    {
+      "name": "kusa01a",
+      "kind": 3,
+      "palette_offset": 26892
+    },
+    {
+      "name": "kusa01b",
+      "kind": 1,
+      "palette_offset": 26908
+    },
+    {
+      "name": "kusa02a",
+      "kind": 3,
+      "palette_offset": 26924
+    },
+    {
+      "name": "kusa02b",
+      "kind": 1,
+      "palette_offset": 26940
+    },
+    {
+      "name": "kusa_ec1s",
+      "kind": 3,
+      "palette_offset": 26956
+    },
+    {
+      "name": "kusa_ec2s",
+      "kind": 3,
+      "palette_offset": 26988
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 27004
+    }
+  ]
+}

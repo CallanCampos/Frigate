@@ -14,6 +14,8 @@ exactly what the ROM holds. The sources come in three kinds:
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
 - **glTF 2.0**, for map models under `data/map_models/<chunk>/`. Their mesh positions are packed back into the
   map archive's Nitro display lists. The remaining fields come from the extracted ROM.
+- **PNG**, for map textures under `data/map_texture_sets/<set>/`. The packer converts edited pixels to the set's
+  original Nitro texture format.
 
 The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
 by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
@@ -32,6 +34,7 @@ which documents the format and can write them again.
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
 | `a/0/0/8` | `data/map_models/<chunk>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
+| `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
 | `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
@@ -538,9 +541,13 @@ The numbered layout follows the archive's stable chunk IDs while giving each map
 This is closer to [pokeemerald's per-map directories](https://github.com/pret/pokeemerald/tree/master/data/maps)
 than to [pokeplatinum's numbered binary map data](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/data).
 Like [pokeplatinum's separate texture sets](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/texture_sets),
-shared texture resources belong in separate directories. `data/map_texture_sets/<set>/` currently holds PNG previews
-for the 119 identified texture sets. They are referenced by the glTF files, but are not packed into the ROM until a
-Nitro texture encoder is implemented.
+shared texture resources belong in separate directories. `data/map_texture_sets/<set>/` holds editable color PNGs
+for all 409 texture sets. Each set's `nitro.json` records the original resource hash and palette association for the
+packer; it is build metadata, not a color source. Edit the PNG in Blender or an image editor. The build packs it back
+into `a/0/1/4` and checks the original archive against both ROMs. PNGs must be 8-bit RGB or RGBA and retain their
+dimensions. Nitro supports
+limited colors and alpha precision, so the packer quantizes edited colors to RGB555 and rejects a set when its shared
+palette cannot hold the edited colors. Textures that share the same encoded texels must remain compatible.
 
 `data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and the texture
 set selected for viewing when the map-to-area relationship identifies one. Each chunk has its own numbered directory:
@@ -566,9 +573,9 @@ archive byte for byte; editing one house vertex changes only chunk 834. The expo
 The current converter supports position edits for all models within the existing command encoding and triangle
 correspondence.
 Some Nitro commands reuse a previous vertex axis or encode a small relative difference; edits outside those ranges
-fail with an error. The shared PNGs are viewing previews; topology, UVs, material parameters, textures, collision and
-props still come from the extracted ROM. These need their own source and packing support before map graphics are fully
-editable.
+fail with an error. Topology, UVs, material parameters, collision and props still come from the extracted ROM. These
+need their own source and packing support before map graphics are fully editable. Some texture previews referenced by
+glTF models are embedded in a model rather than in the shared texture archive; those still need a model texture packer.
 
 ## Map matrices, areas and lights
 

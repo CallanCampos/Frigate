@@ -1,0 +1,110 @@
+{
+  "nitro_sha256": "bfa90bc5851322db460b3e31fae6571446d159f56f7857a1103e25de11e0b1a3",
+  "textures": [
+    {
+      "name": "chip_counter",
+      "kind": 2,
+      "palette_offset": 8324
+    },
+    {
+      "name": "chip_ent",
+      "kind": 2,
+      "palette_offset": 8340
+    },
+    {
+      "name": "chip_kabe",
+      "kind": 2,
+      "palette_offset": 8372
+    },
+    {
+      "name": "chip_kabe2",
+      "kind": 2,
+      "palette_offset": 8356
+    },
+    {
+      "name": "chip_mat",
+      "kind": 2,
+      "palette_offset": 8388
+    },
+    {
+      "name": "chip_yuka",
+      "kind": 2,
+      "palette_offset": 8420
+    },
+    {
+      "name": "chip_yuka2",
+      "kind": 2,
+      "palette_offset": 8404
+    },
+    {
+      "name": "d0_miz",
+      "kind": 3,
+      "palette_offset": 8436
+    },
+    {
+      "name": "d0_mizgiwa",
+      "kind": 3,
+      "palette_offset": 8452
+    },
+    {
+      "name": "d0_mizkado",
+      "kind": 3,
+      "palette_offset": 8468
+    },
+    {
+      "name": "d0ana_001",
+      "kind": 3,
+      "palette_offset": 8484
+    },
+    {
+      "name": "d0ana_002",
+      "kind": 3,
+      "palette_offset": 8516
+    },
+    {
+      "name": "d0dan_001",
+      "kind": 1,
+      "palette_offset": 8548
+    },
+    {
+      "name": "d0gake_001",
+      "kind": 3,
+      "palette_offset": 8580
+    },
+    {
+      "name": "d0gake_002",
+      "kind": 3,
+      "palette_offset": 8612
+    },
+    {
+      "name": "d0gake_003",
+      "kind": 3,
+      "palette_offset": 8644
+    },
+    {
+      "name": "d0kaidan_01",
+      "kind": 3,
+      "palette_offset": 8676
+    },
+    {
+      "name": "d0yuka_001",
+      "kind": 3,
+      "palette_offset": 8692
+    },
+    {
+      "name": "d0yuka_002",
+      "kind": 3,
+      "palette_offset": 8708
+    },
+    {
+      "name": "d_hashi01",
+      "kind": 3,
+      "palette_offset": 8740
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 8772
+    }
+  ]
+}

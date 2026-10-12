@@ -1,0 +1,150 @@
+{
+  "nitro_sha256": "426bf39b13ac3a41880b455e5beab79880df51f1c9c045d681abb8b9482908c8",
+  "textures": [
+    {
+      "name": "d6yuka_002",
+      "kind": 3,
+      "palette_offset": 28244
+    },
+    {
+      "name": "d6yuka_003",
+      "kind": 4,
+      "palette_offset": 28276
+    },
+    {
+      "name": "yuka_002",
+      "kind": 3,
+      "palette_offset": 28468
+    },
+    {
+      "name": "d6_dan02",
+      "kind": 4,
+      "palette_offset": 28500
+    },
+    {
+      "name": "d6_dan3",
+      "kind": 3,
+      "palette_offset": 28532
+    },
+    {
+      "name": "d6_hashi1",
+      "kind": 3,
+      "palette_offset": 28564
+    },
+    {
+      "name": "d6_hashi2",
+      "kind": 3,
+      "palette_offset": 28596
+    },
+    {
+      "name": "d6_udan1",
+      "kind": 3,
+      "palette_offset": 28628
+    },
+    {
+      "name": "d6_udan2",
+      "kind": 3,
+      "palette_offset": 28660
+    },
+    {
+      "name": "d6ana_001",
+      "kind": 3,
+      "palette_offset": 28692
+    },
+    {
+      "name": "d6ana_002",
+      "kind": 3,
+      "palette_offset": 28724
+    },
+    {
+      "name": "d6ana_003",
+      "kind": 4,
+      "palette_offset": 28756
+    },
+    {
+      "name": "d6ana_004",
+      "kind": 3,
+      "palette_offset": 28788
+    },
+    {
+      "name": "d6dansa_001",
+      "kind": 3,
+      "palette_offset": 28820
+    },
+    {
+      "name": "d6gake_001",
+      "kind": 3,
+      "palette_offset": 28852
+    },
+    {
+      "name": "d6gake_002",
+      "kind": 3,
+      "palette_offset": 28884
+    },
+    {
+      "name": "d6gake_003",
+      "kind": 3,
+      "palette_offset": 28916
+    },
+    {
+      "name": "d6gake_004",
+      "kind": 3,
+      "palette_offset": 28948
+    },
+    {
+      "name": "d6gake_005",
+      "kind": 3,
+      "palette_offset": 28916
+    },
+    {
+      "name": "d6gake_007",
+      "kind": 3,
+      "palette_offset": 28980
+    },
+    {
+      "name": "d6gake_008",
+      "kind": 3,
+      "palette_offset": 29012
+    },
+    {
+      "name": "d6gake_02_2",
+      "kind": 3,
+      "palette_offset": 29044
+    },
+    {
+      "name": "d6gake_03",
+      "kind": 3,
+      "palette_offset": 29076
+    },
+    {
+      "name": "d6gake_03_2",
+      "kind": 3,
+      "palette_offset": 29076
+    },
+    {
+      "name": "d6gake_06",
+      "kind": 3,
+      "palette_offset": 29108
+    },
+    {
+      "name": "d6kaidan_001",
+      "kind": 3,
+      "palette_offset": 29140
+    },
+    {
+      "name": "d6yuka_001",
+      "kind": 3,
+      "palette_offset": 29156
+    },
+    {
+      "name": "yuka_001",
+      "kind": 3,
+      "palette_offset": 29188
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 29220
+    }
+  ]
+}

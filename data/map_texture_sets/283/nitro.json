@@ -1,0 +1,220 @@
+{
+  "nitro_sha256": "fe11708763e2e3da847099c7004daecb1eaabaa6c8da6de1eac8fccb4229c388",
+  "textures": [
+    {
+      "name": "chip_counter",
+      "kind": 2,
+      "palette_offset": 14412
+    },
+    {
+      "name": "chip_ent",
+      "kind": 2,
+      "palette_offset": 14428
+    },
+    {
+      "name": "chip_kabe",
+      "kind": 2,
+      "palette_offset": 14460
+    },
+    {
+      "name": "chip_kabe2",
+      "kind": 2,
+      "palette_offset": 14444
+    },
+    {
+      "name": "chip_mat",
+      "kind": 2,
+      "palette_offset": 14476
+    },
+    {
+      "name": "chip_yuka",
+      "kind": 2,
+      "palette_offset": 14508
+    },
+    {
+      "name": "chip_yuka2",
+      "kind": 2,
+      "palette_offset": 14492
+    },
+    {
+      "name": "d0_miz",
+      "kind": 3,
+      "palette_offset": 14524
+    },
+    {
+      "name": "d0_mizgiwa",
+      "kind": 3,
+      "palette_offset": 14540
+    },
+    {
+      "name": "d0_mizkado",
+      "kind": 3,
+      "palette_offset": 14556
+    },
+    {
+      "name": "d0ana_001",
+      "kind": 3,
+      "palette_offset": 14572
+    },
+    {
+      "name": "d0ana_002",
+      "kind": 3,
+      "palette_offset": 14604
+    },
+    {
+      "name": "d0dan_001",
+      "kind": 1,
+      "palette_offset": 14636
+    },
+    {
+      "name": "d0gake_001",
+      "kind": 3,
+      "palette_offset": 14668
+    },
+    {
+      "name": "d0gake_002",
+      "kind": 3,
+      "palette_offset": 14700
+    },
+    {
+      "name": "d0gake_003",
+      "kind": 3,
+      "palette_offset": 14732
+    },
+    {
+      "name": "d0kaidan_01",
+      "kind": 3,
+      "palette_offset": 14764
+    },
+    {
+      "name": "d0yuka_001",
+      "kind": 3,
+      "palette_offset": 14780
+    },
+    {
+      "name": "d0yuka_002",
+      "kind": 3,
+      "palette_offset": 14796
+    },
+    {
+      "name": "d_hashi01",
+      "kind": 3,
+      "palette_offset": 14828
+    },
+    {
+      "name": "black",
+      "kind": 2,
+      "palette_offset": 14860
+    },
+    {
+      "name": "cashier01",
+      "kind": 3,
+      "palette_offset": 14876
+    },
+    {
+      "name": "in02_fs",
+      "kind": 3,
+      "palette_offset": 14892
+    },
+    {
+      "name": "in02_kage",
+      "kind": 2,
+      "palette_offset": 14924
+    },
+    {
+      "name": "in02_lgpc01",
+      "kind": 3,
+      "palette_offset": 14940
+    },
+    {
+      "name": "in02_lgpc02",
+      "kind": 2,
+      "palette_offset": 14956
+    },
+    {
+      "name": "in02_lgpc03",
+      "kind": 3,
+      "palette_offset": 14972
+    },
+    {
+      "name": "in02_lgpc04",
+      "kind": 3,
+      "palette_offset": 14988
+    },
+    {
+      "name": "in02_lgpc05",
+      "kind": 3,
+      "palette_offset": 15020
+    },
+    {
+      "name": "in02_logo",
+      "kind": 2,
+      "palette_offset": 15068
+    },
+    {
+      "name": "in02_logo1",
+      "kind": 2,
+      "palette_offset": 15052
+    },
+    {
+      "name": "in02_pc",
+      "kind": 3,
+      "palette_offset": 15100
+    },
+    {
+      "name": "in02_pc3",
+      "kind": 2,
+      "palette_offset": 15084
+    },
+    {
+      "name": "in02_pckabe",
+      "kind": 3,
+      "palette_offset": 15132
+    },
+    {
+      "name": "in02_pcwin",
+      "kind": 1,
+      "palette_offset": 15148
+    },
+    {
+      "name": "in02_step",
+      "kind": 3,
+      "palette_offset": 15196
+    },
+    {
+      "name": "in02_step3",
+      "kind": 3,
+      "palette_offset": 15164
+    },
+    {
+      "name": "in02_window",
+      "kind": 2,
+      "palette_offset": 15212
+    },
+    {
+      "name": "in02_yuka6",
+      "kind": 2,
+      "palette_offset": 15228
+    },
+    {
+      "name": "in02_yuka7",
+      "kind": 2,
+      "palette_offset": 15244
+    },
+    {
+      "name": "in02_yuka8",
+      "kind": 3,
+      "palette_offset": 15260
+    },
+    {
+      "name": "in02_yuka9",
+      "kind": 3,
+      "palette_offset": 15276
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 15292
+    }
+  ]
+}

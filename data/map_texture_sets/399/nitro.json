@@ -1,0 +1,200 @@
+{
+  "nitro_sha256": "8185c646e5ef3532a37f1e46554760192c998045226f286b55ddd5ccb1339f39",
+  "textures": [
+    {
+      "name": "in24_bara",
+      "kind": 3,
+      "palette_offset": 24796
+    },
+    {
+      "name": "in24_carpet",
+      "kind": 2,
+      "palette_offset": 24860
+    },
+    {
+      "name": "in24_carpet03",
+      "kind": 3,
+      "palette_offset": 24828
+    },
+    {
+      "name": "in24_carten",
+      "kind": 3,
+      "palette_offset": 24876
+    },
+    {
+      "name": "in24_chair",
+      "kind": 2,
+      "palette_offset": 24908
+    },
+    {
+      "name": "in24_coror_g",
+      "kind": 3,
+      "palette_offset": 24924
+    },
+    {
+      "name": "in24_e",
+      "kind": 3,
+      "palette_offset": 24956
+    },
+    {
+      "name": "in24_g_lump",
+      "kind": 6,
+      "palette_offset": 24988
+    },
+    {
+      "name": "in24_hashira",
+      "kind": 3,
+      "palette_offset": 25004
+    },
+    {
+      "name": "in24_hat",
+      "kind": 3,
+      "palette_offset": 25036
+    },
+    {
+      "name": "in24_in",
+      "kind": 1,
+      "palette_offset": 25068
+    },
+    {
+      "name": "in24_kabe",
+      "kind": 3,
+      "palette_offset": 25212
+    },
+    {
+      "name": "in24_kabe2",
+      "kind": 3,
+      "palette_offset": 25084
+    },
+    {
+      "name": "in24_kabe_02",
+      "kind": 3,
+      "palette_offset": 25116
+    },
+    {
+      "name": "in24_kabe_03",
+      "kind": 3,
+      "palette_offset": 25148
+    },
+    {
+      "name": "in24_kabe_g1",
+      "kind": 3,
+      "palette_offset": 25164
+    },
+    {
+      "name": "in24_kabe_g2",
+      "kind": 3,
+      "palette_offset": 25196
+    },
+    {
+      "name": "in24_kabehasi",
+      "kind": 2,
+      "palette_offset": 25228
+    },
+    {
+      "name": "in24_kabekaza",
+      "kind": 3,
+      "palette_offset": 25244
+    },
+    {
+      "name": "in24_kaidan",
+      "kind": 3,
+      "palette_offset": 25260
+    },
+    {
+      "name": "in24_ki_03",
+      "kind": 3,
+      "palette_offset": 25292
+    },
+    {
+      "name": "in24_light",
+      "kind": 6,
+      "palette_offset": 25308
+    },
+    {
+      "name": "in24_logo",
+      "kind": 2,
+      "palette_offset": 25324
+    },
+    {
+      "name": "in24_lump",
+      "kind": 2,
+      "palette_offset": 25340
+    },
+    {
+      "name": "in24_maku",
+      "kind": 3,
+      "palette_offset": 25356
+    },
+    {
+      "name": "in24_mat",
+      "kind": 2,
+      "palette_offset": 25388
+    },
+    {
+      "name": "in24_mirror",
+      "kind": 3,
+      "palette_offset": 25404
+    },
+    {
+      "name": "in24_plant",
+      "kind": 3,
+      "palette_offset": 25436
+    },
+    {
+      "name": "in24_tana",
+      "kind": 3,
+      "palette_offset": 25468
+    },
+    {
+      "name": "in24_tesuri",
+      "kind": 3,
+      "palette_offset": 25484
+    },
+    {
+      "name": "in24_tile",
+      "kind": 2,
+      "palette_offset": 25516
+    },
+    {
+      "name": "in24_tile_g",
+      "kind": 2,
+      "palette_offset": 25500
+    },
+    {
+      "name": "in24_tukue",
+      "kind": 3,
+      "palette_offset": 25548
+    },
+    {
+      "name": "in24_tukue2",
+      "kind": 3,
+      "palette_offset": 25532
+    },
+    {
+      "name": "in24_yuka",
+      "kind": 3,
+      "palette_offset": 25596
+    },
+    {
+      "name": "in24_yuka2",
+      "kind": 2,
+      "palette_offset": 25580
+    },
+    {
+      "name": "in24_yukag",
+      "kind": 3,
+      "palette_offset": 25644
+    },
+    {
+      "name": "in24_yukag2",
+      "kind": 3,
+      "palette_offset": 25612
+    },
+    {
+      "name": "in24_yukag3",
+      "kind": 2,
+      "palette_offset": 25628
+    }
+  ]
+}

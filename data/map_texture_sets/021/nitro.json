@@ -1,0 +1,105 @@
+{
+  "nitro_sha256": "909e558c71d0608e43d70f08760828b0fe76114fd3dc44081d7f9c50667c7a3e",
+  "textures": [
+    {
+      "name": "building1",
+      "kind": 4,
+      "palette_offset": 169600
+    },
+    {
+      "name": "building2",
+      "kind": 4,
+      "palette_offset": 169696
+    },
+    {
+      "name": "building3",
+      "kind": 1,
+      "palette_offset": 169792
+    },
+    {
+      "name": "building4",
+      "kind": 1,
+      "palette_offset": 169856
+    },
+    {
+      "name": "c3_billboard",
+      "kind": 6,
+      "palette_offset": 169920
+    },
+    {
+      "name": "c3_common",
+      "kind": 4,
+      "palette_offset": 169936
+    },
+    {
+      "name": "c3_green",
+      "kind": 3,
+      "palette_offset": 170128
+    },
+    {
+      "name": "c3_kanban",
+      "kind": 4,
+      "palette_offset": 170160
+    },
+    {
+      "name": "c3_kumo_a",
+      "kind": 6,
+      "palette_offset": 170576
+    },
+    {
+      "name": "c3_road2",
+      "kind": 2,
+      "palette_offset": 170592
+    },
+    {
+      "name": "c3_saku",
+      "kind": 3,
+      "palette_offset": 170608
+    },
+    {
+      "name": "c3_sky2",
+      "kind": 3,
+      "palette_offset": 170640
+    },
+    {
+      "name": "c3_test",
+      "kind": 4,
+      "palette_offset": 170672
+    },
+    {
+      "name": "c3_window",
+      "kind": 4,
+      "palette_offset": 170736
+    },
+    {
+      "name": "c3bay_yuka1_2",
+      "kind": 3,
+      "palette_offset": 170784
+    },
+    {
+      "name": "c3bay_yuka3",
+      "kind": 3,
+      "palette_offset": 170800
+    },
+    {
+      "name": "pc_win1",
+      "kind": 3,
+      "palette_offset": 170816
+    },
+    {
+      "name": "sea_gake02",
+      "kind": 3,
+      "palette_offset": 170848
+    },
+    {
+      "name": "sea_mizu1",
+      "kind": 3,
+      "palette_offset": 170880
+    },
+    {
+      "name": "w_gra",
+      "kind": 6,
+      "palette_offset": 170912
+    }
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "nitro_sha256": "87ed818809d838c82f848a242f9c8bb7bb22126d3b268b9b5eed6a3fecbe1294",
+  "textures": [
+    {
+      "name": "chip_counter",
+      "kind": 2,
+      "palette_offset": 15820
+    },
+    {
+      "name": "chip_ent",
+      "kind": 2,
+      "palette_offset": 15836
+    },
+    {
+      "name": "chip_kabe",
+      "kind": 2,
+      "palette_offset": 15868
+    },
+    {
+      "name": "chip_kabe2",
+      "kind": 2,
+      "palette_offset": 15852
+    },
+    {
+      "name": "chip_mat",
+      "kind": 2,
+      "palette_offset": 15884
+    },
+    {
+      "name": "chip_yuka",
+      "kind": 2,
+      "palette_offset": 15916
+    },
+    {
+      "name": "chip_yuka2",
+      "kind": 2,
+      "palette_offset": 15900
+    },
+    {
+      "name": "d0_miz",
+      "kind": 3,
+      "palette_offset": 15932
+    },
+    {
+      "name": "d0_mizgiwa",
+      "kind": 3,
+      "palette_offset": 15948
+    },
+    {
+      "name": "d0_mizkado",
+      "kind": 3,
+      "palette_offset": 15964
+    },
+    {
+      "name": "d0ana_001",
+      "kind": 3,
+      "palette_offset": 15980
+    },
+    {
+      "name": "d0ana_002",
+      "kind": 3,
+      "palette_offset": 16012
+    },
+    {
+      "name": "d0dan_001",
+      "kind": 1,
+      "palette_offset": 16044
+    },
+    {
+      "name": "d0gake_001",
+      "kind": 3,
+      "palette_offset": 16076
+    },
+    {
+      "name": "d0gake_002",
+      "kind": 3,
+      "palette_offset": 16108
+    },
+    {
+      "name": "d0gake_003",
+      "kind": 3,
+      "palette_offset": 16140
+    },
+    {
+      "name": "d0kaidan_01",
+      "kind": 3,
+      "palette_offset": 16172
+    },
+    {
+      "name": "d0yuka_001",
+      "kind": 3,
+      "palette_offset": 16188
+    },
+    {
+      "name": "d0yuka_002",
+      "kind": 3,
+      "palette_offset": 16204
+    },
+    {
+      "name": "d_hashi01",
+      "kind": 3,
+      "palette_offset": 16236
+    },
+    {
+      "name": "carpet01_1",
+      "kind": 3,
+      "palette_offset": 16268
+    },
+    {
+      "name": "desk01",
+      "kind": 3,
+      "palette_offset": 16284
+    },
+    {
+      "name": "fh_bbed01",
+      "kind": 3,
+      "palette_offset": 16300
+    },
+    {
+      "name": "fh_bramp",
+      "kind": 3,
+      "palette_offset": 16316
+    },
+    {
+      "name": "fh_bshelf",
+      "kind": 3,
+      "palette_offset": 16332
+    },
+    {
+      "name": "fh_bshiki",
+      "kind": 2,
+      "palette_offset": 16364
+    },
+    {
+      "name": "fh_wbed01",
+      "kind": 3,
+      "palette_offset": 16380
+    },
+    {
+      "name": "fh_wcurtain",
+      "kind": 3,
+      "palette_offset": 16396
+    },
+    {
+      "name": "fh_wcushion",
+      "kind": 3,
+      "palette_offset": 16428
+    },
+    {
+      "name": "fh_wflower",
+      "kind": 3,
+      "palette_offset": 16460
+    },
+    {
+      "name": "fh_wshiki2",
+      "kind": 3,
+      "palette_offset": 16492
+    },
+    {
+      "name": "fh_wshiki3",
+      "kind": 3,
+      "palette_offset": 16508
+    },
+    {
+      "name": "fh_wtable",
+      "kind": 3,
+      "palette_offset": 16524
+    },
+    {
+      "name": "fhgenkan",
+      "kind": 2,
+      "palette_offset": 16540
+    },
+    {
+      "name": "fhkabe",
+      "kind": 2,
+      "palette_offset": 16604
+    },
+    {
+      "name": "fhkabe2",
+      "kind": 3,
+      "palette_offset": 16556
+    },
+    {
+      "name": "fhkabe3",
+      "kind": 2,
+      "palette_offset": 16572
+    },
+    {
+      "name": "fhkabe4",
+      "kind": 2,
+      "palette_offset": 16588
+    },
+    {
+      "name": "fhyuka",
+      "kind": 3,
+      "palette_offset": 16620
+    },
+    {
+      "name": "h_kage",
+      "kind": 1,
+      "palette_offset": 16636
+    },
+    {
+      "name": "h_mado",
+      "kind": 2,
+      "palette_offset": 16652
+    },
+    {
+      "name": "hh_ashiato",
+      "kind": 1,
+      "palette_offset": 16668
+    },
+    {
+      "name": "hh_bed01",
+      "kind": 3,
+      "palette_offset": 16684
+    },
+    {
+      "name": "hh_chushion02",
+      "kind": 3,
+      "palette_offset": 16700
+    },
+    {
+      "name": "hh_desk01",
+      "kind": 3,
+      "palette_offset": 16716
+    },
+    {
+      "name": "hh_dust01",
+      "kind": 3,
+      "palette_offset": 16732
+    },
+    {
+      "name": "hh_shelf",
+      "kind": 3,
+      "palette_offset": 16748
+    },
+    {
+      "name": "hh_shiki",
+      "kind": 2,
+      "palette_offset": 16780
+    },
+    {
+      "name": "hkabeue",
+      "kind": 3,
+      "palette_offset": 16796
+    },
+    {
+      "name": "idr_plant01",
+      "kind": 3,
+      "palette_offset": 16828
+    },
+    {
+      "name": "idr_tv01",
+      "kind": 3,
+      "palette_offset": 16860
+    },
+    {
+      "name": "idr_win01",
+      "kind": 2,
+      "palette_offset": 16892
+    },
+    {
+      "name": "in40_kage",
+      "kind": 1,
+      "palette_offset": 16636
+    },
+    {
+      "name": "m_lab01_09",
+      "kind": 3,
+      "palette_offset": 16908
+    },
+    {
+      "name": "m_lab01_11",
+      "kind": 3,
+      "palette_offset": 16940
+    },
+    {
+      "name": "pc_desk02",
+      "kind": 3,
+      "palette_offset": 16972
+    },
+    {
+      "name": "pcdesk02_pc",
+      "kind": 3,
+      "palette_offset": 17004
+    },
+    {
+      "name": "wii01",
+      "kind": 3,
+      "palette_offset": 17020
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 17052
+    }
+  ]
+}

@@ -1,0 +1,510 @@
+{
+  "nitro_sha256": "64d0192a7fb94dfe82fa0161ba27c4d237de58418b9ad5e0f73e24b843b7830a",
+  "textures": [
+    {
+      "name": "dansa01a",
+      "kind": 1,
+      "palette_offset": 42260
+    },
+    {
+      "name": "doukutu01",
+      "kind": 3,
+      "palette_offset": 42292
+    },
+    {
+      "name": "fence_01",
+      "kind": 3,
+      "palette_offset": 42324
+    },
+    {
+      "name": "gake01a",
+      "kind": 3,
+      "palette_offset": 42340
+    },
+    {
+      "name": "gake01a2",
+      "kind": 3,
+      "palette_offset": 42340
+    },
+    {
+      "name": "gake1_0",
+      "kind": 3,
+      "palette_offset": 42356
+    },
+    {
+      "name": "gake1_1",
+      "kind": 3,
+      "palette_offset": 42372
+    },
+    {
+      "name": "gake1_2",
+      "kind": 3,
+      "palette_offset": 42404
+    },
+    {
+      "name": "gake1_3",
+      "kind": 3,
+      "palette_offset": 42420
+    },
+    {
+      "name": "gake_futa",
+      "kind": 3,
+      "palette_offset": 42452
+    },
+    {
+      "name": "gake_michi",
+      "kind": 3,
+      "palette_offset": 42468
+    },
+    {
+      "name": "gake_michi_x",
+      "kind": 3,
+      "palette_offset": 42500
+    },
+    {
+      "name": "grass01ax",
+      "kind": 3,
+      "palette_offset": 42516
+    },
+    {
+      "name": "hana01.1",
+      "kind": 3,
+      "palette_offset": 42532
+    },
+    {
+      "name": "hashi01a",
+      "kind": 3,
+      "palette_offset": 42548
+    },
+    {
+      "name": "hashi02a",
+      "kind": 3,
+      "palette_offset": 42580
+    },
+    {
+      "name": "ike01",
+      "kind": 2,
+      "palette_offset": 42612
+    },
+    {
+      "name": "iwa01",
+      "kind": 3,
+      "palette_offset": 42628
+    },
+    {
+      "name": "kage_out",
+      "kind": 1,
+      "palette_offset": 42660
+    },
+    {
+      "name": "kaidan01a",
+      "kind": 3,
+      "palette_offset": 42676
+    },
+    {
+      "name": "karichip0",
+      "kind": 2,
+      "palette_offset": 42708
+    },
+    {
+      "name": "kawa01a",
+      "kind": 3,
+      "palette_offset": 42724
+    },
+    {
+      "name": "kawa01b",
+      "kind": 1,
+      "palette_offset": 42756
+    },
+    {
+      "name": "kawa_fuchi.1",
+      "kind": 3,
+      "palette_offset": 42772
+    },
+    {
+      "name": "kawa_kage",
+      "kind": 6,
+      "palette_offset": 42788
+    },
+    {
+      "name": "kawa_nose.1",
+      "kind": 3,
+      "palette_offset": 42804
+    },
+    {
+      "name": "kawa_soko",
+      "kind": 3,
+      "palette_offset": 42820
+    },
+    {
+      "name": "kawasoko_isi",
+      "kind": 3,
+      "palette_offset": 42852
+    },
+    {
+      "name": "kemono01",
+      "kind": 3,
+      "palette_offset": 42868
+    },
+    {
+      "name": "ki02ax",
+      "kind": 3,
+      "palette_offset": 42900
+    },
+    {
+      "name": "ki02bx",
+      "kind": 3,
+      "palette_offset": 42932
+    },
+    {
+      "name": "ki02c",
+      "kind": 1,
+      "palette_offset": 42964
+    },
+    {
+      "name": "ki02dx",
+      "kind": 3,
+      "palette_offset": 42980
+    },
+    {
+      "name": "ki03ax",
+      "kind": 3,
+      "palette_offset": 42996
+    },
+    {
+      "name": "ki03bx",
+      "kind": 3,
+      "palette_offset": 43028
+    },
+    {
+      "name": "ki03dx",
+      "kind": 3,
+      "palette_offset": 43060
+    },
+    {
+      "name": "kisetu_hana",
+      "kind": 3,
+      "palette_offset": 43076
+    },
+    {
+      "name": "kisetu_yuki",
+      "kind": 6,
+      "palette_offset": 43092
+    },
+    {
+      "name": "kusa_ec1",
+      "kind": 3,
+      "palette_offset": 43108
+    },
+    {
+      "name": "kusa_ec1s",
+      "kind": 3,
+      "palette_offset": 43140
+    },
+    {
+      "name": "kusa_ec2",
+      "kind": 3,
+      "palette_offset": 43172
+    },
+    {
+      "name": "kusa_ec2s",
+      "kind": 3,
+      "palette_offset": 43204
+    },
+    {
+      "name": "kusa_ec3",
+      "kind": 6,
+      "palette_offset": 43220
+    },
+    {
+      "name": "michi01a",
+      "kind": 3,
+      "palette_offset": 43236
+    },
+    {
+      "name": "michi01b",
+      "kind": 3,
+      "palette_offset": 43268
+    },
+    {
+      "name": "michi02a",
+      "kind": 3,
+      "palette_offset": 43284
+    },
+    {
+      "name": "michi02b",
+      "kind": 2,
+      "palette_offset": 43316
+    },
+    {
+      "name": "michi03a",
+      "kind": 3,
+      "palette_offset": 43332
+    },
+    {
+      "name": "michi03b",
+      "kind": 2,
+      "palette_offset": 43348
+    },
+    {
+      "name": "michi_hage",
+      "kind": 3,
+      "palette_offset": 43380
+    },
+    {
+      "name": "michi_hage02",
+      "kind": 3,
+      "palette_offset": 43364
+    },
+    {
+      "name": "michi_hibi",
+      "kind": 3,
+      "palette_offset": 43412
+    },
+    {
+      "name": "michi_isi",
+      "kind": 3,
+      "palette_offset": 43428
+    },
+    {
+      "name": "mizu_sita2",
+      "kind": 3,
+      "palette_offset": 43444
+    },
+    {
+      "name": "mizutama01",
+      "kind": 1,
+      "palette_offset": 43476
+    },
+    {
+      "name": "mori01a",
+      "kind": 3,
+      "palette_offset": 43492
+    },
+    {
+      "name": "mori01s",
+      "kind": 6,
+      "palette_offset": 43524
+    },
+    {
+      "name": "nagaisu",
+      "kind": 3,
+      "palette_offset": 43540
+    },
+    {
+      "name": "plant01",
+      "kind": 3,
+      "palette_offset": 43572
+    },
+    {
+      "name": "saku01a",
+      "kind": 1,
+      "palette_offset": 43588
+    },
+    {
+      "name": "saku_001",
+      "kind": 3,
+      "palette_offset": 43620
+    },
+    {
+      "name": "sea_gake01",
+      "kind": 3,
+      "palette_offset": 43652
+    },
+    {
+      "name": "sea_gake02",
+      "kind": 3,
+      "palette_offset": 43668
+    },
+    {
+      "name": "sea_grass",
+      "kind": 3,
+      "palette_offset": 43700
+    },
+    {
+      "name": "sea_mizu1",
+      "kind": 3,
+      "palette_offset": 43716
+    },
+    {
+      "name": "sea_zanami2",
+      "kind": 3,
+      "palette_offset": 43748
+    },
+    {
+      "name": "shore01",
+      "kind": 2,
+      "palette_offset": 43764
+    },
+    {
+      "name": "slamp03",
+      "kind": 3,
+      "palette_offset": 43780
+    },
+    {
+      "name": "taki_sakai.1",
+      "kind": 3,
+      "palette_offset": 43812
+    },
+    {
+      "name": "taki_shibu.1",
+      "kind": 2,
+      "palette_offset": 43844
+    },
+    {
+      "name": "ue_grass00",
+      "kind": 3,
+      "palette_offset": 43860
+    },
+    {
+      "name": "ue_grass01",
+      "kind": 2,
+      "palette_offset": 43876
+    },
+    {
+      "name": "yamagake01",
+      "kind": 3,
+      "palette_offset": 43892
+    },
+    {
+      "name": "yamagrs01",
+      "kind": 2,
+      "palette_offset": 43924
+    },
+    {
+      "name": "yamasaba01",
+      "kind": 3,
+      "palette_offset": 43940
+    },
+    {
+      "name": "yamasaba01e",
+      "kind": 3,
+      "palette_offset": 43956
+    },
+    {
+      "name": "kn_c_yuka4",
+      "kind": 3,
+      "palette_offset": 43972
+    },
+    {
+      "name": "out18_gake01",
+      "kind": 3,
+      "palette_offset": 43988
+    },
+    {
+      "name": "out18_gake02",
+      "kind": 3,
+      "palette_offset": 44020
+    },
+    {
+      "name": "out18_tile01",
+      "kind": 3,
+      "palette_offset": 44052
+    },
+    {
+      "name": "out18_tile05",
+      "kind": 3,
+      "palette_offset": 44084
+    },
+    {
+      "name": "out57_futa",
+      "kind": 3,
+      "palette_offset": 44116
+    },
+    {
+      "name": "out57_gake01a",
+      "kind": 3,
+      "palette_offset": 44132
+    },
+    {
+      "name": "out57_gake1_0",
+      "kind": 3,
+      "palette_offset": 44148
+    },
+    {
+      "name": "sea_asase02",
+      "kind": 2,
+      "palette_offset": 44164
+    },
+    {
+      "name": "sea_jimen",
+      "kind": 3,
+      "palette_offset": 44180
+    },
+    {
+      "name": "sea_simi.1",
+      "kind": 3,
+      "palette_offset": 44196
+    },
+    {
+      "name": "sea_simi.2",
+      "kind": 3,
+      "palette_offset": 44196
+    },
+    {
+      "name": "sea_simi.3",
+      "kind": 3,
+      "palette_offset": 44196
+    },
+    {
+      "name": "sea_simi.4",
+      "kind": 3,
+      "palette_offset": 44196
+    },
+    {
+      "name": "sea_zanami",
+      "kind": 1,
+      "palette_offset": 44212
+    },
+    {
+      "name": "sio_fe02_r",
+      "kind": 3,
+      "palette_offset": 44260
+    },
+    {
+      "name": "tg_02",
+      "kind": 3,
+      "palette_offset": 44292
+    },
+    {
+      "name": "tg_kabe3",
+      "kind": 3,
+      "palette_offset": 44324
+    },
+    {
+      "name": "tg_michi02a",
+      "kind": 3,
+      "palette_offset": 44356
+    },
+    {
+      "name": "tg_michi02b",
+      "kind": 3,
+      "palette_offset": 44388
+    },
+    {
+      "name": "tg_mizo",
+      "kind": 3,
+      "palette_offset": 44404
+    },
+    {
+      "name": "tg_saido",
+      "kind": 3,
+      "palette_offset": 44420
+    },
+    {
+      "name": "tg_stair",
+      "kind": 3,
+      "palette_offset": 44276
+    },
+    {
+      "name": "tg_tesu2",
+      "kind": 3,
+      "palette_offset": 44452
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 44484
+    }
+  ]
+}

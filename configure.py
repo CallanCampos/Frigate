@@ -166,6 +166,7 @@ DATA_PACKS = [
     ("tools/data/trade_data.py", "data/trades", ["a/1/6/3"], False),  # In-game trades
     ("tools/data/map_matrix_data.py", "data/map_matrices", ["a/0/0/9"], False),  # Map matrices
     ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True),  # Map model glTF sources
+    ("tools/data/map_texture_data.py", "data/map_texture_sets", ["a/0/1/4"], True),  # Map texture PNG sources
     ("tools/data/area_data.py", "data/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
     ("tools/data/light_data.py", "data/lights", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
     # The town map's places, whose texts are messages of town_map.txt

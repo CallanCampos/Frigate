@@ -1,0 +1,235 @@
+{
+  "nitro_sha256": "bef3cf115a4cbd3385d389c1d13696a396bba5d8f9427a31a52f3d28065eede4",
+  "textures": [
+    {
+      "name": "chip_counter",
+      "kind": 2,
+      "palette_offset": 17864
+    },
+    {
+      "name": "chip_ent",
+      "kind": 2,
+      "palette_offset": 17880
+    },
+    {
+      "name": "chip_kabe",
+      "kind": 2,
+      "palette_offset": 17912
+    },
+    {
+      "name": "chip_kabe2",
+      "kind": 2,
+      "palette_offset": 17896
+    },
+    {
+      "name": "chip_mat",
+      "kind": 2,
+      "palette_offset": 17928
+    },
+    {
+      "name": "chip_yuka",
+      "kind": 2,
+      "palette_offset": 17960
+    },
+    {
+      "name": "chip_yuka2",
+      "kind": 2,
+      "palette_offset": 17944
+    },
+    {
+      "name": "d0_miz",
+      "kind": 3,
+      "palette_offset": 17976
+    },
+    {
+      "name": "d0_mizgiwa",
+      "kind": 3,
+      "palette_offset": 17992
+    },
+    {
+      "name": "d0_mizkado",
+      "kind": 3,
+      "palette_offset": 18008
+    },
+    {
+      "name": "d0ana_001",
+      "kind": 3,
+      "palette_offset": 18024
+    },
+    {
+      "name": "d0ana_002",
+      "kind": 3,
+      "palette_offset": 18056
+    },
+    {
+      "name": "d0dan_001",
+      "kind": 1,
+      "palette_offset": 18088
+    },
+    {
+      "name": "d0gake_001",
+      "kind": 3,
+      "palette_offset": 18120
+    },
+    {
+      "name": "d0gake_002",
+      "kind": 3,
+      "palette_offset": 18152
+    },
+    {
+      "name": "d0gake_003",
+      "kind": 3,
+      "palette_offset": 18184
+    },
+    {
+      "name": "d0kaidan_01",
+      "kind": 3,
+      "palette_offset": 18216
+    },
+    {
+      "name": "d0yuka_001",
+      "kind": 3,
+      "palette_offset": 18232
+    },
+    {
+      "name": "d0yuka_002",
+      "kind": 3,
+      "palette_offset": 18248
+    },
+    {
+      "name": "d_hashi01",
+      "kind": 3,
+      "palette_offset": 18280
+    },
+    {
+      "name": "fs_room7",
+      "kind": 2,
+      "palette_offset": 18312
+    },
+    {
+      "name": "fs_room8",
+      "kind": 2,
+      "palette_offset": 18328
+    },
+    {
+      "name": "h_kage",
+      "kind": 2,
+      "palette_offset": 18344
+    },
+    {
+      "name": "maq_ps01",
+      "kind": 3,
+      "palette_offset": 18360
+    },
+    {
+      "name": "maq_ps04",
+      "kind": 3,
+      "palette_offset": 18392
+    },
+    {
+      "name": "maq_pt01",
+      "kind": 3,
+      "palette_offset": 18424
+    },
+    {
+      "name": "maq_pt11",
+      "kind": 3,
+      "palette_offset": 18456
+    },
+    {
+      "name": "maq_rm02",
+      "kind": 3,
+      "palette_offset": 18520
+    },
+    {
+      "name": "maq_rm02_",
+      "kind": 3,
+      "palette_offset": 18488
+    },
+    {
+      "name": "maq_rm03",
+      "kind": 3,
+      "palette_offset": 18552
+    },
+    {
+      "name": "maq_rm04",
+      "kind": 3,
+      "palette_offset": 18568
+    },
+    {
+      "name": "maq_rm05",
+      "kind": 3,
+      "palette_offset": 18584
+    },
+    {
+      "name": "maq_rm06",
+      "kind": 2,
+      "palette_offset": 18600
+    },
+    {
+      "name": "maq_rm07",
+      "kind": 2,
+      "palette_offset": 18616
+    },
+    {
+      "name": "maq_rm08",
+      "kind": 3,
+      "palette_offset": 18632
+    },
+    {
+      "name": "maq_rm09",
+      "kind": 2,
+      "palette_offset": 18664
+    },
+    {
+      "name": "maq_rm10",
+      "kind": 2,
+      "palette_offset": 18680
+    },
+    {
+      "name": "maq_rm_lt",
+      "kind": 6,
+      "palette_offset": 18696
+    },
+    {
+      "name": "maq_rs01a",
+      "kind": 3,
+      "palette_offset": 18712
+    },
+    {
+      "name": "maq_rs05",
+      "kind": 2,
+      "palette_offset": 18744
+    },
+    {
+      "name": "maq_rs06",
+      "kind": 2,
+      "palette_offset": 18760
+    },
+    {
+      "name": "maq_rs09",
+      "kind": 3,
+      "palette_offset": 18776
+    },
+    {
+      "name": "maq_rs10",
+      "kind": 2,
+      "palette_offset": 18808
+    },
+    {
+      "name": "maq_rs12",
+      "kind": 2,
+      "palette_offset": 18824
+    },
+    {
+      "name": "maq_slope_a",
+      "kind": 3,
+      "palette_offset": 18840
+    },
+    {
+      "name": "grid",
+      "kind": 3,
+      "palette_offset": 18856
+    }
+  ]
+}
