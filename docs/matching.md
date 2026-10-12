@@ -190,6 +190,13 @@ Same instructions, registers swapped.
   copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:
   `irc_sync_check.c`'s `IrcSyncCheck_CompareTraces` matches with `own[i].x - ownStart->x` in the loop, and was 52
   bytes off with `int ownStartX = ownStart[0].x;` above it.
+- Two computations of the same shape, one for x and one for y, that alternate registers (`r6` then `r7`) reuse one
+  pair of locals; a pair each keeps the same registers both times (`irc_compat_menu.c`'s
+  `IrcCompatMenuHeart_Update`, one `diff` and `sign` for both).
+- An array element read as `buttons->defs[buttons->touched].x` several times copies the index, multiplies it in
+  place and loads the base last (`adds r1, r2, #0; muls; ldr; adds r0, r0, r1`); through a
+  `const Def *def = &buttons->defs[i];` local the base is loaded first and the product goes to the constant's
+  register. `IrcCompatMenuButtons_Update` is the first form and its sibling `IrcCompatMenuButtons_Reset` the second.
 - An integer `+` of a local and a temporary puts the local first whatever the source order, and a pointer `+` puts
   the pointer first. `adds r1, r7, r1` with the size in `r7` and the running address in `r1` is therefore integer
   arithmetic on the address: `musical_system.c`'s `MusicalSystem_LoadProgramData` sets its second and third sound

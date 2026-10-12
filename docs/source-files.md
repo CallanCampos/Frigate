@@ -1540,7 +1540,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_compat_menu.c` | `0x0219ad20`–`0x0219c278` | 60 | partial | descriptive |
+| `irc_compat_menu.c` | `0x0219ad20`–`0x0219c278` | 60 | complete | descriptive |
 
 ### Overlay 177
 
