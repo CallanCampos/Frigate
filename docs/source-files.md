@@ -86,7 +86,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | partial | descriptive |
+| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | complete | descriptive |
 
 ### Overlay 11
 
@@ -896,7 +896,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_virbank.c` | `0x021eec80`–`0x021ef08c` | 11 | partial | descriptive |
+| `gym_virbank.c` | `0x021eec80`–`0x021ef08c` | 11 | complete | descriptive |
 
 ### Overlay 101
 
@@ -1125,7 +1125,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_passing_vehicles.c` | `0x021eec80`–`0x021eefe8` | 6 | partial | descriptive |
+| `gimmick_passing_vehicles.c` | `0x021eec80`–`0x021eefe8` | 6 | complete | descriptive |
 
 ### Overlay 129
 
@@ -1522,7 +1522,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `ircbattlematch.c` | `0x0219ce80`–`0x0219f0b4` | 86 | partial | string at `0x0219f30c` |
+| `ircbattlematch.c` | `0x0219ce80`–`0x0219f0b4` | 86 | complete | string at `0x0219f30c` |
 
 ### Overlay 175
 

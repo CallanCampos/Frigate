@@ -206,18 +206,9 @@ static void func_ov100_021eee4c(VirbankMusic *music, Field *field) {
     if (*var0 != 0) {
         unmute0 = FALSE;
     }
-    unmute1 = TRUE;
-    if (*var1 != 0) {
-        unmute1 = FALSE;
-    }
-    BOOL unmute2 = TRUE;
-    if (*var2 != 0) {
-        unmute2 = FALSE;
-    }
-    BOOL unmute3 = TRUE;
-    if (*var3 != 0) {
-        unmute3 = FALSE;
-    }
+    unmute1 = (*var1 == 0) ? TRUE : FALSE;
+    BOOL unmute2 = (*var2 == 0) ? TRUE : FALSE;
+    BOOL unmute3 = (*var3 == 0) ? TRUE : FALSE;
     ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 3, unmute2, SEQ_BGM_POISONE_GYM_01);
     ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 2, unmute1, SEQ_BGM_POISONE_GYM_01);
     ISSSwitch_ReqSwitchMuteStateChange(music->switchSys, 1, unmute0, SEQ_BGM_POISONE_GYM_01);

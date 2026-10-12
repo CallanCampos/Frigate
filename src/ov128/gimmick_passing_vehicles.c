@@ -56,9 +56,9 @@ static const G3DSceneResourceSetup sResources[MODEL_COUNT] = {
 };
 
 static const G3DSceneActorSetup sActors[MODEL_COUNT * 2] = {
-    { 0, 0, 0, 0, NULL, 0 }, { 1, 1, 0, 0, NULL, 0 }, { 0, 0, 0, 0, NULL, 0 }, { 1, 1, 0, 0, NULL, 0 },
-    { 2, 2, 0, 0, NULL, 0 }, { 3, 3, 0, 0, NULL, 0 }, { 2, 2, 0, 0, NULL, 0 }, { 3, 3, 0, 0, NULL, 0 },
-    { 4, 4, 0, 0, NULL, 0 }, { 5, 5, 0, 0, NULL, 0 }, { 4, 4, 0, 0, NULL, 0 }, { 5, 5, 0, 0, NULL, 0 },
+    { 0, 0, 0, 0, NULL, 0 }, { 1, 0, 1, 0, NULL, 0 }, { 0, 0, 0, 0, NULL, 0 }, { 1, 0, 1, 0, NULL, 0 },
+    { 2, 0, 2, 0, NULL, 0 }, { 3, 0, 3, 0, NULL, 0 }, { 2, 0, 2, 0, NULL, 0 }, { 3, 0, 3, 0, NULL, 0 },
+    { 4, 0, 4, 0, NULL, 0 }, { 5, 0, 5, 0, NULL, 0 }, { 4, 0, 4, 0, NULL, 0 }, { 5, 0, 5, 0, NULL, 0 },
 };
 
 static G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
@@ -190,6 +190,8 @@ static void func_ov128_021eeec8(GimmickWork *work, Field *field, u32 first, u32 
     SRTMatrix *matrix;
     fx32 cos;
     fx32 sin;
+    fx32 cos2;
+    fx32 sin2;
 
     heapId = Field_GetHeapID(field);
     expObj = Field_GetExpObjSystem(field);
@@ -214,15 +216,15 @@ static void func_ov128_021eeec8(GimmickWork *work, Field *field, u32 first, u32 
     matrix->translation.x = ROAD_END_X;
     matrix->translation.y = FX32_CONST(80);
     matrix->translation.z = FX32_CONST(8368);
-    sin = FX_SinIdx(DEG_TO_IDX(270));
-    cos = FX_CosIdx(DEG_TO_IDX(270));
-    MAT3_RotationY(&matrix->rotation, sin, cos);
+    sin2 = FX_SinIdx(DEG_TO_IDX(270));
+    cos2 = FX_CosIdx(DEG_TO_IDX(270));
+    MAT3_RotationY(&matrix->rotation, sin2, cos2);
     func_ov036_021b8248(expObj, 0, first + 2, 1);
 
     matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, second + 2);
     matrix->translation.x = ROAD_END_X - VEHICLE_LENGTH;
     matrix->translation.y = FX32_CONST(80);
     matrix->translation.z = FX32_CONST(8368);
-    MAT3_RotationY(&matrix->rotation, sin, cos);
+    MAT3_RotationY(&matrix->rotation, sin2, cos2);
     func_ov036_021b8248(expObj, 0, second + 2, 1);
 }
