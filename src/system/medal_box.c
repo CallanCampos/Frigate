@@ -80,7 +80,7 @@ void MedalBox_SetMedalNotSpecial(MedalBox *box, u16 medal) {
     MedalBox_WriteMedal(box, medal)->special = FALSE;
 }
 
-void MedalBox_SetLastMedal(MedalBox *box, u8 medal) {
+void MedalBox_SetLastMedal(MedalBox *box, u32 medal) {
     box->lastMedal = medal;
 }
 

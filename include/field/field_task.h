@@ -35,6 +35,8 @@ FieldTask *FieldCameraMoveTaskZoom_Create(Field *field, u16 duration, fx32 zoom)
 FieldTask *FieldCameraMoveTaskPitch_Callback(Field *field, u16 duration, u16 pitch);
 FieldTask *FieldCameraMoveTaskYaw_Callback(Field *field, u16 duration, u16 yaw);
 FieldTask *FieldCameraMoveTaskTargetOffs_Create(Field *field, u16 duration, const VecFx32 *offset);
+// Moves the camera's target from one position to another
+FieldTask *FieldCameraMoveTaskTarget_Create(Field *field, u16 duration, const VecFx32 *from, const VecFx32 *to);
 FieldTaskManager *FieldTaskManager_Create(u32 count, HeapID heapId);
 void FieldTaskManager_Free(FieldTaskManager *manager);
 void FieldTaskManager_Update(FieldTaskManager *manager);

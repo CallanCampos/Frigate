@@ -4,7 +4,9 @@
 #include "types.h"
 #include "gfl/proc.h"
 #include "gfl/str.h"
+#include "gfl/heap.h"
 #include "nitro/fx.h"
+#include "system/game_event.h"
 #include "struct_decls.h"
 
 typedef enum {
@@ -20,14 +22,43 @@ struct GameSystemProcData {
     u16 unk12;
 };
 
+// The game itself, from the title screen's choice to the reset: the process that owns the game data, the field map,
+// the running event and the processes the events start
+struct GameSystem {
+    HeapID heapId;
+    GameSystemProcData *procData;
+    GameProcManager *procManager;
+    // What GFL_ProcMgrUpdate returned last: 0 with no process left
+    u32 procManagerState;
+    // Asked for a new event each frame that none runs
+    GameEventProvider eventProvider;
+    void *eventProviderData;
+    GameEvent *event;
+    GameData *gameData;
+    // NULL while the field map is down
+    Field *field;
+    GameCommSys *comm;
+    u32 unk28;
+    ISS *iss;
+    LinkFestival *festival;
+    u8 unk34;
+    // Whether an event ran at the start of the frame
+    u8 eventRunning;
+    // Nonzero keeps GSYS_TryBootGameComm from starting the field's communication
+    u8 unk36;
+    // Set when the console wakes with the communication on
+    u8 unk37_0 : 1;
+};
+
 extern const GameProcFunctions GAMESYSTEM_PROC_FUNCTIONS;
+extern GameSystem *g_GameSystem;
 
 GameSystemProcData *GameSystem_CreateProcData(GameEntryPoint entryPoint, u16 zoneId, const VecFx32 *spawnPos, s16 unk12);
 Field *GSYS_GetField(GameSystem *gsys);
 // A VBlank task that draws from the random generator, which the anti-piracy checks add when they fail, and how many
 // they added
 void get_mt(TCB *tcb, void *data);
-extern u32 data_021410f8;
+extern u32 g_AntiPiracyTaskCount;
 // Whether the field map is up, which Game Freak's asserts call GAMESYSTEM_CheckFieldMapWork
 BOOL GSYS_CheckField(GameSystem *gsys);
 PlayerState *GSYS_GetPlayerState(GameSystem *gsys);
@@ -53,6 +84,12 @@ u32 getStatusOfFesMission(LinkFestival *festival);
 
 void GSYS_SetEventProvider(GameSystem *gsys, void *provider, void *data);
 GameEvent *GSYS_GetNowEvent(GameSystem *gsys);
+void GSYS_SetNowEvent(GameSystem *gsys, GameEvent *event);
+void GSYS_StartFieldmapProc(GameSystem *gsys);
+void func_02016bf8(GameSystem *gsys);
 void GSYS_SetField(GameSystem *gsys, Field *field);
+
+// Overlay 36's field map process (fieldmap.c), declared here until its header has it
+extern const GameProcFunctions FIELDMAP_PROC_FUNCS;
 
 #endif // POKEBW2_SYSTEM_GAME_SYSTEM_H

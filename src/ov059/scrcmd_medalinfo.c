@@ -46,7 +46,7 @@ BOOL func_ov059_021e7c70(VM *vm, FieldScriptEnv *env) {
     param->mode = 0;
     param->gameData = gameData;
     param->gsys = gsys;
-    ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_MEDAL_INFO, &MedalInfo_ProcFunctions, param,
+    ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_MEDAL_INFO, &MedalInfo_ProcFunctions, param,
                                              func_ov059_021e7d68, param));
     return TRUE;
 }

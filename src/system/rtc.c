@@ -1,0 +1,75 @@
+#include "system/rtc.h"
+#include "types.h"
+#include "nitro/rtc.h"
+#include "system/season.h"
+
+// The periods of the day, which start at different hours in each season. The file's name is a guess, after swan's
+// header. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except IsDayPeriodNight
+
+// The hour each period starts at, by season
+static const u8 LIGHT_CHANGE_HOURS[SEASON_COUNT][DAY_PERIOD_COUNT] = {
+    {  5, 10, 17, 20, 0 },
+    {  4,  9, 19, 21, 0 },
+    {  6, 10, 17, 20, 0 },
+    {  7, 11, 17, 19, 0 },
+};
+
+// The period of each hour, by season
+static const u8 day_part[SEASON_COUNT][24] = {
+    {
+        DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT,
+        DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MORNING, DAY_PERIOD_MORNING, DAY_PERIOD_MORNING,
+        DAY_PERIOD_MORNING, DAY_PERIOD_MORNING, DAY_PERIOD_DAY, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_EVENING, DAY_PERIOD_EVENING, DAY_PERIOD_EVENING,
+        DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT,
+    },
+    {
+        DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT,
+        DAY_PERIOD_MORNING, DAY_PERIOD_MORNING, DAY_PERIOD_MORNING, DAY_PERIOD_MORNING,
+        DAY_PERIOD_MORNING, DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_EVENING,
+        DAY_PERIOD_EVENING, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT,
+    },
+    {
+        DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT,
+        DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MORNING, DAY_PERIOD_MORNING,
+        DAY_PERIOD_MORNING, DAY_PERIOD_MORNING, DAY_PERIOD_DAY, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_EVENING, DAY_PERIOD_EVENING, DAY_PERIOD_EVENING,
+        DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT,
+    },
+    {
+        DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT,
+        DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MORNING,
+        DAY_PERIOD_MORNING, DAY_PERIOD_MORNING, DAY_PERIOD_MORNING, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY, DAY_PERIOD_DAY,
+        DAY_PERIOD_DAY, DAY_PERIOD_EVENING, DAY_PERIOD_EVENING, DAY_PERIOD_NIGHT,
+        DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT,
+    },
+};
+
+u16 GetRealTimeDayPeriod(int season) {
+    RTCTime time;
+
+    RTC_GetCachedTime(&time);
+    return GetDayPeriod(season, time.hour);
+}
+
+u16 GetDayPeriod(int season, u32 hour) {
+    return day_part[season][hour];
+}
+
+u8 GetLightChangeHoursForSeasons(u32 season, u32 period) {
+    return LIGHT_CHANGE_HOURS[season][period];
+}
+
+BOOL IsDayPeriodNight(int season) {
+    switch (GetRealTimeDayPeriod(season)) {
+    case DAY_PERIOD_NIGHT:
+    case DAY_PERIOD_MIDNIGHT:
+        return TRUE;
+    }
+    return FALSE;
+}

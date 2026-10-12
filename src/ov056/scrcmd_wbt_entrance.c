@@ -69,7 +69,7 @@ BOOL WbtCmd_CheckRegulation(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     Regulation *regulation = func_ov055_021e5f78(sys);
 
-    *var = func_0201f268(regulation, WbtMakeMatch_GetParty(sys, FieldScriptEnv_GetGameData(env))) == 0 ? TRUE : FALSE;
+    *var = PokeRegulation_CheckPartyCanEnter(regulation, WbtMakeMatch_GetParty(sys, FieldScriptEnv_GetGameData(env))) == 0 ? TRUE : FALSE;
     return FALSE;
 }
 

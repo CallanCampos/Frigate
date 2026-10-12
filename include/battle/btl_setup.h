@@ -2,6 +2,7 @@
 #define POKEBW2_BATTLE_BTL_SETUP_H
 
 #include "types.h"
+#include "battle/regulation.h"
 #include "gfl/heap.h"
 #include "nitro/math.h"
 #include "save/config.h"
@@ -22,7 +23,7 @@ typedef struct {
 // The battle's surroundings, which GetFieldEffectData returns
 struct BtlFieldSituation {
     BtlFieldEnv env;
-    // The battle's music
+    // The battle's music, and the music of a win
     u16 bgm;
     u16 unk12;
     void *netHandle;
@@ -79,10 +80,14 @@ struct BtlSetup {
     void *unk88;
     u16 unk8C;
     u16 unk8E;
+    // What func_0200b760 fills in from a regulation, a RegulationUnkAC
     u8 unk90[7];
     u8 unk97;
+    // The player's badges
     u8 unk98;
-    u8 unk99[7];
+    u8 unk99[3];
+    // BtlSetup_SetFlag sets these
+    u32 flags;
     u16 unkA0;
     u16 unkA2;
     u32 unkA4;
@@ -118,8 +123,7 @@ struct BtlSetup {
     u8 unkDE_1 : 7;
     u8 unkDF;
     u8 unkE0;
-    u8 unkE1[4];
-    u8 unkE5[2];
+    u8 unkE1[6];
     // The party slots each client sends out
     u8 unkE7[4][6];
     u8 unkFF;
@@ -149,11 +153,11 @@ void BtlSetup_SetWildMulti(BtlSetup *setup, GameData *gameData, PokeParty *party
 void BtlSetup_SetFlag(BtlSetup *setup, u32 flag);
 void BtlSetup_Free(BtlSetup *setup);
 PokeParty *BtlSetup_GetParty(BtlSetup *setup, u32 index);
-void BtlSetup_SetNet1v1Double(BtlSetup *setup, GameData *gameData, NetHandle *handle, u32 a3, HeapID heapId);
-void BtlSetup_SetNet1v1Single(BtlSetup *setup, GameData *gameData, NetHandle *handle, u32 a3, HeapID heapId);
-void BtlSetup_SetNetRotation(BtlSetup *setup, GameData *gameData, NetHandle *handle, u32 a3, HeapID heapId);
-void BtlSetup_SetNetTriple(BtlSetup *setup, GameData *gameData, NetHandle *handle, u32 a3, HeapID heapId);
-void BtlSetup_SetNetMultiVsNet(BtlSetup *setup, GameData *gameData, NetHandle *handle, u32 a3, u8 a4, HeapID heapId);
+void BtlSetup_SetNet1v1Double(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
+void BtlSetup_SetNet1v1Single(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
+void BtlSetup_SetNetRotation(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
+void BtlSetup_SetNetTriple(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, HeapID heapId);
+void BtlSetup_SetNetMultiVsNet(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, u8 a4, HeapID heapId);
 // Battles against trainers, in the surroundings that SaveBtlFieldStatus saved
 void BtlSetup_SetTrainer1v1Single(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
 void BtlSetup_SetTrainer1v1Double(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
@@ -164,7 +168,7 @@ void BtlSetup_SetTrainer1v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus 
 void BtlSetup_SetTrainer3v3(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
 void BtlSetup_SetTrainerRotation(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
 // A multi battle of two linked players against trainers
-void BtlSetup_SetNetMultiVsAI(BtlSetup *setup, GameData *gameData, NetHandle *handle, u32 a3, u8 a4, u32 a5, u32 a6,
+void BtlSetup_SetNetMultiVsAI(BtlSetup *setup, GameData *gameData, NetHandle *handle, u8 a3, u8 a4, u32 a5, u32 a6,
                               HeapID heapId);
 void BtlSetup_PostProcessTrialHouse(BtlSetup *setup);
 // The capture demonstration, between the two parties
@@ -173,17 +177,16 @@ void BtlSetup_SetCaptureDemo(BtlSetup *setup, GameData *gameData, PokeParty *par
 // Changes the levels of the parties for the challenge mode of the zone, which the keys of Unova Link unlock
 void adjustPkmLvForChallengeKeys(BtlSetup *setup, GameData *gameData, u16 zoneId);
 // Frees what the setup holds and clears it
-void func_02017cac(BtlSetup *setup);
-void func_02017cfc(BtlSetup *setup, PokeParty *party, u32 a2);
-void func_02017d30(BtlSetup *setup, Regulation *regulation, HeapID heapId);
+void BtlSetup_FreeContents(BtlSetup *setup);
+void BtlSetup_SetParty(BtlSetup *setup, PokeParty *party, u32 a2);
+void BtlSetup_ApplyRegulation(BtlSetup *setup, Regulation *regulation, HeapID heapId);
 // Gives a battle's trainer a name buffer and empty words
 BtlSetupTrainer *TrainerBattleSetup_Create(HeapID heapId);
 // A field status with the default background
 void ResetBtlFieldStatus(BtlFieldStatus *status);
-void func_02018540(BtlSetup *setup, GameData *gameData, HeapID heapId);
-void func_020185b4(BtlSetup *setup);
-void func_020186b0(BtlSetup *setup, u32 a1);
-void func_0201f63c(Regulation *regulation, PokeParty *party);
+void BtlSetup_InitForRecord(BtlSetup *setup, GameData *gameData, HeapID heapId);
+void BtlSetup_FreeForRecord(BtlSetup *setup);
+void BtlSetup_AllocRecBuffer(BtlSetup *setup, HeapID heapId);
 void func_0200bb24(HeapID heapId);
 void freeVSPlayerBlkClearPtr(void);
 

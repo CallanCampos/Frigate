@@ -81,7 +81,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         }
         break;
     case 7:
-        GSYS_QueueProc(gsys, OVERLAY_ID(266), &data_ov266_0219e518, &work->ov266Param);
+        GSYS_QueueProc(gsys, OVERLAY_STAFF_ROLL, &STAFF_ROLL_PROC_FUNCTIONS, &work->staffRollParam);
         EventGameClear_NextState(work, state);
         break;
     case 8:
@@ -222,10 +222,10 @@ void SetGameClearGameData(GameClearWork *work) {
 void func_ov012_0215a50c(GameClearWork *work) {
     u32 value;
 
-    work->ov266Param.unk00 = work->unk08 == 1;
-    work->ov266Param.playerInfo = GetGameDataPlayerInfo(work->gameData);
+    work->staffRollParam.skippable = work->unk08 == 1;
+    work->staffRollParam.playerInfo = GetGameDataPlayerInfo(work->gameData);
     value = func_02008a84((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(work->gameData)));
-    work->ov266Param.unk04 = value;
+    work->staffRollParam.unk04 = value;
     work->ov267Param.unk00 = value;
 }
 

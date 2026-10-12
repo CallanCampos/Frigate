@@ -72,7 +72,7 @@ BOOL s02B0_CallUnovaLinkKeyUnlock(VM *vm, FieldScriptEnv *env) {
     param->gameData = gameData;
     param->unk00 = 0;
     param->mode = mode;
-    ScriptWork_CallEvent(work, func_020196d0(gsys, field, OVERLAY_ID(332), &UNOVA_LINK_PROC_FUNCTIONS, param,
+    ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(332), &UNOVA_LINK_PROC_FUNCTIONS, param,
                                              func_ov012_0216a8cc, param));
     return TRUE;
 }

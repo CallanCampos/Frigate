@@ -96,7 +96,7 @@ static BOOL Sandstorm_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
     if (work->timer > 0) {
         if (--work->timer == 0) {
             func_ov036_02199958(task, 8, 0x7f5e, 0x5a, arg);
-            func_ov036_02199734(task, 0x3d, func_020198f0(3));
+            func_ov036_02199734(task, 0x3d, FieldLightStatus_GetWeatherLight(3));
         }
     } else if (func_ov036_021999dc(task) && done) {
         func_ov036_0219978c(task, 1, 0);
@@ -112,7 +112,7 @@ static BOOL Sandstorm_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     func_ov036_0219990c(task, 8, 0x7f5e, arg);
     func_ov036_02199880(task, Sandstorm_AddGrains, 24, 2, 2, heapId);
     func_ov036_0219978c(task, 1, 0);
-    func_ov036_02199740(task, 0x3d, func_020198f0(3));
+    func_ov036_02199740(task, 0x3d, FieldLightStatus_GetWeatherLight(3));
     return TRUE;
 }
 

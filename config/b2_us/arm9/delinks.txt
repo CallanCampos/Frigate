@@ -1369,3 +1369,263 @@ src/system/dwc_friend.c:
 src/system/net_bgm_volume.c:
     complete
     .text       start:0x02011bdc end:0x02011bfc
+
+src/system/net_err.c:
+    complete
+    .text       start:0x02011bfc end:0x02012908
+    .rodata     start:0x0208fdb8 end:0x0208fe08
+    .data       start:0x0209a230 end:0x0209a244
+    .bss        start:0x02141014 end:0x02141078
+
+src/system/wih_dwc.c:
+    complete
+    .text       start:0x02012908 end:0x02012ee0
+    .data       start:0x0209a244 end:0x0209a2b4
+    .bss        start:0x02141078 end:0x02141080
+
+src/system/net_save.c:
+    complete
+    .text       start:0x02012ee0 end:0x020130b4
+    .data       start:0x0209a2b4 end:0x0209a2c0
+
+src/system/game_sync_settings_proc.c:
+    complete
+    .text       start:0x020130b4 end:0x02013210
+    .rodata     start:0x0208fe08 end:0x0208fe14
+
+src/system/battle_video_proc.c:
+    complete
+    .text       start:0x02013210 end:0x0201340c
+    .rodata     start:0x0208fe14 end:0x0208fe20
+
+src/system/pass_power.c:
+    .text       start:0x0201340c end:0x02013914
+    .rodata     start:0x0208fe20 end:0x0208fe3c
+    .bss        start:0x02141080 end:0x021410f4
+
+src/system/game_beacon_accessor.c:
+    complete
+    .text       start:0x02013914 end:0x02014498
+    .rodata     start:0x0208fe3c end:0x0208ff00
+    .data       start:0x0209a2c0 end:0x0209a2d8
+
+src/system/link_festival.c:
+    complete
+    .text       start:0x02014498 end:0x02014d1c
+    .data       start:0x0209a2d8 end:0x0209a2e8
+
+src/system/fest_mission.c:
+    complete
+    .text       start:0x02014d1c end:0x02014ff0
+    .rodata     start:0x0208ff00 end:0x0208ff20
+    .data       start:0x0209a2e8 end:0x0209a2f8
+
+src/system/fest_mission_beacon.c:
+    complete
+    .text       start:0x02014ff0 end:0x02015878
+    .rodata     start:0x0208ff20 end:0x0208ff7c
+
+src/system/rtc.c:
+    complete
+    .text       start:0x02015a90 end:0x02015ae0
+    .rodata     start:0x0208ff84 end:0x0208fff8
+
+src/system/ica_anime.c:
+    .text       start:0x02015ae0 end:0x02016440
+    .rodata     start:0x0208fff8 end:0x02090010
+    .data       start:0x0209a300 end:0x0209a30c
+
+src/system/nsbtx_to_clwk.c:
+    complete
+    .text       start:0x02016440 end:0x0201666c
+    .data       start:0x0209a30c end:0x0209a31c
+
+src/system/game_system.c:
+    .text       start:0x0201666c end:0x02016cb4
+    .rodata     start:0x02090010 end:0x0209001c
+    .bss        start:0x021410f4 end:0x02141110
+
+src/system/game_event.c:
+    complete
+    .text       start:0x02016cb4 end:0x02016ee8
+    .data       start:0x0209a31c end:0x0209a32c
+
+src/system/game_data.c:
+    complete
+    .text       start:0x02016ee8 end:0x02017bc0
+    .rodata     start:0x0209001c end:0x02090060
+    .data       start:0x0209a32c end:0x0209a338
+
+src/system/text_speed.c:
+    complete
+    .text       start:0x02017bc0 end:0x02017c60
+    .rodata     start:0x02090060 end:0x02090068
+    .data       start:0x0209a338 end:0x0209a33c
+
+src/system/btl_setup.c:
+    complete
+    .text       start:0x02017c60 end:0x020186e0
+    .rodata     start:0x02090068 end:0x02090070
+    .data       start:0x0209a33c end:0x0209a348
+
+src/system/zonedata.c:
+    complete
+    .text       start:0x020186e0 end:0x02018ee4
+    .rodata     start:0x02090070 end:0x02090120
+    .data       start:0x0209a348 end:0x0209a380
+    .bss        start:0x02141110 end:0x02141114
+
+src/system/zone_spawn.c:
+    complete
+    .text       start:0x02018fbc end:0x02019194
+
+src/system/event_work.c:
+    complete
+    .text       start:0x02019194 end:0x020192e4
+    .bss        start:0x02141114 end:0x0214111c
+
+src/system/field_dir.c:
+    complete
+    .text       start:0x020192e4 end:0x020192f0
+    .rodata     start:0x02090120 end:0x02090124
+
+src/system/field_status.c:
+    complete
+    .text       start:0x020192f0 end:0x02019350
+    .data       start:0x0209a380 end:0x0209a390
+
+src/system/field_event.c:
+    complete
+    .text       start:0x02019350 end:0x02019804
+
+src/system/field_light_status.c:
+    complete
+    .text       start:0x02019804 end:0x020199e8
+    .rodata     start:0x02090124 end:0x02090160
+
+src/system/mcss.c:
+    .text       start:0x020199e8 end:0x0201bfdc
+    .rodata     start:0x02090160 end:0x02090178
+    .data       start:0x0209a390 end:0x0209a398
+
+src/system/mcss_tool.c:
+    complete
+    .text       start:0x0201bfdc end:0x0201c2ac
+    .rodata     start:0x02090178 end:0x02090350
+    .data       start:0x0209a398 end:0x0209a3a8
+
+src/system/poke_regulation.c:
+    .text       start:0x0201f07c end:0x0201fcf8
+    .rodata     start:0x020904f4 end:0x02090534
+    .data       start:0x0209a3b4 end:0x0209a3c8
+
+src/system/pokeparty.c:
+    .text       start:0x0201fcf8 end:0x02020208
+    .data       start:0x0209a3c8 end:0x0209a3d4
+
+src/system/poke_personal.c:
+    complete
+    .text       start:0x02020208 end:0x02020510
+    .data       start:0x0209a3d4 end:0x0209a3e4
+    .bss        start:0x021413e8 end:0x021413f0
+
+src/system/pokerus.c:
+    complete
+    .text       start:0x02020510 end:0x02020788
+
+src/system/shinka_check.c:
+    complete
+    .text       start:0x02020788 end:0x02020c78
+    .data       start:0x0209a3e4 end:0x0209a404
+
+src/system/poke_friendship.c:
+    complete
+    .text       start:0x02020c78 end:0x02020df8
+    .rodata     start:0x02090534 end:0x0209054c
+
+src/system/poke_recover.c:
+    complete
+    .text       start:0x02020df8 end:0x02020f40
+
+src/system/poke_icon.c:
+    complete
+    .text       start:0x02020f40 end:0x02021280
+    .rodata     start:0x0209054c end:0x02090840
+
+src/system/waza_tool.c:
+    complete
+    .text       start:0x02021280 end:0x02021974
+    .data       start:0x0209a404 end:0x0209a410
+    .bss        start:0x021413f0 end:0x02141418
+
+src/system/poke_tool.c:
+    complete
+    .text       start:0x0201c2ac end:0x0201f07c
+    .rodata     start:0x02090350 end:0x020904f4
+    .data       start:0x0209a3a8 end:0x0209a3b4
+    .bss        start:0x0214111c end:0x021413e8
+
+src/system/main.c:
+    complete
+    .text       start:0x02005124 end:0x02005364
+    .bss        start:0x0209d740 end:0x0209d744
+
+src/system/machine_use.c:
+    complete
+    .text       start:0x02005364 end:0x020054b8
+    .bss        start:0x0209d744 end:0x0209da58
+
+src/system/gfl_use.c:
+    complete
+    .text       start:0x020054b8 end:0x02005838
+    .rodata     start:0x0208ee58 end:0x0208ee78
+    .data       start:0x02099080 end:0x02099efc
+    .bss        start:0x0209da58 end:0x0209da70
+
+src/system/pm_voice.c:
+    complete
+    .text       start:0x020065b4 end:0x02006d64
+    .rodata     start:0x0208ee78 end:0x0208eea8
+    .data       start:0x02099f14 end:0x02099f20
+    .bss        start:0x0213b278 end:0x02140f58
+
+src/system/snd_mic.c:
+    complete
+    .text       start:0x02006d64 end:0x02006ee8
+    .data       start:0x02099f20 end:0x02099f38
+    .bss        start:0x02140f58 end:0x02140f5c
+
+src/system/bgm_info.c:
+    complete
+    .text       start:0x02006ee8 end:0x02006fc8
+    .data       start:0x02099f38 end:0x02099f44
+
+src/system/snd_strm.c:
+    complete
+    .text       start:0x02006fc8 end:0x020070f0
+    .data       start:0x02099f44 end:0x02099f50
+    .bss        start:0x02140f5c end:0x02140f60
+
+src/system/save_control.c:
+    .text       start:0x020070f0 end:0x02007710
+    .data       start:0x02099f50 end:0x02099fa4
+    .bss        start:0x02140f60 end:0x02140f64
+
+src/system/save_table.c:
+    complete
+    .rodata     start:0x0208eea8 end:0x0208f4cc
+
+src/system/box_savedata.c:
+    complete
+    .text       start:0x02007710 end:0x02007e20
+    .data       start:0x02099fa4 end:0x0209a074
+
+src/system/perapvoice.c:
+    .text       start:0x02007e20 end:0x02007fd0
+    .data       start:0x0209a074 end:0x0209a084
+
+src/system/myitem_savedata.c:
+    complete
+    .text       start:0x02007fd0 end:0x0200897c
+    .rodata     start:0x0208f4cc end:0x0208f750
+    .data       start:0x0209a084 end:0x0209a098

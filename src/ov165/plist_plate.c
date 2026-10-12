@@ -234,11 +234,11 @@ static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
     if (plate->pkm != NULL) {
         BoxPkm *pkm = func_0201d624(plate->pkm);
 
-        file = func_02020f40(pkm);
-        palette = func_020210c0(pkm);
+        file = PokeIcon_GetFileOfPkm(pkm);
+        palette = PokeIcon_GetPaletteOfPkm(pkm);
     } else {
         file = PokeParty_GetIconIndex(1, 0, 0, TRUE);
-        palette = func_02021034(1, 0, 0, TRUE);
+        palette = PokeIcon_GetPalette(1, 0, 0, TRUE);
     }
     plate->iconChars = func_0204b81c(arc, file, FALSE, 0, wk->heapId);
     GFL_ArcToolFree(arc);
@@ -659,7 +659,7 @@ BOOL PokeListPlate_IsEgg(PokeListWork *wk, PokeListPlate *plate) {
 static void PokeListPlate_UpdateEntry(PokeListWork *wk, PokeListPlate *plate) {
     if (PokeList_IsBattle(wk) == FALSE) {
         plate->entry = POKELIST_ENTRY_EMPTY;
-    } else if (func_0201f14c(wk->param->regulation, wk->param->unk18, plate->pkm) == 0) {
+    } else if (PokeRegulation_CheckPokemonExtraRule(wk->param->regulation, wk->param->unk18, plate->pkm) == 0) {
         plate->entry = POKELIST_ENTRY_ABLE;
     } else {
         plate->entry = POKELIST_ENTRY_UNABLE;

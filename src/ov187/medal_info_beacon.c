@@ -113,7 +113,7 @@ BOOL MedalInfoBeacon_LogMain(GameProc *proc, u32 *state, void *param, void *work
 static BOOL MedalInfoBeacon_LogExit(GameProc *proc, u32 *state, void *param, void *work) {
     MedalInfoBeaconWork *logWork = work;
     BeaconStatus *status;
-    BeaconStatus *log;
+    GameBeaconInfoTable *log;
     u32 result = MedalInfoViewer_Delete(logWork->viewer);
     u32 i;
     int shownFirst;
@@ -132,7 +132,7 @@ static BOOL MedalInfoBeacon_LogExit(GameProc *proc, u32 *state, void *param, voi
     // Scroll the log to keep the last beacon shown in view
     shownFirst = logWork->viewerParam.entries[logWork->viewerParam.startIndex].index;
     shownLast = logWork->viewerParam.entries[logWork->viewerParam.selected].index;
-    count = func_02013b80(log);
+    count = GameBeaconInfoTable_GetCount(log);
     lowest = shownFirst - logWork->param->logRow;
     highest = shownFirst + (3 - logWork->param->logRow);
     if (shownLast < lowest || shownLast > highest) {
@@ -157,16 +157,16 @@ static void MedalInfoBeacon_LoadBeacons(MedalInfoBeaconWork *work) {
     int total;
     u16 time;
     u32 kind;
-    GameBeacon *beacon = func_02013b8c(work->heapId);
-    BeaconStatus *status = func_0202d7a8(func_020174d4(work->param->gameData));
+    GameBeacon *beacon = GameBeacon_Alloc(work->heapId);
+    GameBeaconInfoTable *status = func_0202d7a8(func_020174d4(work->param->gameData));
 
     work->viewerParam.count = 0;
     work->viewerParam.mode = MEDAL_INFO_VIEWER_MODE_LIST;
-    total = func_02013b80(status);
+    total = GameBeaconInfoTable_GetCount(status);
     for (i = 0; i < total; i++) {
-        func_02013b44(status, beacon, &time, i);
-        kind = func_02013cc0(beacon);
-        if (!func_02013bd4(beacon) && !func_02013c88(beacon) && (kind == 0x16 || kind == 0x17)) {
+        GameBeaconInfoTable_RingGet(status, beacon, &time, i);
+        kind = GameBeacon_GetVersion(beacon);
+        if (!GameBeacon_IsInvalid(beacon) && !GameBeacon_IsGiftType(beacon) && (kind == 0x16 || kind == 0x17)) {
             if (func_02013dc8(beacon) != MEDAL_INFO_NO_MEDAL) {
                 work->viewerParam.count++;
             }
@@ -175,9 +175,9 @@ static void MedalInfoBeacon_LoadBeacons(MedalInfoBeaconWork *work) {
     work->viewerParam.entries = GFL_HeapAllocate(work->heapId, work->viewerParam.count * sizeof(MedalInfoEntry), TRUE,
                                                  "medal_info_beacon.c", 282);
     for (i = 0; i < total; i++) {
-        func_02013b44(status, beacon, &time, i);
-        kind = func_02013cc0(beacon);
-        if (!func_02013bd4(beacon) && !func_02013c88(beacon) && (kind == 0x16 || kind == 0x17)) {
+        GameBeaconInfoTable_RingGet(status, beacon, &time, i);
+        kind = GameBeacon_GetVersion(beacon);
+        if (!GameBeacon_IsInvalid(beacon) && !GameBeacon_IsGiftType(beacon) && (kind == 0x16 || kind == 0x17)) {
             if (work->param->beaconIndex == i) {
                 work->viewerParam.startIndex = n;
             }
@@ -185,9 +185,9 @@ static void MedalInfoBeacon_LoadBeacons(MedalInfoBeaconWork *work) {
                 MedalInfoEntry *entry = &work->viewerParam.entries[n];
 
                 entry->name = GFL_StrBufCreate(8, work->heapId);
-                func_02013cac(beacon, entry->name);
+                GameBeacon_GetName(beacon, entry->name);
                 entry->medal = func_02013dc8(beacon);
-                entry->count = func_02013dd0(beacon);
+                entry->count = GameBeacon_GetMedalCount(beacon);
                 entry->rank = 0;
                 entry->index = i;
                 n++;

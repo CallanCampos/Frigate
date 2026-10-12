@@ -426,7 +426,7 @@ void BtlvMcss_AddPokemon(BtlvMcss *work, PartyPkm *pkm, int pos) {
     if (PokeParty_GetParam(pkm, PKM_PARAM_N_POKEMON, NULL) == TRUE) {
         work->entries[index].flags |= BTLV_MCSS_FLAG_N_POKEMON;
     }
-    if (func_0201f010(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL)) >= 4) {
+    if (PML_GetPokestarFameLevel(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL)) >= 4) {
         work->entries[index].flags |= BTLV_MCSS_FLAG_FAMOUS;
     }
     BtlvMcss_SetupPokemonLoadInfo(work, pkm, &work->entries[index].info, pos);

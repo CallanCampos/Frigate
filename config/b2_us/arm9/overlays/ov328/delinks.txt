@@ -3,3 +3,14 @@
     .ctor       start:0x0219ef80 end:0x0219ef80 kind:rodata align:4
     .data       start:0x0219efa0 end:0x0219efc0 kind:data align:32
     .bss        start:0x0219efc0 end:0x0219efc0 kind:bss align:32
+
+src/ov328/gpower_app.c:
+    complete
+    .text       start:0x0219ce80 end:0x0219e9d8
+    .rodata     start:0x0219ec1c end:0x0219edc4
+
+src/ov328/gpower_app_graphic.c:
+    complete
+    .text       start:0x0219e9d8 end:0x0219ec1c
+    .rodata     start:0x0219edc4 end:0x0219ef80
+    .data       start:0x0219efa0 end:0x0219efc0

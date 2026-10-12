@@ -7,41 +7,63 @@
 #include "pml/poke_party.h"
 #include "struct_decls.h"
 
-// The size of a box, and a box
-u32 getSizeofPokeBox(void);
-u32 getSizeofBox(void);
-void *BoxSaveAccessor_GetBox(BoxSaveAccessor *boxes, u32 box);
-u32 howManyNormalPokesAreInAllBoxes(BoxSaveAccessor *boxes);
-u32 howManyTotalPokesAreInBoxes(BoxSaveAccessor *boxes);
+// The PC boxes, save blocks 0 (the main block) and 1 to 24 (the boxes). The names of the limits are the ones the
+// assertions of box_savedata.c keep
+#define BOX_MAX_TRAY 24
+#define BOX_MAX_POS 30
+#define BOX_NAME_LENGTH 20
+// The box that is open, where a function takes a box
+#define BOXDAT_TRAYNUM_CURRENT 0xffffffff
+
+typedef struct BoxMainSave BoxMainSave;
+
+void BoxMainSave_InitBlock(BoxMainSave *main);
+u32 BoxMainSave_GetBlockSize(void);
+// Puts a Pokémon in the first free slot from the open box on, opening more boxes when all are full
 BOOL BoxSaveAccessor_InsertPkm(BoxSaveAccessor *boxes, BoxPkm *pkm);
+// Puts a Pokémon in the first free slot of a box
 BOOL BoxSaveAccessor_InsertPkmCore(BoxSaveAccessor *boxes, u32 box, BoxPkm *pkm);
-// How many Pokémon the boxes have room for
-u32 func_02007a38(BoxSaveAccessor *boxes);
+BOOL BoxSaveAccessor_SetPkm(BoxSaveAccessor *boxes, u32 box, u32 slot, BoxPkm *pkm);
+void BoxSaveAccessor_SwapPkms(BoxSaveAccessor *boxes, u32 box1, u32 slot1, u32 box2, u32 slot2);
 void BoxSaveAccessor_ClearPkm(BoxSaveAccessor *boxes, u32 box, u32 slot);
-BOOL BoxSaveAccessor_GetNextFreeBoxSlot(BoxSaveAccessor *boxes, int *box, int *slot);
-u32 BoxSaveAccessor_GetPkmParam(BoxSaveAccessor *boxes, u32 box, u32 slot, u32 param, void *buffer);
-BoxPkm *BoxSaveAccessor_GetPkm(BoxSaveAccessor *boxes, u32 box, u32 slot);
 u32 BoxSaveAccessor_GetLastOpenedBox(BoxSaveAccessor *boxes);
 // How many boxes are open: 8, 16 or 24
 u8 BoxSaveAccessor_GetAvailableBoxCount(BoxSaveAccessor *boxes);
 // Opens 8 more boxes, up to 24, and returns how many are open
 u8 BoxSaveAccessor_UnlockMoreBoxes(BoxSaveAccessor *boxes);
+// Finds the first free slot from *box and *slot on, opening more boxes when all are full
+BOOL BoxSaveAccessor_GetNextFreeBoxSlot(BoxSaveAccessor *boxes, int *box, int *slot);
+// How many Pokémon the boxes have room for
+u32 BoxSaveAccessor_CountEmptySlots(BoxSaveAccessor *boxes);
+u32 countEmptySlotsInBox(BoxSaveAccessor *boxes, u32 box);
 void saveLastOpenedBoxIdx(BoxSaveAccessor *boxes, u32 box);
 // A box's wallpaper
 u32 getBoxNumFromIdx(BoxSaveAccessor *boxes, u32 box);
-void func_02007b00(BoxSaveAccessor *boxes, u32 box, u32 wallpaper);
+void BoxSaveAccessor_SetWallpaper(BoxSaveAccessor *boxes, u32 box, u32 wallpaper);
 // Copies a box's name into a string, and back
 void loadBoxNameToStrbuf(BoxSaveAccessor *boxes, u32 box, StrBuf *str);
 void getBoxNameFromStrbuf(BoxSaveAccessor *boxes, u32 box, StrBuf *name);
 u32 howManyPokesInGeneralAreInBox(BoxSaveAccessor *boxes, u32 box);
-u32 countEmptySlotsInBox(BoxSaveAccessor *boxes, u32 box);
-BOOL BoxSaveAccessor_SetPkm(BoxSaveAccessor *boxes, u32 box, u32 slot, BoxPkm *pkm);
-void BoxSaveAccessor_SwapPkms(BoxSaveAccessor *boxes, u32 box1, u32 slot1, u32 box2, u32 slot2);
-// Allocates a copy of a boxed Pokémon, which func_02007d84 frees
+u32 howManyTotalPokesAreInBoxes(BoxSaveAccessor *boxes);
+// Without the eggs
+u32 howManyNormalPokesAreInAllBoxes(BoxSaveAccessor *boxes);
+u32 BoxSaveAccessor_GetPkmParam(BoxSaveAccessor *boxes, u32 box, u32 slot, u32 param, void *buffer);
+BoxPkm *BoxSaveAccessor_GetPkm(BoxSaveAccessor *boxes, u32 box, u32 slot);
+// Allocates a copy of a boxed Pokémon, which BoxSaveAccessor_FreePkmCopy frees
 BoxPkm *copyBoxedPkmToBuf(BoxSaveAccessor *boxes, u32 box, u32 slot, HeapID heapId);
-void func_02007d84(BoxPkm *pkm);
+void BoxSaveAccessor_FreePkmCopy(BoxPkm *pkm);
+// Sets flags of the main block: the sets of extra wallpapers that are unlocked
+void BoxSaveAccessor_SetFlags(BoxSaveAccessor *boxes, u32 flags);
 // Whether a set of extra wallpapers (1 or 2) is unlocked
-BOOL func_02007da4(BoxSaveAccessor *boxes, u32 set);
+BOOL BoxSaveAccessor_CheckFlags(BoxSaveAccessor *boxes, u32 set);
+// The size of a box
+u32 getSizeofPokeBox(void);
+BoxSaveAccessor *BoxSaveAccessor_Create(HeapID heapId, SaveControl *save);
+void BoxSaveAccessor_Free(BoxSaveAccessor *boxes);
+// A box's block: its size, its init and its pointer
+void initFullBox(void *tray);
+u32 getSizeofBox(void);
+void *BoxSaveAccessor_GetBox(BoxSaveAccessor *boxes, u32 box);
 
 // The battle box, save block 0x31: one box of six Pokémon, its name and its flags
 #define BATTLE_BOX_COUNT 1
@@ -105,8 +127,5 @@ void DayCareSave_UpdateStepCount(DayCareSave *dayCare, u32 steps);
 u32 getSizeofBreedingBlock(void);
 void setEggArea(DayCareSave *dayCare);
 DayCareSave *getDaycareBlockAddress(SaveControl *save);
-
-// Sets flags of the box save
-void func_02007d8c(BoxSaveAccessor *accessor, u32 flags);
 
 #endif // POKEBW2_SAVE_BOX_H

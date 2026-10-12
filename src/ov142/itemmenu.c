@@ -1703,7 +1703,7 @@ static void ItemMenu_SortByUses(ItemMenuWork *work, BOOL mostUsedFirst) {
     for (; i < count; i++) {
         item = &items[i];
         data = PML_ItemArcHandleReadFile(arc, item->item, work->heapId);
-        uses = func_0200854c(work->bag, item->item);
+        uses = BagSave_GetExistingItemCount(work->bag, item->item);
         if (mostUsedFirst == TRUE) {
             sort[i].key = ((u64)(999 - uses) << 40) + (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28)
                 + (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16) + item->item;

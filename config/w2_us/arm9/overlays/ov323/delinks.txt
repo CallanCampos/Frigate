@@ -3,3 +3,15 @@
     .ctor       start:0x0219ee08 end:0x0219ee08 kind:rodata align:4
     .data       start:0x0219ee20 end:0x0219eec0 kind:data align:32
     .bss        start:0x0219eec0 end:0x0219eec0 kind:bss align:32
+
+src/ov323/pkwd_selectscreen.c:
+    complete
+    .text       start:0x0219cec0 end:0x0219e70c
+    .rodata     start:0x0219e948 end:0x0219ec4c
+    .data       start:0x0219ee20 end:0x0219ee98
+
+src/ov323/pkwd_selectscreen_graphic.c:
+    complete
+    .text       start:0x0219e70c end:0x0219e948
+    .rodata     start:0x0219ec4c end:0x0219ee08
+    .data       start:0x0219ee98 end:0x0219eec0

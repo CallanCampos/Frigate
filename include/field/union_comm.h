@@ -229,7 +229,7 @@ struct UnionSystem {
     struct {
         UnionApp *uniapp;
         Regulation *regulation;
-        void *rpm; // the regulation's rules printed, from func_0201f8b4 (the name is the ROM's)
+        void *rpm; // the regulation's rules printed, from PokeRegulation_CreatePrintMsg (the name is the ROM's)
         void *partySelect;
         PokeParty *boxParty; // the Battle Box as a party
         TrainerCardParam *cardParam;

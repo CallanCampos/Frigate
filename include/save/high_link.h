@@ -51,51 +51,106 @@ void func_0200c6d8(HighLinkSave *save, u8 *dest, u32 a2);
 // Counts play time in seconds: mode 0 starts the count, 1 adds the time since the start to the save's total and
 // 2 returns the total as it would be. Returns the total
 u64 HighLinkSave_CountPlaySeconds(HighLinkSave *save, PlayTime *playTime, u32 mode);
-BOOL PassPower_IsIDInvalid(u32 passPower);
-BOOL PassPower_IsIDValid(u32 passPower);
-// Starts a pass power, bought with Pass Orbs when paid is set
-void PassPower_Activate(u32 passPower, void *data, u32 paid);
-// A pass power's effect and its price in Pass Orbs, from the table of PassPowerData_Create
-u8 PassPowerData_GetEffect(void *data, u32 passPower);
-u16 PassPowerData_GetPrice(void *data, u32 passPower);
-// The pass powers that act at once: they restore the party's HP or PP
-void PassPower_ApplyHPRestore(PokeParty *party);
-void PassPower_ApplyPPRestore(PokeParty *party);
-u32 PassPower_GetUsedIDByEffect(int effect);
-BOOL PassPower_IsBW1Compatible(u32 passPower);
-u32 PassPower_GetRemainingSeconds(int effect);
-u32 PassPower_ApplyPrizeMoney(u32 money);
-u32 PassPower_ApplyBargain(u32 price);
-BOOL PassPower_IsBW1Compatible(u32 passPower);
-u32 PassPower_ApplyEXP(u32 exp);
-u32 PassPower_ApplyCapture(u32 rate);
-// The pass powers on wild encounters: the encounter rate, the rolls for a shiny and the row of the slots' odds
-u32 PassPower_ApplyEncounter(u32 rate);
-u32 PassPower_ApplyLuckyShiny(u32 rolls);
-u32 PassPower_ApplyLuckyEncProb(u32 row);
-// The steps between phenomena, and the chance of one, in tenths of a percent
-u16 PassPower_ApplyExploring(u16 steps);
-u32 PassPower_ApplyExploringChance(u32 chance);
+// The pass powers in effect (pass_power.c, a guessed name; the functions' names are swan's)
+
+// The pass powers are numbered to PASS_POWER_MAX, without 0x2e and 0x2f. Those from PASS_POWER_NONE on are new in
+// Black 2 and White 2, and PASS_POWER_SPECIAL_FIRST to PASS_POWER_SPECIAL_LAST are the special ones
+#define PASS_POWER_SPECIAL_FIRST 0x21
+#define PASS_POWER_SPECIAL_LAST 0x26
+#define PASS_POWER_BW1_MAX 0x2e
+#define PASS_POWER_NONE HIGH_LINK_POWER_NONE
+#define PASS_POWER_MAX 0x40
+
+// What a pass power does. One pass power of each effect runs at a time
+typedef enum {
+    PASS_POWER_EFFECT_ENCOUNTER_UP,
+    PASS_POWER_EFFECT_ENCOUNTER_DOWN,
+    PASS_POWER_EFFECT_HATCH,
+    PASS_POWER_EFFECT_BEFRIEND,
+    PASS_POWER_EFFECT_BARGAIN,
+    PASS_POWER_EFFECT_HP_RESTORE,
+    PASS_POWER_EFFECT_PP_RESTORE,
+    PASS_POWER_EFFECT_EXP_UP,
+    PASS_POWER_EFFECT_EXP_DOWN,
+    PASS_POWER_EFFECT_PRIZE_MONEY,
+    PASS_POWER_EFFECT_CAPTURE,
+    PASS_POWER_EFFECT_11,
+    PASS_POWER_EFFECT_12,
+    PASS_POWER_EFFECT_EXPLORING,
+    PASS_POWER_EFFECT_GROTTO,
+    PASS_POWER_EFFECT_LUCKY,
+    PASS_POWER_EFFECT_COUNT,
+} PassPowerEffect;
+
 // A pass power of the table that PassPowerData_Create reads: the two levels it is unlocked by, White then Black,
 // its name in message file 263 and its description in message file 264
 typedef struct {
     u8 level1;
     u8 level2;
-    // A number that the description shows
+    // The price in Pass Orbs, which the description shows
     u16 unk02;
     u16 name;
     u16 info;
-    u8 unk08[4];
+    // The strength of the effect: a percentage, an amount or a level
+    u16 value;
+    // PASS_POWER_EFFECT_*
+    u8 effect;
+    // How long it lasts, in minutes
+    u8 minutes;
 } PassPowerData;
 
+void PassPower_Init(void);
+// Counts the pass powers' time down, once a frame
+void PassPower_Update(void);
+// Whether a number is neither a pass power nor PASS_POWER_NONE, and whether it is a pass power
+BOOL PassPower_IsIDInvalid(int passPower);
+BOOL PassPower_IsIDValid(int passPower);
+// Whether Black and White know the pass power
+BOOL PassPower_IsBW1Compatible(int passPower);
+// The bit of a special pass power in the two bytes of func_0200c6d8, or 0xff
+u8 PassPower_GetSPowerBaseID(int passPower);
+// Starts a pass power, bought with Pass Orbs when paid is set. It ends the pass power of the opposite effect
+void PassPower_Activate(u32 passPower, void *data, BOOL paid);
+// The pass power that runs with the effect of the given one, and with a given effect, or PASS_POWER_NONE
+u32 PassPower_GetUsedIDByPassPower(u32 passPower, void *data);
+u32 PassPower_GetUsedIDByEffect(int effect);
+// The time an effect has left, at least 1 while it runs
+u32 PassPower_GetRemainingSeconds(int effect);
+// A pass power whose time is up, or PASS_POWER_NONE. It runs on until it is ended
+u32 PassPower_GetDepletedID(void);
+// Ends the pass power that runs with the effect of the given one
+void PassPower_Deactivate(u32 passPower, void *data);
 // The pass powers' table, read from its archive
 void *PassPowerData_Create(HeapID heapId);
 void PassPowerData_Free(void *data);
+// A pass power's effect and its price in Pass Orbs, from the table of PassPowerData_Create
+u8 PassPowerData_GetEffect(void *data, u32 passPower);
+u16 PassPowerData_GetPrice(void *data, u32 passPower);
+// The pass powers on wild encounters: the encounter rate, the rolls for a shiny and the row of the slots' odds
+u32 PassPower_ApplyEncounter(u32 rate);
+// An egg's steps, and the friendship a Pokémon gains
+u32 PassPower_ApplyHatch(u32 steps);
+int PassPower_ApplyBefriend(int friendship);
+u32 PassPower_ApplyBargain(u32 price);
+// The pass powers that act at once: they restore the HP or PP of the first Pokémon able to battle, and return its
+// place in the party (0 when the whole party was healed), or 0xff without the pass power
+u32 PassPower_ApplyHPRestore(PokeParty *party);
+u32 PassPower_ApplyPPRestore(PokeParty *party);
+u32 PassPower_ApplyEXP(u32 exp);
+u32 PassPower_ApplyPrizeMoney(u32 money);
+u32 PassPower_ApplyCapture(s32 rate);
+// The steps between phenomena, and the chance of one, in percent
+u32 PassPower_ApplyExploring(u32 steps);
+u32 PassPower_ApplyExploringChance(u32 chance);
+// The chance that a Hidden Grotto fills, in percent, and a number of the Hidden Grottoes that it adds 2 to
+u32 PassPower_ApplyGrotto(u32 chance);
+u32 PassPower_ApplyGrottoVolume(u32 volume);
+u32 PassPower_ApplyLuckyEncProb(u32 row);
+u32 PassPower_ApplyLuckyShiny(u32 rolls);
+
 // Two levels of what func_02017208 returns, which the pass powers need
 u16 func_0200c5dc(void *levels);
 u16 func_0200c5e0(void *levels);
-// The bit of a special pass power in the two bytes of func_0200c6d8, or 0xff
-u32 PassPower_GetSPowerBaseID(int index);
 // Overlay 12's pass_power_check.c: whether a pass power is unlocked (0), nearly (1) or not (2), and how many are
 u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags);
 u32 GetUnlockedPassPowerCount(void *data, void *levels, u8 *flags);

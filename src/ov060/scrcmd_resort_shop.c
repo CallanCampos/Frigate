@@ -38,6 +38,7 @@
 #include "system/bmp_winframe.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
+#include "system/nsbtx_to_clwk.h"
 #include "system/printsys.h"
 #include "system/resort_binary.h"
 #include "system/text_speed.h"
@@ -1311,7 +1312,7 @@ static void func_ov060_021e7404(ResortShopWork *wk, u16 objCode) {
         arc = GFL_ArcSysCreateFileHandle(ARCID_MMODEL_TBL, wk->heapId);
         func_ov060_021e8720(arc, objCode, &texture, &fileId);
         GFL_ArcToolFree(arc);
-        func_020164e8(wk->actors[4], ARCID_MMODEL_GRA, fileId, texture, 4, 4, 0, 0, wk->heapId);
+        NsbtxToClwk_LoadTexture(wk->actors[4], ARCID_MMODEL_GRA, fileId, texture, 4, 4, 0, 0, wk->heapId);
         func_0204c124(wk->actors[4], TRUE);
     } else {
         func_0204c124(wk->actors[4], FALSE);

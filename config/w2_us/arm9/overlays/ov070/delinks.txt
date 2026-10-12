@@ -3,3 +3,13 @@
     .ctor       start:0x0217fc94 end:0x0217fc94 kind:rodata align:4
     .data       start:0x0217fca0 end:0x0217fda0 kind:data align:32
     .bss        start:0x0217fda0 end:0x0217fda0 kind:bss align:32
+
+src/ov070/oekaki_comm.c:
+    complete
+    .text       start:0x0217d000 end:0x0217d38c
+    .rodata     start:0x0217f88c end:0x0217f8cc
+
+src/ov070/oekaki.c:
+    .text       start:0x0217d38c end:0x0217f88c
+    .rodata     start:0x0217f8cc end:0x0217fc94
+    .data       start:0x0217fca0 end:0x0217fda0

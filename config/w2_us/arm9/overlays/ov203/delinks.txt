@@ -3,3 +3,47 @@
     .ctor       start:0x021a9b04 end:0x021a9b04 kind:rodata align:4
     .data       start:0x021a9b20 end:0x021a9ba0 kind:data align:32
     .bss        start:0x021a9ba0 end:0x021a9ba0 kind:bss align:32
+
+src/ov203/wifi_2dchar.c:
+    complete
+    .text       start:0x021a7900 end:0x021a81c0
+    .rodata     start:0x021a99d0 end:0x021a9a2c
+    .data       start:0x021a9b20 end:0x021a9b30
+
+src/ov203/wf2dmap_map.c:
+    complete
+    .text       start:0x021a81c0 end:0x021a82a0
+    .rodata     start:0x021a9a2c end:0x021a9a30
+    .data       start:0x021a9b30 end:0x021a9b40
+
+src/ov203/wf2dmap_obj.c:
+    complete
+    .text       start:0x021a82a0 end:0x021a8d90
+    .rodata     start:0x021a9a30 end:0x021a9a9c
+    .data       start:0x021a9b40 end:0x021a9b50
+
+src/ov203/wf2dmap_judge.c:
+    complete
+    .text       start:0x021a8d90 end:0x021a8fb0
+    .rodata     start:0x021a9a9c end:0x021a9acc
+
+src/ov203/wf2dmap_objdraw.c:
+    complete
+    .text       start:0x021a8fb0 end:0x021a93b4
+    .rodata     start:0x021a9acc end:0x021a9ae4
+    .data       start:0x021a9b50 end:0x021a9b64
+
+src/ov203/wf2dmap_scroll.c:
+    complete
+    .text       start:0x021a93b4 end:0x021a9414
+
+src/ov203/wf2dmap_scrdraw.c:
+    complete
+    .text       start:0x021a9414 end:0x021a990c
+    .rodata     start:0x021a9ae4 end:0x021a9b04
+    .data       start:0x021a9b64 end:0x021a9b78
+
+src/ov203/wf2dmap_cmdq.c:
+    complete
+    .text       start:0x021a990c end:0x021a99d0
+    .data       start:0x021a9b78 end:0x021a9ba0

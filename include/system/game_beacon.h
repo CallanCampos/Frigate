@@ -103,7 +103,7 @@ struct GameBeacon {
         } mission;
     } arg;
     GameBeaconPayload payload;
-    // The last notable event: a species (kinds 0 and 1), an item (kinds 2 to 4), or GAME_BEACON_RECENT_NONE
+    // The last notable event: a species (kinds 0 and 1), a trainer (kinds 2 to 4), or GAME_BEACON_RECENT_NONE
     u16 recentKind : 8;
     u16 cgear0 : 3;
     u16 cgear1 : 5;
@@ -228,7 +228,7 @@ void GameBeaconSys_SetTrainerView(u32 trainerView);
 void GameBeaconSys_UpdateGreeting(void);
 // Sets the medal count that the game's beacon sends
 void GameBeaconSys_SetMedalCount(u8 count);
-void func_0202d194(u8 value);
+void func_0202d194(u32 value);
 // Sends that the player caught species, of a wild battle of the kinds a1 and a2
 void GameBeaconSys_SendCapture(u16 species, BOOL a1, BOOL a2);
 // Sends a Funfest mission beacon for a defeated species, of a wild battle of the kinds a1 and a2
@@ -252,27 +252,97 @@ void GameBeaconSys_SetAvenuePeople(JoinAvenuePersonList *list);
 // Checks overlay 338; when the check fails, the received beacons are hidden every HBlank
 void func_0202d6a8(void);
 
-// In another file of ARM9 main
-// Whether a received beacon is invalid
-BOOL func_02013bd4(const GameBeacon *beacon);
-// The beacon's type, or 1 for a type of 0 or of GAME_BEACON_TYPE_MAX or more
-u16 func_02013eac(const GameBeacon *beacon);
+// game_beacon_accessor.c: tables of received beacons and the readers of a beacon's fields
 
-// The log of received beacons that BeaconStatus keeps. Copies the beacon at index into dest and its time into time,
-// and returns whether there is one
-BOOL func_02013b44(BeaconStatus *status, GameBeacon *dest, u16 *time, u32 index);
-// How many beacons the log holds
-u8 func_02013b80(BeaconStatus *status);
+// A table of beacons with the times they were received at. It is used either as a list, filled from the front
+// (GameBeaconInfoTable_TakeNew to GameBeaconInfoTable_MarkAllNew), or as a ring that head is the newest entry of (GameBeaconInfoTable_RingIndex to GameBeaconInfoTable_GetCount).
+// BeaconStatus starts with one, the ring of the beacons that the game keeps
+typedef struct {
+    GameBeacon beacons[GAME_BEACON_LOG_MAX];
+    // GameBeaconTime's minute and hour
+    u16 times[GAME_BEACON_LOG_MAX];
+    u8 head;
+    u8 count;
+} GameBeaconInfoTable;
+
+// A type's entry of the table that GameBeacon_GetTypeFormat and func_020140cc read
+typedef struct {
+    // What the type's message shows and its payload holds, the index of the checks and of GameBeacon_SetMessageWords's cases
+    u8 format;
+    u8 unk1;
+} GameBeaconTypeFormat;
+
+// Moves GameBeaconSys's beacons not yet shown into the list, until it is full, and returns how many
+int GameBeaconInfoTable_TakeNew(GameBeaconInfoTable *table);
+// Takes the list's first beacon; FALSE when the list is empty
+BOOL GameBeaconInfoTable_PopFront(GameBeaconInfoTable *table, GameBeacon *dest, u16 *time);
+// Marks the list's beacons as not yet shown in GameBeaconSys again
+void GameBeaconInfoTable_MarkAllNew(GameBeaconInfoTable *table);
+// The ring's entry at offset from the newest
+int GameBeaconInfoTable_RingIndex(GameBeaconInfoTable *table, int offset);
+// Stores a beacon in the ring, over the one of the same trainer, whose offset it returns, or as the newest. isNew,
+// which may be NULL, gets whether the trainer was not in the ring
+int GameBeaconInfoTable_RingAdd(GameBeaconInfoTable *table, const GameBeacon *beacon, u16 time, BOOL *isNew);
+// Copies the ring's beacon at offset from the newest into dest and its time into time, and returns whether there is
+// one
+BOOL GameBeaconInfoTable_RingGet(GameBeaconInfoTable *table, GameBeacon *dest, u16 *time, int offset);
+// How many beacons the ring holds
+u8 GameBeaconInfoTable_GetCount(GameBeaconInfoTable *table);
 // Allocates a beacon, cleared
-GameBeacon *func_02013b8c(HeapID heapId);
+GameBeacon *GameBeacon_Alloc(HeapID heapId);
+// Allocates a table, cleared
+GameBeaconInfoTable *GameBeaconInfoTable_Alloc(HeapID heapId);
+// Whether a received beacon is invalid
+BOOL GameBeacon_IsInvalid(const GameBeacon *beacon);
 // Whether the beacon's type is one of a distribution, 0x19, 0x1a, 0x1b or 0x32
-BOOL func_02013c88(const GameBeacon *beacon);
-// Loads the beacon's trainer name, 8 characters, into a StrBuf
-void func_02013cac(const GameBeacon *beacon, StrBuf *dest);
-// The beacon's kind, the low 6 bits of its word at 0xc
-u32 func_02013cc0(const GameBeacon *beacon);
+BOOL GameBeacon_IsGiftType(const GameBeacon *beacon);
+// Loads the beacon's trainer name into a StrBuf
+void GameBeacon_GetName(const GameBeacon *beacon, StrBuf *dest);
+// The game version of the beacon's sender
+u32 GameBeacon_GetVersion(const GameBeacon *beacon);
+u32 GameBeacon_GetLanguage(const GameBeacon *beacon);
+u32 GameBeacon_GetCountry(const GameBeacon *beacon);
+u8 GameBeacon_GetRegion(const GameBeacon *beacon);
+// The sender's answers to the survey's questions 0x1a and 0x19, or 0xff for none
+u8 func_02013cd8(GameBeacon *beacon);
+u8 func_02013cf0(GameBeacon *beacon);
+// The sender's C-Gear record
+void GameBeacon_GetCGearRecord(const GameBeacon *beacon, PMSData *dest);
+u8 GameBeacon_GetSurveyRank(const GameBeacon *beacon);
+// The color of func_0207c3b4's table that the sender's favorite color is shown in
+void func_02013d38(u16 *dest, const GameBeacon *beacon);
+u8 GameBeacon_GetFavoriteColor(const GameBeacon *beacon);
+u16 GameBeacon_GetTrainerId(const GameBeacon *beacon);
+// The sender's trainer view, plus 8 for a female trainer
+u8 GameBeacon_GetTrainerViewWithGender(const GameBeacon *beacon);
+u32 GameBeacon_GetGender(const GameBeacon *beacon);
+void GameBeacon_GetPlayTime(const GameBeacon *beacon, u16 *hours, u16 *minutes);
+u32 GameBeacon_GetPassPower(const GameBeacon *beacon);
+u16 GameBeacon_GetZone(const GameBeacon *beacon);
+u16 GameBeacon_GetParentZone(const GameBeacon *beacon);
+u32 func_02013db8(const GameBeacon *beacon);
+u32 func_02013dc0(const GameBeacon *beacon);
 // The medal that the beacon's sender wears last, or 0xff, and how many medals it has
 u8 func_02013dc8(const GameBeacon *beacon);
-u8 func_02013dd0(const GameBeacon *beacon);
+u8 GameBeacon_GetMedalCount(const GameBeacon *beacon);
+void GameBeacon_GetGreeting(const GameBeacon *beacon, StrBuf *dest);
+// The message of a beacon of type 0x18 and the text of one of type 0x31; empty for other types
+void func_02013df4(const GameBeacon *beacon, StrBuf *dest);
+void func_02013e14(const GameBeacon *beacon, StrBuf *dest);
+// The beacon's recent event: its kind, GAME_BEACON_RECENT_NONE when invalid, its trainer (kinds 2 to 4) and its
+// species (kinds 0 and 1)
+u32 GameBeacon_GetRecentKind(const GameBeacon *beacon);
+u16 GameBeacon_GetRecentTrainer(const GameBeacon *beacon);
+u16 GameBeacon_GetRecentSpecies(const GameBeacon *beacon);
+// The beacon's type, or 1 for a type of 0 or of GAME_BEACON_TYPE_MAX or more
+u16 GameBeacon_GetType(const GameBeacon *beacon);
+// The Pass Power of a distribution of type 0x32, else 0
+u16 GameBeacon_GetGiftPassPower(const GameBeacon *beacon);
+u8 func_020140cc(int type);
+// Sets the words of the beacon's message: the sender's name as word 0 and what the type's format shows from word 1
+void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, HeapID heapId);
+
+// In another file of ARM9 main: a table of colors, by favorite color
+const u16 *func_0207c3b4(void);
 
 #endif // POKEBW2_SYSTEM_GAME_BEACON_H

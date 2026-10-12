@@ -1386,11 +1386,11 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
         ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
         u32 cells;
 
-        icon->palette = func_0204bc48(arc, func_02021114(), 0, 0x80, heapId);
-        cells = func_0202111c();
+        icon->palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 0, 0x80, heapId);
+        cells = PokeIcon_GetCellFile_Main();
         icon->cellAnims = func_0204bde0(arc, cells, getOBJTileMapping_MainEng(), heapId);
-        icon->chars = func_0204b81c(arc, func_02020f40(func_0201d620(pkm)), FALSE, 0, heapId);
-        iconPalette = func_020210c0(func_0201d620(pkm));
+        icon->chars = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d620(pkm)), FALSE, 0, heapId);
+        iconPalette = PokeIcon_GetPaletteOfPkm(func_0201d620(pkm));
         GFL_ArcToolFree(arc);
         GFL_HeapFree(pkm);
         break;
@@ -1529,7 +1529,7 @@ static u32 CygnusFlow_GetState(KeySystemWork *wk, u32 *msgId) {
         *msgId = 174;
         return CYGNUS_FLOW_CANT_RECEIVE;
     }
-    if (func_02007a38(GameData_GetBoxSaveAccessor(wk->param->gameData)) < 6) {
+    if (BoxSaveAccessor_CountEmptySlots(GameData_GetBoxSaveAccessor(wk->param->gameData)) < 6) {
         *msgId = 175;
         return CYGNUS_FLOW_CANT_RECEIVE;
     }

@@ -98,7 +98,7 @@ void UnionApp_LimitEntry(UnionApp *app, u8 limit);
 void UnionApp_RequestStart(UnionApp *app);
 BOOL UnionApp_IsStarted(UnionApp *app);
 UnionAppMember *UnionApp_GetMember(UnionApp *app, u8 netId);
-u8 UnionApp_GetJoined(UnionApp *app);
+u32 UnionApp_GetJoined(UnionApp *app);
 u8 UnionApp_CountJoined(UnionApp *app);
 
 #endif // POKEBW2_FIELD_UNION_APP_H

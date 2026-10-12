@@ -3,3 +3,20 @@
     .ctor       start:0x021b7b30 end:0x021b7b30 kind:rodata align:4
     .data       start:0x021b7b40 end:0x021b7c20 kind:data align:32
     .bss        start:0x021b7c20 end:0x021b7c20 kind:bss align:32
+
+src/ov195/gtsnego_proc.c:
+    complete
+    .text       start:0x021b2fc0 end:0x021b4d64
+    .rodata     start:0x021b78b0 end:0x021b7908
+    .data       start:0x021b7b40 end:0x021b7b68
+
+src/ov195/gtsnego_disp.c:
+    .text       start:0x021b4d64 end:0x021b66f8
+    .rodata     start:0x021b7908 end:0x021b7af8
+    .data       start:0x021b7b68 end:0x021b7be0
+
+src/ov195/gtsnego_message.c:
+    complete
+    .text       start:0x021b66f8 end:0x021b78b0
+    .rodata     start:0x021b7af8 end:0x021b7b30
+    .data       start:0x021b7be0 end:0x021b7c20

@@ -36,7 +36,7 @@ extern const GameProcFunctions COMM_TVT_FIELD_PROC_FUNCTIONS;
 
 // Overlay 12's stubs, as this screen calls them: the state of the communication (always 0), the caller's number and
 // whether the caller is ready, given the name. The prototypes of intrude_work.h in field/ take no arguments
-u32 func_ov012_02153658(void);
+u32 func_ov012_02153658(GameCommSys *commSys);
 u32 func_ov012_0215365c(GameCommSys *comm);
 BOOL func_ov012_02153660(GameCommSys *comm, StrBuf *name);
 

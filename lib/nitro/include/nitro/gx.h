@@ -316,6 +316,7 @@ typedef enum {
 #define GX_VRAM_BG_128_D GX_VRAM_D
 #define GX_VRAM_BG_256_AB (GX_VRAM_A | GX_VRAM_B)
 #define GX_VRAM_BGEXTPLTT_NONE GX_VRAM_NONE
+#define GX_VRAM_BGEXTPLTT_0123_E GX_VRAM_E
 #define GX_VRAM_BGEXTPLTT_23_G GX_VRAM_G
 #define GX_VRAM_SUB_BG_32_H GX_VRAM_H
 #define GX_VRAM_SUB_BG_128_C GX_VRAM_C
@@ -1375,9 +1376,9 @@ void *gfxGetCharAddrBG2B(void);
 void *gfxGetCharAddrBG3B(void);
 
 // NitroSDK's GX_ResetBankFor* and GX_SetBankFor*, which take VRAM banks as masks
-void gfxAcquireBGBanksA(void);
+u32 gfxAcquireBGBanksA(void);
 void gfxAcquireBGExtPltBanksA(void);
-void gfxAcquireBGBanksB(void);
+u32 gfxAcquireBGBanksB(void);
 void gfxAcquireBGExtPltBanksB(void);
 void gfxAcquireObjBanksA(void);
 void gfxAcquireObjExtPltBanksA(void);

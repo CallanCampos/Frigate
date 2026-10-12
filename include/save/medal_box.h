@@ -54,7 +54,7 @@ void MedalBox_DiscoverMedal(MedalBox *box, u16 medal);
 void MedalBox_AcknowledgeMedal(MedalBox *box, u16 medal, u8 year, u8 month, u8 day);
 void MedalBox_DiscoverInitialMedal(MedalBox *box, u16 medal, u8 year, u8 month, u8 day);
 void MedalBox_SetMedalNotSpecial(MedalBox *box, u16 medal);
-void MedalBox_SetLastMedal(MedalBox *box, u8 medal);
+void MedalBox_SetLastMedal(MedalBox *box, u32 medal);
 void MedalBox_IncrementRank(MedalBox *box);
 // The medal obtained last, or 0xff
 u8 MedalBox_GetLastMedal(MedalBox *box);

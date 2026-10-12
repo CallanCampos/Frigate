@@ -468,41 +468,41 @@ static void GameBeaconSys_CheckMission(GameBeaconSystem *sys, const GameBeacon *
     festival = GSYS_GetLinkFestival(sys->gsys);
     status = getStatusOfFesMission(festival);
     if (status != 0) {
-        func_020151c0(func_02014710(festival), beacon);
+        FestMissionPassPowers_AddBeacon(func_02014710(festival), beacon);
     }
     if (!GameBeacon_IsMissionType(beacon)) {
         return;
     }
-    if (func_02015458(festival, beacon)) {
+    if (FestMission_IsBeaconInvalid(festival, beacon)) {
         return;
     }
-    func_0201528c(festival, beacon);
+    FestMissionOffers_AddBeacon(festival, beacon);
     if (status == 0 || beacon->type == 0x3d) {
         return;
     }
-    result = func_020147bc(festival);
+    result = LinkFestival_GetState(festival);
     if (result < 1 || result > 3) {
         return;
     }
     func_02014c78(&entry);
-    entry.trainerId = beacon->trainerId;
-    entry.zoneId = beacon->parentZoneId;
-    entry.missionId = beacon->arg.mission.missionId;
-    func_02014fb0(&entry, beacon);
+    entry.record.member.trainerId = beacon->trainerId;
+    entry.record.member.zoneId = beacon->parentZoneId;
+    entry.record.member.score = beacon->arg.mission.missionId;
+    FestMissionConfig_FromBeacon(&entry.config, beacon);
     result = func_02014c94(festival, &entry, &value);
     if (result == 0) {
         return;
     }
     if (result < 4) {
         if (result == 1) {
-            func_020150a8(festival, beacon, value, 0, 0);
+            FestMissionLog_AddBeacon(festival, beacon, value, 0, 0);
         }
-        func_020150a8(festival, beacon, value, 1, 0);
+        FestMissionLog_AddBeacon(festival, beacon, value, 1, 0);
     }
     if (result == 3 || result == 5) {
-        func_020150a8(festival, beacon, value, 3, 0);
+        FestMissionLog_AddBeacon(festival, beacon, value, 3, 0);
     } else {
-        func_020150a8(festival, beacon, value, 2, 0);
+        FestMissionLog_AddBeacon(festival, beacon, value, 2, 0);
     }
     GFL_StrBufLoadFixedString(sys->nameBuf, beacon->name, 8);
     func_02014a00(festival, beacon->trainerId, value, sys->nameBuf);
@@ -540,7 +540,7 @@ BOOL GameBeaconSys_Receive(const GameBeacon *beacon) {
     if (beacon->type == 0x18 && sys->mine.beacon.trainerId != beacon->payload.message.trainerId) {
         return isUpdate;
     }
-    if (func_02013bd4(beacon)) {
+    if (GameBeacon_IsInvalid(beacon)) {
         return FALSE;
     }
 
@@ -836,7 +836,7 @@ void GameBeaconSendSlot_SetMissionEx(GameBeaconSendSlot *slot, u16 type, u32 val
     beacon->missionWord = config->unk1C;
     GameBeacon_ClearRecent(beacon);
     if (type != 0x3c) {
-        func_020150a8(festival, &newSlot.beacon, func_020145d8(festival), 2, 1);
+        FestMissionLog_AddBeacon(festival, &newSlot.beacon, func_020145d8(festival), 2, 1);
     }
     if (GameBeaconSys_CanSendType(type) == TRUE) {
         *slot = newSlot;
@@ -975,7 +975,7 @@ void GameBeaconSys_SetMedalCount(u8 count) {
     slot->updated = TRUE;
 }
 
-void func_0202d194(u8 value) {
+void func_0202d194(u32 value) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
 
     slot->beacon.unk5B = value;
@@ -1138,7 +1138,7 @@ static void GameBeacon_UpdateZone(GameBeacon *beacon, u16 zoneId, GameData *game
     GameBeacon_ClearRecent(beacon);
     festival = GSYS_GetLinkFestival(GameBeaconSys->gsys);
     if (getStatusOfFesMission(festival) && func_02014844(festival, beacon->parentZoneId)) {
-        func_020150a8(festival, beacon, func_020145d8(festival), 1, 1);
+        FestMissionLog_AddBeacon(festival, beacon, func_020145d8(festival), 1, 1);
     }
 }
 

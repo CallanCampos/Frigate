@@ -3,3 +3,22 @@
     .ctor       start:0x021eec84 end:0x021eec84 kind:rodata align:4
     .data       start:0x021eeca0 end:0x021eecc0 kind:data align:32
     .bss        start:0x021eecc0 end:0x021eecc0 kind:bss align:32
+
+src/ov084/beacon_view_setup.c:
+    complete
+    .text       start:0x021eaea0 end:0x021ec1ec
+    .rodata     start:0x021eeb64 end:0x021eec34
+    .data       start:0x021eeca0 end:0x021eecc0
+
+src/ov084/beacon_view.c:
+    complete
+    .text       start:0x021ec1ec end:0x021ece2c
+
+src/ov084/beacon_view_sub.c:
+    complete
+    .text       start:0x021ece2c end:0x021ee9e4
+    .rodata     start:0x021eec34 end:0x021eec84
+
+src/ov084/beacon_view_accessor.c:
+    complete
+    .text       start:0x021ee9e4 end:0x021eeb64

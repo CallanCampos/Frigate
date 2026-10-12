@@ -18,7 +18,7 @@ void TownMapData_Free(void *data) {
     GFL_HeapFree(data);
 }
 
-u16 TownMapData_GetParam(void *data, u16 place, u16 param) {
+u16 TownMapData_GetParam(void *data, u16 place, u32 param) {
     u16(*places)[TOWNMAP_PARAM_COUNT] = data;
 
     return places[place][param];

@@ -912,7 +912,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
         isMulti = FALSE;
     }
     unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
-    unisys->alloc.rpm = func_0201f8b4(unisys->alloc.regulation, unisys->wordset, UNION_HEAPID, isMulti);
+    unisys->alloc.rpm = PokeRegulation_CreatePrintMsg(unisys->alloc.regulation, unisys->wordset, UNION_HEAPID, isMulti);
     UnionMsg_SetupWordSet(unisys);
 
     if (mode == 0) {
@@ -957,7 +957,7 @@ void UnionMsg_FreeRulesWindow(UnionSystem *unisys)
     if (unisys->alloc.rpm != NULL) {
         func_ov036_02188ab0(unisys->fldmsgwin);
         unisys->fldmsgwin = NULL;
-        func_0201f950(unisys->alloc.rpm);
+        PokeRegulation_FreePrintMsg(unisys->alloc.rpm);
         unisys->alloc.rpm = NULL;
     }
 }

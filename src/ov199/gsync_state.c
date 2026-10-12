@@ -951,7 +951,7 @@ static void GSync_AddForestPokemon(GSyncWork *wk, DreamWorldSave *dreamWorld, in
         int size = 3;
         u8 sanitized = PML_PkmSanitizeForme(species, form);
         u32 sexRatio = PML_PersonalGetParamSingle(species, sanitized, PERSONAL_SEX_RATIO);
-        u8 modelForm = func_0201efe4(species, sanitized);
+        u8 modelForm = PML_PkmGetSpriteForme(species, sanitized);
 
         switch (sexRatio) {
         case 0:

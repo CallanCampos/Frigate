@@ -155,7 +155,7 @@ static BOOL Tint9_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
 
     if (work->state == 0) {
         func_ov036_02199958(task, work->level, work->color, TINT_FADE_IN_FRAMES, arg);
-        func_ov036_02199734(task, TINT_SOUND_TYPE, func_020198f0(9));
+        func_ov036_02199734(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(9));
         work->state--;
     } else if (func_ov036_021999dc(task)) {
         return TRUE;
@@ -167,7 +167,7 @@ static BOOL Tint9_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     Tint9Work *work = func_ov036_021997e4(task);
 
     func_ov036_0219990c(task, work->level, work->color, arg);
-    func_ov036_02199740(task, TINT_SOUND_TYPE, func_020198f0(9));
+    func_ov036_02199740(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(9));
     return TRUE;
 }
 
@@ -256,7 +256,7 @@ static BOOL Tint_FadeIn(WeatherTask *task, u32 arg, HeapID heapId) {
 
     if (work->state == 0) {
         func_ov036_02199958(task, work->level, work->color, TINT_FADE_IN_FRAMES, arg);
-        func_ov036_02199734(task, TINT_SOUND_TYPE, func_020198f0(work->sound));
+        func_ov036_02199734(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(work->sound));
         work->state--;
     } else if (func_ov036_021999dc(task)) {
         return TRUE;
@@ -268,7 +268,7 @@ static BOOL Tint_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId) {
     TintWork *work = func_ov036_021997e4(task);
 
     func_ov036_0219990c(task, work->level, work->color, arg);
-    func_ov036_02199740(task, TINT_SOUND_TYPE, func_020198f0(work->sound));
+    func_ov036_02199740(task, TINT_SOUND_TYPE, FieldLightStatus_GetWeatherLight(work->sound));
     return TRUE;
 }
 

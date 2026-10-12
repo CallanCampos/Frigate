@@ -20,7 +20,11 @@ typedef struct G3DLight G3DLight;
 typedef struct G3DManager G3DManager;
 typedef struct G3DModel G3DModel;
 
-G3DCurve *GFL_G3DCurveCreateToLoadBuffer(HeapID heapId, u32 arcId, u32 fileId, u32 type, void *buffer, u32 bufferSize);
+// Curves (ica_anime.c) that keep their keyframes in the caller's buffer: preloadCount frames at a time, or all of them.
+// They return NULL when the buffer is too small. GFL_G3DCurveCreateToLoadBufferEntire is not from swan
+G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u32 fileId, void *buffer, u32 bufferSize);
+G3DCurve *GFL_G3DCurveCreateToLoadBuffer(HeapID heapId, u32 arcId, u32 fileId, u32 preloadCount, void *buffer,
+                                         u32 bufferSize);
 void GFL_G3DResBindData(void *resource, u32 kind, void *data);
 BOOL GFL_G3DCurveFrameStepLoop(G3DCurve *curve, fx32 step);
 BOOL GFL_G3DCurveGetNowTranslation(G3DCurve *curve, VecFx32 *translation);

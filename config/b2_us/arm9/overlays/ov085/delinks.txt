@@ -3,3 +3,19 @@
     .ctor       start:0x021eda3c end:0x021eda3c kind:rodata align:4
     .data       start:0x021eda40 end:0x021eda80 kind:data align:32
     .bss        start:0x021eda80 end:0x021eda80 kind:bss align:32
+
+src/ov085/fmission_view.c:
+    complete
+    .text       start:0x021eae60 end:0x021ec5cc
+    .rodata     start:0x021ed950 end:0x021ed988
+
+src/ov085/fmission_view_setup.c:
+    complete
+    .text       start:0x021ec5cc end:0x021ed688
+    .rodata     start:0x021ed988 end:0x021eda3c
+    .data       start:0x021eda40 end:0x021eda58
+
+src/ov085/fmission_log_accessor_fv.c:
+    complete
+    .text       start:0x021ed688 end:0x021ed950
+    .data       start:0x021eda58 end:0x021eda80

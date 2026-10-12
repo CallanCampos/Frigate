@@ -91,33 +91,6 @@ typedef struct {
     s16 unk2c;
 } PokewoodMovieFile;
 
-// The parameters of the screen before the battle, overlay 324, whose first result is the grade of the cast
-typedef struct {
-    u32 movie;
-    u32 grade;
-    u32 result;
-    PlayerInfo *playerInfo;
-    u32 unk10;
-    u32 unk14;
-    BtlSetup *setup;
-    u32 flag;
-    // Set by the screen when the movie is skipped
-    u32 skip;
-} PokewoodBriefingParam;
-
-// The parameters of the screen after the battle, overlay 324
-typedef struct {
-    u32 movie;
-    u32 grade;
-    u32 result;
-    PlayerInfo *playerInfo;
-    SaveControl *saveControl;
-    GameData *gameData;
-    BtlSetup *setup;
-    u32 flag;
-    u32 unk20;
-} PokewoodResultParam;
-
 // What GameEvent_CreateOverlayDelegate hands the events that run a movie, which also is their data
 typedef struct {
     GameSystem *gsys;
@@ -128,8 +101,8 @@ typedef struct {
     u32 slot;
     u16 heapId;
     PokewoodTitleParam title;
-    PokewoodBriefingParam briefing;
-    PokewoodResultParam result;
+    PkwdBriefingParam briefing;
+    PkwdBriefingParam result;
     StrBuf *introText;
     // How the downloaded movies of the slots are shown
     u8 slotInfo[8];
@@ -141,18 +114,10 @@ typedef struct {
     PokewoodMovieParam *param;
 } PokewoodMovieEvent;
 
-// The data of the events that put up a screen of overlay 322: the player and the save it works on, and where it puts
-// the movie it chose
-typedef struct {
-    PlayerInfo *playerInfo;
-    PokewoodSave *save;
-    s16 *var;
-} PokewoodPickerParam;
-
 typedef struct {
     GameSystem *gsys;
     Field *field;
-    PokewoodPickerParam param;
+    PkwdBookParam param;
 } PokewoodPickerEvent;
 
 // The same for overlay 323
@@ -170,16 +135,11 @@ typedef struct {
     PokewoodMenuParam param;
 } PokewoodMenuEvent;
 
-// The same for overlay 325
-typedef struct {
-    PlayerInfo *playerInfo;
-    PokewoodSave *save;
-} PokewoodScreenParam;
-
+// The same for the record monitor, overlay 325
 typedef struct {
     GameSystem *gsys;
     Field *field;
-    PokewoodScreenParam param;
+    PkwdRecordMonitorParam param;
 } PokewoodScreenEvent;
 
 // The data of the event that picks the cast
@@ -232,11 +192,11 @@ static void EventPokewood_FreeSetup(BtlSetup *setup);
 static void EventPokewood_StoreRecordedSetup(GameData *gameData, BtlSetup *setup, HeapID heapId);
 static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *setup);
 static void EventPokewood_FreeTitleParam(PokewoodTitleParam *title);
-static void EventPokewood_InitBriefingParam(PokewoodBriefingParam *briefing, BtlSetup *setup, PlayerInfo *playerInfo,
+static void EventPokewood_InitBriefingParam(PkwdBriefingParam *briefing, BtlSetup *setup, PlayerInfo *playerInfo,
                                             GameData *gameData);
-static void EventPokewood_InitResultParam(PokewoodResultParam *result, BtlSetup *setup, PlayerInfo *playerInfo,
+static void EventPokewood_InitResultParam(PkwdBriefingParam *result, BtlSetup *setup, PlayerInfo *playerInfo,
                                           GameData *gameData);
-static void EventPokewood_OnBriefingDone(PokewoodBriefingParam *briefing);
+static void EventPokewood_OnBriefingDone(PkwdBriefingParam *briefing);
 static void EventPokewood_ResumeFieldMusic(GameSystem *gsys, GameData *gameData, GameEvent *event, Field *field,
                                            FieldSound *fieldSound);
 static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, void *data);
@@ -384,7 +344,7 @@ static BtlSetup *EventPokewood_CreateFilmSetup(GameSystem *gsys, Field *field, H
     status.bgId = 9;
     status.terrain = 14;
     BtlSetup_SetTrainer1v1Single(setup, gameData, &status, 0, heapId);
-    func_020186b0(setup, heapId);
+    BtlSetup_AllocRecBuffer(setup, heapId);
     EventPokewood_SetupMovieTrainer(movie, POKEWOOD_KIND_FILM, setup->trainers[1], playerInfo, heapId);
     EventPokewood_CreateCastParty(playerInfo, setup->party[1], heapId, movie, 1);
     setup->unk34[0] = GetGameDataPlayerInfo(gameData);
@@ -421,7 +381,7 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
     if (func_02010644(GameData_GetSaveControl(gameData), heapId, slot) == 1) {
         setup = BtlSetup_Create(heapId);
         BtlSetup_Reset(setup);
-        func_02018540(setup, gameData, heapId);
+        BtlSetup_InitForRecord(setup, gameData, heapId);
         func_0200c1f0();
         movie = func_020107f0(0, 0);
         BattleRecTool_LoadSetup(setup, 1, heapId);
@@ -439,7 +399,7 @@ static BtlSetup *EventPokewood_LoadBlockSetup(GameSystem *gsys, Field *field, He
     loadPokewoodAndCheck(GameData_GetSaveControl(gameData), heapId, 0);
     setup = BtlSetup_Create(heapId);
     BtlSetup_Reset(setup);
-    func_02018540(setup, gameData, heapId);
+    BtlSetup_InitForRecord(setup, gameData, heapId);
     func_0200c1f0();
     BattleRecTool_LoadSetup(setup, 1, heapId);
     func_0200c200();
@@ -515,7 +475,7 @@ static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem
 static void EventPokewood_FreeSetup(BtlSetup *setup) {
     if (setup->unkDD_3 == 2) {
         GFL_HeapFree(setup->unk34[0]);
-        func_020185b4(setup);
+        BtlSetup_FreeForRecord(setup);
     }
     BtlSetup_Free(setup);
 }
@@ -553,28 +513,28 @@ static void EventPokewood_FreeTitleParam(PokewoodTitleParam *title) {
     GFL_StrBufFree(title->title);
 }
 
-static void EventPokewood_InitBriefingParam(PokewoodBriefingParam *briefing, BtlSetup *setup, PlayerInfo *playerInfo,
+static void EventPokewood_InitBriefingParam(PkwdBriefingParam *briefing, BtlSetup *setup, PlayerInfo *playerInfo,
                                             GameData *gameData) {
     briefing->movie = setup->unkDF;
-    briefing->grade = setup->unk128;
+    briefing->audienceCount = setup->unk128;
     briefing->setup = setup;
     briefing->playerInfo = playerInfo;
-    briefing->flag = setup->unkDD_7;
+    briefing->noSkip = setup->unkDD_7;
 }
 
-static void EventPokewood_InitResultParam(PokewoodResultParam *result, BtlSetup *setup, PlayerInfo *playerInfo,
+static void EventPokewood_InitResultParam(PkwdBriefingParam *result, BtlSetup *setup, PlayerInfo *playerInfo,
                                           GameData *gameData) {
     result->saveControl = GameData_GetSaveControl(gameData);
     result->gameData = gameData;
     result->playerInfo = playerInfo;
-    result->grade = setup->unk128;
-    result->result = setup->unk12C;
+    result->audienceCount = setup->unk128;
+    result->audience = setup->unk12C;
     result->setup = setup;
     result->movie = setup->unkDF;
-    result->flag = setup->unkDD_7;
+    result->noSkip = setup->unkDD_7;
 }
 
-static void EventPokewood_OnBriefingDone(PokewoodBriefingParam *briefing) {
+static void EventPokewood_OnBriefingDone(PkwdBriefingParam *briefing) {
 }
 
 static void EventPokewood_ResumeFieldMusic(GameSystem *gsys, GameData *gameData, GameEvent *event, Field *field,
@@ -618,11 +578,11 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
         break;
     case 4:
         EventPokewood_InitBriefingParam(&param->briefing, wk->setup, playerInfo, gameData);
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(324), &data_ov324_0219f698, &param->briefing);
+        GSYS_QueueProcAsEvent(event, OVERLAY_PKWD_BRIEFING, &PKWD_BRIEFING_PROC_FUNCTIONS, &param->briefing);
         (*state)++;
         break;
     case 5:
-        wk->setup->unk12C = param->briefing.result;
+        wk->setup->unk12C = param->briefing.audience;
         if (param->briefing.skip != 0) {
             *state = 8;
         } else {
@@ -638,7 +598,7 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
     case 7:
         if (wk->setup->unk134 == 0) {
             EventPokewood_InitResultParam(&param->result, wk->setup, playerInfo, gameData);
-            GSYS_QueueProcAsEvent(event, OVERLAY_ID(324), &data_ov324_0219f6a4, &param->result);
+            GSYS_QueueProcAsEvent(event, OVERLAY_PKWD_BRIEFING, &PKWD_BRIEFING_CREDITS_PROC_FUNCTIONS, &param->result);
         }
         (*state)++;
         break;
@@ -852,7 +812,7 @@ GameEvent *EventPokewood_CreateMoviePickerEvent(GameSystem *gsys, void *args) {
     sys_memset(wk, 0, sizeof(PokewoodPickerEvent));
     wk->gsys = gsys;
     wk->field = field;
-    wk->param = *(PokewoodPickerParam *)args;
+    wk->param = *(PkwdBookParam *)args;
     return event;
 }
 
@@ -862,16 +822,16 @@ static GameEventReturnCode EventPokewood_RunPicker(GameEvent *event, u32 *state,
     switch (*state) {
     case 0:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(322),
-                                                                         &data_ov322_021a0834, &wk->param));
+                                                                         &PKWD_BOOK_PROC_FUNCTIONS, &wk->param));
         *state = 1;
         break;
     case 1:
-        if (wk->param.var != NULL && *wk->param.var == -1) {
-            *wk->param.var = 41;
+        if (wk->param.result != NULL && *wk->param.result == -1) {
+            *wk->param.result = 41;
         } else {
             PokewoodSystem **sys = func_02017a04(GSYS_GetGameData(wk->gsys));
 
-            PokewoodSystem_SetMovie(*sys, *wk->param.var);
+            PokewoodSystem_SetMovie(*sys, *wk->param.result);
         }
         return GAMEEVENT_DONE;
     }
@@ -896,7 +856,7 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
     switch (*state) {
     case 0:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(323),
-                                                                         &data_ov323_0219ea60, &wk->param));
+                                                                         &PKWD_SELECTSCREEN_PROC_FUNCTIONS, &wk->param));
         *state = 1;
         break;
     case 1:
@@ -1037,7 +997,7 @@ GameEvent *EventPokewood_CreateScreenEvent(GameSystem *gsys, void *args) {
     sys_memset(wk, 0, sizeof(PokewoodScreenEvent));
     wk->gsys = gsys;
     wk->field = field;
-    wk->param = *(PokewoodScreenParam *)args;
+    wk->param = *(PkwdRecordMonitorParam *)args;
     return event;
 }
 
@@ -1046,8 +1006,9 @@ static GameEventReturnCode EventPokewood_RunScreen(GameEvent *event, u32 *state,
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(325),
-                                                                         &data_ov325_0219f47c, &wk->param));
+        GameEvent_ChainNext(event,
+                            EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_PKWD_RECORD_MONITOR,
+                                                                  &PKWD_RECORD_MONITOR_PROC_FUNCTIONS, &wk->param));
         *state = 1;
         break;
     case 1:

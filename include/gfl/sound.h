@@ -104,6 +104,8 @@ void func_02005b60(u32 handle);
 void GFL_SndStreamInit(HeapID heapId);
 void GFL_SndStreamFree(void);
 void GFL_SndStreamUpdate(void);
+// Whether GFL_SndStreamInit has run
+BOOL GFL_SndStreamCheckInit(void);
 void GFL_SndStreamPlay(u32 stream);
 void GFL_SndStreamStop(void);
 BOOL GFL_SndStreamIsPlaying(void);
@@ -116,10 +118,25 @@ typedef struct {
 
 void PokeVoice_CreateChatterInfo(PokeVoiceChatterInfo *info);
 
-// Cries are played through handles
-u32 PokeVoice_Load(u32 species, u32 form, u32 a2, u32 a3, u32 a4, u32 a5, u32 a6,
+// What PokeVoice_Init is given: the wave archive of a species and form's cry, and the cry's volume with, when the
+// cry is not the wave archive's (a Chatot's recording), its samples, their count, sample rate and speed, returning
+// TRUE. The game's are getResIDFunc and getWaveInfoFunc
+typedef void (*PokeVoiceGetResIDFunc)(u32 species, u32 form, u32 *waveArc);
+typedef BOOL (*PokeVoiceGetWaveInfoFunc)(u32 species, u32 form, const PokeVoiceChatterInfo *chatterInfo,
+                                         void **samples, u32 *size, u32 *sampleRate, u32 *speed, s8 *volume);
+
+void PokeVoice_Init(u16 a0, PokeVoiceGetResIDFunc getResID, PokeVoiceGetWaveInfoFunc getWaveInfo);
+// Releases the handles whose cries have ended; called each frame
+void PokeVoice_Update(void);
+void getResIDFunc(u32 species, u32 form, u32 *waveArc);
+BOOL getWaveInfoFunc(u32 species, u32 form, const PokeVoiceChatterInfo *chatterInfo, void **samples, u32 *size,
+                     u32 *sampleRate, u32 *speed, s8 *volume);
+
+// Cries are played through handles. A cry has a pan (64 is the center), and with chorus a second voice whose volume
+// and speed are relative to the first's; reverse plays it backwards. PokeVoice_Load only readies the cry
+u32 PokeVoice_Load(u32 species, u32 form, u32 pan, u32 chorus, u32 chorusVolume, u32 chorusSpeed, u32 reverse,
                    const PokeVoiceChatterInfo *chatterInfo);
-u32 PokeVoice_Play(u32 species, u32 form, u32 a2, u32 a3, u32 a4, u32 a5, u32 a6,
+u32 PokeVoice_Play(u32 species, u32 form, u32 pan, u32 chorus, u32 chorusVolume, u32 chorusSpeed, u32 reverse,
                    const PokeVoiceChatterInfo *chatterInfo);
 BOOL PokeVoice_StartPlayback(u32 handle);
 void PokeVoice_AdjustVolume(u32 handle, s8 volume);
@@ -127,7 +144,7 @@ void PokeVoice_AdjustSpeed(u32 handle, s32 speed);
 BOOL PokeVoice_IsPlaying(u32 handle);
 BOOL PokeVoice_IsPlayingAny(void);
 // Room for count cries at once, and its release
-void PokeVoice_AllocMulti(u32 count, HeapID heapId);
+void PokeVoice_AllocMulti(int count, HeapID heapId);
 void PokeVoice_FreeMulti(void);
 void PokeVoice_ReleaseAll(void);
 void PokeVoice_Release(u32 handle);
@@ -151,6 +168,8 @@ u32 func_02006e80(void (*callback)(u32 result, u32 *done), u32 *done);
 void func_02006ec0(void *chatter);
 
 // The BGM info archive: which interactive sound subsystem each BGM uses (ISS_SUBSYSTEM_*), or 0 for none
+BGMInfo *BGMInfo_Create(HeapID heapId);
+void BGMInfo_Free(BGMInfo *info);
 u8 BGMInfo_GetISSSubsystem(BGMInfo *info, u16 bgm);
 
 #endif // POKEBW2_GFL_SOUND_H

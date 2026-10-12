@@ -14,20 +14,24 @@ void BrNet_Exit(BrNet *net);
 void BrNet_Main(BrNet *net);
 
 // The data of a request to the Global Link
-typedef struct {
-    union {
-        // The musical photo upload, request 0, sends the photo
-        void *data;
-        // The species whose musical photos request 1 downloads
-        u16 species;
-        // The arguments of request 4
-        struct {
-            u16 a1;
-            u8 a3;
-            u8 a4;
+typedef union {
+    struct {
+        union {
+            // The musical photo upload, request 0, sends the photo
+            void *data;
+            // The species whose musical photos request 1 downloads
+            u16 species;
+            // The arguments of request 4
+            struct {
+                u16 a1;
+                u8 a3;
+                u8 a4;
+            };
         };
+        u32 unk4;
     };
-    u32 unk4;
+    // The number of the battle video that requests 3 and 8 download and mark
+    u64 dataNumber;
 } BrNetRequestParam;
 
 // A musical photo downloaded from the Global Link, after the profile of the player who sent it

@@ -3,3 +3,19 @@
     .ctor       start:0x021b95f8 end:0x021b95f8 kind:rodata align:4
     .data       start:0x021b9600 end:0x021b9680 kind:data align:32
     .bss        start:0x021b9680 end:0x021b9680 kind:bss align:32
+
+src/ov205/codein.c:
+    complete
+    .text       start:0x021b73c0 end:0x021b7750
+    .rodata     start:0x021b942c end:0x021b9518
+    .data       start:0x021b9600 end:0x021b9630
+
+src/ov205/codein_pv.c:
+    complete
+    .text       start:0x021b7750 end:0x021b8638
+    .rodata     start:0x021b9518 end:0x021b95f8
+    .data       start:0x021b9630 end:0x021b9680
+
+src/ov205/codein_disp.c:
+    complete
+    .text       start:0x021b8638 end:0x021b942c
