@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Export field map GLBs and terrain, then pack edited geometry back into Nitro.
 
-Usage: map_model_data.py extract APICULA OUTPUT_DIR
+Usage: map_model_data.py extract APICULA OUTPUT_DIR [CHUNK_ID ...]
        map_model_data.py migrate SOURCE_DIR
        map_model_data.py embed-props SOURCE_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
@@ -1011,13 +1011,18 @@ def rebuild_topology(chunk, doc, primitives, binary, mapping, name):
     return bytes(result)
 
 
-def export(apicula, output):
+def export(apicula, output, selected=None):
     archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
     textures = read_narc((ROOT / "extract/b2_us/files/a/0/1/4").read_bytes())
     output.mkdir(parents=True, exist_ok=True)
     texture_root = output.parent / "map_texture_sets"
     for entry in models(ROOT / "data/map_models"):
-        chunk_id, name, texture_id = entry["chunk"], entry["name"], entry["texture_set"]
+        chunk_id, name = entry["chunk"], entry["name"]
+        if selected is not None and chunk_id not in selected:
+            continue
+        texture_id = entry["texture_set"]
+        if texture_id is None:
+            texture_id = entry.get("texture_preview")
         nitro = model_bytes(archive[chunk_id])
         texture_names = ({item["name"]: item for item in resources(textures[texture_id])[0]}
                          if texture_id is not None else {})
@@ -1086,8 +1091,9 @@ def export(apicula, output):
 
 
 def main():
-    if len(sys.argv) == 4 and sys.argv[1] == "extract":
-        export(sys.argv[2], Path(sys.argv[3]))
+    if len(sys.argv) >= 4 and sys.argv[1] == "extract":
+        export(sys.argv[2], Path(sys.argv[3]),
+               set(map(int, sys.argv[4:])) if len(sys.argv) > 4 else None)
         return
     if len(sys.argv) == 3 and sys.argv[1] == "migrate":
         for entry in models(Path(sys.argv[2])):
@@ -1121,8 +1127,12 @@ def main():
             raise ValueError(f"{name}: Nitro model differs from the GLB mapping")
         doc, primitives, binary = mesh_primitives(model_dir, name)
         texture_id = entry["texture_set"]
+        if texture_id is None:
+            texture_id = entry.get("texture_preview")
         bound, _ = patch_material_bindings(
             original, doc, primitives, texture_archive[texture_id] if texture_id is not None else None, name)
+        if entry["texture_set"] is None and bound != original:
+            raise ValueError(f"{name}: texture bindings need an unambiguous map texture set")
         fallback_errors = ("triangle count changed", "triangle topology or shared vertex changed",
                            "one Nitro vertex has multiple edited UVs", "vertices sharing a Nitro UV command",
                            "this shape has no Nitro texture commands", "this UV has no editable Nitro texture command",

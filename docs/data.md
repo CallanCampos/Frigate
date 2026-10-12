@@ -550,8 +550,10 @@ dimensions. Nitro supports limited colors and alpha precision, so the packer qua
 rejects a set when its shared
 palette cannot hold the edited colors. Textures that share the same encoded texels must remain compatible.
 
-`data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and the texture
-set selected for viewing when the map-to-area relationship identifies one. Each chunk has its own numbered directory:
+`data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and a confirmed
+`texture_set` when the map-to-area relationship or resource names identify one. Where several sets contain every
+texture and palette name used by a model, `texture_preview` selects one representative set for Blender viewing.
+Each chunk has its own numbered directory:
 `model.glb` and `nitro.json`; texture PNGs are shared by texture-set number. The binary glTF (`.glb`) holds the
 model geometry and its buffer in one file and opens directly in Blender. The numbered layout keeps maps distinct
 even when embedded model names repeat. For example, chunk 0103 is a four-vertex ground plane;
@@ -579,8 +581,10 @@ The archive has 1,065 chunks (`WB`, `GC`, `NG` or `RD`), each with one `BMD0` mo
 Black 2 and White 2. All 1,065 models roundtrip through the position converter without edits: 1,007 map directly to
 Nitro vertices, while 58 use scene node transforms that the packer reverses when writing positions. For the latter,
 the converter checks each vertex against the exported baseline before enabling edits.
-Of the 1,065 models, 646 reference PNGs from an identified texture set; other entries have no single unambiguous
-texture assignment in the current manifest.
+Of the 1,065 models, 695 have a confirmed texture set, 346 have a representative preview, and 24 name resources
+absent from every shared map texture set. GLBs for 1,036 models reference editable shared PNGs; five models with a
+confirmed set have no matching image in the GLB. A preview is for viewing and geometry edits; binding a material to
+a different texture needs a confirmed set because the runtime set varies by area.
 
 The build reads each GLB `POSITION` and `TEXCOORD_0` accessor and the exposed material settings, writes representable
 values into the original Nitro resource, packs `a/0/0/8` and checks it against both ROMs. An unchanged Blender export of
@@ -596,7 +600,7 @@ fit Nitro's 16-bit fixed-point position and UV ranges. Models with scene transfo
 to recover local vertex positions; blended skin weights are unsupported by this map model format.
 UV edits use Nitro's 1/16-texel coordinate precision and each material's texture dimensions and transform.
 GLB material base color, opacity, emission and double-sided settings also pack into Nitro. Color and opacity are
-quantized to the DS's five-bit channels. For models with a selected texture set, changing a material's
+quantized to the DS's five-bit channels. For models with a confirmed texture set, changing a material's
 `baseColorTexture` to a PNG from that set updates Nitro's texture and palette bindings, material dimensions and UV
 coordinates. Clearing the texture slot removes its binding. The packer rebuilds Nitro's name-search dictionary when
 the new texture was not already listed by the model. Other Nitro material settings retain their original values.
