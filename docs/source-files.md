@@ -86,7 +86,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | partial | descriptive |
+| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | complete | descriptive |
 
 ### Overlay 11
 
@@ -1589,8 +1589,8 @@ prints the tables below from the configs and the ROM:
 | `mb_gameinfo.c` | `0x021a2040`–`0x021a2638` | 14 | partial | descriptive |
 | `mb_wm.c` | `0x021a2638`–`0x021a3b28` | 28 | partial | descriptive |
 | `mb_cache.c` | `0x021a3b28`–`0x021a3bd4` | 3 | partial | descriptive |
-| `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | partial | descriptive |
-| `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | partial | descriptive |
+| `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | complete | descriptive |
+| `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | complete | descriptive |
 
 ### Overlay 184
 

@@ -4,5 +4,6 @@
     .bss        start:0x02150400 end:0x02150400 kind:bss align:32
 
 src/ov010/event_make.c:
+    complete
     .text       start:0x0214ff40 end:0x021503dc
     .rodata     start:0x021503dc end:0x021503e8

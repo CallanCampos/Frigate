@@ -932,6 +932,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A ternary, an `if`/`else` on the value alone and an inline abs all give other code.
 - A call left unmerged in one arm while both arms jump to one store means the store is written at the end of both
   arms, not once after the `if` (`PkwdSelectScreen_PrintMovie`).
+- `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
+  `b`, is a constant arm written first and a select in the `else`:
+  `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
+  event has it. With the test turned round (`p != NULL` first) the constant arm cannot jump into the select's tail,
+  and `&&` builds the constant before the call. The stores after it were also in the order of the asm's loads
+  (`ldr r0, [r4]; str r1, [r4, #0x1c]; str r0, [r4, #0x18]` is `param.gameData = battle->gameData;` and then
+  `param.unk4 = saved;`), which alone took 4 bytes off.
 
 ## Loops
 
