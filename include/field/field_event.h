@@ -5,6 +5,7 @@
 #include "field/zone.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // What a battle started from the field takes from it, which SaveBtlFieldStatus of overlay 36 fills in
 struct BtlFieldStatus {
@@ -61,7 +62,9 @@ GameEvent *EventFieldSubprocessCall_CreateWithCallback(GameSystem *gsys, Field *
                                                        void (*callback)(void *work), void *work);
 // Events of overlay 36's other files that scripts start: a name input for the Pokémon, and another input with its result
 GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 a1, u16 a2, u16 *result, WordSet *wordSet);
-GameEvent *func_ov036_021bfc9c(GameSystem *gsys, u16 *result);
+GameEvent *RivalNameEntry_Create(GameSystem *gsys, u16 *result);
+GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state, void *data);
 GameEvent *EventFieldSubprocessTransition_Create(GameSystem *gsys, Field *field, s32 overlayId,
                                                  const GameProcFunctions *functions, void *param);
 GameEvent *EventPlayerSpinDown_Create(GameEvent *event, GameSystem *gsys, Field *field);

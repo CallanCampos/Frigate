@@ -975,7 +975,7 @@ BOOL func_ov059_021e6bd4(VM *vm, FieldScriptEnv *env) {
     u16 a0 = VM_Read16(vm);
     u16 a3 = VM_Read16(vm);
 
-    ScriptWork_CallEvent(work, func_ov036_021bfa68(a0, gsys, 0, a3));
+    ScriptWork_CallEvent(work, JoinAvenueNameEntry_Create(a0, gsys, 0, a3));
     return TRUE;
 }
 

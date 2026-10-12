@@ -182,7 +182,7 @@ BmpWin *func_ov036_02187c9c(void *window);
 u32 func_ov036_02189cb0(void *msgBGSys);
 void func_ov036_02189cd8(u32 value);
 void func_ov036_02189de8(u32 value, GFLBitmap *bitmap, u32 number);
-GameEvent *func_ov036_021bfa68(u16 a0, GameSystem *gsys, u32 a2, u16 a3);
+GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result, u16 useCurrent);
 // Check the party and the Battle Box against a regulation. func_ov036_021aebf0 returns the event that lets the player
 // choose between them, or NULL when neither can enter
 GameEvent *func_ov036_021aebf0(GameSystem *gsys, u32 a1, Regulation *regulation, u16 *result, HeapID heapId);
