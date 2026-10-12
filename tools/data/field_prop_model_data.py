@@ -24,6 +24,8 @@ from map_model_data import (accessor_values, canonical_texture_name, decoded_pos
                             patch_uvs, positions_from_gltf, rebuild_topology,
                             u32, write_glb)
 from map_texture_data import read_png, resources
+from graphics_paths import asset_dir
+from graphics_names import prop_bundle_name
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -68,7 +70,8 @@ def wrapped(model):
 
 def export_one(apicula, directory, kind, bundle_id, entry, texture_blob):
     index, res_id, name, nitro = entry
-    model_dir = directory / f"{bundle_id:03d}" / f"{index:03d}"
+    bundle_dir = asset_dir(directory, bundle_id, 3)
+    model_dir = asset_dir(bundle_dir, index, 3, name)
     model_dir.mkdir(parents=True, exist_ok=True)
     texture_names = {item["name"]: item for item in resources(texture_blob)[0]}
     with tempfile.TemporaryDirectory() as temporary:
@@ -89,11 +92,11 @@ def export_one(apicula, directory, kind, bundle_id, entry, texture_blob):
             canonical = canonical_texture_name(picture["uri"], texture_names)
             texture = texture_names[Path(canonical).stem]
             preview = converted / picture["uri"]
-            shared = (ROOT / "data/field_prop_textures" / kind / f"{bundle_id:03d}" / canonical)
+            shared = asset_dir(ROOT / "data/field_prop_textures" / kind, bundle_id, 3) / canonical
             if read_png(preview, texture["width"], texture["height"]) != read_png(
                     shared, texture["width"], texture["height"]):
                 raise ValueError(f"{kind} {bundle_id}/{index}: {canonical} differs from shared PNG")
-            picture["uri"] = f"../../../../field_prop_textures/{kind}/{bundle_id:03d}/{canonical}"
+            picture["uri"] = f"../../../../field_prop_textures/{kind}/{shared.parent.name}/{canonical}"
         binary = gltfs[0].with_suffix(".bin").read_bytes()
     write_glb(model_dir / "model.glb", document, binary)
     doc, primitives, binary = mesh_primitives(model_dir, name)
@@ -112,11 +115,11 @@ def export_one(apicula, directory, kind, bundle_id, entry, texture_blob):
             direct = patch_model(wrapped(nitro), positions, name) == wrapped(nitro)
         except ValueError:
             direct = False
-    mapping = {"nitro_sha256": hashlib.sha256(nitro).hexdigest(), "direct": direct,
+    mapping = {"direct": direct,
                "glb_sha256": hashlib.sha256((model_dir / "model.glb").read_bytes()).hexdigest()}
     if not direct:
         mapping["positions"] = positions
-    (model_dir / "nitro.json").write_text(json.dumps(mapping, indent=2) + "\n")
+    return mapping
 
 
 def export(apicula, directory, selected_bundle=None, selected_model=None):
@@ -135,33 +138,42 @@ def export(apicula, directory, selected_bundle=None, selected_model=None):
         if selected_bundle is not None and bundle_id != selected_bundle:
             continue
         entries = bundle_models(bundle)
-        folder = directory / f"{bundle_id:03d}"
+        folder = asset_dir(directory, bundle_id, 3,
+                           prop_bundle_name(kind, bundle_id, entries[0][2] if entries else "empty"))
         folder.mkdir(parents=True, exist_ok=True)
-        (folder / "manifest.json").write_text(json.dumps({
-            "bundle_sha256": hashlib.sha256(bundle).hexdigest(),
-            "models": [{"index": index, "res_id": res_id, "name": name}
-                       for index, res_id, name, _ in entries]}, indent=2) + "\n")
+        manifest_path = folder / "manifest.json"
+        metadata = (json.loads(manifest_path.read_text()) if selected_model is not None
+                    and manifest_path.exists() else
+                    {"bundle_sha256": hashlib.sha256(bundle).hexdigest(),
+                     "models": [{"index": index, "res_id": res_id, "name": name}
+                                for index, res_id, name, _ in entries]})
         selected = [entry for entry in entries
                     if selected_model is None or entry[0] == selected_model]
         with ThreadPoolExecutor(max_workers=4) as executor:
-            list(executor.map(lambda entry: export_one(apicula, directory, kind, bundle_id,
-                                                       entry, textures[bundle_id]), selected))
+            mappings = list(executor.map(lambda entry: export_one(apicula, directory, kind, bundle_id,
+                                                                  entry, textures[bundle_id]), selected))
+        for entry, mapping in zip(selected, mappings):
+            item = metadata["models"][entry[0]]
+            item["glb_sha256"] = mapping.pop("glb_sha256")
+            if mapping["direct"]:
+                item.pop("conversion", None)
+            else:
+                item["conversion"] = mapping
+        (folder / "manifest.json").write_text(json.dumps(metadata, indent=2) + "\n")
         print(f"{kind} {bundle_id:03d}: {len(selected)} GLBs", flush=True)
 
 
-def edit_model(model_dir, name, original, texture_blob, texture_directory=None):
-    mapping = json.loads((model_dir / "nitro.json").read_text())
-    if mapping["nitro_sha256"] != hashlib.sha256(original).hexdigest():
-        raise ValueError(f"{model_dir}: original Nitro model changed")
+def edit_model(model_dir, name, original, texture_blob, metadata, texture_directory=None):
     glb = (model_dir / "model.glb").read_bytes()
-    if hashlib.sha256(glb).hexdigest() == mapping["glb_sha256"]:
+    if hashlib.sha256(glb).hexdigest() == metadata["glb_sha256"]:
         return original
+    mapping = metadata.get("conversion", {"direct": True})
     doc, primitives, binary = mesh_primitives(model_dir, name)
     wrapped_original = wrapped(original)
     bound, _ = patch_material_bindings(wrapped_original, doc, primitives, texture_blob, name,
                                        binary, texture_directory)
     try:
-        positions, direct, _ = positions_from_gltf(model_dir, name, original)
+        positions, direct, _ = positions_from_gltf(model_dir, name, original, mapping)
         edited = patch_model(bound, positions, name) if direct else bound
         edited = patch_uvs(edited, doc, primitives, binary, name)
     except ValueError as error:
@@ -188,15 +200,17 @@ def pack(directory, game, output):
     result = []
     for bundle_id, bundle in enumerate(archive):
         entries = bundle_models(bundle)
-        folder = directory / f"{bundle_id:03d}"
+        folder = asset_dir(directory, bundle_id, 3)
         metadata = json.loads((folder / "manifest.json").read_text())
-        if metadata != {"bundle_sha256": hashlib.sha256(bundle).hexdigest(),
-                        "models": [{"index": i, "res_id": r, "name": n}
-                                   for i, r, n, _ in entries]}:
+        if metadata["bundle_sha256"] != hashlib.sha256(bundle).hexdigest() or [
+                {key: value for key, value in item.items()
+                 if key not in ("conversion", "glb_sha256")}
+                for item in metadata["models"]] != [
+                    {"index": i, "res_id": r, "name": n} for i, r, n, _ in entries]:
             raise ValueError(f"{kind} bundle {bundle_id}: model manifest changed")
-        texture_directory = ROOT / "data/field_prop_textures" / kind / f"{bundle_id:03d}"
-        edited = [edit_model(folder / f"{index:03d}", name, model, textures[bundle_id],
-                             texture_directory)
+        texture_directory = asset_dir(ROOT / "data/field_prop_textures" / kind, bundle_id, 3)
+        edited = [edit_model(asset_dir(folder, index, 3), name, model, textures[bundle_id],
+                             metadata["models"][index], texture_directory)
                   for index, _, name, model in entries]
         if all(model == original[3] for model, original in zip(edited, entries)):
             result.append(bundle)

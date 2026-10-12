@@ -1,0 +1,224 @@
+{
+  "bundle_sha256": "a8521a48409051d243c97cb6aab94cc902ef591dbab3e197064890d988f1035a",
+  "models": [
+    {
+      "index": 0,
+      "res_id": 0,
+      "name": "pc_01",
+      "glb_sha256": "db3cbe49ff6c45d5f7328e38ce3d088e3a1c33e86b5c321c60fba53653d7b70f"
+    },
+    {
+      "index": 1,
+      "res_id": 1,
+      "name": "gate_01",
+      "glb_sha256": "b908564612f896c9ae63c006b4712a13f487271cae483ca03f09e939cdb98f6b"
+    },
+    {
+      "index": 2,
+      "res_id": 21,
+      "name": "rock_01",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "8b5cd6db97dbc325c1cbc7d54541477c262f12861bdecfb91c2ba700df5de4e9"
+    },
+    {
+      "index": 3,
+      "res_id": 24,
+      "name": "fountain_01",
+      "glb_sha256": "34c01b5c00557bc487a9b2301f19abc585e7a45a05b06d935a741d3535deb370"
+    },
+    {
+      "index": 4,
+      "res_id": 25,
+      "name": "o_chair_01",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "b93f7ba266bb273b95b46c33703115f1703a0de117c79b5bed7d06c8f50fd402"
+    },
+    {
+      "index": 5,
+      "res_id": 26,
+      "name": "o_parasol_01",
+      "glb_sha256": "c8deff8a846c5148c0b93e87a9134b01dde40690ea91d8a92bb1f8b24342e73d"
+    },
+    {
+      "index": 6,
+      "res_id": 27,
+      "name": "o_table_01",
+      "glb_sha256": "5d8430f70970f896a34448ab0fa2781da6c2599266bd85c069f7e82ee35f02b0"
+    },
+    {
+      "index": 7,
+      "res_id": 54,
+      "name": "searock_01",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "ea2148261b4d199046a888967f2c740dd7501a91085fb751da72de035a00babe"
+    },
+    {
+      "index": 8,
+      "res_id": 55,
+      "name": "searock_02",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "c56af195a97bf1c29cff45947cf0a4aa1938261accb9527d88895af2aef7d15b"
+    },
+    {
+      "index": 9,
+      "res_id": 69,
+      "name": "plant_01",
+      "glb_sha256": "442bebd65278c458b59534a44d0464aecb9bf3bdfd95c36bb0188ccc1c234537"
+    },
+    {
+      "index": 10,
+      "res_id": 93,
+      "name": "door_pc",
+      "glb_sha256": "991601af8359cc98ded656590a2a126ba577974656fc9f6940907658159061f8"
+    },
+    {
+      "index": 11,
+      "res_id": 101,
+      "name": "door01",
+      "glb_sha256": "981d246c15684cad457d5ebb4dda501ae42627c7f85c0edc4a72e1c227826873"
+    },
+    {
+      "index": 12,
+      "res_id": 103,
+      "name": "c0101",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "72f0547e285cb6772eac13bd0148eeee14b9b358eb98074b88977e96f9006660"
+    },
+    {
+      "index": 13,
+      "res_id": 112,
+      "name": "thouse_01",
+      "glb_sha256": "bd9a92118610d96797c7467171a744fd401e209824b388f48eb85c3ca41a427c"
+    },
+    {
+      "index": 14,
+      "res_id": 134,
+      "name": "cart_01",
+      "glb_sha256": "3c51882fc3004b85f441162360f93450196a2b2c464355d40f365953097189df"
+    },
+    {
+      "index": 15,
+      "res_id": 151,
+      "name": "sign01",
+      "glb_sha256": "f00cc0f17a0f98b238ca1225826eb387e1c479fc36a6b477d2180b34ea1b7f0c"
+    },
+    {
+      "index": 16,
+      "res_id": 152,
+      "name": "sign02",
+      "glb_sha256": "5f616de9e3779134777574ba5ff0ee597bdbb49c8397bcbd6b2a92b6062f56b8"
+    },
+    {
+      "index": 17,
+      "res_id": 153,
+      "name": "sign03",
+      "glb_sha256": "9c7d66822c76e81844968489e0939c264274d78b7aae3b530ac4387d306ea1b4"
+    },
+    {
+      "index": 18,
+      "res_id": 154,
+      "name": "sign04",
+      "glb_sha256": "4ac3506f7726063d692af77a2ea98278c47f384a078345b31ace56485afd624c"
+    },
+    {
+      "index": 19,
+      "res_id": 155,
+      "name": "out_vender01",
+      "glb_sha256": "32b3d04ba34296132898bddb737d9a89cd06b2847ceaaffe0ce567fd85b8f2b2"
+    },
+    {
+      "index": 20,
+      "res_id": 156,
+      "name": "out_dust01",
+      "glb_sha256": "7ad4a0db2305f48560e0a7ef844b6706eea8ec626f1303489397e810ebbfaf57"
+    },
+    {
+      "index": 21,
+      "res_id": 190,
+      "name": "outwarp01",
+      "glb_sha256": "28109e7d2559016e2f8e084698534e712314a55feef09e4f1cd2970c3cd078a9"
+    },
+    {
+      "index": 22,
+      "res_id": 191,
+      "name": "outwarp02",
+      "glb_sha256": "c41c1e28f00bdf8446e364654320636dbf33f3a4a3a13183050c36e7c40cfcd7"
+    },
+    {
+      "index": 23,
+      "res_id": 192,
+      "name": "outwarp03",
+      "glb_sha256": "d291d81ba6b673b26386c43482081af99a2b003b3b3d646c5cc0080c9edd9365"
+    },
+    {
+      "index": 24,
+      "res_id": 258,
+      "name": "rock_02",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "2c7e476cfaa40fe5cb03c6d487a87e73469967354a54df0bf01d045829150b52"
+    },
+    {
+      "index": 25,
+      "res_id": 259,
+      "name": "door_normal01",
+      "glb_sha256": "763b14342f5aceeb10f7307b13f67ad4bcf1f7dcd354c238d976dfb373cfb0b2"
+    },
+    {
+      "index": 26,
+      "res_id": 260,
+      "name": "door_normal02",
+      "glb_sha256": "4c66ccd3c90c25f7f721117568460ea2ded24b2e8a9178ee68744e67ab901fb4"
+    },
+    {
+      "index": 27,
+      "res_id": 261,
+      "name": "door_normal03",
+      "glb_sha256": "8a25c02b0a235a637b4fcc84ea46f6d3cbd8257563e719fef1e17576edb0a4b4"
+    },
+    {
+      "index": 28,
+      "res_id": 28,
+      "name": "drum_01",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "2b5254bc0565eb830effba08a27c2dbd4e5c0e518540c41c4e391dcc8f546c33"
+    },
+    {
+      "index": 29,
+      "res_id": 29,
+      "name": "tile_01",
+      "glb_sha256": "372286f98f95d309b6357e20a18f9604295cb5b531b7ad396c3e262b6eb1682d"
+    },
+    {
+      "index": 30,
+      "res_id": 30,
+      "name": "fireplace_01",
+      "glb_sha256": "2d5e1f76accf4da426eaa80819c1824d5e4a1454df210a55be528170d6e62fcb"
+    },
+    {
+      "index": 31,
+      "res_id": 31,
+      "name": "fireplace_02",
+      "glb_sha256": "3a461be1ef3f42b1f83f0a10cb9a566f293bc16814281ef5afa338b9d1a79ed3"
+    },
+    {
+      "index": 32,
+      "res_id": 32,
+      "name": "entrance_01",
+      "glb_sha256": "ce4058f3d532824f12ca7fec9504fd97771a0be040592bde357fc05c67981102"
+    }
+  ]
+}

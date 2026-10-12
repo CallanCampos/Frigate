@@ -540,14 +540,18 @@ they are files of their own that trainers name.
 
 ## Map model sources
 
-The numbered layout follows the archive's stable chunk IDs while giving each map model its own editable directory.
+Field graphics directories use a location or resource name followed by `__<archive-id>` to distinguish
+assets that share a name. For example, `nacrene_city_6_m_whouse01_00_00__0834` is a house model.
+Names come from map matrices and zone-to-area references where possible; shared resources use `shared_`.
+Run `.venv/bin/python tools/data/find_graphics.py nacrene_city_7` (or another `data/zones/` filename)
+to see the map model, map texture set, prop bundle and prop textures used by that zone.
 This is closer to [pokeemerald's per-map directories](https://github.com/pret/pokeemerald/tree/master/data/maps)
 than to [pokeplatinum's numbered binary map data](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/data).
 Like [pokeplatinum's separate texture sets](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/texture_sets),
-shared texture resources belong in separate directories. `data/map_texture_sets/<set>/` holds editable color PNGs
+shared texture resources belong in separate directories. `data/map_texture_sets/<location>__<set>/` holds editable color PNGs
 for all 409 texture sets. GLB image paths point to these same PNGs, including resource names containing dots.
-Each set's `nitro.json` records the original resource hash and palette association for the
-packer; it is build metadata, not a color source. Edit the PNG in Blender or an image editor. The build packs it back
+The packer reads the original Nitro resource to recover its texture format and palette association. Edit the PNG
+in Blender or an image editor. The build packs it back
 into `a/0/1/4` and checks the original archive against both ROMs. PNGs must be 8-bit RGB or RGBA and retain their
 dimensions. Nitro supports limited colors and alpha precision, so the packer quantizes edited colors to RGB555 and
 rejects a set when its shared
@@ -556,14 +560,15 @@ palette cannot hold the edited colors. Textures that share the same encoded texe
 `data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and a confirmed
 `texture_set` when the map-to-area relationship or resource names identify one. Where several sets contain every
 texture and palette name used by a model, `texture_preview` selects one representative set for Blender viewing.
-Each chunk has its own numbered directory:
-`model.glb` and `nitro.json`; texture PNGs are shared by texture-set number. The binary glTF (`.glb`) holds the
-model geometry and its buffer in one file and opens directly in Blender. The numbered layout keeps maps distinct
-even when embedded model names repeat. For example, chunk 0103 is a four-vertex ground plane;
-chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices and ten materials. `nitro.json` records the
-original model hash, whether its GLB positions map directly to Nitro commands, and baseline positions for models
-whose scene transforms need reversing. It is packer metadata, not an editable graphics source. The packer
-derives the original triangle and vertex order from those commands, so a Blender export can reindex vertices while
+Each chunk has its own named directory containing `model.glb` and terrain CSVs; texture PNGs are shared by texture set.
+The binary glTF (`.glb`) holds the model geometry and its buffer in one file and opens directly in Blender.
+The archive ID suffix keeps maps distinct even when embedded model names repeat. For example, chunk 0103 is a
+four-vertex ground plane; chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices and ten materials.
+The packer reconstructs scene transforms from the GLB and original Nitro model. Seven unusual prop models retain
+their original position baselines in their bundle manifests because their transforms cannot yet be reconstructed. The packer
+also stores each prop GLB's export hash there so repacking one edited model does not reprocess all 6,331 models.
+These fields are generated conversion metadata; edits belong in the GLB or PNG. The packer
+derives the original triangle and vertex order from Nitro commands, so a Blender export can reindex vertices while
 the packer still maps edits to the right commands.
 
 The same GLB contains a Blender empty for each placed field prop, named `bw2_prop_NNNN_id_XXXXX`. Move or rotate
@@ -620,12 +625,12 @@ Adding material slots or draw calls is not yet supported. Every map model contai
 The exterior and interior field props use separate texture archives. Their PNGs live under
 `data/field_prop_textures/exterior/` and `data/field_prop_textures/interior/`, each grouped by the
 area's texture set number. Editing a PNG repacks its original Nitro texture and shared palette;
-`nitro.json` records the original format and palette mapping needed for a byte-matching build.
+the original Nitro archive supplies the format and palette mapping needed for a byte-matching build.
 The texture size, pixel format and shared palette capacity still constrain edits. The PNGs can be
 re-exported with `tools/data/map_texture_data.py extract OUTPUT_DIR a/1/7/4` or `a/1/7/5`.
 
 All 163 exterior and interior field prop bundles have an editable GLB for each of their 6,331 models.
-The bundle number is the area's `prop_bundle`; the model directory is its index in that bundle.
+The bundle ID suffix is the area's `prop_bundle`; the model directory's suffix is its index in that bundle.
 The bundle's `manifest.json` records the in-game resource ID and model name. Editing geometry,
 UVs, material colors and texture bindings uses the same Nitro conversion as map models.
 The prop's resource information and animations retain their original Nitro bytes. Models can be

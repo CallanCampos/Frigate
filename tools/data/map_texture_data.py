@@ -2,13 +2,14 @@
 """Export field map NSBTX textures as PNG and pack edited pixels into Nitro."""
 
 import json
-import hashlib
 import struct
 import sys
 import zlib
 from pathlib import Path
 
 from narc import read_narc, write_narc
+from graphics_paths import asset_dir
+from graphics_names import map_texture_name, prop_bundle_name
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -240,17 +241,17 @@ def export(directory, archive_name="a/0/1/4"):
     (directory / "manifest.json").write_text(json.dumps({"archive": archive_name, "sets": len(archive)}, indent=2) + "\n")
     for set_id, blob in enumerate(archive):
         textures, palettes = resources(blob)
-        folder = directory / f"{set_id:03d}"
+        first = textures[0]["name"] if textures else "empty"
+        name = (map_texture_name(set_id, first) if archive_name == "a/0/1/4" else
+                prop_bundle_name("exterior" if archive_name == "a/1/7/4" else "interior",
+                                 set_id, first) + "_textures")
+        folder = asset_dir(directory, set_id, 3, name)
         folder.mkdir(parents=True, exist_ok=True)
-        mapping = {"nitro_sha256": hashlib.sha256(blob).hexdigest(), "textures": []}
         for index, texture in enumerate(textures):
             palette = palette_for(texture, palettes, index)
             pixels = decode(blob, texture, palette)
             (folder / f"{texture['name']}.png").write_bytes(
                 write_png(texture["width"], texture["height"], pixels))
-            mapping["textures"].append({"name": texture["name"], "kind": texture["kind"],
-                                        "palette_offset": palette["offset"]})
-        (folder / "nitro.json").write_text(json.dumps(mapping, indent=2) + "\n")
 
 
 def quantized_pixels(pixels, texture):
@@ -327,15 +328,7 @@ def pack(directory, game, output):
     for set_id, original in enumerate(archive):
         blob = bytearray(original)
         textures, palettes = resources(blob)
-        folder = directory / f"{set_id:03d}"
-        mapping = json.loads((folder / "nitro.json").read_text())
-        if mapping["nitro_sha256"] != hashlib.sha256(original).hexdigest():
-            raise ValueError(f"texture set {set_id}: original Nitro data changed")
-        expected = [{"name": item["name"], "kind": item["kind"],
-                     "palette_offset": palette_for(item, palettes, i)["offset"]}
-                    for i, item in enumerate(textures)]
-        if mapping["textures"] != expected:
-            raise ValueError(f"texture set {set_id}: texture order or palette mapping changed")
+        folder = asset_dir(directory, set_id, 3)
         pixels = []
         changed = set()
         for index, texture in enumerate(textures):

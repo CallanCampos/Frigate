@@ -5,7 +5,10 @@
       "chunk": 0,
       "name": "map24_23",
       "texture_set": null,
-      "texture_preview": 2
+      "texture_preview": 2,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1,
@@ -675,7 +678,10 @@
     {
       "chunk": 113,
       "name": "c03_g00_00",
-      "texture_set": 186
+      "texture_set": 186,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 114,
@@ -1401,7 +1407,10 @@
       "chunk": 251,
       "name": "map08_05",
       "texture_set": null,
-      "texture_preview": 0
+      "texture_preview": 0,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 252,
@@ -2218,7 +2227,10 @@
       "chunk": 392,
       "name": "map25_05",
       "texture_set": null,
-      "texture_preview": 0
+      "texture_preview": 0,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 393,
@@ -2450,7 +2462,10 @@
     {
       "chunk": 436,
       "name": "m_dun0602_00_00",
-      "texture_set": 293
+      "texture_set": 293,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 437,
@@ -2595,7 +2610,10 @@
     {
       "chunk": 465,
       "name": "m_dun0702_01_00",
-      "texture_set": 294
+      "texture_set": 294,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 466,
@@ -2640,7 +2658,10 @@
     {
       "chunk": 474,
       "name": "m_dun0704_00_01",
-      "texture_set": 294
+      "texture_set": 294,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 475,
@@ -3098,7 +3119,10 @@
     {
       "chunk": 560,
       "name": "m_dun2005_00_00",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 561,
@@ -3142,7 +3166,10 @@
     {
       "chunk": 568,
       "name": "m_dun2005_01_00",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 569,
@@ -3152,7 +3179,10 @@
     {
       "chunk": 570,
       "name": "m_dun2005_00_01",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 571,
@@ -3277,12 +3307,18 @@
     {
       "chunk": 595,
       "name": "m_dun2005_00_03",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 596,
       "name": "m_dun2005_00_04",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 597,
@@ -3292,7 +3328,10 @@
     {
       "chunk": 598,
       "name": "m_dun2005_01_04",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 599,
@@ -3307,7 +3346,10 @@
     {
       "chunk": 601,
       "name": "m_dun2005_03_00",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 602,
@@ -3327,17 +3369,26 @@
     {
       "chunk": 605,
       "name": "m_dun2005_03_04",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 606,
       "name": "m_dun2005_04_00",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 607,
       "name": "m_dun2005_04_01",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 608,
@@ -3347,12 +3398,18 @@
     {
       "chunk": 609,
       "name": "m_dun2005_04_03",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 610,
       "name": "m_dun2005_04_04",
-      "texture_set": 340
+      "texture_set": 340,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 611,
@@ -4052,12 +4109,18 @@
     {
       "chunk": 743,
       "name": "m_dun2903_01_00",
-      "texture_set": 332
+      "texture_set": 332,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 744,
       "name": "m_dun2903_01_01",
-      "texture_set": 332
+      "texture_set": 332,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 745,
@@ -4132,7 +4195,10 @@
     {
       "chunk": 759,
       "name": "m_dun2904_01_00",
-      "texture_set": 332
+      "texture_set": 332,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 760,
@@ -4147,7 +4213,10 @@
     {
       "chunk": 762,
       "name": "m_dun2508_00_00",
-      "texture_set": 347
+      "texture_set": 347,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 763,
@@ -4157,7 +4226,10 @@
     {
       "chunk": 764,
       "name": "m_dun2510_00_00",
-      "texture_set": 347
+      "texture_set": 347,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 765,
@@ -4242,7 +4314,10 @@
     {
       "chunk": 781,
       "name": "m_dun2601_01_01",
-      "texture_set": 392
+      "texture_set": 392,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 782,
@@ -4322,7 +4397,10 @@
     {
       "chunk": 797,
       "name": "white2601_01_01",
-      "texture_set": 392
+      "texture_set": 392,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 798,
@@ -4472,7 +4550,10 @@
     {
       "chunk": 827,
       "name": "m_pc01_00_00",
-      "texture_set": 283
+      "texture_set": 283,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 828,
@@ -4517,7 +4598,10 @@
     {
       "chunk": 836,
       "name": "m_buill04_00_00",
-      "texture_set": 289
+      "texture_set": 289,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 837,
@@ -4527,17 +4611,26 @@
     {
       "chunk": 838,
       "name": "m_fha01_00_00",
-      "texture_set": 284
+      "texture_set": 284,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 839,
       "name": "m_fha02_00_00",
-      "texture_set": 284
+      "texture_set": 284,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 840,
       "name": "m_fhb01_00_00",
-      "texture_set": 284
+      "texture_set": 284,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 841,
@@ -4547,7 +4640,10 @@
     {
       "chunk": 842,
       "name": "m_hh01_00_00",
-      "texture_set": 284
+      "texture_set": 284,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 843,
@@ -4557,7 +4653,10 @@
     {
       "chunk": 844,
       "name": "m_labo01_00_00",
-      "texture_set": 285
+      "texture_set": 285,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 845,
@@ -4612,7 +4711,10 @@
     {
       "chunk": 855,
       "name": "m_pc02_00_00",
-      "texture_set": 283
+      "texture_set": 283,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 856,
@@ -4693,7 +4795,10 @@
     {
       "chunk": 871,
       "name": "m_union01_00_00",
-      "texture_set": 324
+      "texture_set": 324,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 872,
@@ -4708,7 +4813,10 @@
     {
       "chunk": 874,
       "name": "m_ph01_00_00",
-      "texture_set": 327
+      "texture_set": 327,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 875,
@@ -4773,12 +4881,18 @@
     {
       "chunk": 887,
       "name": "m_gym0401_01_00",
-      "texture_set": 304
+      "texture_set": 304,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 888,
       "name": "m_gym0401_01_01",
-      "texture_set": 304
+      "texture_set": 304,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 889,
@@ -4808,12 +4922,18 @@
     {
       "chunk": 894,
       "name": "m_siten04_00_00",
-      "texture_set": 335
+      "texture_set": 335,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 895,
       "name": "m_champ01_00_00",
-      "texture_set": 319
+      "texture_set": 319,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 896,
@@ -4854,7 +4974,10 @@
     {
       "chunk": 903,
       "name": "m_gym0601_00_01",
-      "texture_set": 309
+      "texture_set": 309,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 904,
@@ -4920,7 +5043,10 @@
     {
       "chunk": 916,
       "name": "m_un01_00_00",
-      "texture_set": 336
+      "texture_set": 336,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 917,
@@ -5199,12 +5325,18 @@
     {
       "chunk": 971,
       "name": "m_hh03_00_00",
-      "texture_set": 284
+      "texture_set": 284,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 972,
       "name": "m_zbuill01_00_00",
-      "texture_set": 341
+      "texture_set": 341,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 973,
@@ -5383,7 +5515,10 @@
     {
       "chunk": 1007,
       "name": "m_remainder01_00",
-      "texture_set": 291
+      "texture_set": 291,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1008,
@@ -5459,7 +5594,10 @@
     {
       "chunk": 1022,
       "name": "m_nschool02_00_0",
-      "texture_set": 282
+      "texture_set": 282,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1023,
@@ -5484,7 +5622,10 @@
     {
       "chunk": 1027,
       "name": "m_champ01_00_01",
-      "texture_set": 319
+      "texture_set": 319,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1028,
@@ -5605,12 +5746,18 @@
     {
       "chunk": 1051,
       "name": "C3_00_00",
-      "texture_set": 18
+      "texture_set": 18,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1052,
       "name": "C3_00_01",
-      "texture_set": 18
+      "texture_set": 18,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1053,
@@ -5625,17 +5772,26 @@
     {
       "chunk": 1055,
       "name": "h01a_00_00",
-      "texture_set": 14
+      "texture_set": 14,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1056,
       "name": "h01a_00_01",
-      "texture_set": 14
+      "texture_set": 14,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1057,
       "name": "h01a_00_02",
-      "texture_set": 14
+      "texture_set": 14,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1058,
@@ -5645,32 +5801,50 @@
     {
       "chunk": 1059,
       "name": "h01a_01_01",
-      "texture_set": 14
+      "texture_set": 14,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1060,
       "name": "h01a_01_02",
-      "texture_set": 14
+      "texture_set": 14,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1061,
       "name": "champion_00_00",
-      "texture_set": 58
+      "texture_set": 58,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1062,
       "name": "champion_00_01",
-      "texture_set": 58
+      "texture_set": 58,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1063,
       "name": "champion_01_00",
-      "texture_set": 58
+      "texture_set": 58,
+      "conversion": {
+        "direct": false
+      }
     },
     {
       "chunk": 1064,
       "name": "champion_01_01",
-      "texture_set": 58
+      "texture_set": 58,
+      "conversion": {
+        "direct": false
+      }
     }
   ]
 }

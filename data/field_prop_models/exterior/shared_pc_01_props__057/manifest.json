@@ -1,0 +1,263 @@
+{
+  "bundle_sha256": "d107cecf76f9df7589d01c6b5c05a4c0642618f24caf74217ac17dba57876f3b",
+  "models": [
+    {
+      "index": 0,
+      "res_id": 0,
+      "name": "pc_01",
+      "glb_sha256": "1b8a6e3af7fee810c0dd8e52db9464e209318ca77076ded3feb12a8d14763f17"
+    },
+    {
+      "index": 1,
+      "res_id": 1,
+      "name": "gate_01",
+      "glb_sha256": "469ab14086ff1e77cfa110f3864828d979733832f6cf844645ce47aed35cf8a5"
+    },
+    {
+      "index": 2,
+      "res_id": 21,
+      "name": "rock_01",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "7ce32e9026f6d8fd55d5af8ced8d1070f7878311b03926f128be442ead40ee87"
+    },
+    {
+      "index": 3,
+      "res_id": 24,
+      "name": "fountain_01",
+      "glb_sha256": "46ab843f697afcdcde86ea9e5e45fd66842fdcde308c22568391cc946fdcdffd"
+    },
+    {
+      "index": 4,
+      "res_id": 25,
+      "name": "o_chair_01",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "45a00ff666c0c03d08795e91a8767c4cab9e7b1ebcc2776743003f673b44ad96"
+    },
+    {
+      "index": 5,
+      "res_id": 26,
+      "name": "o_parasol_01",
+      "glb_sha256": "c268df5aba4e3a4ce4a0435f9138bf445b60b972215d03fa350b4220ffe5d689"
+    },
+    {
+      "index": 6,
+      "res_id": 27,
+      "name": "o_table_01",
+      "glb_sha256": "8218ae5a48068624eb47ea781c5bc94e3b00ca252e217fcebbe163fa66ce93e7"
+    },
+    {
+      "index": 7,
+      "res_id": 54,
+      "name": "searock_01",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "9189023ebd7587cd25c6f75368b8a112ba29863e35e7aada5f050e705e8c2bfd"
+    },
+    {
+      "index": 8,
+      "res_id": 55,
+      "name": "searock_02",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "e1580ac69b14873dfa825125ff71376d4d8a116345627e992f8f9d5fe0d1201d"
+    },
+    {
+      "index": 9,
+      "res_id": 69,
+      "name": "plant_01",
+      "glb_sha256": "3b63ec9d8ca24abc5138087ce9e9dcd8859cb9207640877b6ea0354c19cb385b"
+    },
+    {
+      "index": 10,
+      "res_id": 93,
+      "name": "door_pc",
+      "glb_sha256": "f0eeb008503e2e2c41f8298b458a9551d9173015798f9a67a4f6067d52126ea6"
+    },
+    {
+      "index": 11,
+      "res_id": 101,
+      "name": "door01",
+      "glb_sha256": "f1fdbe941318056dc280bcfeadb816779ee732f31a9158183aad50c57b5d02ee"
+    },
+    {
+      "index": 12,
+      "res_id": 103,
+      "name": "c0101",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "d41a02f177350971a22fc2414c92e54e611be5b401683a1c0a97f00257ad50c6"
+    },
+    {
+      "index": 13,
+      "res_id": 112,
+      "name": "thouse_01",
+      "glb_sha256": "cf665dd996077e7ee58fa766c1e35ce83e1979e0d2ff4a8780dc250d0b000f9c"
+    },
+    {
+      "index": 14,
+      "res_id": 134,
+      "name": "cart_01",
+      "glb_sha256": "ef8341555ece7b9f06f6261b8769be69acfac52946450410d054c824ac3f932d"
+    },
+    {
+      "index": 15,
+      "res_id": 151,
+      "name": "sign01",
+      "glb_sha256": "a7dad3b79ea3d80ec7cfeac59bcac74871c55fdccd3a7522ad3479fa6840f793"
+    },
+    {
+      "index": 16,
+      "res_id": 152,
+      "name": "sign02",
+      "glb_sha256": "a003f95c5cd2cb0caf6a37d635f0c3d94afb8a23f31d698e46e568223e2a56bb"
+    },
+    {
+      "index": 17,
+      "res_id": 153,
+      "name": "sign03",
+      "glb_sha256": "5b4e10dc6ad5c5a1331bda090916e1d76bc6f1063fc53175c14f368e7716d2d8"
+    },
+    {
+      "index": 18,
+      "res_id": 154,
+      "name": "sign04",
+      "glb_sha256": "c928f1eb9496945404ebfd9a54e701b655271b175df0709feba7d4a1669889a4"
+    },
+    {
+      "index": 19,
+      "res_id": 155,
+      "name": "out_vender01",
+      "glb_sha256": "ab3a4636f7f5dede4a1b2b3797e0b9f4a9740cfb37dece104cfa18510fdde37b"
+    },
+    {
+      "index": 20,
+      "res_id": 156,
+      "name": "out_dust01",
+      "glb_sha256": "f000aa347507c4d6078a606332c65122bb3ba6dcc4b881ab8770b186e86e95bb"
+    },
+    {
+      "index": 21,
+      "res_id": 190,
+      "name": "outwarp01",
+      "glb_sha256": "237c74e147b79c1eed8c8128cc089744c82c33e5064a00ed38f50791480bceff"
+    },
+    {
+      "index": 22,
+      "res_id": 191,
+      "name": "outwarp02",
+      "glb_sha256": "e5d88c9208f40a555ebea4f90d52ba9c78511c016ee79de0d377f571eaa28edd"
+    },
+    {
+      "index": 23,
+      "res_id": 192,
+      "name": "outwarp03",
+      "glb_sha256": "be5b430cf94f489b2a5c3fc4071a7d9d60bcc166e41018028174139cefac1603"
+    },
+    {
+      "index": 24,
+      "res_id": 258,
+      "name": "rock_02",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "d3266eb9e0b3e412070c63725585e985eb22d2105f65cefc03af95085c64041a"
+    },
+    {
+      "index": 25,
+      "res_id": 259,
+      "name": "door_normal01",
+      "glb_sha256": "b5382c4fd8e9621c74c77af4e446e6479e61d6c4238b77a8265be20dbdc53305"
+    },
+    {
+      "index": 26,
+      "res_id": 260,
+      "name": "door_normal02",
+      "glb_sha256": "4c1b3f2d1a4c115ab875aa962fd6785aa7f6f231284f01487cf26c5ddc638b6e"
+    },
+    {
+      "index": 27,
+      "res_id": 261,
+      "name": "door_normal03",
+      "glb_sha256": "6f215ec79422b808ac1e56878bd7bab6e901ba1dc126ec47940897ba8b0b9183"
+    },
+    {
+      "index": 28,
+      "res_id": 335,
+      "name": "h6_gate_01",
+      "glb_sha256": "22c616c51ee786291b862f176f86502446ef836975839a37a3c15313aa96a669"
+    },
+    {
+      "index": 29,
+      "res_id": 347,
+      "name": "bigicicle_01",
+      "glb_sha256": "f034014c222c08f9f9207e589f6383a83a03b4d33faa54d777b723225a263b1e"
+    },
+    {
+      "index": 30,
+      "res_id": 348,
+      "name": "c14_house_01",
+      "glb_sha256": "253a6618974334afbcdb51a07c8f8d74952c8eac361806830792881435893ea8"
+    },
+    {
+      "index": 31,
+      "res_id": 349,
+      "name": "c14_house_02",
+      "glb_sha256": "e6f4c8af07bb1e5dd7cbacd43b7073bb85b7c473230fcd40ac2c54352e13de54"
+    },
+    {
+      "index": 32,
+      "res_id": 350,
+      "name": "c14_gym_01",
+      "glb_sha256": "fe492c27c66b33243b98cd3af40a72417391d402c7c831c85baa082ad5969e7f"
+    },
+    {
+      "index": 33,
+      "res_id": 423,
+      "name": "c03_ship_03_02",
+      "glb_sha256": "4f9b38f4242d0e2808d14cdb19909db4734f4253aa4af944585981557ab46955"
+    },
+    {
+      "index": 34,
+      "res_id": 444,
+      "name": "door_c14_gym",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "fec863243afc85b9cac87981e03dbb11fa7edd8c701fcfe3716902f65bbdabcb"
+    },
+    {
+      "index": 35,
+      "res_id": 447,
+      "name": "c03_ship_03_04",
+      "glb_sha256": "3375d6eae47048ec05ae04d42bda538d67a2aa09b66f60ce8b72e54533ae55c1"
+    },
+    {
+      "index": 36,
+      "res_id": 452,
+      "name": "door_c14",
+      "glb_sha256": "dfee609d0fc18c421d94ad6de1cc99c8569f65b38c426e784d38327bb5b45979"
+    },
+    {
+      "index": 37,
+      "res_id": 453,
+      "name": "c14_boat",
+      "conversion": {
+        "direct": false
+      },
+      "glb_sha256": "9d3610795b16066542900f96eed357001b664e20f838557e13285d031ee7b375"
+    },
+    {
+      "index": 38,
+      "res_id": 455,
+      "name": "tship03_15",
+      "glb_sha256": "cd0e7d00facdecfbd791edf3c13dfd7b1f6fe5a54ec50d578f5fa373b412c7ce"
+    }
+  ]
+}

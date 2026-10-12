@@ -10,7 +10,6 @@ Unchanged topology keeps the original Nitro display lists byte for byte. A mesh
 that changes its triangles is encoded as new DS GPU commands for each draw call.
 """
 
-import hashlib
 import json
 import math
 import re
@@ -25,6 +24,8 @@ from narc import read_narc, write_narc
 from map_texture_data import decode, decode_png, palette_for, read_png, resources
 from map_terrain_data import export_terrains, patch_terrains
 from nitro_dictionary import build_dictionary, replace_names
+from graphics_paths import asset_dir
+from graphics_names import map_model_name, map_texture_name
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -272,10 +273,35 @@ def inverse_joint_position(doc, joint, position):
     return tuple(point)
 
 
-def positions_from_gltf(directory, name, nitro):
-    mapping = json.loads((directory / "nitro.json").read_text())
-    if mapping["nitro_sha256"] != hashlib.sha256(nitro).hexdigest():
-        raise ValueError(f"{name}: Nitro model differs from the glTF mapping")
+def forward_joint_position(doc, joint, position):
+    """Recreate Apicula's baked vertex position from a Nitro local position."""
+    nodes = doc["nodes"]
+    parents = {child: parent for parent, node in enumerate(nodes)
+               for child in node.get("children", [])}
+    index = doc["skins"][0]["joints"][joint]
+    point = list(position)
+    while True:
+        node = nodes[index]
+        if "matrix" in node:
+            raise ValueError("glTF matrix node transforms are unsupported")
+        scale = node.get("scale", (1, 1, 1))
+        point = [point[i] * scale[i] for i in range(3)]
+        x, y, z, w = node.get("rotation", (0, 0, 0, 1))
+        cross = (y * point[2] - z * point[1], z * point[0] - x * point[2],
+                 x * point[1] - y * point[0])
+        doubled = [2 * item for item in cross]
+        cross_again = (y * doubled[2] - z * doubled[1],
+                       z * doubled[0] - x * doubled[2],
+                       x * doubled[1] - y * doubled[0])
+        translation = node.get("translation", (0, 0, 0))
+        point = [point[i] + w * doubled[i] + cross_again[i] + translation[i]
+                 for i in range(3)]
+        if index not in parents:
+            return tuple(point)
+        index = parents[index]
+
+
+def positions_from_gltf(directory, name, nitro, mapping):
     block = u32(nitro, 16)
     model = block + dictionary_offsets(nitro, block + 8)[0]
     shape_dict = model + u32(nitro, model + 12)
@@ -283,14 +309,14 @@ def positions_from_gltf(directory, name, nitro):
     order = draw_order(nitro, model)
     vertex_count, original_index_sets = canonical_indices(nitro, shapes, order)
     raw_positions = decoded_positions(nitro, shapes, order, u32(nitro, model + 28) / 4096)
-    baseline = raw_positions if mapping["direct"] else mapping["positions"]
-    if vertex_count != len(baseline):
+    baseline = raw_positions if mapping["direct"] else mapping.get("positions")
+    if vertex_count != len(raw_positions) or (baseline is not None and vertex_count != len(baseline)):
         raise ValueError(f"{name}: vertex count differs from Nitro")
     doc, primitives, binary = mesh_primitives(directory, name)
     if len(primitives) != len(original_index_sets):
         raise ValueError(f"{name}: primitive count changed")
-    positions = [None] * len(baseline)
-    joints = [None] * len(baseline)
+    positions = [None] * vertex_count
+    joints = [None] * vertex_count
     for prim, original_indices in zip(primitives, original_index_sets):
         current_indices = [item[0] for item in accessor_values(doc, binary, prim["indices"])]
         current_positions = accessor_values(doc, binary, prim["attributes"]["POSITION"])
@@ -315,6 +341,9 @@ def positions_from_gltf(directory, name, nitro):
                 if joints[original] is not None and joints[original] != joint:
                     raise ValueError(f"{name}: shared vertex has multiple joints")
                 joints[original] = joint
+    if baseline is None:
+        baseline = [forward_joint_position(doc, joint, raw) if joint is not None else raw
+                    for joint, raw in zip(joints, raw_positions)]
     result = [value if value is not None else original
               for value, original in zip(positions, baseline)]
     if mapping["direct"]:
@@ -1052,7 +1081,8 @@ def export(apicula, output, selected=None):
     textures = read_narc((ROOT / "extract/b2_us/files/a/0/1/4").read_bytes())
     output.mkdir(parents=True, exist_ok=True)
     texture_root = output.parent / "map_texture_sets"
-    for entry in models(ROOT / "data/map_models"):
+    entries = models(ROOT / "data/map_models")
+    for entry in entries:
         chunk_id, name = entry["chunk"], entry["name"]
         if selected is not None and chunk_id not in selected:
             continue
@@ -1062,7 +1092,7 @@ def export(apicula, output, selected=None):
         nitro = model_bytes(archive[chunk_id])
         texture_names = ({item["name"]: item for item in resources(textures[texture_id])[0]}
                          if texture_id is not None else {})
-        model_dir = output / f"{chunk_id:04d}"
+        model_dir = asset_dir(output, chunk_id, 4, map_model_name(chunk_id, name))
         model_dir.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory() as temporary:
             model_path = Path(temporary) / f"chunk_{chunk_id:04d}.nsbmd"
@@ -1079,7 +1109,9 @@ def export(apicula, output, selected=None):
                 if path.suffix == ".png":
                     if texture_id is None:
                         raise ValueError(f"{chunk_id}: unexpected texture without a texture set")
-                    texture_dir = texture_root / f"{texture_id:03d}"
+                    first_texture = next(iter(texture_names), "empty")
+                    texture_dir = asset_dir(texture_root, texture_id, 3,
+                                            map_texture_name(texture_id, first_texture))
                     texture_dir.mkdir(parents=True, exist_ok=True)
                     canonical = canonical_texture_name(path.name, texture_names)
                     target = texture_dir / canonical
@@ -1098,7 +1130,7 @@ def export(apicula, output, selected=None):
             for picture in document.get("images", []):
                 if "uri" in picture:
                     canonical = canonical_texture_name(picture["uri"], texture_names)
-                    picture["uri"] = f"../../map_texture_sets/{texture_id:03d}/{canonical}"
+                    picture["uri"] = f"../../map_texture_sets/{asset_dir(texture_root, texture_id, 3).name}/{canonical}"
         add_prop_nodes(document, archive[chunk_id])
         write_glb(model_dir / "model.glb", document, (model_dir / "model.bin").read_bytes())
         (model_dir / "model.gltf").unlink()
@@ -1119,11 +1151,16 @@ def export(apicula, output, selected=None):
                 direct = patch_model(archive[chunk_id], positions, name) == archive[chunk_id]
             except ValueError:
                 direct = False
-        mapping = {"nitro_sha256": hashlib.sha256(nitro).hexdigest(), "direct": direct}
+        mapping = {"direct": direct}
         if not direct:
             mapping["positions"] = positions
-        (model_dir / "nitro.json").write_text(json.dumps(mapping, indent=2) + "\n")
+        if direct:
+            entry.pop("conversion", None)
+        else:
+            entry["conversion"] = mapping
         export_terrains(archive[chunk_id], model_dir)
+    (output / "manifest.json").write_text(json.dumps(
+        {"archive": "a/0/0/8", "models": entries}, indent=2) + "\n")
 
 
 def main():
@@ -1133,7 +1170,7 @@ def main():
         return
     if len(sys.argv) == 3 and sys.argv[1] == "migrate":
         for entry in models(Path(sys.argv[2])):
-            directory = Path(sys.argv[2]) / f"{entry['chunk']:04d}"
+            directory = asset_dir(Path(sys.argv[2]), entry["chunk"], 4)
             doc = json.loads((directory / "model.gltf").read_text())
             write_glb(directory / "model.glb", doc, (directory / "model.bin").read_bytes())
             (directory / "model.gltf").unlink()
@@ -1142,7 +1179,7 @@ def main():
     if len(sys.argv) == 3 and sys.argv[1] == "embed-props":
         archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
         for entry in models(Path(sys.argv[2])):
-            path = Path(sys.argv[2]) / f"{entry['chunk']:04d}" / "model.glb"
+            path = asset_dir(Path(sys.argv[2]), entry["chunk"], 4) / "model.glb"
             doc, binary = read_glb(path)
             add_prop_nodes(doc, archive[entry["chunk"]])
             write_glb(path, doc, binary)
@@ -1156,18 +1193,16 @@ def main():
     texture_archive = read_narc((ROOT / "extract" / version / "files/a/0/1/4").read_bytes())
     for entry in models(Path(directory)):
         chunk_id, name = entry["chunk"], entry["name"]
-        model_dir = Path(directory) / f"{chunk_id:04d}"
+        model_dir = asset_dir(Path(directory), chunk_id, 4)
         original = archive[chunk_id]
-        mapping = json.loads((model_dir / "nitro.json").read_text())
-        if mapping["nitro_sha256"] != hashlib.sha256(model_bytes(original)).hexdigest():
-            raise ValueError(f"{name}: Nitro model differs from the GLB mapping")
+        mapping = entry.get("conversion", {"direct": True})
         doc, primitives, binary = mesh_primitives(model_dir, name)
         texture_id = entry["texture_set"]
         if texture_id is None:
             texture_id = entry.get("texture_preview")
         bound, _ = patch_material_bindings(
             original, doc, primitives, texture_archive[texture_id] if texture_id is not None else None,
-            name, binary, ROOT / "data/map_texture_sets" / f"{texture_id:03d}"
+            name, binary, asset_dir(ROOT / "data/map_texture_sets", texture_id, 3)
             if texture_id is not None else None)
         if entry["texture_set"] is None and bound != original:
             raise ValueError(f"{name}: texture bindings need an unambiguous map texture set")
@@ -1177,7 +1212,7 @@ def main():
                            "UV before the first Nitro texture command", "changes an axis omitted by Nitro opcode",
                            "vertex coordinate is not representable", "vertex coordinate exceeds Nitro command range")
         try:
-            positions, direct, _ = positions_from_gltf(model_dir, name, model_bytes(original))
+            positions, direct, _ = positions_from_gltf(model_dir, name, model_bytes(original), mapping)
             edited = patch_model(bound, positions, name) if direct else bound
             edited = patch_uvs(edited, doc, primitives, binary, name)
         except ValueError as error:
@@ -1186,7 +1221,7 @@ def main():
             edited = rebuild_topology(bound, doc, primitives, binary, mapping, name)
         archive[chunk_id] = edited
         archive[chunk_id] = patch_materials(archive[chunk_id], doc, primitives, name)
-        archive[chunk_id] = patch_terrains(archive[chunk_id], Path(directory) / f"{chunk_id:04d}")
+        archive[chunk_id] = patch_terrains(archive[chunk_id], model_dir)
         archive[chunk_id] = patch_props(archive[chunk_id], doc)
     dest = Path(output)
     dest.parent.mkdir(parents=True, exist_ok=True)
