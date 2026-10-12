@@ -221,6 +221,10 @@ Same code, other `sp` offsets or frame size.
   declaration order and the later pieces the lowest slots, in the order they are assigned. `status_rcv.c`'s
   `StatusRcv_UseItem` reuses one function-level `add` in its six effort blocks, which puts the first block's value
   among the declared slots and the other five at the bottom of the frame; a block-scoped `add` in each block does not.
+  The EXIF reader's `func_ov257_021ac6f0` (`ssp_exifdec.c`) reads the byte order and then every IFD entry's tag into
+  one function-level `tag`; with a block-scoped `tag` in each loop and an `order` of its own, two slots were swapped.
+  Once the set of variables changes, sweep the declaration orders again: there, moving `makerNote` after `exifIfd`
+  then fixed the registers, though no position of it had helped before.
 - In a chained assignment, `a = b = f();`, MWCC treats `a` as its own copy of `b`, and a spilled `a` takes the lowest
   slot instead of its declared one. `StatusRcv_UseItem` needs `status = f(); newStatus = status;`.
 - Named locals take stack slots apart from the compiler's temporaries. When the original's spilled values all sit in

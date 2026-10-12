@@ -105,5 +105,6 @@ lib/twl/src/ssp_jpegdec.c:
     .bss        start:0x021b3dcc end:0x021b6278
 
 lib/twl/src/ssp_exifdec.c:
+    complete
     .text       start:0x021ac6a0 end:0x021acca0
     .bss        start:0x021b6278 end:0x021b62c0
