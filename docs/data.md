@@ -574,8 +574,9 @@ chunks use a shape, slope-table index, height-table index and tile type per cell
 `terrain_<layer>_splits.csv`. The `x` and `z` columns identify cells in row order. These are editable integer
 sources, including for the one 64×64 chunk. The packer checks every value and writes it into the original terrain
 section. Slope and height indices refer to the game's tables in `src/ov036/field_map_chunk_height.c`; the split
-file's `index` is the value in a split tile's `offset` column. Changing a tile's shape to split requires an
-existing split record. The current packer keeps each terrain section's dimensions and split count fixed.
+file's `index` is the value in a split tile's `offset` column. Add a row to that file and set a tile's shape to `2`
+with its `offset` pointing to the new row to create a split tile. The packer updates the following section offsets
+when the split count changes. Terrain grid dimensions remain fixed by the map chunk layout.
 
 The archive has 1,065 chunks (`WB`, `GC`, `NG` or `RD`), each with one `BMD0` model, and the archive is identical in
 Black 2 and White 2. All 1,065 models roundtrip through the position converter without edits: 1,007 map directly to
@@ -603,7 +604,10 @@ GLB material base color, opacity, emission and double-sided settings also pack i
 quantized to the DS's five-bit channels. For models with a confirmed texture set, changing a material's
 `baseColorTexture` to a PNG from that set updates Nitro's texture and palette bindings, material dimensions and UV
 coordinates. Clearing the texture slot removes its binding. The packer rebuilds Nitro's name-search dictionary when
-the new texture was not already listed by the model. Other Nitro material settings retain their original values.
+the new texture was not already listed by the model. Blender may embed preview images when exporting a GLB; the
+packer resolves those by image name. Texture pixels are sourced from the shared PNGs, so save pixel edits there.
+The packer rejects changed embedded pixels instead of silently ignoring them.
+Other Nitro material settings retain their original values.
 Adding material slots or draw calls is not yet supported. Every map model contains only an
 `MDL0` block; its textures come from the shared texture archive.
 

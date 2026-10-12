@@ -22,7 +22,7 @@ import tempfile
 from pathlib import Path
 
 from narc import read_narc, write_narc
-from map_texture_data import palette_for, read_png, resources
+from map_texture_data import decode, decode_png, palette_for, read_png, resources
 from map_terrain_data import export_terrains, patch_terrains
 from nitro_dictionary import build_dictionary, replace_names
 
@@ -570,7 +570,7 @@ def rebuild_pairing_tables(chunk, requested_textures, requested_palettes, name):
     return bytearray(data[:insertion] + payload + data[insertion:]), changed[0], changed[1]
 
 
-def patch_material_bindings(chunk, doc, primitives, texture_blob, name):
+def patch_material_bindings(chunk, doc, primitives, texture_blob, name, binary=None):
     if texture_blob is None:
         if any("baseColorTexture" in material.get("pbrMetallicRoughness", {})
                for material in doc.get("materials", [])):
@@ -605,11 +605,26 @@ def patch_material_bindings(chunk, doc, primitives, texture_blob, name):
         texture_index = binding["index"]
         image_index = doc["textures"][texture_index]["source"]
         image = doc["images"][image_index]
-        if "uri" not in image:
-            raise ValueError(f"{name}: texture assignment needs an external PNG URI")
-        texture_name = Path(canonical_texture_name(Path(image["uri"]).name, by_name)).stem
+        image_name = Path(image["uri"]).name if "uri" in image else image.get("name")
+        if not image_name:
+            raise ValueError(f"{name}: GLB texture needs an image name or PNG URI")
+        filename = image_name if image_name.endswith(".png") else image_name + ".png"
+        texture_name = Path(canonical_texture_name(filename, by_name)).stem
         index, texture = by_name[texture_name]
         palette = palette_for(texture, palettes, index)
+        if binary is not None and "bufferView" in image:
+            if image.get("mimeType") != "image/png":
+                raise ValueError(f"{name}: embedded texture {texture_name} must be a PNG")
+            view = doc["bufferViews"][image["bufferView"]]
+            if view["buffer"] != 0:
+                raise ValueError(f"{name}: embedded texture is outside the GLB buffer")
+            start = view.get("byteOffset", 0)
+            end = start + view["byteLength"]
+            embedded = decode_png(binary[start:end], texture["width"], texture["height"],
+                                  f"{name}: {texture_name}")
+            original_pixels = decode(texture_blob, texture, palette)
+            if embedded != original_pixels:
+                raise ValueError(f"{name}: embedded {texture_name} image changed; save edits to its shared PNG")
         if material_id in wanted_textures and wanted_textures[material_id] != texture_name:
             raise ValueError(f"{name}: one Nitro material has conflicting GLB textures")
         wanted_textures[material_id] = texture_name
@@ -1130,7 +1145,8 @@ def main():
         if texture_id is None:
             texture_id = entry.get("texture_preview")
         bound, _ = patch_material_bindings(
-            original, doc, primitives, texture_archive[texture_id] if texture_id is not None else None, name)
+            original, doc, primitives, texture_archive[texture_id] if texture_id is not None else None,
+            name, binary)
         if entry["texture_set"] is None and bound != original:
             raise ValueError(f"{name}: texture bindings need an unambiguous map texture set")
         fallback_errors = ("triangle count changed", "triangle topology or shared vertex changed",

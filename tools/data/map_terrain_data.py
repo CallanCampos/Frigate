@@ -101,18 +101,26 @@ def export_terrains(chunk, directory):
 
 def patch_terrains(chunk, directory):
     result = bytearray(chunk)
-    for layer, (start, end) in enumerate(terrain_ranges(chunk)):
-        width, height = struct.unpack_from("<HH", chunk, start)
+    shift = 0
+    for layer, (old_start, old_end) in enumerate(terrain_ranges(chunk)):
+        start, end = old_start + shift, old_end + shift
+        width, height = struct.unpack_from("<HH", result, start)
         count = width * height
         path = directory / f"terrain_{layer}.csv"
         if chunk[:2] == b"RD":
             rows = read_csv(path, RD_FIELDS)
+            splits = []
         else:
             rows = read_csv(path, HEIGHT_FIELDS)
+            split_path = directory / f"terrain_{layer}_splits.csv"
+            splits = read_csv(split_path, SPLIT_FIELDS)
         if len(rows) != count:
             raise ValueError(f"{path}: expected {count} tiles")
         split_start = start + 4 + count * 8
-        split_count = (end - split_start) // 8 if chunk[:2] != b"RD" else 0
+        if chunk[:2] != b"RD" and (split_start > end or (end - split_start) % 8):
+            raise ValueError(f"{path}: invalid original split section")
+        if len(splits) > 65535:
+            raise ValueError(f"{path}: too many split planes")
         for index, row in enumerate(rows):
             if (row["x"], row["z"]) != (index % width, index // width):
                 raise ValueError(f"{path}: tile order or dimensions changed")
@@ -129,17 +137,14 @@ def patch_terrains(chunk, directory):
                 offset = checked(row["offset"], 16)
                 if shape == 0 and (slope >= SLOPE_COUNT or offset >= OFFSET_COUNT):
                     raise ValueError(f"{path}: plane tile {index} exceeds slope or height table")
-                if shape == 2 and offset >= split_count:
+                if shape == 2 and offset >= len(splits):
                     raise ValueError(f"{path}: split tile {index} refers past split table")
                 if shape not in (0, 2):
                     raise ValueError(f"{path}: unsupported tile shape {shape}")
                 struct.pack_into("<HHI", result, start + 4 + 8 * index,
                                  shape | slope << 2, offset, flags)
         if chunk[:2] != b"RD":
-            split_path = directory / f"terrain_{layer}_splits.csv"
-            splits = read_csv(split_path, SPLIT_FIELDS)
-            if len(splits) != split_count:
-                raise ValueError(f"{split_path}: expected {split_count} split planes")
+            encoded = bytearray(8 * len(splits))
             for index, row in enumerate(splits):
                 if row["index"] != index:
                     raise ValueError(f"{split_path}: split order changed")
@@ -149,5 +154,14 @@ def patch_terrains(chunk, directory):
                     raise ValueError(f"{split_path}: split {index} exceeds slope table")
                 if row["offset0"] >= OFFSET_COUNT or row["offset1"] >= OFFSET_COUNT:
                     raise ValueError(f"{split_path}: split {index} exceeds height table")
-                struct.pack_into("<4H", result, split_start + 8 * index, first, *values)
+                struct.pack_into("<4H", encoded, 8 * index, first, *values)
+            result[split_start:end] = encoded
+            delta = split_start + len(encoded) - end
+            if delta:
+                fields = {b"WB": (8, 12, 16), b"GC": (8, 12, 16, 20)}[chunk[:2]]
+                for field in fields:
+                    offset = struct.unpack_from("<I", result, field)[0]
+                    if offset >= end:
+                        struct.pack_into("<I", result, field, offset + delta)
+                shift += delta
     return bytes(result)

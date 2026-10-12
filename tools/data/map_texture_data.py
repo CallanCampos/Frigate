@@ -130,10 +130,9 @@ def write_png(width, height, pixels):
             + png_chunk(b"IDAT", zlib.compress(scanlines, 9)) + png_chunk(b"IEND", b""))
 
 
-def read_png(path, width, height):
-    data = path.read_bytes()
+def decode_png(data, width, height, label="PNG"):
     if not data.startswith(PNG_MAGIC):
-        raise ValueError(f"{path}: expected a PNG")
+        raise ValueError(f"{label}: expected a PNG")
     offset = 8
     compressed = bytearray()
     dimensions = None
@@ -142,7 +141,7 @@ def read_png(path, width, height):
         kind = data[offset + 4:offset + 8]
         payload = data[offset + 8:offset + 8 + length]
         if zlib.crc32(kind + payload) != struct.unpack_from(">I", data, offset + 8 + length)[0]:
-            raise ValueError(f"{path}: invalid PNG checksum")
+            raise ValueError(f"{label}: invalid PNG checksum")
         offset += 12 + length
         if kind == b"IHDR":
             dimensions = struct.unpack(">IIBBBBB", payload)
@@ -151,7 +150,7 @@ def read_png(path, width, height):
         elif kind == b"IEND":
             break
     if dimensions not in ((width, height, 8, 2, 0, 0, 0), (width, height, 8, 6, 0, 0, 0)):
-        raise ValueError(f"{path}: expected {width}x{height} RGB or RGBA PNG")
+        raise ValueError(f"{label}: expected {width}x{height} RGB or RGBA PNG")
     channels = 3 if dimensions[3] == 2 else 4
     scanlines = zlib.decompress(compressed)
     stride = width * channels
@@ -163,7 +162,7 @@ def read_png(path, width, height):
         line = bytearray(scanlines[cursor + 1:cursor + 1 + stride])
         cursor += stride + 1
         if len(line) != stride:
-            raise ValueError(f"{path}: truncated PNG")
+            raise ValueError(f"{label}: truncated PNG")
         for i in range(stride):
             left = line[i - channels] if i >= channels else 0
             above = previous[i]
@@ -180,7 +179,7 @@ def read_png(path, width, height):
             elif mode == 0:
                 predictor = 0
             else:
-                raise ValueError(f"{path}: unsupported PNG filter {mode}")
+                raise ValueError(f"{label}: unsupported PNG filter {mode}")
             line[i] = (line[i] + predictor) & 255
         if channels == 3:
             pixels.extend(value for i in range(0, stride, 3)
@@ -189,6 +188,10 @@ def read_png(path, width, height):
             pixels.extend(line)
         previous = line
     return bytes(pixels)
+
+
+def read_png(path, width, height):
+    return decode_png(path.read_bytes(), width, height, str(path))
 
 
 def encode_pixels(source, kind):
