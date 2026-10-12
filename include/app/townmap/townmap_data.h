@@ -58,7 +58,7 @@ enum {
 void *TownMapData_Load(HeapID heapId);
 void TownMapData_Free(void *data);
 // A TOWNMAP_PARAM_* of a place
-u16 TownMapData_GetParam(void *data, u16 place, u16 param);
+u16 TownMapData_GetParam(void *data, u16 place, u32 param);
 // The place whose TOWNMAP_PARAM_ZONE is zone, or TOWNMAP_PLACE_NONE
 u16 TownMapData_GetPlaceByZone(void *data, u16 zone);
 
