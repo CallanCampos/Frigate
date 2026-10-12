@@ -7,6 +7,7 @@
 #include "field/gym_driftveil.h"
 #include "field/gym_driftveil_lift.h"
 #include "field/gym_gimmick.h"
+#include "field/gym_humilau.h"
 #include "field/gym_icirrus.h"
 #include "field/gym_mistralton.h"
 #include "field/gym_opelucid.h"
@@ -278,7 +279,7 @@ BOOL func_ov036_021ab178(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    func_ov101_021eee48(gsys);
+    GymHumilau_PlayLeaderSplash(gsys);
     return TRUE;
 }
 
@@ -286,7 +287,7 @@ BOOL func_ov036_021ab190(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    func_ov101_021eeee0(gsys);
+    GymHumilau_PlayLeaderWaves(gsys);
     return TRUE;
 }
 

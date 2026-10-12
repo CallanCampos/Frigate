@@ -167,6 +167,8 @@
 // The touch screen of no_gear.c (a/2/8/7): many palettes and screens that look like the C-Gear's. Our name and a
 // guess, not swan's
 #define ARCID_C_GEAR 287
+// The models and animations of Humilau City's gym, which gym_humilau.c loads. Our name, not swan's
+#define ARCID_GYM_HUMILAU 276
 #define ARCID_GIMMICK_EXPOBJ_MARINETUBE 295
 
 #endif // POKEBW2_CONSTANTS_ARC_H
