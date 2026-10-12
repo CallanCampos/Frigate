@@ -708,6 +708,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A ternary argument `f(c ? 1 : 0)` compiles to the select form (`movs r0, #1; cmp; beq; movs r0, #0`). A branchy
   original (`bne`; `movs #1`; `b`; `movs #0`) is an `if`/`else` with a call in each branch, as `CtvtTalk_UpdateMain`
   calls `func_0203d564(TRUE)` or `func_0203d564(FALSE)`.
+- A flag set with `b = TRUE; if (*p != 0) { b = FALSE; }` is live before `*p` is loaded, so `b` and `p` need two
+  registers, and a spilled flag is stored twice. `b = (*p == 0) ? TRUE : FALSE;` reads `*p` first, takes `p`'s
+  register (`ldrh r0, [r7]; movs r7, #1; ...; movs r7, #0`) and stores a spilled flag once at the join. A function
+  can mix the two: `gym_virbank.c`'s `func_ov100_021eee4c` has the first of its four flags as `TRUE` plus `if` (its
+  `movs r5, #1` is in the prologue) and the other three as ternaries; one spelling for all four leaves a pointer
+  spilled and the frame larger.
 - A ternary store `*p = c ? a : b` computes the address once and stores after the branches; an `if`/`else` with a
   store in each branch computes the address in each, as `Bitmap_Scroll16` does.
 - Parenthesized offsets change the code: `pixels + (dst + 4)` adds the offsets and indexes once, `pixels + dst + 4`
