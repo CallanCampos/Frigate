@@ -808,7 +808,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pleasure_boat_rooms.c` | `0x021eec80`–`0x021ef054` | 7 | partial | descriptive |
+| `pleasure_boat_rooms.c` | `0x021eec80`–`0x021ef054` | 7 | complete | descriptive |
 
 ### Overlay 90
 

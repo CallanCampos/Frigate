@@ -776,6 +776,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 ## Branches and block layout
 
 - When both branches of an `if`/`else` give a local a constant, MWCC emits the then-value, branches over the else
+- Two identical expressions are merged into one spilled value, even across calls and loops. Where the original
+  computes the value twice, the two sites differ in type: `pleasure_boat_rooms.c`'s `PleasureBoat_SetUpRooms` draws
+  `NELEMS(sPeople) - (trainerCount + 2)` people, which is unsigned through `sizeof`, and later loops to the signed
+  `PLEASURE_BOAT_ROOM_COUNT - (trainerCount + 2)`; with both as `15 - (trainerCount + 2)` the difference is computed
+  once and kept at `sp+4`.
+- An array element written through a local index, `boat->rooms[room].field` with `u32 room = picker.order[slot];`,
+  folds each field's offset into its store; a `PleasureBoatRoom *room` pointer keeps the base and the scaled index
+  in registers and spills more (the same function's frame fell from 0x7c to 0x6c). The index must be a local when
+  the array it comes from has had its address taken, or every store forces a reload of it.
   value on the condition, and the else-value last, so the condition's direction decides which constant comes first:
   `b_bag_anm.c`'s button animation needs `if (button >= 10) palette = 2; else palette = 5;`, and `< 10`, a ternary
   or a default followed by an `if` all fail.
@@ -1200,6 +1209,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   Medal Rally's `p_sv` does.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
   a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.
+- A small table that sits among a file's other small `static const` tables but that no code loads from was a
+  referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
+  of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven
+  values in case order, and the switch reading `sTrainerCounts[0]` to `[6]` compiles to the same `movs` while keeping
+  the table. Its place among the packed tables is not definition order: defined between the room tables it came out
+  one early, defined first it is where the ROM has it.
 - A table one element longer in the ROM than the code needs has a terminator: pml_item.c's `TM_MOVE_LIST` is 101 moves
   and a `MOVE_NONE`. Without it the next object starts 2 bytes early.
 
