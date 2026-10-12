@@ -319,11 +319,13 @@ static void ZenkokuZukanAward_Unused(ZenkokuZukanAwardWork *wk) {
 static void ZenkokuZukanAward_InitText(ZenkokuZukanAwardWork *wk) {
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(wk->param->gameData);
     u32 kanji = func_02008a84((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(wk->param->gameData)));
+    StrBuf *strbuf;
+    StrBuf *certifies;
+    StrBuf *staff;
     WordSet *wordSet;
     StrBuf *format;
     u16 textWidth;
     u16 windowWidth;
-    StrBuf *strbuf;
     s16 x;
     u8 i;
 
@@ -365,22 +367,22 @@ static void ZenkokuZukanAward_InitText(ZenkokuZukanAwardWork *wk) {
     GFL_StrBufFree(format);
     GFL_WordSetSystemFree(wordSet);
 
-    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_DocumentCertifiesHaveSuccessfully);
-    textWidth = GFL_FontGetBlockWidth(strbuf, wk->font, 0);
+    certifies = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_DocumentCertifiesHaveSuccessfully);
+    textWidth = GFL_FontGetBlockWidth(certifies, wk->font, 0);
     windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_CERTIFIES]));
     if (windowWidth >= textWidth && kanji == 1) {
         x = (windowWidth - textWidth) / 2;
     }
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_CERTIFIES]), x, 0, strbuf, wk->font,
+    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_CERTIFIES]), x, 0, certifies, wk->font,
                   PRINT_COLOR(1, 2, 0));
-    GFL_StrBufFree(strbuf);
+    GFL_StrBufFree(certifies);
 
-    strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_GameFreakAllStaff_2);
-    GFL_FontGetBlockWidth(strbuf, wk->font, 0);
+    staff = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_GameFreakAllStaff_2);
+    GFL_FontGetBlockWidth(staff, wk->font, 0);
     GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_STAFF]));
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_STAFF]), 0, 0, strbuf, wk->font,
+    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_STAFF]), 0, 0, staff, wk->font,
                   PRINT_COLOR(1, 2, 0));
-    GFL_StrBufFree(strbuf);
+    GFL_StrBufFree(staff);
 
     for (i = 1; i < WINDOW_COUNT; i++) {
         BmpWin_Transfer(wk->windows[i]);
@@ -442,7 +444,8 @@ static void ZenkokuZukanAward_InitBackdrop(ZenkokuZukanAwardWork *wk) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[1]), 3);
     BmpWin_FlushChar(wk->windows[1]);
     screen = GFL_HeapAllocate(wk->heapId, 32 * 24 * sizeof(u16), TRUE, "zenkoku_zukan_award.c", 1004);
-    entry = BmpWin_GetCharPos(wk->windows[1]) | (15 << 12);
+    entry = BmpWin_GetCharPos(wk->windows[1]);
+    entry |= 15 << 12;
     for (y = 0; y < 24; y++) {
         for (x = 0; x < 32; x++) {
             screen[i] = entry;
@@ -477,14 +480,16 @@ static void ZenkokuZukanAward_FreeRibbon(ZenkokuZukanAwardWork *wk) {
 // Puts the diploma's BGs and the ribbon below the screen, to slide up
 static void ZenkokuZukanAward_StartSlide(ZenkokuZukanAwardWork *wk) {
     ClActorPos pos;
-    const ClActorSetup *setup = &sZenkokuZukanAwardRibbonSetup[0];
+    u32 i;
 
     if (wk->param->unk04 == 0) {
         GFL_BGSysMoveBG(BG_MAIN_DIPLOMA, BG_MOVE_SET_Y, 64);
         GFL_BGSysMoveBG(BG_MAIN_BACKDROP, BG_MOVE_SET_Y, 64);
-        pos.x = setup->x;
-        pos.y = setup->y - 64;
-        func_0204c140(wk->ribbon, &pos, 0);
+        for (i = 0; i < NELEMS(sZenkokuZukanAwardRibbonSetup); i++) {
+            pos.x = sZenkokuZukanAwardRibbonSetup[i].x;
+            pos.y = sZenkokuZukanAwardRibbonSetup[i].y - 64;
+            func_0204c140(wk->ribbon, &pos, 0);
+        }
         wk->slideWait = 0;
     }
 }

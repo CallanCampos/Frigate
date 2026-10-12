@@ -510,6 +510,10 @@ Same instructions, scheduled in another order.
   ldr r0, [sp, #0x18]; ldr r2, =SHINKA_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
   needs `CheckEvolveSpecies` to return `u16`, or the call's result is narrowed. It is not aliasing: taking the
   local's address, moving it into a local struct or retyping the pointee's fields leaves the `u32` hoist in place.
+- The same for a pointer: `zenkoku_zukan_award.c`'s `ZenkokuZukanAward_InitText` prints its three blocks through
+  three `StrBuf *` locals (`strbuf`, `certifies`, `staff`), declared together ahead of `wordSet`. One `strbuf` for
+  all three stays in `r4`, the width takes `r6`, and the print colour is then shared across the last two prints
+  where the original builds it again for each.
 
 ## An instruction too many or too few
 
