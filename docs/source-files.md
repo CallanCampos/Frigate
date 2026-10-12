@@ -1892,7 +1892,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `musical_system.c` | `0x021eec80`–`0x021eef38` | 6 | partial | string at `0x021ef1a0` |
+| `musical_system.c` | `0x021eec80`–`0x021eef38` | 6 | complete | string at `0x021ef1a0` |
 | `mus_item_data.c` | `0x021eef38`–`0x021ef188` | 14 | complete | string at `0x021ef1b4` |
 
 ### Overlay 211
