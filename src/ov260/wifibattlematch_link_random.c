@@ -1065,7 +1065,7 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         break;
     case 7:
         rivalData = getHollow_RivalData(GameData_GetSaveControl(param->param->gameData));
-        func_0200f700(rivalData, getIDAsUInt(&param->otherPlayer->info));
+        Misc_AddMetTrainer(rivalData, getIDAsUInt(&param->otherPlayer->info));
         *seq = 8;
         WifiBattleMatchNet_ResetEnd(link->net);
         break;
@@ -1752,7 +1752,7 @@ static void WifiBattleMatchLink_TaskFreeResult(WifiBattleMatchTask *task, u32 *s
         break;
     case 6:
         rivalData = getHollow_RivalData(GameData_GetSaveControl(param->param->gameData));
-        func_0200f700(rivalData, getIDAsUInt(&param->otherPlayer->info));
+        Misc_AddMetTrainer(rivalData, getIDAsUInt(&param->otherPlayer->info));
         func_ov262_021c5c94(param->param->gameData, param->battleResult->result);
         WifiBattleMatchNet_ResetEnd(link->net);
         *seq = 7;
@@ -2006,9 +2006,9 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
     if (kind == 0) {
         titleMsg = 1;
         info.titleMsg = link->param->param->unk4;
-        info.unk4 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 0);
-        info.unk10 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 1);
-        info.unk12 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 2);
+        info.unk4 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 0);
+        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);
+        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 2);
         info.unkC = info.unk10 + info.unk12;
         if (info.unk4 == 0 && info.unkC == 0) {
             info.unk4 = 1500;
@@ -2017,8 +2017,8 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
         titleMsg = 0;
         info.titleMsg = link->param->param->unk4;
         info.unk4 = 0;
-        info.unk10 = func_0200e870(link->param->record, link->param->param->unk4, 1);
-        info.unk12 = func_0200e870(link->param->record, link->param->param->unk4, 2);
+        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 1);
+        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
         info.unkC = info.unk10 + info.unk12;
     }
     info.look = func_02008bf4(playerInfo);
@@ -2121,13 +2121,13 @@ static BOOL WifiBattleMatchLink_UpdateRecord(void *results, u32 battleType, Wifi
         break;
     }
     changed = FALSE;
-    if (rating != func_0200e870(results, battleType + 5, 0) || first != func_0200e870(results, battleType + 5, 1) ||
-        second != func_0200e870(results, battleType + 5, 2)) {
+    if (rating != RndMatchData_GetParam(results, battleType + 5, 0) || first != RndMatchData_GetParam(results, battleType + 5, 1) ||
+        second != RndMatchData_GetParam(results, battleType + 5, 2)) {
         changed = TRUE;
     }
-    func_0200e87c(results, battleType + 5, 0, rating);
-    func_0200e87c(results, battleType + 5, 1, first);
-    func_0200e87c(results, battleType + 5, 2, second);
+    RndMatchData_SetParam(results, battleType + 5, 0, rating);
+    RndMatchData_SetParam(results, battleType + 5, 1, first);
+    RndMatchData_SetParam(results, battleType + 5, 2, second);
     return changed;
 }
 
@@ -2135,11 +2135,11 @@ static void WifiBattleMatchLink_AddMatchResult(void *results, u32 battleType, u3
     switch (matchResult) {
     case 1:
     case 4:
-        func_0200e8a0(results, battleType, 1);
+        RndMatchData_IncParam(results, battleType, 1);
         break;
     case 0:
     case 3:
-        func_0200e8a0(results, battleType, 2);
+        RndMatchData_IncParam(results, battleType, 2);
         break;
     }
 }
@@ -2231,25 +2231,25 @@ static void WifiBattleMatchLink_FillOwnPlayer(WifiBattleMatchLinkPlayer *player,
     player->unk44 = 100;
     info = GetGameDataPlayerInfo(gameData);
     sys_memcpy(info, player, PlayerInfo_GetSize());
-    func_0200ef90(func_0200ef7c(save), 0, &player->sentence);
+    CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
     if (link->param->mode == 0) {
-        player->record1 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 1);
-        player->record2 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 2);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 2);
     } else {
-        player->record1 = func_0200e870(link->param->record, link->param->param->unk4, 1);
-        player->record2 = func_0200e870(link->param->record, link->param->param->unk4, 2);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 1);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
     }
     player->gsid = WifiList_GetMyGSID(GameData_GetWifiList(gameData));
 }
 
 static void WifiBattleMatchLink_UpdatePlayerRecord(WifiBattleMatchLinkPlayer *player, WifiBattleMatchLinkRandom *link) {
     if (link->param->mode == 0) {
-        player->record1 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 1);
-        player->record2 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 2);
-        player->unk34 = func_0200e870(link->param->record, link->param->param->unk4 + 5, 0);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 2);
+        player->unk34 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 0);
     } else {
-        player->record1 = func_0200e870(link->param->record, link->param->param->unk4, 1);
-        player->record2 = func_0200e870(link->param->record, link->param->param->unk4, 2);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 1);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
     }
 }
 

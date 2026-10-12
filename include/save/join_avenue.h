@@ -314,6 +314,30 @@ struct JoinAvenueInfo {
     u16 unkEA;
 };
 
+// Save block 0x43 (join_avenue_savedata.c, a descriptive name): the people met, the entries, the occupants and the
+// info. Clearing the block leaves the rest of it
+#define JOIN_AVE_PERSON_COUNT 8
+#define JOIN_AVE_ENTRY_COUNT 12
+
+struct JoinAvenueSave {
+    u8 personList[sizeof(JoinAvenuePersonList) + JOIN_AVE_PERSON_COUNT * sizeof(JoinAvenuePerson)];
+    u8 entryList[sizeof(JoinAvenueEntryList) + JOIN_AVE_ENTRY_COUNT * sizeof(JoinAvenueEntry)];
+    JoinAvenueOccupants occupants;
+    JoinAvenueInfo info;
+    u8 unk13E0[0x2c8];
+};
+
+// What a person is added from, the kind that func_020388e8 takes
+typedef enum {
+    JOIN_AVE_SOURCE_VISITOR = 0,
+    JOIN_AVE_SOURCE_PERSON = 1,
+    JOIN_AVE_SOURCE_ENTRY = 2,
+} JoinAvenueSourceKind;
+
+// The block's size and its initial state
+u32 func_0200fffc(void);
+void func_02010004(JoinAvenueSave *joinAvenue);
+
 JoinAvenuePersonList *JoinAvenuePersonList_Create(HeapID heapId, u32 count);
 void JoinAvenuePersonList_Free(JoinAvenuePersonList *list);
 void func_02037ffc(JoinAvenuePersonList *list, u32 count);

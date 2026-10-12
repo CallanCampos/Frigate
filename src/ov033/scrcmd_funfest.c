@@ -193,7 +193,7 @@ BOOL func_ov033_021772f4(VM *vm, FieldScriptEnv *env) {
 
     result = ScriptReadVar(vm, env);
     save = getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
-    if (func_0200c678(save, 0) != 0x30) {
+    if (HighLinkSave_GetPassPower(save, 0) != 0x30) {
         *result = 1;
     } else {
         *result = 0;

@@ -565,7 +565,7 @@ void func_ov012_02160390(GameData *gameData, u16 value) {
 }
 
 static void func_ov012_021603bc(GameBeacon *info, GameData *gameData, u16 value) {
-    wcharsncpy(func_0200c954(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))), info->payload.named.name, 9);
+    wcharsncpy(TrainerGameInfo_GetThanks(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))), info->payload.named.name, 9);
     info->type = 0x18;
     info->payload.named.value = value;
     GameBeacon_ClearRecent(info);

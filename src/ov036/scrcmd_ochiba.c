@@ -25,6 +25,7 @@
 #include "save/medal_box.h"
 #include "save/pokedex.h"
 #include "save/save_control.h"
+#include "save/wbt_save.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
 #include "system/vm.h"

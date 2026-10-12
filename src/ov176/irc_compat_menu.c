@@ -732,7 +732,7 @@ static void IrcCompatMenu_StepConnect(IrcCompatMenuWork *wk, u16 *state) {
         CompatibleIrcSys_GetPeerProfile(wk->param->sys, wk->param->profile);
         if (wk->param->gsys != NULL) {
             rivalData = getHollow_RivalData(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
-            func_0200f700(rivalData, getIDAsUInt(&wk->param->profile->trainer));
+            Misc_AddMetTrainer(rivalData, getIDAsUInt(&wk->param->profile->trainer));
         }
         *state = CONNECT_EXCHANGE_IDS;
         break;

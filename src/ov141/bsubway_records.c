@@ -85,7 +85,7 @@ enum {
 #define INPUT_BACK 2
 #define INPUT_NONE (-1)
 
-// A record of the Battle Subway's save, which func_0200e7f0 copies: a player's name and place, and the message that
+// A record of the Battle Subway's save, which BSubwayWifiData_AllocLeaders copies: a player's name and place, and the message that
 // they left
 typedef struct {
     u16 name[8];
@@ -331,8 +331,8 @@ static void BSubwayRecords_InitData(BSubwayRecordsWork *wk, BSubwayRecordsParam 
     wk->strbuf = GFL_StrBufCreate(0x40, HEAPID_BSUBWAY_RECORDS);
     wk->wordSet = GFL_WordSetSystemCreate(8, 0x40, HEAPID_BSUBWAY_RECORDS);
     wk->vblankTcb = GFL_VBlankTCBAdd(BSubwayRecords_VBlank, wk, 0);
-    wk->records = func_0200e7f0(func_02017968(wk->param->gameData), HEAPID_BSUBWAY_RECORDS);
-    wk->count = func_0200e82c(wk->records);
+    wk->records = BSubwayWifiData_AllocLeaders(func_02017968(wk->param->gameData), HEAPID_BSUBWAY_RECORDS);
+    wk->count = BSubwayWifiLeader_CountList(wk->records);
     BSubwayRecords_InitPages(wk);
 }
 

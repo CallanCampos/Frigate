@@ -282,7 +282,7 @@ static void JoinAvenueProfile_SetFromGameData(JoinAvenueProfile *profile, GameDa
 
     sys_memset(profile, 0, sizeof(JoinAvenueProfile));
     JoinAvenueProfile_SetFromPlayerInfo(profile, GetGameDataPlayerInfo(gameData));
-    sys_memcpy(func_0200c93c(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))), profile->greeting,
+    sys_memcpy(TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))), profile->greeting,
                sizeof(profile->greeting));
     answers = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(gameData)));
     profile->job = func_0200ec3c(answers, 26);
@@ -444,7 +444,7 @@ static void JoinAvenueData_FillAdventure(JoinAvenueData *data, GameData *gameDat
 
     medalBox = SaveControl_GetMedalBox(save);
     adventure->medalCount = MedalBox_GetObtainedCount(medalBox, 0);
-    adventure->lastMedal = func_0200fa44(medalBox);
+    adventure->lastMedal = MedalBox_GetLastMedal(medalBox);
     adventure->medalRank = MedalBox_GetRank(medalBox);
     if (adventure->lastMedal < 0xff) {
         MedalBox_GetMedalDate(medalBox, adventure->lastMedal, &year, &month, &day);

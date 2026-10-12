@@ -2241,7 +2241,7 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
         p_wk->state = 6;
         break;
     case 6:
-        if (func_0200b8c8(p_wk->downloadBuffer)) {
+        if (TournamentEntry_CheckCRC(p_wk->downloadBuffer)) {
             p_wk->downloading = FALSE;
             return 1;
         }

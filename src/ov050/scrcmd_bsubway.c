@@ -170,7 +170,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     EventWork *eventWork = GameData_GetEventWork(gameData);
     BSubwayScrWork *bsw = func_0201794c(gameData);
     BSubwayPlayData *playData = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY);
-    u32 mode = func_0200e11c(playData, 0, NULL);
+    u32 mode = BSubwayPlayData_GetData(playData, 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     void *data3A = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_3A);
     Field *field = GSYS_GetField(gsys);
@@ -193,10 +193,10 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         sys_reset(0);
         break;
     case 2:
-        func_0200e0f4(playData);
+        BSubwayPlayData_Init(playData);
         break;
     case 3:
-        *retWk = func_0200e114(playData);
+        *retWk = BSubwayPlayData_GetSaveFlag(playData);
         break;
     case 4: {
         VecFx32 pos;
@@ -232,7 +232,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         EventWork_FlagReset(eventWork, FLAG_BSUBWAY_ON_TRAIN);
         break;
     case 6:
-        *retWk = func_0200e35c(score, param0);
+        *retWk = BSubwayScoreData_GetStreak(score, param0);
         if (*retWk > BSUBWAY_COUNT_MAX) {
             *retWk = BSUBWAY_COUNT_MAX;
         }
@@ -250,29 +250,29 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 8:
-        *retWk = func_0200e2ec(playData) + 1;
+        *retWk = BSubwayPlayData_GetRound(playData) + 1;
         break;
     case 11:
-        *retWk = func_0200e2ec(bsw->unk70);
+        *retWk = BSubwayPlayData_GetRound(bsw->unk70);
         *retWk = *retWk + 1;
         break;
     case 14:
         if (sTable701a[param0] == 11) {
             *retWk = TRUE;
         } else {
-            *retWk = func_0200e438(score, sTable701a[param0], 0);
+            *retWk = BSubwayScoreData_SetFlag(score, sTable701a[param0], 0);
         }
         break;
     case 15:
         if (sTable701a[param0] != 11) {
-            func_0200e438(score, sTable701a[param0], 1);
+            BSubwayScoreData_SetFlag(score, sTable701a[param0], 1);
         }
         break;
     case 16:
-        *retWk = func_0200e438(score, 10, 0);
+        *retWk = BSubwayScoreData_SetFlag(score, 10, 0);
         break;
     case 17:
-        func_0200e438(score, 10, 1);
+        BSubwayScoreData_SetFlag(score, 10, 1);
         break;
     case 18:
         FieldGimmickBSubway_StartTrainEffect(field, sTable706c[param0], &sTable7054[param1]);
@@ -284,7 +284,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         func_ov036_021c65e8(FieldGimmickBSubway_GetTrainEffect(field), param0);
         break;
     case 21:
-        *retWk = func_0200e11c(playData, 0, NULL);
+        *retWk = BSubwayPlayData_GetData(playData, 0, NULL);
         break;
     case 22:
         *retWk = FALSE;
@@ -343,7 +343,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = func_ov033_0217bcb4(score, gsys, 4);
         break;
     case 30:
-        *retWk = func_0200e418(score, param0);
+        *retWk = BSubwayScoreData_GetStage(score, param0);
         break;
     case 31:
         *retWk = FieldPlayer_GetObjCodeByExState(
@@ -353,7 +353,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         BattleBoxSave *battleBox = getBattleBox(save);
 
         *retWk = FALSE;
-        if (func_0200c340(battleBox) == TRUE) {
+        if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
             *retWk = TRUE;
         }
         break;
@@ -382,7 +382,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         result = TRUE;
         break;
     case 38:
-        *retWk = func_0200e3dc(score, param0);
+        *retWk = BSubwayScoreData_HasStage(score, param0);
         break;
     case 39: {
         u16 index;
@@ -420,9 +420,9 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     }
     case 43: {
-        void *list = func_0200e7f0(data3A, HEAPID_GAMEEVENT);
+        void *list = BSubwayWifiData_AllocLeaders(data3A, HEAPID_GAMEEVENT);
 
-        *retWk = func_0200e82c(list);
+        *retWk = BSubwayWifiLeader_CountList(list);
         GFL_HeapFree(list);
         break;
     }
@@ -448,13 +448,13 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     }
     case 100:
         if (param0 == 0) {
-            func_0200e438(score, 1, 2);
+            BSubwayScoreData_SetFlag(score, 1, 2);
         } else {
-            func_0200e438(score, 1, 1);
+            BSubwayScoreData_SetFlag(score, 1, 1);
         }
         break;
     case 101:
-        *retWk = func_0200e438(score, 1, 0);
+        *retWk = BSubwayScoreData_SetFlag(score, 1, 0);
         break;
     case 103:
         args.mode = 0;
@@ -478,32 +478,32 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         result = TRUE;
         break;
     case 106:
-        *retWk = func_0200e72c(data3A);
+        *retWk = BSubwayWifiData_GetPlayerRank(data3A);
         break;
     case 107:
-        *retWk = func_0200e6f4(data3A);
+        *retWk = BSubwayWifiData_HasPlayers(data3A);
         break;
     case 108: {
         u8 value = param0;
 
-        func_0200e1ac(playData, 11, &value);
+        BSubwayPlayData_SetData(playData, 11, &value);
         break;
     }
     case 109:
-        *retWk = func_0200e11c(playData, 11, NULL);
+        *retWk = BSubwayPlayData_GetData(playData, 11, NULL);
         break;
     case 110:
-        *retWk = func_0200e6fc(data3A);
+        *retWk = BSubwayWifiData_HasLeaders(data3A);
         break;
     case 111:
         ScriptWork_CallEvent(work, func_ov012_02166294(gsys));
         result = TRUE;
         break;
     case 112:
-        *retWk = func_0200e7d8(data3A);
+        *retWk = BSubwayWifiData_GetLeaderRank(data3A);
         break;
     case 113:
-        *retWk = func_0200e7e4(data3A);
+        *retWk = BSubwayWifiData_GetLeaderRoom(data3A);
         break;
     case 200:
         *retWk = 0;
@@ -522,7 +522,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 300: {
-        u8 value = func_0200e11c(playData, 10, NULL);
+        u8 value = BSubwayPlayData_GetData(playData, 10, NULL);
 
         ScriptWork_CallEvent(work, func_ov012_02165f70(bsw, gsys, value));
         result = TRUE;
@@ -601,7 +601,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 324: {
         u8 value = param0;
 
-        func_0200e1ac(playData, 10, &value);
+        BSubwayPlayData_SetData(playData, 10, &value);
         break;
     }
     case 325:
@@ -638,7 +638,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     // Fades in the switches for the train's cars
     case 334: {
         ISSSwitchIndex i = 0;
-        u16 count = func_0200e2ec(playData);
+        u16 count = BSubwayPlayData_GetRound(playData);
         ISSSwitchSys *switchSys;
 
         if (count != 0) {
@@ -673,7 +673,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         u32 check;
 
         *retWk = 0;
-        useBattleBox = func_0200e11c(playData, 10, NULL);
+        useBattleBox = BSubwayPlayData_GetData(playData, 10, NULL);
         regulation = func_0201f734(func_ov050_021e6f60(mode), HEAPID_GAMEEVENT);
         if (useBattleBox == TRUE) {
             party = convertBoxedPokeSetToParty(getBattleBox(save), HEAPID_GAMEEVENT);
@@ -754,14 +754,14 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         result = TRUE;
         break;
     case 349:
-        func_0200e2ac(playData);
-        func_0200e3b4(score, mode);
+        BSubwayPlayData_ResetRound(playData);
+        BSubwayScoreData_ResetStage(score, mode);
         break;
     case 350:
         FieldGimmickBSubway_StopShake(field);
         break;
     case 351: {
-        u16 index = func_0200e2ec(playData);
+        u16 index = BSubwayPlayData_GetRound(playData);
 
         switch (mode) {
         case 2:
@@ -800,7 +800,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
                 maxHpSum += PokeParty_GetParam(pkm, 0xa1, NULL);
                 hpSum += hp;
             }
-            func_0200e280(playData, b, a, maxHpSum - hpSum);
+            BSubwayPlayData_AddWifiRecord(playData, b, a, maxHpSum - hpSum);
         }
         break;
     case 354:
@@ -810,10 +810,10 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = bsw->unkC_12;
         break;
     case 356:
-        *retWk = func_0200e11c(playData, 10, NULL);
+        *retWk = BSubwayPlayData_GetData(playData, 10, NULL);
         break;
     case 357:
-        func_0200e2c0(playData);
+        BSubwayPlayData_IncRound(playData);
         func_ov033_0217bd8c(bsw);
         *retWk = func_ov033_0217bd84(bsw);
         if (*retWk > BSUBWAY_COUNT_MAX) {
@@ -827,9 +827,9 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 359:
-        if (func_0200e3dc(score, mode) == 0) {
-            func_0200e3c8(score, mode);
-            func_0200e2ac(playData);
+        if (BSubwayScoreData_HasStage(score, mode) == 0) {
+            BSubwayScoreData_StartStage(score, mode);
+            BSubwayPlayData_ResetRound(playData);
             func_ov033_0217bda0(bsw);
         }
         break;
@@ -902,7 +902,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 410:
-        func_0200f700(getHollow_RivalData(save), bsw->partner.id);
+        Misc_AddMetTrainer(getHollow_RivalData(save), bsw->partner.id);
         break;
     case 411:
         *retWk = func_0203ffc4() == FALSE ? FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0)
@@ -973,7 +973,7 @@ static BOOL func_ov050_021e6a20(VM *vm, void *env) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     BSubwayScrWork *bsw = func_0201794c(gameData);
-    u32 mode = func_0200e11c(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
+    u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     u32 answer = func_ov036_021c3f98(bsw->unk71C);
 
@@ -1003,7 +1003,7 @@ static BOOL func_ov050_021e6ab4(VM *vm, void *env) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     BSubwayScrWork *bsw = func_0201794c(gameData);
-    u32 mode = func_0200e11c(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
+    u32 mode = BSubwayPlayData_GetData(SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY), 0, NULL);
     BSubwayScoreData *score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
     u32 answer = func_ov036_021c3f98(bsw->unk71C);
 
@@ -1139,9 +1139,9 @@ static void func_ov050_021e6cb0(BSubwayScrWork *bsw, GameData *gameData, MMSys *
 
     if (mode == 4) {
         const BSubwayActorPos *pos = sActorPositions;
-        BSubwayRecord *list = func_0200e7f0(
+        BSubwayRecord *list = BSubwayWifiData_AllocLeaders(
             SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), SAVE_BLOCK_BSUBWAY_3A), HEAPID_GAMEEVENT);
-        int count = func_0200e82c(list);
+        int count = BSubwayWifiLeader_CountList(list);
         BSubwayRecord *record;
         FieldActor *actor;
         u32 index;
@@ -1150,7 +1150,7 @@ static void func_ov050_021e6cb0(BSubwayScrWork *bsw, GameData *gameData, MMSys *
         if (count != 0) {
             record = &list[count - 1];
             while (count != 0 && i < 5) {
-                index = func_0200e84c(record) % 10;
+                index = BSubwayWifiLeader_GetID(record) % 10;
                 if (record->female == FALSE) {
                     objCode = sTable702c[index];
                 } else {
@@ -1171,7 +1171,7 @@ static void func_ov050_021e6cb0(BSubwayScrWork *bsw, GameData *gameData, MMSys *
     }
     {
         const BSubwayActor *entry = sActors;
-        u16 stage = func_0200e418(bsw->unk74, mode);
+        u16 stage = BSubwayScoreData_GetStage(bsw->unk74, mode);
         FieldActor *actor;
 
         switch (mode) {

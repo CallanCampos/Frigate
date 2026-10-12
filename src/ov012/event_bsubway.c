@@ -308,8 +308,8 @@ static GameEventReturnCode func_ov012_02166230(GameEvent *event, u32 *state, voi
     case 0:
         data->param.gameData = GSYS_GetGameData(data->gsys);
         bsubwaySave = func_02017968(data->param.gameData);
-        data->param.rank = func_0200e7d8(bsubwaySave);
-        data->param.trainNumber = func_0200e7e4(bsubwaySave);
+        data->param.rank = BSubwayWifiData_GetLeaderRank(bsubwaySave);
+        data->param.trainNumber = BSubwayWifiData_GetLeaderRoom(bsubwaySave);
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(data->gsys, data->field, OVERLAY_ID(141),
                                                                          &BSUBWAY_RECORDS_PROC_FUNCTIONS, &data->param));
         (*state)++;
@@ -536,7 +536,7 @@ GameEvent *func_ov012_0216657c(GameSystem *gsys, u16 index, u16 actorId) {
     data->pos.x += offset.x;
     data->pos.y += offset.y;
     data->pos.z += offset.z;
-    leaders = func_0200e7f0(SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), 0x3a), HEAPID_GAMEEVENT);
+    leaders = BSubwayWifiData_AllocLeaders(SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), 0x3a), HEAPID_GAMEEVENT);
     data->strbuf = PMSData_ToString(&leaders[index].message, HEAPID_GAMEEVENT);
     GFL_HeapFree(leaders);
     func_ov036_021a8c00(winPos, &winX, &winY);

@@ -506,7 +506,7 @@ BOOL s00EA_HOFCheckIntegrity(VM *vm, FieldScriptEnv *env) {
             break;
         case 1:
         case 2:
-            if (func_0200f660(getAddressOfExtraSaveBlk(save, 8, 0)) == 0) {
+            if (HallOfFameSave_GetTeamCount(getAddressOfExtraSaveBlk(save, 8, 0)) == 0) {
                 *result = 0;
             } else {
                 *result = 1;

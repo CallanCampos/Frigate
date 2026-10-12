@@ -700,7 +700,7 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     PlayerInfo *player = GetGameDataPlayerInfo(gameData);
     SaveControl *save = GameData_GetSaveControl(gameData);
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(save);
-    void *cgear = func_0200ef7c(save);
+    void *cgear = CGearPhrases_GetBlock(save);
     OSOwnerInfo owner;
     PMSData cgearRecord;
     MedalBox *medalBox;
@@ -736,13 +736,13 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     beacon->unk08 = func_0200c90c(info);
     beacon->unk04 = func_0200c924(info);
     medalBox = SaveControl_GetMedalBox(save);
-    beacon->unk5B = func_0200fa44(medalBox);
+    beacon->unk5B = MedalBox_GetLastMedal(medalBox);
     beacon->medalCount = MedalBox_GetObtainedCount(medalBox, 0);
     playTime = func_02017a40(gameData);
     beacon->playHours = func_02008cec(playTime);
     beacon->playMinutes = func_02008cf0(playTime);
     sys_memcpy(func_0200ec38(func_0200ec2c(save)), beacon->surveyAnswers, sizeof(beacon->surveyAnswers));
-    func_0200ef90(cgear, 0, &cgearRecord);
+    CGearPhrases_Get(cgear, 0, &cgearRecord);
     GameBeacon_SetMyCGearRecord(&cgearRecord);
     terminator = GFL_StrBufGetTerminator();
     str = GetPlayerName(player);
@@ -752,7 +752,7 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
             break;
         }
     }
-    str = func_0200c93c(info);
+    str = TrainerGameInfo_GetGreeting(info);
     for (i = 0; i < 8; i++) {
         beacon->greeting[i] = str[i];
         if (terminator == str[i]) {
@@ -956,7 +956,7 @@ void GameBeaconSys_UpdateGreeting(void) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
     TrainerGameInfoSave *info = getTrainerGameInfoAddress(GameData_GetSaveControl(GameBeaconSys->gameData));
     u16 terminator = GFL_StrBufGetTerminator();
-    const u16 *greeting = func_0200c93c(info);
+    const u16 *greeting = TrainerGameInfo_GetGreeting(info);
     int i;
 
     for (i = 0; i < 8; i++) {

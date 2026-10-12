@@ -1070,9 +1070,9 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     card->iconPalette = func_0204bc48(arc, func_02021114(), card->surface, card->iconPaletteSlot << 5, HEAPID_TAIL(heapId));
     card->iconCells = func_0204bde0(arc, func_0202111c(), getOBJTileMapping_MainEng(), heapId);
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
-        u16 species = func_0200b934(records, 0, i);
-        u8 form = func_0200b934(records, 1, i);
-        u8 gender = func_0200b934(records, 3, i);
+        u16 species = TournamentTeam_GetField(records, 0, i);
+        u8 form = TournamentTeam_GetField(records, 1, i);
+        u8 gender = TournamentTeam_GetField(records, 3, i);
 
         if (species == 0) {
             species = 1;
@@ -1093,10 +1093,10 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     setup.bgPriority = 1;
     setup.priority = 1;
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
-        u16 species = func_0200b934(records, 0, i);
-        u8 form = func_0200b934(records, 1, i);
-        u8 gender = func_0200b934(records, 3, i);
-        u8 hasItem = func_0200b934(records, 2, i);
+        u16 species = TournamentTeam_GetField(records, 0, i);
+        u8 form = TournamentTeam_GetField(records, 1, i);
+        u8 gender = TournamentTeam_GetField(records, 3, i);
+        u8 hasItem = TournamentTeam_GetField(records, 2, i);
 
         if (species != 0) {
             setup.x = i * 32 + 288;

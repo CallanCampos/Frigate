@@ -80,7 +80,7 @@ BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
     }
     data->pms = PMSIParam_Create(kind, 0, 0, 0, GameData_GetSaveControl(gameData), HEAPID_USER);
     if (data->useCGear) {
-        func_0200ef90(getCGearDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))), data->cgearIndex,
+        CGearPhrases_Get(getCGearDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))), data->cgearIndex,
                       &sentence);
         PMSIParam_SetSentence(data->pms, &sentence);
     }
@@ -117,7 +117,7 @@ static GameEventReturnCode func_ov012_02161114(GameEvent *event, u32 *state, voi
         } else {
             PMSIParam_GetSentence(pms, &sentence);
             if (data->useCGear) {
-                func_0200efa8(
+                CGearPhrases_Set(
                     getCGearDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(GameEvent_GetGameSystem(event)))),
                     data->cgearIndex, &sentence);
             }

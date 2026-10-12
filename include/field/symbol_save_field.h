@@ -7,14 +7,7 @@
 #include "types.h"
 #include "field/entree_forest.h"
 #include "struct_decls.h"
-
-// The area NPC data of the save, which getAreaNPCData returns: the forest's Pokémon, ten in the first area, ten more in
-// the second, then ten for each of three areas and twenty for each of the deeper ones
-struct AreaNPCSave {
-    EntreeForestPokemon pokemon[530];
-    u8 unk848;
-    u8 unk849;
-};
+#include "save/symbol_save.h"
 
 u32 func_ov012_02161260(AreaNPCSave *npcData);
 u32 func_ov012_0216127c(AreaNPCSave *npcData);

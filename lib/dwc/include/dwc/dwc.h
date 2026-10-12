@@ -24,6 +24,11 @@ s32 DWC_GetGsProfileId(const DWCUserData *userData, const DWCFriendData *friendD
 void DWC_CreateExchangeToken(const DWCUserData *userData, DWCFriendData *token);
 // The friend key of the player's user data
 u64 func_02057ec4(const DWCUserData *userData);
+// Whether a friend key is valid for the player's user data, and the friend data of a friend key
+BOOL func_020578cc(const DWCUserData *userData, u64 friendKey);
+void func_02057ef8(DWCFriendData *token, u64 friendKey);
+// Whether two friends' data name the same friend
+BOOL func_02057fd4(const DWCFriendData *friendData, const DWCFriendData *other);
 // Clears the error, unless it is 9
 void func_02058490(void);
 

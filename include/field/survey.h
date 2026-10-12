@@ -6,6 +6,7 @@
 #include "types.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
+#include "save/survey_savedata.h"
 
 struct SurveyProbabilityState {
     u8 selection[6];
@@ -35,22 +36,11 @@ struct SurveyTextWork {
 
 // The hours since the survey started, up to 24
 u16 detectLengthSinceLastSession(SaveControl *save);
-void *func_0200ec2c(SaveControl *save);
-// Sets the survey's question at index
-void func_0200ecd8(void *survey, u8 question, u32 index);
 void func_0200ca84(TrainerGameInfoSave *info, u8 value);
 void func_0200ca94(TrainerGameInfoSave *info, u8 index, u8 value);
 void func_0200caa8(TrainerGameInfoSave *info, u8 index, u16 value);
 // Whether the survey's answer of the index has been given
 BOOL func_0200ca9c(TrainerGameInfoSave *info, u8 index);
-void *func_0200ec38(void *survey);
-void func_0200ec80(void *survey, u8 question, u32 answer);
-u32 func_0200ec3c(void *answers, u8 question);
-// The survey's question at index, 0xff for none
-u8 func_0200ece4(void *survey, u32 index);
-void func_0200ecf8(void *survey, u32 question, u32 count);
-BOOL func_0200ed34(void *survey, u16 question, int answer);
-void func_0200ed64(void *survey, u16 question, int answer, int count);
 BOOL func_0201148c(u8 question);
 BOOL func_ov012_0216538c(GameData *gameData);
 // Overlay 12's survey.c: the questions of the surveys, and whether one is done
@@ -67,13 +57,7 @@ u16 func_ov027_02170758(SaveControl *save);
 u16 func_ov027_021707b8(SaveControl *save);
 GameEvent *func_ov027_02170860(GameSystem *gsys);
 void func_ov027_02170884(SurveyTextWork *work, GameSystem *gsys);
-u32 func_0200ed90(void *survey, u16 question, int answer);
-void func_0200edb0(void *survey);
-// How many people answered a question, today and before today, which the Research Radar's graph adds up
-u16 func_0200ecf0(void *survey, u8 question);
-u32 func_0200ed14(void *survey, u8 question);
-u32 func_0200ed48(void *survey, u16 question, int answer);
-int GetSurveyAnswerMsgIDCount(u16 question);
+int GetSurveyAnswerMsgIDCount(int question);
 u16 GetSurveyAnswerMsgID(u16 question, int answer);
 
 void probabilityLoop(SurveyProbabilityState *state);

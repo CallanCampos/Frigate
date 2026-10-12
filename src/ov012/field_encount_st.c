@@ -85,7 +85,7 @@ void func_ov012_021591f4(GameData *gameData) {
 }
 
 u16 EncountSave_GetRoamingPkmZone(EncountSave *save, u8 slot) {
-    u32 clock = EncountSave_GetRoamingPkmZoneClock(save);
+    u32 clock = EncountSave_GetRoamingPkmZoneClock(save, slot);
     if (clock > 16) {
         return 319;
     }

@@ -67,10 +67,10 @@ GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *pa
     case 14:
         break;
     case 5:
-        GFL_StrBufLoadString(data->nameEntry.name, func_0200c93c(data->trainerInfo));
+        GFL_StrBufLoadString(data->nameEntry.name, TrainerGameInfo_GetGreeting(data->trainerInfo));
         break;
     case 6:
-        GFL_StrBufLoadString(data->nameEntry.name, func_0200c954(data->trainerInfo));
+        GFL_StrBufLoadString(data->nameEntry.name, TrainerGameInfo_GetThanks(data->trainerInfo));
         break;
     case 15:
         GFL_StrBufLoadString(data->nameEntry.name, func_0201150c(data->saveBlock));
@@ -117,11 +117,11 @@ void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *para
     case 13:
         break;
     case 5:
-        func_0200c940(data->trainerInfo, param->name);
+        TrainerGameInfo_SetGreeting(data->trainerInfo, param->name);
         GameBeaconSys_UpdateGreeting();
         break;
     case 6:
-        func_0200c958(data->trainerInfo, param->name);
+        TrainerGameInfo_SetThanks(data->trainerInfo, param->name);
         break;
     case 15:
         func_020114fc(data->saveBlock, param->name);

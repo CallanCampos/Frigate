@@ -96,8 +96,8 @@ BrNet *BrNet_Init(GameData *gameData, u32 a1, HeapID heapId) {
     net->isOpen = TRUE;
 
     GameData_GetSaveControl(gameData);
-    net->profile = func_0200de34(heapId);
-    func_0200de68(net->profile, gameData);
+    net->profile = GdsProfile_Create(heapId);
+    GdsProfile_SetFromGameData(net->profile, gameData);
     net->seq = BrNetSeq_Init(net, BrNet_SeqIdle, heapId);
     DWCRap_SetEventFunc(BrNet_EventFunc, net);
     return net;
@@ -106,7 +106,7 @@ BrNet *BrNet_Init(GameData *gameData, u32 a1, HeapID heapId) {
 void BrNet_Exit(BrNet *net) {
     DWCRap_SetEventFunc(NULL, NULL);
     BrNetSeq_Exit(net->seq);
-    func_0200de60(net->profile);
+    GdsProfile_Free(net->profile);
     if (net->isOpen) {
         func_ov201_021b5534(net);
         net->isOpen = FALSE;

@@ -18,6 +18,38 @@ struct GameRecords {
     u16 seedHigh;
 };
 
+#define BATTLEMATCH_MAC_ADDRESS_SIZE 6
+#define LIVEMATCH_COUNT_MAX 0xff
+#define LIVEMATCH_OPPONENT_MAX 10
+
+// An opponent of the live competition
+typedef struct {
+    u8 macAddress[BATTLEMATCH_MAC_ADDRESS_SIZE];
+    u8 params[2];
+} LiveMatchOpponent;
+
+// The results of the live competition (livematch_savedata.c)
+typedef struct {
+    // The console the competition was entered on
+    u8 macAddress[BATTLEMATCH_MAC_ADDRESS_SIZE];
+    // The first is the number of opponents
+    u8 counts[4];
+    // A ring of the last opponents
+    LiveMatchOpponent opponents[LIVEMATCH_OPPONENT_MAX];
+} LiveMatchData; // size: 0x5a
+
+// Block 0x3b (battlematch_savedata.c)
+struct RecordSave {
+    /* 0x00 */ LiveMatchData liveMatch;
+    // The results of the random matches and the Wi-Fi competition (rndmatch_savedata.c)
+    /* 0x5a */ u16 rndMatch[11][3];
+    // The console and the time, in seconds, a match was started at, and whether it is still in progress
+    /* 0x9c */ u8 macAddress[BATTLEMATCH_MAC_ADDRESS_SIZE];
+    /* 0xa2 */ u8 matchInProgress;
+    /* 0xa3 */ u8 unkA3;
+    /* 0xa4 */ s64 matchSeconds;
+}; // size: 0xac
+
 // The size of the records
 u32 func_020093d0(void);
 void initTrainerCardInfoBlk(GameRecords *records);
@@ -47,6 +79,10 @@ u8 func_02009628(GameRecords *records);
 u32 func_02009650(GameRecords *records);
 void func_020095e0(GameRecords *records);
 void func_02009638(GameRecords *records, u32 points);
+// The block's size and its initial state
+u32 func_0200f29c(void);
+void func_0200f2a0(RecordSave *record);
+// The same as getRecordBlkAddress, which save/save_control.h declares
 RecordSave *func_0200f2bc(SaveControl *save);
 // The results of the random matches
 void *func_0200f2d4(RecordSave *record);
@@ -60,11 +96,17 @@ u8 func_0200f384(RecordSave *record);
 // live competition's (the record itself, with a byte after each result's 6 bytes)
 void *func_0200f2d0(RecordSave *record);
 void *func_0200f2d8(RecordSave *record);
+
+// livematch_savedata.c, whose other functions app/livebattlematch_flow.h declares. A count of the live competition's
+// results
 u32 func_0200f1d8(void *results, u32 index);
-u16 func_0200e870(void *results, u32 index, u32 field);
+
+// rndmatch_savedata.c
+void RndMatchData_Init(void *results);
+u16 RndMatchData_GetParam(void *results, u32 index, u32 field);
 // Sets a field of a result, from 0 to 0xffff
-void func_0200e87c(void *results, u32 index, u32 field, s32 value);
+void RndMatchData_SetParam(void *results, u32 index, u32 field, s32 value);
 // Adds 1 to a field of a result, up to 0xffff
-void func_0200e8a0(void *results, u32 index, u32 field);
+void RndMatchData_IncParam(void *results, u32 index, u32 field);
 
 #endif // POKEBW2_SAVE_RECORDS_H

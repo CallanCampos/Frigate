@@ -489,7 +489,7 @@ static void IrcBattleMatch_RecvPlayerInfo(int netId, int size, const void *data,
         info = func_02017378(work->param->gameData, netId);
         func_02008b34(data, info);
         rival = getHollow_RivalData(GameData_GetSaveControl(work->param->gameData));
-        func_0200f700(rival, getIDAsUInt(info));
+        Misc_AddMetTrainer(rival, getIDAsUInt(info));
     }
 }
 

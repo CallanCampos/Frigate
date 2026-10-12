@@ -966,7 +966,7 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
             if (func_0200b4a8(wk->param->worldtrade_data)) {
                 PartyPkm *pkm = WorldTrade_AllocPartyPkm(HEAPID_WORLDTRADE);
 
-                func_0200b4b8(wk->param->worldtrade_data, pkm);
+                WorldTradeData_GetPkm(wk->param->worldtrade_data, pkm);
                 loadPokemonNicknameToStrbuf(wk->wordSet, 0, pkm);
                 wk->errorMesNo = 2;
                 wk->subprocessSeq = UPLOAD_SEQ_TIMEOUT_SAVE;
@@ -982,7 +982,7 @@ static int Upload_SubSeqServerTradeCheckResult(WorldTradeWork *wk) {
             if (func_0200b4a8(wk->param->worldtrade_data)) {
                 PartyPkm *pkm = WorldTrade_AllocPartyPkm(HEAPID_WORLDTRADE);
 
-                func_0200b4b8(wk->param->worldtrade_data, pkm);
+                WorldTradeData_GetPkm(wk->param->worldtrade_data, pkm);
                 loadPokemonNicknameToStrbuf(wk->wordSet, 0, pkm);
                 wk->errorMesNo = 3;
                 wk->subprocessSeq = UPLOAD_SEQ_TIMEOUT_SAVE;
@@ -1100,7 +1100,7 @@ static void Upload_MakeTradeExchangeInfo(WorldTradeWork *wk, PartyPkm *received,
     BOOL otherColor;
 
     RecordAddOne(wk->param->record, 0x10);
-    func_0200f700(getHollow_RivalData(wk->param->savedata), trData->trainerID);
+    Misc_AddMetTrainer(getHollow_RivalData(wk->param->savedata), trData->trainerID);
 
     partner = WorldTrade_MakePartnerStatus(trData);
     func_0200a504(getPalPadFriendListAddress(wk->param->savedata), partner);
@@ -1490,7 +1490,7 @@ static void Upload_UploadPokemonDataDelete(WorldTradeWork *wk, BOOL keep) {
 
         WorldTrade_BoxPkmToPartyPkm(BoxSaveAccessor_GetPkm(wk->param->mybox, wk->boxTrayNo, wk->boxCursorPos), pkm);
         if (keep) {
-            func_0200b4d4(wk->param->worldtrade_data, pkm, wk->boxTrayNo);
+            WorldTradeData_SetPkm(wk->param->worldtrade_data, pkm, wk->boxTrayNo);
         }
         BoxSaveAccessor_ClearPkm(wk->param->mybox, wk->boxTrayNo, wk->boxCursorPos);
         GFL_HeapFree(pkm);
@@ -1499,7 +1499,7 @@ static void Upload_UploadPokemonDataDelete(WorldTradeWork *wk, BOOL keep) {
         GameData *gameData;
 
         if (keep) {
-            func_0200b4d4(wk->param->worldtrade_data, pkm, wk->boxTrayNo);
+            WorldTradeData_SetPkm(wk->param->worldtrade_data, pkm, wk->boxTrayNo);
         }
         PokeParty_RemovePkm(wk->param->myparty, wk->boxCursorPos);
         gameData = GSYS_GetGameData(wk->param->gsys);

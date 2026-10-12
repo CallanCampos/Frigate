@@ -404,7 +404,7 @@ static void GameClearSave_RegisterTeam(GameClearSave *save) {
     func_020074ec(saveControl, HALL_OF_FAME_BLOCK, HEAPID_GAMEEVENT);
     hallOfFame = getAddressOfExtraSaveBlk(saveControl, HALL_OF_FAME_BLOCK, 0);
     if (!func_0200746c(saveControl)) {
-        func_0200f57c(hallOfFame, party, &date, HEAPID_GAMEEVENT);
+        HallOfFameSave_AddTeam(hallOfFame, party, &date, HEAPID_GAMEEVENT);
         func_020178c4(save->gameData, HALL_OF_FAME_BLOCK);
         save->registered = TRUE;
     }

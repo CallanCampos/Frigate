@@ -221,7 +221,7 @@ u8 GameBeaconSys_PopSurveyUpdated(void);
 void GameBeaconSys_SetSurveyAnswers(const void *answers);
 void GameBeaconSys_SetCountryRegion(u8 country, u8 region);
 void GameBeaconSys_SetSurveyRank(u8 rank);
-// Sets the C-Gear record, a sentence (func_0200ef90)
+// Sets the C-Gear record, a sentence (CGearPhrases_Get)
 void GameBeaconSys_SetCGearRecord(const PMSData *record);
 void GameBeaconSys_SetTrainerView(u32 trainerView);
 // Sets the greeting from the save, after the player changed it

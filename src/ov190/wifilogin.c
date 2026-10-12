@@ -408,10 +408,10 @@ static void WifiLogin_StateOpenYesNo(WifiLoginWork *work) {
 static void WifiLogin_StateWaitResetConfirm(WifiLoginWork *work) {
     if (WifiLoginMessage_IsMenuAnswered(work->menu)) {
         if (WifiLoginMessage_GetMenuAnswer(work->menu) == 0) {
-            void *entry = func_0200b8f4(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
+            void *entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
 
-            func_0200c370(getBattleBox(GameData_GetSaveControl(work->gameData)), 1);
-            func_0200b830(entry, 10, 5);
+            BattleBoxSave_ClearFlags(getBattleBox(GameData_GetSaveControl(work->gameData)), 1);
+            TournamentEntry_SetField(entry, 10, 5);
             work->param->result = 0;
             initWifi(work->wifiList);
             WifiLogin_SetState(work, WifiLogin_StateStartNet);
@@ -444,9 +444,9 @@ static void WifiLogin_StateWaitProfileConfirm(WifiLoginWork *work) {
         WifiLoginMessage_FreeMenu(work->menu);
         work->menu = NULL;
         if (answer == 0) {
-            void *entry = func_0200b8f4(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
-            u32 field2 = func_0200b798(entry, 2);
-            u32 field10 = func_0200b798(entry, 10);
+            void *entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
+            u32 field2 = TournamentEntry_GetField(entry, 2);
+            u32 field10 = TournamentEntry_GetField(entry, 10);
 
             if (field2 != 0 && field10 >= 1 && field10 <= 4) {
                 WifiLoginMessage_ClearTitle(work->msg);

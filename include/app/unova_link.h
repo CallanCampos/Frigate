@@ -13,6 +13,7 @@
 #include "system/gf_font.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
+#include "save/memory_link_savedata.h"
 
 // Unova Link, overlay 332: the Key System, which exchanges keys with another Black 2 or White 2, Memory Link, which
 // reads a Black or White save, and the Nintendo 3DS Link with Pokémon Dream Radar. None of these names is swan's.
@@ -231,31 +232,11 @@ typedef struct KeySystemKeyAnim {
     BOOL (*func)(struct KeySystemKeyAnim *anim);
 } KeySystemKeyAnim;
 
-// What the Memory Link reads from a Black or White save's player
-typedef struct {
-    u32 id;
-    u16 name[8];
-    u8 gender;
-    u8 unk15;
-} WBSavePlayer;
-
-// What the Memory Link reads from a Black or White save to unlock the memories
-typedef struct {
-    // Bits from event flags and from a word of block 52
-    u8 flags[2];
-    // Event work variables
-    u16 vars[3];
-    u16 unk08[16];
-    u16 unk28;
-    u16 unk2A;
-    u8 unk2C[0x168];
-} WBSaveMemories;
-
-// wb_save_convert.c's summary of a Black or White save
-typedef struct {
-    WBSavePlayer player;
-    WBSaveMemories memories;
-} WBSaveData;
+// What the Memory Link reads from a Black or White save: save/memory_link_savedata.h has the layouts, which
+// wb_save_convert.c fills
+typedef MemoryLinkPlayer WBSavePlayer;
+typedef MemoryLinkMemories WBSaveMemories;
+typedef MemoryLinkData WBSaveData;
 
 struct KeySystemWork {
     KeySystemScene *scene;

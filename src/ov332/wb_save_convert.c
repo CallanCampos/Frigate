@@ -119,7 +119,7 @@ static void WBSaveConvert_ReadMemories(void *save, WBSaveMemories *memories) {
         memories->vars[sEventVars[i].index] = ((u16 *)eventWork)[sEventVars[i].var - WB_EVENT_WORK_VARS_START];
     }
     unk42 = WBSaveBlock_Get(save, WB_SAVE_BLOCK_UNK42);
-    sys_memcpy(unk42 + 0x258, memories->unk08, sizeof(memories->unk08));
+    sys_memcpy(unk42 + 0x258, memories->props, sizeof(memories->props));
     memories->unk28 = *(u16 *)(unk42 + 0x256);
     memories->unk2A = *(u16 *)(unk42 + 0x252);
     sys_memcpy(WBSaveBlock_Get(save, WB_SAVE_BLOCK_UNK66), memories->unk2C, sizeof(memories->unk2C));

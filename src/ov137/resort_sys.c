@@ -1993,7 +1993,7 @@ static void ResortEntry_Setup(ResortSys *sys, GameData *gameData, JoinAvenueEntr
     ResortEntry_Fill(entry, shopKind, texts, row, heapId);
     if (shopKind == 4) {
         func_02037c70(entry, JOIN_AVE_PARAM_GREETING,
-                      (u32)func_0200c93c(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))));
+                      (u32)TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))));
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE1, message);
         func_02037c70(entry, JOIN_AVE_PARAM_MESSAGE1, (u32)message);
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE2, message);

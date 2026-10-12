@@ -365,7 +365,7 @@ static BOOL PokemonCenter_CheckBoxes(MedalCheckContext *ctx, GameData *gameData,
                 }
             }
         }
-        if (func_0200c340(battleBox) == TRUE) {
+        if (BattleBoxSave_HasPkm(battleBox) == TRUE) {
             for (slot = 0; slot < 6; slot++) {
                 func_ov065_021e5d1c(getBoxSlotAddress(battleBox, 0, slot), ctx);
             }
@@ -569,17 +569,17 @@ static BOOL PokemonCenter_CheckBoxCount(MedalCheckContext *ctx, GameData *gameDa
 }
 
 static BOOL func_ov065_021e609c(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(func_0200e370(func_0201795c(gameData), 0), threshold);
+    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(func_0201795c(gameData), 0), threshold);
 }
 
 static BOOL func_ov065_021e60b4(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(func_0200e370(func_0201795c(gameData), 1), threshold);
+    return PokemonCenter_MeetsThreshold(BSubwayScoreData_GetMaxStreak(func_0201795c(gameData), 1), threshold);
 }
 
 static BOOL func_ov065_021e60cc(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     void *block = func_0201795c(gameData);
-    u16 a = func_0200e370(block, 2);
-    u16 b = func_0200e370(block, 3);
+    u16 a = BSubwayScoreData_GetMaxStreak(block, 2);
+    u16 b = BSubwayScoreData_GetMaxStreak(block, 3);
 
     if (a > b) {
         return PokemonCenter_MeetsThreshold(a, threshold);
@@ -860,7 +860,7 @@ BOOL func_ov065_021e6634(VM *vm, FieldScriptEnv *env) {
     RecordSave *record = getRecordBlkAddress(GameData_GetSaveControl(gameData));
     u16 value = ScriptReadAny(vm, env);
 
-    func_0200e318(func_0201795c(gameData), value);
+    BSubwayScoreData_AddBattlePoints(func_0201795c(gameData), value);
     if (value != 0) {
         RecordAdd(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), 0x21, value);
     }
