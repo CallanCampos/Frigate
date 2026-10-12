@@ -177,6 +177,9 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
+  declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
+  `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there.
 - Taking a parameter's address makes MWCC push all four argument registers to give it a home; an original that pushes
   fewer copied the parameter to a local first and passed that local's address: `g2d_Font.c`'s
   `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2p2).
@@ -761,6 +764,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- With constant arguments, the order of an inline's `if`/`else` arms decides how much MWCC folds. NitroSDK's
+  `G2_SetOBJEffect` (`nitro/gx.h`) keeps two stores and a `cmp #0x100` in NitroSystem's `SetAffinedOamPosition_`
+  only when written `if (effect != AFFINE && effect != AFFINE_DOUBLE) { plain store } else { store with the
+  parameter }`; the `==`/`||` order folds into one store.
 - When both branches of an `if`/`else` give a local a constant, MWCC emits the then-value, branches over the else
   value on the condition, and the else-value last, so the condition's direction decides which constant comes first:
   `b_bag_anm.c`'s button animation needs `if (button >= 10) palette = 2; else palette = 5;`, and `< 10`, a ternary

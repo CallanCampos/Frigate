@@ -217,14 +217,15 @@ static inline u32 G2_GetOBJEffect(const GXOamAttr *oam) {
 }
 
 static inline void G2_SetOBJEffect(GXOamAttr *oam, u32 effect, int rsParam) {
-    if (effect == GX_OAM_EFFECT_AFFINE || effect == GX_OAM_EFFECT_AFFINE_DOUBLE) {
-        oam->attr01 = (oam->attr01 & ~(GX_OAM_ATTR01_RSENABLE_MASK | GX_OAM_ATTR01_HF_MASK | GX_OAM_ATTR01_VF_MASK |
-                                       GX_OAM_ATTR01_RS_MASK)) |
-                      effect | (rsParam << GX_OAM_ATTR01_RS_SHIFT);
-    } else {
+    // The plain store comes first: with constant arguments, MWCC folds the other order into one store
+    if (effect != GX_OAM_EFFECT_AFFINE && effect != GX_OAM_EFFECT_AFFINE_DOUBLE) {
         oam->attr01 = (oam->attr01 & ~(GX_OAM_ATTR01_RSENABLE_MASK | GX_OAM_ATTR01_HF_MASK | GX_OAM_ATTR01_VF_MASK |
                                        GX_OAM_ATTR01_RS_MASK)) |
                       effect;
+    } else {
+        oam->attr01 = (oam->attr01 & ~(GX_OAM_ATTR01_RSENABLE_MASK | GX_OAM_ATTR01_HF_MASK | GX_OAM_ATTR01_VF_MASK |
+                                       GX_OAM_ATTR01_RS_MASK)) |
+                      effect | (rsParam << GX_OAM_ATTR01_RS_SHIFT);
     }
 }
 
