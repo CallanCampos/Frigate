@@ -739,8 +739,8 @@ static void Oekaki_UpdateTouch(OekakiWork *wk) {
                         GFL_SndSEPlay(SEQ_SE_SELECT4);
                     } else {
                         wk->banFlag = OEKAKI_BAN_ON;
-                        endPressed = TRUE;
                         Oekaki_PrintMessage(wk, EventMapchange_Text_WouldLikeStopDrawing, TRUE);
+                        endPressed = TRUE;
                         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_END_SELECT_MSG_WAIT);
                         Oekaki_SetEndButton(wk->endButton, TRUE);
                         GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -750,8 +750,8 @@ static void Oekaki_UpdateTouch(OekakiWork *wk) {
                     if (wk->allTouch[0].banFlag == OEKAKI_BAN_ON) {
                         GFL_SndSEPlay(SEQ_SE_SELECT4);
                     } else {
-                        endPressed = TRUE;
                         Oekaki_PrintMessage(wk, EventMapchange_Text_WouldLikeStopDrawing, TRUE);
+                        endPressed = TRUE;
                         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_END_SELECT_MSG_WAIT);
                         Oekaki_SetEndButton(wk->endButton, TRUE);
                         GFL_SndSEPlay(SEQ_SE_CANCEL1);

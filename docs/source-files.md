@@ -651,7 +651,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `oekaki_comm.c` | `0x0217cfc0`–`0x0217d34c` | 12 | complete | descriptive |
-| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | partial | string at `0x0217fd38` |
+| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | complete | string at `0x0217fd38` |
 
 ### Overlay 71
 
