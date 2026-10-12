@@ -208,6 +208,10 @@ Same code, other `sp` offsets or frame size.
   it was spilled in a later round of register allocation. In the Join Avenue's records command, a large switch, the
   declarations counted too: one group of slots followed the declaration order in reverse, and the variables declared
   in a loop body took the highest slots, in their declaration order.
+- A loop counter that the original keeps in a stack slot in a small function may be assigned before a call: its value
+  then lives across the call, so it can't stay in a scratch register. `ssp_jpegenc.c`'s `JpegEnc_SetupHuffmanTable`
+  matches only with `i = 0;` before its `sys_memset32_fast` call and the loop written `while (i < 16)` after it, with
+  the table's terminator stored inside the outer loop.
 - A variable reused by several switch cases is split into one value per case (see Registers), and a split piece that is
   spilled takes the lowest slot whatever the declarations say. When the original has a case's spilled value among the
   declared variables' slots, that case had a variable of its own, as case 9 of the records command does.
