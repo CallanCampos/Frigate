@@ -9,11 +9,11 @@
 
 void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 season) {
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
-    BOOL deerlingRegistered = FALSE;
-    BOOL sawsbuckRegistered = FALSE;
+    int count;
     u32 deerlingForm;
     u32 sawsbuckForm;
-    int count;
+    BOOL deerlingRegistered = FALSE;
+    BOOL sawsbuckRegistered = FALSE;
     int i;
     PartyPkm *pkm;
     u32 species;

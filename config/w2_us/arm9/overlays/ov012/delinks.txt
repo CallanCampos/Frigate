@@ -310,6 +310,7 @@ src/ov012/scrcmd_actor_move.c:
     .text       start:0x02164878 end:0x02164a2c
 
 src/ov012/season_form.c:
+    complete
     .text       start:0x02164a2c end:0x02164b20
 
 src/ov012/scrcmd_entree_forest.c:

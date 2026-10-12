@@ -2386,6 +2386,7 @@ overlays/ov011 0x0218ba00 sNetDevWifiWork
 overlays/ov011 0x0218ba04 _dWork
 overlays/ov011 0x0218ba08 pDwcRapWork
 overlays/ov012 0x02160a00 PleasureBoat_Free
+overlays/ov012 0x0216af5c sRibbonParams
 overlays/ov020 0x0216e660 EventPokeSelect_Create
 overlays/ov020 0x0216e6b4 EventMoveTutorPokeSelect_Create
 overlays/ov020 0x0216e714 EventMusicalPokeSelect_Create

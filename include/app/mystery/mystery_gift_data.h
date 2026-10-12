@@ -1,9 +1,9 @@
 #ifndef POKEBW2_APP_MYSTERY_MYSTERY_GIFT_DATA_H
 #define POKEBW2_APP_MYSTERY_MYSTERY_GIFT_DATA_H
 
-// What a received gift gives, read from its card. mystery.c, mystery_album.c and mystery_check.c each have their own
-// copy of the ribbon table and of the inlined Pokémon maker, so these are static in a header they include. Our
-// names; swan has none for this overlay
+// What a received gift gives, read from its card. Overlay 197's mystery.c, mystery_album.c and mystery_check.c and
+// overlay 12's mystery_gift_pokemon.c each compile their own copy of the ribbon table and inline the Pokémon maker, so
+// these are static in a header they all include. Our names; swan has none for these overlays
 
 #include "types.h"
 #include "constants/pokemon.h"
@@ -48,8 +48,8 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(MysteryGift *gift, HeapID heap
     u8 value;
     u16 location;
     u16 year;
-    u8 month;
-    u8 day;
+    u32 month;
+    u32 day;
 
     stats[0] = poke->ivs[0];
     stats[1] = poke->ivs[1];
@@ -61,153 +61,165 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(MysteryGift *gift, HeapID heap
     moves[1] = poke->moves[1];
     moves[2] = poke->moves[2];
     moves[3] = poke->moves[3];
-    if (gift->kind == 1 && species <= 649 && species != 0 && level <= 100 && poke->heldItem <= 638) {
-        if (level == 0) {
-            level = GFL_RandomLC(100) + 1;
-        }
-        if (poke->trainerId == 0) {
-            trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));
-        }
-        if (gender == 0xff) {
-            gender = 2;
-        }
-        for (i = 0; i < 6; i++) {
-            if (stats[i] == 0xff) {
-                stats[i] = GFL_RandomLC(32);
-            }
-        }
-        pkm = PokeParty_NewTempPkm(species, level, trainerId, heapId);
-        ivs = (stats[0] & 0x1f) | ((stats[1] & 0x1f) << 5) | ((stats[2] & 0x1f) << 10) | ((stats[3] & 0x1f) << 15) |
-              ((stats[4] & 0x1f) << 20) | ((stats[5] & 0x1f) << 25);
-        if (abilityType == 4) {
-            abilityType = (u8)GFL_RandomLC(3);
-        }
-        switch (abilityType) {
-        case 0:
-            ability = 0;
-            break;
-        case 1:
-            ability = 1;
-            break;
-        case 2:
-            ability = 0;
-            break;
-        case 3:
-            ability = 2;
-            break;
-        default:
-            return NULL;
-        }
-        if (poke->personality != 0) {
-            pid = poke->personality;
-        } else if (poke->shininess == 0) {
-            pid = PML_GenPID(trainerId, species, poke->form, gender, ability, 0);
-        } else if (poke->shininess == 1) {
-            pid = PML_GenPID(trainerId, species, poke->form, gender, ability, 2);
-        } else if (poke->shininess == 2) {
-            pid = PML_GenPID(trainerId, species, poke->form, gender, ability, 1);
-        }
-        PokeParty_CreatePkm(pkm, poke->species, level, trainerId, ivs, pid);
-        PokeParty_SetParam(pkm, PKM_PARAM_ITEM, poke->heldItem);
-        PokeParty_SetDefaultMoves(pkm);
-        for (i = 0; i < 4; i++) {
-            move = moves[i];
-            if (move != 0 && move < 560) {
-                if (PokeParty_LearnMove(pkm, move) == 0xffff) {
-                    PokeParty_SetLastMove(pkm, move);
-                }
-            }
-        }
-        if (poke->personality == 0 && abilityType == 2) {
-            PokeParty_SetHiddenAbil(pkm, species, poke->form);
-        }
-        PokeParty_SetParam(pkm, PKM_PARAM_FORM, poke->form);
-        if (poke->ball != 0 && poke->ball <= 25) {
-            PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, poke->ball);
-        } else {
-            PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, 4);
-        }
-        if (poke->metLevel != 0) {
-            PokeParty_SetParam(pkm, PKM_PARAM_MET_LEVEL, poke->metLevel);
-        }
-        PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_COOL, poke->contest[0]);
-        PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_BEAUTY, poke->contest[1]);
-        PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_CUTE, poke->contest[2]);
-        PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_SMART, poke->contest[3]);
-        PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_TOUGH, poke->contest[4]);
-#ifdef BUGFIX
-        PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_SHEEN, poke->contest[5]);
-#else
-        // BUG: The sheen is set to the toughness, and the gift's sheen is never used
-        PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_SHEEN, poke->contest[4]);
-#endif
-        for (bit = 0; bit < 15; bit++) {
-            if (poke->ribbons & (1 << bit)) {
-                PokeParty_SetParam(pkm, sRibbonParams[bit], TRUE);
-            }
-        }
-        if (poke->version == 0) {
-            PokeParty_SetParam(pkm, PKM_PARAM_ORIGIN_GAME, game_version);
-        } else {
-            PokeParty_SetParam(pkm, PKM_PARAM_ORIGIN_GAME, poke->version);
-        }
-        if (poke->language == 0) {
-            PokeParty_SetParam(pkm, PKM_PARAM_REGION, region);
-        } else {
-            PokeParty_SetParam(pkm, PKM_PARAM_REGION, poke->language);
-        }
-        if (poke->nickname[0] == 0) {
-            GFL_HeapFree(pkm);
-            return NULL;
-        }
-        if (poke->nickname[0] != GFL_StrBufGetTerminator()) {
-            PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)poke->nickname);
-        }
-        value = poke->nature;
-        if (value == 0xff) {
-            value = GFL_RandomLC(25);
-        }
-        PokeParty_SetParam(pkm, PKM_PARAM_NATURE, value);
-        PokeParty_SetParam(pkm, PKM_PARAM_EGG_LOCATION, poke->eggLocation);
-        PokeParty_SetParam(pkm, PKM_PARAM_MET_LOCATION, poke->metLocation);
-        if (poke->otName[0] == 0) {
-            GFL_HeapFree(pkm);
-            return NULL;
-        }
-        if (poke->otName[0] == GFL_StrBufGetTerminator()) {
-            PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)GetPlayerName(GetGameDataPlayerInfo(gameData)));
-        } else {
-            PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)poke->otName);
-        }
-        value = poke->otGender;
-        if (value > 2) {
-            value = getTrainerGender(GetGameDataPlayerInfo(gameData));
-        }
-        PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, value);
-        if (poke->isEgg) {
-            PokeParty_SetParam(pkm, PKM_PARAM_IS_EGG, TRUE);
-            name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
-            PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
-            GFL_StrBufFree(name);
-            PokeParty_SetParam(pkm, PKM_PARAM_HAPPINESS, 10);
-        }
-        year = poke->date >> 16;
-        month = poke->date >> 8;
-        day = poke->date;
-        if (poke->isEgg) {
-            location = poke->eggLocation;
-        } else {
-            location = poke->metLocation;
-        }
-        setFatefulEncounterPkmData(func_0201d620(pkm), location, year - 2000, month, day);
-        PokeParty_RecalcStats(pkm);
-        if (PokeParty_GetParam(pkm, PKM_PARAM_BAD_EGG, NULL)) {
-            GFL_HeapFree(pkm);
-            return NULL;
-        }
-        return pkm;
+    if (gift->kind != 1) {
+        return NULL;
     }
-    return NULL;
+    if (species > 649) {
+        return NULL;
+    }
+    if (species == 0) {
+        return NULL;
+    }
+    if (level > 100) {
+        return NULL;
+    }
+    if (poke->heldItem > 638) {
+        return NULL;
+    }
+    if (level == 0) {
+        level = GFL_RandomLC(100) + 1;
+    }
+    if (poke->trainerId == 0) {
+        trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));
+    }
+    if (gender == 0xff) {
+        gender = 2;
+    }
+    for (i = 0; i < 6; i++) {
+        if (stats[i] == 0xff) {
+            stats[i] = GFL_RandomLC(32);
+        }
+    }
+    pkm = PokeParty_NewTempPkm(species, level, trainerId, heapId);
+    ivs = (stats[0] & 0x1f) | ((stats[1] & 0x1f) << 5) | ((stats[2] & 0x1f) << 10) | ((stats[3] & 0x1f) << 15) |
+          ((stats[4] & 0x1f) << 20) | ((stats[5] & 0x1f) << 25);
+    if (abilityType == 4) {
+        abilityType = (u8)GFL_RandomLC(3);
+    }
+    switch (abilityType) {
+    case 0:
+        ability = 0;
+        break;
+    case 1:
+        ability = 1;
+        break;
+    case 2:
+        ability = 0;
+        break;
+    case 3:
+        ability = 2;
+        break;
+    default:
+        return NULL;
+    }
+    if (poke->personality != 0) {
+        pid = poke->personality;
+    } else if (poke->shininess == 0) {
+        pid = PML_GenPID(trainerId, species, poke->form, gender, ability, 0);
+    } else if (poke->shininess == 1) {
+        pid = PML_GenPID(trainerId, species, poke->form, gender, ability, 2);
+    } else if (poke->shininess == 2) {
+        pid = PML_GenPID(trainerId, species, poke->form, gender, ability, 1);
+    }
+    PokeParty_CreatePkm(pkm, poke->species, level, trainerId, ivs, pid);
+    PokeParty_SetParam(pkm, PKM_PARAM_ITEM, poke->heldItem);
+    PokeParty_SetDefaultMoves(pkm);
+    for (i = 0; i < 4; i++) {
+        move = moves[i];
+        if (move != 0 && move < 560) {
+            if (PokeParty_LearnMove(pkm, move) == 0xffff) {
+                PokeParty_SetLastMove(pkm, move);
+            }
+        }
+    }
+    if (poke->personality == 0 && abilityType == 2) {
+        PokeParty_SetHiddenAbil(pkm, species, poke->form);
+    }
+    PokeParty_SetParam(pkm, PKM_PARAM_FORM, poke->form);
+    if (poke->ball != 0 && poke->ball <= 25) {
+        PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, poke->ball);
+    } else {
+        PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, 4);
+    }
+    if (poke->metLevel != 0) {
+        PokeParty_SetParam(pkm, PKM_PARAM_MET_LEVEL, poke->metLevel);
+    }
+    PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_COOL, poke->contest[0]);
+    PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_BEAUTY, poke->contest[1]);
+    PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_CUTE, poke->contest[2]);
+    PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_SMART, poke->contest[3]);
+    PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_TOUGH, poke->contest[4]);
+#ifdef BUGFIX
+    PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_SHEEN, poke->contest[5]);
+#else
+    // BUG: The sheen is set to the toughness, and the gift's sheen is never used
+    PokeParty_SetParam(pkm, PKM_PARAM_CONTEST_SHEEN, poke->contest[4]);
+#endif
+    for (bit = 0; bit < 15; bit++) {
+        if (poke->ribbons & (1 << bit)) {
+            PokeParty_SetParam(pkm, sRibbonParams[bit], TRUE);
+        }
+    }
+    if (poke->version == 0) {
+        PokeParty_SetParam(pkm, PKM_PARAM_ORIGIN_GAME, game_version);
+    } else {
+        PokeParty_SetParam(pkm, PKM_PARAM_ORIGIN_GAME, poke->version);
+    }
+    if (poke->language == 0) {
+        PokeParty_SetParam(pkm, PKM_PARAM_REGION, region);
+    } else {
+        PokeParty_SetParam(pkm, PKM_PARAM_REGION, poke->language);
+    }
+    if (poke->nickname[0] == 0) {
+        GFL_HeapFree(pkm);
+        return NULL;
+    }
+    if (poke->nickname[0] != GFL_StrBufGetTerminator()) {
+        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)poke->nickname);
+    }
+    value = poke->nature;
+    if (value == 0xff) {
+        value = GFL_RandomLC(25);
+    }
+    PokeParty_SetParam(pkm, PKM_PARAM_NATURE, value);
+    PokeParty_SetParam(pkm, PKM_PARAM_EGG_LOCATION, poke->eggLocation);
+    PokeParty_SetParam(pkm, PKM_PARAM_MET_LOCATION, poke->metLocation);
+    if (poke->otName[0] == 0) {
+        GFL_HeapFree(pkm);
+        return NULL;
+    }
+    if (poke->otName[0] == GFL_StrBufGetTerminator()) {
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)GetPlayerName(GetGameDataPlayerInfo(gameData)));
+    } else {
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)poke->otName);
+    }
+    if (poke->otGender <= 2) {
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, poke->otGender);
+    } else {
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, getTrainerGender(GetGameDataPlayerInfo(gameData)));
+    }
+    if (poke->isEgg) {
+        PokeParty_SetParam(pkm, PKM_PARAM_IS_EGG, TRUE);
+        name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
+        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
+        GFL_StrBufFree(name);
+        PokeParty_SetParam(pkm, PKM_PARAM_HAPPINESS, 10);
+    }
+    year = poke->date >> 16;
+    month = (poke->date >> 8) & 0xff;
+    day = poke->date & 0xff;
+    if (poke->isEgg) {
+        location = poke->eggLocation;
+    } else {
+        location = poke->metLocation;
+    }
+    setFatefulEncounterPkmData(func_0201d620(pkm), location, year - 2000, month, day);
+    PokeParty_RecalcStats(pkm);
+    if (PokeParty_GetParam(pkm, PKM_PARAM_BAD_EGG, NULL)) {
+        GFL_HeapFree(pkm);
+        return NULL;
+    }
+    return pkm;
 }
 
 // The values the getters below give for a gift that doesn't give one
