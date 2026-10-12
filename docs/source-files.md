@@ -2532,7 +2532,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `th_award.c` | `0x0219ce80`–`0x0219d9a8` | 14 | partial | descriptive |
+| `th_award.c` | `0x0219ce80`–`0x0219d9a8` | 14 | complete | descriptive |
 | `th_award_graphic.c` | `0x0219d9a8`–`0x0219dbe4` | 14 | complete | string at `0x0219ddc0` |
 
 ### Overlay 314

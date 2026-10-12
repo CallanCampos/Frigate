@@ -521,6 +521,13 @@ Same instructions, scheduled in another order.
   ldr r0, [sp, #0x18]; ldr r2, =SHINKA_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
   needs `CheckEvolveSpecies` to return `u16`, or the call's result is narrowed. It is not aliasing: taking the
   local's address, moving it into a local struct or retyping the pointee's fields leaves the `u32` hoist in place.
+- One constant register feeds a stack argument and a register argument of the same value, so an extra `mov` into
+  an argument register beside an equal constant is a wrong argument, not scheduling: `th_award.c`'s
+  `ThAward_InitRankIcons` loads file 1, and with file 0 it had one `mov r1, r6` too many at the same size.
+- A variable reused by a second block of the same shape changes how that block's arguments are scheduled, with the
+  registers unchanged: `ThAward_InitText` measures its points text into a `pointsWidth` of its own, which lets the
+  width's reload move above the stack argument's store, where reusing `kindWidth` kept it below. In the same
+  function two address locals set in one branch are spilled in statement order (`record` before `name`).
 
 ## An instruction too many or too few
 
