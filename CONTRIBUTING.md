@@ -73,7 +73,9 @@ and naming of the code around yours.
 - Subjects like the history's: `Decompile btl_server_flow.c's HP recovery`, `Complete event_shortcut_menu.c`,
   `Match func_ov012_0215c160`, `tools: <what>`. The body says how many functions match, which mismatches are
   documented, and the reason for any guessed name.
-- A PR states that `ninja` passes with both ROMs matching. Keep PRs to one topic so they are easy to review.
+- A PR states that `ninja` passes with both ROMs matching. Keep PRs to one topic so they are easy to review. A PR may
+  cover only part of an overlay or original file; completion is not required for a regular PR. Use a draft PR only
+  while the changes are not ready for review, and leave the overlay issue open until the whole overlay is complete.
 
 ## Claude Code
 

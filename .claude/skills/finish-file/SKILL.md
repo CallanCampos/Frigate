@@ -66,6 +66,10 @@ specifies.
 
 ## 7. Publish
 
+For a PR workflow, a review-ready change may cover only part of a file or overlay. Do not require a draft PR just
+because the decompilation is incomplete; use draft status only while the submitted change itself needs more work.
+Keep the overlay issue open until the entire overlay is complete.
+
 Every commit goes to `origin/main` at once, so the sessions working in parallel stay close to one another:
 
 1. `git fetch origin && git merge origin/main`, in a worktree into its own branch.
