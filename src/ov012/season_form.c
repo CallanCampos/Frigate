@@ -9,11 +9,11 @@
 
 void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 season) {
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
-    BOOL deerlingRegistered = FALSE;
-    BOOL sawsbuckRegistered = FALSE;
-    u32 deerlingForm;
-    u32 sawsbuckForm;
     int count;
+    u32 sawsbuckForm;
+    u32 deerlingForm;
+    BOOL sawsbuckRegistered = FALSE;
+    BOOL deerlingRegistered = FALSE;
     int i;
     PartyPkm *pkm;
     u32 species;
@@ -21,24 +21,24 @@ void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 seaso
 
     switch (season) {
     case 0:
-        deerlingForm = 0;
         sawsbuckForm = 0;
+        deerlingForm = 0;
         break;
     case 1:
-        deerlingForm = 1;
         sawsbuckForm = 1;
+        deerlingForm = 1;
         break;
     case 2:
-        deerlingForm = 2;
         sawsbuckForm = 2;
+        deerlingForm = 2;
         break;
     case 3:
-        deerlingForm = 3;
         sawsbuckForm = 3;
+        deerlingForm = 3;
         break;
     default:
-        deerlingForm = 0;
         sawsbuckForm = 0;
+        deerlingForm = 0;
         break;
     }
     count = PokeParty_GetPkmCount(party);
@@ -46,17 +46,17 @@ void TransformVsPokePartyBySeason(GameData *gameData, PokeParty *party, u8 seaso
         pkm = PokeParty_GetPkm(party, i);
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
-        if (species == SPECIES_DEERLING && form != deerlingForm) {
-            PokeParty_ChangeForme(pkm, deerlingForm);
-            if (!deerlingRegistered) {
-                PokeDex_RegistPkm(pokedex, pkm);
-                deerlingRegistered = TRUE;
-            }
-        } else if (species == SPECIES_SAWSBUCK && form != sawsbuckForm) {
+        if (species == SPECIES_SAWSBUCK && form != sawsbuckForm) {
             PokeParty_ChangeForme(pkm, sawsbuckForm);
             if (!sawsbuckRegistered) {
                 PokeDex_RegistPkm(pokedex, pkm);
                 sawsbuckRegistered = TRUE;
+            }
+        } else if (species == SPECIES_DEERLING && form != deerlingForm) {
+            PokeParty_ChangeForme(pkm, deerlingForm);
+            if (!deerlingRegistered) {
+                PokeDex_RegistPkm(pokedex, pkm);
+                deerlingRegistered = TRUE;
             }
         }
     }

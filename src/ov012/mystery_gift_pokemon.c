@@ -22,9 +22,9 @@ PartyPkm *func_ov012_02153160(MysteryGift *gift, HeapID heapId, GameData *gameDa
     MysteryGiftPokemon *poke = (MysteryGiftPokemon *)gift;
     u16 level = poke->level;
     u32 trainerId = poke->trainerId;
-    u32 species = poke->species;
-    u32 gender = poke->gender;
-    u32 abilityType = poke->abilityType;
+    u8 abilityType = poke->abilityType;
+    u8 gender = poke->gender;
+    u16 species = poke->species;
     u32 ability;
     u64 pid;
     u32 ivs;
