@@ -250,6 +250,7 @@ static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs)
 
     for (i = 0; i < 8; i++) {
         in = block + i;
+        ws = &workspace[i];
         tmp0 = in[0] + in[56] - 256;
         tmp1 = in[8] + in[48] - 256;
         tmp2 = in[16] + in[40] - 256;
@@ -263,7 +264,6 @@ static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs)
         tmp11 = tmp1 + tmp2;
         tmp12 = tmp1 - tmp2;
         tmp13 = tmp0 - tmp3;
-        ws = &workspace[i];
         ws[0] = (tmp10 + tmp11) << 8;
         ws[32] = (tmp10 - tmp11) << 8;
         z1 = (tmp12 + tmp13) * 181;
@@ -868,7 +868,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
                           JpegEncConvertFunc convert) {
     JpegEncComponent components[3];
     u32 pos;
-    u32 crOffset, cbOffset, yOffset;
+    u32 yOffset, cbOffset, crOffset;
     u32 chromBlocksX, chromBlocksY;
     u32 blocksX, blocksY;
     u32 mcusX, mcusY;
@@ -880,6 +880,12 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     u32 dhtLength;
     u32 coefOffset;
     u32 size;
+    u8 (*quant)[64];
+    JpegEncHuffTable *dcLum;
+    JpegEncHuffTable *dcChrom;
+    JpegEncHuffTable *acLum;
+    JpegEncHuffTable *acChrom;
+    JpegEncHuffWork *huffWork;
 
     switch (sampling) {
     case SSP_JPEG_444:
@@ -897,6 +903,12 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     mcusY = height / (vFactor * 8);
     blocksX = width / 8;
     blocksY = height / 8;
+    quant = work->quant;
+    dcLum = &work->dcLum;
+    dcChrom = &work->dcChrom;
+    acLum = &work->acLum;
+    acChrom = &work->acChrom;
+    huffWork = &work->huffWork;
     chromBlocksX = blocksX / hFactor;
     chromBlocksY = blocksY / vFactor;
     coefOffset = sizeof(JpegEncWork) + blocksX * blocksY * 128;
@@ -908,11 +920,11 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     components[1].blocksX = chromBlocksX;
     components[1].blocksY = chromBlocksY;
     components[1].lastDc = 0;
-    components[2].coefs = (s16 *)((u8 *)work + (coefOffset + chromBlocksY * chromBlocksX * 128));
+    components[2].coefs = (s16 *)((u8 *)work + (coefOffset + chromBlocksX * chromBlocksY * 128));
     components[2].blocksX = chromBlocksX;
     components[2].blocksY = chromBlocksY;
     components[2].lastDc = 0;
-    yOffset = coefOffset + chromBlocksY * chromBlocksX * 128 * 2;
+    yOffset = coefOffset + chromBlocksX * chromBlocksY * 128 * 2;
     size = width * height;
     cbOffset = yOffset + size;
     crOffset = yOffset + size * 2;
@@ -931,7 +943,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         if (q > 255) {
             q = 255;
         }
-        work->quant[0][i] = q;
+        quant[0][i] = q;
         work->divisors[0][i] = sJpegEncAanScales[i] / (s32)q;
         q = (sJpegEncChromQuantTable[i] * quality + 50) / 100;
         if (q == 0) {
@@ -940,7 +952,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         if (q > 255) {
             q = 255;
         }
-        work->quant[1][i] = q;
+        quant[1][i] = q;
         work->divisors[1][i] = sJpegEncAanScales[i] / (s32)q;
     }
 
@@ -995,20 +1007,22 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     }
     dst[pos++] = 0;
     for (i = 0; i < 64; i++) {
-        dst[pos++] = work->quant[0][sJpegEncZigzag[i]];
+        dst[pos] = quant[0][sJpegEncZigzag[i]];
+        pos++;
     }
     dst[pos++] = 1;
     for (i = 0; i < 64; i++) {
-        dst[pos++] = work->quant[1][sJpegEncZigzag[i]];
+        dst[pos] = quant[1][sJpegEncZigzag[i]];
+        pos++;
     }
 
     // DHT
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->dcLum, 0);
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->acLum, 2);
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->dcChrom, 1);
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->acChrom, 3);
-    dhtLength = 2 + JpegEnc_GetHuffmanTableLength(&work->dcLum) + JpegEnc_GetHuffmanTableLength(&work->dcChrom) +
-                JpegEnc_GetHuffmanTableLength(&work->acLum) + JpegEnc_GetHuffmanTableLength(&work->acChrom);
+    JpegEnc_SetupHuffmanTable(huffWork, dcLum, 0);
+    JpegEnc_SetupHuffmanTable(huffWork, acLum, 2);
+    JpegEnc_SetupHuffmanTable(huffWork, dcChrom, 1);
+    JpegEnc_SetupHuffmanTable(huffWork, acChrom, 3);
+    dhtLength = 2 + JpegEnc_GetHuffmanTableLength(dcLum) + JpegEnc_GetHuffmanTableLength(dcChrom) +
+                JpegEnc_GetHuffmanTableLength(acLum) + JpegEnc_GetHuffmanTableLength(acChrom);
     if (pos + 4 >= sJpegEncLimit) {
         return 0;
     }
@@ -1018,19 +1032,19 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     dst[pos + 3] = dhtLength;
     pos += 4;
     dst[pos++] = 0x00;
-    if (!JpegEnc_WriteHuffmanTable(&work->dcLum, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(dcLum, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x01;
-    if (!JpegEnc_WriteHuffmanTable(&work->dcChrom, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(dcChrom, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x10;
-    if (!JpegEnc_WriteHuffmanTable(&work->acLum, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(acLum, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x11;
-    if (!JpegEnc_WriteHuffmanTable(&work->acChrom, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(acChrom, dst, &pos)) {
         return 0;
     }
 
@@ -1049,34 +1063,34 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     for (y = 0; y < mcusY; y++) {
         for (x = 0; x < mcusX; x++) {
             if (sampling == SSP_JPEG_444) {
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x, y)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x, y)) {
                     return 0;
                 }
             } else if (sampling == SSP_JPEG_420) {
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2, y * 2)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, y * 2)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2 + 1, y * 2)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, y * 2)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2, y * 2 + 1)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, y * 2 + 1)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2 + 1, y * 2 + 1)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, y * 2 + 1)) {
                     return 0;
                 }
             } else {
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2, y)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, y)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2 + 1, y)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, y)) {
                     return 0;
                 }
             }
-            if (!JpegEnc_EncodeBlock(&work->dcChrom, &work->acChrom, &components[1], dst, &pos, x, y)) {
+            if (!JpegEnc_EncodeBlock(dcChrom, acChrom, &components[1], dst, &pos, x, y)) {
                 return 0;
             }
-            if (!JpegEnc_EncodeBlock(&work->dcChrom, &work->acChrom, &components[2], dst, &pos, x, y)) {
+            if (!JpegEnc_EncodeBlock(dcChrom, acChrom, &components[2], dst, &pos, x, y)) {
                 return 0;
             }
         }
@@ -1095,7 +1109,8 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     if (isThumbnail) {
         // The thumbnail is padded to an even size
         if ((pos & 1) == 1) {
-            dst[pos++] = 0;
+            dst[pos] = 0;
+            pos++;
         }
         return pos;
     }
