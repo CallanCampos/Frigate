@@ -34,17 +34,7 @@ int fclose(void *file);
 u32 __fread(void *buffer, u32 size, u32 count, void *file);
 
 // What overlay 189's HTTP code (the NHTTP client and the GameSpy HTTP code) calls in the main module and overlay 11.
-// Of NitroSDK, the thread library: the message queue is initialized with the array it will hold (OS_InitMessageQueue's
-// code), a thread's end is waited for (OS_JoinThread's), and the thread that runs is the second word of the
-// scheduler's state, which swan names g_IsThreadSwitchRequested
-void func_0207acc4(OSMessageQueue *queue, OSMessage *messages, s32 count);
-#define OS_MESSAGE_BLOCK 1
-BOOL OS_SendMessage(OSMessageQueue *queue, OSMessage message, s32 flags);
-void func_0207a800(OSThread *thread);
-extern struct {
-    int unk_00;
-    OSThread *current;
-} g_IsThreadSwitchRequested;
+// NitroSDK's thread library, which it also calls, is in nitro/os.h
 // NitroSDK's STD_GetStringLength with a limit: the length of the string, or the limit if it is longer
 int func_0207f900(const char *s, int max);
 // The socket library of overlay 11, whose functions take and return negative error codes. The address and port of a

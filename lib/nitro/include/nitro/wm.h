@@ -121,7 +121,7 @@ typedef struct {
     u16 scanBufSize;
     u16 channelList;
     u16 maxChannelTime;
-    u16 bssid[3];
+    u8 bssid[6];
     u16 scanType;
     u16 ssidLength;
     u8 ssid[32];

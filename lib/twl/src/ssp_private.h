@@ -2,6 +2,7 @@
 #define POKEBW2_TWL_SSP_PRIVATE_H
 
 #include "types.h"
+#include "twl/photo_sign.h"
 
 // What TwlSDK's SSP files share: the DSi's photo signature, which the encoder writes into a JPEG's maker note and the
 // decoder checks, and the EXIF reader's state that the decoder reads
@@ -9,10 +10,7 @@
 // The size of the signature block in the maker note
 #define SSP_SIGNATURE_SIZE 0x1c
 
-// The signature functions, in the LTD autoload, which keep their default names until it is analyzed. The first sets
-// up the ARM7's side once; the second signs data, whose signature block is zeroed, into sig, and returns 1 on success
-void func_027076c4(void);
-int func_02707ba4(u8 *sig, const u8 *data, u32 size);
+// The signature functions are the LTD autoload's photo_sign.c (twl/photo_sign.h)
 
 // ssp_exifdec.c
 // Whether SSP_StartJpegDecoder checks the signature of a JPEG
