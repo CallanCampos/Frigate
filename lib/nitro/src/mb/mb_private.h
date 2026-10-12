@@ -152,7 +152,8 @@ struct MBTask {
 
 typedef struct {
     OSThread thread;
-    MBTask *head;
+    // The queue's first job, which the task thread and the threads adding jobs both change
+    MBTask *volatile head;
     // The job that ends the thread
     MBTask exitTask;
     u8 stack[MB_TASK_THREAD_SIZE - sizeof(OSThread) - sizeof(MBTask *) - sizeof(MBTask)];
@@ -323,7 +324,6 @@ typedef struct {
     u8 fragmentCount;
     u8 sequence;
     u8 unk_2a[0x1e];
-    MBBeacon beacon;
 } MBGameInfoSender;
 
 // A frame that the parent sends to the children: a type and what goes with it
@@ -350,6 +350,17 @@ typedef struct {
         };
     };
 } MBChildFrame;
+
+// What a child asks the parent for when it connects: the game it wants, who it is and the program's number. The
+// request is MB_CHILD_REQUEST_SIZE bytes, the struct's size without its padding
+typedef struct {
+    u32 ggid;
+    MBUserInfo user;
+    u16 unk_1a;
+    u8 fileNo;
+} MBChildRequest;
+
+#define MB_CHILD_REQUEST_SIZE 0x1d
 
 // The pieces of the requests of the children that came so far, and which pieces
 typedef struct {
@@ -383,17 +394,24 @@ struct MBCommFile {
     const u32 *segmentRomOffsets;
 };
 
-// The memory the library gets with MB_Init, from its third part on: what the parent knows of its children
+// The memory the library gets with MB_Init, from its third part on: what a parent and a child both have. MB_Init
+// clears this much of it, and a parent's start clears the rest of MBCommParentWork
 typedef struct {
     u8 sendBuf[0x400];
     u8 recvBuf[0x1300 - 0x400];
-    MBUserInfo parentUser;
+    // The user of this console
+    MBUserInfo user;
     u16 initialized;
     // How many bytes of a program go in a block
     u32 blockSize;
     u32 mpRequested;
     u32 started;
     u8 unk_1324[0x1c];
+} MBCommWork;
+
+// The same memory for a parent: the common part, and what the parent knows of its children
+typedef struct {
+    MBCommWork common;
     MBUserInfo childUser[MB_CHILD_MAX];
     u16 childUnk148a[MB_CHILD_MAX];
     u32 childRequestGgid[MB_CHILD_MAX];
@@ -412,7 +430,7 @@ typedef struct {
     u8 unk_74cc[0x14];
     MBTaskThread thread;
     MBTask task;
-} MBCommWork;
+} MBCommParentWork;
 
 typedef void (*MBCommEventCallback)(u16 event, void *arg);
 
@@ -475,8 +493,23 @@ typedef struct {
     MBScanEntry scanEntries[16];
 } MBWmWork;
 
-// The parent's communication state, which MB_Init sets and the end of the library clears
+// The library's communication state, which MB_Init sets and the end of the library clears. The parent's code reaches
+// its part through MB_PARENT_WORK: the original adds a field's offset to the address of an element of the parent's
+// arrays, which only a cast of the common pointer gives (see MB_DisconnectChild)
 extern MBCommWork *gMBCommWork;
+#define MB_PARENT_WORK ((MBCommParentWork *)gMBCommWork)
+
+// Takes a child that left out of the players of the program it chose (MB_DisconnectChild, MBComm_OnWmEvent)
+static inline void MBComm_LeaveFile(u16 aid) {
+    if (MB_PARENT_WORK->childFile[aid - 1] != -1) {
+        u8 n = (u8)MB_PARENT_WORK->childFile[aid - 1];
+
+        MB_PARENT_WORK->files[n].memberMask &= ~(1 << aid);
+        MB_PARENT_WORK->files[n].changedMask |= 1 << aid;
+        MB_PARENT_WORK->childFile[aid - 1] = -1;
+        MB_PARENT_WORK->files[n].downloadMask &= ~(1 << aid);
+    }
+}
 
 // mb_comm.c
 void MBComm_OnWmEvent(u16 event, void *arg);
@@ -494,7 +527,7 @@ void MBGameInfo_Init(void);
 void MBGameInfo_Send(u32 ggid, u16 tgid, u8 attr);
 
 // mb_wm.c
-int MBWm_SendToChildren(const void *data, u16 size, u16 aidBitmap);
+int MBWm_SendToChildren(const void *data, u32 size, u32 aidBitmap);
 u32 MBWm_GetGgid(void);
 u16 MBWm_GetTgid(void);
 u8 MBWm_GetAttribute(void);

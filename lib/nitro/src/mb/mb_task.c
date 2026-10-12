@@ -19,19 +19,16 @@ static void MBTask_ThreadMain(void *arg) {
     while (TRUE) {
         u32 irq = CPU_IRQDisable();
         MBTask *task;
-        MBTask *queued;
         void (*done)(MBTask *task);
         u32 priority;
         u32 next;
 
-        if (thread->head == NULL) {
-            do {
-                func_0207a998(&thread->thread, 0);
-                scheduler_yield(NULL);
-            } while (thread->head == NULL);
+        while (thread->head == NULL) {
+            func_0207a998(&thread->thread, 0);
+            scheduler_yield(NULL);
         }
         task = thread->head;
-        thread->head = task->next;
+        thread->head = thread->head->next;
         func_0207a998(&thread->thread, task->priority);
         CPU_SetIRQMask(irq);
         if (task->func != NULL) {
@@ -40,11 +37,10 @@ static void MBTask_ThreadMain(void *arg) {
         irq = CPU_IRQDisable();
         done = task->done;
         priority = func_0207aa00(&thread->thread);
-        queued = thread->head;
-        if (queued == NULL) {
+        if (thread->head == NULL) {
             next = 0;
-        } else if (priority < queued->priority) {
-            next = queued->priority;
+        } else if (priority < thread->head->priority) {
+            next = thread->head->priority;
         } else {
             next = priority;
         }
@@ -57,11 +53,11 @@ static void MBTask_ThreadMain(void *arg) {
             done(task);
         }
         if (task == &thread->exitTask) {
-            scheduler_thread_exit_proc();
-            return;
+            break;
         }
         CPU_SetIRQMask(irq);
     }
+    scheduler_thread_exit_proc();
 }
 
 // Starts the thread, with a block of memory for it and its stack
@@ -69,11 +65,12 @@ void MBTask_StartThread(MBTaskThread *thread, u32 size) {
     u32 irq = CPU_IRQDisable();
 
     if (sTaskThread == NULL) {
-        u32 stackSize = (size - sizeof(MBTaskThread) + sizeof(thread->stack)) & ~3;
+        u32 stackSize;
 
         sTaskThread = thread;
         MBTask_Clear(&thread->exitTask);
         thread->head = NULL;
+        stackSize = (size - sizeof(MBTaskThread) + sizeof(thread->stack)) & ~3;
         scheduler_init_thread(&thread->thread, MBTask_ThreadMain, thread, thread->stack + stackSize, stackSize, 0);
         scheduler_start_thread(&thread->thread);
     }
@@ -126,45 +123,38 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
     }
     {
         u32 irq = CPU_IRQDisable();
-        MBTask *queued;
 
         task->busy = 1;
         task->priority = priority;
         task->func = func;
         task->done = done;
-        queued = thread->head;
-        if (queued == NULL) {
+        if (thread->head == NULL) {
             if (task == &thread->exitTask) {
                 sTaskThread = NULL;
             }
             thread->head = task;
             scheduler_start_thread(&thread->thread);
-        } else if (task == &thread->exitTask) {
-            MBTask *last = queued->next;
-
-            if (last != NULL) {
-                do {
-                    queued = last;
-                    last = last->next;
-                } while (last != NULL);
-            }
-            queued->next = task;
-            sTaskThread = NULL;
-        } else if (queued->priority > priority) {
-            thread->head = task;
-            task->next = queued;
         } else {
-            MBTask *next;
+            MBTask *queued = thread->head;
 
-            while (TRUE) {
-                next = queued->next;
-                if (next == NULL || next->priority > priority) {
-                    break;
+            if (task == &thread->exitTask) {
+                while (queued->next != NULL) {
+                    queued = queued->next;
                 }
-                queued = next;
+                queued->next = task;
+                sTaskThread = NULL;
+            } else if (queued->priority > priority) {
+                thread->head = task;
+                task->next = queued;
+            } else {
+                MBTask *next;
+
+                while ((next = queued->next) != NULL && next->priority <= priority) {
+                    queued = next;
+                }
+                task->next = next;
+                queued->next = task;
             }
-            task->next = next;
-            queued->next = task;
         }
         CPU_SetIRQMask(irq);
     }

@@ -8,6 +8,13 @@ tools that show the differences.
 
 ## Registers
 
+- A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
+  taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
+  (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
+  difference late in r7.
+- A value passed to a `static inline` stays in a register across the inline's stores, where a field read again at
+  each use (`cb->aid`) is reloaded after each store: multiboot's `MBComm_OnWmEvent` (`mb_comm.c`) matches with its
+  disconnect step as an inline taking the aid.
 - A loop that walks on from a parameter reuses the parameter as its cursor, with the start kept in a local
   (`int start = pos;`), as `b_plist_main.c`'s `BPlistMain_GetNextPos` does; a separate counter swaps the registers.
 - A `const` pointer parameter lets MWCC keep a value loaded through it across a store through another pointer; the
@@ -486,6 +493,17 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
+  `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
+  task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
+  with it `MBTask_ThreadMain` and `MBTask_Add` match.
+- A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
+  `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
+  is the parent's and child's shared part, which the parent's code casts to its extension (`MB_PARENT_WORK`), and
+  `MB_DisconnectChild` (`mb_wm.c`) only matches through it.
+- A narrowing missing after an `if`/`else` that assigns a `u16` in both branches comes from a conditional expression:
+  `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `MBWm_NextChannel`
+  (`mb_wm.c`) needed.
 - On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
   load's offset from the shared base, where the same address in a named local, or the element written `a[n + k]`,
   is computed again. `snd_arc_loader.c`'s `LoadSingleWave` reads a wave's file offset and the next one's as
@@ -917,6 +935,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
+  stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
+  the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
