@@ -502,6 +502,11 @@ Same instructions, scheduled in another order.
   the way: `poke_tool.c`'s `fillDataForHatchedEgg` stored `heapId` to the stack too early until `placeName` was a
   `u32` in it, in `PML_UtilSetupMetData`'s prototype and in that function's static helper. When a caller differs
   only in such an order, widen the callee's parameter and follow it down.
+- A `u32` local's reload from its stack slot is hoisted above a store through a pointer, and a `u16` local's is
+  not: `event_battle_return.c`'s `EventBattleReturn_Main` sets up the evolution demo with `str r7, [r3, #4];
+  ldr r0, [sp, #0x18]; ldr r2, =SHINKA_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
+  needs `CheckEvolveSpecies` to return `u16`, or the call's result is narrowed. It is not aliasing: taking the
+  local's address, moving it into a local struct or retyping the pointee's fields leaves the `u32` hoist in place.
 
 ## An instruction too many or too few
 
