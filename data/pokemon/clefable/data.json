@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 90,
-    "baby_species": "SPECIES_CLEFFA"
+    "baby_species": "SPECIES_CLEFFA",
+    "cry_volume": 110
 }

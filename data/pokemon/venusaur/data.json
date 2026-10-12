@@ -173,5 +173,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_BULBASAUR"
+    "baby_species": "SPECIES_BULBASAUR",
+    "cry_volume": 110
 }

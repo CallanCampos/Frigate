@@ -143,5 +143,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 0,
-    "baby_species": "SPECIES_VICTINI"
+    "baby_species": "SPECIES_VICTINI",
+    "cry_volume": 110
 }

@@ -180,5 +180,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_RELICANTH"
+    "baby_species": "SPECIES_RELICANTH",
+    "cry_volume": 120
 }

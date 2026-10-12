@@ -133,5 +133,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 230,
-    "baby_species": "SPECIES_TYMPOLE"
+    "baby_species": "SPECIES_TYMPOLE",
+    "cry_volume": 120
 }

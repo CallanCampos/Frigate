@@ -116,5 +116,6 @@
         }
     ],
     "regional_dex_number": 155,
-    "baby_species": "SPECIES_KARRABLAST"
+    "baby_species": "SPECIES_KARRABLAST",
+    "cry_volume": 120
 }

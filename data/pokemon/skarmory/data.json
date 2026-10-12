@@ -179,5 +179,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 203,
-    "baby_species": "SPECIES_SKARMORY"
+    "baby_species": "SPECIES_SKARMORY",
+    "cry_volume": 110
 }

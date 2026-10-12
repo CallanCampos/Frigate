@@ -123,5 +123,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 38,
-    "baby_species": "SPECIES_PANSAGE"
+    "baby_species": "SPECIES_PANSAGE",
+    "cry_volume": 110
 }

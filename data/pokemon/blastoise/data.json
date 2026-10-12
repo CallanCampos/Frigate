@@ -179,5 +179,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SQUIRTLE"
+    "baby_species": "SPECIES_SQUIRTLE",
+    "cry_volume": 110
 }

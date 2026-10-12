@@ -123,5 +123,6 @@
         }
     ],
     "regional_dex_number": 178,
-    "baby_species": "SPECIES_TYNAMO"
+    "baby_species": "SPECIES_TYNAMO",
+    "cry_volume": 125
 }

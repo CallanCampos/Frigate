@@ -108,5 +108,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 85,
-    "baby_species": "SPECIES_PETILIL"
+    "baby_species": "SPECIES_PETILIL",
+    "cry_volume": 110
 }

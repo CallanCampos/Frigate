@@ -125,5 +125,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 40,
-    "baby_species": "SPECIES_PANSEAR"
+    "baby_species": "SPECIES_PANSEAR",
+    "cry_volume": 110
 }

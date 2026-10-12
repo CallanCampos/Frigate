@@ -125,5 +125,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 116,
-    "baby_species": "SPECIES_DWEBBLE"
+    "baby_species": "SPECIES_DWEBBLE",
+    "cry_volume": 120
 }

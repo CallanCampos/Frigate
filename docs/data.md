@@ -31,7 +31,7 @@ which documents the format and can write them again.
 | `a/0/1/6`, `a/0/1/8`, `a/0/1/9`, `a/0/2/0`, `a/1/2/4` | `data/pokemon/` (JSON) | Species data, level-up moves, evolutions, baby species, egg moves | `tools/data/species_data.py` |
 | `a/0/1/7` | `data/pokemon/growth_rates.csv` | Experience tables of the growth rates | `tools/data/species_data.py` |
 | `a/0/0/4`, `a/0/0/7`, `a/0/5/1`, `a/1/6/5`, `a/2/2/9` | `data/pokemon/<species>/` (PNG, palette, Nitro animation files) | Battle sprites, icons, musical sprites, and footprints | `tools/data/pokemon_graphics.py` |
-| `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `cry_volume.txt` | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
+| `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `data.json` (`cry_volume`) | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
 | `a/0/2/1` | `data/moves/` (JSON) | Move data | `tools/data/move_data.py` |
 | `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
@@ -307,7 +307,9 @@ species. Eggs and currently unidentified reserved graphics slots are kept under 
 archive entries are dropped.
 
 `cry.wav` is mono PCM8 at the game's sample rate; the packer also accepts mono PCM16 edits and different lengths.
-`cry_volume.txt` is the game's 0–127 playback volume. Forms with a separate cry have a `form_<n>/cry.wav`.
+`cry_volume` in each species' `data.json` is the game's 0–127 playback volume. Eggs and reserved cry slots use a
+small `data.json` beside their `cry.wav`. Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
+volume.
 The other sounds in `swan_sound_data.sdat` retain their original data. Extract the graphics again with
 `.venv/bin/python tools/data/pokemon_graphics.py extract data/pokemon` and the cries with
 `.venv/bin/python tools/data/pokemon_cries.py extract data/pokemon`; the build packs them automatically.

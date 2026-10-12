@@ -170,5 +170,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CRESSELIA"
+    "baby_species": "SPECIES_CRESSELIA",
+    "cry_volume": 113
 }

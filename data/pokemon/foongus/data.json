@@ -126,5 +126,6 @@
         }
     ],
     "regional_dex_number": 161,
-    "baby_species": "SPECIES_FOONGUS"
+    "baby_species": "SPECIES_FOONGUS",
+    "cry_volume": 120
 }

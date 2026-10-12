@@ -203,5 +203,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 294,
-    "baby_species": "SPECIES_LARVITAR"
+    "baby_species": "SPECIES_LARVITAR",
+    "cry_volume": 118
 }

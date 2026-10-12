@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 114,
-    "baby_species": "SPECIES_SANDSHREW"
+    "baby_species": "SPECIES_SANDSHREW",
+    "cry_volume": 118
 }

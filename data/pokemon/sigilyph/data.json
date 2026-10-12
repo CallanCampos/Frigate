@@ -142,5 +142,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 120,
-    "baby_species": "SPECIES_SIGILYPH"
+    "baby_species": "SPECIES_SIGILYPH",
+    "cry_volume": 120
 }

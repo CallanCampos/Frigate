@@ -127,5 +127,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 268,
-    "baby_species": "SPECIES_SAWK"
+    "baby_species": "SPECIES_SAWK",
+    "cry_volume": 105
 }

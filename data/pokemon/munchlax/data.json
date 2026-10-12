@@ -200,5 +200,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MUNCHLAX"
+    "baby_species": "SPECIES_MUNCHLAX",
+    "cry_volume": 120
 }

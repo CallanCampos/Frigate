@@ -164,5 +164,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 239,
-    "baby_species": "SPECIES_STARYU"
+    "baby_species": "SPECIES_STARYU",
+    "cry_volume": 110
 }

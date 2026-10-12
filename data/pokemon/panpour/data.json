@@ -148,5 +148,6 @@
         }
     ],
     "regional_dex_number": 41,
-    "baby_species": "SPECIES_PANPOUR"
+    "baby_species": "SPECIES_PANPOUR",
+    "cry_volume": 110
 }

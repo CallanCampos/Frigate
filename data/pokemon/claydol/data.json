@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 170,
-    "baby_species": "SPECIES_BALTOY"
+    "baby_species": "SPECIES_BALTOY",
+    "cry_volume": 120
 }

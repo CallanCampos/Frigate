@@ -201,5 +201,6 @@
         }
     ],
     "regional_dex_number": 221,
-    "baby_species": "SPECIES_GLIGAR"
+    "baby_species": "SPECIES_GLIGAR",
+    "cry_volume": 110
 }

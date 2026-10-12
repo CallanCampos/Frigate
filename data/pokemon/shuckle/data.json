@@ -181,5 +181,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 232,
-    "baby_species": "SPECIES_SHUCKLE"
+    "baby_species": "SPECIES_SHUCKLE",
+    "cry_volume": 110
 }

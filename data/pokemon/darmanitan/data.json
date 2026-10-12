@@ -146,5 +146,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 103,
-    "baby_species": "SPECIES_DARUMAKA"
+    "baby_species": "SPECIES_DARUMAKA",
+    "cry_volume": 127
 }

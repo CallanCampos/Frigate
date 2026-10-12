@@ -157,5 +157,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_LUVDISC"
+    "baby_species": "SPECIES_LUVDISC",
+    "cry_volume": 120
 }

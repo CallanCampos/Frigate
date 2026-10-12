@@ -211,5 +211,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MEWTWO"
+    "baby_species": "SPECIES_MEWTWO",
+    "cry_volume": 110
 }

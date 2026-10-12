@@ -197,5 +197,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MAWILE"
+    "baby_species": "SPECIES_MAWILE",
+    "cry_volume": 120
 }

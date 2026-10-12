@@ -130,5 +130,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 19,
-    "baby_species": "SPECIES_SEWADDLE"
+    "baby_species": "SPECIES_SEWADDLE",
+    "cry_volume": 120
 }

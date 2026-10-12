@@ -173,5 +173,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_REGIROCK"
+    "baby_species": "SPECIES_REGIROCK",
+    "cry_volume": 120
 }

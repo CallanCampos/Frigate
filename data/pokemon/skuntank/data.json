@@ -162,5 +162,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_STUNKY"
+    "baby_species": "SPECIES_STUNKY",
+    "cry_volume": 120
 }

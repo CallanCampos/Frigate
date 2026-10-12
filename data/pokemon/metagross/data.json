@@ -183,5 +183,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 264,
-    "baby_species": "SPECIES_BELDUM"
+    "baby_species": "SPECIES_BELDUM",
+    "cry_volume": 126
 }

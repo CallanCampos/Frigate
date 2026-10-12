@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Export and pack Pokémon cries as WAV plus their in-game volume setting.
+"""Export and pack Pokémon cries as WAV plus cry_volume in data.json.
 
     pokemon_cries.py extract data/pokemon
     pokemon_cries.py pack data/pokemon black2|white2 SDAT VOLUME_ARCHIVE
 """
 
 import io
+import json
 import struct
 import sys
 import wave
 from pathlib import Path
 
+from datajson import write
 from narc import read_narc, write_narc
 from pokemon_graphics import ROOT, species_names
 
@@ -31,6 +33,11 @@ def cry_folder(root, cry_id):
     if cry_id == 651:
         return root / "bad_egg"
     return root / "extra_graphics" / f"battle_group_{cry_id - 2}"
+
+
+def volume_path(root, cry_id):
+    return (root / species_names()[cry_id] / "data.json" if cry_id < len(species_names())
+            else cry_folder(root, cry_id) / "data.json")
 
 
 def sound_tables(data):
@@ -142,7 +149,10 @@ def export(root):
         rate, samples = cry_wave(sound[offset:offset + size])
         (folder / "cry.wav").write_bytes(wav_bytes(rate, samples))
         if cry_id < len(volume):
-            (folder / "cry_volume.txt").write_text(str(struct.unpack_from("<H", volume[cry_id], 2)[0]) + "\n")
+            path = volume_path(root, cry_id)
+            data = json.loads(path.read_text()) if path.exists() else {}
+            data["cry_volume"] = struct.unpack_from("<H", volume[cry_id], 2)[0]
+            write(path, data)
     print(f"{len(cries)} cries", flush=True)
 
 
@@ -164,10 +174,10 @@ def pack(root, game, sound_output, volume_output):
     target.write_bytes(result)
     volume = read_narc((ROOT / "extract" / version / "files/a/1/9/1").read_bytes())
     for cry_id in range(1, len(volume)):
-        folder = cry_folder(root, cry_id)
-        value = int((folder / "cry_volume.txt").read_text())
-        if not 0 <= value <= 127:
-            raise ValueError(f"{folder}: cry volume must be 0 to 127")
+        path = volume_path(root, cry_id)
+        value = json.loads(path.read_text())["cry_volume"]
+        if type(value) is not int or not 0 <= value <= 127:
+            raise ValueError(f"{path}: cry_volume must be an integer from 0 to 127")
         entry = bytearray(volume[cry_id])
         struct.pack_into("<H", entry, 2, value)
         volume[cry_id] = bytes(entry)

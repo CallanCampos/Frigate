@@ -194,5 +194,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MACHOP"
+    "baby_species": "SPECIES_MACHOP",
+    "cry_volume": 110
 }

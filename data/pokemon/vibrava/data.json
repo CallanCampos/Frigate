@@ -174,5 +174,6 @@
         }
     ],
     "regional_dex_number": 122,
-    "baby_species": "SPECIES_TRAPINCH"
+    "baby_species": "SPECIES_TRAPINCH",
+    "cry_volume": 120
 }
