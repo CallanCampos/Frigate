@@ -81,7 +81,7 @@ GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *
         }
         break;
     case 7:
-        GSYS_QueueProc(gsys, OVERLAY_ID(266), &data_ov266_0219e518, &work->ov266Param);
+        GSYS_QueueProc(gsys, OVERLAY_ID(266), &STAFF_ROLL_PROC_FUNCTIONS, &work->ov266Param);
         EventGameClear_NextState(work, state);
         break;
     case 8:
