@@ -3,6 +3,7 @@
 
 Usage: map_model_data.py extract APICULA OUTPUT_DIR
        map_model_data.py migrate SOURCE_DIR
+       map_model_data.py embed-props SOURCE_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
 
 Mesh positions are editable for all models through direct, translated or skinned
@@ -11,6 +12,8 @@ coordinates. The original Nitro resource supplies command order and materials.
 
 import hashlib
 import json
+import math
+import re
 import shutil
 import struct
 import subprocess
@@ -24,6 +27,8 @@ from narc import read_narc, write_narc
 ROOT = Path(__file__).resolve().parents[2]
 GLB_JSON = 0x4e4f534a
 GLB_BIN = 0x004e4942
+PROP_NAME = re.compile(r"bw2_prop_(\d+)_id_(\d+)(?:\.\d+)?$")
+PROP_OFFSETS = {b"WB": (12, 16), b"GC": (16, 20), b"NG": (8, 12), b"RD": (12, 16)}
 GPU_PARAMS = {0x00: 0, 0x20: 1, 0x21: 1, 0x22: 1, 0x23: 2, 0x24: 1,
               0x25: 1, 0x26: 1, 0x27: 1, 0x28: 1, 0x40: 1, 0x41: 0}
 SBC_PARAMS = {0x00: 0, 0x01: 0, 0x02: 2, 0x03: 1, 0x04: 1, 0x05: 1,
@@ -105,6 +110,69 @@ def write_glb(path, doc, binary):
             + struct.pack("<II", len(encoded), GLB_JSON) + encoded
             + struct.pack("<II", len(binary), GLB_BIN) + binary)
     path.write_bytes(data)
+
+
+def prop_section(chunk):
+    if chunk[:2] not in PROP_OFFSETS:
+        raise ValueError("unknown field map chunk type")
+    offset_field, end_field = PROP_OFFSETS[chunk[:2]]
+    offset, end = u32(chunk, offset_field), u32(chunk, end_field)
+    if end != len(chunk) or offset + 4 > end:
+        raise ValueError("invalid field prop section bounds")
+    count = u32(chunk, offset)
+    if offset + 4 + 16 * count != end:
+        raise ValueError("field prop section size differs from count")
+    return offset, end_field, count
+
+
+def add_prop_nodes(doc, chunk):
+    offset, _, count = prop_section(chunk)
+    roots = doc["scenes"][doc.get("scene", 0)].setdefault("nodes", [])
+    nodes = doc.setdefault("nodes", [])
+    for index in range(count):
+        x, y, z, rotation, high, low = struct.unpack_from("<iiiHBB", chunk, offset + 4 + 16 * index)
+        angle = rotation * math.tau / 65536
+        nodes.append({"name": f"bw2_prop_{index:04d}_id_{(high << 8) | low:05d}",
+                      "translation": [x / 4096, y / 4096, -z / 4096],
+                      "rotation": [0, math.sin(angle / 2), 0, math.cos(angle / 2)]})
+        roots.append(len(nodes) - 1)
+
+
+def patch_props(chunk, doc):
+    offset, end_field, _ = prop_section(chunk)
+    props = []
+    roots = set(doc["scenes"][doc.get("scene", 0)].get("nodes", []))
+    for node_index, node in enumerate(doc.get("nodes", [])):
+        name = node.get("name", "")
+        if not name.startswith("bw2_prop_"):
+            continue
+        match = PROP_NAME.fullmatch(name)
+        if match is None:
+            raise ValueError(f"invalid field prop node name: {name}")
+        prop_id = int(match[2])
+        if prop_id > 65535:
+            raise ValueError(f"field prop ID exceeds 16 bits: {prop_id}")
+        if node_index not in roots:
+            raise ValueError(f"{name}: field props must stay at the scene root")
+        if any(abs(value - 1) > 0.0001 for value in node.get("scale", [1, 1, 1])):
+            raise ValueError(f"{name}: field props cannot be scaled")
+        position = node.get("translation", [0, 0, 0])
+        if len(position) != 3:
+            raise ValueError(f"{name}: expected a 3D translation")
+        coords = [round(value * 4096) for value in (position[0], position[1], -position[2])]
+        if any(not -(1 << 31) <= value < (1 << 31) for value in coords):
+            raise ValueError(f"{name}: position exceeds Nitro fixed point range")
+        qx, qy, qz, qw = node.get("rotation", [0, 0, 0, 1])
+        if abs(qx) > 0.0001 or abs(qz) > 0.0001 or abs(qx*qx + qy*qy + qz*qz + qw*qw - 1) > 0.0001:
+            raise ValueError(f"{name}: prop supports only rotation around Y")
+        angle = 2 * math.atan2(qy, qw)
+        rotation = round(angle * 65536 / math.tau) & 0xffff
+        props.append((int(match[1]), struct.pack("<iiiHBB", *coords, rotation, prop_id >> 8, prop_id & 255)))
+    props.sort(key=lambda item: item[0])
+    section = struct.pack("<I", len(props)) + b"".join(data for _, data in props)
+    result = bytearray(chunk[:offset] + section)
+    struct.pack_into("<I", result, end_field, len(result))
+    return bytes(result)
 
 
 def accessor_values(doc, binary, accessor_index):
@@ -492,6 +560,7 @@ def export(apicula, output):
             for picture in document.get("images", []):
                 if "uri" in picture:
                     picture["uri"] = f"../../map_texture_sets/{texture_id:03d}/{picture['uri']}"
+        add_prop_nodes(document, archive[chunk_id])
         write_glb(model_dir / "model.glb", document, (model_dir / "model.bin").read_bytes())
         (model_dir / "model.gltf").unlink()
         (model_dir / "model.bin").unlink()
@@ -529,6 +598,14 @@ def main():
             (directory / "model.gltf").unlink()
             (directory / "model.bin").unlink()
         return
+    if len(sys.argv) == 3 and sys.argv[1] == "embed-props":
+        archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
+        for entry in models(Path(sys.argv[2])):
+            path = Path(sys.argv[2]) / f"{entry['chunk']:04d}" / "model.glb"
+            doc, binary = read_glb(path)
+            add_prop_nodes(doc, archive[entry["chunk"]])
+            write_glb(path, doc, binary)
+        return
     if len(sys.argv) != 5 or sys.argv[1] != "pack":
         raise SystemExit(__doc__)
     _, _, directory, game, output = sys.argv
@@ -541,6 +618,8 @@ def main():
                                                 name, model_bytes(archive[chunk_id]))
         if direct:
             archive[chunk_id] = patch_model(archive[chunk_id], positions, name)
+        doc, _ = read_glb(Path(directory) / f"{chunk_id:04d}" / "model.glb")
+        archive[chunk_id] = patch_props(archive[chunk_id], doc)
     dest = Path(output)
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.unlink(missing_ok=True)
