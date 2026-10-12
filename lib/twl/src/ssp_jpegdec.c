@@ -937,7 +937,7 @@ static inline int YccToRgb555(int y, int c) {
 
 // Converts the decoded MCU at (x, y) into RGB555 pixels of dest, a bitmap width pixels wide, clipped to height
 static void func_ov257_021ac018(u8 *dest, int x, int y, int width, int height) {
-    int i, j, h, v;
+    int h, v, i, j;
     int k;
     int p;
     int c;
