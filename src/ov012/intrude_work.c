@@ -40,14 +40,14 @@ u32 func_ov012_0215364c(GameCommSys *commSys, GameData *gameData) {
     return 0;
 }
 
-u32 func_ov012_02153650(void) {
+u32 func_ov012_02153650(GameCommSys *commSys) {
     return 0;
 }
 
-void func_ov012_02153654(void) {
+void func_ov012_02153654(GameCommSys *commSys) {
 }
 
-u32 func_ov012_02153658(void) {
+u32 func_ov012_02153658(GameCommSys *commSys) {
     return 0;
 }
 

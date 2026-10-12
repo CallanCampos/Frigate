@@ -181,7 +181,7 @@ extern const BtlvInputKeyStop *const data_ov169_0689e6e0[2][15];
 extern const BtlvInputKeyStop *const data_ov169_0689e884[3][15];
 
 // The battle's selection screens, which share an address range with the bag
-void func_ov288_021f4440(void *param);
+void BScenarioMain_Start(void *param);
 void BChoiceMain_Start(void *param);
 
 BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeCon *pokeCon, u32 arg3, HeapID heapId);
