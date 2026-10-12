@@ -858,7 +858,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
             GSYS_QueueProc(gsys, OVERLAY_ID(70), &data_ov070_0217f910, param);
         } else {
             param->app = unisys->alloc.uniapp;
-            GSYS_QueueProc(gsys, OVERLAY_ID(216), &data_ov216_021c08d0, param);
+            GSYS_QueueProc(gsys, OVERLAY_ID(216), &GURU2_PROC_FUNCTIONS, param);
         }
         (*step)++;
         break;

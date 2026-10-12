@@ -1830,8 +1830,10 @@ overlays/ov207 0x021bb1b5 remove_symbol
 overlays/ov207 0x021bb349 remove_symbol
 overlays/ov207 0x021bb369 remove_symbol
 overlays/ov207 0x021bb37d remove_symbol
+overlays/ov208 0x02199d38 reloc_module overlay(209)
 overlays/ov208 0x0219a0f8 reloc_module overlay(210)
 overlays/ov208 0x0219a0fc reloc_module overlay(210)
+overlays/ov208 0x0219a66e reloc_module overlay(209)
 overlays/ov208 0x0219a802 reloc_module overlay(210)
 overlays/ov208 0x0219a806 reloc_module overlay(210)
 overlays/ov208 0x0219a9b0 reloc_module overlay(210)
@@ -1964,7 +1966,19 @@ overlays/ov215 0x021ab018 reloc_module overlay(185)
 overlays/ov215 0x021ab0c8 remove_reloc
 overlays/ov215 0x021ab410 remove_reloc
 overlays/ov215 0x021ab440 remove_reloc
+overlays/ov216 0x021bc024 reloc_addend 6
+overlays/ov216 0x021bc028 reloc_addend 7
+overlays/ov216 0x021bc40c reloc_addend 16
+overlays/ov216 0x021bc410 reloc_addend 24
 overlays/ov216 0x021be9f4 reloc_addend 0x380
+overlays/ov216 0x021c0992 remove_symbol
+overlays/ov216 0x021c0993 remove_symbol
+overlays/ov216 0x021c09d4 remove_symbol
+overlays/ov216 0x021c09dc remove_symbol
+overlays/ov216 0x021c0a02 remove_symbol
+overlays/ov216 0x021c0a54 remove_reloc
+overlays/ov216 0x021c0ab4 remove_reloc
+overlays/ov216 0x021c0b02 remove_symbol
 overlays/ov253 0x0217caa8 reloc_module overlay(162)
 overlays/ov253 0x0217d79c remove_reloc
 overlays/ov255 0x021d46da reloc_module overlay(139)
@@ -2237,10 +2251,10 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
-overlays/ov310 0x021a773c add_data ResearchCommon_Unused
+overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
 overlays/ov311 0x0219d93c reloc_module overlay(139)
 overlays/ov311 0x0219d97c reloc_module overlay(139)
