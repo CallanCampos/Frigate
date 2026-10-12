@@ -11,10 +11,12 @@ src/ov175/compatible_irc_sys.c:
     .data       start:0x0219ace0 end:0x0219acfc
 
 src/ov175/irc_compatible.c:
+    complete
     .text       start:0x0219a0f8 end:0x0219a89c
     .rodata     start:0x0219ac6c end:0x0219acc8
     .data       start:0x0219acfc end:0x0219ad10
 
 src/ov175/irc_appbar.c:
+    complete
     .text       start:0x0219a89c end:0x0219abc4
     .data       start:0x0219ad10 end:0x0219ad20

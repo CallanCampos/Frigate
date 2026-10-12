@@ -1531,8 +1531,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `compatible_irc_sys.c` | `0x021998c0`–`0x0219a0f8` | 48 | complete | string at `0x0219ace4` |
-| `irc_compatible.c` | `0x0219a0f8`–`0x0219a89c` | 28 | partial | string at `0x0219acfc` |
-| `irc_appbar.c` | `0x0219a89c`–`0x0219abc4` | 14 | partial | string at `0x0219ad10` |
+| `irc_compatible.c` | `0x0219a0f8`–`0x0219a89c` | 28 | complete | string at `0x0219acfc` |
+| `irc_appbar.c` | `0x0219a89c`–`0x0219abc4` | 14 | complete | string at `0x0219ad10` |
 
 ### Overlay 176
 
