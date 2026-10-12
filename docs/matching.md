@@ -493,6 +493,10 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
+  `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
+  task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
+  with it `MBTask_ThreadMain` and `MBTask_Add` match.
 - A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
   `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
   is the parent's and child's shared part, which the parent's code casts to its extension (`MB_PARENT_WORK`), and

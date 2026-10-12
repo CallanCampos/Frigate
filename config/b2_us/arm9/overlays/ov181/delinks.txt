@@ -56,6 +56,7 @@ lib/nitro/src/mb/mb_cache.c:
     .text       start:0x021a3b28 end:0x021a3bd4
 
 lib/nitro/src/mb/mb_task.c:
+    complete
     .text       start:0x021a3bd4 end:0x021a3e44
     .bss        start:0x021a4904 end:0x021a4908
 

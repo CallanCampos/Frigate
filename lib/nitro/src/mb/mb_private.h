@@ -152,7 +152,8 @@ struct MBTask {
 
 typedef struct {
     OSThread thread;
-    MBTask *head;
+    // The queue's first job, which the task thread and the threads adding jobs both change
+    MBTask *volatile head;
     // The job that ends the thread
     MBTask exitTask;
     u8 stack[MB_TASK_THREAD_SIZE - sizeof(OSThread) - sizeof(MBTask *) - sizeof(MBTask)];
