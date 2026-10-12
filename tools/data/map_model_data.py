@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Export the map model archive to binary glTF 2.0 and pack positions and UVs back into Nitro.
+"""Export field map GLBs and terrain, then pack edited geometry back into Nitro.
 
 Usage: map_model_data.py extract APICULA OUTPUT_DIR
        map_model_data.py migrate SOURCE_DIR
        map_model_data.py embed-props SOURCE_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
 
-Mesh positions are editable for all models through direct, translated or skinned
-coordinates. Texture coordinates use the original Nitro draw commands and materials.
+Unchanged topology keeps the original Nitro display lists byte for byte. A mesh
+that changes its triangles is encoded as new DS GPU commands for each draw call.
 """
 
 import hashlib
@@ -193,7 +193,8 @@ def accessor_values(doc, binary, accessor_index):
         raise ValueError("sparse glTF accessors are unsupported")
     fmt = {(5121, "SCALAR"): "B", (5123, "SCALAR"): "H",
            (5125, "SCALAR"): "I", (5126, "VEC2"): "2f", (5126, "VEC3"): "3f",
-           (5121, "VEC4"): "4B", (5123, "VEC4"): "4H"}.get(
+           (5121, "VEC3"): "3B", (5123, "VEC3"): "3H",
+           (5121, "VEC4"): "4B", (5123, "VEC4"): "4H", (5126, "VEC4"): "4f"}.get(
                (accessor["componentType"], accessor["type"]))
     if fmt is None:
         raise ValueError("unsupported glTF accessor format")
@@ -695,6 +696,134 @@ def patch_model(chunk, positions, name):
     return bytes(data)
 
 
+def nitro_command(opcode, *parameters):
+    return struct.pack("<I", opcode) + struct.pack("<" + "I" * len(parameters), *parameters)
+
+
+def gltf_color(doc, accessor_index, values, vertex, name):
+    accessor = doc["accessors"][accessor_index]
+    components = values[vertex]
+    if accessor["componentType"] == 5126:
+        rgb = components[:3]
+        alpha = components[3] if len(components) == 4 else 1
+    else:
+        maximum = {5121: 255, 5123: 65535}[accessor["componentType"]]
+        rgb = [value / maximum for value in components[:3]]
+        alpha = components[3] / maximum if len(components) == 4 else 1
+    if abs(alpha - 1) > 0.00001:
+        raise ValueError(f"{name}: Nitro vertex colors cannot carry per-vertex alpha")
+    # Apicula exports Nitro RGB555 vertex colors as linear glTF colors.
+    rgb = [value * 12.92 if value <= 0.0031308 else 1.055 * value ** (1 / 2.4) - 0.055
+           for value in rgb]
+    return pack_color5(rgb, name)
+
+
+def topology_display_list(data, model, material_index, doc, primitive, binary, scale, direct, name):
+    attributes = primitive["attributes"]
+    indices = [value[0] for value in accessor_values(doc, binary, primitive["indices"])]
+    if len(indices) % 3:
+        raise ValueError(f"{name}: triangle index count is not divisible by three")
+    if not indices:
+        raise ValueError(f"{name}: a Nitro shape needs at least one triangle")
+    positions = accessor_values(doc, binary, attributes["POSITION"])
+    uvs = accessor_values(doc, binary, attributes["TEXCOORD_0"]) if "TEXCOORD_0" in attributes else None
+    colors = accessor_values(doc, binary, attributes["COLOR_0"]) if "COLOR_0" in attributes else None
+    normals = accessor_values(doc, binary, attributes["NORMAL"]) if "NORMAL" in attributes else None
+    joints = accessor_values(doc, binary, attributes["JOINTS_0"]) if not direct else None
+    weights = accessor_values(doc, binary, attributes["WEIGHTS_0"]) if not direct else None
+    if not direct and (joints is None or weights is None):
+        raise ValueError(f"{name}: transformed model needs single-joint skin attributes")
+    width, height, uv_scale = material_uv_transform(data, model, material_index)
+    if uvs is not None and not all(uv_scale):
+        raise ValueError(f"{name}: material has a zero texture scale")
+    commands = bytearray(nitro_command(0x40, 0))
+    for vertex in indices:
+        if vertex >= len(positions) or any(vertex >= len(values) for values in (uvs, colors, normals, joints, weights)
+                                               if values is not None):
+            raise ValueError(f"{name}: triangle index exceeds a vertex attribute")
+        point = positions[vertex]
+        if not direct:
+            if any(weights[vertex][axis] != 0 for axis in (1, 2, 3)) or not weights[vertex][0]:
+                raise ValueError(f"{name}: blended skin weights are unsupported")
+            point = inverse_joint_position(doc, joints[vertex][0], point)
+        coords = [round(value * 4096 / scale) for value in point]
+        if any(not -32768 <= value <= 32767 for value in coords):
+            raise ValueError(f"{name}: edited vertex exceeds Nitro VTX_16 range")
+        if colors is not None:
+            commands.extend(nitro_command(0x20, gltf_color(doc, attributes["COLOR_0"], colors, vertex, name)))
+        if normals is not None:
+            normal = normals[vertex]
+            packed = sum((max(-512, min(511, round(value * 512))) & 0x3ff) << (axis * 10)
+                         for axis, value in enumerate(normal))
+            commands.extend(nitro_command(0x21, packed))
+        if uvs is not None:
+            u, v = uvs[vertex]
+            raw = (round(u * width * 16 / uv_scale[0]), round(v * height * 16 / uv_scale[1]))
+            if any(not -32768 <= value <= 32767 for value in raw):
+                raise ValueError(f"{name}: edited UV exceeds Nitro coordinate range")
+            commands.extend(nitro_command(0x22, (raw[0] & 0xffff) | ((raw[1] & 0xffff) << 16)))
+        commands.extend(nitro_command(0x23, (coords[0] & 0xffff) | ((coords[1] & 0xffff) << 16),
+                                      coords[2] & 0xffff))
+    commands.extend(nitro_command(0x41))
+    return bytes(commands)
+
+
+def rebuild_topology(chunk, doc, primitives, binary, mapping, name):
+    data = bytearray(chunk)
+    model_start = u32(data, 4)
+    nitro_length = u32(data, model_start + 8)
+    block = model_start + u32(data, model_start + 16)
+    model = block + dictionary_offsets(data, block + 8)[0]
+    shape_dict = model + u32(data, model + 12)
+    shapes = [shape_dict + offset for offset in dictionary_offsets(data, shape_dict)]
+    calls = draw_calls(data, model)
+    if len(calls) != len(primitives) or sorted(shape for shape, _ in calls) != list(range(len(shapes))):
+        raise ValueError(f"{name}: GLB must keep the original material draw calls")
+    scale = u32(data, model + 28) / 4096
+    appended = bytearray()
+    triangle_count = 0
+    for (shape_index, material_index), primitive in zip(calls, primitives):
+        triangle_count += doc["accessors"][primitive["indices"]]["count"] // 3
+        display_list = topology_display_list(data, model, material_index, doc, primitive, binary,
+                                             scale, mapping["direct"], name)
+        shape = shapes[shape_index]
+        struct.pack_into("<II", data, shape + 8,
+                         model_start + nitro_length + len(appended) - shape, len(display_list))
+        appended.extend(display_list)
+    delta = len(appended)
+    if triangle_count > 65535 or triangle_count * 3 > 65535:
+        raise ValueError(f"{name}: edited mesh exceeds Nitro model polygon or vertex count")
+    struct.pack_into("<4H", data, model + 36, triangle_count * 3,
+                     triangle_count, triangle_count, 0)
+    struct.pack_into("<I", data, model + 0, u32(data, model) + delta)
+    struct.pack_into("<I", data, block + 4, u32(data, block + 4) + delta)
+    struct.pack_into("<I", data, model_start + 8, nitro_length + delta)
+    for field in {b"WB": (8, 12, 16), b"GC": (8, 12, 16, 20),
+                  b"NG": (8, 12), b"RD": (8, 12, 16)}[bytes(data[:2])]:
+        struct.pack_into("<I", data, field, u32(data, field) + delta)
+    insertion = model_start + nitro_length
+    result = bytearray(data[:insertion] + appended + data[insertion:])
+    nitro = model_bytes(result)
+    shapes = [shape_dict - model_start + offset
+              for offset in dictionary_offsets(nitro, shape_dict - model_start)]
+    # The model box is used for visibility checks, so expand it with the edited mesh.
+    local = decoded_positions(nitro, shapes, draw_order(nitro, model - model_start), scale)
+    box_scale = u32(result, model + 56) / 4096
+    while True:
+        origins = [math.floor(min(point[axis] for point in local) * 4096 / box_scale)
+                   for axis in range(3)]
+        extents = [math.ceil(max(point[axis] for point in local) * 4096 / box_scale) - origins[axis]
+                   for axis in range(3)]
+        if all(-32768 <= value <= 32767 for value in (*origins, *extents)):
+            break
+        box_scale *= 2
+        if box_scale * 4096 >= 1 << 32:
+            raise ValueError(f"{name}: edited model exceeds Nitro bounding-box range")
+    struct.pack_into("<6hII", result, model + 44, *origins, *extents,
+                     round(box_scale * 4096), round(4096 / box_scale))
+    return bytes(result)
+
+
 def export(apicula, output):
     archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
     textures = read_narc((ROOT / "extract/b2_us/files/a/0/1/4").read_bytes())
@@ -797,11 +926,26 @@ def main():
     archive = read_narc(source.read_bytes())
     for entry in models(Path(directory)):
         chunk_id, name = entry["chunk"], entry["name"]
-        positions, direct, (doc, primitives, binary) = positions_from_gltf(
-            Path(directory) / f"{chunk_id:04d}", name, model_bytes(archive[chunk_id]))
-        if direct:
-            archive[chunk_id] = patch_model(archive[chunk_id], positions, name)
-        archive[chunk_id] = patch_uvs(archive[chunk_id], doc, primitives, binary, name)
+        model_dir = Path(directory) / f"{chunk_id:04d}"
+        original = archive[chunk_id]
+        mapping = json.loads((model_dir / "nitro.json").read_text())
+        if mapping["nitro_sha256"] != hashlib.sha256(model_bytes(original)).hexdigest():
+            raise ValueError(f"{name}: Nitro model differs from the GLB mapping")
+        doc, primitives, binary = mesh_primitives(model_dir, name)
+        fallback_errors = ("triangle count changed", "triangle topology or shared vertex changed",
+                           "one Nitro vertex has multiple edited UVs", "vertices sharing a Nitro UV command",
+                           "this shape has no Nitro texture commands", "this UV has no editable Nitro texture command",
+                           "UV before the first Nitro texture command", "changes an axis omitted by Nitro opcode",
+                           "vertex coordinate is not representable", "vertex coordinate exceeds Nitro command range")
+        try:
+            positions, direct, _ = positions_from_gltf(model_dir, name, model_bytes(original))
+            edited = patch_model(original, positions, name) if direct else original
+            edited = patch_uvs(edited, doc, primitives, binary, name)
+        except ValueError as error:
+            if not any(reason in str(error) for reason in fallback_errors):
+                raise
+            edited = rebuild_topology(original, doc, primitives, binary, mapping, name)
+        archive[chunk_id] = edited
         archive[chunk_id] = patch_materials(archive[chunk_id], doc, primitives, name)
         archive[chunk_id] = patch_terrains(archive[chunk_id], Path(directory) / f"{chunk_id:04d}")
         archive[chunk_id] = patch_props(archive[chunk_id], doc)

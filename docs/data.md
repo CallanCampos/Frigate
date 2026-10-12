@@ -589,16 +589,16 @@ can be repeated with
 `tools/data/map_model_data.py extract APICULA OUTPUT_DIR`, using an installed
 [Apicula](https://github.com/scurest/apicula) executable; the build itself needs only Python.
 
-The current converter supports position edits for all models within the existing command encoding and triangle
-correspondence. UV edits use Nitro's 1/16-texel coordinate precision and each material's texture dimensions and
-transform. Vertices that share one Nitro texture-coordinate command must keep the same UV; a shape without such a
-command cannot gain UVs through this converter.
+The packer keeps original Nitro draw commands when Blender edits fit their encoding. When face count, vertex sharing
+or coordinate-command limits change, it re-encodes the GLB triangles as Nitro GPU commands, preserving each model's
+existing draw calls and material slots. This also permits UVs on a shape that originally had none. New vertices must
+fit Nitro's 16-bit fixed-point position and UV ranges. Models with scene transforms use their GLB joint assignments
+to recover local vertex positions; blended skin weights are unsupported by this map model format.
+UV edits use Nitro's 1/16-texel coordinate precision and each material's texture dimensions and transform.
 GLB material base color, opacity, emission and double-sided settings also pack into Nitro. Color and opacity are
 quantized to the DS's five-bit channels. Texture bindings and other Nitro material settings still use the original
 resource data.
-Some Nitro commands reuse a previous vertex axis or encode a small relative difference; edits outside those ranges
-fail with an error. Mesh topology still comes from the extracted ROM and needs its own packing support before map
-graphics are fully editable. Every map model contains only an
+Adding material slots or draw calls is not yet supported. Every map model contains only an
 `MDL0` block; its textures come from the shared texture archive.
 
 ## Map matrices, areas and lights
