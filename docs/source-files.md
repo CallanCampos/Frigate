@@ -864,7 +864,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_driftveil.c` | `0x021eec80`–`0x021efc70` | 30 | partial | descriptive |
+| `gym_driftveil.c` | `0x021eec80`–`0x021efc70` | 30 | complete | descriptive |
 
 ### Overlay 97
 

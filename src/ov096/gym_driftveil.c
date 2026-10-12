@@ -54,7 +54,8 @@
 
 // A distance in tiles, and half a tile, in fx32
 #define TILE(n) ((n) << 16)
-#define HALF_TILE (1 << 15)
+// Unsigned, which keeps MWCC from folding it into the tile offset it is added to
+#define HALF_TILE (1u << 15)
 
 // How high the elevators rise: 5 tiles
 #define ELEVATOR_HEIGHT TILE(5)
@@ -744,10 +745,10 @@ static void DriftveilGym_ShowElevatorRider(DriftveilGymElevatorEvent *ev, BOOL a
     BOOL hidden;
 
     NNS_G3dMdlSetMdlFogEnableFlag(resMdl, 0, atFloor);
-    hidden = TRUE;
     NNS_G3dMdlSetMdlFogEnableFlag(resMdl, 1, atFloor);
     NNS_G3dMdlSetMdlFogEnableFlag(resMdl, 2, atFloor);
     NNS_G3dMdlSetMdlFogEnableFlag(resMdl, 3, atFloor);
+    hidden = TRUE;
     matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, model);
     FieldPlayer_GetWPos(ev->player, &pos);
     matrix->translation.x = pos.x;
