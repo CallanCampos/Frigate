@@ -486,6 +486,8 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A trailing `mov r1, #0` after a 32-bit result is a function returning `u64`: DWC's `DivWords` (`crypt.c`) returns
+  `(u32)(...)` from a `u64` function.
 - On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
   load's offset from the shared base, where the same address in a named local, or the element written `a[n + k]`,
   is computed again. `snd_arc_loader.c`'s `LoadSingleWave` reads a wave's file offset and the next one's as
