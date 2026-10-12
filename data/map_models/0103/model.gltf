@@ -203,7 +203,7 @@
   "buffers": [
     {
       "byteLength": 252,
-      "uri": "map_outgrass.bin"
+      "uri": "model.bin"
     }
   ]
 }

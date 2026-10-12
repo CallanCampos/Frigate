@@ -1,0 +1,15 @@
+{
+  "archive": "a/0/0/8",
+  "models": [
+    {
+      "chunk": 103,
+      "name": "map_outgrass",
+      "texture_set": 0
+    },
+    {
+      "chunk": 834,
+      "name": "m_whouse01_00_00",
+      "texture_set": 288
+    }
+  ]
+}
