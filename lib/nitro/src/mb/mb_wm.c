@@ -221,14 +221,12 @@ static void MBWm_ParentCallback(void *arg) {
         }
     }
     case MB_WM_API_SET_MP_DATA: {
-        MBCommWork *work = gMBCommWork;
-
-        if (work->multiChild != 0) {
+        if (MB_PARENT_WORK->multiChild != 0) {
             u32 i;
             u32 children = 0;
 
             for (i = 0; i < 15; i++) {
-                if (work->childState[i] != 0) {
+                if (MB_PARENT_WORK->childState[i] != 0) {
                     children++;
                     if (children >= 2) {
                         break;
@@ -646,7 +644,7 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     sWmWork = wmWork;
     gMBCommWork = commWork;
     MI_CpuClear32(wmWork, sizeof(MBWmWork));
-    MI_CpuClear16(commWork, offsetof(MBCommWork, childUser));
+    MI_CpuClear16(commWork, sizeof(MBCommWork));
     name = wmWork->userName;
     for (i = 0; i < user->nameLength; i++) {
         *name++ = user->name[i];
@@ -661,9 +659,9 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
         sWmConfig.name++;
         *name++ = c;
     }
-    sys_memcpy(user, &commWork->parentUser, sizeof(MBUserInfo));
+    sys_memcpy(user, &commWork->user, sizeof(MBUserInfo));
     if (user->nameLength < MB_USER_NAME_LENGTH) {
-        commWork->parentUser.name[user->nameLength] = 0;
+        commWork->user.name[user->nameLength] = 0;
     }
     wmWork->parentSendSize = 0x100;
     wmWork->childSendSize = 8;
@@ -753,20 +751,20 @@ static int MBWm_Start(int channel) {
     int i;
 
     sWmWork->parentParam.channel = channel;
-    sWmBuf = (void *)(((u32)gMBCommWork + sizeof(MBCommWork) + 0x1f) & ~0x1f);
-    callback = gMBCommWork->callback;
-    MI_CpuClear16(&gMBCommWork->childUser, sizeof(MBCommWork) - offsetof(MBCommWork, childUser));
+    sWmBuf = (void *)(((u32)gMBCommWork + sizeof(MBCommParentWork) + 0x1f) & ~0x1f);
+    callback = MB_PARENT_WORK->callback;
+    MI_CpuClear16(&MB_PARENT_WORK->childUser, sizeof(MBCommParentWork) - sizeof(MBCommWork));
     MB_CommSetParentStateCallback(callback);
     gMBCommWork->blockSize = sWmWork->parentSendSize - 6;
     MBFrame_SetPayloadSize(sWmWork->childSendSize);
-    MBFrame_SetBuffer(&gMBCommWork->fragmentBuf);
+    MBFrame_SetBuffer(&MB_PARENT_WORK->fragmentBuf);
     for (i = 0; i < 15; i++) {
-        gMBCommWork->childState[i] = 0;
-        gMBCommWork->childFile[i] = -1;
+        MB_PARENT_WORK->childState[i] = 0;
+        MB_PARENT_WORK->childFile[i] = -1;
     }
-    gMBCommWork->fileCount = 0;
-    MI_CpuClear16(gMBCommWork->files, sizeof(gMBCommWork->files));
-    sys_memset(gMBCommWork->response, 0, sizeof(gMBCommWork->response));
+    MB_PARENT_WORK->fileCount = 0;
+    MI_CpuClear16(MB_PARENT_WORK->files, sizeof(MB_PARENT_WORK->files));
+    sys_memset(MB_PARENT_WORK->response, 0, sizeof(MB_PARENT_WORK->response));
     sWmWork->mode = 1;
     sWmWork->commCallback = MBComm_OnWmEvent;
     sWmWork->wmCallback = MBWm_ParentCallback;
@@ -777,7 +775,7 @@ static int MBWm_Start(int channel) {
     MBGameInfo_Init();
     result = MBWm_StartInit();
     CPU_SetIRQMask(irq);
-    gMBCommWork->multiChild = func_0207ca48(15, 1);
+    MB_PARENT_WORK->multiChild = func_0207ca48(15, 1);
     return result;
 }
 
@@ -834,24 +832,17 @@ void MB_End(void) {
 void MB_DisconnectChild(u16 aid) {
     func_02081774(MBWm_ParentCallback, aid);
     if (aid != 0 && aid < 16) {
-        gMBCommWork->childUnk148a[aid - 1] = 0;
-        sys_memset(&gMBCommWork->childRequestGgid[aid - 1], 0, sizeof(u32));
-        sys_memset(&gMBCommWork->childUser[aid - 1], 0, sizeof(MBUserInfo));
+        MB_PARENT_WORK->childUnk148a[aid - 1] = 0;
+        sys_memset(&MB_PARENT_WORK->childRequestGgid[aid - 1], 0, sizeof(u32));
+        sys_memset(&MB_PARENT_WORK->childUser[aid - 1], 0, sizeof(MBUserInfo));
         MBFrame_ClearChild(aid);
-        gMBCommWork->response[aid - 1] = 0;
-        if (gMBCommWork->childFile[aid - 1] != -1) {
-            u8 n = (u8)gMBCommWork->childFile[aid - 1];
-
-            gMBCommWork->files[n].memberMask &= ~(1 << aid);
-            gMBCommWork->files[n].changedMask |= 1 << aid;
-            gMBCommWork->childFile[aid - 1] = -1;
-            gMBCommWork->files[n].downloadMask &= ~(1 << aid);
+        MB_PARENT_WORK->response[aid - 1] = 0;
+        MBComm_LeaveFile(aid);
+        if (MB_PARENT_WORK->childBitmap & (1 << aid)) {
+            MB_PARENT_WORK->childCount--;
+            MB_PARENT_WORK->childBitmap &= ~(1 << aid);
         }
-        if (gMBCommWork->childBitmap & (1 << aid)) {
-            gMBCommWork->childCount--;
-            gMBCommWork->childBitmap &= ~(1 << aid);
-        }
-        gMBCommWork->childState[aid - 1] = 0;
+        MB_PARENT_WORK->childState[aid - 1] = 0;
     }
 }
 

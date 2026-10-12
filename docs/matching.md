@@ -8,6 +8,9 @@ tools that show the differences.
 
 ## Registers
 
+- A value passed to a `static inline` stays in a register across the inline's stores, where a field read again at
+  each use (`cb->aid`) is reloaded after each store: multiboot's `MBComm_OnWmEvent` (`mb_comm.c`) matches with its
+  disconnect step as an inline taking the aid.
 - A loop that walks on from a parameter reuses the parameter as its cursor, with the start kept in a local
   (`int start = pos;`), as `b_plist_main.c`'s `BPlistMain_GetNextPos` does; a separate counter swaps the registers.
 - A `const` pointer parameter lets MWCC keep a value loaded through it across a store through another pointer; the
@@ -486,6 +489,10 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
+  `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
+  is the parent's and child's shared part, which the parent's code casts to its extension (`MB_PARENT_WORK`), and
+  `MB_DisconnectChild` (`mb_wm.c`) only matches through it.
 - A narrowing missing after an `if`/`else` that assigns a `u16` in both branches comes from a conditional expression:
   `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `MBWm_NextChannel`
   (`mb_wm.c`) needed.

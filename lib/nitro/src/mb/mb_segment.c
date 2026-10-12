@@ -271,16 +271,16 @@ BOOL MB_RegisterFile(const MBGameRegistry *gameReg, const void *buf) {
         CPU_SetIRQMask(irq);
         return FALSE;
     }
-    if (gMBCommWork->fileCount + 1 > MB_FILE_MAX) {
+    if (MB_PARENT_WORK->fileCount + 1 > MB_FILE_MAX) {
         CPU_SetIRQMask(irq);
         return FALSE;
     }
     for (i = 0; i < MB_FILE_MAX; i++) {
-        if (gMBCommWork->files[i].registry == gameReg) {
+        if (MB_PARENT_WORK->files[i].registry == gameReg) {
             CPU_SetIRQMask(irq);
             return FALSE;
         }
-        if (!gMBCommWork->files[i].valid) {
+        if (!MB_PARENT_WORK->files[i].valid) {
             slot = i;
             break;
         }
@@ -290,30 +290,30 @@ BOOL MB_RegisterFile(const MBGameRegistry *gameReg, const void *buf) {
         return FALSE;
     }
 
-    gMBCommWork->files[slot].registry = gameReg;
-    file = &gMBCommWork->files[slot];
+    MB_PARENT_WORK->files[slot].registry = gameReg;
+    file = &MB_PARENT_WORK->files[slot];
     MBFile_InitSegments(file, buf);
     sys_memcpy(gameReg->userParam, file->userParam, sizeof(file->userParam));
-    if (!MBFile_BuildLayout(&gMBCommWork->files[slot].layout, file)) {
+    if (!MBFile_BuildLayout(&MB_PARENT_WORK->files[slot].layout, file)) {
         CPU_SetIRQMask(irq);
         return FALSE;
     }
-    MBGameInfo_Build(&gMBCommWork->files[slot].record, gameReg, &gMBCommWork->parentUser);
-    gMBCommWork->files[slot].record.slot = slot;
-    MBGameInfo_Link(&gMBCommWork->files[slot].record);
-    gMBCommWork->files[slot].record.gameNo = sRegisteredCount++;
-    gMBCommWork->files[slot].memberMask = 1;
-    gMBCommWork->files[slot].buf = buf;
-    gMBCommWork->files[slot].cache = &((MBSegmentImage *)buf)->cache;
-    gMBCommWork->files[slot].segmentRomOffsets = ((const MBSegmentImage *)buf)->romOffsets.segment;
-    if (gMBCommWork->files[slot].cache->entries[3].state != 0) {
+    MBGameInfo_Build(&MB_PARENT_WORK->files[slot].record, gameReg, &gMBCommWork->user);
+    MB_PARENT_WORK->files[slot].record.slot = slot;
+    MBGameInfo_Link(&MB_PARENT_WORK->files[slot].record);
+    MB_PARENT_WORK->files[slot].record.gameNo = sRegisteredCount++;
+    MB_PARENT_WORK->files[slot].memberMask = 1;
+    MB_PARENT_WORK->files[slot].buf = buf;
+    MB_PARENT_WORK->files[slot].cache = &((MBSegmentImage *)buf)->cache;
+    MB_PARENT_WORK->files[slot].segmentRomOffsets = ((const MBSegmentImage *)buf)->romOffsets.segment;
+    if (MB_PARENT_WORK->files[slot].cache->entries[3].state != 0) {
         if (!MBTask_IsThreadStarted()) {
-            MBTask_Clear(&gMBCommWork->task);
-            MBTask_StartThread(&gMBCommWork->thread, 0x800);
+            MBTask_Clear(&MB_PARENT_WORK->task);
+            MBTask_StartThread(&MB_PARENT_WORK->thread, 0x800);
         }
     }
-    gMBCommWork->files[slot].valid = 1;
-    gMBCommWork->fileCount++;
+    MB_PARENT_WORK->files[slot].valid = 1;
+    MB_PARENT_WORK->fileCount++;
     CPU_SetIRQMask(irq);
     return TRUE;
 }

@@ -24,7 +24,7 @@ static void MBComm_NotifyError(u16 aid, u16 errcode);
 void MB_CommSetParentStateCallback(MBCommPStateCallback callback) {
     u32 irq = CPU_IRQDisable();
 
-    gMBCommWork->callback = callback;
+    MB_PARENT_WORK->callback = callback;
     CPU_SetIRQMask(irq);
 }
 
@@ -32,9 +32,9 @@ const MBUserInfo *MB_CommGetChildUser(u16 childAid) {
     u32 irq = CPU_IRQDisable();
 
     if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)) {
-        sys_memcpy(&gMBCommWork->childUser[childAid - 1], &gMBCommWork->childUserCopy, sizeof(MBUserInfo));
+        sys_memcpy(&MB_PARENT_WORK->childUser[childAid - 1], &MB_PARENT_WORK->childUserCopy, sizeof(MBUserInfo));
         CPU_SetIRQMask(irq);
-        return &gMBCommWork->childUserCopy;
+        return &MB_PARENT_WORK->childUserCopy;
     }
     CPU_SetIRQMask(irq);
     return NULL;
@@ -42,7 +42,7 @@ const MBUserInfo *MB_CommGetChildUser(u16 childAid) {
 
 BOOL MB_CommIsBootable(u16 childAid) {
     if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)
-        && gMBCommWork->childState[childAid - 1] == MB_COMM_PSTATE_SEND_COMPLETE) {
+        && MB_PARENT_WORK->childState[childAid - 1] == MB_COMM_PSTATE_SEND_COMPLETE) {
         return TRUE;
     }
     return FALSE;
@@ -76,8 +76,8 @@ BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
     }
 
     if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)
-        && state == gMBCommWork->childState[childAid - 1]) {
-        gMBCommWork->response[childAid - 1] = response;
+        && state == MB_PARENT_WORK->childState[childAid - 1]) {
+        MB_PARENT_WORK->response[childAid - 1] = response;
         CPU_SetIRQMask(irq);
         return TRUE;
     }
@@ -88,13 +88,13 @@ BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
 // Records a child's state and tells the callback
 static void MBComm_SetState(u16 aid, u32 state, void *arg) {
     if (MBComm_IsValidAid(aid)) {
-        gMBCommWork->childState[aid - 1] = state;
+        MB_PARENT_WORK->childState[aid - 1] = state;
     }
     MBComm_NotifyState(aid, state, arg);
 }
 
 static void MBComm_NotifyState(u16 aid, u32 state, void *arg) {
-    MBCommWork *work = gMBCommWork;
+    MBCommParentWork *work = MB_PARENT_WORK;
 
     if (work->callback != NULL) {
         work->callback(aid, state, arg);
@@ -117,41 +117,31 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
     }
     case MB_WM_EVENT_DISCONNECTED: {
         WMStartParentCallback *cb = arg;
-        MBCommWork *work;
-        u16 aid = cb->aid;
 
-        if (aid == 0 || aid >= 16) {
+        if (cb->aid == 0 || cb->aid >= 16) {
             break;
         }
-        gMBCommWork->childUnk148a[aid - 1] = 0;
-        sys_memset(&gMBCommWork->childRequestGgid[aid - 1], 0, sizeof(u32));
-        sys_memset(&gMBCommWork->childUser[aid - 1], 0, sizeof(MBUserInfo));
-        MBFrame_ClearChild(aid);
-        gMBCommWork->response[aid - 1] = 0;
-        work = gMBCommWork;
-        if (work->childFile[aid - 1] != -1) {
-            MBCommFile *file = &work->files[(u8)work->childFile[aid - 1]];
-            u16 bit = 1 << aid;
-
-            file->memberMask &= (u16)~bit;
-            file->changedMask |= bit;
-            work->childFile[aid - 1] = -1;
-            file->downloadMask &= (u16)~bit;
+        MB_PARENT_WORK->childUnk148a[cb->aid - 1] = 0;
+        sys_memset(&MB_PARENT_WORK->childRequestGgid[cb->aid - 1], 0, sizeof(u32));
+        sys_memset(&MB_PARENT_WORK->childUser[cb->aid - 1], 0, sizeof(MBUserInfo));
+        MBFrame_ClearChild(cb->aid);
+        MB_PARENT_WORK->response[cb->aid - 1] = 0;
+        MBComm_LeaveFile(cb->aid);
+        if (MB_PARENT_WORK->childBitmap & (1 << cb->aid)) {
+            MB_PARENT_WORK->childCount--;
+            MB_PARENT_WORK->childBitmap &= ~(1 << cb->aid);
         }
-        work = gMBCommWork;
-        if (work->childBitmap & (1 << aid)) {
-            work->childCount--;
-            work->childBitmap &= (u16)~(1 << aid);
+        if (MB_PARENT_WORK->childState[cb->aid - 1] == MB_COMM_PSTATE_BOOT_REQUEST) {
+            MBComm_SetState(cb->aid, MB_COMM_PSTATE_BOOT_STARTABLE, NULL);
         }
-        if (gMBCommWork->childState[aid - 1] == MB_COMM_PSTATE_BOOT_REQUEST) {
-            MBComm_SetState(aid, MB_COMM_PSTATE_BOOT_STARTABLE, NULL);
-        }
-        MBComm_SetState(aid, MB_COMM_PSTATE_DISCONNECTED, arg);
-        gMBCommWork->childState[aid - 1] = MB_COMM_PSTATE_NONE;
+        MBComm_SetState(cb->aid, MB_COMM_PSTATE_DISCONNECTED, arg);
+        MB_PARENT_WORK->childState[cb->aid - 1] = MB_COMM_PSTATE_NONE;
         break;
     }
     case MB_WM_EVENT_MP_RECEIVED:
         MBComm_ReadMPData(arg);
+        break;
+    case MB_WM_EVENT_END:
         break;
     case MB_WM_EVENT_MP_READY:
         MBComm_SendNextFrame();
@@ -160,11 +150,10 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
         u8 i;
 
         for (i = 0; i < 16; i++) {
-            MBCommFile *file = &gMBCommWork->files[i];
-
-            if (file->valid && file->changedMask != 0) {
-                MBGameInfo_Update(&file->record, gMBCommWork->childUser, file->memberMask, file->changedMask);
-                file->changedMask = 0;
+            if (MB_PARENT_WORK->files[i].valid && MB_PARENT_WORK->files[i].changedMask != 0) {
+                MBGameInfo_Update(&MB_PARENT_WORK->files[i].record, MB_PARENT_WORK->childUser,
+                                  MB_PARENT_WORK->files[i].memberMask, MB_PARENT_WORK->files[i].changedMask);
+                MB_PARENT_WORK->files[i].changedMask = 0;
             }
         }
         MBGameInfo_Send(MBWm_GetGgid(), MBWm_GetTgid(), MBWm_GetAttribute());
@@ -182,6 +171,8 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
         case 9:
             MBComm_NotifyError(0, MB_ERRCODE_FATAL);
             break;
+        // The table of the switch runs to 15, so a case of that value goes with the default
+        case 15:
         default:
             MBComm_NotifyError(0, MB_ERRCODE_WM_FAILURE);
             break;
@@ -205,6 +196,10 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
         case 29:
             MBComm_NotifyError(0, MB_ERRCODE_FATAL);
             break;
+        // The original's switch is one table from 0 to 29, which takes at least two more cases that go with the
+        // default; which ones can't be told
+        case MB_WM_API_RESET:
+        case MB_WM_API_END:
         default:
             MBComm_NotifyError(0, MB_ERRCODE_WM_FAILURE);
             break;
@@ -214,10 +209,10 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
     }
 
     if (event == MB_WM_EVENT_END) {
-        MBCommWork *work = gMBCommWork;
+        MBCommParentWork *work = MB_PARENT_WORK;
         MBCommPStateCallback callback = work->callback;
 
-        MI_CpuClearFast(work, sizeof(MBCommWork));
+        MI_CpuClearFast(work, sizeof(MBCommParentWork));
         gMBCommWork = NULL;
         if (callback != NULL) {
             callback(0, MB_COMM_PSTATE_END, NULL);
@@ -227,16 +222,15 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
 
 // Takes in a frame that a child sent
 static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
-    MBCommWork *work = gMBCommWork;
     MBChildFrame frame;
-    const u8 *request;
+    const MBChildRequest *request;
     u32 state;
 
     if (aid == 0 || aid > 15) {
         return;
     }
     request = MBFrame_Decode(recv->data, &frame, aid);
-    state = work->childState[aid - 1];
+    state = MB_PARENT_WORK->childState[aid - 1];
 
     switch (frame.type) {
     case MB_FRAME_REQUEST:
@@ -244,54 +238,53 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
             return;
         }
         if (state == MB_COMM_PSTATE_CONNECTED) {
-            u8 buf[0x1d];
-            MBUserInfo *user;
+            MBChildRequest req;
 
-            sys_memcpy(request, buf, sizeof(buf));
-            gMBCommWork->childRequestGgid[aid - 1] = *(u32 *)buf;
-            gMBCommWork->childUnk148a[aid - 1] = *(u16 *)&buf[0x1a];
-            user = (MBUserInfo *)&buf[4];
-            sys_memcpy(user, &gMBCommWork->childUser[aid - 1], sizeof(MBUserInfo));
-            gMBCommWork->childUser[aid - 1].playerNo = aid;
-            MBComm_SetState(aid, MB_COMM_PSTATE_REQUESTED, user);
+            sys_memcpy(request, &req, MB_CHILD_REQUEST_SIZE);
+            MB_PARENT_WORK->childRequestGgid[aid - 1] = req.ggid;
+            MB_PARENT_WORK->childUnk148a[aid - 1] = req.unk_1a;
+            sys_memcpy(&req.user, &MB_PARENT_WORK->childUser[aid - 1], sizeof(MBUserInfo));
+            MB_PARENT_WORK->childUser[aid - 1].playerNo = aid;
+            MBComm_SetState(aid, MB_COMM_PSTATE_REQUESTED, &req.user);
         }
         if (state == MB_COMM_PSTATE_REQUESTED) {
-            u8 file = request[0x1c];
-            u8 count = 0;
             u8 i;
+            u8 count = 0;
+            u8 file = request->fileNo;
 
-            if (file < 16 && gMBCommWork->files[file].valid
-                && gMBCommWork->childRequestGgid[aid - 1] == gMBCommWork->files[file].registry->ggid) {
+            if (file >= 16 || !MB_PARENT_WORK->files[file].valid
+                || MB_PARENT_WORK->childRequestGgid[aid - 1] != MB_PARENT_WORK->files[file].registry->ggid) {
+                MB_PARENT_WORK->response[aid - 1] = MB_COMM_RESPONSE_KICK;
+            } else {
                 for (i = 0; i < 16; i++) {
-                    if (gMBCommWork->files[file].memberMask & (1 << i)) {
+                    if (MB_PARENT_WORK->files[file].memberMask & (1 << i)) {
                         count++;
                     }
                 }
-                if (count >= gMBCommWork->files[file].registry->maxPlayerNum) {
-                    gMBCommWork->response[aid - 1] = 0;
+                if (count >= MB_PARENT_WORK->files[file].registry->maxPlayerNum) {
+                    MB_PARENT_WORK->response[aid - 1] = 0;
                     MBComm_SetState(aid, MB_COMM_PSTATE_MEMBER_FULL, NULL);
                     return;
                 }
-            } else {
-                gMBCommWork->response[aid - 1] = MB_COMM_RESPONSE_KICK;
             }
 
-            if (gMBCommWork->response[aid - 1] == MB_COMM_RESPONSE_ACCEPT) {
-                u16 bit = 1 << aid;
-
-                if (gMBCommWork->childBitmap & bit) {
-                    return;
+            switch (MB_PARENT_WORK->response[aid - 1]) {
+            case MB_COMM_RESPONSE_ACCEPT:
+                if (MB_PARENT_WORK->childBitmap & (1 << aid)) {
+                    break;
                 }
-                gMBCommWork->childCount++;
-                gMBCommWork->childBitmap |= bit;
-                gMBCommWork->childFile[aid - 1] = file;
-                gMBCommWork->files[file].memberMask |= bit;
-                gMBCommWork->files[file].changedMask |= bit;
-                gMBCommWork->response[aid - 1] = 0;
+                MB_PARENT_WORK->childCount++;
+                MB_PARENT_WORK->childBitmap |= 1 << aid;
+                MB_PARENT_WORK->childFile[aid - 1] = file;
+                MB_PARENT_WORK->files[file].memberMask |= 1 << aid;
+                MB_PARENT_WORK->files[file].changedMask |= 1 << aid;
+                MB_PARENT_WORK->response[aid - 1] = 0;
                 MBComm_SetState(aid, MB_COMM_PSTATE_REQ_ACCEPTED, NULL);
-            } else if (gMBCommWork->response[aid - 1] == MB_COMM_RESPONSE_KICK) {
-                gMBCommWork->response[aid - 1] = 0;
+                break;
+            case MB_COMM_RESPONSE_KICK:
+                MB_PARENT_WORK->response[aid - 1] = 0;
                 MBComm_SetState(aid, MB_COMM_PSTATE_KICKED, NULL);
+                break;
             }
         }
         break;
@@ -299,40 +292,43 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
         if (state == MB_COMM_PSTATE_REQ_ACCEPTED) {
             MBComm_SetState(aid, MB_COMM_PSTATE_WAIT_TO_SEND, NULL);
         } else if (state == MB_COMM_PSTATE_WAIT_TO_SEND) {
-            if (work->response[aid - 1] == MB_COMM_RESPONSE_DOWNLOAD) {
-                MBCommFile *file = &work->files[(u8)work->childFile[aid - 1]];
+            if (MB_PARENT_WORK->response[aid - 1] == MB_COMM_RESPONSE_DOWNLOAD) {
+                u8 file = MB_PARENT_WORK->childFile[aid - 1];
 
-                file->downloadMask |= 1 << aid;
-                file->sendCursor = 0;
-                work->response[aid - 1] = 0;
+                MB_PARENT_WORK->files[file].downloadMask |= 1 << aid;
+                MB_PARENT_WORK->files[file].sendCursor = 0;
+                MB_PARENT_WORK->response[aid - 1] = 0;
                 MBComm_SetState(aid, MB_COMM_PSTATE_SEND_PROCEED, NULL);
             }
         }
         break;
     case MB_FRAME_BLOCK_REQUEST:
         if (state == MB_COMM_PSTATE_SEND_PROCEED) {
-            u8 file = work->childFile[aid - 1];
+            u8 file = MB_PARENT_WORK->childFile[aid - 1];
 
             if (file != 0xff) {
-                work->files[file].requestedBlock = MBComm_MaxBlock(work->files[file].requestedBlock, frame.value);
+                MB_PARENT_WORK->files[file].requestedBlock = MBComm_MaxBlock(MB_PARENT_WORK->files[file].requestedBlock, frame.value);
                 sBlockRequestMask |= 1 << file;
             }
         }
         break;
     case MB_FRAME_DOWNLOAD_DONE:
         if (state == MB_COMM_PSTATE_SEND_PROCEED) {
-            u8 file = work->childFile[aid - 1];
+            u8 file = MB_PARENT_WORK->childFile[aid - 1];
 
             if (file != 0xff) {
-                work->files[file].downloadMask &= (u16)~(1 << aid);
+                MB_PARENT_WORK->files[file].downloadMask &= (u16)~(1 << aid);
                 MBComm_SetState(aid, MB_COMM_PSTATE_SEND_COMPLETE, NULL);
             }
         } else if (state == MB_COMM_PSTATE_SEND_COMPLETE) {
-            if (work->response[aid - 1] == MB_COMM_RESPONSE_BOOT) {
-                work->response[aid - 1] = 0;
+            if (MB_PARENT_WORK->response[aid - 1] == MB_COMM_RESPONSE_BOOT) {
+                MB_PARENT_WORK->response[aid - 1] = 0;
                 MBComm_SetState(aid, MB_COMM_PSTATE_BOOT_REQUEST, NULL);
             }
         }
+        break;
+    // A frame type that the parent's side takes and ignores: the switch's table runs to it
+    case 11:
         break;
     }
 }
@@ -343,8 +339,8 @@ static void MBComm_ReadMPData(const WMMpRecvBuf *mp) {
     u16 aid;
 
     for (i = 0; i < 16; i++) {
-        if (gMBCommWork->files[i].valid) {
-            gMBCommWork->files[i].requestedBlock = 0;
+        if (MB_PARENT_WORK->files[i].valid) {
+            MB_PARENT_WORK->files[i].requestedBlock = 0;
         }
     }
     sBlockRequestMask = 0;
@@ -375,10 +371,10 @@ static int MBComm_SendFileInfo(void) {
     u8 *out;
     u16 aid;
     u8 i;
-    MBCommWork *work;
+    MBCommParentWork *work;
 
     sys_memset(count, 0, sizeof(count));
-    work = gMBCommWork;
+    work = MB_PARENT_WORK;
     for (aid = 1; aid <= 15; aid++) {
         if (work->childState[aid - 1] == MB_COMM_PSTATE_REQ_ACCEPTED) {
             count[work->childFile[aid - 1]]++;
@@ -406,9 +402,9 @@ static int MBComm_SendFileInfo(void) {
     }
     frame.type = MB_FRAME_FILE_INFO;
     frame.value = file;
-    out = MBFrame_Encode(&frame, work->sendBuf);
+    out = MBFrame_Encode(&frame, work->common.sendBuf);
     if (out != NULL) {
-        sys_memcpy(&gMBCommWork->files[file], out, 0xe4);
+        sys_memcpy(&MB_PARENT_WORK->files[file], out, 0xe4);
     }
     return MBComm_FlushAndSend(0xea, aidBitmap, gMBCommWork->sendBuf);
 }
@@ -432,14 +428,10 @@ static void MBComm_LoadCacheBlock(MBTask *task) {
             u32 secondEnd = header->twlRegionOffset + header->twlRegionSize;
             u32 offset = entry->offset;
 
-            if (offset < firstEnd) {
-                if (offset + size > firstEnd) {
-                    size = firstEnd - offset;
-                }
-            } else if (offset < secondEnd) {
-                if (offset + size > secondEnd) {
-                    size = secondEnd - offset;
-                }
+            if (offset < firstEnd && offset + size > firstEnd) {
+                size = firstEnd - offset;
+            } else if (offset < secondEnd && offset + size > secondEnd) {
+                size = secondEnd - offset;
             }
         }
     }
@@ -467,35 +459,35 @@ static int MBComm_SendBlock(void) {
     u8 *out;
     u8 i;
 
-    if (gMBCommWork->fileCount == 0) {
+    if (MB_PARENT_WORK->fileCount == 0) {
         return MB_SEND_NOTHING;
     }
     for (i = 0; i < 16; i++) {
-        gMBCommWork->fileCursor = (gMBCommWork->fileCursor + 1) % 16;
-        if (gMBCommWork->files[gMBCommWork->fileCursor].valid
-            && gMBCommWork->files[gMBCommWork->fileCursor].downloadMask != 0) {
+        MB_PARENT_WORK->fileCursor = (MB_PARENT_WORK->fileCursor + 1) % 16;
+        if (MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].valid
+            && MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].downloadMask != 0) {
             break;
         }
     }
     if (i == 16) {
         return MB_SEND_NOTHING;
     }
-    MBComm_AdvanceSendCursor(gMBCommWork->fileCursor);
-    if (!MBFile_LocateBlock(&source, &gMBCommWork->files[gMBCommWork->fileCursor].layout,
-                            gMBCommWork->files[gMBCommWork->fileCursor].sendCursor,
-                            &gMBCommWork->files[gMBCommWork->fileCursor])) {
+    MBComm_AdvanceSendCursor(MB_PARENT_WORK->fileCursor);
+    if (!MBFile_LocateBlock(&source, &MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].layout,
+                            MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].sendCursor,
+                            &MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor])) {
         return MB_SEND_NOTHING;
     }
     frame.type = MB_FRAME_BLOCK;
-    frame.value = gMBCommWork->fileCursor;
-    frame.value2 = gMBCommWork->files[gMBCommWork->fileCursor].sendCursor;
+    frame.value = MB_PARENT_WORK->fileCursor;
+    frame.value2 = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].sendCursor;
     out = MBFrame_Encode(&frame, gMBCommWork->sendBuf);
     offsetInSegment = source.bufAddr
-                      - gMBCommWork->files[gMBCommWork->fileCursor].layout.segOffset[source.segment];
-    tableOffset = gMBCommWork->files[gMBCommWork->fileCursor].segmentRomOffsets[source.segment];
-    cache = gMBCommWork->files[gMBCommWork->fileCursor].cache;
+                      - MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].layout.segOffset[source.segment];
+    tableOffset = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].segmentRomOffsets[source.segment];
+    cache = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].cache;
     if (!MBCache_Read(cache, offsetInSegment + tableOffset, out, source.size)) {
-        task = &gMBCommWork->task;
+        task = &MB_PARENT_WORK->task;
         if (!MBTask_IsBusy(task)) {
             if (cache->missCounter != 0) {
                 cache->missCounter--;
@@ -524,7 +516,7 @@ static int MBComm_SendBlock(void) {
         }
         return MB_SEND_NOTHING;
     }
-    return MBComm_FlushAndSend(source.size + 6, gMBCommWork->files[gMBCommWork->fileCursor].downloadMask,
+    return MBComm_FlushAndSend(source.size + 6, MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].downloadMask,
                                gMBCommWork->sendBuf);
 }
 
@@ -536,7 +528,7 @@ static void MBComm_SendNextFrame(void) {
 
     sys_memset16(0, want, sizeof(want));
     for (aid = 1; aid <= 15; aid++) {
-        switch (gMBCommWork->childState[aid - 1]) {
+        switch (MB_PARENT_WORK->childState[aid - 1]) {
         case MB_COMM_PSTATE_CONNECTED:
             want[0] |= 1 << aid;
             break;
@@ -575,19 +567,17 @@ static void MBComm_SendNextFrame(void) {
 
 // Moves the block that a file sends next on, or back to the one that a child asked for
 static void MBComm_AdvanceSendCursor(u32 file) {
-    MBCommFile *entry;
-
     if ((sBlockRequestMask & (1 << file)) == 0) {
         return;
     }
-    entry = &gMBCommWork->files[file];
-    if (entry->valid == 0 || entry->downloadMask == 0) {
+    if (MB_PARENT_WORK->files[file].valid == 0 || MB_PARENT_WORK->files[file].downloadMask == 0) {
         return;
     }
-    if (entry->requestedBlock <= entry->sendCursor && entry->sendCursor <= entry->requestedBlock + 2) {
-        entry->sendCursor++;
+    if (MB_PARENT_WORK->files[file].requestedBlock <= MB_PARENT_WORK->files[file].sendCursor
+        && MB_PARENT_WORK->files[file].sendCursor <= MB_PARENT_WORK->files[file].requestedBlock + 2) {
+        MB_PARENT_WORK->files[file].sendCursor++;
     } else {
-        entry->sendCursor = entry->requestedBlock;
+        MB_PARENT_WORK->files[file].sendCursor = MB_PARENT_WORK->files[file].requestedBlock;
     }
 }
 
