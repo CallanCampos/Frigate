@@ -1,0 +1,197 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A town map place",
+    "description": "One place read by the town map, Pokédex habitat map and beacon details (TownMapData_GetParam). data/town_map/order.json gives its position in a/0/8/5; tools/data/town_map_data.py packs it.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "zone",
+        "type",
+        "radius",
+        "position",
+        "cursor",
+        "hit",
+        "fly",
+        "unk13",
+        "unk14",
+        "arrival_flag",
+        "shown_by",
+        "description",
+        "landmarks",
+        "area"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "This schema, for editors"
+        },
+        "zone": {
+            "type": "string",
+            "x-constant": "ZONE_",
+            "description": "The zone the place stands for, which TownMapData_GetPlaceByZone finds it by"
+        },
+        "type": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "The kind of place, which picks its marker: 0 for the towns and cities, 1 the routes, 2 caves, forests and other landmarks, 3 the PWT, Pokéstar Studios, Join Avenue and Victory Road, 4 N's Castle, the Plasma Frigate and the Abyssal Ruins, 5 the Unity Tower"
+        },
+        "radius": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "How near the cursor must come to point at it, scaled by the zoom"
+        },
+        "position": {
+            "$ref": "#/$defs/point",
+            "description": "Where its marker is"
+        },
+        "cursor": {
+            "$ref": "#/$defs/point",
+            "description": "Where the cursor points at it"
+        },
+        "hit": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "start",
+                "end",
+                "radius"
+            ],
+            "description": "The capsule that a touch hits it in: a segment and its radius",
+            "properties": {
+                "start": {
+                    "$ref": "#/$defs/point"
+                },
+                "end": {
+                    "$ref": "#/$defs/point"
+                },
+                "radius": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                }
+            }
+        },
+        "fly": {
+            "type": "boolean",
+            "description": "Whether the player can fly there once its arrival flag is set"
+        },
+        "unk13": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "Copied with the zone into the result of choosing it to fly to; 0 for every place"
+        },
+        "unk14": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "Copied with the zone into the result of choosing it to fly to; 0 for every place"
+        },
+        "arrival_flag": {
+            "$ref": "#/$defs/flag",
+            "description": "The event flag set when the player first arrives there, which lets them fly there; null for none"
+        },
+        "shown_by": {
+            "$ref": "#/$defs/flag",
+            "description": "The flag, an event flag or a TOWNMAP_FLAG_*, without which the place isn't on the map; null to show it always"
+        },
+        "description": {
+            "description": "Its description, a message of data/text/system/town_map.txt, or one per version where they differ",
+            "anyOf": [
+                {
+                    "$ref": "#/$defs/message"
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "black2",
+                        "white2"
+                    ],
+                    "properties": {
+                        "black2": {
+                            "$ref": "#/$defs/message"
+                        },
+                        "white2": {
+                            "$ref": "#/$defs/message"
+                        }
+                    }
+                }
+            ]
+        },
+        "landmarks": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+                "$ref": "#/$defs/message"
+            },
+            "description": "The buildings and sights it lists, messages of data/text/system/town_map.txt"
+        },
+        "area": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "animation",
+                "x",
+                "y"
+            ],
+            "description": "Its area on the Pokédex's habitat map: the animation that draws it and where",
+            "properties": {
+                "animation": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                },
+                "x": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767
+                },
+                "y": {
+                    "type": "integer",
+                    "minimum": -32768,
+                    "maximum": 32767
+                }
+            }
+        }
+    },
+    "$defs": {
+        "point": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "x",
+                "y"
+            ],
+            "properties": {
+                "x": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                },
+                "y": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                }
+            }
+        },
+        "flag": {
+            "anyOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "string",
+                    "pattern": "^(EVENT_FLAG_|TOWNMAP_FLAG_)"
+                }
+            ]
+        },
+        "message": {
+            "type": "string",
+            "pattern": "^TownMap_Text_"
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_ROUTE_5",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 118,
+        "y": 91
+    },
+    "cursor": {
+        "x": 118,
+        "y": 91
+    },
+    "hit": {
+        "start": {
+            "x": 118,
+            "y": 87
+        },
+        "end": {
+            "x": 118,
+            "y": 95
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_BusyRoadWherePerformers",
+    "landmarks": [],
+    "area": {
+        "animation": 15,
+        "x": 111,
+        "y": 87
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_STRIATON_CITY",
+    "type": 0,
+    "radius": 12,
+    "position": {
+        "x": 228,
+        "y": 118
+    },
+    "cursor": {
+        "x": 228,
+        "y": 118
+    },
+    "hit": {
+        "start": {
+            "x": 228,
+            "y": 114
+        },
+        "end": {
+            "x": 228,
+            "y": 122
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_STRIATON_CITY",
+    "shown_by": null,
+    "description": "TownMap_Text_EntryStairsBuiltMemory",
+    "landmarks": [ "TownMap_Text_StriatonRestaurant", "TownMap_Text_PokemonCenter_2", "TownMap_Text_TrainersSchool" ],
+    "area": {
+        "animation": 0,
+        "x": 221,
+        "y": 110
+    }
+}

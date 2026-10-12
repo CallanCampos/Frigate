@@ -29,7 +29,7 @@ format and can write them again.
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
-| `a/0/1/3` | `data/areas/areas.json` | Area records | `tools/data/area_data.py` |
+| `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
@@ -537,10 +537,11 @@ A zone's header names its map matrix, `data/map_matrices/<matrix>.json` (`a/0/0/
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
 
-The areas, `data/areas/areas.json`, are the records of `a/0/1/3` (`AreaData`), which name the graphics that zones
-share: their props, textures, animations (null for none), lights and colors, by the numbers of files that aren't built
-from source yet. A zone's header names its area by its number, and an area with seasons has a record per season after
-it. `tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
+Each area is `data/areas/<number>.json`, numbered from `000` in record order. These are the records of `a/0/1/3`
+(`AreaData`), which name the graphics that zones share: their props, textures, animations (null for none), lights and
+colors, by the numbers of files that aren't built from source yet. A zone's header names its area by its number, and
+an area with seasons has a record per season after it. `data/areas/area.schema.json` describes one record and
+`tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
 
 An area's lights are a lighting set, `data/lights/field/<n>.json` (`a/0/6/0`, `ARCID_LIGHTS_FIELD`), by its number;
 the battles' are `data/lights/battle/<n>.json` (`a/0/6/1`). A set is the periods of the day, which
@@ -551,10 +552,11 @@ packs them, and both versions have the same sets.
 
 ## Town map
 
-The town map's places, `data/town_map/places.json` (`a/0/8/5`), are the table that the town map, the Pokédex's habitat
-map and a beacon's details read by `TOWNMAP_PARAM_*` (`include/app/townmap/townmap_data.h`): for each place, in the
-order the code numbers them, its zone, kind, where its marker, cursor and touch area are, whether the player can fly
-there, the flags that let them and that show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
+The town map's places, `data/town_map/<zone>.json` (`a/0/8/5`), form the table that the town map, the Pokédex's habitat
+map and a beacon's details read by `TOWNMAP_PARAM_*` (`include/app/townmap/townmap_data.h`). Each file is named after
+its zone constant, and `data/town_map/order.json` gives the order the code numbers them. Each place has its zone,
+kind, where its marker, cursor and touch area are, whether the player can fly there, the flags that let them and that
+show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
 `constants/town_map.h`), its area on the habitat map, and its description and landmarks, messages of
 `data/text/system/town_map.txt` by ID. The versions differ only in a few descriptions, which then give one per version:
 
@@ -563,7 +565,7 @@ there, the flags that let them and that show it (an event flag, or a `TOWNMAP_FL
 "landmarks": ["TownMap_Text_OpelucidCityGym", "TownMap_Text_PokemonCenter_9"],
 ```
 
-`tools/data/town_map_data.py` packs it for each version.
+`data/town_map/place.schema.json` describes each file, and `tools/data/town_map_data.py` packs them for each version.
 
 ## Zone events
 

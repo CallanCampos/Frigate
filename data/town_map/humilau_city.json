@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_HUMILAU_CITY",
+    "type": 0,
+    "radius": 12,
+    "position": {
+        "x": 235,
+        "y": 36
+    },
+    "cursor": {
+        "x": 235,
+        "y": 36
+    },
+    "hit": {
+        "start": {
+            "x": 235,
+            "y": 32
+        },
+        "end": {
+            "x": 235,
+            "y": 40
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_HUMILAU_CITY",
+    "shown_by": null,
+    "description": "TownMap_Text_ResortCityWhereBuildings",
+    "landmarks": [ "TownMap_Text_HumilauCityGym", "TownMap_Text_PokemonCenter_17", "TownMap_Text_MoveTutor_5" ],
+    "area": {
+        "animation": 0,
+        "x": 227,
+        "y": 28
+    }
+}

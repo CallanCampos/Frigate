@@ -1,0 +1,42 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_DRIFTVEIL_CITY",
+    "type": 0,
+    "radius": 12,
+    "position": {
+        "x": 74,
+        "y": 91
+    },
+    "cursor": {
+        "x": 74,
+        "y": 91
+    },
+    "hit": {
+        "start": {
+            "x": 74,
+            "y": 87
+        },
+        "end": {
+            "x": 74,
+            "y": 95
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_DRIFTVEIL_CITY",
+    "shown_by": null,
+    "description": "TownMap_Text_PortTownDistributingMany",
+    "landmarks": [
+        "TownMap_Text_DriftveilCityGym",
+        "TownMap_Text_PokemonCenter_6",
+        "TownMap_Text_DriftveilMarket",
+        "TownMap_Text_MoveTutor_2"
+    ],
+    "area": {
+        "animation": 0,
+        "x": 66,
+        "y": 83
+    }
+}
