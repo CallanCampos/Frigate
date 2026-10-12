@@ -17,17 +17,15 @@ struct EventPassPower {
     GameSystem *gsys;
     GameData *gameData;
     PassPowerParam param;
-    u32 mode;
-    u32 argument;
     u32 unused50;
-    void *paramArgument;
+    u32 paramArgument;
     void *exitArgument;
 };
 
-void func_ov014_0216e660(PassPowerParam *param, void *argument, GameSystem *gsys, GameData *gameData, u16 item);
+void func_ov014_0216e660(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item);
 GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data);
 
-void func_ov014_0216e660(PassPowerParam *param, void *argument, GameSystem *gsys, GameData *gameData, u16 item) {
+void func_ov014_0216e660(PassPowerParam *param, u32 argument, GameSystem *gsys, GameData *gameData, u16 item) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     BagSave *bag;
     HighLinkSave *highLink;
@@ -91,7 +89,7 @@ GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data
         (*state)++;
     case 3:
         func_ov014_0216e660(&work->param, work->paramArgument, gsys, gameData, 0x8004);
-        GSYS_QueueProc(gsys, OVERLAY_PASS_POWER_APP, &data_ov328_0219ed2c, &work->param);
+        GSYS_QueueProc(gsys, OVERLAY_PASS_POWER_APP, &GPOWER_APP_PROC_FUNCTIONS, &work->param);
         (*state)++;
         break;
     case 4:
@@ -106,7 +104,7 @@ GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data
         break;
     case 6: {
         FieldSubscreen *subscreen = Field_GetSubscreen(field);
-        if (work->mode == 3) {
+        if (work->param.result == PASS_POWER_APP_ABORTED) {
             FieldSubscreen_ChangeImm(subscreen, 0);
         }
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, field, 0, 0, 1, 0, 0));
@@ -115,11 +113,11 @@ GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data
     }
     case 7:
         GameEvent_ChainNext(event, EventBGMFadeWait_Create(gsys));
-        switch (work->mode) {
-        case 1:
+        switch (work->param.result) {
+        case PASS_POWER_APP_USE:
             *state = 8;
             break;
-        case 2:
+        case PASS_POWER_APP_ENTRALINK:
             *state = 9;
             break;
         default:
@@ -129,7 +127,7 @@ GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data
         break;
     case 8: {
         u32 args[2];
-        args[0] = work->argument;
+        args[0] = work->param.passPower;
         args[1] = 1;
         GameEvent_Replace(event, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(156), EventPassPowerActivate_Create, args));
         return GAMEEVENT_CONTINUE;
@@ -150,6 +148,6 @@ GameEvent *func_ov014_0216e8ac(GameSystem *gsys, const u32 *args) {
 
     work->gameData = GSYS_GetGameData(gsys);
     work->gsys = gsys;
-    work->paramArgument = (void *)argument;
+    work->paramArgument = argument;
     return event;
 }

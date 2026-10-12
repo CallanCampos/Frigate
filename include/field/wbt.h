@@ -220,7 +220,7 @@ void LoadPWTTournamentTypeText(HeapID heapId, u32 tournament, StrBuf *strbuf);
 // The overworld setup of the tournament's Trainers, which overlay 22 shows
 typedef struct {
     StrBuf *name;
-    u16 unk4;
+    s16 unk4;
     u8 unk6;
     u8 unk7;
     u8 rank;

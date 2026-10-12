@@ -1344,7 +1344,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
     case 0:
         GFL_SndBGMPlay(battle->setup->fieldSituation.bgm, SND_CHANNEL_MASK_ALL);
         battle->players->base.unk44 = 1;
-        QueueGameProc(wk->manager, OVERLAY_ID(305), &data_ov305_0219e990, battle->players);
+        QueueGameProc(wk->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
         running = 2;
         *state = 1;
         break;
@@ -1485,7 +1485,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             }
         }
         if (queue) {
-            QueueGameProc(wk->manager, OVERLAY_ID(305), &data_ov305_0219e990, battle->players);
+            QueueGameProc(wk->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
             running = 2;
             *state = 12;
         }
