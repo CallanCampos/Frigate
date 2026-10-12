@@ -24,6 +24,6 @@ struct Calendar {
 
 Calendar *Calendar_Create(GameData *gameData, HeapID heapId);
 void Calendar_Free(Calendar *calendar);
-u8 Calendar_GetWeather(Calendar *calendar, u16 zoneId);
+u16 Calendar_GetWeather(Calendar *calendar, u16 zoneId);
 
 #endif // POKEBW2_FIELD_CALENDER_H

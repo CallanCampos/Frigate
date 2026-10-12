@@ -10,6 +10,8 @@
 // The size of a box, and a box
 u32 getSizeofPokeBox(void);
 u32 getSizeofBox(void);
+BoxSaveAccessor *BoxSaveAccessor_Create(HeapID heapId, SaveControl *save);
+void BoxSaveAccessor_Free(BoxSaveAccessor *boxes);
 void *BoxSaveAccessor_GetBox(BoxSaveAccessor *boxes, u32 box);
 u32 howManyNormalPokesAreInAllBoxes(BoxSaveAccessor *boxes);
 u32 howManyTotalPokesAreInBoxes(BoxSaveAccessor *boxes);

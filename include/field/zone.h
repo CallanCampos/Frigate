@@ -123,7 +123,21 @@ struct ZoneWarp {
     } pos;
 };
 
+// Where Fly lands in a zone with rails, as LoadZoneFlyPosRailCoords gives it
+typedef struct {
+    s32 componentId;
+    s32 posFront;
+    s32 posSide;
+} ZoneFlyRailPosition;
+
 extern const RespawnZoneInfo RESPAWN_ZONE_INFO[82];
+// Tables of zonedata.c that no code of the ROM reads
+extern const u16 BC_WF_ZONES[9];
+extern const u16 GEAR_STATION_PLATFORM_ZONES[9];
+
+// What GetRailIDForZone and GetCameraIDForZone return for a zone without one
+#define ZONE_RAIL_NONE 0xffffffff
+#define ZONE_CAMERA_NONE 0xffff
 
 // Spawns at a position instead of a warp, warpId is -1
 #define ZONE_SPAWN_CHANGE_TYPE_POSITION 1
@@ -264,7 +278,7 @@ BOOL GetZoneFlagsEnableCycling(u16 zoneId);
 u16 DecideZoneHeaderBGMID(u16 zoneId, u8 season);
 // Whether the cycling and surfing BGM play in the zone
 BOOL GetZoneFlagsEnableCycleSurfBGM(u16 zoneId);
-u8 GetZoneEnvFlagsWeather(u16 zoneId);
+u16 GetZoneEnvFlagsWeather(u16 zoneId);
 // The zone a zone belongs to, such as the town of a building
 u16 GetZoneParentZone(u16 zoneId);
 BOOL GetZoneHasRailSystem(u16 zoneId);
@@ -272,9 +286,21 @@ u32 GetRailIDForZone(u16 zoneId);
 BOOL IsZoneEntralinkEdgeColorTable(u16 zoneId);
 BOOL IsZoneFlashbackMemoryPostFX(u16 zoneId);
 BOOL IsZoneBlackCityOrWhiteForestLobby(u16 zoneId);
-BOOL IsZoneBlackTowerOrWhiteTreehollow(u16 zoneId);
 u32 GetZoneStaticLightDataIndex(u16 zoneId);
 u16 GetCameraIDForZone(u16 zoneId);
+// The position Fly lands at
+void LoadZoneFlyPosToVecFx32(u16 zoneId, VecFx32 *position);
+void LoadZoneFlyPosRailCoords(u16 zoneId, ZoneFlyRailPosition *position);
+// Whether Fly lands on a rail in the zone
+BOOL IsZonesWithRailsArrayHasZoneID(u16 zoneId);
+// Whether the zone is one of the Battle Subway's two
+BOOL IsZoneLEQ76(u16 zoneId);
+// The zone's place name for a game of the given version
+u16 GetZoneLocationNameIdx(u16 zoneId, u32 version);
+u32 GetZoneLocNameDispType(u16 zoneId);
+u32 GetZoneEasyChallengeModeLevelAdjust(u16 zoneId);
+u16 GetZoneNameIcon(u16 zoneId);
+u32 GetMapTransitionEffectType(u16 zoneId);
 void GetPlayerZoneStateWPos(ZoneSpawnInfo *spawn, VecFx32 *pos);
 void SetPlayerZoneStateWPos(ZoneSpawnInfo *spawn, const VecFx32 *pos);
 

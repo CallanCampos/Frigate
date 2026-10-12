@@ -67,6 +67,8 @@
 . 0x02014b10 overlay_id 24
 . 0x02014b14 overlay_id 25
 . 0x02014b18 overlay_id 26
+. 0x020168e8 reloc_addend 4
+. 0x0201880c reloc_addend 2
 . 0x02019f78 reloc_addend 0x4c
 . 0x02019f84 reloc_addend 0x240
 . 0x02019f88 reloc_addend 0x24c
@@ -271,6 +273,11 @@
 . 0x0208fe89 remove_symbol
 . 0x0208fed8 remove_reloc
 . 0x0208ff01 remove_symbol
+. 0x02090001 remove_symbol
+. 0x0209009a add_data BC_WF_ZONES
+. 0x020900be add_data GEAR_STATION_PLATFORM_ZONES
+. 0x020900c5 remove_symbol
+. 0x02090101 remove_symbol
 . 0x02090bce remove_symbol
 . 0x02090d18 remove_reloc
 . 0x02090d1c remove_reloc
@@ -336,6 +343,7 @@
 . 0x020956bc remove_symbol
 . 0x0209780c remove_reloc
 . 0x02097bfc remove_symbol
+. 0x0209a34a remove_symbol
 . 0x0209b1bc reloc_addend 0x48
 . 0x0209b1c0 reloc_addend 0x60
 . 0x0209b1c4 reloc_addend 0x48
@@ -361,6 +369,7 @@
 . 0x021410c0 remove_symbol
 . 0x021410d0 remove_symbol
 . 0x021410e0 remove_symbol
+. 0x02141100 remove_symbol
 . 0x02141668 remove_symbol
 . 0x0214166c remove_symbol
 . 0x02141678 remove_symbol
@@ -746,6 +755,7 @@ overlays/ov036 0x021d0308 remove_reloc
 overlays/ov036 0x021d0310 remove_reloc
 overlays/ov036 0x021d031c remove_reloc
 overlays/ov036 0x021d091e add_data sUnk021d091e
+overlays/ov036 0x021d0958 remove_reloc
 overlays/ov036 0x021d097c remove_reloc
 overlays/ov036 0x021d09b8 remove_reloc
 overlays/ov036 0x021d1288 reloc_module overlay(109)
@@ -2170,9 +2180,9 @@ overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
 overlays/ov310 0x021a7028 add_data data_ov310_021a7028
+overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
 overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
-overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
 overlays/ov311 0x0219d93c reloc_module overlay(139)
 overlays/ov311 0x0219d97c reloc_module overlay(139)
 overlays/ov311 0x0219da74 reloc_module overlay(139)

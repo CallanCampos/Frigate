@@ -2,6 +2,7 @@
 #define POKEBW2_FIELD_PLAYER_STATE_H
 
 #include "types.h"
+#include "field/zone.h"
 #include "nitro/fx.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
@@ -19,19 +20,19 @@ struct PlayerState {
     u16 zoneId;
     u16 unk2;
     VecFx32 position;
-    u16 unk10;
-    u16 unk12;
-    u16 unk14;
-    u16 unk16;
-    u16 unk18;
+    RailPosition railPos;
+    u16 rotation;
     u8 unk1A;
-    u8 unk1B;
-    u8 unk1C[4];
+    u8 isRail;
+    u16 objCode;
+    u8 unk1E[2];
     PlayerInfo playerInfo;
     u32 exState;
 };
 
 u32 FieldPlayerState_GetExState(PlayerState *playerState);
+u16 FieldPlayerState_GetObjCode(PlayerState *playerState);
+void FieldPlayerState_SetObjCode(PlayerState *playerState, u16 objCode);
 u16 PlayerState_CalcDirection(PlayerState *playerState);
 VecFx32 *PlayerState_GetWPos(PlayerState *playerState);
 RailPosition *PlayerState_GetRailPos(PlayerState *playerState);
@@ -39,7 +40,7 @@ RailPosition *PlayerState_GetRailPos(PlayerState *playerState);
 u8 func_0201753c(PlayerState *playerState);
 u16 PlayerState_GetZoneID(PlayerState *playerState);
 void PlayerState_SetIsRail(PlayerState *playerState, BOOL isRail);
-void PlayerState_SetRailPos(PlayerState *playerState, RailPosition *pos);
+void PlayerState_SetRailPos(PlayerState *playerState, const RailPosition *pos);
 void PlayerState_SetRotation(PlayerState *playerState, u16 angle);
 u16 func_0201754c(PlayerState *playerState); // the rotation that PlayerState_SetRotation sets
 void PlayerState_SetRotationByDir(PlayerState *playerState, u16 dir);

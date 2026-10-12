@@ -58,7 +58,9 @@ extern DSProtCallback data_ov337_02182444[2];
         }                                                                                                              \
     }
 
+void *DSProt_CallRunChecks1(void *arg0, void *arg1);
 void *DSProt_CallRunChecks2(void *arg0, void *arg1);
+void *DSProt_CallRunChecks3(void *arg0, void *arg1);
 void *DSProt_CallRunChecks4(void *arg0, void *arg1);
 void DSProt_Init(void);
 
