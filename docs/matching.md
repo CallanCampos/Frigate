@@ -785,6 +785,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   narrow in the other order.
 - `FX32_ONE` is an `int` constant in `nitro/fx.h` but a `long` in the SDK. Where a product of it is passed on,
   the type shows: `oekaki.c`'s `Oekaki_CreateActors` matches only with the sub surface's Y as `256 * 0x1000L`.
+- Two identical expressions are merged into one spilled value, even across calls and loops. Where the original
+  computes the value twice, the two sites differ in type: `pleasure_boat_rooms.c`'s `PleasureBoat_SetUpRooms` draws
+  `NELEMS(sPeople) - (trainerCount + 2)` people, which is unsigned through `sizeof`, and later loops to the signed
+  `PLEASURE_BOAT_ROOM_COUNT - (trainerCount + 2)`; with both as `15 - (trainerCount + 2)` the difference is computed
+  once and kept at `sp+4`.
+- An array element written through a local index, `boat->rooms[room].field` with `u32 room = picker.order[slot];`,
+  folds each field's offset into its store; a `PleasureBoatRoom *room` pointer keeps the base and the scaled index
+  in registers and spills more (the same function's frame fell from 0x7c to 0x6c). The index must be a local when
+  the array it comes from has had its address taken, or every store forces a reload of it.
 
 ## Branches and block layout
 
@@ -1222,6 +1231,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   after a file's larger tables, is the next file's first object: the 4 bytes at 0x021a773c in overlay 310 can't end
   `research_graph.c`, whose tables are larger, and as `research_common.c`'s global `ResearchCommon_Unused` they take
   a section of their own ahead of that file's 8-byte table, as the ROM has them.
+- A small table that sits among a file's other small `static const` tables but that no code loads from was a
+  referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
+  of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven
+  values in case order, and the switch reading `sTrainerCounts[0]` to `[6]` compiles to the same `movs` while keeping
+  the table. Its place among the packed tables is not definition order: defined between the room tables it came out
+  one early, defined first it is where the ROM has it.
 - `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
   Medal Rally's `p_sv` does.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry

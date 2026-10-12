@@ -4,5 +4,6 @@
     .bss        start:0x021ef360 end:0x021ef360 kind:bss align:32
 
 src/ov089/pleasure_boat_rooms.c:
+    complete
     .text       start:0x021eecc0 end:0x021ef094
     .rodata     start:0x021ef094 end:0x021ef358
