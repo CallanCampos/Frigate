@@ -303,7 +303,7 @@ BOOL func_ov036_021ae300(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    ScriptWork_CallEvent(work, func_ov036_021bfc9c(gsys, ScriptReadVar(vm, env)));
+    ScriptWork_CallEvent(work, RivalNameEntry_Create(gsys, ScriptReadVar(vm, env)));
     return TRUE;
 }
 

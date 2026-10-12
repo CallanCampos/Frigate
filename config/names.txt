@@ -3177,6 +3177,11 @@ overlays/ov036 0x021b02f8 FieldRailSystem_Reset
 overlays/ov036 0x021b05b8 FieldRailSystem_SetLineEnabled
 overlays/ov036 0x021b3da8 FieldNoGridMapper_SetLineEnabled
 overlays/ov036 0x021b84e4 FieldExpObjAnm_SetFrameStep
+overlays/ov036 0x021bf9d4 PokeNameEntry_Callback
+overlays/ov036 0x021bfa68 JoinAvenueNameEntry_Create
+overlays/ov036 0x021bfb88 JoinAvenueNameEntry_Callback
+overlays/ov036 0x021bfc9c RivalNameEntry_Create
+overlays/ov036 0x021bfcf4 RivalNameEntry_Callback
 overlays/ov036 0x021c2080 PleasureBoat_Create
 overlays/ov036 0x021c2168 PleasureBoat_AdvanceClock
 overlays/ov036 0x021c21b8 PleasureBoat_GetInfo
