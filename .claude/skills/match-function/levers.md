@@ -203,7 +203,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - `bne next; b target` where `||` gives one `beq`: the same body in both arms of an `if`/`else if`. (matching.md:
   "`bne next; b hide`")
 - Early `return FALSE`s go to one shared tail only when the C has one trailing return (an `if`/`else if` chain, or a
-  `result` variable). A return that branches to the wrong one of two equal `b end` trampolines can be `goto end`.
+  `result` variable, or an inlined function: see the next line). A return that branches to the wrong one of two equal
+  `b end` trampolines can be `goto end`.
+- Failures that set a saved register to 0 and jump to one `mov r0, rN` exit, where a `result` variable gets a stack
+  slot: the body is a `static inline` called by a one-line wrapper. (matching.md: "Every `return` gets its own
+  epilogue")
 - A redundant outer `if` gives a doubled `beq`.
 - `v = f(); if (v == x)` and `if (f() == x)` put `cmp`'s operands in opposite orders. (matching.md: "operands of `cmp`")
 - A last test that branches the wrong way (`bne` to the false return for `beq` to the true one): negate the condition

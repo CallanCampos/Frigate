@@ -313,3 +313,9 @@ src/ov036/sound_obj.c:
 
 src/ov036/event_name_entry.c:
     .text       start:0x021bf914 end:0x021bfe88
+
+src/ov036/shortcut_menu.c:
+    .text       start:0x021bedd8 end:0x021bf914
+    .rodata     start:0x021d2248 end:0x021d22a8
+    .data       start:0x021d54e0 end:0x021d54f0
+    .bss        start:0x021dd940 end:0x021dd94c

@@ -1676,7 +1676,7 @@ data_ov012_0216ae08 kind:data(any) addr:0x0216ae48
 data_ov012_0216ae1c kind:data(any) addr:0x0216ae5c
 data_ov012_0216af34 kind:data(any) addr:0x0216af74
 data_ov012_0216af3c kind:data(any) addr:0x0216af7c
-data_ov012_0216af5c kind:data(any) addr:0x0216af9c
+sRibbonParams kind:data(any) addr:0x0216af9c
 GLOBAL_SCRIPT_TABLE kind:data(any) addr:0x0216afd8
 EVCMD_PERM_TABLE kind:data(any) addr:0x0216b230
 EVCMD_MAX kind:data(any) addr:0x0216b524

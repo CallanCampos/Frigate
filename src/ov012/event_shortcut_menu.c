@@ -540,7 +540,7 @@ BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
 
 void func_ov012_0215b284(u32 arg0, ShortcutMenuWork *work) {
     GameData *gameData;
-    void *param;
+    u16 *param;
 
     if (work->app == NULL && work->done == 0) {
         GFL_BGSysSetBGEnabled(1, 0);
@@ -549,7 +549,7 @@ void func_ov012_0215b284(u32 arg0, ShortcutMenuWork *work) {
         }
         gameData = GSYS_GetGameData(work->gameSystem);
         param = func_02017670(gameData);
-        work->app = func_ov036_021bedd8(gameData, arg0, (u32)param, 0x50, 0x15);
+        work->app = func_ov036_021bedd8(gameData, arg0, param, 0x50, 0x15);
     }
 }
 

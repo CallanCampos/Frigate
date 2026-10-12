@@ -797,8 +797,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
   on, where `if (!f()) { return FALSE; } n++;` puts it before.
 - Every `return` gets its own epilogue. Failures that all branch to one block that sets a saved register and jumps
-  to a shared `mov r0, rN` exit come from a result variable and a single `return`, as `mystery_gift_pokemon.c`'s
-  original has.
+  to a shared `mov r0, rN` exit can be a `static inline`'s early returns, which inlining turns into stores to one
+  result and jumps to its end. `mystery_gift_pokemon.c`'s `func_ov012_02153160` is
+  `return Mystery_CreateGiftPokemon(gift, heapId, gameData);`, the maker overlay 197 also inlines: written out with
+  a result variable and `goto`, the result got a stack slot of its own and the frame grew.
 - Identical statements in different branches are merged, so a branch that jumps into the middle of another block had
   the same code in the source. For example, `if (a) { x = 3; y = 19; } else { x = 0; y = 19; }` compiles differently
   from `x = a ? 3 : 0; y = 19;`. A run of jumps to one store, as in the start menu's `StartMenu_MoveCursor`, is the
