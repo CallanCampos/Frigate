@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""The town map's table of places in data/town_map/places.json: dump writes it from the ROM once, and pack builds its
-archive (a/0/8/5) for a version from it, which the build does.
+"""The town map's places in data/town_map/<zone>.json: dump writes them from the ROM once, and pack builds their
+archive (a/0/8/5) for a version from them, which the build does.
 
     town_map_data.py dump extract/b2_us/files extract/w2_us/files data/town_map
     town_map_data.py pack data/town_map black2 ARCHIVE
 
 Each place is 27 u16s, which TownMapData_GetParam reads by TOWNMAP_PARAM_*. Its texts are messages of
 data/text/system/town_map.txt by ID; a place whose description differs between the versions gives one per version.
-places.schema.json describes the fields.
+order.json preserves the table's order, and place.schema.json describes each place's fields.
 """
 import argparse
+import json
 import struct
 import sys
 from pathlib import Path
@@ -64,8 +65,14 @@ def dump(black2: Path, white2: Path, output: Path):
     messages = {number: message_id for message_id, number in message_numbers(TEXT)}
     tables = [read_places(black2), read_places(white2)]
     places = [place_json(versions, messages) for versions in zip(*tables)]
-    write(output / "places.json", {"$schema": "places.schema.json", "places": places})
-    print(f"wrote {len(places)} places to {output / 'places.json'}")
+    write(output / "order.json", [place["zone"] for place in places])
+    for place in places:
+        write(output / place_file(place["zone"]), {"$schema": "place.schema.json", **place})
+    print(f"wrote {len(places)} places to {output}")
+
+
+def place_file(zone: str) -> str:
+    return zone.removeprefix("ZONE_").lower() + ".json"
 
 
 def flag_value(flag, where: str) -> int:
@@ -93,11 +100,29 @@ def place_bytes(place: dict, game: str, messages: dict, where: str) -> bytes:
 
 
 def pack(root: Path, game: str, output: Path):
-    path = root / "places.json"
-    data = load(path, load_schema(root / "places.schema.json"))
+    order = root / "order.json"
+    zones = json.loads(order.read_text())
+    if (not isinstance(zones, list) or len(zones) != 85
+            or any(not isinstance(zone, str) or not zone.startswith("ZONE_") for zone in zones)
+            or len(set(zones)) != 85):
+        raise DataError(f"{label(order)}: expected 85 distinct zones")
+    for zone in zones:
+        value(zone, label(order))
+    expected = {place_file(zone) for zone in zones}
+    actual = {path.name for path in root.glob("*.json")
+              if path.name != "order.json" and not path.name.endswith(".schema.json")}
+    if actual != expected:
+        raise DataError(f"{label(root)}: place files differ from order.json: "
+                        f"missing {sorted(expected - actual)}, extra {sorted(actual - expected)}")
+    schema = load_schema(root / "place.schema.json")
     messages = dict(message_numbers(TEXT))
-    places = b"".join(place_bytes(place, game, messages, f"{label(path)}: places[{i}]")
-                      for i, place in enumerate(data["places"]))
+    places = b""
+    for zone in zones:
+        path = root / place_file(zone)
+        place = load(path, schema)
+        if place["zone"] != zone:
+            raise DataError(f"{label(path)}: zone differs from order.json ({zone})")
+        places += place_bytes(place, game, messages, label(path))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(write_narc([places]))
 

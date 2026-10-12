@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_ROUTE_23",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 195,
+        "y": 30
+    },
+    "cursor": {
+        "x": 195,
+        "y": 30
+    },
+    "hit": {
+        "start": {
+            "x": 195,
+            "y": 26
+        },
+        "end": {
+            "x": 195,
+            "y": 34
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_MountainPathNoReturn",
+    "landmarks": [],
+    "area": {
+        "animation": 20,
+        "x": 184,
+        "y": 7
+    }
+}

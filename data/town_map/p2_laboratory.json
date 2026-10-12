@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_P2_LABORATORY",
+    "type": 2,
+    "radius": 6,
+    "position": {
+        "x": 214,
+        "y": 151
+    },
+    "cursor": {
+        "x": 214,
+        "y": 151
+    },
+    "hit": {
+        "start": {
+            "x": 214,
+            "y": 148
+        },
+        "end": {
+            "x": 214,
+            "y": 154
+        },
+        "radius": 6
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_TeamPlasmasSecretLab",
+    "landmarks": [],
+    "area": {
+        "animation": 1,
+        "x": 206,
+        "y": 143
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_LACUNOSA_TOWN",
+    "type": 0,
+    "radius": 12,
+    "position": {
+        "x": 190,
+        "y": 43
+    },
+    "cursor": {
+        "x": 190,
+        "y": 43
+    },
+    "hit": {
+        "start": {
+            "x": 190,
+            "y": 39
+        },
+        "end": {
+            "x": 190,
+            "y": 47
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_LACUNOSA_TOWN",
+    "shown_by": null,
+    "description": "TownMap_Text_TownWhereAllHonor",
+    "landmarks": [ "TownMap_Text_PokemonCenter_11" ],
+    "area": {
+        "animation": 0,
+        "x": 182,
+        "y": 35
+    }
+}

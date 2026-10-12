@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_ENTRALINK",
+    "type": 2,
+    "radius": 12,
+    "position": {
+        "x": 132,
+        "y": 67
+    },
+    "cursor": {
+        "x": 132,
+        "y": 67
+    },
+    "hit": {
+        "start": {
+            "x": 132,
+            "y": 63
+        },
+        "end": {
+            "x": 132,
+            "y": 71
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_MiddleUnovaRegionPlace",
+    "landmarks": [],
+    "area": {
+        "animation": 1,
+        "x": 124,
+        "y": 59
+    }
+}
