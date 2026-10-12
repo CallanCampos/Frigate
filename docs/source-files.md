@@ -1224,7 +1224,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `config_panel.c` | `0x0219ce80`–`0x0219ee3c` | 89 | partial | descriptive |
+| `config_panel.c` | `0x0219ce80`–`0x0219ee3c` | 89 | complete | descriptive |
 
 ### Overlay 141
 
@@ -1892,7 +1892,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `musical_system.c` | `0x021eec80`–`0x021eef38` | 6 | partial | string at `0x021ef1a0` |
+| `musical_system.c` | `0x021eec80`–`0x021eef38` | 6 | complete | string at `0x021ef1a0` |
 | `mus_item_data.c` | `0x021eef38`–`0x021ef188` | 14 | complete | string at `0x021ef1b4` |
 
 ### Overlay 211
@@ -2532,7 +2532,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `th_award.c` | `0x0219ce80`–`0x0219d9a8` | 14 | partial | descriptive |
+| `th_award.c` | `0x0219ce80`–`0x0219d9a8` | 14 | complete | descriptive |
 | `th_award_graphic.c` | `0x0219d9a8`–`0x0219dbe4` | 14 | complete | string at `0x0219ddc0` |
 
 ### Overlay 314
@@ -2559,7 +2559,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `psel.c` | `0x0219ce80`–`0x0219f6d0` | 80 | partial | string at `0x0219fe00` |
+| `psel.c` | `0x0219ce80`–`0x0219f6d0` | 80 | complete | string at `0x0219fe00` |
 | `psel_graphic.c` | `0x0219f6d0`–`0x0219fa84` | 23 | complete | string at `0x0219fe08` |
 
 ### Overlay 317
