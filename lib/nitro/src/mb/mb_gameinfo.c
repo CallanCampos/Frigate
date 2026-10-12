@@ -4,6 +4,8 @@
 
 // What the beacon sends: the list of programs, the one being sent, and how far it is
 static MBGameInfoSender sSender;
+// The beacon that the sender fills, an object of its own after the sender's state
+static MBBeacon sBeacon;
 
 static u16 MBGameInfo_Checksum(const u16 *data, int length);
 static BOOL MBGameInfo_LoadIconFile(const char *path, MBGameInfoRecord *record, BOOL isChar);
@@ -17,7 +19,7 @@ static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr);
 
 static u16 MBGameInfo_Checksum(const u16 *data, int length) {
     u32 sum = 0;
-    int count = length / 2;
+    int count = length >> 1;
 
     while (count > 0) {
         sum += *data++;
@@ -25,7 +27,7 @@ static u16 MBGameInfo_Checksum(const u16 *data, int length) {
     }
     sum = (sum >> 16) + (sum & 0xffff);
     sum += sum >> 16;
-    return ~sum;
+    return sum ^ 0xffff;
 }
 
 // Puts a program on offer: its picture, name, description and player limit, from its registration
@@ -37,7 +39,7 @@ void MBGameInfo_Build(MBGameInfoRecord *record, const MBGameRegistry *reg, const
     record->iconError = 0;
     charFailed = !MBGameInfo_LoadIconFile(reg->iconCharPathp, record, TRUE);
     paletteFailed = !MBGameInfo_LoadIconFile(reg->iconPalettePathp, record, FALSE);
-    if (charFailed || paletteFailed) {
+    if ((charFailed | paletteFailed) != 0) {
         record->iconError = 1;
         MI_CpuClearFast(record, 0x220);
     }
@@ -46,7 +48,7 @@ void MBGameInfo_Build(MBGameInfoRecord *record, const MBGameRegistry *reg, const
         MI_CpuCopy16(parentUser, &record->parentUser, sizeof(MBUserInfo));
     }
     record->maxPlayers = reg->maxPlayerNum;
-    MI_CpuCopy16(reg->gameNamep, record->gameName, MBGameInfo_CountChars(reg->gameNamep) * 2);
+    MI_CpuCopy16(reg->gameNamep, record->gameName, (u16)(MBGameInfo_CountChars(reg->gameNamep) * 2));
     MI_CpuCopy16(reg->gameIntroductionp, record->gameIntro, sizeof(record->gameIntro));
     record->playerCount = 1;
     record->memberMask = 1;
@@ -162,6 +164,8 @@ void MBGameInfo_Send(u32 ggid, u16 tgid, u8 attr) {
         case MB_BEACON_STATE_MEMBERS:
             MBGameInfo_SendMembers(ggid, tgid, attr);
             return;
+        case 6: // A state that nothing in this file sets
+            break;
         }
     }
 }
@@ -174,7 +178,7 @@ static int MBGameInfo_PickRecord(void) {
         u32 ggid = MBWm_GetGgid();
         u16 tgid = MBWm_GetTgid();
 
-        func_020824bc(NULL, &sSender.beacon, sizeof(MBBeacon), ggid, tgid, MB_BEACON_ATTR_NO_GAME);
+        func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, MB_BEACON_ATTR_NO_GAME);
         return 0;
     }
     if (sSender.current == NULL || (record = sSender.current->next) == NULL) {
@@ -182,7 +186,7 @@ static int MBGameInfo_PickRecord(void) {
     }
     sSender.current = record;
     MBGameInfo_ResetCounters();
-    sSender.updateCount = record->updateCount;
+    sSender.updateCount = sSender.current->updateCount;
     sSender.state = MB_BEACON_STATE_START_FRAGMENTS;
     return 1;
 }
@@ -205,35 +209,34 @@ static void MBGameInfo_StartFragments(void) {
 
 // Sends the next piece of the record
 static void MBGameInfo_SendFragment(u32 ggid, u16 tgid, u8 attr) {
-    MBGameInfoRecord *record = sSender.current;
-    MBBeacon *beacon = &sSender.beacon;
-    const u8 *recordEnd = (const u8 *)&record->playerCount;
+    const u8 *recordEnd = (const u8 *)&sSender.current->playerCount;
 
-    if (sSender.source + MB_BEACON_FRAGMENT_SIZE > recordEnd) {
-        beacon->u.fragment.length = recordEnd - sSender.source;
-        MI_CpuFill16(&beacon->u.fragment.data[beacon->u.fragment.length], 0,
-                     MB_BEACON_FRAGMENT_SIZE - beacon->u.fragment.length);
+    if (sSender.source + MB_BEACON_FRAGMENT_SIZE <= recordEnd) {
+        sBeacon.u.fragment.length = MB_BEACON_FRAGMENT_SIZE;
     } else {
-        beacon->u.fragment.length = MB_BEACON_FRAGMENT_SIZE;
+        sBeacon.u.fragment.length = recordEnd - sSender.source;
+        MI_CpuFill16(&sBeacon.u.fragment.data[sBeacon.u.fragment.length], 0,
+                     MB_BEACON_FRAGMENT_SIZE - sBeacon.u.fragment.length);
     }
-    MI_CpuCopy16(sSender.source, beacon->u.fragment.data, beacon->u.fragment.length);
-    beacon->u.fragment.index = sSender.fragmentIndex;
-    beacon->u.fragment.count = sSender.fragmentCount;
-    beacon->kind = sSender.current->iconError;
-    beacon->gameNo = sSender.current->gameNo;
-    beacon->updateCount = sSender.updateCount;
-    beacon->ggid = sSender.current->ggid;
-    beacon->slot = sSender.current->slot;
-    beacon->sequence = sSender.sequence++;
-    beacon->checksum = 0;
-    beacon->checksum = MBGameInfo_Checksum(&beacon->checksum, MB_BEACON_CHECKED_SIZE);
+    MI_CpuCopy16(sSender.source, sBeacon.u.fragment.data, sBeacon.u.fragment.length);
+    sBeacon.u.fragment.index = sSender.fragmentIndex;
+    sBeacon.u.fragment.count = sSender.fragmentCount;
+    sBeacon.kind = sSender.current->iconError;
+    sBeacon.gameNo = sSender.current->gameNo;
+    sBeacon.updateCount = sSender.updateCount;
+    sBeacon.ggid = sSender.current->ggid;
+    sBeacon.slot = sSender.current->slot;
+    sBeacon.sequence = sSender.sequence++;
+    sBeacon.checksum = 0;
+    sBeacon.checksum = MBGameInfo_Checksum(&sBeacon.checksum, MB_BEACON_CHECKED_SIZE);
     sSender.fragmentIndex++;
     if (sSender.fragmentIndex < sSender.fragmentCount) {
         sSender.source += MB_BEACON_FRAGMENT_SIZE;
     } else {
         sSender.state = MB_BEACON_STATE_START_MEMBERS;
     }
-    func_020824bc(NULL, beacon, sizeof(MBBeacon), ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT);
+    // 1 is the wireless manager's entry attribute: children may connect
+    func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT | 1);
 }
 
 // Starts to send who is in the program's game
@@ -245,39 +248,39 @@ static void MBGameInfo_StartMembers(void) {
 
 // Sends up to four of the players that the children have not seen yet
 static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr) {
-    MBGameInfoRecord *record;
-    MBBeacon *beacon;
     u16 missing;
-    int sent;
+    u32 sent;
     int i;
 
     if (sSender.updateCount != sSender.current->updateCount) {
         MBGameInfo_StartMembers();
     }
-    record = sSender.current;
-    beacon = &sSender.beacon;
-    beacon->kind = MB_BEACON_KIND_MEMBERS;
-    beacon->gameNo = record->gameNo;
-    beacon->updateCount = sSender.updateCount;
-    beacon->ggid = record->ggid;
-    beacon->slot = record->slot;
-    beacon->sequence = sSender.sequence++;
-    beacon->u.members.playerCount = record->playerCount;
-    beacon->u.members.memberMask = record->memberMask;
-    beacon->u.members.changedMask = record->changedMask;
+    sBeacon.kind = MB_BEACON_KIND_MEMBERS;
+    sBeacon.gameNo = sSender.current->gameNo;
+    sBeacon.updateCount = sSender.updateCount;
+    sBeacon.ggid = sSender.current->ggid;
+    sBeacon.slot = sSender.current->slot;
+    sBeacon.sequence = sSender.sequence++;
+    sBeacon.u.members.playerCount = sSender.current->playerCount;
+    sBeacon.u.members.memberMask = sSender.current->memberMask;
+    sBeacon.u.members.changedMask = sSender.current->changedMask;
     if (sSender.mode == 0 && sSender.callback != NULL) {
         sSender.callback(sSender.current->ggid);
     }
-    for (i = 0; i < 8; i++) {
-        beacon->u.members.params[i] = sSender.current->params[i];
+    {
+        u8 *params = sBeacon.u.members.params;
+
+        for (i = 0; i < 8; i++) {
+            params[i] = sSender.current->params[i];
+        }
     }
-    MI_CpuClear16(beacon->u.members.users, sizeof(beacon->u.members.users));
+    MI_CpuClear16(sBeacon.u.members.users, sizeof(sBeacon.u.members.users));
     missing = sSender.current->sentMask ^ sSender.current->memberMask;
     sent = 0;
     for (i = 0; i < 15; i++) {
         if ((2 << i) & missing) {
-            MI_CpuCopy16(&sSender.current->members[i], &beacon->u.members.users[sent], sizeof(MBUserInfo));
-            sSender.current->sentMask |= 2 << i;
+            MI_CpuCopy16(&sSender.current->members[i], &sBeacon.u.members.users[sent], sizeof(MBUserInfo));
+            sSender.current->sentMask |= (u16)(2 << i);
             sent++;
             if (sent == 4) {
                 break;
@@ -285,14 +288,15 @@ static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr) {
         }
     }
     if (sent < 4) {
-        beacon->u.members.users[sent].playerNo = 0;
+        sBeacon.u.members.users[sent].playerNo = 0;
     }
-    beacon->checksum = 0;
-    beacon->checksum = MBGameInfo_Checksum(&beacon->checksum, MB_BEACON_CHECKED_SIZE);
+    sBeacon.checksum = 0;
+    sBeacon.checksum = MBGameInfo_Checksum(&sBeacon.checksum, MB_BEACON_CHECKED_SIZE);
     if (sSender.current->sentMask == sSender.current->memberMask) {
         sSender.state = MB_BEACON_STATE_PICK;
     }
-    func_020824bc(NULL, beacon, sizeof(MBBeacon), ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT);
+    // 1 is the wireless manager's entry attribute: children may connect
+    func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT | 1);
     if (sSender.mode == 1 && sSender.callback != NULL) {
         sSender.callback(sSender.current->ggid);
     }

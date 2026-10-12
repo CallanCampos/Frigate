@@ -486,6 +486,9 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A narrowing missing after an `if`/`else` that assigns a `u16` in both branches comes from a conditional expression:
+  `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `MBWm_NextChannel`
+  (`mb_wm.c`) needed.
 - On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
   load's offset from the shared base, where the same address in a named local, or the element written `a[n + k]`,
   is computed again. `snd_arc_loader.c`'s `LoadSingleWave` reads a wave's file offset and the next one's as
@@ -917,6 +920,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
+  stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
+  the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:

@@ -323,7 +323,6 @@ typedef struct {
     u8 fragmentCount;
     u8 sequence;
     u8 unk_2a[0x1e];
-    MBBeacon beacon;
 } MBGameInfoSender;
 
 // A frame that the parent sends to the children: a type and what goes with it
@@ -494,7 +493,7 @@ void MBGameInfo_Init(void);
 void MBGameInfo_Send(u32 ggid, u16 tgid, u8 attr);
 
 // mb_wm.c
-int MBWm_SendToChildren(const void *data, u16 size, u16 aidBitmap);
+int MBWm_SendToChildren(const void *data, u32 size, u32 aidBitmap);
 u32 MBWm_GetGgid(void);
 u16 MBWm_GetTgid(void);
 u8 MBWm_GetAttribute(void);
