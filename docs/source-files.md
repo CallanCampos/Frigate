@@ -896,7 +896,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_virbank.c` | `0x021eec80`–`0x021ef08c` | 11 | partial | descriptive |
+| `gym_virbank.c` | `0x021eec80`–`0x021ef08c` | 11 | complete | descriptive |
 
 ### Overlay 101
 
