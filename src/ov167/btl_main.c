@@ -1218,7 +1218,7 @@ BOOL func_ov167_0219b3a8(BtlMainModule *mainModule, s32 *state) {
                     chatter = func_ov167_021b9e48(i);
                     if (chatter != NULL) {
                         mainModule->unk3E0[i] = allocChatotChatterBlk(mainModule->heapId);
-                        sys_memcpy(chatter, mainModule->unk3E0[i], func_02007e20());
+                        sys_memcpy(chatter, mainModule->unk3E0[i], PerapVoice_GetSize());
                     }
                 }
                 func_ov167_0219dfd0(mainModule, i);
@@ -2700,7 +2700,7 @@ BOOL func_ov167_0219d228(BtlMainModule *mainModule, u32 index, void **out) {
 u8 func_ov167_0219d258(BtlMainModule *mainModule, u8 clientId) {
     if (!func_ov167_0219c980(mainModule)) {
         if (mainModule->unk3E0[clientId] != NULL && doesChatotExist(mainModule->unk3E0[clientId])) {
-            return func_02007f90(mainModule->unk3E0[clientId]);
+            return PerapVoice_GetChatterEffect(mainModule->unk3E0[clientId]);
         }
         return 0;
     }

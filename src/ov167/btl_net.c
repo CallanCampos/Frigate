@@ -317,7 +317,7 @@ BOOL func_ov167_021b9d0c(void *chatter) {
     u32 size;
 
     if (doesChatotExist(chatter)) {
-        size = func_02007e20();
+        size = PerapVoice_GetSize();
     } else {
         size = sizeof(u32);
         chatter = &sWork->sendBuf.noChatter;

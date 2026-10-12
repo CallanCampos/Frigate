@@ -324,7 +324,4 @@ BOOL func_0205b5ec(void);
 int func_0205b250(void);
 void func_0205b198(void);
 
-// The Pokémon cries' update, which no header declares yet
-void PokeVoice_Update(void);
-
 #endif // POKEBW2_GFL_NET_H

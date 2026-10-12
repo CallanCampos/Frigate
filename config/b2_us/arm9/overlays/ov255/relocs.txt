@@ -6967,7 +6967,6 @@ from:0x021d8ea8 kind:load to:0x021d5fb9 module:overlay(255)
 from:0x021d8eac kind:load to:0x021d6001 module:overlay(255)
 from:0x021d8eb0 kind:load to:0x021d5d8d module:overlay(255)
 from:0x021d8eb4 kind:load to:0x021d5d91 module:overlay(255)
-from:0x021d8ec8 kind:load to:0x02140101 module:main
 from:0x021d8ed0 kind:load to:0x021d5e25 module:overlay(255)
 from:0x021d8ed4 kind:load to:0x021d5ec9 module:overlay(255)
 from:0x021d8ed8 kind:load to:0x021d5f51 module:overlay(255)
