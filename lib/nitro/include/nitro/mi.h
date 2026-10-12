@@ -21,6 +21,8 @@ void sys_memcpy(const void *src, void *dest, u32 size);
 // Copies halfwords with a DMA channel and waits for it to finish
 void func_020780e8(u32 dmaNo, const void *src, void *dest, u32 size, int mode);
 void sys_memset(void *dest, u32 value, u32 size);
+// Compares size bytes, returning the difference of the first that differ, or 0
+int sys_memcmp(const void *a, const void *b, u32 size);
 
 // NitroSDK's MI_CpuCopy16, an inline over sys_memcpy16 (MIi_CpuCopy16). MWCC evaluates an inline call's arguments
 // from the last, so the size is read before a destination that a call gives

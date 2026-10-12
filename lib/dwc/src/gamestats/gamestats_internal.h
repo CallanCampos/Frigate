@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_GAMESTATS_INTERNAL_H
 
 #include "types.h"
+#include "nitro/math.h"
 
 // What gamestats.c calls outside itself, none of it with a name in the ROM
 
@@ -13,8 +14,6 @@ BOOL func_020584b0(void);
 void func_020584cc(int type, int code);
 // The Wi-Fi library's error, as its type and its group
 int func_020583b0(int *type, int *group);
-// The SHA-1 digest of size bytes into 20 bytes
-void func_02077720(u8 *digest, const void *data, u32 size);
 // Formats a text like snprintf, and into a bigger buffer without a size
 int func_0207a2c0(char *dest, u32 size, const char *format, ...);
 int func_0207a290(char *dest, const char *format, ...);
