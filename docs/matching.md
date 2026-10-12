@@ -300,6 +300,10 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- A sum of several terms in one expression has its right-hand terms evaluated first; accumulating it in separate
+  statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
+  (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
+  `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
   `readSize = romfs_fread(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.

@@ -87,8 +87,8 @@ static u32 GetCharIndex1D(u32 x, u32 y, int areaWidth, int areaHeight, int objWi
     u32 charNo = 0;
 
     while (TRUE) {
-        const u32 maskH = 0xffffffff << objHeightShift;
         const u32 maskW = 0xffffffff << objWidthShift;
+        const u32 maskH = 0xffffffff << objHeightShift;
         const u32 bodyWidth = areaWidth & maskW;
         const u32 bodyHeight = areaHeight & maskH;
 
@@ -105,14 +105,21 @@ static u32 GetCharIndex1D(u32 x, u32 y, int areaWidth, int areaHeight, int objWi
                 areaWidth = bodyWidth;
                 areaHeight -= bodyHeight;
             }
-        } else if (bodyWidth <= x) {
-            charNo += bodyWidth * bodyHeight;
-            x -= bodyWidth;
-            areaWidth -= bodyWidth;
-            areaHeight = bodyHeight;
         } else {
-            return charNo + (y & maskH) * bodyWidth + ((x & maskW) << objHeightShift) +
-                   ((y & ~maskH) << objWidthShift) + (x & ~maskW);
+            const u32 lowH = ~maskH;
+
+            if (bodyWidth <= x) {
+                charNo += bodyWidth * bodyHeight;
+                x -= bodyWidth;
+                areaWidth -= bodyWidth;
+                areaHeight = bodyHeight;
+            } else {
+                charNo += (y & maskH) * bodyWidth;
+                charNo += (x & maskW) << objHeightShift;
+                charNo += (y & lowH) << objWidthShift;
+                charNo += x & ~maskW;
+                return charNo;
+            }
         }
 
         {
@@ -469,34 +476,32 @@ static void ClearArea1D(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w
     const int bottom = y + h;
     const int bpp = pCC->dstBpp;
     const u32 pattern = FillPattern(cl, bpp);
+    Obj1DParam objParam = { pCC->param };
     const int x0 = x & ~7;
-    Obj1DParam objParam;
-
     cy = y & ~7;
-    objParam.param = pCC->param;
     const int x1 = (right + 7) & ~7;
     const int y1 = (bottom + 7) & ~7;
     const int areaWidth = pCC->areaWidth;
     const int areaHeight = pCC->areaHeight;
-    u8 *charBase = pCC->charBase;
     const int objWidthShift = objParam.objWidthShift;
     const int objHeightShift = objParam.objHeightShift;
     const int charSize = CharSize(bpp);
+    u8 *charBase = pCC->charBase;
     const int charX0 = x0 / 8;
     int charY = cy / 8;
 
-    for (; cy < y1; cy += 8, charY++) {
+    for (; cy < y1; charY++, cy += 8) {
         const int top = (cy < y) ? y - cy : 0;
         int cx;
         int charX;
 
         height = MATH_MIN(bottom - cy, 8) - top;
-        for (cx = x0, charX = charX0; cx < x1; cx += 8, charX++) {
+        for (charX = charX0, cx = x0; cx < x1; cx += 8, charX++) {
             const u32 charNo = GetCharIndex1D(charX, charY, areaWidth, areaHeight, objWidthShift, objHeightShift);
             const int left = (cx < x) ? x - cx : 0;
             const int width = MATH_MIN(right - cx, 8) - left;
 
-            FillChar((u32 *)(charBase + charSize * charNo), left, top, width, height, pattern, bpp);
+            FillChar((u32 *)(charBase + charNo * charSize), left, top, width, height, pattern, bpp);
         }
     }
 }
