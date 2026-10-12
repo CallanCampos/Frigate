@@ -196,7 +196,6 @@ DATA_PACKS = [
 # tutor bits (tools/data/species_data.py)
 DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/data/gen_constants.py", "tools/data/narc.py",
                    "tools/data/map_terrain_data.py", "tools/data/map_texture_data.py",
-                   "tools/data/map_model_data.py",
                    "tools/data/nitro_dictionary.py",
                    "tools/text/text_sources.py", "tools/text/text_data.py", "tools/text/msgdata.py",
                    "src/ov036/scrcmd_shop.c", "tools/data/facility_data.py", "tools/data/make_constants.py"]
@@ -430,7 +429,10 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         sources = sorted(str(p.relative_to(ROOT)) for d in [data_dir, *(other_dirs[0] if other_dirs else [])]
                          for p in ([ROOT / d] if (ROOT / d).is_file() else (ROOT / d).rglob("*")) if p.is_file())
         game = VERSIONS[version]["defines"][0].lower() if per_version else ""
-        n.build(outputs, "data_pack", sources, implicit=[script, *DATA_PACK_TOOLS, *constant_sources],
+        dependencies = [script, *DATA_PACK_TOOLS, *constant_sources]
+        if script == "tools/data/field_prop_model_data.py":
+            dependencies.append("tools/data/map_model_data.py")
+        n.build(outputs, "data_pack", sources, implicit=dependencies,
                 order_only=[files_ok], variables={"script": script, "dir": data_dir, "game": game})
         for path, archive in zip(paths, outputs):
             archive_ok = stamp_dir / "files" / f"{path.replace('/', '_')}.ok"

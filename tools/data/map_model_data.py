@@ -218,6 +218,17 @@ def mesh_primitives(directory, name):
     meshes = [mesh for mesh in doc["meshes"] if mesh.get("name") == name]
     if len(meshes) != 1:
         raise ValueError(f"expected one {name} mesh")
+    if len(doc["meshes"]) != 1:
+        raise ValueError(f"{name}: extra GLB meshes cannot be packed into this Nitro model")
+    mesh_nodes = [node for node in doc.get("nodes", []) if node.get("mesh") == 0]
+    if len(mesh_nodes) != 1:
+        raise ValueError(f"{name}: expected one instance of the GLB mesh")
+    node = mesh_nodes[0]
+    if ("matrix" in node or any(abs(value) > 0.00001 for value in node.get("translation", (0, 0, 0)))
+            or any(abs(value - target) > 0.00001 for value, target in zip(
+                node.get("rotation", (0, 0, 0, 1)), (0, 0, 0, 1)))
+            or any(abs(value - 1) > 0.00001 for value in node.get("scale", (1, 1, 1)))):
+        raise ValueError(f"{name}: apply the mesh object's transforms in Blender before exporting")
     primitives = meshes[0]["primitives"]
     if any(prim.get("mode", 4) != 4 for prim in primitives):
         raise ValueError("only triangle primitives are supported")

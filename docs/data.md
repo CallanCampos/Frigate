@@ -602,6 +602,8 @@ or coordinate-command limits change, it re-encodes the GLB triangles as Nitro GP
 existing draw calls and material slots. This also permits UVs on a shape that originally had none. New vertices must
 fit Nitro's 16-bit fixed-point position and UV ranges. Models with scene transforms use their GLB joint assignments
 to recover local vertex positions; blended skin weights are unsupported by this map model format.
+Apply the mesh object's transforms in Blender before exporting. The packer rejects an extra mesh object or an
+unapplied object transform so no visible geometry edits are silently omitted.
 UV edits use Nitro's 1/16-texel coordinate precision and each material's texture dimensions and transform.
 GLB material base color, opacity, emission and double-sided settings also pack into Nitro. Color and opacity are
 quantized to the DS's five-bit channels. For models with a confirmed texture set, changing a material's
