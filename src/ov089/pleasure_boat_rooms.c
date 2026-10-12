@@ -58,12 +58,12 @@ static int RoomPicker_Get(const RoomPicker *picker, int index);
 static BOOL RoomPicker_Remove(RoomPicker *picker, int index);
 static BOOL RoomPicker_PickOrder(RoomPicker *picker);
 
+// How many Trainers are aboard by weekday, Monday first
+static const u8 sTrainerCounts[7] = { 4, 3, 4, 5, 4, 6, 7 };
+
 static const u8 sFirstRooms[6] = { 9, 10, 11, 12, 13, 14 };
 
 static const u8 sStarboardRooms[7] = { 4, 5, 6, 7, 8, 13, 14 };
-
-// Nothing reads it. Declared here, it gives the original's order of .rodata
-static const u8 sUnused[7] = { 4, 3, 4, 5, 4, 6, 7 };
 
 static const u8 sPortRooms[8] = { 0, 1, 2, 3, 9, 10, 11, 12 };
 
@@ -96,13 +96,11 @@ static const PersonEntry sPeople[PERSON_TABLE_SIZE] = {
 };
 
 void PleasureBoat_SetUpRooms(PleasureBoat *boat, BOOL flag) {
-    struct {
-        u8 pairScratch[5];
-        u8 peopleScratch[15];
-        u8 trainerScratch[10];
-        RoomPicker picker;
-    } draw;
     RTCDate date;
+    RoomPicker picker;
+    u8 trainerScratch[TRAINER_TABLE_SIZE];
+    u8 peopleScratch[PERSON_TABLE_SIZE];
+    u8 pairScratch[PAIR_TABLE_SIZE];
     int trainerCount;
     int slot;
     u8 i;
@@ -110,22 +108,26 @@ void PleasureBoat_SetUpRooms(PleasureBoat *boat, BOOL flag) {
 
     RTC_GetCachedDate(&date);
     switch (date.week) {
-    case RTC_WEEK_SUNDAY:
-        trainerCount = 7;
-        break;
     case RTC_WEEK_MONDAY:
-    case RTC_WEEK_WEDNESDAY:
-    case RTC_WEEK_FRIDAY:
-        trainerCount = 4;
+        trainerCount = sTrainerCounts[0];
         break;
     case RTC_WEEK_TUESDAY:
-        trainerCount = 3;
+        trainerCount = sTrainerCounts[1];
+        break;
+    case RTC_WEEK_WEDNESDAY:
+        trainerCount = sTrainerCounts[2];
         break;
     case RTC_WEEK_THURSDAY:
-        trainerCount = 5;
+        trainerCount = sTrainerCounts[3];
+        break;
+    case RTC_WEEK_FRIDAY:
+        trainerCount = sTrainerCounts[4];
         break;
     case RTC_WEEK_SATURDAY:
-        trainerCount = 6;
+        trainerCount = sTrainerCounts[5];
+        break;
+    case RTC_WEEK_SUNDAY:
+        trainerCount = sTrainerCounts[6];
         break;
     default:
         trainerCount = 0;
@@ -133,16 +135,16 @@ void PleasureBoat_SetUpRooms(PleasureBoat *boat, BOOL flag) {
     }
     boat->trainerCount = trainerCount;
 
-    RoomPicker_Reset(&draw.picker);
-    if (!RoomPicker_PickOrder(&draw.picker)) {
-        RoomPicker_Reset(&draw.picker);
+    RoomPicker_Reset(&picker);
+    if (!RoomPicker_PickOrder(&picker)) {
+        RoomPicker_Reset(&picker);
     }
-    PickRandom(10, trainerCount, draw.trainerScratch, draw.picker.trainers);
-    PickRandom(5, 2, draw.pairScratch, draw.picker.pairs);
-    PickRandom(15, 15 - (trainerCount + 2), draw.peopleScratch, draw.picker.people);
+    PickRandom(NELEMS(sTrainers), trainerCount, trainerScratch, picker.trainers);
+    PickRandom(NELEMS(sPairs), 2, pairScratch, picker.pairs);
+    PickRandom(NELEMS(sPeople), NELEMS(sPeople) - (trainerCount + 2), peopleScratch, picker.people);
 
     for (i = 0; i < trainerCount; i++) {
-        const RoomSide *side = &sRoomSides[draw.picker.order[i]];
+        const RoomSide *side = &sRoomSides[picker.order[i]];
 
         if (side->isPort == 0) {
             boat->infoCounts[0]++;
@@ -158,46 +160,47 @@ void PleasureBoat_SetUpRooms(PleasureBoat *boat, BOOL flag) {
 
     slot = 0;
     for (i = 0; i < trainerCount; i++) {
-        PleasureBoatRoom *room = &boat->rooms[draw.picker.order[slot]];
-        u32 trainer = draw.picker.trainers[i];
-        const TrainerEntry *table;
+        u32 room = picker.order[slot];
+        u32 trainer = picker.trainers[i];
 
-        room->index = trainer;
-        room->kind = ROOM_TRAINER;
+        boat->rooms[room].index = trainer;
+        boat->rooms[room].kind = ROOM_TRAINER;
         slot++;
         if (flag == 1) {
-            table = sTrainers;
+            boat->rooms[room].unk4 = sTrainers[trainer].unk4;
+            boat->rooms[room].objCode = sTrainers[trainer].objCode;
+            boat->rooms[room].values[0] = sTrainers[trainer].values[0];
+            boat->rooms[room].values[1] = sTrainers[trainer].values[1];
         } else {
-            table = sTrainersAlt;
+            boat->rooms[room].unk4 = sTrainersAlt[trainer].unk4;
+            boat->rooms[room].objCode = sTrainersAlt[trainer].objCode;
+            boat->rooms[room].values[0] = sTrainersAlt[trainer].values[0];
+            boat->rooms[room].values[1] = sTrainersAlt[trainer].values[1];
         }
-        room->unk4 = table[trainer].unk4;
-        room->objCode = table[trainer].objCode;
-        room->values[0] = table[trainer].values[0];
-        room->values[1] = table[trainer].values[1];
     }
     for (i = 0; i < 2; i++) {
-        PleasureBoatRoom *room = &boat->rooms[draw.picker.order[slot]];
-        const PersonEntry *entry = &sPairs[draw.picker.pairs[i]];
+        u32 room = picker.order[slot];
+        u32 person = picker.pairs[i];
 
-        room->index = i;
-        room->unk4 = 0;
-        room->objCode = entry->objCode;
-        room->kind = ROOM_PAIR;
+        boat->rooms[room].index = i;
+        boat->rooms[room].unk4 = 0;
+        boat->rooms[room].objCode = sPairs[person].objCode;
+        boat->rooms[room].kind = ROOM_PAIR;
         slot++;
-        room->values[0] = entry->values[0];
-        room->values[1] = entry->values[1];
+        boat->rooms[room].values[0] = sPairs[person].values[0];
+        boat->rooms[room].values[1] = sPairs[person].values[1];
     }
-    for (j = 0; j < 15 - (trainerCount + 2); j++) {
-        PleasureBoatRoom *room = &boat->rooms[draw.picker.order[slot]];
-        const PersonEntry *entry = &sPeople[draw.picker.people[j]];
+    for (j = 0; j < PLEASURE_BOAT_ROOM_COUNT - (trainerCount + 2); j++) {
+        u32 room = picker.order[slot];
+        u32 person = picker.people[j];
 
-        room->index = j;
-        room->unk4 = 0;
-        room->objCode = entry->objCode;
-        room->kind = ROOM_PERSON;
+        boat->rooms[room].index = j;
+        boat->rooms[room].unk4 = 0;
+        boat->rooms[room].objCode = sPeople[person].objCode;
+        boat->rooms[room].kind = ROOM_PERSON;
         slot++;
-        room->values[0] = entry->values[0];
-        room->values[1] = entry->values[1];
+        boat->rooms[room].values[0] = sPeople[person].values[0];
+        boat->rooms[room].values[1] = sPeople[person].values[1];
     }
 }
 
