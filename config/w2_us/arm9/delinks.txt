@@ -1524,6 +1524,7 @@ src/system/pokeparty.c:
     .data       start:0x0209a408 end:0x0209a414
 
 src/system/poke_personal.c:
+    complete
     .text       start:0x02020234 end:0x0202053c
     .data       start:0x0209a414 end:0x0209a424
     .bss        start:0x02141428 end:0x02141430
@@ -1556,3 +1557,10 @@ src/system/waza_tool.c:
     .text       start:0x020212ac end:0x020219a0
     .data       start:0x0209a444 end:0x0209a450
     .bss        start:0x02141430 end:0x02141458
+
+src/system/poke_tool.c:
+    complete
+    .text       start:0x0201c2d8 end:0x0201f0a8
+    .rodata     start:0x0209037c end:0x02090520
+    .data       start:0x0209a3e8 end:0x0209a3f4
+    .bss        start:0x0214115c end:0x02141428

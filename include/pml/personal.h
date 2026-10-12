@@ -14,6 +14,8 @@
 #define PERSONAL_ABILITY_HIDDEN 28
 #define PERSONAL_SEX_RATIO 20
 #define PERSONAL_HATCH_CYCLES 21
+#define PERSONAL_FRIENDSHIP 22
+#define PERSONAL_GROWTH_RATE 23
 // The offset of the forms' sprites (not from swan)
 #define PERSONAL_FORM_SPRITE_OFFSET 31
 #define PERSONAL_FORM_COUNT 32
@@ -24,6 +26,11 @@
 // Not from swan: a flag that keeps the summary screen's sprite from bouncing, and the weight
 #define PERSONAL_NO_BOUNCE 16
 #define PERSONAL_WEIGHT 38
+// Not from swan: the first of the four words of TM and HM flags, the free move tutors' flags, and the first of the
+// four words of the paid move tutors' flags
+#define PERSONAL_MACHINES_1 39
+#define PERSONAL_TUTORS 43
+#define PERSONAL_TUTOR_PAID_1 44
 
 // A species' data, the files of ARCID_PERSONAL. PML_PersonalGetParam reads its fields by number
 typedef struct {
@@ -78,7 +85,7 @@ void *PML_PersonalLoad(u16 species, u16 form, HeapID heapId);
 u32 PML_PersonalGetParam(void *personal, u32 param);
 void PML_PersonalFree(void *personal);
 // The moves a species learns by level, pairs of move and level that end with two 0xffff
-void PML_LearnsetLvUpLoad(u16 species, u8 form, void *dest);
+void PML_LearnsetLvUpLoad(u16 species, u16 form, void *dest);
 // The experience a Pokémon of the species needs for the level
 u32 PML_UtilGetPkmLvExp(u16 species, u16 form, u16 level);
 // The regional Pokédex numbers, by national number, and, if count is not NULL, how many species have one. The caller

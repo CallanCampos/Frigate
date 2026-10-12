@@ -1012,7 +1012,7 @@ BOOL Box2Main_PokeItemFormChange(Box2SysWork *syswk, BoxPkm *pkm) {
     } else if (species == SPECIES_GENESECT) {
         item = PML_PkmGetParam(pkm, PKM_PARAM_ITEM, NULL);
         form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
-        newForm = func_0201ef8c(item);
+        newForm = PML_ItemGetGenesectDriveForme(item);
         if (form != newForm) {
             PokeChangeForme(syswk, pkm, newForm);
         }

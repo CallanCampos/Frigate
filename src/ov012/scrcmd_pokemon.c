@@ -916,7 +916,7 @@ PartyPkm *GameData_MakeBoxPkm(GameData *gameData, BoxPkmCreateParams *params) {
     trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));
     pid = PML_GenPID(trainerId, (u16)params->species, (u16)params->form, params->sex, params->ability,
                      params->param1C);
-    pkm = PokeParty_NewPkm((u16)params->species, (u16)params->level, trainerId, 0, -1, pid, params->heapId);
+    pkm = PokeParty_NewPkm((u16)params->species, (u16)params->level, trainerId, PKM_IVS_RANDOM, pid, params->heapId);
     PokeParty_ChangeForme(pkm, params->form);
     PokeParty_SetParam(pkm, 6, params->item);
     if (params->hiddenAbility != 0) {

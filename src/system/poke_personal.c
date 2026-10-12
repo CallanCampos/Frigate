@@ -35,7 +35,7 @@ void PML_PersonalFetchBW2(u16 species, u16 form, PersonalData *dest) {
     GFL_ArcToolReadRaw(g_PMLPersonalArcBW2[0], sizeof(PersonalData), dest);
 }
 
-void PML_LearnsetLvUpLoad(u16 species, u8 form, void *dest) {
+void PML_LearnsetLvUpLoad(u16 species, u16 form, void *dest) {
     GFL_ArcSysRead(dest, ARCID_LEARNSETS, PML_PersonalGetDatID(species, form));
 }
 
@@ -155,8 +155,9 @@ u32 PML_PersonalGetParam(void *personal, u32 param) {
 }
 
 // Whether a sex ratio leaves one sex only: all male, all female, or none
-BOOL isGenderlessOrSetGender(u8 genderRatio) {
-    if (genderRatio == 0 || (genderRatio >= 254 && genderRatio <= 255)) {
+BOOL isGenderlessOrSetGender(u32 genderRatio) {
+    if (genderRatio == GENDER_RATIO_MALE_ONLY || genderRatio == GENDER_RATIO_FEMALE_ONLY ||
+        genderRatio == GENDER_RATIO_GENDERLESS) {
         return TRUE;
     }
     return FALSE;

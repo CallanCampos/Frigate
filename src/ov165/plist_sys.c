@@ -2944,7 +2944,7 @@ static void PokeList_LearnMove(PokeListWork *wk, PartyPkm *pkm) {
     if (wk->param->mode == 5 || wk->param->mode == 8) {
         PokeParty_LearnMove(pkm, wk->param->move);
     } else {
-        func_0201d268(pkm, wk->param->move);
+        PokeParty_LearnMoveTutor(pkm, wk->param->move);
     }
 }
 
@@ -2952,7 +2952,7 @@ static void PokeList_SetMove(PokeListWork *wk, PartyPkm *pkm, u8 slot) {
     if (wk->param->mode == 5 || wk->param->mode == 8) {
         PokeParty_SetMove(pkm, wk->param->move, slot);
     } else {
-        func_0201d2d0(pkm, wk->param->move, slot);
+        PokeParty_SetMoveKeepPP(pkm, wk->param->move, slot);
     }
 }
 

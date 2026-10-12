@@ -237,7 +237,7 @@ void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
         record.cast[i] = PokeIcon_PackSpecies(species, form, PokeParty_GetParam(pkm, 0x6e, NULL));
-        if (func_0201f010(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL)) >= 2) {
+        if (PML_GetPokestarFameLevel(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL)) >= 2) {
             record.famousCast |= (u8)(1 << i);
         }
     }

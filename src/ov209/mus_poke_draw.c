@@ -241,7 +241,7 @@ static void MusPokeDraw_GetLoadInfo(MusicalPoke *musPoke, MCSSLoadInfo *info, BO
     sex = musPoke->sex;
     rare = musPoke->rare;
     dir = POKEGRA_DIR_FRONT;
-    form = func_0201efe4(musPoke->species, form);
+    form = PML_PkmGetSpriteForme(musPoke->species, form);
     if (back == TRUE) {
         dir = POKEGRA_DIR_BACK;
     }

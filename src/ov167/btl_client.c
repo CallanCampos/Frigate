@@ -5591,7 +5591,7 @@ static BOOL BattleClient_LearnMoveSeq(BtlClient *client, s32 *seq, BattleMon *mo
         sLearnMove = 0;
         *seq = 1;
     case 1:
-        sLearnMove = func_0201d358(GetSrcData(mon), &sLearnIdx, client->heapId);
+        sLearnMove = PokeParty_LearnNextLevelMove(GetSrcData(mon), &sLearnIdx, client->heapId);
         if (sLearnMove == 0) {
             return TRUE;
         }
@@ -6774,7 +6774,7 @@ static void func_ov167_021b96f0(BtlClient *client, BtlClientStudioWork *studio, 
     int fame;
 
     PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
-    fame = func_0201f010(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL));
+    fame = PML_GetPokestarFameLevel(PokeParty_GetParam(pkm, PKM_PARAM_POKESTAR_FAME, NULL));
     studio->score.points[1] += sFameBonus[fame];
     studio->score.counts[1]++;
     func_ov167_021b96e0(client->viewCore, &client->studio, fame);
