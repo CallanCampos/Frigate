@@ -39,6 +39,7 @@
 #include "system/bmp_oam.h"
 #include "system/bmp_winframe.h"
 #include "system/gf_font.h"
+#include "system/nsbtx_to_clwk.h"
 #include "system/poke_icon.h"
 #include "system/printsys.h"
 #include "system/prof_word.h"
@@ -2794,13 +2795,13 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
     switch (type) {
     case ICON_TYPE_PLAYER:
         if (species == 0) {
-            func_020164e8(icon->actor, 48, 209, 3, 4, 4, 0, 0, heapId);
+            NsbtxToClwk_LoadTexture(icon->actor, 48, 209, 3, 4, 4, 0, 0, heapId);
         } else {
-            func_020164e8(icon->actor, 48, 218, 3, 4, 4, 0, 0, heapId);
+            NsbtxToClwk_LoadTexture(icon->actor, 48, 218, 3, 4, 4, 0, 0, heapId);
         }
         break;
     case ICON_TYPE_RIVAL:
-        func_020164e8(icon->actor, 48, 48 + 221, 3, 4, 4, 0, 0, heapId);
+        NsbtxToClwk_LoadTexture(icon->actor, 48, 48 + 221, 3, 4, 4, 0, 0, heapId);
         break;
     case ICON_TYPE_FRIEND:
         func_0204c378(icon->actor, 0, TRUE);

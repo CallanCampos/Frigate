@@ -223,7 +223,7 @@ static BtlSetup *BtlSetup_SetTrainerTrialHouse(GameSystem *gsys, u16 mode, BtlFi
         break;
     }
     if (a3 == TRUE) {
-        func_020186b0(setup, heapId);
+        BtlSetup_AllocRecBuffer(setup, heapId);
     }
     return setup;
 }

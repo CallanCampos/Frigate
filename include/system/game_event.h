@@ -29,6 +29,13 @@ void GameEvent_Transplant(GameEvent *event, GameEventCallback callback, u32 size
 void *GameEvent_GetData(GameEvent *event);
 GameSystem *GameEvent_GetGameSystem(GameEvent *event);
 u32 *GameEvent_GetStatePtr(GameEvent *event);
+// Frees the event and runs next in its place: next returns to the event that called this one
 void GameEvent_Replace(GameEvent *event, GameEvent *next);
+// The event that goes on when this one is done, or NULL
+GameEvent *GameEvent_GetReturnEvent(GameEvent *event);
+// Runs the current event, and the ones it returns to while they ask for it. Whether the last event ended
+BOOL GSYS_UpdateEvents(GameSystem *gsys);
+// Starts the event that provider creates, if it creates one and no event is running
+BOOL GSYS_FeedEventsFromProvider(GameSystem *gsys, GameEventProvider provider, void *data);
 
 #endif // POKEBW2_SYSTEM_GAME_EVENT_H

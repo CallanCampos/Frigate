@@ -155,6 +155,9 @@ BOOL func_0200746c(SaveControl *save);
 void func_020073ac(SaveControl *save);
 u32 func_020073c4(SaveControl *save);
 void func_02007424(SaveControl *save);
+// The same for one block: func_0200760c starts and func_0200764c continues
+void func_0200760c(SaveControl *save, u32 block);
+u32 func_0200764c(SaveControl *save, u32 block);
 // Four flags of the save control, at 4 to 7
 u8 func_0200748c(SaveControl *save);
 void func_02007490(SaveControl *save, u32 value);

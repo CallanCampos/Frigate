@@ -1424,3 +1424,53 @@ src/system/fest_mission_beacon.c:
     complete
     .text       start:0x02014ff0 end:0x02015878
     .rodata     start:0x0208ff20 end:0x0208ff7c
+
+src/system/rtc.c:
+    complete
+    .text       start:0x02015a90 end:0x02015ae0
+    .rodata     start:0x0208ff84 end:0x0208fff8
+
+src/system/ica_anime.c:
+    .text       start:0x02015ae0 end:0x02016440
+    .rodata     start:0x0208fff8 end:0x02090010
+    .data       start:0x0209a300 end:0x0209a30c
+
+src/system/nsbtx_to_clwk.c:
+    complete
+    .text       start:0x02016440 end:0x0201666c
+    .data       start:0x0209a30c end:0x0209a31c
+
+src/system/game_system.c:
+    .text       start:0x0201666c end:0x02016cb4
+    .rodata     start:0x02090010 end:0x0209001c
+    .bss        start:0x021410f4 end:0x02141110
+
+src/system/game_event.c:
+    complete
+    .text       start:0x02016cb4 end:0x02016ee8
+    .data       start:0x0209a31c end:0x0209a32c
+
+src/system/game_data.c:
+    complete
+    .text       start:0x02016ee8 end:0x02017bc0
+    .rodata     start:0x0209001c end:0x02090060
+    .data       start:0x0209a32c end:0x0209a338
+
+src/system/text_speed.c:
+    complete
+    .text       start:0x02017bc0 end:0x02017c60
+    .rodata     start:0x02090060 end:0x02090068
+    .data       start:0x0209a338 end:0x0209a33c
+
+src/system/btl_setup.c:
+    complete
+    .text       start:0x02017c60 end:0x020186e0
+    .rodata     start:0x02090068 end:0x02090070
+    .data       start:0x0209a33c end:0x0209a348
+
+src/system/zonedata.c:
+    complete
+    .text       start:0x020186e0 end:0x02018ee4
+    .rodata     start:0x02090070 end:0x02090120
+    .data       start:0x0209a348 end:0x0209a380
+    .bss        start:0x02141110 end:0x02141114

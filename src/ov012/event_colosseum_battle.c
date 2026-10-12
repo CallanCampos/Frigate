@@ -47,7 +47,7 @@ static GameEventReturnCode func_ov012_0215264c(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 5:
-        func_02017cac(&work->setup);
+        BtlSetup_FreeContents(&work->setup);
         GameEvent_ChainNext(event, EventBGMFadePop_Create(gsys));
         (*state)++;
         break;
@@ -142,13 +142,13 @@ GameEvent *func_ov012_02152704(GameSystem *gsys, Field *field, u32 category, Col
         GFL_ASSERT_MSG(FALSE, "play_category = %d\n", category);
         return NULL;
     }
-    func_02017cfc(setup, param->party, 0);
-    func_02017d30(setup, param->regulation, HEAPID_GAMEEVENT);
+    BtlSetup_SetParty(setup, param->party, 0);
+    BtlSetup_ApplyRegulation(setup, param->regulation, HEAPID_GAMEEVENT);
     // The battle's music, as above
     setup->fieldSituation.bgm = param->bgm;
     work->players->rule = rule;
     work->players->unk4C = 0;
-    func_020186b0(setup, 1);
+    BtlSetup_AllocRecBuffer(setup, 1);
     return event;
 }
 

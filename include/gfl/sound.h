@@ -151,6 +151,8 @@ u32 func_02006e80(void (*callback)(u32 result, u32 *done), u32 *done);
 void func_02006ec0(void *chatter);
 
 // The BGM info archive: which interactive sound subsystem each BGM uses (ISS_SUBSYSTEM_*), or 0 for none
+BGMInfo *BGMInfo_Create(HeapID heapId);
+void BGMInfo_Free(BGMInfo *info);
 u8 BGMInfo_GetISSSubsystem(BGMInfo *info, u16 bgm);
 
 #endif // POKEBW2_GFL_SOUND_H

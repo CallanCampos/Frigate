@@ -4,6 +4,7 @@
 // Names, layouts and constants from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
+#include "gfl/heap.h"
 #include "struct_decls.h"
 
 #define FLD_STATUS_BUSY_NONE 0x0
@@ -14,6 +15,8 @@
 #define FLD_FLASH_ALLOW 0x1
 #define FLD_FLASH_ACTIVE 0x2
 
+FieldStatus *FieldStatus_Create(HeapID heapId);
+void FieldStatus_Free(FieldStatus *status);
 BOOL FieldStatus_CheckFlashUsed(FieldStatus *status);
 u16 FieldStatus_GetFlashPerms(FieldStatus *status);
 BOOL FieldStatus_CheckContinueFlag(FieldStatus *status);

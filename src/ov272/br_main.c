@@ -220,7 +220,7 @@ static void *BrMain_BattleCreateParam(HeapID heapId, void *work, u32 preID) {
     BrMainWork *wk = work;
     BtlSetup *setup = BtlSetup_Create(heapId);
 
-    func_02018540(setup, wk->param->gameData, heapId);
+    BtlSetup_InitForRecord(setup, wk->param->gameData, heapId);
     func_0200c1f0();
     BattleRecTool_LoadSetup(setup, 0, heapId);
     func_0200c200();
@@ -244,7 +244,7 @@ static void BrMain_BattleFreeParam(void *param, void *work) {
     }
     wk->data.unk_17bc = setup->unkDD_1;
     GFL_HeapFree(setup->unk34[0]);
-    func_020185b4(setup);
+    BtlSetup_FreeForRecord(setup);
     BtlSetup_Free(setup);
     BrMainProcSys_SetNext(work, BR_MAIN_PROCID_CORE);
 }

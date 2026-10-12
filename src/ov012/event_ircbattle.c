@@ -308,8 +308,8 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
             break;
         }
         }
-        func_02017cfc(work->btlSetup, work->party, 0);
-        func_020186b0(work->btlSetup, 1);
+        BtlSetup_SetParty(work->btlSetup, work->party, 0);
+        BtlSetup_AllocRecBuffer(work->btlSetup, 1);
         work->bgm = GFL_SndBGMGetID();
         func_02005d8c();
         func_02040624(func_02040440(), 10, 12);
