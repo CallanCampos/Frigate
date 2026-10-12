@@ -290,8 +290,9 @@ beside `data.json`.
 
 Each species folder now keeps its battle graphics, icon, footprint, and cry next to its gameplay data, following the
 per-species organization used by [pokeemerald expansion](https://github.com/rh-hideout/pokeemerald-expansion/tree/master/graphics/pokemon).
-`front_single.png` and `back_single.png` are 96×96 character atlases; `front.png` and `back.png` are the 256×128
-animated character sheets. Optional female variants have `_female` in their names. The indexed PNGs carry the
+`front_single.png` and `back_single.png` assemble the game's four OBJ blocks into a 96×96 sprite.
+`front.png` and `back.png` are 256×128 linear texture atlases for the animated sprite; their pieces are positioned
+by the Nitro cell and multi-cell animation data. Optional female variants have `_female` in their names. The indexed PNGs carry the
 original 4-bit color indices, while `normal.pal` and `shiny.pal` are the palettes used by the game. Edit palette
 colors in the JASC `.pal` file; the PNG palette is for viewing in an image editor. The game assembles characters
 into sprites using the adjacent `*_cells.ncer` and `*_animations.nanr.lz11` Nitro resources, so a raw PNG sheet can look
@@ -300,7 +301,8 @@ fragmented. Those resources are preserved as separate source files and can be re
 `icon.png` is a 32×64 two-frame icon, using a bank in
 `data/pokemon/shared/icon_palettes.pal`; the code in `src/system/poke_icon.c` picks the bank.
 `footprint.png` is a 16×32 character sheet and uses `data/pokemon/shared/footprint_palette.pal`.
-The older musical sprite archive has its own `musical/` subfolder. Sprite forms have `form_<n>/` folders under their
+The older musical sprite archive has its own `musical/` subfolder. Files identical to the regular sprite are omitted
+there; the packer uses the regular file for those entries. Sprite forms have `form_<n>/` folders under their
 species. Eggs and currently unidentified reserved graphics slots are kept under `egg/` and `extra_graphics/` so no
 archive entries are dropped.
 

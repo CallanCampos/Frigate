@@ -114,10 +114,11 @@ def single_cell_reorder(chars, reverse=False):
     if len(chars) != 0x1200:
         raise ValueError("single-cell Pokémon sprite must be 96 by 96")
     output = bytearray(len(chars))
-    spans = ([(i * 0x180, i * 0x100, 0x100) for i in range(8)]
-             + [((i * 12 + 8) * 32, 0x800 + i * 0x80, 0x80) for i in range(8)]
-             + [(i * 0x180 + 0xc00, 0xc00 + i * 0x100, 0x100) for i in range(4)]
-             + [((i * 12 + 104) * 32, 0x1000 + i * 0x80, 0x80) for i in range(4)])
+    # Four OBJ blocks (64x64, 32x64, 64x32, 32x32) become one 96x96 tiled image.
+    spans = ([(i * 0x100, i * 0x180, 0x100) for i in range(8)]
+             + [(0x800 + i * 0x80, i * 0x180 + 0x100, 0x80) for i in range(8)]
+             + [(0xc00 + i * 0x100, 0xc00 + i * 0x180, 0x100) for i in range(4)]
+             + [(0x1000 + i * 0x80, 0xc00 + i * 0x180 + 0x100, 0x80) for i in range(4)])
     for source, target, size in spans:
         if reverse:
             output[source:source + size] = chars[target:target + size]
@@ -126,7 +127,7 @@ def single_cell_reorder(chars, reverse=False):
     return bytes(output)
 
 
-def character_pixels(blob, width=None, height=None, single_cell=False):
+def character_pixels(blob, width=None, height=None, single_cell=False, linear=False):
     raw = resource_data(blob, b"RGCN", b"RAHC")
     tile_height, tile_width = struct.unpack_from("<HH", raw, 24)
     size = struct.unpack_from("<I", raw, 40)[0]
@@ -139,6 +140,8 @@ def character_pixels(blob, width=None, height=None, single_cell=False):
         raise ValueError("invalid Nitro character data")
     if single_cell:
         chars = single_cell_reorder(chars)
+    if linear:
+        return width, height, bytes(value for byte in chars for value in (byte & 15, byte >> 4))
     pixels = bytearray(width * height)
     cursor = 0
     for ty in range(0, height, 8):
@@ -153,23 +156,30 @@ def character_pixels(blob, width=None, height=None, single_cell=False):
     return width, height, bytes(pixels)
 
 
-def patch_characters(blob, width, height, pixels, single_cell=False):
+def patch_characters(blob, width, height, pixels, single_cell=False, linear=False):
     raw = bytearray(resource_data(blob, b"RGCN", b"RAHC"))
-    old_width, old_height, _ = character_pixels(blob, width, height, single_cell)
+    old_width, old_height, _ = character_pixels(blob, width, height, single_cell, linear)
     if (width, height) != (old_width, old_height) or len(pixels) != width * height:
         raise ValueError("Nitro character dimensions changed")
     chars = bytearray(width * height // 2)
     cursor = 0
-    for ty in range(0, height, 8):
-        for tx in range(0, width, 8):
-            for y in range(8):
-                for x in range(0, 8, 2):
-                    base = (ty + y) * width + tx + x
-                    left, right = pixels[base:base + 2]
-                    if left > 15 or right > 15:
-                        raise ValueError("Nitro character index exceeds 4bpp")
-                    chars[cursor] = left | right << 4
-                    cursor += 1
+    if linear:
+        for left, right in zip(pixels[::2], pixels[1::2]):
+            if left > 15 or right > 15:
+                raise ValueError("Nitro character index exceeds 4bpp")
+            chars[cursor] = left | right << 4
+            cursor += 1
+    else:
+        for ty in range(0, height, 8):
+            for tx in range(0, width, 8):
+                for y in range(8):
+                    for x in range(0, 8, 2):
+                        base = (ty + y) * width + tx + x
+                        left, right = pixels[base:base + 2]
+                        if left > 15 or right > 15:
+                            raise ValueError("Nitro character index exceeds 4bpp")
+                        chars[cursor] = left | right << 4
+                        cursor += 1
     raw[48:48 + len(chars)] = single_cell_reorder(chars, reverse=True) if single_cell else chars
     return compress_literals(bytes(raw), blob[0]) if blob[0] in (0x10, 0x11) else bytes(raw)
 

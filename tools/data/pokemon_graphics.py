@@ -91,7 +91,8 @@ def battle_file(root, index, musical):
     folder = group_folder(root, group, musical)
     name = SLOT_NAMES[slot]
     if slot in CHAR_SLOTS:
-        return folder / f"{name}.png", "char", {"single_cell": slot in (0, 1, 9, 10)}
+        return folder / f"{name}.png", "char", {
+            "single_cell": slot in (0, 1, 9, 10), "linear": slot in (2, 3, 11, 12)}
     if slot in PALETTE_SLOTS:
         return folder / f"{name}.pal", "palette", None
     extension = {4: ".ncer", 5: ".nanr.lz11", 6: ".nmcr", 7: ".nmar",
@@ -174,10 +175,21 @@ def export(root):
             else:
                 width, height, pixels = character_pixels(blob, *(options.get("size", (None, None)) if options else
                                                           (None, None)),
-                                                          single_cell=options.get("single_cell", False) if options else False)
+                                                          single_cell=options.get("single_cell", False) if options else False,
+                                                          linear=options.get("linear", False) if options else False)
                 target.write_bytes(write_indexed_png(width, height, pixels,
                                                     colors_for(root, archive_name, archive, index, options)))
         print(f"{archive_name}: {len(archive)} entries", flush=True)
+    musical = read_narc((ROOT / "extract/b2_us/files/a/0/5/1").read_bytes())
+    for index, blob in enumerate(musical):
+        if not blob:
+            continue
+        path, _, _ = battle_file(root, index, True)
+        if path.parent.name != "musical":
+            continue
+        shared = path.parent.parent / path.name
+        if shared.is_file() and path.read_bytes() == shared.read_bytes():
+            path.unlink()
 
 
 def pack(root, game, output):
@@ -192,6 +204,8 @@ def pack(root, game, output):
             result.append(original)
             continue
         path, kind, options = source_file(root, archive_name, index)
+        if archive_name == "a/0/5/1" and not path.exists() and path.parent.name == "musical":
+            path = path.parent.parent / path.name
         if kind == "raw":
             edited = path.read_bytes()
         elif kind == "palette":
@@ -205,12 +219,14 @@ def pack(root, game, output):
             width, height, pixels = read_indexed_png(path)
             expected_width, expected_height, original_pixels = character_pixels(
                 original, *(options.get("size", (None, None)) if options else (None, None)),
-                single_cell=options.get("single_cell", False) if options else False)
+                single_cell=options.get("single_cell", False) if options else False,
+                linear=options.get("linear", False) if options else False)
             if (width, height) != (expected_width, expected_height):
                 raise ValueError(f"{path}: expected {expected_width} by {expected_height} pixels")
             edited = (original if pixels == original_pixels else
                       patch_characters(original, width, height, pixels,
-                                       single_cell=options.get("single_cell", False) if options else False))
+                                       single_cell=options.get("single_cell", False) if options else False,
+                                       linear=options.get("linear", False) if options else False))
         result.append(edited)
     target = Path(output)
     target.parent.mkdir(parents=True, exist_ok=True)
