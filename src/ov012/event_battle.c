@@ -356,19 +356,19 @@ GameEvent *LoadTradedPokemonBattleStats(GameSystem *gsys, Field *field, u32 a2, 
     void *block = GetTradedPokemonBlock(GSYS_GetGameData(gsys));
     GameEvent *event = EventTrainerBattleCall_Create(gsys, field, a2, a3, trainerId, a5, flags);
 
-    if (func_0200efd4(block, index)) {
+    if (TradedPokemonSave_IsTraded(block, index)) {
         EventBattleCallWork *work = GameEvent_GetData(event);
         PartyPkm *pkm = PokeParty_GetPkm(work->setup->party[1], 0);
-        u32 species = func_0200f01c(block, index, GAME_VERSION);
-        u8 level = func_0200efe0(block, index);
-        u32 id = func_0200f068(block, index);
+        u32 species = TradedPokemonSave_GetSpecies(block, index, GAME_VERSION);
+        u8 level = TradedPokemonSave_GetBattleLevel(block, index);
+        u32 id = TradedPokemonSave_GetId(block, index);
 
-        PokeParty_CreatePkm(pkm, species, level, id, PKM_IVS_RANDOM, func_0200f058(block, index));
-        if (func_0200f000(block, index)) {
+        PokeParty_CreatePkm(pkm, species, level, id, PKM_IVS_RANDOM, TradedPokemonSave_GetPersonality(block, index));
+        if (TradedPokemonSave_HasAbility(block, index)) {
             PokeParty_SetParam(pkm, 0x71, TRUE);
-            PokeParty_SetParam(pkm, PKM_PARAM_ABILITY, func_0200f014(block, index));
+            PokeParty_SetParam(pkm, PKM_PARAM_ABILITY, TradedPokemonSave_GetAbility(block, index));
         }
-        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)func_0200f060(block, index));
+        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)TradedPokemonSave_GetNickname(block, index));
         setChangedPkmSpecies(pkm, (u16)species);
         PokeParty_SetDefaultMoves(pkm);
     }

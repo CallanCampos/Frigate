@@ -2,6 +2,7 @@
 #define POKEBW2_SAVE_POKEWOOD_H
 
 #include "types.h"
+#include <stddef.h>
 #include "gfl/heap.h"
 #include "save/battle_rec.h"
 #include "struct_decls.h"
@@ -17,7 +18,9 @@ typedef struct {
     s32 score;
     // func_02021204 of each Pokémon of the cast: its species, form and sex
     u16 cast[6];
-    u16 unk10;
+    // Set once the movie has a record, and whether that record was beaten and func_0201117c has not seen it yet
+    u8 hasRecord;
+    u8 isNewRecord;
     // A bit for each Pokémon of the cast whose Pokéstar fame is at level 2 or more
     u8 famousCast;
     u8 unk13;
@@ -41,18 +44,78 @@ typedef struct {
     u16 trainerClass;
     u8 unk128;
     u8 unkE0;
-    u8 unk4A4[8];
+    // When the movie was saved: the year, month, day and day of the week, and the hour, minute and second, a byte
+    // each from the top
+    u32 date;
+    u32 time;
     u32 unk130;
-} PokewoodBlock;
+    // getCRC16 of everything before it
+    u32 crc;
+} PokewoodBlock; // size: 0x4b4
 
+// The size that the block's CRC covers
+#define POKEWOOD_BLOCK_CRC_SIZE offsetof(PokewoodBlock, crc)
+// The size of the extra save block that holds a movie, and of the buffer the block is loaded into
+#define POKEWOOD_EXTRA_BLOCK_SIZE 0x600
+// The downloaded movies the save has room for
+#define POKEWOOD_DOWNLOAD_SLOT_COUNT 8
+
+// The fields of the loaded movie that func_020107f0 gives
+enum {
+    POKEWOOD_BLOCK_FIELD_UNKDF,
+    POKEWOOD_BLOCK_FIELD_UNK124,
+    // Makes the party Pokémon that the second argument points to of a Pokémon of the cast, and gives 1
+    POKEWOOD_BLOCK_FIELD_PKM_0,
+    POKEWOOD_BLOCK_FIELD_PKM_5 = POKEWOOD_BLOCK_FIELD_PKM_0 + 5,
+    POKEWOOD_BLOCK_FIELD_UNK128,
+    POKEWOOD_BLOCK_FIELD_UNKE0,
+    POKEWOOD_BLOCK_FIELD_DATE,
+    POKEWOOD_BLOCK_FIELD_TIME,
+    POKEWOOD_BLOCK_FIELD_UNK130,
+};
+
+// The flag lists of the save, with a flag for each movie
+#define POKEWOOD_FLAG_LIST_COUNT 7
+#define POKEWOOD_FLAG_WORDS ((POKEWOOD_MOVIE_COUNT + 31) / 32)
+#define POKEWOOD_SLOT_COUNT 8
+#define POKEWOOD_LAST_SERIES_COUNT 4
+
+// Block 0x47 (pokewood_savedata.c, a descriptive name)
+struct PokewoodSave {
+    u32 flags0[POKEWOOD_FLAG_WORDS];
+    u32 flags1[POKEWOOD_FLAG_WORDS];
+    u32 flags2[POKEWOOD_FLAG_WORDS];
+    u32 flags3[POKEWOOD_FLAG_WORDS];
+    u8 slots[POKEWOOD_SLOT_COUNT];
+    PokewoodRecord records[POKEWOOD_MOVIE_COUNT];
+    // 0 to 99
+    s16 unk348;
+    // A bit for each level of func_020111ec
+    s16 levelBits;
+    // The series (plus 1, 0 for none) of the last movies filmed, from the newest
+    u8 lastSeries[POKEWOOD_LAST_SERIES_COUNT];
+    u32 flags4[POKEWOOD_FLAG_WORDS];
+    u32 flags5[POKEWOOD_FLAG_WORDS];
+    u32 flags6[POKEWOOD_FLAG_WORDS];
+    u8 padding368[0x7c];
+}; // size: 0x3e4
+
+// The block's size and its initial state
+u32 func_02010ff4(void);
+void func_02010ffc(PokewoodSave *save);
 PokewoodSave *func_02011040(GameData *gameData);
 // Flag lists 0 to 6 of the save, with a flag for each movie
 BOOL func_020110ac(PokewoodSave *save, u32 list, u32 movie);
 void func_020110d4(PokewoodSave *save, u32 list, u32 movie);
+// func_020110ac for lists 0 and 1
+BOOL func_02011100(PokewoodSave *save, u32 movie);
+BOOL func_02011118(PokewoodSave *save, u32 movie);
 // func_020110d4 for list 1
 void func_02011124(PokewoodSave *save, u32 movie);
 // Keeps record as the movie's best if it scored at least as much
 void func_02011130(PokewoodSave *save, u32 movie, const PokewoodRecord *record);
+// Marks a movie's record as there and as seen
+void func_0201117c(PokewoodSave *save, u32 movie);
 PokewoodRecord *func_02011194(PokewoodSave *save, u32 movie);
 // A byte for each of 8 slots
 u8 func_020111a0(PokewoodSave *save, u32 slot);
@@ -71,7 +134,9 @@ void func_0201127c(PokewoodSave *save, u32 a1, u32 a2, u8 *a3);
 // How many movies have their flag set in a list
 u32 func_020112d8(PokewoodSave *save, u32 list);
 
-// The Pokewood block is the buffer that a downloaded movie is loaded into
+// The Pokewood block is the buffer that a downloaded movie is loaded into (pokewood_rec.c). The size of the block
+// and its initial state, as an extra save block
+void clearPokewoodBlock(PokewoodBlock *block);
 u32 getSizeOfPokewoodBlock(void);
 void allocatePokewoodBlk(HeapID heapId);
 void freeAndClearPokewoodBlk(void);

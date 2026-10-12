@@ -902,7 +902,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 410:
-        func_0200f700(getHollow_RivalData(save), bsw->partner.id);
+        Misc_AddMetTrainer(getHollow_RivalData(save), bsw->partner.id);
         break;
     case 411:
         *retWk = func_0203ffc4() == FALSE ? FieldPlayer_GetObjCodeByForme(FieldPlayer_GetSex(Field_GetPlayer(field)), 0)

@@ -196,7 +196,7 @@ static GameEventReturnCode func_ov012_02150e6c(GameEvent *event, u32 *state, voi
                     PlayerInfo *info = func_ov211_021ef9c4(work->commWork->comm, i);
 
                     if (info != NULL) {
-                        func_0200f700(rivals, getIDAsUInt(info));
+                        Misc_AddMetTrainer(rivals, getIDAsUInt(info));
                     }
                 }
             }

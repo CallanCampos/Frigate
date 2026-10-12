@@ -1062,7 +1062,7 @@ static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, 
     case 0: {
         RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(wk->param.gameData));
 
-        func_0200f700(rival, getIDAsUInt(&wk->param.partnerData->info));
+        Misc_AddMetTrainer(rival, getIDAsUInt(&wk->param.partnerData->info));
         *seq = 1;
         break;
     }
@@ -1475,7 +1475,7 @@ static void LiveBattleMatchFlow_FillPlayerData(LiveBattleMatchPlayerData *data, 
     data->unk44 = 100;
     sys_memcpy(GetGameDataPlayerInfo(gameData), data, PlayerInfo_GetSize());
     func_0207c33c(data->mac);
-    func_0200ef90(func_0200ef7c(GameData_GetSaveControl(gameData)), 0, &data->sentence);
+    CGearPhrases_Get(CGearPhrases_GetBlock(GameData_GetSaveControl(gameData)), 0, &data->sentence);
     party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(gameData)), HEAPID_LIVEBATTLEMATCH_TEAM);
     sys_memcpy(party, (u8 *)data + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, PokeParty_GetSaveDataSize());
     GFL_HeapFree(party);

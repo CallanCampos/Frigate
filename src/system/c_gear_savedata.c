@@ -18,7 +18,7 @@ u32 func_02009854(void) {
 
 void func_02009858(CGearSave *cgear) {
     sys_memset(cgear, 0, func_02009854());
-    func_0200ef48(cgear->phrases);
+    CGearPhrases_Init(cgear->phrases);
     func_02009890(&cgear->settings);
     ShortcutSave_Init(&cgear->shortcuts);
     func_020114a8(cgear->name);

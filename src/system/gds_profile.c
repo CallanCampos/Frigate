@@ -52,7 +52,7 @@ void GdsProfile_SetFromGameData(GdsProfile *profile, GameData *gameData) {
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     UnityTowerSurveySave *survey = getUnityTower_SurveySaveBlkAddrress(save);
     TrainerGameInfoSave *gameInfo = getTrainerCardDataBlkAddress(gameData);
-    void *sentences = func_0200ef7c(save);
+    void *sentences = CGearPhrases_GetBlock(save);
     OSOwnerInfo ownerInfo;
     int species;
     int form;
@@ -75,7 +75,7 @@ void GdsProfile_SetFromGameData(GdsProfile *profile, GameData *gameData) {
     for (i = 0; i < GDS_PROFILE_INTRODUCTION_LENGTH; i++) {
         profile->introduction.text[i] = GFL_StrBufGetTerminator();
     }
-    func_0200ef90(sentences, 0, &profile->introduction.pms);
+    CGearPhrases_Get(sentences, 0, &profile->introduction.pms);
     profile->birthMonth = ownerInfo.birthday.month;
     profile->unionView = func_02008bf4(playerInfo);
     profile->version = GAME_VERSION;

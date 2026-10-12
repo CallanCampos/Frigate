@@ -444,7 +444,7 @@ static void JoinAvenueData_FillAdventure(JoinAvenueData *data, GameData *gameDat
 
     medalBox = SaveControl_GetMedalBox(save);
     adventure->medalCount = MedalBox_GetObtainedCount(medalBox, 0);
-    adventure->lastMedal = func_0200fa44(medalBox);
+    adventure->lastMedal = MedalBox_GetLastMedal(medalBox);
     adventure->medalRank = MedalBox_GetRank(medalBox);
     if (adventure->lastMedal < 0xff) {
         MedalBox_GetMedalDate(medalBox, adventure->lastMedal, &year, &month, &day);

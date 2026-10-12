@@ -1092,7 +1092,7 @@ void func_ov257_021aae44(CommTvtWork *sys) {
 }
 
 void func_ov257_021aae54(CommTvtWork *sys, const CtvtCommMemberInfo *info) {
-    func_0200f700(getHollow_RivalData(GameData_GetSaveControl(sys->param->gameData)),
+    Misc_AddMetTrainer(getHollow_RivalData(GameData_GetSaveControl(sys->param->gameData)),
                   getIDAsUInt((PlayerInfo *)info->playerInfo));
 }
 

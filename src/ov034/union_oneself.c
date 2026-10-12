@@ -380,7 +380,7 @@ static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *r
             if (i == 0) {
                 if (UnionEff_IsFriendBeacon(wifiList, &entry->beacon) == TRUE) {
                     UnionEff_AddMark(effWork, actor, 0);
-                } else if (func_0200f770(rival, entry->beacon.trainerId) == TRUE) {
+                } else if (Misc_IsMetTrainer(rival, entry->beacon.trainerId) == TRUE) {
                     UnionEff_AddMark(effWork, actor, 1);
                 }
             }
@@ -549,7 +549,7 @@ void UnionOneself_UpdateMarks(UnionSystem *unisys, GameData *gameData, Field *fi
             if (actor != NULL) {
                 if (UnionEff_IsFriendBeacon(wifiList, &entry->beacon) == TRUE) {
                     UnionEff_AddMark(effWork, actor, 0);
-                } else if (func_0200f770(rival, entry->beacon.trainerId) == TRUE) {
+                } else if (Misc_IsMetTrainer(rival, entry->beacon.trainerId) == TRUE) {
                     UnionEff_AddMark(effWork, actor, 1);
                 }
             }
@@ -2114,7 +2114,7 @@ static BOOL UnionOneself_StepTradeRun(UnionSystem *unisys, UnionSelf *situ, Fiel
             GameData *gameData = GSYS_GetGameData(unisys->param->gsys);
             RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
 
-            func_0200f700(rival, getIDAsUInt(func_02017378(gameData, func_02042a6c(func_02040440()) ^ 1)));
+            Misc_AddMetTrainer(rival, getIDAsUInt(func_02017378(gameData, func_02042a6c(func_02040440()) ^ 1)));
             (*seq)++;
         }
         break;
@@ -2686,7 +2686,7 @@ static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *si
 
         for (i = 0; i < count; i++) {
             if (clsys->members[i].unk26 == 1 && i != func_02042a6c(func_02040440())) {
-                func_0200f700(rival, getIDAsUInt(&clsys->members[i].info));
+                Misc_AddMetTrainer(rival, getIDAsUInt(&clsys->members[i].info));
             }
         }
         func_ov028_021729a0(clsys, TRUE);

@@ -1236,3 +1236,136 @@ src/system/symbol_save.c:
 src/system/survey_savedata.c:
     complete
     .text       start:0x0200ec00 end:0x0200ee20
+
+src/system/battle_examination.c:
+    complete
+    .text       start:0x0200ee20 end:0x0200ef48
+    .data       start:0x0209a1f0 end:0x0209a208
+
+src/system/c_gear_phrase_savedata.c:
+    complete
+    .text       start:0x0200ef48 end:0x0200efc4
+
+src/system/traded_pokemon_savedata.c:
+    complete
+    .text       start:0x0200efc4 end:0x0200f128
+
+src/system/unity_tower_floor_savedata.c:
+    complete
+    .text       start:0x0200f128 end:0x0200f164
+
+src/system/pokedex_skin_save.c:
+    complete
+    .text       start:0x0200f164 end:0x0200f19c
+
+src/system/trial_house_savedata.c:
+    complete
+    .text       start:0x0200f19c end:0x0200f1c4
+
+src/system/livematch_savedata.c:
+    complete
+    .text       start:0x0200f1c4 end:0x0200f29c
+
+src/system/battlematch_savedata.c:
+    complete
+    .text       start:0x0200f29c end:0x0200f3b8
+
+src/system/hall_of_fame_savedata.c:
+    complete
+    .text       start:0x0200f3b8 end:0x0200f6e4
+
+src/system/misc_savedata.c:
+    .text       start:0x0200f6e4 end:0x0200f8f4
+    .rodata     start:0x0208f984 end:0x0208f9b0
+
+src/system/medal_box.c:
+    complete
+    .text       start:0x0200f8f4 end:0x0200fb54
+
+src/system/field_actor_savedata.c:
+    complete
+    .text       start:0x0200fb54 end:0x0200fe80
+
+src/system/wbt_savedata.c:
+    complete
+    .text       start:0x0200fe80 end:0x0200ff40
+
+src/system/hollow_rival_savedata.c:
+    complete
+    .text       start:0x0200ff40 end:0x0200fffc
+
+src/system/join_avenue_savedata.c:
+    complete
+    .text       start:0x0200fffc end:0x02010230
+    .rodata     start:0x0208f9b0 end:0x0208f9ec
+    .bss        start:0x02140f70 end:0x02140f74
+
+src/system/key_data_savedata.c:
+    .text       start:0x02010230 end:0x020103f4
+    .rodata     start:0x0208f9ec end:0x0208f9f8
+
+src/system/extra_block_savedata.c:
+    complete
+    .text       start:0x020103f4 end:0x02010448
+
+src/system/key_info.c:
+    complete
+    .text       start:0x02010448 end:0x020105c8
+    .rodata     start:0x0208f9f8 end:0x0208fa40
+
+src/system/pokewood_rec.c:
+    complete
+    .text       start:0x020105c8 end:0x020108cc
+    .rodata     start:0x0208fa40 end:0x0208fa60
+    .data       start:0x0209a208 end:0x0209a218
+    .bss        start:0x02140f74 end:0x02140f78
+
+src/system/memory_link_savedata.c:
+    complete
+    .text       start:0x020108cc end:0x02010ca0
+    .rodata     start:0x0208fa60 end:0x0208fac0
+
+src/system/zukan_habitat_savedata.c:
+    complete
+    .text       start:0x02010ca0 end:0x02010dc0
+
+src/system/funfest_savedata.c:
+    complete
+    .text       start:0x02010dc0 end:0x02010ff4
+
+src/system/pokewood_savedata.c:
+    complete
+    .text       start:0x02010ff4 end:0x020112fc
+
+src/system/cygnus_savedata.c:
+    complete
+    .text       start:0x020112fc end:0x0201142c
+
+src/system/survey_data.c:
+    complete
+    .text       start:0x0201142c end:0x020114a4
+    .rodata     start:0x0208fac0 end:0x0208fd58
+
+src/system/c_gear_name_savedata.c:
+    complete
+    .text       start:0x020114a4 end:0x02011510
+
+src/system/cygnus_save_control.c:
+    complete
+    .text       start:0x02011510 end:0x020116ac
+    .rodata     start:0x0208fd58 end:0x0208fdb8
+    .data       start:0x0209a218 end:0x0209a230
+    .bss        start:0x02140f78 end:0x02141010
+
+src/system/net_define.c:
+    complete
+    .text       start:0x020116ac end:0x02011890
+    .bss        start:0x02141010 end:0x02141014
+
+src/system/dwc_friend.c:
+    complete
+    .text       start:0x02011890 end:0x02011bdc
+
+src/system/net_bgm_volume.c:
+    complete
+    .text       start:0x02011bdc end:0x02011bfc

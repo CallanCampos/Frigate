@@ -90,7 +90,7 @@ void UnionOneself_SetUpdateDisabled(UnionSystem *unisys, Field *field, u8 disabl
 
 // Functions outside this file that it calls, without their own header yet
 // (main) whether the trainer ID is one in the rival data
-BOOL func_0200f770(RivalDataSave *rival, u32 trainerId);
+BOOL Misc_IsMetTrainer(RivalDataSave *rival, u32 trainerId);
 // (overlay 36) adds the player of a beacon heard to the visitors the field shows
 void func_ov036_021b445c(UnionSystem *unisys, UnionBeaconEntry *entry, const u16 *look, u8 state);
 // (overlay 36) sets the callbacks that add and remove a colosseum player to the screen the object stands for

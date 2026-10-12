@@ -57,7 +57,7 @@ u16 func_ov027_02170758(SaveControl *save);
 u16 func_ov027_021707b8(SaveControl *save);
 GameEvent *func_ov027_02170860(GameSystem *gsys);
 void func_ov027_02170884(SurveyTextWork *work, GameSystem *gsys);
-int GetSurveyAnswerMsgIDCount(u16 question);
+int GetSurveyAnswerMsgIDCount(int question);
 u16 GetSurveyAnswerMsgID(u16 question, int answer);
 
 void probabilityLoop(SurveyProbabilityState *state);

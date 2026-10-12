@@ -280,7 +280,7 @@ static u32 func_ov012_02169450(TrainerCardSysWork *wk) {
     if (wk->greeting.result != NULL) {
         cgear = getCGearDataBlkAddress(GameData_GetSaveControl(wk->param->gameData));
         wk->param->shownData->greeting = *wk->greeting.result;
-        func_0200efa8(cgear, 0, wk->greeting.result);
+        CGearPhrases_Set(cgear, 0, wk->greeting.result);
         GameBeaconSys_SetCGearRecord(wk->greeting.result);
     }
     return TRCARD_SEQ_CARD;
@@ -325,7 +325,7 @@ void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapI
     avenue = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(save));
     records = getTrainerCardInfoBlkAddress(save);
     unk = func_02010dec(save);
-    data->lastMedal = func_0200fa44(box);
+    data->lastMedal = MedalBox_GetLastMedal(box);
     data->medalCount = MedalBox_GetObtainedCount(box, 0);
     data->medalRank = MedalBox_GetRank(box);
     if (data->lastMedal < 0xff) {
@@ -421,7 +421,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
     AdventureTime *adventureTime = getSaveAdventureTimeBlock(save);
     GameRecords *records = getTrainerCardInfoBlkAddress(save);
-    void *cgear = func_0200ef7c(save);
+    void *cgear = CGearPhrases_GetBlock(save);
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
     HighLinkSave *highLink;
     void *passPowerData;
@@ -469,7 +469,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     }
     data->unk48 = func_020091e8(timeSig);
     data->unk04_4 = func_02009204(timeSig);
-    func_0200ef90(cgear, 0, &data->greeting);
+    CGearPhrases_Get(cgear, 0, &data->greeting);
     func_0207d244(&date, &time, adventureTime->startSeconds);
     data->startYear = date.year;
     data->startMonth = date.month;

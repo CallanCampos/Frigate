@@ -1065,7 +1065,7 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         break;
     case 7:
         rivalData = getHollow_RivalData(GameData_GetSaveControl(param->param->gameData));
-        func_0200f700(rivalData, getIDAsUInt(&param->otherPlayer->info));
+        Misc_AddMetTrainer(rivalData, getIDAsUInt(&param->otherPlayer->info));
         *seq = 8;
         WifiBattleMatchNet_ResetEnd(link->net);
         break;
@@ -1752,7 +1752,7 @@ static void WifiBattleMatchLink_TaskFreeResult(WifiBattleMatchTask *task, u32 *s
         break;
     case 6:
         rivalData = getHollow_RivalData(GameData_GetSaveControl(param->param->gameData));
-        func_0200f700(rivalData, getIDAsUInt(&param->otherPlayer->info));
+        Misc_AddMetTrainer(rivalData, getIDAsUInt(&param->otherPlayer->info));
         func_ov262_021c5c94(param->param->gameData, param->battleResult->result);
         WifiBattleMatchNet_ResetEnd(link->net);
         *seq = 7;
@@ -2231,7 +2231,7 @@ static void WifiBattleMatchLink_FillOwnPlayer(WifiBattleMatchLinkPlayer *player,
     player->unk44 = 100;
     info = GetGameDataPlayerInfo(gameData);
     sys_memcpy(info, player, PlayerInfo_GetSize());
-    func_0200ef90(func_0200ef7c(save), 0, &player->sentence);
+    CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
     if (link->param->mode == 0) {
         player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);
         player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 2);

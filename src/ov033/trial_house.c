@@ -23,7 +23,7 @@
 #include "system/version.h"
 
 struct TrialHouseWork *CreateTrialHouseWk(GameSystem *gsys) {
-    u32 saveSize = func_0200ee20();
+    u32 saveSize = BattleExamination_GetSize();
     GameData *gameData = GSYS_GetGameData(gsys);
     struct TrialHouseWork *work;
 
@@ -47,8 +47,8 @@ void func_ov033_0217acd4(GameSystem *gsys, TrialHouseWork *work) {
     func_02007560(save, 5, 0x8004, buffer, 0x800);
     extraSave = getAddressOfExtraSaveBlk(save, 5, 0);
     state = 0;
-    if (func_0200ee38(extraSave)) {
-        if (func_0200ee64(extraSave)) {
+    if (BattleExamination_IsValid(extraSave)) {
+        if (BattleExamination_IsSingle(extraSave)) {
             state = 1;
         } else {
             state = 2;
@@ -148,7 +148,7 @@ void func_ov033_0217ae5c(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
     buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x14c);
     if (func_02007560(save, 5, 0x8004, buffer, 0x800) == 1) {
         extra = getAddressOfExtraSaveBlk(save, 5, 0);
-        work->trainer = *func_0200ee90(extra, mode);
+        work->trainer = *BattleExamination_GetTrainer(extra, mode);
     }
     freeIntermediateSaveExtraBlksAfterLoad2(save, 5);
     GFL_HeapFree(buffer);
@@ -173,7 +173,7 @@ GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *resu
     data->work = work;
     data->timeout = 0;
     data->init.code = 0x2e;
-    data->init.data[0].datasize = func_0200ee20();
+    data->init.data[0].datasize = BattleExamination_GetSize();
     data->init.data[0].pData = work->saveBuffer;
     data->init.data[0].region = region;
 #ifdef BLACK2
@@ -248,12 +248,12 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
         gameData = GSYS_GetGameData(gsys);
         save = func_0200f1b8(GameData_GetSaveControl(gameData));
         saveBuffer = data->work->saveBuffer;
-        a = func_0200ee7c(saveBuffer);
-        b = func_0200ee38(saveBuffer);
+        a = BattleExamination_GetNumber(saveBuffer);
+        b = BattleExamination_IsValid(saveBuffer);
         c = func_ov033_0217b35c(save, a);
         if (b != 0 && (c == 0 || a == 0)) {
             func_ov033_0217b384(save, a);
-            func_0200eea0(gameData, data->work->saveBuffer, 0x8004);
+            BattleExamination_Load(gameData, data->work->saveBuffer, 0x8004);
             *data->result = 1;
         } else if (c != 0) {
             *data->result = 2;
@@ -434,9 +434,9 @@ GameEventReturnCode func_ov033_0217b3ac(GameEvent *event, u32 *state, void *arg)
         func_02007560(save, 5, 0x8004, data->buffer, 0x800);
         extraSave = getAddressOfExtraSaveBlk(save, 5, 0);
         if (data->mode == 1) {
-            func_0200ef1c(extraSave);
+            BattleExamination_SetUsed(extraSave);
         } else {
-            sys_memset(extraSave, 0, func_0200ee20());
+            sys_memset(extraSave, 0, BattleExamination_GetSize());
         }
         func_020178c4(gameData, 5);
         (*state)++;

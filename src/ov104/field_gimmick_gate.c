@@ -411,12 +411,12 @@ void func_ov104_021ef084(GimmickGateWork *work, u32 *species, s32 *count) {
     result = func_020074ec(save, 8, work->heapId);
     if (result == 1 || result == 2) {
         hallOfFame = getAddressOfExtraSaveBlk(save, 8, 0);
-        if (func_0200f660(hallOfFame) != 0) {
-            *count = func_0200f67c(hallOfFame, 0);
+        if (HallOfFameSave_GetTeamCount(hallOfFame) != 0) {
+            *count = HallOfFameSave_GetPokemonCount(hallOfFame, 0);
             for (i = 0; i < *count; i++) {
                 pokemon.nickname = GFL_StrBufCreate(0x40, work->heapId);
                 pokemon.trainerName = GFL_StrBufCreate(0x40, work->heapId);
-                func_0200f69c(hallOfFame, 0, i, &pokemon);
+                HallOfFameSave_GetPokemon(hallOfFame, 0, i, &pokemon);
                 species[i] = pokemon.species;
                 GFL_StrBufFree(pokemon.nickname);
                 GFL_StrBufFree(pokemon.trainerName);

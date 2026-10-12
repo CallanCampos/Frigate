@@ -134,7 +134,7 @@ void func_0200ffb8(void *block, u32 value);
 BOOL func_0200ffd4(void *block, int index);
 // The C-Gear's save block (getCGearDataBlkAddress)
 // Copies the C-Gear's record at index, 4 u16
-void func_0200f700(RivalDataSave *rivalData, u32 id);
+void Misc_AddMetTrainer(RivalDataSave *rivalData, u32 id);
 void copyRivalNameIntoHollowBlock(RivalDataSave *data, const u16 *name);
 const u16 *getPtrToRivalName(RivalDataSave *data);
 u32 func_0200ca64(TrainerGameInfoSave *info);
@@ -198,7 +198,7 @@ u16 func_02010e94(void *a0);
 // func_02010fc0 clears
 u16 func_02010ebc(void *records, u8 mission);
 u16 func_02010f14(void *records, u8 mission);
-u8 func_02010f6c(void *records, u8 mission);
+u32 func_02010f6c(void *records, u8 mission);
 BOOL func_02010fb0(void *records, u8 mission);
 void func_02010fc0(void *records, u8 mission);
 KeyInfoSave *getKeyInfoSaveBlk(SaveControl *save);

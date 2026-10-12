@@ -475,6 +475,11 @@ Same instructions, scheduled in another order.
   stores of a NitroSDK register inline was written before it: `mystery_album.c`'s `MysteryCardView_SeqThrowAway`
   reads a card position's x and y into `int` locals before `G2_SetWnd0InsidePlane`.
 
+- An xor hoisted before a search loop (`mov r3, r1; eor r3, r0` ahead of the loop, with the struct pointer still
+  live) was the xor written inside the loop, `if ((keyInfo->difficulty ^ keyInfo->seed) == UNOVA_LINK_DIFFICULTY_KEYS[i])` in
+  `key_info.c`'s `GetGameDifficulty`, not a local computed before it. That file's setters matched only with the
+  table's constant read into a local first: `u32 value = sUnlockKeys[key]; keyInfo->unlocked[key] = value ^ keyInfo->seed;`.
+
 ## An instruction too many or too few
 
 - On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
@@ -924,6 +929,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `mystery.c`'s `Mystery_GetSpriteBottom` reads a sprite's characters a row at a time with
   `tile = (u32 *)charData->rawData + (row * 12 + col) * 8;` in the column loop; read in the innermost loop, the load
   only moves to the column loop, and read in the row loop, the `charData` load is not hoisted.
+
+- A loop guard kept as an unsigned compare (`cmp r3, #4; bhs`) came from an enum counter tested against
+  `NELEMS(table)`, whose `sizeof` makes the comparison unsigned; the enum's own bound gives `bge`. `symbol_save.c`'s
+  `getKindOfSlot` loops `for (i = SYMBOL_KIND_KEEP_LARGE; i < NELEMS(sSlotRanges); i++)`.
 
 ## Switches
 

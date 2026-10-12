@@ -1100,7 +1100,7 @@ static void Upload_MakeTradeExchangeInfo(WorldTradeWork *wk, PartyPkm *received,
     BOOL otherColor;
 
     RecordAddOne(wk->param->record, 0x10);
-    func_0200f700(getHollow_RivalData(wk->param->savedata), trData->trainerID);
+    Misc_AddMetTrainer(getHollow_RivalData(wk->param->savedata), trData->trainerID);
 
     partner = WorldTrade_MakePartnerStatus(trData);
     func_0200a504(getPalPadFriendListAddress(wk->param->savedata), partner);

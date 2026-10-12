@@ -2052,7 +2052,7 @@ static void WifiBattleMatchLink_CompetitionTaskResult(WifiBattleMatchTask *task,
         break;
     case 5:
         rivalData = getHollow_RivalData(GameData_GetSaveControl(param->param->gameData));
-        func_0200f700(rivalData, getIDAsUInt(&param->otherPlayer->info));
+        Misc_AddMetTrainer(rivalData, getIDAsUInt(&param->otherPlayer->info));
         WifiBattleMatchNet_ResetEnd(link->net);
         *seq = 6;
         break;
@@ -2952,7 +2952,7 @@ static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer 
     void *entry;
 
     func_02008b34(GetGameDataPlayerInfo(link->param->param->gameData), &player->info);
-    func_0200ef90(func_0200ef7c(save), 0, &player->sentence);
+    CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
     param = link->param;
     player->record1 = param->unk34->unk8;
     player->record2 = param->unk34->unkC;
