@@ -1203,6 +1203,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A table one element longer in the ROM than the code needs has a terminator: pml_item.c's `TM_MOVE_LIST` is 101 moves
   and a `MOVE_NONE`. Without it the next object starts 2 bytes early.
 
+- MWCC doesn't pad a `.bss` section to its alignment: a 16-byte array declared `ATTRIBUTE_ALIGN(32)` at the end of a
+  file's `.bss` leaves the section 0x30 bytes long, not 0x40. When the next file's `.bss` starts 16 bytes later in the
+  ROM, the aligned buffer is larger than its use: the LTD's `photo_sign.c` sizes its random buffer, which the ARM7
+  writes, to a whole 32-byte cache line though each fill uses 16. Aligning the next file's object instead gave the
+  right size but changed how its code addresses it.
 - Sections start 4-aligned at link time (`ALIGNALL(4)` in the LCF), whatever their own alignment: pms_data.c's
   12-entry `u16` initializer after 0x16 bytes of shared `.rodata` sits at +0x18, not +0x16.
 - The same small table in the `.rodata` of several files of one overlay, each file with its own copy of the same

@@ -1117,9 +1117,9 @@ BOOL SSP_StartJpegDecoder(u8 *data, u32 size, void *dst, s16 *width, s16 *height
         sys_memcpy(data + sigOffset, sig, SSP_SIGNATURE_SIZE);
         sys_memset(data + sigOffset, 0, SSP_SIGNATURE_SIZE);
         if (hw_isDSi()) {
-            func_027076c4();
+            PhotoSign_Init();
         }
-        signResult = func_02707ba4(sig, data, size);
+        signResult = PhotoSign_Verify(sig, data, size);
         sys_memcpy(sig, data + sigOffset, SSP_SIGNATURE_SIZE);
         if (signResult != 1) {
             return FALSE;
