@@ -1,14 +1,15 @@
 #include "types.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
-#include "field/gimmick_nimbasa.h"
+#include "field/gimmick_plasma_frigate_deck.h"
 #include "gfl/calctool.h"
 #include "gfl/g3d.h"
 #include "nitro/fx.h"
 #include "system/game_system.h"
 
-// Overlay 118 has no name string. It is gimmick 48 of overlay 36's table, which zone 585, a version of Nimbasa City,
-// uses, so the name is a guess. It places two models of archive 0x120 on the map, one of them turned around
+// Overlay 118 has no name string. It is gimmick 45 of overlay 36's table, which only zone 552 uses: the Plasma
+// Frigate's deck, where the player boards the ship and fights its grunts with Cheren. The name is a guess. It places
+// two models of archive 0x120 on the map, one of them turned around
 
 typedef struct {
     FieldExpObjSystem *system;
