@@ -856,6 +856,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A test that branches past an unconditional jump, `bne next; b hide`, where `||` would give one `beq hide`, is the
   first copy of a body written twice in an `if`/`else if` chain and replaced by a jump to the second:
   `func_ov194_021c4ec0` hides a marking icon with `if (anim == -1) { hide } else if (isEgg && i == 6) { hide }`.
+- A 0 or 1 argument built directly in `r1` to `r3` across branches, where any local for it takes a callee-saved
+  register and shifts the others, is an inlined helper whose branches return the constants. Its
+  `if (x) { return 0; } return 1;` tail gives `movs r1, #0; cmp; bne; movs r1, #1`, and its `if`/`else` of returns
+  the `beq; b` layout. `pokemontrade_demo_common.c`'s `PokemonTradeDemoCommon_InitSide` passes
+  `PokemonTradeDemoCommon_GetSide(wk, partner)` to `PokemonTrade_GetPkm`; an `int side` local, nested ternaries and
+  an inline with a result local all build the 1 first or move the registers.
 - A `bne` over a `b` into another branch's call, `cmp r0, #0; bne x; b call; x: cmp r7, #0; beq call; mov r6, #1;
   call:`, is the call written in both branches: overlay 185's `PMSIView_CmdWordWinToCategory` matches only with
   `if (mode == 0) { f(flag); } else { if (search) { flag = TRUE; } f(flag); }`. Writing the call once after the `if`

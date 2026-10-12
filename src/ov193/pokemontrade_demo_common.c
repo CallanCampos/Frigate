@@ -75,29 +75,30 @@ static void PokemonTradeDemoCommon_UpdateFade(TradeFade *fade) {
     }
 }
 
+// The side of the trade whose Pokémon is shown as the partner's or the player's: a nego trade swaps them
+static inline int PokemonTradeDemoCommon_GetSide(PokemonTradeWork *wk, BOOL partner) {
+    if (partner) {
+        if (PokemonTrade_IsNegoType(wk)) {
+            return 1;
+        }
+        return 0;
+    }
+    if (PokemonTrade_IsNegoType(wk)) {
+        return 0;
+    }
+    return 1;
+}
+
 // Works out, for a side of the trade, whether its Pokémon was caught by the player and whether its sprite doesn't hop
 static void PokemonTradeDemoCommon_InitSide(PokemonTradeWork *wk, u8 *ownedByPlayer, u8 *noBounce, PlayerInfo *player,
                                             BOOL partner) {
     PartyPkm *pkm;
-    int side;
     u32 species;
     u32 form;
     BOOL isEgg;
     u32 noHop;
 
-    if (partner) {
-        if (PokemonTrade_IsNegoType(wk)) {
-            side = 1;
-        } else {
-            side = 0;
-        }
-    } else {
-        side = 0;
-        if (!PokemonTrade_IsNegoType(wk)) {
-            side = 1;
-        }
-    }
-    pkm = PokemonTrade_GetPkm(wk, side);
+    pkm = PokemonTrade_GetPkm(wk, PokemonTradeDemoCommon_GetSide(wk, partner));
     PokeParty_GetParam(pkm, PKM_PARAM_ID, NULL);
     species = PokeParty_GetParam(pkm, PKM_PARAM_LEGAL_SPECIES, NULL);
     form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
@@ -108,7 +109,9 @@ static void PokemonTradeDemoCommon_InitSide(PokemonTradeWork *wk, u8 *ownedByPla
         noHop = PML_PersonalGetParam(personal, PERSONAL_NO_BOUNCE);
         PML_PersonalFree(personal);
     }
-    if (isEgg || noHop) {
+    if (isEgg) {
+        *noBounce = TRUE;
+    } else if (noHop) {
         *noBounce = TRUE;
     } else {
         *noBounce = FALSE;
