@@ -181,5 +181,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 247,
-    "baby_species": "SPECIES_SWABLU"
+    "baby_species": "SPECIES_SWABLU",
+    "cry_volume": 120
 }

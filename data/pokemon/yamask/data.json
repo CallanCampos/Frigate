@@ -138,5 +138,6 @@
         }
     ],
     "regional_dex_number": 124,
-    "baby_species": "SPECIES_YAMASK"
+    "baby_species": "SPECIES_YAMASK",
+    "cry_volume": 120
 }

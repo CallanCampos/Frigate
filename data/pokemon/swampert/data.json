@@ -178,5 +178,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MUDKIP"
+    "baby_species": "SPECIES_MUDKIP",
+    "cry_volume": 120
 }

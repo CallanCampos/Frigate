@@ -143,5 +143,6 @@
         }
     ],
     "regional_dex_number": 73,
-    "baby_species": "SPECIES_TIMBURR"
+    "baby_species": "SPECIES_TIMBURR",
+    "cry_volume": 125
 }

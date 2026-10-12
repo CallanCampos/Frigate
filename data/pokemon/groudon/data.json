@@ -183,5 +183,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_GROUDON"
+    "baby_species": "SPECIES_GROUDON",
+    "cry_volume": 120
 }

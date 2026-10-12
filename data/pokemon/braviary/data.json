@@ -123,5 +123,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 110,
-    "baby_species": "SPECIES_RUFFLET"
+    "baby_species": "SPECIES_RUFFLET",
+    "cry_volume": 120
 }

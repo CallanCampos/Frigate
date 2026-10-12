@@ -173,5 +173,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SCYTHER"
+    "baby_species": "SPECIES_SCYTHER",
+    "cry_volume": 110
 }

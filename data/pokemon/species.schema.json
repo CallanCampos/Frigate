@@ -93,6 +93,10 @@
         },
         "hidden_ability": { "$ref": "#/$defs/ability", "description": "The ability from the Dream World" },
         "flee_rate": { "$ref": "#/$defs/u8" },
+        "cry_volume": {
+            "type": "integer", "minimum": 0, "maximum": 127,
+            "description": "Playback volume from a/1/9/1 for species with a cry; absent for forms and extra personal records"
+        },
         "forms": {
             "type": "object", "additionalProperties": false, "required": [ "count", "sprite_offset" ],
             "description": "The species' forms. Their records follow the order of data/pokemon/forms.json, which the packer sets the record of the first form from; forms that only change the sprite have no record",

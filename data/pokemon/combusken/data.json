@@ -181,5 +181,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_TORCHIC"
+    "baby_species": "SPECIES_TORCHIC",
+    "cry_volume": 120
 }

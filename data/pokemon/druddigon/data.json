@@ -154,5 +154,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 270,
-    "baby_species": "SPECIES_DRUDDIGON"
+    "baby_species": "SPECIES_DRUDDIGON",
+    "cry_volume": 120
 }

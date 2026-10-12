@@ -130,5 +130,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 112,
-    "baby_species": "SPECIES_VULLABY"
+    "baby_species": "SPECIES_VULLABY",
+    "cry_volume": 123
 }

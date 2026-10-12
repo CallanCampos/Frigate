@@ -12,6 +12,7 @@
 #include "app/battle_recorder/br_proc_sys.h"
 #include "app/battle_recorder/br_res.h"
 #include "app/battle_recorder/br_sidebar.h"
+#include "app/battle_recorder/br_util.h"
 #include "gfl/clact.h"
 #include "gfl/proc.h"
 #include "save/battle_rec.h"
@@ -83,7 +84,7 @@ typedef struct {
     BrOutline data[BR_OUTLINE_RECV_MAX];
     // Set once the player has watched the video to its end
     u8 isSecure[BR_OUTLINE_RECV_MAX];
-    u32 dataNum;
+    int data_num;
     // The video chosen from the list
     u32 select;
 } BrOutlineData;
@@ -99,7 +100,7 @@ typedef struct {
     BrBtnRecovery btnRecovery;
     // Set from the battle setup's unkDD_1 when the video has played
     u32 unk_17bc;
-    u8 bvRankSearch[4];
+    BrListPos bvRankListPos;
     u32 bvRankMode;
 } BrData;
 
@@ -190,10 +191,11 @@ typedef struct {
     BrRes *res;
     BrProcSys *procSys;
     BrNet *net;
-    BrOutlineData *outline;
-    u32 searchUnk20;
-    u32 searchUnk24;
-    u8 *search;
+    BrOutlineData *p_outline;
+    // What BR_BVRANK_MODE_SEARCH searches for
+    BrNetVideoSearchData search;
+    // Where the list was scrolled to, kept while a video of it is shown
+    BrListPos *listPos;
 } BrBvRankProcParam;
 
 typedef struct {
@@ -202,8 +204,8 @@ typedef struct {
     BrRes *res;
     BrProcSys *procSys;
     GameData *gameData;
-    u32 unk14;
-    u32 unk18;
+    // What the player chose to search for
+    BrNetVideoSearchData search;
 } BrBvSearchProcParam;
 
 typedef struct {
@@ -224,7 +226,8 @@ typedef struct {
 } BrBvSendProcParam;
 
 typedef struct {
-    u32 mode;
+    // The slot of the video to delete
+    int mode;
     BrFade *fade;
     ClActUnit *unit;
     BrRes *res;
@@ -255,13 +258,13 @@ extern const GameProcFunctions BR_START_PROC_FUNCTIONS;
 extern const GameProcFunctions BR_MENU_PROC_FUNCTIONS;
 extern const GameProcFunctions BR_RECORD_PROC_FUNCTIONS;
 extern const GameProcFunctions BR_BTLSUBWAY_PROC_FUNCTIONS;
-extern const GameProcFunctions data_ov268_021c2390;
-extern const GameProcFunctions data_ov268_021c2574;
-extern const GameProcFunctions data_ov268_021c26b8;
-extern const GameProcFunctions data_ov268_021c26c4;
-extern const GameProcFunctions data_ov268_021c2768;
-extern const GameProcFunctions data_ov268_021c2774;
-extern const GameProcFunctions data_ov268_021c27b8;
+extern const GameProcFunctions BR_RNDMATCH_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_BVRANK_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_BVSEARCH_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_CODEIN_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_BVSEND_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_BVDELETE_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_BVSAVE_PROC_FUNCTIONS;
 
 extern const GameProcFunctions BR_CORE_PROC_FUNCTIONS;
 

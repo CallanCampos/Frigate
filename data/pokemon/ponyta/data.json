@@ -165,5 +165,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_PONYTA"
+    "baby_species": "SPECIES_PONYTA",
+    "cry_volume": 110
 }

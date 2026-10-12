@@ -211,5 +211,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 216,
-    "baby_species": "SPECIES_ABSOL"
+    "baby_species": "SPECIES_ABSOL",
+    "cry_volume": 120
 }

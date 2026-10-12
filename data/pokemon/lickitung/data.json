@@ -200,5 +200,6 @@
         }
     ],
     "regional_dex_number": 284,
-    "baby_species": "SPECIES_LICKITUNG"
+    "baby_species": "SPECIES_LICKITUNG",
+    "cry_volume": 110
 }

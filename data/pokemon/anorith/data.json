@@ -174,5 +174,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_ANORITH"
+    "baby_species": "SPECIES_ANORITH",
+    "cry_volume": 120
 }

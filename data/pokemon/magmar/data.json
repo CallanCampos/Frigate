@@ -172,5 +172,6 @@
         }
     ],
     "regional_dex_number": 54,
-    "baby_species": "SPECIES_MAGBY"
+    "baby_species": "SPECIES_MAGBY",
+    "cry_volume": 110
 }

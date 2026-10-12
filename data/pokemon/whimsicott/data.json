@@ -112,5 +112,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 83,
-    "baby_species": "SPECIES_COTTONEE"
+    "baby_species": "SPECIES_COTTONEE",
+    "cry_volume": 120
 }

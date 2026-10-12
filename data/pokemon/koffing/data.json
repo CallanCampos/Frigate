@@ -173,5 +173,6 @@
         }
     ],
     "regional_dex_number": 46,
-    "baby_species": "SPECIES_KOFFING"
+    "baby_species": "SPECIES_KOFFING",
+    "cry_volume": 110
 }

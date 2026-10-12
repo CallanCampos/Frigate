@@ -166,5 +166,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CARVANHA"
+    "baby_species": "SPECIES_CARVANHA",
+    "cry_volume": 120
 }

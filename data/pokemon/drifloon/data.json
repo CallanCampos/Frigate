@@ -188,5 +188,6 @@
         }
     ],
     "regional_dex_number": 208,
-    "baby_species": "SPECIES_DRIFLOON"
+    "baby_species": "SPECIES_DRIFLOON",
+    "cry_volume": 120
 }

@@ -19,6 +19,7 @@ as regional_dex_number; the baby species archive has no entries for the forms.
 
 A species' egg moves (a/1/2/4, one entry per species, a count and the moves) are its learnset's egg_moves;
 SPECIES_NONE's entry is empty, so its file has none, and forms and extra records have none.
+Species records also keep cry_volume from a/1/9/1; pokemon_cries.py packs that archive.
 
 The experience tables of the growth rates (a/0/1/7) are data/pokemon/growth_rates.csv: a row per level from 0 to 100
 and a column per table, in archive order, each headed by its GROWTH_* constant. The two tables after the growth rates
@@ -169,6 +170,7 @@ def dump(files: Path, output: Path):
     evolutions = read_narc((files / "a/0/1/9").read_bytes())
     babies = read_narc((files / "a/0/2/0").read_bytes())
     egg_moves = read_narc((files / "a/1/2/4").read_bytes())
+    cry_volumes = read_narc((files / "a/1/9/1").read_bytes())
     *records, table = personal
     dex = struct.unpack(f"<{len(table) // 2}H", table)
     species = sorted(load_list("species").items(), key=lambda item: item[1])
@@ -204,6 +206,8 @@ def dump(files: Path, output: Path):
     language_forms = {name_: i for i, name_ in enumerate(LANGUAGE_FORMS)}
     for name_, index in species:
         data = entry(index)
+        if 0 < index < len(cry_volumes):
+            data["cry_volume"] = struct.unpack_from("<H", cry_volumes[index], 2)[0]
         if egg_moves[index]:
             count = struct.unpack_from("<H", egg_moves[index])[0]
             moves = struct.unpack_from(f"<{count}H", egg_moves[index], 2)

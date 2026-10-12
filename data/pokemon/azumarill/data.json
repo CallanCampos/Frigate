@@ -173,5 +173,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 32,
-    "baby_species": "SPECIES_AZURILL"
+    "baby_species": "SPECIES_AZURILL",
+    "cry_volume": 110
 }

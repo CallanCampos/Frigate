@@ -185,5 +185,6 @@
         }
     ],
     "regional_dex_number": 59,
-    "baby_species": "SPECIES_RATTATA"
+    "baby_species": "SPECIES_RATTATA",
+    "cry_volume": 110
 }

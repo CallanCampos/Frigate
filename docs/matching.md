@@ -181,6 +181,9 @@ Same instructions, registers swapped.
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
   and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
   loop without the `NULL` test, matches with plain indexing.
+- A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
+  `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
+  every caller's narrowing with the definition before trusting a prototype written from one of them.
 
 ## Stack slots
 
@@ -1030,17 +1033,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   follows the source: `poke_tool.c`'s `PML_PkmGetParamCore` had the tail in its level case, one instruction away from
   the original for 258 bytes, until the max PP case, `if (move != 0) { result = ... }`, got its explicit
   `else { result = 0; }`.
-
-## Floats and runtime helpers
-
-- A random pick in a variable range with no zero check is `u64 value = GFL_RandomMT(); value *= n; value >>= 32;`, as
-  `btlv_mcss.c`'s idle task does.
 - A `goto` from one case into another's tail makes the shared block a region of its own: an address or offset that
   is live across the switch is built again there (`movs r0, #0x91; lsls r0, r0, #2` where the original has
   `subs r0, #8` from the offset it still holds), and the temporaries at the switch's head take other registers, so
   the diff reads as registers only. Two cases with the same tail were written out in full and merged by MWCC:
   `ircbattlematch.c`'s `IrcBattleMatch_StateStartNet` matches with both musical cases complete, and with its last
   three mode tests as a `switch` in the blocks' order rather than an `if` chain.
+
+## Floats and runtime helpers
+
+- A random pick in a variable range with no zero check is `u64 value = GFL_RandomMT(); value *= n; value >>= 32;`, as
+  `btlv_mcss.c`'s idle task does.
 - Float arithmetic calls MWCC's runtime helpers, such as `_fadd` and `_ffix`, which swan names `__aeabi_*`. When a
   complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`, or, when the AEABI
   name is in use, give it the MWCC name as a second one with `config_fixes.py add-label`, as `_ddiv` and `_dsub` for
@@ -1228,6 +1231,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `const` on a pointer parameter lets MWCC hoist loads through it above later byte stores: the hit tests of
   `beacon_view.c` match only with a non-const `BeaconViewTouch *`, and the accessors of
   `fmission_log_accessor_fv.c` only with non-const entries.
+- A 2-aligned object right after a 2-byte constant that nothing reads shows both are in the shared section: the
+  constant is a global that unemitted code reads, not an unreferenced static, which would get a section of its own
+  and push the next one to a 4-byte boundary (`wifi_p2pmatch.c`'s `64 00` at the start of its `.rodata`).
+- When a file's equal-size tables and local initializers don't fall into the ROM's order with every table at the
+  top, each object can go either at the top or right before its first user; searching those placements with
+  `rodata_order.py`'s model found `wifi_p2pmatch.c`'s 39 objects in seconds. Functions that reach `.data` through
+  one section-relative anchor (`ldr =first; str [r, #n]`) need the `.data` objects defined in ROM order as well.
 
 ## When nothing moves it
 

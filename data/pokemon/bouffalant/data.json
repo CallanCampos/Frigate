@@ -129,5 +129,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 269,
-    "baby_species": "SPECIES_BOUFFALANT"
+    "baby_species": "SPECIES_BOUFFALANT",
+    "cry_volume": 125
 }

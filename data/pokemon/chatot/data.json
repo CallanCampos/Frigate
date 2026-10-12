@@ -169,5 +169,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CHATOT"
+    "baby_species": "SPECIES_CHATOT",
+    "cry_volume": 120
 }

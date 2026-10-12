@@ -530,19 +530,19 @@ from:0x0219f288 kind:thumb_call to:0x020232e8 module:main
 from:0x0219f292 kind:thumb_call to:0x020232e8 module:main
 from:0x0219f2b4 kind:load to:0x021a737c module:overlay(173)
 from:0x0219f312 kind:thumb_call to:0x0219e504 module:overlay(173)
-from:0x0219f31c kind:load to:0x021a7450 module:overlay(173)
+from:0x0219f31c kind:load to:0x021a7430 add:0x20 module:overlay(173)
 from:0x0219f324 kind:load to:0x021a7548 module:overlay(173)
 from:0x0219f328 kind:load to:0x021a74b0 module:overlay(173)
 from:0x0219f344 kind:thumb_call to:0x0219e504 module:overlay(173)
-from:0x0219f34c kind:load to:0x021a7510 module:overlay(173)
+from:0x0219f34c kind:load to:0x021a74e0 add:0x30 module:overlay(173)
 from:0x0219f350 kind:load to:0x021a7514 module:overlay(173)
 from:0x0219f354 kind:load to:0x021a7458 module:overlay(173)
 from:0x0219f370 kind:thumb_call to:0x0219e504 module:overlay(173)
-from:0x0219f378 kind:load to:0x021a7510 module:overlay(173)
+from:0x0219f378 kind:load to:0x021a74e0 add:0x30 module:overlay(173)
 from:0x0219f37c kind:load to:0x021a7514 module:overlay(173)
 from:0x0219f380 kind:load to:0x021a73e0 module:overlay(173)
 from:0x0219f39a kind:thumb_call to:0x0219e504 module:overlay(173)
-from:0x0219f3a4 kind:load to:0x021a7510 module:overlay(173)
+from:0x0219f3a4 kind:load to:0x021a74e0 add:0x30 module:overlay(173)
 from:0x0219f3a8 kind:load to:0x021a7514 module:overlay(173)
 from:0x0219f3ac kind:load to:0x021a73f8 module:overlay(173)
 from:0x0219f3d4 kind:thumb_call to:0x020480c0 module:main
@@ -608,7 +608,7 @@ from:0x0219f7ca kind:thumb_call to:0x0204c520 module:main
 from:0x0219f7d2 kind:thumb_call to:0x0204c124 module:main
 from:0x0219f7fa kind:thumb_call to:0x0219e504 module:overlay(173)
 from:0x0219f804 kind:thumb_call to:0x02026520 module:main
-from:0x0219f80c kind:load to:0x021a7510 module:overlay(173)
+from:0x0219f80c kind:load to:0x021a74e0 add:0x30 module:overlay(173)
 from:0x0219f810 kind:load to:0x021a7514 module:overlay(173)
 from:0x0219f814 kind:load to:0x021a73d0 module:overlay(173)
 from:0x0219f838 kind:thumb_call to:0x0219e19c module:overlay(173)

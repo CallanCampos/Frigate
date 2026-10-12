@@ -183,5 +183,6 @@
         }
     ],
     "regional_dex_number": 277,
-    "baby_species": "SPECIES_SLAKOTH"
+    "baby_species": "SPECIES_SLAKOTH",
+    "cry_volume": 120
 }

@@ -127,5 +127,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 227,
-    "baby_species": "SPECIES_VIRIZION"
+    "baby_species": "SPECIES_VIRIZION",
+    "cry_volume": 120
 }

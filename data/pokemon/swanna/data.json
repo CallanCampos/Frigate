@@ -115,5 +115,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 154,
-    "baby_species": "SPECIES_DUCKLETT"
+    "baby_species": "SPECIES_DUCKLETT",
+    "cry_volume": 120
 }

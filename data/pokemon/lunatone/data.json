@@ -185,5 +185,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 214,
-    "baby_species": "SPECIES_LUNATONE"
+    "baby_species": "SPECIES_LUNATONE",
+    "cry_volume": 120
 }

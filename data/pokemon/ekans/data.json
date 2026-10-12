@@ -186,5 +186,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_EKANS"
+    "baby_species": "SPECIES_EKANS",
+    "cry_volume": 110
 }

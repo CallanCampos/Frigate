@@ -183,5 +183,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 202,
-    "baby_species": "SPECIES_SKORUPI"
+    "baby_species": "SPECIES_SKORUPI",
+    "cry_volume": 125
 }

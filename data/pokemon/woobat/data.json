@@ -151,5 +151,6 @@
         }
     ],
     "regional_dex_number": 66,
-    "baby_species": "SPECIES_WOOBAT"
+    "baby_species": "SPECIES_WOOBAT",
+    "cry_volume": 120
 }

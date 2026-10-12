@@ -144,5 +144,6 @@
         }
     ],
     "regional_dex_number": 219,
-    "baby_species": "SPECIES_MIENFOO"
+    "baby_species": "SPECIES_MIENFOO",
+    "cry_volume": 120
 }

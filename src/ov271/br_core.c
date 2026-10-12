@@ -74,19 +74,19 @@ static const BrProcData sBrProcTable[BR_PROCID_MAX] = {
                            BrCore_RecordAfter },
     [BR_PROCID_BTLSUBWAY] = { &BR_BTLSUBWAY_PROC_FUNCTIONS, sizeof(BrBtlSubwayProcParam), OVERLAY_ID(268),
                               BrCore_BtlSubwayBefore, BrCore_BtlSubwayAfter },
-    [BR_PROCID_RNDMATCH] = { &data_ov268_021c2390, sizeof(BrRndMatchProcParam), OVERLAY_ID(268), BrCore_RndMatchBefore,
+    [BR_PROCID_RNDMATCH] = { &BR_RNDMATCH_PROC_FUNCTIONS, sizeof(BrRndMatchProcParam), OVERLAY_ID(268), BrCore_RndMatchBefore,
                              BrCore_RndMatchAfter },
-    [BR_PROCID_BV_RANK] = { &data_ov268_021c2574, sizeof(BrBvRankProcParam), OVERLAY_ID(268), BrCore_BvRankBefore,
+    [BR_PROCID_BV_RANK] = { &BR_BVRANK_PROC_FUNCTIONS, sizeof(BrBvRankProcParam), OVERLAY_ID(268), BrCore_BvRankBefore,
                             BrCore_BvRankAfter },
-    [BR_PROCID_BV_SEARCH] = { &data_ov268_021c26b8, sizeof(BrBvSearchProcParam), OVERLAY_ID(268), BrCore_BvSearchBefore,
+    [BR_PROCID_BV_SEARCH] = { &BR_BVSEARCH_PROC_FUNCTIONS, sizeof(BrBvSearchProcParam), OVERLAY_ID(268), BrCore_BvSearchBefore,
                               BrCore_BvSearchAfter },
-    [BR_PROCID_CODEIN] = { &data_ov268_021c26c4, sizeof(BrCodeInProcParam), OVERLAY_ID(268), BrCore_CodeInBefore,
+    [BR_PROCID_CODEIN] = { &BR_CODEIN_PROC_FUNCTIONS, sizeof(BrCodeInProcParam), OVERLAY_ID(268), BrCore_CodeInBefore,
                            BrCore_CodeInAfter },
-    [BR_PROCID_BV_SEND] = { &data_ov268_021c2768, sizeof(BrBvSendProcParam), OVERLAY_ID(268), BrCore_BvSendBefore,
+    [BR_PROCID_BV_SEND] = { &BR_BVSEND_PROC_FUNCTIONS, sizeof(BrBvSendProcParam), OVERLAY_ID(268), BrCore_BvSendBefore,
                             BrCore_BvSendAfter },
-    [BR_PROCID_BV_DELETE] = { &data_ov268_021c2774, sizeof(BrBvDeleteProcParam), OVERLAY_ID(268), BrCore_BvDeleteBefore,
+    [BR_PROCID_BV_DELETE] = { &BR_BVDELETE_PROC_FUNCTIONS, sizeof(BrBvDeleteProcParam), OVERLAY_ID(268), BrCore_BvDeleteBefore,
                               BrCore_BvDeleteAfter },
-    [BR_PROCID_BV_SAVE] = { &data_ov268_021c27b8, sizeof(BrBvSaveProcParam), OVERLAY_ID(268), BrCore_BvSaveBefore,
+    [BR_PROCID_BV_SAVE] = { &BR_BVSAVE_PROC_FUNCTIONS, sizeof(BrBvSaveProcParam), OVERLAY_ID(268), BrCore_BvSaveBefore,
                             BrCore_BvSaveAfter },
     [BR_PROCID_MUSICAL_LOOK] = { &BR_MUSICAL_LOOK_PROC_FUNCTIONS, sizeof(BrMusicalLookProcParam), OVERLAY_ID(270),
                                  BrCore_MusicalLookBefore, BrCore_MusicalLookAfter },
@@ -454,22 +454,21 @@ static void BrCore_BvRankBefore(void *param, void *work, const void *preParam, u
     BrBvRankProcParam *p = param;
     BrCoreWork *wk = work;
 
-    p->outline = &wk->param->data->outline;
-    p->search = wk->param->data->bvRankSearch;
+    p->p_outline = &wk->param->data->outline;
+    p->listPos = &wk->param->data->bvRankListPos;
     if (preID == BR_PROCID_MENU) {
         const BrMenuProcParam *menuParam = preParam;
 
         p->mode = menuParam->nextMode;
         wk->param->data->bvRankMode = menuParam->nextMode;
-        sys_memset(p->search, 0, sizeof(wk->param->data->bvRankSearch));
+        sys_memset(p->listPos, 0, sizeof(BrListPos));
     } else if (preID == BR_PROCID_BV_SEARCH) {
         const BrBvSearchProcParam *searchParam = preParam;
 
         p->mode = 3;
-        p->searchUnk20 = searchParam->unk14;
-        p->searchUnk24 = searchParam->unk18;
+        p->search = searchParam->search;
         wk->param->data->bvRankMode = 3;
-        sys_memset(p->search, 0, sizeof(wk->param->data->bvRankSearch));
+        sys_memset(p->listPos, 0, sizeof(BrListPos));
     } else if (preID == BR_PROCID_RECORD) {
         p->mode = wk->param->data->bvRankMode;
         p->isReturn = TRUE;

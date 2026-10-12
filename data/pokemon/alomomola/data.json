@@ -117,5 +117,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 182,
-    "baby_species": "SPECIES_ALOMOMOLA"
+    "baby_species": "SPECIES_ALOMOMOLA",
+    "cry_volume": 120
 }

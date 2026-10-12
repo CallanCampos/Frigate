@@ -185,5 +185,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 278,
-    "baby_species": "SPECIES_SLAKOTH"
+    "baby_species": "SPECIES_SLAKOTH",
+    "cry_volume": 120
 }
