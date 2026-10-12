@@ -174,6 +174,41 @@ static inline fx32 NNS_G3dAnmObjGetNumFrame(const NNSG3dAnmObj *anmObj) {
     return ((const NNSG3dResAnmCommon *)anmObj->resAnm)->numFrame * FX32_ONE;
 }
 
+// The header of every animation resource
+typedef struct {
+    u8 category0;
+    u8 revision;
+    u16 category1;
+} NNSG3dResAnmHeader;
+
+// A joint animation. Each joint's tag, at ofsTag[joint], is a word of NNS_G3D_JNTANM_SRTINFO_* flags followed by the
+// data of each component that isn't constant
+typedef struct {
+    NNSG3dResAnmHeader anmHeader;
+    u16 numFrame;
+    u16 numNode;
+    u32 flag;
+    u32 ofsRot3;
+    u32 ofsRot5;
+    u16 ofsTag[1];
+} NNSG3dResJntAnm;
+
+#define NNS_G3D_JNTANM_SRTINFO_IDENTITY 0x00000001
+#define NNS_G3D_JNTANM_SRTINFO_IDENTITY_T 0x00000002
+#define NNS_G3D_JNTANM_SRTINFO_BASE_T 0x00000004
+#define NNS_G3D_JNTANM_SRTINFO_CONST_TX 0x00000008
+#define NNS_G3D_JNTANM_SRTINFO_CONST_TY 0x00000010
+#define NNS_G3D_JNTANM_SRTINFO_CONST_TZ 0x00000020
+
+// The first word of a translation component's data; the second is the offset of its values from the animation
+#define NNS_G3D_JNTANM_TINFO_STEP_1 0x00000000
+#define NNS_G3D_JNTANM_TINFO_STEP_2 0x40000000
+#define NNS_G3D_JNTANM_TINFO_STEP_4 0x80000000
+#define NNS_G3D_JNTANM_TINFO_STEP_MASK 0xc0000000
+#define NNS_G3D_JNTANM_TINFO_FX16ARR 0x20000000
+#define NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK 0x1fff0000
+#define NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT 16
+
 // What draws a model, 0x54 bytes
 typedef struct {
     u32 flag;

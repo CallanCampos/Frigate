@@ -133,6 +133,8 @@
 #define ARCID_THE_END 215
 // The Research Radar's graphics. Our name, not swan's
 #define ARCID_RESEARCH_RADAR 189
+// The Unity Tower's floor select's graphics (un_select.c). Our name, not swan's
+#define ARCID_UN_SELECT 190
 // The Union Room's touch screen, union_subdisp.c. Our name, not swan's
 #define ARCID_UNION_SUBDISP 88
 // The Dowsing MCHN's graphics and map of the hidden items around the player. Our name, not swan's
@@ -165,6 +167,8 @@
 // The touch screen of no_gear.c (a/2/8/7): many palettes and screens that look like the C-Gear's. Our name and a
 // guess, not swan's
 #define ARCID_C_GEAR 287
+// The models and animations of Humilau City's gym, which gym_humilau.c loads. Our name, not swan's
+#define ARCID_GYM_HUMILAU 276
 #define ARCID_GIMMICK_EXPOBJ_MARINETUBE 295
 
 #endif // POKEBW2_CONSTANTS_ARC_H

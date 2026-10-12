@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "app/unova_link.h"
+#include "demo/staff_roll.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
 #include "system/game_event.h"
@@ -23,11 +24,7 @@ struct GameClearWork {
         PlayerInfo *playerInfo;
         PlayTime *playTime;
     } ov265Param;
-    struct {
-        BOOL unk00;
-        u32 unk04;
-        PlayerInfo *playerInfo;
-    } ov266Param;
+    StaffRollParam staffRollParam;
     struct {
         u32 unk00;
     } ov267Param;
@@ -38,9 +35,8 @@ struct GameClearWork {
     s32 counter;
 };
 
-// The procs it runs, in overlays 265, 266, 267 (demo/the_end.h) and 295
+// The procs it runs, in overlays 265, 266 (demo/staff_roll.h), 267 (demo/the_end.h) and 295
 extern const GameProcFunctions data_ov265_0219b7d0;
-extern const GameProcFunctions data_ov266_0219e518;
 extern const GameProcFunctions GAME_CLEAR_SAVE_PROC_FUNCTIONS;
 
 GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *data);

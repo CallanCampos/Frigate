@@ -129,7 +129,4 @@ BOOL func_ov012_02160cdc(VM *vm, FieldScriptEnv *env);
 BOOL s01CF_UnityTowerGetStateParam(VM *vm, FieldScriptEnv *env);
 BOOL s01D0_UnityTowerCallFloorSelect(VM *vm, FieldScriptEnv *env);
 
-// Overlay 311, the floor select
-extern const GameProcFunctions data_ov311_0219e440;
-
 #endif // POKEBW2_FIELD_UNITY_TOWER_H

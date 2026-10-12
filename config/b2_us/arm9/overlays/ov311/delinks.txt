@@ -3,3 +3,14 @@
     .ctor       start:0x0219e940 end:0x0219e940 kind:rodata align:4
     .data       start:0x0219e960 end:0x0219e9c0 kind:data align:32
     .bss        start:0x0219e9c0 end:0x0219e9c0 kind:bss align:32
+
+src/ov311/un_select.c:
+    .text       start:0x0219ce80 end:0x0219e088
+    .rodata     start:0x0219e3f4 end:0x0219e76c
+    .data       start:0x0219e960 end:0x0219e994
+
+src/ov311/un_select_graphic.c:
+    complete
+    .text       start:0x0219e088 end:0x0219e3f4
+    .rodata     start:0x0219e76c end:0x0219e940
+    .data       start:0x0219e994 end:0x0219e9c0
