@@ -3,3 +3,33 @@
     .ctor       start:0x021b7b0c end:0x021b7b0c kind:rodata align:4
     .data       start:0x021b7b20 end:0x021b7ce0 kind:data align:32
     .bss        start:0x021b7ce0 end:0x021ba180 kind:bss align:32
+
+src/ov201/gds_rap.c:
+    .text       start:0x021b5460 end:0x021b6144
+    .rodata     start:0x021b7a9c end:0x021b7aec
+    .data       start:0x021b7b20 end:0x021b7bcc
+
+src/ov201/gds_rap_response.c:
+    complete
+    .text       start:0x021b6144 end:0x021b635c
+    .data       start:0x021b7bcc end:0x021b7bd4
+
+src/ov201/battle_rec_ov.c:
+    complete
+    .text       start:0x021b635c end:0x021b6528
+
+lib/poke_net/src/poke_net.c:
+    .text       start:0x021b6528 end:0x021b73b4
+    .data       start:0x021b7bd4 end:0x021b7bd8
+    .bss        start:0x021b7ce0 end:0x021b9928
+
+lib/poke_net/src/poke_net_gds.c:
+    complete
+    .text       start:0x021b73b4 end:0x021b7958
+    .rodata     start:0x021b7aec end:0x021b7b0c
+
+lib/poke_net/src/poke_net_ssl.c:
+    complete
+    .text       start:0x021b7958 end:0x021b7a9c
+    .data       start:0x021b7bd8 end:0x021b7ce0
+    .bss        start:0x021b9928 end:0x021ba180
