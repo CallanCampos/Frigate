@@ -66,6 +66,7 @@
 #include "gfl/proc.h"
 #include "gfl/sound.h"
 #include "gfl/tcb.h"
+#include "gfl/wm_icon.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"

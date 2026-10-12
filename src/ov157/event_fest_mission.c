@@ -116,7 +116,7 @@ GameEvent *EventFestMissionMessage_Create(GameSystem *gsys, void *args) {
     FestMissionEvent_Init(work, gsys, field);
     work->mission = *(FestMission *)&eventArgs->config;
     work->messageType = eventArgs->messageType;
-    func_020153b8(work->festival, eventArgs);
+    FestMissionOffers_Remove(work->festival, &eventArgs->config);
     return event;
 }
 
@@ -249,7 +249,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
             joinedCount = FestRecords_AddJoined(records);
             func_0201472c(work->festival, &work->mission, work->joined);
             work->mission = *(FestMission *)GetFestMissionCfg(work->festival);
-            func_020153b8(work->festival, &work->mission);
+            FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
             if (joinedCount >= 1) {
                 MedalBox_GiveMedal(medalBox, MEDAL_MISSION_JOIN_1);
                 if (joinedCount >= 10) {
@@ -268,7 +268,7 @@ static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 
             next = EventMEPlay_Create(work->gsys, SEQ_ME_MISSION_START);
         }
         GameEvent_ChainNext(event, next);
-        func_020150dc(func_020146fc(work->festival), work->gameData, work->joined);
+        FestMissionLog_AddPlayer(func_020146fc(work->festival), work->gameData, work->joined);
         func_02038bc8(7);
         func_02014844(work->festival, func_ov012_02160eb4(work->gameData, Field_GetPlayerStateZoneID(work->field)));
         work->window = func_ov036_02187ca0(work->msgBGSys, work->msgData, 1, 1, 30, 20);
@@ -335,7 +335,7 @@ static GameEventReturnCode EventFestMissionMessage_Callback(GameEvent *event, u3
         (*state)++;
         break;
     case 1:
-        func_020153b8(work->festival, &work->mission);
+        FestMissionOffers_Remove(work->festival, (FestMissionConfig *)&work->mission);
         func_02014964(work->festival, &work->mission);
         FestMissionEvent_Exit(work);
         return GAMEEVENT_DONE;
@@ -449,7 +449,7 @@ static void FestMission_PrintLine(FestMissionEventWork *work, StrBuf *format, u1
 
 // Prints the mission's name and description, the time it has left, how many it wants and its kind
 static void FestMission_Print(FestMissionEventWork *work) {
-    s32 seconds = func_02014dcc(&work->mission);
+    s32 seconds = FestMissionConfig_GetSecondsLeft((FestMissionConfig *)&work->mission);
     s32 minutes;
 
     GFL_MsgDataLoadStrbuf(work->msgData, ScriptBank0412_Text_Empty, work->strbuf);

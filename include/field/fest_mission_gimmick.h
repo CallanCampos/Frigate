@@ -75,7 +75,7 @@ typedef struct {
 } FesGimmick;
 
 // The festival's total, at most 9999
-int func_02014870(LinkFestival *festival);
+int LinkFestival_GetTotalScore(LinkFestival *festival);
 
 // The first actor on a rail position, other than exclude
 FieldActor *func_ov036_0219584c(MMSys *system, const RailPosition *position, BOOL checkInit, FieldActor *exclude);

@@ -349,7 +349,6 @@ from:0x021a9970 kind:thumb_call_arm to:0x0208d894 module:main
 from:0x021a997e kind:thumb_call to:0x021a99a0 module:overlay(203)
 from:0x021a9998 kind:thumb_call_arm to:0x0208d894 module:main
 from:0x021a99c4 kind:thumb_call_arm to:0x0208d894 module:main
-from:0x021a99d0 kind:load to:0x0208ff01 module:main
 from:0x021a99dc kind:load to:0x021a806d module:overlay(203)
 from:0x021a99e0 kind:load to:0x021a807d module:overlay(203)
 from:0x021a99e4 kind:load to:0x021a808d module:overlay(203)

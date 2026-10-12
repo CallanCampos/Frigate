@@ -1369,3 +1369,58 @@ src/system/dwc_friend.c:
 src/system/net_bgm_volume.c:
     complete
     .text       start:0x02011bdc end:0x02011bfc
+
+src/system/net_err.c:
+    complete
+    .text       start:0x02011bfc end:0x02012908
+    .rodata     start:0x0208fde4 end:0x0208fe34
+    .data       start:0x0209a270 end:0x0209a284
+    .bss        start:0x02141054 end:0x021410b8
+
+src/system/wih_dwc.c:
+    complete
+    .text       start:0x02012908 end:0x02012ee0
+    .data       start:0x0209a284 end:0x0209a2f4
+    .bss        start:0x021410b8 end:0x021410c0
+
+src/system/net_save.c:
+    complete
+    .text       start:0x02012ee0 end:0x020130b4
+    .data       start:0x0209a2f4 end:0x0209a300
+
+src/system/game_sync_settings_proc.c:
+    complete
+    .text       start:0x020130b4 end:0x02013210
+    .rodata     start:0x0208fe34 end:0x0208fe40
+
+src/system/battle_video_proc.c:
+    complete
+    .text       start:0x02013210 end:0x0201340c
+    .rodata     start:0x0208fe40 end:0x0208fe4c
+
+src/system/pass_power.c:
+    .text       start:0x0201340c end:0x02013914
+    .rodata     start:0x0208fe4c end:0x0208fe68
+    .bss        start:0x021410c0 end:0x02141134
+
+src/system/game_beacon_accessor.c:
+    complete
+    .text       start:0x02013914 end:0x02014498
+    .rodata     start:0x0208fe68 end:0x0208ff2c
+    .data       start:0x0209a300 end:0x0209a318
+
+src/system/link_festival.c:
+    complete
+    .text       start:0x02014498 end:0x02014d1c
+    .data       start:0x0209a318 end:0x0209a328
+
+src/system/fest_mission.c:
+    complete
+    .text       start:0x02014d1c end:0x02014ff0
+    .rodata     start:0x0208ff2c end:0x0208ff4c
+    .data       start:0x0209a328 end:0x0209a338
+
+src/system/fest_mission_beacon.c:
+    complete
+    .text       start:0x02014ff0 end:0x02015878
+    .rodata     start:0x0208ff4c end:0x0208ffa8

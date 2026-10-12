@@ -142,7 +142,7 @@ static void func_ov012_0215f5f4(void *work) {
     BeaconSearchWork *search = work;
 
     search->state = 1;
-    search->unk88 = func_02012908(HEAPID_GAMEEVENT, HEAPID_TAIL(HEAPID_TRIAL_HOUSE));
+    search->unk88 = func_02012908(4, HEAPID_TAIL(HEAPID_TRIAL_HOUSE));
 }
 
 BOOL func_ov012_0215f610(u32 *seq, void *param, void *work) {

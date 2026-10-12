@@ -63,7 +63,7 @@ void func_ov072_021e8c74(FesGimmick *gimmick, PokeParty *party) {
 
     if (gimmick->mission->target == 6) {
         count = PokeParty_GetPkmCount(party);
-        bonus = func_02014870(gimmick->festival);
+        bonus = LinkFestival_GetTotalScore(gimmick->festival);
         if (bonus > 30) {
             bonus = 30;
         }

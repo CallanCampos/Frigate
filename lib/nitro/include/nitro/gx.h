@@ -1375,9 +1375,9 @@ void *gfxGetCharAddrBG2B(void);
 void *gfxGetCharAddrBG3B(void);
 
 // NitroSDK's GX_ResetBankFor* and GX_SetBankFor*, which take VRAM banks as masks
-void gfxAcquireBGBanksA(void);
+u32 gfxAcquireBGBanksA(void);
 void gfxAcquireBGExtPltBanksA(void);
-void gfxAcquireBGBanksB(void);
+u32 gfxAcquireBGBanksB(void);
 void gfxAcquireBGExtPltBanksB(void);
 void gfxAcquireObjBanksA(void);
 void gfxAcquireObjExtPltBanksA(void);

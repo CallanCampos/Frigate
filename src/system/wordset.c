@@ -3,7 +3,6 @@
 #include "constants/script_text_banks.h"
 #include "constants/text_banks.h"
 #include "battle/trainer_data.h"
-#include "field/festival.h"
 #include "field/wbt.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -47,7 +46,7 @@ struct WordSet {
 
 // Declared here until their files are decompiled
 void loadBoxNameToStrbuf(void *boxData, u32 box, StrBuf *strbuf);
-BOOL PassPower_IsIDValid(u32 id);
+BOOL PassPower_IsIDValid(int id);
 void *allocateForFestMission(HeapID heapId);
 // The festival missions' functions as this file declared them. The original passes the mission to
 // func_ov027_02170b98 without narrowing it, while fest_mission_data.c defines that parameter as a u8, so this file

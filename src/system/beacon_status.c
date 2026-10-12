@@ -16,7 +16,7 @@
 #define BEACON_STATUS_GREETING_SIZE 9
 
 struct BeaconStatus {
-    u8 unk0[0xb80];
+    GameBeaconInfoTable table;
     u8 unkB80[2];
     u8 unkB82;
     u32 unkB84;
@@ -51,8 +51,8 @@ void BeaconStatus_Free(BeaconStatus *status) {
     GFL_HeapFree(status);
 }
 
-BeaconStatus *func_0202d7a8(BeaconStatus *status) {
-    return status;
+GameBeaconInfoTable *func_0202d7a8(BeaconStatus *status) {
+    return &status->table;
 }
 
 u8 func_0202d7ac(BeaconStatus *status) {

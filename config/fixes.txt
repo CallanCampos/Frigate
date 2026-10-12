@@ -29,7 +29,44 @@
 . 0x02011674 reloc_addend 0xa
 . 0x02011678 reloc_addend 0xb
 . 0x020116a8 reloc_addend 4
+. 0x02011d1c reloc_addend 64
+. 0x0201210c reloc_addend 64
+. 0x02012140 reloc_addend 64
+. 0x0201245c reloc_addend 64
+. 0x020126f0 reloc_addend 2
+. 0x020126f4 reloc_addend 4
+. 0x020126f8 reloc_addend 6
 . 0x020131e8 reloc_module overlay(199)
+. 0x02013468 reloc_addend 96
+. 0x02013550 reloc_addend 64
+. 0x02013558 reloc_addend 80
+. 0x0201355c reloc_addend 96
+. 0x02013570 reloc_addend 64
+. 0x0201357c reloc_addend 64
+. 0x020135a4 reloc_addend 64
+. 0x020135d0 reloc_addend 64
+. 0x0201360c reloc_addend 64
+. 0x02013614 reloc_addend 80
+. 0x02013618 reloc_addend 96
+. 0x02013688 reloc_addend 64
+. 0x020136a4 reloc_addend 64
+. 0x020136bc reloc_addend 64
+. 0x020136d8 reloc_addend 64
+. 0x02013750 reloc_addend 64
+. 0x020137ec reloc_addend 64
+. 0x02013818 reloc_addend 64
+. 0x02013834 reloc_addend 64
+. 0x02013858 reloc_addend 64
+. 0x02013874 reloc_addend 64
+. 0x02013898 reloc_addend 64
+. 0x020138c0 reloc_addend 64
+. 0x020138dc reloc_addend 64
+. 0x020138f4 reloc_addend 64
+. 0x02013910 reloc_addend 64
+. 0x020140dc reloc_addend 1
+. 0x02014b10 overlay_id 24
+. 0x02014b14 overlay_id 25
+. 0x02014b18 overlay_id 26
 . 0x02019f78 reloc_addend 0x4c
 . 0x02019f84 reloc_addend 0x240
 . 0x02019f88 reloc_addend 0x24c
@@ -228,7 +265,12 @@
 . 0x0208fd60 remove_symbol
 . 0x0208fd62 remove_symbol
 . 0x0208fd63 remove_symbol
+. 0x0208fdba remove_symbol
+. 0x0208fdbc remove_symbol
+. 0x0208fdbe remove_symbol
+. 0x0208fe89 remove_symbol
 . 0x0208fed8 remove_reloc
+. 0x0208ff01 remove_symbol
 . 0x02090bce remove_symbol
 . 0x02090d18 remove_reloc
 . 0x02090d1c remove_reloc
@@ -314,6 +356,11 @@
 . 0x0209ec00 remove_symbol
 . 0x0210000b remove_symbol
 . 0x0210020f remove_symbol
+. 0x02141054 remove_symbol
+. 0x0214107c add_data _localcfg
+. 0x021410c0 remove_symbol
+. 0x021410d0 remove_symbol
+. 0x021410e0 remove_symbol
 . 0x02141668 remove_symbol
 . 0x0214166c remove_symbol
 . 0x02141678 remove_symbol
@@ -1684,6 +1731,7 @@ overlays/ov199 0x021b9874 remove_reloc
 overlays/ov199 0x021b98f4 remove_reloc
 overlays/ov200 0x021b38bc remove_reloc
 overlays/ov201 0x021b59ce reloc_module overlay(189)
+overlays/ov203 0x021a9990 remove_reloc
 overlays/ov203 0x021a9994 remove_reloc
 overlays/ov204 0x021adee0 remove_reloc
 overlays/ov204 0x021adee8 remove_reloc
@@ -2120,8 +2168,8 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
+overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
 overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata

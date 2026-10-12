@@ -128,6 +128,8 @@ u32 GameData_GetLastBtlResult(GameData *gameData);
 void GameData_SetLensFlareRequested(GameData *gameData, BOOL requested);
 // Whether a Funfest mission is running, which plays its BGM everywhere (a guess from that use)
 BOOL func_02017b34(GameData *gameData);
+// Sets whether a Funfest mission is running
+void func_02017b40(GameData *gameData, BOOL flag);
 u32 GameData_GetLensFlareEntryIdx(GameData *gameData);
 void func_020173f8(GameData *gameData, u8 value);
 void GameData_SetLensFlareEntryIdx(GameData *gameData, u32 index);
