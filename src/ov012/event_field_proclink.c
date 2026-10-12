@@ -90,7 +90,7 @@ const FieldProcLink FIELD_PROC_LINK_LIST[15] = {
     { OVERLAY_ID(284), &SHINKA_DEMO_PROC_FUNCTIONS, script_evo, func_ov012_0215c3a4, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(272), &BR_MAIN_PROC_FUNCTIONS, func_ov012_0215c3d0, func_ov012_0215c3fc, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(259), &data_ov143_021a039c, func_ov012_0215c438, func_ov012_0215c474, NULL, func_ov012_0215c594 },
-    { OVERLAY_ID(145), &data_ov145_021a0fe0, func_ov012_0215c488, func_ov012_0215c4b4, NULL, func_ov012_0215c594 },
+    { OVERLAY_ID(145), &MEDALBOX_PROC_FUNCTIONS, func_ov012_0215c488, func_ov012_0215c4b4, NULL, func_ov012_0215c594 },
 };
 
 GameEvent *EventFieldAppCall_Create(FieldAppCallInput *input, u16 code) {

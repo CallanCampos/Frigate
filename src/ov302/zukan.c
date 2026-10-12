@@ -119,7 +119,7 @@ typedef struct {
 typedef u32 (*ZukanStateFunc)(ZukanWork *work);
 
 extern const GameProcFunctions data_ov299_021a25c8;
-extern const GameProcFunctions data_ov300_021a4094;
+extern const GameProcFunctions ZukanSearch_ProcFunctions;
 extern const GameProcFunctions data_ov303_021a32d8;
 extern const GameProcFunctions data_ov304_021a1dac;
 
@@ -360,7 +360,7 @@ static u32 Zukan_StateSearch(ZukanWork *work) {
     search->criteria = &work->criteria;
     search->list = NULL;
     search->count = 0;
-    QueueGameProc(work->procManager, OVERLAY_ID(300), &data_ov300_021a4094, work->subParam);
+    QueueGameProc(work->procManager, OVERLAY_ID(300), &ZukanSearch_ProcFunctions, work->subParam);
     return Zukan_SetNextState(work, STATE_AFTER_SEARCH);
 }
 

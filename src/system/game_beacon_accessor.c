@@ -308,7 +308,7 @@ u32 GameBeacon_GetLanguage(const GameBeacon *beacon) {
     return beacon->language;
 }
 
-u8 GameBeacon_GetCountry(const GameBeacon *beacon) {
+u32 GameBeacon_GetCountry(const GameBeacon *beacon) {
     return beacon->country;
 }
 

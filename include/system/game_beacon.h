@@ -228,7 +228,7 @@ void GameBeaconSys_SetTrainerView(u32 trainerView);
 void GameBeaconSys_UpdateGreeting(void);
 // Sets the medal count that the game's beacon sends
 void GameBeaconSys_SetMedalCount(u8 count);
-void func_0202d194(u8 value);
+void func_0202d194(u32 value);
 // Sends that the player caught species, of a wild battle of the kinds a1 and a2
 void GameBeaconSys_SendCapture(u16 species, BOOL a1, BOOL a2);
 // Sends a Funfest mission beacon for a defeated species, of a wild battle of the kinds a1 and a2
@@ -301,7 +301,7 @@ void GameBeacon_GetName(const GameBeacon *beacon, StrBuf *dest);
 // The game version of the beacon's sender
 u32 GameBeacon_GetVersion(const GameBeacon *beacon);
 u32 GameBeacon_GetLanguage(const GameBeacon *beacon);
-u8 GameBeacon_GetCountry(const GameBeacon *beacon);
+u32 GameBeacon_GetCountry(const GameBeacon *beacon);
 u8 GameBeacon_GetRegion(const GameBeacon *beacon);
 // The sender's answers to the survey's questions 0x1a and 0x19, or 0xff for none
 u8 func_02013cd8(GameBeacon *beacon);

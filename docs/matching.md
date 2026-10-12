@@ -1180,6 +1180,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   inlined code that reads it, is a `static const` in a header with a `static inline` function: overlay 197's
   `mystery.c`, `mystery_album.c` and `mystery_check.c` each have the 15 ribbon parameters and the inlined gift-Pokémon
   routine of `app/mystery/mystery_gift_data.h`.
+- The size sort that orders a file's `.rodata` takes its `.data` objects into the same list (string literals are
+  not in it), and a tentative `.bss` definition counts at the end of the file. With that, `rodata_order.py`'s model
+  predicts `pkwd_briefing.c` (117 objects), `c_gear_sw.c` and `comm_btl_demo.c` exactly; without it no declaration
+  order of their tables gives the ROM's layout. A lone table ahead of the sorted run still means another file in
+  front (`oekaki_comm.c`).
+- A `const` on a pointer parameter lets MWCC hoist loads through it above later byte stores: the hit tests of
+  `beacon_view.c` match only with a non-const `BeaconViewTouch *`, and the accessors of
+  `fmission_log_accessor_fv.c` only with non-const entries.
 
 ## When nothing moves it
 

@@ -975,7 +975,7 @@ void GameBeaconSys_SetMedalCount(u8 count) {
     slot->updated = TRUE;
 }
 
-void func_0202d194(u8 value) {
+void func_0202d194(u32 value) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
 
     slot->beacon.unk5B = value;

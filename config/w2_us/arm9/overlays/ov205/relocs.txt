@@ -180,7 +180,7 @@ from:0x021b834e kind:thumb_call to:0x02050478 module:main
 from:0x021b835c kind:load to:0x021b9598 module:overlay(205)
 from:0x021b8360 kind:load to:0x021b838d module:overlay(205)
 from:0x021b8384 kind:load to:0x021b952c module:overlay(205)
-from:0x021b8388 kind:load to:0x021b952d module:overlay(205)
+from:0x021b8388 kind:load to:0x021b952c add:0x1 module:overlay(205)
 from:0x021b83e4 kind:thumb_call to:0x02006254 module:main
 from:0x021b8400 kind:thumb_call to:0x02006254 module:main
 from:0x021b8406 kind:thumb_call to:0x021b81d4 module:overlay(205)

@@ -60,7 +60,7 @@ GameEventReturnCode func_ov021_0216e660(GameEvent *event, u32 *state, void *data
     case 2:
         FieldSnd_DuckVolume(GameData_GetFieldSoundSystem(gameData), GameSystem_GetISS(gsys));
         func_ov021_0216e848(&work->param, work->gsys, work->gameData, work->mode);
-        GSYS_QueueProc(gsys, OVERLAY_FESTIVAL_APP, &data_ov309_021a01d0, &work->param);
+        GSYS_QueueProc(gsys, OVERLAY_FESTIVAL_APP, &FMISSION_APP_PROC_FUNCTIONS, &work->param);
         (*state)++;
         break;
     case 3:

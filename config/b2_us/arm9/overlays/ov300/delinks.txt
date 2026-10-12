@@ -3,3 +3,39 @@
     .ctor       start:0x021a47e8 end:0x021a47e8 kind:rodata align:4
     .data       start:0x021a4800 end:0x021a4820 kind:data align:32
     .bss        start:0x021a4820 end:0x021a4820 kind:bss align:32
+
+src/ov300/zukansearch.c:
+    complete
+    .text       start:0x0219fbc0 end:0x0219fc14
+    .rodata     start:0x021a4094 end:0x021a40a0
+
+src/ov300/zknsearch_main.c:
+    complete
+    .text       start:0x0219fc14 end:0x021a08d0
+    .rodata     start:0x021a40a0 end:0x021a4214
+    .data       start:0x021a4800 end:0x021a4820
+
+src/ov300/zknsearch_seq.c:
+    complete
+    .text       start:0x021a08d0 end:0x021a1ce8
+    .rodata     start:0x021a4214 end:0x021a4280
+
+src/ov300/zknsearch_bmp.c:
+    complete
+    .text       start:0x021a1ce8 end:0x021a26ac
+    .rodata     start:0x021a4280 end:0x021a42e0
+
+src/ov300/zknsearch_obj.c:
+    complete
+    .text       start:0x021a26ac end:0x021a382c
+    .rodata     start:0x021a42e0 end:0x021a4494
+
+src/ov300/zknsearch_ui.c:
+    complete
+    .text       start:0x021a382c end:0x021a3bb4
+    .rodata     start:0x021a4494 end:0x021a4564
+
+src/ov300/zknsearch_list.c:
+    complete
+    .text       start:0x021a3bb4 end:0x021a4094
+    .rodata     start:0x021a4564 end:0x021a47e8

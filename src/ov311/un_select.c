@@ -742,7 +742,7 @@ static BOOL UnSelect_ListRun(UIScene *scene, void *param) {
         selected = FrameList_GetSelected(wk->list);
         if (wk->visited[selected] == TRUE) {
             wk->selected = selected;
-            SetRowPalette(wk->list, FrameList_GetCursor(wk->list), 3);
+            FrameList_SetRowPalette(wk->list, FrameList_GetCursor(wk->list), 3);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             UIScene_SetNext(scene, wk->param->floor == UN_SELECT_FLOOR(selected) ? UN_SELECT_STEP_SAME_FLOOR
                                                                                  : UN_SELECT_STEP_CONFIRM);

@@ -153,13 +153,15 @@ u32 FrameList_GetBarPos(FrameList *list);
 void FrameList_RedrawCursor(FrameList *list);
 // Where the scroll bar goes, from its y
 int FrameList_ClampBarPos(FrameList *list, int y);
+// Sets the palette of an item's row
+void FrameList_SetRowPalette(FrameList *list, u32 row, u32 palette);
 PrintQueue *FrameList_GetPrintQueue(FrameList *list);
 // An item's value
 u32 FrameList_GetValue(FrameList *list, u32 index);
 // The item under the cursor, the cursor's row, and the first row shown
 int FrameList_GetSelected(FrameList *list);
 s16 FrameList_GetCursor(FrameList *list);
-s16 FrameList_GetScroll(FrameList *list);
+int FrameList_GetScroll(FrameList *list);
 // Whether the list can scroll down
 BOOL FrameList_CanScrollDown(FrameList *list);
 void FrameList_SetCursor(FrameList *list, int pos);
@@ -169,7 +171,5 @@ void FrameList_SetKeyMask(FrameList *list, u32 a1);
 void FrameList_ScrollBlocking(FrameList *list, int a1);
 u32 FrameList_GetScrollFrames(FrameList *list);
 BlinkPalAnm *FrameList_GetBlinkAnm(FrameList *list);
-// Sets the palette of a row's tiles; overlays 259, 299, 304, 311, 322 and 325 call it too
-void SetRowPalette(FrameList *list, u32 row, u32 palette);
 
 #endif // POKEBW2_APP_UI_FRAME_LIST_H

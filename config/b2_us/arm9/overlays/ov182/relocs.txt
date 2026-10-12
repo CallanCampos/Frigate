@@ -5503,7 +5503,7 @@ from:0x021b9432 kind:thumb_call_arm to:0x02078920 module:main
 from:0x021b947e kind:thumb_call to:0x021a33bc module:overlay(181)
 from:0x021b9486 kind:thumb_call to:0x0207c774 module:main
 from:0x021b9490 kind:thumb_call to:0x021a355c module:overlays(181,189,294)
-from:0x021b9496 kind:thumb_call to:0x021a092c module:overlays(181,189,308)
+from:0x021b9496 kind:thumb_call to:0x021a092c module:overlay(181)
 from:0x021b949c kind:thumb_call to:0x021b9a54 module:overlay(182)
 from:0x021b94a8 kind:load to:0x021c417c module:overlay(182)
 from:0x021b94b4 kind:load to:0x021b9861 module:overlay(182)

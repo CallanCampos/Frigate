@@ -1284,7 +1284,7 @@ static void PrintRowOnBg2(FrameList *list, int item, s8 y) {
 }
 
 // Sets the palette of an item's row
-void SetRowPalette(FrameList *list, u32 row, u32 palette) {
+void FrameList_SetRowPalette(FrameList *list, u32 row, u32 palette) {
     s16 y = list->bgOffset / 8 + (list->setup.layout.y + row * list->setup.layout.rowHeight);
     u16 i;
 
@@ -1306,12 +1306,12 @@ void SetRowPalette(FrameList *list, u32 row, u32 palette) {
 // Gives the row of the cursor its palette, and the row that it left its own
 static void SetCursorRow(FrameList *list, u16 newCursor, u16 oldCursor) {
     if (oldCursor < list->rows) {
-        SetRowPalette(list, oldCursor,
-                            list->screens[list->items[list->scroll + oldCursor].screen][0] >> 12);
+        FrameList_SetRowPalette(list, oldCursor,
+                                list->screens[list->items[list->scroll + oldCursor].screen][0] >> 12);
     }
     if (newCursor < list->rows && !func_0203d554()) {
         BlinkPalAnm_InitAnime(list->blinkAnm);
-        SetRowPalette(list, newCursor, list->setup.layout.palette);
+        FrameList_SetRowPalette(list, newCursor, list->setup.layout.palette);
     }
 }
 
@@ -1348,7 +1348,7 @@ s16 FrameList_GetCursor(FrameList *list) {
     return list->cursor;
 }
 
-s16 FrameList_GetScroll(FrameList *list) {
+int FrameList_GetScroll(FrameList *list) {
     return list->scroll;
 }
 

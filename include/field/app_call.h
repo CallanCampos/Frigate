@@ -99,7 +99,7 @@ extern const GameProcFunctions data_ov140_0219eecc;
 extern const GameProcFunctions TOWNMAP_PROC_FUNCTIONS;
 extern const GameProcFunctions data_ov189_021ae03c;
 extern const GameProcFunctions data_ov143_021a039c;
-extern const GameProcFunctions data_ov145_021a0fe0;
+extern const GameProcFunctions MEDALBOX_PROC_FUNCTIONS;
 
 // Overlay 12: the trainer card's param, whose canEdit is FALSE in the Union Room
 void *func_ov012_02169b04(GameData *gameData, HeapID heapId, BOOL canEdit);

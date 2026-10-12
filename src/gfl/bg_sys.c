@@ -429,7 +429,7 @@ void GFL_BGSysMoveBG(u8 bg, u8 op, int value) {
     }
 }
 
-int GFL_BGSysGetBGOffsetX(u8 bg) {
+int GFL_BGSysGetBGOffsetX(u32 bg) {
     return sBGSys->bgs[bg].x;
 }
 

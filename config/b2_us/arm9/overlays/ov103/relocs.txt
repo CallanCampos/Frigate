@@ -79,7 +79,7 @@ from:0x021ef1fa kind:thumb_call to:0x021b84e8 module:overlay(36)
 from:0x021ef20e kind:thumb_call to:0x021ef1ac module:overlay(103)
 from:0x021ef224 kind:thumb_call to:0x021b84a8 module:overlays(36,260)
 from:0x021ef228 kind:thumb_call to:0x021b84ec module:overlay(36)
-from:0x021ef240 kind:thumb_call to:0x021b8520 module:overlays(36,205)
+from:0x021ef240 kind:thumb_call to:0x021b8520 module:overlay(36)
 from:0x021ef254 kind:thumb_call to:0x02016af0 module:main
 from:0x021ef262 kind:thumb_call to:0x02016cb4 module:main
 from:0x021ef268 kind:thumb_call to:0x02016edc module:main

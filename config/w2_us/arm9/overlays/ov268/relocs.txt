@@ -1620,7 +1620,7 @@ from:0x021c1b38 kind:thumb_call to:0x021f3fc4 module:overlay(271)
 from:0x021c1b4a kind:thumb_call to:0x021f46b8 module:overlay(271)
 from:0x021c1b58 kind:thumb_call to:0x021f55dc module:overlays(271,286)
 from:0x021c1b6a kind:thumb_call to:0x021f5608 module:overlay(271)
-from:0x021c1bb2 kind:thumb_call to:0x021b635c module:overlays(195,201)
+from:0x021c1bb2 kind:thumb_call to:0x021b635c module:overlay(201)
 from:0x021c1be4 kind:thumb_call_arm to:0x020787d4 module:main
 from:0x021c1be8 kind:thumb_call to:0x0200c0c0 module:main
 from:0x021c1bf0 kind:thumb_call to:0x0200c124 module:main
