@@ -32,7 +32,8 @@ If unclaimed, post `Claiming overlay 033 for decompilation; starting with FILE_O
 `gh issue comment NUMBER --repo fuddlesworth/pokebw2 --body '...'`. Read the comments again immediately. If another
 claim was posted first, comment that you withdraw yours and switch overlays (or report the conflict for a named
 overlay). Keep the issue URL in the workstream's memory. Comment `Releasing my claim on overlay 033` when you stop
-working on it before completion; an overlay completed in full can have its issue closed instead.
+working on it before completion. After each published overlay change, post progress; close the issue only when the
+whole overlay is verified complete, as described in `finish-file` step 8.
 
 ## 1. Boundaries, name and place
 

@@ -94,7 +94,17 @@ intended, stop and ask the user.
 
 ## 8. Report and continue
 
-Tell the user in one or two lines: the file, N of M matching, the rows added or removed, and the commit. Then start
-the next file with `decomp-file`, without asking unless something real is blocked. Keep the same overlay claim while
-continuing within it. If leaving an unfinished overlay, release the claim in its issue comment. If the entire
-overlay is complete, close its issue after publishing the verified commit.
+After the verified commit is pushed, comment on the claimed `[Decomp] Overlay NNN` issue for every overlay changed by
+the commit. State the file or range, N of M functions matching, files newly marked complete, the published commit
+SHA or URL, and what remains. This gives partial work a history; do not wait for the overlay to be complete. Use
+`gh issue comment NUMBER --repo fuddlesworth/pokebw2 --body '...'`.
+
+If the overlay is now 100%, check both versions' `delinks.txt`: all original code and data ranges are covered by the
+recovered source files and every file is marked `complete`. After the published commit's `ninja` has verified both
+ROM SHA1s, post a final progress comment stating completion and close the issue with
+`gh issue close NUMBER --repo fuddlesworth/pokebw2 --reason completed`. Leave it open if any file or range remains.
+If leaving an unfinished overlay, comment that you release your claim.
+
+Tell the user in one or two lines: the file, N of M matching, the rows added or removed, the commit, and the issue
+update. Then start the next file with `decomp-file`, without asking unless something real is blocked. Keep the same
+overlay claim while continuing within it.

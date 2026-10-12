@@ -16,7 +16,10 @@ follows; [the docs](README.md#documentation) have the details.
    overlay work, find its open `[Decomp] Overlay NNN` issue and read the comments. If nobody has claimed it, comment
    that you are claiming it and what file or range you are starting with; then recheck for a concurrent claim.
    Treat a claim as active until its author releases it or the issue closes. Release yours if you leave the overlay
-   unfinished. If someone already has it, choose another overlay or coordinate with them first.
+   unfinished. If someone already has it, choose another overlay or coordinate with them first. After each published
+   overlay change, comment on the issue with the file or range, matching progress, commit and remaining work. When
+   every original range is covered and every file is complete in both versions, verify both ROMs, add a final progress
+   comment and close the issue.
 
 ## Decompiling a file
 
