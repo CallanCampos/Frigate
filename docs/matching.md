@@ -89,6 +89,10 @@ Same instructions, registers swapped.
 - A variable gets a register or stack slot for each group of assignments that reach the same uses, so a variable
   that is assigned in two branches and stored once after them stays in one register, while a copy of the store in
   each branch lets the two assignments go to different places.
+- The same holds for an update written in both branches of an `if`/`else`: MWCC merges the two into one instruction
+  at the join, but allocates as if they were separate assignments. `ssp_jpegdec.c`'s `func_ov257_021ab808` keeps
+  `nbits` in r6 and the loop counter in r7 only with `nbits--;` at the end of each branch; one `nbits--;` after the
+  `if`/`else` swaps them.
 - Where a flag is first set changes which register its zero is built in. When the original builds a flag's `FALSE` in
   the register of a call's argument, or copies it from another zero, the flag was set after the call or loop, as
   `value = joinAveTextHandler(...); found = FALSE;` and a loop's total followed by `any = FALSE;` in the Join Avenue's
