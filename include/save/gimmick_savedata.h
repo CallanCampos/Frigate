@@ -26,7 +26,7 @@ void *GimmickState_SetID(GimmickState *gimmick, u32 gimmickId);
 void *GimmickState_GetUserData(GimmickState *gimmick, u32 gimmickId);
 // The two areas after the user data. The ID is not checked
 void *func_0200bac8(GimmickState *gimmick, u32 gimmickId);
-void *func_0200bacc(GimmickState *gimmick);
+void *func_0200bacc(GimmickState *gimmick, u32 gimmickId);
 u32 GimmickState_GetID(GimmickState *gimmick);
 void GimmickState_StoreSave(const GimmickState *gimmick, SaveControl *save);
 void GimmickState_LoadSave(SaveControl *save, GimmickState *gimmick);

@@ -1,0 +1,12 @@
+#ifndef POKEBW2_FIELD_GIMMICK_PLASMA_FRIGATE_DECK_H
+#define POKEBW2_FIELD_GIMMICK_PLASMA_FRIGATE_DECK_H
+
+#include "types.h"
+#include "struct_decls.h"
+
+// The gimmick of the Plasma Frigate's deck (zone 552, gimmick 45), overlay 118. Overlay 36's gimmick table calls these
+void func_ov118_021eec80(Field *field);
+void func_ov118_021eecb4(Field *field);
+void func_ov118_021eeccc(Field *field);
+
+#endif // POKEBW2_FIELD_GIMMICK_PLASMA_FRIGATE_DECK_H

@@ -81,7 +81,6 @@ static s8 GetOffscreenRowY(FrameList *list, int dir);
 static s8 WrapRow(s8 pos, s8 count, s8 delta);
 static void PrintRow(FrameList *list, int item, s8 y);
 static void PrintRowOnBg2(FrameList *list, int item, s8 y);
-static void SetRowPalette(FrameList *list, u32 row, u32 palette);
 static void SetCursorRow(FrameList *list, u16 newCursor, u16 oldCursor);
 static void FlushWindows(FrameList *list);
 static u32 GetKeyTrigger(FrameList *list);
@@ -1285,7 +1284,7 @@ static void PrintRowOnBg2(FrameList *list, int item, s8 y) {
 }
 
 // Sets the palette of an item's row
-static void SetRowPalette(FrameList *list, u32 row, u32 palette) {
+void SetRowPalette(FrameList *list, u32 row, u32 palette) {
     s16 y = list->bgOffset / 8 + (list->setup.layout.y + row * list->setup.layout.rowHeight);
     u16 i;
 

@@ -3,7 +3,7 @@
     .ctor       start:0x021eede0 end:0x021eede0 kind:rodata align:4
     .bss        start:0x021eee00 end:0x021eee00 kind:bss align:32
 
-src/ov118/gimmick_nimbasa.c:
+src/ov118/gimmick_plasma_frigate_deck.c:
     complete
     .text       start:0x021eec80 end:0x021eed98
     .rodata     start:0x021eed98 end:0x021eede0

@@ -3,9 +3,11 @@
 #include "types.h"
 #include "field/field_script.h"
 #include "field/field_sound.h"
+#include "field/gimmick_roller_coaster.h"
 #include "field/gym_driftveil.h"
 #include "field/gym_driftveil_lift.h"
 #include "field/gym_gimmick.h"
+#include "field/gym_humilau.h"
 #include "field/gym_icirrus.h"
 #include "field/gym_mistralton.h"
 #include "field/gym_opelucid.h"
@@ -277,7 +279,7 @@ BOOL func_ov036_021ab178(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    func_ov101_021eee48(gsys);
+    GymHumilau_PlayLeaderSplash(gsys);
     return TRUE;
 }
 
@@ -285,7 +287,7 @@ BOOL func_ov036_021ab190(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    func_ov101_021eeee0(gsys);
+    GymHumilau_PlayLeaderWaves(gsys);
     return TRUE;
 }
 
@@ -293,7 +295,7 @@ BOOL func_ov036_021ab1a8(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u8 a1 = VM_Read16(vm);
-    GameEvent *event = func_ov102_021ef3e8(gsys, a1);
+    GameEvent *event = RollerCoaster_CreateSwitchEvent(gsys, a1);
 
     if (event == NULL) {
         return TRUE;
@@ -308,11 +310,11 @@ BOOL func_ov036_021ab1e0(VM *vm, FieldScriptEnv *env) {
 
     u8 a1 = VM_Read16(vm);
 
-    func_ov102_021ef6f8(gsys, a1);
+    RollerCoaster_SetCarIntroSeen(gsys, a1);
     return FALSE;
 }
 
 BOOL func_ov036_021ab208(VM *vm, FieldScriptEnv *env) {
-    func_ov102_021ef338(FieldScriptEnv_GetGameSystem(env));
+    RollerCoaster_StartAmbience(FieldScriptEnv_GetGameSystem(env));
     return FALSE;
 }

@@ -1,7 +1,7 @@
 #include "types.h"
+#include "app/un_select.h"
 #include "field/field_script.h"
 #include "field/unity_tower.h"
-#include "gfl/overlay.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/game_event.h"
@@ -11,18 +11,9 @@
 // The script commands of the Unity Tower (a descriptive name). Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
-#define UNITY_TOWER_COUNTRY_MAX 232
-#define UNITY_TOWER_VISITOR_MAX 20
-
-// What overlay 311's floor select gets
+// The floor select's parameter, and what the event writes its result to
 typedef struct {
-    u8 floor;
-    u8 selectedFloor;
-    u16 selectedCountry;
-    BOOL selected;
-    u16 visitorCountries[UNITY_TOWER_VISITOR_MAX];
-    // For each country, whether a visitor from it has come
-    u8 countryVisited[UNITY_TOWER_COUNTRY_MAX];
+    UnSelectParam param;
     u32 unk118;
     u16 *floorResult;
     u16 *countryResult;
@@ -64,7 +55,7 @@ static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorRes
     int i;
     int count;
 
-    work->floor = floor;
+    work->param.floor = floor;
     work->selectedResult = selectedResult;
     work->floorResult = floorResult;
     work->countryResult = countryResult;
@@ -72,9 +63,9 @@ static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorRes
     for (country = 1; country < UNITY_TOWER_COUNTRY_MAX + 1; country++) {
         i = country - 1;
         if (func_02009eb0(survey, country)) {
-            work->countryVisited[i] = TRUE;
+            work->param.countryVisited[i] = TRUE;
         } else {
-            work->countryVisited[i] = FALSE;
+            work->param.countryVisited[i] = FALSE;
         }
     }
     count = func_02009ce4(survey);
@@ -82,10 +73,10 @@ static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorRes
         count = UNITY_TOWER_VISITOR_MAX;
     }
     for (i = 0; i < count; i++) {
-        work->visitorCountries[i] = UnityTowerVisitor_GetCountry(UnityTower_GetVisitor(survey, i));
+        work->param.visitorCountries[i] = UnityTowerVisitor_GetCountry(UnityTower_GetVisitor(survey, i));
     }
     for (; i < UNITY_TOWER_VISITOR_MAX; i++) {
-        work->visitorCountries[i] = 0;
+        work->param.visitorCountries[i] = 0;
     }
     return event;
 }
@@ -95,14 +86,14 @@ static GameEventReturnCode func_ov012_02160c64(GameEvent *event, u32 *state, voi
 
     switch (*state) {
     case 0:
-        GSYS_QueueProcAsEvent(event, OVERLAY_ID(311), &data_ov311_0219e440, work);
+        GSYS_QueueProcAsEvent(event, OVERLAY_UN_SELECT, &UN_SELECT_PROC_FUNCTIONS, &work->param);
         (*state)++;
         break;
     case 1:
-        if (work->selected == TRUE) {
+        if (work->param.selected == TRUE) {
             *work->selectedResult = TRUE;
-            *work->floorResult = work->selectedFloor;
-            *work->countryResult = work->selectedCountry;
+            *work->floorResult = work->param.selectedFloor;
+            *work->countryResult = work->param.selectedCountry;
         } else {
             *work->selectedResult = FALSE;
             *work->floorResult = 0;

@@ -81,6 +81,8 @@ enum {
     HEAPID_BATTLE_LOAD = 0x76,
     HEAPID_WIFILOGIN = 0x78,
     HEAPID_WIFILOGOUT = 0x79,
+    // Not from swan: the Unity Tower's floor select, overlay 311
+    HEAPID_UN_SELECT = 0x7a,
     // Not from swan: the Pokédex opening's
     HEAPID_ZUKAN_OPEN = 0x7e,
     HEAPID_CDEMO = 0x7f,
@@ -97,6 +99,8 @@ enum {
     HEAPID_FIELD_CLACT = 0x89,
     // Not from swan: the C-Gear's help screens' heap, overlay 200
     HEAPID_CG_HELP = 0x8a,
+    // Not from swan: the credits' heap, overlay 266
+    HEAPID_STAFF_ROLL = 0x8e,
     HEAPID_EGG_DEMO = 0x8f,
     // Not from swan: the trade's, in overlay 194's own memory
     HEAPID_POKEMON_TRADE = 0x91,

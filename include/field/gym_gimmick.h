@@ -28,12 +28,8 @@ void GymInsect_PlayObject(Field *field, u8 object);
 void GymInsect_ShowEffect(Field *field);
 BOOL GymInsect_IsRideAhead(GameSystem *gsys, u8 dir);
 
-// Overlays 100 to 102: the other gyms' puzzles (overlay 94's are in gym_mistralton.h, overlay 96's in
-// gym_driftveil.h, overlay 97's in gym_driftveil_lift.h, overlay 99's in gym_opelucid.h)
-void func_ov101_021eee48(GameSystem *gsys);
-void func_ov101_021eeee0(GameSystem *gsys);
-GameEvent *func_ov102_021ef3e8(GameSystem *gsys, u8 a1);
-void func_ov102_021ef6f8(GameSystem *gsys, u8 a1);
-void func_ov102_021ef338(GameSystem *gsys);
+// The other gyms' puzzles have their own headers: overlay 94's gym_mistralton.h, overlay 96's gym_driftveil.h,
+// overlay 97's gym_driftveil_lift.h, overlay 99's gym_opelucid.h, overlay 100's gym_virbank.h, overlay 101's
+// gym_humilau.h and overlay 102's gimmick_roller_coaster.h
 
 #endif // POKEBW2_FIELD_GYM_GIMMICK_H

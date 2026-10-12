@@ -169,5 +169,7 @@ void FrameList_SetKeyMask(FrameList *list, u32 a1);
 void FrameList_ScrollBlocking(FrameList *list, int a1);
 u32 FrameList_GetScrollFrames(FrameList *list);
 BlinkPalAnm *FrameList_GetBlinkAnm(FrameList *list);
+// Sets the palette of a row's tiles; overlays 259, 299, 304, 311, 322 and 325 call it too
+void SetRowPalette(FrameList *list, u32 row, u32 palette);
 
 #endif // POKEBW2_APP_UI_FRAME_LIST_H

@@ -519,6 +519,22 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `gym_striaton.c` | `0x021eec80`–`0x021eecbc` | 3 | complete | descriptive |
 
+### Overlay 101
+
+43 of 43 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `gym_humilau.c` | `0x021eec80`–`0x021f042c` | 43 | partial | descriptive |
+
+### Overlay 102
+
+27 of 27 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | partial | descriptive |
+
 ### Overlay 103
 
 17 of 17 functions are in source files.
@@ -551,6 +567,14 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `gimmick_league_lift.c` | `0x021eec80`–`0x021eee58` | 12 | complete | descriptive |
+
+### Overlay 118
+
+6 of 6 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `gimmick_plasma_frigate_deck.c` | `0x021eec80`–`0x021eed98` | 6 | complete | descriptive |
 
 ### Overlay 126
 
@@ -674,6 +698,14 @@ prints the tables below from the configs and the ROM:
 The interpreter boundary is inferred from its command tables and the single incoming dispatcher call. No filename
 string proves it; the remaining controller owns a separate state table and movie descriptions.
 
+### Overlay 266
+
+57 of 57 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `staff_roll_main.c` | `0x0219ce80`–`0x0219e518` | 57 | partial | string at `0x0219e660` |
+
 ### Overlay 279
 
 4 of 4 functions are in source files.
@@ -717,3 +749,12 @@ string proves it; the remaining controller owns a separate state table and movie
 | `egg_demo.c` | `0x021ddbc0`–`0x021de730` | 38 | complete | descriptive |
 | `egg_demo_graphic.c` | `0x021de730`–`0x021dead0` | 21 | complete | string at `0x021df7e0` |
 | `egg_demo_view.c` | `0x021dead0`–`0x021df528` | 38 | complete | string at `0x021df7f4` |
+
+### Overlay 311
+
+70 of 70 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | partial | string at `0x0219e988` |
+| `un_select_graphic.c` | `0x0219e088`–`0x0219e3f4` | 17 | complete | string at `0x0219e994` |
