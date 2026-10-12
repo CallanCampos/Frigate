@@ -902,6 +902,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   on a `u8`, 255 is the type's maximum and the test is `cmp r0, #0xfe; blo`. `poke_personal.c`'s
   `isGenderlessOrSetGender` was 2 bytes short with a `u8` parameter, and its three callers in `poke_tool.c`, which
   pass the ratio unnarrowed, showed the parameter is a `u32`.
+- `cmp; blt; mov; b; neg` in front of one shared division is the remainder written in both arms,
+  `if (x >= 0) { t = x % 10; } else { t = -x % 10; }`, as in `pkwd_selectscreen.c`'s `PkwdSelectScreen_PrintDetails`.
+  A ternary, an `if`/`else` on the value alone and an inline abs all give other code.
+- A call left unmerged in one arm while both arms jump to one store means the store is written at the end of both
+  arms, not once after the `if` (`PkwdSelectScreen_PrintMovie`).
 
 ## Loops
 

@@ -3,3 +3,14 @@
     .ctor       start:0x0219fe2c end:0x0219fe2c kind:rodata align:4
     .data       start:0x0219fe40 end:0x0219fe60 kind:data align:32
     .bss        start:0x0219fe60 end:0x0219fe60 kind:bss align:32
+
+src/ov316/psel.c:
+    .text       start:0x0219cec0 end:0x0219f710
+    .rodata     start:0x0219fac4 end:0x0219fc84
+    .data       start:0x0219fe40 end:0x0219fe48
+
+src/ov316/psel_graphic.c:
+    complete
+    .text       start:0x0219f710 end:0x0219fac4
+    .rodata     start:0x0219fc84 end:0x0219fe2c
+    .data       start:0x0219fe48 end:0x0219fe60

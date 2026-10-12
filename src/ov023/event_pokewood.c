@@ -896,7 +896,7 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
     switch (*state) {
     case 0:
         GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(323),
-                                                                         &data_ov323_0219ea60, &wk->param));
+                                                                         &PKWD_SELECTSCREEN_PROC_FUNCTIONS, &wk->param));
         *state = 1;
         break;
     case 1:
