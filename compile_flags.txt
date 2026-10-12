@@ -6,6 +6,7 @@
 -Ilib/dwc/include
 -Ilib/nitro/include
 -Ilib/nnsys/include
+-Ilib/poke_net/include
 -Ilib/spl/include
 -Ilib/twl/include
 -Ibuild/include/generated

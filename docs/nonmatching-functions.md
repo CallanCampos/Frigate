@@ -788,6 +788,9 @@ the original code is linked until they match. The differences are the same in bo
 | `lib/dwc/src/ghttp/ghttpPost.c` | `ghiNewPost` | `0x021a30c8` / `0x021a3108` | 4 bytes short (0x44 against 0x48): the original clears the post with a byte loop through a copy of the pointer and does not share its zeros; ours shares one register for all of them. Tried while, for and do-while loops. |
 | `lib/dwc/src/ghttp/ghttpProcess.c` | `ghiDoConnecting` | `0x021a4418` / `0x021a4458` | 4 bytes long (0x1b4 against 0x1b0): the original keeps the socket address's base in r0 through the port's computation, ours rebuilds it. |
 | `lib/dwc/src/ghttp/ghttpProcess.c` | `ghiDoReceivingHeaders` | `0x021a4ee4` / `0x021a4f24` | 6 bytes short (0x3f6 against 0x3fc): the original keeps the buffer on the stack and the received data in r7, ours keeps the buffer in r7. Tried the order of the locals. |
+| `src/ov201/gds_rap.c` | `GdsRap_MainSend` | `0x021b5908` / `0x021b5948` | 4 bytes shorter: every `result = …; break` shares one `str r0, [sp, #8]` in the first case, where the original shares the one in the search switch's case 2 and keeps a copy in case 3. Tried: no `break` on the last inner case, a different exit from case 3. |
+| `lib/poke_net/src/poke_net.c` | `POKE_NET_Release` | `0x021b64e8` / `0x021b6528` | 0x20 shorter: the original zeroes `Auth` in place with an `stmia` loop, ours calls `memset`. A compound literal, a zeroed local and a `static const` zero all copy from a temporary; the compiler has no `memset` intrinsic. |
+| `lib/poke_net/src/poke_net.c` | `POKE_NET_Connecting` | `0x021b6d7c` / `0x021b6dbc` | 47 bytes, same size: the original computes the port and loads the address before storing the four fields, ours stores length and family first. Tried: locals, an aggregate initializer, an inline helper. |
 
 ## Matching, but not linkable as is
 

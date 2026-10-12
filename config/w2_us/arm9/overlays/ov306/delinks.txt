@@ -3,3 +3,15 @@
     .ctor       start:0x0219ef48 end:0x0219ef48 kind:rodata align:4
     .data       start:0x0219ef60 end:0x0219efa0 kind:data align:32
     .bss        start:0x0219efa0 end:0x0219efa0 kind:bss align:32
+
+src/ov306/btl_rec_sel.c:
+    complete
+    .text       start:0x0219cec0 end:0x0219e9e0
+    .rodata     start:0x0219ed80 end:0x0219ee24
+    .data       start:0x0219ef60 end:0x0219ef70
+
+src/ov306/btl_rec_sel_graphic.c:
+    complete
+    .text       start:0x0219e9e0 end:0x0219ed80
+    .rodata     start:0x0219ee24 end:0x0219ef48
+    .data       start:0x0219ef70 end:0x0219efa0

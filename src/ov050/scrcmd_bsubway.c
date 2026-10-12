@@ -750,7 +750,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
             bsw->ov306Param.unk14 = BSUBWAY_COUNT_MAX;
         }
         ScriptWork_CallEvent(
-            work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(306), &data_ov306_0219ed40, &bsw->ov306Param, NULL, NULL));
+            work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(306), &BtlRecSelProcFunctions, &bsw->ov306Param, NULL, NULL));
         result = TRUE;
         break;
     case 349:

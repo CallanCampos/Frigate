@@ -279,8 +279,8 @@ void func_02011c78(void) {
     }
 }
 
-void GFL_NetErrShow(u32 a0) {
-    GFL_NetErrShowCore(a0);
+BOOL GFL_NetErrShow(u32 a0) {
+    return GFL_NetErrShowCore(a0);
 }
 
 void func_02011d04(u32 message) {

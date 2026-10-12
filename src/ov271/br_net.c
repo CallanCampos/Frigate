@@ -29,7 +29,7 @@ struct BrNetSeq {
 
 struct BrNet {
     // The GDS client's work
-    u8 gdsWork[0x5a4];
+    GdsRapWork gdsrap;
     BOOL isOpen;
     GdsProfile *profile;
     BrNetSeq *seq;
@@ -59,12 +59,12 @@ static void BrNet_Seq5(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net);
 static void BrNet_Seq6(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net);
 static void BrNet_Seq7(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net);
 static void BrNet_Seq8(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net);
-static void BrNet_OnUploadMusicalShotEnd(void *work);
-static void BrNet_OnDownloadMusicalShotEnd(void *work);
-static void BrNet_OnUploadVideoEnd(void *work);
-static void BrNet_OnDownloadVideoListEnd(void *work);
-static void BrNet_OnDownloadVideoEnd(void *work);
-static void BrNet_OnUnk5d8End(void *work);
+static void BrNet_OnUploadMusicalShotEnd(void *work, const GdsRapResult *result);
+static void BrNet_OnDownloadMusicalShotEnd(void *work, const GdsRapResult *result);
+static void BrNet_OnUploadVideoEnd(void *work, const GdsRapResult *result);
+static void BrNet_OnDownloadVideoListEnd(void *work, const GdsRapResult *result);
+static void BrNet_OnDownloadVideoEnd(void *work, const GdsRapResult *result);
+static void BrNet_OnUnk5d8End(void *work, const GdsRapResult *result);
 static BrNetSeq *BrNetSeq_Init(BrNet *net, BrNetSeqFunc func, HeapID heapId);
 static void BrNetSeq_Exit(BrNetSeq *p_wk);
 static void BrNetSeq_Main(BrNetSeq *p_wk);
@@ -84,15 +84,15 @@ BrNet *BrNet_Init(GameData *gameData, u32 a1, HeapID heapId) {
     sys_memset(&init, 0, sizeof(GdsRapInit));
     init.gameData = gameData;
     init.profileId = func_02008bdc(GetGameDataPlayerInfo(gameData));
-    init.unkC = a1;
-    init.work = net;
-    init.onUploadMusicalShotEnd = BrNet_OnUploadMusicalShotEnd;
-    init.onDownloadMusicalShotEnd = BrNet_OnDownloadMusicalShotEnd;
-    init.onUploadVideoEnd = BrNet_OnUploadVideoEnd;
-    init.onDownloadVideoListEnd = BrNet_OnDownloadVideoListEnd;
-    init.onDownloadVideoEnd = BrNet_OnDownloadVideoEnd;
-    init.onUnk5d8End = BrNet_OnUnk5d8End;
-    func_ov201_021b5420(net, &init);
+    init.loginBuffer = (void *)a1;
+    init.callbacks.work = net;
+    init.callbacks.onUploadMusicalShotEnd = BrNet_OnUploadMusicalShotEnd;
+    init.callbacks.onDownloadMusicalShotEnd = BrNet_OnDownloadMusicalShotEnd;
+    init.callbacks.onUploadVideoEnd = BrNet_OnUploadVideoEnd;
+    init.callbacks.onDownloadVideoListEnd = BrNet_OnDownloadVideoListEnd;
+    init.callbacks.onDownloadVideoEnd = BrNet_OnDownloadVideoEnd;
+    init.callbacks.onFavoriteVideoEnd = BrNet_OnUnk5d8End;
+    GdsRap_Init(&net->gdsrap, &init);
     net->isOpen = TRUE;
 
     GameData_GetSaveControl(gameData);
@@ -108,7 +108,7 @@ void BrNet_Exit(BrNet *net) {
     BrNetSeq_Exit(net->seq);
     GdsProfile_Free(net->profile);
     if (net->isOpen) {
-        func_ov201_021b5534(net);
+        GdsRap_Exit(&net->gdsrap);
         net->isOpen = FALSE;
     }
     GFL_HeapFree(net);
@@ -118,7 +118,7 @@ void BrNet_Exit(BrNet *net) {
 void BrNet_Main(BrNet *net) {
     if (net->isOpen) {
         BrNetSeq_Main(net->seq);
-        func_ov201_021b57fc(net);
+        GdsRap_Main(&net->gdsrap);
     }
 }
 
@@ -172,7 +172,7 @@ BOOL BrNet_GetDownloadMusicalShot(BrNet *net, BrMusicalShotRecv **tbl, int tblMa
     BOOL isEnd = net->downloadMusicalShotEnd;
 
     if (isEnd) {
-        *recvNum = func_ov201_021b614c(net, tbl, tblMax);
+        *recvNum = GdsRapResponse_GetMusicalShots(&net->gdsrap, (POKE_NET_GDS_MUSICALSHOT_SEND **)tbl, tblMax);
     }
     return isEnd;
 }
@@ -181,7 +181,7 @@ BOOL BrNet_GetUploadVideoNumber(BrNet *net, u64 *number) {
     BOOL isEnd = net->uploadVideoEnd;
 
     if (isEnd) {
-        *number = func_ov201_021b61b8(net);
+        *number = GdsRapResponse_GetBattleVideoNumber(&net->gdsrap);
     }
     return isEnd;
 }
@@ -190,7 +190,7 @@ BOOL BrNet_GetDownloadVideo(BrNet *net, void **video, u32 *value) {
     BOOL isEnd = net->downloadVideoEnd;
 
     if (isEnd) {
-        *value = func_ov201_021b62b4(net, video);
+        *value = GdsRapResponse_GetBattleVideo(&net->gdsrap, (BattleRecVideo **)video);
     }
     return isEnd;
 }
@@ -199,7 +199,7 @@ BOOL BrNet_GetDownloadVideoListA(BrNet *net, void *list, int listMax, int *num) 
     BOOL isEnd = net->downloadVideoListEnd;
 
     if (isEnd) {
-        *num = func_ov201_021b61ec(net, list, listMax);
+        *num = GdsRapResponse_GetBattleVideoList(&net->gdsrap, list, listMax);
     }
     return *num != 0 && isEnd;
 }
@@ -208,7 +208,7 @@ BOOL BrNet_GetDownloadVideoListB(BrNet *net, void *list, int listMax, int *num) 
     BOOL isEnd = net->downloadVideoListEnd;
 
     if (isEnd) {
-        *num = func_ov201_021b61ec(net, list, listMax);
+        *num = GdsRapResponse_GetBattleVideoList(&net->gdsrap, list, listMax);
     }
     return *num != 0 && isEnd;
 }
@@ -217,7 +217,7 @@ BOOL BrNet_GetDownloadVideoListC(BrNet *net, void *list, int listMax, int *num) 
     BOOL isEnd = net->downloadVideoListEnd;
 
     if (isEnd) {
-        *num = func_ov201_021b61ec(net, list, listMax);
+        *num = GdsRapResponse_GetBattleVideoList(&net->gdsrap, list, listMax);
     }
     return *num != 0 && isEnd;
 }
@@ -226,7 +226,7 @@ BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID) {
     GdsRapResult *result;
     BOOL ret;
 
-    if (func_ov201_021b60c4(net, &result)) {
+    if (GdsRap_GetResult(&net->gdsrap, &result)) {
         ret = TRUE;
         if (result->type == 0) {
             if (result->detail != 0) {
@@ -314,7 +314,7 @@ BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID) {
             }
         }
 
-        func_ov201_021b60d0(net);
+        GdsRap_ClearResult(&net->gdsrap);
         if (ret == 3) {
             net->isFailed = TRUE;
         }
@@ -355,105 +355,105 @@ static void BrNet_SeqIdle(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
 }
 
 static void BrNet_SeqWaitEnd(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    if (func_ov201_021b60e4(net)) {
+    if (GdsRap_IsIdle(&net->gdsrap)) {
         BrNetSeq_SetNext(p_seqwk, BrNet_SeqIdle);
     }
 }
 
 static void BrNet_SeqUploadMusicalShot(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b558c(net, net->profile, net->param.data);
+    BOOL ret = GdsRap_SendMusicalShotUpload(&net->gdsrap, net->profile, net->param.data);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_SeqDownloadMusicalShot(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b55d8(net, net->param.species);
+    BOOL ret = GdsRap_SendMusicalShotDownload(&net->gdsrap, net->param.species);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_Seq2(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b5600(net, net->profile);
+    BOOL ret = GdsRap_SendBattleVideoUpload(&net->gdsrap, net->profile);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_Seq3(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b57a4(net, (u32)net->param.data, net->param.unk4);
+    BOOL ret = GdsRap_SendBattleVideoDownload(&net->gdsrap, net->param.dataNumber);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_Seq4(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b56b0(net, net->param.a1, net->param.unk4, net->param.a3, net->param.a4);
+    BOOL ret = GdsRap_SendBattleVideoSearch(&net->gdsrap, net->param.a1, net->param.unk4, net->param.a3, net->param.a4);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_Seq5(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b5730(net);
+    BOOL ret = GdsRap_SendBattleVideoList1(&net->gdsrap);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_Seq6(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b577c(net);
+    BOOL ret = GdsRap_SendBattleVideoList3(&net->gdsrap);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_Seq7(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b5754(net);
+    BOOL ret = GdsRap_SendBattleVideoList2(&net->gdsrap);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
 static void BrNet_Seq8(BrNetSeq *p_seqwk, u32 *p_seq, BrNet *net) {
-    BOOL ret = func_ov201_021b57d0(net, (u32)net->param.data, net->param.unk4);
+    BOOL ret = GdsRap_SendBattleVideoFavorite(&net->gdsrap, net->param.dataNumber);
 
     GFL_ASSERT(ret);
     BrNetSeq_SetNext(p_seqwk, BrNet_SeqWaitEnd);
 }
 
-static void BrNet_OnUploadMusicalShotEnd(void *work) {
+static void BrNet_OnUploadMusicalShotEnd(void *work, const GdsRapResult *result) {
     BrNet *net = work;
 
     net->uploadMusicalShotEnd = TRUE;
 }
 
-static void BrNet_OnDownloadMusicalShotEnd(void *work) {
+static void BrNet_OnDownloadMusicalShotEnd(void *work, const GdsRapResult *result) {
     BrNet *net = work;
 
     net->downloadMusicalShotEnd = TRUE;
 }
 
-static void BrNet_OnUploadVideoEnd(void *work) {
+static void BrNet_OnUploadVideoEnd(void *work, const GdsRapResult *result) {
     BrNet *net = work;
 
     net->uploadVideoEnd = TRUE;
 }
 
-static void BrNet_OnDownloadVideoListEnd(void *work) {
+static void BrNet_OnDownloadVideoListEnd(void *work, const GdsRapResult *result) {
     BrNet *net = work;
 
     net->downloadVideoListEnd = TRUE;
 }
 
-static void BrNet_OnDownloadVideoEnd(void *work) {
+static void BrNet_OnDownloadVideoEnd(void *work, const GdsRapResult *result) {
     BrNet *net = work;
 
     net->downloadVideoEnd = TRUE;
 }
 
-static void BrNet_OnUnk5d8End(void *work) {
+static void BrNet_OnUnk5d8End(void *work, const GdsRapResult *result) {
     BrNet *net = work;
 
     net->unk5d8End = TRUE;
@@ -494,10 +494,10 @@ static u32 BrNet_EventFunc(void *work, int a1, int event, int a3) {
         return TRUE;
     }
 
-    func_ov201_021b5ef8(net, a1, event, a3);
+    GdsRap_OnNetEvent(&net->gdsrap, a1, event, a3);
     if (event == 3 || event == 6) {
         if (net->isOpen) {
-            func_ov201_021b5534(net);
+            GdsRap_Exit(&net->gdsrap);
             net->isOpen = FALSE;
         }
         DWCRap_SetEventFunc(NULL, NULL);
