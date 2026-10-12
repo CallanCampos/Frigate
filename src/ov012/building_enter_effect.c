@@ -20,12 +20,15 @@ static BuildingEnterEffect sEffect;
 static void func_ov012_02160dc8(void *data) {
     MtxFx22 mtx;
     f32 zoom;
+    f32 zero = 0.0f;
     fx32 scale;
 
     if (reg_GX_DISPSTAT & REG_GX_DISPSTAT_VBLK_MASK) {
         zoom = sEffect.scale + sScaleStep;
         sEffect.scale = zoom;
-        scale = FX32_CONST(1.0f / zoom);
+        scale = (fx32)(((1.0f / zoom) > zero) ?
+                       ((1.0f / zoom) * FX32_ONE + 0.5f) :
+                       ((1.0f / zoom) * FX32_ONE - 0.5f));
         MAT2_Scaling(&mtx, scale, scale);
         G2_SetBG2Affine(&mtx, 128, 92, 0, 0);
     }
