@@ -6013,7 +6013,7 @@ static int func_ov255_021cb97c(Box2SysWork *syswk) {
         return func_ov255_021cbec8(syswk, Box2Main_VFuncFrameMove, 112);
     case 1:
         if (syswk->app->unkA55C == 0) {
-            if (func_02007da4(syswk->param->boxes, 1) == TRUE) {
+            if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 1) == TRUE) {
                 func_ov255_021ceed0(syswk, sMenu71a8, 6);
             } else {
                 func_ov255_021ceed0(syswk, sMenu711c, 5);
@@ -6027,7 +6027,7 @@ static int func_ov255_021cb97c(Box2SysWork *syswk) {
         } else if (syswk->app->unkA55C == 4) {
             func_ov255_021ceed0(syswk, sMenu7180, 5);
         } else if (syswk->app->unkA55C == 5) {
-            if (func_02007da4(syswk->param->boxes, 2) == TRUE) {
+            if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == TRUE) {
                 func_ov255_021ceed0(syswk, sMenu71c0, 6);
             } else {
                 func_ov255_021ceed0(syswk, sMenu7108, 5);
@@ -6047,11 +6047,11 @@ static int func_ov255_021cb97c(Box2SysWork *syswk) {
         }
         all = FALSE;
         if (syswk->app->unkA55C == 0) {
-            if (func_02007da4(syswk->param->boxes, 1) == FALSE) {
+            if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 1) == FALSE) {
                 all = TRUE;
             }
         } else if (syswk->app->unkA55C == 5) {
-            if (func_02007da4(syswk->param->boxes, 2) == FALSE) {
+            if (BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == FALSE) {
                 all = TRUE;
             }
         } else if (syswk->app->unkA55C != 6) {
@@ -6105,7 +6105,7 @@ static int func_ov255_021cbb00(Box2SysWork *syswk) {
             syswk->app->unkA55C = 4;
             return func_ov255_021cc3b0(syswk, 4, func_ov255_021cbe58(syswk, 112));
         }
-        if (syswk->app->unkA55C == 5 && func_02007da4(syswk->param->boxes, 2) == TRUE) {
+        if (syswk->app->unkA55C == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == TRUE) {
             syswk->app->unkA55C = 6;
             return func_ov255_021cc3b0(syswk, 4, func_ov255_021cbe58(syswk, 112));
         }
@@ -6147,7 +6147,7 @@ static int func_ov255_021cbd2c(Box2SysWork *syswk) {
         return BOX2SEQ_PALETTE_FADE;
     case 1:
         Box2Main_WallPaperChange(syswk, syswk->app->wallpaperPos);
-        func_02007b00(syswk->param->boxes, syswk->tray, syswk->app->wallpaperPos);
+        BoxSaveAccessor_SetWallpaper(syswk->param->boxes, syswk->tray, syswk->app->wallpaperPos);
         func_ov255_021d1570(syswk, syswk->tray);
         syswk->app->subSeq++;
         break;
@@ -7481,7 +7481,7 @@ static void func_ov255_021cdd04(Box2SysWork *syswk, u32 mark) {
 // Picks a wallpaper of the theme's menu
 static int func_ov255_021cdd24(Box2SysWork *syswk, u32 pos) {
     if (syswk->app->unkA55C <= 4
-        || (syswk->app->unkA55C == 5 && func_02007da4(syswk->param->boxes, 2) == FALSE)) {
+        || (syswk->app->unkA55C == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == FALSE)) {
         syswk->app->wallpaperPos = pos + (syswk->app->unkA55C - 1) * 4 - 1;
     } else {
         syswk->app->wallpaperPos = pos + (syswk->app->unkA55C - 1) * 4;

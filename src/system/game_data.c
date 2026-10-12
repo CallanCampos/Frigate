@@ -209,7 +209,7 @@ GameData *GameData_Create(HeapID heapId) {
     gameData->fieldSound = FieldSnd_Create(gameData, heapId);
     gameData->fieldStatus = FieldStatus_Create(heapId);
 
-    gameData->bagCursor = func_02008860(heapId);
+    gameData->bagCursor = BagCursor_Create(heapId);
     func_020088ec(gameData->bagCursor, 0);
     gameData->bag = SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_BAG);
     gameData->party = SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_PARTY);

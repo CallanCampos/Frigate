@@ -5067,7 +5067,7 @@ static void PokeDataRangeMoveBox(Box2SysWork *syswk, u32 getPos, u32 putPos) {
     }
     for (i = 0; i < BOX2_TRAY_POKE_MAX; i++) {
         if (pkms[i] != NULL) {
-            func_02007d84(pkms[i]);
+            BoxSaveAccessor_FreePkmCopy(pkms[i]);
         }
     }
 }

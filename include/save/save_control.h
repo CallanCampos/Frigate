@@ -5,12 +5,126 @@
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "nitro/rtc.h"
+#include "save/memory_link_savedata.h"
 #include "save/player_savedata.h"
 #include "save/playtime.h"
 #include "save/timesig_savedata.h"
 #include "save/trainer_data_savedata.h"
 #include "struct_decls.h"
 
+// The game's save (save_control.c, the ROM's name): the main save with its backup copy, and the extra saves that
+// follow it on the card, each loaded on its own. Names from swan (https://github.com/ds-pokemon-hacking/swan,
+// GPL-3.0) where the functions have them; the fields' names are ours, except sv_extra, which an assert names
+
+// The main save's blocks. The files that own a block define its ID again, with the same value
+#define SAVE_BLOCK_BOX_MAIN 0
+// The first of the 24 trays
+#define SAVE_BLOCK_BOX_TRAY 1
+#define SAVE_BLOCK_BAG 0x19
+#define SAVE_BLOCK_PARTY 0x1a
+#define SAVE_BLOCK_TRAINER_DATA 0x1b
+#define SAVE_BLOCK_PLAYER 0x1c
+#define SAVE_BLOCK_UNITY_TOWER_SURVEY 0x1d
+#define SAVE_BLOCK_WIFI_LIST 0x1e
+#define SAVE_BLOCK_PAL_PAD 0x1f
+#define SAVE_BLOCK_CGEAR 0x20
+#define SAVE_BLOCK_TIMESIG 0x21
+#define SAVE_BLOCK_MYSTERY_GIFT 0x22
+#define SAVE_BLOCK_DREAM_WORLD 0x23
+#define SAVE_BLOCK_CHATTER 0x24
+#define SAVE_BLOCK_ADVENTURE 0x25
+#define SAVE_BLOCK_RECORDS 0x26
+#define SAVE_BLOCK_PMS 0x27
+#define SAVE_BLOCK_MAIL 0x28
+#define SAVE_BLOCK_FIELD_ACTORS 0x29
+#define SAVE_BLOCK_MUSICAL 0x2a
+#define SAVE_BLOCK_RESH_ZEK 0x2b
+#define SAVE_BLOCK_TRAINER_LOG 0x2c
+#define SAVE_BLOCK_EVENT_WORK 0x2d
+#define SAVE_BLOCK_WORLDTRADE 0x2e
+#define SAVE_BLOCK_TOURNAMENT 0x2f
+#define SAVE_BLOCK_GIMMICK 0x30
+#define SAVE_BLOCK_BATTLE_BOX 0x31
+#define SAVE_BLOCK_DAY_CARE 0x32
+#define SAVE_BLOCK_STRENGTH_ROCKS 0x33
+#define SAVE_BLOCK_TRAINER_GAME_INFO 0x34
+#define SAVE_BLOCK_HIGH_LINK 0x35
+#define SAVE_BLOCK_POKEDEX 0x36
+#define SAVE_BLOCK_ENCOUNT 0x37
+#define SAVE_BLOCK_BSUBWAY_PLAY 0x38
+#define SAVE_BLOCK_BSUBWAY_SCORE 0x39
+#define SAVE_BLOCK_BSUBWAY_3A 0x3a
+#define SAVE_BLOCK_RECORD 0x3b
+#define SAVE_BLOCK_SYMBOL 0x3c
+#define SAVE_BLOCK_SURVEY 0x3d
+#define SAVE_BLOCK_UNITY_TOWER_FLOOR 0x3e
+#define SAVE_BLOCK_TRIAL_HOUSE 0x3f
+#define SAVE_BLOCK_40 0x40
+#define SAVE_BLOCK_TRADED_POKEMON 0x41
+#define SAVE_BLOCK_MISC 0x42
+#define SAVE_BLOCK_JOIN_AVENUE 0x43
+#define SAVE_BLOCK_MEDAL_BOX 0x44
+#define SAVE_BLOCK_KEY_DATA 0x45
+#define SAVE_BLOCK_FUNFEST 0x46
+#define SAVE_BLOCK_POKEWOOD 0x47
+#define SAVE_BLOCK_DREAM_RADAR 0x48
+#define SAVE_BLOCK_MAX 0x49
+
+// The extra saves, each of one block. Only the Hall of Fame has a backup copy
+typedef enum {
+    SAVE_EXTRA_ID_BATTLE_REC_0,
+    SAVE_EXTRA_ID_BATTLE_REC_1,
+    SAVE_EXTRA_ID_BATTLE_REC_2,
+    SAVE_EXTRA_ID_BATTLE_REC_3,
+    SAVE_EXTRA_ID_CGEAR_PICTURE,
+    SAVE_EXTRA_ID_BATTLE_EXAMINATION,
+    SAVE_EXTRA_ID_MUSICAL_DIST,
+    SAVE_EXTRA_ID_POKEDEX_SKIN,
+    SAVE_EXTRA_ID_HALL_OF_FAME,
+    // Eight films
+    SAVE_EXTRA_ID_POKEWOOD_0,
+    // Three downloaded tournaments
+    SAVE_EXTRA_ID_TOURNAMENT_0 = 17,
+    SAVE_EXTRA_ID_TOURNAMENT_1,
+    SAVE_EXTRA_ID_TOURNAMENT_2,
+    // A block of 0xc8 bytes
+    SAVE_EXTRA_ID_20,
+    SAVE_EXTRA_ID_MAX
+} SaveExtraID;
+
+// What func_02007464 returns: the main save had a block that only one copy had right, or was broken and has been
+// initialized. An extra save that could not be loaded has the bit of its ID above them, and the data outside the save
+// the last two
+#define SAVE_CONTROL_ERROR_PARTIAL 0x1
+#define SAVE_CONTROL_ERROR_BROKEN 0x2
+#define SAVE_CONTROL_ERROR_EXTRA(extraId) (1 << ((extraId) + 2))
+#define SAVE_CONTROL_ERROR_GIFTS_BROKEN 0x800000
+#define SAVE_CONTROL_ERROR_KEYS_BROKEN 0x1000000
+
+struct SaveControl {
+    // No save was loaded, so the game starts anew
+    u8 newGame;
+    // The card holds a save
+    u8 dataExists;
+    // Cleared when both copies of the save loaded right
+    u8 unk2;
+    // func_02008df4 at the start of a save, which canceling restores
+    u8 unk3;
+    // What SaveOutside told of the data outside the save
+    u8 giftsLoaded;
+    u8 giftsBroken;
+    u8 keysLoaded;
+    u8 keysBroken;
+    // The next save calls func_020115f0, which marks Dream Radar's data on the card as read
+    u8 unk8;
+    u32 errors;
+    SaveData *sv;
+    SaveData *sv_extra[SAVE_EXTRA_ID_MAX];
+    MemoryLinkSave *memoryLink;
+}; // size: 0x6c
+
+// Loads the save, its extra saves' state and the data outside the save
+SaveControl *SaveControl_Create(HeapID heapId);
 SaveControl *SaveControl_GetInstance(void);
 // Frees the save data and its control
 void SaveControl_Free(void);
@@ -42,7 +156,8 @@ void func_020074b8(SaveControl *save, u32 *a1, u32 *a2);
 u32 func_0200743c(SaveControl *save);
 u32 func_02007464(SaveControl *save);
 void func_0200749c(SaveControl *save);
-void func_02007324(SaveControl *save);
+// Loads the save again, returning a SAVE_LOAD_RESULT_*
+u32 func_02007324(SaveControl *save);
 TrainerGameInfoSave *getTrainerGameInfoAddress(SaveControl *save);
 u16 func_0200c96c(TrainerGameInfoSave *info);
 void func_0200c974(TrainerGameInfoSave *info, u32 value);
@@ -169,7 +284,7 @@ u8 func_020074e4(SaveControl *save);
 void func_020074e8(SaveControl *save, u32 value);
 // Used to delete the save data: func_020074ec tells whether a block is in the save, and func_020076a4 clears it
 void func_020074ac(SaveControl *save);
-BOOL func_020074ec(SaveControl *save, u32 block, HeapID heapId);
+u32 func_020074ec(SaveControl *save, u32 block, HeapID heapId);
 void func_020075b8(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size);
 // Reads one of the two copies of a block from the card
 BOOL func_020074c4(SaveControl *save, u32 block, u32 copy, void *dest, u32 size);

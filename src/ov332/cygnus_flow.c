@@ -1529,7 +1529,7 @@ static u32 CygnusFlow_GetState(KeySystemWork *wk, u32 *msgId) {
         *msgId = 174;
         return CYGNUS_FLOW_CANT_RECEIVE;
     }
-    if (func_02007a38(GameData_GetBoxSaveAccessor(wk->param->gameData)) < 6) {
+    if (BoxSaveAccessor_CountEmptySlots(GameData_GetBoxSaveAccessor(wk->param->gameData)) < 6) {
         *msgId = 175;
         return CYGNUS_FLOW_CANT_RECEIVE;
     }

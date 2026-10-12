@@ -446,7 +446,7 @@ BOOL func_ov012_02155d00(VM *vm, FieldScriptEnv *env) {
     BoxSaveAccessor *box = GameData_GetBoxSaveAccessor(FieldScriptEnv_GetGameData(env));
 
     if (flags == 1 || flags == 2) {
-        func_02007d8c(box, flags);
+        BoxSaveAccessor_SetFlags(box, flags);
     }
     return FALSE;
 }

@@ -1,5 +1,7 @@
 # Names that are not in swan, applied by tools/decomp/rename_symbol.py
 # module address(b2_us) name
+. 0x020051e4 IsMainMemoryPriorityFree
+. 0x02005494 OnExitRequest
 . 0x02005844 BGMStack_ResetEntry
 . 0x02005890 BGMStack_InitEntry
 . 0x020058b4 BGMStack_FreeEntry
@@ -15,6 +17,20 @@
 . 0x02006370 StartLoadThread
 . 0x020063d8 StopLoadThread
 . 0x02006404 IsLoadThreadDone
+. 0x02007710 BoxMainSave_InitBlock
+. 0x02007a38 BoxSaveAccessor_CountEmptySlots
+. 0x02007b00 BoxSaveAccessor_SetWallpaper
+. 0x02007d84 BoxSaveAccessor_FreePkmCopy
+. 0x02007d8c BoxSaveAccessor_SetFlags
+. 0x02007da4 BoxSaveAccessor_CheckFlags
+. 0x02007e20 PerapVoice_GetSize
+. 0x02007e88 PerapVoice_Decode
+. 0x02007ef0 PerapVoice_Encode
+. 0x02007f90 PerapVoice_GetChatterEffect
+. 0x0200854c BagSave_GetExistingItemCount
+. 0x02008860 BagCursor_Create
+. 0x0200891c BagSave_GetOwnedItemFlags
+. 0x0200896c BagSave_GetPocketItems
 . 0x02008b08 PlayerInfo_GetSize
 . 0x02008dd0 SaveControl_GetPlayerInfo
 . 0x02009a0c DreamWorldSave_IsPokemonAsleep
@@ -1931,6 +1947,22 @@
 . 0x0208df14 _fadd
 . 0x0208e144 _fsub
 . 0x0208e3c8 _fdiv
+. 0x0208eea8 sExtraBattleRec0
+. 0x0208eeb4 sExtraBlock20
+. 0x0208eec0 sExtraHallOfFame
+. 0x0208eecc sExtraTournament1
+. 0x0208eed8 sExtraTournament0
+. 0x0208eee4 sExtraPokewood
+. 0x0208eef0 sExtraTournament2
+. 0x0208eefc sExtraPokedexSkin
+. 0x0208ef08 sExtraMusicalDist
+. 0x0208ef14 sExtraBattleExamination
+. 0x0208ef20 sExtraCGearPicture
+. 0x0208ef2c sExtraBattleRec3
+. 0x0208ef38 sExtraBattleRec2
+. 0x0208ef44 sExtraBattleRec1
+. 0x0208f4cc sDnaSplicers
+. 0x0208f4d0 sItemPockets
 . 0x0208f750 sKeyRemaps
 . 0x0208f7b8 sBattleRecModes
 . 0x0208f974 sSlotRanges
@@ -2073,6 +2105,7 @@
 . 0x0209447c sAdpcmIndexTable
 . 0x0209448c sAdpcmStepTable
 . 0x02098d60 __ctype_map
+. 0x02099f20 sMicFilter
 . 0x0209a338 sSaveControl
 . 0x0209a398 sMcssSpindaSpots
 . 0x0209a788 sSpindaSpots
@@ -2093,6 +2126,11 @@
 . 0x0209b268 mtxTransOnly_
 . 0x0209b280 zOffsetStep_
 . 0x0209b528 GXi_DmaId
+. 0x0209d740 g_MainMemoryPriorityBlocked
+. 0x0209d744 sExitRequested
+. 0x0209d748 sExitCallbackInfo
+. 0x0209d758 sVramTransferTasks
+. 0x0209da58 sVBlankCallback
 . 0x0209da70 sBGMStack
 . 0x0209da7c sBGMStackEntries
 . 0x0209db24 sTrackMask
@@ -2100,6 +2138,11 @@
 . 0x0209db34 sSndHeap
 . 0x0209db80 sSndArc
 . 0x0209dcd8 sTrackInfo
+. 0x0213b278 sSystem
+. 0x0213b328 sBuffer
+. 0x02140f58 sSndMic
+. 0x02140f5c sSndStream
+. 0x02140f60 SaveControlWork
 . 0x02140f68 sStartSeconds
 . 0x02140f70 sAddStep
 . 0x02140f74 sBlock

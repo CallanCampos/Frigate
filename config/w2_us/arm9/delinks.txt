@@ -1564,3 +1564,68 @@ src/system/poke_tool.c:
     .rodata     start:0x0209037c end:0x02090520
     .data       start:0x0209a3e8 end:0x0209a3f4
     .bss        start:0x0214115c end:0x02141428
+
+src/system/main.c:
+    complete
+    .text       start:0x02005124 end:0x02005364
+    .bss        start:0x0209d780 end:0x0209d784
+
+src/system/machine_use.c:
+    complete
+    .text       start:0x02005364 end:0x020054b8
+    .bss        start:0x0209d784 end:0x0209da98
+
+src/system/gfl_use.c:
+    complete
+    .text       start:0x020054b8 end:0x02005838
+    .rodata     start:0x0208ee84 end:0x0208eea4
+    .data       start:0x020990c0 end:0x02099f3c
+    .bss        start:0x0209da98 end:0x0209dab0
+
+src/system/pm_voice.c:
+    complete
+    .text       start:0x020065b4 end:0x02006d64
+    .rodata     start:0x0208eea4 end:0x0208eed4
+    .data       start:0x02099f54 end:0x02099f60
+    .bss        start:0x0213b2b8 end:0x02140f98
+
+src/system/snd_mic.c:
+    complete
+    .text       start:0x02006d64 end:0x02006ee8
+    .data       start:0x02099f60 end:0x02099f78
+    .bss        start:0x02140f98 end:0x02140f9c
+
+src/system/bgm_info.c:
+    complete
+    .text       start:0x02006ee8 end:0x02006fc8
+    .data       start:0x02099f78 end:0x02099f84
+
+src/system/snd_strm.c:
+    complete
+    .text       start:0x02006fc8 end:0x020070f0
+    .data       start:0x02099f84 end:0x02099f90
+    .bss        start:0x02140f9c end:0x02140fa0
+
+src/system/save_control.c:
+    .text       start:0x020070f0 end:0x02007710
+    .data       start:0x02099f90 end:0x02099fe4
+    .bss        start:0x02140fa0 end:0x02140fa4
+
+src/system/save_table.c:
+    complete
+    .rodata     start:0x0208eed4 end:0x0208f4f8
+
+src/system/box_savedata.c:
+    complete
+    .text       start:0x02007710 end:0x02007e20
+    .data       start:0x02099fe4 end:0x0209a0b4
+
+src/system/perapvoice.c:
+    .text       start:0x02007e20 end:0x02007fd0
+    .data       start:0x0209a0b4 end:0x0209a0c4
+
+src/system/myitem_savedata.c:
+    complete
+    .text       start:0x02007fd0 end:0x0200897c
+    .rodata     start:0x0208f4f8 end:0x0208f77c
+    .data       start:0x0209a0c4 end:0x0209a0d8
