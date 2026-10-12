@@ -749,6 +749,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `mystery.c`'s effects match with `static inline void Mystery_SetBlendAlpha(s16 ev1, s16 ev2)` storing
   `ev1 | (ev2 << 8)`, called as `Mystery_SetBlendAlpha(alpha, 16 - alpha)` with a `u32` alpha; `s16` locals or casts
   narrow in the other order.
+- `FX32_ONE` is an `int` constant in `nitro/fx.h` but a `long` in the SDK. Where a product of it is passed on,
+  the type shows: `oekaki.c`'s `Oekaki_CreateActors` matches only with the sub surface's Y as `256 * 0x1000L`.
 
 ## Branches and block layout
 

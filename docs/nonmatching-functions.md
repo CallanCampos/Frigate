@@ -791,6 +791,7 @@ the original code is linked until they match. The differences are the same in bo
 | `src/ov201/gds_rap.c` | `GdsRap_MainSend` | `0x021b5908` / `0x021b5948` | 4 bytes shorter: every `result = …; break` shares one `str r0, [sp, #8]` in the first case, where the original shares the one in the search switch's case 2 and keeps a copy in case 3. Tried: no `break` on the last inner case, a different exit from case 3. |
 | `lib/poke_net/src/poke_net.c` | `POKE_NET_Release` | `0x021b64e8` / `0x021b6528` | 0x20 shorter: the original zeroes `Auth` in place with an `stmia` loop, ours calls `memset`. A compound literal, a zeroed local and a `static const` zero all copy from a temporary; the compiler has no `memset` intrinsic. |
 | `lib/poke_net/src/poke_net.c` | `POKE_NET_Connecting` | `0x021b6d7c` / `0x021b6dbc` | 47 bytes, same size: the original computes the port and loads the address before storing the four fields, ours stores length and family first. Tried: locals, an aggregate initializer, an inline helper. |
+| `src/ov070/oekaki.c` | `Oekaki_UpdateTouch` | `0x0217de80` / `0x0217dec0` | Same size, 2 bytes: the End button's flag is set through r1 (`movs r1, #1; str r1, [sp]`) where ours uses r0. The block is written in both the parent's and the child's arm, which the compiler merges as in the original. Tried the flag as int and u32, three declaration orders, the flag passed as the message's argument, and one shared block after the arms (39 bytes). |
 
 ## Matching, but not linkable as is
 

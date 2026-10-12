@@ -280,7 +280,7 @@ BOOL func_02042be8(NetHandle *handle, int command, u16 size, const void *data);
 BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
                    BOOL noCopy);
 BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6, BOOL noCopy);
-BOOL func_02042cfc(void);
+BOOL func_02042cfc(NetHandle *handle);
 void func_02042d04(NetHandle *handle, u16 timing);
 BOOL func_02042d0c(NetHandle *handle, u16 timing);
 // The second argument is unused
