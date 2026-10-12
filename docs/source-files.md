@@ -283,7 +283,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `fest_mission_sparkle_place.c` | `0x0216f900`–`0x0216fb98` | 5 | partial | descriptive |
+| `fest_mission_sparkle_place.c` | `0x0216f900`–`0x0216fb98` | 5 | complete | descriptive |
 
 ### Overlay 25
 
