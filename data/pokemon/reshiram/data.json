@@ -134,5 +134,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 295,
-    "baby_species": "SPECIES_RESHIRAM"
+    "baby_species": "SPECIES_RESHIRAM",
+    "cry_volume": 120
 }

@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_KABUTO"
+    "baby_species": "SPECIES_KABUTO",
+    "cry_volume": 110
 }

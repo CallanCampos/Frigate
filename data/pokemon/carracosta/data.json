@@ -130,5 +130,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 127,
-    "baby_species": "SPECIES_TIRTOUGA"
+    "baby_species": "SPECIES_TIRTOUGA",
+    "cry_volume": 127
 }

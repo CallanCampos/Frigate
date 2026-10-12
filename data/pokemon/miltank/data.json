@@ -192,5 +192,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MILTANK"
+    "baby_species": "SPECIES_MILTANK",
+    "cry_volume": 110
 }

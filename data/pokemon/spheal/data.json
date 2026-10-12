@@ -178,5 +178,6 @@
         }
     ],
     "regional_dex_number": 243,
-    "baby_species": "SPECIES_SPHEAL"
+    "baby_species": "SPECIES_SPHEAL",
+    "cry_volume": 120
 }

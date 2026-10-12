@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_PACHIRISU"
+    "baby_species": "SPECIES_PACHIRISU",
+    "cry_volume": 120
 }

@@ -142,5 +142,6 @@
         }
     ],
     "regional_dex_number": 99,
-    "baby_species": "SPECIES_SANDILE"
+    "baby_species": "SPECIES_SANDILE",
+    "cry_volume": 120
 }

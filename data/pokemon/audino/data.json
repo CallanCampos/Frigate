@@ -161,5 +161,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 36,
-    "baby_species": "SPECIES_AUDINO"
+    "baby_species": "SPECIES_AUDINO",
+    "cry_volume": 120
 }

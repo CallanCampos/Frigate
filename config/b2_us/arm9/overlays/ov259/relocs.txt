@@ -833,10 +833,10 @@ from:0x0219cd16 kind:thumb_call to:0x0204566c module:main
 from:0x0219cd40 kind:thumb_call to:0x0204566c module:main
 from:0x0219cd50 kind:thumb_call to:0x02044f90 module:main
 from:0x0219cd5a kind:thumb_call to:0x0219c12c module:overlay(259)
-from:0x0219cd70 kind:load to:0x021a06f2 module:overlay(259)
+from:0x0219cd70 kind:load to:0x021a06f0 add:0x2 module:overlay(259)
 from:0x0219cd74 kind:load to:0x021a06f0 module:overlay(259)
-from:0x0219cd78 kind:load to:0x021a06f3 module:overlay(259)
-from:0x0219cd7c kind:load to:0x021a06f1 module:overlay(259)
+from:0x0219cd78 kind:load to:0x021a06f0 add:0x3 module:overlay(259)
+from:0x0219cd7c kind:load to:0x021a06f0 add:0x1 module:overlay(259)
 from:0x0219cd94 kind:thumb_call to:0x02074a88 module:main
 from:0x0219cdc2 kind:thumb_call to:0x02074a6c module:main
 from:0x0219cdca kind:thumb_call to:0x02042788 module:main

@@ -129,5 +129,6 @@
         }
     ],
     "regional_dex_number": 2,
-    "baby_species": "SPECIES_SNIVY"
+    "baby_species": "SPECIES_SNIVY",
+    "cry_volume": 110
 }

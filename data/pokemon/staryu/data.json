@@ -171,5 +171,6 @@
         }
     ],
     "regional_dex_number": 238,
-    "baby_species": "SPECIES_STARYU"
+    "baby_species": "SPECIES_STARYU",
+    "cry_volume": 110
 }

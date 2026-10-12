@@ -133,5 +133,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 13,
-    "baby_species": "SPECIES_PURRLOIN"
+    "baby_species": "SPECIES_PURRLOIN",
+    "cry_volume": 105
 }

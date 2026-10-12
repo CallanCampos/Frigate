@@ -186,5 +186,6 @@
         }
     ],
     "regional_dex_number": 51,
-    "baby_species": "SPECIES_GROWLITHE"
+    "baby_species": "SPECIES_GROWLITHE",
+    "cry_volume": 120
 }

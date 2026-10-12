@@ -157,5 +157,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 254,
-    "baby_species": "SPECIES_DELIBIRD"
+    "baby_species": "SPECIES_DELIBIRD",
+    "cry_volume": 110
 }

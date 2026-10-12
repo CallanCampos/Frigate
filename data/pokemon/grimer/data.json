@@ -188,5 +188,6 @@
         }
     ],
     "regional_dex_number": 64,
-    "baby_species": "SPECIES_GRIMER"
+    "baby_species": "SPECIES_GRIMER",
+    "cry_volume": 110
 }

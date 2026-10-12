@@ -202,5 +202,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SABLEYE"
+    "baby_species": "SPECIES_SABLEYE",
+    "cry_volume": 120
 }

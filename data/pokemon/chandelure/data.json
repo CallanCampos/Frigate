@@ -113,5 +113,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 192,
-    "baby_species": "SPECIES_LITWICK"
+    "baby_species": "SPECIES_LITWICK",
+    "cry_volume": 127
 }

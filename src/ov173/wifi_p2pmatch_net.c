@@ -30,12 +30,12 @@ static const NetCommand sWifiP2PMatchNetCommands[WIFIP2PMATCH_NET_CMD_NUM] = {
     { WifiP2PMatchNet_RecvUnused0, NULL },
     { WifiP2PMatchNet_RecvUnused1, NULL },
     { WifiP2PMatchNet_RecvUnused2, NULL },
-    { func_ov173_021a4d2c, NULL },
-    { func_ov173_021a4c64, NULL },
-    { func_ov173_021a4cd8, NULL },
-    { func_ov173_021a4d10, NULL },
-    { func_ov173_021a4ca8, func_ov173_021a4cc8 },
-    { func_ov173_021a4cac, NULL },
+    { WifiP2PMatch_RecvConnectData, NULL },
+    { WifiP2PMatch_RecvPlayerInfo, NULL },
+    { WifiP2PMatch_RecvNextSeq, NULL },
+    { WifiP2PMatch_RecvRegulation, NULL },
+    { WifiP2PMatch_RecvParty, WifiP2PMatch_GetPartyRecvBuffer },
+    { WifiP2PMatch_RecvCancel, NULL },
 };
 
 static const NetCommand *WifiP2PMatchNet_CommandTableGet(void) {
@@ -53,7 +53,7 @@ void WifiP2PMatchNet_CommandInit(void *work) {
     func_02040c20(WIFIP2PMATCH_NET_CMD_BASE, commands, num, work);
 }
 
-void WifiP2PMatchNet_CommandExit(void) {
+void WifiP2PMatchNet_CommandExit(void *work) {
     func_02040c64(WIFIP2PMATCH_NET_CMD_BASE);
 }
 

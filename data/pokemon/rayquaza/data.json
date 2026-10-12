@@ -192,5 +192,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_RAYQUAZA"
+    "baby_species": "SPECIES_RAYQUAZA",
+    "cry_volume": 120
 }

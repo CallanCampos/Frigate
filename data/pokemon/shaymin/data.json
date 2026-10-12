@@ -206,5 +206,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SHAYMIN"
+    "baby_species": "SPECIES_SHAYMIN",
+    "cry_volume": 120
 }

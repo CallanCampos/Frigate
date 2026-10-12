@@ -125,5 +125,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 45,
-    "baby_species": "SPECIES_VENIPEDE"
+    "baby_species": "SPECIES_VENIPEDE",
+    "cry_volume": 120
 }

@@ -176,5 +176,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_FINNEON"
+    "baby_species": "SPECIES_FINNEON",
+    "cry_volume": 120
 }

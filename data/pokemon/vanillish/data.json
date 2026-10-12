@@ -119,5 +119,6 @@
         }
     ],
     "regional_dex_number": 256,
-    "baby_species": "SPECIES_VANILLITE"
+    "baby_species": "SPECIES_VANILLITE",
+    "cry_volume": 125
 }

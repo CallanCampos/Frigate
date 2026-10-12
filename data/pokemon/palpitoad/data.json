@@ -119,5 +119,6 @@
         }
     ],
     "regional_dex_number": 229,
-    "baby_species": "SPECIES_TYMPOLE"
+    "baby_species": "SPECIES_TYMPOLE",
+    "cry_volume": 110
 }

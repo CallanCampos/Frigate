@@ -210,5 +210,6 @@
         }
     ],
     "regional_dex_number": 89,
-    "baby_species": "SPECIES_CLEFFA"
+    "baby_species": "SPECIES_CLEFFA",
+    "cry_volume": 110
 }

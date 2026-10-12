@@ -194,5 +194,6 @@
         }
     ],
     "regional_dex_number": 28,
-    "baby_species": "SPECIES_PSYDUCK"
+    "baby_species": "SPECIES_PSYDUCK",
+    "cry_volume": 110
 }

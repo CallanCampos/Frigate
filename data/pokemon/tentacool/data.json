@@ -182,5 +182,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_TENTACOOL"
+    "baby_species": "SPECIES_TENTACOOL",
+    "cry_volume": 110
 }

@@ -172,5 +172,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 27,
-    "baby_species": "SPECIES_MAREEP"
+    "baby_species": "SPECIES_MAREEP",
+    "cry_volume": 115
 }

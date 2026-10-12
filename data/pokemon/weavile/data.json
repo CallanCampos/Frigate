@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 253,
-    "baby_species": "SPECIES_SNEASEL"
+    "baby_species": "SPECIES_SNEASEL",
+    "cry_volume": 120
 }

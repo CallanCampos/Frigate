@@ -148,5 +148,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 141,
-    "baby_species": "SPECIES_SOLOSIS"
+    "baby_species": "SPECIES_SOLOSIS",
+    "cry_volume": 120
 }

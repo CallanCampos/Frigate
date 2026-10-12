@@ -173,5 +173,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_NIDORAN_M"
+    "baby_species": "SPECIES_NIDORAN_M",
+    "cry_volume": 110
 }

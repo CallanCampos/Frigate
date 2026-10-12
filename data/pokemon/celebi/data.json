@@ -182,5 +182,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CELEBI"
+    "baby_species": "SPECIES_CELEBI",
+    "cry_volume": 110
 }

@@ -165,5 +165,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_NINCADA"
+    "baby_species": "SPECIES_NINCADA",
+    "cry_volume": 120
 }

@@ -172,5 +172,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_HEATRAN"
+    "baby_species": "SPECIES_HEATRAN",
+    "cry_volume": 125
 }

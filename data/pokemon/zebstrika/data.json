@@ -107,5 +107,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 148,
-    "baby_species": "SPECIES_BLITZLE"
+    "baby_species": "SPECIES_BLITZLE",
+    "cry_volume": 97
 }

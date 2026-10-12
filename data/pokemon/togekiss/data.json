@@ -173,5 +173,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_TOGEPI"
+    "baby_species": "SPECIES_TOGEPI",
+    "cry_volume": 125
 }

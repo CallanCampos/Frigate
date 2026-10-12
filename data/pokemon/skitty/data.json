@@ -194,5 +194,6 @@
         }
     ],
     "regional_dex_number": 78,
-    "baby_species": "SPECIES_SKITTY"
+    "baby_species": "SPECIES_SKITTY",
+    "cry_volume": 120
 }

@@ -163,5 +163,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_PLUSLE"
+    "baby_species": "SPECIES_PLUSLE",
+    "cry_volume": 125
 }

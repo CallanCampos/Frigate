@@ -123,5 +123,6 @@
         }
     ],
     "regional_dex_number": 153,
-    "baby_species": "SPECIES_DUCKLETT"
+    "baby_species": "SPECIES_DUCKLETT",
+    "cry_volume": 120
 }

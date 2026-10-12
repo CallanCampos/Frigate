@@ -157,5 +157,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_MOLTRES"
+    "baby_species": "SPECIES_MOLTRES",
+    "cry_volume": 110
 }

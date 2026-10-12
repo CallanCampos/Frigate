@@ -171,5 +171,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 213,
-    "baby_species": "SPECIES_WINGULL"
+    "baby_species": "SPECIES_WINGULL",
+    "cry_volume": 120
 }
