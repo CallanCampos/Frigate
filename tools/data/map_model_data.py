@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Export the map model archive to glTF 2.0 and pack positions back into Nitro.
+"""Export the map model archive to binary glTF 2.0 and pack positions back into Nitro.
 
 Usage: map_model_data.py extract APICULA OUTPUT_DIR
+       map_model_data.py migrate SOURCE_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
 
 Mesh positions are editable for all models through direct, translated or skinned
@@ -21,6 +22,8 @@ from narc import read_narc, write_narc
 
 
 ROOT = Path(__file__).resolve().parents[2]
+GLB_JSON = 0x4e4f534a
+GLB_BIN = 0x004e4942
 GPU_PARAMS = {0x00: 0, 0x20: 1, 0x21: 1, 0x22: 1, 0x23: 2, 0x24: 1,
               0x25: 1, 0x26: 1, 0x27: 1, 0x28: 1, 0x40: 1, 0x41: 0}
 SBC_PARAMS = {0x00: 0, 0x01: 0, 0x02: 2, 0x03: 1, 0x04: 1, 0x05: 1,
@@ -63,7 +66,48 @@ def model_bytes(chunk):
     return chunk[offset:offset + u32(chunk, offset + 8)]
 
 
-def accessor_values(doc, directory, accessor_index):
+def read_glb(path):
+    data = path.read_bytes()
+    if len(data) < 20 or data[:4] != b"glTF" or u32(data, 4) != 2 or u32(data, 8) != len(data):
+        raise ValueError(f"{path}: expected glTF 2.0 binary")
+    offset = 12
+    chunks = []
+    while offset < len(data):
+        if offset + 8 > len(data):
+            raise ValueError(f"{path}: truncated GLB chunk")
+        size, kind = struct.unpack_from("<II", data, offset)
+        offset += 8
+        if size % 4 or offset + size > len(data):
+            raise ValueError(f"{path}: invalid GLB chunk size")
+        chunks.append((kind, data[offset:offset + size]))
+        offset += size
+    if not chunks or chunks[0][0] != GLB_JSON or len(chunks) > 2:
+        raise ValueError(f"{path}: unexpected GLB chunks")
+    doc = json.loads(chunks[0][1])
+    binary = chunks[1][1] if len(chunks) == 2 and chunks[1][0] == GLB_BIN else b""
+    if len(doc.get("buffers", [])) != 1 or "uri" in doc["buffers"][0]:
+        raise ValueError(f"{path}: expected one embedded glTF buffer")
+    if doc["buffers"][0]["byteLength"] > len(binary):
+        raise ValueError(f"{path}: GLB binary chunk is too short")
+    return doc, binary
+
+
+def write_glb(path, doc, binary):
+    if len(doc.get("buffers", [])) != 1:
+        raise ValueError(f"{path}: expected one glTF buffer")
+    doc["buffers"][0].pop("uri", None)
+    if doc["buffers"][0]["byteLength"] > len(binary):
+        raise ValueError(f"{path}: glTF buffer is too short")
+    encoded = json.dumps(doc, indent=2).encode("utf-8")
+    encoded += b" " * (-len(encoded) % 4)
+    binary += b"\0" * (-len(binary) % 4)
+    data = (struct.pack("<4sII", b"glTF", 2, 12 + 8 + len(encoded) + 8 + len(binary))
+            + struct.pack("<II", len(encoded), GLB_JSON) + encoded
+            + struct.pack("<II", len(binary), GLB_BIN) + binary)
+    path.write_bytes(data)
+
+
+def accessor_values(doc, binary, accessor_index):
     accessor = doc["accessors"][accessor_index]
     if "sparse" in accessor:
         raise ValueError("sparse glTF accessors are unsupported")
@@ -74,21 +118,19 @@ def accessor_values(doc, directory, accessor_index):
     if fmt is None:
         raise ValueError("unsupported glTF accessor format")
     view = doc["bufferViews"][accessor["bufferView"]]
-    uri = doc["buffers"][view["buffer"]]["uri"]
-    if "/" in uri or "\\" in uri or uri.startswith("."):
-        raise ValueError("glTF buffer must be a local filename")
-    data = (directory / uri).read_bytes()
+    if view["buffer"] != 0:
+        raise ValueError("expected an accessor in the embedded GLB buffer")
     size = struct.calcsize("<" + fmt)
     stride = view.get("byteStride", size)
     offset = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
-    if stride < size or offset + stride * (accessor["count"] - 1) + size > len(data):
+    if stride < size or offset + stride * (accessor["count"] - 1) + size > doc["buffers"][0]["byteLength"]:
         raise ValueError("glTF accessor exceeds its buffer")
-    return [struct.unpack_from("<" + fmt, data, offset + stride * i)
+    return [struct.unpack_from("<" + fmt, binary, offset + stride * i)
             for i in range(accessor["count"])]
 
 
 def mesh_primitives(directory, name):
-    doc = json.loads((directory / "model.gltf").read_text())
+    doc, binary = read_glb(directory / "model.glb")
     if doc["asset"]["version"] != "2.0":
         raise ValueError("expected glTF 2.0")
     meshes = [mesh for mesh in doc["meshes"] if mesh.get("name") == name]
@@ -97,7 +139,7 @@ def mesh_primitives(directory, name):
     primitives = meshes[0]["primitives"]
     if any(prim.get("mode", 4) != 4 for prim in primitives):
         raise ValueError("only triangle primitives are supported")
-    return doc, primitives
+    return doc, primitives, binary
 
 
 def inverse_joint_position(doc, joint, position):
@@ -151,17 +193,17 @@ def positions_from_gltf(directory, name, nitro):
     baseline = raw_positions if mapping["direct"] else mapping["positions"]
     if vertex_count != len(baseline):
         raise ValueError(f"{name}: vertex count differs from Nitro")
-    doc, primitives = mesh_primitives(directory, name)
+    doc, primitives, binary = mesh_primitives(directory, name)
     if len(primitives) != len(original_index_sets):
         raise ValueError(f"{name}: primitive count changed")
     positions = [None] * len(baseline)
     joints = [None] * len(baseline)
     for prim, original_indices in zip(primitives, original_index_sets):
-        current_indices = [item[0] for item in accessor_values(doc, directory, prim["indices"])]
-        current_positions = accessor_values(doc, directory, prim["attributes"]["POSITION"])
-        current_joints = (accessor_values(doc, directory, prim["attributes"]["JOINTS_0"])
+        current_indices = [item[0] for item in accessor_values(doc, binary, prim["indices"])]
+        current_positions = accessor_values(doc, binary, prim["attributes"]["POSITION"])
+        current_joints = (accessor_values(doc, binary, prim["attributes"]["JOINTS_0"])
                           if not mapping["direct"] and "JOINTS_0" in prim["attributes"] else None)
-        current_weights = (accessor_values(doc, directory, prim["attributes"]["WEIGHTS_0"])
+        current_weights = (accessor_values(doc, binary, prim["attributes"]["WEIGHTS_0"])
                            if not mapping["direct"] and "WEIGHTS_0" in prim["attributes"] else None)
         if len(current_indices) != len(original_indices):
             raise ValueError(f"{name}: triangle count changed")
@@ -446,15 +488,15 @@ def export(apicula, output):
                     target = "model.gltf" if path.suffix == ".gltf" else "model.bin" if path.suffix == ".bin" else path.name
                     shutil.copyfile(path, model_dir / target)
         document = json.loads((model_dir / "model.gltf").read_text())
-        for buffer in document["buffers"]:
-            buffer["uri"] = "model.bin"
         if texture_id is not None:
             for picture in document.get("images", []):
                 if "uri" in picture:
                     picture["uri"] = f"../../map_texture_sets/{texture_id:03d}/{picture['uri']}"
-        (model_dir / "model.gltf").write_text(json.dumps(document, indent=2) + "\n")
-        doc, primitives = mesh_primitives(model_dir, name)
-        positions = accessor_values(doc, model_dir, primitives[0]["attributes"]["POSITION"])
+        write_glb(model_dir / "model.glb", document, (model_dir / "model.bin").read_bytes())
+        (model_dir / "model.gltf").unlink()
+        (model_dir / "model.bin").unlink()
+        doc, primitives, binary = mesh_primitives(model_dir, name)
+        positions = accessor_values(doc, binary, primitives[0]["attributes"]["POSITION"])
         block = u32(nitro, 16)
         model = block + dictionary_offsets(nitro, block + 8)[0]
         shape_dict = model + u32(nitro, model + 12)
@@ -478,6 +520,14 @@ def export(apicula, output):
 def main():
     if len(sys.argv) == 4 and sys.argv[1] == "extract":
         export(sys.argv[2], Path(sys.argv[3]))
+        return
+    if len(sys.argv) == 3 and sys.argv[1] == "migrate":
+        for entry in models(Path(sys.argv[2])):
+            directory = Path(sys.argv[2]) / f"{entry['chunk']:04d}"
+            doc = json.loads((directory / "model.gltf").read_text())
+            write_glb(directory / "model.glb", doc, (directory / "model.bin").read_bytes())
+            (directory / "model.gltf").unlink()
+            (directory / "model.bin").unlink()
         return
     if len(sys.argv) != 5 or sys.argv[1] != "pack":
         raise SystemExit(__doc__)

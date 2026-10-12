@@ -545,14 +545,15 @@ shared texture resources belong in separate directories. `data/map_texture_sets/
 for all 409 texture sets. Each set's `nitro.json` records the original resource hash and palette association for the
 packer; it is build metadata, not a color source. Edit the PNG in Blender or an image editor. The build packs it back
 into `a/0/1/4` and checks the original archive against both ROMs. PNGs must be 8-bit RGB or RGBA and retain their
-dimensions. Nitro supports
-limited colors and alpha precision, so the packer quantizes edited colors to RGB555 and rejects a set when its shared
+dimensions. Nitro supports limited colors and alpha precision, so the packer quantizes edited colors to RGB555 and
+rejects a set when its shared
 palette cannot hold the edited colors. Textures that share the same encoded texels must remain compatible.
 
 `data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and the texture
 set selected for viewing when the map-to-area relationship identifies one. Each chunk has its own numbered directory:
-`model.gltf`, `model.bin` and `nitro.json`; texture previews are shared by texture-set number. The numbered layout
-keeps maps distinct even when embedded model names repeat. For example, chunk 0103 is a four-vertex ground plane;
+`model.glb` and `nitro.json`; texture PNGs are shared by texture-set number. The binary glTF (`.glb`) holds the
+model geometry and its buffer in one file and opens directly in Blender. The numbered layout keeps maps distinct
+even when embedded model names repeat. For example, chunk 0103 is a four-vertex ground plane;
 chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices and ten materials. `nitro.json` records the
 model hash and whether its glTF positions map directly to Nitro commands. The packer
 derives the original triangle and vertex order from those commands, so a Blender export can reindex vertices while
