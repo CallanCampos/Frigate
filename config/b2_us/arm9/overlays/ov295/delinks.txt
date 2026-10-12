@@ -4,6 +4,7 @@
     .bss        start:0x0219d800 end:0x0219d800 kind:bss align:32
 
 src/ov295/game_clear_save.c:
+    complete
     .text       start:0x0219ce80 end:0x0219d460
     .rodata     start:0x0219d704 end:0x0219d774
 

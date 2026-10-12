@@ -327,6 +327,10 @@ Same code, other `sp` offsets or frame size.
   another offset the function already holds (`adds r0, r4, #0; str r0, [sp, #0x18]; adds r0, #0xc; str r0, [sp, #0x18]`).
   `psel.c`'s `PselText_PrintType` declares `BOOL *done = &wk->winDone[2];` right after `BmpWin *win = wk->win[2];` and
   ends with `*done = FALSE;`; the plain `wk->winDone[2] = FALSE;` rebuilds the constant and has no slot, 8 bytes shorter.
+- A halfword local whose address is passed, stored through the register that is then the argument
+  (`add r0, sp, #4; add r0, #2; strh r6, [r0]`), is a one-element array with an initializer, `u16 black[1] = { 0 };`,
+  as `game_clear_save.c`'s `GameClearSave_Main` passes to `gfxUploadStdPaletteBGB`. A scalar `u16 black = 0;` with
+  `&black` stores at base plus offset and computes the address a second time.
 
 ## Instruction order
 
@@ -1005,6 +1009,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   and `&&` builds the constant before the call. The stores after it were also in the order of the asm's loads
   (`ldr r0, [r4]; str r1, [r4, #0x1c]; str r0, [r4, #0x18]` is `param.gameData = battle->gameData;` and then
   `param.unk4 = saved;`), which alone took 4 bytes off.
+- Two `b` trampolines to one merged tail are two copies of the tail in the source. The free-blocks state of
+  `GameClearSave_Main` has `(*state)++; break;` inside the `if`, after the inner `if (!save->blocksFreed) { break; }`,
+  and again after the `if`; one shared copy after the `if` puts all three branches on one `b`.
 
 ## Loops
 

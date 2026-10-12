@@ -140,9 +140,9 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
         reg_G2_BLDCNT = 0;
         GX_SetVisiblePlane(GX_PLANEMASK_BG0);
         if (getGameVersion() == VERSION_BLACK2) {
-            u16 black = 0;
+            u16 black[1] = { 0 };
 
-            gfxUploadStdPaletteBGB(&black, 0, 2);
+            gfxUploadStdPaletteBGB(black, 0, 2);
             GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
         } else {
             u16 white[1] = { 0xffff };
@@ -190,6 +190,8 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
             if (!save->blocksFreed) {
                 break;
             }
+            (*state)++;
+            break;
         }
         (*state)++;
         break;
