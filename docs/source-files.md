@@ -1521,7 +1521,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `ircbattlematch.c` | `0x0219ce80`–`0x0219f0b4` | 86 | partial | string at `0x0219f30c` |
+| `ircbattlematch.c` | `0x0219ce80`–`0x0219f0b4` | 86 | complete | string at `0x0219f30c` |
 
 ### Overlay 175
 

@@ -1035,6 +1035,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A random pick in a variable range with no zero check is `u64 value = GFL_RandomMT(); value *= n; value >>= 32;`, as
   `btlv_mcss.c`'s idle task does.
+- A `goto` from one case into another's tail makes the shared block a region of its own: an address or offset that
+  is live across the switch is built again there (`movs r0, #0x91; lsls r0, r0, #2` where the original has
+  `subs r0, #8` from the offset it still holds), and the temporaries at the switch's head take other registers, so
+  the diff reads as registers only. Two cases with the same tail were written out in full and merged by MWCC:
+  `ircbattlematch.c`'s `IrcBattleMatch_StateStartNet` matches with both musical cases complete, and with its last
+  three mode tests as a `switch` in the blocks' order rather than an `if` chain.
 - Float arithmetic calls MWCC's runtime helpers, such as `_fadd` and `_ffix`, which swan names `__aeabi_*`. When a
   complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`, or, when the AEABI
   name is in use, give it the MWCC name as a second one with `config_fixes.py add-label`, as `_ddiv` and `_dsub` for
