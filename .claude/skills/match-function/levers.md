@@ -226,8 +226,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - `f(x ? a : b)` against two calls in `if`/`else`, which are merged into one call with a `beq; b` layout.
   (matching.md: "picked by branches")
 - A `return` inside `for (;;)` leaves a dead `bx lr`, which the original counts as padding.
-- Literal pool placement: a pool dumped mid-function is placed after an unconditional branch. See the `event_make.c`
-  row of the nonmatching doc for a case still open.
+- Literal pool placement: a pool dumped mid-function is placed after an unconditional branch. A constant arm that
+  jumps into a select's `movs #0` is `if (p == NULL) { v = FALSE; } else { v = f() ? TRUE : FALSE; }`.
+  (matching.md: "a constant arm written first")
 - A wrapping decrement that reads the variable again in one branch: `if (x == 0) { x = 3; } else { x--; }`, not a
   conditional expression (matching.md: "reads it again in the `else`")
 - A bit test (`lsl; tst #mask`) for a value among a few constants: `return x == a || x == b || x == c;`.
