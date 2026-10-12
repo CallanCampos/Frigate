@@ -1548,7 +1548,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_sync_check.c` | `0x0219ad20`–`0x0219c9d8` | 79 | partial | descriptive |
+| `irc_sync_check.c` | `0x0219ad20`–`0x0219c9d8` | 79 | complete | descriptive |
 
 ### Overlay 178
 
