@@ -161,7 +161,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
     int slot;
     BOOL nickname;
     StrBuf *oldName;
-    u32 species;
+    u16 species;
     u32 evolveSlot;
     PartyPkm *pkm;
     u32 method;

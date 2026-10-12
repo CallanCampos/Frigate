@@ -1423,7 +1423,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_battle_return.c` | `0x0219ce80`–`0x0219d650` | 10 | partial | string at `0x0219d6c0` |
+| `event_battle_return.c` | `0x0219ce80`–`0x0219d650` | 10 | complete | string at `0x0219d6c0` |
 
 ### Overlay 167
 
