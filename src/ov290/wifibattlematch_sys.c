@@ -280,7 +280,7 @@ static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
     { OVERLAY_ID(190), &WIFILOGIN_PROC_FUNCTIONS, WifiBattleMatchSys_CreateLoginParam, WifiBattleMatchSys_FinishLogin },
     { OVERLAY_ID(263), &WIFIBATTLEMATCH_EXCHANGE_PROC_FUNCTIONS, WifiBattleMatchSys_CreateExchangeParam,
       WifiBattleMatchSys_FinishExchange },
-    { OVERLAY_ID(306), &data_ov306_0219ed40, WifiBattleMatchSys_CreateResultParam, WifiBattleMatchSys_FinishResult },
+    { OVERLAY_ID(306), &BtlRecSelProcFunctions, WifiBattleMatchSys_CreateResultParam, WifiBattleMatchSys_FinishResult },
     { OVERLAY_ID(190), &WIFILOGOUT_PROC_FUNCTIONS, WifiBattleMatchSys_CreateLogoutParam,
       WifiBattleMatchSys_FinishLogout },
     { OVERLAY_NONE, &data_ov167_021d6ce0, WifiBattleMatchSys_CreateReplayParam, WifiBattleMatchSys_FinishReplay },

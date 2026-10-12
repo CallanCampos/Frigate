@@ -19,6 +19,6 @@ typedef struct {
     s32 unk14;
 } Ov306Param;
 
-extern const GameProcFunctions data_ov306_0219ed40;
+extern const GameProcFunctions BtlRecSelProcFunctions;
 
 #endif // POKEBW2_APP_OV306_H

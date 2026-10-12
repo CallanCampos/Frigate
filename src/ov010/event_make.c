@@ -242,7 +242,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         battle->ov306Param.unkC = 1;
         battle->ov306Param.unk10 = battle->rule;
         battle->ov306Param.unk14 = battle->unk10;
-        QueueGameProc(procWork->manager, OVERLAY_ID(306), &data_ov306_0219ed40, &battle->ov306Param);
+        QueueGameProc(procWork->manager, OVERLAY_ID(306), &BtlRecSelProcFunctions, &battle->ov306Param);
         *state = 16;
         break;
     case 16:
