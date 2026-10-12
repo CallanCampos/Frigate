@@ -81,6 +81,7 @@ GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, u32 slo
     work->field = GSYS_GetField(gsys);
     work->result = result;
     work->callback = callback;
+    gameData = GSYS_GetGameData(work->gsys);
     pkm = PokeParty_GetPkm(GameData_GetParty(gameData), slot);
     gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(gameData));
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
@@ -182,7 +183,7 @@ GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, v
         JoinAvenueSave *save = SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(work->gsys)));
         JoinAvenueInfo *info = JoinAvenue_GetInfo(save);
         JoinAvenuePerson *person = func_02038a18(getAddressOfBeginningOfOccupants(save));
-        u16 *str = GFL_StrBufGetStringPtr(work->nameEntry->name);
+        const u16 *str = GFL_StrBufGetStringPtr(work->nameEntry->name);
 
         switch (work->target) {
         case 1:
@@ -214,7 +215,7 @@ GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *state, v
 }
 
 GameEvent *RivalNameEntry_Create(GameSystem *gsys, u16 *result) {
-    GameData *gameData = GSYS_GetGameData(gsys);
+    TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     EventRivalNameEntry *work;
     GameEvent *event;
 
@@ -223,8 +224,7 @@ GameEvent *RivalNameEntry_Create(GameSystem *gsys, u16 *result) {
     work->gsys = gsys;
     work->field = GSYS_GetField(gsys);
     work->result = result;
-    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_RIVAL, 0, 0, 7, NULL,
-                                     getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)));
+    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_RIVAL, 0, 0, 7, NULL, gameInfo);
     return event;
 }
 
@@ -249,6 +249,7 @@ GameEventReturnCode RivalNameEntry_Callback(GameEvent *event, u32 *state, void *
 }
 
 GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 species, u16 form, u16 *result, WordSet *wordSet) {
+    TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     EventPokeNameWordSetInput *work;
     GameEvent *event;
 
@@ -257,11 +258,10 @@ GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 species, u16 f
     work->gsys = gsys;
     work->field = GSYS_GetField(gsys);
     work->result = result;
-    work->species = species;
     work->form = form;
+    work->species = species;
     work->wordSet = wordSet;
-    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_PLAYER, species, 0, 10, NULL,
-                                     getTrainerGameInfoAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, NAME_ENTRY_PLAYER, species, 0, 10, NULL, gameInfo);
     return event;
 }
 
