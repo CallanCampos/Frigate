@@ -16,7 +16,7 @@ struct GameManualEventWork {
 };
 
 extern const char data_ov033_0217c610[];
-extern const GameProcFunctions data_ov319_0219f6f8;
+extern const GameProcFunctions gManualProcFunctions;
 
 GameEvent *func_ov033_02179dd4(GameSystem *gsys, u16 *result);
 GameEventReturnCode func_ov033_02179e28(GameEvent *event, u32 *state, void *data);

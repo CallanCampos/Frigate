@@ -1,100 +1,100 @@
-func_ov173_0219ce80 kind:function(thumb,size=0xd0) addr:0x0219cec0
-func_ov173_0219cf50 kind:function(thumb,size=0x5c) addr:0x0219cf90
-func_ov173_0219cfac kind:function(thumb,size=0x4) addr:0x0219cfec
-func_ov173_0219cfb0 kind:function(thumb,size=0xb8) addr:0x0219cff0
-func_ov173_0219d068 kind:function(thumb,size=0x44) addr:0x0219d0a8
-func_ov173_0219d0ac kind:function(thumb,size=0x28) addr:0x0219d0ec
-func_ov173_0219d0d4 kind:function(thumb,size=0xa) addr:0x0219d114
-func_ov173_0219d0e0 kind:function(thumb,size=0x4a) addr:0x0219d120
-func_ov173_0219d12c kind:function(thumb,size=0x4e) addr:0x0219d16c
-func_ov173_0219d17c kind:function(thumb,size=0x48) addr:0x0219d1bc
-func_ov173_0219d1c4 kind:function(thumb,size=0xc) addr:0x0219d204
-func_ov173_0219d1d0 kind:function(thumb,size=0x8) addr:0x0219d210
-func_ov173_0219d1d8 kind:function(thumb,size=0x4) addr:0x0219d218
-func_ov173_0219d1dc kind:function(thumb,size=0x4) addr:0x0219d21c
-func_ov173_0219d1e0 kind:function(thumb,size=0x68) addr:0x0219d220
-func_ov173_0219d248 kind:function(thumb,size=0x8a) addr:0x0219d288
-func_ov173_0219d2d4 kind:function(thumb,size=0x40) addr:0x0219d314
-func_ov173_0219d314 kind:function(thumb,size=0x1c) addr:0x0219d354
-func_ov173_0219d330 kind:function(thumb,size=0x10) addr:0x0219d370
-func_ov173_0219d340 kind:function(thumb,size=0x10) addr:0x0219d380
-func_ov173_0219d350 kind:function(thumb,size=0x70) addr:0x0219d390
-func_ov173_0219d3c0 kind:function(thumb,size=0x20) addr:0x0219d400
-func_ov173_0219d3e0 kind:function(thumb,size=0x22) addr:0x0219d420
-func_ov173_0219d404 kind:function(thumb,size=0x30) addr:0x0219d444
-func_ov173_0219d434 kind:function(thumb,size=0x10) addr:0x0219d474
-func_ov173_0219d444 kind:function(thumb,size=0x1c) addr:0x0219d484
-func_ov173_0219d460 kind:function(thumb,size=0x26) addr:0x0219d4a0
-func_ov173_0219d488 kind:function(thumb,size=0x1c) addr:0x0219d4c8
-func_ov173_0219d4a4 kind:function(thumb,size=0x88) addr:0x0219d4e4
-func_ov173_0219d52c kind:function(thumb,size=0x50) addr:0x0219d56c
-func_ov173_0219d57c kind:function(thumb,size=0x32) addr:0x0219d5bc
-func_ov173_0219d5b0 kind:function(thumb,size=0x28) addr:0x0219d5f0
-func_ov173_0219d5d8 kind:function(thumb,size=0x38) addr:0x0219d618
-func_ov173_0219d610 kind:function(thumb,size=0x2c) addr:0x0219d650
-func_ov173_0219d63c kind:function(thumb,size=0x10) addr:0x0219d67c
-func_ov173_0219d64c kind:function(thumb,size=0x44) addr:0x0219d68c
-func_ov173_0219d690 kind:function(thumb,size=0x10) addr:0x0219d6d0
-func_ov173_0219d6a0 kind:function(thumb,size=0x14) addr:0x0219d6e0
-func_ov173_0219d6b4 kind:function(thumb,size=0x10) addr:0x0219d6f4
-func_ov173_0219d6c4 kind:function(thumb,size=0x8) addr:0x0219d704
-func_ov173_0219d6cc kind:function(thumb,size=0x8) addr:0x0219d70c
-func_ov173_0219d6d4 kind:function(thumb,size=0x8) addr:0x0219d714
-func_ov173_0219d6dc kind:function(thumb,size=0x8) addr:0x0219d71c
-func_ov173_0219d6e4 kind:function(thumb,size=0x2) addr:0x0219d724
-func_ov173_0219d6e8 kind:function(thumb,size=0x2) addr:0x0219d728
-func_ov173_0219d6ec kind:function(thumb,size=0x44) addr:0x0219d72c
-func_ov173_0219d730 kind:function(thumb,size=0x50) addr:0x0219d770
-func_ov173_0219d780 kind:function(thumb,size=0x18) addr:0x0219d7c0
-func_ov173_0219d798 kind:function(thumb,size=0x7c) addr:0x0219d7d8
-func_ov173_0219d814 kind:function(thumb,size=0x12) addr:0x0219d854
-func_ov173_0219d828 kind:function(thumb,size=0x3a) addr:0x0219d868
-func_ov173_0219d864 kind:function(thumb,size=0xc) addr:0x0219d8a4
-func_ov173_0219d870 kind:function(thumb,size=0x3e) addr:0x0219d8b0
-func_ov173_0219d8b0 kind:function(thumb,size=0xc) addr:0x0219d8f0
-func_ov173_0219d8bc kind:function(thumb,size=0x70) addr:0x0219d8fc
-func_ov173_0219d92c kind:function(thumb,size=0xac) addr:0x0219d96c
-func_ov173_0219d9d8 kind:function(thumb,size=0x70) addr:0x0219da18
-func_ov173_0219da48 kind:function(thumb,size=0x26) addr:0x0219da88
-func_ov173_0219da70 kind:function(thumb,size=0x32) addr:0x0219dab0
-func_ov173_0219daa4 kind:function(thumb,size=0x38) addr:0x0219dae4
-func_ov173_0219dadc kind:function(thumb,size=0x2a) addr:0x0219db1c
-func_ov173_0219db08 kind:function(thumb,size=0x20) addr:0x0219db48
-func_ov173_0219db28 kind:function(thumb,size=0x1c) addr:0x0219db68
-func_ov173_0219db44 kind:function(thumb,size=0x40) addr:0x0219db84
-func_ov173_0219db84 kind:function(thumb,size=0x2c) addr:0x0219dbc4
-func_ov173_0219dbb0 kind:function(thumb,size=0x2) addr:0x0219dbf0
-func_ov173_0219dbb4 kind:function(thumb,size=0x98) addr:0x0219dbf4
-func_ov173_0219dc4c kind:function(thumb,size=0xaa) addr:0x0219dc8c
-func_ov173_0219dcf8 kind:function(thumb,size=0xae) addr:0x0219dd38
-func_ov173_0219dda8 kind:function(thumb,size=0x56) addr:0x0219dde8
-func_ov173_0219de00 kind:function(thumb,size=0x16) addr:0x0219de40
-func_ov173_0219de18 kind:function(thumb,size=0x40) addr:0x0219de58
-func_ov173_0219de58 kind:function(thumb,size=0x16) addr:0x0219de98
-func_ov173_0219de70 kind:function(thumb,size=0x4) addr:0x0219deb0
-func_ov173_0219de74 kind:function(thumb,size=0x20) addr:0x0219deb4
-func_ov173_0219de94 kind:function(thumb,size=0x28) addr:0x0219ded4
-func_ov173_0219debc kind:function(thumb,size=0x14) addr:0x0219defc
-func_ov173_0219ded0 kind:function(thumb,size=0x1c) addr:0x0219df10
-func_ov173_0219deec kind:function(thumb,size=0x3c) addr:0x0219df2c
-func_ov173_0219df28 kind:function(thumb,size=0x16) addr:0x0219df68
-func_ov173_0219df40 kind:function(thumb,size=0x12) addr:0x0219df80
-func_ov173_0219df54 kind:function(thumb,size=0x68) addr:0x0219df94
-func_ov173_0219dfbc kind:function(thumb,size=0x88) addr:0x0219dffc
-func_ov173_0219e044 kind:function(thumb,size=0xc) addr:0x0219e084
-func_ov173_0219e050 kind:function(thumb,size=0x1c) addr:0x0219e090
-func_ov173_0219e06c kind:function(thumb,size=0x6) addr:0x0219e0ac
-func_ov173_0219e074 kind:function(thumb,size=0x28) addr:0x0219e0b4
-func_ov173_0219e09c kind:function(thumb,size=0xe) addr:0x0219e0dc
-func_ov173_0219e0ac kind:function(thumb,size=0x8) addr:0x0219e0ec
-func_ov173_0219e0b4 kind:function(thumb,size=0x4) addr:0x0219e0f4
-func_ov173_0219e0b8 kind:function(thumb,size=0x1e) addr:0x0219e0f8
-func_ov173_0219e0d8 kind:function(thumb,size=0xc) addr:0x0219e118
-func_ov173_0219e0e4 kind:function(thumb,size=0x4) addr:0x0219e124
-func_ov173_0219e0e8 kind:function(thumb,size=0x4) addr:0x0219e128
-func_ov173_0219e0ec kind:function(thumb,size=0x4) addr:0x0219e12c
-func_ov173_0219e0f0 kind:function(thumb,size=0xc) addr:0x0219e130
-func_ov173_0219e0fc kind:function(thumb,size=0xc) addr:0x0219e13c
+WIFI_MCR_Init kind:function(thumb,size=0xd0) addr:0x0219cec0
+WIFI_MCR_Dest kind:function(thumb,size=0x5c) addr:0x0219cf90
+WIFI_MCR_GetInitFlag kind:function(thumb,size=0x4) addr:0x0219cfec
+WIFI_MCR_Main kind:function(thumb,size=0xb8) addr:0x0219cff0
+WifiMcr_PlayerKeyCheck kind:function(thumb,size=0x44) addr:0x0219d0a8
+WifiMcr_PlayerKeyCheckAll kind:function(thumb,size=0x28) addr:0x0219d0ec
+WIFI_MCR_PlayerSelect kind:function(thumb,size=0xa) addr:0x0219d114
+WIFI_MCR_GetPlayerOnMapParam kind:function(thumb,size=0x4a) addr:0x0219d120
+WIFI_MCR_GetPlayerOnUnderMapParam kind:function(thumb,size=0x4e) addr:0x0219d16c
+WIFI_MCR_CursorOn kind:function(thumb,size=0x48) addr:0x0219d1bc
+WIFI_MCR_ShadowOn kind:function(thumb,size=0xc) addr:0x0219d204
+WIFI_MCR_CursorOff kind:function(thumb,size=0x8) addr:0x0219d210
+WIFI_MCR_PlayerMovePause kind:function(thumb,size=0x4) addr:0x0219d218
+WIFI_MCR_PlayerMovePauseGet kind:function(thumb,size=0x4) addr:0x0219d21c
+WIFI_MCR_SetPlayer kind:function(thumb,size=0x68) addr:0x0219d220
+WIFI_MCR_SetNpc kind:function(thumb,size=0x8a) addr:0x0219d288
+WIFI_MCR_DelPeopleReq kind:function(thumb,size=0x40) addr:0x0219d314
+WIFI_MCR_DelPeople kind:function(thumb,size=0x1c) addr:0x0219d354
+WIFI_MCR_GetFriendNo kind:function(thumb,size=0x10) addr:0x0219d370
+WIFI_MCR_GetRetWay kind:function(thumb,size=0x10) addr:0x0219d380
+WIFI_MCR_NpcPauseOn kind:function(thumb,size=0x70) addr:0x0219d390
+WIFI_MCR_NpcPauseOff kind:function(thumb,size=0x20) addr:0x0219d400
+WIFI_MCR_NpcMoveSet kind:function(thumb,size=0x22) addr:0x0219d420
+WIFI_MCR_PCAnmStart kind:function(thumb,size=0x30) addr:0x0219d444
+WIFI_MCR_PCAnmOff kind:function(thumb,size=0x10) addr:0x0219d474
+WIFI_MCR_PCAnmMain kind:function(thumb,size=0x1c) addr:0x0219d484
+WifiMcr_DelPeopleAll kind:function(thumb,size=0x26) addr:0x0219d4a0
+WifiMcr_PlayerMoveEndCheck kind:function(thumb,size=0x1c) addr:0x0219d4c8
+WifiMcr_PlayerFrontPcCheck kind:function(thumb,size=0x88) addr:0x0219d4e4
+WifiMcr_ReqCmdMain kind:function(thumb,size=0x50) addr:0x0219d56c
+WifiMcr_MoveObjMoveAll kind:function(thumb,size=0x32) addr:0x0219d5bc
+WifiMcr_MoveObjDrawAll kind:function(thumb,size=0x28) addr:0x0219d5f0
+WifiMcr_HitObjGet kind:function(thumb,size=0x38) addr:0x0219d618
+WifiMcr_ObjDrawInit kind:function(thumb,size=0x2c) addr:0x0219d650
+WifiMcr_ObjDrawExit kind:function(thumb,size=0x10) addr:0x0219d67c
+WifiMcr_ScrDrawInit kind:function(thumb,size=0x44) addr:0x0219d68c
+WifiMcr_ScrDrawExit kind:function(thumb,size=0x10) addr:0x0219d6d0
+WifiMcr_ClactInit kind:function(thumb,size=0x14) addr:0x0219d6e0
+WifiMcr_ClactExit kind:function(thumb,size=0x10) addr:0x0219d6f4
+WifiMcr_ClactResLoad kind:function(thumb,size=0x8) addr:0x0219d704
+WifiMcr_ClactResFree kind:function(thumb,size=0x8) addr:0x0219d70c
+WifiMcr_ClactActorAdd kind:function(thumb,size=0x8) addr:0x0219d714
+WifiMcr_ClactActorDel kind:function(thumb,size=0x8) addr:0x0219d71c
+WifiMcr_BgInit kind:function(thumb,size=0x2) addr:0x0219d724
+WifiMcr_BgExit kind:function(thumb,size=0x2) addr:0x0219d728
+WifiMcr_BgLoad kind:function(thumb,size=0x44) addr:0x0219d72c
+WifiMcr_ClactResLoadCore kind:function(thumb,size=0x50) addr:0x0219d770
+WifiMcr_ClactResFreeCore kind:function(thumb,size=0x18) addr:0x0219d7c0
+WifiMcr_ClactActorAddCore kind:function(thumb,size=0x7c) addr:0x0219d7d8
+WifiMcr_ClactActorDelCore kind:function(thumb,size=0x12) addr:0x0219d854
+WifiMcr_ExitCursorOn kind:function(thumb,size=0x3a) addr:0x0219d868
+WifiMcr_ExitCursorOff kind:function(thumb,size=0xc) addr:0x0219d8a4
+WifiMcr_CursorSet kind:function(thumb,size=0x3e) addr:0x0219d8b0
+WifiMcr_CursorHide kind:function(thumb,size=0xc) addr:0x0219d8f0
+WifiMcr_PlayerOnExitCheck kind:function(thumb,size=0x70) addr:0x0219d8fc
+WifiMcr_FriendSeatPosGet kind:function(thumb,size=0xac) addr:0x0219d96c
+WifiMcr_ExitPosGet kind:function(thumb,size=0x70) addr:0x0219da18
+WifiMcr_FreeObjGet kind:function(thumb,size=0x26) addr:0x0219da88
+WifiMcr_ObjDrawNew kind:function(thumb,size=0x32) addr:0x0219dab0
+WifiMcr_ObjNew kind:function(thumb,size=0x38) addr:0x0219dae4
+WifiMcr_ObjAccessCheck kind:function(thumb,size=0x2a) addr:0x0219db1c
+WifiMcr_PlayerMoveInit kind:function(thumb,size=0x20) addr:0x0219db48
+WifiMcr_NpcInMoveInit kind:function(thumb,size=0x1c) addr:0x0219db68
+WifiMcr_NpcNormalMoveInit kind:function(thumb,size=0x40) addr:0x0219db84
+WifiMcr_NpcJumpMoveInit kind:function(thumb,size=0x2c) addr:0x0219dbc4
+WifiMcr_DrawNone kind:function(thumb,size=0x2) addr:0x0219dbf0
+WifiMcr_DrawKuru kind:function(thumb,size=0x98) addr:0x0219dbf4
+WifiMcr_DrawJump kind:function(thumb,size=0xaa) addr:0x0219dc8c
+WifiMcr_PlayerMove kind:function(thumb,size=0xae) addr:0x0219dd38
+WifiMcr_NpcInMove kind:function(thumb,size=0x56) addr:0x0219dde8
+WifiMcr_NpcOutMove kind:function(thumb,size=0x16) addr:0x0219de40
+WifiMcr_NpcNormalMove kind:function(thumb,size=0x40) addr:0x0219de58
+WifiMcr_NpcJumpMove kind:function(thumb,size=0x16) addr:0x0219de98
+WifiMcr_NpcPauseMove kind:function(thumb,size=0x4) addr:0x0219deb0
+WifiMcr_ReqCmdSet kind:function(thumb,size=0x20) addr:0x0219deb4
+WifiMcr_ReqCmdSetObj kind:function(thumb,size=0x28) addr:0x0219ded4
+WifiMcr_NpcMoveSetCheck kind:function(thumb,size=0x14) addr:0x0219defc
+WifiMcr_NpcMoveInit kind:function(thumb,size=0x1c) addr:0x0219df10
+WifiMcr_PcAnmInit kind:function(thumb,size=0x3c) addr:0x0219df2c
+WifiMcr_PcAnmExit kind:function(thumb,size=0x16) addr:0x0219df68
+WifiMcr_PcAnmMain kind:function(thumb,size=0x12) addr:0x0219df80
+WifiMcr_PcAnmFreeMain kind:function(thumb,size=0x68) addr:0x0219df94
+WifiMcr_PcAnmUseMain kind:function(thumb,size=0x88) addr:0x0219dffc
+WifiMcr_PcAnmColorGet kind:function(thumb,size=0xc) addr:0x0219e084
+WifiMcr_PcAnmUseEnd kind:function(thumb,size=0x1c) addr:0x0219e090
+WifiMcr_PcAnmNextReq kind:function(thumb,size=0x6) addr:0x0219e0ac
+WifiMcr_PcAnmUseStart kind:function(thumb,size=0x28) addr:0x0219e0b4
+WifiMcr_PcAnmUseStop kind:function(thumb,size=0xe) addr:0x0219e0dc
+WifiP2PMatchNet_CommandTableGet kind:function(thumb,size=0x8) addr:0x0219e0ec
+WifiP2PMatchNet_CommandNumGet kind:function(thumb,size=0x4) addr:0x0219e0f4
+WifiP2PMatchNet_CommandInit kind:function(thumb,size=0x1e) addr:0x0219e0f8
+WifiP2PMatchNet_CommandExit kind:function(thumb,size=0xc) addr:0x0219e118
+WifiP2PMatchNet_RecvUnused0 kind:function(thumb,size=0x4) addr:0x0219e124
+WifiP2PMatchNet_RecvUnused1 kind:function(thumb,size=0x4) addr:0x0219e128
+WifiP2PMatchNet_RecvUnused2 kind:function(thumb,size=0x4) addr:0x0219e12c
+WIFI_MCR_MapSizeGet kind:function(thumb,size=0xc) addr:0x0219e130
+WIFI_MCR_MapDataGet kind:function(thumb,size=0xc) addr:0x0219e13c
 func_ov173_0219e108 kind:function(thumb,size=0x30) addr:0x0219e148
 func_ov173_0219e138 kind:function(thumb,size=0x1c) addr:0x0219e178
 func_ov173_0219e154 kind:function(thumb,size=0x46) addr:0x0219e194
@@ -427,73 +427,29 @@ func_ov173_021a5eb4 kind:function(thumb,size=0x1c) addr:0x021a5ef4
 func_ov173_021a5ed0 kind:function(thumb,size=0x118) addr:0x021a5f10
 func_ov173_021a5fe8 kind:function(thumb,size=0x12c) addr:0x021a6028
 func_ov173_021a6114 kind:function(thumb,size=0xac) addr:0x021a6154
-func_ov173_021a61c0 kind:function(thumb,size=0x4) addr:0x021a6200
-func_ov173_021a61c4 kind:function(thumb,size=0x4) addr:0x021a6204
-func_ov173_021a61c8 kind:function(thumb,size=0x4) addr:0x021a6208
-func_ov173_021a61cc kind:function(thumb,size=0x4) addr:0x021a620c
-func_ov173_021a61d0 kind:function(thumb,size=0x8) addr:0x021a6210
-func_ov173_021a61d8 kind:function(thumb,size=0x10) addr:0x021a6218
-func_ov173_021a61e8 kind:function(thumb,size=0x18) addr:0x021a6228
-func_ov173_021a6200 kind:function(thumb,size=0x1c) addr:0x021a6240
-func_ov173_021a621c kind:function(thumb,size=0x22) addr:0x021a625c
-func_ov173_021a6240 kind:function(thumb,size=0xc) addr:0x021a6280
-func_ov173_021a624c kind:function(thumb,size=0x8) addr:0x021a628c
-func_ov173_021a6254 kind:function(thumb,size=0x10) addr:0x021a6294
-func_ov173_021a6264 kind:function(thumb,size=0x4) addr:0x021a62a4
-data_ov173_021a6268 kind:data(any) addr:0x021a62a8
-data_ov173_021a626c kind:data(any) addr:0x021a62ac
-data_ov173_021a626d kind:data(any) addr:0x021a62ad
-data_ov173_021a626e kind:data(any) addr:0x021a62ae
-data_ov173_021a626f kind:data(any) addr:0x021a62af
+WIFI_STATUS_GetWifiStatus kind:function(thumb,size=0x4) addr:0x021a6200
+WIFI_STATUS_SetWifiStatus kind:function(thumb,size=0x4) addr:0x021a6204
+WIFI_STATUS_GetGameMode kind:function(thumb,size=0x4) addr:0x021a6208
+WIFI_STATUS_SetGameMode kind:function(thumb,size=0x4) addr:0x021a620c
+WIFI_STATUS_GetVChatStatus kind:function(thumb,size=0x8) addr:0x021a6210
+WIFI_STATUS_SetVChatStatus kind:function(thumb,size=0x10) addr:0x021a6218
+WIFI_STATUS_IsVChatMac kind:function(thumb,size=0x18) addr:0x021a6228
+WIFI_STATUS_SetVChatMac kind:function(thumb,size=0x1c) addr:0x021a6240
+WIFI_STATUS_ResetVChatMac kind:function(thumb,size=0x22) addr:0x021a625c
+WIFI_STATUS_SetMyMac kind:function(thumb,size=0xc) addr:0x021a6280
+WIFI_STATUS_GetUseVChat kind:function(thumb,size=0x8) addr:0x021a628c
+WIFI_STATUS_SetUseVChat kind:function(thumb,size=0x10) addr:0x021a6294
+WIFI_STATUS_GetCallCounter kind:function(thumb,size=0x4) addr:0x021a62a4
+sWifiMcrPcAnmFreeWait kind:data(any) addr:0x021a62a8
+sWifiMcrPcAnmSteps kind:data(any) addr:0x021a62ac
 data_ov173_021a628c kind:data(any) addr:0x021a62cc
-data_ov173_021a6298 kind:data(any) addr:0x021a62d8
-data_ov173_021a62e0 kind:data(any) addr:0x021a6320
-data_ov173_021a62f0 kind:data(any) addr:0x021a6330
-data_ov173_021a6500 kind:data(any) addr:0x021a6540 ambiguous
-data_ov173_021a65ac kind:data(any) addr:0x021a65ec ambiguous
-data_ov173_021a65b0 kind:data(any) addr:0x021a65f0
-data_ov173_021a6669 kind:data(any) addr:0x021a66a9 ambiguous
-data_ov173_021a6684 kind:data(any) addr:0x021a66c4 ambiguous
-data_ov173_021a66b5 kind:data(any) addr:0x021a66f5 ambiguous
-data_ov173_021a66c0 kind:data(any) addr:0x021a6700 ambiguous
-data_ov173_021a66ed kind:data(any) addr:0x021a672d ambiguous
-data_ov173_021a6711 kind:data(any) addr:0x021a6751 ambiguous
-data_ov173_021a674c kind:data(any) addr:0x021a678c ambiguous
-data_ov173_021a675d kind:data(any) addr:0x021a679d ambiguous
-data_ov173_021a67a4 kind:data(any) addr:0x021a67e4 ambiguous
-data_ov173_021a67ad kind:data(any) addr:0x021a67ed ambiguous
-data_ov173_021a67dd kind:data(any) addr:0x021a681d ambiguous
-data_ov173_021a685d kind:data(any) addr:0x021a689d ambiguous
-data_ov173_021a6870 kind:data(any) addr:0x021a68b0
-data_ov173_021a68d1 kind:data(any) addr:0x021a6911 ambiguous
-data_ov173_021a68ec kind:data(any) addr:0x021a692c ambiguous
-data_ov173_021a693d kind:data(any) addr:0x021a697d ambiguous
-data_ov173_021a6961 kind:data(any) addr:0x021a69a1 ambiguous
-data_ov173_021a69a5 kind:data(any) addr:0x021a69e5 ambiguous
-data_ov173_021a69e1 kind:data(any) addr:0x021a6a21 ambiguous
-data_ov173_021a6a25 kind:data(any) addr:0x021a6a65 ambiguous
-data_ov173_021a6a61 kind:data(any) addr:0x021a6aa1 ambiguous
-data_ov173_021a6aa0 kind:data(any) addr:0x021a6ae0 ambiguous
-data_ov173_021a6aa1 kind:data(any) addr:0x021a6ae1 ambiguous
-data_ov173_021a6ac5 kind:data(any) addr:0x021a6b05 ambiguous
-data_ov173_021a6b18 kind:data(any) addr:0x021a6b58 ambiguous
-data_ov173_021a6c38 kind:data(any) addr:0x021a6c78
-data_ov173_021a6cd9 kind:data(any) addr:0x021a6d19 ambiguous
-data_ov173_021a6d15 kind:data(any) addr:0x021a6d55 ambiguous
-data_ov173_021a6d5d kind:data(any) addr:0x021a6d9d ambiguous
-data_ov173_021a6dad kind:data(any) addr:0x021a6ded ambiguous
-data_ov173_021a6df5 kind:data(any) addr:0x021a6e35 ambiguous
-data_ov173_021a6e25 kind:data(any) addr:0x021a6e65 ambiguous
-data_ov173_021a6e65 kind:data(any) addr:0x021a6ea5 ambiguous
-data_ov173_021a6e75 kind:data(any) addr:0x021a6eb5 ambiguous
-data_ov173_021a6ec5 kind:data(any) addr:0x021a6f05 ambiguous
-data_ov173_021a6f09 kind:data(any) addr:0x021a6f49 ambiguous
-data_ov173_021a6f3d kind:data(any) addr:0x021a6f7d ambiguous
-data_ov173_021a6fa9 kind:data(any) addr:0x021a6fe9 ambiguous
-data_ov173_021a7021 kind:data(any) addr:0x021a7061 ambiguous
-data_ov173_021a705d kind:data(any) addr:0x021a709d ambiguous
-data_ov173_021a7095 kind:data(any) addr:0x021a70d5 ambiguous
-data_ov173_021a70d9 kind:data(any) addr:0x021a7119 ambiguous
+sWifiP2PMatchNetCommands kind:data(any) addr:0x021a62d8
+sWifiMcrMapSizes kind:data(any) addr:0x021a6320
+sWifiMcrMap0 kind:data(any) addr:0x021a6330
+sWifiMcrMap1 kind:data(any) addr:0x021a65f0
+sWifiMcrMap2 kind:data(any) addr:0x021a68b0
+sWifiMcrMap3 kind:data(any) addr:0x021a6c78
+data_ov173_021a7108 kind:data(any) addr:0x021a7148
 data_ov173_021a710a kind:data(any) addr:0x021a714a
 data_ov173_021a7110 kind:data(any) addr:0x021a7150
 data_ov173_021a7115 kind:data(any) addr:0x021a7155 ambiguous
@@ -531,8 +487,7 @@ data_ov173_021a7341 kind:data(any) addr:0x021a7381 ambiguous
 data_ov173_021a735c kind:data(any) addr:0x021a739c
 data_ov173_021a737c kind:data(any) addr:0x021a73bc
 data_ov173_021a73b1 kind:data(any) addr:0x021a73f1 ambiguous
-data_ov173_021a73c0 kind:data(any) addr:0x021a7400
-data_ov173_021a73c1 kind:data(any) addr:0x021a7401 ambiguous
+sWifiMcrMaps kind:data(any) addr:0x021a7400
 data_ov173_021a73d0 kind:data(any) addr:0x021a7410
 data_ov173_021a73e0 kind:data(any) addr:0x021a7420
 data_ov173_021a73ed kind:data(any) addr:0x021a742d ambiguous

@@ -3,6 +3,8 @@
 #include "app/battle_recorder.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
+#include "app/wifi_note.h"
+#include "app/xtransceiver.h"
 #include "app/zukan.h"
 #include "constants/pokemon.h"
 #include "demo/shinka_demo.h"
@@ -81,15 +83,15 @@ const FieldProcLink FIELD_PROC_LINK_LIST[15] = {
     { OVERLAY_ID(142), &BAG_PROC_FUNCTIONS, func_ov012_0215bd48, func_ov012_0215bdd0, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(186), &data_ov012_0216dd78, func_ov012_0215bef4, func_ov012_0215bf58, NULL, func_ov012_0215c594 },
     { 0, NULL, NULL, NULL, func_ov012_0215c0dc, func_ov012_0215c594 },
-    { OVERLAY_ID(140), &data_ov140_0219eecc, func_ov012_0215c094, func_ov012_0215c0cc, NULL, func_ov012_0215c594 },
+    { OVERLAY_ID(140), &CONFIG_PANEL_PROC_FUNCTIONS, func_ov012_0215c094, func_ov012_0215c0cc, NULL, func_ov012_0215c594 },
     { 0, NULL, NULL, NULL, func_ov012_0215c574, func_ov012_0215c594 },
     { OVERLAY_PSTATUS, &PSTATUS_PROC_FUNCTIONS, func_ov012_0215bb70, func_ov012_0215bcf0, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(144), &TOWNMAP_PROC_FUNCTIONS, func_ov012_0215bf8c, func_ov012_0215bff8, NULL, func_ov012_0215c594 },
-    { OVERLAY_ID(204), &data_ov189_021ae03c, func_ov012_0215c10c, func_ov012_0215c138, NULL, func_ov012_0215c594 },
+    { OVERLAY_ID(204), &WIFI_NOTE_PROC_FUNCTIONS, func_ov012_0215c10c, func_ov012_0215c138, NULL, func_ov012_0215c594 },
     { OVERLAY_NONE, &MAILSYS_PROC_FUNCTIONS, func_ov012_0215c160, func_ov012_0215c218, NULL, func_ov012_0215c2c8 },
     { OVERLAY_ID(284), &SHINKA_DEMO_PROC_FUNCTIONS, script_evo, func_ov012_0215c3a4, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(272), &BR_MAIN_PROC_FUNCTIONS, func_ov012_0215c3d0, func_ov012_0215c3fc, NULL, func_ov012_0215c594 },
-    { OVERLAY_ID(259), &data_ov143_021a039c, func_ov012_0215c438, func_ov012_0215c474, NULL, func_ov012_0215c594 },
+    { OVERLAY_ID(259), &XTRANSCEIVER_PROC_FUNCTIONS, func_ov012_0215c438, func_ov012_0215c474, NULL, func_ov012_0215c594 },
     { OVERLAY_ID(145), &MEDALBOX_PROC_FUNCTIONS, func_ov012_0215c488, func_ov012_0215c4b4, NULL, func_ov012_0215c594 },
 };
 

@@ -2,3 +2,23 @@
     .rodata     start:0x0219b7d0 end:0x0219badc kind:rodata align:4
     .ctor       start:0x0219badc end:0x0219badc kind:rodata align:4
     .bss        start:0x0219bae0 end:0x0219bae0 kind:bss align:32
+
+src/ov265/dendou_demo.c:
+    complete
+    .text       start:0x021998c0 end:0x0219991c
+    .rodata     start:0x0219b7d0 end:0x0219b7dc
+
+src/ov265/ddemo_main.c:
+    complete
+    .text       start:0x0219991c end:0x0219a1d4
+    .rodata     start:0x0219b7dc end:0x0219b910
+
+src/ov265/ddemo_seq.c:
+    complete
+    .text       start:0x0219a1d4 end:0x0219aadc
+    .rodata     start:0x0219b910 end:0x0219b938
+
+src/ov265/ddemo_obj.c:
+    complete
+    .text       start:0x0219aadc end:0x0219b7d0
+    .rodata     start:0x0219b938 end:0x0219badc

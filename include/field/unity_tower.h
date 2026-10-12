@@ -81,10 +81,10 @@ struct UnityTowerSurveySave {
 u32 func_02009b5c(void);
 void func_02009b64(UnityTowerSurveySave *save);
 // Gives the player the country and region and records them as the player's own
-void func_02009b84(UnityTowerSurveySave *save, PlayerInfo *info, u8 country, u8 region);
+void func_02009b84(UnityTowerSurveySave *save, PlayerInfo *info, int country, int region);
 // The UNITY_TOWER_REGION_* state of a country's region, and recording one
-u32 func_02009ba4(UnityTowerSurveySave *save, u8 country, u8 region);
-void func_02009be0(UnityTowerSurveySave *save, u8 country, u8 region, u32 state);
+u32 func_02009ba4(UnityTowerSurveySave *save, int country, int region);
+void func_02009be0(UnityTowerSurveySave *save, int country, int region, u32 state);
 u8 func_02009c38(UnityTowerSurveySave *save);
 // A day has passed: every region recorded today becomes one recorded before
 void func_02009c48(UnityTowerSurveySave *save);

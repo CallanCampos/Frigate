@@ -3,3 +3,44 @@
     .ctor       start:0x021ab3c0 end:0x021ab3c0 kind:rodata align:4
     .data       start:0x021ab3e0 end:0x021ab4a0 kind:data align:32
     .bss        start:0x021ab4a0 end:0x021ab4a0 kind:bss align:32
+
+src/ov293/demo3d.c:
+    complete
+    .text       start:0x021a1ba0 end:0x021a1f24
+    .rodata     start:0x021a3dec end:0x021a3e08
+    .data       start:0x021ab3e0 end:0x021ab3ec
+
+src/ov293/demo3d_graphic.c:
+    complete
+    .text       start:0x021a1f24 end:0x021a2334
+    .rodata     start:0x021a3e08 end:0x021a3f94
+    .data       start:0x021ab3ec end:0x021ab400
+
+src/ov293/demo3d_engine.c:
+    .text       start:0x021a2334 end:0x021a2a0c
+    .rodata     start:0x021a3f94 end:0x021a3fb8
+    .data       start:0x021ab400 end:0x021ab410
+
+src/ov293/demo3d_data.c:
+    .text       start:0x021a2a0c end:0x021a2c28
+    .rodata     start:0x021a3fb8 end:0x021ab2b0
+    .data       start:0x021ab410 end:0x021ab420
+
+src/ov293/demo3d_capture.c:
+    .text       start:0x021a2c28 end:0x021a2e38
+    .rodata     start:0x021ab2b0 end:0x021ab2dc
+
+src/ov293/demo3d_cmd.c:
+    complete
+    .text       start:0x021a2e38 end:0x021a3a64
+    .data       start:0x021ab420 end:0x021ab470
+
+src/ov293/demo3d_cmdsys.c:
+    complete
+    .text       start:0x021a3a64 end:0x021a3c80
+    .data       start:0x021ab470 end:0x021ab480
+
+src/ov293/demo3d_exp_c_cruiser.c:
+    .text       start:0x021a3c80 end:0x021a3dec
+    .rodata     start:0x021ab2dc end:0x021ab3c0
+    .data       start:0x021ab480 end:0x021ab4a0

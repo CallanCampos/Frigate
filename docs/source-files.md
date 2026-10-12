@@ -171,7 +171,7 @@ prints the tables below from the configs and the ROM:
 | `shaymin_form.c` | `0x02164330`–`0x02164490` | 4 | complete | descriptive |
 | `scrcmd_trial_house.c` | `0x02164490`–`0x02164838` | 16 | complete | descriptive |
 | `scrcmd_actor_move.c` | `0x02164838`–`0x021649ec` | 4 | complete | descriptive |
-| `season_form.c` | `0x021649ec`–`0x02164ae0` | 1 | partial | descriptive |
+| `season_form.c` | `0x021649ec`–`0x02164ae0` | 1 | complete | descriptive |
 | `scrcmd_entree_forest.c` | `0x02164ae0`–`0x021652cc` | 16 | complete | descriptive |
 | `survey.c` | `0x021652cc`–`0x02165598` | 14 | complete | descriptive |
 | `scrcmd_sp_poke_gimmick.c` | `0x02165598`–`0x0216598c` | 8 | complete | descriptive |
@@ -415,7 +415,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 36
 
-1506 of 4339 functions are in source files. Embedded names without a file yet: `comm_entry_menu.c`, `ctalkmsgwin.c`, `enceff.c`, `entrance_camera.c`, `fes_gimmick.c`, `field_3dbg.c`, `field_bbd_color.c`, `field_camera.c`, `field_camera_anime.c`, `field_comm_actor.c`, `field_fade.c`, `field_flash.c`, `field_fmission_info.c`, `field_fog.c`, `field_g3dobj.c`, `field_light.c`, `field_msgbg.c`, `field_place_name.c`, `field_player_core.c`, `field_player_grid_event.c`, `field_player_nogrid.c`, `field_rail.c`, `field_rail_loader.c`, `field_saveanime.c`, `field_subscreen.c`, `field_task.c`, `field_task_manager.c`, `field_wfbc.c`, `field_zonefog.c`, `fieldmap_ctrl_grid.c`, `fieldmap_ctrl_nogrid_work.c`, `fieldmap_tcb_camera_zoom.c`, `fieldskill_mapeff.c`, `fld3d_ci.c`, `fld_exp_obj.c`, `fld_particle.c`, `fld_wipe_3dobj.c`, `fldeff_btrain.c`, `fldeff_bubble.c`, `fldeff_d06denki.c`, `fldeff_hide.c`, `fldeff_iaigiri.c`, `fldeff_ochiba.c`, `fldeff_reflect.c`, `fldeff_ripple.c`, `fldeff_splash.c`, `fldmmdl_acmd.c`, `fldmmdl_blact.c`, `fldmmdl_g3dobj.c`, `height_ex.c`, `ircbattlemenu.c`, `land_data_patch.c`, `party_select_list.c`, `place_name_letter.c`, `pleasure_boat.c`, `scrcmd_pokemon_fld.c`, `shortcut_menu.c`, `sodateya.c`, `weather.c`, `weather_task.c`.
+1530 of 4339 functions are in source files. Embedded names without a file yet: `comm_entry_menu.c`, `ctalkmsgwin.c`, `enceff.c`, `entrance_camera.c`, `fes_gimmick.c`, `field_3dbg.c`, `field_bbd_color.c`, `field_camera.c`, `field_camera_anime.c`, `field_comm_actor.c`, `field_fade.c`, `field_flash.c`, `field_fmission_info.c`, `field_fog.c`, `field_g3dobj.c`, `field_light.c`, `field_msgbg.c`, `field_place_name.c`, `field_player_core.c`, `field_player_grid_event.c`, `field_player_nogrid.c`, `field_rail.c`, `field_rail_loader.c`, `field_saveanime.c`, `field_subscreen.c`, `field_task.c`, `field_task_manager.c`, `field_wfbc.c`, `field_zonefog.c`, `fieldmap_ctrl_grid.c`, `fieldmap_ctrl_nogrid_work.c`, `fieldmap_tcb_camera_zoom.c`, `fieldskill_mapeff.c`, `fld3d_ci.c`, `fld_exp_obj.c`, `fld_particle.c`, `fld_wipe_3dobj.c`, `fldeff_btrain.c`, `fldeff_bubble.c`, `fldeff_d06denki.c`, `fldeff_hide.c`, `fldeff_iaigiri.c`, `fldeff_ochiba.c`, `fldeff_reflect.c`, `fldeff_ripple.c`, `fldeff_splash.c`, `fldmmdl_acmd.c`, `fldmmdl_blact.c`, `fldmmdl_g3dobj.c`, `height_ex.c`, `ircbattlemenu.c`, `land_data_patch.c`, `party_select_list.c`, `place_name_letter.c`, `pleasure_boat.c`, `scrcmd_pokemon_fld.c`, `sodateya.c`, `weather.c`, `weather_task.c`.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -474,6 +474,7 @@ prints the tables below from the configs and the ROM:
 | `fieldmap_func.c` | `0x021b427c`–`0x021b445c` | 9 | complete | string at `0x021d5290` |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
+| `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | partial | descriptive |
 | `field_map_chunk_height.c` | `0x021c7028`–`0x021c71d4` | 1 | complete | descriptive |
 | `scrcmd_medal.c` | `0x021c7b38`–`0x021c7fd8` | 13 | partial | descriptive |
@@ -1217,6 +1218,14 @@ prints the tables below from the configs and the ROM:
 | `yesno_menu.c` | `0x0219a584`–`0x0219af1c` | 8 | partial | string at `0x0219ce44` |
 | `frame_list.c` | `0x0219af1c`–`0x0219cd18` | 55 | partial | string at `0x0219ce54` |
 
+### Overlay 140
+
+89 of 89 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `config_panel.c` | `0x0219ce80`–`0x0219ee3c` | 89 | partial | descriptive |
+
 ### Overlay 141
 
 42 of 42 functions are in source files.
@@ -1495,6 +1504,17 @@ prints the tables below from the configs and the ROM:
 | `pdc_main.c` | `0x021999a8`–`0x02199f94` | 11 | complete | string at `0x0219a628` |
 | `pdc_msg.c` | `0x02199f94`–`0x0219a53c` | 16 | partial | string at `0x0219a634` |
 
+### Overlay 173
+
+110 of 442 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `wifi_p2pmatchroom.c` | `0x0219ce80`–`0x0219e0ac` | 88 | partial | descriptive |
+| `wifi_p2pmatch_net.c` | `0x0219e0ac`–`0x0219e0f0` | 7 | complete | descriptive |
+| `wifi_p2pmatchroom_map.c` | `0x0219e0f0`–`0x0219e108` | 2 | complete | descriptive |
+| `wifi_status.c` | `0x021a61c0`–`0x021a6268` | 13 | complete | descriptive |
+
 ### Overlay 174
 
 86 of 86 functions are in source files.
@@ -1598,6 +1618,17 @@ prints the tables below from the configs and the ROM:
 | `pmsiv_wordwin.c` | `0x021a3124`–`0x021a3a14` | 23 | complete | string at `0x021a7564` |
 | `pms_select.c` | `0x021a3a14`–`0x021a4ef0` | 44 | complete | descriptive |
 | `pms_select_graphic.c` | `0x021a4ef0`–`0x021a512c` | 14 | complete | string at `0x021a7578` |
+
+### Overlay 186
+
+162 of 162 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `trainer_card.c` | `0x021a75a0`–`0x021a9f80` | 63 | complete | descriptive |
+| `trcard_bmp.c` | `0x021a9f80`–`0x021aaf00` | 22 | partial | descriptive |
+| `trcard_obj.c` | `0x021aaf00`–`0x021ab178` | 6 | complete | descriptive |
+| `badge_view.c` | `0x021ab178`–`0x021acd20` | 71 | partial | string at `0x021ada4c` |
 
 ### Overlay 187
 
@@ -1789,6 +1820,14 @@ prints the tables below from the configs and the ROM:
 | `wf2dmap_scrdraw.c` | `0x021a93d4`–`0x021a98cc` | 9 | complete | string at `0x021a9b24` |
 | `wf2dmap_cmdq.c` | `0x021a98cc`–`0x021a9990` | 4 | complete | string at `0x021a9b38` |
 
+### Overlay 204
+
+170 of 170 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `wifi_note.c` | `0x021a9b60`–`0x021aded8` | 170 | partial | descriptive |
+
 ### Overlay 205
 
 51 of 51 functions are in source files.
@@ -1938,6 +1977,19 @@ prints the tables below from the configs and the ROM:
 | `box_search.c` | `0x021d3b64`–`0x021d6d28` | 118 | partial | descriptive |
 | `box_search_graphic.c` | `0x021d6d28`–`0x021d6f6c` | 16 | complete | string at `0x021d96c0` |
 
+### Overlay 256
+
+77 of 77 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `dendou_pc.c` | `0x021bb700`–`0x021bb758` | 3 | complete | descriptive |
+| `dpc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
+| `dpc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
+| `dpc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
+| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | partial | descriptive |
+| `dpc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
+
 ### Overlay 257
 
 630 of 630 functions are in source files.
@@ -1963,6 +2015,35 @@ prints the tables below from the configs and the ROM:
 | `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | partial | descriptive |
 | `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
 | `ssp_exifenc.c` | `0x021ae378`–`0x021af740` | 11 | complete | descriptive |
+
+### Overlay 258
+
+84 of 84 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `waza_oshie_main.c` | `0x021998c0`–`0x0219b9a8` | 84 | complete | descriptive |
+
+### Overlay 259
+
+217 of 318 functions are in source files. Embedded names without a file yet: `local_tvt_callselect.c`, `local_tvt_util.c`.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `local_tvt_sys.c` | `0x021998c0`–`0x02199b3c` | 11 | complete | string at `0x021a0940` |
+| `local_tvt_chara.c` | `0x02199b3c`–`0x0219a8a4` | 32 | complete | string at `0x021a0950` |
+| `local_tvt_scriptmode.c` | `0x0219a8a4`–`0x0219ac00` | 15 | complete | string at `0x021a0964` |
+| `local_tvt_callmode.c` | `0x0219ac00`–`0x0219b3f4` | 16 | complete | string at `0x021a097c` |
+| `local_tvt_graphic.c` | `0x0219b3f4`–`0x0219b630` | 14 | complete | string at `0x021a0994` |
+| `local_tvt_message.c` | `0x0219b630`–`0x0219be0c` | 29 | complete | string at `0x021a09a8` |
+| `local_tvt_calldata.c` | `0x0219e3f0`–`0x0219e70c` | 23 | complete | string at `0x021a09e8` |
+| `local_tvt_person.c` | `0x0219e70c`–`0x0219e908` | 8 | complete | string at `0x021a0a00` |
+| `local_tvt_person_support.c` | `0x0219e908`–`0x0219ee18` | 8 | complete | string at `0x021a0a14` |
+| `local_tvt_person_mother.c` | `0x0219ee18`–`0x0219f04c` | 7 | complete | string at `0x021a0a30` |
+| `local_tvt_person_doctor.c` | `0x0219f04c`–`0x0219f63c` | 11 | complete | string at `0x021a0a4c` |
+| `local_tvt_person_chelen.c` | `0x0219f63c`–`0x0219faac` | 9 | complete | string at `0x021a0a68` |
+| `local_tvt_person_rival.c` | `0x0219faac`–`0x0219fcac` | 7 | complete | string at `0x021a0a84` |
+| `local_tvt_person_secret.c` | `0x0219fcac`–`0x021a039c` | 27 | partial | string at `0x021a0aa0` |
 
 ### Overlay 260
 
@@ -2024,6 +2105,17 @@ prints the tables below from the configs and the ROM:
 | `cdemo_control.c` | `0x02199b40`–`0x02199e9c` | 8 | complete | descriptive |
 | `cdemo_script.c` | `0x02199e9c`–`0x0219a098` | 21 | complete | descriptive |
 
+### Overlay 265
+
+99 of 99 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `dendou_demo.c` | `0x021998c0`–`0x0219991c` | 3 | complete | descriptive |
+| `ddemo_main.c` | `0x0219991c`–`0x0219a1d4` | 44 | complete | descriptive |
+| `ddemo_seq.c` | `0x0219a1d4`–`0x0219aadc` | 17 | complete | descriptive |
+| `ddemo_obj.c` | `0x0219aadc`–`0x0219b7d0` | 35 | complete | descriptive |
+
 ### Overlay 266
 
 57 of 57 functions are in source files.
@@ -2040,6 +2132,17 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `the_end.c` | `0x0219ce80`–`0x0219d110` | 7 | complete | descriptive |
 | `the_end_graphic.c` | `0x0219d110`–`0x0219d46c` | 15 | complete | string at `0x0219d5c0` |
+
+### Overlay 268
+
+59 of 191 functions are in source files. Embedded names without a file yet: `br_codein.c`.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `br_start_proc.c` | `0x021ba140`–`0x021ba4f8` | 7 | complete | descriptive |
+| `br_menu_proc.c` | `0x021ba4f8`–`0x021ba7a0` | 4 | complete | descriptive |
+| `br_record_proc.c` | `0x021ba7a0`–`0x021bc1e0` | 30 | complete | descriptive |
+| `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | partial | descriptive |
 
 ### Overlay 269
 
@@ -2186,6 +2289,21 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `wifibattlematch_sys.c` | `0x021fb880`–`0x021fcf84` | 36 | partial | string at `0x021fd048` |
 
+### Overlay 293
+
+112 of 112 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `demo3d.c` | `0x021a1b20`–`0x021a1ea4` | 10 | complete | string at `0x021ab360` |
+| `demo3d_graphic.c` | `0x021a1ea4`–`0x021a22b4` | 24 | complete | string at `0x021ab36c` |
+| `demo3d_engine.c` | `0x021a22b4`–`0x021a298c` | 11 | partial | string at `0x021ab380` |
+| `demo3d_data.c` | `0x021a298c`–`0x021a2ba8` | 13 | partial | string at `0x021ab390` |
+| `demo3d_capture.c` | `0x021a2ba8`–`0x021a2db8` | 7 | partial | descriptive |
+| `demo3d_cmd.c` | `0x021a2db8`–`0x021a39e4` | 36 | complete | descriptive |
+| `demo3d_cmdsys.c` | `0x021a39e4`–`0x021a3c00` | 7 | complete | string at `0x021ab3f0` |
+| `demo3d_exp_c_cruiser.c` | `0x021a3c00`–`0x021a3d6c` | 4 | partial | string at `0x021ab400` |
+
 ### Overlay 294
 
 132 of 132 functions are in source files.
@@ -2246,6 +2364,19 @@ prints the tables below from the configs and the ROM:
 | `zukan_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | string at `0x021ace88` |
 | `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | partial | string at `0x021acec4` |
 
+### Overlay 299
+
+94 of 94 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `zukanlist.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
+| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | partial | descriptive |
+| `zknlist_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
+| `zknlist_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
+| `zknlist_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
+| `zknlist_ui.c` | `0x021a23a4`–`0x021a25c8` | 1 | complete | descriptive |
+
 ### Overlay 300
 
 190 of 190 functions are in source files.
@@ -2277,6 +2408,24 @@ prints the tables below from the configs and the ROM:
 | `zukan.c` | `0x021acee0`–`0x021ad624` | 19 | complete | string at `0x021ae5a0` |
 | `zukan_common.c` | `0x021ad624`–`0x021adecc` | 20 | partial | string at `0x021ae5a8` |
 | `zukan_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | partial | string at `0x021ae5b8` |
+
+### Overlay 303
+
+114 of 114 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `zukan_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | partial | descriptive |
+| `zukan_habitat_graphic.c` | `0x021a1a80`–`0x021a32d8` | 58 | complete | descriptive |
+
+### Overlay 304
+
+92 of 92 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `zukan_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | partial | descriptive |
+| `zukan_area_list_view.c` | `0x021a073c`–`0x021a1dac` | 58 | complete | descriptive |
 
 ### Overlay 305
 
@@ -2356,6 +2505,14 @@ prints the tables below from the configs and the ROM:
 | `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | partial | string at `0x0219e988` |
 | `un_select_graphic.c` | `0x0219e088`–`0x0219e3f4` | 17 | complete | string at `0x0219e994` |
 
+### Overlay 312
+
+49 of 49 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `geonet.c` | `0x0217c940`–`0x0217eb9c` | 49 | complete | descriptive |
+
 ### Overlay 313
 
 28 of 28 functions are in source files.
@@ -2410,6 +2567,23 @@ prints the tables below from the configs and the ROM:
 | `marine_tube_board.c` | `0x0219ce80`–`0x0219d16c` | 4 | complete | descriptive |
 | `marine_tube_board_message.c` | `0x0219d16c`–`0x0219d324` | 6 | complete | descriptive |
 | `marine_tube_board_graphic.c` | `0x0219d324`–`0x0219d550` | 12 | complete | string at `0x0219d640` |
+
+### Overlay 319
+
+115 of 115 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `manual.c` | `0x0219ce80`–`0x0219d1e0` | 4 | complete | descriptive |
+| `manual_graphic.c` | `0x0219d1e0`–`0x0219d41c` | 14 | complete | string at `0x0219f8e0` |
+| `manual_data.c` | `0x0219d41c`–`0x0219d62c` | 22 | complete | string at `0x0219f8f4` |
+| `manual_common.c` | `0x0219d62c`–`0x0219d838` | 6 | complete | string at `0x0219f904` |
+| `manual_touchbar.c` | `0x0219d838`–`0x0219df70` | 21 | complete | string at `0x0219f914` |
+| `manual_list.c` | `0x0219df70`–`0x0219ebc8` | 19 | complete | string at `0x0219f928` |
+| `manual_top.c` | `0x0219ebc8`–`0x0219eff4` | 10 | complete | string at `0x0219f938` |
+| `manual_category.c` | `0x0219eff4`–`0x0219f168` | 4 | complete | string at `0x0219f948` |
+| `manual_title.c` | `0x0219f168`–`0x0219f388` | 4 | complete | string at `0x0219f95c` |
+| `manual_explain.c` | `0x0219f388`–`0x0219f6f8` | 11 | complete | string at `0x0219f96c` |
 
 ### Overlay 320
 

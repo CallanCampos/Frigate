@@ -129,7 +129,7 @@ u8 UnityTowerVisitor_GetProvince(PlayerInfo *info) {
     return info->province;
 }
 
-void func_02008c14(PlayerInfo *info, u8 country, u8 province) {
+void func_02008c14(PlayerInfo *info, int country, int province) {
     info->country = country;
     info->province = province;
 }

@@ -92,9 +92,9 @@ const GameProcFunctions data_ov012_0216dd6c = {
 };
 
 static const GameProcFunctions data_ov012_0216dd60 = {
-    func_ov186_021a75a0,
-    func_ov186_021a7864,
-    func_ov186_021a7a20,
+    TrainerCard_Init,
+    TrainerCard_Main,
+    TrainerCard_Exit,
 };
 
 // The records that each sum on the card adds up, ending at 0
@@ -291,7 +291,7 @@ static u32 func_ov012_021694ac(TrainerCardSysWork *wk) {
         wk->procMgr = CreateGameProcManager(wk->heapId);
     }
     wk->greeting.save = GameData_GetSaveControl(wk->param->gameData);
-    QueueGameProc(wk->procMgr, OVERLAY_ID(185), &data_ov186_021ad288, wk->param);
+    QueueGameProc(wk->procMgr, OVERLAY_ID(185), &BADGE_VIEW_PROC_FUNCTIONS, wk->param);
     return TRCARD_SEQ_OTHER_WAIT;
 }
 

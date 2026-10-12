@@ -3,3 +3,58 @@
     .ctor       start:0x0219f918 end:0x0219f918 kind:rodata align:4
     .data       start:0x0219f920 end:0x0219f9c0 kind:data align:32
     .bss        start:0x0219f9c0 end:0x0219f9c0 kind:bss align:32
+
+src/ov319/manual.c:
+    complete
+    .text       start:0x0219cec0 end:0x0219d220
+    .rodata     start:0x0219f738 end:0x0219f744
+
+src/ov319/manual_graphic.c:
+    complete
+    .text       start:0x0219d220 end:0x0219d45c
+    .rodata     start:0x0219f744 end:0x0219f850
+    .data       start:0x0219f920 end:0x0219f934
+
+src/ov319/manual_data.c:
+    complete
+    .text       start:0x0219d45c end:0x0219d66c
+    .data       start:0x0219f934 end:0x0219f944
+
+src/ov319/manual_common.c:
+    complete
+    .text       start:0x0219d66c end:0x0219d878
+    .data       start:0x0219f944 end:0x0219f954
+
+src/ov319/manual_touchbar.c:
+    complete
+    .text       start:0x0219d878 end:0x0219dfb0
+    .rodata     start:0x0219f850 end:0x0219f8e0
+    .data       start:0x0219f954 end:0x0219f968
+
+src/ov319/manual_list.c:
+    complete
+    .text       start:0x0219dfb0 end:0x0219ec08
+    .rodata     start:0x0219f8e0 end:0x0219f8f0
+    .data       start:0x0219f968 end:0x0219f978
+
+src/ov319/manual_top.c:
+    complete
+    .text       start:0x0219ec08 end:0x0219f034
+    .rodata     start:0x0219f8f0 end:0x0219f8fc
+    .data       start:0x0219f978 end:0x0219f988
+
+src/ov319/manual_category.c:
+    complete
+    .text       start:0x0219f034 end:0x0219f1a8
+    .data       start:0x0219f988 end:0x0219f99c
+
+src/ov319/manual_title.c:
+    complete
+    .text       start:0x0219f1a8 end:0x0219f3c8
+    .data       start:0x0219f99c end:0x0219f9ac
+
+src/ov319/manual_explain.c:
+    complete
+    .text       start:0x0219f3c8 end:0x0219f738
+    .rodata     start:0x0219f8fc end:0x0219f918
+    .data       start:0x0219f9ac end:0x0219f9c0

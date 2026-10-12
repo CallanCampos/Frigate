@@ -213,7 +213,7 @@ BattleRecHeader *func_0200c0c0(void);
 // The header of a video
 BattleRecHeader *func_0200c0cc(BattleRecVideo *video);
 // Makes the loaded video of a received profile, header and body, and decrypts its body
-void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body);
+void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body, SaveControl *save);
 // A value from the header, BATTLE_REC_HEADER_*, such as the video's number
 u64 func_0200c124(BattleRecHeader *header, u32 id, u32 index);
 // Sets the CRC of a body

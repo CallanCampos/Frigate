@@ -822,7 +822,7 @@ static inline void G3X_AlphaTest(BOOL enable, int ref) {
     if (enable) {
         reg_G3X_DISP3DCNT = (u16)((reg_G3X_DISP3DCNT & ~(REG_G3X_DISP3DCNT_RO_MASK | REG_G3X_DISP3DCNT_GO_MASK)) |
                                   REG_G3X_DISP3DCNT_ATE_MASK);
-        *(vu8 *)0x04000340 = (u8)ref;
+        *(vu16 *)0x04000340 = (u16)ref;
     } else {
         reg_G3X_DISP3DCNT &= ~(REG_G3X_DISP3DCNT_ATE_MASK | REG_G3X_DISP3DCNT_RO_MASK | REG_G3X_DISP3DCNT_GO_MASK);
     }

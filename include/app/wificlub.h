@@ -31,6 +31,6 @@ typedef struct {
 
 extern const GameProcFunctions WIFICLUB_PROC_FUNCTIONS;
 
-void func_ov173_021a6240(void *buffer);
+void WIFI_STATUS_SetMyMac(void *buffer);
 
 #endif // POKEBW2_APP_WIFICLUB_H

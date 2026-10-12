@@ -318,7 +318,7 @@ from:0x0219e280 kind:thumb_call to:0x020279b4 module:main
 from:0x0219e290 kind:thumb_call to:0x02027acc module:main
 from:0x0219e2bc kind:thumb_call to:0x0219cfb4 module:overlay(323)
 from:0x0219e2de kind:thumb_call to:0x02021c0c module:main
-from:0x0219e2ec kind:thumb_call to:0x02199c58 module:overlays(139,258)
+from:0x0219e2ec kind:thumb_call to:0x02199c58 module:overlay(139)
 from:0x0219e2f6 kind:thumb_call to:0x0219d8b4 module:overlay(323)
 from:0x0219e306 kind:thumb_call to:0x0219d910 module:overlay(323)
 from:0x0219e30e kind:thumb_call to:0x0219dedc module:overlay(323)

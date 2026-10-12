@@ -90,7 +90,7 @@ static const u8 sAnswerMsgIds[SURVEY_QUESTION_COUNT][SURVEY_ANSWER_MAX] = {
     { 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145 },
 };
 
-u16 GetSurveyAnswerMsgID(u16 question, int answer) {
+u16 GetSurveyAnswerMsgID(int question, int answer) {
     return sAnswerMsgIds[question][answer];
 }
 

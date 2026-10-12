@@ -36,7 +36,7 @@ struct GameClearWork {
 };
 
 // The procs it runs, in overlays 265, 266 (demo/staff_roll.h), 267 (demo/the_end.h) and 295
-extern const GameProcFunctions data_ov265_0219b7d0;
+extern const GameProcFunctions DENDOU_DEMO_PROC_FUNCTIONS;
 extern const GameProcFunctions GAME_CLEAR_SAVE_PROC_FUNCTIONS;
 
 GameEventReturnCode EventGameClear_Callback(GameEvent *event, u32 *state, void *data);

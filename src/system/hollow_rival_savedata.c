@@ -35,7 +35,7 @@ u8 func_0200ff60(HollowRivalSave *hollowRival, u16 index) {
     return hollowRival->flags[index];
 }
 
-void func_0200ff68(HollowRivalSave *hollowRival, u8 value) {
+void func_0200ff68(HollowRivalSave *hollowRival, u32 value) {
     hollowRival->unk10 = value;
 }
 

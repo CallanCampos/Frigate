@@ -66,13 +66,13 @@ const GameProcFunctions BR_CORE_PROC_FUNCTIONS = {
 };
 
 static const BrProcData sBrProcTable[BR_PROCID_MAX] = {
-    [BR_PROCID_START] = { &data_ov268_021c20e8, sizeof(BrStartProcParam), OVERLAY_ID(268), BrCore_StartBefore,
+    [BR_PROCID_START] = { &BR_START_PROC_FUNCTIONS, sizeof(BrStartProcParam), OVERLAY_ID(268), BrCore_StartBefore,
                           BrCore_StartAfter },
-    [BR_PROCID_MENU] = { &data_ov268_021c20f4, sizeof(BrMenuProcParam), OVERLAY_ID(268), BrCore_MenuBefore,
+    [BR_PROCID_MENU] = { &BR_MENU_PROC_FUNCTIONS, sizeof(BrMenuProcParam), OVERLAY_ID(268), BrCore_MenuBefore,
                          BrCore_MenuAfter },
-    [BR_PROCID_RECORD] = { &data_ov268_021c211c, sizeof(BrRecordProcParam), OVERLAY_ID(268), BrCore_RecordBefore,
+    [BR_PROCID_RECORD] = { &BR_RECORD_PROC_FUNCTIONS, sizeof(BrRecordProcParam), OVERLAY_ID(268), BrCore_RecordBefore,
                            BrCore_RecordAfter },
-    [BR_PROCID_BTLSUBWAY] = { &data_ov268_021c2234, sizeof(BrBtlSubwayProcParam), OVERLAY_ID(268),
+    [BR_PROCID_BTLSUBWAY] = { &BR_BTLSUBWAY_PROC_FUNCTIONS, sizeof(BrBtlSubwayProcParam), OVERLAY_ID(268),
                               BrCore_BtlSubwayBefore, BrCore_BtlSubwayAfter },
     [BR_PROCID_RNDMATCH] = { &data_ov268_021c2390, sizeof(BrRndMatchProcParam), OVERLAY_ID(268), BrCore_RndMatchBefore,
                              BrCore_RndMatchAfter },
@@ -352,7 +352,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
     p->unit = BrGraphic_GetClunit(wk->graphic);
     p->net = wk->net;
     p->gameData = wk->param->mainParam->gameData;
-    p->unk2C = wk->param->data->unk_1720;
+    p->unk2C = &wk->param->data->unk_1720;
     p->isRecovery = FALSE;
     p->recordInfo = &wk->param->data->recordInfo;
     p->unk3C = &wk->param->data->unk_17bc;
@@ -363,7 +363,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
         GameData *gameData;
 
         p->mode = menuParam->nextMode;
-        p->video = NULL;
+        p->outline = NULL;
         wk->param->data->recordMode = menuParam->nextMode;
         gameData = wk->param->mainParam->gameData;
         func_0200bc9c(GameData_GetSaveControl(gameData), HEAPID_BATTLE_RECORDER_SYS, &result, p->mode);
@@ -378,7 +378,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
     }
     case BR_PROCID_BV_RANK:
         p->mode = BR_RECORD_MODE_BROWSE;
-        p->video = wk->param->data->video;
+        p->outline = &wk->param->data->outline;
         wk->param->data->recordMode = BR_RECORD_MODE_BROWSE;
         break;
     case BR_PROCID_CODEIN: {
@@ -386,7 +386,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
 
         p->mode = BR_RECORD_MODE_CODEIN;
         p->videoNumber = codeInParam->videoNumber;
-        p->video = NULL;
+        p->outline = NULL;
         wk->param->data->recordMode = BR_RECORD_MODE_CODEIN;
         break;
     }
@@ -394,7 +394,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
         const BrBvSaveProcParam *saveParam = preParam;
 
         p->mode = wk->param->data->recordMode;
-        p->video = wk->param->data->video;
+        p->outline = &wk->param->data->outline;
         p->videoNumber = saveParam->videoNumber;
         p->isRecovery = TRUE;
         break;
@@ -403,7 +403,7 @@ static void BrCore_RecordBefore(void *param, void *work, const void *preParam, u
         break;
     case BR_PROCID_RECOVERY:
         p->mode = wk->param->data->recordMode;
-        p->video = wk->param->data->video;
+        p->outline = &wk->param->data->outline;
         p->isRecovery = TRUE;
         break;
     }
@@ -454,7 +454,7 @@ static void BrCore_BvRankBefore(void *param, void *work, const void *preParam, u
     BrBvRankProcParam *p = param;
     BrCoreWork *wk = work;
 
-    p->video = wk->param->data->video;
+    p->outline = &wk->param->data->outline;
     p->search = wk->param->data->bvRankSearch;
     if (preID == BR_PROCID_MENU) {
         const BrMenuProcParam *menuParam = preParam;

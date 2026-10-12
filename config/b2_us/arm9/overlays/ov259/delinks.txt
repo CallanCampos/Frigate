@@ -3,3 +3,81 @@
     .ctor       start:0x021a0934 end:0x021a0934 kind:rodata align:4
     .data       start:0x021a0940 end:0x021a0ac0 kind:data align:32
     .bss        start:0x021a0ac0 end:0x021a0ac0 kind:bss align:32
+
+src/ov259/local_tvt_sys.c:
+    complete
+    .text       start:0x021998c0 end:0x02199b3c
+    .rodata     start:0x021a039c end:0x021a03a8
+    .data       start:0x021a0940 end:0x021a0950
+
+src/ov259/local_tvt_chara.c:
+    complete
+    .text       start:0x02199b3c end:0x0219a8a4
+    .rodata     start:0x021a03a8 end:0x021a0458
+    .data       start:0x021a0950 end:0x021a0964
+
+src/ov259/local_tvt_scriptmode.c:
+    complete
+    .text       start:0x0219a8a4 end:0x0219ac00
+    .rodata     start:0x021a0458 end:0x021a0480
+    .data       start:0x021a0964 end:0x021a097c
+
+src/ov259/local_tvt_callmode.c:
+    complete
+    .text       start:0x0219ac00 end:0x0219b3f4
+    .rodata     start:0x021a0480 end:0x021a0498
+    .data       start:0x021a097c end:0x021a0994
+
+src/ov259/local_tvt_graphic.c:
+    complete
+    .text       start:0x0219b3f4 end:0x0219b630
+    .rodata     start:0x021a0498 end:0x021a0654
+    .data       start:0x021a0994 end:0x021a09a8
+
+src/ov259/local_tvt_message.c:
+    complete
+    .text       start:0x0219b630 end:0x0219be0c
+    .rodata     start:0x021a0654 end:0x021a06d4
+    .data       start:0x021a09a8 end:0x021a09bc
+
+src/ov259/local_tvt_calldata.c:
+    complete
+    .text       start:0x0219e3f0 end:0x0219e70c
+    .rodata     start:0x021a0724 end:0x021a0760
+    .data       start:0x021a09e8 end:0x021a0a00
+
+src/ov259/local_tvt_person.c:
+    complete
+    .text       start:0x0219e70c end:0x0219e908
+    .data       start:0x021a0a00 end:0x021a0a14
+
+src/ov259/local_tvt_person_support.c:
+    complete
+    .text       start:0x0219e908 end:0x0219ee18
+    .data       start:0x021a0a14 end:0x021a0a30
+
+src/ov259/local_tvt_person_mother.c:
+    complete
+    .text       start:0x0219ee18 end:0x0219f04c
+    .data       start:0x021a0a30 end:0x021a0a4c
+
+src/ov259/local_tvt_person_doctor.c:
+    complete
+    .text       start:0x0219f04c end:0x0219f63c
+    .rodata     start:0x021a0760 end:0x021a07f0
+    .data       start:0x021a0a4c end:0x021a0a68
+
+src/ov259/local_tvt_person_chelen.c:
+    complete
+    .text       start:0x0219f63c end:0x0219faac
+    .data       start:0x021a0a68 end:0x021a0a84
+
+src/ov259/local_tvt_person_rival.c:
+    complete
+    .text       start:0x0219faac end:0x0219fcac
+    .data       start:0x021a0a84 end:0x021a0aa0
+
+src/ov259/local_tvt_person_secret.c:
+    .text       start:0x0219fcac end:0x021a039c
+    .rodata     start:0x021a07f0 end:0x021a0934
+    .data       start:0x021a0aa0 end:0x021a0ac0

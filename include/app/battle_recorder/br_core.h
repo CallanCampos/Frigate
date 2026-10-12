@@ -14,7 +14,9 @@
 #include "app/battle_recorder/br_sidebar.h"
 #include "gfl/clact.h"
 #include "gfl/proc.h"
+#include "save/battle_rec.h"
 #include "save/bsubway_save.h"
+#include "save/gds_profile.h"
 #include "save/musical_savedata.h"
 #include "struct_decls.h"
 
@@ -67,11 +69,30 @@ struct BrRecordInfo {
     BOOL isInit;
 };
 
+// The battle videos that a list from the Global Link can hold
+#define BR_OUTLINE_RECV_MAX 30
+
+// A battle video of a downloaded list: the profile of its player and its header
+typedef struct {
+    GdsProfile profile;
+    BattleRecHeader header;
+} BrOutline;
+
+// The list of battle videos downloaded last, which the ranking screen fills and the record screen plays from
+typedef struct {
+    BrOutline data[BR_OUTLINE_RECV_MAX];
+    // Set once the player has watched the video to its end
+    u8 isSecure[BR_OUTLINE_RECV_MAX];
+    u32 dataNum;
+    // The video chosen from the list
+    u32 select;
+} BrOutlineData;
+
 // The data that outlives the core proc, while a battle video plays. br_main.c holds it
 typedef struct {
-    // The video downloaded to play
-    u8 video[0x1720];
-    u8 unk_1720[8];
+    BrOutlineData outline;
+    // The value that came with the video downloaded to play
+    u64 unk_1720;
     BrProcSysRecovery procRecovery;
     u32 recordMode;
     BrRecordInfo recordInfo;
@@ -110,7 +131,7 @@ typedef struct {
 } BrStartProcParam;
 
 typedef struct {
-    u32 menuID;
+    int menuID;
     u32 unk4;
     // What the screen that the menu starts does, such as the record screen's mode
     u32 nextMode;
@@ -128,7 +149,7 @@ typedef struct {
     // 1 to play the video
     u32 result;
     u32 unk4;
-    u32 mode;
+    int mode;
     BrFade *fade;
     BrRes *res;
     BrProcSys *procSys;
@@ -136,8 +157,8 @@ typedef struct {
     u64 videoNumber;
     BrNet *net;
     GameData *gameData;
-    u8 *unk2C;
-    u8 *video;
+    u64 *unk2C;
+    BrOutlineData *outline;
     BOOL isRecovery;
     BrRecordInfo *recordInfo;
     u32 *unk3C;
@@ -169,7 +190,7 @@ typedef struct {
     BrRes *res;
     BrProcSys *procSys;
     BrNet *net;
-    u8 *video;
+    BrOutlineData *outline;
     u32 searchUnk20;
     u32 searchUnk24;
     u8 *search;
@@ -230,10 +251,10 @@ typedef struct {
 } BrBvSaveProcParam;
 
 // The screens' procs
-extern const GameProcFunctions data_ov268_021c20e8;
-extern const GameProcFunctions data_ov268_021c20f4;
-extern const GameProcFunctions data_ov268_021c211c;
-extern const GameProcFunctions data_ov268_021c2234;
+extern const GameProcFunctions BR_START_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_MENU_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_RECORD_PROC_FUNCTIONS;
+extern const GameProcFunctions BR_BTLSUBWAY_PROC_FUNCTIONS;
 extern const GameProcFunctions data_ov268_021c2390;
 extern const GameProcFunctions data_ov268_021c2574;
 extern const GameProcFunctions data_ov268_021c26b8;

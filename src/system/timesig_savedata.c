@@ -51,7 +51,7 @@ u16 func_020091e8(TimeSigSave *timeSig) {
     return timeSig->unk600;
 }
 
-void func_020091f0(TimeSigSave *timeSig, u16 value) {
+void func_020091f0(TimeSigSave *timeSig, u32 value) {
     timeSig->unk600 = value;
 }
 
@@ -95,6 +95,6 @@ u16 func_020092a8(TimeSigSave *timeSig, u32 index) {
     return timeSig->unk638[index];
 }
 
-void func_020092b8(TimeSigSave *timeSig, u32 index, u16 value) {
+void func_020092b8(TimeSigSave *timeSig, u32 index, u32 value) {
     timeSig->unk638[index] = value;
 }

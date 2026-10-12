@@ -3,3 +3,23 @@
     .ctor       start:0x021c27c4 end:0x021c27c4 kind:rodata align:4
     .data       start:0x021c27e0 end:0x021c2900 kind:data align:32
     .bss        start:0x021c2900 end:0x021c2900 kind:bss align:32
+
+src/ov268/br_start_proc.c:
+    complete
+    .text       start:0x021ba140 end:0x021ba4f8
+    .rodata     start:0x021c20e8 end:0x021c20f4
+
+src/ov268/br_menu_proc.c:
+    complete
+    .text       start:0x021ba4f8 end:0x021ba7a0
+    .rodata     start:0x021c20f4 end:0x021c211c
+
+src/ov268/br_record_proc.c:
+    complete
+    .text       start:0x021ba7a0 end:0x021bc1e0
+    .rodata     start:0x021c211c end:0x021c21d0
+    .data       start:0x021c27e0 end:0x021c2814
+
+src/ov268/br_btlsubway_proc.c:
+    .text       start:0x021bc1e0 end:0x021bd02c
+    .rodata     start:0x021c21d0 end:0x021c2390

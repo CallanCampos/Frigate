@@ -433,7 +433,7 @@ int GFL_BGSysGetBGOffsetX(u32 bg) {
     return sBGSys->bgs[bg].x;
 }
 
-int GFL_BGSysGetBGOffsetY(u8 bg) {
+int GFL_BGSysGetBGOffsetY(u32 bg) {
     return sBGSys->bgs[bg].y;
 }
 
