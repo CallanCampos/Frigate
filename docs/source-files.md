@@ -2820,7 +2820,8 @@ prints the tables below from the configs and the ROM:
 | `key_system_graphic.c` | `0x021c0120`–`0x021c054c` | 22 | complete | string at `0x021c92d8` |
 | `key_system_util.c` | `0x021c054c`–`0x021c1dd0` | 82 | partial | string at `0x021c92f0` |
 | `key_system_net.c` | `0x021c1dd0`–`0x021c2b18` | 35 | complete | string at `0x021c9394` |
-| `key_system_flow.c` | `0x021c2b18`–`0x021c53dc` | 81 | partial | descriptive |
+| `key_system_flow.c` | `0x021c2b18`–`0x021c45bc` | 48 | complete | descriptive |
+| `key_system_flow_sub.c` | `0x021c45bc`–`0x021c53dc` | 33 | complete | descriptive |
 | `data_convert_flow.c` | `0x021c53dc`–`0x021c6e14` | 38 | complete | string at `0x021c944c` |
 | `wb_save_block.c` | `0x021c6e14`–`0x021c6e80` | 4 | complete | descriptive |
 | `wb_save_convert.c` | `0x021c6e80`–`0x021c7028` | 3 | complete | string at `0x021c9468` |
