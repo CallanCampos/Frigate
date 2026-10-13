@@ -428,6 +428,12 @@ Same code, other `sp` offsets or frame size.
 - Two flags set side by side and chained (`refresh = redraw = TRUE;`) change which of them is spilled where their
   declaration order does not; the instructions are otherwise the same. The film scenario's `BScenarioMain_ScriptInput`
   (799 bytes of register allocation before) needed the chain in its two touch branches.
+- When two fields of a struct are set to constants and one constant is shared, assign the fields in the struct's
+  order: `Demo3DExpCCruiser_Init` had `r0` and `r1` swapped (21 bytes) until its `setup` was filled
+  `vramType = 1; flags = 0;` first. In the same overlay `Demo3DEngine_SetCamera` needed the inline `FX_Mul` where
+  the source had the `FX_MUL` macro (the inline keeps a call's result as the first operand), an `fx32` local for the
+  `fx16` cosine (it is then loaded where it is written, not forwarded to its first use), and `left = -FX_Div(...)`
+  in a local assigned after `right` (as an argument the negation is done when the arguments are set up).
 
 ## Instruction order
 
