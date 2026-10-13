@@ -370,6 +370,12 @@ Same instructions, registers swapped.
   immediates and which are register copies, look for a statement before the first copy that the original wrote with
   one more (or one fewer) named step, and measure by padding rather than counting. This also explains "holding three
   nested call results in locals keeps the zero in a register" (`func_ov059_021e6630`).
+- A reload of a spilled parameter that trades places with a constant, at the same size, can be a free width
+  conversion to a wider callee parameter: the GTS Negotiations screen's `GtsNegoDisp_DimPalettes` passed a `u16 vram`
+  to `PaletteFade_BlendBuffer`'s `u32 buffer`, which emits nothing but moves the reload. The palette fade's five
+  buffer functions that took `u16` take `u32`. A twin function that matches either way does not vouch for the
+  prototype, since it kept the value in a register. To test a prototype without editing a shared header, compile
+  against a copy with the same include guard (`--extra-flags "-i DIR -prefix copy.h"`).
 
 ## Stack slots
 

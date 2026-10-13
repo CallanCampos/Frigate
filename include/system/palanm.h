@@ -50,8 +50,8 @@ enum {
 PaletteFade *PaletteFade_Create(u32 heapId);
 void PaletteFade_Free(PaletteFade *fade);
 // Allocates a buffer's two copies of size bytes
-void PaletteFade_AllocBuffer(PaletteFade *fade, u16 buffer, u32 size, HeapID heapId);
-void PaletteFade_FreeBuffer(PaletteFade *fade, u16 buffer);
+void PaletteFade_AllocBuffer(PaletteFade *fade, u32 buffer, u32 size, HeapID heapId);
+void PaletteFade_FreeBuffer(PaletteFade *fade, u32 buffer);
 // Copies size bytes of colors to both copies of a buffer, from the color at offset
 void PaletteFade_LoadData(PaletteFade *fade, const void *src, u32 buffer, u16 offset, u16 size);
 // Loads a palette file's colors from srcOffset to a buffer at offset, size bytes of them or all for 0
@@ -63,9 +63,9 @@ void PaletteFade_LoadArcNCLREx(PaletteFade *fade, ArcTool *arc, u32 fileId, Heap
 void PaletteFade_LoadArcNCLR(PaletteFade *fade, ArcTool *arc, u32 fileId, HeapID heapId, u32 buffer, u32 size,
                              u16 offset);
 // Copies a standard palette memory's colors (PALFADE_VRAM_*) to the buffer of the same number
-void PaletteFade_LoadFromVRAM(PaletteFade *fade, u16 vram, u16 offset, u32 size);
-u16 *PaletteFade_GetUnfadedBuffer(PaletteFade *fade, u16 buffer);
-u16 *PaletteFade_GetFadedBuffer(PaletteFade *fade, u16 buffer);
+void PaletteFade_LoadFromVRAM(PaletteFade *fade, u32 vram, u16 offset, u32 size);
+u16 *PaletteFade_GetUnfadedBuffer(PaletteFade *fade, u32 buffer);
+u16 *PaletteFade_GetFadedBuffer(PaletteFade *fade, u32 buffer);
 // Starts fading the buffers in bufferMask that aren't fading, the palettes in paletteMask of each, from step start to
 // step end of 16 toward color, applying the first step at once. A delay of 0 or more moves 2 steps every delay + 1
 // frames, a negative one -delay + 2 steps (at most 16) every frame. Returns whether a buffer started

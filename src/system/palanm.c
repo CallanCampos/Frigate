@@ -58,7 +58,7 @@ struct PaletteFade {
     u8 stopRequested;
 };
 
-static void PaletteFade_SetBuffer(PaletteFade *fade, u16 buffer, u16 *unfaded, u16 *faded, u32 size);
+static void PaletteFade_SetBuffer(PaletteFade *fade, u32 buffer, u16 *unfaded, u16 *faded, u32 size);
 static u8 IsBitSet(u16 mask, u16 bit);
 static void PaletteFade_SetTransfer(PaletteFade *fade, u8 buffer);
 static void MaskPalettes(int buffer, PaletteBuffer *paletteBuffer, u16 *paletteMask);
@@ -87,20 +87,20 @@ void PaletteFade_Free(PaletteFade *fade) {
     GFL_HeapFree(fade);
 }
 
-static void PaletteFade_SetBuffer(PaletteFade *fade, u16 buffer, u16 *unfaded, u16 *faded, u32 size) {
+static void PaletteFade_SetBuffer(PaletteFade *fade, u32 buffer, u16 *unfaded, u16 *faded, u32 size) {
     fade->buffers[buffer].unfaded = unfaded;
     fade->buffers[buffer].faded = faded;
     fade->buffers[buffer].size = size;
 }
 
-void PaletteFade_AllocBuffer(PaletteFade *fade, u16 buffer, u32 size, HeapID heapId) {
+void PaletteFade_AllocBuffer(PaletteFade *fade, u32 buffer, u32 size, HeapID heapId) {
     u16 *unfaded = GFL_HeapAllocate(heapId, size, FALSE, "palanm.c", 143);
     u16 *faded = GFL_HeapAllocate(heapId, size, FALSE, "palanm.c", 144);
 
     PaletteFade_SetBuffer(fade, buffer, unfaded, faded, size);
 }
 
-void PaletteFade_FreeBuffer(PaletteFade *fade, u16 buffer) {
+void PaletteFade_FreeBuffer(PaletteFade *fade, u32 buffer) {
     GFL_HeapFree(fade->buffers[buffer].unfaded);
     GFL_HeapFree(fade->buffers[buffer].faded);
 }
@@ -143,7 +143,7 @@ void PaletteFade_LoadArcNCLR(PaletteFade *fade, ArcTool *arc, u32 fileId, HeapID
     PaletteFade_LoadArcNCLREx(fade, arc, fileId, heapId, buffer, size, offset, 0);
 }
 
-void PaletteFade_LoadFromVRAM(PaletteFade *fade, u16 vram, u16 offset, u32 size) {
+void PaletteFade_LoadFromVRAM(PaletteFade *fade, u32 vram, u16 offset, u32 size) {
     u16 *src;
 
     switch (vram) {
@@ -165,11 +165,11 @@ void PaletteFade_LoadFromVRAM(PaletteFade *fade, u16 vram, u16 offset, u32 size)
     PaletteFade_LoadData(fade, src + offset, vram, offset, size);
 }
 
-u16 *PaletteFade_GetUnfadedBuffer(PaletteFade *fade, u16 buffer) {
+u16 *PaletteFade_GetUnfadedBuffer(PaletteFade *fade, u32 buffer) {
     return fade->buffers[buffer].unfaded;
 }
 
-u16 *PaletteFade_GetFadedBuffer(PaletteFade *fade, u16 buffer) {
+u16 *PaletteFade_GetFadedBuffer(PaletteFade *fade, u32 buffer) {
     return fade->buffers[buffer].faded;
 }
 

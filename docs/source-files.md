@@ -1843,7 +1843,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `gtsnego_proc.c` | `0x021b2f80`–`0x021b4d24` | 67 | complete | descriptive |
-| `gtsnego_disp.c` | `0x021b4d24`–`0x021b66b8` | 61 | partial | string at `0x021b7b90` |
+| `gtsnego_disp.c` | `0x021b4d24`–`0x021b66b8` | 61 | complete | string at `0x021b7b90` |
 | `gtsnego_message.c` | `0x021b66b8`–`0x021b7870` | 47 | complete | string at `0x021b7bb4` |
 
 ### Overlay 196
