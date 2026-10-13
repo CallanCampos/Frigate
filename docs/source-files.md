@@ -635,7 +635,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `scrcmd_resort.c` | `0x021e58c0`–`0x021e7c70` | 43 | partial | string at `0x021e7de0` |
+| `scrcmd_resort.c` | `0x021e58c0`–`0x021e7c70` | 43 | complete | string at `0x021e7de0` |
 | `scrcmd_medalinfo.c` | `0x021e7c70`–`0x021e7db4` | 3 | complete | string at `0x021e7df0` |
 
 ### Overlay 60

@@ -352,6 +352,12 @@ Same instructions, registers swapped.
   halfword fields loaded as `adds r3, r4, #0; adds r3, #8; ldrh [r3, #2]; ldrh [r3, #4]` are read through a pointer
   to the first of them (`const u16 *values = &place->pos.rail.componentId;` then `values[0]`, `values[1]`,
   `values[2]`).
+- Whether a constant shared by two uses is kept in a register or rebuilt can depend on how many temporaries the
+  function has, not on the constant: the resort's `func_ov059_021e6630` keeps its zero in `r5` once three of its
+  nested call results are held in locals (`field`, `people`, `person`), and no spelling of the zero itself does it.
+  A pool word that differs between the versions by a table row is a table indexed by the version:
+  `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
+  to the address + 0x10 in White 2. Check the pool words of both versions before linking a file.
 
 ## Stack slots
 
