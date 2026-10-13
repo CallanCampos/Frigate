@@ -31,11 +31,13 @@ static void StaActAudience_DrawMember(StaActAudience *sys, StaActAudienceMember 
 static void StaActAudience_SetCheerTargets(StaActAudience *sys);
 static void StaActAudience_ClearTargets(StaActAudience *sys);
 
-// Nothing reads it
-const u16 STA_ACT_AUDIENCE_UNUSED = 3;
+// The last column of a spectator's four, which StaActAudience_DrawMember counts back from to mirror one. The
+// read is folded, so no code refers to the table, but only a referenced static lies in the section of
+// STA_ACT_AUDIENCE_CHARS, as the original's does
+static const u16 STA_ACT_AUDIENCE_LAST_COLUMN[] = { 3 };
 
 // The first character of each type's spectator
-static const u16 STA_ACT_AUDIENCE_CHARS[] = { 0x10, 0x90, 0x08, 0x88, 0 };
+static const u16 STA_ACT_AUDIENCE_CHARS[] = { 0x10, 0x90, 0x08, 0x88 };
 
 StaActAudience *StaActAudience_InitSystem(HeapID heapId, StaActing *stage, MusicalStageParam *param) {
     u8 i;
@@ -231,7 +233,7 @@ static void StaActAudience_DrawMember(StaActAudience *sys, StaActAudienceMember 
     for (y = 0; y < 4; y++) {
         for (x = 0; x < 4; x++) {
             if (flip == TRUE) {
-                col = 3 - x + member->x * 4;
+                col = STA_ACT_AUDIENCE_LAST_COLUMN[0] - x + member->x * 4;
             } else {
                 col = x + member->x * 4;
             }

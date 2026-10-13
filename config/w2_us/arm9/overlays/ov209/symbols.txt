@@ -407,7 +407,7 @@ data_ov209_021c2f2c kind:data(any) addr:0x021c2f6c
 data_ov209_021c2f38 kind:data(any) addr:0x021c2f78
 data_ov209_021c2f44 kind:data(any) addr:0x021c2f84
 data_ov209_021c2f50 kind:data(any) addr:0x021c2f90
-STA_ACT_AUDIENCE_UNUSED kind:data(any) addr:0x021c2fac
+STA_ACT_AUDIENCE_LAST_COLUMN kind:data(any) addr:0x021c2fac
 STA_ACT_AUDIENCE_CHARS kind:data(any) addr:0x021c2fae
 STA_ACT_BUTTON_TOUCH_RECTS kind:data(any) addr:0x021c2fb8
 STA_ACT_SCRIPT_VM_PARAM kind:data(any) addr:0x021c2fc4
