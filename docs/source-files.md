@@ -2648,7 +2648,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pkwd_record_monitor.c` | `0x0219ce80`–`0x0219f098` | 65 | partial | descriptive |
+| `pkwd_record_monitor.c` | `0x0219ce80`–`0x0219f098` | 65 | complete | descriptive |
 | `pkwd_record_monitor_graphic.c` | `0x0219f098`–`0x0219f2dc` | 16 | complete | string at `0x0219f7d8` |
 
 ### Overlay 326

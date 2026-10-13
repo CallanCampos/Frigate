@@ -245,6 +245,12 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+- A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
+  counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
+  tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter
+  got `r2` and `&buffer[page * 0x400 + y * 32]` got `r3`, through 48 declaration orders. With `i` as the row counter
+  (`s32 i; s32 page; s32 j;` and `buffer[page * 0x400 + i * 32 + j] += 6 << 12;`) they swap. `i` as the page or the
+  column counter does not match.
 
 ## Stack slots
 
@@ -894,6 +900,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   unless the sum is signed and the last constant unsigned. `gym_driftveil.c`'s `DriftveilGym_InitObjects` adds
   `TILE(6)` and then `HALF_TILE` in two `adds`, which needs `#define HALF_TILE (1u << 15)`; with `(1 << 15)` they
   fold into one `0x68000` and the function is 12 bytes short.
+- A product the original computes twice, where ours keeps it in a stack temporary, has operands of different
+  signedness in its two uses: MWCC does not merge a signed and an unsigned multiply. `PkwdRecordMonitor_UpdateListMarks`
+  passes `(POSITION_LIST_MARK + i) * 2` and `(u32)(POSITION_LIST_MARK + i) * 2 + 1` to a `u32 index` parameter; without
+  the cast `(i + 17) * 2` was spilled and reloaded twice and the frame was 4 bytes larger. The two spilled slots left
+  swapped after that (`scroll` and the loop body's `visible`) were fixed by making the block-scoped
+  `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
 
 ## Branches and block layout
 

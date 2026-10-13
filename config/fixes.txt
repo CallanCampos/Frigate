@@ -2711,6 +2711,7 @@ overlays/ov260 0x021b5212 reloc_module overlay(262)
 overlays/ov260 0x021b5224 reloc_module overlay(262)
 overlays/ov260 0x021b5652 reloc_module overlay(189)
 overlays/ov260 0x021b56aa reloc_module overlay(189)
+overlays/ov260 0x021b56b2 reloc_module overlay(189)
 overlays/ov260 0x021b5838 reloc_module overlay(262)
 overlays/ov260 0x021b592e reloc_module overlay(262)
 overlays/ov260 0x021b5a38 reloc_module overlay(262)
@@ -2718,6 +2719,7 @@ overlays/ov260 0x021b5a3e reloc_module overlay(262)
 overlays/ov260 0x021b86b8 reloc_module overlay(262)
 overlays/ov260 0x021b8a4e reloc_module overlay(189)
 overlays/ov260 0x021b8aa6 reloc_module overlay(189)
+overlays/ov260 0x021b8aae reloc_module overlay(189)
 overlays/ov260 0x021bb5f8 reloc_module overlay(189)
 overlays/ov260 0x021bb5fe reloc_module overlay(189)
 overlays/ov260 0x021bb788 reloc_module overlay(189)
@@ -3248,6 +3250,7 @@ overlays/ov294 0x021a27d2 reloc_module overlay(162)
 overlays/ov294 0x021a27f8 reloc_module overlay(162)
 overlays/ov294 0x021a282e reloc_module overlay(162)
 overlays/ov297 0x021f4382 reloc_module overlay(296)
+overlays/ov297 0x021f43d0 reloc_module overlay(296)
 overlays/ov297 0x021f4514 reloc_module overlay(296)
 overlays/ov297 0x021f4f50 add_data ZUKAN_NICKNAME_UNUSED_BUTTON_FLAGS
 overlays/ov298 0x021a0aa8 reloc_addend 0x380
@@ -3451,11 +3454,11 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
-overlays/ov310 0x021a773c add_data ResearchCommon_Unused
-overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
+overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
+overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov311 0x0219cea0 reloc_module overlay(139)
 overlays/ov311 0x0219cf02 reloc_module overlay(139)
 overlays/ov311 0x0219cf8c reloc_module overlay(139)
