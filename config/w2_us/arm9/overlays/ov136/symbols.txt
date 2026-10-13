@@ -28,4 +28,4 @@ data_ov136_021ef000 kind:data(any) addr:0x021ef040
 data_ov136_021ef010 kind:data(any) addr:0x021ef050
 data_ov136_021ef011 kind:data(any) addr:0x021ef051 ambiguous
 data_ov136_021ef020 kind:data(any) addr:0x021ef060
-GIMMICK_POKEWOOD_POSTER_UNUSED kind:data(any) addr:0x021eef9c
+sTileWidth kind:data(any) addr:0x021eef9c

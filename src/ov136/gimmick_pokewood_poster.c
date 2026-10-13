@@ -38,17 +38,14 @@ static u32 func_ov136_021eef20(const NNSG3dResTex *tex, const char *name);
 // The poster model, from archive 0x125
 static const G3DSceneResourceSetup sResources[] = { { 0x125, 0, 0 } };
 
-// The textures and palettes of the posters, newest movie first
-static const char *sPosterTexNames[POSTER_COUNT] = { "c15_poster1", "c15_poster2", "c15_poster3", "c15_poster4" };
-static const char *sPosterPlttNames[POSTER_COUNT] = { "c15_poster1_pl", "c15_poster2_pl", "c15_poster3_pl",
-                                                      "c15_poster4_pl" };
-
 static const G3DSceneActorSetup sActors[] = { { 0, 0, 0, 0, NULL, 0 } };
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-// Nothing reads it. Declared here, it gives the original's order of .rodata
-const u8 GIMMICK_POKEWOOD_POSTER_UNUSED[3] = { 8, 8, 8 };
+// The textures and palettes of the posters, newest movie first
+static const char *sPosterTexNames[POSTER_COUNT] = { "c15_poster1", "c15_poster2", "c15_poster3", "c15_poster4" };
+static const char *sPosterPlttNames[POSTER_COUNT] = { "c15_poster1_pl", "c15_poster2_pl", "c15_poster3_pl",
+                                                      "c15_poster4_pl" };
 
 void func_ov136_021eec80(Field *field) {
     int i;
@@ -107,6 +104,11 @@ static void func_ov136_021eed50(GimmickWork *work, u32 poster) {
 
 static void func_ov136_021eedc0(void *texResource, const char *texName, const char *plttName, u32 image,
                                 HeapID heapId) {
+    // A poster's size in tiles and a tile's in pixels. The reads are folded, but a function's constants stay in
+    // .rodata, as three bytes of 8; which 8 is which is a guess
+    static const u8 sTileWidth = 8;
+    static const u8 sTileHeight = 8;
+    static const u8 sTilePixels = 8;
     NNSGfdTexKey texKey = GFL_G3DResGetTexVRAMHandle(texResource);
     NNSGfdPlttKey plttKey = GFL_G3DResGetPltVRAMHandle(texResource);
     NNSG3dResTex *tex = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(texResource));
@@ -116,7 +118,8 @@ static void func_ov136_021eedc0(void *texResource, const char *texName, const ch
     NNSG2dPaletteData *palette = NULL;
     void *characterFile = GFL_G2DIOReadBGNCGR(0x126, image * 2 + 1, TRUE, &character, heapId);
     void *paletteFile = GFL_G2DIOReadNCLR(0x126, image * 2, &palette, heapId);
-    GFLBitmap *bitmap = GFL_BitmapWrap(character->rawData, 8, 8, 0x20, heapId);
+    GFLBitmap *bitmap =
+        GFL_BitmapWrap(character->rawData, sTileWidth, sTileHeight, sTilePixels * sTilePixels / 2, heapId);
 
     GFL_BitmapMakeLinear(bitmap, FALSE, heapId);
 

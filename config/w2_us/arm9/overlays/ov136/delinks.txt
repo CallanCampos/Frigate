@@ -5,6 +5,7 @@
     .bss        start:0x021ef080 end:0x021ef080 kind:bss align:32
 
 src/ov136/gimmick_pokewood_poster.c:
+    complete
     .text       start:0x021eecc0 end:0x021eef9c
     .rodata     start:0x021eef9c end:0x021eefd8
     .data       start:0x021eefe0 end:0x021ef080

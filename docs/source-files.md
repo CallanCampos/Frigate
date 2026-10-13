@@ -1267,7 +1267,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_pokewood_poster.c` | `0x021eec80`–`0x021eef5c` | 13 | partial | descriptive |
+| `gimmick_pokewood_poster.c` | `0x021eec80`–`0x021eef5c` | 13 | complete | descriptive |
 
 ### Overlay 137
 

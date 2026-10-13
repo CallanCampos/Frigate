@@ -1834,6 +1834,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   BGs through five one-BG inlines, three defined before it and two after, which gives both the ROM's falling stack
   slots and the order of its two equal-size initializers. Which helpers sit after the caller is a fit; a table the
   original link dead-stripped would explain the ROM as well.
+- When a layout search needs N extra small objects, first ask whether an object already in the ROM is N + 1 smaller
+  ones. The `08 08 08` at the head of `gimmick_pokewood_poster.c`'s `.rodata` is not one unreferenced 3-byte global
+  but three one-byte objects in the packed section (function-local `static const u8` whose reads fold): the bytes are
+  the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
+  order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
+  one is dropped; a used `.bss` static joins the sort, an unused one does not.
 
 ## When nothing moves it
 

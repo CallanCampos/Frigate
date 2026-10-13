@@ -5284,6 +5284,7 @@ overlays/ov135 0x021efb04 WbtMakeMatch_GetParty
 overlays/ov135 0x021efb34 WbtMakeMatch_LoadBattleBoxParty
 overlays/ov135 0x021efb60 WbtMakeMatch_SetupPokeList
 overlays/ov135 0x021efbb4 WbtMakeMatch_SetupPStatus
+overlays/ov136 0x021eef5c sTileWidth
 overlays/ov137 0x021f1f1c ResortSys_Create
 overlays/ov137 0x021f1fb4 ResortSys_Free
 overlays/ov137 0x021f1ff8 ResortSys_GetShopData
