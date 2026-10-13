@@ -498,6 +498,17 @@ Same code, other `sp` offsets or frame size.
   order, so a declaration sweep finds nothing until each loop has a counter of its own:
   `ZukanCommon_BuildHabitatSummary` matched once its counting loop got its own `i`, with `pokedex` declared first
   and assigned last.
+- **MWCC allocates registers and stack slots before it merges identical tails.** A call written at the end of both
+  branches of an `if`/`else` compiles to the same bytes as one copy after it, but it counts twice for the allocator
+  and ends live ranges inside the branches. That decides slots and registers that no type or declaration order can
+  reach. The medal box's `MedalBoxApp_DrawInfo` writes `WordSetNumber(wordSet, 1, total, 3, 1, TRUE);` in both
+  branches of its obtained check, which makes `total` a call-result temporary and puts its three spilled values in
+  assignment order (9 bytes off with one call after the `if`); `MedalBoxApp_UpdateSparkles` writes
+  `func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);` at the end of both branches, which gives `actors + i` enough
+  uses to win `r7`, so the zero is not hoisted and nothing spills (0x150 against 0x13c before). Try this first when a
+  function has the right instructions with the wrong slots or a hoisted constant. Related: a product shifted at each
+  use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
+  variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
 
 ## Instruction order
 

@@ -5,6 +5,7 @@
     .bss        start:0x021a1440 end:0x021a1440 kind:bss align:32
 
 src/ov145/medalbox.c:
+    complete
     .text       start:0x0219cec0 end:0x021a064c
     .rodata     start:0x021a0cfc end:0x021a1018
     .data       start:0x021a1020 end:0x021a102c

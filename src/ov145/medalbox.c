@@ -1512,10 +1512,11 @@ static void MedalBoxApp_DrawInfo(MedalBoxApp *work, MedalBoxEntry *medal, BOOL s
         str = GFL_MsgDataLoadStrbufNew(work->msgData[MSG_UI], Title10_Text_Empty_2);
         if (medal->status == MEDAL_STATUS_OBTAINED) {
             WordSetNumber(wordSet, 0, obtained, 3, 1, TRUE);
+            WordSetNumber(wordSet, 1, total, 3, 1, TRUE);
         } else {
             WordSetNumber(wordSet, 0, total - obtained, 3, 1, TRUE);
+            WordSetNumber(wordSet, 1, total, 3, 1, TRUE);
         }
-        WordSetNumber(wordSet, 1, total, 3, 1, TRUE);
         GFL_WordSetFormatStrbuf(wordSet, buf, str);
         PrintWindow_Print(&work->printWindows[WINDOW_INFO], work->printQueue, 200, 8, buf, work->font, color);
         GFL_StrBufFree(str);
@@ -1867,12 +1868,13 @@ static void MedalBoxApp_UpdateSparkles(MedalBoxApp *work) {
                 func_0204c488(actors[ACTOR_SPARKLE + i], 4);
                 func_0204c140(actors[ACTOR_SPARKLE + i], &pos, 0);
                 func_0204c124(work->actors[ACTOR_SPARKLE + i], TRUE);
+                func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
             } else {
                 func_0204c488(actors[ACTOR_SPARKLE + i], 4);
                 func_0204c140(actors[ACTOR_SPARKLE + i], &pos, 0);
                 func_0204c124(work->actors[ACTOR_SPARKLE + i], FALSE);
+                func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
             }
-            func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
         }
     }
 }
@@ -2002,17 +2004,16 @@ static BOOL MedalBoxApp_SeqSlider(MedalBoxApp *work) {
 static BOOL MedalBoxApp_UpdateSlider(MedalBoxApp *work) {
     ClActorPos pos;
     u32 distance;
-    int target;
+    fx32 target;
 
     target = FX_Mul((work->data.columnCount - 1) << FX32_SHIFT,
                     FX_Div(work->sliderX << FX32_SHIFT, FX32_CONST(SLIDER_WIDTH)));
     pos.x = work->sliderX + SLIDER_X;
     pos.y = SLIDER_Y;
     func_0204c140(work->actors[ACTOR_SLIDER], &pos, 0);
-    target >>= FX32_SHIFT;
-    if (target < work->column) {
+    if ((target >> FX32_SHIFT) < work->column) {
         MedalBoxApp_SetScrollDir(work, -1);
-    } else if (target > work->column) {
+    } else if ((target >> FX32_SHIFT) > work->column) {
         MedalBoxApp_SetScrollDir(work, 1);
     } else {
         work->scrollX = 0;
@@ -2021,7 +2022,7 @@ static BOOL MedalBoxApp_UpdateSlider(MedalBoxApp *work) {
         MedalBoxApp_DrawColumns(work, TRUE, FALSE);
         return TRUE;
     }
-    distance = MATH_ABS(target - work->column);
+    distance = MATH_ABS((target >> FX32_SHIFT) - work->column);
     if (distance > 5) {
         work->scrollSpeed += FX32_CONST(2);
         if (work->scrollSpeed > FX32_CONST(32)) {
@@ -2039,9 +2040,9 @@ static BOOL MedalBoxApp_UpdateSlider(MedalBoxApp *work) {
         if (work->scrollSpeed == FX32_CONST(32)) {
             u16 skip = distance / 3;
 
-            if (target < work->column) {
+            if ((target >> FX32_SHIFT) < work->column) {
                 work->column -= skip;
-            } else if (target > work->column) {
+            } else if ((target >> FX32_SHIFT) > work->column) {
                 work->column += skip;
             } else {
                 return TRUE;

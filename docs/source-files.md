@@ -1279,7 +1279,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `medalbox.c` | `0x0219ce80`–`0x021a0610` | 74 | partial | descriptive |
+| `medalbox.c` | `0x0219ce80`–`0x021a0610` | 74 | complete | descriptive |
 | `medalbox_data_sys.c` | `0x021a0610`–`0x021a0cc0` | 9 | complete | string at `0x021a13e8` |
 
 ### Overlay 146
