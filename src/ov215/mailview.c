@@ -178,7 +178,7 @@ static void MailView_ReleaseBGs(MailSysWork *work) {
 }
 
 static void MailView_LoadGraphics(MailSysWork *work) {
-    u8 design = work->edit->design;
+    u32 design = work->edit->design;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_MAIL, work->heapId);
 
     LoadSysMsgBox(0, 1, 4, 0, work->heapId);

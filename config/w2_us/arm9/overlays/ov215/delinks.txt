@@ -10,11 +10,13 @@ src/ov215/mailtool.c:
     .data       start:0x021ab7c0 end:0x021ab7cc
 
 src/ov215/mailsys.c:
+    complete
     .text       start:0x021a775c end:0x021a8524
     .rodata     start:0x021ab044 end:0x021ab0e8
     .data       start:0x021ab7cc end:0x021ab7d8
 
 src/ov215/mailview.c:
+    complete
     .text       start:0x021a8524 end:0x021a8da8
     .rodata     start:0x021ab0e8 end:0x021ab198
     .data       start:0x021ab7d8 end:0x021ab7e4
