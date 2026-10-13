@@ -527,6 +527,10 @@ Same code, other `sp` offsets or frame size.
   function has the right instructions with the wrong slots or a hoisted constant. Related: a product shifted at each
   use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
   variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
+- A spilled value that sits below temporaries assigned after it has the narrow type of the field it is read from:
+  Pokéstar Studios' `EventPokewood_CreateCastParty` matched once `s32 count` became `s16 count`, the type of
+  `PokewoodCastFile.count[]`. MWCC still spills it as a word, but gives it the lowest slot. Try the field's own type
+  before sweeping declaration orders.
 
 ## Instruction order
 

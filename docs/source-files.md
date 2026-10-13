@@ -276,7 +276,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_pokewood.c` | `0x0216e660`–`0x0216f838` | 41 | partial | string at `0x0216f8e0` |
+| `event_pokewood.c` | `0x0216e660`–`0x0216f838` | 41 | complete | string at `0x0216f8e0` |
 
 ### Overlay 24
 
