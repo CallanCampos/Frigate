@@ -1350,6 +1350,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   with the two cases in the other order. The same holds inside an inline: `case 1: return TRUE; case 2: return TRUE;`
   gives `case 2` a `b` to `case 1`'s `movs r1, #1`, where `case 1: case 2: return TRUE;` gives none, and
   `case 0: return FALSE;` before a `default: return FALSE;` gives `case 0` a `b` to the default.
+- The compare tree is a function of the case set alone: cases form a run while the gap to the next is 3 or less, and
+  the pivot is the run at index (n - 1) / 2. No case order, value type, `default:` placement, extra label, flag or
+  compiler build makes a run at a gap of 4. The ROM has such a run in three switches all the same (`{15,19}` in
+  `ItemMenuDisp_IsFieldMoveTM`, `{42,46}` in overlay 36's `SetupEncountFlagsByPartyPokeAbil`, `{2,6}` in overlay
+  293's capture functions), each time the pair that holds the switch's first label, while other pairs 4 apart in
+  matched code stay separate leaves. Unexplained: don't spend a session on that symptom.
 
 ## Floats and runtime helpers
 
