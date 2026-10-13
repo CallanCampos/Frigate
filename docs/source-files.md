@@ -1595,11 +1595,12 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 182
 
-5 of 1113 functions are in source files.
+14 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `dwc_raputil.c` | `0x021a4920`–`0x021a49d0` | 5 | complete | string at `0x021c05c0` |
+| `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
 
 ### Overlay 184
 

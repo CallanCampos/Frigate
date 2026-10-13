@@ -86,15 +86,15 @@ func_ov182_021a6e98 kind:function(thumb,size=0x178) addr:0x021a6e98
 func_ov182_021a7010 kind:function(thumb,size=0x1d0) addr:0x021a7010
 func_ov182_021a71e0 kind:function(thumb,size=0x8) addr:0x021a71e0
 func_ov182_021a71e8 kind:function(thumb,size=0x14) addr:0x021a71e8
-func_ov182_021a71fc kind:function(thumb,size=0x2b8) addr:0x021a71fc
-func_ov182_021a74b4 kind:function(thumb,size=0x68) addr:0x021a74b4
-func_ov182_021a751c kind:function(thumb,size=0x42) addr:0x021a751c
-func_ov182_021a7560 kind:function(thumb,size=0xf0) addr:0x021a7560
-func_ov182_021a7650 kind:function(thumb,size=0x3c) addr:0x021a7650
-func_ov182_021a768c kind:function(thumb,size=0x38) addr:0x021a768c
-func_ov182_021a76c4 kind:function(thumb,size=0x58) addr:0x021a76c4
-func_ov182_021a771c kind:function(thumb,size=0x84) addr:0x021a771c
-func_ov182_021a77a0 kind:function(thumb,size=0xb8) addr:0x021a77a0
+WcmNotify kind:function(thumb,size=0x2b8) addr:0x021a71fc
+WcmAbort kind:function(thumb,size=0x68) addr:0x021a74b4
+DWC_Wcm_GetApList kind:function(thumb,size=0x42) addr:0x021a751c
+DWC_Wcm_Search kind:function(thumb,size=0xf0) addr:0x021a7560
+DWC_Wcm_EndSearch kind:function(thumb,size=0x3c) addr:0x021a7650
+DWC_Wcm_Disconnect kind:function(thumb,size=0x38) addr:0x021a768c
+DWC_Wcm_Cleanup kind:function(thumb,size=0x58) addr:0x021a76c4
+DWC_Wcm_Connect kind:function(thumb,size=0x84) addr:0x021a771c
+DWC_Wcm_Start kind:function(thumb,size=0xb8) addr:0x021a77a0
 func_ov182_021a7858 kind:function(thumb,size=0x30c) addr:0x021a7858
 func_ov182_021a7b64 kind:function(thumb,size=0x68) addr:0x021a7b64
 func_ov182_021a7bcc kind:function(thumb,size=0x42) addr:0x021a7bcc
@@ -1571,9 +1571,9 @@ data_ov182_021c2960 kind:bss addr:0x021c2960
 data_ov182_021c2980 kind:bss addr:0x021c2980
 data_ov182_021c2989 kind:bss addr:0x021c2989 ambiguous
 data_ov182_021c2a40 kind:bss addr:0x021c2a40
-data_ov182_021c2aa0 kind:bss addr:0x021c2aa0
-data_ov182_021c2ac8 kind:bss addr:0x021c2ac8
-data_ov182_021c2ad0 kind:bss addr:0x021c2ad0
+sWcm kind:bss addr:0x021c2aa0
+sBssid kind:bss addr:0x021c2ac8
+sEssid kind:bss addr:0x021c2ad0
 data_ov182_021c2af0 kind:bss addr:0x021c2af0
 data_ov182_021c2b40 kind:bss addr:0x021c2b40
 data_ov182_021c2b70 kind:bss addr:0x021c2b70
