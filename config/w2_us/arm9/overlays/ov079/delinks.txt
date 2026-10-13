@@ -5,6 +5,7 @@
     .bss        start:0x021edaa0 end:0x021edaa0 kind:bss align:32
 
 src/ov079/c_gear_sw.c:
+    complete
     .text       start:0x021ea8a0 end:0x021ed830
     .rodata     start:0x021ed830 end:0x021eda74
     .data       start:0x021eda80 end:0x021edaa0

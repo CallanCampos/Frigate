@@ -726,7 +726,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `c_gear_sw.c` | `0x021ea860`–`0x021ed7f0` | 130 | partial | string at `0x021eda48` |
+| `c_gear_sw.c` | `0x021ea860`–`0x021ed7f0` | 130 | complete | string at `0x021eda48` |
 
 ### Overlay 80
 
