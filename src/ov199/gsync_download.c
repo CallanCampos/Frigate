@@ -38,10 +38,13 @@ static BOOL GSyncDownload_UpdateTimer(GSyncDownload *dl);
 static GSyncDownload *_pDLWork;
 
 static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
+    u32 result = error;
+
     switch (error) {
     case DWC_ND_ERROR_NONE:
         break;
     case DWC_ND_ERROR_HTTP:
+        result = error;
         break;
     case DWC_ND_ERROR_CANCELED:
         _pDLWork->cancelled = TRUE;
@@ -51,7 +54,7 @@ static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
         break;
     }
     _pDLWork->done = TRUE;
-    _pDLWork->error = error;
+    _pDLWork->error = result;
 }
 
 GSyncDownload *GSyncDownload_Create(HeapID heapId, u32 size) {

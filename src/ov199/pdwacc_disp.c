@@ -62,13 +62,13 @@ static void PdwAccDisp_LoadGraphics(PdwAccDisp *disp);
 static void PdwAccDisp_CyclePalette(TCB *task, void *work);
 static void PdwAccDisp_DeleteActors(PdwAccDisp *disp);
 
-static BGSysLCDConfig sPdwAccLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
-
 static BGSysVRAMConfig sPdwAccVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
 };
+
+static BGSysLCDConfig sPdwAccLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
 
 PdwAccDisp *PdwAccDisp_Create(HeapID heapId) {
     PdwAccDisp *disp = GFL_HeapAllocate(heapId, sizeof(PdwAccDisp), TRUE, "pdwacc_disp.c", 201);
