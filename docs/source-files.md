@@ -775,7 +775,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `weather_rain.c` | `0x021e90c0`–`0x021ea674` | 47 | partial | descriptive |
+| `weather_rain.c` | `0x021e90c0`–`0x021ea674` | 47 | complete | descriptive |
 
 ### Overlay 77
 

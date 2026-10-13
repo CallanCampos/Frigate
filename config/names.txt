@@ -3757,6 +3757,9 @@ overlays/ov076 0x021ea528 Lightning_SetupFlickers
 overlays/ov076 0x021ea580 Lightning_SetupBolt
 overlays/ov076 0x021ea5c0 Lightning_SetupForked
 overlays/ov076 0x021ea658 Lightning_GetShade
+overlays/ov076 0x021ea778 RAIN_WEATHER
+overlays/ov076 0x021ea7c4 THUNDERSTORM_WEATHER
+overlays/ov076 0x021ea810 GUSTY_RAIN_WEATHER
 overlays/ov077 0x021e90c0 Sandstorm_Init
 overlays/ov077 0x021e9124 Sandstorm_FadeIn
 overlays/ov077 0x021e9194 Sandstorm_InitNoFade
