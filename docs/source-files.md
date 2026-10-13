@@ -1904,7 +1904,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mus_comm_func.c` | `0x021ef1e0`–`0x021f0614` | 77 | partial | string at `0x021f06d0` |
+| `mus_comm_func.c` | `0x021ef1e0`–`0x021f0614` | 77 | complete | string at `0x021f06d0` |
 
 ### Overlay 213
 

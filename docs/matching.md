@@ -311,6 +311,11 @@ Same instructions, registers swapped.
   across a call, but a read through a pointer to its row is loaded again: `Guru2MainSeq_Bonus` reads the clamp's
   first Berry through `const u32 *range = sBonusItems[count];`. The tell is a function that matches when the table is
   made non-`const` although it sits in `.rodata`.
+- A copy's size computed by a call and held in a local before the `sys_memcpy` or `sys_memset` is scheduled
+  differently from the call written as the size argument: the musical's `MusComm_SendAllPokes`,
+  `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `func_ov211_021ef3e4` all matched with
+  `u32 size = ...GetSize();` first. In `MusComm_Main`, `requesters[count] = i; count++;` in place of
+  `requesters[count++] = i;` and `requests += chosen << 16;` as its own statement before the call were each needed.
 
 ## Stack slots
 
