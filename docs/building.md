@@ -24,9 +24,12 @@ The downloaded macOS wibo build is x86-64. Apple silicon requires Rosetta 2:
 softwareupdate --install-rosetta
 ```
 
-Homebrew's LLVM is not linked by default. Add its executables to your `PATH`:
+The build invokes GNU `sha1sum`, and Homebrew's LLVM is not linked by default. Install the tools and add them to your
+`PATH`:
 
 ```sh
+brew install coreutils ninja llvm xz
+export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
 export PATH="$(brew --prefix llvm)/bin:$PATH"
 ```
 
