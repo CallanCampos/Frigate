@@ -2298,8 +2298,8 @@ prints the tables below from the configs and the ROM:
 | `br_util.c` | `0x021f34a0`–`0x021f54d8` | 63 | partial | string at `0x021f7e20` |
 | `br_fade.c` | `0x021f54d8`–`0x021f5b68` | 17 | complete | string at `0x021f7eb0` |
 | `br_sidebar.c` | `0x021f5b68`–`0x021f6224` | 18 | complete | string at `0x021f7ebc` |
-| `br_net.c` | `0x021f6224`–`0x021f6a1c` | 37 | partial | string at `0x021f7ed4` |
-| `br_pokesearch.c` | `0x021f6a1c`–`0x021f70a0` | 17 | partial | string at `0x021f7f08` |
+| `br_net.c` | `0x021f6224`–`0x021f6a1c` | 37 | complete | string at `0x021f7ed4` |
+| `br_pokesearch.c` | `0x021f6a1c`–`0x021f70a0` | 17 | complete | string at `0x021f7f08` |
 
 ### Overlay 272
 
