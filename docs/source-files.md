@@ -1215,10 +1215,10 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `ui_scene.c` | `0x021998c0`–`0x02199aa0` | 9 | complete | string at `0x0219ce20` |
-| `touchbar.c` | `0x02199aa0`–`0x0219a2a4` | 41 | partial | string at `0x0219ce2c` |
+| `touchbar.c` | `0x02199aa0`–`0x0219a2a4` | 41 | complete | string at `0x0219ce2c` |
 | `print_msg.c` | `0x0219a2a4`–`0x0219a438` | 3 | complete | descriptive |
 | `msgsearch.c` | `0x0219a438`–`0x0219a584` | 4 | complete | string at `0x0219ce38` |
-| `yesno_menu.c` | `0x0219a584`–`0x0219af1c` | 8 | partial | string at `0x0219ce44` |
+| `yesno_menu.c` | `0x0219a584`–`0x0219af1c` | 8 | complete | string at `0x0219ce44` |
 | `frame_list.c` | `0x0219af1c`–`0x0219cd18` | 55 | partial | string at `0x0219ce54` |
 
 ### Overlay 140

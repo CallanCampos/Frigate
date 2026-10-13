@@ -328,6 +328,12 @@ Same instructions, registers swapped.
   per-case switch locals took their declared slots where `u8` ones sank to the bottom, and
   `StaActButton_InitSystem`'s "wrong register" was a wrong constant (`GX_WNDMASK_W0`, not `OW`): check the values
   before the registers.
+- `s8 -= u8` loads the right side with `ldrsb`, and `step *= -1` on an `s8` gives `mvns; muls`: the frame list's
+  `FrameListLayout.speed` is `u8[6]` (`HandleEvent`, `UpdateBar`), and `ScrollToTouched` and `StartFlick` negate
+  their `s8 step` by multiplying. `y -= rowHeight` and `list->cursor--` matched where `y = y - rowHeight` and
+  `cursor = cursor - 1` did not (`FrameList_Create`, `DrawAll`, `KeyEvent`), and the order of declaration
+  initializers places a spilled `= 0`: `TouchBar_Create` has `size`, then `bar = GFL_HeapAllocate(...)`, then
+  `sub = 0` as initializers.
 
 ## Stack slots
 

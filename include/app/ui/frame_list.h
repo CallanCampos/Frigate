@@ -52,7 +52,7 @@ typedef struct {
     u8 windowWidth;
     u8 windowHeight;
     u8 windowPalette;
-    s8 speed[6]; // pixels a step scrolls by, from the fastest
+    u8 speed[6]; // pixels a step scrolls by, from the fastest
     u8 palette; // of the cursor
     u8 barSize;
     u8 unk13;
