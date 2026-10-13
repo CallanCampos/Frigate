@@ -76,8 +76,8 @@ static void TrCardBmp_PrintSeenCount(TrainerCardWork *wk, BmpWin *win, int x, in
 static void TrCardBmp_PrintTimeNumber(TrainerCardWork *wk, BmpWin *win, int x, int margin, int y, StrBuf *tmp,
                                       u32 value, u8 digits, u32 pad, int a9, int a10, int color);
 static void TrCardBmp_PrintRight(TrainerCardWork *wk, BmpWin *win, int x, int margin, int y, StrBuf *strbuf);
-static void TrCardBmp_PrintPlayTime(TrainerCardWork *wk, BmpWin *win, int y, TrainerCardData *data, StrBuf *tmp,
-                                    int color);
+static void TrCardBmp_PrintPlayTime(TrainerCardWork *wk, BmpWin *win, int y, const TrainerCardData *data,
+                                    StrBuf *tmp, int color);
 
 // The text's colors: normally, and while the list is dragged
 static const u16 sTrCardBmpColors[] = { 0x0440, 0x1060 };
@@ -119,7 +119,7 @@ void TrCardBmp_Exit(TrainerCardWork *wk) {
 }
 
 // The front: the name, the Pokédex count, the union room appearance, the personality, the money and the greeting
-void TrCardBmp_DrawFront(TrainerCardWork *wk, BmpWin **win, TrainerCardData *data) {
+void TrCardBmp_DrawFront(TrainerCardWork *wk, BmpWin **win, const TrainerCardData *data) {
     u8 i;
     StrBuf *tmp;
 
@@ -473,8 +473,8 @@ static void TrCardBmp_PrintRight(TrainerCardWork *wk, BmpWin *win, int x, int ma
 }
 
 // The play time, which keeps running on the player's own card
-static void TrCardBmp_PrintPlayTime(TrainerCardWork *wk, BmpWin *win, int y, TrainerCardData *data, StrBuf *tmp,
-                                    int color) {
+static void TrCardBmp_PrintPlayTime(TrainerCardWork *wk, BmpWin *win, int y, const TrainerCardData *data,
+                                    StrBuf *tmp, int color) {
     int hours;
 
     if (data->playTime == NULL) {
