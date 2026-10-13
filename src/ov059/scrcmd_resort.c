@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/version.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/script_text_banks.h"
@@ -43,8 +44,10 @@ typedef struct {
     u16 *var;
 } ResortRecordsWork;
 
-static const u16 sUnk7db4[] = {
-    161, 171, 181, 191, 201, 211, 221, 231, 241, 251, 261, 271, 281, 291, 301, 311,
+// By version: Black 2's row, then White 2's
+static const u16 sUnk7db4[2][8] = {
+    { 161, 171, 181, 191, 201, 211, 221, 231 },
+    { 241, 251, 261, 271, 281, 291, 301, 311 },
 };
 
 static ResortPeople *func_ov059_021e7b98(Field *field);
@@ -702,14 +705,18 @@ BOOL func_ov059_021e6630(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
-    ResortPerson *person = ResortSys_GetScriptPerson(env, func_ov059_021e7b98(GSYS_GetField(gsys)));
+    Field *field = GSYS_GetField(gsys);
+    ResortPeople *people = func_ov059_021e7b98(field);
+    ResortPerson *person = ResortSys_GetScriptPerson(env, people);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u16 amount = ScriptReadAny(vm, env);
     u16 bit = ScriptReadAny(vm, env);
     u32 cost = amount * 10;
     GameRecords *records;
+    TrainerCardSave *card;
 
-    subCashFromTotal(getTrainerCardDataBlkAddress(gameData), cost);
+    card = getTrainerCardDataBlkAddress(gameData);
+    subCashFromTotal(card, cost);
     records = GameData_GetRecords(gameData);
     RecordAdd(records, 0x16, cost);
     RecordAddOne(records, 0x15);
@@ -1438,7 +1445,7 @@ BOOL func_ov059_021e74cc(VM *vm, FieldScriptEnv *env) {
         JoinAvenuePerson_SetParam(own, (u16)param + 64, value);
         break;
     case 16:
-        JoinAvenuePerson_SetParam(own, 19, sUnk7db4[value]);
+        JoinAvenuePerson_SetParam(own, 19, sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]);
         break;
     case 17:
         func_02039064(info, 5, value);

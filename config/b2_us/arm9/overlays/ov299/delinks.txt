@@ -9,6 +9,7 @@ src/ov299/zukanlist.c:
     .rodata     start:0x021a25c8 end:0x021a25d4
 
 src/ov299/zknlist_main.c:
+    complete
     .text       start:0x0219fc14 end:0x021a05dc
     .rodata     start:0x021a25d4 end:0x021a27a0
 

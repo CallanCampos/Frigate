@@ -103,9 +103,17 @@ static GameEventReturnCode func_ov012_02162ccc(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
+// The battle type of the work, which MWCC loads before the other arguments only when it goes through a variable of an
+// enum type
+typedef enum {
+    TRIAL_HOUSE_BATTLE_SINGLE,
+    TRIAL_HOUSE_BATTLE_DOUBLE,
+} TrialHouseBattleType;
+
 GameEvent *CallTrialHouseBattle(GameSystem *gsys, TrialHouseWork *work) {
     Field *field = GSYS_GetField(gsys);
-    BtlSetup *setup = SetupTrialHouseBattle(gsys, work->party, work->battleType, &work->trainer, NULL, work->capacity);
+    TrialHouseBattleType type = work->battleType;
+    BtlSetup *setup = SetupTrialHouseBattle(gsys, work->party, type, &work->trainer, NULL, work->capacity);
 
     return CreateTrialHouseBattleEvent(gsys, field, setup);
 }

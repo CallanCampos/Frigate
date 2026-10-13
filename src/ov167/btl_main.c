@@ -52,68 +52,15 @@
 #include "system/ringtone_sys.h"
 #include "text/system/ability_handlers_btl_main.h"
 
+// The name shown for a link opponent whose name is hidden: the other version's
+#ifdef BLACK2
+#define TEXT_HIDDEN_TRAINER_NAME AbilityHandlersBtlMain_Text_Kuro
+#else
+#define TEXT_HIDDEN_TRAINER_NAME AbilityHandlersBtlMain_Text_Shiro
+#endif
+
 // The first mon ID of each client
 static const u8 data_ov167_021d6c24[4] = { 0, 12, 6, 18 };
-
-static const u8 data_ov167_021d6c28[2][3] = {
-    { 3, 5, 0 },
-    { 2, 4, 0 },
-};
-
-static const u8 data_ov167_021d6c2e[2][3] = {
-    { 3, 5, 7 },
-    { 2, 4, 6 },
-};
-
-// The steps of setting up a link battle, after the first, for each battle style
-static BOOL (*const data_ov167_021d6c34[7])(BtlMainModule *mainModule, s32 *state) = {
-    NULL,
-    func_ov167_0219ada0,
-    func_ov167_0219af50,
-    func_ov167_0219b160,
-    func_ov167_0219b3a8,
-    func_ov167_0219b610,
-    func_ov167_0219bb54,
-};
-
-static BOOL (*const data_ov167_021d6c50[7])(BtlMainModule *mainModule, s32 *state) = {
-    NULL,
-    func_ov167_0219ada0,
-    func_ov167_0219af50,
-    func_ov167_0219b160,
-    func_ov167_0219b3a8,
-    func_ov167_0219b4ac,
-    func_ov167_0219bb54,
-};
-
-static BOOL (*const data_ov167_021d6c6c[7])(BtlMainModule *mainModule, s32 *state) = {
-    NULL,
-    func_ov167_0219ada0,
-    func_ov167_0219af50,
-    func_ov167_0219b160,
-    func_ov167_0219b3a8,
-    func_ov167_0219b9d4,
-    func_ov167_0219bb54,
-};
-
-static BOOL (*const data_ov167_021d6c88[7])(BtlMainModule *mainModule, s32 *state) = {
-    NULL,
-    func_ov167_0219ada0,
-    func_ov167_0219af50,
-    func_ov167_0219b160,
-    func_ov167_0219b3a8,
-    func_ov167_0219b868,
-    func_ov167_0219bb54,
-};
-
-static const AdjacentOpponentData data_ov167_021d6ca4[BTL_POS_MAX] = {
-    { 2, 2, { 5, 3, 6 }, { 0, 2, 6 } },
-    { 2, 2, { 4, 2, 6 }, { 1, 3, 6 } },
-    { 3, 3, { 1, 3, 5 }, { 0, 2, 4 } },
-    { 3, 3, { 0, 2, 4 }, { 1, 3, 5 } },
-    { 2, 2, { 1, 3, 6 }, { 4, 2, 6 } },
-    { 2, 2, { 0, 2, 6 }, { 5, 3, 6 } },
-};
 
 // The battle system's proc
 const GameProcFunctions data_ov167_021d6ce0 = { func_ov167_021998c0, func_ov167_02199c08, func_ov167_02199cd4 };
@@ -136,10 +83,11 @@ static inline BOOL BtlMainSeq_Run(BtlMainSeq *seq) {
         return FALSE;
     }
     if (seq->nextFunc != NULL) {
-        if (!seq->nextFunc(&seq->state, seq->mainModule)) {
+        if (seq->nextFunc(&seq->state, seq->mainModule)) {
+            seq->nextFunc = NULL;
+        } else {
             return FALSE;
         }
-        seq->nextFunc = NULL;
     }
     return TRUE;
 }
@@ -149,6 +97,7 @@ BOOL func_ov167_021998c0(GameProc *proc, u32 *state, void *param, void *work) {
     BtlSetup *setup = param;
     BOOL notInitialized;
     BOOL isSet;
+    BOOL flag;
 
     switch (*state) {
     case 0:
@@ -209,8 +158,9 @@ BOOL func_ov167_021998c0(GameProc *proc, u32 *state, void *param, void *work) {
             }
         }
         func_ov167_021bda58(&mainModule->unk448);
+        flag = func_02008a68(setup->config);
         isSet = FALSE;
-        if (func_02008a68(setup->config)) {
+        if (flag) {
             isSet = TRUE;
         }
         mainModule->unk46F = isSet;
@@ -297,6 +247,7 @@ BOOL func_ov167_02199ca0(BtlMainModule *mainModule) {
 
 BOOL func_ov167_02199cd4(GameProc *proc, u32 *state, void *param, void *work) {
     BtlMainModule *mainModule = work;
+    s32 brightness;
 
     switch (*state) {
     case 0:
@@ -319,10 +270,12 @@ BOOL func_ov167_02199cd4(GameProc *proc, u32 *state, void *param, void *work) {
     case 1:
         if (mainModule->unk460 > -16) {
             mainModule->unk460--;
-            if (gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR) > mainModule->unk460) {
+            brightness = gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR);
+            if (brightness > mainModule->unk460) {
                 GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, mainModule->unk460);
             }
-            if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) > mainModule->unk460) {
+            brightness = gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR);
+            if (brightness > mainModule->unk460) {
                 GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, mainModule->unk460);
             }
             break;
@@ -335,8 +288,10 @@ BOOL func_ov167_02199cd4(GameProc *proc, u32 *state, void *param, void *work) {
                 break;
             }
             func_02005d8c();
+            (*state)++;
+        } else {
+            (*state)++;
         }
-        (*state)++;
         break;
     case 3:
         if (mainModule->field != NULL) {
@@ -815,6 +770,17 @@ BOOL func_ov167_0219a9cc(u32 *state, BtlMainModule *mainModule) {
 }
 
 BOOL func_ov167_0219ab44(u32 *state, BtlMainModule *mainModule) {
+    // The steps of setting up the link battle, after the first
+    static BOOL (*const data_ov167_021d6c50[7])(BtlMainModule *mainModule, s32 *state) = {
+        NULL,
+        func_ov167_0219ada0,
+        func_ov167_0219af50,
+        func_ov167_0219b160,
+        func_ov167_0219b3a8,
+        func_ov167_0219b4ac,
+        func_ov167_0219bb54,
+    };
+
     if (*state == 0) {
         mainModule->clientCount = 2;
         mainModule->posClientIds[0] = 0;
@@ -835,6 +801,17 @@ BOOL func_ov167_0219ab44(u32 *state, BtlMainModule *mainModule) {
 }
 
 BOOL func_ov167_0219abbc(u32 *state, BtlMainModule *mainModule) {
+    // The steps of setting up the link battle, after the first
+    static BOOL (*const data_ov167_021d6c34[7])(BtlMainModule *mainModule, s32 *state) = {
+        NULL,
+        func_ov167_0219ada0,
+        func_ov167_0219af50,
+        func_ov167_0219b160,
+        func_ov167_0219b3a8,
+        func_ov167_0219b610,
+        func_ov167_0219bb54,
+    };
+
     if (*state == 0) {
         switch (mainModule->setup->fieldSituation.unk1a) {
         case 0:
@@ -871,6 +848,17 @@ BOOL func_ov167_0219abbc(u32 *state, BtlMainModule *mainModule) {
 }
 
 BOOL func_ov167_0219ac80(u32 *state, BtlMainModule *mainModule) {
+    // The steps of setting up the link battle, after the first
+    static BOOL (*const data_ov167_021d6c6c[7])(BtlMainModule *mainModule, s32 *state) = {
+        NULL,
+        func_ov167_0219ada0,
+        func_ov167_0219af50,
+        func_ov167_0219b160,
+        func_ov167_0219b3a8,
+        func_ov167_0219b9d4,
+        func_ov167_0219bb54,
+    };
+
     if (*state == 0) {
         mainModule->clientCount = 2;
         mainModule->posClientIds[0] = 0;
@@ -895,6 +883,17 @@ BOOL func_ov167_0219ac80(u32 *state, BtlMainModule *mainModule) {
 }
 
 BOOL func_ov167_0219ad10(u32 *state, BtlMainModule *mainModule) {
+    // The steps of setting up the link battle, after the first
+    static BOOL (*const data_ov167_021d6c88[7])(BtlMainModule *mainModule, s32 *state) = {
+        NULL,
+        func_ov167_0219ada0,
+        func_ov167_0219af50,
+        func_ov167_0219b160,
+        func_ov167_0219b3a8,
+        func_ov167_0219b868,
+        func_ov167_0219bb54,
+    };
+
     if (*state == 0) {
         mainModule->clientCount = 2;
         mainModule->posClientIds[0] = 0;
@@ -1085,7 +1084,7 @@ BOOL func_ov167_0219b160(BtlMainModule *mainModule, s32 *state) {
     MsgData *msgData;
     StrBuf *strBuf;
     const u16 *str;
-    u32 j;
+    s32 j;
     u16 name[16];
     u8 index;
 
@@ -1117,10 +1116,10 @@ BOOL func_ov167_0219b160(BtlMainModule *mainModule, s32 *state) {
                     if (i != mainModule->playerClientId && setup->unkDD_2) {
                         j = 0;
                         msgData = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, mainModule->heapId);
-                        strBuf = GFL_MsgDataLoadStrbufNew(msgData, AbilityHandlersBtlMain_Text_Kuro);
+                        strBuf = GFL_MsgDataLoadStrbufNew(msgData, TEXT_HIDDEN_TRAINER_NAME);
                         GFL_MsgDataFree(msgData);
                         str = GFL_StrBufGetStringPtr(strBuf);
-                        for (; j < 15 && j < GFL_StrBufGetCharCount(strBuf); j++) {
+                        for (; j < 15 && j < (u32)GFL_StrBufGetCharCount(strBuf); j++) {
                             name[j] = str[j];
                         }
                         name[j] = GFL_StrBufGetTerminator();
@@ -1128,8 +1127,9 @@ BOOL func_ov167_0219b160(BtlMainModule *mainModule, s32 *state) {
                         copyTrainerName(mainModule->trainers[i].playerInfo, name);
                         GFL_StrBufFree(mainModule->trainers[i].name);
                         msgData = GFL_MsgSysLoadData(0, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, mainModule->heapId);
-                        mainModule->trainers[i].name = GFL_MsgDataLoadStrbufNew(msgData, AbilityHandlersBtlMain_Text_Kuro);
+                        strBuf = GFL_MsgDataLoadStrbufNew(msgData, TEXT_HIDDEN_TRAINER_NAME);
                         GFL_MsgDataFree(msgData);
+                        mainModule->trainers[i].name = strBuf;
                     }
                     func_ov167_0219dfa8(mainModule, i, mainModule->trainers[i].playerInfo);
                 }
@@ -2092,6 +2092,16 @@ void func_ov167_0219c694(BtlMainModule *mainModule, u8 pos, u8 *clientId, u8 *in
 }
 
 u8 func_ov167_0219c6dc(BtlMainModule *mainModule, u8 pos) {
+    static const u8 data_ov167_021d6c28[2][3] = {
+        { 3, 5, 0 },
+        { 2, 4, 0 },
+    };
+
+    static const u8 data_ov167_021d6c2e[2][3] = {
+        { 3, 5, 7 },
+        { 2, 4, 6 },
+    };
+
     u32 sameSide = TRUE;
     u8 side;
     u32 battleStyle;
@@ -2465,41 +2475,41 @@ void func_ov167_0219cd3c(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u8 clie
     u32 count;
     u8 monId;
     s32 i;
-    u8 firstMonId;
     s32 eligible;
     BattleMon *mon;
     PokeParty *party;
     u8 partyCount;
     u8 k;
     u16 species;
+    PartyPkm *pkm;
+    u8 firstMonId;
 
     srcParty = func_ov167_0219da94(mainModule, clientId, pokeCon->unkE4);
     battleParty = &pokeCon->parties[clientId];
     count = PokeParty_GetPkmCount(srcParty);
     firstMonId = data_ov167_021d6c24[clientId];
     pokeCon->srcParties[clientId] = srcParty;
-    monId = firstMonId;
-    for (i = 0; i < count; i++) {
-        pokeCon->mons[monId] = BattleMon_Create(PokeParty_GetPkm(srcParty, i), monId, HEAPID_BATTLE);
+    for (monId = firstMonId, i = 0; i < count; i++) {
+        pkm = PokeParty_GetPkm(srcParty, i);
+        pokeCon->mons[monId] = BattleMon_Create(pkm, monId, HEAPID_BATTLE);
         AddBattleMonToParty(battleParty, pokeCon->mons[monId]);
         monId++;
     }
     eligible = GetPartyPkmnEligibleForBattle(srcParty);
     if (eligible > 0) {
-        monId = firstMonId;
-        for (i = 0; i < eligible; i++) {
+        for (monId = firstMonId, i = 0; i < eligible; monId++) {
             if (GetBattleMonStat(pokeCon->mons[monId], 0x11) == ABILITY_ILLUSION) {
                 SetIllusionDisguise(pokeCon->mons[monId], PokeParty_GetPkm(srcParty, eligible));
             }
-            monId++;
+            i++;
         }
     }
     if (BtlSetup_GetBattleType(mainModule) == 0 && clientId == 1) {
-        for (i = 0; i < count; i++) {
+        for (i = 0; i < count; firstMonId++) {
             mon = pokeCon->mons[firstMonId];
             if (GetBattleMonSpecies(mon) == SPECIES_ZOROARK && GetBattleMonStat(mon, 0x11) == ABILITY_ILLUSION) {
-                species = 0;
                 party = func_ov167_0219da94(mainModule, 0, pokeCon->unkE4);
+                species = 0;
                 partyCount = PokeParty_GetPkmCount(party);
                 for (k = 0; k < partyCount; k++) {
                     u16 partySpecies = PokeParty_GetParam(PokeParty_GetPkm(party, k), PKM_PARAM_SPECIES, NULL);
@@ -2525,7 +2535,7 @@ void func_ov167_0219cd3c(BtlPokeCon *pokeCon, BtlMainModule *mainModule, u8 clie
                     SetIllusionDisguise(mon, mainModule->unk2C0);
                 }
             }
-            firstMonId++;
+            i++;
         }
     }
     func_ov167_0219d454(battleParty);
@@ -2721,6 +2731,15 @@ u8 func_ov167_0219d29c(BtlMainModule *mainModule, u8 clientId) {
 }
 
 const AdjacentOpponentData *func_ov167_0219d2bc(u8 pos) {
+    static const AdjacentOpponentData data_ov167_021d6ca4[BTL_POS_MAX] = {
+        { 2, 2, { 5, 3, 6 }, { 0, 2, 6 } },
+        { 2, 2, { 4, 2, 6 }, { 1, 3, 6 } },
+        { 3, 3, { 1, 3, 5 }, { 0, 2, 4 } },
+        { 3, 3, { 0, 2, 4 }, { 1, 3, 5 } },
+        { 2, 2, { 1, 3, 6 }, { 4, 2, 6 } },
+        { 2, 2, { 0, 2, 6 }, { 5, 3, 6 } },
+    };
+
     return &data_ov167_021d6ca4[pos];
 }
 
@@ -3328,7 +3347,8 @@ void func_ov167_0219dc10(BtlMainModule *mainModule) {
     u16 item;
     u8 clientId;
     u32 j;
-    u32 index;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long index;
     u32 k;
     BattleParty *battleParty;
     u32 monCount;

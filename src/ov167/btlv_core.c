@@ -156,7 +156,21 @@ typedef struct BtlvTwoStringWork {
     u32 unk08;
 } BtlvTwoStringWork;
 
-extern const BtlvCmdEntry data_ov167_021da8c4[2];
+// The display commands that run a procedure of their own
+const BtlvCmdEntry data_ov167_021da8c4[2] = {
+    { 0, func_ov167_021ce940 },
+    { 1, func_ov167_021cea24 },
+};
+
+const BGSysLCDConfig data_ov167_021da8d4 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D };
+
+const ClActSysSetup data_ov167_021da8e4 = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 56, 48, 48, 48, 16, 16 };
+
+const BGSysVRAMConfig data_ov167_021da900 = {
+    GX_VRAM_BG_128_D,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
+    GX_VRAM_OBJ_64_E,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_01_FG,   GX_OBJVRAMMODE_CHAR_1D_64K, GX_OBJVRAMMODE_CHAR_1D_32K,
+};
 
 static inline void BtlvCore_SetSubProc(BtlvCore *core, BtlvSubProcFn main) {
     core->subProc.init = NULL;
@@ -812,27 +826,6 @@ void BattleClientCmd_StartMoveInfoView(BtlvCore *core, u8 partyIndex, u8 slot) {
     core->subSeq = 0;
 }
 
-static inline u8 BtlvCore_GetBagKind(BtlvCore *core, u8 canUseItems, u8 arg5) {
-    if (!canUseItems) {
-        return 3;
-    }
-    if (BtlSetup_IsBattleType(core->mainModule, 0x40)) {
-        return 1;
-    }
-    if (BtlSetup_GetBattleType(core->mainModule) == 0) {
-        if (func_ov167_0219d3f8(core->pokeCon, 1) > 1) {
-            return 2;
-        }
-        if (arg5) {
-            return 4;
-        }
-    }
-    if (BtlSetup_IsBattleType(core->mainModule, 0x10000)) {
-        return 5;
-    }
-    return 0;
-}
-
 void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3, u8 canUseItems, u8 arg5) {
     u32 kind;
     BattleParty *party;
@@ -862,8 +855,32 @@ void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3,
             kind = 1;
         }
         core->ov286.isWild = kind;
+        kind = 0;
         core->ov286.done = FALSE;
-        core->ov286.ballError = BtlvCore_GetBagKind(core, canUseItems, arg5);
+        if (!canUseItems) {
+            kind = 3;
+        } else if (BtlSetup_IsBattleType(core->mainModule, 0x40)) {
+            kind = 1;
+        } else {
+            switch (BtlSetup_GetBattleType(core->mainModule)) {
+            case 0:
+                if (func_ov167_0219d3f8(core->pokeCon, 1) > 1) {
+                    kind = 2;
+                    break;
+                }
+                if (arg5) {
+                    kind = 4;
+                    break;
+                }
+                // fallthrough
+            default:
+                if (BtlSetup_IsBattleType(core->mainModule, 0x10000)) {
+                    kind = 5;
+                }
+                break;
+            }
+        }
+        core->ov286.ballError = kind;
         func_ov167_021cf234(core, &core->ov287, 3, 0, 0);
         party = BattleClient_GetParty(core->client);
         count = GetNumMonsInParty(party);

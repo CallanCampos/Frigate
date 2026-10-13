@@ -222,7 +222,7 @@ void EventPokewood_CreateCastParty(PlayerInfo *playerInfo, PokeParty *dest, Heap
     PokeParty *party;
     PokewoodCastFile *file;
     s32 first;
-    s32 count;
+    s16 count;
 
     trainerId = getIDAsUInt(playerInfo);
     gender = getTrainerGender(playerInfo);

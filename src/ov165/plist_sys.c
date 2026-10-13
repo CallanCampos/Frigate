@@ -383,12 +383,11 @@ BOOL PokeList_Main(PokeListWork *wk) {
 
 // Blends the plates' palettes toward white while a plate flashes, and makes the cursor's plate glow
 static void PokeList_UpdateGlow(PokeListWork *wk) {
-    u8 i;
-    u8 j;
-
     sys_memcpy16(wk->baseColors, wk->colors, sizeof(wk->colors));
     if (wk->flashTimer != 0) {
         u8 level;
+        u8 i;
+        u8 j;
 
         wk->flashTimer--;
         level = wk->flashTimer;
@@ -415,6 +414,8 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
         u16 glowColors[3] = { 0x7ff4, 0x7fff, 0x7be9 };
         u16 baseColors[3] = { 0x4a0a, 0x5ef7, 0x4140 };
         fx32 ratio;
+        u8 i;
+        u8 j;
 
         if (wk->glowPaused == FALSE) {
             if (wk->glowAngle + 0x400 >= 0x10000) {

@@ -13,11 +13,11 @@ typedef struct {
 } LocalTvtRival;
 
 static LocalTvtRival *LocalTvtRival_Create(GameData *gameData, HeapID heapId);
-static void LocalTvtRival_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtRival_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtRival_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtRival_Extra(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtRival_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+static void LocalTvtRival_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtRival_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtRival_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtRival_Extra(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtRival_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 
 void LocalTvtRival_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId) {
     sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
@@ -43,11 +43,11 @@ static LocalTvtRival *LocalTvtRival_Create(GameData *gameData, HeapID heapId) {
     return rival;
 }
 
-static void LocalTvtRival_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static void LocalTvtRival_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     GFL_HeapFree(work);
 }
 
-static BOOL LocalTvtRival_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtRival_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtRival *rival = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -70,7 +70,7 @@ static BOOL LocalTvtRival_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *set
     return FALSE;
 }
 
-static BOOL LocalTvtRival_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtRival_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtRival *rival = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -93,7 +93,7 @@ static BOOL LocalTvtRival_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setu
     return FALSE;
 }
 
-static BOOL LocalTvtRival_Extra(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtRival_Extra(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtRival *rival = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -116,7 +116,7 @@ static BOOL LocalTvtRival_Extra(LocalTvtPerson *person, LocalTvtPersonSetup *set
     return FALSE;
 }
 
-static BOOL LocalTvtRival_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtRival_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtRival *rival = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 

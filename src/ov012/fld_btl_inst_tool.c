@@ -313,8 +313,10 @@ u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pi
     personality = pid;
     if (personality == 0) {
         personality = PML_GenPID(id, data.species, data.form, 2, 2, 0);
+        pkm->personality = personality;
+    } else {
+        pkm->personality = personality;
     }
-    pkm->personality = personality;
     pkm->nature = data.nature;
     pkm->ivs.stat.hp = iv;
     pkm->ivs.stat.attack = iv;
@@ -342,13 +344,13 @@ u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pi
     ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1b);
     if (ability != 0) {
         if (pkm->personality & 1) {
+            pkm->ability = ability;
         } else {
-            ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
+            pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
         }
     } else {
-        ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
+        pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
     }
-    pkm->ability = ability;
     pkm->happiness = happiness;
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, heapId);
     GFL_MsgDataLoadRawStr(msgData, pkm->species, pkm->nickname, NELEMS(pkm->nickname));

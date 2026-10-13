@@ -34,6 +34,7 @@ src/ov214/worldtrade_enter.c:
     .data       start:0x021e2d5c end:0x021e2d88
 
 src/ov214/worldtrade_input.c:
+    complete
     .text       start:0x021d80b4 end:0x021daef8
     .rodata     start:0x021e214c end:0x021e23f8
     .data       start:0x021e2d88 end:0x021e2e50

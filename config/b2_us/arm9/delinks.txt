@@ -698,6 +698,7 @@ src/system/time_icon.c:
     .data       start:0x0209a814 end:0x0209a820
 
 src/system/unity_tower_register.c:
+    complete
     .text       start:0x02035350 end:0x020355b8
 
 src/system/shooter_item.c:
@@ -1277,6 +1278,7 @@ src/system/hall_of_fame_savedata.c:
     .text       start:0x0200f3b8 end:0x0200f6e4
 
 src/system/misc_savedata.c:
+    complete
     .text       start:0x0200f6e4 end:0x0200f8f4
     .rodata     start:0x0208f984 end:0x0208f9b0
 

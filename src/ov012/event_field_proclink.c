@@ -875,19 +875,22 @@ void *func_ov012_0215c160(FieldAppCallWork *work, s32 appParam, s32 prevAppId, v
     BagProcessData *bag;
     PokeParty *party;
     void *param;
+    u32 slot;
+    u32 item;
 
     GFL_OvlLoad(OVERLAY_ID(215));
     if (prevAppId == FIELD_APP_POKELIST) {
         partyParam = prevParam;
         party = GameData_GetParty(gameData);
-        work->partySlot = partyParam->index;
-        work->item = partyParam->item;
+        slot = partyParam->index;
+        work->partySlot = slot;
+        item = partyParam->item;
+        work->item = item;
         if (partyParam->result == 6) {
-            return MailTool_CreateWriteParam(gameData, 2, partyParam->index, PML_ItemGetMailID(partyParam->item),
-                                       HEAPID_GAMEEVENT);
+            return MailTool_CreateWriteParam(gameData, 2, partyParam->index, PML_ItemGetMailID(item), HEAPID_GAMEEVENT);
         }
         work->subMode = 1;
-        return MailTool_CreatePokemonViewParam(gameData, PokeParty_GetPkm(party, partyParam->index), HEAPID_GAMEEVENT);
+        return MailTool_CreatePokemonViewParam(gameData, PokeParty_GetPkm(party, slot), HEAPID_GAMEEVENT);
     }
     bag = prevParam;
     if (bag->mode == 2) {

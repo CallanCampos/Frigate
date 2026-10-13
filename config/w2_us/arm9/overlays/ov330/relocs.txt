@@ -61,7 +61,7 @@ from:0x0219d1b8 kind:thumb_call to:0x02017364 module:main
 from:0x0219d1c0 kind:thumb_call to:0x0201d64c module:main
 from:0x0219d1c8 kind:thumb_call to:0x02007794 module:main
 from:0x0219d1e4 kind:overlay_id to:297
-from:0x0219d1e8 kind:load to:0x021f4e78 module:overlays(127,297)
+from:0x0219d1e8 kind:load to:0x021f4e78 module:overlay(297)
 from:0x0219d1ec kind:overlay_id to:280
 from:0x0219d1f0 kind:load to:0x021dd980 module:overlays(36,167,280)
 from:0x0219d1f4 kind:load to:0x0219cef1 module:overlay(330)

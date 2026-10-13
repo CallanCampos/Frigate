@@ -291,6 +291,7 @@ BOOL GdsRap_Main(GdsRapWork *gdsrap) {
 // calls; if the check could not be made, this gives TRUE in checkError as well
 static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
     BOOL result = FALSE;
+    BOOL searchResult = FALSE;
 
     *checkError = FALSE;
     switch (gdsrap->sendReq) {
@@ -428,18 +429,20 @@ static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
     case POKE_NET_GDS_REQCODE_BATTLEDATA_SEARCH:
         switch (gdsrap->searchType) {
         case POKE_NET_GDS_BATTLEDATA_SEARCHTYPE_CONDITION:
-            result = POKE_NET_GDS_BattleDataSearchCondition(&gdsrap->send.condition, gdsrap->response);
+            searchResult = POKE_NET_GDS_BattleDataSearchCondition(&gdsrap->send.condition, gdsrap->response);
             break;
         case POKE_NET_GDS_BATTLEDATA_SEARCHTYPE_LIST1:
-            result = POKE_NET_GDS_BattleDataSearchList1(BATTLE_REC_VERSION, gdsrap->response);
+            searchResult = POKE_NET_GDS_BattleDataSearchList1(BATTLE_REC_VERSION, gdsrap->response);
             break;
         case POKE_NET_GDS_BATTLEDATA_SEARCHTYPE_LIST2:
-            result = POKE_NET_GDS_BattleDataSearchList2(BATTLE_REC_VERSION, gdsrap->response);
+            searchResult = POKE_NET_GDS_BattleDataSearchList2(BATTLE_REC_VERSION, gdsrap->response);
             break;
         case POKE_NET_GDS_BATTLEDATA_SEARCHTYPE_LIST3:
-            result = POKE_NET_GDS_BattleDataSearchList3(BATTLE_REC_VERSION, gdsrap->response);
+            searchResult = POKE_NET_GDS_BattleDataSearchList3(BATTLE_REC_VERSION, gdsrap->response);
             break;
         }
+        // The search has a result of its own: with one variable, the stores are shared differently
+        result = searchResult;
         break;
     case POKE_NET_GDS_REQCODE_BATTLEDATA_GET:
         result = POKE_NET_GDS_BattleDataGet(gdsrap->dataNumber, BATTLE_REC_VERSION, gdsrap->response);

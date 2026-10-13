@@ -140,6 +140,7 @@ void EncEffGrid_Draw(EncEffGrid *grid) {
         for (i = 0; i < count; i++) {
             EncEffCell *cell = &grid->cells[i];
             s32 column, row;
+            fx32 s1, t1;
 
             G3_PushMtx();
             column = i % grid->columns;
@@ -147,6 +148,8 @@ void EncEffGrid_Draw(EncEffGrid *grid) {
             trans = cell->pos;
             s = column * width * FX32_ONE;
             t = row * height * FX32_ONE;
+            s1 = s + width * FX32_ONE;
+            t1 = t + height * FX32_ONE;
             G3_Translate(trans.x, trans.y, trans.z);
             G3_Scale(scale.x, scale.y, scale.z);
             MAT3_RotationY(&rot, FX_SinIdx(cell->offset), FX_CosIdx(cell->offset));
@@ -157,11 +160,11 @@ void EncEffGrid_Draw(EncEffGrid *grid) {
             G3_Normal(0, 0, FX16_ONE);
             G3_TexCoord(s, t);
             G3_Vtx(-FX16_CONST(4), FX16_CONST(4), 0);
-            G3_TexCoord(s, t + height * FX32_ONE);
+            G3_TexCoord(s, t1);
             G3_Vtx(-FX16_CONST(4), -FX16_CONST(4), 0);
-            G3_TexCoord(s + width * FX32_ONE, t + height * FX32_ONE);
+            G3_TexCoord(s1, t1);
             G3_Vtx(FX16_CONST(4), -FX16_CONST(4), 0);
-            G3_TexCoord(s + width * FX32_ONE, t);
+            G3_TexCoord(s1, t);
             G3_Vtx(FX16_CONST(4), FX16_CONST(4), 0);
             G3_End();
             G3_PopMtx(1);

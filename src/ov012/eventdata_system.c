@@ -435,15 +435,13 @@ void *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
 
 s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *position, u16 direction) {
     ZoneBGEntity *entity;
-    u16 alternateDirection;
-    u16 count;
+    u32 count;
     u16 i;
     u16 flag;
 
     entity = data->entities;
     if (entity != NULL) {
         count = data->entityCount;
-        alternateDirection = direction - 2;
         for (i = 0; i < count; i++, entity++) {
             if (entity->condition >= 3) {
                 continue;
@@ -486,7 +484,7 @@ s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *pos
             case 4:
                 return entity->scrId;
             case 5:
-                if (alternateDirection <= 1) {
+                if (direction == 2 || direction == 3) {
                         return entity->scrId;
                     }
                 break;
@@ -726,16 +724,18 @@ BOOL CheckWarpPositionMatch(const ZoneWarp *warp, const VecFx32 *position) {
 void GetRailWarpOutPos(ZoneWarp *warp, u32 direction, RailPosition *position) {
     ZoneWarpRailPosition *rail = &warp->pos.rail;
     u32 warpDirection = ZoneWarp_GetDirection(warp);
+    u16 param;
 
     position->componentId = rail->componentId;
     position->componentIsLine = 1;
     position->railDirection = ConvDirToRailDir(warpDirection);
     position->posSide = rail->posSide;
+    param = rail->param;
     position->posFront = rail->posFront;
     if (rail->sideSpan > 1) {
-        position->posSide += (s16)CalcWarpTransferAddend(direction, warpDirection, 1, rail->param, rail->sideSpan);
+        position->posSide += (s16)CalcWarpTransferAddend(direction, warpDirection, 1, param, rail->sideSpan);
     } else if (rail->frontSpan > 1) {
-        position->posFront += CalcWarpTransferAddend(direction, warpDirection, 1, rail->param, rail->frontSpan);
+        position->posFront += CalcWarpTransferAddend(direction, warpDirection, 1, param, rail->frontSpan);
     }
 }
 

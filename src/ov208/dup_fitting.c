@@ -977,6 +977,13 @@ static void DupFitting_UpdateDress(DupFittingWork *work) {
     }
 }
 
+// The ring angles up to which a prop is full size, shrinks, and shrinks to nothing
+static const u16 DUP_FITTING_SCALE_ANGLES[3] = { 0x4000, 0x6e00, 0x78e0 };
+// The smallest turn of a drag that moves the ring, and the speed under which a spin stops
+static const u16 DUP_FITTING_SPIN_THRESHOLDS[2] = { 227, 128 };
+// The tilt change per frame while dragging; the original's table has a second, unused entry
+static const u16 DUP_FITTING_DRAG_TILT_STEPS[2] = { 0x100, 0 };
+
 static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 angle, s16 delta, u16 radiusX,
                                                      u16 radiusY) {
     s32 i = 0;
@@ -1057,18 +1064,18 @@ static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 a
         MusItemDraw_SetPosition(work->itemSys, draw, &vec);
         MusItemDraw_SetRotation(work->itemSys, draw, tilt);
         DupFittingItemNode_SetPos(node, &pt);
-        if (a < 0x4000) {
+        if (a < DUP_FITTING_SCALE_ANGLES[0]) {
             scale = FX32_ONE;
             MusItemDraw_SetSize(work->itemSys, draw, FX32_ONE, FX32_ONE);
             MusItemDraw_SetVisible(work->itemSys, draw, TRUE);
             DupFittingItemNode_SetScale(node, FX32_ONE);
-        } else if (a < 0x6e00) {
-            scale = ((u16)(0x6e00 - a) << 11) / 0x2e00 + 0x800;
+        } else if (a < DUP_FITTING_SCALE_ANGLES[1]) {
+            scale = ((u16)(DUP_FITTING_SCALE_ANGLES[1] - a) << 11) / 0x2e00 + 0x800;
             MusItemDraw_SetSize(work->itemSys, draw, scale, scale);
             MusItemDraw_SetVisible(work->itemSys, draw, TRUE);
             DupFittingItemNode_SetScale(node, scale);
-        } else if (a < 0x78e0) {
-            scale = ((u16)(0x78e0 - a) << 11) / 0xae0;
+        } else if (a < DUP_FITTING_SCALE_ANGLES[2]) {
+            scale = ((u16)(DUP_FITTING_SCALE_ANGLES[2] - a) << 11) / 0xae0;
             MusItemDraw_SetSize(work->itemSys, draw, scale, scale);
             MusItemDraw_SetVisible(work->itemSys, draw, TRUE);
             DupFittingItemNode_SetScale(node, scale);
@@ -1199,7 +1206,7 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
         }
         work->angle = angle;
         DupFitting_UpdateCarousel(work, work->angle, work->angleSpeed, 72, 48);
-        if (work->angleSpeed > 128 || work->angleSpeed < -128) {
+        if (work->angleSpeed > DUP_FITTING_SPIN_THRESHOLDS[1] || work->angleSpeed < -DUP_FITTING_SPIN_THRESHOLDS[1]) {
             work->angleSpeed *= 0.75f;
         } else {
             work->angleSpeed = 0;
@@ -1244,7 +1251,7 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
         }
     }
     if (work->dragging == TRUE) {
-        if (MATH_ABS(delta) > 227 && MATH_ABS(delta) < 0x4000) {
+        if (MATH_ABS(delta) > DUP_FITTING_SPIN_THRESHOLDS[0] && MATH_ABS(delta) < 0x4000) {
             s32 angle = work->angle + 0x10000 - delta;
 
             if (angle < 0) {
@@ -1266,11 +1273,11 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
                 work->tilt = 0;
             } else if (work->angleSpeed > 0 && work->tilt > -0x3000) {
                 if (work->angleSpeed * 15 > work->tilt * -10) {
-                    work->tilt -= 0x100;
+                    work->tilt -= DUP_FITTING_DRAG_TILT_STEPS[0];
                 }
             } else if (work->angleSpeed < 0 && work->tilt < 0x3000) {
                 if (work->angleSpeed * -15 > work->tilt * 10) {
-                    work->tilt += 0x100;
+                    work->tilt += DUP_FITTING_DRAG_TILT_STEPS[0];
                 }
             }
         } else {
@@ -1718,10 +1725,12 @@ static s32 DupFitting_FindNearestEquipPos(DupFittingWork *work, MusItemDraw *dra
         }
         equip = MusPokeDraw_GetEquipPos(work->poke, i);
         if (equip->valid == TRUE && canEquip == TRUE) {
-            s32 x = FX_FX32_TO_F32(equip->info.pos.x + equip->info.offset.x);
-            s32 y = FX_FX32_TO_F32(equip->info.pos.y + equip->info.offset.y);
+            // The position's screen coordinates (+128, +96), relative to the touch origin the callers subtract
+            // (128, 112). The folded +0 is the original's `adds r0, r0, #0`
+            s32 x = (s32)FX_FX32_TO_F32(equip->info.pos.x + equip->info.offset.x) + 128 - 128;
+            s32 y = (s32)FX_FX32_TO_F32(equip->info.pos.y + equip->info.offset.y) + 96 - 112;
             s32 dx = pos[0] - x;
-            s32 dy = pos[1] - (y - 16);
+            s32 dy = pos[1] - y;
             s32 d = dx * dx + dy * dy;
 
             if (d < best) {
@@ -1739,12 +1748,15 @@ static inline void DupFitting_GetMovePos(VecFx32 *vec, DupFittingPoint *origin, 
     s32 oy;
     s32 t;
     s32 ox;
+    s32 d;
 
     t = 10 - frames;
     ox = origin->x;
-    vec->x = FX32_CONST(ox + t * (pos->x - ox) / 10);
+    d = pos->x - ox;
+    vec->x = FX32_CONST(ox + d * t / 10);
     oy = origin->y;
-    vec->y = FX32_CONST(oy + t * (pos->y - oy) / 10);
+    d = pos->y - oy;
+    vec->y = FX32_CONST(oy + d * t / 10);
 }
 
 static void DupFitting_UpdateReturning(DupFittingWork *work) {
@@ -1775,7 +1787,7 @@ static void DupFitting_UpdateReturning(DupFittingWork *work) {
 
             MusItemDraw_SetSize(work->itemSys, draw, scale, scale);
             MusItemDraw_GetPosition(work->itemSys, draw, &vec);
-            DupFitting_GetMovePos(&vec, origin, pos, frames);
+            DupFitting_GetMovePos(&vec, origin, pos, (s32)frames);
             vec.z = FX32_CONST(70);
             MusItemDraw_SetPosition(work->itemSys, draw, &vec);
             DupFittingItemNode_SetFrames(cur, frames);

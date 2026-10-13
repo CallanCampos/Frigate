@@ -21,6 +21,7 @@ src/ov167/btl_server_flow.c:
     .bss        start:0x021db000 end:0x021db024
 
 src/ov167/btl_server_flow_sub.c:
+    complete
     .text       start:0x021ae32c end:0x021b083c
     .rodata     start:0x021d6cfc end:0x021d6dd8
 
@@ -74,6 +75,7 @@ src/ov167/move_handlers.c:
     .rodata     start:0x021d9488 end:0x021da8c4
 
 src/ov167/handler_common.c:
+    complete
     .text       start:0x021cde38 end:0x021ce10c
 
 src/ov167/battle_overlay.c:
@@ -90,6 +92,7 @@ src/ov167/poke_type_pair.c:
     .text       start:0x021ce520 end:0x021ce604
 
 src/ov167/btlv_core.c:
+    complete
     .text       start:0x021ce604 end:0x021d0c24
     .rodata     start:0x021da8c4 end:0x021da930
     .data       start:0x021dafa0 end:0x021dafac
@@ -117,6 +120,7 @@ src/ov167/btl_string.c:
     .bss        start:0x021dd87c end:0x021dd8e8
 
 src/ov167/btl_field.c:
+    complete
     .text       start:0x021d5968 end:0x021d5e1c
     .data       start:0x021dafd4 end:0x021dafe0
     .bss        start:0x021dd8e8 end:0x021dda60

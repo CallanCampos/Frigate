@@ -78,6 +78,7 @@ src/ov259/local_tvt_person_rival.c:
     .data       start:0x021a0a84 end:0x021a0aa0
 
 src/ov259/local_tvt_person_secret.c:
+    complete
     .text       start:0x0219fcac end:0x021a039c
     .rodata     start:0x021a07f0 end:0x021a0934
     .data       start:0x021a0aa0 end:0x021a0ac0

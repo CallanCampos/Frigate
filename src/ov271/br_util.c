@@ -98,7 +98,7 @@ struct BrSeq {
 typedef struct {
     BrPoint center;
     BrPoint now;
-    s16 r_start;
+    u16 r_start;
     s16 r_end;
     u16 rot_start;
     u16 rot_end;
@@ -184,13 +184,12 @@ static BOOL BrBallLine_Main(BrBallLine *p_wk, BrPoint *p_now, s32 sync);
 static void BrBallFollow_Init(BrBallFollow *p_wk, const BrPoint *cp_target, const BrPoint *cp_start, fx32 speed);
 static BOOL BrBallFollow_Main(BrBallFollow *p_wk, BrPoint *p_now);
 
-// Where the balls of the effects start and end
-static const BrPoint sc_ball_pos[] = {
-    { 128, 16 },
-    { 128, 96 },
-    { 128, -16 },
-    { 128, 216 },
-};
+// Where the balls of the effects start and end. Four objects, declared in an order that MWCC's size sort lays out
+// as the ROM has them: top, center, above, below
+static const BrPoint sc_ball_pos_center = { 128, 96 };
+static const BrPoint sc_ball_pos_above = { 128, -16 };
+static const BrPoint sc_ball_pos_top = { 128, 16 };
+static const BrPoint sc_ball_pos_below = { 128, 216 };
 
 // The scroll areas at the sides of a list
 static const TouchRect sc_slide_rect[] = {
@@ -211,8 +210,6 @@ static const BrProfileMsgWinData sc_profile_msgwin[BR_PROFILE_MSGWIN_MAX] = {
     { 7, 4, 18, 2, 14 },  { 17, 8, 11, 4, 16 }, { 4, 11, 12, 2, 17 }, { 3, 13, 25, 2, 23 },
     { 3, 15, 25, 2, 24 }, { 4, 17, 11, 2, 18 }, { 3, 19, 26, 4, 0 },
 };
-
-static const PMSDrawPos sc_profile_pms_pos = { 8, 0 };
 
 // Shows the scroll arrows of the directions the list can still scroll in
 static inline void BrList_UpdateArrow(BrList *p_wk) {
@@ -300,6 +297,11 @@ static void BrMsgWin_GetPrintPos(u32 type, const BrPoint *cp_pos, GFLBitmap *bmp
     }
 }
 
+// NitroSDK's MATH_IMin, which nitro/math.h doesn't have yet
+static inline int MATH_IMin(int a, int b) {
+    return (a <= b) ? a : b;
+}
+
 BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
     BrList *p_wk;
     u32 size = sizeof(BrList) + sizeof(GFLBitmap *) * cp_param->list_max;
@@ -311,9 +313,7 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
     p_wk->unk3C = 0;
     p_wk->list_max = cp_param->list_max;
     p_wk->line_max = cp_param->h / cp_param->str_line;
-    if (p_wk->line_max > cp_param->list_max) {
-        p_wk->line_max = cp_param->list_max;
-    }
+    p_wk->line_max = MATH_IMin(p_wk->line_max, cp_param->list_max);
     if (cp_param->pos != NULL) {
         p_wk->list = cp_param->pos->list;
         p_wk->cursor = cp_param->pos->cursor;
@@ -323,9 +323,9 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
         for (i = 0; i < p_wk->line_max; i++) {
             GFL_ASSERT(i < BR_LIST_HITTBL_MAX);
             p_wk->hittbl[i].left = p_wk->param.x * 8;
-            p_wk->hittbl[i].top = (p_wk->param.y + p_wk->param.str_line * i) * 8;
+            p_wk->hittbl[i].top = (p_wk->param.y + i * p_wk->param.str_line) * 8;
             p_wk->hittbl[i].right = (p_wk->param.x + p_wk->param.w) * 8;
-            p_wk->hittbl[i].bottom = (p_wk->param.y + p_wk->param.str_line * (i + 1)) * 8;
+            p_wk->hittbl[i].bottom = (p_wk->param.y + (i + 1) * p_wk->param.str_line) * 8;
         }
         GFL_ASSERT(i < BR_LIST_HITTBL_MAX);
         p_wk->hittbl[i].left = TOUCH_RECT_END;
@@ -671,10 +671,9 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
                           HeapID heapId) {
     BrProfile *p_wk;
     Font *font;
+    int i;
     MsgData *msg;
     WordSet *wordset;
-    PMSDrawPos pms_pos;
-    int i;
 
     p_wk = GFL_HeapAllocate(heapId, sizeof(BrProfile), FALSE, "br_util.c", 1345);
     sys_memset(p_wk, 0, sizeof(BrProfile));
@@ -685,7 +684,6 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
     BrRes_LoadBG(p_wk->res, 8, heapId);
     msg = BrRes_GetMsgData(res);
     wordset = BrRes_GetWordSet(res);
-    pms_pos = sc_profile_pms_pos;
 
     for (i = 0; i < BR_PROFILE_MSGWIN_MAX; i++) {
         const BrProfileMsgWinData *cp_data = &sc_profile_msgwin[i];
@@ -752,7 +750,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
                 GFL_StrBufFree(src);
                 BrMsgWin_SetPos(p_wk->msgwin[i], 8, 1, BR_MSGWIN_POS_ABSOLUTE);
             } else {
-                PMSDrawPos pos = pms_pos;
+                PMSDrawPos pos = { 8, 0 };
 
                 PMSDraw_SetBackColor(p_wk->pms, 0);
                 PMSDraw_SetColor(p_wk->pms, 0x3da0);
@@ -779,14 +777,13 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
         u32 gender = GdsProfile_GetGender(cp_profile);
 
         if (species != 0) {
-            HeapID tailHeapId = HEAPID_TAIL(heapId);
-            ArcTool *handle = GFL_ArcSysCreateFileHandle(7, tailHeapId);
+            ArcTool *handle = GFL_ArcSysCreateFileHandle(7, HEAPID_TAIL(heapId));
             ClActorSetup setup;
 
-            p_wk->pokeIconPlt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, tailHeapId);
-            p_wk->pokeIconCel = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), tailHeapId);
+            p_wk->pokeIconPlt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, HEAPID_TAIL(heapId));
+            p_wk->pokeIconCel = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
             p_wk->pokeIconChr = func_0204b81c(handle, PokeParty_GetIconIndex(species, form, gender, egg), FALSE,
-                                              CLACT_VRAM_MAIN, tailHeapId);
+                                              CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
             GFL_ArcToolFree(handle);
 
             sys_memset(&setup, 0, sizeof(ClActorSetup));
@@ -802,18 +799,18 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
 
     switch (type) {
     case BR_PROFILE_TYPE_TRAINER: {
-        u32 chr, cel, plt, anm;
+        u32 cel, chr, plt, anm;
         ArcTool *handle;
 
         if (GdsProfile_GetSex(cp_profile) == 0) {
             chr = 20;
-            cel = 18;
             plt = 4;
+            cel = 18;
             anm = 19;
         } else {
             chr = 23;
-            cel = 21;
             plt = 6;
+            cel = 21;
             anm = 22;
         }
         handle = GFL_ArcSysCreateFileHandle(30, HEAPID_TAIL(heapId));
@@ -1072,18 +1069,16 @@ static void BrBallEff_Seq_Line(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     BrBallEffect *p_wk = p_wk_adrs;
     int i;
     ClActorPos pos;
-    BrPoint start;
     BOOL isEnd;
 
     switch (*p_seq) {
     case 0:
         p_wk->cnt = 0;
-        start = sc_ball_pos[0];
         for (i = 0; i < BR_BALL_NUM; i++) {
-            p_wk->ball[i] = start;
+            p_wk->ball[i] = sc_ball_pos_top;
             func_0204c124(p_wk->clwk[i], TRUE);
         }
-        BrBallLine_Init(&p_wk->move[0].line, &p_wk->ball[0], &sc_ball_pos[3], 0, 50);
+        BrBallLine_Init(&p_wk->move[0].line, &p_wk->ball[0], &sc_ball_pos_below, 0, 50);
         for (i = 1; i < BR_BALL_NUM; i++) {
             BrBallFollow_Init(&p_wk->move[i].follow, &p_wk->ball[i - 1], &p_wk->ball[i], FX32_CONST(4) - 0x666 * i / 2);
         }
@@ -1117,22 +1112,18 @@ static void BrBallEff_Seq_LineRot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     int i;
 
     switch (*p_seq) {
-    case 0: {
-        BrPoint start;
-
+    case 0:
         p_wk->cnt = 0;
-        start = sc_ball_pos[2];
         for (i = 0; i < 6; i++) {
-            p_wk->ball[i] = start;
+            p_wk->ball[i] = sc_ball_pos_above;
             func_0204c124(p_wk->clwk[i], TRUE);
         }
-        BrBallLine_Init(&p_wk->move[0].line, &p_wk->ball[0], &sc_ball_pos[1], 0, 36);
+        BrBallLine_Init(&p_wk->move[0].line, &p_wk->ball[0], &sc_ball_pos_center, 0, 36);
         for (i = 1; i < 6; i++) {
             BrBallFollow_Init(&p_wk->move[i].follow, &p_wk->ball[i - 1], &p_wk->ball[i],
                               FX32_CONST(3.5) - 0xb33 * i / 2);
         }
         *p_seq = 1;
-    }
         // fallthrough
     case 1:
         p_wk->is_move_end[0] = BrBallLine_Main(&p_wk->move[0].line, &p_wk->ball[0], p_wk->cnt);
@@ -1155,7 +1146,7 @@ static void BrBallEff_Seq_LineRot(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     case 2:
         p_wk->cnt = 0;
         for (i = 6; i < BR_BALL_NUM; i++) {
-            BrBallRot_Init(&p_wk->move[i].rot, &sc_ball_pos[1], 15, 0xffff * (i - 6) / 6, 90);
+            BrBallRot_Init(&p_wk->move[i].rot, &sc_ball_pos_center, 15, 0xffff * (i - 6) / 6, 90);
             func_0204c124(p_wk->clwk[i], TRUE);
         }
         *p_seq = 3;
@@ -1316,7 +1307,7 @@ static void BrBallEff_Seq_Ring(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             u16 rot = p_wk->move[i].rot.rot + p_wk->cnt / p_wk->move[i].rot.sync_max;
 #endif
 
-            BrBallCircle_Init(&p_wk->move[i].circle, &sc_ball_pos[1], 15, 1, rot, rot + 0xf000, 30);
+            BrBallCircle_Init(&p_wk->move[i].circle, &sc_ball_pos_center, 15, 1, rot, rot + 0xf000, 30);
             func_0204c318(p_wk->clwk[i], FALSE);
         }
         p_wk->cnt = 0;
@@ -1355,21 +1346,19 @@ static void BrBallCircle_Init(BrBallCircle *p_wk, const BrPoint *cp_center, u16 
 }
 
 static BOOL BrBallCircle_Main(BrBallCircle *p_wk, BrPoint *p_now, s32 sync) {
-    u16 rot_start = p_wk->rot_start;
-    u16 rot_dist = p_wk->rot_end - rot_start;
-    u16 r_start = p_wk->r_start;
-    s16 r_dist = p_wk->r_end - (s16)r_start;
+    u16 rot_dist = p_wk->rot_end - p_wk->rot_start;
+    s16 r_dist = p_wk->r_end - (s16)p_wk->r_start;
     s8 dir = r_dist / MATH_ABS(r_dist);
-    u16 rot = rot_start + rot_dist * sync / p_wk->sync_max;
-    s32 r;
+    u16 rot = p_wk->rot_start + rot_dist * sync / p_wk->sync_max;
+    s32 r = p_wk->r_start + dir * (MATH_ABS(r_dist) * sync / p_wk->sync_max);
 
-    r_dist = MATH_ABS(r_dist);
-    r = r_start + dir * (r_dist * sync / p_wk->sync_max);
     if (r < 0) {
         r = 0;
     }
-    p_wk->now.x = ((FX_CosIdx(rot) * r) >> FX32_SHIFT) + p_wk->center.x;
-    p_wk->now.y = ((FX_SinIdx(rot) * r) >> FX32_SHIFT) + p_wk->center.y;
+    p_wk->now.x = (FX_CosIdx(rot) * r) >> FX32_SHIFT;
+    p_wk->now.y = (FX_SinIdx(rot) * r) >> FX32_SHIFT;
+    p_wk->now.x += p_wk->center.x;
+    p_wk->now.y += p_wk->center.y;
     if (p_now != NULL) {
         *p_now = p_wk->now;
     }
@@ -1388,8 +1377,10 @@ static void BrBallRot_Init(BrBallRot *p_wk, const BrPoint *cp_center, u16 r, u16
 static BOOL BrBallRot_Main(BrBallRot *p_wk, BrPoint *p_now, s32 sync) {
     u16 rot = p_wk->rot + 0xffff * sync / p_wk->sync_max;
 
-    p_wk->now.x = ((FX_CosIdx(rot) * p_wk->r) >> FX32_SHIFT) + p_wk->center.x;
-    p_wk->now.y = ((FX_SinIdx(rot) * p_wk->r) >> FX32_SHIFT) + p_wk->center.y;
+    p_wk->now.x = (FX_CosIdx(rot) * p_wk->r) >> FX32_SHIFT;
+    p_wk->now.y = (FX_SinIdx(rot) * p_wk->r) >> FX32_SHIFT;
+    p_wk->now.x += p_wk->center.x;
+    p_wk->now.y += p_wk->center.y;
     if (p_now != NULL) {
         *p_now = p_wk->now;
     }

@@ -84,8 +84,9 @@ static u32 func_ov012_02151b4c(PlayerInfo *info);
 static void func_ov012_02151e0c(MusicalEventWork *work);
 
 static const VecFx32 data_ov012_0216ade4 = {FX32_CONST(232), 0, FX32_CONST(200)};
-static const VecFx32 data_ov012_0216adf0 = {FX32_CONST(136), 0, FX32_CONST(200)};
+// MWCC lays these two out in the reverse of their definitions
 static const VecFx32 data_ov012_0216adfc = {FX32_CONST(168), 0, FX32_CONST(200)};
+static const VecFx32 data_ov012_0216adf0 = {FX32_CONST(136), 0, FX32_CONST(200)};
 
 // The total points from which a number of the program's prize slots is drawn, from 10 slots down
 static const u16 data_ov012_0216ae08[10] = {12000, 8000, 5500, 3500, 2000, 1000, 500, 250, 100, 0};
@@ -567,7 +568,6 @@ static void func_ov012_02151384(MusicalEventWork *work) {
 
 // Records the show in the save
 static void func_ov012_0215168c(MusicalEventWork *work) {
-    u8 counts[4];
     u8 i;
     u8 points;
     u8 topPoints;
@@ -584,19 +584,19 @@ static void func_ov012_0215168c(MusicalEventWork *work) {
     }
     func_0200aedc(work->musicalSave, points);
     func_0200af1c(work->musicalSave, points);
-    counts[0] = 0;
-    counts[1] = 0;
-    counts[2] = 0;
-    counts[3] = 0;
-    items = MusItemData_Init(HEAPID_GAMEEVENT);
-    poke = work->stage->pokes[work->playerPos];
-    for (i = 0; i < 9; i++) {
-        if (poke->equips[i].itemId != 0xff) {
-            counts[(u8)func_ov210_021ef164(items, poke->equips[i].itemId)]++;
+    {
+        u8 counts[4] = {0};
+
+        items = MusItemData_Init(HEAPID_GAMEEVENT);
+        poke = work->stage->pokes[work->playerPos];
+        for (i = 0; i < 9; i++) {
+            if (poke->equips[i].itemId != 0xff) {
+                counts[(u8)func_ov210_021ef164(items, poke->equips[i].itemId)]++;
+            }
         }
-    }
-    for (i = 0; i < 4; i++) {
-        func_0200aec8(work->musicalSave, i, counts[i]);
+        for (i = 0; i < 4; i++) {
+            func_0200aec8(work->musicalSave, i, counts[i]);
+        }
     }
     MusItemData_Free(items);
     zoneId = GameData_GetPlayerState(work->gameData)->zoneId;

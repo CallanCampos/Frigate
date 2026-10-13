@@ -5,6 +5,7 @@
     .bss        start:0x021a78c0 end:0x021a78c0 kind:bss align:32
 
 src/ov173/wifi_p2pmatchroom.c:
+    complete
     .text       start:0x0219ce80 end:0x0219e0ac
     .rodata     start:0x021a6268 end:0x021a6298
 

@@ -820,9 +820,9 @@ static void WifiP2PMatch_ViewButtonAnime(WIFIP2PMATCH_WORK *wk);
 static void WifiP2PMatch_ViewGraphicInit(WIFIP2PMATCH_WORK *wk, ArcTool *arc, u32 heapId);
 static void WifiP2PMatch_ViewGraphicExit(WIFIP2PMATCH_WORK *wk);
 static void WifiP2PMatch_ViewScreenAddCharOffset(NNSG2dScreenData *scrn, u16 add);
-static void WifiP2PMatch_ViewSetFriendState(WIFIP2PMATCH_WORK *wk, u32 friendNo, u32 state);
-static void WifiP2PMatch_ViewClearFriendState(WIFIP2PMATCH_WORK *wk, u32 friendNo);
-static u8 WifiP2PMatch_ViewGetFriendState(WIFIP2PMATCH_WORK *wk, u32 friendNo);
+static void WifiP2PMatch_ViewSetFriendState(WIFIP2PMATCH_WORK *wk, unsigned long friendNo, u32 state);
+static void WifiP2PMatch_ViewClearFriendState(WIFIP2PMATCH_WORK *wk, unsigned long friendNo);
+static u8 WifiP2PMatch_ViewGetFriendState(WIFIP2PMATCH_WORK *wk, unsigned long friendNo);
 static void WifiP2PMatch_ViewRedraw(WIFIP2PMATCH_WORK *wk, HeapID heapId);
 static void WifiP2PMatch_ViewRequestRedrawAll(WIFIP2PMATCH_WORK *wk);
 static void WifiP2PMatch_ViewPageChanged(WIFIP2PMATCH_WORK *wk);
@@ -6594,17 +6594,17 @@ static void WifiP2PMatch_ViewScreenAddCharOffset(NNSG2dScreenData *scrn, u16 add
 }
 
 // state: 0 for a friend who is not online, 1 for one who is and 2 for one who is in the room
-static void WifiP2PMatch_ViewSetFriendState(WIFIP2PMATCH_WORK *wk, u32 friendNo, u32 state) {
+static void WifiP2PMatch_ViewSetFriendState(WIFIP2PMATCH_WORK *wk, unsigned long friendNo, u32 state) {
     wk->view.friendState[friendNo - 1] = state;
     wk->view.redrawButtons = TRUE;
 }
 
-static void WifiP2PMatch_ViewClearFriendState(WIFIP2PMATCH_WORK *wk, u32 friendNo) {
+static void WifiP2PMatch_ViewClearFriendState(WIFIP2PMATCH_WORK *wk, unsigned long friendNo) {
     wk->view.friendState[friendNo - 1] = 0;
     wk->view.redrawButtons = TRUE;
 }
 
-static u8 WifiP2PMatch_ViewGetFriendState(WIFIP2PMATCH_WORK *wk, u32 friendNo) {
+static u8 WifiP2PMatch_ViewGetFriendState(WIFIP2PMATCH_WORK *wk, unsigned long friendNo) {
     return wk->view.friendState[friendNo - 1];
 }
 

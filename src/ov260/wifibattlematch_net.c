@@ -53,12 +53,13 @@ enum {
 
 // How an error ends for the player: nothing, the Wi-Fi connection lost, the competition failed or the game's network
 // error. They are what DWCRapCommon_CheckError and the error converters answer
-enum {
+typedef enum {
     WBM_RESULT_OK,
     WBM_RESULT_DISCONNECTED,
     WBM_RESULT_FAILED,
     WBM_RESULT_NET_ERROR,
-};
+    WBM_RESULT_TIMEOUT,
+} WifiBattleMatchNetResult;
 
 // The error that was found, by its kind
 typedef struct {
@@ -356,7 +357,7 @@ BOOL WifiBattleMatchNet_CheckSync(WifiBattleMatchNet *p_wk) {
 
 u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
     WifiBattleMatchNetError *error = &p_wk->error;
-    u32 result = 0;
+    WifiBattleMatchNetResult result = WBM_RESULT_OK;
 
     if (func_02042788()) {
         if (GFL_NetErrCheck()) {
@@ -382,7 +383,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
             result = WBM_RESULT_NET_ERROR;
             break;
         case 4:
-            result = 4;
+            result = WBM_RESULT_TIMEOUT;
             break;
         }
         return result;
@@ -390,6 +391,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
     if (result == 0) {
         switch (error->kind) {
         case WBM_ERROR_NONE:
+            result = WBM_RESULT_OK;
             break;
         case WBM_ERROR_DWC:
             result = WifiBattleMatchNet_GetDwcResult(error->dwcCode);
@@ -399,6 +401,7 @@ u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2) {
             break;
         case WBM_ERROR_UNUSED_3:
         case WBM_ERROR_HTTP:
+            result = WBM_RESULT_OK;
             break;
         case WBM_ERROR_TIMEOUT:
             result = WifiBattleMatchNet_GetTimeoutResult(error->timeoutCode);
@@ -799,7 +802,7 @@ void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind
             break;
         }
     } else if (mode == 1) {
-        if (a3 != 0) {
+        if (a5 != 0) {
             switch (kind) {
             case 0:
                 p_wk->resultFunc = WifiBattleMatchNet_SetNoRating1C;
@@ -829,6 +832,18 @@ void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind
             }
         }
     }
+}
+
+static inline void WifiBattleMatchNet_CopySessionId(u8 *dest) {
+    const char *src = Sc_GetSessionId();
+
+    sys_memcpy(src, dest, 0x28);
+}
+
+static inline void WifiBattleMatchNet_CopyConnectionId(u8 *dest) {
+    const char *src = Sc_GetConnectionId();
+
+    sys_memcpy(src, dest, 0x28);
 }
 
 u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
@@ -923,7 +938,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         break;
     case 7:
         if (p_wk->counter == 0) {
-            sys_memcpy(Sc_GetSessionId(), p_wk->p_data->mine.unk8, 0x28);
+            WifiBattleMatchNet_CopySessionId(p_wk->p_data->mine.unk8);
             p_wk->state = 8;
         } else {
             if (p_wk->timer++ > 3600) {
@@ -943,7 +958,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         if (p_wk->flag164 != 0) {
             p_wk->state = 11;
         } else {
-            sys_memcpy(Sc_GetConnectionId(), p_wk->p_data->mine.unk30, 0x28);
+            WifiBattleMatchNet_CopyConnectionId(p_wk->p_data->mine.unk30);
             func_02040624(func_02040440(), 1, 0x24);
             p_wk->state = 9;
         }
@@ -961,7 +976,7 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         } else if (p_wk->flagInfoReceived != 0 || p_wk->flag164 != 0) {
             p_wk->flagInfoReceived = 0;
             err = Sc_SetSessionId(p_wk->p_data->theirs.unk8);
-            sys_memcpy(Sc_GetSessionId(), p_wk->p_data->mine.unk8, 0x28);
+            WifiBattleMatchNet_CopySessionId(p_wk->p_data->mine.unk8);
             if (err != 0) {
                 WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 2061);
                 WifiBattleMatchNet_EndRequests(p_wk);
@@ -1121,10 +1136,10 @@ static void WifiBattleMatchNet_OnRequestDone(int error, void *work) {
 
 static void WifiBattleMatchNet_OnRequestDoneWithData(int error, void *work) {
     WifiBattleMatchNet *p_wk = work;
-    WifiBattleMatchNetData *p_data = p_wk->p_data;
+    WifiBattleMatchNetInfo *mine = &p_wk->p_data->mine;
 
     if (error == 0) {
-        sys_memcpy(Sc_GetConnectionId(), p_data->mine.unk30, 0x28);
+        sys_memcpy(Sc_GetConnectionId(), mine->unk30, 0x28);
     } else {
         p_wk->errorCode = error;
     }
@@ -1190,7 +1205,7 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
             resultMode = 2;
             break;
         default:
-            GFL_ASSERT_MSG(0, "\x83\x6f\x83\x67\x83\x8b\x8c\x8b\x89\xca\x95\x73\x90\xb3\x92\x6c %d\n");
+            GFL_ASSERT_MSG(0, "\x83\x6f\x83\x67\x83\x8b\x8c\x8b\x89\xca\x95\x73\x90\xb3\x92\x6c %d\n", param->outcome);
             break;
         }
     }
@@ -1227,7 +1242,7 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
                 theirsMode = 2;
                 break;
             default:
-                GFL_ASSERT_MSG(0, "\x83\x6f\x83\x67\x83\x8b\x8c\x8b\x89\xca\x95\x73\x90\xb3\x92\x6c %d\n");
+                GFL_ASSERT_MSG(0, "\x83\x6f\x83\x67\x83\x8b\x8c\x8b\x89\xca\x95\x73\x90\xb3\x92\x6c %d\n", param->outcome);
                 break;
             }
         }
@@ -1696,13 +1711,13 @@ static void WifiBattleMatchNet_BuildProfileRecord(WifiBattleMatchNet *p_wk) {
 
     p_wk->record[0].name = "MYSTATUS";
     p_wk->record[0].type = GDB_FIELD_BINARY;
-    p_wk->record[0].value.data = info;
-    p_wk->record[0].size = 0x20;
+    p_wk->record[0].value.binaryData.data = info;
+    p_wk->record[0].value.binaryData.size = 0x20;
     WifiBattleMatchNet_GetLoginDate(p_wk->loginDate);
     p_wk->record[1].name = "LAST_LOGIN_DATETIME";
     p_wk->record[1].type = GDB_FIELD_BINARY;
-    p_wk->record[1].value.data = p_wk->loginDate;
-    p_wk->record[1].size = 6;
+    p_wk->record[1].value.binaryData.data = p_wk->loginDate;
+    p_wk->record[1].value.binaryData.size = 6;
     p_wk->record[2].name = "INITIAL_PROFILE_ID";
     p_wk->record[2].type = GDB_FIELD_INT;
     p_wk->record[2].value.intValue = p_wk->profileId;
@@ -1809,7 +1824,9 @@ static void WifiBattleMatchNet_ReadWifiCup(int recordNum, GdbField **records, vo
             } else if (!_STD_CompareNString(field->name, "RECORD_SAVE_IDX")) {
                 stats->recordSaveIdx = field->value.intValue;
             } else if (!_STD_CompareNString(field->name, "WIFICUP_POKEMON_PARTY")) {
-                sys_memcpy(field->value.data, stats->party, field->size);
+                GdbBinaryData *bin = &field->value.binaryData;
+
+                sys_memcpy(bin->data, stats->party, bin->size);
             }
         }
     }
@@ -1839,7 +1856,7 @@ static void WifiBattleMatchNet_ReadWifiCupParty(int recordNum, GdbField **record
             GdbField *field = &records[i][j];
 
             if (_STD_CompareNString(field->name, "WIFICUP_POKEMON_PARTY") == 0) {
-                sys_memcpy(field->value.data, work, field->size);
+                sys_memcpy(field->value.binaryData.data, work, field->value.binaryData.size);
             }
         }
     }
@@ -1854,7 +1871,7 @@ static void WifiBattleMatchNet_ReadLastLogin(int recordNum, GdbField **records, 
             GdbField *field = &records[i][j];
 
             if (_STD_CompareNString(field->name, "LAST_LOGIN_DATETIME") == 0) {
-                sys_memcpy(field->value.data, work, field->size);
+                sys_memcpy(field->value.binaryData.data, work, field->value.binaryData.size);
             }
         }
     }
@@ -1882,8 +1899,8 @@ void WifiBattleMatchNet_StartWrite(WifiBattleMatchNet *p_wk, int kind, void *dat
         p_wk->record[4].value.intValue = 0;
         p_wk->record[5].name = "WIFICUP_POKEMON_PARTY";
         p_wk->record[5].type = GDB_FIELD_BINARY;
-        p_wk->record[5].value.data = data;
-        p_wk->record[5].size = 1332;
+        p_wk->record[5].value.binaryData.data = data;
+        p_wk->record[5].value.binaryData.size = 1332;
         p_wk->table_name_num = 6;
         break;
     case WBM_WRITE_LAST_LOGIN:
@@ -1891,8 +1908,8 @@ void WifiBattleMatchNet_StartWrite(WifiBattleMatchNet *p_wk, int kind, void *dat
         p_wk->table_name_num = 1;
         p_wk->record[0].name = "LAST_LOGIN_DATETIME";
         p_wk->record[0].type = GDB_FIELD_BINARY;
-        p_wk->record[0].value.data = p_wk->loginDate;
-        p_wk->record[0].size = 6;
+        p_wk->record[0].value.binaryData.data = p_wk->loginDate;
+        p_wk->record[0].value.binaryData.size = 6;
         break;
     case WBM_WRITE_PROFILE:
         WifiBattleMatchNet_BuildProfileRecord(p_wk);
@@ -1902,8 +1919,8 @@ void WifiBattleMatchNet_StartWrite(WifiBattleMatchNet *p_wk, int kind, void *dat
         p_wk->table_name_num = 2;
         p_wk->record[0].name = sRecordDataTables[p_wk->recordData.slot];
         p_wk->record[0].type = GDB_FIELD_BINARY;
-        p_wk->record[0].value.data = p_wk->recordData.data;
-        p_wk->record[0].size = 0x50;
+        p_wk->record[0].value.binaryData.data = p_wk->recordData.data;
+        p_wk->record[0].value.binaryData.size = 0x50;
         p_wk->record[1].name = "RECORD_SAVE_IDX";
         p_wk->record[1].type = GDB_FIELD_BYTE;
         p_wk->record[1].value.byteValue = (p_wk->recordData.slot + 1) % 6;

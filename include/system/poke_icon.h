@@ -9,10 +9,10 @@
 // The file of a Pokémon's icon, the female one if sex is 1 and the species has one
 u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg);
 // The palette of a Pokémon's icon
-u32 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
+u8 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
 // The file and palette of a Pokémon's icon
 u32 PokeIcon_GetFileOfPkm(BoxPkm *pkm);
-u32 PokeIcon_GetPaletteOfPkm(BoxPkm *pkm);
+u8 PokeIcon_GetPaletteOfPkm(BoxPkm *pkm);
 // The files of the icons' palette, and of the second palette that the PC boxes load
 u32 PokeIcon_GetPaletteFile(void);
 u32 PokeIcon_GetAltPaletteFile(void);

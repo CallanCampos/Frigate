@@ -78,7 +78,12 @@ static void ZukanOpen_SetVRAM(void);
 static void ZukanOpen_VBlank(TCB *tcb, void *data);
 static void ZukanOpen_AddVBlank(ZukanOpenWork *work);
 static void ZukanOpen_RemoveVBlank(ZukanOpenWork *work);
+static inline void ZukanOpen_InitCoverTopBG(void);
+static inline void ZukanOpen_InitCoverBackBG(void);
+static inline void ZukanOpen_InitCoverFrontBG(void);
 static void ZukanOpen_InitBG(void);
+static inline void ZukanOpen_InitSubTopBG(void);
+static inline void ZukanOpen_InitCoverSubBG(void);
 static void ZukanOpen_FreeBG(void);
 static void ZukanOpen_LoadGraphics(ZukanOpenWork *work);
 static void ZukanOpen_LoadSkin(ZukanOpenWork *work);
@@ -161,11 +166,7 @@ static void ZukanOpen_RemoveVBlank(ZukanOpenWork *work) {
     GFL_TCBRemove(work->vblankTask);
 }
 
-static void ZukanOpen_InitBG(void) {
-    GFL_BGSysCreate(HEAPID_ZUKAN_OPEN);
-    BGSysLCDConfig lcdConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_3, GX_BGMODE_3, FALSE };
-    GFL_BGSysSetLCDConfig(&lcdConfig);
-
+static inline void ZukanOpen_InitCoverTopBG(void) {
     BGSetup coverTop = { 0,
                          0xe8,
                          0x2000,
@@ -181,7 +182,9 @@ static void ZukanOpen_InitBG(void) {
                          FALSE };
     GFL_BGSysCreateBG(BG_COVER_TOP, &coverTop, BGMODE_EXTENDED);
     GFL_BGSysClearScr(BG_COVER_TOP);
+}
 
+static inline void ZukanOpen_InitCoverBackBG(void) {
     BGSetup coverBack = { 0,
                           0,
                           0x1000,
@@ -198,7 +201,9 @@ static void ZukanOpen_InitBG(void) {
     GFL_BGSysCreateBG(BG_COVER_BACK, &coverBack, BGMODE_TEXT);
     GFL_BGSysClearCharCore(BG_COVER_BACK, BGSYS_TILE_SIZE_16, 0x7fe0, HEAPID_TAIL(HEAPID_ZUKAN_OPEN));
     GFL_BGSysFillScrAsync(BG_COVER_BACK, 0x7fe0 / BGSYS_TILE_SIZE_16);
+}
 
+static inline void ZukanOpen_InitCoverFrontBG(void) {
     BGSetup coverFront = { 0,
                            0,
                            0x1000,
@@ -214,7 +219,22 @@ static void ZukanOpen_InitBG(void) {
                            FALSE };
     GFL_BGSysCreateBG(BG_COVER_FRONT, &coverFront, BGMODE_TEXT);
     GFL_BGSysClearScr(BG_COVER_FRONT);
+}
 
+static void ZukanOpen_InitBG(void) {
+    GFL_BGSysCreate(HEAPID_ZUKAN_OPEN);
+    BGSysLCDConfig lcdConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_3, GX_BGMODE_3, FALSE };
+    GFL_BGSysSetLCDConfig(&lcdConfig);
+    ZukanOpen_InitCoverTopBG();
+    ZukanOpen_InitCoverBackBG();
+    ZukanOpen_InitCoverFrontBG();
+    ZukanOpen_InitSubTopBG();
+    ZukanOpen_InitCoverSubBG();
+    GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, TRUE);
+    GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG3, TRUE);
+}
+
+static inline void ZukanOpen_InitSubTopBG(void) {
     BGSetup subTop = { 0,
                        0,
                        0x800,
@@ -230,7 +250,9 @@ static void ZukanOpen_InitBG(void) {
                        FALSE };
     GFL_BGSysCreateBG(BG_SUB_TOP, &subTop, BGMODE_EXTENDED);
     GFL_BGSysClearScr(BG_SUB_TOP);
+}
 
+static inline void ZukanOpen_InitCoverSubBG(void) {
     BGSetup coverSub = { 0,
                          0x18,
                          0x1000,
@@ -246,8 +268,6 @@ static void ZukanOpen_InitBG(void) {
                          FALSE };
     GFL_BGSysCreateBG(BG_COVER_SUB, &coverSub, BGMODE_TEXT);
     GFL_BGSysClearScr(BG_COVER_SUB);
-    GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, TRUE);
-    GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG3, TRUE);
 }
 
 static void ZukanOpen_FreeBG(void) {

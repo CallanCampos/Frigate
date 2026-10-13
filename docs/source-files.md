@@ -106,18 +106,18 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `event_ircbattle.c` | `0x021503c0`–`0x02150cf8` | 13 | complete | string at `0x0216dfa0` |
-| `musical_event.c` | `0x02150cf8`–`0x02151e68` | 33 | partial | string at `0x0216dfb4` |
+| `musical_event.c` | `0x02150cf8`–`0x02151e68` | 33 | complete | string at `0x0216dfb4` |
 | `musical_dressup_sys.c` | `0x02151e68`–`0x02151f90` | 5 | complete | string at `0x0216dfd0` |
 | `musical_stage_sys.c` | `0x02151f90`–`0x021522d8` | 9 | complete | string at `0x0216dff4` |
-| `musical_program.c` | `0x021522d8`–`0x0215264c` | 15 | partial | string at `0x0216e008` |
+| `musical_program.c` | `0x021522d8`–`0x0215264c` | 15 | complete | string at `0x0216e008` |
 | `event_colosseum_battle.c` | `0x0215264c`–`0x0215291c` | 3 | complete | descriptive |
 | `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | partial | string at `0x0216e0a8` |
 | `delivery_irc.c` | `0x02152c0c`–`0x02153160` | 27 | complete | string at `0x0216e180` |
 | `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | partial | descriptive |
 | `intrude_work.c` | `0x021535dc`–`0x0215366c` | 12 | complete | descriptive |
-| `script_sys.c` | `0x0215366c`–`0x02153da4` | 41 | partial | string at `0x0216e190` |
+| `script_sys.c` | `0x0215366c`–`0x02153da4` | 41 | complete | string at `0x0216e190` |
 | `script_work.c` | `0x02153da4`–`0x02154070` | 31 | complete | string at `0x0216e1b4` |
-| `script_sub_event.c` | `0x02154070`–`0x02154180` | 7 | partial | descriptive |
+| `script_sub_event.c` | `0x02154070`–`0x02154180` | 7 | complete | descriptive |
 | `scrcmd_vm.c` | `0x02154180`–`0x02154948` | 59 | complete | descriptive |
 | `script_plugin.c` | `0x02154948`–`0x02154a64` | 5 | complete | descriptive |
 | `map_matrix.c` | `0x02154a64`–`0x02154c94` | 15 | partial | string at `0x0216e1c4` |
@@ -127,21 +127,21 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_work.c` | `0x021550a4`–`0x021555f8` | 47 | complete | string at `0x0216e1e4` |
 | `scrcmd_game_state.c` | `0x021555f8`–`0x02156174` | 55 | complete | descriptive |
 | `scrcmd_pokemon.c` | `0x02156174`–`0x021574a4` | 43 | complete | string at `0x0216e1f4` |
-| `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | partial | string at `0x0216e208` |
+| `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | complete | string at `0x0216e208` |
 | `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
 | `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | partial | string at `0x0216e22c` |
 | `field_encount_st.c` | `0x021590ec`–`0x021593fc` | 15 | complete | string at `0x0216e240` |
 | `hiden_event.c` | `0x021593fc`–`0x02159bc0` | 43 | complete | descriptive |
 | `scrcmd_network.c` | `0x02159bc0`–`0x02159d54` | 9 | complete | string at `0x0216e254` |
-| `scrcmd_stadium.c` | `0x02159d54`–`0x0215a0b0` | 9 | partial | descriptive |
+| `scrcmd_stadium.c` | `0x02159d54`–`0x0215a0b0` | 9 | complete | descriptive |
 | `event_battle_lose.c` | `0x0215a0b0`–`0x0215a19c` | 2 | complete | descriptive |
 | `event_game_clear.c` | `0x0215a19c`–`0x0215a7a4` | 13 | complete | descriptive |
 | `event_field_menu.c` | `0x0215a7a4`–`0x0215aa68` | 3 | complete | descriptive |
 | `event_shortcut_menu.c` | `0x0215aa68`–`0x0215b488` | 17 | complete | string at `0x0216e268` |
 | `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | partial | string at `0x0216e280` |
-| `event_save.c` | `0x0215c4f8`–`0x0215c6b0` | 5 | partial | descriptive |
+| `event_save.c` | `0x0215c4f8`–`0x0215c6b0` | 5 | complete | descriptive |
 | `event_action_call.c` | `0x0215c6b0`–`0x0215cb48` | 13 | complete | descriptive |
-| `event_3d_demo.c` | `0x0215cb48`–`0x0215cd58` | 5 | partial | descriptive |
+| `event_3d_demo.c` | `0x0215cb48`–`0x0215cd58` | 5 | complete | descriptive |
 | `city_state.c` | `0x0215cd58`–`0x0215cda4` | 3 | complete | descriptive |
 | `eventdata_system.c` | `0x0215cda4`–`0x0215dabc` | 61 | partial | string at `0x0216e298` |
 | `field_actor_tool.c` | `0x0215dabc`–`0x0215ee10` | 69 | partial | descriptive |
@@ -165,9 +165,9 @@ prints the tables below from the configs and the ROM:
 | `fld_btl_inst_event.c` | `0x02161c88`–`0x02161f6c` | 4 | complete | descriptive |
 | `fld_btl_inst_tool.c` | `0x02161f6c`–`0x02162b64` | 22 | partial | string at `0x0216e36c` |
 | `event_cgear_poweron.c` | `0x02162b64`–`0x02162c48` | 3 | complete | descriptive |
-| `event_trial_house.c` | `0x02162c48`–`0x02162f44` | 6 | partial | descriptive |
+| `event_trial_house.c` | `0x02162c48`–`0x02162f44` | 6 | complete | descriptive |
 | `ev_time.c` | `0x02162f44`–`0x021631c8` | 13 | complete | descriptive |
-| `field_g3d_map.c` | `0x021631c8`–`0x02163b38` | 47 | partial | string at `0x0216e380` |
+| `field_g3d_map.c` | `0x021631c8`–`0x02163b38` | 47 | complete | string at `0x0216e380` |
 | `report_event.c` | `0x02163b38`–`0x02164330` | 20 | complete | string at `0x0216e390` |
 | `shaymin_form.c` | `0x02164330`–`0x02164490` | 4 | complete | descriptive |
 | `scrcmd_trial_house.c` | `0x02164490`–`0x02164838` | 16 | complete | descriptive |
@@ -178,7 +178,7 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_sp_poke_gimmick.c` | `0x02165598`–`0x0216598c` | 8 | complete | descriptive |
 | `oneshot_dr.c` | `0x0216598c`–`0x021659ec` | 2 | complete | descriptive |
 | `namein_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | string at `0x0216e3a0` |
-| `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | partial | descriptive |
+| `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | complete | descriptive |
 | `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | partial | descriptive |
 | `fldmmdl.c` | `0x02166664`–`0x02168320` | 270 | complete | string at `0x0216e5c0` |
 | `fest_mission_field.c` | `0x02168320`–`0x02168468` | 5 | complete | descriptive |
@@ -188,7 +188,7 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_sp_poke.c` | `0x02169c1c`–`0x02169c7c` | 4 | complete | descriptive |
 | `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | partial | string at `0x0216e5fc` |
 | `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | partial | descriptive |
-| `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | partial | descriptive |
+| `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | complete | descriptive |
 | `pair_sys.c` | `0x0216a23c`–`0x0216a6a4` | 16 | complete | string at `0x0216e60c` |
 | `scrcmd_hollow_rival.c` | `0x0216a6a4`–`0x0216a82c` | 7 | complete | descriptive |
 | `scrcmd_keysystem.c` | `0x0216a82c`–`0x0216a950` | 5 | complete | string at `0x0216e618` |
@@ -276,7 +276,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_pokewood.c` | `0x0216e660`–`0x0216f838` | 41 | partial | string at `0x0216f8e0` |
+| `event_pokewood.c` | `0x0216e660`–`0x0216f838` | 41 | complete | string at `0x0216f8e0` |
 
 ### Overlay 24
 
@@ -292,7 +292,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `fest_mission_people.c` | `0x0216f900`–`0x0216fffc` | 17 | partial | descriptive |
+| `fest_mission_people.c` | `0x0216f900`–`0x0216fffc` | 17 | complete | descriptive |
 
 ### Overlay 26
 
@@ -344,7 +344,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `net_devwireless.c` | `0x021730e0`–`0x0217333c` | 39 | complete | string at `0x0217576c` |
-| `net_whpipe.c` | `0x0217333c`–`0x02174140` | 60 | partial | string at `0x02175780` |
+| `net_whpipe.c` | `0x0217333c`–`0x02174140` | 60 | complete | string at `0x02175780` |
 | `wih.c` | `0x02174140`–`0x02175680` | 70 | partial | string at `0x021757b4` |
 
 ### Overlay 31
@@ -635,7 +635,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `scrcmd_resort.c` | `0x021e58c0`–`0x021e7c70` | 43 | partial | string at `0x021e7de0` |
+| `scrcmd_resort.c` | `0x021e58c0`–`0x021e7c70` | 43 | complete | string at `0x021e7de0` |
 | `scrcmd_medalinfo.c` | `0x021e7c70`–`0x021e7db4` | 3 | complete | string at `0x021e7df0` |
 
 ### Overlay 60
@@ -767,7 +767,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `weather_particles.c` | `0x021e90c0`–`0x021ea0dc` | 37 | partial | descriptive |
+| `weather_particles.c` | `0x021e90c0`–`0x021ea0dc` | 37 | complete | descriptive |
 
 ### Overlay 76
 
@@ -775,7 +775,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `weather_rain.c` | `0x021e90c0`–`0x021ea674` | 47 | partial | descriptive |
+| `weather_rain.c` | `0x021e90c0`–`0x021ea674` | 47 | complete | descriptive |
 
 ### Overlay 77
 
@@ -996,7 +996,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_badge_gate.c` | `0x021eec80`–`0x021ef794` | 17 | partial | descriptive |
+| `gimmick_badge_gate.c` | `0x021eec80`–`0x021ef794` | 17 | complete | descriptive |
 
 ### Overlay 104
 
@@ -1189,11 +1189,11 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `infinity_dungeon_gimmick.c` | `0x021eec80`–`0x021efaf0` | 40 | partial | string at `0x021f4e20` |
-| `infinity_dungeon.c` | `0x021efaf0`–`0x021f0a64` | 34 | partial | string at `0x021f4f04` |
-| `infinity_dungeon_rooms.c` | `0x021f0a64`–`0x021f1684` | 38 | partial | descriptive |
-| `infinity_dungeon_creator.c` | `0x021f1684`–`0x021f1c80` | 6 | partial | string at `0x021f4f18` |
-| `inf_dungeon_retire.c` | `0x021f1c80`–`0x021f2128` | 19 | partial | string at `0x021f4f60` |
+| `infinity_dungeon_gimmick.c` | `0x021eec80`–`0x021efaf0` | 40 | complete | string at `0x021f4e20` |
+| `infinity_dungeon.c` | `0x021efaf0`–`0x021f0a64` | 34 | complete | string at `0x021f4f04` |
+| `infinity_dungeon_rooms.c` | `0x021f0a64`–`0x021f1684` | 38 | complete | descriptive |
+| `infinity_dungeon_creator.c` | `0x021f1684`–`0x021f1c80` | 6 | complete | string at `0x021f4f18` |
+| `inf_dungeon_retire.c` | `0x021f1c80`–`0x021f2128` | 19 | complete | string at `0x021f4f60` |
 
 ### Overlay 128
 
@@ -1267,7 +1267,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_pokewood_poster.c` | `0x021eec80`–`0x021eef5c` | 13 | partial | descriptive |
+| `gimmick_pokewood_poster.c` | `0x021eec80`–`0x021eef5c` | 13 | complete | descriptive |
 
 ### Overlay 137
 
@@ -1393,7 +1393,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `encounter_effect_grid.c` | `0x021f5da0`–`0x021f61d8` | 5 | partial | descriptive |
+| `encounter_effect_grid.c` | `0x021f5da0`–`0x021f61d8` | 5 | complete | descriptive |
 
 ### Overlay 151
 
@@ -1480,11 +1480,11 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `pokelist.c` | `0x02199a00`–`0x02199b88` | 4 | complete | descriptive |
 | `plist_sys.c` | `0x02199b88`–`0x0219e678` | 89 | partial | descriptive |
-| `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | partial | string at `0x021a4cec` |
+| `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | complete | string at `0x021a4cec` |
 | `plist_message.c` | `0x0219f5ec`–`0x0219fae8` | 23 | complete | string at `0x021a4cfc` |
 | `plist_menu.c` | `0x0219fae8`–`0x0219fef0` | 14 | complete | string at `0x021a4d0c` |
 | `plist_item.c` | `0x0219fef0`–`0x021a0d38` | 21 | complete | descriptive |
-| `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | partial | string at `0x021a4d1c` |
+| `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | complete | string at `0x021a4d1c` |
 | `plist_demo.c` | `0x021a1944`–`0x021a23e8` | 21 | complete | string at `0x021a4d2c` |
 | `status_rcv.c` | `0x021a23e8`–`0x021a30f8` | 7 | complete | descriptive |
 | `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | partial | descriptive |
@@ -1510,7 +1510,7 @@ prints the tables below from the configs and the ROM:
 | `btl_main.c` | `0x021998c0`–`0x0219e3cc` | 231 | partial | string at `0x021dae80` |
 | `btl_server.c` | `0x0219e3cc`–`0x0219f390` | 55 | complete | string at `0x021dae8c` |
 | `btl_server_flow.c` | `0x0219f390`–`0x021ae32c` | 997 | partial | string at `0x021dae9c` |
-| `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | partial | descriptive |
+| `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | complete | descriptive |
 | `btl_handler_work.c` | `0x021b083c`–`0x021b0a1c` | 11 | complete | descriptive |
 | `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | partial | descriptive |
 | `btl_client.c` | `0x021b1674`–`0x021b9950` | 311 | partial | string at `0x021daf60` |
@@ -1522,16 +1522,16 @@ prints the tables below from the configs and the ROM:
 | `ability_handlers.c` | `0x021bdcac`–`0x021c26ec` | 442 | complete | descriptive |
 | `item_handlers.c` | `0x021c26ec`–`0x021c5b04` | 431 | complete | descriptive |
 | `move_handlers.c` | `0x021c5b04`–`0x021cde38` | 620 | complete | descriptive |
-| `handler_common.c` | `0x021cde38`–`0x021ce10c` | 16 | partial | descriptive |
+| `handler_common.c` | `0x021cde38`–`0x021ce10c` | 16 | complete | descriptive |
 | `battle_overlay.c` | `0x021ce10c`–`0x021ce158` | 2 | complete | descriptive |
 | `battle_condition.c` | `0x021ce158`–`0x021ce520` | 20 | complete | descriptive |
 | `poke_type_pair.c` | `0x021ce520`–`0x021ce604` | 8 | complete | descriptive |
-| `btlv_core.c` | `0x021ce604`–`0x021d0c24` | 295 | partial | string at `0x021dafa0` |
+| `btlv_core.c` | `0x021ce604`–`0x021d0c24` | 295 | complete | string at `0x021dafa0` |
 | `btlv_scu.c` | `0x021d0c24`–`0x021d45b0` | 124 | complete | string at `0x021dafac` |
 | `btl_rec.c` | `0x021d45b0`–`0x021d4a1c` | 18 | partial | string at `0x021dafb8` |
 | `btl_adapter.c` | `0x021d4a1c`–`0x021d4c64` | 17 | complete | string at `0x021dafc4` |
 | `btl_string.c` | `0x021d4c64`–`0x021d5968` | 33 | complete | descriptive |
-| `btl_field.c` | `0x021d5968`–`0x021d5e1c` | 36 | partial | string at `0x021dafd4` |
+| `btl_field.c` | `0x021d5968`–`0x021d5e1c` | 36 | complete | string at `0x021dafd4` |
 | `pokewood_cutin.c` | `0x021d5e1c`–`0x021d6c24` | 48 | partial | string at `0x021dafe0` |
 
 ### Overlay 168
@@ -1596,7 +1596,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `pdc.c` | `0x021998c0`–`0x021999a8` | 12 | complete | string at `0x0219a620` |
 | `pdc_main.c` | `0x021999a8`–`0x02199f94` | 11 | complete | string at `0x0219a628` |
-| `pdc_msg.c` | `0x02199f94`–`0x0219a53c` | 16 | partial | string at `0x0219a634` |
+| `pdc_msg.c` | `0x02199f94`–`0x0219a53c` | 16 | complete | string at `0x0219a634` |
 
 ### Overlay 173
 
@@ -1604,7 +1604,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifi_p2pmatchroom.c` | `0x0219ce80`–`0x0219e0ac` | 88 | partial | descriptive |
+| `wifi_p2pmatchroom.c` | `0x0219ce80`–`0x0219e0ac` | 88 | complete | descriptive |
 | `wifi_p2pmatch_net.c` | `0x0219e0ac`–`0x0219e0f0` | 7 | complete | descriptive |
 | `wifi_p2pmatchroom_map.c` | `0x0219e0f0`–`0x0219e108` | 2 | complete | descriptive |
 | `wifi_p2pmatch.c` | `0x0219e108`–`0x021a61c0` | 332 | partial | descriptive |
@@ -1699,12 +1699,6 @@ prints the tables below from the configs and the ROM:
 | `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | partial | descriptive |
-
-The next unregistered file spans `.text` `0x021a7858`–`0x021ab040` (66 functions),
-`.rodata` `0x021bd2e8`–`0x021bfb18`, `.data` `0x021c0678`–`0x021c0740`, and
-`.bss` `0x021c2af0`–`0x021c4024`. Its functions share the access point connection
-work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` run.
-`dwc_ac.c` is a descriptive name pending source recovery; no embedded filename was found.
 
 ### Overlay 184
 
@@ -1851,7 +1845,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `gtsnego_proc.c` | `0x021b2f80`–`0x021b4d24` | 67 | complete | descriptive |
-| `gtsnego_disp.c` | `0x021b4d24`–`0x021b66b8` | 61 | partial | string at `0x021b7b90` |
+| `gtsnego_disp.c` | `0x021b4d24`–`0x021b66b8` | 61 | complete | string at `0x021b7b90` |
 | `gtsnego_message.c` | `0x021b66b8`–`0x021b7870` | 47 | complete | string at `0x021b7bb4` |
 
 ### Overlay 196
@@ -1912,7 +1906,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gds_rap.c` | `0x021b5420`–`0x021b6104` | 24 | partial | string at `0x021b7ae0` |
+| `gds_rap.c` | `0x021b5420`–`0x021b6104` | 24 | complete | string at `0x021b7ae0` |
 | `gds_rap_response.c` | `0x021b6104`–`0x021b631c` | 10 | complete | descriptive |
 | `battle_rec_ov.c` | `0x021b631c`–`0x021b64e8` | 7 | complete | descriptive |
 | `poke_net.c` | `0x021b64e8`–`0x021b7374` | 31 | partial | descriptive |
@@ -2035,7 +2029,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `worldtrade_demo.c` | `0x021d5c48`–`0x021d61dc` | 6 | complete | string at `0x021e2bec` |
 | `worldtrade_deposit.c` | `0x021d61dc`–`0x021d77c8` | 59 | partial | string at `0x021e2ca0` |
 | `worldtrade_enter.c` | `0x021d77c8`–`0x021d8074` | 30 | complete | string at `0x021e2d34` |
-| `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | partial | string at `0x021e2dd8` |
+| `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | complete | string at `0x021e2dd8` |
 | `worldtrade_mypoke.c` | `0x021daeb8`–`0x021dba8c` | 27 | complete | descriptive |
 | `worldtrade_partner.c` | `0x021dba8c`–`0x021dc784` | 29 | complete | descriptive |
 | `worldtrade_search.c` | `0x021dc784`–`0x021de3f8` | 61 | complete | string at `0x021e2f38` |
@@ -2106,7 +2100,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `dpc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
 | `dpc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
 | `dpc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
-| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | partial | descriptive |
+| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | complete | descriptive |
 | `dpc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
 
 ### Overlay 257
@@ -2164,7 +2158,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `local_tvt_person_doctor.c` | `0x0219f04c`–`0x0219f63c` | 11 | complete | string at `0x021a0a4c` |
 | `local_tvt_person_chelen.c` | `0x0219f63c`–`0x0219faac` | 9 | complete | string at `0x021a0a68` |
 | `local_tvt_person_rival.c` | `0x0219faac`–`0x0219fcac` | 7 | complete | string at `0x021a0a84` |
-| `local_tvt_person_secret.c` | `0x0219fcac`–`0x021a039c` | 27 | partial | string at `0x021a0aa0` |
+| `local_tvt_person_secret.c` | `0x0219fcac`–`0x021a039c` | 27 | complete | string at `0x021a0aa0` |
 
 ### Overlay 260
 
@@ -2173,8 +2167,8 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `wifibattlematch_link.c` | `0x021b2f80`–`0x021b3064` | 3 | complete | descriptive |
-| `wifibattlematch_link_random.c` | `0x021b3064`–`0x021b57dc` | 44 | partial | descriptive |
-| `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | partial | descriptive |
+| `wifibattlematch_link_random.c` | `0x021b3064`–`0x021b57dc` | 44 | complete | descriptive |
+| `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
 | `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | partial | descriptive |
 | `sake.c` | `0x021bc218`–`0x021bc4fc` | 19 | complete | descriptive |
@@ -2243,7 +2237,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `staff_roll_main.c` | `0x0219ce80`–`0x0219e518` | 57 | partial | string at `0x0219e660` |
+| `staff_roll_main.c` | `0x0219ce80`–`0x0219e518` | 57 | complete | string at `0x0219e660` |
 
 ### Overlay 267
 
@@ -2263,9 +2257,9 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `br_start_proc.c` | `0x021ba140`–`0x021ba4f8` | 7 | complete | descriptive |
 | `br_menu_proc.c` | `0x021ba4f8`–`0x021ba7a0` | 4 | complete | descriptive |
 | `br_record_proc.c` | `0x021ba7a0`–`0x021bc1e0` | 30 | complete | descriptive |
-| `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | partial | descriptive |
+| `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | complete | descriptive |
 | `br_rndmatch_proc.c` | `0x021bd02c`–`0x021bd804` | 11 | complete | descriptive |
-| `br_bvrank_proc.c` | `0x021bd804`–`0x021be790` | 20 | partial | descriptive |
+| `br_bvrank_proc.c` | `0x021bd804`–`0x021be790` | 20 | complete | descriptive |
 | `br_bvsearch_proc.c` | `0x021be790`–`0x021bf37c` | 19 | complete | descriptive |
 | `br_codein_proc.c` | `0x021bf37c`–`0x021bf540` | 3 | complete | descriptive |
 | `br_codein.c` | `0x021bf540`–`0x021bf6b8` | 8 | complete | string at `0x021c284c` |
@@ -2273,7 +2267,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `br_codein_pv.c` | `0x021c004c`–`0x021c0afc` | 16 | complete | descriptive |
 | `br_bvsend_proc.c` | `0x021c0afc`–`0x021c0ea4` | 6 | complete | descriptive |
 | `br_bvdelete_proc.c` | `0x021c0ea4`–`0x021c13f8` | 11 | complete | descriptive |
-| `br_bvsave_proc.c` | `0x021c13f8`–`0x021c20e8` | 20 | partial | descriptive |
+| `br_bvsave_proc.c` | `0x021c13f8`–`0x021c20e8` | 20 | complete | descriptive |
 
 ### Overlay 269
 
@@ -2306,8 +2300,8 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `br_util.c` | `0x021f34a0`–`0x021f54d8` | 63 | partial | string at `0x021f7e20` |
 | `br_fade.c` | `0x021f54d8`–`0x021f5b68` | 17 | complete | string at `0x021f7eb0` |
 | `br_sidebar.c` | `0x021f5b68`–`0x021f6224` | 18 | complete | string at `0x021f7ebc` |
-| `br_net.c` | `0x021f6224`–`0x021f6a1c` | 37 | partial | string at `0x021f7ed4` |
-| `br_pokesearch.c` | `0x021f6a1c`–`0x021f70a0` | 17 | partial | string at `0x021f7f08` |
+| `br_net.c` | `0x021f6224`–`0x021f6a1c` | 37 | complete | string at `0x021f7ed4` |
+| `br_pokesearch.c` | `0x021f6a1c`–`0x021f70a0` | 17 | complete | string at `0x021f7f08` |
 
 ### Overlay 272
 
@@ -2392,7 +2386,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `b_plist_anm.c` | `0x021f4440`–`0x021f4f44` | 12 | complete | string at `0x021fb860` |
 | `b_plist_bmp.c` | `0x021f4f44`–`0x021f75dc` | 56 | complete | descriptive |
 | `b_plist_obj.c` | `0x021f75dc`–`0x021f8714` | 34 | complete | descriptive |
-| `b_plist_main.c` | `0x021f8714`–`0x021facd0` | 79 | partial | string at `0x021fb870` |
+| `b_plist_main.c` | `0x021f8714`–`0x021facd0` | 79 | complete | string at `0x021fb870` |
 | `b_plist_cursor.c` | `0x021facd0`–`0x021fadac` | 9 | complete | descriptive |
 
 ### Overlay 288
@@ -2503,7 +2497,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `zukanlist.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
-| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | partial | descriptive |
+| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | complete | descriptive |
 | `zknlist_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
 | `zknlist_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
 | `zknlist_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
@@ -2529,7 +2523,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | partial | descriptive |
+| `zukan_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | complete | descriptive |
 
 ### Overlay 302
 
@@ -2842,3 +2836,4 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `ir_check.c` | `0x0217c940`–`0x0217cb10` | 6 | partial | descriptive |
+

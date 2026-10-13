@@ -42,11 +42,17 @@ GameEventReturnCode EventFinishScriptSubEvents_Callback(GameEvent *event, u32 *s
         if (finish == NULL) {
             return GAMEEVENT_DONE;
         }
-        if (FieldScriptSubEvent_IsRegisteredCore(work->index) && !finish(work, &work->state)) {
-            return GAMEEVENT_CONTINUE;
+        if (FieldScriptSubEvent_IsRegisteredCore(work->index)) {
+            if (finish(work, &work->state)) {
+                work->index++;
+                work->state = 0;
+            } else {
+                return GAMEEVENT_CONTINUE;
+            }
+        } else {
+            work->index++;
+            work->state = 0;
         }
-        work->index++;
-        work->state = 0;
     } while (work->index < work->count);
     return GAMEEVENT_DONE;
 }

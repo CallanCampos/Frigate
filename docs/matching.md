@@ -350,6 +350,41 @@ Same instructions, registers swapped.
 - A spilled `u8` that is reloaded and narrowed at each use can come from a later callee's `u8` parameter, not from
   the local's own type: the Dream World postman's `func_ov033_02177d78` matched once its callee
   `func_ov033_021780a4` took `u8 kind` in place of `u32`.
+- Whether an argument is loaded with `ldrh` or `ldrsh` follows the callee's parameter type, not the field's: the
+  Funfest's `FesMissionPeople_PlaceActors` matched once `func_ov012_021682d4` took `u16 sidePos`. Consecutive
+  halfword fields loaded as `adds r3, r4, #0; adds r3, #8; ldrh [r3, #2]; ldrh [r3, #4]` are read through a pointer
+  to the first of them (`const u16 *values = &place->pos.rail.componentId;` then `values[0]`, `values[1]`,
+  `values[2]`).
+- Whether a constant shared by two uses is kept in a register or rebuilt can depend on how many temporaries the
+  function has, not on the constant: the resort's `func_ov059_021e6630` keeps its zero in `r5` once three of its
+  nested call results are held in locals (`field`, `people`, `person`), and no spelling of the zero itself does it.
+  A pool word that differs between the versions by a table row is a table indexed by the version:
+  `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
+  to the address + 0x10 in White 2. Check the pool words of both versions before linking a file.
+- **MWCC propagates a hoisted constant as an immediate only within a budget of about 100 IR nodes from the start of
+  the function.** A constant that needs a register (for a stack argument, or because it is used often) is written
+  as an immediate at each use up to that edge, and as a copy of the register (`mov r3, r7`) at every use past it.
+  The edge is counted in IR nodes, not instructions, so a respelling that compiles to the same bytes moves it: a
+  one-argument call is about 3 nodes, a call without arguments 1, a parameter as an argument 1, a field load 1, a
+  `u16` narrowing 1; casts of constants and dead code are free. The badge gate's `func_ov103_021ef630` (16 bytes
+  off, immediates where the ROM copies) matched when a call's result went through a local
+  (`matrix = FieldExpObj_GetActorMatrixPtr(...); matrix->translation = ...;`), which is the same code for that
+  statement and three nodes more before the edge. So when the only difference is which uses of a constant are
+  immediates and which are register copies, look for a statement before the first copy that the original wrote with
+  one more (or one fewer) named step, and measure by padding rather than counting. This also explains "holding three
+  nested call results in locals keeps the zero in a register" (`func_ov059_021e6630`).
+- A reload of a spilled parameter that trades places with a constant, at the same size, can be a free width
+  conversion to a wider callee parameter: the GTS Negotiations screen's `GtsNegoDisp_DimPalettes` passed a `u16 vram`
+  to `PaletteFade_BlendBuffer`'s `u32 buffer`, which emits nothing but moves the reload. The palette fade's five
+  buffer functions that took `u16` take `u32`. A twin function that matches either way does not vouch for the
+  prototype, since it kept the value in a register. To test a prototype without editing a shared header, compile
+  against a copy with the same include guard (`--extra-flags "-i DIR -prefix copy.h"`).
+- An array zeroed where it is declared in an inner block (`u8 list[N] = { 0 };` inside the block that fills it) is
+  laid out and cleared differently from one declared at the top of the function and cleared by a call or a loop:
+  overlay 12's `func_ov012_0215168c`, `func_ov012_02159f90` and `func_ov012_021522d8` matched that way. A constant
+  the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
+  does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
+  `s01D6_MoveReminderCallMoveSelect`'s mode).
 
 ## Stack slots
 
@@ -525,6 +560,15 @@ Same code, other `sp` offsets or frame size.
   function has the right instructions with the wrong slots or a hoisted constant. Related: a product shifted at each
   use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
   variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
+- A spilled value that sits below temporaries assigned after it has the narrow type of the field it is read from:
+  Pokéstar Studios' `EventPokewood_CreateCastParty` matched once `s32 count` became `s16 count`, the type of
+  `PokewoodCastFile.count[]`. MWCC still spills it as a word, but gives it the lowest slot. Try the field's own type
+  before sweeping declaration orders.
+- Loop-invariant values that MWCC spills take their slots top down in the order they first appear in the loop's
+  body, not in preheader order or by use count. A loop-body local that depends on the body moves an invariant's slot
+  without being hoisted itself: the grid transition's `EncEffGrid_Draw` (22 bytes of stack slots) matched with
+  `s1 = s + width * FX32_ONE; t1 = t + height * FX32_ONE;` assigned right after `s` and `t`, the far corner's texture
+  coordinates. The invariant itself as a local (`w = width * FX32_ONE`) is hoisted under a guard and costs 4 bytes.
 
 ## Instruction order
 
@@ -1108,6 +1152,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   with `ACTOR_CAR` 0 folds the addition but keeps the second narrowing. Seven functions of the roller coaster
   (`gimmick_roller_coaster.c`) differed by that. Check a file's data values as well as its order when completing it:
   all eighteen Y coordinates there were `FX32_CONST(2)` where the ROM has `FX32_CONST(32)`, which no probe shows.
+- MWCC forwards a single-use local's computation to its first use, even a division call past a store; reassigning
+  the computation's input afterwards anchors it where it is written. The blizzard's `Blizzard_ScrollBg` has
+  `step = scrollStep / 28; scrollStep = (scrollStep + 1) % (NELEMS(sBlizzardScrollX) * 28);` with `scrollStep` a local
+  copy of the field. `% NELEMS(table)` is the unsigned modulo of a signed index (`_u32_div_f`), and `% 30` of an
+  unsigned call result that the ROM divides signed needs `(int)`: the probe masks those helper calls, so check the
+  call targets. Pointers that the original sets between a loop's guard and its top, before the body's first
+  computation, are locals of an explicit `if (count > 0) { ...; do { } while (++i < count); }` (`Flake_Add`).
 
 ## Branches and block layout
 
@@ -1351,6 +1402,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   version constant can hide in a file that otherwise matches: `MonolithMission_IsAvailable` tests
   `header.unk01 == 2` in Black 2 and `== 1` in White 2, and mismatched in White 2 only, without a row. Probe both
   versions for every function of a file, not only the ones with rows.
+- Two different tests of a `u16` that compile to the same `cmp #0; beq` are both kept: the wireless pipe's
+  `TickBeaconTimers` has `if (t == 0) continue;` and then `if (t > 0) { t--; ... }`. In the same file an
+  `if (WH_End(NULL)) { return; }` keeps a bare `cmp r0, #0` before the `pop` that a `break` drops, and initializing a
+  `.bss` static (`static NetWhpipeWork *sWork = NULL;`) changed the order of two equal-size local initializers in
+  `.rodata` while the static stays in `.bss`.
+- Switching `u32`/`s32` to the SDK's `unsigned long`/`long` for the whole project was tried with a full rebuild: 12
+  nonmatching functions then match and 75 matching ones break (27 restored by an `int` local, 30 only by an `int`
+  parameter, 18 not at all), so the typedefs stay `unsigned int`/`int` and a function that wants the SDK's type gets
+  it on one local, parameter or struct field (`RivalDataSave.metTrainerCount`: `arr[s->count - 1]` compiles to
+  `adds; subs #4; str` only with an `unsigned long` count). When a row says a constant is folded into an index or an
+  offset the wrong way, or two index registers are swapped, try each 32-bit index as `unsigned long` first.
 
 ## Loops
 
@@ -1785,6 +1847,36 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   does, the original had an object its linker stripped; `pokemontrade_proc.c` is laid out as such a fit, and says so.
   An external `inline` function gets its own copy of a string literal where a `static inline` shares the file's:
   `pokemontrade_save.c`'s `BackupMail` and `BackupRecords` are plain `inline` for their file-name strings.
+- Byte-equal data can still be mislaid: two tables of equal bytes or two equal-size initializers that are swapped
+  show only in the relocation targets, so a data check compares where each pool word points, not only the section's
+  bytes. `infinity_dungeon.c` had three such pairs and `infinity_dungeon_gimmick.c` its two scene setups. In the same
+  overlay a swap of two loop counters' spill slots that no declaration order moved meant the later loop reuses the
+  earlier counters (`i` for floors, `j` for rooms in `InfinityDungeon_LayoutFloors`): spilled pieces are grouped by
+  variable.
+- A "merged tail" or "registers only" difference of hundreds of bytes can hide a wrong statement: the Battle
+  Competition's `WifiBattleMatchLink_CompetitionTaskMatch` (743 bytes off) had two calls and a store the ROM lacks in
+  one case, an inner `switch` with its cases in the wrong order and a flag set in the wrong arm, and
+  `WifiBattleMatchNet_StartReport` tested the wrong parameter. Before respelling a large function, check its
+  statements against the asm case by case.
+- A `bl` that the probe masks can go to a linker veneer's symbol instead of the function: five calls of
+  `btl_server_flow.c` named veneers (through local prototypes) and compiled to matching bytes. The call-target check
+  has to follow veneers (`ov167a_calls.py` in that session did); the battle overlay has 45 of them in one file's
+  range. In the same overlay a pointer to `const` was the shared cause of eight nonmatching functions (the damage
+  list's five readers, a move param, the stat-change and cure handlers' params): when sibling functions all differ
+  by a load placed against a store or call, try `const` on the pointee they share before anything else.
+- A helper's local initializer joins the size sort where the helper is defined, and a `static inline` defined after
+  its caller is still inlined, so where a helper sits moves equal-size initializers without touching code. In a
+  frame, the caller's own locals take the highest slots in declaration order, then each inlined call's locals follow
+  in call order, with the locals inside one helper ascending. The Pokédex cover's `ZukanOpen_InitBG` sets up its five
+  BGs through five one-BG inlines, three defined before it and two after, which gives both the ROM's falling stack
+  slots and the order of its two equal-size initializers. Which helpers sit after the caller is a fit; a table the
+  original link dead-stripped would explain the ROM as well.
+- When a layout search needs N extra small objects, first ask whether an object already in the ROM is N + 1 smaller
+  ones. The `08 08 08` at the head of `gimmick_pokewood_poster.c`'s `.rodata` is not one unreferenced 3-byte global
+  but three one-byte objects in the packed section (function-local `static const u8` whose reads fold): the bytes are
+  the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
+  order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
+  one is dropped; a used `.bss` static joins the sort, an unused one does not.
 
 ## When nothing moves it
 

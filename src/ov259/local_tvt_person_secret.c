@@ -61,18 +61,18 @@ typedef struct {
 } LocalTvtSecretStage;
 
 static LocalTvtSecret *LocalTvtSecret_Create(GameData *gameData, BOOL unk, HeapID heapId);
-static void LocalTvtSecret_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSecret_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSecret_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSecret_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
+static void LocalTvtSecret_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSecret_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSecret_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSecret_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
                                         int *step);
-static BOOL LocalTvtSecret_TalkChat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
+static BOOL LocalTvtSecret_TalkChat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
                                     int *step);
-static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
+static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
                                    int *step);
-static BOOL LocalTvtSecret_ShortCall(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSecret_WholeCall(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSecret_ShortCall(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSecret_WholeCall(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 static u32 LocalTvtSecret_GetStage10(LocalTvtCallData *data);
 static u32 LocalTvtSecret_GetChatMsg(u8 *surveyAnswers, LocalTvtCallData *data, LocalTvtMessage *message);
 static void LocalTvtSecret_SetWords(LocalTvtCallData *data, LocalTvtMessage *message, u32 callCount, u32 answerMsg,
@@ -188,17 +188,17 @@ static LocalTvtSecret *LocalTvtSecret_Create(GameData *gameData, BOOL unk, HeapI
     return secret;
 }
 
-static void LocalTvtSecret_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static void LocalTvtSecret_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     GFL_HeapFree(work);
 }
 
-static BOOL LocalTvtSecret_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSecret_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSecret *secret = work;
 
     return LocalTvtSecret_TalkGreeting(person, setup, secret, &secret->step);
 }
 
-static BOOL LocalTvtSecret_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSecret_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSecret *secret = work;
 
     switch (secret->step) {
@@ -219,13 +219,13 @@ static BOOL LocalTvtSecret_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *set
     return FALSE;
 }
 
-static BOOL LocalTvtSecret_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSecret_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSecret *secret = work;
 
     return LocalTvtSecret_TalkBye(person, setup, secret, &secret->step);
 }
 
-static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
+static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
                                         int *step) {
     u32 messageId = 0;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -256,7 +256,7 @@ static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, LocalTvtPersonSe
     return FALSE;
 }
 
-static BOOL LocalTvtSecret_TalkChat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
+static BOOL LocalTvtSecret_TalkChat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
                                     int *step) {
     BOOL male = FALSE;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -293,7 +293,7 @@ static BOOL LocalTvtSecret_TalkChat(LocalTvtPerson *person, LocalTvtPersonSetup 
     return FALSE;
 }
 
-static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
+static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
                                    int *step) {
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 
@@ -343,7 +343,7 @@ static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, LocalTvtPersonSetup *
 }
 
 // A call that is over after one message
-static BOOL LocalTvtSecret_ShortCall(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSecret_ShortCall(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSecret *secret = work;
     u32 messageId = 0;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -376,7 +376,7 @@ static BOOL LocalTvtSecret_ShortCall(LocalTvtPerson *person, LocalTvtPersonSetup
 }
 
 // A call without a menu: the greeting, the chat and the goodbye
-static BOOL LocalTvtSecret_WholeCall(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSecret_WholeCall(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSecret *secret = work;
 
     switch (secret->step) {

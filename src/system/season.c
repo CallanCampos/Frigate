@@ -26,7 +26,7 @@ BOOL GameData_GetSeasons(GameData *gameData, u16 *prevSeason, u16 *season) {
     return FALSE;
 }
 
-u32 Season_GetRealTime(void) {
+u8 Season_GetRealTime(void) {
     RTCDate date;
     u8 season;
 
