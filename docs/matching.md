@@ -1601,6 +1601,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   no layout of one file gives that (`rodata_order.py`: G:12! S:144 B:12 is always B G S or G B S). Its three
   functions are the last of `.text`, use no string or static of wifibattlematch_sys.c, and the step table points to it
   like to the other overlays' proc tables: a second file with an extern table.
+- The string literals of a pointer table's initializer do follow the size sort (this corrects what is said about
+  `mbp.c` above): each literal joins the list just before its table, with size `strlen + 1`, and literals created in
+  code are not in the list and come last. The model predicted 12 of 12 random declaration orders of
+  `field_gimmick_gate.c`, whose `gelboard_N` strings were in the wrong order in `.data` until `sBoardNames` was
+  declared directly before `sBoardPlNames`.
 
 ## When nothing moves it
 

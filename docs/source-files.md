@@ -928,8 +928,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `field_gimmick_gate.c` | `0x021eec80`–`0x021efbd8` | 48 | partial | string at `0x021f078c` |
-| `gimmick_obj_elboard.c` | `0x021efbd8`–`0x021f039c` | 19 | partial | string at `0x021f07a4` |
+| `field_gimmick_gate.c` | `0x021eec80`–`0x021efbd8` | 48 | complete | string at `0x021f078c` |
+| `gimmick_obj_elboard.c` | `0x021efbd8`–`0x021f039c` | 19 | complete | string at `0x021f07a4` |
 
 ### Overlay 105
 
