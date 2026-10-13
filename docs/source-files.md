@@ -1827,7 +1827,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifi_note.c` | `0x021a9b60`–`0x021aded8` | 170 | partial | descriptive |
+| `wifi_note.c` | `0x021a9b60`–`0x021aded8` | 170 | complete | descriptive |
 
 ### Overlay 205
 

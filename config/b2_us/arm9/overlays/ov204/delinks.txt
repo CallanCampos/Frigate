@@ -5,6 +5,7 @@
     .bss        start:0x021ae200 end:0x021ae200 kind:bss align:32
 
 src/ov204/wifi_note.c:
+    complete
     .text       start:0x021a9b60 end:0x021aded8
     .rodata     start:0x021aded8 end:0x021ae19c
     .data       start:0x021ae1a0 end:0x021ae200

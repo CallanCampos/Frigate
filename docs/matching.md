@@ -239,6 +239,12 @@ Same instructions, registers swapped.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
+- A 32-bit parameter passed on the stack is only ever reloaded from its stack home; its copy in a local of the other
+  signedness is a new value and gets a saved register. The Pal Pad's `WifiNoteListArea_DrawFriend` takes
+  `s32 friendPos` as a stack argument and starts with `u32 pos = friendPos;`: `pos` sits in `r4`
+  (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
+  bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
+  (`area->chars[(u32)pos]`) does the same as the local.
 
 ## Stack slots
 

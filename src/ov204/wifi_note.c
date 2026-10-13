@@ -467,7 +467,7 @@ static void WifiNoteDraw_InitClAct(WifiNoteDraw *draw, HeapID heapId);
 static void WifiNoteDraw_ExitClAct(WifiNoteDraw *draw);
 static void WifiNoteDraw_InitMsg(WifiNoteDraw *draw, HeapID heapId);
 static void WifiNoteDraw_ExitMsg(WifiNoteDraw *draw);
-static void WifiNoteDraw_InitTitle(WifiNoteDraw *draw, WifiNoteData *data, HeapID heapId);
+static void WifiNoteDraw_InitTitle(WifiNoteDraw *draw, const WifiNoteData *data, HeapID heapId);
 static void WifiNoteDraw_ExitTitle(WifiNoteDraw *draw);
 static void WifiNoteDraw_LoadScreens(WifiNoteDraw *draw, HeapID heapId);
 static void WifiNoteDraw_FreeScreens(WifiNoteDraw *draw);
@@ -556,7 +556,7 @@ static void WifiNoteListArea_Draw(WifiNoteListArea *area, WifiNoteData *data, Wi
 static void WifiNoteListArea_Clear(WifiNoteListArea *area, WifiNoteDraw *draw, WifiNoteScreens *screens);
 static void WifiNoteListArea_DeleteActors(WifiNoteListArea *area, WifiNoteDraw *draw);
 static void WifiNoteListArea_DrawFriend(WifiNoteListArea *area, WF_2DCSYS *charSys, WifiNoteDraw *draw,
-                                        WifiNoteScreens *screens, s32 pos, WifiList *wifiList, u32 index,
+                                        WifiNoteScreens *screens, s32 friendPos, WifiList *wifiList, u32 index,
                                         HeapID heapId);
 static void WifiNoteListArea_DrawFrame(WifiNoteListArea *area, WifiNoteDraw *draw, WifiNoteScreens *screens, s32 pos,
                                        HeapID heapId);
@@ -1213,7 +1213,7 @@ static void WifiNoteDraw_ExitMsg(WifiNoteDraw *draw) {
     GFL_WordSetSystemFree(draw->wordSet);
 }
 
-static void WifiNoteDraw_InitTitle(WifiNoteDraw *draw, WifiNoteData *data, HeapID heapId) {
+static void WifiNoteDraw_InitTitle(WifiNoteDraw *draw, const WifiNoteData *data, HeapID heapId) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 0x140, 0x20, heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x1c0, 0x20, heapId);
     LoadSysMsgBox(1, 70, 11, data->frameType, heapId);
@@ -2623,13 +2623,14 @@ static void WifiNoteListArea_DeleteActors(WifiNoteListArea *area, WifiNoteDraw *
 
 // A friend's trainer, or an empty frame for a friend not met, and the name in the color of the gender
 static void WifiNoteListArea_DrawFriend(WifiNoteListArea *area, WF_2DCSYS *charSys, WifiNoteDraw *draw,
-                                        WifiNoteScreens *screens, s32 pos, WifiList *wifiList, u32 index,
+                                        WifiNoteScreens *screens, s32 friendPos, WifiList *wifiList, u32 index,
                                         HeapID heapId) {
     WF_2DC_WKDATA charData;
     u16 colors[3];
     u32 view;
     u32 gender;
     StrBuf *name;
+    u32 pos = friendPos;
 
     colors[0] = 0x14c0;
     colors[1] = 0xc80;
