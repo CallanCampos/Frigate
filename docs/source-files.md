@@ -415,19 +415,44 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 36
 
-1530 of 4339 functions are in source files. Embedded names without a file yet: `comm_entry_menu.c`, `ctalkmsgwin.c`, `enceff.c`, `entrance_camera.c`, `fes_gimmick.c`, `field_3dbg.c`, `field_bbd_color.c`, `field_camera.c`, `field_camera_anime.c`, `field_comm_actor.c`, `field_fade.c`, `field_flash.c`, `field_fmission_info.c`, `field_fog.c`, `field_g3dobj.c`, `field_light.c`, `field_msgbg.c`, `field_place_name.c`, `field_player_core.c`, `field_player_grid_event.c`, `field_player_nogrid.c`, `field_rail.c`, `field_rail_loader.c`, `field_saveanime.c`, `field_subscreen.c`, `field_task.c`, `field_task_manager.c`, `field_wfbc.c`, `field_zonefog.c`, `fieldmap_ctrl_grid.c`, `fieldmap_ctrl_nogrid_work.c`, `fieldmap_tcb_camera_zoom.c`, `fieldskill_mapeff.c`, `fld3d_ci.c`, `fld_exp_obj.c`, `fld_particle.c`, `fld_wipe_3dobj.c`, `fldeff_btrain.c`, `fldeff_bubble.c`, `fldeff_d06denki.c`, `fldeff_hide.c`, `fldeff_iaigiri.c`, `fldeff_ochiba.c`, `fldeff_reflect.c`, `fldeff_ripple.c`, `fldeff_splash.c`, `fldmmdl_acmd.c`, `fldmmdl_blact.c`, `fldmmdl_g3dobj.c`, `height_ex.c`, `ircbattlemenu.c`, `land_data_patch.c`, `party_select_list.c`, `place_name_letter.c`, `pleasure_boat.c`, `scrcmd_pokemon_fld.c`, `sodateya.c`, `weather.c`, `weather_task.c`.
+4339 of 4339 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `fieldmap.c` | `0x0217f600`–`0x021814dc` | 128 | partial | string at `0x021d4b20` |
+| `fieldmap_event.c` | `0x021814dc`–`0x0218304c` | 55 | partial | descriptive |
 | `field_buildmodel.c` | `0x0218304c`–`0x02184244` | 85 | partial | string at `0x021d4b2c` |
 | `field_g3d_mapper.c` | `0x02184244`–`0x021856a0` | 57 | partial | string at `0x021d4b4c` |
+| `field_camera.c` | `0x021856a0`–`0x02186ed0` | 84 | partial | string at `0x021d4b88` |
+| `field_camera_anime.c` | `0x02186ed0`–`0x021876d0` | 34 | partial | string at `0x021d4b98` |
+| `field_msgbg.c` | `0x021876d0`–`0x0218a7f8` | 177 | partial | string at `0x021d4bb0` |
 | `field_map_chunk_wb.c` | `0x0218a7f8`–`0x0218a8f8` | 2 | complete | descriptive |
 | `field_map_chunk_gc.c` | `0x0218a8f8`–`0x0218aa7c` | 3 | complete | descriptive |
 | `field_map_chunk_ng.c` | `0x0218aa7c`–`0x0218ab60` | 2 | complete | descriptive |
 | `field_map_chunk_rd.c` | `0x0218ab60`–`0x0218adac` | 2 | complete | descriptive |
+| `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | partial | string at `0x021d4bc0` |
+| `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | partial | string at `0x021d4bd0` |
+| `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | partial | descriptive |
+| `ctalkmsgwin.c` | `0x0218b1f8`–`0x0218d0f4` | 56 | partial | string at `0x021d4c23` |
+| `ircbattlemenu.c` | `0x0218d0f4`–`0x0218ed18` | 63 | partial | string at `0x021d4d24` |
+| `fldmmdl_acmd.c` | `0x0218ed18`–`0x02193680` | 430 | partial | string at `0x021d4d40` |
+| `fldmmdl_blact.c` | `0x02193680`–`0x021946b4` | 58 | partial | string at `0x021d4d50` |
+| `fldmmdl_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | partial | string at `0x021d4d60` |
+| `fld_act_rail.c` | `0x02195378`–`0x02196238` | 74 | partial | descriptive |
+| `field_rail_loader.c` | `0x02196238`–`0x02197534` | 62 | partial | string at `0x021d4de8` |
+| `field_fog.c` | `0x02197534`–`0x02197710` | 22 | partial | string at `0x021d4dfc` |
+| `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | partial | string at `0x021d4e08` |
+| `field_light.c` | `0x02197820`–`0x02198198` | 31 | partial | string at `0x021d4e18` |
+| `field_subscreen.c` | `0x02198198`–`0x02198bc0` | 72 | partial | string at `0x021d4e28` |
+| `field_3dbg.c` | `0x02198bc0`–`0x02199004` | 20 | partial | string at `0x021d4e3c` |
+| `weather.c` | `0x02199004`–`0x021993e0` | 16 | partial | string at `0x021d4e54` |
+| `weather_task.c` | `0x021993e0`–`0x0219a3b4` | 91 | partial | string at `0x021d4e60` |
+| `fieldmap_ctrl_grid.c` | `0x0219a3b4`–`0x0219a47c` | 5 | partial | string at `0x021d4e70` |
 | `field_player.c` | `0x0219a47c`–`0x0219ad4c` | 68 | complete | string at `0x021d4e88` |
+| `field_player_core.c` | `0x0219ad4c`–`0x0219b7a8` | 65 | partial | string at `0x021d4e98` |
 | `field_player_grid.c` | `0x0219b7a8`–`0x0219cea0` | 99 | complete | string at `0x021d4eac` |
+| `field_player_nogrid.c` | `0x0219cea0`–`0x0219e328` | 91 | partial | string at `0x021d4ee4` |
+| `fieldmap_ctrl_nogrid_work.c` | `0x0219e328`–`0x0219e430` | 7 | partial | string at `0x021d4efc` |
 | `fieldmap_ctrl_hybrid.c` | `0x0219e430`–`0x0219e9d0` | 13 | complete | string at `0x021d4f44` |
 | `field_ground_anime.c` | `0x0219e9d0`–`0x0219f178` | 32 | partial | string at `0x021d4f5c` |
 | `event_entrance_effect.c` | `0x0219f178`–`0x0219fa10` | 25 | complete | descriptive |
@@ -467,22 +492,67 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_encount.c` | `0x021ae394`–`0x021ae6d4` | 9 | complete | string at `0x021d51f0` |
 | `scrcmd_camera.c` | `0x021ae6d4`–`0x021aea40` | 14 | complete | descriptive |
 | `scrcmd_fld_battle.c` | `0x021aea40`–`0x021aedf4` | 9 | complete | string at `0x021d5204` |
+| `scrcmd_pokemon_misc.c` | `0x021aedf4`–`0x021afa2c` | 27 | partial | descriptive |
+| `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | partial | string at `0x021d5218` |
 | `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | partial | descriptive |
+| `field_rail.c` | `0x021b0228`–`0x021b3a3c` | 137 | partial | string at `0x021d5238` |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
 | `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |
 | `fieldmap_func.c` | `0x021b427c`–`0x021b445c` | 9 | complete | string at `0x021d5290` |
+| `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | partial | descriptive |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
+| `fldeff_reflect.c` | `0x021b496c`–`0x021b4eb4` | 15 | partial | string at `0x021d5338` |
+| `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | partial | string at `0x021d534c` |
+| `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | partial | string at `0x021d5360` |
+| `fes_gimmick.c` | `0x021b64b0`–`0x021b6824` | 18 | partial | string at `0x021d5378` |
+| `place_name_letter.c` | `0x021b6824`–`0x021b733c` | 39 | partial | string at `0x021d53b0` |
+| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | partial | string at `0x021d53c4` |
+| `field_gimmick.c` | `0x021b7f7c`–`0x021b804c` | 4 | partial | descriptive |
+| `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | partial | string at `0x021d53d8` |
+| `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | partial | descriptive |
+| `field_fade.c` | `0x021b9494`–`0x021ba5d0` | 43 | partial | string at `0x021d53e8` |
+| `height_ex.c` | `0x021ba5d0`–`0x021ba81c` | 14 | partial | string at `0x021d53f8` |
+| `field_player_grid_event.c` | `0x021ba81c`–`0x021bb590` | 23 | partial | string at `0x021d5404` |
+| `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | partial | string at `0x021d5420` |
+| `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | partial | string at `0x021d5430` |
+| `sodateya.c` | `0x021bd2ac`–`0x021be790` | 65 | partial | string at `0x021d54a4` |
+| `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | partial | string at `0x021d54b4` |
+| `fldeff_splash.c` | `0x021be988`–`0x021beb70` | 9 | partial | string at `0x021d54c4` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
 | `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | partial | descriptive |
+| `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | partial | string at `0x021d54f0` |
+| `fieldmap_tcb_camera_zoom.c` | `0x021c05d4`–`0x021c0870` | 6 | partial | string at `0x021d5500` |
+| `field_task.c` | `0x021c0870`–`0x021c0914` | 11 | partial | string at `0x021d551c` |
+| `field_task_manager.c` | `0x021c0914`–`0x021c1bc4` | 52 | partial | string at `0x021d552c` |
+| `field_flash.c` | `0x021c1bc4`–`0x021c1d88` | 18 | partial | string at `0x021d5544` |
+| `fieldskill_mapeff.c` | `0x021c1d88`–`0x021c1e30` | 9 | partial | string at `0x021d5554` |
+| `fld_wipe_3dobj.c` | `0x021c1e30`–`0x021c2080` | 7 | partial | string at `0x021d5568` |
+| `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | partial | string at `0x021d557c` |
+| `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | partial | descriptive |
+| `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | partial | descriptive |
+| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | partial | string at `0x021d558c` |
+| `land_data_patch.c` | `0x021c2cbc`–`0x021c2ddc` | 6 | partial | string at `0x021d55a0` |
+| `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | partial | string at `0x021d55c0` |
+| `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | partial | string at `0x021d55f8` |
+| `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | partial | string at `0x021d5620` |
+| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | partial | string at `0x021d5634` |
+| `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | partial | string at `0x021d5648` |
+| `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | partial | string at `0x021d5654` |
+| `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | partial | string at `0x021d5664` |
+| `fldeff_bubble.c` | `0x021c6934`–`0x021c6cc8` | 15 | partial | string at `0x021d56b0` |
+| `field_saveanime.c` | `0x021c6cc8`–`0x021c7028` | 12 | partial | string at `0x021d56c0` |
 | `field_map_chunk_height.c` | `0x021c7028`–`0x021c71d4` | 1 | complete | descriptive |
+| `scrcmd_field.c` | `0x021c71d4`–`0x021c7b38` | 25 | partial | descriptive |
 | `scrcmd_medal.c` | `0x021c7b38`–`0x021c7fd8` | 13 | partial | descriptive |
 | `fld_vreq.c` | `0x021c7fd8`–`0x021c81f4` | 14 | complete | string at `0x021d56f0` |
 | `field_palace_sys.c` | `0x021c81f4`–`0x021c83e8` | 6 | complete | string at `0x021d56fc` |
 | `field_goout_effect.c` | `0x021c83e8`–`0x021c8808` | 11 | complete | string at `0x021d5710` |
 | `field_goout_effect_data.c` | `0x021c8808`–`0x021c8954` | 9 | complete | string at `0x021d5728` |
 | `resort_mapcreate.c` | `0x021c8954`–`0x021c8c34` | 6 | partial | string at `0x021d5744` |
+| `scrcmd_hidden_hollow.c` | `0x021c8c34`–`0x021c944c` | 19 | partial | descriptive |
+| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | partial | string at `0x021d5758` |
 | `scrcmd_ochiba.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | string at `0x021d5768` |
 
 ### Overlay 50
@@ -1485,12 +1555,12 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `field_handlers.c` | `0x06898020`–`0x068981f0` | 36 | complete | descriptive |
-| `pos_handlers.c` | `0x068981f0`–`0x06898bfc` | 175 | partial | descriptive |
+| `pos_handlers.c` | `0x068981f0`–`0x06898bfc` | 175 | complete | descriptive |
 | `side_handlers.c` | `0x06898bfc`–`0x06899af0` | 261 | complete | descriptive |
 | `btlv_scd.c` | `0x06899af0`–`0x0689b938` | 428 | complete | string at `0x0689e938` |
-| `condition_effects.c` | `0x0689b938`–`0x0689ca10` | 263 | partial | descriptive |
+| `condition_effects.c` | `0x0689b938`–`0x0689ca10` | 263 | complete | descriptive |
 | `btl_tables.c` | `0x0689ca10`–`0x0689cc20` | 27 | complete | descriptive |
-| `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | partial | descriptive |
+| `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | complete | descriptive |
 | `btl_monset.c` | `0x0689ccc4`–`0x0689d178` | 38 | partial | descriptive |
 | `btl_wazarec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
 | `btl_faintrec.c` | `0x0689d284`–`0x0689d384` | 9 | complete | descriptive |
@@ -1671,7 +1741,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 189
 
-498 of 498 functions are in source files. Embedded names without a file yet: `ncryption.c`.
+497 of 497 functions are in source files. Embedded names without a file yet: `ncryption.c`.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1704,7 +1774,7 @@ prints the tables below from the configs and the ROM:
 | `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | partial | descriptive |
 | `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | partial | descriptive |
 | `gamestats.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
-| `crypt.c` | `0x021a90f0`–`0x021ac838` | 68 | partial | descriptive |
+| `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | partial | descriptive |
 
 ### Overlay 190
 
@@ -2042,7 +2112,7 @@ prints the tables below from the configs and the ROM:
 | `ctvt_game_cam_graphic.c` | `0x021a9704`–`0x021a98d4` | 8 | complete | string at `0x021b26a4` |
 | `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | partial | string at `0x021b26c8` |
 | `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | partial | descriptive |
-| `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | partial | descriptive |
+| `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | complete | descriptive |
 | `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
 | `ssp_exifenc.c` | `0x021ae378`–`0x021af740` | 11 | complete | descriptive |
 
