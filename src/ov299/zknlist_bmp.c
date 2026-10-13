@@ -121,7 +121,7 @@ static void ZknListBmp_LoadWindowBG(ZknListWork *wk, u32 window) {
     pixels = GFL_BitmapGetPixelData(BmpWin_GetBitmap(wk->windows[window].window));
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_ZUKAN_LIST);
     screenFile = GFL_G2DIOReadNSCRArc(arc, 71, FALSE, &screenData, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-    screen = screenData->rawData;
+    screen = (u16 *)screenData->rawData;
     charFile = GFL_G2DIOReadBGNCGRArc(arc, 59, FALSE, &charData, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
     chars = charData->rawData;
     GFL_ArcToolFree(arc);

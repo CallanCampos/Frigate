@@ -88,7 +88,7 @@ static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL succ
 }
 
 static BOOL NetDevWifi_Start(void (*callback)(BOOL ok)) {
-    BOOL result = DWCRap_Init(func_02042d48(), func_02042d64());
+    BOOL result = DWCRap_Init((void *)func_02042d48(), (DWCFriendData *)func_02042d64());
 
     if (callback != NULL) {
         callback(TRUE);
@@ -123,7 +123,7 @@ static BOOL NetDevWifi_Exit(void (*callback)(BOOL ok)) {
 }
 
 static BOOL NetDevWifi_Unk4C(int a0, int a1, int a2, int a3) {
-    return DWCRap_StartMatch(a0, a1, a2, a3);
+    return DWCRap_StartMatch((const char *)a0, a1, a2, a3);
 }
 
 static BOOL NetDevWifi_Unk50(int a0, int a1, int a2) {

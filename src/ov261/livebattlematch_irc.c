@@ -22,7 +22,7 @@
 #define LIVEBATTLEMATCH_IRC_DELIVERY_CODE 0x30
 #define LIVEBATTLEMATCH_IRC_DELIVERY_SIZE 0x160
 
-typedef struct LiveBattleMatchIrc {
+struct LiveBattleMatchIrc {
     // The steps of whichever function is stepping the link
     u32 state;
     HeapID heapId;
@@ -35,7 +35,7 @@ typedef struct LiveBattleMatchIrc {
     BOOL readyArrived;
     void *p_delivery; // the ROM's name, from its assert
     int deliveryResult;
-} LiveBattleMatchIrc;
+};
 
 static void LiveBattleMatchIrc_OnPlayerData(int netId, int size, const void *data, void *work, NetHandle *handle);
 static void *LiveBattleMatchIrc_GetBuffer(int netId, void *work, int size);

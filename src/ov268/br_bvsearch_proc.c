@@ -561,7 +561,8 @@ static BOOL BrBvSearch_ModeMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
 
     BrList_Main(p_wk->p_list);
     select = BrList_GetSelect(p_wk->p_list);
-    isReturn = func_0203dac8(&x, &y) & BrBtn_GetTrg(p_wk->btn[BR_BVSEARCH_BTN_RETURN], x, y);
+    isReturn = func_0203dac8(&x, &y);
+    isReturn &= BrBtn_GetTrg(p_wk->btn[BR_BVSEARCH_BTN_RETURN], x, y);
 
     if (select != BR_LIST_SELECT_NONE) {
         u32 x;
@@ -705,7 +706,8 @@ static BOOL BrBvSearch_AreaMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
 
     BrList_Main(p_wk->p_list);
     select = BrList_GetSelect(p_wk->p_list);
-    isReturn = func_0203dac8(&x, &y) & BrBtn_GetTrg(p_wk->btn[BR_BVSEARCH_BTN_RETURN], x, y);
+    isReturn = func_0203dac8(&x, &y);
+    isReturn &= BrBtn_GetTrg(p_wk->btn[BR_BVSEARCH_BTN_RETURN], x, y);
 
     if (select != BR_LIST_SELECT_NONE) {
         u32 x;
