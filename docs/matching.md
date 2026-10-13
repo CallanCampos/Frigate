@@ -334,6 +334,12 @@ Same instructions, registers swapped.
   `cursor = cursor - 1` did not (`FrameList_Create`, `DrawAll`, `KeyEvent`), and the order of declaration
   initializers places a spilled `= 0`: `TouchBar_Create` has `size`, then `bar = GFL_HeapAllocate(...)`, then
   `sub = 0` as initializers.
+- A callee's narrow parameter can be what keeps its callers from matching: the dress-up's `DupFitting_SortEntries`
+  and `DupFitting_SelectCategory` matched once the item checks they call (`MusItemDraw_CanEquipPos` and its two
+  siblings in overlay 209, three getters in overlay 210) take `s32 pos` in place of `u8 pos`, with the callees
+  themselves matching either way. In the same file the raw display-register masks of `DupFitting_InitGraphics` were
+  `GX_SetVisiblePlane(0); GXS_SetVisiblePlane(0);` (the SDK inline's parameter is what holds the zero in a
+  register), and `(s32)work->badgeFrame < 45` gives the signed `bge` a `u16` field is otherwise compared without.
 
 ## Stack slots
 

@@ -119,15 +119,15 @@ static void MusItemDraw_GetFaceSize(MusItemDraw *item, u8 *width, u8 *height) {
     *height = texHeight / 32;
 }
 
-BOOL MusItemDraw_CanEquipPos(MusItemDraw *item, u8 pos) {
+BOOL MusItemDraw_CanEquipPos(MusItemDraw *item, s32 pos) {
     return func_ov210_021eef98(item->data, pos);
 }
 
-BOOL MusItemDraw_ItemCanEquipPos(MusItemDrawSys *sys, u16 itemId, u8 pos) {
+BOOL MusItemDraw_ItemCanEquipPos(MusItemDrawSys *sys, u16 itemId, s32 pos) {
     return func_ov210_021ef018(MusItemData_GetItem(sys->itemData, itemId), pos);
 }
 
-BOOL MusItemDraw_IsItemOfPos(MusItemDrawSys *sys, u16 itemId, u8 pos) {
+BOOL MusItemDraw_IsItemOfPos(MusItemDrawSys *sys, u16 itemId, s32 pos) {
     return func_ov210_021ef088(MusItemData_GetItem(sys->itemData, itemId), pos);
 }
 
