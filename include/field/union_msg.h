@@ -71,7 +71,7 @@ u16 func_ov034_0217acac(u8 gender);
 u16 func_ov034_0217acb8(u8 gender);
 // The message of a trainer card's origin: nothing, another country, another province or the same
 u32 UnionMsg_GetOriginMessage(UnionSystem *unisys, u8 country, u8 province);
-u8 UnionMsg_GetTableByte(s32 index);
+s32 UnionMsg_GetTableByte(s32 index);
 // Frees the message system, the menus and the windows
 void UnionMsg_FreeAll(UnionSystem *unisys);
 // Creates the message system (the message data, the stream window, the word set) or reopens its window

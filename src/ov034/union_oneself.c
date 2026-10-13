@@ -44,6 +44,12 @@
 
 #define UNION_ACTOR_ID_MEMBER_BASE 0x20
 
+// Whose actor an id is: the one of an entry's parent, or of a member that joined it
+typedef enum {
+    UNION_ACTOR_PARENT,
+    UNION_ACTOR_MEMBER,
+} UnionActorKind;
+
 // The keys that end a message: A, B and the Control Pad
 #define UNION_PAD_ANY (PAD_BUTTON_A | PAD_BUTTON_B | PAD_PLUS_KEY_MASK)
 
@@ -83,9 +89,9 @@ typedef struct {
 
 // BEGIN PROTOS
 static BOOL UnionOneself_SetActorNextStep(UnionActorSlot *slot, u8 step);
-static FieldActor *UnionOneself_CreateActor(UnionSystem *unisys, GameData *gameData, u32 look, u16 id);
+static FieldActor *UnionOneself_CreateActor(UnionSystem *unisys, GameData *gameData, u16 look, u16 id);
 static u16 UnionOneself_GetActorId(UnionBeaconEntry *entry, UnionActorSlot *slot);
-static BOOL UnionOneself_IsMemberId(u16 id);
+static UnionActorKind UnionOneself_IsMemberId(u16 id);
 static u16 UnionOneself_GetEntryIndex(u16 id);
 static u8 UnionOneself_GetActorGender(UnionSystem *unisys, u16 id);
 static BOOL UnionOneself_CanTalkTo(UnionSystem *unisys, u16 id);
@@ -245,7 +251,7 @@ static BOOL UnionOneself_SetActorNextStep(UnionActorSlot *slot, u8 step) {
     return TRUE;
 }
 
-static FieldActor *UnionOneself_CreateActor(UnionSystem *unisys, GameData *gameData, u32 look, u16 id) {
+static FieldActor *UnionOneself_CreateActor(UnionSystem *unisys, GameData *gameData, u16 look, u16 id) {
     MMSys *mmsys = GameData_GetMMSys(gameData);
     u16 entryIndex = id >> 8;
     u16 member = (u8)id - UNION_ACTOR_ID_MEMBER_BASE;
@@ -265,13 +271,13 @@ static u16 UnionOneself_GetActorId(UnionBeaconEntry *entry, UnionActorSlot *slot
     return (entry->index << 8) | (slot->member + UNION_ACTOR_ID_MEMBER_BASE);
 }
 
-static BOOL UnionOneself_IsMemberId(u16 id) {
+static UnionActorKind UnionOneself_IsMemberId(u16 id) {
     u16 member = (id & 0xff) - UNION_ACTOR_ID_MEMBER_BASE;
 
     if (member == 0) {
-        return FALSE;
+        return UNION_ACTOR_PARENT;
     }
-    return TRUE;
+    return UNION_ACTOR_MEMBER;
 }
 
 static u16 UnionOneself_GetEntryIndex(u16 id) {
@@ -438,13 +444,13 @@ static BOOL UnionOneself_ShowFocus(UnionSystem *unisys, UnionBeaconEntry *entry)
 
 void UnionOneself_UpdateActors(UnionSystem *unisys, GameData *gameData, Field *field) {
     u8 zero[6] = { 0, 0, 0, 0, 0, 0 };
+    int i;
     BOOL focus = FALSE;
     RivalDataSave *rival;
     WifiList *wifiList;
     void *effWork;
     MMSys *mmsys;
     UnionBeaconEntry *entry;
-    int i;
 
     rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
     wifiList = GameData_GetWifiList(gameData);
@@ -469,13 +475,14 @@ void UnionOneself_UpdateActors(UnionSystem *unisys, GameData *gameData, Field *f
                 UnionActorSlot *slot = entry->actor[j];
 
                 if (slot != NULL) {
-                    if (UnionOneself_RunActor(unisys, slot, field) != FALSE) {
-                        continue;
+                    if (UnionOneself_RunActor(unisys, slot, field) == FALSE) {
+                        UnionOneself_FreeActorSlot(unisys, entry, slot);
+                        entry->actor[j] = NULL;
+                        emptyCount++;
                     }
-                    UnionOneself_FreeActorSlot(unisys, entry, slot);
-                    entry->actor[j] = NULL;
+                } else {
+                    emptyCount++;
                 }
-                emptyCount++;
             }
             if (emptyCount >= UNION_MEMBER_MAX && entry->timeout == 0) {
                 sys_memset(entry, 0, sizeof(UnionBeaconEntry));
@@ -964,7 +971,7 @@ static BOOL UnionOneself_StepIdleRun(UnionSystem *unisys, UnionSelf *situ, Field
         situ->mycomm.unk44 = id;
         entryIndex = UnionOneself_GetEntryIndex(id);
         UnionComm_SetSelf(unisys, 0, (u32)&unisys->found[entryIndex]);
-        if (UnionOneself_IsMemberId(id) == FALSE) {
+        if (UnionOneself_IsMemberId(id) == UNION_ACTOR_PARENT) {
             if (unisys->found[entryIndex].beacon.activity == 0) {
                 UnionComm_SetSelf(unisys, 1, (u32)&unisys->found[entryIndex]);
                 UnionOneself_SetNextStep(unisys, UNION_STEP_ASK);
@@ -1332,7 +1339,6 @@ static BOOL UnionOneself_StepParentBegin(UnionSystem *unisys, UnionSelf *situ, F
 static BOOL UnionOneself_StepParentRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq) {
     PokeParty *party;
     int choice;
-    u32 msgId;
 
     if (UnionOneself_CheckNetError(unisys) == TRUE) {
         return TRUE;
@@ -1362,7 +1368,7 @@ static BOOL UnionOneself_StepParentRun(UnionSystem *unisys, UnionSelf *situ, Fie
         party = GameData_GetParty(unisys->param->gameData);
         choice = UnionMsg_UpdateMainMenu(unisys, field);
         if (choice == -1) {
-            return FALSE;
+            break;
         }
         UnionMsg_FreeMainMenu(unisys);
         if (choice == -2 || choice == 0) {
@@ -1371,23 +1377,23 @@ static BOOL UnionOneself_StepParentRun(UnionSystem *unisys, UnionSelf *situ, Fie
             UnionOneself_SetNextStep(unisys, UNION_STEP_OFFER);
             return TRUE;
         }
-        msgId = 0;
         if (choice == UNION_ACTIVITY_TRADE) {
             GSYS_GetGameData(unisys->param->gsys);
             if (howManyPartyPokesAreNotEggs(party) < 2) {
-                msgId = func_ov034_0217ab18(situ->mycomm.target->beacon.gender);
+                UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ab18(situ->mycomm.target->beacon.gender));
+                *seq = 4;
+                break;
             }
         } else if (choice == UNION_ACTIVITY_EGG_TRADE) {
             if (countSanityEggsInParty(party) > 0) {
-                msgId = func_ov034_0217ab30(unisys);
+                UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ab30(unisys));
+                *seq = 4;
+                break;
             } else if (countAllEggsInParty(party) == 0) {
-                msgId = func_ov034_0217ab24(situ->mycomm.target->beacon.gender);
+                UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ab24(situ->mycomm.target->beacon.gender));
+                *seq = 4;
+                break;
             }
-        }
-        if (msgId != 0) {
-            UnionMsg_CreateAndPrint(unisys, field, msgId);
-            *seq = 4;
-            return FALSE;
         }
         if (choice == UNION_ACTIVITY_NONE) {
             UnionOneself_SetNextStep(unisys, UNION_STEP_RULE_SELECT);
@@ -1723,9 +1729,8 @@ static BOOL UnionOneself_StepRuleSelectRun(UnionSystem *unisys, UnionSelf *situ,
 }
 
 static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq) {
-    UnionBeaconEntry *entry = &unisys->found[UnionOneself_GetEntryIndex(situ->mycomm.unk44)];
-    u8 activity = entry->beacon.activity;
-    BOOL yes;
+    u16 index = UnionOneself_GetEntryIndex(situ->mycomm.unk44);
+    u32 activity = unisys->found[index].beacon.activity;
 
     switch (*seq) {
     case 0:
@@ -1740,16 +1745,6 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
             UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ab88(situ->mycomm.target->beacon.gender));
             UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
             *seq = 2;
-            break;
-        case 3:
-            if (entry->beacon.memberCount < UnionMsg_GetTableByte(activity)) {
-                UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac10(situ->mycomm.target->beacon.gender));
-                *seq = 10;
-            } else {
-                UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217aba4(situ->mycomm.target->beacon.gender));
-                UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
-                *seq = 2;
-            }
             break;
         case 4:
         case 5:
@@ -1775,7 +1770,7 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
         case 21:
         case 22:
         case 23:
-            if (entry->beacon.memberCount < UnionMsg_GetTableByte(activity)) {
+            if (unisys->found[index].beacon.memberCount < UnionMsg_GetTableByte(activity)) {
                 UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217abf8(situ->mycomm.target->beacon.gender));
                 UnionOneself_SetRegulation(unisys, activity);
                 UnionMsg_CreateRulesWindow(unisys, field, 0, UnionOneself_IsDoubleActivity(activity), 0);
@@ -1786,13 +1781,9 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
                 *seq = 2;
             }
             break;
-        case UNION_ACTIVITY_TRADE:
-            UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217abc0(situ->mycomm.target->beacon.gender));
-            UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
-            *seq = 2;
-            break;
         case UNION_ACTIVITY_EGG_TRADE:
-            if (entry->beacon.memberCount < UnionMsg_GetTableByte(activity) && !entry->beacon.entryClosed) {
+            if (unisys->found[index].beacon.memberCount < UnionMsg_GetTableByte(activity)
+                && !unisys->found[index].beacon.entryClosed) {
                 UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac04(situ->mycomm.target->beacon.gender));
                 *seq = 10;
             } else {
@@ -1801,6 +1792,21 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
                 *seq = 2;
             }
             break;
+        case 3:
+            if (unisys->found[index].beacon.memberCount < UnionMsg_GetTableByte(activity)) {
+                UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac10(situ->mycomm.target->beacon.gender));
+                *seq = 10;
+            } else {
+                UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217aba4(situ->mycomm.target->beacon.gender));
+                UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
+                *seq = 2;
+            }
+            break;
+        case UNION_ACTIVITY_TRADE:
+            UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217abc0(situ->mycomm.target->beacon.gender));
+            UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
+            *seq = 2;
+            break;
         default:
             UnionMsg_CreateAndPrint(unisys, field, 0x151);
             UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
@@ -1808,13 +1814,13 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
             break;
         }
         break;
-    case 1:
-        if (UnionMsg_IsPrintDone(unisys) == TRUE) {
+    case 2:
+        if (UnionMsg_IsPrintDone(unisys) == TRUE && (GCTX_HIDGetPressedKeys() & UNION_PAD_ANY)) {
             return TRUE;
         }
         break;
-    case 2:
-        if (UnionMsg_IsPrintDone(unisys) == TRUE && (GCTX_HIDGetPressedKeys() & UNION_PAD_ANY)) {
+    case 1:
+        if (UnionMsg_IsPrintDone(unisys) == TRUE) {
             return TRUE;
         }
         break;
@@ -1830,7 +1836,9 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
             (*seq)++;
         }
         break;
-    case 5:
+    case 5: {
+        BOOL yes;
+
         if (UnionMsg_UpdateYesNo(unisys, &yes) == TRUE) {
             UnionMsg_FreeYesNo(unisys);
             if (yes == 0) {
@@ -1849,6 +1857,7 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
             }
         }
         break;
+    }
     case 6:
         if (UnionMsg_IsPrintDone(unisys) == TRUE) {
             return TRUE;
@@ -1882,14 +1891,19 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
             (*seq)++;
         }
         break;
-    case 11:
+    case 11: {
+        BOOL yes;
+
         if (UnionMsg_UpdateYesNo(unisys, &yes) == TRUE) {
             UnionMsg_FreeYesNo(unisys);
             if (yes == 0) {
-                if (situ->mycomm.unk19 == 3) {
+                switch (situ->mycomm.unk19) {
+                case 3:
                     UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac34(situ->mycomm.target->beacon.gender));
-                } else if (situ->mycomm.unk19 == UNION_ACTIVITY_EGG_TRADE) {
+                    break;
+                case UNION_ACTIVITY_EGG_TRADE:
                     UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac28(situ->mycomm.target->beacon.gender));
+                    break;
                 }
                 UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
                 *seq = 2;
@@ -1897,22 +1911,31 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
                 situ->mycomm.unk1A = yes;
                 UnionOneself_SetNextStep(unisys, UNION_STEP_RECRUIT);
                 *seq = 1;
-                if (situ->mycomm.unk19 == 3) {
+                switch (situ->mycomm.unk19) {
+                case 3:
                     UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac7c(situ->mycomm.target->beacon.gender));
-                } else if (situ->mycomm.unk19 == UNION_ACTIVITY_EGG_TRADE) {
+                    break;
+                case UNION_ACTIVITY_EGG_TRADE: {
                     PokeParty *party = GameData_GetParty(unisys->param->gameData);
 
                     if (countSanityEggsInParty(party) > 0) {
                         UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac4c(situ->mycomm.target->beacon.gender));
+                        UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
+                        *seq = 2;
                     } else if (countAllEggsInParty(party) == 0) {
                         UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac40(situ->mycomm.target->beacon.gender));
+                        UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
+                        *seq = 2;
                     } else {
                         UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac58(situ->mycomm.target->beacon.gender));
                     }
+                    break;
+                }
                 }
             }
         }
         break;
+    }
     }
     return FALSE;
 }
@@ -2190,7 +2213,9 @@ static BOOL UnionOneself_StepRecruitRun(UnionSystem *unisys, UnionSelf *situ, Fi
             if (func_02042a78() > 1) {
                 func_02042e9c(TRUE);
                 needed = UnionMsg_GetTableByte(situ->mycomm.unk19);
-                if (needed > func_02042a6c(func_02040440())) {
+                if (needed <= func_02042a6c(func_02040440())) {
+                    *seq = 4;
+                } else {
                     UnionComm_SetSelf(unisys, 3, (u32)&unisys->found[entryIndex]);
                     situ->mycomm.unk46_1 = 1;
                     switch (situ->mycomm.unk19) {
@@ -2217,8 +2242,6 @@ static BOOL UnionOneself_StepRecruitRun(UnionSystem *unisys, UnionSelf *situ, Fi
                         break;
                     }
                     *seq = 3;
-                } else {
-                    *seq = 4;
                 }
             } else {
                 situ->wait++;
@@ -2232,14 +2255,14 @@ static BOOL UnionOneself_StepRecruitRun(UnionSystem *unisys, UnionSelf *situ, Fi
         break;
     case 2:
         switch (situ->mycomm.unk19) {
-        case 3:
-            UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac94(situ->mycomm.target->beacon.gender));
-            break;
         case 20:
         case 21:
         case 22:
         case 23:
             UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217acb8(situ->mycomm.target->beacon.gender));
+            break;
+        case 3:
+            UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac94(situ->mycomm.target->beacon.gender));
             break;
         case UNION_ACTIVITY_EGG_TRADE:
             UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac70(situ->mycomm.target->beacon.gender));
@@ -2535,12 +2558,13 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
         break;
     case 1:
         if (situ->mycomm.unk46_1 == 0) {
-            if (func_02040664(func_02040440(), 0xc, 0x14) != TRUE) {
-                break;
+            if (func_02040664(func_02040440(), 0xc, 0x14) == TRUE) {
+                func_02042a9c(func_02040440(), 1);
+                (*seq)++;
             }
-            func_02042a9c(func_02040440(), 1);
+        } else {
+            (*seq)++;
         }
-        (*seq)++;
         break;
     case 2:
         (*seq)++;
@@ -2559,7 +2583,11 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
                 func_02042e9c(TRUE);
                 break;
             case 2:
+                *seq = 0xc8;
+                break;
             case 3:
+                *seq = 0xc8;
+                break;
             case 4:
                 *seq = 0xc8;
                 break;
@@ -3075,8 +3103,7 @@ static BOOL UnionOneself_StepPartySendRun(UnionSystem *unisys, UnionSelf *situ, 
 static BOOL UnionOneself_StepBattleListRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq) {
     UnionColosseum *clsys = unisys->colosseum_sys;
     UnionColosseumParam *param;
-    int count;
-    u8 netId = func_02042a6c(func_02040440());
+    int netId = func_02042a6c(func_02040440());
 
     if (*seq < 3 && UnionOneself_CheckNetErrorEnd(unisys) == TRUE) {
         UnionMsg_FreeAll(unisys);
@@ -3130,6 +3157,7 @@ static BOOL UnionOneself_StepBattleListRun(UnionSystem *unisys, UnionSelf *situ,
         break;
     case 3: {
         int i;
+        int count;
 
         param = GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionColosseumParam), TRUE, "union_oneself.c", 4426);
 
@@ -3280,7 +3308,9 @@ static BOOL UnionOneself_StepColosseumEndRun(UnionSystem *unisys, UnionSelf *sit
         if (func_02042bc4() == TRUE) {
             u8 mask = clsys->unk17C[2];
 
-            if (func_0203ff6c() > 1) {
+            if (func_0203ff6c() <= 1) {
+                (*seq)++;
+            } else {
                 for (i = 0; i < 5; i++) {
                     if (i != func_0203ffc4() && (mask & (1 << i)) && func_02042a80((u8)i) == TRUE) {
                         break;
@@ -3289,8 +3319,6 @@ static BOOL UnionOneself_StepColosseumEndRun(UnionSystem *unisys, UnionSelf *sit
                 if (i == 5) {
                     (*seq)++;
                 }
-            } else {
-                (*seq)++;
             }
         } else {
             (*seq)++;

@@ -71,7 +71,7 @@ void func_ov028_021729a0(UnionColosseum *colosseum, BOOL value) {
     colosseum->unkC8_0 = value;
 }
 
-void func_ov028_021729bc(UnionColosseum *colosseum, u8 value) {
+void func_ov028_021729bc(UnionColosseum *colosseum, u32 value) {
     colosseum->unkDC = value;
     colosseum->unkDD = 0xff;
 }

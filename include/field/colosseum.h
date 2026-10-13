@@ -81,7 +81,7 @@ BOOL func_ov028_02172818(void);
 UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const PlayerInfo *info, u32 flag);
 void Colosseum_Free(UnionColosseum *colosseum, GameSystem *gsys);
 void func_ov028_021729a0(UnionColosseum *colosseum, BOOL value);
-void func_ov028_021729bc(UnionColosseum *colosseum, u8 value);
+void func_ov028_021729bc(UnionColosseum *colosseum, u32 value);
 u8 func_ov028_021729dc(const UnionColosseum *colosseum);
 void func_ov028_02172a1c(UnionColosseum *colosseum);
 void func_ov028_02172a50(UnionColosseum *colosseum);
