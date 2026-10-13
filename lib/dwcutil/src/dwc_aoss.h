@@ -27,8 +27,8 @@ typedef struct AossResult {
 
 // A count or a delay of -1 is the default. In the answer, types has the types that were asked for and found
 typedef struct AossParam {
-    u16 types;         // 0x000
-    u8 version;        // 0x002
+    u16 types;  // 0x000
+    u8 version; // 0x002
     u8 padding_03;
     u16 length;        // 0x004: of data, which ends with a 0
     u8 data[0x100];    // 0x006

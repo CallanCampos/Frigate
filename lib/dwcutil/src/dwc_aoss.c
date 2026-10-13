@@ -1,7 +1,7 @@
 #include "dwc_aoss.h"
+#include "dwc/ext.h"
 #include "dwc_aoss_ap.h"
 #include "dwc_wcm.h"
-#include "dwc/ext.h"
 #include "gfl/std.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -9,8 +9,8 @@
 #include "nitro/wm.h"
 
 // The AOSS client of DWC's settings (see dwc_aoss.h): Buffalo's one-touch setup. It looks for the access point named
-// ESSID-AOSS, joins it with a fixed WEP key, takes an address in its subnet and talks to it in UDP packets on port 22416
-// in three stages, each answered by the access point: the hello (0x1000), the security settings that it offers
+// ESSID-AOSS, joins it with a fixed WEP key, takes an address in its subnet and talks to it in UDP packets on port
+// 22416 in three stages, each answered by the access point: the hello (0x1000), the security settings that it offers
 // (0x2000) and the end (0x3000). The packets are encrypted with RC4 under the id of the access point. It ends with the
 // keys of the network. The file also has the small network helpers that it works with; the Wi-Fi scan and connect are
 // in dwc_aoss_ap.c. The ROM names none of it; the names are ours.
@@ -52,16 +52,16 @@ typedef struct AossRecord {
 
 // The header of a message
 typedef struct AossHeader {
-    u16 version;  // 0x00: 1
+    u16 version; // 0x00: 1
     u16 unk_02;
     u16 unk_04;
-    u16 type;     // 0x06: 0x1010 + 0x1000 for each stage
+    u16 type; // 0x06: 0x1010 + 0x1000 for each stage
     u16 unk_08;
-    u16 length;   // 0x0a: of the body
-    u16 flags;    // 0x0c: bit 4 says it is encrypted
-    s8 checksum;  // 0x0e
-    u8 protocol;  // 0x0f
-    u8 id[8];     // 0x10: of a client, 6 bytes of address and 2 of a number
+    u16 length;  // 0x0a: of the body
+    u16 flags;   // 0x0c: bit 4 says it is encrypted
+    s8 checksum; // 0x0e
+    u8 protocol; // 0x0f
+    u8 id[8];    // 0x10: of a client, 6 bytes of address and 2 of a number
 } AossHeader;
 
 // A record with a status
@@ -125,14 +125,14 @@ typedef struct AossApInfo {
 
 // The request that is run
 typedef struct AossRequest {
-    const u8 *data;  // 0x24
-    int length;      // 0x28
-    u32 wanted;      // 0x2c: the types of security that were asked for
-    u32 found;       // 0x30: the types that the access point has
-    u32 addr;        // 0x34: of the access point
-    u32 netmask;     // 0x38
-    s8 reconnected;  // 0x3c
-    s8 version;      // 0x3d
+    const u8 *data; // 0x24
+    int length;     // 0x28
+    u32 wanted;     // 0x2c: the types of security that were asked for
+    u32 found;      // 0x30: the types that the access point has
+    u32 addr;       // 0x34: of the access point
+    u32 netmask;    // 0x38
+    s8 reconnected; // 0x3c
+    s8 version;     // 0x3d
 } AossRequest;
 
 typedef struct AossWork {
@@ -171,7 +171,6 @@ typedef struct SocTimeval {
     int usec;
 } SocTimeval;
 
-
 static void *Aoss_Alloc(u32 size);
 static void Aoss_Free(void *ptr);
 static int Aoss_Run(AossParam *param);
@@ -206,7 +205,8 @@ static int Aoss_SendStage1(const AossEndpoints *endpoints, const u8 *ids, int so
 static int Aoss_SendStage2(const AossEndpoints *endpoints, const u8 *ids, int sock);
 static s16 Aoss_BuildHello(u8 *buffer);
 static void Aoss_BuildPayload(int encrypt, u8 *dest, const u8 *src, s16 *length, s16 *flags, s8 *checksum);
-static void Aoss_BuildHeader(AossHeader *header, int type, int length, int flags, s8 checksum, s8 protocol, const u8 *id);
+static void Aoss_BuildHeader(AossHeader *header, int type, int length, int flags, s8 checksum, s8 protocol,
+                             const u8 *id);
 static int Aoss_SendPacket(void *buffer, int length, int toAll, int sock);
 static int Aoss_Encrypt(const u8 *in, u8 *out, u32 length, u8 *checksum, u8 *iv, const u8 *key, u32 keyLength);
 static int Aoss_Decrypt(const u8 *in, u8 *out, u32 length, u8 checksum, const u8 *iv, const u8 *key, u32 keyLength);
@@ -243,12 +243,12 @@ static u16 Aoss_Rand(void);
 static void Net_PollInit(SocPollFd *fd);
 static void Net_PollSet(int sock, SocPollFd *fd);
 
-static u8 sRecordType[3] = {9, 8, 0};
+static u8 sRecordType[3] = { 9, 8, 0 };
 static struct {
     int socket;
     int mode;
-} sNet = {-1, -1};
-static SocConfig sSocConfig = {0x01000000, Soc_Alloc, Soc_Free, 0, 0, 0, 0, 0, 0, 0x1000, 0x1000};
+} sNet = { -1, -1 };
+static SocConfig sSocConfig = { 0x01000000, Soc_Alloc, Soc_Free, 0, 0, 0, 0, 0, 0, 0x1000, 0x1000 };
 
 static u8 sCipherKey[0x78];
 static u8 sPeerMac[8];
@@ -268,9 +268,9 @@ static void Aoss_Free(void *ptr) {
 int DWC_Aoss_Start(AossParam *param) {
     int result;
 
-    if (param->scanCount == 0 || param->scanCount < -1 || param->scanDelay < -1 || param->sendCount == 0
-        || param->sendCount < -1 || param->sendDelay < -1 || param->timeout < -1 || param->length == 0
-        || param->length > 0x100 || param->data[param->length - 1] != 0) {
+    if (param->scanCount == 0 || param->scanCount < -1 || param->scanDelay < -1 || param->sendCount == 0 ||
+        param->sendCount < -1 || param->sendDelay < -1 || param->timeout < -1 || param->length == 0 ||
+        param->length > 0x100 || param->data[param->length - 1] != 0) {
         result = -1;
     } else {
         result = 0;
@@ -303,8 +303,8 @@ static int Aoss_Run(AossParam *param) {
     u8 ids[3][8];
     WifiConnectParam target;
     AossEndpoints endpoints;
-    AossRetry scan = {-1, -1};
-    AossRetry send = {0, 0};
+    AossRetry scan = { -1, -1 };
+    AossRetry send = { 0, 0 };
     int option = 1;
     int sends = 0;
     SocAddrIn from;
@@ -585,7 +585,8 @@ static int Aoss_Run(AossParam *param) {
             }
             fromLength = 8;
             packet->sock = sNet.socket;
-            packet->length = Net_Ntohs(Net_RecvFrom(sNet.socket, &packet->header, AOSS_PACKET_SIZE, 0, &from, &fromLength));
+            packet->length =
+                Net_Ntohs(Net_RecvFrom(sNet.socket, &packet->header, AOSS_PACKET_SIZE, 0, &from, &fromLength));
             newState = Aoss_ProcessPacket(state, packet, &sends, ids[0], sNet.socket);
             if (newState == 100) {
                 ret = 0;
@@ -886,8 +887,8 @@ static int Aoss_CheckScan(const WifiScanList *list) {
     for (i = 0; i < count; i++) {
         const WifiApInfo *ap = &list->ap[i];
 
-        if ((ap->type & 1) && ap->ssidLength == Str_Length(AOSS_SSID)
-            && Mem_Compare(ap->ssid, (u8 *)AOSS_SSID, Str_Length(AOSS_SSID)) == 0) {
+        if ((ap->type & 1) && ap->ssidLength == Str_Length(AOSS_SSID) &&
+            Mem_Compare(ap->ssid, (u8 *)AOSS_SSID, Str_Length(AOSS_SSID)) == 0) {
             found++;
         }
     }
@@ -1193,15 +1194,13 @@ static int Aoss_ParseHello(const AossItem *items, AossHello *hello) {
             Mem_Copy(hello->extra, item->data, length);
             break;
         case 3:
-        case 4:
-            {
-                int value = Net_Ntohs(item->data[0]);
+        case 4: {
+            int value = Net_Ntohs(item->data[0]);
 
-                if (value <= 0) {
-                    return -2;
-                }
+            if (value <= 0) {
+                return -2;
             }
-            break;
+        } break;
         case 5:
             sAoss.request.addr = Net_Ntohl(Aoss_ReadLe(item->data, length));
             break;
@@ -1584,7 +1583,8 @@ static void Aoss_BuildPayload(int encrypt, u8 *dest, const u8 *src, s16 *length,
     }
 }
 
-static void Aoss_BuildHeader(AossHeader *header, int type, int length, int flags, s8 checksum, s8 protocol, const u8 *id) {
+static void Aoss_BuildHeader(AossHeader *header, int type, int length, int flags, s8 checksum, s8 protocol,
+                             const u8 *id) {
     header->version = Net_Htons(1);
     header->unk_02 = 0;
     header->unk_04 = 0;
@@ -1938,7 +1938,3 @@ static void Net_PollSet(int sock, SocPollFd *fd) {
     fd->fd = sock;
     fd->events = 1;
 }
-
-
-
-

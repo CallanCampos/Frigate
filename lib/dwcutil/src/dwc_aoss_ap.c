@@ -1,14 +1,14 @@
 #include "dwc_aoss_ap.h"
-#include "dwc_wcm.h"
 #include "dwc/ext.h"
+#include "dwc_wcm.h"
+#include "gfl/std.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
-#include "gfl/std.h"
 
 // The access point layer of the AOSS client (see dwc_aoss_ap.h): the scan for the access points, the connection to one
-// with a WEP key, and the disconnection, over DWC_Wcm_*. A message queue turns the WCM's events into waits. The ROM names
-// none of it; the names are ours.
+// with a WEP key, and the disconnection, over DWC_Wcm_*. A message queue turns the WCM's events into waits. The ROM
+// names none of it; the names are ours.
 //
 // MWCC 2.0 lays the statics out in the reverse of their definition order
 
@@ -42,8 +42,8 @@ static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap) {
         u16 mask;
         u8 rate;
     } sRates[12] = {
-        {0x0001, 0x02}, {0x0002, 0x04}, {0x0004, 0x0b}, {0x0008, 0x0c}, {0x0010, 0x12}, {0x0020, 0x16},
-        {0x0040, 0x18}, {0x0080, 0x24}, {0x0100, 0x30}, {0x0200, 0x48}, {0x0400, 0x60}, {0x0800, 0x6c},
+        { 0x0001, 0x02 }, { 0x0002, 0x04 }, { 0x0004, 0x0b }, { 0x0008, 0x0c }, { 0x0010, 0x12 }, { 0x0020, 0x16 },
+        { 0x0040, 0x18 }, { 0x0080, 0x24 }, { 0x0100, 0x30 }, { 0x0200, 0x48 }, { 0x0400, 0x60 }, { 0x0800, 0x6c },
     };
     int i;
     int count;
@@ -215,7 +215,8 @@ int AossAp_Disconnect(void) {
 }
 
 static // Searches for access points and lists them; 0 if it ended well
-int AossAp_Scan(WifiScanList **list) {
+    int
+    AossAp_Scan(WifiScanList **list) {
     int result = -1;
     BOOL running = TRUE;
     BOOL started = FALSE;
@@ -321,7 +322,8 @@ int AossAp_Scan(WifiScanList **list) {
 }
 
 static // Connects to the access point; 0 if it did
-int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *result) {
+    int
+    AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *result) {
     BOOL running = TRUE;
     int status = -1;
     int connected = 0;
@@ -444,4 +446,3 @@ int AossAp_NotifyModeChange(int mode) {
     }
     return 0;
 }
-

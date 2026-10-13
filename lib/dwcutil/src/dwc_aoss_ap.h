@@ -10,9 +10,9 @@
 
 // An access point of a scan, and the scan
 typedef struct WifiApInfo {
-    u32 ssidLength;   // 0x00
-    u8 ssid[0x20];    // 0x04
-    u32 channel;      // 0x24
+    u32 ssidLength; // 0x00
+    u8 ssid[0x20];  // 0x04
+    u32 channel;    // 0x24
     u32 unk_28[2];
     u8 bssid[6];      // 0x30
     u32 rateCount;    // 0x38
@@ -33,19 +33,19 @@ typedef struct WifiConnectResult {
 
 // The access point to connect to
 typedef struct WifiConnectParam {
-    u32 ssidLength;  // 0x00
-    u8 ssid[0x20];   // 0x04
-    u32 authMode;    // 0x24
-    u32 keyLength;   // 0x28
-    u8 key[0x10];    // 0x2c
+    u32 ssidLength; // 0x00
+    u8 ssid[0x20];  // 0x04
+    u32 authMode;   // 0x24
+    u32 keyLength;  // 0x28
+    u8 key[0x10];   // 0x2c
 } WifiConnectParam;
 
 // The memory functions the client was started with, the block it gave the WCM, and a function to tell when the mode
 // of the client changes (never set)
 typedef struct AossApWork {
-    DWCAossAllocFunc alloc;     // 0x00
+    DWCAossAllocFunc alloc;         // 0x00
     void (*onModeChange)(int mode); // 0x04
-    void *block;                // 0x08
+    void *block;                    // 0x08
 } AossApWork;
 
 extern AossApWork gAossAp;
