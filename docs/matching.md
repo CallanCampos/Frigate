@@ -1466,9 +1466,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
                                                             _pDLWork->error = result;
 - In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
   `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
-  tree is split. Two cases form a group only up to a distance of 3; three cases within a span of 5 also do. The bag's
-  `ItemMenuDisp_IsFieldMoveTM` has 15 and 19 in one group in the ROM, which no spelling of its six cases gives (see
-  its row).
+  tree is split. Two cases form a group up to a distance of 4, and three cases within a span of 5 also do. The bag's
+  `ItemMenuDisp_IsFieldMoveTM` has 15 and 19 in one group, which is the density of exactly 0.4 that needs the
+  compiler's 53-bit precision (see below).
 - A jump-table entry (or `beq`) that lands on a lone `b` to another case's code is a case whose body was written
   out again, not a fall-through. MWCC merges the identical body into the earlier case but keeps a one-instruction
   stub for the later one. `WbtDownloadMessage_Print` has `case 0` at a `b` placed after the shared print block: it
@@ -1487,16 +1487,18 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   gives `case 2` a `b` to `case 1`'s `movs r1, #1`, where `case 1: case 2: return TRUE;` gives none, and
   `case 0: return FALSE;` before a `default: return FALSE;` gives `case 0` a `b` to the default.
 - **Switch trees depend on the x87 precision the compiler runs with.** MWCC groups a switch's sorted cases into
-  ranges with a floating-point density test (cases / span above 0.4), done in x87. A Win32 process starts with the
-  control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is exactly
-  0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, so our build makes
-  another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
-  unchanged: `ItemMenuDisp_IsFieldMoveTM` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
-  (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
-  bytes), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
-  for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. Until the build
-  runs the compiler that way these stay rows: don't spend a session on a "run at a gap of 4" or a tree rooted one
-  case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
+  ranges with a floating-point density test (cases / span of at least 0.4), done in x87. A Win32 process starts with
+  the control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is
+  exactly 0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, which
+  makes another tree than the ROM's compiler did, and no source changes that. So on Linux x86-64 the build and the
+  probe run wibo through `tools/win32_fpu`, which sets 0x27f (see
+  [Build details](building.md#the-compilers-floating-point-precision)). These match only that way:
+  `ItemMenuDisp_IsFieldMoveTM` and `PokeList_GetHidenResult` (cases 15 and 19), overlay 36's
+  `SetupEncountFlagsByPartyPokeAbil` (42 and 46), `Demo3DCapture_End`, `Demo3DCapture_VBlank` and
+  `Demo3DCapture_Begin` (2 and 6), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30).
+  Where the wrapper isn't used (macOS, `--wine`), a tree rooted one case off, or two cases 4 apart tested as
+  separate leaves, is this and not the source. What the tree builder does otherwise: ranges are built left to
+  right, a case joining while the density
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
   in the ranges before it.

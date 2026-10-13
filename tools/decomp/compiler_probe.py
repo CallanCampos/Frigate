@@ -20,7 +20,7 @@ from elftools.elf.relocation import RelocationSection
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
-from configure import INCLUDE_DIRS, library_of  # noqa: E402
+from configure import INCLUDE_DIRS, library_of, run_windows  # noqa: E402
 
 DEFAULT_FLAGS = (
     "-O4,p -proc arm946e -thumb -interworking -enum int -char signed -fp soft -lang=c99 -Cpp_exceptions off -gccext,on -gccinc "
@@ -209,7 +209,7 @@ def main():
         for compiler in compilers:
             obj = Path(tmp) / f"{compiler.replace('/', '_')}.o"
             command = [
-                str(TOOLS / "wibo"),
+                *run_windows(TOOLS),
                 str((TOOLS / "mwccarm" / compiler if "/" in compiler else compilers_dir / compiler) / "mwccarm.exe"),
                 *shlex.split(args.flags),
                 *shlex.split(args.extra_flags),

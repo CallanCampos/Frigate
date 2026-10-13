@@ -5,7 +5,7 @@ The [README](../README.md#build) covers the standard build and required ROM file
 ## Requirements
 
 Use Linux, WSL on Windows, or macOS with Python 3.11+, ninja, and LLVM. Both `clang` and `llvm-objcopy` must be on
-your `PATH`; they assemble the game's scripts.
+your `PATH`; they assemble the game's scripts. Linux also needs a C compiler for the host, as `cc` or that `clang`.
 
 `configure.py` downloads [wibo](https://github.com/decompals/wibo), objdiff, the Metrowerks CodeWarrior tools and
 dsd. The Metrowerks tools are Windows programs, run through wibo. To use an existing Wine installation instead:
@@ -13,6 +13,27 @@ dsd. The Metrowerks tools are Windows programs, run through wibo. To use an exis
 ```sh
 python3 configure.py --wine wine
 ```
+
+### The compiler's floating-point precision
+
+A Win32 process starts with the x87 control word 0x27f (53-bit precision), and wibo leaves Linux's 0x37f (64-bit).
+mwccarm lays out some `switch` statements differently between the two (see
+[Matching](matching.md#switches)), so on Linux x86-64 `configure.py` compiles `tools/win32_fpu.c` with the
+system's C compiler (`cc`, or `clang`) and runs wibo through it: `tools/win32_fpu tools/wibo mwccarm.exe ...` sets
+the control word of the process it starts. The decompilation tools (`compiler_probe.py`, `compile_all.py`, the
+permuter) use it too once `configure.py` has built it.
+
+On macOS, and with `--wine`, the compiler runs as before and `configure.py` says so. Under wibo alone these
+functions come out different, so the ROMs do not match on macOS; whether they do with `--wine` depends on the
+control word that program starts mwccarm with, which is untested:
+
+| File | Function |
+| --- | --- |
+| `src/ov036/enc_pokeset.c` | `SetupEncountFlagsByPartyPokeAbil` |
+| `src/ov142/itemmenu_disp.c` | `ItemMenuDisp_IsFieldMoveTM` |
+| `src/ov165/plist_sys.c` | `PokeList_GetHidenResult` |
+| `src/ov255/box_search.c` | `func_ov255_021d40e8` |
+| `src/ov293/demo3d_capture.c` | `Demo3DCapture_End`, `Demo3DCapture_VBlank`, `Demo3DCapture_Begin` |
 
 ### macOS
 
