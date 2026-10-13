@@ -36,18 +36,6 @@ void Btlv_StringParam_AddArg(BtlvStringParam *param, u32 arg);
 
 typedef BOOL (*BtlvMainProc)(BtlvCore *core, s32 *seq, void *work);
 
-// The party list command's parameters; only the mode is known
-struct BtlvPokeListCmd {
-    u8 unk00[0xb];
-    u8 mode;
-};
-
-// Where a party selection's result goes, handled by overlay 169
-struct BtlvPokeSelectParam {
-    u8 unk00[8];
-    u8 unk08;
-};
-
 // Called while a message prints
 typedef BOOL (*BtlvMsgCallback)(u32 arg);
 
@@ -131,54 +119,6 @@ void func_ov167_021d428c(BtlvScu *scu);
 BOOL func_ov167_021d42ac(BtlvScu *scu);
 void func_ov167_021d4304(BtlvScu *scu);
 BOOL func_ov167_021d4324(BtlvScu *scu);
-
-// The battle view's touch screen, in overlay 169
-void *func_ov169_06899af0(BtlvCore *core, BtlMainModule *mainModule, BtlPokeCon *pokeCon, TCBExManager *tcbManager,
-                          Font *font, BtlClient *client, u32 arg6, HeapID heapId);
-void func_ov169_06899c7c(void *data);
-void func_ov169_06899d9c(void *data, u32 arg1);
-void func_ov169_06899dd4(void *data);
-BOOL func_ov169_06899dfc(void *data);
-void func_ov169_06899e24(void *data);
-void func_ov169_06899e28(void *data);
-void func_ov169_06899e34(void *data);
-void func_ov169_06899e5c(void *data);
-BOOL func_ov169_06899ea8(void *data);
-void func_ov169_06899ed0(void *data);
-void func_ov169_0689a008(void *data, BattleMon *mon, u8 arg2, u8 arg3, void *arg4);
-void func_ov169_0689a038(void *data, BattleMon *mon, u8 arg2, void *arg3);
-u32 func_ov169_0689a060(void *data);
-void func_ov169_0689a078(void *data, BattleMon *mon, void *arg2);
-void func_ov169_0689a09c(void *data, BtlvSelectTargetParam *param, void *arg2);
-BOOL func_ov169_0689a10c(void *data);
-void func_ov169_0689a114(void *data);
-void func_ov169_0689a120(void *data, BattleMon *mon, void *arg2);
-void func_ov169_0689a140(void *data, BattleMon *mon, void *arg2);
-BOOL func_ov169_0689a158(void *data);
-void func_ov169_0689a160(void *data);
-BOOL func_ov169_0689b228(void *data);
-void func_ov169_0689b670(void *data, void *work);
-BOOL func_ov169_0689b680(void *data, u8 *out);
-void func_ov169_0689b6b4(void *data);
-void func_ov169_0689b700(void *data, void *work);
-BOOL func_ov169_0689b728(void *data, u32 *answer);
-u8 *func_ov169_0689b7c8(void *data);
-void func_ov169_0689b7cc(void *data);
-BOOL func_ov169_0689b7f8(void *data);
-void func_ov169_0689b8dc(void *data, void *param);
-u32 func_ov169_0689b8ec(void *data);
-void func_ov169_0689b904(void *data, u32 arg1, u32 arg2, u32 arg3);
-u32 func_ov169_0689b920(void *data);
-void func_ov169_0689b92c(void *data, u32 arg1);
-BOOL func_ov169_0689ca94(u16 item);
-void func_ov169_0689cc74(BtlvPokeSelectParam *param, u8 index, u8 slot);
-u32 func_ov169_0689cca0(BtlvPokeSelectParam *param);
-u8 func_ov169_0689ccb4(BtlvPokeSelectParam *param, u8 index);
-// The cursor stops of btlv_input.c's target screen and their counts, by [pokeIndex][range], for doubles and triples
-extern const u8 data_ov169_0689e218[2][15];
-extern const u8 data_ov169_0689e238[3][15];
-extern const BtlvInputKeyStop *const data_ov169_0689e6e0[2][15];
-extern const BtlvInputKeyStop *const data_ov169_0689e884[3][15];
 
 // The battle's selection screens, which share an address range with the bag
 void BScenarioMain_Start(void *param);
@@ -341,12 +281,5 @@ void func_ov167_021d0bac(BtlvCore *core, u32 arg1, u32 arg2, u32 arg3);
 u32 func_ov167_021d0be4(BtlvCore *core);
 void func_ov167_021d0bf4(BtlvCore *core, u32 arg1);
 
-// Overlay 169's party list
-void func_ov169_0689cc20(BtlvPokeListCmd *cmd, BattleParty *party, u8 count, u8 mode);
-void func_ov169_0689cc38(BtlvPokeListCmd *cmd, u8 numCoverPos);
-void func_ov169_0689cc68(BtlvPokeSelectParam *select, BtlvPokeListCmd *cmd);
-BOOL func_ov169_0689cc90(BtlvPokeSelectParam *select);
-BOOL func_ov169_0689cc9c(BtlvPokeSelectParam *select);
-u8 func_ov169_0689cca4(BtlvPokeSelectParam *select);
 
 #endif // POKEBW2_BATTLE_BTLV_H

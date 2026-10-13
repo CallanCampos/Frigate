@@ -185,6 +185,7 @@ typedef struct BtlvGauge BtlvGauge;
 typedef struct BtlvInput BtlvInput;
 typedef struct BtlvInputKeyStop BtlvInputKeyStop;
 typedef struct BtlvMcss BtlvMcss;
+typedef struct BtlvScd BtlvScd;
 typedef struct BtlvScu BtlvScu;
 typedef struct PokewoodCutin PokewoodCutin;
 typedef struct BtlvPokeListCmd BtlvPokeListCmd;

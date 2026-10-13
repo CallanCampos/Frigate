@@ -5,13 +5,14 @@
 #include "battle/btl_client.h"
 #include "battle/btl_field.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
+#include "battle/btl_poke_select.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_rec.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_setup.h"
 #include "battle/btl_string.h"
+#include "battle/btl_tables.h"
 #include "battle/btlv.h"
 #include "battle/btlv_effect.h"
 #include "battle/btlv_mcss.h"
@@ -2200,7 +2201,7 @@ static BOOL BattleClient_ActionSelectRoot(BtlClient *client, s32 *seq) {
                                           NULL)) {
                         client->shooterEnergy += shooterWork_GetCost(client, client->procActionIdx);
                         if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == 3) {
-                            func_ov169_0689cc90(&client->pokeSelect);
+                            PokeSelect_Pop(&client->pokeSelect);
                         }
                         if (BattleAction_GetAction(&client->actions[client->procActionIdx]) == 2) {
                             selItemWork_Restore(client, client->procActionIdx);
@@ -2522,8 +2523,8 @@ static BOOL BattleClient_ActionSwitchPokemon(BtlClient *client, s32 *seq) {
             return FALSE;
         }
         if (BattleClientCmd_WaitPokeSelect(client->viewCore)) {
-            if (!func_ov169_0689cc9c(&client->pokeSelect)) {
-                u8 slot = func_ov169_0689cca4(&client->pokeSelect);
+            if (!PokeSelect_IsSelecting(&client->pokeSelect)) {
+                u8 slot = PokeSelect_GetLast(&client->pokeSelect);
                 if (slot < 6) {
                     func_ov167_021bdbbc(client->procAction, client->procActionIdx, slot);
                     BattleClient_SetSelActProc(client, BattleClient_ActionSelectAutoRest);
@@ -3720,19 +3721,19 @@ static void PickBestMonToSwitchInto(BtlClient *client, u8 *list, u8 count, Battl
 
 static void func_ov167_021b5d7c(BtlClient *client, u8 mode, u8 count, BtlvPokeListCmd *cmd,
                                 BtlvPokeSelectParam *select) {
-    func_ov169_0689cc20(cmd, client->party, count, mode);
-    func_ov169_0689cc38(cmd, client->numCoverPos);
-    func_ov169_0689cc68(select, cmd);
+    PokeListCmd_Init(cmd, client->party, count, mode);
+    PokeListCmd_SetCoverSlots(cmd, client->numCoverPos);
+    PokeSelect_Init(select, cmd);
 }
 
 static void func_ov167_021b5dd8(BtlClient *client, const BtlvPokeSelectParam *select) {
     u8 i;
 
-    for (i = 0; i < select->unk00[6]; i++) {
-        func_ov167_021bdbbc(&client->actions[i], select->unk00[3 + i], select->unk00[i]);
+    for (i = 0; i < select->count; i++) {
+        func_ov167_021bdbbc(&client->actions[i], select->position[i], select->partyIndex[i]);
     }
     client->returnData = client->actions;
-    client->returnDataSize = select->unk00[6] * sizeof(BattleAction);
+    client->returnDataSize = select->count * sizeof(BattleAction);
 }
 
 static void func_ov167_021b5e1c(BtlClient *client) {
@@ -4029,8 +4030,8 @@ static BOOL func_ov167_021b6328(BtlClient *client, s32 *seq) {
         break;
     case 3:
         if (BattleClientCmd_WaitPokeSelect(client->viewCore)) {
-            if (!func_ov169_0689cc9c(&client->pokeSelect) &&
-                (partyIdx = func_ov169_0689cca4(&client->pokeSelect)) != 0 && partyIdx < 6) {
+            if (!PokeSelect_IsSelecting(&client->pokeSelect) &&
+                (partyIdx = PokeSelect_GetLast(&client->pokeSelect)) != 0 && partyIdx < 6) {
                 func_ov167_021bdbbc(client->actions, 0, partyIdx);
                 *seq = 5;
             } else {

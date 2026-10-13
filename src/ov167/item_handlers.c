@@ -10,6 +10,7 @@
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
+#include "battle/btl_tables.h"
 #include "battle/handler_common.h"
 #include "constants/battle.h"
 #include "constants/items.h"
@@ -1909,7 +1910,7 @@ static void CommonJabocaRowapBerryReaction(BattleEventItem *item, BtlServerFlow 
     BattleHandlerUseHeldItemParam *param;
 
     if (BattleEventVar_GetValue(4) == monId && BattleEventVar_GetValue(0x46) == 0 &&
-        !func_ov169_0689ca54(BattleEventVar_GetValue(0x12)) && BattleEventVar_GetValue(0x1a) == category) {
+        !IsDelayedAttackMove(BattleEventVar_GetValue(0x12)) && BattleEventVar_GetValue(0x1a) == category) {
         BattleEventItem_SetRecallEnable(item);
         work[0] = BattleEventVar_GetValue(3) + 1;
         param = BattleHandler_PushWork(flow, 0, monId);
@@ -2630,7 +2631,7 @@ static void HandlerMetronomeItem(BattleEventItem *item, BtlServerFlow *flow, u8 
     u16 ratio;
 
     if (BattleEventVar_GetValue(3) == monId) {
-        if (!func_ov169_0689ca54(BattleEventVar_GetValue(0x12))) {
+        if (!IsDelayedAttackMove(BattleEventVar_GetValue(0x12))) {
             mon = GetBattleMon(flow, monId);
             count = GetConsecutiveMoveCount(mon);
             if (count >= 1) {
@@ -4322,7 +4323,7 @@ static void CommonGemDecide(BattleEventItem *item, BtlServerFlow *flow, u8 monId
 
     if (BattleEventVar_GetValue(3) == monId && BattleEventVar_GetValue(0x16) == type) {
         move = BattleEventVar_GetValue(0x12);
-        if (PML_MoveIsDamaging(move) && !func_ov169_0689ca74(move) && !BattleEventItem_IsIsolated(item) &&
+        if (PML_MoveIsDamaging(move) && !IsPledgeMove(move) && !BattleEventItem_IsIsolated(item) &&
             !func_ov167_021aba04(flow)) {
             BattleEventItem_ConvertToIsolated(item);
             param = BattleHandler_PushWork(flow, 0x23, monId);

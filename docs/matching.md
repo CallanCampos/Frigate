@@ -164,6 +164,8 @@ Same instructions, registers swapped.
   a `ClActor **`, where `call->rows[i].frame = CtvtCall_CreateActor(...)` computes the address after the call.
 - Two loops that reuse one counter and both spill it share its stack slots in the order MWCC splits the variable,
   not in declaration order; giving the second loop a counter of its own, as `pos` in the same function, moves it.
+  A counter of its own also moves registers: `pos_handlers.c`'s `HandlerPosLunarDance` gives its PP loop `j` and its
+  check loop `i`; with `i` in both, the counters and work pointers take `r4` and `monId` `r5`, the reverse.
 - A pair of values computed twice and spilled to two different slots is two pairs of variables, and the second pair
   repeats the first's declaration order. `gimmick_passing_vehicles.c`'s `func_ov128_021eeec8` takes the sine and
   cosine of 90 and then of 270 degrees: one reused `cos, sin` pair gave the second cosine `r7` and spilled the sine,
@@ -180,6 +182,8 @@ Same instructions, registers swapped.
 - A parameter that the callers narrow with shifts before the call is a `u16` or `u8`, and the type also decides how it
   is spilled: `BagItemList_GetItem` spills `pocket` first and compares the reloaded copy only once `pocket` and `index`
   are `u16`, as `itemmenu.c`'s caller narrows them; as `u32` it compares a register copy and stores it after.
+  The same holds with no narrowing caller to show it: `condition_effects.c`'s `Condition_SetCureMessage` matches
+  only with its fourth parameter `u16` (or `u8`), and its one caller passes 0.
 - Loops over an array of structs that test two fields through a pointer to the element, then write the fields as
   `list->entries[i].x` in the body, keep the array's base in a register and the element's address in another, as
   `bag_item.c`'s `BagItemList_Remove` and `BagItemList_GetItem` do; indexing in the test too folds the field offsets.
@@ -623,7 +627,8 @@ Same instructions, scheduled in another order.
 - A load through a `const` pointer is also reused across stores, as the World Tournament's `wbt_setup.c` reads an
   entrant's bit fields from one load, but it is not hoisted out of a loop: `wbt_party.c`'s filter check reads each
   list's count again in every iteration because its filter is `const`, where a plain pointer's count is loaded once
-  before the loop.
+  before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with
+  `const BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`.
 - A field load scheduled ahead of a store it doesn't depend on, where MWCC keeps the written order, can come from an
   inline helper's argument: arguments are evaluated before the body's stores. The PC box's sequences set the picked
   position with `u8 pos = func_0202ba60(...); Box2Seq_SetGetPos(syswk, pos, syswk->tray);`, which loads `tray` before
@@ -1550,6 +1555,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   file scope or inside its one function, and each static at the top, before its first function or inside it. Its
   `.rodata` and `.bss` are the original's with four tables inside their functions, `sXItems` and `sCureItems` at
   file scope before theirs, and `sSelectSeq` declared before the first function that uses it.
+- MWCC 2.0 lays a file's `.bss` statics out in the reverse of their definition order, without the size sort: the
+  DWC utility's `dwc_wcm.c` (overlay 182) matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and
+  `sEssid[0x20]` defined in that order, but the module check failed until they were defined as `sEssid`, `sBssid`,
+  `sWcm`, the ROM's order backwards.
+- MWCC 2.0 reaches a file's own statics of one section through a shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`),
+  and another file's global by its own address. In overlay 182 that set the seam between `dwc_aoss.c`, which loads
+  the free callback at `0x021c294c` directly, and `dwc_aoss_ap.c`, which loads it as `0x021c2940` + 0xc. It emits a
+  jump table only when every value of the range has a case label, so `dwc_aoss.c`'s switches list the empty cases too.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM

@@ -269,7 +269,7 @@ u32 ZukanSearchEngine_LoadList(u32 type, HeapID heapId, u16 **outList) {
         *outList = list;
         return NATIONAL_COUNT;
     } else {
-        u16 *regionalTable = PML_PersonalLoadRegionalDexTable(heapId, (u32)&size);
+        u16 *regionalTable = PML_PersonalLoadRegionalDexTable(heapId, &size);
         u32 length;
         u16 *national = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ZUKAN_SEARCH, FILE_NATIONAL_ORDER, FALSE, heapId, &length);
         u16 count = length >> 1;

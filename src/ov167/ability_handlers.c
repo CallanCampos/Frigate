@@ -10,6 +10,7 @@
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
+#include "battle/btl_tables.h"
 #include "battle/handler_common.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
@@ -3413,7 +3414,7 @@ BOOL CommonMoveTargetChangeToMe(BtlServerFlow *flow, u8 monId, s32 *work, u32 ty
     attackerId = BattleEventVar_GetValue(3);
     if (attackerId != monId && BattleEventVar_GetValue(0x16) == type) {
         move = BattleEventVar_GetValue(0x12);
-        if (!func_ov167_021abdd0(flow, attackerId, monId, move) && !func_ov169_0689ca74(move)) {
+        if (!func_ov167_021abdd0(flow, attackerId, monId, move) && !IsPledgeMove(move)) {
             targetId = BattleEventVar_GetValue(4);
             if (BattleEventVar_RewriteValue(4, monId) && targetId != monId) {
                 return TRUE;
@@ -3652,7 +3653,7 @@ void HandlerPressure(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *
             move = BattleEventVar_GetValue(0x12);
             if (PML_MoveGetQuality(move) == 10) {
                 apply = TRUE;
-            } else if (func_ov169_0689ca64(move)) {
+            } else if (IsPressureFieldMove(move)) {
                 apply = TRUE;
             }
         }
@@ -3894,7 +3895,7 @@ void HandlerCursedBody(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32
         attacker = GetBattleMon(flow, attackerId);
         if (!CheckCondition(attacker, 0xd)) {
             move = BattleEventVar_GetValue(0x14);
-            if (move != 0 && move != 0xa5 && !func_ov169_0689ca54(move) && AbilityEvent_RollEffectChance(flow, 30)) {
+            if (move != 0 && move != 0xa5 && !IsDelayedAttackMove(move) && AbilityEvent_RollEffectChance(flow, 30)) {
                 turns = 4;
                 if (GetTurnFlag(attacker, 1)) {
                     turns++;
@@ -4414,7 +4415,7 @@ const BattleEventHandlerEntry *EventAddAnalytic(u32 *priority) {
 }
 
 void HandlerAnalytic(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work) {
-    if (BattleEventVar_GetValue(3) == monId && !func_ov169_0689ca54(BattleEventVar_GetValue(0x12)) &&
+    if (BattleEventVar_GetValue(3) == monId && !IsDelayedAttackMove(BattleEventVar_GetValue(0x12)) &&
         IsMonLastInTurnOrder(flow, monId)) {
         BattleEventVar_MulValue(0x31, 0x14cd);
     }

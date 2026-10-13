@@ -2,9 +2,9 @@
 #include "battle/btl_event.h"
 #include "battle/btl_handler.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
+#include "battle/btl_tables.h"
 #include "battle/handler_common.h"
 #include "constants/items.h"
 #include "constants/species.h"
@@ -41,12 +41,12 @@ BOOL GiratinaArceusGenesectItemCheck(u16 species, u16 item) {
         }
         break;
     case SPECIES_ARCEUS:
-        if (func_ov169_0689cb08(item)) {
+        if (IsArceusPlate(item)) {
             return TRUE;
         }
         break;
     case SPECIES_GENESECT:
-        if (func_ov169_0689cb18(item)) {
+        if (IsGenesectDrive(item)) {
             return TRUE;
         }
         break;

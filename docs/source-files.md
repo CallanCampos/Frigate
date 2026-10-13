@@ -1481,6 +1481,24 @@ prints the tables below from the configs and the ROM:
 | `btlv_bg.c` | `0x021f26b8`–`0x021f2cdc` | 15 | complete | string at `0x021f4208` |
 | `btlv_finger_cursor.c` | `0x021f2cdc`–`0x021f2f54` | 7 | complete | string at `0x021f4214` |
 
+### Overlay 169
+
+1298 of 1298 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `field_handlers.c` | `0x06898020`–`0x068981f0` | 36 | complete | descriptive |
+| `pos_handlers.c` | `0x068981f0`–`0x06898bfc` | 175 | partial | descriptive |
+| `side_handlers.c` | `0x06898bfc`–`0x06899af0` | 261 | complete | descriptive |
+| `btlv_scd.c` | `0x06899af0`–`0x0689b938` | 428 | complete | string at `0x0689e938` |
+| `condition_effects.c` | `0x0689b938`–`0x0689ca10` | 263 | partial | descriptive |
+| `btl_tables.c` | `0x0689ca10`–`0x0689cc20` | 27 | complete | descriptive |
+| `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | partial | descriptive |
+| `btl_monset.c` | `0x0689ccc4`–`0x0689d178` | 38 | partial | descriptive |
+| `btl_wazarec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
+| `btl_faintrec.c` | `0x0689d284`–`0x0689d384` | 9 | complete | descriptive |
+| `btl_pospoke.c` | `0x0689d384`–`0x0689d790` | 44 | complete | descriptive |
+
 ### Overlay 170
 
 161 of 161 functions are in source files.
@@ -1595,6 +1613,17 @@ prints the tables below from the configs and the ROM:
 | `mb_cache.c` | `0x021a3b28`–`0x021a3bd4` | 3 | partial | descriptive |
 | `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | complete | descriptive |
 | `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | complete | descriptive |
+
+### Overlay 182
+
+97 of 1113 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `dwc_raputil.c` | `0x021a4920`–`0x021a49d0` | 5 | complete | string at `0x021c05c0` |
+| `dwc_aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | partial | descriptive |
+| `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
+| `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
 
 ### Overlay 184
 

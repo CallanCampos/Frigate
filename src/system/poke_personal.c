@@ -1,5 +1,6 @@
 #include "types.h"
 #include "pml/personal.h"
+#include "pml/poke_party.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"

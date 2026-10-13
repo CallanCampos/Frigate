@@ -487,7 +487,7 @@ static void ThAward_InitText(ThAwardWork *wk) {
     wk->transferred = FALSE;
     if (wk->param->downloaded) {
         record = &wk->param->save->records[1];
-        name = wk->param->save->unk38;
+        name = (const u16 *)wk->param->save->unk38;
     } else {
         record = &wk->param->save->records[0];
     }

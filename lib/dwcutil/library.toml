@@ -1,0 +1,22 @@
+# Nintendo's DWC utility (libdwcutil), the Wi-Fi Connection settings that overlay 182 runs through DWC_StartUtility
+# (lib/dwc/include/dwc/utility.h). It was built apart from the rest of DWC: with MWCC 2.0, which keeps reloading a
+# static's address where dsi/1.1p1 keeps it in a register. Its first file, dwc_wcm.c, went from 1 to 6 of 9 functions
+# matching on the compiler alone, with DWC's own flags (Thumb, -O4,p).
+compiler = "2.0/sp2p2"
+flags = [
+    "-O4,p",               # Optimize for speed
+    "-proc arm946e",       # ARM9 processor
+    "-thumb",              # Thumb code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char signed",        # char is signed
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]

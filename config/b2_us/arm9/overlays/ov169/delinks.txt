@@ -3,3 +3,54 @@
     .ctor       start:0x0689e6d4 end:0x0689e6d4 kind:rodata align:4
     .data       start:0x0689e6e0 end:0x0689e960 kind:data align:32
     .bss        start:0x0689e960 end:0x0689eb20 kind:bss align:32
+
+src/ov169/field_handlers.c:
+    complete
+    .text       start:0x06898020 end:0x068981f0
+    .rodata     start:0x0689d790 end:0x0689d818
+
+src/ov169/pos_handlers.c:
+    complete
+    .text       start:0x068981f0 end:0x06898bfc
+    .rodata     start:0x0689d818 end:0x0689d878
+
+src/ov169/side_handlers.c:
+    complete
+    .text       start:0x06898bfc end:0x06899af0
+    .rodata     start:0x0689d878 end:0x0689d9b0
+    .bss        start:0x0689e960 end:0x0689eb20
+
+src/ov169/btlv_scd.c:
+    complete
+    .text       start:0x06899af0 end:0x0689b938
+    .rodata     start:0x0689d9b0 end:0x0689e388
+    .data       start:0x0689e6e0 end:0x0689e960
+
+src/ov169/btl_tables.c:
+    complete
+    .text       start:0x0689ca10 end:0x0689cc20
+    .rodata     start:0x0689e42c end:0x0689e6d4
+
+src/ov169/btl_poke_select.c:
+    complete
+    .text       start:0x0689cc20 end:0x0689ccc4
+
+src/ov169/condition_effects.c:
+    complete
+    .text       start:0x0689b938 end:0x0689ca10
+    .rodata     start:0x0689e388 end:0x0689e42c
+
+src/ov169/btl_monset.c:
+    .text       start:0x0689ccc4 end:0x0689d178
+
+src/ov169/btl_wazarec.c:
+    complete
+    .text       start:0x0689d178 end:0x0689d284
+
+src/ov169/btl_faintrec.c:
+    complete
+    .text       start:0x0689d284 end:0x0689d384
+
+src/ov169/btl_pospoke.c:
+    complete
+    .text       start:0x0689d384 end:0x0689d790
