@@ -1357,7 +1357,7 @@ void ItemMenuDisp_SetListCursorPalette(ItemMenuWork *work, u32 palette) {
             break;
         }
     }
-    func_0204c378(work->rowNames[i], palette, 0);
+    func_0204c378(work->rowNames[i], (u8)palette, 0);
 }
 
 // Lights the lower screen up for the list, or dims it behind a menu

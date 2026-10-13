@@ -1225,6 +1225,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
       _pDLWork->error = error;                              ...
                                                             }
                                                             _pDLWork->error = result;
+- In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
+  `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
+  tree is split. Two cases form a group only up to a distance of 3; three cases within a span of 5 also do. The bag's
+  `ItemMenuDisp_IsFieldMoveTM` has 15 and 19 in one group in the ROM, which no spelling of its six cases gives (see
+  its row).
 
 ## Floats and runtime helpers
 
