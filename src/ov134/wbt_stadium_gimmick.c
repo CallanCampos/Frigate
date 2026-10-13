@@ -78,10 +78,6 @@ static BOOL WbtStadiumGimmick_EndTask(void *data);
 // The animations of the stage's actors (named by actor), the scene 0 setup, and the textures and palettes of the
 // portraits and the name plates (not const, so in .data). These lie in this order only to give the original's .rodata
 // and .data: the size sort of MWCC's data puts equal sizes in an order that depends on every declaration
-static const G3DSceneAnimationSetup sActor5Anms[] = { { 0xb, 0 }, { 0xc, 0 } };
-static const G3DSceneAnimationSetup sActor6Anms[] = { { 0xe, 0 }, { 0xf, 0 } };
-static const G3DSceneAnimationSetup sActor0Anms[] = { { 1, 0 }, { 2, 0 } };
-static const G3DSceneAnimationSetup sActor14Anms[] = { { 0x1f, 0 }, { 0x20, 0 }, { 0x21, 0 } };
 static const G3DSceneResourceSetup sResources[] = {
     { 0x107, 0, 0 },  { 0x107, 1, 0 },  { 0x107, 2, 0 },  { 0x107, 3, 0 },  { 0x107, 4, 0 },  { 0x107, 5, 0 },
     { 0x107, 6, 0 },  { 0x107, 7, 0 },  { 0x107, 14, 0 }, { 0x107, 15, 0 }, { 0x107, 8, 0 },  { 0x107, 9, 0 },
@@ -90,12 +86,15 @@ static const G3DSceneResourceSetup sResources[] = {
     { 0x107, 24, 0 }, { 0x107, 25, 0 }, { 0x107, 26, 0 }, { 0x107, 27, 0 }, { 0x107, 28, 0 }, { 0x107, 29, 0 },
     { 0x107, 30, 0 }, { 0x107, 31, 0 }, { 0x107, 32, 0 }, { 0x107, 33, 0 },
 };
+static const G3DSceneAnimationSetup sActor0Anms[] = { { 1, 0 }, { 2, 0 } };
 static const G3DSceneAnimationSetup sActor2Anms[] = { { 5, 0 }, { 6, 0 } };
-static const G3DSceneAnimationSetup sActor11Anms[] = { { 0x15, 0 }, { 0x16, 0 }, { 0x17, 0 } };
-static const G3DSceneAnimationSetup sActor13Anms[] = { { 0x1d, 0 } };
-static char *sNamePlttNames[3] = { "wbt_name01_pl", "wbt_name02_pl", "wbt_name03_pl" };
+static const G3DSceneAnimationSetup sActor5Anms[] = { { 0xb, 0 }, { 0xc, 0 } };
+static const G3DSceneAnimationSetup sActor14Anms[] = { { 0x1f, 0 }, { 0x20, 0 }, { 0x21, 0 } };
 static const G3DSceneAnimationSetup sActor12Anms[] = { { 0x19, 0 }, { 0x1a, 0 }, { 0x1b, 0 } };
 static const G3DSceneAnimationSetup sActor4Anms[] = { { 9, 0 } };
+static const G3DSceneAnimationSetup sActor13Anms[] = { { 0x1d, 0 } };
+static const G3DSceneAnimationSetup sActor6Anms[] = { { 0xe, 0 }, { 0xf, 0 } };
+static const G3DSceneAnimationSetup sActor11Anms[] = { { 0x15, 0 }, { 0x16, 0 }, { 0x17, 0 } };
 static const G3DSceneActorSetup sActors[] = {
     { 0, 0, 0, 0, sActor0Anms, 2 },    { 3, 0, 3, 0, NULL, 0 },          { 4, 0, 4, 0, sActor2Anms, 2 },
     { 7, 0, 7, 0, NULL, 0 },           { 8, 0, 8, 0, sActor4Anms, 1 },   { 10, 0, 10, 0, sActor5Anms, 2 },
@@ -105,9 +104,10 @@ static const G3DSceneActorSetup sActors[] = {
 };
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
+static char *sNameTexNames[3] = { "wbt_name01", "wbt_name02", "wbt_name03" };
 static char *sFaceTexNames[3] = { "wbt_v_kao1", "wbt_v_kao2", "wbt_v_kao1" };
 static char *sFacePlttNames[3] = { "wbt_v_kao1_pl", "wbt_v_kao2_pl", "wbt_v_kao1_pl" };
-static char *sNameTexNames[3] = { "wbt_name01", "wbt_name02", "wbt_name03" };
+static char *sNamePlttNames[3] = { "wbt_name01_pl", "wbt_name02_pl", "wbt_name03_pl" };
 
 void WbtStadiumGimmick_Setup(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
@@ -133,7 +133,7 @@ void WbtStadiumGimmick_Update(Field *field) {
 
 // Shows the Trainers' names on the plates (mode 0 for both, 1 and 2 for the player's alone) and, once the portraits
 // are drawn, sets the screens up
-void WbtStadiumGimmick_SetNames(Field *field, u8 mode, StrBuf *name, StrBuf *playerName, u32 file, u32 playerFile) {
+void WbtStadiumGimmick_SetNames(Field *field, u8 mode, StrBuf *name, StrBuf *playerName, u16 file, u16 playerFile) {
     GimmickWork *work = Field_GetGimmickWorkBlock(field, 1);
     HeapID heapId = HEAPID_TAIL(work->heapId);
     Font *font;

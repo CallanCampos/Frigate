@@ -5,11 +5,13 @@
     .bss        start:0x021f0f00 end:0x021f0f00 kind:bss align:32
 
 src/ov134/wbt_battle.c:
+    complete
     .text       start:0x021efc60 end:0x021f0994
     .rodata     start:0x021f0ccc end:0x021f0e04
     .data       start:0x021f0edc end:0x021f0f00
 
 src/ov134/wbt_stadium_gimmick.c:
+    complete
     .text       start:0x021eec80 end:0x021efc60
     .rodata     start:0x021f0994 end:0x021f0ccc
     .data       start:0x021f0e20 end:0x021f0edc

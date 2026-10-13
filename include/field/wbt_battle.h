@@ -17,7 +17,7 @@ void *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys);
 void WbtBattle_ShowPartyList(void *work);
 void WbtBattle_ClosePartyList(void *work);
 void WbtBattle_FreePartyList(void *work);
-void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, WbtEntrant *opponent);
+void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, const WbtEntrant *opponent);
 // The battle of the current round, which overlay 22 starts, and its end and freeing
 BtlSetup *WbtBattle_SetupBattle(WbtSystem *sys, GameSystem *gsys);
 void WbtBattle_FreeBattle(WbtSystem *sys, BtlSetup *setup);

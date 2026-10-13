@@ -14,7 +14,7 @@ void WbtStadiumGimmick_Setup(Field *field);
 void WbtStadiumGimmick_End(Field *field);
 void WbtStadiumGimmick_Update(Field *field);
 // Writes the names on the name plates, mode 0 for both Trainers and 1 and 2 for one, and the files of the portraits
-void WbtStadiumGimmick_SetNames(Field *field, u8 mode, StrBuf *name, StrBuf *playerName, u32 file, u32 playerFile);
+void WbtStadiumGimmick_SetNames(Field *field, u8 mode, StrBuf *name, StrBuf *playerName, u16 file, u16 playerFile);
 // Draws the portraits and starts the screens' animations
 void WbtStadiumGimmick_ShowPortraits(Field *field, u8 mode);
 // Loads scene 2 with the portrait of a position (20 for a lone one) on a side
