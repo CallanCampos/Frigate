@@ -298,6 +298,12 @@ Same instructions, registers swapped.
 - `x += f();` and `x = x + f();` on an `s16` local are not the same to the register allocator: Castelia's crowd
   `Passerby_StepAside` had `passerby` and `dir` swapped in `r4`/`r5` through every declaration order until
   `x = x + GetDirectionVectorCompX(dir);` became `x += ...` (and the same for `z`).
+- A byte field passed straight to a call makes MWCC load argument 0 first and then copy the base pointer out of `r0`.
+  Where the original loads the fields first (`ldrb r1, [r0, #1]; ldrb r2, [r0]; mov r0, r4`), they went through
+  enum-typed locals: Opelucid Gym's `GymOpelucid_ShowState`, `RefreshVars`, `MoveState` and `CreateEvent` copy
+  `tier` and `column` into `OpelucidGymTier` and `OpelucidGymColumn` locals before the call. Parameter types,
+  integer locals, inline wrappers and `const` did not change it. The callee keeps `int` parameters: with enum
+  parameters the locals are propagated again.
 
 ## Stack slots
 
@@ -1234,6 +1240,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `list->prevDirection`, and MWCC merges the equal bodies; a `direction` variable set first does not give it. In the
   same file a clamp matched only as `MATH_MAX`, and the operand order matters: `target = MATH_MAX(target, 0);` in
   `IrcRanking_StepScrollToSelf` but `list->scrollMax = MATH_MAX(0, list->scrollMax);` in `IrcRankingList_Init`.
+- Arms that each end in the same calls plus `*state = N; break;` are tail-merged, calls included, with the odd arm
+  placed after the shared tail; an `if`/`else if`/`else` with one shared `*state = 3;` after it keeps a call per arm.
+  `GymOpelucid_MoveEventCallback`'s state 2 is three such arms.
 
 ## Loops
 
@@ -1379,12 +1388,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   with the two cases in the other order. The same holds inside an inline: `case 1: return TRUE; case 2: return TRUE;`
   gives `case 2` a `b` to `case 1`'s `movs r1, #1`, where `case 1: case 2: return TRUE;` gives none, and
   `case 0: return FALSE;` before a `default: return FALSE;` gives `case 0` a `b` to the default.
-- The compare tree is a function of the case set alone: cases form a run while the gap to the next is 3 or less, and
-  the pivot is the run at index (n - 1) / 2. No case order, value type, `default:` placement, extra label, flag or
-  compiler build makes a run at a gap of 4. The ROM has such a run in three switches all the same (`{15,19}` in
-  `ItemMenuDisp_IsFieldMoveTM`, `{42,46}` in overlay 36's `SetupEncountFlagsByPartyPokeAbil`, `{2,6}` in overlay
-  293's capture functions), each time the pair that holds the switch's first label, while other pairs 4 apart in
-  matched code stay separate leaves. Unexplained: don't spend a session on that symptom.
+- **Switch trees depend on the x87 precision the compiler runs with.** MWCC groups a switch's sorted cases into
+  ranges with a floating-point density test (cases / span above 0.4), done in x87. A Win32 process starts with the
+  control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is exactly
+  0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, so our build makes
+  another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
+  unchanged: `ItemMenuDisp_IsFieldMoveTM` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
+  (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
+  bytes), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
+  for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. Until the build
+  runs the compiler that way these stay rows: don't spend a session on a "run at a gap of 4" or a tree rooted one
+  case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
+  holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
+  (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
+  in the ranges before it.
 
 ## Floats and runtime helpers
 

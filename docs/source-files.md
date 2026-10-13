@@ -891,7 +891,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_opelucid.c` | `0x021eec80`–`0x021efbac` | 35 | partial | descriptive |
+| `gym_opelucid.c` | `0x021eec80`–`0x021efbac` | 35 | complete | descriptive |
 
 ### Overlay 100
 
@@ -1177,8 +1177,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_stadium_gimmick.c` | `0x021eec80`–`0x021efc60` | 35 | partial | descriptive |
-| `wbt_battle.c` | `0x021efc60`–`0x021f0994` | 32 | partial | string at `0x021f0edc` |
+| `wbt_stadium_gimmick.c` | `0x021eec80`–`0x021efc60` | 35 | complete | descriptive |
+| `wbt_battle.c` | `0x021efc60`–`0x021f0994` | 32 | complete | string at `0x021f0edc` |
 
 ### Overlay 135
 
@@ -1942,8 +1942,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `mailtool.c` | `0x021a75a0`–`0x021a771c` | 6 | complete | string at `0x021ab780` |
-| `mailsys.c` | `0x021a771c`–`0x021a84e4` | 29 | partial | string at `0x021ab78c` |
-| `mailview.c` | `0x021a84e4`–`0x021a8d68` | 16 | partial | string at `0x021ab798` |
+| `mailsys.c` | `0x021a771c`–`0x021a84e4` | 29 | complete | string at `0x021ab78c` |
+| `mailview.c` | `0x021a84e4`–`0x021a8d68` | 16 | complete | string at `0x021ab798` |
 | `mb_seq.c` | `0x021a8d68`–`0x021ab004` | 118 | partial | string at `0x021ab7a4` |
 
 ### Overlay 216
