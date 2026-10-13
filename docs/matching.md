@@ -425,6 +425,9 @@ Same code, other `sp` offsets or frame size.
   `PkwdBook_GetPosition(wk, positionIdx * 2)` and `(wk, positionIdx * 2 + 1)`; MWCC still spills the doubled value
   once, but in the slot before the hoisted `wk + paletteSlot * 4`. `positionIdx = entries->positionIdx * 2;`
   gave the same instructions with the two slots exchanged, in every declaration order.
+- Two flags set side by side and chained (`refresh = redraw = TRUE;`) change which of them is spilled where their
+  declaration order does not; the instructions are otherwise the same. The film scenario's `BScenarioMain_ScriptInput`
+  (799 bytes of register allocation before) needed the chain in its two touch branches.
 
 ## Instruction order
 
@@ -636,6 +639,10 @@ Same instructions, scheduled in another order.
   stepped: `u32 *state = area->states; state += type;` in `ZukanHabitat_GetTypeAward`. A pointer that is only
   initialized (`&area->states[type]`), a nested struct, an inline accessor and other index types all fold back to
   `(area + type * 4) + 0x354`.
+- A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
+  shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
+  after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
+  `r7` and which a stack slot.
 
 ## An instruction too many or too few
 
@@ -1153,6 +1160,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `TownMapMap_Main` sets its scroll limits that way (`TownMapMap_SetLimits(map, 0, 0, 0, 0)` against the four
   `TOWNMAP_SCROLL_*`); with `int` parameters, or with the fields stored in another order in the inline, it does not
   match, and none of the 120 orders of the plain assignments does.
+- A flat table indexed through an unsigned local is not strength-reduced to a hoisted row address: with
+  `u32 corner = place * 4 + i; s16 index = sBScenarioCursorPositions[corner];` MWCC hoists only `place * 4` and loads
+  the table's address on every pass, as `BScenarioGraphic_SetCursor` does in the ROM. With a `[5][4]` table or `int`
+  operands the row's address is hoisted.
 
 ## Loops
 

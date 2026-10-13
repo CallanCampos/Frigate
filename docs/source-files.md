@@ -2283,8 +2283,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `b_scenario_main.c` | `0x021f4440`–`0x021f61a8` | 42 | partial | string at `0x021f7230` |
-| `b_scenario_graphic.c` | `0x021f61a8`–`0x021f6db0` | 32 | partial | descriptive |
+| `b_scenario_main.c` | `0x021f4440`–`0x021f61a8` | 42 | complete | string at `0x021f7230` |
+| `b_scenario_graphic.c` | `0x021f61a8`–`0x021f6db0` | 32 | complete | descriptive |
 
 ### Overlay 289
 

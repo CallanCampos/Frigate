@@ -200,8 +200,8 @@ static const s16 sBScenarioFlashRects[4][4] = {
 };
 
 // The positions of the cursor's four corners, by place
-static const s16 sBScenarioCursorPositions[5][4] = {
-    { 7, 8, 9, 10 }, { 11, 12, 13, 14 }, { 15, 16, 17, 18 }, { 19, 20, 21, 22 }, { 23, 24, 25, 26 },
+static const s16 sBScenarioCursorPositions[5 * 4] = {
+    7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
 };
 
 static const BScenarioActorSetup sBScenarioCursorSetups[5] = {
@@ -623,7 +623,8 @@ static void BScenarioGraphic_SetCursor(BScenarioWork *work, BOOL show, int place
     }
     if (show == TRUE) {
         for (i = 0; i < 4; i++) {
-            s16 index = sBScenarioCursorPositions[place][i];
+            u32 corner = place * 4 + i;
+            s16 index = sBScenarioCursorPositions[corner];
 
             pos.x = BScenarioGraphic_GetPosition(work, index * 2);
             pos.y = BScenarioGraphic_GetPosition(work, index * 2 + 1);

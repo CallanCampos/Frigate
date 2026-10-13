@@ -5,11 +5,13 @@
     .bss        start:0x021f72a0 end:0x021f72a0 kind:bss align:32
 
 src/ov288/b_scenario_main.c:
+    complete
     .text       start:0x021f4480 end:0x021f61e8
     .rodata     start:0x021f6df0 end:0x021f6f58
     .data       start:0x021f7240 end:0x021f7284
 
 src/ov288/b_scenario_graphic.c:
+    complete
     .text       start:0x021f61e8 end:0x021f6df0
     .rodata     start:0x021f6f58 end:0x021f7238
     .data       start:0x021f7284 end:0x021f72a0
