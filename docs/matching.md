@@ -1343,6 +1343,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   version constant can hide in a file that otherwise matches: `MonolithMission_IsAvailable` tests
   `header.unk01 == 2` in Black 2 and `== 1` in White 2, and mismatched in White 2 only, without a row. Probe both
   versions for every function of a file, not only the ones with rows.
+- Two different tests of a `u16` that compile to the same `cmp #0; beq` are both kept: the wireless pipe's
+  `TickBeaconTimers` has `if (t == 0) continue;` and then `if (t > 0) { t--; ... }`. In the same file an
+  `if (WH_End(NULL)) { return; }` keeps a bare `cmp r0, #0` before the `pop` that a `break` drops, and initializing a
+  `.bss` static (`static NetWhpipeWork *sWork = NULL;`) changed the order of two equal-size local initializers in
+  `.rodata` while the static stays in `.bss`.
 
 ## Loops
 

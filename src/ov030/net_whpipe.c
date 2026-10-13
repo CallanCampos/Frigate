@@ -94,7 +94,7 @@ typedef struct {
     u8 unkCF7;
 } NetWhpipeWork;
 
-static NetWhpipeWork *sWork;
+static NetWhpipeWork *sWork = NULL;
 
 static void StateEnd(void *arg);
 static void StateWaitEnd(void *arg);
@@ -316,7 +316,10 @@ static void TickBeaconTimers(void) {
     int i;
 
     for (i = 0; i < BEACON_MAX; i++) {
-        if (work->beaconTimer[i] != 0) {
+        if (work->beaconTimer[i] == 0) {
+            continue;
+        }
+        if (work->beaconTimer[i] > 0) {
             work->beaconTimer[i]--;
             if (work->beaconTimer[i] == 0) {
                 work->beaconListChanged = TRUE;
@@ -406,7 +409,9 @@ static void Update(u16 count) {
             }
         }
         if (work->endKind == 2) {
-            WH_End(NULL);
+            if (WH_End(NULL)) {
+                return;
+            }
         }
         break;
     case WH_SYSSTATE_CONNECT_FAIL:
