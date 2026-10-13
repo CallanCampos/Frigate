@@ -364,7 +364,6 @@ the original code is linked until they match. The differences are the same in bo
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_ParsePsk` | `0x021a5f94` / `0x021a5fd4` | 4 bytes over (0xbc against 0xb8): the item pointer and the stored length are spilled in another order. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_ParseSecurity` | `0x021a607c` / `0x021a60bc` | Same size, 185 bytes: the original copies the record pointer before the type compare. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_BuildHello` | `0x021a647c` / `0x021a64bc` | 14 bytes: `total` and `length` in swapped registers. Tried: the declaration order. |
-| `lib/dwcutil/src/dwc_aoss.c` | `Aoss_Decrypt` | `0x021a6698` / `0x021a66d8` | 1 byte: the operands of the final checksum compare are swapped. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Rc4_Init` | `0x021a6720` / `0x021a6760` | 6 bytes short (0x5c against 0x62): the original spills the context and the key and keeps the length at sp+0xc. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Crc32_MakeTable` | `0x021a6850` / `0x021a6890` | 13 bytes: the original's table loop holds 1 in `r5` and 256 in `r3`. |
 | `lib/dwcutil/src/dwc_aoss_ap.c` | `DWC_Aoss_Init` | `0x021a6d04` / `0x021a6d44` | 8 bytes over: the original reaches the free callback (`0x021c294c`) as `gAossAp` + 0xc, while `dwc_aoss.c` reaches it by its own address; no spelling gave both (a member of `gAossAp` breaks `dwc_aoss.c`'s `Aoss_Free`, `Soc_Free` and `DWC_Aoss_Start`, so it is its own global `gAossApFree`). |

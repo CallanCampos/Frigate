@@ -1641,7 +1641,8 @@ static int Aoss_Decrypt(const u8 *in, u8 *out, u32 length, u8 checksum, const u8
     Mem_Copy(sCipherKey + 2, key, keyLength);
     Rc4_Init(&context, sCipherKey, keyLength + 2, length);
     Rc4_Crypt(&context, out, in, length);
-    if (checksum != Aoss_Checksum(out, length)) {
+    u8 actual = Aoss_Checksum(out, length);
+    if (actual != checksum) {
         Aoss_SetError(0x12);
         Aoss_Free(context.s);
         return -1;
