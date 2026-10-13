@@ -811,7 +811,9 @@ static void func_ov194_021c2844(PokemonTradeWork *wk) {
             x = end + (over - 80) * 48 / 80 + 112;
         }
     }
-    pos = ((u64)((x + 48) % width) << 16) / width;
+    x += 48;
+    x %= width;
+    pos = ((u64)x << 16) / width;
     for (i = 0; i < count; i++) {
         func_ov194_021c2714(sCubeParams.distance, i, (i << 16) / count, 0x10000 - pos);
     }

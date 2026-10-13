@@ -1760,6 +1760,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   drop starts a new file. Overlay 215's `mb_seq.c` was six files (`mailbox.c`, `mb_main.c`, `mb_bmp.c`, `mb_obj.c`,
   `mb_seq.c`, `mb_ui.c`), and an assert's line number checks the result: `MailBox_StateInit` passes `"mb_seq.c", 268`
   and sat at line 1275 before the split, at 185 after it.
+- An object's place in the size sort is its definition, not its first declaration, so a static table can be
+  forward-declared (`static const TouchRect sSideButtonRects[3];`) and defined after its user to reach a layout.
+  When no order with every static defined before its user gives the ROM's layout, but one extra unreferenced object
+  does, the original had an object its linker stripped; `pokemontrade_proc.c` is laid out as such a fit, and says so.
+  An external `inline` function gets its own copy of a string literal where a `static inline` shares the file's:
+  `pokemontrade_save.c`'s `BackupMail` and `BackupRecords` are plain `inline` for their file-name strings.
 
 ## When nothing moves it
 

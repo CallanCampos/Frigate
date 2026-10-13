@@ -1828,12 +1828,12 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pokemontrade_proc.c` | `0x021b76e0`–`0x021bbe14` | 179 | partial | string at `0x021c6eb0` |
+| `pokemontrade_proc.c` | `0x021b76e0`–`0x021bbe14` | 179 | complete | string at `0x021c6eb0` |
 | `pokemontrade_nego.c` | `0x021bbe14`–`0x021be808` | 99 | complete | string at `0x021c6ee0` |
 | `pokemontrade_mcss.c` | `0x021be808`–`0x021bead8` | 11 | complete | string at `0x021c6ef4` |
-| `pokemontrade_save.c` | `0x021bead8`–`0x021bfba4` | 32 | partial | string at `0x021c6f08` |
+| `pokemontrade_save.c` | `0x021bead8`–`0x021bfba4` | 32 | complete | string at `0x021c6f08` |
 | `pokemontrade_message.c` | `0x021bfba4`–`0x021c1918` | 50 | complete | descriptive |
-| `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | partial | string at `0x021c6fc0` |
+| `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | complete | string at `0x021c6fc0` |
 | `pokemontrade_2d.c` | `0x021c2a24`–`0x021c6380` | 109 | partial | string at `0x021c7330` |
 
 ### Overlay 195
