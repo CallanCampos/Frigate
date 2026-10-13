@@ -19,7 +19,7 @@ BOOL Condition_SetDamageMessage(BattleHandlerString *string, BattleMon *mon, u32
 void Condition_SetAddMessage(u32 condition, BattleCondition value, BattleMon *mon, BattleHandlerString *string);
 // Sets the message for the cure of a condition, and returns whether it has one. The caller passes a condition that
 // ended, and a count that selects a second message
-BOOL Condition_SetCureMessage(u32 condition, BattleCondition cont, BattleMon *mon, u32 count, BattleHandlerString *string);
+BOOL Condition_SetCureMessage(u32 condition, BattleCondition cont, BattleMon *mon, u16 count, BattleHandlerString *string);
 // Whether the condition of a Pokemon keeps it from being switched out, in the event
 void Condition_CheckTrapped(BtlServerFlow *flow, BattleMon *mon);
 // Whether the conditions of a Pokemon ground it, or give it a type chart check, in the event

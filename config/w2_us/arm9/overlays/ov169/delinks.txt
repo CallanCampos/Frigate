@@ -35,6 +35,7 @@ src/ov169/btl_poke_select.c:
     .text       start:0x0689cc20 end:0x0689ccc4
 
 src/ov169/condition_effects.c:
+    complete
     .text       start:0x0689b938 end:0x0689ca10
     .rodata     start:0x0689e388 end:0x0689e42c
 

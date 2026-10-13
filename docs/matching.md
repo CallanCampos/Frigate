@@ -633,6 +633,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - An argument narrowed by a `u16` parameter is narrowed again at each call, and only hoisted out of a loop, while a
   `(u16)` cast is computed once and reused: `PMSIVEdit_ScrollWait` matched only once `func_0204c1a8` and
   `func_0204c1dc` took their surface as `u16`.
+- A spilled parameter that the original stores to its slot at entry and tests through a reload of that slot, where
+  ours tests the incoming register and stores it later, is narrower than `u32`: `condition_effects.c`'s
+  `Condition_SetCureMessage` matches once its fourth parameter is `u16` (or `u8`), with the same body.
 - After `a = b;`, a test of `b` reuses the register just stored and a test of `a` loads `a` again. The phrase
   select's `PMSSelect_SetupList` writes `wk->lineCount = wk->sentenceCount; if (wk->sentenceCount < 20)`, and its
   `PMSSelect_SetupScreen` tests `wk->pos` after `wk->prevPos = wk->pos;`.
