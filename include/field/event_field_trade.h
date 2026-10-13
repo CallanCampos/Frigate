@@ -27,7 +27,7 @@ typedef struct {
 
 GameEvent *EventFieldTrade_Create(GameSystem *gsys, u8 offerIndex, u8 partyIndex);
 GameEventReturnCode EventFieldTrade_Callback(GameEvent *event, u32 *state, void *data);
-void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm, const FieldTradeOfferData *offer,
+void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm, FieldTradeOfferData *offer,
                                u32 offerIndex);
 void EventFieldTrade_DebugLogPkm(PartyPkm *pkm);
 void func_ov033_0217a864(void *param);

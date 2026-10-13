@@ -30,14 +30,10 @@ typedef struct {
     u32 actorIdBase;
 } EntreeForestSpawnContext;
 
-FieldActor *EntreeForest_SpawnPkmActor(EntreeForestSpawnContext *context, const EntreeForestPokemon *pokemon, u16 index,
-                                      u16 x, u16 z, s32 y);
+FieldActor *EntreeForest_SpawnPkmActor(const EntreeForestSpawnContext *context, const EntreeForestPokemon *pokemon,
+                                      u16 index, u16 x, u16 z, s32 y);
 void EntreeForest_SpawnAllPokemon(Field *field, u32 actorIdBase, const EntreeForestPokemon *pokemon, u32 unused,
                                   u32 area);
-
-extern const u8 data_ov033_0217c340[];
-extern const u8 data_ov033_0217c398[];
-extern const u8 data_ov033_0217c3c0[];
 
 PartyPkm *func_ov033_02176bd0(HeapID heapId, GameData *gameData, const EntreeForestPokemon *pokemon);
 

@@ -372,19 +372,19 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `entree_forest.c` | `0x02176b00`–`0x02176d88` | 5 | partial | descriptive |
+| `entree_forest.c` | `0x02176b00`–`0x02176d88` | 5 | complete | descriptive |
 | `event_funfest_mission.c` | `0x02176d88`–`0x02176ec4` | 2 | complete | descriptive |
 | `entree_forest_first_warp.c` | `0x02176ec4`–`0x02176f90` | 1 | complete | descriptive |
 | `scrcmd_funfest.c` | `0x02176f90`–`0x02177370` | 13 | complete | descriptive |
 | `entralink_warp.c` | `0x02177370`–`0x02177574` | 3 | complete | descriptive |
 | `event_cgear_shutdown.c` | `0x02177574`–`0x021775e8` | 2 | complete | descriptive |
 | `event_phrase_input.c` | `0x021775e8`–`0x02177998` | 6 | complete | descriptive |
-| `pdw_postman.c` | `0x02177998`–`0x02178448` | 47 | partial | string at `0x0217c600` |
+| `pdw_postman.c` | `0x02177998`–`0x02178448` | 47 | complete | string at `0x0217c600` |
 | `scrcmd_field_move.c` | `0x02178448`–`0x021785c4` | 6 | complete | descriptive |
 | `event_sweet_scent.c` | `0x021785c4`–`0x02178908` | 8 | complete | descriptive |
-| `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | partial | descriptive |
-| `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | partial | descriptive |
-| `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | partial | descriptive |
+| `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | complete | descriptive |
+| `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | complete | descriptive |
+| `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | complete | descriptive |
 | `event_dendou_machine.c` | `0x02179664`–`0x02179868` | 8 | complete | descriptive |
 | `event_pc.c` | `0x02179868`–`0x02179b54` | 8 | complete | descriptive |
 | `event_pokemon_center.c` | `0x02179b54`–`0x02179dd4` | 9 | complete | descriptive |
@@ -392,9 +392,9 @@ prints the tables below from the configs and the ROM:
 | `event_abyssal_ruins.c` | `0x02179e98`–`0x02179f04` | 1 | complete | descriptive |
 | `event_dive.c` | `0x02179f04`–`0x0217a1b0` | 7 | complete | descriptive |
 | `field_actor_animation.c` | `0x0217a1b0`–`0x0217a4a0` | 12 | complete | descriptive |
-| `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | partial | string at `0x0217c624` |
+| `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | complete | string at `0x0217c624` |
 | `unity_visitor.c` | `0x0217aa1c`–`0x0217ac70` | 6 | complete | descriptive |
-| `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | partial | string at `0x0217c630` |
+| `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | complete | string at `0x0217c630` |
 | `bsubway_scr.c` | `0x0217b468`–`0x0217c340` | 39 | partial | string at `0x0217c640` |
 
 ### Overlay 34
@@ -403,9 +403,11 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `union_oneself.c` | `0x02176b00`–`0x0217aa7c` | 87 | partial | string at `0x0217c6ec` |
+| `union_actor.c` | `0x02176b00`–`0x02177444` | 23 | complete | descriptive |
+| `union_oneself.c` | `0x02177444`–`0x0217aa7c` | 64 | complete | string at `0x0217c6ec` |
 | `union_msg.c` | `0x0217aa7c`–`0x0217b68c` | 66 | partial | string at `0x0217c85c` |
-| `union_eff.c` | `0x0217b68c`–`0x0217becc` | 42 | partial | string at `0x0217c8b0` |
+| `union_eff.c` | `0x0217b68c`–`0x0217bc84` | 32 | complete | string at `0x0217c8b0` |
+| `colosseum_tool.c` | `0x0217bc84`–`0x0217becc` | 10 | complete | descriptive |
 
 ### Overlay 35
 
@@ -1834,12 +1836,12 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pokemontrade_proc.c` | `0x021b76e0`–`0x021bbe14` | 179 | partial | string at `0x021c6eb0` |
+| `pokemontrade_proc.c` | `0x021b76e0`–`0x021bbe14` | 179 | complete | string at `0x021c6eb0` |
 | `pokemontrade_nego.c` | `0x021bbe14`–`0x021be808` | 99 | complete | string at `0x021c6ee0` |
 | `pokemontrade_mcss.c` | `0x021be808`–`0x021bead8` | 11 | complete | string at `0x021c6ef4` |
-| `pokemontrade_save.c` | `0x021bead8`–`0x021bfba4` | 32 | partial | string at `0x021c6f08` |
+| `pokemontrade_save.c` | `0x021bead8`–`0x021bfba4` | 32 | complete | string at `0x021c6f08` |
 | `pokemontrade_message.c` | `0x021bfba4`–`0x021c1918` | 50 | complete | descriptive |
-| `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | partial | string at `0x021c6fc0` |
+| `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | complete | string at `0x021c6fc0` |
 | `pokemontrade_2d.c` | `0x021c2a24`–`0x021c6380` | 109 | partial | string at `0x021c7330` |
 
 ### Overlay 195
@@ -2052,7 +2054,12 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `mailtool.c` | `0x021a75a0`–`0x021a771c` | 6 | complete | string at `0x021ab780` |
 | `mailsys.c` | `0x021a771c`–`0x021a84e4` | 29 | complete | string at `0x021ab78c` |
 | `mailview.c` | `0x021a84e4`–`0x021a8d68` | 16 | complete | string at `0x021ab798` |
-| `mb_seq.c` | `0x021a8d68`–`0x021ab004` | 118 | partial | string at `0x021ab7a4` |
+| `mailbox.c` | `0x021a8d68`–`0x021a8de4` | 3 | complete | descriptive |
+| `mb_main.c` | `0x021a8de4`–`0x021a9740` | 23 | complete | descriptive |
+| `mb_bmp.c` | `0x021a9740`–`0x021a9d90` | 15 | complete | descriptive |
+| `mb_obj.c` | `0x021a9d90`–`0x021aa188` | 17 | complete | descriptive |
+| `mb_seq.c` | `0x021aa188`–`0x021aaefc` | 50 | complete | string at `0x021ab7a4` |
+| `mb_ui.c` | `0x021aaefc`–`0x021ab004` | 10 | complete | descriptive |
 
 ### Overlay 216
 
@@ -2291,7 +2298,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `br_core.c` | `0x021efe40`–`0x021f0770` | 30 | complete | descriptive |
-| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | partial | string at `0x021f7b84` |
+| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | complete | string at `0x021f7b84` |
 | `br_btn.c` | `0x021f0a6c`–`0x021f23b8` | 56 | complete | string at `0x021f7c20` |
 | `br_btn_data.c` | `0x021f23b8`–`0x021f266c` | 8 | complete | string at `0x021f7cd8` |
 | `br_res.c` | `0x021f266c`–`0x021f31b8` | 20 | complete | string at `0x021f7d50` |
@@ -2821,7 +2828,8 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `key_system_graphic.c` | `0x021c0120`–`0x021c054c` | 22 | complete | string at `0x021c92d8` |
 | `key_system_util.c` | `0x021c054c`–`0x021c1dd0` | 82 | partial | string at `0x021c92f0` |
 | `key_system_net.c` | `0x021c1dd0`–`0x021c2b18` | 35 | complete | string at `0x021c9394` |
-| `key_system_flow.c` | `0x021c2b18`–`0x021c53dc` | 81 | partial | descriptive |
+| `key_system_flow.c` | `0x021c2b18`–`0x021c45bc` | 48 | complete | descriptive |
+| `key_system_flow_sub.c` | `0x021c45bc`–`0x021c53dc` | 33 | complete | descriptive |
 | `data_convert_flow.c` | `0x021c53dc`–`0x021c6e14` | 38 | complete | string at `0x021c944c` |
 | `wb_save_block.c` | `0x021c6e14`–`0x021c6e80` | 4 | complete | descriptive |
 | `wb_save_convert.c` | `0x021c6e80`–`0x021c7028` | 3 | complete | string at `0x021c9468` |

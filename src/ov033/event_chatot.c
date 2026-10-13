@@ -31,6 +31,9 @@
 #include "system/game_event.h"
 #include "system/game_system.h"
 
+// The sprite of the Chatot
+static const ClActorSetup sSpriteSetup = { 128, 72, 0, 0, 0 };
+
 GameEvent *func_ov033_02178ca8(GameSystem *gsys, Field *field, u8 partyIndex) {
     GameEvent *event;
     ChatotEventWork *work;
@@ -64,7 +67,7 @@ GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data
         break;
     case 1:
         work->msgData = func_ov036_021879a0(work->msgBGSys, 0x6c);
-        work->talkWindow = func_ov036_0218845c(work->msgBGSys);
+        work->talkWindow = func_ov036_0218845c(work->msgBGSys, work->msgData);
         work->wordSet = GFL_WordSetSystemCreateDefault(21);
         work->strbuf = GFL_StrBufCreate(0x400, 21);
         func_ov033_02179140(work);
@@ -214,7 +217,7 @@ void func_ov033_02178ffc(ChatotEventWork *work) {
     work->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(pkm, 0, 1, 0, 21);
     PML_PkmReEncrypt(pkm, encrypted);
     GFL_ArcToolFree(arc);
-    setup = data_ov033_0217c488;
+    setup = sSpriteSetup;
     work->sprite = func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, 21);
 }
 

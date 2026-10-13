@@ -126,7 +126,7 @@ void func_ov036_021a8c00(u32 winPos, u32 *a1, u32 *a2);
 // whether printing has ended, clear, and the window
 MsgData *func_ov036_021879a0(void *msgBGSys, u32 fileId);
 void func_ov036_021879b8(MsgData *msgData);
-void *func_ov036_0218845c(void *msgBGSys);
+void *func_ov036_0218845c(void *msgBGSys, MsgData *msgData);
 void func_ov036_02188338(void *window);
 void func_ov036_0218836c(void *window, u32 a1, u32 a2, u32 messageId);
 void func_ov036_021883b0(void *window, u32 a1, u32 a2, StrBuf *strbuf);

@@ -5,6 +5,7 @@
     .bss        start:0x0217c660 end:0x0217c660 kind:bss align:32
 
 src/ov033/entree_forest.c:
+    complete
     .text       start:0x02176b00 end:0x02176d88
     .rodata     start:0x0217c340 end:0x0217c3e8
 
@@ -36,6 +37,7 @@ src/ov033/event_phrase_input.c:
     .rodata     start:0x0217c400 end:0x0217c404
 
 src/ov033/pdw_postman.c:
+    complete
     .text       start:0x02177998 end:0x02178448
     .rodata     start:0x0217c404 end:0x0217c484
     .data       start:0x0217c600 end:0x0217c610
@@ -50,13 +52,16 @@ src/ov033/event_sweet_scent.c:
     .rodata     start:0x0217c484 end:0x0217c488
 
 src/ov033/event_fly.c:
+    complete
     .text       start:0x02178908 end:0x02178ca8
 
 src/ov033/event_chatot.c:
+    complete
     .text       start:0x02178ca8 end:0x021791c0
     .rodata     start:0x0217c488 end:0x0217c490
 
 src/ov033/event_fishing.c:
+    complete
     .text       start:0x021791c0 end:0x02179664
 
 src/ov033/event_dendou_machine.c:
@@ -93,6 +98,7 @@ src/ov033/field_actor_animation.c:
     .rodata     start:0x0217c534 end:0x0217c564
 
 src/ov033/fld_trade.c:
+    complete
     .text       start:0x0217a4a0 end:0x0217aa1c
     .data       start:0x0217c624 end:0x0217c630
 
@@ -101,6 +107,7 @@ src/ov033/unity_visitor.c:
     .text       start:0x0217aa1c end:0x0217ac70
 
 src/ov033/trial_house.c:
+    complete
     .text       start:0x0217ac70 end:0x0217b468
     .data       start:0x0217c630 end:0x0217c640
 

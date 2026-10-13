@@ -69,19 +69,17 @@ void TrialHouseWorkDelete(void *unused, struct TrialHouseWork **workPtr) {
 }
 
 void func_ov033_0217ad78(TrialHouseWork *work, u32 mode) {
-    u32 capacity;
     u32 battleType;
 
     if (work != NULL) {
         if (mode <= 1) {
             if (mode == 0) {
                 battleType = 0;
-                capacity = 3;
+                work->capacity = 3;
             } else {
                 battleType = 1;
-                capacity = 4;
+                work->capacity = 4;
             }
-            work->capacity = capacity;
             work->battleType = battleType;
         } else {
             work->battleType = 0;
@@ -281,17 +279,20 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
 void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankOut, u16 *pointsOut) {
     u16 *stats = work->stats;
     s32 total;
-    u32 points;
-    u32 rank;
     SaveControl *save;
+    u32 points;
     TrialHouseSave *thSave;
+    u32 rank;
     TrialHouseRecord *record;
     s32 i;
     PartyPkm *pkm;
+    TrialHousePokemon *pokemon;
     SaveControl *extraSaveControl;
     void *buffer;
+    GameRecords *records;
 
-    total = 0 + stats[7] * 1000;
+    total = 0;
+    total += stats[7] * 1000;
     total += stats[8] * 80;
     total += stats[1] * 5;
     total += stats[3];
@@ -303,12 +304,12 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
     total -= stats[4] * 2;
     total -= stats[9] * 80;
     total -= 500 - stats[10];
-    points = total;
     if (total < 0) {
-        points = 0;
+        total = 0;
     } else if (total > 9999) {
-        points = 9999;
+        total = 9999;
     }
+    points = total;
     if (points >= 6000) {
         rank = 6;
     } else if (points >= 5000) {
@@ -330,24 +331,21 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
     thSave = func_0200f1b8(save);
     record = &thSave->records[(u8)(work->initState != 0 ? 1 : 0)];
     record->valid = TRUE;
-    switch (work->capacity) {
-    case 3:
+    if (work->capacity == 3) {
         record->isDouble = FALSE;
-        break;
-    case 4:
+    } else if (work->capacity == 4) {
         record->isDouble = TRUE;
-        break;
-    default:
+    } else {
         record->isDouble = FALSE;
-        break;
     }
     record->points = points;
     sys_memset(record->pokemon, 0, sizeof(record->pokemon));
-    for (i = 0; i < work->capacity; i++) {
+    for (i = 0; i < (s32)work->capacity; i++) {
+        pokemon = &record->pokemon[i];
         pkm = PokeParty_GetPkm(work->party, i);
-        record->pokemon[i].species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
-        record->pokemon[i].form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
-        record->pokemon[i].sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
+        pokemon->species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
+        pokemon->form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
+        pokemon->sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
     }
     if (work->initState != 0) {
         extraSaveControl = GameData_GetSaveControl(GSYS_GetGameData(gsys));
@@ -358,8 +356,9 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
         GFL_HeapFree(buffer);
         freeIntermediateSaveExtraBlksAfterLoad2(extraSaveControl, 5);
     }
-    func_02009638(getTrainerCardInfoBlkAddress(save), points);
-    func_02009618(getTrainerCardInfoBlkAddress(save), rank);
+    records = getTrainerCardInfoBlkAddress(save);
+    func_02009638(records, points);
+    func_02009618(records, rank);
 }
 
 u32 func_ov033_0217b2e4(GameSystem *gsys, TrialHouseWork *work) {

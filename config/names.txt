@@ -13750,6 +13750,7 @@ overlays/ov215 0x021ab038 sMailSysTouchRects
 overlays/ov215 0x021ab054 sMailSysPresetSentences
 overlays/ov215 0x021ab078 MailSys_VRAMConfig
 overlays/ov215 0x021ab158 MAILBOX_PROC_FUNCTIONS
+overlays/ov215 0x021ab194 MailBox_VRAMConfig
 overlays/ov216 0x021bb700 Guru2Proc_Init
 overlays/ov216 0x021bb728 Guru2Proc_Main
 overlays/ov216 0x021bb75c Guru2Proc_Exit

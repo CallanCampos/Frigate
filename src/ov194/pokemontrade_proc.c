@@ -208,28 +208,10 @@ static BOOL PokemonTrade_ProcExit(GameProc *proc, u32 *state, void *param, void 
 static BOOL func_ov194_021bab08(PokemonTradeWork *wk);
 static void func_ov194_021babc4(PokemonTradeWork *wk);
 
-// Where each box starts in the strip
-static int sBoxStartX[] = {
-    48,   208,  368,  528,  688,  848,  1008, 1168, 1328, 1488, 1648, 1808, 1968,
-    2128, 2288, 2448, 2608, 2768, 2928, 3088, 3248, 3408, 3568, 3728, 3856,
-};
-
-// The boxes of the box list
-static TouchRect sBoxListRects[] = {
-    { 0x44, 0x5c, 0x08, 0x20 }, { 0x44, 0x5c, 0x20, 0x38 }, { 0x44, 0x5c, 0x38, 0x50 }, { 0x44, 0x5c, 0x50, 0x68 },
-    { 0x44, 0x5c, 0x68, 0x80 }, { 0x44, 0x5c, 0x80, 0x98 }, { 0x44, 0x5c, 0x98, 0xb0 }, { 0x44, 0x5c, 0xb0, 0xc8 },
-    { 0x44, 0x5c, 0xc8, 0xe0 }, { 0x44, 0x5c, 0xe0, 0xf8 }, { 0x5c, 0x74, 0x08, 0x20 }, { 0x5c, 0x74, 0x20, 0x38 },
-    { 0x5c, 0x74, 0x38, 0x50 }, { 0x5c, 0x74, 0x50, 0x68 }, { 0x5c, 0x74, 0x68, 0x80 }, { 0x5c, 0x74, 0x80, 0x98 },
-    { 0x5c, 0x74, 0x98, 0xb0 }, { 0x5c, 0x74, 0xb0, 0xc8 }, { 0x5c, 0x74, 0xc8, 0xe0 }, { 0x5c, 0x74, 0xe0, 0xf8 },
-    { 0x74, 0x8c, 0x08, 0x20 }, { 0x74, 0x8c, 0x20, 0x38 }, { 0x74, 0x8c, 0x38, 0x50 }, { 0x74, 0x8c, 0x50, 0x68 },
-    { 0x74, 0x8c, 0x68, 0x80 }, { 0x74, 0x8c, 0x80, 0x98 }, { TOUCH_RECT_END },
-};
-
-static const TouchRect sSideButtonRects[] = {
-    { 4, 28, 88, 112 },
-    { 4, 28, 152, 176 },
-    { TOUCH_RECT_END },
-};
+// MWCC lays the file's data out by a heapsort over the order of declaration, which is not stable: the tables below
+// are declared where they are, and the proc tables at the end in their order, because that gives the original's
+// `.rodata` (see `tools/decomp/rodata_order.py`)
+static const TouchRect sSideButtonRects[3];
 
 static const NetCommand sNetCommands[] = {
     { func_ov194_021b803c, NULL },
@@ -1442,6 +1424,13 @@ static void func_ov194_021b9058(PokemonTradeWork *wk) {
     wk->touchHeld = func_0203da2c();
 }
 
+// The two sides' buttons
+static const TouchRect sSideButtonRects[] = {
+    { 4, 28, 88, 112 },
+    { 4, 28, 152, 176 },
+    { TOUCH_RECT_END },
+};
+
 static void func_ov194_021b9394(PokemonTradeWork *wk) {
     PartyPkm *pkm;
     func_ov194_021be554(wk, 0);
@@ -1840,6 +1829,23 @@ static BOOL func_ov194_021b9df4(PokemonTradeWork *wk) {
     GFL_HeapFree(pkm);
     return TRUE;
 }
+
+// Where each box starts in the strip
+static int sBoxStartX[] = {
+    48,   208,  368,  528,  688,  848,  1008, 1168, 1328, 1488, 1648, 1808, 1968,
+    2128, 2288, 2448, 2608, 2768, 2928, 3088, 3248, 3408, 3568, 3728, 3856,
+};
+
+// The boxes of the box list
+static TouchRect sBoxListRects[] = {
+    { 0x44, 0x5c, 0x08, 0x20 }, { 0x44, 0x5c, 0x20, 0x38 }, { 0x44, 0x5c, 0x38, 0x50 }, { 0x44, 0x5c, 0x50, 0x68 },
+    { 0x44, 0x5c, 0x68, 0x80 }, { 0x44, 0x5c, 0x80, 0x98 }, { 0x44, 0x5c, 0x98, 0xb0 }, { 0x44, 0x5c, 0xb0, 0xc8 },
+    { 0x44, 0x5c, 0xc8, 0xe0 }, { 0x44, 0x5c, 0xe0, 0xf8 }, { 0x5c, 0x74, 0x08, 0x20 }, { 0x5c, 0x74, 0x20, 0x38 },
+    { 0x5c, 0x74, 0x38, 0x50 }, { 0x5c, 0x74, 0x50, 0x68 }, { 0x5c, 0x74, 0x68, 0x80 }, { 0x5c, 0x74, 0x80, 0x98 },
+    { 0x5c, 0x74, 0x98, 0xb0 }, { 0x5c, 0x74, 0xb0, 0xc8 }, { 0x5c, 0x74, 0xc8, 0xe0 }, { 0x5c, 0x74, 0xe0, 0xf8 },
+    { 0x74, 0x8c, 0x08, 0x20 }, { 0x74, 0x8c, 0x20, 0x38 }, { 0x74, 0x8c, 0x38, 0x50 }, { 0x74, 0x8c, 0x50, 0x68 },
+    { 0x74, 0x8c, 0x68, 0x80 }, { 0x74, 0x8c, 0x80, 0x98 }, { TOUCH_RECT_END },
+};
 
 static void func_ov194_021b9e60(PokemonTradeWork *wk) {
     if (func_ov194_021c00b0(wk)) {
@@ -3055,6 +3061,18 @@ static void func_ov194_021bbdac(PokemonTradeWork *wk, BOOL moved) {
     }
 }
 
+const GameProcFunctions data_ov194_021c63d0 = {
+    func_ov194_021bba4c,
+    PokemonTrade_ProcMain,
+    PokemonTrade_ProcExit,
+};
+
+const GameProcFunctions data_ov194_021c6400 = {
+    func_ov194_021bba8c,
+    PokemonTrade_ProcMain,
+    PokemonTrade_ProcExit,
+};
+
 const GameProcFunctions POKEMONTRADE_PROC_FUNCTIONS = {
     PokemonTrade_ProcInitGtsNego,
     PokemonTrade_ProcMain,
@@ -3067,20 +3085,8 @@ const GameProcFunctions data_ov194_021c63ac = {
     PokemonTrade_ProcExit,
 };
 
-const GameProcFunctions data_ov194_021c63b8 = {
-    func_ov194_021bba0c,
-    PokemonTrade_ProcMain,
-    PokemonTrade_ProcExit,
-};
-
 const GameProcFunctions POKEMONTRADE_WIFICLUB_PROC_FUNCTIONS = {
     PokemonTrade_ProcInitWifiClub,
-    PokemonTrade_ProcMain,
-    PokemonTrade_ProcExit,
-};
-
-const GameProcFunctions data_ov194_021c63d0 = {
-    func_ov194_021bba4c,
     PokemonTrade_ProcMain,
     PokemonTrade_ProcExit,
 };
@@ -3091,8 +3097,8 @@ const GameProcFunctions data_ov194_021c63dc = {
     PokemonTrade_ProcExit,
 };
 
-const GameProcFunctions data_ov194_021c6400 = {
-    func_ov194_021bba8c,
+const GameProcFunctions data_ov194_021c63b8 = {
+    func_ov194_021bba0c,
     PokemonTrade_ProcMain,
     PokemonTrade_ProcExit,
 };

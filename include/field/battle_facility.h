@@ -21,7 +21,7 @@ typedef struct {
 } BSubwayPokemonData;
 
 // What a trainer class gives, for the Trial House and Battle Subway
-u32 func_ov012_02162b38(u32 trainerClass);
+u16 func_ov012_02162b38(u32 trainerClass);
 // Loads the trainer of the file, and count Pokémon for it, none of species and none holding items
 BOOL func_ov012_02162864(BSubwayTrainer *trainer, u16 trainerId, u32 count, const u16 *species, const u16 *items,
                          BSubwayTeamConfig *config, HeapID heapId);
@@ -38,7 +38,7 @@ void *func_ov012_021627c0(u32 arcId, u16 file, HeapID heapId);
 BOOL func_ov012_0216292c(const u16 *trainerData, u16 trainerId, BSubwayPokemon *pkms, u8 count, u32 arcId,
                          const u16 *species, const u16 *items, BSubwayTeamConfig *config, MATHRandContext32 *rand,
                          u8 iv, HeapID heapId);
-u32 func_ov012_02162b0c(u32 arcId, u16 file, HeapID heapId);
+u16 func_ov012_02162b0c(u32 arcId, u16 file, HeapID heapId);
 u16 func_ov012_02162b28(u32 arcId, u16 file, HeapID heapId);
 
 #endif // POKEBW2_FIELD_BATTLE_FACILITY_H

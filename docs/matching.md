@@ -347,6 +347,9 @@ Same instructions, registers swapped.
   themselves matching either way. In the same file the raw display-register masks of `DupFitting_InitGraphics` were
   `GX_SetVisiblePlane(0); GXS_SetVisiblePlane(0);` (the SDK inline's parameter is what holds the zero in a
   register), and `(s32)work->badgeFrame < 45` gives the signed `bge` a `u16` field is otherwise compared without.
+- A spilled `u8` that is reloaded and narrowed at each use can come from a later callee's `u8` parameter, not from
+  the local's own type: the Dream World postman's `func_ov033_02177d78` matched once its callee
+  `func_ov033_021780a4` took `u8 kind` in place of `u32`.
 
 ## Stack slots
 
@@ -1389,6 +1392,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   The same file's three BG setups are one `static const BGSetup sBGSetups[3]` (as three statics their section order
   was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
   `.data` match: the strings give the original's variable names.
+- A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
+  `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
+  `i < 8`, and an inline with `return kind < N;`, are both rotated.
 
 ## Switches
 
@@ -1753,6 +1759,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `VCT_DecodeAdpcm` at once. Its files are built without `-ipa file`, so their `.bss` statics come out in reverse of
   their declaration order: a matching function whose pool words point at the wrong static needs the declarations
   reversed.
+- Size drops inside one file's `.rodata` are file boundaries: a translation unit's packed data rises in size, so each
+  drop starts a new file. Overlay 215's `mb_seq.c` was six files (`mailbox.c`, `mb_main.c`, `mb_bmp.c`, `mb_obj.c`,
+  `mb_seq.c`, `mb_ui.c`), and an assert's line number checks the result: `MailBox_StateInit` passes `"mb_seq.c", 268`
+  and sat at line 1275 before the split, at 185 after it.
+- An object's place in the size sort is its definition, not its first declaration, so a static table can be
+  forward-declared (`static const TouchRect sSideButtonRects[3];`) and defined after its user to reach a layout.
+  When no order with every static defined before its user gives the ROM's layout, but one extra unreferenced object
+  does, the original had an object its linker stripped; `pokemontrade_proc.c` is laid out as such a fit, and says so.
+  An external `inline` function gets its own copy of a string literal where a `static inline` shares the file's:
+  `pokemontrade_save.c`'s `BackupMail` and `BackupRecords` are plain `inline` for their file-name strings.
 
 ## When nothing moves it
 
