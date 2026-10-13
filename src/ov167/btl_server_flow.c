@@ -5520,7 +5520,7 @@ BOOL func_ov167_021a8e68(BtlServerFlow *flow, BattleParty *party, const BtlFlowE
     BOOL result = FALSE;
 
     for (i = 0; i < 6; i++) {
-        BtlFlowExpEntry *entry = &entries[i];
+        const BtlFlowExpEntry *entry = &entries[i];
         if (entries[i].exp != 0) {
             BattleMon *mon = func_ov167_0219d4e4(party, i);
             if ((s32)GetBattleMonStat(mon, 0xf) < 100) {
