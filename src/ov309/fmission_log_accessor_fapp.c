@@ -2,6 +2,7 @@
 #include "app/fmission_log_accessor_fapp.h"
 #include "constants/flags.h"
 #include "constants/vars.h"
+#include "constants/version.h"
 #include "field/fest_mission_data.h"
 #include "field/festival.h"
 #include "gfl/heap.h"
@@ -22,6 +23,13 @@
 
 #define BONUS_OVER 0
 #define BONUS_RATE 1
+
+// The game a mission belongs to, FestMissionHeader's unk01. The values from 3 are missions no medal counts
+typedef enum {
+    FEST_MISSION_VERSION_BOTH,
+    FEST_MISSION_VERSION_WHITE2,
+    FEST_MISSION_VERSION_BLACK2,
+} FestMissionVersion;
 
 static void FMissionLogFAppEntry_Clear(FMissionLogFAppEntry *entry);
 static void FMissionLogFApp_GiveMedals(LinkFestival *festival, FMissionAppResult *result, MedalBox *medalBox,
@@ -156,11 +164,12 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
             sum = FX32_CONST(score);
             rest = result->total - score;
             for (i = 0; i < NELEMS(sFMissionLogFAppBonuses); i++) {
-                if (rest > sFMissionLogFAppBonuses[i][BONUS_OVER]) {
-                    int over;
+                const fx32 *bonus = sFMissionLogFAppBonuses[i];
 
-                    rate = sFMissionLogFAppBonuses[i][BONUS_RATE];
-                    over = rest - sFMissionLogFAppBonuses[i][BONUS_OVER];
+                if (rest > bonus[BONUS_OVER]) {
+                    int over = rest - bonus[BONUS_OVER];
+
+                    rate = bonus[BONUS_RATE];
                     sum += FX_Mul(FX32_CONST(over), rate);
                     rest -= over;
                 }
@@ -181,7 +190,8 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
             result->item2Count = festival->info->unk10_0;
         }
         levels = func_02017208(festival->gameData);
-        points = func_02010fd4(funfest, festival->info->unk0_31) + result->total;
+        points = func_02010fd4(funfest, festival->info->unk0_31);
+        points += result->total;
         if (points > 1000) {
             points = 1000;
         }
@@ -229,8 +239,8 @@ static void FMissionLogFApp_GiveMedals(LinkFestival *festival, FMissionAppResult
     }
     if (result->cleared) {
         u32 completed = func_02010e50(funfest);
-        // The kind of mission that doesn't count
-        u32 excluded;
+        // The other game's missions don't count
+        FestMissionVersion excluded;
         int i;
 
         if (completed >= 30) {
@@ -239,7 +249,11 @@ static void FMissionLogFApp_GiveMedals(LinkFestival *festival, FMissionAppResult
                 MedalBox_GiveMedal(medalBox, 230);
             }
         }
-        excluded = 1;
+        if (GAME_VERSION == VERSION_BLACK2) {
+            excluded = FEST_MISSION_VERSION_WHITE2;
+        } else {
+            excluded = FEST_MISSION_VERSION_BLACK2;
+        }
         for (i = 1; i < FEST_MISSION_COUNT; i++) {
             u8 kind = ((FestMissionHeader *)festival->headers)[i].unk01;
 
