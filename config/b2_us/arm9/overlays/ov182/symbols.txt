@@ -161,9 +161,9 @@ func_ov182_021aaf44 kind:function(thumb,size=0x94) addr:0x021aaf44
 func_ov182_021aafd8 kind:function(thumb,size=0x38) addr:0x021aafd8
 func_ov182_021ab010 kind:function(thumb,size=0x14) addr:0x021ab010
 func_ov182_021ab024 kind:function(thumb,size=0x1c) addr:0x021ab024
-func_ov182_021ab040 kind:function(thumb,size=0x8c) addr:0x021ab040
-func_ov182_021ab0cc kind:function(thumb,size=0x28) addr:0x021ab0cc
-func_ov182_021ab0f4 kind:function(thumb,size=0x88) addr:0x021ab0f4
+DWCUtilUiEffect_Init kind:function(thumb,size=0x8c) addr:0x021ab040
+DWCUtilUiEffect_Destroy kind:function(thumb,size=0x28) addr:0x021ab0cc
+DWCUtilUiEffect_Update kind:function(thumb,size=0x88) addr:0x021ab0f4
 func_ov182_021ab17c kind:function(thumb,size=0x9c) addr:0x021ab17c
 func_ov182_021ab218 kind:function(thumb,size=0x20) addr:0x021ab218
 func_ov182_021ab238 kind:function(thumb,size=0x10) addr:0x021ab238
@@ -1139,7 +1139,7 @@ data_ov182_021bef18 kind:data(any) addr:0x021bef18
 data_ov182_021bf024 kind:data(any) addr:0x021bf024
 data_ov182_021bf318 kind:data(any) addr:0x021bf318
 data_ov182_021bf718 kind:data(any) addr:0x021bf718
-data_ov182_021bfb18 kind:data(any) addr:0x021bfb18
+sEffectData kind:data(any) addr:0x021bfb18
 data_ov182_021bfb24 kind:data(any) addr:0x021bfb24
 data_ov182_021bfb28 kind:data(any) addr:0x021bfb28
 data_ov182_021bfb30 kind:data(any) addr:0x021bfb30
@@ -1608,7 +1608,7 @@ data_ov182_021c315d kind:bss addr:0x021c315d ambiguous
 data_ov182_021c35ed kind:bss addr:0x021c35ed ambiguous
 data_ov182_021c3721 kind:bss addr:0x021c3721 ambiguous
 data_ov182_021c3824 kind:bss addr:0x021c3824
-data_ov182_021c4024 kind:bss addr:0x021c4024
+sEffect kind:bss addr:0x021c4024
 data_ov182_021c4028 kind:bss addr:0x021c4028
 sScreenActive kind:bss addr:0x021c402c
 data_ov182_021c4030 kind:bss addr:0x021c4030

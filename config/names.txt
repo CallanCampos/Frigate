@@ -9272,12 +9272,16 @@ overlays/ov182 0x021a768c DWC_Wcm_Disconnect
 overlays/ov182 0x021a76c4 DWC_Wcm_Cleanup
 overlays/ov182 0x021a771c DWC_Wcm_Connect
 overlays/ov182 0x021a77a0 DWC_Wcm_Start
+overlays/ov182 0x021ab040 DWCUtilUiEffect_Init
+overlays/ov182 0x021ab0cc DWCUtilUiEffect_Destroy
+overlays/ov182 0x021ab0f4 DWCUtilUiEffect_Update
 overlays/ov182 0x021ab588 DWCUtilScreen_Reset
 overlays/ov182 0x021ab594 DWCUtilScreen_Start
 overlays/ov182 0x021ab61c DWCUtilScreen_Stop
 overlays/ov182 0x021adbc0 DWC_StartUtility
 overlays/ov182 0x021bd2cc DWC_UTILITY_RESET_PROC_FUNCTIONS
 overlays/ov182 0x021bd2d8 DWC_UTILITY_PROC_FUNCTIONS
+overlays/ov182 0x021bfb18 sEffectData
 overlays/ov182 0x021c05d0 sRecordType
 overlays/ov182 0x021c05d4 sNet
 overlays/ov182 0x021c05dc sSocConfig
@@ -9298,6 +9302,7 @@ overlays/ov182 0x021c2a40 sWep
 overlays/ov182 0x021c2aa0 sWcm
 overlays/ov182 0x021c2ac8 sBssid
 overlays/ov182 0x021c2ad0 sEssid
+overlays/ov182 0x021c4024 sEffect
 overlays/ov182 0x021c402c sScreenActive
 overlays/ov184 0x0219f340 ErrorWindowScreen_Show
 overlays/ov185 0x0219ce80 PMSIData_Create
