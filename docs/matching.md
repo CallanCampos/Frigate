@@ -1621,6 +1621,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When `rodata_order.py`'s prediction disagrees with the built object, move one declaration at a time, compile, and
   compare the sections with the ROM. `pokemontrade_3d.c` lays out its scene tables in order only with its lights
   declared after the scenes' resource lists, and its cube data only with the vertices declared before the texture coordinates.
+- Before trusting a "no declaration order works" result, check the model against the real compiler on 20 or so random
+  declaration orders. `btlv_input.c`'s layout was declared unreachable until the sorted list also counted every
+  function-local initializer, down to an 8-byte `ClActorSetup` local, and the tables referenced only by other tables;
+  with those in the list a fitted model reproduced 25 of 25 random compiles and found a pure top-of-file permutation
+  that matches, which `rodata_order.py` had missed.
 - A run of fields that every function reaches from one literal, at fixed offsets, can be several small statics of the
   shared section rather than a struct. The size sort tells them apart: `snd_sys.c`'s `.bss` has a 2-byte mask, six
   4-byte statics and a 24-byte struct (0x34 bytes) before a 40-byte array, which a 0x34-byte struct would follow.
