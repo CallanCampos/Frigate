@@ -1786,6 +1786,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   overlay a swap of two loop counters' spill slots that no declaration order moved meant the later loop reuses the
   earlier counters (`i` for floors, `j` for rooms in `InfinityDungeon_LayoutFloors`): spilled pieces are grouped by
   variable.
+- A "merged tail" or "registers only" difference of hundreds of bytes can hide a wrong statement: the Battle
+  Competition's `WifiBattleMatchLink_CompetitionTaskMatch` (743 bytes off) had two calls and a store the ROM lacks in
+  one case, an inner `switch` with its cases in the wrong order and a flag set in the wrong arm, and
+  `WifiBattleMatchNet_StartReport` tested the wrong parameter. Before respelling a large function, check its
+  statements against the asm case by case.
 
 ## When nothing moves it
 

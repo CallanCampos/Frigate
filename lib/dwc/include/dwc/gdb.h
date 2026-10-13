@@ -12,17 +12,21 @@
 // reports failing. It works one request at a time, in the order of the library: start it, start a request, run it
 // each frame until it ends, then ask what the result was. The Sc, which this header used to hold, is dwc/sc.h's
 
-// A field of a record, to write and as read: SakeField's first fields, with the binary data's size as the callers
-// write it. Its types are SakeFieldType's
+// A binary field's value: the data and its size in bytes
+typedef struct GdbBinaryData {
+    void *data;
+    u32 size;
+} GdbBinaryData;
+
+// A field of a record, to write and as read: SakeField's first fields. Its types are SakeFieldType's
 typedef struct GdbField {
     const char *name;
     u32 type;
     union {
         s32 intValue;
         u8 byteValue;
-        void *data;
+        GdbBinaryData binaryData;
     } value;
-    u32 size;
 } GdbField;
 #define GDB_FIELD_BYTE SAKE_FIELD_BYTE
 #define GDB_FIELD_INT SAKE_FIELD_INT

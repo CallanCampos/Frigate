@@ -2165,8 +2165,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `wifibattlematch_link.c` | `0x021b2f80`–`0x021b3064` | 3 | complete | descriptive |
-| `wifibattlematch_link_random.c` | `0x021b3064`–`0x021b57dc` | 44 | partial | descriptive |
-| `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | partial | descriptive |
+| `wifibattlematch_link_random.c` | `0x021b3064`–`0x021b57dc` | 44 | complete | descriptive |
+| `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
 | `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | partial | descriptive |
 | `sake.c` | `0x021bc218`–`0x021bc4fc` | 19 | complete | descriptive |
