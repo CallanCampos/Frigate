@@ -292,7 +292,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `fest_mission_people.c` | `0x0216f900`–`0x0216fffc` | 17 | partial | descriptive |
+| `fest_mission_people.c` | `0x0216f900`–`0x0216fffc` | 17 | complete | descriptive |
 
 ### Overlay 26
 
@@ -1480,11 +1480,11 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `pokelist.c` | `0x02199a00`–`0x02199b88` | 4 | complete | descriptive |
 | `plist_sys.c` | `0x02199b88`–`0x0219e678` | 89 | partial | descriptive |
-| `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | partial | string at `0x021a4cec` |
+| `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | complete | string at `0x021a4cec` |
 | `plist_message.c` | `0x0219f5ec`–`0x0219fae8` | 23 | complete | string at `0x021a4cfc` |
 | `plist_menu.c` | `0x0219fae8`–`0x0219fef0` | 14 | complete | string at `0x021a4d0c` |
 | `plist_item.c` | `0x0219fef0`–`0x021a0d38` | 21 | complete | descriptive |
-| `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | partial | string at `0x021a4d1c` |
+| `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | complete | string at `0x021a4d1c` |
 | `plist_demo.c` | `0x021a1944`–`0x021a23e8` | 21 | complete | string at `0x021a4d2c` |
 | `status_rcv.c` | `0x021a23e8`–`0x021a30f8` | 7 | complete | descriptive |
 | `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | partial | descriptive |

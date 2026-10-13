@@ -347,6 +347,11 @@ Same instructions, registers swapped.
 - A spilled `u8` that is reloaded and narrowed at each use can come from a later callee's `u8` parameter, not from
   the local's own type: the Dream World postman's `func_ov033_02177d78` matched once its callee
   `func_ov033_021780a4` took `u8 kind` in place of `u32`.
+- Whether an argument is loaded with `ldrh` or `ldrsh` follows the callee's parameter type, not the field's: the
+  Funfest's `FesMissionPeople_PlaceActors` matched once `func_ov012_021682d4` took `u16 sidePos`. Consecutive
+  halfword fields loaded as `adds r3, r4, #0; adds r3, #8; ldrh [r3, #2]; ldrh [r3, #4]` are read through a pointer
+  to the first of them (`const u16 *values = &place->pos.rail.componentId;` then `values[0]`, `values[1]`,
+  `values[2]`).
 
 ## Stack slots
 

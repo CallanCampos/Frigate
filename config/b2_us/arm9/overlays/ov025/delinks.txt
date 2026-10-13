@@ -4,5 +4,6 @@
     .bss        start:0x02170340 end:0x02170340 kind:bss align:32
 
 src/ov025/fest_mission_people.c:
+    complete
     .text       start:0x0216f900 end:0x0216fffc
     .rodata     start:0x0216fffc end:0x02170330
