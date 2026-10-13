@@ -1023,6 +1023,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   register. Where the original loads the pointer after the call, the call's result was in a local first: the Pokédex
   search's `ZukanSearchEngine_Step` has `u8 color = PML_PersonalGetParam(...);` and `u8 shape = ...GetShape(...);`
   before their comparisons (8 bytes larger without them).
+- `u32` is `unsigned int` in our `types.h` and `unsigned long` in the SDK, and MWCC treats the two differently in an
+  index: for `&sActorData[15 + i]` with an `unsigned int i` it adds first and multiplies (`adds r1, #0xf; muls`), and
+  with an `unsigned long i` it keeps `i * 0x18` and adds the constant's offset, and folds the constant of
+  `actors[ret + 11]` into the load's offset. The PC box's `func_ov255_021d0d70` and `func_ov255_021d57a0` match with
+  the counter and the result declared `unsigned long`. Rows that say "the original folds the constant into the
+  offset", or that match only with `(&a[i])[11]`, are candidates.
 
 ## Branches and block layout
 

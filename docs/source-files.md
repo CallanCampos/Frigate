@@ -1975,7 +1975,7 @@ prints the tables below from the configs and the ROM:
 | `box2_main.c` | `0x021bb7e0`–`0x021c28a8` | 163 | complete | string at `0x021d9640` |
 | `box2_seq.c` | `0x021c28a8`–`0x021cdf18` | 192 | complete | string at `0x021d964c` |
 | `box2_bmp.c` | `0x021cdf18`–`0x021cf3c0` | 58 | complete | descriptive |
-| `box2_obj.c` | `0x021cf3c0`–`0x021d23d8` | 130 | partial | descriptive |
+| `box2_obj.c` | `0x021cf3c0`–`0x021d23d8` | 130 | complete | descriptive |
 | `box2_ui.c` | `0x021d23d8`–`0x021d364c` | 71 | complete | string at `0x021d9658` |
 | `box2_bgwfrm.c` | `0x021d364c`–`0x021d3b64` | 35 | complete | descriptive |
 | `box_search.c` | `0x021d3b64`–`0x021d6d28` | 118 | partial | descriptive |
