@@ -4,5 +4,6 @@
     .bss        start:0x021a0360 end:0x021a0360 kind:bss align:32
 
 src/ov301/zukan_open.c:
+    complete
     .text       start:0x0219fbc0 end:0x021a023c
     .rodata     start:0x021a023c end:0x021a0340

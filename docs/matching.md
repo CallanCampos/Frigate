@@ -1827,6 +1827,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   range. In the same overlay a pointer to `const` was the shared cause of eight nonmatching functions (the damage
   list's five readers, a move param, the stat-change and cure handlers' params): when sibling functions all differ
   by a load placed against a store or call, try `const` on the pointee they share before anything else.
+- A helper's local initializer joins the size sort where the helper is defined, and a `static inline` defined after
+  its caller is still inlined, so where a helper sits moves equal-size initializers without touching code. In a
+  frame, the caller's own locals take the highest slots in declaration order, then each inlined call's locals follow
+  in call order, with the locals inside one helper ascending. The Pokédex cover's `ZukanOpen_InitBG` sets up its five
+  BGs through five one-BG inlines, three defined before it and two after, which gives both the ROM's falling stack
+  slots and the order of its two equal-size initializers. Which helpers sit after the caller is a fit; a table the
+  original link dead-stripped would explain the ROM as well.
 
 ## When nothing moves it
 
