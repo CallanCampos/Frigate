@@ -1596,7 +1596,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `pdc.c` | `0x021998c0`–`0x021999a8` | 12 | complete | string at `0x0219a620` |
 | `pdc_main.c` | `0x021999a8`–`0x02199f94` | 11 | complete | string at `0x0219a628` |
-| `pdc_msg.c` | `0x02199f94`–`0x0219a53c` | 16 | partial | string at `0x0219a634` |
+| `pdc_msg.c` | `0x02199f94`–`0x0219a53c` | 16 | complete | string at `0x0219a634` |
 
 ### Overlay 173
 
