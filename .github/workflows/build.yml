@@ -115,6 +115,13 @@ jobs:
         run: |
           set -o pipefail
           python3 configure.py b2_us w2_us
-          ninja 2>&1 | tee build/ninja.log
+          if ninja 2>&1 | tee build/ninja.log; then
+            echo "Ninja completed successfully"
+          else
+            statuses=("${PIPESTATUS[@]}")
+            echo "Ninja exited ${statuses[0]}; tee exited ${statuses[1]}"
+            exit 1
+          fi
           if grep -n 'warning:' build/ninja.log; then exit 1; fi
+          echo "No compiler warnings; checking ROM SHA1s"
           shasum -a 1 -c b2_us.sha1 w2_us.sha1
