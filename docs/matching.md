@@ -295,6 +295,9 @@ Same instructions, registers swapped.
   `BagSave_AddItem`'s return, so `bag` and `result` both live in `r6` (76 bytes off with `result` set first). A
   `mov r7, #1` that comes after the tested call there is `getTrainerGender(info) != 0 ? 0 : 1` in the flag's
   declaration.
+- `x += f();` and `x = x + f();` on an `s16` local are not the same to the register allocator: Castelia's crowd
+  `Passerby_StepAside` had `passerby` and `dir` swapped in `r4`/`r5` through every declaration order until
+  `x = x + GetDirectionVectorCompX(dir);` became `x += ...` (and the same for `z`).
 
 ## Stack slots
 

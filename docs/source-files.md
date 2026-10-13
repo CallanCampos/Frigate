@@ -1065,7 +1065,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `castelia_rush.c` | `0x021eef80`–`0x021efb80` | 35 | partial | descriptive |
+| `castelia_rush.c` | `0x021eef80`–`0x021efb80` | 35 | complete | descriptive |
 
 ### Overlay 122
 
