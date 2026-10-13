@@ -17429,7 +17429,7 @@ overlays/ov290 0x021fcb88 WifiBattleMatchSys_BattleProcExit
 overlays/ov290 0x021fcbcc WifiBattleMatchSys_BattleProcMain
 overlays/ov290 0x021fcf84 WIFIBATTLEMATCH_PROC_FUNCTIONS
 overlays/ov290 0x021fcf90 sWifiBattleMatchSysSteps
-overlays/ov290 0x021fd020 sWifiBattleMatchSysBattleProcFunctions
+overlays/ov290 0x021fd020 WIFIBATTLEMATCH_BATTLE_PROC_FUNCTIONS
 overlays/ov293 0x021a1b20 Demo3D_Init
 overlays/ov293 0x021a1c04 Demo3D_Exit
 overlays/ov293 0x021a1c68 Demo3D_Main

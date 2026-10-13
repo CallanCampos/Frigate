@@ -2300,7 +2300,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifibattlematch_sys.c` | `0x021fb880`–`0x021fcf84` | 36 | partial | string at `0x021fd048` |
+| `wifibattlematch_sys.c` | `0x021fb880`–`0x021fcb4c` | 33 | complete | string at `0x021fd048` |
+| `wifibattlematch_battle.c` | `0x021fcb4c`–`0x021fcf84` | 3 | complete | descriptive |
 
 ### Overlay 293
 

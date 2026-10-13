@@ -986,6 +986,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `WbtList_SetPaletteGray` runs its gray loop in a `static inline` taking `u32 palette` while the function has
   `s32 palette`, so the tail computes the offset again with `palette` in `r7` and `work` spilled (75 bytes off
   without it). `work->grayPalettes[(u32)palette]` in the tail shows the same thing.
+- A `sys_memset(p, 0, size)` whose size is computed before the zero is loaded was `GFL_STD_MemClear(p, size)`.
+  gflib's clear is an inline over the fill, so the size is an argument of the inline and is evaluated first.
+  `WifiBattleMatchSys_AllocPlayers` has `adds r2, #0xd4` before `movs r1, #0` only with
+
+      static inline void MemClear(void *dest, u32 size) { sys_memset(dest, 0, size); }
+      MemClear(sys->player, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize());
+
+  written directly as `sys_memset(sys->player, 0, sizeof(...) + PokeParty_GetSaveDataSize())` the zero comes first.
+  (Scheduling section; a candidate for a shared inline in `gfl/std.h`.)
 
 ## Branches and block layout
 
@@ -1547,6 +1556,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   of `gsync_disp.c`, gets the ROM's BG setup order only with a referenced table between its VRAM and LCD configs,
   where `gsync_disp.c` has `sActorPositions`. Look at the sibling file a copy was made from for the missing object.
   Nothing the compiler drops itself is listed, so this can't be reproduced under `-nodead`.
+- A small table that the ROM has after a 64-byte-or-larger table of the same file, where the size sort can only put
+  it before, belongs to the next file. Overlay 290's 12-byte battle proc table sits after the 0x90-byte step table:
+  no layout of one file gives that (`rodata_order.py`: G:12! S:144 B:12 is always B G S or G B S). Its three
+  functions are the last of `.text`, use no string or static of wifibattlematch_sys.c, and the step table points to it
+  like to the other overlays' proc tables: a second file with an extern table.
 
 ## When nothing moves it
 
