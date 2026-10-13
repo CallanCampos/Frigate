@@ -1480,11 +1480,12 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 169
 
-36 of 1298 functions are in source files. Embedded names without a file yet: `btlv_scd.c`.
+211 of 1298 functions are in source files. Embedded names without a file yet: `btlv_scd.c`.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `field_handlers.c` | `0x06898020`–`0x068981f0` | 36 | complete | descriptive |
+| `pos_handlers.c` | `0x068981f0`–`0x06898bfc` | 175 | partial | descriptive |
 
 ### Overlay 170
 

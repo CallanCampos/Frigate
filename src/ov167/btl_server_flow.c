@@ -16,6 +16,7 @@
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_server_flow.h"
 #include "battle/btl_server_flow_sub.h"
+#include "battle/pos_handlers.h"
 #include "constants/abilities.h"
 #include "constants/moves.h"
 #include "constants/tr_ai.h"
@@ -7530,7 +7531,7 @@ u32 func_ov167_021abe10(BtlServerFlow *flow, u8 pos, u32 sideEffect) {
 }
 
 BOOL func_ov167_021abe34(BtlServerFlow *flow, u8 pos, u32 a2) {
-    return func_ov169_068982ac(a2);
+    return IsPosEffectFree(a2, pos);
 }
 
 u8 func_ov167_021abe40(BtlServerFlow *flow, u8 clientId) {

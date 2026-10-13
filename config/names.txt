@@ -7452,6 +7452,8 @@ overlays/ov168 0x021f2e9c BtlvFingerCursor_AnimCallback
 overlays/ov168 0x021f2f30 BtlvFingerCursor_Task
 overlays/ov168 0x021f4240 sBtlvEffect
 overlays/ov169 0x06898080 FieldEffectEventRemove
+overlays/ov169 0x068982ac IsPosEffectFree
+overlays/ov169 0x068982c0 IsPosEffectFreeCore
 overlays/ov170 0x0217f6b0 TrAI_Think
 overlays/ov170 0x0217f780 TrAI_DeleteVM
 overlays/ov170 0x0217f7bc TrAI_Setup
