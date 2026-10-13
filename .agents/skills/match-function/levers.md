@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
+  with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
   Declaring every local first and assigning them below moves both registers and slots (matching.md: "declared first")
 - A `u16` local and `local ± 1` sharing a register can push a parameter out of r0: a wider local keeps them apart.
@@ -14,7 +16,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A ternary store computes the address once, an `if`/`else` store in each branch. (matching.md: "ternary store")
 - `p + (a + 4)` and `p + a + 4` differ. (matching.md: "Parenthesized offsets")
 - A sum folded into the load's offset (`ldrb r2, [r3, #9]` from `base + pos`) where ours adds `pos + 1` first:
-  `*(data + pos + 1)` instead of `data[pos + 1]`. (matching.md: "`*(data + pos + 1)`")
+  `*(data + pos + 1)` instead of `data[pos + 1]`; this also folds `- 1` in `BrProcSys_Pop`.
+  (matching.md: "`*(data + pos + 1)`")
 - Of two variables that compete for one register, the one used more gets it. `docs/matching.md` spells out what counts as a
   use; on a tie the one assigned first wins, though in a large function the last declared won.
   (matching.md: "compete for the same register")
@@ -329,6 +332,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   one. (matching.md: "gets two literals")
 
 ## Function order and presence
+
+- A Thumb to ARM `bx pc` trampoline: define a Thumb `asm void` with `bx pc; nop` and a separate ARM `asm void` with
+  `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, toggling `#pragma thumb off/on` around the ARM part.
+  (matching.md: "A Thumb `bx pc` trampoline")
 
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.

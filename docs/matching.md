@@ -945,7 +945,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `*(data + pos + 1)` adds `pos` once and then loads at `#1`, where `data[pos + 1]` adds `pos + 1` first; and a value
   built in a `u16` local with `|=` and then returned has no final narrowing pair, where a returned `int` expression does
   (`ssp_exifdec.c`'s byte readers). The battle server's command queue reads its halfwords and words the same way,
-  `*(que->buffer + que->readPtr + 1)` loading at `#9` from `que + readPtr` (`btl_server_cmd.c`). A ternary that stores
+  `*(que->buffer + que->readPtr + 1)` loading at `#9` from `que + readPtr` (`btl_server_cmd.c`).
+  `BrProcSys_Pop` similarly needs `*(p_wk->stack + p_wk->stack_num - 1)` to fold `- 1` into the load offset;
+  `p_wk->stack[p_wk->stack_num - 1]` emits an extra subtraction. A ternary that stores
   to a static is a select (`bhi`); the original's `bls; b` is an `if`/`else` with a store in each branch.
 - Advancing a pointer-like offset with `x += 0xc` lets MWCC fold the 0xc into every later offset from it; writing
   `pos = x + 0xc` and reading through `pos` keeps the `add` (`ssp_exifdec.c`'s IFD loop).
@@ -1199,6 +1201,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   only as `!type ? a : b`; `type == 0 ? a : b` branches with `beq` and puts `b` first.
 - The operands of `==` between two fields are compared in source order: `syswk->tray == syswk->getTray` gives
   `cmp tray, getTray`, as the PC box's `func_ov255_021cc8dc` needs.
+- `Aoss_Decrypt` needs the `u8` returned by `Aoss_Checksum` stored in a local before it is compared with the
+  `checksum` parameter; comparing the call directly swaps the `cmp` operands, even when the expression is reversed.
 - The left operand of a comparison is loaded first, even before a store just above it: `sw->nowFrame++; if
   (sw->endFrame < sw->nowFrame)` loads `endFrame` before the increment's store, as `iss_switch.c`'s
   `ISSSwitch_AdvanceFade` does, where `sw->nowFrame > sw->endFrame` is 2 bytes off.
@@ -1735,6 +1739,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   reversed.
 
 ## When nothing moves it
+
+- A Thumb `bx pc` trampoline followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS` needs separate functions with
+  `#pragma thumb off` around the ARM function. `card_pull_out.c`'s two DSi jump stubs also need a Thumb `nop` after
+  `bx pc` to reproduce the alignment halfword. The probe reports these Thumb functions as two bytes long in the ROM,
+  excluding that padding; the full module check includes it. A C function pointer call makes each ARM part eight
+  bytes too large.
 
 - An index into a flat array of actors that the source names by ranges is written with the range's enum base even
   when that base is 0: `b_plist_obj.c`'s `BPlistObj_ShowList` matches only as `actors[BPLIST_ACTOR_ITEM + slot]`, since

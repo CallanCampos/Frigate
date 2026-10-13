@@ -26,10 +26,15 @@ It refuses while a function the file defines as `static` is referenced from anot
 ## 3. Build and verify
 
 ```sh
-python3 configure.py && ninja 2>&1 | tail -20      # configure only if source files were added
+python3 configure.py # only if source files were added
+set -o pipefail
+ninja 2>&1 | tee build/ninja.log || exit 1
+if rg -n 'warning:' build/ninja.log; then exit 1; fi
 ```
 
-A clean `ninja` has passed every module check and both SHA1s. On any failure, use the `fix-build` skill. A file that
+A clean `ninja` has passed every module check and both SHA1s. The warning check is also required: do not hide
+compiler output with `tail` or accept a zero Ninja exit status when MWCC emitted warnings. Fix warnings in the source
+or declaration that caused them, then rebuild; use `fix-build` for diagnostics that need triage. A file that
 isn't complete still builds from the original code. Its C is only probed, so it can't break the ROM, but its header
 changes can.
 
@@ -84,9 +89,11 @@ Every commit goes to `origin/main` at once, so the sessions working in parallel 
      sides declared the same functions in different headers, keep the header of the side that decompiled the
      function and convert the other side's callers (types and field names too), then probe those callers: they must
      show only their documented rows.
-3. `python3 configure.py && ninja`, and check both SHA1s. The default target also compiles every incomplete file in
+3. Repeat the build and warning check in step 3, and check both SHA1s. If this branch has not had a full build since
+   merging, run `ninja -t clean` first: an incremental run cannot reveal warnings in unchanged files. The default
+   target also compiles every incomplete file in
    both versions, though only complete ones are linked, so a file that no longer compiles fails here instead of in
-   the next session's build. A merge that breaks the build is fixed before it is pushed (the `fix-build` skill).
+   the next session's build. Fix any build failure or compiler warning before pushing (the `fix-build` skill).
 4. `git push origin HEAD:main`. If it is rejected because `origin/main` moved, go back to step 1.
 
 Never force-push or rewrite pushed commits. If a conflict can't be resolved without knowing what the other session

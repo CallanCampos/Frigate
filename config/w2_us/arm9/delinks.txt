@@ -1019,6 +1019,7 @@ lib/nnsys/src/g3d/util.c:
     .text       start:0x02067dd0 end:0x020681b8
 
 lib/nnsys/src/g3d/mem.c:
+    complete
     .text       start:0x020681b8 end:0x020681ec
 
 lib/nnsys/src/g3d/model.c:
@@ -1630,3 +1631,12 @@ src/system/myitem_savedata.c:
     .text       start:0x02007fd0 end:0x0200897c
     .rodata     start:0x0208f4f8 end:0x0208f77c
     .data       start:0x0209a0c4 end:0x0209a0d8
+
+lib/nitro/src/card/card_pull_out.c:
+    complete
+    .text       start:0x0206ff04 end:0x02070058
+    .bss        start:0x0214bd80 end:0x0214bd8c
+
+lib/nitro/src/cp/cp_context.c:
+    complete
+    .text       start:0x02070058 end:0x020700d4

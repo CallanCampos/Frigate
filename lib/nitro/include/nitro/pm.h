@@ -21,6 +21,7 @@ u32 PM_GetBackLight(u32 *top, u32 *bottom);
 u32 PM_SetBackLight(u32 target, u32 backlight);
 u32 PM_GetBattery(u32 *battery);
 u32 PM_GetBatteryLevel(u16 *level);
+void func_0207ef8c(void);
 void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern);
 
 // Callbacks run before the system sleeps and after it wakes, in lists ordered by priority: the TwlSDK's

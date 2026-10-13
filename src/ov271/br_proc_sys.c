@@ -149,7 +149,7 @@ void BrProcSys_Pop(BrProcSys *p_wk) {
     if (p_wk->stack_num != 0) {
         p_wk->stack_num--;
         if (p_wk->stack_num != 0) {
-            u16 procID = p_wk->stack[p_wk->stack_num - 1];
+            u16 procID = *(p_wk->stack + p_wk->stack_num - 1);
 
             BrProcSys_SetStack(&stack, procID, &p_wk->tbl[procID]);
             p_wk->next = stack;

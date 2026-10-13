@@ -22,6 +22,7 @@ void func_02004eb0(const char *signature);
 void sys_reset(u32 parameter);
 // Stops the game after a fatal error, calling the registered handler first
 void sys_exit(void);
+void WaitByLoop(u32 cycles);
 // Stops the CPU until an interrupt, which swan names cp15_halt. NitroSDK's OS_Halt
 void cp15_halt(void);
 // Writes a range of the data cache back to memory, before DMA reads it. NitroSDK's DC_FlushRange

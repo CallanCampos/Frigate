@@ -497,7 +497,7 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     MsgData *msgData;
 
     func_0200c1f0();
-    func_020107f0(2, pkm);
+    func_020107f0(2, (u32)pkm);
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_TAIL(HEAPID_GAMEEVENT));
     GFL_MsgDataLoadStrbuf(msgData, species, name);
@@ -1044,7 +1044,7 @@ static void EventPokewood_ShowCastNames(BtlSetup *setup, HeapID heapId) {
                     member->shownSpecies <= POKEWOOD_CAST_SPECIES_LAST) {
                     StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, member->shownSpecies - POKEWOOD_CAST_MSG_OFFSET);
 
-                    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, name);
+                    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
                     GFL_StrBufFree(name);
                 }
             }

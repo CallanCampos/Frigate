@@ -296,6 +296,7 @@ BOOL NNS_G3dForceBindMdlPltt(NNSG3dResMdl *mdl, const NNSG3dResTex *tex, u32 plt
 void NNS_G3dReleaseMdlPltt(NNSG3dResMdl *mdl);
 void NNS_G3DModelAttachResource(NNSG3dRenderObj *obj, NNSG3dResMdl *mdl);
 NNSG3dAnmObj *NNS_G3DAnimationAlloc(NNSFndAllocator *allocator, const void *anm, const NNSG3dResMdl *mdl);
+u32 NNS_G3DAnimationCalcAllocSize(const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3dFreeAnmObj(NNSFndAllocator *allocator, NNSG3dAnmObj *anmObj);
 void NNS_G3DAnimationCreate(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl, const NNSG3dResTex *tex);
 void NNS_G3DAnimationBind(NNSG3dRenderObj *obj, NNSG3dAnmObj *anmObj);

@@ -22,6 +22,8 @@ Limits:
 - Never print a whole `.s` file or doc. Use `tools/decomp/show_func.py` a few functions at a time.
 - Write every function first, then probe the whole file. Give each mismatch at most two rounds of the levers that fit
   its symptom, then leave the closest natural C and move on. The caller decides whether to grind further.
+- Check probe output for compiler warnings in both versions. Fix warnings in owned files and report any warning that
+  needs a declaration outside your ownership; a byte match does not make a warning acceptable.
 - Natural C only, as `CLAUDE.md` defines it. A match through unnatural C counts as no match.
 - No `add_source_file.py`, `mark_complete.py`, `rename_symbol.py`, `ninja` or commits: the caller registers, names,
   builds and commits. Names you would give go in the report instead.

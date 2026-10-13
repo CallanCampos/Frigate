@@ -1,15 +1,17 @@
 ---
 name: fix-build
-description: Diagnose a pokebw2 build failure after a C or config change. Covers link errors, a section range that doesn't contain its last symbol, a module check or SHA1 failing in one module or one version, undefined runtime helpers, redeclarations, and a probe that matches while ninja fails. Use whenever `ninja` fails or a ROM no longer matches.
+description: Diagnose a pokebw2 build failure or compiler warning after a C or config change. Covers link errors, section ranges, module or SHA1 failures, runtime helpers, redeclarations, and probes that match while Ninja fails. Use whenever Ninja fails, warns, or a ROM no longer matches.
 ---
 
 # Fix the build
 
-Read only the end of the output: `ninja 2>&1 | tail -30`. `ninja` checks, per version, the archives built from source,
+Keep the full Ninja output and inspect every `warning:` and `error:` line; use the tail for the failing task's context.
+Ninja checks, per version, the archives built from source,
 every module (`dsd check modules`) and the ROM's SHA1, so the failing check names the module and the version.
 
 | Symptom | Cause and fix |
 | --- | --- |
+| MWCC emits a warning while Ninja succeeds | Treat the build as unfinished. Correct the declaration, cast, initialization or duplicate definition at the reported line; do not silence warnings with compiler flags. Recompile the affected file in both versions and check the ROMs. If the first build log was incremental, run a clean build once to catch warnings in untouched files. |
 | `Last symbol 'X' ... not contained within the file's section range` | A `.data`/`.rodata`/`.bss` range in `delinks.txt` ends before the file's last object. Extend the range to the end of that object. If the object is the next file's, the boundary is wrong. When an object nothing references sits between files, `config_fixes.py add-data` gives it a symbol. Fix both versions. |
 | `Check ... overlay N: checksum failed` in one module the change didn't touch | (1) A function made `static` that this module calls links to address 0 through a veneer, and one whose address it loads (a `kind:load` relocation, such as ov036's pointer to `ListMenuCore_FreeStrBufs`) becomes 0. Make it global again; `mark_complete.py` and `add_source_file.py` without `--incomplete` check for this. (2) A header type change altered a caller's code in another file. `git diff include/` and probe the files that include it. A caller's local typed only to fit a wrong prototype (a `u32 heapId` passed to a parameter that is really `HeapID`) changes with it: give the local the parameter's real type. Other modules failing at the same time may only be calling into the changed one. (3) An ambiguous relocation now resolves to another overlay's symbol (see below). (4) A literal in that module that dsd took for a pointer into the data just made complete, such as ov011's MD5 constant `0x021ac7f4` that fell inside overlay 298's rodata in White 2: the same value in both versions while the data moved shows it is not a pointer. `config_fixes.py remove-reloc` it. |
 | A file just marked complete fails its own overlay's check, and the overlay's `*_TEXT_END` in `build/<version>/arm9.o.xMAP` is 0x10 past `delinks.txt` | A function the file made `static` is still called from the overlay's code that is not in C yet. `mark_complete.py` only looks at other modules, so it passes; the call links to a veneer to address 1 at the end of `.text`. Find the calls with a `bl` scan of the built overlay for that address and make the function global, as `key_system_net.c`'s `KeySystemNet_GetRequest`, which data_convert_flow.c calls. |

@@ -26,6 +26,8 @@ Limits:
   says: capped, in the background, time-boxed, stopped with `systemctl --user stop perm-F.scope`.
 - Natural C only, as the skill defines it. A match through unnatural C counts as no match, though you report what
   it changed.
+- Reject variants that introduce compiler warnings, even if their bytes match; report warnings already present in the
+  starting source so the caller can fix them.
 - Stop under the skill's stop rules. Don't run past them to please the caller.
 - No commits, no `ninja` of the whole ROM. The probe is the test.
 

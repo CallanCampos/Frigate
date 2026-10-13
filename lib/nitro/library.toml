@@ -22,6 +22,7 @@ flags = [
 # The multiboot library (libmb), which overlay 181 links for the parent of DS Download Play, is Thumb code like the
 # game's, with -ipa file (its statics and the globals it defines are reached from one base) and -inline on,noauto
 [file_flags]
+"card/card_pull_out.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_cache.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_comm.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_frame.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
