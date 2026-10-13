@@ -1281,8 +1281,8 @@ static void WbtList_ShowLine(WbtList *work, s32 line, s32 drawn, s32 side) {
     func_0204c124(work->actors[ACTOR_LINE + line], TRUE);
     func_0204c520(work->actors[ACTOR_LINE + line], TRUE);
     position = sWbtListLines[index + LINE_POSITION];
-    // The flags' column of the table, by the same index
-    flags = (sWbtListLines + LINE_FLAGS)[index];
+    // The sum's order folds the column into the load's base, as *(data + pos + 1) does
+    flags = *(sWbtListLines + index + LINE_FLAGS);
     if (flags & ACTOR_FLAG_FLIP_Y) {
         func_0204c2b0(work->actors[ACTOR_LINE + line], 1, TRUE);
     } else {
