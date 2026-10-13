@@ -5,6 +5,7 @@
     .bss        start:0x021f5420 end:0x021f5420 kind:bss align:32
 
 src/ov289/b_choice_main.c:
+    complete
     .text       start:0x021f4440 end:0x021f51a0
     .rodata     start:0x021f51a0 end:0x021f53bc
     .data       start:0x021f53c0 end:0x021f5420

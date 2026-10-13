@@ -2292,7 +2292,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `b_choice_main.c` | `0x021f4440`–`0x021f51a0` | 33 | partial | string at `0x021f53fc` |
+| `b_choice_main.c` | `0x021f4440`–`0x021f51a0` | 33 | complete | string at `0x021f53fc` |
 
 ### Overlay 290
 

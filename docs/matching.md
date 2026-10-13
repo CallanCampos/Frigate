@@ -283,6 +283,13 @@ Same instructions, registers swapped.
 - A constant assigned once and passed to a call is propagated as an immediate; assigned in both arms of an `if`,
   next to the values that do differ, it stays in a saved register. The Pokéstar counter's `PkwdCount_StartFade` sets
   `delay = 4;` beside `start` and `end` in each arm (`r6`, 0x5c); with one assignment it was 0x58.
+- A sign extension split between the prologue and a later compare is a narrow local declared first and assigned late
+  from an `int` parameter: the film choice screen's `BChoiceMain_SetChoicePalette` takes `int palette` and has
+  `s16 pal;` declared before its other locals and assigned after their initializers (4 bytes short before). In the
+  same file `BChoiceMain_UpdateCursor` passes `(u32)index * 2` for x and `index * 2 + 1` for y, the mixed signedness
+  of `PkwdRecordMonitor_UpdateListMarks`, and `BChoiceMain_CreateActors` declares
+  `int i` first but zeroes it in a plain `for` after the `sys_memset`: the stack slot follows the declaration, the
+  store the statement.
 
 ## Stack slots
 
