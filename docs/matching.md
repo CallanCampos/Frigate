@@ -1214,6 +1214,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   are `u8`, which alone moves the `won = 0` store after the first call's argument load, and
   `BattleChampionshipFlow_MenuOpenList`'s interleaved stores come from plain field order in the source, not from
   writing them in the asm's order.
+- A duplicated compare with a `blt` to a lone `b` can be two arms that each hold the same bodies written out: the
+  ranking list's `IrcRankingList_VBlank` has the full forward and backward scroll bodies (with their
+  `list->prevDirection = 1;` and `= -1;`) both in the arm that tests `list->delta` and in the arm that tests
+  `list->prevDirection`, and MWCC merges the equal bodies; a `direction` variable set first does not give it. In the
+  same file a clamp matched only as `MATH_MAX`, and the operand order matters: `target = MATH_MAX(target, 0);` in
+  `IrcRanking_StepScrollToSelf` but `list->scrollMax = MATH_MAX(0, list->scrollMax);` in `IrcRankingList_Init`.
 
 ## Loops
 

@@ -1572,7 +1572,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_ranking.c` | `0x0219ad20`–`0x0219cc4c` | 70 | partial | string at `0x0219ce40` |
+| `irc_ranking.c` | `0x0219ad20`–`0x0219cc4c` | 70 | complete | string at `0x0219ce40` |
 
 ### Overlay 181
 
