@@ -90,13 +90,14 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 11
 
-117 of 1688 functions are in source files.
+230 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `net_devwifi.c` | `0x021503c0`–`0x021505d4` | 26 | complete | string at `0x021852ac` |
 | `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | partial | string at `0x021852d0` |
 | `dwc_rapcommon.c` | `0x02152078`–`0x0215251c` | 14 | complete | string at `0x021853f0` |
+| `cps.c` | `0x0215251c`–`0x02155e34` | 113 | partial | descriptive |
 
 ### Overlay 12
 

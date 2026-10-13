@@ -2,6 +2,7 @@
 # module address(b2_us) action [argument]
 . 0x02004fb0 reloc_addend 0x948
 . 0x02004fb4 reloc_addend 0x988
+. 0x020050ac add_data CPSi_Signature
 . 0x0200587c reloc_addend 0x4
 . 0x02005880 reloc_addend 0xc
 . 0x02005884 reloc_addend 0x10
@@ -503,6 +504,7 @@ overlays/ov009 0x0214f610 reloc_module overlay(191)
 overlays/ov010 0x02150288 reloc_module overlay(305)
 overlays/ov010 0x021502fc reloc_module overlay(306)
 overlays/ov011 0x0215208e reloc_module overlay(32)
+overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)

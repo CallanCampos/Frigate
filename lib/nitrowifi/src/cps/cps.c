@@ -1,5 +1,4 @@
 #include "nitrowifi/cps.h"
-
 #include "cps_internal.h"
 #include "dwc/wcm.h"
 #include "gfl/std.h"
@@ -7,9 +6,8 @@
 #include "nitro/os.h"
 
 // NitroWiFi's CPS, the TCP/IP stack under the socket layer (SOCL) in overlay 11: ARP, IP with its fragments, ICMP's
-// echo, UDP, TCP, the DHCP client and DNS lookups. The ROM names none of it; see cps.h. The functions keep their
-// default names until they are recorded; each says the name it is to get.
-
+// echo, UDP, TCP, the DHCP client and DNS lookups. The ROM names neither the file nor its
+// functions: cps.c is a guess, and the names follow NitroWiFi's CPS where the code shows the role (see cps.h).
 static void CPSi_Nop(void);
 static BOOL CPSi_LinkIsOn(void);
 static u32 CPSi_CalcSum(void *data, u32 len, u32 sum);
@@ -194,14 +192,12 @@ static u8 sAckStack[CPS_STACK_SIZE] ATTRIBUTE_ALIGN(32);
 #define CPS_CURRENT_SOC() ((CPSSoc *)OS_GetCurrentThread()->specific[0])
 
 // CPS_SetAddressCheckCallback
-void CPS_SetAddressCheckCallback(BOOL (*callback)(void))
-{
+void CPS_SetAddressCheckCallback(BOOL (*callback)(void)) {
     sAddressCheck = callback;
 }
 
 // CPSi_SetNoIp: drops the address, and with it the ARP cache, the connections and the fragments
-static void CPSi_SetNoIp(u32 reason)
-{
+static void CPSi_SetNoIp(u32 reason) {
     BOOL hadIp = CPSMyIp != 0;
     OSThread *thread;
     int i;
@@ -241,8 +237,7 @@ static void CPSi_SetNoIp(u32 reason)
 }
 
 // CPSi_Yield: lets the other threads run while waiting
-static void CPSi_Yield(void)
-{
+static void CPSi_Yield(void) {
     if (sYieldWait == 0) {
         func_0207a92c();
     } else {
@@ -251,22 +246,19 @@ static void CPSi_Yield(void)
 }
 
 // CPSi_Nop: the default of the callbacks and of the allocator
-static void CPSi_Nop(void)
-{
+static void CPSi_Nop(void) {
 }
 
 // CPSi_LinkIsOn: the default link check
-static BOOL CPSi_LinkIsOn(void)
-{
+static BOOL CPSi_LinkIsOn(void) {
     return TRUE;
 }
 
 // CPS_Startup
-void CPS_Startup(CPSConfig *config)
-{
+void CPS_Startup(CPSConfig *config) {
     u64 seed;
 
-    func_02004eb0(data_020050ac);
+    func_02004eb0(CPSi_Signature);
     if (config->random_seed) {
         seed = config->random_seed;
     } else {
@@ -317,8 +309,7 @@ void CPS_Startup(CPSConfig *config)
 }
 
 // CPS_CalmDown
-BOOL CPS_CalmDown(void)
-{
+BOOL CPS_CalmDown(void) {
     u32 enabled = CPU_IRQDisable();
     BOOL ended = scheduler_is_thread_ended(&sScavengerThread);
 
@@ -331,14 +322,12 @@ BOOL CPS_CalmDown(void)
 }
 
 // CPS_SetScavengerCallback
-void CPS_SetScavengerCallback(void (*callback)(void))
-{
+void CPS_SetScavengerCallback(void (*callback)(void)) {
     sScavengerCallback = callback;
 }
 
 // CPS_Cleanup
-void CPS_Cleanup(void)
-{
+void CPS_Cleanup(void) {
     u32 enabled;
 
     CPS_CalmDown();
@@ -358,16 +347,14 @@ void CPS_Cleanup(void)
 }
 
 // CPS_SetThreadPriority
-void CPS_SetThreadPriority(u32 priority)
-{
+void CPS_SetThreadPriority(u32 priority) {
     sThreadPriority = priority;
     func_0207a998(&sRecvThread, priority);
     func_0207a998(&sScavengerThread, priority);
 }
 
 // CPSi_CalcSum: adds the 16-bit words of data to sum, in ones' complement
-static u32 CPSi_CalcSum(void *data, u32 len, u32 sum)
-{
+static u32 CPSi_CalcSum(void *data, u32 len, u32 sum) {
     u32 *p = data;
     u32 align = (u32)data & 3;
     u32 acc = 0;
@@ -437,8 +424,7 @@ fold:
 }
 
 // CPSi_FinishSum
-static u16 CPSi_FinishSum(u16 sum)
-{
+static u16 CPSi_FinishSum(u16 sum) {
     sum ^= 0xffff;
     if (sum == 0) {
         sum = 0xffff;
@@ -447,14 +433,12 @@ static u16 CPSi_FinishSum(u16 sum)
 }
 
 // CPS_CalcCksum
-static u16 CPS_CalcCksum(void *data, u32 len)
-{
+static u16 CPS_CalcCksum(void *data, u32 len) {
     return CPSi_FinishSum(CPSi_CalcSum(data, len, 0));
 }
 
 // CPSi_BadPseudoSum: checks a UDP or TCP packet's sum, with the pseudo-header of its addresses, protocol and length
-static BOOL CPSi_BadPseudoSum(void *data, u32 len, CPSIpHeader *ip, u32 proto)
-{
+static BOOL CPSi_BadPseudoSum(void *data, u32 len, CPSIpHeader *ip, u32 proto) {
     u32 sum = CPSi_CalcSum(ip->src, 8, CPSi_CalcSum(data, len, proto));
 
     sum += len;
@@ -466,20 +450,17 @@ static BOOL CPSi_BadPseudoSum(void *data, u32 len, CPSIpHeader *ip, u32 proto)
 }
 
 // CPSi_IsOnLink: whether an address is reached without the gateway
-static BOOL CPSi_IsOnLink(CPSInAddr ip)
-{
+static BOOL CPSi_IsOnLink(CPSInAddr ip) {
     BOOL onLink = TRUE;
 
-    if (ip != CPS_BROADCAST_ADDR && ip != CPS_LOOPBACK_ADDR
-        && (ip & CPSNetMask) != (CPSMyIp & CPSNetMask)) {
+    if (ip != CPS_BROADCAST_ADDR && ip != CPS_LOOPBACK_ADDR && (ip & CPSNetMask) != (CPSMyIp & CPSNetMask)) {
         onLink = FALSE;
     }
     return onLink;
 }
 
 // CPSi_NextHop
-static CPSInAddr CPSi_NextHop(CPSInAddr ip)
-{
+static CPSInAddr CPSi_NextHop(CPSInAddr ip) {
     if (!CPSi_IsOnLink(ip)) {
         ip = CPSGatewayIp;
     }
@@ -487,8 +468,7 @@ static CPSInAddr CPSi_NextHop(CPSInAddr ip)
 }
 
 // CPSi_IsBroadcast
-static BOOL CPSi_IsBroadcast(CPSInAddr ip)
-{
+static BOOL CPSi_IsBroadcast(CPSInAddr ip) {
     BOOL broadcast = FALSE;
 
     if (CPSi_IsOnLink(ip)) {
@@ -502,8 +482,7 @@ static BOOL CPSi_IsBroadcast(CPSInAddr ip)
 }
 
 // CPSi_IsMulticast
-static BOOL CPSi_IsMulticast(CPSInAddr ip)
-{
+static BOOL CPSi_IsMulticast(CPSInAddr ip) {
     if ((ip & 0xf0000000) == 0xe0000000) {
         return TRUE;
     }
@@ -511,15 +490,12 @@ static BOOL CPSi_IsMulticast(CPSInAddr ip)
 }
 
 // CPSi_IsForMe
-static BOOL CPSi_IsForMe(CPSInAddr ip)
-{
-    return CPSMyIp == 0 || ip == CPSMyIp || ip == CPS_LOOPBACK_ADDR
-        || CPSi_IsBroadcast(ip) || CPSi_IsMulticast(ip);
+static BOOL CPSi_IsForMe(CPSInAddr ip) {
+    return CPSMyIp == 0 || ip == CPSMyIp || ip == CPS_LOOPBACK_ADDR || CPSi_IsBroadcast(ip) || CPSi_IsMulticast(ip);
 }
 
 // CPSi_MacDiffers
-static BOOL CPSi_MacDiffers(u16 *a, u16 *b)
-{
+static BOOL CPSi_MacDiffers(u16 *a, u16 *b) {
     int i;
 
     for (i = 0; i < 3; i++) {
@@ -531,15 +507,13 @@ static BOOL CPSi_MacDiffers(u16 *a, u16 *b)
 }
 
 // CPSi_SendFrame: sends an Ethernet frame as an 802.11 one, with the SNAP header over its source address
-static void CPSi_SendFrame(u8 *frame, u32 len, u8 *data, u32 dataLen)
-{
+static void CPSi_SendFrame(u8 *frame, u32 len, u8 *data, u32 dataLen) {
     sys_memcpy_fast(CPS_SNAP_HEADER, frame + 6, 6);
     sSendFailed = func_ov011_0215cba4(frame, frame + 6, len - 6, data, dataLen) < 0;
 }
 
 // CPSi_PutFrame: puts a received frame in the LAN buffer, as its size and the Ethernet frame that it was
-static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data, u32 dataLen)
-{
+static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data, u32 dataLen) {
     u8 *buf = sLanBuf;
     u32 len;
     u16 size;
@@ -591,8 +565,7 @@ static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data,
 }
 
 // CPSi_RecvCallback
-void CPSi_RecvCallback(u8 *src, u8 *dst, u8 *data, u32 len)
-{
+void CPSi_RecvCallback(u8 *src, u8 *dst, u8 *data, u32 len) {
     CPSi_PutFrame(src, dst, data, len, NULL, 0);
     if (sRecvWaiter != NULL && !scheduler_is_thread_ended(sRecvWaiter)) {
         scheduler_start_thread(sRecvWaiter);
@@ -600,8 +573,7 @@ void CPSi_RecvCallback(u8 *src, u8 *dst, u8 *data, u32 len)
 }
 
 // CPSi_GetFrame: waits for a frame in the LAN buffer
-static CPSEtherHeader *CPSi_GetFrame(u32 *len)
-{
+static CPSEtherHeader *CPSi_GetFrame(u32 *len) {
     u32 enabled = CPU_IRQDisable();
     u8 *buf;
     u16 size;
@@ -627,8 +599,7 @@ static CPSEtherHeader *CPSi_GetFrame(u32 *len)
 }
 
 // CPSi_ConsumeFrame
-static void CPSi_ConsumeFrame(void)
-{
+static void CPSi_ConsumeFrame(void) {
     u32 enabled = CPU_IRQDisable();
 
     sLanRead += *(u16 *)(sLanBuf + sLanRead);
@@ -639,8 +610,7 @@ static void CPSi_ConsumeFrame(void)
 }
 
 // CPSi_LookupMac: the MAC address of an address in the cache, or NULL
-static u8 *CPSi_LookupMac(CPSInAddr ip)
-{
+static u8 *CPSi_LookupMac(CPSInAddr ip) {
     u32 enabled = CPU_IRQDisable();
     u8 *mac = NULL;
     u32 i;
@@ -665,8 +635,7 @@ static u8 *CPSi_LookupMac(CPSInAddr ip)
 }
 
 // CPSi_SendArpRequest
-static void CPSi_SendArpRequest(CPSInAddr ip)
-{
+static void CPSi_SendArpRequest(CPSInAddr ip) {
     u8 frame[42];
 
     sys_memset(frame, 0, 42);
@@ -684,8 +653,7 @@ static void CPSi_SendArpRequest(CPSInAddr ip)
 }
 
 // CPSi_ResolveMac: asks for an address's MAC address until it comes, or until the waits run out
-static u8 *CPSi_ResolveMac(CPSInAddr ip)
-{
+static u8 *CPSi_ResolveMac(CPSInAddr ip) {
     u32 try;
     u32 i;
     u8 *mac;
@@ -707,13 +675,11 @@ static u8 *CPSi_ResolveMac(CPSInAddr ip)
 }
 
 // CPSi_UpdateArp: refreshes an address's entry, or takes a free or the oldest one for it when add is set
-static void CPSi_UpdateArp(u8 *mac, CPSInAddr ip, BOOL add)
-{
+static void CPSi_UpdateArp(u8 *mac, CPSInAddr ip, BOOL add) {
     u16 now;
     u32 i;
 
-    if (ip == CPS_LOOPBACK_ADDR || ip == CPSMyIp || !CPSi_IsOnLink(ip)
-        || CPSi_IsMulticast(ip)) {
+    if (ip == CPS_LOOPBACK_ADDR || ip == CPSMyIp || !CPSi_IsOnLink(ip) || CPSi_IsMulticast(ip)) {
         return;
     }
     now = CPS_NOW();
@@ -745,8 +711,7 @@ static void CPSi_UpdateArp(u8 *mac, CPSInAddr ip, BOOL add)
 }
 
 // CPSi_SendEther: puts the Ethernet header in front of buf and sends the frame to the next hop
-static void CPSi_SendEther(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u16 type)
-{
+static void CPSi_SendEther(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u16 type) {
     CPS_PUT16(buf - 2, type);
     if (!CPSi_IsMulticast(ip)) {
         u8 *mac;
@@ -776,8 +741,7 @@ static void CPSi_SendEther(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip
 }
 
 // CPSi_SendIpPacket: finishes the IP header in front of buf and sends one packet, to itself through the LAN buffer
-static void CPSi_SendIpPacket(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u32 frag)
-{
+static void CPSi_SendIpPacket(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u32 frag) {
     CPS_PUT16(buf - 18, (u16)(len + 20 + dataLen));
     CPS_PUT16(buf - 14, (u16)frag);
     *(u16 *)(buf - 10) = 0;
@@ -796,8 +760,7 @@ static void CPSi_SendIpPacket(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr
 }
 
 // CPSi_SendIp: puts the IP header in front of buf and sends the packet, in fragments when it is too long
-static void CPSi_SendIp(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u8 proto)
-{
+static void CPSi_SendIp(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u8 proto) {
     u16 offset;
 
     buf[-20] = 0x45;
@@ -839,8 +802,7 @@ static void CPSi_SendIp(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u
 }
 
 // CPSi_SendPing: sends an echo request
-static void CPSi_SendPing(u8 *data, u32 len, CPSSoc *soc)
-{
+static void CPSi_SendPing(u8 *data, u32 len, CPSSoc *soc) {
     u16 *icmp = (u16 *)(soc->sndbuf + CPS_SNDBUF_HEADER);
 
     icmp[0] = 8;
@@ -852,8 +814,7 @@ static void CPSi_SendPing(u8 *data, u32 len, CPSSoc *soc)
 }
 
 // CPSi_SendUdp
-static void CPSi_SendUdp(u8 *data, u32 len, CPSSoc *soc)
-{
+static void CPSi_SendUdp(u8 *data, u32 len, CPSSoc *soc) {
     u8 *buf = soc->sndbuf;
     u8 *udp = buf + CPS_SNDBUF_HEADER;
 
@@ -870,8 +831,7 @@ static void CPSi_SendUdp(u8 *data, u32 len, CPSSoc *soc)
 }
 
 // CPSi_SendTcp: sends a segment with as much of the data as fits, returning how much that was
-static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags)
-{
+static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags) {
     u8 *tcp;
     u32 headerLen;
     int blocks;
@@ -903,8 +863,8 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags)
             int i;
 
             for (i = 0; i < 4 && soc->ooo[i].start != 0; i++) {
-                if ((best < 0 || soc->ooo[best].order < soc->ooo[i].order)
-                    && (last < 0 || soc->ooo[i].order < soc->ooo[last].order)) {
+                if ((best < 0 || soc->ooo[best].order < soc->ooo[i].order) &&
+                    (last < 0 || soc->ooo[i].order < soc->ooo[last].order)) {
                     best = i;
                 }
             }
@@ -912,8 +872,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags)
                 break;
             }
             CPS_PUT32(tcp + blocks * 8 + 24, soc->ackno + soc->ooo[best].start - soc->rcvbuf_len);
-            CPS_PUT32(tcp + blocks * 8 + 28,
-                      soc->ackno + soc->ooo[best].start - soc->rcvbuf_len + soc->ooo[best].len);
+            CPS_PUT32(tcp + blocks * 8 + 28, soc->ackno + soc->ooo[best].start - soc->rcvbuf_len + soc->ooo[best].len);
             last = best;
             best = -1;
             blocks++;
@@ -952,8 +911,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags)
         soc->delayed_ack = 0;
         soc->ack_time = clock();
     }
-    CPS_PUT16(tcp + 16, CPSi_FinishSum(CPSi_CalcSum(data, len,
-                                                                CPSi_CalcSum(tcp - 12, headerLen + 12, 0))));
+    CPS_PUT16(tcp + 16, CPSi_FinishSum(CPSi_CalcSum(data, len, CPSi_CalcSum(tcp - 12, headerLen + 12, 0))));
     soc->seqno += len;
     if (flags & (CPS_TCP_SYN | CPS_TCP_FIN)) {
         soc->seqno++;
@@ -963,8 +921,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags)
 }
 
 // CPSi_ReplyArp: turns a request into its reply and sends it back
-static void CPSi_ReplyArp(CPSArpPacket *arp)
-{
+static void CPSi_ReplyArp(CPSArpPacket *arp) {
     arp->op = 0x200;
     sys_memcpy_fast(arp->src_mac, arp->dst_mac, 10);
     sys_memcpy_fast(sMyMac, arp->src_mac, 6);
@@ -975,8 +932,7 @@ static void CPSi_ReplyArp(CPSArpPacket *arp)
 }
 
 // CPSi_ReceiveArp
-static void CPSi_ReceiveArp(CPSArpPacket *arp, u32 len)
-{
+static void CPSi_ReceiveArp(CPSArpPacket *arp, u32 len) {
     u16 op;
     BOOL fromMe;
     BOOL toMe;
@@ -1014,8 +970,7 @@ static void CPSi_ReceiveArp(CPSArpPacket *arp, u32 len)
 }
 
 // CPSi_ReceiveEchoRequest: turns the request into its reply and sends it back
-static void CPSi_ReceiveEchoRequest(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len)
-{
+static void CPSi_ReceiveEchoRequest(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len) {
     CPSInAddr hop = CPSi_NextHop(CPS_GET32(ip->src));
     u32 sum;
 
@@ -1033,16 +988,15 @@ static void CPSi_ReceiveEchoRequest(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 le
 }
 
 // CPSi_ReceiveEchoReply: gives the reply to the socket that pinged
-static void CPSi_ReceiveEchoReply(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len)
-{
+static void CPSi_ReceiveEchoReply(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len) {
     u32 enabled = CPU_IRQDisable();
     OSThread *thread;
 
     for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
         CPSSoc *soc = thread->specific[0];
 
-        if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_PING && (u16)(u32)soc->thread == icmp->id
-            && soc->local_port == icmp->seq && soc->rcvbuf_len == 0 && soc->remote_ip == CPS_GET32(ip->src)) {
+        if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_PING && (u16)(u32)soc->thread == icmp->id &&
+            soc->local_port == icmp->seq && soc->rcvbuf_len == 0 && soc->remote_ip == CPS_GET32(ip->src)) {
             len -= sizeof(CPSIcmpHeader);
             if (len > soc->rcvbuf_size) {
                 soc->rcvbuf_len = soc->rcvbuf_size;
@@ -1061,18 +1015,16 @@ static void CPSi_ReceiveEchoReply(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len)
 }
 
 // CPSi_IsUnicast: whether both addresses are of single hosts
-static BOOL CPSi_IsUnicast(CPSInAddr src, CPSInAddr dst)
-{
-    if (src != 0 && !CPSi_IsBroadcast(src) && !CPSi_IsMulticast(src) && dst != 0 && !CPSi_IsBroadcast(dst)
-        && !CPSi_IsMulticast(dst)) {
+static BOOL CPSi_IsUnicast(CPSInAddr src, CPSInAddr dst) {
+    if (src != 0 && !CPSi_IsBroadcast(src) && !CPSi_IsMulticast(src) && dst != 0 && !CPSi_IsBroadcast(dst) &&
+        !CPSi_IsMulticast(dst)) {
         return TRUE;
     }
     return FALSE;
 }
 
 // CPSi_ReceiveIcmp
-static void CPSi_ReceiveIcmp(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len)
-{
+static void CPSi_ReceiveIcmp(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len) {
     if (len < sizeof(CPSIcmpHeader)) {
         return;
     }
@@ -1093,17 +1045,16 @@ static void CPSi_ReceiveIcmp(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len)
 }
 
 // CPSi_FindListener: the socket that listens for a SYN
-static CPSSoc *CPSi_FindListener(CPSIpHeader *ip, CPSTcpHeader *tcp)
-{
+static CPSSoc *CPSi_FindListener(CPSIpHeader *ip, CPSTcpHeader *tcp) {
     CPSSoc *soc;
     OSThread *thread;
 
     for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
         soc = thread->specific[0];
-        if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_LISTEN
-            && soc->local_port == CPS_GET16(&tcp->dst_port)
-            && (soc->remote_port == 0 || soc->remote_port == CPS_GET16(&tcp->src_port))
-            && (soc->remote_ip == 0 || soc->remote_ip == CPS_GET32(ip->src))) {
+        if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_LISTEN &&
+            soc->local_port == CPS_GET16(&tcp->dst_port) &&
+            (soc->remote_port == 0 || soc->remote_port == CPS_GET16(&tcp->src_port)) &&
+            (soc->remote_ip == 0 || soc->remote_ip == CPS_GET32(ip->src))) {
             return soc;
         }
     }
@@ -1111,16 +1062,14 @@ static CPSSoc *CPSi_FindListener(CPSIpHeader *ip, CPSTcpHeader *tcp)
 }
 
 // CPSi_IsTcpOf: whether a segment belongs to a socket's connection
-static BOOL CPSi_IsTcpOf(CPSIpHeader *ip, CPSTcpHeader *tcp, CPSSoc *soc)
-{
-    return soc->state != CPS_STT_DATAGRAM && soc->state != CPS_STT_PING
-        && soc->local_port == CPS_GET16(&tcp->dst_port) && soc->remote_port == CPS_GET16(&tcp->src_port)
-        && soc->remote_ip == CPS_GET32(ip->src);
+static BOOL CPSi_IsTcpOf(CPSIpHeader *ip, CPSTcpHeader *tcp, CPSSoc *soc) {
+    return soc->state != CPS_STT_DATAGRAM && soc->state != CPS_STT_PING &&
+           soc->local_port == CPS_GET16(&tcp->dst_port) && soc->remote_port == CPS_GET16(&tcp->src_port) &&
+           soc->remote_ip == CPS_GET32(ip->src);
 }
 
 // CPSi_FindTcpSoc
-static CPSSoc *CPSi_FindTcpSoc(CPSIpHeader *ip, CPSTcpHeader *tcp)
-{
+static CPSSoc *CPSi_FindTcpSoc(CPSIpHeader *ip, CPSTcpHeader *tcp) {
     CPSSoc *soc;
     OSThread *thread;
 
@@ -1134,8 +1083,7 @@ static CPSSoc *CPSi_FindTcpSoc(CPSIpHeader *ip, CPSTcpHeader *tcp)
 }
 
 // CPSi_ParseTcpOptions: the peer's MSS and whether it takes SACK
-static void CPSi_ParseTcpOptions(CPSTcpHeader *tcp, CPSSoc *soc)
-{
+static void CPSi_ParseTcpOptions(CPSTcpHeader *tcp, CPSSoc *soc) {
     u8 *option;
     int len;
 
@@ -1176,8 +1124,7 @@ static void CPSi_ParseTcpOptions(CPSTcpHeader *tcp, CPSSoc *soc)
 }
 
 // CPSi_KnowsNextHop: whether the MAC address of an address's next hop is known (or there is none to know)
-static BOOL CPSi_KnowsNextHop(CPSInAddr ip)
-{
+static BOOL CPSi_KnowsNextHop(CPSInAddr ip) {
     ip = CPSi_NextHop(ip);
     if (ip == 0) {
         return TRUE;
@@ -1186,8 +1133,7 @@ static BOOL CPSi_KnowsNextHop(CPSInAddr ip)
 }
 
 // CPSi_SendTcpControl: sends a segment without data. The receiving thread can't wait for ARP, so it asks instead
-static void CPSi_SendTcpControl(CPSSoc *soc, u32 flags)
-{
+static void CPSi_SendTcpControl(CPSSoc *soc, u32 flags) {
     if (CPSi_KnowsNextHop(soc->remote_ip) || OS_GetCurrentThread() != &sRecvThread) {
         CPSi_SendTcp(NULL, 0, soc, flags);
         return;
@@ -1197,8 +1143,7 @@ static void CPSi_SendTcpControl(CPSSoc *soc, u32 flags)
 
 // CPSi_SendAck: acknowledges what came in, now (mode 2), or when there is something to tell (mode 1), or after a
 // second segment or the ACK delay
-static void CPSi_SendAck(CPSSoc *soc, int mode)
-{
+static void CPSi_SendAck(CPSSoc *soc, int mode) {
     if (mode != 2) {
         if (soc->acked == soc->ackno && soc->acked_window == (u16)(soc->rcvbuf_size - soc->rcvbuf_len)) {
             return;
@@ -1215,14 +1160,12 @@ static void CPSi_SendAck(CPSSoc *soc, int mode)
 }
 
 // CPSi_SendFin
-static void CPSi_SendFin(CPSSoc *soc)
-{
+static void CPSi_SendFin(CPSSoc *soc) {
     CPSi_SendTcpControl(soc, CPS_TCP_FIN | CPS_TCP_ACK);
 }
 
 // CPSi_SendReset: answers a segment that belongs to no connection
-static void CPSi_SendReset(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
-{
+static void CPSi_SendReset(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     CPSSoc *soc = &sReplySoc;
     u8 flags;
 
@@ -1245,8 +1188,7 @@ static void CPSi_SendReset(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
 }
 
 // CPSi_AcceptSyn: answers a SYN with a SYN-ACK
-static void CPSi_AcceptSyn(CPSIpHeader *ip, CPSTcpHeader *tcp, CPSSoc *soc)
-{
+static void CPSi_AcceptSyn(CPSIpHeader *ip, CPSTcpHeader *tcp, CPSSoc *soc) {
     soc->state = CPS_STT_SYN_RCVD;
     soc->when = CPS_NOW();
     soc->local_ip_real = CPS_GET32(ip->dst);
@@ -1258,8 +1200,7 @@ static void CPSi_AcceptSyn(CPSIpHeader *ip, CPSTcpHeader *tcp, CPSSoc *soc)
 }
 
 // CPSi_ReceiveSynAgain: a SYN for a connection that exists
-static BOOL CPSi_ReceiveSynAgain(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
-{
+static BOOL CPSi_ReceiveSynAgain(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     CPSSoc *soc = CPSi_FindTcpSoc(ip, tcp);
 
     if (soc != NULL) {
@@ -1277,8 +1218,7 @@ static BOOL CPSi_ReceiveSynAgain(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
 }
 
 // CPSi_ReceiveSyn
-static void CPSi_ReceiveSyn(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
-{
+static void CPSi_ReceiveSyn(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     CPSSoc *soc;
 
     if (!CPSi_IsUnicast(CPS_GET32(ip->src), CPS_GET32(ip->dst))) {
@@ -1301,8 +1241,7 @@ static void CPSi_ReceiveSyn(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
 }
 
 // CPSi_ReceiveSynAck
-static void CPSi_ReceiveSynAck(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
-{
+static void CPSi_ReceiveSynAck(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     CPSSoc *soc = CPSi_FindTcpSoc(ip, tcp);
 
     if (soc == NULL || soc->state != CPS_STT_SYN_SENT) {
@@ -1323,8 +1262,7 @@ static void CPSi_ReceiveSynAck(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
 }
 
 // CPSi_MarkOoo: makes a run the most recent
-static void CPSi_MarkOoo(CPSSoc *soc, int index)
-{
+static void CPSi_MarkOoo(CPSSoc *soc, int index) {
     int i;
     u32 max = 0;
 
@@ -1337,8 +1275,7 @@ static void CPSi_MarkOoo(CPSSoc *soc, int index)
 }
 
 // CPSi_MergeOoo: takes the runs that the received data reached into it, and joins the runs that touch
-static void CPSi_MergeOoo(CPSSoc *soc)
-{
+static void CPSi_MergeOoo(CPSSoc *soc) {
     u32 start;
     int i;
 
@@ -1357,8 +1294,8 @@ again:
         }
     }
     for (i = 0; i < 3; i++) {
-        if (soc->ooo[i].start != 0 && soc->ooo[i + 1].start != 0
-            && soc->ooo[i].start + soc->ooo[i].len >= soc->ooo[i + 1].start) {
+        if (soc->ooo[i].start != 0 && soc->ooo[i + 1].start != 0 &&
+            soc->ooo[i].start + soc->ooo[i].len >= soc->ooo[i + 1].start) {
             soc->ooo[i].len = soc->ooo[i + 1].start + soc->ooo[i + 1].len - soc->ooo[i].start;
             soc->ooo[i + 1].start = 0;
             CPSi_PackOoo(soc);
@@ -1368,8 +1305,7 @@ again:
 }
 
 // CPSi_PackOoo: closes the gaps of the runs
-static void CPSi_PackOoo(CPSSoc *soc)
-{
+static void CPSi_PackOoo(CPSSoc *soc) {
     int i;
 
     for (i = 0; i < 3; i++) {
@@ -1381,8 +1317,7 @@ static void CPSi_PackOoo(CPSSoc *soc)
 }
 
 // CPSi_InsertOoo: makes room for a run at index
-static void CPSi_InsertOoo(CPSSoc *soc, int index)
-{
+static void CPSi_InsertOoo(CPSSoc *soc, int index) {
     int i;
 
     for (i = 2; i >= index; i--) {
@@ -1391,10 +1326,8 @@ static void CPSi_InsertOoo(CPSSoc *soc, int index)
     soc->ooo[index].start = 0;
 }
 
-
 // CPSi_ReceiveTcpData: a segment with ACK
-static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
-{
+static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     u32 offset = 0;
     CPSSoc *soc = CPSi_FindTcpSoc(ip, tcp);
     u8 flags;
@@ -1592,8 +1525,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
 }
 
 // CPSi_ReceiveFin: a FIN without ACK
-static void CPSi_ReceiveFin(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
-{
+static void CPSi_ReceiveFin(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     CPSSoc *soc = CPSi_FindTcpSoc(ip, tcp);
     u32 enabled;
 
@@ -1632,8 +1564,7 @@ static void CPSi_ReceiveFin(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
 }
 
 // CPSi_ReceiveRst
-static void CPSi_ReceiveRst(CPSIpHeader *ip, CPSTcpHeader *tcp)
-{
+static void CPSi_ReceiveRst(CPSIpHeader *ip, CPSTcpHeader *tcp) {
     CPSSoc *soc = CPSi_FindTcpSoc(ip, tcp);
 
     if (soc == NULL) {
@@ -1648,8 +1579,7 @@ static void CPSi_ReceiveRst(CPSIpHeader *ip, CPSTcpHeader *tcp)
 }
 
 // CPSi_ReceiveTcp
-static void CPSi_ReceiveTcp(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
-{
+static void CPSi_ReceiveTcp(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     u8 flags;
 
     if (len < sizeof(CPSTcpHeader)) {
@@ -1692,8 +1622,7 @@ static void CPSi_ReceiveTcp(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len)
 }
 
 // CPSi_ReceiveUdp: gives a datagram to the socket bound to its port, when that has taken the last one
-static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len)
-{
+static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len) {
     u32 enabled;
     OSThread *thread;
 
@@ -1707,10 +1636,10 @@ static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len)
     for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
         CPSSoc *soc = thread->specific[0];
 
-        if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_DATAGRAM
-            && soc->local_port == CPS_GET16(&udp->dst_port)
-            && (soc->remote_port == 0 || soc->remote_port == CPS_GET16(&udp->src_port))
-            && (soc->remote_ip == 0 || soc->remote_ip == CPS_BROADCAST_ADDR || soc->remote_ip == CPS_GET32(ip->src))) {
+        if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_DATAGRAM &&
+            soc->local_port == CPS_GET16(&udp->dst_port) &&
+            (soc->remote_port == 0 || soc->remote_port == CPS_GET16(&udp->src_port)) &&
+            (soc->remote_ip == 0 || soc->remote_ip == CPS_BROADCAST_ADDR || soc->remote_ip == CPS_GET32(ip->src))) {
             soc->local_ip_real = CPS_GET32(ip->dst);
             if (soc->remote_ip == 0) {
                 soc->remote_ip = CPS_GET32(ip->src);
@@ -1738,8 +1667,7 @@ static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len)
 }
 
 // CPSi_Reassemble: the whole packet once its fragments are all in, which allocated says to free, or NULL
-static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated)
-{
+static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated) {
     CPSReassembly *free = NULL;
     CPSReassembly *reassembly;
     u32 frag;
@@ -1830,8 +1758,7 @@ static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated)
 }
 
 // CPSi_ReceiveIp
-static void CPSi_ReceiveIp(CPSIpHeader *ip, u32 len)
-{
+static void CPSi_ReceiveIp(CPSIpHeader *ip, u32 len) {
     BOOL allocated;
     u8 proto;
     u32 headerLen;
@@ -1882,8 +1809,7 @@ static void CPSi_ReceiveIp(CPSIpHeader *ip, u32 len)
 }
 
 // CPSi_RecvThread
-static void CPSi_RecvThread(void *arg)
-{
+static void CPSi_RecvThread(void *arg) {
     for (;;) {
         u32 len;
         CPSEtherHeader *frame = CPSi_GetFrame(&len);
@@ -1903,8 +1829,7 @@ static void CPSi_RecvThread(void *arg)
 }
 
 // CPSi_GetNewPort
-u16 CPSi_GetNewPort(void)
-{
+u16 CPSi_GetNewPort(void) {
     BOOL used;
 
     do {
@@ -1928,26 +1853,22 @@ u16 CPSi_GetNewPort(void)
 }
 
 // CPSi_Rand
-static u32 CPSi_Rand(void)
-{
+static u32 CPSi_Rand(void) {
     return MATH_Rand32(&CPSiRand, 0);
 }
 
 // CPS_SocRegister
-void CPS_SocRegister(CPSSoc *soc)
-{
+void CPS_SocRegister(CPSSoc *soc) {
     OS_GetCurrentThread()->specific[0] = soc;
 }
 
 // CPS_SocUnRegister
-void CPS_SocUnRegister(void)
-{
+void CPS_SocUnRegister(void) {
     OS_GetCurrentThread()->specific[0] = NULL;
 }
 
 // CPS_SocDatagramMode
-void CPS_SocDatagramMode(void)
-{
+void CPS_SocDatagramMode(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -1957,8 +1878,7 @@ void CPS_SocDatagramMode(void)
 }
 
 // CPS_SocBind
-void CPS_SocBind(u16 localPort, u16 remotePort, CPSInAddr remoteIp)
-{
+void CPS_SocBind(u16 localPort, u16 remotePort, CPSInAddr remoteIp) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -1976,8 +1896,7 @@ void CPS_SocBind(u16 localPort, u16 remotePort, CPSInAddr remoteIp)
 }
 
 // CPS_SocUse
-void CPS_SocUse(void)
-{
+void CPS_SocUse(void) {
     OSThread *thread = OS_GetCurrentThread();
     CPSSoc *soc = thread->specific[0];
 
@@ -1993,8 +1912,7 @@ void CPS_SocUse(void)
 }
 
 // CPS_SocRelease
-void CPS_SocRelease(void)
-{
+void CPS_SocRelease(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2003,14 +1921,12 @@ void CPS_SocRelease(void)
 }
 
 // CPS_SocDup
-void CPS_SocDup(OSThread *thread)
-{
+void CPS_SocDup(OSThread *thread) {
     thread->specific[0] = OS_GetCurrentThread()->specific[0];
 }
 
 // CPS_SetUdpCallback
-void CPS_SetUdpCallback(BOOL (*callback)(u8 *data, u32 len, CPSSoc *soc))
-{
+void CPS_SetUdpCallback(BOOL (*callback)(u8 *data, u32 len, CPSSoc *soc)) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2019,8 +1935,7 @@ void CPS_SetUdpCallback(BOOL (*callback)(u8 *data, u32 len, CPSSoc *soc))
 }
 
 // CPSi_TcpConnect: sends the SYN up to three times, returning 0 once connected
-int CPSi_TcpConnect(CPSSoc *soc)
-{
+int CPSi_TcpConnect(CPSSoc *soc) {
     u32 seqno = CPSi_Rand();
     u32 i;
 
@@ -2048,8 +1963,7 @@ int CPSi_TcpConnect(CPSSoc *soc)
 }
 
 // CPS_TcpConnect
-int CPS_TcpConnect(void)
-{
+int CPS_TcpConnect(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2062,8 +1976,7 @@ int CPS_TcpConnect(void)
 }
 
 // CPSi_TcpShutdown
-static void CPSi_TcpShutdown(CPSSoc *soc)
-{
+static void CPSi_TcpShutdown(CPSSoc *soc) {
     u32 enabled;
 
     func_0207a92c();
@@ -2083,8 +1996,7 @@ static void CPSi_TcpShutdown(CPSSoc *soc)
 }
 
 // CPS_TcpShutdown
-void CPS_TcpShutdown(void)
-{
+void CPS_TcpShutdown(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2096,8 +2008,7 @@ void CPS_TcpShutdown(void)
 }
 
 // CPS_TcpClose: waits up to about five seconds for the connection to close
-void CPS_TcpClose(void)
-{
+void CPS_TcpClose(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
     s32 start;
 
@@ -2115,8 +2026,7 @@ void CPS_TcpClose(void)
 }
 
 // CPSi_UdpRead
-static u8 *CPSi_UdpRead(u32 *len, CPSSoc *soc)
-{
+static u8 *CPSi_UdpRead(u32 *len, CPSSoc *soc) {
     u32 enabled = CPU_IRQDisable();
     u32 received = soc->rcvbuf_len;
 
@@ -2131,8 +2041,7 @@ static u8 *CPSi_UdpRead(u32 *len, CPSSoc *soc)
 }
 
 // CPSi_TcpRead
-u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc)
-{
+u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc) {
     if (soc->state == CPS_STT_ESTABLISHED) {
         CPSi_SendAck(soc, 1);
     }
@@ -2154,8 +2063,7 @@ u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc)
 }
 
 // CPS_SocRead
-u8 *CPS_SocRead(u32 *len)
-{
+u8 *CPS_SocRead(u32 *len) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2172,8 +2080,7 @@ u8 *CPS_SocRead(u32 *len)
 }
 
 // CPSi_TcpConsume: drops data from the front of the receive buffer, moving the runs after it along
-void CPSi_TcpConsume(u32 len, CPSSoc *soc)
-{
+void CPSi_TcpConsume(u32 len, CPSSoc *soc) {
     u32 enabled = CPU_IRQDisable();
     u32 received = soc->rcvbuf_len;
     BOOL wasFull = FALSE;
@@ -2219,8 +2126,7 @@ void CPSi_TcpConsume(u32 len, CPSSoc *soc)
 }
 
 // CPS_SocConsume
-void CPS_SocConsume(u32 len)
-{
+void CPS_SocConsume(u32 len) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2233,8 +2139,7 @@ void CPS_SocConsume(u32 len)
 }
 
 // CPSi_TcpSendSegments: sends data in segments while the window lasts, or a byte to probe a closed window
-static u32 CPSi_TcpSendSegments(u8 *data, u32 len, CPSSoc *soc, BOOL probe)
-{
+static u32 CPSi_TcpSendSegments(u8 *data, u32 len, CPSSoc *soc, BOOL probe) {
     u32 window = 1;
     u32 sent;
     u32 segments;
@@ -2274,8 +2179,7 @@ static u32 CPSi_TcpSendSegments(u8 *data, u32 len, CPSSoc *soc, BOOL probe)
 }
 
 // CPSi_TcpSendBoth
-static u32 CPSi_TcpSendBoth(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc, BOOL probe)
-{
+static u32 CPSi_TcpSendBoth(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc, BOOL probe) {
     u32 sent = CPSi_TcpSendSegments(data, len, soc, probe);
 
     if (sent != 0 && len2 != 0) {
@@ -2285,8 +2189,7 @@ static u32 CPSi_TcpSendBoth(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc,
 }
 
 // CPSi_TcpWrite: sends both pieces of data and waits for their ACKs, returning how much of it was acknowledged
-u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc)
-{
+u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
     u32 total = 0;
     BOOL probe;
     u32 base;
@@ -2304,8 +2207,8 @@ u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc)
         start = CPS_NOW();
         do {
             CPSi_Yield();
-        } while (sLinkIsOn() && soc->state == CPS_STT_ESTABLISHED && soc->seqno != soc->remote_ackno
-                 && CPS_NOW() - start < 15 && (!probe || soc->remote_win == 0));
+        } while (sLinkIsOn() && soc->state == CPS_STT_ESTABLISHED && soc->seqno != soc->remote_ackno &&
+                 CPS_NOW() - start < 15 && (!probe || soc->remote_win == 0));
         acked = soc->remote_ackno - base;
         if (acked > soc->seqno - base) {
             acked = 0;
@@ -2347,8 +2250,7 @@ u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc)
 }
 
 // CPSi_SocWrite: sends both pieces of data the way the socket sends, returning how much went, or 0 on an error
-static u32 CPSi_SocWrite(u8 *data, u32 len, u8 *data2, u32 len2)
-{
+static u32 CPSi_SocWrite(u8 *data, u32 len, u8 *data2, u32 len2) {
     CPSSoc *soc = CPS_CURRENT_SOC();
     u32 sent;
 
@@ -2382,8 +2284,7 @@ static u32 CPSi_SocWrite(u8 *data, u32 len, u8 *data2, u32 len2)
 }
 
 // CPS_SocWrite
-u32 CPS_SocWrite(u8 *data, u32 len)
-{
+u32 CPS_SocWrite(u8 *data, u32 len) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2407,8 +2308,7 @@ u32 CPS_SocWrite(u8 *data, u32 len)
 }
 
 // CPS_SocGetLength
-s32 CPS_SocGetLength(void)
-{
+s32 CPS_SocGetLength(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2418,8 +2318,8 @@ s32 CPS_SocGetLength(void)
         if (soc->ssl) {
             return func_ov011_0215a43c(soc);
         }
-        if (soc->rcvbuf_len != 0 || soc->state == CPS_STT_ESTABLISHED || soc->state == CPS_STT_DATAGRAM
-            || soc->state == CPS_STT_PING) {
+        if (soc->rcvbuf_len != 0 || soc->state == CPS_STT_ESTABLISHED || soc->state == CPS_STT_DATAGRAM ||
+            soc->state == CPS_STT_PING) {
             return soc->rcvbuf_len;
         }
         return -1;
@@ -2428,8 +2328,7 @@ s32 CPS_SocGetLength(void)
 }
 
 // CPS_SocFlush
-void CPS_SocFlush(void)
-{
+void CPS_SocFlush(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL && soc->outbuf_len != 0) {
@@ -2439,8 +2338,7 @@ void CPS_SocFlush(void)
 }
 
 // CPSi_CheckCollision: asks twice who has the address and waits for an answer, FALSE when another host has it
-static BOOL CPSi_CheckCollision(void)
-{
+static BOOL CPSi_CheckCollision(void) {
     s32 start;
 
     CPSi_SendArpRequest(CPSMyIp);
@@ -2457,8 +2355,7 @@ static BOOL CPSi_CheckCollision(void)
 }
 
 // CPSi_DhcpGiveUp: tells the DHCP callback, and checks a static address
-static void CPSi_DhcpGiveUp(void)
-{
+static void CPSi_DhcpGiveUp(void) {
     sDhcpCallback();
     if (CPSMyIp != 0 && !CPSi_CheckCollision()) {
         CPSi_SetNoIp(CPS_NOIP_REASON_COLLISION);
@@ -2466,14 +2363,12 @@ static void CPSi_DhcpGiveUp(void)
 }
 
 // Whether the address check callback rejects the address DHCP gave
-static inline BOOL CPSi_AddressRejected(void)
-{
+static inline BOOL CPSi_AddressRejected(void) {
     return sAddressCheck != NULL && !sAddressCheck();
 }
 
 // CPSi_ScavengerThread: once a second, runs DHCP and drops what timed out
-static void CPSi_ScavengerThread(void *arg)
-{
+static void CPSi_ScavengerThread(void *arg) {
     int state;
     u32 arpTimer;
     u32 leaseTimer;
@@ -2623,8 +2518,7 @@ static void CPSi_ScavengerThread(void *arg)
 }
 
 // CPSi_SendDelayedAcks: sends the ACKs that waited long enough, and sets the alarm for the next one
-static void CPSi_SendDelayedAcks(void)
-{
+static void CPSi_SendDelayedAcks(void) {
     u32 wait = 0xffffffff;
     u32 enabled = CPU_IRQDisable();
     u32 now = clock();
@@ -2651,8 +2545,7 @@ static void CPSi_SendDelayedAcks(void)
 }
 
 // CPSi_AckThread
-static void CPSi_AckThread(void *arg)
-{
+static void CPSi_AckThread(void *arg) {
     while (!scheduler_is_thread_ended(&sScavengerThread)) {
         CPSi_SendDelayedAcks();
         scheduler_yield(NULL);
@@ -2660,14 +2553,12 @@ static void CPSi_AckThread(void *arg)
 }
 
 // CPSi_AckAlarm
-static void CPSi_AckAlarm(void *arg)
-{
+static void CPSi_AckAlarm(void *arg) {
     scheduler_start_thread(&sAckThread);
 }
 
 // CPSi_DhcpMakeMessage: the BOOTP header and the options every message has, returning where the rest go
-static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type)
-{
+static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type) {
     u8 *option;
 
     sys_memset(buf, 0, 0xec);
@@ -2700,8 +2591,7 @@ static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type)
 }
 
 // CPSi_Pad: fills the rest of the first size bytes, of which used are taken
-static u8 *CPSi_Pad(u32 value, u32 size, u8 *p, u32 used)
-{
+static u8 *CPSi_Pad(u32 value, u32 size, u8 *p, u32 used) {
     if (used < size) {
         u32 rest = size - used;
 
@@ -2714,8 +2604,7 @@ static u8 *CPSi_Pad(u32 value, u32 size, u8 *p, u32 used)
 #define DHCP_BUF (sDhcpSndBuf + CPS_SNDBUF_HEADER + sizeof(CPSUdpHeader))
 
 // CPSi_DhcpSendDiscover
-static u32 CPSi_DhcpSendDiscover(void)
-{
+static u32 CPSi_DhcpSendDiscover(void) {
     u8 *buf = DHCP_BUF;
     u8 *p;
 
@@ -2733,8 +2622,7 @@ static u32 CPSi_DhcpSendDiscover(void)
 }
 
 // CPSi_DhcpSendRequest: after an offer (mode 0), or to renew (1) or rebind (2) the lease
-static u32 CPSi_DhcpSendRequest(int mode)
-{
+static u32 CPSi_DhcpSendRequest(int mode) {
     u8 *buf = DHCP_BUF;
     u8 *p = CPSi_DhcpMakeMessage(buf, DHCP_REQUEST);
 
@@ -2753,8 +2641,7 @@ static u32 CPSi_DhcpSendRequest(int mode)
 }
 
 // CPSi_DhcpWait: waits for the answer to a message and takes its options
-static int CPSi_DhcpWait(u32 xid, int try)
-{
+static int CPSi_DhcpWait(u32 xid, int try) {
     s32 start;
     s32 timeout;
     int result;
@@ -2772,8 +2659,8 @@ static int CPSi_DhcpWait(u32 xid, int try)
             continue;
         }
         msg = CPS_SocRead(&len);
-        if (len > 0xf0 && msg[0] == 2 && xid == CPS_GET32(msg + 4)
-            && !CPSi_MacDiffers((u16 *)(msg + 28), (u16 *)sMyMac)) {
+        if (len > 0xf0 && msg[0] == 2 && xid == CPS_GET32(msg + 4) &&
+            !CPSi_MacDiffers((u16 *)(msg + 28), (u16 *)sMyMac)) {
             CPSInAddr yourIp;
             u8 *end;
 
@@ -2828,8 +2715,7 @@ static int CPSi_DhcpWait(u32 xid, int try)
 }
 
 // CPSi_DhcpDiscover: TRUE once a server offered an address
-static BOOL CPSi_DhcpDiscover(void)
-{
+static BOOL CPSi_DhcpDiscover(void) {
     int result;
     int i;
 
@@ -2847,8 +2733,7 @@ static BOOL CPSi_DhcpDiscover(void)
 }
 
 // CPSi_DhcpRequest: TRUE once the server acknowledged; timer gets the seconds until the next request
-static BOOL CPSi_DhcpRequest(u32 *timer, int mode)
-{
+static BOOL CPSi_DhcpRequest(u32 *timer, int mode) {
     int result;
     int i;
 
@@ -2890,8 +2775,7 @@ static BOOL CPSi_DhcpRequest(u32 *timer, int mode)
 }
 
 // CPSi_DhcpRelease
-static void CPSi_DhcpRelease(void)
-{
+static void CPSi_DhcpRelease(void) {
     u8 *buf;
     u8 *p;
 
@@ -2910,8 +2794,7 @@ static void CPSi_DhcpRelease(void)
 }
 
 // CPSi_DnsSkipName
-static u8 *CPSi_DnsSkipName(u8 *p)
-{
+static u8 *CPSi_DnsSkipName(u8 *p) {
     u8 len = *p++;
 
     while (len != 0) {
@@ -2926,8 +2809,7 @@ static u8 *CPSi_DnsSkipName(u8 *p)
 
 // CPSi_DnsQuery: asks the bound server about a name, returning an address, 1 or 2 for a name that did or didn't fit
 // in result, -1 for no such name, or 0 when no answer came
-static s32 CPSi_DnsQuery(const u8 *name, u32 type, u16 id, u8 *result, u32 resultSize)
-{
+static s32 CPSi_DnsQuery(const u8 *name, u32 type, u16 id, u8 *result, u32 resultSize) {
     u32 len;
     u8 query[0x44];
     s32 start;
@@ -3016,8 +2898,7 @@ static s32 CPSi_DnsQuery(const u8 *name, u32 type, u16 id, u8 *result, u32 resul
 }
 
 // CPSi_ParseNumber
-static u32 CPSi_ParseNumber(const u8 *text, const u8 **end)
-{
+static u32 CPSi_ParseNumber(const u8 *text, const u8 **end) {
     u32 n;
 
     *end = text;
@@ -3036,8 +2917,7 @@ static u32 CPSi_ParseNumber(const u8 *text, const u8 **end)
 }
 
 // CPSi_ParseIp: a dotted address
-static BOOL CPSi_ParseIp(const u8 *text, CPSInAddr *addr)
-{
+static BOOL CPSi_ParseIp(const u8 *text, CPSInAddr *addr) {
     CPSInAddr ip = 0;
     int i;
 
@@ -3061,8 +2941,7 @@ static BOOL CPSi_ParseIp(const u8 *text, CPSInAddr *addr)
 }
 
 // CPSi_DnsLookup: asks a server for a name's address
-static s32 CPSi_DnsLookup(const u8 *name, CPSInAddr server, u16 id)
-{
+static s32 CPSi_DnsLookup(const u8 *name, CPSInAddr server, u16 id) {
     s32 result;
 
     if (server == 0) {
@@ -3077,8 +2956,7 @@ static s32 CPSi_DnsLookup(const u8 *name, CPSInAddr server, u16 id)
 }
 
 // CPS_Resolve: the address of a name, or of a dotted address, or 0
-CPSInAddr CPS_Resolve(const char *name)
-{
+CPSInAddr CPS_Resolve(const char *name) {
     s32 result = 0;
     struct {
         u8 usable[2];
@@ -3101,8 +2979,8 @@ CPSInAddr CPS_Resolve(const char *name)
             if (!servers.usable[i]) {
                 continue;
             }
-            if (CPSDnsIp[i] == 0 || (hop = CPSi_NextHop(CPSDnsIp[i])) == 0
-                || (CPSi_LookupMac(hop) == NULL && CPSi_ResolveMac(hop) == NULL)) {
+            if (CPSDnsIp[i] == 0 || (hop = CPSi_NextHop(CPSDnsIp[i])) == 0 ||
+                (CPSi_LookupMac(hop) == NULL && CPSi_ResolveMac(hop) == NULL)) {
                 servers.usable[i] = FALSE;
                 continue;
             }
