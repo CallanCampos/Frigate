@@ -181,7 +181,7 @@ void BattleEventItem_SetRecallEnable(BattleEventItem *item) {
     }
 }
 
-void BattleEventItem_SetWorkValue(BattleEventItem *item, u32 index, u32 value) {
+void BattleEventItem_SetWorkValue(BattleEventItem *item, u8 index, u32 value) {
     item->work[index] = value;
 }
 
