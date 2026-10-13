@@ -1954,7 +1954,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `guru2.c` | `0x021bb700`–`0x021bb984` | 13 | complete | string at `0x021c1100` |
 | `guru2_comm.c` | `0x021bb984`–`0x021bbc98` | 25 | complete | string at `0x021c1108` |
-| `guru2_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | partial | descriptive |
+| `guru2_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | complete | descriptive |
 | `guru2_main.c` | `0x021bd6a0`–`0x021c08d0` | 185 | complete | string at `0x021c1158` |
 
 ### Overlay 253

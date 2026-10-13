@@ -17,6 +17,7 @@ src/ov216/guru2_comm.c:
     .data       start:0x021c1108 end:0x021c1118
 
 src/ov216/guru2_receipt.c:
+    complete
     .text       start:0x021bbc98 end:0x021bd6a0
     .rodata     start:0x021c098c end:0x021c0b34
 
