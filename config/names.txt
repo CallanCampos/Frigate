@@ -21491,6 +21491,7 @@ overlays/ov322 0x021a04cc PkwdBookClAct_Free
 overlays/ov322 0x021a04e8 PkwdBookClAct_Update
 overlays/ov322 0x021a04f0 PkwdBookClAct_VBlank
 overlays/ov322 0x021a04f8 PkwdBookClAct_GetUnit
+overlays/ov322 0x021a0834 PKWD_BOOK_PROC_FUNCTIONS
 overlays/ov322 0x021a0a74 sPkwdBookLCDConfig
 overlays/ov322 0x021a0a84 sPkwdBookClActSetup
 overlays/ov322 0x021a0aa0 sPkwdBookVRAMConfig
