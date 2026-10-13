@@ -764,6 +764,7 @@ overlays/ov012 0x0216ba6c reloc_module overlay(36)
 overlays/ov012 0x0216ba80 reloc_module overlay(36)
 overlays/ov012 0x0216ba8c reloc_module overlay(36)
 overlays/ov012 0x0216ba90 reloc_module overlay(36)
+overlays/ov012 0x0216bb20 reloc_module overlay(104)
 overlays/ov012 0x0216bb50 reloc_module overlay(36)
 overlays/ov012 0x0216bb54 reloc_module overlay(36)
 overlays/ov012 0x0216bb68 reloc_module overlay(36)
@@ -995,13 +996,13 @@ overlays/ov036 0x021cf2e4 section_end src/ov036/fldmmdl_blact.c:.rodata
 overlays/ov036 0x021cf2e4 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_end src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_start src/ov036/fld_act_rail.c:.rodata
-overlays/ov036 0x021cf768 section_end src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf768 section_start src/ov036/field_rail_loader.c:.rodata
+overlays/ov036 0x021cf768 section_end src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf76c add_section src/ov036/field_rail_loader.c:.rodata:0x250
-overlays/ov036 0x021cf9dc section_end src/ov036/field_rail_loader.c:.rodata
 overlays/ov036 0x021cf9dc section_start src/ov036/field_subscreen.c:.rodata
-overlays/ov036 0x021cf9ec section_start src/ov036/weather.c:.rodata
+overlays/ov036 0x021cf9dc section_end src/ov036/field_rail_loader.c:.rodata
 overlays/ov036 0x021cf9ec section_end src/ov036/field_subscreen.c:.rodata
+overlays/ov036 0x021cf9ec section_start src/ov036/weather.c:.rodata
 overlays/ov036 0x021cfb74 section_end src/ov036/weather.c:.rodata
 overlays/ov036 0x021cfb84 reloc_module overlay(77)
 overlays/ov036 0x021cfbb4 reloc_module overlay(78)
@@ -3478,11 +3479,11 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
-overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
+overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
 overlays/ov311 0x0219cea0 reloc_module overlay(139)
 overlays/ov311 0x0219cf02 reloc_module overlay(139)
 overlays/ov311 0x0219cf8c reloc_module overlay(139)
