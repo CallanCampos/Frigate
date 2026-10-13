@@ -537,8 +537,6 @@ static void PkwdCount_LoadGraphics(PkwdCountWork *wk) {
     const PkwdCountLoad *screen = sPkwdCountScreenLoads;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_COUNT, wk->heapId);
     int i;
-    int row;
-    int col;
 
     for (i = 0; i < LOAD_COUNT_MAX; i++, palette++) {
         if (palette->target == 0xff) {
@@ -561,11 +559,12 @@ static void PkwdCount_LoadGraphics(PkwdCountWork *wk) {
                                                wk->heapId);
         if (screen->extra != 0) {
             u16 *screenBuf = GFL_BGSysIsScrHeapExists(screen->target);
-            u16 paletteAdd = (screen->extra & 0xf) << 12;
+            int row;
+            int col;
 
             for (row = 0; row < 24; row++) {
                 for (col = 0; col < 32; col++) {
-                    screenBuf[row * 32 + col] += paletteAdd;
+                    screenBuf[row * 32 + col] += (screen->extra & 0xf) << 12;
                 }
             }
             GFL_BGSysLoadScr(screen->target);
@@ -576,30 +575,29 @@ static void PkwdCount_LoadGraphics(PkwdCountWork *wk) {
 }
 
 static void PkwdCount_LoadTitleGraphics(PkwdCountWork *wk, u32 graphicIdx, BOOL loadScreen) {
+    const PkwdCountLoad *palette = sPkwdCountTitlePalettes;
+    const PkwdCountLoad *chars = sPkwdCountTitleChars;
+    const PkwdCountLoad *screen = sPkwdCountTitleScreens;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_COUNT, wk->heapId);
-    const PkwdCountLoad *palette;
-    const PkwdCountLoad *chars;
-    const PkwdCountLoad *screen;
-    int row;
-    int col;
 
     if (!loadScreen) {
-        palette = &sPkwdCountTitlePalettes[graphicIdx];
+        palette += graphicIdx;
         GFL_G2DIOLoadArcNCLRDefault(arc, palette->fileId, palette->target, palette->offset << 5, palette->extra << 5,
                                     wk->heapId);
     } else {
-        chars = &sPkwdCountTitleChars[graphicIdx];
+        chars += graphicIdx;
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, wk->heapId);
-        screen = &sPkwdCountTitleScreens[graphicIdx];
+        screen += graphicIdx;
         loadBGScrToVramByFileNoReserveNegAlign(arc, screen->fileId, screen->target, screen->offset, 0, FALSE,
                                                wk->heapId);
         if (screen->extra != 0) {
             u16 *screenBuf = GFL_BGSysIsScrHeapExists(screen->target);
-            u16 paletteAdd = (screen->extra & 0xf) << 12;
+            int row;
+            int col;
 
             for (row = 0; row < 24; row++) {
                 for (col = 0; col < 32; col++) {
-                    screenBuf[row * 32 + col] += paletteAdd;
+                    screenBuf[row * 32 + col] += (screen->extra & 0xf) << 12;
                 }
             }
             GFL_BGSysLoadScr(screen->target);
@@ -611,6 +609,7 @@ static void PkwdCount_LoadTitleGraphics(PkwdCountWork *wk, u32 graphicIdx, BOOL 
 
 static void PkwdCount_CreateActors(PkwdCountWork *wk, u32 surface, const PkwdCountActorEntry *entries,
                                    const PkwdCountActorGroup *group) {
+    int i;
     ClActUnit *unit = PkwdCountGraphic_GetClActUnit(wk->graphic);
     ClActorSetup setup;
     ClActor **actors;
@@ -619,20 +618,19 @@ static void PkwdCount_CreateActors(PkwdCountWork *wk, u32 surface, const PkwdCou
     s16 paletteSlot;
     s16 charsSlot;
     s16 cellSlot;
-    int i;
 
     sys_memset(&setup, 0, sizeof(setup));
-    count = group->count;
     isSub = group->isSub;
     paletteSlot = group->paletteSlot;
     charsSlot = group->charsSlot;
     cellSlot = group->cellSlot;
+    count = group->count;
     if (isSub == 0) {
         actors = wk->mainActors;
     } else {
         actors = wk->subActors;
     }
-    for (i = 0; i < count; i++, entries++) {
+    for (i = 0; i < count; entries++, i++) {
         u32 positionIdx;
         s16 x;
         s16 y;
@@ -826,11 +824,12 @@ static void PkwdCount_StartFade(PkwdCountWork *wk, BOOL fadeIn) {
     if (!fadeIn) {
         start = 16;
         end = 0;
+        delay = 4;
     } else {
         start = 0;
         end = 16;
+        delay = 4;
     }
-    delay = 4;
     PaletteFade_StartFade(fade, 1, 0xfff, delay, start, end, 0, GFL_VBlankGetTCBMgr());
     PaletteFade_StartFade(fade, 4, 0xfff, delay, start, end, 0, GFL_VBlankGetTCBMgr());
 }

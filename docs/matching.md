@@ -280,6 +280,9 @@ Same instructions, registers swapped.
   `PkwdBookSeries series; ... series = wk->movies[wk->selected].series; PkwdBook_TransferSeriesPalette(wk, series);`
   in `PkwdBook_ListInput`. An integer local of any width, a reused variable, inline getters and wrappers gave the
   same bytes as the direct argument; `PkwdBook_InitScreen` passes the field directly and has the other order.
+- A constant assigned once and passed to a call is propagated as an immediate; assigned in both arms of an `if`,
+  next to the values that do differ, it stays in a saved register. The Pokéstar counter's `PkwdCount_StartFade` sets
+  `delay = 4;` beside `start` and `end` in each arm (`r6`, 0x5c); with one assignment it was 0x58.
 
 ## Stack slots
 
@@ -1170,6 +1173,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u32 corner = place * 4 + i; s16 index = sBScenarioCursorPositions[corner];` MWCC hoists only `place * 4` and loads
   the table's address on every pass, as `BScenarioGraphic_SetCursor` does in the ROM. With a `[5][4]` table or `int`
   operands the row's address is hoisted.
+- A loop's two increments are emitted in the order written: `PkwdCount_CreateActors` has `entries++, i++`, and
+  `i++, entries++` was 2 bytes longer. There `int i;` declared first fixed the stack slots, and `count = group->count;`
+  assigned last of the group's five fields fixed the register of the first load. In `PkwdCount_LoadGraphics` and
+  `PkwdCount_LoadTitleGraphics` the palette loop's registers were right only without a `u16 paletteAdd` local: the
+  expression `(screen->extra & 0xf) << 12` sits in the inner loop's body.
 
 ## Loops
 

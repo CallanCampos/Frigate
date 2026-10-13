@@ -2613,7 +2613,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pkwd_count.c` | `0x0219ce80`–`0x0219dc04` | 34 | partial | descriptive |
+| `pkwd_count.c` | `0x0219ce80`–`0x0219dc04` | 34 | complete | descriptive |
 | `pkwd_count_graphic.c` | `0x0219dc04`–`0x0219de5c` | 17 | complete | string at `0x0219e2a0` |
 
 ### Overlay 322
