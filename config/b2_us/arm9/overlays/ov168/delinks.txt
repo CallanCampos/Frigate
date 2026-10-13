@@ -57,6 +57,7 @@ src/ov168/btlv_gauge.c:
     .data       start:0x021f41d8 end:0x021f41e8
 
 src/ov168/btlv_timer.c:
+    complete
     .text       start:0x021f2174 end:0x021f26b8
     .rodata     start:0x021f3e9c end:0x021f3ef4
     .data       start:0x021f41f8 end:0x021f4208

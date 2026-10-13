@@ -135,12 +135,16 @@ BOOL BtlvTimer_IsTimeUp(BtlvTimer *timer, int which) {
     return left <= 0;
 }
 
+// The label actor's sequences: the battle's time and the time to choose a command
+enum {
+    TIMER_SEQ_BATTLE_LABEL,
+    TIMER_SEQ_COMMAND_LABEL,
+};
+
 // Draws a countdown's time left
-// NONMATCHING: the original tests which with bne and sets 0 first, where MWCC turns label's conditional the other way
-// round (beq, 1 first); the rest matches
 static void BtlvTimer_Draw(BtlvTimer *timer, int which) {
     const s32 warnTimes[2] = { 300, 15 };
-    int label = which != 0 ? 1 : 0;
+    int label = which == 0 ? TIMER_SEQ_BATTLE_LABEL : TIMER_SEQ_COMMAND_LABEL;
     s32 left = timer->limits[which] - (s32)OS_TicksToSeconds(clock() - timer->startTicks[which]);
     int minutes, seconds, minuteTens, minuteOnes, secondTens, secondOnes;
 

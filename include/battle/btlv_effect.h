@@ -55,7 +55,7 @@ typedef struct {
 BtlvEffectSetup *BtlvEffect_Create(u32 battleStyle, u32 battleType, const BtlFieldEnv *fieldEnv, BOOL multi,
                                    const u16 *trainerTypes, BtlMainModule *mainModule, BtlvScu *scu, HeapID heapId);
 BtlvEffectSetup *BtlvEffect_CreateSetup(BtlMainModule *mainModule, BtlvScu *scu, HeapID heapId);
-void BtlvEffect_Init(const BtlvEffectSetup *setup, Font *font, HeapID heapId);
+void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId);
 void BtlvEffect_Exit(void);
 void BtlvEffect_Main(void);
 
