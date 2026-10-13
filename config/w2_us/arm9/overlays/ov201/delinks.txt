@@ -5,6 +5,7 @@
     .bss        start:0x021b7ce0 end:0x021ba180 kind:bss align:32
 
 src/ov201/gds_rap.c:
+    complete
     .text       start:0x021b5460 end:0x021b6144
     .rodata     start:0x021b7a9c end:0x021b7aec
     .data       start:0x021b7b20 end:0x021b7bcc

@@ -1904,7 +1904,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gds_rap.c` | `0x021b5420`–`0x021b6104` | 24 | partial | string at `0x021b7ae0` |
+| `gds_rap.c` | `0x021b5420`–`0x021b6104` | 24 | complete | string at `0x021b7ae0` |
 | `gds_rap_response.c` | `0x021b6104`–`0x021b631c` | 10 | complete | descriptive |
 | `battle_rec_ov.c` | `0x021b631c`–`0x021b64e8` | 7 | complete | descriptive |
 | `poke_net.c` | `0x021b64e8`–`0x021b7374` | 31 | partial | descriptive |
