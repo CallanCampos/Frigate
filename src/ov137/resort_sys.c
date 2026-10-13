@@ -1595,7 +1595,6 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
     s32 count;
     u32 position;
     u32 result;
-    s32 k;
     s32 i;
     s32 j;
 
@@ -1630,8 +1629,8 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
         }
     }
 
-    for (k = 0; k < count - 1; k++) {
-        for (j = count - 1; j > k; j--) {
+    for (i = 0; i < count - 1; i++) {
+        for (j = count - 1; j > i; j--) {
             ResortRankSelf *upper = &entries[j - 1];
             u32 value = upper->value;
             ResortRankSelf *lower = &entries[j];
@@ -1652,6 +1651,7 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
         if (entries[i].isSelf) {
             if (entries[i].value == 0) {
                 result = 8;
+                return result;
             }
             return result;
         }
