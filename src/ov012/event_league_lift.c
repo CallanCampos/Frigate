@@ -141,9 +141,9 @@ static void func_ov012_02165cd8(LeagueLiftArrivalData *data) {
     FieldPlayer *player = Field_GetPlayer(data->field);
     VecFx32 pos;
 
-    pos.x = FX_Whole(matrix->translation.x) / 16 * FX32_CONST(16) + FX32_CONST(8);
-    pos.y = matrix->translation.y;
-    pos.z = FX_Whole(matrix->translation.z + FX32_CONST(32)) / 16 * FX32_CONST(16) + FX32_CONST(8);
+    VEC_Set(&pos, matrix->translation.x, matrix->translation.y, matrix->translation.z + FX32_CONST(32));
+    pos.x = FX_Whole(pos.x) / 16 * FX32_CONST(16) + FX32_CONST(8);
+    pos.z = FX_Whole(pos.z) / 16 * FX32_CONST(16) + FX32_CONST(8);
     FieldPlayer_SetWPos(player, &pos);
 }
 

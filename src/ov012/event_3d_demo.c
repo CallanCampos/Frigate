@@ -87,7 +87,7 @@ void CreateSeqLoadParam(Demo3DParam *out, GameSystem *gsys, u32 demoId, u8 param
 
 void SetupPlaySequenceEventRealTime(Demo3DParam *out, GameSystem *gsys, u8 demoId, u8 param) {
     RTCTime time;
-    u32 season;
+    u8 season;
 
     RTC_GetCachedTime(&time);
     season = Season_GetRealTime();

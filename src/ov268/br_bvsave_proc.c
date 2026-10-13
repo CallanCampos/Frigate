@@ -62,7 +62,7 @@ struct BrBvSaveWork {
     BrMsgWin *text;
     BrSeq *seq;
     // The slot button chosen. Its slot is one more, since the first slot is for the player's own video
-    u32 select;
+    unsigned long select;
     BrBtn *btn[BTN_MAX];
     u32 unk24;
     BrMsgWin *msgWin[MSGWIN_MAX];

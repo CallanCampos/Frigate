@@ -114,8 +114,8 @@ typedef struct {
 } GtsNegoCursorPos;
 
 static void GtsNegoDisp_CreateBGs(GtsNegoDisp *disp);
-static void GtsNegoDisp_DimPalettes(GtsNegoDisp *disp, u16 vram, int *starts, int *counts, int count);
-static void GtsNegoDisp_DimPalettesVBlank(GtsNegoDisp *disp, u16 vram, int *starts, int *counts, int count);
+static void GtsNegoDisp_DimPalettes(GtsNegoDisp *disp, u32 vram, int *starts, int *counts, int count);
+static void GtsNegoDisp_DimPalettesVBlank(GtsNegoDisp *disp, u32 vram, int *starts, int *counts, int count);
 static void GtsNegoDisp_VBlank(TCB *tcb, void *work);
 static void GtsNegoDisp_LoadGraphics(GtsNegoDisp *disp);
 static void GtsNegoDisp_CreateCursor(GtsNegoDisp *disp);
@@ -403,7 +403,7 @@ static void GtsNegoDisp_CreateBGs(GtsNegoDisp *disp) {
 
 // Dims count runs of palettes of the lower screen's OBJ or BG palettes (PALFADE_VRAM_*), each from a palette of
 // starts for as many as in counts
-static void GtsNegoDisp_DimPalettes(GtsNegoDisp *disp, u16 vram, int *starts, int *counts, int count) {
+static void GtsNegoDisp_DimPalettes(GtsNegoDisp *disp, u32 vram, int *starts, int *counts, int count) {
     int i;
     PaletteFade *fade = PaletteFade_Create(disp->heapId);
     u8 *colors;
@@ -429,7 +429,7 @@ static void GtsNegoDisp_DimPalettes(GtsNegoDisp *disp, u16 vram, int *starts, in
 }
 
 // The same, with the palettes copied in the V-blank
-static void GtsNegoDisp_DimPalettesVBlank(GtsNegoDisp *disp, u16 vram, int *starts, int *counts, int count) {
+static void GtsNegoDisp_DimPalettesVBlank(GtsNegoDisp *disp, u32 vram, int *starts, int *counts, int count) {
     PaletteFade *fade = PaletteFade_Create(disp->heapId);
     u8 *colors;
     int i;

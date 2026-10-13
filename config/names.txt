@@ -3757,6 +3757,9 @@ overlays/ov076 0x021ea528 Lightning_SetupFlickers
 overlays/ov076 0x021ea580 Lightning_SetupBolt
 overlays/ov076 0x021ea5c0 Lightning_SetupForked
 overlays/ov076 0x021ea658 Lightning_GetShade
+overlays/ov076 0x021ea778 RAIN_WEATHER
+overlays/ov076 0x021ea7c4 THUNDERSTORM_WEATHER
+overlays/ov076 0x021ea810 GUSTY_RAIN_WEATHER
 overlays/ov077 0x021e90c0 Sandstorm_Init
 overlays/ov077 0x021e9124 Sandstorm_FadeIn
 overlays/ov077 0x021e9194 Sandstorm_InitNoFade
@@ -5281,6 +5284,7 @@ overlays/ov135 0x021efb04 WbtMakeMatch_GetParty
 overlays/ov135 0x021efb34 WbtMakeMatch_LoadBattleBoxParty
 overlays/ov135 0x021efb60 WbtMakeMatch_SetupPokeList
 overlays/ov135 0x021efbb4 WbtMakeMatch_SetupPStatus
+overlays/ov136 0x021eef5c sTileWidth
 overlays/ov137 0x021f1f1c ResortSys_Create
 overlays/ov137 0x021f1fb4 ResortSys_Free
 overlays/ov137 0x021f1ff8 ResortSys_GetShopData
@@ -6340,6 +6344,7 @@ overlays/ov150 0x021f5ec4 EncEffGrid_EventCallback
 overlays/ov150 0x021f5f18 EncEffGrid_Update
 overlays/ov150 0x021f5f78 EncEffGrid_ClearAndDraw
 overlays/ov150 0x021f5fac EncEffGrid_Draw
+overlays/ov150 0x021f61d8 sCellScale
 overlays/ov151 0x021f5da0 EncEffRipple_CreateWhite
 overlays/ov151 0x021f5ddc EncEffRipple_CreateBlack
 overlays/ov151 0x021f5e18 EncEffRipple_InitWhite

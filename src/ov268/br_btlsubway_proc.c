@@ -349,12 +349,17 @@ static void BrBtlSubway_CreateTop(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p) 
     BrBtlSubwayBp_Init(&wk->bp, p->unit, &obj, bp, 104, 88, wk->heapId);
 }
 
+// NitroSDK's MATH_IMin, which nitro/math.h doesn't have yet
+static inline int MATH_IMin(int a, int b) {
+    return (a <= b) ? a : b;
+}
+
 // The streaks of the Single Line, or of the Super Single Line once it is open
 static void BrBtlSubway_CreateSingle(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p) {
     Font *font;
     MsgData *msg;
     WordSet *wordSet;
-    u16 mode;
+    u32 mode;
     int i;
     StrBuf *str;
     u32 bp;
@@ -386,12 +391,9 @@ static void BrBtlSubway_CreateSingle(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
             break;
         case 3:
         {
-            int streak = BSubwayScoreData_GetStreak(p->score, mode);
+            int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);
@@ -401,12 +403,9 @@ static void BrBtlSubway_CreateSingle(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
         }
         case 6:
         {
-            int streak = BSubwayScoreData_GetMaxStreak(p->score, mode);
+            int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);
@@ -432,7 +431,7 @@ static void BrBtlSubway_CreateDouble(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
     Font *font;
     MsgData *msg;
     WordSet *wordSet;
-    u16 mode;
+    u32 mode;
     int i;
     StrBuf *str;
     u32 bp;
@@ -464,12 +463,9 @@ static void BrBtlSubway_CreateDouble(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
             break;
         case 3:
         {
-            int streak = BSubwayScoreData_GetStreak(p->score, mode);
+            int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);
@@ -479,12 +475,9 @@ static void BrBtlSubway_CreateDouble(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
         }
         case 6:
         {
-            int streak = BSubwayScoreData_GetMaxStreak(p->score, mode);
+            int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);
@@ -510,8 +503,8 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
     Font *font;
     MsgData *msg;
     WordSet *wordSet;
-    u16 mode;
-    u16 commMode;
+    u32 mode;
+    u32 commMode;
     int i;
     StrBuf *str;
     u32 bp;
@@ -545,12 +538,9 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
             break;
         case 4:
         {
-            int streak = BSubwayScoreData_GetStreak(p->score, mode);
+            int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);
@@ -560,12 +550,9 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
         }
         case 7:
         {
-            int streak = BSubwayScoreData_GetMaxStreak(p->score, mode);
+            int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);
@@ -578,12 +565,9 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
             break;
         case 11:
         {
-            int streak = BSubwayScoreData_GetStreak(p->score, commMode);
+            int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, commMode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);
@@ -593,12 +577,9 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
         }
         case 14:
         {
-            int streak = BSubwayScoreData_GetMaxStreak(p->score, commMode);
+            int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, commMode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
-            if (streak > BR_BTLSUBWAY_STREAK_MAX) {
-                streak = BR_BTLSUBWAY_STREAK_MAX;
-            }
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
             str = GFL_StrBufCreate(0x80, wk->heapId);
             WordSetNumber(wordSet, 0, streak, 4, 1, TRUE);

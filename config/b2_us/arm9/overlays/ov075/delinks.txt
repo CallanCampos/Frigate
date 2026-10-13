@@ -5,6 +5,7 @@
     .bss        start:0x021ea3c0 end:0x021ea3c0 kind:bss align:32
 
 src/ov075/weather_particles.c:
+    complete
     .text       start:0x021e90c0 end:0x021ea0dc
     .rodata     start:0x021ea0dc end:0x021ea264
     .data       start:0x021ea280 end:0x021ea3c0

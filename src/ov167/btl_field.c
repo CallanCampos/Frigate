@@ -220,7 +220,8 @@ BOOL func_ov167_021d5c04(BtlField *field, u32 effect, u8 monId) {
 
 // Removes a Pokemon from every effect that depends on it, ending the effects that no other Pokemon keeps up
 void func_ov167_021d5c60(BtlField *field, u8 monId) {
-    u32 effect;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long effect;
     u32 i;
     BOOL found;
 

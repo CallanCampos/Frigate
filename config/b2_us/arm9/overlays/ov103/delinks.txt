@@ -4,5 +4,6 @@
     .bss        start:0x021efd40 end:0x021efd40 kind:bss align:32
 
 src/ov103/gimmick_badge_gate.c:
+    complete
     .text       start:0x021eec80 end:0x021ef794
     .rodata     start:0x021ef794 end:0x021efd30

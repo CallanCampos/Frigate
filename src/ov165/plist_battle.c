@@ -44,7 +44,7 @@ static void PokeListBattle_CreateUnit(PokeListWork *wk);
 static void PokeListBattle_FreeUnit(PokeListWork *wk);
 static void PokeListBattle_LoadResources(PokeListWork *wk);
 static void PokeListBattle_FreeResources(PokeListWork *wk);
-static PokeListPartner *PokeListBattle_CreatePartner(PokeListWork *wk, PokeListPartnerParam *partnerParam, int x, int y,
+static PokeListPartner *PokeListBattle_CreatePartner(PokeListWork *wk, PokeListPartnerParam *partnerParam, u8 x, u8 y,
                                                      u8 spacing);
 static void PokeListBattle_FreePartner(PokeListWork *wk, PokeListPartner *partner);
 static void PokeListBattle_UpdatePartner(PokeListWork *wk, PokeListPartner *partner);
@@ -188,25 +188,28 @@ static void PokeListBattle_LoadResources(PokeListWork *wk) {
 static void PokeListBattle_FreeResources(PokeListWork *wk) {
 }
 
-static PokeListPartner *PokeListBattle_CreatePartner(PokeListWork *wk, PokeListPartnerParam *partnerParam, int x, int y,
+static inline PokeListPartnerPkm *PokeListBattle_CreatePartnerPkmAt(PokeListWork *wk, PartyPkm *pkm, u8 col, u8 row,
+                                                                    u8 offset) {
+    return PokeListBattle_CreatePartnerPkm(wk, pkm, offset + col * 8, row * 8);
+}
+
+static PokeListPartner *PokeListBattle_CreatePartner(PokeListWork *wk, PokeListPartnerParam *partnerParam, u8 x, u8 y,
                                                      u8 spacing) {
     PokeListPartner *partner = GFL_HeapAllocate(wk->heapId, sizeof(PokeListPartner), FALSE, "plist_battle.c", 323);
     u8 i;
     u8 count = PokeParty_GetPkmCount(partnerParam->party);
-    int step = spacing + 5;
     StrBuf *name;
 
     for (i = 0; i < 6; i++) {
         if (i < count) {
-            u8 col = x + (i % 2) * step;
+            u8 col = x + (i % 2) * (spacing + 5);
             u8 row = y + (i / 2) * 6 + 4;
-            u8 offset = 4;
+            int offset = 4;
 
             if (i % 2 != 0) {
                 offset = 0;
             }
-            partner->pkms[i] = PokeListBattle_CreatePartnerPkm(wk, PokeParty_GetPkm(partnerParam->party, i),
-                                                               offset + col * 8, row * 8);
+            partner->pkms[i] = PokeListBattle_CreatePartnerPkmAt(wk, PokeParty_GetPkm(partnerParam->party, i), col, row, offset);
         } else {
             partner->pkms[i] = NULL;
         }
@@ -246,6 +249,38 @@ static void PokeListBattle_UpdatePartner(PokeListWork *wk, PokeListPartner *part
     }
 }
 
+static inline void PokeListBattle_CreateSexWindow(PokeListWork *wk, PokeListPartnerPkm *partnerPkm, BOOL isEgg, u32 sex,
+                                                  u8 x, u8 y) {
+    u8 subX = x % 8;
+    u8 tileY = y / 8;
+    u8 tileX = x / 8;
+
+    partnerPkm->sexWindow = BmpWin_CreateDynamic(4, tileX + 3, tileY, 3, 2, 13, TRUE);
+    if (isEgg == FALSE) {
+        if (sex == GENDER_MALE) {
+            PokeList_PrintString(wk, partnerPkm->sexWindow, 7, subX + 4, 0, 0x14c0);
+        } else if (sex == GENDER_FEMALE) {
+            PokeList_PrintString(wk, partnerPkm->sexWindow, 8, subX + 4, 0, 0xc80);
+        }
+    }
+}
+
+static inline void PokeListBattle_CreateLevelWindow(PokeListWork *wk, PokeListPartnerPkm *partnerPkm, BOOL isEgg,
+                                                    u32 level, u8 x, u8 y) {
+    u8 subX = x % 8;
+    u8 tileY = y / 8;
+    u8 tileX = x / 8;
+
+    partnerPkm->levelWindow = BmpWin_CreateDynamic(4, tileX, tileY + 3, 6, 1, 14, TRUE);
+    if (isEgg == FALSE) {
+        WordSet *wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
+
+        WordSetNumber(wordSet, 0, level, 3, 0, TRUE);
+        PokeList_PrintWordSetStringSmall(wk, partnerPkm->levelWindow, wordSet, 2, subX, 0, 0x3c40);
+        GFL_WordSetSystemFree(wordSet);
+    }
+}
+
 static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, PartyPkm *pkm, u8 x, u8 y) {
     PokeListPartnerPkm *partnerPkm =
         GFL_HeapAllocate(wk->heapId, sizeof(PokeListPartnerPkm), FALSE, "plist_battle.c", 409);
@@ -255,9 +290,6 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
     u32 palette;
     u32 item;
     u32 sex;
-    int tileX;
-    int tileY;
-    int subX;
     u32 level;
     ClActorSetup iconSetup;
     ClActorSetup itemSetup;
@@ -294,26 +326,9 @@ static PokeListPartnerPkm *PokeListBattle_CreatePartnerPkm(PokeListWork *wk, Par
         func_0204c124(partnerPkm->itemIcon, FALSE);
     }
     sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
-    subX = x % 8;
-    tileY = y / 8;
-    tileX = x / 8;
-    partnerPkm->sexWindow = BmpWin_CreateDynamic(4, tileX + 3, tileY, 3, 2, 13, TRUE);
-    if (isEgg == FALSE) {
-        if (sex == GENDER_MALE) {
-            PokeList_PrintString(wk, partnerPkm->sexWindow, 7, subX + 4, 0, 0x14c0);
-        } else if (sex == GENDER_FEMALE) {
-            PokeList_PrintString(wk, partnerPkm->sexWindow, 8, subX + 4, 0, 0xc80);
-        }
-    }
+    PokeListBattle_CreateSexWindow(wk, partnerPkm, isEgg, sex, x, y);
     level = PokeParty_GetLevel(pkm);
-    partnerPkm->levelWindow = BmpWin_CreateDynamic(4, tileX, tileY + 3, 6, 1, 14, TRUE);
-    if (isEgg == FALSE) {
-        WordSet *wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
-
-        WordSetNumber(wordSet, 0, level, 3, 0, TRUE);
-        PokeList_PrintWordSetStringSmall(wk, partnerPkm->levelWindow, wordSet, 2, subX, 0, 0x3c40);
-        GFL_WordSetSystemFree(wordSet);
-    }
+    PokeListBattle_CreateLevelWindow(wk, partnerPkm, isEgg, level, x, y);
     partnerPkm->dirty = TRUE;
     return partnerPkm;
 }

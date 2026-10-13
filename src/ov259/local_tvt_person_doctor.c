@@ -53,12 +53,12 @@ typedef struct {
 } LocalTvtEvolutionMsg;
 
 static LocalTvtDoctor *LocalTvtDoctor_Create(GameData *gameData, HeapID heapId);
-static void LocalTvtDoctor_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtDoctor_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtDoctor_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtDoctor_Evolution(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtDoctor_Pokedex(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtDoctor_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+static void LocalTvtDoctor_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtDoctor_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtDoctor_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtDoctor_Evolution(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtDoctor_Pokedex(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtDoctor_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 static u16 LocalTvtDoctor_GetEvolutionMsg(ArcTool *evolutionFile, u16 species);
 static BOOL LocalTvtDoctor_FindEvolutionMsg(const LocalTvtEvolutionMsg *table, u32 count, u32 key, u16 *messageId);
 static void LocalTvtDoctor_EvaluatePokedex(PokeDexSave *pokedex, EventWork *eventWork, HeapID heapId, u16 *startMsg,
@@ -123,7 +123,7 @@ static LocalTvtDoctor *LocalTvtDoctor_Create(GameData *gameData, HeapID heapId) 
     return doctor;
 }
 
-static void LocalTvtDoctor_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static void LocalTvtDoctor_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtDoctor *doctor = work;
 
     GFL_ArcToolFree(doctor->evolutionFile);
@@ -132,7 +132,7 @@ static void LocalTvtDoctor_Free(LocalTvtPerson *person, LocalTvtPersonSetup *set
     GFL_HeapFree(doctor);
 }
 
-static BOOL LocalTvtDoctor_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtDoctor_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtDoctor *doctor = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 
@@ -156,7 +156,7 @@ static BOOL LocalTvtDoctor_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *se
     return FALSE;
 }
 
-static BOOL LocalTvtDoctor_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtDoctor_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtDoctor *doctor = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 
@@ -180,7 +180,7 @@ static BOOL LocalTvtDoctor_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *set
     return FALSE;
 }
 
-static BOOL LocalTvtDoctor_Evolution(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtDoctor_Evolution(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtDoctor *doctor = work;
     u16 messageId = 0;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -253,7 +253,7 @@ static BOOL LocalTvtDoctor_Evolution(LocalTvtPerson *person, LocalTvtPersonSetup
     return FALSE;
 }
 
-static BOOL LocalTvtDoctor_Pokedex(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtDoctor_Pokedex(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtDoctor *doctor = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 
@@ -325,7 +325,7 @@ static BOOL LocalTvtDoctor_Pokedex(LocalTvtPerson *person, LocalTvtPersonSetup *
     return FALSE;
 }
 
-static BOOL LocalTvtDoctor_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtDoctor_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtDoctor *doctor = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 

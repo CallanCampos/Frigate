@@ -254,20 +254,19 @@ BOOL PdcMsg_ConsumeFinished(PdcMsg *msg) {
 static void PdcMsg_Print(PdcMsg *msg, int waitFrames) {
     GFL_BitmapFill(BmpWin_GetBitmap(msg->win), 12);
     GFL_TextRndUpdateColorIndexLUT(1, 9, 12);
-    BOOL instant = TRUE;
     GFL_BGSysSetBGEnabled(PDC_MSG_BG, TRUE);
     if (waitFrames != 0) {
-        instant = FALSE;
         msg->stream = func_02022268(msg->win, 0, 0, msg->strbuf, msg->font, msg->printWait, msg->tcbManager, 0,
                                     msg->heapId, 12);
         func_02022390(msg->stream);
+        msg->instant = FALSE;
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(msg->win), 0, 0, msg->strbuf, msg->font);
         BmpWin_FlushMap(msg->win);
         GFL_BGSysLoadScr(PDC_MSG_BG);
         BmpWin_FlushChar(msg->win);
+        msg->instant = TRUE;
     }
-    msg->instant = instant;
     msg->step = PDC_MSG_STEP_FADE_IN_START;
     msg->timer = waitFrames;
     msg->timerReset = waitFrames;

@@ -15,6 +15,7 @@ src/ov165/plist_sys.c:
     .rodata     start:0x021a49dc end:0x021a4be0
 
 src/ov165/plist_plate.c:
+    complete
     .text       start:0x0219e678 end:0x0219f5ec
     .rodata     start:0x021a4be0 end:0x021a4bf0
     .data       start:0x021a4cec end:0x021a4cfc
@@ -36,6 +37,7 @@ src/ov165/plist_item.c:
     .rodata     start:0x021a4c5c end:0x021a4c68
 
 src/ov165/plist_battle.c:
+    complete
     .text       start:0x021a0d38 end:0x021a1944
     .data       start:0x021a4d1c end:0x021a4d2c
 

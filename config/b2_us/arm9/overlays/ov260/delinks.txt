@@ -11,10 +11,12 @@ src/ov260/wifibattlematch_link.c:
     .data       start:0x021bfe60 end:0x021bfe68
 
 src/ov260/wifibattlematch_link_random.c:
+    complete
     .text       start:0x021b3064 end:0x021b57dc
     .rodata     start:0x021bfce4 end:0x021bfcf0
 
 src/ov260/wifibattlematch_link_competition.c:
+    complete
     .text       start:0x021b57dc end:0x021b8cc8
     .rodata     start:0x021bfcf0 end:0x021bfcfc
     .data       start:0x021bfe68 end:0x021bfe70

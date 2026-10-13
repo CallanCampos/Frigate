@@ -404,9 +404,7 @@ u32 FieldScript_ResolveSCRID(u32 zoneId, u16 scriptId, u16 *fileId, u16 *msgArcI
     table = GLOBAL_SCRIPT_TABLE;
     for (i = 0; i < 60; i++) {
         if (scriptId >= table[i].start) {
-            if (scriptId > table[i].end) {
-                GFL_DebugAssertFailEx(data_ov012_0216e1a0, 0, data_ov012_0216e1a4, scriptId, table[i].end);
-            }
+            GFL_ASSERT_MSG(scriptId <= table[i].end, "id=%d end=%d", scriptId, table[i].end);
             *fileId = table[i].fileId;
             *msgArcId = table[i].msgArcId;
             *msgFileNo = table[i].msgFileNo;
@@ -427,10 +425,18 @@ u32 FieldScript_ResolveSCRID(u32 zoneId, u16 scriptId, u16 *fileId, u16 *msgArcI
     return 0;
 }
 
+// Where a script file is read from. Only the archive is left in the retail game, but the test of the source stays in
+// the code, which MWCC only does for a variable of an enum type
+typedef enum {
+    SCRIPT_SOURCE_ARCHIVE,
+    SCRIPT_SOURCE_OTHER,
+} ScriptSource;
+
 void *FieldScript_LoadData(u16 fileId, HeapID heapId) {
+    ScriptSource source = SCRIPT_SOURCE_ARCHIVE;
     void *data = NULL;
 
-    if (data == NULL) {
+    if (source == SCRIPT_SOURCE_ARCHIVE) {
         data = GFL_ArcSysReadHeapNewLZ(0x38, fileId, FALSE, heapId);
     }
     return data;

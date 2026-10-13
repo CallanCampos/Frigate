@@ -52,11 +52,9 @@ MusicalProgram *func_ov012_021522d8(HeapID heapId, Ov210Work *ov210, u16 shots) 
     u8 i;
     u8 left;
     u8 add;
-    u8 count;
     u8 a;
     u8 b;
     u8 temp;
-    u8 candidates[6];
 
     program = GFL_HeapAllocate(heapId, sizeof(MusicalProgram), FALSE, "musical_program.c", 100);
     program->data = ov210->unk4;
@@ -76,33 +74,32 @@ MusicalProgram *func_ov012_021522d8(HeapID heapId, Ov210Work *ov210, u16 shots) 
         program->points[GFL_RandomMTRange(4)] += add * 5;
         left -= add;
     }
-    count = 0;
-    candidates[0] = 0;
-    candidates[1] = 0;
-    candidates[2] = 0;
-    candidates[3] = 0;
-    candidates[4] = 0;
-    candidates[5] = 0;
-    for (i = 0; i < 6; i++) {
-        if (program->data->npcs[i].minShots <= shots) {
-            candidates[count++] = i;
+    {
+        u8 candidates[6] = {0};
+        u8 count = 0;
+
+        for (i = 0; i < 6; i++) {
+            if (program->data->npcs[i].minShots <= shots) {
+                candidates[count] = i;
+                count++;
+            }
         }
-    }
-    if (count < 3) {
-        candidates[0] = 0;
-        candidates[1] = 1;
-        candidates[2] = 2;
-        count = 3;
-    }
-    for (i = 0; i < 30; i++) {
-        a = GFL_RandomMTRange(count);
-        b = GFL_RandomMTRange(count);
-        temp = candidates[a];
-        candidates[a] = candidates[b];
-        candidates[b] = temp;
-    }
-    for (i = 0; i < 3; i++) {
-        program->npcs[i] = candidates[i];
+        if (count < 3) {
+            candidates[0] = 0;
+            candidates[1] = 1;
+            candidates[2] = 2;
+            count = 3;
+        }
+        for (i = 0; i < 30; i++) {
+            a = GFL_RandomMTRange(count);
+            b = GFL_RandomMTRange(count);
+            temp = candidates[a];
+            candidates[a] = candidates[b];
+            candidates[b] = temp;
+        }
+        for (i = 0; i < 3; i++) {
+            program->npcs[i] = candidates[i];
+        }
     }
     return program;
 }
@@ -116,11 +113,8 @@ void func_ov012_02152424(HeapID heapId, MusicalProgram *program, MusicalStagePar
     void *items = MusItemData_Init(heapId);
     u8 i;
     u8 j;
-    u8 kind;
-    u8 value;
     u8 totals[4];
     u8 counts[4][4];
-    MusicalPoke *poke;
 
     for (j = 0; j < 4; j++) {
         for (i = 0; i < 4; i++) {
@@ -129,10 +123,13 @@ void func_ov012_02152424(HeapID heapId, MusicalProgram *program, MusicalStagePar
         totals[j] = 0;
     }
     for (i = 0; i < 4; i++) {
-        poke = stage->pokes[i];
-        for (j = 0; j < 9; j++) {
-            if (poke->equips[j].itemId != 0xff) {
-                kind = func_ov210_021ef164(items, poke->equips[j].itemId);
+        MusicalPoke *poke = stage->pokes[i];
+        u8 slot;
+
+        for (slot = 0; slot < 9; slot++) {
+            if (poke->equips[slot].itemId != 0xff) {
+                u8 kind = func_ov210_021ef164(items, poke->equips[slot].itemId);
+
                 counts[i][kind]++;
                 totals[kind]++;
             }
@@ -142,9 +139,11 @@ void func_ov012_02152424(HeapID heapId, MusicalProgram *program, MusicalStagePar
         program->propPoints[i] = program->points[i] / totals[i];
     }
     for (i = 0; i < 4; i++) {
-        poke = stage->pokes[i];
+        MusicalPoke *poke = stage->pokes[i];
+
         for (j = 0; j < 4; j++) {
-            value = program->propPoints[j] * counts[i][j];
+            u8 value = program->propPoints[j] * counts[i][j];
+
             poke->points += value;
             poke->unk4C[j] = value;
         }

@@ -38,13 +38,6 @@
 
 s32 ConvertConditionCode(BattleMon *mon, s32 *condition);
 
-BOOL func_ov167_021acca8(u32 condition, BattleCondition value, BattleMon *mon, u32 context,
-                         BattleHandlerString *string);
-
-BOOL func_ov167_021aceb4(void *state, u8 monId);
-
-BOOL func_ov167_021acec4(void *state, u8 monId);
-
 // The targets hit by one strike of a damaging move, as func_ov167_021a4c90 works through them
 static u32 sHitEffectiveness[3];
 static BattleMon *sHitMons[3];
@@ -113,9 +106,9 @@ void func_ov167_0219f570(BtlServerFlow *flow) {
 
 u8 func_ov167_0219f588(BtlServerFlow *flow) {
     BtlServerCmdQueue *queue;
-    u8 result;
     u8 weather;
     u32 clientId;
+    u8 result;
     BtlServerClient *client;
     u32 i;
     BattleMon *mon;
@@ -967,7 +960,8 @@ u32 func_ov167_021a0a44(BtlServerFlow *flow, BattleMon *mon) {
                 if (rand < level - maxLevel && !func_ov167_021a0b28(flow, mon)) {
                     return 2;
                 }
-                if ((u16)(rand - (u16)(level - maxLevel)) < level - maxLevel) {
+                rand -= level - maxLevel;
+                if (rand < level - maxLevel) {
                     return 3;
                 }
                 return 4;
@@ -3030,16 +3024,16 @@ void func_ov167_021a44f0(BtlServerFlow *flow, BattleMon *attacker, void *targets
     list->total = i;
 }
 
-u32 func_ov167_021a46d4(BtlFlowDamageList *list) {
+u32 func_ov167_021a46d4(const BtlFlowDamageList *list) {
     return list->total;
 }
 
-u32 func_ov167_021a46d8(BtlServerFlow *flow, BtlFlowDamageList *list, BattleMon **mons, u16 *damages,
+u32 func_ov167_021a46d8(BtlServerFlow *flow, const BtlFlowDamageList *list, BattleMon **mons, u16 *damages,
                         u32 *effectiveness, u8 *critical) {
     u32 i;
-    u32 count = 0;
+    u32 count;
 
-    for (i = 0; i < list->total; i++) {
+    for (i = 0, count = 0; i < list->total; i++) {
         if (list->entries[i].substitute) {
             mons[count] = GetPokeParam(flow->pokeCon, list->entries[i].monId);
             damages[count] = list->entries[i].damage;
@@ -3051,7 +3045,7 @@ u32 func_ov167_021a46d8(BtlServerFlow *flow, BtlFlowDamageList *list, BattleMon 
     return count;
 }
 
-u32 func_ov167_021a4754(BtlServerFlow *flow, BtlFlowDamageList *list, BattleMon **mons) {
+u32 func_ov167_021a4754(BtlServerFlow *flow, const BtlFlowDamageList *list, BattleMon **mons) {
     u32 i;
     for (i = 0; i < list->total; i++) {
         mons[i] = GetPokeParam(flow->pokeCon, list->entries[i].monId);
@@ -3059,12 +3053,12 @@ u32 func_ov167_021a4754(BtlServerFlow *flow, BtlFlowDamageList *list, BattleMon 
     return list->total;
 }
 
-u32 func_ov167_021a4788(BtlServerFlow *flow, BtlFlowDamageList *list, BattleMon **mons, u16 *damages,
+u32 func_ov167_021a4788(BtlServerFlow *flow, const BtlFlowDamageList *list, BattleMon **mons, u16 *damages,
                         u32 *effectiveness, u8 *critical, u8 *unk9) {
     u32 i;
-    u32 count = 0;
+    u32 count;
 
-    for (i = 0; i < list->total; i++) {
+    for (i = 0, count = 0; i < list->total; i++) {
         if (!list->entries[i].substitute) {
             mons[count] = GetPokeParam(flow->pokeCon, list->entries[i].monId);
             damages[count] = list->entries[i].damage;
@@ -3077,9 +3071,9 @@ u32 func_ov167_021a4788(BtlServerFlow *flow, BtlFlowDamageList *list, BattleMon 
     return count;
 }
 
-u32 func_ov167_021a4810(BtlFlowDamageList *list) {
-    u32 total = 0;
+u32 func_ov167_021a4810(const BtlFlowDamageList *list) {
     u32 i;
+    u32 total = 0;
     for (i = 0; i < list->total; i++) {
         total += list->entries[i].damage;
     }
@@ -3205,16 +3199,15 @@ u32 func_ov167_021a4c90(BtlServerFlow *flow, BattleMon *attacker, void *monSet, 
                         BtlFlowMoveParam *param, BtlFlowHitWork *hitWork, u32 ratio, BtlFlowDamageFlags flags) {
     int i;
     u8 hitCount;
-    u8 substituteCount;
     u32 total;
     u8 attackerPos;
 
     attackerPos = GetBattlePos(&flow->posPoke, GetMonID(attacker));
     total = func_ov167_021a4810(list);
-    substituteCount = func_ov167_021a46d8(flow, list, sHitMons, sHitDamages, sHitEffectiveness, sHitCritical);
-    for (i = 0; i < substituteCount; i++) {
+    hitCount = func_ov167_021a46d8(flow, list, sHitMons, sHitDamages, sHitEffectiveness, sHitCritical);
+    for (i = 0; i < hitCount; i++) {
         if (IsSubstituteActive(sHitMons[i])) {
-            u32 dealt = func_ov167_021a7bb4(flow, attacker, sHitMons[i], sHitDamages[i], sHitEffectiveness[i],
+            u16 dealt = func_ov167_021a7bb4(flow, attacker, sHitMons[i], sHitDamages[i], sHitEffectiveness[i],
                                             sHitCritical[i], param);
             BtlMonSet_AddDamage(flow->unk860, sHitMons[i], dealt, 1);
             total -= sHitDamages[i] - dealt;
@@ -3550,7 +3543,7 @@ void func_ov167_021a5784(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon
     }
 }
 
-BOOL ServerControl_FlinchCore(BtlServerFlow *flow, BattleMon *mon, u8 chance) {
+BOOL ServerControl_FlinchCore(BtlServerFlow *flow, BattleMon *mon, u32 chance) {
     if (GetTurnFlag(mon, 5)) {
         func_ov167_021bb7c0(mon, 6);
         return TRUE;
@@ -4192,7 +4185,7 @@ u32 func_ov167_021a68fc(BtlServerFlow *flow) {
     return flow->unk778;
 }
 
-BOOL func_ov167_021a6914(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *attacker, BattleMon *target,
+BOOL func_ov167_021a6914(BtlServerFlow *flow, const BtlFlowMoveParam *param, BattleMon *attacker, BattleMon *target,
                          BOOL showFail) {
     u32 stat;
     s32 change;
@@ -4324,7 +4317,7 @@ void func_ov167_021a6c34(BtlServerFlow *flow, const BtlFlowMoveParam *param, Bat
         BattleMoveEffectState *effect;
 
         // 021a6914 only reads param, but it matches only with it non-const, and this function only with it const
-        if (func_ov167_021a6914(flow, (BtlFlowMoveParam *)param, mon, target, TRUE)) {
+        if (func_ov167_021a6914(flow, param, mon, target, TRUE)) {
             effect = flow->moveEffect;
             if (!effect->enabled) {
                 effect->enabled = 1;
@@ -5519,7 +5512,7 @@ BOOL func_ov167_021a8dec(BtlServerFlow *flow, BattleMon *mon) {
     return FALSE;
 }
 
-BOOL func_ov167_021a8e68(BtlServerFlow *flow, BattleParty *party, BtlFlowExpEntry *entries) {
+BOOL func_ov167_021a8e68(BtlServerFlow *flow, BattleParty *party, const BtlFlowExpEntry *entries) {
     u32 remaining;
     u32 i;
     u8 monId;
@@ -5527,7 +5520,7 @@ BOOL func_ov167_021a8e68(BtlServerFlow *flow, BattleParty *party, BtlFlowExpEntr
     BOOL result = FALSE;
 
     for (i = 0; i < 6; i++) {
-        BtlFlowExpEntry *entry = &entries[i];
+        const BtlFlowExpEntry *entry = &entries[i];
         if (entries[i].exp != 0) {
             BattleMon *mon = func_ov167_0219d4e4(party, i);
             if ((s32)GetBattleMonStat(mon, 0xf) < 100) {
@@ -6489,11 +6482,10 @@ BOOL func_ov167_021aa710(BtlServerFlow *flow, BattleMon *attacker, BattleMon *ta
 s32 ServerEvent_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 damage, BOOL *forced) {
     u8 monId;
     u8 ratio;
-    u32 kind;
+    u8 bonus;
     u8 failed;
     u8 force;
-    u8 bonus;
-    u8 total;
+    u32 kind;
 
     monId = GetMonID(mon);
     // A share of the damage dealt, or of the user's max HP
@@ -6518,7 +6510,7 @@ s32 ServerEvent_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 da
     BattleEventVar_SetRewriteOnceValue(0x41, FALSE);
     BattleEventVar_SetRewriteOnceValue(0x51, FALSE);
     BattleEvent_CallHandlers(flow, 0x50);
-    total = BattleEventVar_GetValue(0x35);
+    ratio = BattleEventVar_GetValue(0x35);
     failed = BattleEventVar_GetValue(0x41);
     force = BattleEventVar_GetValue(0x51);
     bonus = BattleEventVar_GetValue(0x36);
@@ -6526,15 +6518,15 @@ s32 ServerEvent_CalcRecoil(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 da
     if (!force && failed == TRUE) {
         return 0;
     }
-    total = total + bonus;
-    if (total != 0) {
+    ratio += bonus;
+    if (ratio != 0) {
         if (kind == 2) {
-            damage = MultiplyValueByRatio(GetBattleMonStat(mon, 0xe), total);
+            damage = MultiplyValueByRatio(GetBattleMonStat(mon, 0xe), ratio);
             if (damage < 1) {
                 damage = 1;
             }
         } else if (damage != 0) {
-            damage = MultiplyValueByRatio(damage, total);
+            damage = MultiplyValueByRatio(damage, ratio);
             if (damage < 1) {
                 damage = 1;
             }
@@ -6906,11 +6898,11 @@ fx32 ServerEvent_SameTypeAttackBonus(BtlServerFlow *flow, BattleMon *attacker, u
 }
 
 // The chance that a move makes its target flinch
-u8 func_ov167_021ab17c(BtlServerFlow *flow, u16 move, BattleMon *attacker) {
-    u32 chance;
+u32 func_ov167_021ab17c(BtlServerFlow *flow, u16 move, BattleMon *attacker) {
     BOOL failed;
     BOOL doubled;
     u32 bonus;
+    u32 chance;
 
     chance = PML_MoveGetParam(move, 0xa);
     BattleEventVar_Push(0x31be);
@@ -6936,7 +6928,7 @@ u8 func_ov167_021ab17c(BtlServerFlow *flow, u16 move, BattleMon *attacker) {
     return chance;
 }
 
-BOOL ServerEvent_CheckFlinch(BtlServerFlow *flow, BattleMon *mon, u8 chance) {
+BOOL ServerEvent_CheckFlinch(BtlServerFlow *flow, BattleMon *mon, u32 chance) {
     BOOL failed;
     BOOL result;
     u32 rate;
@@ -8185,10 +8177,9 @@ u8 BattleHandler_DecrementPP(BtlServerFlow *handler, BattleHandlerPPParam *param
 }
 
 // Function name from swan.
-u8 BattleHandler_CureCondition(BtlServerFlow *handler, struct BattleHandlerCureConditionParam *param, u32 context) {
-    BattleHandlerString *string;
+u8 BattleHandler_CureCondition(BtlServerFlow *handler, const struct BattleHandlerCureConditionParam *param, u16 context) {
     BattleMon *target;
-    u32 changed;
+    u8 changed;
     u32 i;
     BattleMon *mon;
     s32 condition;
@@ -8206,27 +8197,21 @@ u8 BattleHandler_CureCondition(BtlServerFlow *handler, struct BattleHandlerCureC
             continue;
         }
         condition = param->condition;
-        code = ConvertConditionCode(mon, &condition);
-        if (code == 0) {
-            continue;
-        }
-        string = &param->string;
-        changed = TRUE;
-        do {
+        while ((code = ConvertConditionCode(mon, &condition)) != 0) {
+            changed = TRUE;
             ServerControl_CureCondition(handler, mon, code, &prev);
             if (param->useString == 0) {
-                if (func_ov167_021acca8(code, prev, mon, context, &handler->message)) {
+                if (Condition_SetCureMessage(code, prev, mon, context, &handler->message)) {
                     BattleHandler_SetString(handler, &handler->message);
                     BattleHandler_StrClear(&handler->message);
                 }
             } else {
-                BattleHandler_SetString(handler, string);
+                BattleHandler_SetString(handler, &param->string);
             }
             if (code == 0x13) {
                 ServerControl_CheckItemReaction(handler, mon, 0);
             }
-            code = ConvertConditionCode(mon, &condition);
-        } while (code);
+        }
     }
     if (param->popup) {
         ServerDisplay_AbilityPopupRemove(handler, target);
@@ -8262,11 +8247,11 @@ u8 BattleHandler_AddCondition(BtlServerFlow *handler, const BattleHandlerAddCond
 }
 
 // Function name from swan.
-u8 BattleHandler_StatChange(BtlServerFlow *handler, struct BattleHandlerStatChangeParam *param, u16 context) {
+u8 BattleHandler_StatChange(BtlServerFlow *handler, const struct BattleHandlerStatChangeParam *param, u16 context) {
     BattleMon *popupMon;
     BattleMon *mon;
     BOOL valid;
-    BOOL result;
+    u8 result;
     u32 i;
     u32 stat;
 
@@ -8274,7 +8259,7 @@ u8 BattleHandler_StatChange(BtlServerFlow *handler, struct BattleHandlerStatChan
     valid = FALSE;
     result = FALSE;
     for (i = 0; i < param->count; i++) {
-        if (func_ov167_021aceb4(&handler->posPoke, param->monIds[i])) {
+        if (DoesBattleMonExist(&handler->posPoke, param->monIds[i])) {
             mon = GetPokeParam(handler->pokeCon, param->monIds[i]);
             if (!IsFainted(mon) && IsStatChangeValid(mon, param->stat, param->change)) {
                 valid = TRUE;
@@ -8286,7 +8271,7 @@ u8 BattleHandler_StatChange(BtlServerFlow *handler, struct BattleHandlerStatChan
         ServerDisplay_AbilityPopupAdd(handler, popupMon);
     }
     for (i = 0; i < param->count; i++) {
-        if (func_ov167_021acec4(&handler->posPoke, param->monIds[i])) {
+        if (DoesBattleMonExist(&handler->posPoke, param->monIds[i])) {
             mon = GetPokeParam(handler->pokeCon, param->monIds[i]);
             if (!IsFainted(mon)) {
                 stat = param->stat;
@@ -8408,7 +8393,7 @@ u8 BattleHandler_ChangeType(BtlServerFlow *handler, BattleHandlerChangeTypeParam
 
     if (DoesBattleMonExist(&handler->posPoke, param->monIndex)) {
         mon = GetPokeParam(handler->pokeCon, param->monIndex);
-        if (!IsFainted(mon) && !func_ov167_021ad204(GetBattleMonSpecies(mon))) {
+        if (!IsFainted(mon) && !IsArceus(GetBattleMonSpecies(mon))) {
             func_ov167_021b1434(handler->queue, 0x16, param->monIndex, param->type);
             ChangePokeType(mon, param->type);
             if (!param->suppressMessage && PokeTypePair_IsMonotype(param->type)) {
@@ -8602,7 +8587,7 @@ u8 BattleHandler_AbilityChange(BtlServerFlow *handler, BattleHandlerAbilityChang
 
     mon = GetPokeParam(handler->pokeCon, param->targetIndex);
     oldAbility = GetBattleMonStat(mon, 0x10);
-    if (func_ov167_021ad6e8(oldAbility)) {
+    if (IsAbilityMultitype(oldAbility)) {
         return FALSE;
     }
     if (IsFainted(mon)) {

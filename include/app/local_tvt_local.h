@@ -257,14 +257,14 @@ typedef struct {
 } LocalTvtPersonSetup;
 
 // A step of a call, which returns TRUE once it is over. The work starts with the step's own counter
-typedef BOOL (*LocalTvtPersonFunc)(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+typedef BOOL (*LocalTvtPersonFunc)(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 
 // What each local_tvt_person_*.c gives of its person
 typedef struct {
     void *work;
     LocalTvtPersonFunc greet;
     LocalTvtPersonFunc topics[LOCAL_TVT_TOPIC_MAX];
-    void (*free)(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+    void (*free)(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
     // The messages of the topics in the menu
     u32 topicNames[LOCAL_TVT_TOPIC_MAX];
     u32 topicCount;

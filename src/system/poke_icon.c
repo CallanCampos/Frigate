@@ -139,7 +139,7 @@ u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg) {
     return file + sex;
 }
 
-u32 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg) {
+u8 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg) {
     if (egg) {
         species = (species == SPECIES_MANAPHY) + POKEICON_PALETTE_EGG;
     } else if (form != 0) {
@@ -160,7 +160,7 @@ u32 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg) {
     return (u8)(sPokeIconPalettes[species] & 0xf);
 }
 
-u32 PokeIcon_GetPaletteOfPkm(BoxPkm *pkm) {
+u8 PokeIcon_GetPaletteOfPkm(BoxPkm *pkm) {
     BOOL wasEncrypted;
     u32 species;
     u32 form;

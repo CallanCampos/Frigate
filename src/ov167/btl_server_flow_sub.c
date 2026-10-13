@@ -359,7 +359,11 @@ static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, 
         if (IsFainted(fainted) && !IsAllyMonID(GetMonID(mon), GetMonID(fainted))) {
             pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
             BtlMonSet_Remove(targets, fainted);
-            code = getMoveFlag(param->move, 0xb) ? 0x600 | pos : 0x100 | pos;
+            if (getMoveFlag(param->move, 0xb)) {
+                code = 0x600 | pos;
+            } else {
+                code = 0x100 | pos;
+            }
             numPositions = func_ov167_0219bfe4(flow->mainModule, code, positions);
             for (i = 0; i < 3; i++) {
                 mons[i] = NULL;

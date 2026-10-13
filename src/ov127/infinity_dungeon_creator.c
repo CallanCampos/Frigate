@@ -32,7 +32,7 @@ static inline u32 InfinityDungeonRandom_Next(InfinityDungeonRandom *rnd, u32 max
     return ((rnd->state >> 32) * max) >> 32;
 }
 
-void InfinityDungeonCreator_Create(InfinityDungeon *dungeon, u8 rank, u32 seed, int floorCount, HeapID heapId) {
+void InfinityDungeonCreator_Create(InfinityDungeon *dungeon, u32 rank, u32 seed, u8 floorCount, HeapID heapId) {
     InfinityDungeonRandom rnd;
     u32 goalSlots[INFINITY_DUNGEON_FLOOR_TRAINER_MAX];
     u32 goalRooms[INFINITY_DUNGEON_FLOOR_TRAINER_MAX];
@@ -91,50 +91,52 @@ void InfinityDungeonCreator_Create(InfinityDungeon *dungeon, u8 rank, u32 seed, 
 // The trainers of a rank, in the order of the rank's classes, each class's share shuffled
 static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 rank, u32 *trainers, InfinityDungeonRandom *rnd, HeapID heapId) {
     int trainerCount = 0;
-    u8 version;
-    u32 candidateCount;
     u32 *candidates;
     u32 *group;
-    const u8 *classCounts;
+    u8 version;
+    u32 candidateCount;
     u8 trainerClass;
+    const u8 *classCounts;
     int i;
 
     version = func_ov127_021f0dd8(dungeon);
     candidateCount = 0;
     candidates = GFL_HeapAllocate(HEAPID_TAIL(heapId), 2000, TRUE, "infinity_dungeon_creator.c", 1022);
     group = GFL_HeapAllocate(HEAPID_TAIL(heapId), 2000, TRUE, "infinity_dungeon_creator.c", 1023);
-
     for (i = 0; i < INFINITY_DUNGEON_TRAINER_COUNT; i++) {
         const InfinityDungeonTrainer *trainer = InfinityDungeon_GetTrainer(i);
 
         if (rank >= trainer->minRank && rank <= trainer->maxRank &&
             (trainer->version == version || trainer->version == 0)) {
-            candidates[candidateCount++] = i;
+            candidates[candidateCount] = i;
+            candidateCount++;
         }
     }
-
     classCounts = func_ov127_021f0b74(rank, version);
     for (trainerClass = 0; trainerClass < INFINITY_DUNGEON_TRAINER_CLASS_COUNT; trainerClass++) {
         int count = classCounts[trainerClass];
 
         if (count != 0) {
+            int picked = 0;
             int groupCount = 0;
             int j;
 
             sys_memset(group, 0, sizeof(u32));
             for (j = 0; j < candidateCount; j++) {
                 if (trainerClass == func_ov127_021f0a90(candidates[j])) {
-                    group[groupCount++] = candidates[j];
+                    group[groupCount] = candidates[j];
+                    groupCount++;
                 }
             }
             func_ov127_021f0bfc(group, groupCount, rnd);
-            j = 0;
-            for (; count > 0; count--) {
-                trainers[trainerCount++] = group[j++];
+            while (count > 0) {
+                trainers[trainerCount] = group[picked];
+                trainerCount++;
+                count--;
+                picked++;
             }
         }
     }
-
     GFL_HeapFree(candidates);
     GFL_HeapFree(group);
     return trainerCount;

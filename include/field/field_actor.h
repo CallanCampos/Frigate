@@ -504,7 +504,7 @@ void func_ov012_021681b0(FieldActor *actor);
 // The count of boulders with a saved position
 u32 func_ov012_021682a0(MMSys *system);
 // Sets a ZoneNPC's position on a rail
-void func_ov012_021682d4(ZoneNPC *npc, u16 railIndex, u16 frontPos, s16 sidePos);
+void func_ov012_021682d4(ZoneNPC *npc, u16 railIndex, u16 frontPos, u16 sidePos);
 
 // Overlay 36's functions that fldmmdl.c calls
 void func_ov036_0218ed18(MMSys *system);

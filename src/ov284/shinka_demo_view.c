@@ -1255,6 +1255,9 @@ static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
     VecFx32 returnSpinVector;
     MtxFx43 returnStartMatrix;
     VecFx32 returnStartVector;
+    fx32 stepX;
+    fx32 stepY;
+    fx32 stepZ;
     fx32 returnHomeDx;
     fx32 returnHomeDz;
 
@@ -1480,19 +1483,24 @@ static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
                         distSqY = FX_Mul(delta.y, delta.y);
                         if (distSqXZ > FX32_ONE) {
                             invDist = FX_InvSqrt(distSqXZ);
-                            delta.x = FX_Mul(delta.x, invDist);
-                            delta.z = FX_Mul(delta.z, invDist);
+                            stepX = FX_Mul(delta.x, invDist);
+                            stepZ = FX_Mul(delta.z, invDist);
+                        } else {
+                            stepX = delta.x;
+                            stepZ = delta.z;
                         }
                         if (distSqY > FX32_ONE) {
                             if (delta.y >= 0) {
-                                delta.y = FX32_ONE;
+                                stepY = FX32_ONE;
                             } else {
-                                delta.y = -FX32_ONE;
+                                stepY = -FX32_ONE;
                             }
+                        } else {
+                            stepY = delta.y;
                         }
-                        piece->pos.x += delta.x;
-                        piece->pos.y += delta.y;
-                        piece->pos.z += delta.z;
+                        piece->pos.x += stepX;
+                        piece->pos.y += stepY;
+                        piece->pos.z += stepZ;
                         piece->frame++;
                     } else {
 

@@ -357,6 +357,29 @@ void Dowsing_Free(DowsingWork *work) {
     GFL_HeapFree(work);
 }
 
+// Whether the hit that the signal comes from has moved since the frame before, so that the signal's sound plays again
+static inline BOOL Dowsing_HitMoved(DowsingWork *work) {
+    u32 oldZ;
+    u32 oldX;
+    u32 newZ;
+    u32 newX;
+    BOOL changed = FALSE;
+    if (work->prevHit.type == HIT_HIDDEN_ITEM) {
+        oldX = work->prevHit.item->x;
+        oldZ = work->prevHit.item->z;
+    } else {
+        return TRUE;
+    }
+    if (work->hit.type == HIT_HIDDEN_ITEM) {
+        newX = work->hit.item->x;
+        newZ = work->hit.item->z;
+    }
+    if ((oldX != newX || oldZ != newZ) && work->prevSignal != work->signal) {
+        changed = TRUE;
+    }
+    return changed;
+}
+
 void Dowsing_Update(DowsingWork *work, BOOL active) {
     MapMatrix *matrix;
     GameSystem *gsys;
@@ -517,25 +540,7 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
         }
 
         if (quiet && work->signal != SIGNAL_CLOSEST && work->hit.type != HIT_NONE) {
-            BOOL changed = FALSE;
-            u32 oldX;
-            u32 oldZ;
-            u32 newX;
-            u32 newZ;
-            if (work->prevHit.type == HIT_HIDDEN_ITEM) {
-                oldX = work->prevHit.item->x;
-                oldZ = work->prevHit.item->z;
-                if (work->hit.type == HIT_HIDDEN_ITEM) {
-                    newX = work->hit.item->x;
-                    newZ = work->hit.item->z;
-                }
-                if ((oldX != newX || oldZ != newZ) && work->prevSignal != work->signal) {
-                    changed = TRUE;
-                }
-            } else {
-                changed = TRUE;
-            }
-            if (changed) {
+            if (Dowsing_HitMoved(work)) {
                 s32 player = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_120);
                 s32 pan = (sSignals[work->signal].pan - 8) * 16;
                 if (pan < -127) {

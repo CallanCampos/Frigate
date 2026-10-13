@@ -212,13 +212,7 @@ static const u8 sHead2KeyTable[4][4] = { { 3, 3, 2, 1 }, { 3, 3, 0, 2 }, { 3, 3,
 static const TouchRect sSexTouchTbl[5] = {
     { 24, 44, 136, 248 }, { 56, 76, 136, 248 }, { 88, 108, 136, 248 }, { 133, 154, 197, 250 }, { TOUCH_RECT_END },
 };
-static const TouchRect sHead2TouchTbl[5] = {
-    { 39, 56, 142, 159 }, { 39, 56, 174, 191 }, { 39, 56, 206, 223 }, { 133, 154, 197, 250 }, { TOUCH_RECT_END },
-};
 
-static const u8 sNationHead1CursorPos[11][2] = {
-    { 2, 5 }, { 6, 5 }, { 10, 5 }, { 2, 8 }, { 6, 8 }, { 10, 8 }, { 2, 11 }, { 6, 11 }, { 10, 11 }, { 8, 17 }, { 8, 3 },
-};
 static const u8 sHead1WinPos[12][2] = {
     { 2, 5 },  { 6, 5 },  { 10, 5 },  { 2, 8 },  { 6, 8 }, { 10, 8 },
     { 2, 11 }, { 6, 11 }, { 10, 11 }, { 9, 17 }, { 2, 2 }, { 1, 2 },
@@ -228,10 +222,18 @@ static const u8 sHead1CursorPos[12][2] = {
     { 2, 11 }, { 6, 11 }, { 10, 11 }, { 8, 17 }, { 2, 2 }, { 1, 2 },
 };
 
+static const TouchRect sHead2TouchTbl[5] = {
+    { 39, 56, 142, 159 }, { 39, 56, 174, 191 }, { 39, 56, 206, 223 }, { 133, 154, 197, 250 }, { TOUCH_RECT_END },
+};
 static const TouchRect sNameTouchTbl[8] = {
     { 16, 35, 136, 248 },   { 40, 60, 136, 248 },   { 64, 84, 136, 248 },   { 88, 108, 136, 248 },
     { 133, 154, 198, 248 }, { 108, 129, 143, 160 }, { 108, 126, 223, 240 }, { TOUCH_RECT_END },
 };
+
+static const u8 sNationHead1CursorPos[11][2] = {
+    { 2, 5 }, { 6, 5 }, { 10, 5 }, { 2, 8 }, { 6, 8 }, { 10, 8 }, { 2, 11 }, { 6, 11 }, { 10, 11 }, { 8, 17 }, { 8, 3 },
+};
+
 static const TouchRect sNationTouchTbl[9] = {
     { 8, 28, 8, 247 },      { 32, 52, 8, 247 },   { 56, 76, 8, 247 },     { 80, 100, 8, 247 }, { 104, 124, 8, 247 },
     { 133, 154, 195, 248 }, { 124, 145, 77, 96 }, { 124, 145, 173, 190 }, { TOUCH_RECT_END },
@@ -668,7 +670,8 @@ static u32 Input_Head2DecideFunc(WorldTradeInputWork *wk, int decide) {
 
 static u32 Input_WordHead2SelectMain(WorldTradeInputWork *wk, u8 *seeCheck) {
     int pos = wk->listpos;
-    u32 hit;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long hit;
 
     if (pos < 3) {
         wk->listposBackupX = pos;

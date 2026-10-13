@@ -126,9 +126,9 @@ void WIFI_MCR_Init(WIFI_MATCHROOM *wk, u32 heapId, ArcTool *arc, u32 heroView, u
         mapNo = (friendNum - 1) / WIFI_MCR_BLOCK_FRIEND_NUM;
     }
 
+    wk->heapId = heapId;
     wk->clact.unit = unit;
     wk->clact.renderer = renderer;
-    wk->heapId = heapId;
 
     WifiMcr_ClactInit(&wk->clact, heapId, arc);
     WifiMcr_BgInit(wk->unk10, heapId);
@@ -1009,8 +1009,8 @@ static void WifiMcr_PcAnmUseMain(MCR_PCANM *anm) {
         }
 
         anm->seqWait = sWifiMcrPcAnmSteps[anm->seq].wait;
-        color = sWifiMcrPcAnmSteps[anm->seq].color;
         trans = sWifiMcrPcAnmSteps[anm->seq].trans;
+        color = sWifiMcrPcAnmSteps[anm->seq].color;
     }
 
     if (trans) {

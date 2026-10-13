@@ -1692,8 +1692,9 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
     case 23:
         if (WifiBattleMatchNet_TakeValue4(link->net, &link->unkE8)) {
             *seq = 24;
+        } else {
+            countIdle = TRUE;
         }
-        countIdle = TRUE;
         break;
     case 24:
         if (link->unkE8 == 0 && link->unkE4 == 0) {
@@ -1714,14 +1715,11 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         switch (WifiBattleMatchNet_CheckError(link->net, FALSE, TRUE)) {
         case 1:
         case 4:
-            link->cancelSeq = 0;
-            WifiBattleMatchLink_CompetitionDeleteMenu(link);
             WifiBattleMatchLinkIcon_SetShown(link->linkIcon, FALSE);
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_CompetitionTaskContinue);
             WifiBattleMatchLink_CompetitionResetCancel(link);
             break;
         case 2:
-            WifiBattleMatchLink_CompetitionDeleteMenu(link);
             WifiBattleMatchLinkIcon_SetShown(link->linkIcon, FALSE);
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_CompetitionTaskRelogin);
             break;
@@ -1898,15 +1896,15 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         break;
     case 47:
         switch (WifiBattleMatchNet_CheckError(link->net, FALSE, FALSE)) {
-        case 0:
-            WifiBattleMatchLink_CompetitionStartSubTask(link, WifiBattleMatchLink_CompetitionTaskCheckPeriod);
-            *seq = 48;
-            break;
         case 1:
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_CompetitionTaskMenu);
             break;
         case 2:
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_CompetitionTaskRelogin);
+            break;
+        case 0:
+            WifiBattleMatchLink_CompetitionStartSubTask(link, WifiBattleMatchLink_CompetitionTaskCheckPeriod);
+            *seq = 48;
             break;
         }
         break;

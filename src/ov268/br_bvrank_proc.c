@@ -655,8 +655,9 @@ static void BrBvRankList_CreateIcons(BrBvRankList *p_wk, ClActUnit *unit, HeapID
     int j;
     int num;
 
-    num = p_wk->p_outline->data_num;
-    if (num >= BR_BVRANK_ICON_ROW_MAX) {
+    if (p_wk->p_outline->data_num < BR_BVRANK_ICON_ROW_MAX) {
+        num = p_wk->p_outline->data_num;
+    } else {
         num = BR_BVRANK_ICON_ROW_MAX;
     }
 
@@ -724,7 +725,6 @@ static void BrBvRankList_ScrollIcons(BrBvRankList *p_wk, u32 list, s8 slide, Hea
     ArcTool *handle;
     int row;
     int col;
-    int i;
 
     for (row = 0; row < BR_BVRANK_ICON_ROW_MAX; row++) {
         for (col = 0; col < BR_BVRANK_ICON_COL_MAX; col++) {
@@ -773,7 +773,7 @@ static void BrBvRankList_ScrollIcons(BrBvRankList *p_wk, u32 list, s8 slide, Hea
         }
     }
 
-    for (i = 0; i < BR_BVRANK_ICON_COL_MAX; i++) {
+    for (col = 0; col < BR_BVRANK_ICON_COL_MAX; col++) {
         BrBvRankPokeData poke;
 
         if (slide == 1) {
@@ -782,23 +782,23 @@ static void BrBvRankList_ScrollIcons(BrBvRankList *p_wk, u32 list, s8 slide, Hea
             row = 0;
         }
         BrBvRank_GetPokeData(&p_wk->p_outline->data[row + list], &poke);
-        if (poke.species[i] != 0) {
+        if (poke.species[col] != 0) {
             NNSG2dCharacterData *chr;
             NNSG2dImageProxy proxy;
             void *buf;
 
-            buf = GFL_G2DIOReadOBJNCGRArc(handle,
-                                          PokeParty_GetIconIndex(poke.species[i], poke.form[i], poke.gender[i], FALSE),
-                                          FALSE, &chr, HEAPID_TAIL(heapId));
-            func_0204ba40(p_wk->chr[p_wk->chrTop][i], chr);
-            func_0204bb58(p_wk->chr[p_wk->chrTop][i], &proxy);
-            func_0204c3e4(p_wk->icon[row][i], &proxy);
-            func_0204c378(p_wk->icon[row][i], PokeIcon_GetPalette(poke.species[i], poke.form[i], poke.gender[i], FALSE),
-                          0);
+            buf = GFL_G2DIOReadOBJNCGRArc(
+                handle, PokeParty_GetIconIndex(poke.species[col], poke.form[col], poke.gender[col], FALSE), FALSE, &chr,
+                HEAPID_TAIL(heapId));
+            func_0204ba40(p_wk->chr[p_wk->chrTop][col], chr);
+            func_0204bb58(p_wk->chr[p_wk->chrTop][col], &proxy);
+            func_0204c3e4(p_wk->icon[row][col], &proxy);
+            func_0204c378(p_wk->icon[row][col],
+                          PokeIcon_GetPalette(poke.species[col], poke.form[col], poke.gender[col], FALSE), 0);
             GFL_HeapFree(buf);
-            func_0204c124(p_wk->icon[row][i], TRUE);
+            func_0204c124(p_wk->icon[row][col], TRUE);
         } else {
-            func_0204c124(p_wk->icon[row][i], FALSE);
+            func_0204c124(p_wk->icon[row][col], FALSE);
         }
     }
 

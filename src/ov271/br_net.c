@@ -232,7 +232,8 @@ BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID) {
             if (result->detail != 0) {
                 if (msgID != NULL) {
                     *msgID = result->detail + 0x11b;
-                }
+                    ret = TRUE;
+            }
                 ret = TRUE;
             }
         } else if (result->type == 1) {
@@ -240,6 +241,8 @@ BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID) {
                 if (msgID != NULL) {
                     *msgID = result->detail + 0x12a;
                 }
+                ret = TRUE;
+            } else {
                 ret = TRUE;
             }
         } else if (result->type == 2) {

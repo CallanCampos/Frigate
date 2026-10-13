@@ -298,8 +298,9 @@ static void FesMissionPeople_PlaceActors(GameSystem *gsys, FesMissionWork *work,
                 func_ov012_021682c0(&npc, coords[0], coords[1], FX32_CONST(coords[2]));
                 npc.moveCode = 2;
             } else {
-                func_ov012_021682d4(&npc, place->pos.rail.componentId, place->pos.rail.posFront,
-                                    place->pos.rail.posSide);
+                const u16 *values = &place->pos.rail.componentId;
+
+                func_ov012_021682d4(&npc, values[0], values[1], values[2]);
                 npc.moveCode = 70;
             }
             npc.uid = 236 + i;

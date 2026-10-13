@@ -131,7 +131,7 @@ typedef struct {
 } GustParticle;
 
 // Both kinds of function get the particle's actor, and the move functions ignore it
-typedef void (*GustParticleFunc)(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor);
+typedef void (*GustParticleFunc)(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor);
 
 static BOOL Rain_Init(WeatherTask *task, u32 arg, HeapID heapId);
 static BOOL Rain_FadeIn(WeatherTask *task, u32 arg, HeapID heapId);
@@ -161,12 +161,12 @@ static BOOL GustyRain_FadeOut(WeatherTask *task, u32 arg, HeapID heapId);
 static BOOL GustyRain_Exit(WeatherTask *task, u32 arg, HeapID heapId);
 static void GustParticle_Move(WeatherObj *obj);
 static void Gust_AddParticles(WeatherTask *task, int count, HeapID heapId);
-static void GustSlant_Move(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor);
-static void GustSlant_Init(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor);
-static void GustStreak_Move(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor);
-static void GustStreak_Init(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor);
-static void GustDriven_Move(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor);
-static void GustDriven_Init(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor);
+static void GustSlant_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor);
+static void GustSlant_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor);
+static void GustStreak_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor);
+static void GustStreak_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor);
+static void GustDriven_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor);
+static void GustDriven_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor);
 static void Gust_StartLull(WeatherTask *task, GustWork *work, u32 arg, BOOL noFade);
 static void Gust_Update(WeatherTask *task, GustWork *work, u32 arg, BOOL noFade);
 static void Gust_ScrollBgs(WeatherTask *task, GustWork *work);
@@ -741,7 +741,7 @@ static void Gust_AddParticles(WeatherTask *task, int count, HeapID heapId) {
     }
 }
 
-static void GustSlant_Move(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor) {
+static void GustSlant_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
     s16 windX = work->windX;
     s16 windY;
     ClActorPos pos;
@@ -766,7 +766,7 @@ static void GustSlant_Move(WeatherObj *obj, GustWork *work, GustParticleData *da
     func_ov036_02199cf0(obj, &pos);
 }
 
-static void GustSlant_Init(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor) {
+static void GustSlant_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
     u32 random = GFL_RandomLC(0);
     u32 r = random % 24;
     ClActorPos pos;
@@ -787,7 +787,7 @@ static void GustSlant_Init(WeatherObj *obj, GustWork *work, GustParticleData *da
     func_0204c53c(actor, 1 << 13);
 }
 
-static void GustStreak_Move(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor) {
+static void GustStreak_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
     ClActorPos pos;
 
     func_ov036_02199c6c(obj, &pos);
@@ -802,7 +802,7 @@ static void GustStreak_Move(WeatherObj *obj, GustWork *work, GustParticleData *d
     func_ov036_02199cf0(obj, &pos);
 }
 
-static void GustStreak_Init(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor) {
+static void GustStreak_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
     u32 random = GFL_RandomLC(0);
     u32 r = random % 43;
     ClActorPos pos;
@@ -819,22 +819,19 @@ static void GustStreak_Init(WeatherObj *obj, GustWork *work, GustParticleData *d
     func_0204c53c(actor, 1 << 13);
 }
 
-static void GustDriven_Move(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor) {
+static void GustDriven_Move(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
     ClActorPos pos;
     s16 windX;
 
     func_ov036_02199c6c(obj, &pos);
     windX = work->windX;
     if (windX != 0) {
-        s16 dx = data->speedX + windX;
-        s16 dy = data->speedY + work->windY;
-
-        data->x += dx;
-        data->y += dy;
+        data->x += data->speedX + windX;
+        data->y += data->speedY + work->windY;
         pos.x = data->x / 8;
         pos.y = data->y / 8;
-        data->baseX = dx;
-        data->baseY = dy;
+        data->baseX = data->speedX + windX;
+        data->baseY = data->speedY + work->windY;
     } else {
         data->x += data->baseX;
         data->y += data->baseY;
@@ -848,7 +845,7 @@ static void GustDriven_Move(WeatherObj *obj, GustWork *work, GustParticleData *d
     func_ov036_02199cf0(obj, &pos);
 }
 
-static void GustDriven_Init(WeatherObj *obj, GustWork *work, GustParticleData *data, ClActor *actor) {
+static void GustDriven_Init(WeatherObj *obj, const GustWork *work, GustParticleData *data, ClActor *actor) {
     u32 random = GFL_RandomLC(0);
     u32 r = random % 24;
     ClActorPos pos;

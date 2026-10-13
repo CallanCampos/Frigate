@@ -2069,7 +2069,7 @@ void func_ov012_021682c0(ZoneNPC *npc, u16 x, u16 z, s32 y) {
     pos->y = y;
 }
 
-void func_ov012_021682d4(ZoneNPC *npc, u16 railIndex, u16 frontPos, s16 sidePos) {
+void func_ov012_021682d4(ZoneNPC *npc, u16 railIndex, u16 frontPos, u16 sidePos) {
     ZoneNPCRailPosition *pos;
 
     npc->isRail = TRUE;
