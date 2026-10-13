@@ -110,6 +110,11 @@ static void PStaSkill_GetPlateRect(SkillPlate *plate, TouchRect *rect);
 static void PStaSkill_GetPlatePos(SkillPlate *plate, ClActorPos *pos);
 static void PStaSkill_SetPlateAnim(SkillPlate *plate, u32 anim);
 
+// The Pokémon's move in a slot
+static inline u32 PStaSkill_GetMove(PStatusWork *wk, u32 slot) {
+    return PML_PkmGetParam(PStatus_GetBoxPkm(wk), PKM_PARAM_MOVE1 + slot, NULL);
+}
+
 static const PlatePos sPlatePos[PLATE_COUNT] = { { 1, 2 }, { 1, 6 }, { 1, 10 }, { 1, 14 }, { 1, 20 } };
 
 static const PStaWindowSetup sSkillWindows[SKILL_WINDOW_COUNT] = {
@@ -800,7 +805,7 @@ static void PStaSkill_HandleTouch(PStatusWork *wk, PStaSkillWork *skill) {
         if (hit == TOUCH_RECT_NONE) {
             return;
         }
-        if (PML_PkmGetParam(PStatus_GetBoxPkm(wk), PKM_PARAM_MOVE1 + hit, NULL) == MOVE_NONE) {
+        if (PStaSkill_GetMove(wk, hit) == MOVE_NONE) {
             return;
         }
         if (wk->isInputEnabled == TRUE) {
@@ -849,7 +854,7 @@ static void PStaSkill_HandleTouch(PStatusWork *wk, PStaSkillWork *skill) {
         }
         if (skill->isSwapping == TRUE) {
             if (hit != TOUCH_RECT_NONE) {
-                if (PML_PkmGetParam(PStatus_GetBoxPkm(wk), PKM_PARAM_MOVE1 + hit, NULL) == MOVE_NONE) {
+                if (PStaSkill_GetMove(wk, hit) == MOVE_NONE) {
                     return;
                 }
                 PStaSkill_SelectMove(wk, skill, hit, FALSE);
@@ -1012,7 +1017,7 @@ static void PStaSkill_HandleForgetTouch(PStatusWork *wk, PStaSkillWork *skill) {
     }
     if (skill->isConfirming == FALSE) {
         if (hit < PLATE_NEW) {
-            if (PML_PkmGetParam(PStatus_GetBoxPkm(wk), PKM_PARAM_MOVE1 + hit, NULL) == MOVE_NONE) {
+            if (PStaSkill_GetMove(wk, hit) == MOVE_NONE) {
                 return;
             }
             isHm = isPkmMoveHmMove(wk->param->gameData,

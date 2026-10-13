@@ -1249,6 +1249,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Arms that each end in the same calls plus `*state = N; break;` are tail-merged, calls included, with the odd arm
   placed after the shared tail; an `if`/`else if`/`else` with one shared `*state = 3;` after it keeps a call per arm.
   `GymOpelucid_MoveEventCallback`'s state 2 is three such arms.
+- An array indexed as `[4 + i]` where the original uses a base of its own is two fields: the summary screen's
+  `PStatus_AnimatePalettes` matched once `u16 cursorPltt[8]` became `u16 cursorPlttSrc[4]; u16 cursorPltt[4];`, with
+  `s8 r, g, b` declared in each loop's body. In the same overlay `PStaRibbon_HandleInput` needed its three stores in
+  the statement order `isDragging = TRUE; cursorRow = hit; cursorMoved = TRUE;` although MWCC emits the byte store
+  first either way, and a table's `{ TOUCH_RECT_END, 0, 0, 0 }` terminator had been swallowed into a `//` comment,
+  which the code match could not show and the `.rodata` check did.
 
 ## Loops
 

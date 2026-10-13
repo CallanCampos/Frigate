@@ -206,6 +206,11 @@ void PStaInfo_Clear(PStatusWork *wk, PStaInfoWork *info) {
     func_0204c488(wk->buttons[PSTA_BUTTON_INFO], 0);
 }
 
+// A new string of a species' name
+static inline StrBuf *PStaInfo_LoadSpeciesName(u32 species) {
+    return GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, species);
+}
+
 static void PStaInfo_PrintInfo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm) {
     WordSet *wordSet;
     u32 dexNumber;
@@ -244,9 +249,9 @@ static void PStaInfo_PrintInfo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
 
         PStatus_PrintToWindow(wk, info->windows[1], 10, 1, 1, PRINT_COLOR(15, 2, 0));
         if (wk->isEgg == FALSE) {
-            str = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL));
+            str = PStaInfo_LoadSpeciesName(PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL));
         } else {
-            str = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
+            str = PStaInfo_LoadSpeciesName(SPECIES_EGG);
         }
         func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->windows[1]), 65, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
         GFL_StrBufFree(str);
