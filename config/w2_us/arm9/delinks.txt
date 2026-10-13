@@ -1019,6 +1019,7 @@ lib/nnsys/src/g3d/util.c:
     .text       start:0x02067dd0 end:0x020681b8
 
 lib/nnsys/src/g3d/mem.c:
+    complete
     .text       start:0x020681b8 end:0x020681ec
 
 lib/nnsys/src/g3d/model.c:
