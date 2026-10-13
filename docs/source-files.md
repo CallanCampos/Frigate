@@ -2430,7 +2430,7 @@ work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` r
 | `demo3d.c` | `0x021a1b20`–`0x021a1ea4` | 10 | complete | string at `0x021ab360` |
 | `demo3d_graphic.c` | `0x021a1ea4`–`0x021a22b4` | 24 | complete | string at `0x021ab36c` |
 | `demo3d_engine.c` | `0x021a22b4`–`0x021a298c` | 11 | complete | string at `0x021ab380` |
-| `demo3d_data.c` | `0x021a298c`–`0x021a2ba8` | 13 | partial | string at `0x021ab390` |
+| `demo3d_data.c` | `0x021a298c`–`0x021a2ba8` | 13 | complete | string at `0x021ab390` |
 | `demo3d_capture.c` | `0x021a2ba8`–`0x021a2db8` | 7 | complete | descriptive |
 | `demo3d_cmd.c` | `0x021a2db8`–`0x021a39e4` | 36 | complete | descriptive |
 | `demo3d_cmdsys.c` | `0x021a39e4`–`0x021a3c00` | 7 | complete | string at `0x021ab3f0` |
