@@ -191,7 +191,7 @@ data_ov215_021ab164 kind:data(any) addr:0x021ab164
 data_ov215_021ab174 kind:data(any) addr:0x021ab174
 data_ov215_021ab179 kind:data(any) addr:0x021ab179 ambiguous
 data_ov215_021ab191 kind:data(any) addr:0x021ab191 ambiguous
-data_ov215_021ab194 kind:data(any) addr:0x021ab194
+MailBox_VRAMConfig kind:data(any) addr:0x021ab194
 data_ov215_021ab1a9 kind:data(any) addr:0x021ab1a9 ambiguous
 data_ov215_021ab1c4 kind:data(any) addr:0x021ab1c4
 data_ov215_021ab1d4 kind:data(any) addr:0x021ab1d4

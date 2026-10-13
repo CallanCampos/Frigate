@@ -1753,6 +1753,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `VCT_DecodeAdpcm` at once. Its files are built without `-ipa file`, so their `.bss` statics come out in reverse of
   their declaration order: a matching function whose pool words point at the wrong static needs the declarations
   reversed.
+- Size drops inside one file's `.rodata` are file boundaries: a translation unit's packed data rises in size, so each
+  drop starts a new file. Overlay 215's `mb_seq.c` was six files (`mailbox.c`, `mb_main.c`, `mb_bmp.c`, `mb_obj.c`,
+  `mb_seq.c`, `mb_ui.c`), and an assert's line number checks the result: `MailBox_StateInit` passes `"mb_seq.c", 268`
+  and sat at line 1275 before the split, at 185 after it.
 
 ## When nothing moves it
 

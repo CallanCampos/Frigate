@@ -2046,7 +2046,12 @@ prints the tables below from the configs and the ROM:
 | `mailtool.c` | `0x021a75a0`–`0x021a771c` | 6 | complete | string at `0x021ab780` |
 | `mailsys.c` | `0x021a771c`–`0x021a84e4` | 29 | complete | string at `0x021ab78c` |
 | `mailview.c` | `0x021a84e4`–`0x021a8d68` | 16 | complete | string at `0x021ab798` |
-| `mb_seq.c` | `0x021a8d68`–`0x021ab004` | 118 | partial | string at `0x021ab7a4` |
+| `mailbox.c` | `0x021a8d68`–`0x021a8de4` | 3 | complete | descriptive |
+| `mb_main.c` | `0x021a8de4`–`0x021a9740` | 23 | complete | descriptive |
+| `mb_bmp.c` | `0x021a9740`–`0x021a9d90` | 15 | complete | descriptive |
+| `mb_obj.c` | `0x021a9d90`–`0x021aa188` | 17 | complete | descriptive |
+| `mb_seq.c` | `0x021aa188`–`0x021aaefc` | 50 | complete | string at `0x021ab7a4` |
+| `mb_ui.c` | `0x021aaefc`–`0x021ab004` | 10 | complete | descriptive |
 
 ### Overlay 216
 
