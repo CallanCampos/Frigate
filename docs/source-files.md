@@ -1315,7 +1315,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `itemmenu.c` | `0x021998c0`–`0x0219d4c0` | 125 | complete | string at `0x021a1640` |
-| `itemmenu_disp.c` | `0x0219d4c0`–`0x021a03d4` | 58 | partial | descriptive |
+| `itemmenu_disp.c` | `0x0219d4c0`–`0x021a03d4` | 58 | complete | descriptive |
 | `bag_item.c` | `0x021a03d4`–`0x021a08e0` | 13 | complete | string at `0x021a1694` |
 
 ### Overlay 143
@@ -2078,7 +2078,7 @@ prints the tables below from the configs and the ROM:
 | `box2_obj.c` | `0x021cf3c0`–`0x021d23d8` | 130 | complete | descriptive |
 | `box2_ui.c` | `0x021d23d8`–`0x021d364c` | 71 | complete | string at `0x021d9658` |
 | `box2_bgwfrm.c` | `0x021d364c`–`0x021d3b64` | 35 | complete | descriptive |
-| `box_search.c` | `0x021d3b64`–`0x021d6d28` | 118 | partial | descriptive |
+| `box_search.c` | `0x021d3b64`–`0x021d6d28` | 118 | complete | descriptive |
 | `box_search_graphic.c` | `0x021d6d28`–`0x021d6f6c` | 16 | complete | string at `0x021d96c0` |
 
 ### Overlay 256
@@ -2283,7 +2283,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `br_core.c` | `0x021efe40`–`0x021f0770` | 30 | complete | descriptive |
-| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | partial | string at `0x021f7b84` |
+| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | complete | string at `0x021f7b84` |
 | `br_btn.c` | `0x021f0a6c`–`0x021f23b8` | 56 | complete | string at `0x021f7c20` |
 | `br_btn_data.c` | `0x021f23b8`–`0x021f266c` | 8 | complete | string at `0x021f7cd8` |
 | `br_res.c` | `0x021f266c`–`0x021f31b8` | 20 | complete | string at `0x021f7d50` |
@@ -2416,7 +2416,7 @@ prints the tables below from the configs and the ROM:
 | `demo3d_graphic.c` | `0x021a1ea4`–`0x021a22b4` | 24 | complete | string at `0x021ab36c` |
 | `demo3d_engine.c` | `0x021a22b4`–`0x021a298c` | 11 | complete | string at `0x021ab380` |
 | `demo3d_data.c` | `0x021a298c`–`0x021a2ba8` | 13 | partial | string at `0x021ab390` |
-| `demo3d_capture.c` | `0x021a2ba8`–`0x021a2db8` | 7 | partial | descriptive |
+| `demo3d_capture.c` | `0x021a2ba8`–`0x021a2db8` | 7 | complete | descriptive |
 | `demo3d_cmd.c` | `0x021a2db8`–`0x021a39e4` | 36 | complete | descriptive |
 | `demo3d_cmdsys.c` | `0x021a39e4`–`0x021a3c00` | 7 | complete | string at `0x021ab3f0` |
 | `demo3d_exp_c_cruiser.c` | `0x021a3c00`–`0x021a3d6c` | 4 | complete | string at `0x021ab400` |

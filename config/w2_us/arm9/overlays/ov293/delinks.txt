@@ -28,6 +28,7 @@ src/ov293/demo3d_data.c:
     .data       start:0x021ab410 end:0x021ab420
 
 src/ov293/demo3d_capture.c:
+    complete
     .text       start:0x021a2c28 end:0x021a2e38
     .rodata     start:0x021ab2b0 end:0x021ab2dc
 
