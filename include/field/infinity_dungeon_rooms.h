@@ -41,6 +41,6 @@ u8 func_ov127_021f0b68(u16 mode);
 u32 InfinityDungeon_GetNpcScriptIndex(InfinityDungeon *dungeon, u32 objCode, u8 floor, u8 slot);
 u8 func_ov127_021f0bd0(u32 objCode);
 // Digs the passages of the floors from the seed, and puts the kinds of rooms in them
-void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u8 rank, u32 seed, int width, int height, u8 floorCount);
+void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, int width, int height, u8 floorCount);
 
 #endif // POKEBW2_FIELD_INFINITY_DUNGEON_ROOMS_H

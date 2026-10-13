@@ -118,8 +118,8 @@ static const G3DSceneAnimationSetup sAnimationsDoor[] = { { 2, 0 }, { 1, 0 } };
 static const G3DSceneAnimationSetup sAnimationsMachine[] = { { 5, 0 }, { 4, 0 } };
 static const G3DSceneAnimationSetup sAnimationsLiftWhite[] = { { 7, 0 }, { 8, 0 } };
 
-static const G3DSceneSetup sBlackScene = { sBlackResources, 9, sBlackActors, 4 };
 static const G3DSceneSetup sWhiteScene = { sWhiteResources, 9, sWhiteActors, 4 };
+static const G3DSceneSetup sBlackScene = { sBlackResources, 9, sBlackActors, 4 };
 
 static const G3DSceneActorSetup sWhiteActors[4] = {
     { 0, 0, 0, 0, sAnimationsDoor, 2 },
@@ -189,23 +189,23 @@ void InfinityDungeonGimmick_Update(Field *field) {
 
 // Loads the scene, puts its objects in place for the zone and shows the machine and the lift as the save says
 static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, InfinityDungeonGimmick *gimmick) {
-    InfinityDungeonObject *objects;
     int i;
-    InfinityDungeonObject *object;
+    u32 j;
     const ObjectPlacement *placements;
-    int j;
+    u32 anm;
+    InfinityDungeonObject *object;
 
     if (func_ov127_021f0dd8(dungeon) == VERSION_BLACK2) {
         LoadFieldExpandObjData(gimmick->expObjSystem, &sBlackScene, 0);
     } else {
         LoadFieldExpandObjData(gimmick->expObjSystem, &sWhiteScene, 0);
     }
-    objects = gimmick->objects;
     for (i = 0; i < INFINITY_DUNGEON_OBJECT_COUNT; i++) {
-        objects[i].scene = 0;
-        objects[i].actor = i;
-        objects[i].expObj = gimmick->expObjSystem;
-        FieldExpObj_SetActorHidden(objects[i].expObj, objects[i].scene, objects[i].actor, TRUE);
+        object = &gimmick->objects[i];
+        object->scene = 0;
+        object->actor = i;
+        object->expObj = gimmick->expObjSystem;
+        FieldExpObj_SetActorHidden(object->expObj, object->scene, object->actor, TRUE);
     }
 
     placements = InfinityDungeonGimmick_GetPlacements(gimmick);
@@ -214,7 +214,6 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
 
         if (gimmick->zoneId == placements[j].zoneId) {
             SRTMatrix *matrix = FieldExpObj_GetActorMatrixPtr(object->expObj, 0, object->actor);
-            u32 anm;
 
             matrix->translation.x = FX32_CONST(placements[j].x);
             matrix->translation.y = FX32_CONST(placements[j].y);
@@ -228,17 +227,15 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
     }
 
     if (gimmick->zoneId - ZONE_WHITE_TREEHOLLOW <= 1) {
-        InfinityDungeonObject *machineB;
+        u32 level = func_02010274(gimmick->keyData, gimmick->unk50);
+        InfinityDungeonObject *machineA = &gimmick->objects[OBJECT_MACHINE_A];
+        InfinityDungeonObject *machineB = &gimmick->objects[OBJECT_MACHINE_B];
 
-        if (func_02010274(gimmick->keyData, gimmick->unk50) <= 4) {
-            machineB = &gimmick->objects[OBJECT_MACHINE_B];
-            FieldExpObj_SetActorHidden(gimmick->objects[OBJECT_MACHINE_A].expObj, 0,
-                                       gimmick->objects[OBJECT_MACHINE_A].actor, TRUE);
+        if (level <= 4) {
+            FieldExpObj_SetActorHidden(machineA->expObj, 0, machineA->actor, TRUE);
             FieldExpObj_SetActorHidden(machineB->expObj, 0, machineB->actor, FALSE);
         } else {
-            machineB = &gimmick->objects[OBJECT_MACHINE_B];
-            FieldExpObj_SetActorHidden(gimmick->objects[OBJECT_MACHINE_A].expObj, 0,
-                                       gimmick->objects[OBJECT_MACHINE_A].actor, FALSE);
+            FieldExpObj_SetActorHidden(machineA->expObj, 0, machineA->actor, FALSE);
             FieldExpObj_SetActorHidden(machineB->expObj, 0, machineB->actor, TRUE);
         }
     } else {
@@ -246,9 +243,9 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
         u8 room = func_020102ec(gimmick->keyData);
 
         if (func_ov127_021f093c(dungeon, floor, room)) {
-            InfinityDungeonObject *lift = &gimmick->objects[OBJECT_LIFT];
-            u8 count;
             u8 anm;
+            u8 count;
+            InfinityDungeonObject *lift = &gimmick->objects[OBJECT_LIFT];
             BOOL done = func_ov127_021f096c(dungeon, gimmick->keyData);
 
             FieldExpObj_SetActorHidden(lift->expObj, 0, lift->actor, FALSE);
@@ -308,7 +305,6 @@ GameEvent *InfinityDungeonGimmick_CreateMachineEvent(GameSystem *gsys, Field *fi
 // Opens or closes a door by playing its animations over a range of frames, with the sound of it
 static GameEventReturnCode InfinityDungeonGimmick_DoorEvent(GameEvent *event, u32 *state, void *data) {
     u32 anm;
-    int anm2;
     ObjectEvent *door = data;
     InfinityDungeonGimmick *gimmick = door->gimmick;
     InfinityDungeonObject *object = &gimmick->objects[door->object];
@@ -336,9 +332,7 @@ static GameEventReturnCode InfinityDungeonGimmick_DoorEvent(GameEvent *event, u3
     }
 
     switch (*state) {
-    case 0: {
-        u32 anm;
-
+    case 0:
         for (anm = 0; anm < SCENE_ANM_COUNT; anm++) {
             FieldExpObjAnm *info = FieldExpObj_GetAnmInfo(object->expObj, 0, object->actor, anm);
             FieldExpObj_SetAnmFrame(object->expObj, 0, object->actor, anm, startFrame);
@@ -347,11 +341,10 @@ static GameEventReturnCode InfinityDungeonGimmick_DoorEvent(GameEvent *event, u3
         GFL_SndSEPlay(se);
         (*state)++;
         break;
-    }
     case 1:
-        if (func_ov036_021b8520(object->expObj, 0, object->actor, 0) >= endFrame) {
-            for (anm2 = 0; anm2 < SCENE_ANM_COUNT; anm2++) {
-                FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(object->expObj, 0, object->actor, anm2), TRUE);
+        if ((fx32)func_ov036_021b8520(object->expObj, 0, object->actor, 0) >= endFrame) {
+            for (anm = 0; anm < SCENE_ANM_COUNT; anm++) {
+                FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(object->expObj, 0, object->actor, anm), TRUE);
             }
             (*state)++;
             return GAMEEVENT_DONE;
@@ -785,7 +778,9 @@ static void InfinityDungeonRoomChange_SetNextRoom(InfinityDungeonRoomChange *roo
         roomChange->nextRoom = roomChange->room + 1;
         break;
     }
-    if (roomChange->nextRoom < 0 || roomChange->nextRoom >= INFINITY_DUNGEON_ROOM_COUNT) {
+    if (roomChange->nextRoom < 0) {
+        roomChange->nextRoom = roomChange->room;
+    } else if (roomChange->nextRoom >= INFINITY_DUNGEON_ROOM_COUNT) {
         roomChange->nextRoom = roomChange->room;
     }
     room = InfinityDungeonRoomChange_GetNextRoom(roomChange);
@@ -832,15 +827,13 @@ static void InfinityDungeonRoomChange_SetFloorPosition(InfinityDungeonRoomChange
 
 static void InfinityDungeonRoomChange_SetArrivalPosition(InfinityDungeonRoomChange *roomChange) {
     InfinityDungeonDestination *destination = &roomChange->destination;
-    u32 index;
     const InfinityDungeonPos *pos;
 
     if (roomChange->level <= 4) {
-        index = 0;
+        pos = func_ov127_021f0af4(0);
     } else {
-        index = 1;
+        pos = func_ov127_021f0af4(1);
     }
-    pos = func_ov127_021f0af4(index);
     InfinityDungeonGimmick_SetTilePosition(&destination->pos, pos->x, pos->y, pos->z);
 }
 

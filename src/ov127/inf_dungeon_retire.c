@@ -102,7 +102,8 @@ static GameEventReturnCode InfDungeonRetire_EventMain(GameEvent *event, u32 *sta
             func_ov036_021984e4(Field_GetSubscreen(retire->field));
             if (returnScreen == RETIRE_SUBSCREEN_RETURN) {
                 if (retire->screenId == 10 || retire->screenId == 4) {
-                    FieldSubscreen_ReqChange(Field_GetSubscreen(retire->field), retire->screenId);
+                    FieldSubscreen *subscreen = Field_GetSubscreen(retire->field);
+                    FieldSubscreen_ReqChange(subscreen, retire->screenId);
                 } else {
                     FieldSubscreen_ReqChange(Field_GetSubscreen(retire->field), 0);
                 }

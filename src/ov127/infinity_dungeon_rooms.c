@@ -1387,7 +1387,7 @@ u16 InfinityDungeon_GetTrainerId(InfinityDungeon *dungeon, u8 floor, u8 slot) {
     return dungeon->trainerIds[floor][slot];
 }
 
-void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u8 rank, u32 seed, int width, int height, u8 floorCount) {
+void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, int width, int height, u8 floorCount) {
     InfinityDungeonWalk walk;
     InfinityDungeonWalk extraWalk;
     InfinityDungeonGridPos starts[INFINITY_DUNGEON_FLOOR_COUNT];
@@ -1403,7 +1403,6 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u8 rank, u32 seed, i
     u8 goalRoom;
     int count;
     int floor;
-    int roomFloor;
     int kind;
     int i;
     int j;
@@ -1432,11 +1431,13 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u8 rank, u32 seed, i
     goalFloor = MATH_Rand32(&rand, floorCount);
     {
         InfinityDungeonRoom *goalRooms = dungeon->floors[goalFloor].rooms;
+        InfinityDungeonRoom *room;
 
         count = func_ov127_021f1388(goalRooms, rooms, width, height);
         goalRoom = rooms[MATH_Rand32(&rand, count)];
-        goalRooms[goalRoom].kind = 1;
-        goalRooms[goalRoom].type = INFINITY_DUNGEON_ROOM_TYPE_NONE;
+        room = &goalRooms[goalRoom];
+        room->kind = 1;
+        room->type = INFINITY_DUNGEON_ROOM_TYPE_NONE;
     }
     goal.x = goalRoom % INFINITY_DUNGEON_GRID_WIDTH;
     goal.y = goalRoom / INFINITY_DUNGEON_GRID_WIDTH;
@@ -1476,34 +1477,34 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u8 rank, u32 seed, i
         }
     }
 
-    for (roomFloor = 0; roomFloor < floorCount; roomFloor++) {
+    for (i = 0; i < floorCount; i++) {
         int placed = 0;
 
-        count = func_ov127_021f1308(rank, roomFloor, dungeon->version, types);
+        count = func_ov127_021f1308(rank, i, dungeon->version, types);
         func_ov127_021f0c54(types, count, &rand);
-        for (i = 0; i < INFINITY_DUNGEON_ROOM_COUNT; i++) {
-            if (dungeon->floors[roomFloor].rooms[i].kind == 4) {
-                int x = i % INFINITY_DUNGEON_GRID_WIDTH;
-                int y = i / INFINITY_DUNGEON_GRID_WIDTH;
+        for (j = 0; j < INFINITY_DUNGEON_ROOM_COUNT; j++) {
+            if (dungeon->floors[i].rooms[j].kind == 4) {
+                int x = j % INFINITY_DUNGEON_GRID_WIDTH;
+                int y = j / INFINITY_DUNGEON_GRID_WIDTH;
 
                 if (x < width && y < height) {
-                    if (goal.x == x && goal.y + 1 == y && goalFloor == roomFloor) {
+                    if (goal.x == x && goal.y + 1 == y && i == goalFloor) {
                         const InfinityDungeonRoomTemplate *roomTemplate;
                         u8 type;
 
-                        count = func_ov127_021f1348(rank, roomFloor, dungeon->version, goalTypes);
+                        count = func_ov127_021f1348(rank, i, dungeon->version, goalTypes);
                         type = goalTypes[MATH_Rand32(&rand, count)];
                         roomTemplate = InfinityDungeon_GetRoomTemplate(type);
-                        dungeon->floors[roomFloor].rooms[i].type = type;
-                        dungeon->floors[roomFloor].rooms[i].kind = roomTemplate->kind;
+                        dungeon->floors[i].rooms[j].type = type;
+                        dungeon->floors[i].rooms[j].kind = roomTemplate->kind;
                     } else {
                         u8 type = types[placed];
 
                         if (type != INFINITY_DUNGEON_ROOM_TYPE_NONE) {
                             const InfinityDungeonRoomTemplate *roomTemplate = InfinityDungeon_GetRoomTemplate(type);
 
-                            dungeon->floors[roomFloor].rooms[i].type = type;
-                            dungeon->floors[roomFloor].rooms[i].kind = roomTemplate->kind;
+                            dungeon->floors[i].rooms[j].type = type;
+                            dungeon->floors[i].rooms[j].kind = roomTemplate->kind;
                         }
                         placed++;
                     }

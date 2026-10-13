@@ -230,7 +230,7 @@ static BOOL func_ov061_021e5cb8(VM *vm, FieldScriptEnv *env) {
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
     u8 level = func_02010378(getKeyDataBlkAddress(save));
-    u8 unk = func_ov127_021f02e0(dungeon);
+    u32 unk = func_ov127_021f02e0(dungeon);
 
     *var = unk + func_020103a0(level) + 1;
     return FALSE;

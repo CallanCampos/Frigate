@@ -98,7 +98,7 @@ typedef struct {
 
 void func_ov127_021efd60(GameSystem *gsys, InfinityDungeon *gimmick);
 GameEvent *func_ov127_021efeec(GameSystem *gsys, Field *field, u8 a2);
-u8 func_ov127_021f02e0(InfinityDungeon *gimmick);
+u32 func_ov127_021f02e0(InfinityDungeon *gimmick);
 u32 InfinityDungeon_GetNpcScript(KeyDataSave *keyData, InfinityDungeon *gimmick, u16 objCode, u8 a3);
 u32 func_ov127_021f03dc(KeyDataSave *keyData, InfinityDungeon *gimmick, u16 objCode, u16 a3);
 u32 func_ov127_021f08b4(InfinityDungeon *gimmick, u16 a1);

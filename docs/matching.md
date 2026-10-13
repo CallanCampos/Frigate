@@ -1780,6 +1780,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   does, the original had an object its linker stripped; `pokemontrade_proc.c` is laid out as such a fit, and says so.
   An external `inline` function gets its own copy of a string literal where a `static inline` shares the file's:
   `pokemontrade_save.c`'s `BackupMail` and `BackupRecords` are plain `inline` for their file-name strings.
+- Byte-equal data can still be mislaid: two tables of equal bytes or two equal-size initializers that are swapped
+  show only in the relocation targets, so a data check compares where each pool word points, not only the section's
+  bytes. `infinity_dungeon.c` had three such pairs and `infinity_dungeon_gimmick.c` its two scene setups. In the same
+  overlay a swap of two loop counters' spill slots that no declaration order moved meant the later loop reuses the
+  earlier counters (`i` for floors, `j` for rooms in `InfinityDungeon_LayoutFloors`): spilled pieces are grouped by
+  variable.
 
 ## When nothing moves it
 

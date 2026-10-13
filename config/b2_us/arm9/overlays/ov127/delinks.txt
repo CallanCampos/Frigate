@@ -5,24 +5,29 @@
     .bss        start:0x021f4f80 end:0x021f4f80 kind:bss align:32
 
 src/ov127/infinity_dungeon_gimmick.c:
+    complete
     .text       start:0x021eec80 end:0x021efaf0
     .rodata     start:0x021f2128 end:0x021f233c
     .data       start:0x021f4e20 end:0x021f4e3c
 
 src/ov127/infinity_dungeon.c:
+    complete
     .text       start:0x021efaf0 end:0x021f0a64
     .rodata     start:0x021f233c end:0x021f2bfc
     .data       start:0x021f4e3c end:0x021f4f18
 
 src/ov127/infinity_dungeon_rooms.c:
+    complete
     .text       start:0x021f0a64 end:0x021f1684
     .rodata     start:0x021f2bfc end:0x021f4da0
 
 src/ov127/infinity_dungeon_creator.c:
+    complete
     .text       start:0x021f1684 end:0x021f1c80
     .data       start:0x021f4f18 end:0x021f4f34
 
 src/ov127/inf_dungeon_retire.c:
+    complete
     .text       start:0x021f1c80 end:0x021f2128
     .rodata     start:0x021f4da0 end:0x021f4e08
     .data       start:0x021f4f34 end:0x021f4f80

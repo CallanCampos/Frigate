@@ -1189,11 +1189,11 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `infinity_dungeon_gimmick.c` | `0x021eec80`–`0x021efaf0` | 40 | partial | string at `0x021f4e20` |
-| `infinity_dungeon.c` | `0x021efaf0`–`0x021f0a64` | 34 | partial | string at `0x021f4f04` |
-| `infinity_dungeon_rooms.c` | `0x021f0a64`–`0x021f1684` | 38 | partial | descriptive |
-| `infinity_dungeon_creator.c` | `0x021f1684`–`0x021f1c80` | 6 | partial | string at `0x021f4f18` |
-| `inf_dungeon_retire.c` | `0x021f1c80`–`0x021f2128` | 19 | partial | string at `0x021f4f60` |
+| `infinity_dungeon_gimmick.c` | `0x021eec80`–`0x021efaf0` | 40 | complete | string at `0x021f4e20` |
+| `infinity_dungeon.c` | `0x021efaf0`–`0x021f0a64` | 34 | complete | string at `0x021f4f04` |
+| `infinity_dungeon_rooms.c` | `0x021f0a64`–`0x021f1684` | 38 | complete | descriptive |
+| `infinity_dungeon_creator.c` | `0x021f1684`–`0x021f1c80` | 6 | complete | string at `0x021f4f18` |
+| `inf_dungeon_retire.c` | `0x021f1c80`–`0x021f2128` | 19 | complete | string at `0x021f4f60` |
 
 ### Overlay 128
 
