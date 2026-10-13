@@ -128,6 +128,7 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
     BattleMon *mon;
     BOOL needsHeal;
     u32 i;
+    u32 j;
     u32 moveCount;
     u32 ppUsed;
     BattleHandlerEffectAtPosParam *effect;
@@ -177,13 +178,13 @@ static void HandlerPosLunarDance(BattleEventItem *item, BtlServerFlow *flow, u8 
             BattleHandler_PopWork(flow, cure);
         }
         moveCount = GetBattleMonMoveCount(mon);
-        for (i = 0; i < moveCount; i++) {
-            ppUsed = GetMovePPUsed(mon, i);
+        for (j = 0; j < moveCount; j++) {
+            ppUsed = GetMovePPUsed(mon, j);
             if (ppUsed) {
                 pp = BattleHandler_PushWork(flow, 9, monId);
                 pp->monIndex = monId;
                 pp->amount = ppUsed;
-                pp->moveIndex = i;
+                pp->moveIndex = j;
                 BattleHandler_PopWork(flow, pp);
             }
         }
