@@ -1768,7 +1768,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `comm_tvt_field.c` | `0x021b2f80`–`0x021b4444` | 35 | partial | descriptive |
+| `comm_tvt_field.c` | `0x021b2f80`–`0x021b4444` | 35 | complete | descriptive |
 
 ### Overlay 199
 
