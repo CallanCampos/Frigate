@@ -2075,8 +2075,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `battle_championship_flow.c` | `0x02176b00`–`0x02177954` | 41 | partial | string at `0x0217a868` |
-| `livebattlematch_flow.c` | `0x02177954`–`0x021795c8` | 36 | partial | string at `0x0217a884` |
+| `battle_championship_flow.c` | `0x02176b00`–`0x02177954` | 41 | complete | string at `0x0217a868` |
+| `livebattlematch_flow.c` | `0x02177954`–`0x021795c8` | 36 | complete | string at `0x0217a884` |
 | `digitalcardcheck.c` | `0x021795c8`–`0x0217a27c` | 24 | complete | string at `0x0217a8bc` |
 | `livebattlematch_irc.c` | `0x0217a27c`–`0x0217a7b4` | 26 | complete | string at `0x0217a8d4` |
 

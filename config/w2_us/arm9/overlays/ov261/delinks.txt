@@ -5,11 +5,13 @@
     .bss        start:0x0217a960 end:0x0217a960 kind:bss align:32
 
 src/ov261/battle_championship_flow.c:
+    complete
     .text       start:0x02176b40 end:0x02177994
     .rodata     start:0x0217a7f4 end:0x0217a800
     .data       start:0x0217a8a0 end:0x0217a8c4
 
 src/ov261/livebattlematch_flow.c:
+    complete
     .text       start:0x02177994 end:0x02179608
     .data       start:0x0217a8c4 end:0x0217a8fc
 

@@ -1208,6 +1208,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loaders and a `u32` zero-plus-`if` flag feeds `func_0204c040`, and in `ZukanInfo_ShowTypesInGameLanguage`,
   `ZukanInfo_ShowTypesInLanguage` and `ZukanInfo_LoadFootprint` it is the other way round. All four were 4 bytes
   long or 29 bytes off before.
+- A dead second conditional branch on the same flags is a redundant test in the source: the live competition's
+  `LiveBattleMatchFlow_StepLink` has `wk->readySent = (field12 != 0 || (field12 == 0 && !known));` (4 bytes short
+  without the inner `field12 == 0`). In the same overlay `LiveBattleMatchFlow_StepRecord`'s spilled `won` and `lost`
+  are `u8`, which alone moves the `won = 0` store after the first call's argument load, and
+  `BattleChampionshipFlow_MenuOpenList`'s interleaved stores come from plain field order in the source, not from
+  writing them in the asm's order.
 
 ## Loops
 
