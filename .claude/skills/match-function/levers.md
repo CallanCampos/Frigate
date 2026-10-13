@@ -147,6 +147,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "compound assignment to a narrow field")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
   twice. (matching.md: "chained assignment to fields")
+- Two constants on one field folded into one (`subs #0xff` for `- 0x100 + 1`) where the original keeps both: write
+  them as two statements on the field. (matching.md: "Two constants applied to a field")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows
   arguments for narrow parameters, so an argument passed without them is for a wider one. (matching.md: "narrows an argument")
 - A parameter passed on to a `u8` parameter without shifts is a `u8` too. (matching.md: "narrows an argument")
@@ -203,6 +205,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An inline's 0/1 result materialized then tested (`movs r0, #1; b; movs r0, #0; cmp r0, #0`) where ours folds it into the branch: return `u32` with the if-form, or `return (BOOL)(a >= b);`. (matching.md: "An inline's 0/1 result")
 - A final boolean returned from a register shared with a `NULL` argument: `return f() == TRUE ? FALSE : TRUE;`.
   (matching.md: "ends in `return f(...) == TRUE")
+- A `? 0 : 1` with inverted branch polarity whose 1 the original takes from a long-lived constant register:
+  default-then-override through a local, `v = 0; if (!cond) { v = 1; }`. (matching.md: "default-then-override")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same

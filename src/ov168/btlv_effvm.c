@@ -3050,12 +3050,11 @@ static int BtlvEffvm_GetTargetPositions(BtlvEffvm *wk, int code, int *positions)
     return count;
 }
 
-// NONMATCHING: the rule-1 targets' `? 0 : 1` puts 0 in count's register and 1 in a register the original keeps 1 in
-// for the whole function, 5 bytes
 static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *positions) {
     int count = 1;
     int rule;
     int i;
+    int side;
     BtlvMcssPos pos;
 
     positions[0] = wk->defender;
@@ -3116,7 +3115,11 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
             case 9:
             case 13:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    side = 0;
+                    if (!(wk->attacker & 1)) {
+                        side = 1;
+                    }
+                    positions[0] = side;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4024[wk->attacker];
@@ -3128,7 +3131,11 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
                 break;
             case 11:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    side = 0;
+                    if (!(wk->attacker & 1)) {
+                        side = 1;
+                    }
+                    positions[0] = side;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4044[wk->attacker];
@@ -4282,9 +4289,8 @@ static void BtlvEffvm_BgmFadeTask(TCB *tcb, void *data) {
     }
 }
 
-// NONMATCHING: MWCC folds each step of the window's bounds, `- 0x100 + 1`, into one `subs #0xff`, where the original
-// keeps a subtraction of 0x100 and an addition of 1 (mixing in an unsigned `1u` keeps them apart), and the original
-// masks the vertical bounds with 0xffff before storing them, loading winV before winH
+// NONMATCHING: the original masks the vertical bounds with 0xffff (an `ands` against a mask built as 0xff << 8 | 0xff,
+// shared by both stores) where MWCC drops the mask under the 16-bit store, and loads winV before winH, 12 bytes
 static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
     BtlvEffvmWindowWork *work = data;
 
@@ -4302,16 +4308,20 @@ static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
             work->wait = work->waitReload;
             switch (work->dir) {
             case 0:
-                work->winV = work->winV - 0x100 + 1;
+                work->winV -= 0x100;
+                work->winV++;
                 break;
             case 1:
-                work->winV = work->winV + 0x100 - 1;
+                work->winV += 0x100;
+                work->winV--;
                 break;
             case 2:
-                work->winH = work->winH - 0x100 + 1;
+                work->winH -= 0x100;
+                work->winH++;
                 break;
             case 3:
-                work->winH = work->winH + 0x100 - 1;
+                work->winH += 0x100;
+                work->winH--;
                 break;
             }
             reg_G2_WIN0H = work->winH;

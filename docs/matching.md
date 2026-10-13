@@ -797,6 +797,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `fieldmap.c`'s `FieldmapProc_Init`. The result in a local and the subtraction in the argument don't do it.
 - `res -= 34;` lets MWCC fold a later `res + 36` into `res + 2`; a variable of its own, `u32 slot = res - 34;`, keeps the
   difference in its register and adds 36 to it, as the PC box's `func_ov255_021c445c` does.
+- Two constants applied to a field in one expression are folded into one (`x = x - 0x100 + 1` becomes `subs #0xff`);
+  as two statements, `work->winV -= 0x100; work->winV++;`, both operations stay, as `btlv_effvm.c`'s
+  `BtlvEffvm_WindowTask` needs (an unsigned `1u` mixed in also keeps them apart, but less naturally).
 - A chained assignment to fields, `a->x = a->y = value;`, stores `y`, reloads it and stores `x`. When the original
   narrows the value once and stores it to both, the stores were separate statements, as in the PC box's
   `PokeIconChgDataMake`.
@@ -1136,6 +1139,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A flag set to 0 and then to 1 under a branch (`movs #0`, `cmp`, `beq`, `movs #1`) is
   `BOOL b = FALSE; if (x) { b = TRUE; }`; `x != 0` builds 1 first. `script_command.c`'s `StaScriptCmd_PokeFlip`
   also needs the call before it in the argument list read into a local first.
+- A `cond ? 0 : 1` whose 0 the original takes from an existing register while 1 comes from a register it keeps 1 in
+  throughout inverts the branch polarity under every ternary spelling; `btlv_effvm.c`'s
+  `BtlvEffvm_GetDefenderPositions` needs the default-then-override form through a local,
+  `side = 0; if (!(wk->attacker & 1)) { side = 1; }`.
 - Blocks are laid out in source order. A switch whose default code comes right after its comparisons or jump table
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
   on, where `if (!f()) { return FALSE; } n++;` puts it before.
