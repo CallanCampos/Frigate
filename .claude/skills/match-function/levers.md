@@ -14,7 +14,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A ternary store computes the address once, an `if`/`else` store in each branch. (matching.md: "ternary store")
 - `p + (a + 4)` and `p + a + 4` differ. (matching.md: "Parenthesized offsets")
 - A sum folded into the load's offset (`ldrb r2, [r3, #9]` from `base + pos`) where ours adds `pos + 1` first:
-  `*(data + pos + 1)` instead of `data[pos + 1]`. (matching.md: "`*(data + pos + 1)`")
+  `*(data + pos + 1)` instead of `data[pos + 1]`; this also folds `- 1` in `BrProcSys_Pop`.
+  (matching.md: "`*(data + pos + 1)`")
 - Of two variables that compete for one register, the one used more gets it. `docs/matching.md` spells out what counts as a
   use; on a tie the one assigned first wins, though in a large function the last declared won.
   (matching.md: "compete for the same register")

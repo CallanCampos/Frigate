@@ -945,7 +945,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `*(data + pos + 1)` adds `pos` once and then loads at `#1`, where `data[pos + 1]` adds `pos + 1` first; and a value
   built in a `u16` local with `|=` and then returned has no final narrowing pair, where a returned `int` expression does
   (`ssp_exifdec.c`'s byte readers). The battle server's command queue reads its halfwords and words the same way,
-  `*(que->buffer + que->readPtr + 1)` loading at `#9` from `que + readPtr` (`btl_server_cmd.c`). A ternary that stores
+  `*(que->buffer + que->readPtr + 1)` loading at `#9` from `que + readPtr` (`btl_server_cmd.c`).
+  `BrProcSys_Pop` similarly needs `*(p_wk->stack + p_wk->stack_num - 1)` to fold `- 1` into the load offset;
+  `p_wk->stack[p_wk->stack_num - 1]` emits an extra subtraction. A ternary that stores
   to a static is a select (`bhi`); the original's `bls; b` is an `if`/`else` with a store in each branch.
 - Advancing a pointer-like offset with `x += 0xc` lets MWCC fold the 0xc into every later offset from it; writing
   `pos = x + 0xc` and reading through `pos` keeps the `add` (`ssp_exifdec.c`'s IFD loop).

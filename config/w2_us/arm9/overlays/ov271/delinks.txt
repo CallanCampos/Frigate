@@ -11,6 +11,7 @@ src/ov271/br_core.c:
     .data       start:0x021f7ba0 end:0x021f7bc4
 
 src/ov271/br_proc_sys.c:
+    complete
     .text       start:0x021f07b0 end:0x021f0aac
     .data       start:0x021f7bc4 end:0x021f7c44
 
