@@ -31,7 +31,7 @@ struct BtlvPokeSelectParam {
 
 void PokeListCmd_Init(BtlvPokeListCmd *cmd, BattleParty *party, u8 count, u8 mode);
 void PokeListCmd_SetCoverSlots(BtlvPokeListCmd *cmd, u8 numCoverPos);
-void PokeSelect_Init(BtlvPokeSelectParam *select, BtlvPokeListCmd *cmd);
+void PokeSelect_Init(BtlvPokeSelectParam *select, const BtlvPokeListCmd *cmd);
 void PokeSelect_Push(BtlvPokeSelectParam *select, u8 index, u8 slot);
 void PokeSelect_Pop(BtlvPokeSelectParam *select);
 BOOL PokeSelect_IsSelecting(BtlvPokeSelectParam *select);

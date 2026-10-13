@@ -26,11 +26,9 @@ static void PokeListCmd_SetSlotState(BtlvPokeListCmd *cmd, u8 state, u8 slot) {
     cmd->slotState[slot] = state;
 }
 
-void PokeSelect_Init(BtlvPokeSelectParam *select, BtlvPokeListCmd *cmd) {
-    u8 count = cmd->count;
-
+void PokeSelect_Init(BtlvPokeSelectParam *select, const BtlvPokeListCmd *cmd) {
     select->count = 0;
-    select->max = count;
+    select->max = cmd->count;
 }
 
 void PokeSelect_Push(BtlvPokeSelectParam *select, u8 index, u8 slot) {

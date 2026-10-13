@@ -19,7 +19,9 @@ tools that show the differences.
   (`int start = pos;`), as `b_plist_main.c`'s `BPlistMain_GetNextPos` does; a separate counter swaps the registers.
 - A `const` pointer parameter lets MWCC keep a value loaded through it across a store through another pointer; the
   original reloads it, so `btlv_effect.c`'s `BtlvEffTool_Step` takes its step pointer non-const. The same decided
-  several vector copies in `btlv_mcss.c` and `btlv_effvm.c`: field-by-field copies from non-const sources.
+  several vector copies in `btlv_mcss.c` and `btlv_effvm.c`: field-by-field copies from non-const sources. It also
+  lets a load move above such a store: `btl_poke_select.c`'s `PokeSelect_Init` reads `cmd->count` before storing 0
+  to `select->count` only with `const BtlvPokeListCmd *cmd`; non-const, the load waits for the store.
 - Clearing one bit with `flags &= ~(1 << i)` gives `mvns`; the original's `eors` with -1 is `flags &= (1 << i) ^ 0xffffffff`,
   as `btlv_clact.c`'s move and scale task ends do, and `btlv_stage.c`'s vanish flags use `(1 << side) ^ 3`.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
