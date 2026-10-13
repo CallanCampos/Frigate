@@ -4,5 +4,6 @@
     .bss        start:0x021f0940 end:0x021f0940 kind:bss align:32
 
 src/ov101/gym_humilau.c:
+    complete
     .text       start:0x021eecc0 end:0x021f046c
     .rodata     start:0x021f046c end:0x021f0930

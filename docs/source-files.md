@@ -904,7 +904,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_humilau.c` | `0x021eec80`–`0x021f042c` | 43 | partial | descriptive |
+| `gym_humilau.c` | `0x021eec80`–`0x021f042c` | 43 | complete | descriptive |
 
 ### Overlay 102
 
