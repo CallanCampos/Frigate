@@ -1685,7 +1685,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `wifilogin.c` | `0x021b2f80`–`0x021b3a80` | 39 | complete | descriptive |
 | `wifilogin_disp.c` | `0x021b3a80`–`0x021b46cc` | 17 | complete | string at `0x021b53b8` |
-| `wifilogin_message.c` | `0x021b46cc`–`0x021b4da4` | 21 | partial | string at `0x021b53cc` |
+| `wifilogin_message.c` | `0x021b46cc`–`0x021b4da4` | 21 | complete | string at `0x021b53cc` |
 | `wifilogout.c` | `0x021b4da4`–`0x021b50a0` | 17 | complete | descriptive |
 
 ### Overlay 191

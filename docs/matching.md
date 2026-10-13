@@ -930,6 +930,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the cast `(i + 17) * 2` was spilled and reloaded twice and the frame was 4 bytes larger. The two spilled slots left
   swapped after that (`scroll` and the loop body's `visible`) were fixed by making the block-scoped
   `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
+- A field loaded again with no call or store in between, where ours keeps the first load alive across an `if`, is a
+  second read through a `static inline` that takes a pointer to `const`: a load through a `const` pointer is a
+  different expression from the plain read, so the two are not shared. The Wi-Fi login's `WifiLoginMessage_PrintFrom`
+  picks `y` from `msg->style` and then creates its window on
+  `WifiLoginMessage_GetMessageBGOf(msg)` (`return WifiLoginMessage_GetMessageBG(msg->style);` with
+  `const WifiLoginMessage *msg`), which loads the style again (0xc8). The same inline with a plain pointer, or the call
+  written in place, reuses the first load (0xc6).
 
 ## Branches and block layout
 
