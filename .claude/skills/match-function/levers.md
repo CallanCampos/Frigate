@@ -149,6 +149,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "compound assignment to a narrow field")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
   twice. (matching.md: "chained assignment to fields")
+- A member's address CSE'd into a callee-saved register from a store to a later call's argument, where ours
+  recomputes it: a pointer local declared at the top, assigned just before the call — not at its declaration.
+  (matching.md: "assigned just before the call")
 - Two constants on one field folded into one (`subs #0xff` for `- 0x100 + 1`) where the original keeps both: write
   them as two statements on the field. (matching.md: "Two constants applied to a field")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows
@@ -207,6 +210,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An inline's 0/1 result materialized then tested (`movs r0, #1; b; movs r0, #0; cmp r0, #0`) where ours folds it into the branch: return `u32` with the if-form, or `return (BOOL)(a >= b);`. (matching.md: "An inline's 0/1 result")
 - A final boolean returned from a register shared with a `NULL` argument: `return f() == TRUE ? FALSE : TRUE;`.
   (matching.md: "ends in `return f(...) == TRUE")
+- A 0/1 flag laid out first value first (`bne; movs #0; b; movs #1`) where every plain spelling loads 1 first: the
+  arms are enum constants, with the condition written so the original's first arm comes first.
+  (matching.md: "held in an enum type")
 - A `? 0 : 1` with inverted branch polarity whose 1 the original takes from a long-lived constant register:
   default-then-override through a local, `v = 0; if (!cond) { v = 1; }`. (matching.md: "default-then-override")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
@@ -357,6 +363,12 @@ sm64ds-decomp's catalogue for another mwccarm build, so they are untested here:
 - `#pragma opt_strength_reduction off`
 - `#pragma optimize_for_size on`
 - `#pragma opt_propagation off`
+
+Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles`
+(a loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
+restructures it. A function whose loop enters with a `b` to the test at -O4 may be one the original's global
+optimizer gave up on; `WorldTrade_NationSortListMake`, `Country_IsValidPlace`, `NNS_SndArcStrmInit` and
+`MBGameInfo_SendMembers` show the same symptom in their rows.
 
 Try one at a time with `try_variants.py`, which allows definitions before the function. If a pragma is all that
 matches, write that down in the nonmatching row; it's evidence, not a fix.

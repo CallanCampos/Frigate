@@ -799,6 +799,11 @@ Same instructions, scheduled in another order.
 - A narrowing missing after an `if`/`else` that assigns a `u16` in both branches comes from a conditional expression:
   `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `MBWm_NextChannel`
   (`mb_wm.c`) needed.
+- A member's address kept in a callee-saved register from an early store to a later call's argument, where ours
+  recomputes it: `btlv_mcss.c`'s `BtlvMcss_Transform` needed a pointer local declared at the top but assigned just
+  before the call, `MCSSLoadInfo *dst; ... dst = &work->entries[index].info; func_02019bd8(..., dst);`. Initializing
+  `dst` at its declaration gives the base in the right register but adds a `mov ip, r0` spill, and passing the
+  expression straight to the call drops the CSE entirely.
 - A trailing `mov r1, #0` after a 32-bit result is a function returning `u64`: DWC's `DivWords` (`crypt.c`) returns
   `(u32)(...)` from a `u64` function.
 - On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
@@ -1192,7 +1197,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A 0/1 choice laid out first value first (`bhs`, `movs r0, #0`, `b`, `movs r0, #1`) is held in an enum type: every
   plain 0/1 spelling (ternary, `if`/`else`, `!`, `== FALSE`, an int local) gives `blo`, `movs r0, #1` first.
   `btl_main.c`'s `GetSideFromMonID` matches as `BtlSide side = monId < 12 ? BTL_SIDE_1ST : BTL_SIDE_2ND;`, with the
-  condition written so the original's first arm comes first.
+  condition written so the original's first arm comes first. `btlv_timer.c`'s `BtlvTimer_Draw` is the same with a
+  file-local anonymous enum, `int label = which == 0 ? TIMER_SEQ_BATTLE_LABEL : TIMER_SEQ_COMMAND_LABEL;`; the
+  condition must stay `which == 0`, since `which ? B : A` still builds 1 first.
 - A flag set to 0 and then to 1 under a branch (`movs #0`, `cmp`, `beq`, `movs #1`) is
   `BOOL b = FALSE; if (x) { b = TRUE; }`; `x != 0` builds 1 first. `script_command.c`'s `StaScriptCmd_PokeFlip`
   also needs the call before it in the argument list read into a local first.
@@ -1211,7 +1218,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Identical statements in different branches are merged, so a branch that jumps into the middle of another block had
   the same code in the source. For example, `if (a) { x = 3; y = 19; } else { x = 0; y = 19; }` compiles differently
   from `x = a ? 3 : 0; y = 19;`. A run of jumps to one store, as in the start menu's `StartMenu_MoveCursor`, is the
-  same store written in several `else` branches.
+  same store written in several `else` branches. The merged branches keep one predecessor each, so a constant's
+  register from before the branch is reused in every arm; a constant rebuilt after a `?:` or `if`/`else` merge, where
+  the original reuses the earlier register, means the original duplicated the tail in each branch:
+  `btlv_effvm.c`'s `BtlvEffvm_MoveEmitterArc` needs the `FX_Mul`/`pos.z = 0` tail repeated in both `else` arms.
   A test that branches past an unconditional jump, `bne next; b hide`, where `||` would give one `beq hide`, is the
   first copy of a body written twice in an `if`/`else if` chain and replaced by a jump to the second:
   `func_ov194_021c4ec0` hides a marking icon with `if (anim == -1) { hide } else if (isEgg && i == 6) { hide }`.

@@ -70,7 +70,7 @@ jobs:
   build-macos:
     name: Build both ROMs on macOS
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: macos-15-intel
+    runs-on: macos-26-intel
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -84,7 +84,8 @@ jobs:
 
       - name: Install packages
         run: |
-          brew install ninja llvm xz
+          brew install coreutils ninja llvm xz
+          echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
           echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
 
       - name: Unpack base ROMs
@@ -113,15 +114,33 @@ jobs:
 
       - name: Build and verify both ROMs
         run: |
-          set -o pipefail
-          python3 configure.py b2_us w2_us
-          if ninja 2>&1 | tee build/ninja.log; then
-            echo "Ninja completed successfully"
-          else
-            statuses=("${PIPESTATUS[@]}")
-            echo "Ninja exited ${statuses[0]}; tee exited ${statuses[1]}"
-            exit 1
-          fi
+          for attempt in 1 2 3; do
+            if python3 configure.py b2_us w2_us; then break; fi
+            if [ "$attempt" -eq 3 ]; then exit 1; fi
+            sleep 5
+          done
+          mkdir -p build
+          : > build/ninja.log
+          for attempt in 1 2 3; do
+            if ninja -j 4 >> build/ninja.log 2>&1; then
+              echo "Ninja completed successfully"
+              tail -20 build/ninja.log
+              break
+            else
+              status=$?
+            fi
+            echo "Ninja attempt $attempt exited $status"
+            tail -100 build/ninja.log
+            if [ "$status" -ne 139 ] || [ "$attempt" -eq 3 ]; then exit "$status"; fi
+            sleep 5
+          done
           if grep -n 'warning:' build/ninja.log; then exit 1; fi
           echo "No compiler warnings; checking ROM SHA1s"
           shasum -a 1 -c b2_us.sha1 w2_us.sha1
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-build-log
+          path: build/ninja.log

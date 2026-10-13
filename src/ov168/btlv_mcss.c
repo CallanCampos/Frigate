@@ -1147,11 +1147,10 @@ static void BtlvMcss_SetLevel(BtlvMcss *work, int pos, int level) {
     func_0201af54(work->mcssSys, work->entries[index].mcss, level);
 }
 
-// NONMATCHING: 6 bytes short; the original keeps work + 0xc for the copy's first store and the last call, which spills
-// targetPos
 void BtlvMcss_Transform(BtlvMcss *work, int targetPos, int pos) {
     int target = BtlvMcss_GetIndex(work, targetPos);
     int index = BtlvMcss_GetIndex(work, pos);
+    MCSSLoadInfo *dst;
 
     work->entries[index].info.arcId = work->entries[target].info.arcId;
     work->entries[index].info.palette = work->entries[target].info.palette;
@@ -1172,7 +1171,9 @@ void BtlvMcss_Transform(BtlvMcss *work, int targetPos, int pos) {
         work->entries[index].info.bin = work->entries[target].info.bin - 9;
     }
     work->entries[index].mon = work->entries[target].mon;
-    func_02019bd8(work->mcssSys, work->entries[index].mcss, &work->entries[index].info);
+    // dst must be assigned here, not at its declaration: only this form CSEs &entries[index] with the stores above
+    dst = &work->entries[index].info;
+    func_02019bd8(work->mcssSys, work->entries[index].mcss, dst);
 }
 
 void BtlvMcss_ReloadSprite(BtlvMcss *work, int pos, const MCSSLoadInfo *info) {

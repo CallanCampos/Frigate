@@ -3645,7 +3645,6 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
     GFL_HeapFree(param);
 }
 
-// NONMATCHING: type and work swap r4/r5, so the zero of the type 5 branch is rematerialized (4 bytes longer)
 static void BtlvEffvm_MoveEmitterArc(SPLEmitter *emitter, u32 type) {
     BtlvEffvmEmitterMotionWork *work = func_02050364(emitter);
     VecFx32 pos;
@@ -3674,8 +3673,12 @@ static void BtlvEffvm_MoveEmitterArc(SPLEmitter *emitter, u32 type) {
             pos.z = FX_CosIdx(angle2);
             pos.z = FX_Mul(pos.z, work->height);
             pos.y = 0;
+        } else if (work->type == 5) {
+            pos.y = FX_CosIdx(angle2);
+            pos.y = FX_Mul(pos.y, work->height);
+            pos.z = 0;
         } else {
-            pos.y = work->type == 5 ? FX_CosIdx(angle2) : FX_CosIdx(angle);
+            pos.y = FX_CosIdx(angle);
             pos.y = FX_Mul(pos.y, work->height);
             pos.z = 0;
         }
