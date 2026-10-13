@@ -251,6 +251,12 @@ Same instructions, registers swapped.
   got `r2` and `&buffer[page * 0x400 + y * 32]` got `r3`, through 48 declaration orders. With `i` as the row counter
   (`s32 i; s32 page; s32 j;` and `buffer[page * 0x400 + i * 32 + j] += 6 << 12;`) they swap. `i` as the page or the
   column counter does not match.
+- An `if`/`else` that stores a constant to the same field of a static struct in each arm, on a condition that is a
+  call, loads the struct's address once before the call into the first saved register, ahead of the parameter's copy,
+  and the stores after it reuse it. The Wi-Fi login's `WifiLogin_StateStartNet` starts with
+  `if (hw_isDSi()) { sNetInit.wifiHeapSize = 0x79000; } else { sNetInit.wifiHeapSize = 0x5e400; }` and then fills
+  `sNetInit.` directly. A ternary store loads the address late into a scratch register, and a
+  `GFLNetInitData *init = &sNetInit;` local swaps `r4` and `r5`.
 
 ## Stack slots
 
@@ -1200,6 +1206,25 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the diff reads as registers only. Two cases with the same tail were written out in full and merged by MWCC:
   `ircbattlematch.c`'s `IrcBattleMatch_StateStartNet` matches with both musical cases complete, and with its last
   three mode tests as a `switch` in the blocks' order rather than an `if` chain.
+- A switch case whose block holds nothing but a `b` to the code after the switch (its jump-table entry points at a
+  lone branch, laid out in source order among the other cases, while the cases without code go straight to the end)
+  had a copy between two variables that the register allocator later gave the same register. The block is created
+  for the assignment and only the `mov` is deleted, after block layout. Empty statements, empty blocks or `if`s,
+  nested switches, `for (;;) break;`, `goto end`, a dead store to a parameter or to an unused local and
+  `error = error;` are all removed before blocks are made and merge the case with the end. `gsync_download.c`'s
+  `GSyncDownload_OnNdEvent` (4 bytes short before):
+
+      // before: case 3's table entry goes to the end      // after: case 3 gets `b end` of its own
+      switch (error) {                                      u32 result = error;
+      case DWC_ND_ERROR_NONE:                               switch (error) {
+          break;                                            case DWC_ND_ERROR_NONE:
+      case DWC_ND_ERROR_HTTP:                                   break;
+          break;                                            case DWC_ND_ERROR_HTTP:
+      ...                                                       result = error;
+      }                                                         break;
+      _pDLWork->error = error;                              ...
+                                                            }
+                                                            _pDLWork->error = result;
 
 ## Floats and runtime helpers
 
@@ -1405,6 +1430,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   top, each object can go either at the top or right before its first user; searching those placements with
   `rodata_order.py`'s model found `wifi_p2pmatch.c`'s 39 objects in seconds. Functions that reach `.data` through
   one section-relative anchor (`ldr =first; str [r, #n]`) need the `.data` objects defined in ROM order as well.
+- An order of equal-size local initializers that no declaration order of the file's objects gives can come from a
+  table the original link dead-stripped: the sort listed it, then the linker dropped its section (an object of 64
+  bytes or more has one of its own) with the unused public functions that read it. `pdwacc_disp.c`, a cut-down copy
+  of `gsync_disp.c`, gets the ROM's BG setup order only with a referenced table between its VRAM and LCD configs,
+  where `gsync_disp.c` has `sActorPositions`. Look at the sibling file a copy was made from for the missing object.
+  Nothing the compiler drops itself is listed, so this can't be reproduced under `-nodead`.
 
 ## When nothing moves it
 

@@ -100,10 +100,11 @@ void WifiLoginMessage_Print(WifiLoginMessage *msg, u32 msgNo) {
 
 void WifiLoginMessage_PrintFrom(WifiLoginMessage *msg, MsgData *msgData, u32 msgNo) {
     BmpWin *window;
-    u8 y = 1;
     u32 flags;
+    u8 y;
 
     GFL_MsgDataLoadStrbuf(msgData, msgNo, msg->strbuf);
+    y = 1;
     if (msg->style != WIFILOGIN_MESSAGE_STYLE_PDWACC) {
         y = 19;
     }

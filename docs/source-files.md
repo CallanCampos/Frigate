@@ -1683,7 +1683,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifilogin.c` | `0x021b2f80`–`0x021b3a80` | 39 | partial | descriptive |
+| `wifilogin.c` | `0x021b2f80`–`0x021b3a80` | 39 | complete | descriptive |
 | `wifilogin_disp.c` | `0x021b3a80`–`0x021b46cc` | 17 | complete | string at `0x021b53b8` |
 | `wifilogin_message.c` | `0x021b46cc`–`0x021b4da4` | 21 | partial | string at `0x021b53cc` |
 | `wifilogout.c` | `0x021b4da4`–`0x021b50a0` | 17 | complete | descriptive |
@@ -1778,7 +1778,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `gsync_menu.c` | `0x021b2f80`–`0x021b4224` | 41 | complete | string at `0x021b99e0` |
 | `gsync_message.c` | `0x021b4224`–`0x021b4870` | 17 | complete | string at `0x021b99f0` |
-| `gsync_download.c` | `0x021b4870`–`0x021b4b48` | 16 | partial | string at `0x021b9a00` |
+| `gsync_download.c` | `0x021b4870`–`0x021b4b48` | 16 | complete | string at `0x021b9a00` |
 | `gsync_disp.c` | `0x021b4b48`–`0x021b5bfc` | 36 | complete | string at `0x021b9b40` |
 | `gsync_state.c` | `0x021b5bfc`–`0x021b8238` | 98 | complete | string at `0x021b9b50` |
 | `pdwacc_message.c` | `0x021b8238`–`0x021b88d0` | 13 | complete | string at `0x021b9b98` |
