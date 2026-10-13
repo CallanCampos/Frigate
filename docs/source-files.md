@@ -1393,7 +1393,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `encounter_effect_grid.c` | `0x021f5da0`–`0x021f61d8` | 5 | partial | descriptive |
+| `encounter_effect_grid.c` | `0x021f5da0`–`0x021f61d8` | 5 | complete | descriptive |
 
 ### Overlay 151
 

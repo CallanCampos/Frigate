@@ -549,6 +549,11 @@ Same code, other `sp` offsets or frame size.
   Pokéstar Studios' `EventPokewood_CreateCastParty` matched once `s32 count` became `s16 count`, the type of
   `PokewoodCastFile.count[]`. MWCC still spills it as a word, but gives it the lowest slot. Try the field's own type
   before sweeping declaration orders.
+- Loop-invariant values that MWCC spills take their slots top down in the order they first appear in the loop's
+  body, not in preheader order or by use count. A loop-body local that depends on the body moves an invariant's slot
+  without being hoisted itself: the grid transition's `EncEffGrid_Draw` (22 bytes of stack slots) matched with
+  `s1 = s + width * FX32_ONE; t1 = t + height * FX32_ONE;` assigned right after `s` and `t`, the far corner's texture
+  coordinates. The invariant itself as a local (`w = width * FX32_ONE`) is hoisted under a guard and costs 4 bytes.
 
 ## Instruction order
 
