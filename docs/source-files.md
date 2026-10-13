@@ -2090,7 +2090,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `wifibattlematch_graphic.c` | `0x021c2560`–`0x021c279c` | 14 | complete | string at `0x021c5fa0` |
-| `wifibattlematch_view.c` | `0x021c279c`–`0x021c568c` | 52 | partial | string at `0x021c5fbc` |
+| `wifibattlematch_view.c` | `0x021c279c`–`0x021c568c` | 52 | complete | string at `0x021c5fbc` |
 | `wifibattlematch_util.c` | `0x021c568c`–`0x021c5cf8` | 24 | complete | string at `0x021c5fd4` |
 
 ### Overlay 263

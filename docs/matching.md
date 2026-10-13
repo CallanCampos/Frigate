@@ -1047,6 +1047,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `actors[ret + 11]` into the load's offset. The PC box's `func_ov255_021d0d70` and `func_ov255_021d57a0` match with
   the counter and the result declared `unsigned long`. Rows that say "the original folds the constant into the
   offset", or that match only with `(&a[i])[11]`, are candidates.
+- `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
+  problem: the Battle Competition's `WifiBattleMatchView_BlendColor` matched with `fx16 ratio`. In the same file a
+  constant assigned in both arms of an `if`/`else` is written first in each arm (`frameBG = 2;` / `= 6;` in the two
+  card `Create` functions), positions computed one from the next are a variable each
+  (`count2X = right - width; middleX = count2X - width;` in `PrintCounts`, not a running `x -= width`), and an
+  element stored and read back (`list->windows[i] = BmpWin_CreateDynamic(...); window = list->windows[i];`) computes
+  its address before the call.
 
 ## Branches and block layout
 
