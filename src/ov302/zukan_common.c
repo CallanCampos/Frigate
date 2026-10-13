@@ -35,13 +35,13 @@ typedef struct {
     u8 unused;
 } ZukanHabitatTableEntry;
 
-static BOOL ZukanCommon_IsInHabitat(PokeDexSave *pokedex, const ZukanHabitatFileEntry *entry, u32 type, u32 season,
+static BOOL ZukanCommon_IsInHabitat(PokeDexSave *pokedex, const ZukanHabitatFileEntry *entry, u8 type, u8 season,
                                     u32 bySeason);
 static void ZukanCommon_GetHabitatStates(u32 *states, const ZukanHabitatFile *file, PokeDexSave *pokedex);
 static BOOL ZukanCommon_IsAreaShown(const ZukanHabitatFile *file, const ZukanHabitatConditions *conditions);
 static void ZukanCommon_GetConditions(ZukanHabitatConditions *conditions, EventWork *eventWork);
 static int ZukanCommon_GetAreaFile(u16 zone);
-static u16 *ZukanCommon_CreateSpeciesList(const ZukanHabitatFile *file, PokeDexSave *pokedex, u32 type, u32 season,
+static u16 *ZukanCommon_CreateSpeciesList(const ZukanHabitatFile *file, PokeDexSave *pokedex, u8 type, u8 season,
                                           u16 *total, HeapID heapId);
 static u32 ZukanCommon_CountAreas(EventWork *eventWork, ArcTool *arc, const ZukanHabitatConditions *conditions);
 
@@ -109,10 +109,15 @@ static const ZukanHabitatTableEntry sZukanHabitats[ZUKAN_HABITAT_COUNT] = {
 u32 ZukanCommon_CreateList(PokeDexSave *pokedex, u16 **list, HeapID heapId) {
     u16 *species;
     u32 count;
-    u32 last = 0;
+    u32 last;
     u32 i;
 
-    count = ZukanSearchEngine_LoadList(func_0200d1f8(pokedex) == 1 ? 0 : 1, heapId, &species);
+    if (func_0200d1f8(pokedex) == 1) {
+        count = ZukanSearchEngine_LoadList(0, heapId, &species);
+    } else {
+        count = ZukanSearchEngine_LoadList(1, heapId, &species);
+    }
+    last = 0;
     for (i = 0; i < count; i++) {
         if (PokeDex_IsCaught(pokedex, species[i]) == 1 || PokeDex_IsSeen(pokedex, species[i]) == 1) {
             last = (u16)(i + 1);
@@ -122,7 +127,7 @@ u32 ZukanCommon_CreateList(PokeDexSave *pokedex, u16 **list, HeapID heapId) {
     return last;
 }
 
-static BOOL ZukanCommon_IsInHabitat(PokeDexSave *pokedex, const ZukanHabitatFileEntry *entry, u32 type, u32 season,
+static BOOL ZukanCommon_IsInHabitat(PokeDexSave *pokedex, const ZukanHabitatFileEntry *entry, u8 type, u8 season,
                                     u32 bySeason) {
     if (PokeDex_IsCaught(pokedex, entry->species) == 1 || PokeDex_IsSeen(pokedex, entry->species) == 1) {
         if (bySeason == 1) {
@@ -206,13 +211,13 @@ u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **ou
     u16 total;
     ZukanHabitatFile file;
     u16 zone;
-    u32 type;
-    u32 season;
-    ArcTool *arc;
-    int areaFile;
     u16 *list;
-    u32 n = 0;
+    int areaFile;
+    ArcTool *arc;
+    u8 season;
+    u8 type;
     u32 i;
+    u32 n = 0;
 
     total = 0;
     zone = func_02010d78(habitat);
@@ -253,8 +258,8 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
         param->count = 1;
     }
     if (param->count != 0) {
-        index = 0;
         sys_memset(param->areas, 0, sizeof(param->areas));
+        index = 0;
         for (habitatIndex = 0; habitatIndex < ZUKAN_HABITAT_COUNT; habitatIndex++) {
             const ZukanHabitatTableEntry *entry = &sZukanHabitats[habitatIndex];
             BOOL flag = EventWork_FlagGet(eventWork, entry->flag);
@@ -270,10 +275,12 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
                 sys_memset(&file, 0, sizeof(ZukanHabitatFile));
                 GFL_ArcToolRead(arc, entry->file, &file);
                 if (ZukanCommon_IsAreaShown(&file, &conditions)) {
-                    ZukanHabitatArea *area = &param->areas[index];
                     int j;
                     int k;
+                    ZukanHabitatSpecies *species;
+                    ZukanHabitatArea *area;
 
+                    area = &param->areas[index];
                     sys_memset(area, 0, 4);
                     area->complete = 1;
                     area->zone = entry->zone;
@@ -288,9 +295,9 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
                         }
                     }
                     for (k = 0; k < file.count; k++) {
-                        ZukanHabitatSpecies *species = &area->species[k];
                         u8 season;
 
+                        species = &area->species[k];
                         species->species = file.entries[k].species;
                         for (season = 0; season < ZUKAN_SEASON_COUNT; season++) {
                             u8 type;
@@ -319,18 +326,21 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
 
 void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *param) {
     ZukanHabitatConditions conditions;
-    int index;
-    int habitatIndex;
+    PokeDexSave *pokedex;
     EventWork *eventWork = GameData_GetEventWork(param->gameData);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_HABITAT, HEAPID_ZUKAN);
+    int habitatIndex;
+    int index;
+    int i;
     ZukanHabitatFile countFile;
     void *habitatSave = func_02010cb8(GameData_GetSaveControl(param->gameData));
-    PokeDexSave *pokedex = GameData_GetPokedex(param->gameData);
     ZukanHabitatFile file;
 
+    pokedex = GameData_GetPokedex(param->gameData);
+
     ZukanCommon_GetConditions(&conditions, eventWork);
-    for (habitatIndex = 0; habitatIndex < ZUKAN_HABITAT_COUNT; habitatIndex++) {
-        const ZukanHabitatTableEntry *entry = &sZukanHabitats[habitatIndex];
+    for (i = 0; i < ZUKAN_HABITAT_COUNT; i++) {
+        const ZukanHabitatTableEntry *entry = &sZukanHabitats[i];
 
         if (EventWork_FlagGet(eventWork, entry->flag) == 1) {
             sys_memset(&countFile, 0, sizeof(ZukanHabitatFile));
@@ -340,8 +350,8 @@ void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *pa
             }
         }
     }
-    index = 0;
     sys_memset(param->areas, 0, sizeof(param->areas));
+    index = 0;
     for (habitatIndex = 0; habitatIndex < ZUKAN_HABITAT_COUNT; habitatIndex++) {
         const ZukanHabitatTableEntry *entry = &sZukanHabitats[habitatIndex];
 
@@ -454,7 +464,7 @@ static int ZukanCommon_GetAreaFile(u16 zone) {
     return FILE_NONE;
 }
 
-static u16 *ZukanCommon_CreateSpeciesList(const ZukanHabitatFile *file, PokeDexSave *pokedex, u32 type, u32 season,
+static u16 *ZukanCommon_CreateSpeciesList(const ZukanHabitatFile *file, PokeDexSave *pokedex, u8 type, u8 season,
                                           u16 *total, HeapID heapId) {
     int i = 0;
 

@@ -2420,8 +2420,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `zukan.c` | `0x021acee0`–`0x021ad624` | 19 | complete | string at `0x021ae5a0` |
-| `zukan_common.c` | `0x021ad624`–`0x021adecc` | 20 | partial | string at `0x021ae5a8` |
-| `zukan_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | partial | string at `0x021ae5b8` |
+| `zukan_common.c` | `0x021ad624`–`0x021adecc` | 20 | complete | string at `0x021ae5a8` |
+| `zukan_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | complete | string at `0x021ae5b8` |
 
 ### Overlay 303
 

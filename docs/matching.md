@@ -458,6 +458,10 @@ Same code, other `sp` offsets or frame size.
   (`for (; i < FAN_COUNT; i++)`) and uses a second `u8 j` for the later loops. Repeat a statement-order sweep after a
   type change: in `Mistralton_SetStage` the `u32 count`'s store moved wherever it was written, and the `u8` one
   stays where it is written.
+- A loop counter shared by two loops is split, and its spilled piece takes the lowest slot whatever the declaration
+  order, so a declaration sweep finds nothing until each loop has a counter of its own:
+  `ZukanCommon_BuildHabitatSummary` matched once its counting loop got its own `i`, with `pokedex` declared first
+  and assigned last.
 
 ## Instruction order
 
@@ -1009,6 +1013,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
   written directly as `sys_memset(sys->player, 0, sizeof(...) + PokeParty_GetSaveDataSize())` the zero comes first.
   (Scheduling section; a candidate for a shared inline in `gfl/std.h`.)
+- In `if ((u8)f() != engine->criteria->color)` MWCC loads `engine->criteria` before the call and keeps it in a saved
+  register. Where the original loads the pointer after the call, the call's result was in a local first: the Pokédex
+  search's `ZukanSearchEngine_Step` has `u8 color = PML_PersonalGetParam(...);` and `u8 shape = ...GetShape(...);`
+  before their comparisons (8 bytes larger without them).
 
 ## Branches and block layout
 
