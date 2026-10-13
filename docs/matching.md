@@ -344,6 +344,9 @@ Same instructions, registers swapped.
   themselves matching either way. In the same file the raw display-register masks of `DupFitting_InitGraphics` were
   `GX_SetVisiblePlane(0); GXS_SetVisiblePlane(0);` (the SDK inline's parameter is what holds the zero in a
   register), and `(s32)work->badgeFrame < 45` gives the signed `bge` a `u16` field is otherwise compared without.
+- A spilled `u8` that is reloaded and narrowed at each use can come from a later callee's `u8` parameter, not from
+  the local's own type: the Dream World postman's `func_ov033_02177d78` matched once its callee
+  `func_ov033_021780a4` took `u8 kind` in place of `u32`.
 
 ## Stack slots
 

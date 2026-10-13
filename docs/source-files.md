@@ -372,19 +372,19 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `entree_forest.c` | `0x02176b00`–`0x02176d88` | 5 | partial | descriptive |
+| `entree_forest.c` | `0x02176b00`–`0x02176d88` | 5 | complete | descriptive |
 | `event_funfest_mission.c` | `0x02176d88`–`0x02176ec4` | 2 | complete | descriptive |
 | `entree_forest_first_warp.c` | `0x02176ec4`–`0x02176f90` | 1 | complete | descriptive |
 | `scrcmd_funfest.c` | `0x02176f90`–`0x02177370` | 13 | complete | descriptive |
 | `entralink_warp.c` | `0x02177370`–`0x02177574` | 3 | complete | descriptive |
 | `event_cgear_shutdown.c` | `0x02177574`–`0x021775e8` | 2 | complete | descriptive |
 | `event_phrase_input.c` | `0x021775e8`–`0x02177998` | 6 | complete | descriptive |
-| `pdw_postman.c` | `0x02177998`–`0x02178448` | 47 | partial | string at `0x0217c600` |
+| `pdw_postman.c` | `0x02177998`–`0x02178448` | 47 | complete | string at `0x0217c600` |
 | `scrcmd_field_move.c` | `0x02178448`–`0x021785c4` | 6 | complete | descriptive |
 | `event_sweet_scent.c` | `0x021785c4`–`0x02178908` | 8 | complete | descriptive |
-| `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | partial | descriptive |
-| `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | partial | descriptive |
-| `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | partial | descriptive |
+| `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | complete | descriptive |
+| `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | complete | descriptive |
+| `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | complete | descriptive |
 | `event_dendou_machine.c` | `0x02179664`–`0x02179868` | 8 | complete | descriptive |
 | `event_pc.c` | `0x02179868`–`0x02179b54` | 8 | complete | descriptive |
 | `event_pokemon_center.c` | `0x02179b54`–`0x02179dd4` | 9 | complete | descriptive |
@@ -392,9 +392,9 @@ prints the tables below from the configs and the ROM:
 | `event_abyssal_ruins.c` | `0x02179e98`–`0x02179f04` | 1 | complete | descriptive |
 | `event_dive.c` | `0x02179f04`–`0x0217a1b0` | 7 | complete | descriptive |
 | `field_actor_animation.c` | `0x0217a1b0`–`0x0217a4a0` | 12 | complete | descriptive |
-| `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | partial | string at `0x0217c624` |
+| `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | complete | string at `0x0217c624` |
 | `unity_visitor.c` | `0x0217aa1c`–`0x0217ac70` | 6 | complete | descriptive |
-| `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | partial | string at `0x0217c630` |
+| `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | complete | string at `0x0217c630` |
 | `bsubway_scr.c` | `0x0217b468`–`0x0217c340` | 39 | partial | string at `0x0217c640` |
 
 ### Overlay 34

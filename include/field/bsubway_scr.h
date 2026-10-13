@@ -194,8 +194,6 @@ GameEvent *func_ov012_02166294(GameSystem *gsys);
 GameEvent *func_ov012_0216657c(GameSystem *gsys, u16 index, u16 actorId);
 
 // Overlay 33's bsubway_scr.c
-extern const u8 data_ov033_0217c564[12];
-
 void func_ov033_0217b468(GameSystem *gsys);
 BSubwayScrWork *func_ov033_0217b478(GameSystem *gsys, u16 a1, u16 a2);
 void func_ov033_0217b664(GameSystem *gsys, BSubwayScrWork *bsw);
@@ -240,19 +238,11 @@ void func_ov033_0217c2c4(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 train
 // Function name from swan
 u16 randFFFFFFFFdivFFFF(BSubwayScrWork *bsw);
 
-extern const char data_ov033_0217c640[];
-extern const u8 data_ov033_0217c570[60];
-extern const u8 data_ov033_0217c5ac[10];
-
 // The range of trainer IDs a train's trainers come from, by level
 typedef struct {
     u16 min;
     u16 max;
 } BSubwayTrainerRange;
 
-extern const BSubwayTrainerRange data_ov033_0217c5bc[2];
-extern const BSubwayTrainerRange data_ov033_0217c5c4[3];
-extern const BSubwayTrainerRange data_ov033_0217c5d0[4];
-extern const BSubwayTrainerRange data_ov033_0217c5e0[4];
 
 #endif // POKEBW2_FIELD_BSUBWAY_SCR_H

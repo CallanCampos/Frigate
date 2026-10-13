@@ -41,8 +41,6 @@ struct ChatotEventWork {
     u32 recorded;
 };
 
-extern const ClActorSetup data_ov033_0217c488;
-
 GameEvent *func_ov033_02178ca8(GameSystem *gsys, Field *field, u8 partyIndex);
 GameEventReturnCode func_ov033_02178d10(GameEvent *event, u32 *state, void *data);
 void func_ov033_02178fcc(u32 result, u32 *done);
