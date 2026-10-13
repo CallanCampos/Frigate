@@ -135,6 +135,7 @@ void vecfx_add16(const VecFx16 *a, const VecFx16 *b, VecFx16 *ab);
 
 fx32 FX_Div(fx32 numer, fx32 denom);
 s32 FX_ModS32(s32 numer, s32 denom);
+s32 FX_DivS32(s32 numer, s32 denom);
 fx32 FX_Inv(fx32 x);
 // NitroSDK's FX_Mul as a function, rounding, and FX_Atan2Idx
 fx32 fx_mul_round(fx32 v1, fx32 v2);

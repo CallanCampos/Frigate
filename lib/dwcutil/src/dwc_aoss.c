@@ -1231,12 +1231,14 @@ static u32 Aoss_ReadLe(const u8 *data, int length) {
 
 static int Aoss_ParseWep(const AossRecord *record, AossWepInfo *info) {
     const AossItem *item = record->payload.secure.items;
-    const AossItem *items = item;
+    const AossItem *items;
     char *ssid = info->ssid;
     u8 *key3 = info->key[3];
     u8 *key2 = info->key[2];
     u8 *key1 = info->key[1];
     u8 *key0 = info->key[0];
+
+    items = item;
 
     while (1) {
         u32 length = Net_Ntohs(item->length);
@@ -1305,10 +1307,12 @@ static int Aoss_ParseWep(const AossRecord *record, AossWepInfo *info) {
 }
 
 static int Aoss_ParsePsk(const AossRecord *record, AossPskInfo *info) {
-    const AossItem *items = record->payload.secure.items;
-    const AossItem *item = items;
-    u8 *key = info->key;
+    const AossItem *item = record->payload.secure.items;
+    const AossItem *items;
     char *ssid = info->ssid;
+    u8 *key = info->key;
+
+    items = item;
 
     while (1) {
         u32 length = Net_Ntohs(item->length);
@@ -1343,11 +1347,13 @@ static int Aoss_ParsePsk(const AossRecord *record, AossPskInfo *info) {
         default:
             return -1;
         }
-        if (item->next == 0) {
-            return 0;
+        if (item->next != 0) {
+            item = (const AossItem *)((const u8 *)items + Net_Ntohs(item->next));
+        } else {
+            break;
         }
-        item = (const AossItem *)((const u8 *)items + Net_Ntohs(item->next));
     }
+    return 0;
 }
 
 static int Aoss_ParseKey(const AossRecord *record, u8 *key) {
@@ -1723,9 +1729,8 @@ static u32 Crc32_Update(u32 crc, const u8 *data, int length, int ready, u32 *tab
 
 static void Crc32_MakeTable(int i, u32 *table) {
     for (i = 0; i < 256; i++) {
-        int bit;
         u32 value = i;
-
+        int bit;
         for (bit = 0; bit < 8; bit++) {
             if (value & 1) {
                 value = (value >> 1) ^ 0xedb88320;

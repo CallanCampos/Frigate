@@ -4,14 +4,17 @@
 Run this once after cloning (and again after adding source files), then run `ninja`.
 """
 import argparse
+import hashlib
 import io
 import json
+import os
 import platform
 import shlex
 import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 import tomllib
 import urllib.request
 import zipfile
@@ -27,7 +30,14 @@ VERSIONS = {
     "w2_us": {"sha1": "b5d7490be7b415b8f1e672a53e978a9cc667e56a", "rom": "pokewhite2_us.nds", "defines": ["WHITE2"]},
 }
 
-WIBO_VERSION = "1.2.0"
+# Upstream 1.2.0 predates the guest x87 initialization in decompals/wibo e8f4795.
+# Pin binaries built from upstream 420a75b until an upstream release includes that fix.
+WIBO_REPO = "https://github.com/fuddlesworth/wibo"
+WIBO_VERSION = "pokebw2-fpu-1"
+WIBO_SHA256 = {
+    "wibo-x86_64": "4dfd711b9197c98e54a7e0531b926e9e42096eaee55af03e8a8dae8085da1831",
+    "wibo-macos": "4f1bee058fa9a097917de0576bcb50eebf53e0ff3d3cdc03a036566481293e7c",
+}
 OBJDIFF_VERSION = "v3.8.1"
 # Release binaries of wibo and objdiff-cli for macOS, by (sys.platform, machine); other platforms get the Linux x86-64
 # ones. wibo's macOS build is x86-64 only, and runs under Rosetta 2 on Apple silicon.
@@ -270,12 +280,23 @@ class Writer:
 def download_tools(tools_dir: Path):
     host = (sys.platform, platform.machine().lower())
     wibo = tools_dir / "wibo"
-    if not wibo.exists():
+    binary = WIBO_BINARIES.get(host, "wibo-x86_64")
+    expected_hash = WIBO_SHA256[binary]
+    if not wibo.exists() or hashlib.sha256(wibo.read_bytes()).hexdigest() != expected_hash:
         print(f"Downloading wibo {WIBO_VERSION}")
-        binary = WIBO_BINARIES.get(host, "wibo-x86_64")
-        url = f"https://github.com/decompals/wibo/releases/download/{WIBO_VERSION}/{binary}"
-        urllib.request.urlretrieve(url, wibo)
-        wibo.chmod(wibo.stat().st_mode | stat.S_IEXEC)
+        url = f"{WIBO_REPO}/releases/download/{WIBO_VERSION}/{binary}"
+        with urllib.request.urlopen(url) as response:
+            data = response.read()
+        if hashlib.sha256(data).hexdigest() != expected_hash:
+            raise ValueError(f"Downloaded wibo has an unexpected SHA256: {url}")
+        with tempfile.NamedTemporaryFile(dir=tools_dir, prefix="wibo-", delete=False) as temporary:
+            temporary.write(data)
+            temporary_path = Path(temporary.name)
+        try:
+            temporary_path.chmod(temporary_path.stat().st_mode | stat.S_IEXEC)
+            os.replace(temporary_path, wibo)
+        finally:
+            temporary_path.unlink(missing_ok=True)
 
     objdiff = tools_dir / "objdiff-cli"
     if not objdiff.exists():

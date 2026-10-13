@@ -11,6 +11,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
   Declaring every local first and assigning them below moves both registers and slots (matching.md: "declared first")
+- A pointer needs an earlier slot but a later store: declare it without an initializer and assign it after other
+  pointers, as in `Aoss_ParseWep` and `Aoss_ParsePsk`. (matching.md: "A pointer that must")
 - A `u16` local and `local ± 1` sharing a register can push a parameter out of r0: a wider local keeps them apart.
   (matching.md: "wider local")
 - A ternary store computes the address once, an `if`/`else` store in each branch. (matching.md: "ternary store")
