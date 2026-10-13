@@ -333,17 +333,14 @@ static void UnionEff_StartMark(MarkMan *mark_man, FieldActor *actor, BOOL asonda
 }
 
 static void UnionEff_InitMarkSlot(MarkMan *mark_man, UnionEffSlot *slot, FieldActor *actor, u16 serial, BOOL asonda) {
-    void *res;
-
     sys_memset(slot, 0, sizeof(UnionEffSlot));
     slot->actor = actor;
     slot->serial = serial;
     if (asonda == FALSE) {
-        res = mark_man->res_nsbmd_tomo;
+        slot->model = GFL_G3DMdlCreate(mark_man->res_nsbmd_tomo, 0, mark_man->res_nsbmd_tomo);
     } else {
-        res = mark_man->res_nsbmd_asonda;
+        slot->model = GFL_G3DMdlCreate(mark_man->res_nsbmd_asonda, 0, mark_man->res_nsbmd_asonda);
     }
-    slot->model = GFL_G3DMdlCreate(res, 0, res);
     slot->g3dActor = GFL_G3DActorCreate(slot->model, NULL, 0);
 }
 

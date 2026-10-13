@@ -114,9 +114,9 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
         engine->step = STEP_FILTER;
         break;
     case STEP_FILTER: {
+        u16 total = engine->total;
         u16 i = engine->position;
         u16 end;
-        u16 total = engine->total;
 
         if (i >= total) {
             engine->step = STEP_FINISH;
@@ -189,14 +189,17 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
                 }
             }
             if (engine->criteria->color != CRITERIA_ANY) {
-                if ((u8)PML_PersonalGetParam(engine->personal, 0x21) != engine->criteria->color) {
+                u8 color = PML_PersonalGetParam(engine->personal, 0x21);
+
+                if (color != engine->criteria->color) {
                     engine->excluded[i] = 1;
                     continue;
                 }
             }
             if (engine->criteria->shape != CRITERIA_ANY) {
-                if (ZukanSearchEngine_GetShape(engine->shapes, engine->forms, species, form) !=
-                    engine->criteria->shape) {
+                u8 shape = ZukanSearchEngine_GetShape(engine->shapes, engine->forms, species, form);
+
+                if (shape != engine->criteria->shape) {
                     engine->excluded[i] = 1;
                     continue;
                 }
@@ -205,7 +208,7 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
         break;
     }
     case STEP_FINISH: {
-        u16 found = 0;
+        u16 found;
         u16 i;
         u16 n;
         u16 *result;
@@ -213,6 +216,7 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
         if (engine->personal != NULL) {
             PML_PersonalFree(engine->personal);
         }
+        found = 0;
         for (i = 0; i < engine->total; i++) {
             if (engine->excluded[i] == 0) {
                 found++;
@@ -265,7 +269,7 @@ u32 ZukanSearchEngine_LoadList(u32 type, HeapID heapId, u16 **outList) {
         *outList = list;
         return NATIONAL_COUNT;
     } else {
-        u16 *regionalTable = PML_PersonalLoadRegionalDexTable(heapId, (u32)&size);
+        u16 *regionalTable = PML_PersonalLoadRegionalDexTable(heapId, &size);
         u32 length;
         u16 *national = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ZUKAN_SEARCH, FILE_NATIONAL_ORDER, FALSE, heapId, &length);
         u16 count = length >> 1;

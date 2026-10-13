@@ -224,12 +224,12 @@ static void MysteryCardRes_Clear(MysteryCardRes *res);
 static void MysteryAlbumShake_Init(MysteryAlbumShake *shake, u16 rotation, s32 x, s32 y);
 static BOOL MysteryAlbumShake_Update(MysteryAlbumShake *shake, u16 *rotation, MysteryAlbumPos *pos);
 
-// Not referenced by any code
-const u8 data_ov197_021be610[2] = { 0, 4 };
+// The BG palettes of the main and of the sub screen. No code loads from it: its reads have constant indices
+static const u8 sBgPalTypes[2] = { PALTYPE_MAIN_BG, PALTYPE_SUB_BG };
 
 // The shake's steps
-static const s8 sShakeDirs[11] = { 1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
 static const s8 sShakeFrames[11] = { 2, 3, 3, 2, 2, 1, 1, 1, 0, 0, 10 };
+static const s8 sShakeDirs[11] = { 1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 // The BG palettes of a card's frame by the gift's kind, 5 palettes later for a gift not picked up yet
 static const u32 sCardPalettes[5] = { 0, 0, 1, 2, 2 };
@@ -360,6 +360,11 @@ void MysteryCardView_Delete(MysteryCardView *view) {
     GFL_HeapFree(view);
 }
 
+// The slot of the card under the cursor
+static inline int MysteryCardView_GetSlot(const MysteryCardView *view) {
+    return view->cursor + view->page * 4;
+}
+
 void MysteryCardView_Main(MysteryCardView *view) {
     BOOL shown;
 
@@ -371,8 +376,8 @@ void MysteryCardView_Main(MysteryCardView *view) {
             MysteryAlbum_Close(view->opened);
             view->opened = NULL;
         }
-        if (view->cursor < CURSOR_BACK && MysteryCard_IsUsed(&view->cards[view->cursor + view->page * 4])) {
-            MysteryAlbum_SetVisible(view->albums[view->cursor + view->page * 4], TRUE);
+        if (view->cursor < CURSOR_BACK && MysteryCard_IsUsed(&view->cards[MysteryCardView_GetSlot(view)])) {
+            MysteryAlbum_SetVisible(view->albums[MysteryCardView_GetSlot(view)], TRUE);
             shown = TRUE;
         }
         if (!shown) {
@@ -416,19 +421,19 @@ static void MysteryCardView_LoadGraphics(MysteryCardView *view, HeapID heapId) {
     MysteryCardPos pos;
     ClActorSetup actorSetup;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_MAIN_BG, 0, 0x140, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 1, sBgPalTypes[0], 0, 0x140, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 10, 3, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 17, 3, 0, 0, FALSE, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 10, 1, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 19, 1, 0, 0, FALSE, heapId);
     GFL_BGSysLoadScr(3);
-    GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_SUB_BG, 0, 0x140, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 1, sBgPalTypes[1], 0, 0x140, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 10, 7, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 18, 7, 0, 0, FALSE, heapId);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, 5, PALTYPE_MAIN_BG, 0x1e0, 0x20, heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, 5, PALTYPE_SUB_BG, 0x1e0, 0x20, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 5, sBgPalTypes[0], 0x1e0, 0x20, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, 5, sBgPalTypes[1], 0x1e0, 0x20, heapId);
     GFL_ArcToolFree(arc);
     GFL_BGSysFillChar(1, 0, 1, 0);
     GFL_BGSysFillChar(2, 0, 1, 0);
@@ -549,9 +554,6 @@ static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL lef
     MysteryCard *card = &view->cards[slot];
     MysteryCardPos pos = sCardPositions[index];
     u32 win = index;
-    u8 num;
-    int i;
-    int j;
     ArcTool *arc;
     ClActorSetup actorSetup;
     s16 dx;
@@ -564,13 +566,23 @@ static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL lef
         pos.x += 32;
         pos.winX += 32;
     }
-    num = slot;
-    for (j = 0; j < 2; j++) {
-        for (i = 0; i < 2; i++) {
-            GFL_BGSysFillScrArea(3, num % 3 * 64 + 0x58 + num / 3 * 2 + j * 32 + i, pos.x + i - 2, pos.y + j, 1, 1, 3);
+    {
+        int i;
+        int j;
+
+        for (j = 0; j < 2; j++) {
+            for (i = 0; i < 2; i++) {
+                u8 num = slot;
+
+                GFL_BGSysFillScrArea(3, num % 3 * 64 + 0x58 + num / 3 * 2 + j * 32 + i, pos.x + i - 2, pos.y + j, 1, 1,
+                                     3);
+            }
         }
     }
     if (!MysteryCard_IsUsed(card)) {
+        int i;
+        int j;
+
         for (j = 0; j < 7; j++) {
             for (i = 0; i < 12; i++) {
                 GFL_BGSysFillScrArea(3, 0x180 + j * 32 + i, pos.x + i, pos.y + j, 1, 1, 3);
@@ -580,9 +592,14 @@ static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL lef
         BmpWin_FlushChar(view->windows[win]);
         return;
     }
-    for (j = 0; j < 7; j++) {
-        for (i = 0; i < 12; i++) {
-            GFL_BGSysFillScrArea(3, 0x40 + j * 32 + i, pos.x + i, pos.y + j, 1, 1, 5);
+    {
+        int i;
+        int j;
+
+        for (j = 0; j < 7; j++) {
+            for (i = 0; i < 12; i++) {
+                GFL_BGSysFillScrArea(3, 0x40 + j * 32 + i, pos.x + i, pos.y + j, 1, 1, 5);
+            }
         }
     }
     GFL_BGSysSetScrPaletteNo(3, pos.x, pos.y, 12, 7, MysteryCard_GetFramePalette(card));
@@ -1080,7 +1097,7 @@ static void MysteryCardView_SeqMain(MysterySeq *seq, u32 *state, void *work) {
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     MysterySeq_SetNext(seq, MysteryCardView_SeqExit);
                 }
-            } else if (MysteryCard_IsUsed(&view->cards[view->cursor + view->page * 4])) {
+            } else if (MysteryCard_IsUsed(&view->cards[MysteryCardView_GetSlot(view)])) {
                 func_0204c124(view->arrows[0], FALSE);
                 func_0204c124(view->arrows[1], FALSE);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1108,10 +1125,18 @@ static void MysteryCardView_SeqMain(MysterySeq *seq, u32 *state, void *work) {
         if (dir != 0) {
             pages = MysteryCardView_GetPageCount(view);
             if (dir < 0) {
-                page = view->page != 0 ? view->page - 1 : pages - 1;
+                if (view->page != 0) {
+                    page = view->page - 1;
+                } else {
+                    page = pages - 1;
+                }
                 left = TRUE;
             } else if (dir > 0) {
-                page = view->page < pages - 1 ? view->page + 1 : 0;
+                if (view->page < pages - 1) {
+                    page = view->page + 1;
+                } else {
+                    page = 0;
+                }
                 left = FALSE;
             }
             GFL_SndSEPlay(SEQ_SE_SYS_03);
@@ -1769,21 +1794,19 @@ MysteryAlbum *MysteryAlbum_CreateReceived(MysteryGift *gift, MysteryCardRes *res
         GFL_StrBufFree(fmt);
     }
     if (MysteryCard_GetKind(&album->card) == 1) {
-        HeapID tailHeapId = HEAPID_TAIL(heapId);
-        PartyPkm *pkm = Mystery_CreateGiftPokemon(album->gift, tailHeapId, album->gameData);
-        ArcTool *arc = MakePokeGraArcHandle(tailHeapId);
         MysteryGiftPokemon *poke = (MysteryGiftPokemon *)album->gift;
+        u16 palFile;
+        PartyPkm *pkm = Mystery_CreateGiftPokemon(album->gift, HEAPID_TAIL(heapId), album->gameData);
+        ArcTool *arc = MakePokeGraArcHandle(HEAPID_TAIL(heapId));
 
         album->species = poke->species;
         album->form = poke->form;
         album->isEgg = poke->isEgg;
-        album->palBuf = GFL_G2DIOReadNCLRArc(
-            arc,
-            (u16)GetPokemonPaletteDataNo(GetPokemonGraphicsARCID(), PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL),
-                                         PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL),
-                                         PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL), PokeParty_IsRare(pkm), 0,
-                                         PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL)),
-            &album->pal, album->heapId);
+        palFile = GetPokemonPaletteDataNo(GetPokemonGraphicsARCID(), PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL),
+                                          PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL),
+                                          PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL), PokeParty_IsRare(pkm), 0,
+                                          PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL));
+        album->palBuf = GFL_G2DIOReadNCLRArc(arc, palFile, &album->pal, album->heapId);
         album->charBuf = LoadSingleCellSpindaGraphicsByBoxData(&album->chars, func_0201d624(pkm), 0, album->heapId);
         GFL_HeapFree(pkm);
         GFL_ArcToolFree(arc);
@@ -1918,7 +1941,7 @@ static void MysteryCardRes_LoadBg(const MysteryCardResSetup *setup, MysteryCard 
     arc = GFL_ArcSysCreateFileHandle(ARCID_MYSTERY, heapId);
     GFL_G2DIOLoadArcNCLR(arc, 4, palType, palette * 32, setup->bgPalette * 32, 32, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 13, setup->bg, 0, 0, FALSE, heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, scrFile, setup->bg, 0, 0, FALSE, heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, (u16)scrFile, setup->bg, 0, 0, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(setup->bg, 0, 0, 34, 24, setup->bgPalette);
     GFL_BGSysLoadScr(setup->bg);
     GFL_ArcToolFree(arc);
@@ -1949,11 +1972,17 @@ static void MysteryAlbum_LoadIcon(MysteryAlbum *album, MysteryCardRes *res, Heap
     NNSG2dCharacterData *chars;
     ClActorPos pos;
     u16 *pltt;
+    u32 dst;
     int i;
 
     buf = GFL_G2DIOReadNCLRArc(arc, MysteryCard_GetIconPaletteFile(&album->card), &pal, album->heapId);
-    sys_memcpy(pal->rawData,
-               (void *)((res->vramType == 0 ? HW_OBJ_PLTT : HW_DB_OBJ_PLTT) + res->setup.iconPalette * 32), 0x60);
+    dst = res->setup.iconPalette * 32;
+    if (res->vramType == 0) {
+        dst += HW_OBJ_PLTT;
+    } else {
+        dst += HW_DB_OBJ_PLTT;
+    }
+    sys_memcpy(pal->rawData, (void *)dst, 0x60);
     GFL_HeapFree(buf);
     buf = GFL_G2DIOReadOBJNCGRArc(arc, MysteryCard_GetIconCharFile(&album->card), FALSE, &chars, album->heapId);
     func_0204bab8(res->chars, chars->rawData, 0x200, 0, res->vramType);

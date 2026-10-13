@@ -69,13 +69,13 @@ static u32 GetBarTouchValue(FrameList *list);
 static void GetBarRange(FrameList *list, u8 *top, u8 *bottom);
 
 static BOOL UpdateBar(FrameList *list);
-static void StartDrag(FrameList *list, u8 item);
+static void StartDrag(FrameList *list, u32 item);
 static BOOL UpdateDrag(FrameList *list);
 static BOOL ScrollToTouched(FrameList *list, int item);
 static BOOL StartFlick(FrameList *list);
 static u8 GetBgNo(u8 bg);
-static void DrawItemFrame(FrameList *list, int item, s8 row);
-static void LoadRowScreen(FrameList *list, s8 row, s8 y);
+static void DrawItemFrame(FrameList *list, int item, int row);
+static void LoadRowScreen(FrameList *list, int row, s8 y);
 static void ClearRow(FrameList *list, u8 bg, s8 y);
 static s8 GetOffscreenRowY(FrameList *list, int dir);
 static s8 WrapRow(s8 pos, s8 count, s8 delta);
@@ -143,12 +143,15 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
     }
     list->rowOffset = LIST_SCREEN_ROWS;
     do {
-        list->rowOffset = list->rowOffset - list->setup.layout.rowHeight;
+        list->rowOffset -= list->setup.layout.rowHeight;
     } while (list->rowOffset > 0);
     if (list->setup.touch != NULL) {
         u32 n = 0;
 
-        while (list->setup.touch[n].rect.top != TOUCH_RECT_END) {
+        while (TRUE) {
+            if (list->setup.touch[n].rect.top == TOUCH_RECT_END) {
+                break;
+            }
             n++;
         }
         list->touchRects = GFL_HeapAllocate(list->heapId, (n + 1) * sizeof(TouchRect), FALSE, "frame_list.c", 323);
@@ -307,7 +310,7 @@ static void DrawAll(FrameList *list, BOOL moved) {
             break;
         }
         item--;
-        y = y - list->setup.layout.rowHeight;
+        y -= list->setup.layout.rowHeight;
     }
     list->firstRow = 0;
     while (TRUE) {
@@ -317,7 +320,7 @@ static void DrawAll(FrameList *list, BOOL moved) {
         PrintRow(list, item, y);
         list->firstRow++;
         item++;
-        y = y + list->setup.layout.rowHeight;
+        y += list->setup.layout.rowHeight;
     }
     list->shownRows = list->firstRow;
     if (list->setup.layout.bg2 != 0xff) {
@@ -329,7 +332,7 @@ static void DrawAll(FrameList *list, BOOL moved) {
                 break;
             }
             item--;
-            y = y - list->setup.layout.rowHeight;
+            y -= list->setup.layout.rowHeight;
         }
         list->firstRow2 = 0;
         while (TRUE) {
@@ -339,7 +342,7 @@ static void DrawAll(FrameList *list, BOOL moved) {
             PrintRowOnBg2(list, item, y);
             list->firstRow2++;
             item++;
-            y = y + list->setup.layout.rowHeight;
+            y += list->setup.layout.rowHeight;
         }
         list->shownRows2 = list->firstRow2;
         SetCursorRow(list, list->cursor, 0xff);
@@ -446,7 +449,7 @@ static int KeyEvent(FrameList *list) {
         func_0203d564(FALSE);
         if (list->cursor != 0) {
             list->prevCursor = list->cursor;
-            list->cursor = list->cursor - 1;
+            list->cursor--;
             list->cursorDelay = 8;
             return LIST_EVENT_CURSOR_MOVE;
         }
@@ -461,7 +464,7 @@ static int KeyEvent(FrameList *list) {
         func_0203d564(FALSE);
         if (list->cursor < list->rows - 1) {
             list->prevCursor = list->cursor;
-            list->cursor = list->cursor + 1;
+            list->cursor++;
             list->cursorDelay = 8;
             return LIST_EVENT_CURSOR_MOVE;
         }
@@ -615,9 +618,11 @@ static int HandleEvent(FrameList *list) {
                 list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
             }
             return list->cursor;
-        default:
-            return FRAMELIST_NONE;
+        case LIST_EVENT_BLANK:
+        case LIST_EVENT_NONE:
+            break;
         }
+        return FRAMELIST_NONE;
     }
 }
 
@@ -843,19 +848,24 @@ static void StartBar(FrameList *list, u32 index) {
     // The area around the bar that still follows it
     top = list->barTouch[0].top;
     if (top >= 32) {
-        top = top - 32;
+        list->barTouch[0].top = top - 32;
     } else {
-        top = 0;
+        list->barTouch[0].top = 0;
     }
-    list->barTouch[0].top = top;
     bottom = list->barTouch[0].bottom + 32;
-    bottom = bottom <= 191 ? bottom : 191;
-    list->barTouch[0].bottom = bottom;
+    if (bottom <= 191) {
+        list->barTouch[0].bottom = bottom;
+    } else {
+        list->barTouch[0].bottom = 191;
+    }
     left = list->barTouch[0].left;
     list->barTouch[0].left = left;
     right = list->barTouch[0].right;
-    right = right <= 255 ? right : 255;
-    list->barTouch[0].right = right;
+    if (right <= 255) {
+        list->barTouch[0].right = right;
+    } else {
+        list->barTouch[0].right = 255;
+    }
     list->barTouch[1].top = TOUCH_RECT_END;
     if (!func_0203da84(&x, (u32 *)&list->barTouchY)) {
         list->barTouchY = -1;
@@ -964,12 +974,12 @@ static BOOL UpdateBar(FrameList *list) {
 }
 
 // Starts following a touch that began on an item
-static void StartDrag(FrameList *list, u8 item) {
+static void StartDrag(FrameList *list, u32 item) {
     list->dragState = 0;
     list->dragItem = item;
-    list->flicking = FALSE;
     list->flags.touchFrames = 0;
     list->flickStartY = list->touchY;
+    list->flicking = FALSE;
     list->flickEndY = list->touchY;
     list->state = LIST_STATE_DRAG;
 }
@@ -1045,7 +1055,7 @@ static BOOL UpdateDrag(FrameList *list) {
 // Scrolls toward the item that a drag has moved to
 static BOOL ScrollToTouched(FrameList *list, int item) {
     int diff = list->dragItem - item;
-    int step;
+    s8 step;
 
     if ((diff < 0 && list->dragDelta > 0) || (diff > 0 && list->dragDelta < 0)) {
         return FALSE;
@@ -1069,7 +1079,7 @@ static BOOL ScrollToTouched(FrameList *list, int item) {
         step = list->setup.layout.speed[0];
     }
     if (item > list->dragItem) {
-        step = -1 * step;
+        step *= -1;
     }
     {
         u32 available = GetScrollRoom(list, step);
@@ -1088,16 +1098,16 @@ static BOOL ScrollToTouched(FrameList *list, int item) {
 
 // Keeps scrolling after a flick, as far and as fast as it was
 static BOOL StartFlick(FrameList *list) {
-    int diff;
+    u32 diff;
     u32 i;
-    int step;
+    s8 step;
 
     if ((list->dragDelta < 0 && list->flickEndY > list->flickStartY) ||
         (list->dragDelta > 0 && list->flickEndY < list->flickStartY)) {
         return FALSE;
     }
     diff = list->flickEndY - list->flickStartY;
-    if (diff < 0) {
+    if ((s32)diff < 0) {
         diff = -diff;
     }
     if (diff == 0) {
@@ -1116,7 +1126,7 @@ static BOOL StartFlick(FrameList *list) {
         return FALSE;
     }
     if (list->flickStartY > list->flickEndY) {
-        step = -1 * step;
+        step *= -1;
     }
     {
         u32 available = GetScrollRoom(list, step);
@@ -1162,11 +1172,11 @@ static u8 GetBgNo(u8 bg) {
 }
 
 // Draws an item's frame, with its text, into the row's window
-static void DrawItemFrame(FrameList *list, int item, s8 row) {
+static void DrawItemFrame(FrameList *list, int item, int row) {
     BmpWin *window = list->printWindows[row].window;
     u16 *screen = list->screens[list->items[item].screen];
-    u8 *tiles;
     u8 *pixels;
+    u8 *tiles;
     u8 screenWidth;
     u8 width;
     u8 height;
@@ -1185,10 +1195,8 @@ static void DrawItemFrame(FrameList *list, int item, s8 row) {
     y = BmpWin_GetPosY(window);
     pixels = GFL_BitmapGetPixelData(BmpWin_GetBitmap(window));
     for (j = 0; j < height; j++) {
-        u16 *line = screen + x + (j + y) * screenWidth;
-
         for (i = 0; i < width; i++) {
-            u16 entry = line[i];
+            u16 entry = screen[x + (j + y) * screenWidth + i];
 
             sys_memcpy32(tiles + (entry & 0x3ff) * 32, pixels + (i + j * width) * 32, 32);
         }
@@ -1196,7 +1204,7 @@ static void DrawItemFrame(FrameList *list, int item, s8 row) {
 }
 
 // Puts a row's frame on its BG at y
-static void LoadRowScreen(FrameList *list, s8 row, s8 y) {
+static void LoadRowScreen(FrameList *list, int row, s8 y) {
     u16 *screen = BGWinFrame_GetScreen(list->frames, row);
     u32 bg = BGWinFrame_GetBG(list->frames, row);
     u16 i;
@@ -1236,13 +1244,12 @@ static void ClearRow(FrameList *list, u8 bg, s8 y) {
 
 // Where the row that scrolls in goes
 static s8 GetOffscreenRowY(FrameList *list, int dir) {
-    s8 start = list->setup.layout.y;
-    s8 step = dir * list->setup.layout.rowHeight;
-    s8 pos = start;
+    s8 pos = list->setup.layout.y;
+    s8 step = list->setup.layout.rowHeight * dir;
 
     do {
-        pos = pos + step;
-    } while (pos >= start && pos < LIST_SCREEN_ROWS);
+        pos += step;
+    } while (pos >= list->setup.layout.y && pos < LIST_SCREEN_ROWS);
     return pos + list->bgOffset / 8;
 }
 
@@ -1306,8 +1313,9 @@ void FrameList_SetRowPalette(FrameList *list, u32 row, u32 palette) {
 // Gives the row of the cursor its palette, and the row that it left its own
 static void SetCursorRow(FrameList *list, u16 newCursor, u16 oldCursor) {
     if (oldCursor < list->rows) {
-        FrameList_SetRowPalette(list, oldCursor,
-                                list->screens[list->items[list->scroll + oldCursor].screen][0] >> 12);
+        u16 palette = list->screens[list->items[list->scroll + oldCursor].screen][0] >> 12;
+
+        FrameList_SetRowPalette(list, oldCursor, palette);
     }
     if (newCursor < list->rows && !func_0203d554()) {
         BlinkPalAnm_InitAnime(list->blinkAnm);

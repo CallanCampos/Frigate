@@ -629,6 +629,17 @@ int FMissionAppDraw_CheckTouch(FMissionApp *work) {
 }
 
 // Makes one of the result's messages, gives the player what it says, and starts printing it
+// Sets an item message's count and returns whether the item's name is to be plural
+static inline BOOL FMissionAppDraw_SetCountWord(FMissionApp *work, int count) {
+    BOOL plural = TRUE;
+
+    WordSetNumber(work->wordSet, 2, count, 3, 0, TRUE);
+    if (count == 1) {
+        plural = FALSE;
+    }
+    return plural;
+}
+
 static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int message) {
     const s16 *messages = sFMissionAppDrawMessages;
 
@@ -645,7 +656,6 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *name = GFL_StrBufCreate(64, work->heapId);
         int count;
         int room;
-        BOOL plural;
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
@@ -655,14 +665,9 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         if (count > room) {
             count = room;
         }
-        plural = TRUE;
-        WordSetNumber(work->wordSet, 2, count, 3, 0, TRUE);
-        if (count == 1) {
-            plural = FALSE;
-        }
-        loadItemText(work->wordSet, 1, work->result.item, plural, FALSE);
+        loadItemText(work->wordSet, 1, work->result.item, FMissionAppDraw_SetCountWord(work, count), FALSE);
         work->message = GFL_StrBufCreate(256, work->heapId);
-        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], messages[message]);
+        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
         GFL_WordSetFormatStrbuf(work->wordSet, work->message, format);
         GFL_StrBufFree(name);
         GFL_StrBufFree(format);
@@ -680,7 +685,6 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *name = GFL_StrBufCreate(64, work->heapId);
         int count;
         int room;
-        BOOL plural;
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
@@ -690,12 +694,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         if (count > room) {
             count = room;
         }
-        plural = TRUE;
-        WordSetNumber(work->wordSet, 2, count, 3, 0, TRUE);
-        if (count == 1) {
-            plural = FALSE;
-        }
-        loadItemText(work->wordSet, 1, work->result.item2, plural, FALSE);
+        loadItemText(work->wordSet, 1, work->result.item2, FMissionAppDraw_SetCountWord(work, count), FALSE);
         work->message = GFL_StrBufCreate(256, work->heapId);
         format = GFL_MsgDataLoadStrbufNew(work->msgData[0], Title4_Text_Obtained);
         GFL_WordSetFormatStrbuf(work->wordSet, work->message, format);

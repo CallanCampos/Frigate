@@ -1499,17 +1499,29 @@ static void ZukanHabitat_CheckTypes(ZukanHabitatWork *wk) {
 }
 
 static void ZukanHabitat_HideListButtons(ZukanHabitatWork *wk) {
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_LAND), FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_WATER), FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_FISHING), FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP), FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN), FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SHORTCUT), FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_EXIT), FALSE);
+    ClActor *actor;
+
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_LAND);
+    func_0204c124(actor, FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_WATER);
+    func_0204c124(actor, FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_TAB + TYPE_FISHING);
+    func_0204c124(actor, FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_UP);
+    func_0204c124(actor, FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_AREA_DOWN);
+    func_0204c124(actor, FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SHORTCUT);
+    func_0204c124(actor, FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_EXIT);
+    func_0204c124(actor, FALSE);
     ZukanHabitatGraphic_SetNewMarksVisible(&wk->graphic, FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO), TRUE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT), FALSE);
-    func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT), FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO);
+    func_0204c124(actor, TRUE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_LEFT);
+    func_0204c124(actor, FALSE);
+    actor = ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_SEASON_RIGHT);
+    func_0204c124(actor, FALSE);
 }
 
 static void ZukanHabitat_ShowListButtons(ZukanHabitatWork *wk) {
@@ -1594,9 +1606,11 @@ static u32 ZukanHabitat_GetAward(ZukanHabitatWork *wk) {
 static u32 ZukanHabitat_GetTypeAward(ZukanHabitatWork *wk, u32 type) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
     int done = func_02010cc4(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone), type);
+    u32 *state = area->states;
 
-    if (done < (int)area->states[type]) {
-        return area->states[type];
+    state += type;
+    if (done < (int)*state) {
+        return *state;
     }
     return AWARD_NONE;
 }

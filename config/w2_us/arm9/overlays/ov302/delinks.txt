@@ -11,11 +11,13 @@ src/ov302/zukan.c:
     .data       start:0x021ae5e0 end:0x021ae5e8
 
 src/ov302/zukan_common.c:
+    complete
     .text       start:0x021ad664 end:0x021adf0c
     .rodata     start:0x021ae45c end:0x021ae5b4
     .data       start:0x021ae5e8 end:0x021ae5f8
 
 src/ov302/zukan_search_engine.c:
+    complete
     .text       start:0x021adf0c end:0x021ae41c
     .rodata     start:0x021ae5b4 end:0x021ae5cc
     .data       start:0x021ae5f8 end:0x021ae620

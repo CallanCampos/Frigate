@@ -184,7 +184,7 @@ static void BChoiceMain_CreateActors(BChoiceWork *work, u32 surface, const BChoi
 static s16 BChoiceMain_GetPosition(BChoiceWork *work, u32 index);
 static void BChoiceMain_SetCursorVisible(BChoiceWork *work, u32 unused, int index, BOOL visible);
 static void BChoiceMain_UpdateCursor(BChoiceWork *work, BOOL show, int layout, int choice);
-static void BChoiceMain_SetChoicePalette(BChoiceWork *work, int layout, int choice, s16 palette);
+static void BChoiceMain_SetChoicePalette(BChoiceWork *work, int layout, int choice, int palette);
 static void BChoiceMain_StartFlash(BChoiceWork *work);
 static void BChoiceMain_UpdateFlash(BChoiceWork *work);
 static BOOL BChoiceMain_IsFlashing(BChoiceWork *work);
@@ -627,13 +627,12 @@ static BOOL BChoiceMain_ReadInput(BChoiceWork *work) {
 
 static void BChoiceMain_LoadGraphics(BChoiceWork *work, int layout) {
     int i;
-    u32 heapId = work->param->heapId;
     const BChoicePaletteLoad *paletteLoad = sBChoicePaletteLoads;
     const BChoiceBGLoad *charLoad = sBChoiceCharLoads;
     const BChoiceBGLoad *screenLoad = sBChoiceScreenLoadTables[layout];
-    ArcTool *arc;
+    u32 heapId = work->param->heapId;
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BATTLE_CHOICE, HEAPID_TAIL(heapId));
 
-    arc = GFL_ArcSysCreateFileHandle(ARCID_BATTLE_CHOICE, HEAPID_TAIL(heapId));
     for (i = 0; i < 8; i++) {
         if (paletteLoad->type == 0xff) {
             break;
@@ -770,43 +769,50 @@ static void BChoiceMain_LoadActorResources(BChoiceWork *work) {
 
 static void BChoiceMain_CreateActors(BChoiceWork *work, u32 surface, const BChoiceActorSetup *setups,
                                      const s16 *resources) {
+    int i;
     ClActUnit *unit = work->unit;
     ClActorSetup setup;
-    int i = 0;
 
     sys_memset(&setup, 0, sizeof(ClActorSetup));
+    ClActor **actors = work->actors;
     s16 palette = resources[0];
     s16 chars = resources[1];
     s16 cells = resources[2];
     s16 count = resources[3];
-    ClActor **actors = work->actors;
-    if (count > 0) {
-        do {
-            if (setups->sequence == 0xff) {
-                break;
-            }
-            u32 position = setups->position * 2;
-            s16 x = BChoiceMain_GetPosition(work, position);
-            s16 y = BChoiceMain_GetPosition(work, position + 1);
+    for (i = 0; i < count; i++) {
+        if (setups->sequence == 0xff) {
+            break;
+        }
+        u32 position = setups->position * 2;
+        s16 x = BChoiceMain_GetPosition(work, position);
+        s16 y = BChoiceMain_GetPosition(work, position + 1);
+        BOOL visible;
+        BOOL animated;
 
-            setup.x = x;
-            setup.y = y;
-            setup.sequence = setups->sequence;
-            setup.priority = setups->priority;
-            setup.bgPriority = setups->bgPriority;
-            actors[i] = func_0204c040(unit, work->resources[chars], work->resources[palette], work->resources[cells],
-                                      &setup, surface, work->param->heapId);
-            func_0204c124(actors[i], setups->visible == 1 ? TRUE : FALSE);
-            func_0204c520(actors[i], setups->flags & 1 ? TRUE : FALSE);
-            if (setups->flags & 2) {
-                func_0204c2b0(actors[i], 1, TRUE);
-            }
-            if (setups->flags & 4) {
-                func_0204c2b0(actors[i], 0, TRUE);
-            }
-            setups++;
-            i++;
-        } while (i < count);
+        setup.x = x;
+        setup.y = y;
+        setup.sequence = setups->sequence;
+        setup.priority = setups->priority;
+        setup.bgPriority = setups->bgPriority;
+        actors[i] = func_0204c040(unit, work->resources[chars], work->resources[palette], work->resources[cells],
+                                  &setup, surface, work->param->heapId);
+        visible = FALSE;
+        if (setups->visible == 1) {
+            visible = TRUE;
+        }
+        func_0204c124(actors[i], visible);
+        animated = FALSE;
+        if (setups->flags & 1) {
+            animated = TRUE;
+        }
+        func_0204c520(actors[i], animated);
+        if (setups->flags & 2) {
+            func_0204c2b0(actors[i], 1, TRUE);
+        }
+        if (setups->flags & 4) {
+            func_0204c2b0(actors[i], 0, TRUE);
+        }
+        setups++;
     }
 }
 
@@ -837,24 +843,26 @@ static void BChoiceMain_UpdateCursor(BChoiceWork *work, BOOL show, int layout, i
         for (i = 0; i < ACTOR_COUNT; i++) {
             s16 index = indices[i];
 
-            pos.x = BChoiceMain_GetPosition(work, index * 2);
+            pos.x = BChoiceMain_GetPosition(work, (u32)index * 2);
             pos.y = BChoiceMain_GetPosition(work, index * 2 + 1);
             func_0204c140(work->actors[i], &pos, CLACT_SURFACE_SUB);
         }
     }
 }
 
-static void BChoiceMain_SetChoicePalette(BChoiceWork *work, int layout, int choice, s16 palette) {
-    const BChoiceRect *rect = &sBChoiceChoiceRectTables[layout][choice];
-    s16 x = rect->x;
-    s16 y = rect->y;
-    s16 width = rect->width;
-    s16 height = rect->height;
+static void BChoiceMain_SetChoicePalette(BChoiceWork *work, int layout, int choice, int palette) {
+    s16 pal;
+    const BChoiceRect *rects = sBChoiceChoiceRectTables[layout];
+    s16 x = rects[choice].x;
+    s16 y = rects[choice].y;
+    s16 width = rects[choice].width;
+    s16 height = rects[choice].height;
 
-    if (palette == PALETTE_DEFAULT) {
-        palette = sBChoiceChoicePalettes[choice];
+    pal = palette;
+    if (pal == PALETTE_DEFAULT) {
+        pal = sBChoiceChoicePalettes[choice];
     }
-    GFL_BGSysSetScrPaletteNo(BG_FLASH, x, y, width, height, palette);
+    GFL_BGSysSetScrPaletteNo(BG_FLASH, x, y, width, height, pal);
     GFL_BGSysLoadScr(BG_FLASH);
 }
 

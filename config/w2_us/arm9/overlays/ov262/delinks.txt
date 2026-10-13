@@ -11,6 +11,7 @@ src/ov262/wifibattlematch_graphic.c:
     .data       start:0x021c5fe0 end:0x021c5ffc
 
 src/ov262/wifibattlematch_view.c:
+    complete
     .text       start:0x021c27dc end:0x021c56cc
     .rodata     start:0x021c5ef4 end:0x021c5fa0
     .data       start:0x021c5ffc end:0x021c6014

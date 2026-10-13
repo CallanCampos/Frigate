@@ -21,9 +21,10 @@
 // after the app. It runs one of three screens at a time, the top screen, the list of surveys and a survey's graph,
 // which share the work in research_common.c, and draws the BGs that stay behind all of them
 
-// The pattern's palette cycles: it changes every this many frames, through this many palettes
+// The pattern's palette cycles: it changes every this many frames, through this many palettes, from this one
 #define PATTERN_FRAMES 10
 #define PATTERN_PALETTES 6
+#define PATTERN_PALETTE_FIRST 0
 
 typedef struct {
     HeapID heapId;
@@ -389,8 +390,9 @@ static void ResearchRadar_LoadSubBG(HeapID heapId) {
 }
 
 static void ResearchRadar_AnimateSubBG(ResearchRadarWork *wk) {
-    GFL_BGSysSetScrPaletteNo(RESEARCH_BG_SUB_PATTERN, 0, 0, 32, 24,
-                             ResearchRadar_GetFrames(wk) / PATTERN_FRAMES % PATTERN_PALETTES);
+    GFL_BGSysSetScrPaletteNo(
+        RESEARCH_BG_SUB_PATTERN, 0, 0, 32, 24,
+        (u8)(ResearchRadar_GetFrames(wk) / PATTERN_FRAMES % PATTERN_PALETTES) + PATTERN_PALETTE_FIRST);
     GFL_BGSysLoadScr(RESEARCH_BG_SUB_PATTERN);
 }
 

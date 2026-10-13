@@ -46,9 +46,9 @@ MusItemDrawSys *MusItemDraw_InitSystem(BlActScene *blact, u16 count, HeapID heap
 void MusItemDraw_TermSystem(MusItemDrawSys *sys);
 void MusItemDraw_UpdateSystem(MusItemDrawSys *sys);
 void MusItemDraw_DrawSystem(MusItemDrawSys *sys);
-BOOL MusItemDraw_CanEquipPos(MusItemDraw *item, u8 pos);
-BOOL MusItemDraw_ItemCanEquipPos(MusItemDrawSys *sys, u16 itemId, u8 pos);
-BOOL MusItemDraw_IsItemOfPos(MusItemDrawSys *sys, u16 itemId, u8 pos);
+BOOL MusItemDraw_CanEquipPos(MusItemDraw *item, s32 pos);
+BOOL MusItemDraw_ItemCanEquipPos(MusItemDrawSys *sys, u16 itemId, s32 pos);
+BOOL MusItemDraw_IsItemOfPos(MusItemDrawSys *sys, u16 itemId, s32 pos);
 BOOL MusItemDraw_GetItemFlag7(MusItemDraw *item);
 BOOL MusItemDraw_GetItemFlag9(MusItemDraw *item);
 // The texture of a prop, as a 3D resource

@@ -38,10 +38,10 @@ void MusItemData_GetOffset(MusicalItemData *item, s32 *offset);
 // The BlAct size of its texture
 u32 MusItemData_GetTexSize(MusicalItemData *item);
 // Whether the prop can be worn at a position, by its flags
-BOOL func_ov210_021eef98(MusicalItemData *item, u8 pos);
-BOOL func_ov210_021ef018(MusicalItemData *item, u8 pos);
+BOOL func_ov210_021eef98(MusicalItemData *item, s32 pos);
+BOOL func_ov210_021ef018(MusicalItemData *item, s32 pos);
 // Whether the prop's category is that of a position
-BOOL func_ov210_021ef088(MusicalItemData *item, u8 pos);
+BOOL func_ov210_021ef088(MusicalItemData *item, s32 pos);
 // Its flags 0x80 and 0x200
 BOOL func_ov210_021ef0f4(MusicalItemData *item);
 BOOL func_ov210_021ef104(MusicalItemData *item);

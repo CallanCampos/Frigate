@@ -11,6 +11,6 @@
 
 // The number of things wrong with the gift: unterminated texts, an ID or kind out of range, or a Pokémon that can't be
 // made
-u32 MysteryCheck_CountErrors(const MysteryGiftRecvData *recv, GameData *gameData, HeapID heapId);
+u32 MysteryCheck_CountErrors(MysteryGiftRecvData *recv, GameData *gameData, HeapID heapId);
 
 #endif // POKEBW2_APP_MYSTERY_MYSTERY_CHECK_H

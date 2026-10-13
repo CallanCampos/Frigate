@@ -18,9 +18,9 @@ VCTSettings gVCTSettings;
 void func_02004eb0(const char *signature);
 extern const char func_02005108[];
 
-static int DispatchPacket(int aid, const void *data, int size, VCTEventResult *result);
+static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result);
 
-BOOL VCT_Init(const VCTConfig *config)
+BOOL VCT_Init(VCTConfig *config)
 {
     func_02004eb0(func_02005108);
     if (config == NULL) {
@@ -90,7 +90,7 @@ void VCT_Tick(void)
     }
 }
 
-BOOL VCT_ReceivePacket(u8 aid, const void *data, int size)
+BOOL VCT_ReceivePacket(u8 aid, void *data, int size)
 {
     VCTEventResult result;
 
@@ -108,9 +108,9 @@ BOOL VCT_ReceivePacket(u8 aid, const void *data, int size)
 
 // Hands a packet to the voice or the control side by its type, returning 0 for one that has been dealt with, 1 for
 // one that has given an event and 2 for one that does not belong to the library
-static int DispatchPacket(int aid, const void *data, int size, VCTEventResult *result)
+static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result)
 {
-    const VCTVoicePacket *packet = data;
+    VCTVoicePacket *packet = data;
     u64 now;
     u8 type;
 

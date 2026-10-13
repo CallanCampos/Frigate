@@ -5,6 +5,7 @@
     .bss        start:0x021efc80 end:0x021efc80 kind:bss align:32
 
 src/ov135/wbt_makematch.c:
+    complete
     .text       start:0x021eecc0 end:0x021efc34
     .rodata     start:0x021efc34 end:0x021efc4c
     .data       start:0x021efc60 end:0x021efc80

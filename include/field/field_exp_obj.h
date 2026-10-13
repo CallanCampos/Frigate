@@ -27,7 +27,7 @@ void FieldExpObj_SetAnmFrame(FieldExpObjSystem *system, u16 scene, u16 actor, u1
 // Sets the frames the animation advances per step (swan names the field FrameStep)
 void FieldExpObjAnm_SetFrameStep(FieldExpObjAnm *anm, fx32 step);
 void FieldExpObjAnm_SetPaused(FieldExpObjAnm *anm, u8 paused);
-BOOL func_ov036_021b84ec(FieldExpObjAnm *anm);
+u8 func_ov036_021b84ec(FieldExpObjAnm *anm);
 void FieldExpObjAnm_SetLooped(FieldExpObjAnm *anm, u8 looped);
 BOOL FieldExpObjAnm_IsPlaybackFinished(FieldExpObjAnm *anm);
 u32 func_ov036_021b8520(FieldExpObjSystem *system, u16 scene, u16 actor, u32 value);

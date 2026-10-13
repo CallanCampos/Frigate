@@ -124,7 +124,7 @@ BOOL PStatus_Init(PStatusWork *wk) {
     PStatus_CreateActors(wk);
     wk->vblankTcb = GFL_VBlankTCBAdd(PStatus_VBlank, wk, 8);
     wk->plttAnimPhase = 0;
-    sys_memcpy16((void *)(HW_OBJ_PLTT + 0x6c), wk->cursorPltt, 12);
+    sys_memcpy16((void *)(HW_OBJ_PLTT + 0x6c), wk->cursorPlttSrc, 12);
     sys_memcpy16((void *)(HW_OBJ_PLTT + 0x160), wk->tabPlttSrc, sizeof(wk->tabPlttSrc));
     sys_memcpy16((void *)(HW_OBJ_PLTT + 0x1a0), wk->buttonPltt, sizeof(wk->buttonPltt));
     sys_memcpy16((void *)(HW_OBJ_PLTT + 0x1a0), wk->buttonPlttSrc, sizeof(wk->buttonPlttSrc));
@@ -550,8 +550,8 @@ static void PStatus_CheckTouch(PStatusWork *wk) {
     TouchRect rects[PSTA_BUTTON_COUNT + 1] = {
         { 168, 192, 0, 40 },    { 168, 192, 40, 80 },   { 168, 192, 80, 120 },
         { 168, 192, 120, 144 }, { 168, 192, 144, 168 }, { 168, 192, 168, 192 },
-        { 168, 192, 200, 224 }, { 168, 192, 232, 0 }, // The right edge is 256, which wraps to 0   { TOUCH_RECT_END, 0,
-                                                      // 0, 0 },
+        // The last button's right edge is 256, which wraps to 0
+        { 168, 192, 200, 224 }, { 168, 192, 232, 0 },   { TOUCH_RECT_END, 0, 0, 0 },
     };
 
     wk->touchHit = func_0203da0c(rects);
@@ -730,12 +730,6 @@ static void PStatus_HandleTouch(PStatusWork *wk) {
 static void PStatus_AnimatePalettes(PStatusWork *wk) {
     f32 ratio;
     u8 i;
-    s8 r;
-    s8 g;
-    s8 b;
-    s8 endR;
-    s8 endG;
-    s8 endB;
 
     if (wk->plttAnimPhase + 0x400 >= 0x10000) {
         wk->plttAnimPhase = wk->plttAnimPhase + 0x400 - 0x10000;
@@ -749,6 +743,10 @@ static void PStatus_AnimatePalettes(PStatusWork *wk) {
         ratio = (f32)((FX_SinIdx(wk->plttAnimPhase) + FX32_ONE) / 2) / 4096.0f;
 
         for (i = 0; i < 4; i++) {
+            s8 r;
+            s8 g;
+            s8 b;
+
             r = startColors[i] & GX_RGB_R_MASK;
             g = (startColors[i] & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
             b = (startColors[i] & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT;
@@ -773,11 +771,15 @@ static void PStatus_AnimatePalettes(PStatusWork *wk) {
             if (b > 31) {
                 b = 31;
             }
-            wk->cursorPltt[4 + i] = GX_RGB(r, g, b);
+            wk->cursorPltt[i] = GX_RGB(r, g, b);
         }
-        NNS_GfdRegisterNewVramTransferTask(14, 0x6c, &wk->cursorPltt[4], 8);
+        NNS_GfdRegisterNewVramTransferTask(14, 0x6c, wk->cursorPltt, sizeof(wk->cursorPltt));
     }
     for (i = 0; i < 16; i++) {
+        s8 r;
+        s8 g;
+        s8 b;
+
         r = wk->tabPlttSrc[0][i] & GX_RGB_R_MASK;
         g = (wk->tabPlttSrc[0][i] & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
         b = (wk->tabPlttSrc[0][i] & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT;
@@ -807,12 +809,19 @@ static void PStatus_AnimatePalettes(PStatusWork *wk) {
     NNS_GfdRegisterNewVramTransferTask(14, 0x180, wk->tabPltt, sizeof(wk->tabPltt));
 
     for (i = 12; i <= 14; i++) {
+        s8 r;
+        s8 g;
+        s8 b;
+        s8 endR;
+        s8 endG;
+        s8 endB;
+
         r = wk->buttonPlttSrc[i] & GX_RGB_R_MASK;
         g = (wk->buttonPlttSrc[i] & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
         b = (wk->buttonPlttSrc[i] & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT;
-        endR = r + 10;
-        endG = g + 10;
-        endB = b + 10;
+        endR = (wk->buttonPlttSrc[i] & GX_RGB_R_MASK) + 10;
+        endG = ((wk->buttonPlttSrc[i] & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT) + 10;
+        endB = ((wk->buttonPlttSrc[i] & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT) + 10;
         if (endR > 31) {
             endR = 31;
         }

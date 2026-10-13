@@ -4,6 +4,7 @@
     .bss        start:0x021a3700 end:0x021a3700 kind:bss align:32
 
 src/ov303/zukan_habitat.c:
+    complete
     .text       start:0x0219fbc0 end:0x021a1a80
     .rodata     start:0x021a32d8 end:0x021a356c
 

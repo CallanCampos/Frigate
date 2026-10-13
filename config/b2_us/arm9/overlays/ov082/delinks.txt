@@ -5,6 +5,7 @@
     .bss        start:0x021ebae0 end:0x021ebae0 kind:bss align:32
 
 src/ov082/union_subdisp.c:
+    complete
     .text       start:0x021ea860 end:0x021eb9fc
     .rodata     start:0x021eb9fc end:0x021eba74
     .data       start:0x021eba80 end:0x021ebae0

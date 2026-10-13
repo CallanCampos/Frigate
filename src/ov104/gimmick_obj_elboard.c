@@ -79,7 +79,7 @@ Elboard *func_ov104_021efbd8(ElboardInit *init) {
     return state;
 }
 
-void func_ov104_021efc6c(Elboard *state, ElboardMessageArg *arg) {
+void func_ov104_021efc6c(Elboard *state, const ElboardMessageArg *arg) {
     if (state->capacity > state->count) {
         state->messages[state->count] = func_ov104_021efe88(state, arg, state->count);
         state->count++;
@@ -169,7 +169,7 @@ void func_ov104_021efcfc(Elboard *state, fx32 time) {
     GFL_HeapFree(frames);
 }
 
-ElboardMessage *func_ov104_021efe88(Elboard *state, ElboardMessageArg *arg, u32 index) {
+ElboardMessage *func_ov104_021efe88(Elboard *state, const ElboardMessageArg *arg, u32 index) {
     ElboardMessage *message = GFL_HeapAllocate(state->heapId, sizeof(ElboardMessage), FALSE, "gimmick_obj_elboard.c", 0x17f);
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, arg->messageArc, arg->messageFile, state->heapId);
     StrBuf *text;
@@ -179,6 +179,7 @@ ElboardMessage *func_ov104_021efe88(Elboard *state, ElboardMessageArg *arg, u32 
     s32 start;
     s32 end;
     s32 length;
+    s32 gap;
 
     if (arg->wordSet != NULL) {
         text = GFL_StrBufCreate(0xc0, state->heapId);
@@ -196,8 +197,10 @@ ElboardMessage *func_ov104_021efe88(Elboard *state, ElboardMessageArg *arg, u32 
     start = state->unk04 * 13;
     end = start + width;
     length = end - start;
+    gap = state->unk05 * 13;
+    length += gap;
     message->elapsed = 0;
-    message->triggerTime = FX32_CONST((length + state->unk05 * 13) / 1024.0f);
+    message->triggerTime = FX32_CONST(length / 1024.0f);
     message->triggerTime = FX_Mul(message->triggerTime, frameCount);
     message->duration = FX32_CONST(end / 1024.0f);
     message->duration = FX_Mul(message->duration, frameCount);

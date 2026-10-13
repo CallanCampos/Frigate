@@ -4,5 +4,6 @@
     .bss        start:0x021f1840 end:0x021f1840 kind:bss align:32
 
 src/ov094/gym_mistralton.c:
+    complete
     .text       start:0x021eecc0 end:0x021f0274
     .rodata     start:0x021f0274 end:0x021f1838

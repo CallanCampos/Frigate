@@ -1303,6 +1303,7 @@ static void BadgeView_StartMove(BadgeViewWork *wk, int move) {
     from = sBadgeViewLeaderMoves[half * 4];
     BadgeView_StartValue(wk, 1, from, sBadgeViewLeaderMoves[half * 4 + 1], sBadgeViewLeaderMoves[half * 4 + 3]);
     BadgeView_SetLeadersX(wk, from);
+    half = move / 2;
     from = sBadgeViewModelMoves[half * 4];
     BadgeView_StartValue(wk, 2, from, sBadgeViewModelMoves[half * 4 + 1], sBadgeViewModelMoves[half * 4 + 3]);
     wk->srt.translation.x = from << 8;

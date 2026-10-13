@@ -139,6 +139,7 @@ u32 TDownloadSave_GetEntry(TDownloadWork *wk, const TDownloadTournament *data, i
     int i, j;
     int count;
     const u8 *bits;
+    const u8 *items;
 
     if (kind == 0) {
         bits = data->species;
@@ -156,11 +157,11 @@ u32 TDownloadSave_GetEntry(TDownloadWork *wk, const TDownloadTournament *data, i
             }
         }
     } else if (kind == 1) {
-        bits = data->items;
+        items = data->items;
         count = 0;
         for (i = 0; i < T_DOWNLOAD_ITEM_BYTES; i++) {
             for (j = 0; j < 8; j++) {
-                if (bits[i] & (1 << j)) {
+                if (items[i] & (1 << j)) {
                     count++;
                     if (number == count) {
                         return i * 8 + j;

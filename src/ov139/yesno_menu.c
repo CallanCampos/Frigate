@@ -29,7 +29,7 @@ typedef struct {
 
 TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32 palette, u8 objPalette,
                                    ClActUnit *unit, Font *font, PrintQueue *queue, u32 a8) {
-    TwoChoiceMenu *menu;
+    TwoChoiceMenu *menu = GFL_HeapAllocate(heapId, sizeof(TwoChoiceMenu), FALSE, "yesno_menu.c", 211);
     ArcTool *arc;
     void *file;
     NNSG2dPaletteData *paletteData;
@@ -40,7 +40,6 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
     u8 i;
     u8 j;
 
-    menu = GFL_HeapAllocate(heapId, sizeof(TwoChoiceMenu), FALSE, "yesno_menu.c", 211);
     sys_memset(menu, 0, sizeof(TwoChoiceMenu));
     menu->heapId = heapId;
     menu->unit = unit;

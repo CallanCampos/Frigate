@@ -966,6 +966,8 @@ static void MailBox_RegisterAuthorName(MailBoxWork *work, int unused) {
     MailData *mail = work->view->mails[work->mailIndex];
     StrBuf *name = GFL_StrBufCreate(16, HEAPID_MAILBOX_VIEW);
 
+    // The original fetches the name twice and drops the first result
+    func_02009734(mail);
     GFL_StrBufLoadString(name, func_02009734(mail));
     func_0202437c(work->view->wordSet, 0, name, func_0200974c(mail), 1, 2);
     GFL_StrBufFree(name);

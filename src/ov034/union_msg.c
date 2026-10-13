@@ -13,6 +13,7 @@
 #include "system/bmp_menulist.h"
 #include "system/game_data.h"
 #include "system/pms_word.h"
+#include "system/printsys.h"
 #include "system/wordset.h"
 #include "text/system/0399.h"
 
@@ -604,7 +605,7 @@ static void UnionMsg_FreeWordSet(UnionSystem *unisys)
     }
 }
 
-u8 UnionMsg_GetTableByte(s32 index)
+s32 UnionMsg_GetTableByte(s32 index)
 {
     if (index >= 27) {
         return 0;
@@ -838,7 +839,7 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
     }
 
     for (i = 0; i < 8; i++) {
-        if (ret == (u32)sMenuInfo[i].rows) {
+        if (sMenuInfo[i].rows == (const UnionMenuRow *)ret) {
             *picked = TRUE;
             return i;
         }
@@ -926,19 +927,18 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
 
     for (i = 0; i < 6; i++) {
         RegulationRulesText *rpm;
-        u32 palette;
+        u32 color;
 
         if (okMask & (1 << i)) {
-            palette = 0x41;
+            color = PRINT_COLOR(4, 2, 0);
         } else {
-            palette = 0x11;
+            color = PRINT_COLOR(1, 2, 0);
         }
-        palette <<= 6;
 
         rpm = unisys->alloc.rpm;
-        func_ov036_02188b70(unisys->fldmsgwin, 0, (i * 2 + 4) * 8, rpm->rule[i], palette);
+        func_ov036_02188b70(unisys->fldmsgwin, 0, (i * 2 + 4) * 8, rpm->rule[i], color);
         rpm = unisys->alloc.rpm;
-        func_ov036_02188b70(unisys->fldmsgwin, 0x70, (i * 2 + 4) * 8, rpm->value[i], palette);
+        func_ov036_02188b70(unisys->fldmsgwin, 0x70, (i * 2 + 4) * 8, rpm->value[i], color);
     }
 }
 

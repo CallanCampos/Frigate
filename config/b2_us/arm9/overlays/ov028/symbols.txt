@@ -155,10 +155,10 @@ func_ov028_02172c60 kind:function(thumb,size=0xc) addr:0x02172c60
 Colosseum_SetPlayer kind:function(thumb,size=0x26) addr:0x02172c6c
 data_ov028_02172c94 kind:data(any) addr:0x02172c94
 data_ov028_02172d04 kind:data(any) addr:0x02172d04
-data_ov028_02172db4 kind:data(any) addr:0x02172db4
+sUnionCommands kind:data(any) addr:0x02172db4
 data_ov028_02172db8 kind:data(any) addr:0x02172db8
 data_ov028_02172db9 kind:data(any) addr:0x02172db9
-data_ov028_02172ea4 kind:data(any) addr:0x02172ea4
+sColosseumCommands kind:data(any) addr:0x02172ea4
 data_ov028_02172f20 kind:data(any) addr:0x02172f20
 data_ov028_02172f30 kind:data(any) addr:0x02172f30
 data_ov028_02172f34 kind:data(any) addr:0x02172f34

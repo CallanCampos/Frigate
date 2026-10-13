@@ -151,7 +151,7 @@ data_ov322_021a0762 kind:data(any) addr:0x021a07a2
 data_ov322_021a078c kind:data(any) addr:0x021a07cc
 data_ov322_021a07c4 kind:data(any) addr:0x021a0804
 data_ov322_021a07fc kind:data(any) addr:0x021a083c
-data_ov322_021a0834 kind:data(any) addr:0x021a0874 ambiguous
+PKWD_BOOK_PROC_FUNCTIONS kind:data(any) addr:0x021a0874 ambiguous
 data_ov322_021a0840 kind:data(any) addr:0x021a0880
 data_ov322_021a0880 kind:data(any) addr:0x021a08c0
 data_ov322_021a08c8 kind:data(any) addr:0x021a0908

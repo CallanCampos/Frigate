@@ -399,6 +399,8 @@ void func_ov211_021ef3e4(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameC
     MusicalSave *musical = getMusicalInfoBlkAddress(comm->gameData);
     u8 i;
     u8 j;
+    u32 pokeSize;
+    u32 dataSize;
 
     comm->heapId = heapId;
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
@@ -414,8 +416,10 @@ void func_ov211_021ef3e4(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameC
             GFL_HeapAllocate(comm->heapId, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke), FALSE, "mus_comm_func.c", 526);
         comm->players[i].data = GFL_HeapAllocate(comm->heapId, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), FALSE,
                                         "mus_comm_func.c", 527);
-        sys_memset(comm->players[i].poke, 0, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
-        sys_memset(comm->players[i].data, 0, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize());
+        pokeSize = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
+        sys_memset(comm->players[i].poke, 0, pokeSize);
+        dataSize = PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize();
+        sys_memset(comm->players[i].data, 0, dataSize);
         comm->players[i].musicalId = (u16 *)comm->players[i].data;
         comm->players[i].info = (PlayerInfo *)(comm->players[i].data + 4);
         comm->players[i].pkm = (BoxPkm *)(comm->players[i].data + 4 + PlayerInfo_GetSize());
@@ -483,6 +487,15 @@ static void MusComm_OnNetEnd(void *work) {
     MusCommWork *comm = work;
 
     comm->netEnded = TRUE;
+}
+
+// A random number below range, which is not 0
+static inline u32 MusComm_Random(u32 range) {
+    u64 value = GFL_RandomMT();
+
+    value *= range;
+    value >>= 32;
+    return value;
 }
 
 static void MusComm_Main(MusCommWork *work) {
@@ -644,14 +657,16 @@ static void MusComm_Main(MusCommWork *work) {
         count = 0;
         for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
             if (work->players[i].equipRequested == 1) {
-                requesters[count++] = i;
+                requesters[count] = i;
+                count++;
             }
             requests += work->players[i].equipRequest << (i * 4);
         }
         if (count != 0) {
-            u8 chosen = requesters[GFL_RandomMTRange(count)];
+            u8 chosen = requesters[MusComm_Random(count)];
 
-            if (MusComm_SendMsg(work, MUS_MSG_EQUIPS, requests + (chosen << 16), 0xff) == 1) {
+            requests += chosen << 16;
+            if (MusComm_SendMsg(work, MUS_MSG_EQUIPS, requests, 0xff) == 1) {
                 for (i = 0; i < count; i++) {
                     work->players[requesters[i]].equipRequested = FALSE;
                     work->players[requesters[i]].equipRequest = MUS_COMM_EQUIP_NONE;
@@ -853,20 +868,19 @@ static void MusComm_RecvMsg(int netId, int size, const void *data, void *work_, 
 
 static BOOL MusComm_SendPlayerData(MusCommWork *work) {
     u8 *data;
-    u8 *infoData;
-    u32 infoSize;
+    PlayerInfo *info;
+    BoxPkm *pkm;
 
     if (work->playerData != NULL) {
         GFL_HeapFree(work->playerData);
     }
     data = GFL_HeapAllocate(work->heapId, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), FALSE, "mus_comm_func.c", 1331);
     work->playerData = data;
-    infoSize = PlayerInfo_GetSize();
-    // The musical's id and its padding
-    infoData = data + 4;
+    info = (PlayerInfo *)(data + 4);
+    pkm = (BoxPkm *)(data + 4 + PlayerInfo_GetSize());
     sys_memcpy(&work->musicalId, data, 4);
-    sys_memcpy(work->info, infoData, PlayerInfo_GetSize());
-    sys_memcpy(work->pkm, infoData + infoSize, PML_GetPkmRawSize());
+    sys_memcpy(work->info, info, PlayerInfo_GetSize());
+    sys_memcpy(work->pkm, pkm, PML_GetPkmRawSize());
     return func_02042c18(func_02040440(), 0xff, MUS_COMM_CMD_PLAYER_DATA,
                          PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), work->playerData, 1, FALSE, TRUE);
 }
@@ -903,9 +917,10 @@ static void MusComm_RecvAllPlayerData(int netId, int size, const void *data, voi
 
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
         u8 *src = comm->allPlayerData + i * (PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize());
+        u32 dataSize = PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize();
         BOOL valid;
 
-        sys_memcpy(src, comm->players[i].data, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize());
+        sys_memcpy(src, comm->players[i].data, dataSize);
         valid = func_02008b5c(comm->players[i].info) == 0;
         comm->players[i].joined = valid;
         comm->players[i].hasInfo = valid;
@@ -957,8 +972,9 @@ static BOOL MusComm_SendAllPokes(MusCommWork *work) {
 
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
         u8 *dest = work->allPokeData + i * (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
+        u32 size = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
 
-        sys_memcpy(work->players[i].poke, dest, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
+        sys_memcpy(work->players[i].poke, dest, size);
     }
     return func_02042c18(func_02040414(0xff), 0xff, MUS_COMM_CMD_ALL_POKES,
                          (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke)) * 4, work->allPokeData, 1, FALSE, TRUE);
@@ -972,8 +988,9 @@ static void MusComm_RecvAllPokes(int netId, int size, const void *data, void *wo
 
         if (func_02008b5c(comm->players[i].info) == 0) {
             u8 *src = comm->allPokeData + i * (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
+            u32 pokeSize = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
 
-            sys_memcpy(src, comm->players[i].poke, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
+            sys_memcpy(src, comm->players[i].poke, pokeSize);
             comm->players[i].poke->pkm = (PartyPkm *)(comm->players[i].poke + 1);
             comm->players[i].hasPoke = TRUE;
         } else {
@@ -1064,9 +1081,10 @@ static void MusComm_RecvSoundChunk(int netId, int size, const void *data, void *
     if (comm->soundChunk * MUS_COMM_SOUND_CHUNK_SIZE >= comm->ov210->soundDataSize) {
         u32 *sizes = comm->ov210->soundData;
 
+        // The three sizes, then the three parts
         comm->ov210->sound[0] = sizes + 3;
-        comm->ov210->sound[1] = (u8 *)(comm->ov210->soundData + 3) + sizes[0];
-        comm->ov210->sound[2] = (u8 *)(comm->ov210->soundData + 3) + sizes[0] + sizes[1];
+        comm->ov210->sound[1] = (void *)((u32)(comm->ov210->soundData + 3) + sizes[0]);
+        comm->ov210->sound[2] = (void *)((u32)(comm->ov210->soundData + 3) + sizes[0] + sizes[1]);
     }
 }
 

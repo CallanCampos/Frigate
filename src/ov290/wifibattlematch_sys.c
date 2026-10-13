@@ -7,6 +7,7 @@
 #include "app/ov306.h"
 #include "app/wifi_login.h"
 #include "app/wifibattlematch.h"
+#include "app/wifibattlematch_battle.h"
 #include "app/wifibattlematch_link.h"
 #include "app/wifibattlematch_subproc.h"
 #include "battle/battle_proc.h"
@@ -37,12 +38,6 @@
 #include "system/game_data.h"
 
 #define HEAPID_WIFIBATTLEMATCH 0x56
-// The heap of the proc that runs the battle
-#define HEAPID_WIFIBATTLEMATCH_BATTLE 0x58
-
-// GFLNetInitData.bNetType of an infrared connection
-#define NET_TYPE_IRC 3
-
 // What the chain runs, by the number that WifiBattleMatchSys_ChainSetNext gets
 enum {
     STEP_CHAMPIONSHIP,
@@ -74,7 +69,7 @@ typedef struct {
 
 struct WifiBattleMatchChain {
     GameProcManager *procManager;
-    void *p_param;
+    void *p_proc_param;
     HeapID heapId;
     WifiBattleMatchSys *sys;
     const WifiBattleMatchStep *steps;
@@ -197,29 +192,6 @@ typedef struct {
     u32 unk44;
 } WifiBattleMatchNetParam;
 
-// The players of a battle, with what the ranking needs
-typedef struct {
-    BattlePlayers base;
-    u32 unk50;
-    GameRecords *records;
-} WifiBattleMatchPlayers;
-
-// What the battle step gets
-typedef struct {
-    GameData *gameData;
-    BtlSetup *setup;
-    WifiBattleMatchPlayers *players;
-    u32 result;
-} WifiBattleMatchBattleParam;
-
-// The battle proc's work
-typedef struct {
-    GameProcManager *manager;
-    u32 timer;
-    BOOL ov167Loaded;
-    BOOL commandsSet;
-} WifiBattleMatchBattleWork;
-
 static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL WifiBattleMatchSys_Main(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL WifiBattleMatchSys_Exit(GameProc *proc, u32 *state, void *param, void *work);
@@ -248,8 +220,8 @@ static void WifiBattleMatchSys_FreePlayers(WifiBattleMatchSys *sys);
 static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokeParty *party, PokeParty *otherParty,
                                            WifiBattleMatchPlayer *otherPlayer, Regulation *regulation, u32 unk14,
                                            BtlSetup *setup, WifiBattleMatchBattleResult *battleResult, u32 unk10);
-static void WifiBattleMatchSys_CountAlive(BtlSetup *setup, u8 *own, u8 *other);
-static void WifiBattleMatchSys_GetHpPercents(BtlSetup *setup, u8 *own, u8 *other);
+static void WifiBattleMatchSys_CountAlive(const BtlSetup *setup, u8 *own, u8 *other);
+static void WifiBattleMatchSys_GetHpPercents(const BtlSetup *setup, u8 *own, u8 *other);
 static WifiBattleMatchChain *WifiBattleMatchSys_ChainCreate(const WifiBattleMatchStep *steps, u32 stepCount,
                                                             WifiBattleMatchSys *sys, HeapID heapId);
 static void WifiBattleMatchSys_ChainFree(WifiBattleMatchChain *p_wk);
@@ -258,12 +230,6 @@ static u32 WifiBattleMatchSys_ChainGetResult(WifiBattleMatchChain *chain);
 static u8 WifiBattleMatchSys_ChainGetPrevious(WifiBattleMatchChain *chain);
 static void WifiBattleMatchSys_ChainSetNext(WifiBattleMatchChain *chain, u8 step);
 static void WifiBattleMatchSys_ChainEnd(WifiBattleMatchChain *chain);
-static BOOL WifiBattleMatchSys_BattleProcInit(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL WifiBattleMatchSys_BattleProcExit(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *param, void *work);
-
-static const GameProcFunctions sWifiBattleMatchSysBattleProcFunctions;
-
 const GameProcFunctions WIFIBATTLEMATCH_PROC_FUNCTIONS = {
     WifiBattleMatchSys_Init,
     WifiBattleMatchSys_Main,
@@ -276,7 +242,7 @@ static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
     { OVERLAY_ID(260), &WIFIBATTLEMATCH_LINK_PROC_FUNCTIONS, WifiBattleMatchSys_CreateNetParam, WifiBattleMatchSys_FinishNet },
     { OVERLAY_ID(263), &WIFIBATTLEMATCH_LIST_PROC_FUNCTIONS, WifiBattleMatchSys_CreateListParam,
       WifiBattleMatchSys_FinishList },
-    { OVERLAY_NONE, &sWifiBattleMatchSysBattleProcFunctions, WifiBattleMatchSys_CreateBattleParam, WifiBattleMatchSys_FinishBattle },
+    { OVERLAY_NONE, &WIFIBATTLEMATCH_BATTLE_PROC_FUNCTIONS, WifiBattleMatchSys_CreateBattleParam, WifiBattleMatchSys_FinishBattle },
     { OVERLAY_ID(190), &WIFILOGIN_PROC_FUNCTIONS, WifiBattleMatchSys_CreateLoginParam, WifiBattleMatchSys_FinishLogin },
     { OVERLAY_ID(263), &WIFIBATTLEMATCH_EXCHANGE_PROC_FUNCTIONS, WifiBattleMatchSys_CreateExchangeParam,
       WifiBattleMatchSys_FinishExchange },
@@ -284,12 +250,6 @@ static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
     { OVERLAY_ID(190), &WIFILOGOUT_PROC_FUNCTIONS, WifiBattleMatchSys_CreateLogoutParam,
       WifiBattleMatchSys_FinishLogout },
     { OVERLAY_NONE, &data_ov167_021d6ce0, WifiBattleMatchSys_CreateReplayParam, WifiBattleMatchSys_FinishReplay },
-};
-
-static const GameProcFunctions sWifiBattleMatchSysBattleProcFunctions = {
-    WifiBattleMatchSys_BattleProcInit,
-    WifiBattleMatchSys_BattleProcMain,
-    WifiBattleMatchSys_BattleProcExit,
 };
 
 static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, void *work) {
@@ -646,8 +606,8 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
     BattlePlayer *player;
 
     tournament = getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData));
-    fileId = 0x10;
     param = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchBattleParam), FALSE, "wifibattlematch_sys.c", 992);
+    fileId = 0x10;
     sys_memset(param, 0, sizeof(WifiBattleMatchBattleParam));
     param->gameData = sys->param.gameData;
     clearVSPlayer();
@@ -967,8 +927,7 @@ static void *WifiBattleMatchSys_CreateResultParam(WifiBattleMatchChain *chain, H
     u32 index;
     u32 value;
     int param0D;
-    BOOL flag = TRUE;
-    Regulation *regulation;
+    Regulation *regulation = NULL;
 
     sys_memset(param, 0, sizeof(Ov306Param));
     if (sys->mode == 3) {
@@ -993,16 +952,15 @@ static void *WifiBattleMatchSys_CreateResultParam(WifiBattleMatchChain *chain, H
         battleType = value * 2 + 0x21 + param0D;
     }
     param->gameData = sys->param.gameData;
-    param->unk4 = flag;
+    param->unk4 = TRUE;
     param->unk8 = FALSE;
     param->unk10 = battleType;
     param->unk14 = 0;
-    if (sys->mode != 1) {
-        if (sys->battleResult.unk10 != 0 || sys->battleResult.unk14 != 0) {
-            flag = FALSE;
-        }
+    if (sys->mode == 1) {
+        param->unkC = TRUE;
+    } else {
+        param->unkC = (sys->battleResult.unk10 != 0 || sys->battleResult.unk14 != 0) ? FALSE : TRUE;
     }
-    param->unkC = flag;
     if (func_0200c1d0(sys->otherPlayer->unk44)) {
         param->unk4 = TRUE;
     } else {
@@ -1085,13 +1043,17 @@ static BOOL WifiBattleMatchSys_FinishReplay(WifiBattleMatchChain *chain, void *p
     return TRUE;
 }
 
+static inline void WifiBattleMatchSys_MemClear(void *dest, u32 size) {
+    sys_memset(dest, 0, size);
+}
+
 static void WifiBattleMatchSys_AllocPlayers(WifiBattleMatchSys *sys, HeapID heapId) {
     sys->player = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize(), FALSE,
                                    "wifibattlematch_sys.c", 1836);
-    sys_memset(sys->player, 0, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize());
+    WifiBattleMatchSys_MemClear(sys->player, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize());
     sys->otherPlayer = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize(), FALSE,
                                         "wifibattlematch_sys.c", 1838);
-    sys_memset(sys->otherPlayer, 0, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize());
+    WifiBattleMatchSys_MemClear(sys->otherPlayer, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize());
 }
 
 static void WifiBattleMatchSys_FreePlayers(WifiBattleMatchSys *sys) {
@@ -1146,15 +1108,16 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
     report->unkFlag = Regulation_GetParam(regulation, 0xd);
 }
 
-static void WifiBattleMatchSys_CountAlive(BtlSetup *setup, u8 *own, u8 *other) {
+static void WifiBattleMatchSys_CountAlive(const BtlSetup *setup, u8 *own, u8 *other) {
     int i;
-    u32 client = setup->fieldSituation.unk19 & 1;
+    u32 client;
     u32 index;
     int j;
     int count;
 
     *own = 0;
     *other = 0;
+    client = setup->fieldSituation.unk19 & 1;
     for (i = 0; i <= 1; i++) {
         if ((i & 1) == client) {
             if (client) {
@@ -1184,7 +1147,7 @@ static void WifiBattleMatchSys_CountAlive(BtlSetup *setup, u8 *own, u8 *other) {
     }
 }
 
-static void WifiBattleMatchSys_GetHpPercents(BtlSetup *setup, u8 *own, u8 *other) {
+static void WifiBattleMatchSys_GetHpPercents(const BtlSetup *setup, u8 *own, u8 *other) {
     int i;
     u32 client = setup->fieldSituation.unk19 & 1;
     u32 index;
@@ -1225,7 +1188,7 @@ static WifiBattleMatchChain *WifiBattleMatchSys_ChainCreate(const WifiBattleMatc
 }
 
 static void WifiBattleMatchSys_ChainFree(WifiBattleMatchChain *p_wk) {
-    GFL_ASSERT(p_wk->p_param == NULL);
+    GFL_ASSERT(p_wk->p_proc_param == NULL);
     FreeGameProcManager(p_wk->procManager);
     GFL_HeapFree(p_wk);
 }
@@ -1242,12 +1205,12 @@ static BOOL WifiBattleMatchSys_ChainUpdate(WifiBattleMatchChain *chain) {
     case 1:
         step = &chain->steps[chain->current];
         if (step->create != NULL) {
-            chain->p_param = step->create(chain, chain->heapId, chain->sys);
+            chain->p_proc_param = step->create(chain, chain->heapId, chain->sys);
         } else {
-            chain->p_param = NULL;
+            chain->p_proc_param = NULL;
         }
         QueueGameProc(chain->procManager, chain->steps[chain->current].overlayId,
-                      chain->steps[chain->current].functions, chain->p_param);
+                      chain->steps[chain->current].functions, chain->p_proc_param);
         chain->state = 2;
         break;
     case 2:
@@ -1259,10 +1222,10 @@ static BOOL WifiBattleMatchSys_ChainUpdate(WifiBattleMatchChain *chain) {
     case 3:
         step = &chain->steps[chain->current];
         if (step->finish != NULL) {
-            if (!step->finish(chain, chain->p_param, chain->sys)) {
+            if (!step->finish(chain, chain->p_proc_param, chain->sys)) {
                 break;
             }
-            chain->p_param = NULL;
+            chain->p_proc_param = NULL;
             chain->state = 4;
         } else {
             chain->state = 4;
@@ -1295,241 +1258,4 @@ static void WifiBattleMatchSys_ChainSetNext(WifiBattleMatchChain *chain, u8 step
 
 static void WifiBattleMatchSys_ChainEnd(WifiBattleMatchChain *chain) {
     chain->next = 0xff;
-}
-
-static BOOL WifiBattleMatchSys_BattleProcInit(GameProc *proc, u32 *state, void *param, void *work) {
-    WifiBattleMatchBattleParam *battle = param;
-    WifiBattleMatchBattleWork *wk;
-
-    GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFIBATTLEMATCH_BATTLE, 0x150);
-    wk = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchBattleWork), HEAPID_WIFIBATTLEMATCH_BATTLE);
-    sys_memset(wk, 0, sizeof(WifiBattleMatchBattleWork));
-    battle->result = 0;
-    wk->manager = CreateGameProcManager(HEAPID_WIFIBATTLEMATCH_BATTLE);
-    GFL_SndBGMFadeOut(0x10);
-    return TRUE;
-}
-
-static BOOL WifiBattleMatchSys_BattleProcExit(GameProc *proc, u32 *state, void *param, void *work) {
-    WifiBattleMatchBattleWork *wk = work;
-
-    if (wk->ov167Loaded) {
-        GFL_OvlUnload(OVERLAY_ID(167));
-        wk->ov167Loaded = FALSE;
-    }
-    if (wk->commandsSet) {
-        func_02040c64(0x100);
-        wk->commandsSet = FALSE;
-    }
-    FreeGameProcManager(wk->manager);
-    GFL_ProcReleaseSubsystem(proc);
-    GFL_HeapDelete(HEAPID_WIFIBATTLEMATCH_BATTLE);
-    return TRUE;
-}
-
-static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *param, void *work) {
-    WifiBattleMatchBattleParam *battle = param;
-    WifiBattleMatchBattleWork *wk = work;
-    int running = GFL_ProcMgrUpdate(wk->manager);
-    BOOL queue;
-    int last;
-    u32 first;
-    u32 second;
-    int i;
-    int j;
-    u32 client;
-    u32 source;
-
-    switch (*state) {
-    case 0:
-        GFL_SndBGMPlay(battle->setup->fieldSituation.bgm, SND_CHANNEL_MASK_ALL);
-        battle->players->base.unk44 = 1;
-        QueueGameProc(wk->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
-        running = 2;
-        *state = 1;
-        break;
-    case 1:
-        if (running == TRUE) {
-            break;
-        }
-        *state = 2;
-        break;
-    case 2:
-        GFL_OvlLoad(OVERLAY_ID(167));
-        wk->ov167Loaded = TRUE;
-        func_02040c20(0x100, data_ov167_021d7448, 9, NULL);
-        wk->commandsSet = TRUE;
-        func_02040624(func_02040440(), 0xc8, 0x24);
-        *state = 3;
-        break;
-    case 3:
-        if (func_02040664(func_02040440(), 0xc8, 0x24)) {
-            *state = 4;
-        }
-        break;
-    case 4:
-        QueueGameProc(wk->manager, OVERLAY_NONE, &data_ov167_021d6ce0, battle->setup);
-        running = 2;
-        *state = 5;
-        break;
-    case 5:
-        if (running == TRUE) {
-            break;
-        }
-        *state = 6;
-        break;
-    case 6:
-        *state = 7;
-        break;
-    case 7:
-        func_02040624(func_02040440(), 0xd2, 0x24);
-        wk->timer = 0;
-        *state = 8;
-        break;
-    case 8:
-        if (func_02040664(func_02040440(), 0xd2, 0x24)) {
-            func_02040c64(0x100);
-            wk->commandsSet = FALSE;
-            GFL_OvlUnload(OVERLAY_ID(167));
-            wk->ov167Loaded = FALSE;
-            *state = 9;
-        }
-        if (func_02042788()) {
-            if (func_02042e84()->bNetType == NET_TYPE_IRC) {
-                if (wk->timer++ > 600) {
-                    func_02040c64(0x100);
-                    wk->commandsSet = FALSE;
-                    GFL_OvlUnload(OVERLAY_ID(167));
-                    wk->ov167Loaded = FALSE;
-                    *state = 9;
-                    wk->timer = 0;
-                }
-            }
-        }
-        break;
-    case 9:
-        func_02040624(func_02040440(), 0xd3, 0x24);
-        *state = 10;
-        wk->timer = 0;
-        break;
-    case 10:
-        if (func_02040664(func_02040440(), 0xd3, 0x24)) {
-            *state = 11;
-        }
-        if (func_02042788()) {
-            if (func_02042e84()->bNetType == NET_TYPE_IRC) {
-                if (wk->timer++ > 600) {
-                    *state = 11;
-                    wk->timer = 0;
-                }
-            }
-        }
-        break;
-    case 11:
-        queue = TRUE;
-        if (battle->setup->fieldSituation.unk1a == 0) {
-            battle->players->base.unk44 = 2;
-        } else {
-            battle->players->base.unk44 = 4;
-        }
-        switch (battle->setup->unkA8) {
-        case 1:
-        case 4:
-            battle->players->base.result = 0;
-            break;
-        case 0:
-        case 3:
-            battle->players->base.result = 1;
-            break;
-        case 2:
-            battle->players->base.result = 2;
-            break;
-        case 6:
-            wk->timer = 0;
-            queue = FALSE;
-            *state = 15;
-            break;
-        default:
-            battle->players->base.result = 2;
-            break;
-        }
-        if (battle->setup->fieldSituation.unk1a == 0) {
-            last = 1;
-            first = 0;
-            second = 1;
-        } else {
-            last = 3;
-            first = 0;
-            second = 2;
-        }
-        client = battle->setup->fieldSituation.unk19;
-        for (i = 0; i <= last; i++) {
-            if ((i & 1) == (client & 1)) {
-                if (client & 1) {
-                    source = (i & 2) + 1;
-                } else {
-                    source = i & 2;
-                }
-                for (j = 0; j < 6; j++) {
-                    battle->players->base.players[first + (i >> 1)].order[j] = battle->setup->unkE7[source][j];
-                }
-            } else {
-                if (client & 1) {
-                    source = i & 2;
-                } else {
-                    source = (i & 2) + 1;
-                }
-                for (j = 0; j < 6; j++) {
-                    battle->players->base.players[second + (i >> 1)].order[j] = battle->setup->unkE7[source][j];
-                }
-            }
-        }
-        if (queue) {
-            QueueGameProc(wk->manager, OVERLAY_ID(305), &CommBtlDemoProc, battle->players);
-            running = 2;
-            *state = 12;
-        }
-        break;
-    case 12:
-        if (running == TRUE) {
-            break;
-        }
-        *state = 14;
-        break;
-    case 13:
-        break;
-    case 14:
-        return TRUE;
-    case 15:
-        if (wk->timer++ > 1800) {
-            GFL_NetErrMarkShown();
-            battle->result = 2;
-            return TRUE;
-        }
-        break;
-    }
-    if (func_02042788() && running != TRUE) {
-        if (func_02042e84()->bNetType == NET_TYPE_IRC) {
-            if (GFL_NetErrCheck()) {
-                GFL_NetErrMarkShown();
-                battle->result = 1;
-                return TRUE;
-            }
-        } else {
-            switch (DWCRapCommon_CheckError(TRUE, TRUE)) {
-            case 0:
-                break;
-            case 1:
-            case 2:
-            case 3:
-            default:
-                battle->result = 2;
-                return TRUE;
-            case 4:
-                battle->result = 3;
-                return TRUE;
-            }
-        }
-    }
-    return FALSE;
 }

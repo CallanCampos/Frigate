@@ -276,7 +276,7 @@ void UnionComm_SetSelf(UnionSystem *sys, u32 which, u32 value);
 void UnionGroup_ResetTargets(UnionGroup *group);
 void UnionGroup_Init(UnionSystem *sys, UnionGroup *group);
 // Adds a player to the group's list, and removes one; the entry forms take the player from a beacon heard
-int UnionGroup_AddMember(UnionGroup *group, const u8 *mac, u32 look, u8 gender);
+int UnionGroup_AddMember(UnionGroup *group, const u8 *mac, u8 look, u8 gender);
 void UnionGroup_AddBeaconMember(UnionGroup *group, const UnionBeaconEntry *entry);
 void UnionGroup_RemoveMember(UnionGroup *group, const u8 *mac);
 void UnionGroup_RemoveBeaconMember(UnionGroup *group, const UnionBeaconEntry *entry);

@@ -5,6 +5,12 @@
     .bss        start:0x021fd0c0 end:0x021fd0c0 kind:bss align:32
 
 src/ov290/wifibattlematch_sys.c:
-    .text       start:0x021fb8c0 end:0x021fcfc4
-    .rodata     start:0x021fcfc4 end:0x021fd06c
+    complete
+    .text       start:0x021fb8c0 end:0x021fcb8c
+    .rodata     start:0x021fcfc4 end:0x021fd060
     .data       start:0x021fd080 end:0x021fd0c0
+
+src/ov290/wifibattlematch_battle.c:
+    complete
+    .text       start:0x021fcb8c end:0x021fcfc4
+    .rodata     start:0x021fd060 end:0x021fd06c

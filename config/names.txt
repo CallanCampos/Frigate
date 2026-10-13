@@ -2615,6 +2615,8 @@ overlays/ov028 0x021729e4 Colosseum_Vote
 overlays/ov028 0x02172ac0 Colosseum_StoreChoice
 overlays/ov028 0x02172b8c Colosseum_BuildBattlePlayers
 overlays/ov028 0x02172c6c Colosseum_SetPlayer
+overlays/ov028 0x02172db4 sUnionCommands
+overlays/ov028 0x02172ea4 sColosseumCommands
 overlays/ov029 0x021922c0 InitHardware
 overlays/ov029 0x02192318 MicCallback
 overlays/ov029 0x0219231c StreamCallback
@@ -11221,6 +11223,8 @@ overlays/ov197 0x021bdd1c MysteryNet_OnDwcEvent
 overlays/ov197 0x021bdd34 MysteryCheck_CountErrors
 overlays/ov197 0x021bdd74 MysteryCheck_CountGiftErrors
 overlays/ov197 0x021be328 MYSTERY_GIFT_PROC_FUNCTIONS
+overlays/ov197 0x021be558 sYesNoWindow
+overlays/ov197 0x021be610 sBgPalTypes
 overlays/ov198 0x021b2f80 CommTvtField_SetFunc
 overlays/ov198 0x021b2f84 CommTvtField_SetFuncLine
 overlays/ov198 0x021b2f8c CommTvtField_InitBG
@@ -12769,6 +12773,7 @@ overlays/ov209 0x021c2e98 STA_ACTING_BG1_SETUP
 overlays/ov209 0x021c2eb8 STA_ACTING_BG2_SETUP
 overlays/ov209 0x021c2ed8 STA_ACTING_BG3_SETUP
 overlays/ov209 0x021c2ef8 STA_ACTING_VRAM_CONFIG
+overlays/ov209 0x021c2f6c STA_ACT_AUDIENCE_LAST_COLUMN
 overlays/ov209 0x021c2f6e STA_ACT_AUDIENCE_CHARS
 overlays/ov209 0x021c2f78 STA_ACT_BUTTON_TOUCH_RECTS
 overlays/ov209 0x021c2f84 STA_ACT_SCRIPT_VM_PARAM
@@ -15950,6 +15955,7 @@ overlays/ov262 0x021c5c74 WifiBattleMatchTask_SetFunc
 overlays/ov262 0x021c5c7c WifiBattleMatchTask_End
 overlays/ov262 0x021c5c88 WifiBattleMatchTask_SetReturnSeq
 overlays/ov262 0x021c5c8c WifiBattleMatchTask_ReturnToSeq
+overlays/ov262 0x021c5eb4 sRows
 overlays/ov263 0x021c2560 WifiBattleMatchList_Init
 overlays/ov263 0x021c25f0 WifiBattleMatchList_Exit
 overlays/ov263 0x021c2648 WifiBattleMatchList_Main
@@ -17710,7 +17716,7 @@ overlays/ov290 0x021fcb88 WifiBattleMatchSys_BattleProcExit
 overlays/ov290 0x021fcbcc WifiBattleMatchSys_BattleProcMain
 overlays/ov290 0x021fcf84 WIFIBATTLEMATCH_PROC_FUNCTIONS
 overlays/ov290 0x021fcf90 sWifiBattleMatchSysSteps
-overlays/ov290 0x021fd020 sWifiBattleMatchSysBattleProcFunctions
+overlays/ov290 0x021fd020 WIFIBATTLEMATCH_BATTLE_PROC_FUNCTIONS
 overlays/ov293 0x021a1b20 Demo3D_Init
 overlays/ov293 0x021a1c04 Demo3D_Exit
 overlays/ov293 0x021a1c68 Demo3D_Main
@@ -21772,6 +21778,7 @@ overlays/ov322 0x021a04cc PkwdBookClAct_Free
 overlays/ov322 0x021a04e8 PkwdBookClAct_Update
 overlays/ov322 0x021a04f0 PkwdBookClAct_VBlank
 overlays/ov322 0x021a04f8 PkwdBookClAct_GetUnit
+overlays/ov322 0x021a0834 PKWD_BOOK_PROC_FUNCTIONS
 overlays/ov322 0x021a0a74 sPkwdBookLCDConfig
 overlays/ov322 0x021a0a84 sPkwdBookClActSetup
 overlays/ov322 0x021a0aa0 sPkwdBookVRAMConfig

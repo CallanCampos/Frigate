@@ -62,23 +62,7 @@ static void ItemMenuDisp_Print(ItemMenuWork *work, PrintWindow *window, StrBuf *
 static void ItemMenuDisp_TransferScreen(PrintWindow *window);
 static BOOL ItemMenuDisp_ShowsCount(u8 pocket);
 
-// The priority of each pocket's tab, and its animation sequences when picked and not
-static const u8 sPocketTabPriorities[] = { 14, 12, 10, 12, 16, 16 };
-static const u8 sPocketTabSequences[][2] = { { 9, 4 }, { 8, 3 }, { 6, 1 }, { 7, 2 }, { 5, 0 }, { 11, 10 } };
-
-// Whether each row of the list is dimmed: the rows half off the screen
-static const u8 sRowDimmed[] = { TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE };
-
-static const ClActSysSetup sItemMenuClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 100, 100, 100, 100, 16, 16 };
-
-// Where the pocket tabs slide to
-static ClActorPos sPocketTabPos[] = { { 0, 80 }, { 0, 80 }, { 0, 80 }, { 0, 80 }, { 0, 80 }, { 0, 80 } };
-
-static BGSysVRAMConfig sItemMenuVRAMConfig = {
-    GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
-    GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
-    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
-};
+// Each data table is declared just before the function that first uses it, which gives the original's .rodata order
 
 static void ItemMenuDisp_InitBGs(void) {
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
@@ -292,6 +276,14 @@ static void ItemMenuDisp_LoadPocketTabRes(ItemMenuWork *work, ArcTool *arc) {
     work->pocketTabChr = func_0204b81c(arc, chars, FALSE, 0, work->heapId);
     work->pocketTabCel = func_0204bde0(arc, cells, anims, work->heapId);
 }
+
+static const ClActSysSetup sItemMenuClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 100, 100, 100, 100, 16, 16 };
+
+static BGSysVRAMConfig sItemMenuVRAMConfig = {
+    GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
+    GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
+};
 
 // Sets up the screens and loads the bag's graphics
 void ItemMenuDisp_Init(ItemMenuWork *work) {
@@ -733,6 +725,9 @@ static BOOL ItemMenuDisp_IsFieldMoveTM(u16 item) {
     return FALSE;
 }
 
+// Whether each row of the list is dimmed: the rows half off the screen
+static const u8 sRowDimmed[] = { TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE };
+
 // Draws the list's rows
 void ItemMenuDisp_DrawList(ItemMenuWork *work) {
     s32 i;
@@ -951,6 +946,13 @@ static void ItemMenuDisp_CreateButtons(ItemMenuWork *work) {
         }
     }
 }
+
+// The priority of each pocket's tab, and its animation sequences when picked and not
+static const u8 sPocketTabPriorities[] = { 14, 12, 10, 12, 16, 16 };
+static const u8 sPocketTabSequences[][2] = { { 9, 4 }, { 8, 3 }, { 6, 1 }, { 7, 2 }, { 5, 0 }, { 11, 10 } };
+
+// Where the pocket tabs slide to
+static ClActorPos sPocketTabPos[] = { { 0, 80 }, { 0, 80 }, { 0, 80 }, { 0, 80 }, { 0, 80 }, { 0, 80 } };
 
 // Creates the pocket tabs, left of where they slide in to
 void ItemMenuDisp_CreatePocketTabs(ItemMenuWork *work) {
@@ -1357,7 +1359,7 @@ void ItemMenuDisp_SetListCursorPalette(ItemMenuWork *work, u32 palette) {
             break;
         }
     }
-    func_0204c378(work->rowNames[i], palette, 0);
+    func_0204c378(work->rowNames[i], (u8)palette, 0);
 }
 
 // Lights the lower screen up for the list, or dims it behind a menu

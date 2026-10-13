@@ -43,7 +43,7 @@ static void GFL_G3DCurveAllocPreload(G3DCurve *curve, int count);
 static BOOL GFL_G3DCurveSetLoadBuffer(G3DCurve *curve, int count, void *buffer, int bufferSize);
 static void GFL_G3DCurvePreloadFrames(G3DCurve *curve, fx32 frame);
 
-G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u32 fileId, void *buffer, u32 bufferSize) {
+G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u16 fileId, void *buffer, u32 bufferSize) {
     G3DCurve *curve = GFL_HeapAllocate(heapId, sizeof(G3DCurve), FALSE, "ica_anime.c", 84);
 
     GFL_G3DCurveReset(curve);

@@ -65,8 +65,9 @@ enum {
     FMISSION_APP_MESSAGE_LEVEL,
     FMISSION_APP_MESSAGE_ITEM2,
     FMISSION_APP_MESSAGE_ITEM2_NO_ROOM,
-    // The names of the Entralink's two sides, for the level messages
-    FMISSION_APP_MESSAGE_WHITE,
+    // The names of the Entralink's two sides, for the level messages. These are places in the table of the messages'
+    // texts, which has none for the second item's messages
+    FMISSION_APP_MESSAGE_WHITE = FMISSION_APP_MESSAGE_ITEM2,
     FMISSION_APP_MESSAGE_BLACK,
 };
 

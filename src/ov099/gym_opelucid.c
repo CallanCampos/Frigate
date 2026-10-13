@@ -45,8 +45,20 @@
 #define ANM_MOVE 4
 #define ANM_STATE 5
 
+// The tiers of the gym's state, from the entrance up to the Gym Leader
+typedef enum {
+    TIER_0,
+    TIER_1,
+    TIER_2,
+    TIER_3,
+} OpelucidGymTier;
+
 // The columns of the gym's state: the player's side, or the center
-#define COLUMN_CENTER 2
+typedef enum {
+    COLUMN_LEFT,
+    COLUMN_RIGHT,
+    COLUMN_CENTER,
+} OpelucidGymColumn;
 
 // The directions of a move
 #define DIRECTION_UP 0
@@ -105,7 +117,7 @@ typedef struct {
 typedef struct {
     u8 object;
     FieldActor *actor;
-    u32 frame;
+    s32 frame;
     u32 frameCount;
     G3DCurve *curve;
     OpelucidGymObject *obj;
@@ -366,12 +378,13 @@ static void GymOpelucid_InitObjects(OpelucidGymWork *work) {
     int i;
     int j;
     OpelucidGymObject *obj;
+    OpelucidGymObject *objects = work->objects;
 
     for (i = 0; i < OBJECT_COUNT; i++) {
-        work->objects[i].scene = 0;
-        work->objects[i].actor = i;
-        work->objects[i].expObj = work->expObj;
-        FieldExpObj_SetActorHidden(work->objects[i].expObj, work->objects[i].scene, work->objects[i].actor, FALSE);
+        objects[i].scene = 0;
+        objects[i].actor = i;
+        objects[i].expObj = work->expObj;
+        FieldExpObj_SetActorHidden(objects[i].expObj, objects[i].scene, objects[i].actor, FALSE);
     }
     for (i = 0; i < OBJECT_COUNT; i++) {
         SRTMatrix *matrix;
@@ -401,11 +414,15 @@ static void GymOpelucid_StartMoveAnimations(OpelucidGymWork *work) {
 // The first statue holds the pose of the stage that the state calls for
 static void GymOpelucid_ShowState(OpelucidGymWork *work) {
     OpelucidGymObject *obj = &work->objects[0];
+    OpelucidGymTier tier;
+    OpelucidGymColumn column;
     int stage;
 
     FieldExpObj_SetAnm(obj->expObj, 0, obj->actor, ANM_MOVE, FALSE);
     FieldExpObj_SetAnm(obj->expObj, 0, obj->actor, ANM_STATE, TRUE);
-    stage = GymOpelucid_GetStage(work->eventWork, work->state->tier, work->state->column);
+    tier = work->state->tier;
+    column = work->state->column;
+    stage = GymOpelucid_GetStage(work->eventWork, tier, column);
     FieldExpObj_SetAnmFrame(obj->expObj, 0, obj->actor, ANM_STATE, FX32_CONST(stage));
 }
 
@@ -528,8 +545,9 @@ void GymOpelucid_RefreshVars(GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     OpelucidGymState *state = GimmickState_GetUserData(GameData_GetGimmickState(gameData), GIMMICK_STATE_ID);
-
-    int stage = GymOpelucid_GetStage(eventWork, state->tier, state->column);
+    OpelucidGymTier tier = state->tier;
+    OpelucidGymColumn column = state->column;
+    int stage = GymOpelucid_GetStage(eventWork, tier, column);
 
     GymOpelucid_SetVarsOfStage(stage, eventWork);
 }
@@ -541,9 +559,10 @@ static GameEvent *GymOpelucid_CreateEvent(GameSystem *gsys, u16 direction) {
     OpelucidGymMoveEvent *ev = GameEvent_GetData(event);
     GameData *gameData = GSYS_GetGameData(gsys);
     GimmickState *gimmickState = GameData_GetGimmickState(gameData);
-    OpelucidGymState *state = work->state;
+    OpelucidGymTier tier = work->state->tier;
+    OpelucidGymColumn column = work->state->column;
 
-    ev->step = &sGymOpelucidSteps[state->tier][state->column][direction];
+    ev->step = &sGymOpelucidSteps[tier][column][direction];
     ev->direction = direction;
     ev->work = work;
     ev->field = field;
@@ -598,11 +617,15 @@ static GameEventReturnCode GymOpelucid_MoveEventCallback(GameEvent *event, u32 *
 
         if (tier1 == 1) {
             GameEvent_ChainNext(event, GymOpelucid_CreateButtonEvent(gsys, 1));
-        } else if (tier2 == 1) {
-            GameEvent_ChainNext(event, GymOpelucid_CreateButtonEvent(gsys, 2));
-        } else {
-            GFL_SndSEPlay(SEQ_SE_SW_DRGGYM_07);
+            *state = 3;
+            break;
         }
+        if (tier2 == 1) {
+            GameEvent_ChainNext(event, GymOpelucid_CreateButtonEvent(gsys, 2));
+            *state = 3;
+            break;
+        }
+        GFL_SndSEPlay(SEQ_SE_SW_DRGGYM_07);
         *state = 3;
         break;
     }
@@ -616,6 +639,13 @@ static GameEventReturnCode GymOpelucid_MoveEventCallback(GameEvent *event, u32 *
         return TRUE;
     }
     return FALSE;
+}
+
+// Gives a mover its model and loads the curve it follows
+static inline void GymOpelucid_LoadMoverCurve(OpelucidGymMoveEvent *ev, OpelucidGymMover *mover, u8 object, u16 curve) {
+    mover->object = object;
+    mover->entry = &sCurves[curve];
+    mover->curve = GFL_G3DCurveLoadFileAll(ev->work->heapId, GIMMICK_ARCID, sCurveFiles[mover->entry->file]);
 }
 
 static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
@@ -633,9 +663,7 @@ static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
 
     // The statue that carries the player
     mover = &ev->movers[0];
-    mover->object = 0;
-    mover->entry = &sCurves[ev->step->playerCurve];
-    mover->curve = GFL_G3DCurveLoadFileAll(ev->work->heapId, GIMMICK_ARCID, sCurveFiles[mover->entry->file]);
+    GymOpelucid_LoadMoverCurve(ev, mover, 0, ev->step->playerCurve);
     mover->obj = &ev->work->objects[mover->object];
     mover->frameCount = GFL_G3DCurveGetFrameCount(mover->curve) - 1;
     mover->frame = mover->entry->start;
@@ -650,9 +678,10 @@ static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
     }
     for (j = 0; j < sGymOpelucidActors[mover->object].animationCount; j++) {
         if (j != ANM_STATE) {
+            OpelucidGymObject *obj = mover->obj;
             FieldExpObjAnm *anm;
-            FieldExpObj_SetAnmFrame(mover->obj->expObj, 0, mover->obj->actor, j, FX32_CONST(mover->frame));
-            anm = FieldExpObj_GetAnmInfo(mover->obj->expObj, 0, mover->obj->actor, j);
+            FieldExpObj_SetAnmFrame(obj->expObj, 0, obj->actor, j, FX32_CONST(mover->frame));
+            anm = FieldExpObj_GetAnmInfo(obj->expObj, 0, obj->actor, j);
             FieldExpObjAnm_SetPaused(anm, FALSE);
         }
     }
@@ -660,10 +689,10 @@ static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
     // The Veterans' statue and the Veterans that ride it
     step = ev->step;
     if (step->hasMover1 == 1) {
+        int j;
+
         mover = &ev->movers[1];
-        mover->object = step->object;
-        mover->entry = &sCurves[step->curve1];
-        mover->curve = GFL_G3DCurveLoadFileAll(ev->work->heapId, GIMMICK_ARCID, sCurveFiles[mover->entry->file]);
+        GymOpelucid_LoadMoverCurve(ev, mover, step->object, step->curve1);
         mover->obj = &ev->work->objects[mover->object];
         mover->frameCount = GFL_G3DCurveGetFrameCount(mover->curve) - 1;
         mover->frame = mover->entry->start;
@@ -677,20 +706,20 @@ static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
             func_ov036_021b82ac(mover->obj->expObj, 0, -FX32_ONE);
         }
         for (j = 0; j < sGymOpelucidActors[mover->object].animationCount; j++) {
+            OpelucidGymObject *obj = mover->obj;
             FieldExpObjAnm *anm;
-            FieldExpObj_SetAnmFrame(mover->obj->expObj, 0, mover->obj->actor, j, FX32_CONST(mover->frame));
-            anm = FieldExpObj_GetAnmInfo(mover->obj->expObj, 0, mover->obj->actor, j);
+            FieldExpObj_SetAnmFrame(obj->expObj, 0, obj->actor, j, FX32_CONST(mover->frame));
+            anm = FieldExpObj_GetAnmInfo(obj->expObj, 0, obj->actor, j);
             FieldExpObjAnm_SetPaused(anm, FALSE);
         }
     } else {
-        ev->movers[1].done = TRUE;
-        ev->movers[1].curve = NULL;
+        mover = &ev->movers[1];
+        mover->done = TRUE;
+        mover->curve = NULL;
     }
     if (step->hasMover2 == 1) {
         mover = &ev->movers[2];
-        mover->object = step->object;
-        mover->entry = &sCurves[step->curve2];
-        mover->curve = GFL_G3DCurveLoadFileAll(ev->work->heapId, GIMMICK_ARCID, sCurveFiles[mover->entry->file]);
+        GymOpelucid_LoadMoverCurve(ev, mover, step->object, step->curve2);
         mover->obj = NULL;
         mover->frameCount = GFL_G3DCurveGetFrameCount(mover->curve) - 1;
         mover->frame = mover->entry->start;
@@ -702,8 +731,9 @@ static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
             mover->reverse = TRUE;
         }
     } else {
-        ev->movers[2].done = TRUE;
-        ev->movers[2].curve = NULL;
+        mover = &ev->movers[2];
+        mover->done = TRUE;
+        mover->curve = NULL;
     }
 }
 
@@ -793,6 +823,14 @@ static void GymOpelucid_UpdateCamera(OpelucidGymMoveEvent *ev) {
     }
 }
 
+// The length of the curve that a mover plays
+static int GymOpelucid_GetMoverLength(OpelucidGymMover *mover) {
+    if (mover->reverse == 0) {
+        return mover->entry->end - mover->entry->start;
+    }
+    return mover->entry->start - mover->entry->end;
+}
+
 static void GymOpelucid_ShakeCamera(Field *field) {
     FieldCameraShakeSetup setup;
     FieldTask *task;
@@ -805,14 +843,6 @@ static void GymOpelucid_ShakeCamera(Field *field) {
     setup.mode = 1;
     task = FieldCameraShakeTask_Create(field, &setup);
     FieldTaskManager_AddTask(Field_GetTaskManager(field), task, 0);
-}
-
-// The length of the curve that a mover plays
-static int GymOpelucid_GetMoverLength(OpelucidGymMover *mover) {
-    if (mover->reverse == 0) {
-        return mover->entry->end - mover->entry->start;
-    }
-    return mover->entry->start - mover->entry->end;
 }
 
 static void GymOpelucid_PlayEndSounds(OpelucidGymMoveEvent *ev) {
@@ -855,8 +885,8 @@ static void GymOpelucid_AdvanceMover(OpelucidGymMover *mover) {
 
 static void GymOpelucid_UpdateOtherMovers(OpelucidGymMoveEvent *ev) {
     int j;
-    OpelucidGymMover *mover2 = &ev->movers[2];
     OpelucidGymMover *mover1 = &ev->movers[1];
+    OpelucidGymMover *mover2 = &ev->movers[2];
     const OpelucidGymStep *step = ev->step;
 
     if (step->hasMover1 == 1) {
@@ -896,6 +926,8 @@ static void GymOpelucid_UpdateActorMover(OpelucidGymMover *mover) {
 
 // The statues are at their new place: the column or tier of the state
 static void GymOpelucid_MoveState(OpelucidGymMoveEvent *ev) {
+    OpelucidGymTier tier;
+    OpelucidGymColumn column;
     int stage;
 
     if (ev->direction == DIRECTION_UP) {
@@ -904,18 +936,20 @@ static void GymOpelucid_MoveState(OpelucidGymMoveEvent *ev) {
         ev->state->tier--;
     } else if (ev->direction == DIRECTION_LEFT) {
         if (ev->state->column == COLUMN_CENTER) {
-            ev->state->column = 0;
+            ev->state->column = COLUMN_LEFT;
         } else {
             ev->state->column = COLUMN_CENTER;
         }
     } else if (ev->direction == DIRECTION_RIGHT) {
         if (ev->state->column == COLUMN_CENTER) {
-            ev->state->column = 1;
+            ev->state->column = COLUMN_RIGHT;
         } else {
             ev->state->column = COLUMN_CENTER;
         }
     }
-    stage = GymOpelucid_GetStage(ev->eventWork, ev->state->tier, ev->state->column);
+    tier = ev->state->tier;
+    column = ev->state->column;
+    stage = GymOpelucid_GetStage(ev->eventWork, tier, column);
     GymOpelucid_SetVarsOfStage(stage, ev->eventWork);
 }
 

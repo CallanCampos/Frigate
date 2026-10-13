@@ -28,8 +28,11 @@ static const u32 sRibbonParams[15] = {
 
 // The Pokémon of a Pokémon gift, as overlay 12's func_ov012_02153160 makes it. NULL when the gift's Pokémon is not
 // valid
-static inline PartyPkm *Mystery_CreateGiftPokemon(MysteryGift *gift, HeapID heapId, GameData *gameData) {
-    MysteryGiftPokemon *poke = (MysteryGiftPokemon *)gift;
+static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapID heapId, GameData *gameData) {
+    const MysteryGiftPokemon *poke = (const MysteryGiftPokemon *)gift;
+    // The copy keeps a computed heap ID, such as a tail heap, in a slot of its own before the other locals, as the
+    // original's callers in overlay 197 have it
+    HeapID heap = heapId;
     u16 level = poke->level;
     u32 trainerId = poke->trainerId;
     u32 species = poke->species;
@@ -90,7 +93,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(MysteryGift *gift, HeapID heap
             stats[i] = GFL_RandomLC(32);
         }
     }
-    pkm = PokeParty_NewTempPkm(species, level, trainerId, heapId);
+    pkm = PokeParty_NewTempPkm(species, level, trainerId, heap);
     ivs = (stats[0] & 0x1f) | ((stats[1] & 0x1f) << 5) | ((stats[2] & 0x1f) << 10) | ((stats[3] & 0x1f) << 15) |
           ((stats[4] & 0x1f) << 20) | ((stats[5] & 0x1f) << 25);
     if (abilityType == 4) {
@@ -258,7 +261,7 @@ static inline u16 Mystery_GetGiftPassPower(const MysteryGift *gift) {
 }
 
 // The one-shot power of a gift of kind 4, as overlay 33's func_ov033_021782d0 reads it
-static inline u8 Mystery_GetGiftOneShotPower(const MysteryGift *gift) {
+static inline u32 Mystery_GetGiftOneShotPower(const MysteryGift *gift) {
     s32 value;
 
     if (gift->kind != 4) {

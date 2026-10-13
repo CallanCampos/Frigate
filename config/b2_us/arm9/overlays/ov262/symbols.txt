@@ -92,7 +92,7 @@ data_ov262_021c5cf8 kind:data(any) addr:0x021c5cf8
 data_ov262_021c5d08 kind:data(any) addr:0x021c5d08
 data_ov262_021c5d24 kind:data(any) addr:0x021c5d24
 data_ov262_021c5d54 kind:data(any) addr:0x021c5d54
-WifiBattleMatchView_Unk021C5EB4 kind:data(any) addr:0x021c5eb4
+sRows kind:data(any) addr:0x021c5eb4
 data_ov262_021c5eb6 kind:data(any) addr:0x021c5eb6
 data_ov262_021c5ec6 kind:data(any) addr:0x021c5ec6
 data_ov262_021c5ee6 kind:data(any) addr:0x021c5ee6

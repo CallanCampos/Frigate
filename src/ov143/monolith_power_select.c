@@ -54,6 +54,13 @@
 #define MONOLITH_POWER_LIST_MAX 66
 #define PASS_POWER_COUNT 64
 
+// A pass power's number. The loop over them in MonolithPower_CreateList checks its bound before the first pass, which
+// MWCC only keeps for a counter of an enum type, so the pass powers were numbered by an enum; high_link.h has none yet
+typedef enum {
+    MONOLITH_POWER_ID_FIRST,
+    MONOLITH_POWER_ID_COUNT = PASS_POWER_COUNT,
+} MonolithPowerId;
+
 // What CheckPassPowerUnlocked returns for a pass power that isn't shown
 #define PASS_POWER_LOCKED 2
 
@@ -179,7 +186,7 @@ static void MonolithPower_DeleteArrows(MonolithPowerWork *mpw);
 static void MonolithPower_UpdateArrows(MonolithPowerWork *mpw);
 static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *mpw);
 static BOOL MonolithPower_SetCursor(MonolithPowerWork *mpw, int index, u32 by);
-static void MonolithPower_SetRowPalette(MonolithPowerWork *mpw, int index, u8 palette);
+static void MonolithPower_SetRowPalette(MonolithPowerWork *mpw, int index, int palette);
 static void MonolithPower_HighlightRow(MonolithPowerWork *mpw, int index);
 static void MonolithPower_UnhighlightRow(MonolithPowerWork *mpw, int index);
 static void MonolithPower_UnhighlightPrevRow(MonolithPowerWork *mpw);
@@ -322,10 +329,10 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
 
             MonolithPower_ClearMessage(mpw);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            if (func_0203da48()) {
-                MonolithPower_SetCursor(mpw, MONOLITH_POWER_NONE, MONOLITH_POWER_CURSOR_DRAG);
-            } else {
+            if (func_0203da48() == FALSE) {
                 MonolithPower_SetCursor(mpw, 1, MONOLITH_POWER_CURSOR_DRAG);
+            } else {
+                MonolithPower_SetCursor(mpw, MONOLITH_POWER_NONE, MONOLITH_POWER_CURSOR_DRAG);
             }
             visible = TRUE;
             if (func_0203d554() == TRUE) {
@@ -345,7 +352,11 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
         hit = func_0203da0c(sMonolithPowerTouchRects);
         if (hit == 0 || (pressed & PAD_BUTTON_B)) {
             MonolithTool_PressReturnButton(&mpw->returnButton);
-            func_0203d564(hit == 0 ? TRUE : FALSE);
+            if (hit == 0) {
+                func_0203d564(TRUE);
+            } else {
+                func_0203d564(FALSE);
+            }
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             *state = MONOLITH_POWER_SEQ_RETURN;
             break;
@@ -688,6 +699,7 @@ static void MonolithPower_ClearUnusedRows(MonolithPowerWork *mpw) {
 }
 
 static void MonolithPower_CreateList(MonolithScreenParam *screen, MonolithPowerWork *mpw, MonolithWork *wk) {
+    MonolithPowerId power;
     int count = 0;
     PassPowerLevel *levels;
     int i;
@@ -702,10 +714,10 @@ static void MonolithPower_CreateList(MonolithScreenParam *screen, MonolithPowerW
     mpw->states[count] = 1;
     mpw->listBitmaps[count] = GFL_BitmapCreate(23, 2, 0x20, HEAPID_MONOLITH);
     count++;
-    for (i = 0; i < PASS_POWER_COUNT; i++) {
-        unlocked = CheckPassPowerUnlocked(wk->passPowerData, i, levels, screen->param->powerFlags);
+    for (power = 0; power < PASS_POWER_COUNT; power++) {
+        unlocked = CheckPassPowerUnlocked(wk->passPowerData, power, levels, screen->param->powerFlags);
         if (unlocked != PASS_POWER_LOCKED) {
-            mpw->ids[count] = i;
+            mpw->ids[count] = power;
             mpw->states[count] = unlocked;
             mpw->listBitmaps[count] = GFL_BitmapCreate(23, 2, 0x20, HEAPID_MONOLITH);
             count++;
@@ -842,7 +854,6 @@ static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *
         touching = FALSE;
     }
     if (MonolithPower_GetHeldKeys(mpw) & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_KEY_UP | PAD_KEY_DOWN)) {
-        touching = FALSE;
         row = ((mpw->scroll >> 8) + 24) / MONOLITH_POWER_ROW_HEIGHT;
         rem = ((mpw->scroll >> 8) + 24) % MONOLITH_POWER_ROW_HEIGHT;
         mpw->velocity = 0;
@@ -864,7 +875,7 @@ static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             MonolithPower_SetCursor(mpw, mpw->cursor, MONOLITH_POWER_CURSOR_KEYS);
-            func_0203d564(touching);
+            func_0203d564(FALSE);
             if (mpw->states[mpw->cursor] == 0) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             } else {
@@ -872,6 +883,7 @@ static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *
             }
             return TRUE;
         }
+        touching = FALSE;
         if (MonolithPower_GetTypedKeys(mpw) & PAD_KEY_UP) {
             if (rem != 0) {
                 row++;
@@ -929,9 +941,10 @@ static BOOL MonolithPower_Input(MonolithScreenParam *screen, MonolithPowerWork *
                 diff = -diff;
             }
             if (diff < 4) {
-                index = MonolithPower_GetRowAt(mpw, mpw->lastY);
-                if (index != MONOLITH_POWER_NONE) {
+                row = MonolithPower_GetRowAt(mpw, mpw->lastY);
+                if (row != MONOLITH_POWER_NONE) {
                     picked = TRUE;
+                    index = row;
                     if (mpw->states[index] == 0) {
                         GFL_SndSEPlay(SEQ_SE_SELECT1);
                     } else {
@@ -975,19 +988,22 @@ static BOOL MonolithPower_SetCursor(MonolithPowerWork *mpw, int index, u32 by) {
 }
 
 // Sets the palette of a row's background, if the row is on the screen
-static void MonolithPower_SetRowPalette(MonolithPowerWork *mpw, int index, u8 palette) {
+static void MonolithPower_SetRowPalette(MonolithPowerWork *mpw, int index, int palette) {
     int scroll;
     int top;
     int rel;
+    int mod32;
+    int mod64;
 
     if (index != MONOLITH_POWER_NONE) {
         scroll = mpw->scroll >> 8;
         top = scroll / MONOLITH_POWER_ROW_HEIGHT;
+        mod32 = scroll % 32;
+        mod64 = scroll % 64;
         rel = index - top;
         if (rel >= 0 && rel < top + MONOLITH_POWER_ROW_COUNT) {
             GFL_BGSysSetScrPaletteNo(MONOLITH_POWER_BG_LIST, 3,
-                                     (rel * MONOLITH_POWER_ROW_HEIGHT + scroll % 64 - scroll % 32) % 256 / 8, 25, 4,
-                                     palette);
+                                     (rel * MONOLITH_POWER_ROW_HEIGHT + mod64 - mod32) % 256 / 8, 25, 4, palette);
         }
     }
 }
@@ -1190,12 +1206,19 @@ static void MonolithPower_Equip(MonolithScreenParam *screen, MonolithPowerWork *
             mpw->states[index] = 0;
             MonolithPower_RedrawRow(screen, mpw, index);
         }
-    }
-    screen->state->equipped[slot] = passPower;
-    index = MonolithPower_FindPower(mpw, passPower);
-    if (index != -1) {
-        mpw->states[index] = 1;
-        MonolithPower_RedrawRow(screen, mpw, index);
+        screen->state->equipped[slot] = passPower;
+        index = MonolithPower_FindPower(mpw, passPower);
+        if (index != -1) {
+            mpw->states[index] = 1;
+            MonolithPower_RedrawRow(screen, mpw, index);
+        }
+    } else {
+        screen->state->equipped[slot] = passPower;
+        index = MonolithPower_FindPower(mpw, passPower);
+        if (index != -1) {
+            mpw->states[index] = 1;
+            MonolithPower_RedrawRow(screen, mpw, index);
+        }
     }
     MonolithPower_UpdateRows(mpw);
     mpw->rowsChanged = TRUE;

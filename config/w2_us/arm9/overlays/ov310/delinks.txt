@@ -5,6 +5,7 @@
     .bss        start:0x021a78e0 end:0x021a78e0 kind:bss align:32
 
 src/ov310/research_radar.c:
+    complete
     .text       start:0x0219cec0 end:0x0219d400
     .rodata     start:0x021a6888 end:0x021a6928
     .data       start:0x021a7820 end:0x021a782c
@@ -38,6 +39,7 @@ src/ov310/queue.c:
     .data       start:0x021a7890 end:0x021a7898
 
 src/ov310/bg_font.c:
+    complete
     .text       start:0x021a494c end:0x021a4b20
     .data       start:0x021a7898 end:0x021a78a4
 
@@ -61,10 +63,12 @@ src/ov310/percentage.c:
     .data       start:0x021a78bc end:0x021a78cc
 
 src/ov310/palette_anime.c:
+    complete
     .text       start:0x021a6420 end:0x021a6888
     .data       start:0x021a78cc end:0x021a78e0
 
 src/ov310/research_graph.c:
+    complete
     .text       start:0x021a0fa0 end:0x021a43d4
     .rodata     start:0x021a7068 end:0x021a777c
     .data       start:0x021a784c end:0x021a7860

@@ -5,6 +5,7 @@
     .bss        start:0x021a0ca0 end:0x021a0ca0 kind:bss align:32
 
 src/ov322/pkwd_book.c:
+    complete
     .text       start:0x0219ce80 end:0x021a02a8
     .rodata     start:0x021a04fc end:0x021a0a74
     .data       start:0x021a0c40 end:0x021a0c8c

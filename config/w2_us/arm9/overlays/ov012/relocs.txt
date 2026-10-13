@@ -1940,7 +1940,7 @@ from:0x02157a74 kind:thumb_call to:0x02154928 module:overlay(12)
 from:0x02157a86 kind:thumb_call to:0x0203a228 module:main
 from:0x02157a9c kind:thumb_call to:0x02157534 module:overlay(12)
 from:0x02157aac kind:load to:0x0216e248 module:overlay(12)
-from:0x02157ab4 kind:load to:0x0219fbe4 module:overlays(296,316,324)
+from:0x02157ab4 kind:load to:0x0219fbe4 module:overlay(316)
 from:0x02157abe kind:thumb_call to:0x021551c4 module:overlay(12)
 from:0x02157ac4 kind:thumb_call to:0x021551ac module:overlay(12)
 from:0x02157ad6 kind:thumb_call to:0x021551c4 module:overlay(12)

@@ -71,11 +71,11 @@ static const u16 sTrainerLines[78][2] = {
 
 static BOOL WbtBattle_IsDownloadedPokemonUsed(const WbtDownloadedPokemon *pkm);
 static void WbtBattle_MakePartyPkm(PartyPkm *pkm, const WbtDownloadedPokemon *src, HeapID heapId);
-static void WbtBattle_MakeDownloadedParty(PokeParty *party, WbtDownload *download, u8 round, u32 count, HeapID heapId);
+static void WbtBattle_MakeDownloadedParty(PokeParty *party, WbtDownload *download, u32 round, u32 count, HeapID heapId);
 static int WbtBattle_GetRivalTrainerId(GameSystem *gsys);
 static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament, WbtEntrant *entrant, u8 count, HeapID heapId);
 static void WbtBattle_MakeTournamentParty(PokeParty *party, WbtEntrant *entrant, u32 tournament, u8 count, HeapID heapId);
-static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, WbtEntrant *entrant);
+static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, const WbtEntrant *entrant);
 static int WbtBattle_CountRemainingPokemon(PokeParty *party, const u8 *slots);
 static u8 WbtBattle_GetRoundSlot(u32 round);
 static void WbtBattle_SetRoundRemaining(WbtSystem *sys, u32 round, u8 remaining);
@@ -266,19 +266,21 @@ static void WbtBattle_MakePartyPkm(PartyPkm *pkm, const WbtDownloadedPokemon *sr
     PokeParty_RecalcStats(pkm);
 }
 
+static inline WbtDownloadedPokemon *WbtDownload_GetPokemon(WbtDownload *download, u8 round, u8 index) {
+    return &download->trainers[round].pokemon[index];
+}
+
 // Makes a party of the Pokémon of a downloaded tournament's Trainer, in a random order
-static void WbtBattle_MakeDownloadedParty(PokeParty *party, WbtDownload *download, u8 round, u32 count, HeapID heapId) {
+static void WbtBattle_MakeDownloadedParty(PokeParty *party, WbtDownload *download, u32 round, u32 count, HeapID heapId) {
     WbtDownloadedPokemon *used[6];
+    int i;
     int usedCount = 0;
     int limit = download->tournament.unk1;
     PartyPkm *pkm;
-    WbtDownloadedPokemon *candidates;
-    int i;
 
     MI_CpuClear32(used, sizeof(used));
-    candidates = download->trainers[round].pokemon;
     for (i = 0; i < 6; i++) {
-        WbtDownloadedPokemon *candidate = &candidates[(u8)i];
+        WbtDownloadedPokemon *candidate = WbtDownload_GetPokemon(download, round, i);
 
         if (WbtBattle_IsDownloadedPokemonUsed(candidate)) {
             used[usedCount] = candidate;
@@ -370,7 +372,7 @@ static void WbtBattle_MakeTournamentParty(PokeParty *party, WbtEntrant *entrant,
 }
 
 // Makes the party of the player's opponent
-void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, WbtEntrant *opponent) {
+void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, const WbtEntrant *opponent) {
     HeapID heapId = HEAPID_TAIL(sys->heapId);
     u32 count = func_ov055_021e5d7c(sys);
 
@@ -380,7 +382,8 @@ void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, WbtEntrant *o
             TrainerUtil_LoadParty(WbtBattle_GetRivalTrainerId(gsys), sys->partyC0, heapId);
             return;
         }
-        WbtBattle_MakeTournamentParty(sys->partyC0, opponent, func_ov055_021e5ca4(sys), count, heapId);
+        // The getters of wbt_system.c that this reaches don't take a const entrant
+        WbtBattle_MakeTournamentParty(sys->partyC0, (WbtEntrant *)opponent, func_ov055_021e5ca4(sys), count, heapId);
         return;
     case 1:
     case 2:
@@ -391,7 +394,7 @@ void WbtBattle_MakeOpponentParty(WbtSystem *sys, GameSystem *gsys, WbtEntrant *o
     }
 }
 
-static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, WbtEntrant *entrant) {
+static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, const WbtEntrant *entrant) {
     u32 aiFlags = 0;
     u32 flags = entrant->unk6_12;
 
@@ -406,6 +409,12 @@ static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, WbtEntrant *ent
     MI_CpuClear16(trainer->items, sizeof(trainer->items));
     PMSData_Clear(&trainer->unk18);
     PMSData_Clear(&trainer->unk20);
+}
+
+// The two lines that the opponent says in the battle
+static inline void BtlSetup_SetLines(BtlSetup *setup, StrBuf *line1, StrBuf *line2) {
+    setup->unk68 = line1;
+    setup->unk6C = line2;
 }
 
 // The battle of the current round
@@ -425,8 +434,7 @@ BtlSetup *WbtBattle_SetupBattle(WbtSystem *sys, GameSystem *gsys) {
     sys->unk13D8 = GFL_StrBufCreate(0x130, sys->heapId);
     WbtBattle_LoadOpponentLine(sys, 3, sys->unk13D4);
     WbtBattle_LoadOpponentLine(sys, 4, sys->unk13D8);
-    setup->unk68 = sys->unk13D4;
-    setup->unk6C = sys->unk13D8;
+    BtlSetup_SetLines(setup, sys->unk13D4, sys->unk13D8);
     WbtBattle_GetBattleMusic(sys, &setup->fieldSituation.bgm, &setup->fieldSituation.unk12);
     if (func_ov055_021e5ca4(sys) == 3 && sys->download.tournament.unkA8 == 1) {
         setup->fieldSituation.env.bgType = 0x12;

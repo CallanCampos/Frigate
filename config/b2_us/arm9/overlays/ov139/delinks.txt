@@ -19,11 +19,13 @@ src/ov139/ui_scene.c:
     .data       start:0x0219ce20 end:0x0219ce2c
 
 src/ov139/touchbar.c:
+    complete
     .text       start:0x02199aa0 end:0x0219a2a4
     .rodata     start:0x0219cd18 end:0x0219cda4
     .data       start:0x0219ce2c end:0x0219ce38
 
 src/ov139/yesno_menu.c:
+    complete
     .text       start:0x0219a584 end:0x0219af1c
     .rodata     start:0x0219cda4 end:0x0219cde4
     .data       start:0x0219ce44 end:0x0219ce54

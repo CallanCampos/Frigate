@@ -279,7 +279,7 @@ u32 func_ov055_021e5e10(WbtEntrant *entrant);
 u8 func_ov055_021e5e18(WbtEntrant *entrant);
 u32 func_ov055_021e5e20(WbtEntrant *entrant);
 u8 func_ov055_021e5e28(WbtEntrant *entrant);
-u32 func_ov055_021e5e2c(WbtEntrant *entrant);
+u16 func_ov055_021e5e2c(WbtEntrant *entrant);
 u32 func_ov055_021e5e34(WbtEntrant *entrant);
 void func_ov055_021e5e3c(const WbtEntrant *entrant, StrBuf *dest);
 u32 func_ov055_021e5e4c(WbtEntrant *entrant);

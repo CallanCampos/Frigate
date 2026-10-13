@@ -35,7 +35,7 @@ u32 MusItemData_GetTexSize(MusicalItemData *item) {
     return item->texSize;
 }
 
-BOOL func_ov210_021eef98(MusicalItemData *item, u8 pos) {
+BOOL func_ov210_021eef98(MusicalItemData *item, s32 pos) {
     switch (pos) {
     case 0:
     case 1:
@@ -80,7 +80,7 @@ BOOL func_ov210_021eef98(MusicalItemData *item, u8 pos) {
     return FALSE;
 }
 
-BOOL func_ov210_021ef018(MusicalItemData *item, u8 pos) {
+BOOL func_ov210_021ef018(MusicalItemData *item, s32 pos) {
     switch (pos) {
     case 0:
     case 1:
@@ -120,7 +120,7 @@ BOOL func_ov210_021ef018(MusicalItemData *item, u8 pos) {
     return FALSE;
 }
 
-BOOL func_ov210_021ef088(MusicalItemData *item, u8 pos) {
+BOOL func_ov210_021ef088(MusicalItemData *item, s32 pos) {
     switch (pos) {
     case 0:
     case 1:

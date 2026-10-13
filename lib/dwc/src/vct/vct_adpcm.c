@@ -16,12 +16,12 @@ static const s16 sVctAdpcmStepTable[89] = {
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767,
 };
 
-static void DecodeAdpcm4(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
-static void EncodeAdpcm4(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *state);
-static void DecodeAdpcm3(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
-static void EncodeAdpcm3(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *state);
-static void DecodeAdpcm2(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
-static void EncodeAdpcm2(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *state);
+static void DecodeAdpcm4(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
+static void EncodeAdpcm4(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state);
+static void DecodeAdpcm3(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
+static void EncodeAdpcm3(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state);
+static void DecodeAdpcm2(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
+static void EncodeAdpcm2(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state);
 
 // Moves the step index by the adjustment of a code, within the table
 #define ADVANCE_STEP_INDEX(index, adjust) \
@@ -270,7 +270,7 @@ static inline u8 EncodeSample2(VCTAdpcmState *state, s16 input)
 }
 
 // Decodes count bytes of 4-bit codes, two samples to a byte, low nibble first
-static void DecodeAdpcm4(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
+static void DecodeAdpcm4(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
 {
     u32 i;
 
@@ -282,7 +282,7 @@ static void DecodeAdpcm4(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *stat
 }
 
 // Encodes count samples to 4-bit codes
-static void EncodeAdpcm4(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *state)
+static void EncodeAdpcm4(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
 {
     u32 i;
 
@@ -296,7 +296,7 @@ static void EncodeAdpcm4(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *stat
 }
 
 // Decodes groups of three bytes of 3-bit codes, eight samples to a group, the first sample in the top bits
-static void DecodeAdpcm3(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
+static void DecodeAdpcm3(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
 {
     u32 i;
 
@@ -315,7 +315,7 @@ static void DecodeAdpcm3(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *stat
 }
 
 // Encodes count samples to 3-bit codes
-static void EncodeAdpcm3(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *state)
+static void EncodeAdpcm3(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
 {
     u32 i;
 
@@ -339,7 +339,7 @@ static void EncodeAdpcm3(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *stat
 }
 
 // Decodes count bytes of 2-bit codes, four samples to a byte, the first in the low bits
-static void DecodeAdpcm2(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
+static void DecodeAdpcm2(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
 {
     u32 i;
 
@@ -354,7 +354,7 @@ static void DecodeAdpcm2(const u8 *src, s16 *dst, u32 count, VCTAdpcmState *stat
 }
 
 // Encodes count samples to 2-bit codes
-static void EncodeAdpcm2(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *state)
+static void EncodeAdpcm2(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
 {
     u32 i;
 
@@ -370,12 +370,12 @@ static void EncodeAdpcm2(u8 *dst, const s16 *src, u32 count, VCTAdpcmState *stat
 }
 
 // Decodes a packet of ADPCM: the state it starts from, then bytes of codes at the given number of bits a sample
-void VCT_DecodeAdpcm(const u8 *packet, s16 *dst, int size, int bits)
+void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits)
 {
     VCTAdpcmState state;
 
-    state.predictor = ((const VCTAdpcmState *)packet)->predictor;
-    state.stepIndex = ((const VCTAdpcmState *)packet)->stepIndex;
+    state.predictor = ((VCTAdpcmState *)packet)->predictor;
+    state.stepIndex = ((VCTAdpcmState *)packet)->stepIndex;
     switch (bits) {
     case 2:
         DecodeAdpcm2(packet + 4, dst, size - 4, &state);
@@ -390,7 +390,7 @@ void VCT_DecodeAdpcm(const u8 *packet, s16 *dst, int size, int bits)
 }
 
 // Encodes count samples to a packet of ADPCM, which starts with the state before the first sample
-void VCT_EncodeAdpcm(u8 *packet, const s16 *src, int count, VCTAdpcmState *state, int bits)
+void VCT_EncodeAdpcm(u8 *packet, s16 *src, int count, VCTAdpcmState *state, int bits)
 {
     VCTAdpcmState *header = (VCTAdpcmState *)packet;
 

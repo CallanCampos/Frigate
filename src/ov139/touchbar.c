@@ -71,7 +71,7 @@ static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *
 static void TouchBarIcon_Delete(TouchBarIcon *icon);
 static BOOL TouchBarIcon_CheckTouch(TouchBarIcon *icon);
 static BOOL TouchBarIcon_IsAnimEnded(TouchBarIcon *icon);
-static u32 TouchBarIcon_GetId(TouchBarIcon *icon);
+static u32 TouchBarIcon_GetId(const TouchBarIcon *icon);
 static void TouchBarIcon_SetVisible(TouchBarIcon *icon, BOOL visible);
 static void TouchBarIcon_SetActive(TouchBarIcon *icon, BOOL active);
 static void TouchBarIcon_SetSe(TouchBarIcon *icon, u32 se);
@@ -85,15 +85,13 @@ static void TouchBarIcon_OnTouchToggle(TouchBarIcon *icon);
 static void TouchBarIcon_SetActivePress(TouchBarIcon *icon, BOOL active);
 static void TouchBarIcon_SetActiveToggle(TouchBarIcon *icon, BOOL active);
 
-TouchBar *TouchBar_Create(const TouchBarSetup *setup, HeapID heapId) {
-    TouchBar *bar;
+TouchBar *TouchBar_Create(TouchBarSetup *setup, HeapID heapId) {
+    u32 size = setup->count * sizeof(TouchBarIcon) + sizeof(TouchBar);
+    TouchBar *bar = GFL_HeapAllocate(heapId, size, FALSE, "touchbar.c", 291);
+    u32 sub = 0;
     u32 bgScreenType;
     u32 i;
-    u32 size = sizeof(TouchBar) + setup->count * sizeof(TouchBarIcon);
-    u32 sub;
 
-    sub = 0;
-    bar = GFL_HeapAllocate(heapId, size, FALSE, "touchbar.c", 291);
     sys_memset(bar, 0, size);
     bar->count = setup->count;
     bar->state = sub;
@@ -242,7 +240,7 @@ static TouchBarIcon *TouchBar_FindIcon(TouchBar *bar, u32 icon) {
 
     for (i = 0; i < bar->count; i++) {
         if (icon == TouchBarIcon_GetId(&bar->icons[i])) {
-            return bar->icons + i;
+            return &bar->icons[i];
         }
     }
     return NULL;
@@ -390,7 +388,7 @@ static BOOL TouchBarIcon_IsAnimEnded(TouchBarIcon *icon) {
     return FALSE;
 }
 
-static u32 TouchBarIcon_GetId(TouchBarIcon *icon) {
+static u32 TouchBarIcon_GetId(const TouchBarIcon *icon) {
     return icon->item.icon;
 }
 

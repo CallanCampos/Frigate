@@ -781,9 +781,8 @@ static void PkwdRecordMonitor_LoadBG(PkwdRecordMonitorWork *wk) {
     u16 *buffer;
     s32 i;
     s32 page;
+    s32 j;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_RECORD_MONITOR_GRA, wk->heapId);
-    s32 x;
-    s32 y;
 
     for (i = 0; i < LOAD_MAX; i++) {
         if (palette->target == 0xff) {
@@ -812,9 +811,9 @@ static void PkwdRecordMonitor_LoadBG(PkwdRecordMonitorWork *wk) {
     // Gives the three pages of the upper screen's frame their palette
     buffer = GFL_BGSysIsScrHeapExists(7);
     for (page = 0; page < 3; page++) {
-        for (y = 0; y < 32; y++) {
-            for (x = 0; x < 32; x++) {
-                buffer[page * 0x400 + y * 32 + x] += 6 << 12;
+        for (i = 0; i < 32; i++) {
+            for (j = 0; j < 32; j++) {
+                buffer[page * 0x400 + i * 32 + j] += 6 << 12;
             }
         }
     }
@@ -1931,6 +1930,7 @@ static void PkwdRecordMonitor_UpdateScrollBar(PkwdRecordMonitorWork *wk) {
 // Puts the marks of the new movies and the new records by the list's rows after it scrolled, a row off when it is
 // still scrolling there
 static void PkwdRecordMonitor_UpdateListMarks(PkwdRecordMonitorWork *wk, BOOL reset) {
+    BOOL visible;
     u32 newBits = 0;
     u32 recordBits = 0;
     s32 scroll;
@@ -1983,8 +1983,7 @@ static void PkwdRecordMonitor_UpdateListMarks(PkwdRecordMonitorWork *wk, BOOL re
         }
     }
     for (i = 0; i < LIST_MARK_COUNT; i++) {
-        BOOL visible = FALSE;
-
+        visible = FALSE;
         if (newBits & (1 << i)) {
             visible = TRUE;
             PkwdRecordMonitor_SetActorSequence(wk, ACTOR_GROUP_LIST, LIST_ACTOR_MARK + i, 1);
@@ -1999,7 +1998,8 @@ static void PkwdRecordMonitor_UpdateListMarks(PkwdRecordMonitorWork *wk, BOOL re
 
         func_0204c178(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
         pos.x = PkwdRecordMonitor_GetPosition(wk, (POSITION_LIST_MARK + i) * 2);
-        pos.y = PkwdRecordMonitor_GetPosition(wk, (POSITION_LIST_MARK + i) * 2 + 1);
+        // The two indexes differ in signedness: the original computes the product twice
+        pos.y = PkwdRecordMonitor_GetPosition(wk, (u32)(POSITION_LIST_MARK + i) * 2 + 1);
         pos.y += (s16)(direction * LIST_ROW_HEIGHT);
         func_0204c140(wk->listActors[LIST_ACTOR_MARK + i], &pos, 1);
     }

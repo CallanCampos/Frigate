@@ -289,16 +289,18 @@ static void WifiLogin_StateWaitMessageThenSave(WifiLoginWork *work) {
 
 // Starts the network library for the Wi-Fi connection
 static void WifiLogin_StateStartNet(WifiLoginWork *work) {
-    GFLNetInitData *init = &sNetInit;
-
-    init->wifiHeapSize = hw_isDSi() ? 0x79000 : 0x5e400;
+    if (hw_isDSi()) {
+        sNetInit.wifiHeapSize = 0x79000;
+    } else {
+        sNetInit.wifiHeapSize = 0x5e400;
+    }
     if (work->param->unkC == 0x2c) {
-        init->wifiHeapSize = 0x50000;
+        sNetInit.wifiHeapSize = 0x50000;
     } else if (work->param->unkC == 0x24) {
-        init->wifiHeapSize = 0x6e000;
+        sNetInit.wifiHeapSize = 0x6e000;
     }
     if (work->param->unkC != 0xa) {
-        init->unk40 = NULL;
+        sNetInit.unk40 = NULL;
     }
     sNetInit.gameCommandBase = work->param->unkC;
     sGameType = work->param->unkC;
@@ -527,7 +529,7 @@ static void WifiLogin_StateCheckStart(WifiLoginWork *work) {
         WifiLogin_SetState(work, WifiLogin_StateOpenYesNo);
         return;
     }
-    if (!func_02057d40(func_02009f7c(work->wifiList))) {
+    if (!DWC_CheckHasProfile(func_02009f7c(work->wifiList))) {
         work->userDataInvalid = TRUE;
         WifiLoginMessage_ClearTitle(work->msg);
         if (!isRunningOnDSi()) {
@@ -538,7 +540,7 @@ static void WifiLogin_StateCheckStart(WifiLoginWork *work) {
         WifiLogin_SetState(work, WifiLogin_StateOpenConfirmStart);
         return;
     }
-    if (!func_02057cd8(func_02009f7c(work->wifiList))) {
+    if (!DWC_CheckValidConsole(func_02009f7c(work->wifiList))) {
         work->userDataInvalid = TRUE;
         WifiLoginMessage_ClearTitle(work->msg);
         if (!isRunningOnDSi()) {

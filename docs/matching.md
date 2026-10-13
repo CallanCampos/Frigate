@@ -243,6 +243,107 @@ Same instructions, registers swapped.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
+- A 32-bit parameter passed on the stack is only ever reloaded from its stack home; its copy in a local of the other
+  signedness is a new value and gets a saved register. The Pal Pad's `WifiNoteListArea_DrawFriend` takes
+  `s32 friendPos` as a stack argument and starts with `u32 pos = friendPos;`: `pos` sits in `r4`
+  (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
+  bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
+  (`area->chars[(u32)pos]`) does the same as the local.
+- A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
+  counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
+  tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter
+  got `r2` and `&buffer[page * 0x400 + y * 32]` got `r3`, through 48 declaration orders. With `i` as the row counter
+  (`s32 i; s32 page; s32 j;` and `buffer[page * 0x400 + i * 32 + j] += 6 << 12;`) they swap. `i` as the page or the
+  column counter does not match.
+- An `if`/`else` that stores a constant to the same field of a static struct in each arm, on a condition that is a
+  call, loads the struct's address once before the call into the first saved register, ahead of the parameter's copy,
+  and the stores after it reuse it. The Wi-Fi login's `WifiLogin_StateStartNet` starts with
+  `if (hw_isDSi()) { sNetInit.wifiHeapSize = 0x79000; } else { sNetInit.wifiHeapSize = 0x5e400; }` and then fills
+  `sNetInit.` directly. A ternary store loads the address late into a scratch register, and a
+  `GFLNetInitData *init = &sNetInit;` local swaps `r4` and `r5`.
+- Constants hoisted into saved registers across a run of `f(g(x, N), FALSE)` calls (`movs r1, #0; movs r4, #0` at the
+  first call, `adds r1, r4, #0` at the last ones) come from the inner call's result passing through one local that
+  every statement reassigns: `actor = GetActor(...); func_0204c124(actor, FALSE);`, as the habitat list's
+  `ZukanHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
+  constant locals, inline helpers and loops did not reproduce it.
+- A register argument or a loop counter that takes its 0 from another variable's stack slot
+  (`ldr r1, [sp, #0x20]` for `sys_memset`'s 0, and for `i = 0`) where the original has `movs r1, #0`: an earlier
+  statement nested a call in another call's arguments. `WbtDownloadNetBG_Load` wrote
+  `GFL_G2DIOLoadNSCRSync(arc, 6, 4, 0, (u16)GFL_BGSysLoadArcNCGRDynamic(...), 0, FALSE, heapId);` three times; with
+  the inner call's result in a local first (`chars = GFL_BGSysLoadArcNCGRDynamic(...);` then the call with
+  `(u16)chars`) the zeros stored for the stack arguments still come from the hoisted `count = 0` slot, as in the
+  original, but the later `sys_memset(…, 0, …)` and `for (i = 0; …)` of the inlined code build their own. Where
+  `count` is declared or set, its type, and the shape of the inline changed nothing.
+- A store written in each branch of an `if` is the extra use that wins a register for a member-pointer local. The
+  battle party list's `BPlistObj_LoadPokeIconRes` has `u32 *res = wk->charRes;` before its loop and writes
+  `res[i] = func_0204b81c(...)` in both branches, with `wk->pokemon[i]` indexed at each use. With one store after
+  the branches the code has the right size but the file handle and `res` are swapped in `r6`/`r7`, through every
+  declaration order.
+- A bit field argument extracted completely before the first argument is set up (`ldrh r0; lsls r0, #0x11; lsrs r1,
+  r0, #0x19; adds r0, r5, #0`, against ours `ldrh r1; adds r0, r5, #0; lsls r1; lsrs r1`) is the enum-local rule:
+  `PkwdBookSeries series; ... series = wk->movies[wk->selected].series; PkwdBook_TransferSeriesPalette(wk, series);`
+  in `PkwdBook_ListInput`. An integer local of any width, a reused variable, inline getters and wrappers gave the
+  same bytes as the direct argument; `PkwdBook_InitScreen` passes the field directly and has the other order.
+- A constant assigned once and passed to a call is propagated as an immediate; assigned in both arms of an `if`,
+  next to the values that do differ, it stays in a saved register. The Pokéstar counter's `PkwdCount_StartFade` sets
+  `delay = 4;` beside `start` and `end` in each arm (`r6`, 0x5c); with one assignment it was 0x58.
+- A sign extension split between the prologue and a later compare is a narrow local declared first and assigned late
+  from an `int` parameter: the film choice screen's `BChoiceMain_SetChoicePalette` takes `int palette` and has
+  `s16 pal;` declared before its other locals and assigned after their initializers (4 bytes short before). In the
+  same file `BChoiceMain_UpdateCursor` passes `(u32)index * 2` for x and `index * 2 + 1` for y, the mixed signedness
+  of `PkwdRecordMonitor_UpdateListMarks`, and `BChoiceMain_CreateActors` declares
+  `int i` first but zeroes it in a plain `for` after the `sys_memset`: the stack slot follows the declaration, the
+  store the statement.
+- A result variable that shares a saved register with another local across a call must not be assigned before that
+  call: the compatibility check's `IrcCompatResult_GiveReward` sets `result` in an `if`/`else` on
+  `BagSave_AddItem`'s return, so `bag` and `result` both live in `r6` (76 bytes off with `result` set first). A
+  `mov r7, #1` that comes after the tested call there is `getTrainerGender(info) != 0 ? 0 : 1` in the flag's
+  declaration.
+- `x += f();` and `x = x + f();` on an `s16` local are not the same to the register allocator: Castelia's crowd
+  `Passerby_StepAside` had `passerby` and `dir` swapped in `r4`/`r5` through every declaration order until
+  `x = x + GetDirectionVectorCompX(dir);` became `x += ...` (and the same for `z`).
+- A byte field passed straight to a call makes MWCC load argument 0 first and then copy the base pointer out of `r0`.
+  Where the original loads the fields first (`ldrb r1, [r0, #1]; ldrb r2, [r0]; mov r0, r4`), they went through
+  enum-typed locals: Opelucid Gym's `GymOpelucid_ShowState`, `RefreshVars`, `MoveState` and `CreateEvent` copy
+  `tier` and `column` into `OpelucidGymTier` and `OpelucidGymColumn` locals before the call. Parameter types,
+  integer locals, inline wrappers and `const` did not change it. The callee keeps `int` parameters: with enum
+  parameters the locals are propagated again.
+- A store of 0 is not always emitted where it is written: MWCC can sink it below later stores, and only the place
+  where the zero is built shows where the statement was. In the Spin Trade's `Guru2Receipt_UpdatePalAnim`
+  (`anim->counter = 0;` before `anim->index++;`) and `Guru2Main_InitDisc` (`disc->angle = 0;` before
+  `disc->angleOffset = ...`) moving the zero store up fixed a register swap. A `static const` table's read is reused
+  across a call, but a read through a pointer to its row is loaded again: `Guru2MainSeq_Bonus` reads the clamp's
+  first Berry through `const u32 *range = sBonusItems[count];`. The tell is a function that matches when the table is
+  made non-`const` although it sits in `.rodata`.
+- A copy's size computed by a call and held in a local before the `sys_memcpy` or `sys_memset` is scheduled
+  differently from the call written as the size argument: the musical's `MusComm_SendAllPokes`,
+  `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `func_ov211_021ef3e4` all matched with
+  `u32 size = ...GetSize();` first. In `MusComm_Main`, `requesters[count] = i; count++;` in place of
+  `requesters[count++] = i;` and `requests += chosen << 16;` as its own statement before the call were each needed.
+- A struct field that is a pointer to `const` explains several users at once: loop bounds read through it are loaded
+  again on each pass, and a `u64` copied through it is `ldr, ldr, str, str`. The World Tournament's
+  `WbtMakeMatch.param` as `const WbtMatchParam *` matched `WbtMakeMatch_Create`, `CountCandidates` and
+  `FindCandidate`. A callee's parameter type can also reorder its caller's stack-argument stores while the callee's
+  own code is the same either way (`WbtEntrant_SetTableForDownloaded`'s `u8 index` matched `WbtMakeMatch_SetEntrants`):
+  sweep callee types when only the argument order differs.
+- A `const` by-value parameter stays in a register although its address is passed on: the musical stage's
+  `StaActPoke_SetShowFlg` has `const BOOL show` in its definition. In the same overlay `a = x; a += y;` fixed a load
+  order that `a = x + y` leaves to MWCC (`charAddr += index << 11` in `StaActButton_LoadItemTexture`), `u32`
+  per-case switch locals took their declared slots where `u8` ones sank to the bottom, and
+  `StaActButton_InitSystem`'s "wrong register" was a wrong constant (`GX_WNDMASK_W0`, not `OW`): check the values
+  before the registers.
+- `s8 -= u8` loads the right side with `ldrsb`, and `step *= -1` on an `s8` gives `mvns; muls`: the frame list's
+  `FrameListLayout.speed` is `u8[6]` (`HandleEvent`, `UpdateBar`), and `ScrollToTouched` and `StartFlick` negate
+  their `s8 step` by multiplying. `y -= rowHeight` and `list->cursor--` matched where `y = y - rowHeight` and
+  `cursor = cursor - 1` did not (`FrameList_Create`, `DrawAll`, `KeyEvent`), and the order of declaration
+  initializers places a spilled `= 0`: `TouchBar_Create` has `size`, then `bar = GFL_HeapAllocate(...)`, then
+  `sub = 0` as initializers.
+- A callee's narrow parameter can be what keeps its callers from matching: the dress-up's `DupFitting_SortEntries`
+  and `DupFitting_SelectCategory` matched once the item checks they call (`MusItemDraw_CanEquipPos` and its two
+  siblings in overlay 209, three getters in overlay 210) take `s32 pos` in place of `u8 pos`, with the callees
+  themselves matching either way. In the same file the raw display-register masks of `DupFitting_InitGraphics` were
+  `GX_SetVisiblePlane(0); GXS_SetVisiblePlane(0);` (the SDK inline's parameter is what holds the zero in a
+  register), and `(s32)work->badgeFrame < 45` gives the signed `bge` a `u16` field is otherwise compared without.
 
 ## Stack slots
 
@@ -383,6 +484,41 @@ Same code, other `sp` offsets or frame size.
   (`add r0, sp, #4; add r0, #2; strh r6, [r0]`), is a one-element array with an initializer, `u16 black[1] = { 0 };`,
   as `game_clear_save.c`'s `GameClearSave_Main` passes to `gfxUploadStdPaletteBGB`. A scalar `u16 black = 0;` with
   `&black` stores at base plus offset and computes the address a second time.
+- Two spill slots swapped between a doubled index local and a hoisted loop invariant: the local held the undoubled
+  value and the doubling was in the uses. `PkwdBook_CreateTextActors` has `positionIdx = entries->positionIdx;` with
+  `PkwdBook_GetPosition(wk, positionIdx * 2)` and `(wk, positionIdx * 2 + 1)`; MWCC still spills the doubled value
+  once, but in the slot before the hoisted `wk + paletteSlot * 4`. `positionIdx = entries->positionIdx * 2;`
+  gave the same instructions with the two slots exchanged, in every declaration order.
+- Two flags set side by side and chained (`refresh = redraw = TRUE;`) change which of them is spilled where their
+  declaration order does not; the instructions are otherwise the same. The film scenario's `BScenarioMain_ScriptInput`
+  (799 bytes of register allocation before) needed the chain in its two touch branches.
+- When two fields of a struct are set to constants and one constant is shared, assign the fields in the struct's
+  order: `Demo3DExpCCruiser_Init` had `r0` and `r1` swapped (21 bytes) until its `setup` was filled
+  `vramType = 1; flags = 0;` first. In the same overlay `Demo3DEngine_SetCamera` needed the inline `FX_Mul` where
+  the source had the `FX_MUL` macro (the inline keeps a call's result as the first operand), an `fx32` local for the
+  `fx16` cosine (it is then loaded where it is written, not forwarded to its first use), and `left = -FX_Div(...)`
+  in a local assigned after `right` (as an argument the negation is done when the arguments are set up).
+- A pointer reused across several loops is spilled to the lowest slot; declared in each loop's body it sits above the
+  compiler's element-address temporaries. Mistralton Gym's `Mistralton_LoadScene` (0x334 against 0x32c before)
+  declares `SRTMatrix *matrix;` in each of its loop bodies, zeroes `u8 i` at its declaration
+  (`for (; i < FAN_COUNT; i++)`) and uses a second `u8 j` for the later loops. Repeat a statement-order sweep after a
+  type change: in `Mistralton_SetStage` the `u32 count`'s store moved wherever it was written, and the `u8` one
+  stays where it is written.
+- A loop counter shared by two loops is split, and its spilled piece takes the lowest slot whatever the declaration
+  order, so a declaration sweep finds nothing until each loop has a counter of its own:
+  `ZukanCommon_BuildHabitatSummary` matched once its counting loop got its own `i`, with `pokedex` declared first
+  and assigned last.
+- **MWCC allocates registers and stack slots before it merges identical tails.** A call written at the end of both
+  branches of an `if`/`else` compiles to the same bytes as one copy after it, but it counts twice for the allocator
+  and ends live ranges inside the branches. That decides slots and registers that no type or declaration order can
+  reach. The medal box's `MedalBoxApp_DrawInfo` writes `WordSetNumber(wordSet, 1, total, 3, 1, TRUE);` in both
+  branches of its obtained check, which makes `total` a call-result temporary and puts its three spilled values in
+  assignment order (9 bytes off with one call after the `if`); `MedalBoxApp_UpdateSparkles` writes
+  `func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);` at the end of both branches, which gives `actors + i` enough
+  uses to win `r7`, so the zero is not hoisted and nothing spills (0x150 against 0x13c before). Try this first when a
+  function has the right instructions with the wrong slots or a hoisted constant. Related: a product shifted at each
+  use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
+  variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
 
 ## Instruction order
 
@@ -590,6 +726,15 @@ Same instructions, scheduled in another order.
   `staff`), declared together ahead of `wordSet`. One `strbuf` for
   all three stays in `r4`, the width takes `r6`, and the print colour is then shared across the last two prints
   where the original builds it again for each.
+- A member array's offset added to the struct pointer before the index is shifted
+  (`adds r2, r6, r1; lsls r1, r4, #2; ldr r1, [r2, r1]`) comes from a pointer local that is initialized and then
+  stepped: `u32 *state = area->states; state += type;` in `ZukanHabitat_GetTypeAward`. A pointer that is only
+  initialized (`&area->states[type]`), a nested struct, an inline accessor and other index types all fold back to
+  `(area + type * 4) + 0x354`.
+- A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
+  shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
+  after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
+  `r7` and which a stack slot.
 
 ## An instruction too many or too few
 
@@ -893,6 +1038,60 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   unless the sum is signed and the last constant unsigned. `gym_driftveil.c`'s `DriftveilGym_InitObjects` adds
   `TILE(6)` and then `HALF_TILE` in two `adds`, which needs `#define HALF_TILE (1u << 15)`; with `(1 << 15)` they
   fold into one `0x68000` and the function is 12 bytes short.
+- A product the original computes twice, where ours keeps it in a stack temporary, has operands of different
+  signedness in its two uses: MWCC does not merge a signed and an unsigned multiply. `PkwdRecordMonitor_UpdateListMarks`
+  passes `(POSITION_LIST_MARK + i) * 2` and `(u32)(POSITION_LIST_MARK + i) * 2 + 1` to a `u32 index` parameter; without
+  the cast `(i + 17) * 2` was spilled and reloaded twice and the frame was 4 bytes larger. The two spilled slots left
+  swapped after that (`scroll` and the loop body's `visible`) were fixed by making the block-scoped
+  `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
+- A field loaded again with no call or store in between, where ours keeps the first load alive across an `if`, is a
+  second read through a `static inline` that takes a pointer to `const`: a load through a `const` pointer is a
+  different expression from the plain read, so the two are not shared. The Wi-Fi login's `WifiLoginMessage_PrintFrom`
+  picks `y` from `msg->style` and then creates its window on
+  `WifiLoginMessage_GetMessageBGOf(msg)` (`return WifiLoginMessage_GetMessageBG(msg->style);` with
+  `const WifiLoginMessage *msg`), which loads the style again (0xc8). The same inline with a plain pointer, or the call
+  written in place, reuses the first load (0xc6).
+- A table entry's address that the original computes before a call's other arguments (`ldr r1, =table; adds r2, r1,
+  r5` ahead of the stack argument's load), where `entry = &table[i]; f(arc, entry->fileId, ..., wk->heapId);` sinks the
+  address into the argument: the pointer was set to the table and then advanced, a local with two assignments that is
+  not moved to its use. `PkwdBook_LoadPoster` matches with `const PkwdBookLoad *screen = sPkwdBookPosterScreens;` at
+  the top and `screen += graphicIdx;` before each call. An inline helper taking `&table[i]`, entry pointers at any
+  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".)
+- A shifted index that the original computes again after a loop, where ours reuses the loop's, is the same index in
+  another type: MWCC shares `palette << 5` only between uses of one type. The World Tournament list's
+  `WbtList_SetPaletteGray` runs its gray loop in a `static inline` taking `u32 palette` while the function has
+  `s32 palette`, so the tail computes the offset again with `palette` in `r7` and `work` spilled (75 bytes off
+  without it). `work->grayPalettes[(u32)palette]` in the tail shows the same thing.
+- A `sys_memset(p, 0, size)` whose size is computed before the zero is loaded was `GFL_STD_MemClear(p, size)`.
+  gflib's clear is an inline over the fill, so the size is an argument of the inline and is evaluated first.
+  `WifiBattleMatchSys_AllocPlayers` has `adds r2, #0xd4` before `movs r1, #0` only with
+
+      static inline void MemClear(void *dest, u32 size) { sys_memset(dest, 0, size); }
+      MemClear(sys->player, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize());
+
+  written directly as `sys_memset(sys->player, 0, sizeof(...) + PokeParty_GetSaveDataSize())` the zero comes first.
+  (Scheduling section; a candidate for a shared inline in `gfl/std.h`.)
+- In `if ((u8)f() != engine->criteria->color)` MWCC loads `engine->criteria` before the call and keeps it in a saved
+  register. Where the original loads the pointer after the call, the call's result was in a local first: the Pokédex
+  search's `ZukanSearchEngine_Step` has `u8 color = PML_PersonalGetParam(...);` and `u8 shape = ...GetShape(...);`
+  before their comparisons (8 bytes larger without them).
+- `u32` is `unsigned int` in our `types.h` and `unsigned long` in the SDK, and MWCC treats the two differently in an
+  index: for `&sActorData[15 + i]` with an `unsigned int i` it adds first and multiplies (`adds r1, #0xf; muls`), and
+  with an `unsigned long i` it keeps `i * 0x18` and adds the constant's offset, and folds the constant of
+  `actors[ret + 11]` into the load's offset. The PC box's `func_ov255_021d0d70` and `func_ov255_021d57a0` match with
+  the counter and the result declared `unsigned long`. Rows that say "the original folds the constant into the
+  offset", or that match only with `(&a[i])[11]`, are candidates.
+- `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
+  problem: the Battle Competition's `WifiBattleMatchView_BlendColor` matched with `fx16 ratio`. In the same file a
+  constant assigned in both arms of an `if`/`else` is written first in each arm (`frameBG = 2;` / `= 6;` in the two
+  card `Create` functions), positions computed one from the next are a variable each
+  (`count2X = right - width; middleX = count2X - width;` in `PrintCounts`, not a running `x -= width`), and an
+  element stored and read back (`list->windows[i] = BmpWin_CreateDynamic(...); window = list->windows[i];`) computes
+  its address before the call.
+- An index narrowed twice where one narrowing is expected adds a base that is zero: `u8 actor = ACTOR_CAR + car;`
+  with `ACTOR_CAR` 0 folds the addition but keeps the second narrowing. Seven functions of the roller coaster
+  (`gimmick_roller_coaster.c`) differed by that. Check a file's data values as well as its order when completing it:
+  all eighteen Y coordinates there were `FX32_CONST(2)` where the ROM has `FX32_CONST(32)`, which no probe shows.
 
 ## Branches and block layout
 
@@ -1076,6 +1275,55 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Two `b` trampolines to one merged tail are two copies of the tail in the source. The free-blocks state of
   `GameClearSave_Main` has `(*state)++; break;` inside the `if`, after the inner `if (!save->blocksFreed) { break; }`,
   and again after the `if`; one shared copy after the `if` puts all three branches on one `b`.
+- Two branches that store the same fields, one of them all zeros, are cross-jumped at their last store when the
+  stores are plain assignments, and the zero takes the first free register. Through a `static inline` setter with
+  `s16` parameters each argument is a value of its own: the zero gets a late register (`r3`), the other branch builds
+  its constants from it (`adds r0, r3, #0; subs r0, #0x60`), and both branches keep all four `strh`. The town map's
+  `TownMapMap_Main` sets its scroll limits that way (`TownMapMap_SetLimits(map, 0, 0, 0, 0)` against the four
+  `TOWNMAP_SCROLL_*`); with `int` parameters, or with the fields stored in another order in the inline, it does not
+  match, and none of the 120 orders of the plain assignments does.
+- A flat table indexed through an unsigned local is not strength-reduced to a hoisted row address: with
+  `u32 corner = place * 4 + i; s16 index = sBScenarioCursorPositions[corner];` MWCC hoists only `place * 4` and loads
+  the table's address on every pass, as `BScenarioGraphic_SetCursor` does in the ROM. With a `[5][4]` table or `int`
+  operands the row's address is hoisted.
+- A loop's two increments are emitted in the order written: `PkwdCount_CreateActors` has `entries++, i++`, and
+  `i++, entries++` was 2 bytes longer. There `int i;` declared first fixed the stack slots, and `count = group->count;`
+  assigned last of the group's five fields fixed the register of the first load. In `PkwdCount_LoadGraphics` and
+  `PkwdCount_LoadTitleGraphics` the palette loop's registers were right only without a `u16 paletteAdd` local: the
+  expression `(screen->extra & 0xf) << 12` sits in the inner loop's body.
+- A flag built as `bne; movs #0; b; movs #1; str [sp]` is an enum-typed local set with a ternary; every plain 0/1
+  spelling folds to the mirrored `beq` layout. Which of a function's two flags is the enum can differ between
+  siblings: in the Pokédex entry's `ZukanInfo_InitTypeIcons` the enum (`ClActDrawType`, our name) feeds the resource
+  loaders and a `u32` zero-plus-`if` flag feeds `func_0204c040`, and in `ZukanInfo_ShowTypesInGameLanguage`,
+  `ZukanInfo_ShowTypesInLanguage` and `ZukanInfo_LoadFootprint` it is the other way round. All four were 4 bytes
+  long or 29 bytes off before.
+- A dead second conditional branch on the same flags is a redundant test in the source: the live competition's
+  `LiveBattleMatchFlow_StepLink` has `wk->readySent = (field12 != 0 || (field12 == 0 && !known));` (4 bytes short
+  without the inner `field12 == 0`). In the same overlay `LiveBattleMatchFlow_StepRecord`'s spilled `won` and `lost`
+  are `u8`, which alone moves the `won = 0` store after the first call's argument load, and
+  `BattleChampionshipFlow_MenuOpenList`'s interleaved stores come from plain field order in the source, not from
+  writing them in the asm's order.
+- A duplicated compare with a `blt` to a lone `b` can be two arms that each hold the same bodies written out: the
+  ranking list's `IrcRankingList_VBlank` has the full forward and backward scroll bodies (with their
+  `list->prevDirection = 1;` and `= -1;`) both in the arm that tests `list->delta` and in the arm that tests
+  `list->prevDirection`, and MWCC merges the equal bodies; a `direction` variable set first does not give it. In the
+  same file a clamp matched only as `MATH_MAX`, and the operand order matters: `target = MATH_MAX(target, 0);` in
+  `IrcRanking_StepScrollToSelf` but `list->scrollMax = MATH_MAX(0, list->scrollMax);` in `IrcRankingList_Init`.
+- Arms that each end in the same calls plus `*state = N; break;` are tail-merged, calls included, with the odd arm
+  placed after the shared tail; an `if`/`else if`/`else` with one shared `*state = 3;` after it keeps a call per arm.
+  `GymOpelucid_MoveEventCallback`'s state 2 is three such arms.
+- An array indexed as `[4 + i]` where the original uses a base of its own is two fields: the summary screen's
+  `PStatus_AnimatePalettes` matched once `u16 cursorPltt[8]` became `u16 cursorPlttSrc[4]; u16 cursorPltt[4];`, with
+  `s8 r, g, b` declared in each loop's body. In the same overlay `PStaRibbon_HandleInput` needed its three stores in
+  the statement order `isDragging = TRUE; cursorRow = hit; cursorMoved = TRUE;` although MWCC emits the byte store
+  first either way, and a table's `{ TOUCH_RECT_END, 0, 0, 0 }` terminator had been swallowed into a `//` comment,
+  which the code match could not show and the `.rodata` check did.
+- A flag passed as a constant in each arm (`if (hit == 0) f(TRUE); else f(FALSE);`) is not the same as passing the
+  comparison: the monolith's `MonolithPower_Main` and `MonolithMission_Main` pass their touch flag and cursor that
+  way, and their `Input` functions clear `touching` after the A-button block, which passes a literal `FALSE`. A
+  version constant can hide in a file that otherwise matches: `MonolithMission_IsAvailable` tests
+  `header.unk01 == 2` in Black 2 and `== 1` in White 2, and mismatched in White 2 only, without a row. Probe both
+  versions for every function of a file, not only the ones with rows.
 
 ## Loops
 
@@ -1121,6 +1369,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A loop over an array of small structs read through by-value inline getters matches only when each getter takes
   `learnset[i]` itself: `poke_tool.c`'s learnset loops (`PML_UtilPkmSetDefaultMoves`, `PokeParty_LearnNextLevelMove`)
   lose the copy the original makes for `GetMove` when the element is first put in an `entry` local.
+- A loop entered with a `b` to its test and reloading its bound on each pass, where every plain comparison is
+  rotated, has a test whose value is 0/1: `i <= ICON_COUNT - 1 ? TRUE : FALSE`, or an inline predicate. The Union
+  Room's lower screen has it in `UnionSubdisp_SelectIcon` and in the `UnionSubdisp_ShowSelected` inline of `Create`.
+  The same file's three BG setups are one `static const BGSetup sBGSetups[3]` (as three statics their section order
+  was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
+  `.data` match: the strings give the original's variable names.
 
 ## Switches
 
@@ -1180,6 +1434,67 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the diff reads as registers only. Two cases with the same tail were written out in full and merged by MWCC:
   `ircbattlematch.c`'s `IrcBattleMatch_StateStartNet` matches with both musical cases complete, and with its last
   three mode tests as a `switch` in the blocks' order rather than an `if` chain.
+- A switch case whose block holds nothing but a `b` to the code after the switch (its jump-table entry points at a
+  lone branch, laid out in source order among the other cases, while the cases without code go straight to the end)
+  had a copy between two variables that the register allocator later gave the same register. The block is created
+  for the assignment and only the `mov` is deleted, after block layout. Empty statements, empty blocks or `if`s,
+  nested switches, `for (;;) break;`, `goto end`, a dead store to a parameter or to an unused local and
+  `error = error;` are all removed before blocks are made and merge the case with the end. `gsync_download.c`'s
+  `GSyncDownload_OnNdEvent` (4 bytes short before):
+
+      // before: case 3's table entry goes to the end      // after: case 3 gets `b end` of its own
+      switch (error) {                                      u32 result = error;
+      case DWC_ND_ERROR_NONE:                               switch (error) {
+          break;                                            case DWC_ND_ERROR_NONE:
+      case DWC_ND_ERROR_HTTP:                                   break;
+          break;                                            case DWC_ND_ERROR_HTTP:
+      ...                                                       result = error;
+      }                                                         break;
+      _pDLWork->error = error;                              ...
+                                                            }
+                                                            _pDLWork->error = result;
+- In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
+  `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
+  tree is split. Two cases form a group only up to a distance of 3; three cases within a span of 5 also do. The bag's
+  `ItemMenuDisp_IsFieldMoveTM` has 15 and 19 in one group in the ROM, which no spelling of its six cases gives (see
+  its row).
+- A jump-table entry (or `beq`) that lands on a lone `b` to another case's code is a case whose body was written
+  out again, not a fall-through. MWCC merges the identical body into the earlier case but keeps a one-instruction
+  stub for the later one. `WbtDownloadMessage_Print` has `case 0` at a `b` placed after the shared print block: it
+  matches as
+
+  ```c
+  case WBT_DOWNLOAD_MSG_PRINT_WAIT:
+      p_wk->waitIcon = WaitIcon_Create(...);
+      PrintWindow_Print(...); p_wk->state = ...; break;
+  case WBT_DOWNLOAD_MSG_PRINT:
+      PrintWindow_Print(...); p_wk->state = ...; break;
+  ```
+
+  and not with `case PRINT_WAIT: ...; /* falls */ case PRINT:` (which points the table straight at the block), nor
+  with the two cases in the other order. The same holds inside an inline: `case 1: return TRUE; case 2: return TRUE;`
+  gives `case 2` a `b` to `case 1`'s `movs r1, #1`, where `case 1: case 2: return TRUE;` gives none, and
+  `case 0: return FALSE;` before a `default: return FALSE;` gives `case 0` a `b` to the default.
+- **Switch trees depend on the x87 precision the compiler runs with.** MWCC groups a switch's sorted cases into
+  ranges with a floating-point density test (cases / span above 0.4), done in x87. A Win32 process starts with the
+  control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is exactly
+  0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, so our build makes
+  another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
+  unchanged: `ItemMenuDisp_IsFieldMoveTM` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
+  (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
+  bytes), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
+  for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. Until the build
+  runs the compiler that way these stay rows: don't spend a session on a "run at a gap of 4" or a tree rooted one
+  case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
+  holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
+  (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
+  in the ranges before it.
+- A three-case `switch` is not range-folded where the `||` chain over the same values is, which frees a register:
+  the tournament download's `TDownload_SelectTouch` and `TDownload_SavedTouch` test their touched button with
+  `switch (touched) { case 3: case 4: case 5: }`. A constant stored to a spilled local as the last statement of a
+  block is emitted at the top of the block, in the register of a later call argument of the same value
+  (`movs r2, #1; str r2, [sp]` for `result = TRUE;` at the end of the block), and a spilled local's zero store lands
+  late in the prologue unless the local is 16 bits wide (`u16 input = 0` in `SavedTouch`, where its twin has `int`).
 
 ## Floats and runtime helpers
 
@@ -1393,6 +1708,31 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   top, each object can go either at the top or right before its first user; searching those placements with
   `rodata_order.py`'s model found `wifi_p2pmatch.c`'s 39 objects in seconds. Functions that reach `.data` through
   one section-relative anchor (`ldr =first; str [r, #n]`) need the `.data` objects defined in ROM order as well.
+- An order of equal-size local initializers that no declaration order of the file's objects gives can come from a
+  table the original link dead-stripped: the sort listed it, then the linker dropped its section (an object of 64
+  bytes or more has one of its own) with the unused public functions that read it. `pdwacc_disp.c`, a cut-down copy
+  of `gsync_disp.c`, gets the ROM's BG setup order only with a referenced table between its VRAM and LCD configs,
+  where `gsync_disp.c` has `sActorPositions`. Look at the sibling file a copy was made from for the missing object.
+  Nothing the compiler drops itself is listed, so this can't be reproduced under `-nodead`.
+- A small table that the ROM has after a 64-byte-or-larger table of the same file, where the size sort can only put
+  it before, belongs to the next file. Overlay 290's 12-byte battle proc table sits after the 0x90-byte step table:
+  no layout of one file gives that (`rodata_order.py`: G:12! S:144 B:12 is always B G S or G B S). Its three
+  functions are the last of `.text`, use no string or static of wifibattlematch_sys.c, and the step table points to it
+  like to the other overlays' proc tables: a second file with an extern table.
+- The string literals of a pointer table's initializer do follow the size sort (this corrects what is said about
+  `mbp.c` above): each literal joins the list just before its table, with size `strlen + 1`, and literals created in
+  code are not in the list and come last. The model predicted 12 of 12 random declaration orders of
+  `field_gimmick_gate.c`, whose `gelboard_N` strings were in the wrong order in `.data` until `sBoardNames` was
+  declared directly before `sBoardPlNames`.
+- A second `""` in what was taken for one file's `.data` is a file boundary: MWCC pools equal string literals within
+  a translation unit, so each run of functions that shares one `""` is a file of its own. Overlay 28's `union_main.c`
+  and `colosseum.c` were five files (`union_main.c`, `union_receive.c`, `union_subproc.c`, `colosseum_comm.c`,
+  `colosseum.c`), which also explains statics that had to be external.
+- A library's style applies to all of its files: libVCT (`lib/dwc/src/vct`) takes no pointer to `const` anywhere, and
+  dropping the `const` we had put on its parameters matched `VCT_Init`, `GetEvent`, `HandleCommand4` and
+  `VCT_DecodeAdpcm` at once. Its files are built without `-ipa file`, so their `.bss` statics come out in reverse of
+  their declaration order: a matching function whose pool words point at the wrong static needs the declarations
+  reversed.
 
 ## When nothing moves it
 

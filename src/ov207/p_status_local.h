@@ -142,8 +142,10 @@ struct PStatusWork {
     ClActor *typeIcons[2];
     ClActor *pressedButton;
     u16 plttAnimPhase;
-    // Copied from OBJ palette RAM at the start, though only the animated colors 4 to 7 are used
-    u16 cursorPltt[8];
+    // Six colors are copied here from OBJ palette RAM at the start, which runs over into cursorPltt. Never read
+    u16 cursorPlttSrc[4];
+    // The cursor's four animated colors
+    u16 cursorPltt[4];
     u16 tabPlttSrc[2][16];
     u16 tabPltt[16];
     u16 buttonPltt[16];

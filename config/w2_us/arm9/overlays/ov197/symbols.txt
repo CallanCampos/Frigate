@@ -248,12 +248,12 @@ data_ov197_021be3b4 kind:data(any) addr:0x021be3f4
 data_ov197_021be3d4 kind:data(any) addr:0x021be414
 data_ov197_021be3f4 kind:data(any) addr:0x021be434
 data_ov197_021be424 kind:data(any) addr:0x021be464
-data_ov197_021be558 kind:data(any) addr:0x021be598
+sYesNoWindow kind:data(any) addr:0x021be598
 data_ov197_021be55c kind:data(any) addr:0x021be59c
 data_ov197_021be560 kind:data(any) addr:0x021be5a0
 data_ov197_021be57c kind:data(any) addr:0x021be5bc
 data_ov197_021be5b0 kind:data(any) addr:0x021be5f0
-data_ov197_021be610 kind:data(any) addr:0x021be650
+sBgPalTypes kind:data(any) addr:0x021be650
 data_ov197_021be612 kind:data(any) addr:0x021be652
 data_ov197_021be61d kind:data(any) addr:0x021be65d
 data_ov197_021be628 kind:data(any) addr:0x021be668

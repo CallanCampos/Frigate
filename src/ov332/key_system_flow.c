@@ -1749,8 +1749,8 @@ static void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, Key
         }
     }
     keySelect->setup(keySelect, &setup);
-    setup.items[setup.count - 1].x += 3;
-    setup.items[setup.count - 1].width -= 3;
+    (setup.items + setup.count - 1)->x += 3;
+    (setup.items + setup.count - 1)->width -= 3;
     *keySelect->list = KeySystemList_Create(&setup, heapId);
 }
 
