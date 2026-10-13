@@ -1266,7 +1266,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `townmap.c` | `0x0219ce80`–`0x0219f2dc` | 84 | partial | string at `0x0219f940` |
+| `townmap.c` | `0x0219ce80`–`0x0219f2dc` | 84 | complete | string at `0x0219f940` |
 | `townmap_grh.c` | `0x0219f2dc`–`0x0219f718` | 19 | complete | string at `0x0219f94c` |
 | `townmap_data.c` | `0x0219f718`–`0x0219f76c` | 4 | complete | descriptive |
 
@@ -1642,7 +1642,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 189
 
-498 of 498 functions are in source files. Embedded names without a file yet: `ncryption.c`.
+497 of 497 functions are in source files. Embedded names without a file yet: `ncryption.c`.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1675,7 +1675,7 @@ prints the tables below from the configs and the ROM:
 | `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | partial | descriptive |
 | `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | partial | descriptive |
 | `gamestats.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
-| `crypt.c` | `0x021a90f0`–`0x021ac838` | 68 | partial | descriptive |
+| `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | partial | descriptive |
 
 ### Overlay 190
 
@@ -2013,7 +2013,7 @@ prints the tables below from the configs and the ROM:
 | `ctvt_game_cam_graphic.c` | `0x021a9704`–`0x021a98d4` | 8 | complete | string at `0x021b26a4` |
 | `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | partial | string at `0x021b26c8` |
 | `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | partial | descriptive |
-| `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | partial | descriptive |
+| `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | complete | descriptive |
 | `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
 | `ssp_exifenc.c` | `0x021ae378`–`0x021af740` | 11 | complete | descriptive |
 

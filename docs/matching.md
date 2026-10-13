@@ -1071,6 +1071,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Two `b` trampolines to one merged tail are two copies of the tail in the source. The free-blocks state of
   `GameClearSave_Main` has `(*state)++; break;` inside the `if`, after the inner `if (!save->blocksFreed) { break; }`,
   and again after the `if`; one shared copy after the `if` puts all three branches on one `b`.
+- Two branches that store the same fields, one of them all zeros, are cross-jumped at their last store when the
+  stores are plain assignments, and the zero takes the first free register. Through a `static inline` setter with
+  `s16` parameters each argument is a value of its own: the zero gets a late register (`r3`), the other branch builds
+  its constants from it (`adds r0, r3, #0; subs r0, #0x60`), and both branches keep all four `strh`. The town map's
+  `TownMapMap_Main` sets its scroll limits that way (`TownMapMap_SetLimits(map, 0, 0, 0, 0)` against the four
+  `TOWNMAP_SCROLL_*`); with `int` parameters, or with the fields stored in another order in the inline, it does not
+  match, and none of the 120 orders of the plain assignments does.
 
 ## Loops
 
