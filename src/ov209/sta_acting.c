@@ -1145,6 +1145,13 @@ static void StaActing_UpdateNpcItemUse(StaActing *stage) {
     }
 }
 
+static inline u8 StaActing_RandomHand(void) {
+    if ((u8)GFL_RandomMTRange(2) == 0) {
+        return STA_ACTING_EQUIP_HAND_R;
+    }
+    return STA_ACTING_EQUIP_HAND_L;
+}
+
 void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
     u8 i;
 
@@ -1167,10 +1174,8 @@ void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
                         equip = STA_ACTING_EQUIP_HAND_R;
                     } else if (hand[1] == TRUE && hand[0] == FALSE) {
                         equip = STA_ACTING_EQUIP_HAND_L;
-                    } else if ((u8)GFL_RandomMTRange(2) == 0) {
-                        equip = STA_ACTING_EQUIP_HAND_R;
                     } else {
-                        equip = STA_ACTING_EQUIP_HAND_L;
+                        equip = StaActing_RandomHand();
                     }
                     switch (timing) {
                     case 1:
