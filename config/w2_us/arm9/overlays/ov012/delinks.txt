@@ -11,6 +11,7 @@ src/ov012/event_ircbattle.c:
     .data       start:0x0216dfe0 end:0x0216dff4
 
 src/ov012/musical_event.c:
+    complete
     .text       start:0x02150d38 end:0x02151ea8
     .rodata     start:0x0216ae24 end:0x0216af74
     .data       start:0x0216dff4 end:0x0216e004
@@ -26,6 +27,7 @@ src/ov012/musical_stage_sys.c:
     .data       start:0x0216e028 end:0x0216e048
 
 src/ov012/musical_program.c:
+    complete
     .text       start:0x02152318 end:0x0215268c
     .data       start:0x0216e048 end:0x0216e05c
 
@@ -54,6 +56,7 @@ src/ov012/intrude_work.c:
     .text       start:0x0215361c end:0x021536ac
 
 src/ov012/script_sys.c:
+    complete
     .text       start:0x021536ac end:0x02153de4
     .data       start:0x0216e1d0 end:0x0216e1f4
 
@@ -63,6 +66,7 @@ src/ov012/script_work.c:
     .data       start:0x0216e1f4 end:0x0216e204
 
 src/ov012/script_sub_event.c:
+    complete
     .text       start:0x021540b0 end:0x021541c0
 
 src/ov012/scrcmd_vm.c:
@@ -111,6 +115,7 @@ src/ov012/scrcmd_pokemon.c:
     .data       start:0x0216e234 end:0x0216e248
 
 src/ov012/scrcmd_proc.c:
+    complete
     .text       start:0x021574e4 end:0x02157c60
     .data       start:0x0216e248 end:0x0216e258
 
@@ -139,6 +144,7 @@ src/ov012/scrcmd_network.c:
     .data       start:0x0216e294 end:0x0216e2a8
 
 src/ov012/scrcmd_stadium.c:
+    complete
     .text       start:0x02159d94 end:0x0215a0f0
 
 src/ov012/event_battle_lose.c:
@@ -164,6 +170,7 @@ src/ov012/event_field_proclink.c:
     .data       start:0x0216e2c0 end:0x0216e2d8
 
 src/ov012/event_save.c:
+    complete
     .text       start:0x0215c538 end:0x0215c6f0
 
 src/ov012/event_action_call.c:
@@ -172,6 +179,7 @@ src/ov012/event_action_call.c:
     .rodata     start:0x0216cd40 end:0x0216cda0
 
 src/ov012/event_3d_demo.c:
+    complete
     .text       start:0x0215cb88 end:0x0215cd98
 
 src/ov012/city_state.c:
@@ -281,6 +289,7 @@ src/ov012/event_cgear_poweron.c:
     .text       start:0x02162ba4 end:0x02162c88
 
 src/ov012/event_trial_house.c:
+    complete
     .text       start:0x02162c88 end:0x02162f84
 
 src/ov012/ev_time.c:
@@ -288,6 +297,7 @@ src/ov012/ev_time.c:
     .text       start:0x02162f84 end:0x02163208
 
 src/ov012/field_g3d_map.c:
+    complete
     .text       start:0x02163208 end:0x02163b78
     .rodata     start:0x0216dac8 end:0x0216db04
     .data       start:0x0216e3c0 end:0x0216e3d0
@@ -338,6 +348,7 @@ src/ov012/namein_setup.c:
     .data       start:0x0216e3e0 end:0x0216e3f0
 
 src/ov012/event_league_lift.c:
+    complete
     .text       start:0x02165b5c end:0x02165ef8
     .rodata     start:0x0216dc7c end:0x0216dc9c
 
@@ -374,6 +385,7 @@ src/ov012/g3d_text_draw.c:
     .rodata     start:0x0216de44 end:0x0216de98
 
 src/ov012/pass_power_check.c:
+    complete
     .text       start:0x0216a1d0 end:0x0216a27c
 
 src/ov012/scrcmd_hollow_rival.c:

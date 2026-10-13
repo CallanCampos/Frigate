@@ -20,7 +20,7 @@ BOOL GameData_GetSeasons(GameData *gameData, u16 *prevSeason, u16 *season);
 u8 Season_GetNext(u8 season);
 u8 Season_GetPrevious(u8 season);
 // The season of the date: spring in January, May and September, and so on
-u32 Season_GetRealTime(void);
+u8 Season_GetRealTime(void);
 void Season_Set(GameData *gameData, u16 season);
 
 #endif // POKEBW2_SYSTEM_SEASON_H

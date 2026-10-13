@@ -97,12 +97,6 @@ BOOL s01E5_StadiumResetTrainerFlags(VM *vm, FieldScriptEnv *env) {
 
 BOOL func_ov012_02159f90(VM *vm, FieldScriptEnv *env) {
     u16 *results[6];
-    u16 picked[6];
-    u16 range;
-    s16 n;
-    s32 i;
-    s32 j;
-    s32 value;
 
     FieldScriptEnv_GetScriptWork(env);
     results[0] = ScriptReadVar(vm, env);
@@ -111,34 +105,36 @@ BOOL func_ov012_02159f90(VM *vm, FieldScriptEnv *env) {
     results[3] = ScriptReadVar(vm, env);
     results[4] = ScriptReadVar(vm, env);
     results[5] = ScriptReadVar(vm, env);
-    picked[0] = 0;
-    picked[1] = 0;
-    picked[2] = 0;
-    picked[3] = 0;
-    picked[4] = 0;
-    picked[5] = 0;
-    range = 52;
-    for (i = 0; i < 6; i++) {
-        n = GFL_RandomLC(range);
-        for (value = 0; value < 52; value++) {
-            for (j = 0; j < i; j++) {
-                if (value == picked[j]) {
+    {
+        u16 range = 52;
+        u16 picked[6] = {0};
+        s32 i;
+        s32 value;
+        s32 j;
+        s16 n;
+
+        for (i = 0; i < 6; i++) {
+            n = GFL_RandomLC(range);
+            for (value = 0; value < 52; value++) {
+                for (j = 0; j < i; j++) {
+                    if (value == picked[j]) {
+                        break;
+                    }
+                }
+                if (j == i && --n < 0) {
+                    picked[i] = value;
                     break;
                 }
             }
-            if (j == i && --n < 0) {
-                picked[i] = value;
-                break;
-            }
+            range--;
         }
-        range--;
+        *results[0] = picked[0] + 0x50;
+        *results[1] = picked[1] + 0x50;
+        *results[2] = picked[2] + 0x50;
+        *results[3] = picked[3] + 0x50;
+        *results[4] = picked[4] + 0x50;
+        *results[5] = picked[5] + 0x50;
     }
-    *results[0] = picked[0] + 0x50;
-    *results[1] = picked[1] + 0x50;
-    *results[2] = picked[2] + 0x50;
-    *results[3] = picked[3] + 0x50;
-    *results[4] = picked[4] + 0x50;
-    *results[5] = picked[5] + 0x50;
     return FALSE;
 }
 

@@ -54,6 +54,13 @@ void func_ov012_0215c594(void *param) {
     GFL_HeapFree(param);
 }
 
+// A third actor that would wait with the player and the actor of move code 0x30. The retail game has none, but the
+// test stays in the code, which MWCC only does for a variable of an enum type
+typedef enum {
+    THIRD_ACTOR_NONE,
+    THIRD_ACTOR_PRESENT,
+} ThirdActorKind;
+
 GameEventReturnCode func_ov012_0215c59c(GameEvent *event, u32 *state, void *data) {
     PrepareResidentActorsWork *work = data;
     Field *field = work->field;
@@ -61,6 +68,7 @@ GameEventReturnCode func_ov012_0215c59c(GameEvent *event, u32 *state, void *data
     FieldActor *player;
     FieldActor *actor;
     FieldActor *third;
+    ThirdActorKind kind;
 
     switch (*state) {
     case 0:
@@ -73,8 +81,9 @@ GameEventReturnCode func_ov012_0215c59c(GameEvent *event, u32 *state, void *data
             work->movingActors |= 1;
             EnableActorMovement(player);
         }
+        kind = THIRD_ACTOR_NONE;
         third = NULL;
-        if (third != NULL && IsActorFlag16(third) == TRUE) {
+        if (kind != THIRD_ACTOR_NONE && IsActorFlag16(third) == TRUE) {
             work->movingActors |= 4;
             EnableActorMovement(third);
         }

@@ -376,6 +376,12 @@ Same instructions, registers swapped.
   buffer functions that took `u16` take `u32`. A twin function that matches either way does not vouch for the
   prototype, since it kept the value in a register. To test a prototype without editing a shared header, compile
   against a copy with the same include guard (`--extra-flags "-i DIR -prefix copy.h"`).
+- An array zeroed where it is declared in an inner block (`u8 list[N] = { 0 };` inside the block that fills it) is
+  laid out and cleared differently from one declared at the top of the function and cleared by a call or a loop:
+  overlay 12's `func_ov012_0215168c`, `func_ov012_02159f90` and `func_ov012_021522d8` matched that way. A constant
+  the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
+  does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
+  `s01D6_MoveReminderCallMoveSelect`'s mode).
 
 ## Stack slots
 

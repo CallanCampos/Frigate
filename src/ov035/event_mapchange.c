@@ -173,6 +173,7 @@ GameEventReturnCode EventGameOpening_Callback(GameEvent *event, u32 *state, void
     EventGameOpening *wk = data;
     GameSystem *gsys = wk->gsys;
     GameData *gameData = GSYS_GetGameData(gsys);
+    u32 realSeason;
     u8 season;
 
     switch (*state) {
@@ -181,7 +182,8 @@ GameEventReturnCode EventGameOpening_Callback(GameEvent *event, u32 *state, void
         (*state)++;
         break;
     case 1:
-        Season_Set(gameData, Season_GetRealTime());
+        realSeason = Season_GetRealTime();
+        Season_Set(gameData, realSeason);
         season = GameData_GetSeason(gameData);
         GameEvent_ChainNext(event, EventSeasonBanner_CreateStandalone(gsys, season, season));
         (*state)++;

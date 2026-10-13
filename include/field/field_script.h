@@ -186,8 +186,6 @@ struct GlobalScriptEntry {
 };
 
 extern const GlobalScriptEntry GLOBAL_SCRIPT_TABLE[60];
-extern const char data_ov012_0216e1a0[];
-extern const char data_ov012_0216e1a4[];
 
 struct OpcodePermissions {
     u8 level0 : 1;
