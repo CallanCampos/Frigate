@@ -1240,6 +1240,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   file scope or inside its one function, and each static at the top, before its first function or inside it. Its
   `.rodata` and `.bss` are the original's with four tables inside their functions, `sXItems` and `sCureItems` at
   file scope before theirs, and `sSelectSeq` declared before the first function that uses it.
+- MWCC 2.0 lays a file's `.bss` statics out in the reverse of their definition order, without the size sort: the
+  DWC utility's `dwc_wcm.c` (overlay 182) matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and
+  `sEssid[0x20]` defined in that order, but the module check failed until they were defined as `sEssid`, `sBssid`,
+  `sWcm`, the ROM's order backwards.
+- MWCC 2.0 reaches a file's own statics of one section through a shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`),
+  and another file's global by its own address. In overlay 182 that set the seam between `dwc_aoss.c`, which loads
+  the free callback at `0x021c294c` directly, and `dwc_aoss_ap.c`, which loads it as `0x021c2940` + 0xc. It emits a
+  jump table only when every value of the range has a case label, so `dwc_aoss.c`'s switches list the empty cases too.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM

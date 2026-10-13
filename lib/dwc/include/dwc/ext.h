@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include "types.h"
 #include "nitro/os.h"
+#include "system/rtc.h"
 #include "dwc/sake.h"
 #include "dwc/soap.h"
 
@@ -175,5 +176,54 @@ int DWCi_HandleGHTTPError(int error);
 // The state of a transfer that was started with a request of the module, and cancelling it
 int ghttpGetState(int request);
 void ghttpCancelRequest(int request);
+
+// What DWC's settings in overlay 182 (the AOSS client) call in overlay 11 and the main module. The socket library's
+// calls are above. A poll descriptor, and the configuration that the socket library starts with (its addresses are in
+// network order)
+typedef struct SocPollFd {
+    int fd;
+    s16 events;
+    s16 revents;
+} SocPollFd;
+typedef void *(*SocAllocFunc)(u32 name, s32 size);
+typedef void (*SocFreeFunc)(u32 name, void *ptr, s32 size);
+typedef struct SocConfig {
+    u32 flag;           // 0x00
+    SocAllocFunc alloc; // 0x04
+    SocFreeFunc free;   // 0x08
+    int useDhcp;        // 0x0c
+    u32 addr;           // 0x10
+    u32 netmask;        // 0x14
+    u32 gateway;        // 0x18
+    u32 dns1;           // 0x1c
+    u32 dns2;           // 0x20
+    u32 unk_24;         // 0x24
+    u32 unk_28;         // 0x28
+    u32 unk_2c;         // 0x2c
+    u32 unk_30;         // 0x30
+    u32 unk_34[9];      // 0x34
+} SocConfig;
+// Bind a socket to an address, receive from it and send to one (the address's first byte is its size)
+int func_ov011_02157bf0(int sock, const SocAddrIn *address);
+int func_ov011_02157c64(int sock, void *buffer, int size, int flags, SocAddrIn *from);
+int func_ov011_02157cd0(int sock, const void *buffer, int size, int flags, const SocAddrIn *to);
+// Starts the library with a configuration (negative if it cannot), cleans it up (negative if it cannot) and waits on
+// one descriptor for at most some ticks, returning how many are ready
+int func_ov011_02157f10(const SocConfig *config);
+int func_ov011_0215800c(void);
+int func_ov011_021580d0(SocPollFd *fds, u32 count, s64 ticks);
+// Whether the library has started
+extern int data_ov011_0218ba5c;
+// Clears the WCM's list of access points
+void func_ov011_0215c594(void);
+
+// NitroSDK's alarms, by their code: OS_CreateAlarm, OS_SetAlarm (the alarm fires once after the ticks and calls the
+// function with the argument) and OS_CancelAlarm
+typedef struct OSAlarm {
+    u8 unk_00[0x2c];
+} OSAlarm;
+void func_0207bc24(OSAlarm *alarm);
+void func_0207bcf4(OSAlarm *alarm, u64 ticks, void (*handler)(void *arg), void *arg);
+void func_0207bd3c(OSAlarm *alarm);
 
 #endif // POKEBW2_DWC_EXT_H

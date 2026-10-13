@@ -1611,6 +1611,17 @@ prints the tables below from the configs and the ROM:
 | `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | complete | descriptive |
 | `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | complete | descriptive |
 
+### Overlay 182
+
+97 of 1113 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `dwc_raputil.c` | `0x021a4920`–`0x021a49d0` | 5 | complete | string at `0x021c05c0` |
+| `dwc_aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | partial | descriptive |
+| `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
+| `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
+
 ### Overlay 184
 
 1 of 1 functions are in source files.
