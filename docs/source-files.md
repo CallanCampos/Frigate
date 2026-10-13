@@ -2347,7 +2347,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | partial | string at `0x0219fba0` |
+| `zukan_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | complete | string at `0x0219fba0` |
 
 ### Overlay 297
 

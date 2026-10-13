@@ -1178,6 +1178,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   assigned last of the group's five fields fixed the register of the first load. In `PkwdCount_LoadGraphics` and
   `PkwdCount_LoadTitleGraphics` the palette loop's registers were right only without a `u16 paletteAdd` local: the
   expression `(screen->extra & 0xf) << 12` sits in the inner loop's body.
+- A flag built as `bne; movs #0; b; movs #1; str [sp]` is an enum-typed local set with a ternary; every plain 0/1
+  spelling folds to the mirrored `beq` layout. Which of a function's two flags is the enum can differ between
+  siblings: in the Pokédex entry's `ZukanInfo_InitTypeIcons` the enum (`ClActDrawType`, our name) feeds the resource
+  loaders and a `u32` zero-plus-`if` flag feeds `func_0204c040`, and in `ZukanInfo_ShowTypesInGameLanguage`,
+  `ZukanInfo_ShowTypesInLanguage` and `ZukanInfo_LoadFootprint` it is the other way round. All four were 4 bytes
+  long or 29 bytes off before.
 
 ## Loops
 

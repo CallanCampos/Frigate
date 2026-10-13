@@ -83,6 +83,12 @@ enum {
     ZUKAN_INFO_ARC_COUNT,
 };
 
+// Where the resources of the actors are loaded: the VRAM of the main or of the sub screen
+typedef enum {
+    CLACT_DRAW_MAIN,
+    CLACT_DRAW_SUB,
+} ClActDrawType;
+
 // The windows that print the entry
 enum {
     ZUKAN_INFO_WINDOW_LABEL,
@@ -1172,28 +1178,24 @@ static void ZukanInfo_HideOtherSprites(ZukanInfo *info) {
 }
 
 static void ZukanInfo_InitTypeIcons(ZukanInfo *info) {
-    BOOL sub;
-    u32 vram = 0;
-    ArcTool *arc = info->arcs[ZUKAN_INFO_ARC_APP_MENU_COMMON];
+    ClActDrawType draw = info->engine == 0 ? CLACT_DRAW_MAIN : CLACT_DRAW_SUB;
+    u32 surface = CLACT_SURFACE_MAIN;
+    ArcTool *arc;
     ClActorSetup setup;
     u8 i;
     u8 j;
 
-    if (info->engine == 0) {
-        sub = FALSE;
-    } else {
-        sub = TRUE;
-    }
     if (info->engine != 0) {
-        vram = 1;
+        surface = CLACT_SURFACE_SUB;
     }
+    arc = info->arcs[ZUKAN_INFO_ARC_APP_MENU_COMMON];
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             info->typeChars[i][j] = -1;
         }
     }
     info->typeSlot = 0;
-    info->typePalette = func_0204bbb8(arc, func_0202d7e4(), sub, 0x40, 0, 3, info->heapId);
+    info->typePalette = func_0204bbb8(arc, func_0202d7e4(), draw, 0x40, 0, 3, info->heapId);
     info->typeCellAnims = func_0204bde0(arc, func_0202d7f8(2), func_0202d7fc(2), info->heapId);
 
     if (info->mode == ZUKAN_INFO_MODE_DETAIL && info->engine == 0) {
@@ -1206,9 +1208,9 @@ static void ZukanInfo_InitTypeIcons(ZukanInfo *info) {
         info->shownTypes[0] = TYPE_NULL;
         info->shownTypes[1] = TYPE_NULL;
         for (i = 0; i < TYPE_NULL; i++) {
-            info->allTypeChars[i] = func_0204b81c(arc, func_0202d7f4(i), FALSE, sub, info->heapId);
+            info->allTypeChars[i] = func_0204b81c(arc, func_0202d7f4(i), FALSE, draw, info->heapId);
             info->allTypeActors[i] = func_0204c040(info->unit, info->allTypeChars[i], info->typePalette,
-                                                   info->typeCellAnims, &setup, vram, info->heapId);
+                                                   info->typeCellAnims, &setup, surface, info->heapId);
             func_0204c378(info->allTypeActors[i], func_0202d7e8(i), TRUE);
             func_0204c438(info->allTypeActors[i], 2);
             func_0204c318(info->allTypeActors[i], 1);
@@ -1299,21 +1301,17 @@ static void ZukanInfo_ShowTypesInGameLanguage(ZukanInfo *info, u32 type1, u32 ty
             func_0204c140(info->allTypeActors[info->shownTypes[1]], &pos[1], sub);
         }
     } else {
-        BOOL sub = FALSE;
-        ClActorSetup setups[2] = { { 0 }, { 0 } };
-        u8 types[2];
-        u32 vram;
         ArcTool *arc;
+        ClActorSetup setups[2] = { { 0 }, { 0 } };
+        u32 draw = CLACT_DRAW_MAIN;
+        u8 types[2];
+        ClActSurface surface;
         int i;
 
         if (info->engine != 0) {
-            sub = TRUE;
+            draw = CLACT_DRAW_SUB;
         }
-        if (info->engine != 0) {
-            vram = 1;
-        } else {
-            vram = 0;
-        }
+        surface = info->engine == 0 ? CLACT_SURFACE_MAIN : CLACT_SURFACE_SUB;
         types[0] = type1;
         types[1] = type2;
         setups[0].x = 168;
@@ -1325,13 +1323,13 @@ static void ZukanInfo_ShowTypesInGameLanguage(ZukanInfo *info, u32 type1, u32 ty
         for (i = 0; i < 2; i++) {
             info->typeChars[slot][i] = -1;
             if (types[i] != TYPE_NULL) {
-                info->typeChars[slot][i] = func_0204b81c(arc, func_0202d7f4(types[i]), FALSE, sub, info->heapId);
+                info->typeChars[slot][i] = func_0204b81c(arc, func_0202d7f4(types[i]), FALSE, draw, info->heapId);
             }
         }
         for (i = 0; i < 2; i++) {
             if (info->typeChars[slot][i] != -1) {
                 info->typeActors[slot][i] = func_0204c040(info->unit, info->typeChars[slot][i], info->typePalette,
-                                                          info->typeCellAnims, &setups[i], vram, info->heapId);
+                                                          info->typeCellAnims, &setups[i], surface, info->heapId);
                 func_0204c378(info->typeActors[slot][i], func_0202d7e8(types[i]), TRUE);
                 func_0204c438(info->typeActors[slot][i], 2);
                 func_0204c318(info->typeActors[slot][i], 1);
@@ -1341,45 +1339,43 @@ static void ZukanInfo_ShowTypesInGameLanguage(ZukanInfo *info, u32 type1, u32 ty
 }
 
 static void ZukanInfo_ShowTypesInLanguage(ZukanInfo *info, u32 type1, u32 type2, u32 language, u32 slot) {
-    BOOL sub = FALSE;
+    ArcTool *arc;
     ClActorSetup setups[2] = { { 0 }, { 0 } };
     u8 types[2];
-    u32 vram;
     NNSG2dCharacterData *character;
     void *file;
     u8 *tiles;
     int i;
+    u32 column;
+    u32 row;
+    u8 type;
+    u32 draw = CLACT_DRAW_MAIN;
+    ClActSurface surface;
 
     if (info->engine != 0) {
-        sub = TRUE;
+        draw = CLACT_DRAW_SUB;
     }
-    if (info->engine != 0) {
-        vram = 1;
-    } else {
-        vram = 0;
-    }
+    surface = info->engine == 0 ? CLACT_SURFACE_MAIN : CLACT_SURFACE_SUB;
     types[0] = type1;
     types[1] = type2;
     setups[0].x = 168;
     setups[0].y = info->scrollY + 84;
     setups[1].x = 208;
     setups[1].y = info->scrollY + 84;
+    arc = info->arcs[ZUKAN_INFO_ARC_APP_MENU_COMMON];
 
     file = GFL_G2DIOReadBGNCGRArc(info->arcs[ZUKAN_INFO_ARC_ZUKAN_GRA], sTypeIconFiles[language], FALSE, &character,
                                   info->heapId);
     tiles = character->rawData;
     for (i = 0; i < 2; i++) {
         info->typeChars[slot][i] = -1;
-        if (types[i] != TYPE_NULL) {
-            info->typeChars[slot][i] =
-                func_0204b81c(info->arcs[ZUKAN_INFO_ARC_APP_MENU_COMMON], func_0202d7f4(types[i]), FALSE, sub,
-                              info->heapId);
-            func_0204bab8(info->typeChars[slot][i],
-                          tiles + (sTypeIconTiles[types[i]][0] << 11) + (sTypeIconTiles[types[i]][1] << 7), 0x80, 0,
-                          sub);
-            func_0204bab8(info->typeChars[slot][i],
-                          tiles + (sTypeIconTiles[types[i]][0] << 11) + 0x400 + (sTypeIconTiles[types[i]][1] << 7),
-                          0x80, 0x80, sub);
+        type = types[i];
+        if (type != TYPE_NULL) {
+            info->typeChars[slot][i] = func_0204b81c(arc, func_0202d7f4(type), FALSE, draw, info->heapId);
+            column = sTypeIconTiles[type][1] << 7;
+            row = sTypeIconTiles[type][0] << 11;
+            func_0204bab8(info->typeChars[slot][i], &tiles[row + column], 0x80, 0, draw);
+            func_0204bab8(info->typeChars[slot][i], &tiles[row + 0x400 + column], 0x80, 0x80, draw);
         }
     }
     GFL_HeapFree(file);
@@ -1387,7 +1383,7 @@ static void ZukanInfo_ShowTypesInLanguage(ZukanInfo *info, u32 type1, u32 type2,
     for (i = 0; i < 2; i++) {
         if (info->typeChars[slot][i] != -1) {
             info->typeActors[slot][i] = func_0204c040(info->unit, info->typeChars[slot][i], info->typePalette,
-                                                      info->typeCellAnims, &setups[i], vram, info->heapId);
+                                                      info->typeCellAnims, &setups[i], surface, info->heapId);
             func_0204c378(info->typeActors[slot][i], func_0202d7e8(types[i]), TRUE);
             func_0204c438(info->typeActors[slot][i], 2);
             func_0204c318(info->typeActors[slot][i], 1);
@@ -1464,26 +1460,24 @@ static void ZukanInfo_FreeFootprints(ZukanInfo *info) {
 }
 
 static void ZukanInfo_LoadFootprint(ZukanInfo *info, u32 species, u32 form, u32 slot) {
-    BOOL sub = FALSE;
-    u32 vram;
+    u32 draw = CLACT_DRAW_MAIN;
+    ClActSurface surface;
+    ArcTool *arc;
     u32 formFile;
     ClActorSetup setup;
 
     if (info->engine != 0) {
-        vram = 1;
-    } else {
-        vram = 0;
+        draw = CLACT_DRAW_SUB;
     }
-    if (info->engine != 0) {
-        sub = TRUE;
-    }
+    surface = info->engine == 0 ? CLACT_SURFACE_MAIN : CLACT_SURFACE_SUB;
     formFile = ZukanInfo_GetFootprintFormFile(species, form);
     if (formFile == 0xffff) {
-        info->footprintChars[slot] = func_0204b81c(info->arcs[ZUKAN_INFO_ARC_FOOTPRINT],
-                                                   ZukanInfo_GetFootprintFile(species), TRUE, sub, info->heapId);
+        arc = info->arcs[ZUKAN_INFO_ARC_FOOTPRINT];
+        info->footprintChars[slot] =
+            func_0204b81c(arc, ZukanInfo_GetFootprintFile(species), TRUE, draw, info->heapId);
     } else {
         info->footprintChars[slot] =
-            func_0204b81c(info->arcs[ZUKAN_INFO_ARC_FOOTPRINT_FORM], formFile, TRUE, sub, info->heapId);
+            func_0204b81c(info->arcs[ZUKAN_INFO_ARC_FOOTPRINT_FORM], formFile, TRUE, draw, info->heapId);
     }
 
     setup.x = 120;
@@ -1493,10 +1487,10 @@ static void ZukanInfo_LoadFootprint(ZukanInfo *info, u32 species, u32 form, u32 
     setup.bgPriority = 0;
     if (species <= SPECIES_ARCEUS && formFile != 0xffff) {
         info->footprints[slot] = func_0204c040(info->unit, info->footprintChars[slot], info->footprintPalette,
-                                               info->footprintCellAnimsOld, &setup, vram, info->heapId);
+                                               info->footprintCellAnimsOld, &setup, surface, info->heapId);
     } else {
         info->footprints[slot] = func_0204c040(info->unit, info->footprintChars[slot], info->footprintPalette,
-                                               info->footprintCellAnims, &setup, vram, info->heapId);
+                                               info->footprintCellAnims, &setup, surface, info->heapId);
     }
     func_0204c438(info->footprints[slot], 1);
     func_0204c318(info->footprints[slot], 1);
