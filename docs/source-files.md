@@ -1763,7 +1763,7 @@ prints the tables below from the configs and the ROM:
 | `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | partial | string at `0x021be9a0` |
 | `mystery_album.c` | `0x021b99e0`–`0x021bd068` | 59 | partial | string at `0x021be9b0` |
 | `mystery_net.c` | `0x021bd068`–`0x021bdd34` | 40 | complete | string at `0x021be9c0` |
-| `mystery_check.c` | `0x021bdd34`–`0x021be2dc` | 2 | partial | descriptive |
+| `mystery_check.c` | `0x021bdd34`–`0x021be2dc` | 2 | complete | descriptive |
 
 ### Overlay 198
 

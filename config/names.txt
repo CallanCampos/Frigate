@@ -10942,6 +10942,8 @@ overlays/ov197 0x021bdd1c MysteryNet_OnDwcEvent
 overlays/ov197 0x021bdd34 MysteryCheck_CountErrors
 overlays/ov197 0x021bdd74 MysteryCheck_CountGiftErrors
 overlays/ov197 0x021be328 MYSTERY_GIFT_PROC_FUNCTIONS
+overlays/ov197 0x021be558 sYesNoWindow
+overlays/ov197 0x021be610 sBgPalTypes
 overlays/ov198 0x021b2f80 CommTvtField_SetFunc
 overlays/ov198 0x021b2f84 CommTvtField_SetFuncLine
 overlays/ov198 0x021b2f8c CommTvtField_InitBG

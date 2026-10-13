@@ -33,5 +33,6 @@ src/ov197/mystery_net.c:
     .bss        start:0x021bea40 end:0x021bea60
 
 src/ov197/mystery_check.c:
+    complete
     .text       start:0x021bdd74 end:0x021be31c
     .rodata     start:0x021be964 end:0x021be9a0
