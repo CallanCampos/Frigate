@@ -1636,3 +1636,7 @@ lib/nitro/src/card/card_pull_out.c:
     complete
     .text       start:0x0206fed8 end:0x0207002c
     .bss        start:0x0214bd40 end:0x0214bd4c
+
+lib/nitro/src/cp/cp_context.c:
+    complete
+    .text       start:0x0207002c end:0x020700a8
