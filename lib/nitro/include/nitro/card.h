@@ -55,6 +55,14 @@ void func_0206f898(void);
 typedef BOOL (*CARDPulledOutCallback)(void);
 
 void func_0206ff50(CARDPulledOutCallback callback); // CARD_SetPulledOutCallback
+void func_0206f0f0(u32 command, u32 value);
+void func_0206fed8(void);
+BOOL func_0206ff5c(void);
+void func_0206ffac(void);
+void func_0206ffb0(void);
+void func_0206ffbc(void);
+void func_0206ffc0(void);
+void func_0206ffcc(u32 cardId);
 
 static inline BOOL CARD_ReadBackup(u32 src, void *dest, u32 size) {
     return func_0206f80c(src, (u32)dest, size, NULL, NULL, FALSE, CARD_REQ_READ_BACKUP, 1, CARD_REQUEST_MODE_RECV);

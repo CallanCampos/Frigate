@@ -1740,6 +1740,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## When nothing moves it
 
+- A Thumb `bx pc` trampoline followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS` needs separate functions with
+  `#pragma thumb off` around the ARM function. `card_pull_out.c`'s two DSi jump stubs also need a Thumb `nop` after
+  `bx pc` to reproduce the alignment halfword. The probe reports these Thumb functions as two bytes long in the ROM,
+  excluding that padding; the full module check includes it. A C function pointer call makes each ARM part eight
+  bytes too large.
+
 - An index into a flat array of actors that the source names by ranges is written with the range's enum base even
   when that base is 0: `b_plist_obj.c`'s `BPlistObj_ShowList` matches only as `actors[BPLIST_ACTOR_ITEM + slot]`, since
   the named 0 changes what the compiler reuses, and `u8` locals for its index bases fixed two swapped stack slots in

@@ -333,6 +333,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Function order and presence
 
+- A Thumb to ARM `bx pc` trampoline: define a Thumb `asm void` with `bx pc; nop` and a separate ARM `asm void` with
+  `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, toggling `#pragma thumb off/on` around the ARM part.
+  (matching.md: "A Thumb `bx pc` trampoline")
+
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.
 - A static function whose symbol isn't renamed to its C name shows as "unknown" in the probe.

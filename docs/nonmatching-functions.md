@@ -6,11 +6,14 @@ and `--show-diff 1.1p1` the instructions.
 
 ## In C, not matching
 
-These functions are written as the closest natural C found. Their files are partial (no `complete` in `delinks.txt`), so
-the original code is linked until they match. The differences are the same in both versions.
+These functions are written as the closest natural C found. Unless a row says the full ROM matches, their files are
+partial (no `complete` in `delinks.txt`), so the original code is linked until they match. The differences are the same
+in both versions.
 
 | File | Function | Address | Difference |
 | --- | --- | --- | --- |
+| `lib/nitro/src/card/card_pull_out.c` | `func_0206ffac` | `0x0206ffac` / `0x0206ffd8` | Probe reports 4 bytes against 2 because the ROM symbol excludes its trailing Thumb `nop` alignment halfword. The complete file's ARM9 module matches byte for byte in both versions. |
+| `lib/nitro/src/card/card_pull_out.c` | `func_0206ffbc` | `0x0206ffbc` / `0x0206ffe8` | The same Thumb `nop` padding as `func_0206ffac`; the complete ARM9 module matches in both versions. |
 | `src/ov036/shortcut_menu.c` | `func_ov036_021bedd8` | `0x021bedd8` / `0x021bee10` | 8 bytes short (0x224 against 0x22c). Open. |
 | `src/ov036/shortcut_menu.c` | `SetupMenu` | `0x021bf204` / `0x021bf24c` | 2 bytes short (0x82 against 0x84). The original sets `sys_memset_fast`, keeps the window in a register across the three flush calls and reloads it from `work->window` for `printWindow.window`; ours keeps it in `r4`. Tried: no local window, the local declared before and after the member stores, `printWindow` filled before the flushes, and the arguments of `BmpWin_CreateDynamic` written as literals and reordered. Open. |
 | `src/ov036/shortcut_menu.c` | `ReadInput` | `0x021bf3a8` / `0x021bf450` | 0xc short (0x1b0 against 0x1bc). The original's frame is 0x14 with `count` on the stack at `sp` and the six `u16` locals at `sp+4` to `sp+0xe`; ours is 0x10 with `count` in `r7` and the locals at `sp` to `sp+0xa`, so every access is offset by 4 and one register more is pushed. Tried: all 504 orders of the locals with the six `u16` in order, `volatile count`, `count` as `u32`/`u16`/`s16`, `handled` as `u8`/`u32` with and without an initializer, `newIndex` inlined and as `u8`/`s32`. Open. |
