@@ -1,0 +1,24 @@
+# Nintendo's NitroWiFi, the TCP/IP stack (CPS) and socket layer (SOCL) under DWC, in overlay 11. It is Thumb code, built
+# apart from the game with the game's compiler, dsi/1.1p1, and the same flags as DWC (lib/dwc)
+compiler = "dsi/1.1p1"
+flags = [
+    "-O4,p",               # Optimize for speed
+    "-proc arm946e",       # ARM9 processor
+    "-thumb",              # Thumb code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char signed",        # char is signed
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]
+
+# CPS reaches its globals from one anchor, as -ipa file does
+[file_flags]
+"cps/cps.c" = ["-ipa file"]

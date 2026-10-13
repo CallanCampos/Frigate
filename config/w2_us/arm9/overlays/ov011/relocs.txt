@@ -490,6 +490,7 @@ from:0x0215271e kind:thumb_call to:0x0207a910 module:main
 from:0x02152724 kind:thumb_call to:0x0207a910 module:main
 from:0x0215272a kind:thumb_call to:0x0207bc50 module:main
 from:0x0215273e kind:thumb_call to:0x0207a5b4 module:main
+from:0x02152748 kind:load to:0x020050ac module:main
 from:0x0215274c kind:load to:0x0218ba4c module:overlay(11)
 from:0x02152758 kind:load to:0x0218bacc module:overlay(11)
 from:0x02152760 kind:load to:0x02152625 module:overlay(11)

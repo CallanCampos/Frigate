@@ -51,6 +51,11 @@ s32 func_ov011_0215c0ac(void);                                                  
 s32 func_ov011_0215c5d0(void);                                                  // WCM_CountApList
 s32 func_ov011_0215c60c(s32 lock);                                              // WCM_LockApList
 void *func_ov011_0215c65c(u16 index);                                           // WCM_PointApList
+// WCM_SendDCFDataEx: sends a frame to the MAC address dst as a header and the data after it, returning a negative
+// number on an error. NitroWiFi's CPS sends every frame through it
+s32 func_ov011_0215cba4(const u8 *dst, const u8 *header, s32 headerLen, const u8 *data, s32 dataLen);
+// Copies the MAC address of the wireless hardware to mac (WCM_GetMacAddress's role)
+void func_ov011_0215ccc0(u8 *mac);
 
 // The "any" BSSID and ESSID that a search takes when the caller gives none
 extern const u8 data_ov011_02184fdc[];

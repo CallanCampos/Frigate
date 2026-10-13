@@ -21,3 +21,8 @@ src/ov011/dwc_rap.c:
     .rodata     start:0x02185008 end:0x02185014
     .data       start:0x021852fc end:0x021853d4
     .bss        start:0x0218ba44 end:0x0218ba48
+
+lib/nitrowifi/src/cps/cps.c:
+    .text       start:0x0215255c end:0x02155e74
+    .data       start:0x0218546c end:0x021854ac
+    .bss        start:0x0218ba4c end:0x0218dc20

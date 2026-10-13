@@ -1813,10 +1813,10 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
     if (func_ov011_02157f10(&sSocConfig) < 0) {
         return -1;
     }
-    if (data_ov011_0218ba5c == 0) {
+    if (CPSMyIp == 0) {
         do {
             AossAp_Sleep(100);
-        } while (data_ov011_0218ba5c == 0);
+        } while (CPSMyIp == 0);
     }
     return 0;
 }

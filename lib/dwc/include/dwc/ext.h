@@ -7,6 +7,8 @@
 #include "system/rtc.h"
 #include "dwc/sake.h"
 #include "dwc/soap.h"
+// For CPS's address (CPSMyIp), which is set once the library has started
+#include "nitrowifi/cps.h"
 
 // What the DWC code of overlay 260 (GameSpy's Sake, the competition client and Nintendo's Gdb) calls in the main
 // module and in overlays 11 and 189. The ROM names none of it, so these are the addresses with a word on what each
@@ -212,18 +214,8 @@ int func_ov011_02157cd0(int sock, const void *buffer, int size, int flags, const
 int func_ov011_02157f10(const SocConfig *config);
 int func_ov011_0215800c(void);
 int func_ov011_021580d0(SocPollFd *fds, u32 count, s64 ticks);
-// Whether the library has started
-extern int data_ov011_0218ba5c;
 // Clears the WCM's list of access points
 void func_ov011_0215c594(void);
 
-// NitroSDK's alarms, by their code: OS_CreateAlarm, OS_SetAlarm (the alarm fires once after the ticks and calls the
-// function with the argument) and OS_CancelAlarm
-typedef struct OSAlarm {
-    u8 unk_00[0x2c];
-} OSAlarm;
-void func_0207bc24(OSAlarm *alarm);
-void func_0207bcf4(OSAlarm *alarm, u64 ticks, void (*handler)(void *arg), void *arg);
-void func_0207bd3c(OSAlarm *alarm);
 
 #endif // POKEBW2_DWC_EXT_H

@@ -31,6 +31,7 @@ asm_HWIsDSi kind:function(arm,size=0x20) addr:0x02004eb4
 asm_MemCpy32Fast kind:function(arm,size=0x4c) addr:0x02004ed4
 boot_MemSet32Fast kind:function(arm,size=0x5c) addr:0x02004f20
 BuildInfo kind:data(any) addr:0x02004fb0
+CPSi_Signature kind:data(any) addr:0x020050ac
 func_02004fd4 kind:function(arm,size=0x28) addr:0x02004fd4
 func_02004ffc kind:function(arm,size=0x34) addr:0x02004ffc
 main kind:function(thumb,size=0xb4) addr:0x02005124
