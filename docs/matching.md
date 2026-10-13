@@ -1083,6 +1083,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`count2X = right - width; middleX = count2X - width;` in `PrintCounts`, not a running `x -= width`), and an
   element stored and read back (`list->windows[i] = BmpWin_CreateDynamic(...); window = list->windows[i];`) computes
   its address before the call.
+- An index narrowed twice where one narrowing is expected adds a base that is zero: `u8 actor = ACTOR_CAR + car;`
+  with `ACTOR_CAR` 0 folds the addition but keeps the second narrowing. Seven functions of the roller coaster
+  (`gimmick_roller_coaster.c`) differed by that. Check a file's data values as well as its order when completing it:
+  all eighteen Y coordinates there were `FX32_CONST(2)` where the ROM has `FX32_CONST(32)`, which no probe shows.
 
 ## Branches and block layout
 
