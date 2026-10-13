@@ -120,6 +120,7 @@ src/ov167/btl_string.c:
     .bss        start:0x021dd87c end:0x021dd8e8
 
 src/ov167/btl_field.c:
+    complete
     .text       start:0x021d5968 end:0x021d5e1c
     .data       start:0x021dafd4 end:0x021dafe0
     .bss        start:0x021dd8e8 end:0x021dda60

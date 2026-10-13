@@ -16,7 +16,7 @@ static u32 UnityTowerVisitors_Count(UnityTowerVisitor *visitors);
 static u32 UnityTowerVisitors_CountCountry(UnityTowerVisitor *visitors, u32 country);
 static u32 UnityTowerVisitors_FindCountry(UnityTowerVisitor *visitors, u32 country);
 static u32 UnityTowerVisitors_Find(UnityTowerVisitor *visitors, UnityTowerVisitor *visitor);
-static void UnityTowerVisitors_Remove(UnityTowerVisitor *visitors, u32 index);
+static void UnityTowerVisitors_Remove(UnityTowerVisitor *visitors, unsigned long index);
 static void UnityTowerSurvey_AddVisitor(UnityTowerSurveySave *save, UnityTowerVisitor *visitor, BOOL scriptFlag);
 static void UnityTowerVisitors_Add(UnityTowerVisitor *visitors, UnityTowerVisitor *visitor, BOOL scriptFlag);
 
@@ -122,7 +122,8 @@ static u32 UnityTowerVisitors_Find(UnityTowerVisitor *visitors, UnityTowerVisito
 }
 
 // Closes the gap the visitor leaves, and clears the entries left at the end
-static void UnityTowerVisitors_Remove(UnityTowerVisitor *visitors, u32 index) {
+// The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+static void UnityTowerVisitors_Remove(UnityTowerVisitor *visitors, unsigned long index) {
     if (index >= UNITY_TOWER_VISITOR_MAX) {
         return;
     }

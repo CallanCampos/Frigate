@@ -1531,7 +1531,7 @@ prints the tables below from the configs and the ROM:
 | `btl_rec.c` | `0x021d45b0`–`0x021d4a1c` | 18 | partial | string at `0x021dafb8` |
 | `btl_adapter.c` | `0x021d4a1c`–`0x021d4c64` | 17 | complete | string at `0x021dafc4` |
 | `btl_string.c` | `0x021d4c64`–`0x021d5968` | 33 | complete | descriptive |
-| `btl_field.c` | `0x021d5968`–`0x021d5e1c` | 36 | partial | string at `0x021dafd4` |
+| `btl_field.c` | `0x021d5968`–`0x021d5e1c` | 36 | complete | string at `0x021dafd4` |
 | `pokewood_cutin.c` | `0x021d5e1c`–`0x021d6c24` | 48 | partial | string at `0x021dafe0` |
 
 ### Overlay 168
@@ -2029,7 +2029,7 @@ prints the tables below from the configs and the ROM:
 | `worldtrade_demo.c` | `0x021d5c48`–`0x021d61dc` | 6 | complete | string at `0x021e2bec` |
 | `worldtrade_deposit.c` | `0x021d61dc`–`0x021d77c8` | 59 | partial | string at `0x021e2ca0` |
 | `worldtrade_enter.c` | `0x021d77c8`–`0x021d8074` | 30 | complete | string at `0x021e2d34` |
-| `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | partial | string at `0x021e2dd8` |
+| `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | complete | string at `0x021e2dd8` |
 | `worldtrade_mypoke.c` | `0x021daeb8`–`0x021dba8c` | 27 | complete | descriptive |
 | `worldtrade_partner.c` | `0x021dba8c`–`0x021dc784` | 29 | complete | descriptive |
 | `worldtrade_search.c` | `0x021dc784`–`0x021de3f8` | 61 | complete | string at `0x021e2f38` |
@@ -2386,7 +2386,7 @@ prints the tables below from the configs and the ROM:
 | `b_plist_anm.c` | `0x021f4440`–`0x021f4f44` | 12 | complete | string at `0x021fb860` |
 | `b_plist_bmp.c` | `0x021f4f44`–`0x021f75dc` | 56 | complete | descriptive |
 | `b_plist_obj.c` | `0x021f75dc`–`0x021f8714` | 34 | complete | descriptive |
-| `b_plist_main.c` | `0x021f8714`–`0x021facd0` | 79 | partial | string at `0x021fb870` |
+| `b_plist_main.c` | `0x021f8714`–`0x021facd0` | 79 | complete | string at `0x021fb870` |
 | `b_plist_cursor.c` | `0x021facd0`–`0x021fadac` | 9 | complete | descriptive |
 
 ### Overlay 288

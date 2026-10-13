@@ -1397,6 +1397,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `if (WH_End(NULL)) { return; }` keeps a bare `cmp r0, #0` before the `pop` that a `break` drops, and initializing a
   `.bss` static (`static NetWhpipeWork *sWork = NULL;`) changed the order of two equal-size local initializers in
   `.rodata` while the static stays in `.bss`.
+- Switching `u32`/`s32` to the SDK's `unsigned long`/`long` for the whole project was tried with a full rebuild: 12
+  nonmatching functions then match and 75 matching ones break (27 restored by an `int` local, 30 only by an `int`
+  parameter, 18 not at all), so the typedefs stay `unsigned int`/`int` and a function that wants the SDK's type gets
+  it on one local, parameter or struct field (`RivalDataSave.metTrainerCount`: `arr[s->count - 1]` compiles to
+  `adds; subs #4; str` only with an `unsigned long` count). When a row says a constant is folded into an index or an
+  offset the wrong way, or two index registers are swapped, try each 32-bit index as `unsigned long` first.
 
 ## Loops
 

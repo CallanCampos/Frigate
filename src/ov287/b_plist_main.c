@@ -1093,8 +1093,6 @@ static void BPlistMain_ExitText(BPlistWork *work) {
     GFL_StrBufFree(work->strBuf);
 }
 
-// NONMATCHING: narrows PokeParty_GetSex's result before the sex bit field, which the original doesn't (it
-// matches once PokeParty_GetSex returns u8)
 static void BPlistMain_SetPokemon(BPlistWork *work, PartyPkm *pkm, BPlistPokemon *row) {
     BPlistMove *move;
     u32 i;
@@ -1156,10 +1154,9 @@ static void BPlistMain_SetPokemon(BPlistWork *work, PartyPkm *pkm, BPlistPokemon
     }
 }
 
-// NONMATCHING: in the multi battle loop the original keeps i * 0x4c in r6 across the calls and adds 0xe4 to it
-// for the partner's row, where this computes (i + 3) * 0x4c
 static void BPlistMain_InitPokemon(BPlistWork *work) {
-    u32 i;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long i;
 
     if (work->param->unk18 == FALSE) {
         for (i = 0; i < 6; i++) {

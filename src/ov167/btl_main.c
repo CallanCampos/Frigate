@@ -3347,7 +3347,8 @@ void func_ov167_0219dc10(BtlMainModule *mainModule) {
     u16 item;
     u8 clientId;
     u32 j;
-    u32 index;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long index;
     u32 k;
     BattleParty *battleParty;
     u32 monCount;
