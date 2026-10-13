@@ -189,9 +189,6 @@ static const u8 sBadgePaletteStarts[16] = {
     2, 3, 6, 5, 4, 5, 2, 0, 1, 3, 6, 5, 4, 7, 7, 0,
 };
 
-// Two bytes that nothing in the overlay refers to, before the tables: a global that is not used
-const u8 WifiBattleMatchView_Unk021C5EB4[2] = { 0, 2 };
-
 // The windows of the Wi-Fi competition's card, of the other player's card, of the live one's card and of the rank
 // card, each with its x, y, width and height
 static const u8 sPartnerCardRects[8][4] = {
@@ -292,6 +289,8 @@ static u32 WifiBattleMatchView_GetRes(WifiBattleMatchRes *res, u32 index) {
 }
 
 void WifiBattleMatchRes_Update(WifiBattleMatchRes *res) {
+    // The palette rows that are blended: the first of the BGs and the third of the main screen's OBJs
+    static const u8 sRows[2] = { 0, 2 };
     int i;
 
     if (res->angle + 0x200 >= 0x10000) {
@@ -300,11 +299,11 @@ void WifiBattleMatchRes_Update(WifiBattleMatchRes *res) {
         res->angle += 0x200;
     }
     for (i = 0; i < 16; i++) {
-        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_MAIN, &res->colors[i], &res->angle, 0, 0, i,
+        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_MAIN, &res->colors[i], &res->angle, 0, sRows[0], i,
                                        res->colorsA[i], res->colorsB[i]);
-        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_SUB, &res->colors[i], &res->angle, 0, 0, i,
+        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_SUB, &res->colors[i], &res->angle, 0, sRows[0], i,
                                        res->colorsA[i], res->colorsB[i]);
-        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, &res->colors[i], &res->angle, 0, 2, i,
+        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, &res->colors[i], &res->angle, 0, sRows[1], i,
                                        res->colorsA[i], res->colorsB[i]);
     }
 }
