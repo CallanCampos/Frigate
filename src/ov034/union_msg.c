@@ -801,6 +801,15 @@ void UnionMsg_FreeRuleMenu(UnionSystem *unisys)
     UnionMsg_FreeMenu(unisys);
 }
 
+// Whether the number is one of sMenuInfo's menus
+static inline BOOL UnionMsg_IsMenuKind(u32 kind)
+{
+    if (kind < NELEMS(sMenuInfo)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 // Runs the menu of the battle rules and takes the choice: the value is a submenu or a rule. picked says the choice
 // changed the rules or opened a menu, isFinal that the rules are confirmed
 u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL *isFinal, Field *field)
@@ -838,7 +847,7 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
         }
     }
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; UnionMsg_IsMenuKind(i); i++) {
         if (sMenuInfo[i].rows == (const UnionMenuRow *)ret) {
             *picked = TRUE;
             return i;

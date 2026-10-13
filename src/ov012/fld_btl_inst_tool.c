@@ -573,9 +573,9 @@ static BOOL func_ov012_02162ae8(const BSubwayTrainer *trainer) {
     return FALSE;
 }
 
-u32 func_ov012_02162b0c(u32 arcId, u16 file, HeapID heapId) {
+u16 func_ov012_02162b0c(u32 arcId, u16 file, HeapID heapId) {
     u16 *trainerData = func_ov012_021627c0(arcId, file, heapId);
-    u32 value = func_ov012_02162b38(trainerData[0]);
+    u16 value = func_ov012_02162b38(trainerData[0]);
 
     GFL_HeapFree(trainerData);
     return value;
@@ -589,7 +589,7 @@ u16 func_ov012_02162b28(u32 arcId, u16 file, HeapID heapId) {
     return trainerClass;
 }
 
-u32 func_ov012_02162b38(u32 trainerClass) {
+u16 func_ov012_02162b38(u32 trainerClass) {
     u32 i;
 
     for (i = 0; i < NELEMS(data_ov012_0216d9b4); i++) {

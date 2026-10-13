@@ -407,7 +407,7 @@ s32 FindMysteryGiftDeliveryManNPCID(GameData *gameData) {
     return -1;
 }
 
-BOOL func_ov033_02178074(MysteryGift *gift, u32 kind) {
+BOOL func_ov033_02178074(MysteryGift *gift, u8 kind) {
     if (kind != 2) {
         return FALSE;
     }
@@ -420,7 +420,7 @@ BOOL func_ov033_02178074(MysteryGift *gift, u32 kind) {
     return FALSE;
 }
 
-u32 func_ov033_021780a4(FieldScriptEnv *env, MysteryGift *gift, u32 kind) {
+u32 func_ov033_021780a4(FieldScriptEnv *env, MysteryGift *gift, u8 kind) {
     PartyPkm *pkm;
     PlayerInfo *playerInfo;
     u32 result;

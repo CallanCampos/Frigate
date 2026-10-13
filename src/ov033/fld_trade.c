@@ -70,7 +70,7 @@ StrBuf *FieldTradeInput_LoadName(u32 heapId, u32 messageId) {
     return name;
 }
 
-void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm, const FieldTradeOfferData *offer,
+void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm, FieldTradeOfferData *offer,
                                u32 offerIndex) {
     u32 sexMode = offer->sex;
     u32 pid;

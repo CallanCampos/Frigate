@@ -72,8 +72,8 @@ BOOL CreateSurfPos(void *context, Field *field, VecFx32 *position) {
 GameEvent *EventFieldFishing_Create(Field *field, GameSystem *gsys) {
     GameEvent *event;
     FishingEventWork *work;
-    VecFx32 position;
     MapTerrainBuf terrain;
+    VecFx32 position;
     u32 flag;
 
     event = GameEvent_Create(gsys, NULL, EventFieldFishing_Callback, sizeof(FishingEventWork));
@@ -90,7 +90,7 @@ GameEvent *EventFieldFishing_Create(Field *field, GameSystem *gsys) {
     work->faceDirection = GetActorFaceDir(work->actor);
     FieldPlayer_GetWPos(work->player, &work->playerPos);
     work->playerExState = FieldPlayer_DeriveExState(work->player);
-    if (!CreateSurfPos(work, work->field, &work->fishingPos)) {
+    if (!CreateSurfPos(work->gameData, work->field, &work->fishingPos)) {
         work->noFishing = 1;
     }
     work->gridX = (work->fishingPos.x >> 4) / 4096;
@@ -99,15 +99,21 @@ GameEvent *EventFieldFishing_Create(Field *field, GameSystem *gsys) {
     position = work->playerPos;
     ExpandVecInGridDir(1, &position, 0x10000);
     flag = 1;
-    if (FieldG3DMapper_GetTerrain(Field_GetG3DMapper(field), &position, &terrain)) {
+    if (!FieldG3DMapper_GetTerrain(Field_GetG3DMapper(field), &position, &terrain)) {
+        work->flag5B = flag;
+    } else {
         if (GetTileFlags(terrain.tileType) & 0x40) {
             flag = 0;
         }
+        work->flag5B = flag;
     }
-    work->flag5B = flag;
-    flag = EncountState_CheckSpecialEncountPos(work->encountSystem, &work->gridX) ? TRUE : FALSE;
-    work->isPhenomenon = flag;
-    work->battleSetup = BtlSetup_CreateFishing(work->encountSystem, flag);
+    if (EncountState_CheckSpecialEncountPos(work->encountSystem, &work->gridX)) {
+        work->isPhenomenon = TRUE;
+        work->battleSetup = BtlSetup_CreateFishing(work->encountSystem, TRUE);
+    } else {
+        work->isPhenomenon = FALSE;
+        work->battleSetup = BtlSetup_CreateFishing(work->encountSystem, FALSE);
+    }
     DisableAllActorsMovement(work->actorSystem);
     return event;
 }
