@@ -130,20 +130,19 @@ static void BPlistObj_ClearResources(BPlistWork *wk) {
     }
 }
 
-// NONMATCHING: 4 bytes longer; the original hoists &wk->charRes out of the loop, we hoist &wk->pokemon and load 0x24a4
 static void BPlistObj_LoadPokeIconRes(BPlistWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(wk->param->heapId));
+    u32 *res = wk->charRes;
     u16 i;
 
     for (i = 0; i < 6; i++) {
-        BPlistPokemon *pkm = &wk->pokemon[i];
-        u32 file;
-        if (pkm->species != 0) {
-            file = PokeIcon_GetFileOfPkm(func_0201d624(pkm->pkm));
+        if (wk->pokemon[i].species != 0) {
+            res[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(wk->pokemon[i].pkm)), FALSE,
+                                   CLACT_VRAM_SUB, wk->param->heapId);
         } else {
-            file = PokeParty_GetIconIndex(0, 0, 0, FALSE);
+            res[i] = func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB,
+                                   wk->param->heapId);
         }
-        wk->charRes[i] = func_0204b81c(arc, file, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
     }
     wk->plttRes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->param->heapId);
     wk->cellRes[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->param->heapId);

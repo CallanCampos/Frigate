@@ -270,6 +270,11 @@ Same instructions, registers swapped.
   `(u16)chars`) the zeros stored for the stack arguments still come from the hoisted `count = 0` slot, as in the
   original, but the later `sys_memset(…, 0, …)` and `for (i = 0; …)` of the inlined code build their own. Where
   `count` is declared or set, its type, and the shape of the inline changed nothing.
+- A store written in each branch of an `if` is the extra use that wins a register for a member-pointer local. The
+  battle party list's `BPlistObj_LoadPokeIconRes` has `u32 *res = wk->charRes;` before its loop and writes
+  `res[i] = func_0204b81c(...)` in both branches, with `wk->pokemon[i]` indexed at each use. With one store after
+  the branches the code has the right size but the file handle and `res` are swapped in `r6`/`r7`, through every
+  declaration order.
 
 ## Stack slots
 

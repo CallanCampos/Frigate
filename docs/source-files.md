@@ -2273,7 +2273,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `b_plist_anm.c` | `0x021f4440`–`0x021f4f44` | 12 | complete | string at `0x021fb860` |
 | `b_plist_bmp.c` | `0x021f4f44`–`0x021f75dc` | 56 | complete | descriptive |
-| `b_plist_obj.c` | `0x021f75dc`–`0x021f8714` | 34 | partial | descriptive |
+| `b_plist_obj.c` | `0x021f75dc`–`0x021f8714` | 34 | complete | descriptive |
 | `b_plist_main.c` | `0x021f8714`–`0x021facd0` | 79 | partial | string at `0x021fb870` |
 | `b_plist_cursor.c` | `0x021facd0`–`0x021fadac` | 9 | complete | descriptive |
 
