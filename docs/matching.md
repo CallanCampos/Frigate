@@ -82,6 +82,9 @@ Same instructions, registers swapped.
   other (`movs r6, #0` ... `subs r4, r6, #1` for `-1`), declare the locals without initializers and assign them in the
   original's order. The phrase select's `PMSSelect_SeqSelect` needs `BOOL end; int touch;` then `touch = -1;
   end = FALSE;`.
+- A pointer that must have the earlier declaration's slot but a later store is declared without an initializer and
+  assigned after the other pointers. This matches the item-base spills in `Aoss_ParseWep` and `Aoss_ParsePsk` in
+  `dwc_aoss.c`.
 - Of two variables that compete for the same register, the one used more gets it: one use of the Battle Subway
   command's result variable too many gave its register to the command ID. A single `*var = cond ? a : b;` counts as
   one use where an `if`/`else` with a store in each counts as two. Measured on small functions, the count is of
