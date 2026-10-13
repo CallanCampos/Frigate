@@ -257,6 +257,11 @@ Same instructions, registers swapped.
   `if (hw_isDSi()) { sNetInit.wifiHeapSize = 0x79000; } else { sNetInit.wifiHeapSize = 0x5e400; }` and then fills
   `sNetInit.` directly. A ternary store loads the address late into a scratch register, and a
   `GFLNetInitData *init = &sNetInit;` local swaps `r4` and `r5`.
+- Constants hoisted into saved registers across a run of `f(g(x, N), FALSE)` calls (`movs r1, #0; movs r4, #0` at the
+  first call, `adds r1, r4, #0` at the last ones) come from the inner call's result passing through one local that
+  every statement reassigns: `actor = GetActor(...); func_0204c124(actor, FALSE);`, as the habitat list's
+  `ZukanHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
+  constant locals, inline helpers and loops did not reproduce it.
 
 ## Stack slots
 
@@ -603,6 +608,11 @@ Same instructions, scheduled in another order.
   `staff`), declared together ahead of `wordSet`. One `strbuf` for
   all three stays in `r4`, the width takes `r6`, and the print colour is then shared across the last two prints
   where the original builds it again for each.
+- A member array's offset added to the struct pointer before the index is shifted
+  (`adds r2, r6, r1; lsls r1, r4, #2; ldr r1, [r2, r1]`) comes from a pointer local that is initialized and then
+  stepped: `u32 *state = area->states; state += type;` in `ZukanHabitat_GetTypeAward`. A pointer that is only
+  initialized (`&area->states[type]`), a nested struct, an inline accessor and other index types all fold back to
+  `(area + type * 4) + 0x354`.
 
 ## An instruction too many or too few
 

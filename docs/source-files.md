@@ -2428,7 +2428,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | partial | descriptive |
+| `zukan_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | complete | descriptive |
 | `zukan_habitat_graphic.c` | `0x021a1a80`–`0x021a32d8` | 58 | complete | descriptive |
 
 ### Overlay 304
