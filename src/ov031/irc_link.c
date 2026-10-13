@@ -24,7 +24,8 @@ typedef struct {
     void (*recvCallback)(u8 *data, u8 size, u8 cmd, u8 id);
     // Called when the link ends, and when the other side accepts it
     void (*closeCallback)(int a0);
-    void (*connectCallback)(void);
+    // Never set. The call keeps the peer's ID in r0 and a zero in r1, so it takes both
+    void (*connectCallback)(u8 id, int a1);
     BOOL resend;
     // Whether this machine pinged and got the reply
     BOOL isParent;
@@ -246,6 +247,8 @@ static BOOL IrcLink_ValidateFrame(u8 size) {
 }
 
 BOOL IrcLink_Poll(void) {
+    IrcFrameData *frame;
+    u8 *raw;
     u8 size = IrcSpi_Recv((u8 *)&IrcFrame);
 
     if (IrcLink_IsRecvIgnored(size)) {
@@ -261,48 +264,28 @@ BOOL IrcLink_Poll(void) {
         return FALSE;
     }
     IrcLink.tick = clock();
-    if (IrcFrame.cmd < IRC_CMD_MIN) {
+    frame = &IrcFrame;
+    raw = (u8 *)&IrcFrame;
+    if (raw[0] < IRC_CMD_MIN) {
         if (!IrcLink.linked) {
             return FALSE;
         }
-        if (IrcFrame.id != IrcLinkIds.local) {
+        if (raw[1] != IrcLinkIds.local) {
             return FALSE;
         }
     }
-    switch (IrcFrame.cmd) {
-    case IRC_CMD_RESEND:
-        IrcLink_OnError();
-        break;
-    case IRC_CMD_ACCEPT:
-        if (IrcLink.state == IRC_STATE_REPLIED) {
-            IrcLink.state = IRC_STATE_CHILD_LINKED;
-            IrcLinkIds.peer = IrcFrame.id;
-            IrcLink.linked = TRUE;
-            IrcLink.resend = FALSE;
-            IrcLink.pinging = FALSE;
-            if (IrcLink.connectCallback != NULL) {
-                IrcLink.connectCallback();
-            }
-        }
-        break;
-    case IRC_CMD_REPLY:
-        if (IrcLink.state == IRC_STATE_PING_SENT) {
-            IrcLink.state = IRC_STATE_PARENT_LINKED;
-            IrcLink.isParent = TRUE;
-            IrcLinkIds.peer = IrcFrame.id;
-            if (IrcFrame.id == IrcLinkIds.local) {
-                IrcLink_SendFrame(NULL, 0, IRC_CMD_ACCEPT, IrcLinkIds.local);
-                IrcLink.linked = TRUE;
-                IrcLink.resend = FALSE;
-                IrcLink.pinging = FALSE;
-            }
-        }
-        break;
+    switch (frame->cmd) {
     case IRC_CMD_PING:
         switch (IrcLink.state) {
+        case IRC_STATE_IDLE:
+            break;
         case IRC_STATE_PING_SENT:
             IrcLink.state = IRC_STATE_REPLIED;
             IrcLink_SendFrame(NULL, 0, IRC_CMD_REPLY, IrcLinkIds.local);
+            break;
+        case IRC_STATE_REPLIED:
+        case IRC_STATE_PARENT_LINKED:
+        case IRC_STATE_CHILD_LINKED:
             break;
         }
         if (!IrcLink.pinging) {
@@ -317,6 +300,34 @@ BOOL IrcLink_Poll(void) {
                 IrcLink_Nop();
             }
         }
+        break;
+    case IRC_CMD_REPLY:
+        if (IrcLink.state == IRC_STATE_PING_SENT) {
+            IrcLink.state = IRC_STATE_PARENT_LINKED;
+            IrcLink.isParent = TRUE;
+            IrcLinkIds.peer = frame->id;
+            if (frame->id == IrcLinkIds.local) {
+                IrcLink_SendFrame(NULL, 0, IRC_CMD_ACCEPT, IrcLinkIds.local);
+                IrcLink.linked = TRUE;
+                IrcLink.resend = FALSE;
+                IrcLink.pinging = FALSE;
+            }
+        }
+        break;
+    case IRC_CMD_ACCEPT:
+        if (IrcLink.state == IRC_STATE_REPLIED) {
+            IrcLink.state = IRC_STATE_CHILD_LINKED;
+            IrcLinkIds.peer = frame->id;
+            IrcLink.linked = TRUE;
+            IrcLink.resend = FALSE;
+            IrcLink.pinging = FALSE;
+            if (IrcLink.connectCallback != NULL) {
+                IrcLink.connectCallback(frame->id, 0);
+            }
+        }
+        break;
+    case IRC_CMD_RESEND:
+        IrcLink_OnError();
         break;
     default:
         if (IrcLink.resend != TRUE && IrcLink.linked) {
