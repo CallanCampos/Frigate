@@ -1,7 +1,16 @@
 {
-  "pre_tool_use": [
-    {
-      "command": "python3 \"$CODEX_PROJECT_DIR/.codex/hooks/guard.py\""
-    }
-  ]
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/guard.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
 }
