@@ -1619,6 +1619,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   relocations, and two with the same contents only by the code that loads them: `btlv_scu.c`'s four 12-byte
   encounter step tables, two of them identical, needed their own declaration order, found by trying the orders of
   the four.
+- When structured reorderings don't reach the shared section's tie order, invert the model: the heapsort permutation
+  depends only on the sequence of sizes by declaration slot, so for a given sequence the ROM's layout forces which
+  object every slot must hold, exactly. Search the size sequences instead of the orders — anneal with the forced
+  assignment's uses-before-definition count as the cost, swapping the sizes of two slots (prefer the two slots of a
+  violated edge) — and write the file in the forced order that reaches zero. `demo3d_data.c` (overlay 293, 516
+  objects, 341 small ones misplaced by every per-demo structure tried) matched this way, with one table left after
+  its user and forward-declared. `tools/decomp/rodata_solver.py` runs this search.
 - A `static const` table declared inside the one function that reads it is listed where that function is, among
   the local initializers, rather than where file-scope data would be. `pokemontrade_nego.c` lays out its menus' item
   lists in the game's order only with its table of blocking fields declared inside `func_ov194_021bbe60`, and
