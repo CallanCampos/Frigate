@@ -1,7 +1,6 @@
 #include "types.h"
 #include "battle/btl_calc.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_setup.h"
 #include "battle/btl_tables.h"

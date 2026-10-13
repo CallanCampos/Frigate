@@ -2,7 +2,6 @@
 #include "battle/btl_event.h"
 #include "battle/btl_handler.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
 #include "battle/btl_tables.h"

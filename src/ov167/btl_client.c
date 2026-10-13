@@ -5,7 +5,6 @@
 #include "battle/btl_client.h"
 #include "battle/btl_field.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
 #include "battle/btl_poke_select.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_rec.h"
