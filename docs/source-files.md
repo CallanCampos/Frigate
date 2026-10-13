@@ -750,7 +750,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `union_subdisp.c` | `0x021ea860`–`0x021eb9fc` | 37 | partial | string at `0x021eba80` |
+| `union_subdisp.c` | `0x021ea860`–`0x021eb9fc` | 37 | complete | string at `0x021eba80` |
 
 ### Overlay 83
 

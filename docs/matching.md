@@ -1348,6 +1348,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A loop over an array of small structs read through by-value inline getters matches only when each getter takes
   `learnset[i]` itself: `poke_tool.c`'s learnset loops (`PML_UtilPkmSetDefaultMoves`, `PokeParty_LearnNextLevelMove`)
   lose the copy the original makes for `GetMove` when the element is first put in an `entry` local.
+- A loop entered with a `b` to its test and reloading its bound on each pass, where every plain comparison is
+  rotated, has a test whose value is 0/1: `i <= ICON_COUNT - 1 ? TRUE : FALSE`, or an inline predicate. The Union
+  Room's lower screen has it in `UnionSubdisp_SelectIcon` and in the `UnionSubdisp_ShowSelected` inline of `Create`.
+  The same file's three BG setups are one `static const BGSetup sBGSetups[3]` (as three statics their section order
+  was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
+  `.data` match: the strings give the original's variable names.
 
 ## Switches
 
