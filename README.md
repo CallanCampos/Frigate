@@ -34,9 +34,7 @@ ROMs are not included or provided.
 | White 2 | `orig/baserom_w2_us.nds` | `b5d7490be7b415b8f1e672a53e978a9cc667e56a` |
 
 Output: `build/pokeblack2_us.nds` and/or `build/pokewhite2_us.nds`.
-See [Build details](docs/building.md) for macOS setup, toolchain options and modified builds. The ROMs match on
-Linux x86-64 (WSL included) only for now: [a few functions](docs/building.md#the-compilers-floating-point-precision) need
-the compiler run in a way that the build sets up only there.
+See [Build details](docs/building.md) for macOS setup, toolchain options and modified builds.
 
 ## Contribute
 

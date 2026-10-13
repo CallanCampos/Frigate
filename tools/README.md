@@ -14,6 +14,4 @@ build runs them with the system's `python3`.
 | `script/` | The field and trainer AI scripts' disassemblers and command table, see [docs/scripts.md](../docs/scripts.md) |
 | `compiler_tests/` | Small C files that pin down how the compiler behaves |
 
-`dsd`, `mwccarm`, `objdiff-cli` and `wibo` are the external tools, which `configure.py` downloads. `win32_fpu.c` is
-the wrapper that `configure.py` builds and runs wibo through on Linux, see
-[Build details](../docs/building.md#the-compilers-floating-point-precision).
+`dsd`, `mwccarm`, `objdiff-cli` and `wibo` are the external tools, which `configure.py` downloads.

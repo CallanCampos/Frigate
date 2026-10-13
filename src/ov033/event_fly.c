@@ -54,11 +54,6 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
     FieldCamera *camera = Field_GetCameraSystem(field);
     void *g3dCi = Field_Get3DCi(field);
     NoGridMapper *mapper = Field_GetNoGridMapper(field);
-    FieldEvCameraAnimationFlags returnFlags;
-    VecFx32 landingPosition;
-    VecFx32 takeoffPosition;
-    FieldEvCameraAnimationSetup landingSetup;
-    FieldEvCameraAnimationSetup takeoffSetup;
     GameEvent *next;
     FieldActor *actor;
     u32 enabled;
@@ -70,7 +65,10 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         FieldCamera_FinishDelay(camera);
         (*state)++;
         break;
-    case 1:
+    case 1: {
+        VecFx32 takeoffPosition;
+        FieldEvCameraAnimationSetup takeoffSetup;
+
         if (work->bind != NULL && FieldCamera_IsDelayActive(camera)) {
             break;
         }
@@ -94,6 +92,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         takeoffSetup.flags.animateTargetPos = TRUE;
         FieldCameraAnm_SetAnimation(camera, &takeoffSetup, 10);
         (*state)++;
+    }
     case 2:
         if (FieldCamera_IsAnimating(camera)) {
             break;
@@ -113,7 +112,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         (*state)++;
         break;
     case 4:
-        GameEvent_ChainNext(event, EventMapChange_CreateForFly(work->gsys, field, work->zoneId, &work->spawn, 1));
+        GameEvent_ChainNext(event, EventMapChange_CreateForFly(work->gsys, field, (u16)work->zoneId, &work->spawn, 1));
         (*state)++;
         break;
     case 5:
@@ -122,7 +121,10 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         FieldCamera_FinishDelay(camera);
         (*state)++;
         break;
-    case 6:
+    case 6: {
+        VecFx32 landingPosition;
+        FieldEvCameraAnimationSetup landingSetup;
+
         if (work->bind != NULL && FieldCamera_IsDelayActive(camera)) {
             break;
         }
@@ -147,6 +149,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         landingSetup.flags.animateTargetPos = TRUE;
         FieldCameraAnm_SetAnimation(camera, &landingSetup, 1);
         (*state)++;
+    }
     case 7:
         if (FieldCamera_IsAnimating(camera)) {
             break;
@@ -161,16 +164,20 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
     case 8:
         DisableAllActorsMovement(Field_GetActorSystem(field));
         next = EventFieldEffect_Create(work->gsys, g3dCi, work->effectIn);
-        if (next == NULL) {
+        if (next != NULL) {
+            GameEvent_ChainNext(event, next);
+        } else {
             actor = FieldPlayer_GetActor(Field_GetPlayer(field));
             SetActorHidden(actor, FALSE);
             CheckSetActorFaceDir(actor, 1);
             next = GameEvent_Create(work->gsys, event, func_ov033_02178c6c, 0);
+            GameEvent_ChainNext(event, next);
         }
-        GameEvent_ChainNext(event, next);
         (*state)++;
         break;
-    case 9:
+    case 9: {
+        FieldEvCameraAnimationFlags returnFlags;
+
         EnableAllActorsMovement(Field_GetActorSystem(field));
         func_ov036_021b50f4(Field_GetPlaceName(field), work->zoneId);
         returnFlags.animateExtraTranslation = TRUE;
@@ -181,6 +188,7 @@ GameEventReturnCode EventFly_Callback(GameEvent *event, u32 *state, void *data) 
         returnFlags.animateTargetPos = TRUE;
         FieldCameraAnm_SetReturnAnimation(camera, &returnFlags, 10);
         (*state)++;
+    }
     case 10:
         if (FieldCamera_IsAnimating(camera)) {
             break;

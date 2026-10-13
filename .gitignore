@@ -10,7 +10,6 @@ tools/dsd.rev
 tools/src/
 tools/objdiff-cli
 tools/wibo
-tools/win32_fpu
 tools/mwccarm
 
 .venv

@@ -161,9 +161,9 @@ func_ov182_021aaf44 kind:function(thumb,size=0x94) addr:0x021aaf44
 func_ov182_021aafd8 kind:function(thumb,size=0x38) addr:0x021aafd8
 func_ov182_021ab010 kind:function(thumb,size=0x14) addr:0x021ab010
 func_ov182_021ab024 kind:function(thumb,size=0x1c) addr:0x021ab024
-func_ov182_021ab040 kind:function(thumb,size=0x8c) addr:0x021ab040
-func_ov182_021ab0cc kind:function(thumb,size=0x28) addr:0x021ab0cc
-func_ov182_021ab0f4 kind:function(thumb,size=0x88) addr:0x021ab0f4
+DWCUtilUiEffect_Init kind:function(thumb,size=0x8c) addr:0x021ab040
+DWCUtilUiEffect_Destroy kind:function(thumb,size=0x28) addr:0x021ab0cc
+DWCUtilUiEffect_Update kind:function(thumb,size=0x88) addr:0x021ab0f4
 func_ov182_021ab17c kind:function(thumb,size=0x9c) addr:0x021ab17c
 func_ov182_021ab218 kind:function(thumb,size=0x20) addr:0x021ab218
 func_ov182_021ab238 kind:function(thumb,size=0x10) addr:0x021ab238
@@ -179,9 +179,9 @@ func_ov182_021ab378 kind:function(thumb,size=0xf4) addr:0x021ab378
 func_ov182_021ab46c kind:function(thumb,size=0x3c) addr:0x021ab46c
 func_ov182_021ab4a8 kind:function(thumb,size=0x50) addr:0x021ab4a8
 func_ov182_021ab4f8 kind:function(thumb,size=0x90) addr:0x021ab4f8
-func_ov182_021ab588 kind:function(thumb,size=0xc) addr:0x021ab588
-func_ov182_021ab594 kind:function(thumb,size=0x88) addr:0x021ab594
-func_ov182_021ab61c kind:function(thumb,size=0x20) addr:0x021ab61c
+DWCUtilScreen_Reset kind:function(thumb,size=0xc) addr:0x021ab588
+DWCUtilScreen_Start kind:function(thumb,size=0x88) addr:0x021ab594
+DWCUtilScreen_Stop kind:function(thumb,size=0x20) addr:0x021ab61c
 func_ov182_021ab63c kind:function(thumb,size=0x40) addr:0x021ab63c
 func_ov182_021ab67c kind:function(thumb,size=0x28) addr:0x021ab67c
 func_ov182_021ab6a4 kind:function(thumb,size=0x2c) addr:0x021ab6a4
@@ -1139,7 +1139,7 @@ data_ov182_021bef18 kind:data(any) addr:0x021bef18
 data_ov182_021bf024 kind:data(any) addr:0x021bf024
 data_ov182_021bf318 kind:data(any) addr:0x021bf318
 data_ov182_021bf718 kind:data(any) addr:0x021bf718
-data_ov182_021bfb18 kind:data(any) addr:0x021bfb18
+sEffectData kind:data(any) addr:0x021bfb18
 data_ov182_021bfb24 kind:data(any) addr:0x021bfb24
 data_ov182_021bfb28 kind:data(any) addr:0x021bfb28
 data_ov182_021bfb30 kind:data(any) addr:0x021bfb30
@@ -1329,7 +1329,7 @@ data_ov182_021c06e4 kind:data(any) addr:0x021c06e4
 data_ov182_021c06ec kind:data(any) addr:0x021c06ec
 data_ov182_021c06f8 kind:data(any) addr:0x021c06f8
 data_ov182_021c0738 kind:data(any) addr:0x021c0738
-data_ov182_021c0740 kind:data(any) addr:0x021c0740
+sBlankScreenPath kind:data(any) addr:0x021c0740
 data_ov182_021c0754 kind:data(any) addr:0x021c0754
 data_ov182_021c0768 kind:data(any) addr:0x021c0768
 data_ov182_021c077c kind:data(any) addr:0x021c077c
@@ -1608,9 +1608,9 @@ data_ov182_021c315d kind:bss addr:0x021c315d ambiguous
 data_ov182_021c35ed kind:bss addr:0x021c35ed ambiguous
 data_ov182_021c3721 kind:bss addr:0x021c3721 ambiguous
 data_ov182_021c3824 kind:bss addr:0x021c3824
-data_ov182_021c4024 kind:bss addr:0x021c4024
+sEffect kind:bss addr:0x021c4024
 data_ov182_021c4028 kind:bss addr:0x021c4028
-data_ov182_021c402c kind:bss addr:0x021c402c
+sScreenActive kind:bss addr:0x021c402c
 data_ov182_021c4030 kind:bss addr:0x021c4030
 data_ov182_021c4070 kind:bss addr:0x021c4070
 data_ov182_021c4074 kind:bss addr:0x021c4074

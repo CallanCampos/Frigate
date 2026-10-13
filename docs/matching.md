@@ -82,6 +82,9 @@ Same instructions, registers swapped.
   other (`movs r6, #0` ... `subs r4, r6, #1` for `-1`), declare the locals without initializers and assign them in the
   original's order. The phrase select's `PMSSelect_SeqSelect` needs `BOOL end; int touch;` then `touch = -1;
   end = FALSE;`.
+- A pointer that must have the earlier declaration's slot but a later store is declared without an initializer and
+  assigned after the other pointers. This matches the item-base spills in `Aoss_ParseWep` and `Aoss_ParsePsk` in
+  `dwc_aoss.c`.
 - Of two variables that compete for the same register, the one used more gets it: one use of the Battle Subway
   command's result variable too many gave its register to the command ID. A single `*var = cond ? a : b;` counts as
   one use where an `if`/`else` with a store in each counts as two. Measured on small functions, the count is of
@@ -344,6 +347,9 @@ Same instructions, registers swapped.
   themselves matching either way. In the same file the raw display-register masks of `DupFitting_InitGraphics` were
   `GX_SetVisiblePlane(0); GXS_SetVisiblePlane(0);` (the SDK inline's parameter is what holds the zero in a
   register), and `(s32)work->badgeFrame < 45` gives the signed `bge` a `u16` field is otherwise compared without.
+- A spilled `u8` that is reloaded and narrowed at each use can come from a later callee's `u8` parameter, not from
+  the local's own type: the Dream World postman's `func_ov033_02177d78` matched once its callee
+  `func_ov033_021780a4` took `u8 kind` in place of `u32`.
 
 ## Stack slots
 
@@ -1386,6 +1392,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   The same file's three BG setups are one `static const BGSetup sBGSetups[3]` (as three statics their section order
   was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
   `.data` match: the strings give the original's variable names.
+- A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
+  `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
+  `i < 8`, and an inline with `return kind < N;`, are both rotated.
 
 ## Switches
 
@@ -1466,9 +1475,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
                                                             _pDLWork->error = result;
 - In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
   `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
-  tree is split. Two cases form a group up to a distance of 4, and three cases within a span of 5 also do. The bag's
-  `ItemMenuDisp_IsFieldMoveTM` has 15 and 19 in one group, which is the density of exactly 0.4 that needs the
-  compiler's 53-bit precision (see below).
+  tree is split. At 53-bit x87 precision, two cases form a group up to a distance of 4; three cases within a span
+  of 5 also do. The bag's `ItemMenuDisp_IsFieldMoveTM` has 15 and 19 in one group, which requires that precision.
 - A jump-table entry (or `beq`) that lands on a lone `b` to another case's code is a case whose body was written
   out again, not a fall-through. MWCC merges the identical body into the earlier case but keeps a one-instruction
   stub for the later one. `WbtDownloadMessage_Print` has `case 0` at a `b` placed after the shared print block: it
@@ -1487,18 +1495,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   gives `case 2` a `b` to `case 1`'s `movs r1, #1`, where `case 1: case 2: return TRUE;` gives none, and
   `case 0: return FALSE;` before a `default: return FALSE;` gives `case 0` a `b` to the default.
 - **Switch trees depend on the x87 precision the compiler runs with.** MWCC groups a switch's sorted cases into
-  ranges with a floating-point density test (cases / span of at least 0.4), done in x87. A Win32 process starts with
-  the control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is
-  exactly 0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, which
-  makes another tree than the ROM's compiler did, and no source changes that. So on Linux x86-64 the build and the
-  probe run wibo through `tools/win32_fpu`, which sets 0x27f (see
-  [Build details](building.md#the-compilers-floating-point-precision)). These match only that way:
-  `ItemMenuDisp_IsFieldMoveTM` and `PokeList_GetHidenResult` (cases 15 and 19), overlay 36's
-  `SetupEncountFlagsByPartyPokeAbil` (42 and 46), `Demo3DCapture_End`, `Demo3DCapture_VBlank` and
-  `Demo3DCapture_Begin` (2 and 6), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30).
-  Where the wrapper isn't used (macOS, `--wine`), a tree rooted one case off, or two cases 4 apart tested as
-  separate leaves, is this and not the source. What the tree builder does otherwise: ranges are built left to
-  right, a case joining while the density
+  ranges with a floating-point density test (cases / span above 0.4), done in x87. A Win32 process starts with the
+  control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is exactly
+  0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, so wibo 1.2.0 made
+  another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
+  unchanged: `ItemMenuDisp_IsFieldMoveTM` and `PokeList_GetHidenResult` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
+  (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
+  bytes), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
+  for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. The pinned wibo
+  release configures the guest at 0x27f; if an older binary is used, check that before trying a "gap of 4" or a tree
+  rooted one case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
   in the ranges before it.
@@ -1752,6 +1758,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `VCT_DecodeAdpcm` at once. Its files are built without `-ipa file`, so their `.bss` statics come out in reverse of
   their declaration order: a matching function whose pool words point at the wrong static needs the declarations
   reversed.
+- Size drops inside one file's `.rodata` are file boundaries: a translation unit's packed data rises in size, so each
+  drop starts a new file. Overlay 215's `mb_seq.c` was six files (`mailbox.c`, `mb_main.c`, `mb_bmp.c`, `mb_obj.c`,
+  `mb_seq.c`, `mb_ui.c`), and an assert's line number checks the result: `MailBox_StateInit` passes `"mb_seq.c", 268`
+  and sat at line 1275 before the split, at 185 after it.
+- An object's place in the size sort is its definition, not its first declaration, so a static table can be
+  forward-declared (`static const TouchRect sSideButtonRects[3];`) and defined after its user to reach a layout.
+  When no order with every static defined before its user gives the ROM's layout, but one extra unreferenced object
+  does, the original had an object its linker stripped; `pokemontrade_proc.c` is laid out as such a fit, and says so.
+  An external `inline` function gets its own copy of a string literal where a `static inline` shares the file's:
+  `pokemontrade_save.c`'s `BackupMail` and `BackupRecords` are plain `inline` for their file-name strings.
 
 ## When nothing moves it
 

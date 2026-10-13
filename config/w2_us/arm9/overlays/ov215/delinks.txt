@@ -22,6 +22,32 @@ src/ov215/mailview.c:
     .data       start:0x021ab7d8 end:0x021ab7e4
 
 src/ov215/mb_seq.c:
-    .text       start:0x021a8da8 end:0x021ab044
-    .rodata     start:0x021ab198 end:0x021ab7b8
+    complete
+    .text       start:0x021aa1c8 end:0x021aaf3c
+    .rodata     start:0x021ab650 end:0x021ab708
     .data       start:0x021ab7e4 end:0x021ab800
+
+src/ov215/mailbox.c:
+    complete
+    .text       start:0x021a8da8 end:0x021a8e24
+    .rodata     start:0x021ab198 end:0x021ab1a4
+
+src/ov215/mb_main.c:
+    complete
+    .text       start:0x021a8e24 end:0x021a9780
+    .rodata     start:0x021ab1a4 end:0x021ab314
+
+src/ov215/mb_bmp.c:
+    complete
+    .text       start:0x021a9780 end:0x021a9dd0
+    .rodata     start:0x021ab314 end:0x021ab494
+
+src/ov215/mb_obj.c:
+    complete
+    .text       start:0x021a9dd0 end:0x021aa1c8
+    .rodata     start:0x021ab494 end:0x021ab650
+
+src/ov215/mb_ui.c:
+    complete
+    .text       start:0x021aaf3c end:0x021ab044
+    .rodata     start:0x021ab708 end:0x021ab7b8
