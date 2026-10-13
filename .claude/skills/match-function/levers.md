@@ -20,6 +20,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "compete for the same register")
 - A variable gets a register per group of assignments that reach the same uses: a store after two branches keeps
   one register, a copy of the store in each branch splits it. (matching.md: "group of assignments")
+- An update written in both branches of an `if`/`else` (`nbits--;` twice) is merged into one instruction but
+  allocated like two assignments, which can swap registers. (matching.md: "update written in both branches")
 - A pointer local to a struct's element costs a callee-saved register; index the element at each use instead.
   (matching.md: "A pointer local to an element")
 - `arr[count++] = x` and `arr[count] = x; count++;` allocate differently, as do `count = 1; arr[0] = x;` and the

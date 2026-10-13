@@ -983,6 +983,10 @@ static void IrcCompatMenuButtons_Free(IrcCompatMenuButtons *buttons) {
     sys_memset(buttons, 0, sizeof(IrcCompatMenuButtons));
 }
 
+static inline u8 IrcCompatMenuButtons_GetBG(const IrcCompatMenuButtons *buttons, u32 index) {
+    return BmpWin_GetBGIndex(buttons->windows[index]);
+}
+
 // Runs the buttons: a touched button flashes for a few frames, and then counts as pressed
 static void IrcCompatMenuButtons_Update(IrcCompatMenuButtons *buttons) {
     switch (buttons->state) {
@@ -996,12 +1000,11 @@ static void IrcCompatMenuButtons_Update(IrcCompatMenuButtons *buttons) {
         break;
     case 1: {
         u8 flash = (buttons->frame / 4) % 2;
-        u8 bg = BmpWin_GetBGIndex(buttons->windows[buttons->touched]);
-        const IrcCompatMenuButtonDef *def = &buttons->defs[buttons->touched];
-        u8 x = def->x;
-        u8 y = def->y;
-        u8 width = def->width;
-        u8 height = def->height;
+        u8 bg = IrcCompatMenuButtons_GetBG(buttons, buttons->touched);
+        u8 x = buttons->defs[buttons->touched].x;
+        u8 y = buttons->defs[buttons->touched].y;
+        u8 width = buttons->defs[buttons->touched].width;
+        u8 height = buttons->defs[buttons->touched].height;
         u8 normalPalette;
         u8 flashPalette;
 
@@ -1015,8 +1018,13 @@ static void IrcCompatMenuButtons_Update(IrcCompatMenuButtons *buttons) {
             normalPalette = 4;
             break;
         }
-        GFL_BGSysSetScrPaletteNo(bg, x, y, width, height, flash == 0 ? normalPalette : flashPalette);
-        GFL_BGSysLoadScr(bg);
+        if (flash == 0) {
+            GFL_BGSysSetScrPaletteNo(bg, x, y, width, height, normalPalette);
+            GFL_BGSysLoadScr(bg);
+        } else {
+            GFL_BGSysSetScrPaletteNo(bg, x, y, width, height, flashPalette);
+            GFL_BGSysLoadScr(bg);
+        }
         buttons->frame++;
         if (buttons->frame >= 16) {
             buttons->pressed = 1;
@@ -1134,17 +1142,15 @@ static void IrcCompatMenuHeart_Free(IrcCompatMenuHeart *heart) {
 
 static void IrcCompatMenuHeart_Update(IrcCompatMenuHeart *heart) {
     ClActorPos pos;
-    int diffX = heart->x - heart->startX;
-    s8 signX = diffX / (diffX < 0 ? -diffX : diffX);
-    int diffY;
-    s8 signY;
+    int diff = heart->x - heart->startX;
+    s8 sign = diff / (diff < 0 ? -diff : diff);
 
-    diffX = diffX < 0 ? -diffX : diffX;
-    pos.x = heart->startX + signX * (heart->frame * diffX / heart->duration);
-    diffY = heart->y - heart->startY;
-    signY = diffY / (diffY < 0 ? -diffY : diffY);
-    diffY = diffY < 0 ? -diffY : diffY;
-    pos.y = heart->startY + signY * (heart->frame * diffY / heart->duration);
+    diff = diff < 0 ? -diff : diff;
+    pos.x = heart->startX + sign * (diff * heart->frame / heart->duration);
+    diff = heart->y - heart->startY;
+    sign = diff / (diff < 0 ? -diff : diff);
+    diff = diff < 0 ? -diff : diff;
+    pos.y = heart->startY + sign * (diff * heart->frame / heart->duration);
     func_0204c140(heart->actor, &pos, TRUE);
     if (heart->frame++ > heart->duration) {
         IrcCompatMenuHeart_Reset(heart);

@@ -1094,8 +1094,8 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
         } else {
             alpha = work->logoFrame * 16 / 138;
         }
-        evb = 16 - alpha;
         eva = alpha;
+        evb = 16 - alpha;
         work->logoFrame++;
         if (eva >= 16) {
             G2_ChangeBlendAlpha(16, 0);

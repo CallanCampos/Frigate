@@ -5,9 +5,11 @@
     .bss        start:0x021f0180 end:0x021f0180 kind:bss align:32
 
 src/ov129/sp_poke_gimmick.c:
+    complete
     .text       start:0x021eecc0 end:0x021ef874
     .rodata     start:0x021efd0c end:0x021f014c
     .data       start:0x021f0160 end:0x021f0180
 
 src/ov129/sp_poke_event.c:
+    complete
     .text       start:0x021ef874 end:0x021efd0c

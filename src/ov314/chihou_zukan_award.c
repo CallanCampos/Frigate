@@ -408,7 +408,8 @@ static void ChihouZukanAward_InitBackdrop(ChihouZukanAwardWork *wk) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[1]), 3);
     BmpWin_FlushChar(wk->windows[1]);
     screen = GFL_HeapAllocate(wk->heapId, 32 * 24 * sizeof(u16), TRUE, "chihou_zukan_award.c", 930);
-    entry = BmpWin_GetCharPos(wk->windows[1]) | (15 << 12);
+    entry = BmpWin_GetCharPos(wk->windows[1]);
+    entry |= 15 << 12;
     for (y = 0; y < 24; y++) {
         for (x = 0; x < 32; x++) {
             screen[i] = entry;
@@ -443,14 +444,16 @@ static void ChihouZukanAward_FreeRibbon(ChihouZukanAwardWork *wk) {
 // Puts the diploma's BGs and the ribbon below the screen, to slide up
 static void ChihouZukanAward_StartSlide(ChihouZukanAwardWork *wk) {
     ClActorPos pos;
-    const ClActorSetup *setup = &sChihouZukanAwardRibbonSetup[0];
+    u32 i;
 
     if (wk->param->unk04 == 0) {
         GFL_BGSysMoveBG(BG_MAIN_DIPLOMA, BG_MOVE_SET_Y, 64);
         GFL_BGSysMoveBG(BG_MAIN_BACKDROP, BG_MOVE_SET_Y, 64);
-        pos.x = setup->x;
-        pos.y = setup->y - 64;
-        func_0204c140(wk->ribbon, &pos, 0);
+        for (i = 0; i < NELEMS(sChihouZukanAwardRibbonSetup); i++) {
+            pos.x = sChihouZukanAwardRibbonSetup[i].x;
+            pos.y = sChihouZukanAwardRibbonSetup[i].y - 64;
+            func_0204c140(wk->ribbon, &pos, 0);
+        }
         wk->slideWait = 0;
     }
 }

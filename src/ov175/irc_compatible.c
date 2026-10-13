@@ -399,7 +399,6 @@ static void IrcCompatible_FreeParam2(void *param, IrcCompatibleWork *wk) {
 }
 
 static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
-    BOOL isNew = FALSE;
     IrcCompatibleParam3 *param = GFL_HeapAllocate(heapId, sizeof(IrcCompatibleParam3), FALSE, "irc_compatible.c", 1048);
 
     sys_memset(param, 0, sizeof(IrcCompatibleParam3));
@@ -410,6 +409,7 @@ static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
         CompatibleIrcProfile mine;
         TrainerLogSave *log;
         BOOL isNewTrainer;
+        BOOL isNew = FALSE;
         PlayerInfo *trainer = &wk->profile->trainer;
         u32 date;
 

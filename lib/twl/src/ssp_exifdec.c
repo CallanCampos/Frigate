@@ -77,13 +77,13 @@ static u32 func_ov257_021ac694(u8 *data, u32 pos, BOOL bigEndian) {
 // IFD in the order they are stored
 static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 option) {
     u16 len;
-    u16 order;
+    u16 tag;
     u16 count;
     u32 valueCount;
     u32 value;
     BOOL bigEndian;
-    u32 makerNote = IFD_NONE;
     u32 exifIfd = IFD_NONE;
+    u32 makerNote = IFD_NONE;
     u32 interopIfd = IFD_NONE;
     u32 ifd1;
     s32 thumbnail;
@@ -112,10 +112,11 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
         return EXIF_RESULT_ERROR;
     }
 
-    order = func_ov257_021ac664(data, pos + 8, bigEndian);
-    if (order == 0x4949) {
+    // The byte order is read into the variable the IFD loops read the tags into
+    tag = func_ov257_021ac664(data, pos + 8, bigEndian);
+    if (tag == 0x4949) {
         bigEndian = FALSE;
-    } else if (order != 0x4d4d) {
+    } else if (tag != 0x4d4d) {
         return EXIF_RESULT_ERROR;
     }
 
@@ -126,7 +127,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
         return EXIF_RESULT_ERROR;
     }
     while (count != 0) {
-        u16 tag = func_ov257_021ac664(data, pos, bigEndian);
+        tag = func_ov257_021ac664(data, pos, bigEndian);
         func_ov257_021ac664(data, pos + 2, bigEndian);
         valueCount = func_ov257_021ac694(data, pos + 4, bigEndian);
         value = func_ov257_021ac694(data, pos + 8, bigEndian);
@@ -170,7 +171,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
         return EXIF_RESULT_ERROR;
     }
     while (count != 0) {
-        u16 tag = func_ov257_021ac664(data, pos, bigEndian);
+        tag = func_ov257_021ac664(data, pos, bigEndian);
         func_ov257_021ac664(data, pos + 2, bigEndian);
         valueCount = func_ov257_021ac694(data, pos + 4, bigEndian);
         value = func_ov257_021ac694(data, pos + 8, bigEndian);
@@ -207,7 +208,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
                     return EXIF_RESULT_ERROR;
                 }
                 while (count != 0) {
-                    u16 tag = func_ov257_021ac664(data, pos, bigEndian);
+                    tag = func_ov257_021ac664(data, pos, bigEndian);
                     func_ov257_021ac664(data, pos + 2, bigEndian);
                     valueCount = func_ov257_021ac694(data, pos + 4, bigEndian);
                     value = func_ov257_021ac694(data, pos + 8, bigEndian);
@@ -273,7 +274,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
                 return EXIF_RESULT_ERROR;
             }
             while (count != 0) {
-                u16 tag = func_ov257_021ac664(data, pos, bigEndian);
+                tag = func_ov257_021ac664(data, pos, bigEndian);
                 func_ov257_021ac664(data, pos + 2, bigEndian);
                 func_ov257_021ac694(data, pos + 4, bigEndian);
                 value = func_ov257_021ac694(data, pos + 8, bigEndian);

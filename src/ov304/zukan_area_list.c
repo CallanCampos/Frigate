@@ -648,14 +648,20 @@ static void ZukanAreaList_InitModes(ZukanAreaListWork *wk) {
     ZukanAreaList_PrintModes(wk);
 }
 
+// A kind of habitat: an index of an area's conditions. An enum, which keeps the loop's test before its first pass
+typedef enum {
+    KIND_FIRST,
+    KIND_LAST = ZUKAN_AREA_LIST_KINDS - 1,
+} ZukanAreaListKind;
+
 // The kind of habitat of the mark at a place of an area's row, 0 the leftmost: the marks of the kinds that the
 // area has are put from the right. KIND_NONE if the place has no mark
 static u32 ZukanAreaList_GetMarkKind(ZukanHabitatSummary *area, u32 place) {
+    u8 next = ZUKAN_AREA_LIST_KINDS - 1;
+    ZukanAreaListKind i;
     u32 kinds[ZUKAN_AREA_LIST_KINDS] = { KIND_NONE, KIND_NONE, KIND_NONE };
-    int i;
-    u8 next;
 
-    for (i = ZUKAN_AREA_LIST_KINDS - 1, next = ZUKAN_AREA_LIST_KINDS - 1; i >= 0; i--) {
+    for (i = next; i >= KIND_FIRST; i--) {
         if (area->conditions[i] == 1 && area->conditionsMet[i] == 1) {
             kinds[next] = i;
             next--;

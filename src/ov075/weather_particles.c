@@ -351,6 +351,8 @@ static void Flake_Add(WeatherTask *task, int count, HeapID heapId) {
         Flake *flake;
         ClActor *actor;
         ClActorPos pos;
+        int *mode = &work->mode;
+        int *done = &work->done;
 
         if (obj == NULL) {
             break;
@@ -363,8 +365,8 @@ static void Flake_Add(WeatherTask *task, int count, HeapID heapId) {
         flake->state = 0;
         flake->timer = GFL_RandomLC(0) % 30 + 2;
         flake->rate = GFL_RandomLC(8) + 12;
-        flake->mode = &work->mode;
-        flake->done = &work->done;
+        flake->mode = mode;
+        flake->done = done;
         pos.x = GFL_RandomLC(0x19e) - 0x20;
         if (work->mode == 1 && i >= count / 2) {
             pos.y = -8 - 0x20 - GFL_RandomLC(20);
@@ -545,7 +547,8 @@ static void Blizzard_ScrollBg(WeatherTask *task, BlizzardWork *work) {
     func_ov036_02199a78(task, &x, &y);
     func_ov036_02199b90(task, x, y);
     step = (int)work->scrollStep / 28;
-    work->scrollStep = (work->scrollStep + 1) % 252;
+    work->scrollStep++;
+    work->scrollStep %= 252;
     work->scrollX = work->scrollX + sBlizzardScrollX[step] - x / 2;
     work->scrollY = work->scrollY + sBlizzardScrollY[step] - y / 2;
     if (work->scrollX < 0) {

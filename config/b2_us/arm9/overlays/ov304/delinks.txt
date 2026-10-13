@@ -4,6 +4,7 @@
     .bss        start:0x021a20e0 end:0x021a20e0 kind:bss align:32
 
 src/ov304/zukan_area_list.c:
+    complete
     .text       start:0x0219fbc0 end:0x021a073c
     .rodata     start:0x021a1dac end:0x021a1e84
 
