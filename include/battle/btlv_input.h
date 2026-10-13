@@ -52,7 +52,7 @@ typedef struct {
     u32 forms[3];                     // 0xa4
     u32 sexes[3];                     // 0xb0
     s32 pokePos;                      // 0xbc  the battle position, halved in place from 2 on into a slot
-    u8 unkc0[4];
+    u32 scdState;      // 0xc0  the creator's scdState, which nothing reads
     u8 launcherPoints; // 0xc4  the Wonder Launcher's points
     u8 ballSlide;      // 0xc5  the ball count's slide, 0 for none
 } BtlvInputCommandParam;
@@ -72,7 +72,8 @@ typedef struct {
     u8 selectable : 1;
     u8 unk1;
     u16 unk2;
-    s16 species; // 0: no mon in that position
+    s16 hp;    // 0: no mon in that position, or it has fainted
+    s16 maxHp;
     PartyPkm *pkm;
 } BtlvInputTargetEntry;
 

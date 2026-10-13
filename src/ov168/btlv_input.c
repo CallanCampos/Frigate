@@ -11,6 +11,7 @@
 #include "battle/btlv_finger_cursor.h"
 #include "battle/btlv_gauge.h"
 #include "battle/btlv_mcss.h"
+#include "battle/btlv_scd.h"
 #include "constants/arc.h"
 #include "constants/moves.h"
 #include "constants/sound.h"
@@ -2583,7 +2584,7 @@ static void BtlvInput_DrawTargetPanels(BtlvInput *work, BtlvInputScreenTask *tas
     wordSet = GFL_WordSetSystemCreateDefault(HEAPID_TAIL(work->heapId));
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     for (i = 0; i < count; i++) {
-        if (param->mons[i].species != 0) {
+        if (param->mons[i].hp != 0) {
             fmt = GFL_MsgDataLoadStrbufNew(work->msgData, param->mons[i].msgForm + 3);
             loadPokemonNicknameToStrbuf(wordSet, 0, param->mons[i].pkm);
             GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
