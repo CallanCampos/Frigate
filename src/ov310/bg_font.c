@@ -86,7 +86,7 @@ void BGFont_SetPalette(BGFont *bgFont, u8 palette) {
 
 static int BGFont_GetCenteredX(BGFont *bgFont, const StrBuf *str) {
     int width = BmpWin_GetSizeX(bgFont->window) * 8;
-    int x = (width - GFL_FontGetBlockWidth(str, bgFont->font, 0)) * 0.5f;
+    int x = (width - (int)GFL_FontGetBlockWidth(str, bgFont->font, 0)) * 0.5f;
 
     if (x < 0) {
         x = 0;
