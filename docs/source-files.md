@@ -1258,9 +1258,9 @@ prints the tables below from the configs and the ROM:
 | `monolith_top.c` | `0x0219aa70`–`0x0219afac` | 17 | complete | descriptive |
 | `monolith_record.c` | `0x0219afac`–`0x0219b6d4` | 13 | complete | descriptive |
 | `monolith_status.c` | `0x0219b6d4`–`0x0219bb80` | 9 | complete | descriptive |
-| `monolith_power_select.c` | `0x0219bb80`–`0x0219d360` | 53 | partial | descriptive |
-| `monolith_power_info.c` | `0x0219d360`–`0x0219d8f8` | 12 | partial | descriptive |
-| `monolith_mission_select.c` | `0x0219d8f8`–`0x0219f64c` | 69 | partial | descriptive |
+| `monolith_power_select.c` | `0x0219bb80`–`0x0219d360` | 53 | complete | descriptive |
+| `monolith_power_info.c` | `0x0219d360`–`0x0219d8f8` | 12 | complete | descriptive |
+| `monolith_mission_select.c` | `0x0219d8f8`–`0x0219f64c` | 69 | complete | descriptive |
 | `monolith_mission_info.c` | `0x0219f64c`–`0x0219fe70` | 18 | partial | descriptive |
 
 ### Overlay 144

@@ -1303,6 +1303,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the statement order `isDragging = TRUE; cursorRow = hit; cursorMoved = TRUE;` although MWCC emits the byte store
   first either way, and a table's `{ TOUCH_RECT_END, 0, 0, 0 }` terminator had been swallowed into a `//` comment,
   which the code match could not show and the `.rodata` check did.
+- A flag passed as a constant in each arm (`if (hit == 0) f(TRUE); else f(FALSE);`) is not the same as passing the
+  comparison: the monolith's `MonolithPower_Main` and `MonolithMission_Main` pass their touch flag and cursor that
+  way, and their `Input` functions clear `touching` after the A-button block, which passes a literal `FALSE`. A
+  version constant can hide in a file that otherwise matches: `MonolithMission_IsAvailable` tests
+  `header.unk01 == 2` in Black 2 and `== 1` in White 2, and mismatched in White 2 only, without a row. Probe both
+  versions for every function of a file, not only the ones with rows.
 
 ## Loops
 

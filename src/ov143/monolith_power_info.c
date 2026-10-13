@@ -126,6 +126,18 @@ static BOOL MonolithPowerInfo_Init(GameProc *proc, u32 *state, void *param, void
     return FALSE;
 }
 
+// PrintWindow_Flush as the library's inline most likely is: it also says whether the window's text has been sent,
+// which is what this file alone uses. printsys.h's returns nothing
+static inline BOOL MonolithPowerInfo_FlushWindow(PrintWindow *printWindow, PrintQueue *queue) {
+    if (printWindow->flushPending) {
+        if (!func_02021c1c(queue, BmpWin_GetBitmap(printWindow->window))) {
+            BmpWin_FlushChar(printWindow->window);
+            printWindow->flushPending = FALSE;
+        }
+    }
+    return !printWindow->flushPending;
+}
+
 static BOOL MonolithPowerInfo_Main(GameProc *proc, u32 *state, void *param, void *work) {
     MonolithScreenParam *screen = param;
     MonolithPowerInfoWork *piw = work;
@@ -136,11 +148,7 @@ static BOOL MonolithPowerInfo_Main(GameProc *proc, u32 *state, void *param, void
         return TRUE;
     }
     for (i = 0; i < MONOLITH_POWER_INFO_WINDOW_COUNT; i++) {
-        PrintQueue *queue = screen->work->printQueue;
-        PrintWindow *print = &piw->prints[i];
-
-        PrintWindow_Flush(print, queue);
-        printed[i] = PrintWindow_IsPrinted(print);
+        printed[i] = MonolithPowerInfo_FlushWindow(&piw->prints[i], screen->work->printQueue);
     }
     if (func_02021c0c(screen->work->printQueue) == FALSE) {
         return FALSE;
@@ -287,11 +295,11 @@ static void MonolithPowerInfo_DrawDescription(MonolithScreenParam *screen, Monol
         } else {
             levels = MonolithTool_GetLevels(screen);
             if (((PassPowerData *)wk->passPowerData)[passPower].level1 > levels->level1) {
-                msgId = 42;
                 level = ((PassPowerData *)wk->passPowerData)[passPower].level1;
+                msgId = 42;
             } else {
-                msgId = 43;
                 level = ((PassPowerData *)wk->passPowerData)[passPower].level2;
+                msgId = 43;
             }
             WordSetNumber(wk->wordSet, 0, level, 3, 0, TRUE);
             WordSetNumber(wk->wordSet, 1, levels->level1, 3, 0, TRUE);

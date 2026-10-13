@@ -96,6 +96,14 @@ enum {
 #define MONOLITH_MISSION_RECORD_NEW 1
 #define MONOLITH_MISSION_RECORD_SEEN 2
 
+// The value of a mission's header.unk01 that makes it available in this version alone: 2 in Black 2, 1 in White 2.
+// 0 is available in both, and 4 to 7 need a download
+#ifdef BLACK2
+#define MONOLITH_MISSION_UNLOCK_VERSION 2
+#else
+#define MONOLITH_MISSION_UNLOCK_VERSION 1
+#endif
+
 // The length of the cheat code in keys
 #define MONOLITH_MISSION_CODE_LENGTH 9
 
@@ -205,13 +213,15 @@ typedef struct {
     s16 palette;
 } MonolithMissionIcon;
 
-// The position and priorities of a level button's text
-typedef struct {
-    s16 x;
-    s16 y;
-    s16 priority;
-    s16 bgPriority;
-} MonolithMissionLevelButton;
+// The values of a level button's text in sMonolithMissionLevelButtons, which is a flat table of numbers: the code
+// indexes it with i * 4 + n
+enum {
+    LEVEL_BUTTON_X,
+    LEVEL_BUTTON_Y,
+    LEVEL_BUTTON_PRIORITY,
+    LEVEL_BUTTON_BG_PRIORITY,
+    LEVEL_BUTTON_VALUES,
+};
 
 // By the highest level cleared: the highest level that can be picked, and how many level buttons are shown
 typedef struct {
@@ -320,11 +330,11 @@ static const MonolithMissionLevelRange sMonolithMissionLevelRanges[5] = {
     { 0, 1 }, { 1, 2 }, { 2, 3 }, { 2, 3 }, { 2, 3 },
 };
 
-static const MonolithMissionLevelButton sMonolithMissionLevelButtons[] = {
-    { 130, 177, 48, 1 },
-    { 166, 177, 48, 1 },
-    { 202, 177, 48, 1 },
-    { -1, -1, -1, -1 },
+static const s16 sMonolithMissionLevelButtons[] = {
+    130, 177, 48, 1,
+    166, 177, 48, 1,
+    202, 177, 48, 1,
+    -1, -1, -1, -1,
 };
 
 const GameProcFunctions MONOLITH_MISSION_SELECT_PROC_FUNCTIONS = {
@@ -464,10 +474,10 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
             (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             MonolithMission_ClearMessage(mfw);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            if (func_0203da48()) {
-                MonolithMission_SetCursor(mfw, MONOLITH_MISSION_NONE, MONOLITH_MISSION_CURSOR_DRAG);
-            } else {
+            if (func_0203da48() == FALSE) {
                 MonolithMission_SetCursor(mfw, 1, MONOLITH_MISSION_CURSOR_DRAG);
+            } else {
+                MonolithMission_SetCursor(mfw, MONOLITH_MISSION_NONE, MONOLITH_MISSION_CURSOR_DRAG);
             }
             (*state)++;
         }
@@ -482,7 +492,11 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
         hit = func_0203da0c(sMonolithMissionTouchRects);
         if (hit == 0 || (pressed & PAD_BUTTON_B)) {
             MonolithTool_PressReturnButton(&mfw->returnButton);
-            func_0203d564(hit == 0 ? TRUE : FALSE);
+            if (hit == 0) {
+                func_0203d564(TRUE);
+            } else {
+                func_0203d564(FALSE);
+            }
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             *state = MONOLITH_MISSION_SEQ_RETURN;
             break;
@@ -594,17 +608,17 @@ static BOOL MonolithMission_Main(GameProc *proc, u32 *state, void *param, void *
                 }
                 func_ov027_02170cf8(mfw->festText, picked, level, &mission);
                 func_0201472c(mfw->festival, &mission, 0);
-                if (bootState != 1) {
-                    if (bootState == 0) {
-                        *state = MONOLITH_MISSION_SEQ_BOOT_COMM;
-                    } else {
-                        GameCommSys_ExitReq(mfw->comm);
-                        *state = MONOLITH_MISSION_SEQ_WAIT_DISCONNECT;
-                    }
-                    break;
+                if (bootState == 1) {
+                    *state = MONOLITH_MISSION_SEQ_END;
+                } else if (bootState == 0) {
+                    *state = MONOLITH_MISSION_SEQ_BOOT_COMM;
+                } else {
+                    GameCommSys_ExitReq(mfw->comm);
+                    *state = MONOLITH_MISSION_SEQ_WAIT_DISCONNECT;
                 }
+            } else {
+                *state = MONOLITH_MISSION_SEQ_END;
             }
-            *state = MONOLITH_MISSION_SEQ_END;
         }
         break;
     case MONOLITH_MISSION_SEQ_WAIT_DISCONNECT:
@@ -963,7 +977,6 @@ static BOOL MonolithMission_Input(MonolithScreenParam *screen, MonolithMissionWo
     }
     if (MonolithMission_GetHeldKeys(mfw) &
         (PAD_BUTTON_A | PAD_BUTTON_B | PAD_KEY_RIGHT | PAD_KEY_LEFT | PAD_KEY_UP | PAD_KEY_DOWN)) {
-        touching = FALSE;
         row = ((mfw->scroll >> 8) + 24) / MONOLITH_MISSION_ROW_HEIGHT;
         rem = ((mfw->scroll >> 8) + 24) % MONOLITH_MISSION_ROW_HEIGHT;
         mfw->velocity = 0;
@@ -985,10 +998,11 @@ static BOOL MonolithMission_Input(MonolithScreenParam *screen, MonolithMissionWo
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             MonolithMission_SetCursor(mfw, mfw->cursor, MONOLITH_MISSION_CURSOR_KEYS);
-            func_0203d564(touching);
+            func_0203d564(FALSE);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             return TRUE;
         }
+        touching = FALSE;
         if (MonolithMission_GetTypedKeys(mfw) & PAD_KEY_UP) {
             if (rem != 0) {
                 row++;
@@ -1056,9 +1070,10 @@ static BOOL MonolithMission_Input(MonolithScreenParam *screen, MonolithMissionWo
                 diff = -diff;
             }
             if (diff < 4) {
-                index = MonolithMission_GetRowAt(mfw, mfw->lastY);
-                if (index != MONOLITH_MISSION_NONE) {
+                row = MonolithMission_GetRowAt(mfw, mfw->lastY);
+                if (row != MONOLITH_MISSION_NONE) {
                     picked = TRUE;
+                    index = row;
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
                 }
             }
@@ -1192,7 +1207,10 @@ static void MonolithMission_UpdateRows(MonolithMissionWork *mfw) {
     int i;
 
     for (i = 0; i < MONOLITH_MISSION_ROW_COUNT; i++) {
-        BmpOam_ActorSetPos(mfw->rowActors[i], 32, i * MONOLITH_MISSION_ROW_HEIGHT + y);
+        // The row's position is written out here and taken from y for the icons: the original adds the two anew
+        // for each call, which MWCC does only when the first sum is not the one the later calls use
+        BmpOam_ActorSetPos(mfw->rowActors[i], 32,
+                           i * MONOLITH_MISSION_ROW_HEIGHT + (8 - scroll % MONOLITH_MISSION_ROW_HEIGHT));
         if (mfw->listBitmaps[first + i] != NULL) {
             GFL_BitmapCopy(mfw->listBitmaps[first + i], mfw->rowBitmaps[i]);
         }
@@ -1322,7 +1340,8 @@ static void MonolithMission_UpdateClearedIcons(MonolithMissionWork *mfw) {
     int i;
 
     for (i = 0; i < MONOLITH_MISSION_ROW_COUNT; i++) {
-        u8 cleared = mfw->records[i + first].clearedLevel;
+        u32 index = i + first;
+        u8 cleared = mfw->records[index].clearedLevel;
 
         if (cleared == 0) {
             MonolithMission_SetIconVisible(mfw, MONOLITH_MISSION_ICON_CLEARED + i, FALSE);
@@ -1351,10 +1370,10 @@ static void MonolithMission_CreateLevelButtons(MonolithWork *wk, MonolithMission
     setup.surface = 1;
     setup.vramType = CLACT_VRAM_SUB;
     for (i = 0; i < MONOLITH_MISSION_LEVEL_COUNT; i++) {
-        setup.x = sMonolithMissionLevelButtons[i].x;
-        setup.y = sMonolithMissionLevelButtons[i].y;
-        setup.priority = sMonolithMissionLevelButtons[i].priority;
-        setup.bgPriority = sMonolithMissionLevelButtons[i].bgPriority;
+        setup.x = sMonolithMissionLevelButtons[i * LEVEL_BUTTON_VALUES + LEVEL_BUTTON_X];
+        setup.y = sMonolithMissionLevelButtons[i * LEVEL_BUTTON_VALUES + LEVEL_BUTTON_Y];
+        setup.priority = sMonolithMissionLevelButtons[i * LEVEL_BUTTON_VALUES + LEVEL_BUTTON_PRIORITY];
+        setup.bgPriority = sMonolithMissionLevelButtons[i * LEVEL_BUTTON_VALUES + LEVEL_BUTTON_BG_PRIORITY];
         mfw->levelBitmaps[i] = GFL_BitmapCreate(6, 2, 0x20, HEAPID_MONOLITH);
         setup.bitmap = mfw->levelBitmaps[i];
         mfw->levelActors[i] = BmpOam_ActorAdd(wk->bmpOam, &setup);
@@ -1436,7 +1455,7 @@ static BOOL MonolithMission_IsAvailable(MonolithScreenParam *screen, MonolithMis
     case 0:
         available = TRUE;
         break;
-    case 2:
+    case MONOLITH_MISSION_UNLOCK_VERSION:
         available = TRUE;
         break;
     case 4:
@@ -1561,7 +1580,7 @@ static void MonolithMission_UpdateCheatCode(MonolithScreenParam *screen, Monolit
                 }
             } else {
                 mfw->codeProgress = 0;
-                key = sMonolithMissionCode[0];
+                key = sMonolithMissionCode[mfw->codeProgress];
                 if (GCTX_HIDGetPressedKeys() & key) {
                     mfw->codeProgress++;
                 }
