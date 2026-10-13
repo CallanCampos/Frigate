@@ -2156,7 +2156,7 @@ prints the tables below from the configs and the ROM:
 | `local_tvt_person_doctor.c` | `0x0219f04c`–`0x0219f63c` | 11 | complete | string at `0x021a0a4c` |
 | `local_tvt_person_chelen.c` | `0x0219f63c`–`0x0219faac` | 9 | complete | string at `0x021a0a68` |
 | `local_tvt_person_rival.c` | `0x0219faac`–`0x0219fcac` | 7 | complete | string at `0x021a0a84` |
-| `local_tvt_person_secret.c` | `0x0219fcac`–`0x021a039c` | 27 | partial | string at `0x021a0aa0` |
+| `local_tvt_person_secret.c` | `0x0219fcac`–`0x021a039c` | 27 | complete | string at `0x021a0aa0` |
 
 ### Overlay 260
 
@@ -2255,9 +2255,9 @@ prints the tables below from the configs and the ROM:
 | `br_start_proc.c` | `0x021ba140`–`0x021ba4f8` | 7 | complete | descriptive |
 | `br_menu_proc.c` | `0x021ba4f8`–`0x021ba7a0` | 4 | complete | descriptive |
 | `br_record_proc.c` | `0x021ba7a0`–`0x021bc1e0` | 30 | complete | descriptive |
-| `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | partial | descriptive |
+| `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | complete | descriptive |
 | `br_rndmatch_proc.c` | `0x021bd02c`–`0x021bd804` | 11 | complete | descriptive |
-| `br_bvrank_proc.c` | `0x021bd804`–`0x021be790` | 20 | partial | descriptive |
+| `br_bvrank_proc.c` | `0x021bd804`–`0x021be790` | 20 | complete | descriptive |
 | `br_bvsearch_proc.c` | `0x021be790`–`0x021bf37c` | 19 | complete | descriptive |
 | `br_codein_proc.c` | `0x021bf37c`–`0x021bf540` | 3 | complete | descriptive |
 | `br_codein.c` | `0x021bf540`–`0x021bf6b8` | 8 | complete | string at `0x021c284c` |
@@ -2265,7 +2265,7 @@ prints the tables below from the configs and the ROM:
 | `br_codein_pv.c` | `0x021c004c`–`0x021c0afc` | 16 | complete | descriptive |
 | `br_bvsend_proc.c` | `0x021c0afc`–`0x021c0ea4` | 6 | complete | descriptive |
 | `br_bvdelete_proc.c` | `0x021c0ea4`–`0x021c13f8` | 11 | complete | descriptive |
-| `br_bvsave_proc.c` | `0x021c13f8`–`0x021c20e8` | 20 | partial | descriptive |
+| `br_bvsave_proc.c` | `0x021c13f8`–`0x021c20e8` | 20 | complete | descriptive |
 
 ### Overlay 269
 

@@ -25,12 +25,12 @@ typedef struct {
 } LocalTvtSupport;
 
 static LocalTvtSupport *LocalTvtSupport_Create(GameData *gameData, HeapID heapId);
-static void LocalTvtSupport_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSupport_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSupport_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSupport_Happiness(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSupport_EffortValues(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSupport_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+static void LocalTvtSupport_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSupport_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSupport_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSupport_Happiness(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSupport_EffortValues(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtSupport_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 
 void LocalTvtSupport_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId) {
     sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
@@ -64,11 +64,11 @@ static LocalTvtSupport *LocalTvtSupport_Create(GameData *gameData, HeapID heapId
     return support;
 }
 
-static void LocalTvtSupport_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static void LocalTvtSupport_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     GFL_HeapFree(work);
 }
 
-static BOOL LocalTvtSupport_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSupport_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSupport *support = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -91,7 +91,7 @@ static BOOL LocalTvtSupport_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *s
     return FALSE;
 }
 
-static BOOL LocalTvtSupport_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSupport_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSupport *support = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -114,7 +114,7 @@ static BOOL LocalTvtSupport_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *se
     return FALSE;
 }
 
-static BOOL LocalTvtSupport_Happiness(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSupport_Happiness(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSupport *support = work;
     u16 messageId = 0;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -202,7 +202,7 @@ static BOOL LocalTvtSupport_Happiness(LocalTvtPerson *person, LocalTvtPersonSetu
     return FALSE;
 }
 
-static BOOL LocalTvtSupport_EffortValues(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSupport_EffortValues(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSupport *support = work;
     int count = 0;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -326,7 +326,7 @@ static BOOL LocalTvtSupport_EffortValues(LocalTvtPerson *person, LocalTvtPersonS
     return FALSE;
 }
 
-static BOOL LocalTvtSupport_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtSupport_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtSupport *support = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 

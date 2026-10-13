@@ -27,12 +27,12 @@ typedef struct {
 } LocalTvtChelen;
 
 static LocalTvtChelen *LocalTvtChelen_Create(GameData *gameData, HeapID heapId);
-static void LocalTvtChelen_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtChelen_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtChelen_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtChelen_Types(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtChelen_Ability(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtChelen_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+static void LocalTvtChelen_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtChelen_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtChelen_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtChelen_Types(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtChelen_Ability(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtChelen_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 static u16 LocalTvtChelen_GetTypesMsg(u16 type1, u16 type2);
 
 void LocalTvtChelen_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId) {
@@ -63,7 +63,7 @@ static LocalTvtChelen *LocalTvtChelen_Create(GameData *gameData, HeapID heapId) 
     return chelen;
 }
 
-static void LocalTvtChelen_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static void LocalTvtChelen_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtChelen *chelen = work;
 
     GFL_MsgDataFree(chelen->abilityMsgData);
@@ -71,7 +71,7 @@ static void LocalTvtChelen_Free(LocalTvtPerson *person, LocalTvtPersonSetup *set
     GFL_HeapFree(chelen);
 }
 
-static BOOL LocalTvtChelen_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtChelen_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtChelen *chelen = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -94,7 +94,7 @@ static BOOL LocalTvtChelen_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *se
     return FALSE;
 }
 
-static BOOL LocalTvtChelen_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtChelen_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtChelen *chelen = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -117,7 +117,7 @@ static BOOL LocalTvtChelen_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *set
     return FALSE;
 }
 
-static BOOL LocalTvtChelen_Types(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtChelen_Types(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtChelen *chelen = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 
@@ -190,7 +190,7 @@ static BOOL LocalTvtChelen_Types(LocalTvtPerson *person, LocalTvtPersonSetup *se
     return FALSE;
 }
 
-static BOOL LocalTvtChelen_Ability(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtChelen_Ability(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtChelen *chelen = work;
     u16 messageId = 0;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -262,7 +262,7 @@ static BOOL LocalTvtChelen_Ability(LocalTvtPerson *person, LocalTvtPersonSetup *
     return FALSE;
 }
 
-static BOOL LocalTvtChelen_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtChelen_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtChelen *chelen = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 

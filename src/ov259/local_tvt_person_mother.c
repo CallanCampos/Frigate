@@ -22,11 +22,11 @@ typedef struct {
 } LocalTvtMother;
 
 static LocalTvtMother *LocalTvtMother_Create(GameData *gameData, HeapID heapId);
-static void LocalTvtMother_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtMother_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtMother_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtMother_Place(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtMother_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work);
+static void LocalTvtMother_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtMother_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtMother_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtMother_Place(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
+static BOOL LocalTvtMother_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 
 void LocalTvtMother_Setup(LocalTvtPersonFuncs *funcs, LocalTvtMessage *message, MsgData *msgData, GameData *gameData,
                           HeapID heapId) {
@@ -55,14 +55,14 @@ static LocalTvtMother *LocalTvtMother_Create(GameData *gameData, HeapID heapId) 
     return mother;
 }
 
-static void LocalTvtMother_Free(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static void LocalTvtMother_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtMother *mother = work;
 
     GFL_MsgDataFree(mother->placeMsgData);
     GFL_HeapFree(mother);
 }
 
-static BOOL LocalTvtMother_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtMother_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtMother *mother = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -85,7 +85,7 @@ static BOOL LocalTvtMother_Greet(LocalTvtPerson *person, LocalTvtPersonSetup *se
     return FALSE;
 }
 
-static BOOL LocalTvtMother_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtMother_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtMother *mother = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -108,7 +108,7 @@ static BOOL LocalTvtMother_Chat(LocalTvtPerson *person, LocalTvtPersonSetup *set
     return FALSE;
 }
 
-static BOOL LocalTvtMother_Place(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtMother_Place(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtMother *mother = work;
     MsgData *msgData = NULL;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
@@ -133,7 +133,7 @@ static BOOL LocalTvtMother_Place(LocalTvtPerson *person, LocalTvtPersonSetup *se
     return FALSE;
 }
 
-static BOOL LocalTvtMother_Bye(LocalTvtPerson *person, LocalTvtPersonSetup *setup, void *work) {
+static BOOL LocalTvtMother_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work) {
     LocalTvtMother *mother = work;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 

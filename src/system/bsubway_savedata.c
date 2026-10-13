@@ -169,7 +169,7 @@ static u32 BSubwayScoreData_GetModeIndex(u32 mode) {
     return mode;
 }
 
-u16 BSubwayScoreData_GetStreak(BSubwayScoreData *score, u16 mode) {
+u16 BSubwayScoreData_GetStreak(BSubwayScoreData *score, u32 mode) {
     return score->streaks[BSubwayScoreData_GetModeIndex(mode)];
 }
 
