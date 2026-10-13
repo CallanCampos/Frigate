@@ -44,6 +44,11 @@ adds each variant's count of differing aligned lines, to tell apart variants of 
 `tools/decomp/locals.py src/... FUNC` prints the register or stack slot of each parameter and local of a function,
 from the debug info of its built object, which shows which variable to move when registers or stack slots differ.
 
+`tools/decomp/rodata_order.py` predicts how MWCC lays out a file's static data and searches small reorderings; when
+no structured order reaches the ROM's layout, `tools/decomp/rodata_solver.py` anneals the sequence of sizes by
+declaration slot until the layout-forced declaration order defines every table before its users, and prints the
+order to realize (docs/matching.md, "invert the model").
+
 ## Compiler
 
 The game code was built with CodeWarrior for DSi, a version between `dsi/1.1p1` and `dsi/1.3p1`, and
