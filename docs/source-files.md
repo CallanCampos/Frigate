@@ -2098,7 +2098,7 @@ prints the tables below from the configs and the ROM:
 | `dpc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
 | `dpc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
 | `dpc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
-| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | partial | descriptive |
+| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | complete | descriptive |
 | `dpc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
 
 ### Overlay 257

@@ -23,6 +23,7 @@ src/ov256/dpc_bmp.c:
     .text       start:0x021bc754 end:0x021bcec8
 
 src/ov256/dpc_obj.c:
+    complete
     .text       start:0x021bcec8 end:0x021bd788
     .rodata     start:0x021bda68 end:0x021bdc04
 
