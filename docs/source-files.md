@@ -2672,7 +2672,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `wbt_download_sys.c` | `0x021b5d80`–`0x021b60a4` | 15 | complete | string at `0x021b7320` |
 | `wbt_download_net_graphic.c` | `0x021b60a4`–`0x021b62f0` | 12 | complete | string at `0x021b7354` |
-| `wbt_download_net_util.c` | `0x021b62f0`–`0x021b70d4` | 33 | partial | string at `0x021b7370` |
+| `wbt_download_net_util.c` | `0x021b62f0`–`0x021b70d4` | 33 | complete | string at `0x021b7370` |
 
 ### Overlay 328
 

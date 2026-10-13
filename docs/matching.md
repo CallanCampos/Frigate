@@ -262,6 +262,14 @@ Same instructions, registers swapped.
   every statement reassigns: `actor = GetActor(...); func_0204c124(actor, FALSE);`, as the habitat list's
   `ZukanHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
   constant locals, inline helpers and loops did not reproduce it.
+- A register argument or a loop counter that takes its 0 from another variable's stack slot
+  (`ldr r1, [sp, #0x20]` for `sys_memset`'s 0, and for `i = 0`) where the original has `movs r1, #0`: an earlier
+  statement nested a call in another call's arguments. `WbtDownloadNetBG_Load` wrote
+  `GFL_G2DIOLoadNSCRSync(arc, 6, 4, 0, (u16)GFL_BGSysLoadArcNCGRDynamic(...), 0, FALSE, heapId);` three times; with
+  the inner call's result in a local first (`chars = GFL_BGSysLoadArcNCGRDynamic(...);` then the call with
+  `(u16)chars`) the zeros stored for the stack arguments still come from the hoisted `count = 0` slot, as in the
+  original, but the later `sys_memset(…, 0, …)` and `for (i = 0; …)` of the inlined code build their own. Where
+  `count` is declared or set, its type, and the shape of the inline changed nothing.
 
 ## Stack slots
 
@@ -1240,6 +1248,23 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   tree is split. Two cases form a group only up to a distance of 3; three cases within a span of 5 also do. The bag's
   `ItemMenuDisp_IsFieldMoveTM` has 15 and 19 in one group in the ROM, which no spelling of its six cases gives (see
   its row).
+- A jump-table entry (or `beq`) that lands on a lone `b` to another case's code is a case whose body was written
+  out again, not a fall-through. MWCC merges the identical body into the earlier case but keeps a one-instruction
+  stub for the later one. `WbtDownloadMessage_Print` has `case 0` at a `b` placed after the shared print block: it
+  matches as
+
+  ```c
+  case WBT_DOWNLOAD_MSG_PRINT_WAIT:
+      p_wk->waitIcon = WaitIcon_Create(...);
+      PrintWindow_Print(...); p_wk->state = ...; break;
+  case WBT_DOWNLOAD_MSG_PRINT:
+      PrintWindow_Print(...); p_wk->state = ...; break;
+  ```
+
+  and not with `case PRINT_WAIT: ...; /* falls */ case PRINT:` (which points the table straight at the block), nor
+  with the two cases in the other order. The same holds inside an inline: `case 1: return TRUE; case 2: return TRUE;`
+  gives `case 2` a `b` to `case 1`'s `movs r1, #1`, where `case 1: case 2: return TRUE;` gives none, and
+  `case 0: return FALSE;` before a `default: return FALSE;` gives `case 0` a `b` to the default.
 
 ## Floats and runtime helpers
 

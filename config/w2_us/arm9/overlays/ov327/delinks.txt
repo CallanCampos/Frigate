@@ -17,6 +17,7 @@ src/ov327/wbt_download_net_graphic.c:
     .data       start:0x021b7394 end:0x021b73b0
 
 src/ov327/wbt_download_net_util.c:
+    complete
     .text       start:0x021b6330 end:0x021b7114
     .rodata     start:0x021b733c end:0x021b7348
     .data       start:0x021b73b0 end:0x021b7400
