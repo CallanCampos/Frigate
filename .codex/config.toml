@@ -1,0 +1,22 @@
+[agents]
+default_subagent_model = "gpt-5.3-codex"
+
+[agents.boundary-scout]
+description = "Read-only scout that identifies original source-file boundaries, names, section ranges, statics, and add_source_file commands."
+config_file = "agents/boundary-scout.toml"
+
+[agents.decomp-reviewer]
+description = "Read-only adversarial reviewer of a decompiled file and its diff before commit."
+config_file = "agents/decomp-reviewer.toml"
+
+[agents.file-writer]
+description = "Writes one original source file from assembly, probes it, and reports names, headers, statics, and mismatches without registering or committing."
+config_file = "agents/file-writer.toml"
+
+[agents.function-matcher]
+description = "Matches one nonmatching function byte-for-byte using the project's triage, lever, and stop-rule workflow."
+config_file = "agents/function-matcher.toml"
+
+[agents.struct-recovery]
+description = "Read-only specialist that derives a struct layout from all assembly accesses and reports the owning header and evidence."
+config_file = "agents/struct-recovery.toml"
