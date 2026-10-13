@@ -996,7 +996,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_badge_gate.c` | `0x021eec80`–`0x021ef794` | 17 | partial | descriptive |
+| `gimmick_badge_gate.c` | `0x021eec80`–`0x021ef794` | 17 | complete | descriptive |
 
 ### Overlay 104
 

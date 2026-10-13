@@ -358,6 +358,18 @@ Same instructions, registers swapped.
   A pool word that differs between the versions by a table row is a table indexed by the version:
   `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
   to the address + 0x10 in White 2. Check the pool words of both versions before linking a file.
+- **MWCC propagates a hoisted constant as an immediate only within a budget of about 100 IR nodes from the start of
+  the function.** A constant that needs a register (for a stack argument, or because it is used often) is written
+  as an immediate at each use up to that edge, and as a copy of the register (`mov r3, r7`) at every use past it.
+  The edge is counted in IR nodes, not instructions, so a respelling that compiles to the same bytes moves it: a
+  one-argument call is about 3 nodes, a call without arguments 1, a parameter as an argument 1, a field load 1, a
+  `u16` narrowing 1; casts of constants and dead code are free. The badge gate's `func_ov103_021ef630` (16 bytes
+  off, immediates where the ROM copies) matched when a call's result went through a local
+  (`matrix = FieldExpObj_GetActorMatrixPtr(...); matrix->translation = ...;`), which is the same code for that
+  statement and three nodes more before the edge. So when the only difference is which uses of a constant are
+  immediates and which are register copies, look for a statement before the first copy that the original wrote with
+  one more (or one fewer) named step, and measure by padding rather than counting. This also explains "holding three
+  nested call results in locals keeps the zero in a register" (`func_ov059_021e6630`).
 
 ## Stack slots
 
