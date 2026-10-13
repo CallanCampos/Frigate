@@ -452,6 +452,12 @@ Same code, other `sp` offsets or frame size.
   the source had the `FX_MUL` macro (the inline keeps a call's result as the first operand), an `fx32` local for the
   `fx16` cosine (it is then loaded where it is written, not forwarded to its first use), and `left = -FX_Div(...)`
   in a local assigned after `right` (as an argument the negation is done when the arguments are set up).
+- A pointer reused across several loops is spilled to the lowest slot; declared in each loop's body it sits above the
+  compiler's element-address temporaries. Mistralton Gym's `Mistralton_LoadScene` (0x334 against 0x32c before)
+  declares `SRTMatrix *matrix;` in each of its loop bodies, zeroes `u8 i` at its declaration
+  (`for (; i < FAN_COUNT; i++)`) and uses a second `u8 j` for the later loops. Repeat a statement-order sweep after a
+  type change: in `Mistralton_SetStage` the `u32 count`'s store moved wherever it was written, and the `u8` one
+  stays where it is written.
 
 ## Instruction order
 
