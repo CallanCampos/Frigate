@@ -54,7 +54,6 @@ static void PokeListPlate_Draw(PokeListWork *wk, PokeListPlate *plate, BOOL numb
 static void PokeListPlate_DrawInfo(PokeListWork *wk, PokeListPlate *plate, BOOL numbersOnly);
 static void PokeListPlate_DrawHpBar(PokeListWork *wk, PokeListPlate *plate);
 static void PokeListPlate_DrawEgg(PokeListWork *wk, PokeListPlate *plate);
-static void PokeListPlate_SetPalette(PokeListWork *wk, PokeListPlate *plate, u32 palette);
 static void PokeListPlate_RedrawNumbers(PokeListWork *wk, PokeListPlate *plate);
 static void PokeListPlate_UpdateEntry(PokeListWork *wk, PokeListPlate *plate);
 static u8 PokeListPlate_GetHpColor(PokeListPlate *plate);
@@ -488,7 +487,7 @@ void PokeListPlate_SetSelected(PokeListWork *wk, PokeListPlate *plate, BOOL sele
 }
 
 // The palette of a plate: the fainted ones' palette follows each of 3 and 6
-static void PokeListPlate_SetPalette(PokeListWork *wk, PokeListPlate *plate, u32 palette) {
+void PokeListPlate_SetPalette(PokeListWork *wk, PokeListPlate *plate, u32 palette) {
     if (palette == 3 && PokeListPlate_GetHpColor(plate) == HP_GAUGE_COLOR_NONE) {
         GFL_BGSysSetScrPaletteNo(2, sPlatePos[plate->index][0] + 16, sPlatePos[plate->index][1], 16, 6, 4);
     } else if (palette == 6 && PokeListPlate_GetHpColor(plate) == HP_GAUGE_COLOR_NONE) {
