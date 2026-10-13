@@ -14,6 +14,10 @@ void clock_init(void);
 #define OS_TicksToSeconds(tick) (((tick) * 64) / OS_SYSTEM_CLOCK)
 #define OS_TicksToMilliSeconds(tick) (((tick) * 64) / (OS_SYSTEM_CLOCK / 1000))
 #define OS_TicksToMicroSeconds(tick) (((tick) * 64 * 1000) / (OS_SYSTEM_CLOCK / 1000))
+#define OS_MilliSecondsToTicks(msec) ((u64)(((OS_SYSTEM_CLOCK / 1000) * (u64)(msec)) / 64))
+// NitroSDK's OSi_ReferSymbol, which does nothing but be called with a library's signature ("[SDK+...]"), keeping the
+// signature in the link
+void func_02004eb0(const char *signature);
 // Restarts the game, which swan names sys_reset
 void sys_reset(u32 parameter);
 // Stops the game after a fatal error, calling the registered handler first
@@ -231,10 +235,15 @@ BOOL OS_SendMessage(OSMessageQueue *queue, OSMessage message, s32 flags);
 BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags);
 
 // NitroSDK's threads, under swan's names: OS_CreateThread, whose stack is its top, OS_SleepThread, which sleeps on
-// queue until OS_WakeupThread wakes it, and OS_WakeupThreadDirect, which starts a new thread. The thread's fields
-// aren't known yet
+// queue until OS_WakeupThread wakes it, and OS_WakeupThreadDirect, which starts a new thread. Of the thread's fields
+// only the link of the list of all threads and the specific words (NitroWiFi's CPS keeps a thread's socket in the
+// first) are known yet
 typedef struct OSThread {
-    u8 data[0xc0];
+    u8 unk_00[0x68];
+    struct OSThread *next;
+    u8 unk_6c[0x38];
+    void *specific[3];
+    u8 unk_b0[0x10];
 } OSThread;
 
 static inline void OS_InitThreadQueue(OSThreadQueue *queue) {
@@ -254,12 +263,22 @@ BOOL scheduler_is_thread_ended(const OSThread *thread);
 void func_0207a710(OSThread *thread);
 // NitroSDK's OS_JoinThread, by its code: waits for a thread's end
 void func_0207a800(OSThread *thread);
+// NitroSDK's OS_YieldThread, by its place between OS_JoinThread and OS_SetThreadPriority: lets the other threads of the
+// same priority run
+void func_0207a92c(void);
 
-// The scheduler's state, which swan names g_IsThreadSwitchRequested: the thread that runs is its second word
+// The scheduler's state, which swan names g_IsThreadSwitchRequested: the thread that runs is its second word, and the
+// list of all threads, linked through their next, its third (NitroSDK's OSThreadInfo)
 extern struct {
     int unk_00;
     OSThread *current;
+    OSThread *list;
 } g_IsThreadSwitchRequested;
+
+// NitroSDK's OS_GetCurrentThread
+static inline OSThread *OS_GetCurrentThread(void) {
+    return g_IsThreadSwitchRequested.current;
+}
 
 // NitroSDK's events, by their code: a word of flags, and the threads waiting for some of them to be set
 typedef struct OSEvent {
@@ -278,6 +297,15 @@ void func_0207c7f4(OSEvent *event);
 u32 func_0207c800(OSEvent *event, u32 pattern, u32 mode, u32 clearBits);
 // Sets flags and wakes the threads waiting on the event (OS_SignalEvent's code)
 void func_0207c864(OSEvent *event, u32 setPattern);
+
+// NitroSDK's alarms, by their code: OS_CreateAlarm, OS_SetAlarm (the alarm fires once after the ticks and calls the
+// function with the argument) and OS_CancelAlarm
+typedef struct OSAlarm {
+    u8 unk_00[0x2c];
+} OSAlarm;
+void func_0207bc24(OSAlarm *alarm);
+void func_0207bcf4(OSAlarm *alarm, u64 ticks, void (*handler)(void *arg), void *arg);
+void func_0207bd3c(OSAlarm *alarm);
 
 // NitroSDK's mutexes, which a thread may lock again; OS_LockMutex sleeps until the mutex is free
 typedef struct OSMutexLink {

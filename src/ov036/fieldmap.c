@@ -1446,7 +1446,7 @@ fx32 func_ov036_0218132c(Field *field) {
 }
 
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId) {
-    if (zoneId == 0x78 && !func_ov011_02154e70(field->gameData, 0)) {
+    if (zoneId == 0x78 && !GameData_IsMapReplaceEventSet(field->gameData, 0)) {
         return 0xfffffff;
     }
     return GetZoneFogIndex(zoneId);

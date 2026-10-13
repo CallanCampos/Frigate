@@ -1568,7 +1568,7 @@ void FieldMapControl_LoadZone(GameSystem *gsys, u16 zoneId) {
     SetAllowVersionSpecificArea(VERSION_AREA_BLACK2, FALSE);
     SetAllowVersionSpecificArea(VERSION_AREA_WHITE2, FALSE);
     SetAllowVersionSpecificArea(VERSION_AREA_2, FALSE);
-    if (func_ov011_02154e70(gameData, 0)) {
+    if (GameData_IsMapReplaceEventSet(gameData, 0)) {
         SetAllowVersionSpecificArea(VERSION_AREA_2, TRUE);
         SetAllowVersionSpecificArea(VERSION_AREA_OWN, TRUE);
     }

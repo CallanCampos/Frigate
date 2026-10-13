@@ -426,7 +426,7 @@ BOOL POKE_NET_Setup(void) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_NETWORKSETTING;
         return FALSE;
     }
-    gPOKE_NET_Control.ServerAddr = POKE_NET_Swap32(func_ov011_02155d40(address));
+    gPOKE_NET_Control.ServerAddr = POKE_NET_Swap32(CPS_Resolve(address));
     POKE_NET_SSL_StartConnection(gPOKE_NET_Control.ServerURL, &sPOKE_NET_SslConnection);
     if (func_ov011_02158174(gPOKE_NET_Control.Socket, &sPOKE_NET_SslConnection) < 0) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_SSL;

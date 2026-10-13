@@ -254,7 +254,6 @@ FieldTaskManager *Field_GetTaskManager(Field *field);
 void Field_SetSeasonBannerOverdrawFlag(Field *field, BOOL flag);
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId);
 void ShutdownFollowWork(GameData *gameData);
-BOOL func_ov011_02154e70(GameData *gameData, u32 a1);
 void func_ov012_02162f44(GameData *gameData);
 void func_ov012_021683f4(GameSystem *gsys, u16 zoneId);
 void func_ov036_0219ad24(FieldPlayer *player, RailPosition *pos);
