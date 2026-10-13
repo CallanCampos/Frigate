@@ -88,6 +88,4 @@ BOOL func_ov169_0689d1ec(void *data, u16 move, u32 turn);
 u32 GetUsedMoveCount(void *data, u16 move, u32 turn);
 u16 func_ov169_0689d250(void *data, u32 turn);
 
-void *FieldEffectEventAdd(u32 effect, u32 subParam);
-void func_ov169_06898080(void *event);
 #endif // POKEBW2_BATTLE_BTL_OV169_H
