@@ -1498,14 +1498,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - **Switch trees depend on the x87 precision the compiler runs with.** MWCC groups a switch's sorted cases into
   ranges with a floating-point density test (cases / span above 0.4), done in x87. A Win32 process starts with the
   control word 0x27f (53-bit precision); wibo 1.2.0 leaves Linux's 0x37f (64-bit). A range whose density is exactly
-  0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, so our build makes
+  0.4 (two cases 4 apart, four cases in a span of 10) passes under 53-bit and fails under 64-bit, so wibo 1.2.0 made
   another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
   unchanged: `ItemMenuDisp_IsFieldMoveTM` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
   (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
   bytes), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
-  for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. Until the build
-  runs the compiler that way these stay rows: don't spend a session on a "run at a gap of 4" or a tree rooted one
-  case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
+  for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. The pinned wibo
+  release configures the guest at 0x27f; if an older binary is used, check that before trying a "gap of 4" or a tree
+  rooted one case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
   in the ranges before it.
