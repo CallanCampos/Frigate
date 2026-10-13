@@ -4,6 +4,7 @@
 #include "battle/btl_ov169.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_setup.h"
+#include "battle/btl_tables.h"
 #include "battle/trainer_data.h"
 #include "constants/pokemon.h"
 #include "gfl/heap.h"

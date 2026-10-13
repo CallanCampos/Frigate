@@ -16,6 +16,7 @@
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_server_flow.h"
 #include "battle/btl_server_flow_sub.h"
+#include "battle/btl_tables.h"
 #include "battle/pos_handlers.h"
 #include "battle/side_handlers.h"
 #include "constants/abilities.h"
@@ -4775,7 +4776,7 @@ void func_ov167_021a78bc(BtlServerFlow *flow, BattleMon *mon, void *targets) {
     target = func_ov169_0689cdf8(targets, 0);
     ability = GetBattleMonStat(mon, 0x10);
     targetAbility = GetBattleMonStat(target, 0x10);
-    if (ability != targetAbility && !func_ov169_0689cadc(ability) && !func_ov169_0689cadc(targetAbility)) {
+    if (ability != targetAbility && !IsSkillSwapExcludedAbility(ability) && !IsSkillSwapExcludedAbility(targetAbility)) {
         BattleMoveEffectState *effect;
 
         monId = GetMonID(mon);

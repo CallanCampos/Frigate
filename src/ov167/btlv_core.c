@@ -6,8 +6,10 @@
 #include "battle/b_plist_main.h"
 #include "battle/btl_client.h"
 #include "battle/btl_main.h"
+#include "battle/btl_poke_select.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_string.h"
+#include "battle/btl_tables.h"
 #include "battle/btlv.h"
 #include "battle/btlv_clact.h"
 #include "battle/btlv_effect.h"
@@ -734,17 +736,17 @@ void BattleClientCmd_StartPokeList(BtlvCore *core, const BtlvPokeListCmd *cmd, s
         partyIndex = 0;
     }
     func_ov167_021cf234(core, &core->ov287, cmd->mode, partyIndex, move);
-    count = func_ov169_0689cca0(select);
+    count = PokeSelect_GetCount(select);
     for (i = 0; i < count; i++) {
         if (i >= 2) {
             break;
         }
-        core->ov287.unk1D[i] = func_ov169_0689ccb4(select, i);
+        core->ov287.unk1D[i] = PokeSelect_Get(select, i);
     }
     for (; i < 2; i++) {
         core->ov287.unk1D[i] = 6;
     }
-    select->unk08 = 1;
+    select->selecting = TRUE;
     core->selectParam = select;
     core->subSeq = 0;
 }
@@ -779,9 +781,9 @@ BOOL BattleClientCmd_WaitPokeSelect(BtlvCore *core) {
             if (core->ov287.unk1F != 5 && core->ov287.unk30 == 0) {
                 for (i = 0; i < 3; i++) {
                     if (core->ov287.unk48[i] != 0xff) {
-                        func_ov169_0689cc74(core->selectParam, i, core->ov287.unk48[i]);
-                        func_ov169_0689cca0(core->selectParam);
-                        core->selectParam->unk08 = 0;
+                        PokeSelect_Push(core->selectParam, i, core->ov287.unk48[i]);
+                        PokeSelect_GetCount(core->selectParam);
+                        core->selectParam->selecting = FALSE;
                     }
                 }
             }
@@ -908,7 +910,7 @@ BOOL func_ov167_021cf73c(BtlvCore *core) {
         }
         break;
     case 4:
-        if (core->ov286.item != 0 && core->ov286.pocket != 2 && !func_ov169_0689ca94(core->ov286.item)) {
+        if (core->ov286.item != 0 && core->ov286.pocket != 2 && !IsEscapeItem(core->ov286.item)) {
             core->ov287.item = core->ov286.item;
             GFL_OvlLoad(OVERLAY_ID(287));
             BPlistMain_Start(&core->ov287);

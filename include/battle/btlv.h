@@ -36,18 +36,6 @@ void Btlv_StringParam_AddArg(BtlvStringParam *param, u32 arg);
 
 typedef BOOL (*BtlvMainProc)(BtlvCore *core, s32 *seq, void *work);
 
-// The party list command's parameters; only the mode is known
-struct BtlvPokeListCmd {
-    u8 unk00[0xb];
-    u8 mode;
-};
-
-// Where a party selection's result goes, handled by overlay 169
-struct BtlvPokeSelectParam {
-    u8 unk00[8];
-    u8 unk08;
-};
-
 // Called while a message prints
 typedef BOOL (*BtlvMsgCallback)(u32 arg);
 
@@ -132,11 +120,6 @@ BOOL func_ov167_021d42ac(BtlvScu *scu);
 void func_ov167_021d4304(BtlvScu *scu);
 BOOL func_ov167_021d4324(BtlvScu *scu);
 
-// Overlay 169, past btlv_scd.c
-BOOL func_ov169_0689ca94(u16 item);
-void func_ov169_0689cc74(BtlvPokeSelectParam *param, u8 index, u8 slot);
-u32 func_ov169_0689cca0(BtlvPokeSelectParam *param);
-u8 func_ov169_0689ccb4(BtlvPokeSelectParam *param, u8 index);
 // The battle's selection screens, which share an address range with the bag
 void BScenarioMain_Start(void *param);
 void BChoiceMain_Start(void *param);
@@ -298,12 +281,5 @@ void func_ov167_021d0bac(BtlvCore *core, u32 arg1, u32 arg2, u32 arg3);
 u32 func_ov167_021d0be4(BtlvCore *core);
 void func_ov167_021d0bf4(BtlvCore *core, u32 arg1);
 
-// Overlay 169's party list
-void func_ov169_0689cc20(BtlvPokeListCmd *cmd, BattleParty *party, u8 count, u8 mode);
-void func_ov169_0689cc38(BtlvPokeListCmd *cmd, u8 numCoverPos);
-void func_ov169_0689cc68(BtlvPokeSelectParam *select, BtlvPokeListCmd *cmd);
-BOOL func_ov169_0689cc90(BtlvPokeSelectParam *select);
-BOOL func_ov169_0689cc9c(BtlvPokeSelectParam *select);
-u8 func_ov169_0689cca4(BtlvPokeSelectParam *select);
 
 #endif // POKEBW2_BATTLE_BTLV_H

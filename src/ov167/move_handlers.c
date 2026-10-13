@@ -12,6 +12,7 @@
 #include "battle/btl_ov169.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
+#include "battle/btl_tables.h"
 #include "battle/handler_common.h"
 #include "battle/side_handlers.h"
 #include "constants/moves.h"
@@ -1300,7 +1301,7 @@ static void HandlerMimic(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s
             if (used != move) {
                 move = used;
             }
-            if (move != 0 && !func_ov169_0689cc04(move) && func_ov167_021baf78(mon, move) == 4) {
+            if (move != 0 && !IsMimicExcludedMove(move) && func_ov167_021baf78(mon, move) == 4) {
                 slot = func_ov167_021baf78(mon, BattleEventItem_GetSubID(item));
                 if (slot != 4) {
                     update = BattleHandler_PushWork(flow, 0x25, monId);
@@ -5050,7 +5051,7 @@ static void HandlerEncore(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
         targetId = BattleEventVar_GetValue(6);
         target = GetBattleMon(flow, targetId);
         move = GetPreviousMoveUsed(target);
-        if (!CheckCondition(target, 0x17) && !func_ov169_0689ca34(move) && func_ov167_021bada0(target, move)) {
+        if (!CheckCondition(target, 0x17) && !IsEncoreExcludedMove(move) && func_ov167_021bada0(target, move)) {
             if (GetTurnFlag(target, 1)) {
                 turns++;
             }
@@ -6088,7 +6089,7 @@ static void HandlerRolePlay(BattleEventItem *item, BtlServerFlow *flow, u8 monId
     if (BattleEventVar_GetValue(3) == monId) {
         targetId = BattleEventVar_GetValue(6);
         ability = GetBattleMonStat(GetBattleMon(flow, targetId), 0x10);
-        if (!func_ov169_0689caa4(ability)) {
+        if (!IsRolePlayExcludedAbility(ability)) {
             param = BattleHandler_PushWork(flow, 0x1f, monId);
             param->targetIndex = monId;
             param->ability = ability;
@@ -6942,7 +6943,7 @@ static void HandlerDestinyBondDamage(BattleEventItem *item, BtlServerFlow *flow,
     BattleHandlerFaintParam *param;
 
     if (BattleEventVar_GetValue(4) == monId && IsFainted(GetBattleMon(flow, monId))) {
-        if (!func_ov169_0689ca54(BattleEventVar_GetValue(0x12))) {
+        if (!IsDelayedAttackMove(BattleEventVar_GetValue(0x12))) {
             attackerId = BattleEventVar_GetValue(3);
             attacker = GetBattleMon(flow, attackerId);
             if (!IsAllyMonID(monId, attackerId) && !IsFainted(attacker)) {
@@ -6994,7 +6995,7 @@ static void HandlerGrudgeReducePP(BattleEventItem *item, BtlServerFlow *flow, u8
     u32 slot;
     BattleHandlerPPParam *param;
 
-    if (BattleEventVar_GetValue(4) == monId && !func_ov169_0689ca54(BattleEventVar_GetValue(0x12)) &&
+    if (BattleEventVar_GetValue(4) == monId && !IsDelayedAttackMove(BattleEventVar_GetValue(0x12)) &&
         IsFainted(GetBattleMon(flow, monId))) {
         attackerId = BattleEventVar_GetValue(3);
         attacker = GetBattleMon(flow, attackerId);
@@ -7131,7 +7132,7 @@ static void HandlerMetronome(BattleEventItem *item, BtlServerFlow *flow, u8 monI
     u8 targetPos;
 
     if (BattleEventVar_GetValue(2) == monId) {
-        excluded = func_ov169_0689cc14(&count);
+        excluded = GetMetronomeExcludedMoves(&count);
         move = func_ov167_021bd658(excluded, count);
         targetPos = func_ov167_021abb70(flow, monId, move);
         BattleEventVar_RewriteValue(0x12, move);
@@ -7258,7 +7259,7 @@ static void HandlerAssist(BattleEventItem *item, BtlServerFlow *flow, u8 monId, 
                 numMoves = GetBattleMonMoveCount(mon);
                 for (j = 0; j < numMoves; j++) {
                     move = MoveGetID(mon, j);
-                    if (!func_ov169_0689cbc4(move)) {
+                    if (!IsAssistExcludedMove(move)) {
                         moves[count++] = move;
                     }
                 }
@@ -7298,7 +7299,7 @@ static void HandlerSleepTalk(BattleEventItem *item, BtlServerFlow *flow, u8 monI
             numMoves = GetBattleMonMoveCount(mon);
             for (i = 0, count = 0; i < numMoves; i++) {
                 move = MoveGetID(mon, i);
-                if (!func_ov169_0689cba4(move) && !getMoveFlag(move, 1)) {
+                if (!IsSleepTalkExcludedMove(move) && !getMoveFlag(move, 1)) {
                     work[count++] = move;
                 }
             }
@@ -7378,7 +7379,7 @@ static void HandlerMeFirst(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
             if (!GetTurnFlag(target, 3) && func_ov167_021abb8c(flow, targetId, &action) &&
                 func_ov167_021abc8c(flow, targetId) && !func_ov167_021abeb4(flow, targetId)) {
                 move = func_ov167_021bdb68(&action);
-                if (move != 0 && PML_MoveIsDamaging(move) && !func_ov169_0689ca44(move)) {
+                if (move != 0 && PML_MoveIsDamaging(move) && !IsMeFirstExcludedMove(move)) {
                     success = TRUE;
                 }
             }
@@ -7413,7 +7414,7 @@ static void HandlerCopycat(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
 
     if (BattleEventVar_GetValue(2) == monId) {
         move = func_ov167_021abc54(flow);
-        if (move != 0 && !func_ov169_0689cbe4(move)) {
+        if (move != 0 && !IsCopycatExcludedMove(move)) {
             targetPos = func_ov167_021abb70(flow, monId, move);
             BattleEventVar_RewriteValue(0x12, move);
             BattleEventVar_RewriteValue(0xd, targetPos);

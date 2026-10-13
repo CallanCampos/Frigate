@@ -33,7 +33,6 @@ BOOL func_ov169_0689ce3c(void *monSet, BattleMon *mon, u32 *value);
 BOOL func_ov169_0689ce80(void *monSet, BattleMon *mon, u32 *value);
 void func_ov169_0689c4ec(u32 condition, BattleCondition value, BattleMon *mon, BattleHandlerString *string);
 void func_ov169_0689c92c(BtlServerFlow *flow, BattleMon *mon);
-BOOL func_ov169_0689cadc(u16 ability);
 void func_ov169_0689b938(BattleMon *mon, u32 condition, BattleCondition prev, BOOL cured, BtlServerFlow *flow);
 void func_ov169_0689ba5c(BattleHandlerString *string, BattleMon *mon, u32 condition);
 void func_ov169_0689d2e4(void *data, u8 monId);
@@ -41,8 +40,6 @@ BOOL func_ov169_0689d328(void *data, u32 arg1, u8 index);
 u8 func_ov169_0689d30c(void *data, u32 arg1, u8 index);
 void func_ov169_0689d344(void *data, u32 arg1, u8 index);
 u8 GetExistPokeID(void *data, u8 pos);
-u32 func_ov169_0689cb6c(u32 index);
-u32 func_ov169_0689cb80(u32 index);
 u32 func_ov169_0689cec0(void *monSet);
 void func_ov169_0689cf54(void *monSet, BattleMon *mon, void *out);
 void func_ov169_0689cfe0(void *monSet, BattleMon *mon, void *out);
@@ -55,27 +52,10 @@ u32 func_ov169_0689cec8(void *monSet);
 BattleMon *func_ov169_0689cdf8(void *monSet, u32 index);
 void Condition_CheckFloating(BtlServerFlow *flow, BattleMon *mon);
 u8 func_ov169_0689d77c(void *data, u8 monId);
-BOOL func_ov169_0689cb28(u16 background);
-BOOL func_ov169_0689ca84(u16 item);
 u8 func_ov169_0689d35c(void *data);
 void func_ov169_0689c6c8(BtlServerFlow *flow, BattleMon *target);
 
-BOOL func_ov169_0689cb5c(u16 move);
-// Whether an item is an Arceus plate, and a Genesect drive
-BOOL func_ov169_0689cb08(u16 item);
-BOOL func_ov169_0689cb18(u16 item);
 
-// Move and ability checks the move handlers use
-BOOL func_ov169_0689ca34(u16 move);
-BOOL func_ov169_0689ca44(u16 move);
-BOOL func_ov169_0689caa4(u16 ability);
-BOOL func_ov169_0689cac4(u16 ability);
-BOOL func_ov169_0689cba4(u16 move);
-BOOL func_ov169_0689cbc4(u16 move);
-BOOL func_ov169_0689cbe4(u16 move);
-// Whether Mimic can't copy a move
-BOOL func_ov169_0689cc04(u16 move);
-const u16 *func_ov169_0689cc14(u32 *count);
 BOOL func_ov169_0689d1ec(void *data, u16 move, u32 turn);
 u32 GetUsedMoveCount(void *data, u16 move, u32 turn);
 u16 func_ov169_0689d250(void *data, u32 turn);
