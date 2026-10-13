@@ -958,6 +958,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   not moved to its use. `PkwdBook_LoadPoster` matches with `const PkwdBookLoad *screen = sPkwdBookPosterScreens;` at
   the top and `screen += graphicIdx;` before each call. An inline helper taking `&table[i]`, entry pointers at any
   scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".)
+- A shifted index that the original computes again after a loop, where ours reuses the loop's, is the same index in
+  another type: MWCC shares `palette << 5` only between uses of one type. The World Tournament list's
+  `WbtList_SetPaletteGray` runs its gray loop in a `static inline` taking `u32 palette` while the function has
+  `s32 palette`, so the tail computes the offset again with `palette` in `r7` and `work` spilled (75 bytes off
+  without it). `work->grayPalettes[(u32)palette]` in the tail shows the same thing.
 
 ## Branches and block layout
 
