@@ -300,7 +300,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
-  globals get their own sections. Predict with `tools/decomp/rodata_order.py`. (matching.md: "Static data is sorted by size")
+  globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
+  `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
+  compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
 - The full model, checked by fuzzing MWCC: there is one list per file in declaration order, except tentative `.bss`
   statics, which join at the end in reverse order. Each kind (rodata, data, bss) gets its own shared section.
   Unreferenced statics are dropped. `rodata_order.py` doesn't model the per-kind sections or the `.bss` rule yet, but
