@@ -68,8 +68,14 @@ BOOL func_ov167_021cdedc(BtlServerFlow *flow, u8 monId) {
 }
 
 BOOL func_ov167_021cdf08(BtlServerFlow *flow, u8 monId) {
-    if (func_ov167_021abca8(flow) == 0 && func_ov167_0219c648(monId) == 1) {
-        return TRUE;
+    if (func_ov167_021abca8(flow) == 0) {
+        u32 client = func_ov167_0219c648(monId);
+
+        // The original tests the client against 1 twice (`beq` to the next instruction, then `bne`), as two
+        // constants of the same value would
+        if (client == 1 || client == 1) {
+            return TRUE;
+        }
     }
     return FALSE;
 }

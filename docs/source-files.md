@@ -1510,7 +1510,7 @@ prints the tables below from the configs and the ROM:
 | `btl_main.c` | `0x021998c0`–`0x0219e3cc` | 231 | partial | string at `0x021dae80` |
 | `btl_server.c` | `0x0219e3cc`–`0x0219f390` | 55 | complete | string at `0x021dae8c` |
 | `btl_server_flow.c` | `0x0219f390`–`0x021ae32c` | 997 | partial | string at `0x021dae9c` |
-| `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | partial | descriptive |
+| `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | complete | descriptive |
 | `btl_handler_work.c` | `0x021b083c`–`0x021b0a1c` | 11 | complete | descriptive |
 | `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | partial | descriptive |
 | `btl_client.c` | `0x021b1674`–`0x021b9950` | 311 | partial | string at `0x021daf60` |
@@ -1522,11 +1522,11 @@ prints the tables below from the configs and the ROM:
 | `ability_handlers.c` | `0x021bdcac`–`0x021c26ec` | 442 | complete | descriptive |
 | `item_handlers.c` | `0x021c26ec`–`0x021c5b04` | 431 | complete | descriptive |
 | `move_handlers.c` | `0x021c5b04`–`0x021cde38` | 620 | complete | descriptive |
-| `handler_common.c` | `0x021cde38`–`0x021ce10c` | 16 | partial | descriptive |
+| `handler_common.c` | `0x021cde38`–`0x021ce10c` | 16 | complete | descriptive |
 | `battle_overlay.c` | `0x021ce10c`–`0x021ce158` | 2 | complete | descriptive |
 | `battle_condition.c` | `0x021ce158`–`0x021ce520` | 20 | complete | descriptive |
 | `poke_type_pair.c` | `0x021ce520`–`0x021ce604` | 8 | complete | descriptive |
-| `btlv_core.c` | `0x021ce604`–`0x021d0c24` | 295 | partial | string at `0x021dafa0` |
+| `btlv_core.c` | `0x021ce604`–`0x021d0c24` | 295 | complete | string at `0x021dafa0` |
 | `btlv_scu.c` | `0x021d0c24`–`0x021d45b0` | 124 | complete | string at `0x021dafac` |
 | `btl_rec.c` | `0x021d45b0`–`0x021d4a1c` | 18 | partial | string at `0x021dafb8` |
 | `btl_adapter.c` | `0x021d4a1c`–`0x021d4c64` | 17 | complete | string at `0x021dafc4` |

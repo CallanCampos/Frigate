@@ -1804,6 +1804,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   one case, an inner `switch` with its cases in the wrong order and a flag set in the wrong arm, and
   `WifiBattleMatchNet_StartReport` tested the wrong parameter. Before respelling a large function, check its
   statements against the asm case by case.
+- A `bl` that the probe masks can go to a linker veneer's symbol instead of the function: five calls of
+  `btl_server_flow.c` named veneers (through local prototypes) and compiled to matching bytes. The call-target check
+  has to follow veneers (`ov167a_calls.py` in that session did); the battle overlay has 45 of them in one file's
+  range. In the same overlay a pointer to `const` was the shared cause of eight nonmatching functions (the damage
+  list's five readers, a move param, the stat-change and cure handlers' params): when sibling functions all differ
+  by a load placed against a store or call, try `const` on the pointee they share before anything else.
 
 ## When nothing moves it
 
