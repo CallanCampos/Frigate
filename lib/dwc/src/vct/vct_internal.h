@@ -182,28 +182,28 @@ u16 func_0207bb84(void);
 #define REG_SQRTCNT_BUSY 0x8000
 
 // vct_adpcm.c
-void VCT_DecodeAdpcm(const u8 *packet, s16 *dst, int size, int bits);
-void VCT_EncodeAdpcm(u8 *packet, const s16 *src, int count, VCTAdpcmState *state, int bits);
+void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits);
+void VCT_EncodeAdpcm(u8 *packet, s16 *src, int count, VCTAdpcmState *state, int bits);
 
 // vct_audio.c: the frames going out and coming in
 BOOL VCT_InitAudio(void);
 void VCT_ClearSessionCount(void);
 BOOL VCT_AttachSession(VCTSession *session);
 void VCT_DetachSession(VCTSession *session);
-BOOL VCT_SubmitSamples(const void *samples, int size);
+BOOL VCT_SubmitSamples(void *samples, int size);
 BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask);
 BOOL VCT_SetCodec(int codec);
 void VCT_SetVad(BOOL enabled);
 void VCT_SetEchoCancel(BOOL enabled);
-BOOL VCT_HandleVoicePacket(int aid, const VCTVoicePacket *packet, int size, u64 now);
+BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now);
 int VCT_DecodeReceived(void);
 BOOL VCT_SendPending(void);
 
 // vct_session.c: the machines
 void VCT_ClearSessions(void);
 void VCT_CheckTimeout(void);
-BOOL VCT_HandleControlPacket(int aid, const VCTControlPacket *packet, int size, VCTEventResult *result);
-BOOL VCT_InitSessions(const VCTConfig *config);
+BOOL VCT_HandleControlPacket(int aid, VCTControlPacket *packet, int size, VCTEventResult *result);
+BOOL VCT_InitSessions(VCTConfig *config);
 
 // vct_dsp.c: packet memory, microphone levels and echo
 BOOL VCT_InitPacketPool(void *buffer, u32 size);
@@ -215,8 +215,8 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level);
 void VCT_InitCapture(void);
 u32 VCT_FilterFrame(s16 *samples, int bytes);
 void VCT_InitEcho(void);
-void VCT_SaveFarEnd(const s16 *samples, int bytes);
+void VCT_SaveFarEnd(s16 *samples, int bytes);
 void VCT_CancelEcho(s16 *samples, int bytes, u32 rms);
-void VCT_MixSamples(const s16 *a, const s16 *b, s16 *out, int bytes);
+void VCT_MixSamples(s16 *a, s16 *b, s16 *out, u32 bytes);
 
 #endif // POKEBW2_DWC_VCT_INTERNAL_H

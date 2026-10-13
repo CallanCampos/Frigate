@@ -329,7 +329,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dwc_rap_vchat.c` | `0x021922c0`–`0x02192ae8` | 19 | partial | descriptive |
+| `dwc_rap_vchat.c` | `0x021922c0`–`0x02192ae8` | 19 | complete | descriptive |
 | `vct_adpcm.c` | `0x02192ae8`–`0x02193cb0` | 8 | partial | descriptive |
 | `vct_audio.c` | `0x02193cb0`–`0x021956d4` | 39 | partial | descriptive |
 | `vct_session.c` | `0x021956d4`–`0x02196680` | 30 | partial | descriptive |

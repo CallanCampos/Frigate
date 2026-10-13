@@ -113,15 +113,20 @@ static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, voi
 }
 
 static BOOL RequestVoice(u8 aid) {
-    VCTSession *session = sVChatWork->requestSession;
+    VCTSession *session;
+    int ret;
 
-    if (session == NULL) {
+    if (sVChatWork->requestSession == NULL) {
         session = VCT_AllocSession(aid);
         if (session == NULL) {
             return FALSE;
         }
+        ret = VCT_Request(session, 0);
+    } else {
+        session = sVChatWork->requestSession;
+        ret = VCT_Request(session, 0);
     }
-    if (VCT_Request(session, 0)) {
+    if (ret) {
         VCT_ReleaseSession(session);
         sVChatWork->requestSession = NULL;
         return FALSE;
@@ -131,29 +136,28 @@ static BOOL RequestVoice(u8 aid) {
 }
 
 static BOOL AcceptVoice(u8 aid) {
-    VCTSession *session = sVChatWork->requestSession;
     BOOL result;
 
-    if (session == NULL || session->state != 4) {
-        return FALSE;
-    }
-    result = FALSE;
-    if (VCT_Respond(session, 0)) {
+    if (sVChatWork->requestSession != NULL && sVChatWork->requestSession->state == 4) {
+        result = FALSE;
+        if (VCT_Respond(sVChatWork->requestSession, 0)) {
+            return result;
+        }
+        if (VCT_AttachSession(sVChatWork->requestSession)) {
+            result = TRUE;
+        }
         return result;
     }
-    if (VCT_AttachSession(session)) {
-        result = TRUE;
-    }
-    return result;
+    return FALSE;
 }
 
 static void ManualCallback(u8 aid, int event, VCTSession *session, void *userData) {
     switch (event) {
-    case 7:
-        VCT_AttachSession(session);
-        break;
     case 9:
         DropSession(session);
+        break;
+    case 7:
+        VCT_AttachSession(session);
         break;
     case 12:
         DropSession(session);
@@ -281,7 +285,11 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
     sVChatWork->micParam.type = MIC_SAMPLING_TYPE_SIGNED_12BIT;
     sVChatWork->micParam.buffer = sVChatWork->micRing;
     sVChatWork->micParam.size = VCT_SAMPLE_BYTES;
-    sVChatWork->micParam.rate = isRunningOnDSi() ? 0x1001 : 0x1040;
+    if (!isRunningOnDSi()) {
+        sVChatWork->micParam.rate = 0x1040;
+    } else {
+        sVChatWork->micParam.rate = 0x1001;
+    }
     sVChatWork->micParam.loop = TRUE;
     sVChatWork->micParam.fullCallback = NULL;
     sVChatWork->micParam.fullArg = NULL;
@@ -292,17 +300,21 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
                            VCT_SAMPLE_BYTES, isRunningOnDSi() ? 0x40 : 0x41, 2, StreamCallback, sVChatWork);
     GFL_ASSERT(ret);
     sVChatWork->phase = 0;
-    sVChatWork->lastTick = 0;
+    sVChatWork->requestSession = NULL;
+    config.mode = 1;
     sVChatWork->callbackKind = 1;
     config.sessions = &sVChatWork->session;
     config.sessionCount = count;
-    config.mode = 1;
     config.aid = func_ov011_021602c0();
-    GFL_ASSERT(config.aid != -1);
+    GFL_ASSERT((config.aid != -1));
+    if (sVChatWork->callbackKind == 3) {
+        config.callback = ManualCallback;
+    } else {
+        config.callback = SessionCallback;
+    }
+    config.userData = NULL;
     config.buffer = sVChatWork->packetMemory;
     config.bufferSize = 0x23c0 * count + 32;
-    config.callback = sVChatWork->callbackKind == 3 ? ManualCallback : SessionCallback;
-    config.userData = NULL;
     VCT_Init(&config);
     sVChatWork->stalled = 0;
     VCT_SetCodec(codec);

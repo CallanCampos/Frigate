@@ -1610,6 +1610,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a translation unit, so each run of functions that shares one `""` is a file of its own. Overlay 28's `union_main.c`
   and `colosseum.c` were five files (`union_main.c`, `union_receive.c`, `union_subproc.c`, `colosseum_comm.c`,
   `colosseum.c`), which also explains statics that had to be external.
+- A library's style applies to all of its files: libVCT (`lib/dwc/src/vct`) takes no pointer to `const` anywhere, and
+  dropping the `const` we had put on its parameters matched `VCT_Init`, `GetEvent`, `HandleCommand4` and
+  `VCT_DecodeAdpcm` at once. Its files are built without `-ipa file`, so their `.bss` statics come out in reverse of
+  their declaration order: a matching function whose pool words point at the wrong static needs the declarations
+  reversed.
 
 ## When nothing moves it
 

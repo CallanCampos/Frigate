@@ -42,12 +42,12 @@ typedef struct VCTEcho {
 static VCTCapture sCapture = {0, 0, 15, 0x3fc};
 static s16 sInitialCoefficients[6] = {-5637, 16445, -14404, 11473, -12246, 892};
 
-static VCTPacketPool sPacketPool;
-static VCTNoiseFloor sNoiseFloor;
-static u32 sLoudnessHistory[4];
-static VCTEcho sEcho;
-static s16 sFarEnd[VCT_FRAME_SAMPLES];
 static s16 sEchoHistory[0x800];
+static s16 sFarEnd[VCT_FRAME_SAMPLES];
+static VCTEcho sEcho;
+static u32 sLoudnessHistory[4];
+static VCTNoiseFloor sNoiseFloor;
+static VCTPacketPool sPacketPool;
 
 BOOL VCT_InitPacketPool(void *buffer, u32 size)
 {
@@ -258,7 +258,7 @@ void VCT_InitEcho(void)
 }
 
 // Keeps the frame that was played, to know what the microphone heard of it
-void VCT_SaveFarEnd(const s16 *samples, int bytes)
+void VCT_SaveFarEnd(s16 *samples, int bytes)
 {
     sys_memcpy32_fast(samples, sFarEnd, bytes);
 }
@@ -330,7 +330,7 @@ void VCT_CancelEcho(s16 *samples, int bytes, u32 rms)
     SuppressEcho(samples, sFarEnd, bytes, rms);
 }
 
-void VCT_MixSamples(const s16 *a, const s16 *b, s16 *out, int bytes)
+void VCT_MixSamples(s16 *a, s16 *b, s16 *out, u32 bytes)
 {
     u32 count = bytes >> 1;
     u32 i;

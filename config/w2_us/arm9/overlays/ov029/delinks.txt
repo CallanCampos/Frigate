@@ -5,6 +5,7 @@
     .bss        start:0x02197480 end:0x02199900 kind:bss align:32
 
 src/ov029/dwc_rap_vchat.c:
+    complete
     .text       start:0x02192300 end:0x02192b28
     .data       start:0x02197400 end:0x0219741c
     .bss        start:0x02197480 end:0x02197484
