@@ -11,6 +11,7 @@
 #include "battle/btl_server_flow.h"
 #include "battle/btl_server_flow_sub.h"
 #include "battle/handler_common.h"
+#include "battle/side_handlers.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
 #include "constants/moves.h"
@@ -1096,7 +1097,7 @@ static BOOL func_ov167_021afb1c(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 
     side = GetSideFromMonID(GetMonID(mon));
     cont = SetConditionTurns(5);
-    if (func_ov169_06898c10(side, 3, cont)) {
+    if (SideEffectEventAdd(side, 3, cont)) {
         message = BattleHandler_PushWork(flow, 4, 0x1f);
         BattleHandler_StrSetup(&message->string, 1, 0x88);
         BattleHandler_AddArg(&message->string, side);

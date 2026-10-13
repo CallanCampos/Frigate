@@ -13,6 +13,7 @@
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
 #include "battle/handler_common.h"
+#include "battle/side_handlers.h"
 #include "constants/moves.h"
 #include "constants/species.h"
 #include "gfl/std.h"
@@ -1221,7 +1222,7 @@ static void HandlerBrickBreakCheck(BattleEventItem *item, BtlServerFlow *flow, u
 
     if (BattleEventVar_GetValue(3) == monId) {
         side = GetSideFromMonID(BattleEventVar_GetValue(4));
-        if (func_ov169_06898cf4(side, 0) || func_ov169_06898cf4(side, 1)) {
+        if (IsSideEffectSet(side, 0) || IsSideEffectSet(side, 1)) {
             remove = BattleHandler_PushWork(flow, 0x1a, monId);
             remove->side = side;
             BattleHandler_InitFlags(remove->effects, sizeof(remove->effects));
@@ -6167,9 +6168,9 @@ static void HandlerRapidSpin(BattleEventItem *item, BtlServerFlow *flow, u8 monI
             BattleHandler_PopWork(flow, cure);
         }
         side = GetSideFromMonID(monId);
-        spikes = func_ov169_06898cf4(side, 6);
-        toxicSpikes = func_ov169_06898cf4(side, 7);
-        stealthRock = func_ov169_06898cf4(side, 8);
+        spikes = IsSideEffectSet(side, 6);
+        toxicSpikes = IsSideEffectSet(side, 7);
+        stealthRock = IsSideEffectSet(side, 8);
         if (spikes || toxicSpikes || stealthRock) {
             param = BattleHandler_PushWork(flow, 0x1a, monId);
             param->side = side;

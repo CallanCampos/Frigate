@@ -7454,6 +7454,13 @@ overlays/ov168 0x021f4240 sBtlvEffect
 overlays/ov169 0x06898080 FieldEffectEventRemove
 overlays/ov169 0x068982ac IsPosEffectFree
 overlays/ov169 0x068982c0 IsPosEffectFreeCore
+overlays/ov169 0x06898bfc SideEffectsInit
+overlays/ov169 0x06898c10 SideEffectEventAdd
+overlays/ov169 0x06898ce0 GetSideEffectLayers
+overlays/ov169 0x06898cf4 IsSideEffectSet
+overlays/ov169 0x06898d54 SideEffectsEndTurn
+overlays/ov169 0x06898de0 GetSideEffectLayersOfItem
+overlays/ov169 0x0689e960 sSideEffects
 overlays/ov170 0x0217f6b0 TrAI_Think
 overlays/ov170 0x0217f780 TrAI_DeleteVM
 overlays/ov170 0x0217f7bc TrAI_Setup

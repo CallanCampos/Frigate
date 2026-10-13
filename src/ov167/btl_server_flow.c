@@ -17,6 +17,7 @@
 #include "battle/btl_server_flow.h"
 #include "battle/btl_server_flow_sub.h"
 #include "battle/pos_handlers.h"
+#include "battle/side_handlers.h"
 #include "constants/abilities.h"
 #include "constants/moves.h"
 #include "constants/tr_ai.h"
@@ -84,7 +85,7 @@ void func_ov167_0219f400(BtlServerFlow *flow) {
     func_ov167_021bda58(&flow->clientIdList);
     func_ov167_021b083c(&flow->actionState);
     func_ov167_021a8f8c(&flow->unk1B54);
-    func_ov169_06898bfc();
+    SideEffectsInit();
     flow->unk786 = 0;
     flow->unk787 = 0;
     flow->unk78A_0 = 0;
@@ -5199,10 +5200,10 @@ u32 func_ov167_021a85fc(BtlServerFlow *flow, BattleMon *mon, u32 condition, u32 
 }
 
 void func_ov167_021a864c(BtlServerFlow *flow) {
-    func_ov169_06898d54(ServerControl_SideEffectEndMessage, flow);
+    SideEffectsEndTurn(ServerControl_SideEffectEndMessage, flow);
 }
 
-void ServerControl_SideEffectEndMessage(u32 side, u32 effect, BtlServerFlow *flow) {
+void ServerControl_SideEffectEndMessage(u8 side, u32 effect, BtlServerFlow *flow) {
     func_ov167_021a866c(flow, effect, side);
 }
 
@@ -7523,11 +7524,11 @@ BOOL func_ov167_021abdf8(BtlServerFlow *flow, u32 value) {
 }
 
 BOOL func_ov167_021abe04(BtlServerFlow *flow, u8 side, u32 sideEffect) {
-    return func_ov169_06898cf4(side, sideEffect);
+    return IsSideEffectSet(side, sideEffect);
 }
 
 u32 func_ov167_021abe10(BtlServerFlow *flow, u8 pos, u32 sideEffect) {
-    return func_ov169_06898ce0(func_ov167_0219d3bc(pos), sideEffect);
+    return GetSideEffectLayers(func_ov167_0219d3bc(pos), sideEffect);
 }
 
 BOOL func_ov167_021abe34(BtlServerFlow *flow, u8 pos, u32 a2) {
@@ -8481,7 +8482,7 @@ u8 BattleHandler_AddSideEffect(BtlServerFlow *handler, const BattleHandlerAddSid
     BattleCondition cont = param->cont;
 
     ServerEvent_CheckSideEffectParam(handler, param->header.monId, param->effect, param->side, &cont);
-    if (func_ov169_06898c10(param->side, param->effect, cont)) {
+    if (SideEffectEventAdd(param->side, param->effect, cont)) {
         BattleHandler_SetString(handler, &param->string);
         return TRUE;
     }

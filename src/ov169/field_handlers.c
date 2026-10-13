@@ -1,6 +1,7 @@
 #include "battle/field_handlers.h"
 #include "types.h"
 #include "battle/btl_event.h"
+#include "constants/battle.h"
 #include "constants/types.h"
 
 // One entry of the field effect table: an effect and the function that returns its handlers
@@ -28,14 +29,14 @@ static void HandlerFieldMagicRoom(BattleEventItem *item, BtlServerFlow *flow, u8
 
 // Each field effect and the function that returns its handlers
 static const FieldEffectEventAddEntry sFieldEffectEventAddTable[] = {
-    { 0, EventAddFieldWeather },
-    { 1, EventAddFieldTrickRoom },
-    { 2, EventAddFieldGravity },
-    { 3, EventAddFieldImprison },
-    { 4, EventAddFieldWaterSport },
-    { 5, EventAddFieldMudSport },
-    { 6, EventAddFieldWonderRoom },
-    { 7, EventAddFieldMagicRoom },
+    { FIELD_CONDITION_WEATHER, EventAddFieldWeather },
+    { FIELD_CONDITION_TRICK_ROOM, EventAddFieldTrickRoom },
+    { FIELD_CONDITION_GRAVITY, EventAddFieldGravity },
+    { FIELD_CONDITION_IMPRISON, EventAddFieldImprison },
+    { FIELD_CONDITION_WATER_SPORT, EventAddFieldWaterSport },
+    { FIELD_CONDITION_MUD_SPORT, EventAddFieldMudSport },
+    { FIELD_CONDITION_WONDER_ROOM, EventAddFieldWonderRoom },
+    { FIELD_CONDITION_MAGIC_ROOM, EventAddFieldMagicRoom },
 };
 
 BattleEventItem *FieldEffectEventAdd(u32 effect, u8 monId) {

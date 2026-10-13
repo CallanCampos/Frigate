@@ -7,7 +7,6 @@
 // Overlay 169's functions that the battle server's flow calls. dsd reads that overlay as data, so these are its
 // addresses, which the calls reach through linker veneers
 
-void func_ov169_06898bfc(void);
 void func_ov169_0689d178(void *data);
 void func_ov169_0689d2a0(void *data);
 void func_ov169_0689d2bc(void *data);
@@ -35,7 +34,6 @@ BOOL func_ov169_0689ce80(void *monSet, BattleMon *mon, u32 *value);
 void func_ov169_0689c4ec(u32 condition, BattleCondition value, BattleMon *mon, BattleHandlerString *string);
 void func_ov169_0689c92c(BtlServerFlow *flow, BattleMon *mon);
 BOOL func_ov169_0689cadc(u16 ability);
-void func_ov169_06898d54(void (*callback)(u32 side, u32 effect, BtlServerFlow *flow), BtlServerFlow *flow);
 void func_ov169_0689b938(BattleMon *mon, u32 condition, BattleCondition prev, BOOL cured, BtlServerFlow *flow);
 void func_ov169_0689ba5c(BattleHandlerString *string, BattleMon *mon, u32 condition);
 void func_ov169_0689d2e4(void *data, u8 monId);
@@ -57,10 +55,6 @@ u32 func_ov169_0689cec8(void *monSet);
 BattleMon *func_ov169_0689cdf8(void *monSet, u32 index);
 void Condition_CheckFloating(BtlServerFlow *flow, BattleMon *mon);
 u8 func_ov169_0689d77c(void *data, u8 monId);
-BOOL func_ov169_06898cf4(u8 side, u32 sideEffect);
-u32 func_ov169_06898ce0(u8 side, u32 sideEffect);
-BOOL func_ov169_06898c10(u8 side, u32 effect, BattleCondition cont);
-BOOL ServerDisplay_RemoveSideEffect(u8 side, u32 effect);
 BOOL func_ov169_0689cb28(u16 background);
 BOOL func_ov169_0689ca84(u16 item);
 u8 func_ov169_0689d35c(void *data);
