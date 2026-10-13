@@ -21,6 +21,8 @@ enum {
     HEAPID_DLP = 0xc,
     // Not from swan: the bag's heap, overlay 142
     HEAPID_BAG = 0xe,
+    // Not from swan: the heap of the Nintendo Wi-Fi Connection settings, overlay 182
+    HEAPID_DWC_UTILITY = 0xf,
     // Not from swan: the battle's heap, which overlay 167 allocates its Pokémon and parties from
     HEAPID_BATTLE = 0x12,
     HEAPID_FIELDMAP = 0x15,
