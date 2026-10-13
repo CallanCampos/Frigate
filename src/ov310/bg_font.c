@@ -51,10 +51,11 @@ void BGFont_PrintStr(BGFont *bgFont, const StrBuf *str) {
     GFL_BitmapFill(bitmap, bgFont->setup.window.backColor);
     if (bgFont->setup.centered) {
         x = bgFont->setup.window.textX + BGFont_GetCenteredX(bgFont, str);
+        y = bgFont->setup.window.textY;
     } else {
         x = bgFont->setup.window.textX;
+        y = bgFont->setup.window.textY;
     }
-    y = bgFont->setup.window.textY;
     GFL_TextRendererDrawToBitmapEx(bitmap, x, y, str, bgFont->font, color);
     if (bgFont->visible) {
         BmpWin_Transfer(bgFont->window);

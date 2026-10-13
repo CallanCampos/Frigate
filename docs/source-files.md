@@ -2499,19 +2499,19 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `research_radar.c` | `0x0219ce80`–`0x0219d3c0` | 23 | partial | descriptive |
+| `research_radar.c` | `0x0219ce80`–`0x0219d3c0` | 23 | complete | descriptive |
 | `research_top.c` | `0x0219d3c0`–`0x0219e470` | 96 | complete | string at `0x021a77ec` |
 | `research_list.c` | `0x0219e470`–`0x021a0f60` | 186 | complete | string at `0x021a77fc` |
-| `research_graph.c` | `0x021a0f60`–`0x021a4394` | 204 | partial | string at `0x021a780c` |
+| `research_graph.c` | `0x021a0f60`–`0x021a4394` | 204 | complete | string at `0x021a780c` |
 | `research_common.c` | `0x021a4394`–`0x021a47dc` | 49 | complete | string at `0x021a7820` |
 | `research_list_recovery.c` | `0x021a47dc`–`0x021a4820` | 9 | complete | string at `0x021a7834` |
 | `queue.c` | `0x021a4820`–`0x021a490c` | 13 | complete | string at `0x021a7850` |
-| `bg_font.c` | `0x021a490c`–`0x021a4ae0` | 7 | partial | string at `0x021a7858` |
+| `bg_font.c` | `0x021a490c`–`0x021a4ae0` | 7 | complete | string at `0x021a7858` |
 | `circle_graph.c` | `0x021a4ae0`–`0x021a5a88` | 64 | complete | string at `0x021a7864` |
 | `arrow.c` | `0x021a5a88`–`0x021a605c` | 25 | complete | string at `0x021a7874` |
 | `research_data.c` | `0x021a605c`–`0x021a6100` | 6 | complete | descriptive |
 | `percentage.c` | `0x021a6100`–`0x021a63e0` | 24 | complete | string at `0x021a787c` |
-| `palette_anime.c` | `0x021a63e0`–`0x021a6848` | 28 | partial | string at `0x021a788c` |
+| `palette_anime.c` | `0x021a63e0`–`0x021a6848` | 28 | complete | string at `0x021a788c` |
 
 ### Overlay 311
 

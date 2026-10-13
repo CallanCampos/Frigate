@@ -2622,6 +2622,7 @@ static void ResearchGraph_ClearData(ResearchGraph *wk) {
 // Reads the survey's questions and the counts of their answers from the save, adding today's to those of before
 static void ResearchGraph_LoadData(ResearchGraph *wk) {
     void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
+    int count;
     int q, i;
     u8 surveyId = ResearchGraph_GetSurveyID(wk);
     u16 answerIds[RESEARCH_QUESTION_COUNT][RESEARCH_ANSWER_MAX];
@@ -2647,8 +2648,8 @@ static void ResearchGraph_LoadData(ResearchGraph *wk) {
 
     for (q = 0; q < RESEARCH_QUESTION_COUNT; q++) {
         u8 question = questions[q];
-        int count = answerCounts[q];
 
+        count = answerCounts[q];
         for (i = 0; i < count; i++) {
             answerIds[q][i] = GetSurveyAnswerMsgID(question, i);
             todayCounts[q][i] = func_0200ed48(survey, question, i + 1);
