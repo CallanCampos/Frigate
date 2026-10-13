@@ -2495,7 +2495,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `zukanlist.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
-| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | partial | descriptive |
+| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | complete | descriptive |
 | `zknlist_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
 | `zknlist_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
 | `zknlist_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
