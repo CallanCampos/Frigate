@@ -71,15 +71,8 @@ static const u8 sPlateScreenPos[2][2] = {
     { 16, 2 },
 };
 
-PokeListPlate *PokeListPlate_Create(PokeListWork *wk, u8 index, PartyPkm *pkm) {
-    return PokeListPlate_CreateCore(wk, index, pkm);
-}
-
-PokeListPlate *PokeListPlate_CreateEmpty(PokeListWork *wk, u8 index) {
-    return PokeListPlate_CreateCore(wk, index, NULL);
-}
-
 static PokeListPlate *PokeListPlate_CreateCore(PokeListWork *wk, u8 index, PartyPkm *pkm) {
+    u8 i;
     u8 x = sPlatePos[index][0];
     u8 y = sPlatePos[index][1];
     int windowX;
@@ -125,8 +118,6 @@ static PokeListPlate *PokeListPlate_CreateCore(PokeListWork *wk, u8 index, Party
     func_0204bedc(plate->renderer, 0, &pos);
     plate->window = BmpWin_CreateDynamic(1, windowX, y, 16, 6, 13, TRUE);
     if (pkm != NULL) {
-        u8 i;
-
         plate->isEgg = PokeParty_GetParam(plate->pkm, PKM_PARAM_IS_EGG, NULL);
         plate->hp = PokeParty_GetParam(plate->pkm, PKM_PARAM_HP, NULL);
         plate->targetHp = plate->hp;
@@ -146,6 +137,14 @@ static PokeListPlate *PokeListPlate_CreateCore(PokeListWork *wk, u8 index, Party
         GFL_BGSysQueueScrLoad(2);
     }
     return plate;
+}
+
+PokeListPlate *PokeListPlate_Create(PokeListWork *wk, u8 index, PartyPkm *pkm) {
+    return PokeListPlate_CreateCore(wk, index, pkm);
+}
+
+PokeListPlate *PokeListPlate_CreateEmpty(PokeListWork *wk, u8 index) {
+    return PokeListPlate_CreateCore(wk, index, NULL);
 }
 
 void PokeListPlate_Free(PokeListWork *wk, PokeListPlate *plate) {
@@ -228,7 +227,7 @@ static void PokeListPlate_CreateActors(PokeListWork *wk, PokeListPlate *plate) {
 static void PokeListPlate_CreateIcon(PokeListWork *wk, PokeListPlate *plate) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(7, HEAPID_TAIL(wk->heapId));
     u32 file;
-    u32 palette;
+    u8 palette;
     ClActorSetup setup;
 
     if (plate->pkm != NULL) {
