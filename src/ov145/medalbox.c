@@ -4,6 +4,7 @@
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
+#include "constants/version.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -608,13 +609,12 @@ static void MedalBoxApp_InitBG(MedalBoxApp *work) {
 // The palette of a rank's case. The last rank has one for each version, Black 2's after White 2's
 static int MedalBoxApp_GetRankPalette(MedalBox *box) {
     int rank = MedalBox_GetRank(box);
+    int palette = rank;
 
     if (rank == MEDAL_RANK_MAX) {
-#ifdef BLACK2
-        rank++;
-#endif
+        palette = rank + GAME_VERSION - VERSION_WHITE2;
     }
-    return rank;
+    return palette;
 }
 
 // Loads the BG that the menu and the messages drew over again
@@ -902,8 +902,8 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
 
                     MedalBoxApp_GetFavoritePos(actor % MEDALBOX_COLUMN_SIZE, &pos);
                     func_0204c140(work->actors[ACTOR_FAVORITE], &pos, 0);
-                    favorite = TRUE;
                     func_0204c124(work->actors[ACTOR_FAVORITE], TRUE);
+                    favorite = TRUE;
                 }
             }
             // The medal's place in the order, in three digits, highlighted for the favorite medal
@@ -912,16 +912,17 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
             for (j = 0; j < 3; j++) {
                 int digit = number / divisor;
                 int x = sMedalBoxNumberPos[i].x + shown * 10 - (2 - j);
+                int y = sMedalBoxNumberPos[i].y;
                 u8 palette = 8;
 
                 if (work->data.favoriteMedal != medals->medals[i]->id) {
                     palette = 0;
                 }
                 if (digit == 0) {
-                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), 10, x, sMedalBoxNumberPos[i].y, 1, 1,
+                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), 10, x, y, 1, 1,
                                          palette);
                 } else {
-                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), digit, x, sMedalBoxNumberPos[i].y, 1, 1,
+                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), digit, x, y, 1, 1,
                                          palette);
                 }
                 number -= digit * divisor;
@@ -1374,13 +1375,17 @@ static BOOL MedalBoxApp_Scroll(MedalBoxApp *work, fx32 speed) {
 
 static void MedalBoxApp_MoveMedals(MedalBoxApp *work) {
     int x = work->scrollX >> FX32_SHIFT;
+    s16 actorX;
+    int bgX;
     ClActorPos pos;
     int i;
 
+    bgX = x + COLUMN_WIDTH;
+    actorX = x;
     for (i = 0; i < MEDAL_ACTOR_COUNT; i++) {
         MedalBoxApp_GetMedalPos(i, &pos);
-        pos.x -= (s16)x;
-        GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_NUMBER), BG_MOVE_SET_X, x + COLUMN_WIDTH);
+        pos.x -= actorX;
+        GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_NUMBER), BG_MOVE_SET_X, bgX);
         func_0204c140(work->actors[ACTOR_MEDAL + i], &pos, 0);
         func_0204c140(work->actors[MedalBoxApp_GetWindowActor(i)], &pos, 0);
     }
@@ -1466,6 +1471,7 @@ static void MedalBoxApp_DrawInfo(MedalBoxApp *work, MedalBoxEntry *medal, BOOL s
     WordSet *wordSet;
     ClActor *actor;
     StrBuf *str;
+    StrBuf *buf;
     u8 goal;
 
     color = MedalBoxApp_GetInfoColor();
@@ -1502,8 +1508,7 @@ static void MedalBoxApp_DrawInfo(MedalBoxApp *work, MedalBoxEntry *medal, BOOL s
     total = MedalBox_GetObtainedCount(work->medalBox, TRUE);
     goal = MedalBox_GetNextRankRequirement(work->medalBox) + 1;
     if (show == TRUE) {
-        StrBuf *buf = GFL_StrBufCreate(20, work->heapId);
-
+        buf = GFL_StrBufCreate(20, work->heapId);
         str = GFL_MsgDataLoadStrbufNew(work->msgData[MSG_UI], Title10_Text_Empty_2);
         if (medal->status == MEDAL_STATUS_OBTAINED) {
             WordSetNumber(wordSet, 0, obtained, 3, 1, TRUE);
@@ -2173,7 +2178,7 @@ static void MedalBoxApp_OpenMenu(MedalBoxApp *work) {
             work->menuItemCount++;
         }
     }
-    work->menuItems[work->menuItemCount - 1].type = APP_TASKMENU_ITEM_RETURN;
+    (work->menuItems + work->menuItemCount - 1)->type = APP_TASKMENU_ITEM_RETURN;
     init.heapId = work->heapId;
     init.itemCount = work->menuItemCount;
     init.items = work->menuItems;
