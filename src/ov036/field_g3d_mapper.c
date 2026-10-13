@@ -458,7 +458,7 @@ void FieldG3DMapper_GenLocators2(FieldG3DMapper *mapper, const VecFx32 *playerPo
 // The player's layer of the matrix and the nearer of the layers above and below it
 void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPos, FieldChunkLocator *locators) {
     u16 width = mapper->matrixWidth;
-    u32 matrixSize = mapper->matrixHeight * width;
+    u32 matrixSize = width * mapper->matrixHeight;
     fx32 span = mapper->chunkSpan;
     fx32 halfSpan = FX_Div(span, FX32_CONST(2));
     fx32 layerHeight = mapper->unk08;
