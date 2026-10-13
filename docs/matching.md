@@ -290,6 +290,11 @@ Same instructions, registers swapped.
   of `PkwdRecordMonitor_UpdateListMarks`, and `BChoiceMain_CreateActors` declares
   `int i` first but zeroes it in a plain `for` after the `sys_memset`: the stack slot follows the declaration, the
   store the statement.
+- A result variable that shares a saved register with another local across a call must not be assigned before that
+  call: the compatibility check's `IrcCompatResult_GiveReward` sets `result` in an `if`/`else` on
+  `BagSave_AddItem`'s return, so `bag` and `result` both live in `r6` (76 bytes off with `result` set first). A
+  `mov r7, #1` that comes after the tested call there is `getTrainerGender(info) != 0 ? 0 : 1` in the flag's
+  declaration.
 
 ## Stack slots
 

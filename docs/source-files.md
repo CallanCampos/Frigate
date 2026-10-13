@@ -1564,7 +1564,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_compat_result.c` | `0x0219ad20`–`0x0219c144` | 53 | partial | descriptive |
+| `irc_compat_result.c` | `0x0219ad20`–`0x0219c144` | 53 | complete | descriptive |
 
 ### Overlay 180
 
