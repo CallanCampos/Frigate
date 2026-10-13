@@ -94,6 +94,11 @@ BOOL func_ov028_02171664(u8 netId);
 BOOL func_ov028_02171724(const UnionAppStatus *status, u8 sendTo);
 BOOL func_ov028_0217181c(u8 sendTo, const UnionAppMember *member);
 BOOL func_ov028_0217196c(u8 sendTo, u8 leftNetId);
+// The senders that union_subproc.c's commands use
+BOOL UnionMain_SendEnqueue(void);
+BOOL UnionMain_SendRequestStatus(void);
+BOOL UnionMain_SendAppProfile(u8 sendTo, const PlayerInfo *info);
+BOOL UnionMain_SendConfirmProfile(u8 sendTo, const PlayerInfo *info);
 
 // The event that runs the command that UnionCommand_Set set, and whether one is set or running. The ids are
 // the rows of the table in union_main.c

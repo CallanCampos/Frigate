@@ -2615,6 +2615,8 @@ overlays/ov028 0x021729e4 Colosseum_Vote
 overlays/ov028 0x02172ac0 Colosseum_StoreChoice
 overlays/ov028 0x02172b8c Colosseum_BuildBattlePlayers
 overlays/ov028 0x02172c6c Colosseum_SetPlayer
+overlays/ov028 0x02172db4 sUnionCommands
+overlays/ov028 0x02172ea4 sColosseumCommands
 overlays/ov029 0x021922c0 InitHardware
 overlays/ov029 0x02192318 MicCallback
 overlays/ov029 0x0219231c StreamCallback

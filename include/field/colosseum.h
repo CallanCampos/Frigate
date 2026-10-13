@@ -63,14 +63,6 @@ struct UnionColosseum {
     u8 unk17F;
 };
 
-// Union commands (rows of union_main.c's table): the battle's event, and the greeting's phrase select. They take the
-// GameSystem, the UnionSystem, the Field, an argument, the event that runs them, one to give them an event to chain and
-// their step
-BOOL Colosseum_CommandBattle(GameSystem *gsys, UnionSystem *sys, Field *field, void *param, GameEvent *event,
-                         GameEvent **next, u8 *step);
-BOOL Colosseum_CommandPmsSelect(GameSystem *gsys, UnionSystem *sys, Field *field, void *param, GameEvent *event,
-                         GameEvent **next, u8 *step);
-
 // Registers the colosseum's net commands, with the UnionSystem as their work
 void Colosseum_RegisterCommands(UnionSystem *sys);
 // Sends the player's info (to the parent only when toParent is TRUE, else to all), the card, and the card's first part
@@ -99,5 +91,14 @@ BOOL func_ov028_02172b20(const UnionColosseum *colosseum);
 void func_ov028_02172b4c(UnionColosseum *colosseum, BOOL keepOwn);
 void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, ColosseumPlayers *players, u32 unused);
 void func_ov028_02172c60(ColosseumPlayers *players);
+
+// What colosseum_comm.c and colosseum.c use of each other
+BOOL Colosseum_SendUnk5(UnionColosseum *colosseum, u32 netId, u32 value);
+BOOL Colosseum_SendUnkA(u32 netId);
+BOOL Colosseum_SendUnkB(void);
+u8 Colosseum_GetUnkDC(const UnionColosseum *colosseum);
+void Colosseum_SetUnkDD(UnionColosseum *colosseum, u32 value);
+BOOL Colosseum_Vote(UnionColosseum *colosseum, u32 netId, u8 value);
+void Colosseum_StoreChoice(UnionColosseum *colosseum, u32 netId, const ColosseumChoice *choice);
 
 #endif // POKEBW2_FIELD_COLOSSEUM_H

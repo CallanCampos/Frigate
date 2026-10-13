@@ -316,9 +316,12 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `union_comm.c` | `0x02170340`–`0x02170ec8` | 41 | partial | string at `0x02172f20` |
-| `union_main.c` | `0x02170ec8`–`0x02172384` | 65 | partial | string at `0x02172f6c` |
-| `colosseum.c` | `0x02172384`–`0x02172c94` | 49 | partial | string at `0x02173084` |
+| `union_comm.c` | `0x02170340`–`0x02170ec8` | 41 | complete | string at `0x02172f20` |
+| `union_main.c` | `0x02170ec8`–`0x0217110c` | 10 | complete | string at `0x02172f6c` |
+| `union_receive.c` | `0x0217110c`–`0x021719dc` | 44 | complete | descriptive |
+| `union_subproc.c` | `0x021719dc`–`0x021723ec` | 13 | complete | descriptive |
+| `colosseum_comm.c` | `0x021723ec`–`0x02172830` | 29 | complete | descriptive |
+| `colosseum.c` | `0x02172830`–`0x02172c94` | 18 | complete | string at `0x02173084` |
 
 ### Overlay 29
 

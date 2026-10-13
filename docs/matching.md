@@ -1606,6 +1606,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   code are not in the list and come last. The model predicted 12 of 12 random declaration orders of
   `field_gimmick_gate.c`, whose `gelboard_N` strings were in the wrong order in `.data` until `sBoardNames` was
   declared directly before `sBoardPlNames`.
+- A second `""` in what was taken for one file's `.data` is a file boundary: MWCC pools equal string literals within
+  a translation unit, so each run of functions that shares one `""` is a file of its own. Overlay 28's `union_main.c`
+  and `colosseum.c` were five files (`union_main.c`, `union_receive.c`, `union_subproc.c`, `colosseum_comm.c`,
+  `colosseum.c`), which also explains statics that had to be external.
 
 ## When nothing moves it
 
