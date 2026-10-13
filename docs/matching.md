@@ -1109,6 +1109,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   with `ACTOR_CAR` 0 folds the addition but keeps the second narrowing. Seven functions of the roller coaster
   (`gimmick_roller_coaster.c`) differed by that. Check a file's data values as well as its order when completing it:
   all eighteen Y coordinates there were `FX32_CONST(2)` where the ROM has `FX32_CONST(32)`, which no probe shows.
+- MWCC forwards a single-use local's computation to its first use, even a division call past a store; reassigning
+  the computation's input afterwards anchors it where it is written. The blizzard's `Blizzard_ScrollBg` has
+  `step = scrollStep / 28; scrollStep = (scrollStep + 1) % (NELEMS(sBlizzardScrollX) * 28);` with `scrollStep` a local
+  copy of the field. `% NELEMS(table)` is the unsigned modulo of a signed index (`_u32_div_f`), and `% 30` of an
+  unsigned call result that the ROM divides signed needs `(int)`: the probe masks those helper calls, so check the
+  call targets. Pointers that the original sets between a loop's guard and its top, before the body's first
+  computation, are locals of an explicit `if (count > 0) { ...; do { } while (++i < count); }` (`Flake_Add`).
 
 ## Branches and block layout
 

@@ -767,7 +767,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `weather_particles.c` | `0x021e90c0`–`0x021ea0dc` | 37 | partial | descriptive |
+| `weather_particles.c` | `0x021e90c0`–`0x021ea0dc` | 37 | complete | descriptive |
 
 ### Overlay 76
 
