@@ -8,7 +8,7 @@
 #define PASS_POWER_NEAR 1
 #define PASS_POWER_LOCKED 2
 // The levels a pass power needs, or one of these
-#define PASS_POWER_NONE 0xff
+#define PASS_POWER_LEVEL_NONE 0xff
 #define PASS_POWER_SPECIAL 0xfe
 
 u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags) {
@@ -18,7 +18,7 @@ u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags) {
     u32 bit;
     u32 unlocked;
 
-    if (level1 == PASS_POWER_NONE) {
+    if (level1 == PASS_POWER_LEVEL_NONE) {
         return PASS_POWER_LOCKED;
     }
     if (level1 == PASS_POWER_SPECIAL) {

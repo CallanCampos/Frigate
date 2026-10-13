@@ -831,20 +831,20 @@ static int Aoss_StoreResult(AossParam *param) {
         Mem_Copy(result->wep104Ssid, wep104->ssid, Str_Length(wep104->ssid));
     }
     if (param->types & AOSS_TYPE_TKIP) {
-        if (Aoss_IsPrintable(tkip->key[0], tkip->keyLength - 1) != 0) {
+        if (Aoss_IsPrintable(tkip->key, tkip->keyLength - 1) != 0) {
             goto fail;
         }
-        Mem_Copy(result->tkipKey, tkip->key[0], tkip->keyLength);
+        Mem_Copy(result->tkipKey, tkip->key, tkip->keyLength);
         if (Aoss_IsPrintable((u8 *)tkip->ssid, Str_Length(tkip->ssid)) != 0) {
             goto fail;
         }
         Mem_Copy(result->tkipSsid, tkip->ssid, Str_Length(tkip->ssid));
     }
     if (param->types & AOSS_TYPE_AES) {
-        if (Aoss_IsPrintable(aes->key[0], aes->keyLength - 1) != 0) {
+        if (Aoss_IsPrintable(aes->key, aes->keyLength - 1) != 0) {
             goto fail;
         }
-        Mem_Copy(result->aesKey, aes->key[0], aes->keyLength);
+        Mem_Copy(result->aesKey, aes->key, aes->keyLength);
         if (Aoss_IsPrintable((u8 *)aes->ssid, Str_Length(aes->ssid)) != 0) {
             goto fail;
         }

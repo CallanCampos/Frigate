@@ -35,6 +35,8 @@ Check:
 8. **Docs:** every function that doesn't match has a current row in `docs/nonmatching-functions.md` with both
    addresses, and rows of functions that now match are gone.
 9. **Scope:** no unrelated changes: formatting of untouched code, other sessions' files, generated files.
+10. **Warnings:** inspect available probe or build diagnostics for the changed file. A compiler warning is a must-fix
+    finding even when the function matches or Ninja exits successfully.
 
 Report a numbered list: `file:line`, the problem, and why it matters. Most severe first. Mark each as must-fix or
 optional.

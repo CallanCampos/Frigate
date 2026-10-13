@@ -633,7 +633,7 @@ void UnionMsg_CreateMsgSystem(UnionSystem *unisys, Field *field)
         unisys->msgbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         unisys->fmtbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         UnionMsg_CreateWordSet(unisys);
-        unisys->fld_msgwin_stream = func_ov036_02188a54(fldmsg_bg, unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
+        unisys->fld_msgwin_stream = func_ov036_02188a54(fldmsg_bg, (u32)unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
     } else {
         func_ov036_02188ae8(unisys->fld_msgwin_stream);
     }
@@ -744,7 +744,7 @@ static s32 UnionMsg_UpdateMenu(UnionSystem *unisys, Field *field)
 
 void UnionMsg_CreateMainMenu(UnionSystem *unisys, Field *field)
 {
-    UnionMsg_CreateMenu(unisys, field, sMenuMain, 6, &sMenuMainRequest);
+    UnionMsg_CreateMenu(unisys, field, sMenuMain, 6, (ListMenuRequest *)&sMenuMainRequest);
 }
 
 void UnionMsg_FreeMainMenu(UnionSystem *unisys)
@@ -884,7 +884,7 @@ void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field)
     if (unisys->fldmsgwin == NULL) {
         void *msgBGSys = Field_GetMsgBGSys(field);
 
-        unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1e, 2);
+        unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, (u32)unisys->msgdata, 0, 1, 1, 0x1e, 2);
         func_ov036_02188b18(unisys->fldmsgwin, 0, 0, Bank0399_Text_BattleFormatMultiBattle);
     }
 }
@@ -912,7 +912,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
     if (battleType != 1) {
         isMulti = FALSE;
     }
-    unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
+    unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, (u32)unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
     unisys->alloc.rpm = PokeRegulation_CreatePrintMsg(unisys->alloc.regulation, unisys->wordset, UNION_HEAPID, isMulti);
     UnionMsg_SetupWordSet(unisys);
 

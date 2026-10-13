@@ -202,13 +202,13 @@ int Gdb_Cancel(void) {
         Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
         break;
     case GDB_OPERATION_DOWNLOAD_FILE:
-        Gdb_Printf(385, "cancel ghttp. state[%d]\n", ghttpGetState(sGdbRequests[sGdb.requestIndex].request));
-        ghttpCancelRequest(sGdbRequests[sGdb.requestIndex].request);
+        Gdb_Printf(385, "cancel ghttp. state[%d]\n", ghttpGetState((int)sGdbRequests[sGdb.requestIndex].request));
+        ghttpCancelRequest((int)sGdbRequests[sGdb.requestIndex].request);
         break;
     case GDB_OPERATION_UPLOAD_FILE:
         Gdb_Printf(392, "cancel ghttp. state[%d]\n",
-                   ghttpGetState(sGdbRequests[sGdb.requestIndex].u.delete.table));
-        ghttpCancelRequest(sGdbRequests[sGdb.requestIndex].u.delete.table);
+                   ghttpGetState((int)sGdbRequests[sGdb.requestIndex].u.delete.table));
+        ghttpCancelRequest((int)sGdbRequests[sGdb.requestIndex].u.delete.table);
         break;
     default:
         Gdb_Printf(399, "illegal process[%d].\n", sGdb.operation);
