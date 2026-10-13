@@ -360,7 +360,6 @@ in both versions.
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_CheckScan` | `0x021a57c8` / `0x021a5808` | 0x14 short (0x68 against 0x7c): the original keeps `count` and the result in stack slots. Tried: other orders of the locals. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_ProcessPacket` | `0x021a58e4` / `0x021a5924` | Same size, 74 bytes: the packet and its header swap `r6`/`r7`, and the original spills `ids`. Tried: no `header` local. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_OnStage2` | `0x021a5b38` / `0x021a5b78` | 2 bytes short: the original adds `header->id` in two steps. |
-| `lib/dwcutil/src/dwc_aoss.c` | `Aoss_ParseWep` | `0x021a5e40` / `0x021a5e80` | 6 bytes: ours spills the item pointer earlier. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_ParsePsk` | `0x021a5f94` / `0x021a5fd4` | 4 bytes over (0xbc against 0xb8): the item pointer and the stored length are spilled in another order. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_ParseSecurity` | `0x021a607c` / `0x021a60bc` | Same size, 185 bytes: the original copies the record pointer before the type compare. |
 | `lib/dwcutil/src/dwc_aoss.c` | `Aoss_BuildHello` | `0x021a647c` / `0x021a64bc` | 14 bytes: `total` and `length` in swapped registers. Tried: the declaration order. |

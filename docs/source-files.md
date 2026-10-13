@@ -1696,6 +1696,12 @@ prints the tables below from the configs and the ROM:
 | `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
 | `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
 
+The next unregistered file spans `.text` `0x021a7858`–`0x021ab040` (66 functions),
+`.rodata` `0x021bd2e8`–`0x021bfb18`, `.data` `0x021c0678`–`0x021c0740`, and
+`.bss` `0x021c2af0`–`0x021c4024`. Its functions share the access point connection
+work area at `0x021c2af0`; the next function starts a new `.rodata` and `.bss` run.
+`dwc_ac.c` is a descriptive name pending source recovery; no embedded filename was found.
+
 ### Overlay 184
 
 1 of 1 functions are in source files.

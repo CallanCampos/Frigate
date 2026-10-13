@@ -1231,12 +1231,14 @@ static u32 Aoss_ReadLe(const u8 *data, int length) {
 
 static int Aoss_ParseWep(const AossRecord *record, AossWepInfo *info) {
     const AossItem *item = record->payload.secure.items;
-    const AossItem *items = item;
+    const AossItem *items;
     char *ssid = info->ssid;
     u8 *key3 = info->key[3];
     u8 *key2 = info->key[2];
     u8 *key1 = info->key[1];
     u8 *key0 = info->key[0];
+
+    items = item;
 
     while (1) {
         u32 length = Net_Ntohs(item->length);
