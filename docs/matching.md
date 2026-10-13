@@ -304,6 +304,13 @@ Same instructions, registers swapped.
   `tier` and `column` into `OpelucidGymTier` and `OpelucidGymColumn` locals before the call. Parameter types,
   integer locals, inline wrappers and `const` did not change it. The callee keeps `int` parameters: with enum
   parameters the locals are propagated again.
+- A store of 0 is not always emitted where it is written: MWCC can sink it below later stores, and only the place
+  where the zero is built shows where the statement was. In the Spin Trade's `Guru2Receipt_UpdatePalAnim`
+  (`anim->counter = 0;` before `anim->index++;`) and `Guru2Main_InitDisc` (`disc->angle = 0;` before
+  `disc->angleOffset = ...`) moving the zero store up fixed a register swap. A `static const` table's read is reused
+  across a call, but a read through a pointer to its row is loaded again: `Guru2MainSeq_Bonus` reads the clamp's
+  first Berry through `const u32 *range = sBonusItems[count];`. The tell is a function that matches when the table is
+  made non-`const` although it sits in `.rodata`.
 
 ## Stack slots
 

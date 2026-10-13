@@ -433,8 +433,8 @@ static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data) {
 
     if (anim->active) {
         if (anim->counter > sPalAnimSteps[anim->index].wait) {
-            anim->index++;
             anim->counter = 0;
+            anim->index++;
             if (sPalAnimSteps[anim->index].palette == 0xff) {
                 anim->index = 0;
             }
