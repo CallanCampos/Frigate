@@ -120,15 +120,20 @@ jobs:
             sleep 5
           done
           mkdir -p build
-          if ninja > build/ninja.log 2>&1; then
-            echo "Ninja completed successfully"
-            tail -20 build/ninja.log
-          else
-            status=$?
-            echo "Ninja exited $status"
+          : > build/ninja.log
+          for attempt in 1 2 3; do
+            if ninja -j 4 >> build/ninja.log 2>&1; then
+              echo "Ninja completed successfully"
+              tail -20 build/ninja.log
+              break
+            else
+              status=$?
+            fi
+            echo "Ninja attempt $attempt exited $status"
             tail -100 build/ninja.log
-            exit "$status"
-          fi
+            if [ "$status" -ne 139 ] || [ "$attempt" -eq 3 ]; then exit "$status"; fi
+            sleep 5
+          done
           if grep -n 'warning:' build/ninja.log; then exit 1; fi
           echo "No compiler warnings; checking ROM SHA1s"
           shasum -a 1 -c b2_us.sha1 w2_us.sha1
