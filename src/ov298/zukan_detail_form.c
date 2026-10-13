@@ -917,10 +917,10 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
     return FALSE;
 }
 
-// Moves an index around the entries
-static inline void ZukanDetailForm_AddIndex(u16 *index, u16 add, u16 count) {
-    *index += add;
-    *index %= count;
+// Moves the next entry's index around the entries
+static inline void ZukanDetailForm_AddNext(ZukanDetailFormWork *wk, u16 add) {
+    wk->next += add;
+    wk->next %= wk->count;
 }
 
 static void ZukanDetailForm_Command(ZukanDetailProcSys *sys, int *seq, void *param, void *work,
@@ -1053,9 +1053,9 @@ static void ZukanDetailForm_Command(ZukanDetailProcSys *sys, int *seq, void *par
             break;
         case ZUKAN_DETAIL_CMD_FORM_CUR_R_TOUCH:
             if (wk->count >= 3) {
-                ZukanDetailForm_AddIndex(&wk->next, 1, wk->count);
+                ZukanDetailForm_AddNext(wk, 1);
                 if (wk->cur == wk->next) {
-                    ZukanDetailForm_AddIndex(&wk->next, 1, wk->count);
+                    ZukanDetailForm_AddNext(wk, 1);
                 }
                 ZukanDetailForm_ChangeNext(param, wk, common);
                 wk->sliderSnap = TRUE;
@@ -1064,9 +1064,9 @@ static void ZukanDetailForm_Command(ZukanDetailProcSys *sys, int *seq, void *par
             break;
         case ZUKAN_DETAIL_CMD_FORM_CUR_L_TOUCH:
             if (wk->count >= 3) {
-                ZukanDetailForm_AddIndex(&wk->next, wk->count - 1, wk->count);
+                ZukanDetailForm_AddNext(wk, wk->count - 1);
                 if (wk->cur == wk->next) {
-                    ZukanDetailForm_AddIndex(&wk->next, wk->count - 1, wk->count);
+                    ZukanDetailForm_AddNext(wk, wk->count - 1);
                 }
                 ZukanDetailForm_ChangeNext(param, wk, common);
                 wk->sliderSnap = TRUE;

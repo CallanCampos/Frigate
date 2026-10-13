@@ -2374,10 +2374,10 @@ prints the tables below from the configs and the ROM:
 | `zukan_detail.c` | `0x021a03e8`–`0x021a0700` | 5 | complete | string at `0x021ace10` |
 | `zukan_detail_graphic.c` | `0x021a0700`–`0x021a0ae0` | 23 | complete | string at `0x021ace20` |
 | `zknd_tbar.c` | `0x021a0ae0`–`0x021a1268` | 39 | complete | string at `0x021ace38` |
-| `zukan_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | partial | string at `0x021ace44` |
+| `zukan_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | complete | string at `0x021ace44` |
 | `zukan_detail_headbar.c` | `0x021a21f0`–`0x021a24e0` | 13 | complete | string at `0x021ace5c` |
 | `zukan_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
-| `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | partial | descriptive |
+| `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
 | `zukan_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | string at `0x021ace88` |
 | `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | partial | string at `0x021acec4` |
 
