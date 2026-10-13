@@ -2663,9 +2663,9 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `win_record.c` | `0x0219ce80`–`0x0219e234` | 47 | complete | descriptive |
 | `win_record_graphic.c` | `0x0219e234`–`0x0219e478` | 16 | complete | string at `0x021a36c0` |
-| `t_download.c` | `0x0219e478`–`0x021a0a84` | 34 | partial | descriptive |
-| `t_download_util.c` | `0x021a0a84`–`0x021a24ac` | 66 | partial | descriptive |
-| `t_download_save.c` | `0x021a24ac`–`0x021a2afc` | 19 | partial | string at `0x021a3748` |
+| `t_download.c` | `0x0219e478`–`0x021a0a84` | 34 | complete | descriptive |
+| `t_download_util.c` | `0x021a0a84`–`0x021a24ac` | 66 | complete | descriptive |
+| `t_download_save.c` | `0x021a24ac`–`0x021a2afc` | 19 | complete | string at `0x021a3748` |
 | `t_download_graphic.c` | `0x021a2afc`–`0x021a2d40` | 16 | complete | string at `0x021a375c` |
 
 ### Overlay 327

@@ -1480,6 +1480,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
   in the ranges before it.
+- A three-case `switch` is not range-folded where the `||` chain over the same values is, which frees a register:
+  the tournament download's `TDownload_SelectTouch` and `TDownload_SavedTouch` test their touched button with
+  `switch (touched) { case 3: case 4: case 5: }`. A constant stored to a spilled local as the last statement of a
+  block is emitted at the top of the block, in the register of a later call argument of the same value
+  (`movs r2, #1; str r2, [sp]` for `result = TRUE;` at the end of the block), and a spilled local's zero store lands
+  late in the prologue unless the local is 16 bits wide (`u16 input = 0` in `SavedTouch`, where its twin has `int`).
 
 ## Floats and runtime helpers
 

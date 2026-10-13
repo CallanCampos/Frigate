@@ -16,6 +16,7 @@ src/ov326/win_record_graphic.c:
     .data       start:0x021a3700 end:0x021a3718
 
 src/ov326/t_download.c:
+    complete
     .text       start:0x0219e4b8 end:0x021a0ac4
     .rodata     start:0x021a31ac end:0x021a31b8
     .data       start:0x021a3718 end:0x021a3738
@@ -27,11 +28,13 @@ src/ov326/t_download_graphic.c:
     .data       start:0x021a379c end:0x021a37c0
 
 src/ov326/t_download_util.c:
+    complete
     .text       start:0x021a0ac4 end:0x021a24ec
     .rodata     start:0x021a31b8 end:0x021a3514
     .data       start:0x021a3738 end:0x021a3788
 
 src/ov326/t_download_save.c:
+    complete
     .text       start:0x021a24ec end:0x021a2b3c
     .rodata     start:0x021a3514 end:0x021a352c
     .data       start:0x021a3788 end:0x021a379c
