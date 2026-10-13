@@ -520,7 +520,7 @@ struct BattleHandlerPPParam {
 };
 
 struct BattleHandlerDrainParam {
-    u32 unk00;
+    BattleHandlerHeader header;
     u16 amount;
     u8 monIndex;
     u8 sourceIndex;

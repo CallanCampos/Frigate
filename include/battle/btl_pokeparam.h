@@ -381,6 +381,5 @@ BOOL func_ov167_021bc6ac(BattleMon *mon);
 
 // Overlay 169's, which ov167 calls through a linker veneer: whether a condition passes to the Pokémon that Baton Pass
 // brings in
-BOOL func_ov169_0689c9f0(u32 condition);
 
 #endif // POKEBW2_BATTLE_BTL_POKEPARAM_H

@@ -1480,7 +1480,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 169
 
-937 of 1298 functions are in source files.
+1200 of 1298 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1488,6 +1488,7 @@ prints the tables below from the configs and the ROM:
 | `pos_handlers.c` | `0x068981f0`–`0x06898bfc` | 175 | partial | descriptive |
 | `side_handlers.c` | `0x06898bfc`–`0x06899af0` | 261 | complete | descriptive |
 | `btlv_scd.c` | `0x06899af0`–`0x0689b938` | 428 | complete | string at `0x0689e938` |
+| `condition_effects.c` | `0x0689b938`–`0x0689ca10` | 263 | partial | descriptive |
 | `btl_tables.c` | `0x0689ca10`–`0x0689cc20` | 27 | complete | descriptive |
 | `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | partial | descriptive |
 

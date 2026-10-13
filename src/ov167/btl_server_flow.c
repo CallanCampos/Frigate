@@ -17,6 +17,7 @@
 #include "battle/btl_server_flow.h"
 #include "battle/btl_server_flow_sub.h"
 #include "battle/btl_tables.h"
+#include "battle/condition_effects.h"
 #include "battle/pos_handlers.h"
 #include "battle/side_handlers.h"
 #include "constants/abilities.h"
@@ -1336,7 +1337,7 @@ BOOL func_ov167_021a12f8(BtlServerFlow *flow, BattleMon *mon) {
     BattleEventVar_Push(0xb9d);
     BattleEventVar_SetConstValue(2, GetMonID(mon));
     BattleEventVar_SetRewriteOnceValue(0x41, 0);
-    func_ov169_0689c814(flow, mon);
+    Condition_CheckTrapped(flow, mon);
     BattleEvent_CallHandlers(flow, 0xc);
     result = BattleEventVar_GetValue(0x41);
     BattleEventVar_Pop(0xba3);
@@ -4023,7 +4024,7 @@ void ServerControl_AddCondition(BtlServerFlow *flow, BattleMon *target, BattleMo
         break;
     }
     if (showMessage) {
-        func_ov169_0689c4ec(condition, value, target, &flow->message);
+        Condition_SetAddMessage(condition, value, target, &flow->message);
         BattleHandler_SetString(flow, &flow->message);
         BattleHandler_StrClear(&flow->message);
     } else if (string != NULL) {
@@ -4623,7 +4624,7 @@ BOOL func_ov167_021a74fc(BtlServerFlow *flow, BattleMon *attacker, BattleMon *ta
     BattleEventVar_SetRewriteOnceValue(0x41, 0);
     BattleEventVar_SetConstValue(4, GetMonID(target));
     BattleEvent_CallHandlers(flow, 0x8b);
-    func_ov169_0689c92c(flow, target);
+    Condition_CheckIngrainForceSwitch(flow, target);
     blocked = BattleEventVar_GetValue(0x41);
     BattleEventVar_Pop(0x22c3);
     return blocked;
@@ -5150,7 +5151,7 @@ BOOL func_ov167_021a83ec(BtlServerFlow *flow, void *monSet) {
             BattleMon *mon = GetPokeParam(flow->pokeCon, monIds[i]);
             if (!IsFainted(mon) && func_ov167_021bb864(mon, condition, &prev, &cured)) {
                 state = PushState(&flow->actionState, 0x2600);
-                func_ov169_0689b938(mon, condition, prev, cured, flow);
+                Condition_EndTurnEffect(mon, condition, prev, cured, flow);
                 PopState(&flow->actionState, state, 0x2602);
             }
         }
@@ -5182,7 +5183,7 @@ void func_ov167_021a8524(BtlServerFlow *flow, BattleMon *mon, u32 condition, u32
             break;
         }
         BattleHandler_StrClear(&flow->message);
-        func_ov169_0689ba5c(&flow->message, mon, condition);
+        Condition_SetDamageMessage(&flow->message, mon, condition);
         ServerControl_SimpleDamageCore(flow, mon, amount, &flow->message);
     }
     PopState(&flow->actionState, state, 0x2644);
@@ -6651,7 +6652,7 @@ u32 func_ov167_021aab50(BtlServerFlow *flow, BattleMon *attacker, BattleMon *tar
     BattleEventVar_SetConstValue(0x16, moveType);
     BattleEventVar_SetRewriteOnceValue(0x4b, FALSE);
     BattleEventVar_SetRewriteOnceValue(0x4c, FALSE);
-    func_ov169_0689c6c8(flow, target);
+    Condition_CheckTypeImmunity(flow, target);
     BattleEvent_CallHandlers(flow, 0x3e);
     ignoreImmunity = BattleEventVar_GetValue(0x4b);
     forceNormal = BattleEventVar_GetValue(0x4c);

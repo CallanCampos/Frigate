@@ -5,6 +5,7 @@
 #include "battle/btl_calc.h"
 #include "battle/btl_field.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/condition_effects.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
@@ -1393,7 +1394,7 @@ void CopyBatonPassParams(BattleMon *target, BattleMon *source) {
     target->statStages = source->statStages;
     target->substituteHP = source->substituteHP;
     for (i = 0; i < 36; i++) {
-        if (GetConditionPtr(source, i)->common.type != 0 && func_ov169_0689c9f0(i)) {
+        if (GetConditionPtr(source, i)->common.type != 0 && Condition_IsPassedByBatonPass(i)) {
             *GetConditionPtr(target, i) = *GetConditionPtr(source, i);
             target->core.conditionCounters[i] = source->core.conditionCounters[i];
         }
