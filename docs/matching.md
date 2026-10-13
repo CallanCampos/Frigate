@@ -316,6 +316,12 @@ Same instructions, registers swapped.
   `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `func_ov211_021ef3e4` all matched with
   `u32 size = ...GetSize();` first. In `MusComm_Main`, `requesters[count] = i; count++;` in place of
   `requesters[count++] = i;` and `requests += chosen << 16;` as its own statement before the call were each needed.
+- A struct field that is a pointer to `const` explains several users at once: loop bounds read through it are loaded
+  again on each pass, and a `u64` copied through it is `ldr, ldr, str, str`. The World Tournament's
+  `WbtMakeMatch.param` as `const WbtMatchParam *` matched `WbtMakeMatch_Create`, `CountCandidates` and
+  `FindCandidate`. A callee's parameter type can also reorder its caller's stack-argument stores while the callee's
+  own code is the same either way (`WbtEntrant_SetTableForDownloaded`'s `u8 index` matched `WbtMakeMatch_SetEntrants`):
+  sweep callee types when only the argument order differs.
 
 ## Stack slots
 

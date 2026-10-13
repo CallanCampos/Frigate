@@ -34,7 +34,7 @@ typedef struct {
 } WbtMatchParam;
 
 typedef struct {
-    WbtMatchParam *param;
+    const WbtMatchParam *param;
     MATHRandContext32 rand;
     // Per Trainer of the table: 0 when it isn't up for the pick, 1 when it is, 2 when it was picked
     u8 *status;
@@ -51,6 +51,12 @@ typedef union {
     u16 value;
 } WbtBracketEntry;
 
+// The slots of the save's downloaded tournaments; slot 0 is none
+typedef enum {
+    WBT_DOWNLOAD_SLOT_FIRST = 1,
+    WBT_DOWNLOAD_SLOT_END = 4
+} WbtDownloadSlot;
+
 #define WBT_STATUS_UNUSED 0
 #define WBT_STATUS_CANDIDATE 1
 #define WBT_STATUS_PICKED 2
@@ -64,13 +70,13 @@ typedef union {
 #define WBT_KIND_CAST_LAST 0xf4
 #define WBT_KIND_PLAYER 0xff
 
-static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, void *record, WbtMatchParam *param);
+static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, void *record, const WbtMatchParam *param);
 static void WbtMakeMatch_Free(WbtMakeMatch *m);
 static void WbtMakeMatch_GetPicks(WbtMakeMatch *m, WbtBracketEntry *result);
 static u32 WbtMakeMatch_CountCandidates(WbtMakeMatch *m, u32 status, u32 rank, u32 encountered);
 static u32 WbtMakeMatch_FindCandidate(WbtMakeMatch *m, u32 rank, u32 encountered, u8 n);
 static int WbtMakeMatch_PickRank(WbtMakeMatch *m, u32 rank, u8 count);
-static BOOL WbtMakeMatch_IsEligible(WbtMatchParam *param, WbtTrainer *trainer);
+static BOOL WbtMakeMatch_IsEligible(const WbtMatchParam *param, WbtTrainer *trainer);
 static void WbtMakeMatch_InitStatus(WbtMakeMatch *m, void *record);
 static void WbtMakeMatch_PickDownloaded(const WbtUnk18A *slots, WbtMakeMatch *m, WbtBracketEntry *result);
 static void WbtMakeMatch_PickTournament1(WbtMakeMatch *m, WbtBracketEntry *result);
@@ -90,14 +96,14 @@ static void WbtEntrant_Set(WbtEntrant *entrant, u32 unk0_0, u32 unk2, u8 unk0_3,
                                 BOOL unk0_7, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12);
 static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *entrant, u32 index);
 static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *gameData);
-static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank);
-static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u32 index, WbtDownloadedTrainer *trainer,
+static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank);
+static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index, WbtDownloadedTrainer *trainer,
                                 u32 unk3_6, u32 rank);
 static void WbtMakeMatch_SetEntrants(WbtSystem *sys, GameData *gameData, WbtBracketEntry *result);
 static BOOL WbtMakeMatch_IsDownloadValid(GameData *gameData, u32 slot);
 static void WbtMakeMatch_ClearDownload(WbtSystem *sys);
 
-static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, void *record, WbtMatchParam *param) {
+static WbtMakeMatch *WbtMakeMatch_Create(HeapID heapId, void *record, const WbtMatchParam *param) {
     WbtMakeMatch *m = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(WbtMakeMatch), FALSE, "wbt_makematch.c", 71);
 
     m->param = param;
@@ -119,8 +125,9 @@ static void WbtMakeMatch_GetPicks(WbtMakeMatch *m, WbtBracketEntry *result) {
     u32 count;
     u32 i;
 
-    result[0].value = 0xff00;
-    for (i = 0, count = 1; i < m->param->trainerCount; i++) {
+    count = 0;
+    result[count++].value = 0xff00;
+    for (i = 0; i < m->param->trainerCount; i++) {
         if (m->status[i] == WBT_STATUS_PICKED && count < 8) {
             result[count].kind = WBT_KIND_TABLE;
             result[count].index = i;
@@ -145,15 +152,14 @@ static u32 WbtMakeMatch_CountCandidates(WbtMakeMatch *m, u32 status, u32 rank, u
 
 // The nth candidate of the rank that has or hasn't been beaten by the player, or the number of Trainers
 static u32 WbtMakeMatch_FindCandidate(WbtMakeMatch *m, u32 rank, u32 encountered, u8 n) {
-    WbtMatchParam *param = m->param;
-    u8 *status = m->status;
+    u32 left = n;
     u32 i;
 
-    for (i = 0; i < param->trainerCount; i++) {
-        if (status[i] == WBT_STATUS_CANDIDATE && (rank == 0 || rank == param->trainers[i].unk8_0) &&
+    for (i = 0; i < m->param->trainerCount; i++) {
+        if (m->status[i] == WBT_STATUS_CANDIDATE && (rank == 0 || rank == m->param->trainers[i].unk8_0) &&
             (encountered == WBT_ANY || encountered == m->encountered[i])) {
-            n--;
-            if (n == 0) {
+            left--;
+            if (left == 0) {
                 return i;
             }
         }
@@ -199,7 +205,7 @@ static int WbtMakeMatch_PickRank(WbtMakeMatch *m, u32 rank, u8 count) {
 }
 
 // Whether the tournament takes the Trainer
-static BOOL WbtMakeMatch_IsEligible(WbtMatchParam *param, WbtTrainer *trainer) {
+static BOOL WbtMakeMatch_IsEligible(const WbtMatchParam *param, WbtTrainer *trainer) {
     switch (param->tournament) {
     case 14:
         return trainer->inTournament14;
@@ -296,8 +302,9 @@ static void WbtMakeMatch_PickTournament1(WbtMakeMatch *m, WbtBracketEntry *resul
     int count;
 
     sys_memset(result, 0, 8 * sizeof(WbtBracketEntry));
-    result[0].value = 0xff00;
-    for (i = 0, count = 1; i < m->param->trainerCount; i++) {
+    count = 0;
+    result[count++].value = 0xff00;
+    for (i = 0; i < m->param->trainerCount; i++) {
         if (m->param->trainers[i].tournament == 1) {
             result[count].kind = WBT_KIND_TABLE;
             result[count].index = i;
@@ -438,9 +445,16 @@ static void WbtMakeMatch_ShuffleEntrants(MATHRandContext32 *rand, WbtEntrant **i
 }
 
 // Where the highest ranks of the eight sit, by the player's place in the bracket
-static const u8 sSecondPlace[8] = { 2, 2, 0, 0, 6, 6, 4, 4 };
 static const u8 sFirstPlace[8] = { 4, 4, 4, 4, 0, 0, 0, 0 };
+static const u8 sSecondPlace[8] = { 2, 2, 0, 0, 6, 6, 4, 4 };
 static const u8 sThirdPlace[8] = { 1, 0, 3, 2, 5, 4, 7, 6 };
+
+static inline void WbtMakeMatch_SwapEntrants(WbtEntrant **items, u32 a, u32 b) {
+    WbtEntrant *tmp = items[a];
+
+    items[a] = items[b];
+    items[b] = tmp;
+}
 
 // Puts the eight Trainers into the bracket's places: the player at random, the best two of the others as far from
 // the player as they can be, and the rest at random
@@ -452,6 +466,7 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
     int playerPlace;
     int i;
     int j;
+    int next;
 
     MATH_InitRand32(&rand, seed);
     sys_memset(others, 0, sizeof(others));
@@ -474,13 +489,8 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
     others[7] = NULL;
     for (j = 0; j < 6; j++) {
         for (i = j + 1; i < 7; i++) {
-            u32 rank = func_ov055_021e5e10(others[j]);
-
-            if (rank < func_ov055_021e5e10(others[i])) {
-                WbtEntrant *tmp = others[j];
-
-                others[j] = others[i];
-                others[i] = tmp;
+            if (func_ov055_021e5e10(others[j]) < func_ov055_021e5e10(others[i])) {
+                WbtMakeMatch_SwapEntrants(others, j, i);
             }
         }
     }
@@ -488,11 +498,11 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
     places[(u8)(sSecondPlace[playerPlace] + MATH_Rand32(&rand, 2))] = others[1];
     places[sThirdPlace[playerPlace]] = others[2];
     WbtMakeMatch_ShuffleEntrants(&rand, &others[3], 4);
-    for (i = 0, j = 3; i < 8; i++) {
+    for (next = 3, i = 0; i < 8; i++) {
         if (places[i] == NULL) {
-            places[i] = others[j];
-            j++;
-            if (j >= 7) {
+            places[i] = others[next];
+            next++;
+            if (next >= 7) {
                 break;
             }
         }
@@ -551,7 +561,7 @@ static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *
 }
 
 // A Trainer of a downloaded tournament
-static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank) {
+static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank) {
     u32 trainerClass = func_ov055_021e67e4(trainer->unk3D4);
     u32 objCode = func_ov012_02162b38(trainerClass);
 
@@ -563,7 +573,7 @@ static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, WbtDownloadedTrainer *
 
 // A Trainer of the table that a downloaded tournament uses in place of one of its own; the original takes the
 // downloaded Trainer and a rank too, and does nothing with them
-static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u32 index, WbtDownloadedTrainer *trainer,
+static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index, WbtDownloadedTrainer *trainer,
                                 u32 unk3_6, u32 rank) {
     WbtTrainer table;
 
@@ -650,10 +660,10 @@ void WbtMakeMatch_Make(WbtSystem *sys, GameData *gameData) {
 
 u8 WbtMakeMatch_GetBattlePoints(WbtSystem *sys) {
     if (sys->tournament == 1 || sys->tournament == 10) {
-        u8 total = 0;
+        u8 total;
         int i;
 
-        for (i = 0; i < 3; i++) {
+        for (i = 0, total = 0; i < 3; i++) {
             total += sys->unk13DC[i];
         }
         return total;
@@ -680,10 +690,10 @@ static BOOL WbtMakeMatch_IsDownloadValid(GameData *gameData, u32 slot) {
 
 // How many downloaded tournaments are in the save
 u32 WbtMakeMatch_CountDownloads(WbtSystem *sys, GameData *gameData) {
-    u32 count = 0;
-    int slot;
+    u32 count;
+    WbtDownloadSlot slot;
 
-    for (slot = 1; slot < 4; slot++) {
+    for (slot = WBT_DOWNLOAD_SLOT_FIRST, count = 0; slot < WBT_DOWNLOAD_SLOT_END; slot++) {
         if (WbtMakeMatch_IsDownloadValid(gameData, slot) == TRUE) {
             count++;
         }

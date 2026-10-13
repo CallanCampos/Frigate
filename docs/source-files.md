@@ -1186,7 +1186,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_makematch.c` | `0x021eec80`–`0x021efbf4` | 39 | partial | string at `0x021efc20` |
+| `wbt_makematch.c` | `0x021eec80`–`0x021efbf4` | 39 | complete | string at `0x021efc20` |
 
 ### Overlay 136
 
