@@ -2235,7 +2235,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `staff_roll_main.c` | `0x0219ce80`–`0x0219e518` | 57 | partial | string at `0x0219e660` |
+| `staff_roll_main.c` | `0x0219ce80`–`0x0219e518` | 57 | complete | string at `0x0219e660` |
 
 ### Overlay 267
 
