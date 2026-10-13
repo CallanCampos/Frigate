@@ -1133,8 +1133,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `sp_poke_gimmick.c` | `0x021eec80`–`0x021ef834` | 31 | partial | string at `0x021f0120` |
-| `sp_poke_event.c` | `0x021ef834`–`0x021efccc` | 9 | partial | descriptive |
+| `sp_poke_gimmick.c` | `0x021eec80`–`0x021ef834` | 31 | complete | string at `0x021f0120` |
+| `sp_poke_event.c` | `0x021ef834`–`0x021efccc` | 9 | complete | descriptive |
 
 ### Overlay 130
 
@@ -1531,8 +1531,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `compatible_irc_sys.c` | `0x021998c0`–`0x0219a0f8` | 48 | complete | string at `0x0219ace4` |
-| `irc_compatible.c` | `0x0219a0f8`–`0x0219a89c` | 28 | partial | string at `0x0219acfc` |
-| `irc_appbar.c` | `0x0219a89c`–`0x0219abc4` | 14 | partial | string at `0x0219ad10` |
+| `irc_compatible.c` | `0x0219a0f8`–`0x0219a89c` | 28 | complete | string at `0x0219acfc` |
+| `irc_appbar.c` | `0x0219a89c`–`0x0219abc4` | 14 | complete | string at `0x0219ad10` |
 
 ### Overlay 176
 
@@ -1540,7 +1540,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_compat_menu.c` | `0x0219ad20`–`0x0219c278` | 60 | partial | descriptive |
+| `irc_compat_menu.c` | `0x0219ad20`–`0x0219c278` | 60 | complete | descriptive |
 
 ### Overlay 177
 
@@ -2437,7 +2437,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | partial | descriptive |
+| `zukan_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | complete | descriptive |
 | `zukan_area_list_view.c` | `0x021a073c`–`0x021a1dac` | 58 | complete | descriptive |
 
 ### Overlay 305
@@ -2541,7 +2541,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | partial | string at `0x0219db80` |
+| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | complete | string at `0x0219db80` |
 | `chihou_zukan_award_graphic.c` | `0x0219d6a4`–`0x0219da10` | 17 | complete | string at `0x0219db98` |
 
 ### Overlay 315

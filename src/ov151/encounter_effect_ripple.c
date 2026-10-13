@@ -136,6 +136,7 @@ static void EncEffRipple_Draw(EncEffRipple *ripple) {
 static BOOL EncEffRipple_Update(EncEffRipple *ripple) {
     s16 heights[ENCEFF_RIPPLE_VERTICES];
     int i;
+    VecFx16 *vertex;
 
     for (i = 0; i < ENCEFF_RIPPLE_VERTICES; i++) {
         heights[i] = ripple->vertices[i].z;
@@ -177,18 +178,19 @@ static BOOL EncEffRipple_Update(EncEffRipple *ripple) {
         up = n >= 0 ? heights[n * ENCEFF_RIPPLE_COLUMNS + x] : 0;
         n = y + 1;
         down = n < ENCEFF_RIPPLE_ROWS ? heights[n * ENCEFF_RIPPLE_COLUMNS + x] : 0;
+        vertex = &ripple->vertices[i];
 
-        ripple->speeds[i] += (left + right + up + down) / 4 - ripple->vertices[i].z;
-        ripple->vertices[i].z += ripple->speeds[i];
-        if (ripple->vertices[i].z > FX16_ONE) {
-            ripple->vertices[i].z = FX16_ONE;
+        ripple->speeds[i] += (left + right + up + down) / 4 - vertex->z;
+        vertex->z += ripple->speeds[i];
+        if (vertex->z > FX16_ONE) {
+            vertex->z = FX16_ONE;
         }
-        if (ripple->vertices[i].z < -FX16_ONE) {
-            ripple->vertices[i].z = -FX16_ONE;
+        if (vertex->z < -FX16_ONE) {
+            vertex->z = -FX16_ONE;
         }
         // The edges stay flat
         if (x == 0 || x == ENCEFF_RIPPLE_COLUMNS - 1 || y == 0 || y == ENCEFF_RIPPLE_ROWS - 1) {
-            ripple->vertices[i].z = 0;
+            vertex->z = 0;
         }
     }
     return FALSE;

@@ -57,7 +57,8 @@ IrcAppBar *IrcAppBar_Create(u32 unused0, ClActUnit *unit, u8 bg, u8 palette, u8 
     IrcAppBar *bar = GFL_HeapAllocate(heapId, sizeof(IrcAppBar), FALSE, "irc_appbar.c", 125);
     MsgData *msgData;
     AppTaskMenuItem item;
-    u32 vramType = 0;
+    BOOL isSub = FALSE;
+    u32 vramType;
     u32 surface;
 
     sys_memset(bar, 0, sizeof(IrcAppBar));
@@ -68,14 +69,16 @@ IrcAppBar *IrcAppBar_Create(u32 unused0, ClActUnit *unit, u8 bg, u8 palette, u8 
     bar->heapId = heapId;
     bar->active = TRUE;
     if (bg >= 4) {
+        isSub = TRUE;
         vramType = 1;
         surface = 4;
     } else {
+        vramType = 0;
         surface = 0;
     }
     IrcAppBar_LoadObjRes(bar, vramType, surface, unused5, palette, objPalette, heapId);
     bar->res = AppTaskMenuRes_Create(bg, palette, font, queue, heapId);
-    IrcAppBar_CreateActor(bar, unit, unused0, vramType, GFL_BGSysGetBGPriority(bg), heapId);
+    IrcAppBar_CreateActor(bar, unit, unused0, isSub, GFL_BGSysGetBGPriority(bg), heapId);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_4, heapId);
     sys_memset(&item, 0, sizeof(AppTaskMenuItem));
     item.color = 0x39e3;

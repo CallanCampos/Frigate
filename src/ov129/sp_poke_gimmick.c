@@ -245,7 +245,6 @@ void SpPokeGimmickB_Update(Field *field) {
     SpPokeGimmickCurve *curve = work->data.curve;
     VecFx32 pos;
     u32 i;
-    u16 objCode;
 
     switch (curve->state) {
     case CURVE_STATE_IDLE:
@@ -262,8 +261,11 @@ void SpPokeGimmickB_Update(Field *field) {
                 CopyActorWPos(curve->actor, &actorPos);
                 matrix->translation = actorPos;
                 if (func_ov036_021b8520(system, 0, 2, 0) == FX32_CONST(12)) {
-                    objCode = curve->phase == 2 ? OBJ_CODE_SP_POKE_SWORD : OBJ_CODE_SP_POKE_STILL;
-                    FldAct_UpdateBlInfoForNewObjCode(curve->actor, objCode);
+                    if (curve->phase == 2) {
+                        FldAct_UpdateBlInfoForNewObjCode(curve->actor, OBJ_CODE_SP_POKE_SWORD);
+                    } else {
+                        FldAct_UpdateBlInfoForNewObjCode(curve->actor, OBJ_CODE_SP_POKE_STILL);
+                    }
                     SetActorMovementFlag(curve->actor, ACTOR_MOVEMENT_FLAG_SP_POKE);
                 }
                 if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(system, 0, 2, 0)) == TRUE) {

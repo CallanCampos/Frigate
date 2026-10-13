@@ -96,6 +96,10 @@ Same instructions, registers swapped.
 - A variable gets a register or stack slot for each group of assignments that reach the same uses, so a variable
   that is assigned in two branches and stored once after them stays in one register, while a copy of the store in
   each branch lets the two assignments go to different places.
+- The same holds for an update written in both branches of an `if`/`else`: MWCC merges the two into one instruction
+  at the join, but allocates as if they were separate assignments. `ssp_jpegdec.c`'s `func_ov257_021ab808` keeps
+  `nbits` in r6 and the loop counter in r7 only with `nbits--;` at the end of each branch; one `nbits--;` after the
+  `if`/`else` swaps them.
 - Where a flag is first set changes which register its zero is built in. When the original builds a flag's `FALSE` in
   the register of a call's argument, or copies it from another zero, the flag was set after the call or loop, as
   `value = joinAveTextHandler(...); found = FALSE;` and a loop's total followed by `any = FALSE;` in the Join Avenue's
@@ -198,6 +202,34 @@ Same instructions, registers swapped.
   wider than 2 bytes. `ZoneBGEntity` holds its `s32` grid coordinates as `u16 grid[6]`, read through a cast, which is
   also why overlay 12's readers only matched through pointer locals; with it `FestSparklePlace_PickPlaces` and
   `FesMissionPeople_PickPlaces` copy their entities as the original does.
+- A scalar declared before a local array with an initializer is allocated ahead of the initializer's copy and the
+  parameters' copies; declared after it, it takes the register right after the counter. `zukan_area_list.c`'s
+  `ZukanAreaList_GetMarkKind` has `u8 next;` and its enum counter `i` ahead of `u32 kinds[3] = { ... }`, which puts
+  `next` in `r3` and the loop's temporary in `r1`. The counter is initialized from `next` (`for (i = next; ...)`), and
+  the test before the first pass, which an enum counter keeps, is on `next`'s register.
+- A subtraction feeding a multiply, computed into its second operand's register and then copied to `r0`
+  (`subs r1, r1, r0; adds r0, r1, #0; muls r0, r5`) with the first operand spilled after the `subs`, is a named
+  local: `sp_poke_event.c`'s inline `SpPokeEvent_Lerp` is `fx32 d = b - a; return a + d * step / steps;`. The unnamed
+  `a + (b - a) * step / steps` spills `a` first and subtracts into `r0`, 2 bytes shorter at each use.
+- A `u16` built from a call's result and then updated in place, `entry = BmpWin_GetCharPos(win); entry |= 15 << 12;`,
+  stays in the call's `r0` through its narrowing, and the loop counter's zero takes `r1`; the single expression
+  `entry = BmpWin_GetCharPos(win) | (15 << 12);` moves it to `r1` and the zero to `r0`
+  (`chihou_zukan_award.c`'s `ChihouZukanAward_InitBackdrop`).
+- A flag's zero built in the entry block, above the first call, does not mean the flag is declared at the top:
+  a `BOOL isNew = FALSE;` declared inside a later block is hoisted there too, and the block is what decides its
+  register. `irc_compatible.c`'s `IrcCompatible_CreateParam3` declares it in its `if` block after `isNewTrainer`,
+  which puts it in `r6`; every order at the top of the function kept two registers swapped.
+- An argument copied inside each branch (`mov r7, r1` where `r1` is already 1, `mov r1, r7` in the other arm) while
+  a zero stays in `r7` from the top is two variables holding the same value: `irc_appbar.c`'s `IrcAppBar_Create`
+  has `BOOL isSub = FALSE;` set in the branch and a `vramType` assigned in both arms. One `vramType = 0` with
+  `vramType = 1` in the branch copies after the join and swaps `r6` and `r7`.
+- Two computations of the same shape, one for x and one for y, that alternate registers (`r6` then `r7`) reuse one
+  pair of locals; a pair each keeps the same registers both times (`irc_compat_menu.c`'s
+  `IrcCompatMenuHeart_Update`, one `diff` and `sign` for both).
+- An array element read as `buttons->defs[buttons->touched].x` several times copies the index, multiplies it in
+  place and loads the base last (`adds r1, r2, #0; muls; ldr; adds r0, r0, r1`); through a
+  `const Def *def = &buttons->defs[i];` local the base is loaded first and the product goes to the constant's
+  register. `IrcCompatMenuButtons_Update` is the first form and its sibling `IrcCompatMenuButtons_Reset` the second.
 - An integer `+` of a local and a temporary puts the local first whatever the source order, and a pointer `+` puts
   the pointer first. `adds r1, r7, r1` with the size in `r7` and the running address in `r1` is therefore integer
   arithmetic on the address: `musical_system.c`'s `MusicalSystem_LoadProgramData` sets its second and third sound
@@ -241,6 +273,10 @@ Same code, other `sp` offsets or frame size.
   it was spilled in a later round of register allocation. In the Join Avenue's records command, a large switch, the
   declarations counted too: one group of slots followed the declaration order in reverse, and the variables declared
   in a loop body took the highest slots, in their declaration order.
+- A loop counter that the original keeps in a stack slot in a small function may be assigned before a call: its value
+  then lives across the call, so it can't stay in a scratch register. `ssp_jpegenc.c`'s `JpegEnc_SetupHuffmanTable`
+  matches only with `i = 0;` before its `sys_memset32_fast` call and the loop written `while (i < 16)` after it, with
+  the table's terminator stored inside the outer loop.
 - A variable reused by several switch cases is split into one value per case (see Registers), and a split piece that is
   spilled takes the lowest slot whatever the declarations say. When the original has a case's spilled value among the
   declared variables' slots, that case had a variable of its own, as case 9 of the records command does.
@@ -254,6 +290,10 @@ Same code, other `sp` offsets or frame size.
   declaration order and the later pieces the lowest slots, in the order they are assigned. `status_rcv.c`'s
   `StatusRcv_UseItem` reuses one function-level `add` in its six effort blocks, which puts the first block's value
   among the declared slots and the other five at the bottom of the frame; a block-scoped `add` in each block does not.
+  The EXIF reader's `func_ov257_021ac6f0` (`ssp_exifdec.c`) reads the byte order and then every IFD entry's tag into
+  one function-level `tag`; with a block-scoped `tag` in each loop and an `order` of its own, two slots were swapped.
+  Once the set of variables changes, sweep the declaration orders again: there, moving `makerNote` after `exifIfd`
+  then fixed the registers, though no position of it had helped before.
 - In a chained assignment, `a = b = f();`, MWCC treats `a` as its own copy of `b`, and a spilled `a` takes the lowest
   slot instead of its declared one. `StatusRcv_UseItem` needs `status = f(); newStatus = status;`.
 - Named locals take stack slots apart from the compiler's temporaries. When the original's spilled values all sit in
@@ -559,6 +599,8 @@ Same instructions, scheduled in another order.
 - A narrowing missing after an `if`/`else` that assigns a `u16` in both branches comes from a conditional expression:
   `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `MBWm_NextChannel`
   (`mb_wm.c`) needed.
+- A trailing `mov r1, #0` after a 32-bit result is a function returning `u64`: DWC's `DivWords` (`crypt.c`) returns
+  `(u32)(...)` from a `u64` function.
 - On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
   load's offset from the shared base, where the same address in a named local, or the element written `a[n + k]`,
   is computed again. `snd_arc_loader.c`'s `LoadSingleWave` reads a wave's file offset and the next one's as
