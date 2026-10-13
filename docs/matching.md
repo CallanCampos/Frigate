@@ -1386,6 +1386,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   The same file's three BG setups are one `static const BGSetup sBGSetups[3]` (as three statics their section order
   was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
   `.data` match: the strings give the original's variable names.
+- A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
+  `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
+  `i < 8`, and an inline with `return kind < N;`, are both rotated.
 
 ## Switches
 

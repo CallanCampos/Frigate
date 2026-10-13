@@ -403,9 +403,11 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `union_oneself.c` | `0x02176b00`–`0x0217aa7c` | 87 | partial | string at `0x0217c6ec` |
+| `union_actor.c` | `0x02176b00`–`0x02177444` | 23 | complete | descriptive |
+| `union_oneself.c` | `0x02177444`–`0x0217aa7c` | 64 | complete | string at `0x0217c6ec` |
 | `union_msg.c` | `0x0217aa7c`–`0x0217b68c` | 66 | partial | string at `0x0217c85c` |
-| `union_eff.c` | `0x0217b68c`–`0x0217becc` | 42 | partial | string at `0x0217c8b0` |
+| `union_eff.c` | `0x0217b68c`–`0x0217bc84` | 32 | complete | string at `0x0217c8b0` |
+| `colosseum_tool.c` | `0x0217bc84`–`0x0217becc` | 10 | complete | descriptive |
 
 ### Overlay 35
 
@@ -2283,7 +2285,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `br_core.c` | `0x021efe40`–`0x021f0770` | 30 | complete | descriptive |
-| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | partial | string at `0x021f7b84` |
+| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | complete | string at `0x021f7b84` |
 | `br_btn.c` | `0x021f0a6c`–`0x021f23b8` | 56 | complete | string at `0x021f7c20` |
 | `br_btn_data.c` | `0x021f23b8`–`0x021f266c` | 8 | complete | string at `0x021f7cd8` |
 | `br_res.c` | `0x021f266c`–`0x021f31b8` | 20 | complete | string at `0x021f7d50` |
