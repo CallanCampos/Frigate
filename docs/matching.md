@@ -322,6 +322,12 @@ Same instructions, registers swapped.
   `FindCandidate`. A callee's parameter type can also reorder its caller's stack-argument stores while the callee's
   own code is the same either way (`WbtEntrant_SetTableForDownloaded`'s `u8 index` matched `WbtMakeMatch_SetEntrants`):
   sweep callee types when only the argument order differs.
+- A `const` by-value parameter stays in a register although its address is passed on: the musical stage's
+  `StaActPoke_SetShowFlg` has `const BOOL show` in its definition. In the same overlay `a = x; a += y;` fixed a load
+  order that `a = x + y` leaves to MWCC (`charAddr += index << 11` in `StaActButton_LoadItemTexture`), `u32`
+  per-case switch locals took their declared slots where `u8` ones sank to the bottom, and
+  `StaActButton_InitSystem`'s "wrong register" was a wrong constant (`GX_WNDMASK_W0`, not `OW`): check the values
+  before the registers.
 
 ## Stack slots
 

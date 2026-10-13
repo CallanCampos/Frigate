@@ -121,11 +121,13 @@ static void StaActPoke_UpdatePoke(StaActPokeSys *sys, StaActPoke *poke) {
     VecFx32 scale;
     VecFx32 center;
     MtxFx33 rotation;
+    u16 angle;
 
     VEC_Add(&poke->pos, &poke->offset, &pos);
+    angle = poke->rotation;
     center.x = 0;
     center.y = mark5->y;
-    MAT3_RotationZ(&rotation, -FX_SinIdx(poke->rotation), FX_CosIdx(poke->rotation));
+    MAT3_RotationZ(&rotation, -FX_SinIdx(angle), FX_CosIdx(angle));
     MAT3_MulVec(&center, &rotation, &poke->rotOffset);
     VEC_Subtract(&center, &poke->rotOffset, &poke->rotOffset);
     pos.x = (pos.x - mark4->x - poke->rotOffset.x) / 16;
@@ -142,7 +144,11 @@ static void StaActPoke_UpdatePoke(StaActPokeSys *sys, StaActPoke *poke) {
     poke->update = FALSE;
     if (poke->animating == TRUE) {
         poke->blinkTimer += GFL_RandomLC(2);
-        MusPokeDraw_SetFlip(poke->draw, poke->blinkTimer > 120 ? TRUE : FALSE);
+        if (poke->blinkTimer > 120) {
+            MusPokeDraw_SetFlip(poke->draw, TRUE);
+        } else {
+            MusPokeDraw_SetFlip(poke->draw, FALSE);
+        }
         if (poke->blinkTimer > 125) {
             poke->blinkTimer = GFL_RandomLC(120) / 3;
         }
@@ -178,8 +184,8 @@ static void StaActPoke_UpdateItems(StaActPokeSys *sys, StaActPoke *poke) {
                     u16 itemRot = (0x10000 + equip->info.cellRotation + poke->equips[i]->unk2) % 0x10000;
                     fx32 scaleX;
                     MtxFx33 rotation;
-                    VecFx32 offset;
                     VecFx32 center;
+                    VecFx32 offset;
 
                     MusPokeDraw_GetMarkPos4(poke->draw);
                     scaleX = equip->info.scale.x;
@@ -198,8 +204,11 @@ static void StaActPoke_UpdateItems(StaActPokeSys *sys, StaActPoke *poke) {
                     if (MusItemDraw_GetItemFlag7(poke->items[i]) == TRUE) {
                         pos.z = poke->pos.z - FX32_CONST(20);
                     } else {
-                        pos.z = poke->pos.z + (equipPos == 7 || equipPos == 8 ? FX32_CONST(10) : FX32_CONST(5)) -
-                                (poke->equips[i]->slot << 11);
+                        if (equipPos == 7 || equipPos == 8) {
+                            pos.z = poke->pos.z + FX32_CONST(10) - (poke->equips[i]->slot << 11);
+                        } else {
+                            pos.z = poke->pos.z + FX32_CONST(5) - (poke->equips[i]->slot << 11);
+                        }
                     }
                     MusItemDraw_SetPosition(sys->itemDraw, poke->items[i], &pos);
                     MusItemDraw_SetRotation(sys->itemDraw, poke->items[i], itemRot - rot);
@@ -452,7 +461,7 @@ static void StaActPoke_ItemParticleInit(StaActPokeSys *sys, StaActPoke *poke) {
 static void StaActPoke_ItemParticle(StaActPokeSys *sys, StaActPoke *poke) {
     StaActPokeItemWork *work = &poke->itemWork;
     VecFx32 pos;
-    MusPokeDrawEquipPos *equip = MusPokeDraw_GetEquipPos(poke->draw, work->pos);
+    MusPokeDrawEquipPos *equip = MusPokeDraw_GetEquipPos(poke->draw, poke->itemWork.pos);
 
     if (poke->isFront == TRUE && equip->valid == TRUE) {
         MusItemDraw_GetPosition(sys->itemDraw, poke->items[work->pos], &pos);
@@ -507,7 +516,7 @@ static void StaActPoke_ItemFall(StaActPokeSys *sys, StaActPoke *poke) {
     pos.x += FX_Mul(timer / 3 * 205, sin);
     pos.y -= FX32_CONST(0.75);
     MusItemDraw_SetPosition(sys->itemDraw, poke->items[work->pos], &pos);
-    MusItemDraw_SetRotation(sys->itemDraw, poke->items[work->pos], (sin << 15) >> 16);
+    MusItemDraw_SetRotation(sys->itemDraw, poke->items[work->pos], sin >> 1);
     work->timer++;
     if (work->timer >= STA_ACT_POKE_ITEM_FRAMES) {
         MusItemDraw_SetVisible(sys->itemDraw, poke->items[work->pos], FALSE);
@@ -629,7 +638,7 @@ void StaActPoke_ChangeAnime(StaActPokeSys *sys, StaActPoke *poke, u8 anime) {
     MusPokeDraw_ChangeAnime(poke->draw, anime);
 }
 
-void StaActPoke_SetShowFlg(StaActPokeSys *sys, StaActPoke *poke, BOOL show) {
+void StaActPoke_SetShowFlg(StaActPokeSys *sys, StaActPoke *poke, const BOOL show) {
     int i;
 
     MusPokeDraw_SetVisible(poke->draw, show);
