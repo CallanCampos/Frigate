@@ -275,6 +275,11 @@ Same instructions, registers swapped.
   `res[i] = func_0204b81c(...)` in both branches, with `wk->pokemon[i]` indexed at each use. With one store after
   the branches the code has the right size but the file handle and `res` are swapped in `r6`/`r7`, through every
   declaration order.
+- A bit field argument extracted completely before the first argument is set up (`ldrh r0; lsls r0, #0x11; lsrs r1,
+  r0, #0x19; adds r0, r5, #0`, against ours `ldrh r1; adds r0, r5, #0; lsls r1; lsrs r1`) is the enum-local rule:
+  `PkwdBookSeries series; ... series = wk->movies[wk->selected].series; PkwdBook_TransferSeriesPalette(wk, series);`
+  in `PkwdBook_ListInput`. An integer local of any width, a reused variable, inline getters and wrappers gave the
+  same bytes as the direct argument; `PkwdBook_InitScreen` passes the field directly and has the other order.
 
 ## Stack slots
 
@@ -415,6 +420,11 @@ Same code, other `sp` offsets or frame size.
   (`add r0, sp, #4; add r0, #2; strh r6, [r0]`), is a one-element array with an initializer, `u16 black[1] = { 0 };`,
   as `game_clear_save.c`'s `GameClearSave_Main` passes to `gfxUploadStdPaletteBGB`. A scalar `u16 black = 0;` with
   `&black` stores at base plus offset and computes the address a second time.
+- Two spill slots swapped between a doubled index local and a hoisted loop invariant: the local held the undoubled
+  value and the doubling was in the uses. `PkwdBook_CreateTextActors` has `positionIdx = entries->positionIdx;` with
+  `PkwdBook_GetPosition(wk, positionIdx * 2)` and `(wk, positionIdx * 2 + 1)`; MWCC still spills the doubled value
+  once, but in the slot before the hoisted `wk + paletteSlot * 4`. `positionIdx = entries->positionIdx * 2;`
+  gave the same instructions with the two slots exchanged, in every declaration order.
 
 ## Instruction order
 
@@ -942,6 +952,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `WifiLoginMessage_GetMessageBGOf(msg)` (`return WifiLoginMessage_GetMessageBG(msg->style);` with
   `const WifiLoginMessage *msg`), which loads the style again (0xc8). The same inline with a plain pointer, or the call
   written in place, reuses the first load (0xc6).
+- A table entry's address that the original computes before a call's other arguments (`ldr r1, =table; adds r2, r1,
+  r5` ahead of the stack argument's load), where `entry = &table[i]; f(arc, entry->fileId, ..., wk->heapId);` sinks the
+  address into the argument: the pointer was set to the table and then advanced, a local with two assignments that is
+  not moved to its use. `PkwdBook_LoadPoster` matches with `const PkwdBookLoad *screen = sPkwdBookPosterScreens;` at
+  the top and `screen += graphicIdx;` before each call. An inline helper taking `&table[i]`, entry pointers at any
+  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".)
 
 ## Branches and block layout
 

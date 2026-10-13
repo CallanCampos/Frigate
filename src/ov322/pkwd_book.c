@@ -62,7 +62,6 @@
 // The movies that the book can list
 #define LIST_MOVIE_COUNT 40
 #define LIST_ROWS 7
-#define SERIES_COUNT 4
 #define CAST_COUNT 6
 #define MOVE_COUNT 4
 #define WINDOW_COUNT 16
@@ -199,6 +198,15 @@ enum {
     PAGE_STEP_LIST_MENU = 400,
     PAGE_STEP_END = 10000,
 };
+
+// The series of a movie, which gives the color of its row and of the upper screen
+typedef enum {
+    SERIES_0,
+    SERIES_1,
+    SERIES_2,
+    SERIES_3,
+    SERIES_COUNT,
+} PkwdBookSeries;
 
 // What the menu of a movie returns
 enum {
@@ -1121,10 +1129,8 @@ static void PkwdBook_LoadTouchBarBG(PkwdBookWork *wk, u32 bg, u32 palette) {
 
 // Loads a poster to the upper screen, at once or in the next VBlank
 static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred) {
-    const PkwdBookLoad *charLoads = sPkwdBookPosterChars;
-    const PkwdBookLoad *screenLoads = sPkwdBookPosterScreens;
-    const PkwdBookLoad *chars;
-    const PkwdBookLoad *screen;
+    const PkwdBookLoad *chars = sPkwdBookPosterChars;
+    const PkwdBookLoad *screen = sPkwdBookPosterScreens;
     ArcTool *arc;
 
     if (deferred == TRUE) {
@@ -1134,12 +1140,12 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
         void *charFile;
 
         arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
-        screen = &screenLoads[graphicIdx];
+        screen += graphicIdx;
         screenFile = GFL_G2DIOReadNSCRArc(arc, screen->fileId, FALSE, &screenData, wk->heapId);
         GFL_BGSysBufferScrDefault(2, screenData->rawData, 0x800);
         GFL_BGSysSetScrPaletteNo(2, 0, 0, 32, 24, 9);
         GFL_BGSysQueueScrLoad(2);
-        chars = &charLoads[graphicIdx];
+        chars += graphicIdx;
         charFile = GFL_G2DIOReadBGNCGRArc(arc, chars->fileId, FALSE, &charData, wk->heapId);
         NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG2_CHAR_MAIN, 0, charData->rawData, 0x4000);
         GFL_ArcToolFree(arc);
@@ -1147,9 +1153,9 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
         GFL_HeapFree(charFile);
     } else {
         arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
-        chars = &charLoads[graphicIdx];
+        chars += graphicIdx;
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, wk->heapId);
-        screen = &screenLoads[graphicIdx];
+        screen += graphicIdx;
         loadBGScrToVramByFileNoReserveNegAlign(arc, screen->fileId, screen->target, screen->offset, 0, FALSE,
                                                wk->heapId);
         GFL_ArcToolFree(arc);
@@ -1499,11 +1505,7 @@ static void PkwdBook_CreateTextActors(PkwdBookWork *wk, u32 surface, const PkwdB
 
     // BUG: the entries are never stepped through, so the three texts are created from the first one. It only shows
     // in where they are until PkwdBook_PrintTextActor places them
-#ifdef BUGFIX
-    for (i = 0; i < TEXT_ACTOR_COUNT; i++, entries++) {
-#else
     for (i = 0; i < TEXT_ACTOR_COUNT; i++) {
-#endif
         BmpOamActorSetup setup;
         u32 positionIdx;
         s16 x;
@@ -1513,9 +1515,9 @@ static void PkwdBook_CreateTextActors(PkwdBookWork *wk, u32 surface, const PkwdB
             break;
         }
         wk->textBitmaps[i] = GFL_BitmapCreate(entries->width, entries->height, 0x20, wk->heapId);
-        positionIdx = entries->positionIdx * 2;
-        x = PkwdBook_GetPosition(wk, positionIdx);
-        y = PkwdBook_GetPosition(wk, positionIdx + 1);
+        positionIdx = entries->positionIdx;
+        x = PkwdBook_GetPosition(wk, positionIdx * 2);
+        y = PkwdBook_GetPosition(wk, positionIdx * 2 + 1);
         sys_memset(&setup, 0, sizeof(setup));
         setup.bitmap = wk->textBitmaps[i];
         setup.x = x;
@@ -1530,6 +1532,9 @@ static void PkwdBook_CreateTextActors(PkwdBookWork *wk, u32 surface, const PkwdB
         if (entries->visible == 0) {
             BmpOam_ActorSetDrawEnable(wk->textActors[i], FALSE);
         }
+#ifdef BUGFIX
+        entries++;
+#endif
     }
 }
 
@@ -1922,9 +1927,12 @@ static void PkwdBook_ListInput(PkwdBookWork *wk) {
         }
     }
     if (action == 1) {
+        PkwdBookSeries series;
+
         PkwdBook_PrintLabels(wk, FALSE, PAGE_LIST);
         PkwdBook_PrintMovie(wk, TRUE);
-        PkwdBook_TransferSeriesPalette(wk, wk->movies[wk->selected].series);
+        series = wk->movies[wk->selected].series;
+        PkwdBook_TransferSeriesPalette(wk, series);
         PkwdBook_LoadPoster(wk, PkwdBook_GetPosterGraphicIdx(wk, wk->movies[wk->selected].movie), TRUE);
     }
     if (!(wk->flags & FLAG_CURSOR_SHOWN)) {

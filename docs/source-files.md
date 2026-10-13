@@ -2622,7 +2622,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pkwd_book.c` | `0x0219ce80`–`0x021a02a8` | 101 | partial | descriptive |
+| `pkwd_book.c` | `0x0219ce80`–`0x021a02a8` | 101 | complete | descriptive |
 | `pkwd_book_graphic.c` | `0x021a02a8`–`0x021a04fc` | 16 | complete | string at `0x021a0c8c` |
 
 ### Overlay 323
