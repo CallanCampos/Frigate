@@ -19,9 +19,7 @@ tools that show the differences.
   (`int start = pos;`), as `b_plist_main.c`'s `BPlistMain_GetNextPos` does; a separate counter swaps the registers.
 - A `const` pointer parameter lets MWCC keep a value loaded through it across a store through another pointer; the
   original reloads it, so `btlv_effect.c`'s `BtlvEffTool_Step` takes its step pointer non-const. The same decided
-  several vector copies in `btlv_mcss.c` and `btlv_effvm.c`: field-by-field copies from non-const sources. It also
-  lets a load move above such a store: `btl_poke_select.c`'s `PokeSelect_Init` reads `cmd->count` before storing 0
-  to `select->count` only with `const BtlvPokeListCmd *cmd`; non-const, the load waits for the store.
+  several vector copies in `btlv_mcss.c` and `btlv_effvm.c`: field-by-field copies from non-const sources.
 - Clearing one bit with `flags &= ~(1 << i)` gives `mvns`; the original's `eors` with -1 is `flags &= (1 << i) ^ 0xffffffff`,
   as `btlv_clact.c`'s move and scale task ends do, and `btlv_stage.c`'s vanish flags use `(1 << side) ^ 3`.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
@@ -184,6 +182,8 @@ Same instructions, registers swapped.
 - A parameter that the callers narrow with shifts before the call is a `u16` or `u8`, and the type also decides how it
   is spilled: `BagItemList_GetItem` spills `pocket` first and compares the reloaded copy only once `pocket` and `index`
   are `u16`, as `itemmenu.c`'s caller narrows them; as `u32` it compares a register copy and stores it after.
+  The same holds with no narrowing caller to show it: `condition_effects.c`'s `Condition_SetCureMessage` matches
+  only with its fourth parameter `u16` (or `u8`), and its one caller passes 0.
 - Loops over an array of structs that test two fields through a pointer to the element, then write the fields as
   `list->entries[i].x` in the body, keep the array's base in a register and the element's address in another, as
   `bag_item.c`'s `BagItemList_Remove` and `BagItemList_GetItem` do; indexing in the test too folds the field offsets.
@@ -491,7 +491,8 @@ Same instructions, scheduled in another order.
 - A load through a `const` pointer is also reused across stores, as the World Tournament's `wbt_setup.c` reads an
   entrant's bit fields from one load, but it is not hoisted out of a loop: `wbt_party.c`'s filter check reads each
   list's count again in every iteration because its filter is `const`, where a plain pointer's count is loaded once
-  before the loop.
+  before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with
+  `const BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`.
 - A field load scheduled ahead of a store it doesn't depend on, where MWCC keeps the written order, can come from an
   inline helper's argument: arguments are evaluated before the body's stores. The PC box's sequences set the picked
   position with `u8 pos = func_0202ba60(...); Box2Seq_SetGetPos(syswk, pos, syswk->tray);`, which loads `tray` before
@@ -635,9 +636,6 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - An argument narrowed by a `u16` parameter is narrowed again at each call, and only hoisted out of a loop, while a
   `(u16)` cast is computed once and reused: `PMSIVEdit_ScrollWait` matched only once `func_0204c1a8` and
   `func_0204c1dc` took their surface as `u16`.
-- A spilled parameter that the original stores to its slot at entry and tests through a reload of that slot, where
-  ours tests the incoming register and stores it later, is narrower than `u32`: `condition_effects.c`'s
-  `Condition_SetCureMessage` matches once its fourth parameter is `u16` (or `u8`), with the same body.
 - After `a = b;`, a test of `b` reuses the register just stored and a test of `a` loads `a` again. The phrase
   select's `PMSSelect_SetupList` writes `wk->lineCount = wk->sentenceCount; if (wk->sentenceCount < 20)`, and its
   `PMSSelect_SetupScreen` tests `wk->pos` after `wk->prevPos = wk->pos;`.

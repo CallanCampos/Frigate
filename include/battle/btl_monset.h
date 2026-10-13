@@ -42,9 +42,9 @@ void BtlMonSet_ResetIndex(BtlMonSet *set);
 // The next mon of the set, or NULL after the last
 BattleMon *BtlMonSet_GetNext(BtlMonSet *set);
 // The damage a mon took, HP and substitute together; FALSE when it took none
-BOOL BtlMonSet_GetTotalDamage(BtlMonSet *set, BattleMon *mon, u32 *damage);
+BOOL BtlMonSet_GetTotalDamage(const BtlMonSet *set, BattleMon *mon, u32 *damage);
 // The HP damage a mon took; FALSE when it took none
-BOOL BtlMonSet_GetHpDamage(BtlMonSet *set, BattleMon *mon, u32 *damage);
+BOOL BtlMonSet_GetHpDamage(const BtlMonSet *set, BattleMon *mon, u32 *damage);
 u32 BtlMonSet_GetCount(BtlMonSet *set);
 u32 BtlMonSet_GetCountMax(BtlMonSet *set);
 void BtlMonSet_SetNumTargets(BtlMonSet *set, u8 numTargets);

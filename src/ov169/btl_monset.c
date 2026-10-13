@@ -86,7 +86,7 @@ BattleMon *BtlMonSet_GetNext(BtlMonSet *set) {
     return NULL;
 }
 
-BOOL BtlMonSet_GetTotalDamage(BtlMonSet *set, BattleMon *mon, u32 *damage) {
+BOOL BtlMonSet_GetTotalDamage(const BtlMonSet *set, BattleMon *mon, u32 *damage) {
     u32 i;
 
     for (i = 0; i < set->count; i++) {
@@ -98,7 +98,7 @@ BOOL BtlMonSet_GetTotalDamage(BtlMonSet *set, BattleMon *mon, u32 *damage) {
     return FALSE;
 }
 
-BOOL BtlMonSet_GetHpDamage(BtlMonSet *set, BattleMon *mon, u32 *damage) {
+BOOL BtlMonSet_GetHpDamage(const BtlMonSet *set, BattleMon *mon, u32 *damage) {
     u32 i;
 
     for (i = 0; i < set->count; i++) {
