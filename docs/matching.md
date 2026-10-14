@@ -286,6 +286,13 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+- In NitroSystem's 2.0/sp2p2 code, a `for` loop's comma-separated increment keeps its last variable in a register for
+  the test and stores the earlier ones, and the `for` initializer's order sets the spill slots of the start values:
+  `g2d_CharCanvas.c`'s `ClearArea1D` matches with `for (; cy < y1; charY++, cy += 8)` and `for (charX = charX0, cx =
+  x0; cx < x1; charX++, cx += 8)`, and `DrawGlyph1D` with `cy++, y -= 8`. There too a load written before a group of
+  temporaries holds its low register and keeps the scheduler from interleaving them (`objParam.param = pCC->param;`
+  first in `ClearArea1D`), and a `const u8` local for a `u8` field picks other registers than an `int`
+  (`DrawGlyph1D`'s glyph width).
 - An inline's enum-typed parameter changes how MWCC orders and allocates the inlined expression when the argument
   is an integer: `billboard.c`'s `BlActScene_Draw` packs its polygon attributes in the original's order (alpha,
   then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
