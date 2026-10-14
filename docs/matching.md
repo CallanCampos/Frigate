@@ -286,6 +286,10 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+  Overlay 311's `UnSelectMsg_PrintItem` matches the same way, with `int pos = index;` from a `u32 index`: `pos` takes
+  `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
+  order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
+  and declared first stores it right after the subtraction.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
@@ -2185,6 +2189,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
   order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
   one is dropped; a used `.bss` static joins the sort, an unused one does not.
+- A function-local `static` joins the size sort at the end of the file, after every local initializer, and such
+  statics come in reverse order, the last one declared first. So it reorders equal-size local initializers anywhere
+  in the file: overlay 311's `un_select.c` keeps its two windows' background color in function-local
+  `static const u8 backColor = 15;` (the `0f 0f` at the head of its `.rodata`), and its five 24-byte
+  `UnSelectActorTemplate` initializers come out in the ROM's order only with `sUnSelectListTouch` defined first among
+  the file's tables. Give `rodata_order.py` such statics last, reversed. Its `--check` compares only the shared
+  section, not the order of the objects with sections of their own, and counts a string literal in `.data` as a
+  local initializer.
 
 ## When nothing moves it
 

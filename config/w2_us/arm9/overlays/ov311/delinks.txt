@@ -5,6 +5,7 @@
     .bss        start:0x0219ea00 end:0x0219ea00 kind:bss align:32
 
 src/ov311/un_select.c:
+    complete
     .text       start:0x0219cec0 end:0x0219e0c8
     .rodata     start:0x0219e434 end:0x0219e7ac
     .data       start:0x0219e9a0 end:0x0219e9d4
