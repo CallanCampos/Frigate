@@ -810,6 +810,12 @@ static inline BOOL UnionMsg_IsMenuKind(u32 kind)
     return FALSE;
 }
 
+// The entry of sMenuInfo for a menu kind
+static inline const UnionMenuInfo *UnionMsg_GetMenuInfo(int kind)
+{
+    return &sMenuInfo[kind];
+}
+
 // Runs the menu of the battle rules and takes the choice: the value is a submenu or a rule. picked says the choice
 // changed the rules or opened a menu, isFinal that the rules are confirmed
 u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL *isFinal, Field *field)
@@ -828,7 +834,8 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
         if (ruleSel[3] == 0) {
             return ret;
         }
-        ret = sMenuInfo[ruleSel[3]].rows[sMenuInfo[ruleSel[3]].count - 1].value;
+        // The last row goes back to the menu that opened this one
+        ret = sMenuInfo[ruleSel[3]].rows[UnionMsg_GetMenuInfo(ruleSel[3])->count - 1].value;
         break;
     case 0x64:
         return sRuleResult[ruleSel[0]][ruleSel[1]][ruleSel[2]];
@@ -848,7 +855,7 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
     }
 
     for (i = 0; UnionMsg_IsMenuKind(i); i++) {
-        if (sMenuInfo[i].rows == (const UnionMenuRow *)ret) {
+        if (UnionMsg_GetMenuInfo(i)->rows == (const UnionMenuRow *)ret) {
             *picked = TRUE;
             return i;
         }
