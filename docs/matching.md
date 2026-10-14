@@ -516,6 +516,12 @@ Same code, other `sp` offsets or frame size.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
+- A spilled local's width for the rule below can come from its callee's return: `wbt_list.c`'s
+  `WbtList_PrintMessage` stores its first name call's last stack argument before the name's address, as the
+  original does, only with `s16 first` set from `WbtList_GetMatchValue` returning `s16` (and its `value` local
+  `s16`). An `s16` local from an `s32` return, or any other pairing, swaps the two. The callee's other callers
+  bound the width: `WbtList_UpdateMessage`'s `u16 message = WbtList_GetMatchValue(...)` keeps its narrowing
+  only with a signed or wider return.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
