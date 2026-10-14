@@ -1030,13 +1030,9 @@ static BOOL CygnusData_Save(CygnusData *data) {
 }
 
 static BOOL CygnusData_GetEntry(const CygnusData *data, u32 index, u32 *type, u32 *id) {
-    u32 entryType = data->entries[index].type;
-
-    if (entryType != CYGNUS_ENTRY_NONE) {
-        u32 entryId = data->entries[index].id;
-
-        *type = entryType;
-        *id = entryId;
+    if (data->entries[index].type != CYGNUS_ENTRY_NONE) {
+        *id = data->entries[index].id;
+        *type = data->entries[index].type;
         return TRUE;
     }
     return FALSE;
