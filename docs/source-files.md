@@ -144,7 +144,7 @@ prints the tables below from the configs and the ROM:
 | `event_3d_demo.c` | `0x0215cb48`–`0x0215cd58` | 5 | complete | descriptive |
 | `city_state.c` | `0x0215cd58`–`0x0215cda4` | 3 | complete | descriptive |
 | `eventdata_system.c` | `0x0215cda4`–`0x0215dabc` | 61 | partial | string at `0x0216e298` |
-| `field_actor_tool.c` | `0x0215dabc`–`0x0215ee10` | 69 | partial | descriptive |
+| `field_actor_tool.c` | `0x0215dabc`–`0x0215ee10` | 69 | complete | descriptive |
 | `zone_change.c` | `0x0215ee10`–`0x0215ef60` | 9 | complete | descriptive |
 | `itemuse_event.c` | `0x0215ef60`–`0x0215f23c` | 13 | complete | descriptive |
 | `hidden_item.c` | `0x0215f23c`–`0x0215f2d0` | 4 | complete | descriptive |

@@ -346,7 +346,7 @@ void ActorTerrainEffect_ApplyAll(FieldActor *actor);
 // The collision flags at a grid position, with the world position's y
 u32 ActorRouteCollCheckCore(FieldActor *actor, const VecFx32 *position, s16 x, s16 y, s16 z, u16 dir);
 u32 ActorRouteCollCheck(FieldActor *actor, s16 x, s16 y, s16 z, u16 dir);
-BOOL CheckActorNewPosOtherActorCollision(FieldActor *actor, s16 x, s16 y, s16 z);
+BOOL CheckActorNewPosOtherActorCollision(const FieldActor *actor, s16 x, s16 y, s16 z);
 BOOL CheckActorVolumeOverGPos(FieldActor *actor, s16 x, s16 z, BOOL checkInit);
 BOOL IsGPosOutsideActorWalkArea(FieldActor *actor, s16 x, s16 z);
 BOOL CheckBlockedCollPathToPosition(FieldActor *actor, u16 dir, VecFx32 position);
