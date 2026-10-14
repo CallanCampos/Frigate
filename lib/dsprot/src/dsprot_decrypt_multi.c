@@ -7,7 +7,7 @@
 
 // The address of this array stands for nothing: lengths and keys are made from it, so that no plain length of code is
 // in the ROM
-u8 DSProt_WorkMulti[0x1c];
+u8 DSProt_WorkMulti[0x14];
 
 static const u32 sDecryptFunctionMulti = (u32)(DSProt_DecryptFunctionMulti + 0x2200);
 static const u32 sEncryptFunctionMulti = (u32)(DSProt_EncryptFunctionMulti + 0x2200);
