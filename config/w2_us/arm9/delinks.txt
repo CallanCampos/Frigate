@@ -279,6 +279,7 @@ src/gfl/g3d_util.c:
     .data       start:0x0209af48 end:0x0209af54
 
 src/gfl/g3d_system.c:
+    complete
     .text       start:0x02048d54 end:0x02049d50
     .rodata     start:0x02093dec end:0x02093e38
     .data       start:0x0209af38 end:0x0209af48
