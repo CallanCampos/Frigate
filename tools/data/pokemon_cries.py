@@ -133,7 +133,9 @@ def replace_files(data, fat, file_section, entries, changes):
         struct.pack_into("<II", result, fat + 12 + 16 * file_id, new_offset, len(member))
         cursor = offset + size
     result.extend(data[cursor:])
+    # The FILE block's size is both its own and the header's (at 0x2c), and the archive's total size is at 8
     struct.pack_into("<I", result, file_section + 4, len(result) - file_section)
+    struct.pack_into("<I", result, 0x2c, len(result) - file_section)
     struct.pack_into("<I", result, 8, len(result))
     return bytes(result)
 

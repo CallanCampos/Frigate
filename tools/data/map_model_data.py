@@ -217,6 +217,12 @@ def patch_props(chunk, doc):
     return bytes(result)
 
 
+def blended(weights):
+    """Whether a vertex's WEIGHTS_0 blends joints, rather than giving its first joint all the weight, whether the GLB
+    stores weights as normalized bytes or shorts or as floats."""
+    return any(weight != 0 for weight in weights[1:]) or not weights[0]
+
+
 def accessor_values(doc, binary, accessor_index):
     accessor = doc["accessors"][accessor_index]
     if "sparse" in accessor:
@@ -363,7 +369,7 @@ def positions_from_gltf(directory, name, nitro, mapping):
                 raise ValueError(f"{name}: triangle topology or shared vertex changed")
             positions[original] = value
             if current_joints is not None and current_weights is not None:
-                if current_weights[current] != (255, 0, 0, 0):
+                if blended(current_weights[current]):
                     raise ValueError(f"{name}: blended skin weights are unsupported")
                 joint = current_joints[current][0]
                 if joints[original] is not None and joints[original] != joint:
@@ -1023,7 +1029,7 @@ def topology_display_list(data, model, material_index, doc, primitive, binary, s
             raise ValueError(f"{name}: triangle index exceeds a vertex attribute")
         point = positions[vertex]
         if not direct:
-            if any(weights[vertex][axis] != 0 for axis in (1, 2, 3)) or not weights[vertex][0]:
+            if blended(weights[vertex]):
                 raise ValueError(f"{name}: blended skin weights are unsupported")
             point = inverse_joint_position(doc, joints[vertex][0], point)
         coords = [round(value * 4096 / scale) for value in point]
@@ -1063,6 +1069,11 @@ def rebuild_topology(chunk, doc, primitives, binary, mapping, name):
     appended = bytearray()
     triangle_count = 0
     for (shape_index, material_index), primitive in zip(calls, primitives):
+        # The new display list only draws, so a shape that restores or scales matrices as it draws can't be rebuilt
+        start = shapes[shape_index] + u32(data, shapes[shape_index] + 8)
+        if any(op in (0x14, 0x1b) for op, _ in gpu_commands(data, start, start + u32(data, shapes[shape_index] + 12))):
+            raise ValueError(f"{name}: shape {shape_index} sets matrices as it draws, so its triangles can't be "
+                             "re-encoded yet; keep its topology")
         triangle_count += doc["accessors"][primitive["indices"]]["count"] // 3
         display_list = topology_display_list(data, model, material_index, doc, primitive, binary,
                                              scale, mapping["direct"], name)

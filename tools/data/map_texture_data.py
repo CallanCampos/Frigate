@@ -276,6 +276,15 @@ def quantized_pixels(pixels, texture):
     return result
 
 
+def visible(pixels, texture):
+    """Returns pixels as the texture's format shows them: in its colors, and with any color where an alpha format's
+    pixel is wholly transparent, so that an editor's saving the same image differently is no edit."""
+    values = quantized_pixels(pixels, texture)
+    if texture["kind"] in (1, 6):
+        return [(None, 0) if alpha == 0 else (color, alpha) for color, alpha in values]
+    return values
+
+
 def encode_palette_group(blob, members, start, end):
     """Assign colors across all images that share one Nitro palette."""
     capacity = (end - start) // 2
@@ -333,7 +342,9 @@ def pack(directory, game, output):
             path = folder / f"{texture['name']}.png"
             image = read_png(path, texture["width"], texture["height"])
             pixels.append(image)
-            if image != decode(original, texture, palette_for(texture, palettes, index)):
+            if image != decode(original, texture, palette_for(texture, palettes, index)) and visible(
+                    image, texture) != visible(decode(original, texture, palette_for(texture, palettes, index)),
+                                               texture):
                 changed.add(index)
         if changed:
             segments = {start: end for start, end, _ in palette_segments(blob, palettes)}
