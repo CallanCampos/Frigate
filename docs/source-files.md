@@ -2149,7 +2149,7 @@ prints the tables below from the configs and the ROM:
 | `local_tvt_callmode.c` | `0x0219ac00`–`0x0219b3f4` | 16 | complete | string at `0x021a097c` |
 | `local_tvt_graphic.c` | `0x0219b3f4`–`0x0219b630` | 14 | complete | string at `0x021a0994` |
 | `local_tvt_message.c` | `0x0219b630`–`0x0219be0c` | 29 | complete | string at `0x021a09a8` |
-| `local_tvt_util.c` | `0x0219be0c`–`0x0219d558` | 51 | partial | string at `0x021a09bc` |
+| `local_tvt_util.c` | `0x0219be0c`–`0x0219d558` | 51 | complete | string at `0x021a09bc` |
 | `local_tvt_callselect.c` | `0x0219d558`–`0x0219e3f0` | 50 | complete | string at `0x021a09d0` |
 | `local_tvt_calldata.c` | `0x0219e3f0`–`0x0219e70c` | 23 | complete | string at `0x021a09e8` |
 | `local_tvt_person.c` | `0x0219e70c`–`0x0219e908` | 8 | complete | string at `0x021a0a00` |
