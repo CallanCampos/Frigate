@@ -96,7 +96,7 @@ BOOL UnionEff_AllColosseumReady(UnionColosseum *colosseum) {
             count++;
         }
     }
-    if (count >= func_02042a78() || count >= countOneBits(mask)) {
+    if (count >= func_02042a78() || count >= MATH_CountPopulation(mask)) {
         return TRUE;
     }
     return FALSE;

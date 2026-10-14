@@ -811,7 +811,7 @@ static BOOL UnionOneself_StepParentBegin(UnionSystem *unisys, UnionSelf *situ, F
         }
         break;
     case 3:
-        if (countOneBits(situ->mycomm.unk47) > 1) {
+        if (MATH_CountPopulation(situ->mycomm.unk47) > 1) {
             return TRUE;
         }
         break;
@@ -960,7 +960,7 @@ static BOOL UnionOneself_StepOfferBegin(UnionSystem *unisys, UnionSelf *situ, Fi
         }
         break;
     case 3:
-        if (countOneBits(situ->mycomm.unk47) > 1) {
+        if (MATH_CountPopulation(situ->mycomm.unk47) > 1) {
             return TRUE;
         }
         break;

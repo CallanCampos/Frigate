@@ -126,7 +126,7 @@ void mainBackupSystemInit(u32 heapId, BackupReadErrorCallback readErrorCallback,
     BackupWriteErrorCallback writeErrorCallback) {
     svsys = GFL_HeapAllocate(heapId, sizeof(BackupSystem), FALSE, "backup_system.c", 223);
     sys_memset32(0, svsys, sizeof(BackupSystem));
-    MATH_CRC16CCITTInitTable(&svsys->crcTable, 0x1021);
+    MATHi_CRC16InitTable(&svsys->crcTable, 0x1021);
     svsys->readErrorCallback = readErrorCallback;
     svsys->writeErrorCallback = writeErrorCallback;
     svsys->cardOk = identifyGameCardBackup();

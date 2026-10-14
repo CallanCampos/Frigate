@@ -317,7 +317,7 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
         }
         break;
     case 1:
-        if (countOneBits(self->mycomm.doneMask) >= func_02042a78()) {
+        if (MATH_CountPopulation(self->mycomm.doneMask) >= func_02042a78()) {
             func_02042e9c(FALSE);
             self->mycomm.step++;
         }

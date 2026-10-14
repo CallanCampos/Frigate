@@ -42,7 +42,7 @@ static void PhotoSign_InitRandom(void) {
     sRandomInitialized = TRUE;
     MATH_InitRand32(&rand, ((u64)(u32)&rand << 32) | (u32)&rand);
     OS_GetLowEntropyData(entropy);
-    func_02077720((u8 *)digest, entropy, sizeof(entropy));
+    MATH_CalcSHA1((u8 *)digest, entropy, sizeof(entropy));
     for (i = 0; i < NELEMS(entropy); i++) {
         entropy[i] = MATH_Rand32(&rand, 0);
     }

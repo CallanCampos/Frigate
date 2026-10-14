@@ -27,7 +27,7 @@ void initTableArea(HeapID heapId) {
     sGFLStd->mti = MT_N + 1;
     sGFLStd->mag01[0] = 0;
     sGFLStd->mag01[1] = MT_MATRIX_A;
-    MATH_CRC16CCITTInitTable(&sGFLStd->crcTable, 0x1021);
+    MATHi_CRC16InitTable(&sGFLStd->crcTable, 0x1021);
 }
 
 s32 GFL_STD_MemCmp(const void *a, const void *b, u32 size) {
