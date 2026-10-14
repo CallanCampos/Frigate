@@ -1644,6 +1644,7 @@ src/system/box_savedata.c:
     .data       start:0x02099fe4 end:0x0209a0b4
 
 src/system/perapvoice.c:
+    complete
     .text       start:0x02007e20 end:0x02007fd0
     .data       start:0x0209a0b4 end:0x0209a0c4
 
