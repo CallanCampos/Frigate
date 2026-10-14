@@ -64,4 +64,4 @@ data_ov337_02182428 kind:data(any) addr:0x02182428
 data_ov337_0218242c kind:data(any) addr:0x0218242c
 data_ov337_02182440 kind:bss addr:0x02182440
 data_ov337_02182444 kind:bss addr:0x02182444
-DSProt_BSS_ov337 kind:bss addr:0x0218244c
+DSProt_WorkMulti kind:bss addr:0x0218244c

@@ -13,8 +13,9 @@
 #define REG_CARD_DATA (*(vu32 *)0x04100010)
 #define REG_SCFG_A9ROM (*(vu8 *)0x04004000)
 
-// The card's ROM control word that the system copied from the header
-#define HW_ROM_HEADER_CARD_CTRL(twl) (*(u32 *)(((twl) ? 0x02fffe60 : 0x027ffe60)))
+// The card's ROM control word that the system copied from the header, at 0x027ffe60, or 0x02fffe60 in TWL mode. DS
+// Protect computes the address from the TWL bit instead of choosing between the two.
+#define HW_ROM_HEADER_CARD_CTRL(twl) (*(u32 *)((((twl) + 5) << 23) - 0x1a0))
 
 // Bytes of the first MAC address whose reversed bits an emulator has
 static const u8 sEmulatorMacMulti[6] = { 0xff, 0xf6, 0x40, 0xff, 0xff, 0xce };
@@ -151,7 +152,7 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
     int i;
 
     reg_MI_EXMEMCNT &= ~0x0800;
-    control = (HW_ROM_HEADER_CARD_CTRL((REG_SCFG_A9ROM & 1) != 0) & ~0x07000000) | 0xa1000000;
+    control = (HW_ROM_HEADER_CARD_CTRL(REG_SCFG_A9ROM & 1) & ~0x07000000) | 0xa1000000;
     offset = -(int)(address & 0x1ff);
     while (REG_ROMCTRL & 0x80000000) {
     }

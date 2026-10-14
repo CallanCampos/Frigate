@@ -23404,6 +23404,7 @@ overlays/ov337 0x021823b4 DSProt_DecryptDetectMulti
 overlays/ov337 0x021823f0 DSProt_EncryptCodeEntryMulti
 overlays/ov337 0x02182408 DSProt_DecryptCodeEntryMulti
 overlays/ov337 0x0218240c sEncryptedKeyMulti
+overlays/ov337 0x0218244c DSProt_WorkMulti
 overlays/ov338 0x0217c940 IrCheck_ReadId
 overlays/ov338 0x0217ca24 IrCheck_WaitBusy
 overlays/ov338 0x0217ca34 IrCheck_SetControl
