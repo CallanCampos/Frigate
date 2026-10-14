@@ -37,7 +37,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
     u32 trainerId = poke->trainerId;
     u32 species = poke->species;
     u64 pid;
-    u32 gender = poke->gender;
+    u8 gender = poke->gender;
     u32 abilityType = poke->abilityType;
     u32 ability;
     u32 ivs;

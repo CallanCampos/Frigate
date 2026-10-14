@@ -8,6 +8,6 @@
 #include "struct_decls.h"
 
 // NULL when the gift's Pokémon is not valid
-PartyPkm *func_ov012_02153160(MysteryGift *gift, HeapID heapId, GameData *gameData);
+PartyPkm *func_ov012_02153160(const MysteryGift *gift, HeapID heapId, GameData *gameData);
 
 #endif // POKEBW2_FIELD_MYSTERY_GIFT_POKEMON_H
