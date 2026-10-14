@@ -436,7 +436,7 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
     minZ = playerZ - SEARCH_TOP;
     maxZ = playerZ + SEARCH_BOTTOM;
     DowsingHit hit = { HIT_NONE, NULL };
-    DowsingHit best = { HIT_NONE, NULL };
+    DowsingHit best = hit;
     bestDistance = -1;
 
     if (work->searchRestart) {
