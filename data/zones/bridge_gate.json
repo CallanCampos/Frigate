@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 118,
+    "area": "AREA_BRIDGE_GATE",
     "matrix": "MAP_MATRIX_BRIDGE_GATE",
     "scripts": "SCRIPTS_BRIDGE_GATE",
     "text": "SCRIPT_TEXT_BRIDGE_GATE",

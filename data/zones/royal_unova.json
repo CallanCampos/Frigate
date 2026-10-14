@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 17,
     "npc_cache": 24,
-    "area": 337,
+    "area": "AREA_ROYAL_UNOVA",
     "matrix": "MAP_MATRIX_ROYAL_UNOVA",
     "scripts": "SCRIPTS_ROYAL_UNOVA",
     "text": "SCRIPT_TEXT_ROYAL_UNOVA",

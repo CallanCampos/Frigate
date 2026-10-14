@@ -35,6 +35,7 @@ NAMED_DATA = [
     ("places", "data/places", "PLACE_", ".json"),
     ("field_scripts", "data/field_scripts", "SCRIPTS_", ".s"),
     ("map_matrices", "data/map_matrices", "MAP_MATRIX_", ".json"),
+    ("areas", "data/areas", "AREA_", ".json"),
     ("map_models", "data/map_models", "MAP_MODEL_", "/"),
     ("map_texture_sets", "data/map_texture_sets", "MAP_TEXTURE_SET_", "/"),
     ("field_props_exterior", "data/field_prop_models/exterior", "FIELD_PROPS_EXTERIOR_", "/"),

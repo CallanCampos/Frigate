@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 242,
+    "area": "AREA_POKESTAR_STUDIOS",
     "matrix": "MAP_MATRIX_POKESTAR_STUDIOS",
     "scripts": "SCRIPTS_POKESTAR_STUDIOS",
     "text": "SCRIPT_TEXT_POKESTAR_STUDIOS",

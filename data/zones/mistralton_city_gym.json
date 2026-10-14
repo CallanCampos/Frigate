@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 309,
+    "area": "AREA_MISTRALTON_CITY_GYM",
     "matrix": "MAP_MATRIX_MISTRALTON_CITY_GYM",
     "scripts": "SCRIPTS_MISTRALTON_CITY_GYM",
     "text": "SCRIPT_TEXT_MISTRALTON_CITY_GYM",

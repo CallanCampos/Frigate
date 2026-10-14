@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 283,
+    "area": "AREA_BLACK_CITY_POKEMON_CENTER",
     "matrix": "MAP_MATRIX_BLACK_CITY_POKEMON_CENTER",
     "scripts": "SCRIPTS_LACUNOSA_TOWN_POKEMON_CENTER",
     "text": "SCRIPT_TEXT_LACUNOSA_TOWN_POKEMON_CENTER",
