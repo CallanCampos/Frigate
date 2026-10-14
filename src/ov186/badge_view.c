@@ -1281,21 +1281,29 @@ static void BadgeView_Update(BadgeViewWork *wk) {
 // the Gym Leader's picture's
 static void BadgeView_StartMove(BadgeViewWork *wk, int move) {
     int from;
+    s16 to;
+    s16 frames;
     s16 half;
 
     from = sBadgeViewMoves[move].from;
-    BadgeView_StartValue(wk, 0, from, sBadgeViewMoves[move].to, sBadgeViewMoves[move].frames);
+    to = sBadgeViewMoves[move].to;
+    frames = sBadgeViewMoves[move].frames;
+    BadgeView_StartValue(wk, 0, from, to, frames);
     wk->scrollY = from;
     GFL_BGSysMoveBG(7, BG_MOVE_SET_Y, from);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->scrollY);
     wk->moveSeq = sBadgeViewMoves[move].moveSeq;
     half = move / 2;
     from = sBadgeViewLeaderMoves[half * 4];
-    BadgeView_StartValue(wk, 1, from, sBadgeViewLeaderMoves[half * 4 + 1], sBadgeViewLeaderMoves[half * 4 + 3]);
+    to = sBadgeViewLeaderMoves[half * 4 + 1];
+    frames = sBadgeViewLeaderMoves[half * 4 + 3];
+    BadgeView_StartValue(wk, 1, from, to, frames);
     BadgeView_SetLeadersX(wk, from);
     half = move / 2;
     from = sBadgeViewModelMoves[half * 4];
-    BadgeView_StartValue(wk, 2, from, sBadgeViewModelMoves[half * 4 + 1], sBadgeViewModelMoves[half * 4 + 3]);
+    to = sBadgeViewModelMoves[half * 4 + 1];
+    frames = sBadgeViewModelMoves[half * 4 + 3];
+    BadgeView_StartValue(wk, 2, from, to, frames);
     wk->srt.translation.x = from << 8;
 }
 
