@@ -2072,7 +2072,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mictest.c` | `0x0217c940`–`0x0217d648` | 46 | partial | string at `0x0217d800` |
+| `mictest.c` | `0x0217c940`–`0x0217d648` | 46 | complete | string at `0x0217d800` |
 
 ### Overlay 255
 

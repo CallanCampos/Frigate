@@ -82,6 +82,15 @@ text to `grep -n` there. Entries without a key come from later work and still be
   the member array and stepped, `p = s->arr; p += i;`. (matching.md: "keeps a loaded index in its own register")
 - A whole function's registers off, with an element's base added before its index and field offset: the inline
   reads through `T *p = &arr[i];`. (matching.md: "Reads through such a pointer in an inline")
+- A table field passed to a call through its own argument register (`ldr r3, =...; ldrsh r3, [r3, r4]`), where
+  the original uses the lowest free one (`ldr r1, =...; ldrsh r3, [r1, r4]`): read it into one local that every
+  block making the same call assigns. (matching.md: "picks the register of an argument's address")
+- A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`): two accesses
+  to `p[i].f` through a pointer variable that MWCC's first CSE pass did not merge, as in `f[i].b += v`;
+  `(&p->f)[i * 2]` folds back to index first. (matching.md: "its first common-subexpression pass did")
+- Every register moved by a field that the caller keeps in a saved register after an inline read it, where the
+  original loads it again: the inline takes a `const T *`, even from a caller's plain pointer.
+  (matching.md: "a `const` pointer from a caller whose")
 
 ## Stack slots or frame size
 
@@ -122,6 +131,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   across the first call. (matching.md: "spilled temporary takes its slot by where its first use")
 - A long-lived local spilled by a loop that stores two fields of `list[i]`: store through `T *entry = &list[i];`.
   (matching.md: "keeps the offset live as a third temporary")
+- A struct local's members in the lowest slots, every declared slot moved up: MWCC split it, since its address
+  did not survive into the optimizer; an initializer, a real call with `&s`, a copy through memory or a pointer
+  live across blocks keeps it whole. (matching.md: "split into one variable per member")
+- A register parameter stored at entry and loaded back from its slot, where ours copies it out of the register:
+  the parameter is narrower than `int` (for a static helper, the type its public caller passes); loop with a
+  separate `int` counter. (matching.md: "A register parameter stored at entry and read back from its slot")
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
 
 ## Instructions in another order (scheduling)
@@ -195,6 +210,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `const` table read before I/O register stores: it was written before them. (matching.md: "not moved across stores to I/O")
 - A global's address loaded early into a saved register, before unrelated calls: take it into a pointer local
   there. (matching.md: "A global's address that the original loads early")
+- A static table's address loaded into a saved register at entry after a parameter's spill, where the original
+  loads it first: drop the pointer local aliasing the table and index the table at each use.
+  (matching.md: "A static table's address that MWCC gathers")
 
 ## An instruction too many or too few
 
@@ -217,6 +235,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
   a sum that adds a counter known to be 0, has an enum counter. (matching.md: "enum type")
+- A constant kept in a callee-saved register for calls, then reduced at run time before a field store
+  (`subs r6, #0x20; str r6, [r5, #8]`), where ours folds it: assign the field, then update it in place,
+  `p->size = size; p->size -= 0x20;`. (matching.md: "reduced at run time before a field store")
 - A local holding a constant keeps its own register or slot, while a literal is hoisted.
   (matching.md: "holds a constant, like")
 - An address computed before calls is reused after them only when the expression is the same, types included. An
@@ -229,6 +250,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   to the element, whichever the original does. (matching.md: "pointer to an array element")
 - A value a loop uses and the code after it uses again is reused from the hoisted copy, unless it is a variable
   declared in the loop body. (matching.md: "reused from the copy hoisted")
+- An index product computed once, spilled and shared by every use with the index dropped and a constant folded
+  into the base (`(base + 8)[p * 4]`), where ours keeps `p` and computes `(p + 2) * 4`: declare the index `long`,
+  the SDK's `s32`. (matching.md: "`long` where the SDK types it `s32`")
 - An address passed to a `const` pointer parameter is converted, and not shared. (matching.md: "`const` pointer parameter is converted")
 - An element's address formed twice in two shapes, or a field loaded again after an inline read it: the callee or
   the inline takes a `const` pointer, even in another file. (matching.md: "The callee can be in another file"),
@@ -279,6 +303,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
   code was written there. (matching.md: "Identical statements in different branches")
 - A branch to the next instruction comes from cross-jumping a shared tail. (matching.md: "cross-jumping")
+- A load at the top of both arms of an `if`/`else`, where ours hoists it between the test and the branch: one
+  arm began with another statement, as `destPixel--;`.
+  (matching.md: "A load that both arms of an `if`/`else` begin with")
 - `bne next; b target` where `||` gives one `beq`: the same body in both arms of an `if`/`else if`. (matching.md:
   "`bne next; b hide`")
 - Early `return FALSE`s go to one shared tail only when the C has one trailing return (an `if`/`else if` chain, or a
