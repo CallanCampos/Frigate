@@ -550,11 +550,10 @@ static void MysteryCardView_ClearPage(MysteryCardView *view, BOOL shown) {
 }
 
 static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL left, u32 page, u16 index, HeapID heapId) {
-    u32 slot = index + page * 4;
-    MysteryCard *card = &view->cards[slot];
+    ArcTool *arc;
+    MysteryCard *card = &view->cards[index + page * 4];
     MysteryCardPos pos = sCardPositions[index];
     u32 win = index;
-    ArcTool *arc;
     ClActorSetup actorSetup;
     s16 dx;
     s16 dy;
@@ -572,7 +571,7 @@ static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL lef
 
         for (j = 0; j < 2; j++) {
             for (i = 0; i < 2; i++) {
-                u8 num = slot;
+                u8 num = index + page * 4;
 
                 GFL_BGSysFillScrArea(3, num % 3 * 64 + 0x58 + num / 3 * 2 + j * 32 + i, pos.x + i - 2, pos.y + j, 1, 1,
                                      3);
@@ -643,7 +642,7 @@ static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL lef
                                      &actorSetup, 0, view->heapId);
     func_0204c378(view->icons[win], (u8)MysteryCard_GetPokeIconPalette(card), 0);
     func_0204c124(view->icons[win], TRUE);
-    if (view->moving && view->moveSlot == slot) {
+    if (view->moving && view->moveSlot == index + page * 4) {
         cursorPos.x = sCardPositions[index].x * 8 - 24;
         cursorPos.y = sCardPositions[index].y * 8 - 8;
         if (!shown) {
@@ -1396,7 +1395,7 @@ static void MysteryCardView_SeqThrowAway(MysterySeq *seq, u32 *state, void *work
 // Puts the card being moved where the cursor is, swapping it with the card there
 static void MysteryCardView_SeqMove(MysterySeq *seq, u32 *state, void *work) {
     MysteryCardView *view = work;
-    u32 slot = view->cursor + view->page * 4;
+    u32 slot = MysteryCardView_GetSlot(view);
 
     switch (*state) {
     case 0:
@@ -1415,16 +1414,9 @@ static void MysteryCardView_SeqMove(MysterySeq *seq, u32 *state, void *work) {
     case 1: {
         u8 pos1 = slot % 4;
         u8 pos2 = view->moveSlot % 4;
-        BOOL shown1;
+        BOOL shown1 = view->page == slot / 4;
         BOOL shown2 = view->page == view->moveSlot / 4;
-        int windows;
-
-        if (view->page == slot / 4) {
-            shown1 = TRUE;
-        } else {
-            shown1 = FALSE;
-        }
-        windows = GX_WNDMASK_NONE;
+        int windows = GX_WNDMASK_NONE;
 
         if (shown1) {
             windows |= GX_WNDMASK_W0;
