@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 21,
     "npc_cache": 24,
-    "area": 246,
+    "area": "AREA_MARINE_TUBE",
     "matrix": "MAP_MATRIX_MARINE_TUBE",
     "scripts": "SCRIPTS_MARINE_TUBE",
     "text": "SCRIPT_TEXT_MARINE_TUBE",

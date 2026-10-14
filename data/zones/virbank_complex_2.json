@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 218,
+    "area": "AREA_VIRBANK_CITY",
     "matrix": "MAP_MATRIX_VIRBANK_COMPLEX_2",
     "scripts": "SCRIPTS_VIRBANK_COMPLEX_2",
     "text": "SCRIPT_TEXT_VIRBANK_COMPLEX_2",

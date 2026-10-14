@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 295,
+    "area": "AREA_DRAGONSPIRAL_TOWER_3",
     "matrix": "MAP_MATRIX_DRAGONSPIRAL_TOWER_8",
     "scripts": "SCRIPTS_DRAGONSPIRAL_TOWER_8",
     "text": "SCRIPT_TEXT_DRAGONSPIRAL_TOWER_8",

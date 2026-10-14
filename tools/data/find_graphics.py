@@ -16,10 +16,10 @@ from tools.data.datajson import value  # noqa: E402
 def find(zone):
     path = ROOT / "data/zones" / f"{zone}.json"
     header = json.loads(path.read_text())
-    area_id = header["area"]
-    area = json.loads((ROOT / "data/areas" / f"{area_id:03d}.json").read_text())
+    area_path = ROOT / "data/areas" / (header["area"].removeprefix("AREA_").lower() + ".json")
+    area = json.loads(area_path.read_text())
     print(f"Zone: {path.relative_to(ROOT)}")
-    print(f"Area: {area_id}")
+    print(f"Area: {area_path.relative_to(ROOT)}")
     print(f"Textures: {directories('a/0/1/4')[value(area['texture_set'], zone)].relative_to(ROOT)}")
     kind = "exterior" if area["exterior"] else "interior"
     if isinstance(area["prop_bundle"], str):

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 134,
+    "area": "AREA_ANVILLE_TOWN",
     "matrix": "MAP_MATRIX_NATURE_PRESERVE",
     "scripts": "SCRIPTS_NATURE_PRESERVE",
     "text": "SCRIPT_TEXT_NATURE_PRESERVE",

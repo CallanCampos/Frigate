@@ -45,7 +45,7 @@ which documents the format and can write them again.
 | `a/1/7/4` | `data/field_prop_textures/exterior/<bundle>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
 | `a/1/7/5` | `data/field_prop_textures/interior/<bundle>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
 | `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
-| `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
+| `a/0/1/3` | `data/areas/<area>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
@@ -692,13 +692,17 @@ none), row by row,
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
 
-Each area is `data/areas/<number>.json`, numbered from `000` in record order. These are the records of `a/0/1/3`
-(`AreaData`), which name the graphics that zones share: their props, textures, animations (null for none), lights and
-colors. The props and texture set are named by their constants (see [Map model sources](#map-model-sources)), or by
-number for the few props that the archive doesn't have; the rest are file numbers. A zone's header names its area by
-its number, and
-an area with seasons has a record per season after it. `data/areas/area.schema.json` describes one record and
-`tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
+Each area is `data/areas/<area>.json`, named after its constant in `data/constants/areas.txt`, in whose order
+`a/0/1/3` has the records (`AreaData`), which name the graphics that zones share: their props, textures, animations
+(null for none), lights and colors. The props and texture set are named by their constants (see
+[Map model sources](#map-model-sources)), or by number for the few props that the archive doesn't have; the rest are
+file numbers. A zone's header names its area by its constant. The field reads the record of the area plus a variant
+(`AreaData_Create`): the season for an area with seasons (records 2 to 0x119, `AreaData_HasSeasons`), whose records
+after the first are named `_SUMMER`, `_AUTUMN` and `_WINTER`, and other state for three other ranges
+(`func_02018f60`, `func_02018f78` and `func_02018f90` in `fieldmap.c`), whose records after the zone's are numbered
+from `_2`. An area is named after the first zone whose header names it, and the 81 records that nothing names, by
+their number; `make_constants.py --areas` bootstrapped the list. `data/areas/area.schema.json` describes one record
+and `tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
 
 An area's lights are a lighting set, `data/lights/field/<n>.json` (`a/0/6/0`, `ARCID_LIGHTS_FIELD`), by its number;
 the battles' are `data/lights/battle/<n>.json` (`a/0/6/1`). A set is the periods of the day, which

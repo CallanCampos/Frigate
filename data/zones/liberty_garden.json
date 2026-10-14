@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 19,
     "npc_cache": 15,
-    "area": 86,
+    "area": "AREA_UNITY_TOWER",
     "matrix": "MAP_MATRIX_OVERWORLD",
     "scripts": "SCRIPTS_LIBERTY_GARDEN",
     "text": "SCRIPT_TEXT_LIBERTY_GARDEN",

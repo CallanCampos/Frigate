@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 340,
+    "area": "AREA_ABYSSAL_RUINS",
     "matrix": "MAP_MATRIX_ABYSSAL_RUINS_5",
     "scripts": "SCRIPTS_ABYSSAL_RUINS_5",
     "text": "SCRIPT_TEXT_ABYSSAL_RUINS_5",
