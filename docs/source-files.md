@@ -163,7 +163,7 @@ prints the tables below from the configs and the ROM:
 | `comm_player.c` | `0x021613d0`–`0x02161844` | 12 | complete | string at `0x0216e2e4` |
 | `bsubway_comm.c` | `0x02161844`–`0x02161c88` | 27 | complete | descriptive |
 | `fld_btl_inst_event.c` | `0x02161c88`–`0x02161f6c` | 4 | complete | descriptive |
-| `fld_btl_inst_tool.c` | `0x02161f6c`–`0x02162b64` | 22 | partial | string at `0x0216e36c` |
+| `fld_btl_inst_tool.c` | `0x02161f6c`–`0x02162b64` | 22 | complete | string at `0x0216e36c` |
 | `event_cgear_poweron.c` | `0x02162b64`–`0x02162c48` | 3 | complete | descriptive |
 | `event_trial_house.c` | `0x02162c48`–`0x02162f44` | 6 | complete | descriptive |
 | `ev_time.c` | `0x02162f44`–`0x021631c8` | 13 | complete | descriptive |

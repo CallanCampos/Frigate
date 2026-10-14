@@ -284,6 +284,7 @@ src/ov012/fld_btl_inst_event.c:
     .text       start:0x02161cc8 end:0x02161fac
 
 src/ov012/fld_btl_inst_tool.c:
+    complete
     .text       start:0x02161fac end:0x02162ba4
     .rodata     start:0x0216d9ec end:0x0216dac8
     .data       start:0x0216e3ac end:0x0216e3c0
