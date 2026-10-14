@@ -451,14 +451,14 @@ static void func_0203b148(FooterCheck *check, SaveData *sv, u8 *data, u32 copy) 
 
 // Loads a save with a backup, taking each block from a copy that has it right
 static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
-    u8 *data;
-    u32 end;
     u8 *mainData;
     u8 *backupData;
     u16 *crcs;
     u32 offset;
     u32 size;
+    u32 end;
     u32 copyIndex;
+    u8 *data;
     u32 i;
     FooterCheck backupCheck;
     BlockFooter *dataFooter;
@@ -550,13 +550,13 @@ static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
             offset = getStartOffsetOfSaveBlockDataInSave(sv->table, i);
             size = getSizeOfSaveBlockData(sv->table, i);
             end = offset + size;
+            dataFooter = (BlockFooter *)(data + end);
             mainFooter = (BlockFooter *)(mainData + end);
             backupFooter = (BlockFooter *)(backupData + end);
             func_0203bdbc(sv, i, BLOCK_STATUS_OK);
             if (mainFooter->crc != crcs[i] && backupFooter->crc != crcs[i]) {
                 break;
             }
-            dataFooter = (BlockFooter *)(data + end);
             if (mainFooter->crc == crcs[i]) {
                 if (mainFooter->crc != MATH_CalcCRC16CCITT(&svsys->crcTable, mainData + offset, size)) {
                     func_0203bdbc(sv, i, BLOCK_STATUS_WRITE_MAIN);
