@@ -1180,6 +1180,7 @@ src/system/daycare_savedata.c:
     .text       start:0x0200c3a8 end:0x0200c598
 
 src/system/trainer_game_info_savedata.c:
+    complete
     .text       start:0x0200c7a0 end:0x0200cb44
 
 src/system/battle_rec.c:
