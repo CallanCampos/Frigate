@@ -5,6 +5,7 @@
     .bss        start:0x021bea00 end:0x021bea20 kind:bss align:32
 
 src/ov197/mystery.c:
+    complete
     .text       start:0x021b5420 end:0x021b8348
     .rodata     start:0x021be2dc end:0x021be364
     .data       start:0x021be980 end:0x021be98c
