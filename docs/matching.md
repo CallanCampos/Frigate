@@ -290,6 +290,13 @@ Same instructions, registers swapped.
   `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
   order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
   and declared first stores it right after the subtraction.
+- In NitroSystem's 2.0/sp2p2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
+  written in place it loads `a` first (`g2d_Animation.c`'s `SequenceEdgeHandle_` clamps through
+  `GetLastFrame_(seq)`). Spilled locals take slots from the top of the frame down: the function's locals, then an
+  `if` block's, then its `else` block's, each in declaration order, then an inline's in reverse, so a slot order no
+  block layout gives needs the locals at function scope (`NNS_G2dInitMCAnimationInstance`). A second loop that
+  reuses the first loop's counter swaps registers with its block's temporary, where a counter of its own declared
+  after the others doesn't (`gfd_LinkedListTexVramMan.c`'s `NNS_GfdResetLnkTexVramState`).
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through

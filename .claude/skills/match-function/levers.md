@@ -111,6 +111,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A NitroSystem (2.0/sp2p2) function's spill slots in another order: locals are slotted function scope first, then
+  the `if` block's, then the `else` block's, then inlines' in reverse; move them to function scope.
+  (matching.md: "In NitroSystem's 2.0/sp2p2 code a pointer sum")
 - A narrow local's stack slot swapped with another's where the original slots it like a temporary: make every
   callee parameter it is passed to the same type. (matching.md: "A narrow local passed to several calls")
 - An extra slot holding a copy of an address-taken local before a nested loop: read its field inside the inner loop,
