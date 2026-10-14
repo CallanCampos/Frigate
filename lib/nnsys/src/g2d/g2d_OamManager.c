@@ -38,6 +38,10 @@ static void CpuLoadOAMMain_(const void *src, u32 offset, u32 size) {
 }
 
 // Whether every entry of usedBy from from to last is free
+static inline OamBuffer *GetOamBuffer_(NNSG2dOamType type) {
+    return &oamBuffers_[type];
+}
+
 static inline BOOL IsRegionFree_(const u16 *usedBy, u16 from, u16 last) {
     const u16 *p;
 
@@ -98,7 +102,8 @@ void NNS_G2dInitOamManagerModule(void) {
                  sizeof(oamBuffers_[0].affineUsedBy));
 }
 
-BOOL NNS_G2dGetNewOamManagerInstanceAsFastTransferMode(NNSG2dOamManagerInstance *man, u16 from, u16 num, u32 type) {
+BOOL NNS_G2dGetNewOamManagerInstanceAsFastTransferMode(NNSG2dOamManagerInstance *man, u16 from, u16 num,
+                                                       NNSG2dOamType type) {
     u16 last = from + (num - 1);
     OamBuffer *buffer = &oamBuffers_[type];
 
@@ -123,7 +128,7 @@ BOOL NNS_G2dGetNewOamManagerInstanceAsFastTransferMode(NNSG2dOamManagerInstance 
 
 BOOL NNS_G2dEntryOamManagerOamWithAffineIdx(NNSG2dOamManagerInstance *man, const GXOamAttr *oam, u16 affineIdx) {
     if (IsCapacityEnough_(&man->managedAttrRegion, 1)) {
-        GXOamAttr *dst = &oamBuffers_[man->type].oamBuffer[man->managedAttrRegion.currentIdx];
+        GXOamAttr *dst = &GetOamBuffer_(man->type)->oamBuffer[man->managedAttrRegion.currentIdx];
 
         dst->attr0 = oam->attr0;
         dst->attr1 = oam->attr1;
@@ -139,7 +144,7 @@ BOOL NNS_G2dEntryOamManagerOamWithAffineIdx(NNSG2dOamManagerInstance *man, const
 
 u16 NNS_G2dEntryOamManagerAffine(NNSG2dOamManagerInstance *man, const MtxFx22 *mtx) {
     if (IsCapacityEnough_(&man->managedAffineRegion, 1)) {
-        GXOamAttr *dst = &oamBuffers_[man->type].oamBuffer[man->managedAffineRegion.currentIdx * 4];
+        GXOamAttr *dst = &GetOamBuffer_(man->type)->oamBuffer[man->managedAffineRegion.currentIdx * 4];
         u16 affineIdx = man->managedAffineRegion.currentIdx;
 
         dst[0].affineParam = mtx->_00 >> 4;
@@ -216,13 +221,13 @@ void NNS_G2dApplyOamManagerToHW(NNSG2dOamManagerInstance *man) {
 void NNS_G2dResetOamManagerBuffer(NNSG2dOamManagerInstance *man) {
     if (man->bFastTransferMode) {
         u32 size = GetOamSize_(&man->managedAttrRegion);
-        GXOamAttr *oam = &oamBuffers_[man->type].oamBuffer[man->managedAttrRegion.fromIdx];
+        GXOamAttr *oam = &GetOamBuffer_(man->type)->oamBuffer[man->managedAttrRegion.fromIdx];
 
         cp15_invalidateDC(oam, size);
         GXi_DmaFill32(GXi_DmaId, oam, 0xc0, size);
     } else {
         u16 i;
-        GXOamAttr *oam = &oamBuffers_[man->type].oamBuffer[man->managedAttrRegion.fromIdx];
+        GXOamAttr *oam = &GetOamBuffer_(man->type)->oamBuffer[man->managedAttrRegion.fromIdx];
         u16 num = man->managedAttrRegion.toIdx - man->managedAttrRegion.fromIdx + 1;
 
         for (i = 0; i < num; i++) {
