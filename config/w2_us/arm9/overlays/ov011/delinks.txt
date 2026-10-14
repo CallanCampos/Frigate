@@ -35,3 +35,6 @@ lib/nitrowifi/src/soc/socl_startup.c:
 lib/nitrowifi/src/soc/socl_command.c:
     .text       start:0x02156040 end:0x02156240
     .bss        start:0x0218dc60 end:0x0218dc84
+
+lib/nitrowifi/src/soc/socl_create.c:
+    .text       start:0x02156240 end:0x0215650c

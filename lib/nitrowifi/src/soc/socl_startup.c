@@ -18,14 +18,10 @@ extern const char SOCLi_Signature[];
 SOCLConfig *SOCLiConfigPtr = NULL;
 u32 SOCLiDefaultLanBufferSize = 0x4000;
 
-// SOCLiDhcpState: DHCP is in use, and it has finished (or the address is static)
-#define SOCLI_DHCP_REQUESTED 1
-#define SOCLI_DHCP_DONE 2
-
 static u32 SOCLiYieldWait;
-static CPSInAddr SOCLiRequestedIP;
-static u32 SOCLiDhcpState;
-static int SOCLiUDPSendSocket;
+CPSInAddr SOCLiRequestedIP;
+u32 SOCLiDhcpState;
+SOCLSocket *SOCLiUDPSendSocket;
 CPSConfig SOCLiCPSConfig;
 
 int SOCL_Startup(SOCLConfig *config) {
@@ -50,7 +46,7 @@ static int SOCLi_StartupSOCL(void) {
     int result = SOCLi_StartupCommandPacketQueue(SOCLiConfigPtr->cmd_packet_max);
 
     if (result >= 0) {
-        SOCLiUDPSendSocket = SOCL_CreateSocket(&SOCLSocketParamUDPSend);
+        SOCLiUDPSendSocket = (SOCLSocket *)SOCL_CreateSocket(&SOCLSocketParamUDPSend);
     }
     return result;
 }

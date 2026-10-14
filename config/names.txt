@@ -2573,6 +2573,7 @@ overlays/ov011 0x02157714 SOCL_CalmDown
 overlays/ov011 0x02157764 SOCL_Resolve
 overlays/ov011 0x021577d8 SOCL_InetAtoH
 overlays/ov011 0x02157978 SOCLi_RoundUp4
+overlays/ov011 0x02157af0 SOCLi_SocketRegister
 overlays/ov011 0x02157bd0 SOC_Socket
 overlays/ov011 0x02157c10 SOC_Connect
 overlays/ov011 0x02157d30 SOC_Shutdown

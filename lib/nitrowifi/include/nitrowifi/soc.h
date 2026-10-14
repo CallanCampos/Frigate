@@ -28,19 +28,38 @@ typedef struct SOCLConfig {
     s32 rwin;             // TCP's receive window, 0 for 0x10c0
 } SOCLConfig;
 
-// How a socket is created: SOCLSocketParamTCP, SOCLSocketParamUDP and SOCLSocketParamUDPSend (soc.c)
+// The thread of a socket's command pipe, and how many packets it queues
+typedef struct SOCLPipeParam {
+    u16 stack_size;
+    u8 priority;
+    u8 queue_length;
+} SOCLPipeParam;
+
+// How a socket is created: SOCLSocketParamTCP, SOCLSocketParamUDP and SOCLSocketParamUDPSend (soc.c). A socket has a
+// receive pipe when rcvbuf_size is not 0 and a send pipe when sndbuf_size is not 0; without one it uses the UDP send
+// socket's.
 typedef struct SOCLSocketParam {
     s8 flag_mode;
     s8 flag_block;
     struct {
         u16 rcvbuf_size;
         u16 rcvbuf_consume_min;
-        u8 unk6[0x12];
+        u16 sndbuf_size;
+        u16 rcvbuf_aux_size;
+        u16 sndbuf_aux_size;
+        u16 sndpipe_buf_size;
+        u16 rcvpipe_unk_e;
     } buffer;
+    SOCLPipeParam rcv_pipe;
+    SOCLPipeParam snd_pipe;
 } SOCLSocketParam;
 
 extern SOCLSocketParam SOCLSocketParamTCP;
 extern SOCLSocketParam SOCLSocketParamUDPSend;
+
+// SOCL's errors, as negative return values (BSD's numbers)
+#define SOCL_ENETRESET (-39) // SOCL has not been started
+#define SOCL_ENOMEM (-49)
 
 int SOCL_Startup(SOCLConfig *config);
 int SOCL_CreateSocket(const SOCLSocketParam *param);

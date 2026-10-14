@@ -398,6 +398,7 @@ in both versions.
 | `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_SetMyIP` | `0x02155f98` / `0x02155fd8` | Same size, 2 bytes: `SOCLiDhcpState` is `[r1, #8]` from the `.bss` base, as in `SOCLi_StartupCPS`. |
 | `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_DhcpTimeout` | `0x02155fdc` / `0x0215601c` | Same size, 2 bytes: as `SOCLi_SetMyIP`. |
 | `lib/nitrowifi/src/soc/socl_command.c` | `SOCLi_CleanupCommandPacketQueue` | `0x0215605c` / `0x0215609c` | 0x30 against the original's 0x2c: the original reaches the file's `.bss` statics from one base (`ldr r4, =0x0218dc20`, `SOCLiCommandPackets` at `[r4]`, the queue's `msgCount` and `usedCount` as `[r4, #0x18]` and `[r4, #0x20]`), where ours loads each variable's own address, as in `socl_startup.c`. Nothing else differs. |
+| `lib/nitrowifi/src/soc/socl_create.c` | `SOCL_CreateSocket` | `0x02156200` / `0x02156240` | Same size (0x7c), 35 bytes: the original keeps the socket in `r5` and the constant 1 in `r4` (ours has them swapped) and builds the "socket is created" and "is TCP" tests as BOOLs in `r1` (`movs r1, #0 ... adds r1, r4, #0 ... cmp r1, #0`), where ours tests directly with `cmp r4, #0` and branches. Tried: both tests as inline BOOL helpers in four spellings each (multi-return, result variable, nested ifs; the variable forms fold the tests away to 0x74), and the socket held as an `int` handle. |
 
 ## Matching, but not linkable as is
 
