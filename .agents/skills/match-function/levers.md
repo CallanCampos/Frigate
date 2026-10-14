@@ -7,6 +7,14 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A table's base and index swapped between the two registers (`ldr r4, =table; muls; adds r4, r4, r2` in the
+  original): index the table in a `static inline` taking the index as an enum type. (matching.md: "A table indexed
+  by a field")
+- A narrow stack parameter read from its slot at each use where the original loads it into a saved register at
+  entry: declare the parameter `const`. (matching.md: "A narrow stack parameter used twice")
+- An index kept in two registers (copied after a division and again before a multiply) where ours keeps one: a
+  `const` struct parameter with its pointer field read at each use. (matching.md: "A pointer field read through a
+  `const` parameter")
 - A stack-passed parameter kept on the stack where the original loads it into a saved register: copy it into a
   local of the other signedness (`int pos = index;`). (matching.md: "A 32-bit parameter passed on the stack")
 - A 64-bit sum of products in other registers, or an `ldm` of two fields where the original has two `ldr`: build

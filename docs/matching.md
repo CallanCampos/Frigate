@@ -290,6 +290,18 @@ Same instructions, registers swapped.
   `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
   order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
   and declared first stores it right after the subtraction.
+- A table indexed by a field, with the base in the higher register and the index's product added into the lower
+  one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
+  `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
+  `GetOamBuffer_(NNSG2dOamType type)` returning `&oamBuffers_[type]`, which matches `NNS_G2dEntryOamManagerAffine`,
+  `NNS_G2dEntryOamManagerOamWithAffineIdx` and both branches of `NNS_G2dResetOamManagerBuffer`. The same helper
+  with a `u32` or `int` parameter, a cast to the enum, or an enum-typed field alone keeps the swap.
+- A narrow stack parameter used twice is read from its slot at each use, and declared `const` it is loaded once at
+  entry into a saved register: `g3d_system.c`'s `GFL_G3DSysCreate` takes `const HeapID heapId`, loaded into `r7`
+  at entry (`add r0, sp, #0x68; ldrh r7, [r0, #4]`), which moves MWCC's cached `&g_G3DSystem` out of `r7` and
+  gives every register the original's. A plain copy of the same type folds back into the parameter; a `const`
+  copy, or a copy of another width, works only when both uses go through it. The prototype in the header can stay
+  without the `const`, which isn't part of the function's type.
 - A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
   counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
   tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter
@@ -1175,6 +1187,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   pointer is not `const`: `bmp.c`'s `ClipCopyArea` takes `const GFLBitmap *dest`, and `GFL_BitmapCopyArea_IDX4`,
   `_IDX8` and `GFL_BitmapCopyAreaRebased_IDX8` load `dest->width` again after it for their tile counts, as the
   original does, where with a plain `dest` the clip's load stays live in a saved register and every register moves.
+  A pointer field read through a `const` parameter at each use is loaded once into a compiler temporary, which the
+  allocator places apart from the index: `ica_anime.c`'s `GFL_G3DCurveGetNowTranslationLoop` and its rotation and
+  scale siblings keep the remainder both in `r2` after `__aeabi_uidivmod` and in `r3` for `* 12`, as the original
+  does, only with `const G3DCurve *curve`, `frame %= curve->frameCount` and `curve->translations[frame].x` (`.y`,
+  `.z`) written out; a `values` local or a separate index keeps one of the two copies.
 - Reads of a `const` table at a constant index are folded into immediates, but reads in a loop over the table are not,
   even when the loop runs once and is unrolled. An `ldm` from a table straight into argument registers is two fields
   read in such a loop, as the egg and evolution demos' particles load the resource of each of their one unit. Reads
