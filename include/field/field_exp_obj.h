@@ -30,7 +30,7 @@ void FieldExpObjAnm_SetPaused(FieldExpObjAnm *anm, u8 paused);
 u8 func_ov036_021b84ec(FieldExpObjAnm *anm);
 void FieldExpObjAnm_SetLooped(FieldExpObjAnm *anm, u8 looped);
 BOOL FieldExpObjAnm_IsPlaybackFinished(FieldExpObjAnm *anm);
-u32 func_ov036_021b8520(FieldExpObjSystem *system, u16 scene, u16 actor, u32 value);
+u32 func_ov036_021b8520(FieldExpObjSystem *system, u16 scene, u16 actor, u16 anm);
 // The animation's last frame
 fx32 func_ov036_021b8580(FieldExpObjAnm *anm);
 FieldExpObjSystem *FieldExpObj_Create(u32 a0, u32 a1, HeapID heapId);

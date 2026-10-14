@@ -380,7 +380,7 @@ static void RollerCoaster_Task(TCB *task, void *data) {
 
     for (i = 0; i < CAR_COUNT; i++) {
         u8 path = work->paths[i];
-        u8 anm = work->paths[i] + 1;
+        u8 anm = path + 1;
         u8 actor = ACTOR_CAR + i;
         FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, actor, anm);
 
