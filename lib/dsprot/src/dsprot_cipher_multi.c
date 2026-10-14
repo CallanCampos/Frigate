@@ -33,11 +33,11 @@ u32 DSProt_GetBranchTypeMulti(u32 instruction) {
 
 void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength) {
     int i;
-    u32 *tableEnd = (u32 *)(state->table + 256);
-    u32 value;
-    u32 j;
+    u32 *tableEnd;
     u32 keyIndex;
+    u32 value;
     u32 *table;
+    u32 j;
 
     state->offset = 0xaa;
     keyIndex = 0;
@@ -46,6 +46,7 @@ void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength)
     state->j = 0;
     j = keyIndex;
     table = (u32 *)state->table;
+    tableEnd = (u32 *)(state->table + 256);
     do {
         *table = value;
         table++;
@@ -57,11 +58,11 @@ void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength)
 
         j = (j + key[keyIndex] + swap) & 0xff;
         other = state->table[j];
+        state->table[j] = swap;
         keyIndex++;
         if (keyIndex >= keyLength) {
             keyIndex = 0;
         }
-        state->table[j] = swap;
         state->table[i] = other;
     }
 }

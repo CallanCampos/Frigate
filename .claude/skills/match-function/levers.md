@@ -203,6 +203,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A `u16` argument narrowed before a call where the original passes one of two constants unnarrowed: a `u16` local
   set in an `if`/`else`, not a conditional expression. (matching.md: "The same goes for an argument")
+- I/O registers off a base register built by `lsl` of a register holding 1, where ours loads each address from the
+  literal pool: `u32 base = 1; base <<= 26;` (matching.md: "base made by shifting a register")
 
 ## Branches and block layout
 
