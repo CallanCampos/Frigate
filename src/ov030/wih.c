@@ -383,6 +383,7 @@ BOOL WH_StartScan(WHScanCallback callback, const u8 *mac, u16 channel) {
 static BOOL WH_StateInStartScan(void) {
     u16 allowed = func_020810cc();
     int result;
+    u32 channel;
 
     if (allowed == 0x8000) {
         WH_ReportError(3);
@@ -392,10 +393,10 @@ static BOOL WH_StateInStartScan(void) {
         WH_ReportError(0x16);
         return FALSE;
     }
-    if (_pWmInfo->sScanChannel == 0) {
+    channel = _pWmInfo->sScanChannel;
+    if (channel == 0) {
         int i;
         u32 list;
-        u32 channel;
         int bit;
 
         list = _pWmInfo->sScanParam.channelList;
@@ -415,7 +416,7 @@ static BOOL WH_StateInStartScan(void) {
         } while (!(allowed & bit));
         _pWmInfo->sScanParam.channelList = bit;
     } else {
-        _pWmInfo->sScanParam.channelList = 1 << (_pWmInfo->sScanChannel - 1);
+        _pWmInfo->sScanParam.channelList = 1 << (channel - 1);
     }
     _pWmInfo->sScanParam.maxChannelTime = func_020811a4();
     _pWmInfo->sScanParam.scanBuf = (WMBssDesc *)_pWmInfo->sScanBuf;
