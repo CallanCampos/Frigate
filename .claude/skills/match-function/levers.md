@@ -39,6 +39,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Where a flag is first set decides which register builds its zero. The register a shared zero gets follows statement
   order, and stores of 0 before a loop take the zero of the variable its initializer sets first, as in
   `for (i = 0, count = 0; ...)`. (matching.md: "Where a flag is first set")
+- Registers swapped around a flag set `TRUE` and overridden in an `if`, with the instructions already right:
+  write it as a ternary, `x = k != 0 ? TRUE : FALSE;`. (matching.md: "the ternary still allocates the")
 - A register swap with otherwise identical code, in code that mirrors a sibling function: try that code as a
   `static inline` helper. (matching.md: "Moving code into a `static inline` helper")
 - Chained stores of one constant (`a = b = TRUE`) share a register; separate ones may not.
@@ -57,6 +59,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   assigned just before the store. (matching.md: "pointer to an array slot")
 - A struct member's offset loaded early into `r6`/`r7` and added to the base at each use: a local pointer to the
   member, assigned where the original loads the offset. (matching.md: "pointer to a struct member")
+- A stack pointer parameter kept in a callee-saved register where the original reloads it at each use: its
+  uses weigh too much; move its dereferences into a `static inline` taking a `const T *`.
+  (matching.md: "goes to a callee-saved register at entry")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -89,6 +94,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `u32` before). (matching.md: "types of locals")
 - Struct copies to the stack: a struct passed by value goes in registers and on the stack, and a copy whose address
   is passed is a local copy, and a struct local keeps a stack slot. (matching.md: "Structs passed by value")
+- A struct copied to the stack for each by-value inline call, and again before an inner loop: the inlines
+  took the array element, `Get(learnset[i])`, not a local copy. (matching.md: "is copied for each call")
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
 
 ## Instructions in another order (scheduling)
@@ -97,6 +104,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
+- A `void *` parameter copied to a typed local takes the `const` itself, callback typedef included; through a
+  wrapper whose body is a `static inline`, only the wrapper's parameter counts.
+  (matching.md: "copied to a typed local needs the `const`"), (matching.md: "only the wrapper's own parameter counts")
+- MWCC passes a `const void *` to a `T *` silently: find the dropped `const` with
+  `clang -fsyntax-only @compile_flags.txt` and make the callee's parameter `const`.
+  (matching.md: "without a word, even with `-w all`")
 - The same rule orders a call's stack argument stores against the register arguments. (matching.md: "stack argument stores")
 - Two fields loaded before either is stored, through a pointer that is not `const`: a struct assignment.
   (matching.md: "A struct assignment loads every field")
@@ -117,6 +130,15 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - One load of a struct's pointer field for two stores through it, where ours reloads: an inline helper taking the
   pointer. (matching.md: "Two stores through a pointer")
 - A parameter passed on the stack is loaded at entry, unless it is an `int` or `s32`. (matching.md: "passed on the stack is loaded")
+- A spilled index parameter's multiply scheduled apart from the original's, which no statement order fixes:
+  widen the parameter from `u16` to `int` in the prototype. (matching.md: "width of a spilled index parameter")
+- A local's arithmetic done at its first use, past a call, where the original does it where written: give the
+  local the type of the callee parameters it is passed to.
+  (matching.md: "A local of another type than the callee parameters")
+- A spilled reload above another spill's store, where the original stores first: the spilled locals are `u8`
+  or `u16`; sweep the widths of several together. (matching.md: "can mean narrow locals")
+- Loads moved among a call's stack argument stores with the same instructions and slots: give a local read
+  from a field the field's type. (matching.md: "can need the field's type even with the same")
 - NitroSDK's inline functions take enums, which changes when their arguments are loaded and shifted.
   (matching.md: "NitroSDK's inline functions")
 - `FX_Mul`'s sign extensions move with statement order and with a `static inline` wrapper. (matching.md: "FX_Mul")
@@ -279,6 +301,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - `beq` before and `bne` after the loop is a `!=` bound. (matching.md: "A loop counted with `!=`")
 - A loop bound computed once and tested with `ble`: `i <= N - 1`; `i < N` reloads it and tests `blt`.
   (matching.md: "i <= N - 1")
+- A loop guard testing the bound's own register, with no copy, and `i` in a dead pointer's register: the
+  bound written in the `for` condition, not in a local. (matching.md: "A bound written in the `for` condition")
 - A test after a body that is entered from the top and from an earlier branch, in a function that does one box a frame:
   `while (box < n) { ...; break; }`, with a comment. (matching.md: "stops after its first pass")
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
@@ -315,6 +339,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "_s32_div_f")
 - `__aeabi_uldivmod` on sign-extended operands is an `int` cast to `u64`; MWCC calls it `_ll_udiv`.
   (matching.md: "A 64-bit division")
+- A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
+  call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
   off")
 

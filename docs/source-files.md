@@ -113,7 +113,7 @@ prints the tables below from the configs and the ROM:
 | `event_colosseum_battle.c` | `0x0215264c`–`0x0215291c` | 3 | complete | descriptive |
 | `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | partial | string at `0x0216e0a8` |
 | `delivery_irc.c` | `0x02152c0c`–`0x02153160` | 27 | complete | string at `0x0216e180` |
-| `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | partial | descriptive |
+| `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | complete | descriptive |
 | `intrude_work.c` | `0x021535dc`–`0x0215366c` | 12 | complete | descriptive |
 | `script_sys.c` | `0x0215366c`–`0x02153da4` | 41 | complete | string at `0x0216e190` |
 | `script_work.c` | `0x02153da4`–`0x02154070` | 31 | complete | string at `0x0216e1b4` |
@@ -129,7 +129,7 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_pokemon.c` | `0x02156174`–`0x021574a4` | 43 | complete | string at `0x0216e1f4` |
 | `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | complete | string at `0x0216e208` |
 | `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
-| `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | partial | string at `0x0216e22c` |
+| `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | complete | string at `0x0216e22c` |
 | `field_encount_st.c` | `0x021590ec`–`0x021593fc` | 15 | complete | string at `0x0216e240` |
 | `hiden_event.c` | `0x021593fc`–`0x02159bc0` | 43 | complete | descriptive |
 | `scrcmd_network.c` | `0x02159bc0`–`0x02159d54` | 9 | complete | string at `0x0216e254` |
@@ -138,7 +138,7 @@ prints the tables below from the configs and the ROM:
 | `event_game_clear.c` | `0x0215a19c`–`0x0215a7a4` | 13 | complete | descriptive |
 | `event_field_menu.c` | `0x0215a7a4`–`0x0215aa68` | 3 | complete | descriptive |
 | `event_shortcut_menu.c` | `0x0215aa68`–`0x0215b488` | 17 | complete | string at `0x0216e268` |
-| `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | partial | string at `0x0216e280` |
+| `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | complete | string at `0x0216e280` |
 | `event_save.c` | `0x0215c4f8`–`0x0215c6b0` | 5 | complete | descriptive |
 | `event_action_call.c` | `0x0215c6b0`–`0x0215cb48` | 13 | complete | descriptive |
 | `event_3d_demo.c` | `0x0215cb48`–`0x0215cd58` | 5 | complete | descriptive |
@@ -163,7 +163,7 @@ prints the tables below from the configs and the ROM:
 | `comm_player.c` | `0x021613d0`–`0x02161844` | 12 | complete | string at `0x0216e2e4` |
 | `bsubway_comm.c` | `0x02161844`–`0x02161c88` | 27 | complete | descriptive |
 | `fld_btl_inst_event.c` | `0x02161c88`–`0x02161f6c` | 4 | complete | descriptive |
-| `fld_btl_inst_tool.c` | `0x02161f6c`–`0x02162b64` | 22 | partial | string at `0x0216e36c` |
+| `fld_btl_inst_tool.c` | `0x02161f6c`–`0x02162b64` | 22 | complete | string at `0x0216e36c` |
 | `event_cgear_poweron.c` | `0x02162b64`–`0x02162c48` | 3 | complete | descriptive |
 | `event_trial_house.c` | `0x02162c48`–`0x02162f44` | 6 | complete | descriptive |
 | `ev_time.c` | `0x02162f44`–`0x021631c8` | 13 | complete | descriptive |
@@ -179,15 +179,15 @@ prints the tables below from the configs and the ROM:
 | `oneshot_dr.c` | `0x0216598c`–`0x021659ec` | 2 | complete | descriptive |
 | `namein_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | string at `0x0216e3a0` |
 | `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | complete | descriptive |
-| `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | partial | descriptive |
+| `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | complete | descriptive |
 | `fldmmdl.c` | `0x02166664`–`0x02168320` | 270 | complete | string at `0x0216e5c0` |
 | `fest_mission_field.c` | `0x02168320`–`0x02168468` | 5 | complete | descriptive |
 | `burmy_form.c` | `0x02168468`–`0x021684bc` | 1 | complete | descriptive |
 | `event_battle.c` | `0x021684bc`–`0x0216919c` | 26 | complete | string at `0x0216e5dc` |
 | `trcard_sys.c` | `0x0216919c`–`0x02169c1c` | 23 | complete | string at `0x0216e5ec` |
 | `scrcmd_sp_poke.c` | `0x02169c1c`–`0x02169c7c` | 4 | complete | descriptive |
-| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | partial | string at `0x0216e5fc` |
-| `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | partial | descriptive |
+| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | complete | string at `0x0216e5fc` |
+| `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | complete | descriptive |
 | `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | complete | descriptive |
 | `pair_sys.c` | `0x0216a23c`–`0x0216a6a4` | 16 | complete | string at `0x0216e60c` |
 | `scrcmd_hollow_rival.c` | `0x0216a6a4`–`0x0216a82c` | 7 | complete | descriptive |

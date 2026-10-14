@@ -255,7 +255,7 @@ static GameEventReturnCode func_ov012_021660b0(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, u16 index, u16 actorId, u8 winPos) {
+GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos) {
     GameEvent *event;
     GameData *gameData;
     void *msgBGSys;
@@ -274,8 +274,8 @@ GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, u16 index,
     msgBGSys = Field_GetMsgBGSys(field);
     event = GameEvent_Create(gsys, NULL, func_ov012_021660b0, sizeof(BSubwayTrainerMsgData));
     data = GameEvent_GetData(event);
-    data->actorId = actorId;
     data->gsys = gsys;
+    data->actorId = actorId;
     message = &bsw->trainers[index].message;
     if (message->type == 0xffff) {
         data->strbuf = GFL_StrBufCreate(0x300, HEAPID_GAMEEVENT);

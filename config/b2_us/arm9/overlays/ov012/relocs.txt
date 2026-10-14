@@ -3039,12 +3039,12 @@ from:0x0215b6a8 kind:thumb_call to:0x02016ad4 module:main
 from:0x0215b6cc kind:thumb_call to:0x0215b718 module:overlay(12)
 from:0x0215b6e4 kind:thumb_call to:0x0215b754 module:overlay(12)
 from:0x0215b6ee kind:thumb_call to:0x0203a24c module:main
-from:0x0215b700 kind:load to:0x0216cba8 module:overlay(12)
-from:0x0215b704 kind:load to:0x0216cba0 module:overlay(12)
-from:0x0215b708 kind:load to:0x0216cbac module:overlay(12)
-from:0x0215b70c kind:load to:0x0216cb9c module:overlay(12)
+from:0x0215b700 kind:load to:0x0216cb98 add:0x10 module:overlay(12)
+from:0x0215b704 kind:load to:0x0216cb98 add:0x8 module:overlay(12)
+from:0x0215b708 kind:load to:0x0216cb98 add:0x14 module:overlay(12)
+from:0x0215b70c kind:load to:0x0216cb98 add:0x4 module:overlay(12)
 from:0x0215b710 kind:load to:0x0216cb98 module:overlay(12)
-from:0x0215b714 kind:load to:0x0216cba4 module:overlay(12)
+from:0x0215b714 kind:load to:0x0216cb98 add:0xc module:overlay(12)
 from:0x0215b75a kind:thumb_call to:0x02016ad8 module:main
 from:0x0215b75e kind:thumb_call to:0x0201734c module:main
 from:0x0215b764 kind:thumb_call to:0x020088ec module:main

@@ -84,7 +84,7 @@ struct FieldAppCallWork {
 typedef struct {
     s32 overlayId;
     const GameProcFunctions *functions;
-    void *(*createParam)(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+    void *(*createParam)(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
     u32 (*getResult)(FieldAppCallWork *work, void *param);
     // Called in place of a proc, if functions is NULL
     void (*call)(FieldAppCallWork *work, s32 appParam);
@@ -102,34 +102,34 @@ extern const GameProcFunctions MEDALBOX_PROC_FUNCTIONS;
 // Overlay 12: the trainer card's param, whose canEdit is FALSE in the Union Room
 void *func_ov012_02169b04(GameData *gameData, HeapID heapId, BOOL canEdit);
 
-void *func_ov012_0215b7d8(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215b7d8(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215b9cc(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bad4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215bad4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215bb44(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bb70(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215bb70(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215bcf0(FieldAppCallWork *work, void *param);
 u32 func_ov012_0215bd1c(GameSystem *gsys);
-void *func_ov012_0215bd48(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215bd48(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215bdd0(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bef4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215bef4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215bf58(FieldAppCallWork *work, void *param);
-void *func_ov012_0215bf8c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215bf8c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215bff8(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c094(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215c094(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215c0cc(FieldAppCallWork *work, void *param);
 void func_ov012_0215c0dc(FieldAppCallWork *work, s32 appParam);
-void *func_ov012_0215c10c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215c10c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215c138(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c160(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215c160(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215c218(FieldAppCallWork *work, void *param);
 void func_ov012_0215c2c8(void *param);
-void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215c3a4(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c3d0(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215c3d0(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215c3fc(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c438(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215c438(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215c474(FieldAppCallWork *work, void *param);
-void *func_ov012_0215c488(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam);
+void *func_ov012_0215c488(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam);
 u32 func_ov012_0215c4b4(FieldAppCallWork *work, void *param);
 
 GameEventReturnCode EventFieldAppCall_Callback(GameEvent *event, u32 *state, void *data);

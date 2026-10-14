@@ -29,17 +29,6 @@ static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
     return entry.level;
 }
 
-static inline u8 LearnsetEntry_FindIn(LearnsetEntry entry, const u16 *moves, u8 count) {
-    u8 i;
-
-    for (i = 0; i < count; i++) {
-        if (moves[i] == LearnsetEntry_GetMove(entry)) {
-            break;
-        }
-    }
-    return i;
-}
-
 MoveReminderProcessData *func_ov012_02169c7c(HeapID heapId) {
     MoveReminderProcessData *data =
         GFL_HeapAllocate(heapId, sizeof(MoveReminderProcessData), FALSE, "waza_oshie.c", 35);
@@ -53,15 +42,15 @@ void func_ov012_02169ca4(MoveReminderProcessData *data) {
 }
 
 u16 *PokeParty_GetRememberableMoves(PartyPkm *pkm, HeapID heapId) {
+    LearnsetEntry *learnset;
+    u16 *moves;
     u16 species;
     u8 form;
     u8 level;
     u16 known[4];
-    LearnsetEntry *learnset;
-    u16 *moves;
     u8 count;
     u8 i;
-    LearnsetEntry entry;
+    u8 j;
 
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
@@ -74,21 +63,30 @@ u16 *PokeParty_GetRememberableMoves(PartyPkm *pkm, HeapID heapId) {
     PML_LearnsetLvUpLoad(species, form, learnset);
     count = 0;
     for (i = 0; i < LEARNSET_MAX; i++) {
-        entry = learnset[i];
-        if (LearnsetEntry_IsEnd(entry)) {
+        if (LearnsetEntry_IsEnd(learnset[i])) {
             moves[count] = LEARNSET_END;
             break;
         }
-        if (LearnsetEntry_GetLevel(entry) > level) {
+        if (LearnsetEntry_GetLevel(learnset[i]) > level) {
             continue;
         }
-        if (LearnsetEntry_FindIn(entry, known, 4) != 4) {
+        for (j = 0; j < 4; j++) {
+            if (known[j] == LearnsetEntry_GetMove(learnset[i])) {
+                break;
+            }
+        }
+        if (j != 4) {
             continue;
         }
-        if (LearnsetEntry_FindIn(entry, moves, count) != count) {
+        for (j = 0; j < count; j++) {
+            if (moves[j] == LearnsetEntry_GetMove(learnset[i])) {
+                break;
+            }
+        }
+        if (j != count) {
             continue;
         }
-        moves[count] = LearnsetEntry_GetMove(entry);
+        moves[count] = LearnsetEntry_GetMove(learnset[i]);
         count++;
     }
     GFL_HeapFree(learnset);

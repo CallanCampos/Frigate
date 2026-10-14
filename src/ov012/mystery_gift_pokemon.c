@@ -5,6 +5,6 @@
 
 // The body is the maker that overlay 197 also inlines: its early returns all leave through one exit, which the
 // original only gets from inlining
-PartyPkm *func_ov012_02153160(MysteryGift *gift, HeapID heapId, GameData *gameData) {
+PartyPkm *func_ov012_02153160(const MysteryGift *gift, HeapID heapId, GameData *gameData) {
     return Mystery_CreateGiftPokemon(gift, heapId, gameData);
 }

@@ -89,10 +89,7 @@ BOOL func_ov012_021580c4(VM *vm, FieldScriptEnv *env) {
     kind = VM_Read8(vm);
     if (kind <= 1) {
         commWork = func_020179dc(gameData);
-        online = TRUE;
-        if (kind == 0) {
-            online = FALSE;
-        }
+        online = kind != 0 ? TRUE : FALSE;
         event = GameEvent_Create(gsys, NULL, func_ov012_02158c8c, sizeof(MusicalCallEvent));
         data = GameEvent_GetData(event);
         sys_memset(data, 0, sizeof(MusicalCallEvent));
@@ -146,8 +143,8 @@ BOOL func_ov012_02158280(VM *vm, FieldScriptEnv *env) {
     u32 mostIndex;
     u32 fewestIndex;
     u32 firstIndex;
-    u32 topIndex;
-    u32 secondValue;
+    u8 topIndex;
+    u8 secondValue;
     u32 second;
     PokeParty *party;
     u8 kind;
