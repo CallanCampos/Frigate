@@ -11,6 +11,7 @@ src/ov034/union_oneself.c:
     .data       start:0x0217c718 end:0x0217c7d4
 
 src/ov034/union_msg.c:
+    complete
     .text       start:0x0217aabc end:0x0217b6cc
     .rodata     start:0x0217c218 end:0x0217c640
     .data       start:0x0217c7d4 end:0x0217c8f0
