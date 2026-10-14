@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A multiply's operand copied right after its `subs` where the original loads the constant first: give the index
+  its own variable and index the elements in place. (matching.md: "The copy of a multiply's operand")
 - A 64-bit sum of products in other registers, or an `ldm` of two fields where the original has two `ldr`: build
   the sum with `+=`, one product a statement. (matching.md: "built up with `+=`")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
