@@ -1684,3 +1684,26 @@ lib/nitro/src/fx/fx_cp.c:
 
 lib/nitro/src/fx/fx_vec.c:
     .text       start:0x02073fe0 end:0x02074594
+
+lib/nitro/src/fx/fx_mtx43.c:
+    .text       start:0x02072c4c end:0x02073468
+
+lib/nitro/src/fx/fx_mtx44.c:
+    .text       start:0x02073468 end:0x02073e1c
+
+lib/nitro/src/fx/fx_sincos.c:
+    complete
+    .rodata     start:0x020946e8 end:0x020986e8
+
+lib/nitro/src/fx/fx_atanidx.c:
+    complete
+    .text       start:0x02074594 end:0x02074684
+    .rodata     start:0x020986e8 end:0x020987ec
+
+lib/nitro/src/fx/fx.c:
+    complete
+    .text       start:0x02074684 end:0x020746ec
+
+lib/nitro/src/fx/fx_trig.c:
+    complete
+    .text       start:0x020746ec end:0x02074744

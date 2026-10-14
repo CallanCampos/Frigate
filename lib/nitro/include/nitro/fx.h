@@ -194,7 +194,7 @@ fx32 FX_Mul32x64cFunc(fx32 v32, fx64 v64c);
 // Returns the fraction of x and writes its whole part, both with the sign of x
 fx32 FX_Modf(fx32 x, fx32 *whole);
 
-// FX_AcosIdx's file, after fx.c. Swan: fx_acos
+// fx_trig.c (the file name is a guess). Swan: fx_acos
 u16 FX_AcosIdx(fx32 x);
 
 // GFL's calctool.c, also declared in gfl/calctool.h

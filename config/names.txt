@@ -1916,6 +1916,7 @@
 . 0x02077a2c MATH_CalcCRC32
 . 0x02077a4c MATH_QSort
 . 0x0207873c MI_Copy36B
+. 0x02078758 MI_Copy48B
 . 0x02079c28 OSi_IrqCallback
 . 0x02079e20 OSi_EnterTimerCallback
 . 0x02079ed8 OS_SetIrqStackChecker

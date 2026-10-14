@@ -62,6 +62,8 @@ static inline void MI_CpuClearFast(void *dest, u32 size) {
 
 // Copies 36 bytes, a 3x3 matrix
 void MI_Copy36B(const void *src, void *dest);
+// Swan's MAT43_Copy
+void MI_Copy48B(const void *src, void *dest);
 
 // Which processor has priority on the main memory
 static inline void MI_SetMainMemoryPriority(MIProcessor proc) {
