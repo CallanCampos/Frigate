@@ -48,7 +48,7 @@ MailParam *MailTool_CreateItemViewParam(GameData *gameData, u32 mailId, u32 heap
     return param;
 }
 
-BOOL MailTool_IsWritten(MailParam *param) {
+BOOL MailTool_IsWritten(const MailParam *param) {
     return param->written;
 }
 
