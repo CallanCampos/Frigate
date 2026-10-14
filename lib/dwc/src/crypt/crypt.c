@@ -393,7 +393,7 @@ static BOOL VerifyDigest(const u8 *digest, const u8 *signature, const u8 *modulu
 int Crypt_VerifySignature(const void *data, u32 size, void *signature, const u8 *key) {
     u8 digest[0x14];
 
-    func_02077720(digest, data, size);
+    MATH_CalcSHA1(digest, data, size);
     return VerifyDigest(digest, signature, key);
 }
 

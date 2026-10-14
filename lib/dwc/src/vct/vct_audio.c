@@ -447,7 +447,7 @@ static VCTVoicePacket *EncodeNextFrame(void)
     }
     sSendQueue.pendingMask = sAudio.activeMask;
     sSendQueue.pendingMask &= ~(1 << gVCTSettings.aid);
-    sSendQueue.scheduleRow = countOneBits(sSendQueue.pendingMask) - 1;
+    sSendQueue.scheduleRow = MATH_CountPopulation(sSendQueue.pendingMask) - 1;
     if (sSendQueue.scheduleRow > 7) {
         return NULL;
     }

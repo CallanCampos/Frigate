@@ -132,7 +132,7 @@ static BOOL CheckAnswer(char *data, int size) {
     *(GamestatsSecret *)buffer = sClient.secret;
     func_ov011_0216e878(data, buffer + 0x14, bodySize, 2);
     *(GamestatsSecret *)(buffer + 0x14 + GamestatsEncodedSize(bodySize)) = sClient.secret;
-    func_02077720(digest, buffer, GamestatsEncodedSize(bodySize) + 0x28);
+    MATH_CalcSHA1(digest, buffer, GamestatsEncodedSize(bodySize) + 0x28);
     func_02058728(8, buffer, 0);
     for (i = 0; i < 0x14; i++) {
         hash[i * 2] = digits[digest[i] >> 4];
@@ -172,7 +172,7 @@ static void OnAnswered(char *data, int size, int status, void *arg) {
 
             *(GamestatsSecret *)block = sClient.secret;
             memcpy(block + 0x14, data, 0x20);
-            func_02077720(digest, block, 0x34);
+            MATH_CalcSHA1(digest, block, 0x34);
             for (i = 0; i < 0x14; i++) {
                 sClient.hashField[i * 2] = digits[digest[i] >> 4];
                 sClient.hashField[i * 2 + 1] = digits[digest[i] & 0xf];

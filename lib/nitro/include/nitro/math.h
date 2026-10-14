@@ -43,27 +43,35 @@ typedef struct {
 
 #define MATH_SHA1_DIGEST_SIZE 20
 
-// The number of set bits, NitroSDK's MATH_CountPopulation (swan's name)
-u8 countOneBits(u32 x);
+// libmath, in link order. The names are NitroSDK's, as pret's pokediamond and pmd-sky use them; functions with no SDK
+// name in pret have descriptive ones.
 
-// The number of leading zero bits: NitroSDK's MATH_CountLeadingZerosFunc (swan's name), which MATH_CountLeadingZeros
-// calls from Thumb code, where CLZ doesn't exist
-u32 countLeadingZeros(u32 x);
+// math_pop.c. Swan: countLeadingZeros, countOneBits
+// The number of leading zero bits, which MATH_CountLeadingZeros calls from Thumb code, where CLZ doesn't exist
+u32 MATH_CountLeadingZerosFunc(u32 x);
+// The number of set bits
+u8 MATH_CountPopulation(u32 x);
 
 static inline u32 MATH_CountLeadingZeros(u32 x) {
-    return countLeadingZeros(x);
+    return MATH_CountLeadingZerosFunc(x);
 }
 
+// math_dgt.c: MD5, SHA-1 and HMAC-SHA1
+void MATH_SHA1Init(MATHSHA1Context *context);
+void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size);
+void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest);
+// The SHA-1 digest of size bytes, through the three above
+void MATH_CalcSHA1(u8 *digest, const void *data, u32 size);
+
+// math_crc.c. Swan: MATH_CRC16CCITTInitTable (MATHi_CRC16InitTable)
+void MATHi_CRC16InitTable(MATHCRC16Table *table, u16 poly);
+u16 MATH_CalcCRC16CCITT(const MATHCRC16Table *table, const void *data, u32 size);
+
+// math.c
 // Quicksort of num elements of width bytes; stackBuffer may be NULL
 typedef s32 (*MATHCompareFunc)(void *a, void *b);
 void MATH_QSort(void *head, u32 num, u32 width, MATHCompareFunc comp, void *stackBuffer);
 
-void MATH_CRC16CCITTInitTable(MATHCRC16Table *table, u16 poly);
-u16 MATH_CalcCRC16CCITT(const MATHCRC16Table *table, const void *data, u32 size);
-void MATH_SHA1Init(MATHSHA1Context *context);
-void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size);
-void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest);
-// The SHA-1 digest of size bytes, through the three above (MATH_CalcSHA1's code)
-void func_02077720(u8 *digest, const void *data, u32 size);
+// sha1_block.c
 
 #endif // POKEBW2_NITRO_MATH_H

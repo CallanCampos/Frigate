@@ -453,7 +453,7 @@ static void IrcBattleMatch_OnNegotiated(void *work_, int netId) {
     IrcBattleMatch *work = work_;
 
     work->acceptedPlayers |= 1 << netId;
-    if (countOneBits(work->acceptedPlayers) >= 2) {
+    if (MATH_CountPopulation(work->acceptedPlayers) >= 2) {
         work->enoughPlayers = TRUE;
     }
 }

@@ -123,7 +123,7 @@ static void Guru2Comm_RecvSignal(int netId, int size, const void *data, void *wo
             switch (signal->type) {
             case GURU2_SIGNAL_LEAVE_REQUEST:
                 if (g2c->joinCount != UnionApp_CountJoined(Guru2Comm_GetUnionApp(g2c))
-                    || g2c->joinCount != countOneBits(UnionApp_GetJoined(Guru2Comm_GetUnionApp(g2c)))) {
+                    || g2c->joinCount != MATH_CountPopulation(UnionApp_GetJoined(Guru2Comm_GetUnionApp(g2c)))) {
                     answer.ok = FALSE;
                 } else {
                     g2c->leavingBits |= 1 << netId;
