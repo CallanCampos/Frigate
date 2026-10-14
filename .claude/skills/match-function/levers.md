@@ -224,6 +224,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
+  the function, before the calls. (matching.md: "A constant narrowed at a call")
 - A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
   offset to the base after a plain read: read that field through an inline taking an `int` index.
   (matching.md: "Two fields of one element of a static table")
