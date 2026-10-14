@@ -912,7 +912,7 @@ static inline void G3_Scale(fx32 x, fx32 y, fx32 z) {
     reg_G3_MTX_SCALE = (u32)z;
 }
 
-static inline void G3_PolygonAttr(GXLightMask light, GXPolygonMode polyMode, GXCull cullMode, int polygonID, int alpha,
+static inline void G3_PolygonAttr(int light, GXPolygonMode polyMode, GXCull cullMode, int polygonID, int alpha,
                                   int misc) {
     reg_G3_POLYGON_ATTR = GX_PACK_POLYGONATTR_PARAM(light, polyMode, cullMode, polygonID, alpha, misc);
 }

@@ -476,14 +476,16 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights) {
 
         // The face's corners in the texture, read from the far side when flipped
         if (actor->flipS) {
-            s1 = scene->texOffsetS + (actor->face % mat->facesPerRow * mat->faceWidth << FX32_SHIFT);
+            s1 = actor->face % mat->facesPerRow * mat->faceWidth << FX32_SHIFT;
+            s1 += scene->texOffsetS;
             s0 = s1 + (mat->faceWidth << FX32_SHIFT);
         } else {
             s0 = actor->face % mat->facesPerRow * mat->faceWidth << FX32_SHIFT;
             s1 = s0 + (mat->faceWidth << FX32_SHIFT);
         }
         if (actor->flipT) {
-            t1 = scene->texOffsetT + (actor->face / mat->facesPerRow * mat->faceHeight << FX32_SHIFT);
+            t1 = actor->face / mat->facesPerRow * mat->faceHeight << FX32_SHIFT;
+            t1 += scene->texOffsetT;
             t0 = t1 + (mat->faceHeight << FX32_SHIFT);
         } else {
             t0 = actor->face / mat->facesPerRow * mat->faceHeight << FX32_SHIFT;
