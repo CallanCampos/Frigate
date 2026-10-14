@@ -988,7 +988,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | partial | descriptive |
+| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | complete | descriptive |
 
 ### Overlay 103
 
@@ -2488,7 +2488,7 @@ prints the tables below from the configs and the ROM:
 | `zukan_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
 | `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
 | `zukan_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | string at `0x021ace88` |
-| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | partial | string at `0x021acec4` |
+| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | complete | string at `0x021acec4` |
 
 ### Overlay 299
 
@@ -2628,7 +2628,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | partial | string at `0x0219e988` |
+| `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | complete | string at `0x0219e988` |
 | `un_select_graphic.c` | `0x0219e088`–`0x0219e3f4` | 17 | complete | string at `0x0219e994` |
 
 ### Overlay 312
@@ -2717,7 +2717,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | partial | descriptive |
+| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | complete | descriptive |
 | `wbt_list_graphic.c` | `0x0219eb70`–`0x0219edb4` | 16 | complete | string at `0x0219f140` |
 
 ### Overlay 321

@@ -9,6 +9,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A multiply's operand copied right after its `subs` where the original loads the constant first: give the index
   its own variable and index the elements in place. (matching.md: "The copy of a multiply's operand")
+- A table's base and index swapped between the two registers (`ldr r4, =table; muls; adds r4, r4, r2` in the
+  original): index the table in a `static inline` taking the index as an enum type. (matching.md: "A table indexed
+  by a field")
+- A narrow stack parameter read from its slot at each use where the original loads it into a saved register at
+  entry: declare the parameter `const`. (matching.md: "A narrow stack parameter used twice")
+- An index kept in two registers (copied after a division and again before a multiply) where ours keeps one: a
+  `const` struct parameter with its pointer field read at each use. (matching.md: "A pointer field read through a
+  `const` parameter")
+- A stack-passed parameter kept on the stack where the original loads it into a saved register: copy it into a
+  local of the other signedness (`int pos = index;`). (matching.md: "A 32-bit parameter passed on the stack")
 - A 64-bit sum of products in other registers, or an `ldm` of two fields where the original has two `ldr`: build
   the sum with `+=`, one product a statement. (matching.md: "built up with `+=`")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
@@ -101,6 +111,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A narrow local's stack slot swapped with another's where the original slots it like a temporary: make every
+  callee parameter it is passed to the same type. (matching.md: "A narrow local passed to several calls")
 - An extra slot holding a copy of an address-taken local before a nested loop: read its field inside the inner loop,
   not into a local in the outer one. (matching.md: "hoisted only out of the loop it sits in")
 - Stack locals are laid out in reverse declaration order; to read values in one order and slot them in another,
@@ -148,6 +160,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- A stack argument stored after the next argument's setup starts, where the original stores it first, around a
+  spilled local: sweep the local's width together with its callee's return type and `value` local.
+  (matching.md: "A spilled local's width for the rule below")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
@@ -223,6 +238,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
+  the function, before the calls. (matching.md: "A constant narrowed at a call")
 - A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
   offset to the base after a plain read: read that field through an inline taking an `int` index.
   (matching.md: "Two fields of one element of a static table")

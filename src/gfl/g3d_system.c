@@ -113,7 +113,7 @@ static BOOL GFL_G3DActorTestBBox(G3DActor *actor);
 static int TestModelBoundingBox(const s16 *box);
 
 void GFL_G3DSysCreate(BOOL frmTexVramMgr, u32 texVramSize, BOOL frmPltVramMgr, u32 pltVramSize, u16 dtcmAllocSize,
-                      HeapID heapId, G3DSystemInitCallback initCallback) {
+                      const HeapID heapId, G3DSystemInitCallback initCallback) {
     G3DCameraProjection projection;
     FxLookAt lookAt;
     Light light;

@@ -556,12 +556,12 @@ void NNS_G2dLoadPaletteEx(const NNSG2dPaletteData *data, const NNSG2dPaletteComp
                           NNSG2dVRamType type, NNSG2dImagePaletteProxy *proxy);
 
 // The OAM managers, each of a range of OAMs of an engine, which they fill each frame and send at the vertical blank
-enum {
+typedef enum {
     NNS_G2D_OAMTYPE_MAIN,
     NNS_G2D_OAMTYPE_SUB,
     NNS_G2D_OAMTYPE_SOFTWAREEMULATION,
     NNS_G2D_OAMTYPE_MAX,
-};
+} NNSG2dOamType;
 
 // The affine index of an OAM that uses no affine parameters, and what NNS_G2dEntryOamManagerAffine returns when full
 #define NNS_G2D_OAM_AFFINE_IDX_NONE 0xfffe
@@ -574,7 +574,7 @@ typedef struct {
 } NNSG2dOamManagedRegion;
 
 typedef struct {
-    u32 type;
+    NNSG2dOamType type;
     NNSG2dOamManagedRegion managedAttrRegion;
     NNSG2dOamManagedRegion managedAffineRegion;
     u16 managerID;
@@ -583,7 +583,7 @@ typedef struct {
 } NNSG2dOamManagerInstance;
 
 void NNS_G2dInitOamManagerModule(void);
-BOOL NNS_G2dGetNewOamManagerInstanceAsFastTransferMode(NNSG2dOamManagerInstance *man, u16 from, u16 num, u32 type);
+BOOL NNS_G2dGetNewOamManagerInstanceAsFastTransferMode(NNSG2dOamManagerInstance *man, u16 from, u16 num, NNSG2dOamType type);
 BOOL NNS_G2dEntryOamManagerOamWithAffineIdx(NNSG2dOamManagerInstance *man, const GXOamAttr *oam, u16 affineIdx);
 u16 NNS_G2dEntryOamManagerAffine(NNSG2dOamManagerInstance *man, const MtxFx22 *mtx);
 // Sends the manager's OAMs and affine parameters to the hardware. swan calls it NNS_G2dApplyAndResetOamManagerBuffer

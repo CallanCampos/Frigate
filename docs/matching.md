@@ -286,6 +286,22 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+  Overlay 311's `UnSelectMsg_PrintItem` matches the same way, with `int pos = index;` from a `u32 index`: `pos` takes
+  `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
+  order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
+  and declared first stores it right after the subtraction.
+- A table indexed by a field, with the base in the higher register and the index's product added into the lower
+  one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
+  `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
+  `GetOamBuffer_(NNSG2dOamType type)` returning `&oamBuffers_[type]`, which matches `NNS_G2dEntryOamManagerAffine`,
+  `NNS_G2dEntryOamManagerOamWithAffineIdx` and both branches of `NNS_G2dResetOamManagerBuffer`. The same helper
+  with a `u32` or `int` parameter, a cast to the enum, or an enum-typed field alone keeps the swap.
+- A narrow stack parameter used twice is read from its slot at each use, and declared `const` it is loaded once at
+  entry into a saved register: `g3d_system.c`'s `GFL_G3DSysCreate` takes `const HeapID heapId`, loaded into `r7`
+  at entry (`add r0, sp, #0x68; ldrh r7, [r0, #4]`), which moves MWCC's cached `&g_G3DSystem` out of `r7` and
+  gives every register the original's. A plain copy of the same type folds back into the parameter; a `const`
+  copy, or a copy of another width, works only when both uses go through it. The prototype in the header can stay
+  without the `const`, which isn't part of the function's type.
 - A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
   counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
   tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter
@@ -522,6 +538,17 @@ Same code, other `sp` offsets or frame size.
   `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
   `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
   the copy too, a sign that the CSE and copy propagation passes place it.
+- A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
+  locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
+  Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
+  `func_ov036_021b8520` taking `u16 anm`, like the other callee, where its old prototype took a `u32`; a `(u16)`
+  cast at the call does not do it. When such a local's slot is off, check the callees' prototypes first.
+- A spilled local's width for the rule below can come from its callee's return: `wbt_list.c`'s
+  `WbtList_PrintMessage` stores its first name call's last stack argument before the name's address, as the
+  original does, only with `s16 first` set from `WbtList_GetMatchValue` returning `s16` (and its `value` local
+  `s16`). An `s16` local from an `s32` return, or any other pairing, swaps the two. The callee's other callers
+  bound the width: `WbtList_UpdateMessage`'s `u16 message = WbtList_GetMatchValue(...)` keeps its narrowing
+  only with a signed or wider return.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
@@ -1095,6 +1122,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   without folding the subtraction, so it keeps the constant in `r6` like a variable. `= bufferSize - 0x20` folds to
   `0x100`, and an enum local reduced at run time gave the same instructions with the constant in `r4`, ahead of the
   parameters.
+  A constant narrowed at a call (`movs r3, #0x11` then `lsls`/`asrs` to `s16`) is an enum local too, and where it
+  is assigned decides where it is built: set at the top, before the first call, and live across calls while every
+  saved register is taken, it is rebuilt at its one use inside the argument setup. `zukan_detail_form.c`'s
+  `ZukanDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
+  print; set in the color's block, the 17 is built before `x`'s arithmetic (9 bytes), and an `int` or a field
+  folds the narrowing away.
 - A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
   comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
   so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.
@@ -1165,6 +1198,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   pointer is not `const`: `bmp.c`'s `ClipCopyArea` takes `const GFLBitmap *dest`, and `GFL_BitmapCopyArea_IDX4`,
   `_IDX8` and `GFL_BitmapCopyAreaRebased_IDX8` load `dest->width` again after it for their tile counts, as the
   original does, where with a plain `dest` the clip's load stays live in a saved register and every register moves.
+  A pointer field read through a `const` parameter at each use is loaded once into a compiler temporary, which the
+  allocator places apart from the index: `ica_anime.c`'s `GFL_G3DCurveGetNowTranslationLoop` and its rotation and
+  scale siblings keep the remainder both in `r2` after `__aeabi_uidivmod` and in `r3` for `* 12`, as the original
+  does, only with `const G3DCurve *curve`, `frame %= curve->frameCount` and `curve->translations[frame].x` (`.y`,
+  `.z`) written out; a `values` local or a separate index keeps one of the two copies.
 - Reads of a `const` table at a constant index are folded into immediates, but reads in a loop over the table are not,
   even when the loop runs once and is unrolled. An `ldm` from a table straight into argument registers is two fields
   read in such a loop, as the egg and evolution demos' particles load the resource of each of their one unit. Reads
@@ -2162,6 +2200,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
   order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
   one is dropped; a used `.bss` static joins the sort, an unused one does not.
+- A function-local `static` joins the size sort at the end of the file, after every local initializer, and such
+  statics come in reverse order, the last one declared first. So it reorders equal-size local initializers anywhere
+  in the file: overlay 311's `un_select.c` keeps its two windows' background color in function-local
+  `static const u8 backColor = 15;` (the `0f 0f` at the head of its `.rodata`), and its five 24-byte
+  `UnSelectActorTemplate` initializers come out in the ROM's order only with `sUnSelectListTouch` defined first among
+  the file's tables. Give `rodata_order.py` such statics last, reversed. Its `--check` compares only the shared
+  section, not the order of the objects with sections of their own, and counts a string literal in `.data` as a
+  local initializer.
 
 ## When nothing moves it
 
