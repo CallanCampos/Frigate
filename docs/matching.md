@@ -286,6 +286,11 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+- An inline's enum-typed parameter changes how MWCC orders and allocates the inlined expression when the argument
+  is an integer: `billboard.c`'s `BlActScene_Draw` packs its polygon attributes in the original's order (alpha,
+  then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
+  NitroSDK declares it, not `GXLightMask light`; casts or enum locals at the call don't help. Check the SDK's
+  prototype of an inline before the call site.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through

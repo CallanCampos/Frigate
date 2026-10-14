@@ -154,6 +154,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- An inlined SDK call whose packed value is built in another order: check the inline's parameter types against the
+  SDK (an `int` where ours has an enum). (matching.md: "An inline's enum-typed parameter")
 - A stack argument stored after the next argument's setup starts, where the original stores it first, around a
   spilled local: sweep the local's width together with its callee's return type and `value` local.
   (matching.md: "A spilled local's width for the rule below")
