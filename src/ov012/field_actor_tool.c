@@ -13,13 +13,14 @@
 // The grid height of a height on the map
 #define HEIGHT_TO_GRID(height) ((s16)(((height) >> 4) / FX32_ONE))
 
+static BOOL (*const TILE_EXIT_BLOCK_CHECKS[4])(u16 tileClass) = {
+    TileExitBlockCheck_Up,
+    TileExitBlockCheck_Down,
+    TileExitBlockCheck_Left,
+    TileExitBlockCheck_Right,
+};
+
 static const u16 data_ov012_0216cd60[4] = { 0x8000, 0x0000, 0x4000, 0xc000 };
-
-static const u8 data_ov012_0216cd68[16] = { 0, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 0 };
-
-static const s32 DIRECTION_VEC_Z[4] = { -1, 1, 0, 0 };
-
-static const s32 DIRECTION_VEC_X[4] = { 0, 0, -1, 1 };
 
 static BOOL (*const TILE_ENTER_BLOCK_CHECKS[4])(u16 tileClass) = {
     TileExitBlockCheck_Down,
@@ -28,14 +29,13 @@ static BOOL (*const TILE_ENTER_BLOCK_CHECKS[4])(u16 tileClass) = {
     TileExitBlockCheck_Left,
 };
 
-static BOOL (*const TILE_EXIT_BLOCK_CHECKS[4])(u16 tileClass) = {
-    TileExitBlockCheck_Up,
-    TileExitBlockCheck_Down,
-    TileExitBlockCheck_Left,
-    TileExitBlockCheck_Right,
-};
+static const s32 DIRECTION_VEC_X[4] = { 0, 0, -1, 1 };
+
+static const s32 DIRECTION_VEC_Z[4] = { -1, 1, 0, 0 };
 
 static const u32 INV_DIR_TABLE[4] = { DIR_DOWN, DIR_UP, DIR_RIGHT, DIR_LEFT };
+
+static const u8 data_ov012_0216cd68[16] = { 0, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 0 };
 
 static const u8 data_ov012_0216cdc8[4][4] = {
     { 0, 1, 2, 3 },
@@ -43,9 +43,6 @@ static const u8 data_ov012_0216cdc8[4][4] = {
     { 1, 0, 3, 2 },
     { 2, 3, 1, 0 },
 };
-
-// How far an actor sinks into deep sand
-static const VecFx32 data_ov012_0216cdd8 = { 0, -FX32_CONST(7), 0 };
 
 void func_ov012_0215dabc(FieldActor *actor) {
     func_ov012_02167174(actor);
@@ -229,7 +226,8 @@ void func_ov012_0215de7c(FieldActor *actor) {
 
 void func_ov012_0215def4(FieldActor *actor, ActorTerrainEffectParam *param) {
     if (func_ov012_021676f0(actor) == FALSE && MapTile_IsDeepSand(param->tileClass)) {
-        VecFx32 offset = data_ov012_0216cdd8;
+        // How far an actor sinks into deep sand
+        VecFx32 offset = { 0, -FX32_CONST(7), 0 };
         func_ov012_0216736c(actor, &offset);
     } else {
         VecFx32 offset = { 0, 0, 0 };
@@ -558,7 +556,7 @@ static inline BOOL CheckAreaOverActor(FieldActor *actor, const GPosXYZ *pos, s16
     return TRUE;
 }
 
-BOOL CheckActorNewPosOtherActorCollision(FieldActor *actor, s16 x, s16 y, s16 z) {
+BOOL CheckActorNewPosOtherActorCollision(const FieldActor *actor, s16 x, s16 y, s16 z) {
     const MMSys *system = actor->actorSystem;
     u32 ignoreFlags;
     s16 maxX;

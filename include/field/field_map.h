@@ -87,7 +87,7 @@ extern const char data_ov012_0216e1d4[];
 
 MapMatrix *InitMapMatrix(HeapID heapId);
 void MapMatrix_Load(MapMatrix *matrix, u16 matrixId, u16 zoneId, HeapID heapId);
-void ProcessMapMatrix(MapMatrix *matrix, MapMatrixFileHeader *data, u32 matrixId, u16 zoneId);
+void ProcessMapMatrix(MapMatrix *matrix, const MapMatrixFileHeader *data, u32 matrixId, u16 zoneId);
 void FreeMapMatrix(MapMatrix *matrix);
 u16 GetZoneIDAtMatrixXZ(MapMatrix *matrix, s32 x, s32 z);
 u16 GetZoneIDAtMatrixXZWorld(MapMatrix *matrix, s32 x, s32 z);

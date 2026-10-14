@@ -7728,7 +7728,6 @@ from:0x0216cda8 kind:load to:0x021a2d59 module:overlays(36,326)
 from:0x0216cdac kind:load to:0x021a2d75 module:overlays(36,326)
 from:0x0216cdb0 kind:load to:0x021a2d91 module:overlays(36,326)
 from:0x0216cdb4 kind:load to:0x021a2da5 module:overlays(36,185,326)
-from:0x0216cdd0 kind:load to:0x02030001 module:main
 from:0x0216cde4 kind:load to:0x0215f1a9 module:overlay(12)
 from:0x0216cdec kind:load to:0x0215f1cd module:overlay(12)
 from:0x0216cdf4 kind:load to:0x0217dca9 module:overlay(35)
