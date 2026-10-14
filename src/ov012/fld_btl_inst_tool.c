@@ -110,6 +110,14 @@ BtlSetup *SetupTrialHouseBattle(GameSystem *gsys, PokeParty *party, u32 mode, BS
     return setup;
 }
 
+// Sets up the client's trainer from trainer, numbered from trainerIdBase
+static inline void SetTrialHouseTrainer(BtlSetup *setup, SetupClient client, const BSubwayTrainer *trainer,
+                                        u32 trainerIdBase) {
+    setup->trainers[client]->trainerId = trainer->unk00 - 1;
+    func_ov012_02162394(0, trainerIdBase + setup->trainers[client]->trainerId, trainer, setup->trainers[client], 0x87,
+                        TRUE, FALSE);
+}
+
 // A Trial House battle against one trainer, of levels between minLevel and maxLevel
 BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount, int mode, int count,
                               BSubwayTrainer *trainer, u32 a6, u32 trainerIdBase, u16 maxLevel, u16 minLevel, u32 a10,
@@ -118,6 +126,7 @@ BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount
     BtlFieldStatus status;
     BtlSetup *setup;
     SetupClient client;
+    PlayerInfo *info;
     u16 level;
 
     // Only mode 0 makes the setup, so the others use it unset
@@ -125,12 +134,11 @@ BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount
         setup = BtlSetup_SetTrainerTrialHouse(gsys, 0, &status, FALSE, 4);
     }
     client = CLIENT_PLAYER;
-    setup->unk34[client] = GetGameDataPlayerInfo(gameData);
+    info = GetGameDataPlayerInfo(gameData);
+    setup->unk34[client] = info;
     RestrictPlayerParty(party, setup->party[client], partyCount, 0, 4);
     client = CLIENT_ENEMY;
-    setup->trainers[client]->trainerId = trainer->unk00 - 1;
-    func_ov012_02162394(0, trainerIdBase + setup->trainers[client]->trainerId, trainer, setup->trainers[client], 0x87,
-                        TRUE, FALSE);
+    SetTrialHouseTrainer(setup, client, trainer, trainerIdBase);
     level = minLevel + func_ov012_021627d4(rand) % (maxLevel - minLevel + 1);
     LoadTrialHouseParty(trainer, setup->party[client], level, count, 4);
     if (a11 == 0x17) {

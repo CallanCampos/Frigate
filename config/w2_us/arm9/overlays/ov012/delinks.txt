@@ -48,6 +48,7 @@ src/ov012/delivery_irc.c:
     .data       start:0x0216e150 end:0x0216e1d0
 
 src/ov012/mystery_gift_pokemon.c:
+    complete
     .text       start:0x021531a0 end:0x0215361c
     .rodata     start:0x0216af9c end:0x0216afd8
 
@@ -126,6 +127,7 @@ src/ov012/scrcmd_sodateya.c:
     .data       start:0x0216e258 end:0x0216e26c
 
 src/ov012/scrcmd_musical.c:
+    complete
     .text       start:0x02158104 end:0x0215912c
     .data       start:0x0216e26c end:0x0216e280
 
@@ -167,7 +169,9 @@ src/ov012/event_shortcut_menu.c:
     .data       start:0x0216e2a8 end:0x0216e2c0
 
 src/ov012/event_field_proclink.c:
+    complete
     .text       start:0x0215b4c8 end:0x0215c538
+    .rodata     start:0x0216cbd8 end:0x0216cd40
     .data       start:0x0216e2c0 end:0x0216e2d8
 
 src/ov012/event_save.c:
@@ -282,6 +286,7 @@ src/ov012/fld_btl_inst_event.c:
     .text       start:0x02161cc8 end:0x02161fac
 
 src/ov012/fld_btl_inst_tool.c:
+    complete
     .text       start:0x02161fac end:0x02162ba4
     .rodata     start:0x0216d9ec end:0x0216dac8
     .data       start:0x0216e3ac end:0x0216e3c0
@@ -355,6 +360,7 @@ src/ov012/event_league_lift.c:
     .rodata     start:0x0216dc7c end:0x0216dc9c
 
 src/ov012/event_bsubway.c:
+    complete
     .text       start:0x02165ef8 end:0x021666a4
     .rodata     start:0x0216dc9c end:0x0216dca8
 
@@ -379,10 +385,12 @@ src/ov012/scrcmd_sp_poke.c:
     .text       start:0x02169c5c end:0x02169cbc
 
 src/ov012/waza_oshie.c:
+    complete
     .text       start:0x02169cbc end:0x02169e58
     .data       start:0x0216e63c end:0x0216e64c
 
 src/ov012/g3d_text_draw.c:
+    complete
     .text       start:0x02169e58 end:0x0216a1d0
     .rodata     start:0x0216de44 end:0x0216de98
 

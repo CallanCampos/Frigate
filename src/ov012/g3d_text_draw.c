@@ -146,12 +146,11 @@ static void G3DTextDraw_BitmapTiledToLinear(GFLBitmap *tiled, GFLBitmap *linear)
     u16 tileRow = bytesPerTile / 8;
     u8 *src = GFL_BitmapGetPixelData(tiled);
     u8 *dest = GFL_BitmapGetPixelData(linear);
-    int size = width * height * bytesPerTile;
     int i;
     int row;
     int rest;
 
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < width * height * bytesPerTile; i++) {
         row = i / (width * tileRow);
         rest = i % (width * tileRow);
         dest[i] = src[(rest % tileRow) + (row % 8) * tileRow + ((row / 8) * width + rest / tileRow) * bytesPerTile];
@@ -160,22 +159,21 @@ static void G3DTextDraw_BitmapTiledToLinear(GFLBitmap *tiled, GFLBitmap *linear)
 
 static void G3DTextDraw_StringToTexture(G3DTextDrawWork *work, const StrBuf *text, u16 x, u16 y, u16 color,
                                         HeapID heapId) {
-    u32 height = TEX_DIM_LUT[work->resource.unk2].size;
-    u32 tilesY = height / 8;
-    u32 tilesX = TEX_DIM_LUT[work->resource.unk0].size / 8;
-    GFLBitmap *linear = GFL_BitmapCreate(tilesX, tilesY, 0x20, heapId);
-    GFLBitmap *tiled = GFL_BitmapCreate(tilesX, tilesY, 0x20, heapId);
+    u16 width = TEX_DIM_LUT[work->resource.unk0].size;
+    u16 height = TEX_DIM_LUT[work->resource.unk2].size;
+    GFLBitmap *linear = GFL_BitmapCreate(width / 8, height / 8, 0x20, heapId);
+    GFLBitmap *tiled = GFL_BitmapCreate(width / 8, height / 8, 0x20, heapId);
     u8 *pixels;
     u32 texKey;
     u32 texOffset;
-    int size;
+    u32 size;
 
     G3DTextDraw_RenderBitmap(text, x, y, color, tiled, work->font);
     G3DTextDraw_BitmapTiledToLinear(tiled, linear);
     pixels = GFL_BitmapGetPixelData(linear);
     texOffset = work->resource.unkC;
     texKey = (work->resource.unk4 & 0xffff) << 3;
-    size = (int)(tilesX * height) / 8 * 32;
+    size = width / 8 * height / 8 * 32;
     gfxBeginTextureUpload();
     cp15_flushDC(pixels, size);
     gfxUploadTexture(pixels, texOffset + texKey, size);

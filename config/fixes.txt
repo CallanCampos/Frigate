@@ -578,6 +578,11 @@ overlays/ov012 0x0215a45c overlay_id 332
 overlays/ov012 0x0215a464 overlay_id 295
 overlays/ov012 0x0215a46c overlay_id 267
 overlays/ov012 0x0215a760 reloc_module overlay(35)
+overlays/ov012 0x0215b700 reloc_addend 0x10
+overlays/ov012 0x0215b704 reloc_addend 0x8
+overlays/ov012 0x0215b708 reloc_addend 0x14
+overlays/ov012 0x0215b70c reloc_addend 0x4
+overlays/ov012 0x0215b714 reloc_addend 0xc
 overlays/ov012 0x0215b9c8 overlay_id 215
 overlays/ov012 0x0215c1b2 reloc_module overlay(215)
 overlays/ov012 0x0215c1ec reloc_module overlay(215)
@@ -816,8 +821,14 @@ overlays/ov012 0x0216c2c4 reloc_module overlay(66)
 overlays/ov012 0x0216c2d8 reloc_module overlay(67)
 overlays/ov012 0x0216c911 remove_symbol
 overlays/ov012 0x0216c9a4 add_data REBATTLE_TRAINER_COUNT
+overlays/ov012 0x0216cb98 add_section src/ov012/event_field_proclink.c:.rodata:0x168
 overlays/ov012 0x0216cb98 overlay_id 165
+overlays/ov012 0x0216cb9c remove_symbol
 overlays/ov012 0x0216cb9c reloc_module overlay(165)
+overlays/ov012 0x0216cba0 remove_symbol
+overlays/ov012 0x0216cba4 remove_symbol
+overlays/ov012 0x0216cba8 remove_symbol
+overlays/ov012 0x0216cbac remove_symbol
 overlays/ov012 0x0216cbb0 overlay_id 302
 overlays/ov012 0x0216cbb4 reloc_module overlay(302)
 overlays/ov012 0x0216cbc8 overlay_id 142
@@ -995,8 +1006,8 @@ overlays/ov036 0x021cac9c remove_reloc
 overlays/ov036 0x021cacf4 section_end src/ov036/ircbattlemenu.c:.rodata
 overlays/ov036 0x021cf2e4 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf2e4 section_end src/ov036/fldmmdl_blact.c:.rodata
-overlays/ov036 0x021cf3a8 section_start src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf3a8 section_end src/ov036/fldmmdl_g3dobj.c:.rodata
+overlays/ov036 0x021cf3a8 section_start src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf768 section_end src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf768 section_start src/ov036/field_rail_loader.c:.rodata
 overlays/ov036 0x021cf76c add_section src/ov036/field_rail_loader.c:.rodata:0x250
@@ -3480,11 +3491,11 @@ overlays/ov310 0x021a4fc4 reloc_addend 0x4c
 overlays/ov310 0x021a4fc8 reloc_addend 0x80
 overlays/ov310 0x021a4fcc reloc_addend 0x8
 overlays/ov310 0x021a7021 remove_symbol
-overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
 overlays/ov310 0x021a7028 add_data data_ov310_021a7028
+overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
 overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
-overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
 overlays/ov310 0x021a773c add_data ResearchCommon_Unused
+overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
 overlays/ov311 0x0219cea0 reloc_module overlay(139)
 overlays/ov311 0x0219cf02 reloc_module overlay(139)
 overlays/ov311 0x0219cf8c reloc_module overlay(139)

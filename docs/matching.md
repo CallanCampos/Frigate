@@ -464,6 +464,14 @@ Same code, other `sp` offsets or frame size.
   loading its bound, the number of mons, only with the bound a `u16`. And `func_ov167_021afd90` matched only with
   `numMoves` a `u32` and its locals in one order of 720; no order matched with it a `u8` or `u16`, so sweep the orders
   again after widening a local.
+  The spills stay word-sized `str` and `ldr` whatever the type, so the asm doesn't show it. A reload placed above
+  another spill's store, where the original stores first, can mean narrow locals: in `scrcmd_musical.c`'s
+  `func_ov012_02158280`, `secondValue = most; second = topIndex;` stores before it reloads only with `topIndex` and
+  `secondValue` both `u8` (or `u16`), so sweep the widths of several locals together: narrowing one at a time, or
+  all the candidates at once, misses it. A local read from a field can need the field's type even with the same
+  instructions and slots: `u8 gender = poke->gender;` in `Mystery_CreateGiftPokemon` moves the species reload and
+  the `poke->form` load among `PML_GenPID`'s stack argument stores, which matched `mystery_gift_pokemon.c`'s
+  `func_ov012_02153160`.
 - A hardware address that the original builds with shifts and keeps on the stack, where ours loads it from the
   literal pool, comes from an SDK inline that returns it: the ribbon page's `PStaRibbon_CreateActors` builds
   `0x19 << 22` and `2 << 16` apart, and matches as `(u8 *)G2_GetOBJCharPtr() + 0x20000` but not as
@@ -639,11 +647,20 @@ Same instructions, scheduled in another order.
   schedules early, such as an argument loaded before the stack arguments are stored, points to a `const` parameter.
   It has to be the parameter: `fld_scenearea_loader.c`'s camera-area callbacks scheduled their area's loads only
   once the callback typedefs took `const CameraArea *`, and a `const` local pointer to the member did nothing. The
-  same change fixed the register allocation of the loop in `fld_scenearea.c` that calls them. Since `const` shows in
-  the code, a caller and its callee can disagree, and then the call casts: `btl_server_flow.c`'s
+  same change fixed the register allocation of the loop in `fld_scenearea.c` that calls them. A `void *` parameter
+  copied to a typed local needs the `const` on the `void *` itself: `event_field_proclink.c`'s `func_ov012_0215c160`
+  and `script_evo` matched once `FieldProcLink`'s `createParam` and every callback in its table took
+  `const void *prevParam`, while `const PokeListParam *partyParam = prevParam;` alone did nothing. Through a wrapper
+  whose whole body is a `static inline`, only the wrapper's own parameter counts: `func_ov012_02153160` matched with
+  `const MysteryGift *gift`, though `Mystery_CreateGiftPokemon`, which it returns, already took one. Since `const`
+  shows in the code, a caller and its callee can disagree, and then the call casts: `btl_server_flow.c`'s
   `func_ov167_021a6c34` matches only with a `const` param and `func_ov167_021a6914`, which it passes it to, only
   without, so it passes `(BtlFlowMoveParam *)param`. Before casting, check that dropping `const` along the caller's
   chain doesn't match as well: `battle_rec_tool.c`'s party loaders took a non-`const` record with no change.
+- MWCC passes a `const void *` to a `T *` parameter without a word, even with `-w all`, while a `const T *` passed to
+  a `T *` warns of an illegal implicit conversion. After making a `void *` parameter `const`, find the `const` its
+  uses drop with `clang -fsyntax-only @compile_flags.txt src/X.c`, which reports each as discarding qualifiers, and
+  give a callee that only reads it a `const` parameter, as `MailTool_IsWritten` got for `event_field_proclink.c`.
 - A dispatcher switch whose cases each end in their own `pop`, with `movs r0, #0` before the jump table, is a result
   local set to 0 after the last call before the switch, `case X: command = f(...); break;` and one `return command;`.
   `return f(...)` in each case with a final `return 0;` is 2 bytes longer and zeroes at the end:
@@ -673,6 +690,13 @@ Same instructions, scheduled in another order.
 - The same rule moves a call's stack argument stores. When loads through a pointer that is not `const` follow the
   call, the stack arguments are stored before the register arguments are set up. If the original stores them last,
   the pointer is `const`.
+- A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
+  between, where a local of their type is computed where it is written: `g3d_text_draw.c`'s
+  `G3DTextDraw_StringToTexture` computes `size` before `gfxBeginTextureUpload()`, as the original does, only as a
+  `u32`, the type `cp15_flushDC` and `gfxUploadTexture` take, not as an `int`. The same function loads its heap ID,
+  a stack parameter, after the second `TEX_DIM_LUT` read only with the table's `u16` sizes read into `u16` locals
+  and divided at each call, `GFL_BitmapCreate(width / 8, height / 8, ...)`; `u32` locals holding the quotients load
+  it first.
 - A global's address that the original loads early, into a saved register before unrelated calls, and copies from
   later was taken into a pointer local where it is loaded: `fldeff_gyoe.c`'s draw loads `&NNS_G3dGlb.projMtx` before
   the float calls of its depth offset only as `const MtxFx44 *proj = NNS_G3dGlbGetProjectionMtx();` declared first
@@ -734,7 +758,13 @@ Same instructions, scheduled in another order.
   `GFL_BGSysFillScrArea` does.
   This isn't the whole rule: `fld_btl_inst_tool.c`'s `SetupTrialHouseBattle` loads its count at entry, as the
   original does, only as an `int`, the type its callees take, and at its uses as a `u32`. Whether the parameter's
-  type matches its uses' seems to count too.
+  type matches its uses' seems to count too. A pointer goes to a callee-saved register at entry only when its uses
+  weigh about 4, where a use as the base of `->` or `*` weighs 2 and a plain use, an argument or a copy, weighs 1; a
+  dereference through a cast weighs 1, and so does passing it to a `static inline` that takes a `const T *`. A
+  lighter pointer is reloaded from its stack slot at each use, with nearby uses sharing a load. The same file's
+  `func_ov012_02162068` reloads its `trainer` (`ldr r2, [sp, #0x3c]`) as the original does once its dereferences go
+  through `SetTrialHouseTrainer`, an inline taking `const BSubwayTrainer *trainer`; with a non-`const` parameter the
+  inline is transparent and `trainer` keeps its register.
 - A `u16` stack parameter reloaded with `ldrh` at some uses, with one `ldrh` into a register that feeds others, has
   few uses of its own: the shared load is its conversion to a wider type, so the callees there take a `u32`. In
   bmp_menu.c's `BmpMenu_AddEx`, `BmpCursor_Create` and `BmpCursor_LoadBitmap` narrow their heap ID with shifts, so they take
@@ -1024,7 +1054,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   register (`ldrh r0, [r7]; movs r7, #1; ...; movs r7, #0`) and stores a spilled flag once at the join. A function
   can mix the two: `gym_virbank.c`'s `func_ov100_021eee4c` has the first of its four flags as `TRUE` plus `if` (its
   `movs r5, #1` is in the prologue) and the other three as ternaries; one spelling for all four leaves a pointer
-  spilled and the frame larger.
+  spilled and the frame larger. Where both spellings give the same instructions, the ternary still allocates the
+  rest of the function differently: `scrcmd_musical.c`'s `func_ov012_021580c4` swaps its `vm` and `env` between
+  `r4` and `r5`, and everything that shares them, with `online = TRUE; if (kind == 0) { online = FALSE; }`, and
+  matches with `online = kind != 0 ? TRUE : FALSE;`, after over 400 declaration orders had not.
 - A ternary store `*p = c ? a : b` computes the address once and stores after the branches; an `if`/`else` with a
   store in each branch computes the address in each, as `Bitmap_Scroll16` does.
 - Parenthesized offsets change the code: `pixels + (dst + 4)` adds the offsets and indexes once, `pixels + dst + 4`
@@ -1080,6 +1113,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   differ (`GameBeaconSys_GetRecentEntry`, `GameBeaconSys_GetNextNew`).
 - A `u16` parameter is spilled at entry before the other parameters are moved, a `u32` one after them. A caller's
   `u16` narrowing can come from its own `u16` local rather than the parameter type (`GameCommSys_LogPlayers`).
+  The width of a spilled index parameter also schedules its multiply, with no narrowing anywhere to show it:
+  `event_bsubway.c`'s `func_ov012_02166118` builds the size of `bsw->trainers[index]`
+  (`movs r1, #0xe8; adds r1, #0x38`) after its event data's field stores with `u16 index`, under every order of the
+  stores, and ahead of them with `int index` (or `u32`), which matches once the stores are in the original's order.
 
 - A store written before a read through a `const` pointer parameter can move above another store; dropping the
   `const` keeps the source order (app_taskmenu.c's `AppTaskMenu_Create`).
@@ -1461,6 +1498,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A bound written as `i <= N - 1` is computed once into a register before the loop and tested with `ble`, where
   `i < N` reloads `N` from the literal pool and tests with `blt`. The bag's Free Space list compacts its entries with
   `for (i = 0; i <= BAG_ITEM_LIST_SLOTS - 1; i++)` in `bag_item.c`'s `BagItemList_Compact`.
+- A bound written in the `for` condition allocates differently from the same bound in a local: with
+  `i < width * height * bytesPerTile`, the guard tests the product's own register (`cmp r1, #0`, with no copy),
+  `i = 0` is set before the multiplies and takes the register of a pointer that is dead by then, and the other
+  invariant takes the later stack slot. `g3d_text_draw.c`'s `G3DTextDraw_BitmapTiledToLinear` matches so, 2 bytes
+  shorter than with an `int size` local.
 
 - A test that the original places after its body, entered from the top as well as from an earlier branch, is a loop
   that stops after its first pass: `while (box < n) { ...; break; }`. The trade does one box a frame this way in
@@ -1476,7 +1518,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `getKindOfSlot` loops `for (i = SYMBOL_KIND_KEEP_LARGE; i < NELEMS(sSlotRanges); i++)`.
 - A loop over an array of small structs read through by-value inline getters matches only when each getter takes
   `learnset[i]` itself: `poke_tool.c`'s learnset loops (`PML_UtilPkmSetDefaultMoves`, `PokeParty_LearnNextLevelMove`)
-  lose the copy the original makes for `GetMove` when the element is first put in an `entry` local.
+  lose the copy the original makes for `GetMove` when the element is first put in an `entry` local. A plain local
+  passed by value keeps its stack copy only when the inline reads a field other than the one at offset 0, while an
+  element, `Get(learnset[i])`, is copied for each call, and once more into the preheader of an inner loop that
+  passes it. Many copies of one element, as the eight of `waza_oshie.c`'s `PokeParty_GetRememberableMoves`, mean
+  every accessor took the element; that function also writes its two searches out, with
+  `LearnsetEntry_GetMove(learnset[i])` compared inside each loop.
 - A loop entered with a `b` to its test and reloading its bound on each pass, where every plain comparison is
   rotated, has a test whose value is 0/1: `i <= ICON_COUNT - 1 ? TRUE : FALSE`, or an inline predicate. The Union
   Room's lower screen has it in `UnionSubdisp_SelectIcon` and in the `UnionSubdisp_ShowSelected` inline of `Create`.
@@ -1633,7 +1680,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u8` or `u16` promotes to a signed `int`, so `(u8)id % 5u` is the unsigned one, and so is a `u16` divided by a
   `u32`. Compare the built overlay in `build/<version>/build`
   with the original to find it.
-- A 64-bit division calls `_ll_udiv` (swan's `__aeabi_uldivmod`) when either operand is unsigned. A call to it with
+- A 64-bit division calls `_ll_udiv` (swan's `__aeabi_uldivmod`) when either operand is unsigned, and `_ll_sdiv`
+  (0x0208d414) when both are signed: `pass_power.c`'s `PassPower_ApplyCapture` divides an `s64 value` by 100. The
+  probe masks the call's relocation, so only linking the file shows the wrong helper. A call to `_ll_udiv` with
   operands sign-extended by `asr #0x1f` is an `int` cast to `u64`: the trade's box cubes turn by
   `((u64)((x + 48) % width) << 16) / width` in `func_ov194_021c2844`. A file that calls it needs `_ll_udiv` added as a
   label on `__aeabi_uldivmod` with `config_fixes.py add-label` before it can go complete.
