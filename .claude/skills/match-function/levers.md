@@ -302,6 +302,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- A 0/1 flag built with branches (`bne; movs r1, #1; b; movs r1, #0`) where ours is set-then-clear: the flag's
+  register is an operand of the `cmp`; declare and compute that flag first. (matching.md: "A 0/1 comparison flag")
 - Returns of `-1` and `0` folded into one computed result (`rsbs`, `mvns`) where the original keeps two returns: the
   function returns an enum. (matching.md: "returns an enum")
 - `bne` over a `b` to the end at the top: the body is in an `if`, not after an early return. (matching.md: "An early `return`")
