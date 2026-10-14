@@ -168,7 +168,7 @@ static void WipeCircle_GetSpan(s32 radius, s32 cx, s32 cy, s32 y, s32 *x1, s32 *
 static void WipeCircleWork_Compute(WipeCircleWork *work);
 static void WipeLine_Init(WipeScreen *screen, WipeLinePattern *pattern);
 static BOOL WipeLine_Main(WipeScreen *screen);
-static void WipeLineWork_Init(WipeLineWork *work, const WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
+static void WipeLineWork_Init(WipeLineWork *work, WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
                               WipeWnd *wnd, WipeHBlank *hblank, u32 heapId);
 static BOOL WipeLineWork_Step(WipeLineWork *work);
 static void WipeLineWork_Exit(WipeLineWork *work);
@@ -918,7 +918,7 @@ static BOOL WipeLine_Main(WipeScreen *screen) {
     return done;
 }
 
-static void WipeLineWork_Init(WipeLineWork *work, const WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
+static void WipeLineWork_Init(WipeLineWork *work, WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
                               WipeWnd *wnd, WipeHBlank *hblank, u32 heapId) {
     WipeLineWnd_Init(&work->lines, screen, 1, 0, 0);
     if (pattern->isOut == FALSE) {
