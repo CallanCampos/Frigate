@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 214,
+    "area": "AREA_ROUTE_19",
     "matrix": "MAP_MATRIX_PLEDGE_GROVE",
     "scripts": "SCRIPTS_PLEDGE_GROVE",
     "text": "SCRIPT_TEXT_PLEDGE_GROVE",

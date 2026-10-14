@@ -6,7 +6,8 @@ builds the archive (a/0/0/9) from them, which the build does.
     map_matrix_data.py pack data/map_matrices ARCHIVE
 
 A matrix is a grid of map cells: its header says whether it also gives each cell's zone, as the overworld's do, then
-its width and height, then each cell's map, a file of the map archive or 0xffffffff for none, row by row, then the zones.
+its width and height, then each cell's map, a file of the map archive (a/0/0/8, by its MAP_MODEL_* constant in the
+file) or 0xffffffff for none, row by row, then the zones.
 Each matrix is data/map_matrices/<matrix>.json, named after its constant in data/constants/map_matrices.txt, in whose
 order the archive has them. map_matrix.schema.json describes the fields.
 """
@@ -32,7 +33,8 @@ def matrix_json(data: bytes) -> dict:
     if unk or len(data) != 8 + width * height * 4 * (2 if has_zones else 1):
         raise ValueError("unexpected matrix")
     maps = struct.unpack_from(f"<{width * height}I", data, 8)
-    matrix = {"$schema": "map_matrix.schema.json", "maps": rows([None if m == NONE else m for m in maps], width)}
+    matrix = {"$schema": "map_matrix.schema.json",
+              "maps": rows([None if m == NONE else name("MAP_MODEL_", m) for m in maps], width)}
     if has_zones:
         zones = struct.unpack_from(f"<{width * height}I", data, 8 + 4 * width * height)
         matrix["zones"] = rows([None if z == NONE else name("ZONE_", z) for z in zones], width)
@@ -58,7 +60,7 @@ def matrix_bytes(matrix: dict, where: str) -> bytes:
         if len(grid) != height or any(len(row) != width for row in grid):
             raise DataError(f"{where}: the grids' rows aren't all {width} cells, {height} rows")
     data = struct.pack("<HHHH", "zones" in matrix, 0, width, height)
-    data += b"".join(struct.pack("<I", NONE if cell is None else cell) for row in maps for cell in row)
+    data += b"".join(struct.pack("<I", NONE if cell is None else value(cell, where)) for row in maps for cell in row)
     if "zones" in matrix:
         data += b"".join(struct.pack("<I", NONE if cell is None else value(cell, where))
                          for row in matrix["zones"] for cell in row)

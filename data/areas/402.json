@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
     "prop_bundle": 70,
-    "texture_set": 402,
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_243",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": true,

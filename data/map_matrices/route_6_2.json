@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 875 ]
+        [ "MAP_MODEL_ROUTE_6_2_M_WLABO01_00_00" ]
     ]
 }

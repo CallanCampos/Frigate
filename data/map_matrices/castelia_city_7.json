@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 113 ],
-        [ 227 ]
+        [ "MAP_MODEL_CASTELIA_CITY_7_C03_G00_00" ],
+        [ "MAP_MODEL_CASTELIA_CITY_7_C03_G00_01" ]
     ]
 }

@@ -554,10 +554,12 @@ BOOL PML_ItemIsBerry(u16 item) {
 }
 
 BOOL PML_ItemIsNotSpecialMonsball(u16 item) {
-    if (item < ITEM_FAST_BALL || item > ITEM_PARK_BALL) {
-        return TRUE;
+    if (item == ITEM_FAST_BALL || item == ITEM_LEVEL_BALL || item == ITEM_LURE_BALL || item == ITEM_HEAVY_BALL ||
+        item == ITEM_LOVE_BALL || item == ITEM_FRIEND_BALL || item == ITEM_MOON_BALL || item == ITEM_SPORT_BALL ||
+        item == ITEM_PARK_BALL) {
+        return FALSE;
     }
-    return FALSE;
+    return TRUE;
 }
 
 // Converts a ball item to its ball ID (dir 0) or back (dir 1), or gives 0

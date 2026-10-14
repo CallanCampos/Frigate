@@ -13,7 +13,7 @@ enum {
 };
 
 // Shows the icon, or shows it again with new graphics when it is already shown
-void func_0203e76c(u16 x, u16 y, u32 type, u32 heapId);
+void func_0203e76c(u32 x, u32 y, u32 type, HeapID heapId);
 void func_0203e7dc(void);
 // The signal strength, 0 to 3
 void func_0203e7f8(int level);

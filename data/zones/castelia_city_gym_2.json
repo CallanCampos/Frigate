@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 302,
+    "area": "AREA_CASTELIA_CITY_GYM",
     "matrix": "MAP_MATRIX_CASTELIA_CITY_GYM_2",
     "scripts": "SCRIPTS_CASTELIA_CITY_GYM_2",
     "text": "SCRIPT_TEXT_CASTELIA_CITY_GYM_2",

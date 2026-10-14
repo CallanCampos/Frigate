@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 967 ]
+        [ "MAP_MODEL_LIBERTY_GARDEN_3_M_D12H02_00_00" ]
     ]
 }

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 389,
+    "area": "AREA_HUMILAU_CITY_GYM",
     "matrix": "MAP_MATRIX_HUMILAU_CITY_GYM",
     "scripts": "SCRIPTS_HUMILAU_CITY_GYM",
     "text": "SCRIPT_TEXT_HUMILAU_CITY_GYM",

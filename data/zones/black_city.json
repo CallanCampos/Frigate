@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 27,
     "npc_cache": 24,
-    "area": 74,
+    "area": "AREA_BLACK_CITY",
     "matrix": "MAP_MATRIX_BLACK_CITY",
     "scripts": "SCRIPTS_BLACK_CITY",
     "text": "SCRIPT_TEXT_BLACK_CITY",

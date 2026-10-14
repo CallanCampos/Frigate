@@ -2,10 +2,15 @@
 """Export field prop models as GLB and pack edited models into their area bundles.
 
 Usage: field_prop_model_data.py extract APICULA OUTPUT_DIR [BUNDLE [MODEL]]
+       field_prop_model_data.py relink SOURCE_DIR
        field_prop_model_data.py pack SOURCE_DIR black2|white2 OUTPUT
 
 The bundle's resource information and animations stay in their original Nitro
-encoding. Each model's editable geometry and materials live in one GLB.
+encoding. Each model's editable geometry and materials live in one GLB, next to
+its data.json (field_prop_model.schema.json). Bundles are directories named
+after their constants in data/constants/field_props_{exterior,interior}.txt.
+relink points every GLB's images at its bundle's texture directory again, after
+a bundle is renamed.
 """
 
 import hashlib
@@ -18,24 +23,21 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from narc import read_narc, write_narc
-from map_model_data import (accessor_values, canonical_texture_name, decoded_positions,
-                            dictionary_offsets, draw_order, mesh_primitives, model_bytes,
+from map_model_data import (FALLBACK_ERRORS, accessor_values, canonical_texture_name, decoded_positions,
+                            dictionary_offsets, draw_order, mesh_primitives, model_bytes, read_glb,
                             patch_material_bindings, patch_materials, patch_model,
                             patch_uvs, positions_from_gltf, rebuild_topology,
                             u32, write_glb)
 from map_texture_data import read_png, resources
-from graphics_paths import asset_dir
-from graphics_names import prop_bundle_name
+from graphics_paths import directories, numbered
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from tools.data.datajson import DataError, load, load_schema, write  # noqa: E402
+
 ARCHIVES = {"exterior": ("a/2/2/5", "a/1/7/4"),
             "interior": ("a/2/2/6", "a/1/7/5")}
-FALLBACK_ERRORS = ("triangle count changed", "triangle topology or shared vertex changed",
-                   "one Nitro vertex has multiple edited UVs", "vertices sharing a Nitro UV command",
-                   "this shape has no Nitro texture commands", "this UV has no editable Nitro texture command",
-                   "UV before the first Nitro texture command", "changes an axis omitted by Nitro opcode",
-                   "vertex coordinate is not representable", "vertex coordinate exceeds Nitro command range")
 
 
 def bundle_models(bundle):
@@ -68,10 +70,18 @@ def wrapped(model):
     return struct.pack("<2sHIII", b"NG", 0, 16, end, end) + model
 
 
-def export_one(apicula, directory, kind, bundle_id, entry, texture_blob):
+def needs_baseline(model_dir, name, nitro):
+    """Whether a transformed model's GLB, unedited, packs back into something else than its Nitro model when the packer
+    works out the exported positions from the GLB's joints, so that it needs them as exported."""
+    try:
+        positions, direct, _ = positions_from_gltf(model_dir, name, nitro, {"direct": False})
+        return not direct or patch_model(wrapped(nitro), positions, name) != wrapped(nitro)
+    except ValueError:
+        return True
+
+
+def export_one(apicula, model_dir, texture_dir, entry, texture_blob):
     index, res_id, name, nitro = entry
-    bundle_dir = asset_dir(directory, bundle_id, 3)
-    model_dir = asset_dir(bundle_dir, index, 3, name)
     model_dir.mkdir(parents=True, exist_ok=True)
     texture_names = {item["name"]: item for item in resources(texture_blob)[0]}
     with tempfile.TemporaryDirectory() as temporary:
@@ -84,7 +94,7 @@ def export_one(apicula, directory, kind, bundle_id, entry, texture_blob):
                        check=True, capture_output=True)
         gltfs = list(converted.glob("*.gltf"))
         if len(gltfs) != 1:
-            raise ValueError(f"{kind} {bundle_id}/{index}: expected one exported glTF")
+            raise ValueError(f"{model_dir}: expected one exported glTF")
         document = json.loads(gltfs[0].read_text())
         for picture in document.get("images", []):
             if "uri" not in picture:
@@ -92,11 +102,11 @@ def export_one(apicula, directory, kind, bundle_id, entry, texture_blob):
             canonical = canonical_texture_name(picture["uri"], texture_names)
             texture = texture_names[Path(canonical).stem]
             preview = converted / picture["uri"]
-            shared = asset_dir(ROOT / "data/field_prop_textures" / kind, bundle_id, 3) / canonical
+            shared = texture_dir / canonical
             if read_png(preview, texture["width"], texture["height"]) != read_png(
                     shared, texture["width"], texture["height"]):
-                raise ValueError(f"{kind} {bundle_id}/{index}: {canonical} differs from shared PNG")
-            picture["uri"] = f"../../../../field_prop_textures/{kind}/{shared.parent.name}/{canonical}"
+                raise ValueError(f"{model_dir}: {canonical} differs from shared PNG")
+            picture["uri"] = image_uri(texture_dir, canonical)
         binary = gltfs[0].with_suffix(".bin").read_bytes()
     write_glb(model_dir / "model.glb", document, binary)
     doc, primitives, binary = mesh_primitives(model_dir, name)
@@ -115,11 +125,23 @@ def export_one(apicula, directory, kind, bundle_id, entry, texture_blob):
             direct = patch_model(wrapped(nitro), positions, name) == wrapped(nitro)
         except ValueError:
             direct = False
-    mapping = {"direct": direct,
-               "glb_sha256": hashlib.sha256((model_dir / "model.glb").read_bytes()).hexdigest()}
+    data = {"$schema": "../../../field_prop_model.schema.json", "res_id": res_id}
     if not direct:
-        mapping["positions"] = positions
-    return mapping
+        data["transformed"] = True
+        if needs_baseline(model_dir, name, nitro):
+            data["positions"] = positions
+    data["glb_sha256"] = hashlib.sha256((model_dir / "model.glb").read_bytes()).hexdigest()
+    write(model_dir / "data.json", data)
+
+
+def image_uri(texture_dir, filename):
+    """Returns a GLB's path to one of its bundle's textures, from data/field_prop_models/<kind>/<bundle>/<model>/."""
+    return f"../../../../field_prop_textures/{texture_dir.parent.name}/{texture_dir.name}/{filename}"
+
+
+def model_dirs(folder, entries):
+    """Returns the directories of a bundle's models, named after them, numbered where a name repeats."""
+    return [folder / name for name in numbered(name for _, _, name, _ in entries)]
 
 
 def export(apicula, directory, selected_bundle=None, selected_model=None):
@@ -131,43 +153,57 @@ def export(apicula, directory, selected_bundle=None, selected_model=None):
     textures = read_narc((ROOT / "extract/b2_us/files" / texture_name).read_bytes())
     if len(archive) != len(textures):
         raise ValueError("field prop bundle and texture set counts differ")
-    directory.mkdir(parents=True, exist_ok=True)
-    (directory / "manifest.json").write_text(json.dumps(
-        {"archive": archive_name, "bundles": len(archive)}, indent=2) + "\n")
-    for bundle_id, bundle in enumerate(archive):
+    folders = directories(archive_name, directory)
+    texture_dirs = directories(texture_name)
+    if len(folders) != len(archive):
+        raise ValueError(f"{archive_name} has {len(archive)} bundles and its list {len(folders)}")
+    for bundle_id, (bundle, folder) in enumerate(zip(archive, folders)):
         if selected_bundle is not None and bundle_id != selected_bundle:
             continue
         entries = bundle_models(bundle)
-        folder = asset_dir(directory, bundle_id, 3,
-                           prop_bundle_name(kind, bundle_id, entries[0][2] if entries else "empty"))
-        folder.mkdir(parents=True, exist_ok=True)
-        manifest_path = folder / "manifest.json"
-        metadata = (json.loads(manifest_path.read_text()) if selected_model is not None
-                    and manifest_path.exists() else
-                    {"bundle_sha256": hashlib.sha256(bundle).hexdigest(),
-                     "models": [{"index": index, "res_id": res_id, "name": name}
-                                for index, res_id, name, _ in entries]})
-        selected = [entry for entry in entries
+        selected = [(entry, model_dir) for entry, model_dir in zip(entries, model_dirs(folder, entries))
                     if selected_model is None or entry[0] == selected_model]
         with ThreadPoolExecutor(max_workers=4) as executor:
-            mappings = list(executor.map(lambda entry: export_one(apicula, directory, kind, bundle_id,
-                                                                  entry, textures[bundle_id]), selected))
-        for entry, mapping in zip(selected, mappings):
-            item = metadata["models"][entry[0]]
-            item["glb_sha256"] = mapping.pop("glb_sha256")
-            if mapping["direct"]:
-                item.pop("conversion", None)
-            else:
-                item["conversion"] = mapping
-        (folder / "manifest.json").write_text(json.dumps(metadata, indent=2) + "\n")
+            list(executor.map(lambda item: export_one(apicula, item[1], texture_dirs[bundle_id], item[0],
+                                                      textures[bundle_id]), selected))
         print(f"{kind} {bundle_id:03d}: {len(selected)} GLBs", flush=True)
 
 
-def edit_model(model_dir, name, original, texture_blob, metadata, texture_directory=None):
+def relink(directory):
+    kind = directory.name
+    if kind not in ARCHIVES:
+        raise ValueError("source directory must end in exterior or interior")
+    archive_name, texture_name = ARCHIVES[kind]
+    archive = read_narc((ROOT / "extract/b2_us/files" / archive_name).read_bytes())
+    for bundle, folder, texture_dir in zip(archive, directories(archive_name, directory),
+                                           directories(texture_name)):
+        entries = bundle_models(bundle)
+        for model_dir in model_dirs(folder, entries):
+            path = model_dir / "model.glb"
+            glb = path.read_bytes()
+            doc, binary = read_glb(path)
+            images = [picture for picture in doc.get("images", []) if "uri" in picture]
+            uris = [image_uri(texture_dir, Path(picture["uri"]).name) for picture in images]
+            if [picture["uri"] for picture in images] == uris:
+                continue
+            for picture, uri in zip(images, uris):
+                picture["uri"] = uri
+            write_glb(path, doc, binary)
+            # A GLB as extracted stays one, so that it packs its original model
+            data_path = model_dir / "data.json"
+            data = json.loads(data_path.read_text())
+            if data["glb_sha256"] == hashlib.sha256(glb).hexdigest():
+                data["glb_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+                write(data_path, data)
+
+
+def edit_model(model_dir, name, original, texture_blob, data, texture_directory=None):
     glb = (model_dir / "model.glb").read_bytes()
-    if hashlib.sha256(glb).hexdigest() == metadata["glb_sha256"]:
+    if hashlib.sha256(glb).hexdigest() == data["glb_sha256"]:
         return original
-    mapping = metadata.get("conversion", {"direct": True})
+    mapping = {"direct": not data.get("transformed", False)}
+    if "positions" in data:
+        mapping["positions"] = data["positions"]
     doc, primitives, binary = mesh_primitives(model_dir, name)
     wrapped_original = wrapped(original)
     bound, _ = patch_material_bindings(wrapped_original, doc, primitives, texture_blob, name,
@@ -194,24 +230,20 @@ def pack(directory, game, output):
     version = {"black2": "b2_us", "white2": "w2_us"}[game]
     archive = read_narc((ROOT / "extract" / version / "files" / archive_name).read_bytes())
     textures = read_narc((ROOT / "extract" / version / "files" / texture_name).read_bytes())
-    if json.loads((directory / "manifest.json").read_text()) != {
-            "archive": archive_name, "bundles": len(archive)}:
-        raise ValueError("field prop model manifest differs from original archive")
+    folders = directories(archive_name, directory)
+    texture_dirs = directories(texture_name)
+    if len(folders) != len(archive):
+        raise ValueError(f"{archive_name} has {len(archive)} bundles and its list {len(folders)}")
+    schema = load_schema(directory.parent / "field_prop_model.schema.json")
     result = []
-    for bundle_id, bundle in enumerate(archive):
+    for bundle_id, (bundle, folder) in enumerate(zip(archive, folders)):
         entries = bundle_models(bundle)
-        folder = asset_dir(directory, bundle_id, 3)
-        metadata = json.loads((folder / "manifest.json").read_text())
-        if metadata["bundle_sha256"] != hashlib.sha256(bundle).hexdigest() or [
-                {key: value for key, value in item.items()
-                 if key not in ("conversion", "glb_sha256")}
-                for item in metadata["models"]] != [
-                    {"index": i, "res_id": r, "name": n} for i, r, n, _ in entries]:
-            raise ValueError(f"{kind} bundle {bundle_id}: model manifest changed")
-        texture_directory = asset_dir(ROOT / "data/field_prop_textures" / kind, bundle_id, 3)
-        edited = [edit_model(asset_dir(folder, index, 3), name, model, textures[bundle_id],
-                             metadata["models"][index], texture_directory)
-                  for index, _, name, model in entries]
+        edited = []
+        for (index, res_id, name, model), model_dir in zip(entries, model_dirs(folder, entries)):
+            data = load(model_dir / "data.json", schema)
+            if data["res_id"] != res_id:
+                raise DataError(f"{model_dir}: the bundle gives this model the resource ID {res_id}")
+            edited.append(edit_model(model_dir, name, model, textures[bundle_id], data, texture_dirs[bundle_id]))
         if all(model == original[3] for model, original in zip(edited, entries)):
             result.append(bundle)
             continue
@@ -233,8 +265,13 @@ def main():
         export(sys.argv[2], Path(sys.argv[3]),
                int(sys.argv[4]) if len(sys.argv) >= 5 else None,
                int(sys.argv[5]) if len(sys.argv) == 6 else None)
+    elif len(sys.argv) == 3 and sys.argv[1] == "relink":
+        relink(Path(sys.argv[2]))
     elif len(sys.argv) == 5 and sys.argv[1] == "pack":
-        pack(Path(sys.argv[2]), sys.argv[3], sys.argv[4])
+        try:
+            pack(Path(sys.argv[2]), sys.argv[3], sys.argv[4])
+        except DataError as error:
+            sys.exit(f"error: {error}")
     else:
         raise SystemExit(__doc__)
 

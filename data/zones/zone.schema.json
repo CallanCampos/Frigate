@@ -13,7 +13,7 @@
         "$schema": { "type": "string", "description": "This schema, for editors" },
         "map_type": { "$ref": "#/$defs/u8", "description": "GetZoneMapType" },
         "npc_cache": { "$ref": "#/$defs/u8", "description": "The NPC info cache index" },
-        "area": { "$ref": "#/$defs/u16", "description": "The area: its textures and buildings" },
+        "area": { "type": [ "string", "integer" ], "x-constant": "AREA_", "minimum": 0, "maximum": 65535, "description": "The area, an AREA_* constant (data/constants/areas.txt): its textures and buildings" },
         "matrix": { "type": "string", "x-constant": "MAP_MATRIX_", "description": "The map matrix, a MAP_MATRIX_* constant, data/map_matrices/<name>.json" },
         "scripts": {
             "type": "string", "x-constant": "SCRIPTS_",

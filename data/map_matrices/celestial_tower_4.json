@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 519 ]
+        [ "MAP_MODEL_CELESTIAL_TOWER_4_M_DUN1703_00_00" ]
     ]
 }

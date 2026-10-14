@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 468, 469 ],
-        [ 470, 471 ]
+        [ "MAP_MODEL_TWIST_MOUNTAIN_4_M_DUN0703_00_00", "MAP_MODEL_TWIST_MOUNTAIN_4_M_DUN0703_01_00" ],
+        [ "MAP_MODEL_TWIST_MOUNTAIN_4_M_DUN0703_00_01", "MAP_MODEL_TWIST_MOUNTAIN_4_M_DUN0703_01_01" ]
     ]
 }

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 10,
     "npc_cache": 24,
-    "area": 304,
+    "area": "AREA_NIMBASA_CITY_GYM",
     "matrix": "MAP_MATRIX_NIMBASA_CITY_GYM",
     "scripts": "SCRIPTS_NIMBASA_CITY_GYM",
     "text": "SCRIPT_TEXT_NIMBASA_CITY_GYM",

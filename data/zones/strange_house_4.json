@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 347,
+    "area": "AREA_LENTIMAS_TOWN_2",
     "matrix": "MAP_MATRIX_STRANGE_HOUSE_4",
     "scripts": "SCRIPTS_STRANGE_HOUSE_4",
     "text": "SCRIPT_TEXT_STRANGE_HOUSE_4",

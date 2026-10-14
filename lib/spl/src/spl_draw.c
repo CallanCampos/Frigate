@@ -96,15 +96,15 @@ void SPLDraw_Billboard(SPLManager *mgr, SPLParticle *particle) {
 
     emitter = mgr->drawEmitter;
     header = emitter->resource->header;
-    alpha = (particle->baseAlpha * (particle->animAlpha + 1)) >> 5;
-    scaleAnimDir = header->scaleAnimDir;
     aspectRatio = header->aspectRatio;
+    scaleAnimDir = header->scaleAnimDir;
+    alpha = (particle->baseAlpha * (particle->animAlpha + 1)) >> 5;
     emitterColor = emitter->color;
     animScale = particle->animScale;
     color = particle->color;
     viewMatrix = mgr->viewMatrix;
-    reg_G3_POLYGON_ATTR = GX_PACK_POLYGONATTR_PARAM(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE,
-                                                    particle->polygonId, alpha, mgr->polygonAttr);
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, particle->polygonId, alpha,
+                   mgr->polygonAttr);
     (void)reg_G3_POLYGON_ATTR;
     if (alpha == 0) {
         return;

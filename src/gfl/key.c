@@ -120,6 +120,19 @@ void GCTX_HIDUpdateKeypad(void) {
     GFL_HIDUpdateKeypad(GCTX_HIDGetInstance());
 }
 
+// The keys a swap reports: to for from, and from for to
+static inline u32 SwapRemappedKeys(const u32 *keys, const KeyRemap *remap) {
+    u32 swapped = 0;
+
+    if (*keys & remap->from) {
+        swapped |= remap->to;
+    }
+    if (*keys & remap->to) {
+        swapped |= remap->from;
+    }
+    return swapped;
+}
+
 static void keypressInterpreter(KeypadManager *keypad) {
     u32 *typed;
     u32 *held;
@@ -148,39 +161,11 @@ static void keypressInterpreter(KeypadManager *keypad) {
                 *typed |= remap->to;
             }
             break;
-        case KEY_REMAP_SWAP: {
-            u32 keys;
-            u32 swapped;
-
-            keys = keypad->pressed;
-            swapped = 0;
-            if (keys & remap->from) {
-                swapped |= remap->to;
-            }
-            if (remap->to & keys) {
-                swapped |= remap->from;
-            }
-            *pressed = (*pressed & ((remap->from | remap->to) ^ 0xffff)) | swapped;
-            keys = keypad->held;
-            swapped = 0;
-            if (keys & remap->from) {
-                swapped |= remap->to;
-            }
-            if (remap->to & keys) {
-                swapped |= remap->from;
-            }
-            *held = (*held & ((remap->from | remap->to) ^ 0xffff)) | swapped;
-            keys = keypad->typed;
-            swapped = 0;
-            if (keys & remap->from) {
-                swapped |= remap->to;
-            }
-            if (remap->to & keys) {
-                swapped |= remap->from;
-            }
-            *typed = (*typed & ((remap->from | remap->to) ^ 0xffff)) | swapped;
+        case KEY_REMAP_SWAP:
+            *pressed = (*pressed & ((remap->from | remap->to) ^ 0xffff)) | SwapRemappedKeys(&keypad->pressed, remap);
+            *held = (*held & ((remap->from | remap->to) ^ 0xffff)) | SwapRemappedKeys(&keypad->held, remap);
+            *typed = (*typed & ((remap->from | remap->to) ^ 0xffff)) | SwapRemappedKeys(&keypad->typed, remap);
             break;
-        }
         case KEY_REMAP_REMOVE:
             *pressed &= remap->from ^ 0xffff;
             *held &= remap->from ^ 0xffff;

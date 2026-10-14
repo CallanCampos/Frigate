@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 907 ]
+        [ "MAP_MODEL_POKE_TRANSFER_LAB_M_PAL01_00_00" ]
     ]
 }

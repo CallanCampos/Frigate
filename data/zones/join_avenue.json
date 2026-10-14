@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 25,
     "npc_cache": 24,
-    "area": 353,
+    "area": "AREA_JOIN_AVENUE",
     "matrix": "MAP_MATRIX_JOIN_AVENUE",
     "scripts": "SCRIPTS_JOIN_AVENUE",
     "text": "SCRIPT_TEXT_JOIN_AVENUE",

@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1061, 1063 ],
-        [ 1062, 1064 ]
+        [ "MAP_MODEL_VICTORY_ROAD_2_CHAMPION_00_00", "MAP_MODEL_VICTORY_ROAD_2_CHAMPION_01_00" ],
+        [ "MAP_MODEL_VICTORY_ROAD_2_CHAMPION_00_01", "MAP_MODEL_VICTORY_ROAD_2_CHAMPION_01_01" ]
     ]
 }

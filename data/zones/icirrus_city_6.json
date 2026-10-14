@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 307,
+    "area": "AREA_ICIRRUS_CITY_6",
     "matrix": "MAP_MATRIX_ICIRRUS_CITY_6",
     "scripts": "SCRIPTS_ICIRRUS_CITY_6",
     "text": "SCRIPT_TEXT_ICIRRUS_CITY_6",

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 278,
+    "area": "AREA_PLASMA_FRIGATE",
     "matrix": "MAP_MATRIX_PLASMA_FRIGATE",
     "scripts": "SCRIPTS_PLASMA_FRIGATE",
     "text": "SCRIPT_TEXT_PLASMA_FRIGATE",

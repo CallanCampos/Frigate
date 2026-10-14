@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 810 ]
+        [ "MAP_MODEL_CHARGESTONE_CAVE_5_M_OLDDUN0601_00" ]
     ]
 }

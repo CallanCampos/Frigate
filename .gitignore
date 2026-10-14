@@ -10,6 +10,7 @@ tools/dsd.rev
 tools/src/
 tools/objdiff-cli
 tools/wibo
+tools/sjiswrap.exe
 tools/mwccarm
 
 .venv

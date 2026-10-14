@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 774, 776 ],
-        [ 775, 777 ]
+        [ "MAP_MODEL_NATURE_PRESERVE_M_DUN3501_00_00", "MAP_MODEL_NATURE_PRESERVE_M_DUN3501_01_00" ],
+        [ "MAP_MODEL_NATURE_PRESERVE_M_DUN3501_00_01", "MAP_MODEL_NATURE_PRESERVE_M_DUN3501_01_01" ]
     ]
 }

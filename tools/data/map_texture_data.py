@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
-"""Export field map NSBTX textures as PNG and pack edited pixels into Nitro."""
+"""Export field map NSBTX textures as PNG and pack edited pixels into Nitro.
 
-import json
+Usage: map_texture_data.py extract OUTPUT_DIR [ARCHIVE]
+       map_texture_data.py pack SOURCE_DIR black2|white2 OUTPUT
+
+ARCHIVE is a/0/1/4, the map texture sets (the default), or a/1/7/4 or a/1/7/5, the exterior or interior field props'
+textures. Each texture set is a directory of PNGs named after its constant in the archive's list (graphics_paths.py).
+"""
+
 import struct
 import sys
 import zlib
 from pathlib import Path
 
 from narc import read_narc, write_narc
-from graphics_paths import asset_dir
-from graphics_names import map_texture_name, prop_bundle_name
+from graphics_paths import directories
 
 
 ROOT = Path(__file__).resolve().parents[2]
+TEXTURE_ARCHIVES = ("a/0/1/4", "a/1/7/4", "a/1/7/5")
 
 
 def number(data, offset, fmt="I"):
@@ -234,18 +240,14 @@ def palette_segments(blob, palettes):
 
 
 def export(directory, archive_name="a/0/1/4"):
-    if archive_name not in ("a/0/1/4", "a/1/7/4", "a/1/7/5"):
+    if archive_name not in TEXTURE_ARCHIVES:
         raise ValueError(f"unsupported field texture archive {archive_name}")
     archive = read_narc((ROOT / "extract/b2_us/files" / archive_name).read_bytes())
-    directory.mkdir(parents=True, exist_ok=True)
-    (directory / "manifest.json").write_text(json.dumps({"archive": archive_name, "sets": len(archive)}, indent=2) + "\n")
-    for set_id, blob in enumerate(archive):
+    folders = directories(archive_name, directory)
+    if len(folders) != len(archive):
+        raise ValueError(f"{archive_name} has {len(archive)} texture sets and its list {len(folders)}")
+    for blob, folder in zip(archive, folders):
         textures, palettes = resources(blob)
-        first = textures[0]["name"] if textures else "empty"
-        name = (map_texture_name(set_id, first) if archive_name == "a/0/1/4" else
-                prop_bundle_name("exterior" if archive_name == "a/1/7/4" else "interior",
-                                 set_id, first) + "_textures")
-        folder = asset_dir(directory, set_id, 3, name)
         folder.mkdir(parents=True, exist_ok=True)
         for index, texture in enumerate(textures):
             palette = palette_for(texture, palettes, index)
@@ -272,6 +274,15 @@ def quantized_pixels(pixels, texture):
                 raise ValueError(f"{texture['name']}: this Nitro texture cannot contain transparency")
             result.append((color, 0))
     return result
+
+
+def visible(pixels, texture):
+    """Returns pixels as the texture's format shows them: in its colors, and with any color where an alpha format's
+    pixel is wholly transparent, so that an editor's saving the same image differently is no edit."""
+    values = quantized_pixels(pixels, texture)
+    if texture["kind"] in (1, 6):
+        return [(None, 0) if alpha == 0 else (color, alpha) for color, alpha in values]
+    return values
 
 
 def encode_palette_group(blob, members, start, end):
@@ -314,28 +325,26 @@ def encode_palette_group(blob, members, start, end):
 
 def pack(directory, game, output):
     version = {"black2": "b2_us", "white2": "w2_us"}[game]
-    manifest = json.loads((directory / "manifest.json").read_text())
-    archive_name = manifest["archive"]
-    if archive_name not in ("a/0/1/4", "a/1/7/4", "a/1/7/5"):
-        raise ValueError(f"unsupported field texture archive {archive_name}")
-    if not Path(output).as_posix().endswith("/" + archive_name):
-        raise ValueError(f"output {output} does not name {archive_name}")
-    archive_path = ROOT / "extract" / version / "files" / archive_name
-    archive = read_narc(archive_path.read_bytes())
-    if manifest != {"archive": archive_name, "sets": len(archive)}:
-        raise ValueError("field texture set manifest differs from the Nitro archive")
+    archive_name = next((name for name in TEXTURE_ARCHIVES if Path(output).as_posix().endswith("/" + name)), None)
+    if archive_name is None:
+        raise ValueError(f"output {output} names no field texture archive")
+    archive = read_narc((ROOT / "extract" / version / "files" / archive_name).read_bytes())
+    folders = directories(archive_name, directory)
+    if len(folders) != len(archive):
+        raise ValueError(f"{archive_name} has {len(archive)} texture sets and its list {len(folders)}")
     result = []
-    for set_id, original in enumerate(archive):
+    for set_id, (original, folder) in enumerate(zip(archive, folders)):
         blob = bytearray(original)
         textures, palettes = resources(blob)
-        folder = asset_dir(directory, set_id, 3)
         pixels = []
         changed = set()
         for index, texture in enumerate(textures):
             path = folder / f"{texture['name']}.png"
             image = read_png(path, texture["width"], texture["height"])
             pixels.append(image)
-            if image != decode(original, texture, palette_for(texture, palettes, index)):
+            if image != decode(original, texture, palette_for(texture, palettes, index)) and visible(
+                    image, texture) != visible(decode(original, texture, palette_for(texture, palettes, index)),
+                                               texture):
                 changed.add(index)
         if changed:
             segments = {start: end for start, end, _ in palette_segments(blob, palettes)}
@@ -379,7 +388,7 @@ def main():
     elif len(sys.argv) == 5 and sys.argv[1] == "pack":
         pack(Path(sys.argv[2]), sys.argv[3], sys.argv[4])
     else:
-        raise SystemExit(__doc__ + "\nextract OUTPUT_DIR [ARCHIVE]\npack SOURCE_DIR black2|white2 OUTPUT")
+        raise SystemExit(__doc__)
 
 
 if __name__ == "__main__":

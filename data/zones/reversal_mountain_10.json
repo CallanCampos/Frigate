@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 388,
+    "area": "AREA_REVERSAL_MOUNTAIN_8",
     "matrix": "MAP_MATRIX_REVERSAL_MOUNTAIN_10",
     "scripts": "SCRIPTS_REVERSAL_MOUNTAIN_10",
     "text": "SCRIPT_TEXT_REVERSAL_MOUNTAIN_10",

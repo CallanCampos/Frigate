@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1041 ]
+        [ "MAP_MODEL_VILLAGE_BRIDGE_9_M_H04HOLE_00_00" ]
     ]
 }

@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 782 ]
+        [ "MAP_MODEL_VICTORY_ROAD_18_M_DUN2602_00_00" ]
     ]
 }

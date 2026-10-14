@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 526, 527 ],
-        [ 528, 529 ]
+        [ "MAP_MODEL_WINTER0701_00_00", "MAP_MODEL_WINTER0701_01_00" ],
+        [ "MAP_MODEL_WINTER0701_00_01", "MAP_MODEL_WINTER0701_01_01" ]
     ]
 }

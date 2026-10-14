@@ -26,6 +26,7 @@ jobs:
         with:
           path: |
             tools/wibo
+            tools/sjiswrap.exe
             tools/objdiff-cli
             tools/mwccarm
           key: tools-${{ hashFiles('configure.py', 'lib/*/library.toml') }}

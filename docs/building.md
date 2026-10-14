@@ -7,10 +7,13 @@ The [README](../README.md#build) covers the standard build and required ROM file
 Use Linux, WSL on Windows, or macOS with Python 3.11+, ninja, and LLVM. Both `clang` and `llvm-objcopy` must be on
 your `PATH`; they assemble the game's scripts.
 
-`configure.py` downloads a [pinned wibo build](https://github.com/fuddlesworth/wibo/releases/tag/pokebw2-fpu-1),
-objdiff, the Metrowerks CodeWarrior tools and dsd. The Metrowerks tools are Windows programs, run through wibo.
+`configure.py` downloads a [pinned wibo build](https://github.com/fuddlesworth/wibo/releases/tag/pokebw2-sjis-1),
+a [pinned sjiswrap build](https://github.com/fuddlesworth/sjiswrap/releases/tag/v1.2.2-pokebw2.1), objdiff, the
+Metrowerks CodeWarrior tools and dsd. The Metrowerks tools are Windows programs, run through wibo, and the compilers
+also through sjiswrap, which gives them the UTF-8 sources in Shift JIS, the encoding of the game's own text.
 The pinned build includes upstream's Win32 x87 initialization, so compiler output is consistent on Linux and macOS.
-`configure.py` checks its SHA256 and replaces older cached wibo binaries. To use an existing Wine installation instead:
+`configure.py` checks the SHA256 of wibo and sjiswrap and replaces older cached binaries. To use an existing Wine
+installation instead:
 
 ```sh
 python3 configure.py --wine wine
