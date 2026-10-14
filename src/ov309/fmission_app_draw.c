@@ -572,7 +572,9 @@ void FMissionAppDraw_SetNumber(FMissionApp *work, int type, int first, int numbe
     }
 }
 
-void FMissionAppDraw_SetTime(FMissionApp *work, int type, int first, int minutes, int seconds) {
+// `first` is a long, the SDK's s32: MWCC then shares one `first * 4` among the position, the digit loops and the
+// colon, as the original does
+void FMissionAppDraw_SetTime(FMissionApp *work, int type, long first, int minutes, int seconds) {
     int values[4];
     ClActorPos pos;
     int i;
@@ -641,8 +643,6 @@ static inline BOOL FMissionAppDraw_SetCountWord(FMissionApp *work, int count) {
 }
 
 static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int message) {
-    const s16 *messages = sFMissionAppDrawMessages;
-
     if (work->stream != NULL) {
         func_020223cc(work->stream);
         work->stream = NULL;
@@ -677,7 +677,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
 
         loadItemsNameToStrbuf(work->wordSet, 0, work->result.item);
         work->message = GFL_StrBufCreate(256, work->heapId);
-        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], messages[message]);
+        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
         GFL_WordSetFormatStrbuf(work->wordSet, work->message, format);
         GFL_StrBufFree(format);
     } else if (message == FMISSION_APP_MESSAGE_ITEM2) {
@@ -718,27 +718,29 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         textCopy(playerInfo->name, name);
         func_0202437c(work->wordSet, 0, name, 0, 1, 2);
         GFL_StrBufFree(name);
-        side = GFL_MsgDataLoadStrbufNew(work->msgData[0], messages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
+        side = GFL_MsgDataLoadStrbufNew(work->msgData[0],
+                                        sFMissionAppDrawMessages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
         func_0202437c(work->wordSet, 1, side, 0, 1, 2);
         WordSetNumber(work->wordSet, 2, work->result.levels, 3, 0, TRUE);
         work->message = GFL_StrBufCreate(256, work->heapId);
-        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], messages[message]);
+        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
         GFL_WordSetFormatStrbuf(work->wordSet, work->message, format);
         GFL_StrBufFree(side);
         GFL_StrBufFree(format);
     } else if (message == FMISSION_APP_MESSAGE_LEVEL) {
-        StrBuf *side = GFL_MsgDataLoadStrbufNew(work->msgData[0], messages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
+        StrBuf *side = GFL_MsgDataLoadStrbufNew(
+            work->msgData[0], sFMissionAppDrawMessages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
         StrBuf *format;
 
         func_0202437c(work->wordSet, 0, side, 0, 1, 2);
         WordSetNumber(work->wordSet, 1, work->result.levels, 3, 0, TRUE);
         work->message = GFL_StrBufCreate(256, work->heapId);
-        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], messages[message]);
+        format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
         GFL_WordSetFormatStrbuf(work->wordSet, work->message, format);
         GFL_StrBufFree(side);
         GFL_StrBufFree(format);
     } else {
-        work->message = GFL_MsgDataLoadStrbufNew(work->msgData[0], messages[message]);
+        work->message = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
     }
     work->stream = func_02022268(work->windows[window].window, 0, 0, work->message, work->font, func_02017bcc(),
                                  work->tcbManager, 4, work->heapId, 15);

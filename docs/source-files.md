@@ -2599,7 +2599,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `fmission_app.c` | `0x0219ce80`–`0x0219e938` | 34 | complete | descriptive |
 | `fmission_app_gra.c` | `0x0219e938`–`0x0219ecd8` | 21 | complete | string at `0x021a06f0` |
-| `fmission_app_draw.c` | `0x0219ecd8`–`0x0219fbc0` | 26 | partial | descriptive |
+| `fmission_app_draw.c` | `0x0219ecd8`–`0x0219fbc0` | 26 | complete | descriptive |
 | `fmission_log_accessor_fapp.c` | `0x0219fbc0`–`0x021a014c` | 6 | complete | string at `0x021a0720` |
 
 ### Overlay 310
