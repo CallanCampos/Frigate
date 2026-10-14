@@ -447,6 +447,7 @@ src/system/cursor_move.c:
     .data       start:0x0209a5b0 end:0x0209a5c0
 
 src/system/bmp_oam.c:
+    complete
     .text       start:0x0202ae88 end:0x0202b488
     .rodata     start:0x02091abc end:0x02091ae0
     .data       start:0x0209a5a4 end:0x0209a5b0
