@@ -1545,6 +1545,7 @@ src/system/poke_regulation.c:
     .data       start:0x0209a3f4 end:0x0209a408
 
 src/system/pokeparty.c:
+    complete
     .text       start:0x0201fd24 end:0x02020234
     .data       start:0x0209a408 end:0x0209a414
 
