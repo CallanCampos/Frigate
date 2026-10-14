@@ -1728,11 +1728,6 @@ data_ov012_0216cb44 kind:data(any) addr:0x0216cb84
 TYPE_CHAMP_MEDAL_IDS kind:data(any) addr:0x0216cb90
 data_ov012_0216cb74 kind:data(any) addr:0x0216cbb4
 FIELD_PROC_LINK_LIST kind:data(any) addr:0x0216cbd8
-data_ov012_0216cb9c kind:data(any) addr:0x0216cbdc
-data_ov012_0216cba0 kind:data(any) addr:0x0216cbe0
-data_ov012_0216cba4 kind:data(any) addr:0x0216cbe4
-data_ov012_0216cba8 kind:data(any) addr:0x0216cbe8
-data_ov012_0216cbac kind:data(any) addr:0x0216cbec
 ACMD_QUEUE_WALK_E_8F kind:data(any) addr:0x0216cd40
 ACMD_QUEUE_WALK_W_8F kind:data(any) addr:0x0216cd48
 ACMD_QUEUE_WALK_S_8F kind:data(any) addr:0x0216cd50

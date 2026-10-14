@@ -138,7 +138,7 @@ prints the tables below from the configs and the ROM:
 | `event_game_clear.c` | `0x0215a19c`–`0x0215a7a4` | 13 | complete | descriptive |
 | `event_field_menu.c` | `0x0215a7a4`–`0x0215aa68` | 3 | complete | descriptive |
 | `event_shortcut_menu.c` | `0x0215aa68`–`0x0215b488` | 17 | complete | string at `0x0216e268` |
-| `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | partial | string at `0x0216e280` |
+| `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | complete | string at `0x0216e280` |
 | `event_save.c` | `0x0215c4f8`–`0x0215c6b0` | 5 | complete | descriptive |
 | `event_action_call.c` | `0x0215c6b0`–`0x0215cb48` | 13 | complete | descriptive |
 | `event_3d_demo.c` | `0x0215cb48`–`0x0215cd58` | 5 | complete | descriptive |
