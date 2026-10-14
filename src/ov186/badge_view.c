@@ -924,18 +924,8 @@ static void BadgeView_DrawMessage(BadgeViewWork *wk, int kind, int badge, int pa
     GFL_BitmapFill(BmpWin_GetBitmap(wk->win), 0);
     switch (kind) {
     case 0: {
-        u32 packed = func_02009230(wk->timeSig, badge);
-        TimeSigBadgeDate date;
-        TimeSigBadgeDate unpacked;
+        TimeSigBadgeDate date = func_02009230(wk->timeSig, badge);
 
-        unpacked.year = packed;
-        packed >>= 8;
-        unpacked.month = packed;
-        packed >>= 8;
-        unpacked.day = packed;
-        packed >>= 8;
-        unpacked.unk3 = packed;
-        date = unpacked;
         WordSetNumber(wk->wordSet, 0, date.year + 2000, 4, 0, TRUE);
         WordSetNumber(wk->wordSet, 1, date.month, 2, 0, TRUE);
         WordSetNumber(wk->wordSet, 2, date.day, 2, 0, TRUE);
