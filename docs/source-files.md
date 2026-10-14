@@ -186,7 +186,7 @@ prints the tables below from the configs and the ROM:
 | `event_battle.c` | `0x021684bc`–`0x0216919c` | 26 | complete | string at `0x0216e5dc` |
 | `trcard_sys.c` | `0x0216919c`–`0x02169c1c` | 23 | complete | string at `0x0216e5ec` |
 | `scrcmd_sp_poke.c` | `0x02169c1c`–`0x02169c7c` | 4 | complete | descriptive |
-| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | partial | string at `0x0216e5fc` |
+| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | complete | string at `0x0216e5fc` |
 | `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | complete | descriptive |
 | `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | complete | descriptive |
 | `pair_sys.c` | `0x0216a23c`–`0x0216a6a4` | 16 | complete | string at `0x0216e60c` |
