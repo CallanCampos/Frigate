@@ -344,6 +344,7 @@ src/system/printsys.c:
     .bss        start:0x02141458 end:0x02141478
 
 src/system/gf_font.c:
+    complete
     .text       start:0x02022d84 end:0x02024200
     .rodata     start:0x0209086c end:0x02090888
     .data       start:0x0209a45c end:0x0209a468
