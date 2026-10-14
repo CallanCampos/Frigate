@@ -154,7 +154,7 @@ s32 GetWarpIDByPlayerPosRail(EventData *data, const RailPosition *position) {
     return 0xffff;
 }
 
-ZoneWarp *GetZoneWarpByID(EventData *data, u16 warpId) {
+ZoneWarp *GetZoneWarpByID(const EventData *data, u16 warpId) {
     ZoneWarp *warps = data->warps;
 
     if (warps == NULL) {
@@ -170,7 +170,7 @@ BOOL IsWarpDestId256(ZoneWarp *warp) {
     return warp->destId == 0x100;
 }
 
-BOOL SetupZoneWarpArrival(EventData *eventData, ZoneSpawnInfo *spawn, u16 warpId, u16 posWeightBits) {
+BOOL SetupZoneWarpArrival(const EventData *eventData, ZoneSpawnInfo *spawn, u16 warpId, u16 posWeightBits) {
     ZoneWarp *warp = GetZoneWarpByID(eventData, warpId);
     VecFx32 position;
     RailPosition railPosition;
@@ -721,8 +721,8 @@ BOOL CheckWarpPositionMatch(const ZoneWarp *warp, const VecFx32 *position) {
     return FALSE;
 }
 
-void GetRailWarpOutPos(ZoneWarp *warp, u32 direction, RailPosition *position) {
-    ZoneWarpRailPosition *rail = &warp->pos.rail;
+void GetRailWarpOutPos(const ZoneWarp *warp, u32 direction, RailPosition *position) {
+    const ZoneWarpRailPosition *rail = &warp->pos.rail;
     u32 warpDirection = ZoneWarp_GetDirection(warp);
     u16 param;
 
@@ -730,8 +730,8 @@ void GetRailWarpOutPos(ZoneWarp *warp, u32 direction, RailPosition *position) {
     position->componentIsLine = 1;
     position->railDirection = ConvDirToRailDir(warpDirection);
     position->posSide = rail->posSide;
-    param = rail->param;
     position->posFront = rail->posFront;
+    param = rail->param;
     if (rail->sideSpan > 1) {
         position->posSide += (s16)CalcWarpTransferAddend(direction, warpDirection, 1, param, rail->sideSpan);
     } else if (rail->frontSpan > 1) {
