@@ -111,6 +111,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- Spill slots grouped by kind across branches where ours are in declaration order: a local set from an inline's
+  return is slotted as a temporary; compute it in place to make it named, or the reverse. (matching.md: "A local
+  assigned straight from a `static inline`'s return")
 - A narrow local's stack slot swapped with another's where the original slots it like a temporary: make every
   callee parameter it is passed to the same type. (matching.md: "A narrow local passed to several calls")
 - An extra slot holding a copy of an address-taken local before a nested loop: read its field inside the inner loop,

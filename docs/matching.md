@@ -538,6 +538,11 @@ Same code, other `sp` offsets or frame size.
   `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
   `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
   the copy too, a sign that the CSE and copy propagation passes place it.
+- A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
+  which is slotted by first use after the named locals, while the same value computed in place stays a named local
+  slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
+  `ShinkaDemoPieces_Move` gets the original's slots only with each branch's `fx32 distSqXZ` block-scoped and set as
+  `FX_Mul(x, x) + FX_Mul(z, z)` written out; through the file's `SquaredLengthXZ` inline they are temporaries.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
