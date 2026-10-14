@@ -286,6 +286,10 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+  Overlay 311's `UnSelectMsg_PrintItem` matches the same way, with `int pos = index;` from a `u32 index`: `pos` takes
+  `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
+  order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
+  and declared first stores it right after the subtraction.
 - In NitroSystem's 2.0/sp2p2 code, a `for` loop's comma-separated increment keeps its last variable in a register for
   the test and stores the earlier ones, and the `for` initializer's order sets the spill slots of the start values:
   `g2d_CharCanvas.c`'s `ClearArea1D` matches with `for (; cy < y1; charY++, cy += 8)` and `for (charX = charX0, cx =
@@ -540,6 +544,11 @@ Same code, other `sp` offsets or frame size.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
+- A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
+  locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
+  Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
+  `func_ov036_021b8520` taking `u16 anm`, like the other callee, where its old prototype took a `u32`; a `(u16)`
+  cast at the call does not do it. When such a local's slot is off, check the callees' prototypes first.
 - A spilled local's width for the rule below can come from its callee's return: `wbt_list.c`'s
   `WbtList_PrintMessage` stores its first name call's last stack argument before the name's address, as the
   original does, only with `s16 first` set from `WbtList_GetMatchValue` returning `s16` (and its `value` local
@@ -2197,6 +2206,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
   order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
   one is dropped; a used `.bss` static joins the sort, an unused one does not.
+- A function-local `static` joins the size sort at the end of the file, after every local initializer, and such
+  statics come in reverse order, the last one declared first. So it reorders equal-size local initializers anywhere
+  in the file: overlay 311's `un_select.c` keeps its two windows' background color in function-local
+  `static const u8 backColor = 15;` (the `0f 0f` at the head of its `.rodata`), and its five 24-byte
+  `UnSelectActorTemplate` initializers come out in the ROM's order only with `sUnSelectListTouch` defined first among
+  the file's tables. Give `rodata_order.py` such statics last, reversed. Its `--check` compares only the shared
+  section, not the order of the objects with sections of their own, and counts a string literal in `.data` as a
+  local initializer.
 
 ## When nothing moves it
 

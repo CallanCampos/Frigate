@@ -4,5 +4,6 @@
     .bss        start:0x021f0600 end:0x021f0600 kind:bss align:32
 
 src/ov102/gimmick_roller_coaster.c:
+    complete
     .text       start:0x021eecc0 end:0x021f01d4
     .rodata     start:0x021f01d4 end:0x021f05fc
