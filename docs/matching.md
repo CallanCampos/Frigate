@@ -529,6 +529,10 @@ Same code, other `sp` offsets or frame size.
   `u32 x` and `y`, passed on as `u32`, ahead of the stack argument stores, and its `HeapID heapId`, passed to a
   `u32 heapId`, after them. Widening the callee alone, or narrowing `heapId` alone, did not match: sweep the caller's
   and the callee's widths together.
+  A `u32` local that holds a 16-bit value counts as `u32` when the narrowing is a mask: the mystery gift's
+  `Mystery_CreateGiftPokemon` stores `setFatefulEncounterPkmData`'s day argument last, after reloading the spilled
+  year, only with `u32 year = (poke->date >> 16) & 0xffff`, written like its month and day; a `u16 year` stores
+  it first.
   A spilled loop bound is the same: `AddExpAndEVs` in `btl_server_flow_sub.c` stores the spilled counter before
   loading its bound, the number of mons, only with the bound a `u16`. And `func_ov167_021afd90` matched only with
   `numMoves` a `u32` and its locals in one order of 720; no order matched with it a `u8` or `u16`, so sweep the orders
@@ -710,7 +714,9 @@ Same code, other `sp` offsets or frame size.
   a store is read into a local in a statement before it: `g3d_system.c`'s `GFL_G3DAnmCreate` reads
   `resource->data` before storing `resource` in the animation, and `event_field_proclink.c`'s `func_ov012_0215bb70`
   loads the party and the trainer data into locals before storing either, where reading a stored field back for a
-  call gives load, store, load, store.
+  call gives load, store, load, store. libfx's `MTX_Concat33`, `MTX_Concat43` and `MTX_Concat44` load a column of `b`
+  once for two neighbouring products of the result only with the column in locals: every store into the result
+  reloads `b` otherwise, 0x18 to 0x40 bytes in all.
 - A constant assigned to a spilled local is stored where MWCC likes, but the register that builds it follows where
   the source assigns it: `ctvt_game.c`'s `CtvtGamePlayer_Create` builds `isSelf`'s `TRUE` in `r2`, as the original
   does, only assigned right after the allocation, not at its declaration.
@@ -756,6 +762,10 @@ Same instructions, scheduled in another order.
 - A bit field read through a `static inline` getter is not shared with a later read of the same word: its
   `u8 shape = MapHeightTile_GetShape(tile);` makes the plane branch load the halfword again for `tile->slope`,
   where a direct `tile->shape` reused the first load.
+  Plain fields go the same way across a `switch`: the mystery gift album's `MysteryCardView_SeqMove` reads its
+  slot through the file's `MysteryCardView_GetSlot(view)` (`view->cursor + view->page * 4`), which makes case 1
+  load `view->page` again as the original does, where the expression written out reused the load before the
+  `switch`.
 - The order of a product's operands picks the registers of what feeds it: the tile index
   `x / TILE_SIZE + (FX_Whole(size) / 16) * (z / TILE_SIZE)` matched in `FieldChunkAccessor_RD_GetTerrain` and
   swapped the registers of `x` and `z` with the factors the other way round.
@@ -1421,6 +1431,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A flag set to 0 and then to 1 under a branch (`movs #0`, `cmp`, `beq`, `movs #1`) is
   `BOOL b = FALSE; if (x) { b = TRUE; }`; `x != 0` builds 1 first. `script_command.c`'s `StaScriptCmd_PokeFlip`
   also needs the call before it in the argument list read into a local first.
+- A 0/1 comparison flag is built set-then-clear (`movs r5, #1; beq; movs r5, #0`) when its register is free at
+  the `cmp`, and with branches (`bne; movs r1, #1; b; movs r1, #0`) when its register is an operand of the
+  `cmp`, so the shape follows the registers, not the spelling. `MysteryCardView_SeqMove` writes both flags as
+  `BOOL shown1 = view->page == slot / 4;` and `shown2` likewise: declared first, `shown1` takes the `r1` that
+  holds `slot / 4` and gets the branches, as in the original.
 - A `cond ? 0 : 1` whose 0 the original takes from an existing register while 1 comes from a register it keeps 1 in
   throughout inverts the branch polarity under every ternary spelling; `btlv_effvm.c`'s
   `BtlvEffvm_GetDefenderPositions` needs the default-then-override form through a local,

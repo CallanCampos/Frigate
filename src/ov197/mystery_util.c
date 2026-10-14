@@ -927,9 +927,10 @@ void MysteryPal_BlendOne(u32 type, u16 *dest, u16 angle, u8 palette, u8 index, u
 
 void MysteryPal_Blend(u32 type, u16 *dest, u16 angle, u32 palette, const u16 *from, const u16 *to) {
     int i;
-    s16 t = (FX_CosIdx(angle) + FX32_ONE) / 2;
 
     for (i = 0; i < 16; i++) {
+        fx16 cosine = FX_CosIdx(angle);
+        s16 t = (cosine + FX32_ONE) / 2;
         u16 fromColor = from[i];
         u8 fromG = (fromColor & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
         u16 toColor = to[i];

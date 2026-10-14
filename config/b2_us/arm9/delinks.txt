@@ -1707,3 +1707,29 @@ lib/nitro/src/fx/fx.c:
 lib/nitro/src/fx/fx_trig.c:
     complete
     .text       start:0x020746c0 end:0x02074718
+
+lib/nitro/src/math/math_pop.c:
+    complete
+    .text       start:0x02076fa8 end:0x02076fe8
+
+lib/nitro/src/math/math_crc.c:
+    complete
+    .text       start:0x02077884 end:0x02077a4c
+
+lib/nitro/src/math/math.c:
+    complete
+    .text       start:0x02077a4c end:0x02077cd4
+
+lib/nitro/src/math/math_md5.c:
+    .text       start:0x02076fe8 end:0x02077454
+    .data       start:0x0209b52c end:0x0209b6f0
+
+lib/nitro/src/math/math_sha1.c:
+    .text       start:0x02077454 end:0x02077884
+    .rodata     start:0x02098830 end:0x02098858
+    .data       start:0x0209b6f0 end:0x0209b6f4
+    .bss        start:0x0214c0a8 end:0x0214c0ac
+
+lib/nitro/src/math/sha1_block.c:
+    complete
+    .text       start:0x02077cd4 end:0x02078000

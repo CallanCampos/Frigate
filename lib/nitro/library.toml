@@ -42,3 +42,9 @@ flags = [
 "fx/fx_sincos.c" = ["-thumb"]
 "fx/fx_trig.c" = ["-thumb"]
 "fx/fx_vec.c" = ["-thumb"]
+
+# libmath's Thumb files, with their ARM functions in #pragma thumb off
+"math/math_crc.c" = ["-thumb"]
+"math/math_md5.c" = ["-thumb"]
+"math/math_sha1.c" = ["-thumb"]
+"math/math_pop.c" = ["-thumb"]

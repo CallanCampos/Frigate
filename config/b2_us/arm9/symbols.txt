@@ -33,6 +33,7 @@ boot_MemSet32Fast kind:function(arm,size=0x5c) addr:0x02004f20
 BuildInfo kind:data(any) addr:0x02004fb0
 CPSi_Signature kind:data(any) addr:0x020050ac
 SOCLi_Signature kind:data(any) addr:0x020050c4
+sha1_block_constants kind:data(any) addr:0x02077cd4
 func_02004fd4 kind:function(arm,size=0x28) addr:0x02004fd4
 func_02004ffc kind:function(arm,size=0x34) addr:0x02004ffc
 main kind:function(thumb,size=0xb4) addr:0x02005124
@@ -8143,7 +8144,7 @@ data_020987c0 kind:data(any) addr:0x020987c0
 TEX_VRAM_BANK_RANGES kind:data(any) addr:0x020987d0
 data_020987d2 kind:data(any) addr:0x020987d2
 data_020987d4 kind:data(any) addr:0x020987d4
-data_02098830 kind:data(any) addr:0x02098830
+SHA1_PADDING kind:data(any) addr:0x02098830
 data_02098831 kind:data(any) addr:0x02098831
 data_0209883c kind:data(any) addr:0x0209883c
 data_02098858 kind:data(any) addr:0x02098858
@@ -8804,10 +8805,10 @@ data_0209b518 kind:data(any) addr:0x0209b518
 data_0209b51c kind:data(any) addr:0x0209b51c
 g_GfxEngineAEnabled kind:data(any) addr:0x0209b524
 GXi_DmaId kind:data(any) addr:0x0209b528
-data_0209b52c kind:data(any) addr:0x0209b52c
+MD5_PADDING kind:data(any) addr:0x0209b52c
 MD5_MSG_INDEX kind:data(any) addr:0x0209b530
 MD5_PARTS_OF_SINES kind:data(any) addr:0x0209b5f0
-data_0209b6f0 kind:data(any) addr:0x0209b6f0
+sSHA1BlockFunc kind:data(any) addr:0x0209b6f0
 data_0209b6f4 kind:data(any) addr:0x0209b6f4
 data_0209b70c kind:data(any) addr:0x0209b70c
 data_0209b714 kind:data(any) addr:0x0209b714
@@ -9238,7 +9239,7 @@ g_GfxVRAMBGBanksB kind:bss addr:0x0214c09e
 g_GfxVRAMObjBanksB kind:bss addr:0x0214c0a0
 g_GfxVRAMBGExtPltBanksB kind:bss addr:0x0214c0a2
 g_GfxVRAMObjExtPltBanksB kind:bss addr:0x0214c0a4
-data_0214c0a8 kind:bss addr:0x0214c0a8
+sSHA1Masked kind:bss addr:0x0214c0a8
 data_0214c0ac kind:bss addr:0x0214c0ac
 data_0214c0e0 kind:bss addr:0x0214c0e0
 data_0214c100 kind:bss addr:0x0214c100

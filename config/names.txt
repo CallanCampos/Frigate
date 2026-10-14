@@ -2166,6 +2166,7 @@
 . 0x0209448c sAdpcmStepTable
 . 0x020946bc FX_SinCosTable_
 . 0x020986bc FX_AtanIdxTable_
+. 0x02098830 SHA1_PADDING
 . 0x02098d60 __ctype_map
 . 0x02099f20 sMicFilter
 . 0x0209a338 sSaveControl
@@ -2188,7 +2189,9 @@
 . 0x0209b268 mtxTransOnly_
 . 0x0209b280 zOffsetStep_
 . 0x0209b528 GXi_DmaId
+. 0x0209b52c MD5_PADDING
 . 0x0209b530 MD5_MSG_INDEX
+. 0x0209b6f0 sSHA1BlockFunc
 . 0x0209d740 g_MainMemoryPriorityBlocked
 . 0x0209d744 sExitRequested
 . 0x0209d748 sExitCallbackInfo
@@ -2300,6 +2303,7 @@
 . 0x02149b00 sDecodeBuffer
 . 0x02149d00 sPlayers
 . 0x0214a2f0 sThread
+. 0x0214c0a8 sSHA1Masked
 dtcm 0x02fe0000 SDK_AUTOLOAD_DTCM_START
 ltd_autoload_0 0x02707628 PhotoSign_FifoCallback
 ltd_autoload_0 0x027076a4 PhotoSign_WaitResult
