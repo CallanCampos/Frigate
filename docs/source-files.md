@@ -1862,9 +1862,9 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mystery.c` | `0x021b5420`–`0x021b8348` | 57 | partial | string at `0x021be980` |
+| `mystery.c` | `0x021b5420`–`0x021b8348` | 57 | complete | string at `0x021be980` |
 | `mystery_graphic.c` | `0x021b8348`–`0x021b876c` | 23 | complete | string at `0x021be98c` |
-| `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | partial | string at `0x021be9a0` |
+| `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | complete | string at `0x021be9a0` |
 | `mystery_album.c` | `0x021b99e0`–`0x021bd068` | 59 | partial | string at `0x021be9b0` |
 | `mystery_net.c` | `0x021bd068`–`0x021bdd34` | 40 | complete | string at `0x021be9c0` |
 | `mystery_check.c` | `0x021bdd34`–`0x021be2dc` | 2 | complete | descriptive |
