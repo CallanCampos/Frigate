@@ -200,6 +200,14 @@ static BOOL UnSelect_ShowActor(ClActor **actors, int index, u16 surface, int y);
 static BOOL UnSelect_IsVisitorFloor(UnSelectWork *wk, u32 index);
 static u32 UnSelect_FindCountry(u32 country);
 
+// The rows of the list, the scroll bar and the buttons that scroll by a page
+static const FrameListTouch sUnSelectListTouch[] = {
+    { { 0, 39, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },   { { 40, 79, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
+    { { 80, 119, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE }, { { 120, 159, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
+    { { 8, 160, 240, 255 }, FRAMELIST_TOUCH_BAR },         { { 168, 191, 16, 39 }, FRAMELIST_TOUCH_PAGE_UP },
+    { { 168, 191, 80, 103 }, FRAMELIST_TOUCH_PAGE_DOWN },  { { TOUCH_RECT_END } },
+};
+
 static const FrameListCallbacks sUnSelectListCallbacks = {
     UnSelect_PrintItem,
     UnSelect_SelectItem,
@@ -216,14 +224,6 @@ const GameProcFunctions UN_SELECT_PROC_FUNCTIONS = {
     UnSelect_Init,
     UnSelect_Main,
     UnSelect_Exit,
-};
-
-// The rows of the list, the scroll bar and the buttons that scroll by a page
-static const FrameListTouch sUnSelectListTouch[] = {
-    { { 0, 39, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },   { { 40, 79, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 80, 119, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE }, { { 120, 159, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 8, 160, 240, 255 }, FRAMELIST_TOUCH_BAR },         { { 168, 191, 16, 39 }, FRAMELIST_TOUCH_PAGE_UP },
-    { { 168, 191, 80, 103 }, FRAMELIST_TOUCH_PAGE_DOWN },  { { TOUCH_RECT_END } },
 };
 
 // The country of each floor, from the top floor down

@@ -2172,6 +2172,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
   order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
   one is dropped; a used `.bss` static joins the sort, an unused one does not.
+- A function-local `static` joins the size sort at the end of the file, after every local initializer, and such
+  statics come in reverse order, the last one declared first. So it reorders equal-size local initializers anywhere
+  in the file: overlay 311's `un_select.c` keeps its two windows' background color in function-local
+  `static const u8 backColor = 15;` (the `0f 0f` at the head of its `.rodata`), and its five 24-byte
+  `UnSelectActorTemplate` initializers come out in the ROM's order only with `sUnSelectListTouch` defined first among
+  the file's tables. Give `rodata_order.py` such statics last, reversed. Its `--check` compares only the shared
+  section, not the order of the objects with sections of their own, and counts a string literal in `.data` as a
+  local initializer.
 
 ## When nothing moves it
 
