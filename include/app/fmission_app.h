@@ -137,7 +137,7 @@ void FMissionAppDraw_SetActorPalette(FMissionApp *work, int type, int index, u32
 // Shows a number with the four digit actors from `first`, at x and y
 void FMissionAppDraw_SetNumber(FMissionApp *work, int type, int first, int number, int digits, BOOL pad, int x, int y);
 // Shows a time with the five actors from `first`: two digits, a colon and two digits
-void FMissionAppDraw_SetTime(FMissionApp *work, int type, int first, int minutes, int seconds);
+void FMissionAppDraw_SetTime(FMissionApp *work, int type, long first, int minutes, int seconds);
 void FMissionAppDraw_SetLevelIcon(FMissionApp *work, int index);
 // What of the sub screen is touched this frame: 0 for the return button
 int FMissionAppDraw_CheckTouch(FMissionApp *work);

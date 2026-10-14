@@ -109,7 +109,7 @@ data_ov309_021a040a kind:data(any) addr:0x021a044a
 data_ov309_021a0416 kind:data(any) addr:0x021a0456
 data_ov309_021a0422 kind:data(any) addr:0x021a0462
 data_ov309_021a0432 kind:data(any) addr:0x021a0472
-data_ov309_021a0442 kind:data(any) addr:0x021a0482
+sFMissionAppDrawMessages kind:data(any) addr:0x021a0482
 data_ov309_021a0454 kind:data(any) addr:0x021a0494
 data_ov309_021a0468 kind:data(any) addr:0x021a04a8
 data_ov309_021a0488 kind:data(any) addr:0x021a04c8
