@@ -120,6 +120,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A spilled counter's zero stored before a call, in `r1` rather than `r0`: try `n = 0;` later, after the call's
   result is used. (matching.md: "A counter's zero stored")
 - `x[n++].f = ...` against a separate `n++` changes scheduling.
+- A constant built before stores written ahead of it, all to one global, where ours builds it at its first store:
+  write the stores through a pointer to a member (`&G.header`); a `&G` local of G's own type keeps them chained.
+  (matching.md: "told apart by offset")
 - Store order in initialization code is usually source order: try the stores in the asm's order first.
 - A field of a local struct loaded before a call that doesn't fill it was read into a local there, as `targetX = target.x;`.
   (matching.md: "A field of a local struct")

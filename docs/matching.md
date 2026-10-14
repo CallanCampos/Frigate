@@ -615,6 +615,13 @@ Same code, other `sp` offsets or frame size.
 - A constant stored to a field that the original builds one store earlier is stored first in the source: MWCC
   keeps the stores in their order but builds the constant sooner. `ctvt_draw.c`'s `CtvtDraw_Main` writes
   `draw->exit = TRUE; draw->state = DRAW_STATE_FADE_OUT;`.
+- Stores to the fields of one global, made directly or through a pointer local of its own type set to its address
+  (`F *f = &G`, which MWCC turns back into direct accesses), stay chained in their written order, so a constant they
+  store is built just before its first store. Through a pointer to a member (`&G.header`), a parameter or a cast
+  pointer, the stores are told apart by offset and are independent, so the constant can be built ahead of stores
+  written before it. `lib/irc`'s `IrcLink_SendFrame` builds the zero of the checksum bytes, which is also its copy
+  loop's counter, before storing `id` and `cmd` only when it writes the frame's head through
+  `IrcFrameHeader *header = &IrcFrame.header`; through `IrcFrameData *frame = &IrcFrame` the zero follows them.
 - MWCC keeps a load and a store through pointers that may alias in source order. A field the original loads before
   a store is read into a local in a statement before it: `g3d_system.c`'s `GFL_G3DAnmCreate` reads
   `resource->data` before storing `resource` in the animation, and `event_field_proclink.c`'s `func_ov012_0215bb70`
