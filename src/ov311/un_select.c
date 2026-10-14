@@ -503,17 +503,18 @@ static void UnSelectMsg_Update(UnSelectMsg *msg) {
 
 // Prints a row of the list: its floor, and the name of its country, in one line or two
 static void UnSelectMsg_PrintItem(UnSelectMsg *msg, PrintWindow *window, PrintQueue *queue, Font *font, u32 index) {
-    u32 floor = UN_SELECT_FLOOR(index);
+    int pos = index;
     u32 y = 12;
+    u32 floor = UN_SELECT_FLOOR(pos);
 
     GFL_MsgDataLoadStrbuf(msg->msgData, floor == 2 ? UnSelect_Text_F_2 : UnSelect_Text_F, msg->strbuf);
     WordSetNumber(msg->wordSet, 2, floor, 3, 0, TRUE);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->expanded, msg->strbuf);
     PrintStrAligned(window, queue, 0, 12, msg->expanded, font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
-    if (func_0202284c(msg->names[index]) > 1) {
+    if (func_0202284c(msg->names[pos]) > 1) {
         y = 4;
     }
-    PrintStrAligned(window, queue, 30, y, msg->names[index], font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
+    PrintStrAligned(window, queue, 30, y, msg->names[pos], font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
 }
 
 static void UnSelectMsg_Print(UnSelectMsg *msg, u32 msgId) {
