@@ -286,6 +286,12 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+- A narrow stack parameter used twice is read from its slot at each use, and declared `const` it is loaded once at
+  entry into a saved register: `g3d_system.c`'s `GFL_G3DSysCreate` takes `const HeapID heapId`, loaded into `r7`
+  at entry (`add r0, sp, #0x68; ldrh r7, [r0, #4]`), which moves MWCC's cached `&g_G3DSystem` out of `r7` and
+  gives every register the original's. A plain copy of the same type folds back into the parameter; a `const`
+  copy, or a copy of another width, works only when both uses go through it. The prototype in the header can stay
+  without the `const`, which isn't part of the function's type.
 - A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
   counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
   tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter

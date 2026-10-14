@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A narrow stack parameter read from its slot at each use where the original loads it into a saved register at
+  entry: declare the parameter `const`. (matching.md: "A narrow stack parameter used twice")
 - An index kept in two registers (copied after a division and again before a multiply) where ours keeps one: a
   `const` struct parameter with its pointer field read at each use. (matching.md: "A pointer field read through a
   `const` parameter")
