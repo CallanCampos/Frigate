@@ -160,15 +160,20 @@ void CPS_SocFlush(void);                 // CPS_SocFlush
 CPSInAddr CPS_Resolve(const char *name); // CPS_Resolve
 
 // CPS's SSL layer, which follows in the overlay: a socket's calls go there when its ssl is set
-int func_ov011_0215a23c(CPSSoc *soc);
-u8 *func_ov011_0215a284(u32 *len, CPSSoc *soc);
-void func_ov011_0215a320(u32 len, CPSSoc *soc);
-s32 func_ov011_0215a43c(CPSSoc *soc);
+u32 CPS_SslGetMaxPriority(void);                       // CPS_SslGetMaxPriority's role
+void CPS_SslSetMaxPriority(u32 priority);               // CPS_SslSetMaxPriority's role
+void CPS_SslSetNamedParams(void *const *params, u32 count); // Registers the caller's named params (pinned
+                                                            // certificates) on the current thread's connection
+void CPS_SslAddRandomSeed(const void *seed, u32 len);  // CPS_SslAddRandomSeed's role: stirs entropy into SSLi_GetRandomBytes's pool
+int CPS_SslConnect(CPSSoc *soc);
+u8 *CPS_SslRead(u32 *len, CPSSoc *soc);
+void CPS_SslReadRelease(u32 len, CPSSoc *soc);
+s32 CPS_SslCanRead(CPSSoc *soc);
 u32 func_ov011_0215a49c(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc);
-void func_ov011_0215a564(CPSSoc *soc);
-void func_ov011_0215a5b4(CPSSoc *soc);
-void func_ov011_0215a604(s32 now);
-void func_ov011_0215a6a0(void);
-void func_ov011_0215a5e0(BOOL enable); // CPS_SetSsl's role: turns the SSL layer on for the caller's socket
+void CPS_SslShutdown(CPSSoc *soc);
+void CPS_SslClose(CPSSoc *soc);
+void CPS_SslTick(s32 now);
+void CPS_SslInit(void);
+void CPS_SetSsl(BOOL enable); // CPS_SetSsl's role: turns the SSL layer on for the caller's socket
 
 #endif // POKEBW2_NITROWIFI_CPS_H

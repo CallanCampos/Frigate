@@ -37,7 +37,7 @@ void SOCLi_CleanupCPS(void) {
     CPS_Cleanup();
     CPS_SetScavengerCallback(NULL);
     CPS_SetAddressCheckCallback(NULL);
-    func_ov011_0215cb8c(NULL);
+    WCM_SetRecvDCFCallback(NULL);
 }
 
 // Closes the sockets that SOCL_Close has not run on, except the UDP send socket; EINPROGRESS while any is left
@@ -80,7 +80,7 @@ int SOCL_CalmDown(void) {
         }
         SOCLi_TrashSocket();
     } else if (CPS_CalmDown()) {
-        func_ov011_0215cb8c(NULL);
+        WCM_SetRecvDCFCallback(NULL);
         result = 0;
     } else {
         result = SOCL_EINPROGRESS;

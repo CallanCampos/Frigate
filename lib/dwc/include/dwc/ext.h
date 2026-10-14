@@ -42,7 +42,7 @@ u32 __fread(void *buffer, u32 size, u32 count, void *file);
 // NitroSDK's STD_GetStringLength with a limit: the length of the string, or the limit if it is longer
 int func_0207f900(const char *s, int max);
 // Seeds the random number generator of the secure connections with some bytes
-void func_ov011_02159d64(const void *data, u32 size);
+void CPS_SslAddRandomSeed(const void *data, u32 size);
 
 // GameSpy's common code in overlay 11, used by the HTTP code: realloc and free (the ones beside the allocator above),
 // the clock in milliseconds and a sleep, and the sockets (the numbers that the socket functions return are -1 for an
@@ -158,7 +158,7 @@ void ghttpCancelRequest(int request);
 // What DWC's settings in overlay 182 (the AOSS client) call in overlay 11 and the main module. The socket library's
 // calls are in nitrowifi/soc.h.
 // Clears the WCM's list of access points
-void func_ov011_0215c594(void);
+void WCM_ClearApListBuffer(void);
 
 
 #endif // POKEBW2_DWC_EXT_H

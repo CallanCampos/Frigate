@@ -234,7 +234,7 @@ static GHISslConnection *ghiTwlSSLInit(const char *url) {
     if (rootCA != NULL) {
         if (rootCA->certs != NULL && rootCA->count > 0) {
             OS_GetLowEntropyData(sSslEntropy);
-            func_ov011_02159d64(sSslEntropy, sizeof(sSslEntropy));
+            CPS_SslAddRandomSeed(sSslEntropy, sizeof(sSslEntropy));
             ssl = func_ov011_0216dddc(sizeof(GHISslConnection));
             if (ssl != NULL) {
                 memset(ssl, 0, sizeof(GHISslConnection));

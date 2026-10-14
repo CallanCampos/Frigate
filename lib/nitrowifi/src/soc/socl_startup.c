@@ -95,7 +95,7 @@ static void SOCLi_StartupCPS(void) {
         cps->dhcp_callback = SOCLi_SetMyIP;
     }
     CPS_SetThreadPriority(config->cps_thread_prio ? config->cps_thread_prio : 11);
-    func_ov011_0215cb8c(CPSi_RecvCallback);
+    WCM_SetRecvDCFCallback(CPSi_RecvCallback);
     CPS_SetScavengerCallback(SOCLi_TrashSocket);
     CPS_SetAddressCheckCallback(SOCLi_AddressCheckCallback);
     CPS_Startup(cps);
@@ -118,7 +118,7 @@ static void SOCLi_DhcpTimeout(void) {
 }
 
 static BOOL SOCL_LinkIsOn(void) {
-    if (func_ov011_0215cb14() != NULL) {
+    if (WCM_GetApMacAddress() != NULL) {
         return TRUE;
     }
     return FALSE;

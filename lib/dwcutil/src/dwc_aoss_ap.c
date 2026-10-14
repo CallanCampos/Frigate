@@ -355,7 +355,7 @@ static // Connects to the access point; 0 if it did
     }
     sWep.keyId = connected;
     sys_memcpy(param->key, sWep.key[connected], param->keyLength);
-    func_ov011_0215c594();
+    WCM_ClearApListBuffer();
     if (DWC_Wcm_Search(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
         func_0207bc24(&alarm);
         func_0207bcf4(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_CONNECT);

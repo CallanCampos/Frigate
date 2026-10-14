@@ -22,7 +22,7 @@ static u32 NHttpSocSslFilterNone(u32 flags) {
 
 static void NHttpSocSeedRandom(void) {
     OS_GetLowEntropyData(sEntropy);
-    func_ov011_02159d64(sEntropy, sizeof(sEntropy));
+    CPS_SslAddRandomSeed(sEntropy, sizeof(sEntropy));
 }
 
 // Whether the socket still has its connection: 0 if reading would wait, -1 if not

@@ -52,7 +52,7 @@ static int POKE_NET_SSL_AuthCallback(int result, POKE_NET_SSL_CONNECTION *connec
 // Seeds the random numbers of the secure connections, and makes the default settings the first time
 void POKE_NET_SSL_Setup(void) {
     OS_GetLowEntropyData(sPOKE_NET_SSL_Entropy);
-    func_ov011_02159d64(sPOKE_NET_SSL_Entropy, sizeof(sPOKE_NET_SSL_Entropy));
+    CPS_SslAddRandomSeed(sPOKE_NET_SSL_Entropy, sizeof(sPOKE_NET_SSL_Entropy));
     if (sPOKE_NET_SSL_Connection != NULL) {
         return;
     }

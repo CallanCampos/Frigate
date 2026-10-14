@@ -24,6 +24,6 @@ void func_0200afac(ReshZekSave *reshZek, const PartyPkm *pkm);
 
 // The init tail-calls a function at 0x0215cd8c with the block, which dsd can't tell between overlays 11 and 12;
 // neither overlay's function there inits a Pokémon, so the symbol is the linker's choice, overlay 11's
-void func_ov011_0215cd8c(void *block);
+void WCM_RssiToQuality(void *block);
 
 #endif // POKEBW2_SAVE_RESH_ZEK_H

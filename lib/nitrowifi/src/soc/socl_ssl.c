@@ -44,11 +44,11 @@ static int SOCLi_EnableSslCallBack(SOCLCommandPacket *packet) {
     OS_LockMutex(&pipe->base.mutex);
     if (packet->args.ssl.info != NULL) {
         soc->con = packet->args.ssl.info;
-        func_ov011_0215a5e0(TRUE);
+        CPS_SetSsl(TRUE);
         socket->flag = 4;
     } else {
         socket->flag = 0;
-        func_ov011_0215a5e0(FALSE);
+        CPS_SetSsl(FALSE);
         soc->con = NULL;
     }
     OS_UnlockMutex(&pipe->base.mutex);

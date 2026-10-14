@@ -81,3 +81,29 @@ lib/nitrowifi/src/soc/soc.c:
 lib/nitrowifi/src/soc/socl_ssl.c:
     complete
     .text       start:0x021581b4 end:0x02158290
+
+lib/nitrowifi/src/ssl/ssl.c:
+    .text       start:0x02158290 end:0x0215a6f4
+    .rodata     start:0x02185014 end:0x0218501c
+    .data       start:0x0218550c end:0x0218557c
+    .bss        start:0x0218de28 end:0x0218dfb4
+
+lib/nitrowifi/src/ssl/md5.c:
+    .text       start:0x0215a6f4 end:0x0215ab44
+    .data       start:0x0218557c end:0x021856fc
+
+lib/nitrowifi/src/ssl/sha1.c:
+    .text       start:0x0215ab44 end:0x0215b218
+    .data       start:0x021856fc end:0x0218573c
+
+lib/nitrowifi/src/ssl/ssl_rc4.c:
+    complete
+    .text       start:0x0215b218 end:0x0215b2b4
+
+lib/nitrowifi/src/ssl/biginteger.c:
+    .text       start:0x0215b2b4 end:0x0215bc2c
+
+lib/nitrowifi/src/wcm/wcm.c:
+    .text       start:0x0215bc2c end:0x0215ddb4
+    .rodata     start:0x0218501c end:0x02185054
+    .bss        start:0x0218dfb4 end:0x0218e008
