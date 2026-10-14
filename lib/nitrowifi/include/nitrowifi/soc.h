@@ -60,10 +60,12 @@ extern SOCLSocketParam SOCLSocketParamUDPSend;
 // SOCL's errors, as negative return values (BSD's numbers)
 #define SOCL_EAGAIN (-6)
 #define SOCL_EALREADY (-7)
+#define SOCL_ECANCELED (-11) // What the commands still queued in a pipe that is freed get
 #define SOCL_ECONNRESET (-15)
 #define SOCL_EINPROGRESS (-26)
 #define SOCL_EINVAL (-28)
 #define SOCL_EMFILE (-33)
+#define SOCL_EMSGSIZE (-35) // A datagram that is more than a packet holds
 #define SOCL_EISCONN (-30)
 #define SOCL_ENETRESET (-39) // SOCL has not been started
 #define SOCL_ENOMEM (-49)

@@ -60,10 +60,10 @@ struct SOCLSocket;
 typedef struct SOCLSendPipe {
     SOCLCommandPipe base;
     SOCLSocketBuffer buffer;
-    u8 unk_100[4];
-    int unk_104;
-    int unk_108;
-    struct SOCLSocket *socket;
+    u16 write_pos;           // Where the next write goes in the buffer (a ring)
+    u16 read_pos;            // How far the pipe's thread has taken data out of it
+    OSThreadQueue wait;      // Where a blocking write sleeps until the buffer has room
+    struct SOCLSocket *socket; // The socket that owns the pipe (a UDP socket shares the UDP send socket's)
 } SOCLSendPipe;
 
 // A socket, 0xbc bytes, followed in memory by its pipes and buffers
@@ -84,12 +84,17 @@ typedef struct SOCLSocket {
     u16 local_port;  // 0xb0
     u16 remote_port;
     CPSInAddr remote_ip;
-    u8 unk_b8[4];
+    struct SOCLSocket *next; // The next socket of the list it is in
 } SOCLSocket;
 
 // The receive pipe of a socket that has one (every socket that reads)
 static inline SOCLRecvPipe *SOCLi_GetRecvPipe(const SOCLSocket *socket) {
     return (SOCLRecvPipe *)socket->recv_pipe;
+}
+
+// The send pipe of a socket that has one (a UDP socket's is the UDP send socket's)
+static inline SOCLSendPipe *SOCLi_GetSendPipe(const SOCLSocket *socket) {
+    return (SOCLSendPipe *)socket->send_pipe;
 }
 
 // socl_startup.c: the socket that sends every UDP socket's datagrams
@@ -99,11 +104,16 @@ extern SOCLSocket *SOCLiUDPSendSocket;
 #define SOCLI_READ_PEEK 2     // Leave the data to be read again
 #define SOCLI_READ_NOBLOCK 4  // Do not wait for data
 
+// SOCL_WriteTo's flags
+#define SOCLI_WRITE_NOBLOCK 4 // Do not wait for room in the send buffer
+
 // SOCLSocket.state
 #define SOCLI_STATE_CREATED 1
 #define SOCLI_STATE_BINDING 2        // SOCLi_ExecBindCommand has queued the bind (and connect)
 #define SOCLI_STATE_CONNECTED 4      // The bind (and for TCP the connect) succeeded
 #define SOCLI_STATE_CLOSING 8
+#define SOCLI_STATE_CLOSE_CALLED 0x10   // SOCL_Close has run (it queued the close command)
+#define SOCLI_STATE_CLOSED 0x20         // The close command has run: the socket waits in the trash list
 #define SOCLI_STATE_CONNECT_FAILED 0x40 // The connect failed, with the error in the socket's result
 #define SOCLI_STATE_RESET 0x80       // The connection was reset
 
@@ -119,7 +129,15 @@ static inline BOOL SOCLi_SocketIsCreated(const SOCLSocket *socket) {
     return created;
 }
 
-// SOCLSocket.flag: 0 and 4 are TCP
+// SOCLSocket.flag: 0 and 4 are TCP. SOCLi_ModeIsTCP tests a mode that was read already
+static inline BOOL SOCLi_ModeIsTCP(s8 mode) {
+    BOOL tcp = TRUE;
+    if (mode != 0 && mode != 4) {
+        tcp = FALSE;
+    }
+    return tcp;
+}
+
 static inline BOOL SOCLi_SocketIsTCP(const SOCLSocket *socket) {
     BOOL tcp = TRUE;
     if (socket->flag != 0 && socket->flag != 4) {
@@ -152,6 +170,17 @@ typedef struct SOCLCommandPacket {
             u16 *remote_port; // Where the datagram's sender goes, or NULL
             CPSInAddr *remote_ip;
         } read;
+        struct {
+            u8 *buf1;        // Where the data is in the send pipe's buffer, in up to two parts (the second when it
+            int len1;        // wraps around the buffer's end)
+            u8 *buf2;
+            int len2;
+            u16 write_end;   // The pipe's write position after this data
+            u8 unk_22[2];
+            u16 local_port;  // For a UDP packet, the datagram's ports and address
+            u16 remote_port;
+            CPSInAddr remote_ip; // 0 for TCP
+        } write;
         u8 raw[0x1c];
     } args;
 } SOCLCommandPacket;
@@ -174,7 +203,22 @@ void SOCLi_CommandPacketHandler(OSMessageQueue *queue);
 int SOCL_Bind(SOCLSocket *socket, u16 local_port);
 int SOCL_Connect(SOCLSocket *socket, u16 remote_port, CPSInAddr remote_ip);
 
+// socl_write.c
+// Writes to a socket; remote_port and remote_ip are for UDP (remote_ip 0 uses the socket's), flags is SOCLI_WRITE_*
+int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip, int flags);
+// How much room the socket's send pipe has in its buffer
+int SOCLi_GetWriteBufferFreeSize(const SOCLSocket *socket);
+
+// socl_shutdown.c
+int SOCL_Shutdown(SOCLSocket *socket);
+
 // socl_close.c
+// Whether a handle is no socket any more and has left the trash too
+BOOL SOCL_IsClosed(int socket);
+// TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
+// (SOC_Close's caller in DWC asks it after a failed close; no counterpart in pokediamond's NitroWiFi)
+BOOL func_ov011_02157314(int socket);
+int SOCL_Close(int socket);
 void SOCLi_TrashSocket(void);
 
 // socl_cleanup.c
@@ -196,6 +240,12 @@ extern s32 data_ov011_0218dc4c[2];
 // Puts a new socket in the list of sockets (SOCLi_SocketRegister in pokediamond's NitroWiFi)
 void SOCLi_SocketRegister(SOCLSocket *socket);
 BOOL SOCL_SocketIsInvalid(const SOCLSocket *socket); // TRUE for a handle that is not a socket of the list
+BOOL SOCL_SocketIsInTrash(const SOCLSocket *socket); // TRUE for a socket that SOCLi_CloseCallBack put in the trash
+void SOCLi_SocketUnregister(SOCLSocket *socket);
+void SOCLi_SocketRegisterTrash(SOCLSocket *socket);
+void SOCLi_SocketUnregisterTrash(SOCLSocket *socket);
+// The sockets that were closed and wait for SOCLi_TrashSocket to free them
+extern SOCLSocket *SOCLiSocketListTrash;
 // Prepares the socket lists before SOCL starts (no counterpart in pokediamond's NitroWiFi)
 void func_ov011_02157980(void);
 // CPS's address check callback (no counterpart in pokediamond's NitroWiFi)

@@ -270,6 +270,9 @@ BOOL scheduler_is_thread_ended(const OSThread *thread);
 void func_0207a710(OSThread *thread);
 // NitroSDK's OS_JoinThread, by its code: waits for a thread's end
 void func_0207a800(OSThread *thread);
+// NitroSDK's OS_RescheduleThread, by its place before OS_YieldThread and by its use after OS_EnableScheduler: runs the
+// highest priority thread that is ready
+void func_0207a918(void);
 // NitroSDK's OS_YieldThread, by its place between OS_JoinThread and OS_SetThreadPriority: lets the other threads of the
 // same priority run
 void func_0207a92c(void);

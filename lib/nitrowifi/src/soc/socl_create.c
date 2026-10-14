@@ -122,7 +122,7 @@ static u8 *SOCLi_InitSocket(SOCLSocket *socket, const SOCLSocketParam *param) {
         data = SOCLi_InitSocketBuffer(data, &socket->sndbuf, param->buffer.sndbuf_size);
         data = SOCLi_InitSocketBuffer(data, &socket->sndbuf_aux, param->buffer.sndbuf_aux_size);
         data = SOCLi_InitSocketBuffer(data, &pipe->buffer, param->buffer.sndpipe_buf_size);
-        pipe->unk_104 = pipe->unk_108 = 0;
+        pipe->wait.head = pipe->wait.tail = NULL;
     } else {
         socket->send_pipe = SOCLiUDPSendSocket->send_pipe;
     }
