@@ -33,11 +33,11 @@ u32 DSProt_GetBranchTypeMulti(u32 instruction) {
 
 void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength) {
     int i;
-    u32 *tableEnd = (u32 *)(state->table + 256);
-    u32 value;
-    u32 j;
+    u32 *tableEnd;
     u32 keyIndex;
+    u32 value;
     u32 *table;
+    u32 j;
 
     state->offset = 0xaa;
     keyIndex = 0;
@@ -46,6 +46,7 @@ void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength)
     state->j = 0;
     j = keyIndex;
     table = (u32 *)state->table;
+    tableEnd = (u32 *)(state->table + 256);
     do {
         *table = value;
         table++;
@@ -57,11 +58,11 @@ void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength)
 
         j = (j + key[keyIndex] + swap) & 0xff;
         other = state->table[j];
+        state->table[j] = swap;
         keyIndex++;
         if (keyIndex >= keyLength) {
             keyIndex = 0;
         }
-        state->table[j] = swap;
         state->table[i] = other;
     }
 }
@@ -81,6 +82,7 @@ u32 DSProt_Rc4NextMulti(DSProtCipherState *state) {
 
 int DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size) {
     u32 i;
+    u8 *in;
     u32 sum;
 
     sum = 0;
@@ -88,9 +90,9 @@ int DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 siz
         return -1;
     }
     for (i = 0; i < size; i += 4) {
-        u8 *in = src + i;
         u32 total;
 
+        in = src + i;
         switch (((DSProtBranchTypeFunc)(sCipherFunctionsMulti[0] - 0x2200))(*(u32 *)in)) {
         case 1:
             in[3] ^= 1;
@@ -134,6 +136,7 @@ int DSProt_DecryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 siz
         u8 *in = src + i;
         u32 last = in[3];
         u32 word;
+        u32 byte;
 
         in[3] = last - sum;
         sum = last;
@@ -145,21 +148,27 @@ int DSProt_DecryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 siz
             *(u32 *)(dest + i) = (word & 0xff000000 ^ 0x1000000) | ((word & 0xffffff) + 0xfffff77e & 0xffffff);
             break;
         case 2:
-            dest[i] = in[0] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = in[0];
-            dest[i + 1] = in[1] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = in[1];
-            dest[i + 2] = in[2] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = in[2];
+            byte = in[0];
+            dest[i] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            state->offset = byte;
+            byte = in[1];
+            dest[i + 1] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            state->offset = byte;
+            byte = in[2];
+            dest[i + 2] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            state->offset = byte;
             dest[i + 3] = in[3] ^ 1;
             break;
         default:
-            dest[i] = in[0] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = in[0];
-            dest[i + 1] = in[1] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = in[1];
-            dest[i + 2] = in[2] ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
-            state->offset = in[2];
+            byte = in[0];
+            dest[i] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            state->offset = byte;
+            byte = in[1];
+            dest[i + 1] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            state->offset = byte;
+            byte = in[2];
+            dest[i + 2] = byte ^ ((DSProtNextFunc)(sCipherFunctionsMulti[3] - 0x2200))(state);
+            state->offset = byte;
             dest[i + 3] = in[3];
             break;
         }
