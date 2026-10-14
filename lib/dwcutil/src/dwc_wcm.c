@@ -53,14 +53,14 @@ static void WcmNotify(WCMNotice *notice) {
                     sWcm.callback(DWC_WCM_EVENT_STARTED, 0);
                 }
             } else if (sWcm.state == STATE_SEARCH_STARTING) {
-                if (func_ov011_0215be88(sWcm.bssid, sWcm.essid, sWcm.searchOption) != WCM_RESULT_ACCEPT) {
+                if (WCM_SearchAsync(sWcm.bssid, sWcm.essid, sWcm.searchOption) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
             } else if (sWcm.state == STATE_CONNECTING) {
-                if (func_ov011_0215bf78(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
+                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
@@ -112,21 +112,21 @@ static void WcmNotify(WCMNotice *notice) {
                     sWcm.callback(DWC_WCM_EVENT_SEARCH_ENDED, 0);
                 }
             } else if (sWcm.state == STATE_SEARCH_STARTING) {
-                if (func_ov011_0215be88(sWcm.bssid, sWcm.essid, sWcm.searchOption) != WCM_RESULT_ACCEPT) {
+                if (WCM_SearchAsync(sWcm.bssid, sWcm.essid, sWcm.searchOption) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
             } else if (sWcm.state == STATE_CLEANING_UP) {
-                if (func_ov011_0215be00() != WCM_RESULT_ACCEPT) {
+                if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
             } else if (sWcm.state == STATE_CONNECTING) {
-                if (func_ov011_0215bf78(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
+                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
@@ -148,21 +148,21 @@ static void WcmNotify(WCMNotice *notice) {
                     sWcm.callback(DWC_WCM_EVENT_DISCONNECTED, 0);
                 }
             } else if (sWcm.state == STATE_SEARCH_STARTING) {
-                if (func_ov011_0215be88(sWcm.bssid, sWcm.essid, sWcm.searchOption) != WCM_RESULT_ACCEPT) {
+                if (WCM_SearchAsync(sWcm.bssid, sWcm.essid, sWcm.searchOption) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
             } else if (sWcm.state == STATE_CLEANING_UP) {
-                if (func_ov011_0215be00() != WCM_RESULT_ACCEPT) {
+                if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
                     }
                 }
             } else if (sWcm.state == STATE_CONNECTING) {
-                if (func_ov011_0215bf78(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
+                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
@@ -181,7 +181,7 @@ static void WcmNotify(WCMNotice *notice) {
     case WCM_NOTIFY_CLEANUP:
         if (notice->result == 0) {
             if (sWcm.state == STATE_CLEANING_UP) {
-                func_ov011_0215bce0();
+                WCM_Finish();
                 sWcm.state = STATE_OFF;
                 if (sWcm.callback != NULL) {
                     sWcm.callback(DWC_WCM_EVENT_CLEANED_UP, 0);
@@ -213,17 +213,17 @@ static void WcmNotify(WCMNotice *notice) {
 static BOOL WcmAbort(void) {
     switch (sWcm.state) {
     case STATE_SEARCHING:
-        if (func_ov011_0215be88(NULL, NULL, 0) != WCM_RESULT_ACCEPT) {
+        if (WCM_SearchAsync(NULL, NULL, 0) != WCM_RESULT_ACCEPT) {
             return FALSE;
         }
         break;
     case STATE_CONNECTED:
-        if (func_ov011_0215c0ac() != WCM_RESULT_ACCEPT) {
+        if (WCM_DisconnectAsync() != WCM_RESULT_ACCEPT) {
             return FALSE;
         }
         break;
     case STATE_INITIALIZED:
-        if (func_ov011_0215bd58(sWcm.config, WcmNotify) != WCM_RESULT_ACCEPT) {
+        if (WCM_StartupAsync(sWcm.config, WcmNotify) != WCM_RESULT_ACCEPT) {
             return FALSE;
         }
         break;
@@ -244,18 +244,18 @@ int DWC_Wcm_GetApList(void *dest, int max) {
     int count;
     int i;
 
-    func_ov011_0215c60c(TRUE);
-    count = func_ov011_0215c5d0();
+    WCM_LockApList(TRUE);
+    count = WCM_CountApList();
     if (count > 0) {
         for (i = 0; i < count; i++) {
             if (i >= max) {
                 break;
             }
-            sys_memcpy32(func_ov011_0215c65c(i), out, 0xc0);
+            sys_memcpy32(WCM_PointApList(i), out, 0xc0);
             out += 0xc0;
         }
     }
-    func_ov011_0215c60c(FALSE);
+    WCM_LockApList(FALSE);
     return count;
 }
 
@@ -271,7 +271,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         sWcm.bssid = sBssid;
     } else {
         sys_memset(sBssid, 0xff, 6);
-        sWcm.bssid = data_ov011_02184fdc;
+        sWcm.bssid = WCMiAnyBssid;
     }
     if (essid != NULL && essidLength > 0 && essidLength <= 0x20) {
         for (i = 0; i < essidLength; i++) {
@@ -283,10 +283,10 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         sWcm.essid = sEssid;
     } else {
         sys_memset(sEssid, 0xff, 0x20);
-        sWcm.essid = data_ov011_02184fe4;
+        sWcm.essid = WCMiAnyEssid;
     }
     if (sWcm.state == STATE_IDLE) {
-        if (func_ov011_0215be88(sWcm.bssid, sWcm.essid, sWcm.searchOption) == WCM_RESULT_ACCEPT) {
+        if (WCM_SearchAsync(sWcm.bssid, sWcm.essid, sWcm.searchOption) == WCM_RESULT_ACCEPT) {
             sWcm.state = STATE_SEARCH_STARTING;
             CPU_SetIRQMask(irq);
             return TRUE;
@@ -303,7 +303,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
 BOOL DWC_Wcm_EndSearch(void) {
     u32 irq = CPU_IRQDisable();
 
-    if (sWcm.state == STATE_SEARCHING && func_ov011_0215be88(NULL, NULL, 0) == WCM_RESULT_ACCEPT) {
+    if (sWcm.state == STATE_SEARCHING && WCM_SearchAsync(NULL, NULL, 0) == WCM_RESULT_ACCEPT) {
         sWcm.state = STATE_STOPPING;
         CPU_SetIRQMask(irq);
         return TRUE;
@@ -315,7 +315,7 @@ BOOL DWC_Wcm_EndSearch(void) {
 BOOL DWC_Wcm_Disconnect(void) {
     u32 irq = CPU_IRQDisable();
 
-    if (sWcm.state == STATE_CONNECTED && func_ov011_0215c0ac() == WCM_RESULT_ACCEPT) {
+    if (sWcm.state == STATE_CONNECTED && WCM_DisconnectAsync() == WCM_RESULT_ACCEPT) {
         sWcm.state = STATE_STOPPING;
         CPU_SetIRQMask(irq);
         return TRUE;
@@ -328,7 +328,7 @@ BOOL DWC_Wcm_Cleanup(void) {
     u32 irq = CPU_IRQDisable();
 
     if (sWcm.state == STATE_IDLE) {
-        if (func_ov011_0215be00() != WCM_RESULT_ACCEPT) {
+        if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
             CPU_SetIRQMask(irq);
             return FALSE;
         }
@@ -361,7 +361,7 @@ BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 wepMode) {
         return TRUE;
     }
     if (sWcm.state == STATE_IDLE &&
-        func_ov011_0215bf78(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) == WCM_RESULT_ACCEPT) {
+        WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) == WCM_RESULT_ACCEPT) {
         sWcm.state = STATE_CONNECTING;
         CPU_SetIRQMask(irq);
         return TRUE;
@@ -384,14 +384,14 @@ BOOL DWC_Wcm_Start(DWCWcmCallback callback, void *work, u32 size) {
     sWcm.config->dmano = 3;
     sWcm.callback = callback;
     if (sWcm.state == STATE_OFF) {
-        if (func_ov011_0215bbec(sWcm.wcmWork, WCM_WORK_SIZE) != 0) {
+        if (WCM_Init(sWcm.wcmWork, WCM_WORK_SIZE) != 0) {
             CPU_SetIRQMask(irq);
             return FALSE;
         }
         sWcm.state = STATE_INITIALIZED;
     }
     if (sWcm.state == STATE_INITIALIZED) {
-        if (func_ov011_0215bd58(sWcm.config, WcmNotify) != WCM_RESULT_ACCEPT) {
+        if (WCM_StartupAsync(sWcm.config, WcmNotify) != WCM_RESULT_ACCEPT) {
             CPU_SetIRQMask(irq);
             return FALSE;
         }

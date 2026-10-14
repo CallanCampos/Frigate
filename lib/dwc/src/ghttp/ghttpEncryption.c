@@ -234,7 +234,7 @@ static GHISslConnection *ghiTwlSSLInit(const char *url) {
     if (rootCA != NULL) {
         if (rootCA->certs != NULL && rootCA->count > 0) {
             OS_GetLowEntropyData(sSslEntropy);
-            func_ov011_02159d64(sSslEntropy, sizeof(sSslEntropy));
+            CPS_SslAddRandomSeed(sSslEntropy, sizeof(sSslEntropy));
             ssl = func_ov011_0216dddc(sizeof(GHISslConnection));
             if (ssl != NULL) {
                 memset(ssl, 0, sizeof(GHISslConnection));
@@ -293,7 +293,7 @@ int ghiEncryptorSslStartFunc(GHIConnection *connection, GHIEncryptor *encryptor)
 
     func_ov011_0216cca8(8, 4, 15, "%s(@%s:%d)\r\n", GHI_FILE, __FUNCTION__, 1100);
     if (!state->started) {
-        error = func_ov011_02158174(connection->socket, state->ssl);
+        error = SOCL_EnableSsl(connection->socket, state->ssl);
         if (error < 0) {
             switch (error) {
             case -28:

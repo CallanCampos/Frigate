@@ -63,6 +63,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   uses weigh too much; move its dereferences into a `static inline` taking a `const T *`.
   (matching.md: "goes to a callee-saved register at entry")
 
+- A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
+  with other threads and `volatile`. (matching.md: "A field that other threads change")
+
 ## Stack slots or frame size
 
 - An extra slot holding a copy of an address-taken local before a nested loop: read its field inside the inner loop,

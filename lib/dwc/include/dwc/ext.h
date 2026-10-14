@@ -9,6 +9,7 @@
 #include "dwc/soap.h"
 // For CPS's address (CPSMyIp), which is set once the library has started
 #include "nitrowifi/cps.h"
+#include "nitrowifi/soc.h"
 
 // What the DWC code of overlay 260 (GameSpy's Sake, the competition client and Nintendo's Gdb) calls in the main
 // module and in overlays 11 and 189. The ROM names none of it, so these are the addresses with a word on what each
@@ -40,33 +41,8 @@ u32 __fread(void *buffer, u32 size, u32 count, void *file);
 // NitroSDK's thread library, which it also calls, is in nitro/os.h
 // NitroSDK's STD_GetStringLength with a limit: the length of the string, or the limit if it is longer
 int func_0207f900(const char *s, int max);
-// The socket library of overlay 11, whose functions take and return negative error codes. The address and port of a
-// socket address are in network order, and its first byte is its size
-typedef struct SocAddrIn {
-    u8 len;
-    u8 family;
-    u16 port;
-    u32 addr;
-} SocAddrIn;
-typedef struct SocHostEnt {
-    char *name;
-    char **aliases;
-    s16 addrType;
-    s16 addrLength;
-    u8 **addrList;
-} SocHostEnt;
-int func_ov011_02157bd0(int domain, int type, int protocol);
-int func_ov011_02157c10(int sock, const SocAddrIn *address);
-int func_ov011_02157c50(int sock, void *buffer, int size, int flags);
-int func_ov011_02157cbc(int sock, const void *buffer, int size, int flags);
-int func_ov011_02157d30(int sock, int how);
-int func_ov011_02157d38(int sock);
-SocHostEnt *func_ov011_02157d40(const char *host);
-int func_ov011_02158034(const char *text, u32 *address);
-int func_ov011_02158174(int sock, void *sslInfo);
-void func_ov011_021575f8(void);
 // Seeds the random number generator of the secure connections with some bytes
-void func_ov011_02159d64(const void *data, u32 size);
+void CPS_SslAddRandomSeed(const void *data, u32 size);
 
 // GameSpy's common code in overlay 11, used by the HTTP code: realloc and free (the ones beside the allocator above),
 // the clock in milliseconds and a sleep, and the sockets (the numbers that the socket functions return are -1 for an
@@ -180,42 +156,9 @@ int ghttpGetState(int request);
 void ghttpCancelRequest(int request);
 
 // What DWC's settings in overlay 182 (the AOSS client) call in overlay 11 and the main module. The socket library's
-// calls are above. A poll descriptor, and the configuration that the socket library starts with (its addresses are in
-// network order)
-typedef struct SocPollFd {
-    int fd;
-    s16 events;
-    s16 revents;
-} SocPollFd;
-typedef void *(*SocAllocFunc)(u32 name, s32 size);
-typedef void (*SocFreeFunc)(u32 name, void *ptr, s32 size);
-typedef struct SocConfig {
-    u32 flag;           // 0x00
-    SocAllocFunc alloc; // 0x04
-    SocFreeFunc free;   // 0x08
-    int useDhcp;        // 0x0c
-    u32 addr;           // 0x10
-    u32 netmask;        // 0x14
-    u32 gateway;        // 0x18
-    u32 dns1;           // 0x1c
-    u32 dns2;           // 0x20
-    u32 unk_24;         // 0x24
-    u32 unk_28;         // 0x28
-    u32 unk_2c;         // 0x2c
-    u32 unk_30;         // 0x30
-    u32 unk_34[9];      // 0x34
-} SocConfig;
-// Bind a socket to an address, receive from it and send to one (the address's first byte is its size)
-int func_ov011_02157bf0(int sock, const SocAddrIn *address);
-int func_ov011_02157c64(int sock, void *buffer, int size, int flags, SocAddrIn *from);
-int func_ov011_02157cd0(int sock, const void *buffer, int size, int flags, const SocAddrIn *to);
-// Starts the library with a configuration (negative if it cannot), cleans it up (negative if it cannot) and waits on
-// one descriptor for at most some ticks, returning how many are ready
-int func_ov011_02157f10(const SocConfig *config);
-int func_ov011_0215800c(void);
-int func_ov011_021580d0(SocPollFd *fds, u32 count, s64 ticks);
+// calls are in nitrowifi/soc.h.
 // Clears the WCM's list of access points
-void func_ov011_0215c594(void);
+void WCM_ClearApListBuffer(void);
 
 
 #endif // POKEBW2_DWC_EXT_H

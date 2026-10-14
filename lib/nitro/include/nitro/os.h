@@ -90,6 +90,8 @@ s32 func_0207a1a0(u16 lockId);
 // NitroSDK's OS_DisableInterrupts and OS_RestoreInterrupts, under swan's names
 u32 CPU_IRQDisable(void);
 u32 CPU_SetIRQMask(u32 mask);
+// NitroSDK's OS_GetProcMode: the processor mode, 0x12 in an IRQ handler
+u32 CPU_GetMode(void);
 // NitroSDK's OS_EnableIrqMask, under swan's name
 u32 CPU_EnableInterrupts(u32 mask);
 // NitroSDK's OS_Sleep: waits for some milliseconds, letting other threads run
@@ -234,6 +236,12 @@ typedef struct OSMessageQueue {
 void func_0207acc4(OSMessageQueue *queue, OSMessage *messages, s32 count);
 BOOL OS_SendMessage(OSMessageQueue *queue, OSMessage message, s32 flags);
 BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags);
+BOOL OS_ReadMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags); // The first message, left in the queue
+// OS_SNPrintf's role: snprintf
+int func_0207a2c0(char *dest, u32 size, const char *format, ...);
+// OS_DisableScheduler and OS_EnableScheduler's roles
+u32 func_0207aab4(void);
+u32 func_0207aad8(void);
 
 // NitroSDK's threads, under swan's names: OS_CreateThread, whose stack is its top, OS_SleepThread, which sleeps on
 // queue until OS_WakeupThread wakes it, and OS_WakeupThreadDirect, which starts a new thread. Of the thread's fields
@@ -264,6 +272,9 @@ BOOL scheduler_is_thread_ended(const OSThread *thread);
 void func_0207a710(OSThread *thread);
 // NitroSDK's OS_JoinThread, by its code: waits for a thread's end
 void func_0207a800(OSThread *thread);
+// NitroSDK's OS_RescheduleThread, by its place before OS_YieldThread and by its use after OS_EnableScheduler: runs the
+// highest priority thread that is ready
+void func_0207a918(void);
 // NitroSDK's OS_YieldThread, by its place between OS_JoinThread and OS_SetThreadPriority: lets the other threads of the
 // same priority run
 void func_0207a92c(void);
@@ -323,6 +334,8 @@ typedef struct OSMutex {
 
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
+// NitroSDK's OS_TryLockMutex: TRUE when it got the mutex, without waiting
+BOOL func_0207aeec(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
 
 #endif // POKEBW2_NITRO_OS_H

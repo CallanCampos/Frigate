@@ -232,7 +232,7 @@ static void CPSi_SetNoIp(u32 reason) {
                 reassembly->count = 0;
             }
         }
-        func_ov011_0215a6a0();
+        CPS_SslInit();
     }
 }
 
@@ -295,7 +295,7 @@ void CPS_Startup(CPSConfig *config) {
     sLanRead = 0;
     sLanWrite = 0;
     sLastPort = 1024 + MATH_Rand32(&CPSiRand, 5000 - 1024);
-    func_ov011_0215ccc0(sMyMac);
+    WCM_GetMacAddress(sMyMac);
     sIpCollision = FALSE;
     scheduler_init_thread(&sRecvThread, CPSi_RecvThread, NULL, sRecvStack + CPS_STACK_SIZE, CPS_STACK_SIZE,
                           sThreadPriority);
@@ -509,7 +509,7 @@ static BOOL CPSi_MacDiffers(u16 *a, u16 *b) {
 // CPSi_SendFrame: sends an Ethernet frame as an 802.11 one, with the SNAP header over its source address
 static void CPSi_SendFrame(u8 *frame, u32 len, u8 *data, u32 dataLen) {
     sys_memcpy_fast(CPS_SNAP_HEADER, frame + 6, 6);
-    sSendFailed = func_ov011_0215cba4(frame, frame + 6, len - 6, data, dataLen) < 0;
+    sSendFailed = WCM_SendDCFDataEx(frame, frame + 6, len - 6, data, dataLen) < 0;
 }
 
 // CPSi_PutFrame: puts a received frame in the LAN buffer, as its size and the Ethernet frame that it was
@@ -1968,7 +1968,7 @@ int CPS_TcpConnect(void) {
 
     if (soc != NULL) {
         if (soc->ssl) {
-            return func_ov011_0215a23c(soc);
+            return CPS_SslConnect(soc);
         }
         return CPSi_TcpConnect(soc);
     }
@@ -2001,7 +2001,7 @@ void CPS_TcpShutdown(void) {
 
     if (soc != NULL) {
         if (soc->ssl) {
-            func_ov011_0215a564(soc);
+            CPS_SslShutdown(soc);
         }
         CPSi_TcpShutdown(soc);
     }
@@ -2016,7 +2016,7 @@ void CPS_TcpClose(void) {
         return;
     }
     if (soc->ssl) {
-        func_ov011_0215a5b4(soc);
+        CPS_SslClose(soc);
     }
     start = CPS_NOW();
     while (sLinkIsOn() && soc->state != CPS_STT_CLOSED && CPS_NOW() - start < 39) {
@@ -2071,7 +2071,7 @@ u8 *CPS_SocRead(u32 *len) {
             return CPSi_UdpRead(len, soc);
         }
         if (soc->ssl) {
-            return func_ov011_0215a284(len, soc);
+            return CPS_SslRead(len, soc);
         }
         return CPSi_TcpRead(len, soc);
     }
@@ -2131,7 +2131,7 @@ void CPS_SocConsume(u32 len) {
 
     if (soc != NULL) {
         if (soc->ssl) {
-            func_ov011_0215a320(len, soc);
+            CPS_SslReadRelease(len, soc);
             return;
         }
         CPSi_TcpConsume(len, soc);
@@ -2316,7 +2316,7 @@ s32 CPS_SocGetLength(void) {
             CPSi_SendAck(soc, 1);
         }
         if (soc->ssl) {
-            return func_ov011_0215a43c(soc);
+            return CPS_SslCanRead(soc);
         }
         if (soc->rcvbuf_len != 0 || soc->state == CPS_STT_ESTABLISHED || soc->state == CPS_STT_DATAGRAM ||
             soc->state == CPS_STT_PING) {
@@ -2506,7 +2506,7 @@ static void CPSi_ScavengerThread(void *arg) {
                 reassembly->count = 0;
             }
         }
-        func_ov011_0215a604(now);
+        CPS_SslTick(now);
         if (sScavengerCallback != NULL) {
             sScavengerCallback();
         }

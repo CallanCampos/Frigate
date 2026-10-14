@@ -1815,7 +1815,7 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
     sSocConfig.addr = Net_Htonl(addr);
     sSocConfig.netmask = Net_Htonl(netmask);
     sSocConfig.gateway = Net_Htonl(gateway);
-    if (func_ov011_02157f10(&sSocConfig) < 0) {
+    if (SOC_Startup(&sSocConfig) < 0) {
         return -1;
     }
     if (CPSMyIp == 0) {
@@ -1827,7 +1827,7 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
 }
 
 static int Net_Stop(void) {
-    if (func_ov011_0215800c() < 0) {
+    if (SOC_Cleanup() < 0) {
         return -1;
     }
     return -(AossAp_Disconnect() != 0);
@@ -1853,7 +1853,7 @@ static void Mem_Fill(void *dest, int value, u32 size) {
 
 static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from, int *fromLength) {
     from->len = *fromLength;
-    return func_ov011_02157c64(sock, buffer, size, flags, from);
+    return SOC_RecvFrom(sock, buffer, size, flags, from);
 }
 
 // Waits for the descriptor to be ready for at most the time
@@ -1863,12 +1863,12 @@ static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptF
 
     ticks += ((u64)(s64)timeout->sec * 33514000) >> 6;
     ticks += ((u64)(s64)timeout->usec * 33514000) >> 6;
-    return func_ov011_021580d0(&fd, 1, ticks);
+    return SOC_Poll(&fd, 1, ticks);
 }
 
 static int Net_SendTo(int sock, const void *buffer, int size, int flags, SocAddrIn *to, int toLength) {
     to->len = toLength;
-    return func_ov011_02157cd0(sock, buffer, size, flags, to);
+    return SOC_SendTo(sock, buffer, size, flags, to);
 }
 
 // The socket library takes no options
@@ -1876,16 +1876,16 @@ static int Net_SetSockOpt(int sock, int level, int name, const void *value, int 
 }
 
 static int Net_Socket(int domain, int type, int protocol) {
-    return func_ov011_02157bd0(domain, type, protocol);
+    return SOC_Socket(domain, type, protocol);
 }
 
 static int Net_Bind(int sock, SocAddrIn *address, int length) {
     address->len = length;
-    return func_ov011_02157bf0(sock, address);
+    return SOC_Bind(sock, address);
 }
 
 static int Net_Close(int sock) {
-    return func_ov011_02157d38(sock);
+    return SOC_Close(sock);
 }
 
 static u32 Net_Htonl(u32 value) {
