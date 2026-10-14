@@ -1427,6 +1427,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the forms page walks its form-name table with `for (i = 0; i != form; i++)`.
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return` inside, as the Join Avenue's walks through its data are.
+- At `-O2,p` no loop is rotated: a `for` or `while` loop is entered with a `b` to its test at the end, as the loops of
+  `lib/irc`'s `IrcSpi_Recv`, `IrcSpi_Send` and `IrcLink_SendFrame` are (`-O4,p` rotates all three). A loop there with a
+  guard before its first pass and its test at the end was probably a guarded `do`/`while`: `IrcLink_Checksum` matches
+  as `if (i < size) { do { ... } while (++i < size); }` with `i = 0`, whose unsigned `0 < size` gives the original's
+  `cmp r1, #0; bls`. `if (size != 0)` gives `beq`, and a `for` inside `if (size > 0)` keeps its own `b` to the test.
 - A loop that runs once is unrolled when its counter and bound have the same signedness. `int i; i < NELEMS(x)`
   compares unsigned, so the loop stays, as in the gym files' loops over one-element tables.
 - An address that an inner loop computes from the outer loop's counter, such as `&pieces->pieces[row][col]`, is hoisted
