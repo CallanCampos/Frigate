@@ -25,8 +25,7 @@ import pycparser.c_generator
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.decomp.compiler_probe import DEFAULT_FLAGS, INCLUDE_DIRS, VERSION_DEFINES, find_function, lib_compiler, load_modules  # noqa: E402
 from tools.decomp.dsd_config import ROOT  # noqa: E402
-
-WIBO = ROOT / "tools" / "wibo"
+from configure import mwcc_command  # noqa: E402
 
 
 def relocated_offsets(module_dir: Path, start: int, end: int) -> set[int]:
@@ -98,7 +97,7 @@ def main():
     compiler = ROOT / "tools" / "mwccarm" / (name if "/" in name else f"dsi/{name}") / "mwccarm.exe"
     (out / "compile.sh").write_text(
         "#!/bin/sh\n"
-        f'exec {shlex.quote(str(WIBO))} {shlex.quote(str(compiler))} {flags} -o "$3" "$1"\n'
+        f'exec {shlex.join(mwcc_command(compiler))} {flags} -o "$3" "$1"\n'
     )
     (out / "compile.sh").chmod(0o755)
     objdump = ROOT / "tools" / "decomp" / "permuter_objdump.py"

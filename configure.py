@@ -31,14 +31,20 @@ VERSIONS = {
     "w2_us": {"sha1": "b5d7490be7b415b8f1e672a53e978a9cc667e56a", "rom": "pokewhite2_us.nds", "defines": ["WHITE2"]},
 }
 
-# Upstream 1.2.0 predates the guest x87 initialization in decompals/wibo e8f4795.
-# Pin binaries built from upstream 420a75b until an upstream release includes that fix.
+# Upstream 1.2.0 predates the guest x87 initialization in decompals/wibo e8f4795. The fork's pokebw2 branch is upstream
+# 420a75b, which has it, plus the imports that sjiswrap needs to load the compiler
 WIBO_REPO = "https://github.com/fuddlesworth/wibo"
-WIBO_VERSION = "pokebw2-fpu-1"
+WIBO_VERSION = "pokebw2-sjis-1"
 WIBO_SHA256 = {
-    "wibo-x86_64": "4dfd711b9197c98e54a7e0531b926e9e42096eaee55af03e8a8dae8085da1831",
-    "wibo-macos": "4f1bee058fa9a097917de0576bcb50eebf53e0ff3d3cdc03a036566481293e7c",
+    "wibo-x86_64": "d708570bd64cc8c176273a2bb7b5082f4fa849139d0ffe6cd0b96e26f3bc1ef2",
+    "wibo-macos": "d11a80c3e5dfa85b8097d1968640e12158630f86e95ef29029dcbb22b57dad89",
 }
+# sjiswrap runs the compiler on its sources converted from UTF-8 to Shift JIS, the encoding of the game's own text, so
+# that a string such as an assertion's Japanese expression is written as is. The fork's pokebw2 branch warns only for
+# a character that Shift JIS can't encode outside a comment, such as the é of a "Pokémon" in code
+SJISWRAP_REPO = "https://github.com/fuddlesworth/sjiswrap"
+SJISWRAP_VERSION = "v1.2.2-pokebw2.1"
+SJISWRAP_SHA256 = "4e9c917ba3f245da74a5a48ec91b459e956189cc1411233aa40046e0f7ac294f"
 OBJDIFF_VERSION = "v3.8.1"
 # Release binaries of wibo and objdiff-cli for macOS, by (sys.platform, machine); other platforms get the Linux x86-64
 # ones. wibo's macOS build is x86-64 only, and runs under Rosetta 2 on Apple silicon.
@@ -71,6 +77,10 @@ MWCC_VERSION = "dsi/1.1p1"
 # The linker only places delinked objects, so its version does not affect matching
 MWLD_VERSION = "dsi/1.1"
 
+# The compiler reads its sources as Shift JIS, from sjiswrap: in the default ASCII, a character whose second byte is
+# 0x5c, such as 表, would end in a backslash that escapes a closing quote or continues a // comment
+ENCODING_FLAG = "-enc SJIS"
+
 CC_FLAGS = [
     "-O4,p",               # Optimize for speed
     "-proc arm946e",       # ARM9 processor
@@ -89,6 +99,7 @@ CC_FLAGS = [
     "-requireprotos",      # Calling an undeclared function is an error, instead of an implicit declaration
     "-nolink",
     "-msgstyle gcc",
+    ENCODING_FLAG,
 ]
 
 # Libraries built apart from the game, each with its own compiler and flags: lib/<name>/ holds a library's public
@@ -109,7 +120,7 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
         with settings.open("rb") as f:
             library = tomllib.load(f)
         src = f"{(lib / 'src').relative_to(ROOT).as_posix()}/"
-        libraries[src] = (library["compiler"], library["flags"])
+        libraries[src] = (library["compiler"], [*library["flags"], ENCODING_FLAG])
         for path, flags in library.get("file_flags", {}).items():
             FILE_FLAGS[src + path] = flags
     return libraries
@@ -310,26 +321,39 @@ class Writer:
         self.out.write(f"default {' '.join(str(t) for t in targets)}\n")
 
 
+def download_pinned(name: str, url: str, expected_hash: str, path: Path):
+    """Downloads a pinned release binary to path unless it is already there with the expected SHA256, replacing an older
+    cached one."""
+    if path.exists() and hashlib.sha256(path.read_bytes()).hexdigest() == expected_hash:
+        return
+    print(f"Downloading {name}")
+    with urllib.request.urlopen(url) as response:
+        data = response.read()
+    if hashlib.sha256(data).hexdigest() != expected_hash:
+        raise ValueError(f"Downloaded {name} has an unexpected SHA256: {url}")
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix=f"{path.name}-", delete=False) as temporary:
+        temporary.write(data)
+        temporary_path = Path(temporary.name)
+    try:
+        temporary_path.chmod(temporary_path.stat().st_mode | stat.S_IEXEC)
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def mwcc_command(mwcc: Path, tools_dir: Path = ROOT / "tools") -> list[str]:
+    """Returns the command that runs a Metrowerks compiler under wibo, through sjiswrap."""
+    return [str(tools_dir / "wibo"), str(tools_dir / "sjiswrap.exe"), str(mwcc)]
+
+
 def download_tools(tools_dir: Path):
     host = (sys.platform, platform.machine().lower())
-    wibo = tools_dir / "wibo"
     binary = WIBO_BINARIES.get(host, "wibo-x86_64")
-    expected_hash = WIBO_SHA256[binary]
-    if not wibo.exists() or hashlib.sha256(wibo.read_bytes()).hexdigest() != expected_hash:
-        print(f"Downloading wibo {WIBO_VERSION}")
-        url = f"{WIBO_REPO}/releases/download/{WIBO_VERSION}/{binary}"
-        with urllib.request.urlopen(url) as response:
-            data = response.read()
-        if hashlib.sha256(data).hexdigest() != expected_hash:
-            raise ValueError(f"Downloaded wibo has an unexpected SHA256: {url}")
-        with tempfile.NamedTemporaryFile(dir=tools_dir, prefix="wibo-", delete=False) as temporary:
-            temporary.write(data)
-            temporary_path = Path(temporary.name)
-        try:
-            temporary_path.chmod(temporary_path.stat().st_mode | stat.S_IEXEC)
-            os.replace(temporary_path, wibo)
-        finally:
-            temporary_path.unlink(missing_ok=True)
+    download_pinned(f"wibo {WIBO_VERSION}", f"{WIBO_REPO}/releases/download/{WIBO_VERSION}/{binary}",
+                    WIBO_SHA256[binary], tools_dir / "wibo")
+    download_pinned(f"sjiswrap {SJISWRAP_VERSION}",
+                    f"{SJISWRAP_REPO}/releases/download/{SJISWRAP_VERSION}/sjiswrap-windows-x86.exe",
+                    SJISWRAP_SHA256, tools_dir / "sjiswrap.exe")
 
     objdiff = tools_dir / "objdiff-cli"
     if not objdiff.exists():
@@ -593,6 +617,7 @@ def main():
     n.comment(f"Generated by configure.py for {', '.join(versions)}, do not edit")
     n.variable("dsd", shlex.quote(str(dsd)))
     n.variable("wine", shlex.quote(wine))
+    n.variable("sjiswrap", shlex.quote(str(tools_dir / "sjiswrap.exe")))
     n.variable("python", shlex.quote(sys.executable))
     n.variable("includes", " ".join(f"-i {d}" for d in INCLUDE_DIRS))
     n.variable("as_includes", " ".join(f"-I {d}" for d in INCLUDE_DIRS))
@@ -603,15 +628,15 @@ def main():
     n.rule("delink", "$dsd delink --config-path $config", "Delinking $config")
     n.rule("lcf", "$dsd lcf --config-path $config", "Generating linker script for $config")
     # mwccarm writes the dependency file next to the object, with Windows paths that fix_depfile.py converts
-    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(mwcc))} {' '.join(CC_FLAGS)} $defines "
-           "-gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
+    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} {' '.join(CC_FLAGS)} "
+           "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
            depfile="$dep", deps="gcc")
     # The older compilers (SPL's 1.2/base) warn when MWCIncludes, their system include path, isn't set. The code finds its
     # headers through -i, so any value does
     for i, (compiler, _) in enumerate(LIBRARIES.values()):
         lib_mwcc = tools_dir / "mwccarm" / compiler / "mwccarm.exe"
-        n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine {shlex.quote(str(lib_mwcc))} $flags "
-               "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
+        n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
+               "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
@@ -632,10 +657,13 @@ def main():
     n.rule("rom_build", "$dsd rom build --config $in --rom $out", "Building $out")
     n.rule("check_modules", "$dsd check modules --config-path $config --fail && touch $out", "Checking modules")
     n.rule("sha1", "sha1sum --quiet -c $in && touch $out", "Checking $rom")
+    # The context stays UTF-8, for decomp.me
     n.rule("ctx", f"$wine {shlex.quote(str(mwcc))} -EP -lang=c99 -gccinc $defines $includes $in "
            "| grep -v -e '^#line' -e 'prepdump' > $out", "Preprocessing $in")
+    # decomp.me compiles the UTF-8 it is given without sjiswrap, so its scratches take the compiler's default encoding
+    decomp_me_flags = " ".join(flag for flag in CC_FLAGS if flag != ENCODING_FLAG)
     n.rule("objdiff_config", f"$python tools/build/objdiff_config.py $version --dsd $dsd "
-           f"--compiler {DECOMP_ME_COMPILER} --c-flags '{' '.join(CC_FLAGS)}' -o $out", "Writing $out")
+           f"--compiler {DECOMP_ME_COMPILER} --c-flags '{decomp_me_flags}' -o $out", "Writing $out")
     n.rule("report", f"{tools_dir / 'objdiff-cli'} report generate -p . -o $out", "Generating $out")
     n.rule("progress", "$python tools/build/progress.py $in", "Progress")
     configure_args = [*args.versions, *(["--bugfix"] if args.bugfix else []),
