@@ -1144,6 +1144,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   pointer is not `const`: `bmp.c`'s `ClipCopyArea` takes `const GFLBitmap *dest`, and `GFL_BitmapCopyArea_IDX4`,
   `_IDX8` and `GFL_BitmapCopyAreaRebased_IDX8` load `dest->width` again after it for their tile counts, as the
   original does, where with a plain `dest` the clip's load stays live in a saved register and every register moves.
+  A pointer field read through a `const` parameter at each use is loaded once into a compiler temporary, which the
+  allocator places apart from the index: `ica_anime.c`'s `GFL_G3DCurveGetNowTranslationLoop` and its rotation and
+  scale siblings keep the remainder both in `r2` after `__aeabi_uidivmod` and in `r3` for `* 12`, as the original
+  does, only with `const G3DCurve *curve`, `frame %= curve->frameCount` and `curve->translations[frame].x` (`.y`,
+  `.z`) written out; a `values` local or a separate index keeps one of the two copies.
 - Reads of a `const` table at a constant index are folded into immediates, but reads in a loop over the table are not,
   even when the loop runs once and is unrolled. An `ldm` from a table straight into argument registers is two fields
   read in such a loop, as the egg and evolution demos' particles load the resource of each of their one unit. Reads
