@@ -1631,16 +1631,25 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
 
     for (i = 0; i < count - 1; i++) {
         for (j = count - 1; j > i; j--) {
-            ResortRankSelf *upper = &entries[j - 1];
-            u32 value = upper->value;
-            ResortRankSelf *lower = &entries[j];
+            s32 prev = j - 1;
 
-            if (value < lower->value) {
-                u32 index = upper->index;
+            if (entries[prev].value < entries[j].value) {
+                u32 value = entries[prev].value;
+                u32 index = entries[prev].index;
+#ifdef BUGFIX
+                BOOL isSelf = entries[prev].isSelf;
 
-                *upper = *lower;
-                lower->value = value;
-                lower->index = index;
+                entries[prev] = entries[j];
+                entries[j].value = value;
+                entries[j].index = index;
+                entries[j].isSelf = isSelf;
+#else
+                // BUG: only the value and the index are put back, so the person asked about loses isSelf when
+                // moved down and the function returns 8. Its callers only test for 0, which it isn't then anyway
+                entries[prev] = entries[j];
+                entries[j].value = value;
+                entries[j].index = index;
+#endif
             }
         }
     }
