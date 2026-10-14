@@ -203,6 +203,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
+- A signed `/ 2` narrowed in separate steps before a loop (`asrs #1; lsls #0x10; asrs #0x10`, ours `lsls #0xf`):
+  compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
   twice. (matching.md: "chained assignment to fields")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows
