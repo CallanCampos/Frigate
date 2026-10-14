@@ -103,7 +103,7 @@ typedef struct {
 
 BlActScene *BlActScene_Create(const BlActSceneSetup *setup, HeapID heapId);
 void func_0204e450(BlActScene *scene);
-void BlActScene_SetCustomNormal(BlActScene *scene, const VecFx16 *normal);
+void BlActScene_SetCustomNormal(BlActScene *scene, VecFx16 *normal);
 void BlActScene_SetScale(BlActScene *scene, const VecFx32 *scale);
 void BlActScene_SetColDiffuse(BlActScene *scene, const GXRgb *color);
 void BlActScene_SetColAmbient(BlActScene *scene, const GXRgb *color);

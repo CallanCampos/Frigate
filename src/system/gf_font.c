@@ -52,7 +52,7 @@ enum {
     FONT_MAP_SCAN,
 };
 
-typedef void (*FontGetGlyphProc)(Font *font, u32 index, void *dest, GlyphInfo *info);
+typedef void (*FontGetGlyphProc)(const Font *font, u32 index, void *dest, GlyphInfo *info);
 typedef void (*FontBitmapCopyProc)(const u8 *src, u16 lastBits, u16 *dest);
 typedef u8 (*FontGetWidthProc)(Font *font, u32 index);
 typedef void (*FontInitProc)(Font *font, u32 tilesWide, u32 tilesHigh, HeapID heapId);
@@ -102,10 +102,10 @@ static void GFL_FontInitStreamed(Font *font, u32 tilesWide, u32 tilesHigh, HeapI
 static void func_0202304c(Font *font);
 static void func_02023060(Font *font);
 static void func_02023070(Font *font);
-static u32 GFL_FontGetCharIndex(Font *font, u16 c);
-static void GFL_FontGetGlyphCached(Font *font, u32 index, void *dest, GlyphInfo *info);
-static void GFL_FontGetGlyphStreamed(Font *font, u32 index, void *dest, GlyphInfo *info);
-static void GFL_FontGlyphCopy(Font *font, const u8 *cell, u32 lastBits, void *dest, GlyphInfo *info);
+static u32 GFL_FontGetCharIndex(const Font *font, u16 c);
+static void GFL_FontGetGlyphCached(const Font *font, u32 index, void *dest, GlyphInfo *info);
+static void GFL_FontGetGlyphStreamed(const Font *font, u32 index, void *dest, GlyphInfo *info);
+static void GFL_FontGlyphCopy(const Font *font, const u8 *cell, u32 lastBits, void *dest, GlyphInfo *info);
 static u8 GFL_FontGetCharWidthDynamic(Font *font, u32 index);
 static u8 GFL_FontGetCharWidthFixed(Font *font, u32 index);
 static void GFL_FontBitmapCopy_8x8(const u8 *src, u16 lastBits, u16 *dest);
@@ -245,7 +245,7 @@ void GFL_FontGetGlyph(Font *font, u16 c, void *dest, GlyphInfo *info) {
     font->getGlyph(font, GFL_FontGetCharIndex(font, c), dest, info);
 }
 
-static u32 GFL_FontGetCharIndex(Font *font, u16 c) {
+static u32 GFL_FontGetCharIndex(const Font *font, u16 c) {
     FontMap *map = (FontMap *)font->maps;
 
     for (;;) {
@@ -285,19 +285,19 @@ static u32 GFL_FontGetCharIndex(Font *font, u16 c) {
     }
 }
 
-static void GFL_FontGetGlyphCached(Font *font, u32 index, void *dest, GlyphInfo *info) {
+static void GFL_FontGetGlyphCached(const Font *font, u32 index, void *dest, GlyphInfo *info) {
     sys_memcpy(font->glyphs + index * font->glyphInfo.cellSize, font->cell, font->glyphInfo.cellSize);
     GFL_FontGlyphCopy(font, font->cell, font->lastBits, dest, info);
 }
 
-static void GFL_FontGetGlyphStreamed(Font *font, u32 index, void *dest, GlyphInfo *info) {
+static void GFL_FontGetGlyphStreamed(const Font *font, u32 index, void *dest, GlyphInfo *info) {
     GFL_ArcToolSeek(font->handle, font->fileOffset + (font->glyphsOffset + index * font->glyphInfo.cellSize));
     GFL_ArcToolReadRaw(font->handle, font->glyphInfo.cellSize, font->cell);
     GFL_FontGlyphCopy(font, font->cell, font->lastBits, dest, info);
 }
 
 // A cell is the glyph's left offset, width and advance, then its pixels
-static void GFL_FontGlyphCopy(Font *font, const u8 *cell, u32 lastBits, void *dest, GlyphInfo *info) {
+static void GFL_FontGlyphCopy(const Font *font, const u8 *cell, u32 lastBits, void *dest, GlyphInfo *info) {
     font->copyBitmap(cell + 3, lastBits, dest);
     info->x = cell[0];
     info->width = cell[1];

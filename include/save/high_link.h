@@ -110,7 +110,7 @@ BOOL PassPower_IsBW1Compatible(int passPower);
 // The bit of a special pass power in the two bytes of func_0200c6d8, or 0xff
 u8 PassPower_GetSPowerBaseID(int passPower);
 // Starts a pass power, bought with Pass Orbs when paid is set. It ends the pass power of the opposite effect
-void PassPower_Activate(u32 passPower, void *data, BOOL paid);
+void PassPower_Activate(u32 passPower, const void *data, BOOL paid);
 // The pass power that runs with the effect of the given one, and with a given effect, or PASS_POWER_NONE
 u32 PassPower_GetUsedIDByPassPower(u32 passPower, void *data);
 u32 PassPower_GetUsedIDByEffect(int effect);

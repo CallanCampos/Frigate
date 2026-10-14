@@ -50,7 +50,7 @@ const u16 *func_0200afe4(TrainerLogSave *log, u32 index);
 u8 func_0200afec(TrainerLogSave *log, u32 index);
 u16 func_0200b000(TrainerLogSave *log, u32 index);
 BOOL func_0200b014(TrainerLogSave *log, u32 index);
-void func_0200b024(TrainerLogSave *log, u32 index, u16 *unk18, u8 *unk1A, u8 *unk1B_0, u8 *unk1B_6);
+void func_0200b024(const TrainerLogSave *log, u32 index, u16 *unk18, u8 *unk1A, u8 *unk1B_0, u8 *unk1B_6);
 u8 func_0200b04c(TrainerLogSave *log);
 // The entry whose value is nearest the fortune of the birthday and date, at random between two as near
 u32 func_0200b05c(TrainerLogSave *log, u8 month, u8 day, RTCDate *date);

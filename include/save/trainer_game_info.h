@@ -55,7 +55,7 @@ struct TrainerGameInfoSave {
 u32 TrainerGameInfo_GetSize(void);
 void TrainerGameInfo_Init(TrainerGameInfoSave *info);
 void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 a3, int a4);
-void GetFavePokemonData(TrainerGameInfoSave *info, int *species, int *form, int *a3, int *a4);
+void GetFavePokemonData(const TrainerGameInfoSave *info, int *species, int *form, int *a3, int *a4);
 // Add one to the counters at 0x1c and 0x20, and return them
 u32 func_0200c910(TrainerGameInfoSave *info);
 u32 func_0200c928(TrainerGameInfoSave *info);

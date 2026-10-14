@@ -234,6 +234,7 @@ src/gfl/net.c:
     .bss        start:0x021418e8 end:0x021418f8
 
 src/gfl/net_irc_wireless.c:
+    complete
     .text       start:0x02042fa0 end:0x02043894
     .data       start:0x0209adbc end:0x0209ae00
     .bss        start:0x021418f8 end:0x021418fc
@@ -344,6 +345,7 @@ src/system/printsys.c:
     .bss        start:0x02141458 end:0x02141478
 
 src/system/gf_font.c:
+    complete
     .text       start:0x02022d84 end:0x02024200
     .rodata     start:0x0209086c end:0x02090888
     .data       start:0x0209a45c end:0x0209a468
@@ -1159,6 +1161,7 @@ src/system/resh_zek_savedata.c:
     .text       start:0x0200af74 end:0x0200afbc
 
 src/system/trainer_log_savedata.c:
+    complete
     .text       start:0x0200afbc end:0x0200b488
 
 src/system/high_link_savedata.c:
@@ -1179,6 +1182,7 @@ src/system/daycare_savedata.c:
     .text       start:0x0200c3a8 end:0x0200c598
 
 src/system/trainer_game_info_savedata.c:
+    complete
     .text       start:0x0200c7a0 end:0x0200cb44
 
 src/system/battle_rec.c:
@@ -1403,6 +1407,7 @@ src/system/battle_video_proc.c:
     .rodata     start:0x0208fe40 end:0x0208fe4c
 
 src/system/pass_power.c:
+    complete
     .text       start:0x0201340c end:0x02013914
     .rodata     start:0x0208fe4c end:0x0208fe68
     .bss        start:0x021410c0 end:0x02141134
@@ -1445,6 +1450,7 @@ src/system/nsbtx_to_clwk.c:
     .data       start:0x0209a34c end:0x0209a35c
 
 src/system/game_system.c:
+    complete
     .text       start:0x0201666c end:0x02016cb4
     .rodata     start:0x0209003c end:0x02090048
     .bss        start:0x02141134 end:0x02141150
