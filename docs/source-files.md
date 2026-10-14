@@ -179,7 +179,7 @@ prints the tables below from the configs and the ROM:
 | `oneshot_dr.c` | `0x0216598c`–`0x021659ec` | 2 | complete | descriptive |
 | `namein_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | string at `0x0216e3a0` |
 | `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | complete | descriptive |
-| `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | partial | descriptive |
+| `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | complete | descriptive |
 | `fldmmdl.c` | `0x02166664`–`0x02168320` | 270 | complete | string at `0x0216e5c0` |
 | `fest_mission_field.c` | `0x02168320`–`0x02168468` | 5 | complete | descriptive |
 | `burmy_form.c` | `0x02168468`–`0x021684bc` | 1 | complete | descriptive |

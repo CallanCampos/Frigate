@@ -357,6 +357,7 @@ src/ov012/event_league_lift.c:
     .rodata     start:0x0216dc7c end:0x0216dc9c
 
 src/ov012/event_bsubway.c:
+    complete
     .text       start:0x02165ef8 end:0x021666a4
     .rodata     start:0x0216dc9c end:0x0216dca8
 

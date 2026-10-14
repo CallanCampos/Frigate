@@ -188,7 +188,7 @@ void *func_ov012_021628c0(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16
 GameEvent *func_ov012_02165f70(BSubwayScrWork *bsw, GameSystem *gsys, u8 rental);
 GameEvent *func_ov012_02166070(BSubwayScrWork *bsw, GameSystem *gsys, Field *field);
 // The message of a trainer of the train in a balloon over the actor
-GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, u16 index, u16 actorId, u8 winPos);
+GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, int index, u16 actorId, u8 winPos);
 GameEvent *func_ov012_02166294(GameSystem *gsys);
 // The message of a saved leader in a balloon over the actor
 GameEvent *func_ov012_0216657c(GameSystem *gsys, u16 index, u16 actorId);
