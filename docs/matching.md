@@ -1099,6 +1099,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   without folding the subtraction, so it keeps the constant in `r6` like a variable. `= bufferSize - 0x20` folds to
   `0x100`, and an enum local reduced at run time gave the same instructions with the constant in `r4`, ahead of the
   parameters.
+  A constant narrowed at a call (`movs r3, #0x11` then `lsls`/`asrs` to `s16`) is an enum local too, and where it
+  is assigned decides where it is built: set at the top, before the first call, and live across calls while every
+  saved register is taken, it is rebuilt at its one use inside the argument setup. `zukan_detail_form.c`'s
+  `ZukanDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
+  print; set in the color's block, the 17 is built before `x`'s arithmetic (9 bytes), and an `int` or a field
+  folds the narrowing away.
 - A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
   comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
   so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.

@@ -67,6 +67,7 @@ src/ov298/zukan_detail_form_data.c:
     .rodata     start:0x021ac830 end:0x021ac898
 
 src/ov298/zukan_detail_form.c:
+    complete
     .text       start:0x021a7a20 end:0x021abfb4
     .rodata     start:0x021ac898 end:0x021ace18
     .data       start:0x021acee0 end:0x021acf20
