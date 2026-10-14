@@ -117,6 +117,7 @@ src/gfl/ui.c:
     .bss        start:0x021418c4 end:0x021418cc
 
 src/gfl/touchpanel.c:
+    complete
     .text       start:0x0203d688 end:0x0203dc70
     .data       start:0x0209aa04 end:0x0209aa14
     .bss        start:0x021418cc end:0x021418d0
