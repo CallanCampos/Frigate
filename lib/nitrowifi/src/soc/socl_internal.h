@@ -83,6 +83,9 @@ typedef struct SOCLSocket {
     // SOCLI_STATE_*. volatile: the command pipes' threads change it while callers test it, and the original reloads it
     // for each test (a plain s16 gets one load shared by the tests, and SOCL_GetStatus, SOCL_Connect, SOCLi_ReadFrom and
     // SOCL_WriteTo change)
+    // TODO: volatile was added to match SOCL_GetStatus, SOCLi_ReadFrom and SOCL_WriteTo (and to bring SOCL_Connect and
+    // SOCL_Shutdown to size), on the reasoning that the command pipes' threads change it; it is not known whether
+    // NitroWiFi's own header declares it volatile. Revisit if another spelling of the tests turns up.
     volatile s16 state;
     s8 flag_block;
     s8 flag;    // The mode (SOCLSocketParam's flag_mode), copied into each command packet
@@ -186,6 +189,9 @@ typedef struct SOCLCommandPacket {
             u16 remote_port;
             CPSInAddr remote_ip; // 0 for TCP
         } write;
+        struct {
+            void *info; // What SOCL_EnableSsl was given (an SSL connection), or NULL to turn SSL off
+        } ssl;
         u8 raw[0x1c];
     } args;
 } SOCLCommandPacket;

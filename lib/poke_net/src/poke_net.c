@@ -498,7 +498,7 @@ BOOL POKE_NET_Sending(void) {
         if (size > gPOKE_NET_Control.SendSize) {
             size = gPOKE_NET_Control.SendSize;
         }
-        result = func_ov011_02157cbc(gPOKE_NET_Control.Socket, gPOKE_NET_Control.SendBuffer + offset, size, 0);
+        result = SOC_Send(gPOKE_NET_Control.Socket, gPOKE_NET_Control.SendBuffer + offset, size, 0);
         if (result != POKE_NET_SOC_EWOULDBLOCK) {
             if (result < 0) {
                 gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_SENDTIMEOUT;
@@ -536,7 +536,7 @@ void POKE_NET_RecvThreadEntry(void *arg) {
         POKE_NET_LockMutex();
         if (!gPOKE_NET_Control.RecvDone) {
             gPOKE_NET_Control.RecvResult =
-                func_ov011_02157c50(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
+                SOC_Read(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
                                     gPOKE_NET_Control.RecvSize - offset, 0);
             gPOKE_NET_Control.RecvDone = TRUE;
         }

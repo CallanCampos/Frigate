@@ -54,6 +54,7 @@ typedef struct SOCLSocketParam {
     SOCLPipeParam snd_pipe;
 } SOCLSocketParam;
 
+extern SOCLSocketParam SOCLSocketParamUDP;
 extern SOCLSocketParam SOCLSocketParamTCP;
 extern SOCLSocketParam SOCLSocketParamUDPSend;
 
@@ -71,6 +72,83 @@ extern SOCLSocketParam SOCLSocketParamUDPSend;
 #define SOCL_ENOMEM (-49)
 #define SOCL_ENOTCONN (-56)
 #define SOCL_ETIMEDOUT (-76)
+
+// The BSD-style calls over SOCL (soc.c). A socket is the handle that SOC_Socket returns (SOCL's socket, which the
+// calls take as an int), and they return negative SOCL_E* codes. The address and port of a socket address are in
+// network order, and its first byte is its size
+#define POKE_NET_SOC_AF_INET 2
+#define POKE_NET_SOC_SOCK_STREAM 1
+#define POKE_NET_SOC_SHUT_RDWR 2
+#define POKE_NET_SOC_EWOULDBLOCK (-6)
+#define POKE_NET_SOC_EINPROGRESS (-26)
+#define POKE_NET_SOC_EISCONN (-30)
+
+typedef struct SocAddrIn {
+    u8 len;
+    u8 family;
+    u16 port;
+    u32 addr;
+} SocAddrIn;
+typedef struct SocHostEnt {
+    char *name;
+    char **aliases;
+    s16 addrType;
+    s16 addrLength;
+    u8 **addrList;
+} SocHostEnt;
+// An address (in network order) passed by value
+typedef struct SocInAddr {
+    u32 addr;
+} SocInAddr;
+// A poll descriptor, and the configuration that SOC_Startup takes (its addresses are in network order)
+typedef struct SocPollFd {
+    int fd;
+    s16 events;
+    s16 revents;
+} SocPollFd;
+typedef void *(*SocAllocFunc)(u32 name, s32 size);
+typedef void (*SocFreeFunc)(u32 name, void *ptr, s32 size);
+typedef struct SocConfig {
+    u32 flag;           // 0x00
+    SocAllocFunc alloc; // 0x04
+    SocFreeFunc free;   // 0x08
+    int useDhcp;        // 0x0c
+    u32 addr;           // 0x10
+    u32 netmask;        // 0x14
+    u32 gateway;        // 0x18
+    u32 dns1;           // 0x1c
+    u32 dns2;           // 0x20
+    u32 unk_24;         // 0x24
+    u32 unk_28;         // 0x28
+    u32 mtu;            // 0x2c: SOCLConfig's mtu
+    u32 rwin;           // 0x30: SOCLConfig's rwin
+    u32 unk_34[9];      // 0x34
+} SocConfig;
+
+int SOC_Socket(int domain, int type, int protocol);
+int SOC_Bind(int sock, const SocAddrIn *address);
+int SOC_Connect(int sock, const SocAddrIn *address);
+int SOC_Read(int sock, void *buffer, int size, int flags);
+int SOC_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from);
+int SOC_Send(int sock, const void *buffer, int size, int flags);
+int SOC_SendTo(int sock, const void *buffer, int size, int flags, const SocAddrIn *to);
+int SOC_Shutdown(int sock, int how);
+int SOC_Close(int sock);
+SocHostEnt *SOC_GetHostByAddr(const char *host);
+int SOC_GetSockName(int sock, SocAddrIn *address);
+u32 SOC_GetHostID(void);
+// Sets the DNS servers, despite the name (the SDK's; pokediamond's is the same)
+int SOC_GetResolver(const u32 *dns1, const u32 *dns2);
+int SOC_Fcntl(int sock, int command, int flags);
+int SOC_Startup(const SocConfig *config);
+int SOC_Cleanup(void);
+char *SOC_InetNtoA(SocInAddr addr);
+int SOC_InetAtoN(const char *text, u32 *address);
+char *SOC_InetNtoP(int family, const void *address, char *buffer, u32 size);
+void SOC_U32to4U8(u32 value, u8 *bytes);
+int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks);
+int SOCL_EnableSsl(int sock, void *sslInfo);
+void SOCLi_TrashSocket(void);
 
 int SOCL_Startup(SOCLConfig *config);
 int SOCL_CreateSocket(const SOCLSocketParam *param);

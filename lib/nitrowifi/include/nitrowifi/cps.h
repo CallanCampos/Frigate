@@ -169,5 +169,6 @@ void func_ov011_0215a564(CPSSoc *soc);
 void func_ov011_0215a5b4(CPSSoc *soc);
 void func_ov011_0215a604(s32 now);
 void func_ov011_0215a6a0(void);
+void func_ov011_0215a5e0(BOOL enable); // CPS_SetSsl's role: turns the SSL layer on for the caller's socket
 
 #endif // POKEBW2_NITROWIFI_CPS_H

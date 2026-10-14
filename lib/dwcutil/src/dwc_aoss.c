@@ -1853,7 +1853,7 @@ static void Mem_Fill(void *dest, int value, u32 size) {
 
 static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from, int *fromLength) {
     from->len = *fromLength;
-    return func_ov011_02157c64(sock, buffer, size, flags, from);
+    return SOC_RecvFrom(sock, buffer, size, flags, from);
 }
 
 // Waits for the descriptor to be ready for at most the time
@@ -1868,7 +1868,7 @@ static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptF
 
 static int Net_SendTo(int sock, const void *buffer, int size, int flags, SocAddrIn *to, int toLength) {
     to->len = toLength;
-    return func_ov011_02157cd0(sock, buffer, size, flags, to);
+    return SOC_SendTo(sock, buffer, size, flags, to);
 }
 
 // The socket library takes no options
@@ -1881,7 +1881,7 @@ static int Net_Socket(int domain, int type, int protocol) {
 
 static int Net_Bind(int sock, SocAddrIn *address, int length) {
     address->len = length;
-    return func_ov011_02157bf0(sock, address);
+    return SOC_Bind(sock, address);
 }
 
 static int Net_Close(int sock) {

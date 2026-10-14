@@ -72,3 +72,12 @@ lib/nitrowifi/src/soc/socl_misc.c:
 lib/nitrowifi/src/soc/socl_list.c:
     .text       start:0x02157980 end:0x02157bd0
     .bss        start:0x0218dc4c end:0x0218dc5c
+
+lib/nitrowifi/src/soc/soc.c:
+    .text       start:0x02157bd0 end:0x02158174
+    .data       start:0x02185478 end:0x021854cc
+    .bss        start:0x0218dc5c end:0x0218dde8
+
+lib/nitrowifi/src/soc/socl_ssl.c:
+    complete
+    .text       start:0x02158174 end:0x02158250

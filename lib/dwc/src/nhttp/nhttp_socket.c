@@ -32,7 +32,7 @@ int NHTTPi_SocCheck(int sock) {
 
     if (sock == -1) {
         result = -1;
-    } else if (func_ov011_02157c50(sock, &byte, 1, 4) != -6) {
+    } else if (SOC_Read(sock, &byte, 1, 4) != -6) {
         result = -1;
     }
     return result;
@@ -122,7 +122,7 @@ int NHTTPi_SocRecv_sub(NHttpConnection *connection, int sock, void *buffer, int 
         u32 count;
 
         if (connection->recvSize == 0) {
-            int result = func_ov011_02157c50(sock, recvBuffer, NHTTP_RECV_BUFFER_SIZE, flags);
+            int result = SOC_Read(sock, recvBuffer, NHTTP_RECV_BUFFER_SIZE, flags);
 
             if (result <= 0) {
                 return result;
@@ -171,7 +171,7 @@ int NHTTPi_SocRecv(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, v
 }
 
 int NHTTPi_SocSend_sub(int sock, const void *buffer, int size, int flags) {
-    return func_ov011_02157cbc(sock, buffer, size, flags);
+    return SOC_Send(sock, buffer, size, flags);
 }
 
 int NHTTPi_SocSend(NHttpRequest *request, int sock, const void *buffer, int size, int flags) {
