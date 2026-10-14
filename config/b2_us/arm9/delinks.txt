@@ -1220,6 +1220,7 @@ src/system/encounter_savedata.c:
     .text       start:0x0200dcec end:0x0200de34
 
 src/system/gds_profile.c:
+    complete
     .text       start:0x0200de34 end:0x0200e0f0
     .data       start:0x0209a1bc end:0x0209a1cc
 
