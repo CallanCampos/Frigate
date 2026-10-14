@@ -319,7 +319,7 @@ void freeIntermediateSaveExtraBlksAfterLoad(SaveControl *ctrl, u32 extra_id) {
     ctrl->sv_extra[extra_id] = NULL;
 }
 
-u32 func_02007560(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size) {
+u32 func_02007560(SaveControl *save, u32 block, HeapID heapId, void *buffer, u32 size) {
     save->sv_extra[block] = func_0203ad44(&sv_extra_blk_data[block], heapId, buffer, size, TRUE);
     if (func_02008e24(save, block) == FALSE) {
         return SAVE_LOAD_RESULT_NONE;
