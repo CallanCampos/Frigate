@@ -1736,7 +1736,7 @@ prints the tables below from the configs and the ROM:
 | `trainer_card.c` | `0x021a75a0`–`0x021a9f80` | 63 | complete | descriptive |
 | `trcard_bmp.c` | `0x021a9f80`–`0x021aaf00` | 22 | complete | descriptive |
 | `trcard_obj.c` | `0x021aaf00`–`0x021ab178` | 6 | complete | descriptive |
-| `badge_view.c` | `0x021ab178`–`0x021acd20` | 71 | partial | string at `0x021ada4c` |
+| `badge_view.c` | `0x021ab178`–`0x021acd20` | 71 | complete | string at `0x021ada4c` |
 
 ### Overlay 187
 
