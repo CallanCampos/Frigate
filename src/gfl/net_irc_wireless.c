@@ -126,6 +126,7 @@ void (*func_02043088(void (*a0)(void *work), void (*a1)(void *work, BOOL a1), vo
 void func_020430bc(const u8 *mac) {
     int i;
     u8 empty[6];
+    u8 *p = empty;
 
     if (NetIwSys == NULL) {
         return;
@@ -135,12 +136,12 @@ void func_020430bc(const u8 *mac) {
             return;
         }
     }
-    empty[0] = 0;
-    empty[1] = 0;
-    empty[2] = 0;
-    empty[3] = 0;
-    empty[4] = 0;
-    empty[5] = 0;
+    *p++ = 0;
+    *p++ = 0;
+    *p++ = 0;
+    *p++ = 0;
+    *p++ = 0;
+    *p++ = 0;
     for (i = 0; i < _COLLECTMAC_NUM; i++) {
         if (GFL_STD_MemCmp(empty, NetIwSys->collect.macs[i], 6) == 0) {
             sys_memcpy(mac, NetIwSys->collect.macs[i], 6);
