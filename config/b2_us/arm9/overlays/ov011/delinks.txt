@@ -107,3 +107,8 @@ lib/nitrowifi/src/wcm/wcm.c:
     .text       start:0x0215bbec end:0x0215dd74
     .rodata     start:0x02184fdc end:0x02185014
     .bss        start:0x0218df74 end:0x0218dfc8
+
+lib/dwc/src/gt2/gt2.c:
+    .text       start:0x0216eea8 end:0x0216fbf8
+    .data       start:0x02186ffc end:0x021874a0
+    .bss        start:0x02190928 end:0x02190964

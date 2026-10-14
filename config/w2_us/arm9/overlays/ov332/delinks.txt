@@ -17,6 +17,7 @@ src/ov332/key_system_graphic.c:
     .data       start:0x021c9318 end:0x021c9330
 
 src/ov332/key_system_util.c:
+    complete
     .text       start:0x021c058c end:0x021c1e10
     .rodata     start:0x021c8da8 end:0x021c8e1c
     .data       start:0x021c9330 end:0x021c9364

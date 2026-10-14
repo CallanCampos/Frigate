@@ -19,6 +19,7 @@
 void *memset(void *dest, int value, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
 void *memmove(void *dest, const void *src, u32 size);
+int memcmp(const void *a, const void *b, u32 size);
 char *strcpy(char *dest, const char *src);
 int strcmp(const char *a, const char *b);
 int strncmp(const char *a, const char *b, u32 size);
@@ -75,6 +76,9 @@ void func_ov011_02171600(void *array, const void *element, int (*compare)(const 
 void func_ov011_02171668(void *array, int index);
 int func_ov011_021716ac(void *array, const void *element, int (*compare)(const void *a, const void *b), int start,
                         int sorted);
+// Removes the element at index without calling the array's freeFunc on it (gt2.c's only caller frees it itself
+// first)
+void func_ov011_02171634(void *array, int index);
 
 // Writes at most size bytes of a formatted text to dest, returning the length it would have, or a negative number
 int func_0207a2c0(char *dest, u32 size, const char *format, ...);
@@ -119,6 +123,45 @@ u32 func_ov011_0216ee7c(char *dest, const char *src, u32 size);
 char *func_ov011_0216e2c8(const char *text);
 // Reports an error to the library, with a code, a type, a flag and the text
 void func_ov011_0216cca8(int category, int type, int level, const char *format, ...);
+
+// Overlay 11's lower socket layer, which gt2.c's "Udp Engine" builds on; not decompiled, so these are addresses
+// with a word on what each does, read off gt2.c's callers. An "address" is its own opaque object (not a raw ip),
+// read with the two accessors below
+u32 func_ov011_0217d380(const void *address);
+u16 func_ov011_0217d384(const void *address);
+// Formats an address as text (its ip and port) into buf, and returns buf; gt2.c also calls it with a 0 ip and a
+// string pointer in its second argument, so that argument's real type is unclear
+const char *func_ov011_0217ed14(u32 ip, u32 portOrAddr, char *buf);
+// Creates the socket the engine wraps, bound to the resolved address, with the two buffer sizes and the callback
+// that the lower layer calls when a datagram arrives for an address with no connection yet; returns 0, or an error
+int func_ov011_0217d144(void *engine, const void *address, int bufferSize1, int bufferSize2,
+                        void (*onSocketError)(void));
+// Sets two of the socket's callbacks (which is unclear; gt2.c wires one to each of its own dispatchers)
+void func_ov011_0217d3a0(void *socket,
+                         BOOL (*callback)(void *unused, u32 ip, u16 port, int len, const void *data));
+void func_ov011_0217d188(void *socket,
+                         void (*callback)(void *unused, void *handle, u32 ip, u16 port, void *context,
+                                           const void *data, int len));
+// The socket's own local address, once bound
+u32 func_ov011_0217d388(void *socket);
+u16 func_ov011_0217d38c(void *socket);
+// Shuts the socket down, in two steps
+void func_ov011_0217d158(void *socket);
+void func_ov011_0217d168(void *socket);
+// A connection's state, its biggest message size, closing it and sending a message of size bytes with flags
+int func_ov011_0217d364(void *handle);
+int func_ov011_0217d390(void *handle);
+int func_ov011_0217d394(void *handle);
+int func_ov011_0217d290(void *handle, const void *message, int size, u32 flags);
+// Starts a connection attempt to an address with its own callback table (closed, received, ping and socket error,
+// in that order); writes its handle to *outHandle
+void func_ov011_0217d1a0(void *socket, void *outHandle, const char *addrText, const void *header, u32 headerSize,
+                         void *context, const void *table, int unused);
+// Installs a callback table (closed, received, ping and socket error, as above) on a connection that the lower
+// layer auto-accepted
+void func_ov011_0217d190(void *handle, const void *table);
+// Clears a buffer's first two fields
+void func_ov011_0217d198(void *buffer, int a1, int a2);
 
 // Overlay 11's HTTP client: posts a SOAP message to a URL with the SOAPAction header and calls the function with the
 // answer; returns the request, or 0 when it could not start
