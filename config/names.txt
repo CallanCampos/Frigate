@@ -20565,6 +20565,7 @@ overlays/ov309 0x0219fc78 FMissionLogFAppEntry_Clear
 overlays/ov309 0x0219fc8c FMissionLogFApp_EndMission
 overlays/ov309 0x021a00c0 FMissionLogFApp_GiveMedals
 overlays/ov309 0x021a01d0 FMISSION_APP_PROC_FUNCTIONS
+overlays/ov309 0x021a0442 sFMissionAppDrawMessages
 overlays/ov310 0x0219ce80 ResearchRadar_Init
 overlays/ov310 0x0219cee0 ResearchRadar_Exit
 overlays/ov310 0x0219cf00 ResearchRadar_Main
