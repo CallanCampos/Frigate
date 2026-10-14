@@ -1168,11 +1168,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   computation, are locals of an explicit `if (count > 0) { ...; do { } while (++i < count); }` (`Flake_Add`).
 - I/O registers reached as offsets from one base register (`ldr r0, [sb, #0x1a4]`, `add fp, sb, #0x100000`), with
   the base made by shifting a register that holds 1 (`mov r3, #1; lsl sb, r3, #0x1a`), are not `1 << 26` or a base
-  pointer local: MWCC folds both back to a constant and loads each register's address from the literal pool. A shift
-  that MWCC only sees once the value is propagated keeps it: `u32 base = 1; base <<= 26;` and registers as
-  `*(vu32 *)(base + 0x1a4)`. It took DS Protect's `DSProt_CheckFlashcartA` (`dsprot_detect_multi.c`) from 0x780 to
-  its 0x764, together with the header's address computed as the original does, `((((twl) + 5) << 18) - 13) << 5`,
-  where a `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
+  pointer local: MWCC folds both back to a constant and loads each register's address from the literal pool. Only a
+  shift that MWCC sees after propagating the value keeps it, `u32 base = 1; base <<= 26;`, which brought DS Protect's
+  `DSProt_CheckFlashcartA` (`dsprot_detect_multi.c`) from 0x770 to its 0x764 but was judged unnatural and left out of
+  the source. Its header address, which the original computes from the TWL bit, is
+  `(((twl) + 5) << 23) - 0x1a0`; a `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
 
 ## Branches and block layout
 

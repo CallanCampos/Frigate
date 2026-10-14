@@ -6,17 +6,16 @@
 // emulator check and of the flashcart check of dsprot_detect.c, which report to the caller's arguments instead of
 // crashing the game when a check fails. The ROM doesn't name this file; it is named for what it does.
 
-// The card's registers, which the flashcart check reads the ROM through, from the I/O registers' base. DS Protect
-// hides the base and the header's address from a search of its code: it builds the base at run time and the
-// address from the TWL bit.
-#define REG_AUXSPICNT_H(base) (*(vu8 *)((base) + 0x1a1))
-#define REG_ROMCTRL(base) (*(vu32 *)((base) + 0x1a4))
-#define REG_ROMCMD(base, n) (*(vu8 *)((base) + 0x1a8 + (n)))
-#define REG_CARD_DATA(base) (*(vu32 *)((base) + 0x100010))
-#define REG_SCFG_A9ROM(base) (*(vu8 *)((base) + 0x4000))
+// The card's registers, which the flashcart check reads the ROM through
+#define REG_AUXSPICNT_H (*(vu8 *)0x040001a1)
+#define REG_ROMCTRL (*(vu32 *)0x040001a4)
+#define REG_ROMCMD(n) (*(vu8 *)(0x040001a8 + (n)))
+#define REG_CARD_DATA (*(vu32 *)0x04100010)
+#define REG_SCFG_A9ROM (*(vu8 *)0x04004000)
 
-// The card's ROM control word that the system copied from the header, at 0x027ffe60, or 0x02fffe60 in TWL mode
-#define HW_ROM_HEADER_CARD_CTRL(twl) (*(u32 *)(((((twl) + 5) << 18) - 13) << 5))
+// The card's ROM control word that the system copied from the header, at 0x027ffe60, or 0x02fffe60 in TWL mode. DS
+// Protect computes the address from the TWL bit instead of choosing between the two.
+#define HW_ROM_HEADER_CARD_CTRL(twl) (*(u32 *)((((twl) + 5) << 23) - 0x1a0))
 
 // Bytes of the first MAC address whose reversed bits an emulator has
 static const u8 sEmulatorMacMulti[6] = { 0xff, 0xf6, 0x40, 0xff, 0xff, 0xce };
@@ -151,46 +150,44 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
     u32 control;
     int offset;
     int i;
-    u32 base = 1;
 
     reg_MI_EXMEMCNT &= ~0x0800;
-    base <<= 26; // HW_REG_BASE, shifted at run time: the original shifts a register holding 1, so no 0x04000000 appears
-    control = (HW_ROM_HEADER_CARD_CTRL(REG_SCFG_A9ROM(base) & 1) & ~0x07000000) | 0xa1000000;
+    control = (HW_ROM_HEADER_CARD_CTRL(REG_SCFG_A9ROM & 1) & ~0x07000000) | 0xa1000000;
     offset = -(int)(address & 0x1ff);
-    while (REG_ROMCTRL(base) & 0x80000000) {
+    while (REG_ROMCTRL & 0x80000000) {
     }
-    REG_AUXSPICNT_H(base) = 0x80;
+    REG_AUXSPICNT_H = 0x80;
     for (i = 0; i < 8; i++) {
-        savedCommand[i] = REG_ROMCMD(base, i);
+        savedCommand[i] = REG_ROMCMD(i);
     }
     if (offset < 0x200) {
         u32 page = address + offset;
 
         do {
-            REG_ROMCMD(base, 0) = 0xb7;
-            REG_ROMCMD(base, 1) = page >> 24;
-            REG_ROMCMD(base, 2) = page >> 16;
-            REG_ROMCMD(base, 3) = page >> 8;
-            REG_ROMCMD(base, 4) = page;
-            REG_ROMCMD(base, 5) = flag;
-            REG_ROMCMD(base, 6) = 0;
-            REG_ROMCMD(base, 7) = 0;
-            REG_ROMCTRL(base) = control;
+            REG_ROMCMD(0) = 0xb7;
+            REG_ROMCMD(1) = page >> 24;
+            REG_ROMCMD(2) = page >> 16;
+            REG_ROMCMD(3) = page >> 8;
+            REG_ROMCMD(4) = page;
+            REG_ROMCMD(5) = flag;
+            REG_ROMCMD(6) = 0;
+            REG_ROMCMD(7) = 0;
+            REG_ROMCTRL = control;
             do {
-                if (REG_ROMCTRL(base) & 0x800000) {
-                    u32 word = REG_CARD_DATA(base);
+                if (REG_ROMCTRL & 0x800000) {
+                    u32 word = REG_CARD_DATA;
 
                     if (offset >= 0 && offset < 0x200) {
                         *(u32 *)((u8 *)dest + offset) = word;
                     }
                     offset += 4;
                 }
-            } while (REG_ROMCTRL(base) & 0x80000000);
+            } while (REG_ROMCTRL & 0x80000000);
             page += 0x200;
         } while (offset < 0x200);
     }
     for (i = 0; i < 8; i++) {
-        REG_ROMCMD(base, i) = savedCommand[i];
+        REG_ROMCMD(i) = savedCommand[i];
     }
     reg_MI_EXMEMCNT = exmemcnt;
 }
