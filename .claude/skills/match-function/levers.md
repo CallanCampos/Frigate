@@ -273,6 +273,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - I/O registers off a base register built by `lsl` of a register holding 1, where ours loads each address from the
   literal pool: only `u32 base = 1; base <<= 26;` keeps it, judged unnatural so far (matching.md: "base made by
   shifting a register")
+- A `bl memcpy` where the original keeps a hand `ldrb`/`strb` loop: declare `const u8 *`/`u8 *` locals and loop over
+  those, not over the function's own raw `const void *`/`const char *` parameter directly.
+  (matching.md: "only keeps that shape when the loop runs over its own")
 
 ## Branches and block layout
 
