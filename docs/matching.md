@@ -704,7 +704,9 @@ Same code, other `sp` offsets or frame size.
   a store is read into a local in a statement before it: `g3d_system.c`'s `GFL_G3DAnmCreate` reads
   `resource->data` before storing `resource` in the animation, and `event_field_proclink.c`'s `func_ov012_0215bb70`
   loads the party and the trainer data into locals before storing either, where reading a stored field back for a
-  call gives load, store, load, store.
+  call gives load, store, load, store. libfx's `MTX_Concat33`, `MTX_Concat43` and `MTX_Concat44` load a column of `b`
+  once for two neighbouring products of the result only with the column in locals: every store into the result
+  reloads `b` otherwise, 0x18 to 0x40 bytes in all.
 - A constant assigned to a spilled local is stored where MWCC likes, but the register that builds it follows where
   the source assigns it: `ctvt_game.c`'s `CtvtGamePlayer_Create` builds `isSelf`'s `TRUE` in `r2`, as the original
   does, only assigned right after the allocation, not at its declaration.

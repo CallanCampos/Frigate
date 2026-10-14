@@ -170,37 +170,39 @@ int MAT3_Invert(const MtxFx33 *mtx, MtxFx33 *inv) {
 
 void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab) {
     MtxFx33 tmp;
-    MtxFx33 *dst = (ab == b) ? &tmp : ab;
+    MtxFx33 *dst = ab;
+    fx32 b0, b1, b2;
 
-    dst->m[0][0] =
+    if (ab == b) {
+        ab = &tmp;
+    }
+    ab->m[0][0] =
         (fx32)(((fx64)a->m[0][0] * b->m[0][0] + (fx64)a->m[0][1] * b->m[1][0] + (fx64)a->m[0][2] * b->m[2][0]) >>
                FX32_SHIFT);
-    dst->m[0][1] =
+    ab->m[0][1] =
         (fx32)(((fx64)a->m[0][0] * b->m[0][1] + (fx64)a->m[0][1] * b->m[1][1] + (fx64)a->m[0][2] * b->m[2][1]) >>
                FX32_SHIFT);
-    dst->m[0][2] =
-        (fx32)(((fx64)a->m[0][0] * b->m[0][2] + (fx64)a->m[0][1] * b->m[1][2] + (fx64)a->m[0][2] * b->m[2][2]) >>
-               FX32_SHIFT);
-    dst->m[1][0] =
-        (fx32)(((fx64)a->m[1][0] * b->m[0][0] + (fx64)a->m[1][1] * b->m[1][0] + (fx64)a->m[1][2] * b->m[2][0]) >>
-               FX32_SHIFT);
-    dst->m[1][1] =
+    b0 = b->m[0][2];
+    b1 = b->m[1][2];
+    b2 = b->m[2][2];
+    ab->m[0][2] = (fx32)(((fx64)a->m[0][0] * b0 + (fx64)a->m[0][1] * b1 + (fx64)a->m[0][2] * b2) >> FX32_SHIFT);
+    ab->m[1][2] = (fx32)(((fx64)a->m[1][0] * b0 + (fx64)a->m[1][1] * b1 + (fx64)a->m[1][2] * b2) >> FX32_SHIFT);
+    ab->m[1][1] =
         (fx32)(((fx64)a->m[1][0] * b->m[0][1] + (fx64)a->m[1][1] * b->m[1][1] + (fx64)a->m[1][2] * b->m[2][1]) >>
                FX32_SHIFT);
-    dst->m[1][2] =
-        (fx32)(((fx64)a->m[1][0] * b->m[0][2] + (fx64)a->m[1][1] * b->m[1][2] + (fx64)a->m[1][2] * b->m[2][2]) >>
-               FX32_SHIFT);
-    dst->m[2][0] =
-        (fx32)(((fx64)a->m[2][0] * b->m[0][0] + (fx64)a->m[2][1] * b->m[1][0] + (fx64)a->m[2][2] * b->m[2][0]) >>
-               FX32_SHIFT);
-    dst->m[2][1] =
+    b0 = b->m[0][0];
+    b1 = b->m[1][0];
+    b2 = b->m[2][0];
+    ab->m[1][0] = (fx32)(((fx64)a->m[1][0] * b0 + (fx64)a->m[1][1] * b1 + (fx64)a->m[1][2] * b2) >> FX32_SHIFT);
+    ab->m[2][0] = (fx32)(((fx64)a->m[2][0] * b0 + (fx64)a->m[2][1] * b1 + (fx64)a->m[2][2] * b2) >> FX32_SHIFT);
+    ab->m[2][1] =
         (fx32)(((fx64)a->m[2][0] * b->m[0][1] + (fx64)a->m[2][1] * b->m[1][1] + (fx64)a->m[2][2] * b->m[2][1]) >>
                FX32_SHIFT);
-    dst->m[2][2] =
+    ab->m[2][2] =
         (fx32)(((fx64)a->m[2][0] * b->m[0][2] + (fx64)a->m[2][1] * b->m[1][2] + (fx64)a->m[2][2] * b->m[2][2]) >>
                FX32_SHIFT);
-    if (dst == &tmp) {
-        *ab = tmp;
+    if (ab == &tmp) {
+        *dst = tmp;
     }
 }
 
