@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 905 ]
+        [ "MAP_MODEL_BRIDGE_GATE_GATE_M_GATE07_00_00" ]
     ]
 }

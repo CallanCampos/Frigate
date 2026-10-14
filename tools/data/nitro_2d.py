@@ -199,11 +199,13 @@ def write_indexed_png(width, height, pixels, colors):
 
 
 def read_indexed_png(path):
+    """Returns an indexed PNG's width, height, pixels (palette indices) and its palette's colors."""
     data = path.read_bytes()
     if not data.startswith(b"\x89PNG\r\n\x1a\n"):
         raise ValueError(f"{path}: expected PNG")
     cursor, image = 8, bytearray()
     width = height = depth = None
+    colors = []
     while cursor < len(data):
         size = struct.unpack_from(">I", data, cursor)[0]
         kind = data[cursor + 4:cursor + 8]
@@ -215,6 +217,8 @@ def read_indexed_png(path):
             width, height, depth, color, comp, filt, interlace = struct.unpack(">IIBBBBB", payload)
             if color != 3 or depth not in (4, 8) or comp or filt or interlace:
                 raise ValueError(f"{path}: expected noninterlaced indexed PNG")
+        elif kind == b"PLTE":
+            colors = [tuple(payload[i:i + 3]) for i in range(0, len(payload) - 2, 3)]
         elif kind == b"IDAT":
             image.extend(payload)
         elif kind == b"IEND":
@@ -251,4 +255,4 @@ def read_indexed_png(path):
             unpacked = bytes(value for byte in row for value in (byte >> 4, byte & 15))
             pixels.extend(unpacked[:width])
         previous = row
-    return width, height, bytes(pixels)
+    return width, height, bytes(pixels), colors

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 202,
+    "area": "AREA_LOSTLORN_FOREST",
     "matrix": "MAP_MATRIX_LOSTLORN_FOREST",
     "scripts": "SCRIPTS_LOSTLORN_FOREST",
     "text": "SCRIPT_TEXT_LOSTLORN_FOREST",

@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1043 ]
+        [ "MAP_MODEL_UNDELLA_TOWN_5_M_OLDH01_00_00" ]
     ]
 }

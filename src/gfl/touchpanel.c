@@ -116,14 +116,15 @@ TouchpadManager *initTouchpad(HeapID heapId) {
     tp->stopped = 0;
     TP_Init();
     if (TP_GetUserInfo(&calibrate) == TRUE) {
+        TP_SetCalibrateParam(&calibrate);
     } else {
         // Defaults for a system without its touch screen calibrated
         calibrate.x0 = 0x2ae;
         calibrate.y0 = 0x58c;
         calibrate.xDotSize = 0xe25;
         calibrate.yDotSize = 0x1208;
+        TP_SetCalibrateParam(&calibrate);
     }
-    TP_SetCalibrateParam(&calibrate);
     tp->frequency = 4;
     tp->unk76 = 0;
     sTouchpad = tp;

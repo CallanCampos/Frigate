@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 817 ],
-        [ 818 ]
+        [ "MAP_MODEL_ICEBERG_CHAMBER_M_DUN2908_00_00" ],
+        [ "MAP_MODEL_ICEBERG_CHAMBER_M_DUN2908_00_01" ]
     ]
 }

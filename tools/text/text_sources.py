@@ -54,9 +54,11 @@ def ordered(list_name: str) -> list[str]:
 
 @cache
 def species() -> list[dict]:
-    """The species' data.json files, in the order of species.txt (not the forms or extra records)."""
+    """The national Pokédex species' data.json files, in the order of species.txt: the species before SPECIES_EGG,
+    which have text (not the forms, nor the egg and the species after it, whose names are lines of their own)."""
+    national = load_list("species")["SPECIES_EGG"]
     return [read(ROOT / "data/pokemon" / name.removeprefix("SPECIES_").lower() / "data.json")
-            for name in ordered("species")]
+            for name in ordered("species")[:national]]
 
 
 @cache

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 4,
     "npc_cache": 24,
-    "area": 190,
+    "area": "AREA_WHITE_FOREST_GATE",
     "matrix": "MAP_MATRIX_WHITE_FOREST_GATE",
     "scripts": "SCRIPTS_WHITE_FOREST_GATE",
     "text": "SCRIPT_TEXT_WHITE_FOREST_GATE",

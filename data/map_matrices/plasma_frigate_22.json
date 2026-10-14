@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 773 ]
+        [ "MAP_MODEL_PLASMA_FRIGATE_22_M_DUN2720_00_00" ]
     ]
 }

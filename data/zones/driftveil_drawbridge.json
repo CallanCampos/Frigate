@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 11,
     "npc_cache": 24,
-    "area": 30,
+    "area": "AREA_DRIFTVEIL_DRAWBRIDGE",
     "matrix": "MAP_MATRIX_DRIFTVEIL_DRAWBRIDGE",
     "scripts": "SCRIPTS_DRIFTVEIL_DRAWBRIDGE",
     "text": "SCRIPT_TEXT_DRIFTVEIL_DRAWBRIDGE",

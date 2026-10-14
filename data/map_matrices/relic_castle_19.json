@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 446 ]
+        [ "MAP_MODEL_RELIC_CASTLE_19_M_DUN0410_00_00" ]
     ]
 }

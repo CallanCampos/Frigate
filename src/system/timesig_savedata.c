@@ -72,9 +72,8 @@ s64 loadSecondsTime(TimeSigSave *timeSig) {
     return timeSig->seconds;
 }
 
-u32 func_02009230(TimeSigSave *timeSig, u32 badgeId) {
-    return timeSig->badgeDates[badgeId].year | (timeSig->badgeDates[badgeId].month << 8) |
-           (timeSig->badgeDates[badgeId].day << 16) | (timeSig->badgeDates[badgeId].unk3 << 24);
+TimeSigBadgeDate func_02009230(TimeSigSave *timeSig, u32 badgeId) {
+    return timeSig->badgeDates[badgeId];
 }
 
 void setBadgeGetSecondsTime(TimeSigSave *timeSig, u32 badgeId, u32 year, u32 month, u32 day) {

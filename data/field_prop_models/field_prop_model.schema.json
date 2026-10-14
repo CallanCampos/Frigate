@@ -1,0 +1,28 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A field prop model: data/field_prop_models/<exterior|interior>/<bundle>/<model>/data.json",
+    "description": "A model of a field prop bundle (archives a/2/2/5 and a/2/2/6), whose geometry and materials are model.glb next to this file. A bundle is named after its constant in data/constants/field_props_exterior.txt or field_props_interior.txt, and a model after its own name, numbered where it repeats in the bundle. tools/data/field_prop_model_data.py packs them.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "res_id", "glb_sha256" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "res_id": {
+            "type": "integer", "minimum": 0, "maximum": 65535,
+            "description": "The prop's resource ID, which the map models' prop placements (bw2_prop_NNNN_id_XXXXX) name. It is the bundle's and can't be changed here"
+        },
+        "transformed": {
+            "enum": [ true ],
+            "description": "Set when the GLB's positions went through the model's node transforms on export, which the packer reverses"
+        },
+        "positions": {
+            "type": "array",
+            "items": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+            "description": "For a transformed model whose transforms the packer can't yet work out from the GLB's joints, its vertices' positions as exported"
+        },
+        "glb_sha256": {
+            "type": "string", "pattern": "^[0-9a-f]{64}$",
+            "description": "The SHA-256 of model.glb as extracted. A GLB that still has it packs the original model unchanged, since not every unedited model survives conversion; an edited one is converted"
+        }
+    }
+}

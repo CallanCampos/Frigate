@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 946 ],
-        [ 947 ]
+        [ "MAP_MODEL_NS_CASTLE_5_M_NCASTLE09_00_0" ],
+        [ "MAP_MODEL_NS_CASTLE_5_M_NCASTLE09_00_0_2" ]
     ]
 }

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 291,
+    "area": "AREA_RELIC_CASTLE",
     "matrix": "MAP_MATRIX_ROUTE_4_11",
     "scripts": "SCRIPTS_ROUTE_4_15",
     "text": "SCRIPT_TEXT_ROUTE_4_15",

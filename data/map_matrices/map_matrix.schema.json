@@ -9,8 +9,8 @@
         "$schema": { "type": "string", "description": "This schema, for editors" },
         "maps": {
             "type": "array", "minItems": 1,
-            "description": "The rows of the grid: each cell's map, a file of the map archive, or null for none",
-            "items": { "type": "array", "minItems": 1, "items": { "type": [ "integer", "null" ], "minimum": 0, "maximum": 4294967294 } }
+            "description": "The rows of the grid: each cell's map, a MAP_MODEL_* constant (data/constants/map_models.txt), or null for none",
+            "items": { "type": "array", "minItems": 1, "items": { "type": [ "string", "integer", "null" ], "x-constant": "MAP_MODEL_", "minimum": 0, "maximum": 4294967294 } }
         },
         "zones": {
             "type": "array",

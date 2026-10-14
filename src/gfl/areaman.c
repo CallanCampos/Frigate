@@ -340,23 +340,21 @@ BOOL GFL_AreaManSetBits(AreaMan *man, u32 pos, u32 size) {
 
 void GFL_AreaManDeAlloc(AreaMan *man, u32 pos, u32 size) {
     u32 bit = pos % 8;
-    u32 byte = pos / 8;
 
+    pos /= 8;
     if (bit + size <= 8) {
-        GFL_AreaManFreeBitsOptOneByte(&man->bits[byte], bit, size);
+        GFL_AreaManFreeBitsOptOneByte(&man->bits[pos], bit, size);
     } else {
         int first = 8 - bit;
         int rest = size - first;
         int fullBytes = rest / 8;
         int restBits = rest % 8;
-        u8 *bits = man->bits;
-        u32 i = byte + 1;
 
-        bits[byte] &= ~sActiveBits[first];
+        man->bits[pos++] &= ~sActiveBits[first];
         while (fullBytes-- != 0) {
-            man->bits[i++] = 0;
+            man->bits[pos++] = 0;
         }
-        man->bits[i] &= ~sBitCountMasks[restBits];
+        man->bits[pos] &= ~sBitCountMasks[restBits];
     }
     AreaManPrintBits(man);
 }
@@ -397,45 +395,40 @@ static void GFL_AreaManFreeBitsOptOneByte(u8 *bits, u32 bit, u32 size) {
 
 static BOOL GFL_AreaManSetBitsCore(AreaMan *man, int pos, u32 size) {
     int bit;
-    int byte;
     int first;
     u32 mask;
-    u32 fullBytes;
     u32 restBits;
-    u8 *bits;
+    u32 fullBytes;
 
     if (pos + size > man->blocks) {
         return FALSE;
     }
     bit = pos % 8;
-    byte = pos / 8;
     first = 8 - bit;
+    pos /= 8;
     if (first >= size) {
         mask = sBitCountMasks[size] >> bit;
         fullBytes = 0;
         restBits = 0;
     } else {
-        u32 rest = size - first;
-
         mask = sActiveBits[first];
-        fullBytes = rest / 8;
-        restBits = rest % 8;
+        size -= first;
+        fullBytes = size / 8;
+        restBits = size % 8;
     }
-    bits = &man->bits[byte];
-    if (mask & *bits) {
+    if (mask & man->bits[pos]) {
         if (man->debugPrint) {
             AreaManPrintByte(mask);
-            AreaManPrintByte(*bits);
+            AreaManPrintByte(man->bits[pos]);
         }
         return FALSE;
     }
-    *bits |= mask;
-    byte++;
+    man->bits[pos++] |= mask;
     while (fullBytes-- != 0) {
-        man->bits[byte++] = 0xff;
+        man->bits[pos++] = 0xff;
     }
     if (restBits != 0) {
-        man->bits[byte] |= sBitCountMasks[restBits];
+        man->bits[pos] |= sBitCountMasks[restBits];
     }
     return TRUE;
 }

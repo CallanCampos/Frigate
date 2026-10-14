@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 865, 943 ],
-        [ 944, 945 ]
+        [ "MAP_MODEL_ICIRRUS_CITY_2_M_GYM0701_00_00", "MAP_MODEL_ICIRRUS_CITY_2_M_GYM0701_01_00" ],
+        [ "MAP_MODEL_ICIRRUS_CITY_2_M_GYM0701_00_01", "MAP_MODEL_ICIRRUS_CITY_2_M_GYM0701_01_01" ]
     ]
 }

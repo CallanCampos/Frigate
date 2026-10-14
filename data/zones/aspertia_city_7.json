@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 349,
+    "area": "AREA_ASPERTIA_CITY_3",
     "matrix": "MAP_MATRIX_ASPERTIA_CITY_3",
     "scripts": "SCRIPTS_ASPERTIA_CITY_7",
     "text": "SCRIPT_TEXT_ASPERTIA_CITY_7",

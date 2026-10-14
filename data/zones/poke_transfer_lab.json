@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 303,
+    "area": "AREA_POKE_TRANSFER_LAB",
     "matrix": "MAP_MATRIX_POKE_TRANSFER_LAB",
     "scripts": "SCRIPTS_POKE_TRANSFER_LAB",
     "text": "SCRIPT_TEXT_POKE_TRANSFER_LAB",

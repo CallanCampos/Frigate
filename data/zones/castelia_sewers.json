@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 298,
+    "area": "AREA_CASTELIA_SEWERS",
     "matrix": "MAP_MATRIX_CASTELIA_SEWERS",
     "scripts": "SCRIPTS_CASTELIA_SEWERS",
     "text": "SCRIPT_TEXT_CASTELIA_SEWERS",

@@ -119,9 +119,9 @@ def validate(data, schema: dict, where: str, root: dict | None = None):
     types = schema.get("type")
     if types is not None:
         types = [types] if isinstance(types, str) else types
-        checks = {"object": dict, "array": list, "string": str, "boolean": bool, "integer": int,
+        checks = {"object": dict, "array": list, "string": str, "boolean": bool, "integer": int, "number": (int, float),
                   "null": type(None)}
-        if not any(isinstance(data, checks[t]) and not (t == "integer" and isinstance(data, bool)) for t in types):
+        if not any(isinstance(data, checks[t]) and not (t in ("integer", "number") and isinstance(data, bool)) for t in types):
             raise DataError(f"{at}{json.dumps(data)} is not {' or '.join(types)}")
     if "enum" in schema and data not in schema["enum"]:
         raise DataError(f"{at}{json.dumps(data)} is not one of {schema['enum']}")

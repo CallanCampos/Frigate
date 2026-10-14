@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1025 ]
+        [ "MAP_MODEL_POKESTAR_STUDIOS_2_M_PWOOD02_00_00" ]
     ]
 }

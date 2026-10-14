@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 827 ]
+        [ "MAP_MODEL_BLACK_CITY_POKEMON_CENTER_M_PC01_00_00" ]
     ]
 }

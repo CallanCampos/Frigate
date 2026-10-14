@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 938 ]
+        [ "MAP_MODEL_BLACK_CITY_5_M_BCMALL01_00_00" ]
     ]
 }

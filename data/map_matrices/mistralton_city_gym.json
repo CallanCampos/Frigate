@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 863 ],
-        [ 903 ]
+        [ "MAP_MODEL_MISTRALTON_CITY_GYM_M_GYM0601_00_00" ],
+        [ "MAP_MODEL_MISTRALTON_CITY_GYM_M_GYM0601_00_01" ]
     ]
 }

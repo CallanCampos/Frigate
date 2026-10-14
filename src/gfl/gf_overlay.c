@@ -80,11 +80,12 @@ void GFL_OvlUnload(u32 overlayId) {
 
 BOOL GFL_OvlLoad(u32 overlayId) {
     u32 dma = FS_DMA_NOT_USE;
-    u32 region;
+    int region;
     OvlEntry *list;
     int count;
     int i;
     BOOL loaded;
+    BOOL result;
 
     if (overlayId == OVERLAY_NONE) {
         return TRUE;
@@ -96,9 +97,11 @@ BOOL GFL_OvlLoad(u32 overlayId) {
     list = GFL_OvlGetList(region);
     count = GFL_OvlGetListCount(region);
     for (i = 0; i < count; i++) {
-        if (list[i].loaded == FALSE) {
-            list[i].loaded = TRUE;
-            list[i].id = overlayId;
+        OvlEntry *entry = &list[i];
+
+        if (entry->loaded == FALSE) {
+            entry->loaded = TRUE;
+            entry->id = overlayId;
             break;
         }
     }
@@ -114,7 +117,11 @@ BOOL GFL_OvlLoad(u32 overlayId) {
     if (region == OVL_REGION_ITCM || region == OVL_REGION_DTCM) {
         fs_set_dma_id(dma);
     }
-    return loaded ? TRUE : FALSE;
+    result = FALSE;
+    if (loaded) {
+        result = TRUE;
+    }
+    return result;
 }
 
 // Returns FALSE if the overlay would overwrite one that is loaded

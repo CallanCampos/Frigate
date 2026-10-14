@@ -49,6 +49,7 @@ jobs:
         with:
           path: |
             tools/wibo
+            tools/sjiswrap.exe
             tools/objdiff-cli
             tools/mwccarm
             tools/dsd
@@ -106,6 +107,7 @@ jobs:
         with:
           path: |
             tools/wibo
+            tools/sjiswrap.exe
             tools/objdiff-cli
             tools/mwccarm
             tools/dsd

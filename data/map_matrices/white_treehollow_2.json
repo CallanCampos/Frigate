@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 991 ]
+        [ "MAP_MODEL_WHITE_TREEHOLLOW_2_M_MUGEN03_00_00" ]
     ]
 }

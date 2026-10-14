@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 509, 510 ],
-        [ 511, 512 ]
+        [ "MAP_MODEL_GIANT_CHASM_2_M_DUN1001_00_00", "MAP_MODEL_GIANT_CHASM_2_M_DUN1001_01_00" ],
+        [ "MAP_MODEL_GIANT_CHASM_2_M_DUN1001_00_01", "MAP_MODEL_GIANT_CHASM_2_M_DUN1001_01_01" ]
     ]
 }

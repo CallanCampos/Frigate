@@ -1,0 +1,6 @@
+{
+    "$schema": "../../../field_prop_model.schema.json",
+    "res_id": 123,
+    "transformed": true,
+    "glb_sha256": "acc751096e0f4e302c3faff786b564711a779bc940a19a0498d1f9eb5cb69951"
+}
