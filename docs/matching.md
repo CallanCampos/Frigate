@@ -967,6 +967,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - An argument narrowed by a `u16` parameter is narrowed again at each call, and only hoisted out of a loop, while a
   `(u16)` cast is computed once and reused: `PMSIVEdit_ScrollWait` matched only once `func_0204c1a8` and
   `func_0204c1dc` took their surface as `u16`.
+- A signed halving kept apart from its narrowing ahead of a loop (`asrs r0, r0, #1; lsls r0, r0, #0x10; asrs r2, r0,
+  #0x10`), where MWCC gives `lsls r0, r0, #0xf; asrs r4, r0, #0x10`, is a value the loop body computes through a narrow
+  local and the loop-invariant pass hoists. The fold is a tree rewrite before code generation, and it carries a
+  single-use halved value through a store, a call, a label, an enum-typed temporary or a reused parameter, but the
+  hoisting moves the two statements out one by one and nothing folds them again. `local_tvt_util.c`'s
+  `LocalTvtUtil_BlendPalette` matches, with the original's registers (the rate in `r2`), only with `fx16 cosine =
+  FX_CosIdx(angle); fx16 rate = (cosine + FX16_ONE) / 2;` at the top of its 16-color loop. An `fx32` or `u16` cosine,
+  the cosine local before the loop, or `FX_CosIdx` read inside the rate's expression all fold again.
 - After `a = b;`, a test of `b` reuses the register just stored and a test of `a` loads `a` again. The phrase
   select's `PMSSelect_SetupList` writes `wk->lineCount = wk->sentenceCount; if (wk->sentenceCount < 20)`, and its
   `PMSSelect_SetupScreen` tests `wk->pos` after `wk->prevPos = wk->pos;`.
