@@ -200,8 +200,13 @@ static BOOL UnSelect_ShowActor(ClActor **actors, int index, u16 surface, int y);
 static BOOL UnSelect_IsVisitorFloor(UnSelectWork *wk, u32 index);
 static u32 UnSelect_FindCountry(u32 country);
 
-// Unused
-static const u8 sUnSelectUnused[2] = { 15, 15 };
+// The rows of the list, the scroll bar and the buttons that scroll by a page
+static const FrameListTouch sUnSelectListTouch[] = {
+    { { 0, 39, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },   { { 40, 79, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
+    { { 80, 119, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE }, { { 120, 159, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
+    { { 8, 160, 240, 255 }, FRAMELIST_TOUCH_BAR },         { { 168, 191, 16, 39 }, FRAMELIST_TOUCH_PAGE_UP },
+    { { 168, 191, 80, 103 }, FRAMELIST_TOUCH_PAGE_DOWN },  { { TOUCH_RECT_END } },
+};
 
 static const FrameListCallbacks sUnSelectListCallbacks = {
     UnSelect_PrintItem,
@@ -219,14 +224,6 @@ const GameProcFunctions UN_SELECT_PROC_FUNCTIONS = {
     UnSelect_Init,
     UnSelect_Main,
     UnSelect_Exit,
-};
-
-// The rows of the list, the scroll bar and the buttons that scroll by a page
-static const FrameListTouch sUnSelectListTouch[] = {
-    { { 0, 39, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },   { { 40, 79, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 80, 119, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE }, { { 120, 159, 84, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
-    { { 8, 160, 240, 255 }, FRAMELIST_TOUCH_BAR },         { { 168, 191, 16, 39 }, FRAMELIST_TOUCH_PAGE_UP },
-    { { 168, 191, 80, 103 }, FRAMELIST_TOUCH_PAGE_DOWN },  { { TOUCH_RECT_END } },
 };
 
 // The country of each floor, from the top floor down
@@ -456,6 +453,7 @@ static void UnSelect_StartUndim(void) {
 }
 
 static UnSelectMsg *UnSelectMsg_Create(HeapID heapId) {
+    static const u8 backColor = 15;
     UnSelectMsg *msg = GFL_HeapAllocate(heapId, sizeof(UnSelectMsg), TRUE, "un_select.c", 972);
     BmpWin *window;
 
@@ -471,8 +469,8 @@ static UnSelectMsg *UnSelectMsg_Create(HeapID heapId) {
     msg->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 1, 0);
     msg->msgWindow = BmpWin_CreateDynamic(0, 1, 19, 30, 4, 14, TRUE);
     window = msg->titleWindow = BmpWin_CreateDynamic(4, 1, 1, 30, 2, 6, TRUE);
-    GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
-    GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
+    GFL_BitmapFill(BmpWin_GetBitmap(window), backColor);
+    GFL_TextRndUpdateColorIndexLUT(1, 2, backColor);
     GFL_MsgDataLoadStrbuf(msg->msgData, UnSelect_Text_PleaseSelectFloor, msg->strbuf);
     GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(window), 4, 0, msg->strbuf, msg->font);
     BmpWin_Transfer(window);
@@ -503,25 +501,27 @@ static void UnSelectMsg_Update(UnSelectMsg *msg) {
 
 // Prints a row of the list: its floor, and the name of its country, in one line or two
 static void UnSelectMsg_PrintItem(UnSelectMsg *msg, PrintWindow *window, PrintQueue *queue, Font *font, u32 index) {
-    u32 floor = UN_SELECT_FLOOR(index);
+    int pos = index;
     u32 y = 12;
+    u32 floor = UN_SELECT_FLOOR(pos);
 
     GFL_MsgDataLoadStrbuf(msg->msgData, floor == 2 ? UnSelect_Text_F_2 : UnSelect_Text_F, msg->strbuf);
     WordSetNumber(msg->wordSet, 2, floor, 3, 0, TRUE);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->expanded, msg->strbuf);
     PrintStrAligned(window, queue, 0, 12, msg->expanded, font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
-    if (func_0202284c(msg->names[index]) > 1) {
+    if (func_0202284c(msg->names[pos]) > 1) {
         y = 4;
     }
-    PrintStrAligned(window, queue, 30, y, msg->names[index], font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
+    PrintStrAligned(window, queue, 30, y, msg->names[pos], font, PRINT_COLOR(14, 15, 0), PRINT_ALIGN_LEFT);
 }
 
 static void UnSelectMsg_Print(UnSelectMsg *msg, u32 msgId) {
+    static const u8 backColor = 15;
     s32 wait = func_02017bcc();
     BmpWin *window = msg->msgWindow;
 
-    GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
-    GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
+    GFL_BitmapFill(BmpWin_GetBitmap(window), backColor);
+    GFL_TextRndUpdateColorIndexLUT(1, 2, backColor);
     GFL_MsgDataLoadStrbuf(msg->msgData, msgId, msg->strbuf);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->expanded, msg->strbuf);
     msg->stream = func_02022268(window, 4, 0, msg->expanded, msg->font, wait, msg->tcbManager, 0xffff, msg->heapId, 15);

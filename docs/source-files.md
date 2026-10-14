@@ -2628,7 +2628,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | partial | string at `0x0219e988` |
+| `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | complete | string at `0x0219e988` |
 | `un_select_graphic.c` | `0x0219e088`–`0x0219e3f4` | 17 | complete | string at `0x0219e994` |
 
 ### Overlay 312
