@@ -21,6 +21,7 @@ src/gfl/gx_layers.c:
     .bss        start:0x02141950 end:0x02141958
 
 src/gfl/bmp.c:
+    complete
     .text       start:0x02046e54 end:0x020480ac
     .data       start:0x0209aef8 end:0x0209af00
 
