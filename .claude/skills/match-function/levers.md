@@ -62,6 +62,26 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A stack pointer parameter kept in a callee-saved register where the original reloads it at each use: its
   uses weigh too much; move its dereferences into a `static inline` taking a `const T *`.
   (matching.md: "goes to a callee-saved register at entry")
+- Registers off around independent stores: sweep the statement orders, ending with the store that the next call
+  reads back. (matching.md: "`WipeRectWork_Init` matches only with")
+- Registers off around independent loads: reorder the loads in the source, and retry an SDK inline such as
+  `G3_PolygonAttr` against its packing macro after each reorder.
+  (matching.md: "Independent loads also take registers by their source order")
+- A parameter copied to another register at entry, with a value derived from it in a third: the parameter was
+  reassigned (`pos /= 8;`), not copied to a local. (matching.md: "was reassigned too")
+- A later loop's counter swapped with another local, the counter reused from an earlier loop: give that loop a
+  counter of its own. (matching.md: "matches once that loop counts with a `k` of its own")
+- A pointer that both branches of an `if` share loses its callee-saved register to the loop variables: the value
+  tested before the branch and the one a loop works out in it are one variable.
+  (matching.md: "that split frees a register for a pointer")
+- A value and its shift in one register where the original shifts into a new one: the shift is an expression, an
+  inline returning `x << n`, not `x <<= n`. (matching.md: "A shift written in place")
+- Two offsets that a loop steps alike, their registers swapped in every order: change both between `u32` and `int`.
+  (matching.md: "can swap registers by their signedness alone")
+- An index loaded and shifted in place where the original shifts it into another register: a pointer local set to
+  the member array and stepped, `p = s->arr; p += i;`. (matching.md: "keeps a loaded index in its own register")
+- A whole function's registers off, with an element's base added before its index and field offset: the inline
+  reads through `T *p = &arr[i];`. (matching.md: "Reads through such a pointer in an inline")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -96,6 +116,15 @@ text to `grep -n` there. Entries without a key come from later work and still be
   is passed is a local copy, and a struct local keeps a stack slot. (matching.md: "Structs passed by value")
 - A struct copied to the stack for each by-value inline call, and again before an inner loop: the inlines
   took the array element, `Get(learnset[i])`, not a local copy. (matching.md: "is copied for each call")
+- A spilled local in the lowest slot, among the temporaries, where ours keeps its declared slot: it was assigned with
+  a ternary, not a default and an `if`. (matching.md: "A local assigned with a ternary is spilled among")
+- Spilled values interleaved in assignment order where an inline's by-value parameter groups its slots apart: pass
+  the value's address as a `const` pointer and dereference it in the inline.
+  (matching.md: "An inline's parameter is a named local")
+- A common value's spilled temporary at the wrong end of the frame: move its first use, not a local's declaration,
+  across the first call. (matching.md: "spilled temporary takes its slot by where its first use")
+- A long-lived local spilled by a loop that stores two fields of `list[i]`: store through `T *entry = &list[i];`.
+  (matching.md: "keeps the offset live as a third temporary")
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
 
 ## Instructions in another order (scheduling)
@@ -137,6 +166,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A local of another type than the callee parameters")
 - A spilled reload above another spill's store, where the original stores first: the spilled locals are `u8`
   or `u16`; sweep the widths of several together. (matching.md: "can mean narrow locals")
+- A spilled parameter reloaded on the other side of a call's stack argument stores: sweep the caller's and the
+  callee's parameter widths together. (matching.md: "Spilled parameters follow the same rule")
 - Loads moved among a call's stack argument stores with the same instructions and slots: give a local read
   from a field the field's type. (matching.md: "can need the field's type even with the same")
 - NitroSDK's inline functions take enums, which changes when their arguments are loaded and shifted.
@@ -205,6 +236,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A value a loop uses and the code after it uses again is reused from the hoisted copy, unless it is a variable
   declared in the loop body. (matching.md: "reused from the copy hoisted")
 - An address passed to a `const` pointer parameter is converted, and not shared. (matching.md: "`const` pointer parameter is converted")
+- An element's address formed twice in two shapes, or a field loaded again after an inline read it: the callee or
+  the inline takes a `const` pointer, even in another file. (matching.md: "The callee can be in another file"),
+  (matching.md: "A field loaded in an inline that takes a `const` pointer")
 - `const` table reads at a constant index are folded into immediates; reads in a loop, even an unrolled one, are not.
   An `ldm` into argument registers is a loop over a table. Reads through a pointer to the entry aren't folded either.
   (matching.md: "Reads of a `const` table")
@@ -221,8 +255,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An array initializer stores at its declaration: open an inner block where the original clears the array.
   (matching.md: "The initializer's stores happen")
 - `s16` narrowing of a value also used unnarrowed: an inline with `s16` parameters. (matching.md: "inline with `s16` parameters")
+- A bit field sign-extended twice, once plain and once after `lsl`/`asr #16`: an inline with an `s16` parameter
+  called twice on it. (matching.md: "Called twice on one bit field")
 - A call's result copied to a scratch register before a subtraction into an argument register: put the difference
   in a local's initializer. (matching.md: "minus a constant, passed straight")
+- A -1 built from a shift's 1 (`sub rY, rX, #2`) where the original builds it alone (`mov; mvn`): a mask local set to
+  `0xffffffff`, then `mask ^= 1 << bit;`. (matching.md: "the mask was a local set to all ones")
+- A struct local's field loaded through a fresh `add rN, sp, #off` where the original loads through a saved
+  register: a raw buffer read through a typed pointer. (matching.md: "a raw buffer read through a typed pointer")
+- A range test's subtraction repeated after a call, where the original keeps it in a saved register: the variable
+  is an `int`, not a `u32`. (matching.md: "subtracts again at each test")
 - An object's address loaded from two literals in one function, where ours keeps one in a register: the object is a
   `static` of the file. (matching.md: "gets two literals")
 
@@ -265,6 +307,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   and swap the returns. (matching.md: "last test of a condition")
 - `a == 4 || a == 5` becomes a range check; separate comparisons to the same code are separate branches. A
   `BOOL x = FALSE; if (...) x = TRUE;` flag gives the `sub; cmp 1; bhi` range test. (matching.md: "range check")
+- A range check that adds a negated 16-bit constant, from the literal pool when it is large: an `||` chain of `==`
+  tests of consecutive constants, not `x < A || x > B`.
+  (matching.md: "A range check that adds the 16-bit negated constant")
 - A clamp that ends in one store is a conditional expression; `if`/`else if` stores each limit.
   (matching.md: "A clamp that ends in one store")
 - One store after an `if`/`else` of two constants, with a `b` over the else, is still an `if`/`else`; the conditional
@@ -282,6 +327,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A bit test (`lsl; tst #mask`) for a value among a few constants: `return x == a || x == b || x == c;`.
   (matching.md: "bit test")
 - A test after the others that it guards against: a nested `if` without an `else`. (matching.md: "Nested tests")
+- A branch that jumps past an identical second test, where ours goes to it: nest the second test inside the first
+  `if`. (matching.md: "never threads a branch into an identical test")
+- A missing container and a missing entry sharing one `movs rN, #0`, where ours copies the NULL from another zero
+  register and branches over it: a nested-`if` inline ending in one `return NULL;`.
+  (matching.md: "ends in a single `return NULL;`")
 
 ## Loops
 
@@ -404,8 +454,9 @@ sm64ds-decomp's catalogue for another mwccarm build, so they are untested here:
 Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles`
 (a loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
 restructures it. A function whose loop enters with a `b` to the test at -O4 may be one the original's global
-optimizer gave up on; `WorldTrade_NationSortListMake`, `Country_IsValidPlace`, `NNS_SndArcStrmInit` and
-`MBGameInfo_SendMembers` show the same symptom in their rows.
+optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and `MBGameInfo_SendMembers` show the
+same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which showed it too and came within a
+byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is 0/1").
 
 Try one at a time with `try_variants.py`, which allows definitions before the function. If a pragma is all that
 matches, write that down in the nonmatching row; it's evidence, not a fix.
