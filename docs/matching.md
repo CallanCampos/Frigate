@@ -546,6 +546,13 @@ Same code, other `sp` offsets or frame size.
   frame larger than the locals explain holds one: Guard Spec.'s effect in `btl_server_flow_sub.c` stores
   `SetConditionTurns`'s `BattleCondition` in a local before passing it on, and `BattleHandler_AddSideEffect` keeps its
   copy's address in a register to pass the copy by value after passing its address.
+- A struct local whose address does not survive into the optimizer is split into one variable per member, in the
+  lowest stack slots, and every declared slot moves up. A `&s` given to a `static inline`, `(void)&s`, a dead pointer
+  or one used in the same block, `s[1]`, union or nested members and a copy between locals all leave it split. An
+  initializer (stored through a base register), a real call taking `&s`, a copy to or from memory whose address is
+  taken, an inline's by-value parameter or return (each emits the copy), or a pointer local live across blocks (each
+  access an `add rN, sp, #off`) keeps it whole. The original's `best` in `dowsing.c`'s `Dowsing_Update` is whole,
+  with direct `[sp, #0x48]` stores and no initializer, and none of these gives that at no cost (see its row).
 
 - A function that declares every local first and assigns them below gets other registers and stack slots than one
   that initializes them in their declarations (palanm.c's `MaskPalettes` sets `mask = 0` after the count for its
@@ -748,6 +755,14 @@ Same instructions, scheduled in another order.
 - The same rule moves a call's stack argument stores. When loads through a pointer that is not `const` follow the
   call, the stack arguments are stored before the register arguments are set up. If the original stores them last,
   the pointer is `const`.
+- The same rule picks the register of an argument's address. Arguments are set up stack first, then `r0` to `r3`, so
+  a value read in the argument list, or in a local moved there, is loaded once the lower argument registers are set,
+  through its own argument register (`ldr r3, =...; ldrsh r3, [r3, r4]`). A local that every block making the same
+  call assigns again is not moved: it is loaded where it is written, before the setup, through the lowest free
+  register. `badge_view.c`'s `BadgeView_StartMove` makes three `BadgeView_StartValue` calls and loads each `to`
+  through `r1` (`ldr r1, =...; ldrsh r3, [r1, r4]`, with `mov r5, r0` in an earlier load's delay) only with one `to`
+  local assigned before each of the three; assigned in the first block alone, or in two of the three, it compiled
+  like the read in the call, with the copy of `wk` sunk to the `bl`.
 - A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
   between, where a local of their type is computed where it is written: `g3d_text_draw.c`'s
   `G3DTextDraw_StringToTexture` computes `size` before `gfxBeginTextureUpload()`, as the original does, only as a
@@ -759,7 +774,12 @@ Same instructions, scheduled in another order.
   later was taken into a pointer local where it is loaded: `fldeff_gyoe.c`'s draw loads `&NNS_G3dGlb.projMtx` before
   the float calls of its depth offset only as `const MtxFx44 *proj = NNS_G3dGlbGetProjectionMtx();` declared first
   and `saved = *proj;` after the offset. `saved = NNS_G3dGlb.projMtx;`, with or without the offset in a local first,
-  loads the address after the calls into another register.
+  loads the address after the calls into another register. A static table's address that MWCC gathers into a saved
+  register by itself goes the other way: `fmission_app_draw.c`'s `FMissionAppDraw_StartMessage` loads
+  `sFMissionAppDrawMessages` into `r7` at entry, ahead of the spill of its `window` parameter (`str r1, [sp, #0x18]`),
+  only with the table indexed at each use; `const s16 *messages = sFMissionAppDrawMessages;` gives the same registers
+  with the load after the spill. A branch that loads the address again from the pool, as one does there, hints that
+  no local held it.
 - A struct assignment loads every field before it stores any, through a pointer that is not `const` too. Two
   fields copied with both loads first, `ldr r2, [r0, #0x10]; ldr r1, [r0, #0x14]; str r2, [r0]`, are one struct
   copied: `KeySystemTween_Update` ends with `tween->pos = tween->end;` for an `{ s32 x, y; }` position.
@@ -880,6 +900,13 @@ Same instructions, scheduled in another order.
   included, shifts it in place and lets the load move above the parameter's copy: `resonance_resort_data.c`'s
   `JoinAvenuePerson_AddVisitorData` writes `JoinAvenueData *data = person->data; data += visitor->dataIndex;` inside
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
+- A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is MWCC's address
+  of `p[i].field` when two accesses share it, `p` is a pointer variable and its first common-subexpression pass did
+  not merge them, as in `f[i].b += v`. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
+  compiles like `p[i].f`, index first with the offset in the access (`adds r0, r1, r0; ldr r1, [r0, #4]`), and so do
+  other field types, `const`, a nested struct and a one-element array member; a base loaded from a field
+  (`list->table[i].f`) shares the address but indexes first too. Overlay 139's `UpdateScroll` reads
+  `touch[touched].action` twice with the original's offset first, and no natural spelling of it is known (see its row).
 - A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
   shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
   after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
@@ -1014,7 +1041,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the `if` that tests it, after the chapter bit. A constant loaded once into a callee-saved register (`movs r5, #6`)
   and copied to each use (`adds r0, r5, #0`) is such a local too, where an integer local gives a `movs #6` at each
   use: `move_handlers.c`'s `HandlerChatter` holds its confusion status in a `BattleConditionID`. When the values are
-  `#define`s that asm includes share, as `CONDITION_*` are, a count-only enum in a C header gives the type.
+  `#define`s that asm includes share, as `CONDITION_*` are, a count-only enum in a C header gives the type. A constant
+  kept so for calls and then reduced at run time before a field store (`subs r6, #0x20; str r6, [r5, #8]`) has another
+  spelling, the field assigned and then updated in place: `mictest.c`'s `MicTestMic_Init` writes
+  `mic->param.size = bufferSize; mic->param.size -= 0x20;`, and MWCC passes the stored `0x120` on to the update
+  without folding the subtraction, so it keeps the constant in `r6` like a variable. `= bufferSize - 0x20` folds to
+  `0x100`, and an enum local reduced at run time gave the same instructions with the constant in `r4`, ahead of the
+  parameters.
 - A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
   comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
   so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.
@@ -1081,7 +1114,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `(base + off) + 8` for a struct copy), only once `poke_tool.c`'s `PokeParty_GetParam` takes a `const PartyPkm *`.
   A field loaded in an inline that takes a `const` pointer is not shared either: `msgdata.c`'s
   `GFL_MsgDataPreloadFull` loads `msgData->header` again in its `else` after `GFL_MsgDataGetLangOffset`, which takes a
-  `const MsgData *`, read it.
+  `const MsgData *`, read it. The same holds for a `static inline` that takes a `const` pointer from a caller whose
+  pointer is not `const`: `bmp.c`'s `ClipCopyArea` takes `const GFLBitmap *dest`, and `GFL_BitmapCopyArea_IDX4`,
+  `_IDX8` and `GFL_BitmapCopyAreaRebased_IDX8` load `dest->width` again after it for their tile counts, as the
+  original does, where with a plain `dest` the clip's load stays live in a saved register and every register moves.
 - Reads of a `const` table at a constant index are folded into immediates, but reads in a loop over the table are not,
   even when the loop runs once and is unrolled. An `ldm` from a table straight into argument registers is two fields
   read in such a loop, as the egg and evolution demos' particles load the resource of each of their one unit. Reads
@@ -1146,6 +1182,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `widthTiles * (y & ~7)` match in bmp_menulist.c where the other orders do not.
 - `u8` flag parameters, not `BOOL`, change the order in which register parameters are spilled at entry
   (`BmpMenuList_CycleCursor`).
+- A register parameter stored at entry and read back from its slot (`str r1, [sp, #4]` ... `ldr r0, [sp, #4]`), where
+  ours copies it out of the register (`adds r0, r1, #0`), is narrower than `int`: its uses go through its `int`
+  conversion, which reads the slot. A static helper takes the narrow types its public caller passes: `bmp.c`'s four
+  `GFL_BitmapFillArea_*` helpers match with `GFL_BitmapFillArea`'s `s16 x, s16 y, u16 width, u16 height`, and were 16
+  to 27 bytes off with `int` positions. They count rows with an `int j` set from `y`, since `y++` on the `s16`
+  parameter adds an `lsl`/`asr` pair; `GFL_BitmapFillArea_IDX4_VRAM` reloads that counter right after storing its
+  increment (`str r0, [sp, #0x14]; ldr r0, [sp, #0x14]`) only with `s16 y` and `j` together.
 - A bit-table lookup with an unsigned `lsr #5` for the index and a signed modulo for the bit is
   `table[item / (sizeof(u32) * 8)] & (1 << (item % 32))`; `item >> 5` gives `asr` (pml_item.c).
 - A `u8` parameter divided with `asr`/`ror` (signed `/ 4` and `% 4`) while its callers pass a `u8` with no
@@ -1395,6 +1438,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   at the end of both arms of an `if` is merged the same way: `p_sta_sub.c`'s `PStaSub_AnimSwipeX` stores the bounce
   and calls `PStaSub_SetBounce` in each arm, and the `else` passes the zero left from the vector's initializer; one
   call after the `if` drops the `b`.
+- A load that both arms of an `if`/`else` begin with is hoisted above the branch, between the test and the `beq`.
+  When the original loads it first in each arm, after the branch, one arm began with another statement that the
+  scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before
+  `pixels = (srcPixel[0] << 8) | srcPixel[-1];` in its odd arm, which keeps `ldrb r1, [r2]` at the top of both arms.
+  A `color = srcPixel[0];` set before the `if` pinned the load above the branch as well.
 - MWCC evaluates the operands of `|` in the order they are grouped, so a color built from three computed parts shows
   its grouping: `field_menu.c`'s cursor fade (`func_ov036_021a040c`) computes red, then blue, then green, and only
   matches as `r | ((b << 10) | (g << 5))`, not as `GX_RGB(r, g, b)`.
@@ -1568,7 +1616,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   parameter, 18 not at all), so the typedefs stay `unsigned int`/`int` and a function that wants the SDK's type gets
   it on one local, parameter or struct field (`RivalDataSave.metTrainerCount`: `arr[s->count - 1]` compiles to
   `adds; subs #4; str` only with an `unsigned long` count). When a row says a constant is folded into an index or an
-  offset the wrong way, or two index registers are swapped, try each 32-bit index as `unsigned long` first.
+  offset the wrong way, or two index registers are swapped, try each 32-bit index as `unsigned long` first, and as
+  `long` where the SDK types it `s32`. With `int first`, `fmission_app_draw.c`'s `FMissionAppDraw_SetTime` computes
+  `(first + 2) * 4` for `work->upperActors[first + 2]` and shares `first * 4` with either the digit loops' hoisted
+  address or that later use, never both, so `first` stays on the stack; with `long first` MWCC folds the 2 into the
+  base (`(work + 0x38)[first * 4]`), shares one spilled `first * 4` among all the uses and drops `first`. It matches
+  at 0x120, where `int` gave 0x128 and `unsigned long` 0x11c.
 
 ## Loops
 

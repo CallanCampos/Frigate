@@ -5,6 +5,7 @@
     .bss        start:0x0217d820 end:0x0217d840 kind:bss align:32
 
 src/ov253/mictest.c:
+    complete
     .text       start:0x0217c940 end:0x0217d648
     .rodata     start:0x0217d648 end:0x0217d7f8
     .data       start:0x0217d800 end:0x0217d820
