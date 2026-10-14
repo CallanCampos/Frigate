@@ -532,6 +532,11 @@ Same code, other `sp` offsets or frame size.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
+- A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
+  locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
+  Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
+  `func_ov036_021b8520` taking `u16 anm`, like the other callee, where its old prototype took a `u32`; a `(u16)`
+  cast at the call does not do it. When such a local's slot is off, check the callees' prototypes first.
 - A spilled local's width for the rule below can come from its callee's return: `wbt_list.c`'s
   `WbtList_PrintMessage` stores its first name call's last stack argument before the name's address, as the
   original does, only with `s16 first` set from `WbtList_GetMatchValue` returning `s16` (and its `value` local
