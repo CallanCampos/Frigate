@@ -518,6 +518,10 @@ Same code, other `sp` offsets or frame size.
   `u32 x` and `y`, passed on as `u32`, ahead of the stack argument stores, and its `HeapID heapId`, passed to a
   `u32 heapId`, after them. Widening the callee alone, or narrowing `heapId` alone, did not match: sweep the caller's
   and the callee's widths together.
+  A `u32` local that holds a 16-bit value counts as `u32` when the narrowing is a mask: the mystery gift's
+  `Mystery_CreateGiftPokemon` stores `setFatefulEncounterPkmData`'s day argument last, after reloading the spilled
+  year, only with `u32 year = (poke->date >> 16) & 0xffff`, written like its month and day; a `u16 year` stores
+  it first.
   A spilled loop bound is the same: `AddExpAndEVs` in `btl_server_flow_sub.c` stores the spilled counter before
   loading its bound, the number of mons, only with the bound a `u16`. And `func_ov167_021afd90` matched only with
   `numMoves` a `u32` and its locals in one order of 720; no order matched with it a `u8` or `u16`, so sweep the orders
