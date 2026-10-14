@@ -7,6 +7,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A table's base and index swapped between the two registers (`ldr r4, =table; muls; adds r4, r4, r2` in the
+  original): index the table in a `static inline` taking the index as an enum type. (matching.md: "A table indexed
+  by a field")
 - A narrow stack parameter read from its slot at each use where the original loads it into a saved register at
   entry: declare the parameter `const`. (matching.md: "A narrow stack parameter used twice")
 - An index kept in two registers (copied after a division and again before a multiply) where ours keeps one: a

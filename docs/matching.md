@@ -286,6 +286,12 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+- A table indexed by a field, with the base in the higher register and the index's product added into the lower
+  one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
+  `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
+  `GetOamBuffer_(NNSG2dOamType type)` returning `&oamBuffers_[type]`, which matches `NNS_G2dEntryOamManagerAffine`,
+  `NNS_G2dEntryOamManagerOamWithAffineIdx` and both branches of `NNS_G2dResetOamManagerBuffer`. The same helper
+  with a `u32` or `int` parameter, a cast to the enum, or an enum-typed field alone keeps the swap.
 - A narrow stack parameter used twice is read from its slot at each use, and declared `const` it is loaded once at
   entry into a saved register: `g3d_system.c`'s `GFL_G3DSysCreate` takes `const HeapID heapId`, loaded into `r7`
   at entry (`add r0, sp, #0x68; ldrh r7, [r0, #4]`), which moves MWCC's cached `&g_G3DSystem` out of `r7` and
