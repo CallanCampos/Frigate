@@ -1926,7 +1926,7 @@ static void DupFitting_UpdateTransition(DupFittingWork *work) {
         s16 dx = nodePos->x - 128;
         s16 dy = nodePos->y - 80;
         fx32 dist = FX_Sqrt(FX32_CONST(dx * dx + dy * dy));
-        u16 angle = fx_atan2(FX32_CONST(dy), FX32_CONST(dx));
+        u16 angle = FX_Atan2Idx(FX32_CONST(dy), FX32_CONST(dx));
         VecFx32 vec;
         fx32 radius;
 
@@ -2054,7 +2054,7 @@ static void DupFitting_RotateHeld(DupFittingWork *work) {
     y = nodePos->y;
     fx = FX32_CONST((s32)(work->touchX - x));
     fy = FX32_CONST((s32)(work->touchY - y));
-    angle = fx_atan2(fx, fy);
+    angle = FX_Atan2Idx(fx, fy);
     if (work->dragging == TRUE) {
         s16 oldRotation = work->param->poke->equips[pos].unk2;
         s16 rotation = oldRotation + (s16)(work->prevAngle - angle);

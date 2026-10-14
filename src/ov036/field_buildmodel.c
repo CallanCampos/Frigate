@@ -976,7 +976,7 @@ FieldPropHandle *FieldPropSystem_CreateHandleFromExisting(FieldPropSystem *syste
     handle->system = system;
     handle->holder = prop;
     handle->animation = 0xffff;
-    MAT3_RotationY(&handle->transform.rotation, FX_SinIdx(instance->pos.rotationY), FX_CosIdx(instance->pos.rotationY));
+    MTX_RotY33_(&handle->transform.rotation, FX_SinIdx(instance->pos.rotationY), FX_CosIdx(instance->pos.rotationY));
     FieldChunk_GetWorldPos(prop->chunk, &handle->transform.translation);
     VEC_Add(&handle->transform.translation, &instance->pos.position, &handle->transform.translation);
     func_ov036_021852e0(system->mapper, &offset);

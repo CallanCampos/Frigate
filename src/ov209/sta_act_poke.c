@@ -127,8 +127,8 @@ static void StaActPoke_UpdatePoke(StaActPokeSys *sys, StaActPoke *poke) {
     angle = poke->rotation;
     center.x = 0;
     center.y = mark5->y;
-    MAT3_RotationZ(&rotation, -FX_SinIdx(angle), FX_CosIdx(angle));
-    MAT3_MulVec(&center, &rotation, &poke->rotOffset);
+    MTX_RotZ33_(&rotation, -FX_SinIdx(angle), FX_CosIdx(angle));
+    MTX_MultVec33(&center, &rotation, &poke->rotOffset);
     VEC_Subtract(&center, &poke->rotOffset, &poke->rotOffset);
     pos.x = (pos.x - mark4->x - poke->rotOffset.x) / 16;
     pos.y = (FX32_CONST(192) - (poke->rotOffset.y + (pos.y - mark4->y))) / 16;
@@ -189,15 +189,15 @@ static void StaActPoke_UpdateItems(StaActPokeSys *sys, StaActPoke *poke) {
 
                     MusPokeDraw_GetMarkPos4(poke->draw);
                     scaleX = equip->info.scale.x;
-                    MAT3_RotationZ(&rotation, -FX_SinIdx(rot), FX_CosIdx(rot));
-                    MAT3_MulVec(&equip->info.offset, &rotation, &offset);
+                    MTX_RotZ33_(&rotation, -FX_SinIdx(rot), FX_CosIdx(rot));
+                    MTX_MultVec33(&equip->info.offset, &rotation, &offset);
                     if (flipped == TRUE) {
                         itemRot = 0x10000 - itemRot;
                     }
                     if (MusItemDraw_GetItemFlag9(poke->items[i]) == FALSE && flipped == TRUE) {
                         scaleX = -scaleX;
                     }
-                    MAT3_MulVec(&equip->info.center, &rotation, &center);
+                    MTX_MultVec33(&equip->info.center, &rotation, &center);
                     VEC_Subtract(&equip->info.center, &center, &center);
                     pos.x = equip->info.pos.x + offset.x + FX32_CONST(128) + FX32_CONST(sys->scroll);
                     pos.y = equip->info.pos.y + offset.y + FX32_CONST(96);

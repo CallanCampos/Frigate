@@ -49,7 +49,7 @@ void StaActBg_UpdateSystem(StaActBg *bg) {
 
 void StaActBg_DrawSystem(StaActBg *bg) {
     if (bg->mdlRes != NULL) {
-        MAT3_Identity(&sStaActBgMatrix.rotation);
+        MTX_Identity33_(&sStaActBgMatrix.rotation);
         GFL_G3DSysDrawObj(bg->actor, &sStaActBgMatrix);
     }
 }

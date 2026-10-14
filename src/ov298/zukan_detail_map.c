@@ -1659,7 +1659,7 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
                 snap = TRUE;
             }
             if (VEC_Mag(&toPlace) > FX32_ONE) {
-                vecfx_normalize(&toPlace, &toPlace);
+                VEC_Normalize(&toPlace, &toPlace);
                 vecfx_mul(&toPlace, FX32_ONE, &toPlace);
             }
         }
@@ -1672,7 +1672,7 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
             fx32 dx;
             fx32 dy;
 
-            vecfx_normalize(&dir, &dir);
+            VEC_Normalize(&dir, &dir);
             dx = toPlace.x + dir.x * 3;
             dy = toPlace.y + dir.y * 3;
             if (dx > 0 && dx < FX32_ONE) {

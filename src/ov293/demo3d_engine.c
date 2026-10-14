@@ -63,7 +63,7 @@ Demo3DEngine *Demo3DEngine_Create(Demo3DGraphic *graphic, Demo3DParam *param, He
     }
     VEC_Set(&engine->srt.translation, 0, 0, 0);
     VEC_Set(&engine->srt.scale, FX32_ONE, FX32_ONE, FX32_ONE);
-    MAT3_Identity(&engine->srt.rotation);
+    MTX_Identity33_(&engine->srt.rotation);
     engine->unitCount = Demo3DData_GetUnitCount(engine->demoId);
     engine->scenes = GFL_HeapAllocate(heapId, engine->unitCount * sizeof(u16), TRUE, "demo3d_engine.c", 192);
     engine->cameraAnm = Demo3DData_LoadCamera(engine->demoId, heapId, 10);

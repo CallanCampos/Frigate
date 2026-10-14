@@ -1736,8 +1736,8 @@ static void func_ov137_021f0818(ResortFieldScene *scene) {
     fx32 cos = FX_CosIdx(0);
     fx32 sin = FX_SinIdx(0);
 
-    MAT3_RotationX(&matrix0->rotation, sin, cos);
-    MAT3_RotationX(&matrix1->rotation, sin, cos);
+    MTX_RotX33_(&matrix0->rotation, sin, cos);
+    MTX_RotX33_(&matrix1->rotation, sin, cos);
     matrix0->translation.x = FX32_CONST(127);
     matrix0->translation.z = FX32_CONST(500);
     matrix1->translation = matrix0->translation;
@@ -1807,8 +1807,8 @@ static void func_ov137_021f0a38(ResortFieldScene *scene) {
     matrix1 = FieldExpObj_GetActorMatrixPtr(scene->expObj, 0, 1);
     cos = FX_CosIdx(RESORT_FIELD_SCENE_ANGLE);
     sin = FX_SinIdx(RESORT_FIELD_SCENE_ANGLE);
-    MAT3_RotationX(&matrix0->rotation, sin, cos);
-    MAT3_RotationX(&matrix1->rotation, sin, cos);
+    MTX_RotX33_(&matrix0->rotation, sin, cos);
+    MTX_RotX33_(&matrix1->rotation, sin, cos);
 }
 
 static BOOL func_ov137_021f0a80(ResortFieldScene *scene) {

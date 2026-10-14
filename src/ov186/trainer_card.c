@@ -1887,7 +1887,7 @@ static void TrainerCard_AnimateRankPalette(TrainerCardWork *wk) {
         if (wk->rankAngle >= 0x10000) {
             wk->rankAngle -= 0x10000;
         }
-        ratio = (FX_SIN_COS_TABLE[(wk->rankAngle >> 4) * 2 + 1] + 0x1000) / 2;
+        ratio = (FX_SinCosTable_[(wk->rankAngle >> 4) * 2 + 1] + 0x1000) / 2;
         for (i = 0; i < 16; i++) {
             u16 from = wk->rankPalette[0][i];
             u16 to = wk->rankPalette[1][i];

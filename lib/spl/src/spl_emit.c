@@ -23,12 +23,12 @@ static void SPLEmitter_ComputeOrthogonalAxes(SPLEmitter *emitter) {
         VEC_Fx16Set(&axis, 0, 0, FX16_ONE);
         break;
     default:
-        vecfx_normalize16(&emitter->axis, &axis);
+        VEC_Fx16Normalize(&emitter->axis, &axis);
         break;
     }
 
     // An up vector along the axis has no cross product with it
-    dot = vecfx_dot16(&up, &axis);
+    dot = VEC_Fx16DotProduct(&up, &axis);
     if (dot == FX16_ONE || dot == -FX16_ONE) {
         VEC_Fx16Set(&up, FX16_ONE, 0, 0);
     }
@@ -39,16 +39,16 @@ static void SPLEmitter_ComputeOrthogonalAxes(SPLEmitter *emitter) {
     emitter->crossAxis2.x = FX_Mul(axis.y, emitter->crossAxis1.z) - FX_Mul(axis.z, emitter->crossAxis1.y);
     emitter->crossAxis2.y = FX_Mul(axis.z, emitter->crossAxis1.x) - FX_Mul(axis.x, emitter->crossAxis1.z);
     emitter->crossAxis2.z = FX_Mul(axis.x, emitter->crossAxis1.y) - FX_Mul(axis.y, emitter->crossAxis1.x);
-    vecfx_normalize16(&emitter->crossAxis1, &emitter->crossAxis1);
-    vecfx_normalize16(&emitter->crossAxis2, &emitter->crossAxis2);
+    VEC_Fx16Normalize(&emitter->crossAxis1, &emitter->crossAxis1);
+    VEC_Fx16Normalize(&emitter->crossAxis2, &emitter->crossAxis2);
 }
 
 // Coordinates in the emitter's cross axes and their normal, as a position
 static void SPLEmitter_TiltCoordinates(VecFx32 *dest, const VecFx32 *src, SPLEmitter *emitter) {
     VecFx16 normal;
 
-    vecfx_cross16(&emitter->crossAxis1, &emitter->crossAxis2, &normal);
-    vecfx_normalize16(&normal, &normal);
+    VEC_Fx16CrossProduct(&emitter->crossAxis1, &emitter->crossAxis2, &normal);
+    VEC_Fx16Normalize(&normal, &normal);
     dest->x = FX_Mul(src->x, emitter->crossAxis1.x) + FX_Mul(src->y, emitter->crossAxis2.x) + FX_Mul(src->z, normal.x);
     dest->y = FX_Mul(src->x, emitter->crossAxis1.y) + FX_Mul(src->y, emitter->crossAxis2.y) + FX_Mul(src->z, normal.y);
     dest->z = FX_Mul(src->x, emitter->crossAxis1.z) + FX_Mul(src->y, emitter->crossAxis2.z) + FX_Mul(src->z, normal.z);
@@ -135,11 +135,11 @@ void SPLEmitter_EmitParticles(SPLEmitter *emitter, SPLList *freeList) {
             VecFx32 normal;
 
             SPLRandom_VecFx32(&particle->position);
-            vecfx_cross16(&emitter->crossAxis1, &emitter->crossAxis2, &normal16);
+            VEC_Fx16CrossProduct(&emitter->crossAxis1, &emitter->crossAxis2, &normal16);
             normal.x = normal16.x;
             normal.y = normal16.y;
             normal.z = normal16.z;
-            if (vecfx_dot(&normal, &particle->position) <= 0) {
+            if (VEC_DotProduct(&normal, &particle->position) <= 0) {
                 particle->position.x = -particle->position.x;
                 particle->position.y = -particle->position.y;
                 particle->position.z = -particle->position.z;
@@ -154,11 +154,11 @@ void SPLEmitter_EmitParticles(SPLEmitter *emitter, SPLList *freeList) {
             VecFx32 normal;
 
             SPLRandom_VecFx32(&particle->position);
-            vecfx_cross16(&emitter->crossAxis1, &emitter->crossAxis2, &normal16);
+            VEC_Fx16CrossProduct(&emitter->crossAxis1, &emitter->crossAxis2, &normal16);
             normal.x = normal16.x;
             normal.y = normal16.y;
             normal.z = normal16.z;
-            if (vecfx_dot(&normal, &particle->position) < 0) {
+            if (VEC_DotProduct(&normal, &particle->position) < 0) {
                 particle->position.x = -particle->position.x;
                 particle->position.y = -particle->position.y;
                 particle->position.z = -particle->position.z;
@@ -209,11 +209,11 @@ void SPLEmitter_EmitParticles(SPLEmitter *emitter, SPLList *freeList) {
                         FX_Mul(particle->velocity.y, emitter->crossAxis2.y);
                 out.z = FX_Mul(particle->velocity.x, emitter->crossAxis1.z) +
                         FX_Mul(particle->velocity.y, emitter->crossAxis2.z);
-                vecfx_normalize(&out, &dir);
+                VEC_Normalize(&out, &dir);
             } else if (particle->position.x == 0 && particle->position.y == 0 && particle->position.z == 0) {
                 SPLRandom_VecFx32(&dir);
             } else {
-                vecfx_normalize(&particle->position, &dir);
+                VEC_Normalize(&particle->position, &dir);
             }
             particle->velocity.x =
                 emitter->particleInitVelocity.x + (FX_Mul(dir.x, velPositionAmp) + FX_Mul(emitter->axis.x, velAxisAmp));

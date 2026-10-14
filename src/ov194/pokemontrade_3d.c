@@ -268,7 +268,7 @@ static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx) {
     mtx->scale.x = FX32_ONE;
     mtx->scale.y = FX32_ONE;
     mtx->scale.z = FX32_ONE;
-    MAT3_Identity(&mtx->rotation);
+    MTX_Identity33_(&mtx->rotation);
     if (wk->work3D != NULL) {
         if (!wk->work3D->cameraPosDone) {
             GFL_G3DCurveApplyCameraPosTranslation(wk->sceneCamera, wk->work3D->cameraPosPath);

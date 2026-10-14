@@ -41,16 +41,16 @@ void SPLBehavior_ApplySpin(const void *behavior, SPLParticle *particle, VecFx32 
 
     switch (spin->axis) {
     case 0:
-        MAT3_RotationX(&rot, FX_SinIdx(spin->angle), FX_CosIdx(spin->angle));
+        MTX_RotX33_(&rot, FX_SinIdx(spin->angle), FX_CosIdx(spin->angle));
         break;
     case 1:
-        MAT3_RotationY(&rot, FX_SinIdx(spin->angle), FX_CosIdx(spin->angle));
+        MTX_RotY33_(&rot, FX_SinIdx(spin->angle), FX_CosIdx(spin->angle));
         break;
     case 2:
-        MAT3_RotationZ(&rot, FX_SinIdx(spin->angle), FX_CosIdx(spin->angle));
+        MTX_RotZ33_(&rot, FX_SinIdx(spin->angle), FX_CosIdx(spin->angle));
         break;
     }
-    MAT3_MulVec(&particle->position, &rot, &particle->position);
+    MTX_MultVec33(&particle->position, &rot, &particle->position);
 }
 
 void SPLBehavior_ApplyCollisionPlane(const void *behavior, SPLParticle *particle, VecFx32 *acc, SPLEmitter *emitter) {

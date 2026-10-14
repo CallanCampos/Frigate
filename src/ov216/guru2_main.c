@@ -2426,7 +2426,7 @@ static void Guru2Main_DrawObjects(Guru2MainWork *g2m) {
 
             VEC_Set(&srt.translation, cursor->pos.x, cursor->pos.y, cursor->pos.z);
             VEC_Set(&srt.scale, FX32_ONE, FX32_ONE, FX32_ONE);
-            MAT3_Identity(&srt.rotation);
+            MTX_Identity33_(&srt.rotation);
             GFL_G3DSysDrawObj(actor, &srt);
         }
     }

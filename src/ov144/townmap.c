@@ -878,7 +878,7 @@ static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
             from.z = 0;
             VEC_Subtract(&to, &from, &pull);
             if (VEC_Mag(&pull) > FX32_ONE) {
-                vecfx_normalize(&pull, &pull);
+                VEC_Normalize(&pull, &pull);
                 vecfx_mul(&pull, FX32_ONE, &pull);
             }
             moved = TRUE;
@@ -888,7 +888,7 @@ static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
         fx32 x;
         fx32 y;
 
-        vecfx_normalize(&move, &move);
+        VEC_Normalize(&move, &move);
         x = pull.x + move.x * 3;
         y = pull.y + move.y * 3;
         // At least a pixel

@@ -438,7 +438,7 @@ static void func_ov036_0219f7e4(Field *field, VecFx32 *pos) {
 
     FieldPlayer_GetWPos(player, &playerPos);
     func_ov036_0219aab0(player, dir, &dirVec);
-    vecfx_muladd(FX32_CONST(16), &dirVec, &playerPos, &front);
+    VEC_MultAdd(FX32_CONST(16), &dirVec, &playerPos, &front);
     GetHeightFromMap(FieldPlayer_GetActor(player), &front, &height);
     front.y = height;
     *pos = front;

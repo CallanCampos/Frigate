@@ -980,9 +980,9 @@ void KeySystemAccelMove_Init(KeySystemAccelMove *move, const KeySystemPos *start
     VEC_Set(&move->pos, FX32_CONST(start->x), FX32_CONST(start->y), 0);
     VEC_Set(&move->start, FX32_CONST(start->x), FX32_CONST(start->y), 0);
     VEC_Set(&move->end, FX32_CONST(end->x), FX32_CONST(end->y), 0);
-    dist = vecfx_dist(&move->end, &move->start);
+    dist = VEC_Distance(&move->end, &move->start);
     VEC_Subtract(&move->end, &move->start, &move->dir);
-    vecfx_normalize(&move->dir, &move->dir);
+    VEC_Normalize(&move->dir, &move->dir);
     accel = FX_Div((dist - speed * frames) * 2, frames * frames * FX32_ONE);
     move->speed = speed;
     move->accel = accel;
@@ -997,7 +997,7 @@ BOOL KeySystemAccelMove_Update(KeySystemAccelMove *move) {
         move->frame++;
         dist =
             FX_MUL(move->speed, move->frame * FX32_ONE) + FX_MUL(move->accel, move->frame * move->frame * FX32_ONE) / 2;
-        vecfx_muladd(dist, &move->dir, &move->start, &move->pos);
+        VEC_MultAdd(dist, &move->dir, &move->start, &move->pos);
         return FALSE;
     }
     move->pos = move->end;

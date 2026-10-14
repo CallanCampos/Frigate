@@ -459,9 +459,9 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
     func_ov036_02195a78(namiTask->params.actor, DIR_UP, &up);
     func_ov036_02195a78(namiTask->params.actor, namiTask->dir, &forward);
     up.y = 0;
-    vecfx_normalize16(&up, &up);
+    VEC_Fx16Normalize(&up, &up);
     forward.y = 0;
-    vecfx_normalize16(&forward, &forward);
+    VEC_Fx16Normalize(&forward, &forward);
     if (namiTask->mode == 1) {
         namiTask->bob += namiTask->bobSpeed;
         if (namiTask->bob >= FX32_CONST(4)) {
@@ -525,7 +525,7 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
                 }
             }
         }
-        distance = vecfx_dist(&actorPos, &wake->pos);
+        distance = VEC_Distance(&actorPos, &wake->pos);
         if (distance >= WAKE_MAX_DISTANCE) {
             wake->pos.x = actorPos.x - FX_Mul(forward.x, WAKE_MAX_DISTANCE);
             wake->pos.z = actorPos.z - FX_Mul(forward.z, WAKE_MAX_DISTANCE);

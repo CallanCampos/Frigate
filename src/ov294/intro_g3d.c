@@ -100,7 +100,7 @@ void IntroG3d_Draw(IntroG3d *g3d) {
         transform.scale.x = FX32_ONE;
         transform.scale.y = FX32_ONE;
         transform.scale.z = FX32_ONE;
-        MAT3_Identity(&transform.rotation);
+        MTX_Identity33_(&transform.rotation);
         GFL_G3DSysDrawObj(GFL_G3DMgrGetActor(g3d->manager, g3d->scene), &transform);
     }
 }

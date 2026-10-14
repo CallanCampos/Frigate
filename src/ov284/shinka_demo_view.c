@@ -770,7 +770,7 @@ static void ShinkaDemoView_DrawPieces(ShinkaDemoView *view) {
         MtxFx33 rot;
         VecFx32 trans = { 0, 0, 0 };
 
-        MAT3_Identity(&rot);
+        MTX_Identity33_(&rot);
         NNS_G3dGlbSetBaseTrans(&trans);
         NNS_G3dGlbSetBaseRot(&rot);
         NNS_G3dGlbSetBaseScale(&scale);
@@ -1289,11 +1289,11 @@ static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
                 if (angle >= 0x10000) {
                     angle -= 0x10000;
                 }
-                MAT43_RotationY(&gatherMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
+                MTX_RotY43_(&gatherMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
                 gatherVector.x = gatherPiece->radius;
                 gatherVector.y = 0;
                 gatherVector.z = 0;
-                MAT43_MulVec(&gatherVector, &gatherMatrix, &target);
+                MTX_MultVec43(&gatherVector, &gatherMatrix, &target);
                 target.y = gatherPiece->height;
                 if (gatherPiece->state == PIECE_WAIT) {
                     if (gatherFirst || gatherSecond) {
@@ -1397,11 +1397,11 @@ static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
                 if (angle >= 0x10000) {
                     angle -= 0x10000;
                 }
-                MAT43_RotationY(&spinMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
+                MTX_RotY43_(&spinMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
                 spinVector.x = spinPiece->radius;
                 spinVector.y = 0;
                 spinVector.z = 0;
-                MAT43_MulVec(&spinVector, &spinMatrix, &spinPiece->pos);
+                MTX_MultVec43(&spinVector, &spinMatrix, &spinPiece->pos);
                 spinPiece->pos.y = spinPiece->height;
             }
         }
@@ -1459,22 +1459,22 @@ static void ShinkaDemoPieces_Move(SpritePieces *pieces, HeapID heapId) {
                         }
                     } else {
 
-                        MAT43_RotationY(&returnSpinMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
+                        MTX_RotY43_(&returnSpinMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
                         returnSpinVector.x = piece->radius;
                         returnSpinVector.y = 0;
                         returnSpinVector.z = 0;
-                        MAT43_MulVec(&returnSpinVector, &returnSpinMatrix, &piece->pos);
+                        MTX_MultVec43(&returnSpinVector, &returnSpinMatrix, &piece->pos);
                         piece->pos.y = piece->height;
                     }
                     done = FALSE;
                 } else if (piece->state == PIECE_RETURN) {
                     if (piece->frame == 0) {
 
-                        MAT43_RotationY(&returnStartMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
+                        MTX_RotY43_(&returnStartMatrix, FX_SinIdx(angle), FX_CosIdx(angle));
                         returnStartVector.x = piece->radius;
                         returnStartVector.y = 0;
                         returnStartVector.z = 0;
-                        MAT43_MulVec(&returnStartVector, &returnStartMatrix, &piece->pos);
+                        MTX_MultVec43(&returnStartVector, &returnStartMatrix, &piece->pos);
                         piece->pos.y = piece->height;
                         delta.x = piece->pos.x - piece->prevPos.x;
                         delta.y = piece->pos.y - piece->prevPos.y;

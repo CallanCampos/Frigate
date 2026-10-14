@@ -579,7 +579,7 @@ static void IrcRanking_StepInput(IrcRankingStepMan *mgr, int *state, IrcRankingW
             IrcRankingList_Move(&wk->list, -delta.y);
             IrcRankingFling_Stop(&wk->fling);
         } else if (IrcRankingTouch_GetRelease(&wk->touch, NULL, NULL, &release, &moveFrames)) {
-            IrcRankingFling_Start(&wk->fling, vecfx_dot(&sIrcRankingUpVector, &release), moveFrames);
+            IrcRankingFling_Start(&wk->fling, VEC_DotProduct(&sIrcRankingUpVector, &release), moveFrames);
         }
     }
     if (IrcRankingFling_IsActive(&wk->fling)) {

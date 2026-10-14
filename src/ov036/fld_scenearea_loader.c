@@ -118,8 +118,8 @@ static BOOL FieldCameraArea_CIRCLE_CheckColl(FieldSceneArea *area, const CameraA
     VEC_Subtract(pos, &center, &dir);
     dir.y = 0;
     dist = VEC_Mag(&dir);
-    vecfx_normalize(&dir, &dir);
-    angle = fx_atan2(dir.x, dir.z);
+    VEC_Normalize(&dir, &dir);
+    angle = FX_Atan2Idx(dir.x, dir.z);
     if (cameraArea->circle.radiusStart <= dist && cameraArea->circle.radiusEnd > dist) {
         if (cameraArea->circle.angleEnd < cameraArea->circle.angleStart) {
             // The ring passes angle 0
@@ -151,7 +151,7 @@ static void FieldCameraAreaCalc_CIRCLE_AimPlayerCentre(FieldSceneArea *area, con
     target.y = 0;
     dir.y = 0;
     VEC_Subtract(&dir, &target, &dir);
-    vecfx_normalize(&dir, &normal);
+    VEC_Normalize(&dir, &normal);
     target.y = centerY;
     eye.y = FX_Mul(FX_SinIdx(cameraArea->circle.pitch), cameraArea->circle.tzDist);
     horizontal = FX_Mul(FX_CosIdx(cameraArea->circle.pitch), cameraArea->circle.tzDist);

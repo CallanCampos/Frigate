@@ -249,7 +249,7 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
     } else {
         gfxLookAt(&MUSICAL_MCSS_ORTHO_POS, &MUSICAL_MCSS_ORTHO_UP, &MUSICAL_MCSS_ORTHO_TARGET, TRUE, NULL);
     }
-    MAT43_Invert(&NNS_G3dGlb.cameraMtx, &invCamera);
+    MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
     MAT3_To4x4(&rotation, &billboard);
 
@@ -289,8 +289,8 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
             viewport.m[3][1] = 0;
             viewport.m[3][2] = 0;
             viewport.m[3][3] = -FX32_ONE;
-            MAT43_To4x4(&NNS_G3dGlb.cameraMtx, &viewProj);
-            MAT4_Mul(&viewProj, &NNS_G3dGlb.projMtx, &viewProj);
+            MTX_Copy43To44_(&NNS_G3dGlb.cameraMtx, &viewProj);
+            MTX_Concat44(&viewProj, &NNS_G3dGlb.projMtx, &viewProj);
             MusicalMcss_MulVecMtx44(&pos, &viewProj, &pos, &w);
             pos.x = FX_Div(pos.x, w);
             pos.y = FX_Div(pos.y, w);
@@ -314,8 +314,8 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
             gfxRotateZ(-FX_SinIdx(rot), FX_CosIdx(rot));
         }
         G3_Scale(FX_Mul(mcSrt.sx, mcss->scale.x), FX_Mul(mcSrt.sy, mcss->scale.y), FX32_ONE);
-        MAT3_RotationZ(&centerRotation, -FX_SinIdx(mcss->rotation), FX_CosIdx(mcss->rotation));
-        MAT3_MulVec(&mcss->center, &centerRotation, &mcss->centerOffset);
+        MTX_RotZ33_(&centerRotation, -FX_SinIdx(mcss->rotation), FX_CosIdx(mcss->rotation));
+        MTX_MultVec33(&mcss->center, &centerRotation, &mcss->centerOffset);
         VEC_Subtract(&mcss->center, &mcss->centerOffset, &mcss->centerOffset);
         mcss->centerOffset.x = FX_Div(mcss->centerOffset.x, mcss->scale.x);
         mcss->centerOffset.y = FX_Div(mcss->centerOffset.y, mcss->scale.y);

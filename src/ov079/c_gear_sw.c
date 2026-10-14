@@ -1786,7 +1786,7 @@ static fx32 CGearSw_GetDistance(int x1, int y1, int x2, int y2) {
     b.x = FX32_CONST(x2);
     b.y = FX32_CONST(y2);
     b.z = 0;
-    return vecfx_dist(&a, &b);
+    return VEC_Distance(&a, &b);
 }
 
 // Whether another marker is too close to a point for this one to be there

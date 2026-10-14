@@ -342,7 +342,7 @@ void FieldChunk_RenderProps(FieldChunk *chunk, void *camera) {
         cos = FX_CosIdx(chunk->propInstances[i].pos.rotationY);
         NNS_G3dGeLoadMtx43(&NNS_G3dGlb.cameraMtx);
         VEC_Add(&chunk->worldPos, &chunk->propInstances[i].pos.position, &mtx.rt.trans);
-        MAT3_RotationY(&mtx.rt.rot, sin, cos);
+        MTX_RotY33_(&mtx.rt.rot, sin, cos);
         NNS_G3dGeMultMtx43(&mtx);
         if (FieldChunk_CheckModelBBox(mdl) == TRUE) {
             GFL_G3DSysDispatchDraw(obj);

@@ -435,7 +435,7 @@ static BOOL MistraltonBobTask_Run(void *taskData) {
         } else {
             VecFx32 offset;
 
-            offset.x = FX_SIN_COS_TABLE[(angle >> 4) * 2] * data->amplitude;
+            offset.x = FX_SinCosTable_[(angle >> 4) * 2] * data->amplitude;
             offset.y = 0;
             offset.z = 0;
             SetActorWPosOffset(data->actor, &offset);

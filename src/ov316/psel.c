@@ -447,7 +447,7 @@ static PselObj *PselObj_AllocAll(HeapID heapId, u16 count) {
     for (i = 0; i < count; i++) {
         VEC_Set(&objs[i].status.translation, 0, 0, 0);
         VEC_Set(&objs[i].status.scale, FX32_ONE, FX32_ONE, FX32_ONE);
-        MAT3_Identity(&objs[i].status.rotation);
+        MTX_Identity33_(&objs[i].status.rotation);
     }
     return objs;
 }

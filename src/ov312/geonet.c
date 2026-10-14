@@ -1450,11 +1450,11 @@ static void Geonet_CreateLight(GeonetWork *work) {
 static void Geonet_GetEarthRotation(MtxFx33 *mtx, const VecFx32 *rotation) {
     MtxFx33 tmp;
 
-    MAT3_RotationY(mtx, FX_SinIdx((u16)rotation->y), FX_CosIdx((u16)rotation->y));
-    MAT3_RotationX(&tmp, FX_SinIdx((u16)rotation->x), FX_CosIdx((u16)rotation->x));
-    MAT3_Mul(mtx, &tmp, mtx);
-    MAT3_RotationZ(&tmp, FX_SinIdx((u16)rotation->z), FX_CosIdx((u16)rotation->z));
-    MAT3_Mul(mtx, &tmp, mtx);
+    MTX_RotY33_(mtx, FX_SinIdx((u16)rotation->y), FX_CosIdx((u16)rotation->y));
+    MTX_RotX33_(&tmp, FX_SinIdx((u16)rotation->x), FX_CosIdx((u16)rotation->x));
+    MTX_Concat33(mtx, &tmp, mtx);
+    MTX_RotZ33_(&tmp, FX_SinIdx((u16)rotation->z), FX_CosIdx((u16)rotation->z));
+    MTX_Concat33(mtx, &tmp, mtx);
 }
 
 // The rotation that puts a mark at a place. The sine and cosine of the last rotation are in each other's place,
@@ -1462,11 +1462,11 @@ static void Geonet_GetEarthRotation(MtxFx33 *mtx, const VecFx32 *rotation) {
 static void Geonet_GetPlaceRotation(MtxFx33 *mtx, const VecFx32 *rotation) {
     MtxFx33 tmp;
 
-    MAT3_RotationY(mtx, FX_SinIdx((u16)rotation->x), FX_CosIdx((u16)rotation->x));
-    MAT3_RotationX(&tmp, FX_SinIdx((u16)-rotation->y), FX_CosIdx((u16)-rotation->y));
-    MAT3_Mul(mtx, &tmp, mtx);
-    MAT3_RotationZ(&tmp, FX_CosIdx((u16)rotation->z), FX_SinIdx((u16)rotation->z));
-    MAT3_Mul(mtx, &tmp, mtx);
+    MTX_RotY33_(mtx, FX_SinIdx((u16)rotation->x), FX_CosIdx((u16)rotation->x));
+    MTX_RotX33_(&tmp, FX_SinIdx((u16)-rotation->y), FX_CosIdx((u16)-rotation->y));
+    MTX_Concat33(mtx, &tmp, mtx);
+    MTX_RotZ33_(&tmp, FX_CosIdx((u16)rotation->z), FX_SinIdx((u16)rotation->z));
+    MTX_Concat33(mtx, &tmp, mtx);
 }
 
 // Turns the globe with the keys or the touch screen, and A moves the camera. Returns whether a key did anything
@@ -1562,7 +1562,7 @@ static BOOL Geonet_MoveCamera(GeonetWork *work) {
     GFL_G3DCameraGetLookatTarget(work->camera, &target);
     VEC_Subtract(&pos, &target, &direction);
     distance = VEC_Mag(&direction);
-    vecfx_normalize(&direction, &direction);
+    VEC_Normalize(&direction, &direction);
 
     switch (work->zoom) {
     case TRUE:
@@ -1587,7 +1587,7 @@ static BOOL Geonet_MoveCamera(GeonetWork *work) {
         break;
     }
 
-    vecfx_muladd(distance, &direction, &target, &pos);
+    VEC_MultAdd(distance, &direction, &target, &pos);
     GFL_G3DCameraSetLookatPos(work->camera, &pos);
     return done;
 }
@@ -1612,7 +1612,7 @@ static void Geonet_Draw(GeonetWork *work) {
         GFL_G3DSysMtxViewFlush();
 
         status.translation = work->translation;
-        MAT3_Identity(&status.rotation);
+        MTX_Identity33_(&status.rotation);
         status.scale = work->markScale;
         GFL_G3DSysDrawObj(work->markActors[MARK_CURSOR], &status);
 
@@ -1623,7 +1623,7 @@ static void Geonet_Draw(GeonetWork *work) {
         markStatus.translation = work->translation;
         markStatus.scale = work->markScale;
         for (i = 0; i < work->placeCount; i++) {
-            MAT3_Mul(&work->places[i].rotation, &status.rotation, &markStatus.rotation);
+            MTX_Concat33(&work->places[i].rotation, &status.rotation, &markStatus.rotation);
             if (work->places[i].state != UNITY_TOWER_REGION_NONE) {
                 GFL_G3DSysDrawObj(work->markActors[work->places[i].state], &markStatus);
             }

@@ -1083,7 +1083,7 @@ void TDownloadUtil_AnimatePalette(TDownloadWork *wk) {
         if (wk->palAnimCount >= 0x10000) {
             wk->palAnimCount -= 0x10000;
         }
-        ratio = (FX_SIN_COS_TABLE[(wk->palAnimCount >> 4) * 2 + 1] + 0x1000) / 2;
+        ratio = (FX_SinCosTable_[(wk->palAnimCount >> 4) * 2 + 1] + 0x1000) / 2;
         for (i = 0; i < 16; i++) {
             u16 from = wk->palFadeFrom[i];
             u16 to = wk->palFadeTo[i];

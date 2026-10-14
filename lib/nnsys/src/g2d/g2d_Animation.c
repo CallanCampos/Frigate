@@ -128,7 +128,7 @@ BOOL NNS_G2dTickAnimCtrl(NNSG2dAnimController *animCtrl, fx32 frames) {
         return FALSE;
     }
 
-    animCtrl->currentTime += abs(fx_mul_round(animCtrl->speed, frames));
+    animCtrl->currentTime += abs(FX_MulFunc(animCtrl->speed, frames));
     while (IsFrameEnd_(animCtrl)) {
         changed = TRUE;
         animCtrl->currentTime -= (animCtrl->pCurrent->frames << FX32_SHIFT);

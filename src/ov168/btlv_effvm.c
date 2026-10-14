@@ -3535,7 +3535,7 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         if (work->angleStep == 0) {
             work->angleStep = 1;
         }
-        work->radius = vecfx_dist(&from, &to) / 2;
+        work->radius = VEC_Distance(&from, &to) / 2;
         if (param->motionType == 1 || param->motionType == 4) {
             work->height = 0;
         } else {
@@ -3556,14 +3556,14 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         dir.x = to.x - from.x;
         dir.y = to.y - from.y;
         dir.z = to.z - from.z;
-        vecfx_normalize(&dir, &dir);
+        VEC_Normalize(&dir, &dir);
         base.x = FX32_ONE;
         base.y = 0;
         base.z = 0;
-        angle = fx_acos(vecfx_dot(&base, &dir));
-        vecfx_cross(&base, &dir, &axis);
-        vecfx_normalize(&axis, &axis);
-        MAT43_RotationAxisAngle(&work->mtx, &axis, FX_SinIdx(angle), FX_CosIdx(angle));
+        angle = FX_AcosIdx(VEC_DotProduct(&base, &dir));
+        VEC_CrossProduct(&base, &dir, &axis);
+        VEC_Normalize(&axis, &axis);
+        MTX_RotAxis43(&work->mtx, &axis, FX_SinIdx(angle), FX_CosIdx(angle));
         work->mtx.rt.trans.x = from.x;
         work->mtx.rt.trans.y = from.y;
         work->mtx.rt.trans.z = from.z;
@@ -3582,17 +3582,17 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         vec.x = emitterAxis.x;
         vec.y = 0;
         vec.z = emitterAxis.z;
-        vecfx_normalize(&vec, &vec);
-        vecfx_normalize(&flat, &flat);
-        angle = fx_acos(vecfx_dot(&vec, &flat));
-        vecfx_cross(&vec, &flat, &rotAxis);
-        vecfx_normalize(&rotAxis, &rotAxis);
-        MAT43_RotationAxisAngle(&mtx, &rotAxis, FX_SinIdx(angle), FX_CosIdx(angle));
+        VEC_Normalize(&vec, &vec);
+        VEC_Normalize(&flat, &flat);
+        angle = FX_AcosIdx(VEC_DotProduct(&vec, &flat));
+        VEC_CrossProduct(&vec, &flat, &rotAxis);
+        VEC_Normalize(&rotAxis, &rotAxis);
+        MTX_RotAxis43(&mtx, &rotAxis, FX_SinIdx(angle), FX_CosIdx(angle));
         vec.x = emitterAxis.x;
         vec.y = emitterAxis.y;
         vec.z = emitterAxis.z;
-        MAT43_MulVec(&vec, &mtx, &vec);
-        vecfx_normalize(&vec, &vec);
+        MTX_MultVec43(&vec, &mtx, &vec);
+        VEC_Normalize(&vec, &vec);
         if (flip == TRUE) {
             vec.x *= -1;
             vec.z *= -1;
@@ -3682,7 +3682,7 @@ static void BtlvEffvm_MoveEmitterArc(SPLEmitter *emitter, u32 type) {
             pos.y = FX_Mul(pos.y, work->height);
             pos.z = 0;
         }
-        MAT43_MulVec(&pos, &work->mtx, &pos);
+        MTX_MultVec43(&pos, &work->mtx, &pos);
         if (work->offsetMode != 0) {
             BtlvEffvm_ProjectToScreen(&pos, NULL);
         }
@@ -4047,8 +4047,8 @@ static void BtlvEffvm_ProjectToScreen(VecFx32 *pos, const VecFx32 *offset) {
     MtxFx44 mtx;
     fx32 w;
 
-    MAT43_To4x4(&NNS_G3dGlb.cameraMtx, &mtx);
-    MAT4_Mul(&mtx, &NNS_G3dGlb.projMtx, &mtx);
+    MTX_Copy43To44_(&NNS_G3dGlb.cameraMtx, &mtx);
+    MTX_Concat44(&mtx, &NNS_G3dGlb.projMtx, &mtx);
     if (offset != NULL) {
         pos->x += offset->x;
         pos->y += offset->y;

@@ -271,7 +271,7 @@ static void UnionEff_UpdateFocus(FocusMan *focus_man) {
 static void UnionEff_DrawFocus(FocusMan *focus_man) {
     SRTMatrix mtx = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE }, { 0 } };
 
-    MAT3_Identity(&mtx.rotation);
+    MTX_Identity33_(&mtx.rotation);
     if (focus_man->slot[0].g3dActor != NULL && func_ov012_0216749c(focus_man->slot[0].actor) == TRUE) {
         UnionEff_DrawFocusSlot(&focus_man->slot[0], &mtx);
     }
@@ -382,7 +382,7 @@ static void UnionEff_DrawMarks(MarkMan *mark_man) {
     SRTMatrix mtx = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE }, { 0 } };
     int i;
 
-    MAT3_Identity(&mtx.rotation);
+    MTX_Identity33_(&mtx.rotation);
     for (i = 0; i < MARK_SLOT_MAX; i++) {
         UnionEffSlot *slot = &mark_man->slot[i];
 

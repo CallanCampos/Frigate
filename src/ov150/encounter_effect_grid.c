@@ -152,9 +152,9 @@ void EncEffGrid_Draw(EncEffGrid *grid) {
             t1 = t + height * FX32_ONE;
             G3_Translate(trans.x, trans.y, trans.z);
             G3_Scale(scale.x, scale.y, scale.z);
-            MAT3_RotationY(&rot, FX_SinIdx(cell->offset), FX_CosIdx(cell->offset));
+            MTX_RotY33_(&rot, FX_SinIdx(cell->offset), FX_CosIdx(cell->offset));
             gfxMultMatrix3x3(&rot);
-            MAT3_RotationZ(&rot, FX_SinIdx(cell->unk20), FX_CosIdx(cell->unk20));
+            MTX_RotZ33_(&rot, FX_SinIdx(cell->unk20), FX_CosIdx(cell->unk20));
             gfxMultMatrix3x3(&rot);
             G3_Begin(GX_BEGIN_QUADS);
             G3_Normal(0, 0, FX16_ONE);

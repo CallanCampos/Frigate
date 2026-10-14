@@ -334,7 +334,7 @@ static void func_ov036_021a55b8(FieldEffectTask *task, void *work) {
     FieldEffectEncount *effect = encountTask->params.effect;
 
     if (!encountTask->hidden) {
-        MAT3_Identity(&srt.rotation);
+        MTX_Identity33_(&srt.rotation);
         func_ov036_021a3ad4(task, &srt.translation);
         GFL_G3DSysDrawObjBBoxCull(effect->objs[encountTask->params.variant].actor, &srt);
     }

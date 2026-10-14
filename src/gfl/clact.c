@@ -1438,10 +1438,10 @@ static BOOL func_0204ca1c(const NNSG2dCellData *cell, const MtxFx32 *mtx, const 
         minX = minY;
         maxX = maxY;
     }
-    top = posY + (fx_mul_round(minY, mtx->_01) + fx_mul_round(minY, mtx->_11));
-    bottom = posY + (fx_mul_round(maxY, mtx->_01) + fx_mul_round(maxY, mtx->_11));
-    left = posX + (fx_mul_round(minX, mtx->_00) + fx_mul_round(minX, mtx->_10));
-    right = posX + (fx_mul_round(maxX, mtx->_00) + fx_mul_round(maxX, mtx->_10));
+    top = posY + (FX_MulFunc(minY, mtx->_01) + FX_MulFunc(minY, mtx->_11));
+    bottom = posY + (FX_MulFunc(maxY, mtx->_01) + FX_MulFunc(maxY, mtx->_11));
+    left = posX + (FX_MulFunc(minX, mtx->_00) + FX_MulFunc(minX, mtx->_10));
+    right = posX + (FX_MulFunc(maxX, mtx->_00) + FX_MulFunc(maxX, mtx->_10));
     if (bottom < top) {
         tmp = bottom;
         bottom = top;
@@ -1539,16 +1539,16 @@ static BOOL func_0204cc54(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top,
     fx32 minY;
     fx32 maxY;
 
-    minX = fx_mul_round(left, mtx->_00) + fx_mul_round(top, mtx->_10);
+    minX = FX_MulFunc(left, mtx->_00) + FX_MulFunc(top, mtx->_10);
     maxX = minX;
-    ClAct_UpdateMinMax(fx_mul_round(left, mtx->_00) + fx_mul_round(bottom, mtx->_10), &minX, &maxX);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_00) + fx_mul_round(top, mtx->_10), &minX, &maxX);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_00) + fx_mul_round(bottom, mtx->_10), &minX, &maxX);
-    minY = fx_mul_round(left, mtx->_01) + fx_mul_round(top, mtx->_11);
+    ClAct_UpdateMinMax(FX_MulFunc(left, mtx->_00) + FX_MulFunc(bottom, mtx->_10), &minX, &maxX);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_00) + FX_MulFunc(top, mtx->_10), &minX, &maxX);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_00) + FX_MulFunc(bottom, mtx->_10), &minX, &maxX);
+    minY = FX_MulFunc(left, mtx->_01) + FX_MulFunc(top, mtx->_11);
     maxY = minY;
-    ClAct_UpdateMinMax(fx_mul_round(left, mtx->_01) + fx_mul_round(bottom, mtx->_11), &minY, &maxY);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_01) + fx_mul_round(top, mtx->_11), &minY, &maxY);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_01) + fx_mul_round(bottom, mtx->_11), &minY, &maxY);
+    ClAct_UpdateMinMax(FX_MulFunc(left, mtx->_01) + FX_MulFunc(bottom, mtx->_11), &minY, &maxY);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_01) + FX_MulFunc(top, mtx->_11), &minY, &maxY);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_01) + FX_MulFunc(bottom, mtx->_11), &minY, &maxY);
     minX += posX;
     maxX += posX;
     minY += posY;

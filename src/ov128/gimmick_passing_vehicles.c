@@ -202,14 +202,14 @@ static void func_ov128_021eeec8(GimmickWork *work, Field *field, u32 first, u32 
     matrix->translation.z = FX32_CONST(8448);
     sin = FX_SinIdx(DEG_TO_IDX(90));
     cos = FX_CosIdx(DEG_TO_IDX(90));
-    MAT3_RotationY(&matrix->rotation, sin, cos);
+    MTX_RotY33_(&matrix->rotation, sin, cos);
     func_ov036_021b8248(expObj, 0, first, 1);
 
     matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, second);
     matrix->translation.x = ROAD_START_X + VEHICLE_LENGTH;
     matrix->translation.y = FX32_CONST(80);
     matrix->translation.z = FX32_CONST(8448);
-    MAT3_RotationY(&matrix->rotation, sin, cos);
+    MTX_RotY33_(&matrix->rotation, sin, cos);
     func_ov036_021b8248(expObj, 0, second, 1);
 
     matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, first + 2);
@@ -218,13 +218,13 @@ static void func_ov128_021eeec8(GimmickWork *work, Field *field, u32 first, u32 
     matrix->translation.z = FX32_CONST(8368);
     sin2 = FX_SinIdx(DEG_TO_IDX(270));
     cos2 = FX_CosIdx(DEG_TO_IDX(270));
-    MAT3_RotationY(&matrix->rotation, sin2, cos2);
+    MTX_RotY33_(&matrix->rotation, sin2, cos2);
     func_ov036_021b8248(expObj, 0, first + 2, 1);
 
     matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, second + 2);
     matrix->translation.x = ROAD_END_X - VEHICLE_LENGTH;
     matrix->translation.y = FX32_CONST(80);
     matrix->translation.z = FX32_CONST(8368);
-    MAT3_RotationY(&matrix->rotation, sin2, cos2);
+    MTX_RotY33_(&matrix->rotation, sin2, cos2);
     func_ov036_021b8248(expObj, 0, second + 2, 1);
 }

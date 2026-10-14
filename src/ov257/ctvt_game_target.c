@@ -27,7 +27,7 @@ void CtvtGameTarget_Init(CtvtGameTarget *target) {
     target->srt.scale.x = FX32_ONE;
     target->srt.scale.y = FX32_ONE;
     target->srt.scale.z = FX32_ONE;
-    MAT3_Identity(&target->srt.rotation);
+    MTX_Identity33_(&target->srt.rotation);
     target->depth = 2;
     target->alpha = 31;
     target->fadeFrames = 0;

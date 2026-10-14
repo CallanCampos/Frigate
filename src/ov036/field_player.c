@@ -406,7 +406,7 @@ void func_ov036_0219aab0(FieldPlayer *player, u32 dir, VecFx32 *vec) {
         vec->z = GetDirectionVectorCompZ(dir);
         vec->x = GRID_TO_FX32(vec->x);
         vec->z = GRID_TO_FX32(vec->z);
-        vecfx_normalize(vec, vec);
+        VEC_Normalize(vec, vec);
     } else {
         func_ov036_02195a78(actor, dir, &dirVec);
         VEC_Set(vec, dirVec.x, dirVec.y, dirVec.z);

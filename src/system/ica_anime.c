@@ -392,8 +392,8 @@ void GFL_G3DCurveApplyCamera(G3DCamera *camera, G3DCurve *curve) {
     angleY = 65535.0f * (y / 360.0f);
     angleZ = 65535.0f * (z / 360.0f);
     MAT3_RotationEulerZYX(angleX, angleY, angleZ, &matrix);
-    MAT3_MulVec(&forward, &matrix, &direction);
-    MAT3_MulVec(&up, &matrix, &upVector);
+    MTX_MultVec33(&forward, &matrix, &direction);
+    MTX_MultVec33(&up, &matrix, &upVector);
     GFL_G3DCurveGetNowTranslation(curve, &position);
     VEC_Add(&position, &direction, &target);
     GFL_G3DCameraSetLookatPos(camera, &position);

@@ -250,7 +250,7 @@ static void BtlvCamera_UpdateAngles(BtlvCamera *camera) {
     pos.x -= target.x;
     pos.y -= target.y;
     pos.z -= target.z;
-    camera->pitch = fx_atan2(pos.y, pos.z);
-    camera->yaw = fx_atan2(pos.z, pos.x);
+    camera->pitch = FX_Atan2Idx(pos.y, pos.z);
+    camera->yaw = FX_Atan2Idx(pos.z, pos.x);
     camera->distance = VEC_Mag(&pos);
 }

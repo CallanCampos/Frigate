@@ -10,12 +10,12 @@ void SPLRandom_VecFx32(VecFx32 *vec) {
     vec->x = SPLRandom_Fx32(24);
     vec->y = SPLRandom_Fx32(24);
     vec->z = SPLRandom_Fx32(24);
-    vecfx_normalize(vec, vec);
+    VEC_Normalize(vec, vec);
 }
 
 void SPLRandom_VecFx32_XY(VecFx32 *vec) {
     vec->x = SPLRandom_Fx32(24);
     vec->y = SPLRandom_Fx32(24);
     vec->z = 0;
-    vecfx_normalize(vec, vec);
+    VEC_Normalize(vec, vec);
 }

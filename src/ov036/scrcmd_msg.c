@@ -271,10 +271,10 @@ static void ActorMsgWin_CalcAttachmentOffsetDynamic(const VecFx32 *pos, VecFx32 
     VEC_Subtract(&target, &camPos, &dir);
     flatDir = dir;
     flatDir.y = 0;
-    vecfx_normalize(&flatDir, &flatDir);
-    vecfx_cross(&flatDir, &ACTOR_MSGWIN_CALC_AXIS_Y, &side);
-    vecfx_cross(&dir, &side, &up);
-    vecfx_normalize(&up, &up);
+    VEC_Normalize(&flatDir, &flatDir);
+    VEC_CrossProduct(&flatDir, &ACTOR_MSGWIN_CALC_AXIS_Y, &side);
+    VEC_CrossProduct(&dir, &side, &up);
+    VEC_Normalize(&up, &up);
     world.x += up.x;
     world.y += up.y;
     world.z += up.z;
@@ -309,10 +309,10 @@ static void ActorMsgWin_MulVecInvCamRot(VecFx32 *vec, G3DCamera *camera) {
     GFL_G3DCameraGetLookatPos(camera, &camPos);
     GFL_G3DCameraGetLookatUpVector(camera, &camUp);
     GFL_G3DCameraGetLookatTarget(camera, &target);
-    MAT43_LookAt(&camPos, &camUp, &target, &lookAt);
+    MTX_LookAt(&camPos, &camUp, &target, &lookAt);
     MI_Copy36B(&lookAt, &rot);
     MAT3_Invert(&rot, &rot);
-    MAT3_MulVec(vec, &rot, vec);
+    MTX_MultVec33(vec, &rot, vec);
 }
 
 static void ActorMsgWin_GetAttachmentOffset(const VecFx32 *pos, VecFx32 *offset, G3DCamera *g3dCamera,

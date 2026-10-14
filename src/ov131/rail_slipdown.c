@@ -117,7 +117,7 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
         func_ov036_02195a58(work->actor, &dir);
         found = FALSE;
         dir.y = 0;
-        vecfx_normalize16(&dir, &dir);
+        VEC_Fx16Normalize(&dir, &dir);
         RailUnit_GetCalcPos(work->railUnit, &pos);
         work->start.x = pos.x + FX_Mul(dir.x, SLIPDOWN_START_DIST);
         work->start.y = pos.y + FX_Mul(dir.y, SLIPDOWN_START_DIST);
@@ -162,10 +162,10 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
         func_ov036_021b06ec(rail, &work->railPos, &work->end);
         VEC_Subtract(&work->end, &work->start, &diff);
         dist = VEC_Mag(&diff);
-        vecfx_normalize(&diff, &diff);
+        VEC_Normalize(&diff, &diff);
         VEC_Fx16Set(&work->dir, diff.x, diff.y, diff.z);
         dist = FX_Div(dist, SLIPDOWN_SPEED);
-        if (fx_fract(dist, &dist) == 0) {
+        if (FX_Modf(dist, &dist) == 0) {
             work->frames = FX_Whole(dist);
         } else {
             work->frames = FX_Whole(dist) + 1;

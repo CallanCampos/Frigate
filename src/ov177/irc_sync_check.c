@@ -720,7 +720,7 @@ static void IrcSyncCheckModel_Init(IrcSyncCheckModel *model, ArcTool *arc, const
         }
         func_020683ec(renderObj->resMdl, polygonId);
     }
-    MAT3_Identity(&model->transform.rotation);
+    MTX_Identity33_(&model->transform.rotation);
     model->transform.scale.x = FX32_ONE;
     model->transform.scale.y = FX32_ONE;
     model->transform.scale.z = FX32_ONE;
@@ -1332,8 +1332,8 @@ static void IrcSyncCheckThumbs_Place(IrcSyncCheckThumbs *thumbs, int index, int 
     case 0:
         func_02067fa0(x, y, &nearPos, &farPos);
         VEC_Subtract(&farPos, &nearPos, &direction);
-        vecfx_normalize(&direction, &direction);
-        vecfx_muladd(FX32_CONST(64), &direction, &nearPos, &nearPos);
+        VEC_Normalize(&direction, &direction);
+        VEC_MultAdd(FX32_CONST(64), &direction, &nearPos, &nearPos);
         IrcSyncCheckModel_SetPosition(thumbs->models[index], &nearPos);
         thumbs->lastX = x;
         thumbs->lastY = y;
@@ -1342,8 +1342,8 @@ static void IrcSyncCheckThumbs_Place(IrcSyncCheckThumbs *thumbs, int index, int 
         func_02067fa0(thumbs->lastX + (x - thumbs->lastX) * 2, thumbs->lastY + (y - thumbs->lastY) * 2, &nearPos,
                       &farPos);
         VEC_Subtract(&farPos, &nearPos, &direction);
-        vecfx_normalize(&direction, &direction);
-        vecfx_muladd(FX32_CONST(64), &direction, &nearPos, &nearPos);
+        VEC_Normalize(&direction, &direction);
+        VEC_MultAdd(FX32_CONST(64), &direction, &nearPos, &nearPos);
         IrcSyncCheckModel_SetPosition(thumbs->models[index], &nearPos);
         break;
     }

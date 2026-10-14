@@ -347,7 +347,7 @@ void func_0204ff54(ParticleSystem *system) {
         {
             VecFx32 trans = {0, 0, 0};
 
-            MAT3_Identity(&rot);
+            MTX_Identity33_(&rot);
             NNS_G3dGlbSetBaseTrans(&trans);
             NNS_G3dGlbSetBaseRot(&rot);
             NNS_G3dGlbSetBaseScale(&scale);

@@ -164,7 +164,7 @@ static void func_ov036_021a57ec(FieldEffectTask *task, void *work) {
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     RockSmashTask *rockTask = work;
 
-    MAT3_Identity(&srt.rotation);
+    MTX_Identity33_(&srt.rotation);
     func_ov036_021a3ad4(task, &srt.translation);
     GFL_G3DSysDrawObjBBoxCull(rockTask->actor, &srt);
 }

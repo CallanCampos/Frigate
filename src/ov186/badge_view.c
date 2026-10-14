@@ -460,7 +460,7 @@ static void BadgeView_InitWork(BadgeViewWork *wk, TrainerCardParam *param) {
     wk->srt.scale.x = FX32_ONE;
     wk->srt.scale.y = FX32_ONE;
     wk->srt.scale.z = FX32_ONE;
-    MAT3_Identity(&wk->srt.rotation);
+    MTX_Identity33_(&wk->srt.rotation);
 }
 
 static void BadgeView_FreeWork(BadgeViewWork *wk) {
@@ -1490,7 +1490,7 @@ static void BadgeView_SelectLeader(BadgeViewWork *wk, int show, int badge) {
 
 static void BadgeView_UpdateRotation(BadgeViewWork *wk) {
     wk->angle = 0x4000;
-    MAT3_RotationX(&wk->srt.rotation, FX_SinIdx(wk->angle), FX_CosIdx(wk->angle));
+    MTX_RotX33_(&wk->srt.rotation, FX_SinIdx(wk->angle), FX_CosIdx(wk->angle));
 }
 
 static void BadgeView_SetModelVisible(BadgeViewWork *wk, int visible) {
@@ -1516,7 +1516,7 @@ static void BadgeView_AnimatePalette(BadgeViewWork *wk) {
         if (wk->palAngle >= 0x10000) {
             wk->palAngle -= 0x10000;
         }
-        ratio = (FX_SIN_COS_TABLE[(wk->palAngle >> 4) * 2 + 1] + 0x1000) / 2;
+        ratio = (FX_SinCosTable_[(wk->palAngle >> 4) * 2 + 1] + 0x1000) / 2;
         for (i = 0; i < 16; i++) {
             u16 from = wk->palette[0][i];
             u16 to = wk->palette[1][i];

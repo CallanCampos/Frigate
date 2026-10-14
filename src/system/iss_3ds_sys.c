@@ -348,20 +348,20 @@ static s32 ISS3DSoundUnit_CalcPan(const ISS3DSoundUnit *unit, const VecFx32 *lis
     VEC_Subtract(&target, &pos, &toTarget);
     VEC_Subtract(&unitPos, &pos, &toUnit);
     VEC_Set(&up, 0, FX32_ONE, 0);
-    vecfx_normalize(&toTarget, &forward);
-    vecfx_cross(&forward, &up, &right);
-    vecfx_normalize(&right, &right);
-    vecfx_cross(&right, &forward, &vertical);
+    VEC_Normalize(&toTarget, &forward);
+    VEC_CrossProduct(&forward, &up, &right);
+    VEC_Normalize(&right, &right);
+    VEC_CrossProduct(&right, &forward, &vertical);
     // The original normalizes it twice
-    vecfx_normalize(&vertical, &vertical);
-    vecfx_normalize(&vertical, &vertical);
-    height = vecfx_dot(&toUnit, &vertical);
+    VEC_Normalize(&vertical, &vertical);
+    VEC_Normalize(&vertical, &vertical);
+    height = VEC_DotProduct(&toUnit, &vertical);
     toUnitVertical.x = FX_Mul(vertical.x, height);
     toUnitVertical.y = FX_Mul(vertical.y, height);
     toUnitVertical.z = FX_Mul(vertical.z, height);
     VEC_Subtract(&toUnit, &toUnitVertical, &toUnitFlat);
-    vecfx_normalize(&toUnitFlat, &toUnitFlat);
-    pan = 128.0f * FX_FX32_TO_F32(vecfx_dot(&right, &toUnitFlat));
+    VEC_Normalize(&toUnitFlat, &toUnitFlat);
+    pan = 128.0f * FX_FX32_TO_F32(VEC_DotProduct(&right, &toUnitFlat));
     if (pan < -128) {
         pan = -128;
     }
