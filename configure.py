@@ -31,7 +31,7 @@ VERSIONS = {
     "w2_us": {"sha1": "b5d7490be7b415b8f1e672a53e978a9cc667e56a", "rom": "pokewhite2_us.nds", "defines": ["WHITE2"]},
 }
 
-# Upstream 1.2.0 predates the guest x87 initialization in decompals/wibo e8f4795. The fork's pokebw2 branch is upstream
+# Upstream 1.2.0 predates the guest x87 initialization in decompals/wibo e8f4795. The fork's main is upstream
 # 420a75b, which has it, plus the imports that sjiswrap needs to load the compiler
 WIBO_REPO = "https://github.com/fuddlesworth/wibo"
 WIBO_VERSION = "pokebw2-sjis-1"
