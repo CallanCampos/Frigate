@@ -1000,10 +1000,11 @@ static void LocalTvtPokeSelect_VBlank(TCB *tcb, void *data) {
 // Blends two palettes of 16 colors by the cosine of an angle, and copies the result to a palette at the next VBlank
 static void LocalTvtUtil_BlendPalette(NNS_GFD_DST_TYPE type, u16 *dest, u16 angle, u32 palette, const u16 *from,
                                       const u16 *to) {
-    fx16 rate = (FX_CosIdx(angle) + FX16_ONE) / 2;
     int i;
 
     for (i = 0; i < 16; i++) {
+        fx16 cosine = FX_CosIdx(angle);
+        fx16 rate = (cosine + FX16_ONE) / 2;
         u8 fromR = from[i] & GX_RGB_R_MASK;
         u8 fromG = (from[i] & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
         u8 fromB = (from[i] & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT;
