@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 332,
+    "area": "AREA_GIANT_CHASM_2",
     "matrix": "MAP_MATRIX_UNDERGROUND_RUINS_3",
     "scripts": "SCRIPTS_UNDERGROUND_RUINS_3",
     "text": "SCRIPT_TEXT_UNDERGROUND_RUINS_3",

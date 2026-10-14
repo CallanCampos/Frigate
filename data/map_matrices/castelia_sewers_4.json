@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 652 ]
+        [ "MAP_MODEL_CASTELIA_SEWERS_4_M_DUN1104_00_00" ]
     ]
 }

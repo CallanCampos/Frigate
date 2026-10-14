@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 555 ]
+        [ "MAP_MODEL_ABYSSAL_RUINS_M_DUN2001_00_00" ]
     ]
 }

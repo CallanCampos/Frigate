@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 851 ]
+        [ "MAP_MODEL_NACRENE_CITY_9_M_WHOUSE02_00_00" ]
     ]
 }

@@ -42,7 +42,7 @@ def zone_json(header: bytes) -> dict:
     # The entities file is the zone's events, data/events/<zone>.json, at its place in data/events/order.json
     (map_type, npc_cache, area, matrix, scripts, init_scripts, text, *rest) = HEADER.unpack(header)
     bgm, (encounters, entities, parent, place, env, flags, cam_bound, icon, fly_x, fly_y, fly_z) = rest[:4], rest[4:]
-    data = {"$schema": "zone.schema.json", "map_type": map_type, "npc_cache": npc_cache, "area": area,
+    data = {"$schema": "zone.schema.json", "map_type": map_type, "npc_cache": npc_cache, "area": name("AREA_", area),
             "matrix": name("MAP_MATRIX_", matrix), "scripts": name("SCRIPTS_", scripts)}
     if init_scripts != scripts + 1:
         data["init_scripts"] = name("SCRIPTS_", init_scripts)
@@ -87,7 +87,7 @@ def zone_bytes(data: dict, entities: int, where: str) -> bytes:
     for flag, bit in FLAGS:
         flags |= data.get(flag, flag == "flag11") << bit
     return HEADER.pack(
-        data["map_type"], data["npc_cache"], data["area"], value(data["matrix"], where), value(data["scripts"], where),
+        data["map_type"], data["npc_cache"], value(data["area"], where), value(data["matrix"], where), value(data["scripts"], where),
         value(data.get("init_scripts", value(data["scripts"], where) + 1), where), value(data["text"], where),
         *seasons, encounters | data["enc_slot"] << 13, entities, value(data["parent"], where), value(data["place"], where) | data["place_display"] << 10,
         data["weather"] | data["projection"] << 6 | data["camera"] << 9, flags, data["cam_bound"],

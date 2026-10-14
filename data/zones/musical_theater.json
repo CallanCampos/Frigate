@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 9,
     "npc_cache": 24,
-    "area": 305,
+    "area": "AREA_MUSICAL_THEATER",
     "matrix": "MAP_MATRIX_MUSICAL_THEATER",
     "scripts": "SCRIPTS_MUSICAL_THEATER",
     "text": "SCRIPT_TEXT_MUSICAL_THEATER",

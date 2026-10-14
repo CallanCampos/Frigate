@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 883 ]
+        [ "MAP_MODEL_ZONE_151_M_CLOSSEUM02_00" ]
     ]
 }

@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 975 ]
+        [ "MAP_MODEL_FLOCCESY_TOWN_2_M_ADC01_00_00" ]
     ]
 }

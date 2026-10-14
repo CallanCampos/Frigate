@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 121, 122, 374 ]
+        [ "MAP_MODEL_NIMBASA_CITY_2_C04_A00_00", "MAP_MODEL_NIMBASA_CITY_2_C04_A01_00", "MAP_MODEL_NIMBASA_CITY_2_C04_A02_00" ]
     ]
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 436, 438 ],
-        [ 437, 439 ]
+        [ "MAP_MODEL_CHARGESTONE_CAVE_3_M_DUN0602_00_00", "MAP_MODEL_CHARGESTONE_CAVE_3_M_DUN0602_01_00" ],
+        [ "MAP_MODEL_CHARGESTONE_CAVE_3_M_DUN0602_00_01", "MAP_MODEL_CHARGESTONE_CAVE_3_M_DUN0602_01_01" ]
     ]
 }

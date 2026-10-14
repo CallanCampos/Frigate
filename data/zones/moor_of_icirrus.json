@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 198,
+    "area": "AREA_MOOR_OF_ICIRRUS",
     "matrix": "MAP_MATRIX_MOOR_OF_ICIRRUS",
     "scripts": "SCRIPTS_MOOR_OF_ICIRRUS",
     "text": "SCRIPT_TEXT_MOOR_OF_ICIRRUS",

@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 237 ]
+        [ "MAP_MODEL_ENTREE_FOREST_3_PALACE05_00_00" ]
     ]
 }

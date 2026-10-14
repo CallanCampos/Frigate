@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 980 ]
+        [ "MAP_MODEL_HUMILAU_CITY_2_M_H07_00_00" ]
     ]
 }

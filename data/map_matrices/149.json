@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 180 ]
+        [ "MAP_MODEL_BCGATA08_00_00" ]
     ]
 }

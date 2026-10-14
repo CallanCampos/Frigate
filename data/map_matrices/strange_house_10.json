@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 764 ]
+        [ "MAP_MODEL_STRANGE_HOUSE_10_M_DUN2510_00_00" ]
     ]
 }

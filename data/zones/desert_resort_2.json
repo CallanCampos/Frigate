@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 22,
+    "area": "AREA_DESERT_RESORT",
     "matrix": "MAP_MATRIX_DESERT_RESORT_2",
     "scripts": "SCRIPTS_DESERT_RESORT_2",
     "text": "SCRIPT_TEXT_DESERT_RESORT_2",

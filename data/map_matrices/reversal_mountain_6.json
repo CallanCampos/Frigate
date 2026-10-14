@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 675 ]
+        [ "MAP_MODEL_REVERSAL_MOUNTAIN_6_M_DUN2405_00_00" ]
     ]
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 821 ],
-        [ 822 ]
+        [ "MAP_MODEL_PLEDGE_GROVE_M_DUN3601_00_00" ],
+        [ "MAP_MODEL_PLEDGE_GROVE_M_DUN3601_00_01" ]
     ]
 }

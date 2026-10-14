@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 965 ]
+        [ "MAP_MODEL_UNITY_TOWER_3_M_UN02_00_00" ]
     ]
 }

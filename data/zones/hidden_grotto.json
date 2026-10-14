@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 262,
+    "area": "AREA_HIDDEN_GROTTO",
     "matrix": "MAP_MATRIX_HIDDEN_GROTTO",
     "scripts": "SCRIPTS_HIDDEN_GROTTO",
     "text": "SCRIPT_TEXT_HIDDEN_GROTTO",

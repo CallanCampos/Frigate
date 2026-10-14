@@ -1,11 +1,11 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 310 ],
-        [ 311 ],
-        [ 312 ],
-        [ 313 ],
-        [ 314 ],
-        [ 315 ]
+        [ "MAP_MODEL_MARINE_TUBE_H06_A00_00" ],
+        [ "MAP_MODEL_MARINE_TUBE_H06_A00_01" ],
+        [ "MAP_MODEL_MARINE_TUBE_H06_A00_02" ],
+        [ "MAP_MODEL_MARINE_TUBE_H06_A00_03" ],
+        [ "MAP_MODEL_MARINE_TUBE_H06_A00_04" ],
+        [ "MAP_MODEL_MARINE_TUBE_H06_A00_05" ]
     ]
 }

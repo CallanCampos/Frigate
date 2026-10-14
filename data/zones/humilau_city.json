@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 22,
-    "area": 230,
+    "area": "AREA_ROUTE_21",
     "matrix": "MAP_MATRIX_OVERWORLD",
     "scripts": "SCRIPTS_HUMILAU_CITY",
     "text": "SCRIPT_TEXT_HUMILAU_CITY",

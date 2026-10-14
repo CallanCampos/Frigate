@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 867 ],
-        [ 953 ]
+        [ "MAP_MODEL_OPELUCID_CITY_GYM_M_GYM0801_00_00" ],
+        [ "MAP_MODEL_OPELUCID_CITY_GYM_M_GYM0801_00_01" ]
     ]
 }

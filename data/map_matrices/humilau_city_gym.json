@@ -1,8 +1,8 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1019 ],
-        [ 1020 ],
-        [ 1021 ]
+        [ "MAP_MODEL_HUMILAU_CITY_GYM_M_GYM0901_00_00" ],
+        [ "MAP_MODEL_HUMILAU_CITY_GYM_M_GYM0901_00_01" ],
+        [ "MAP_MODEL_HUMILAU_CITY_GYM_M_GYM0901_00_02" ]
     ]
 }

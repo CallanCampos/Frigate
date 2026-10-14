@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 3,
     "npc_cache": 24,
-    "area": 98,
+    "area": "AREA_ENTRALINK",
     "matrix": "MAP_MATRIX_ENTRALINK",
     "scripts": "SCRIPTS_ENTRALINK",
     "text": "SCRIPT_TEXT_ENTRALINK",

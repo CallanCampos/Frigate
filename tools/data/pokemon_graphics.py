@@ -159,6 +159,47 @@ def colors_for(root, archive_name, archive, index, options):
     return palette_colors(archive[0])[:16]
 
 
+def current_colors(root, archive_name, archive, index, options):
+    """Returns the colors the game shows a sprite with: its palette's source file, as edited, or else the original's."""
+    kind = ARCHIVES[archive_name]
+    member, palette_archive = ((index // 20 * 20 + 18, archive_name) if kind in ("battle", "musical") else
+                               (0, "a/1/6/5") if kind == "footprint_forms" else (0, archive_name))
+    path, source_kind, _ = source_file(root, palette_archive, member)
+    if palette_archive == "a/0/5/1" and not path.exists() and path.parent.name == "musical":
+        path = path.parent.parent / path.name
+    if source_kind != "palette" or not path.exists():
+        return colors_for(root, archive_name, archive, index, options)
+    colors = read_palette(path)
+    bank = options["palette_bank"] if kind == "icons" else 0
+    return colors[bank * 16:(bank + 1) * 16]
+
+
+def palette_indices(path, pixels, png_colors, colors):
+    """Returns a PNG's pixels as indices of the sprite's palette: its own indices where the PNG's palette agrees with
+    the sprite's, as exported, or else the sprite's index of the same color, where an editor reordered or compacted
+    the PNG's palette on saving. Index 0 is transparent and stays 0."""
+    def color5(color):
+        return tuple(round(axis * 31 / 255) for axis in color)
+
+    target = [color5(color) for color in colors]
+    mapping = {0: 0}
+    for i in sorted(set(pixels) - {0}):
+        if i >= len(png_colors):
+            raise ValueError(f"{path}: a pixel's index {i} is outside the PNG's palette")
+        color = color5(png_colors[i])
+        if i < len(target) and target[i] == color:
+            mapping[i] = i
+            continue
+        matches = [j for j, other in enumerate(target) if j and other == color]
+        if not matches:
+            raise ValueError(f"{path}: the PNG's color {png_colors[i]} is not in the sprite's palette; change the "
+                             "palette's colors in its .pal file")
+        mapping[i] = matches[0]
+    if all(i == j for i, j in mapping.items()):
+        return pixels
+    return bytes(mapping[i] for i in pixels)
+
+
 def export(root):
     for archive_name in ARCHIVES:
         path = ROOT / "extract/b2_us/files" / archive_name
@@ -200,10 +241,13 @@ def pack(root, game, output):
     archive = read_narc((ROOT / "extract" / version / "files" / archive_name).read_bytes())
     result = []
     for index, original in enumerate(archive):
+        path, kind, options = source_file(root, archive_name, index)
         if not original:
+            # The game has no file here, such as a female sprite of a species that has none
+            if path.exists():
+                raise ValueError(f"{path}: the archive has no file for this, so it can't be packed")
             result.append(original)
             continue
-        path, kind, options = source_file(root, archive_name, index)
         if archive_name == "a/0/5/1" and not path.exists() and path.parent.name == "musical":
             path = path.parent.parent / path.name
         if kind == "raw":
@@ -216,7 +260,8 @@ def pack(root, game, output):
                                       for a, b in zip(left, right)) and len(edited_colors) == len(original_colors)
                       else patch_palette(original, edited_colors))
         else:
-            width, height, pixels = read_indexed_png(path)
+            width, height, pixels, png_colors = read_indexed_png(path)
+            pixels = palette_indices(path, pixels, png_colors, current_colors(root, archive_name, archive, index, options))
             expected_width, expected_height, original_pixels = character_pixels(
                 original, *(options.get("size", (None, None)) if options else (None, None)),
                 single_cell=options.get("single_cell", False) if options else False,

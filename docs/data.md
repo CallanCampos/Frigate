@@ -12,10 +12,13 @@ exactly what the ROM holds. The sources come in three kinds:
   is adding its constant and its file; the build notices new, removed and renamed files by itself.
 - **Assembly**, for the field and trainer AI scripts, which are code more than data, as pret keeps them: one source
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
-- **glTF 2.0**, for map models under `data/map_models/<name>__<chunk>/` and field prop models under
-  `data/field_prop_models/`. Their editable mesh and material data is packed back into Nitro models.
-- **PNG**, for map textures under `data/map_texture_sets/<name>__<set>/` and field prop textures under
-  `data/field_prop_textures/`. The packer converts edited pixels to each set's original Nitro texture format.
+- **glTF 2.0**, for map models under `data/map_models/<model>/` and field prop models under
+  `data/field_prop_models/`, each with a `data.json`. Their editable mesh and material data is packed back into Nitro
+  models.
+- **PNG**, for map textures under `data/map_texture_sets/<set>/` and field prop textures under
+  `data/field_prop_textures/`. The packer converts edited pixels to each set's original Nitro texture format. Like the
+  JSON, these directories are named after their constants and the lists give their order (see
+  [Map model sources](#map-model-sources)).
 - **Indexed PNG, JASC palettes, and WAV**, for each Pokémon's battle sprites, icons, footprints, and cries under
   `data/pokemon/<species>/`. Nitro cell and animation resources remain as separate binary files next to the images.
 
@@ -37,12 +40,12 @@ which documents the format and can write them again.
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
-| `a/0/0/8` | `data/map_models/<chunk>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
+| `a/0/0/8` | `data/map_models/<model>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
 | `a/2/2/5`, `a/2/2/6` | `data/field_prop_models/{exterior,interior}/<bundle>/<model>/` (glTF 2.0) | Field prop models | `tools/data/field_prop_model_data.py` |
-| `a/1/7/4` | `data/field_prop_textures/exterior/<set>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
-| `a/1/7/5` | `data/field_prop_textures/interior/<set>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
+| `a/1/7/4` | `data/field_prop_textures/exterior/<bundle>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
+| `a/1/7/5` | `data/field_prop_textures/interior/<bundle>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
 | `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
-| `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
+| `a/0/1/3` | `data/areas/<area>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
@@ -574,15 +577,21 @@ they are files of their own that trainers name.
 
 ## Map model sources
 
-Field graphics directories use a location or resource name followed by `__<archive-id>` to distinguish
-assets that share a name. For example, `nacrene_city_6_m_whouse01_00_00__0834` is a house model.
-Names come from map matrices and zone-to-area references where possible; shared resources use `shared_`.
-Run `.venv/bin/python tools/data/find_graphics.py nacrene_city_7` (or another `data/zones/` filename)
+Each file of the field graphics' archives is a directory named after its constant, as the JSON data is, in
+`data/constants/map_models.txt` (`MAP_MODEL_*`, `a/0/0/8`), `map_texture_sets.txt` (`MAP_TEXTURE_SET_*`, `a/0/1/4`),
+and `field_props_exterior.txt` and `field_props_interior.txt` (`FIELD_PROPS_EXTERIOR_*` and `FIELD_PROPS_INTERIOR_*`,
+for both a prop bundle, `a/2/2/5` or `a/2/2/6`, and its textures, `a/1/7/4` or `a/1/7/5`), whose order is the archive's.
+For example, `MAP_MODEL_NACRENE_CITY_6_M_WHOUSE01_00_00` is a house, `data/map_models/nacrene_city_6_m_whouse01_00_00/`.
+`make_constants.py --field-graphics` bootstrapped the names: a map model by the place of the map matrices that use it,
+or the overworld's, and the model's own name; a texture set or prop bundle by the place of the zones whose areas use
+it, or else `shared_` and its first texture or model; numbered from `_2` where they repeat. Map matrices name their
+cells' models by these constants, and areas their texture sets and props. Rename one with `rename_constant.py`, which
+also points the GLBs at a renamed texture directory (the packers' `relink` command). Run `.venv/bin/python tools/data/find_graphics.py nacrene_city_7` (or another `data/zones/` filename)
 to see the map model, map texture set, prop bundle and prop textures used by that zone.
 This is closer to [pokeemerald's per-map directories](https://github.com/pret/pokeemerald/tree/master/data/maps)
 than to [pokeplatinum's numbered binary map data](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/data).
 Like [pokeplatinum's separate texture sets](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/texture_sets),
-shared texture resources belong in separate directories. `data/map_texture_sets/<location>__<set>/` holds editable color PNGs
+shared texture resources belong in separate directories. `data/map_texture_sets/<set>/` holds editable color PNGs
 for all 409 texture sets. GLB image paths point to these same PNGs, including resource names containing dots.
 The packer reads the original Nitro resource to recover its texture format and palette association. Edit the PNG
 in Blender or an image editor. The build packs it back
@@ -591,17 +600,16 @@ dimensions. Nitro supports limited colors and alpha precision, so the packer qua
 rejects a set when its shared
 palette cannot hold the edited colors. Textures that share the same encoded texels must remain compatible.
 
-`data/map_models/manifest.json` lists all 1,065 map chunks in archive order, with the Nitro model name and a confirmed
-`texture_set` when the map-to-area relationship or resource names identify one. Where several sets contain every
-texture and palette name used by a model, `texture_preview` selects one representative set for Blender viewing.
-Each chunk has its own named directory containing `model.glb` and terrain CSVs; texture PNGs are shared by texture set.
+Each map model's directory holds `model.glb`, its terrain CSVs and a `data.json` (`map_model.schema.json`): its
+`texture_set`, a constant where the map-to-area relationship or resource names confirm one, or else null, and then a
+`texture_preview`, a set that contains every texture and palette name the model uses, for Blender viewing.
+Texture PNGs are shared by texture set.
 The binary glTF (`.glb`) holds the model geometry and its buffer in one file and opens directly in Blender.
-The archive ID suffix keeps maps distinct even when embedded model names repeat. For example, chunk 0103 is a
-four-vertex ground plane; chunk 0834 is a house from Nacrene City's map matrix, with 736 vertices and ten materials.
-The packer reconstructs scene transforms from the GLB and original Nitro model. Seven unusual prop models retain
-their original position baselines in their bundle manifests because their transforms cannot yet be reconstructed. The packer
-also stores each prop GLB's export hash there so repacking one edited model does not reprocess all 6,331 models.
-These fields are generated conversion metadata; edits belong in the GLB or PNG. The packer
+For example, `MAP_MODEL_MAP_OUTGRASS` is a four-vertex ground plane, and `MAP_MODEL_NACRENE_CITY_6_M_WHOUSE01_00_00` a
+house from Nacrene City's map matrix, with 736 vertices and ten materials. A `data.json` with `"transformed": true`
+marks a model whose GLB positions went through its scene transforms on export, which the packer reverses from the GLB
+and the original Nitro model. Seven unusual prop models also keep their `positions` as exported, because their
+transforms cannot yet be reconstructed. These fields come from the export; edits belong in the GLB or PNG. The packer
 derives the original triangle and vertex order from Nitro commands, so a Blender export can reindex vertices while
 the packer still maps edits to the right commands.
 
@@ -657,15 +665,18 @@ Adding material slots or draw calls is not yet supported. Every map model contai
 `MDL0` block; its textures come from the shared texture archive.
 
 The exterior and interior field props use separate texture archives. Their PNGs live under
-`data/field_prop_textures/exterior/` and `data/field_prop_textures/interior/`, each grouped by the
-area's texture set number. Editing a PNG repacks its original Nitro texture and shared palette;
+`data/field_prop_textures/exterior/` and `data/field_prop_textures/interior/`, a directory per prop bundle,
+named as the bundle is. Editing a PNG repacks its original Nitro texture and shared palette;
 the original Nitro archive supplies the format and palette mapping needed for a byte-matching build.
 The texture size, pixel format and shared palette capacity still constrain edits. The PNGs can be
 re-exported with `tools/data/map_texture_data.py extract OUTPUT_DIR a/1/7/4` or `a/1/7/5`.
 
 All 163 exterior and interior field prop bundles have an editable GLB for each of their 6,331 models.
-The bundle ID suffix is the area's `prop_bundle`; the model directory's suffix is its index in that bundle.
-The bundle's `manifest.json` records the in-game resource ID and model name. Editing geometry,
+A bundle is the area's `prop_bundle`, and each of its models a directory named after the model's own name, numbered
+from `_2` where a bundle repeats one, in the bundle's order. The model's `data.json` (`field_prop_model.schema.json`)
+gives its resource ID, which map models' prop placements name, and `glb_sha256`, the hash of the GLB as extracted: a
+GLB that still has it packs the original model unchanged, since not every unedited model survives conversion (the
+skinned `c11_flag_01` doesn't), and an edited one is converted. Editing geometry,
 UVs, material colors and texture bindings uses the same Nitro conversion as map models.
 The prop's resource information and animations retain their original Nitro bytes. Models can be
 re-exported with `tools/data/field_prop_model_data.py extract APICULA OUTPUT_DIR`.
@@ -676,15 +687,22 @@ changes only its bundle, and the rebuilt model loads in Apicula.
 
 A zone's header names its map matrix, `data/map_matrices/<matrix>.json` (`a/0/0/9`), by its constant in
 `data/constants/map_matrices.txt`, which names a matrix after the first zone that uses it, the overworld's
-`MAP_MATRIX_OVERWORLD`. A matrix is a grid of its cells' maps, files of the map archive (null for none), row by row,
+`MAP_MATRIX_OVERWORLD`. A matrix is a grid of its cells' maps, map models by their `MAP_MODEL_*` constants (null for
+none), row by row,
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
 
-Each area is `data/areas/<number>.json`, numbered from `000` in record order. These are the records of `a/0/1/3`
-(`AreaData`), which name the graphics that zones share: their props, textures, animations (null for none), lights and
-colors, by their file numbers. A zone's header names its area by its number, and
-an area with seasons has a record per season after it. `data/areas/area.schema.json` describes one record and
-`tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
+Each area is `data/areas/<area>.json`, named after its constant in `data/constants/areas.txt`, in whose order
+`a/0/1/3` has the records (`AreaData`), which name the graphics that zones share: their props, textures, animations
+(null for none), lights and colors. The props and texture set are named by their constants (see
+[Map model sources](#map-model-sources)), or by number for the few props that the archive doesn't have; the rest are
+file numbers. A zone's header names its area by its constant. The field reads the record of the area plus a variant
+(`AreaData_Create`): the season for an area with seasons (records 2 to 0x119, `AreaData_HasSeasons`), whose records
+after the first are named `_SUMMER`, `_AUTUMN` and `_WINTER`, and other state for three other ranges
+(`func_02018f60`, `func_02018f78` and `func_02018f90` in `fieldmap.c`), whose records after the zone's are numbered
+from `_2`. An area is named after the first zone whose header names it, and the 81 records that nothing names, by
+their number; `make_constants.py --areas` bootstrapped the list. `data/areas/area.schema.json` describes one record
+and `tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
 
 An area's lights are a lighting set, `data/lights/field/<n>.json` (`a/0/6/0`, `ARCID_LIGHTS_FIELD`), by its number;
 the battles' are `data/lights/battle/<n>.json` (`a/0/6/1`). A set is the periods of the day, which

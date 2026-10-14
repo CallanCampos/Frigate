@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 997 ]
+        [ "MAP_MODEL_BLACK_TOWER_5_M_MUGEN09_00_00" ]
     ]
 }

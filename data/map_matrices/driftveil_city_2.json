@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1011 ]
+        [ "MAP_MODEL_DRIFTVEIL_CITY_2_M_HOTEL01_00_00" ]
     ]
 }

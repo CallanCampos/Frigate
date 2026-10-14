@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 284,
+    "area": "AREA_NUVEMA_TOWN_2",
     "matrix": "MAP_MATRIX_NUVEMA_TOWN_7",
     "scripts": "SCRIPTS_NUVEMA_TOWN_7",
     "text": "SCRIPT_TEXT_NUVEMA_TOWN_7",

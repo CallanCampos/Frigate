@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 630 ],
-        [ 631 ]
+        [ "MAP_MODEL_SEASIDE_CAVE_M_DUN3201_00_00" ],
+        [ "MAP_MODEL_SEASIDE_CAVE_M_DUN3201_00_01" ]
     ]
 }

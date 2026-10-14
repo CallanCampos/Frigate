@@ -35,6 +35,13 @@ NAMED_DATA = [
     ("places", "data/places", "PLACE_", ".json"),
     ("field_scripts", "data/field_scripts", "SCRIPTS_", ".s"),
     ("map_matrices", "data/map_matrices", "MAP_MATRIX_", ".json"),
+    ("areas", "data/areas", "AREA_", ".json"),
+    ("map_models", "data/map_models", "MAP_MODEL_", "/"),
+    ("map_texture_sets", "data/map_texture_sets", "MAP_TEXTURE_SET_", "/"),
+    ("field_props_exterior", "data/field_prop_models/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
+    ("field_props_exterior", "data/field_prop_textures/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
+    ("field_props_interior", "data/field_prop_models/interior", "FIELD_PROPS_INTERIOR_", "/"),
+    ("field_props_interior", "data/field_prop_textures/interior", "FIELD_PROPS_INTERIOR_", "/"),
     ("tr_ai_scripts", "data/tr_ai", "TR_AI_SCRIPT_", ".s"),
     ("text_banks", "data/text/system", "TEXT_BANK_", ".txt"),
     ("script_text_banks", "data/text/script", "SCRIPT_TEXT_", ".txt"),
@@ -42,6 +49,13 @@ NAMED_DATA = [
     ("encounters", "data/encounters", "ENCOUNTERS_", ".json"),
     ("zones", "data/zones", "ZONE_", ".json"),
     ("zones", "data/events", "ZONE_", ".json"),
+]
+
+# The textures' directories, and the script that relinks the models that show them
+RELINKS = [
+    ("data/map_texture_sets", "tools/data/map_model_data.py", "data/map_models"),
+    ("data/field_prop_textures/exterior", "tools/data/field_prop_model_data.py", "data/field_prop_models/exterior"),
+    ("data/field_prop_textures/interior", "tools/data/field_prop_model_data.py", "data/field_prop_models/interior"),
 ]
 
 
@@ -95,6 +109,12 @@ def main():
     for old_path, new_path in moves:
         subprocess.run(["git", "mv", str(old_path), str(new_path)], cwd=ROOT, check=True)
         print(f"moved {old_path.relative_to(ROOT)} to {new_path.relative_to(ROOT)}")
+    # The models' GLBs show their textures by path, so a moved texture set or prop bundle needs them pointed at it
+    for old_path, _ in moves:
+        for directory, script, models in RELINKS:
+            if old_path.parent == ROOT / directory:
+                subprocess.run([sys.executable, str(ROOT / script), "relink", str(ROOT / models)], cwd=ROOT,
+                               check=True)
     print(f"renamed {args.old} to {args.new} in {changed} files")
 
 

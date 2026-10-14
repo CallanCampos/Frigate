@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 554 ],
-        [ 556 ]
+        [ "MAP_MODEL_LOSTLORN_FOREST_M_DUN2102_00_00" ],
+        [ "MAP_MODEL_LOSTLORN_FOREST_M_DUN2102_00_01" ]
     ]
 }

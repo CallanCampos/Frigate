@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 380,
+    "area": "AREA_CAVE_OF_BEING",
     "matrix": "MAP_MATRIX_CAVE_OF_BEING",
     "scripts": "SCRIPTS_CAVE_OF_BEING",
     "text": "SCRIPT_TEXT_CAVE_OF_BEING",

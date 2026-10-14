@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 716 ]
+        [ "MAP_MODEL_TWIST_MOUNTAIN_8_M_DUN0706_00_00" ]
     ]
 }

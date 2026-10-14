@@ -2,9 +2,12 @@
 """Export field map GLBs and terrain, then pack edited geometry back into Nitro.
 
 Usage: map_model_data.py extract APICULA OUTPUT_DIR [CHUNK_ID ...]
-       map_model_data.py migrate SOURCE_DIR
-       map_model_data.py embed-props SOURCE_DIR
+       map_model_data.py relink SOURCE_DIR
        map_model_data.py pack data/map_models black2|white2 OUTPUT
+
+Each map model is a directory named after its constant in data/constants/map_models.txt, with its GLB, its terrain
+CSVs and its data.json (map_model.schema.json). relink points every GLB's images at its texture set's directory again,
+after a texture set is renamed.
 
 Unchanged topology keeps the original Nitro display lists byte for byte. A mesh
 that changes its triangles is encoded as new DS GPU commands for each draw call.
@@ -24,17 +27,24 @@ from narc import read_narc, write_narc
 from map_texture_data import decode, decode_png, palette_for, read_png, resources
 from map_terrain_data import export_terrains, patch_terrains
 from nitro_dictionary import build_dictionary, replace_names
-from graphics_paths import asset_dir
-from graphics_names import map_model_name, map_texture_name
+from graphics_paths import directories
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from tools.data.datajson import DataError, load, load_schema, value, write  # noqa: E402
 GLB_JSON = 0x4e4f534a
 GLB_BIN = 0x004e4942
 PROP_NAME = re.compile(r"bw2_prop_(\d+)_id_(\d+)(?:\.\d+)?$")
 PROP_OFFSETS = {b"WB": (12, 16), b"GC": (16, 20), b"NG": (8, 12), b"RD": (12, 16)}
 GPU_PARAMS = {0x00: 0, 0x14: 1, 0x1b: 3, 0x20: 1, 0x21: 1, 0x22: 1, 0x23: 2, 0x24: 1,
               0x25: 1, 0x26: 1, 0x27: 1, 0x28: 1, 0x40: 1, 0x41: 0}
+# The errors of an edit that the original draw commands cannot hold, which re-encode the model's triangles instead
+FALLBACK_ERRORS = ("triangle count changed", "triangle topology or shared vertex changed",
+                   "one Nitro vertex has multiple edited UVs", "vertices sharing a Nitro UV command",
+                   "this shape has no Nitro texture commands", "this UV has no editable Nitro texture command",
+                   "UV before the first Nitro texture command", "changes an axis omitted by Nitro opcode",
+                   "vertex coordinate is not representable", "vertex coordinate exceeds Nitro command range")
 SBC_PARAMS = {0x00: 0, 0x01: 0, 0x02: 2, 0x03: 1, 0x04: 1, 0x05: 1,
               0x06: 3, 0x07: 1, 0x08: 1, 0x0b: 0, 0x0c: 2, 0x0d: 2,
               0x24: 1, 0x26: 4, 0x2b: 0, 0x40: 0, 0x44: 1, 0x46: 4,
@@ -45,14 +55,32 @@ def u32(data, offset):
     return struct.unpack_from("<I", data, offset)[0]
 
 
-def models(directory):
-    manifest = json.loads((directory / "manifest.json").read_text())
-    if manifest["archive"] != "a/0/0/8":
-        raise ValueError("unexpected map model archive")
-    entries = manifest["models"]
-    if [entry["chunk"] for entry in entries] != list(range(1065)):
-        raise ValueError("map model manifest must contain all 1,065 chunks in archive order")
-    return entries
+def models(directory, count):
+    """Returns the map models' directories, in archive order, and their data, which name their texture sets."""
+    folders = directories("a/0/0/8", directory)
+    if len(folders) != count:
+        raise ValueError(f"a/0/0/8 has {count} map models and map_models.txt {len(folders)}")
+    schema = load_schema(ROOT / "data/map_models/map_model.schema.json")
+    return [(folder, load(folder / "data.json", schema)) for folder in folders]
+
+
+def texture_set(data, where):
+    """Returns the texture set whose PNGs a model's GLB shows: its own, or else the one it is previewed with."""
+    name = data["texture_set"] if data["texture_set"] is not None else data.get("texture_preview")
+    return value(name, where) if name is not None else None
+
+
+def model_name(nitro):
+    """Returns the name of a BMD0 file's one model."""
+    block = u32(nitro, 16)
+    if len(dictionary_offsets(nitro, block + 8)) != 1:
+        raise ValueError("expected one model")
+    return nitro[block + 32:block + 48].split(b"\0")[0].decode("ascii")
+
+
+def image_uri(texture_dir, filename):
+    """Returns a GLB's path to one of its texture set's PNGs, from data/map_models/<model>/."""
+    return f"../../map_texture_sets/{texture_dir.name}/{filename}"
 
 
 def dictionary_offsets(data, offset):
@@ -187,6 +215,12 @@ def patch_props(chunk, doc):
     result = bytearray(chunk[:offset] + section)
     struct.pack_into("<I", result, end_field, len(result))
     return bytes(result)
+
+
+def blended(weights):
+    """Whether a vertex's WEIGHTS_0 blends joints, rather than giving its first joint all the weight, whether the GLB
+    stores weights as normalized bytes or shorts or as floats."""
+    return any(weight != 0 for weight in weights[1:]) or not weights[0]
 
 
 def accessor_values(doc, binary, accessor_index):
@@ -335,7 +369,7 @@ def positions_from_gltf(directory, name, nitro, mapping):
                 raise ValueError(f"{name}: triangle topology or shared vertex changed")
             positions[original] = value
             if current_joints is not None and current_weights is not None:
-                if current_weights[current] != (255, 0, 0, 0):
+                if blended(current_weights[current]):
                     raise ValueError(f"{name}: blended skin weights are unsupported")
                 joint = current_joints[current][0]
                 if joints[original] is not None and joints[original] != joint:
@@ -995,7 +1029,7 @@ def topology_display_list(data, model, material_index, doc, primitive, binary, s
             raise ValueError(f"{name}: triangle index exceeds a vertex attribute")
         point = positions[vertex]
         if not direct:
-            if any(weights[vertex][axis] != 0 for axis in (1, 2, 3)) or not weights[vertex][0]:
+            if blended(weights[vertex]):
                 raise ValueError(f"{name}: blended skin weights are unsupported")
             point = inverse_joint_position(doc, joints[vertex][0], point)
         coords = [round(value * 4096 / scale) for value in point]
@@ -1035,6 +1069,11 @@ def rebuild_topology(chunk, doc, primitives, binary, mapping, name):
     appended = bytearray()
     triangle_count = 0
     for (shape_index, material_index), primitive in zip(calls, primitives):
+        # The new display list only draws, so a shape that restores or scales matrices as it draws can't be rebuilt
+        start = shapes[shape_index] + u32(data, shapes[shape_index] + 8)
+        if any(op in (0x14, 0x1b) for op, _ in gpu_commands(data, start, start + u32(data, shapes[shape_index] + 12))):
+            raise ValueError(f"{name}: shape {shape_index} sets matrices as it draws, so its triangles can't be "
+                             "re-encoded yet; keep its topology")
         triangle_count += doc["accessors"][primitive["indices"]]["count"] // 3
         display_list = topology_display_list(data, model, material_index, doc, primitive, binary,
                                              scale, mapping["direct"], name)
@@ -1080,19 +1119,16 @@ def export(apicula, output, selected=None):
     archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
     textures = read_narc((ROOT / "extract/b2_us/files/a/0/1/4").read_bytes())
     output.mkdir(parents=True, exist_ok=True)
-    texture_root = output.parent / "map_texture_sets"
-    entries = models(ROOT / "data/map_models")
-    for entry in entries:
-        chunk_id, name = entry["chunk"], entry["name"]
+    texture_dirs = directories("a/0/1/4", output.parent / "map_texture_sets")
+    for chunk_id, ((source, data), model_dir) in enumerate(zip(models(ROOT / "data/map_models", len(archive)),
+                                                                 directories("a/0/0/8", output))):
         if selected is not None and chunk_id not in selected:
             continue
-        texture_id = entry["texture_set"]
-        if texture_id is None:
-            texture_id = entry.get("texture_preview")
+        texture_id = texture_set(data, str(source))
         nitro = model_bytes(archive[chunk_id])
+        name = model_name(nitro)
         texture_names = ({item["name"]: item for item in resources(textures[texture_id])[0]}
                          if texture_id is not None else {})
-        model_dir = asset_dir(output, chunk_id, 4, map_model_name(chunk_id, name))
         model_dir.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory() as temporary:
             model_path = Path(temporary) / f"chunk_{chunk_id:04d}.nsbmd"
@@ -1109,9 +1145,7 @@ def export(apicula, output, selected=None):
                 if path.suffix == ".png":
                     if texture_id is None:
                         raise ValueError(f"{chunk_id}: unexpected texture without a texture set")
-                    first_texture = next(iter(texture_names), "empty")
-                    texture_dir = asset_dir(texture_root, texture_id, 3,
-                                            map_texture_name(texture_id, first_texture))
+                    texture_dir = texture_dirs[texture_id]
                     texture_dir.mkdir(parents=True, exist_ok=True)
                     canonical = canonical_texture_name(path.name, texture_names)
                     target = texture_dir / canonical
@@ -1130,7 +1164,7 @@ def export(apicula, output, selected=None):
             for picture in document.get("images", []):
                 if "uri" in picture:
                     canonical = canonical_texture_name(picture["uri"], texture_names)
-                    picture["uri"] = f"../../map_texture_sets/{asset_dir(texture_root, texture_id, 3).name}/{canonical}"
+                    picture["uri"] = image_uri(texture_dirs[texture_id], canonical)
         add_prop_nodes(document, archive[chunk_id])
         write_glb(model_dir / "model.glb", document, (model_dir / "model.bin").read_bytes())
         (model_dir / "model.gltf").unlink()
@@ -1151,72 +1185,53 @@ def export(apicula, output, selected=None):
                 direct = patch_model(archive[chunk_id], positions, name) == archive[chunk_id]
             except ValueError:
                 direct = False
-        mapping = {"direct": direct}
+        data = {key: item for key, item in data.items() if key != "transformed"}
         if not direct:
-            mapping["positions"] = positions
-        if direct:
-            entry.pop("conversion", None)
-        else:
-            entry["conversion"] = mapping
+            data["transformed"] = True
+        write(model_dir / "data.json", data)
         export_terrains(archive[chunk_id], model_dir)
-    (output / "manifest.json").write_text(json.dumps(
-        {"archive": "a/0/0/8", "models": entries}, indent=2) + "\n")
 
 
-def main():
-    if len(sys.argv) >= 4 and sys.argv[1] == "extract":
-        export(sys.argv[2], Path(sys.argv[3]),
-               set(map(int, sys.argv[4:])) if len(sys.argv) > 4 else None)
-        return
-    if len(sys.argv) == 3 and sys.argv[1] == "migrate":
-        for entry in models(Path(sys.argv[2])):
-            directory = asset_dir(Path(sys.argv[2]), entry["chunk"], 4)
-            doc = json.loads((directory / "model.gltf").read_text())
-            write_glb(directory / "model.glb", doc, (directory / "model.bin").read_bytes())
-            (directory / "model.gltf").unlink()
-            (directory / "model.bin").unlink()
-        return
-    if len(sys.argv) == 3 and sys.argv[1] == "embed-props":
-        archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
-        for entry in models(Path(sys.argv[2])):
-            path = asset_dir(Path(sys.argv[2]), entry["chunk"], 4) / "model.glb"
-            doc, binary = read_glb(path)
-            add_prop_nodes(doc, archive[entry["chunk"]])
+def relink(directory):
+    count = len(read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes()))
+    texture_dirs = directories("a/0/1/4")
+    for model_dir, data in models(directory, count):
+        texture_id = texture_set(data, str(model_dir))
+        path = model_dir / "model.glb"
+        doc, binary = read_glb(path)
+        images = [picture for picture in doc.get("images", []) if "uri" in picture]
+        if texture_id is None or not images:
+            continue
+        uris = [image_uri(texture_dirs[texture_id], Path(picture["uri"]).name) for picture in images]
+        if [picture["uri"] for picture in images] != uris:
+            for picture, uri in zip(images, uris):
+                picture["uri"] = uri
             write_glb(path, doc, binary)
-        return
-    if len(sys.argv) != 5 or sys.argv[1] != "pack":
-        raise SystemExit(__doc__)
-    _, _, directory, game, output = sys.argv
+
+
+def pack(directory, game, output):
     version = {"black2": "b2_us", "white2": "w2_us"}[game]
     source = ROOT / "extract" / version / "files/a/0/0/8"
     archive = read_narc(source.read_bytes())
     texture_archive = read_narc((ROOT / "extract" / version / "files/a/0/1/4").read_bytes())
-    for entry in models(Path(directory)):
-        chunk_id, name = entry["chunk"], entry["name"]
-        model_dir = asset_dir(Path(directory), chunk_id, 4)
+    texture_dirs = directories("a/0/1/4")
+    for chunk_id, (model_dir, data) in enumerate(models(directory, len(archive))):
         original = archive[chunk_id]
-        mapping = entry.get("conversion", {"direct": True})
+        name = model_name(model_bytes(original))
+        mapping = {"direct": not data.get("transformed", False)}
         doc, primitives, binary = mesh_primitives(model_dir, name)
-        texture_id = entry["texture_set"]
-        if texture_id is None:
-            texture_id = entry.get("texture_preview")
+        texture_id = texture_set(data, str(model_dir))
         bound, _ = patch_material_bindings(
             original, doc, primitives, texture_archive[texture_id] if texture_id is not None else None,
-            name, binary, asset_dir(ROOT / "data/map_texture_sets", texture_id, 3)
-            if texture_id is not None else None)
-        if entry["texture_set"] is None and bound != original:
+            name, binary, texture_dirs[texture_id] if texture_id is not None else None)
+        if data["texture_set"] is None and bound != original:
             raise ValueError(f"{name}: texture bindings need an unambiguous map texture set")
-        fallback_errors = ("triangle count changed", "triangle topology or shared vertex changed",
-                           "one Nitro vertex has multiple edited UVs", "vertices sharing a Nitro UV command",
-                           "this shape has no Nitro texture commands", "this UV has no editable Nitro texture command",
-                           "UV before the first Nitro texture command", "changes an axis omitted by Nitro opcode",
-                           "vertex coordinate is not representable", "vertex coordinate exceeds Nitro command range")
         try:
             positions, direct, _ = positions_from_gltf(model_dir, name, model_bytes(original), mapping)
             edited = patch_model(bound, positions, name) if direct else bound
             edited = patch_uvs(edited, doc, primitives, binary, name)
         except ValueError as error:
-            if not any(reason in str(error) for reason in fallback_errors):
+            if not any(reason in str(error) for reason in FALLBACK_ERRORS):
                 raise
             edited = rebuild_topology(bound, doc, primitives, binary, mapping, name)
         archive[chunk_id] = edited
@@ -1227,6 +1242,23 @@ def main():
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.unlink(missing_ok=True)
     dest.write_bytes(write_narc(archive))
+
+
+def main():
+    if len(sys.argv) >= 4 and sys.argv[1] == "extract":
+        export(sys.argv[2], Path(sys.argv[3]),
+               set(map(int, sys.argv[4:])) if len(sys.argv) > 4 else None)
+        return
+    if len(sys.argv) == 3 and sys.argv[1] == "relink":
+        relink(Path(sys.argv[2]))
+        return
+    if len(sys.argv) != 5 or sys.argv[1] != "pack":
+        raise SystemExit(__doc__)
+    _, _, directory, game, output = sys.argv
+    try:
+        pack(Path(directory), game, output)
+    except DataError as error:
+        sys.exit(f"error: {error}")
 
 
 if __name__ == "__main__":
