@@ -129,7 +129,7 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_pokemon.c` | `0x02156174`–`0x021574a4` | 43 | complete | string at `0x0216e1f4` |
 | `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | complete | string at `0x0216e208` |
 | `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
-| `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | partial | string at `0x0216e22c` |
+| `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | complete | string at `0x0216e22c` |
 | `field_encount_st.c` | `0x021590ec`–`0x021593fc` | 15 | complete | string at `0x0216e240` |
 | `hiden_event.c` | `0x021593fc`–`0x02159bc0` | 43 | complete | descriptive |
 | `scrcmd_network.c` | `0x02159bc0`–`0x02159d54` | 9 | complete | string at `0x0216e254` |

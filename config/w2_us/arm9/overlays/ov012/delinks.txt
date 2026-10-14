@@ -127,6 +127,7 @@ src/ov012/scrcmd_sodateya.c:
     .data       start:0x0216e258 end:0x0216e26c
 
 src/ov012/scrcmd_musical.c:
+    complete
     .text       start:0x02158104 end:0x0215912c
     .data       start:0x0216e26c end:0x0216e280
 
