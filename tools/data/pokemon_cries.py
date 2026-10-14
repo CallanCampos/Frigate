@@ -17,27 +17,24 @@ from narc import read_narc, write_narc
 from pokemon_graphics import ROOT, species_names
 
 
+# The forms with cries of their own, after the species' (POKE_VOICE_EXTRA_ENTRIES, pm_voice.c)
 FORMS = (("shaymin", 1), ("kyurem", 1), ("kyurem", 2),
          ("tornadus", 1), ("thundurus", 1), ("landorus", 1))
 
 
 def cry_folder(root, cry_id):
+    """Returns the directory of a cry: each species' its own, the egg's, the bad egg's and the Pokéstar Studios
+    species' too, then the forms'."""
     names = species_names()
     if cry_id < len(names):
         return root / names[cry_id]
-    if cry_id >= 685:
-        species, form = FORMS[cry_id - 685]
-        return root / species / f"form_{form}"
-    if cry_id == 650:
-        return root / "egg"
-    if cry_id == 651:
-        return root / "bad_egg"
-    return root / "extra_graphics" / f"battle_group_{cry_id - 2}"
+    species, form = FORMS[cry_id - len(names)]
+    return root / species / f"form_{form}"
 
 
 def volume_path(root, cry_id):
-    return (root / species_names()[cry_id] / "data.json" if cry_id < len(species_names())
-            else cry_folder(root, cry_id) / "data.json")
+    """Returns the data.json with a species' cry_volume (a/1/9/1, which has an entry per species)."""
+    return root / species_names()[cry_id] / "data.json"
 
 
 def sound_tables(data):

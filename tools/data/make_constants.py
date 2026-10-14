@@ -35,11 +35,16 @@ TABLES = [
     ("moves.txt", "MOVE", 403, None, "Moves"),
     ("abilities.txt", "ABILITY", 374, None, "Abilities"),
     ("items.txt", "ITEM", 64, None, "Items"),
-    # The lines after the national Pokédex name eggs and other things that are not species
-    ("species.txt", "SPECIES", 90, 650, "Species, by national Pokédex number"),
+    # After the national Pokédex, the egg, the bad egg and Pokéstar Studios' props and costumes, which the game keeps as
+    # species of their own; the last two lines name the eggs' icons
+    ("species.txt", "SPECIES", 90, 685, "Species, by national Pokédex number, then the egg, the bad egg and the "
+     "Pokéstar Studios props and costumes that the studio's movies show as Pokémon"),
     ("types.txt", "TYPE", 398, None, "Types"),
     ("natures.txt", "NATURE", 27, None, "Natures"),
 ]
+
+# The IDs whose name takes a prefix: the Pokéstar Studios species, whose names, such as UFO or Prop U1, are a movie's
+PREFIXES = {"SPECIES": (range(652, 685), "POKESTAR_")}
 
 # Names for the IDs whose text is not a name, or is shared with another ID. The item descriptions tell them apart.
 OVERRIDES = {
@@ -629,7 +634,8 @@ def main():
             elif text == "???":
                 names[i] = f"{prefix}_UNUSED_{i}"
             else:
-                names[i] = f"{prefix}_{identifier(text)}"
+                ids, extra = PREFIXES.get(prefix, (range(0), ""))
+                names[i] = f"{prefix}_{extra if i in ids else ''}{identifier(text)}"
         seen = {}
         for i, name in names.items():
             if name in seen:

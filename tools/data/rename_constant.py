@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.gen_constants import LISTS_DIR, parse  # noqa: E402
+from tools.data.species_data import directory as species_directory  # noqa: E402
 from tools.text.text_data import bank_prefix  # noqa: E402
 
 ROOT = LISTS_DIR.parents[1]
@@ -60,6 +61,8 @@ RELINKS = [
 
 
 def data_path(constant: str, directory: str, prefix: str, suffix: str) -> Path:
+    if prefix == "SPECIES_":
+        return ROOT / directory / species_directory(constant)
     return ROOT / directory / (constant.removeprefix(prefix).lower() + ("" if suffix == "/" else suffix))
 
 

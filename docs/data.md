@@ -252,16 +252,19 @@ documents each field.
 
 `tools/data/species_data.py pack` builds the archives, one entry per record, in this order:
 
-- The species of `data/constants/species.txt`, from `SPECIES_NONE` (`none/`, an empty record) to Genesect.
-- The extra records, `data/pokemon/extra/<record>.json`, which no species' forms point at, kept until their use is
-  known. Some look like unused species, such as a Steel and Flying one with 600 base stats.
+- The species of `data/constants/species.txt`, from `SPECIES_NONE` (`none/`, an empty record) to Genesect, then
+  `SPECIES_EGG` and `SPECIES_BAD_EGG` and the 33 Pokéstar Studios species, `SPECIES_POKESTAR_UFO` to
+  `SPECIES_POKESTAR_SMEARGLE_2`: the props and costumes of the studio's movies, which the game keeps as species, with
+  their own records, sprites, icons and cries (a Steel and Flying UFO with 600 base stats, the doors, the sixteen prop
+  boxes). Not being Pokémon, they are in `data/pokemon/pokestar/<name>/`, such as `pokestar/ufo/`. Their names are lines of `species_names.txt` after the national Pokédex's, as the code names Bad Egg's
+  message, and they have no Pokédex text, so their files have only their records and `cry_volume`.
 - The alternate forms that have records of their own, `data/pokemon/<species>/form_<n>.json`, in the order of
   `data/pokemon/forms.json`. The packer sets each species' first form record from it, so a species' `forms` only
   gives the number of forms and where their sprites start. Species whose forms only differ in looks, such as Unown,
   have no form records.
 
 The baby species archive stops before the forms, which have no `baby_species`. The species data archive ends with a
-table of the species' and extra records' Unova Pokédex numbers, which their files hold as `regional_dex_number`: its 301
+table of the species' Unova Pokédex numbers, which their files hold as `regional_dex_number`: its 301
 numbers match the game's Unova Pokédex, from #000 for Victini to #300. The TMs and HMs a species learns are named, and
 so are its tutor moves: the record keeps them as a bit per move of each tutor, and the packer finds each move's bit, the
 type tutor's (the pledges, the starters' ultimate moves and Draco Meteor, in the order `PokeParty_GetTutorMoveID` tests
@@ -302,16 +305,22 @@ into sprites using the adjacent `*_cells.ncer` and `*_animations.nanr.lz11` Nitr
 fragmented. Those resources are preserved as separate source files and can be replaced with edited Nitro data.
 
 `icon.png` is a 32×64 two-frame icon, using a bank in
-`data/pokemon/shared/icon_palettes.pal`; the code in `src/system/poke_icon.c` picks the bank.
-`footprint.png` is a 16×32 character sheet and uses `data/pokemon/shared/footprint_palette.pal`.
+`data/pokemon/shared/icon_palettes.pal` (the PC boxes use `icon_palettes_box.pal`); the code in
+`src/system/poke_icon.c` picks the bank, and the icons' cells and animations for each OBJ mapping are
+`shared/icon_{cells,animations}_{32k,64k,128k}`. `footprint.png` is a 16×32 character sheet and uses
+`data/pokemon/shared/footprint_palette.pal`, with the cells and animations of `shared/footprint_*_old` for the species
+up to Arceus and `shared/footprint_*` for the rest (`zukan_info.c`).
 The older musical sprite archive has its own `musical/` subfolder. Files identical to the regular sprite are omitted
-there; the packer uses the regular file for those entries. Sprite forms have `form_<n>/` folders under their
-species. Eggs and currently unidentified reserved graphics slots are kept under `egg/` and `extra_graphics/` so no
-archive entries are dropped.
+there; the packer uses the regular file for those entries, so an edit of one shows in both. Sprite forms have
+`form_<n>/` folders under their species, numbered by the forms' `sprite_offset` (`GetPokemonDataIDBase`); the musical
+sprites' follow Black and White's species data instead (`MusicalMcss_GetDataIDBase`), so a form's `musical/` is where
+it has one. `egg/` holds the egg's sprites and icon, which every egg shows, and `species_icon.png`, the icon file of
+`SPECIES_EGG` itself; Manaphy's egg is `manaphy/egg/`. The Substitute doll is `shared/substitute/`
+(`BtlvMcss_SetSubstitute`), and `shared/substitute/musical/` is Black and White's copy, which nothing loads.
 
 `cry.wav` is mono PCM8 at the game's sample rate; the packer also accepts mono PCM16 edits and different lengths.
-`cry_volume` in each species' `data.json` is the game's 0–127 playback volume. Eggs and reserved cry slots use a
-small `data.json` beside their `cry.wav`. Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
+`cry_volume` in each species' `data.json` is the game's 0–127 playback volume; the egg, the bad egg and the
+Pokéstar Studios species have cries and volumes of their own too (`pm_voice.c`). Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
 volume.
 The other sounds in `swan_sound_data.sdat` retain their original data. Extract the graphics again with
 `.venv/bin/python tools/data/pokemon_graphics.py extract data/pokemon` and the cries with
