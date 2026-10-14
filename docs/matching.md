@@ -286,6 +286,10 @@ Same instructions, registers swapped.
   (`ldr r4, [sp, #0x50]`), which spills the screens pointer, the name and `pos * 4` as in the ROM (frame 0x38, 0x110
   bytes). A `u32` or `int` parameter used directly, or a copy of the same type, gives 0x10c. A cast at the first use
   (`area->chars[(u32)pos]`) does the same as the local.
+  Overlay 311's `UnSelectMsg_PrintItem` matches the same way, with `int pos = index;` from a `u32 index`: `pos` takes
+  `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
+  order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
+  and declared first stores it right after the subtraction.
 - A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
   counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
   tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter

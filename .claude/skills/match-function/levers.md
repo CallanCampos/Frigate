@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A stack-passed parameter kept on the stack where the original loads it into a saved register: copy it into a
+  local of the other signedness (`int pos = index;`). (matching.md: "A 32-bit parameter passed on the stack")
 - A 64-bit sum of products in other registers, or an `ldm` of two fields where the original has two `ldr`: build
   the sum with `+=`, one product a statement. (matching.md: "built up with `+=`")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
