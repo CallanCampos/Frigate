@@ -387,6 +387,7 @@ src/ov012/waza_oshie.c:
     .data       start:0x0216e63c end:0x0216e64c
 
 src/ov012/g3d_text_draw.c:
+    complete
     .text       start:0x02169e58 end:0x0216a1d0
     .rodata     start:0x0216de44 end:0x0216de98
 
