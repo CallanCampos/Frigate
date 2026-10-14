@@ -1856,7 +1856,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Japanese text in a string is written as is: sources are UTF-8, and the build hands them to MWCC in Shift JIS, the
   encoding of the game's strings, through sjiswrap, with `-enc SJIS` so that a second byte of 0x5c (`表`, `ソ`) isn't
   read as a backslash. An escape such as `\x94` can't stand in for it in an assert, whose expression is stringized as
-  written. A character that Shift JIS can't encode is fine in a comment; anywhere else sjiswrap names it, and its
+  written: `wm_icon.c`'s `func_0203e5ec` has `GFL_ASSERT(0 && "非対応のOBJマッピングモード")`. A character that Shift JIS can't encode is fine in a comment; anywhere else sjiswrap names it, and its
   bytes would be wrong.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
   a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.

@@ -141,7 +141,7 @@ static u32 func_0203e5ec(u32 engine, u32 charNo) {
         return charNo;
     case GX_OBJVRAMMODE_CHAR_1D_256K:
     default:
-        GFL_ASSERT(0);
+        GFL_ASSERT(0 && "非対応のOBJマッピングモード"); // "Unsupported OBJ mapping mode"
         return charNo;
     }
 }

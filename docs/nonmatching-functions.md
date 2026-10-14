@@ -503,12 +503,6 @@ in both versions.
   `0x02180270` / `0x021802b0`, words of a code address plus 0x2200, then resolves to 0x2200 plus small offsets. They
   stay incomplete until those address-plus-0x2200 references link.
 
-- `src/gfl/wm_icon.c` matches every function, but its `.data` needs the text of an assert in `func_0203e5ec`'s
-  branch for an unsupported mapping mode: the ROM has `0 && "非対応のOBJマッピングモード"` ("unsupported OBJ mapping
-  mode") in Shift-JIS at `0x0209aa30` / `0x0209aa70`, from `GFL_ASSERT(0 && "...")`, which stringizes the whole
-  expression. The sources are ASCII and a `\x` escape is stringized as text, so the bytes need raw Shift-JIS in
-  the source file; it stays incomplete until the project decides how to hold such text.
-
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file
