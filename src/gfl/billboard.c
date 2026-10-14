@@ -76,7 +76,7 @@ void func_0204e450(BlActScene *scene) {
     GFL_HeapFree(scene);
 }
 
-void BlActScene_SetCustomNormal(BlActScene *scene, const VecFx16 *normal) {
+void BlActScene_SetCustomNormal(BlActScene *scene, VecFx16 *normal) {
     scene->customNormal = TRUE;
     VEC_Fx16Set(&scene->normal, normal->x, normal->y, normal->z);
 }
