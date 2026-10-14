@@ -549,8 +549,8 @@ u16 CalcWarpTransferAddend(u32 posWeightBits, u32 warpDirection, BOOL isRail, u3
     if (posWeightBits == 0) {
         return 0;
     }
-    index = posWeightBits & 0xf;
     width = (s32)(posWeightBits & 0xf0) >> 4;
+    index = posWeightBits & 0xf;
     direction = (s32)(posWeightBits & 0xf00) >> 8;
     if ((direction == 0 && warpDirection == 3) || (direction == 1 && warpDirection == 2) ||
         (direction == 3 && warpDirection == 0) || (direction == 2 && warpDirection == 1)) {
