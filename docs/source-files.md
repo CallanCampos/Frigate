@@ -988,7 +988,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | partial | descriptive |
+| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | complete | descriptive |
 
 ### Overlay 103
 
@@ -1279,7 +1279,7 @@ prints the tables below from the configs and the ROM:
 | `resort_people.c` | `0x021f0e98`–`0x021f1710` | 46 | complete | string at `0x021f58b0` |
 | `resort_data_manager.c` | `0x021f1710`–`0x021f1c24` | 30 | complete | string at `0x021f58c0` |
 | `resort_npc.c` | `0x021f1c24`–`0x021f1f1c` | 11 | complete | string at `0x021f58d8` |
-| `resort_sys.c` | `0x021f1f1c`–`0x021f52ac` | 61 | partial | string at `0x021f58e8` |
+| `resort_sys.c` | `0x021f1f1c`–`0x021f52ac` | 61 | complete | string at `0x021f58e8` |
 
 ### Overlay 139
 

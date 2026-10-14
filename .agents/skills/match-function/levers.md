@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A multiply's operand copied right after its `subs` where the original loads the constant first: give the index
+  its own variable and index the elements in place. (matching.md: "The copy of a multiply's operand")
 - A table's base and index swapped between the two registers (`ldr r4, =table; muls; adds r4, r4, r2` in the
   original): index the table in a `static inline` taking the index as an enum type. (matching.md: "A table indexed
   by a field")
@@ -109,6 +111,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A narrow local's stack slot swapped with another's where the original slots it like a temporary: make every
+  callee parameter it is passed to the same type. (matching.md: "A narrow local passed to several calls")
 - An extra slot holding a copy of an address-taken local before a nested loop: read its field inside the inner loop,
   not into a local in the outer one. (matching.md: "hoisted only out of the loop it sits in")
 - Stack locals are laid out in reverse declaration order; to read values in one order and slot them in another,
