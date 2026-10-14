@@ -265,7 +265,7 @@ void func_0204e820(BlActScene *scene, u32 material, NNSGfdPlttKey *plttKey) {
     *plttKey = scene->materials[material].plttKey;
 }
 
-void func_0204e830(BlActScene *scene, u32 material, u32 face, u32 *offset, u32 *faceSize, u8 byRow) {
+void func_0204e830(BlActScene *scene, u32 material, int face, u32 *offset, u32 *faceSize, u8 byRow) {
     BlActMaterial *mat = &scene->materials[material];
 
     switch (mat->texFormat) {
@@ -284,7 +284,7 @@ void func_0204e830(BlActScene *scene, u32 material, u32 face, u32 *offset, u32 *
     if (byRow == FALSE) {
         *offset = face * *faceSize;
     } else {
-        u32 width = mat->texWidth;
+        int width = mat->texWidth;
 
         *offset = *faceSize * (face / width) + face % width * mat->faceWidth;
     }
