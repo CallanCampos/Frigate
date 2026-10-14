@@ -912,6 +912,13 @@ Same instructions, scheduled in another order.
   A pointer local such as `entries = data->entries` is kept, not folded into `data`, once it has a use in a later
   block than its definition, but reads with no store between are merged first. Overlay 332's
   `CygnusData_GetEntry` gets the original's loads this way, with its two stores in the other order (see its row).
+- Two fields of one element of a static table read from the same base, one as `ldr r0, [r1, r2]` and the other
+  after `adds r1, r1, r2; ldrb r1, [r1, #4]`, are a plain read and a read through an inline taking an `int` index.
+  Written plainly, the second field's offset folds into the table's literal (`sMenuInfo+4`); through an element
+  pointer, or a getter whose index has the plain read's type, the element address is shared and computed first,
+  into a new register. The union room's `UnionMsg_UpdateRuleMenu` reads
+  `sMenuInfo[ruleSel[3]].rows[UnionMsg_GetMenuInfo(ruleSel[3])->count - 1]`, with `UnionMsg_GetMenuInfo(int kind)`
+  returning `&sMenuInfo[kind]`; the getter with a `u8` index is 14 bytes off and with `s8` folds again.
 - A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
   shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
   after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets

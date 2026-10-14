@@ -219,6 +219,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
+  offset to the base after a plain read: read that field through an inline taking an `int` index.
+  (matching.md: "Two fields of one element of a static table")
 - A saved register, `bl` and return where the C tail-calls (`ldr r3, =f; bx r3`): the call passes a fourth register
   argument. (matching.md: "four arguments in registers")
 
