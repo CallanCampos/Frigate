@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 16,
-    "texture_set": 298,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_CASTELIA_SEWERS",
+    "texture_set": "MAP_TEXTURE_SET_CASTELIA_SEWERS",
     "srt_animation": 8,
     "pattern_animation": null,
     "exterior": false,

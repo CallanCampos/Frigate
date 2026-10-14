@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 76,
-    "texture_set": 379,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_PLASMA_FRIGATE",
+    "texture_set": "MAP_TEXTURE_SET_PLASMA_FRIGATE_2",
     "srt_animation": 27,
     "pattern_animation": null,
     "exterior": false,

@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A map model: data/map_models/<model>/data.json",
+    "description": "A map model of archive a/0/0/8, whose geometry, materials and placed props are model.glb next to this file and whose collision terrain is its terrain CSVs. tools/data/map_model_data.py packs them in the order of data/constants/map_models.txt. A string value is the name of a constant from data/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "texture_set" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "texture_set": {
+            "type": [ "string", "null" ], "x-constant": "MAP_TEXTURE_SET_",
+            "description": "The texture set the model's materials bind to, where the map matrices' areas or the resource names show it, or null where they don't. Only a model with one can have its texture bindings edited, since the set the game loads depends on the area"
+        },
+        "texture_preview": {
+            "type": "string", "x-constant": "MAP_TEXTURE_SET_",
+            "description": "For a model with no texture_set, one of the sets that has every texture and palette it names, which its GLB shows in Blender"
+        },
+        "transformed": {
+            "enum": [ true ],
+            "description": "Set when the GLB's positions went through the model's node transforms on export, which the packer reverses"
+        }
+    }
+}

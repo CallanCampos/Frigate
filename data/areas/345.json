@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 63,
-    "texture_set": 345,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_P2_LABORATORY_2",
+    "texture_set": "MAP_TEXTURE_SET_P2_LABORATORY_2",
     "srt_animation": 14,
     "pattern_animation": null,
     "exterior": false,

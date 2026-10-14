@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 44,
-    "texture_set": 326,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_SHOPPING_MALL",
+    "texture_set": "MAP_TEXTURE_SET_SHOPPING_MALL",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

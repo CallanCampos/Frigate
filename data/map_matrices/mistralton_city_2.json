@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 848 ]
+        [ "MAP_MODEL_MISTRALTON_CITY_2_M_H03_00_00" ]
     ]
 }

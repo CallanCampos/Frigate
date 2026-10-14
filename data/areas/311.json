@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 29,
-    "texture_set": 311,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_ICIRRUS_CITY_2",
+    "texture_set": "MAP_TEXTURE_SET_ICIRRUS_CITY_2",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

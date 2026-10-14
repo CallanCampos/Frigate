@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 64,
-    "texture_set": 261,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_ASPERTIA_CITY_GYM",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_225",
     "srt_animation": 0,
     "pattern_animation": 0,
     "exterior": true,

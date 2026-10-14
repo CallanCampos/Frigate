@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 40,
-    "texture_set": 322,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_DRIFTVEIL_CITY_7",
+    "texture_set": "MAP_TEXTURE_SET_DRIFTVEIL_CITY_7",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

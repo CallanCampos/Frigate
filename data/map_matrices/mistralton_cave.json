@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 489 ]
+        [ "MAP_MODEL_MISTRALTON_CAVE_M_DUN1501_00_00" ]
     ]
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 60,
-    "texture_set": 242,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_POKESTAR_STUDIOS",
+    "texture_set": "MAP_TEXTURE_SET_POKESTAR_STUDIOS",
     "srt_animation": 0,
     "pattern_animation": 0,
     "exterior": true,

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 80,
-    "texture_set": 388,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_REVERSAL_MOUNTAIN_2",
+    "texture_set": "MAP_TEXTURE_SET_REVERSAL_MOUNTAIN_2",
     "srt_animation": 29,
     "pattern_animation": null,
     "exterior": false,

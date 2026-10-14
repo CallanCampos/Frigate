@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 85,
-    "texture_set": 393,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_VILLAGE_BRIDGE_9",
+    "texture_set": "MAP_TEXTURE_SET_VILLAGE_BRIDGE_9",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

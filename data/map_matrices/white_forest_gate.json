@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 228, 229 ],
-        [ 230, 231 ]
+        [ "MAP_MODEL_WHITE_FOREST_GATE_WF_00_00", "MAP_MODEL_WHITE_FOREST_GATE_WF_01_00" ],
+        [ "MAP_MODEL_WHITE_FOREST_GATE_WF_00_01", "MAP_MODEL_WHITE_FOREST_GATE_WF_01_01" ]
     ]
 }

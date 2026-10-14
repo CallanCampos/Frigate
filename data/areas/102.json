@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 25,
-    "texture_set": 102,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_DREAMYARD",
+    "texture_set": "MAP_TEXTURE_SET_DREAMYARD",
     "srt_animation": 0,
     "pattern_animation": 0,
     "exterior": true,

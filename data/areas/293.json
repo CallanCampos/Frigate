@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 11,
-    "texture_set": 293,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_CHARGESTONE_CAVE",
+    "texture_set": "MAP_TEXTURE_SET_CHARGESTONE_CAVE",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

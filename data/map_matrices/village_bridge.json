@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 188, 189, 190 ],
-        [ 191, 192, 193 ]
+        [ "MAP_MODEL_VILLAGE_BRIDGE_H04_A00_00", "MAP_MODEL_VILLAGE_BRIDGE_H04_A01_00", "MAP_MODEL_VILLAGE_BRIDGE_H04_A02_00" ],
+        [ "MAP_MODEL_VILLAGE_BRIDGE_H04_A00_01", "MAP_MODEL_VILLAGE_BRIDGE_H04_A01_01", "MAP_MODEL_VILLAGE_BRIDGE_H04_A02_01" ]
     ]
 }

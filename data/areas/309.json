@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 27,
-    "texture_set": 309,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_MISTRALTON_CITY_GYM",
+    "texture_set": "MAP_TEXTURE_SET_MISTRALTON_CITY_GYM",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 20,
-    "texture_set": 85,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_MARVELOUS_BRIDGE",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_71",
     "srt_animation": 40,
     "pattern_animation": 0,
     "exterior": true,

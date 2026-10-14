@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 959 ]
+        [ "MAP_MODEL_NIMBASA_CITY_9_M_SEAT02_00_00" ]
     ]
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 55,
-    "texture_set": 337,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_ROYAL_UNOVA",
+    "texture_set": "MAP_TEXTURE_SET_ROYAL_UNOVA",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

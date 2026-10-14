@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 54,
-    "texture_set": 336,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_UNITY_TOWER",
+    "texture_set": "MAP_TEXTURE_SET_UNITY_TOWER",
     "srt_animation": 19,
     "pattern_animation": null,
     "exterior": false,

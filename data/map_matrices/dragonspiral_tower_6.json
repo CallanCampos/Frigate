@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 539 ]
+        [ "MAP_MODEL_DRAGONSPIRAL_TOWER_6_M_DUN0804_00_00" ]
     ]
 }

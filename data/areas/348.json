@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 66,
-    "texture_set": 348,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_ASPERTIA_CITY",
+    "texture_set": "MAP_TEXTURE_SET_ASPERTIA_CITY_2",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

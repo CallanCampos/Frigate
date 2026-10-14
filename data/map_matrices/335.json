@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 356, 358 ],
-        [ 357, 359 ]
+        [ "MAP_MODEL_FREEZEB_00_00", "MAP_MODEL_FREEZEB_01_00" ],
+        [ "MAP_MODEL_FREEZEB_00_01", "MAP_MODEL_FREEZEB_01_01" ]
     ]
 }

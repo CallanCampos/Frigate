@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 889 ]
+        [ "MAP_MODEL_MUSICAL_THEATER_2_M_THEATER02_00_0" ]
     ]
 }

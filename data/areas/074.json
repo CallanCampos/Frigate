@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 18,
-    "texture_set": 74,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_BLACK_CITY",
+    "texture_set": "MAP_TEXTURE_SET_BLACK_CITY",
     "srt_animation": 39,
     "pattern_animation": 0,
     "exterior": true,

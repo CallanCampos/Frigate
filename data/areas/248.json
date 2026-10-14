@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 61,
-    "texture_set": 248,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_MARINE_TUBE",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_214",
     "srt_animation": 51,
     "pattern_animation": 0,
     "exterior": true,

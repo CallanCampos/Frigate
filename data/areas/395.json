@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 87,
-    "texture_set": 395,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_FLOCCESY_TOWN_5",
+    "texture_set": "MAP_TEXTURE_SET_FLOCCESY_TOWN_5",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

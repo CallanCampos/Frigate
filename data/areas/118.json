@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 29,
-    "texture_set": 118,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_BRIDGE_GATE",
+    "texture_set": "MAP_TEXTURE_SET_BRIDGE_GATE",
     "srt_animation": 43,
     "pattern_animation": null,
     "exterior": true,

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 19,
-    "texture_set": 78,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_ROUTE_15",
+    "texture_set": "MAP_TEXTURE_SET_ROUTE_15",
     "srt_animation": 0,
     "pattern_animation": 0,
     "exterior": true,

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 51,
-    "texture_set": 206,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_GIANT_CHASM",
+    "texture_set": "MAP_TEXTURE_SET_GIANT_CHASM",
     "srt_animation": 0,
     "pattern_animation": 0,
     "exterior": true,

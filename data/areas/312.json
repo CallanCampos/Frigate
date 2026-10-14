@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 30,
-    "texture_set": 312,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_OPELUCID_CITY_GYM",
+    "texture_set": "MAP_TEXTURE_SET_OPELUCID_CITY_GYM",
     "srt_animation": 13,
     "pattern_animation": null,
     "exterior": false,

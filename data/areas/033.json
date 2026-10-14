@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 7,
-    "texture_set": 33,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_DRIFTVEIL_DRAWBRIDGE",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_26",
     "srt_animation": 0,
     "pattern_animation": 0,
     "exterior": true,

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 49,
-    "texture_set": 199,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_MOOR_OF_ICIRRUS",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_171",
     "srt_animation": 38,
     "pattern_animation": 0,
     "exterior": true,

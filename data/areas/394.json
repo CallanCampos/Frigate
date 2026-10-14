@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 86,
-    "texture_set": 394,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_SHARED_PC01_30",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_B01_KABE",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

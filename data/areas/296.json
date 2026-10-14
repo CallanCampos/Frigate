@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 14,
-    "texture_set": 296,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_VICTORY_ROAD_16",
+    "texture_set": "MAP_TEXTURE_SET_VICTORY_ROAD_16",
     "srt_animation": 3,
     "pattern_animation": null,
     "exterior": false,

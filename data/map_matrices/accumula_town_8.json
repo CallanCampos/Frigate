@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 847 ]
+        [ "MAP_MODEL_ACCUMULA_TOWN_8_M_H02_00_00" ]
     ]
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 38,
-    "texture_set": 320,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_NS_CASTLE",
+    "texture_set": "MAP_TEXTURE_SET_NS_CASTLE",
     "srt_animation": 14,
     "pattern_animation": 1,
     "exterior": false,

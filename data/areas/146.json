@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 36,
-    "texture_set": 146,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_ENTREE_FOREST",
+    "texture_set": "MAP_TEXTURE_SET_ENTREE_FOREST",
     "srt_animation": 57,
     "pattern_animation": 0,
     "exterior": true,

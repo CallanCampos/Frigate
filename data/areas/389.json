@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 81,
-    "texture_set": 389,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_HUMILAU_CITY_GYM",
+    "texture_set": "MAP_TEXTURE_SET_HUMILAU_CITY_GYM",
     "srt_animation": 30,
     "pattern_animation": null,
     "exterior": false,

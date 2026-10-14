@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 157, 158 ],
-        [ 159, 160 ]
+        [ "MAP_MODEL_ANVILLE_TOWN_T05_00_00", "MAP_MODEL_ANVILLE_TOWN_T05_01_00" ],
+        [ "MAP_MODEL_ANVILLE_TOWN_T05_00_01", "MAP_MODEL_ANVILLE_TOWN_T05_01_01" ]
     ]
 }

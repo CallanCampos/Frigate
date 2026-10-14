@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 3,
-    "texture_set": 14,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_SKYARROW_BRIDGE",
+    "texture_set": "MAP_TEXTURE_SET_SKYARROW_BRIDGE",
     "srt_animation": 36,
     "pattern_animation": null,
     "exterior": true,

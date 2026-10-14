@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 621 ],
-        [ 622 ]
+        [ "MAP_MODEL_VIRBANK_COMPLEX_2_M_DUN2301_00_00" ],
+        [ "MAP_MODEL_VIRBANK_COMPLEX_2_M_DUN2301_00_01" ]
     ]
 }

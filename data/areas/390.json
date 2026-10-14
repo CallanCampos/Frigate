@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 82,
-    "texture_set": 390,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_NACRENE_CITY",
+    "texture_set": "MAP_TEXTURE_SET_NACRENE_CITY",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

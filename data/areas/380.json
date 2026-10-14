@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 77,
-    "texture_set": 380,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_CAVE_OF_BEING",
+    "texture_set": "MAP_TEXTURE_SET_CAVE_OF_BEING",
     "srt_animation": 3,
     "pattern_animation": null,
     "exterior": false,

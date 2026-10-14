@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 22,
-    "texture_set": 92,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_CELESTIAL_TOWER",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_77",
     "srt_animation": 41,
     "pattern_animation": 0,
     "exterior": true,

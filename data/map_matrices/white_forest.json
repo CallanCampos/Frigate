@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 366, 367 ],
-        [ 368, 369 ]
+        [ "MAP_MODEL_WHITE_FOREST_SWWF_00_00", "MAP_MODEL_WHITE_FOREST_SWWF_01_00" ],
+        [ "MAP_MODEL_WHITE_FOREST_SWWF_00_01", "MAP_MODEL_WHITE_FOREST_SWWF_01_01" ]
     ]
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 2,
-    "texture_set": 284,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_NUVEMA_TOWN",
+    "texture_set": "MAP_TEXTURE_SET_NUVEMA_TOWN",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

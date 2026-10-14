@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 15,
-    "texture_set": 65,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_VILLAGE_BRIDGE",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_54",
     "srt_animation": 0,
     "pattern_animation": 0,
     "exterior": true,

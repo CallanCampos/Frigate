@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 23,
-    "texture_set": 305,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_MUSICAL_THEATER",
+    "texture_set": "MAP_TEXTURE_SET_MUSICAL_THEATER",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

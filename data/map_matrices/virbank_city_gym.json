@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 856 ]
+        [ "MAP_MODEL_VIRBANK_CITY_GYM_M_GYM0201_00_00" ]
     ]
 }

@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 24,
-    "texture_set": 98,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_ENTRALINK",
+    "texture_set": "MAP_TEXTURE_SET_ENTRALINK",
     "srt_animation": 56,
     "pattern_animation": 0,
     "exterior": true,

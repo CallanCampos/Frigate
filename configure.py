@@ -4,6 +4,7 @@
 Run this once after cloning (and again after adding source files), then run `ninja`.
 """
 import argparse
+import ast
 import hashlib
 import io
 import json
@@ -179,9 +180,13 @@ DATA_PACKS = [
     ("tools/data/zone_data.py", "data/zones", ["a/0/1/2"], False, ["data/events"]),
     ("tools/data/trade_data.py", "data/trades", ["a/1/6/3"], False),  # In-game trades
     ("tools/data/map_matrix_data.py", "data/map_matrices", ["a/0/0/9"], False),  # Map matrices
-    ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True),  # Map model glTF sources
-    ("tools/data/field_prop_model_data.py", "data/field_prop_models/exterior", ["a/2/2/5"], True),
-    ("tools/data/field_prop_model_data.py", "data/field_prop_models/interior", ["a/2/2/6"], True),
+    # Map models, whose GLBs show the map texture sets' PNGs, which name the textures they bind
+    ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True, ["data/map_texture_sets"]),
+    # Field prop models, which their bundles' textures go with in the same way
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/exterior", ["a/2/2/5"], True,
+     ["data/field_prop_textures/exterior", "data/field_prop_models/field_prop_model.schema.json"]),
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/interior", ["a/2/2/6"], True,
+     ["data/field_prop_textures/interior", "data/field_prop_models/field_prop_model.schema.json"]),
     ("tools/data/map_texture_data.py", "data/map_texture_sets", ["a/0/1/4"], True),  # Map texture PNG sources
     ("tools/data/map_texture_data.py", "data/field_prop_textures/exterior", ["a/1/7/4"], True),
     ("tools/data/map_texture_data.py", "data/field_prop_textures/interior", ["a/1/7/5"], True),
@@ -207,12 +212,40 @@ DATA_PACKS = [
     ("tools/data/event_data.py", "data/events", ["a/1/2/6"], False),
 ]
 # What every packer reads besides its data: the scripts, and the move tutors' tables, which name the species data's
-# tutor bits (tools/data/species_data.py)
+# tutor bits (tools/data/species_data.py). A packer also depends on the modules of tools/ that it imports
+# (script_imports).
 DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/data/gen_constants.py", "tools/data/narc.py",
-                   "tools/data/map_terrain_data.py", "tools/data/map_texture_data.py",
-                   "tools/data/nitro_dictionary.py",
                    "tools/text/text_sources.py", "tools/text/text_data.py", "tools/text/msgdata.py",
                    "src/ov036/scrcmd_shop.c", "tools/data/facility_data.py", "tools/data/make_constants.py"]
+# The C files a packer reads its tables from, besides scrcmd_shop.c
+DATA_PACK_SOURCES = {"tools/data/pokemon_graphics.py": ["src/system/poke_icon.c"],
+                     "tools/data/pokemon_cries.py": ["src/system/poke_icon.c"]}
+
+
+def script_imports(script: str) -> list[str]:
+    """Returns the modules of tools/ that a script imports, and theirs: as tools.data.narc, or as narc from the
+    script's own directory. Imports inside functions are left out, since those are the one-off commands'."""
+    found: list[str] = []
+    pending = [ROOT / script]
+    while pending:
+        path = pending.pop()
+        nodes = list(ast.parse(path.read_text()).body)
+        while nodes:
+            node = nodes.pop()
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                continue
+            nodes.extend(ast.iter_child_nodes(node))
+            names = ([alias.name for alias in node.names] if isinstance(node, ast.Import) else
+                     [node.module] if isinstance(node, ast.ImportFrom) and node.module and not node.level else [])
+            for name in names:
+                for candidate in (ROOT / (name.replace(".", "/") + ".py"), path.parent / f"{name}.py"):
+                    if candidate.is_file() and candidate.is_relative_to(ROOT / "tools"):
+                        module = str(candidate.relative_to(ROOT))
+                        if module not in found and candidate != ROOT / script:
+                            found.append(module)
+                            pending.append(candidate)
+                        break
+    return sorted(found)
 
 # The data in JSON that the text takes messages from, with \from{...} lines (tools/text/text_sources.py)
 TEXT_DATA_DIRS = ["data/pokemon", "data/moves", "data/items", "data/trainers", "data/abilities", "data/types",
@@ -454,13 +487,8 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         sources = sorted(str(p.relative_to(ROOT)) for d in [data_dir, *(other_dirs[0] if other_dirs else [])]
                          for p in ([ROOT / d] if (ROOT / d).is_file() else (ROOT / d).rglob("*")) if p.is_file())
         game = VERSIONS[version]["defines"][0].lower() if per_version else ""
-        dependencies = [script, *DATA_PACK_TOOLS, *constant_sources]
-        if script == "tools/data/field_prop_model_data.py":
-            dependencies.append("tools/data/map_model_data.py")
-        if script == "tools/data/pokemon_graphics.py":
-            dependencies.extend(["tools/data/nitro_2d.py", "src/system/poke_icon.c"])
-        if script == "tools/data/pokemon_cries.py":
-            dependencies.append("tools/data/pokemon_graphics.py")
+        dependencies = sorted({script, *DATA_PACK_TOOLS, *script_imports(script), *DATA_PACK_SOURCES.get(script, []),
+                               *constant_sources})
         n.build(outputs, "data_pack", sources, implicit=dependencies,
                 order_only=[files_ok], variables={"script": script, "dir": data_dir, "game": game})
         for path, archive in zip(paths, outputs):

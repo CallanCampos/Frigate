@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 35,
-    "texture_set": 143,
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_NIMBASA_CITY_2",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_121",
     "srt_animation": 45,
     "pattern_animation": 0,
     "exterior": true,

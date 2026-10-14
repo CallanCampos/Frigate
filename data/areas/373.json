@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 74,
-    "texture_set": 373,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_WHITE_TREEHOLLOW",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_CHIP_COUNTER_45",
     "srt_animation": 25,
     "pattern_animation": null,
     "exterior": false,

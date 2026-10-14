@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 931, 932, 948, 949, 950 ]
+        [ "MAP_MODEL_ROYAL_UNOVA_M_CABIN01_00_00", "MAP_MODEL_ROYAL_UNOVA_M_CABIN01_01_00", "MAP_MODEL_ROYAL_UNOVA_M_CABIN01_02_00", "MAP_MODEL_ROYAL_UNOVA_M_CABIN01_03_00", "MAP_MODEL_ROYAL_UNOVA_M_CABIN01_04_00" ]
     ]
 }

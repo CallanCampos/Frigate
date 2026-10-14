@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 60,
-    "texture_set": 342,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_CASTELIA_CITY_22",
+    "texture_set": "MAP_TEXTURE_SET_CASTELIA_CITY_22",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

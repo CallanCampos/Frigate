@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 52,
-    "texture_set": 334,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_POKEMON_LEAGUE_7",
+    "texture_set": "MAP_TEXTURE_SET_POKEMON_LEAGUE_7",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,

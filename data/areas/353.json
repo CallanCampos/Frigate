@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 71,
-    "texture_set": 353,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_JOIN_AVENUE",
+    "texture_set": "MAP_TEXTURE_SET_JOIN_AVENUE",
     "srt_animation": 23,
     "pattern_animation": null,
     "exterior": false,

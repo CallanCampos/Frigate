@@ -20,11 +20,24 @@
             "description": "This schema, for editors"
         },
         "prop_bundle": {
-            "$ref": "#/$defs/u16",
-            "description": "The area's props, a file of ARCID_AREA_BMDATA_EXT or ARCID_AREA_BMDATA_INT"
+            "type": [
+                "string",
+                "integer"
+            ],
+            "x-constant": "FIELD_PROPS_",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "The area's props: a FIELD_PROPS_EXTERIOR_* constant for an exterior area, a file of ARCID_AREA_BMDATA_EXT, or a FIELD_PROPS_INTERIOR_* one, of ARCID_AREA_BMDATA_INT, or a number where the archive has no such file"
         },
         "texture_set": {
-            "$ref": "#/$defs/u16"
+            "type": [
+                "string",
+                "integer"
+            ],
+            "x-constant": "MAP_TEXTURE_SET_",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "The area's map texture set, a MAP_TEXTURE_SET_* constant (a/0/1/4)"
         },
         "srt_animation": {
             "type": [

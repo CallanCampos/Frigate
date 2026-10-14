@@ -1,7 +1,7 @@
 {
     "$schema": "area.schema.json",
-    "prop_bundle": 57,
-    "texture_set": 339,
+    "prop_bundle": "FIELD_PROPS_INTERIOR_LIBERTY_GARDEN",
+    "texture_set": "MAP_TEXTURE_SET_LIBERTY_GARDEN",
     "srt_animation": null,
     "pattern_animation": null,
     "exterior": false,
