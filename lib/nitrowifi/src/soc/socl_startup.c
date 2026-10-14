@@ -31,12 +31,12 @@ int SOCL_Startup(SOCLConfig *config) {
     if (SOCLiConfigPtr != NULL) {
         return 0;
     }
-    func_ov011_02157980();
+    SOCLi_ResetSocketCount();
     SOCLiConfigPtr = config;
     SOCLi_StartupCPS();
     result = SOCLi_StartupSOCL();
     if (result < 0) {
-        func_ov011_02157688();
+        SOCLi_CleanupCPS();
         SOCLiConfigPtr = NULL;
     }
     return result;
@@ -97,7 +97,7 @@ static void SOCLi_StartupCPS(void) {
     CPS_SetThreadPriority(config->cps_thread_prio ? config->cps_thread_prio : 11);
     func_ov011_0215cb8c(CPSi_RecvCallback);
     CPS_SetScavengerCallback(SOCLi_TrashSocket);
-    CPS_SetAddressCheckCallback(func_ov011_02157a48);
+    CPS_SetAddressCheckCallback(SOCLi_AddressCheckCallback);
     CPS_Startup(cps);
 }
 

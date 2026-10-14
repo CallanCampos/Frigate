@@ -72,9 +72,9 @@ int SOCL_Close(int socket) {
     s->state |= SOCLI_STATE_CLOSING | SOCLI_STATE_CLOSE_CALLED;
     if (SOCLi_SocketIsTCP(s)) {
         SOCLi_SendCommandPacket(s->send_pipe, NULL);
-        data_ov011_0218dc4c[0]--;
+        SOCLiSocketCount[0]--;
     } else {
-        data_ov011_0218dc4c[1]--;
+        SOCLiSocketCount[1]--;
     }
     packet = SOCLi_CreateCommandPacket(SOCLi_CloseCallBack, s, 1);
     packet->reply_queue = NULL;

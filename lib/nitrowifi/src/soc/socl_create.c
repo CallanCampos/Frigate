@@ -27,9 +27,9 @@ int SOCL_CreateSocket(const SOCLSocketParam *param) {
     SOCLi_ExecCommandPacketInCtrlPipe(socket, SOCLi_CreateCommandPacket(SOCLi_CreateSocketCallBack, socket, 1));
     if (SOCLi_SocketIsCreated(socket)) {
         if (SOCLi_SocketIsTCP(socket)) {
-            data_ov011_0218dc4c[0]++;
+            SOCLiSocketCount[0]++;
         } else {
-            data_ov011_0218dc4c[1]++;
+            SOCLiSocketCount[1]++;
         }
     }
     return (int)socket;

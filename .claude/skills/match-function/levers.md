@@ -58,6 +58,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A struct member's offset loaded early into `r6`/`r7` and added to the base at each use: a local pointer to the
   member, assigned where the original loads the offset. (matching.md: "pointer to a struct member")
 
+- A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
+  with other threads and `volatile`. (matching.md: "A field that other threads change")
+
 ## Stack slots or frame size
 
 - An extra slot holding a copy of an address-taken local before a nested loop: read its field inside the inner loop,

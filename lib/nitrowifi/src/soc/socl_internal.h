@@ -68,9 +68,11 @@ typedef struct SOCLSendPipe {
 
 // A socket, 0xbc bytes, followed in memory by its pipes and buffers
 typedef struct SOCLSocket {
-    u8 unk_00[0x48];
+    u8 unk_00[8];              // The socket starts with its CPSSoc (0xa0 bytes: SOCL_Resolve makes one on its own)
+    u8 cps_state;              // 0x08, CPSSoc.state
+    u8 unk_09[0x3f];
     SOCLSocketBuffer rcvbuf;   // 0x48
-    u8 unk_50[4];
+    u32 rcvbuf_len;            // CPSSoc.rcvbuf_len: how much of the receive buffer holds data
     SOCLSocketBuffer sndbuf;   // 0x54
     SOCLSocketBuffer rcvbuf_aux;
     SOCLSocketBuffer sndbuf_aux;
@@ -78,7 +80,10 @@ typedef struct SOCLSocket {
     SOCLCommandPipe *recv_pipe;
     SOCLCommandPipe *send_pipe;
     int result; // What the last command packet returned
-    s16 state;  // SOCLI_STATE_*
+    // SOCLI_STATE_*. volatile: the command pipes' threads change it while callers test it, and the original reloads it
+    // for each test (a plain s16 gets one load shared by the tests, and SOCL_GetStatus, SOCL_Connect, SOCLi_ReadFrom and
+    // SOCL_WriteTo change)
+    volatile s16 state;
     s8 flag_block;
     s8 flag;    // The mode (SOCLSocketParam's flag_mode), copied into each command packet
     u16 local_port;  // 0xb0
@@ -222,8 +227,24 @@ int SOCL_Close(int socket);
 void SOCLi_TrashSocket(void);
 
 // socl_cleanup.c
-// Shuts CPS down after a failed SOCL_Startup (no counterpart in pokediamond's NitroWiFi)
-void func_ov011_02157688(void);
+int SOCL_Cleanup(void);
+int SOCL_CalmDown(void);
+CPSInAddr SOCL_Resolve(const char *name);
+CPSInAddr SOCL_InetAtoH(const char *name);
+CPSInAddr SOCL_GetHostID(void);
+int SOCL_SetResolver(CPSInAddr dns1, CPSInAddr dns2);
+// Shuts CPS down after a failed SOCL_Startup, and in SOCL_Cleanup (no counterpart in pokediamond's NitroWiFi, whose
+// SOCL_Cleanup does it inline; name a guess)
+void SOCLi_CleanupCPS(void);
+
+// socl_poll.c
+// SOCL_GetStatus's bits
+#define SOCL_STATUS_READABLE 0x01  // Data to read (or a datagram)
+#define SOCL_STATUS_WRITABLE 0x08  // Room in the send buffer
+#define SOCL_STATUS_ERROR 0x20     // The connect failed
+#define SOCL_STATUS_NOTCONN 0x40   // Neither connecting nor connected
+#define SOCL_STATUS_INVALID 0x80   // Not a socket
+int SOCL_GetStatus(SOCLSocket *socket);
 
 // socl_misc.c
 u32 SOCLi_RoundUp4(u32 value);
@@ -234,9 +255,9 @@ int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSIn
 BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc);
 
 // socl_list.c
-// Two counters that SOCL_CreateSocket raises, for the TCP sockets and for the others (a later file's data, probably
-// the socket list's, unnamed yet)
-extern s32 data_ov011_0218dc4c[2];
+// Two counters that SOCL_CreateSocket raises and SOCL_Close lowers, for the TCP sockets and for the others (the name
+// and the split are guesses)
+extern s32 SOCLiSocketCount[2];
 // Puts a new socket in the list of sockets (SOCLi_SocketRegister in pokediamond's NitroWiFi)
 void SOCLi_SocketRegister(SOCLSocket *socket);
 BOOL SOCL_SocketIsInvalid(const SOCLSocket *socket); // TRUE for a handle that is not a socket of the list
@@ -245,10 +266,12 @@ void SOCLi_SocketUnregister(SOCLSocket *socket);
 void SOCLi_SocketRegisterTrash(SOCLSocket *socket);
 void SOCLi_SocketUnregisterTrash(SOCLSocket *socket);
 // The sockets that were closed and wait for SOCLi_TrashSocket to free them
+extern SOCLSocket *SOCLiSocketList;
 extern SOCLSocket *SOCLiSocketListTrash;
-// Prepares the socket lists before SOCL starts (no counterpart in pokediamond's NitroWiFi)
-void func_ov011_02157980(void);
-// CPS's address check callback (no counterpart in pokediamond's NitroWiFi)
-BOOL func_ov011_02157a48(void);
+// Zeroes the socket counters before SOCL starts (no counterpart in pokediamond's NitroWiFi; name a guess)
+void SOCLi_ResetSocketCount(void);
+// CPS's address check callback: drops a gateway or DNS server that the net mask and address rule out (no counterpart in
+// pokediamond's NitroWiFi; name a guess)
+BOOL SOCLi_AddressCheckCallback(void);
 
 #endif // POKEBW2_NITROWIFI_SOCL_INTERNAL_H
