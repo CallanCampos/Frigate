@@ -604,11 +604,11 @@ static void MicTest_FreeWindows(MicTestBG *bg) {
 
 static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, void *arg) {
     u8 *buffer;
-    enum { MIC_BUFFER_SIZE = 0x120 } bufferSize;
+    u32 bufferSize;
 
     setupMic(heapId);
     GCTX_HIDBlockSleep(8);
-    bufferSize = MIC_BUFFER_SIZE;
+    bufferSize = 0x120;
     buffer = GFL_HeapAllocate(heapId, bufferSize, FALSE, "mictest.c", 1539);
     sys_memset(buffer, 0, bufferSize);
     mic->buffer = buffer;
@@ -616,7 +616,9 @@ static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, v
     mic->param.buffer = (void *)(((u32)buffer + 0x1f) & ~0x1f);
     mic->param.rate = MIC_SAMPLING_RATE_8180;
     mic->param.loop = TRUE;
-    mic->param.size = bufferSize - 0x20;
+    // Less the 32 bytes that aligning the start may skip
+    mic->param.size = bufferSize;
+    mic->param.size -= 0x20;
     mic->param.fullCallback = callback;
     mic->param.fullArg = arg;
     mic->wasOpen = func_02006e3c();
