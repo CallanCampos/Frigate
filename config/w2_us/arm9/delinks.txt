@@ -1320,6 +1320,7 @@ src/system/join_avenue_savedata.c:
     .bss        start:0x02140fb0 end:0x02140fb4
 
 src/system/key_data_savedata.c:
+    complete
     .text       start:0x02010230 end:0x020103f4
     .rodata     start:0x0208fa18 end:0x0208fa24
 
