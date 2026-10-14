@@ -146,6 +146,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- A stack argument stored after the next argument's setup starts, where the original stores it first, around a
+  spilled local: sweep the local's width together with its callee's return type and `value` local.
+  (matching.md: "A spilled local's width for the rule below")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a

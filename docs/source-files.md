@@ -2717,7 +2717,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | partial | descriptive |
+| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | complete | descriptive |
 | `wbt_list_graphic.c` | `0x0219eb70`–`0x0219edb4` | 16 | complete | string at `0x0219f140` |
 
 ### Overlay 321
