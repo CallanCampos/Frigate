@@ -453,6 +453,7 @@ src/system/bmp_oam.c:
     .data       start:0x0209a5a4 end:0x0209a5b0
 
 src/system/country_region.c:
+    complete
     .text       start:0x0202b488 end:0x0202b600
     .rodata     start:0x02091ae0 end:0x02091de0
 
