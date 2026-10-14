@@ -58,8 +58,17 @@ extern SOCLSocketParam SOCLSocketParamTCP;
 extern SOCLSocketParam SOCLSocketParamUDPSend;
 
 // SOCL's errors, as negative return values (BSD's numbers)
+#define SOCL_EAGAIN (-6)
+#define SOCL_EALREADY (-7)
+#define SOCL_ECONNRESET (-15)
+#define SOCL_EINPROGRESS (-26)
+#define SOCL_EINVAL (-28)
+#define SOCL_EMFILE (-33)
+#define SOCL_EISCONN (-30)
 #define SOCL_ENETRESET (-39) // SOCL has not been started
 #define SOCL_ENOMEM (-49)
+#define SOCL_ENOTCONN (-56)
+#define SOCL_ETIMEDOUT (-76)
 
 int SOCL_Startup(SOCLConfig *config);
 int SOCL_CreateSocket(const SOCLSocketParam *param);

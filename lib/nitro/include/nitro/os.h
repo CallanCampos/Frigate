@@ -90,6 +90,8 @@ s32 func_0207a1a0(u16 lockId);
 // NitroSDK's OS_DisableInterrupts and OS_RestoreInterrupts, under swan's names
 u32 CPU_IRQDisable(void);
 u32 CPU_SetIRQMask(u32 mask);
+// NitroSDK's OS_GetProcMode: the processor mode, 0x12 in an IRQ handler
+u32 CPU_GetMode(void);
 // NitroSDK's OS_EnableIrqMask, under swan's name
 u32 CPU_EnableInterrupts(u32 mask);
 // NitroSDK's OS_Sleep: waits for some milliseconds, letting other threads run
@@ -327,6 +329,8 @@ typedef struct OSMutex {
 
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
+// NitroSDK's OS_TryLockMutex: TRUE when it got the mutex, without waiting
+BOOL func_0207aeec(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
 
 #endif // POKEBW2_NITRO_OS_H

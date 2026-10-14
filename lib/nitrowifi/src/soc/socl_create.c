@@ -110,8 +110,8 @@ static u8 *SOCLi_InitSocket(SOCLSocket *socket, const SOCLSocketParam *param) {
         data = SOCLi_InitCommandPipe(data + sizeof(SOCLRecvPipe), &pipe->base, &param->rcv_pipe);
         data = SOCLi_InitSocketBuffer(data, &socket->rcvbuf, param->buffer.rcvbuf_size);
         data = SOCLi_InitSocketBuffer(data, &socket->rcvbuf_aux, param->buffer.rcvbuf_aux_size);
-        pipe->unk_10a = param->buffer.rcvpipe_unk_e;
-        pipe->unk_10c = pipe->unk_110 = 0;
+        pipe->udp_queued_max = param->buffer.rcvpipe_unk_e;
+        pipe->udp_wait.head = pipe->udp_wait.tail = NULL;
     }
     if (param->buffer.sndbuf_size != 0) {
         SOCLSendPipe *pipe = (SOCLSendPipe *)data;
