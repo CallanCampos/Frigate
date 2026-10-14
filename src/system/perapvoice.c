@@ -48,23 +48,23 @@ void *getChatterVoice(PerapVoice *chatter) {
     return chatter->voice;
 }
 
+static inline s8 PerapVoice_DecodeSample(u8 nibble) {
+    s8 sample = nibble - 8;
+    return sample << 4;
+}
+
 void PerapVoice_Decode(s8 *dest, const s8 *src) {
     int i;
     int pos = 0;
     int j;
-    u8 nibble;
     s8 sample;
 
     for (i = 0; i < PERAP_VOICE_SAMPLES / 2; i++) {
-        nibble = src[i] & 0xf;
-        sample = nibble - 8;
-        sample <<= 4;
+        sample = PerapVoice_DecodeSample(src[i] & 0xf);
         for (j = 0; j < 4; j++) {
             dest[pos + j] = sample;
         }
-        nibble = src[i] >> 4;
-        sample = nibble - 8;
-        sample <<= 4;
+        sample = PerapVoice_DecodeSample(src[i] >> 4);
         for (j = 4; j < 8; j++) {
             dest[pos + j] = sample;
         }

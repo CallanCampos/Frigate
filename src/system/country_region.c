@@ -193,15 +193,17 @@ BOOL Country_IsValidPlace(u32 country, u32 region, BOOL japanOnly) {
         if (region == 0 && CountryHasProvinces(country)) {
             return FALSE;
         }
-    }
-    if (country != COUNTRY_NONE) {
-        for (i = 0; i < gSelectableCountryCount; i++) {
-            if (gSelectableCountries[i] == country) {
-                break;
+        // The original tests the country again, and its loop test is a 0/1 value, which keeps the loop entered at
+        // its test (docs/matching.md)
+        if (country != COUNTRY_NONE) {
+            for (i = 0; i < gSelectableCountryCount ? TRUE : FALSE; i++) {
+                if (gSelectableCountries[i] == country) {
+                    break;
+                }
             }
-        }
-        if (i >= gSelectableCountryCount) {
-            return FALSE;
+            if (i >= gSelectableCountryCount) {
+                return FALSE;
+            }
         }
     }
     if (CountryHasProvinces(country) < region) {

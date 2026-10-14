@@ -129,7 +129,7 @@ SaveControl *SaveControl_GetInstance(void);
 // Frees the save data and its control
 void SaveControl_Free(void);
 EncountSave *SaveControl_GetEncountSave(SaveControl *save);
-u32 func_02007560(SaveControl *save, u32 block, u32 heapId, void *buffer, u32 size);
+u32 func_02007560(SaveControl *save, u32 block, HeapID heapId, void *buffer, u32 size);
 // The save data Game Sync uploads, and its size
 void *func_02007454(SaveControl *save, u32 *size);
 // The sizes of a downloaded C-Gear skin and Pokédex skin, and a Pokédex skin block's valid flag
