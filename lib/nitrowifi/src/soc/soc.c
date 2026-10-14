@@ -4,7 +4,8 @@
 #include "nitro/os.h"
 
 // soc.c: the BSD-style SOC_ calls over SOCL, which NitroWiFi's SOC_ API is (pokediamond's soc.o: the same calls under
-// the same names, in the reverse order). Their addresses and ports are in network order, so they swap them. The three
+// the same names, in the reverse order, except that pokediamond calls the host name lookup SOC_GetHostByAddr, the
+// name of the reverse lookup; pokeheartgold's SOC_GetHostByName is the one for it). Their addresses and ports are in network order, so they swap them. The three
 // tables of socket parameters (SOCLSocketParamUDP and the others) are its data.
 
 // How SOC_Socket's sockets are made. A TCP socket gets no receive buffer of its own: it reads from CPS's.
@@ -33,7 +34,7 @@ SOCLSocketParam SOCLSocketParamUDPSend = {
 static SocFreeFunc FreeFunc_SOC;
 static SocAllocFunc AllocFunc_SOC;
 static SocHostEnt sHostEnt;
-// What SOC_GetHostByAddr gives: the address, the list of addresses (one, and NULL), and the name
+// What SOC_GetHostByName gives: the address, the list of addresses (one, and NULL), and the name
 static u32 sHostAddr;
 static u8 *sHostAddrList[2];
 static char sInetNtoABuffer[16];
@@ -111,7 +112,7 @@ int SOC_Close(int sock) {
     return SOCL_Close(sock);
 }
 
-SocHostEnt *SOC_GetHostByAddr(const char *host) {
+SocHostEnt *SOC_GetHostByName(const char *host) {
     CPSInAddr addr = SOCL_Resolve(host);
 
     if (addr == 0) {

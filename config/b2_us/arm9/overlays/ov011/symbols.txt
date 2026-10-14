@@ -322,7 +322,7 @@ SOC_Send kind:function(thumb,size=0x14) addr:0x02157cbc
 SOC_SendTo kind:function(thumb,size=0x60) addr:0x02157cd0
 SOC_Shutdown kind:function(thumb,size=0x8) addr:0x02157d30
 SOC_Close kind:function(thumb,size=0x8) addr:0x02157d38
-SOC_GetHostByAddr kind:function(thumb,size=0x80) addr:0x02157d40
+SOC_GetHostByName kind:function(thumb,size=0x80) addr:0x02157d40
 SOC_GetSockName kind:function(thumb,size=0x6a) addr:0x02157dc0
 SOC_GetHostID kind:function(thumb,size=0x2a) addr:0x02157e2c
 SOC_GetResolver kind:function(thumb,size=0x4c) addr:0x02157e58
@@ -2765,7 +2765,7 @@ data_ov011_0219089c kind:bss addr:0x0219089c
 data_ov011_021908ac kind:bss addr:0x021908ac
 data_ov011_021908c0 kind:bss addr:0x021908c0
 data_ov011_02190904 kind:bss addr:0x02190904
-data_ov011_02190928 kind:bss addr:0x02190928
+sEngine kind:bss addr:0x02190928
 data_ov011_02190964 kind:bss addr:0x02190964
 data_ov011_02190968 kind:bss addr:0x02190968
 data_ov011_02190d03 kind:bss addr:0x02190d03

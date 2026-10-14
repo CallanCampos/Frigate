@@ -7,7 +7,7 @@
 // (func_ov011_0217d144 and the other func_ov011_0217dNNN addresses declared in ext.h) isn't decompiled either, so
 // every name and struct field here is a guess read off this file's own behavior, never swan's or the SDK's.
 
-// The one engine this build creates (data_ov011_02190928); every function below reaches it through Gt2_GetEngine
+// The one engine this build creates (sEngine); every function below reaches it through Gt2_GetEngine
 typedef struct GT2Engine {
     void *socket;                       // the lower layer's socket handle
     void *connections;                  // GT2Connection array, the established connections, keyed by ip and port

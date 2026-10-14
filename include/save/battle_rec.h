@@ -118,7 +118,7 @@ typedef struct {
 #define BATTLE_REC_BLOCK_SIZE 0x1a00
 // The version that a video's header carries
 #define BATTLE_REC_VERSION 100
-// The battle modes that a header's mode can be, the size of data_0208f7b8
+// The battle modes that a header's mode can be, the size of sBattleRecModes
 #define BATTLE_REC_MODE_MAX 41
 // The Pokémon that a header lists
 #define BATTLE_REC_HEADER_PKM_MAX 12

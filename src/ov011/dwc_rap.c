@@ -194,10 +194,10 @@ int DWCRap_Init(void *userData, DWCFriendData *friendList) {
     for (i = 0; i < DWCRAP_FRIEND_MAX; i++) {
         _dWork->friendStatus[i] = 0;
     }
-    if (!func_02057d40(_dWork->userData)) {
+    if (!DWC_CheckHasProfile(_dWork->userData)) {
         return 1;
     }
-    if (!func_02057cd8(_dWork->userData)) {
+    if (!DWC_CheckValidConsole(_dWork->userData)) {
         return 2;
     }
     return 0;
