@@ -345,7 +345,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `net_devwireless.c` | `0x021730e0`–`0x0217333c` | 39 | complete | string at `0x0217576c` |
 | `net_whpipe.c` | `0x0217333c`–`0x02174140` | 60 | complete | string at `0x02175780` |
-| `wih.c` | `0x02174140`–`0x02175680` | 70 | partial | string at `0x021757b4` |
+| `wih.c` | `0x02174140`–`0x02175680` | 70 | complete | string at `0x021757b4` |
 
 ### Overlay 31
 
