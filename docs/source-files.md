@@ -356,7 +356,7 @@ prints the tables below from the configs and the ROM:
 | `net_devirc.c` | `0x02175800`–`0x0217591c` | 24 | complete | descriptive |
 | `net_irc.c` | `0x0217591c`–`0x02175f30` | 24 | complete | descriptive |
 | `irc_link.c` | `0x02175f30`–`0x02176384` | 19 | partial | descriptive |
-| `irc_spi.c` | `0x02176384`–`0x02176628` | 7 | partial | descriptive |
+| `irc_spi.c` | `0x02176384`–`0x02176628` | 7 | complete | descriptive |
 
 ### Overlay 32
 

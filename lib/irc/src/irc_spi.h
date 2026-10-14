@@ -1,5 +1,5 @@
-#ifndef POKEBW2_FIELD_IRC_SPI_H
-#define POKEBW2_FIELD_IRC_SPI_H
+#ifndef POKEBW2_IRC_IRC_SPI_H
+#define POKEBW2_IRC_IRC_SPI_H
 
 #include "types.h"
 
@@ -14,4 +14,4 @@ void IrcSpi_Release(void);
 u8 IrcSpi_Recv(u8 *buf);
 void IrcSpi_Send(const u8 *data, int size);
 
-#endif // POKEBW2_FIELD_IRC_SPI_H
+#endif // POKEBW2_IRC_IRC_SPI_H

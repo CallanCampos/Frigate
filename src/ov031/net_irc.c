@@ -3,10 +3,10 @@
 // peer filter that the games set through net_devirc.h.
 #include "field/net_irc.h"
 #include "field/net_devirc.h"
-#include "field/irc_link.h"
 #include "gfl/net_handle.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
+#include "irc/irc_link.h"
 #include "nitro/wm.h"
 
 // The most data one packet carries, and the size of a whole one

@@ -1,5 +1,5 @@
-#ifndef POKEBW2_FIELD_IRC_LINK_H
-#define POKEBW2_FIELD_IRC_LINK_H
+#ifndef POKEBW2_IRC_IRC_LINK_H
+#define POKEBW2_IRC_IRC_LINK_H
 
 #include "types.h"
 
@@ -25,4 +25,4 @@ BOOL IrcLink_Poll(void);
 void IrcLink_SetRecvCallback(void (*callback)(u8 *data, u8 size, u8 cmd, u8 id));
 u8 IrcLink_GetPeerId(void);
 
-#endif // POKEBW2_FIELD_IRC_LINK_H
+#endif // POKEBW2_IRC_IRC_LINK_H

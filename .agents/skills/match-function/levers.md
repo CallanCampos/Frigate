@@ -246,6 +246,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
+- At `-O2,p` (`lib/irc`) loops are not rotated; a guard before the first pass and the test at the end is a guarded
+  `do`/`while`, `if (i < size) do ... while (++i < size)`. (matching.md: "At `-O2,p` no loop is rotated")
 - A loop that runs once is unrolled when its counter and bound have the same signedness; `int i < NELEMS(x)` compares
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an

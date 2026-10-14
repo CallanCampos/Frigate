@@ -1,7 +1,8 @@
 // Overlay 31, the last of its four files (see net_devirc.c): the SPI bus to the card's infrared chip, which it talks
 // to through the backup SPI bus (as src/ov338/ir_check.c does). A transfer is a command byte, 1 to read and 2 to
-// write, and then the bytes, with a pause of 60 microseconds between.
-#include "field/irc_spi.h"
+// write, and then the bytes, with a pause of 60 microseconds between. Built at -O2,p as part of lib/irc (see its
+// library.toml), whose name is ours.
+#include "irc_spi.h"
 #include "nitro/card.h"
 #include "nitro/hw.h"
 #include "nitro/os.h"

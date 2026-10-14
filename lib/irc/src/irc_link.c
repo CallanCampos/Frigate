@@ -1,7 +1,8 @@
 // Overlay 31, the third of its four files (see net_devirc.c): the link of frames between the two machines. One pings,
 // the other answers, and then they send each other frames that carry a checksum, over the SPI bus of irc_spi.c.
-#include "field/irc_link.h"
-#include "field/irc_spi.h"
+// Built at -O2,p as part of lib/irc (see its library.toml), whose name is ours.
+#include "irc/irc_link.h"
+#include "irc_spi.h"
 #include "nitro/os.h"
 
 // How long a ping may go unanswered, in milliseconds
@@ -53,7 +54,7 @@ typedef struct {
 static u16 IrcLink_Checksum(const u8 *data, u32 size);
 static void IrcLink_OnError(void);
 static void IrcLink_ClearState(void);
-static void IrcLink_SendFrame(const u8 *data, int size, u8 cmd, u8 id);
+static void IrcLink_SendFrame(const u8 *data, u8 size, u8 cmd, u8 id);
 static void IrcLink_Finish(int a0);
 static void IrcLink_Nop(void);
 static BOOL IrcLink_IsRecvIgnored(u8 size);
@@ -67,16 +68,20 @@ static IrcFrameData IrcFrame;
 
 static u16 IrcLink_Checksum(const u8 *data, u32 size) {
     u32 sum = 0x80;
-    u32 i;
+    u32 i = 0;
 
-    for (i = 0; i < size; i++) {
-        u8 byte = *data++;
+    // The loop is tested before its first pass and then at its end, which at -O2,p takes a guarded do/while: a for
+    // loop is only tested at its end
+    if (i < size) {
+        do {
+            u8 byte = *data++;
 
-        if (i & 1) {
-            sum += byte;
-        } else {
-            sum += byte << 8;
-        }
+            if (i & 1) {
+                sum += byte;
+            } else {
+                sum += byte << 8;
+            }
+        } while (++i < size);
     }
     sum = (sum >> 16) + (sum & 0xffff);
     sum += sum >> 16;
@@ -129,30 +134,30 @@ BOOL IrcLink_IsLinked(void) {
     return IrcLink.linked;
 }
 
-static void IrcLink_SendFrame(const u8 *data, int size, u8 cmd, u8 id) {
+static void IrcLink_SendFrame(const u8 *data, u8 size, u8 cmd, u8 id) {
+    IrcFrameData *frame = &IrcFrame;
     u8 *dst;
     u8 *raw;
     int i;
-    u8 len;
     u16 sum;
 
-    IrcFrame.id = id;
-    IrcFrame.cmd = cmd;
-    IrcFrame.sumLo = 0;
-    IrcFrame.sumHi = 0;
+    frame->id = id;
+    frame->cmd = cmd;
+    frame->sumLo = 0;
+    frame->sumHi = 0;
     dst = IrcFrame.data;
     for (i = 0; i < size; i++) {
         *dst++ = *data++;
     }
-    len = size + 4;
+    size += 4;
     raw = (u8 *)&IrcFrame;
-    sum = IrcLink_Checksum(raw, len);
-    IrcFrame.sumLo = sum;
-    IrcFrame.sumHi = sum >> 8;
-    for (i = 0; i < len; i++) {
+    sum = IrcLink_Checksum(raw, size);
+    frame->sumLo = sum;
+    frame->sumHi = sum >> 8;
+    for (i = 0; i < size; i++) {
         raw[i] ^= IRC_XOR;
     }
-    IrcSpi_Send(raw, len);
+    IrcSpi_Send((u8 *)&IrcFrame, size);
 }
 
 static void IrcLink_Finish(int a0) {
@@ -191,7 +196,10 @@ static BOOL IrcLink_IsRecvIgnored(u8 size) {
         }
         return FALSE;
     }
-    if (size == 2 || size == 3) {
+    switch (size) {
+    case 2:
+    case 3:
+        // Empty loops, probably of debug output compiled out; -O2,p keeps them where -O4,p drops them
         for (i = 0; i < 4; i++) {
         }
         for (i = 0; i < size; i++) {
@@ -214,9 +222,11 @@ static BOOL IrcLink_CheckPingTimeout(void) {
 }
 
 static BOOL IrcLink_ValidateFrame(u8 size) {
+    IrcFrameData *frame = &IrcFrame;
     u8 *raw = (u8 *)&IrcFrame;
     u32 i;
     u16 stored;
+    u16 sum;
 
     if (size == 1) {
         if (raw[0] == IRC_CMD_PING) {
@@ -227,17 +237,16 @@ static BOOL IrcLink_ValidateFrame(u8 size) {
     if (size < 4) {
         return FALSE;
     }
-    stored = IrcFrame.sumLo + (IrcFrame.sumHi << 8);
-    IrcFrame.sumLo = 0;
-    IrcFrame.sumHi = 0;
-    if (stored == IrcLink_Checksum(raw, size)) {
-        IrcFrame.sumLo = stored;
-        IrcFrame.sumHi = stored >> 8;
+    stored = frame->sumLo + (frame->sumHi << 8);
+    frame->sumLo = 0;
+    frame->sumHi = 0;
+    sum = IrcLink_Checksum(raw, size);
+    frame->sumLo = stored;
+    frame->sumHi = stored >> 8;
+    if (stored == sum) {
         IrcLink.unk00 = 0;
         return TRUE;
     }
-    IrcFrame.sumLo = stored;
-    IrcFrame.sumHi = stored >> 8;
     if (IrcLink.linked) {
         for (i = 0; i < size; i++) {
         }

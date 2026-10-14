@@ -5,7 +5,7 @@
 // .bss by size, and the original's .bss order is only possible split so.
 #include "field/net_devirc.h"
 #include "field/net_irc.h"
-#include "field/irc_link.h"
+#include "irc/irc_link.h"
 
 static BOOL NetDevIrc_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work);
 static BOOL NetDevIrc_Begin(void (*callback)(BOOL ok));
