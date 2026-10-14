@@ -279,6 +279,7 @@ src/gfl/g3d_system.c:
     .bss        start:0x02141924 end:0x02141930
 
 src/gfl/clact.c:
+    complete
     .text       start:0x0204b6a8 end:0x0204dca4
     .rodata     start:0x02093e44 end:0x02093f40
     .data       start:0x0209af90 end:0x0209afe8
