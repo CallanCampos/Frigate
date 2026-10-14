@@ -1234,6 +1234,7 @@ src/system/rndmatch_savedata.c:
     .text       start:0x0200e864 end:0x0200e8bc
 
 src/system/musical_dist_save.c:
+    complete
     .text       start:0x0200cc94 end:0x0200ce50
     .data       start:0x0209a1e8 end:0x0209a1fc
 
