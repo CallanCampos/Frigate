@@ -312,7 +312,7 @@ static void WbtList_ShowLineJoint(WbtList *work);
 static void WbtList_ResetBracket(WbtList *work);
 static void WbtList_InitEntrants(WbtList *work);
 static void WbtList_InitMatches(WbtList *work);
-static s32 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset);
+static s16 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset);
 static BOOL WbtList_NextStep(WbtList *work);
 static BOOL WbtList_IsLastStep(WbtList *work);
 static void WbtList_ShuffleLines(WbtList *work);
@@ -1149,8 +1149,8 @@ static void WbtList_MoveColumns(WbtList *work) {
 static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
     WordSet *wordSet = GFL_WordSetSystemCreate(8, 40, work->heapId);
     s32 words = 0;
-    s32 first;
-    s32 second;
+    s16 first;
+    s16 second;
     StrBuf *src;
     BmpWin *window;
 
@@ -1506,8 +1506,8 @@ static void WbtList_InitMatches(WbtList *work) {
 }
 
 // A MATCH_* value of the mode's current step, or of one at an offset from it
-static s32 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset) {
-    s32 value = 0;
+static s16 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset) {
+    s16 value = 0;
 
     if (work->mode == MODE_FIRST_ROUND) {
         offset += work->step + 3;
