@@ -1677,3 +1677,10 @@ lib/nitro/src/fx/fx_mtx22.c:
 
 lib/nitro/src/fx/fx_mtx33.c:
     .text       start:0x0207244c end:0x02072c20
+
+lib/nitro/src/fx/fx_cp.c:
+    complete
+    .text       start:0x02073df0 end:0x02073fb4
+
+lib/nitro/src/fx/fx_vec.c:
+    .text       start:0x02073fb4 end:0x02074568
