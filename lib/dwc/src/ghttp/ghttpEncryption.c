@@ -293,7 +293,7 @@ int ghiEncryptorSslStartFunc(GHIConnection *connection, GHIEncryptor *encryptor)
 
     func_ov011_0216cca8(8, 4, 15, "%s(@%s:%d)\r\n", GHI_FILE, __FUNCTION__, 1100);
     if (!state->started) {
-        error = func_ov011_02158174(connection->socket, state->ssl);
+        error = SOCL_EnableSsl(connection->socket, state->ssl);
         if (error < 0) {
             switch (error) {
             case -28:

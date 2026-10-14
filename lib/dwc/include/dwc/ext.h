@@ -55,16 +55,16 @@ typedef struct SocHostEnt {
     s16 addrLength;
     u8 **addrList;
 } SocHostEnt;
-int func_ov011_02157bd0(int domain, int type, int protocol);
-int func_ov011_02157c10(int sock, const SocAddrIn *address);
+int SOC_Socket(int domain, int type, int protocol);
+int SOC_Connect(int sock, const SocAddrIn *address);
 int func_ov011_02157c50(int sock, void *buffer, int size, int flags);
 int func_ov011_02157cbc(int sock, const void *buffer, int size, int flags);
-int func_ov011_02157d30(int sock, int how);
-int func_ov011_02157d38(int sock);
-SocHostEnt *func_ov011_02157d40(const char *host);
-int func_ov011_02158034(const char *text, u32 *address);
-int func_ov011_02158174(int sock, void *sslInfo);
-void func_ov011_021575f8(void);
+int SOC_Shutdown(int sock, int how);
+int SOC_Close(int sock);
+SocHostEnt *SOC_GetHostByAddr(const char *host);
+int SOC_InetAtoN(const char *text, u32 *address);
+int SOCL_EnableSsl(int sock, void *sslInfo);
+void SOCLi_TrashSocket(void);
 // Seeds the random number generator of the secure connections with some bytes
 void func_ov011_02159d64(const void *data, u32 size);
 
@@ -211,9 +211,9 @@ int func_ov011_02157c64(int sock, void *buffer, int size, int flags, SocAddrIn *
 int func_ov011_02157cd0(int sock, const void *buffer, int size, int flags, const SocAddrIn *to);
 // Starts the library with a configuration (negative if it cannot), cleans it up (negative if it cannot) and waits on
 // one descriptor for at most some ticks, returning how many are ready
-int func_ov011_02157f10(const SocConfig *config);
-int func_ov011_0215800c(void);
-int func_ov011_021580d0(SocPollFd *fds, u32 count, s64 ticks);
+int SOC_Startup(const SocConfig *config);
+int SOC_Cleanup(void);
+int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks);
 // Clears the WCM's list of access points
 void func_ov011_0215c594(void);
 

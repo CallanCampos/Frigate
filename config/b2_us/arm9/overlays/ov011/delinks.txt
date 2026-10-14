@@ -26,3 +26,8 @@ lib/nitrowifi/src/cps/cps.c:
     .text       start:0x0215251c end:0x02155e34
     .data       start:0x0218542c end:0x0218546c
     .bss        start:0x0218ba0c end:0x0218dbe0
+
+lib/nitrowifi/src/soc/socl_startup.c:
+    .text       start:0x02155e34 end:0x02156000
+    .data       start:0x0218546c end:0x02185474
+    .bss        start:0x0218dbe0 end:0x0218dc20

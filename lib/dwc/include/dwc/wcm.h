@@ -56,6 +56,11 @@ void *func_ov011_0215c65c(u16 index);                                           
 s32 func_ov011_0215cba4(const u8 *dst, const u8 *header, s32 headerLen, const u8 *data, s32 dataLen);
 // Copies the MAC address of the wireless hardware to mac (WCM_GetMacAddress's role)
 void func_ov011_0215ccc0(u8 *mac);
+// The MAC address of the access point the connection is with, or NULL while there is none (WCM_GetApMacAddress's
+// role); NitroWiFi's SOCL takes the link to be up while there is one
+const u8 *func_ov011_0215cb14(void);
+// Sets the function that every received data frame goes to (WCM_SetRecvDCFCallback's role)
+void func_ov011_0215cb8c(void (*callback)(u8 *src, u8 *dst, u8 *data, u32 len));
 
 // The "any" BSSID and ESSID that a search takes when the caller gives none
 extern const u8 data_ov011_02184fdc[];

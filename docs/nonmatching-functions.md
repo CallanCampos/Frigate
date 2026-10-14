@@ -393,6 +393,10 @@ in both versions.
 | `lib/nitrowifi/src/cps/cps.c` | `CPSi_DhcpWait` | `0x02155730` / `0x02155770` | 4 bytes short: registers in the options loop. Tried: the option set before the cookie check. |
 | `lib/nitrowifi/src/cps/cps.c` | `CPSi_DnsQuery` | `0x02155ad0` / `0x02155b10` | 4 bytes over: registers in the label loop. Tried: `u32` type and count. |
 | `lib/nitrowifi/src/cps/cps.c` | `CPS_Resolve` | `0x02155d40` / `0x02155d80` | 4 bytes short: the next-hop test's branch shape and how `id[i]` is addressed. Tried: a local struct (fixed the stack slots) and split conditions. |
+| `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_StartupCPS` | `0x02155e9c` / `0x02155edc` | 0x108 against the original's 0xfc: the original reaches the file's `.bss` statics from one base, `SOCLiYieldWait` at 0x0218dbe0 (`ldr r1, =0x0218dbe0; ldr r2, [r1, #8]` for `SOCLiDhcpState`, the `SOCLiCPSConfig` fields as `[r0, #0x14]` and up), and its `.data` (`SOCLiConfigPtr`, then the 0x4000 default) from another, where ours loads each variable's own address. `-ipa file`, which gives `cps.c` that addressing, pools them but puts the NULL `SOCLiConfigPtr` in `.bss` with the statics (at +0x10) and orders the statics by use, so every function moves further (`SOCLi_StartupSOCL` 0x24, `SOCLi_SetMyIP` 0x40); every compiler version does the same, and an explicit `.data` section attribute did not move it. The rest of the function's shape matches. |
+| `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_StartupSOCL` | `0x02155e70` / `0x02155eb0` | Same size, 1 byte: the store of `SOCLiUDPSendSocket` is `[r1, #0xc]` from the `.bss` base, as in `SOCLi_StartupCPS`. |
+| `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_SetMyIP` | `0x02155f98` / `0x02155fd8` | Same size, 2 bytes: `SOCLiDhcpState` is `[r1, #8]` from the `.bss` base, as in `SOCLi_StartupCPS`. |
+| `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_DhcpTimeout` | `0x02155fdc` / `0x0215601c` | Same size, 2 bytes: as `SOCLi_SetMyIP`. |
 
 ## Matching, but not linkable as is
 

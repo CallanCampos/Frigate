@@ -1,0 +1,48 @@
+#ifndef POKEBW2_NITROWIFI_SOC_H
+#define POKEBW2_NITROWIFI_SOC_H
+
+#include "types.h"
+#include "nitrowifi/cps.h"
+
+// NitroWiFi's socket layer, SOCL, over CPS, in overlay 11, and the BSD-style SOC calls over it. The ROM names none of
+// it. Its files and names follow NitroWiFi's objects as pret's pokediamond links them (socl_startup.o, socl_command.o
+// and so on, with every function named), matched to this newer version (NitroWiFi 3.3, by its signature in the main
+// module) by what each function does.
+
+// What SOCL_Startup takes
+typedef struct SOCLConfig {
+    BOOL use_dhcp; // Ask DHCP for an address, or use host_ip
+    struct {
+        CPSInAddr my_ip;
+        CPSInAddr net_mask;
+        CPSInAddr gateway_ip;
+        CPSInAddr dns_ip[2];
+    } host_ip;
+    void *(*alloc)(u32 size);
+    void (*free)(void *ptr);
+    u32 cmd_packet_max;   // How many command packets the sockets can have waiting
+    u32 lan_buffer_size;  // 0 for SOCLiDefaultLanBufferSize
+    void *lan_buffer;     // NULL to allocate lan_buffer_size bytes
+    s32 cps_thread_prio;  // 0 for 11
+    s32 mtu;              // 0 for 576, and kept between 576 and 1500
+    s32 rwin;             // TCP's receive window, 0 for 0x10c0
+} SOCLConfig;
+
+// How a socket is created: SOCLSocketParamTCP, SOCLSocketParamUDP and SOCLSocketParamUDPSend (soc.c)
+typedef struct SOCLSocketParam {
+    s8 flag_mode;
+    s8 flag_block;
+    struct {
+        u16 rcvbuf_size;
+        u16 rcvbuf_consume_min;
+        u8 unk6[0x12];
+    } buffer;
+} SOCLSocketParam;
+
+extern SOCLSocketParam SOCLSocketParamTCP;
+extern SOCLSocketParam SOCLSocketParamUDPSend;
+
+int SOCL_Startup(SOCLConfig *config);
+int SOCL_CreateSocket(const SOCLSocketParam *param);
+
+#endif // POKEBW2_NITROWIFI_SOC_H

@@ -1815,7 +1815,7 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
     sSocConfig.addr = Net_Htonl(addr);
     sSocConfig.netmask = Net_Htonl(netmask);
     sSocConfig.gateway = Net_Htonl(gateway);
-    if (func_ov011_02157f10(&sSocConfig) < 0) {
+    if (SOC_Startup(&sSocConfig) < 0) {
         return -1;
     }
     if (CPSMyIp == 0) {
@@ -1827,7 +1827,7 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
 }
 
 static int Net_Stop(void) {
-    if (func_ov011_0215800c() < 0) {
+    if (SOC_Cleanup() < 0) {
         return -1;
     }
     return -(AossAp_Disconnect() != 0);
@@ -1863,7 +1863,7 @@ static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptF
 
     ticks += ((u64)(s64)timeout->sec * 33514000) >> 6;
     ticks += ((u64)(s64)timeout->usec * 33514000) >> 6;
-    return func_ov011_021580d0(&fd, 1, ticks);
+    return SOC_Poll(&fd, 1, ticks);
 }
 
 static int Net_SendTo(int sock, const void *buffer, int size, int flags, SocAddrIn *to, int toLength) {
@@ -1876,7 +1876,7 @@ static int Net_SetSockOpt(int sock, int level, int name, const void *value, int 
 }
 
 static int Net_Socket(int domain, int type, int protocol) {
-    return func_ov011_02157bd0(domain, type, protocol);
+    return SOC_Socket(domain, type, protocol);
 }
 
 static int Net_Bind(int sock, SocAddrIn *address, int length) {
@@ -1885,7 +1885,7 @@ static int Net_Bind(int sock, SocAddrIn *address, int length) {
 }
 
 static int Net_Close(int sock) {
-    return func_ov011_02157d38(sock);
+    return SOC_Close(sock);
 }
 
 static u32 Net_Htonl(u32 value) {

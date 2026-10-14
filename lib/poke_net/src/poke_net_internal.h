@@ -105,7 +105,7 @@ typedef struct {
     u32 addr;
 } SocInAddr;
 u32 CPS_Resolve(const char *host);
-char *func_ov011_02158014(SocInAddr addr);
+char *SOC_InetNtoA(SocInAddr addr);
 #define POKE_NET_SOC_AF_INET 2
 #define POKE_NET_SOC_SOCK_STREAM 1
 #define POKE_NET_SOC_SHUT_RDWR 2
