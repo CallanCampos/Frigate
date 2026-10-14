@@ -20,11 +20,11 @@ from elftools.elf.relocation import RelocationSection
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT))
-from configure import INCLUDE_DIRS, library_of  # noqa: E402
+from configure import ENCODING_FLAG, INCLUDE_DIRS, library_of, mwcc_command  # noqa: E402
 
 DEFAULT_FLAGS = (
     "-O4,p -proc arm946e -thumb -interworking -enum int -char signed -fp soft -lang=c99 -Cpp_exceptions off -gccext,on -gccinc "
-    "-inline on,noauto -ipa file -requireprotos -nolink -msgstyle gcc -w off"
+    f"-inline on,noauto -ipa file -requireprotos -nolink -msgstyle gcc -w off {ENCODING_FLAG}"
 )
 # Preprocessor defines of each game version, as in configure.py
 VERSION_DEFINES = {"b2_us": ["BLACK2"], "w2_us": ["WHITE2"]}
@@ -208,9 +208,9 @@ def main():
     with tempfile.TemporaryDirectory() as tmp:
         for compiler in compilers:
             obj = Path(tmp) / f"{compiler.replace('/', '_')}.o"
+            mwcc = (TOOLS / "mwccarm" / compiler if "/" in compiler else compilers_dir / compiler) / "mwccarm.exe"
             command = [
-                str(TOOLS / "wibo"),
-                str((TOOLS / "mwccarm" / compiler if "/" in compiler else compilers_dir / compiler) / "mwccarm.exe"),
+                *mwcc_command(mwcc),
                 *shlex.split(args.flags),
                 *shlex.split(args.extra_flags),
                 *(arg for define in VERSION_DEFINES.get(args.version, []) for arg in ("-d", define)),
