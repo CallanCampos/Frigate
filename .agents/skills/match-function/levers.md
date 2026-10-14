@@ -154,6 +154,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- A stack argument stored after the next argument's setup starts, where the original stores it first, around a
+  spilled local: sweep the local's width together with its callee's return type and `value` local.
+  (matching.md: "A spilled local's width for the rule below")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
@@ -229,6 +232,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
+  the function, before the calls. (matching.md: "A constant narrowed at a call")
+- A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
+  offset to the base after a plain read: read that field through an inline taking an `int` index.
+  (matching.md: "Two fields of one element of a static table")
 - A saved register, `bl` and return where the C tail-calls (`ldr r3, =f; bx r3`): the call passes a fourth register
   argument. (matching.md: "four arguments in registers")
 
@@ -315,6 +323,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- A 0/1 flag built with branches (`bne; movs r1, #1; b; movs r1, #0`) where ours is set-then-clear: the flag's
+  register is an operand of the `cmp`; declare and compute that flag first. (matching.md: "A 0/1 comparison flag")
 - Returns of `-1` and `0` folded into one computed result (`rsbs`, `mvns`) where the original keeps two returns: the
   function returns an enum. (matching.md: "returns an enum")
 - `bne` over a `b` to the end at the top: the body is in an `if`, not after an early return. (matching.md: "An early `return`")

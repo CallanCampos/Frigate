@@ -50,7 +50,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
     u16 move;
     u8 value;
     u16 location;
-    u16 year;
+    u32 year;
     u32 month;
     u32 day;
 
@@ -208,7 +208,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
         GFL_StrBufFree(name);
         PokeParty_SetParam(pkm, PKM_PARAM_HAPPINESS, 10);
     }
-    year = poke->date >> 16;
+    year = (poke->date >> 16) & 0xffff;
     month = (poke->date >> 8) & 0xff;
     day = poke->date & 0xff;
     if (poke->isEgg) {

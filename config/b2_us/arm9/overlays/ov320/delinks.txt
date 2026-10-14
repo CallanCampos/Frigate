@@ -5,6 +5,7 @@
     .bss        start:0x0219f160 end:0x0219f160 kind:bss align:32
 
 src/ov320/wbt_list.c:
+    complete
     .text       start:0x0219ce80 end:0x0219eb70
     .rodata     start:0x0219edb4 end:0x0219efac
 

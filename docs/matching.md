@@ -528,6 +528,12 @@ Same code, other `sp` offsets or frame size.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
+- A spilled local's width for the rule below can come from its callee's return: `wbt_list.c`'s
+  `WbtList_PrintMessage` stores its first name call's last stack argument before the name's address, as the
+  original does, only with `s16 first` set from `WbtList_GetMatchValue` returning `s16` (and its `value` local
+  `s16`). An `s16` local from an `s32` return, or any other pairing, swaps the two. The callee's other callers
+  bound the width: `WbtList_UpdateMessage`'s `u16 message = WbtList_GetMatchValue(...)` keeps its narrowing
+  only with a signed or wider return.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
@@ -535,6 +541,10 @@ Same code, other `sp` offsets or frame size.
   `u32 x` and `y`, passed on as `u32`, ahead of the stack argument stores, and its `HeapID heapId`, passed to a
   `u32 heapId`, after them. Widening the callee alone, or narrowing `heapId` alone, did not match: sweep the caller's
   and the callee's widths together.
+  A `u32` local that holds a 16-bit value counts as `u32` when the narrowing is a mask: the mystery gift's
+  `Mystery_CreateGiftPokemon` stores `setFatefulEncounterPkmData`'s day argument last, after reloading the spilled
+  year, only with `u32 year = (poke->date >> 16) & 0xffff`, written like its month and day; a `u16 year` stores
+  it first.
   A spilled loop bound is the same: `AddExpAndEVs` in `btl_server_flow_sub.c` stores the spilled counter before
   loading its bound, the number of mons, only with the bound a `u16`. And `func_ov167_021afd90` matched only with
   `numMoves` a `u32` and its locals in one order of 720; no order matched with it a `u8` or `u16`, so sweep the orders
@@ -764,6 +774,10 @@ Same instructions, scheduled in another order.
 - A bit field read through a `static inline` getter is not shared with a later read of the same word: its
   `u8 shape = MapHeightTile_GetShape(tile);` makes the plane branch load the halfword again for `tile->slope`,
   where a direct `tile->shape` reused the first load.
+  Plain fields go the same way across a `switch`: the mystery gift album's `MysteryCardView_SeqMove` reads its
+  slot through the file's `MysteryCardView_GetSlot(view)` (`view->cursor + view->page * 4`), which makes case 1
+  load `view->page` again as the original does, where the expression written out reused the load before the
+  `switch`.
 - The order of a product's operands picks the registers of what feeds it: the tile index
   `x / TILE_SIZE + (FX_Whole(size) / 16) * (z / TILE_SIZE)` matched in `FieldChunkAccessor_RD_GetTerrain` and
   swapped the registers of `x` and `z` with the factors the other way round.
@@ -931,6 +945,13 @@ Same instructions, scheduled in another order.
   A pointer local such as `entries = data->entries` is kept, not folded into `data`, once it has a use in a later
   block than its definition, but reads with no store between are merged first. Overlay 332's
   `CygnusData_GetEntry` gets the original's loads this way, with its two stores in the other order (see its row).
+- Two fields of one element of a static table read from the same base, one as `ldr r0, [r1, r2]` and the other
+  after `adds r1, r1, r2; ldrb r1, [r1, #4]`, are a plain read and a read through an inline taking an `int` index.
+  Written plainly, the second field's offset folds into the table's literal (`sMenuInfo+4`); through an element
+  pointer, or a getter whose index has the plain read's type, the element address is shared and computed first,
+  into a new register. The union room's `UnionMsg_UpdateRuleMenu` reads
+  `sMenuInfo[ruleSel[3]].rows[UnionMsg_GetMenuInfo(ruleSel[3])->count - 1]`, with `UnionMsg_GetMenuInfo(int kind)`
+  returning `&sMenuInfo[kind]`; the getter with a `u8` index is 14 bytes off and with `s8` folds again.
 - A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
   shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
   after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
@@ -1086,6 +1107,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   without folding the subtraction, so it keeps the constant in `r6` like a variable. `= bufferSize - 0x20` folds to
   `0x100`, and an enum local reduced at run time gave the same instructions with the constant in `r4`, ahead of the
   parameters.
+  A constant narrowed at a call (`movs r3, #0x11` then `lsls`/`asrs` to `s16`) is an enum local too, and where it
+  is assigned decides where it is built: set at the top, before the first call, and live across calls while every
+  saved register is taken, it is rebuilt at its one use inside the argument setup. `zukan_detail_form.c`'s
+  `ZukanDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
+  print; set in the color's block, the 17 is built before `x`'s arithmetic (9 bytes), and an `int` or a field
+  folds the narrowing away.
 - A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
   comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
   so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.
@@ -1434,6 +1461,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A flag set to 0 and then to 1 under a branch (`movs #0`, `cmp`, `beq`, `movs #1`) is
   `BOOL b = FALSE; if (x) { b = TRUE; }`; `x != 0` builds 1 first. `script_command.c`'s `StaScriptCmd_PokeFlip`
   also needs the call before it in the argument list read into a local first.
+- A 0/1 comparison flag is built set-then-clear (`movs r5, #1; beq; movs r5, #0`) when its register is free at
+  the `cmp`, and with branches (`bne; movs r1, #1; b; movs r1, #0`) when its register is an operand of the
+  `cmp`, so the shape follows the registers, not the spelling. `MysteryCardView_SeqMove` writes both flags as
+  `BOOL shown1 = view->page == slot / 4;` and `shown2` likewise: declared first, `shown1` takes the `r1` that
+  holds `slot / 4` and gets the branches, as in the original.
 - A `cond ? 0 : 1` whose 0 the original takes from an existing register while 1 comes from a register it keeps 1 in
   throughout inverts the branch polarity under every ternary spelling; `btlv_effvm.c`'s
   `BtlvEffvm_GetDefenderPositions` needs the default-then-override form through a local,

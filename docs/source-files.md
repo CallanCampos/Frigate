@@ -405,7 +405,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `union_actor.c` | `0x02176b00`–`0x02177444` | 23 | complete | descriptive |
 | `union_oneself.c` | `0x02177444`–`0x0217aa7c` | 64 | complete | string at `0x0217c6ec` |
-| `union_msg.c` | `0x0217aa7c`–`0x0217b68c` | 66 | partial | string at `0x0217c85c` |
+| `union_msg.c` | `0x0217aa7c`–`0x0217b68c` | 66 | complete | string at `0x0217c85c` |
 | `union_eff.c` | `0x0217b68c`–`0x0217bc84` | 32 | complete | string at `0x0217c8b0` |
 | `colosseum_tool.c` | `0x0217bc84`–`0x0217becc` | 10 | complete | descriptive |
 
@@ -1862,9 +1862,9 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mystery.c` | `0x021b5420`–`0x021b8348` | 57 | partial | string at `0x021be980` |
+| `mystery.c` | `0x021b5420`–`0x021b8348` | 57 | complete | string at `0x021be980` |
 | `mystery_graphic.c` | `0x021b8348`–`0x021b876c` | 23 | complete | string at `0x021be98c` |
-| `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | partial | string at `0x021be9a0` |
+| `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | complete | string at `0x021be9a0` |
 | `mystery_album.c` | `0x021b99e0`–`0x021bd068` | 59 | partial | string at `0x021be9b0` |
 | `mystery_net.c` | `0x021bd068`–`0x021bdd34` | 40 | complete | string at `0x021be9c0` |
 | `mystery_check.c` | `0x021bdd34`–`0x021be2dc` | 2 | complete | descriptive |
@@ -2488,7 +2488,7 @@ prints the tables below from the configs and the ROM:
 | `zukan_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
 | `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
 | `zukan_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | string at `0x021ace88` |
-| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | partial | string at `0x021acec4` |
+| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | complete | string at `0x021acec4` |
 
 ### Overlay 299
 
@@ -2717,7 +2717,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | partial | descriptive |
+| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | complete | descriptive |
 | `wbt_list_graphic.c` | `0x0219eb70`–`0x0219edb4` | 16 | complete | string at `0x0219f140` |
 
 ### Overlay 321

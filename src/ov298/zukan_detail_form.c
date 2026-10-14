@@ -125,6 +125,14 @@ enum {
     ENTRY_COLOR_RARE,
 };
 
+// The lines of an entry's text: its name alone in the middle of the window, or its name above its color. A type of
+// its own, so that MWCC keeps the color's line as a variable and narrows it at the call
+typedef enum {
+    ENTRY_LINE_TOP = 1,
+    ENTRY_LINE_MIDDLE = 9,
+    ENTRY_LINE_BOTTOM = 17,
+} EntryLine;
+
 #define ENTRY_MAX 64
 
 // The text: the species' name, the counts of forms and of shiny colors, their labels, and the names of the two
@@ -1377,13 +1385,14 @@ static void ZukanDetailForm_PrintEntry(ZukanDetailFormParam *param, ZukanDetailF
     StrBuf *color;
     BOOL freeName;
     BOOL freeColor;
-    int y;
+    EntryLine y;
+    EntryLine colorY = ENTRY_LINE_BOTTOM;
 
     ZukanDetailForm_GetEntryText(param, wk, common, &name, &color, &freeName, &freeColor, index);
     // The name alone is printed in the middle of the window
-    y = 1;
+    y = ENTRY_LINE_TOP;
     if (color == NULL) {
-        y = 9;
+        y = ENTRY_LINE_MIDDLE;
     }
     {
         u16 width = GFL_FontGetBlockWidth(name, wk->font, 0);
@@ -1395,8 +1404,7 @@ static void ZukanDetailForm_PrintEntry(ZukanDetailFormParam *param, ZukanDetailF
         u16 width = GFL_FontGetBlockWidth(color, wk->font, 0);
         u16 x = (windowWidth - width) / 2;
 
-        y += 16;
-        func_02021c7c(printQueue, bitmap, x, y, color, wk->font, PRINT_COLOR(15, 2, 0));
+        func_02021c7c(printQueue, bitmap, x, colorY, color, wk->font, PRINT_COLOR(15, 2, 0));
     }
     if (name != NULL && freeName) {
         GFL_StrBufFree(name);

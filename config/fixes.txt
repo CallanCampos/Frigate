@@ -264,6 +264,7 @@
 . 0x0206e228 reloc_addend 0x10e0
 . 0x0206e3fc reloc_addend 0x10c8
 . 0x0206e4dc reloc_addend 0x10e0
+. 0x02077cd4 add_data sha1_block_constants
 . 0x0207ba60 add_reloc load,main,0x0207b9e8,0x50
 . 0x0207e934 add_function MIC_StartAutoSampling:thumb:0x1c
 . 0x0207e958 add_function MIC_StopAutoSampling:thumb:0x18
@@ -1006,15 +1007,15 @@ overlays/ov036 0x021ca8bc remove_symbol
 overlays/ov036 0x021ca8e6 remove_symbol
 overlays/ov036 0x021cac9c remove_reloc
 overlays/ov036 0x021cacf4 section_end src/ov036/ircbattlemenu.c:.rodata
-overlays/ov036 0x021cf2e4 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf2e4 section_end src/ov036/fldmmdl_blact.c:.rodata
+overlays/ov036 0x021cf2e4 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_end src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_start src/ov036/fld_act_rail.c:.rodata
-overlays/ov036 0x021cf768 section_end src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf768 section_start src/ov036/field_rail_loader.c:.rodata
+overlays/ov036 0x021cf768 section_end src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf76c add_section src/ov036/field_rail_loader.c:.rodata:0x250
-overlays/ov036 0x021cf9dc section_start src/ov036/field_subscreen.c:.rodata
 overlays/ov036 0x021cf9dc section_end src/ov036/field_rail_loader.c:.rodata
+overlays/ov036 0x021cf9dc section_start src/ov036/field_subscreen.c:.rodata
 overlays/ov036 0x021cf9ec section_end src/ov036/field_subscreen.c:.rodata
 overlays/ov036 0x021cf9ec section_start src/ov036/weather.c:.rodata
 overlays/ov036 0x021cfb74 section_end src/ov036/weather.c:.rodata
@@ -1022,8 +1023,8 @@ overlays/ov036 0x021cfb84 reloc_module overlay(77)
 overlays/ov036 0x021cfbb4 reloc_module overlay(78)
 overlays/ov036 0x021cfbc4 reloc_module overlay(78)
 overlays/ov036 0x021cfbcc reloc_module overlay(77)
-overlays/ov036 0x021cfbe4 section_end src/ov036/weather.c:.rodata
 overlays/ov036 0x021cfbe4 section_start src/ov036/weather_task.c:.rodata
+overlays/ov036 0x021cfbe4 section_end src/ov036/weather.c:.rodata
 overlays/ov036 0x021d0001 remove_symbol
 overlays/ov036 0x021d01a4 remove_reloc
 overlays/ov036 0x021d01cc remove_reloc
@@ -3496,8 +3497,8 @@ overlays/ov310 0x021a7021 remove_symbol
 overlays/ov310 0x021a7028 add_data data_ov310_021a7028
 overlays/ov310 0x021a7028 section_end src/ov310/research_list.c:.rodata
 overlays/ov310 0x021a773c section_end src/ov310/research_graph.c:.rodata
-overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov310 0x021a773c section_start src/ov310/research_common.c:.rodata
+overlays/ov310 0x021a773c add_data ResearchCommon_Unused
 overlays/ov311 0x0219cea0 reloc_module overlay(139)
 overlays/ov311 0x0219cf02 reloc_module overlay(139)
 overlays/ov311 0x0219cf8c reloc_module overlay(139)
