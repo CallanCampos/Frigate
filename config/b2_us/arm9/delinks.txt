@@ -1448,6 +1448,7 @@ src/system/nsbtx_to_clwk.c:
     .data       start:0x0209a30c end:0x0209a31c
 
 src/system/game_system.c:
+    complete
     .text       start:0x0201666c end:0x02016cb4
     .rodata     start:0x02090010 end:0x0209001c
     .bss        start:0x021410f4 end:0x02141110
