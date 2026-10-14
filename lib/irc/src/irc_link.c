@@ -36,12 +36,17 @@ typedef struct {
     u64 tick;
 } IrcLinkData;
 
-// A frame as it goes over the infrared: the command, the ID of the link, the checksum and the data
+// The head of a frame: the command, the ID of the link and the checksum
 typedef struct {
     u8 cmd;
     u8 id;
     u8 sumLo;
     u8 sumHi;
+} IrcFrameHeader;
+
+// A frame as it goes over the infrared: its head and the data
+typedef struct {
+    IrcFrameHeader header;
     u8 data[0xb4];
 } IrcFrameData;
 
@@ -135,28 +140,29 @@ BOOL IrcLink_IsLinked(void) {
 }
 
 static void IrcLink_SendFrame(const u8 *data, u8 size, u8 cmd, u8 id) {
-    IrcFrameData *frame = &IrcFrame;
+    IrcFrameHeader *header = &IrcFrame.header;
     u8 *dst;
     u8 *raw;
     int i;
     u16 sum;
 
-    frame->id = id;
-    frame->cmd = cmd;
-    frame->sumLo = 0;
-    frame->sumHi = 0;
+    header->id = id;
+    header->cmd = cmd;
+    header->sumLo = 0;
+    header->sumHi = 0;
     dst = IrcFrame.data;
     for (i = 0; i < size; i++) {
         *dst++ = *data++;
     }
-    size += 4;
+    size += sizeof(IrcFrameHeader);
     raw = (u8 *)&IrcFrame;
     sum = IrcLink_Checksum(raw, size);
-    frame->sumLo = sum;
-    frame->sumHi = sum >> 8;
+    header->sumLo = sum;
+    header->sumHi = sum >> 8;
     for (i = 0; i < size; i++) {
         raw[i] ^= IRC_XOR;
     }
+    // The original loads IrcFrame's address again for the call rather than passing raw
     IrcSpi_Send((u8 *)&IrcFrame, size);
 }
 
@@ -191,7 +197,7 @@ static BOOL IrcLink_IsRecvIgnored(u8 size) {
         if (IrcLink.linked) {
             return TRUE;
         }
-        if (IrcFrame.cmd != IRC_CMD_PING) {
+        if (IrcFrame.header.cmd != IRC_CMD_PING) {
             return TRUE;
         }
         return FALSE;
@@ -234,15 +240,15 @@ static BOOL IrcLink_ValidateFrame(u8 size) {
         }
         return FALSE;
     }
-    if (size < 4) {
+    if (size < sizeof(IrcFrameHeader)) {
         return FALSE;
     }
-    stored = frame->sumLo + (frame->sumHi << 8);
-    frame->sumLo = 0;
-    frame->sumHi = 0;
+    stored = frame->header.sumLo + (frame->header.sumHi << 8);
+    frame->header.sumLo = 0;
+    frame->header.sumHi = 0;
     sum = IrcLink_Checksum(raw, size);
-    frame->sumLo = stored;
-    frame->sumHi = stored >> 8;
+    frame->header.sumLo = stored;
+    frame->header.sumHi = stored >> 8;
     if (stored == sum) {
         IrcLink.unk00 = 0;
         return TRUE;
@@ -283,7 +289,7 @@ BOOL IrcLink_Poll(void) {
             return FALSE;
         }
     }
-    switch (frame->cmd) {
+    switch (frame->header.cmd) {
     case IRC_CMD_PING:
         switch (IrcLink.state) {
         case IRC_STATE_IDLE:
@@ -314,8 +320,8 @@ BOOL IrcLink_Poll(void) {
         if (IrcLink.state == IRC_STATE_PING_SENT) {
             IrcLink.state = IRC_STATE_PARENT_LINKED;
             IrcLink.isParent = TRUE;
-            IrcLinkIds.peer = frame->id;
-            if (frame->id == IrcLinkIds.local) {
+            IrcLinkIds.peer = frame->header.id;
+            if (frame->header.id == IrcLinkIds.local) {
                 IrcLink_SendFrame(NULL, 0, IRC_CMD_ACCEPT, IrcLinkIds.local);
                 IrcLink.linked = TRUE;
                 IrcLink.resend = FALSE;
@@ -326,12 +332,12 @@ BOOL IrcLink_Poll(void) {
     case IRC_CMD_ACCEPT:
         if (IrcLink.state == IRC_STATE_REPLIED) {
             IrcLink.state = IRC_STATE_CHILD_LINKED;
-            IrcLinkIds.peer = frame->id;
+            IrcLinkIds.peer = frame->header.id;
             IrcLink.linked = TRUE;
             IrcLink.resend = FALSE;
             IrcLink.pinging = FALSE;
             if (IrcLink.connectCallback != NULL) {
-                IrcLink.connectCallback(frame->id, 0);
+                IrcLink.connectCallback(frame->header.id, 0);
             }
         }
         break;
@@ -340,7 +346,7 @@ BOOL IrcLink_Poll(void) {
         break;
     default:
         if (IrcLink.resend != TRUE && IrcLink.linked) {
-            IrcLink.recvCallback(IrcFrame.data, size - 4, IrcFrame.cmd, IrcFrame.id);
+            IrcLink.recvCallback(IrcFrame.data, size - sizeof(IrcFrameHeader), IrcFrame.header.cmd, IrcFrame.header.id);
         }
         break;
     }
