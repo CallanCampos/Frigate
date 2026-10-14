@@ -392,7 +392,7 @@ BOOL POKE_NET_IsIPAddress(const char *text) {
 // Gives a host's address as text, resolving its name if it is one
 BOOL POKE_NET_GetHostAddress(const char *host, char *address) {
     if (POKE_NET_IsIPAddress(host) == FALSE) {
-        SocHostEnt *entry = SOC_GetHostByAddr(host);
+        SocHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry != NULL) {
             strcpy(address, SOC_InetNtoA(*(SocInAddr *)entry->addrList[0]));

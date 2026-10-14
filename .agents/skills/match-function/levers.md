@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A 64-bit sum of products in other registers, or an `ldm` of two fields where the original has two `ldr`: build
+  the sum with `+=`, one product a statement. (matching.md: "built up with `+=`")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
   with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
@@ -91,6 +93,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Every register moved by a field that the caller keeps in a saved register after an inline read it, where the
   original loads it again: the inline takes a `const T *`, even from a caller's plain pointer.
   (matching.md: "a `const` pointer from a caller whose")
+
+- A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
+  with other threads and `volatile`. (matching.md: "A field that other threads change")
 
 ## Stack slots or frame size
 
@@ -228,6 +233,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
   twice. (matching.md: "chained assignment to fields")
+- A member's address CSE'd into a callee-saved register from a store to a later call's argument, where ours
+  recomputes it: a pointer local declared at the top, assigned just before the call — not at its declaration.
+  (matching.md: "assigned just before the call")
+- Two constants on one field folded into one (`subs #0xff` for `- 0x100 + 1`) where the original keeps both: write
+  them as two statements on the field. (matching.md: "Two constants applied to a field")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows
   arguments for narrow parameters, so an argument passed without them is for a wider one. (matching.md: "narrows an argument")
 - A parameter passed on to a `u8` parameter without shifts is a `u8` too. (matching.md: "narrows an argument")
@@ -291,6 +301,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A `u16` argument narrowed before a call where the original passes one of two constants unnarrowed: a `u16` local
   set in an `if`/`else`, not a conditional expression. (matching.md: "The same goes for an argument")
+- I/O registers off a base register built by `lsl` of a register holding 1, where ours loads each address from the
+  literal pool: only `u32 base = 1; base <<= 26;` keeps it, judged unnatural so far (matching.md: "base made by
+  shifting a register")
+- A `bl memcpy` where the original keeps a hand `ldrb`/`strb` loop: declare `const u8 *`/`u8 *` locals and loop over
+  those, not over the function's own raw `const void *`/`const char *` parameter directly.
+  (matching.md: "only keeps that shape when the loop runs over its own")
 
 ## Branches and block layout
 
@@ -301,6 +317,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An inline's 0/1 result materialized then tested (`movs r0, #1; b; movs r0, #0; cmp r0, #0`) where ours folds it into the branch: return `u32` with the if-form, or `return (BOOL)(a >= b);`. (matching.md: "An inline's 0/1 result")
 - A final boolean returned from a register shared with a `NULL` argument: `return f() == TRUE ? FALSE : TRUE;`.
   (matching.md: "ends in `return f(...) == TRUE")
+- A 0/1 flag laid out first value first (`bne; movs #0; b; movs #1`) where every plain spelling loads 1 first: the
+  arms are enum constants, with the condition written so the original's first arm comes first.
+  (matching.md: "held in an enum type")
+- A `? 0 : 1` with inverted branch polarity whose 1 the original takes from a long-lived constant register:
+  default-then-override through a local, `v = 0; if (!cond) { v = 1; }`. (matching.md: "default-then-override")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
@@ -415,7 +436,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
-  globals get their own sections. Predict with `tools/decomp/rodata_order.py`. (matching.md: "Static data is sorted by size")
+  globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
+  `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
+  compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
 - The full model, checked by fuzzing MWCC: there is one list per file in declaration order, except tentative `.bss`
   statics, which join at the end in reverse order. Each kind (rodata, data, bss) gets its own shared section.
   Unreferenced statics are dropped. `rodata_order.py` doesn't model the per-kind sections or the `.bss` rule yet, but
@@ -464,6 +487,13 @@ sm64ds-decomp's catalogue for another mwccarm build, so they are untested here:
 - `#pragma opt_strength_reduction off`
 - `#pragma optimize_for_size on`
 - `#pragma opt_propagation off`
+
+Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles`
+(a loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
+restructures it. A function whose loop enters with a `b` to the test at -O4 may be one the original's global
+optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and `MBGameInfo_SendMembers` show the
+same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which showed it too and came within a
+byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is 0/1").
 
 Try one at a time with `try_variants.py`, which allows definitions before the function. If a pragma is all that
 matches, write that down in the nonmatching row; it's evidence, not a fix.

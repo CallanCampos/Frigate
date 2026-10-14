@@ -206,7 +206,7 @@ u32 NHTTPi_resolveHostname(NHttpRequest *request, const char *host) {
     if (SOC_InetAtoN(host, &parsed) != 0) {
         address = parsed;
     } else {
-        SocHostEnt *entry = SOC_GetHostByAddr(host);
+        SocHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry != NULL && entry->addrLength > 0) {
             NHTTPi_memcpy(&address, entry->addrList[0], 4);

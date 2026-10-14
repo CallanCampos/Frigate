@@ -2272,7 +2272,7 @@ static u32 CPSi_SocWrite(u8 *data, u32 len, u8 *data2, u32 len2) {
             }
             sent = len + len2;
         } else if (soc->ssl) {
-            sent = func_ov011_0215a49c(data, len, data2, len2, soc);
+            sent = CPS_SslWrite(data, len, data2, len2, soc);
         } else {
             sent = CPSi_TcpWrite(data, len, data2, len2, soc);
         }

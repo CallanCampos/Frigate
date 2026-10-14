@@ -1670,3 +1670,17 @@ lib/nitro/src/card/card_pull_out.c:
 lib/nitro/src/cp/cp_context.c:
     complete
     .text       start:0x0207002c end:0x020700a8
+
+lib/nitro/src/fx/fx_mtx22.c:
+    complete
+    .text       start:0x020723b8 end:0x0207244c
+
+lib/nitro/src/fx/fx_mtx33.c:
+    .text       start:0x0207244c end:0x02072c20
+
+lib/nitro/src/fx/fx_cp.c:
+    complete
+    .text       start:0x02073df0 end:0x02073fb4
+
+lib/nitro/src/fx/fx_vec.c:
+    .text       start:0x02073fb4 end:0x02074568

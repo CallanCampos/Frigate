@@ -508,6 +508,11 @@ Same code, other `sp` offsets or frame size.
 - MWCC reuses a field it has loaded, across the 64-bit multiply helpers, so a value that the original keeps on the
   stack between `piece->home.x - piece->pos.x` and `piece->pos.x = piece->home.x` is MWCC's own copy, not a local.
   Writing it as a local changes which stack slots everything gets.
+- A sum of 64-bit products written as one expression, `(fx64)x * x + (fx64)y * y + (fx64)z * z`, and the same sum
+  built up with `+=`, `fx64 sum = (fx64)v->x * v->x; sum += (fx64)v->y * v->y; sum += ...`, compile to the same
+  `smull`/`smlal` chain with different registers, and only the one expression merges the loads of neighbouring fields
+  into an `ldm`. libfx's `VEC_Mag`, `VEC_Fx16Mag`, `VEC_Distance` and `VEC_Normalize` match only with `+=`; a rounding
+  constant added in 32 bits to the last term (`sum += a->z * b->z + 0x800`) is what `VEC_Fx16DotProduct` needs.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.

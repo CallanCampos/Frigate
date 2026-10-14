@@ -134,7 +134,7 @@ int SOC_Send(int sock, const void *buffer, int size, int flags);
 int SOC_SendTo(int sock, const void *buffer, int size, int flags, const SocAddrIn *to);
 int SOC_Shutdown(int sock, int how);
 int SOC_Close(int sock);
-SocHostEnt *SOC_GetHostByAddr(const char *host);
+SocHostEnt *SOC_GetHostByName(const char *host);
 int SOC_GetSockName(int sock, SocAddrIn *address);
 u32 SOC_GetHostID(void);
 // Sets the DNS servers, despite the name (the SDK's; pokediamond's is the same)

@@ -2661,7 +2661,7 @@ overlays/ov011 0x02157cbc SOC_Send
 overlays/ov011 0x02157cd0 SOC_SendTo
 overlays/ov011 0x02157d30 SOC_Shutdown
 overlays/ov011 0x02157d38 SOC_Close
-overlays/ov011 0x02157d40 SOC_GetHostByAddr
+overlays/ov011 0x02157d40 SOC_GetHostByName
 overlays/ov011 0x02157dc0 SOC_GetSockName
 overlays/ov011 0x02157e2c SOC_GetHostID
 overlays/ov011 0x02157e58 SOC_GetResolver
@@ -2926,6 +2926,7 @@ overlays/ov011 0x0218dc44 SOCLi_CheckCount
 overlays/ov011 0x0218dc4c SOCLiSocketCount
 overlays/ov011 0x0218dc54 SOCLiSocketList
 overlays/ov011 0x0218dc58 SOCLiSocketListTrash
+overlays/ov011 0x02190928 sEngine
 overlays/ov012 0x02160a00 PleasureBoat_Free
 overlays/ov012 0x0216af5c sRibbonParams
 overlays/ov020 0x0216e660 EventPokeSelect_Create

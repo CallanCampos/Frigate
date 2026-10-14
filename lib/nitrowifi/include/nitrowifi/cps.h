@@ -169,7 +169,7 @@ int CPS_SslConnect(CPSSoc *soc);
 u8 *CPS_SslRead(u32 *len, CPSSoc *soc);
 void CPS_SslReadRelease(u32 len, CPSSoc *soc);
 s32 CPS_SslCanRead(CPSSoc *soc);
-u32 func_ov011_0215a49c(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc);
+u32 CPS_SslWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc);
 void CPS_SslShutdown(CPSSoc *soc);
 void CPS_SslClose(CPSSoc *soc);
 void CPS_SslTick(s32 now);

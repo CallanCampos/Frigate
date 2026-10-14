@@ -70,8 +70,6 @@ void func_0205acd0(void);
 BOOL func_0205ae04(void);
 int func_0205af98(void);
 void func_0205ae58(void);
-BOOL func_02057d40(void *userData);
-BOOL func_02057cd8(void *userData);
 BOOL func_02057dc4(void *userData);
 void func_02057de8(void *userData);
 BOOL func_020576a4(const DWCFriendData *friendData);
