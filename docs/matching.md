@@ -907,6 +907,11 @@ Same instructions, scheduled in another order.
   other field types, `const`, a nested struct and a one-element array member; a base loaded from a field
   (`list->table[i].f`) shares the address but indexes first too. Overlay 139's `UpdateScroll` reads
   `touch[touched].action` twice with the original's offset first, and no natural spelling of it is known (see its row).
+  An array member's offset goes the same way: two reads of `data->entries[i].type` with a store between give
+  `adds r1, r0, #0; adds r1, #0x18; ldr r1, [r1, r4]`, and with `const` data a later pass drops the second load.
+  A pointer local such as `entries = data->entries` is kept, not folded into `data`, once it has a use in a later
+  block than its definition, but reads with no store between are merged first. Overlay 332's
+  `CygnusData_GetEntry` gets the original's loads this way, with its two stores in the other order (see its row).
 - A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
   shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
   after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
