@@ -120,7 +120,7 @@ prints the tables below from the configs and the ROM:
 | `script_sub_event.c` | `0x02154070`–`0x02154180` | 7 | complete | descriptive |
 | `scrcmd_vm.c` | `0x02154180`–`0x02154948` | 59 | complete | descriptive |
 | `script_plugin.c` | `0x02154948`–`0x02154a64` | 5 | complete | descriptive |
-| `map_matrix.c` | `0x02154a64`–`0x02154c94` | 15 | partial | string at `0x0216e1c4` |
+| `map_matrix.c` | `0x02154a64`–`0x02154c94` | 15 | complete | string at `0x0216e1c4` |
 | `map_replace.c` | `0x02154c94`–`0x02154ea0` | 11 | complete | string at `0x0216e1d4` |
 | `respawn_zone.c` | `0x02154ea0`–`0x02154f98` | 7 | complete | descriptive |
 | `trainer_script.c` | `0x02154f98`–`0x021550a4` | 11 | complete | descriptive |

@@ -94,12 +94,12 @@ void MapMatrix_Patch(MapMatrix *matrix, GameSystem *gsys, HeapID heapId) {
     MapReplace_Free(replace);
 }
 
-void ProcessMapMatrix(MapMatrix *matrix, MapMatrixFileHeader *data, u32 matrixId, u16 zoneId) {
+void ProcessMapMatrix(MapMatrix *matrix, const MapMatrixFileHeader *data, u32 matrixId, u16 zoneId) {
     u16 width;
     u16 height;
-    u32 *chunkIds;
+    const u32 *chunkIds;
     u16 *zoneIds;
-    u32 *zones;
+    const u32 *zones;
     u32 i;
 
     matrix->zoneId = zoneId;

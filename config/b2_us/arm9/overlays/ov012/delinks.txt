@@ -79,6 +79,7 @@ src/ov012/script_plugin.c:
     .rodata     start:0x0216c104 end:0x0216c300
 
 src/ov012/map_matrix.c:
+    complete
     .text       start:0x02154a64 end:0x02154c94
     .data       start:0x0216e1c4 end:0x0216e1d4
 
