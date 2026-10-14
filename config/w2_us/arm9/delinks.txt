@@ -437,6 +437,7 @@ src/system/playtime_ctrl.c:
     .bss        start:0x02141688 end:0x021416a4
 
 src/system/pml_item.c:
+    complete
     .text       start:0x0202669c end:0x02026d0c
     .rodata     start:0x02090a5c end:0x02091778
 
