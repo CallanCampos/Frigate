@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 146,
+    "area": "AREA_ENTREE_FOREST",
     "matrix": "MAP_MATRIX_ENTREE_FOREST",
     "scripts": "SCRIPTS_ENTREE_FOREST",
     "text": "SCRIPT_TEXT_ENTREE_FOREST",

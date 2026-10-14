@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.gen_constants import LISTS_DIR, parse  # noqa: E402
+from tools.data.species_data import directory as species_directory  # noqa: E402
 from tools.text.text_data import bank_prefix  # noqa: E402
 
 ROOT = LISTS_DIR.parents[1]
@@ -35,6 +36,7 @@ NAMED_DATA = [
     ("places", "data/places", "PLACE_", ".json"),
     ("field_scripts", "data/field_scripts", "SCRIPTS_", ".s"),
     ("map_matrices", "data/map_matrices", "MAP_MATRIX_", ".json"),
+    ("areas", "data/areas", "AREA_", ".json"),
     ("map_models", "data/map_models", "MAP_MODEL_", "/"),
     ("map_texture_sets", "data/map_texture_sets", "MAP_TEXTURE_SET_", "/"),
     ("field_props_exterior", "data/field_prop_models/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
@@ -59,6 +61,8 @@ RELINKS = [
 
 
 def data_path(constant: str, directory: str, prefix: str, suffix: str) -> Path:
+    if prefix == "SPECIES_":
+        return ROOT / directory / species_directory(constant)
     return ROOT / directory / (constant.removeprefix(prefix).lower() + ("" if suffix == "/" else suffix))
 
 

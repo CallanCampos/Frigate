@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 339,
+    "area": "AREA_LIBERTY_GARDEN_2",
     "matrix": "MAP_MATRIX_LIBERTY_GARDEN_2",
     "scripts": "SCRIPTS_LIBERTY_GARDEN_2",
     "text": "SCRIPT_TEXT_LIBERTY_GARDEN_2",

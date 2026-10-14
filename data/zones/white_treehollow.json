@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 368,
+    "area": "AREA_WHITE_TREEHOLLOW",
     "matrix": "MAP_MATRIX_WHITE_TREEHOLLOW",
     "scripts": "SCRIPTS_WHITE_TREEHOLLOW",
     "text": "SCRIPT_TEXT_WHITE_TREEHOLLOW",

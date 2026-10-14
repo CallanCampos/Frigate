@@ -331,11 +331,8 @@ void MCSSSys_Draw(MCSSSystem *system) {
         if (system->mcss[i] == NULL || system->mcss[i]->hidden || system->mcss[i]->loaded != TRUE) {
             continue;
         }
-        ortho = FALSE;
         z = 0;
-        if (system->ortho) {
-            ortho = system->mcss[i]->ortho;
-        }
+        ortho = system->ortho ? system->mcss[i]->ortho : FALSE;
         mcss = system->mcss[i];
         imageProxy = &mcss->imageProxy;
         if (ortho == FALSE) {

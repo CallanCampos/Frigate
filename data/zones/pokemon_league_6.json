@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 15,
     "npc_cache": 24,
-    "area": 333,
+    "area": "AREA_POKEMON_LEAGUE_6",
     "matrix": "MAP_MATRIX_POKEMON_LEAGUE_6",
     "scripts": "SCRIPTS_POKEMON_LEAGUE_6",
     "text": "SCRIPT_TEXT_POKEMON_LEAGUE_6",

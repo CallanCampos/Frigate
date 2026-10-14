@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 11,
     "npc_cache": 24,
-    "area": 82,
+    "area": "AREA_MARVELOUS_BRIDGE",
     "matrix": "MAP_MATRIX_MARVELOUS_BRIDGE",
     "scripts": "SCRIPTS_MARVELOUS_BRIDGE_GATE",
     "text": "SCRIPT_TEXT_MARVELOUS_BRIDGE_GATE",

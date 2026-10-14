@@ -15,6 +15,7 @@ generates the headers from them with gen_constants.py.
     make_constants.py extract/b2_us/files/a/0/0/2 data/constants --flags
     make_constants.py extract/b2_us/files/a/0/0/2 data/constants --map-matrices extract/b2_us
     make_constants.py extract/b2_us/files/a/0/0/2 data/constants --field-graphics extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --areas extract/b2_us
 
 Names are the English names in upper case, with words split at spaces, hyphens and capitals inside a word, so that
 "ThunderPunch" becomes MOVE_THUNDER_PUNCH. Items named "???" are unused, and are named after their ID, as
@@ -34,11 +35,16 @@ TABLES = [
     ("moves.txt", "MOVE", 403, None, "Moves"),
     ("abilities.txt", "ABILITY", 374, None, "Abilities"),
     ("items.txt", "ITEM", 64, None, "Items"),
-    # The lines after the national Pokédex name eggs and other things that are not species
-    ("species.txt", "SPECIES", 90, 650, "Species, by national Pokédex number"),
+    # After the national Pokédex, the egg, the bad egg and Pokéstar Studios' props and costumes, which the game keeps as
+    # species of their own; the last two lines name the eggs' icons
+    ("species.txt", "SPECIES", 90, 685, "Species, by national Pokédex number, then the egg, the bad egg and the "
+     "Pokéstar Studios props and costumes that the studio's movies show as Pokémon"),
     ("types.txt", "TYPE", 398, None, "Types"),
     ("natures.txt", "NATURE", 27, None, "Natures"),
 ]
+
+# The IDs whose name takes a prefix: the Pokéstar Studios species, whose names, such as UFO or Prop U1, are a movie's
+PREFIXES = {"SPECIES": (range(652, 685), "POKESTAR_")}
 
 # Names for the IDs whose text is not a name, or is shared with another ID. The item descriptions tell them apart.
 OVERRIDES = {
@@ -391,6 +397,47 @@ def map_matrix_names(extract: Path) -> dict[int, str]:
     return names
 
 
+# The areas whose record the field picks by something else than the area alone, from its first (area_data.c): by the
+# season, AreaData_HasSeasons, and by other state, func_02018f60, func_02018f78 and func_02018f90
+SEASONAL_AREAS = range(2, 0x11A)
+AREA_VARIANTS = [range(0x166, 0x17A), range(0x161, 0x165), range(0x17D, 0x183)]
+SEASONS = ["SPRING", "SUMMER", "AUTUMN", "WINTER"]
+
+
+def area_names(extract: Path) -> dict[int, str]:
+    """Returns the name of each area: after the first zone whose header names it, the records after an area with
+    seasons by their season, those after another area of a range the field picks a record of by number, and the
+    others, which no zone names, by their own number."""
+    files = extract / "files"
+    (headers,) = read_narc_file(files / "a/0/1/2")
+    count = (files / "a/0/1/3").stat().st_size // 10
+    zones = {number: zone for zone, number in reversed(load_zone_list().items())}
+    first: dict[int, str] = {}
+    for z in range(len(headers) // ZONE_HEADER_SIZE):
+        area = struct.unpack_from("<H", headers, ZONE_HEADER_SIZE * z + 2)[0]
+        # A zone named after its number keeps its prefix, so as not to read as an area's number
+        zone = zones[z].removeprefix("ZONE_")
+        first.setdefault(area, f"ZONE_{zone}" if zone.isdigit() else zone)
+    names = {}
+    for a in range(count):
+        if a in first:
+            names[a] = f"AREA_{first[a]}"
+        elif a in SEASONAL_AREAS and (base := a - (a - SEASONAL_AREAS.start) % 4) in first:
+            names[a] = f"AREA_{first[base]}_{SEASONS[a - base]}"
+        elif (variants := next((r for r in AREA_VARIANTS if a in r), None)) and (
+                base := max((b for b in first if variants.start <= b < a), default=None)) is not None:
+            names[a] = f"AREA_{first[base]}_{a - base + 1}"
+        else:
+            names[a] = f"AREA_{a}"
+    return names
+
+
+def read_narc_file(path: Path) -> list[bytes]:
+    from tools.data.narc import read_narc
+
+    return read_narc(path.read_bytes())
+
+
 def place(names: list[str]) -> str | None:
     """Returns the place that names share: the one name, or the words that two or more start with."""
     names = sorted(set(names))
@@ -482,6 +529,8 @@ def main():
     parser.add_argument("--places", action="store_true", help="write only places.txt, from the place names")
     parser.add_argument("--map-matrices", type=Path, metavar="EXTRACT",
                         help="write only map_matrices.txt, from an extracted version such as extract/b2_us")
+    parser.add_argument("--areas", type=Path, metavar="EXTRACT",
+                        help="write only areas.txt, from an extracted version such as extract/b2_us")
     parser.add_argument("--field-graphics", type=Path, metavar="EXTRACT",
                         help="write only map_models.txt, map_texture_sets.txt and field_props_{exterior,interior}.txt, "
                              "from an extracted version such as extract/b2_us")
@@ -512,6 +561,12 @@ def main():
     if args.map_matrices:
         write_list(args.output / "map_matrices.txt", map_matrix_names(args.map_matrices),
                    "Map matrices: the overworld's, and the others by the first zone whose header names them, or their number")
+        return
+    if args.areas:
+        write_list(args.output / "areas.txt", area_names(args.areas),
+                   "Areas (a/0/1/3), by the first zone whose header names them: the records after an area with "
+                   "seasons by their season, those after another of a range the field picks by number numbered from "
+                   "it, and the rest by their number")
         return
     if args.field_graphics:
         descriptions = {
@@ -579,7 +634,8 @@ def main():
             elif text == "???":
                 names[i] = f"{prefix}_UNUSED_{i}"
             else:
-                names[i] = f"{prefix}_{identifier(text)}"
+                ids, extra = PREFIXES.get(prefix, (range(0), ""))
+                names[i] = f"{prefix}_{extra if i in ids else ''}{identifier(text)}"
         seen = {}
         for i, name in names.items():
             if name in seen:

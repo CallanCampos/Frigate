@@ -45,7 +45,7 @@ which documents the format and can write them again.
 | `a/1/7/4` | `data/field_prop_textures/exterior/<bundle>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
 | `a/1/7/5` | `data/field_prop_textures/interior/<bundle>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
 | `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
-| `a/0/1/3` | `data/areas/<number>.json` | Area records | `tools/data/area_data.py` |
+| `a/0/1/3` | `data/areas/<area>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
@@ -252,16 +252,19 @@ documents each field.
 
 `tools/data/species_data.py pack` builds the archives, one entry per record, in this order:
 
-- The species of `data/constants/species.txt`, from `SPECIES_NONE` (`none/`, an empty record) to Genesect.
-- The extra records, `data/pokemon/extra/<record>.json`, which no species' forms point at, kept until their use is
-  known. Some look like unused species, such as a Steel and Flying one with 600 base stats.
+- The species of `data/constants/species.txt`, from `SPECIES_NONE` (`none/`, an empty record) to Genesect, then
+  `SPECIES_EGG` and `SPECIES_BAD_EGG` and the 33 Pokéstar Studios species, `SPECIES_POKESTAR_UFO` to
+  `SPECIES_POKESTAR_SMEARGLE_2`: the props and costumes of the studio's movies, which the game keeps as species, with
+  their own records, sprites, icons and cries (a Steel and Flying UFO with 600 base stats, the doors, the sixteen prop
+  boxes). Not being Pokémon, they are in `data/pokemon/pokestar/<name>/`, such as `pokestar/ufo/`. Their names are lines of `species_names.txt` after the national Pokédex's, as the code names Bad Egg's
+  message, and they have no Pokédex text, so their files have only their records and `cry_volume`.
 - The alternate forms that have records of their own, `data/pokemon/<species>/form_<n>.json`, in the order of
   `data/pokemon/forms.json`. The packer sets each species' first form record from it, so a species' `forms` only
   gives the number of forms and where their sprites start. Species whose forms only differ in looks, such as Unown,
   have no form records.
 
 The baby species archive stops before the forms, which have no `baby_species`. The species data archive ends with a
-table of the species' and extra records' Unova Pokédex numbers, which their files hold as `regional_dex_number`: its 301
+table of the species' Unova Pokédex numbers, which their files hold as `regional_dex_number`: its 301
 numbers match the game's Unova Pokédex, from #000 for Victini to #300. The TMs and HMs a species learns are named, and
 so are its tutor moves: the record keeps them as a bit per move of each tutor, and the packer finds each move's bit, the
 type tutor's (the pledges, the starters' ultimate moves and Draco Meteor, in the order `PokeParty_GetTutorMoveID` tests
@@ -302,16 +305,22 @@ into sprites using the adjacent `*_cells.ncer` and `*_animations.nanr.lz11` Nitr
 fragmented. Those resources are preserved as separate source files and can be replaced with edited Nitro data.
 
 `icon.png` is a 32×64 two-frame icon, using a bank in
-`data/pokemon/shared/icon_palettes.pal`; the code in `src/system/poke_icon.c` picks the bank.
-`footprint.png` is a 16×32 character sheet and uses `data/pokemon/shared/footprint_palette.pal`.
+`data/pokemon/shared/icon_palettes.pal` (the PC boxes use `icon_palettes_box.pal`); the code in
+`src/system/poke_icon.c` picks the bank, and the icons' cells and animations for each OBJ mapping are
+`shared/icon_{cells,animations}_{32k,64k,128k}`. `footprint.png` is a 16×32 character sheet and uses
+`data/pokemon/shared/footprint_palette.pal`, with the cells and animations of `shared/footprint_*_old` for the species
+up to Arceus and `shared/footprint_*` for the rest (`zukan_info.c`).
 The older musical sprite archive has its own `musical/` subfolder. Files identical to the regular sprite are omitted
-there; the packer uses the regular file for those entries. Sprite forms have `form_<n>/` folders under their
-species. Eggs and currently unidentified reserved graphics slots are kept under `egg/` and `extra_graphics/` so no
-archive entries are dropped.
+there; the packer uses the regular file for those entries, so an edit of one shows in both. Sprite forms have
+`form_<n>/` folders under their species, numbered by the forms' `sprite_offset` (`GetPokemonDataIDBase`); the musical
+sprites' follow Black and White's species data instead (`MusicalMcss_GetDataIDBase`), so a form's `musical/` is where
+it has one. `egg/` holds the egg's sprites and icon, which every egg shows, and `species_icon.png`, the icon file of
+`SPECIES_EGG` itself; Manaphy's egg is `manaphy/egg/`. The Substitute doll is `shared/substitute/`
+(`BtlvMcss_SetSubstitute`), and `shared/substitute/musical/` is Black and White's copy, which nothing loads.
 
 `cry.wav` is mono PCM8 at the game's sample rate; the packer also accepts mono PCM16 edits and different lengths.
-`cry_volume` in each species' `data.json` is the game's 0–127 playback volume. Eggs and reserved cry slots use a
-small `data.json` beside their `cry.wav`. Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
+`cry_volume` in each species' `data.json` is the game's 0–127 playback volume; the egg, the bad egg and the
+Pokéstar Studios species have cries and volumes of their own too (`pm_voice.c`). Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
 volume.
 The other sounds in `swan_sound_data.sdat` retain their original data. Extract the graphics again with
 `.venv/bin/python tools/data/pokemon_graphics.py extract data/pokemon` and the cries with
@@ -692,13 +701,17 @@ none), row by row,
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
 
-Each area is `data/areas/<number>.json`, numbered from `000` in record order. These are the records of `a/0/1/3`
-(`AreaData`), which name the graphics that zones share: their props, textures, animations (null for none), lights and
-colors. The props and texture set are named by their constants (see [Map model sources](#map-model-sources)), or by
-number for the few props that the archive doesn't have; the rest are file numbers. A zone's header names its area by
-its number, and
-an area with seasons has a record per season after it. `data/areas/area.schema.json` describes one record and
-`tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
+Each area is `data/areas/<area>.json`, named after its constant in `data/constants/areas.txt`, in whose order
+`a/0/1/3` has the records (`AreaData`), which name the graphics that zones share: their props, textures, animations
+(null for none), lights and colors. The props and texture set are named by their constants (see
+[Map model sources](#map-model-sources)), or by number for the few props that the archive doesn't have; the rest are
+file numbers. A zone's header names its area by its constant. The field reads the record of the area plus a variant
+(`AreaData_Create`): the season for an area with seasons (records 2 to 0x119, `AreaData_HasSeasons`), whose records
+after the first are named `_SUMMER`, `_AUTUMN` and `_WINTER`, and other state for three other ranges
+(`func_02018f60`, `func_02018f78` and `func_02018f90` in `fieldmap.c`), whose records after the zone's are numbered
+from `_2`. An area is named after the first zone whose header names it, and the 81 records that nothing names, by
+their number; `make_constants.py --areas` bootstrapped the list. `data/areas/area.schema.json` describes one record
+and `tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
 
 An area's lights are a lighting set, `data/lights/field/<n>.json` (`a/0/6/0`, `ARCID_LIGHTS_FIELD`), by its number;
 the battles' are `data/lights/battle/<n>.json` (`a/0/6/1`). A set is the periods of the day, which

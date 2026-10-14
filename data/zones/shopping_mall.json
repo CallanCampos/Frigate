@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 326,
+    "area": "AREA_SHOPPING_MALL",
     "matrix": "MAP_MATRIX_SHOPPING_MALL",
     "scripts": "SCRIPTS_SHOPPING_MALL",
     "text": "SCRIPT_TEXT_SHOPPING_MALL",

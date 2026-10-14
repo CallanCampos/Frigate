@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from configure import (CC_FLAGS, GENERATED_INCLUDE_DIR, INCLUDE_DIRS, MWCC_VERSION, TEXT_ARCHIVES, VERSIONS,  # noqa: E402
-                       download_tools, library_of)
+                       download_tools, library_of, mwcc_command)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.gen_constants import generate  # noqa: E402
 from tools.text import pms_words, text_ids  # noqa: E402
@@ -33,8 +33,7 @@ def compile_file(source: Path, version: str, out_dir: Path) -> tuple[Path, str] 
     obj = out_dir / version / source.with_suffix(".o")
     obj.parent.mkdir(parents=True, exist_ok=True)
     command = [
-        str(TOOLS / "wibo"),
-        str(TOOLS / "mwccarm" / compiler / "mwccarm.exe"),
+        *mwcc_command(TOOLS / "mwccarm" / compiler / "mwccarm.exe"),
         *(arg for flag in flags for arg in shlex.split(flag)),
         *(arg for define in VERSIONS[version]["defines"] for arg in ("-d", define)),
         *(arg for d in INCLUDE_DIRS for arg in ("-i", d)),

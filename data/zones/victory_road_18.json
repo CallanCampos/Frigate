@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 106,
+    "area": "AREA_PINWHEEL_FOREST_2",
     "matrix": "MAP_MATRIX_VICTORY_ROAD_18",
     "scripts": "SCRIPTS_VICTORY_ROAD_18",
     "text": "SCRIPT_TEXT_VICTORY_ROAD_18",

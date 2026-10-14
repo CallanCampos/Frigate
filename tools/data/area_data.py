@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""The areas in data/areas/<number>.json: dump writes them from the ROM once, and pack builds the file (a/0/1/3)
+"""The areas in data/areas/<area>.json: dump writes them from the ROM once, and pack builds the file (a/0/1/3)
 from them, which the build does.
 
     area_data.py dump extract/b2_us/files data/areas
     area_data.py pack data/areas FILE
 
 The file is an array of 10-byte records (AreaData), in order: a zone's header names its area by its number, and an area
-with seasons has a record per season after it. An area names its texture set by its MAP_TEXTURE_SET_* constant and its
+with seasons has a record per season after it. Each area is named after its constant in data/constants/areas.txt, in
+whose order the file has them. An area names its texture set by its MAP_TEXTURE_SET_* constant and its
 props by a FIELD_PROPS_EXTERIOR_* or FIELD_PROPS_INTERIOR_* one, as it is exterior or not, or by number where the archive
 has no such file. area.schema.json describes the fields.
 """
@@ -17,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.datajson import DataError, label, load, load_schema, name, value, write  # noqa: E402
+from tools.data.gen_constants import ordered_files  # noqa: E402
 
 RECORD = struct.Struct("<HHBBBBBB")
 NO_ANIMATION = 0xFF  # AREA_ANM_NONE
@@ -32,7 +34,10 @@ def dump(files: Path, output: Path):
     data = (files / "a/0/1/3").read_bytes()
     if len(data) % RECORD.size:
         sys.exit("the file isn't whole records")
-    for i, values in enumerate(RECORD.iter_unpack(data)):
+    paths = ordered_files("areas", "AREA_", output, ".json")
+    if len(paths) * RECORD.size != len(data):
+        sys.exit(f"{len(data) // RECORD.size} areas in the file and {len(paths)} in areas.txt")
+    for path, values in zip(paths, RECORD.iter_unpack(data)):
         area = dict(zip(FIELDS, values))
         for key in ("srt_animation", "pattern_animation"):
             area[key] = None if area[key] == NO_ANIMATION else area[key]
@@ -41,17 +46,14 @@ def dump(files: Path, output: Path):
         area["exterior"] = bool(area["exterior"])
         area["prop_bundle"] = name(props_prefix(area["exterior"]), area["prop_bundle"])
         area["texture_set"] = name("MAP_TEXTURE_SET_", area["texture_set"])
-        write(output / f"{i:03d}.json", {"$schema": "area.schema.json", **area})
+        write(path, {"$schema": "area.schema.json", **area})
     print(f"wrote {len(data) // RECORD.size} areas to {output}")
 
 
 def pack(root: Path, output: Path):
     schema = load_schema(root / "area.schema.json")
-    paths = sorted(path for path in root.glob("*.json") if not path.name.endswith(".schema.json"))
-    if [path.name for path in paths] != [f"{i:03d}.json" for i in range(len(paths))]:
-        raise DataError(f"{label(root)}: areas must be numbered from 000 without gaps")
     data = b""
-    for path in paths:
+    for path in ordered_files("areas", "AREA_", root, ".json"):
         area = load(path, schema)
         values = dict(area)
         for key in ("srt_animation", "pattern_animation"):

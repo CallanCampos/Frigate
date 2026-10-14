@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 90,
+    "area": "AREA_CELESTIAL_TOWER",
     "matrix": "MAP_MATRIX_CELESTIAL_TOWER",
     "scripts": "SCRIPTS_CELESTIAL_TOWER",
     "text": "SCRIPT_TEXT_CELESTIAL_TOWER",

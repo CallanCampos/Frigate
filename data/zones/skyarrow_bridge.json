@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 1,
     "npc_cache": 24,
-    "area": 14,
+    "area": "AREA_SKYARROW_BRIDGE",
     "matrix": "MAP_MATRIX_SKYARROW_BRIDGE",
     "scripts": "SCRIPTS_SKYARROW_BRIDGE",
     "text": "SCRIPT_TEXT_SKYARROW_BRIDGE",

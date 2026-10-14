@@ -1853,6 +1853,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   one early, defined first it is where the ROM has it.
 - `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
   Medal Rally's `p_sv` does.
+- Japanese text in a string is written as is: sources are UTF-8, and the build hands them to MWCC in Shift JIS, the
+  encoding of the game's strings, through sjiswrap, with `-enc SJIS` so that a second byte of 0x5c (`表`, `ソ`) isn't
+  read as a backslash. An escape such as `\x94` can't stand in for it in an assert, whose expression is stringized as
+  written: `wm_icon.c`'s `func_0203e5ec` has `GFL_ASSERT(0 && "非対応のOBJマッピングモード")`. A character that Shift JIS can't encode is fine in a comment; anywhere else sjiswrap names it, and its
+  bytes would be wrong.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
   a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.
 - A table one element longer in the ROM than the code needs has a terminator: pml_item.c's `TM_MOVE_LIST` is 101 moves

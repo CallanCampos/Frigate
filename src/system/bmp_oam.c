@@ -152,13 +152,13 @@ void BmpOam_ActorBmpTrans(BmpOamActor *actor) {
     void (*upload)(const void *src, u32 offset, u32 size);
     int x;
     u32 tilesHigh;
+    u32 vramOffset;
+    int y;
     // Where the cell's upper and lower rows of 8 pixels are in the bitmap
-    u32 offset;
-    u32 lowerOffset;
+    int offset;
+    int lowerOffset;
     u32 tilesWide;
     u32 size;
-    int y;
-    u32 vramOffset;
     // The size of a row of the last cell of a row, which may be narrower
     u32 lastSize;
 

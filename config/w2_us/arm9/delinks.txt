@@ -36,6 +36,7 @@ src/gfl/strbuf.c:
     .data       start:0x0209af0c end:0x0209af1c
 
 src/gfl/msgdata.c:
+    complete
     .text       start:0x02048788 end:0x02048bbc
     .data       start:0x0209af1c end:0x0209af28
     .bss        start:0x0214195c end:0x02141960
@@ -92,6 +93,7 @@ src/gfl/str_sjis.c:
     .text       start:0x020508e4 end:0x02050a6c
 
 src/gfl/areaman.c:
+    complete
     .text       start:0x0203c410 end:0x0203ca50
     .rodata     start:0x02092f78 end:0x0209328c
     .data       start:0x0209a9cc end:0x0209a9d8
@@ -103,6 +105,7 @@ src/gfl/vman.c:
     .data       start:0x0209a9d8 end:0x0209a9e0
 
 src/gfl/gf_overlay.c:
+    complete
     .text       start:0x0203cd78 end:0x0203d038
     .data       start:0x0209a9e4 end:0x0209a9fc
     .bss        start:0x021418c0 end:0x021418c4
@@ -114,11 +117,13 @@ src/gfl/ui.c:
     .bss        start:0x021418c4 end:0x021418cc
 
 src/gfl/touchpanel.c:
+    complete
     .text       start:0x0203d688 end:0x0203dc70
     .data       start:0x0209aa04 end:0x0209aa14
     .bss        start:0x021418cc end:0x021418d0
 
 src/gfl/key.c:
+    complete
     .text       start:0x0203dc70 end:0x0203dfec
     .data       start:0x0209aa14 end:0x0209aa1c
 
@@ -182,6 +187,7 @@ src/gfl/backup_card.c:
     .bss        start:0x021418a0 end:0x021418a4
 
 src/gfl/backup_system.c:
+    complete
     .text       start:0x0203abd8 end:0x0203bfa8
     .data       start:0x0209a8c0 end:0x0209a918
     .bss        start:0x0214189c end:0x021418a0
@@ -197,6 +203,7 @@ src/gfl/net_queue.c:
     .data       start:0x0209aa30 end:0x0209aa60
 
 src/gfl/wm_icon.c:
+    complete
     .text       start:0x0203e4cc end:0x0203e8f4
     .rodata     start:0x020932fc end:0x0209331c
     .data       start:0x0209aa60 end:0x0209aa94
@@ -277,6 +284,7 @@ src/gfl/g3d_system.c:
     .bss        start:0x02141964 end:0x02141970
 
 src/gfl/clact.c:
+    complete
     .text       start:0x0204b6d4 end:0x0204dcd0
     .rodata     start:0x02093e70 end:0x02093f6c
     .data       start:0x0209afd0 end:0x0209b028
@@ -332,6 +340,7 @@ lib/spl/src/spl_emitter.c:
     .text       start:0x0205156c end:0x020523c0
 
 lib/spl/src/spl_draw.c:
+    complete
     .text       start:0x020523c0 end:0x02054c28
     .data       start:0x0209b084 end:0x0209b094
 
@@ -429,6 +438,7 @@ src/system/playtime_ctrl.c:
     .bss        start:0x02141688 end:0x021416a4
 
 src/system/pml_item.c:
+    complete
     .text       start:0x0202669c end:0x02026d0c
     .rodata     start:0x02090a5c end:0x02091778
 
@@ -439,11 +449,13 @@ src/system/cursor_move.c:
     .data       start:0x0209a5b0 end:0x0209a5c0
 
 src/system/bmp_oam.c:
+    complete
     .text       start:0x0202ae88 end:0x0202b488
     .rodata     start:0x02091abc end:0x02091ae0
     .data       start:0x0209a5a4 end:0x0209a5b0
 
 src/system/country_region.c:
+    complete
     .text       start:0x0202b488 end:0x0202b600
     .rodata     start:0x02091ae0 end:0x02091de0
 
@@ -737,6 +749,7 @@ src/system/boot_proc.c:
     .bss        start:0x02141848 end:0x02141850
 
 src/system/resonance_resort_data.c:
+    complete
     .text       start:0x020363b0 end:0x02039538
     .rodata     start:0x02092c2c end:0x02092d00
     .data       start:0x0209a860 end:0x0209a878
@@ -1211,6 +1224,7 @@ src/system/encounter_savedata.c:
     .text       start:0x0200dcec end:0x0200de34
 
 src/system/gds_profile.c:
+    complete
     .text       start:0x0200de34 end:0x0200e0f0
     .data       start:0x0209a1fc end:0x0209a20c
 
@@ -1224,6 +1238,7 @@ src/system/rndmatch_savedata.c:
     .text       start:0x0200e864 end:0x0200e8bc
 
 src/system/musical_dist_save.c:
+    complete
     .text       start:0x0200cc94 end:0x0200ce50
     .data       start:0x0209a1e8 end:0x0209a1fc
 
@@ -1310,6 +1325,7 @@ src/system/join_avenue_savedata.c:
     .bss        start:0x02140fb0 end:0x02140fb4
 
 src/system/key_data_savedata.c:
+    complete
     .text       start:0x02010230 end:0x020103f4
     .rodata     start:0x0208fa18 end:0x0208fa24
 
@@ -1526,11 +1542,13 @@ src/system/mcss_tool.c:
     .data       start:0x0209a3d8 end:0x0209a3e8
 
 src/system/poke_regulation.c:
+    complete
     .text       start:0x0201f0a8 end:0x0201fd24
     .rodata     start:0x02090520 end:0x02090560
     .data       start:0x0209a3f4 end:0x0209a408
 
 src/system/pokeparty.c:
+    complete
     .text       start:0x0201fd24 end:0x02020234
     .data       start:0x0209a408 end:0x0209a414
 
@@ -1618,6 +1636,7 @@ src/system/snd_strm.c:
     .bss        start:0x02140f9c end:0x02140fa0
 
 src/system/save_control.c:
+    complete
     .text       start:0x020070f0 end:0x02007710
     .data       start:0x02099f90 end:0x02099fe4
     .bss        start:0x02140fa0 end:0x02140fa4
@@ -1632,6 +1651,7 @@ src/system/box_savedata.c:
     .data       start:0x02099fe4 end:0x0209a0b4
 
 src/system/perapvoice.c:
+    complete
     .text       start:0x02007e20 end:0x02007fd0
     .data       start:0x0209a0b4 end:0x0209a0c4
 

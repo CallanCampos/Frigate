@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 194,
+    "area": "AREA_ABUNDANT_SHRINE",
     "matrix": "MAP_MATRIX_ABUNDANT_SHRINE",
     "scripts": "SCRIPTS_ABUNDANT_SHRINE",
     "text": "SCRIPT_TEXT_ABUNDANT_SHRINE",

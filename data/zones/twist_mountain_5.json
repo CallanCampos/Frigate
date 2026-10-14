@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 294,
+    "area": "AREA_TWIST_MOUNTAIN_3",
     "matrix": "MAP_MATRIX_TWIST_MOUNTAIN_5",
     "scripts": "SCRIPTS_TWIST_MOUNTAIN_5",
     "text": "SCRIPT_TEXT_TWIST_MOUNTAIN_5",
