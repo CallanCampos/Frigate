@@ -236,10 +236,10 @@ SOCLi_DhcpTimeout kind:function(thumb,size=0x10) addr:0x0215601c
 SOCL_LinkIsOn kind:function(thumb,size=0x12) addr:0x0215602c
 SOCLi_StartupCommandPacketQueue kind:function(thumb,size=0x5c) addr:0x02156040
 SOCLi_CleanupCommandPacketQueue kind:function(thumb,size=0x2c) addr:0x0215609c
-SOCLi_CreateCommandPacket kind:function(thumb,size=0x1c) addr:0x021560c8
-SOCLi_AllocCommandPacket kind:function(thumb,size=0x24) addr:0x021560e4
+SOCLi_AllocCommandPacket kind:function(thumb,size=0x1c) addr:0x021560c8
+SOCLi_CreateCommandPacket kind:function(thumb,size=0x24) addr:0x021560e4
 SOCLi_FreeCommandPacket kind:function(thumb,size=0x14) addr:0x02156108
-func_ov011_021560dc kind:function(thumb,size=0x12) addr:0x0215611c
+SOCLi_GetCtrlPipe kind:function(thumb,size=0x12) addr:0x0215611c
 SOCLi_SendCommandPacket kind:function(thumb,size=0x34) addr:0x02156130
 SOCLi_SendCommandPacketToCtrlPipe kind:function(thumb,size=0x10) addr:0x02156164
 SOCLi_ExecCommandPacket kind:function(thumb,size=0x42) addr:0x02156174
@@ -2683,8 +2683,8 @@ data_ov011_0218dbe4 kind:bss addr:0x0218dc24
 data_ov011_0218dbe8 kind:bss addr:0x0218dc28
 data_ov011_0218dbec kind:bss addr:0x0218dc2c
 data_ov011_0218dbf0 kind:bss addr:0x0218dc30
-data_ov011_0218dc20 kind:bss addr:0x0218dc60
-data_ov011_0218dc24 kind:bss addr:0x0218dc64
+SOCLiCommandPackets kind:bss addr:0x0218dc60
+SOCLiCommandPacketQueue kind:bss addr:0x0218dc64
 data_ov011_0218dc44 kind:bss addr:0x0218dc84
 data_ov011_0218dc4c kind:bss addr:0x0218dc8c
 data_ov011_0218dc54 kind:bss addr:0x0218dc94

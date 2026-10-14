@@ -2530,9 +2530,10 @@ overlays/ov011 0x02155fdc SOCLi_DhcpTimeout
 overlays/ov011 0x02155fec SOCL_LinkIsOn
 overlays/ov011 0x02156000 SOCLi_StartupCommandPacketQueue
 overlays/ov011 0x0215605c SOCLi_CleanupCommandPacketQueue
-overlays/ov011 0x02156088 SOCLi_CreateCommandPacket
-overlays/ov011 0x021560a4 SOCLi_AllocCommandPacket
+overlays/ov011 0x02156088 SOCLi_AllocCommandPacket
+overlays/ov011 0x021560a4 SOCLi_CreateCommandPacket
 overlays/ov011 0x021560c8 SOCLi_FreeCommandPacket
+overlays/ov011 0x021560dc SOCLi_GetCtrlPipe
 overlays/ov011 0x021560f0 SOCLi_SendCommandPacket
 overlays/ov011 0x02156124 SOCLi_SendCommandPacketToCtrlPipe
 overlays/ov011 0x02156134 SOCLi_ExecCommandPacket
@@ -2617,6 +2618,8 @@ overlays/ov011 0x0218c084 sDhcpRcvBuf
 overlays/ov011 0x0218c204 sReassembly
 overlays/ov011 0x0218cbe0 sScavengerStack
 overlays/ov011 0x0218d3e0 sRecvStack
+overlays/ov011 0x0218dc20 SOCLiCommandPackets
+overlays/ov011 0x0218dc24 SOCLiCommandPacketQueue
 overlays/ov012 0x02160a00 PleasureBoat_Free
 overlays/ov012 0x0216af5c sRibbonParams
 overlays/ov020 0x0216e660 EventPokeSelect_Create

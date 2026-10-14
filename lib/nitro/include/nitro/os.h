@@ -234,6 +234,10 @@ typedef struct OSMessageQueue {
 void func_0207acc4(OSMessageQueue *queue, OSMessage *messages, s32 count);
 BOOL OS_SendMessage(OSMessageQueue *queue, OSMessage message, s32 flags);
 BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags);
+BOOL OS_ReadMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags); // The first message, left in the queue
+// OS_DisableScheduler and OS_EnableScheduler's roles
+u32 func_0207aab4(void);
+u32 func_0207aad8(void);
 
 // NitroSDK's threads, under swan's names: OS_CreateThread, whose stack is its top, OS_SleepThread, which sleeps on
 // queue until OS_WakeupThread wakes it, and OS_WakeupThreadDirect, which starts a new thread. Of the thread's fields

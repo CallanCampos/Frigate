@@ -397,6 +397,7 @@ in both versions.
 | `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_StartupSOCL` | `0x02155e70` / `0x02155eb0` | Same size, 1 byte: the store of `SOCLiUDPSendSocket` is `[r1, #0xc]` from the `.bss` base, as in `SOCLi_StartupCPS`. |
 | `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_SetMyIP` | `0x02155f98` / `0x02155fd8` | Same size, 2 bytes: `SOCLiDhcpState` is `[r1, #8]` from the `.bss` base, as in `SOCLi_StartupCPS`. |
 | `lib/nitrowifi/src/soc/socl_startup.c` | `SOCLi_DhcpTimeout` | `0x02155fdc` / `0x0215601c` | Same size, 2 bytes: as `SOCLi_SetMyIP`. |
+| `lib/nitrowifi/src/soc/socl_command.c` | `SOCLi_CleanupCommandPacketQueue` | `0x0215605c` / `0x0215609c` | 0x30 against the original's 0x2c: the original reaches the file's `.bss` statics from one base (`ldr r4, =0x0218dc20`, `SOCLiCommandPackets` at `[r4]`, the queue's `msgCount` and `usedCount` as `[r4, #0x18]` and `[r4, #0x20]`), where ours loads each variable's own address, as in `socl_startup.c`. Nothing else differs. |
 
 ## Matching, but not linkable as is
 
