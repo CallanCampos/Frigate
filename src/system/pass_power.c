@@ -102,7 +102,7 @@ u8 PassPower_GetSPowerBaseID(int passPower) {
     return 0xff;
 }
 
-void PassPower_Activate(u32 passPower, void *data, BOOL paid) {
+void PassPower_Activate(u32 passPower, const void *data, BOOL paid) {
     int effect;
     const PassPowerData *entry;
     if (!PassPower_IsIDValid(passPower)) {
@@ -314,7 +314,7 @@ u32 PassPower_ApplyPrizeMoney(u32 money) {
 
 u32 PassPower_ApplyCapture(s32 rate) {
     if (g_PassPowerState.passPowers[PASS_POWER_EFFECT_CAPTURE] != PASS_POWER_NONE) {
-        u64 value = g_PassPowerState.values[PASS_POWER_EFFECT_CAPTURE];
+        s64 value = g_PassPowerState.values[PASS_POWER_EFFECT_CAPTURE];
 
         value = value * rate / 100;
         return value;

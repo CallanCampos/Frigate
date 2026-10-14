@@ -1405,6 +1405,7 @@ src/system/battle_video_proc.c:
     .rodata     start:0x0208fe14 end:0x0208fe20
 
 src/system/pass_power.c:
+    complete
     .text       start:0x0201340c end:0x02013914
     .rodata     start:0x0208fe20 end:0x0208fe3c
     .bss        start:0x02141080 end:0x021410f4
