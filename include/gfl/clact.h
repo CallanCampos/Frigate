@@ -14,6 +14,8 @@
 // Holds cell actors, 0xe4 bytes each
 typedef struct ClActUnit ClActUnit;
 typedef struct ClActor ClActor;
+typedef struct ClActAnim ClActAnim;
+typedef struct ClActSys ClActSys;
 
 typedef struct {
     s16 x;
@@ -220,5 +222,11 @@ void func_0204c584(ClActor *actor, u32 playMode);
 void func_0204c5b0(ClActor *actor, const ClActorCallback *callback);
 void func_0204c5bc(ClActor *actor);
 void func_0204c5c8(ClActor *actor, BOOL a1);
+// The actor system, which the ITCM reads
+extern ClActSys *g_ClActSys;
+
+// Called from the ITCM
+void func_0204d3bc(ClActAnim *anim, fx32 frames);
+void func_0204d46c(ClActAnim *anim, fx32 speed);
 
 #endif // POKEBW2_GFL_CLACT_H

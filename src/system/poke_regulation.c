@@ -574,7 +574,7 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
     u32 forms[PARTY_SIZE] = {0};
     u32 items[PARTY_SIZE] = {0};
     u8 count = 0;
-    u8 i, j;
+    u8 i, j, k;
     BOOL ok;
     u16 levelTotal = 0;
     PartyPkm *pkm;
@@ -659,8 +659,8 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
             u32 requiredForm = Regulation_GetParam(regulation, REGULATION_PARAM_12);
 
             found = FALSE;
-            for (j = 0; j < count; j++) {
-                if (required == species[j] && requiredForm == forms[j]) {
+            for (k = 0; k < count; k++) {
+                if (required == species[k] && requiredForm == forms[k]) {
                     found = TRUE;
                     break;
                 }

@@ -141,9 +141,12 @@ StrBuf *GdsProfile_GetIntroduction(GdsProfile *profile, PMSData *pms, u32 heapId
         u32 index;
 
         *pms = profile->introduction.pms;
-        if (pms->type >= GDS_PROFILE_PMS_TYPE_END || pms->id > GDS_PROFILE_PMS_ID_MAX ||
-            (pms->words[0] != PMS_WORD_NULL && !PMSWord_GetMessage(pms->words[0], &category, &index)) ||
-            (pms->words[1] != PMS_WORD_NULL && !PMSWord_GetMessage(pms->words[1], &category, &index))) {
+        if (pms->type >= GDS_PROFILE_PMS_TYPE_END) {
+            errors++;
+        } else if (pms->id > GDS_PROFILE_PMS_ID_MAX) {
+            errors++;
+        } else if ((pms->words[0] != PMS_WORD_NULL && !PMSWord_GetMessage(pms->words[0], &category, &index)) ||
+                   (pms->words[1] != PMS_WORD_NULL && !PMSWord_GetMessage(pms->words[1], &category, &index))) {
             errors++;
         }
         if (errors > 0) {

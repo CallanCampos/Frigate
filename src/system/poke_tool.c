@@ -643,12 +643,12 @@ BOOL PML_PkmReEncrypt(BoxPkm *pkm, BOOL wasEncrypted) {
     return encrypted;
 }
 
-u32 PokeParty_GetParam(PartyPkm *pkm, PkmField param, void *buffer) {
+u32 PokeParty_GetParam(const PartyPkm *pkm, PkmField param, void *buffer) {
     u32 value;
 
-    PokeParty_PkmDecryptCheck(pkm);
-    value = PokeParty_GetParamCore(pkm, param, buffer);
-    PokeParty_PkmEncrypt(pkm);
+    PokeParty_PkmDecryptCheck((PartyPkm *)pkm);
+    value = PokeParty_GetParamCore((PartyPkm *)pkm, param, buffer);
+    PokeParty_PkmEncrypt((PartyPkm *)pkm);
     return value;
 }
 

@@ -152,7 +152,7 @@ typedef enum {
     PKM_PARAM_COUNT = 0xb4,
 } PkmField;
 
-u32 PokeParty_GetParam(PartyPkm *pkm, PkmField param, void *buffer);
+u32 PokeParty_GetParam(const PartyPkm *pkm, PkmField param, void *buffer);
 u32 PokeParty_GetNature(PartyPkm *pkm);
 // A field that is not a number takes a pointer to its value
 void PokeParty_SetParam(PartyPkm *pkm, PkmField param, u32 value);

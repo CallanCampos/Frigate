@@ -1877,7 +1877,10 @@ static void JoinAvenuePerson_SetupShop(JoinAvenuePerson *person, ResortShopData 
 
 static void JoinAvenuePerson_AddVisitorData(JoinAvenuePerson *person, const JoinAvenueVisitor *visitor) {
     if (visitor->dataIndex < JOIN_AVE_DATA_COUNT) {
-        sys_memcpy(&visitor->data, &person->data[visitor->dataIndex], sizeof(JoinAvenueData));
+        JoinAvenueData *data = person->data;
+
+        data += visitor->dataIndex;
+        sys_memcpy(&visitor->data, data, sizeof(JoinAvenueData));
         person->dataMask |= 1 << visitor->dataIndex;
     }
 }

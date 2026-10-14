@@ -35,8 +35,8 @@ typedef struct {
     WmIcon *icon;
 } WmIconSys;
 
-static WmIcon *loadWifiStrengthIcons(u32 unused, u32 heapId, u16 x, u16 y, u32 type, WmIcon *icon, u32 screen,
-    u32 subOam, int level);
+static WmIcon *loadWifiStrengthIcons(u32 unused, u32 heapId, u32 x, u32 y, u32 type, WmIcon *icon, u32 screen,
+                                     u32 subOam, int level);
 static void func_0203e520(WmIcon *icon);
 static u32 func_0203e5ac(WmIcon *icon);
 static u32 func_0203e5ec(u32 engine, u32 charNo);
@@ -58,8 +58,8 @@ static inline void HideOam(GXOamAttr *oam) {
     oam->attr2 = 0;
 }
 
-static WmIcon *loadWifiStrengthIcons(u32 unused, u32 heapId, u16 x, u16 y, u32 type, WmIcon *icon, u32 screen,
-    u32 subOam, int level) {
+static WmIcon *loadWifiStrengthIcons(u32 unused, u32 heapId, u32 x, u32 y, u32 type, WmIcon *icon, u32 screen,
+                                     u32 subOam, int level) {
     if (icon == NULL) {
         icon = GFL_HeapAllocate(HEAPID_TAIL((HeapID)heapId), sizeof(WmIcon), FALSE, "wm_icon.c", 100);
     }
@@ -141,7 +141,7 @@ static u32 func_0203e5ec(u32 engine, u32 charNo) {
         return charNo;
     case GX_OBJVRAMMODE_CHAR_1D_256K:
     default:
-        GFL_ASSERT(0);
+        GFL_ASSERT(0 && "非対応のOBJマッピングモード"); // "Unsupported OBJ mapping mode"
         return charNo;
     }
 }
@@ -209,7 +209,7 @@ static void copyEmptyOAM(void) {
     gfxUploadOAMB(sEmptyOam, 0, sizeof(sEmptyOam));
 }
 
-void func_0203e76c(u16 x, u16 y, u32 type, u32 heapId) {
+void func_0203e76c(u32 x, u32 y, u32 type, HeapID heapId) {
     copyEmptyOAM();
     if (sWmIcon.icon != NULL) {
         u32 screen;
