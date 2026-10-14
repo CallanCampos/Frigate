@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A multiply's operand copied right after its `subs` where the original loads the constant first: give the index
+  its own variable and index the elements in place. (matching.md: "The copy of a multiply's operand")
 - A table's base and index swapped between the two registers (`ldr r4, =table; muls; adds r4, r4, r2` in the
   original): index the table in a `static inline` taking the index as an enum type. (matching.md: "A table indexed
   by a field")

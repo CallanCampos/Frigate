@@ -29,6 +29,7 @@ src/ov137/resort_field.c:
     .bss        start:0x021f5940 end:0x021f5a20
 
 src/ov137/resort_sys.c:
+    complete
     .text       start:0x021f1f5c end:0x021f52f0
     .rodata     start:0x021f56cc end:0x021f58d4
     .data       start:0x021f5928 end:0x021f5940

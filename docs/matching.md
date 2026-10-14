@@ -532,6 +532,12 @@ Same code, other `sp` offsets or frame size.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
+- The copy of a multiply's operand placed after the constant is loaded (`subs r2, r5, #1; movs r0, #0xc; adds r1, r2,
+  #0; muls r1, r0`), where ours copies right after the `subs`, is an index in a variable of its own with the
+  elements indexed in place. Overlay 137's `ResortSys_GetRecordRank` sorts with `s32 prev = j - 1;` and
+  `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
+  `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
+  the copy too, a sign that the CSE and copy propagation passes place it.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
