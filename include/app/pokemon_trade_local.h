@@ -6,6 +6,7 @@
 #include "app/pokemon_trade/pokemontrade_mcss.h"
 #include "app/pokemon_trade/pokemontrade_nego.h"
 #include "app/pokemon_trade/pokemontrade_proc.h"
+#include "app/pokemon_trade/pokemontrade_save.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
 #include "field/unity_tower.h"
@@ -442,10 +443,6 @@ static inline u32 PokemonTrade_GetPressedKeys(void) {
     }
     return keys;
 }
-
-// pokemontrade_save.c
-void func_ov194_021beb48(PokemonTradeWork *wk);
-void func_ov194_021bf938(PokemonTradeWork *wk);
 
 // pokemontrade_message.c, a descriptive name
 void func_ov194_021bfcf8(PokemonTradeWork *wk, BOOL instant, u32 x, u32 y, u32 width, u32 height);
