@@ -1,4 +1,5 @@
 #include "ssl_internal.h"
+
 #include "gfl/std.h"
 #include "nitrowifi/cps.h"
 
@@ -323,40 +324,43 @@ void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const 
     CPSiFree(work);
 }
 
-// Computes result = a modular inverse-like value of value mod modulus, through the extended Euclidean algorithm's
-// division steps; scratch needs 6*n digits
+// Extended Euclidean coefficient recurrence, normalized with the original modulus at the end.
+// The caller zeroes scratch: six n-digit regions precede nominal 3*n division workspace (9*n total).
+// That partition alone does not establish sufficient headroom for every BigInt_Div input.
 static void BigInti_ModInverse(u16 *result, const u16 *value, const u16 *modulus, int n, u16 *scratch) {
+    u16 *currentRemainder = scratch;
     u16 *quotient = scratch + n;
-    u16 *big = scratch + n * 2;
-    u16 *coefCur = scratch + n * 3;
-    u16 *coefPrev = scratch + n * 3;
-    u16 *remainder = scratch + n * 4;
-    u16 *workBuf = scratch + n * 5;
+    u16 *previousRemainder = scratch + n * 2;
+    u16 *currentCoefficient = scratch + n * 3;
+    u16 *previousCoefficient = scratch + n * 4;
+    u16 *temporary = scratch + n * 5;
+    u16 *divisionWork = scratch + n * 6;
 
-    sys_memcpy(value, scratch, n * 2);
-    sys_memcpy(modulus, big, n * 2);
-    big[n] = 1;
+    sys_memcpy(value, currentRemainder, n * 2);
+    sys_memcpy(modulus, previousRemainder, n * 2);
+    currentCoefficient[0] = 1;
 
-    if (BigInt_GetSign(scratch, n) > 0) {
+    if (BigInt_GetSign(currentRemainder, n) > 0) {
         do {
-            BigInt_Div(quotient, big, scratch, remainder, n, workBuf);
-            sys_memcpy(scratch, big, n * 2);
-            sys_memcpy(remainder, scratch, n * 2);
-            BigInt_Mul(remainder, quotient, coefCur, n);
-            BigInt_Sub(remainder, coefPrev, remainder, n);
-            sys_memcpy(coefCur, coefPrev, n * 2);
-            sys_memcpy(remainder, coefCur, n * 2);
-        } while (BigInt_GetSign(scratch, n) > 0);
+            BigInt_Div(quotient, previousRemainder, currentRemainder, temporary, n, divisionWork);
+            sys_memcpy(currentRemainder, previousRemainder, n * 2);
+            sys_memcpy(temporary, currentRemainder, n * 2);
+            BigInt_Mul(temporary, quotient, currentCoefficient, n);
+            BigInt_Sub(temporary, previousCoefficient, temporary, n);
+            sys_memcpy(currentCoefficient, previousCoefficient, n * 2);
+            sys_memcpy(temporary, currentCoefficient, n * 2);
+        } while (BigInt_GetSign(currentRemainder, n) > 0);
     }
 
-    BigInt_Add(coefCur, coefCur, big, n);
-    BigInt_Div(NULL, coefCur, big, result, n, workBuf);
+    BigInt_Add(previousCoefficient, previousCoefficient, modulus, n);
+    BigInt_Div(NULL, previousCoefficient, modulus, result, n, divisionWork);
 }
 
-// One Montgomery-ish step: snapshots acc into scratch, squares it (multiplier == BIGINT_SQUARE) or multiplies it by
-// multiplier, then reduces the result modulo modulus using the precomputed reciprocal mu, with q and t as scratch
+// Montgomery reduction with R = 2^(16*modLen) and mu = -modulus^(-1) mod R, as constructed by ModExpFast.
+// After optional squaring/multiplication, q = (acc*mu) mod R makes acc + q*modulus divisible by R.
+// A NULL multiplier performs reduction alone; q and t are scratch. The names describe the recovered roles.
 static void BigInti_ModExpStep(u16 *acc, u16 *scratch, const u16 *multiplier, int n, int modLen, const u16 *modulus,
-                                const u16 *mu, u16 *q, u16 *t) {
+                               const u16 *mu, u16 *q, u16 *t) {
     sys_memcpy(acc, scratch, n * 2);
     if (multiplier == BIGINT_SQUARE) {
         BigInti_Square(acc, scratch, n);
@@ -364,10 +368,10 @@ static void BigInti_ModExpStep(u16 *acc, u16 *scratch, const u16 *multiplier, in
         BigInt_Mul(acc, scratch, multiplier, n);
     }
 
-    BigInt_Mul(q, acc, mu, n);
+    BigInt_Mul(q, acc, mu, modLen);
     sys_memset(q + modLen, 0, (n - modLen) * 2);
     BigInt_Mul(t, q, modulus, n);
-    BigInt_Sub(acc, acc, t, n);
+    BigInt_Add(acc, acc, t, n);
     memmove(acc, acc + modLen, (n - modLen) * 2);
     sys_memset(acc + (n - modLen), 0, modLen * 2);
 
