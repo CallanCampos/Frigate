@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "app/pokemon_trade.h"
+#include "app/pokemon_trade/pokemontrade_3d.h"
 #include "app/pokemon_trade/pokemontrade_mcss.h"
 #include "app/pokemon_trade/pokemontrade_message.h"
 #include "app/pokemon_trade/pokemontrade_nego.h"
@@ -112,30 +113,6 @@ typedef struct {
     u8 boxes[24][30];
     u8 party[6];
 } TradeBoxColors;
-
-// The particles and the camera and emitter paths of the trade demo's 3D effects. The demo overlays 192 and 193
-// allocate it and fill the fields left unknown here
-typedef struct {
-    ParticleSystem *systems[9];
-    void *systemWork[9];
-    // The sizes of the two sprites that the infrared trade's scene scales
-    VecFx32 ircSpriteSizes[2];
-    // The size of each of the four Pokémon sprites, as func_0201ab70 gives it
-    VecFx32 spriteSizes[4];
-    G3DCurve *cameraPosPath;
-    G3DCurve *cameraTargetPath;
-    // The paths that the two emitters follow
-    G3DCurve *emitterPaths[2];
-    SPLEmitter *emitters[2];
-    // Whether the camera's paths have come to their end
-    BOOL cameraPosDone;
-    BOOL cameraTargetDone;
-    // The sprite of the demo's scenes
-    ClActor *actor;
-    void *resource;
-    u8 unkB8[2];
-    HeapID heapId;
-} PokemonTrade3DWork;
 
 // The OBJ resources of the work's objRes: the palettes, the characters, then the cells with their animations, of the
 // Pokémon icons, the lower screen's sprites (the touch bar's and the icons' cursors), the upper screen's, the common
@@ -444,28 +421,6 @@ static inline u32 PokemonTrade_GetPressedKeys(void) {
     }
     return keys;
 }
-
-// pokemontrade_3d.c
-void func_ov194_021c1b74(PokemonTrade3DWork *work, int path);
-void func_ov194_021c1d00(PokemonTrade3DWork *work);
-void func_ov194_021c1d30(PokemonTrade3DWork *work);
-void func_ov194_021c1d38(PokemonTrade3DWork *work);
-void func_ov194_021c1db4(PokemonTrade3DWork *work);
-void func_ov194_021c1e08(PokemonTrade3DWork *work);
-void func_ov194_021c1e38(PokemonTrade3DWork *work, int count);
-void func_ov194_021c1e74(PokemonTrade3DWork *work);
-void func_ov194_021c1ef0(PokemonTradeWork *wk);
-void func_ov194_021c1fb8(PokemonTradeWork *wk);
-void func_ov194_021c1fc0(PokemonTradeWork *wk);
-void func_ov194_021c2000(PokemonTradeWork *wk);
-void func_ov194_021c200c(PokemonTradeWork *wk, int sceneId);
-void func_ov194_021c2034(PokemonTradeWork *wk);
-// Adds the sprite of a Pokémon on a side, facing front or back, mirrored if asked and the species allows it
-void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
-void func_ov194_021c24ac(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror, BOOL a5);
-void func_ov194_021c24cc(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror);
-void func_ov194_021c24dc(PokemonTradeWork *wk, int side);
-void func_ov194_021c29b4(PokemonTradeWork *wk);
 
 // pokemontrade_2d.c
 void func_ov194_021c2a24(PokemonTradeWork *wk);
