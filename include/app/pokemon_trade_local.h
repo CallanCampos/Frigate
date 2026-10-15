@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "app/pokemon_trade.h"
+#include "app/pokemon_trade/pokemontrade_mcss.h"
 #include "app/pokemon_trade/pokemontrade_nego.h"
 #include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/ui/touchbar.h"
@@ -71,21 +72,6 @@ typedef struct {
     u32 unk1C;
     BOOL chatot;
 } TradeBackup;
-
-// A Pokémon's sprite moving to a place over some frames, straight, bouncing or along a path of offsets
-typedef struct {
-    MCSS *mcss;
-    int duration;
-    int frame;
-    u32 unkC;
-    u8 unk10[4];
-    u16 angle;
-    u16 bounce;
-    u8 unk18[4];
-    VecFx32 start;
-    VecFx32 end;
-    const VecFx32 *path;
-} TradeMcssMove;
 
 // A fade of the screens' brightness over a number of frames, from one level to another
 typedef struct {
@@ -456,18 +442,6 @@ static inline u32 PokemonTrade_GetPressedKeys(void) {
     }
     return keys;
 }
-
-// pokemontrade_mcss.c
-// The sounds of the animations, at each frame
-void func_ov194_021be808(int frame);
-void func_ov194_021be840(int frame);
-void TradeMcssMove_Start(TradeMcssMove *move, int duration, const VecFx32 *end);
-TradeMcssMove *TradeMcssMove_Create(MCSS *mcss, int duration, const VecFx32 *end, HeapID heapId);
-TradeMcssMove *TradeMcssMove_CreateWithPath(MCSS *mcss, int duration, const VecFx32 *end, const VecFx32 *path,
-                                            HeapID heapId);
-void TradeMcssMove_Update(TradeMcssMove *move, PokemonTradeWork *wk);
-void func_ov194_021beab4(PokemonTradeWork *wk);
-void TradeMcssMove_Free(TradeMcssMove *move);
 
 // pokemontrade_save.c
 void func_ov194_021beb48(PokemonTradeWork *wk);
