@@ -2,10 +2,10 @@
 #define POKEBW2_NNSYS_G3D_H
 
 #include "types.h"
+#include "gfl/std.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"
-#include "gfl/std.h"
 #include "nnsys/fnd.h"
 #include "nnsys/gfd.h"
 
@@ -155,6 +155,63 @@ static inline NNSG3dResMdlInfo *NNS_G3dGetMdlInfo(const NNSG3dResMdl *mdl) {
     return (NNSG3dResMdlInfo *)&mdl->info;
 }
 
+// A model's material block: which materials each texture and each palette is for, then the materials by name
+typedef struct {
+    u16 ofsDictTexToMatList;
+    u16 ofsDictPlttToMatList;
+    NNSG3dResDict dict;
+} NNSG3dResMat;
+
+// The start of a material. Binding a texture adds its place in VRAM to texImageParam, and sets magW and magH to scale
+// the texture coordinates by how much the stored texture differs from the size the material was made for, from
+// origWidth and origHeight. Binding a palette sets texPlttBase
+typedef struct {
+    u16 itemTag;
+    u16 size;
+    u32 diffAmb;
+    u32 specEmi;
+    u32 polyAttr;
+    u32 polyAttrMask;
+    u32 texImageParam;
+    u32 texImageParamMask;
+    u16 texPlttBase;
+    u16 flag;
+    u16 origWidth;
+    u16 origHeight;
+    fx32 magW;
+    fx32 magH;
+} NNSG3dResMatData;
+
+// An entry of a texture-to-material or palette-to-material dictionary: numIdx material numbers, one byte each, at
+// offset from the material block. flag has NNS_G3D_MATLIST_BOUND once the texture or palette is bound to them
+typedef struct {
+    u16 offset;
+    u8 numIdx;
+    u8 flag;
+} NNSG3dResDictTexToMatListData;
+
+typedef NNSG3dResDictTexToMatListData NNSG3dResDictPlttToMatListData;
+
+#define NNS_G3D_MATLIST_BOUND 0x01
+
+static inline NNSG3dResMat *NNS_G3dGetMat(const NNSG3dResMdl *mdl) {
+    if (mdl != NULL && mdl->ofsMat != 0) {
+        return (NNSG3dResMat *)((u8 *)mdl + mdl->ofsMat);
+    }
+    return NULL;
+}
+
+static inline NNSG3dResMatData *NNS_G3dGetMatDataByIdx(const NNSG3dResMat *mat, u32 idx) {
+    if (mat != NULL) {
+        const u32 *ofs = NNS_G3dGetResDataByIdx(&mat->dict, idx);
+
+        if (ofs != NULL) {
+            return (NNSG3dResMatData *)((u8 *)mat + *ofs);
+        }
+    }
+    return NULL;
+}
+
 // The start of every animation
 typedef struct {
     u8 category0;
@@ -163,12 +220,30 @@ typedef struct {
     u16 numFrame;
 } NNSG3dResAnmCommon;
 
-// An animation applied to a model, at a frame
-typedef struct {
+// The category of an animation resource's header: which part of a model it animates
+#define NNS_G3D_DATABLK_MAT_ANM 'M'
+#define NNS_G3D_DATABLK_JNT_ANM 'J'
+#define NNS_G3D_DATABLK_VIS_ANM 'V'
+
+// mapData of an animation object has this for each material or node that the animation holds data for
+#define NNS_G3D_ANMOBJ_MAPDATA_EXIST 0x0100
+
+// An animation applied to a model, at a frame. Animations bound to a render object are linked by priority through
+// next. mapData maps each material or node of the model to the animation's data for it
+typedef struct NNSG3dAnmObj {
     fx32 frame;
     fx32 ratio;
     const void *resAnm;
+    void *funcAnm;
+    struct NNSG3dAnmObj *next;
+    const NNSG3dResTex *resTex;
+    u8 priority;
+    u8 numMapData;
+    u16 mapData[1];
 } NNSG3dAnmObj;
+
+// The bytes an animation object takes for a model with numMapData materials or nodes, to a multiple of four
+#define NNS_G3D_ANMOBJ_SIZE(numMapData) ((sizeof(NNSG3dAnmObj) + (numMapData) * sizeof(u16)) & ~3)
 
 static inline fx32 NNS_G3dAnmObjGetNumFrame(const NNSG3dAnmObj *anmObj) {
     return ((const NNSG3dResAnmCommon *)anmObj->resAnm)->numFrame * FX32_ONE;
@@ -209,15 +284,19 @@ typedef struct {
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK 0x1fff0000
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT 16
 
-// What draws a model, 0x54 bytes
+// Set in the flag of a render object when its animations changed, so that its hints are out of date
+#define NNS_G3D_RENDEROBJ_FLAG_HINT_OBSOLETE 0x00000010
+
+// What draws a model, 0x54 bytes. The animations bound to it are in three lists by what they animate, and hint*Exist
+// has a bit for each material or node that one of them has data for
 typedef struct {
     u32 flag;
     NNSG3dResMdl *resMdl;
-    void *anmMat;
+    NNSG3dAnmObj *anmMat;
     void *funcBlendMat;
-    void *anmJnt;
+    NNSG3dAnmObj *anmJnt;
     void *funcBlendJnt;
-    void *anmVis;
+    NNSG3dAnmObj *anmVis;
     void *funcBlendVis;
     void *cbFunc;
     u8 cbCmd;
@@ -256,13 +335,20 @@ static inline const NNSG3dResName *NNS_G3dGetResNameByIdx(const NNSG3dResDict *d
     return NULL;
 }
 
-// The data of a texture block's dictionary entry: the texture's GX_TEXIMAGE_PARAM, with its offset in the low bits
+// The data of a texture block's dictionary entry: the texture's GX_TEXIMAGE_PARAM, with its offset in the low bits, and
+// the texture's original width and height in extraParam
+#define NNS_G3D_RESDICTTEX_EXTRA_WIDTH_MASK 0x000007ff
+#define NNS_G3D_RESDICTTEX_EXTRA_HEIGHT_MASK 0x003ff800
+#define NNS_G3D_RESDICTTEX_EXTRA_HEIGHT_SHIFT 11
+
 typedef struct {
     u32 texImageParam;
     u32 extraParam;
 } NNSG3dResDictTexData;
 
-// The data of a palette dictionary entry: the palette's offset in 8-byte units, and NNS_G3D_RESPLTT_USEPLTT4
+// The data of a palette dictionary entry: the palette's offset in 8-byte units, and whether it is a 4-color palette
+#define NNS_G3D_RESDICTPLTT_USEPLTT4 0x0001
+
 typedef struct {
     u16 offset;
     u16 flag;
@@ -280,20 +366,22 @@ u32 NNS_G3DResTexGetPaletteDataSize(const NNSG3dResTex *tex);
 void NNS_G3DResTexSetPltGfdKey(NNSG3dResTex *tex, NNSGfdPlttKey plttKey);
 void NNS_G3DResTexUploadPlt(NNSG3dResTex *tex, BOOL exec_begin_end);
 NNSGfdPlttKey NNS_G3dPlttReleasePlttKey(NNSG3dResTex *tex);
+
+// Binding a model's materials to a texture block's textures and palettes by name, which sets what the materials draw
+// with. Both return FALSE if a name of the model is not in the texture block. A texture or palette that is bound
+// already is left alone
 BOOL NNS_G3dBindMdlTex(NNSG3dResMdl *mdl, const NNSG3dResTex *tex);
 BOOL NNS_G3dBindMdlPltt(NNSG3dResMdl *mdl, const NNSG3dResTex *tex);
+// Binds the palette at plttNameIdx of the texture block to the materials of the palette-to-material entry
+// plttToMatListIdx, unless that entry is bound already, and returns whether it did. NNS_G3dReleaseMdlPltt clears the
+// bound mark of every palette-to-material entry, so that they can be bound again
+BOOL NNS_G3dForceBindMdlPltt(NNSG3dResMdl *mdl, const NNSG3dResTex *tex, u32 plttToMatListIdx, u32 plttNameIdx);
+void NNS_G3dReleaseMdlPltt(NNSG3dResMdl *mdl);
 
 // Render and animation objects: NNS_G3dRenderObjInit, NNS_G3dAnmObjInit, NNS_G3dRenderObjAddAnmObj and
 // NNS_G3dAllocAnmObj, and drawing one with NNS_G3dDraw
 NNSG3dRenderObj *NNS_G3dAllocRenderObj(NNSFndAllocator *allocator);
 void NNS_G3dFreeRenderObj(NNSFndAllocator *allocator, NNSG3dRenderObj *obj);
-// NNS_G3dBindMdlTex and NNS_G3dBindMdlPltt
-BOOL NNS_G3dBindMdlTex(NNSG3dResMdl *mdl, const NNSG3dResTex *tex);
-BOOL NNS_G3dBindMdlPltt(NNSG3dResMdl *mdl, const NNSG3dResTex *tex);
-// Binds one palette of the texture to the materials of a palette-to-material entry, whatever was bound, and releases
-// every palette of the model
-BOOL NNS_G3dForceBindMdlPltt(NNSG3dResMdl *mdl, const NNSG3dResTex *tex, u32 plttToMatListIdx, u32 plttNameIdx);
-void NNS_G3dReleaseMdlPltt(NNSG3dResMdl *mdl);
 void NNS_G3DModelAttachResource(NNSG3dRenderObj *obj, NNSG3dResMdl *mdl);
 NNSG3dAnmObj *NNS_G3DAnimationAlloc(NNSFndAllocator *allocator, const void *anm, const NNSG3dResMdl *mdl);
 u32 NNS_G3DAnimationCalcAllocSize(const void *anm, const NNSG3dResMdl *mdl);
@@ -302,6 +390,22 @@ void NNS_G3DAnimationCreate(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl 
 void NNS_G3DAnimationBind(NNSG3dRenderObj *obj, NNSG3dAnmObj *anmObj);
 void NNS_G3dRenderObjRemoveAnmObj(NNSG3dRenderObj *obj, NNSG3dAnmObj *anmObj);
 void NNS_G3DDraw(NNSG3dRenderObj *obj);
+
+// What starts an animation of a kind of resource: its header, and the function that fills in the animation object
+typedef struct {
+    NNSG3dResAnmHeader header;
+    void (*init)(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+} NNSG3dAnmObjInit;
+
+// The table that NNS_G3DAnimationCreate searches for the kind of animation it is given, and how many of its entries are
+// in use (anm.c)
+extern u32 NNS_G3D_ANIMATION_INIT_HEADER_COUNT;
+extern NNSG3dAnmObjInit NNS_G3D_ANIMATION_INIT_HEADERS[];
+// The functions that combine the animations of a new render object, for its materials, joints and visibility. They
+// are variables, which NNS_G3DModelAttachResource copies to funcBlendMat, funcBlendJnt and funcBlendVis (anm.c)
+extern void *NNS_G3dFuncBlendMat;
+extern void *NNS_G3dFuncBlendJnt;
+extern void *NNS_G3dFuncBlendVis;
 
 // The buffer that geometry commands wait in, and sending one: NNS_G3dGeFlushBuffer and NNS_G3dGeBufferOP_N
 BOOL NNS_G3dGeIsBufferExist(void);

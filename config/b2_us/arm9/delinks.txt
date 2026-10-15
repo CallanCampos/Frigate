@@ -1015,6 +1015,7 @@ lib/nnsys/src/snd/snd_capture.c:
     .bss        start:0x02149874 end:0x02149910
 
 lib/nnsys/src/g3d/kernel.c:
+    complete
     .text       start:0x02064f8c end:0x02065698
 
 lib/nnsys/src/g3d/glbstate.c:

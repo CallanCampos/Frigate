@@ -2188,6 +2188,9 @@
 . 0x0209b260 mtxStackPosSR_
 . 0x0209b268 mtxTransOnly_
 . 0x0209b280 zOffsetStep_
+. 0x0209b29c NNS_G3dFuncBlendVis
+. 0x0209b2a0 NNS_G3dFuncBlendJnt
+. 0x0209b2a4 NNS_G3dFuncBlendMat
 . 0x0209b528 GXi_DmaId
 . 0x0209b52c MD5_PADDING
 . 0x0209b530 MD5_MSG_INDEX

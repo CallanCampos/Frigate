@@ -8767,9 +8767,9 @@ data_0209b28c kind:data(any) addr:0x0209b28c
 data_0209b290 kind:data(any) addr:0x0209b290
 data_0209b294 kind:data(any) addr:0x0209b294
 data_0209b298 kind:data(any) addr:0x0209b298
-data_0209b29c kind:data(any) addr:0x0209b29c
-data_0209b2a0 kind:data(any) addr:0x0209b2a0
-data_0209b2a4 kind:data(any) addr:0x0209b2a4
+NNS_G3dFuncBlendVis kind:data(any) addr:0x0209b29c
+NNS_G3dFuncBlendJnt kind:data(any) addr:0x0209b2a0
+NNS_G3dFuncBlendMat kind:data(any) addr:0x0209b2a4
 NNS_G3D_ANIMATION_INIT_HEADERS kind:data(any) addr:0x0209b2a8
 data_0209b2ac kind:data(any) addr:0x0209b2ac
 NNS_G3D_JOINT_FLUSH_FUNCS kind:data(any) addr:0x0209b2f8
