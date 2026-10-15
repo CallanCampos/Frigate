@@ -78,15 +78,15 @@ static inline s16 DecodeSample3(VCTAdpcmState *state, int code)
 {
     int index = state->stepIndex;
     int step = sVctAdpcmStepTable[index];
-    int diff = step >> 2;
     int predictor = state->predictor;
+    int diff = step >> 2;
     s16 sample;
 
-    if (code & 2) {
-        diff += step;
-    }
     if (code & 1) {
         diff += step >> 1;
+    }
+    if (code & 2) {
+        diff += step;
     }
     if (code & 4) {
         predictor -= diff;
@@ -108,9 +108,9 @@ static inline s16 DecodeSample3(VCTAdpcmState *state, int code)
 
 static inline s16 DecodeSample2(VCTAdpcmState *state, int code)
 {
+    int predictor = state->predictor;
     int index = state->stepIndex;
     int diff = sVctAdpcmStepTable[index];
-    int predictor = state->predictor;
     s16 sample;
 
     if (!(code & 1)) {
@@ -137,9 +137,9 @@ static inline s16 DecodeSample2(VCTAdpcmState *state, int code)
 static inline u8 EncodeSample4(VCTAdpcmState *state, s16 input)
 {
     int index = state->stepIndex;
-    int step = sVctAdpcmStepTable[index];
     int predictor = state->predictor;
     int diff = input - predictor;
+    int step = sVctAdpcmStepTable[index];
     int vpdiff;
     u8 code;
 
@@ -301,14 +301,18 @@ static void DecodeAdpcm3(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
     u32 i;
 
     for (i = 0; i < count / 3; i++) {
-        dst[0] = DecodeSample3(state, src[0] >> 5);
-        dst[1] = DecodeSample3(state, (src[0] >> 2) & 7);
-        dst[2] = DecodeSample3(state, ((src[0] << 1) & 7) | (src[1] >> 7));
-        dst[3] = DecodeSample3(state, (src[1] >> 4) & 7);
-        dst[4] = DecodeSample3(state, (src[1] >> 1) & 7);
-        dst[5] = DecodeSample3(state, ((src[1] << 2) & 7) | (src[2] >> 6));
-        dst[6] = DecodeSample3(state, (src[2] >> 3) & 7);
-        dst[7] = DecodeSample3(state, src[2] & 7);
+        u8 b0 = src[0];
+        u8 b1 = src[1];
+        u8 b2 = src[2];
+
+        dst[0] = DecodeSample3(state, b0 >> 5);
+        dst[1] = DecodeSample3(state, (b0 >> 2) & 7);
+        dst[2] = DecodeSample3(state, ((b0 << 1) & 7) | (b1 >> 7));
+        dst[3] = DecodeSample3(state, (b1 >> 4) & 7);
+        dst[4] = DecodeSample3(state, (b1 >> 1) & 7);
+        dst[5] = DecodeSample3(state, ((b1 << 2) & 7) | (b2 >> 6));
+        dst[6] = DecodeSample3(state, (b2 >> 3) & 7);
+        dst[7] = DecodeSample3(state, b2 & 7);
         src += 3;
         dst += 8;
     }
@@ -320,15 +324,15 @@ static void EncodeAdpcm3(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
     u32 i;
 
     for (i = 0; i < count / 8; i++) {
+        u8 c6, c7;
         u8 c0 = EncodeSample3(state, src[0]);
         u8 c1 = EncodeSample3(state, src[1]);
         u8 c2 = EncodeSample3(state, src[2]);
-        u8 c3, c4, c5, c6, c7;
+        u8 c3 = EncodeSample3(state, src[3]);
+        u8 c4 = EncodeSample3(state, src[4]);
+        u8 c5 = EncodeSample3(state, src[5]);
 
         dst[0] = (c0 << 5) | (c1 << 2) | (c2 >> 1);
-        c3 = EncodeSample3(state, src[3]);
-        c4 = EncodeSample3(state, src[4]);
-        c5 = EncodeSample3(state, src[5]);
         dst[1] = (c2 << 7) | (c3 << 4) | (c4 << 1) | (c5 >> 2);
         c6 = EncodeSample3(state, src[6]);
         c7 = EncodeSample3(state, src[7]);
@@ -344,12 +348,11 @@ static void DecodeAdpcm2(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
     u32 i;
 
     for (i = 0; i < count; i++) {
-        dst[0] = DecodeSample2(state, src[0] & 3);
-        dst[1] = DecodeSample2(state, (src[0] >> 2) & 3);
-        dst[2] = DecodeSample2(state, (src[0] >> 4) & 3);
-        dst[3] = DecodeSample2(state, (src[0] >> 6) & 3);
+        *dst++ = DecodeSample2(state, *src & 3);
+        *dst++ = DecodeSample2(state, (*src >> 2) & 3);
+        *dst++ = DecodeSample2(state, (*src >> 4) & 3);
+        *dst++ = DecodeSample2(state, (*src >> 6) & 3);
         src++;
-        dst += 4;
     }
 }
 
