@@ -3,9 +3,9 @@
 // functions' are those of the Generation 4 library, with our own for the requests that Generation 5 changed.
 
 #include "types.h"
+#include "dwc/ext.h"
 #include "poke_net/poke_net_gds.h"
 #include "poke_net_internal.h"
-#include "dwc/ext.h"
 
 BOOL POKE_NET_GDS_Initialize(POKE_NET_REQUESTCOMMON_AUTH *auth, const char *url, u16 port) {
     return POKE_NET_Initialize(url, port, auth);
@@ -66,7 +66,7 @@ BOOL POKE_NET_GDS_MusicalShotGet(s32 monsno, void *response) {
 
 // Uploads a battle video with the signature of its Pokémon. The answer is a POKE_NET_GDS_RESPONSE_REGIST
 BOOL POKE_NET_GDS_BattleDataRegist(BattleRecVideo *data, u8 *sign, s32 signSize, void *response) {
-    POKE_NET_GDS_REQUEST_BATTLEDATA_REGIST request = {0};
+    POKE_NET_GDS_REQUEST_BATTLEDATA_REGIST request = { 0 };
 
     if (signSize > POKE_NET_GDS_BATTLEDATA_SIGN_SIZE) {
         return FALSE;
@@ -90,7 +90,7 @@ BOOL POKE_NET_GDS_BattleDataSearchCondition(POKE_NET_GDS_BATTLEDATA_SEARCHCONDIT
 
 // Download the server's three lists of battle videos
 BOOL POKE_NET_GDS_BattleDataSearchList1(u32 serverVersion, void *response) {
-    POKE_NET_GDS_REQUEST_BATTLEDATA_SEARCH request = {0};
+    POKE_NET_GDS_REQUEST_BATTLEDATA_SEARCH request = { 0 };
 
     request.SearchType = POKE_NET_GDS_BATTLEDATA_SEARCHTYPE_LIST1;
     request.ConditionParam.ServerVersion = serverVersion;
@@ -100,7 +100,7 @@ BOOL POKE_NET_GDS_BattleDataSearchList1(u32 serverVersion, void *response) {
 }
 
 BOOL POKE_NET_GDS_BattleDataSearchList3(u32 serverVersion, void *response) {
-    POKE_NET_GDS_REQUEST_BATTLEDATA_SEARCH request = {0};
+    POKE_NET_GDS_REQUEST_BATTLEDATA_SEARCH request = { 0 };
 
     request.SearchType = POKE_NET_GDS_BATTLEDATA_SEARCHTYPE_LIST3;
     request.ConditionParam.ServerVersion = serverVersion;
@@ -110,7 +110,7 @@ BOOL POKE_NET_GDS_BattleDataSearchList3(u32 serverVersion, void *response) {
 }
 
 BOOL POKE_NET_GDS_BattleDataSearchList2(u32 serverVersion, void *response) {
-    POKE_NET_GDS_REQUEST_BATTLEDATA_SEARCH request = {0};
+    POKE_NET_GDS_REQUEST_BATTLEDATA_SEARCH request = { 0 };
 
     request.SearchType = POKE_NET_GDS_BATTLEDATA_SEARCHTYPE_LIST2;
     request.ConditionParam.ServerVersion = serverVersion;
@@ -180,14 +180,10 @@ s32 POKE_NET_GetRequestSize(s32 reqno) {
 
 s32 POKE_NET_GetResponseMaxSize(s32 reqno) {
     s32 reqnos[] = {
-        POKE_NET_GDS_REQCODE_DEBUG_MESSAGE,
-        POKE_NET_GDS_REQCODE_MUSICALSHOT_REGIST,
-        POKE_NET_GDS_REQCODE_MUSICALSHOT_GET,
-        POKE_NET_GDS_REQCODE_BATTLEDATA_REGIST,
-        POKE_NET_GDS_REQCODE_BATTLEDATA_SEARCH,
-        POKE_NET_GDS_REQCODE_BATTLEDATA_GET,
-        POKE_NET_GDS_REQCODE_BATTLEDATA_FAVORITE,
-        -1,
+        POKE_NET_GDS_REQCODE_DEBUG_MESSAGE,       POKE_NET_GDS_REQCODE_MUSICALSHOT_REGIST,
+        POKE_NET_GDS_REQCODE_MUSICALSHOT_GET,     POKE_NET_GDS_REQCODE_BATTLEDATA_REGIST,
+        POKE_NET_GDS_REQCODE_BATTLEDATA_SEARCH,   POKE_NET_GDS_REQCODE_BATTLEDATA_GET,
+        POKE_NET_GDS_REQCODE_BATTLEDATA_FAVORITE, -1,
     };
     s32 size;
     s32 i;

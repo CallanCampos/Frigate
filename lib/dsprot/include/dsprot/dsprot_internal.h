@@ -12,6 +12,7 @@
 // Writes the data cache back and invalidates it, then invalidates the instruction cache, so that code just decrypted
 // or encrypted is what the CPU runs. DS Protect expands this sequence of CP15 operations in place, which C cannot
 // write, so it is the one inline assembly of the library. It uses ip and r0 to r2.
+// clang-format off
 static inline void DSProt_FlushCache(void) {
     asm {
         mov ip, #0
@@ -31,6 +32,7 @@ static inline void DSProt_FlushCache(void) {
         mcr p15, 0, ip, c7, c10, 4
     }
 }
+// clang-format on
 
 // dsprot_run.c
 asm void DSProt_Crash(void);
@@ -86,12 +88,12 @@ asm u32 DSProt_CallCheckEmulator(void);
 // The game's copy of DS Protect (overlay 337) is made of the same parts, with four of the runners, stub checks and
 // detection checks; its checks report through the arguments of the runner that called them
 typedef struct DSProtCheckArgs {
-    DSProtCallback nop;     // called with arg0 and arg1 if all checks pass
-    DSProtCallback tamper;  // called with arg0 and arg1 if a check fails
+    DSProtCallback nop;    // called with arg0 and arg1 if all checks pass
+    DSProtCallback tamper; // called with arg0 and arg1 if a check fails
     void *arg0;
     void *arg1;
-    void *result;           // what tamper returned
-    u32 failed;             // nonzero once tamper has run
+    void *result; // what tamper returned
+    u32 failed;   // nonzero once tamper has run
 } DSProtCheckArgs;
 
 // dsprot_stub_check_multi.c
@@ -153,5 +155,16 @@ const u8 *func_0206eed8(void);
 void func_0206eef0(u16 lockId);
 void func_0206ef38(u16 lockId);
 int func_0206fd24(int dma, u32 source, void *dest, u32 length, void *callback, void *callbackArg, int async);
+
+// One bit of DS Protect's CRC-32, which applies the polynomial to the other half of the values: DSProt_Crc32 and
+// DSProt_Crc32Multi write out a byte's eight steps
+#define DSPROT_CRC32_STEP(crc)                                                                                         \
+    do {                                                                                                               \
+        if ((crc) & 1) {                                                                                               \
+            (crc) = (crc) >> 1;                                                                                        \
+        } else {                                                                                                       \
+            (crc) = ((crc) >> 1) ^ 0xedb88320;                                                                         \
+        }                                                                                                              \
+    } while (0)
 
 #endif // POKEBW2_DSPROT_DSPROT_INTERNAL_H

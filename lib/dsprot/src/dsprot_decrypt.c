@@ -80,6 +80,7 @@ u32 DSProt_EncryptFunction(u32 key, u32 code, u32 end) {
 // Hand-written: the end of every DSProt_Call* stub, which is given the address of the stub's data in ip. It has
 // DSProt_DecryptFunction decrypt the stub's function, calls it with the stub's own arguments and has
 // DSProt_EncryptFunction encrypt it again.
+// clang-format off
 asm void DSProt_Dispatch(void) {
     stmdb sp!, {r0, r1, r2, r3}
     str r10, [ip, #0x10]
@@ -108,9 +109,11 @@ asm void DSProt_Dispatch(void) {
     ldr r10, [r10, #0x10]
     bx lr
 }
+// clang-format on
 
 // Hand-written, run from .ctor when the overlay is loaded: has DSProt_Decrypt decrypt this file's functions, other
 // than DSProt_Decrypt
+// clang-format off
 asm void DSProt_DecryptDispatch(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -124,6 +127,9 @@ asm void DSProt_DecryptDispatch(void) {
     dcd 0
     dcd 0
 }
+// clang-format on
 
-#pragma define_section ctor ".ctor" ".ctor" ".ctor" abs32 RW
+#pragma define_section ctor ".ctor"                                                                                    \
+                            ".ctor"                                                                                    \
+                            ".ctor" abs32 RW
 __declspec(ctor) static void (*const sDecryptDispatch)(void) = DSProt_DecryptDispatch;

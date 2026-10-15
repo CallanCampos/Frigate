@@ -11,6 +11,7 @@ static const u32 sEncryptedKey[6] = { 0x08a27510, 0xe47ab3c3, 0x5a289302, 0xeaa6
 
 // Hand-written: clears 0x100 bytes of the stack, then jumps to sys_exit with the return address cleared, so that the
 // game stops without a trace of where it came from
+// clang-format off
 asm void DSProt_Crash(void) {
     mov r10, pc
     orrs r10, r10, r10
@@ -27,6 +28,7 @@ asm void DSProt_Crash(void) {
     sub lr, lr, #0x2200
     bx r9
 }
+// clang-format on
 
 void DSProt_ClearMemory(void *dest, u32 size) {
     sys_memset32(0, dest, size);
@@ -34,6 +36,7 @@ void DSProt_ClearMemory(void *dest, u32 size) {
 
 // Hand-written, as every DSProt_Call* is: verifies the code from the address packed in its last word, then has
 // DSProt_Dispatch decrypt DSProt_Crash, run it and encrypt it again
+// clang-format off
 asm void *DSProt_CallCrash(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -80,6 +83,7 @@ asm void *DSProt_CallCrash(void *arg0, void *arg1) {
     dcd 0
     dcd DSProt_Dispatch + (26 << 26)
 }
+// clang-format on
 
 // Runs the checks, each of which returns a nonzero code when it passes, and calls the callback if the codes add up
 // to a multiple of 241 with the salt. A check whose code was changed, or that fails, crashes the game
@@ -98,7 +102,7 @@ void *DSProt_RunChecks(DSProtCallback callback, void *arg0, void *arg1) {
     total = 0x30eb87;
     result = NULL;
     do {
-        u32 (*func)(void *) = (u32(*)(void *))(*check - 0x2200);
+        u32 (*func)(void *) = (u32 (*)(void *))(*check - 0x2200);
         u32 *code = (u32 *)func;
         u32 checksum = 0;
         u32 i;
@@ -132,6 +136,7 @@ end:
     return result;
 }
 
+// clang-format off
 asm void *DSProt_CallRunChecks(DSProtCallback callback, void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -178,9 +183,11 @@ asm void *DSProt_CallRunChecks(DSProtCallback callback, void *arg0, void *arg1) 
     dcd 0
     dcd DSProt_Dispatch + (26 << 26)
 }
+// clang-format on
 
 // Hand-written, run from .ctor when the overlay is loaded: has DSProt_Decrypt decrypt this file's encrypted code, the
 // pairs of a function and its length that follow, and erase this code
+// clang-format off
 asm void DSProt_DecryptRun(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -193,6 +200,9 @@ asm void DSProt_DecryptRun(void) {
     dcd 0
     dcd sEncryptedKey + 0x2200
 }
+// clang-format on
 
-#pragma define_section ctor ".ctor" ".ctor" ".ctor" abs32 RW
+#pragma define_section ctor ".ctor"                                                                                    \
+                            ".ctor"                                                                                    \
+                            ".ctor" abs32 RW
 __declspec(ctor) static void (*const sDecryptRun)(void) = DSProt_DecryptRun;

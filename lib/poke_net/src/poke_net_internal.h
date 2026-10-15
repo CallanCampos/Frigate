@@ -3,8 +3,8 @@
 
 #include "types.h"
 #include "dwc/ext.h"
-#include "nitrowifi/soc.h"
 #include "nitro/os.h"
+#include "nitrowifi/soc.h"
 #include "poke_net/poke_net_gds.h"
 
 // What the files of the GDS client share: the request engine and its platform layer (poke_net.c), the SSL settings

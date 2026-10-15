@@ -113,6 +113,7 @@ u32 DSProt_CheckFlashcartStub(void) {
     return 0xa2dd;
 }
 
+// clang-format off
 asm u32 DSProt_CallCheckEmulatorStub(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -159,7 +160,9 @@ asm u32 DSProt_CallCheckEmulatorStub(void) {
     dcd 0
     dcd DSProt_Dispatch + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckFlashcartStub(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -206,8 +209,10 @@ asm u32 DSProt_CallCheckFlashcartStub(void) {
     dcd 0
     dcd DSProt_Dispatch + (26 << 26)
 }
+// clang-format on
 
 // Hand-written, run from .ctor when the overlay is loaded: has DSProt_Decrypt decrypt this file's stubs
+// clang-format off
 asm void DSProt_DecryptStubCheck(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -219,6 +224,9 @@ asm void DSProt_DecryptStubCheck(void) {
     dcd 0
     dcd 0
 }
+// clang-format on
 
-#pragma define_section ctor ".ctor" ".ctor" ".ctor" abs32 RW
+#pragma define_section ctor ".ctor"                                                                                    \
+                            ".ctor"                                                                                    \
+                            ".ctor" abs32 RW
 __declspec(ctor) static void (*const sDecryptStubCheck)(void) = DSProt_DecryptStubCheck;

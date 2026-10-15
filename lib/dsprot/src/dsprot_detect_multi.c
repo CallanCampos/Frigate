@@ -47,14 +47,16 @@ u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                code = 0xf1;
-                goto end;
+                break;
             }
         }
-        DSProt_Tamper(args, 0xfb);
-        code = 0xfb;
+        if (j == 6) {
+            DSProt_Tamper(args, 0xfb);
+            code = 0xfb;
+        } else {
+            code = 0xf1;
+        }
     }
-end:
     return code * 0xbf;
 }
 
@@ -80,64 +82,33 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                code = 0xfb;
-                goto end;
+                break;
             }
         }
-        DSProt_Tamper(args, 0x78);
-        code = 0xf1;
+        if (j == 6) {
+            DSProt_Tamper(args, 0x78);
+            code = 0xf1;
+        } else {
+            code = 0xfb;
+        }
     }
-end:
     return code * 0xb5;
 }
 
-// The CRC-32 of a buffer, with the polynomial applied to the other half of the values
+// The CRC-32 of a buffer, as DSProt_Crc32 (dsprot_detect.c) computes it
 u32 DSProt_Crc32Multi(const u8 *data, u32 size) {
     u32 crc = ~0;
 
     while (size-- != 0) {
-        u32 value = crc ^ *data++;
-
-        if (value & 1) {
-            crc = value >> 1;
-        } else {
-            crc = (value >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
+        crc ^= *data++;
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
     }
     return ~crc;
 }
@@ -192,7 +163,8 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
     reg_MI_EXMEMCNT = exmemcnt;
 }
 
-// Reads the same places of the card with the card's registers and through the SDK, and has the second function run if a flashcart gives different data
+// Reads the same places of the card with the card's registers and through the SDK, and has the second function run if a
+// flashcart gives different data
 u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     u32 crcs[20];
     u32 page[128];
@@ -334,6 +306,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     return 0xc127;
 }
 
+// clang-format off
 asm u32 DSProt_CallCheckFlashcartA(DSProtCheckArgs *args) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -380,7 +353,9 @@ asm u32 DSProt_CallCheckFlashcartA(DSProtCheckArgs *args) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckFlashcartB(DSProtCheckArgs *args) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -427,7 +402,9 @@ asm u32 DSProt_CallCheckFlashcartB(DSProtCheckArgs *args) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckEmulatorA(DSProtCheckArgs *args) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -474,7 +451,9 @@ asm u32 DSProt_CallCheckEmulatorA(DSProtCheckArgs *args) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckEmulatorB(DSProtCheckArgs *args) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -521,8 +500,10 @@ asm u32 DSProt_CallCheckEmulatorB(DSProtCheckArgs *args) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
 // Hand-written, run by DSProt_Init: has DSProt_DecryptMulti decrypt this file's stubs and its checksum function
+// clang-format off
 asm void DSProt_DecryptDetectMulti(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -540,3 +521,4 @@ asm void DSProt_DecryptDetectMulti(void) {
     dcd 0
     dcd 0
 }
+// clang-format on

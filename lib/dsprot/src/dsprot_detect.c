@@ -42,64 +42,33 @@ u32 DSProt_CheckEmulator(void) {
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                code = 0xf1;
-                goto end;
+                break;
             }
         }
-        DSProt_CallCrash(NULL, NULL);
-        code = 0xfb;
+        if (j == 6) {
+            DSProt_CallCrash(NULL, NULL);
+            code = 0xfb;
+        } else {
+            code = 0xf1;
+        }
     }
-end:
     return code * 0xbf;
 }
 
-// The CRC-32 of a buffer, with the polynomial applied to the other half of the values
+// The CRC-32 of a buffer, a byte's eight steps written out
 u32 DSProt_Crc32(const u8 *data, u32 size) {
     u32 crc = ~0;
 
     while (size-- != 0) {
-        u32 value = crc ^ *data++;
-
-        if (value & 1) {
-            crc = value >> 1;
-        } else {
-            crc = (value >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
-        if (crc & 1) {
-            crc = crc >> 1;
-        } else {
-            crc = (crc >> 1) ^ 0xedb88320;
-        }
+        crc ^= *data++;
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
+        DSPROT_CRC32_STEP(crc);
     }
     return ~crc;
 }
@@ -226,6 +195,7 @@ u32 DSProt_CheckFlashcart(void) {
     return 0xaa65;
 }
 
+// clang-format off
 asm u32 DSProt_CallCheckFlashcart(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -272,7 +242,9 @@ asm u32 DSProt_CallCheckFlashcart(void) {
     dcd 0
     dcd DSProt_Dispatch + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckEmulator(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -319,9 +291,11 @@ asm u32 DSProt_CallCheckEmulator(void) {
     dcd 0
     dcd DSProt_Dispatch + (26 << 26)
 }
+// clang-format on
 
 // Hand-written, run from .ctor when the overlay is loaded: has DSProt_Decrypt decrypt this file's stubs and its
 // checksum function
+// clang-format off
 asm void DSProt_DecryptDetect(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -335,6 +309,9 @@ asm void DSProt_DecryptDetect(void) {
     dcd 0
     dcd 0
 }
+// clang-format on
 
-#pragma define_section ctor ".ctor" ".ctor" ".ctor" abs32 RW
+#pragma define_section ctor ".ctor"                                                                                    \
+                            ".ctor"                                                                                    \
+                            ".ctor" abs32 RW
 __declspec(ctor) static void (*const sDecryptDetect)(void) = DSProt_DecryptDetect;

@@ -1,9 +1,9 @@
 #include "dsprot/dsprot_internal.h"
 
 // DS Protect's decryption of its own code, in the game's copy (overlay 337): the code of dsprot_decrypt.c without the
-// .ctor entry, since DSProt_Init runs the decryption here. DSProt_DecryptMulti decrypts the functions a list names; the stubs
-// of DSProt_Call* have DSProt_DispatchMulti decrypt a function for one call and encrypt it again, with a key that changes
-// with each call. The ROM doesn't name this file; it is named for what it does.
+// .ctor entry, since DSProt_Init runs the decryption here. DSProt_DecryptMulti decrypts the functions a list names; the
+// stubs of DSProt_Call* have DSProt_DispatchMulti decrypt a function for one call and encrypt it again, with a key that
+// changes with each call. The ROM doesn't name this file; it is named for what it does.
 
 // The address of this array stands for nothing: lengths and keys are made from it, so that no plain length of code is
 // in the ROM
@@ -44,8 +44,8 @@ void DSProt_DecryptMulti(u32 *list) {
     DSProt_FlushCache();
 }
 
-// Decrypts the code of a function, whose length is the distance from DSProt_WorkMulti to `end`, with a key made from `key`
-// and the length. Returns the function's address.
+// Decrypts the code of a function, whose length is the distance from DSProt_WorkMulti to `end`, with a key made from
+// `key` and the length. Returns the function's address.
 u32 DSProt_DecryptFunctionMulti(u32 key, u32 code, u32 end) {
     u32 words[4];
 
@@ -80,6 +80,7 @@ u32 DSProt_EncryptFunctionMulti(u32 key, u32 code, u32 end) {
 // Hand-written: the end of every DSProt_Call* stub, which is given the address of the stub's data in ip. It has
 // DSProt_DecryptFunctionMulti decrypt the stub's function, calls it with the stub's own arguments and has
 // DSProt_EncryptFunctionMulti encrypt it again.
+// clang-format off
 asm void DSProt_DispatchMulti(void) {
     stmdb sp!, {r0, r1, r2, r3}
     str r10, [ip, #0x10]
@@ -108,9 +109,11 @@ asm void DSProt_DispatchMulti(void) {
     ldr r10, [r10, #0x10]
     bx lr
 }
+// clang-format on
 
 // Hand-written, run from .ctor when the overlay is loaded: has DSProt_DecryptMulti decrypt this file's functions, other
 // than DSProt_DecryptMulti
+// clang-format off
 asm void DSProt_DecryptDispatchMulti(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -124,3 +127,5 @@ asm void DSProt_DecryptDispatchMulti(void) {
     dcd 0
     dcd 0
 }
+
+// clang-format on

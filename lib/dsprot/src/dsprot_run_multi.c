@@ -20,8 +20,8 @@ static inline void *DSProt_CheckFailed(DSProtCheckArgs *args, void *arg0, void *
     }
     return args->tamper(arg0, arg1);
 }
-// Runs the two checks of the stubs `DSProt_CallCheckFlashcartA` and `DSProt_CallCheckFlashcartAStub`, each of which gets the arguments and returns a code
-// that is added up
+// Runs the two checks of the stubs `DSProt_CallCheckFlashcartA` and `DSProt_CallCheckFlashcartAStub`, each of which
+// gets the arguments and returns a code that is added up
 void *DSProt_RunChecks1(void *arg0, void *arg1) {
     DSProtCheckArgs args;
     u32 checks[32];
@@ -41,7 +41,7 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
     check = checks;
     total = 0x30eb87;
     do {
-        u32 (*func)(DSProtCheckArgs *) = (u32(*)(DSProtCheckArgs *))(*check - 0x2200);
+        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
         u32 *code = (u32 *)func;
         u32 checksum = 0;
         u32 i;
@@ -70,8 +70,8 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
     return args.tamper(arg0, arg1);
 }
 
-// Runs the two checks of the stubs `DSProt_CallCheckFlashcartB` and `DSProt_CallCheckFlashcartBStub`, each of which gets the arguments and returns a code
-// that is added up
+// Runs the two checks of the stubs `DSProt_CallCheckFlashcartB` and `DSProt_CallCheckFlashcartBStub`, each of which
+// gets the arguments and returns a code that is added up
 void *DSProt_RunChecks2(void *arg0, void *arg1) {
     DSProtCheckArgs args;
     u32 checks[32];
@@ -91,7 +91,7 @@ void *DSProt_RunChecks2(void *arg0, void *arg1) {
     check = checks;
     total = 0x30eb87;
     do {
-        u32 (*func)(DSProtCheckArgs *) = (u32(*)(DSProtCheckArgs *))(*check - 0x2200);
+        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
         u32 *code = (u32 *)func;
         u32 checksum = 0;
         u32 i;
@@ -120,8 +120,8 @@ void *DSProt_RunChecks2(void *arg0, void *arg1) {
     return args.tamper(arg0, arg1);
 }
 
-// Runs the two checks of the stubs `DSProt_CallCheckEmulatorA` and `DSProt_CallCheckEmulatorAStub`, each of which gets the arguments and returns a code
-// that is added up
+// Runs the two checks of the stubs `DSProt_CallCheckEmulatorA` and `DSProt_CallCheckEmulatorAStub`, each of which gets
+// the arguments and returns a code that is added up
 void *DSProt_RunChecks3(void *arg0, void *arg1) {
     DSProtCheckArgs args;
     u32 checks[32];
@@ -141,7 +141,7 @@ void *DSProt_RunChecks3(void *arg0, void *arg1) {
     check = checks;
     total = 0x30eb87;
     do {
-        u32 (*func)(DSProtCheckArgs *) = (u32(*)(DSProtCheckArgs *))(*check - 0x2200);
+        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
         u32 *code = (u32 *)func;
         u32 checksum = 0;
         u32 i;
@@ -170,8 +170,8 @@ void *DSProt_RunChecks3(void *arg0, void *arg1) {
     return args.tamper(arg0, arg1);
 }
 
-// Runs the two checks of the stubs `DSProt_CallCheckEmulatorB` and `DSProt_CallCheckEmulatorBStub`, each of which gets the arguments and returns a code
-// that is added up
+// Runs the two checks of the stubs `DSProt_CallCheckEmulatorB` and `DSProt_CallCheckEmulatorBStub`, each of which gets
+// the arguments and returns a code that is added up
 void *DSProt_RunChecks4(void *arg0, void *arg1) {
     DSProtCheckArgs args;
     u32 checks[32];
@@ -191,7 +191,7 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
     check = checks;
     total = 0x30eb87;
     do {
-        u32 (*func)(DSProtCheckArgs *) = (u32(*)(DSProtCheckArgs *))(*check - 0x2200);
+        u32 (*func)(DSProtCheckArgs *) = (u32 (*)(DSProtCheckArgs *))(*check - 0x2200);
         u32 *code = (u32 *)func;
         u32 checksum = 0;
         u32 i;
@@ -220,6 +220,7 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
     return args.tamper(arg0, arg1);
 }
 
+// clang-format off
 asm void * DSProt_CallRunChecks1(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -266,7 +267,9 @@ asm void * DSProt_CallRunChecks1(void *arg0, void *arg1) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm void * DSProt_CallRunChecks3(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -313,7 +316,9 @@ asm void * DSProt_CallRunChecks3(void *arg0, void *arg1) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm void * DSProt_CallRunChecks2(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -360,7 +365,9 @@ asm void * DSProt_CallRunChecks2(void *arg0, void *arg1) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm void * DSProt_CallRunChecks4(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -407,10 +414,12 @@ asm void * DSProt_CallRunChecks4(void *arg0, void *arg1) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
 // Hand-written, called by the game before the first of these: has the other objects' Decrypt* functions decrypt their
 // functions, then DSProt_DecryptMulti decrypt this file's, and writes `bx lr` over its own start so that a second call
 // does nothing
+// clang-format off
 asm void DSProt_Init(void) {
     stmdb sp!, {lr}
     bl DSProt_DecryptDetectMulti
@@ -437,3 +446,5 @@ asm void DSProt_Init(void) {
     dcd 0
     dcd sEncryptedKeyMulti + 0x2200
 }
+
+// clang-format on

@@ -10,8 +10,9 @@ typedef void (*DSProtInitFunc)(DSProtCipherState *state, const u8 *key, u32 keyL
 typedef int (*DSProtCodeFunc)(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
 
 static const u32 sCipherFunctionsMulti[5] = {
-    (u32)(DSProt_GetBranchTypeMulti + 0x2200), (u32)(DSProt_EncryptCodeMulti + 0x2200), (u32)(DSProt_DecryptCodeMulti + 0x2200),
-    (u32)(DSProt_Rc4NextMulti + 0x2200),       (u32)(DSProt_Rc4InitMulti + 0x2200),
+    (u32)(DSProt_GetBranchTypeMulti + 0x2200), (u32)(DSProt_EncryptCodeMulti + 0x2200),
+    (u32)(DSProt_DecryptCodeMulti + 0x2200),   (u32)(DSProt_Rc4NextMulti + 0x2200),
+    (u32)(DSProt_Rc4InitMulti + 0x2200),
 };
 
 // What a word of code is, by the top byte of the instruction: 1 for a branch with link and exchange, 2 for a branch
@@ -192,6 +193,7 @@ int DSProt_DecryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size) {
 }
 
 // Hand-written, run from .ctor when the overlay is loaded: has DSProt_DecryptMulti decrypt this file's functions
+// clang-format off
 asm void DSProt_DecryptCipherMulti(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -213,3 +215,5 @@ asm void DSProt_DecryptCipherMulti(void) {
     dcd 0
     dcd 0
 }
+
+// clang-format on

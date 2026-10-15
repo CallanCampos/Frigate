@@ -57,15 +57,15 @@
 #include "gfl/graphics.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
-#include "gfl/touchpanel.h"
-#include "gfl/ui.h"
 #include "gfl/msg.h"
 #include "gfl/net.h"
 #include "gfl/overlay.h"
-#include "gfl/rtc_cache.h"
 #include "gfl/proc.h"
+#include "gfl/rtc_cache.h"
 #include "gfl/sound.h"
 #include "gfl/tcb.h"
+#include "gfl/touchpanel.h"
+#include "gfl/ui.h"
 #include "gfl/wm_icon.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
@@ -99,30 +99,12 @@ typedef struct {
     u32 heapSize;
 } FieldMapConfig;
 
-extern const FieldMapConfig MAP_CONFIGS[];
-
 // A step of the field: 0 to run again next frame, 1 to go on to the next routine, 2 when the field ends
 typedef u32 (*FieldRoutine)(GameSystem *gsys, Field *field);
 typedef void (*FieldRenderFunc)(Field *field);
 
-extern const FieldRoutine FIELDMAP_ROUTINES[][2];
-extern const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE1[];
-extern const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE2[];
-extern const BGSysVRAMConfig FIELDMAP_VRAM_CONFIG;
-extern const ClActSysSetup data_ov036_021c9f20;
-extern const BGSysLCDConfig FIELD_LCD_CONFIG;
-extern u8 FIELD_STD_PALETTE[];
-extern const u32 FIELD_DEFAULT_FOG_TABLE[];
-extern const GXRgb FIELD_DEFAULT_EDGE_COLOR_TABLE[];
-extern const LightSetupList FIELD_LIGHT_SETUP;
-extern const VecFx32 DEFAULT_FIELDCAMERA_POS;
-extern const VecFx32 DEFAULT_FIELDCAMERA_TGT;
-extern const VecFx32 DEFAULT_FIELDCAMERA_UP;
-extern const VecFx32 data_ov036_021ca010;
 // The edge colors of the area, loaded from archive 15
 static GXRgb g_FieldEdgeColorTable[8];
-// The memory of the field's heap 0x89
-extern u8 data_ov036_021d57a0[];
 
 u32 FieldRoutine_Open(GameSystem *gsys, Field *field);
 u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field);
@@ -131,6 +113,98 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field);
 u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field);
 u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field);
 u32 FieldRoutine_Close(GameSystem *gsys, Field *field);
+
+// clang-format off
+static const LightSetup sFieldLights[4] = {
+    { 0, { { -0xfff, -0xfff, -0xfff }, 0x7fff } },
+    { 1, { { 0xfff, -0xfff, -0xfff }, 0x7fff } },
+    { 2, { { -0xfff, -0xfff, -0xfff }, 0x7fff } },
+    { 3, { { -0xfff, -0xfff, -0xfff }, 0x7fff } },
+};
+// clang-format on
+
+static const LightSetupList FIELD_LIGHT_SETUP = { sFieldLights, 4 };
+
+static const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE2[] = {
+    FieldRenderPhase2_Fieldmap,
+    FieldRenderPhase2_FieldEffect,
+    FieldRenderPhase2_EncountEffect,
+};
+
+static const VecFx32 DEFAULT_FIELDCAMERA_POS = { 0, 0x40000, 0x80000 };
+static const VecFx32 DEFAULT_FIELDCAMERA_TGT = { 0, 0, 0 };
+
+static const FieldRenderFunc FIELD_RENDER_FUNCS_PHASE1[] = {
+    FieldRenderPhase1_Fieldmap,
+    NULL,
+    NULL,
+};
+
+static const GXRgb FIELD_DEFAULT_EDGE_COLOR_TABLE[8] = {
+    0x294a, 0x294a, 0x294a, 0x294a, 0x294a, 0x294a, 0x294a, 0x294a
+};
+
+static const BGSysLCDConfig FIELD_LCD_CONFIG = { 1, 0, 0, TRUE };
+
+static const ClActSysSetup FIELD_CLACT_SETUP = {
+    0, 0, 0, 0x200, 4, 0x7c, 4, 0x7c, 0, 0x48, 0x40, 0x40, 0x40, 0x10, 0x10,
+};
+
+static const GXRgb FIELD_STD_PALETTE[16] = { 0x7ffe };
+
+// clang-format off
+static const u32 FIELD_DEFAULT_FOG_TABLE[8] = {
+    0x0c080400, 0x1c181410, 0x2c282420, 0x3c383430, 0x4c484440, 0x5c585450, 0x6c686460, 0x7c787470,
+};
+// clang-format on
+
+static const BGSysVRAMConfig FIELDMAP_VRAM_CONFIG = { 8, 0, 0x80, 0, 0x10, 0, 0x100, 0, 7, 0x40, 0x100010, 0x10 };
+
+static const FieldRoutine FIELDMAP_ROUTINES[][2] = {
+    { FieldRoutine_Open, FieldRoutine_Open },
+    { FieldRoutine_MapLoad, FieldRoutine_MapLoad },
+    { FieldRoutine_MapSpawnFinish, FieldRoutine_MapSpawnFinish },
+    { FieldRoutine_Run, FieldRoutine_RunAltFrame },
+    { FieldRoutine_MapUnload, FieldRoutine_MapUnload },
+    { FieldRoutine_Close, FieldRoutine_Close },
+};
+
+static const VecFx32 DEFAULT_FIELDCAMERA_UP = { 0, 0x1000, 0 };
+static const VecFx32 FIELD_WILD_EFFECT_SCALE = { 0x7000, 0x7000, 0x7000 };
+
+// clang-format off
+static const FieldMapConfig MAP_CONFIGS[] = {
+    { { 0x200000, 0x400000, 2, 2, 1, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x1b008, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x800000, 0x800000, 2, 3, 0, 8, 2, 3, 1, NULL, FALSE, { 0, 0 }, { 0xffffffff, 0xffffffff }, 0x15004, 1 }, &FIELDMAP_CTRL_NOGRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 2, 0, 8, 2, 2, 1, NULL, FALSE, { 0, 0 }, { 0xffffffff, 0xffffffff }, 0x15004, 0 }, &FIELDMAP_CTRL_NOGRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 0 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x400000, 0x400000, 1, 1, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x54010, 0 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 1, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 0 }, &FIELDMAP_CTRL_GRID, TRUE, 0x12a000 },
+    { { 0x200000, 0x400000, 2, 3, 1, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_NOGRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 3, 2, 1, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 0 }, &FIELDMAP_CTRL_NOGRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 1, 1, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 0 }, &FIELDMAP_CTRL_GRID, TRUE, 0xaa000 },
+    { { 0x200000, 0x400000, 2, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 0 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 3, 2, 1, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x1b008, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_NOGRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 6, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 3, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_HYBRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 1, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x1b008, 0 }, &FIELDMAP_CTRL_HYBRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x1b008, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 5, 1, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 3, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 2 }, &FIELDMAP_CTRL_HYBRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 2, 1, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x1b008, 0 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 3, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 6, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0xd004, 1 }, &FIELDMAP_CTRL_NOGRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 3, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0xd534, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0xa004, 1 }, &FIELDMAP_CTRL_HYBRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 3, 2, 1, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0xe004, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 3, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 1, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x15004, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 2, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0x1b008, 1 }, &FIELDMAP_CTRL_HYBRID, TRUE, 0x136800 },
+    { { 0x200000, 0x400000, 1, 2, 0, 8, 1, 1, 1, NULL, FALSE, { 0, 0 }, { 0, 2 }, 0xf000, 1 }, &FIELDMAP_CTRL_GRID, TRUE, 0x136800 },
+};
+// clang-format on
 
 BOOL FieldmapProc_Init(GameProc *proc, int *seq, void *param, void *work) {
     GameSystem *gsys = param;
@@ -143,7 +217,7 @@ BOOL FieldmapProc_Init(GameProc *proc, int *seq, void *param, void *work) {
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_FIELDMAP, heapSize);
         GFL_HeapCreateChild(HEAPID_USER, 0x70, 0xf000);
         GFL_HeapCreateChild(HEAPID_FIELDMAP, 0x50, 0xc000);
-        GFL_HeapCreateRoot(data_ov036_021d57a0, 0x10000, 0x89);
+        GFL_HeapCreateRoot(g_FieldHeapMemory, 0x10000, 0x89);
         GFL_HeapCreateChild(0x89, 0x92, 0x6400);
         GFL_HeapCreateChild(0x89, 0x93, 0x7400);
         GFL_HeapCreateChild(0x89, 0x96, 0x500);
@@ -240,7 +314,7 @@ u32 FieldRoutine_Open(GameSystem *gsys, Field *field) {
 
     GFL_BGSysSetVRAMBanks(&FIELDMAP_VRAM_CONFIG);
     FieldG2D_Init(field);
-    ClActSys_Create(&data_ov036_021c9f20, &FIELDMAP_VRAM_CONFIG, 0x89);
+    ClActSys_Create(&FIELD_CLACT_SETUP, &FIELDMAP_VRAM_CONFIG, 0x89);
     GFL_BGSysSetBGEnabledA(0x10, TRUE);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);
     BmpWin_InitAllocator(heapId);
@@ -273,8 +347,8 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->moneyWin = NULL;
         field->placeName = FieldPlaceName_Create(gsys, 0x93, field->msgBGSys);
         field->unk34 = func_ov036_021b5b7c(gsys, field->heapId);
-        field->skillMapEff = FieldSkillMapEff_Create(FieldStatus_GetFlashPerms(GameData_GetFieldStatus(field->gameData)),
-                                                     field->heapId);
+        field->skillMapEff =
+            FieldSkillMapEff_Create(FieldStatus_GetFlashPerms(GameData_GetFieldStatus(field->gameData)), field->heapId);
         field->cameraSystem = FieldCamera_Create(GetZoneDefaultCameraIndex(field->zoneId), 0, field->g3dCamera,
                                                  &field->playerPos, field->heapId);
         field->sceneArea = FieldSceneArea_Create(field->heapId, field->cameraSystem, field);
@@ -283,8 +357,8 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
     case 1: {
         FieldPropSystem *propSystem;
 
-        field->noGridMapper = FieldNoGridMapper_Create(field->heapId, field->cameraSystem, field->sceneArea,
-                                                       field->sceneAreaLoader);
+        field->noGridMapper =
+            FieldNoGridMapper_Create(field->heapId, field->cameraSystem, field->sceneArea, field->sceneAreaLoader);
         field->palaceSys = FieldPalaceSys_Create(field->heapId, gsys, field, field->zoneId);
         FieldColorPostFX_Set(field->colorPostFX, FieldPalaceSys_GetLuminanceTable(field->palaceSys),
                              IsZoneFlashbackMemoryPostFX(field->zoneId));
@@ -300,8 +374,8 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
     case 2: {
         u32 railId;
 
-        SetupZoneWarpArrivalGrid(&field->playerZoneState, field->zoneId, 0, 0, 0, field->playerPos.x, field->playerPos.y,
-                                 field->playerPos.z);
+        SetupZoneWarpArrivalGrid(&field->playerZoneState, field->zoneId, 0, 0, 0, field->playerPos.x,
+                                 field->playerPos.y, field->playerPos.z);
         FieldG3DMapper_CreateMap(field->g3DMapper, &field->mapperConfig, field->colorPostFX);
         railId = GetRailIDForZone(field->zoneId);
         if (railId != 0xffffffff) {
@@ -374,7 +448,8 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->g3dCi = Fld3DCi_Create(0x50, field->particleSystem);
         field->encEff = EncEff_Create(field->heapId, field);
         FesGimmick_BindPlayer(field->fesGimmick, field->fieldEffects, field->player);
-        field->dayCare = DayCare_Create(field->heapId, field, getDaycareBlockAddress(GameData_GetSaveControl(field->gameData)));
+        field->dayCare =
+            DayCare_Create(field->heapId, field, getDaycareBlockAddress(GameData_GetSaveControl(field->gameData)));
         Field_LoadSceneArea(field, field->zoneId);
         loading = FALSE;
         break;
@@ -411,8 +486,8 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
         FieldAsyncProcManager_Update(field->asyncProcManager);
         field->subroutinePhase++;
     case 1:
-        if (FieldStatus_CheckContinueFlag(GameData_GetFieldStatus(field->gameData)) == TRUE
-            && IsZoneTwoPassLoad(field->zoneId) == TRUE && func_02005cbc()) {
+        if (FieldStatus_CheckContinueFlag(GameData_GetFieldStatus(field->gameData)) == TRUE &&
+            IsZoneTwoPassLoad(field->zoneId) == TRUE && func_02005cbc()) {
             return 0;
         }
         if (FieldStatus_GetNewLoadFlag(GameData_GetFieldStatus(field->gameData))) {
@@ -884,17 +959,16 @@ void FieldG3D_Init(Field *field) {
     field->effectBlAct = BlActSys_Create(0x3a, 0x50, FldActSys_VRAMUploadFunc, field->heapId);
     field->wildEffectBlAct = BlActSys_Create(0x1e, 0x28, FldActSys_VRAMUploadFunc, field->heapId);
     scene = BlActSys_GetScene(field->wildEffectBlAct);
-    scale = data_ov036_021ca010;
+    scale = FIELD_WILD_EFFECT_SCALE;
     BlActScene_SetScale(scene, &scale);
     polyId = 0;
     BlActScene_SetBasePolyID(scene, &polyId);
     Field_LoadActorMatColorPreset(field);
     up = DEFAULT_FIELDCAMERA_UP;
     field->g3DObjSystem = FieldG3DObjSystem_Create(field->heapId, 0x40, 0x40);
-    field->g3dCamera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
-                                           FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE,
-                                           FX32_CONST(1024), 0, &DEFAULT_FIELDCAMERA_POS, &up,
-                                           &DEFAULT_FIELDCAMERA_TGT, field->heapId);
+    field->g3dCamera = GFL_G3DCameraCreate(
+        G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0,
+        FX32_ONE, FX32_CONST(1024), 0, &DEFAULT_FIELDCAMERA_POS, &up, &DEFAULT_FIELDCAMERA_TGT, field->heapId);
     field->g3dLights = GFL_G3DLightCreate(&FIELD_LIGHT_SETUP, field->heapId);
     GFL_G3DCameraFlush(field->g3dCamera);
     GFL_G3DLightFlush(field->g3dLights);
@@ -1214,7 +1288,8 @@ void Field_LoadSceneArea(Field *field, u32 zoneId) {
         LoadCameraDataToSceneAreaLoader(field->sceneAreaLoader, 1, cameraId, 0x96);
         cameraData = GetFldSceneAreaLoaderCameraData(field->sceneAreaLoader);
         count = GetFldSceneAreaLoaderCamCount(field->sceneAreaLoader);
-        BuildSceneArea(field->sceneArea, cameraData, count, GetFldSceneAreaLoaderCamFuncsStaticOffs(field->sceneAreaLoader));
+        BuildSceneArea(field->sceneArea, cameraData, count,
+                       GetFldSceneAreaLoaderCamFuncsStaticOffs(field->sceneAreaLoader));
         return;
     }
     if (!GetZoneHasRailSystem(zoneId)) {

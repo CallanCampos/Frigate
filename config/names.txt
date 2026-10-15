@@ -3806,6 +3806,10 @@ overlays/ov036 0x021c2168 PleasureBoat_AdvanceClock
 overlays/ov036 0x021c21b8 PleasureBoat_GetInfo
 overlays/ov036 0x021c2254 PleasureBoat_SetTrainerDefeated
 overlays/ov036 0x021c2290 PleasureBoat_StopClock
+overlays/ov036 0x021c9ec4 sResolvedControllerTypes
+overlays/ov036 0x021c9f20 FIELD_CLACT_SETUP
+overlays/ov036 0x021c9f7c sFieldLights
+overlays/ov036 0x021ca010 FIELD_WILD_EFFECT_SCALE
 overlays/ov036 0x021cfcf8 TILE_CLASS_SFX_LAY0
 overlays/ov036 0x021cfd30 TILE_CLASS_SFX_LAY1
 overlays/ov036 0x021d0924 sConfirmDialogSetup
@@ -3826,6 +3830,7 @@ overlays/ov036 0x021d0a20 sCameraTargetOffsets
 overlays/ov036 0x021d5178 sMartWindows
 overlays/ov036 0x021d5194 sBPShopWindows
 overlays/ov036 0x021d51b0 sMoveTutorWindows
+overlays/ov036 0x021d57a0 g_FieldHeapMemory
 overlays/ov036 0x021e57bc g_ScrEventActorFlags
 overlays/ov036 0x021e57c0 g_ScrBMAnmWaitHandleID
 overlays/ov050 0x021e5880 BSubwayCmd_Tool

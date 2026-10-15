@@ -225,6 +225,7 @@ u32 DSProt_CheckFlashcartBStub(void) {
     return 0xbd3b;
 }
 
+// clang-format off
 asm u32 DSProt_CallCheckEmulatorAStub(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -271,7 +272,9 @@ asm u32 DSProt_CallCheckEmulatorAStub(void) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckEmulatorBStub(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -318,7 +321,9 @@ asm u32 DSProt_CallCheckEmulatorBStub(void) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckFlashcartAStub(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -365,7 +370,9 @@ asm u32 DSProt_CallCheckFlashcartAStub(void) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
+// clang-format off
 asm u32 DSProt_CallCheckFlashcartBStub(void) {
     orr ip, pc, pc
     ands ip, ip, ip
@@ -412,8 +419,10 @@ asm u32 DSProt_CallCheckFlashcartBStub(void) {
     dcd 0
     dcd DSProt_DispatchMulti + (26 << 26)
 }
+// clang-format on
 
 // Hand-written, run by DSProt_Init: has DSProt_DecryptMulti decrypt this file's stubs
+// clang-format off
 asm void DSProt_DecryptStubCheckMulti(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -429,3 +438,5 @@ asm void DSProt_DecryptStubCheckMulti(void) {
     dcd 0
     dcd 0
 }
+
+// clang-format on

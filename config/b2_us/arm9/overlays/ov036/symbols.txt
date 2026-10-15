@@ -4338,7 +4338,7 @@ DiscoverInitialMedalsCore kind:function(thumb,size=0xac) addr:0x021c9d50
 DiscoverInitialMedals kind:function(thumb,size=0x8) addr:0x021c9dfc
 CheckResetKeldeoOrdinaryForme kind:function(thumb,size=0xb2) addr:0x021c9e04
 FIELDMAP_PROC_FUNCS kind:data(any) addr:0x021c9eb8 ambiguous
-data_ov036_021c9ec4 kind:data(any) addr:0x021c9ec4
+sResolvedControllerTypes kind:data(any) addr:0x021c9ec4
 FIELD_LIGHT_SETUP kind:data(any) addr:0x021c9ec8
 FIELD_RENDER_FUNCS_PHASE2 kind:data(any) addr:0x021c9ed0
 DEFAULT_FIELDCAMERA_POS kind:data(any) addr:0x021c9edc
@@ -4346,14 +4346,14 @@ DEFAULT_FIELDCAMERA_TGT kind:data(any) addr:0x021c9ee8
 FIELD_RENDER_FUNCS_PHASE1 kind:data(any) addr:0x021c9ef4
 FIELD_DEFAULT_EDGE_COLOR_TABLE kind:data(any) addr:0x021c9f00
 FIELD_LCD_CONFIG kind:data(any) addr:0x021c9f10
-data_ov036_021c9f20 kind:data(any) addr:0x021c9f20
+FIELD_CLACT_SETUP kind:data(any) addr:0x021c9f20
 FIELD_STD_PALETTE kind:data(any) addr:0x021c9f3c
 FIELD_DEFAULT_FOG_TABLE kind:data(any) addr:0x021c9f5c
-data_ov036_021c9f7c kind:data(any) addr:0x021c9f7c
+sFieldLights kind:data(any) addr:0x021c9f7c
 FIELDMAP_VRAM_CONFIG kind:data(any) addr:0x021c9fa4
 FIELDMAP_ROUTINES kind:data(any) addr:0x021c9fd4
 DEFAULT_FIELDCAMERA_UP kind:data(any) addr:0x021ca004
-data_ov036_021ca010 kind:data(any) addr:0x021ca010
+FIELD_WILD_EFFECT_SCALE kind:data(any) addr:0x021ca010
 MAP_CONFIGS kind:data(any) addr:0x021ca01c
 SPECIAL_TILE_SCRIPTS kind:data(any) addr:0x021ca844
 data_ov036_021ca84a kind:data(any) addr:0x021ca84a
@@ -5754,7 +5754,7 @@ data_ov036_021d5758 kind:data(any) addr:0x021d5758
 data_ov036_021d5768 kind:data(any) addr:0x021d5768
 data_ov036_021d5778 kind:data(any) addr:0x021d5778
 data_ov036_021d577c kind:data(any) addr:0x021d577c
-data_ov036_021d57a0 kind:bss addr:0x021d57a0
+g_FieldHeapMemory kind:bss addr:0x021d57a0
 data_ov036_021d6ce0 kind:bss addr:0x021d6ce0 ambiguous
 data_ov036_021d7448 kind:bss addr:0x021d7448 ambiguous
 data_ov036_021dd93c kind:bss addr:0x021dd93c ambiguous

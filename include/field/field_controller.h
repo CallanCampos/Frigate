@@ -15,6 +15,11 @@ struct FieldmapCtrlVTable {
     void (*free)(Field *field);
 };
 
+// The three kinds of controller, which fieldmap.c's table of map kinds lists. Their files are not written yet
+extern const FieldmapCtrlVTable FIELDMAP_CTRL_GRID;
+extern const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID;
+extern const FieldmapCtrlVTable FIELDMAP_CTRL_HYBRID;
+
 void *Field_GetController(Field *field);
 void Field_SetController(Field *field, void *controller);
 u32 Field_GetControllerTypeID(Field *field);

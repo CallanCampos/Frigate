@@ -4,10 +4,10 @@
 // two halves may be two files (poke_net.c and a platform file), which nothing in the ROM tells apart.
 
 #include "types.h"
-#include "poke_net_internal.h"
 #include "dwc/ext.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "poke_net_internal.h"
 
 #define POKE_NET_THREAD_STACK_SIZE 0x800
 #define POKE_NET_THREAD_PRIORITY 16
@@ -535,9 +535,8 @@ void POKE_NET_RecvThreadEntry(void *arg) {
 
         POKE_NET_LockMutex();
         if (!gPOKE_NET_Control.RecvDone) {
-            gPOKE_NET_Control.RecvResult =
-                SOC_Read(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
-                                    gPOKE_NET_Control.RecvSize - offset, 0);
+            gPOKE_NET_Control.RecvResult = SOC_Read(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
+                                                    gPOKE_NET_Control.RecvSize - offset, 0);
             gPOKE_NET_Control.RecvDone = TRUE;
         }
         POKE_NET_UnlockMutex();

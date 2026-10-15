@@ -191,6 +191,7 @@ int DSProt_DecryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size) {
 }
 
 // Hand-written, run from .ctor when the overlay is loaded: has DSProt_Decrypt decrypt this file's functions
+// clang-format off
 asm void DSProt_DecryptCipher(void) {
     orr r0, pc, #0
     adds r0, r0, #4
@@ -212,6 +213,9 @@ asm void DSProt_DecryptCipher(void) {
     dcd 0
     dcd 0
 }
+// clang-format on
 
-#pragma define_section ctor ".ctor" ".ctor" ".ctor" abs32 RW
+#pragma define_section ctor ".ctor"                                                                                    \
+                            ".ctor"                                                                                    \
+                            ".ctor" abs32 RW
 __declspec(ctor) static void (*const sDecryptCipher)(void) = DSProt_DecryptCipher;
