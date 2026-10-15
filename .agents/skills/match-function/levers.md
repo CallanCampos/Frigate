@@ -7,6 +7,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- Zeros loaded from a stack slot at each use and a constant hoisted into a saved register, where ours uses `movs`:
+  move a later loop into a `static inline` that counts with its own parameter, passed that constant.
+  (matching.md: "A constant held in a stack slot")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
 - A multiply's operand copied right after its `subs` where the original loads the constant first: give the index
