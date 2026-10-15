@@ -2016,6 +2016,7 @@ overlays/ov182 0x021bac1c reloc_module overlay(181)
 overlays/ov182 0x021bd8e4 remove_symbol
 overlays/ov182 0x021bdaf9 remove_symbol
 overlays/ov182 0x021bdb41 remove_symbol
+overlays/ov182 0x021bfb54 add_data data_ov182_021bfb54
 overlays/ov185 0x0219e83c reloc_module overlay(139)
 overlays/ov185 0x0219ea34 reloc_module overlay(139)
 overlays/ov185 0x0219eb18 reloc_addend 2

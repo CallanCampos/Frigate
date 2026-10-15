@@ -35,3 +35,8 @@ lib/dwcutil/src/dwc_util_ui_effect.c:
     .text       start:0x021ab080 end:0x021ab1bc
     .rodata     start:0x021bfb58 end:0x021bfb64
     .bss        start:0x021c4064 end:0x021c4068
+
+lib/dwcutil/src/dwc_util_ui_object.c:
+    .text       start:0x021ab1bc end:0x021ab5c8
+    .rodata     start:0x021bfb64 end:0x021bfb94
+    .bss        start:0x021c4068 end:0x021c406c
