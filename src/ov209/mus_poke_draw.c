@@ -201,14 +201,15 @@ static void MusPokeDraw_CellCallback(u32 kind, MusicalMcssCellInfo *info, void *
     MusPokeDraw *poke = work;
 
     if (kind >= MUS_POKE_DRAW_CELL_EQUIP) {
-        kind -= MUS_POKE_DRAW_CELL_EQUIP;
-        poke->equips[kind].valid = TRUE;
-        poke->equips[kind].info.pos = info->pos;
-        poke->equips[kind].info.offset = info->offset;
-        poke->equips[kind].info.rotation = info->rotation;
-        poke->equips[kind].info.cellRotation = info->cellRotation;
-        poke->equips[kind].info.scale = info->scale;
-        poke->equips[kind].info.center = info->center;
+        MusPokeDrawEquipNo pos = kind - MUS_POKE_DRAW_CELL_EQUIP;
+
+        poke->equips[pos].valid = TRUE;
+        poke->equips[pos].info.pos = info->pos;
+        poke->equips[pos].info.offset = info->offset;
+        poke->equips[pos].info.rotation = info->rotation;
+        poke->equips[pos].info.cellRotation = info->cellRotation;
+        poke->equips[pos].info.scale = info->scale;
+        poke->equips[pos].info.center = info->center;
     } else if (kind == MUS_POKE_DRAW_CELL_MARK4) {
         fx32 x = info->offset.x;
         fx32 y = info->offset.y;

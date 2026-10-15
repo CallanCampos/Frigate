@@ -1980,13 +1980,13 @@ prints the tables below from the configs and the ROM:
 | `mus_shot_photo.c` | `0x021ba598`–`0x021bad2c` | 10 | complete | string at `0x021c3020` |
 | `mus_shot_info.c` | `0x021bad2c`–`0x021bb368` | 11 | complete | string at `0x021c3034` |
 | `mus_item_draw.c` | `0x021bb368`–`0x021bb9bc` | 32 | complete | string at `0x021c3044` |
-| `mus_poke_draw.c` | `0x021bb9bc`–`0x021bbe50` | 24 | partial | string at `0x021c3054` |
+| `mus_poke_draw.c` | `0x021bb9bc`–`0x021bbe50` | 24 | complete | string at `0x021c3054` |
 | `musical_mcss.c` | `0x021bbe50`–`0x021bd238` | 35 | complete | string at `0x021c3064` |
 | `sta_act_obj.c` | `0x021bd238`–`0x021bd42c` | 10 | complete | string at `0x021c3074` |
 | `sta_act_light.c` | `0x021bd42c`–`0x021bd778` | 12 | complete | string at `0x021c3084` |
 | `sta_act_bg.c` | `0x021bd778`–`0x021bd8f0` | 7 | complete | string at `0x021c30d0` |
 | `sta_act_poke.c` | `0x021bd8f0`–`0x021be9b0` | 36 | complete | string at `0x021c30e0` |
-| `sta_acting.c` | `0x021be9b0`–`0x021c0380` | 68 | partial | string at `0x021c30f0` |
+| `sta_acting.c` | `0x021be9b0`–`0x021c0380` | 68 | complete | string at `0x021c30f0` |
 | `sta_act_effect.c` | `0x021c0380`–`0x021c051c` | 9 | complete | string at `0x021c3100` |
 | `sta_act_audience.c` | `0x021c051c`–`0x021c0ae0` | 15 | complete | string at `0x021c3114` |
 | `sta_act_button.c` | `0x021c0ae0`–`0x021c1024` | 6 | complete | string at `0x021c3128` |
