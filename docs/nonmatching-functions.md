@@ -408,9 +408,8 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_GetConnectedApInfo` | `0x0215cb48` / `0x0215cb88` | 27 bytes differ, same size. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SendDCFDataEx` | `0x0215cba4` / `0x0215cbe4` | Ours compiles to 0xd4, the original is 0xdc |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_BuildFrameHeader` | `0x0215ccd4` / `0x0215cd14` | Ours compiles to 0x4e, the original is 0x54 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_UpdateLinkQuality` | `0x0215cd58` / `0x0215cd98` | Ours compiles to 0x38, the original is 0x34 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_RssiToQuality` | `0x0215cd8c` / `0x0215cdcc` | Ours compiles to 0x58, the original is 0x4c |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_GetAverageRssi` | `0x0215cdd8` / `0x0215ce18` | Ours compiles to 0x50, the original is 0x4c |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_RssiToQuality` | `0x0215cd8c` / `0x0215cdcc` | Ours 0x48, original 0x4c. Recovered unsigned thresholds: substate 2 uses 22/17/12, all other substates use 28/22/16. Natural C omits the original's redundant substate-1 test; remains nonmatching in both versions. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_GetAverageRssi` | `0x0215cdd8` / `0x0215ce18` | Ours 0x54, original 0x4c. Recovered byte return and signed averaging: divide by 16 above sixteen samples, otherwise by the nonzero count; zero samples return zero. Natural C remains nonmatching in both versions; the original calls ARM `_s32_div_f`. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_AddRssiSample` | `0x0215ce24` / `0x0215ce64` | Ours compiles to 0x10, the original is 0x64 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupStep1` | `0x0215ce88` / `0x0215cec8` | Ours compiles to 0x94, the original is 0xc8 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupStep2` | `0x0215cf50` / `0x0215cf90` | Ours compiles to 0x40, the original is 0x44 |

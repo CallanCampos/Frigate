@@ -505,9 +505,11 @@ overlays/ov009 0x0214f60c overlay_id 191
 overlays/ov009 0x0214f610 reloc_module overlay(191)
 overlays/ov010 0x02150288 reloc_module overlay(305)
 overlays/ov010 0x021502fc reloc_module overlay(306)
+overlays/ov011 0x020050c4 remove_orphan_reloc .
 overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x02155e68 add_reloc load,main,0x020050c4
+overlays/ov011 0x0215cd8c add_label ReshZekSave_UnresolvedInitTarget
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)

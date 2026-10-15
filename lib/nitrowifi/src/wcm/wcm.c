@@ -157,8 +157,8 @@ static s32 WCM_BuildFrameHeader(s32 kind, void *header, s32 dataLen, s32 ssidLen
 static BOOL WCM_CompareBytes(const void *a, const void *b, u32 size);
 static BOOL WCM_CompareBssID(const u8 *a, const u8 *b);
 static s32 WCM_UpdateLinkQuality(void);
-static s32 WCM_RssiToQuality(s32 rssi);
-static s32 WCM_GetAverageRssi(void);
+static s32 WCM_RssiToQuality(u32 rssi);
+static u8 WCM_GetAverageRssi(void);
 static s32 WCM_StartupStep1(void);
 static s32 WCM_StartupStep2(void);
 static s32 WCM_ConnectStep1(void *bssDesc, void *wepDesc, u32 wepMode);
@@ -1213,29 +1213,16 @@ static s32 WCM_UpdateLinkQuality(void) {
     s32 quality = 0;
 
     if (work != NULL && work->state == 9) {
-        WCM_AddRssiSample(0);
         quality = WCM_RssiToQuality(WCM_GetAverageRssi());
     }
     CPU_SetIRQMask(irq);
     return quality;
 }
 
-static s32 WCM_RssiToQuality(s32 rssi) {
+static s32 WCM_RssiToQuality(u32 rssi) {
     WCMWork *work = WCM_GetWork();
 
-    if (work->subState == 1 || work->subState == 2) {
-        if (work->subState == 1) {
-            if (rssi >= 0x1c) {
-                return 3;
-            }
-            if (rssi >= 0x16) {
-                return 2;
-            }
-            if (rssi >= 0x10) {
-                return 1;
-            }
-            return 0;
-        }
+    if (work->subState == 2) {
         if (rssi >= 0x16) {
             return 3;
         }
@@ -1246,6 +1233,15 @@ static s32 WCM_RssiToQuality(s32 rssi) {
             return 1;
         }
         return 0;
+    }
+    if (rssi >= 0x1c) {
+        return 3;
+    }
+    if (rssi >= 0x16) {
+        return 2;
+    }
+    if (rssi >= 0x10) {
+        return 1;
     }
     return 0;
 }
@@ -1258,24 +1254,23 @@ static void WCM_AddRssiSample(s32 rssi) {
     sWcm.rssiSampleCount = (u8)(count + 1);
 }
 
-static s32 WCM_GetAverageRssi(void) {
-    u32 i;
+static u8 WCM_GetAverageRssi(void) {
     s32 sum = 0;
     u8 count = sWcm.rssiSampleCount;
+    int i;
 
     if (count > 0x10) {
         for (i = 0; i < 0x10; i++) {
             sum += sWcm.rssiSamples[i];
         }
-        return (sum + (sum >> 0x1c)) >> 4;
+        sum /= 0x10;
+    } else if (count != 0) {
+        for (i = 0; i < count; i++) {
+            sum += sWcm.rssiSamples[i];
+        }
+        sum /= count;
     }
-    if (count == 0) {
-        return 0;
-    }
-    for (i = 0; i < count; i++) {
-        sum += sWcm.rssiSamples[i];
-    }
-    return sum / count;
+    return sum;
 }
 
 // The startup FSM's WM_Initialize-adjacent first step: brings up the hardware and reads its MAC address

@@ -13,7 +13,7 @@ u32 func_0200af74(void) {
 }
 
 void func_0200af78(ReshZekSave *reshZek) {
-    WCM_RssiToQuality(reshZek);
+    ReshZekSave_UnresolvedInitTarget(reshZek);
 }
 
 ReshZekSave *getReshZekBlkAddress(SaveControl *save) {
