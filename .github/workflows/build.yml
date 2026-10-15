@@ -1,9 +1,9 @@
 name: Build
 
 # Builds each version from its base ROM, checks every module and the SHA1, and uploads the progress report that
-# decomp.dev reads, an artifact named <version>_report. The ROMs come from the private pokebw2-roms repository, through a
-# read-only deploy key in the ROMS_DEPLOY_KEY secret. Pull requests from forks get no secrets, so they skip this, and
-# compile.yml still checks that they compile.
+# ByteMatch (bytematch.dev) reads, an artifact named <version>_report. The ROMs come from the private pokebw2-roms
+# repository, through a read-only deploy key in the ROMS_DEPLOY_KEY secret. Pull requests from forks get no secrets,
+# so they skip this, and compile.yml still checks that they compile.
 on:
   push:
     branches: [main]

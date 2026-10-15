@@ -5,13 +5,12 @@ Both USA/Europe ROMs rebuild byte for byte from the same source tree.
 
 ## Progress
 
-[![Code](https://decomp.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=code&label=Code)](https://decomp.dev/fuddlesworth/pokebw2)
-[![Functions](https://decomp.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=functions&label=Functions)](https://decomp.dev/fuddlesworth/pokebw2)
-[![Files](https://decomp.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=complete_units&label=Complete%20files)](https://decomp.dev/fuddlesworth/pokebw2)
+[![Code](https://bytematch.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=matched_code_percent&label=Code)](https://bytematch.dev/fuddlesworth/pokebw2)
+[![Functions](https://bytematch.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=matched_functions&label=Functions)](https://bytematch.dev/fuddlesworth/pokebw2)
+[![Files](https://bytematch.dev/fuddlesworth/pokebw2.svg?mode=shield&measure=complete_units&label=Complete%20files)](https://bytematch.dev/fuddlesworth/pokebw2)
 
-[![Progress](https://decomp.dev/fuddlesworth/pokebw2.svg)](https://decomp.dev/fuddlesworth/pokebw2)
-
-Progress updates automatically from CI. Green areas match; grey and blue areas are still in progress.
+Progress updates automatically from CI. [ByteMatch](https://bytematch.dev/fuddlesworth/pokebw2) shows it for each
+version, for ARM9 main and the overlays, and for the game's code and each library.
 
 ## Build
 

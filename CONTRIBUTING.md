@@ -11,7 +11,7 @@ follows; [the docs](README.md#documentation) have the details.
 2. Open the project in [objdiff](https://github.com/encounter/objdiff). `ninja` writes `objdiff.json`, and objdiff
    rebuilds and diffs each function as you edit.
 3. Pick something to work on. [Source files](docs/source-files.md) lists every overlay's original files and the
-   [progress map on decomp.dev](https://decomp.dev/fuddlesworth/pokebw2) shows what is left. [Nonmatching functions](docs/nonmatching-functions.md) lists
+   [progress on ByteMatch](https://bytematch.dev/fuddlesworth/pokebw2) shows what is left. [Nonmatching functions](docs/nonmatching-functions.md) lists
    functions already in C that don't match yet, each with what was tried, if you like a puzzle. Before starting
    overlay work, find its open `[Decomp] Overlay NNN` issue and read the comments. If nobody has claimed it, comment
    that you are claiming it and what file or range you are starting with; then recheck for a concurrent claim.
