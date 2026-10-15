@@ -1,4 +1,10 @@
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_2d.h"
+#include "app/pokemon_trade/pokemontrade_3d.h"
+#include "app/pokemon_trade/pokemontrade_message.h"
+#include "app/pokemon_trade/pokemontrade_proc.h"
+#include "app/pokemon_trade/pokemontrade_save.h"
+#include "app/pokemon_trade/pokemontrade_touchbar.h"
 #include "app/pokemon_trade_local.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
@@ -696,7 +702,7 @@ static void func_ov194_021bfac4(PokemonTradeWork *wk) {
         func_ov194_021c200c(wk, 0);
         GFL_BGSysSetEnabledBGsA(0x1f);
         GFL_BGSysSetEnabledBGsB(0x1e);
-        func_ov194_021c2a24(wk);
+        PokemonTrade_CreateTouchBar(wk);
         func_02042ba8(TRUE, wk->heapId);
         wk->checkCount = 0;
         PokemonTrade_SetState(wk, func_ov194_021b9a38);

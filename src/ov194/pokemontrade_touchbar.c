@@ -1,15 +1,17 @@
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_touchbar.h"
 #include "app/pokemon_trade_local.h"
 #include "app/ui/touchbar.h"
 #include "constants/sound.h"
 #include "nitro/mi.h"
 
-// The trade's touch bar. The ROM names no file between pokemontrade_3d.c and pokemontrade_2d.c, so the name is
-// descriptive. It is a file of its own because its function's 0x80-byte initializer comes first in .rodata, where
-// MWCC, which sorts a file's data by size, would put it after pokemontrade_2d.c's smaller objects; at the end of
-// pokemontrade_3d.c it would reorder two pairs of that file's equal-size objects
+// The trade's touch bar. This filename and PokemonTrade_CreateTouchBar are descriptive names. The ROM names no
+// file between pokemontrade_3d.c and pokemontrade_2d.c. Its 0x80-byte initializer comes first in .rodata; the current
+// pokemontrade_2d.c reconstruction would sort it after smaller objects, while placing it at the end of
+// pokemontrade_3d.c would reorder two pairs of equal-size objects. This ordering supports the current split without
+// uniquely establishing the original source-file boundary
 
-void func_ov194_021c2a24(PokemonTradeWork *wk) {
+void PokemonTrade_CreateTouchBar(PokemonTradeWork *wk) {
     TouchBarItem items[] = {
         { 1, { 232, 168 } },
         { TOUCHBAR_ICON_CUSTOM, { 28, 168 } },
