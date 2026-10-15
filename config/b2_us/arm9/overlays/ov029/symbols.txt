@@ -156,8 +156,8 @@ sPacketPool kind:bss addr:0x021983e4
 sNoiseFloor kind:bss addr:0x021983ec
 sLoudnessHistory kind:bss addr:0x021983f8
 sEcho kind:bss addr:0x02198408
-data_ov029_0219841c kind:bss addr:0x0219841c
-data_ov029_02198434 kind:bss addr:0x02198434
+sEchoCoefficients kind:bss addr:0x0219841c
+sEchoTaps kind:bss addr:0x02198434
 sFarEnd kind:bss addr:0x0219844c
 sEchoHistory kind:bss addr:0x0219888c
 sLibrary kind:bss addr:0x0219988c

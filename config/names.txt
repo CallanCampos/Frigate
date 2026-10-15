@@ -3354,6 +3354,8 @@ overlays/ov029 0x021983e4 sPacketPool
 overlays/ov029 0x021983ec sNoiseFloor
 overlays/ov029 0x021983f8 sLoudnessHistory
 overlays/ov029 0x02198408 sEcho
+overlays/ov029 0x0219841c sEchoCoefficients
+overlays/ov029 0x02198434 sEchoTaps
 overlays/ov029 0x0219844c sFarEnd
 overlays/ov029 0x0219888c sEchoHistory
 overlays/ov029 0x0219988c sLibrary
