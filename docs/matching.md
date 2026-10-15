@@ -8,6 +8,10 @@ tools that show the differences.
 
 ## Registers
 
+- The order of two independent updates in a loop body can decide the coloring of a whole function, even when the
+  asm shows them in the other order: the SSP decoder's `func_ov257_021abd84` (`ssp_jpegdec.c`) matches only with
+  `l++;` written before `sBitsLeft--;`, though the original emits the decrement first, and no declaration order moves
+  it.
 - A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
   taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
   (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
