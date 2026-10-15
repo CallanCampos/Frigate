@@ -89,7 +89,8 @@ typedef struct NHttpQueueNode {
     struct NHttpQueueNode *prev;
     struct NHttpQueueNode *next;
     int id;
-    NHttpRequest *request;
+    // The comm thread changes it while the caller's thread cancels it
+    NHttpRequest *volatile request;
     int socket;
 } NHttpQueueNode;
 
