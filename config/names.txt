@@ -2800,7 +2800,7 @@ overlays/ov011 0x0215bd58 WCM_StartupAsync
 overlays/ov011 0x0215be00 WCM_CleanupAsync
 overlays/ov011 0x0215be88 WCM_SearchAsync
 overlays/ov011 0x0215bea0 WCM_SearchAsyncWithParams
-overlays/ov011 0x0215bf14 WCM_ContinueSearchAsync
+overlays/ov011 0x0215bf14 WCM_StopSearchAsync
 overlays/ov011 0x0215bf78 WCM_ConnectAsync
 overlays/ov011 0x0215c0ac WCM_DisconnectAsync
 overlays/ov011 0x0215c150 WCM_StartParentAsync
@@ -2850,7 +2850,7 @@ overlays/ov011 0x0215cdd8 WCM_GetAverageRssi
 overlays/ov011 0x0215ce24 WCM_AddRssiSample
 overlays/ov011 0x0215ce88 WCM_StartupStep1
 overlays/ov011 0x0215cf50 WCM_StartupStep2
-overlays/ov011 0x0215cf94 WCM_ConnectStep1
+overlays/ov011 0x0215cf94 WCM_StartSearchStep
 overlays/ov011 0x0215d038 WCM_ConnectStep2
 overlays/ov011 0x0215d0ac WCM_DisconnectStep
 overlays/ov011 0x0215d0f0 WCM_StartParentStep
@@ -2858,7 +2858,7 @@ overlays/ov011 0x0215d184 WCM_SendFrame
 overlays/ov011 0x0215d1f8 WCM_ComputeChannelGap
 overlays/ov011 0x0215d248 WCM_CancelConnection
 overlays/ov011 0x0215d284 WCM_OnWmIndication
-overlays/ov011 0x0215d2d8 WCM_ConnectStep3
+overlays/ov011 0x0215d2d8 WCM_OnWmControlComplete
 overlays/ov011 0x0215d4b8 WCM_ConnectStep4
 overlays/ov011 0x0215d668 WCM_ConnectStep5
 overlays/ov011 0x0215d6bc WCM_ConnectStep6

@@ -48,9 +48,10 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode);
 void WCM_Finish(void);
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify);
 s32 WCM_CleanupAsync(void);
+// Either NULL pointer requests a stop; option is ignored on that path.
 s32 WCM_SearchAsync(const u8 *bssid, const u8 *essid, u32 option);
-// Continues a search begun without a BSSID or ESSID (WCM_SearchAsync's role with both NULL); main calls it directly
-s32 WCM_ContinueSearchAsync(void);
+// Descriptive name: requests a scan stop, with completion through WCM_NOTIFY_END_SEARCH.
+s32 WCM_StopSearchAsync(void);
 s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 wepMode);
 s32 WCM_DisconnectAsync(void);
 // Starts a local wireless (DS-to-DS) parent connection, parallel to WCM_ConnectAsync's infrastructure one
