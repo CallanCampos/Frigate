@@ -42,8 +42,9 @@ typedef struct {
 typedef void (*WCMNotify)(WCMNotice *notice);
 
 s32 WCM_Init(void *work, s32 size);
-// WCM_Init's real body: WCM_Init always passes TRUE for keepBand; ov182's settings call this directly to force a band
-s32 WCM_InitCore(void *work, s32 size, BOOL keepBand);
+// WCM_Init selects mode 1 (DS). The core also accepts 2 (DSi, requiring 0x4800 bytes), or 0 to use the stored
+// preference or hardware default. Main's direct caller selects mode 2; this parameter is a mode, not a boolean.
+s32 WCM_InitCore(void *work, s32 size, s32 requestedMode);
 void WCM_Finish(void);
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify);
 s32 WCM_CleanupAsync(void);
