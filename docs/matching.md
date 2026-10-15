@@ -574,6 +574,13 @@ Same code, other `sp` offsets or frame size.
   with its own `u8 index` parameter (`for (; index < GROUP_MODEL_COUNT; index++)`): the earlier loop then loads its
   zeros from that slot and keeps the 1 for `SetPaused` in `r7`, as the original does. A local counter set from a
   parameter (`i = first`) doesn't.
+- MWCC derives a large constant offset from one built earlier (`subs r6, #0x80` for 0x1cc from 0x24c) across calls
+  and the fall-through of conditional branches, whatever pointer it is added to, and stops only at a join: a label
+  reached from two places, as after an `if` without `else`, an `if`/`else`, `||` or an inline with two returns. Empty
+  `if`s, dead stores and one-pass loops are removed before that and don't stop it. Where the original builds an
+  offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it: overlay 173's
+  `WifiP2PMatch_StateRecruitingFriendMenu` gets its voice-chat store in the common tail with the next state set in
+  both branches and stored once after them.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's

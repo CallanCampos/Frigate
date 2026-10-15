@@ -49,6 +49,7 @@ CI compiles every C file for both versions; fork PRs must verify ROM matching lo
 | [Decompiling](docs/decompiling.md) | Workflow and tools |
 | [Matching](docs/matching.md) | MWCC behavior and matching techniques |
 | [Code organization](docs/code-organization.md) | Source layout, libraries and names |
+| [Native port notes](docs/porting-notes.md) | Recovered platform assumptions and open porting questions |
 | [Source files](docs/source-files.md) | Overlay files and boundary evidence |
 | [Nonmatching functions](docs/nonmatching-functions.md) | Remaining mismatches |
 | [Game data](docs/data.md) | Data formats and archives |
