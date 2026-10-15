@@ -631,7 +631,7 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
     host->state = next;
     if (result->event == 10) {
         BroadcastCommand(1);
-        sSessionState.requestTime = sSessionPool.clock();
+        sSessionState.requestTime = clock();
     } else {
         BroadcastCommand(0);
         sSessionState.requestTime = 0;
