@@ -9,6 +9,7 @@ JASC palette. Nitro cell, animation, and other binary resources remain separate
 files so every archive member has a source without inventing lossy metadata.
 """
 
+import json
 import re
 import struct
 import sys
@@ -22,6 +23,9 @@ from nitro_2d import (character_pixels, palette_colors, patch_characters, patch_
 
 
 ROOT = Path(__file__).resolve().parents[2]
+# The extracted files of the version being packed, which hold the originals that the sources are compared with.
+# Exporting reads Black 2's; pack() switches to the version it packs, the only one extracted in its CI job
+EXTRACTED = ROOT / "extract/b2_us/files"
 ARCHIVES = {"a/0/0/4": "battle", "a/0/0/7": "icons", "a/0/5/1": "musical",
             "a/1/6/5": "footprints", "a/2/2/9": "footprint_forms"}
 SLOT_NAMES = ("front_single", "front_single_female", "front", "front_female",
@@ -52,14 +56,21 @@ def national_species():
 
 @lru_cache(maxsize=2)
 def form_names(musical=False):
-    """Returns the species and form of each form sprite group, from its species' forms.sprite_offset. The musical
-    sprites follow Black and White's species data (ARCID_PERSONAL_BW1, a/3/0/2, which MusicalMcss_GetDataIDBase
-    reads), whose offsets differ. Forms told apart only by their palette (palette_forms, Arceus) have no groups."""
-    records = read_narc((ROOT / "extract/b2_us/files" / ("a/3/0/2" if musical else "a/0/1/6")).read_bytes())
+    """Returns the species and form of each form sprite group, from its species' forms (sprite_offset and count) in
+    data/pokemon. The musical sprites follow Black and White's species data instead (ARCID_PERSONAL_BW1, a/3/0/2,
+    which MusicalMcss_GetDataIDBase reads), whose offsets differ and which has no source. Forms told apart only by
+    their palette (palette_forms, Arceus) have no groups."""
+    records = read_narc((EXTRACTED / "a/3/0/2").read_bytes()) if musical else None
     result = {}
     for number, species in enumerate(species_names()[:national_species()]):
-        _, sprite_offset, count = struct.unpack_from("<HHB", records[number], 0x1C)
-        if count <= 1 or records[number][0x21] >> 7 & 1:
+        if musical:
+            _, sprite_offset, count = struct.unpack_from("<HHB", records[number], 0x1C)
+            palette_only = records[number][0x21] >> 7 & 1
+        else:
+            data = json.loads((ROOT / "data/pokemon" / species / "data.json").read_text())
+            sprite_offset, count = data["forms"]["sprite_offset"], data["forms"]["count"]
+            palette_only = data["palette_forms"]
+        if count <= 1 or palette_only:
             continue
         for form in range(1, count):
             result[sprite_offset + form - 1] = (species, form)
@@ -200,7 +211,7 @@ def colors_for(root, archive_name, archive, index, options):
         bank = options["palette_bank"]
         return colors[bank * 16:(bank + 1) * 16]
     if kind == "footprint_forms":
-        archive = read_narc((ROOT / "extract/b2_us/files/a/1/6/5").read_bytes())
+        archive = read_narc((EXTRACTED / "a/1/6/5").read_bytes())
     return palette_colors(archive[0])[:16]
 
 
@@ -247,7 +258,7 @@ def palette_indices(path, pixels, png_colors, colors):
 
 def export(root):
     for archive_name in ARCHIVES:
-        path = ROOT / "extract/b2_us/files" / archive_name
+        path = EXTRACTED / archive_name
         archive = read_narc(path.read_bytes())
         for index, blob in enumerate(archive):
             if not blob:
@@ -266,7 +277,7 @@ def export(root):
                 target.write_bytes(write_indexed_png(width, height, pixels,
                                                     colors_for(root, archive_name, archive, index, options)))
         print(f"{archive_name}: {len(archive)} entries", flush=True)
-    musical = read_narc((ROOT / "extract/b2_us/files/a/0/5/1").read_bytes())
+    musical = read_narc((EXTRACTED / "a/0/5/1").read_bytes())
     for index, blob in enumerate(musical):
         if not blob:
             continue
@@ -282,8 +293,9 @@ def pack(root, game, output):
     archive_name = Path(output).as_posix().split("/files/", 1)[-1]
     if archive_name not in ARCHIVES:
         raise ValueError(f"unexpected Pokémon graphics archive {archive_name}")
-    version = {"black2": "b2_us", "white2": "w2_us"}[game]
-    archive = read_narc((ROOT / "extract" / version / "files" / archive_name).read_bytes())
+    global EXTRACTED
+    EXTRACTED = ROOT / "extract" / {"black2": "b2_us", "white2": "w2_us"}[game] / "files"
+    archive = read_narc((EXTRACTED / archive_name).read_bytes())
     result = []
     for index, original in enumerate(archive):
         path, kind, options = source_file(root, archive_name, index)

@@ -302,6 +302,13 @@ Same instructions, registers swapped.
   then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
   NitroSDK declares it, not `GXLightMask light`; casts or enum locals at the call don't help. Check the SDK's
   prototype of an inline before the call site.
+- In NitroSystem's 2.0/sp2p2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
+  written in place it loads `a` first (`g2d_Animation.c`'s `SequenceEdgeHandle_` clamps through
+  `GetLastFrame_(seq)`). Spilled locals take slots from the top of the frame down: the function's locals, then an
+  `if` block's, then its `else` block's, each in declaration order, then an inline's in reverse, so a slot order no
+  block layout gives needs the locals at function scope (`NNS_G2dInitMCAnimationInstance`). A second loop that
+  reuses the first loop's counter swaps registers with its block's temporary, where a counter of its own declared
+  after the others doesn't (`gfd_LinkedListTexVramMan.c`'s `NNS_GfdResetLnkTexVramState`).
 - A loop offset that starts at 0, grows by a step and is zeroed after the loop's hoisted invariants is a counter
   times the step: MWCC strength-reduces `x + step * line` into a running offset that it zeroes in the loop's
   preheader, where an offset kept by hand is zeroed before the hoisted code. NitroSystem's `g2d_TextCanvas.c`
@@ -559,6 +566,9 @@ Same code, other `sp` offsets or frame size.
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
   `ShinkaDemoPieces_Move` gets the original's slots only with each branch's `fx32 distSqXZ` block-scoped and set as
   `FX_Mul(x, x) + FX_Mul(z, z)` written out; through the file's `SquaredLengthXZ` inline they are temporaries.
+  Only when the assignment dominates every use, though: overlay 143's `MonolithMissionInfo_DrawRecords` gets `best`
+  slotted as a temporary through a pass-through inline getter, but `count`, assigned in one branch of an `if`/`else`,
+  keeps its declared slot whatever its type.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
@@ -2221,14 +2231,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
   order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
   one is dropped; a used `.bss` static joins the sort, an unused one does not.
-- A function-local `static` joins the size sort at the end of the file, after every local initializer, and such
-  statics come in reverse order, the last one declared first. So it reorders equal-size local initializers anywhere
-  in the file: overlay 311's `un_select.c` keeps its two windows' background color in function-local
-  `static const u8 backColor = 15;` (the `0f 0f` at the head of its `.rodata`), and its five 24-byte
-  `UnSelectActorTemplate` initializers come out in the ROM's order only with `sUnSelectListTouch` defined first among
-  the file's tables. Give `rodata_order.py` such statics last, reversed. Its `--check` compares only the shared
-  section, not the order of the objects with sections of their own, and counts a string literal in `.data` as a
-  local initializer.
+- A function-local `static` joins the size sort at the end of the file, after every local initializer, grouped by
+  function: the functions come in reverse order, each with its statics in declaration order. Unused ones are still
+  emitted and sorted, and a `00` in the packed section can be such a static of 0 rather than padding. So these
+  statics reorder equal-size local initializers anywhere in the file: overlay 311's `un_select.c` keeps its two
+  windows' background color in function-local `static const u8 backColor = 15;` (the `0f 0f` at the head of its
+  `.rodata`), and its five 24-byte `UnSelectActorTemplate` initializers come out in the ROM's order only with
+  `sUnSelectListTouch` defined first among the file's tables. Overlay 207's `p_sta_sub.c`, whose 17 12-byte
+  initializers no declaration order had reproduced, matches with four: `turnShift = FX32_CONST(25)` in
+  `PStaSub_Main`, `iconY = 127` and `defaultSequence = 0` in `PStaSub_CreateActors`, `spinRange = 0x1800` in
+  `PStaSub_AnimCircle` (the `7f 00 00 18 00 90 01 00` that nothing reads), and its icon tables defined just before
+  `PStaSub_CreateActors`. With three no order works; the count, not the sizes, decided the initializers' order.
+  Give `rodata_order.py` such statics last, grouped that way. Its `--check` compares only the shared section, not
+  the order of the objects with sections of their own, and it marks a string literal in `.data` as a local
+  initializer, though string literals don't take part in the sort.
 
 ## When nothing moves it
 
