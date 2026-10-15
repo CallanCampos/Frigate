@@ -49,7 +49,7 @@ u32 MB_GetSegmentLength(FSFile *file) {
         header = (const ROMHeader *)MB_ROM_HEADER_BUF;
     }
     if (header != NULL) {
-        length = header->arm9Size + MB_SEGMENT_FIXED_SIZE + header->arm7Size;
+        length = header->arm9.size + MB_SEGMENT_FIXED_SIZE + header->arm7.size;
         if (length < MB_SEGMENT_LENGTH_MIN) {
             length = MB_SEGMENT_LENGTH_MIN;
         }
@@ -159,9 +159,9 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
             remaining = 0;
         }
 
-        if (remaining >= header->arm9Size + header->arm7Size) {
+        if (remaining >= header->arm9.size + header->arm7.size) {
             u32 base = func_02072010(file);
-            u32 arm9Size = header->arm9Size;
+            u32 arm9Size = header->arm9.size;
             u32 arm9Pos = offsets->segment[1] - base;
             u8 *arm9Dst = dst;
 
@@ -172,11 +172,11 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
             }
             romfs_fseek(file, arm9Pos, FS_SEEK_SET);
             romfs_fread(file, arm9Dst, arm9Size);
-            MBCache_Add(cache, offsets->segment[1], header->arm9Size, dst, MB_CACHE_ENTRY_KEPT);
-            arm9Size = header->arm9Size;
+            MBCache_Add(cache, offsets->segment[1], header->arm9.size, dst, MB_CACHE_ENTRY_KEPT);
+            arm9Size = header->arm9.size;
             romfs_fseek(file, offsets->segment[2] - base, FS_SEEK_SET);
-            romfs_fread(file, dst + arm9Size, header->arm7Size);
-            MBCache_Add(cache, offsets->segment[2], header->arm7Size, dst + arm9Size, MB_CACHE_ENTRY_KEPT);
+            romfs_fread(file, dst + arm9Size, header->arm7.size);
+            MBCache_Add(cache, offsets->segment[2], header->arm7.size, dst + arm9Size, MB_CACHE_ENTRY_KEPT);
             ok = TRUE;
         } else if (remaining >= 3 * MB_CACHE_BLOCK_SIZE) {
             u32 base = func_02072010(file);
@@ -212,7 +212,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
                 const MBSecureAreaPart *part = sSecureAreaTable;
 
                 window.start = header->arm9RomOffset;
-                window.srcBase = header->arm9RamAddr - header->arm9RomOffset;
+                window.srcBase = header->arm9.ramAddr - header->arm9RomOffset;
                 window.dstBase = (u32)cache->entries[1].buf - header->arm9RomOffset;
                 window.length = len;
                 MBSegment_CopyRange(&window, 0x4000, 0x8000, TRUE);
@@ -223,7 +223,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
                 {
                 u8 *arm9 = cache->entries[1].buf;
 
-                *(u32 *)(arm9 + ((u32)AutoloadCallback - header->arm9RamAddr)) = MB_ARM_BX_LR;
+                *(u32 *)(arm9 + ((u32)AutoloadCallback - header->arm9.ramAddr)) = MB_ARM_BX_LR;
             }
             }
         }
@@ -327,8 +327,12 @@ static void MBFile_InitSegments(MBCommFile *file, const ROMHeader *header) {
 
     file->arm9Entry = header->arm9Entry;
     file->arm7Entry = header->arm7Entry;
-    for (kind = sSegmentKinds, segment = file->segment, i = 0; i < MB_SEGMENT_COUNT; i++, segment++, kind++) {
+    kind = sSegmentKinds;
+    segment = file->segment;
+    for (i = 0; i < MB_SEGMENT_COUNT; i++) {
         MBFile_SetupSegment(header, kind, segment, &cursor);
+        segment++;
+        kind++;
     }
     sys_memcpy((const u8 *)header + 0x160, file->romHeaderExtra, sizeof(file->romHeaderExtra));
 }
@@ -337,13 +341,12 @@ static void MBFile_InitSegments(MBCommFile *file, const ROMHeader *header) {
 static void MBFile_SetupSegment(const ROMHeader *header, const u32 *kind, MBSegment *segment, u32 *cursor) {
     switch (*kind) {
     case MB_SEGMENT_KIND_ARM9: {
-        u32 addr = header->arm9RamAddr;
-        u32 size = header->arm9Size;
+        const ROMHeaderLoad *load = &header->arm9;
 
-        if (addr >= 0x2000000 && addr < 0x22c0000 && addr + size <= 0x22c0000) {
-            segment->size = size;
-            segment->ramAddr = addr;
-            segment->recvAddr = addr;
+        if (load->ramAddr >= 0x2000000 && load->ramAddr < 0x22c0000 && load->ramAddr + load->size <= 0x22c0000) {
+            segment->size = load->size;
+            segment->ramAddr = load->ramAddr;
+            segment->recvAddr = load->ramAddr;
             segment->isArm7 = FALSE;
         } else {
             sys_exit();
@@ -351,21 +354,20 @@ static void MBFile_SetupSegment(const ROMHeader *header, const u32 *kind, MBSegm
         break;
     }
     case MB_SEGMENT_KIND_ARM7: {
-        u32 addr = header->arm7RamAddr;
-        u32 size = header->arm7Size;
+        const ROMHeaderLoad *load = &header->arm7;
         BOOL invalid = FALSE;
         BOOL relocate = FALSE;
-        u32 end = addr + size;
+        u32 end = load->ramAddr + load->size;
 
-        if (addr >= 0x2000000 && addr < 0x23fe800) {
+        if (load->ramAddr >= 0x2000000 && load->ramAddr < 0x23fe800) {
             if (end > 0x2300000) {
-                if (end < 0x23fe800 && size <= 0x40000) {
+                if (end < 0x23fe800 && load->size <= 0x40000) {
                     relocate = TRUE;
                 } else {
                     invalid = TRUE;
                 }
             }
-        } else if (addr >= 0x3040000 && addr < 0x3057000) {
+        } else if (load->ramAddr >= 0x3040000 && load->ramAddr < 0x3057000) {
             if (end <= 0x3057000) {
                 relocate = TRUE;
             } else {
@@ -377,13 +379,13 @@ static void MBFile_SetupSegment(const ROMHeader *header, const u32 *kind, MBSegm
         if (invalid == TRUE) {
             sys_exit();
         }
-        segment->size = size;
-        segment->ramAddr = addr;
+        segment->size = load->size;
+        segment->ramAddr = load->ramAddr;
         if (!relocate) {
-            segment->recvAddr = addr;
+            segment->recvAddr = load->ramAddr;
         } else {
             segment->recvAddr = *cursor;
-            *cursor += size;
+            *cursor += load->size;
         }
         segment->isArm7 = TRUE;
         break;

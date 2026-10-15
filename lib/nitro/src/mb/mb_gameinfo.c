@@ -207,6 +207,12 @@ static void MBGameInfo_StartFragments(void) {
     }
 }
 
+// Puts the beacon out. 1 is the wireless manager's entry attribute: children may connect. Through a u32 parameter the
+// original ORs the caller's flag and this one apart, where `attr | MB_BEACON_ATTR_MULTIBOOT | 1` folds them
+static inline void MBGameInfo_SetBeacon(u32 ggid, u16 tgid, u32 attr) {
+    func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, attr | 1);
+}
+
 // Sends the next piece of the record
 static void MBGameInfo_SendFragment(u32 ggid, u16 tgid, u8 attr) {
     const u8 *recordEnd = (const u8 *)&sSender.current->playerCount;
@@ -235,8 +241,7 @@ static void MBGameInfo_SendFragment(u32 ggid, u16 tgid, u8 attr) {
     } else {
         sSender.state = MB_BEACON_STATE_START_MEMBERS;
     }
-    // 1 is the wireless manager's entry attribute: children may connect
-    func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT | 1);
+    MBGameInfo_SetBeacon(ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT);
 }
 
 // Starts to send who is in the program's game
@@ -248,6 +253,7 @@ static void MBGameInfo_StartMembers(void) {
 
 // Sends up to four of the players that the children have not seen yet
 static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr) {
+    u8 *params;
     u16 missing;
     u32 sent;
     int i;
@@ -267,20 +273,18 @@ static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr) {
     if (sSender.mode == 0 && sSender.callback != NULL) {
         sSender.callback(sSender.current->ggid);
     }
-    {
-        u8 *params = sBeacon.u.members.params;
-
-        for (i = 0; i < 8; i++) {
-            params[i] = sSender.current->params[i];
-        }
+    // The loops test a 0/1 value: the original enters both with a jump to the test at their end
+    params = sBeacon.u.members.params;
+    for (i = 0; i < 8 ? TRUE : FALSE; i++) {
+        params[i] = sSender.current->params[i];
     }
     MI_CpuClear16(sBeacon.u.members.users, sizeof(sBeacon.u.members.users));
     missing = sSender.current->sentMask ^ sSender.current->memberMask;
     sent = 0;
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < 15 ? TRUE : FALSE; i++) {
         if ((2 << i) & missing) {
             MI_CpuCopy16(&sSender.current->members[i], &sBeacon.u.members.users[sent], sizeof(MBUserInfo));
-            sSender.current->sentMask |= (u16)(2 << i);
+            sSender.current->sentMask |= (u16)(2U << i);
             sent++;
             if (sent == 4) {
                 break;
@@ -295,8 +299,7 @@ static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr) {
     if (sSender.current->sentMask == sSender.current->memberMask) {
         sSender.state = MB_BEACON_STATE_PICK;
     }
-    // 1 is the wireless manager's entry attribute: children may connect
-    func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT | 1);
+    MBGameInfo_SetBeacon(ggid, tgid, attr | MB_BEACON_ATTR_MULTIBOOT);
     if (sSender.mode == 1 && sSender.callback != NULL) {
         sSender.callback(sSender.current->ggid);
     }
