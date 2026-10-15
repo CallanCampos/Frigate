@@ -5,6 +5,7 @@
     .bss        start:0x0219de00 end:0x0219de00 kind:bss align:32
 
 src/ov208/dup_fitting.c:
+    complete
     .text       start:0x021998c0 end:0x0219d88c
     .rodata     start:0x0219db98 end:0x0219dda0
     .data       start:0x0219ddc0 end:0x0219ddd0
