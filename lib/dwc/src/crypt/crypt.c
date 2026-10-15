@@ -1597,19 +1597,17 @@ static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
     mask = (1 << window) - 1;
     bitPos = 0;
     total = (window + exponent->length * 32 - 1) / window * 2 + 2;
-    dest[total] = 0;
     out = dest + total;
-    out[-1] = 0;
+    *out-- = 0;
+    *out-- = 0;
     next = exponent->digits;
     wordsLeft = exponent->length;
-    low = *next++;
+    current = low = *next++;
     if (wordsLeft <= 1) {
         high = 0;
     } else {
         high = *next++;
     }
-    current = low;
-    out -= 2;
     zeros = 0;
     for (;;) {
         for (;;) {
@@ -1641,15 +1639,13 @@ static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
         if (index == 0) {
             break;
         }
-        out[0] = zeros;
-        out[-1] = index;
-        out -= 2;
+        *out-- = zeros;
+        *out-- = index;
         if (zeros >= 256) {
             while (zeros >= 256) {
                 zeros -= 256;
-                out[0] = 0xff;
-                out[-1] = 0;
-                out -= 2;
+                *out-- = 0xff;
+                *out-- = 0;
             }
         }
         bitPos += window;
