@@ -76,3 +76,9 @@ game, ignoring relocated bytes. For example:
 
 It needs `pyelftools`, `capstone` and `pyyaml`. To look at a function's disassembly, run `dsd dis` into
 `build/asm`, then use `tools/decomp/show_func.py`.
+
+Relocation masks include call targets, so a probe result does not establish which function a call reaches. A
+`size A/B` result reports lengths without comparing the function bytes: `BigInti_ModExpStep` stays at `0xbc/0xba`
+after restoring its multiplication width and replacing a subtraction with the original addition. Original call
+targets and argument meanings are separate evidence. ROM hashes also do not validate an incomplete file's C,
+because that file still links the original object until marked complete.

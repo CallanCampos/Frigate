@@ -271,6 +271,9 @@ int func_0208195c(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void 
 int func_02081998(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap, u16 port,
                   u16 prio);
 int func_02081a68(WMCallbackFunc callback); // WM_EndMP
+// Queues a DCF transmission to the six-byte destination address; buffer remains borrowed until completion.
+// The original SDK symbol name is not established here.
+int func_02081b18(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength);
 // WM_StartDataSharing
 int func_02081bd8(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode);
 int func_02081dbc(WMDataSharingInfo *dsi);                                                    // WM_EndDataSharing
