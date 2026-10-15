@@ -113,6 +113,13 @@ int func_020800e8(char *dst, const char *fmt, ...);
 // TwlSDK's OS_SpinWaitSysCycles: busy-waits for some cycles of the system clock
 void func_0207c160(u32 cycles);
 
+// Where a ROM header's program is loaded in RAM, and its size. NitroSDK's multiboot library reads the pair through a
+// pointer to it
+typedef struct ROMHeaderLoad {
+    u32 ramAddr;
+    u32 size;
+} ROMHeaderLoad;
+
 // The ROM header of the running program, which the card puts at the end of main memory. Only the fields that
 // NitroSDK's multiboot library reads are named
 typedef struct ROMHeader {
@@ -121,12 +128,10 @@ typedef struct ROMHeader {
     u8 unk_13[0xd];
     u32 arm9RomOffset;
     u32 arm9Entry;
-    u32 arm9RamAddr;
-    u32 arm9Size;
+    ROMHeaderLoad arm9;
     u32 arm7RomOffset;
     u32 arm7Entry;
-    u32 arm7RamAddr;
-    u32 arm7Size;
+    ROMHeaderLoad arm7;
     u8 unk_40[0x20];
     u32 unk_60;
     u8 unk_64[0x1c];
