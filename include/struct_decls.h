@@ -567,6 +567,7 @@ typedef struct UnionColosseum UnionColosseum;
 typedef struct UnionGroup UnionGroup;
 typedef struct UnionSystem UnionSystem;
 typedef struct UnityTowerSurveySave UnityTowerSurveySave;
+typedef struct VCTAdpcmState VCTAdpcmState;
 typedef struct VCTConfig VCTConfig;
 typedef struct VCTLibrary VCTLibrary;
 typedef struct VCTSettings VCTSettings;

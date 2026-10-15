@@ -39,14 +39,6 @@ typedef enum VCTCodec {
     VCT_CODEC_MAX,
 } VCTCodec;
 
-// The predictor and step index that every sample of an ADPCM stream is coded against, which the stream's packets
-// start with
-typedef struct VCTAdpcmState {
-    s16 predictor;
-    u8 stepIndex;
-    u8 pad;
-} VCTAdpcmState;
-
 // A voice packet as it goes over the wire
 typedef struct VCTVoicePacket {
     u32 magic;
@@ -180,10 +172,6 @@ u16 func_0207bb84(void);
 #define REG_SQRT_PARAM_LO (*(vu32 *)0x040002b8)
 #define REG_DIVCNT_BUSY 0x8000
 #define REG_SQRTCNT_BUSY 0x8000
-
-// vct_adpcm.c
-void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits);
-void VCT_EncodeAdpcm(u8 *packet, s16 *src, int count, VCTAdpcmState *state, int bits);
 
 // vct_audio.c: the frames going out and coming in
 BOOL VCT_InitAudio(void);

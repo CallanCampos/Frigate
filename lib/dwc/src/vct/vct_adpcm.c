@@ -1,4 +1,4 @@
-#include "vct_internal.h"
+#include "vct_adpcm.h"
 
 // Adaptive differential PCM for the voice chat, at 4, 3 and 2 bits a sample. Each codec keeps a predicted sample and
 // an index into the table of step sizes, and the code of a sample says how far from the prediction the sample was

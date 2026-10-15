@@ -1,6 +1,7 @@
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "vct_adpcm.h"
 #include "vct_internal.h"
 
 // The sound going out and coming in. A frame of the microphone is filtered, coded and sent to every machine that
