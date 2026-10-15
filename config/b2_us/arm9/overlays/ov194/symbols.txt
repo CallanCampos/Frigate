@@ -586,6 +586,7 @@ data_ov194_021c69b0 kind:data(any) addr:0x021c69b0
 data_ov194_021c69b4 kind:data(any) addr:0x021c69b4
 data_ov194_021c69b8 kind:data(any) addr:0x021c69b8
 data_ov194_021c6a10 kind:data(any) addr:0x021c6a10
+data_ov194_021c6a90 kind:data(any) addr:0x021c6a90
 data_ov194_021c6a98 kind:data(any) addr:0x021c6a98
 data_ov194_021c6aa4 kind:data(any) addr:0x021c6aa4
 data_ov194_021c6acc kind:data(any) addr:0x021c6acc

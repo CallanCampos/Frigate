@@ -5,6 +5,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
+#include "nitrowifi/wcm.h"
 
 // The access point layer of the AOSS client (see dwc_aoss_ap.h): the scan for the access points, the connection to one
 // with a WEP key, and the disconnection, over DWC_Wcm_*. A message queue turns the WCM's events into waits. The ROM

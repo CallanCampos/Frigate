@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Compile every C file in src/ and lib/ for each version, with the compiler and flags configure.py gives it, and
-report the files that fail. It needs no base ROM, so CI runs it on every push and pull request; matching is still
-checked by `ninja` with the ROMs.
+report compiler diagnostics, including warnings on successful compilations. Only a nonzero compiler exit status
+counts as failure. It needs no base ROM, so CI runs it on every push and pull request; matching is still checked
+by `ninja` with the ROMs.
 
     compile_all.py                  # every file, both versions
     compile_all.py --version b2_us  # one version
@@ -13,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -26,10 +28,23 @@ from tools.text import pms_words, text_ids  # noqa: E402
 TOOLS = ROOT / "tools"
 
 
-def compile_file(source: Path, version: str, out_dir: Path) -> tuple[Path, str] | None:
-    """Compiles one file, returning it and the compiler's output if it fails."""
+@dataclass(frozen=True)
+class CompileResult:
+    source: Path
+    version: str
+    returncode: int
+    stdout: str
+    stderr: str
+
+
+def compile_file(source: Path, version: str, out_dir: Path) -> CompileResult:
+    """Compiles one file, retaining its exit status and both diagnostic streams."""
     library = library_of(source)
     compiler, flags = library if library else (MWCC_VERSION, CC_FLAGS)
+    env = os.environ.copy()
+    if library:
+        # Match configure.py's library rules: older compilers require this system include path.
+        env["MWCIncludes"] = "."
     obj = out_dir / version / source.with_suffix(".o")
     obj.parent.mkdir(parents=True, exist_ok=True)
     command = [
@@ -40,10 +55,8 @@ def compile_file(source: Path, version: str, out_dir: Path) -> tuple[Path, str] 
         "-o", str(obj),
         str(source),
     ]
-    proc = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
-    if proc.returncode != 0:
-        return source, proc.stdout + proc.stderr
-    return None
+    proc = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
+    return CompileResult(source, version, proc.returncode, proc.stdout, proc.stderr)
 
 
 def write_header(header: Path, text: str):
@@ -76,10 +89,19 @@ def main():
     versions = args.version or list(VERSIONS)
     with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor(args.jobs) as pool:
         jobs = [pool.submit(compile_file, source, version, Path(tmp)) for version in versions for source in sources]
-        failures = [result for job in jobs if (result := job.result())]
-    for source, output in failures:
-        print(f"{source}:\n{output}")
-    print(f"{len(sources) * len(versions) - len(failures)} of {len(sources) * len(versions)} compiled "
+        results = [job.result() for job in jobs]
+    failures = 0
+    for result in results:
+        for output, stream in ((result.stdout, sys.stdout), (result.stderr, sys.stderr)):
+            if output:
+                print(f"{result.source} ({result.version}):", file=stream)
+                print(output, end="" if output.endswith("\n") else "\n", file=stream)
+        if result.returncode != 0:
+            failures += 1
+            if not result.stdout and not result.stderr:
+                print(f"{result.source} ({result.version}): compiler exited with status {result.returncode}",
+                      file=sys.stderr)
+    print(f"{len(sources) * len(versions) - failures} of {len(sources) * len(versions)} compiled "
           f"({len(sources)} files, {', '.join(versions)})")
     sys.exit(1 if failures else 0)
 

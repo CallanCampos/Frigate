@@ -214,10 +214,12 @@
 . 0x02062088 reloc_addend 0x400
 . 0x02062090 reloc_addend 4
 . 0x0206269c reloc_addend 0x400
+. 0x02065024 reloc_addend 0x4
 . 0x02065740 reloc_addend 0x80
 . 0x0206574c reloc_addend 0x4c
 . 0x02065750 reloc_addend 0x8
 . 0x02065780 reloc_addend 0xbc
+. 0x02065784 reloc_addend 0x200
 . 0x020657b0 reloc_addend 0x80
 . 0x020657f8 reloc_addend 0x4
 . 0x020657fc reloc_addend 0x4c
@@ -227,6 +229,7 @@
 . 0x02065888 reloc_addend 0x4c
 . 0x02065890 reloc_addend 0xbc
 . 0x02065898 reloc_addend 0x7c
+. 0x0206589c reloc_addend 0xf8
 . 0x020658a0 reloc_addend 0x80
 . 0x020658c0 reloc_addend 0xe0
 . 0x020658c4 reloc_addend 0x80
@@ -238,14 +241,21 @@
 . 0x02065968 reloc_addend 0x80
 . 0x02065990 reloc_addend 0x80
 . 0x02065994 reloc_addend 0x4c
+. 0x02065998 reloc_addend 0x100
 . 0x02065b34 reloc_addend 0x80
 . 0x02065b38 reloc_addend 0x8
+. 0x02065b3c reloc_addend 0x1c0
 . 0x02065b68 reloc_addend 0xbc
 . 0x02065b6c reloc_addend 0x4c
+. 0x02065b70 reloc_addend 0x130
 . 0x02065b74 reloc_addend 0x80
+. 0x02065b78 reloc_addend 0x160
 . 0x02065b9c reloc_addend 0x80
+. 0x02065ba0 reloc_addend 0x130
 . 0x02065bc4 reloc_addend 0x80
+. 0x02065bc8 reloc_addend 0x160
 . 0x02065c08 reloc_addend 0x80
+. 0x02065c0c reloc_addend 0x200
 . 0x02065c54 reloc_addend 0x80
 . 0x02066864 reloc_addend 0x80
 . 0x02066f00 reloc_addend 0x80
@@ -403,6 +413,7 @@
 . 0x0209b21c remove_symbol
 . 0x0209b234 remove_symbol
 . 0x0209b258 add_data data_0209b258
+. 0x0209b2ac remove_symbol
 . 0x0209b328 add_data sEnvMapCmd
 . 0x0209da80 remove_symbol
 . 0x0209da88 remove_symbol
@@ -453,6 +464,12 @@
 . 0x02143ac8 remove_symbol
 . 0x02143aec remove_symbol
 . 0x02143af8 remove_symbol
+. 0x02143b04 remove_symbol
+. 0x02143b0c remove_symbol
+. 0x02143b3c remove_symbol
+. 0x02143b6c remove_symbol
+. 0x02143bcc remove_symbol
+. 0x02143c0c remove_symbol
 . 0x02143c4c remove_symbol
 . 0x02143c58 remove_symbol
 . 0x02143c64 remove_symbol
@@ -2016,6 +2033,7 @@ overlays/ov182 0x021bac1c reloc_module overlay(181)
 overlays/ov182 0x021bd8e4 remove_symbol
 overlays/ov182 0x021bdaf9 remove_symbol
 overlays/ov182 0x021bdb41 remove_symbol
+overlays/ov182 0x021bfb54 add_data data_ov182_021bfb54
 overlays/ov185 0x0219e83c reloc_module overlay(139)
 overlays/ov185 0x0219ea34 reloc_module overlay(139)
 overlays/ov185 0x0219eb18 reloc_addend 2
@@ -2165,6 +2183,8 @@ overlays/ov189 0x021aa6ec add_function MulWords:arm:0xf0
 overlays/ov189 0x021aa7d8 remove_symbol
 overlays/ov189 0x021acd84 add_data sBase64Pad
 overlays/ov189 0x021acd85 add_data sActionCount
+overlays/ov189 0x021acea0 section_end lib/dwc/src/gamestats/gamestats.c:.rodata
+overlays/ov189 0x021acea0 section_start lib/dwc/src/crypt/crypt.c:.rodata
 overlays/ov189 0x021b2840 add_data data_ov189_021b2840
 overlays/ov190 0x021b5308 reloc_module overlay(184)
 overlays/ov191 0x021b5aa8 reloc_module overlay(189)
@@ -2270,6 +2290,7 @@ overlays/ov194 0x021c1fac reloc_addend 0x380
 overlays/ov194 0x021c2acc reloc_module overlay(139)
 overlays/ov194 0x021c2ad8 reloc_module overlay(139)
 overlays/ov194 0x021c2ae4 reloc_module overlay(139)
+overlays/ov194 0x021c2b08 section_start src/ov194/pokemontrade_2d.c:.text
 overlays/ov194 0x021c4470 reloc_addend 0x380
 overlays/ov194 0x021c4cc8 reloc_module overlay(139)
 overlays/ov194 0x021c4ce8 reloc_module overlay(139)
@@ -2283,6 +2304,8 @@ overlays/ov194 0x021c4f72 reloc_module overlay(139)
 overlays/ov194 0x021c501c reloc_module overlay(139)
 overlays/ov194 0x021c5088 reloc_module overlay(139)
 overlays/ov194 0x021c679c add_data data_ov194_021c679c
+overlays/ov194 0x021c6a90 section_start src/ov194/pokemontrade_2d.c:.rodata
+overlays/ov194 0x021c6a90 add_data data_ov194_021c6a90
 overlays/ov194 0x021c6c98 remove_reloc
 overlays/ov194 0x021c6cb8 remove_reloc
 overlays/ov194 0x021c6d78 remove_reloc

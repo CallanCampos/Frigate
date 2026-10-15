@@ -4,5 +4,6 @@
     .bss        start:0x021ef2c0 end:0x021ef2c0 kind:bss align:32
 
 src/ov123/gimmick_league_grimsley.c:
+    complete
     .text       start:0x021eec80 end:0x021ef154
     .rodata     start:0x021ef154 end:0x021ef2a4

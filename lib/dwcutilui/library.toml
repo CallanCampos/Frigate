@@ -1,0 +1,25 @@
+# The user interface of Nintendo's DWC utility (libdwcutil), the Wi-Fi Connection settings in overlay 182: its screens,
+# its row of selectable objects and their effects. The name is ours. These files were built with the game's compiler
+# and flags, not with the 2.0 that the rest of the utility (lib/dwcutil: dwc_wcm.c and the AOSS files) needs:
+# dwc_util_ui_object.c matches 15 of 15 functions with them against 10 of 15 under 2.0/sp2p2, and -ipa file is what
+# gives DWCUtilUiObject_Destroy its second literal of the object's address.
+compiler = "dsi/1.1p1"
+flags = [
+    "-O4,p",               # Optimize for speed
+    "-proc arm946e",       # ARM9 processor
+    "-thumb",              # Thumb code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char signed",        # char is signed
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-inline on,noauto",   # Only inline functions marked inline
+    "-ipa file",           # Interprocedural analysis within each file
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]

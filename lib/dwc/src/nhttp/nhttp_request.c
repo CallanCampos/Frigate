@@ -293,7 +293,7 @@ int NHTTP_SendRequestAsync(NHttpRoot *root, NHttpRequest *request) {
 }
 
 // Cancels the request that has an id: the one that runs is told to stop and its socket is shut down, one that waits is
-// taken out of the list
+// taken out of the list. The running node's request is volatile (nhttp_internal.h), so it is loaded again at each use
 BOOL NHTTP_CancelRequestAsync(NHttpRoot *root, int id) {
     BOOL canceled = FALSE;
     NHttpReqInfo *reqInfo = NHTTPi_GetReqInfoP(root);
@@ -313,6 +313,7 @@ BOOL NHTTP_CancelRequestAsync(NHttpRoot *root, int id) {
     return canceled;
 }
 
+// Cancels the running request, as NHTTP_CancelRequestAsync does, and frees every request that waits
 void NHTTPi_cancelAllRequests(NHttpRoot *root) {
     NHttpReqInfo *reqInfo = NHTTPi_GetReqInfoP(root);
     NHttpListInfo *list = NHTTPi_GetListInfoP(root);

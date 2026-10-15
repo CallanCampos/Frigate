@@ -4,7 +4,7 @@
 dsd writes paths relative to the version's config directory, such as `config/b2_us/arm9/../../../build/...`. Normalizing
 them makes them match the ninja targets that objdiff asks ninja to rebuild.
 
-Each unit also gets progress categories, which objdiff copies into the report and decomp.dev shows as separate bars: the
+Each unit also gets progress categories, which objdiff copies into the report and ByteMatch shows separately: the
 module group it's in (ARM9 main with its autoloads, or the overlays) and what wrote it (the game, or one of the
 libraries of lib/).
 """

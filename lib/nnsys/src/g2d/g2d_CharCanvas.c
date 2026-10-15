@@ -87,8 +87,8 @@ static u32 GetCharIndex1D(u32 x, u32 y, int areaWidth, int areaHeight, int objWi
     u32 charNo = 0;
 
     while (TRUE) {
-        const u32 maskH = 0xffffffff << objHeightShift;
         const u32 maskW = 0xffffffff << objWidthShift;
+        const u32 maskH = 0xffffffff << objHeightShift;
         const u32 bodyWidth = areaWidth & maskW;
         const u32 bodyHeight = areaHeight & maskH;
 
@@ -105,14 +105,21 @@ static u32 GetCharIndex1D(u32 x, u32 y, int areaWidth, int areaHeight, int objWi
                 areaWidth = bodyWidth;
                 areaHeight -= bodyHeight;
             }
-        } else if (bodyWidth <= x) {
-            charNo += bodyWidth * bodyHeight;
-            x -= bodyWidth;
-            areaWidth -= bodyWidth;
-            areaHeight = bodyHeight;
         } else {
-            return charNo + (y & maskH) * bodyWidth + ((x & maskW) << objHeightShift) +
-                   ((y & ~maskH) << objWidthShift) + (x & ~maskW);
+            const u32 lowH = ~maskH;
+
+            if (bodyWidth <= x) {
+                charNo += bodyWidth * bodyHeight;
+                x -= bodyWidth;
+                areaWidth -= bodyWidth;
+                areaHeight = bodyHeight;
+            } else {
+                charNo += (y & maskH) * bodyWidth;
+                charNo += (x & maskW) << objHeightShift;
+                charNo += (y & lowH) << objWidthShift;
+                charNo += x & ~maskW;
+                return charNo;
+            }
         }
 
         {
@@ -191,22 +198,32 @@ static void FillChar(u32 *pChar, int x, int y, int w, int h, u32 cl, int bpp) {
 }
 
 static void DrawGlyphChar(const DrawGlyphParam *p) {
-    const int sx = (p->x >= 0) ? p->x : 0;
+    u32 sx = (p->x >= 0) ? p->x : 0;
     const int sy = (p->y >= 0) ? p->y : 0;
-    const int ex = (p->x + p->width < 8) ? p->x + p->width : 8;
+    u32 ex = (p->x + p->width < 8) ? p->x + p->width : 8;
     const int ey = (p->y + p->height < 8) ? p->y + p->height : 8;
-    const int srcLineBits = p->srcLineBits;
-    const int srcBpp = p->srcBpp;
-    int srcOffset = srcLineBits * -MATH_MIN(p->y, 0) + -MATH_MIN(p->x, 0) * srcBpp;
-    const u8 *pSrc = p->pSrc;
-    const int dstBpp = p->dstBpp;
-    const u32 sxBits = sx * dstBpp;
-    const u32 exBits = ex * dstBpp;
+    const int offsetY = -MATH_MIN(p->y, 0);
+    const int offsetX = -MATH_MIN(p->x, 0);
+    const u8 *pSrc;
+    int srcOffset;
+    int srcLineBits;
+    int srcBpp;
+    int dstBpp;
+
+    srcLineBits = p->srcLineBits;
+    srcBpp = p->srcBpp;
+    srcOffset = offsetY * srcLineBits + srcBpp * offsetX;
+    pSrc = p->pSrc;
+    dstBpp = p->dstBpp;
+
+    // From pixels to bit positions in a line of the character
+    sx *= dstBpp;
+    ex *= dstBpp;
 
     if (dstBpp == 4) {
         u32 *pLine = p->pChar + sy;
         u32 *pEnd = p->pChar + ey;
-        const int colorOffset = p->colorOffset;
+        const u32 colorOffset = p->colorOffset;
 
         for (; pLine < pEnd; pLine++) {
             u32 line = *pLine;
@@ -215,7 +232,7 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
 
             NNSi_G2dBitReaderInit(&reader, pSrc + (u32)srcOffset / 8);
             NNSi_G2dBitReaderRead(&reader, srcOffset % 8);
-            for (bx = sxBits; bx < exBits; bx += 4) {
+            for (bx = sx; bx < ex; bx += 4) {
                 const u32 c = NNSi_G2dBitReaderRead(&reader, srcBpp);
 
                 if (c != 0) {
@@ -228,7 +245,7 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
     } else {
         u32 *pLine = p->pChar + sy * 2;
         u32 *pEnd = p->pChar + ey * 2;
-        const int colorOffset = p->colorOffset;
+        const u32 colorOffset = p->colorOffset;
 
         for (; pLine < pEnd; pLine += 2) {
             u32 line0 = pLine[0];
@@ -238,14 +255,16 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
 
             NNSi_G2dBitReaderInit(&reader, pSrc + (u32)srcOffset / 8);
             NNSi_G2dBitReaderRead(&reader, srcOffset % 8);
-            for (bx = sxBits; bx < exBits; bx += 8) {
+            for (bx = sx; bx < ex; bx += 8) {
                 const u32 c = NNSi_G2dBitReaderRead(&reader, srcBpp);
 
                 if (c != 0) {
                     if (bx < 32) {
                         line0 = (line0 & ~(0xff << bx)) | ((colorOffset + c) << bx);
                     } else {
-                        line1 = (line1 & ~(0xff << (bx - 32))) | ((colorOffset + c) << (bx - 32));
+                        const u32 shift = bx - 32;
+
+                        line1 = (line1 & ~(0xff << shift)) | ((colorOffset + c) << shift);
                     }
                 }
             }
@@ -259,18 +278,20 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
 // Draws a glyph into a canvas whose characters are in rows of param characters: a BG's, or a 2D OBJ area's
 static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
                             const NNSG2dGlyph *pGlyph) {
-    u8 *charBase = pCC->charBase;
-    const int glyphWidth = pGlyph->pWidths->glyphWidth;
-    const int charSize = CharSize(pCC->dstBpp);
-    const int glyphHeight = pFont->pRes->pGlyph->cellHeight;
-    const int areaWidth = pCC->areaWidth;
-    const int areaHeight = pCC->areaHeight;
     u32 left, top, right, bottom;
     int numX, numY;
-    int xEnd, yEnd;
-    int lineSkip;
-    u8 *pChar;
     DrawGlyphParam param;
+    int yEnd;
+    int lineSkip;
+    int xEnd;
+    int cx;
+    u8 *pChar;
+    const int charSize = CharSize(pCC->dstBpp);
+    const int areaWidth = pCC->areaWidth;
+    const int areaHeight = pCC->areaHeight;
+    u8 *charBase = pCC->charBase;
+    const int glyphWidth = pGlyph->pWidths->glyphWidth;
+    const int glyphHeight = pFont->pRes->pGlyph->cellHeight;
 
     if (glyphWidth == 0 || x + glyphWidth < 0 || y + glyphHeight < 0) {
         return;
@@ -293,8 +314,8 @@ static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont
         return;
     }
 
+    pChar = charBase + charSize * (left + pCC->param * top);
     lineSkip = (pCC->param - numX) * charSize;
-    pChar = charBase + charSize * (left + top * pCC->param);
     if (x >= 0) {
         x &= 7;
     }
@@ -310,11 +331,9 @@ static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont
     param.colorOffset = cl - 1;
     param.srcBpp = pFont->pRes->pGlyph->bpp;
     param.dstBpp = pCC->dstBpp;
-    param.srcLineBits = pFont->pRes->pGlyph->cellWidth * param.srcBpp;
+    param.srcLineBits = param.srcBpp * pFont->pRes->pGlyph->cellWidth;
 
     for (; y > yEnd; y -= 8) {
-        int cx;
-
         param.y = y;
         for (cx = x; cx > xEnd; cx -= 8) {
             param.pChar = (u32 *)pChar;

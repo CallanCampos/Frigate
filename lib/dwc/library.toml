@@ -34,5 +34,8 @@ flags = [
 "crypt/crypt.c" = ["-nothumb"]
 # NHTTP (overlay 189) reaches the statics of its common file from one base, as -ipa file does
 "nhttp/d_nhttp_common.c" = ["-ipa file"]
+# So does the HTTP client's comm thread: its 76-byte content type string has a section of its own, which only -ipa file
+# gives an object of 64 bytes or more
+"nhttp/nhttp_thread.c" = ["-ipa file"]
 # So does the file of DWC that wraps the GameSpy HTTP client (overlay 189)
 "ghttp/dwc_ghttp.c" = ["-ipa file"]

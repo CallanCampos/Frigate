@@ -1157,7 +1157,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_league_grimsley.c` | `0x021eec80`–`0x021ef154` | 18 | partial | descriptive |
+| `gimmick_league_grimsley.c` | `0x021eec80`–`0x021ef154` | 18 | complete | descriptive |
 
 ### Overlay 124
 
@@ -1689,7 +1689,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 182
 
-103 of 1113 functions are in source files.
+118 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1698,7 +1698,8 @@ prints the tables below from the configs and the ROM:
 | `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
 | `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
-| `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | partial | descriptive |
+| `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
+| `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
 
 ### Overlay 184
 
@@ -1836,7 +1837,8 @@ prints the tables below from the configs and the ROM:
 | `pokemontrade_save.c` | `0x021bead8`–`0x021bfba4` | 32 | complete | string at `0x021c6f08` |
 | `pokemontrade_message.c` | `0x021bfba4`–`0x021c1918` | 50 | complete | descriptive |
 | `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | complete | string at `0x021c6fc0` |
-| `pokemontrade_2d.c` | `0x021c2a24`–`0x021c6380` | 109 | partial | string at `0x021c7330` |
+| `pokemontrade_touchbar.c` | `0x021c2a24`–`0x021c2b08` | 1 | complete | descriptive |
+| `pokemontrade_2d.c` | `0x021c2b08`–`0x021c6380` | 108 | partial | string at `0x021c7330` |
 
 ### Overlay 195
 

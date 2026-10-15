@@ -450,7 +450,6 @@ static void FreeAttrs(void) {
 static BOOL SetAttr(int index, const char *text) {
     int size;
     int length;
-    char *attr;
 
     if (*text != '\0') {
         if (StrLen(text) > 10) {
@@ -462,13 +461,13 @@ static BOOL SetAttr(int index, const char *text) {
             SetWifiError(ND_ERROR_BAD_PARAMETER, 0);
             return FALSE;
         }
-        attr = sNdContext.alloc(NdEncodedSize(size) + 1, 4);
-        sNdContext.attrs[index] = attr;
-        if (attr == NULL) {
+        length = NdEncodedSize(size);
+        sNdContext.attrs[index] = sNdContext.alloc(length + 1, 4);
+        if (sNdContext.attrs[index] == NULL) {
             SetWifiError(DWC_ND_ERROR_ALLOC, 0);
             return FALSE;
         }
-        length = Base64Encode(attr, text, size);
+        length = Base64Encode(sNdContext.attrs[index], text, size);
         sNdContext.attrs[index][length] = '\0';
     }
     return TRUE;
@@ -580,9 +579,10 @@ static int Base64Decode(char *dest, const char *src, int srcSize) {
     char bytes[3];
     int length = 0;
     int n;
-    int value = 0;
+    int value;
 
     n = CopyNonZero(in, src, 4);
+    value = 0;
     while (n > 0 && value >= 0) {
         int i;
 
@@ -857,7 +857,7 @@ static int OnHttpEvent(int request, int event, void *arg) {
     NdTask *task;
     int kind;
     OSMessageQueue *waiter;
-    int serverError;
+    int serverError = -1;
     DWCNdCallback callback;
     int error;
 
@@ -865,7 +865,6 @@ static int OnHttpEvent(int request, int event, void *arg) {
     kind = task->kind;
     callback = task->callback;
     waiter = task->waiter;
-    serverError = -1;
 
     switch (event) {
     case NHTTP_EVENT_ANSWER:
@@ -922,27 +921,29 @@ static int OnHttpEvent(int request, int event, void *arg) {
                         error = DWC_ND_ERROR_DLSERVER;
                     }
                 }
-            } else if (status > 0 && status == 200) {
+            } else if (status <= 0 || status != 200) {
+                error = DWC_ND_ERROR_HTTP;
+            } else {
                 switch (kind) {
                 case DWC_ND_CBREASON_GETFILELISTNUM:
                     if (ParseNumberAnswer(request, task)) {
                         result = DWC_ND_ERROR_NONE;
                     }
+                    error = result;
                     break;
                 case DWC_ND_CBREASON_GETFILELIST:
                     if (ParseFileListAnswer(request, task)) {
                         result = DWC_ND_ERROR_NONE;
                     }
+                    error = result;
                     break;
                 case DWC_ND_CBREASON_GETFILE:
                     if (CheckFileAnswer(request, task)) {
                         result = DWC_ND_ERROR_NONE;
                     }
+                    error = result;
                     break;
                 }
-                error = result;
-            } else {
-                error = DWC_ND_ERROR_HTTP;
             }
         }
         FreeTask(task);
@@ -1549,28 +1550,27 @@ static int FormatDecimal64(char *dest, u64 value, int minDigits) {
         10ULL,
     };
     int length = 0;
-    BOOL started = FALSE;
+    BOOL started;
     int i;
 
     if (value >= 100000000000000000ULL) {
         return -1;
     }
-    for (i = 0; i < 16; i++) {
+    for (i = 0, started = FALSE; i < 16; i++) {
         u64 power = powersOfTen[i];
-        int digit;
+        u32 digit;
 
         if (value >= power) {
             digit = value / power;
             value -= digit * power;
             digit += '0';
             started = TRUE;
+            dest[length] = digit;
+            length++;
         } else if (started || 17 - i <= minDigits) {
-            digit = '0';
-        } else {
-            continue;
+            dest[length] = '0';
+            length++;
         }
-        dest[length] = digit;
-        length++;
     }
     dest[length] = value + '0';
     return length + 1;

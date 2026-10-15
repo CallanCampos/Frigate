@@ -89,13 +89,15 @@ typedef struct NHttpQueueNode {
     struct NHttpQueueNode *prev;
     struct NHttpQueueNode *next;
     int id;
-    NHttpRequest *request;
+    // The comm thread changes it while the caller's thread cancels it
+    NHttpRequest *volatile request;
     int socket;
 } NHttpQueueNode;
 
 typedef struct NHttpListInfo {
     NHttpQueueNode *head;
-    int count;
+    // The next request's ID, taken by the caller's thread while the HTTP thread works through the queue
+    volatile int count;
 } NHttpListInfo;
 
 typedef struct NHttpReqInfo {
@@ -131,7 +133,8 @@ typedef void (*NHttpReleaseFunc)(void *buffer, NHttpFreeFunc free, void *param);
 // What the server answered: the raw header (the first NHTTP_HEADER_SIZE bytes here, the rest in blocks) and the body
 // in the user's buffer
 struct NHttpResponse {
-    int headerSize;
+    // Written by the receiving thread while the caller's thread reads it
+    volatile int headerSize;
     int bufferUsed;
     int bodyReceived;
     int contentLength;

@@ -869,8 +869,8 @@ static int func_ov257_021abd84(u8 *data, s32 *pos, int tbl) {
             sBitsLeft = 8;
         }
         code = (code << 1) | ((sBitBuffer >> (sBitsLeft - 1)) & 1);
-        sBitsLeft--;
         l++;
+        sBitsLeft--;
         if (offset + HUFF_MAXCODE + l >= HUFF_WORK_SIZE) {
             sError = 1;
             return 0;

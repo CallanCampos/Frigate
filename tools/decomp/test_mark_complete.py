@@ -1,4 +1,4 @@
-"""Cross-module static checks use temporary configs, never the live checkout."""
+"""Cross-file static checks use temporary configs, never the live checkout."""
 import contextlib
 import io
 from pathlib import Path
@@ -69,11 +69,69 @@ class StaticReferenceTests(unittest.TestCase):
                 self.relocs(f'from:0x02000000 kind:abs32 to:{target:#010x} module:overlay(11)')
                 self.assertEqual(self.check(), ['Local'])
 
-    def test_own_module_reference_ignored(self):
+    def test_same_file_code_and_data_references_ignored(self):
         self.relocs()
+        with (self.owner / 'delinks.txt').open('a') as f:
+            f.write('    .rodata start:0x02100040 end:0x02100050\n'
+                    '    .data start:0x02100060 end:0x02100070\n')
+        for origin in (0x02100000, 0x02100010, 0x0210001f,
+                       0x02100040, 0x0210004f, 0x02100060, 0x0210006f):
+            with self.subTest(origin=origin):
+                (self.owner / 'relocs.txt').write_text(
+                    f'from:{origin:#010x} kind:abs32 to:0x02100000 module:overlay(11)\n')
+                self.assertEqual(self.check(), [])
+
+    def test_same_overlay_cross_file_code_and_callback_references(self):
+        self.relocs()
+        with (self.owner / 'delinks.txt').open('a') as f:
+            f.write('\nsrc/caller.c:\n'
+                    '    .text start:0x02100020 end:0x02100040\n'
+                    '    .rodata start:0x02100040 end:0x02100050\n'
+                    '    .data start:0x02100060 end:0x02100070\n')
+        self.symbols('Local kind:function(thumb,size=0x10) addr:0x02100000',
+                     'Alias kind:label(thumb) addr:0x02100000')
+        for origin in (0x02100020, 0x02100024, 0x02100040, 0x02100060):
+            with self.subTest(origin=origin):
+                (self.owner / 'relocs.txt').write_text(
+                    f'from:{origin:#010x} kind:load to:0x02100001 add:0x4 module:overlays(11,12)\n')
+                self.assertEqual(self.check(), ['Local'])
+
+    def test_same_overlay_unowned_and_end_boundary_sources_rejected(self):
+        self.relocs()
+        with (self.owner / 'delinks.txt').open('a') as f:
+            f.write('    .rodata start:0x02100040 end:0x02100050\n')
+        for origin in (0x020ffffc, 0x02100020, 0x0210003c, 0x02100050):
+            with self.subTest(origin=origin):
+                (self.owner / 'relocs.txt').write_text(
+                    f'from:{origin:#010x} kind:abs32 to:0x02100000 module:overlay(11)\n')
+                self.assertEqual(self.check(), ['Local'])
+
+    def test_owned_data_is_not_a_static_function_target(self):
+        self.relocs()
+        with (self.owner / 'delinks.txt').open('a') as f:
+            f.write('    .data start:0x02100040 end:0x02100050\n')
+        self.symbols('Local kind:label(thumb) addr:0x02100040')
         (self.owner / 'relocs.txt').write_text(
-            'from:0x02100010 kind:abs32 to:0x02100000 module:overlay(11)\n')
+            'from:0x02100100 kind:abs32 to:0x02100040 module:overlay(11)\n')
         self.assertEqual(self.check(), [])
+
+    def test_same_overlay_rejection_in_either_version_does_not_mutate_configs(self):
+        self.relocs()
+        other = self.root / 'config/w2_us/arm9/overlays/ov011'
+        other.mkdir(parents=True)
+        for name in ('delinks.txt', 'symbols.txt'):
+            (other / name).write_bytes((self.owner / name).read_bytes())
+        for rejected in (self.owner, other):
+            with self.subTest(version=rejected):
+                for module in (self.owner, other):
+                    (module / 'relocs.txt').write_text('')
+                (rejected / 'relocs.txt').write_text(
+                    'from:0x02100100 kind:abs32 to:0x02100000 module:overlay(11)\n')
+                original = {p: p.read_bytes() for p in self.root.rglob('*.txt')}
+                with patch('sys.argv', ['mark_complete.py', self.source]), contextlib.redirect_stdout(io.StringIO()) as output:
+                    self.assertEqual(mark_complete.main(), 1)
+                self.assertIn('Local', output.getvalue())
+                self.assertEqual({p: p.read_bytes() for p in self.root.rglob('*.txt')}, original)
 
     def test_other_target_module_ignored(self):
         self.relocs('from:0x02000000 kind:abs32 to:0x02100000 module:overlay(12)')

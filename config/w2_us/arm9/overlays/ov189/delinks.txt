@@ -26,24 +26,27 @@ lib/dwc/src/nd/nd.c:
     .bss        start:0x021b28e8 end:0x021b2aa8
 
 lib/dpw/src/dpw_tr.c:
+    complete
     .text       start:0x021a6cc4 end:0x021a8050
     .data       start:0x021ae2cc end:0x021ae468
     .bss        start:0x021b2aa8 end:0x021b2c7c
 
 lib/dpw/src/dpw_battle_tower.c:
+    complete
     .text       start:0x021a8050 end:0x021a897c
     .data       start:0x021ae468 end:0x021ae53c
     .bss        start:0x021b2c7c end:0x021b2fa8
 
 lib/dwc/src/gamestats/gamestats.c:
     .text       start:0x021a897c end:0x021a9130
-    .rodata     start:0x021aceb8 end:0x021acee4
+    .rodata     start:0x021aceb8 end:0x021acee0
     .data       start:0x021ae53c end:0x021ae6c4
     .bss        start:0x021b2fa8 end:0x021b2fac
 
 lib/dwc/src/crypt/crypt.c:
+    complete
     .text       start:0x021a9130 end:0x021ac878
-    .rodata     start:0x021acee4 end:0x021acf68
+    .rodata     start:0x021acee0 end:0x021acf68
     .data       start:0x021ae6c4 end:0x021ae6e0
     .bss        start:0x021b2fac end:0x021b2fc0
 
@@ -55,6 +58,7 @@ lib/dwc/src/nhttp/nhttp_socket.c:
     .bss        start:0x021ae6e4 end:0x021ae704
 
 lib/dwc/src/nhttp/nhttp_stdlib.c:
+    complete
     .text       start:0x0219d994 end:0x0219ddd4
     .rodata     start:0x021acca4 end:0x021accc8
     .data       start:0x021ad150 end:0x021ad194
@@ -67,9 +71,11 @@ lib/dwc/src/nhttp/nhttp_control.c:
     .rodata     start:0x021accc8 end:0x021acce0
 
 lib/dwc/src/nhttp/nhttp_list.c:
+    complete
     .text       start:0x0219e118 end:0x0219e238
 
 lib/dwc/src/nhttp/nhttp_recvbuf.c:
+    complete
     .text       start:0x0219e238 end:0x0219e578
 
 lib/dwc/src/nhttp/nhttp_request.c:
@@ -77,6 +83,7 @@ lib/dwc/src/nhttp/nhttp_request.c:
     .data       start:0x021ad194 end:0x021ad1a8
 
 lib/dwc/src/nhttp/nhttp_response.c:
+    complete
     .text       start:0x0219ea54 end:0x0219ec64
     .data       start:0x021ad1a8 end:0x021ad1b8
 
@@ -88,11 +95,13 @@ lib/dwc/src/nhttp/d_nhttp_private.c:
     .text       start:0x021a0e5c end:0x021a11a0
 
 lib/dwc/src/ghttp/dwc_ghttp.c:
+    complete
     .text       start:0x021a11a0 end:0x021a158c
     .data       start:0x021ad2d4 end:0x021ad2e0
     .bss        start:0x021b28a0 end:0x021b28a8
 
 lib/dwc/src/ghttp/ghttpBuffer.c:
+    complete
     .text       start:0x021a158c end:0x021a19c0
     .data       start:0x021ad2e0 end:0x021ad32c
 
@@ -121,11 +130,13 @@ lib/dwc/src/ghttp/ghttpPost.c:
     .data       start:0x021adb1c end:0x021add70
 
 lib/dwc/src/ghttp/ghttpProcess.c:
+    complete
     .text       start:0x021a4154 end:0x021a54f4
     .rodata     start:0x021acdb8 end:0x021acdc4
     .data       start:0x021add70 end:0x021ae0dc
 
 lib/dwc/src/nhttp/nhttp_thread.c:
+    complete
     .text       start:0x0219ec64 end:0x021a07ac
     .rodata     start:0x021acce0 end:0x021acdb4
     .data       start:0x021ad1b8 end:0x021ad2d0

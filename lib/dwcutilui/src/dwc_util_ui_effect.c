@@ -16,7 +16,7 @@ typedef struct DWCUtilUiEffect {
 static const u8 sEffectData[12] = { 0x0e, 0x04, 0x05, 0x00, 0xe6, 0x00, 0x8b, 0x00, 0x00, 0x00, 0xa8, 0x00 };
 static DWCUtilUiEffect *sEffect;
 
-static void DWCUtilUiEffect_Update(void);
+static void DWCUtilUiEffect_Update(void *task);
 
 void DWCUtilUiEffect_Init(u8 variant) {
     int mode = 4;
@@ -37,7 +37,7 @@ void DWCUtilUiEffect_Destroy(void) {
     func_ov182_021bc4f0(&sEffect);
 }
 
-static void DWCUtilUiEffect_Update(void) {
+static void DWCUtilUiEffect_Update(void *task) {
     u8 palette;
 
     sEffect->frame = FX_ModS32(sEffect->frame + 1, 40);
