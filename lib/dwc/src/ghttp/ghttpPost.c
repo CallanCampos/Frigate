@@ -104,11 +104,17 @@ static void ghiFreePostItem(void *element) {
 
 GHIPost *ghiNewPost(void) {
     GHIPost *post = func_ov011_0216dddc(sizeof(GHIPost));
+    char *p;
+    u32 size;
 
     if (post == NULL) {
         return NULL;
     }
-    ghiClear(post, sizeof(GHIPost));
+    p = (char *)post;
+    size = sizeof(GHIPost);
+    while (size--) {
+        *p++ = 0;
+    }
     post->autoFree = TRUE;
     post->items = func_ov011_02171514(sizeof(GHIPostItem), 0, ghiFreePostItem);
     if (post->items == NULL) {
@@ -495,10 +501,12 @@ static BOOL ghiPostStringStateDoPosting(GHIPostItemState *state, GHIConnection *
             c = value[i];
         }
     } else {
-        if (!ghiTrySendThenBuffer(connection, item->u.string.value, item->u.string.length)) {
+        switch (ghiTrySendThenBuffer(connection, item->u.string.value, item->u.string.length)) {
+        case 0:
             return FALSE;
+        default:
+            return TRUE;
         }
-        return TRUE;
     }
     if (connection->encryptor.engine == 0) {
         if (!ghiSendBufferedData(connection)) {
@@ -507,8 +515,10 @@ static BOOL ghiPostStringStateDoPosting(GHIPostItemState *state, GHIConnection *
         if (connection->sendBuffer.pos == connection->sendBuffer.length) {
             ghiResetBuffer(&connection->sendBuffer);
         }
+        return TRUE;
+    } else {
+        return TRUE;
     }
-    return TRUE;
 }
 
 // Sends an XML message, with the padding that a DIME record has
@@ -546,15 +556,16 @@ static BOOL ghiPostXmlStateDoPosting(GHIPostItemState *state, GHIConnection *con
     if (!ghiTrySendThenBuffer(connection, func_ov011_0216fecc(message), func_ov011_0216fed0(message))) {
         return FALSE;
     }
-    if (!ghiTrySendThenBuffer(connection, padding, padLength)) {
+    switch (ghiTrySendThenBuffer(connection, padding, padLength)) {
+    case 0:
         return FALSE;
+    default:
+        return TRUE;
     }
-    return TRUE;
 }
 
 // Sends a file of the disk, a piece at a time. Returns 0 for an error, 1 once it is all sent and 2 to go on later
 static int ghiPostFileDiskStateDoPosting(GHIPostItemState *state, GHIConnection *connection) {
-    char padding[3];
     char buffer[0x1000];
     int count;
     int result;
@@ -578,12 +589,10 @@ static int ghiPostFileDiskStateDoPosting(GHIPostItemState *state, GHIConnection 
         }
         if (state->position == state->fileSize) {
             if (connection->post->mixed) {
+                char padding[3] = {0, 0, 0};
                 int padLength;
 
                 padLength = 4 - state->fileSize % 4;
-                padding[0] = 0;
-                padding[1] = 0;
-                padding[2] = 0;
                 if (padLength != 4 && padLength > 0) {
                     if (!ghiTrySendThenBuffer(connection, padding, padLength)) {
                         return 0;
@@ -616,12 +625,9 @@ static int ghiPostFileMemoryStateDoPosting(GHIPostItemState *state, GHIConnectio
             length = item->u.memory.length;
             if (length == state->position) {
                 if (connection->post->mixed) {
-                    char padding[3];
+                    char padding[3] = {0, 0, 0};
                     int padLength;
 
-                    padding[0] = 0;
-                    padding[1] = 0;
-                    padding[2] = 0;
                     padLength = 4 - item->u.memory.length % 4;
                     if (padLength != 4 && padLength > 0) {
                         if (!ghiTrySendThenBuffer(connection, padding, padLength)) {
@@ -649,12 +655,9 @@ static int ghiPostFileMemoryStateDoPosting(GHIPostItemState *state, GHIConnectio
         length = item->u.memory.length;
         if (length == state->position) {
             if (connection->post->mixed) {
-                char padding[3];
+                char padding[3] = {0, 0, 0};
                 int padLength;
 
-                padding[0] = 0;
-                padding[1] = 0;
-                padding[2] = 0;
                 padLength = 4 - item->u.memory.length % 4;
                 if (padLength != 4 && padLength > 0) {
                     if (!ghiTrySendThenBuffer(connection, padding, padLength)) {
@@ -679,7 +682,11 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
     if (state->position == -1) {
         state->position = 0;
         if (!connection->post->hasFiles && !connection->post->hasXml) {
-            func_0207a290(buffer, first ? "%s=" : "&%s=", state->item->name);
+            if (first) {
+                func_0207a290(buffer, "%s=", state->item->name);
+            } else {
+                func_0207a290(buffer, "&%s=", state->item->name);
+            }
         } else {
             GHIPostItem *item = state->item;
 

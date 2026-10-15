@@ -63,8 +63,8 @@ static inline void ghiClear(void *dest, u32 size) {
 
 // The same for a copy of a few bytes
 static inline void ghiCopy(void *dest, const void *src, u32 size) {
-    char *d = dest;
-    const char *s = src;
+    u8 *d = dest;
+    const u8 *s = src;
 
     while (size) {
         *d++ = *s++;

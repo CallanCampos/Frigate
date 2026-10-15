@@ -1883,7 +1883,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A `switch` of two cases tests them in value order but lays their bodies out in source order, which no order of
   `if`s gives: GameSpy's `ghiSendBufferedData` (`ghttpBuffer.c`, overlay 189) matches only as `case -1: return FALSE;`
-  written before `case -2: return TRUE;`.
+  written before `case -2: return TRUE;`. A final `if (!f()) return 0; return 1;` always puts the `return 1`
+  first under dsi/1.1p1, whatever the spelling (ternary, `!= 0`, an enum, a result variable, `goto`); only
+  `switch (f()) { case 0: return FALSE; default: return TRUE; }` gives the original's `bne` past the `return 0`
+  (`ghiPostXmlStateDoPosting`, `ghttpPost.c`).
 - A `switch` with no `default:` whose cases leave one value unassigned keeps the index in `r3` instead of `r2`, as
   `b_plist_main.c`'s `BPlistMain_InitPageCursor` does, and writing `case 0:` last moves its block to the end of the
   switch (`BPlistMain_CanSwitch`).
