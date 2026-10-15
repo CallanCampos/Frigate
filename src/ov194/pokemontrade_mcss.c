@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_mcss.h"
 #include "app/pokemon_trade_local.h"
 #include "constants/sound.h"
 #include "gfl/heap.h"

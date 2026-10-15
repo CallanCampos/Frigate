@@ -1,4 +1,6 @@
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_3d.h"
+#include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/pokemon_trade_local.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"

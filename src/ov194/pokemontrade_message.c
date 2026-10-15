@@ -1,4 +1,9 @@
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_2d.h"
+#include "app/pokemon_trade/pokemontrade_3d.h"
+#include "app/pokemon_trade/pokemontrade_message.h"
+#include "app/pokemon_trade/pokemontrade_nego.h"
+#include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/pokemon_trade_local.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
@@ -40,11 +45,11 @@
 // The trade's messages, menus and the panels that describe a Pokémon: its name, level, stats, moves and icons. The
 // ROM names no file between pokemontrade_save.c and pokemontrade_3d.c, so the name is descriptive
 
-static void func_ov194_021bfba4(ResSprite *sprite);
-static void func_ov194_021bfbc0(ResSprite *sprite, PartyPkm *pkm, int index, ClActUnit *unit, int x, int y,
+static void func_ov194_021bfba4(PokemonTradeSprite *sprite);
+static void func_ov194_021bfbc0(PokemonTradeSprite *sprite, PartyPkm *pkm, int index, ClActUnit *unit, int x, int y,
                                 u32 vramType, HeapID heapId);
-static void func_ov194_021bfc50(ResSprite *sprite);
-static void func_ov194_021bfc6c(ResSprite *sprite, PartyPkm *pkm, ClActUnit *unit, int x, int y, u32 vramType,
+static void func_ov194_021bfc50(PokemonTradeSprite *sprite);
+static void func_ov194_021bfc6c(PokemonTradeSprite *sprite, PartyPkm *pkm, ClActUnit *unit, int x, int y, u32 vramType,
                                 HeapID heapId, u32 plttOffset);
 static void func_ov194_021c0234(PartyPkm *pkm, GFLBitmap *bitmap, int x, int y, BOOL isEgg, BOOL speciesName,
                                 PokemonTradeWork *wk);
@@ -67,7 +72,7 @@ static void func_ov194_021c0e74(PokemonTradeWork *wk, PartyPkm *pkm, int *icons)
 static void func_ov194_021c0f44(PokemonTradeWork *wk, PartyPkm *pkm);
 static void func_ov194_021c189c(TCB *tcb, void *work);
 
-static void func_ov194_021bfba4(ResSprite *sprite) {
+static void func_ov194_021bfba4(PokemonTradeSprite *sprite) {
     if (sprite->actor != NULL) {
         func_0204c108(sprite->actor);
         sprite->actor = NULL;
@@ -76,7 +81,7 @@ static void func_ov194_021bfba4(ResSprite *sprite) {
 }
 
 // A type icon of the Pokémon: its first type (0) or its second (1)
-static void func_ov194_021bfbc0(ResSprite *sprite, PartyPkm *pkm, int index, ClActUnit *unit, int x, int y,
+static void func_ov194_021bfbc0(PokemonTradeSprite *sprite, PartyPkm *pkm, int index, ClActUnit *unit, int x, int y,
                                 u32 vramType, HeapID heapId) {
     UIObjResSetup param;
     u8 type = PokeParty_GetParam(pkm, PKM_PARAM_TYPE1 + index, NULL);
@@ -95,7 +100,7 @@ static void func_ov194_021bfbc0(ResSprite *sprite, PartyPkm *pkm, int index, ClA
     func_0204c378(sprite->actor, func_0202d7e8(type), 1);
 }
 
-static void func_ov194_021bfc50(ResSprite *sprite) {
+static void func_ov194_021bfc50(PokemonTradeSprite *sprite) {
     if (sprite->actor != NULL) {
         func_0204c108(sprite->actor);
         sprite->actor = NULL;
@@ -104,7 +109,7 @@ static void func_ov194_021bfc50(ResSprite *sprite) {
 }
 
 // The icon of the Poké Ball the Pokémon was caught in
-static void func_ov194_021bfc6c(ResSprite *sprite, PartyPkm *pkm, ClActUnit *unit, int x, int y, u32 vramType,
+static void func_ov194_021bfc6c(PokemonTradeSprite *sprite, PartyPkm *pkm, ClActUnit *unit, int x, int y, u32 vramType,
                                 HeapID heapId, u32 plttOffset) {
     UIObjResSetup param;
     u32 ball = PokeParty_GetParam(pkm, PKM_PARAM_POKEBALL, NULL);
