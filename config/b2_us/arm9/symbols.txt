@@ -6236,12 +6236,12 @@ NNS_G3DSetLightColor kind:function(thumb,size=0x10) addr:0x0206591c
 NNS_G3DSetMatDifAmb kind:function(thumb,size=0x20) addr:0x0206592c
 NNS_G3DSetMatSpeEmi kind:function(thumb,size=0x20) addr:0x0206594c
 NNS_G3DGetInvViewMatrix kind:function(thumb,size=0x30) addr:0x0206596c
-func_0206599c kind:function(thumb,size=0x172) addr:0x0206599c
-func_02065b10 kind:function(thumb,size=0x30) addr:0x02065b10
+InvertMtx44 kind:function(thumb,size=0x172) addr:0x0206599c
+NNS_G3DGetInvProjectionMatrix kind:function(thumb,size=0x30) addr:0x02065b10
 NNS_G3DPrecalcTempMVMatrix kind:function(thumb,size=0x3c) addr:0x02065b40
 NNS_G3DGetTempMVMatrix kind:function(thumb,size=0x28) addr:0x02065b7c
 NNS_G3DGetTempInvMVMatrix kind:function(thumb,size=0x28) addr:0x02065ba4
-func_02065bcc kind:function(thumb,size=0x44) addr:0x02065bcc
+NNS_G3DGetInvViewProjectionMatrix kind:function(thumb,size=0x44) addr:0x02065bcc
 NNS_G3DGetViewport kind:function(thumb,size=0x48) addr:0x02065c10
 func_02065c58 kind:function(thumb,size=0x44) addr:0x02065c58
 func_02065c9c kind:function(arm,size=0x70) addr:0x02065c9c
@@ -7038,7 +7038,7 @@ sys_memcpy32_fast kind:function(arm,size=0x38) addr:0x020786e8
 gfxUploadFogTable kind:function(arm,size=0x1c) addr:0x02078720
 MI_Copy36B kind:function(arm,size=0x1c) addr:0x0207873c
 MI_Copy48B kind:function(arm,size=0x24) addr:0x02078758
-MAT4_Copy kind:function(arm,size=0x2c) addr:0x0207877c
+MI_Copy64B kind:function(arm,size=0x2c) addr:0x0207877c
 sys_memset kind:function(arm,size=0x94) addr:0x020787a8
 sys_memset_fast kind:function(arm,size=0xe4) addr:0x0207883c
 sys_memcpy kind:function(arm,size=0x130) addr:0x02078920
@@ -9148,12 +9148,6 @@ s_pUVFlipCorrectFunc kind:bss addr:0x021439ec
 data_021439f8 kind:bss addr:0x021439f8
 pCurrentInstance_ kind:bss addr:0x02143a08
 NNS_G3dGlb kind:bss addr:0x02143a0c
-data_02143b04 kind:bss addr:0x02143b04
-g_NNSTempInvViewMatrix kind:bss addr:0x02143b0c
-g_NNSTempModelViewMatrix kind:bss addr:0x02143b3c
-g_NNSTempInvModelViewMatrix kind:bss addr:0x02143b6c
-data_02143bcc kind:bss addr:0x02143bcc
-data_02143c0c kind:bss addr:0x02143c0c
 g_NNSG3DModelRenderer kind:bss addr:0x02143c70
 g_NNSMaterials kind:bss addr:0x02143c74
 g_NNSG3DJointScales kind:bss addr:0x02144a74

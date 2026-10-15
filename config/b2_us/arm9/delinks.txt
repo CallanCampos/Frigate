@@ -1019,6 +1019,7 @@ lib/nnsys/src/g3d/kernel.c:
     .text       start:0x02064f8c end:0x02065698
 
 lib/nnsys/src/g3d/glbstate.c:
+    complete
     .text       start:0x02065698 end:0x02065c58
     .bss        start:0x02143a0c end:0x02143c70
 

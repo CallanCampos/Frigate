@@ -1635,6 +1635,9 @@
 . 0x02065640 NNS_G3dReleaseMdlPltt
 . 0x020658a4 NNS_G3dGlbSetBaseTrans
 . 0x020658c8 NNS_G3dGlbSetBaseScale
+. 0x0206599c InvertMtx44
+. 0x02065b10 NNS_G3DGetInvProjectionMatrix
+. 0x02065bcc NNS_G3DGetInvViewProjectionMatrix
 . 0x02067b60 NNS_G3dGeIsBufferExist
 . 0x02067b74 NNS_G3dGeSetBuffer
 . 0x02067b88 NNS_G3dGeReleaseBuffer
@@ -1930,6 +1933,7 @@
 . 0x02077ce4 sha1_block
 . 0x0207873c MI_Copy36B
 . 0x02078758 MI_Copy48B
+. 0x0207877c MI_Copy64B
 . 0x02079c28 OSi_IrqCallback
 . 0x02079e20 OSi_EnterTimerCallback
 . 0x02079ed8 OS_SetIrqStackChecker

@@ -425,6 +425,13 @@ static inline void NNS_G3dGePopMtx(int num) {
     NNS_G3DExecOp(G3OP_MTX_POP, (const u32 *)&param, 1);
 }
 
+static inline void NNS_G3dGeMtxMode(int mode) {
+    u32 param = mode;
+
+    // MTX_MODE, 0x10 (gx.h has no name for it yet)
+    NNS_G3DExecOp(0x10, &param, 1);
+}
+
 static inline void NNS_G3dGeIdentity(void) {
     NNS_G3DExecOp(G3OP_MTX_IDENTITY, NULL, 0);
 }
@@ -465,7 +472,8 @@ static inline void NNS_G3dGeBoxTest(const GXBoxTestParam *box) {
     NNS_G3DExecOp(G3OP_BOX_TEST, (const u32 *)box, 3);
 }
 
-// The global state of the geometry engine
+// The global state of the geometry engine. The cmd words hold the geometry commands that send what follows them, so
+// that a flush is one run of the structure
 typedef struct {
     u32 cmd0;
     u32 mtxmode_proj;
@@ -482,19 +490,38 @@ typedef struct {
     u32 cmd3;
     u32 lightColor[4];
     u32 cmd4;
-    MtxFx33 prmBaseRot;
-    VecFx32 prmBaseTrans;
+    // The base transformation of the models: the rotation and translation, which are also one 4x3 matrix, and the scale
+    union {
+        MtxFx43 prmBaseMtx;
+        struct {
+            MtxFx33 prmBaseRot;
+            VecFx32 prmBaseTrans;
+        };
+    };
     VecFx32 prmBaseScale;
     u32 prmTexImageParam;
     u32 flag;
-    // The inverse matrices that are made as needed
-    u8 unk100[0x140];
+    // The matrices that are made as needed, each with the flag that says it is up to date: the inverse of the camera
+    // matrix (INVCAMERA), the base transformation applied to the camera matrix (BASECAMERA) and its inverse (made with
+    // it), the inverse of the base transformation (INVBASE, which no code reads), the inverse of the projection matrix
+    // (INVPROJ), and the inverse of the camera and projection matrices together (INVCAMERAPROJ)
+    MtxFx43 invCameraMtx;
+    MtxFx43 baseCameraMtx;
+    MtxFx43 invBaseCameraMtx;
+    MtxFx43 invBaseMtx;
+    MtxFx44 invProjMtx;
+    MtxFx44 invCameraProjMtx;
     // Where NNS_G3dGlbLookAt last put the camera
     VecFx32 camPos;
     VecFx32 camUp;
     VecFx32 camTarget;
 } NNSG3dGlb;
 
+// What the last flush sent: with neither flag, the projection matrix alone, the camera and the base transformation
+// going to the position matrix; with FLUSH_VP, the camera joins the projection matrix; with FLUSH_WVP, so does the base
+// transformation. The flush functions set and clear them
+#define NNS_G3D_GLB_FLAG_FLUSH_WVP 0x00000001
+#define NNS_G3D_GLB_FLAG_FLUSH_VP 0x00000002
 #define NNS_G3D_GLB_FLAG_INVBASE_UPTODATE 0x00000004
 #define NNS_G3D_GLB_FLAG_INVCAMERA_UPTODATE 0x00000008
 #define NNS_G3D_GLB_FLAG_INVPROJ_UPTODATE 0x00000010
@@ -520,6 +547,16 @@ void NNS_G3DSetMatSpeEmi(GXRgb specular, GXRgb emission, BOOL isShininess);
 void NNS_G3DFlushRenderState(void);
 void NNS_G3DFlushViewProjection(void);
 void NNS_G3DFlushModelViewProjection(void);
+
+// The inverse of the camera matrix; the base transformation applied to the camera matrix (the model view matrix of a
+// model drawn at the origin) and its inverse; and the inverse of the camera and projection matrices together. Each is
+// made when it is first asked for after what it depends on changed, and the pointers are into NNS_G3dGlb
+const MtxFx43 *NNS_G3DGetInvViewMatrix(void);
+const MtxFx43 *NNS_G3DGetTempMVMatrix(void);
+const MtxFx43 *NNS_G3DGetTempInvMVMatrix(void);
+const MtxFx44 *NNS_G3DGetInvViewProjectionMatrix(void);
+// The viewport that the global state holds; a null pointer leaves its value out
+void NNS_G3DGetViewport(int *x1, int *y1, int *x2, int *y2);
 
 static inline void NNS_G3dGlbFlush(void) {
     NNS_G3DFlushRenderState();
