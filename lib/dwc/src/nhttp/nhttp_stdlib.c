@@ -6,6 +6,9 @@
 
 static char sBase64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+// A character in lower case. A macro, not NHTTPi_toLower: the tests work on the character itself, with no copy
+#define TO_LOWER(c) ((((c) >= 'A') & ((c) <= 'Z')) ? (c) + ('a' - 'A') : (c))
+
 void NHTTPi_memcpy(void *dest, const void *src, u32 size) {
     sys_memcpy(src, dest, size);
 }
@@ -38,12 +41,8 @@ int NHTTPi_strnicmp(const char *a, const char *b, int size) {
             size = 0;
             break;
         }
-        if (NHTTPi_isUpper(cb)) {
-            cb += 'a' - 'A';
-        }
-        if (NHTTPi_isUpper(ca)) {
-            ca += 'a' - 'A';
-        }
+        cb = TO_LOWER(cb);
+        ca = TO_LOWER(ca);
         if (ca != cb) {
             break;
         }
@@ -120,9 +119,9 @@ int NHTTPi_encodeUrlChar(char *dest, char c) {
 
 // Reads a number in hexadecimal, from at most 8 digits, with spaces before it and a space or the end after it, or -1
 int NHTTPi_strToHex(const char *s, int size) {
+    int i;
     int value;
     int started;
-    int i;
 
     if (size > 8) {
         return -1;
@@ -133,13 +132,13 @@ int NHTTPi_strToHex(const char *s, int size) {
     value = 0;
     started = 0;
     for (i = 0; i < size; i++) {
-        char c = NHTTPi_toLower(s[i]);
+        char c = TO_LOWER(s[i]);
 
         if (c >= '0' && c <= '9') {
-            value = value * 16 + c - '0';
+            value = (value << 4) + c - '0';
             started = 1;
         } else if (c >= 'a' && c <= 'f') {
-            value = value * 16 + c - 'a' + 10;
+            value = (value << 4) + c - 'a' + 10;
             started = 1;
         } else if (started && (c == ' ' || c == 0)) {
             break;
@@ -152,9 +151,10 @@ int NHTTPi_strToHex(const char *s, int size) {
 
 // Reads a number in decimal, from at most 10 digits, with spaces before it and a space or the end after it, or -1
 int NHTTPi_strToInt(const char *s, int size) {
+    int i;
     int value;
     int started;
-    int i;
+    int before;
 
     if (size > 10) {
         return -1;
@@ -172,14 +172,12 @@ int NHTTPi_strToInt(const char *s, int size) {
         }
         if (c < '0' || c > '9') {
             return -1;
-        } else {
-            int before = value;
-
-            value = c + value * 10 - '0';
-            started = 1;
-            if (before > value) {
-                return -1;
-            }
+        }
+        before = value;
+        started = 1;
+        value = c + value * 10 - '0';
+        if (before > value) {
+            return -1;
         }
     }
     return value;
@@ -213,25 +211,8 @@ int NHTTPi_intToStr(char *dest, u32 value) {
 
 // Compares a token, up to a space or the end of the first string, without caring for the case; 0 if they are equal
 int NHTTPi_compareToken(const char *a, const char *b) {
-    int i = 0;
-    int j = 0;
-
-    for (;;) {
-        char cb = b[j];
-        char ca = a[i];
-        char lower;
-
-        if (NHTTPi_isUpper(cb)) {
-            cb += 'a' - 'A';
-        }
-        lower = ca;
-        if (NHTTPi_isUpper(ca)) {
-            lower = ca + ('a' - 'A');
-        }
-        if (lower != cb) {
-            break;
-        }
-        if (ca == 0 || ca == ' ') {
+    while (TO_LOWER(*a) == TO_LOWER(*b)) {
+        if (*a == 0 || *a == ' ') {
             return 0;
         }
         a++;
@@ -242,8 +223,8 @@ int NHTTPi_compareToken(const char *a, const char *b) {
 
 // Reads the digits of a string, leaving out what is not a digit, or -1 if there are none or more than 9
 int NHTTPi_strtonum(const char *s, int size) {
-    int value = 0;
     int count = 0;
+    int value = 0;
 
     while (size-- != 0) {
         char c = *s;
@@ -257,10 +238,7 @@ int NHTTPi_strtonum(const char *s, int size) {
         }
         s++;
     }
-    if (count == 0) {
-        value = -1;
-    }
-    return value;
+    return count == 0 ? -1 : value;
 }
 
 // Looks for a string in another one: 0 if it is there, -1 if not

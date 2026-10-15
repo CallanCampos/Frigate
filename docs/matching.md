@@ -8,6 +8,11 @@ tools that show the differences.
 
 ## Registers
 
+- An inline function copies its argument into the parameter (`mov r3, r6`) before testing it, where a macro tests
+  the loaded value itself and gives each arm of its conditional a register of its own. DWC's `NHTTPi_compareToken`
+  (`nhttp_stdlib.c`) matches only with its case folding as a macro (`TO_LOWER`) in the `while` condition, which also
+  gives the original's rotated loop. And `return count == 0 ? -1 : value;` lowers `value`'s priority against
+  `if (count == 0) value = -1; return value;` (`NHTTPi_strtonum`).
 - A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
   taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
   (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the

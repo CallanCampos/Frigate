@@ -55,6 +55,7 @@ lib/dwc/src/nhttp/nhttp_socket.c:
     .bss        start:0x021ae6a4 end:0x021ae6c4
 
 lib/dwc/src/nhttp/nhttp_stdlib.c:
+    complete
     .text       start:0x0219d954 end:0x0219dd94
     .rodata     start:0x021acc64 end:0x021acc88
     .data       start:0x021ad110 end:0x021ad154
