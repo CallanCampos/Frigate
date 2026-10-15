@@ -1,7 +1,7 @@
 # Native port notes
 
 These notes collect target assumptions and open questions found in recovered code. The observations below cover
-NitroWiFi's SSL and WCM layers. Their remaining reconstruction differences are tracked in
+NitroWiFi's SSL, SOCL/SOC and WCM layers. Their remaining reconstruction differences are tracked in
 [Nonmatching functions](nonmatching-functions.md); source ownership and naming are described in
 [Code organization](code-organization.md).
 
@@ -12,6 +12,10 @@ offsets. Its `key_storage` union overlays generated key bytes with pointer slots
 [`wcm.c`](../lib/nitrowifi/src/wcm/wcm.c)'s work, global and AP-list structures also contain pointers, thread queues,
 alarms and mutexes. Their recovered DS sizes and offsets do not establish a native 64-bit layout. Host object
 representations and any original binary layouts remain separate porting questions.
+
+[`soc.c`](../lib/nitrowifi/src/soc/soc.c)'s public socket handles are `int` values carrying `SOCLSocket *` pointers
+on the DS. Their representation and conversion to host socket handles need a separate audit before a native port;
+the recovered SDK declarations retain their original ABI.
 
 `WCM_NotifyResult` forwards mixed pointer/integer payloads through 32-bit words. `WCM_Notify` assembles its notice
 and extra payload fields on the stack, then calls the registered callback synchronously. A wider pointer
@@ -45,6 +49,23 @@ owned before the application-record-ready flag is set. Certificate parsing also 
 certificate bytes alongside copied fields. Storage changes need a lifetime audit of the parser, record
 dispatcher, `CPS_SslRead` and release paths together.
 
+SOCL copies application send data into its ring before returning, while queued commands retain ring slices and
+destination scalars. A successful send result counts admitted payload bytes rather than completed transmission.
+A nonblocking write may admit a prefix; a later blocking-loop admission failure can return an error after an
+earlier prefix was queued. Replacing the backend needs to preserve these result and buffer-lifetime distinctions.
+
+UDP receives return the full datagram length even when the caller's buffer truncates the copy, then discard the
+uncopied tail unless peeking. Peek retains queued UDP/plain-CPS position, but the original SSL command path still
+consumes copied bytes. Peer outputs also differ: UDP fills them independently, plain CPS requires both pointers,
+and SSL commands fill neither. `SOC_RecvFrom` only writes port/address fields and has no valid peer guarantee on
+that SSL path. The caller contracts are in [`soc.h`](../lib/nitrowifi/include/nitrowifi/soc.h) and
+[`socl_internal.h`](../lib/nitrowifi/src/soc/socl_internal.h).
+
+`SOC_Startup` copies selected fields and allocator callbacks; direct `SOCL_Startup` retains the caller's config
+through active operation and successful cleanup. Resolver results and `SOC_InetNtoA` formatting use shared static
+storage overwritten by later calls. These storage lifetimes must survive a host implementation independently of
+the caller-buffer copies above.
+
 ## Word and byte order
 
 [`md5.c`](../lib/nitrowifi/src/ssl/md5.c)'s `MD5Encode` and `MD5Decode` use native copies, relying on little-endian
@@ -54,6 +75,9 @@ words. [`sha1.c`](../lib/nitrowifi/src/ssl/sha1.c) converts words explicitly in 
 Hash input lengths count bytes; stored counters count bits. Ordinary finalization mutates the context and uses
 the output buffer as temporary length storage. The caller contracts, including the different no-length SHA1
 operation, are in [`ssl_internal.h`](../lib/nitrowifi/src/ssl/ssl_internal.h).
+
+SOC address structures use network-order port/address fields; their wrappers swap into SOCL's host-order scalars.
+Preserve that boundary when substituting a host networking API rather than passing the representations through.
 
 ## Big-integer boundaries and capacity
 

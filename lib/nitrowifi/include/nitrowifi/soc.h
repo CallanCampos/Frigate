@@ -128,28 +128,41 @@ typedef struct SocConfig {
 int SOC_Socket(int domain, int type, int protocol);
 int SOC_Bind(int sock, const SocAddrIn *address);
 int SOC_Connect(int sock, const SocAddrIn *address);
+// Receive sizes are byte capacities. UDP returns the full datagram length even when fewer bytes fit; ordinary
+// TCP/SSL reads return the copied count. Read flag 2 retains UDP/plain-CPS data, but SSL reads still consume it.
 int SOC_Read(int sock, void *buffer, int size, int flags);
+// On a nonnegative result, only from->port/addr are written when from is nonnull; len/family are unchanged.
+// SSL command reads do not supply peer outputs, so this wrapper does not establish a valid peer on that path.
 int SOC_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from);
+// Copies caller data into the send ring before return; SendTo also copies destination scalars without retaining to.
+// Positive results count admitted payload bytes, not transmission completion. Nonblocking sends can return a prefix;
+// a later admission failure can return an error after an earlier prefix was queued.
 int SOC_Send(int sock, const void *buffer, int size, int flags);
 int SOC_SendTo(int sock, const void *buffer, int size, int flags, const SocAddrIn *to);
 int SOC_Shutdown(int sock, int how);
 int SOC_Close(int sock);
+// Returns shared static result/name/address storage, overwritten by later successful lookups; do not free it.
 SocHostEnt *SOC_GetHostByName(const char *host);
 int SOC_GetSockName(int sock, SocAddrIn *address);
 u32 SOC_GetHostID(void);
 // Sets the DNS servers, despite the name (the SDK's; pokediamond's is the same)
 int SOC_GetResolver(const u32 *dns1, const u32 *dns2);
 int SOC_Fcntl(int sock, int command, int flags);
+// Copies selected configuration fields and allocator callbacks into static storage; does not retain config itself.
 int SOC_Startup(const SocConfig *config);
 int SOC_Cleanup(void);
+// Returns a shared 16-byte static formatting buffer, overwritten by the next call; do not free it.
 char *SOC_InetNtoA(SocInAddr addr);
 int SOC_InetAtoN(const char *text, u32 *address);
+// AF_INET only: reads four address bytes and needs at least 16 writable buffer bytes; returns buffer or NULL.
 char *SOC_InetNtoP(int family, const void *address, char *buffer, u32 size);
 void SOC_U32to4U8(u32 value, u8 *bytes);
 int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks);
 int SOCL_EnableSsl(int sock, void *sslInfo);
 void SOCLi_TrashSocket(void);
 
+// Successful initial startup retains config for later callbacks and cleanup. Keep it alive until cleanup succeeds;
+// an already active layer ignores the new pointer. SOC_Startup instead supplies its own static SOCLConfig.
 int SOCL_Startup(SOCLConfig *config);
 int SOCL_CreateSocket(const SOCLSocketParam *param);
 
