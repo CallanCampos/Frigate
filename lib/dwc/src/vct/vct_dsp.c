@@ -132,7 +132,6 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
 {
     u32 scaled = rms >> 8;
     int result;
-    int i;
 
     sCapture.level = scaled;
     if (level != NULL) {
@@ -141,6 +140,7 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
     if (sCapture.speaking == 0) {
         u32 sum = 0;
         u32 floor;
+        int i;
 
         for (i = 0; i < 4; i++) {
             sum += sLoudnessHistory[i];
@@ -150,7 +150,7 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
         while (REG_SQRTCNT & REG_SQRTCNT_BUSY) {
         }
         floor = REG_SQRT_RESULT;
-        if (scaled != 0 && scaled >= floor * 2) {
+        if (rms != 0 && rms >= floor * 2) {
             sum = 0;
             for (i = 0; i < 4; i++) {
                 sum += sLoudnessHistory[i];
@@ -168,9 +168,9 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
         }
         sLoudnessHistory[sNoiseFloor.index] = energy;
         sNoiseFloor.index = (sNoiseFloor.index + 1) & 3;
-        return result;
     } else {
         u32 sum = 0;
+        int i;
 
         sLoudnessHistory[sNoiseFloor.index] = energy;
         sNoiseFloor.index = (sNoiseFloor.index + 1) & 3;
@@ -183,17 +183,20 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
         }
         if (REG_SQRT_RESULT > sNoiseFloor.threshold) {
             sNoiseFloor.quietFrames = 0;
-            return 2;
+        } else {
+            sNoiseFloor.quietFrames++;
+            if (sNoiseFloor.quietFrames > sCapture.quietFrameLimit) {
+                sCapture.speaking = 0;
+                sNoiseFloor.quietFrames = 0;
+                sNoiseFloor.index = 0;
+                result = 3;
+                goto done;
+            }
         }
-        sNoiseFloor.quietFrames++;
-        if (sNoiseFloor.quietFrames <= sCapture.quietFrameLimit) {
-            return 2;
-        }
-        sCapture.speaking = 0;
-        sNoiseFloor.quietFrames = 0;
-        sNoiseFloor.index = 0;
-        return 3;
+        result = 2;
     }
+done:
+    return result;
 }
 
 void VCT_InitCapture(void)
@@ -207,7 +210,7 @@ void VCT_InitCapture(void)
 u32 VCT_FilterFrame(s16 *samples, int bytes)
 {
     s16 input = samples[0];
-    u32 count = (u32)bytes >> 1;
+    unsigned long count = (u32)bytes >> 1;
     int minusInput = -(input * 0xe9f);
     u32 i;
     u64 sum;

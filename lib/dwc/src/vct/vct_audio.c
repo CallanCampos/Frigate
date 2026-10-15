@@ -1028,10 +1028,10 @@ static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequenc
 // Returns FALSE for a packet that is a repeat, out of range or too late or early to be of use
 static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet)
 {
+    int trend = 0;
     u32 tickDelta;
     u32 arrivalDelta;
     int skew;
-    int trend = 0;
     u64 playTime;
     u64 now;
 
