@@ -214,6 +214,7 @@
 . 0x02062088 reloc_addend 0x400
 . 0x02062090 reloc_addend 4
 . 0x0206269c reloc_addend 0x400
+. 0x02065024 reloc_addend 0x4
 . 0x02065740 reloc_addend 0x80
 . 0x0206574c reloc_addend 0x4c
 . 0x02065750 reloc_addend 0x8
@@ -412,6 +413,7 @@
 . 0x0209b21c remove_symbol
 . 0x0209b234 remove_symbol
 . 0x0209b258 add_data data_0209b258
+. 0x0209b2ac remove_symbol
 . 0x0209b328 add_data sEnvMapCmd
 . 0x0209da80 remove_symbol
 . 0x0209da88 remove_symbol

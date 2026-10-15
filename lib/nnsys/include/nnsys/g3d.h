@@ -225,8 +225,11 @@ typedef struct {
 #define NNS_G3D_DATABLK_JNT_ANM 'J'
 #define NNS_G3D_DATABLK_VIS_ANM 'V'
 
-// mapData of an animation object has this for each material or node that the animation holds data for
+// mapData of an animation object has this for each material or node that the animation holds data for, with the index
+// of the data in the animation in the low byte. The blends skip a target that has DISABLED set as well
 #define NNS_G3D_ANMOBJ_MAPDATA_EXIST 0x0100
+#define NNS_G3D_ANMOBJ_MAPDATA_DISABLED 0x0200
+#define NNS_G3D_ANMOBJ_MAPDATA_DATAFIELD 0x00ff
 
 // An animation applied to a model, at a frame. Animations bound to a render object are linked by priority through
 // next. mapData maps each material or node of the model to the animation's data for it
@@ -284,6 +287,54 @@ typedef struct {
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK 0x1fff0000
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT 16
 
+// The second category of an animation resource's header, which tells the kind of animation within what it animates
+#define NNS_G3D_ANM_CATEGORY1_MA 'MA'
+#define NNS_G3D_ANM_CATEGORY1_TP 'TP'
+#define NNS_G3D_ANM_CATEGORY1_TA 'TA'
+#define NNS_G3D_ANM_CATEGORY1_VA 'VA'
+#define NNS_G3D_ANM_CATEGORY1_CA 'CA'
+
+// What an animation computes for one material, joint or node. The function in an animation object's funcAnm fills one
+// in from the data at the index of the animation's own data that mapData gives, and a blend combines the results of all
+// the animation objects of a list. The material's, shared by the material, texture SRT and texture pattern animations,
+// has no layout yet
+typedef struct NNSG3dMatAnmResult NNSG3dMatAnmResult;
+
+// A joint's flag says which of its parts are the identity: a scale of one, a zero rotation or translation. A blend
+// keeps only those that all its animations have. The rotation is three rows of a matrix, of which a blend adds up the
+// first two and makes the third
+#define NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE 0x00000001
+#define NNS_G3D_JNTANM_RESULTFLAG_ROT_ZERO 0x00000002
+#define NNS_G3D_JNTANM_RESULTFLAG_TRANS_ZERO 0x00000004
+#define NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE 0x00000008
+#define NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE 0x00000010
+
+typedef struct {
+    u32 flag;
+    VecFx32 scale;
+    VecFx32 scaleEx0;
+    VecFx32 scaleEx1;
+    union {
+        MtxFx33 rot;
+        VecFx32 rotRow[3];
+    };
+    VecFx32 trans;
+} NNSG3dJntAnmResult;
+
+typedef struct {
+    u32 isVisible;
+} NNSG3dVisAnmResult;
+
+typedef void (*NNSG3dFuncAnmMat)(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+typedef void (*NNSG3dFuncAnmJnt)(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+typedef void (*NNSG3dFuncAnmVis)(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+
+// What combines the animations of a render object's list for a material or node, and returns whether any had data for
+// it
+typedef BOOL (*NNSG3dFuncBlendMat)(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 matID);
+typedef BOOL (*NNSG3dFuncBlendJnt)(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 nodeID);
+typedef BOOL (*NNSG3dFuncBlendVis)(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 nodeID);
+
 // Set in the flag of a render object when its animations changed, so that its hints are out of date
 #define NNS_G3D_RENDEROBJ_FLAG_HINT_OBSOLETE 0x00000010
 
@@ -293,11 +344,11 @@ typedef struct {
     u32 flag;
     NNSG3dResMdl *resMdl;
     NNSG3dAnmObj *anmMat;
-    void *funcBlendMat;
+    NNSG3dFuncBlendMat funcBlendMat;
     NNSG3dAnmObj *anmJnt;
-    void *funcBlendJnt;
+    NNSG3dFuncBlendJnt funcBlendJnt;
     NNSG3dAnmObj *anmVis;
-    void *funcBlendVis;
+    NNSG3dFuncBlendVis funcBlendVis;
     void *cbFunc;
     u8 cbCmd;
     u8 cbTiming;
@@ -401,11 +452,60 @@ typedef struct {
 // in use (anm.c)
 extern u32 NNS_G3D_ANIMATION_INIT_HEADER_COUNT;
 extern NNSG3dAnmObjInit NNS_G3D_ANIMATION_INIT_HEADERS[];
-// The functions that combine the animations of a new render object, for its materials, joints and visibility. They
-// are variables, which NNS_G3DModelAttachResource copies to funcBlendMat, funcBlendJnt and funcBlendVis (anm.c)
-extern void *NNS_G3dFuncBlendMat;
-extern void *NNS_G3dFuncBlendJnt;
-extern void *NNS_G3dFuncBlendVis;
+// The functions that fill in an animation object of each kind, which its init function (NitroSystem's
+// NNS_G3dAnmObjInitNsBma, NsBtp, NsBta, NsBva and NsBca, in nsbma.c, nsbtp.c, nsbta.c, nsbva.c and nsbca.c) copies
+// from these variables to funcAnm (anm.c). The NNS_G3dFuncAnm names are a guess from the files
+void func_020698d4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void NNS_G3DAnimationInit_TP(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void func_02069ee4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void func_02068764(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void func_02069968(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void func_02069cf8(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void func_02069ea0(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void func_02069f18(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_CA(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+extern void *NNS_G3dFuncAnmVisNsBva;
+extern void *NNS_G3dFuncAnmJntNsBca;
+extern void *NNS_G3dFuncAnmMatNsBtp;
+extern void *NNS_G3dFuncAnmMatNsBta;
+extern void *NNS_G3dFuncAnmMatNsBma;
+
+// The functions that combine the animations of a render object, for its materials, joints and visibility (NitroSystem's
+// NNSi_G3dAnmBlendMat, NNSi_G3dAnmBlendJnt and NNSi_G3dAnmBlendVis). The variables after them are what
+// NNS_G3DModelAttachResource copies to funcBlendMat, funcBlendJnt and funcBlendVis (anm.c)
+BOOL NNSi_G3dAnmBlendMat(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 matID);
+BOOL NNSi_G3dAnmBlendJnt(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 nodeID);
+BOOL NNSi_G3dAnmBlendVis(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 nodeID);
+extern NNSG3dFuncBlendMat NNS_G3dFuncBlendMat;
+extern NNSG3dFuncBlendJnt NNS_G3dFuncBlendJnt;
+extern NNSG3dFuncBlendVis NNS_G3dFuncBlendVis;
+
+// The functions that a model's scaling rule and texture matrix mode choose between when it is drawn, in tables indexed
+// by the rule or the mode (cgtool.c). A flush sends a joint's result to the geometry engine: its scale, rotation and
+// translation, as the result's flag leaves them. A scale function sets the scale parts of a joint's result from the
+// scale of the node, a vector of the scale and then one of its inverse, the node's command in the stream and its flags,
+// where bit 2 is a scale of one. A texture matrix function sends the texture matrix of a material's result
+typedef void (*NNSG3dFuncJointFlush)(const NNSG3dJntAnmResult *result);
+typedef void (*NNSG3dFuncJointScale)(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
+typedef void (*NNSG3dFuncTexMatrix)(const NNSG3dMatAnmResult *result);
+
+// Standard (basic.c), Maya (maya.c) and Softimage (si3d.c) scaling rules
+void func_02069f40(const NNSG3dJntAnmResult *result);
+void func_02069fbc(const NNSG3dJntAnmResult *result);
+void func_0206a714(const NNSG3dJntAnmResult *result);
+void func_02069f94(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
+void func_0206a044(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
+void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
+// Maya (maya.c), Softimage (si3d.c), 3ds Max (3dsmax.c) and XSI (xsi.c) texture matrix modes
+void func_0206a5cc(const NNSG3dMatAnmResult *result);
+void func_0206aa5c(const NNSG3dMatAnmResult *result);
+void func_0206b124(const NNSG3dMatAnmResult *result);
+void func_0206b74c(const NNSG3dMatAnmResult *result);
+
+extern NNSG3dFuncJointFlush NNS_G3D_JOINT_FLUSH_FUNCS[3];
+extern NNSG3dFuncJointScale NNS_G3D_JOINT_SCALE_FUNCS[3];
+extern NNSG3dFuncTexMatrix NNS_G3D_TEX_MATRIX_FUNCS[4];
 
 // The buffer that geometry commands wait in, and sending one: NNS_G3dGeFlushBuffer and NNS_G3dGeBufferOP_N
 BOOL NNS_G3dGeIsBufferExist(void);
