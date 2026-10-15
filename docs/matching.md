@@ -302,6 +302,10 @@ Same instructions, registers swapped.
   then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
   NitroSDK declares it, not `GXLightMask light`; casts or enum locals at the call don't help. Check the SDK's
   prototype of an inline before the call site.
+- A loop offset that starts at 0, grows by a step and is zeroed after the loop's hoisted invariants is a counter
+  times the step: MWCC strength-reduces `x + step * line` into a running offset that it zeroes in the loop's
+  preheader, where an offset kept by hand is zeroed before the hoisted code. NitroSystem's `g2d_TextCanvas.c`
+  `DrawTextAligned` matches with `int line = 0;`, `lineX = x + lfx * line;` and `line++`.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through

@@ -931,6 +931,7 @@ lib/nnsys/src/g2d/g2d_CharCanvas.c:
     .rodata     start:0x020943bc end:0x02094440
 
 lib/nnsys/src/g2d/g2d_TextCanvas.c:
+    complete
     .text       start:0x02064adc end:0x02064db8
 
 lib/nnsys/src/g2d/g2d_NFT_load.c:
