@@ -266,24 +266,19 @@ int NHTTPi_strtonum(const char *s, int size) {
 // Looks for a string in another one: 0 if it is there, -1 if not
 int NHTTPi_memfind(const char *haystack, int haystackSize, const char *needle, int needleSize) {
     int i;
-    int last;
+    int j;
+    const char *p;
 
     if (haystackSize < needleSize) {
         return -1;
     }
-    last = haystackSize - needleSize + 1;
-    for (i = 0; i < last; i++) {
+    for (i = 0; i < haystackSize - needleSize + 1; i++) {
         if (haystack[i] == needle[0]) {
-            int j = 1;
-            const char *p = haystack + i;
-
-            if (needleSize > 1) {
-                do {
-                    if (p[j] != needle[j]) {
-                        break;
-                    }
-                    j++;
-                } while (j < needleSize);
+            p = haystack + i;
+            for (j = 1; j < needleSize; j++) {
+                if (p[j] != needle[j]) {
+                    break;
+                }
             }
             if (j == needleSize) {
                 return 0;

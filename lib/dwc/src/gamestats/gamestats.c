@@ -57,12 +57,7 @@ static GamestatsClient sClient = {2};
 
 // The size of size bytes in base64
 static u32 GamestatsEncodedSize(u32 size) {
-    u32 padded = 1;
-
-    if (size % 3 == 0) {
-        padded = 0;
-    }
-    return (size / 3 + padded) * 4;
+    return (size / 3 + (size % 3 != 0 ? 1 : 0)) * 4;
 }
 
 static void SeedRandom(u32 seed) {
@@ -113,6 +108,10 @@ static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, 
 }
 
 // Checks that the answer ends with the hash of the secret, the answer in base64 and the secret, and keeps it
+static inline void CopySecret(char *dest) {
+    *(GamestatsSecret *)dest = sClient.secret;
+}
+
 static BOOL CheckAnswer(char *data, int size) {
     char hash[0x29];
     u8 digest[0x14];
@@ -129,9 +128,9 @@ static BOOL CheckAnswer(char *data, int size) {
     if (buffer == NULL) {
         return FALSE;
     }
-    *(GamestatsSecret *)buffer = sClient.secret;
+    CopySecret(buffer);
     func_ov011_0216e878(data, buffer + 0x14, bodySize, 2);
-    *(GamestatsSecret *)(buffer + 0x14 + GamestatsEncodedSize(bodySize)) = sClient.secret;
+    CopySecret(buffer + 0x14 + GamestatsEncodedSize(bodySize));
     MATH_CalcSHA1(digest, buffer, GamestatsEncodedSize(bodySize) + 0x28);
     func_02058728(8, buffer, 0);
     for (i = 0; i < 0x14; i++) {
@@ -219,6 +218,7 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     u8 *buffer;
     u32 sum = 0;
     int i;
+    int j;
 
     buffer = func_020586e4(8, total + 4);
     if (buffer == NULL) {
@@ -227,8 +227,8 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     for (i = 0; i < headerSize; i++) {
         buffer[i + 4] = header[i];
     }
-    for (i = 0; i < payloadSize; i++) {
-        buffer[headerSize + i + 4] = payload[i];
+    for (j = 0; j < payloadSize; j++) {
+        buffer[headerSize + j + 4] = payload[j];
     }
     for (i = 0; i < total; i++) {
         sum += buffer[i + 4];
@@ -300,6 +300,9 @@ int Gamestats_Poll(void) {
     case 3:
     case 8:
         break;
+    case 1:
+        SetFailed();
+        break;
     case 4:
         sClient.request = DWC_GetGHTTPData(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
         if (sClient.request >= 0) {
@@ -325,9 +328,6 @@ int Gamestats_Poll(void) {
         if (!DWC_ProcessGHTTP()) {
             SetFailed();
         }
-        break;
-    case 1:
-        SetFailed();
         break;
     }
     return sClient.state;
