@@ -16,6 +16,7 @@ src/ov207/p_status.c:
     .data       start:0x021bb6e0 end:0x021bb6f8
 
 src/ov207/p_sta_sub.c:
+    complete
     .text       start:0x021b53a4 end:0x021b6964
     .rodata     start:0x021bb000 end:0x021bb118
     .data       start:0x021bb6f8 end:0x021bb704
