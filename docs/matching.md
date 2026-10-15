@@ -561,6 +561,26 @@ Same code, other `sp` offsets or frame size.
   `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
   `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
   the copy too, a sign that the CSE and copy propagation passes place it.
+- A local of an inlined helper is slotted after the function's optimizer temporaries, where the same local in the
+  function's body is slotted among its named locals: overlay 197's `MysteryCardView_DrawCard` gets its archive
+  handle the original's slot, above the card and `iconCellAnims` temporaries, only with the icon loading in a
+  `static inline MysteryCardView_LoadIcon` that declares `arc` itself. A call's result held in a local before it
+  is passed on (`date = MysteryCard_GetDateBitmap(card); GFL_BitmapCopy(date, ...)`) also moves the next
+  argument's common subexpressions after the call, where the nested call computes them before it.
+- A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
+  saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
+  a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay
+  123's `func_ov123_021eed54` matches with its group loop in `GrimsleyRoom_InitGroupModels(work, 0)`, which counts
+  with its own `u8 index` parameter (`for (; index < GROUP_MODEL_COUNT; index++)`): the earlier loop then loads its
+  zeros from that slot and keeps the 1 for `SetPaused` in `r7`, as the original does. A local counter set from a
+  parameter (`i = first`) doesn't.
+- MWCC derives a large constant offset from one built earlier (`subs r6, #0x80` for 0x1cc from 0x24c) across calls
+  and the fall-through of conditional branches, whatever pointer it is added to, and stops only at a join: a label
+  reached from two places, as after an `if` without `else`, an `if`/`else`, `||` or an inline with two returns. Empty
+  `if`s, dead stores and one-pass loops are removed before that and don't stop it. Where the original builds an
+  offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it: overlay 173's
+  `WifiP2PMatch_StateRecruitingFriendMenu` gets its voice-chat store in the common tail with the next state set in
+  both branches and stored once after them.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
@@ -1899,6 +1919,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
       _pDLWork->error = error;                              ...
                                                             }
                                                             _pDLWork->error = result;
+- An empty `if` whose condition has three or more `&&` operands is not removed with the other empty statements: its
+  branches become blocks and go only later, so it splits the code around it for CSE and register allocation and
+  emits nothing. Two operands, `(void)(a && b && c)` and `if (TRUE)` are removed first. `btl_monset.c`'s
+  `SortBySpeed` keeps `set + j * 2` from its speed comparison across `BattleRandom` into the swap, in a saved
+  register, only with `if (i && j && set) {}` between the swap's `damage[i]` and `speed[i]` stores, and nowhere
+  else; a real `if (set == NULL) { return; }` there gives the same registers plus its own 4 bytes. That points at
+  code the release build dropped, such as a debug print under a condition, so it is a probe for where the original
+  has a block boundary, not code to commit.
 - In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
   `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
   tree is split. At 53-bit x87 precision, two cases form a group up to a distance of 4; three cases within a span

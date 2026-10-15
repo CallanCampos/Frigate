@@ -39,7 +39,7 @@ typedef struct SOCLRecvPipe {
     SOCLCommandPipe base;
     int cps_read_len;       // What the reads have taken from CPS's receive buffer and not yet consumed
     u16 rcvbuf_consume_min; // From SOCLSocketParam: how much to take before CPS_SocConsume
-    s8 peek;                // 1 while a peeking read runs: it takes the data without moving the position
+    s8 peek;               // Suppresses UDP dequeue/CPS offset advances; SSL command reads ignore it
     u8 unk_ff;
     SOCLUdpPacket *udp_tail;  // The datagrams that came in, oldest first
     SOCLUdpPacket *udp_head;
@@ -109,7 +109,7 @@ static inline SOCLSendPipe *SOCLi_GetSendPipe(const SOCLSocket *socket) {
 extern SOCLSocket *SOCLiUDPSendSocket;
 
 // SOCLi_ReadFrom's flags (BSD's MSG_PEEK and MSG_DONTWAIT)
-#define SOCLI_READ_PEEK 2     // Leave the data to be read again
+#define SOCLI_READ_PEEK 2     // Retain UDP datagrams/plain-CPS read position; SSL reads still consume copied bytes
 #define SOCLI_READ_NOBLOCK 4  // Do not wait for data
 
 // SOCL_WriteTo's flags
@@ -162,9 +162,9 @@ typedef int (*SOCLCommandHandler)(struct SOCLCommandPacket *packet);
 typedef struct SOCLCommandPacket {
     SOCLCommandHandler handler;
     SOCLSocket *socket;
-    OSMessageQueue *reply_queue; // Where a blocking caller waits for the result, NULL otherwise
+    OSMessageQueue *reply_queue; // Borrowed caller-stack result queue for mode 1, NULL otherwise
     s8 socket_flag;
-    s8 flag_block;               // 1 when the caller waits for the result (bit 0 of it blocks the send)
+    s8 flag_block;               // Exactly 1 waits for the result; bit 0 blocks queue admission (writes use 3 or 0)
     u8 unk_0e[2];
     union {
         struct {
@@ -175,12 +175,12 @@ typedef struct SOCLCommandPacket {
         struct {
             u8 *buf;
             int len;
-            u16 *remote_port; // Where the datagram's sender goes, or NULL
+            u16 *remote_port; // Optional peer outputs, filled according to the selected receive path
             CPSInAddr *remote_ip;
         } read;
         struct {
-            u8 *buf1;        // Where the data is in the send pipe's buffer, in up to two parts (the second when it
-            int len1;        // wraps around the buffer's end)
+            u8 *buf1;        // Owned send-ring slices used by the queued callback, not application storage
+            int len1;        // Slice byte counts; buf2 is the wrapped part, not an application-buffer pointer
             u8 *buf2;
             int len2;
             u16 write_end;   // The pipe's write position after this data
@@ -190,7 +190,7 @@ typedef struct SOCLCommandPacket {
             CPSInAddr remote_ip; // 0 for TCP
         } write;
         struct {
-            void *info; // What SOCL_EnableSsl was given (an SSL connection), or NULL to turn SSL off
+            void *info; // Borrowed connection retained by CPS; NULL detaches without freeing/resetting it
         } ssl;
         u8 raw[0x1c];
     } args;
@@ -211,24 +211,31 @@ int SOCLi_ExecCommandPacketInCtrlPipe(SOCLSocket *socket, SOCLCommandPacket *pac
 void SOCLi_CommandPacketHandler(OSMessageQueue *queue);
 
 // socl_bind.c
+// SOCL ports/IP scalars are in host order; SOC wrappers convert their network-order address fields.
 int SOCL_Bind(SOCLSocket *socket, u16 local_port);
 int SOCL_Connect(SOCLSocket *socket, u16 remote_port, CPSInAddr remote_ip);
 
 // socl_write.c
-// Writes to a socket; remote_port and remote_ip are for UDP (remote_ip 0 uses the socket's), flags is SOCLI_WRITE_*
+// Copies caller payload into the send ring before queue admission; caller storage is not retained after return.
+// Returns admitted byte count, not callback/transmission completion. Nonblocking writes may return a prefix;
+// a later blocking-loop admission failure returns EAGAIN even if an earlier prefix was queued.
+// UDP copies destination scalars, using the stored peer only when remote_ip is zero and the stored IP is nonzero.
+// flags is SOCLI_WRITE_*; both command modes used by writes (3/0) return without waiting for callback completion.
 int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip, int flags);
 // How much room the socket's send pipe has in its buffer
 int SOCLi_GetWriteBufferFreeSize(const SOCLSocket *socket);
 
 // socl_shutdown.c
+// Retains the allocation. Exact flag_block==1 waits for the callback; other modes report admission, not completion.
 int SOCL_Shutdown(SOCLSocket *socket);
 
 // socl_close.c
-// Whether a handle is no socket any more and has left the trash too
+// Tests nonnegative handle absence from live/trash lists, not historical allocation ownership or generation.
 BOOL SOCL_IsClosed(int socket);
 // TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
 // (SOC_Close's caller in DWC asks it after a failed close; no counterpart in pokediamond's NitroWiFi)
 BOOL func_ov011_02157314(int socket);
+// Returns without awaiting callback/reclamation; zero also covers an already absent positive handle.
 int SOCL_Close(int socket);
 void SOCLi_TrashSocket(void);
 
@@ -256,7 +263,9 @@ int SOCL_GetStatus(SOCLSocket *socket);
 u32 SOCLi_RoundUp4(u32 value);
 
 // socl_read.c
-// Reads from a socket; flags is SOCLI_READ_*, remote_port and remote_ip (either may be NULL) get the sender's
+// len is a byte capacity; queued UDP returns the full datagram length and discards any uncopied tail unless peeking.
+// UDP fills peer outputs independently; ordinary CPS requires both nonnull; SSL commands fill neither.
+// flags is SOCLI_READ_*. Peek prevents UDP dequeue/CPS offset advancement, but SSL still consumes copied bytes.
 int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int flags);
 BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc);
 

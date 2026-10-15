@@ -117,11 +117,38 @@ void func_ov123_021eed3c(GameSystem *gsys, int animation) {
 }
 
 // Places the models, hidden
-static void func_ov123_021eed54(GrimsleyRoomWork *work) {
-    u8 i;
-    u8 modelAnim = 0;
+// Places the group models from the index-th on, hidden, with their animations set and paused
+static inline void GrimsleyRoom_InitGroupModels(GrimsleyRoomWork *work, u8 index) {
+    const VecFx32 positions[GROUP_MODEL_COUNT] = {
+        { FX32_CONST(536), FX32_CONST(224), FX32_CONST(416) }, { FX32_CONST(472), FX32_CONST(224), FX32_CONST(416) },
+        { FX32_CONST(568), FX32_CONST(224), FX32_CONST(336) }, { FX32_CONST(440), FX32_CONST(224), FX32_CONST(336) },
+        { FX32_CONST(546), FX32_CONST(28), FX32_CONST(720) },  { FX32_CONST(462), FX32_CONST(28), FX32_CONST(720) },
+    };
     u16 model;
     u16 anim;
+    SRTMatrix *matrix;
+    FieldExpObjAnm *anm;
+
+    for (; index < GROUP_MODEL_COUNT; index++) {
+        model = index + 1;
+        matrix = FieldExpObj_GetActorMatrixPtr(work->expObj, 0, model);
+        matrix->translation.x = positions[index].x;
+        matrix->translation.y = positions[index].y;
+        matrix->translation.z = positions[index].z;
+        func_ov036_021b8248(work->expObj, 0, model, 1);
+        FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
+        for (anim = 0; anim < NELEMS(sGroupModelAnimations); anim++) {
+            anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, anim);
+            FieldExpObjAnm_SetLooped(anm, FALSE);
+            FieldExpObjAnm_SetPaused(anm, TRUE);
+            FieldExpObj_SetAnm(work->expObj, 0, model, anim, FALSE);
+        }
+    }
+}
+
+// Places the models, hidden
+static void func_ov123_021eed54(GrimsleyRoomWork *work) {
+    u8 i;
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
 
@@ -132,36 +159,13 @@ static void func_ov123_021eed54(GrimsleyRoomWork *work) {
     matrix->translation.z = FX32_CONST(256);
     func_ov036_021b8248(work->expObj, 0, MODEL_0, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_0, FALSE);
-    i = 0;
-    for (; modelAnim < NELEMS(sModel0Animations); modelAnim++) {
-        anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_0, modelAnim);
+    for (i = 0; i < NELEMS(sModel0Animations); i++) {
+        anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_0, i);
         FieldExpObjAnm_SetLooped(anm, FALSE);
         FieldExpObjAnm_SetPaused(anm, TRUE);
-        FieldExpObj_SetAnm(work->expObj, 0, MODEL_0, modelAnim, FALSE);
+        FieldExpObj_SetAnm(work->expObj, 0, MODEL_0, i, FALSE);
     }
-    {
-        const VecFx32 positions[GROUP_MODEL_COUNT] = {
-            { FX32_CONST(536), FX32_CONST(224), FX32_CONST(416) }, { FX32_CONST(472), FX32_CONST(224), FX32_CONST(416) },
-            { FX32_CONST(568), FX32_CONST(224), FX32_CONST(336) }, { FX32_CONST(440), FX32_CONST(224), FX32_CONST(336) },
-            { FX32_CONST(546), FX32_CONST(28), FX32_CONST(720) },  { FX32_CONST(462), FX32_CONST(28), FX32_CONST(720) },
-        };
-
-        for (; i < GROUP_MODEL_COUNT; i++) {
-            model = i + 1;
-            matrix = FieldExpObj_GetActorMatrixPtr(work->expObj, 0, model);
-            matrix->translation.x = positions[i].x;
-            matrix->translation.y = positions[i].y;
-            matrix->translation.z = positions[i].z;
-            func_ov036_021b8248(work->expObj, 0, model, 1);
-            FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
-            for (anim = 0; anim < NELEMS(sGroupModelAnimations); anim++) {
-                anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, anim);
-                FieldExpObjAnm_SetLooped(anm, FALSE);
-                FieldExpObjAnm_SetPaused(anm, TRUE);
-                FieldExpObj_SetAnm(work->expObj, 0, model, anim, FALSE);
-            }
-        }
-    }
+    GrimsleyRoom_InitGroupModels(work, 0);
 }
 
 static void func_ov123_021eee70(GrimsleyRoomWork *work) {
