@@ -100,6 +100,7 @@ BOOL VCT_InitAudio(void)
 {
     u32 i;
     VCTCodec codec;
+    const u8 *frameSize;
 
     sAudio.sequence = func_0207bb84();
     sVadEnabled = TRUE;
@@ -107,8 +108,9 @@ BOOL VCT_InitAudio(void)
     sAudio.activeMask = 0;
     codec = gVCTSettings.mode == 1 ? VCT_CODEC_PCM8 : VCT_CODEC_ADPCM4;
     sAudio.codec = codec;
-    sAudio.packetSize = (&sFrameSizes[0][0])[codec * 2] * 0x44 + (&sFrameSizes[0][0])[codec * 2 + 1] + 0xc;
+    frameSize = sFrameSizes[codec];
     sAudio.frameBytes = VCT_FRAME_BYTES;
+    sAudio.packetSize = frameSize[0] * 0x44 + frameSize[1] + 0xc;
     sSendQueue.readIndex = 0;
     sSendQueue.writeIndex = 0;
     sSendQueue.pendingMask = 0;
@@ -133,7 +135,7 @@ void VCT_ClearSessionCount(void)
 
 BOOL VCT_AttachSession(VCTSession *session)
 {
-    int slot;
+    u32 slot;
 
     if (session == NULL) {
         return FALSE;
@@ -203,8 +205,8 @@ void VCT_DetachSession(VCTSession *session)
 // Hands a frame of the microphone's samples to the library to send, returning whether it took it
 BOOL VCT_SubmitSamples(void *samples, int size)
 {
-    BOOL hasSender = FALSE;
     int i;
+    BOOL hasSender = FALSE;
     VCTVoicePacket *packet;
 
     if (size != sAudio.frameBytes) {
@@ -231,7 +233,7 @@ BOOL VCT_SubmitSamples(void *samples, int size)
     }
     packet->type = VCT_TYPE_VOICE;
     packet->sequence = sAudio.sequence++;
-    packet->timestamp = clock() / 64;
+    packet->timestamp = (u32)((s64)clock() / 64);
     sSendQueue.writeIndex++;
     return TRUE;
 }
@@ -239,17 +241,19 @@ BOOL VCT_SubmitSamples(void *samples, int size)
 // Takes the next frame of a slot's voice from its queue, if its time has come
 static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask)
 {
+    int count;
+    VCTPacket *packet;
     VCTReceiver *receiver = &sReceivers[slot];
     BOOL more = TRUE;
-    int count = GetQueueCount(slot);
+    u64 now;
 
+    count = GetQueueCount(slot);
     while (count != 0) {
-        u64 now = clock();
-        VCTPacket *packet = PeekQueue(slot);
+        now = clock();
+        packet = PeekQueue(slot);
 
         if (packet == NULL) {
-            receiver->queuedCount = count;
-            return FALSE;
+            goto queued;
         }
         if (packet->playTime > now + 0x34) {
             more = FALSE;
@@ -304,6 +308,10 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask)
         receiver->held = NULL;
     }
     return FALSE;
+
+queued:
+    receiver->queuedCount = count;
+    return FALSE;
 }
 
 // Mixes the voices that are due into a frame of samples, returning whether there is any, and sets the bits of the
@@ -311,7 +319,7 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask)
 BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask)
 {
     BOOL heard;
-    int slot;
+    u32 slot;
 
     if (heardMask != NULL) {
         *heardMask = 0;
@@ -325,7 +333,7 @@ BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask)
             }
         }
         if (heard) {
-            int next = slot + 1;
+            u32 next = slot + 1;
 
             if (next == VCT_SLOT_MAX) {
                 heard = TRUE;
@@ -535,10 +543,10 @@ BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now)
 int VCT_DecodeReceived(void)
 {
     VCTPacket *first = GetActiveHead();
-    u32 irq;
-    int slot;
-    int count;
     int i;
+    int count;
+    int slot;
+    u32 irq;
 
     if (first == NULL) {
         return 0;
@@ -566,25 +574,38 @@ int VCT_DecodeReceived(void)
     return count;
 }
 
+// The ARM count-leading-zeros instruction, inlined at its one call site, as DS Protect inlines its cache flush
+static inline u32 CountLeadingZeros(u32 x)
+{
+    asm
+    {
+        clz x, x
+    }
+    return x;
+}
+
 // Sends the frame that has been coded to the machines it is due to, as many as this tick allows
 BOOL VCT_SendPending(void)
 {
-    int sends;
     int i;
+    int sends;
 
     if (sAudio.sessionCount == 0) {
         return TRUE;
     }
     if (sSendQueue.sending == NULL) {
         sSendQueue.sending = EncodeNextFrame();
-        return sSendQueue.sending != NULL && sAudio.echoCancel != 0 ? FALSE : TRUE;
+        if (sSendQueue.sending != NULL && sAudio.echoCancel != 0) {
+            return FALSE;
+        }
+        return TRUE;
     }
     sends = 1;
     if (gVCTSettings.mode == 2) {
         sends = sSendSchedule[sSendQueue.scheduleRow * 3 + sSendQueue.scheduleColumn++];
     }
     for (i = 0; i < sends; i++) {
-        int leading = __clz(sSendQueue.pendingMask);
+        int leading = CountLeadingZeros(sSendQueue.pendingMask);
 
         if (leading == 32) {
             break;
@@ -724,9 +745,10 @@ static void EncodeMulaw(u8 *dst, s16 *src, u32 count)
     u32 i;
 
     for (i = 0; i < count; i++) {
-        int sample = src[i] >> 2;
-        int sign;
         int segment;
+        int sign;
+        int sample = src[i] >> 2;
+        const int *end = sSegmentEnds;
 
         if (sample < 0) {
             sign = 0x7f;
@@ -738,7 +760,7 @@ static void EncodeMulaw(u8 *dst, s16 *src, u32 count)
             sample = 0x1fdf;
         }
         for (segment = 0; segment < 8; segment++) {
-            if (sample + 0x21 <= sSegmentEnds[segment]) {
+            if (sample + 0x21 <= *end++) {
                 break;
             }
         }

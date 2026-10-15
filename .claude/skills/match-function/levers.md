@@ -465,6 +465,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
   off")
+- `__clz`/`__CLZ`/`__builtin_clz` are not MWCC intrinsics; they call out. For a bare inlined `clz`, use a local
+  `static inline` wrapper with an `asm` block. (matching.md: "no count-leading-zeros intrinsic")
 
 ## Data and sections
 

@@ -162,9 +162,6 @@ void sys_memcpy32_fast(const void *src, void *dest, u32 size);
 // The C library's memset
 void *memset(void *dest, int value, u32 size);
 
-// The compiler's count-leading-zeros intrinsic
-int __clz(u32 x);
-
 // The timer count, which seeds the packets' sequence numbers
 u16 func_0207bb84(void);
 
