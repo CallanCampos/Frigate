@@ -31,12 +31,10 @@ BOOL DWCUtilScreen_Start(void *param, int arg1, int arg2) {
 }
 
 BOOL DWCUtilScreen_Stop(void) {
-    u8 *active = &sScreenActive;
-
-    if (!*active) {
+    if (!sScreenActive) {
         return FALSE;
     }
     func_ov182_021bbf7c(1);
-    *active = FALSE;
+    sScreenActive = FALSE;
     return TRUE;
 }

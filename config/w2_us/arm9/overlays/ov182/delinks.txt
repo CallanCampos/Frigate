@@ -26,12 +26,19 @@ lib/dwcutil/src/dwc_aoss_ap.c:
     .data       start:0x021c0688 end:0x021c06b8
     .bss        start:0x021c2980 end:0x021c2ae0
 
-lib/dwcutil/src/dwc_util_screen.c:
+lib/dwcutilui/src/dwc_util_screen.c:
+    complete
     .text       start:0x021ab5c8 end:0x021ab67c
     .data       start:0x021c0780 end:0x021c0794
     .bss        start:0x021c406c end:0x021c4070
 
-lib/dwcutil/src/dwc_util_ui_effect.c:
+lib/dwcutilui/src/dwc_util_ui_effect.c:
     .text       start:0x021ab080 end:0x021ab1bc
     .rodata     start:0x021bfb58 end:0x021bfb64
     .bss        start:0x021c4064 end:0x021c4068
+
+lib/dwcutilui/src/dwc_util_ui_object.c:
+    complete
+    .text       start:0x021ab1bc end:0x021ab5c8
+    .rodata     start:0x021bfb64 end:0x021bfb94
+    .bss        start:0x021c4068 end:0x021c406c
