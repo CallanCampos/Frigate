@@ -1091,7 +1091,8 @@ int WorldTrade_NationSortListMake(ListMenuOption **menulist, MsgData *countryNam
     int i;
 
     *menulist = ListMenuCore_CreateOptionList(num, HEAPID_WORLDTRADE);
-    for (i = 0; i < num; i++) {
+    // The loop test is a 0/1 value, which keeps the loop entered at its test (docs/matching.md)
+    for (i = 0; i < num ? TRUE : FALSE; i++) {
         ListMenuCore_AppendMsgOption(*menulist, countryNameManager, sCountryListTbl[first + i], first + i + 1,
                                      HEAPID_WORLDTRADE);
     }
