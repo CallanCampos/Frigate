@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_message.h"
 #include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/pokemon_trade/pokemontrade_save.h"
 #include "app/pokemon_trade_local.h"
