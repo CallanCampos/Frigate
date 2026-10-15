@@ -448,9 +448,11 @@ void BigInt_BytesToDigits(u16 *dst, const u8 *src, int nbytes, int n) {
     }
 }
 
-void BigInt_DigitsToBytes(u8 *dst, const u16 *src, int nbytes) {
+// The original accepts the source digit count n but overwrites its register before reading it.
+void BigInt_DigitsToBytes(u8 *dst, const u16 *src, int nbytes, int n) {
     u8 *p = dst + (nbytes - 1);
 
+    (void)n;
     while (nbytes > 1) {
         u8 *hi = p - 1;
 

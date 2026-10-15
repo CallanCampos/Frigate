@@ -438,17 +438,14 @@ in both versions.
 | `lib/nitrowifi/src/ssl/ssl.c` | `CPS_SslTick` | `0x0215a604` / `0x0215a644` | 50 bytes. The session-cache expiry half is confident; the thread-list walk's exact field read on `soc->con` past `read_buf`/`when`/`block_type` (case `CPS_BLOCK_TCPREAD`) isn't fully confirmed. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseMessage` | `0x02158ba0` / `0x02158be0` | Stub (`return SSLI_STATE_ERROR`), ours 4 bytes against the original's 0x20c. Walks the server certificate's DER bytes a field at a time via `SSLi_ParseAsn1Field`, retrying until a field is fully buffered; the bookkeeping fields past `ctx+0x454` aren't recovered. Not attempted. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ProcessHandshakeMessage` | `0x02159918` / `0x02159958` | Stub (sets `ctx->state = SSLI_STATE_ERROR` and ignores `msg`/`msgLen`), ours 0xc against the original's 0x29c. Should dispatch on the handshake message type byte to the ServerHello/Certificate/ServerKeyExchange/ServerHelloDone handlers. Not attempted. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_RestoreSessionById` | `0x02158250` / `0x02158290` | Ours compiles to 0x70, the original is 0x74. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_FindSessionByPeer` | `0x021582c4` / `0x02158304` | Ours compiles to 0xac, the original is 0x78. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SaveSession` | `0x0215833c` / `0x0215837c` | Ours compiles to 0xbc, the original is 0xb4. Open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SaveSession` | `0x0215833c` / `0x0215837c` | Same size, 19 bytes differ. Restored the original peer-hit/invalid-entry/oldest-entry selection and clock() >> 16 timestamps; register allocation remains open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_RaisePriority` | `0x0215847c` / `0x021584bc` | 20 bytes differ, same size. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_FindNamedParam` | `0x021584e8` / `0x02158528` | Ours compiles to 0x40, the original is 0x38. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_DecodeLength` | `0x02158520` / `0x02158560` | Ours compiles to 0x50, the original is 0x42. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_BuildHostPattern` | `0x02158564` / `0x021585a4` | Ours compiles to 0x48, the original is 0x4a. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseCertTime` | `0x021585b0` / `0x021585f0` | Ours compiles to 0x8c, the original is 0x6c. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseAsn1Field` | `0x0215861c` / `0x0215865c` | Ours compiles to 0x1f8, the original is 0x340. DER tag/length/value walker; the field callbacks past `ctx+0x454` aren't fully recovered. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_VerifyQuickResumeSignature` | `0x0215895c` / `0x0215899c` | Ours compiles to 0x11c, the original is 0x124. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_CheckQuickResume` | `0x02158a80` / `0x02158ac0` | Ours compiles to 0xd0, the original is 0xc0. Open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseAsn1Field` | `0x0215861c` / `0x0215865c` | Size 0x1f4/0x340. The OID strings now have their original NUL terminators and comparisons use the original OID length. Other DER field callbacks and bookkeeping remain unrecovered. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_VerifyQuickResumeSignature` | `0x0215895c` / `0x0215899c` | Size 0x128/0x124. Restored the named public-key layout, four digit buffers, original modulus-length conversion and digest-suffix comparison; code generation remains open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_CheckQuickResume` | `0x02158a80` / `0x02158ac0` | Size 0xcc/0xc0. Restored the sentinel return and removed the invented assignment of a named public record to the private-key pointer; code generation remains open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_LabelLength` | `0x02158b40` / `0x02158b80` | Ours compiles to 0x14, the original is 0x16. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_MatchHostname` | `0x02158b58` / `0x02158b98` | Ours compiles to 0x42, the original is 0x46. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseServerHelloRandom2` | `0x02158dac` / `0x02158dec` | Ours compiles to 0xa4, the original is 0x94. Open. |
@@ -456,7 +453,6 @@ in both versions.
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_PickCipherSuite` | `0x02158e74` / `0x02158eb4` | 1 byte differs, same size. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseServerKeyExchange` | `0x02158ec0` / `0x02158f00` | 64 bytes differ, same size. RSA modulus/exponent extraction for the server key exchange. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseServerHello` | `0x02158f4c` / `0x02158f8c` | Ours compiles to 0x7c, the original is 0x74. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_DecryptPreMasterSecret` | `0x02158fc0` / `0x02159000` | Ours compiles to 0x138, the original is 0x168. RSA decryption of the pre-master secret. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_HashKeyMaterialBlock` | `0x02159128` / `0x02159168` | Ours compiles to 0x78, the original is 0x6c. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_GenerateKeyBlock` | `0x021591d4` / `0x02159214` | Ours compiles to 0x138, the original is 0x174. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ComputeFinishedMd5` | `0x0215937c` / `0x021593bc` | 85 bytes differ, same size. Open. |
@@ -469,7 +465,7 @@ in both versions.
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_GetRandomBytes` | `0x02159cbc` / `0x02159cfc` | Ours compiles to 0x98, the original is 0xa8. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ReceiveRecord` | `0x02159bb4` / `0x02159bf4` | Ours compiles to 0xa4, the original is 0x108. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendClientHello` | `0x02159e9c` / `0x02159edc` | Ours compiles to 0xe4, the original is 0x118. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendClientKeyExchange` | `0x02159fb4` / `0x02159ff4` | Ours compiles to 0x154, the original is 0x1d0. RSA-encrypts the pre-master secret. Open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendClientKeyExchange` | `0x02159fb4` / `0x02159ff4` | Ours compiles to 0x154, the original is 0x1d0. RSA-encrypts the pre-master secret. Open.  Its certificate-key view remains provisional and separate from the recovered named-public/CRT-private records. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendChangeCipherSpecAndFinished` | `0x02159db0` / `0x02159df0` | Ours compiles to 0x98, the original is 0xec. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_WaitForChangeCipherSpecAndFinished` | `0x0215a184` / `0x0215a1c4` | 4 bytes differ, same size. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_DoHandshake` | `0x0215a1a8` / `0x0215a1e8` | 15 bytes differ, same size. Open. |
