@@ -2287,6 +2287,7 @@ overlays/ov194 0x021c1fac reloc_addend 0x380
 overlays/ov194 0x021c2acc reloc_module overlay(139)
 overlays/ov194 0x021c2ad8 reloc_module overlay(139)
 overlays/ov194 0x021c2ae4 reloc_module overlay(139)
+overlays/ov194 0x021c2b08 section_start src/ov194/pokemontrade_2d.c:.text
 overlays/ov194 0x021c4470 reloc_addend 0x380
 overlays/ov194 0x021c4cc8 reloc_module overlay(139)
 overlays/ov194 0x021c4ce8 reloc_module overlay(139)
@@ -2300,6 +2301,8 @@ overlays/ov194 0x021c4f72 reloc_module overlay(139)
 overlays/ov194 0x021c501c reloc_module overlay(139)
 overlays/ov194 0x021c5088 reloc_module overlay(139)
 overlays/ov194 0x021c679c add_data data_ov194_021c679c
+overlays/ov194 0x021c6a90 section_start src/ov194/pokemontrade_2d.c:.rodata
+overlays/ov194 0x021c6a90 add_data data_ov194_021c6a90
 overlays/ov194 0x021c6c98 remove_reloc
 overlays/ov194 0x021c6cb8 remove_reloc
 overlays/ov194 0x021c6d78 remove_reloc

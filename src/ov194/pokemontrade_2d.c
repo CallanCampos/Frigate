@@ -37,7 +37,7 @@
 #include "system/printsys.h"
 
 // The trade's 2D: the backgrounds of both screens, the strip of boxes on the lower screen with the Pokémon icons in
-// it, the touch bar, and the sprites of the panels
+// it, and the sprites of the panels
 
 // The strip: the party's two columns of three, then each box's six columns of five, each column 24 pixels wide. On
 // the background, the party takes 12 tiles and each box 20
@@ -167,58 +167,6 @@ static const u32 sNegoIconPosMain[6][2] = {
 static const u32 sNegoIconPosSub[6][2] = {
     { 24, 46 }, { 24, 94 }, { 24, 142 }, { 152, 46 }, { 152, 94 }, { 152, 142 },
 };
-
-void func_ov194_021c2a24(PokemonTradeWork *wk) {
-    TouchBarItem items[] = {
-        { 1, { 232, 168 } },
-        { TOUCHBAR_ICON_CUSTOM, { 28, 168 } },
-        { TOUCHBAR_ICON_CUSTOM + 1, { 204, 168 } },
-        { TOUCHBAR_ICON_CUSTOM + 2, { 48, 168 } },
-    };
-    TouchBarSetup setup;
-
-    sys_memset(&setup, 0, sizeof(setup));
-    setup.items = items;
-    setup.count = NELEMS(items);
-    setup.unit = wk->clactUnit;
-    setup.unk1C = TRUE;
-    setup.bgPalette = 7;
-    setup.objPalette = 0;
-    setup.vramType = 2;
-    setup.bg = 4;
-
-    items[1].charRes = wk->objRes[TRADE_OBJRES_CHAR_SUB];
-    items[1].plttRes = wk->objRes[TRADE_OBJRES_PLTT_SUB];
-    items[1].cellRes = wk->objRes[TRADE_OBJRES_CELL_SUB];
-    items[1].anims[0] = 6;
-    items[1].anims[1] = 5;
-    items[1].anims[2] = 4;
-    items[1].key = 0;
-    items[1].se = SEQ_SE_DECIDE1;
-
-    items[2].charRes = wk->objRes[TRADE_OBJRES_CHAR_SUB];
-    items[2].plttRes = wk->objRes[TRADE_OBJRES_PLTT_SUB];
-    items[2].cellRes = wk->objRes[TRADE_OBJRES_CELL_SUB];
-    items[2].anims[0] = 9;
-    items[2].anims[1] = 8;
-    items[2].anims[2] = 7;
-    items[2].key = PAD_BUTTON_START;
-    items[2].se = SEQ_SE_DECIDE1;
-
-    items[3].charRes = wk->objRes[TRADE_OBJRES_CHAR_SUB];
-    items[3].plttRes = wk->objRes[TRADE_OBJRES_PLTT_SUB];
-    items[3].cellRes = wk->objRes[TRADE_OBJRES_CELL_SUB];
-    items[3].anims[0] = 22;
-    items[3].anims[1] = 21;
-    items[3].anims[2] = 20;
-    items[3].key = PAD_KEY_RIGHT | PAD_KEY_LEFT;
-    items[3].se = SEQ_SE_DECIDE1;
-
-    wk->touchBar = TouchBar_Create(&setup, wk->heapId);
-    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 2, FALSE);
-    TouchBar_SetIconVisible(wk->touchBar, TOUCHBAR_ICON_CUSTOM + 1, FALSE);
-    TouchBar_SetPriority(wk->touchBar, 2);
-}
 
 // The colour of a Pokémon's slot, an index into the box palette: none for an empty slot, the species' colour, or the
 // colour of an egg, Manaphy's being different

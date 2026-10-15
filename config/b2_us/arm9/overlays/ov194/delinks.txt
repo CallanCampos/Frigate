@@ -41,6 +41,11 @@ src/ov194/pokemontrade_3d.c:
     .bss        start:0x021d3360 end:0x021d3380
 
 src/ov194/pokemontrade_2d.c:
-    .text       start:0x021c2a24 end:0x021c6380
-    .rodata     start:0x021c6a10 end:0x021c6dc8
+    .text       start:0x021c2b08 end:0x021c6380
+    .rodata     start:0x021c6a90 end:0x021c6dc8
     .data       start:0x021c6fd4 end:0x021c7360
+
+src/ov194/pokemontrade_touchbar.c:
+    complete
+    .text       start:0x021c2a24 end:0x021c2b08
+    .rodata     start:0x021c6a10 end:0x021c6a90
