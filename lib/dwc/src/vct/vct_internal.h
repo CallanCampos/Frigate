@@ -29,68 +29,6 @@ extern const char VCTi_Signature[];
 #define VCT_TYPE_SYNC 0x41
 #define VCT_TYPE_BROADCAST 0xff
 
-// How the samples of a frame are coded
-typedef enum VCTCodec {
-    VCT_CODEC_PCM8,
-    VCT_CODEC_MULAW,
-    VCT_CODEC_ADPCM2,
-    VCT_CODEC_ADPCM3,
-    VCT_CODEC_ADPCM4,
-    VCT_CODEC_MAX,
-} VCTCodec;
-
-// A voice packet as it goes over the wire
-typedef struct VCTVoicePacket {
-    u32 magic;
-    u8 type;
-    // The codec, with the top bit set on the first frame after a silence
-    u8 codec;
-    u16 sequence;
-    u32 timestamp;
-    u8 payload[0x454];
-} VCTVoicePacket;
-
-// What one machine's voice has gone through on the way to being played
-typedef struct VCTReceiver {
-    u32 avgDelay;
-    u32 playoutDelay;
-    int queuedCount;
-    int skewDifference;
-    u32 lastSequenceSeen;
-    int lostCount;
-    int unk18;
-    int lateCount;
-    int playedCount;
-    int codec;
-    u32 lastDelay;
-    u32 avgDelayCopy;
-    u32 syncSequence;
-    int slot;
-    int aid;
-    VCTPacket *held;
-    int unk40;
-    u64 firstArrival;
-    u32 firstTimestamp;
-    int unk50;
-    u32 lastSequence;
-    u32 lastPlayedSequence;
-    int needsReset;
-    u32 wrap;
-    u32 expectedSequence;
-    u16 sequence16;
-    u8 pad6a[2];
-    u32 warmup;
-    int unk70;
-    int skewAverage;
-    int skewFirst;
-    int jitterAverage;
-    int lastSkew;
-    int burstCount;
-    int delayFloor;
-    u32 delayCeiling;
-    u32 belowCount;
-} VCTReceiver;
-
 // What the library keeps of its configuration
 struct VCTSettings {
     u8 aid;
@@ -125,19 +63,5 @@ u16 func_0207bb84(void);
 #define REG_SQRT_PARAM_LO (*(vu32 *)0x040002b8)
 #define REG_DIVCNT_BUSY 0x8000
 #define REG_SQRTCNT_BUSY 0x8000
-
-// vct_audio.c: the frames going out and coming in
-BOOL VCT_InitAudio(void);
-void VCT_ClearSessionCount(void);
-BOOL VCT_AttachSession(VCTSession *session);
-void VCT_DetachSession(VCTSession *session);
-BOOL VCT_SubmitSamples(void *samples, int size);
-BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask);
-BOOL VCT_SetCodec(int codec);
-void VCT_SetVad(BOOL enabled);
-void VCT_SetEchoCancel(BOOL enabled);
-BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now);
-int VCT_DecodeReceived(void);
-BOOL VCT_SendPending(void);
 
 #endif // POKEBW2_DWC_VCT_INTERNAL_H
