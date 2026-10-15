@@ -2,8 +2,8 @@
 #define POKEBW2_APP_POKEMON_TRADE_LOCAL_H
 
 #include "types.h"
-#include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/pokemon_trade.h"
+#include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
 #include "field/unity_tower.h"
