@@ -23,7 +23,7 @@ typedef struct {
     void *wcmWork;           // 0x00
     u32 searchOption;        // 0x04
     WCMConfig *config;       // 0x08
-    u32 wepMode;             // 0x0c
+    u32 connectOption;       // 0x0c, passed to WCM_SetSearchOption during connection setup
     const u8 *bssid;         // 0x10
     const u8 *essid;         // 0x14
     int state;               // 0x18
@@ -60,7 +60,7 @@ static void WcmNotify(WCMNotice *notice) {
                     }
                 }
             } else if (sWcm.state == STATE_CONNECTING) {
-                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
+                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.connectOption) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
@@ -126,7 +126,7 @@ static void WcmNotify(WCMNotice *notice) {
                     }
                 }
             } else if (sWcm.state == STATE_CONNECTING) {
-                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
+                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.connectOption) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
@@ -162,7 +162,7 @@ static void WcmNotify(WCMNotice *notice) {
                     }
                 }
             } else if (sWcm.state == STATE_CONNECTING) {
-                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) != WCM_RESULT_ACCEPT) {
+                if (WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.connectOption) != WCM_RESULT_ACCEPT) {
                     sWcm.state = STATE_IDLE;
                     if (sWcm.callback != NULL) {
                         sWcm.callback(DWC_WCM_EVENT_FAILED, 0);
@@ -345,10 +345,10 @@ BOOL DWC_Wcm_Cleanup(void) {
     return FALSE;
 }
 
-BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 wepMode) {
+BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
     u32 irq = CPU_IRQDisable();
 
-    sWcm.wepMode = wepMode;
+    sWcm.connectOption = option;
     if (wepDesc != NULL) {
         sys_memcpy(wepDesc, sWcm.wepDesc, 0x50);
     } else {
@@ -361,7 +361,7 @@ BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 wepMode) {
         return TRUE;
     }
     if (sWcm.state == STATE_IDLE &&
-        WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.wepMode) == WCM_RESULT_ACCEPT) {
+        WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.connectOption) == WCM_RESULT_ACCEPT) {
         sWcm.state = STATE_CONNECTING;
         CPU_SetIRQMask(irq);
         return TRUE;

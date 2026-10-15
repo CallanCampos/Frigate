@@ -103,14 +103,14 @@ typedef struct WCMWork {
     // Descriptive private storage recovered from WCM's copies and WM command arguments.
     struct {
         u8 data[0x50];
-        u8 mode;
-        u8 argument;
+        u8 mode;     // Secondary descriptor mode.
+        u8 argument; // Legacy key index or variable-copy byte count; mode zero retains the previous byte.
         u8 padding[2];
     } connectionStorage; // 0x1240..0x1293; no original SDK type identity established
     OSAlarm alarm; // 0x1294
     s32 dmaNo; // 0x12c0, from WCMConfig.dmano
     void *apBuffer; // 0x12c4, from WCMConfig.pbdbuffer: a WCMApListHeader followed by its entries
-    u32 apBufferWords; // 0x12c8, from WCMConfig.nbdbuffer
+    u32 apBufferBytes; // 0x12c8, from WCMConfig.nbdbuffer
     u32 scanMode; // 0x12cc, from WCMConfig.nbdmode
     WCMNotify notify; // 0x12d0
     u32 searchOption; // 0x12d4
@@ -160,7 +160,6 @@ static WCMGlobal sWcm;
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode);
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option);
 static s32 WCM_OnBeaconReceivedDSi(void *frame);
-static void WCM_StoreKnownNetwork(const void *bssDesc, const void *wepDesc);
 static void WCM_AddRssiSample(s32 rawSample);
 static WCMWork *WCM_GetWork(void);
 static void WCM_SetConfig(WCMConfig *config, WCMNotify notify);
@@ -458,7 +457,7 @@ s32 WCM_StopSearchAsync(void) {
     }
 }
 
-s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 wepMode) {
+s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option) {
     u32 irq;
     WCMWork *work;
     s32 result;
@@ -475,12 +474,38 @@ s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 wepMode) {
             CPU_SetIRQMask(irq);
             return 1;
         }
-        if (((const u16 *)bssDesc)[0] != 0) {
+        if (((const WMBssDesc *)bssDesc)->gameInfoLength != 0) {
             CPU_SetIRQMask(irq);
             return 1;
         }
-        WCM_StoreKnownNetwork(bssDesc, wepDesc);
-        WCM_BuildScanRequest((void *)bssDesc, (void *)wepDesc, wepMode);
+        if (wepDesc != NULL) {
+            const u8 *descriptor = wepDesc;
+
+            // BUG: The original checks the previous argument byte, allowing a new length beyond the apparent 0x40
+            // limit.
+#ifdef BUGFIX
+            if ((descriptor[0] <= 3 && descriptor[1] >= 4) || descriptor[1] > 0x40) {
+#else
+            if ((descriptor[0] <= 3 && descriptor[1] >= 4) || work->connectionStorage.argument > 0x40) {
+#endif
+                CPU_SetIRQMask(irq);
+                return 1;
+            }
+            work->connectionStorage.mode = descriptor[0];
+            if (descriptor[0] == 0) {
+                sys_memset(work->connectionStorage.data, 0, sizeof(work->connectionStorage.data));
+            } else if (descriptor[0] <= 3) {
+                work->connectionStorage.argument = descriptor[1];
+                sys_memcpy(descriptor + 2, work->connectionStorage.data, sizeof(work->connectionStorage.data));
+            } else {
+                work->connectionStorage.argument = descriptor[1];
+                sys_memcpy(descriptor + 2, work->connectionStorage.data, work->connectionStorage.argument);
+            }
+        } else {
+            sys_memset(&work->connectionStorage, 0, sizeof(work->connectionStorage));
+        }
+        sys_memcpy(bssDesc, work->unk_12e0, sizeof(work->unk_12e0));
+        WCM_SetSearchOption(option);
         break;
     case 8:
         CPU_SetIRQMask(irq);
@@ -493,7 +518,7 @@ s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 wepMode) {
         return 1;
     }
 
-    switch (work->unk_12e0[0]) {
+    switch (work->wirelessMode) {
     case 1:
         result = WCM_ConnectStep2();
         break;
@@ -689,19 +714,21 @@ static void WCM_SetConfig(WCMConfig *config, WCMNotify notify) {
     if (config == NULL) {
         work->dmaNo = 3;
         work->apBuffer = NULL;
-        work->apBufferWords = 0;
+        work->apBufferBytes = 0;
         work->scanMode = 0;
     } else {
+        u32 alignmentDelta = (4 - ((u32)config->pbdbuffer & 3)) & 3;
+
         work->dmaNo = config->dmano & 3;
-        if ((config->nbdbuffer - (4 - (s32)config->pbdbuffer & 3)) <= 0xc) {
+        if ((u32)config->nbdbuffer < alignmentDelta + sizeof(WCMApListHeader)) {
             work->apBuffer = NULL;
-            work->apBufferWords = 0;
+            work->apBufferBytes = 0;
         } else {
             u32 align = ((u32)config->pbdbuffer + 3) & ~3u;
-            u32 words = config->nbdbuffer - ((4 - ((u32)config->pbdbuffer & 3)) & 3);
+            u32 byteCount = (u32)config->nbdbuffer - alignmentDelta;
             work->apBuffer = (void *)align;
-            work->apBufferWords = words;
-            sys_memset(work->apBuffer, 0, words);
+            work->apBufferBytes = byteCount;
+            sys_memset(work->apBuffer, 0, byteCount);
         }
         work->scanMode = config->nbdmode;
     }
@@ -796,8 +823,8 @@ static void WCM_ClearApListBuffer(void) {
     u32 irq = CPU_IRQDisable();
     WCMWork *work = WCM_GetWork();
 
-    if (work != NULL && work->apBuffer != NULL && (s32)work->apBufferWords > 0) {
-        sys_memset(work->apBuffer, 0, work->apBufferWords);
+    if (work != NULL && work->apBuffer != NULL && (s32)work->apBufferBytes > 0) {
+        sys_memset(work->apBuffer, 0, work->apBufferBytes);
     }
     CPU_SetIRQMask(irq);
 }
@@ -809,7 +836,7 @@ s32 WCM_CountApList(void) {
 
     if (work != NULL) {
         WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
-        if (header != NULL && work->apBufferWords > 0xc) {
+        if (header != NULL && work->apBufferBytes > 0xc) {
             count = header->count;
         }
     }
@@ -899,10 +926,10 @@ static WCMApEntry *WCM_AllocApEntry(void) {
     if (header == NULL) {
         return NULL;
     }
-    if (work->apBufferWords <= 0xc) {
+    if (work->apBufferBytes <= 0xc) {
         return NULL;
     }
-    max = (work->apBufferWords - 0xc) / sizeof(WCMApEntry);
+    max = (work->apBufferBytes - 0xc) / sizeof(WCMApEntry);
     if (header->count >= max) {
         return NULL;
     }
@@ -934,7 +961,7 @@ static WCMApEntry *WCM_GetOldestApEntry(void) {
     WCMWork *work = WCM_GetWork();
     WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
 
-    if (header != NULL && work->apBufferWords > 0xc) {
+    if (header != NULL && work->apBufferBytes > 0xc) {
         return header->head;
     }
     return NULL;
@@ -948,7 +975,7 @@ static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid) {
     if (bssid == NULL) {
         return NULL;
     }
-    if (header != NULL && work->apBufferWords > 0xc) {
+    if (header != NULL && work->apBufferBytes > 0xc) {
         for (entry = header->head; entry != NULL; entry = entry->next) {
             u8 *record = entry->record;
             if (WCM_CompareBssID(record + 4, bssid)) {
@@ -964,7 +991,7 @@ static WCMApEntry *WCM_FindApEntryById(s32 id) {
     WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
     WCMApEntry *entry = NULL;
 
-    if (header != NULL && work->apBufferWords > 0xc) {
+    if (header != NULL && work->apBufferBytes > 0xc) {
         for (entry = header->head; entry != NULL; entry = entry->next) {
             if (entry->id == id) {
                 break;
@@ -982,7 +1009,7 @@ static void WCM_TouchApEntry(WCMApEntry *entry) {
     if (entry == NULL) {
         return;
     }
-    if (header == NULL || work->apBufferWords <= 0xc) {
+    if (header == NULL || work->apBufferBytes <= 0xc) {
         return;
     }
     walk = header->head;

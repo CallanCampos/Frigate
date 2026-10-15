@@ -32,11 +32,14 @@ enum {
 // A WCM_Init's work, and the configuration that WCM_StartupAsync starts with
 #define WCM_WORK_SIZE 0x2300
 
+// The configuration is consumed during startup. Its writable AP-list buffer is borrowed until replaced or Finish.
+// WCM aligns the buffer upward to four bytes, subtracts the skipped bytes, and clears the usable region.
+// At least 12 aligned bytes are needed for the AP-list header.
 typedef struct {
-    s32 dmano;
-    void *pbdbuffer;
-    s32 nbdbuffer;
-    s32 nbdmode;
+    s32 dmano;       // WCM uses the low two bits.
+    void *pbdbuffer; // Borrowed AP-list storage.
+    s32 nbdbuffer;   // Buffer size in bytes, including any leading alignment bytes.
+    s32 nbdmode;     // AP-list mode, copied into WCM's work.
 } WCMConfig;
 
 typedef void (*WCMNotify)(WCMNotice *notice);
@@ -52,7 +55,9 @@ s32 WCM_CleanupAsync(void);
 s32 WCM_SearchAsync(const u8 *bssid, const u8 *essid, u32 option);
 // Descriptive name: requests a scan stop, with completion through WCM_NOTIFY_END_SEARCH.
 s32 WCM_StopSearchAsync(void);
-s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 wepMode);
+// Accepted descriptors are copied into WCM's work during this call; their pointers are not retained.
+// option is applied through WCM_SetSearchOption before the connection backend starts.
+s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option);
 s32 WCM_DisconnectAsync(void);
 // Starts a local wireless (DS-to-DS) parent connection, parallel to WCM_ConnectAsync's infrastructure one
 s32 WCM_StartParentAsync(void);
