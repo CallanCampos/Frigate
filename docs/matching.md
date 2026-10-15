@@ -2035,6 +2035,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   DWC utility's `dwc_wcm.c` (overlay 182) matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and
   `sEssid[0x20]` defined in that order, but the module check failed until they were defined as `sEssid`, `sBssid`,
   `sWcm`, the ROM's order backwards.
+- MWCC 2.0 (`2.0/sp2p2`) gives each initialized global of a file its own section and orders them by size, smallest
+  first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a
+  count and eight function pointers, 4 bytes each, before an 80-byte table: it declares the pointers in the reverse of
+  the ROM's order, then the count, then the table. `cgtool.c` declares its two 12-byte joint tables in reverse and
+  its 16-byte texture-matrix table after them, which the size puts last. The compiled object's symbol table shows the
+  order.
 - MWCC 2.0 reaches a file's own statics of one section through a shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`),
   and another file's global by its own address. In overlay 182 that set the seam between `dwc_aoss.c`, which loads
   the free callback at `0x021c294c` directly, and `dwc_aoss_ap.c`, which loads it as `0x021c2940` + 0xc. It emits a
