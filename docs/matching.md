@@ -2118,6 +2118,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   after a file's larger tables, is the next file's first object: the 4 bytes at 0x021a773c in overlay 310 can't end
   `research_graph.c`, whose tables are larger, and as `research_common.c`'s global `ResearchCommon_Unused` they take
   a section of their own ahead of that file's 8-byte table, as the ROM has them.
+- A global nothing refers to that the ROM has after the shared section, where ours sorts it first, needs an object
+  of its size or less in the shared section that the sort puts first, and the globals' declaration order decides
+  that tie: overlay 280's `namein.c` puts `NAME_ENTRY_SOUND_COUNT` where the ROM has it only declared right after
+  the array it counts, above the tables. When the function-local statics are all one size and every table is at
+  file scope, though, the layout fixes only their order in MWCC's list, not which functions own them: a fit with
+  placeholder statics proves nothing without the code using the values.
 - A small table that sits among a file's other small `static const` tables but that no code loads from was a
   referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
   of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven
