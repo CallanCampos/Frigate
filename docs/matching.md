@@ -2130,6 +2130,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   after a file's larger tables, is the next file's first object: the 4 bytes at 0x021a773c in overlay 310 can't end
   `research_graph.c`, whose tables are larger, and as `research_common.c`'s global `ResearchCommon_Unused` they take
   a section of their own ahead of that file's 8-byte table, as the ROM has them.
+- A global the file never reads can be defined anywhere in it, and moving its definition past functions changes
+  MWCC's listing. Try that before assuming objects the link stripped: overlay 209's `sta_acting.c`, whose three
+  12-byte initializers no table order fixed, matches with `STA_ACTING_UNUSED` (read only by an uncalled header
+  inline) defined after `StaActing_UpdateScroll` and `STA_ACTING_VRAM_CONFIG` first among the tables. Sections of
+  their own are created in sorted order, so among equal sizes which sorts first also decides whether the shared
+  section comes before small initializers; check the object's section order, not only its symbol table.
 - A global nothing refers to that the ROM has after the shared section, where ours sorts it first, needs an object
   of its size or less in the shared section that the sort puts first, and the globals' declaration order decides
   that tie: overlay 280's `namein.c` puts `NAME_ENTRY_SOUND_COUNT` where the ROM has it only declared right after

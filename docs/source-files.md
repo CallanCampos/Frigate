@@ -1986,7 +1986,7 @@ prints the tables below from the configs and the ROM:
 | `sta_act_light.c` | `0x021bd42c`–`0x021bd778` | 12 | complete | string at `0x021c3084` |
 | `sta_act_bg.c` | `0x021bd778`–`0x021bd8f0` | 7 | complete | string at `0x021c30d0` |
 | `sta_act_poke.c` | `0x021bd8f0`–`0x021be9b0` | 36 | complete | string at `0x021c30e0` |
-| `sta_acting.c` | `0x021be9b0`–`0x021c0380` | 68 | partial | string at `0x021c30f0` |
+| `sta_acting.c` | `0x021be9b0`–`0x021c0380` | 68 | complete | string at `0x021c30f0` |
 | `sta_act_effect.c` | `0x021c0380`–`0x021c051c` | 9 | complete | string at `0x021c3100` |
 | `sta_act_audience.c` | `0x021c051c`–`0x021c0ae0` | 15 | complete | string at `0x021c3114` |
 | `sta_act_button.c` | `0x021c0ae0`–`0x021c1024` | 6 | complete | string at `0x021c3128` |
