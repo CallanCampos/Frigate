@@ -28,8 +28,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install clang-format
-        run: python -m pip install clang-format==23.1.1
+      - name: Install clang-format and PyYAML
+        run: python -m pip install clang-format==23.1.1 pyyaml==6.0.3
 
       - name: Find the base
         id: base
