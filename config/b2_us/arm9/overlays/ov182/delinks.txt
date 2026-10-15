@@ -42,3 +42,8 @@ lib/dwcutilui/src/dwc_util_ui_object.c:
     .text       start:0x021ab17c end:0x021ab588
     .rodata     start:0x021bfb24 end:0x021bfb54
     .bss        start:0x021c4028 end:0x021c402c
+
+src/ov182/download_play.c:
+    .text       start:0x021b93e8 end:0x021b9bbc
+    .data       start:0x021c1484 end:0x021c1770
+    .bss        start:0x021c417c end:0x021c4180
