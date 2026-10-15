@@ -1025,6 +1025,9 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
+  one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
+  parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
 - A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
   `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
   task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
