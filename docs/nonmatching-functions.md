@@ -380,7 +380,7 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_Finish` | `0x0215bce0` / `0x0215bd20` | Ours compiles to 0x34, the original is 0x3c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_GetRequiredWorkSize` | `0x0215bd1c` / `0x0215bd5c` | Ours compiles to 0x2e, the original is 0x3a |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupAsync` | `0x0215bd58` / `0x0215bd98` | Ours compiles to 0xa0, the original is 0x98 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CleanupAsync` | `0x0215be00` / `0x0215be40` | Ours compiles to 0x48, the original is 0x78 |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CleanupAsync` | `0x0215be00` / `0x0215be40` | Size 0x7c/0x78. Restored state 3 reaching the backend/substate switch; the earlier C returned on every path. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SearchAsyncWithParams` | `0x0215bea0` / `0x0215bee0` | 12 bytes differ, same size. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ContinueSearchAsync` | `0x0215bf14` / `0x0215bf54` | Ours compiles to 0x70, the original is 0x64 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectAsync` | `0x0215bf78` / `0x0215bfb8` | Ours compiles to 0xbc, the original is 0x124 |
@@ -391,7 +391,6 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SetConfig` | `0x0215c338` / `0x0215c378` | Ours compiles to 0x90, the original is 0xbc |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ResetSearchOption` | `0x0215c3f4` / `0x0215c434` | 12 bytes differ, same size. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_PickChannel` | `0x0215c40c` / `0x0215c44c` | Ours compiles to 0x54, the original is 0x50 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_NotifyResult` | `0x0215c45c` / `0x0215c49c` | Ours compiles to 0x28, the original is 0x30 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SetState` | `0x0215c4bc` / `0x0215c4fc` | Ours compiles to 0x58, the original is 0x70 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CancelTimeout` | `0x0215c52c` / `0x0215c56c` | Ours compiles to 0x48, the original is 0x4c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ClearApListBuffer` | `0x0215c594` / `0x0215c5d4` | Ours compiles to 0x34, the original is 0x3c |
@@ -413,7 +412,7 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_AddRssiSample` | `0x0215ce24` / `0x0215ce64` | Ours compiles to 0x10, the original is 0x64 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupStep1` | `0x0215ce88` / `0x0215cec8` | Ours compiles to 0x94, the original is 0xc8 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupStep2` | `0x0215cf50` / `0x0215cf90` | Ours compiles to 0x40, the original is 0x44 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep1` | `0x0215cf94` / `0x0215cfd4` | Ours compiles to 0x6c, the original is 0xa4 |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep1` | `0x0215cf94` / `0x0215cfd4` | Size 0xa0/0xa4. Restored scan-request initialization, cache maintenance, counter update and submission; request storage now uses the SDK-owned WMScanExParam at work+0x22a0. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep2` | `0x0215d038` / `0x0215d078` | Ours compiles to 0x40, the original is 0x74 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_DisconnectStep` | `0x0215d0ac` / `0x0215d0ec` | Ours compiles to 0x40, the original is 0x44 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartParentStep` | `0x0215d0f0` / `0x0215d130` | Ours compiles to 0x70, the original is 0x94 |
@@ -421,15 +420,15 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ComputeChannelGap` | `0x0215d1f8` / `0x0215d238` | Ours compiles to 0x42, the original is 0x4e |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CancelConnection` | `0x0215d248` / `0x0215d288` | Ours compiles to 0x38, the original is 0x3c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_OnWmIndication` | `0x0215d284` / `0x0215d2c4` | 53 bytes differ, same size. |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep3` | `0x0215d2d8` / `0x0215d318` | Ours compiles to 0x104, the original is 0x1e0 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep4` | `0x0215d4b8` / `0x0215d4f8` | Ours compiles to 0x64, the original is 0x1b0 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep5` | `0x0215d668` / `0x0215d6a8` | Ours compiles to 0x32, the original is 0x54 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep6` | `0x0215d6bc` / `0x0215d6fc` | Ours compiles to 0xc8, the original is 0x17c |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep7` | `0x0215d838` / `0x0215d878` | Ours compiles to 0x74, the original is 0x8c |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep8` | `0x0215d8c4` / `0x0215d904` | Ours compiles to 0xa0, the original is 0xb4 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep2` | `0x0215d978` / `0x0215d9b8` | Ours compiles to 0x58, the original is 0xc4 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep3` | `0x0215da3c` / `0x0215da7c` | Ours compiles to 0x40, the original is 0x1f0 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_BuildConnectRequest` | `0x0215dc2c` / `0x0215dc6c` | Ours compiles to 0xc0, the original is 0xdc |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep3` | `0x0215d2d8` / `0x0215d318` | Size 0x10c/0x1e0. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep4` | `0x0215d4b8` / `0x0215d4f8` | Size 0x1a0/0x1b0. Restored scan callbacks, beacon delivery, channel/counter updates, cache maintenance and resubmission; register allocation and code generation remain open. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep5` | `0x0215d668` / `0x0215d6a8` | Size 0x34/0x54. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep6` | `0x0215d6bc` / `0x0215d6fc` | Size 0x170/0x17c. Restored callback state handling and the halfword fields at work+0x22e8/0x22ea, preserving genuine BSS storage at work+0x12e0. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep7` | `0x0215d838` / `0x0215d878` | Size 0x80/0x8c. Uses the recovered halfword at work+0x22e8 and four-argument notification helper; the surrounding callback remains incomplete. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep8` | `0x0215d8c4` / `0x0215d904` | Size 0xa8/0xb4. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep2` | `0x0215d978` / `0x0215d9b8` | Size 0x5c/0xc4. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep3` | `0x0215da3c` / `0x0215da7c` | Size 0x1e4/0x1f0. Restored state handling, tail-halfword accesses and notification arguments from the original; code generation remains open. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_BuildScanRequest` | `0x0215dc2c` / `0x0215dc6c` | Same size, 5 bytes differ. Corrected the void return, byte offsets, scan fields, channel mask, scan-type comparison and scan counter. The request reuses WMScanExParam; formerly named WCM_BuildConnectRequest. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_OnAsyncDone` | `0x0215dd08` / `0x0215dd48` | Ours compiles to 0x24, the original is 0x26 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_OnAsyncDoneWithStatus` | `0x0215dd30` / `0x0215dd70` | Ours compiles to 0x42, the original is 0x44 |
 | `lib/nitrowifi/src/ssl/ssl.c` | `CPS_SslCanRead` | `0x0215a43c` / `0x0215a47c` | 1 byte: the final `bne` branches to the wrong one of the two adjacent return blocks (`return 0` vs `return -1`), despite the condition being written in the same order as the asm. Tried both the combined-condition and the fully nested-if forms; the nested form made it worse (15 bytes), so this is the closest. Open. |

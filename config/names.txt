@@ -2866,7 +2866,7 @@ overlays/ov011 0x0215d838 WCM_ConnectStep7
 overlays/ov011 0x0215d8c4 WCM_ConnectStep8
 overlays/ov011 0x0215d978 WCM_ParentStep2
 overlays/ov011 0x0215da3c WCM_ParentStep3
-overlays/ov011 0x0215dc2c WCM_BuildConnectRequest
+overlays/ov011 0x0215dc2c WCM_BuildScanRequest
 overlays/ov011 0x0215dd08 WCM_OnAsyncDone
 overlays/ov011 0x0215dd30 WCM_OnAsyncDoneWithStatus
 overlays/ov011 0x0216eea8 Gt2_GetEngine
