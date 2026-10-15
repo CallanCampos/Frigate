@@ -97,21 +97,14 @@ static BOOL DWCi_GHTTPCompleted(int request, int result, char *buffer, int lengt
     completed = entry->param.completed;
     freeBuffer = entry->param.freeBuffer;
     if (completed != NULL) {
-        char *data;
-        int dataLength;
-
         if (result == 0) {
-            data = buffer;
-            dataLength = length;
+            completed(buffer, length, result, entry->param.param);
+        } else if (result == 0x12) {
+            completed(NULL, 0, result, entry->param.param);
         } else {
-            if (result == 0x12) {
-            } else {
-                DWCi_HandleGHTTPError(result);
-            }
-            data = NULL;
-            dataLength = 0;
+            DWCi_HandleGHTTPError(result);
+            completed(NULL, 0, result, entry->param.param);
         }
-        completed(data, dataLength, result, entry->param.param);
     }
     if (result != 0 || freeBuffer == TRUE) {
         if (entry != NULL && entry->buffer != NULL) {
@@ -205,8 +198,8 @@ void DWC_CancelGHTTPRequest(int request) {
 
 // Sets the error of the Wi-Fi library from the result of a request (or the error that making it gave)
 int DWCi_HandleGHTTPError(int error) {
-    int type = 7;
     int code = -98000;
+    int type = 7;
 
     if (error == 0) {
         return 0;
@@ -247,6 +240,8 @@ int DWCi_HandleGHTTPError(int error) {
         code -= 50;
         break;
     case 6:
+    case 11:
+    case 12:
         code -= 20;
         break;
     case 7:
@@ -256,10 +251,6 @@ int DWCi_HandleGHTTPError(int error) {
     case 9:
     case 10:
         code -= 870;
-        break;
-    case 11:
-    case 12:
-        code -= 20;
         break;
     case 13:
     case 14:

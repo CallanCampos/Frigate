@@ -93,6 +93,7 @@ lib/dwc/src/nhttp/d_nhttp_private.c:
     .text       start:0x021a0e1c end:0x021a1160
 
 lib/dwc/src/ghttp/dwc_ghttp.c:
+    complete
     .text       start:0x021a1160 end:0x021a154c
     .data       start:0x021ad294 end:0x021ad2a0
     .bss        start:0x021b2860 end:0x021b2868
