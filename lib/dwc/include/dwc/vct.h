@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_VCT_H
 
 #include "types.h"
+#include "struct_decls.h"
 
 // Nintendo's voice chat library libVCT (the ROM carries the version string "[SDK+Nintendo:libVCT 1.4.1]"), which
 // sends the microphone's sound to the machines of a Wi-Fi match and plays what they send. It sits in overlay 29 beside
@@ -30,7 +31,7 @@ struct VCTSession {
 // 2, 3, 9, 11 and 12 for a refusal, a close or the end of it
 typedef void (*VCTCallback)(u8 aid, int event, VCTSession *session, void *userData);
 
-typedef struct VCTConfig {
+struct VCTConfig {
     // Memory for the sessions, and how many there are, at most 8
     VCTSession *sessions;
     u32 sessionCount;
@@ -44,7 +45,7 @@ typedef struct VCTConfig {
     u32 bufferSize;
     VCTCallback callback;
     void *userData;
-} VCTConfig;
+};
 
 // Starts the library, returning FALSE for a configuration it cannot work with
 BOOL VCT_Init(VCTConfig *config);

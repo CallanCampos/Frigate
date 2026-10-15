@@ -140,7 +140,7 @@ typedef struct VCTReceiver {
 } VCTReceiver;
 
 // What the library keeps of its configuration
-typedef struct VCTSettings {
+struct VCTSettings {
     u8 aid;
     u8 hostAid;
     u8 pad2[2];
@@ -149,7 +149,7 @@ typedef struct VCTSettings {
     int unkC;
     int mode;
     int unk14;
-} VCTSettings;
+};
 
 extern VCTSettings gVCTSettings;
 

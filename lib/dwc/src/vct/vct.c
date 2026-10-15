@@ -4,11 +4,11 @@
 
 // The library's entry points: starting and stopping it, running it a tick, and sorting what the network gives it.
 
-typedef struct VCTLibrary {
+struct VCTLibrary {
     u32 tickCount;
     u32 receivedCount;
     BOOL initialized;
-} VCTLibrary;
+};
 
 static VCTLibrary sLibrary;
 VCTSettings gVCTSettings;
