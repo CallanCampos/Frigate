@@ -1810,6 +1810,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
   `.data` match: the strings give the original's variable names. `country_region.c`'s `Country_IsValidPlace` loops
   while `i < gSelectableCountryCount ? TRUE : FALSE`, a loop that `#pragma optimization_level 1` or `2` also shapes.
+  No enum counter is needed for it in game code: overlay 214's `WorldTrade_NationSortListMake` gets the original's
+  loop entry and registers from `i < num ? TRUE : FALSE` alone. An expression that two of a call's arguments share,
+  as its `first + i` is, becomes a common-subexpression temporary computed before the call's stack arguments are
+  stored, which decides which register loads it; the original computed it after (its row).
 - A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
   `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
   `i < 8`, and an inline with `return kind < N;`, are both rotated.
