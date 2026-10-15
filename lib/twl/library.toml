@@ -29,3 +29,18 @@ flags = [
 "photo_sign_client.c" = ["-nothumb"]
 "photo_sign.c" = ["-nothumb"]
 "photo_sign_util.c" = ["-nothumb"]
+
+# Files registered from the untouched-code scouting; flags beyond the mode are not settled yet
+"rtc/rtc_api_ex.c" = ["-nothumb"]
+"camera/camera_api.c" = ["-nothumb"]
+"camera/camera.c" = ["-nothumb"]
+"nwm/nwm.c" = ["-nothumb"]
+"mic/mic_twl.c" = ["-nothumb"]
+"fatfs/fatfs_api.c" = ["-nothumb"]
+"snd/sndex.c" = ["-nothumb"]
+"dsp/dsp_if.c" = ["-nothumb"]
+"dsp/dsp_process.c" = ["-nothumb"]
+"dsp/dsp_audio.c" = ["-nothumb"]
+"dsp/dsp_pipe.c" = ["-nothumb"]
+"dsp/dsp_g711.c" = ["-nothumb"]
+"dsp/dsp_graphics.c" = ["-nothumb"]

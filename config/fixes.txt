@@ -416,6 +416,7 @@
 . 0x0209b258 add_data data_0209b258
 . 0x0209b2ac remove_symbol
 . 0x0209b328 add_data sEnvMapCmd
+. 0x0209bc20 add_data data_0209bc20
 . 0x0209da80 remove_symbol
 . 0x0209da88 remove_symbol
 . 0x0209da8c remove_symbol

@@ -8882,6 +8882,7 @@ data_0209bbec kind:data(any) addr:0x0209bc2c
 data_0209bbf0 kind:data(any) addr:0x0209bc30
 data_0209bbf4 kind:data(any) addr:0x0209bc34
 data_0209bbf8 kind:data(any) addr:0x0209bc38
+data_0209bc20 kind:data(any) addr:0x0209bc60
 data_0209bc48 kind:data(any) addr:0x0209bc88
 qword_209D768 kind:data(any) addr:0x0209d768
 g_MainMemoryPriorityBlocked kind:bss addr:0x0209d780

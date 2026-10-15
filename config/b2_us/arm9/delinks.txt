@@ -1743,3 +1743,612 @@ lib/nitro/src/math/math_sha1.c:
 lib/nitro/src/math/sha1_block.c:
     complete
     .text       start:0x02077cd4 end:0x02078000
+
+lib/dwc/src/bm/dwc_backup.c:
+    .text       start:0x02056a58 end:0x02056f48
+    .bss        start:0x02141958 end:0x0214196c
+
+lib/dwc/src/bm/dwc_bm_init.c:
+    .text       start:0x02056f48 end:0x02056fb4
+
+lib/dwc/src/bm/util_wifiidtool.c:
+    .text       start:0x02056fb4 end:0x020575d0
+    .rodata     start:0x020940b0 end:0x020940d8
+
+lib/dwc/src/base/dwc_account.c:
+    .text       start:0x020575d0 end:0x020580b8
+    .data       start:0x0209b05c end:0x0209b090
+
+lib/dwc/src/base/dwc_common.c:
+    .text       start:0x020580b8 end:0x02058390
+    .data       start:0x0209b090 end:0x0209b0d8
+
+lib/dwc/src/base/dwc_error.c:
+    .text       start:0x02058390 end:0x020584e4
+    .bss        start:0x0214196c end:0x02141974
+
+lib/dwc/src/base/dwc_init.c:
+    .text       start:0x020584e4 end:0x020586a4
+    .data       start:0x0209b0d8 end:0x0209b10c
+    .bss        start:0x02141974 end:0x0214197c
+
+lib/dwc/src/base/dwc_memfunc.c:
+    .text       start:0x020586a4 end:0x02058840
+    .bss        start:0x0214197c end:0x02141984
+
+lib/dwc/src/wds/wds.c:
+    .text       start:0x02058840 end:0x02058eb0
+    .rodata     start:0x020940d8 end:0x020940dc
+    .bss        start:0x02141984 end:0x02141988
+
+lib/dwc/src/ac/dwc_ac_wcm.c:
+    .text       start:0x02058eb0 end:0x0205975c
+    .rodata     start:0x020940dc end:0x020940e0
+
+lib/dwc/src/ac/dwc_ac_cleanup.c:
+    .text       start:0x0205975c end:0x020598b4
+
+lib/dwc/src/ac/dwc_ac_connect.c:
+    .text       start:0x020598b4 end:0x02059f04
+
+lib/dwc/src/ac/dwc_ac.c:
+    .text       start:0x02059f04 end:0x0205ac24
+    .bss        start:0x02141988 end:0x0214199c
+
+lib/dwc/src/base/dwc_connectinet.c:
+    .text       start:0x0205ac24 end:0x0205b65c
+    .bss        start:0x0214199c end:0x021419a4
+
+lib/dwc/src/ac/dwc_ac_result.c:
+    .text       start:0x0205b65c end:0x0205b890
+
+lib/dwc/src/ac/dwc_ac_aplist.c:
+    .text       start:0x0205b890 end:0x0205be94
+    .rodata     start:0x020940e0 end:0x020940f4
+    .data       start:0x0209b10c end:0x0209b118
+
+lib/dwc/src/base/dwc_wdsscan.c:
+    .text       start:0x0205be94 end:0x0205c2a4
+    .bss        start:0x021419a4 end:0x021419c0
+
+lib/dwc/src/ac/dwc_ac_search.c:
+    .text       start:0x0205c2a4 end:0x0205cf80
+    .rodata     start:0x020940f4 end:0x02094128
+
+lib/dwc/src/ac/dwc_ac_wepkey.c:
+    .text       start:0x0205cf80 end:0x0205d568
+    .rodata     start:0x02094128 end:0x02094160
+    .data       start:0x0209b118 end:0x0209b198
+
+lib/dwc/src/ac/dwc_ac_soc.c:
+    .text       start:0x0205d568 end:0x0205dbc0
+    .rodata     start:0x02094160 end:0x020941b8
+    .data       start:0x0209b198 end:0x0209b1a4
+
+lib/dwc/src/bm/dwc_nvram.c:
+    .text       start:0x0205dbc0 end:0x0205e020
+    .data       start:0x0209b1a4 end:0x0209b1a8
+    .bss        start:0x021419c0 end:0x02141a20
+
+lib/dwc/src/bm/dwc_bm_check.c:
+    .text       start:0x0205e020 end:0x0205ea3c
+
+lib/nitro/src/card/card_common.c:
+    .text       start:0x0206ed94 end:0x0206f2e4
+    .rodata     start:0x02094540 end:0x02094548
+    .bss        start:0x0214b3dc end:0x0214ba80
+
+lib/nitro/src/card/card_request.c:
+    .text       start:0x0206f2e4 end:0x0206f3e0
+
+lib/nitro/src/card/card_backup.c:
+    .text       start:0x0206f3e0 end:0x0206f8b4
+
+lib/nitro/src/card/card_rom.c:
+    .text       start:0x0206f8b4 end:0x0206fed8
+    .data       start:0x0209b500 end:0x0209b508
+    .bss        start:0x0214ba80 end:0x0214bd40
+
+lib/nitro/src/fs/fs_archive.c:
+    .text       start:0x020700a8 end:0x02070c7c
+    .data       start:0x0209b508 end:0x0209b50c
+    .bss        start:0x0214bd4c end:0x0214bf60
+
+lib/nitro/src/fs/fs_file.c:
+    .text       start:0x02070c7c end:0x02070ebc
+
+lib/nitro/src/fs/fs_overlay.c:
+    .text       start:0x02070ebc end:0x0207130c
+    .rodata     start:0x02094548 end:0x02094588
+    .data       start:0x0209b50c end:0x0209b510
+    .bss        start:0x0214bf60 end:0x0214bf80
+
+lib/nitro/src/fs/fs_command_default.c:
+    .text       start:0x0207130c end:0x02072014
+    .rodata     start:0x02094588 end:0x020946bc
+    .data       start:0x0209b510 end:0x0209b514
+
+lib/nitro/src/fs/fs_memfile.c:
+    .text       start:0x02072014 end:0x02072130
+    .data       start:0x0209b514 end:0x0209b518
+    .bss        start:0x0214bf80 end:0x0214bfe0
+
+lib/nitro/src/fs/fs_rom.c:
+    .text       start:0x02072130 end:0x02072390
+    .data       start:0x0209b518 end:0x0209b524
+    .bss        start:0x0214bfe0 end:0x0214c044
+
+lib/nitro/src/fs/fs_api.c:
+    .text       start:0x02072390 end:0x020723b8
+    .bss        start:0x0214c044 end:0x0214c04c
+
+lib/nitro/src/gx/gx.c:
+    .text       start:0x02074718 end:0x020749cc
+    .data       start:0x0209b524 end:0x0209b52c
+    .bss        start:0x0214c04c end:0x0214c050
+
+lib/nitro/src/gx/g2.c:
+    .text       start:0x020749cc end:0x02074b14
+
+lib/nitro/src/gx/g3_util.c:
+    .text       start:0x02074b14 end:0x02074c14
+
+lib/nitro/src/gx/g3imm.c:
+    .text       start:0x02074c14 end:0x02074c9c
+
+lib/nitro/src/gx/g3x.c:
+    .text       start:0x02074c9c end:0x02075100
+
+lib/nitro/src/gx/gx_bgcnt.c:
+    .text       start:0x02075100 end:0x020754b8
+
+lib/nitro/src/gx/gx_load2d.c:
+    .text       start:0x020754b8 end:0x02076138
+    .bss        start:0x0214c050 end:0x0214c06c
+
+lib/nitro/src/gx/gx_load3d.c:
+    .text       start:0x02076138 end:0x020764bc
+    .rodata     start:0x020987c0 end:0x02098830
+    .bss        start:0x0214c06c end:0x0214c08c
+
+lib/nitro/src/gx/gx_vramcnt.c:
+    .text       start:0x020764bc end:0x02076f34
+
+lib/nitro/src/gx/gxasm.c:
+    .text       start:0x02076f34 end:0x02076f74
+
+lib/nitro/src/gx/gx_state.c:
+    .text       start:0x02076f74 end:0x02076fa8
+    .bss        start:0x0214c08c end:0x0214c0a8
+
+lib/nitro/src/mi/mi_sharedWram.c:
+    .text       start:0x02078000 end:0x02078020
+
+lib/nitro/src/mi/mi_wram.c:
+    .text       start:0x02078020 end:0x0207802c
+
+lib/nitro/src/mi/mi_dma.c:
+    .text       start:0x0207802c end:0x02078428
+
+lib/nitro/src/mi/mi_dma_gxcommand.c:
+    .text       start:0x02078428 end:0x02078624
+    .bss        start:0x0214c0ac end:0x0214c0e0
+
+lib/nitro/src/mi/mi_memory.c:
+    .text       start:0x02078624 end:0x02079094
+
+lib/nitro/src/mi/mi_swap.c:
+    .text       start:0x02079094 end:0x0207909c
+
+lib/nitro/src/mi/mi_uncompress.c:
+    .text       start:0x0207909c end:0x0207917c
+
+lib/nitro/src/mi/mi_dma_card.c:
+    .text       start:0x0207917c end:0x020791d0
+
+lib/nitro/src/mi/mi_init.c:
+    .text       start:0x020791d0 end:0x020791fc
+
+lib/nitro/src/nvram/nvram.c:
+    .text       start:0x020791fc end:0x02079bb0
+    .bss        start:0x0214c0e0 end:0x0214c178
+
+lib/nitro/src/os/os_irqHandler.c:
+    .text       start:0x02079bb0 end:0x02079c24
+
+lib/nitro/src/os/os_irqTable.c:
+    .text       start:0x02079c24 end:0x02079d10
+    .data       start:0x0209b6f4 end:0x0209b70c
+    .bss        start:0x0214c178 end:0x0214c208
+
+lib/nitro/src/os/os_interrupt.c:
+    .text       start:0x02079d10 end:0x02079f04
+
+lib/nitro/src/os/os_reset_pxi.c:
+    .text       start:0x02079f04 end:0x02079f5c
+    .bss        start:0x0214c208 end:0x0214c20c
+
+lib/nitro/src/os/os_spinLock.c:
+    .text       start:0x02079f5c end:0x0207a290
+    .bss        start:0x0214c20c end:0x0214c210
+
+lib/nitro/src/os/os_printf.c:
+    .text       start:0x0207a290 end:0x0207a2e4
+
+lib/nitro/src/os/os_thread.c:
+    .text       start:0x0207a2e4 end:0x0207ab04
+    .bss        start:0x0214c210 end:0x0214c484
+
+lib/nitro/src/os/os_context.c:
+    .text       start:0x0207ab04 end:0x0207ac24
+
+lib/nitro/src/os/os_emulator.c:
+    .text       start:0x0207ac24 end:0x0207acc4
+    .rodata     start:0x02098858 end:0x0209886c
+    .data       start:0x0209b70c end:0x0209b714
+    .bss        start:0x0214c484 end:0x0214c4a4
+
+lib/nitro/src/os/os_message.c:
+    .text       start:0x0207acc4 end:0x0207ae4c
+
+lib/nitro/src/os/os_mutex.c:
+    .text       start:0x0207ae4c end:0x0207b040
+
+lib/nitro/src/os/os_cache.c:
+    .text       start:0x0207b040 end:0x0207b104
+
+lib/nitro/src/os/os_init.c:
+    .text       start:0x0207b104 end:0x0207b18c
+
+lib/nitro/src/os/os_arena.c:
+    .text       start:0x0207b18c end:0x0207b468
+    .bss        start:0x0214c4a4 end:0x0214c4ac
+
+lib/nitro/src/os/os_alloc.c:
+    .text       start:0x0207b468 end:0x0207b744
+    .data       start:0x0209b714 end:0x0209b71c
+    .bss        start:0x0214c4ac end:0x0214c4d0
+
+lib/nitro/src/os/os_address_check.c:
+    .text       start:0x0207b744 end:0x0207b79c
+
+lib/nitro/src/os/os_tcm.c:
+    .text       start:0x0207b79c end:0x0207b7b0
+
+lib/nitro/src/os/os_protectionUnit.c:
+    .text       start:0x0207b7b0 end:0x0207b7d0
+
+lib/nitro/src/os/os_protectionRegion.c:
+    .text       start:0x0207b7d0 end:0x0207b894
+    .data       start:0x0209b71c end:0x0209b75c
+
+lib/nitro/src/os/os_exception.c:
+    .text       start:0x0207b894 end:0x0207ba64
+    .bss        start:0x0214c4d0 end:0x0214c56c
+
+lib/nitro/src/os/os_timer.c:
+    .text       start:0x0207ba64 end:0x0207ba7c
+    .bss        start:0x0214c56c end:0x0214c570
+
+lib/nitro/src/os/os_tick.c:
+    .text       start:0x0207ba7c end:0x0207bb90
+    .bss        start:0x0214c570 end:0x0214c580
+
+lib/nitro/src/os/os_alarm.c:
+    .text       start:0x0207bb90 end:0x0207be40
+    .bss        start:0x0214c580 end:0x0214c58c
+
+lib/nitro/src/os/os_valarm.c:
+    .text       start:0x0207be40 end:0x0207c0d0
+    .bss        start:0x0214c58c end:0x0214c5a0
+
+lib/nitro/src/os/os_system.c:
+    .text       start:0x0207c0d0 end:0x0207c210
+
+lib/nitro/src/os/os_codecmode.c:
+    .text       start:0x0207c210 end:0x0207c248
+    .bss        start:0x0214c5a0 end:0x0214c5a8
+
+lib/nitro/src/os/os_reset.c:
+    .text       start:0x0207c248 end:0x0207c33c
+    .bss        start:0x0214c5a8 end:0x0214c5ac
+
+lib/nitro/src/os/os_ownerInfo.c:
+    .text       start:0x0207c33c end:0x0207c3bc
+    .rodata     start:0x0209886c end:0x0209888c
+
+lib/nitro/src/os/os_ownerInfoEx.c:
+    .text       start:0x0207c3bc end:0x0207c4f4
+
+lib/nitro/src/os/os_vramExclusive.c:
+    .text       start:0x0207c4f4 end:0x0207c574
+    .bss        start:0x0214c5ac end:0x0214c5c4
+
+lib/nitro/src/os/os_deliverArg.c:
+    .text       start:0x0207c574 end:0x0207c6d0
+    .bss        start:0x0214c5c4 end:0x0214c5d8
+
+lib/nitro/src/os/os_entropy.c:
+    .text       start:0x0207c6d0 end:0x0207c774
+
+lib/nitro/src/os/os_terminate_proc.c:
+    .text       start:0x0207c774 end:0x0207c7f4
+    .bss        start:0x0214c5d8 end:0x0214c5e4
+
+lib/nitro/src/os/os_event.c:
+    .text       start:0x0207c7f4 end:0x0207c888
+
+lib/nitro/src/os/os_application_jump.c:
+    .text       start:0x0207c888 end:0x0207c94c
+
+lib/nitro/src/pxi/pxi_init.c:
+    .text       start:0x0207c94c end:0x0207c954
+
+lib/nitro/src/pxi/pxi_fifo.c:
+    .text       start:0x0207c954 end:0x0207cb88
+    .bss        start:0x0214c5e4 end:0x0214c668
+
+lib/nitro/src/rtc/rtc_api.c:
+    .text       start:0x0207cb88 end:0x0207d064
+    .bss        start:0x0214c668 end:0x0214c690
+
+lib/nitro/src/rtc/rtc_internal.c:
+    .text       start:0x0207d064 end:0x0207d0b4
+
+lib/nitro/src/rtc/rtc_convert.c:
+    .text       start:0x0207d0b4 end:0x0207d300
+    .data       start:0x0209b75c end:0x0209b78c
+
+lib/nitro/src/snd/snd_interface.c:
+    .text       start:0x0207d300 end:0x0207d670
+
+lib/nitro/src/snd/nitro_snd_main.c:
+    .text       start:0x0207d670 end:0x0207d6b8
+    .bss        start:0x0214c690 end:0x0214c6ac
+
+lib/nitro/src/snd/snd_command.c:
+    .text       start:0x0207d6b8 end:0x0207db34
+    .bss        start:0x0214c6ac end:0x0214e180
+
+lib/nitro/src/snd/snd_alarm.c:
+    .text       start:0x0207db34 end:0x0207dbb8
+    .bss        start:0x0214e180 end:0x0214e1e0
+
+lib/nitro/src/snd/snd_work.c:
+    .text       start:0x0207dbb8 end:0x0207dd2c
+    .bss        start:0x0214e1e0 end:0x0214e1e4
+
+lib/nitro/src/snd/snd_util.c:
+    .text       start:0x0207dd2c end:0x0207dd80
+    .rodata     start:0x0209888c end:0x02098c60
+
+lib/nitro/src/snd/snd_bank.c:
+    .text       start:0x0207dd80 end:0x0207dfd0
+
+lib/nitro/src/spi/tp.c:
+    .text       start:0x0207dfd0 end:0x0207e75c
+    .bss        start:0x0214e1e4 end:0x0214e220
+
+lib/nitro/src/spi/mic.c:
+    .text       start:0x0207e75c end:0x0207eb24
+    .bss        start:0x0214e220 end:0x0214e240
+
+lib/nitro/src/spi/pm.c:
+    .text       start:0x0207eb24 end:0x0207f6cc
+    .data       start:0x0209b78c end:0x0209b794
+    .bss        start:0x0214e240 end:0x0214e280
+
+lib/twl/src/scfg/scfg_proc.c:
+    .text       start:0x0207f6cc end:0x0207f7a4
+    .bss        start:0x0214e280 end:0x0214e298
+
+lib/nitro/src/std/std_string.c:
+    .text       start:0x0207f7a4 end:0x02080070
+
+lib/nitro/src/std/std_sprintf.c:
+    .text       start:0x02080070 end:0x02080758
+
+lib/nitro/src/wm/wm_system.c:
+    .text       start:0x02080758 end:0x02080e7c
+    .bss        start:0x0214e298 end:0x0214ed40
+
+lib/nitro/src/wm/wm_sync.c:
+    .text       start:0x02080e7c end:0x020812fc
+    .data       start:0x0209b794 end:0x0209b798
+
+lib/nitro/src/wm/wm_standard.c:
+    .text       start:0x020812fc end:0x020817fc
+
+lib/nitro/src/wm/wm_mp.c:
+    .text       start:0x020817fc end:0x02081ab0
+
+lib/nitro/src/wm/wm_dcf.c:
+    .text       start:0x02081ab0 end:0x02081bd8
+
+lib/nitro/src/wm/wm_ds.c:
+    .text       start:0x02081bd8 end:0x02082408
+
+lib/nitro/src/wm/wm_ks.c:
+    .text       start:0x02082408 end:0x02082424
+
+lib/nitro/src/wm/wm_etc.c:
+    .text       start:0x02082424 end:0x020825e4
+    .bss        start:0x0214ed40 end:0x0214edc0
+
+lib/nitro/src/wm/wm_common.c:
+    .text       start:0x020825e4 end:0x02082608
+
+lib/nitro/src/ctrdg/ctrdg.c:
+    .text       start:0x02082608 end:0x020827d0
+    .bss        start:0x0214edc0 end:0x0214edc8
+
+lib/nitro/src/ctrdg/ctrdg_proc.c:
+    .text       start:0x020827d0 end:0x020827f8
+
+lib/twl/src/syscall/syscall_twl.c:
+    .text       start:0x020827f8 end:0x020828ac
+
+lib/msl/src/abort_exit_arm.c:
+    .text       start:0x020828c8 end:0x02082994
+
+lib/msl/src/critical_regions_nitro.c:
+    .bss        start:0x0214edcc end:0x0214eeec
+
+lib/msl/src/math_arm.c:
+    .text       start:0x02082994 end:0x020829ac
+
+lib/msl/src/pool_alloc.c:
+    .text       start:0x020829ac end:0x020829f0
+
+lib/msl/src/alloc.c:
+    .text       start:0x020829f0 end:0x02082abc
+
+lib/msl/src/ansi_files.c:
+    .text       start:0x02082abc end:0x02082ba8
+    .data       start:0x0209b798 end:0x0209b87c
+    .bss        start:0x0214eeec end:0x0214f1ec
+
+lib/msl/src/arith.c:
+    .text       start:0x02082ba8 end:0x02082bb4
+
+lib/msl/src/buffer_io.c:
+    .text       start:0x02082bb4 end:0x02082cf4
+
+lib/msl/src/ctype.c:
+    .rodata     start:0x02098c60 end:0x02098e60
+
+lib/msl/src/direct_io.c:
+    .text       start:0x02082cf4 end:0x02083108
+
+lib/msl/src/errno.c:
+    .bss        start:0x0214f1ec end:0x0214f1f0
+
+lib/msl/src/file_io.c:
+    .text       start:0x02083108 end:0x020832dc
+
+lib/msl/src/file_pos.c:
+    .text       start:0x020832dc end:0x02083764
+
+lib/msl/src/float.c:
+    .data       start:0x0209b87c end:0x0209b88c
+
+lib/msl/src/locale.c:
+    .data       start:0x0209b88c end:0x0209baa8
+
+lib/msl/src/math_api.c:
+    .text       start:0x02083764 end:0x02083884
+
+lib/msl/src/mbstring.c:
+    .text       start:0x02083884 end:0x02083964
+
+lib/msl/src/msl_mem.c:
+    .text       start:0x02083964 end:0x02083a50
+
+lib/msl/src/mem_funcs.c:
+    .text       start:0x02083a50 end:0x02083afc
+
+lib/msl/src/printf.c:
+    .text       start:0x02083afc end:0x02085b7c
+    .data       start:0x0209baa8 end:0x0209bae0
+
+lib/msl/src/qsort.c:
+    .text       start:0x02085b7c end:0x02085cb4
+
+lib/msl/src/rand.c:
+    .text       start:0x02085cb4 end:0x02085cf8
+    .data       start:0x0209bae0 end:0x0209bae4
+
+lib/msl/src/scanf.c:
+    .text       start:0x02085cf8 end:0x02085d70
+
+lib/msl/src/secure_error.c:
+    .text       start:0x02085d70 end:0x02085d9c
+    .bss        start:0x0214f1f0 end:0x0214f1f4
+
+lib/msl/src/string.c:
+    .text       start:0x02085d9c end:0x020861ac
+
+lib/msl/src/strtold.c:
+    .text       start:0x020861ac end:0x0208715c
+    .rodata     start:0x02098e60 end:0x02098e74
+
+lib/msl/src/strtoul.c:
+    .text       start:0x0208715c end:0x02087b28
+
+lib/msl/src/wchar_io.c:
+    .text       start:0x02087b28 end:0x02087b98
+
+lib/msl/src/wstring.c:
+    .text       start:0x02087b98 end:0x02087bd4
+
+lib/msl/src/ansi_fp.c:
+    .text       start:0x02087bd4 end:0x02088fb0
+    .data       start:0x0209bae4 end:0x0209bc20
+
+lib/msl/src/math_sun.c:
+    .text       start:0x02088fb0 end:0x02088fdc
+
+lib/msl/src/math/e_pow.c:
+    .text       start:0x02088fdc end:0x0208a164
+    .rodata     start:0x02098e74 end:0x02098ea4
+
+lib/msl/src/math/e_rem_pio2.c:
+    .text       start:0x0208a164 end:0x0208a844
+    .rodata     start:0x02098ea4 end:0x0209902c
+
+lib/msl/src/math/k_cos.c:
+    .text       start:0x0208a844 end:0x0208ab5c
+
+lib/msl/src/math/k_rem_pio2.c:
+    .text       start:0x0208ab5c end:0x0208b70c
+    .rodata     start:0x0209902c end:0x0209907c
+
+lib/msl/src/math/k_sin.c:
+    .text       start:0x0208b70c end:0x0208b988
+
+lib/msl/src/math/s_copysign.c:
+    .text       start:0x0208b988 end:0x0208b9b0
+
+lib/msl/src/math/s_cos.c:
+    .text       start:0x0208b9b0 end:0x0208bb24
+
+lib/msl/src/math/s_fabs.c:
+    .text       start:0x0208bb24 end:0x0208bb44
+
+lib/msl/src/math/s_floor.c:
+    .text       start:0x0208bb44 end:0x0208bd08
+
+lib/msl/src/math/s_frexp.c:
+    .text       start:0x0208bd08 end:0x0208bdc8
+
+lib/msl/src/math/s_ldexp.c:
+    .text       start:0x0208bdc8 end:0x0208c028
+
+lib/msl/src/math/s_sin.c:
+    .text       start:0x0208c028 end:0x0208c1a0
+
+lib/msl/src/math/w_pow.c:
+    .text       start:0x0208c1a0 end:0x0208c1ac
+
+lib/msl/src/extras_string.c:
+    .text       start:0x0208c1ac end:0x0208c224
+
+lib/msl/src/fp/fp_fastI.c:
+    .text       start:0x0208c224 end:0x0208ece0
+
+lib/msl/src/runtime/register_atexit.c:
+    .text       start:0x0208ece0 end:0x0208ed2c
+    .bss        start:0x0214f1f4 end:0x0214f4f8
+
+lib/msl/src/runtime/trk_stubs.c:
+    .text       start:0x0208ed2c end:0x0208ed3c
+
+lib/msl/src/runtime/console_io.c:
+    .text       start:0x0208ed3c end:0x0208edd8
+
+lib/msl/src/runtime/call_static_initializers.c:
+    .text       start:0x0208edd8 end:0x0208ee08
+
+lib/msl/src/runtime/global_destructor_chain.c:
+    .text       start:0x0208ee08 end:0x0208ee28
+    .bss        start:0x0214f4f8 end:0x0214f500
