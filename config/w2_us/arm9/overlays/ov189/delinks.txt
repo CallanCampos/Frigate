@@ -69,6 +69,7 @@ lib/dwc/src/nhttp/nhttp_control.c:
     .rodata     start:0x021accc8 end:0x021acce0
 
 lib/dwc/src/nhttp/nhttp_list.c:
+    complete
     .text       start:0x0219e118 end:0x0219e238
 
 lib/dwc/src/nhttp/nhttp_recvbuf.c:

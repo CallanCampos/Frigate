@@ -95,7 +95,8 @@ typedef struct NHttpQueueNode {
 
 typedef struct NHttpListInfo {
     NHttpQueueNode *head;
-    int count;
+    // The next request's ID, taken by the caller's thread while the HTTP thread works through the queue
+    volatile int count;
 } NHttpListInfo;
 
 typedef struct NHttpReqInfo {

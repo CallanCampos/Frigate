@@ -258,8 +258,6 @@ in both versions.
 | `lib/dpw/src/dpw_tr.c` | `DpwTr_ExchangeFinish` | `0x021a7df8` / `0x021a7e38` | size 0x84/0x8c; the original keeps `0` and `0x18` in registers and writes the answer codes through a separate pointer; the struct copy of the friend key is a pair of loads and stores with two literals, ours an `ldm`/`stm`. |
 | `lib/dpw/src/dpw_battle_tower.c` | `DpwBt_Process` | `0x021a808c` / `0x021a80cc` | size 0x404/0x414; the original writes the answer codes through a separate static (its own literal) and reads them from the work; the upload is copied as a struct. |
 | `lib/dpw/src/dpw_battle_tower.c` | `DpwBt_Upload` | `0x021a8614` / `0x021a8654` | size 0xf8/0x104; the original writes the answer codes through a separate static (its own literal) and reads them from the work; the upload is copied as a struct. |
-| `lib/dwc/src/nhttp/nhttp_list.c` | `NHTTPi_setReqQueue` | `0x0219e0e0` / `0x0219e120` | 2 bytes short (0x54 against 0x56): the original reloads the queue's count where ours keeps it in a register. |
-| `lib/dwc/src/nhttp/nhttp_list.c` | `NHTTPi_findReqQueue` | `0x0219e138` / `0x0219e178` | 2 bytes long (0x32 against 0x30): the original ends both loops with a branch to one shared return, ours returns in each. |
 | `lib/dwc/src/nhttp/nhttp_request.c` | `NHTTP_CreateRequest` | `0x0219e540` / `0x0219e580` | 2 bytes, same size: the original loads the constant 8 into r2 where ours uses r0. |
 | `lib/dwc/src/nhttp/nhttp_request.c` | `NHTTP_CancelRequestAsync` | `0x0219e96c` / `0x0219e9ac` | 2 bytes short (0x5a against 0x5c): a field is reloaded in the original. |
 | `lib/dwc/src/nhttp/nhttp_request.c` | `NHTTPi_cancelAllRequests` | `0x0219e9c8` / `0x0219ea08` | 2 bytes short (0x4a against 0x4c): a field is reloaded in the original. |

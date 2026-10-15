@@ -36,8 +36,8 @@ int NHTTPi_setReqQueue(NHttpListInfo *info, NHttpRequest *request) {
 
 // Finds the request that has an id
 NHttpQueueNode *NHTTPi_findReqQueue(NHttpListInfo *info, int id) {
-    NHttpQueueNode *head = info->head;
     NHttpQueueNode *found = NULL;
+    NHttpQueueNode *head = info->head;
     NHttpQueueNode *node;
 
     if (head != NULL) {
@@ -45,14 +45,12 @@ NHttpQueueNode *NHTTPi_findReqQueue(NHttpListInfo *info, int id) {
             found = head;
         } else {
             node = head->next;
-            if (node != head) {
-                do {
-                    if (node->id == id) {
-                        found = node;
-                        break;
-                    }
-                    node = node->next;
-                } while (node != head);
+            while (node != head) {
+                if (node->id == id) {
+                    found = node;
+                    break;
+                }
+                node = node->next;
             }
         }
     }
