@@ -173,8 +173,8 @@ static const u8 sOidCommonName[4] = { 0x55, 0x04, 0x03, 0 };
 
 static const u8 *const sOids[6] = { sOid0, sOidRsaEncryption, sOid2, sOidMd5WithRsa, sOidSha1WithRsa, sOidCommonName };
 
-// The cipher suites CPS_Sslconnect offers, and the maximum priority a connection's thread may run at while it works
-// (CPS_SslSetMaxPriority's role), -1 until set
+// The cipher suites CPS_Sslconnect offers, and the priority applied during selected crypto operations.
+// CPS_SslSetMaxPriority configures it; -1 disables priority changes until set.
 static struct {
     u16 cipher_suites[2]; // SSL_RSA_WITH_RC4_128_MD5, SSL_RSA_WITH_RC4_128_SHA
     u32 max_priority;
@@ -192,11 +192,11 @@ static void SSLi_FindSessionByPeer(SSLContext *ctx, CPSInAddr ip, u16 port);
 static void SSLi_SaveSession(SSLContext *ctx, CPSInAddr ip, u16 port);
 static void SSLi_InvalidateSession(SSLContext *ctx);
 static u32 SSLi_GetUnixTime(void);
-static u32 SSLi_RaisePriority(void);
+static u32 SSLi_ApplyConfiguredPriority(void);
 static void SSLi_RestorePriority(u32 priority);
 static const SSLNamedParam *SSLi_FindNamedParam(const SSLContext *ctx, const char *name);
 static s32 SSLi_DecodeLength(const u8 **cursor);
-static void SSLi_BuildHostPattern(char *dest, const char *suffix, int repeat);
+static void SSLi_AppendCertificateNameValue(char *dest, const char *value, int byteCount);
 static u32 SSLi_ParseCertTime(const u8 *digits, int tag);
 static int SSLi_ParseAsn1Field(SSLContext *ctx, const u8 **cursor, int depth, int index, int extra);
 static int SSLi_CheckCertificate(SSLContext *ctx);
@@ -339,15 +339,14 @@ u32 CPS_SslGetMaxPriority(void) {
     return sConfig.max_priority;
 }
 
-// CPS_SslSetMaxPriority's role: the priority a connection's thread runs at while SSLi_RaisePriority holds it up for
-// a crypto operation
+// Configures the priority applied unconditionally during selected crypto operations; values >= 32 disable it.
 void CPS_SslSetMaxPriority(u32 priority) {
     sConfig.max_priority = priority;
 }
 
-// Raises the current thread's priority to the configured maximum (CPS_SslSetMaxPriority's role) for a crypto
-// operation, returning the priority it had so SSLi_RestorePriority can put it back; -1 once the slot (0-31) runs out
-static u32 SSLi_RaisePriority(void) {
+// Applies the configured priority without comparing it to the thread's current priority, returning the old value.
+// An invalid configured value (>= 32) returns UINT32_MAX without calling the thread APIs.
+static u32 SSLi_ApplyConfiguredPriority(void) {
     if (sConfig.max_priority >= 0x20) {
         return (u32)-1;
     }
@@ -412,28 +411,27 @@ static s32 SSLi_DecodeLength(const u8 **cursor) {
     return value;
 }
 
-// Appends ", *<suffix>" to a hostname pattern (truncating the whole thing to 0xff bytes), or just <suffix> once if
-// repeat is 0
-static void SSLi_BuildHostPattern(char *dest, const char *suffix, int repeat) {
+// Appends a certificate name value, separating existing values with ", ". The destination has room for 255 bytes
+// excluding its terminator. byteCount controls copying; a NUL in value does not stop it.
+static void SSLi_AppendCertificateNameValue(char *dest, const char *value, int byteCount) {
     char *p = dest;
 
     if (*p != '\0') {
         while (*++p != '\0') {
         }
-        if (p - dest < 0xff) {
-            *p++ = ',';
-            *p++ = ' ';
-        }
-    }
-    while (TRUE) {
-        if (repeat == 0) {
-            break;
-        }
-        repeat--;
+        // BUG: At length 254, the delimiter leaves the terminator one byte beyond the 256-byte destination.
+#ifdef BUGFIX
+        if (p - dest >= 0xfe) {
+#else
         if (p - dest >= 0xff) {
-            break;
+#endif
+            return;
         }
-        *p++ = *suffix++;
+        *p++ = ',';
+        *p++ = ' ';
+    }
+    while (byteCount-- != 0 && p - dest < 0xff) {
+        *p++ = *value++;
     }
     *p = '\0';
 }
@@ -538,13 +536,13 @@ static int SSLi_ParseAsn1Field(SSLContext *ctx, const u8 **cursor, int depth, in
     case 22:
         if (mode != 2) {
             if (ctx->certificate_phase.parsing_subject) {
-                SSLi_BuildHostPattern(ctx->subject, (const char *)value, len);
+                SSLi_AppendCertificateNameValue(ctx->subject, (const char *)value, len);
                 if (ctx->attribute_oid == 5 && len <= 0x4f) {
                     sys_memcpy(value, ctx->common_name, len);
                     ctx->common_name[len] = 0;
                 }
             } else {
-                SSLi_BuildHostPattern(ctx->issuer, (const char *)value, len);
+                SSLi_AppendCertificateNameValue(ctx->issuer, (const char *)value, len);
             }
         }
         ctx->attribute_oid = 0;
@@ -631,7 +629,7 @@ static int SSLi_VerifyCertificateSignature(SSLContext *ctx, const SSLRsaPublicKe
     BigInt_BytesToDigits(sigDigits, ctx->certificate_signature, ctx->certificate_signature_len, n);
     BigInt_BytesToDigits(expDigits, key->exponent, key->exponent_len, n);
     BigInt_BytesToDigits(modDigits, key->modulus, key->modulus_len, n);
-    priority = SSLi_RaisePriority();
+    priority = SSLi_ApplyConfiguredPriority();
     BigInt_ModExp(digits, sigDigits, expDigits, n, modDigits);
     SSLi_RestorePriority(priority);
     BigInt_DigitsToBytes(decrypted, digits, key->modulus_len, n);
@@ -935,7 +933,7 @@ static void SSLi_DecryptPreMasterSecret(SSLContext *ctx, u8 *encrypted, void *ke
     BigInt_BytesToDigits(buf, encrypted, key->modulus_len, n);
     BigInt_BytesToDigits(operand, key->first_exponent, key->first_exponent_len, n);
     BigInt_BytesToDigits(prime, key->first_prime, key->first_prime_len, n);
-    priority = SSLi_RaisePriority();
+    priority = SSLi_ApplyConfiguredPriority();
     BigInt_ModExpFast(firstResult, buf, operand, n, prime);
     BigInt_BytesToDigits(operand, key->second_exponent, key->second_exponent_len, n);
     BigInt_BytesToDigits(prime, key->second_prime, key->second_prime_len, n);
@@ -1648,7 +1646,7 @@ static void SSLi_SendClientKeyExchange(CPSSoc *soc) {
     BigInt_BytesToDigits(base, padded, len, n);
     BigInt_BytesToDigits(exponent, ctx->certificate_key.exponent, ctx->certificate_key.exponent_len, n);
     BigInt_BytesToDigits(modulus, ctx->certificate_key.modulus, len, n);
-    priority = SSLi_RaisePriority();
+    priority = SSLi_ApplyConfiguredPriority();
     BigInt_ModExp(digits, base, exponent, n, modulus);
     SSLi_RestorePriority(priority);
     packet = (u8 *)CPSiAlloc(len + 0x49);

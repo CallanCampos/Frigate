@@ -2704,12 +2704,12 @@ overlays/ov011 0x021583f0 SSLi_InvalidateSession
 overlays/ov011 0x0215843c SSLi_GetUnixTime
 overlays/ov011 0x02158464 CPS_SslGetMaxPriority
 overlays/ov011 0x02158470 CPS_SslSetMaxPriority
-overlays/ov011 0x0215847c SSLi_RaisePriority
+overlays/ov011 0x0215847c SSLi_ApplyConfiguredPriority
 overlays/ov011 0x021584ac SSLi_RestorePriority
 overlays/ov011 0x021584c4 CPS_SslSetNamedParams
 overlays/ov011 0x021584e8 SSLi_FindNamedParam
 overlays/ov011 0x02158520 SSLi_DecodeLength
-overlays/ov011 0x02158564 SSLi_BuildHostPattern
+overlays/ov011 0x02158564 SSLi_AppendCertificateNameValue
 overlays/ov011 0x021585b0 SSLi_ParseCertTime
 overlays/ov011 0x0215861c SSLi_ParseAsn1Field
 overlays/ov011 0x0215895c SSLi_VerifyCertificateSignature
