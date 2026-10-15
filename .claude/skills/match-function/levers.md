@@ -12,6 +12,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A constant held in a stack slot")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
+- An array's address hoisted above an `if` whose arms both read it, where the original builds it in each arm and
+  reuses an earlier shift: a flat array indexed `[i * 2 + k]` instead of `[i][k]`. (matching.md: "Reads of a
+  two-dimensional local array")
 - A multiply's operand copied right after its `subs` where the original loads the constant first: give the index
   its own variable and index the elements in place. (matching.md: "The copy of a multiply's operand")
 - A table's base and index swapped between the two registers (`ldr r4, =table; muls; adds r4, r4, r2` in the
