@@ -1,13 +1,29 @@
+#include "dwc/ext.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "vct_internal.h"
+#include "vct_session_internal.h"
 
 // The machines the voice chat talks to. Machines ask each other for voice with small control packets, and a table of
 // what each packet does to a machine's state decides whether to carry on, to refuse, or to give the application an
 // event.
 
+// A control packet: a machine asking another to start or stop hearing it
+struct VCTControlPacket {
+    u32 magic;
+    u8 type;
+    u8 length;
+    u8 command;
+    u8 pad7;
+    u8 from;
+    u8 to;
+    u8 flag;
+    u8 origin;
+    u32 argument;
+};
+
 // The sessions that are free and in use, the clock and the random number generator's constants
-typedef struct VCTSessionPool {
+struct VCTSessionPool {
     VCTSession *freeList;
     VCTSession *usedList;
     u64 (*clock)(void);
@@ -16,15 +32,15 @@ typedef struct VCTSessionPool {
     // A session to answer from for a machine that cannot be given one, and the one session of the second mode
     VCTSession pending;
     VCTSession host;
-} VCTSessionPool;
+};
 
-typedef struct VCTSessionState {
+struct VCTSessionState {
     // How many machines are in the voice chat, and which
     int count;
     u32 mask;
     // When the last request was sent, or 0
     u64 requestTime;
-} VCTSessionState;
+};
 
 static VCTSession *AllocFromPool(u8 aid);
 static int SendRequest(VCTSession *session, int command);

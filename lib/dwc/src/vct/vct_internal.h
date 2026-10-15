@@ -50,26 +50,6 @@ typedef struct VCTVoicePacket {
     u8 payload[0x454];
 } VCTVoicePacket;
 
-// A control packet: a machine asking another to start or stop hearing it
-typedef struct VCTControlPacket {
-    u32 magic;
-    u8 type;
-    u8 length;
-    u8 command;
-    u8 pad7;
-    u8 from;
-    u8 to;
-    u8 flag;
-    u8 origin;
-    u32 argument;
-} VCTControlPacket;
-
-// What a control packet gave the application: an event, and the session it is for
-typedef struct VCTEventResult {
-    int event;
-    VCTSession *session;
-} VCTEventResult;
-
 // A voice packet that has come in, on its way to being played
 typedef struct VCTPacket VCTPacket;
 struct VCTPacket {
@@ -154,9 +134,6 @@ BOOL func_ov011_02168a08(u8 aid, const void *data, int size);
 // yet)
 void sys_memcpy32_fast(const void *src, void *dest, u32 size);
 
-// The C library's memset
-void *memset(void *dest, int value, u32 size);
-
 // The timer count, which seeds the packets' sequence numbers
 u16 func_0207bb84(void);
 
@@ -186,12 +163,6 @@ void VCT_SetEchoCancel(BOOL enabled);
 BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now);
 int VCT_DecodeReceived(void);
 BOOL VCT_SendPending(void);
-
-// vct_session.c: the machines
-void VCT_ClearSessions(void);
-void VCT_CheckTimeout(void);
-BOOL VCT_HandleControlPacket(int aid, VCTControlPacket *packet, int size, VCTEventResult *result);
-BOOL VCT_InitSessions(VCTConfig *config);
 
 // vct_dsp.c: packet memory, microphone levels and echo
 BOOL VCT_InitPacketPool(void *buffer, u32 size);

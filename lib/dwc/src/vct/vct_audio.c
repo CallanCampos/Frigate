@@ -1,3 +1,4 @@
+#include "dwc/vct_session.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

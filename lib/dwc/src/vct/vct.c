@@ -1,6 +1,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "vct_internal.h"
+#include "vct_session_internal.h"
 
 // The library's entry points: starting and stopping it, running it a tick, and sorting what the network gives it.
 

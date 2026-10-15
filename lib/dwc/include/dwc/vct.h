@@ -2,30 +2,13 @@
 #define POKEBW2_DWC_VCT_H
 
 #include "types.h"
+#include "dwc/vct_session.h"
 #include "struct_decls.h"
 
 // Nintendo's voice chat library libVCT (the ROM carries the version string "[SDK+Nintendo:libVCT 1.4.1]"), which
 // sends the microphone's sound to the machines of a Wi-Fi match and plays what they send. It sits in overlay 29 beside
 // the game's own code for it. The ROM names none of its functions, so the names say what the code does; the one name
 // the ROM gives is the field `aid` of the configuration, from an assertion.
-
-// A machine that the voice chat is talking to. A machine is asked to take part with a request, answers with a reply,
-// and the application hears of what comes of it in an event
-typedef struct VCTSession VCTSession;
-struct VCTSession {
-    // Not 0 while the session is in use: the library's mode
-    int active;
-    u8 aid;
-    // The machine that asked for the machine's voice, when it is not the machine itself
-    u8 origin;
-    u8 pad6[2];
-    // The machines whose voice is heard, a bit each
-    u32 mask;
-    // 2 once the voice flows both ways
-    int state;
-    u32 unk10;
-    VCTSession *next;
-};
 
 // Called with an event for a session. The events are numbers: 1, 4 and 8 for a request, 7 for the voice starting, and
 // 2, 3, 9, 11 and 12 for a refusal, a close or the end of it
@@ -70,14 +53,6 @@ void VCT_SetEchoCancel(BOOL enabled);
 // Copies the four words of how loud the microphone is: whether somebody is speaking, the level, and two limits
 void VCT_GetCaptureLevels(s32 *out);
 
-// The sessions: one for a machine, and its voice's start and end
-VCTSession *VCT_AllocSession(u8 aid);
-BOOL VCT_ReleaseSession(VCTSession *session);
 BOOL VCT_AttachSession(VCTSession *session);
 void VCT_DetachSession(VCTSession *session);
-int VCT_Request(VCTSession *session, int command);
-int VCT_Respond(VCTSession *session, int command);
-int VCT_AddSession(u8 aid);
-int VCT_RemoveSession(u8 aid);
-
 #endif // POKEBW2_DWC_VCT_H
