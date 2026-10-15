@@ -12,6 +12,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A constant held in a stack slot")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
+- An array's address hoisted above an `if` whose arms both read it, where the original builds it in each arm and
+  reuses an earlier shift: a flat array indexed `[i * 2 + k]` instead of `[i][k]`. (matching.md: "Reads of a
+  two-dimensional local array")
 - A multiply's operand copied right after its `subs` where the original loads the constant first: give the index
   its own variable and index the elements in place. (matching.md: "The copy of a multiply's operand")
 - A table's base and index swapped between the two registers (`ldr r4, =table; muls; adds r4, r4, r2` in the
@@ -480,6 +483,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
   compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
+- On NitroSystem's `2.0/sp2p2`, initialized globals are ordered by size, smallest first, and objects of one size in the
+  reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
 - The full model, checked by fuzzing MWCC: there is one list per file in declaration order, except tentative `.bss`
   statics, which join at the end in reverse order. Each kind (rodata, data, bss) gets its own shared section.
   Unreferenced statics are dropped. `rodata_order.py` doesn't model the per-kind sections or the `.bss` rule yet, but
