@@ -258,18 +258,40 @@
 . 0x02065c0c reloc_addend 0x200
 . 0x02065c54 reloc_addend 0x80
 . 0x02066864 reloc_addend 0x80
+. 0x02066d0c reloc_addend 0x1
+. 0x02066d10 reloc_addend 0x2
+. 0x02066d14 reloc_addend 0x3
 . 0x02066f00 reloc_addend 0x80
 . 0x02066f04 reloc_addend 0x4c
+. 0x02066f08 reloc_addend 0x30
+. 0x02066f0c reloc_addend 0x3c
+. 0x02066f14 reloc_addend 0x4
+. 0x02066f1c reloc_addend 0xc
+. 0x02067158 reloc_addend 0xc
 . 0x02067164 reloc_addend 0x80
 . 0x02067168 reloc_addend 0x4c
+. 0x0206716c reloc_addend 0x30
+. 0x02067170 reloc_addend 0x3c
+. 0x02067178 reloc_addend 0x4
+. 0x02067480 reloc_addend 0x40
+. 0x020678dc reloc_addend 0x4
 . 0x020678e0 reloc_addend 0x80
 . 0x020678e4 reloc_addend 0x4c
 . 0x020678e8 reloc_addend 0xbc
+. 0x02067b44 reloc_addend 0x4
 . 0x02067b4c reloc_addend 0x80
 . 0x02067b50 reloc_addend 0xe0
 . 0x02067b54 reloc_addend 0xbc
 . 0x02067f98 reloc_addend 0x8
 . 0x02067f9c reloc_addend 0x4c
+. 0x0206a124 reloc_addend 0xc
+. 0x0206a128 reloc_addend 0x10
+. 0x0206a12c reloc_addend 0x14
+. 0x0206aa48 reloc_addend 0x4
+. 0x0206aa4c reloc_addend 0x8
+. 0x0206aa50 reloc_addend 0xc
+. 0x0206aa54 reloc_addend 0x10
+. 0x0206aa58 reloc_addend 0x14
 . 0x0206e1dc reloc_addend 0x10c8
 . 0x0206e228 reloc_addend 0x10e0
 . 0x0206e3fc reloc_addend 0x10c8
@@ -394,6 +416,9 @@
 . 0x02094364 add_data data_02094364
 . 0x02094384 add_data data_02094384
 . 0x02094390 add_data NNSi_G2dCharCanvasVTableOBJ2DRect
+. 0x02094435 remove_symbol
+. 0x02094436 remove_symbol
+. 0x02094437 remove_symbol
 . 0x020947fc remove_symbol
 . 0x0209497c remove_symbol
 . 0x02094a3c remove_symbol
@@ -414,7 +439,17 @@
 . 0x0209b234 remove_symbol
 . 0x0209b258 add_data data_0209b258
 . 0x0209b2ac remove_symbol
+. 0x0209b324 remove_symbol
 . 0x0209b328 add_data sEnvMapCmd
+. 0x0209b32c remove_symbol
+. 0x0209b394 remove_symbol
+. 0x0209b39c remove_symbol
+. 0x0209b3c0 remove_symbol
+. 0x0209b3cc remove_symbol
+. 0x0209b3dc remove_symbol
+. 0x0209b3e4 remove_symbol
+. 0x0209b408 remove_symbol
+. 0x0209b414 remove_symbol
 . 0x0209da80 remove_symbol
 . 0x0209da88 remove_symbol
 . 0x0209da8c remove_symbol
@@ -474,6 +509,12 @@
 . 0x02143c58 remove_symbol
 . 0x02143c64 remove_symbol
 . 0x0214409a remove_symbol
+. 0x02144a78 remove_symbol
+. 0x02144a7c remove_symbol
+. 0x02144a80 remove_symbol
+. 0x02144a84 remove_symbol
+. 0x02144a88 remove_symbol
+. 0x021450b4 remove_symbol
 . 0x0214697c add_data NNS_G3dFlagUseFastDma
 . 0x02149878 add_data sCaptureReserved
 . 0x0214989c add_data sCaptureMsgBuf
