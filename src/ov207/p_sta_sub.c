@@ -123,10 +123,6 @@ static void PStaSub_SetBounce(PStatusWork *wk, PStaSubWork *sub, fx32 bounce);
 static void PStaSub_SetSpritePosition(PStatusWork *wk, PStaSubWork *sub, const VecFx32 *pos);
 static void PStaSub_AdjustForSpecies(PStatusWork *wk, PStaSubWork *sub, VecFx32 *size, VecFx32 *scale);
 
-// The markings, the shiny star and the Pokérus mark
-static const u8 sIconSequences[PSTA_SUB_ICON_COUNT] = { 0, 2, 4, 6, 8, 10, 12, 13 };
-static const u8 sIconXs[PSTA_SUB_ICON_COUNT] = { 179, 190, 201, 212, 223, 234, 152, 160 };
-
 PStaSubWork *PStaSub_Create(PStatusWork *wk) {
     PStaSubWork *sub = GFL_HeapAllocate(wk->heapId, sizeof(PStaSubWork), TRUE, "p_sta_sub.c", 280);
 
@@ -149,6 +145,7 @@ void PStaSub_Main(PStatusWork *wk, PStaSubWork *sub) {
         PStaSub_HandleMarkings(wk, sub);
         PStaSub_UpdateAnim(wk, sub);
     } else if (sub->state == PSTA_SUB_TURN_TO_FRONT) {
+        static const fx32 turnShift = FX32_CONST(25);
         VecFx32 target = { FX32_CONST(-41), 0, FX32_CONST(101) };
         VecFx32 scale = { FX32_ONE, FX32_CONST(2.2), FX32_ONE };
         VecFx32 offset = { 0, 0, 0 };
@@ -163,7 +160,7 @@ void PStaSub_Main(PStatusWork *wk, PStaSubWork *sub) {
             PStaSub_SetBounce(wk, sub, 0);
             sub->state = PSTA_SUB_FRONT;
         } else {
-            target.x = FX32_CONST(25) * sub->turnTimer / 10 - FX32_CONST(66);
+            target.x = turnShift * sub->turnTimer / 10 - FX32_CONST(66);
             offset.y = FX_SinIdx((u16)(sub->turnTimer * 0x8000 / 10)) * 32;
             if (sub->noBounce == TRUE) {
                 offset.y = 0;
@@ -213,7 +210,13 @@ void PStaSub_FreeResources(PStatusWork *wk, PStaSubWork *sub) {
     PStaSub_Unload(wk, sub);
 }
 
+// The markings, the shiny star and the Pokérus mark
+static const u8 sIconXs[PSTA_SUB_ICON_COUNT] = { 179, 190, 201, 212, 223, 234, 152, 160 };
+static const u8 sIconSequences[PSTA_SUB_ICON_COUNT] = { 0, 2, 4, 6, 8, 10, 12, 13 };
+
 void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
+    static const u8 iconY = 127;
+    static const u8 defaultSequence = 0;
     ClActorSetup ballSetup;
     ClActorSetup iconSetup;
     ClActorSetup pokerusSetup;
@@ -224,11 +227,11 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
     ballSetup.y = 8;
     ballSetup.priority = 10;
     ballSetup.bgPriority = 1;
-    ballSetup.sequence = 0;
+    ballSetup.sequence = defaultSequence;
     sub->ballIcon = func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(2)], wk->clResources[PSTA_RES_PLTT(1)],
                                   wk->clResources[PSTA_RES_CELL(2)], &ballSetup, 0, wk->heapId);
     func_0204c124(sub->ballIcon, FALSE);
-    iconSetup.y = 127;
+    iconSetup.y = iconY;
     iconSetup.priority = 10;
     iconSetup.bgPriority = 1;
     for (i = 0; i < PSTA_SUB_ICON_COUNT; i++) {
@@ -243,7 +246,7 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
     pokerusSetup.y = 26;
     pokerusSetup.priority = 10;
     pokerusSetup.bgPriority = 1;
-    pokerusSetup.sequence = 0;
+    pokerusSetup.sequence = defaultSequence;
     sub->pokerusIcon =
         func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(10)], wk->clResources[PSTA_RES_PLTT(9)],
                       wk->clResources[PSTA_RES_CELL(9)], &pokerusSetup, 0, wk->heapId);
@@ -252,7 +255,7 @@ void PStaSub_CreateActors(PStatusWork *wk, PStaSubWork *sub) {
     statusSetup.y = 31;
     statusSetup.priority = 10;
     statusSetup.bgPriority = 1;
-    statusSetup.sequence = 0;
+    statusSetup.sequence = defaultSequence;
     sub->statusIcon =
         func_0204c040(wk->actorUnit, wk->clResources[PSTA_RES_CHAR(11)], wk->clResources[PSTA_RES_PLTT(10)],
                       wk->clResources[PSTA_RES_CELL(10)], &statusSetup, 0, wk->heapId);
@@ -614,6 +617,7 @@ static BOOL PStaSub_AnimSwipeY(PStatusWork *wk, PStaSubWork *sub) {
 }
 
 static BOOL PStaSub_AnimCircle(PStatusWork *wk, PStaSubWork *sub, BOOL spinning) {
+    static const u16 spinRange = 0x1800;
     VecFx32 offset = { 0, 0, 0 };
     u32 lap;
     u8 i;
@@ -633,7 +637,7 @@ static BOOL PStaSub_AnimCircle(PStatusWork *wk, PStaSubWork *sub, BOOL spinning)
         if (lap > 20) {
             lap = 20;
         }
-        sub->spinTarget = (u16)(20 - lap) * 0x1800 / 10 + 0x800;
+        sub->spinTarget = (u16)(20 - lap) * spinRange / 10 + 0x800;
         offset.y += FX_SinIdx(sub->animFrame * 0x222) * 4;
         sub->animFrame++;
         if (sub->animFrame > 120) {

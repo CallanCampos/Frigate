@@ -557,6 +557,14 @@ Same code, other `sp` offsets or frame size.
   `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
   `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
   the copy too, a sign that the CSE and copy propagation passes place it.
+- A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
+  which is slotted by first use after the named locals, while the same value computed in place stays a named local
+  slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
+  `ShinkaDemoPieces_Move` gets the original's slots only with each branch's `fx32 distSqXZ` block-scoped and set as
+  `FX_Mul(x, x) + FX_Mul(z, z)` written out; through the file's `SquaredLengthXZ` inline they are temporaries.
+  Only when the assignment dominates every use, though: overlay 143's `MonolithMissionInfo_DrawRecords` gets `best`
+  slotted as a temporary through a pass-through inline getter, but `count`, assigned in one branch of an `if`/`else`,
+  keeps its declared slot whatever its type.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
@@ -2219,14 +2227,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
   order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
   one is dropped; a used `.bss` static joins the sort, an unused one does not.
-- A function-local `static` joins the size sort at the end of the file, after every local initializer, and such
-  statics come in reverse order, the last one declared first. So it reorders equal-size local initializers anywhere
-  in the file: overlay 311's `un_select.c` keeps its two windows' background color in function-local
-  `static const u8 backColor = 15;` (the `0f 0f` at the head of its `.rodata`), and its five 24-byte
-  `UnSelectActorTemplate` initializers come out in the ROM's order only with `sUnSelectListTouch` defined first among
-  the file's tables. Give `rodata_order.py` such statics last, reversed. Its `--check` compares only the shared
-  section, not the order of the objects with sections of their own, and counts a string literal in `.data` as a
-  local initializer.
+- A function-local `static` joins the size sort at the end of the file, after every local initializer, grouped by
+  function: the functions come in reverse order, each with its statics in declaration order. Unused ones are still
+  emitted and sorted, and a `00` in the packed section can be such a static of 0 rather than padding. So these
+  statics reorder equal-size local initializers anywhere in the file: overlay 311's `un_select.c` keeps its two
+  windows' background color in function-local `static const u8 backColor = 15;` (the `0f 0f` at the head of its
+  `.rodata`), and its five 24-byte `UnSelectActorTemplate` initializers come out in the ROM's order only with
+  `sUnSelectListTouch` defined first among the file's tables. Overlay 207's `p_sta_sub.c`, whose 17 12-byte
+  initializers no declaration order had reproduced, matches with four: `turnShift = FX32_CONST(25)` in
+  `PStaSub_Main`, `iconY = 127` and `defaultSequence = 0` in `PStaSub_CreateActors`, `spinRange = 0x1800` in
+  `PStaSub_AnimCircle` (the `7f 00 00 18 00 90 01 00` that nothing reads), and its icon tables defined just before
+  `PStaSub_CreateActors`. With three no order works; the count, not the sizes, decided the initializers' order.
+  Give `rodata_order.py` such statics last, grouped that way. Its `--check` compares only the shared section, not
+  the order of the objects with sections of their own, and it marks a string literal in `.data` as a local
+  initializer, though string literals don't take part in the sort.
 
 ## When nothing moves it
 

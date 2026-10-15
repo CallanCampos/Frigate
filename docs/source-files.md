@@ -1954,7 +1954,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `p_sta_sys.c` | `0x021b2f80`–`0x021b50b0` | 36 | complete | descriptive |
 | `p_status.c` | `0x021b50b0`–`0x021b5364` | 3 | complete | string at `0x021bb6ac` |
-| `p_sta_sub.c` | `0x021b5364`–`0x021b6924` | 29 | partial | string at `0x021bb6b8` |
+| `p_sta_sub.c` | `0x021b5364`–`0x021b6924` | 29 | complete | string at `0x021bb6b8` |
 | `p_sta_info.c` | `0x021b6924`–`0x021b7644` | 12 | complete | string at `0x021bb6c4` |
 | `p_sta_ribbon.c` | `0x021b7644`–`0x021b8510` | 29 | complete | string at `0x021bb6d4` |
 | `p_sta_skill.c` | `0x021b8510`–`0x021ba900` | 43 | complete | string at `0x021bb6e4` |
@@ -2353,7 +2353,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `shinka_demo.c` | `0x021e30e0`–`0x021e49b0` | 44 | complete | string at `0x021e80a0` |
 | `shinka_demo_graphic.c` | `0x021e49b0`–`0x021e4dd0` | 23 | complete | string at `0x021e80b0` |
-| `shinka_demo_view.c` | `0x021e4dd0`–`0x021e7824` | 56 | partial | string at `0x021e80c8` |
+| `shinka_demo_view.c` | `0x021e4dd0`–`0x021e7824` | 56 | complete | string at `0x021e80c8` |
 | `shinka_demo_effect.c` | `0x021e7824`–`0x021e7d9c` | 28 | complete | string at `0x021e80dc` |
 
 ### Overlay 285
