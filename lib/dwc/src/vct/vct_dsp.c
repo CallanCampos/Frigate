@@ -35,8 +35,6 @@ typedef struct VCTEcho {
     int readIndex;
     int writeIndex;
     int highpassOutput;
-    s32 coefficients[6];
-    s32 taps[6];
 } VCTEcho;
 
 static VCTCapture sCapture = {0, 0, 15, 0x3fc};
@@ -45,15 +43,16 @@ static s16 sInitialCoefficients[6] = {-5637, 16445, -14404, 11473, -12246, 892};
 static s16 sEchoHistory[0x800];
 static s16 sFarEnd[VCT_FRAME_SAMPLES];
 static VCTEcho sEcho;
+static s32 sEchoTaps[6];
+static s32 sEchoCoefficients[6];
 static u32 sLoudnessHistory[4];
 static VCTNoiseFloor sNoiseFloor;
 static VCTPacketPool sPacketPool;
 
 BOOL VCT_InitPacketPool(void *buffer, u32 size)
 {
-    u32 count = size / sizeof(VCTPacket);
-    VCTPacket *packets;
     u32 i;
+    u32 count = size / sizeof(VCTPacket);
 
     sPacketPool.base = buffer;
     if (count < 4 || count > 0x48) {
@@ -67,11 +66,10 @@ BOOL VCT_InitPacketPool(void *buffer, u32 size)
         return FALSE;
     }
     MI_CpuClearFast(buffer, size);
-    packets = sPacketPool.base;
     for (i = 0; i < count - 1; i++) {
-        packets[i].nextFree = &packets[i + 1];
+        sPacketPool.base[i].nextFree = &sPacketPool.base[i + 1];
     }
-    packets[count - 1].nextFree = NULL;
+    sPacketPool.base[count - 1].nextFree = NULL;
     sPacketPool.freeList = sPacketPool.base;
     return TRUE;
 }
@@ -200,11 +198,8 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
 
 void VCT_InitCapture(void)
 {
-    s16 frames = 15;
-    s16 frameUnits = 0x44;
-
-    sCapture.quietFrameLimit = frames;
-    sCapture.unkC = frames * frameUnits;
+    sCapture.quietFrameLimit = 15;
+    sCapture.unkC = sCapture.quietFrameLimit * 0x44;
     VCT_ResetCapture();
 }
 
@@ -212,12 +207,13 @@ void VCT_InitCapture(void)
 u32 VCT_FilterFrame(s16 *samples, int bytes)
 {
     s16 input = samples[0];
+    u32 count = (u32)bytes >> 1;
     int minusInput = -(input * 0xe9f);
-    int output = ((input * 0xe9f) + sEcho.highpassMinusInput + sEcho.highpassOutput * 0xd3e) >> 12;
-    u64 sum = output * output;
-    u32 count = bytes >> 1;
     u32 i;
+    u64 sum;
+    int output = ((input * 0xe9f) + sEcho.highpassMinusInput + sEcho.highpassOutput * 0xd3e) >> 12;
 
+    sum = output * output;
     sEcho.highpassOutput = output;
     sEcho.highpassMinusInput = minusInput;
     for (i = 1; i < count; i++) {
@@ -244,6 +240,7 @@ u32 VCT_FilterFrame(s16 *samples, int bytes)
 
 void VCT_InitEcho(void)
 {
+    const s16 *coeffs = sInitialCoefficients;
     int i;
 
     sEcho.writeIndex = 0;
@@ -252,8 +249,8 @@ void VCT_InitEcho(void)
         sEchoHistory[i] = 0;
     }
     for (i = 0; i < 6; i++) {
-        sEcho.taps[i] = 0;
-        sEcho.coefficients[i] = sInitialCoefficients[i];
+        sEchoTaps[i] = 0;
+        sEchoCoefficients[i] = coeffs[i];
     }
 }
 
@@ -268,25 +265,25 @@ void VCT_SaveFarEnd(s16 *samples, int bytes)
 static void SuppressEcho(s16 *mic, s16 *far, int bytes, u32 rms)
 {
     u64 energy = 0;
-    u32 count = bytes >> 1;
-    u32 i;
+    u32 i = 0;
+    u32 count = (u32)bytes >> 1;
 
-    for (i = 0; i < count; i++) {
+    for (; i < count; i++) {
         s32 sum;
         s16 sample;
 
         sEchoHistory[sEcho.writeIndex] = far[i];
-        sEcho.taps[0] = sEchoHistory[sEcho.readIndex];
-        sum = sEcho.taps[4] * sEcho.coefficients[4] + sEcho.taps[5] * sEcho.coefficients[5];
-        sEcho.taps[5] = sEcho.taps[4];
-        sum += sEcho.taps[3] * sEcho.coefficients[3];
-        sEcho.taps[4] = sEcho.taps[3];
-        sum += sEcho.taps[2] * sEcho.coefficients[2];
-        sEcho.taps[3] = sEcho.taps[2];
-        sum += sEcho.taps[1] * sEcho.coefficients[1];
-        sEcho.taps[2] = sEcho.taps[1];
-        sum += sEcho.taps[0] * sEcho.coefficients[0];
-        sEcho.taps[1] = sEcho.taps[0];
+        sEchoTaps[0] = sEchoHistory[sEcho.readIndex];
+        sum = sEchoTaps[4] * sEchoCoefficients[4] + sEchoTaps[5] * sEchoCoefficients[5];
+        sEchoTaps[5] = sEchoTaps[4];
+        sum += sEchoTaps[3] * sEchoCoefficients[3];
+        sEchoTaps[4] = sEchoTaps[3];
+        sum += sEchoTaps[2] * sEchoCoefficients[2];
+        sEchoTaps[3] = sEchoTaps[2];
+        sum += sEchoTaps[1] * sEchoCoefficients[1];
+        sEchoTaps[2] = sEchoTaps[1];
+        sum += sEchoTaps[0] * sEchoCoefficients[0];
+        sEchoTaps[1] = sEchoTaps[0];
         if (sum > 0x3fff8000) {
             sum = 0x3fff8000;
         } else if (sum < -0x40000000) {
