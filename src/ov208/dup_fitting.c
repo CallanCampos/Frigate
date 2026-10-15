@@ -221,10 +221,6 @@ static void DupFitting_UpdateSparkles(DupFittingWork *work);
 static void DupFitting_ShowTouchEffect(DupFittingWork *work);
 static void DupFitting_Trace(DupFittingWork *work, u8 id);
 
-static const BOOL DUP_FITTING_HIDDEN_0 = FALSE;
-static const BOOL DUP_FITTING_HIDDEN_1 = FALSE;
-static const BOOL DUP_FITTING_SHOWN = TRUE;
-
 // The index of the prop at a position of the ring, which wraps around once
 static inline u16 DupFitting_GetRingIndexAt(DupFittingWork *work, u32 pos) {
     u32 total = work->entryCount * DUP_FITTING_RING_STEP;
@@ -577,6 +573,17 @@ static void DupFitting_VBlank(TCB *tcb, void *data) {
     MusItemDraw_DrawSystem(work->itemSys);
 }
 
+// The data are defined in the order that gives the ROM's .rodata layout under MWCC's size sort (see
+// docs/matching.md): the angle table and BG7's setup first, the edge colors between the camera vectors
+
+// The ring angles up to which a prop is full size, shrinks, and shrinks to nothing
+static const u16 DUP_FITTING_SCALE_ANGLES[3] = { 0x4000, 0x6e00, 0x78e0 };
+
+static const BGSetup DUP_FITTING_BG7_SETUP = {
+    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800), GX_BG_CHARBASE(0x10000), 0x8000,
+    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+};
+
 static const BGSysVRAMConfig DUP_FITTING_VRAM_CONFIG = {
     GX_VRAM_BG_64_E,
     GX_VRAM_BGEXTPLTT_NONE,
@@ -594,8 +601,8 @@ static const BGSysVRAMConfig DUP_FITTING_VRAM_CONFIG = {
 
 static const VecFx32 DUP_FITTING_CAMERA_POSITION = { 0, 0, 301 * FX32_ONE };
 static const VecFx32 DUP_FITTING_CAMERA_TARGET = { 0, 0, 0 };
-static const VecFx32 DUP_FITTING_CAMERA_UP = { 0, FX32_ONE, 0 };
 static const GXRgb DUP_FITTING_EDGE_COLORS[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+static const VecFx32 DUP_FITTING_CAMERA_UP = { 0, FX32_ONE, 0 };
 static const BGSysLCDConfig DUP_FITTING_LCD_CONFIG = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D };
 
 static const BGSetup DUP_FITTING_BG1_SETUP = {
@@ -620,10 +627,6 @@ static const BGSetup DUP_FITTING_BG5_SETUP = {
 };
 static const BGSetup DUP_FITTING_BG6_SETUP = {
     0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x5000), GX_BG_CHARBASE(0x8000), 0,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
-};
-static const BGSetup DUP_FITTING_BG7_SETUP = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800), GX_BG_CHARBASE(0x10000), 0x8000,
     GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
 };
 
@@ -758,6 +761,7 @@ static void DupFitting_InitPoke(DupFittingWork *work) {
 }
 
 static void DupFitting_InitItems(DupFittingWork *work) {
+    static const BOOL hidden = FALSE;
     MusItemData *items;
     u8 i;
     int k;
@@ -871,7 +875,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         u32 actor = BlActScene_AddNewActor(work->blact, work->badgeMaterial, FX32_ONE, FX32_ONE, &pos, 31, 0, 0);
 
         work->badgeActors[i] = actor;
-        BlActScene_SetActorHidden(work->blact, actor, &DUP_FITTING_HIDDEN_0);
+        BlActScene_SetActorHidden(work->blact, actor, &hidden);
     }
     work->badgeFrame = 0;
     {
@@ -977,15 +981,10 @@ static void DupFitting_UpdateDress(DupFittingWork *work) {
     }
 }
 
-// The ring angles up to which a prop is full size, shrinks, and shrinks to nothing
-static const u16 DUP_FITTING_SCALE_ANGLES[3] = { 0x4000, 0x6e00, 0x78e0 };
-// The smallest turn of a drag that moves the ring, and the speed under which a spin stops
-static const u16 DUP_FITTING_SPIN_THRESHOLDS[2] = { 227, 128 };
-// The tilt change per frame while dragging; the original's table has a second, unused entry
-static const u16 DUP_FITTING_DRAG_TILT_STEPS[2] = { 0x100, 0 };
-
 static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 angle, s16 delta, u16 radiusX,
                                                      u16 radiusY) {
+    static const BOOL hidden = FALSE;
+    static const BOOL shown = TRUE;
     s32 i = 0;
     DupFittingItemNode *node = DupFittingItemList_GetHead(work->carouselList);
     s32 total;
@@ -1093,9 +1092,9 @@ static DupFittingItemNode *DupFitting_UpdateCarousel(DupFittingWork *work, u16 a
             badgePos.z = vec.z + 192 * FX32_ONE / 512;
             BlActScene_SetActorPos(work->blact, work->badgeActors[i], &badgePos);
             func_0204ea5c(work->blact, work->badgeActors[i], &scale, &scale);
-            BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &DUP_FITTING_SHOWN);
+            BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &shown);
         } else {
-            BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &DUP_FITTING_HIDDEN_1);
+            BlActScene_SetActorHidden(work->blact, work->badgeActors[i], &hidden);
         }
     }
     return DupFittingItemList_GetHead(work->carouselList);
@@ -1117,6 +1116,8 @@ static void DupFitting_RefreshCarouselItems(DupFittingWork *work) {
 }
 
 static void DupFitting_UpdateInput(DupFittingWork *work) {
+    // The speed under which a spin stops
+    static const u16 spinStopSpeed = 128;
     BOOL ringDragged = FALSE;
     BOOL selected = FALSE;
     BOOL picked = FALSE;
@@ -1206,7 +1207,7 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
         }
         work->angle = angle;
         DupFitting_UpdateCarousel(work, work->angle, work->angleSpeed, 72, 48);
-        if (work->angleSpeed > DUP_FITTING_SPIN_THRESHOLDS[1] || work->angleSpeed < -DUP_FITTING_SPIN_THRESHOLDS[1]) {
+        if (work->angleSpeed > spinStopSpeed || work->angleSpeed < -spinStopSpeed) {
             work->angleSpeed *= 0.75f;
         } else {
             work->angleSpeed = 0;
@@ -1217,6 +1218,10 @@ static void DupFitting_UpdateInput(DupFittingWork *work) {
 }
 
 static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
+    // The tilt change per frame while dragging; the original's table has a second, unused entry
+    static const u16 tiltSteps[2] = { 0x100, 0 };
+    // The smallest turn of a drag that moves the ring
+    static const u16 dragMinTurn = 227;
     s32 delta = func_020443d8(work->prevTouchX, work->prevTouchY * 72 / 48, work->touchX, work->touchY * 72 / 48, 128,
                               80, 72);
 
@@ -1251,7 +1256,7 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
         }
     }
     if (work->dragging == TRUE) {
-        if (MATH_ABS(delta) > DUP_FITTING_SPIN_THRESHOLDS[0] && MATH_ABS(delta) < 0x4000) {
+        if (MATH_ABS(delta) > dragMinTurn && MATH_ABS(delta) < 0x4000) {
             s32 angle = work->angle + 0x10000 - delta;
 
             if (angle < 0) {
@@ -1273,11 +1278,11 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
                 work->tilt = 0;
             } else if (work->angleSpeed > 0 && work->tilt > -0x3000) {
                 if (work->angleSpeed * 15 > work->tilt * -10) {
-                    work->tilt -= DUP_FITTING_DRAG_TILT_STEPS[0];
+                    work->tilt -= tiltSteps[0];
                 }
             } else if (work->angleSpeed < 0 && work->tilt < 0x3000) {
                 if (work->angleSpeed * -15 > work->tilt * 10) {
-                    work->tilt += DUP_FITTING_DRAG_TILT_STEPS[0];
+                    work->tilt += tiltSteps[0];
                 }
             }
         } else {

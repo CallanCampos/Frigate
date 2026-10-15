@@ -2251,6 +2251,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   Give `rodata_order.py` such statics last, grouped that way. Its `--check` compares only the shared section, not
   the order of the objects with sections of their own, and it marks a string literal in `.data` as a local
   initializer, though string literals don't take part in the sort.
+  It is about scalars, not only function-local ones: a file-scope `static const` scalar whose address is taken
+  joins that end of the list too, after its function's own statics, in the group of the first function to use it
+  (each group: the function's statics in declaration order, then the file-scope scalars it first uses, in use
+  order). Arrays and structs, a function-local `static const` array included, are listed where they are defined.
+  Overlay 208's `dup_fitting.c` gets the ROM's `.rodata` with its three `BOOL`s passed by address as function-local
+  `static const BOOL` and its `{227, 128}` as two `static const u16` scalars of the functions that compare with them;
+  as one array no order of its 13 file-scope objects works. About 120 orders of those objects then fit, so the
+  file's order is one of them and says so. The compiled object's symbol table lists data objects in their sorted
+  order across sections, ties included, which checks a model far better than `--check`.
 
 ## When nothing moves it
 
