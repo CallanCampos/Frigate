@@ -12,7 +12,7 @@
 typedef struct SSLSessionCacheEntry {
     u8 session_id[0x20];
     u8 secret[0x30];
-    s32 time; // CPS_NOW() when the entry was made
+    s32 time; // clock() >> 16 when the entry was last used
     CPSInAddr ip;
     u16 port;
     u8 valid;
@@ -58,7 +58,7 @@ typedef struct SSLContext {
                         // the quick-resume key material and signature check, the subject's common name, validity
     SSLNamedParam *const *named_params; // The caller's registered list, set with CPS_SslSetNamedParams
     u32 named_param_count;
-    void *key_param; // The named param SSLi_CheckQuickResume found, kept for SSLi_FinishKeyExchange
+    void *key_param; // Private key consumed by SSLi_FinishKeyExchange; its writer is not recovered
     u8 unk_820[4];
     u8 *read_buf; // Application data the handshake has read but the caller hasn't taken yet
     u32 read_buf_len;
@@ -92,12 +92,12 @@ static const u8 sNoCertificateAlert[7] = { 0x15, 0x03, 0x00, 0x00, 0x02, 0x01, 0
 
 // X.509 attribute and algorithm OIDs SSLi_ParseAsn1Field recognizes while walking a certificate, and one sentinel
 // that never matches
-static const u8 sOid0[3] = { 0xff, 0xff, 0xff };
-static const u8 sOidRsaEncryption[9] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
-static const u8 sOid2[4] = { 0x55, 0x08, 0x01, 0x01 };
-static const u8 sOidMd5WithRsa[9] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x04 };
-static const u8 sOidSha1WithRsa[9] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x05 };
-static const u8 sOidCommonName[3] = { 0x55, 0x04, 0x03 };
+static const u8 sOid0[4] = { 0xff, 0xff, 0xff, 0 };
+static const u8 sOidRsaEncryption[10] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0 };
+static const u8 sOid2[5] = { 0x55, 0x08, 0x01, 0x01, 0 };
+static const u8 sOidMd5WithRsa[10] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x04, 0 };
+static const u8 sOidSha1WithRsa[10] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x05, 0 };
+static const u8 sOidCommonName[4] = { 0x55, 0x04, 0x03, 0 };
 
 static const u8 *const sOids[6] = { sOid0, sOidRsaEncryption, sOid2, sOidMd5WithRsa, sOidSha1WithRsa, sOidCommonName };
 
@@ -166,6 +166,7 @@ static void SSLi_RestoreSessionById(SSLContext *ctx) {
     u32 enabled = CPU_IRQDisable();
     int i;
 
+    ctx->resumed = FALSE;
     for (i = 0; i < 4; i++) {
         SSLSessionCacheEntry *entry = &sSessionCache[i];
         if (entry->valid && entry->ip == 0 && entry->port == 0 && memcmp(entry, ctx->session_id, 0x20) == 0) {
@@ -181,65 +182,47 @@ static void SSLi_RestoreSessionById(SSLContext *ctx) {
 // ClientHello
 static void SSLi_FindSessionByPeer(SSLContext *ctx, CPSInAddr ip, u16 port) {
     u32 enabled = CPU_IRQDisable();
-    u32 now = (u32)clock();
-    SSLSessionCacheEntry *best = NULL;
-    u32 bestAge = (u32)-1;
-    int i;
-
-    for (i = 0; i < 4; i++) {
-        SSLSessionCacheEntry *entry = &sSessionCache[i];
-        if (entry->valid && ip != 0 && ip == entry->ip && port != 0 && port == entry->port) {
-            best = entry;
-            break;
-        }
-        if (bestAge != (u32)-1) {
-            if (entry->valid) {
-                u32 age = now - entry->time;
-                if (age <= bestAge) {
-                    bestAge = age;
-                    best = entry;
-                }
-            } else {
-                bestAge = (u32)-1;
-                best = entry;
-            }
-        }
-    }
-
-    sys_memcpy(best->session_id, ctx->session_id, 0x20);
-    sys_memcpy(best->secret, ctx->secret, 0x30);
-    best->time = now;
-    best->valid = TRUE;
-    best->ip = ip;
-    best->port = port;
-    CPU_SetIRQMask(enabled);
-}
-
-// Stores the connection's current session (id and secret) in the cache, evicting the oldest entry for the same peer
-static void SSLi_SaveSession(SSLContext *ctx, CPSInAddr ip, u16 port) {
-    u32 enabled = CPU_IRQDisable();
-    u32 now = (u32)clock();
-    SSLSessionCacheEntry *target = NULL;
-    u32 bestFreeLeft = (u32)-1;
     int i;
 
     ctx->resumed = FALSE;
     for (i = 0; i < 4; i++) {
         SSLSessionCacheEntry *entry = &sSessionCache[i];
+        if (entry->valid && entry->ip == ip && entry->port == port) {
+            sys_memcpy(entry->session_id, ctx->session_id, 0x20);
+            sys_memcpy(entry->secret, ctx->secret, 0x30);
+            entry->time = (u32)(clock() >> 16);
+            ctx->resumed = TRUE;
+            break;
+        }
+    }
+    CPU_SetIRQMask(enabled);
+}
+
+// Stores the connection's current session (id and secret) in the cache, reusing a peer hit, an invalid entry, or the
+// oldest entry
+static void SSLi_SaveSession(SSLContext *ctx, CPSInAddr ip, u16 port) {
+    u32 enabled = CPU_IRQDisable();
+    u32 now = (u32)(clock() >> 16);
+    SSLSessionCacheEntry *target = &sSessionCache[0];
+    u32 bestAge = 0;
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        SSLSessionCacheEntry *entry = &sSessionCache[i];
         if (entry->valid && ip != 0 && ip == entry->ip && port != 0 && port == entry->port) {
             target = entry;
             break;
         }
-        if (bestFreeLeft == (u32)-1) {
-            target = entry;
-        } else if (!entry->valid) {
-            bestFreeLeft = (u32)-1;
-            target = entry;
-        } else {
-            u32 left = now - entry->time;
-            if (left > bestFreeLeft) {
-                bestFreeLeft = left;
+        if (bestAge != (u32)-1) {
+            if (!entry->valid) {
+                bestAge = (u32)-1;
                 target = entry;
+            } else {
+                u32 age = now - entry->time;
+                if (age > bestAge) {
+                    bestAge = age;
+                    target = entry;
+                }
             }
         }
     }
@@ -247,10 +230,9 @@ static void SSLi_SaveSession(SSLContext *ctx, CPSInAddr ip, u16 port) {
     sys_memcpy(ctx->session_id, target->session_id, 0x20);
     sys_memcpy(ctx->secret, target->secret, 0x30);
     target->time = now;
+    target->valid = TRUE;
     target->ip = ip;
     target->port = port;
-    target->valid = TRUE;
-    ctx->resumed = FALSE;
     CPU_SetIRQMask(enabled);
 }
 
@@ -341,29 +323,16 @@ static const SSLNamedParam *SSLi_FindNamedParam(const SSLContext *ctx, const cha
 // following big-endian bytes to read it from. -1 if that count would need the high bits of the result
 static s32 SSLi_DecodeLength(const u8 **cursor) {
     const u8 *p = *cursor;
-    u8 first = *p++;
-    s32 value;
+    u32 value = *p++;
 
-    if (!(first & 0x80)) {
-        *cursor = p;
-        return first;
-    }
-
-    {
-        int remaining = (first & 0x7f) - 1;
-        if ((first & 0x7f) == 0) {
-            *cursor = p;
-            return 0;
-        }
-        value = first & 0x7f;
-        while (TRUE) {
+    if (value & 0x80) {
+        u32 count = value & 0x7f;
+        value = 0;
+        while (count-- != 0) {
             if (value & 0xff000000) {
                 return -1;
             }
             value = (value << 8) + *p++;
-            if (--remaining < 0) {
-                break;
-            }
         }
     }
     *cursor = p;
@@ -454,7 +423,7 @@ static int SSLi_ParseAsn1Field(SSLContext *ctx, const u8 **cursor, int depth, in
     case 6: { // OBJECT IDENTIFIER
         int i;
         for (i = 0; i < 6; i++) {
-            if (strlen((const char *)sOids[i]) == (u32)len && memcmp(valueStart, sOids[i], len) == 0) {
+            if (memcmp(valueStart, sOids[i], strlen((const char *)sOids[i])) == 0) {
                 switch (i) {
                 case 1:
                     SSLI_CERT_BYTE(ctx, 0x5ac) = i;
@@ -527,14 +496,24 @@ static int SSLi_ParseAsn1Field(SSLContext *ctx, const u8 **cursor, int depth, in
 #undef SSLI_CERT_FIELD
 #undef SSLI_CERT_BYTE
 
-// A certificate's RSA public key, as SSLi_ParseAsn1Field left it: a modulus and an exponent, each a byte pointer and
-// length
+// Registered public-key record. The length/pointer pairs and name prefix come from the original loads.
+// This private layout is distinct from the RSA-CRT key consumed by SSLi_DecryptPreMasterSecret.
 typedef struct SSLRsaPublicKey {
+    const char *name;
+    s32 modulus_len;
+    const u8 *modulus;
+    s32 exponent_len;
+    const u8 *exponent;
+} SSLRsaPublicKey;
+
+// Provisional certificate-key view used only by the still-incomplete SSLi_SendClientKeyExchange.
+// Keep its existing field interpretation separate from the recovered registered public-key layout.
+typedef struct SSLCertificateKey {
     const u8 *exponent;
     u32 exponent_len;
     const u8 *modulus;
     u32 modulus_len;
-} SSLRsaPublicKey;
+} SSLCertificateKey;
 
 // Checks the signature SSLi_ParseAsn1Field found (ctx's certificate's own, for the quick-resume ticket) against the
 // snapshot handshake digest at ctx+0x468, PKCS#1 v1.5 style: decrypted = signature^e mod n, then 0x00 0x01 0xff...
@@ -542,54 +521,55 @@ typedef struct SSLRsaPublicKey {
 static int SSLi_VerifyQuickResumeSignature(SSLContext *ctx, const SSLRsaPublicKey *key) {
 #define SIG_PTR (*(const u8 **)((u8 *)ctx + 0x5a4))
 #define SIG_LEN (*(u32 *)((u8 *)ctx + 0x5a8))
+#define DIGEST_LEN (*(u32 *)((u8 *)ctx + 0x47c))
     int n;
     u16 *digits;
-    u16 *sigDigits, *modDigits, *expDigits;
+    u16 *sigDigits, *expDigits, *modDigits;
     u8 *decrypted;
     u32 priority;
+    int status = 0;
 
-    if (SIG_PTR == NULL || SIG_LEN == 0 || key->modulus == NULL || key->exponent == NULL || key->modulus_len == 0) {
-        return SSLI_STATE_CERTIFICATE_REQUEST;
+    if (SIG_PTR == NULL || SIG_LEN == 0 || key->exponent == NULL || key->exponent_len == 0 || key->modulus == NULL ||
+        key->modulus_len == 0) {
+        return 2;
     }
 
-    n = ((SIG_LEN << 1 | (SIG_LEN >> 31)) >> 1) + 1;
+    n = (key->modulus_len * 2) / 2;
     digits = (u16 *)CPSiAlloc(n * 8);
     if (digits == NULL) {
-        return SSLI_STATE_CERTIFICATE_REQUEST;
+        return 2;
     }
 
-    sigDigits = digits;
-    modDigits = sigDigits + n;
-    expDigits = modDigits + n;
-    decrypted = (u8 *)(expDigits + n);
+    sigDigits = digits + n;
+    expDigits = sigDigits + n;
+    modDigits = expDigits + n;
+    decrypted = (u8 *)sigDigits;
 
     BigInt_BytesToDigits(sigDigits, SIG_PTR, SIG_LEN, n);
-    BigInt_BytesToDigits(modDigits, key->modulus, key->modulus_len, n);
     BigInt_BytesToDigits(expDigits, key->exponent, key->exponent_len, n);
-
+    BigInt_BytesToDigits(modDigits, key->modulus, key->modulus_len, n);
     priority = SSLi_RaisePriority();
-    BigInt_ModExp(expDigits, sigDigits, expDigits, n, modDigits);
+    BigInt_ModExp(digits, sigDigits, expDigits, n, modDigits);
     SSLi_RestorePriority(priority);
+    BigInt_DigitsToBytes(decrypted, digits, key->modulus_len, n);
 
-    BigInt_DigitsToBytes(decrypted, expDigits, 0x30);
-
-    {
-        int status = SSLI_STATE_SERVER_HELLO_DONE;
-        if (decrypted[0] == 0 && decrypted[1] == 1) {
-            u32 pos = 2;
-            while (pos < key->modulus_len && decrypted[pos] == 0xff) {
-                pos++;
-            }
-            if (pos + 1 < key->modulus_len && decrypted[pos] == 0 && decrypted[pos + 1] == 0x30 &&
-                memcmp((u8 *)ctx + 0x468, decrypted + pos + 2, key->modulus_len - pos - 2) == 0) {
-                status = SSLI_STATE_ERROR;
-            }
+    if (decrypted[0] == 0 && decrypted[1] == 1) {
+        int pos = 2;
+        while (pos < key->modulus_len && decrypted[pos] == 0xff) {
+            pos++;
         }
-        CPSiFree(digits);
-        return status;
+        if (pos + 1 >= key->modulus_len || decrypted[pos] != 0 || decrypted[pos + 1] != 0x30 ||
+            memcmp((u8 *)ctx + 0x468, decrypted + key->modulus_len - DIGEST_LEN, DIGEST_LEN) != 0) {
+            status = 2;
+        }
+    } else {
+        status = 2;
     }
+    CPSiFree(digits);
+    return status;
 #undef SIG_PTR
 #undef SIG_LEN
+#undef DIGEST_LEN
 }
 
 // Decides whether the certificate SSLi_ParseAsn1Field just finished with lets the connection skip the handshake:
@@ -603,7 +583,10 @@ static int SSLi_CheckQuickResume(SSLContext *ctx) {
     u32 digestLen = CF32(0x45c);
     const SSLNamedParam *param;
 
-    if (digestLen != (u32)-1) {
+    if (digestLen == (u32)-1) {
+        return 4 | flags;
+    }
+    {
         u32 type = CF32(0x458);
         const u8 *start = (const u8 *)CF32(0x460);
         const u8 *end = (const u8 *)CF32(0x464);
@@ -627,7 +610,6 @@ static int SSLi_CheckQuickResume(SSLContext *ctx) {
     if (param == NULL) {
         return 1 | flags;
     }
-    ctx->key_param = (void *)param;
     return SSLi_VerifyQuickResumeSignature(ctx, (const SSLRsaPublicKey *)param) | flags;
 #undef CF32
 #undef CF8
@@ -810,81 +792,76 @@ static void SSLi_ParseServerHello(SSLContext *ctx, u8 *msg) {
     ctx->state = SSLI_STATE_SERVER_HELLO_RANDOM;
 }
 
-// The registered param SSLi_CheckQuickResume looks up by the certificate's common name: an RSA-CRT private key
-// (p, dp, q, dq, qinv) the client holds for itself, past the SSLRsaPublicKey fields a caller of
-// CPS_SslSetNamedParams who only wants verification doesn't set
+// RSA-CRT private key: six alternating length/pointer pairs observed in the original function.
+// First/second names avoid assuming a particular p/q ordering for the caller's key material.
 typedef struct SSLRsaPrivateKey {
-    SSLRsaPublicKey pub;
-    const u8 *p;
-    u32 p_len;
-    const u8 *dp;
-    u32 dp_len;
-    const u8 *q;
-    u32 q_len;
-    const u8 *dq;
-    u32 dq_len;
-    const u8 *qinv;
-    u32 qinv_len;
+    s32 modulus_len;
+    const u8 *modulus;
+    s32 first_prime_len;
+    const u8 *first_prime;
+    s32 second_prime_len;
+    const u8 *second_prime;
+    s32 first_exponent_len;
+    const u8 *first_exponent;
+    s32 second_exponent_len;
+    const u8 *second_exponent;
+    s32 coefficient_len;
+    const u8 *coefficient;
 } SSLRsaPrivateKey;
 
-// Decrypts a ClientKeyExchange-shaped RSA ciphertext (the pre-master secret the peer encrypted) with this
-// connection's own RSA-CRT private key, storing the 0x30-byte result in ctx->secret: m1 = c^dp mod p,
-// m2 = c^dq mod q, h = qinv * (m1 - m2) mod p, m = m2 + h * q. The private key's fields past SSLRsaPublicKey, and
-// which of BigInt_ModExp/BigInt_ModExpFast computes which of m1/m2, aren't confirmed (see
-// docs/nonmatching-functions.md)
+// Decrypts with both prime/exponent pairs, recombines their results, then reduces by the full modulus.
+// Seven n-digit regions and BigInt_Div's three-n-digit scratch occupy exactly 20*n allocated bytes.
 static void SSLi_DecryptPreMasterSecret(SSLContext *ctx, u8 *encrypted, void *keyParam) {
     const SSLRsaPrivateKey *key = (const SSLRsaPrivateKey *)keyParam;
     int n;
     u16 *buf;
-    u16 *c, *m1, *m2, *h, *p, *q, *qinv;
+    u16 *operand, *intermediate, *firstResult, *secondResult, *prime, *result, *work;
     u32 priority;
 
-    if (key == NULL || key->p_len == 0) {
+    if (key == NULL || key->modulus_len == 0) {
         return;
     }
 
-    n = ((key->p_len << 1 | (key->p_len >> 31)) >> 1) + 1;
-    buf = (u16 *)CPSiAlloc(0x14 * n);
+    n = (key->modulus_len * 2) / 2 + 1;
+    buf = (u16 *)CPSiAlloc(20 * n);
     if (buf == NULL) {
         return;
     }
 
-    c = buf;
-    m1 = c + 2 * n;
-    m2 = m1 + 2 * n;
-    h = m2 + 2 * n;
-    p = h + 2 * n;
-    q = p + 2 * n;
-    qinv = q + 2 * n;
+    operand = buf + n;
+    intermediate = operand + n;
+    firstResult = intermediate + n;
+    secondResult = firstResult + n;
+    prime = secondResult + n;
+    result = prime + n;
+    work = result + n;
 
-    BigInt_BytesToDigits(c, encrypted, key->p_len, n);
-    BigInt_BytesToDigits(p, key->dp, key->dp_len, n);
-    BigInt_BytesToDigits(q, key->p, key->p_len, n);
-
+    BigInt_BytesToDigits(buf, encrypted, key->modulus_len, n);
+    BigInt_BytesToDigits(operand, key->first_exponent, key->first_exponent_len, n);
+    BigInt_BytesToDigits(prime, key->first_prime, key->first_prime_len, n);
     priority = SSLi_RaisePriority();
-    BigInt_ModExpFast(m1, c, p, n, q);
+    BigInt_ModExpFast(firstResult, buf, operand, n, prime);
+    BigInt_BytesToDigits(operand, key->second_exponent, key->second_exponent_len, n);
+    BigInt_BytesToDigits(prime, key->second_prime, key->second_prime_len, n);
+    BigInt_ModExpFast(secondResult, buf, operand, n, prime);
     SSLi_RestorePriority(priority);
 
-    BigInt_BytesToDigits(p, key->dq, key->dq_len, n);
-    BigInt_BytesToDigits(q, key->q, key->q_len, n);
+    BigInt_Sub(buf, firstResult, secondResult, n);
+    BigInt_BytesToDigits(operand, key->coefficient, key->coefficient_len, n);
+    BigInt_Mul(intermediate, buf, operand, n);
+    BigInt_BytesToDigits(operand, key->second_prime, key->second_prime_len, n);
+    BigInt_Mul(buf, intermediate, operand, n);
+    BigInt_Add(intermediate, buf, secondResult, n);
+    BigInt_BytesToDigits(operand, key->modulus, key->modulus_len, n);
 
-    priority = SSLi_RaisePriority();
-    BigInt_ModExp(m2, c, p, n, q);
-    SSLi_RestorePriority(priority);
-
-    BigInt_Sub(h, m1, m2, n);
-    if (BigInt_GetSign(h, n) < 0) {
-        BigInt_Negate(h, n);
-        BigInt_Add(h, h, q, n);
+    if (BigInt_GetSign(intermediate, n) < 0) {
+        BigInt_Negate(intermediate, n);
+        BigInt_Div(NULL, intermediate, operand, result, n, work);
+        BigInt_Sub(result, operand, result, n);
+    } else {
+        BigInt_Div(NULL, intermediate, operand, result, n, work);
     }
-
-    BigInt_BytesToDigits(p, key->qinv, key->qinv_len, n);
-    BigInt_Mul(h, h, p, n);
-    BigInt_BytesToDigits(q, key->q, key->q_len, n);
-    BigInt_Mul(h, h, q, n);
-    BigInt_Add(m2, m2, h, n);
-
-    BigInt_DigitsToBytes((u8 *)ctx, m2, 0x30);
+    BigInt_DigitsToBytes((u8 *)ctx, result, 0x30, n);
     CPSiFree(buf);
 }
 
@@ -1358,7 +1335,7 @@ static void SSLi_SendClientKeyExchange(CPSSoc *soc) {
     SSLi_GetRandomBytes(ctx->secret + 2, 0x2e);
 
     {
-        const SSLRsaPublicKey *key = (const SSLRsaPublicKey *)ctx->key_param;
+        const SSLCertificateKey *key = (const SSLCertificateKey *)ctx->key_param;
         u32 n = key->modulus_len;
         u8 *encrypted = (u8 *)CPSiAlloc(n);
         u32 priority;
@@ -1385,7 +1362,7 @@ static void SSLi_SendClientKeyExchange(CPSSoc *soc) {
             BigInt_BytesToDigits(e, key->exponent, key->exponent_len, digitCount);
             BigInt_BytesToDigits(mod, key->modulus, n, digitCount);
             BigInt_ModExpFast(c, c, e, digitCount, mod);
-            BigInt_DigitsToBytes(encrypted, c, n);
+            BigInt_DigitsToBytes(encrypted, c, n, digitCount);
             CPSiFree(digits);
         }
         SSLi_RestorePriority(priority);
