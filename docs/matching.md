@@ -1159,6 +1159,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `ZukanDetailForm_PrintEntry` declares `EntryLine colorY = ENTRY_LINE_BOTTOM;` (17) and passes it to the color's
   print; set in the color's block, the 17 is built before `x`'s arithmetic (9 bytes), and an `int` or a field
   folds the narrowing away.
+  An enum-typed index local stays a variable of its own too, which decides which register the copy for a multiply
+  gets: overlay 209's `MusPokeDraw_CellCallback` keeps `kind - 7` in `r4` and multiplies a copy in `r1`, as the
+  original does, only with `MusPokeDrawEquipNo pos = kind - MUS_POKE_DRAW_CELL_EQUIP;` and `poke->equips[pos]`
+  indexed in place; an `int`, `u32` or `s32` local gives the reverse.
 - A result tested with no narrowing after the call, but narrowed after arithmetic on it (`(u8)(weather - 2) <= 2`),
   comes from a function that returns `u8`. `HandlerSolarBeamPower` matches only with `GetWeather` returning `u8`, and
   so do the getters it calls, down to the field's `u8` weather, for their own definitions to keep matching.

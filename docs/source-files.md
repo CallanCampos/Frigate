@@ -1980,7 +1980,7 @@ prints the tables below from the configs and the ROM:
 | `mus_shot_photo.c` | `0x021ba598`–`0x021bad2c` | 10 | complete | string at `0x021c3020` |
 | `mus_shot_info.c` | `0x021bad2c`–`0x021bb368` | 11 | complete | string at `0x021c3034` |
 | `mus_item_draw.c` | `0x021bb368`–`0x021bb9bc` | 32 | complete | string at `0x021c3044` |
-| `mus_poke_draw.c` | `0x021bb9bc`–`0x021bbe50` | 24 | partial | string at `0x021c3054` |
+| `mus_poke_draw.c` | `0x021bb9bc`–`0x021bbe50` | 24 | complete | string at `0x021c3054` |
 | `musical_mcss.c` | `0x021bbe50`–`0x021bd238` | 35 | complete | string at `0x021c3064` |
 | `sta_act_obj.c` | `0x021bd238`–`0x021bd42c` | 10 | complete | string at `0x021c3074` |
 | `sta_act_light.c` | `0x021bd42c`–`0x021bd778` | 12 | complete | string at `0x021c3084` |
