@@ -10,6 +10,7 @@ after importing names from swan.
     config_fixes.py reloc-module overlays/ov035 'overlay(12)' 0x0217c9e8    # an ambiguous destination module
     config_fixes.py overlay-id overlays/ov035 279 0x0217cbe4                 # a literal that is an overlay ID
     config_fixes.py remove-reloc overlays/ov035 0x0217f540                   # a relocation that is not one
+    config_fixes.py remove-orphan-reloc overlays/ov011 --source-module . 0x020050c4  # filed in the wrong module
     config_fixes.py reloc-addend overlays/ov036 2 0x021841e8                 # a relocation to inside an object
     config_fixes.py remove-symbol overlays/ov005 0x0214f5fd                  # a symbol that is not one
     config_fixes.py add-label . _ll_mul 0x0208d60c                           # a second name for a function
@@ -101,18 +102,18 @@ def save_fixes(fixes: list[tuple[str, int, str, str]]):
         number = re.search(r"(\d+)$", module)
         return (module != ".", int(number.group(1)) if number else 0, module, addr)
 
-    lines = [f"{m} {a:#010x} {act} {arg}".rstrip() for m, a, act, arg in sorted(set(fixes), key=key)]
+    # Keep the recorded replay order of different actions at the same address while removing exact duplicates.
+    lines = [f"{m} {a:#010x} {act} {arg}".rstrip() for m, a, act, arg in sorted(dict.fromkeys(fixes), key=key)]
     FIXES.write_text(HEADER + "\n".join(lines) + "\n")
 
 
-def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
-    """Applies a fix to one version's config. Applying a fix again changes nothing."""
+def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
+    """Validate one version's fix and return its file and new text, or None when already applied."""
     if action == "remove_symbol":
         path = config_dir(version, module) / "symbols.txt"
         lines = path.read_text().splitlines()
         kept = [line for line in lines if not (m := SYMBOL_ADDR_RE.search(line)) or int(m.group(1), 16) != addr]
-        path.write_text("\n".join(kept) + "\n")
-        return
+        return path, "\n".join(kept) + "\n"
     if action == "add_data":
         # A data object that dsd found no reference to, such as a global constant that the compiler folds into code but
         # still emits. Without a symbol, the object before it seems to run on over it
@@ -129,8 +130,7 @@ def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
                 and int(m.group(1), 16) < addr]
         symbol = f"{argument} kind:bss addr:{addr:#010x}" if in_bss else f"{argument} kind:data(any) addr:{addr:#010x}"
         lines.insert(data[-1] + 1 if data else len(lines), symbol)
-        path.write_text("\n".join(lines) + "\n")
-        return
+        return path, "\n".join(lines) + "\n"
     if action == "add_function":
         # A function that dsd's analysis missed, such as one after a literal pool that it took for code. Replaces the
         # symbols at the address
@@ -145,14 +145,13 @@ def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
         if existing is not None:
             if re.fullmatch(r"func_(?:ov\d{3}_)?[0-9a-f]{8}", lines[existing].split()[0]):
                 lines[existing] = line
-                path.write_text("\n".join(lines) + "\n")
+                return path, "\n".join(lines) + "\n"
             return
         lines = [l for l in lines if not (m := SYMBOL_ADDR_RE.search(l)) or int(m.group(1), 16) != addr]
         before = [i for i, l in enumerate(lines) if "kind:function" in l and (m := SYMBOL_ADDR_RE.search(l))
                   and int(m.group(1), 16) < addr]
         lines.insert(before[-1] + 1 if before else 0, line)
-        path.write_text("\n".join(lines) + "\n")
-        return
+        return path, "\n".join(lines) + "\n"
     if action == "add_label":
         # A label with the instruction mode of the function at the address, for code that the compiler calls by
         # two names, such as the runtime's _ll_mul and _ull_mul, or of the label dsd found there, for a second entry
@@ -165,7 +164,7 @@ def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
             kept = [line for i, line in enumerate(lines)
                     if not (i in at and line.startswith(".L_") and "kind:label" in line)]
             if len(kept) != len(lines):
-                path.write_text("\n".join(kept) + "\n")
+                return path, "\n".join(kept) + "\n"
             return
         mode = next((m.group(1) for i in at
                      if (m := re.search(r"kind:(?:function|label)\((arm|thumb)", lines[i]))), None)
@@ -177,8 +176,7 @@ def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
             lines[local] = f"{argument} kind:label({mode}) addr:{addr:#010x}"
         else:
             lines.insert(at[-1] + 1, f"{argument} kind:label({mode}) addr:{addr:#010x}")
-        path.write_text("\n".join(lines) + "\n")
-        return
+        return path, "\n".join(lines) + "\n"
 
     if action in ("section_start", "section_end"):
         # A registered source file's section range, moved after add_source_file.py, such as when an object at a boundary
@@ -199,8 +197,7 @@ def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
                 break
         else:
             sys.exit(f"{version} {module}: {source} has no {section}")
-        path.write_text("\n".join(lines) + "\n")
-        return
+        return path, "\n".join(lines) + "\n"
 
     if action == "add_section":
         # A section that a registered source file turns out to have, such as an object it defines that its neighbour
@@ -223,8 +220,7 @@ def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
             at += 1
         end = addr + int(size, 0)
         lines.insert(at, f"    {section:<11} start:{addr:#010x} end:{end:#010x}")
-        path.write_text("\n".join(lines) + "\n")
-        return
+        return path, "\n".join(lines) + "\n"
 
     path = config_dir(version, module) / "relocs.txt"
     lines = path.read_text().splitlines()
@@ -269,11 +265,64 @@ def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
         lines[index] = re.sub(r"to:0x[0-9a-f]+", f"to:{to - addend:#010x} add:{addend:#x}", lines[index])
     else:
         sys.exit(f"unknown action {action!r}")
-    path.write_text("\n".join(lines) + "\n")
+    return path, "\n".join(lines) + "\n"
+
+
+def apply_fix(version: str, module: str, addr: int, action: str, argument: str):
+    """Apply a fix to one version's config. Applying a fix again changes nothing."""
+    change = plan_fix(version, module, addr, action, argument)
+    if change is not None:
+        path, text = change
+        path.write_text(text)
+
+
+def orphan_reloc_plan(mapper: AddressMapper, module: str, addr: int, source_module: str):
+    """Validate every version before removing a relocation filed outside its source module.
+
+    Map the source through its actual owner: the recorded module cannot contain it. An absent entry is valid on
+    replay and in versions where dsd did not produce the orphan; multiple entries at a source are ambiguous.
+    """
+    if not source_module or Path(source_module) == Path(module):
+        sys.exit(f"{module} {addr:#010x}: source module must differ from the recorded module")
+
+    plan = []
+    for version in [PRIMARY, *OTHERS]:
+        mapped = addr if version == PRIMARY else mapper.map(source_module, addr, version)
+        owner_sections = parse_sections(config_dir(version, source_module) / "delinks.txt")
+        recorded_sections = parse_sections(config_dir(version, module) / "delinks.txt")
+        if not owner_sections or not recorded_sections:
+            sys.exit(f"{version}: cannot validate sections for {source_module} and {module}")
+        if not any(start <= mapped < end for start, end in owner_sections.values()):
+            sys.exit(f"{version}: {mapped:#010x} is outside source module {source_module}")
+        if any(start <= mapped < end for start, end in recorded_sections.values()):
+            sys.exit(f"{version}: {mapped:#010x} is inside recorded module {module}")
+
+        path = config_dir(version, module) / "relocs.txt"
+        matches = [RELOC_RE.match(line) for line in path.read_text().splitlines()]
+        count = sum(1 for match in matches if match and int(match.group(1), 16) == mapped)
+        if count > 1:
+            sys.exit(f"{version}: multiple relocations at {module} {mapped:#010x}")
+        # apply_fix expects every relocation line to have a source. Catch a malformed later file before a prior
+        # version is written; an absent source needs no rewrite, so even an empty file stays untouched.
+        if count and any(match is None for match in matches):
+            sys.exit(f"{version}: malformed relocation file {path}")
+        plan.append((version, mapped, count != 0))
+    return plan
 
 
 def apply_everywhere(mapper: AddressMapper, module: str, addr: int, action: str, argument: str):
-    apply_fix(PRIMARY, module, addr, action, argument)
+    if action == "remove_orphan_reloc":
+        plan = orphan_reloc_plan(mapper, module, addr, argument)
+        changes = [plan_fix(version, module, mapped, "remove_reloc", "")
+                   for version, mapped, present in plan if present]
+        for change in changes:
+            if change is not None:
+                path, text = change
+                path.write_text(text)
+        return
+    # Resolve one fix completely before applying it: a missing version-map pair must not leave only the primary
+    # version changed. Keep replay ordering, since later fixes can depend on earlier section edits.
+    plan = [(PRIMARY, addr, argument)]
     for other in OTHERS:
         other_argument = argument
         if action == "add_reloc":
@@ -282,7 +331,13 @@ def apply_everywhere(mapper: AddressMapper, module: str, addr: int, action: str,
             target = int(target, 16)
             mapped = mapper.map(reloc_module_names(destination)[0], target & ~1, other) | (target & 1)
             other_argument = ",".join([kind, destination, f"{mapped:#010x}", *addend])
-        apply_fix(other, module, mapper.map(module, addr, other), action, other_argument)
+        plan.append((other, mapper.map(module, addr, other), other_argument))
+    changes = [plan_fix(version, module, mapped, action, mapped_argument)
+               for version, mapped, mapped_argument in plan]
+    for change in changes:
+        if change is not None:
+            path, text = change
+            path.write_text(text)
 
 
 def main():
@@ -298,6 +353,10 @@ def main():
     command.add_argument("addresses", nargs="+")
     command = commands.add_parser("remove-reloc", help="remove relocations")
     command.add_argument("module")
+    command.add_argument("addresses", nargs="+")
+    command = commands.add_parser("remove-orphan-reloc", help="remove relocations filed outside their source module")
+    command.add_argument("module", help="module whose relocs.txt contains the orphan")
+    command.add_argument("--source-module", required=True, help="actual owner of the source address, e.g. . for main")
     command.add_argument("addresses", nargs="+")
     command = commands.add_parser("reloc-addend", help="point relocations at an object with an addend")
     command.add_argument("module")
@@ -352,6 +411,7 @@ def main():
 
     action = args.command.replace("-", "_")
     argument = {"reloc_module": getattr(args, "destination", ""), "overlay_id": str(getattr(args, "overlay", "")),
+                "remove_orphan_reloc": getattr(args, "source_module", ""),
                 "reloc_addend": getattr(args, "addend", ""), "add_label": getattr(args, "name", ""), "add_data": getattr(args, "name", ""),
                 "add_function": f"{getattr(args, 'name', '')}:{getattr(args, 'mode', '')}:{getattr(args, 'size', '')}",
                 "add_reloc": ",".join([getattr(args, "kind", ""), getattr(args, "destination", ""),
@@ -361,6 +421,10 @@ def main():
                 "section_end": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
                 "add_section": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}:{getattr(args, 'size', '')}"}
     argument = argument.get(action, "")
+    if action == "remove_orphan_reloc":
+        # A command may name several sources. Validate all of them before changing any relocation file or fix record.
+        for address in args.addresses:
+            orphan_reloc_plan(mapper, args.module, int(address, 16), argument)
     for address in args.addresses:
         addr = int(address, 16)
         apply_everywhere(mapper, args.module, addr, action, argument)
