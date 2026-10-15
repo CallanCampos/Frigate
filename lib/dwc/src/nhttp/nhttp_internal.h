@@ -314,7 +314,8 @@ void NHTTPi_CheckCurrentThread(NHttpThreadInfo *info, BOOL outside);
 int NHTTPi_SocCheck(int sock);
 int NHTTPi_SocOpen(NHttpRequest *request);
 int NHTTPi_SocClose(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock);
-int NHTTPi_SocConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, u32 addr, int port);
+int NHTTPi_SocConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, u32 addr,
+                      int port);
 int NHTTPi_SocSSLConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock);
 int NHTTPi_SocRecv_sub(NHttpConnection *connection, int sock, void *buffer, int size, int flags);
 int NHTTPi_SocRecv(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, void *buffer, int size, int flags);

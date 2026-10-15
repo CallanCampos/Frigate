@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_EVENT_BATTLE_LOSE_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "gfl/proc.h"
+#include "struct_decls.h"
 #include "system/game_event.h"
 
 struct BattleLoseData {

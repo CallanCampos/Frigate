@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/box.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
+#include "save/box.h"
 #include "save/save_control.h"
 
 // The day care's save block: its two Pokémon with the steps each has walked, the flag of a waiting egg and the

@@ -315,9 +315,8 @@ int ghiEncryptorSslStartFunc(GHIConnection *connection, GHIEncryptor *encryptor)
 #endif
                 break;
             case -39:
-                func_ov011_0216cca8(8, 4, 15,
-                                    "%s(@%s:%d):GameSpy SSL (TWL) Socket library is not initialized.\r\n", GHI_FILE,
-                                    __FUNCTION__, 1124);
+                func_ov011_0216cca8(8, 4, 15, "%s(@%s:%d):GameSpy SSL (TWL) Socket library is not initialized.\r\n",
+                                    GHI_FILE, __FUNCTION__, 1124);
                 break;
             case -42:
                 func_ov011_0216cca8(8, 4, 15, "%s(@%s:%d):GameSpy SSL (TWL)Insufficient resources.\r\n", GHI_FILE,

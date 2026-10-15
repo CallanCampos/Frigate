@@ -25,7 +25,7 @@ static NNSGfdTexKey EncEffCapture_GetTexKey(void);
 static GameEventReturnCode EncEffCapture_Callback(GameEvent *event, u32 *state, void *data);
 
 GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
-                               void (*render)(EncEffGrid *grid)) {
+                                          void (*render)(EncEffGrid *grid)) {
     GameEvent *event;
     EncEffCaptureWork *work;
 
@@ -39,7 +39,7 @@ GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, 
 }
 
 GameEvent *EncEffCapture_CreateEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
-                               void (*render)(EncEffGrid *grid)) {
+                                     void (*render)(EncEffGrid *grid)) {
     GameEvent *event;
     EncEffCaptureWork *work;
 

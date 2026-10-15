@@ -52,12 +52,16 @@ static const BGSysLCDConfig data_ov255_021d9490 = { GX_DISPMODE_GRAPHICS, GX_BGM
 
 static const ClActSysSetup data_ov255_021d94a0 = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
+// clang-format off
 static const BGSysVRAMConfig data_ov255_021d94bc = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE, GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_0_D,   GX_VRAM_TEXPLTT_0_F,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_32K,
 };
 
+// clang-format on
+
+// clang-format off
 static const BoxSearchBGSetup data_ov255_021d94ec[BG_COUNT] = {
     { 0,
       { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x4000,
@@ -89,9 +93,10 @@ static const BoxSearchBGSetup data_ov255_021d94ec[BG_COUNT] = {
       BGMODE_TEXT, TRUE },
 };
 
+// clang-format on
+
 BoxSearchGraphic *func_ov255_021d6d28(u32 layout, HeapID heapId) {
-    BoxSearchGraphic *graphic =
-        GFL_HeapAllocate(heapId, sizeof(BoxSearchGraphic), FALSE, "box_search_graphic.c", 449);
+    BoxSearchGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(BoxSearchGraphic), FALSE, "box_search_graphic.c", 449);
 
     sys_memset(graphic, 0, sizeof(BoxSearchGraphic));
     G2_BlendNone();

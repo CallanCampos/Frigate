@@ -638,8 +638,7 @@ static void IrcCompatWindow_PrintMsgCentered(IrcCompatWindow *win, IrcCompatText
     PrintWindow_Print(&win->printWindow, queue, x, y, win->strbuf, font, PRINT_COLOR(15, 14, 4));
 }
 
-static void IrcCompatWindow_PrintMsgNumber(IrcCompatWindow *win, IrcCompatText *text, u8 msgId, u8 number,
-                                           u16 index) {
+static void IrcCompatWindow_PrintMsgNumber(IrcCompatWindow *win, IrcCompatText *text, u8 msgId, u8 number, u16 index) {
     WordSet *wordSet;
     PrintQueue *queue;
     Font *font;

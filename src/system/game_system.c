@@ -1,7 +1,4 @@
 #include "types.h"
-#include "system/game_system.h"
-#include "save/c_gear_savedata.h"
-#include "save/save_control.h"
 #include "dsprot/dsprot.h"
 #include "field/event_game_clear.h"
 #include "field/festival.h"
@@ -20,11 +17,14 @@
 #include "gfl/ui.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "save/c_gear_savedata.h"
+#include "save/save_control.h"
 #include "system/aeabi.h"
 #include "system/game_beacon.h"
 #include "system/game_comm.h"
 #include "system/game_data.h"
 #include "system/game_event.h"
+#include "system/game_system.h"
 #include "system/iss_sys.h"
 #include "system/playtime_ctrl.h"
 
@@ -272,8 +272,8 @@ static BOOL GSYS_Update(GameSystem *gsys) {
 
 // Starts the field's communication once the map is up and no event runs
 static void GSYS_UpdateGameCommBoot(GameSystem *gsys) {
-    if (!GSYS_GetEventRunningFlag(gsys) && GSYS_CheckField(gsys) == TRUE
-        && Field_CheckMapLoadFinished(GSYS_GetField(gsys)) == TRUE) {
+    if (!GSYS_GetEventRunningFlag(gsys) && GSYS_CheckField(gsys) == TRUE &&
+        Field_CheckMapLoadFinished(GSYS_GetField(gsys)) == TRUE) {
         GSYS_TryBootGameComm(gsys);
     }
 }
@@ -382,9 +382,9 @@ static BOOL GSYS_CanBootGameComm(GameSystem *gsys) {
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
     u16 zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
 
-    if (gsys->unk36 == 0 && !IsZoneGameCommDisabled(zoneId) && !GFL_NetErrCheck() && func_02016b34(gsys) == TRUE
-        && func_ov012_021535dc(gsys) == TRUE && !(GCTX_HIDIsLidClosed() == TRUE && GetIsShouldUICallback() == TRUE)
-        && func_020098c0(func_02009924(gsys->gameData))) {
+    if (gsys->unk36 == 0 && !IsZoneGameCommDisabled(zoneId) && !GFL_NetErrCheck() && func_02016b34(gsys) == TRUE &&
+        func_ov012_021535dc(gsys) == TRUE && !(GCTX_HIDIsLidClosed() == TRUE && GetIsShouldUICallback() == TRUE) &&
+        func_020098c0(func_02009924(gsys->gameData))) {
         return TRUE;
     }
     return FALSE;

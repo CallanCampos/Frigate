@@ -1,11 +1,11 @@
-#include <stddef.h>
 #include "types.h"
-#include "save/symbol_save.h"
 #include "field/entree_forest.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
 #include "save/save_control.h"
+#include "save/symbol_save.h"
+#include <stddef.h>
 
 // The symbol encounters of the Entree Forest: the Pokémon that came from the Dream World, kept encrypted in ranges
 // of slots by kind. The file's name is the ROM's string. Block 0x3c.

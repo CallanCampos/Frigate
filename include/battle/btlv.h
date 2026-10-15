@@ -281,5 +281,4 @@ void func_ov167_021d0bac(BtlvCore *core, u32 arg1, u32 arg2, u32 arg3);
 u32 func_ov167_021d0be4(BtlvCore *core);
 void func_ov167_021d0bf4(BtlvCore *core, u32 arg1);
 
-
 #endif // POKEBW2_BATTLE_BTLV_H

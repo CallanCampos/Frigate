@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/fmission_app.h"
 #include "app/festival.h"
+#include "app/fmission_app.h"
 #include "app/fmission_app_gra.h"
 #include "app/fmission_log_accessor_fapp.h"
 #include "app/ui/print_msg.h"
@@ -162,8 +162,11 @@ static const s16 sFMissionAppTimeline[] = { 0, 60, 120, 180, 240, 241, -1 };
 static const s16 sFMissionAppRankingWindows[] = { 8, 9, 10, 11, 13, 14, 15, -1 };
 
 static const FMissionAppLabel sFMissionAppLabels[] = {
-    { Title4_Text_TimeLeft, 1 },   { Title4_Text_NumberPlayers, 2 }, { Title4_Text_Objective, 3 },
-    { Title4_Text_TotalScore, 4 }, { -1, -1 },
+    { Title4_Text_TimeLeft, 1 },
+    { Title4_Text_NumberPlayers, 2 },
+    { Title4_Text_Objective, 3 },
+    { Title4_Text_TotalScore, 4 },
+    { -1, -1 },
 };
 
 static const FMissionAppUnitText sFMissionAppUnitTexts[] = {
@@ -176,8 +179,10 @@ static const FMissionAppUnitText sFMissionAppUnitTexts[] = {
 
 const GameProcFunctions FMISSION_APP_PROC_FUNCTIONS = { FMissionApp_Init, FMissionApp_Main, FMissionApp_Exit };
 
-static FMissionAppFunc sFMissionAppUpdateFuncs[FMISSION_APP_MODE_COUNT] = { FMissionApp_UpdateMission, FMissionApp_UpdateResult };
-static FMissionAppFunc sFMissionAppInitFuncs[FMISSION_APP_MODE_COUNT] = { FMissionApp_InitMission, FMissionApp_InitResult };
+static FMissionAppFunc sFMissionAppUpdateFuncs[FMISSION_APP_MODE_COUNT] = { FMissionApp_UpdateMission,
+                                                                            FMissionApp_UpdateResult };
+static FMissionAppFunc sFMissionAppInitFuncs[FMISSION_APP_MODE_COUNT] = { FMissionApp_InitMission,
+                                                                          FMissionApp_InitResult };
 
 static BOOL FMissionApp_Init(GameProc *proc, u32 *state, void *param, void *data) {
     FestivalEventParam *eventParam = param;
@@ -995,8 +1000,8 @@ static void FMissionApp_AddLogEntry(FMissionApp *work, int index) {
     }
     found = -1;
     for (i = 0; i < FMISSION_LOG_FAPP_COUNT; i++) {
-        if (work->log->entries[index].trainerId == work->logEntries[i].trainerId
-            && GFL_StrBufCmp(work->log->entries[index].name, work->logEntries[i].name) == TRUE) {
+        if (work->log->entries[index].trainerId == work->logEntries[i].trainerId &&
+            GFL_StrBufCmp(work->log->entries[index].name, work->logEntries[i].name) == TRUE) {
             found = i;
             break;
         }
@@ -1053,10 +1058,10 @@ static void FMissionApp_MoveLogEntry(FMissionApp *work, int from, int to) {
 static void FMissionApp_PrintLabels(FMissionApp *work, u32 unused) {
     // Nothing reads this table of the screen's messages
     static const s16 messages[] = {
-        Title4_Text_TimeLeft,   Title4_Text_NumberPlayers, Title4_Text_Objective,  Title4_Text_TotalScore,
-        Title4_Text_Reward,     Title4_Text_Score,         Title4_Text_Rank,       Title4_Text_TopScore,
-        Title4_Text_Empty_68,   Title4_Text_TimeLeft_2,    Title4_Text_BonusScore, Title4_Text_DoubleScore,
-        Title4_Text_Empty_66,   Title4_Text_Empty_71,      Title4_Text_Empty_70,   Title4_Text_Of,
+        Title4_Text_TimeLeft, Title4_Text_NumberPlayers, Title4_Text_Objective,  Title4_Text_TotalScore,
+        Title4_Text_Reward,   Title4_Text_Score,         Title4_Text_Rank,       Title4_Text_TopScore,
+        Title4_Text_Empty_68, Title4_Text_TimeLeft_2,    Title4_Text_BonusScore, Title4_Text_DoubleScore,
+        Title4_Text_Empty_66, Title4_Text_Empty_71,      Title4_Text_Empty_70,   Title4_Text_Of,
     };
     int i;
 

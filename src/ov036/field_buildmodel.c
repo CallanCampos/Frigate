@@ -180,8 +180,8 @@ void FieldPropSystem_UnlinkChunk(FieldPropSystem *system, FieldChunk *chunk) {
     FieldPropSystem_ReleaseChunkPropHolders(system, chunk);
 }
 
-void FieldPropSystem_InstantiateFromInfo(FieldPropSystem *system, FieldChunk *chunk, const struct FieldPropSourceInfo *info,
-                                         u32 propIndex) {
+void FieldPropSystem_InstantiateFromInfo(FieldPropSystem *system, FieldChunk *chunk,
+                                         const struct FieldPropSourceInfo *info, u32 propIndex) {
     FieldPropInstance instance;
     u16 resId;
     s32 x, y, z;
@@ -332,7 +332,6 @@ void FieldPropSystem_LoadTextures(FieldPropSystem *system, u16 arcId, u32 fileId
     }
 }
 
-
 void FieldPropSystem_FreeTextures(FieldPropSystem *system) {
     if (system->textureResource != NULL) {
         GFL_G3DResFreeTexData(system->textureResource);
@@ -394,8 +393,8 @@ void FieldPropSystem_InitResources(FieldPropSystem *system, void *postFx) {
 
     if (count != 0) {
         system->resourceCount = count;
-        system->resources = GFL_HeapAllocate(system->heapId, count * sizeof(FieldPropResource), TRUE,
-                                             "field_buildmodel.c", 1099);
+        system->resources =
+            GFL_HeapAllocate(system->heapId, count * sizeof(FieldPropResource), TRUE, "field_buildmodel.c", 1099);
         for (i = 0; i < system->resourceCount; i++) {
             FieldPropSystem_InitResource(system, &system->resources[i], i, postFx);
         }
@@ -425,8 +424,8 @@ void FieldPropSystem_InstantiateResources(FieldPropSystem *system, FieldPropResB
         bank->handles = GFL_HeapAllocate(system->heapId, count * sizeof(FieldPropResInstanceHandle), TRUE,
                                          "field_buildmodel.c", 1148);
         system->resInstanceCount = count;
-        system->resInstances = GFL_HeapAllocate(system->heapId, count * sizeof(FieldPropResInstance), TRUE,
-                                                "field_buildmodel.c", 1152);
+        system->resInstances =
+            GFL_HeapAllocate(system->heapId, count * sizeof(FieldPropResInstance), TRUE, "field_buildmodel.c", 1152);
         for (i = 0; i < system->resInstanceCount; i++) {
             instance = system->resInstances;
             FieldPropResInstance_Init(system, &instance[i], &system->resources[i]);
@@ -926,7 +925,6 @@ FieldChunkPropHolder **FieldPropSystem_FindPropsInArea(FieldPropSystem *system, 
     return props;
 }
 
-
 FieldChunkPropHolder *FieldPropSystem_FindProp(FieldPropSystem *system, u32 propId, const FieldPropAreaBounds *bounds) {
     u32 count;
     FieldChunkPropHolder **holders;
@@ -970,7 +968,8 @@ void FieldChunkPropHolder_GetPosAbs(FieldChunkPropHolder *holder, VecFx32 *posit
 
 FieldPropHandle *FieldPropSystem_CreateHandleFromExisting(FieldPropSystem *system, FieldChunkPropHolder *prop) {
     FieldPropInstance *instance = prop->instance;
-    FieldPropHandle *handle = GFL_HeapAllocate(system->heapId, sizeof(FieldPropHandle), FALSE, "field_buildmodel.c", 2006);
+    FieldPropHandle *handle =
+        GFL_HeapAllocate(system->heapId, sizeof(FieldPropHandle), FALSE, "field_buildmodel.c", 2006);
     VecFx32 offset;
 
     handle->system = system;

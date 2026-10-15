@@ -57,7 +57,6 @@ BOOL func_ov030_02174040(void);
 void func_ov030_021740f0(int unused);
 BOOL func_ov030_02173e9c(WHCallback callback);
 
-
 // Stops the beacon when it was told to lock
 void func_ov030_02174088(void);
 // Sets what the scan calls with each beacon it finds and the game's argument

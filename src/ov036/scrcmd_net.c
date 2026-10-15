@@ -44,7 +44,8 @@ BOOL s015D_NetConnectWiFiClub(VM *vm, FieldScriptEnv *env) {
 
     args.field = GSYS_GetField(gsys);
     args.useTransitions = FALSE;
-    ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(8), EventWifiClub_CreateFromArgs, &args));
+    ScriptWork_CallEvent(work,
+                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(8), EventWifiClub_CreateFromArgs, &args));
     return TRUE;
 }
 

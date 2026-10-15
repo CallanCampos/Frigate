@@ -311,7 +311,7 @@ static BOOL func_02040680(NetHandle *handle) {
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
         if (handle->negotiations[i]->valid && !func_02040a6c(handle->negotiationsSent, i)) {
             if (func_02042c18(handle, GFL_NET_NETID_SERVER, 4, sizeof(NetNegotiation), handle->negotiations[i], 1, 0,
-                    1)) {
+                              1)) {
                 func_02040a2c(handle->negotiationsSent, i, TRUE);
             } else {
                 return FALSE;
@@ -338,8 +338,8 @@ void func_020406e0(void) {
     if (func_02042bc4()) {
         handle = func_02040414(GFL_NET_NETID_SERVER);
         for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-            if (_pBaseWork->relayPending[i] == TRUE
-                && func_02042c9c(handle, _pBaseWork->timingSend[i], 8, 2, &_pBaseWork->timings[i], 0, 0, 0)) {
+            if (_pBaseWork->relayPending[i] == TRUE &&
+                func_02042c9c(handle, _pBaseWork->timingSend[i], 8, 2, &_pBaseWork->timings[i], 0, 0, 0)) {
                 GFL_ASSERT(_pBaseWork->timingSend[i]);
                 _pBaseWork->relayPending[i] = FALSE;
             }
@@ -357,8 +357,8 @@ void func_020406e0(void) {
         handle = func_02040414(GFL_NET_NETID_SERVER);
         if (handle != NULL) {
             for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-                if (handle->negotiations[i] != NULL && handle->negotiations[i]->valid
-                    && !func_02040a6c(handle->serverNegotiationsSent, i) && func_02040680(handle)) {
+                if (handle->negotiations[i] != NULL && handle->negotiations[i]->valid &&
+                    !func_02040a6c(handle->serverNegotiationsSent, i) && func_02040680(handle)) {
                     handle->serverNegotiationsSent = func_02040a2c(handle->serverNegotiationsSent, i, TRUE);
                 }
             }
@@ -476,7 +476,9 @@ void func_02040a20(int netId, int size, u8 *data) {
 static u16 func_02040a2c(u16 bits, int netID, BOOL set) {
     u16 bit;
 
+    // clang-format off
     GFL_ASSERT(netID!=GFL_NET_NETID_SERVER);
+    // clang-format on
     bit = 1 << netID;
     if (set) {
         bits |= bit;
@@ -486,11 +488,12 @@ static u16 func_02040a2c(u16 bits, int netID, BOOL set) {
     return bits;
 }
 
-
 static BOOL func_02040a6c(u16 bits, int netID) {
     u8 bit;
 
+    // clang-format off
     GFL_ASSERT(netID!=GFL_NET_NETID_SERVER);
+    // clang-format on
     bit = 1 << netID;
     if (bit & bits) {
         return TRUE;
@@ -499,7 +502,9 @@ static BOOL func_02040a6c(u16 bits, int netID) {
 }
 
 void func_02040a9c(int netID) {
+    // clang-format off
     GFL_ASSERT(netID!=GFL_NET_NETID_SERVER);
+    // clang-format on
     func_02040224(func_02040414(netID), netID);
     func_02040298(func_02040414(GFL_NET_NETID_SERVER), netID);
 }

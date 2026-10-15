@@ -72,34 +72,48 @@ static void func_0206ff68(void) {
 }
 
 // The NOP is the ROM's alignment halfword before the following ARM entry point.
+// clang-format off
 asm void func_0206ffac(void) {
     bx pc
     nop
 }
 
+// clang-format on
+
 #pragma thumb off
+// clang-format off
 asm void func_0206ffb0(void) {
     ldr ip, [pc, #0]
     bx ip
     dcd 0x02769579
 }
+
+// clang-format on
 #pragma thumb on
 
 // As above, the NOP fills the remaining halfword before ARM code.
+// clang-format off
 asm void func_0206ffbc(void) {
     bx pc
     nop
 }
 
+// clang-format on
+
 #pragma thumb off
+// clang-format off
 asm void func_0206ffc0(void) {
     ldr ip, [pc, #0]
     bx ip
     dcd 0x02768299
 }
+
+// clang-format on
 #pragma thumb on
 
 void func_0206ffcc(u32 cardId) {
+    // volatile: the boot card ID in the shared header is written by the ARM7, and the original reads it into a stack
+    // slot
     volatile u32 bootCardId = *(vu32 *)0x02fffc00;
     if (cardId != bootCardId) {
         u32 irq = CPU_IRQDisable();

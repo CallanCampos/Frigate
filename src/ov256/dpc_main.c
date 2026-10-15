@@ -230,8 +230,8 @@ void DpcMain_BlendPokePalettes(DendouPCWork *wk) {
 
     // Both sets of actors, of which one is shown
     for (i = 0; i < HALL_OF_FAME_TEAM_SIZE; i++) {
-        PaletteFade_BlendPalettes(wk->palFade, PALFADE_BUFFER_MAIN_OBJ,
-                                  (1 << i) | (1 << (i + HALL_OF_FAME_TEAM_SIZE)), wk->fadeNow[i], 0);
+        PaletteFade_BlendPalettes(wk->palFade, PALFADE_BUFFER_MAIN_OBJ, (1 << i) | (1 << (i + HALL_OF_FAME_TEAM_SIZE)),
+                                  wk->fadeNow[i], 0);
     }
     PaletteFade_SetTransferAll(wk->palFade, TRUE);
 }

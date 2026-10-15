@@ -1,13 +1,12 @@
 #include "dwc/nd.h"
-
 #include "dwc/dwc.h"
 #include "dwc/nhttp.h"
 #include "nd_internal.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-// NitroDWC's download library (DWC_Nd), which the games use to fetch files from the Nintendo Wi-Fi Connection's download
-// server (Mystery Gift's gifts). The ROM names none of it: see nd.h for where the names come from.
+// NitroDWC's download library (DWC_Nd), which the games use to fetch files from the Nintendo Wi-Fi Connection's
+// download server (Mystery Gift's gifts). The ROM names none of it: see nd.h for where the names come from.
 //
 // A call starts a request to the server with HTTP's POST; the parameters travel in base64 (a variant that pads with
 // '*', and puts '.' and '-' for 62 and 63) and the answer comes back as a status and a body. A thread waits until the
@@ -178,7 +177,7 @@ static NdState sDwcNdState;
 
 // The padding character of the base64, and the parameter "action" of the requests, "count", "list" and "contents" in
 // base64; the first two are not used
-static const char sBase64Pad[1] = {'*'};
+static const char sBase64Pad[1] = { '*' };
 static const char sActionCount[] = "Y291bnQ*";
 static const char sActionList[] = "bGlzdA**";
 static const char sActionContents[] = "Y29udGVudHM*";
@@ -222,7 +221,8 @@ static void ThreadMain(void *arg) {
                 NdSetResult(DWC_ND_CBREASON_INITIALIZE, ND_ERROR_FATAL, -1);
                 return;
             }
-            if (!Setup(NdAlloc, NdFree, url, token, sDwcNdState.work->gameCode, sDwcNdState.work->password, NdSetResult)) {
+            if (!Setup(NdAlloc, NdFree, url, token, sDwcNdState.work->gameCode, sDwcNdState.work->password,
+                       NdSetResult)) {
                 NdSetResult(DWC_ND_CBREASON_INITIALIZE, ND_ERROR_FATAL, -1);
                 return;
             }
@@ -295,8 +295,9 @@ BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *p
         sDwcNdState.work = NULL;
         return FALSE;
     }
-    scheduler_init_thread(&sDwcNdState.work->thread, ThreadMain, NULL, sDwcNdState.work->stack + sizeof(sDwcNdState.work->stack),
-                          sizeof(sDwcNdState.work->stack), 16);
+    scheduler_init_thread(&sDwcNdState.work->thread, ThreadMain, NULL,
+                          sDwcNdState.work->stack + sizeof(sDwcNdState.work->stack), sizeof(sDwcNdState.work->stack),
+                          16);
     scheduler_start_thread(&sDwcNdState.work->thread);
     return TRUE;
 }
@@ -776,8 +777,8 @@ static BOOL CancelRequest(void) {
     return canceled;
 }
 
-// Writes the information of the access point that the requests carry, in base64: a "00:0000000-00" with the type and the
-// spot's digits in place
+// Writes the information of the access point that the requests carry, in base64: a "00:0000000-00" with the type and
+// the spot's digits in place
 static BOOL MakeApInfoParam(char *dest) {
     char info[13] = "00:0000000-00";
 
@@ -818,11 +819,12 @@ static BOOL MakeUserIdParams(char *gameCode, char *userId) {
 }
 
 // The certificate that the server's identity is checked against: its key is 1024 bits, with the exponent 65537
-static u8 sNdCertExponent[3] = {1, 0, 1};
+static u8 sNdCertExponent[3] = { 1, 0, 1 };
 static NdCertificate sNdCertificate;
-static NdCertificate *sNdCertificates[1] = {&sNdCertificate};
+static NdCertificate *sNdCertificates[1] = { &sNdCertificate };
 static char sNdCertName[80];
 static u8 sNdCertModulus[128];
+// clang-format off
 static NdCertificate sNdCertificate = {
     sNdCertName,
     128,
@@ -830,7 +832,10 @@ static NdCertificate sNdCertificate = {
     3,
     sNdCertExponent,
 };
+
+// clang-format on
 static char sNdCertName[80] = "US, Washington, Nintendo of America Inc, NOA, Nintendo CA, ca@noa.nintendo.com";
+// clang-format off
 static u8 sNdCertModulus[128] = {
     0xb3, 0xcd, 0x79, 0x97, 0x77, 0x5d, 0x8a, 0xaf, 0x86, 0xa8, 0xe8, 0xd7, 0x73, 0x1c, 0x77, 0xdf,
     0x10, 0x90, 0x1f, 0x81, 0xf8, 0x41, 0x9e, 0x21, 0x55, 0xdf, 0xbc, 0xfc, 0x63, 0xfb, 0x19, 0x43,
@@ -841,6 +846,8 @@ static u8 sNdCertModulus[128] = {
     0x3d, 0xbf, 0xe2, 0x4b, 0x49, 0xec, 0xce, 0x66, 0x98, 0x58, 0x26, 0x12, 0xc0, 0xfb, 0xf4, 0x77,
     0x65, 0x1b, 0xea, 0xfb, 0xcb, 0x7f, 0xe0, 0x8c, 0xcb, 0x02, 0xa3, 0x4e, 0x5e, 0x8c, 0xea, 0x9b,
 };
+
+// clang-format on
 
 // Writes "Nitro WiFi SDK/5.3"
 static void MakeUserAgent(char *dest) {
@@ -1178,8 +1185,8 @@ static BOOL RequestFileList(DWCNdFileInfo *files, u32 offset, u32 count) {
         sNdContext.free(buffer);
         return FALSE;
     }
-    if (NHTTPAddPostDataAscii(request, "offset", offsetParam) != -1
-        && NHTTPAddPostDataAscii(request, "num", countParam) != -1) {
+    if (NHTTPAddPostDataAscii(request, "offset", offsetParam) != -1 &&
+        NHTTPAddPostDataAscii(request, "num", countParam) != -1) {
         task->kind = DWC_ND_CBREASON_GETFILELIST;
         task->target.files = files;
         task->offsetParam = offsetParam;
@@ -1436,7 +1443,7 @@ static BOOL ParseFileListAnswer(int request, NdTask *task) {
         }
         fileIndex++;
     } while (fileIndex < task->count);
-    done:
+done:
     return result;
 }
 

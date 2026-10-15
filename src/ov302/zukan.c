@@ -1,8 +1,12 @@
 #include "types.h"
 #include "app/zukan.h"
+#include "app/zukan_area_list.h"
 #include "app/zukan_common.h"
 #include "app/zukan_detail.h"
+#include "app/zukan_habitat.h"
 #include "app/zukan_open.h"
+#include "app/zukanlist.h"
+#include "app/zukansearch.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
 #include "gfl/std.h"
@@ -73,27 +77,6 @@ enum {
 #define DEX_NATIONAL 1
 #define DEX_NATIONAL_OBTAINED 2
 
-// What the list is given, 0x14 bytes (overlay 299)
-typedef struct {
-    GameData *gameData;
-    PokeDexSave *pokedex;
-    // Whether the list is a search's
-    u16 searched;
-    u16 count;
-    u16 *list;
-    int result;
-} ZukanListParam;
-
-// What the search is given, 0x18 bytes (overlay 300)
-typedef struct {
-    GameData *gameData;
-    PokeDexSave *pokedex;
-    ZukanSearchCriteria *criteria;
-    int result;
-    u16 *list;
-    u16 count;
-} ZukanSearchParam;
-
 typedef struct {
     ZukanParam *param;
     GameProcManager *procManager;
@@ -117,11 +100,6 @@ typedef struct {
 } ZukanWork;
 
 typedef u32 (*ZukanStateFunc)(ZukanWork *work);
-
-extern const GameProcFunctions ZukanList_ProcFunctions;
-extern const GameProcFunctions ZukanSearch_ProcFunctions;
-extern const GameProcFunctions ZukanHabitat_ProcFunctions;
-extern const GameProcFunctions ZukanAreaList_ProcFunctions;
 
 static BOOL Zukan_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Zukan_Main(GameProc *proc, u32 *state, void *param, void *work);

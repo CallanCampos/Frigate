@@ -96,7 +96,7 @@ static const TouchRect sGtsNegoMessageMainRects[] = {
 
 // The arrows of the search's settings, left then right of each
 static const TouchRect sGtsNegoMessageSearchRects[] = {
-    { 43, 69, 83, 109 },   { 43, 69, 227, 253 },   { 83, 109, 107, 133 },       { 83, 109, 227, 253 },
+    { 43, 69, 83, 109 },    { 43, 69, 227, 253 },   { 83, 109, 107, 133 },       { 83, 109, 227, 253 },
     { 123, 149, 107, 133 }, { 123, 149, 227, 253 }, { TOUCH_RECT_END, 0, 0, 0 },
 };
 
@@ -425,8 +425,8 @@ AppTaskMenuWin *GtsNegoMessage_CreateButton(GtsNegoMessage *msg, u32 msgNo) {
     msg->items[0].color = GTSNEGO_BUTTON_COLOR;
     msg->items[0].type = 0;
     width = ((int)GFL_FontGetBlockWidth(msg->items[0].str, msg->font, 0) + 32) / 16;
-    button = AppTaskMenuWin_CreateEx(msg->menuRes, &msg->items[0], 16 - width, 21, width * 2, 3, FALSE, TRUE,
-                                     msg->heapId);
+    button =
+        AppTaskMenuWin_CreateEx(msg->menuRes, &msg->items[0], 16 - width, 21, width * 2, 3, FALSE, TRUE, msg->heapId);
     GFL_StrBufFree(msg->items[0].str);
     return button;
 }
@@ -637,8 +637,8 @@ void GtsNegoMessage_FreeMenu(AppTaskMenu *menu) {
 
 void GtsNegoMessage_CreatePMSDraw(GtsNegoMessage *msg, GtsNegoDisp *disp) {
     if (msg->pmsDraw == NULL) {
-        msg->pmsDraw = PMSDraw_Create(GtsNegoDisp_GetClActUnit(disp), CLACT_VRAM_MAIN, msg->printQueue, msg->font, 8,
-                                      4, msg->heapId);
+        msg->pmsDraw = PMSDraw_Create(GtsNegoDisp_GetClActUnit(disp), CLACT_VRAM_MAIN, msg->printQueue, msg->font, 8, 4,
+                                      msg->heapId);
     }
 }
 

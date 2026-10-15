@@ -194,9 +194,8 @@ void KeySystemSaveInfo_Init(KeySystemSaveInfo *info, GameData *gameData) {
     }
 }
 
-void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemClAct *clact,
-                                    KeySystemList **list, MsgData *msgData, Font *font, KeyInfoSave *keyInfo,
-                                    GameData *gameData, HeapID heapId) {
+void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemClAct *clact, KeySystemList **list,
+                             MsgData *msgData, Font *font, KeyInfoSave *keyInfo, GameData *gameData, HeapID heapId) {
     KeySystemListSetup setup;
     ClActorPos pos;
     int i;
@@ -544,7 +543,7 @@ BOOL KeySystemFlow_FormatKeyMsg(KeySystemWork *wk, int key, BOOL receive) {
 }
 
 void KeySystemKeyAnim_Init(KeySystemKeyAnim *anim, KeySystemClAct *clact, KeySystemMsgWin *msgWin, Font *font,
-                                  HeapID heapId) {
+                           HeapID heapId) {
     sys_memset(anim, 0, sizeof(KeySystemKeyAnim));
     anim->clact = clact;
     anim->msgWin = msgWin;
@@ -574,8 +573,7 @@ void KeySystemKeyAnim_Free(KeySystemKeyAnim *anim) {
     BmpOam_Exit(anim->oamSys);
 }
 
-void KeySystemKeyAnim_Start(KeySystemKeyAnim *anim, u32 key, MsgData *msgData, u16 msgId, StrBuf *str,
-                                   BOOL enabled) {
+void KeySystemKeyAnim_Start(KeySystemKeyAnim *anim, u32 key, MsgData *msgData, u16 msgId, StrBuf *str, BOOL enabled) {
     u32 palette;
 
     anim->frame = 0;

@@ -7,7 +7,8 @@
 
 // The Trainers whose battles resetRebattleTrainers resets, by Trainer ID less 0x5f0
 const int REBATTLE_TRAINER_COUNT = 12;
-static const u16 sRebattleTrainers[REBATTLE_TRAINER_COUNT] = { 0x5f, 0x60, 0xb7, 0xb8, 0xb9, 0xba, 0x128, 0x12b, 0x12e, 0x12f, 0x14d, 0x2f0 };
+static const u16 sRebattleTrainers[REBATTLE_TRAINER_COUNT] = { 0x5f,  0x60,  0xb7,  0xb8,  0xb9,  0xba,
+                                                               0x128, 0x12b, 0x12e, 0x12f, 0x14d, 0x2f0 };
 
 void SetupTrainerClashSlot(GameEvent *event, int index, const TrainerClashData *data) {
     ScriptWork *work = EventScriptCall_GetWork(event);

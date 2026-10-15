@@ -2,8 +2,8 @@
 #define POKEBW2_BATTLE_BTL_ACTION_ORDER_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "battle/btl_action.h"
+#include "struct_decls.h"
 
 struct ActionOrderEntry {
     BattleMon *mon;

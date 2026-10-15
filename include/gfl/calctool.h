@@ -5,8 +5,8 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-// Fixed point matrix, vector and collision helpers (calctool.c). The ROM embeds no name for this file; it is named after
-// Game Freak's library's calculation tools. Names of the matrix and vector functions from swan
+// Fixed point matrix, vector and collision helpers (calctool.c). The ROM embeds no name for this file; it is named
+// after Game Freak's library's calculation tools. Names of the matrix and vector functions from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 struct CalcSphere {

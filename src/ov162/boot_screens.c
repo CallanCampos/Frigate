@@ -47,13 +47,35 @@ const GameProcFunctions BOOT_SCREENS_PROC_FUNCTIONS = { BootScreens_Init, BootSc
 static const BGSysLCDConfig sBootLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D };
 
 static const BGSetup sBootBGSetupMain = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x0000),
+    GX_BG_CHARBASE(0x04000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sBootBGSetupSub = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x0000),
+    GX_BG_CHARBASE(0x04000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSysVRAMConfig sBootVRAMConfig = {

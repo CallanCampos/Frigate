@@ -5,8 +5,8 @@
 
 #include "types.h"
 #include "gfl/heap.h"
-#include "save/save_control.h"
 #include "save/musical_savedata.h"
+#include "save/save_control.h"
 #include "struct_decls.h"
 
 MusShotPhoto *MusShotPhoto_Create(MusicalShot *shot, HeapID heapId);

@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/encounter.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
+#include "save/encounter.h"
 #include "save/save_control.h"
 
 // The wild encounters' save: the roaming Pokémon, the swarm's location, the repel and the special Pokémon that were
@@ -52,26 +52,26 @@ RoamingPkm *EncountSave_GetRoamingPkm(EncountSave *save, u8 slot) {
 
 u32 EncountSave_GetRoamingPkmParam(const RoamingPkm *roamingPkm, u32 param) {
     switch (param) {
-        case ROAMING_PKM_PARAM_ZONE:
-            return roamingPkm->zone;
-        case ROAMING_PKM_PARAM_IVS:
-            return roamingPkm->ivs;
-        case ROAMING_PKM_PARAM_PERSONALITY:
-            return roamingPkm->personality;
-        case ROAMING_PKM_PARAM_NATURE:
-            return roamingPkm->nature;
-        case ROAMING_PKM_PARAM_SPECIES:
-            return roamingPkm->species;
-        case ROAMING_PKM_PARAM_HP:
-            return roamingPkm->hp;
-        case ROAMING_PKM_PARAM_LEVEL:
-            return roamingPkm->level;
-        case ROAMING_PKM_PARAM_STATUS:
-            return roamingPkm->status;
-        case ROAMING_PKM_PARAM_ACTIVE:
-            return roamingPkm->active;
-        case ROAMING_PKM_PARAM_UNK13:
-            return roamingPkm->unk13;
+    case ROAMING_PKM_PARAM_ZONE:
+        return roamingPkm->zone;
+    case ROAMING_PKM_PARAM_IVS:
+        return roamingPkm->ivs;
+    case ROAMING_PKM_PARAM_PERSONALITY:
+        return roamingPkm->personality;
+    case ROAMING_PKM_PARAM_NATURE:
+        return roamingPkm->nature;
+    case ROAMING_PKM_PARAM_SPECIES:
+        return roamingPkm->species;
+    case ROAMING_PKM_PARAM_HP:
+        return roamingPkm->hp;
+    case ROAMING_PKM_PARAM_LEVEL:
+        return roamingPkm->level;
+    case ROAMING_PKM_PARAM_STATUS:
+        return roamingPkm->status;
+    case ROAMING_PKM_PARAM_ACTIVE:
+        return roamingPkm->active;
+    case ROAMING_PKM_PARAM_UNK13:
+        return roamingPkm->unk13;
     }
     return 0;
 }

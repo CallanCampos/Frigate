@@ -1,10 +1,10 @@
 #include "types.h"
-#include "system/prof_word.h"
 #include "constants/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
+#include "system/prof_word.h"
 
 // The lists of profane words, each one an encrypted run of PROF_WORD_LEN-character words
 #define PROF_WORD_SEED 0x72012891

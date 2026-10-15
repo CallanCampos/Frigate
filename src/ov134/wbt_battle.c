@@ -1,5 +1,7 @@
 #include "field/wbt_battle.h"
 #include "types.h"
+#include "battle/btl_setup.h"
+#include "battle/trainer_data.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
@@ -13,6 +15,7 @@
 #include "field/field_script.h"
 #include "field/wbt.h"
 #include "gfl/bg_sys.h"
+#include "gfl/bmpwin.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "gfl/random.h"
@@ -26,9 +29,6 @@
 #include "system/game_system.h"
 #include "system/pms_data.h"
 #include "system/wordset.h"
-#include "battle/btl_setup.h"
-#include "battle/trainer_data.h"
-#include "gfl/bmpwin.h"
 
 // The Pokémon World Tournament's rounds, opponents and battles, in overlay 134, which names this file
 
@@ -73,8 +73,10 @@ static BOOL WbtBattle_IsDownloadedPokemonUsed(const WbtDownloadedPokemon *pkm);
 static void WbtBattle_MakePartyPkm(PartyPkm *pkm, const WbtDownloadedPokemon *src, HeapID heapId);
 static void WbtBattle_MakeDownloadedParty(PokeParty *party, WbtDownload *download, u32 round, u32 count, HeapID heapId);
 static int WbtBattle_GetRivalTrainerId(GameSystem *gsys);
-static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament, WbtEntrant *entrant, u8 count, HeapID heapId);
-static void WbtBattle_MakeTournamentParty(PokeParty *party, WbtEntrant *entrant, u32 tournament, u8 count, HeapID heapId);
+static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament, WbtEntrant *entrant, u8 count,
+                                            HeapID heapId);
+static void WbtBattle_MakeTournamentParty(PokeParty *party, WbtEntrant *entrant, u32 tournament, u8 count,
+                                          HeapID heapId);
 static void WbtBattle_SetBattleTrainer(BtlSetupTrainer *trainer, const WbtEntrant *entrant);
 static int WbtBattle_CountRemainingPokemon(PokeParty *party, const u8 *slots);
 static u8 WbtBattle_GetRoundSlot(u32 round);
@@ -146,7 +148,8 @@ u8 WbtBattle_GetPick(WbtSystem *sys, u32 index) {
 
 void *WbtBattle_CreatePartyList(FieldScriptEnv *env, WbtSystem *sys) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
-    WbtPartyList *list = GFL_HeapAllocate(FieldScriptEnv_GetHeapID(env), sizeof(WbtPartyList), TRUE, "wbt_battle.c", 387);
+    WbtPartyList *list =
+        GFL_HeapAllocate(FieldScriptEnv_GetHeapID(env), sizeof(WbtPartyList), TRUE, "wbt_battle.c", 387);
 
     list->env = env;
     list->sys = sys;
@@ -271,7 +274,8 @@ static inline WbtDownloadedPokemon *WbtDownload_GetPokemon(WbtDownload *download
 }
 
 // Makes a party of the Pokémon of a downloaded tournament's Trainer, in a random order
-static void WbtBattle_MakeDownloadedParty(PokeParty *party, WbtDownload *download, u32 round, u32 count, HeapID heapId) {
+static void WbtBattle_MakeDownloadedParty(PokeParty *party, WbtDownload *download, u32 round, u32 count,
+                                          HeapID heapId) {
     WbtDownloadedPokemon *used[6];
     int i;
     int usedCount = 0;
@@ -329,7 +333,8 @@ static int WbtBattle_GetRivalTrainerId(GameSystem *gsys) {
 
 // Makes the Pokémon that a Trainer of the tournament enters with. A Trainer with the flag first has one Pokémon of
 // the tournament's special file, and the rest are picked at random from the files, as the filter allows
-static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament, WbtEntrant *entrant, u8 count, HeapID heapId) {
+static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament, WbtEntrant *entrant, u8 count,
+                                            HeapID heapId) {
     WbtTrainerFile *trainerFile;
     u8 iv = func_ov055_021e5e18(entrant);
     u8 trainer = func_ov055_021e5e28(entrant);
@@ -362,7 +367,8 @@ static void WbtBattle_MakeTournamentPokemon(BSubwayPokemon *dest, u32 tournament
 }
 
 // Makes a party of a Trainer of the tournament
-static void WbtBattle_MakeTournamentParty(PokeParty *party, WbtEntrant *entrant, u32 tournament, u8 count, HeapID heapId) {
+static void WbtBattle_MakeTournamentParty(PokeParty *party, WbtEntrant *entrant, u32 tournament, u8 count,
+                                          HeapID heapId) {
     BSubwayPokemon *pokemon =
         GFL_HeapAllocate(HEAPID_TAIL(heapId), 6 * sizeof(BSubwayPokemon), FALSE, "wbt_battle.c", 769);
 
@@ -680,7 +686,8 @@ void WbtBattle_LoadOpponentLine(WbtSystem *sys, int a1, StrBuf *strbuf) {
         if (set == 0) {
             GFL_StrBufLoadFixedString(strbuf, line, 0x4a);
         } else {
-            MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_TRAINER_MESSAGES_2, heapId);
+            MsgData *msgData =
+                GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_TRAINER_MESSAGES_2, heapId);
 
             GFL_MsgDataLoadStrbuf(msgData, (u16)((set - 1) * 8 + a1), strbuf);
             GFL_MsgDataFree(msgData);

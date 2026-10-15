@@ -71,6 +71,7 @@ static const VecFx32 sCameraPosition = { 0, FX32_CONST(10), FX32_CONST(100) };
 static const VecFx32 sCameraTarget = { 0, 0, 0 };
 static const VecFx32 sCameraUpVector = { 0, FX32_ONE, 0 };
 
+// clang-format off
 static const ShinkaDemoBGSetup sBGSetups[BG_COUNT] = {
     { 1,
       { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x1000), GX_BG_CHARBASE(0x08000), 0x8000,
@@ -97,6 +98,8 @@ static const ShinkaDemoBGSetup sBGSetups[BG_COUNT] = {
         GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE },
       BGMODE_TEXT, TRUE },
 };
+
+// clang-format on
 
 static const Light sLights[] = {
     { { 0, -FX16_ONE, 0 }, GX_RGB(16, 16, 16) },
@@ -129,7 +132,8 @@ static void ShinkaDemoGraphic_G3DInit(void) {
 }
 
 ShinkaDemoGraphic *ShinkaDemoGraphic_Create(u32 layout, HeapID heapId) {
-    ShinkaDemoGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(ShinkaDemoGraphic), FALSE, "shinka_demo_graphic.c", 479);
+    ShinkaDemoGraphic *graphic =
+        GFL_HeapAllocate(heapId, sizeof(ShinkaDemoGraphic), FALSE, "shinka_demo_graphic.c", 479);
 
     sys_memset(graphic, 0, sizeof(ShinkaDemoGraphic));
     G2_BlendNone();
@@ -278,8 +282,8 @@ static void ShinkaDemoG3dSys_Init(ShinkaDemoG3dSys *g3d, HeapID heapId) {
     GFL_G3DSysCreate(FALSE, 2, 0, 1, 0, heapId, ShinkaDemoGraphic_G3DInit);
     // A 40 degree field of view
     g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
-                                      FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024), 0,
-                                      &sCameraPosition, &sCameraUpVector, &sCameraTarget, heapId);
+                                      FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024),
+                                      0, &sCameraPosition, &sCameraUpVector, &sCameraTarget, heapId);
 }
 
 static void ShinkaDemoG3dSys_Free(ShinkaDemoG3dSys *g3d) {

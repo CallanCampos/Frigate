@@ -27,8 +27,8 @@ typedef struct {
     void *fullArg;
 } MICAutoParam;
 
-void func_0207e75c(void);                     // MIC_Init
-void *func_0207e8f8(void);                    // MIC_GetLastSamplingAddress
+void func_0207e75c(void);  // MIC_Init
+void *func_0207e8f8(void); // MIC_GetLastSamplingAddress
 MICResult MIC_StartAutoSampling(MICAutoParam *param);
 MICResult MIC_StopAutoSampling(void);
 

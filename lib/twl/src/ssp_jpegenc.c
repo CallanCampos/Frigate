@@ -792,8 +792,7 @@ static void JpegEnc_MakeThumbnail(const u16 *src, u32 width, u32 height, u16 *ds
                 } else {
                     // The two pixels' Y, and their U and V averaged
                     u = (prev >> 1) + (u >> 1) + (v >> 1);
-                    ((u32 *)dst)[(x + y * dstWidth) >> 1] =
-                        luma | (((prev & 0xff) << 16) | (u & 0xff00ff00));
+                    ((u32 *)dst)[(x + y * dstWidth) >> 1] = luma | (((prev & 0xff) << 16) | (u & 0xff00ff00));
                 }
             } else {
                 dst[y * dstWidth + x] = src[width * (srcY >> 4) + (srcX >> 4)];
@@ -880,7 +879,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     u32 dhtLength;
     u32 coefOffset;
     u32 size;
-    u8 (*quant)[64];
+    u8(*quant)[64];
     JpegEncHuffTable *dcLum;
     JpegEncHuffTable *dcChrom;
     JpegEncHuffTable *acLum;

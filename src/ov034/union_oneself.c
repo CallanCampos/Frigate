@@ -3,40 +3,40 @@
 // players heard are union_actor.c's. Names are not swan's
 #include "field/union_oneself.h"
 #include "types.h"
-#include "constants/sound.h"
-#include "constants/version.h"
-#include "constants/zones.h"
 #include "app/pms_select.h"
 #include "app/pokelist.h"
 #include "app/pokemon_trade.h"
+#include "battle/regulation.h"
+#include "constants/sound.h"
+#include "constants/version.h"
+#include "constants/zones.h"
 #include "demo/shinka_demo.h"
 #include "field/colosseum.h"
+#include "field/comm_player.h"
 #include "field/field_actor.h"
 #include "field/field_controller.h"
 #include "field/field_player.h"
+#include "field/trcard_sys.h"
 #include "field/union_actor.h"
 #include "field/union_comm.h"
 #include "field/union_eff.h"
 #include "field/union_main.h"
 #include "field/union_msg.h"
-#include "battle/regulation.h"
-#include "field/comm_player.h"
-#include "field/trcard_sys.h"
-#include "nitro/math.h"
-#include "pml/poke_party.h"
-#include "save/player_info.h"
-#include "system/wordset.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/net.h"
 #include "gfl/net_system.h"
 #include "gfl/sound.h"
 #include "gfl/std.h"
+#include "nitro/math.h"
+#include "pml/poke_party.h"
 #include "save/box.h"
+#include "save/player_info.h"
 #include "save/save_control.h"
 #include "system/game_comm.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
+#include "system/wordset.h"
 
 // The keys that end a message: A, B and the Control Pad
 #define UNION_PAD_ANY (PAD_BUTTON_A | PAD_BUTTON_B | PAD_PLUS_KEY_MASK)
@@ -123,6 +123,7 @@ static BOOL UnionOneself_StepQuitRun(UnionSystem *unisys, UnionSelf *situ, Field
 static BOOL UnionOneself_StepColosseumEndRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 static BOOL UnionOneself_StepColosseumCardRun(UnionSystem *unisys, UnionSelf *situ, Field *field, u8 *seq);
 
+// clang-format off
 static const UnionSituStep sUnionSituSteps[] = {
     { UnionOneself_StepIdleBegin, UnionOneself_StepIdleRun, NULL }, // UNION_STEP_IDLE
     { NULL, UnionOneself_StepNetErrorRun, NULL }, // UNION_STEP_RESET
@@ -179,6 +180,8 @@ static const UnionSituStep sUnionSituSteps[] = {
     { NULL, NULL, NULL }, // UNION_STEP_END
 };
 
+// clang-format on
+
 void UnionOneself_CheckEntries(UnionSystem *unisys) {
     int i;
     UnionBeaconEntry *entry = unisys->found;
@@ -198,7 +201,8 @@ static void UnionOneself_CheckParentEntry(UnionSystem *unisys, UnionBeaconEntry 
     func_ov036_021b445c(unisys, entry, NULL, 0);
     if (situ->step == 0 && situ->nextStep == 0 && entry->beacon.unk0A == 5 && entry->timeout != 0) {
         func_0207c33c(ownMac);
-        if (GFL_STD_MemCmp(entry, ownMac, 6) == 0 && UnionOneself_SetNextStepIfRunning(unisys, UNION_STEP_ASKED) == TRUE) {
+        if (GFL_STD_MemCmp(entry, ownMac, 6) == 0 &&
+            UnionOneself_SetNextStepIfRunning(unisys, UNION_STEP_ASKED) == TRUE) {
             UnionComm_SetSelf(unisys, 2, (u32)entry);
             UnionComm_SetSelf(unisys, 0, (u32)entry);
         }
@@ -642,7 +646,8 @@ static BOOL UnionOneself_StepAskRun(UnionSystem *unisys, UnionSelf *situ, Field 
         break;
     case 3:
         if (UnionMsg_IsPrintDone(unisys) == TRUE) {
-            if (situ->mycomm.parent->beacon.version == VERSION_WHITE2 || situ->mycomm.parent->beacon.version == VERSION_BLACK2) {
+            if (situ->mycomm.parent->beacon.version == VERSION_WHITE2 ||
+                situ->mycomm.parent->beacon.version == VERSION_BLACK2) {
                 *seq = 8;
             } else {
                 return TRUE;
@@ -728,14 +733,15 @@ static BOOL UnionOneself_StepAskedRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         }
         break;
     case 2:
-        if (!UnionComm_IsLinkRequested(unisys) && UnionMsg_IsPrintDone(unisys) == TRUE
-            && (GCTX_HIDGetPressedKeys() & UNION_PAD_ANY)) {
+        if (!UnionComm_IsLinkRequested(unisys) && UnionMsg_IsPrintDone(unisys) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & UNION_PAD_ANY)) {
             return TRUE;
         }
         break;
     case 3:
         if (func_ov028_02171220() == TRUE) {
-            if (situ->mycomm.answer_pc->beacon.version == VERSION_WHITE2 || situ->mycomm.answer_pc->beacon.version == VERSION_BLACK2) {
+            if (situ->mycomm.answer_pc->beacon.version == VERSION_WHITE2 ||
+                situ->mycomm.answer_pc->beacon.version == VERSION_BLACK2) {
                 *seq = 6;
             } else {
                 *seq = 4;
@@ -758,8 +764,8 @@ static BOOL UnionOneself_StepAskedRun(UnionSystem *unisys, UnionSelf *situ, Fiel
         }
         break;
     case 5:
-        if (!UnionComm_IsLinkRequested(unisys) && UnionMsg_IsPrintDone(unisys) == TRUE
-            && (GCTX_HIDGetPressedKeys() & UNION_PAD_ANY)) {
+        if (!UnionComm_IsLinkRequested(unisys) && UnionMsg_IsPrintDone(unisys) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & UNION_PAD_ANY)) {
             UnionOneself_SetNextStep(unisys, UNION_STEP_IDLE);
             return TRUE;
         }
@@ -911,7 +917,7 @@ static BOOL UnionOneself_StepOfferRun(UnionSystem *unisys, UnionSelf *situ, Fiel
                 return TRUE;
             }
             UnionMsg_CreateAndPrint(unisys, field,
-                                func_ov034_0217aab8(situ->mycomm.unk19, situ->mycomm.target->beacon.gender));
+                                    func_ov034_0217aab8(situ->mycomm.unk19, situ->mycomm.target->beacon.gender));
             (*seq)++;
         }
         break;
@@ -923,7 +929,7 @@ static BOOL UnionOneself_StepOfferRun(UnionSystem *unisys, UnionSelf *situ, Fiel
             } else if (situ->mycomm.unk1A == 0) {
                 UnionOneself_SetNextStep(unisys, UNION_STEP_LEAVE);
                 UnionMsg_CreateAndPrint(unisys, field,
-                                    func_ov034_0217aacc(situ->mycomm.unk19, situ->mycomm.target->beacon.gender));
+                                        func_ov034_0217aacc(situ->mycomm.unk19, situ->mycomm.target->beacon.gender));
                 return TRUE;
             }
         }
@@ -1059,11 +1065,13 @@ static BOOL UnionOneself_StepOfferParty(UnionSystem *unisys, UnionSelf *situ, Fi
         }
         break;
     case 6:
-        UnionMsg_CreateRulesWindow(unisys, field, situ->partyCheck, UnionOneself_IsDoubleActivity(situ->mycomm.unk19), 1);
+        UnionMsg_CreateRulesWindow(unisys, field, situ->partyCheck, UnionOneself_IsDoubleActivity(situ->mycomm.unk19),
+                                   1);
         (*seq)++;
         break;
     case 7:
-        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeRulesWindow(unisys);
             if (situ->boxCheck == -1) {
                 *seq = 10;
@@ -1077,7 +1085,8 @@ static BOOL UnionOneself_StepOfferParty(UnionSystem *unisys, UnionSelf *situ, Fi
         (*seq)++;
         break;
     case 9:
-        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeRulesWindow(unisys);
             *seq = 10;
         }
@@ -1174,17 +1183,20 @@ static BOOL UnionOneself_StepRuleSelectRun(UnionSystem *unisys, UnionSelf *situ,
         (*seq)++;
         break;
     case 4:
-        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeRulesWindow(unisys);
             *seq = 1;
         }
         break;
     case 5:
-        UnionMsg_CreateRulesWindow(unisys, field, situ->partyCheck, UnionOneself_IsDoubleActivity(situ->mycomm.unk19), 1);
+        UnionMsg_CreateRulesWindow(unisys, field, situ->partyCheck, UnionOneself_IsDoubleActivity(situ->mycomm.unk19),
+                                   1);
         (*seq)++;
         break;
     case 6:
-        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeRulesWindow(unisys);
             if (situ->boxCheck == -1) {
                 *seq = 9;
@@ -1198,7 +1210,8 @@ static BOOL UnionOneself_StepRuleSelectRun(UnionSystem *unisys, UnionSelf *situ,
         (*seq)++;
         break;
     case 8:
-        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeRulesWindow(unisys);
             *seq = 9;
         }
@@ -1265,8 +1278,8 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
             }
             break;
         case UNION_ACTIVITY_EGG_TRADE:
-            if (unisys->found[index].beacon.memberCount < UnionMsg_GetTableByte(activity)
-                && !unisys->found[index].beacon.entryClosed) {
+            if (unisys->found[index].beacon.memberCount < UnionMsg_GetTableByte(activity) &&
+                !unisys->found[index].beacon.entryClosed) {
                 UnionMsg_CreateAndPrint(unisys, field, func_ov034_0217ac04(situ->mycomm.target->beacon.gender));
                 *seq = 10;
             } else {
@@ -1345,11 +1358,13 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
         if (UnionMsg_IsPrintDone(unisys) == TRUE) {
             return TRUE;
         }
-        UnionMsg_CreateRulesWindow(unisys, field, situ->partyCheck, UnionOneself_IsDoubleActivity(situ->mycomm.unk19), 1);
+        UnionMsg_CreateRulesWindow(unisys, field, situ->partyCheck, UnionOneself_IsDoubleActivity(situ->mycomm.unk19),
+                                   1);
         (*seq)++;
         break;
     case 7:
-        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeRulesWindow(unisys);
             if (situ->boxCheck == -1) {
                 *seq = 1;
@@ -1363,7 +1378,8 @@ static BOOL UnionOneself_StepAnswerRun(UnionSystem *unisys, UnionSelf *situ, Fie
         (*seq)++;
         break;
     case 9:
-        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+        if (UnionMsg_IsRulesPrinted(unisys, field) == TRUE &&
+            (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeRulesWindow(unisys);
             *seq = 1;
         }
@@ -1527,8 +1543,8 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
         sys_memcpy(unisys->alloc.my_card, unisys->alloc.target_card, 0x678);
         func_02040624(func_02040440(), 3, 0x14);
         UnionMsg_CreateAndPrint(unisys, field,
-                            UnionMsg_GetOriginMessage(unisys, situ->mycomm.target->beacon.country,
-                                                situ->mycomm.target->beacon.province));
+                                UnionMsg_GetOriginMessage(unisys, situ->mycomm.target->beacon.country,
+                                                          situ->mycomm.target->beacon.province));
         (*seq)++;
         break;
     case 1:
@@ -1828,13 +1844,15 @@ static BOOL UnionOneself_StepJoinRun(UnionSystem *unisys, UnionSelf *situ, Field
     case 3:
         if (UnionMsg_IsPrintDone(unisys) == TRUE) {
             if (situ->step == UNION_STEP_JOIN_DRAW) {
-                UnionDrawParam *param = GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionDrawParam), TRUE, "union_oneself.c", 3092);
+                UnionDrawParam *param =
+                    GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionDrawParam), TRUE, "union_oneself.c", 3092);
 
                 param->gameData = unisys->param->gameData;
                 unisys->cmdArg = param;
                 UnionCommand_Set(unisys, 3, param);
             } else {
-                UnionBattleParam *param = GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionBattleParam), TRUE, "union_oneself.c", 3100);
+                UnionBattleParam *param =
+                    GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionBattleParam), TRUE, "union_oneself.c", 3100);
 
                 param->gameData = unisys->param->gameData;
                 param->party = GameData_GetParty(unisys->param->gameData);
@@ -2896,7 +2914,8 @@ static BOOL UnionOneself_StepColosseumCardRun(UnionSystem *unisys, UnionSelf *si
         if (UnionMsg_IsPrintDone(unisys) == TRUE && (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             UnionMsg_FreeAll(unisys);
             clsys->cardCheck[clsys->unk17C[0]]->unk04_5 = 1;
-            unisys->cmdArg = func_ov012_02169b3c(unisys->param->gameData, clsys->cardCheck[clsys->unk17C[0]], HEAPID_UNION);
+            unisys->cmdArg =
+                func_ov012_02169b3c(unisys->param->gameData, clsys->cardCheck[clsys->unk17C[0]], HEAPID_UNION);
             UnionCommand_Set(unisys, 0x1c, unisys->cmdArg);
             (*seq)++;
         }

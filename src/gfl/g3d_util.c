@@ -178,7 +178,6 @@ static void GFL_G3DMgrLoadResources(G3DManager *manager, u16 scene, const G3DSce
     }
 }
 
-
 static void GFL_G3DMgrProcessArcLoadReq(G3DManager *manager, u16 scene, const G3DSceneSetup *setup, HeapID heapId,
                                         ArcTool *arc) {
 
@@ -245,10 +244,9 @@ static void GFL_G3DMgrLoadActors(G3DManager *manager, u16 scene, const G3DSceneS
             manager->actorFlags[firstActor + i] |= G3D_ACTOR_OWN_MODEL;
         }
         if (actorSetup->texResource != actorSetup->modelResource) {
-            if (GFL_G3DResCheckType(manager->resources[firstResource + actorSetup->texResource], G3D_RES_CHECK_MDL)
-                == TRUE) {
-                if (G3DMgr_TakeResource(manager, firstResource, actorSetup->texResource, setup, &texResource)
-                    == TRUE) {
+            if (GFL_G3DResCheckType(manager->resources[firstResource + actorSetup->texResource], G3D_RES_CHECK_MDL) ==
+                TRUE) {
+                if (G3DMgr_TakeResource(manager, firstResource, actorSetup->texResource, setup, &texResource) == TRUE) {
                     manager->actorFlags[firstActor + i] |= G3D_ACTOR_OWN_TEXTURE;
                     GFL_G3DResUploadTexData(texResource);
                 }
@@ -263,8 +261,8 @@ static void GFL_G3DMgrLoadActors(G3DManager *manager, u16 scene, const G3DSceneS
             }
         }
         model = GFL_G3DMdlCreate(mdlResource, actorSetup->modelIndex, texResource);
-        animations = GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(void *), TRUE,
-                                      "g3d_util.c", 534);
+        animations =
+            GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(void *), TRUE, "g3d_util.c", 534);
         for (j = 0; j < actorSetup->animationCount; j++) {
             const G3DSceneAnimationSetup *anmSetup = &actorSetup->animations[j];
             void *animation;
@@ -272,8 +270,8 @@ static void GFL_G3DMgrLoadActors(G3DManager *manager, u16 scene, const G3DSceneS
             if (anmSetup->resource == 0xff) {
                 animation = NULL;
             } else {
-                animation = GFL_G3DAnmCreate(model, manager->resources[firstResource + anmSetup->resource],
-                                             anmSetup->index);
+                animation =
+                    GFL_G3DAnmCreate(model, manager->resources[firstResource + anmSetup->resource], anmSetup->index);
             }
             animations[j] = animation;
         }
@@ -298,8 +296,8 @@ static void GFL_G3DMgrLoadActorsFast(G3DManager *manager, u16 scene, const G3DSc
 
         mdlResource = G3DMgr_UseResource(manager, firstResource, actorSetup->modelResource);
         if (actorSetup->texResource != actorSetup->modelResource) {
-            if (GFL_G3DResCheckType(manager->resources[firstResource + actorSetup->texResource], G3D_RES_CHECK_MDL)
-                == TRUE) {
+            if (GFL_G3DResCheckType(manager->resources[firstResource + actorSetup->texResource], G3D_RES_CHECK_MDL) ==
+                TRUE) {
                 texResource = G3DMgr_UseResource(manager, firstResource, actorSetup->texResource);
             } else {
                 texResource = manager->resources[firstResource + actorSetup->texResource];
@@ -312,8 +310,8 @@ static void GFL_G3DMgrLoadActorsFast(G3DManager *manager, u16 scene, const G3DSc
             }
         }
         model = GFL_G3DMdlCreate(mdlResource, actorSetup->modelIndex, texResource);
-        animations = GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(void *), TRUE,
-                                      "g3d_util.c", 609);
+        animations =
+            GFL_HeapAllocate(HEAPID_TAIL(heapId), actorSetup->animationCount * sizeof(void *), TRUE, "g3d_util.c", 609);
         for (j = 0; j < actorSetup->animationCount; j++) {
             const G3DSceneAnimationSetup *anmSetup = &actorSetup->animations[j];
             void *animation;
@@ -321,8 +319,8 @@ static void GFL_G3DMgrLoadActorsFast(G3DManager *manager, u16 scene, const G3DSc
             if (anmSetup->resource == 0xff) {
                 animation = NULL;
             } else {
-                animation = GFL_G3DAnmCreate(model, manager->resources[firstResource + anmSetup->resource],
-                                             anmSetup->index);
+                animation =
+                    GFL_G3DAnmCreate(model, manager->resources[firstResource + anmSetup->resource], anmSetup->index);
             }
             animations[j] = animation;
         }

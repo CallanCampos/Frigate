@@ -1,5 +1,4 @@
 #include "types.h"
-#include "system/net_define.h"
 #include "dwc/dwc.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
@@ -8,6 +7,7 @@
 #include "save/player_info.h"
 #include "save/wifi_list.h"
 #include "system/game_data.h"
+#include "system/net_define.h"
 
 // Checks of a friend's data or friend key against the friends known, and adding a friend to the Friend Roster.
 // The ROM has no string for the file, so the name is a guess.
@@ -22,15 +22,14 @@
 static int compareFriendData(DWCFriendData *friendData, DWCUserData *userData, DWCFriendData *other);
 static int findFriendData(DWCFriendData *friendData, int *index);
 static void setFriendInfo(WifiList *wifiList, PlayerInfo *info, u32 index, u32 heapId, BOOL setName);
-static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendData, u32 index, u32 heapId,
-                      int mode);
+static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendData, u32 index, u32 heapId, int mode);
 
 static int compareFriendData(DWCFriendData *friendData, DWCUserData *userData, DWCFriendData *other) {
     if (func_02057fd4(friendData, other)) {
         return FRIEND_CHECK_SAME;
     }
-    if (DWC_GetGsProfileId(userData, friendData) > 0
-        && DWC_GetGsProfileId(userData, friendData) == DWC_GetGsProfileId(userData, other)) {
+    if (DWC_GetGsProfileId(userData, friendData) > 0 &&
+        DWC_GetGsProfileId(userData, friendData) == DWC_GetGsProfileId(userData, other)) {
         return FRIEND_CHECK_SAME_PROFILE;
     }
     return FRIEND_CHECK_NEW;
@@ -51,8 +50,8 @@ static int findFriendData(DWCFriendData *friendData, int *index) {
             *index = i;
             return FRIEND_CHECK_SAME;
         }
-        if (DWC_GetGsProfileId(userData, friendData) > 0
-            && DWC_GetGsProfileId(userData, friendData) == DWC_GetGsProfileId(userData, &friends[i])) {
+        if (DWC_GetGsProfileId(userData, friendData) > 0 &&
+            DWC_GetGsProfileId(userData, friendData) == DWC_GetGsProfileId(userData, &friends[i])) {
             *index = i;
             return FRIEND_CHECK_SAME_PROFILE;
         }
@@ -120,8 +119,7 @@ static void setFriendInfo(WifiList *wifiList, PlayerInfo *info, u32 index, u32 h
     func_0200a034(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, func_02008bf4(info));
 }
 
-static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendData, u32 index, u32 heapId,
-                      int mode) {
+static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendData, u32 index, u32 heapId, int mode) {
     WifiList *wifiList = GameData_GetWifiList(gameData);
     DWCFriendData *dest = func_0200a0e4(wifiList, index);
 

@@ -31,7 +31,7 @@ typedef struct {
 } EntreeForestSpawnContext;
 
 FieldActor *EntreeForest_SpawnPkmActor(const EntreeForestSpawnContext *context, const EntreeForestPokemon *pokemon,
-                                      u16 index, u16 x, u16 z, s32 y);
+                                       u16 index, u16 x, u16 z, s32 y);
 void EntreeForest_SpawnAllPokemon(Field *field, u32 actorIdBase, const EntreeForestPokemon *pokemon, u32 unused,
                                   u32 area);
 

@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/event_work.h"
 #include "constants/flags.h"
 #include "constants/vars.h"
 #include "gfl/std.h"
+#include "save/event_work.h"
 
 // The event work save block: the work values and the flags of the scripts. The temporary flags, from
 // EVENT_FLAG_TEMP_0, are not saved.

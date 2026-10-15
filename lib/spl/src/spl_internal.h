@@ -25,7 +25,7 @@ static inline fx32 SPLRandom_Fx32(u32 bits) {
 #define SPLRandom_Range(range) (((range) * (s32)(SPLRandom_Next() >> 23) - ((range) << 8)) >> 8)
 
 // value, more or less by a random part of up to variance out of 255
-#define SPLRandom_Vary(value, variance)                                                                               \
+#define SPLRandom_Vary(value, variance)                                                                                \
     (((value) * (255 + (variance) - (((variance) * (s32)(SPLRandom_Next() >> 24)) >> 7))) >> 8)
 
 // A random unit vector, or one in the xy plane

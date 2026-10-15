@@ -7,8 +7,8 @@
 #include "field/bsubway_scr.h"
 #include "field/delivery_beacon.h"
 #include "gfl/heap.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 struct TrialHouseWork {
     BSubwayTrainer trainer;

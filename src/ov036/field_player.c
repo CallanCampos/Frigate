@@ -43,6 +43,7 @@ typedef struct {
 } PlayerSprite;
 
 // The object code and extra state of each form of the player, by sex
+// clang-format off
 static const PlayerSprite PLAYER_SPRITE_MAP[2][PLAYER_FORM_COUNT] = {
     {
         {0xe7, FLD_PLAYER_EXSTATE_NONE},
@@ -69,6 +70,8 @@ static const PlayerSprite PLAYER_SPRITE_MAP[2][PLAYER_FORM_COUNT] = {
         {0xf6, 4},
     },
 };
+
+// clang-format on
 
 FieldPlayer *FieldPlayer_Create(PlayerState *state, Field *field, const VecFx32 *pos, u32 sex, HeapID heapId) {
     FieldPlayer *player = GFL_HeapAllocate(heapId, sizeof(FieldPlayer), TRUE, "field_player.c", 76);
@@ -503,16 +506,16 @@ void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z) {
 }
 
 BOOL func_ov036_0219ac8c(FieldPlayer *player) {
-    if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID
-        && FieldPlayerGrid_IsCatwalkExiting(player->grid) == TRUE) {
+    if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID &&
+        FieldPlayerGrid_IsCatwalkExiting(player->grid) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
 void func_ov036_0219acac(FieldPlayer *player) {
-    if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID
-        && FieldPlayerGrid_IsCatwalkExiting(player->grid) == TRUE) {
+    if (Field_GetResolvedControllerTypeID(player->field) == CONTROLLER_GRID &&
+        FieldPlayerGrid_IsCatwalkExiting(player->grid) == TRUE) {
         FieldPlayerGrid_SanitizeHeightMismatch(player->grid);
     }
 }

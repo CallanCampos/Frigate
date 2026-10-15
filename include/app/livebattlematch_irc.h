@@ -24,7 +24,6 @@
 
 typedef struct LiveBattleMatchIrc LiveBattleMatchIrc;
 
-
 LiveBattleMatchIrc *LiveBattleMatchIrc_Create(GameData *gameData, HeapID heapId);
 void LiveBattleMatchIrc_Delete(LiveBattleMatchIrc *irc);
 // Called every frame; does nothing

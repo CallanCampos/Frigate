@@ -1,8 +1,9 @@
 #include "types.h"
+#include "battle/trainer_data.h"
 #include "constants/arc.h"
 #include "constants/script_text_banks.h"
 #include "constants/text_banks.h"
-#include "battle/trainer_data.h"
+#include "field/fest_mission_data.h"
 #include "field/wbt.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -10,8 +11,11 @@
 #include "gfl/str.h"
 #include "pml/poke_party.h"
 #include "pml/species_names.h"
+#include "save/box.h"
+#include "save/high_link.h"
 #include "save/player_info.h"
 #include "system/country_region.h"
+#include "system/fest_mission.h"
 #include "system/pms_data.h"
 #include "system/pms_word.h"
 #include "system/printsys.h"
@@ -44,23 +48,10 @@ struct WordSet {
     StrBuf *tmp;
 };
 
-// Declared here until their files are decompiled
-void loadBoxNameToStrbuf(void *boxData, u32 box, StrBuf *strbuf);
-BOOL PassPower_IsIDValid(int id);
-void *allocateForFestMission(HeapID heapId);
-// The festival missions' functions as this file declared them. The original passes the mission to
-// func_ov027_02170b98 without narrowing it, while fest_mission_data.c defines that parameter as a u8, so this file
-// saw a declaration of its own rather than field/fest_mission_data.h's.
-FestivalText *getTextFileForFestMissions(HeapID heapId);
-void func_ov027_02170b00(FestivalText *text);
-void func_ov027_02170b98(void *data, u32 mission, s32 a2, void *buffer);
-void func_ov027_02170d04(FestivalText *text, StrBuf *strbuf, void *buffer, HeapID heapId);
-
 static void GFL_WordSetClearBufFlags(WordSetAttr *attr);
 static void GFL_WordSetClearBuf(WordSet *wordSet, u32 index);
 static void GFL_WordSetCopyStrbuf(WordSet *wordSet, u32 index, const StrBuf *strbuf, const WordSetAttr *attr);
 static void GFL_WordSetLoadMsg(WordSet *wordSet, u32 index, u32 fileId, u32 messageId);
-
 
 WordSet *GFL_WordSetSystemCreateDefault(HeapID heapId) {
     return GFL_WordSetSystemCreate(8, 0x20, heapId);
@@ -254,7 +245,8 @@ void GFL_WordSetLoadStr(WordSet *wordSet, u32 index, const u16 *str) {
 }
 
 void loadCountryToStrbuf(WordSet *wordSet, u32 index, u32 country) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF, wordSet->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF,
+                                          wordSet->heapId);
 
     if (msgData != NULL) {
         if (country < GFL_MsgDataGetLineCount(msgData)) {
@@ -400,7 +392,8 @@ void func_0202483c(WordSet *wordSet, u32 index, u32 tournament) {
 }
 
 void func_02024868(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
-    void *buffer;
+    // The mission's config, whose first 0x14 bytes are a FestMission (system/fest_mission.h)
+    FestMissionConfig *buffer;
     FestivalText *text;
 
     if (mission >= 0x37) {
@@ -412,8 +405,8 @@ void func_02024868(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
     }
     buffer = allocateForFestMission(HEAPID_TAIL((HeapID)wordSet->heapId));
     text = getTextFileForFestMissions(HEAPID_TAIL((HeapID)wordSet->heapId));
-    func_ov027_02170b98(*(void **)text, mission, a3, buffer);
-    func_ov027_02170d04(text, wordSet->tmp, buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
+    func_ov027_02170b98(text->archive, mission, a3, (FestMission *)buffer);
+    func_ov027_02170d04(text, wordSet->tmp, (const FestMission *)buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
     func_ov027_02170b00(text);
     GFL_HeapFree(buffer);

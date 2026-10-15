@@ -25,7 +25,7 @@ static GameEventReturnCode SpPokeEvent_WaitAnimEnd(GameEvent *event, u32 *state,
 static GameEventReturnCode SpPokeEvent_AppearMain(GameEvent *event, u32 *state, void *data);
 
 GameEvent *SpPokeEvent_CreateJump(GameSystem *gsys, u16 mode, const VecFx32 *start, const VecFx32 *end, fx32 height,
-                               u32 frames) {
+                                  u32 frames) {
     Field *field = GSYS_GetField(gsys);
     SpPokeGimmickWork *work = Field_GetGimmickWorkBlock(field, WORK_ID);
     int actor = 1;

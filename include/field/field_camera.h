@@ -2,11 +2,11 @@
 #define POKEBW2_FIELD_FIELD_CAMERA_H
 
 #include "types.h"
-#include "gfl/heap.h"
+#include "field/field_task.h"
 #include "gfl/g3d.h"
+#include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
-#include "field/field_task.h"
 
 // An event camera animation's target and what it animates. Names and layouts from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)

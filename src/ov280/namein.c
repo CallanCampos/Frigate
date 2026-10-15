@@ -319,8 +319,8 @@ static void KeyHighlight_Clear(KeyHighlight *highlight);
 static void KeyHighlight_Set(KeyHighlight *highlight, u32 mode, const KeyRect *rect, u32 kanaPage, u32 type);
 static void KeyHighlight_Update(KeyHighlight *highlight, u32 type, const KeyRect *rect);
 static BOOL KeyHighlight_BlendColor(u16 *color, u16 *phase, u16 step, u32 palette, u8 index, u16 from, u16 to);
-static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, PrintQueue *queue,
-                         NameEntryObjs *objs, HeapID heapId);
+static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, PrintQueue *queue, NameEntryObjs *objs,
+                         HeapID heapId);
 static void NameBox_Free(NameBox *box);
 static BOOL NameBox_Update(NameBox *box);
 static BOOL NameBox_DeleteChar(NameBox *box);
@@ -441,7 +441,7 @@ const u32 NAME_ENTRY_SOUND_COUNT = 6;
 const GameProcFunctions NAME_ENTRY_PROC_FUNCTIONS = { NameEntry_ProcInit, NameEntry_ProcMain, NameEntry_ProcExit };
 
 const u32 NAME_ENTRY_SOUNDS[6] = { SEQ_SE_SELECT1, SEQ_SE_CANCEL3, SEQ_SE_DECIDE1,
-                                   SEQ_SE_SYS_12, SEQ_SE_DECIDE2, SEQ_SE_BEEP };
+                                   SEQ_SE_SYS_12,  SEQ_SE_DECIDE2, SEQ_SE_BEEP };
 
 // The characters of a Game Sync ID (no I, O, 0 or 1)
 static const u16 sGameSyncIdChars[GAME_SYNC_ID_CHAR_COUNT] = {
@@ -499,20 +499,19 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
     unit = NameinGraphic_GetClActUnit(work->graphic);
     NameEntryObjs_Init(&work->objs, unit, HEAPID_NAMEIN);
     species = param->gender;
-    NameEntryIcon_Init(&work->icon, NameEntry_GetIconType(param->mode, species), species, param->unk6, unit,
-                       work->font, work->queue, work->msgData, work->bmpOam, HEAPID_NAMEIN);
+    NameEntryIcon_Init(&work->icon, NameEntry_GetIconType(param->mode, species), species, param->unk6, unit, work->font,
+                       work->queue, work->msgData, work->bmpOam, HEAPID_NAMEIN);
     work->keyboards = NameinData_LoadKeyboards(HEAPID_NAMEIN);
     work->name = GFL_StrBufClone(param->name, HEAPID_NAMEIN);
     if (GFL_StrBufGetCharCount(work->name) != 0) {
-        if (GFL_StrBufGetCharCount(work->name) > param->maxLength
-            || !NameinData_IsNameValid(GFL_StrBufGetStringPtr(work->name), HEAPID_NAMEIN)) {
+        if (GFL_StrBufGetCharCount(work->name) > param->maxLength ||
+            !NameinData_IsNameValid(GFL_StrBufGetStringPtr(work->name), HEAPID_NAMEIN)) {
             GFL_StrBufClear(work->name);
         }
     }
     NameEntryTask_Init(&work->task, work, NameEntryTask_WaitDraw);
     NameBox_Init(&work->box, work->name, param->maxLength, work->font, work->queue, &work->objs, HEAPID_NAMEIN);
-    Keyboard_Init(&work->keyboard, keyboardType, work->font, work->queue, work->keyboards, &work->objs,
-                  HEAPID_NAMEIN);
+    Keyboard_Init(&work->keyboard, keyboardType, work->font, work->queue, work->keyboards, &work->objs, HEAPID_NAMEIN);
     if (param->mode == NAME_ENTRY_GAME_SYNC_ID) {
         Keyboard_SetLocked(&work->keyboard, TRUE);
     }
@@ -765,8 +764,8 @@ static void KeyHighlight_Update(KeyHighlight *highlight, u32 type, const KeyRect
             break;
         }
         for (i = 0; i < 16; i++) {
-            KeyHighlight_BlendColor(&highlight->color[i], &highlight->phase[i], step, palette, i, highlight->baseColor[i],
-                                 highlight->altColor[i]);
+            KeyHighlight_BlendColor(&highlight->color[i], &highlight->phase[i], step, palette, i,
+                                    highlight->baseColor[i], highlight->altColor[i]);
         }
     }
 
@@ -785,7 +784,8 @@ static void KeyHighlight_Update(KeyHighlight *highlight, u32 type, const KeyRect
     }
 }
 
-// Moves the colour towards the other of the two along a cosine, uploads it to the palette and returns whether it got there
+// Moves the colour towards the other of the two along a cosine, uploads it to the palette and returns whether it got
+// there
 static BOOL KeyHighlight_BlendColor(u16 *color, u16 *phase, u16 step, u32 palette, u8 index, u16 from, u16 to) {
     int next = *phase + step;
     u8 fromR;
@@ -822,8 +822,8 @@ static BOOL KeyHighlight_BlendColor(u16 *color, u16 *phase, u16 step, u32 palett
     return FALSE;
 }
 
-static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, PrintQueue *queue,
-                         NameEntryObjs *objs, HeapID heapId) {
+static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, PrintQueue *queue, NameEntryObjs *objs,
+                         HeapID heapId) {
     BmpWin *window;
     ClActorPos pos;
     int offset;
@@ -2012,8 +2012,8 @@ static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue,
     }
     GFL_BGSysLoadScr(1);
     KeyHighlight_Init(&kb->highlight, type, objs, heapId);
-    KeyLayout_Init(&kb->layout, type, NameEntry_GetLayoutIndex(kb->type, kb->kanaPage, kb->kanaGroup),
-                   kb->keyboards, heapId);
+    KeyLayout_Init(&kb->layout, type, NameEntry_GetLayoutIndex(kb->type, kb->kanaPage, kb->kanaGroup), kb->keyboards,
+                   heapId);
     window = BmpWin_CreateDynamic(3, 3, 5, 26, 15, 15, TRUE);
     kb->window = window;
     BmpWin_FlushChar(window);
@@ -2155,13 +2155,13 @@ static BOOL Keyboard_StartSwitch(Keyboard *kb, u32 type) {
         if (hasUpperLayer) {
             gfxRegSetAlphaBlend(REG_BLDCNT_ADDR,
                                 GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2
-                                    | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                                    GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
                                 16, 16);
         } else {
             gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2
-                                    | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                                    GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
                                 16, 16);
         }
         return TRUE;
@@ -2250,8 +2250,8 @@ static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
 static void Keyboard_ApplyType(Keyboard *kb, u32 type) {
     if (kb->type != type) {
         KeyLayout_Clear(&kb->layout);
-        KeyLayout_Init(&kb->layout, type, NameEntry_GetLayoutIndex(type, kb->kanaPage, kb->kanaGroup),
-                       kb->keyboards, kb->heapId);
+        KeyLayout_Init(&kb->layout, type, NameEntry_GetLayoutIndex(type, kb->kanaPage, kb->kanaGroup), kb->keyboards,
+                       kb->heapId);
         GFL_BitmapFill(BmpWin_GetBitmap(kb->window), 0);
         KeyLayout_PrintKeys(&kb->layout, &kb->print, kb->queue, kb->font, kb->heapId);
         if (type == KEYBOARD_TYPE_KANA) {
@@ -2477,8 +2477,7 @@ static BOOL Keyboard_HandleKeysSlide(Keyboard *kb, KeyInput *input) {
         pos = kb->pos;
         KeyLayout_Move(&kb->layout, &pos, &delta);
         kind = KeyLayout_GetChar(&kb->layout, &pos, NULL);
-        if (kind == KEY_KIND_TYPE_0 || kind == KEY_KIND_TYPE_1 || kind == KEY_KIND_TYPE_2
-            || kind == KEY_KIND_TYPE_3) {
+        if (kind == KEY_KIND_TYPE_0 || kind == KEY_KIND_TYPE_1 || kind == KEY_KIND_TYPE_2 || kind == KEY_KIND_TYPE_3) {
             if (func_0203d554() == TRUE) {
                 if (KeyLayout_GetRect(&kb->layout, &kb->pos, &rect)) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -2542,8 +2541,8 @@ static BOOL Keyboard_HandleTouchSlide(Keyboard *kb, KeyInput *input) {
             touch.y = touchY;
             if (KeyLayout_FindAtTouch(&kb->layout, &touch, &kb->pos)) {
                 kind = KeyLayout_GetChar(&kb->layout, &kb->pos, NULL);
-                if (kind == KEY_KIND_TYPE_0 || kind == KEY_KIND_TYPE_1 || kind == KEY_KIND_TYPE_2
-                    || kind == KEY_KIND_TYPE_3) {
+                if (kind == KEY_KIND_TYPE_0 || kind == KEY_KIND_TYPE_1 || kind == KEY_KIND_TYPE_2 ||
+                    kind == KEY_KIND_TYPE_3) {
                     x = kb->pos.x;
                     y = kb->pos.y;
                     input->pos.y = y;
@@ -2696,8 +2695,8 @@ static void NameEntryTalk_Start(NameEntryTalk *talk, NameEntryMessage *message, 
     GFL_BitmapFill(BmpWin_GetBitmap(message->window), message->fillColor);
     GFL_StrBufClear(message->buf);
     GFL_WordSetFormatStrbuf(wordSet, message->buf, (const StrBuf *)param->unkC);
-    talk->stream = func_02022268(message->window, 0, 0, message->buf, message->font, func_02017bcc(),
-                                 talk->tcbManager, 2, heapId, message->fillColor);
+    talk->stream = func_02022268(message->window, 0, 0, message->buf, message->font, func_02017bcc(), talk->tcbManager,
+                                 2, heapId, message->fillColor);
     talk->frame = 0;
     talk->next = NameEntryTask_FadeOut;
     talk->waitFrames = 60;
@@ -3119,8 +3118,8 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
         }
         GFL_StrBufFree(preset);
     }
-    if (GFL_StrBufGetCharCount(work->param->name) == 0 && work->param->mode != NAME_ENTRY_PLAYER
-        && work->param->mode != NAME_ENTRY_RIVAL) {
+    if (GFL_StrBufGetCharCount(work->param->name) == 0 && work->param->mode != NAME_ENTRY_PLAYER &&
+        work->param->mode != NAME_ENTRY_RIVAL) {
         work->param->unk1C = TRUE;
     }
     if (work->param->mode == NAME_ENTRY_POKEMON && work->param->unk1C == FALSE) {
@@ -3131,8 +3130,8 @@ static void NameEntry_CheckChanged(NameEntryWork *work) {
 static BOOL NameEntry_IsNameAcceptable(NameEntryWork *work) {
     u32 mode = work->param->mode;
 
-    if (mode == NAME_ENTRY_PLAYER || mode == NAME_ENTRY_RIVAL || mode == NAME_ENTRY_AVENUE_TITLE
-        || mode == NAME_ENTRY_FAVORITE_PHRASE || mode == NAME_ENTRY_IMPRESSED) {
+    if (mode == NAME_ENTRY_PLAYER || mode == NAME_ENTRY_RIVAL || mode == NAME_ENTRY_AVENUE_TITLE ||
+        mode == NAME_ENTRY_FAVORITE_PHRASE || mode == NAME_ENTRY_IMPRESSED) {
         if (NameBox_GetLength(&work->box) == 0 && NameBox_GetComposeLength(&work->box) == 0) {
             return FALSE;
         }
@@ -3446,8 +3445,8 @@ static void NameEntryTask_Input(NameEntryTask *task, u32 *state, NameEntryWork *
         break;
     }
 
-    if (work->usesPresetNames == TRUE && work->presetNameFilled == TRUE && result != KEY_RESULT_NONE
-        && result != KEY_RESULT_OK) {
+    if (work->usesPresetNames == TRUE && work->presetNameFilled == TRUE && result != KEY_RESULT_NONE &&
+        result != KEY_RESULT_OK) {
         work->presetNameFilled = FALSE;
     }
     Keyboard_Update(&work->keyboard, &work->box);

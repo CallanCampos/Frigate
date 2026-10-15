@@ -5,8 +5,8 @@
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
-// The login's messages, for the callbacks of WifiLoginParam: WifiLoginMessage_PrintFrom prints one and WifiLoginMessage_IsDone
-// waits for it
+// The login's messages, for the callbacks of WifiLoginParam: WifiLoginMessage_PrintFrom prints one and
+// WifiLoginMessage_IsDone waits for it
 #include "app/wifilogin_message.h"
 
 #define OVERLAY_WIFILOGIN OVERLAY_ID(190)
@@ -17,8 +17,8 @@ typedef int (*WifiLoginCallback)(void *msgWork, void *data);
 
 typedef struct {
     GameData *gameData;
-    // The display's style, 0 for the Dream World account's and 1 for Game Sync's; with 0 the login prints a title on the
-    // top screen and ignores the touch screen
+    // The display's style, 0 for the Dream World account's and 1 for Game Sync's; with 0 the login prints a title on
+    // the top screen and ignores the touch screen
     u32 unk4;
     // The style of the messages and menus, as unk4 numbers them
     u32 unk8;

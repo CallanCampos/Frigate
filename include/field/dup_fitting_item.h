@@ -71,7 +71,7 @@ u16 DupFittingItemList_GetCount(DupFittingItemList *list);
 BOOL DupFittingItemList_IsFull(DupFittingItemList *list);
 // Makes a node that shows an entry's prop at a position of the scene
 DupFittingItemNode *DupFittingItemNode_Create(HeapID heapId, MusItemDrawSys *sys, DupFittingItemEntry *entry,
-                                        const VecFx32 *pos);
+                                              const VecFx32 *pos);
 void DupFittingItemNode_Delete(DupFittingItemNode *node, MusItemDrawSys *sys);
 // Shows another entry's prop
 void DupFittingItemNode_ChangeEntry(DupFittingItemNode *node, MusItemDrawSys *sys, DupFittingItemEntry *entry);

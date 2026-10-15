@@ -127,7 +127,7 @@ static const FontFreeProc v_GFLFontFreeSub[] = {
 };
 
 // The top n bits of a byte
-static const u8 BIT_COUNT_TO_BIT_MASK[] = {0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff};
+static const u8 BIT_COUNT_TO_BIT_MASK[] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff };
 
 static u8 g_LastTextColor2[3];
 static BitReader g_GlyphBitReader;

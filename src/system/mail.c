@@ -1,7 +1,7 @@
 #include "types.h"
-#include "pml/mail.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
+#include "pml/mail.h"
 #include "save/player_info.h"
 #include "save/save_control.h"
 #include "system/game_data.h"

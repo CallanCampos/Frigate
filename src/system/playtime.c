@@ -1,9 +1,9 @@
 #include "types.h"
-#include "save/playtime.h"
-#include "nitro/rtc.h"
-#include "system/rtc.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
+#include "nitro/rtc.h"
+#include "save/playtime.h"
+#include "system/rtc.h"
 
 // The time played, and the date and time of the last save (the ROM's string for the file, "playtime.c"). The names of
 // the fields are guessed.

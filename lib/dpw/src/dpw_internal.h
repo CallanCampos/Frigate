@@ -22,5 +22,4 @@ int func_020583b0(int *type, int *group);
 int func_0205b5ec(void);
 void func_02058490(void);
 
-
 #endif // POKEBW2_DPW_INTERNAL_H

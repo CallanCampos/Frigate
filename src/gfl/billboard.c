@@ -30,6 +30,7 @@ const u32 BLACT_PIXEL_FORMATS[5] = {
 const BlActTexSize MMDL_BB_SIZETBL[8] = {
     { 0, 0 }, { 1, 1 }, { 2, 2 }, { 3, 3 }, { 4, 4 }, { 5, 5 }, { 6, 6 }, { 7, 7 },
 };
+// clang-format off
 const BlActQuad BLACT_GEOM_QUADS[9] = {
     { FX32_ONE, -FX32_ONE, -FX32_ONE, FX32_ONE },
     { 0, -2 * FX32_ONE, -FX32_ONE, FX32_ONE },
@@ -41,6 +42,8 @@ const BlActQuad BLACT_GEOM_QUADS[9] = {
     { 2 * FX32_ONE, 0, 0, 2 * FX32_ONE },
     { 2 * FX32_ONE, 0, -2 * FX32_ONE, 0 },
 };
+
+// clang-format on
 
 BlActScene *BlActScene_Create(const BlActSceneSetup *setup, HeapID heapId) {
     BlActScene *scene = GFL_HeapAllocate(heapId, sizeof(BlActScene), TRUE, "billboard.c", 153);
@@ -543,4 +546,3 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights) {
         G3_PopMtx(1);
     }
 }
-

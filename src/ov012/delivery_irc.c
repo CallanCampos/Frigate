@@ -66,6 +66,7 @@ static void func_ov012_0215305c(void *work);
 static void func_ov012_0215307c(void *work);
 static BOOL func_ov012_021530cc(DeliveryIrcWork *pWork);
 
+// clang-format off
 static const NetCommand data_ov012_0216af3c[] = {
     {func_ov012_02152c2c, func_ov012_02152c68},
     {func_ov012_02152c30, NULL},
@@ -73,6 +74,9 @@ static const NetCommand data_ov012_0216af3c[] = {
     {func_ov012_02152c5c, NULL},
 };
 
+// clang-format on
+
+// clang-format off
 static GFLNetInitData data_ov012_0216e110 = {
     data_ov012_0216af3c,
     NELEMS(data_ov012_0216af3c),
@@ -110,6 +114,8 @@ static GFLNetInitData data_ov012_0216e110 = {
     0,
     0,
 };
+
+// clang-format on
 
 static void func_ov012_02152c0c(void *work, int netId) {
     DeliveryIrcWork *pWork = work;

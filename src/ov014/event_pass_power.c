@@ -129,7 +129,8 @@ GameEventReturnCode func_ov014_0216e73c(GameEvent *event, u32 *state, void *data
         u32 args[2];
         args[0] = work->param.passPower;
         args[1] = 1;
-        GameEvent_Replace(event, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(156), EventPassPowerActivate_Create, args));
+        GameEvent_Replace(event,
+                          GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(156), EventPassPowerActivate_Create, args));
         return GAMEEVENT_CONTINUE;
     }
     case 9:

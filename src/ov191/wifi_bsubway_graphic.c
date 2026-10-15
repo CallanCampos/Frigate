@@ -90,7 +90,8 @@ static const WifiBSubwayBGSetup sWifiBSubwayBGSetups[BG_COUNT] = {
 };
 
 WifiBSubwayGraphic *WifiBSubwayGraphic_Create(u32 layout, HeapID heapId) {
-    WifiBSubwayGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(WifiBSubwayGraphic), FALSE, "wifi_bsubway_graphic.c", 444);
+    WifiBSubwayGraphic *graphic =
+        GFL_HeapAllocate(heapId, sizeof(WifiBSubwayGraphic), FALSE, "wifi_bsubway_graphic.c", 444);
 
     sys_memset(graphic, 0, sizeof(WifiBSubwayGraphic));
     G2_BlendNone();

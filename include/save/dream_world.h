@@ -2,8 +2,8 @@
 #define POKEBW2_SAVE_DREAM_WORLD_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "pml/poke_party.h"
+#include "struct_decls.h"
 
 #define DREAM_WORLD_ITEM_MAX 20
 #define DREAM_WORLD_ITEM_COUNT_MAX 20

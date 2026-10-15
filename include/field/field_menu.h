@@ -2,9 +2,9 @@
 #define POKEBW2_FIELD_FIELD_MENU_H
 
 #include "types.h"
+#include "field/app_call.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
-#include "field/app_call.h"
 #include "system/game_event.h"
 
 struct FieldMenuWork {

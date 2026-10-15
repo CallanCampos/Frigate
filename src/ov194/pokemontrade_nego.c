@@ -1,7 +1,7 @@
 #include "types.h"
-#include "constants/arc.h"
-#include "app/ui/touchbar.h"
 #include "app/pokemon_trade_local.h"
+#include "app/ui/touchbar.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -33,7 +33,6 @@
 #include "system/app_taskmenu.h"
 #include "system/game_data.h"
 #include "system/gf_font.h"
-#include "system/wipe.h"
 #include "system/printsys.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
@@ -339,7 +338,8 @@ void func_ov194_021bc2d0(PokemonTradeWork *wk, u32 vram) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
     u16 offset = vram == 1 ? 0x60 : 0;
     wk->objRes[TRADE_OBJRES_PLTT_NEGO] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), vram, offset, wk->heapId);
-    wk->objRes[TRADE_OBJRES_CELL_NEGO] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->objRes[TRADE_OBJRES_CELL_NEGO] =
+        func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -1265,7 +1265,8 @@ static void func_ov194_021bdcc4(PokemonTradeWork *wk) {
                     PartyPkm *pkm = wk->negoPkm[1][i];
                     if (NHttpRap_GetCheckResult(response, count)) {
                         u32 item = PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL);
-                        MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, wk->heapId);
+                        MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE,
+                                                              TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, wk->heapId);
                         StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, MSG_INVALID_PKM_TRAINER);
                         GFL_MsgDataFree(msgData);
                         if (PML_ItemIsMail(item)) {

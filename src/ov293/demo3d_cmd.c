@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/demo3d/demo3d_cmd.h"
 #include "app/demo3d/demo3d_capture.h"
+#include "app/demo3d/demo3d_cmd.h"
 #include "app/demo3d/demo3d_cmdsys.h"
 #include "app/demo3d/demo3d_data.h"
 #include "app/demo3d/demo3d_engine.h"
@@ -437,8 +437,7 @@ static void Demo3DCmd_Flash(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *params
 }
 
 static void Demo3DCmd_AddFlash(Demo3DCmdSys *sys, u8 screens, s8 start, s8 peak, s8 end, s32 inFrames, s32 outFrames) {
-    Demo3DFlash *work =
-        GFL_TCBExGetData(GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_FlashTask, sizeof(Demo3DFlash), 1));
+    Demo3DFlash *work = GFL_TCBExGetData(GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_FlashTask, sizeof(Demo3DFlash), 1));
 
     sys_memset(work, 0, sizeof(Demo3DFlash));
     work->sys = sys;
@@ -505,8 +504,8 @@ static void Demo3DCmd_LightVector(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *
 static void Demo3DCmd_Message(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *params) {
     u32 message = params[1] + params[2] * engine->scene.param;
 
-    Demo3DCmd_AddMessage(sys, params[0], message, Demo3DCmd_ConvFrames(sys, params[3]), params[4], params[5],
-                         params[6], params[7]);
+    Demo3DCmd_AddMessage(sys, params[0], message, Demo3DCmd_ConvFrames(sys, params[3]), params[4], params[5], params[6],
+                         params[7]);
 }
 
 static void Demo3DCmd_AddMessage(Demo3DCmdSys *sys, u32 textBank, u32 message, s32 frames, u8 x, u8 y, u8 width,
@@ -533,8 +532,8 @@ static void Demo3DCmd_MessageTask(TCBEx *task, void *data) {
 
         work->strbuf = GFL_MsgDataLoadStrbufNew(msgData, work->message);
         GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
-        work->stream = func_02022268(work->window, 0, 0, work->strbuf, sys->font, sys->textSpeed, sys->tcbMgr, 0,
-                                     sys->heapId, 15);
+        work->stream =
+            func_02022268(work->window, 0, 0, work->strbuf, sys->font, sys->textSpeed, sys->tcbMgr, 0, sys->heapId, 15);
         window = work->window;
         BmpWin_FlushChar(window);
         BmpWin_FlushMap(window);
@@ -598,8 +597,7 @@ static void Demo3DCmd_Telop(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *params
 
 static void Demo3DCmd_AddTelop(Demo3DCmdSys *sys, u32 paletteFile, u32 charFile, u32 screenFile, s32 frames,
                                s32 fadeInFrames, s32 fadeOutFrames) {
-    Demo3DTelop *work =
-        GFL_TCBExGetData(GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_TelopTask, sizeof(Demo3DTelop), 1));
+    Demo3DTelop *work = GFL_TCBExGetData(GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_TelopTask, sizeof(Demo3DTelop), 1));
 
     Demo3DCmd_InitTelop(sys, work, paletteFile, charFile, screenFile, frames, fadeInFrames, fadeOutFrames);
 }

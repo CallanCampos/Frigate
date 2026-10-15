@@ -4,8 +4,8 @@
 #include "types.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // Overlay 150 runs the encounter effects that split the screen into a grid of cells, which overlays 152 to 154 set
 // up. Overlay 148 runs the event around such an effect
@@ -59,7 +59,7 @@ void EncEff_CallRenderFunc(EncEff *effect);
 GameEvent *EventFieldEffect_CreatePokeSprite(GameSystem *gsys, void *g3DCi, u8 partySlot);
 // The event of an effect: init makes the effect's event, and render draws it
 GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
-                               void (*render)(EncEffGrid *grid));
+                                          void (*render)(EncEffGrid *grid));
 void EncEffCapture_Draw(void *data);
 GameEvent *EncEffGrid_CreateEvent(GameSystem *gsys, const EncEffGridParam *param, u32 mode);
 // Clears the screen to the grid's color, then draws the effect with overlay 148

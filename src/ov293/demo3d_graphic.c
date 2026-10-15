@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/demo3d/demo3d_graphic.h"
 #include "app/demo3d/demo3d_data.h"
+#include "app/demo3d/demo3d_graphic.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -85,6 +85,7 @@ static const Light sDemo3DLights[LIGHT_COUNT] = {
 };
 
 // The VRAM banks of a demo with 3D on the upper screen only, and of one with 3D on both
+// clang-format off
 static const BGSysVRAMConfig sDemo3DVRAMConfigs[] = {
     {
         GX_VRAM_BG_16_F, GX_VRAM_BGEXTPLTT_NONE, GX_VRAM_SUB_BG_128_C, GX_VRAM_SUB_BGEXTPLTT_NONE,
@@ -97,6 +98,8 @@ static const BGSysVRAMConfig sDemo3DVRAMConfigs[] = {
         GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_0123_E, GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_32K,
     },
 };
+
+// clang-format on
 
 // BG1 of the main screen and BG0 to BG2 of the sub screen, all hidden until a command or the demo's own code shows
 // one

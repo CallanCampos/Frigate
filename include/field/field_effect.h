@@ -47,8 +47,7 @@ void func_ov036_021a5c44(FieldEffectTask *task);
 u16 func_ov036_021a5c5c(FieldEffectTask *task, u8 idx);
 u16 func_ov036_021a5c74(FieldEffectTask *task, u8 idx);
 // The field effect of a phenomenon, which fldeff_encount.c plays
-FieldEffectTask *func_ov036_021a53f8(EncountSystem *system, FieldEffects *effects, u16 x, u16 z, fx32 height,
-                                     u32 kind);
+FieldEffectTask *func_ov036_021a53f8(EncountSystem *system, FieldEffects *effects, u16 x, u16 z, fx32 height, u32 kind);
 // Pause and hide a phenomenon
 void func_ov036_021a5498(FieldEffectTask *task, BOOL paused);
 void func_ov036_021a54a8(FieldEffectTask *task, BOOL hidden);
@@ -117,8 +116,8 @@ BOOL FieldEffects_IsLoaded(FieldEffects *effects, u32 id);
 void *FieldEffects_GetHandleData(FieldEffects *effects, u32 id);
 void FieldEffects_TCBManagerInit(FieldEffects *effects, u32 count);
 // Start a task, at pos if it isn't NULL
-FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffectTaskVTable *vtable,
-                                        const VecFx32 *pos, u32 param1, void *param2, u32 priority);
+FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffectTaskVTable *vtable, const VecFx32 *pos,
+                                        u32 param1, void *param2, u32 priority);
 // End a task, update it, and its parameters, position and work
 void func_ov036_021a3a70(FieldEffectTask *task);
 void func_ov036_021a3a94(FieldEffectTask *task);

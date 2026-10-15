@@ -27,8 +27,8 @@ void pokerusHandler(PokeParty *party) {
         do {
             slot = GFL_RandomMTRange(count);
             pkm = PokeParty_GetPkm(party, slot);
-        } while (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) == 0
-                 || PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) != FALSE);
+        } while (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) == 0 ||
+                 PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) != FALSE);
         if (!(infected & (1 << slot))) {
             do {
                 pokerus = GFL_RandomMTRange(0x100);

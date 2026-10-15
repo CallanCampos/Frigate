@@ -58,10 +58,7 @@ enum {
     TOWNMAP_BG_COUNT
 };
 
-enum {
-    TOWNMAP_UNIT_MAIN,
-    TOWNMAP_UNIT_COUNT
-};
+enum { TOWNMAP_UNIT_MAIN, TOWNMAP_UNIT_COUNT };
 
 // The actors the graphics create, all hidden at first
 enum {

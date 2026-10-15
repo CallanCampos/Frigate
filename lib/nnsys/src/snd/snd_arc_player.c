@@ -1,5 +1,5 @@
-#include "snd_internal.h"
 #include "nitro/snd.h"
+#include "snd_internal.h"
 
 // NitroSystem's sound archive player (NNS_SndArcPlayer): sets the sequence players up from the archive's player info,
 // and starts the archive's sequences on them, loading each sequence and its bank into the heap of the sequence player

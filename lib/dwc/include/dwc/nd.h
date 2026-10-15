@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-// NitroDWC's download library (DWC_Nd), in overlay 189, which Mystery Gift receives Wi-Fi gifts with. The ROM names none
-// of it. The names of the calls, of DWCNdFileInfo and of most values of the enums come from pret's symbols
+// NitroDWC's download library (DWC_Nd), in overlay 189, which Mystery Gift receives Wi-Fi gifts with. The ROM names
+// none of it. The names of the calls, of DWCNdFileInfo and of most values of the enums come from pret's symbols
 // (pokeheartgold's NitroDWC and pokeplatinum's use of them), matched to these functions by what they do; the names of
 // DWCNdFileInfo's fields and the values that pret does not show (ND_*) are ours
 
@@ -44,7 +44,8 @@ enum {
     ND_ERROR_FATAL,
 };
 
-// The callback of every asynchronous call, with its result and the code of a failure of the server (-1 when there is none)
+// The callback of every asynchronous call, with its result and the code of a failure of the server (-1 when there is
+// none)
 typedef void (*DWCNdCallback)(u32 reason, u32 error, int serverError);
 
 BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *password);

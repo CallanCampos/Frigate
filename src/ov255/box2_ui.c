@@ -1,8 +1,8 @@
 #include "types.h"
-#include "app/box2_ui.h"
 #include "app/box2_bgwfrm.h"
 #include "app/box2_main.h"
 #include "app/box2_obj.h"
+#include "app/box2_ui.h"
 #include "constants/pokemon.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -63,97 +63,155 @@ static u32 func_ov255_021d3468(const CursorMoveData *data, u32 count, u32 x, u32
 static const TouchRect sTouchRectEnd = { TOUCH_RECT_END, 0, 0, 0 };
 
 static const TouchRect sTouchRects_78cc[2] = {
-    { 0, 191, 168, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 0, 191, 168, 255 },
+    { TOUCH_RECT_END, 0, 0, 0 },
 };
 
 static const TouchRect sTouchRects_78d4[2] = {
-    { 48, 167, 16, 103 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 48, 167, 16, 103 },
+    { TOUCH_RECT_END, 0, 0, 0 },
 };
 
 static const TouchRect sTouchRects_78c4[2] = {
-    { 40, 160, 0, 167 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 40, 160, 0, 167 },
+    { TOUCH_RECT_END, 0, 0, 0 },
 };
 
 static const TouchRect sTouchRects_78dc[2] = {
-    { 48, 167, 168, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 48, 167, 168, 255 },
+    { TOUCH_RECT_END, 0, 0, 0 },
 };
 
 static const TouchRect sTouchRects_78f0[3] = {
-    { 0, 167, 228, 255 }, { 0, 167, 168, 195 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 0, 167, 228, 255 },
+    { 0, 167, 168, 195 },
+    { TOUCH_RECT_END, 0, 0, 0 },
 };
 
 static const TouchRect sTouchRects_78e4[3] = {
-    { 0, 21, 173, 255 }, { 148, 167, 173, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 0, 21, 173, 255 },
+    { 148, 167, 173, 255 },
+    { TOUCH_RECT_END, 0, 0, 0 },
 };
 
 static const CursorMoveCallbacks sCursorCallbacks10 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2ea8, func_ov255_021d2ec0,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2ea8,
+    func_ov255_021d2ec0,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks12 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2f10, func_ov255_021d2f54,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2f10,
+    func_ov255_021d2f54,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks13 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d3064, func_ov255_021d3088,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d3064,
+    func_ov255_021d3088,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks5 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2b0c, func_ov255_021d2b30,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2b0c,
+    func_ov255_021d2b30,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks3 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2848, func_ov255_021d286c,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2848,
+    func_ov255_021d286c,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks2 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2550, func_ov255_021d2760,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2550,
+    func_ov255_021d2760,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks4 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2954, func_ov255_021d2984,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2954,
+    func_ov255_021d2984,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks6 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2bf0, func_ov255_021d2c20,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2bf0,
+    func_ov255_021d2c20,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks14 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d3188, func_ov255_021d31ac,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d3188,
+    func_ov255_021d31ac,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks7 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2d4c, func_ov255_021d2d70,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2d4c,
+    func_ov255_021d2d70,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks11 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2edc, func_ov255_021d2ef4,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2edc,
+    func_ov255_021d2ef4,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks15 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d32b0, func_ov255_021d32c8,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d32b0,
+    func_ov255_021d32c8,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks8 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2e48, func_ov255_021d2e6c,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2e48,
+    func_ov255_021d2e6c,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks1 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2584, func_ov255_021d2584,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2584,
+    func_ov255_021d2584,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks9 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2550, func_ov255_021d2568,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2550,
+    func_ov255_021d2568,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks0 = {
-    func_ov255_021d252c, func_ov255_021d2540, func_ov255_021d2550, func_ov255_021d2624,
+    func_ov255_021d252c,
+    func_ov255_021d2540,
+    func_ov255_021d2550,
+    func_ov255_021d2624,
 };
 
 static const TouchRect sTouchRects_79fc[5] = {
-    { 20, 50, 180, 254 }, { 51, 84, 180, 254 }, { 85, 119, 180, 254 }, { 120, 150, 180, 254 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 20, 50, 180, 254 },   { 51, 84, 180, 254 },        { 85, 119, 180, 254 },
+    { 120, 150, 180, 254 }, { TOUCH_RECT_END, 0, 0, 0 },
 };
 
+// clang-format off
 static const CursorMoveData sCursorData10[5] = {
     { 212, 60, 0, 0, 3, 1, 0, 0, { 64, 87, 168, 255 } },
     { 212, 84, 0, 0, 0, 2, 1, 1, { 88, 111, 168, 255 } },
@@ -162,6 +220,9 @@ static const CursorMoveData sCursorData10[5] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, { TOUCH_RECT_END, 0, 0, 0 } },
 };
 
+// clang-format on
+
+// clang-format off
 static const CursorMoveData sCursorData1[6] = {
     { 84, 16, 0, 0, 0, 0, 0, 0, { 18, 38, 27, 140 } },
     { 0, 0, 0, 0, 1, 1, 1, 1, { 51, 172, 3, 164 } },
@@ -171,6 +232,9 @@ static const CursorMoveData sCursorData1[6] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, { TOUCH_RECT_END, 0, 0, 0 } },
 };
 
+// clang-format on
+
+// clang-format off
 static const CursorMoveData sCursorData11[7] = {
     { 212, 12, 0, 0, 5, 1, 0, 0, { 16, 39, 168, 255 } },
     { 212, 36, 0, 0, 0, 2, 1, 1, { 40, 63, 168, 255 } },
@@ -181,6 +245,9 @@ static const CursorMoveData sCursorData11[7] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, { TOUCH_RECT_END, 0, 0, 0 } },
 };
 
+// clang-format on
+
+// clang-format off
 static const CursorMoveData sCursorData12[8] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, { 0, 11, 200, 223 } },
     { 212, 22, 0, 0, 1, 2, 1, 1, { 22, 45, 200, 223 } },
@@ -192,6 +259,9 @@ static const CursorMoveData sCursorData12[8] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, { TOUCH_RECT_END, 0, 0, 0 } },
 };
 
+// clang-format on
+
+// clang-format off
 static const CursorMoveData sCursorData9[9] = {
     { 200, 36, 0, 0, 0, 2, 0, 1, { 44, 59, 188, 203 } },
     { 232, 36, 0, 0, 1, 3, 0, 1, { 44, 59, 220, 235 } },
@@ -203,6 +273,8 @@ static const CursorMoveData sCursorData9[9] = {
     { 212, 132, 0, 0, 6, 7, 7, 7, { 136, 159, 168, 255 } },
     { 0, 0, 0, 0, 0, 0, 0, 0, { TOUCH_RECT_END, 0, 0, 0 } },
 };
+
+// clang-format on
 
 static const CursorMoveData sCursorData0[14] = {
     { 40, 52, 0, 0, 4, 2, 5, 1, { 56, 79, 30, 53 } },
@@ -613,6 +685,7 @@ static const CursorMoveData sTrayCursorData[3][47] = {
 };
 
 // The positions of each cursor and their callbacks
+// clang-format off
 static const Box2CursorMoveTable sCursorMoveTables[16] = {
     { sCursorData0, &sCursorCallbacks0 },
     { sCursorData1, &sCursorCallbacks1 },
@@ -631,6 +704,8 @@ static const Box2CursorMoveTable sCursorMoveTables[16] = {
     { sCursorData14, &sCursorCallbacks14 },
     { sCursorData15, &sCursorCallbacks15 },
 };
+
+// clang-format on
 
 void func_ov255_021d23d8(Box2SysWork *syswk) {
     BOOL visible;
@@ -659,7 +734,7 @@ void func_ov255_021d23d8(Box2SysWork *syswk) {
     }
     func_ov255_021d24e0(syswk);
     syswk->app->cursorMove = CursorMove_Create(sCursorMoveTables[id].data, sCursorMoveTables[id].callbacks, syswk,
-                                           visible, syswk->curRcvPos, HEAPID_BOX2_APP);
+                                               visible, syswk->curRcvPos, HEAPID_BOX2_APP);
     CursorMove_SetHideOnTouch(syswk->app->cursorMove);
     func_ov255_021d251c(syswk, syswk->curRcvPos);
     func_ov255_021d101c(syswk, visible);
@@ -671,7 +746,7 @@ void func_ov255_021d2478(Box2SysWork *syswk, u32 id, u32 pos) {
 
     func_ov255_021d24e0(syswk);
     syswk->app->cursorMove = CursorMove_Create(sCursorMoveTables[id].data, sCursorMoveTables[id].callbacks, syswk,
-                                           visible, pos, HEAPID_BOX2_APP);
+                                               visible, pos, HEAPID_BOX2_APP);
     CursorMove_SetHideOnTouch(syswk->app->cursorMove);
     func_ov255_021d251c(syswk, pos);
     func_ov255_021d101c(syswk, visible);
@@ -932,8 +1007,7 @@ static void func_ov255_021d2984(void *work, int pos, int prevPos) {
     if (pos == 31 || pos == 32) {
         CursorMove_SetPos(syswk->app->cursorMove, BOX2_PARTY_POS);
         pos = BOX2_PARTY_POS;
-    } else if (pos == 33 || pos == 38 || pos == 40 || pos == 41 || pos == 42 || pos == 43 || pos == 44 ||
-               pos == 45) {
+    } else if (pos == 33 || pos == 38 || pos == 40 || pos == 41 || pos == 42 || pos == 43 || pos == 44 || pos == 45) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {

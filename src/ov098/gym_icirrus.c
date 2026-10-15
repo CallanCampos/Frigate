@@ -136,8 +136,7 @@ void func_ov098_021eeddc(Field *field) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
 
     Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
-    GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))),
-                             GIMMICK_STATE_ID);
+    GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
     FieldExpObj_StepAllAnimations(expObj);
 }
 
@@ -232,15 +231,13 @@ static GameEventReturnCode func_ov098_021eef78(GameEvent *event, u32 *state, voi
     case 0:
         switchIndex = work->switchIndex;
         FieldExpObjAnm_SetPaused(
-            GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET, func_ov098_021eef68(gymState, switchIndex)),
-            FALSE);
+            GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET, func_ov098_021eef68(gymState, switchIndex)), FALSE);
         (*state)++;
         break;
     case 1:
         switchIndex = work->switchIndex;
         if (FieldExpObjAnm_IsPlaybackFinished(
-                GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET,
-                                   func_ov098_021eef68(gymState, switchIndex)))) {
+                GetAnimation(expObj, switchIndex + SECOND_MODEL_OFFSET, func_ov098_021eef68(gymState, switchIndex)))) {
             if (gymState->flipped[work->switchIndex] != 0) {
                 flipped = FALSE;
             }

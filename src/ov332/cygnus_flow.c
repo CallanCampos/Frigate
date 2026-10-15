@@ -818,8 +818,10 @@ static void CygnusAppear_Load(CygnusAppear *appear, PartyPkm *pkm) {
     ArcTool *arc = MakePokeGraArcHandle(appear->heapId);
     ClActorSetup setup;
 
-    appear->palette = PokeGra_LoadClActPaletteByBoxData(arc, func_0201d624(pkm), POKEGRA_DIR_FRONT, 0, 0x80, appear->heapId);
-    appear->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(func_0201d624(pkm), POKEGRA_DIR_FRONT, 2, 0, appear->heapId);
+    appear->palette =
+        PokeGra_LoadClActPaletteByBoxData(arc, func_0201d624(pkm), POKEGRA_DIR_FRONT, 0, 0x80, appear->heapId);
+    appear->cellAnims =
+        PokeGra_LoadClActCellAnimsByBoxData(func_0201d624(pkm), POKEGRA_DIR_FRONT, 2, 0, appear->heapId);
     appear->chars = PokeGra_LoadClActCharsByBoxData(arc, func_0201d624(pkm), POKEGRA_DIR_FRONT, 0, appear->heapId);
     appear->offset = CygnusAppear_GetSpriteBottom(func_0201d624(pkm), appear->heapId) - 48;
     appear->offset = MATH_CLAMP(appear->offset, 0, 48);
@@ -830,8 +832,8 @@ static void CygnusAppear_Load(CygnusAppear *appear, PartyPkm *pkm) {
     setup.x = 0;
     setup.y = 0;
     setup.bgPriority = 0;
-    appear->actor = func_0204c040(appear->unit, appear->chars, appear->palette, appear->cellAnims, &setup, 0,
-                                  appear->heapId);
+    appear->actor =
+        func_0204c040(appear->unit, appear->chars, appear->palette, appear->cellAnims, &setup, 0, appear->heapId);
     func_0204c124(appear->actor, FALSE);
     func_0204c318(appear->actor, GX_OAM_MODE_XLU);
 }
@@ -905,8 +907,8 @@ static void CygnusAppear_Run(CygnusAppear *appear) {
         break;
     case 7:
         appear->blend = (appear->timer * 0x7fff) / 120;
-        KeySystem_BlendPalette(14, appear->blendedPalette, appear->blend, CYGNUS_APPEAR_PALETTE,
-                               appear->spritePalette, appear->whitePalette);
+        KeySystem_BlendPalette(14, appear->blendedPalette, appear->blend, CYGNUS_APPEAR_PALETTE, appear->spritePalette,
+                               appear->whitePalette);
         if (appear->timer++ > 120) {
             appear->timer = 0;
             appear->state = 8;

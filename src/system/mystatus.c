@@ -1,10 +1,10 @@
 #include "types.h"
-#include "save/player_info.h"
 #include "constants/version.h"
 #include "field/unity_tower.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
+#include "save/player_info.h"
 #include "system/str_tool.h"
 
 // The player's name, IDs, gender, country and region (the ROM's string for the file, "mystatus.c"). The names of the

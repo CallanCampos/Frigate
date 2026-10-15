@@ -471,8 +471,8 @@ static void func_ov036_0219f8a4(EntranceEffectWork *work) {
 }
 
 static void func_ov036_0219f8b8(EntranceEffectWork *work) {
-    work->door = FieldPropSystem_CreateHandleAtPos(FieldG3DMapper_GetBMSystem(Field_GetG3DMapper(work->warp->field)),
-                                                   1, &work->pos);
+    work->door = FieldPropSystem_CreateHandleAtPos(FieldG3DMapper_GetBMSystem(Field_GetG3DMapper(work->warp->field)), 1,
+                                                   &work->pos);
 }
 
 static void func_ov036_0219f8d8(EntranceEffectWork *work) {
@@ -527,8 +527,8 @@ static void func_ov036_0219f97c(GameEvent *event, EntranceEffectWork *work) {
     GameEvent *transition;
 
     if (warp->seasonChanged) {
-        transition = CallFieldMapEntranceInTransition(warp->gsys, warp->field, 3, 0, 0, warp->startSeason,
-                                                      warp->endSeason);
+        transition =
+            CallFieldMapEntranceInTransition(warp->gsys, warp->field, 3, 0, 0, warp->startSeason, warp->endSeason);
     } else {
         transition = CallFieldMapEntranceInTransition(warp->gsys, warp->field, warp->inTransition, 0, 1, 0, 0);
     }

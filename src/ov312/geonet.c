@@ -270,8 +270,7 @@ static void Geonet_AddPlace(GeonetWork *work, int index, s16 x, s16 y, u16 count
 static void Geonet_MarkOwnPlace(GeonetWork *work);
 static u32 Geonet_GetSubdividedIndex(u32 country);
 static void Geonet_ReadTouch(GeonetWork *work);
-static void Geonet_GetTouchMove(GeonetWork *work, int prevX, int prevY, int *keysX, int *moveX, int *keysY,
-                                int *moveY);
+static void Geonet_GetTouchMove(GeonetWork *work, int prevX, int prevY, int *keysX, int *moveX, int *keysY, int *moveY);
 static BmpWin *Geonet_CreateWindow(const GeonetWindowSetup *setup, int show);
 static void Geonet_LoadBG(GeonetWork *work, ArcTool *arc);
 static void Geonet_InitButtons(GeonetWork *work);
@@ -284,10 +283,10 @@ static void Geonet_ListCursorCallback(BmpMenuList *list, s32 value, u8 init);
 static void Geonet_CreateMenu(GeonetWork *work, const GeonetWindowSetup *setup, const BmpMenuListHeader *header,
                               const GeonetMenuItem *items);
 static void Geonet_CreateList(GeonetWork *work, const BmpMenuListHeader *header, u32 count);
-static void Geonet_CreateCountryList(GeonetWork *work, const GeonetWindowSetup *setup,
-                                     const BmpMenuListHeader *header, u32 textBank);
-static void Geonet_CreateRegionList(GeonetWork *work, const GeonetWindowSetup *setup,
-                                    const BmpMenuListHeader *header, u32 textBank, const u8 *order, u32 count);
+static void Geonet_CreateCountryList(GeonetWork *work, const GeonetWindowSetup *setup, const BmpMenuListHeader *header,
+                                     u32 textBank);
+static void Geonet_CreateRegionList(GeonetWork *work, const GeonetWindowSetup *setup, const BmpMenuListHeader *header,
+                                    u32 textBank, const u8 *order, u32 count);
 static void Geonet_FreeList(GeonetWork *work);
 static void Geonet_ShowRegisteredPlace(GeonetWork *work);
 static void Geonet_ShowSelectedPlace(GeonetWork *work, u32 country, u32 region);
@@ -310,36 +309,43 @@ static BOOL Geonet_IsSubdivided(u32 country);
 static void Geonet_WrapAngles(GeonetAngles *angles);
 static u32 Geonet_GetDistance(const GeonetAngles *a, const GeonetAngles *b);
 
-static const ConfirmDialogSetup sGeonetYesNoSetup = {6, 24, 13, 4, 0x174};
+static const ConfirmDialogSetup sGeonetYesNoSetup = { 6, 24, 13, 4, 0x174 };
 
-static const GeonetWindowSetup sGeonetListWindow = {6, 3, 2, 26, 13, 4, 0x3e};
-static const GeonetWindowSetup sGeonetPlaceWindow = {6, 2, 1, 27, 6, 4, 0xd2};
-static const GeonetWindowSetup sGeonetMenuWindow = {6, 18, 11, 13, 6, 4, 0x42};
-static const GeonetWindowSetup sGeonetInfoWindow = {6, 2, 19, 28, 4, 4, 0x90};
+static const GeonetWindowSetup sGeonetListWindow = { 6, 3, 2, 26, 13, 4, 0x3e };
+static const GeonetWindowSetup sGeonetPlaceWindow = { 6, 2, 1, 27, 6, 4, 0xd2 };
+static const GeonetWindowSetup sGeonetMenuWindow = { 6, 18, 11, 13, 6, 4, 0x42 };
+static const GeonetWindowSetup sGeonetInfoWindow = { 6, 2, 19, 28, 4, 4, 0x90 };
 
 static const LightSetup sGeonetLights[] = {
-    {0, {{0, 0, -FX16_ONE + 1}, GX_RGB(31, 31, 31)}},
+    { 0, { { 0, 0, -FX16_ONE + 1 }, GX_RGB(31, 31, 31) } },
 };
 
-static const LightSetupList sGeonetLightList = {sGeonetLights, NELEMS(sGeonetLights)};
+static const LightSetupList sGeonetLightList = { sGeonetLights, NELEMS(sGeonetLights) };
 
-static const VecFx32 sGeonetCameraPos = {0, 0, CAMERA_DISTANCE_FAR};
-static const VecFx32 sGeonetCameraTarget = {0, 0, 0};
+static const VecFx32 sGeonetCameraPos = { 0, 0, CAMERA_DISTANCE_FAR };
+static const VecFx32 sGeonetCameraTarget = { 0, 0, 0 };
 
 // The View and Quit buttons
+// clang-format off
 static const TouchRect sGeonetButtonRects[] = {
     {168, 191, 0, 71},
     {168, 191, 184, 255},
     {TOUCH_RECT_END, 0, 0, 0},
 };
 
+// clang-format on
+
 // Where the globe is dragged: the screen above the buttons, and the gap between them
+// clang-format off
 static const TouchRect sGeonetTouchRects[] = {
     {0, 167, 0, 239},
     {168, 191, 72, 183},
     {TOUCH_RECT_END, 0, 0, 0},
 };
 
+// clang-format on
+
+// clang-format off
 static const GeonetMarkFile sGeonetMarkFiles[] = {
     {UNITY_TOWER_REGION_OWN, 1},
     {MARK_CURSOR, 2},
@@ -347,31 +353,59 @@ static const GeonetMarkFile sGeonetMarkFiles[] = {
     {UNITY_TOWER_REGION_BEFORE, 4},
 };
 
+// clang-format on
+
+// clang-format off
 static const GeonetMenuItem sGeonetMenuItems[] = {
     {EventMapchange2_Text_SeeList, 0},
     {EventMapchange2_Text_Register, 1},
     {EventMapchange2_Text_Cancel, 2},
 };
 
+// clang-format on
+
 static const GeonetButtonPos sGeonetButtonPos[BUTTON_COUNT] = {
-    {0, 21, 9},
-    {23, 21, 9},
+    { 0, 21, 9 },
+    { 23, 21, 9 },
 };
 
-static const BGSetup sGeonetTextBGSetup = {0, 0, 0x800, 0, 1, 0, 14, 0, 0x4000, 0, 0, 0, 0};
-static const BGSetup sGeonetBackBGSetup = {0, 0, 0x800, 0, 1, 0, 15, 1, 0x4000, 0, 3, 0, 0};
+static const BGSetup sGeonetTextBGSetup = { 0, 0, 0x800, 0, 1, 0, 14, 0, 0x4000, 0, 0, 0, 0 };
+static const BGSetup sGeonetBackBGSetup = { 0, 0, 0x800, 0, 1, 0, 15, 1, 0x4000, 0, 3, 0, 0 };
 
 static const BmpMenuListHeader sGeonetMenuHeader = {
-    NULL, NULL, NULL, 3, 3, 0, 12, 0, 0, 1, 15, 2, 0, 0, BMPMENULIST_SKIP_NONE, 0, BMPMENULIST_CURSOR_SHOW,
-    NULL, 0, 0, NULL, NULL, NULL, NULL, 20,
+    NULL, NULL, NULL, 3,    3,    0,    12,   0,  0, 1, 15, 2, 0, 0, BMPMENULIST_SKIP_NONE, 0, BMPMENULIST_CURSOR_SHOW,
+    NULL, 0,    0,    NULL, NULL, NULL, NULL, 20,
 };
 
 static const BmpMenuListHeader sGeonetListHeader = {
-    NULL, NULL, NULL, 0, 7, 0, 12, 0, 0, 1, 15, 2, 0, 0, BMPMENULIST_SKIP_LR_KEY, 0, BMPMENULIST_CURSOR_SHOW,
-    NULL, 0, 0, NULL, NULL, NULL, NULL, 20,
+    NULL,
+    NULL,
+    NULL,
+    0,
+    7,
+    0,
+    12,
+    0,
+    0,
+    1,
+    15,
+    2,
+    0,
+    0,
+    BMPMENULIST_SKIP_LR_KEY,
+    0,
+    BMPMENULIST_CURSOR_SHOW,
+    NULL,
+    0,
+    0,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    20,
 };
 
-const GameProcFunctions GEONET_PROC_FUNCTIONS = {GeonetProc_Init, GeonetProc_Main, GeonetProc_End};
+const GameProcFunctions GEONET_PROC_FUNCTIONS = { GeonetProc_Init, GeonetProc_Main, GeonetProc_End };
 
 static BOOL GeonetProc_Init(GameProc *proc, u32 *state, void *param, void *procWork) {
     GeonetWork *work;
@@ -697,8 +731,8 @@ static BOOL Geonet_Main(GeonetWork *work, u32 *state) {
             }
             break;
         }
-        if (((work->keysPressed & (PAD_BUTTON_X | PAD_BUTTON_B | PAD_BUTTON_A)) || (work->touchKeys & PAD_BUTTON_X))
-            && work->infoMode == TRUE) {
+        if (((work->keysPressed & (PAD_BUTTON_X | PAD_BUTTON_B | PAD_BUTTON_A)) || (work->touchKeys & PAD_BUTTON_X)) &&
+            work->infoMode == TRUE) {
             work->infoMode = FALSE;
             Geonet_UpdateInfo(work);
             break;
@@ -781,8 +815,8 @@ static BOOL GeonetProc_End(GameProc *proc, u32 *state, void *param, void *procWo
 
 static void Geonet_SetVRAMBanks(void) {
     BGSysVRAMConfig config = {
-        GX_VRAM_C, GX_VRAM_NONE, GX_VRAM_H, GX_VRAM_NONE, GX_VRAM_F, GX_VRAM_NONE,
-        GX_VRAM_I, GX_VRAM_NONE, GX_VRAM_A | GX_VRAM_B, GX_VRAM_E, 0x10, 0x10,
+        GX_VRAM_C,    GX_VRAM_NONE,          GX_VRAM_H, GX_VRAM_NONE, GX_VRAM_F, GX_VRAM_NONE, GX_VRAM_I,
+        GX_VRAM_NONE, GX_VRAM_A | GX_VRAM_B, GX_VRAM_E, 0x10,         0x10,
     };
 
     gfxSetLCDCBanks(GX_VRAM_LCDC_ALL);
@@ -796,7 +830,7 @@ static void Geonet_SetVRAMBanks(void) {
 }
 
 static void Geonet_InitGraphics(HeapID heapId) {
-    BGSysLCDConfig config = {GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, TRUE};
+    BGSysLCDConfig config = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, TRUE };
 
     GFL_BGSysCreate(heapId);
     GFL_BGSysSetLCDConfig(&config);
@@ -856,7 +890,7 @@ static void Geonet_LoadPlaces(GeonetWork *work) {
 }
 
 static void Geonet_AddPlace(GeonetWork *work, int index, s16 x, s16 y, u16 country, u16 region) {
-    MtxFx33 rotation = {FX32_ONE, 0, 0, 0, FX32_ONE, 0, 0, 0, FX32_ONE};
+    MtxFx33 rotation = { FX32_ONE, 0, 0, 0, FX32_ONE, 0, 0, 0, FX32_ONE };
     VecFx32 angles;
 
     work->places[index].x = x;
@@ -1179,8 +1213,8 @@ static void Geonet_CreateList(GeonetWork *work, const BmpMenuListHeader *header,
     BmpWin_FlushChar(work->listWindow);
 }
 
-static void Geonet_CreateCountryList(GeonetWork *work, const GeonetWindowSetup *setup,
-                                     const BmpMenuListHeader *header, u32 textBank) {
+static void Geonet_CreateCountryList(GeonetWork *work, const GeonetWindowSetup *setup, const BmpMenuListHeader *header,
+                                     u32 textBank) {
     MsgData *msgData;
     int count;
     int i;
@@ -1197,8 +1231,8 @@ static void Geonet_CreateCountryList(GeonetWork *work, const GeonetWindowSetup *
     Geonet_CreateList(work, header, count);
 }
 
-static void Geonet_CreateRegionList(GeonetWork *work, const GeonetWindowSetup *setup,
-                                    const BmpMenuListHeader *header, u32 textBank, const u8 *order, u32 count) {
+static void Geonet_CreateRegionList(GeonetWork *work, const GeonetWindowSetup *setup, const BmpMenuListHeader *header,
+                                    u32 textBank, const u8 *order, u32 count) {
     MsgData *msgData;
     u32 i;
 
@@ -1242,8 +1276,7 @@ static void Geonet_ShowSelectedPlace(GeonetWork *work, u32 country, u32 region) 
     work->windows[WINDOW_PLACE].window = Geonet_CreateWindow(&sGeonetPlaceWindow, TRUE);
     Geonet_LoadPlaceNames(country, region, countryName, regionName, work->heapId);
     if (region != 0) {
-        Geonet_Print(work, &work->windows[WINDOW_PLACE].print, work->windows[WINDOW_PLACE].window, regionName, 0,
-                     16);
+        Geonet_Print(work, &work->windows[WINDOW_PLACE].print, work->windows[WINDOW_PLACE].window, regionName, 0, 16);
     }
     Geonet_Print(work, &work->windows[WINDOW_PLACE].print, work->windows[WINDOW_PLACE].window, countryName, 0, 0);
     GFL_StrBufFree(regionName);
@@ -1295,10 +1328,10 @@ static BOOL Geonet_FindNearestPlace(GeonetWork *work, u32 *index) {
     }
 
     for (i = 0; i < work->placeCount; i++) {
-        if (work->places[i].x > minX && work->places[i].x < maxX
-            && ((work->places[i].y > minY && work->places[i].y < maxY)
-                || (work->places[i].y > wrapMinY && work->places[i].y < wrapMaxY))
-            && work->places[i].state != UNITY_TOWER_REGION_NONE) {
+        if (work->places[i].x > minX && work->places[i].x < maxX &&
+            ((work->places[i].y > minY && work->places[i].y < maxY) ||
+             (work->places[i].y > wrapMinY && work->places[i].y < wrapMaxY)) &&
+            work->places[i].state != UNITY_TOWER_REGION_NONE) {
             u32 distance;
 
             angles.x = work->places[i].x;
@@ -1338,8 +1371,7 @@ static void Geonet_UpdateInfo(GeonetWork *work) {
         Geonet_LoadPlaceNames(work->places[index].country, work->places[index].region, countryName, regionName,
                               work->heapId);
         if (work->places[index].region != 0) {
-            Geonet_Print(work, &work->windows[WINDOW_INFO].print, work->windows[WINDOW_INFO].window, regionName, 0,
-                         16);
+            Geonet_Print(work, &work->windows[WINDOW_INFO].print, work->windows[WINDOW_INFO].window, regionName, 0, 16);
         }
         Geonet_Print(work, &work->windows[WINDOW_INFO].print, work->windows[WINDOW_INFO].window, countryName, 0, 0);
         GFL_StrBufFree(regionName);
@@ -1408,7 +1440,7 @@ static void Geonet_InitEarth(GeonetWork *work) {
 
 static void Geonet_CreateCamera(GeonetWork *work) {
     HeapID heapId = work->heapId;
-    VecFx32 up = {0, FX32_ONE, 0};
+    VecFx32 up = { 0, FX32_ONE, 0 };
 
     work->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
                                        FX_CosIdx(DEG_TO_IDX(20)), FX32_ONE * 4 / 3, 0, FX32_ONE, FX32_ONE * 1024, 0,
@@ -1639,8 +1671,7 @@ static BOOL Geonet_LoadPlaceNames(u32 country, u32 region, StrBuf *countryName, 
     BOOL hasRegions = FALSE;
     MsgData *msgData;
 
-    msgData =
-        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF, heapId);
+    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF, heapId);
     GFL_MsgDataLoadStrbuf(msgData, country, countryName);
     GFL_MsgDataFree(msgData);
     if (subdivided == 0) {

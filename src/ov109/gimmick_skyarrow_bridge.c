@@ -3,13 +3,13 @@
 // zone's music fades in as the camera climbs; and a sound plays when the player passes a point on the way down. The
 // ROM embeds no name for this file, so its name is a guess
 #include "types.h"
-#include "field/gimmick_skyarrow_bridge.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
 #include "field/field_map.h"
 #include "field/field_player.h"
+#include "field/gimmick_skyarrow_bridge.h"
 #include "field/sound_obj.h"
 #include "gfl/arc.h"
 #include "gfl/g3d.h"

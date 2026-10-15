@@ -3,6 +3,7 @@
 // are pairs (sine, cosine) for 4096 angles around the circle; fx.h declares the table.
 #include "nitro/fx.h"
 
+// clang-format off
 const fx16 FX_SinCosTable_[4096 * 2] = {
     0, 4096, 6, 4096, 13, 4096, 19, 4096,
     25, 4096, 31, 4096, 38, 4096, 44, 4096,
@@ -1027,4 +1028,7 @@ const fx16 FX_SinCosTable_[4096 * 2] = {
     -101, 4095, -94, 4095, -88, 4095, -82, 4095,
     -75, 4095, -69, 4095, -63, 4096, -57, 4096,
     -50, 4096, -44, 4096, -38, 4096, -31, 4096,
-    -25, 4096, -19, 4096, -13, 4096, -6, 4096,};
+    -25, 4096, -19, 4096, -13, 4096, -6, 4096,
+};
+
+// clang-format on

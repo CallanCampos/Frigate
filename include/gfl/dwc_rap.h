@@ -2,8 +2,8 @@
 #define POKEBW2_GFL_DWC_RAP_H
 
 #include "types.h"
-#include "gfl/heap.h"
 #include "dwc/dwc.h"
+#include "gfl/heap.h"
 #include "gfl/net.h"
 
 // dwc_rap.c, in overlay 11: the GFL net's Wi-Fi connection, over Nintendo's DWC library

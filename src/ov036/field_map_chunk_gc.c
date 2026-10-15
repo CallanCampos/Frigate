@@ -1,13 +1,14 @@
-#include "field/field_map_chunk.h"
 #include "types.h"
 #include "field/field_g3d_mapper.h"
 #include "field/field_map.h"
+#include "field/field_map_chunk.h"
 #include "field/field_prop.h"
 #include "field/field_terrain_animator.h"
 #include "gfl/std.h"
 
-// A 'GC' chunk file, with two layers of terrain: a model, the terrain of each layer and props. The ROM doesn't name the file; the name is a guess. Function names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); GCChunkFile is ours
+// A 'GC' chunk file, with two layers of terrain: a model, the terrain of each layer and props. The ROM doesn't name the
+// file; the name is a guess. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0);
+// GCChunkFile is ours
 
 // The start of the file. Each offset is from the start of the file
 typedef struct {
@@ -60,8 +61,8 @@ BOOL FieldChunkAccessor_GC_Update(FieldChunk *chunk, FieldChunkContext *context)
         FieldChunk_SetupModel(chunk);
         if (FieldChunkContext_HasAnimator(context)) {
             FieldTerrainSRTAnimatorChunkState_Bind(FieldChunkContext_GetSRTAnimatorState(context),
-                                                   FieldChunk_GetModelResource(chunk),
-                                                   FieldChunk_GetUsedTexRsc(chunk), FieldChunk_GetModel(chunk));
+                                                   FieldChunk_GetModelResource(chunk), FieldChunk_GetUsedTexRsc(chunk),
+                                                   FieldChunk_GetModel(chunk));
         }
         loader->state = FIELD_CHUNK_LOAD_NONE;
         return FALSE;
@@ -71,11 +72,10 @@ BOOL FieldChunkAccessor_GC_Update(FieldChunk *chunk, FieldChunkContext *context)
 }
 
 // Both layers
-void FieldChunkAccessor_GC_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos, fx32 size,
-                                      fx32 baseY) {
+void FieldChunkAccessor_GC_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
+                                      fx32 size, fx32 baseY) {
     const GCChunkFile *file = container;
     MapTerrainSamplerOutput terrain;
-
 
     sys_memset(&terrain, 0, sizeof(terrain));
     FieldChunkAccessor_GetTerrainCore(&terrain, 0, (u8 *)file + file->terrainOffsets[0], pos, size, baseY);
@@ -88,7 +88,6 @@ void FieldChunkAccessor_GC_GetTerrainBaseLayer(MapTerrainSamplerOutput *out, con
                                                fx32 size, fx32 baseY) {
     const GCChunkFile *file = container;
     MapTerrainSamplerOutput terrain;
-
 
     sys_memset(&terrain, 0, sizeof(terrain));
     FieldChunkAccessor_GetTerrainCore(&terrain, 0, (u8 *)file + file->terrainOffsets[0], pos, size, baseY);

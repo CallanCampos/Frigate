@@ -1,22 +1,21 @@
 #include "types.h"
 #include "field/el_scoreboard.h"
+#include "field/field.h"
+#include "field/field_camera.h"
 #include "field/field_gimmick_gate.h"
+#include "field/field_task.h"
 #include "field/gimmick_obj_elboard.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
-#include "gfl/msg.h"
 #include "gfl/key.h"
+#include "gfl/msg.h"
+#include "gfl/str.h"
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
-#include "gfl/str.h"
-#include "field/field.h"
-#include "field/field_camera.h"
-#include "field/field_task.h"
 #include "nitro/fx.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
 #include "system/version.h"
-
 
 struct ElboardMessage {
     u8 index;
@@ -68,7 +67,8 @@ Elboard *func_ov104_021efbd8(ElboardInit *init) {
     state->unk05 = init->unk04;
     state->actor = init->actor;
     state->current = 0;
-    state->messages = GFL_HeapAllocate(init->heapId, init->capacity * sizeof(ElboardMessage *), FALSE, "gimmick_obj_elboard.c", 0x6c);
+    state->messages =
+        GFL_HeapAllocate(init->heapId, init->capacity * sizeof(ElboardMessage *), FALSE, "gimmick_obj_elboard.c", 0x6c);
     state->flags = GFL_HeapAllocate(init->heapId, init->capacity * sizeof(u32), FALSE, "gimmick_obj_elboard.c", 0x6e);
     for (i = 0; i < init->capacity; i++) {
         state->messages[i] = NULL;
@@ -121,8 +121,10 @@ u8 func_ov104_021efcf8(Elboard *state) {
 
 void func_ov104_021efcfc(Elboard *state, fx32 time) {
     s32 seconds = FX_Whole(time);
-    s32 *starts = GFL_HeapAllocate(HEAPID_TAIL(state->heapId), state->count * sizeof(s32), FALSE, "gimmick_obj_elboard.c", 0x119);
-    s32 *frames = GFL_HeapAllocate(HEAPID_TAIL(state->heapId), state->count * sizeof(s32), FALSE, "gimmick_obj_elboard.c", 0x11b);
+    s32 *starts =
+        GFL_HeapAllocate(HEAPID_TAIL(state->heapId), state->count * sizeof(s32), FALSE, "gimmick_obj_elboard.c", 0x119);
+    s32 *frames =
+        GFL_HeapAllocate(HEAPID_TAIL(state->heapId), state->count * sizeof(s32), FALSE, "gimmick_obj_elboard.c", 0x11b);
     s32 total = 0;
     s32 offset;
     s32 i;
@@ -170,7 +172,8 @@ void func_ov104_021efcfc(Elboard *state, fx32 time) {
 }
 
 ElboardMessage *func_ov104_021efe88(Elboard *state, const ElboardMessageArg *arg, u32 index) {
-    ElboardMessage *message = GFL_HeapAllocate(state->heapId, sizeof(ElboardMessage), FALSE, "gimmick_obj_elboard.c", 0x17f);
+    ElboardMessage *message =
+        GFL_HeapAllocate(state->heapId, sizeof(ElboardMessage), FALSE, "gimmick_obj_elboard.c", 0x17f);
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, arg->messageArc, arg->messageFile, state->heapId);
     StrBuf *text;
     StrBuf *format;
@@ -190,7 +193,8 @@ ElboardMessage *func_ov104_021efe88(Elboard *state, const ElboardMessageArg *arg
         text = GFL_MsgDataLoadStrbufNew(msgData, arg->messageId);
     }
     width = GFL_FontGetBlockWidth(text, state->font, 1);
-    message->scoreboard = ElScoreboard_Create(GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(state->actor)), arg->name, arg->plName, text, (u16)(state->unk04 * 14), 1, state->heapId);
+    message->scoreboard = ElScoreboard_Create(GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(state->actor)), arg->name,
+                                              arg->plName, text, (u16)(state->unk04 * 14), 1, state->heapId);
     GFL_HeapFree(text);
     GFL_MsgDataFree(msgData);
     frameCount = NNS_G3dAnmObjGetNumFrame(GFL_G3DAnmGetRenderObj(GFL_G3DActorGetAnm(state->actor, arg->kind)));
@@ -348,7 +352,6 @@ GameEventReturnCode func_ov104_021f0160(GameEvent *event, u32 *state, void *data
     }
     return GAMEEVENT_CONTINUE;
 }
-
 
 GameEvent *func_ov104_021f02fc(GameSystem *gsys, Field *field, u32 duration) {
     GameEvent *event;

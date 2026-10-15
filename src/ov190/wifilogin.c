@@ -3,11 +3,11 @@
 // data and calls the caller's callback while it waits. The ROM has no file name for it, so it is named after its
 // process (our name). It draws with wifilogin_disp.c and prints with wifilogin_message.c
 
-#include "app/wifi_login.h"
 #include "types.h"
+#include "app/error_window_screen.h"
+#include "app/wifi_login.h"
 #include "app/wifilogin_disp.h"
 #include "app/wifilogin_message.h"
-#include "app/error_window_screen.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
 #include "dwc/dwc.h"
@@ -101,7 +101,7 @@ static BOOL WifiLoginProc_Main(GameProc *proc, u32 *state, void *param, void *wo
 static BOOL WifiLoginProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
 
 static const NetCommand sNetCommands[] = {
-    {WifiLogin_OnNetCommand, NULL},
+    { WifiLogin_OnNetCommand, NULL },
 };
 
 const GameProcFunctions WIFILOGIN_PROC_FUNCTIONS = {
@@ -110,6 +110,7 @@ const GameProcFunctions WIFILOGIN_PROC_FUNCTIONS = {
     WifiLoginProc_Exit,
 };
 
+// clang-format off
 static GFLNetInitData sNetInit = {
     sNetCommands,
     NELEMS(sNetCommands),
@@ -147,6 +148,8 @@ static GFLNetInitData sNetInit = {
     0,
     0,
 };
+
+// clang-format on
 
 // The game service ID that the network library shares with the other machine, which the login gets from its parameter
 static u32 sGameType;
@@ -410,7 +413,8 @@ static void WifiLogin_StateOpenYesNo(WifiLoginWork *work) {
 static void WifiLogin_StateWaitResetConfirm(WifiLoginWork *work) {
     if (WifiLoginMessage_IsMenuAnswered(work->menu)) {
         if (WifiLoginMessage_GetMenuAnswer(work->menu) == 0) {
-            void *entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
+            void *entry =
+                TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
 
             BattleBoxSave_ClearFlags(getBattleBox(GameData_GetSaveControl(work->gameData)), 1);
             TournamentEntry_SetField(entry, 10, 5);
@@ -446,7 +450,8 @@ static void WifiLogin_StateWaitProfileConfirm(WifiLoginWork *work) {
         WifiLoginMessage_FreeMenu(work->menu);
         work->menu = NULL;
         if (answer == 0) {
-            void *entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
+            void *entry =
+                TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(work->gameData)), 0);
             u32 field2 = TournamentEntry_GetField(entry, 2);
             u32 field10 = TournamentEntry_GetField(entry, 10);
 
@@ -639,7 +644,8 @@ static BOOL WifiLoginProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     WifiLoginParam *loginParam = param;
     WifiLoginWork *wk;
 
-    GFL_ASSERT_MSG(loginParam->unkC != 0, "\x83\x51\x81\x5b\x83\x80\x83\x54\x81\x5b\x83\x72\x83\x58ID\x82\xf0\x93\xfc\x82\xea\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\n");
+    GFL_ASSERT_MSG(loginParam->unkC != 0, "\x83\x51\x81\x5b\x83\x80\x83\x54\x81\x5b\x83\x72\x83\x58ID\x82\xf0\x93\xfc"
+                                          "\x82\xea\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\n");
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFILOGIN, 0x18000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiLoginWork), HEAPID_WIFILOGIN);
     sys_memset(wk, 0, sizeof(WifiLoginWork));

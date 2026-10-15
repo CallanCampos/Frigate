@@ -1,5 +1,5 @@
-// The gimmick of Nuvema Town (zones 389, 397 and 317 load it), a model standing in Nuvema Town. The name is a guess: the
-// overlay embeds no file name
+// The gimmick of Nuvema Town (zones 389, 397 and 317 load it), a model standing in Nuvema Town. The name is a guess:
+// the overlay embeds no file name
 #include "types.h"
 #include "constants/sound.h"
 #include "field/field.h"

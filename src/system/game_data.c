@@ -204,8 +204,8 @@ GameData *GameData_Create(HeapID heapId) {
 
     gameData->eventWork = getConstDataBlock(gameData->saveControl);
     gameData->mapMatrix = InitMapMatrix(heapId);
-    gameData->mmSys = FldActSys_Create(heapId, 64,
-                                       SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_STRENGTH_ROCKS));
+    gameData->mmSys =
+        FldActSys_Create(heapId, 64, SaveControl_GetBlockPtr(gameData->saveControl, SAVE_BLOCK_STRENGTH_ROCKS));
     gameData->fieldSound = FieldSnd_Create(gameData, heapId);
     gameData->fieldStatus = FieldStatus_Create(heapId);
 

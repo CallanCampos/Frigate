@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/medal_box.h"
 #include "gfl/std.h"
+#include "save/medal_box.h"
 #include "save/save_control.h"
 
 // The save block of the Medal Rally: what the player knows of each medal and the day it was obtained, the medal
@@ -135,8 +135,8 @@ u32 MedalBox_GetObtainedCount(MedalBox *box, BOOL countEarned) {
         u32 date = info->year + info->month + info->day;
 
         if (countEarned) {
-            if (info->status == MEDAL_STATUS_OBTAINED || info->status == MEDAL_STATUS_DISCOVERED
-                || (info->status == MEDAL_STATUS_EARNED && date != 0)) {
+            if (info->status == MEDAL_STATUS_OBTAINED || info->status == MEDAL_STATUS_DISCOVERED ||
+                (info->status == MEDAL_STATUS_EARNED && date != 0)) {
                 count++;
             }
         } else if (info->status == MEDAL_STATUS_OBTAINED) {

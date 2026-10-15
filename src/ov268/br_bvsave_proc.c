@@ -4,9 +4,9 @@
 // runs it as BR_PROCID_BV_SAVE
 
 #include "types.h"
-#include "app/battle_recorder/br_bvsave_proc.h"
 #include "app/battle_rec_ov.h"
 #include "app/battle_recorder/br_btn.h"
+#include "app/battle_recorder/br_bvsave_proc.h"
 #include "app/battle_recorder/br_core.h"
 #include "app/battle_recorder/br_fade.h"
 #include "app/battle_recorder/br_net.h"
@@ -541,8 +541,8 @@ static void BrBvSave_SeqSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         (*p_seq)++;
         break;
     case SEQ_SAVE_MAIN: {
-        u32 ret = BattleRecOv_SaveVideo(p_wk->p_param->gameData, p_wk->select + 1,
-                                        (u8)p_wk->p_param->unk24, &p_wk->saveSeq, &p_wk->saveSeq2, p_wk->heapId);
+        u32 ret = BattleRecOv_SaveVideo(p_wk->p_param->gameData, p_wk->select + 1, (u8)p_wk->p_param->unk24,
+                                        &p_wk->saveSeq, &p_wk->saveSeq2, p_wk->heapId);
 
         if (ret == 2 || ret == 3) {
             p_wk->p_param->isSave = TRUE;
@@ -647,8 +647,8 @@ static void BrBvSave_CreateConfirm(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_para
     wordSet = BrRes_GetWordSet(p_param->res);
     src = GFL_MsgDataLoadStrbufNew(BrRes_GetMsgData(p_param->res), 0x141);
     str = GFL_StrBufCreate(0x80, p_wk->heapId);
-    func_0202437c(wordSet, 0, p_param->recordInfo->name[p_wk->select + 1],
-                  p_param->recordInfo->sex[p_wk->select + 1], 1, 2);
+    func_0202437c(wordSet, 0, p_param->recordInfo->name[p_wk->select + 1], p_param->recordInfo->sex[p_wk->select + 1],
+                  1, 2);
     GFL_WordSetFormatStrbuf(wordSet, str, src);
     BrText_PrintBuf(p_wk->text, p_param->res, str);
     GFL_StrBufFree(str);
@@ -752,13 +752,13 @@ static void BrBvSave_CreateSelect(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_param
         } else {
             GFL_MsgDataLoadStrbuf(msg, 9, str);
         }
-        p_wk->btn[i] = BrBtn_Init(&setup, str, 160, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, &obj,
-                                  p_wk->heapId);
+        p_wk->btn[i] =
+            BrBtn_Init(&setup, str, 160, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, &obj, p_wk->heapId);
         setup.y += 40;
     }
     setup.sequence = 1;
-    p_wk->btn[BTN_RETURN] = BrBtn_InitEx(&setup, 4, 160, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, msg,
-                                         &obj, p_wk->heapId);
+    p_wk->btn[BTN_RETURN] =
+        BrBtn_InitEx(&setup, 4, 160, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, msg, &obj, p_wk->heapId);
 
     // The text asks where to save the video of its player
     profile = getVSPlayerAllocation();

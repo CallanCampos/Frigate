@@ -6,8 +6,8 @@
 
 #include "types.h"
 #include "field/entree_forest.h"
-#include "struct_decls.h"
 #include "save/symbol_save.h"
+#include "struct_decls.h"
 
 u32 func_ov012_02161260(AreaNPCSave *npcData);
 u32 func_ov012_0216127c(AreaNPCSave *npcData);

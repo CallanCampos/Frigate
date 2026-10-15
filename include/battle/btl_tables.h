@@ -8,22 +8,22 @@
 #include "types.h"
 
 // Moves
-BOOL IsEncoreExcludedMove(u16 move); // Encore can't repeat it
+BOOL IsEncoreExcludedMove(u16 move);  // Encore can't repeat it
 BOOL IsMeFirstExcludedMove(u16 move); // Me First can't use it
-BOOL IsDelayedAttackMove(u16 move); // Future Sight, Doom Desire (and no move)
-BOOL IsPressureFieldMove(u16 move); // Pressure also takes extra PP for it
-BOOL IsPledgeMove(u16 move); // The Pledge moves
+BOOL IsDelayedAttackMove(u16 move);   // Future Sight, Doom Desire (and no move)
+BOOL IsPressureFieldMove(u16 move);   // Pressure also takes extra PP for it
+BOOL IsPledgeMove(u16 move);          // The Pledge moves
 BOOL IsStatEffectId(u16 effect);
-BOOL IsSleepTalkExcludedMove(u16 move);         // Sleep Talk can't call it
-BOOL IsAssistExcludedMove(u16 move);         // Assist can't call it
-BOOL IsCopycatExcludedMove(u16 move);         // Copycat can't call it
-BOOL IsMimicExcludedMove(u16 move);         // Mimic can't copy it
+BOOL IsSleepTalkExcludedMove(u16 move);           // Sleep Talk can't call it
+BOOL IsAssistExcludedMove(u16 move);              // Assist can't call it
+BOOL IsCopycatExcludedMove(u16 move);             // Copycat can't call it
+BOOL IsMimicExcludedMove(u16 move);               // Mimic can't copy it
 const u16 *GetMetronomeExcludedMoves(u32 *count); // The moves Metronome can't call
 
 // Items
 BOOL IsReactiveHeldItem(u16 item);
-BOOL IsEscapeItem(u16 item); // Fluffy Tail, Poke Doll and Poke Toy
-BOOL IsArceusPlate(u16 item); // Arceus plates
+BOOL IsEscapeItem(u16 item);    // Fluffy Tail, Poke Doll and Poke Toy
+BOOL IsArceusPlate(u16 item);   // Arceus plates
 BOOL IsGenesectDrive(u16 item); // Genesect drives
 
 // Abilities

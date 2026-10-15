@@ -5,18 +5,18 @@
 #include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_script.h"
 #include "field/mystery_gift_pokemon.h"
 #include "field/pdw_postman.h"
-#include "field/field_script.h"
 #include "gfl/bmpwin.h"
 #include "gfl/graphics.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
-#include "gfl/touchpanel.h"
-#include "gfl/ui.h"
 #include "gfl/msg.h"
 #include "gfl/sound.h"
 #include "gfl/str.h"
+#include "gfl/touchpanel.h"
+#include "gfl/ui.h"
 #include "pml/met_data.h"
 #include "pml/poke_party.h"
 #include "save/bag.h"
@@ -37,12 +37,15 @@
 #define MYSTERY_GIFT_DELIVERY_MAN_OBJ_CODE 0x46
 
 // The values of the gifts of kind 4 and the one-shot DR each gives
+// clang-format off
 static const u8 sOneShotDRGifts[8] = {
     0x33, 2,
     0x34, 3,
     0x35, 4,
     0x36, 5,
 };
+
+// clang-format on
 
 static const PdwPostmanGiftHandler sGiftHandlers[5] = {
     { 0, NULL, NULL, NULL, NULL, NULL },
@@ -588,7 +591,6 @@ u8 func_ov033_021782d0(MysteryGift *gift) {
     }
     return value;
 }
-
 
 BOOL func_ov033_021782f0(FieldScriptEnv *env, GameData *gameData, MysteryGift *gift) {
     return TRUE;

@@ -152,8 +152,8 @@ PartyPkm *PokeParty_GetPkm(PokeParty *party, u32 index) {
 // Replaces the Pokémon of a slot. The count changes by the slot's validity less the new Pokémon's, which is nothing
 // when one Pokémon replaces another
 void copyPkmIntoPartyBlk(PokeParty *party, u32 index, PartyPkm *pkm) {
-    int change = PokeParty_GetParam(&party->pkms[index], PKM_PARAM_SPECIES_VALID, NULL)
-                 - PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL);
+    int change = PokeParty_GetParam(&party->pkms[index], PKM_PARAM_SPECIES_VALID, NULL) -
+                 PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL);
 
     party->pkms[index] = *pkm;
     party->count += change;
@@ -222,7 +222,8 @@ int countActivePkms(PokeParty *party) {
     for (i = 0; i < count; i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
-        if (PokeParty_GetParam(pkm, PKM_PARAM_HP, NULL) != 0 && PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == FALSE) {
+        if (PokeParty_GetParam(pkm, PKM_PARAM_HP, NULL) != 0 &&
+            PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == FALSE) {
             result++;
         }
     }

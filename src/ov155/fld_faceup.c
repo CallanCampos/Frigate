@@ -1,7 +1,7 @@
 #include "types.h"
-#include "field/fld_faceup.h"
 #include "field/field.h"
 #include "field/field_script.h"
+#include "field/fld_faceup.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
 #include "gfl/fade.h"

@@ -28,7 +28,7 @@ typedef struct {
 } TwoChoiceMenuFlash;
 
 TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32 palette, u8 objPalette,
-                                   ClActUnit *unit, Font *font, PrintQueue *queue, u32 a8) {
+                                    ClActUnit *unit, Font *font, PrintQueue *queue, u32 a8) {
     TwoChoiceMenu *menu = GFL_HeapAllocate(heapId, sizeof(TwoChoiceMenu), FALSE, "yesno_menu.c", 211);
     ArcTool *arc;
     void *file;
@@ -111,7 +111,7 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
     UIObjRes_Load(&menu->objRes, &setup, menu->unit, menu->heapId);
     for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
         menu->actors[i] = UIObjRes_CreateActor(&menu->objRes, menu->unit, TwoChoiceMenu_GetActorPos(menu->cursor, i, 0),
-                                              TwoChoiceMenu_GetActorPos(menu->cursor, i, 1), i, menu->heapId);
+                                               TwoChoiceMenu_GetActorPos(menu->cursor, i, 1), i, menu->heapId);
         func_0204c468(menu->actors[i], menu->actorPriority);
         func_0204c124(menu->actors[i], FALSE);
         func_0204c520(menu->actors[i], FALSE);
@@ -163,8 +163,7 @@ void TwoChoiceMenu_Open(TwoChoiceMenu *menu, StrBuf *first, StrBuf *second) {
     func_02021c7c(menu->queue, BmpWin_GetBitmap(menu->firstWindow), x, 16, first, menu->font, PRINT_COLOR(15, 2, 0));
     width = GFL_FontGetBlockWidth(second, menu->font, 0);
     x = (256 - width) / 2;
-    func_02021c7c(menu->queue, BmpWin_GetBitmap(menu->secondWindow), x, 16, second, menu->font,
-                  PRINT_COLOR(15, 2, 0));
+    func_02021c7c(menu->queue, BmpWin_GetBitmap(menu->secondWindow), x, 16, second, menu->font, PRINT_COLOR(15, 2, 0));
     menu->firstSent = FALSE;
     menu->secondSent = FALSE;
     GFL_BGSysSetBGEnabled(menu->textBg, TRUE);

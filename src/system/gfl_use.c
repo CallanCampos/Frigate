@@ -47,6 +47,7 @@ typedef struct {
 static void finishFunc(void);
 
 // The file system paths of the archives, by archive ID
+// clang-format off
 static const char *NARC_PATH_LIST[ARC_PATH_COUNT] = {
 // clang-format off
     "a/0/0/0", "a/0/0/1", "a/0/0/2", "a/0/0/3", "a/0/0/4", "a/0/0/5", "a/0/0/6", "a/0/0/7", "a/0/0/8", "a/0/0/9",
@@ -80,8 +81,10 @@ static const char *NARC_PATH_LIST[ARC_PATH_COUNT] = {
     "a/2/8/0", "a/2/8/1", "a/2/8/2", "a/2/8/3", "a/2/8/4", "a/2/8/5", "a/2/8/6", "a/2/8/7", "a/2/8/8", "a/2/8/9",
     "a/2/9/0", "a/2/9/1", "a/2/9/2", "a/2/9/3", "a/2/9/4", "a/2/9/5", "a/2/9/6", "a/2/9/7", "a/2/9/8", "a/2/9/9",
     "a/3/0/0", "a/3/0/1", "a/3/0/2", "a/3/0/3", "a/3/0/4", "a/3/0/5", "a/3/0/6", "a/3/0/7",
-// clang-format on
+    // clang-format on
 };
+
+// clang-format on
 
 // The root heaps 0 and 1, of a DS and of a DSi
 static const HeapDef HEAP_SETUP_NTR[] = {

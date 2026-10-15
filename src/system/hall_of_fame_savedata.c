@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/hall_of_fame.h"
 #include "constants/pokemon.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
+#include "save/hall_of_fame.h"
 
 // The Hall of Fame's save data: the last 15 teams that entered it, each with the date, kept in extra save block 8,
 // and a single team in block 0x40 of the main save. The ROM has no string for the file, so the name is a guess.

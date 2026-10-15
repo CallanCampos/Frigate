@@ -5,8 +5,8 @@
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
-// String buffers (strbuf.c): up to size characters, of which length are used, followed by the terminator. It grew out of
-// Gen 4's Strbuf in pokeplatinum's string_gf.c
+// String buffers (strbuf.c): up to size characters, of which length are used, followed by the terminator. It grew out
+// of Gen 4's Strbuf in pokeplatinum's string_gf.c
 
 // Sets the character that ends strings, 0xffff unless changed
 void GFL_StrBufSetTerminator(u16 terminator);

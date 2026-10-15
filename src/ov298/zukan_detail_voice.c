@@ -693,7 +693,8 @@ static void ZukanDetailVoice_CreatePokemon(ZukanDetailVoiceParam *param, ZukanDe
         PokeGra_LoadClActChars(arc, species, form, sex, rare, 0, 0, personality, CLACT_VRAM_SUB, param->heapId);
     wk->pokemonPalettes[index] =
         PokeGra_LoadClActPalette(arc, species, form, sex, rare, 0, 0, CLACT_VRAM_SUB, index * 32, param->heapId);
-    wk->pokemonCellAnims[index] = PokeGra_LoadClActCellAnims(species, form, sex, rare, 0, 0, 2, CLACT_VRAM_SUB, param->heapId);
+    wk->pokemonCellAnims[index] =
+        PokeGra_LoadClActCellAnims(species, form, sex, rare, 0, 0, 2, CLACT_VRAM_SUB, param->heapId);
     ZukanDetailPalFade_LoadPalette(wk->palFade, arc,
                                    GetPokemonPaletteDataNo(GetPokemonGraphicsARCID(), species, form, sex, rare, 0, 0),
                                    param->heapId, 3, 32, index * 16, 0);

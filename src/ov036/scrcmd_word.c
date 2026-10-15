@@ -331,7 +331,8 @@ BOOL s029B_WordSetLoadJoinAvenueName(VM *vm, FieldScriptEnv *env) {
     u16 name[22];
     StrBuf *strBuf;
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
-    JoinAvenueInfo *info = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))));
+    JoinAvenueInfo *info =
+        JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))));
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
     u8 index = VM_Read8(vm);
 

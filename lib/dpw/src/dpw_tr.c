@@ -1,16 +1,16 @@
 #include "dpw/dpw_tr.h"
-
 #include "dpw_internal.h"
 #include "dwc/gamestats.h"
 #include "nitro/os.h"
 
-// The Global Trade Station's client, see dpw_tr.h. Every call fills the request that the game statistics client sends to
-// one page of the server, and DpwTr's process runs it a frame at a time. The state is even while a call waits for its
-// answer, and the answer of the server (a code, and for some calls the Pokémon) ends the call with a result: 0 or more
-// when it went well, and a negative number for the ways it failed. A call that could not start ends in state 0x18 with
-// the result -13, and the other states after an answer or a failure of the game statistics client are 0x18 too, until
-// the game asks for the end (DpwTr_IsFinished). The few bytes copied into the request and from the head of the answer go
-// through the compiler's built-in memcpy (__memcpy), which copies a constant size in place; the larger copies call memcpy
+// The Global Trade Station's client, see dpw_tr.h. Every call fills the request that the game statistics client sends
+// to one page of the server, and DpwTr's process runs it a frame at a time. The state is even while a call waits for
+// its answer, and the answer of the server (a code, and for some calls the Pokémon) ends the call with a result: 0 or
+// more when it went well, and a negative number for the ways it failed. A call that could not start ends in state 0x18
+// with the result -13, and the other states after an answer or a failure of the game statistics client are 0x18 too,
+// until the game asks for the end (DpwTr_IsFinished). The few bytes copied into the request and from the head of the
+// answer go through the compiler's built-in memcpy (__memcpy), which copies a constant size in place; the larger copies
+// call memcpy
 
 // The state of the library: where the call is, what it ended with, the player's ID and friend key, and the request
 // that is sent: the Pokémon, the signature that goes with it and the size of the signature. The answer of the server

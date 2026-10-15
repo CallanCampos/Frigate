@@ -180,7 +180,8 @@ void FieldPropSystem_UpdateResInstance(FieldPropSystem *system, FieldPropResInst
 void FieldPropSystem_Update(FieldPropSystem *system);
 void FieldPropSystem_DrawAllHandles(FieldPropSystem *system);
 void FieldPropSystem_UnlinkChunk(FieldPropSystem *system, FieldChunk *chunk);
-s32 FieldPropSystem_InstantiateProps(FieldPropSystem *system, FieldChunk *chunk, const FieldPropSourceInfo *infos, s32 count);
+s32 FieldPropSystem_InstantiateProps(FieldPropSystem *system, FieldChunk *chunk, const FieldPropSourceInfo *infos,
+                                     s32 count);
 BOOL FieldPropSystem_CheckCreateDoorReq(FieldPropSystem *system, u32 resId, VecFx32 *position, u32 *resIndex);
 void FieldPropSystem_InstantiateFromInfo(FieldPropSystem *system, FieldChunk *chunk, const FieldPropSourceInfo *info,
                                          u32 propIndex);
@@ -189,7 +190,8 @@ void FieldPropSystem_FreeResources(FieldPropSystem *system);
 void FieldPropSystem_Free(FieldPropSystem *system);
 void FieldPropSystem_InstantiateProp(FieldChunk *chunk, FieldPropInstance *instance, u32 propIndex);
 FieldPropInstance *FieldChunk_GetPropInstance(FieldChunk *chunk, u32 propIndex);
-FieldChunkPropHolder *FieldPropSystem_LinkPropToChunk(FieldPropSystem *system, FieldChunk *chunk, FieldPropInstance *instance, u32 propIndex);
+FieldChunkPropHolder *FieldPropSystem_LinkPropToChunk(FieldPropSystem *system, FieldChunk *chunk,
+                                                      FieldPropInstance *instance, u32 propIndex);
 void FieldChunkPropHolder_Release(FieldPropSystem *system, FieldChunkPropHolder *holder);
 void FieldPropSystem_ReleaseChunkPropHolders(FieldPropSystem *system, FieldChunk *chunk);
 void FieldPropSystem_ReleaseChunkPropHolder(FieldPropSystem *system, FieldChunkPropHolder *holder);

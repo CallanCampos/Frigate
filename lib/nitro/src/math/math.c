@@ -4,6 +4,7 @@
 
 // The SDK wrote this in assembly: an iterative quicksort whose swaps use SWP and SWPB, with its stack of ranges
 // either the caller's buffer or room made on the stack, sized for the element count.
+// clang-format off
 asm void MATH_QSort(void *head, u32 num, u32 width, MATHCompareFunc comp, void *stackBuffer) {
     stmdb sp!, {r4-r11, lr}
     cmp r1, #1
@@ -188,3 +189,5 @@ done:
     ldmia sp!, {r4-r11, lr}
     bx lr
 }
+
+// clang-format on

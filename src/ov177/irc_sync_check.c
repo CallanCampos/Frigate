@@ -18,10 +18,10 @@
 #include "gfl/gx_layers.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
+#include "gfl/net.h"
 #include "gfl/net_command.h"
 #include "gfl/net_handle.h"
 #include "gfl/net_system.h"
-#include "gfl/net.h"
 #include "gfl/proc.h"
 #include "gfl/random.h"
 #include "gfl/sound.h"
@@ -302,9 +302,9 @@ static BOOL IrcSyncRect_IsHeld(const IrcSyncRect *rect, IrcSyncPoint *point);
 static u8 IrcSyncCheck_ComputeScore(IrcSyncCheckWork *wk);
 static u8 IrcSyncCheck_CompareTraces(const IrcSyncPoint *ownStart, const IrcSyncPoint *own,
                                      const IrcSyncPoint *peerStart, const IrcSyncPoint *peer);
-static void IrcSyncCheck_LoadScreenArea(ArcTool *arc, u32 fileId, u32 bg, u32 tileOffset, u8 srcX, u8 srcY,
-                                        u8 srcWidth, u8 srcHeight, u8 x, u8 y, u8 width, u8 height, u8 palette,
-                                        BOOL compressed, HeapID heapId);
+static void IrcSyncCheck_LoadScreenArea(ArcTool *arc, u32 fileId, u32 bg, u32 tileOffset, u8 srcX, u8 srcY, u8 srcWidth,
+                                        u8 srcHeight, u8 x, u8 y, u8 width, u8 height, u8 palette, BOOL compressed,
+                                        HeapID heapId);
 static void IrcSyncCheck_ShowOutlines(u32 outlines, HeapID heapId);
 static void IrcSyncCheckSparkles_Init(IrcSyncCheckSparkles *sparkles, IrcSyncCheckGraphic *graphic, int unk580,
                                       u32 palette, int firstActor, u32 value);
@@ -339,7 +339,7 @@ static const VecFx32 sIrcSyncCheckCameraPosition = { 0, 0, FX32_CONST(70) };
 
 static const u32 sIrcSyncCheckBGs[BG_COUNT] = { 1, 2, 3, 4, 5, 6, 7 };
 
-static const u32 sIrcSyncCheckBGModes[BG_COUNT] = { BGMODE_TEXT, BGMODE_TEXT, BGMODE_TEXT, BGMODE_TEXT,
+static const u32 sIrcSyncCheckBGModes[BG_COUNT] = { BGMODE_TEXT, BGMODE_TEXT, BGMODE_TEXT,  BGMODE_TEXT,
                                                     BGMODE_TEXT, BGMODE_TEXT, BGMODE_AFFINE };
 
 static const Light sIrcSyncCheckLights[4] = {
@@ -349,11 +349,14 @@ static const Light sIrcSyncCheckLights[4] = {
     { { 0, -4096, 0 }, GX_RGB(16, 16, 16) },
 };
 
+// clang-format off
 static const BGSysVRAMConfig sIrcSyncCheckVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_64_E,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
 };
+
+// clang-format on
 
 static const BGSetup sIrcSyncCheckBGSetups[BG_COUNT] = {
     { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
@@ -946,10 +949,12 @@ static void IrcSyncCheck_StepWaitFirst(IrcSyncCheckWork *wk, u16 *state) {
                 IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_PleaseRemoveBothThumbs, 0, 0);
             } else {
                 if (wk->param->gsys != NULL) {
-                    IrcSyncCheckWindow_PrintMsgPlayer(&wk->messageWindow, &wk->text, BtlMain3_Text_PlaceLeftThumbOutline, wk->param->profile, 0, 0,
+                    IrcSyncCheckWindow_PrintMsgPlayer(&wk->messageWindow, &wk->text,
+                                                      BtlMain3_Text_PlaceLeftThumbOutline, wk->param->profile, 0, 0,
                                                       HEAP_ID);
                 } else {
-                    IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_PlaceLeftThumbOutline, 0, 0);
+                    IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_PlaceLeftThumbOutline, 0,
+                                                0);
                 }
             }
             thumbs = IrcSyncCheckGraphic_GetThumbs(&wk->graphic);
@@ -976,10 +981,12 @@ static void IrcSyncCheck_StepWaitFirst(IrcSyncCheckWork *wk, u16 *state) {
                     IrcSyncCheck_SetStepAt(wk, IrcSyncCheck_StepTraceA, 1);
                 } else {
                     if (wk->param->gsys != NULL) {
-                        IrcSyncCheckWindow_PrintMsgPlayer(&wk->messageWindow, &wk->text, BtlMain3_Text_CheckingHowSynchronized, wk->param->profile, 0, 0,
-                                                          HEAP_ID);
+                        IrcSyncCheckWindow_PrintMsgPlayer(&wk->messageWindow, &wk->text,
+                                                          BtlMain3_Text_CheckingHowSynchronized, wk->param->profile, 0,
+                                                          0, HEAP_ID);
                     } else {
-                        IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_CheckingHowSynchronized, 0, 0);
+                        IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text,
+                                                    BtlMain3_Text_CheckingHowSynchronized, 0, 0);
                     }
                     IrcSyncCheck_SetStep(wk, IrcSyncCheck_StepTraceA);
                 }
@@ -1039,10 +1046,12 @@ static void IrcSyncCheck_StepTraceA(IrcSyncCheckWork *wk, u16 *state) {
             if (IrcSyncRect_IsHeld(&sIrcSyncCheckRectSecond, second)) {
                 IrcSyncCheck_ShowOutlines(0, HEAP_ID);
                 if (wk->param->gsys != NULL) {
-                    IrcSyncCheckWindow_PrintMsgPlayer(&wk->messageWindow, &wk->text, BtlMain3_Text_CheckingHowSynchronized, wk->param->profile, 0, 0,
+                    IrcSyncCheckWindow_PrintMsgPlayer(&wk->messageWindow, &wk->text,
+                                                      BtlMain3_Text_CheckingHowSynchronized, wk->param->profile, 0, 0,
                                                       HEAP_ID);
                 } else {
-                    IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_CheckingHowSynchronized, 0, 0);
+                    IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_CheckingHowSynchronized, 0,
+                                                0);
                 }
                 IrcSyncCheck_SetStep(wk, IrcSyncCheck_StepTraceB);
                 thumbs = IrcSyncCheckGraphic_GetThumbs(&wk->graphic);
@@ -1078,8 +1087,8 @@ static void IrcSyncCheck_StepTraceB(IrcSyncCheckWork *wk, u16 *state) {
         case 0:
             if (IrcSyncRect_IsHeld(&sIrcSyncCheckRectSecond, &point)) {
                 if (IrcSyncTrace_Update(trace, &sIrcSyncCheckRectSecond)) {
-                    IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain3_Text_CheckCompleteCreateInfrared,
-                                                0, 0);
+                    IrcSyncCheckWindow_PrintMsg(&wk->messageWindow, &wk->text,
+                                                BtlMain3_Text_CheckCompleteCreateInfrared, 0, 0);
                     GFL_SndSEPlay(SEQ_SE_SYS_21);
                     IrcSyncCheck_SetStep(wk, IrcSyncCheck_StepResult);
                 }
@@ -1354,7 +1363,8 @@ static BOOL IrcSyncRect_IsPressed(const IrcSyncRect *rect, IrcSyncPoint *point) 
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y) && x - rect->left < rect->right - rect->left && y - rect->top < rect->bottom - rect->top) {
+    if (func_0203dac8(&x, &y) && x - rect->left < rect->right - rect->left &&
+        y - rect->top < rect->bottom - rect->top) {
         if (point != NULL) {
             point->x = x;
             point->y = y;
@@ -1369,7 +1379,8 @@ static BOOL IrcSyncRect_IsHeld(const IrcSyncRect *rect, IrcSyncPoint *point) {
     u32 x;
     u32 y;
 
-    if (func_0203da84(&x, &y) && x - rect->left < rect->right - rect->left && y - rect->top < rect->bottom - rect->top) {
+    if (func_0203da84(&x, &y) && x - rect->left < rect->right - rect->left &&
+        y - rect->top < rect->bottom - rect->top) {
         if (point != NULL) {
             point->x = x;
             point->y = y;
@@ -1415,10 +1426,10 @@ static u8 IrcSyncCheck_ComputeScore(IrcSyncCheckWork *wk) {
     } else {
         pointScore = 0;
     }
-    traceScoreA = IrcSyncCheck_CompareTraces(own.traceA.points, own.traceA.points, peer.traceA.points,
-                                             peer.traceA.points);
-    traceScoreB = IrcSyncCheck_CompareTraces(own.traceB.points, own.traceB.points, peer.traceB.points,
-                                             peer.traceB.points);
+    traceScoreA =
+        IrcSyncCheck_CompareTraces(own.traceA.points, own.traceA.points, peer.traceA.points, peer.traceA.points);
+    traceScoreB =
+        IrcSyncCheck_CompareTraces(own.traceB.points, own.traceB.points, peer.traceB.points, peer.traceB.points);
     return traceScoreB * 20 / 100 + (pointScore * 40 / 100 + traceScoreA * 40 / 100);
 }
 
@@ -1457,9 +1468,9 @@ static u8 IrcSyncCheck_CompareTraces(const IrcSyncPoint *ownStart, const IrcSync
     return total / 9;
 }
 
-static void IrcSyncCheck_LoadScreenArea(ArcTool *arc, u32 fileId, u32 bg, u32 tileOffset, u8 srcX, u8 srcY,
-                                        u8 srcWidth, u8 srcHeight, u8 x, u8 y, u8 width, u8 height, u8 palette,
-                                        BOOL compressed, HeapID heapId) {
+static void IrcSyncCheck_LoadScreenArea(ArcTool *arc, u32 fileId, u32 bg, u32 tileOffset, u8 srcX, u8 srcY, u8 srcWidth,
+                                        u8 srcHeight, u8 x, u8 y, u8 width, u8 height, u8 palette, BOOL compressed,
+                                        HeapID heapId) {
     NNSG2dScreenData *screen;
     void *data;
     int i;
@@ -1509,8 +1520,8 @@ static void IrcSyncCheckSparkles_Init(IrcSyncCheckSparkles *sparkles, IrcSyncChe
     sparkles->timer = 0;
     sparkles->interval = 10;
     for (i = 0; i < SPARKLE_COUNT; i++) {
-        IrcSyncCheckSparkle_Init(&sparkles->sparkles[i], IrcSyncCheckGraphic_GetActor(graphic, firstActor + i),
-                                 palette, value);
+        IrcSyncCheckSparkle_Init(&sparkles->sparkles[i], IrcSyncCheckGraphic_GetActor(graphic, firstActor + i), palette,
+                                 value);
     }
 }
 

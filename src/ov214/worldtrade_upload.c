@@ -5,7 +5,6 @@
 #include "constants/text_banks.h"
 #include "constants/version.h"
 #include "dpw/dpw_tr.h"
-#include "gfl/nhttp_rap.h"
 #include "dwc/dwc.h"
 #include "field/unity_tower.h"
 #include "gfl/arc_util.h"
@@ -19,6 +18,7 @@
 #include "gfl/msg.h"
 #include "gfl/net.h"
 #include "gfl/net_state.h"
+#include "gfl/nhttp_rap.h"
 #include "gfl/random.h"
 #include "gfl/sound.h"
 #include "gfl/std.h"
@@ -141,7 +141,6 @@ enum {
 #define HTTP_STATUS_BAD_REQUEST 400
 #define HTTP_STATUS_UNAUTHORIZED 401
 #define HTTP_STATUS_REQUEST_TIMEOUT 408
-
 
 static void Upload_BgInit(void);
 static void Upload_BgExit(void);
@@ -465,10 +464,10 @@ static int Upload_SubSeqEvilCheckStart(WorldTradeWork *wk) {
 
     // Keep the Pokémon as it was before the check, for the trade demo
     copyPartyPkm(pkm, wk->demoPokemon);
-    wk->uploadPokemonData.countryCode = Country_GetValidCountry(wk->uploadPokemonData.countryCode,
-                                                      wk->uploadPokemonData.localCode, wk->uploadPokemonData.langCode);
-    wk->uploadPokemonData.localCode = Country_GetValidRegion(wk->uploadPokemonData.countryCode, wk->uploadPokemonData.localCode,
-                                                    wk->uploadPokemonData.langCode);
+    wk->uploadPokemonData.countryCode = Country_GetValidCountry(
+        wk->uploadPokemonData.countryCode, wk->uploadPokemonData.localCode, wk->uploadPokemonData.langCode);
+    wk->uploadPokemonData.localCode = Country_GetValidRegion(
+        wk->uploadPokemonData.countryCode, wk->uploadPokemonData.localCode, wk->uploadPokemonData.langCode);
     wk->evilCheck = NHttpRap_Create(HEAPID_WORLDTRADE, func_02008bdc(wk->param->mystatus), wk->wifiLoginBuffer);
     NHttpRap_BeginPost(wk->evilCheck, HEAPID_WORLDTRADE, PokeParty_GetPkmRawSize(), 1);
     NHttpRap_AddPostData(wk->evilCheck, pkm, PokeParty_GetPkmRawSize());
@@ -599,7 +598,8 @@ static int Upload_SubSeqNameCheckWait(WorldTradeWork *wk) {
         if (bad) {
             // A bad name is replaced with the version's default
             u16 *dest = wk->uploadPokemonData.name;
-            MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_WORLDTRADE);
+            MsgData *msgData =
+                GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_WORLDTRADE);
             StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, DEFAULT_NAME_MSG);
             const u16 *src;
             int i;
@@ -827,8 +827,8 @@ static int Upload_SubSeqDownloadFinishResult(WorldTradeWork *wk) {
 }
 
 static int Upload_SubSeqExchangeStart(WorldTradeWork *wk) {
-    DpwTr_Exchange(wk->downloadPokemonData[wk->touchTrainerPos].id, &wk->uploadPokemonData,
-                        &wk->exchangePokemonData, wk->evilCheckSign, sizeof(wk->evilCheckSign));
+    DpwTr_Exchange(wk->downloadPokemonData[wk->touchTrainerPos].id, &wk->uploadPokemonData, &wk->exchangePokemonData,
+                   wk->evilCheckSign, sizeof(wk->evilCheckSign));
     Upload_SetSaveNextSequence(wk, UPLOAD_SEQ_EXCHANGE_FINISH, UPLOAD_SEQ_EXCHANGE_SUCCESS_MESSAGE);
     wk->subprocessSeq = UPLOAD_SEQ_EXCHANGE_RESULT;
     wk->timeoutCount = 0;
@@ -1625,7 +1625,8 @@ static BOOL Upload_DuplicateCheck(WorldTradeWork *wk) {
 // Replaces the original trainer's name, on the Pokémon and its mail, with the version's default, and resets the
 // nickname
 static void Upload_ReplaceBadName(PartyPkm *pkm, HeapID heapId) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_TAIL(heapId));
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_TAIL(heapId));
     StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, DEFAULT_NAME_MSG);
 
     GFL_MsgDataFree(msgData);

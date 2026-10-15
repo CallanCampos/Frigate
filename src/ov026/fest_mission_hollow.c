@@ -1,6 +1,6 @@
 #include "types.h"
-#include "field/fest_mission_hollow.h"
 #include "field/fest_mission_data.h"
+#include "field/fest_mission_hollow.h"
 #include "field/festival.h"
 #include "field/rival_select.h"
 #include "gfl/std.h"
@@ -16,12 +16,15 @@ static u16 func_ov026_0216f9a4(RivalSelectContext *context);
 static u8 func_ov026_0216f9c0(RivalSelectContext *context);
 static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *rand);
 
+// clang-format off
 static const FesMissionHollowPerson data_ov026_0216fa50[] = {
     { 1, 0 },   { 431, 0 }, { 434, 0 }, { 133, 0 }, { 136, 0 }, { 134, 0 }, { 135, 0 },
     { 196, 0 }, { 197, 0 }, { 471, 0 }, { 470, 0 }, { 276, 0 }, { 285, 0 }, { 290, 0 },
     { 316, 0 }, { 327, 0 }, { 293, 0 }, { 261, 0 }, { 263, 0 }, { 270, 0 }, { 296, 0 },
     { 148, 0 }, { 82, 0 },  { 444, 0 }, { 372, 0 }, { 176, 0 }, { 113, 0 },
 };
+
+// clang-format on
 
 void FesMissionHollow_Setup(RivalSelectContext *context) {
     FestMission *mission = GetFestMissionCfg(context->entryOwner);

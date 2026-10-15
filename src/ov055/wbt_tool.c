@@ -96,7 +96,8 @@ static int func_ov055_021e647c(int style) {
 
 void func_ov055_021e6488(int style, StrBuf *strbuf) {
     u16 message = sBattleStyles[func_ov055_021e647c(style)].name;
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_WBT_PARTY, HEAPID_FIELDMAP);
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_WBT_PARTY, HEAPID_FIELDMAP);
 
     if (msgData != NULL) {
         GFL_MsgDataLoadStrbuf(msgData, message, strbuf);

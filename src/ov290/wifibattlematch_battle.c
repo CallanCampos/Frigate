@@ -55,7 +55,6 @@ static BOOL WifiBattleMatchSys_BattleProcInit(GameProc *proc, u32 *state, void *
 static BOOL WifiBattleMatchSys_BattleProcExit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *param, void *work);
 
-
 const GameProcFunctions WIFIBATTLEMATCH_BATTLE_PROC_FUNCTIONS = {
     WifiBattleMatchSys_BattleProcInit,
     WifiBattleMatchSys_BattleProcMain,

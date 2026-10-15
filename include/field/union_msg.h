@@ -9,8 +9,8 @@
 // union_msg.c, overlay 34, which the ROM names: the Union Room's messages, menus and their tables. Names are not
 // swan's. The first functions are lookups of message IDs, by gender, language or a random pick
 
-// The rules of a regulation printed (PokeRegulation_CreatePrintMsg): its message data and, for each of the six rules, the name of the
-// rule and its value. alloc.rpm of the system holds one
+// The rules of a regulation printed (PokeRegulation_CreatePrintMsg): its message data and, for each of the six rules,
+// the name of the rule and its value. alloc.rpm of the system holds one
 typedef struct {
     MsgData *msgData;
     StrBuf *rule[6];

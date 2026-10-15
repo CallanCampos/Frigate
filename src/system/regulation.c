@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include "types.h"
 #include "battle/regulation.h"
 #include "constants/arc.h"
@@ -11,6 +10,7 @@
 #include "pml/poke_party.h"
 #include "save/save_control.h"
 #include "save/tournament_block.h"
+#include <stddef.h>
 
 // The rules of a battle, and the save block of the competitions' regulations and the teams entered in them, which
 // swan calls the tournament block. Block 0x2f.
@@ -419,9 +419,11 @@ void TournamentTeam_SetFromParty(void *record, PokeParty *party) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
-            TournamentTeam_SetField(record, TOURNAMENT_TEAM_SPECIES, i, PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL));
+            TournamentTeam_SetField(record, TOURNAMENT_TEAM_SPECIES, i,
+                                    PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL));
             TournamentTeam_SetField(record, TOURNAMENT_TEAM_FORM, i, PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL));
-            TournamentTeam_SetField(record, TOURNAMENT_TEAM_HAS_ITEM, i, PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL) != 0);
+            TournamentTeam_SetField(record, TOURNAMENT_TEAM_HAS_ITEM, i,
+                                    PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL) != 0);
             TournamentTeam_SetField(record, TOURNAMENT_TEAM_GENDER, i, PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL));
         }
     }

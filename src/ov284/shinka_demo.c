@@ -1,7 +1,7 @@
 #include "types.h"
+#include "app/p_status.h"
 #include "app/ui/ui_scene.h"
 #include "app/ui/yesno_menu.h"
-#include "app/p_status.h"
 #include "battle/b_app_tool.h"
 #include "battle/b_plist_main.h"
 #include "constants/arc.h"
@@ -654,7 +654,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             wk->paletteFade = NULL;
             ShinkaDemoGraphic_InitSubBG(wk->graphic);
             wk->menu = TwoChoiceMenu_Create(wk->heapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic),
-                                           wk->font, wk->printQueue, 0);
+                                            wk->font, wk->printQueue, 0);
             func_02042ba8(0, wk->heapId);
             GFL_FadeSet(2, 16, 0, 0);
         }
@@ -1113,7 +1113,8 @@ static void ShinkaDemo_InitMsg(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     wk->frameChars = LoadCursorImageEndOfHeap(1, 2, 0, wk->graphicHeapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO, wk->graphicHeapId);
-    wk->moveMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO_BTL_MAIN, wk->graphicHeapId);
+    wk->moveMsgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SHINKA_DEMO_BTL_MAIN, wk->graphicHeapId);
     wk->tcbExManager = GFL_TCBExMgrCreate(wk->graphicHeapId, wk->graphicHeapId, 1, 0);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     wk->message = NULL;
@@ -1246,8 +1247,8 @@ static void ShinkaDemo_ShowWindow(ShinkaDemoParam *param, ShinkaDemoWork *wk, BO
 
 static void ShinkaDemo_InitMenu(ShinkaDemoParam *param, ShinkaDemoWork *wk) {
     wk->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_YES_NO, wk->graphicHeapId);
-    wk->menu = TwoChoiceMenu_Create(wk->graphicHeapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic), wk->font,
-                                   wk->printQueue, 0);
+    wk->menu = TwoChoiceMenu_Create(wk->graphicHeapId, 5, 0, 1, 0, ShinkaDemoGraphic_GetClActUnit(wk->graphic),
+                                    wk->font, wk->printQueue, 0);
     wk->choices[0] = NULL;
     wk->choices[1] = NULL;
 }

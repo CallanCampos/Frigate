@@ -466,8 +466,9 @@ static BOOL MonolithPower_Main(GameProc *proc, u32 *state, void *param, void *wo
     case MONOLITH_POWER_SEQ_UNUSED_SAVE:
         if (func_0203da48() || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
             MonolithPower_ClearMessage(mpw);
-            HighLinkSave_SetPassPower(getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
-                          mpw->ids[mpw->selected], 0);
+            HighLinkSave_SetPassPower(
+                getHighLinkBlockAddress(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys))),
+                mpw->ids[mpw->selected], 0);
             comm = GSYS_GetGameCommSystem(screen->param->gsys);
             func_0202bf68(comm, func_020175cc(GSYS_GetGameData(screen->param->gsys)), screen->param->netId);
             mpw->selected = MONOLITH_POWER_NONE;

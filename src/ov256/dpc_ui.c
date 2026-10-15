@@ -1,7 +1,7 @@
 #include "types.h"
-#include "app/dpc_ui.h"
 #include "app/dpc_main.h"
 #include "app/dpc_obj.h"
+#include "app/dpc_ui.h"
 #include "gfl/key.h"
 #include "gfl/touchpanel.h"
 
@@ -12,7 +12,7 @@ static u32 DpcUi_HitPokemon(DendouPCWork *wk);
 
 // The buttons, in the order of DPCUI_*
 static const TouchRect sDpcUiTouchRects[] = {
-    { 168, 191, 8, 31 },    { 168, 191, 88, 111 },      { 168, 191, 200, 223 },
+    { 168, 191, 8, 31 },    { 168, 191, 88, 111 },       { 168, 191, 200, 223 },
     { 168, 191, 232, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
 };
 

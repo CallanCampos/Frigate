@@ -107,8 +107,8 @@ BOOL s0085_CallTrainerBattle(VM *vm, FieldScriptEnv *env) {
     }
     gsys = ScriptWork_GetGameSystem(work);
     fieldWork = ScriptWork_GetFieldWork(work);
-    ScriptWork_CallEvent(work, EventTrainerBattleCall_Create(gsys, fieldWork->field, battleType, 0, trainer1, trainer2,
-                                                             flags));
+    ScriptWork_CallEvent(
+        work, EventTrainerBattleCall_Create(gsys, fieldWork->field, battleType, 0, trainer1, trainer2, flags));
     func_ov036_021a6b4c(env);
     return TRUE;
 }
@@ -123,8 +123,8 @@ BOOL s0085_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = ScriptWork_GetGameSystem(work);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
 
-    ScriptWork_CallEvent(work, EventTrainerBattleCall_Create(gsys, fieldWork->field, 1, partner, trainer1, trainer2,
-                                                             flags));
+    ScriptWork_CallEvent(work,
+                         EventTrainerBattleCall_Create(gsys, fieldWork->field, 1, partner, trainer1, trainer2, flags));
     func_ov036_021a6b4c(env);
     return TRUE;
 }
@@ -173,7 +173,8 @@ BOOL s008B_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 trainerId = ScriptReadAny(vm, env);
 
-    ScriptWork_CallEvent(work, EventBGMPlayPush_Create(gsys, GetTrainerClassEyeBGMID(TrainerData_GetParam(trainerId, 1))));
+    ScriptWork_CallEvent(work,
+                         EventBGMPlayPush_Create(gsys, GetTrainerClassEyeBGMID(TrainerData_GetParam(trainerId, 1))));
     return TRUE;
 }
 
@@ -246,8 +247,8 @@ BOOL s0094_CallTradedPokemonBattle(VM *vm, FieldScriptEnv *env) {
     }
     gsys = ScriptWork_GetGameSystem(work);
     fieldWork = ScriptWork_GetFieldWork(work);
-    ScriptWork_CallEvent(work, LoadTradedPokemonBattleStats(gsys, fieldWork->field, battleType, 0, trainer1, trainer2,
-                                                            flags, index));
+    ScriptWork_CallEvent(
+        work, LoadTradedPokemonBattleStats(gsys, fieldWork->field, battleType, 0, trainer1, trainer2, flags, index));
     return TRUE;
 }
 

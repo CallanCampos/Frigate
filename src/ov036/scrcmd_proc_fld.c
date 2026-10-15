@@ -124,9 +124,9 @@ BOOL s014F_CallPC(VM *vm, FieldScriptEnv *env) {
     callWork->gameData = gameData;
     callWork->result = result;
     callWork->param = param;
-    ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_BOX2,
-                                                                           &BOX2_PROC_FUNCTIONS, param,
-                                                                           func_ov036_021add94, callWork));
+    ScriptWork_CallEvent(work,
+                         EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_BOX2, &BOX2_PROC_FUNCTIONS,
+                                                                     param, func_ov036_021add94, callWork));
     return TRUE;
 }
 

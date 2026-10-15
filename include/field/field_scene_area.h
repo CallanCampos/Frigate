@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_FIELD_SCENE_AREA_H
 
 #include "types.h"
-#include "nitro/fx.h"
 #include "gfl/heap.h"
+#include "nitro/fx.h"
 #include "struct_decls.h"
 // Overlay 36: the camera areas of a zone, and the loader of their data. Names and layouts from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)

@@ -1,5 +1,4 @@
 #include "types.h"
-#include "save/save_table.h"
 #include "field/field_actor.h"
 #include "field/unity_tower.h"
 #include "pml/mail.h"
@@ -37,6 +36,7 @@
 #include "save/records.h"
 #include "save/resh_zek.h"
 #include "save/save_control.h"
+#include "save/save_table.h"
 #include "save/survey_savedata.h"
 #include "save/symbol_save.h"
 #include "save/timesig_savedata.h"

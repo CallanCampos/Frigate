@@ -47,6 +47,7 @@ typedef struct {
     u8 palette;
 } Box2WinData;
 
+// clang-format off
 static const Box2WinData sWinData[BOX2_WIN_MAX] = {
     {4, 1, 0, 30, 3, 15},  {4, 1, 6, 8, 2, 15},   {4, 1, 10, 8, 2, 15},  {4, 11, 10, 6, 2, 15},
     {4, 9, 10, 2, 2, 15},  {4, 1, 4, 7, 2, 15},   {4, 2, 14, 8, 2, 15},  {4, 2, 18, 11, 2, 15},
@@ -56,6 +57,8 @@ static const Box2WinData sWinData[BOX2_WIN_MAX] = {
     {1, 0, 9, 11, 3, 1},   {1, 0, 12, 11, 3, 1},  {0, 0, 0, 12, 3, 12},  {0, 0, 0, 12, 3, 12},
     {0, 1, 21, 30, 2, 11}, {0, 1, 19, 18, 4, 11}, {0, 1, 21, 19, 2, 11}, {0, 1, 19, 30, 4, 11},
 };
+
+// clang-format on
 
 void func_ov255_021cdf18(Box2SysWork *syswk) {
     const Box2WinData *data;
@@ -236,8 +239,7 @@ static void func_ov255_021ce484(Box2SysWork *syswk, Box2PokeInfo *info, u32 inde
             number = syswk->app->regionalDex[info->species];
         }
         if (number != 999) {
-            func_ov255_021ce0c0(syswk->app, index, syswk->app->msgData, 108, 0, 0, syswk->app->font,
-                                BOX2_COLOR_NORMAL);
+            func_ov255_021ce0c0(syswk->app, index, syswk->app->msgData, 108, 0, 0, syswk->app->font, BOX2_COLOR_NORMAL);
             width = GFL_FontGetBlockWidth(syswk->app->expandBuf, syswk->app->font, 0);
             WordSetNumber(syswk->app->wordSet, 0, number, 3, 2, TRUE);
             func_ov255_021ce0c0(syswk->app, index, syswk->app->msgData, 104, width, 0, syswk->app->font,
@@ -411,8 +413,8 @@ static void func_ov255_021ce870(Box2SysWork *syswk, u32 index, u32 msgId, u16 fr
     }
 
     str = GFL_MsgDataLoadStrbufNew(syswk->app->msgData, msgId);
-    PrintStrAligned(&syswk->app->windows[index], syswk->app->printQueue, width * 8 / 2, 4, str,
-                        syswk->app->font, color, PRINT_ALIGN_CENTER);
+    PrintStrAligned(&syswk->app->windows[index], syswk->app->printQueue, width * 8 / 2, 4, str, syswk->app->font, color,
+                    PRINT_ALIGN_CENTER);
     GFL_StrBufFree(str);
 }
 
@@ -461,8 +463,7 @@ static void func_ov255_021cece4(Box2SysWork *syswk, u32 tray, u32 index) {
     loadBoxNameToStrbuf(syswk->param->boxes, tray, str);
     GFL_BitmapFill(syswk->app->fontOam[index].bitmap, 0);
     x = (96 - GFL_FontGetBlockWidth(str, syswk->app->font, 0)) >> 1;
-    GFL_TextRendererDrawToBitmapEx(syswk->app->fontOam[index].bitmap, x, 0, str, syswk->app->font,
-                                   BOX2_COLOR_NORMAL);
+    GFL_TextRendererDrawToBitmapEx(syswk->app->fontOam[index].bitmap, x, 0, str, syswk->app->font, BOX2_COLOR_NORMAL);
     GFL_StrBufFree(str);
 }
 

@@ -4,8 +4,8 @@
 #include "types.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
-#include "struct_decls.h"
 #include "save/gimmick_savedata.h"
+#include "struct_decls.h"
 
 struct MapMatrix {
     u16 heapId;

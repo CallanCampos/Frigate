@@ -2,10 +2,10 @@
 #define POKEBW2_SAVE_POKEWOOD_H
 
 #include "types.h"
-#include <stddef.h>
 #include "gfl/heap.h"
 #include "save/battle_rec.h"
 #include "struct_decls.h"
+#include <stddef.h>
 
 // Pokéstar Studios, which the game calls Pokewood. Its progress is save block 0x47 (PokewoodSave), and the movies
 // downloaded into it are extra save data, which the Pokewood block is loaded from

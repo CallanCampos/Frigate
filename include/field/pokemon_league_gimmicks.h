@@ -2,12 +2,12 @@
 #define POKEBW2_FIELD_POKEMON_LEAGUE_GIMMICKS_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "field/gimmick_league_caitlin.h"
 #include "field/gimmick_league_champion.h"
 #include "field/gimmick_league_grimsley.h"
 #include "field/gimmick_league_marshal.h"
 #include "field/gimmick_league_shauntal.h"
+#include "struct_decls.h"
 
 // The gimmicks of the Pokémon League's rooms, which the League's script plugin (overlay 52) drives. Their sounds use
 // the Elite Four's Japanese names, as SEQ_SE_SW_CATTLEYA_* for Caitlin

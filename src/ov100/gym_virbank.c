@@ -64,6 +64,7 @@ static const G3DSceneActorSetup sActors[3] = {
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
 // The index of the music's volume by where the player stands, by z then x, in each of the two rooms
+// clang-format off
 static const u32 sVolumeIndicesRoom1[18][12] = {
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
     { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
@@ -85,6 +86,9 @@ static const u32 sVolumeIndicesRoom1[18][12] = {
     { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 },
 };
 
+// clang-format on
+
+// clang-format off
 static const u32 sVolumeIndicesRoom2[16][17] = {
     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 },
@@ -103,6 +107,8 @@ static const u32 sVolumeIndicesRoom2[16][17] = {
     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 };
+
+// clang-format on
 
 void func_ov100_021eec80(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));

@@ -42,5 +42,4 @@ BOOL func_ov012_02152bd4(void *work);
 void func_ov012_02152bec(void *work);
 void func_ov012_02152bfc(void *work);
 
-
 #endif // POKEBW2_FIELD_DELIVERY_BEACON_H

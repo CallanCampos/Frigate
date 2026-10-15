@@ -49,11 +49,14 @@ struct LocalTvtCallData {
 static LocalTvtCallEntry *LocalTvtCallData_GetEntry(LocalTvtCallData *data, u16 person);
 
 // Where LOCAL_TVT_CALL_SECRET can be called from once the calls with it have reached the last stage
+// clang-format off
 static const u32 sLocalTvtSecretZones[] = {
     ZONE_NIMBASA_CITY, ZONE_DRIFTVEIL_CITY, ZONE_MISTRALTON_CITY, ZONE_LACUNOSA_TOWN, ZONE_UNDELLA_TOWN,
     ZONE_LENTIMAS_TOWN, ZONE_ROUTE_5,       ZONE_ROUTE_6,         ZONE_ROUTE_7,       ZONE_ROUTE_9,
     ZONE_ROUTE_11,      ZONE_ROUTE_12,      ZONE_ROUTE_13,        ZONE_ROUTE_14,      ZONE_ROUTE_16,
 };
+
+// clang-format on
 
 LocalTvtCallData *LocalTvtCallData_Create(GameSystem *gsys, GameData *gameData, HeapID heapId) {
     LocalTvtCallData *data = GFL_HeapAllocate(heapId, sizeof(LocalTvtCallData), TRUE, "local_tvt_calldata.c", 103);

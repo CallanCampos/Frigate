@@ -1,12 +1,13 @@
 #include "types.h"
-#include "app/box2_seq.h"
 #include "app/box2_bgwfrm.h"
 #include "app/box2_bmp.h"
 #include "app/box2_main.h"
 #include "app/box2_obj.h"
+#include "app/box2_seq.h"
 #include "app/box2_ui.h"
 #include "app/ui/ui_scene.h"
 #include "constants/arc.h"
+#include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
 #include "gfl/graphics.h"
@@ -21,7 +22,6 @@
 #include "gfl/ui.h"
 #include "nitro/gx.h"
 #include "nitro/math.h"
-#include "constants/pokemon.h"
 #include "pml/item.h"
 #include "pml/poke_party.h"
 #include "save/bag.h"
@@ -178,7 +178,6 @@ static int func_ov255_021cc308(Box2SysWork *syswk);
 static int func_ov255_021cc330(Box2SysWork *syswk);
 static int func_ov255_021cc380(Box2SysWork *syswk);
 
-
 static int func_ov255_021cbe58(Box2SysWork *syswk, int seq);
 static int func_ov255_021cbe98(Box2SysWork *syswk, int nextSeq);
 static int func_ov255_021cbed8(Box2SysWork *syswk, int seq);
@@ -269,6 +268,7 @@ static const Box2SubProc sSubProcs[] = {
     { Box2Main_BoxSearchCall, Box2Main_BoxSearchExit, 95 },
 };
 
+// clang-format off
 static const Box2SeqFunc sMainSeq[] = {
     Box2Seq_Init, Box2Seq_Release, Box2Seq_Wipe,
     Box2Seq_PaletteFade, Box2Seq_Wait, Box2Seq_VFunc,
@@ -311,6 +311,9 @@ static const Box2SeqFunc sMainSeq[] = {
     func_ov255_021cbd2c, func_ov255_021cbe1c, func_ov255_021cbe28,
 };
 
+// clang-format on
+
+// clang-format off
 static const Box2YesNoFuncs sYesNoFuncs[] = {
     { func_ov255_021cbf18, func_ov255_021cc380 },
     { func_ov255_021cbfe8, func_ov255_021cc040 },
@@ -319,6 +322,8 @@ static const Box2YesNoFuncs sYesNoFuncs[] = {
     { func_ov255_021cc1bc, func_ov255_021cc198 },
     { func_ov255_021cc308, func_ov255_021cc330 },
 };
+
+// clang-format on
 
 BOOL Box2Seq_Main(Box2SysWork *syswk, u32 *seq) {
     if (syswk->app == NULL || syswk->app->printQueue == NULL || func_02021c0c(syswk->app->printQueue) != FALSE) {
@@ -1073,8 +1078,8 @@ static int func_ov255_021c385c(Box2SysWork *syswk) {
         if (syswk->unk18 == 0) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
-            if (pos >= BOX2_PARTY_POS
-                || Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
+            if (pos >= BOX2_PARTY_POS ||
+                Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                 break;
             }
             syswk->pos = pos;
@@ -1288,8 +1293,8 @@ static int func_ov255_021c3fc0(Box2SysWork *syswk) {
             if (Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                 n = 2;
             }
-        } else if (pos < BOX2_PARTY_POS
-                   && Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
+        } else if (pos < BOX2_PARTY_POS &&
+                   Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             Box2Main_PokeInfoPut(syswk, pos);
             n = 0;
         } else {
@@ -1309,16 +1314,16 @@ static int func_ov255_021c3fc0(Box2SysWork *syswk) {
             if (Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                 n = 2;
             }
-        } else if (pos < BOX2_BOXLIST_POS
-                   && Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
+        } else if (pos < BOX2_BOXLIST_POS &&
+                   Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             Box2Main_PokeInfoPut(syswk, pos);
             n = 0;
         } else {
             Box2Main_PokeInfoOff(syswk);
             n = 2;
         }
-    } else if (pos < BOX2_BOXLIST_POS
-               && Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
+    } else if (pos < BOX2_BOXLIST_POS &&
+               Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
         Box2Main_PokeInfoPut(syswk, pos);
         n = 0;
     } else {
@@ -1619,8 +1624,8 @@ static int func_ov255_021c445c(Box2SysWork *syswk) {
             break;
         }
         pos = CursorMove_GetPos(syswk->app->cursorMove);
-        if (pos >= BOX2_PARTY_POS
-            || Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
+        if (pos >= BOX2_PARTY_POS ||
+            Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
             break;
         }
         syswk->pos = pos;
@@ -1905,8 +1910,8 @@ static int func_ov255_021c4ea0(Box2SysWork *syswk) {
             if (Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                 n = 2;
             }
-        } else if (pos < BOX2_PARTY_POS
-                   && Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
+        } else if (pos < BOX2_PARTY_POS &&
+                   Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             Box2Main_PokeInfoPut(syswk, pos);
             n = 0;
         } else {
@@ -1926,16 +1931,16 @@ static int func_ov255_021c4ea0(Box2SysWork *syswk) {
             if (Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                 n = 2;
             }
-        } else if (pos < BOX2_BOXLIST_POS
-                   && Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
+        } else if (pos < BOX2_BOXLIST_POS &&
+                   Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             Box2Main_PokeInfoPut(syswk, pos);
             n = 0;
         } else {
             Box2Main_PokeInfoOff(syswk);
             n = 2;
         }
-    } else if (pos < BOX2_BOXLIST_POS
-               && Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
+    } else if (pos < BOX2_BOXLIST_POS &&
+               Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
         Box2Main_PokeInfoPut(syswk, pos);
         n = 0;
     } else {
@@ -2324,8 +2329,8 @@ static int func_ov255_021c53f4(Box2SysWork *syswk) {
             break;
         }
         pos = CursorMove_GetPos(syswk->app->cursorMove);
-        if (pos >= BOX2_BOXLIST_POS
-            || Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
+        if (pos >= BOX2_BOXLIST_POS ||
+            Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
             break;
         }
         syswk->pos = pos;
@@ -2442,8 +2447,8 @@ static int func_ov255_021c53f4(Box2SysWork *syswk) {
         if (syswk->unk18 == 1) {
             u32 width, height;
 
-            if ((syswk->app->rangeSelect.endPos < BOX2_PARTY_POS && res >= BOX2_PARTY_POS)
-                || (syswk->app->rangeSelect.endPos >= BOX2_PARTY_POS && res < BOX2_PARTY_POS)) {
+            if ((syswk->app->rangeSelect.endPos < BOX2_PARTY_POS && res >= BOX2_PARTY_POS) ||
+                (syswk->app->rangeSelect.endPos >= BOX2_PARTY_POS && res < BOX2_PARTY_POS)) {
                 func_ov255_021cded4(syswk);
                 Box2Main_PokeInfoPut(syswk, CursorMove_GetPos(syswk->app->cursorMove));
                 break;
@@ -3011,8 +3016,8 @@ static int func_ov255_021c686c(Box2SysWork *syswk) {
         if (syswk->unk18 == 0) {
             u8 pos = CursorMove_GetPos(syswk->app->cursorMove);
 
-            if (pos >= BOX2_BOXLIST_POS
-                || Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
+            if (pos >= BOX2_BOXLIST_POS ||
+                Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
                 break;
             }
             syswk->pos = pos;
@@ -4797,8 +4802,8 @@ static int func_ov255_021c9a70(Box2SysWork *syswk) {
     if (syswk->moveMode == 0) {
         syswk->unk1C_6 = 1;
     }
-    if (syswk->app->pokePutKey == syswk->app->getItemInitPos
-        && (syswk->getTray == BOX2_GET_NONE || syswk->getTray == syswk->tray)) {
+    if (syswk->app->pokePutKey == syswk->app->getItemInitPos &&
+        (syswk->getTray == BOX2_GET_NONE || syswk->getTray == syswk->tray)) {
         syswk->app->getItem = 0;
         func_ov255_021d1af8(syswk, 0, 1, 1, 1);
         return 74;
@@ -4812,15 +4817,14 @@ static int func_ov255_021c9a70(Box2SysWork *syswk) {
     Box2Main_SetPokeParam(syswk, syswk->app->pokePutKey, syswk->tray, PKM_PARAM_ITEM, syswk->app->getItem);
     if (Box2Main_PokeItemFormChange(syswk, Box2Main_GetBoxPkm(syswk, syswk->tray, syswk->app->pokePutKey)) == TRUE) {
         Box2Main_RecalcPartyStats(syswk, syswk->app->pokePutKey);
-        func_ov255_021cfc20(syswk, syswk->tray, syswk->app->pokePutKey,
-                            syswk->app->pokeIconId[syswk->app->pokePutKey]);
+        func_ov255_021cfc20(syswk, syswk->tray, syswk->app->pokePutKey, syswk->app->pokeIconId[syswk->app->pokePutKey]);
     }
     Box2Main_PokeInfoPut(syswk, syswk->app->pokePutKey);
 
     syswk->app->getItem = item;
     Box2Main_SetPokeParam(syswk, syswk->app->getItemInitPos, syswk->getTray, PKM_PARAM_ITEM, syswk->app->getItem);
-    if (Box2Main_PokeItemFormChange(syswk, Box2Main_GetBoxPkm(syswk, syswk->getTray, syswk->app->getItemInitPos))
-        == TRUE) {
+    if (Box2Main_PokeItemFormChange(syswk, Box2Main_GetBoxPkm(syswk, syswk->getTray, syswk->app->getItemInitPos)) ==
+        TRUE) {
         Box2Main_RecalcPartyStats(syswk, syswk->app->getItemInitPos);
         if (syswk->getTray == BOX2_GET_NONE || syswk->getTray == syswk->tray) {
             func_ov255_021cfc20(syswk, syswk->tray, syswk->app->getItemInitPos,
@@ -5599,8 +5603,8 @@ static int func_ov255_021cae84(Box2SysWork *syswk) {
                 syswk->nextSeq = 14;
                 return func_ov255_021cbe58(syswk, BOX2SEQ_TRGWAIT);
             }
-            if (PML_ItemIsMail(PokeParty_GetParam(PokeParty_GetPkm(syswk->param->party, partyPos), PKM_PARAM_ITEM, NULL))
-                == TRUE) {
+            if (PML_ItemIsMail(PokeParty_GetParam(PokeParty_GetPkm(syswk->param->party, partyPos), PKM_PARAM_ITEM,
+                                                  NULL)) == TRUE) {
                 GFL_SndSEPlay(SEQ_SE_BEEP);
                 func_ov255_021cf1ac(syswk, 0, 5, 24);
                 syswk->app->unkA550 = 1;
@@ -7416,8 +7420,8 @@ static int func_ov255_021cdba4(Box2SysWork *syswk, int seq) {
 
 // Allocates the work of a drag of the box list
 static void func_ov255_021cdc04(Box2SysWork *syswk) {
-    Box2BoxListDrag *work = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_BOX2_APP), sizeof(Box2BoxListDrag), FALSE,
-                                             "box2_seq.c", 11290);
+    Box2BoxListDrag *work =
+        GFL_HeapAllocate(HEAPID_TAIL(HEAPID_BOX2_APP), sizeof(Box2BoxListDrag), FALSE, "box2_seq.c", 11290);
 
     work->cnt = 0;
     work->dir = 0;
@@ -7463,8 +7467,7 @@ static u32 func_ov255_021cdcc8(Box2SysWork *syswk) {
     if (Box2Main_BattlePokeCheck(syswk, val) == FALSE) {
         return 1;
     }
-    if (PML_ItemIsMail(PokeParty_GetParam(PokeParty_GetPkm(syswk->param->party, val), PKM_PARAM_ITEM, NULL))
-        == TRUE) {
+    if (PML_ItemIsMail(PokeParty_GetParam(PokeParty_GetPkm(syswk->param->party, val), PKM_PARAM_ITEM, NULL)) == TRUE) {
         val = 2;
     } else {
         val = 0;
@@ -7480,8 +7483,8 @@ static void func_ov255_021cdd04(Box2SysWork *syswk, u32 mark) {
 
 // Picks a wallpaper of the theme's menu
 static int func_ov255_021cdd24(Box2SysWork *syswk, u32 pos) {
-    if (syswk->app->unkA55C <= 4
-        || (syswk->app->unkA55C == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == FALSE)) {
+    if (syswk->app->unkA55C <= 4 ||
+        (syswk->app->unkA55C == 5 && BoxSaveAccessor_CheckFlags(syswk->param->boxes, 2) == FALSE)) {
         syswk->app->wallpaperPos = pos + (syswk->app->unkA55C - 1) * 4 - 1;
     } else {
         syswk->app->wallpaperPos = pos + (syswk->app->unkA55C - 1) * 4;

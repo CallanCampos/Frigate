@@ -1,6 +1,7 @@
 #include "types.h"
 #include "field/battle_cutin.h"
 
+// clang-format off
 const BattleCutinParam BATTLE_CUTIN_DB[] = {
     { 0xd, 0xe, 0x52947fff },
     { 0xe, 0x1, 0x52947fff },
@@ -30,6 +31,8 @@ const BattleCutinParam BATTLE_CUTIN_DB[] = {
     { 0x22, 0x0, 0x7fff },
     { 0x23, 0x0, 0x7fff },
 };
+
+// clang-format on
 
 const BattleCutinParam *BattleCutinDB_GetParam(u32 index) {
     return &BATTLE_CUTIN_DB[index];

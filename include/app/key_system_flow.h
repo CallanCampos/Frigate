@@ -111,9 +111,8 @@ void KeySystemKeyState_Save(KeySystemKeyState *keys, KeyInfoSave *keyInfo);
 BOOL KeySystemKeyState_CanExchange(KeySystemKeyState *keys, KeySystemKeyState *partner, BOOL receive);
 void KeySystemKeyState_Receive(KeySystemKeyState *keys, KeySystemKeyState *partner);
 void KeySystemSaveInfo_Init(KeySystemSaveInfo *info, GameData *gameData);
-void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemClAct *clact,
-                                    KeySystemList **list, MsgData *msgData, Font *font, KeyInfoSave *keyInfo,
-                                    GameData *gameData, HeapID heapId);
+void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemClAct *clact, KeySystemList **list,
+                             MsgData *msgData, Font *font, KeyInfoSave *keyInfo, GameData *gameData, HeapID heapId);
 void KeySystemKeySelect_Free(KeySystemKeySelect *keySelect);
 void KeySystemKeySelect_Update(KeySystemKeySelect *keySelect);
 BOOL KeySystemKeySelect_IsPrinted(KeySystemKeySelect *keySelect);
@@ -128,10 +127,9 @@ u16 KeySystemFlow_GetChamberMsg(KeyInfoSave *keyInfo);
 u16 KeySystemFlow_GetSettingsMsg(KeyInfoSave *keyInfo, u16 item);
 BOOL KeySystemFlow_FormatKeyMsg(KeySystemWork *wk, int key, BOOL receive);
 void KeySystemKeyAnim_Init(KeySystemKeyAnim *anim, KeySystemClAct *clact, KeySystemMsgWin *msgWin, Font *font,
-                                  HeapID heapId);
+                           HeapID heapId);
 void KeySystemKeyAnim_Free(KeySystemKeyAnim *anim);
-void KeySystemKeyAnim_Start(KeySystemKeyAnim *anim, u32 key, MsgData *msgData, u16 msgId, StrBuf *str,
-                                   BOOL enabled);
+void KeySystemKeyAnim_Start(KeySystemKeyAnim *anim, u32 key, MsgData *msgData, u16 msgId, StrBuf *str, BOOL enabled);
 BOOL KeySystemKeyAnim_Update(KeySystemKeyAnim *anim);
 void KeySystemFlow_OnNetError(void *work);
 

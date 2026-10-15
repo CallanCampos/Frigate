@@ -1,8 +1,8 @@
 #include "types.h"
-#include "app/box2_obj.h"
-#include "app/box2_main.h"
-#include "app/box2_ui.h"
 #include "app/box2_bmp.h"
+#include "app/box2_main.h"
+#include "app/box2_obj.h"
+#include "app/box2_ui.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -98,11 +98,9 @@ static void func_ov255_021d2118(int start, int end, s32 *x1, s32 *y1, s32 *x2, s
 static void func_ov255_021d2160(int start, int end, s32 *x1, s32 *y1, s32 *x2, s32 *y2);
 static BOOL func_ov255_021d229c(Box2SysWork *syswk, u32 pos);
 
-
 // Where the copies of the held item's icon that outline it are, around the icon
 static const s8 sItemOutlineX[8] = { 1, -1, 0, 0, 1, 1, -1, -1 };
 static const s8 sItemOutlineY[8] = { 0, 0, 1, -1, 1, -1, 1, -1 };
-
 
 // Where the box name's frame is, by its position
 static const s16 sBoxNameY[4] = { 52, 86, 120, 154 };
@@ -155,6 +153,7 @@ static const u8 sTrayIconColors[24] = {
 };
 
 // The actors that are created from one setup each, by their ID
+// clang-format off
 static const Box2ActorData sActorData[32] = {
     { { 12, 28, 1, 0, 3 }, 122, 6, 6, 0, 0 },
     { { 156, 28, 3, 0, 3 }, 122, 6, 6, 0, 0 },
@@ -189,6 +188,8 @@ static const Box2ActorData sActorData[32] = {
     { { 168, 168, 0, 64, 0 }, 128, 7, 12, 0, 0 },
     { { 0, 0, 24, 50, 0 }, 122, 6, 6, 0, 0 },
 };
+
+// clang-format on
 
 void func_ov255_021cf3c0(Box2SysWork *syswk) {
     func_ov255_021cf430(syswk->app);
@@ -416,8 +417,7 @@ void func_ov255_021cf9c8(Box2SysWork *syswk, u32 tray) {
     for (i = 0; i < BOX2_TRAY_POKE_MAX; i++) {
         if (BoxSaveAccessor_GetPkmParam(syswk->param->boxes, tray, i, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
             syswk->app->pokeIconExist[i] = FALSE;
-        } else if (syswk->param->mode != 3 && syswk->tray == syswk->getTray &&
-                   func_ov255_021d229c(syswk, i) == TRUE) {
+        } else if (syswk->param->mode != 3 && syswk->tray == syswk->getTray && func_ov255_021d229c(syswk, i) == TRUE) {
             syswk->app->pokeIconExist[i] = FALSE;
         } else {
             pkm = Box2Main_GetBoxPkm(syswk, tray, i);
@@ -523,7 +523,7 @@ void func_ov255_021cfc90(Box2SysWork *syswk) {
 
     for (i = 0; i < count; i++) {
         func_ov255_021cfbf0(syswk, func_0201d624(PokeParty_GetPkm(syswk->param->party, i)),
-                    syswk->app->pokeIconId[BOX2_PARTY_POS + i]);
+                            syswk->app->pokeIconId[BOX2_PARTY_POS + i]);
         func_ov255_021cf63c(syswk->app, syswk->app->pokeIconId[BOX2_PARTY_POS + i], FALSE);
     }
 }
@@ -568,8 +568,7 @@ void func_ov255_021cfdb0(Box2SysWork *syswk) {
         pos = syswk->pos - BOX2_PARTY_POS;
         x = pos & 1;
         for (i = 0; i < 6; i++) {
-            if
- ((i & 1) >= x && (i & 1) < x + syswk->app->rangeWidth && (i >> 1) >= (pos >> 1) &&
+            if ((i & 1) >= x && (i & 1) < x + syswk->app->rangeWidth && (i >> 1) >= (pos >> 1) &&
                 (i >> 1) < (pos >> 1) + syswk->app->rangeHeight) {
                 func_ov255_021cf63c(syswk->app, syswk->app->pokeIconId[BOX2_PARTY_POS + i], FALSE);
             }
@@ -880,7 +879,6 @@ void func_ov255_021d052c(Box2SysWork *syswk) {
     s16 y;
     int j;
     int i;
-
 
     if (syswk->unk18 != 0) {
         func_ov255_021cf6ec(syswk->app, BOX2_ACTOR_CURSOR, &x, &y, 0);
@@ -1281,8 +1279,7 @@ void func_ov255_021d11a4(Box2SysWork *syswk, BOOL visible) {
             func_ov255_021cf63c(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i, visible);
             if (visible == TRUE && syswk->pos != BOX2_GET_NONE) {
                 id = syswk->app->pokeIconId[syswk->pos];
-                func_ov255_021cf684(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i,
-                                    func_0204c45c(syswk->app->actors[id]) + 1);
+                func_ov255_021cf684(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i, func_0204c45c(syswk->app->actors[id]) + 1);
                 func_ov255_021cf66c(syswk->app, BOX2_ACTOR_ITEM_OUTLINE + i, func_0204c47c(syswk->app->actors[id]));
             }
         }
@@ -2028,9 +2025,8 @@ void func_ov255_021d232c(Box2SysWork *syswk, BOOL visible) {
         for (j = 0; j < syswk->app->rangeHeight; j++) {
             for (i = 0; i < syswk->app->rangeWidth; i++) {
                 if (syswk->app->rangeFlags[j * rowWidth + i] != 0) {
-                    func_ov255_021cf63c(syswk->app,
-                                        syswk->app->pokeIconId[BOX2_BOXLIST_POS + j * syswk->app->rangeWidth + i],
-                                        visible);
+                    func_ov255_021cf63c(
+                        syswk->app, syswk->app->pokeIconId[BOX2_BOXLIST_POS + j * syswk->app->rangeWidth + i], visible);
                 }
             }
         }

@@ -6,8 +6,8 @@
 #include "struct_decls.h"
 
 // The changes of a Pokémon's friendship (poke_friendship.c, a guessed name: the ROM has no string for it).
-// FriendshipManagerCalc, FriendshipManagerCalcItem and FriendshipManagerCalcParty are declared in pml/poke_party.h. The names are swan's
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// FriendshipManagerCalc, FriendshipManagerCalcItem and FriendshipManagerCalcParty are declared in pml/poke_party.h. The
+// names are swan's (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 // The reasons of FriendshipManagerCalc, rows of its table. Only those the code shows are named
 #define FRIENDSHIP_REASON_LEVEL_UP_PARTY 2

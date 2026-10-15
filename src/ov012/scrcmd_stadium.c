@@ -107,7 +107,7 @@ BOOL func_ov012_02159f90(VM *vm, FieldScriptEnv *env) {
     results[5] = ScriptReadVar(vm, env);
     {
         u16 range = 52;
-        u16 picked[6] = {0};
+        u16 picked[6] = { 0 };
         s32 i;
         s32 value;
         s32 j;

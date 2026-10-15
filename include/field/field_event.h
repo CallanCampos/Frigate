@@ -54,13 +54,14 @@ GameEvent *EventFieldOpenRestoreLCD_Create(GameSystem *gsys);
 // Restores the field's screens and the BGs that were on
 void FieldG3D_RestoreSurface(Field *field);
 // Runs the proc as a field subprocess
-GameEvent *EventFieldSubprocessCall_Create(GameSystem *gsys, Field *field, s32 overlayId, const GameProcFunctions *functions,
-                                           void *param);
+GameEvent *EventFieldSubprocessCall_Create(GameSystem *gsys, Field *field, s32 overlayId,
+                                           const GameProcFunctions *functions, void *param);
 // Runs the proc as a field subprocess, then calls callback with work if there is a callback, and frees work
 GameEvent *EventFieldSubprocessCall_CreateWithCallback(GameSystem *gsys, Field *field, s32 overlayId,
                                                        const GameProcFunctions *functions, void *param,
                                                        void (*callback)(void *work), void *work);
-// Events of overlay 36's other files that scripts start: a name input for the Pokémon, and another input with its result
+// Events of overlay 36's other files that scripts start: a name input for the Pokémon, and another input with its
+// result
 GameEvent *EventPokeNameWordSetInput_Create(GameSystem *gsys, u16 a1, u16 a2, u16 *result, WordSet *wordSet);
 GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, u32 slot,
                                           GameEventReturnCode (*callback)(GameEvent *event, u32 *state, void *data));

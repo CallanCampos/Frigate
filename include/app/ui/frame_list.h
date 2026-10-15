@@ -53,7 +53,7 @@ typedef struct {
     u8 windowHeight;
     u8 windowPalette;
     u8 speed[6]; // pixels a step scrolls by, from the fastest
-    u8 palette; // of the cursor
+    u8 palette;  // of the cursor
     u8 barSize;
     u8 unk13;
 } FrameListLayout;
@@ -143,7 +143,7 @@ void FrameList_AddItem(FrameList *list, u32 type, u32 value);
 void FrameList_LoadScreen(FrameList *list, ArcTool *arc, u32 fileId, BOOL compressed, u32 index);
 // FrameList_LoadScreen, then moves the tiles on by tileOffset and sets the palette
 void FrameList_LoadScreenPalette(FrameList *list, ArcTool *arc, u32 fileId, BOOL compressed, u32 index, u16 tileOffset,
-                         u8 palette);
+                                 u8 palette);
 void FrameList_LoadCursorPalette(FrameList *list, ArcTool *arc, u32 fileId, u32 palette, u32 count);
 // Whether the list is still drawing its items
 BOOL FrameList_Draw(FrameList *list);

@@ -209,12 +209,6 @@ typedef struct {
     GXOamAttr oam;
 } ClActDrawState;
 
-// The renderers in ITCM, by unk5 and unk6 of the unit
-void mainRenderer(ClActUnit *unit);
-void func_01ff8318(ClActUnit *unit);
-void func_01ff8610(ClActUnit *unit);
-void func_01ff8900(ClActUnit *unit);
-
 ClActSys *g_ClActSys;
 
 void func_0204c5e4(ClActRenderer *renderer, const ClActSysSetup *setup, HeapID heapId);

@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_FIELD_EXP_OBJ_H
 
 #include "types.h"
-#include "gfl/heap.h"
 #include "gfl/g3d.h"
+#include "gfl/heap.h"
 #include "struct_decls.h"
 
 // The field's expansion objects: 3D models that zones such as gyms add, in scenes of actors with animations

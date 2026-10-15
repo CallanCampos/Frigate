@@ -116,9 +116,8 @@ static BOOL LocalTvtMother_Place(LocalTvtPerson *person, const LocalTvtPersonSet
     switch (mother->step) {
     case 0:
         msgData = LocalTvtMessage_GetTalkMsgData(setup->message);
-        LocalTvtFace_Talk(
-            face, mother->placeMsgData,
-            ZoneData_GetPlaceNameID(PlayerState_GetZoneID(GameData_GetPlayerState(mother->gameData))));
+        LocalTvtFace_Talk(face, mother->placeMsgData,
+                          ZoneData_GetPlaceNameID(PlayerState_GetZoneID(GameData_GetPlayerState(mother->gameData))));
         mother->step++;
         break;
     case 1:

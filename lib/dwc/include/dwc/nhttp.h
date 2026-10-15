@@ -7,8 +7,9 @@
 // lib/dwc/src/nhttp/. The ROM names none of it except in one assertion's text, " NHTTP_SetRootCA(%d)"; the names are
 // those of pret/pokerevo's Wii build of the same library (asm/SDK/NHTTP/d_nhttp*.s), whose functions these are
 // (NHTTPCreateConnection, NHTTPStartConnection, NHTTPGetBodyBuffer, NHTTPGetUserParam, NHTTPGetConnectionError,
-// NHTTPStartup, NHTTPCleanupAsync, NHTTPAddHeaderField, NHTTPAddPostDataAscii, NHTTPGetResultCode, NHTTPSetVerifyOption),
-// or descriptive for the rest. A connection is a handle that NHTTPCreateConnection returns: 0 if it could not
+// NHTTPStartup, NHTTPCleanupAsync, NHTTPAddHeaderField, NHTTPAddPostDataAscii, NHTTPGetResultCode,
+// NHTTPSetVerifyOption), or descriptive for the rest. A connection is a handle that NHTTPCreateConnection returns: 0 if
+// it could not
 
 typedef void *(*NHttpAllocFunc)(u32 size, int align);
 typedef void (*NHttpFreeFunc)(void *ptr);
@@ -43,8 +44,8 @@ int NHTTPSetVerifyOption(int connection, int option);
 int NHTTPSetBasicAuthorization(int connection, const char *user, const char *password);
 // Sets the root certificates of a request, count of them; negative when it failed
 int NHTTPSetRootCA(int connection, void *certificates, int count);
-// Creates a connection for a URL with a method (0 to get, 1 to post, 2 to ask for the header) and the buffer that receives
-// the answer, and returns it, 0 when it failed
+// Creates a connection for a URL with a method (0 to get, 1 to post, 2 to ask for the header) and the buffer that
+// receives the answer, and returns it, 0 when it failed
 int NHTTPCreateConnection(const char *url, int method, void *buffer, u32 bufferSize, NHttpCallback callback, void *arg);
 // Destroys a connection; nonzero when it could not, negative for an unknown one
 int NHTTPDestroyConnection(int connection);

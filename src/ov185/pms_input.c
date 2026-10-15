@@ -22,7 +22,6 @@
 // The phrase input: the player writes one word, two words or a sentence, choosing each word from a group of words or
 // from the words of an initial, in a window of words, with the keys or the touch screen. The names are ours, guessed
 
-
 // Where the input is driven from
 #define KEY_MODE_KEY 0
 #define KEY_MODE_TOUCH 1

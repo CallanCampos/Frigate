@@ -21,7 +21,7 @@
 // A room of a floor's grid, x + y * 4
 typedef struct {
     u8 type;
-    u8 kind; // the template's class: 1 for the floor's goal room, 4 for an ordinary room not laid out yet
+    u8 kind;     // the template's class: 1 for the floor's goal room, 4 for an ordinary room not laid out yet
     u32 open[4]; // the passages north, south, east and west
     u8 index;
 } InfinityDungeonRoom;

@@ -46,7 +46,6 @@ static int func_0203e188(NetQueue *queue) {
     return count;
 }
 
-
 static BOOL func_0203e1ac(NetQueueList *list) {
     if (list->head != NULL) {
         NetQueueEntry *next = list->head->next;
@@ -114,7 +113,9 @@ BOOL func_0203e2c0(NetQueue *queue, int command, u8 *data, int size, u32 unused,
         GFL_ASSERT(0);
         return FALSE;
     }
+    // clang-format off
     GFL_ASSERT((u16)size < (0xffff/2));
+    // clang-format on
     if (copy) {
         if (size + NET_QUEUE_HEADER_SIZE >= func_0203e110(queue->ring)) {
             GFL_ASSERT(0);
@@ -223,4 +224,3 @@ BOOL func_0203e478(NetQueue *queue, u16 command) {
     }
     return FALSE;
 }
-

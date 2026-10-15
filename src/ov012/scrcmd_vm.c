@@ -302,7 +302,6 @@ BOOL s001F_VMJumpIf(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-
 BOOL s0020_VMCallIf(VM *vm, FieldScriptEnv *env) {
     u8 condition = VM_Read8(vm);
     u32 offset = VM_Read32(vm);

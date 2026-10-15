@@ -44,7 +44,7 @@ void func_0206ef4c(u16 lockId);
 void func_0206ef58(u16 lockId);
 CARDResult func_0206eecc(void);
 BOOL func_0206f80c(u32 src, u32 dest, u32 size, MIDmaCallback callback, void *arg, BOOL async, CARDRequest request,
-    int retries, CARDRequestMode mode);
+                   int retries, CARDRequestMode mode);
 BOOL func_0206f854(CARDBackupType type);
 BOOL func_0206f888(void);
 // Whether no access to the backup is in progress
@@ -73,9 +73,9 @@ static inline BOOL CARD_ReadBackupAsync(u32 src, void *dest, u32 size, MIDmaCall
 }
 
 static inline BOOL CARD_WriteAndVerifyBackupAsync(u32 dest, const void *src, u32 size, MIDmaCallback callback,
-    void *arg) {
+                                                  void *arg) {
     return func_0206f80c((u32)src, dest, size, callback, arg, TRUE, CARD_REQ_WRITE_BACKUP, CARD_RETRY_COUNT_MAX,
-        CARD_REQUEST_MODE_SEND_VERIFY);
+                         CARD_REQUEST_MODE_SEND_VERIFY);
 }
 
 #endif // POKEBW2_NITRO_CARD_H

@@ -1,11 +1,11 @@
 #include "types.h"
-#include "pml/poke_friendship.h"
 #include "constants/hold_effects.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
 #include "field/zone.h"
 #include "gfl/random.h"
 #include "pml/item.h"
+#include "pml/poke_friendship.h"
 #include "pml/poke_party.h"
 #include "save/high_link.h"
 
@@ -21,6 +21,7 @@
 static void happinessIncrement(PartyPkm *pkm, const s8 *deltas, u16 zoneId, HeapID heapId);
 
 // The change of each reason, by the tier of the Pokémon's friendship
+// clang-format off
 static const s8 sFriendshipDeltas[FRIENDSHIP_REASON_COUNT][FRIENDSHIP_TIER_COUNT] = {
     { 5, 4, 3 },
     { 0, 0, 0 },
@@ -31,6 +32,8 @@ static const s8 sFriendshipDeltas[FRIENDSHIP_REASON_COUNT][FRIENDSHIP_TIER_COUNT
     { 4, 3, 2 },
     { 1, 1, 0 },
 };
+
+// clang-format on
 
 void FriendshipManagerCalc(PartyPkm *pkm, u32 reason, u16 zoneId, u16 heapId) {
     happinessIncrement(pkm, sFriendshipDeltas[reason], zoneId, heapId);

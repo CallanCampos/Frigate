@@ -186,11 +186,11 @@ UnionSubdisp *UnionSubdisp_Create(GameSystem *gsys) {
     }
     func_02042ba8(FALSE, HEAPID_FIELDMAP);
     func_0203e84c();
-    G2S_SetWndOBJInsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_BG3
-                                 | GX_WND_PLANEMASK_OBJ,
+    G2S_SetWndOBJInsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_BG3 |
+                                 GX_WND_PLANEMASK_OBJ,
                              FALSE);
-    G2S_SetWndOutsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_BG3
-                               | GX_WND_PLANEMASK_OBJ,
+    G2S_SetWndOutsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_BG3 |
+                               GX_WND_PLANEMASK_OBJ,
                            TRUE);
     GXS_SetVisibleWnd(GX_WNDMASK_OW);
     return work;
@@ -423,8 +423,8 @@ static void UnionSubdisp_InitIcons(UnionSubdisp *work, ArcTool *arc) {
     setup.sequence = 5;
     setup.x = KNOB_X;
     setup.y = TRACK_BOTTOM;
-    work->actors[ACTOR_KNOB] = func_0204c040(work->unit, work->iconChars, work->iconPalette, work->iconCellAnims, &setup, 1,
-                                             HEAPID_FIELDMAP);
+    work->actors[ACTOR_KNOB] =
+        func_0204c040(work->unit, work->iconChars, work->iconPalette, work->iconCellAnims, &setup, 1, HEAPID_FIELDMAP);
     func_0204c124(work->actors[ACTOR_KNOB], FALSE);
 }
 

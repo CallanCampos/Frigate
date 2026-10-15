@@ -70,8 +70,8 @@ void func_0200b248(TrainerLogSave *log);
 // Puts the entry in the first slot whose value is not above its own, moving the rest down. Returns the slot
 u8 func_0200b26c(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry);
 BOOL func_0200b2fc(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry);
-void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 unk10_17, u8 unk10_18,
-                   u8 unk10_22, u32 id, u16 unk18, u8 unk1A, u8 unk1B_0, u8 unk1B_6);
+void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 unk10_17, u8 unk10_18, u8 unk10_22,
+                   u32 id, u16 unk18, u8 unk1A, u8 unk1B_0, u8 unk1B_6);
 TrainerLogEntry *func_0200b3ec(TrainerLogSave *log, s32 count, u32 id);
 // Counts one more meeting for every entry with the entry's ID
 void func_0200b41c(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry);

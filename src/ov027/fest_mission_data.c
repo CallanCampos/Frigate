@@ -44,7 +44,8 @@ FestMissionData *func_ov027_02170b50(ArcTool *arc, HeapID heapId) {
     s32 i;
     FestMissionData *missions;
 
-    missions = GFL_HeapAllocate(heapId, sizeof(FestMissionData) * FEST_MISSION_COUNT, TRUE, "fest_mission_data.c", 0x91);
+    missions =
+        GFL_HeapAllocate(heapId, sizeof(FestMissionData) * FEST_MISSION_COUNT, TRUE, "fest_mission_data.c", 0x91);
     for (i = 0; i < FEST_MISSION_COUNT; i++) {
         func_ov027_02170b24(arc, i, &missions[i]);
     }

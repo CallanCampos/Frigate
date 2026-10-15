@@ -1,10 +1,10 @@
 #include "types.h"
-#include "save/trainer_log.h"
 #include "gfl/random.h"
 #include "gfl/rtc_cache.h"
 #include "gfl/std.h"
 #include "nitro/fx.h"
 #include "save/save_control.h"
+#include "save/trainer_log.h"
 #include "system/str_tool.h"
 
 // The log of thirty trainers met, in the order of the value the scripts match against a fortune drawn from the
@@ -186,8 +186,8 @@ BOOL func_0200b2fc(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry)
     return FALSE;
 }
 
-void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 unk10_17, u8 unk10_18,
-                   u8 unk10_22, u32 id, u16 unk18, u8 unk1A, u8 unk1B_0, u8 unk1B_6) {
+void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 unk10_17, u8 unk10_18, u8 unk10_22,
+                   u32 id, u16 unk18, u8 unk1A, u8 unk1B_0, u8 unk1B_6) {
     sys_memset(entry, 0, sizeof(TrainerLogEntry));
     wcharsncpy(name, entry->name, 8);
     entry->value = value;

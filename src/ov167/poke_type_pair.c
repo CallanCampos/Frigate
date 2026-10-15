@@ -6,7 +6,6 @@ PokeTypePair PokeTypePair_Make(u32 type1, u32 type2) {
     return ((type1 & 0xff) << 8) | (type2 & 0xff);
 }
 
-
 PokeTypePair func_ov167_021ce530(u32 type) {
     return PokeTypePair_Make(type, type);
 }

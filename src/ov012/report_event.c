@@ -95,7 +95,8 @@ u32 EventSave_Update(EventSaveWork *work, u32 *state) {
         if (FieldSubscreen_IsReady(Field_GetSubscreen(work->field)) == TRUE &&
             func_ov036_02198b04(Field_GetSubscreen(work->field)) == TRUE) {
             work->report = GFL_HeapAllocate(work->heapId, sizeof(ReportWork), FALSE, "report_event.c", 159);
-            work->report->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, work->heapId);
+            work->report->msgData =
+                GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520, work->heapId);
             work->report->strbuf = GFL_StrBufCreate(0x200, work->heapId);
             work->report->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 1, 4);
             work->report->cursor = KeyCursor_Create(0xf, 1, 1, work->heapId);
@@ -290,8 +291,9 @@ static void func_ov012_02163f50(EventSaveWork *work) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->report->window.window), 15);
     BmpWin_DrawFrame(work->report->window.window, 2, 1, 13);
     report = work->report;
-    work->report->stream = func_02022268(report->window.window, 0, 0, report->strbuf, func_ov036_0218799c(work->msgBgSys),
-                                         func_02017bcc(), report->tcbManager, 10, work->heapId, 15);
+    work->report->stream =
+        func_02022268(report->window.window, 0, 0, report->strbuf, func_ov036_0218799c(work->msgBgSys), func_02017bcc(),
+                      report->tcbManager, 10, work->heapId, 15);
     work->report->continued = FALSE;
     window = work->report->window.window;
     BmpWin_Transfer(window);
@@ -378,7 +380,7 @@ static void func_ov012_02164150(EventSaveWork *work) {
     work->report->items[1].type = 0;
     GFL_MsgDataFree(msgData);
     work->report->menuRes = AppTaskMenuRes_Create(6, 14, func_ov036_0218799c(work->msgBgSys),
-                                          func_ov036_02187998(work->msgBgSys), work->heapId);
+                                                  func_ov036_02187998(work->msgBgSys), work->heapId);
 }
 
 static void func_ov012_021641c0(EventSaveWork *work) {

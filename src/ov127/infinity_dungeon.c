@@ -45,7 +45,8 @@ typedef struct {
 typedef u32 (*InfinityDungeonNpcScriptFunc)(InfinityDungeonNpcScriptArg *arg);
 
 static const u16 *InfinityDungeon_GetWallProps(InfinityDungeon *dungeon);
-static void InfinityDungeonRoomChange_CreateTrainerActor(const InfinityDungeonRoomChange *roomChange, const InfinityDungeonPos *pos);
+static void InfinityDungeonRoomChange_CreateTrainerActor(const InfinityDungeonRoomChange *roomChange,
+                                                         const InfinityDungeonPos *pos);
 static BOOL func_ov127_021f00a8(KeyDataSave *keyData, InfinityDungeon *dungeon);
 static void func_ov127_021f0190(KeyDataSave *keyData, InfinityDungeon *dungeon);
 static u32 func_ov127_021f031c(InfinityDungeon *dungeon);
@@ -69,13 +70,12 @@ static const u16 sWhiteWallProps[INFINITY_DUNGEON_WALL_COUNT] = { 0x97, 0x9d, 0x
 static const u16 sBlackWallProps[INFINITY_DUNGEON_WALL_COUNT] = { 0x96, 0x9a, 0x99, 0x9b };
 
 static const u16 sBlack2Trainers0[32] = {
-    0x38, 0x271, 0x280, 0x1e, 0x28, 0x26, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1,
+    0x38, 0x271, 0x280, 0x1e, 0x28, 0x26, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 };
 
 static const u16 sBlack2Trainers1[32] = {
-    0x67, 0x6c, 0x74, 0x5d, 0x62, 0x75, 0x281, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1,
+    0x67, 0x6c, 0x74, 0x5d, 0x62, 0x75, 0x281, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1,    1,    1,    1,    1,    1,    1,     1, 1, 1, 1, 1, 1, 1, 1, 1,
 };
 
 static const u16 sBlack2Specials1[32] = {
@@ -98,8 +98,8 @@ static const u16 sBlack2Specials0[32] = {
 };
 
 static const u16 sWhite2Trainers1[32] = {
-    0x42, 0x3f, 0x4e, 0x44, 0x50, 0x46, 0x28b, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1,
+    0x42, 0x3f, 0x4e, 0x44, 0x50, 0x46, 0x28b, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1,    1,    1,    1,    1,    1,    1,     1, 1, 1, 1, 1, 1, 1, 1, 1,
 };
 
 static const u16 sWhite2Specials1[32] = {
@@ -199,7 +199,8 @@ static const u16 *InfinityDungeon_GetWallProps(InfinityDungeon *dungeon) {
 }
 
 // Puts a wall prop in each passage of the room that is closed
-void InfinityDungeonRoomChange_CreateWalls(InfinityDungeonRoomChange *roomChange, InfinityDungeonRoom *room, u32 floor, u32 roomIndex) {
+void InfinityDungeonRoomChange_CreateWalls(InfinityDungeonRoomChange *roomChange, InfinityDungeonRoom *room, u32 floor,
+                                           u32 roomIndex) {
     const u16 *props = InfinityDungeon_GetWallProps(roomChange->dungeon);
     InfinityDungeonGimmick *gimmick = Field_GetGimmickWorkBlock(roomChange->field, 0);
     SRTMatrix matrix;
@@ -214,17 +215,21 @@ void InfinityDungeonRoomChange_CreateWalls(InfinityDungeonRoomChange *roomChange
     if (room->kind != ROOM_KIND_GOAL) {
         if (room->kind != ROOM_KIND_START) {
             if (!func_ov127_021f093c(roomChange->dungeon, floor, roomIndex) && room->open[0] == 0) {
-                InfinityDungeonGimmick_SetWall(gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[0], &matrix), 0);
+                InfinityDungeonGimmick_SetWall(
+                    gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[0], &matrix), 0);
             }
         }
         if (room->open[1] == 0) {
-            InfinityDungeonGimmick_SetWall(gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[1], &matrix), 1);
+            InfinityDungeonGimmick_SetWall(
+                gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[1], &matrix), 1);
         }
         if (room->open[3] == 0) {
-            InfinityDungeonGimmick_SetWall(gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[3], &matrix), 3);
+            InfinityDungeonGimmick_SetWall(
+                gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[3], &matrix), 3);
         }
         if (room->open[2] == 0) {
-            InfinityDungeonGimmick_SetWall(gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[2], &matrix), 2);
+            InfinityDungeonGimmick_SetWall(
+                gimmick, FieldPropSystem_CreateHandleNew(roomChange->propSystem, props[2], &matrix), 2);
         }
     }
 }
@@ -284,19 +289,21 @@ void InfinityDungeonRoomChange_CreateTrainers(InfinityDungeonRoomChange *roomCha
     }
 }
 
-static void InfinityDungeonRoomChange_CreateTrainerActor(const InfinityDungeonRoomChange *roomChange, const InfinityDungeonPos *pos) {
+static void InfinityDungeonRoomChange_CreateTrainerActor(const InfinityDungeonRoomChange *roomChange,
+                                                         const InfinityDungeonPos *pos) {
     FieldActor *actor = CreateNewActorByParam(roomChange->actorSystem, pos->x, pos->z, DIR_UP, 0xd1, 0xb9, 0,
                                               roomChange->destination.zoneId);
     SetActorSCRID(actor, 2000);
 }
 
 void func_ov127_021efd60(GameSystem *gsys, InfinityDungeon *dungeon) {
-    InfinityDungeonRoomChange *roomChange =
-        GFL_HeapAllocate(HEAPID_TAIL(HEAPID_FIELDMAP), sizeof(InfinityDungeonRoomChange), TRUE, "infinity_dungeon.c", 1095);
+    InfinityDungeonRoomChange *roomChange = GFL_HeapAllocate(
+        HEAPID_TAIL(HEAPID_FIELDMAP), sizeof(InfinityDungeonRoomChange), TRUE, "infinity_dungeon.c", 1095);
 
     roomChange->dungeon = dungeon;
     InfinityDungeonRoomChange_Init(roomChange, gsys);
-    InfinityDungeonRoomChange_CreateWalls(roomChange, InfinityDungeonRoomChange_GetRoom(roomChange), roomChange->floor, roomChange->room);
+    InfinityDungeonRoomChange_CreateWalls(roomChange, InfinityDungeonRoomChange_GetRoom(roomChange), roomChange->floor,
+                                          roomChange->room);
     GFL_HeapFree(roomChange);
 }
 
@@ -332,9 +339,9 @@ void func_ov127_021efde0(InfinityDungeonRoomChange *roomChange, InfinityDungeonR
 
             if (trainerId != INFINITY_DUNGEON_TRAINER_NONE) {
                 u16 objCode = func_ov012_02162b0c(INFINITY_DUNGEON_ARC_TRAINERS, trainerId, roomChange->heapId);
-                FieldActor *actor = CreateNewActorByParam(roomChange->actorSystem, roomNpc->x, roomNpc->y,
-                                                          npc->direction, 176 + slot, objCode, npc->moveCode,
-                                                          destination->zoneId);
+                FieldActor *actor =
+                    CreateNewActorByParam(roomChange->actorSystem, roomNpc->x, roomNpc->y, npc->direction, 176 + slot,
+                                          objCode, npc->moveCode, destination->zoneId);
 
                 SetActorEvType(actor, npc->evType);
                 SetActorUserParam(actor, npc->userParam0, 0);
@@ -464,8 +471,10 @@ static void func_ov127_021f0190(KeyDataSave *keyData, InfinityDungeon *dungeon) 
     }
     mode = func_02010274(keyData, index);
     {
-        const u16 *white2Lists[2][2] = { { sWhite2Trainers0, sWhite2Specials0 }, { sWhite2Trainers1, sWhite2Specials1 } };
-        const u16 *black2Lists[2][2] = { { sBlack2Trainers0, sBlack2Specials0 }, { sBlack2Trainers1, sBlack2Specials1 } };
+        const u16 *white2Lists[2][2] = { { sWhite2Trainers0, sWhite2Specials0 },
+                                         { sWhite2Trainers1, sWhite2Specials1 } };
+        const u16 *black2Lists[2][2] = { { sBlack2Trainers0, sBlack2Specials0 },
+                                         { sBlack2Trainers1, sBlack2Specials1 } };
 
         sys_memset(dungeon->trainerIds, 0, sizeof(dungeon->trainerIds));
         sys_memset(dungeon->specialTrainers, 0, sizeof(dungeon->specialTrainers));
@@ -776,7 +785,8 @@ static u32 func_ov127_021f0798(InfinityDungeonNpcScriptArg *arg) {
     BSubwayTrainer trainer;
     u16 *trainerData = func_ov012_021628c0(
         &trainer, INFINITY_DUNGEON_ARC_TRAINERS,
-        InfinityDungeon_GetTrainerId(arg->dungeon, arg->dungeon->targetFloor, arg->dungeon->targetSlot), 0x35, HEAPID_FIELDMAP);
+        InfinityDungeon_GetTrainerId(arg->dungeon, arg->dungeon->targetFloor, arg->dungeon->targetSlot), 0x35,
+        HEAPID_FIELDMAP);
     u16 trainerClass = trainerData[0];
 
     GFL_HeapFree(trainerData);
@@ -794,7 +804,8 @@ static u32 func_ov127_021f07e4(InfinityDungeonNpcScriptArg *arg) {
     int i;
 
     for (i = 0; i < InfinityDungeon_GetRoomNpcCount(rooms[room].type); i++) {
-        if (func_ov127_021f0db4(arg->dungeon, floor, InfinityDungeon_GetTrainerSlot(arg->dungeon, floor, room, i)) == TRUE) {
+        if (func_ov127_021f0db4(arg->dungeon, floor, InfinityDungeon_GetTrainerSlot(arg->dungeon, floor, room, i)) ==
+            TRUE) {
             const InfinityDungeonNpc *npc = InfinityDungeon_GetNpc(roomTemplate->npcs[i].npc);
 
             return npc->script + arg->npcIndex;
@@ -877,13 +888,13 @@ static const u16 sRewardWeightsRank0to4[6] = {
 };
 
 static const u16 sRewardItemsRank9[7] = {
-    ITEM_POMEG_BERRY, ITEM_KELPSY_BERRY, ITEM_QUALOT_BERRY, ITEM_HONDEW_BERRY, ITEM_GREPA_BERRY, ITEM_TAMATO_BERRY,
-    ITEM_RARE_CANDY,
+    ITEM_POMEG_BERRY, ITEM_KELPSY_BERRY, ITEM_QUALOT_BERRY, ITEM_HONDEW_BERRY,
+    ITEM_GREPA_BERRY, ITEM_TAMATO_BERRY, ITEM_RARE_CANDY,
 };
 
 static const u16 sRewardItemsRank5to8[7] = {
-    ITEM_HEALTH_WING, ITEM_MUSCLE_WING, ITEM_RESIST_WING, ITEM_GENIUS_WING, ITEM_CLEVER_WING, ITEM_SWIFT_WING,
-    ITEM_RARE_CANDY,
+    ITEM_HEALTH_WING, ITEM_MUSCLE_WING, ITEM_RESIST_WING, ITEM_GENIUS_WING,
+    ITEM_CLEVER_WING, ITEM_SWIFT_WING,  ITEM_RARE_CANDY,
 };
 
 static const u16 sRewardWeightsRank5to8[7] = {

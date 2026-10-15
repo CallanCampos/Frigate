@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/memory_link_savedata.h"
 #include "gfl/std.h"
+#include "save/memory_link_savedata.h"
 #include "save/musical_savedata.h"
 #include "system/str_tool.h"
 
@@ -31,6 +31,7 @@ static const u32 sMemoryEventWorks[MEMORY_LINK_MEMORY_COUNT] = {
     0x4045, 0x4046, 0x4047, 0x4048, 0x4049, 0x404a, 0x404b, 0x404c,
 };
 
+// clang-format off
 static const MemoryLinkCondition sMemoryConditions[MEMORY_LINK_MEMORY_COUNT] = {
     { 8, func_02010b90 },
     { 13, func_02010b90 },
@@ -41,6 +42,8 @@ static const MemoryLinkCondition sMemoryConditions[MEMORY_LINK_MEMORY_COUNT] = {
     { 1, func_02010bcc },
     { 0, func_02010b90 },
 };
+
+// clang-format on
 
 void zero476Bytes(MemoryLinkSave *link) {
     sys_memset(link, 0, sizeof(MemoryLinkSave));
@@ -78,8 +81,8 @@ BOOL func_0201090c(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl
         if (changed & (1 << i)) {
             const MemoryLinkPlayer *player = &link->players[i];
 
-            if (data->player.id != player->id || !wcharscmp(player->name, data->player.name)
-                || data->player.gender != player->gender || data->player.unk15 != player->unk15) {
+            if (data->player.id != player->id || !wcharscmp(player->name, data->player.name) ||
+                data->player.gender != player->gender || data->player.unk15 != player->unk15) {
                 result = FALSE;
                 break;
             }
@@ -162,8 +165,8 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
             }
         }
     }
-    return changed[MEMORY_LINK_PART_EVENTS] | (changed[MEMORY_LINK_PART_MUSICAL] << 1)
-        | (changed[MEMORY_LINK_PART_UNK2C] << 2);
+    return changed[MEMORY_LINK_PART_EVENTS] | (changed[MEMORY_LINK_PART_MUSICAL] << 1) |
+           (changed[MEMORY_LINK_PART_UNK2C] << 2);
 }
 
 u32 func_02010b0c(MemoryLinkSave *link, u32 kind, void *dest) {

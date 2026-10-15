@@ -305,4 +305,3 @@ static BOOL NetDevWireless_UnkBC(void) {
 static void NetDevWireless_UnkC0(int a0) {
     func_ov030_021740f0(a0);
 }
-

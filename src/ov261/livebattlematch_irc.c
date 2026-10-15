@@ -44,6 +44,7 @@ static void LiveBattleMatchIrc_OnUnused(int netId, int size, const void *data, v
 static void LiveBattleMatchIrc_OnReady(int netId, int size, const void *data, void *work, NetHandle *handle);
 static BOOL LiveBattleMatchIrc_OnLinkChanged(int a, int b);
 
+// clang-format off
 static const NetCommand sLiveBattleMatchIrcCommands[LIVEBATTLEMATCH_IRC_COMMAND_NUM] = {
     {LiveBattleMatchIrc_OnPlayerData, LiveBattleMatchIrc_GetBuffer},
     {LiveBattleMatchIrc_OnParty, LiveBattleMatchIrc_GetBuffer},
@@ -51,6 +52,9 @@ static const NetCommand sLiveBattleMatchIrcCommands[LIVEBATTLEMATCH_IRC_COMMAND_
     {LiveBattleMatchIrc_OnReady, LiveBattleMatchIrc_GetBuffer},
 };
 
+// clang-format on
+
+// clang-format off
 static const GFLNetInitData sLiveBattleMatchIrcNetInit = {
     NULL,
     0,
@@ -89,6 +93,8 @@ static const GFLNetInitData sLiveBattleMatchIrcNetInit = {
     0,
 };
 
+// clang-format on
+
 // Whether the other machine is still linked, which the link reports
 static int sLiveBattleMatchIrcIsLinked = TRUE;
 
@@ -98,7 +104,8 @@ LiveBattleMatchIrc *LiveBattleMatchIrc_Create(GameData *gameData, HeapID heapId)
     sys_memset(irc, 0, sizeof(LiveBattleMatchIrc));
     irc->heapId = heapId;
     if (func_02042788()) {
-        func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands, LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
+        func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands,
+                      LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
     }
     return irc;
 }
@@ -145,7 +152,8 @@ int LiveBattleMatchIrc_StepLink(LiveBattleMatchIrc *irc) {
         }
         break;
     case 2:
-        func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands, LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
+        func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands,
+                      LIVEBATTLEMATCH_IRC_COMMAND_NUM, irc);
         NetDevIrc_SetPeerFilter(LiveBattleMatchIrc_OnLinkChanged);
         irc->state = 3;
         break;

@@ -780,8 +780,10 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
             ArcTool *handle = GFL_ArcSysCreateFileHandle(7, HEAPID_TAIL(heapId));
             ClActorSetup setup;
 
-            p_wk->pokeIconPlt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, HEAPID_TAIL(heapId));
-            p_wk->pokeIconCel = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
+            p_wk->pokeIconPlt =
+                func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, HEAPID_TAIL(heapId));
+            p_wk->pokeIconCel =
+                func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
             p_wk->pokeIconChr = func_0204b81c(handle, PokeParty_GetIconIndex(species, form, gender, egg), FALSE,
                                               CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
             GFL_ArcToolFree(handle);

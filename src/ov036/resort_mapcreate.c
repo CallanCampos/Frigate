@@ -27,16 +27,14 @@ void func_ov036_021c8984(ResortMapCreateWork *work, u16 zoneId, JoinAvenueInfo *
     work->occupants = occupants;
 }
 
-u32 func_ov036_021c898c(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk,
-                        HeapID heapId) {
+u32 func_ov036_021c898c(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk, HeapID heapId) {
     if (IsZoneJoinAvenue(work->zoneId)) {
         return func_ov036_021c89cc(work, map, a2, a3, count, chunk, heapId);
     }
     return count;
 }
 
-u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk,
-                        HeapID heapId) {
+u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk, HeapID heapId) {
     void *shops = ResortShopData_Load(HEAPID_TAIL(work->heapId));
     void *table = ResortBinary_Load(3, 4, HEAPID_TAIL(work->heapId));
     s32 i;
@@ -65,7 +63,8 @@ u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, void *a2, void *a3
                 y = row % 32;
                 srcY = 0;
                 addBuildings = TRUE;
-                patch = ReadLandDataPatchA154Data(ResortShopData_GetShopParam(shop, i % 2 == 1 ? 6 : 7), HEAPID_TAIL(heapId));
+                patch = ReadLandDataPatchA154Data(ResortShopData_GetShopParam(shop, i % 2 == 1 ? 6 : 7),
+                                                  HEAPID_TAIL(heapId));
                 if (chunk == rowChunk) {
                     if (y + 7 >= 32) {
                         rows = 32 - y;

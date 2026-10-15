@@ -6,7 +6,6 @@
 #include "types.h"
 #include "struct_decls.h"
 
-
 GameEvent *CheckAbyssalRuinsStepEvent(GameSystem *gsys, Field *field);
 
 #endif // POKEBW2_FIELD_EVENT_ABYSSAL_RUINS_H

@@ -2,9 +2,9 @@
 #define POKEBW2_APP_T_DOWNLOAD_T_DOWNLOAD_SAVE_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "app/t_download/t_download_local.h"
 #include "gfl/str.h"
+#include "struct_decls.h"
 
 // t_download_save.c: the tournaments kept in the save's extra blocks and those received, and saving one, named after
 // the ROM's "t_download_save.c"

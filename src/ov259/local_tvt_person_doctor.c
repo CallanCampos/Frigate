@@ -81,11 +81,14 @@ static const LocalTvtEvolutionMsg sLocalTvtItemMsgs[] = {
     { ITEM_WATER_STONE, 46 },  { ITEM_LEAF_STONE, 47 }, { ITEM_SHINY_STONE, 48 }, { ITEM_DUSK_STONE, 49 },
 };
 
+// clang-format off
 static const LocalTvtEvolutionMsg sLocalTvtTradeItemMsgs[] = {
     { ITEM_UP_GRADE, 29 },     { ITEM_KINGS_ROCK, 30 },   { ITEM_DEEP_SEA_TOOTH, 31 }, { ITEM_DEEP_SEA_SCALE, 32 },
     { ITEM_METAL_COAT, 33 },   { ITEM_DRAGON_SCALE, 34 }, { ITEM_PROTECTOR, 35 },      { ITEM_ELECTIRIZER, 36 },
     { ITEM_MAGMARIZER, 37 },   { ITEM_DUBIOUS_DISC, 38 }, { ITEM_REAPER_CLOTH, 39 },
 };
+
+// clang-format on
 
 // The species that evolve in more than one way
 static const LocalTvtEvolutionMsg sLocalTvtSpeciesMsgs[] = {

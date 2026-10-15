@@ -19,5 +19,4 @@ BOOL s027F_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *env);
 BOOL func_ov033_021772c8(VM *vm, FieldScriptEnv *env);
 BOOL func_ov033_021772f4(VM *vm, FieldScriptEnv *env);
 
-
 #endif // POKEBW2_FIELD_FUNFEST_SCRIPTS_H

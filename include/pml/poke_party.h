@@ -288,8 +288,9 @@ BOOL PokeParty_SwapPkms(PokeParty *party, u32 indexA, u32 indexB, HeapID heapId)
 // Reorders the party: order[i] is the index of the Pokémon that goes to position i
 void func_0201fff8(PokeParty *party, u32 *order, HeapID heapId);
 void PokeParty_RecoverAll(PokeParty *party);
-// A Pokémon's icon in archive 7: its file, and the palette of the file PokeIcon_GetPaletteFile returns that it uses. The cells
-// and animations depend on the sub engine's OBJ VRAM mapping: PokeIcon_GetCellFile_Sub and getOBJTileMapping_SubEng return them
+// A Pokémon's icon in archive 7: its file, and the palette of the file PokeIcon_GetPaletteFile returns that it uses.
+// The cells and animations depend on the sub engine's OBJ VRAM mapping: PokeIcon_GetCellFile_Sub and
+// getOBJTileMapping_SubEng return them
 u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg);
 u8 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
 u32 PokeIcon_GetPaletteFile(void);

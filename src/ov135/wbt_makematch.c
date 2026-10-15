@@ -52,10 +52,7 @@ typedef union {
 } WbtBracketEntry;
 
 // The slots of the save's downloaded tournaments; slot 0 is none
-typedef enum {
-    WBT_DOWNLOAD_SLOT_FIRST = 1,
-    WBT_DOWNLOAD_SLOT_END = 4
-} WbtDownloadSlot;
+typedef enum { WBT_DOWNLOAD_SLOT_FIRST = 1, WBT_DOWNLOAD_SLOT_END = 4 } WbtDownloadSlot;
 
 #define WBT_STATUS_UNUSED 0
 #define WBT_STATUS_CANDIDATE 1
@@ -93,12 +90,12 @@ static void WbtMakeMatch_PickBracket(GameData *gameData, WbtMatchParam *param, W
 static void WbtMakeMatch_ShuffleEntrants(MATHRandContext32 *rand, WbtEntrant **items, u32 count);
 static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID heapId);
 static void WbtEntrant_Set(WbtEntrant *entrant, u32 unk0_0, u32 unk2, u8 unk0_3, u8 rank, u8 unk3_0, u8 unk3_6,
-                                BOOL unk0_7, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12);
+                           BOOL unk0_7, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12);
 static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *entrant, u32 index);
 static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *gameData);
 static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTrainer *trainer, u32 unk3_6, u8 rank);
-static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index, WbtDownloadedTrainer *trainer,
-                                u32 unk3_6, u32 rank);
+static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index,
+                                             WbtDownloadedTrainer *trainer, u32 unk3_6, u32 rank);
 static void WbtMakeMatch_SetEntrants(WbtSystem *sys, GameData *gameData, WbtBracketEntry *result);
 static BOOL WbtMakeMatch_IsDownloadValid(GameData *gameData, u32 slot);
 static void WbtMakeMatch_ClearDownload(WbtSystem *sys);
@@ -516,7 +513,7 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
 }
 
 static void WbtEntrant_Set(WbtEntrant *entrant, u32 unk0_0, u32 unk2, u8 unk0_3, u8 rank, u8 unk3_0, u8 unk3_6,
-                                BOOL unk0_7, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12) {
+                           BOOL unk0_7, u8 type, u16 objCode, u16 trainerClass, u8 unk6_12) {
     entrant->unk0_0 = unk0_0;
     entrant->unk2 = unk2;
     entrant->unk0_3 = unk0_3;
@@ -536,7 +533,7 @@ static void WbtEntrant_SetFromTable(WbtSystem *sys, HeapID heapId, WbtEntrant *e
 
     func_ov055_021e6440(sys->trainers, index, &trainer);
     WbtEntrant_Set(entrant, 0, index, trainer.gender, trainer.unk8_0, trainer.unk8_3, 0, trainer.unkE != 0,
-                        trainer.type, trainer.unk2, trainer.trainerClass, 15);
+                   trainer.type, trainer.unk2, trainer.trainerClass, 15);
     func_ov055_021e6388(heapId, index, entrant->name);
 }
 
@@ -556,7 +553,7 @@ static void WbtEntrant_SetPlayer(WbtEntrant *entrant, WbtSystem *sys, GameData *
         isFemale = 1;
     }
     WbtEntrant_Set(entrant, 3, 0, gender, rank, 0, 0, FALSE, func_ov055_021e64f0(sys->partyBC, sys->seed), objCode,
-                        isFemale, 1);
+                   isFemale, 1);
     textCopy(playerInfo->name, entrant->name);
 }
 
@@ -566,20 +563,20 @@ static void WbtEntrant_SetDownloaded(WbtEntrant *entrant, const WbtDownloadedTra
     u32 objCode = func_ov012_02162b38(trainerClass);
 
     WbtEntrant_Set(entrant, 1, 0, TrainerClass_GetSex(trainerClass), rank, 0, unk3_6, FALSE, TYPE_NULL, objCode,
-                        trainerClass, trainer->unk3DC);
+                   trainerClass, trainer->unk3DC);
     GFL_StrBufLoadFixedString(entrant->name, trainer->name, 14);
     GFL_StrBufLoadFixedString(entrant->unkC, trainer->className, 22);
 }
 
 // A Trainer of the table that a downloaded tournament uses in place of one of its own; the original takes the
 // downloaded Trainer and a rank too, and does nothing with them
-static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index, WbtDownloadedTrainer *trainer,
-                                u32 unk3_6, u32 rank) {
+static void WbtEntrant_SetTableForDownloaded(WbtEntrant *entrant, WbtSystem *sys, u8 index,
+                                             WbtDownloadedTrainer *trainer, u32 unk3_6, u32 rank) {
     WbtTrainer table;
 
     func_ov055_021e6440(sys->trainers, index, &table);
-    WbtEntrant_Set(entrant, 2, index, table.gender, table.unk8_0, table.unk8_3, unk3_6, FALSE, table.type,
-                        table.unk2, table.trainerClass, 15);
+    WbtEntrant_Set(entrant, 2, index, table.gender, table.unk8_0, table.unk8_3, unk3_6, FALSE, table.type, table.unk2,
+                   table.trainerClass, 15);
     func_ov055_021e6388(sys->heapId, index, entrant->name);
 }
 

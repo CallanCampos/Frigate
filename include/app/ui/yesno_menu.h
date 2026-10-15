@@ -2,10 +2,10 @@
 #define POKEBW2_APP_UI_YESNO_MENU_H
 
 #include "types.h"
+#include "app/ui/ui_scene.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
 #include "gfl/str.h"
-#include "app/ui/ui_scene.h"
 #include "struct_decls.h"
 #include "system/printsys.h"
 
@@ -66,7 +66,7 @@ struct TwoChoiceMenu {
 
 // textBg is the BG of the text and priority its priority; the art is on the BG above it. Sub screen BGs are above 3
 TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32 palette, u8 objPalette,
-                                   ClActUnit *unit, Font *font, PrintQueue *queue, u32 a8);
+                                    ClActUnit *unit, Font *font, PrintQueue *queue, u32 a8);
 void TwoChoiceMenu_Free(TwoChoiceMenu *menu);
 // Opens the menu with the two choices
 void TwoChoiceMenu_Open(TwoChoiceMenu *menu, StrBuf *first, StrBuf *second);

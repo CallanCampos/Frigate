@@ -1,11 +1,11 @@
 #include "types.h"
-#include "save/traded_pokemon.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "gfl/msg.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
 #include "pml/species_names.h"
+#include "save/traded_pokemon.h"
 #include "system/str_tool.h"
 
 // The Pokémon that the player gave away in the in-game trades, which their new Trainers battle with later. The ROM

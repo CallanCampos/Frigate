@@ -1280,7 +1280,7 @@ static BOOL func_ov167_021b23e4(BtlClient *client) {
         break;
     case 1:
         BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                            0, 0);
+                              0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         Studio_SetSeq(&client->studio, 10, 2);
@@ -1747,7 +1747,7 @@ static BOOL func_ov167_021b2dd8(const BtlScriptedRules *rules, BtlClient *client
         break;
     case 1:
         BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                            0, 0);
+                              0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         func_ov167_021b2dd0(&client->studio, 0);
@@ -1780,7 +1780,7 @@ static BOOL func_ov167_021b2dd8(const BtlScriptedRules *rules, BtlClient *client
         break;
     case 7:
         BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                            0, 0);
+                              0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         BtlvEffect_Start(0x29c);
@@ -1899,7 +1899,7 @@ static BOOL func_ov167_021b3100(BtlClient *client) {
         break;
     case 3:
         BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9, 0,
-                            0, 0);
+                              0, 0);
         BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
         BtlvEffect_Start(0x298);
         Studio_SetSeq(&client->studio, 8, 4);
@@ -4217,8 +4217,8 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
         break;
     case 1:
         if (func_ov167_021d02e8(client->viewCore)) {
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 0)), 9,
-                                0, 0, 0);
+            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 0)),
+                                  9, 0, 0, 0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             *seq = 2;
@@ -4244,8 +4244,8 @@ static BOOL func_ov167_021b6680(BtlClient *client, s32 *seq) {
         break;
     case 4:
         if (!BtlvEffect_IsBusy()) {
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9,
-                                0, 0, 0);
+            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)),
+                                  9, 0, 0, 0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             *seq = 5;
@@ -4362,8 +4362,8 @@ static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
             BtlvEffect_PlayBgm(func_ov167_0219bf00(client->mainModule));
         }
         if (result <= 1) {
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 0)), 9,
-                                0, 0, 0);
+            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 0)),
+                                  9, 0, 0, 0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             ShowTrainerWinLoseMsg(client, result, 0);
@@ -4389,8 +4389,8 @@ static BOOL func_ov167_021b6aac(BtlClient *client, s32 *seq) {
     case 3:
         if (!BtlvEffect_IsBusy()) {
             result = GetBattleResultForClient(client);
-            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)), 9,
-                                0, 0, 0);
+            BtlvEffect_SetTrainer(func_ov167_0219d938(client->mainModule, func_ov167_0219c8b8(client->mainModule, 1)),
+                                  9, 0, 0, 0);
             BtlvMcss_SetAnimation(BtlvEffect_GetMcss(), 9, 1);
             BtlvEffect_Start(0x270);
             ShowTrainerWinLoseMsg(client, result, 1);

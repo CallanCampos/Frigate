@@ -164,6 +164,7 @@ static const FMissionAppDrawObjFile sFMissionAppDrawRecordObjFiles[] = {
     { 3, -1 },
 };
 
+// clang-format off
 static const FMissionAppDrawScreenFile sFMissionAppDrawScreens[] = {
     { 7, 10, 0, FMISSION_APP_MODE_MISSION }, { 6, 8, 0, FMISSION_APP_MODE_MISSION },
     { 3, 13, 0, FMISSION_APP_MODE_MISSION }, { 2, 11, 0, FMISSION_APP_MODE_MISSION },
@@ -172,6 +173,9 @@ static const FMissionAppDrawScreenFile sFMissionAppDrawScreens[] = {
     { 0xff },
 };
 
+// clang-format on
+
+// clang-format off
 static const FMissionAppDrawActorSetup sFMissionAppDrawMissionActorSetups[] = {
     { 6, 64, 1, TRUE, 0, ACTOR_AUTO_ANIM, 0 },  { 7, 64, 1, TRUE, 0, ACTOR_AUTO_ANIM, 1 },
     { 5, 64, 1, TRUE, 0, ACTOR_AUTO_ANIM, 2 },  { 0, 64, 1, TRUE, 0, 0, 3 },
@@ -182,6 +186,9 @@ static const FMissionAppDrawActorSetup sFMissionAppDrawMissionActorSetups[] = {
     { 0xff },
 };
 
+// clang-format on
+
+// clang-format off
 static const FMissionAppDrawActorSetup sFMissionAppDrawResultActorSetups[] = {
     { 7, 64, 1, FALSE, 0, ACTOR_AUTO_ANIM, 5 }, { 5, 64, 1, FALSE, 0, ACTOR_AUTO_ANIM, 6 },
     { 0, 64, 1, FALSE, 0, 0, 8 },               { 0, 64, 1, FALSE, 0, 0, 8 },
@@ -192,6 +199,9 @@ static const FMissionAppDrawActorSetup sFMissionAppDrawResultActorSetups[] = {
     { 8, 64, 1, FALSE, 0, ACTOR_AUTO_ANIM, 10 }, { 0xff },
 };
 
+// clang-format on
+
+// clang-format off
 static const FMissionAppDrawWindowSetup sFMissionAppDrawMissionWindows[] = {
     { 4, 1, 0, 24, 3, 8 },  { 4, 5, 7, 12, 2, 8 },  { 4, 5, 10, 12, 2, 8 }, { 4, 3, 13, 20, 2, 8 },
     { 4, 3, 16, 12, 2, 8 }, { 4, 23, 10, 6, 2, 8 }, { 4, 23, 13, 6, 2, 8 }, { 4, 23, 16, 6, 2, 8 },
@@ -200,6 +210,9 @@ static const FMissionAppDrawWindowSetup sFMissionAppDrawMissionWindows[] = {
     { 5, 2, 21, 28, 2, 8 }, { 5, 34, 21, 28, 2, 8 }, { 0xff },
 };
 
+// clang-format on
+
+// clang-format off
 static const FMissionAppDrawWindowSetup sFMissionAppDrawResultWindows[] = {
     { 4, 1, 0, 24, 3, 8 },  { 4, 5, 5, 12, 2, 8 },  { 4, 3, 8, 20, 2, 8 },   { 4, 3, 11, 12, 2, 8 },
     { 4, 3, 14, 12, 2, 8 }, { 4, 23, 5, 6, 2, 8 },  { 4, 23, 8, 6, 2, 8 },   { 4, 23, 11, 6, 2, 8 },
@@ -208,6 +221,8 @@ static const FMissionAppDrawWindowSetup sFMissionAppDrawResultWindows[] = {
     { 0, 10, 4, 19, 2, 8 }, { 0, 21, 7, 8, 2, 8 },  { 0, 13, 12, 16, 2, 8 }, { 0, 23, 15, 6, 2, 8 },
     { 0, 13, 18, 16, 2, 8 }, { 5, 1, 19, 30, 4, 8 }, { 0xff },
 };
+
+// clang-format on
 
 static const FMissionAppDrawBGFile *sFMissionAppDrawPalettes[FMISSION_APP_MODE_COUNT] = {
     sFMissionAppDrawMissionPalettes,
@@ -778,8 +793,8 @@ int FMissionAppDraw_GetItemRoom(FMissionApp *work, u32 item) {
     if (item == 0) {
         return 0;
     }
-    return PML_ItemGetMaxStorageCount(item)
-         - BagSave_GetItemCountByID(GameData_GetBag(work->param->gameData), item, work->heapId);
+    return PML_ItemGetMaxStorageCount(item) -
+           BagSave_GetItemCountByID(GameData_GetBag(work->param->gameData), item, work->heapId);
 }
 
 void FMissionAppDraw_SetKeyCursor(FMissionApp *work, BOOL shown) {

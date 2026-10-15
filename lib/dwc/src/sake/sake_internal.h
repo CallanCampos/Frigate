@@ -1,9 +1,9 @@
 #ifndef POKEBW2_DWC_SAKE_INTERNAL_H
 #define POKEBW2_DWC_SAKE_INTERNAL_H
 
+#include "dwc/ext.h"
 #include "dwc/sake.h"
 #include "dwc/soap.h"
-#include "dwc/ext.h"
 
 // The parts of Sake that its files share (sake.c, sake_error.c, sake_storage.c and sake_records.c): a request, and the
 // description of each kind of request that tells how to check, write and read it
@@ -80,9 +80,9 @@ struct SakeRequest {
     SakeRequestType *type;
 };
 
-// How a kind of request goes: the size of its answer, the element that carries it, its SOAPAction header, the elements of
-// the answer and of the result in it, and the functions that check the input, write the message, read the answer into
-// the output and free the output's parts. The type also keeps the HTTP request that posts it, which can be stopped
+// How a kind of request goes: the size of its answer, the element that carries it, its SOAPAction header, the elements
+// of the answer and of the result in it, and the functions that check the input, write the message, read the answer
+// into the output and free the output's parts. The type also keeps the HTTP request that posts it, which can be stopped
 struct SakeRequestType {
     int outputSize;
     const char *name;

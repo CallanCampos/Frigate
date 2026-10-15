@@ -211,9 +211,10 @@ static void SubwayMapClAct_VBlank(SubwayMapClAct *clact) {
 static void SubwayMapG3dSys_Init(SubwayMapG3dSys *g3d, HeapID heapId) {
     GFL_G3DSysCreate(FALSE, 1, 0, 1, 0, heapId, SubwayMapGraphic_G3DInit);
     // A 40 degree field of view
-    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
-                                      FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024),
-                                      0, &sSubwayMapCameraPosition, &sSubwayMapCameraUpVector, &sSubwayMapCameraTarget, heapId);
+    g3d->camera =
+        GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)),
+                            FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024), 0, &sSubwayMapCameraPosition,
+                            &sSubwayMapCameraUpVector, &sSubwayMapCameraTarget, heapId);
 }
 
 static void SubwayMapG3dSys_Free(SubwayMapG3dSys *g3d) {

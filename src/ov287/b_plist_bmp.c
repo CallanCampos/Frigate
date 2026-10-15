@@ -663,7 +663,8 @@ static void BPlistBmp_PrintStatusHP(BPlistWork *work, u8 pos) {
 
 static void BPlistBmp_PrintAbilityInfo(BPlistWork *work, u8 pos) {
     BPlistPokemon *pokemon = &work->pokemon[BPlistMain_GetPartySlot(work, pos)];
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_DESCRIPTIONS, work->param->heapId);
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_DESCRIPTIONS, work->param->heapId);
     StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, pokemon->ability);
 
     PrintWindow_Print(&work->windows[2], work->printQueue, 0, 0, str, work->param->font, BPLIST_COLOR_STAT);

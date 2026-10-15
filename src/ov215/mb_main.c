@@ -42,11 +42,14 @@ typedef struct {
     u32 type;
 } MailBoxMenuItem;
 
+// clang-format off
 const BGSysVRAMConfig MailBox_VRAMConfig = {
     GX_VRAM_BG_128_B,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_64_E,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_0_A, GX_VRAM_TEXPLTT_01_FG,   GX_OBJVRAMMODE_CHAR_1D_32K, GX_OBJVRAMMODE_CHAR_1D_32K,
 };
+
+// clang-format on
 
 void MailBox_VBlank(TCB *tcb, void *data) {
     GFL_BGSysUpdate();
@@ -65,61 +68,149 @@ void MailBox_InitBGs(MailBoxWork *work) {
         GFL_BGSysSetLCDConfig(&lcdConfig);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800), GX_BG_CHARBASE(0x18000),
-                       0x4000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xf800),
+                       GX_BG_CHARBASE(0x18000),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       0,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(4, &bg, BGMODE_TEXT);
         GFL_BGSysClearScr(4);
         GFL_BGSysClearCharCore(4, BGSYS_TILE_SIZE_16, 0, HEAPID_MAILBOX_VIEW);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf000), GX_BG_CHARBASE(0x10000),
-                       0x4000, GX_BG_EXTPLTT_01, 1, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xf000),
+                       GX_BG_CHARBASE(0x10000),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       1,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(5, &bg, BGMODE_TEXT);
         GFL_BGSysClearScr(5);
         GFL_BGSysClearCharCore(5, BGSYS_TILE_SIZE_16, 0, HEAPID_MAILBOX_VIEW);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe800), GX_BG_CHARBASE(0x0),
-                       0x4000, GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xe800),
+                       GX_BG_CHARBASE(0x0),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       2,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(6, &bg, BGMODE_TEXT);
         GFL_BGSysClearScr(6);
         GFL_BGSysClearCharCore(6, BGSYS_TILE_SIZE_16, 0, HEAPID_MAILBOX_VIEW);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe000), GX_BG_CHARBASE(0x8000),
-                       0x4000, GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xe000),
+                       GX_BG_CHARBASE(0x8000),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       2,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(7, &bg, BGMODE_TEXT);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800), GX_BG_CHARBASE(0x18000),
-                       0x4000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xf800),
+                       GX_BG_CHARBASE(0x18000),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       0,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(0, &bg, BGMODE_TEXT);
         GFL_BGSysClearScr(0);
         GFL_BGSysClearCharCore(0, BGSYS_TILE_SIZE_16, 0, HEAPID_MAILBOX_VIEW);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf000), GX_BG_CHARBASE(0x10000),
-                       0x4000, GX_BG_EXTPLTT_01, 1, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xf000),
+                       GX_BG_CHARBASE(0x10000),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       1,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(1, &bg, BGMODE_TEXT);
         GFL_BGSysClearScr(1);
         GFL_BGSysClearCharCore(1, BGSYS_TILE_SIZE_16, 0, HEAPID_MAILBOX_VIEW);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe800), GX_BG_CHARBASE(0x0),
-                       0x4000, GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xe800),
+                       GX_BG_CHARBASE(0x0),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       2,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(2, &bg, BGMODE_TEXT);
         GFL_BGSysClearScr(2);
     }
     {
-        BGSetup bg = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe000), GX_BG_CHARBASE(0x0),
-                       0x4000, GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, 0 };
+        BGSetup bg = { 0,
+                       0,
+                       0x800,
+                       0,
+                       BGRES_256x256,
+                       GX_BG_COLORMODE_16,
+                       GX_BG_SCRBASE(0xe000),
+                       GX_BG_CHARBASE(0x0),
+                       0x4000,
+                       GX_BG_EXTPLTT_01,
+                       3,
+                       GX_BG_AREAOVER_XLU,
+                       0 };
 
         GFL_BGSysCreateBG(3, &bg, BGMODE_TEXT);
     }
@@ -379,8 +470,8 @@ void MailBox_LoadMailGraphics(MailBoxWork *work) {
 void MailBox_CreatePMSDraw(MailBoxWork *work) {
     work->view->pmsPrintQueue = func_02021998(HEAPID_MAILBOX_VIEW);
     work->view->pmsClActUnit = func_0204bf1c(8, 2, HEAPID_MAILBOX_VIEW);
-    work->view->pmsDraw = PMSDraw_Create(work->view->pmsClActUnit, CLACT_VRAM_SUB, work->view->pmsPrintQueue, work->font,
-                                         4, 4, HEAPID_MAILBOX_VIEW);
+    work->view->pmsDraw = PMSDraw_Create(work->view->pmsClActUnit, CLACT_VRAM_SUB, work->view->pmsPrintQueue,
+                                         work->font, 4, 4, HEAPID_MAILBOX_VIEW);
     PMSDraw_SetBackColor(work->view->pmsDraw, 0);
 }
 

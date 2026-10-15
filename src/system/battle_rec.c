@@ -1,9 +1,9 @@
 #include "types.h"
-#include "save/battle_rec.h"
 #include "constants/species.h"
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/std.h"
+#include "save/battle_rec.h"
 #include "save/save_control.h"
 #include "save/tournament_block.h"
 #include "system/game_data.h"
@@ -329,7 +329,8 @@ BattleRecHeader *func_0200c0cc(BattleRecVideo *video) {
     return &video->header;
 }
 
-void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body, SaveControl *save) {
+void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body,
+                   SaveControl *save) {
     sys_memcpy(header, &data_02140f64->header, sizeof(BattleRecHeader));
     sys_memcpy(body, &data_02140f64->body, sizeof(BattleRecBody));
     sys_memcpy(profile, data_02140f64->profile, sizeof(data_02140f64->profile));

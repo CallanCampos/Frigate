@@ -15,8 +15,8 @@
 typedef struct PdcWork PdcWork;
 
 // Overlay 172
-PdcWork *PdcWork_Create(GameData *gameData, PartyPkm *pkm, BtlFieldStatus *status, PlayerInfo *playerInfo,
-                             BagSave *bag, TrainerDataSave *trainerData, PokeDexSave *pokedex, HeapID heapId);
+PdcWork *PdcWork_Create(GameData *gameData, PartyPkm *pkm, BtlFieldStatus *status, PlayerInfo *playerInfo, BagSave *bag,
+                        TrainerDataSave *trainerData, PokeDexSave *pokedex, HeapID heapId);
 GameData *PdcWork_GetGameData(const PdcWork *work);
 PartyPkm *PdcWork_GetPkm(const PdcWork *work);
 BtlFieldStatus *PdcWork_GetFieldStatus(const PdcWork *work);

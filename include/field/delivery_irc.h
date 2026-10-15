@@ -1,8 +1,9 @@
 #ifndef POKEBW2_FIELD_DELIVERY_IRC_H
 #define POKEBW2_FIELD_DELIVERY_IRC_H
 
-// Overlay 12's delivery_irc.c: hands out or receives data over infrared, with nearly the same init as delivery_beacon.c.
-// The sender picks the data whose region and mask match the receiver's, and sends it encrypted with its CRC
+// Overlay 12's delivery_irc.c: hands out or receives data over infrared, with nearly the same init as
+// delivery_beacon.c. The sender picks the data whose region and mask match the receiver's, and sends it encrypted with
+// its CRC
 
 #include "types.h"
 #include "field/delivery_beacon.h"

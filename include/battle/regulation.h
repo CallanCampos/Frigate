@@ -82,7 +82,8 @@ BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index);
 void func_0200b760(Regulation *regulation, RegulationUnkAC *out);
 // poke_regulation.c, which the ROM names: checks of Pokémon and parties against a regulation. Names are not swan's
 
-// What a party fails a regulation by, which PokeRegulation_CheckPicked, PokeRegulation_CheckPartyCanEnter and PokeRegulation_CheckParty return
+// What a party fails a regulation by, which PokeRegulation_CheckPicked, PokeRegulation_CheckPartyCanEnter and
+// PokeRegulation_CheckParty return
 enum {
     REGULATION_RESULT_OK,
     // The levels of the Pokémon add up to more than the regulation allows

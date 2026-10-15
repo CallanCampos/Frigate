@@ -202,7 +202,8 @@ typedef struct {
     AppTaskMenuWin *button;
     AppTaskMenu *yesNo;
     u16 unk264;
-    // The sub screen's BG palettes of the three Pokémon and of no choice, the one the fade started from and the shown one
+    // The sub screen's BG palettes of the three Pokémon and of no choice, the one the fade started from and the shown
+    // one
     u16 bgPal[4][0x80];
     u16 bgPalFrom[0x80];
     u16 bgPalNow[0x80];
@@ -392,6 +393,7 @@ static const G3DSceneSetup sPselScene = {
 };
 
 // The three balls, and the button that confirms the choice
+// clang-format off
 static const TouchRect sPselTouchRects[] = {
     { TOUCH_RECT_CIRCLE, 60, 90, 27 },
     { TOUCH_RECT_CIRCLE, 128, 90, 27 },
@@ -399,6 +401,8 @@ static const TouchRect sPselTouchRects[] = {
     { 168, 191, 72, 183 },
     { TOUCH_RECT_END, 0, 0, 0 },
 };
+
+// clang-format on
 
 // The window behind the Pokémon's picture, the message window, and the sub screen's
 static const PselWinSetup sPselWinSetups[3] = {
@@ -420,7 +424,7 @@ static const VecFx32 sPselBallPositions[PSEL_POKE_COUNT] = {
 };
 
 static const PselSeqFunc sPselSeqFuncs[] = {
-    PselSeq_Start,  PselSeq_Init,   PselSeq_Load, PselSeq_FadeIn, PselSeq_Main,
+    PselSeq_Start,   PselSeq_Init,   PselSeq_Load, PselSeq_FadeIn, PselSeq_Main,
     PselSeq_FadeOut, PselSeq_Unload, PselSeq_Free, PselSeq_End,
 };
 
@@ -754,8 +758,8 @@ static void PselPoke_Load(PselWork *wk) {
         u32 species = sPselSpecies[i];
 
         wk->poke[i].res[0].chars = PokeGra_LoadClActChars(pokeArc, species, 0, 0, FALSE, 0, FALSE, 0, 1, wk->heapId);
-        wk->poke[i].res[0].pltt =
-            PokeGra_LoadClActPalette(pokeArc, species, 0, 0, FALSE, 0, FALSE, 1, sPselPokePaletteSlots[i] * 32, wk->heapId);
+        wk->poke[i].res[0].pltt = PokeGra_LoadClActPalette(pokeArc, species, 0, 0, FALSE, 0, FALSE, 1,
+                                                           sPselPokePaletteSlots[i] * 32, wk->heapId);
         wk->poke[i].res[0].cellAnim = PokeGra_LoadClActCellAnims(species, 0, 0, FALSE, 0, FALSE, 0, 1, wk->heapId);
     }
     GFL_ArcToolFree(pokeArc);
@@ -836,8 +840,8 @@ static s16 PselPoke_CalcJump(ClActorPos *pos, ClActorScale *scale, u8 x0, u8 y0,
                              u32 duration, u8 height, u32 frame) {
     f32 x = (f32)x0 + (f32)frame * ((f32)x1 - (f32)x0) / (f32)duration;
     f32 y = (f32)y0 + (f32)frame * ((f32)y1 - (f32)y0) / (f32)duration;
-    f32 jump = (f32)height + -(f32)height * ((f32)frame - (f32)duration / 2.0f) *
-                                 ((f32)frame - (f32)duration / 2.0f) * 4.0f / (f32)duration / (f32)duration;
+    f32 jump = (f32)height + -(f32)height * ((f32)frame - (f32)duration / 2.0f) * ((f32)frame - (f32)duration / 2.0f) *
+                                 4.0f / (f32)duration / (f32)duration;
     f32 size = (f32)scale0 + (f32)frame * ((f32)scale1 - (f32)scale0) / (f32)duration;
     s16 posX = x;
     s16 posY = y - jump;
@@ -1259,8 +1263,8 @@ static void PselText_Init(PselWork *wk) {
     GFL_TextRndUpdateColorIndexLUT(15, 2, 0);
     for (i = 0; i < 3; i++) {
         wk->win[i] = BmpWin_CreateDynamic(sPselWinSetups[i].bg, sPselWinSetups[i].x, sPselWinSetups[i].y,
-                                          sPselWinSetups[i].width, sPselWinSetups[i].height,
-                                          sPselWinSetups[i].palette, sPselWinSetups[i].fromEnd);
+                                          sPselWinSetups[i].width, sPselWinSetups[i].height, sPselWinSetups[i].palette,
+                                          sPselWinSetups[i].fromEnd);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->win[i]), 0);
         BmpWin_FlushChar(wk->win[i]);
         wk->winDone[i] = TRUE;

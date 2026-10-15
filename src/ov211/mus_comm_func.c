@@ -1,5 +1,4 @@
 #include "field/mus_comm_func.h"
-#include "save/musical_savedata.h"
 #include "types.h"
 #include "app/musical/musical_system.h"
 #include "constants/sound.h"
@@ -11,6 +10,7 @@
 #include "gfl/sound.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
+#include "save/musical_savedata.h"
 #include "save/player_info.h"
 #include "save/save_control.h"
 #include "system/game_comm.h"
@@ -227,6 +227,7 @@ static void *MusComm_GetScriptBuffer(int netId, void *work, int size);
 static BOOL MusComm_SendPositions(MusCommWork *work);
 static void MusComm_CheckData(void *data, u32 size, u32 kind);
 
+// clang-format off
 static const NetCommand sMusCommCommands[] = {
     {MusComm_RecvMsg, NULL},
     {MusComm_RecvPlayerData, MusComm_GetPlayerDataBuffer},
@@ -239,6 +240,9 @@ static const NetCommand sMusCommCommands[] = {
     {MusComm_RecvScript, MusComm_GetScriptBuffer},
 };
 
+// clang-format on
+
+// clang-format off
 static GFLNetInitData sMusCommInitData = {
     sMusCommCommands,
     NELEMS(sMusCommCommands),
@@ -276,6 +280,8 @@ static GFLNetInitData sMusCommInitData = {
     0x1a0,
     0,
 };
+
+// clang-format on
 
 void func_ov211_021ef1e0(HeapID heapId, GameSystem *gsys, GameCommSys *comm, u16 value) {
     MusCommWork *work = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MusCommWork), TRUE, "mus_comm_func.c", 332);
@@ -412,10 +418,10 @@ void func_ov211_021ef3e4(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameC
         comm->players[i].equipRequested = FALSE;
         comm->players[i].equipRequest = MUS_COMM_EQUIP_NONE;
         comm->players[i].equipUsed = MUS_COMM_EQUIP_NONE;
-        comm->players[i].poke =
-            GFL_HeapAllocate(comm->heapId, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke), FALSE, "mus_comm_func.c", 526);
+        comm->players[i].poke = GFL_HeapAllocate(comm->heapId, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke), FALSE,
+                                                 "mus_comm_func.c", 526);
         comm->players[i].data = GFL_HeapAllocate(comm->heapId, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), FALSE,
-                                        "mus_comm_func.c", 527);
+                                                 "mus_comm_func.c", 527);
         pokeSize = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
         sys_memset(comm->players[i].poke, 0, pokeSize);
         dataSize = PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize();
@@ -874,7 +880,8 @@ static BOOL MusComm_SendPlayerData(MusCommWork *work) {
     if (work->playerData != NULL) {
         GFL_HeapFree(work->playerData);
     }
-    data = GFL_HeapAllocate(work->heapId, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), FALSE, "mus_comm_func.c", 1331);
+    data =
+        GFL_HeapAllocate(work->heapId, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), FALSE, "mus_comm_func.c", 1331);
     work->playerData = data;
     info = (PlayerInfo *)(data + 4);
     pkm = (BoxPkm *)(data + 4 + PlayerInfo_GetSize());
@@ -945,7 +952,8 @@ static BOOL MusComm_SendPoke(MusCommWork *work, MusicalPoke *poke) {
     if (work->pokeData != NULL) {
         GFL_HeapFree(work->pokeData);
     }
-    data = GFL_HeapAllocate(work->heapId, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke), FALSE, "mus_comm_func.c", 1470);
+    data =
+        GFL_HeapAllocate(work->heapId, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke), FALSE, "mus_comm_func.c", 1470);
     work->pokeData = data;
     sys_memcpy(poke, data, sizeof(MusicalPoke));
     sys_memcpy(poke->pkm, data + sizeof(MusicalPoke), PokeParty_GetPkmRawSize());
@@ -1118,8 +1126,8 @@ static BOOL MusComm_SendProgram(MusCommWork *work) {
 
     MusComm_CheckData(work->ov210->unk4, work->ov210->size[0], 2);
     handle = func_02040414(0xff);
-    return func_02042c18(handle, 0xff, MUS_COMM_CMD_PROGRAM_DATA, work->ov210->size[0], work->ov210->unk4,
-                         1, FALSE, TRUE);
+    return func_02042c18(handle, 0xff, MUS_COMM_CMD_PROGRAM_DATA, work->ov210->size[0], work->ov210->unk4, 1, FALSE,
+                         TRUE);
 }
 
 static void MusComm_RecvProgram(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1140,8 +1148,8 @@ static BOOL MusComm_SendMsgArc(MusCommWork *work) {
 
     MusComm_CheckData(work->ov210->msgArc, work->ov210->size[1], 1);
     handle = func_02040414(0xff);
-    return func_02042c18(handle, 0xff, MUS_COMM_CMD_MSG_ARC_DATA, work->ov210->size[1],
-                         work->ov210->msgArc, 1, FALSE, TRUE);
+    return func_02042c18(handle, 0xff, MUS_COMM_CMD_MSG_ARC_DATA, work->ov210->size[1], work->ov210->msgArc, 1, FALSE,
+                         TRUE);
 }
 
 static void MusComm_RecvMsgArc(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -1162,8 +1170,8 @@ static BOOL MusComm_SendScript(MusCommWork *work) {
 
     MusComm_CheckData(work->ov210->script, work->ov210->size[2], 0);
     handle = func_02040414(0xff);
-    return func_02042c18(handle, 0xff, MUS_COMM_CMD_SCRIPT_DATA, work->ov210->size[2], work->ov210->script,
-                         1, FALSE, TRUE);
+    return func_02042c18(handle, 0xff, MUS_COMM_CMD_SCRIPT_DATA, work->ov210->size[2], work->ov210->script, 1, FALSE,
+                         TRUE);
 }
 
 static void MusComm_RecvScript(int netId, int size, const void *data, void *work, NetHandle *handle) {

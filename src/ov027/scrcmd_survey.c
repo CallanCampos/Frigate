@@ -25,6 +25,7 @@
 static GameEventReturnCode func_ov027_021707e8(GameEvent *event, u32 *state, void *data);
 
 // The options a survey can pick, with the score each needs and its probability in percent
+// clang-format off
 static const SurveyProbabilityEntry sProbabilities[0xe0] = {
     { 1, 48, 25, 4 }, { 1, 48, 25, 3 }, { 1, 38, 25, 4 }, { 1, 38, 25, 3 },
     { 1, 32, 25, 4 }, { 1, 32, 25, 3 }, { 1, 24, 25, 4 }, { 1, 24, 25, 3 },
@@ -83,6 +84,8 @@ static const SurveyProbabilityEntry sProbabilities[0xe0] = {
     { 3, 0, 25, 4 }, { 3, 0, 25, 3 }, { 3, 0, 30, 4 }, { 3, 0, 30, 3 },
     { 3, 0, 50, 4 }, { 3, 0, 50, 3 }, { 3, 0, 100, 4 }, { 3, 0, 100, 3 },
 };
+
+// clang-format on
 
 void probabilityLoop(SurveyProbabilityState *state) {
     int i;
@@ -309,7 +312,6 @@ BOOL func_ov027_0217070c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-
 u16 func_ov027_02170758(SaveControl *save) {
     void *survey;
     u16 index;
@@ -328,7 +330,8 @@ u16 func_ov027_02170758(SaveControl *save) {
     minimum = 0xf694e;
     for (i = 0; i < count; i++) {
         value = func_ov012_02165480(survey, answers[i]);
-        if (value < minimum) minimum = value;
+        if (value < minimum)
+            minimum = value;
     }
     return maximum - minimum;
 }
@@ -342,7 +345,8 @@ u16 func_ov027_021707b8(SaveControl *save) {
     index = func_0200ca7c(getTrainerCardData_wrapper(save));
     length = detectLengthSinceLastSession(save);
     result = func_ov012_02165320((u8)index) - length;
-    if (result < 0) result = 0;
+    if (result < 0)
+        result = 0;
     return result;
 }
 
@@ -357,10 +361,12 @@ static GameEventReturnCode func_ov027_021707e8(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 1:
-        if (func_ov036_02187c70(work->window) == 1) (*state)++;
+        if (func_ov036_02187c70(work->window) == 1)
+            (*state)++;
         break;
     case 2:
-        if (GCTX_HIDGetPressedKeys() & 0xf3) (*state)++;
+        if (GCTX_HIDGetPressedKeys() & 0xf3)
+            (*state)++;
         break;
     case 3:
         func_ov027_02170a1c(work);

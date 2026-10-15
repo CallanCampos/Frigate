@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/records.h"
 #include "gfl/std.h"
+#include "save/records.h"
 
 // The results of the random matches and the competitions, which the record block (records.h) holds at 0x5a: three
 // counts for each of 11 kinds of match. The ROM has no string for the file, so the name is a guess.

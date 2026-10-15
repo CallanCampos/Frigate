@@ -1,5 +1,4 @@
 #include "types.h"
-#include "save/save_control.h"
 #include "gfl/backup_system.h"
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
@@ -9,6 +8,7 @@
 #include "save/key_info.h"
 #include "save/memory_link_savedata.h"
 #include "save/musical_savedata.h"
+#include "save/save_control.h"
 #include "save/save_outside.h"
 #include "save/save_table.h"
 #include "save/trainer_data_savedata.h"

@@ -1,9 +1,9 @@
 #include "types.h"
-#include "gfl/sound.h"
 #include "constants/species.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/random.h"
+#include "gfl/sound.h"
 #include "nitro/os.h"
 #include "nitro/snd.h"
 #include "nnsys/snd.h"
@@ -103,6 +103,7 @@ static const PokeVoiceChannels POKE_VOICE_DEFAULT_CHANNEL_LIST[POKE_VOICE_HANDLE
     { 11, 10 },
 };
 
+// clang-format off
 static const PokeVoiceFormEntry POKE_VOICE_EXTRA_ENTRIES[] = {
     { SPECIES_SHAYMIN, 1, 685 },
     { SPECIES_KYUREM, 1, 686 },
@@ -111,6 +112,8 @@ static const PokeVoiceFormEntry POKE_VOICE_EXTRA_ENTRIES[] = {
     { SPECIES_THUNDURUS, 1, 689 },
     { SPECIES_LANDORUS, 1, 690 },
 };
+
+// clang-format on
 
 static PokeVoiceSystem sSystem;
 static u8 sBuffer[POKE_VOICE_BUFFER_SIZE];

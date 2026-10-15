@@ -154,8 +154,7 @@ static void LocalTvtFace_CreateName(LocalTvtFace *face, LocalTvtChara *chara, He
 static u8 LocalTvtFace_GetNameWidth(LocalTvtFace *face);
 static void LocalTvtFace_SetTalking(LocalTvtFace *face, BOOL talking);
 static void LocalTvtFace_StopTalking(LocalTvtFace *face);
-static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, u16 object, int count,
-                                      HeapID heapId);
+static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, u16 object, int count, HeapID heapId);
 static void LocalTvtFace_FreeObject(LocalTvtFace *face);
 static void LocalTvtFace_SetVisible(LocalTvtFace *face, BOOL visible);
 static void LocalTvtChara_CreateCursor(LocalTvtChara *chara);
@@ -187,8 +186,8 @@ static const LocalTvtObjectFiles sLocalTvtObjectFiles[OBJECT_COUNT][2] = {
 };
 
 static const LocalTvtPersonFiles sLocalTvtPersonFiles[LOCAL_TVT_PERSON_COUNT] = {
-    { 2, 18, 56 }, { 3, 20, 60 },  { 4, 22, 64 },  { 5, 24, 68 },  { 0, 14, 44 },  { 6, 26, 48 },  { 8, 30, 76 },
-    { 9, 32, 80 }, { 7, 28, 72 },  { 10, 34, 84 }, { 11, 36, 88 }, { 12, 38, 92 }, { 13, 40, 96 }, { 1, 16, 52 },
+    { 2, 18, 56 }, { 3, 20, 60 }, { 4, 22, 64 },  { 5, 24, 68 },  { 0, 14, 44 },  { 6, 26, 48 },  { 8, 30, 76 },
+    { 9, 32, 80 }, { 7, 28, 72 }, { 10, 34, 84 }, { 11, 36, 88 }, { 12, 38, 92 }, { 13, 40, 96 }, { 1, 16, 52 },
 };
 
 static const LocalTvtBackgroundFiles sLocalTvtBackgroundFiles[BACKGROUND_COUNT][LOCAL_TVT_TIME_COUNT] = {
@@ -365,7 +364,8 @@ LocalTvtFace *LocalTvtChara_GetFace(LocalTvtChara *chara, int index) {
 
 static void LocalTvtFace_TalkCore(LocalTvtFace *face, MsgData *msgData, u16 messageId, u32 keyWait) {
     // The window is on the other half of the screen than the face
-    LocalTvtMessage_OpenTalkWindow(face->chara->setup.message, face->index < 2 ? LOCAL_TVT_TALK_BOTTOM : LOCAL_TVT_TALK_TOP);
+    LocalTvtMessage_OpenTalkWindow(face->chara->setup.message,
+                                   face->index < 2 ? LOCAL_TVT_TALK_BOTTOM : LOCAL_TVT_TALK_TOP);
     LocalTvtChara_ShowCursor(face->chara, face->index);
     LocalTvtMessage_StartTalk(face->chara->setup.message, msgData, messageId, keyWait);
 }
@@ -468,8 +468,7 @@ static void LocalTvtFace_Update(LocalTvtFace *face) {
     case FACE_STATE_READ_BACKGROUND:
         face->step = 0;
         LocalTvtFace_ReadChars(face, face->chara->arc,
-                               sLocalTvtBackgroundFiles[face->background][face->chara->setup.time].chars,
-                               face->heapId);
+                               sLocalTvtBackgroundFiles[face->background][face->chara->setup.time].chars, face->heapId);
         face->state = FACE_STATE_COPY_BACKGROUND;
         break;
     case FACE_STATE_COPY_BACKGROUND:
@@ -546,8 +545,8 @@ static void LocalTvtFace_LoadPalettes(LocalTvtFace *face, LocalTvtChara *chara, 
 
     GFL_G2DIOLoadArcNCLR(chara->arc, sLocalTvtPersonFiles[face->person].palette, 2, 0, face->index * 0x200 + 0x4000,
                          0x200, heapId);
-    GFL_G2DIOLoadArcNCLR(chara->arc, sLocalTvtBackgroundFiles[face->background][face->chara->setup.time].palette, 2,
-                         0, face->index * 0x200 + 0x6000, 0x200, heapId);
+    GFL_G2DIOLoadArcNCLR(chara->arc, sLocalTvtBackgroundFiles[face->background][face->chara->setup.time].palette, 2, 0,
+                         face->index * 0x200 + 0x6000, 0x200, heapId);
     GFL_BGSysSetScrPaletteNo(2, (face->index % 2) * 16, (face->index / 2) * height, 16, height, face->index);
     GFL_BGSysSetScrPaletteNo(3, (face->index % 2) * 16, (face->index / 2) * height, 16, height, face->index);
     GFL_BGSysQueueScrLoad(3);
@@ -671,8 +670,7 @@ static void LocalTvtFace_StopTalking(LocalTvtFace *face) {
     face->talking = FALSE;
 }
 
-static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, u16 object, int count,
-                                      HeapID heapId) {
+static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, u16 object, int count, HeapID heapId) {
     u32 paletteFile;
     u32 charFile;
     u32 cellFile;
@@ -703,8 +701,8 @@ static void LocalTvtFace_CreateObject(LocalTvtFace *face, LocalTvtChara *chara, 
     setup.sequence = 0;
     setup.x = sLocalTvtObjectPositions[face->index].x;
     setup.y = sLocalTvtObjectPositions[face->index].y;
-    face->objectActor = func_0204c040(chara->setup.unit, face->objectChars, face->objectPalette,
-                                      face->objectCellAnims, &setup, 0, heapId);
+    face->objectActor = func_0204c040(chara->setup.unit, face->objectChars, face->objectPalette, face->objectCellAnims,
+                                      &setup, 0, heapId);
     func_0204c124(face->objectActor, FALSE);
     func_0204c520(face->objectActor, TRUE);
     func_0204c4d4(face->objectActor, GFL_RandomLCAlt(0x4000));
@@ -751,8 +749,8 @@ static void LocalTvtChara_CreateCursor(LocalTvtChara *chara) {
     setup.x = 0;
     setup.y = 0;
     setup.sequence = 0;
-    chara->cursor = func_0204c040(chara->setup.unit, chara->cursorChars, chara->cursorPalette,
-                                  chara->cursorCellAnims, &setup, 0, chara->heapId);
+    chara->cursor = func_0204c040(chara->setup.unit, chara->cursorChars, chara->cursorPalette, chara->cursorCellAnims,
+                                  &setup, 0, chara->heapId);
     func_0204c124(chara->cursor, FALSE);
     func_0204c520(chara->cursor, TRUE);
 }

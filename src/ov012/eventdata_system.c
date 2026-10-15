@@ -89,7 +89,6 @@ void LoadZoneEntities(EventData *data, u16 zoneId, u8 season) {
     data->prevTriggerCount = data->triggerCount;
 }
 
-
 void EventData_Clear(EventData *data) {
     data->prevEntityCount = 0;
     data->prevNpcCount = 0;
@@ -376,17 +375,17 @@ ZoneTrigger *FindCollidingZoneTriggerAtLocation(EventData *data, EventWork *even
     if (trigger != NULL) {
         count = data->triggerCount;
         for (i = 0; i < count; i++, trigger++) {
-        if (CheckTriggerPositionMatchXYZ(trigger, position)) {
-            if (trigger->type == 6) {
-                if (trigger->workId == 0) {
-                    return trigger;
-                }
-                work = EventWork_GetWkPtr(eventWork, trigger->workId);
-                if (*work == trigger->workValue) {
-                    return trigger;
+            if (CheckTriggerPositionMatchXYZ(trigger, position)) {
+                if (trigger->type == 6) {
+                    if (trigger->workId == 0) {
+                        return trigger;
+                    }
+                    work = EventWork_GetWkPtr(eventWork, trigger->workId);
+                    if (*work == trigger->workValue) {
+                        return trigger;
+                    }
                 }
             }
-        }
         }
     }
     return NULL;
@@ -402,12 +401,12 @@ ZoneTrigger *FindTriggerAtPosRail(EventData *data, EventWork *eventWork, const R
     if (trigger != NULL) {
         count = data->triggerCount;
         for (i = 0; i < count; i++, trigger++) {
-        if (CheckTriggerPositionMatchRail(trigger, position)) {
-            work = EventWork_GetWkPtr(eventWork, trigger->workId);
-            if (*work == trigger->workValue) {
-                return trigger;
+            if (CheckTriggerPositionMatchRail(trigger, position)) {
+                work = EventWork_GetWkPtr(eventWork, trigger->workId);
+                if (*work == trigger->workValue) {
+                    return trigger;
+                }
             }
-        }
         }
     }
     return NULL;
@@ -463,35 +462,35 @@ s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *pos
             switch (entity->direction) {
             case 0:
                 if (direction == 0) {
-                        return entity->scrId;
-                    }
+                    return entity->scrId;
+                }
                 break;
             case 1:
                 if (direction == 3) {
-                        return entity->scrId;
-                    }
+                    return entity->scrId;
+                }
                 break;
             case 2:
                 if (direction == 2) {
-                        return entity->scrId;
-                    }
+                    return entity->scrId;
+                }
                 break;
             case 3:
                 if (direction == 1) {
-                        return entity->scrId;
-                    }
+                    return entity->scrId;
+                }
                 break;
             case 4:
                 return entity->scrId;
             case 5:
                 if (direction == 2 || direction == 3) {
-                        return entity->scrId;
-                    }
+                    return entity->scrId;
+                }
                 break;
             case 6:
                 if (direction <= 1) {
-                        return entity->scrId;
-                    }
+                    return entity->scrId;
+                }
                 break;
             }
         }

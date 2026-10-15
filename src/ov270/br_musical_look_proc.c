@@ -3,11 +3,11 @@
 // the ROM gives none, and br_core.c runs it as BR_PROCID_MUSICAL_LOOK
 
 #include "types.h"
-#include "app/battle_recorder/br_musical_look_proc.h"
 #include "app/battle_recorder/br_btn.h"
 #include "app/battle_recorder/br_core.h"
 #include "app/battle_recorder/br_fade.h"
 #include "app/battle_recorder/br_graphic.h"
+#include "app/battle_recorder/br_musical_look_proc.h"
 #include "app/battle_recorder/br_net.h"
 #include "app/battle_recorder/br_pokesearch.h"
 #include "app/battle_recorder/br_proc_sys.h"

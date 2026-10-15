@@ -44,6 +44,7 @@ static void PokemonTradeDemoDown_Run(PokemonTradeWork *wk);
 
 // The hops of a Pokémon's sprite, as offsets from its place: one hop of 18 frames, or two of 40. The common file has
 // the same
+// clang-format off
 static VecFx32 sTradeDemoDownHopPath[18] = {
     { 0, 0, 0 },
     { 0, 0, 0 },
@@ -64,6 +65,8 @@ static VecFx32 sTradeDemoDownHopPath[18] = {
     { 0, 0, 0 },
     { 0, 0, 0 },
 };
+
+// clang-format on
 
 static VecFx32 sTradeDemoDownLongHopPath[40] = {
     { 0, 0, 0 },      { 0, 0x2969, 0 }, { 0, 0x5000, 0 }, { 0, 0x7123, 0 }, { 0, 0x8a90, 0 }, { 0, 0x9a8c, 0 },
@@ -136,9 +139,9 @@ static void PokemonTradeDemoDown_CreateActor(PokemonTradeWork *wk) {
         setup.sequence = 0;
         setup.priority = 0;
         setup.bgPriority = 0;
-        wk->work3D->actor = func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_DEMO],
-                                          wk->objRes[TRADE_OBJRES_PLTT_DEMO], wk->objRes[TRADE_OBJRES_CELL_DEMO],
-                                          &setup, 0, wk->heapId);
+        wk->work3D->actor =
+            func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_DEMO], wk->objRes[TRADE_OBJRES_PLTT_DEMO],
+                          wk->objRes[TRADE_OBJRES_CELL_DEMO], &setup, 0, wk->heapId);
         func_0204c520(wk->work3D->actor, TRUE);
         func_0204c124(wk->work3D->actor, TRUE);
     } else {
@@ -226,9 +229,11 @@ static void PokemonTradeDemoDown_StartMove(PokemonTradeWork *wk, int index) {
         MCSS_GetPosition(wk->mcss[index], &pos);
         TradeMcssMove_Free(wk->mcssMoves[3]);
         if (wk->unk11F0[0] != 0) {
-            wk->mcssMoves[3] = TradeMcssMove_CreateWithPath(wk->mcss[index], 20, &pos, sTradeDemoDownScenePath, wk->heapId);
+            wk->mcssMoves[3] =
+                TradeMcssMove_CreateWithPath(wk->mcss[index], 20, &pos, sTradeDemoDownScenePath, wk->heapId);
         } else {
-            wk->mcssMoves[3] = TradeMcssMove_CreateWithPath(wk->mcss[index], 40, &pos, sTradeDemoDownLongHopPath, wk->heapId);
+            wk->mcssMoves[3] =
+                TradeMcssMove_CreateWithPath(wk->mcss[index], 40, &pos, sTradeDemoDownLongHopPath, wk->heapId);
         }
     } else {
         u32 pair[4] = { 2, 3, 0, 1 };
@@ -560,8 +565,8 @@ static void PokemonTradeDemoDown_Run(PokemonTradeWork *wk) {
     if (wk->timer == PokemonTradeDemoDown_Frame(0x490)) {
         func_0201ae2c(wk->mcss[3], 0, 0, 0, 0x7fff);
     }
-    if (PokemonTradeDemoDown_Frame(0x48e) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL
-        && wk->mcssMoves[3]->frame == 9) {
+    if (PokemonTradeDemoDown_Frame(0x48e) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL &&
+        wk->mcssMoves[3]->frame == 9) {
         MCSS_GetPosition(wk->mcss[1], &pos8);
         MCSS_SetPosition(wk->mcss[3], &pos8);
         MCSS_Show(wk->mcss[3]);

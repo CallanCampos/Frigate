@@ -8,6 +8,7 @@
 #define HIDDEN_ITEM_SCRIPT_END 8799
 #define HIDDEN_ITEM_COUNT 213
 
+// clang-format off
 static const HiddenItem HIDDEN_ITEMS[HIDDEN_ITEM_COUNT] = {
     {0, 1, 0, 6, 754, 580},
     {1, 1, 0, 16, 609, 601},
@@ -223,6 +224,8 @@ static const HiddenItem HIDDEN_ITEMS[HIDDEN_ITEM_COUNT] = {
     {211, 1, 0, 444, 156, 639},
     {212, 1, 0, 446, 127, 655},
 };
+
+// clang-format on
 
 u16 GetHiddenItemNoBySCRID(u16 scrId) {
     if (scrId < HIDDEN_ITEM_SCRIPT_START || scrId > HIDDEN_ITEM_SCRIPT_END) {

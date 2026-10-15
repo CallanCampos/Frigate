@@ -137,11 +137,11 @@ static void BPlistObj_LoadPokeIconRes(BPlistWork *wk) {
 
     for (i = 0; i < 6; i++) {
         if (wk->pokemon[i].species != 0) {
-            res[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(wk->pokemon[i].pkm)), FALSE,
-                                   CLACT_VRAM_SUB, wk->param->heapId);
-        } else {
-            res[i] = func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB,
+            res[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(wk->pokemon[i].pkm)), FALSE, CLACT_VRAM_SUB,
                                    wk->param->heapId);
+        } else {
+            res[i] =
+                func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
         }
     }
     wk->plttRes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->param->heapId);
@@ -252,10 +252,10 @@ static void BPlistObj_SetPokeIconPalettes(BPlistWork *wk) {
 
     for (i = 0; i < 6; i++) {
         if (wk->pokemon[i].species != 0) {
-            func_0204c378(
-                wk->pokeIcons[i],
-                PokeIcon_GetPalette(wk->pokemon[i].species, wk->pokemon[i].form, wk->pokemon[i].sex, wk->pokemon[i].isEgg),
-                1);
+            func_0204c378(wk->pokeIcons[i],
+                          PokeIcon_GetPalette(wk->pokemon[i].species, wk->pokemon[i].form, wk->pokemon[i].sex,
+                                              wk->pokemon[i].isEgg),
+                          1);
         }
     }
 }
@@ -373,7 +373,7 @@ static void BPlistObj_ShowList(BPlistWork *wk) {
             ClActorPos pos;
             BPlistObj_ShowAt(wk->actors[BPLIST_ACTOR_POKE + slot], &data_ov287_021fb0ec[i]);
             BPlistObj_ShowStatusIcon(wk->pokemon[slot].status, wk->actors[BPLIST_ACTOR_STATUS + slot],
-                                &data_ov287_021fb104[i]);
+                                     &data_ov287_021fb104[i]);
             if (!wk->pokemon[slot].isEgg) {
                 BPlistObj_ShowAt(wk->actors[BPLIST_ACTOR_UNK1F08 + slot], &data_ov287_021fb11c[i]);
             }
@@ -486,7 +486,8 @@ static void BPlistObj_ShowPage7(BPlistWork *wk) {
     if (wk->param->slot < 4) {
         BPlistObj_LoadCategoryIcon(wk, BPLIST_ACTOR_CATEGORY, 22, pkm->moves[wk->param->slot].category);
     } else {
-        BPlistObj_LoadCategoryIcon(wk, BPLIST_ACTOR_CATEGORY, 22, PML_MoveGetParam(wk->param->move, MOVE_PARAM_CATEGORY));
+        BPlistObj_LoadCategoryIcon(wk, BPLIST_ACTOR_CATEGORY, 22,
+                                   PML_MoveGetParam(wk->param->move, MOVE_PARAM_CATEGORY));
     }
 }
 
@@ -525,7 +526,8 @@ void BPlistObj_ShowMoveTypes(BPlistWork *wk) {
         }
     }
     if (wk->param->move != 0 && wk->param->unk1F == 4) {
-        BPlistObj_LoadTypeIcon(wk, wk->actors[actor + i], chars + i, PML_MoveGetParam(wk->param->move, MOVE_PARAM_TYPE));
+        BPlistObj_LoadTypeIcon(wk, wk->actors[actor + i], chars + i,
+                               PML_MoveGetParam(wk->param->move, MOVE_PARAM_TYPE));
         BPlistObj_ShowAt(wk->actors[actor + i], &data_ov287_021fb0d8[i]);
     }
     wk->typeIconBuf ^= 1;

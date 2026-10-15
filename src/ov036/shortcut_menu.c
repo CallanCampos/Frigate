@@ -93,8 +93,8 @@ static const BGSetup sBgSetup = {
 static const u32 sActorX[ACTORS] = { 0x80, 0xa, 0xf6 };
 
 static const BmpMenuListHeader sListHeader = {
-    NULL, NULL, NULL, 5, 13, 0, 24, 47, 0, 0, 0, 0, 0, 0, BMPMENULIST_SKIP_LR_KEY, 0, 0, NULL, 12, 16, NULL,
-    NULL, NULL, NULL, 0,
+    NULL, NULL, NULL, 5,  13, 0,    24,   47,   0,    0, 0, 0, 0, 0, BMPMENULIST_SKIP_LR_KEY,
+    0,    0,    NULL, 12, 16, NULL, NULL, NULL, NULL, 0,
 };
 
 // The subprocess of overlay 0x118 that the menu returns through, whose work it leaves empty
@@ -150,8 +150,8 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
     for (i = 0; i < ACTORS; i++) {
         setup.sequence = i;
         setup.x = sActorX[i];
-        work->clactActors[i] = func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0,
-                                             heapId);
+        work->clactActors[i] =
+            func_0204c040(work->unit, work->chars, work->palette, work->cellAnims, &setup, 0, heapId);
         func_0204c124(work->clactActors[i], FALSE);
         func_0204c520(work->clactActors[i], TRUE);
     }
@@ -437,8 +437,8 @@ static void ReadInput(ShortcutMenuApp *work) {
         }
         handled = TRUE;
     }
-    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && work->mode == 0
-        && BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT) > 1) {
+    if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && work->mode == 0 &&
+        BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT) > 1) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         handled = TRUE;
     }

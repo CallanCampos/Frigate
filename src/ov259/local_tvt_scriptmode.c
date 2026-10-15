@@ -107,7 +107,8 @@ static const LocalTvtScriptCommandFuncs sLocalTvtScriptCommands[SCRIPT_COMMAND_C
 
 LocalTvtScriptMode *LocalTvtScriptMode_Create(HeapID heapId, GameSystem *gsys, GameData *gameData, u16 scriptId,
                                               LocalTvtChara *chara) {
-    LocalTvtScriptMode *mode = GFL_HeapAllocate(heapId, sizeof(LocalTvtScriptMode), TRUE, "local_tvt_scriptmode.c", 137);
+    LocalTvtScriptMode *mode =
+        GFL_HeapAllocate(heapId, sizeof(LocalTvtScriptMode), TRUE, "local_tvt_scriptmode.c", 137);
     LocalTvtFaceSetup setups[LOCAL_TVT_FACES];
     LocalTvtCallData *callData;
     u32 gender;

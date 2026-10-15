@@ -107,6 +107,7 @@ static const TrainerLineOfSightFunc TRAINER_LOS_DIST_FUNCTIONS[4] = {
     EventTrainerEye_CalcLineOfSight_R,
 };
 
+// clang-format off
 static const EventTrainerEyeRoutine EVENT_TRAINER_EYE_ROUTINES[] = {
     EventTrainerEyeSub_StartMove,
     EventTrainerEyeSub_ForceTrainerDir,
@@ -127,6 +128,8 @@ static const EventTrainerEyeRoutine EVENT_TRAINER_EYE_ROUTINES[] = {
     EventTrainerEyeSub_SetIdleMoveCode,
     EventTrainerEyeSub_Finish,
 };
+
+// clang-format on
 
 GameEvent *EventTrainerEye_CheckAll(Field *field) {
     TrainerClashData data;
@@ -310,8 +313,7 @@ GameEvent *EventTrainerEye_Create(GameSystem *gsys, EventTrainerEyeWork *eye1, E
 
 EventTrainerEyeWork *EventTrainerEye_CreateData(HeapID heapId, Field *field, const TrainerClashData *data,
                                                 BOOL isPair) {
-    EventTrainerEyeWork *work = GFL_HeapAllocate(heapId, sizeof(EventTrainerEyeWork), TRUE, "event_trainer_eye.c",
-                                                 541);
+    EventTrainerEyeWork *work = GFL_HeapAllocate(heapId, sizeof(EventTrainerEyeWork), TRUE, "event_trainer_eye.c", 541);
 
     work->data = *data;
     work->unk20 = 0;

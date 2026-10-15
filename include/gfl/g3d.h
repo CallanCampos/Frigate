@@ -5,8 +5,8 @@
 // setup, whose layout comes from the intro's data
 
 #include "types.h"
-#include "gfl/std.h"
 #include "gfl/heap.h"
+#include "gfl/std.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"

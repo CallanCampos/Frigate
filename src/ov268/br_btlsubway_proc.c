@@ -111,6 +111,7 @@ static const BrBtlSubwayMsgWinData sBrBtlSubwayMenuWins[BR_BTLSUBWAY_MENU_MAX] =
     { 4, 14, 24, 2, 0x81 },
 };
 
+// clang-format off
 static const BrBtlSubwayMsgWinData sBrBtlSubwayWifiWins[] = {
     { 3, 3, 12, 2, 0x7c },
     { 4, 6, 24, 2, 0x90 },
@@ -119,12 +120,15 @@ static const BrBtlSubwayMsgWinData sBrBtlSubwayWifiWins[] = {
     { 27, 10, 2, 2, 0x89 },
 };
 
+// clang-format on
+
 const GameProcFunctions BR_BTLSUBWAY_PROC_FUNCTIONS = {
     BrBtlSubway_ProcInit,
     BrBtlSubway_ProcMain,
     BrBtlSubway_ProcExit,
 };
 
+// clang-format off
 static const BrBtlSubwayMsgWinData sBrBtlSubwaySingleWins[] = {
     { 3, 3, 12, 2, 0x7c },
     { 4, 6, 24, 2, 0x7e },
@@ -136,6 +140,9 @@ static const BrBtlSubwayMsgWinData sBrBtlSubwaySingleWins[] = {
     { 21, 14, 7, 2, 0x8b },
 };
 
+// clang-format on
+
+// clang-format off
 static const BrBtlSubwayMsgWinData sBrBtlSubwayDoubleWins[] = {
     { 3, 3, 12, 2, 0x7c },
     { 4, 6, 24, 2, 0x7f },
@@ -147,7 +154,10 @@ static const BrBtlSubwayMsgWinData sBrBtlSubwayDoubleWins[] = {
     { 21, 14, 7, 2, 0x8b },
 };
 
+// clang-format on
+
 // The lines of the menu on the sub screen. The first, of no line, is never hit
+// clang-format off
 static const BrBtlSubwayRect sBrBtlSubwayMenuRects[BR_BTLSUBWAY_PAGE_MAX] = {
     { 0, 0, 0, 0 },
     { 24, 8, 232, 32 },
@@ -156,6 +166,9 @@ static const BrBtlSubwayRect sBrBtlSubwayMenuRects[BR_BTLSUBWAY_PAGE_MAX] = {
     { 24, 104, 232, 128 },
 };
 
+// clang-format on
+
+// clang-format off
 static const BrBtlSubwayMsgWinData sBrBtlSubwayMultiWins[BR_BTLSUBWAY_MSGWIN_MAX] = {
     { 3, 3, 12, 2, 0x7c },
     { 4, 6, 24, 2, 0x80 },
@@ -174,6 +187,8 @@ static const BrBtlSubwayMsgWinData sBrBtlSubwayMultiWins[BR_BTLSUBWAY_MSGWIN_MAX
     { 14, 22, 7, 2, 0x89 },
     { 21, 22, 7, 2, 0x8b },
 };
+
+// clang-format on
 
 static BOOL BrBtlSubway_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     BrBtlSubwayProcParam *p = param;
@@ -389,8 +404,7 @@ static void BrBtlSubway_CreateSingle(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
         case 2:
             str = GFL_MsgDataLoadStrbufNew(msg, BSubwayScoreData_HasStage(p->score, mode) ? 0x91 : 0x87);
             break;
-        case 3:
-        {
+        case 3: {
             int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -401,8 +415,7 @@ static void BrBtlSubway_CreateSingle(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
             GFL_StrBufFree(src);
             break;
         }
-        case 6:
-        {
+        case 6: {
             int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -461,8 +474,7 @@ static void BrBtlSubway_CreateDouble(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
         case 2:
             str = GFL_MsgDataLoadStrbufNew(msg, BSubwayScoreData_HasStage(p->score, mode) ? 0x91 : 0x87);
             break;
-        case 3:
-        {
+        case 3: {
             int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -473,8 +485,7 @@ static void BrBtlSubway_CreateDouble(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *
             GFL_StrBufFree(src);
             break;
         }
-        case 6:
-        {
+        case 6: {
             int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -536,8 +547,7 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
         case 3:
             str = GFL_MsgDataLoadStrbufNew(msg, BSubwayScoreData_HasStage(p->score, mode) ? 0x91 : 0x87);
             break;
-        case 4:
-        {
+        case 4: {
             int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -548,8 +558,7 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
             GFL_StrBufFree(src);
             break;
         }
-        case 7:
-        {
+        case 7: {
             int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, mode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -563,8 +572,7 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
         case 10:
             str = GFL_MsgDataLoadStrbufNew(msg, BSubwayScoreData_HasStage(p->score, commMode) ? 0x91 : 0x87);
             break;
-        case 11:
-        {
+        case 11: {
             int streak = MATH_IMin(BSubwayScoreData_GetStreak(p->score, commMode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -575,8 +583,7 @@ static void BrBtlSubway_CreateMulti(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p
             GFL_StrBufFree(src);
             break;
         }
-        case 14:
-        {
+        case 14: {
             int streak = MATH_IMin(BSubwayScoreData_GetMaxStreak(p->score, commMode), BR_BTLSUBWAY_STREAK_MAX);
             StrBuf *src;
 
@@ -738,8 +745,8 @@ static u32 BrBtlSubway_GetTrgMenu(BrBtlSubwayWork *wk, u32 x, u32 y) {
         if (i != select) {
             const BrBtlSubwayRect *rect = &sBrBtlSubwayMenuRects[i];
 
-            if ((u32)(x - rect->left) <= (u32)(rect->right - rect->left)
-                && (u32)(y - rect->top) <= (u32)(rect->bottom - rect->top)) {
+            if ((u32)(x - rect->left) <= (u32)(rect->right - rect->left) &&
+                (u32)(y - rect->top) <= (u32)(rect->bottom - rect->top)) {
                 BrPoint pos;
 
                 pos.x = x;

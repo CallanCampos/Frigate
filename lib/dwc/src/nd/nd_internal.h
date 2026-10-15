@@ -2,13 +2,12 @@
 #define POKEBW2_DWC_ND_INTERNAL_H
 
 #include "types.h"
-
 #include "dwc/nhttp.h"
 #include "nitro/os.h"
 
-// What nd.c calls outside itself, none of it with a name in the ROM: the Wi-Fi library's allocator and error in the main
-// module, the C library, and the HTTP client's calls in the front half of overlay 189 (the sources before nd.c), whose
-// header will take the last group
+// What nd.c calls outside itself, none of it with a name in the ROM: the Wi-Fi library's allocator and error in the
+// main module, the C library, and the HTTP client's calls in the front half of overlay 189 (the sources before nd.c),
+// whose header will take the last group
 
 // The main module's: the Wi-Fi library's allocator (the type is 10 for everything here), and the one error that the
 // library keeps

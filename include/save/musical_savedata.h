@@ -59,7 +59,6 @@ typedef struct {
     s16 rotation;
 } MusicalSaveUnk1B0;
 
-
 struct MusicalSave {
     MusicalShot shot;
     MusicalSaveUnk1B0 unk1B0[8];

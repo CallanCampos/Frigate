@@ -9,8 +9,8 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
-// The players of the battle that overlay 28's Colosseum_BuildBattlePlayers builds: battle_proc.h's BattlePlayers, then the
-// records
+// The players of the battle that overlay 28's Colosseum_BuildBattlePlayers builds: battle_proc.h's BattlePlayers, then
+// the records
 typedef struct {
     BattlePlayers battle;
     u32 unk50;

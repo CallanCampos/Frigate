@@ -10,8 +10,6 @@
 #include "system/pms_data.h"
 #include "system/pmsi_param.h"
 
-
-
 // The C-Gear's phrases, which the save keeps
 void *getCGearDataBlkAddress(SaveControl *save);
 void CGearPhrases_Init(PMSData *phrases);

@@ -141,8 +141,7 @@ static const BGSetup sFMissionViewBGSetups[4] = {
 };
 
 FMissionView *FMissionViewSetup_Create(GameSystem *gsys, FieldSubscreen *subscreen) {
-    FMissionView *view =
-        GFL_HeapAllocate(HEAPID_FIELD_MENU, sizeof(FMissionView), TRUE, "fmission_view_setup.c", 93);
+    FMissionView *view = GFL_HeapAllocate(HEAPID_FIELD_MENU, sizeof(FMissionView), TRUE, "fmission_view_setup.c", 93);
 
     view->gsys = gsys;
     view->gameData = GSYS_GetGameData(gsys);
@@ -202,8 +201,8 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
     case FMISSION_VIEW_EVENT_MENU:
     case FMISSION_VIEW_EVENT_MENU_3:
         FMissionLogFV_SetTop(view->log, 0);
-        event = FMissionViewSetup_CreateCallEvent(view, EventFieldMenuReturn_Create(view->gsys, view->field, 0), CALL_BUTTON,
-                                                  FMISSION_VIEW_BUTTON_QUIT);
+        event = FMissionViewSetup_CreateCallEvent(view, EventFieldMenuReturn_Create(view->gsys, view->field, 0),
+                                                  CALL_BUTTON, FMISSION_VIEW_BUTTON_QUIT);
         break;
     case FMISSION_VIEW_EVENT_INFO: {
         u32 args = 0;
@@ -215,7 +214,8 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
     }
     case FMISSION_VIEW_EVENT_QUIT:
         event = FMissionViewSetup_CreateCallEvent(
-            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION, func_ov157_021f5ae4, view->field),
+            view,
+            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FUNFEST_MISSION, func_ov157_021f5ae4, view->field),
             CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
         break;
     case FMISSION_VIEW_EVENT_PASS_POWER: {
@@ -223,8 +223,8 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
 
         event = FMissionViewSetup_CreateCallEvent(
             view,
-            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_PASS_POWER, (GameEventProvider)func_ov014_0216e8ac,
-                                            &args),
+            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_EVENT_PASS_POWER,
+                                            (GameEventProvider)func_ov014_0216e8ac, &args),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_PASS_POWER);
         break;
     }
@@ -234,7 +234,8 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
         args[0] = view->usePassPower;
         args[1] = view->unk89;
         event = FMissionViewSetup_CreateCallEvent(
-            view, GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FIELD_PASS_POWER, EventPassPowerActivate_Create, args),
+            view,
+            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FIELD_PASS_POWER, EventPassPowerActivate_Create, args),
             CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 1));
         view->usePassPower = PASS_POWER_NONE;
         break;
@@ -242,22 +243,21 @@ GameEvent *FMissionViewSetup_CheckEvent(FMissionView *view, BOOL enabled) {
     case FMISSION_VIEW_EVENT_PASS_POWER_LIST:
         event = FMissionViewSetup_CreateCallEvent(
             view,
-            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FIELD_PASS_POWER, (GameEventProvider)EventPassPowerList_Create,
-                                            view->field),
+            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FIELD_PASS_POWER,
+                                            (GameEventProvider)EventPassPowerList_Create, view->field),
             CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
         break;
     case FMISSION_VIEW_EVENT_PASS_POWER_LIST_9:
         event = FMissionViewSetup_CreateCallEvent(
             view,
-            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FIELD_PASS_POWER, (GameEventProvider)EventPassPowerList_Create,
-                                            view->field),
+            GameEvent_CreateOverlayDelegate(view->gsys, OVERLAY_FIELD_PASS_POWER,
+                                            (GameEventProvider)EventPassPowerList_Create, view->field),
             CALL_MENU_BUTTON, (u32)BeaconViewMenu_GetButton(view->menu, 0));
         view->unk80 = 0;
         break;
     case FMISSION_VIEW_EVENT_GREETING:
         event = FMissionViewSetup_CreateCallEvent(
-            view,
-            EventPhraseInput_Create(view->gsys, view->field, NULL, 14, (u16 *)func_0202d7d0(view->beaconStatus)),
+            view, EventPhraseInput_Create(view->gsys, view->field, NULL, 14, (u16 *)func_0202d7d0(view->beaconStatus)),
             CALL_BUTTON, FMISSION_VIEW_BUTTON_GREETING);
         break;
     default:
@@ -449,9 +449,9 @@ static void FMissionViewSetup_InitBG(FMissionView *view, ArcTool *arc) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, 6, 5, 0, 0x800, TRUE, view->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 7, 6, 0, 0x800, TRUE, view->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 8, 7, 0, 0x800, TRUE, view->tmpHeapId);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2,
-                        GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ,
-                        13, 3);
+    gfxRegSetAlphaBlend(
+        REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2,
+        GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 13, 3);
     GFL_BGSysSetBGEnabled(4, TRUE);
     GFL_BGSysSetBGEnabled(5, TRUE);
     GFL_BGSysSetBGEnabled(6, TRUE);
@@ -490,9 +490,9 @@ static void FMissionViewSetup_LoadResources(FMissionView *view, ArcTool *arc) {
         FMissionViewSetup_LoadRes(view, &view->res[FMISSION_VIEW_RES_MAIN], setup, arc, TRUE);
     }
     {
-        FMissionViewResSetup setup[FMISSION_VIEW_RES_TYPE_COUNT] = {
-            { 0, 0 }, { FMISSION_VIEW_PANEL_COUNT, 49 }, { 1, 65 }
-        };
+        FMissionViewResSetup setup[FMISSION_VIEW_RES_TYPE_COUNT] = { { 0, 0 },
+                                                                     { FMISSION_VIEW_PANEL_COUNT, 49 },
+                                                                     { 1, 65 } };
 
         FMissionViewSetup_LoadRes(view, &view->res[FMISSION_VIEW_RES_ICON], setup, iconArc, FALSE);
     }
@@ -588,8 +588,8 @@ static void FMissionViewSetup_LoadRes(FMissionView *view, FMissionViewRes *res, 
     for (i = 0; i < FMISSION_VIEW_RES_TYPE_COUNT; i++) {
         res->lists[i].count = setup[i].count;
         if (res->lists[i].count != 0) {
-            res->lists[i].ids =
-                GFL_HeapAllocate(view->fieldHeapId, res->lists[i].count * sizeof(u32), TRUE, "fmission_view_setup.c", 848);
+            res->lists[i].ids = GFL_HeapAllocate(view->fieldHeapId, res->lists[i].count * sizeof(u32), TRUE,
+                                                 "fmission_view_setup.c", 848);
         }
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_PALETTE].count; i++) {
@@ -597,8 +597,8 @@ static void FMissionViewSetup_LoadRes(FMissionView *view, FMissionViewRes *res, 
             func_0204bba0(arc, setup[FMISSION_VIEW_RES_PALETTE].fileId + i, CLACT_VRAM_SUB, 0, view->fieldHeapId);
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_CHARS].count; i++) {
-        res->lists[FMISSION_VIEW_RES_CHARS].ids[i] =
-            func_0204b81c(arc, setup[FMISSION_VIEW_RES_CHARS].fileId + i, compressed, CLACT_VRAM_SUB, view->fieldHeapId);
+        res->lists[FMISSION_VIEW_RES_CHARS].ids[i] = func_0204b81c(arc, setup[FMISSION_VIEW_RES_CHARS].fileId + i,
+                                                                   compressed, CLACT_VRAM_SUB, view->fieldHeapId);
     }
     for (i = 0; i < res->lists[FMISSION_VIEW_RES_CELL_ANIMS].count; i++) {
         res->lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[i] =
@@ -697,21 +697,21 @@ static void FMissionViewSetup_InitPanel(FMissionView *view, u8 index) {
     panel->queue = view->printQueue;
     panel->x = FMISSION_VIEW_PANEL_X;
     panel->y = index * FMISSION_VIEW_PANEL_HEIGHT + FMISSION_VIEW_PANEL_Y;
-    panel->frame = FMissionViewSetup_AddActor(
-        view, view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CHARS].ids[0],
-        view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
-        view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0], panel->x, panel->y, index % 3 + 1, 3,
-        index + 12);
-    panel->markActor = FMissionViewSetup_AddActor(
-        view, view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CHARS].ids[0],
-        view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
-        view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0], panel->x + 16, panel->y, 21, 3,
-        index + 3);
-    panel->icon = FMissionViewSetup_AddActor(
-        view, view->res[FMISSION_VIEW_RES_ICON].lists[FMISSION_VIEW_RES_CHARS].ids[index],
-        view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
-        view->res[FMISSION_VIEW_RES_ICON].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0], panel->x + 16, panel->y + 16, 0, 3,
-        index + 6);
+    panel->frame =
+        FMissionViewSetup_AddActor(view, view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CHARS].ids[0],
+                                   view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
+                                   view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0],
+                                   panel->x, panel->y, index % 3 + 1, 3, index + 12);
+    panel->markActor =
+        FMissionViewSetup_AddActor(view, view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CHARS].ids[0],
+                                   view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
+                                   view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0],
+                                   panel->x + 16, panel->y, 21, 3, index + 3);
+    panel->icon =
+        FMissionViewSetup_AddActor(view, view->res[FMISSION_VIEW_RES_ICON].lists[FMISSION_VIEW_RES_CHARS].ids[index],
+                                   view->res[FMISSION_VIEW_RES_MAIN].lists[FMISSION_VIEW_RES_PALETTE].ids[0],
+                                   view->res[FMISSION_VIEW_RES_ICON].lists[FMISSION_VIEW_RES_CELL_ANIMS].ids[0],
+                                   panel->x + 16, panel->y + 16, 0, 3, index + 6);
     func_0204c378(panel->icon, (u8)(index + 9), 1);
     FMissionViewSetup_InitLine(view, &panel->lines[0], 8, 2, panel->x + 48, panel->y + 4);
     panel->strs[0] = GFL_StrBufCreate(8, view->heapId);

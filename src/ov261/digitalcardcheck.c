@@ -106,8 +106,8 @@ BOOL DigitalCardCheck_IsFinished(DigitalCardCheck *check) {
 
 static void DigitalCardCheck_TaskStart(WifiBattleMatchTask *task, u32 *seq, void *work) {
     DigitalCardCheck *check = work;
-    void *entry =
-        TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData)), check->param.mode);
+    void *entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData)),
+                                           check->param.mode);
     u32 field2 = TournamentEntry_GetField(entry, 2);
     u32 cardType = TournamentEntry_GetField(entry, 10);
 
@@ -625,14 +625,14 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         first = RndMatchData_GetParam(results, 10, 1);
         info.unkA4 = first + RndMatchData_GetParam(results, 10, 2);
         info.look = func_02008bf4(playerInfo);
-        info.startDate =
-            DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
-        info.endDate =
-            DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
+        info.startDate = DigitalCardCheck_PackBytes(
+            TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
+        info.endDate = DigitalCardCheck_PackBytes(
+            TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
         info.variant = TournamentEntry_GetField(entry, 11);
-        check->card =
-            WifiBattleMatchWifiCard_Create(&info, 0, playerInfo, link, check->param.seq, check->param.font,
-                                check->param.printQueue, check->msgData, check->wordSet, cardData, 1, check->heapId);
+        check->card = WifiBattleMatchWifiCard_Create(&info, 0, playerInfo, link, check->param.seq, check->param.font,
+                                                     check->param.printQueue, check->msgData, check->wordSet, cardData,
+                                                     1, check->heapId);
     } else {
         WifiBattleMatchLiveCardInfo info;
         void *results;
@@ -645,14 +645,14 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         info.unkA4 = func_0200f1d8(results, 0);
         info.unkA6 = Regulation_GetParam(regulation, 0x16);
         info.look = func_02008bf4(playerInfo);
-        info.startDate =
-            DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
-        info.endDate =
-            DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
+        info.startDate = DigitalCardCheck_PackBytes(
+            TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
+        info.endDate = DigitalCardCheck_PackBytes(
+            TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
         info.variant = TournamentEntry_GetField(entry, 11);
-        check->card =
-            WifiBattleMatchLiveCard_Create(&info, playerInfo, link, check->param.seq, check->param.font, check->param.printQueue,
-                                check->msgData, check->wordSet, cardData, 1, check->heapId);
+        check->card = WifiBattleMatchLiveCard_Create(&info, playerInfo, link, check->param.seq, check->param.font,
+                                                     check->param.printQueue, check->msgData, check->wordSet, cardData,
+                                                     1, check->heapId);
     }
     DigitalCardCheck_SetBGEnabled(check, 0);
 }
@@ -681,10 +681,10 @@ static BOOL DigitalCardCheck_IsCardDone(DigitalCardCheck *check) {
 static void DigitalCardCheck_ShowCard(DigitalCardCheck *check, u32 page) {
     if (check->param.mode == DIGITAL_CARD_CHECK_WIFI) {
         WifiBattleMatchWifiCard_ShowPage(check->card, page, check->msgData, check->param.printQueue, check->param.font,
-                            check->heapId);
+                                         check->heapId);
     } else {
         WifiBattleMatchLiveCard_ShowPage(check->card, page, check->msgData, check->param.printQueue, check->param.font,
-                            check->heapId);
+                                         check->heapId);
     }
 }
 

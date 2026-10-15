@@ -39,7 +39,7 @@ typedef struct {
 } LeagueLiftArrivalData;
 
 static const FieldCameraCoords data_ov012_0216dc3c = {
-    0x1d7d, 0, 0x16c000, {0x1f8000, -0x40000, 0x264000}, {0, 0x9d000, 0x90000},
+    0x1d7d, 0, 0x16c000, { 0x1f8000, -0x40000, 0x264000 }, { 0, 0x9d000, 0x90000 },
 };
 
 static GameEvent *func_ov012_02165e80(GameSystem *gsys, Field *field);

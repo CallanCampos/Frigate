@@ -60,17 +60,23 @@ static void IntroG3dSys_Free(IntroG3dSys *g3d);
 static void IntroG3dSys_Begin(IntroG3dSys *g3d);
 static void IntroG3dSys_End(IntroG3dSys *g3d);
 
+// clang-format off
 static const BGSysVRAMConfig sVRAMConfig = {
     GX_VRAM_BG_16_F,       GX_VRAM_BGEXTPLTT_NONE,     GX_VRAM_SUB_BG_32_H,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_16_G,      GX_VRAM_OBJEXTPLTT_NONE,    GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_0123_ABCD, GX_VRAM_TEXPLTT_0123_E,     GX_OBJVRAMMODE_CHAR_1D_32K, GX_OBJVRAMMODE_CHAR_1D_32K,
 };
 
+// clang-format on
+
+// clang-format off
 static const BGSysVRAMConfig sVRAMConfigNamed = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,      GX_VRAM_SUB_BG_32_H,         GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE,     GX_VRAM_SUB_OBJ_16_I,        GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_01_CD, GX_VRAM_TEXPLTT_0123_E,      GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
 };
+
+// clang-format on
 
 static const VecFx32 sCameraPosition = { 0, FX32_CONST(0.043), FX32_CONST(70) };
 static const VecFx32 sCameraUpVector = { 0, FX32_CONST(2.6), 0 };
@@ -83,6 +89,7 @@ static const Light sLights[] = {
     { { 0, -FX16_ONE, 0 }, GX_RGB(16, 16, 16) },
 };
 
+// clang-format off
 static const IntroBGSetup sBGSetups[] = {
     { 1,
       { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0800), GX_BG_CHARBASE(0x00000), 0x4000,
@@ -101,6 +108,8 @@ static const IntroBGSetup sBGSetups[] = {
         GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE },
       BGMODE_TEXT, TRUE },
 };
+
+// clang-format on
 
 static const BGSysLCDConfig sLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D };
 static const ClActSysSetup sClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
@@ -229,28 +238,83 @@ static void IntroBG_InitNamed(IntroBG *bg, HeapID heapId) {
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x00000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf800),
+                          GX_BG_CHARBASE(0x00000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
         GFL_BGSysCreateBG(1, &setup, BGMODE_TEXT);
     }
     {
-        BGSetup setup = { 0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe800),
-                          GX_BG_CHARBASE(0x10000), 0x8000, GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x1000,
+                          0,
+                          BGRES_512x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xe800),
+                          GX_BG_CHARBASE(0x10000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          2,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
         GFL_BGSysCreateBG(2, &setup, BGMODE_TEXT);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe000),
-                          GX_BG_CHARBASE(0x18000), 0x8000, GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xe000),
+                          GX_BG_CHARBASE(0x18000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          3,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
         GFL_BGSysCreateBG(3, &setup, BGMODE_TEXT);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800),
-                          GX_BG_CHARBASE(0x00000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0x7800),
+                          GX_BG_CHARBASE(0x00000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
         GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7000),
-                          GX_BG_CHARBASE(0x00000), 0x8000, GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0x7000),
+                          GX_BG_CHARBASE(0x00000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          2,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
         GFL_BGSysCreateBG(6, &setup, BGMODE_TEXT);
     }
     GFL_BGSysSetBGEnabled(1, TRUE);
@@ -312,9 +376,9 @@ static void IntroG3dSys_Init(IntroG3dSys *g3d, HeapID heapId) {
 
     GFL_G3DSysCreate(FALSE, 4, 0, 2, 0, heapId, IntroGraphic_G3DInit);
     // A 40 degree field of view
-    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)),
-                                      FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024), 0, &sCameraPosition,
-                                      &sCameraUpVector, &sCameraTarget, heapId);
+    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
+                                      FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024),
+                                      0, &sCameraPosition, &sCameraUpVector, &sCameraTarget, heapId);
     far = FX32_CONST(2048);
     near = FX32_CONST(0.1);
     GFL_G3DCameraSetProjectionZFar(g3d->camera, &far);
@@ -328,9 +392,9 @@ static void IntroG3dSys_InitNamed(IntroG3dSys *g3d, HeapID heapId) {
     fx32 near;
 
     GFL_G3DSysCreate(FALSE, 2, 0, 2, 0, heapId, IntroGraphic_G3DInit);
-    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)),
-                                      FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024), 0, &sCameraPosition,
-                                      &sCameraUpVector, &sCameraTarget, heapId);
+    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
+                                      FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024),
+                                      0, &sCameraPosition, &sCameraUpVector, &sCameraTarget, heapId);
     far = FX32_CONST(2048);
     near = FX32_CONST(0.1);
     GFL_G3DCameraSetProjectionZFar(g3d->camera, &far);

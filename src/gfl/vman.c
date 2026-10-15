@@ -20,6 +20,7 @@ typedef struct {
     u32 sizeKB;
 } VRAMBankSize;
 
+// clang-format off
 static const ObjTileMappingBoundary sObjTileMappingBoundaries[] = {
     { GX_OBJVRAMMODE_CHAR_2D, 0x20 },
     { GX_OBJVRAMMODE_CHAR_1D_32K, 0x20 },
@@ -28,6 +29,9 @@ static const ObjTileMappingBoundary sObjTileMappingBoundaries[] = {
     { GX_OBJVRAMMODE_CHAR_1D_256K, 0x100 },
 };
 
+// clang-format on
+
+// clang-format off
 static const VRAMBankSize sVRAMBankSizes[] = {
     { GX_VRAM_A, 128 },
     { GX_VRAM_B, 128 },
@@ -39,6 +43,8 @@ static const VRAMBankSize sVRAMBankSizes[] = {
     { GX_VRAM_H, 32 },
     { GX_VRAM_I, 16 },
 };
+
+// clang-format on
 
 u32 GFL_VRAMManagerCalcBankSizeBytes(u32 banks) {
     u32 i;
@@ -119,4 +125,3 @@ void GFL_VRAMManagerDeAlloc(VRAMMan *man, VRAMAlloc *alloc) {
 u32 GFL_VRAMManagerGetAllocAddress(const VRAMMan *man, const VRAMAlloc *alloc) {
     return man->offset + alloc->pos * man->blockSize;
 }
-

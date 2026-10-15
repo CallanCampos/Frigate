@@ -85,7 +85,8 @@ SaveOutside *SaveOutside_Load(HeapID heapId) {
         broken[i] = FALSE;
     }
     loaded[BLOCK_GIFTS] = func_0203bf30(GIFTS_ADDR, blocks[BLOCK_GIFTS], sizeof(SaveOutsideGiftsBlock));
-    loaded[BLOCK_GIFTS_BACKUP] = func_0203bf30(GIFTS_BACKUP_ADDR, blocks[BLOCK_GIFTS_BACKUP], sizeof(SaveOutsideGiftsBlock));
+    loaded[BLOCK_GIFTS_BACKUP] =
+        func_0203bf30(GIFTS_BACKUP_ADDR, blocks[BLOCK_GIFTS_BACKUP], sizeof(SaveOutsideGiftsBlock));
     loaded[BLOCK_KEYS] = func_0203bf30(KEYS_ADDR, blocks[BLOCK_KEYS], sizeof(SaveOutsideKeysBlock));
     blocks[BLOCK_GIFTS]->size = sizeof(SaveOutsideGifts);
     blocks[BLOCK_GIFTS_BACKUP]->size = sizeof(SaveOutsideGifts);
@@ -191,7 +192,8 @@ BOOL SaveOutside_Save(SaveOutside *work) {
     switch (work->saveSeq) {
     case 0:
     case 2:
-        work->lockId = func_0203bf00(work->saveSlot == 0 ? GIFTS_ADDR : GIFTS_BACKUP_ADDR, work, sizeof(SaveOutsideGiftsBlock));
+        work->lockId =
+            func_0203bf00(work->saveSlot == 0 ? GIFTS_ADDR : GIFTS_BACKUP_ADDR, work, sizeof(SaveOutsideGiftsBlock));
         work->saveSeq++;
         break;
     case 1:

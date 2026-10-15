@@ -138,8 +138,8 @@ static u8 func_ov167_021ae430(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
     case 4:
     case 5:
     case 9:
-        BtlMonSet_Add(targets, redirect == 0x1f ? func_ov167_021aecac(flow, pos, 0)
-                                                      : GetPokeParam(flow->pokeCon, redirect));
+        BtlMonSet_Add(targets,
+                      redirect == 0x1f ? func_ov167_021aecac(flow, pos, 0) : GetPokeParam(flow->pokeCon, redirect));
         return 1;
     case 1:
     case 7:
@@ -561,9 +561,8 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
             entry->exp = ScaleExpGainedByLevel(mon, entry->exp, level, defeatedLevel);
             // A traded mon gets half again as much, or 1.7 times from a game in another language
             if (!IsTrainerOT(pkm, player)) {
-                entry->exp = fixed_round(entry->exp,
-                                         PokeParty_GetParam(pkm, 0xc, NULL) != TrainerInfo_GetRegion(player) ? 0x1b33
-                                                                                                            : 0x1800);
+                entry->exp = fixed_round(
+                    entry->exp, PokeParty_GetParam(pkm, 0xc, NULL) != TrainerInfo_GetRegion(player) ? 0x1b33 : 0x1800);
                 entry->boosted = TRUE;
             }
             if (GetBattleMonHeldItem(mon) == ITEM_LUCKY_EGG) {
@@ -610,6 +609,7 @@ typedef struct {
     u16 powerItem;
 } BtlFlowEVParam;
 
+// clang-format off
 static const BtlFlowEVParam data_ov167_021d6cfc[6] = {
     { 0x0a, 0x0d, 0x126 },
     { 0x0b, 0x0e, 0x121 },
@@ -618,6 +618,8 @@ static const BtlFlowEVParam data_ov167_021d6cfc[6] = {
     { 0x0e, 0x11, 0x123 },
     { 0x0f, 0x12, 0x124 },
 };
+
+// clang-format on
 
 // Function name from swan.
 static void AddEVs(BattleMon *mon, BattleMon *defeated, BtlFlowExpEntry *entry) {
@@ -863,9 +865,8 @@ static BOOL func_ov167_021af5bc(BtlServerFlow *flow, BattleMon *mon, u16 item) {
 
     target = NULL;
     targetPos = 6;
-    numPositions = func_ov167_0219bfe4(flow->mainModule,
-                                       0x600 | MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon)),
-                                       positions);
+    numPositions = func_ov167_0219bfe4(
+        flow->mainModule, 0x600 | MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon)), positions);
     for (i = 0; i < numPositions; i++) {
         target = func_ov167_0219d180(flow->pokeCon, positions[i]);
         if (!IsFainted(target)) {
@@ -1522,7 +1523,7 @@ static s32 func_ov167_021b02ec(BtlMainModule *mainModule, BOOL won) {
 s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon) {
     u8 unkDF = func_ov167_0219c9b0(mainModule);
     BOOL won = FALSE;
-    s32 outcomes[5] = {0};
+    s32 outcomes[5] = { 0 };
     const BtlScriptedRules *rules;
     BOOL playerDown;
     s32 outcome;

@@ -24,7 +24,6 @@ struct FieldActorAnmProc {
     HeapID heapId;
 };
 
-
 FieldActorAnmProc *FieldActorAnmProc_Create(Field *field, u16 actorId, const VecFx32 *pos, HeapID heapId);
 void FieldActorAnmProc_Free(FieldActorAnmProc *proc);
 void FieldActorAnmProc_Play(FieldActorAnmProc *proc, u16 animation);

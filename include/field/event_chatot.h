@@ -4,13 +4,13 @@
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
 #include "gfl/msg.h"
-#include "system/printsys.h"
-#include "system/time_icon.h"
-#include "system/text_speed.h"
-#include "system/app_keycursor.h"
-#include "system/gf_font.h"
 #include "gfl/str.h"
+#include "system/app_keycursor.h"
 #include "system/game_event.h"
+#include "system/gf_font.h"
+#include "system/printsys.h"
+#include "system/text_speed.h"
+#include "system/time_icon.h"
 
 struct ChatotEventWork {
     void *chatter;

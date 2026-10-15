@@ -232,6 +232,7 @@ static void ZukanHabitat_UpdateShortcut(ZukanHabitatWork *wk);
 static BOOL ZukanHabitat_HasSeveralTypes(ZukanHabitatWork *wk);
 static void ZukanHabitat_ShowInfoButton(ZukanHabitatWork *wk, BOOL known, BOOL shown);
 
+// clang-format off
 static const ZukanHabitatSeqFunc sZukanHabitatSequences[SEQ_COUNT + 1] = {
     ZukanHabitat_SeqInit,         ZukanHabitat_SeqFadeIn,     ZukanHabitat_SeqFadeOut,     ZukanHabitat_SeqList,
     ZukanHabitat_SeqLeaveCursor,  ZukanHabitat_SeqChangeSeason, ZukanHabitat_SeqChangeArea, ZukanHabitat_SeqChangeType,
@@ -239,7 +240,10 @@ static const ZukanHabitatSeqFunc sZukanHabitatSequences[SEQ_COUNT + 1] = {
     ZukanHabitat_SeqAllComplete,  NULL,
 };
 
+// clang-format on
+
 // BUG: neither table ends with TOUCH_RECT_END, so the search runs on into the data that follows them
+// clang-format off
 static const TouchRect sZukanHabitatCursorTouchRects[CURSOR_TOUCH_COUNT] = {
     { 168, 191, 232, 255 }, { 168, 191, 96, 212 },
     { 48, 80, 32, 72 },     { 48, 80, 72, 112 },    { 48, 80, 112, 152 },   { 48, 80, 152, 192 },   { 48, 80, 192, 232 },
@@ -248,6 +252,9 @@ static const TouchRect sZukanHabitatCursorTouchRects[CURSOR_TOUCH_COUNT] = {
     { 144, 176, 32, 72 },   { 144, 176, 72, 112 },  { 144, 176, 112, 152 }, { 144, 176, 152, 192 }, { 144, 176, 192, 232 },
 };
 
+// clang-format on
+
+// clang-format off
 static const TouchRect sZukanHabitatListTouchRects[LIST_TOUCH_COUNT] = {
     { 168, 191, 184, 207 }, { 168, 191, 208, 231 }, { 168, 191, 232, 255 }, { 168, 191, 68, 92 },   { 168, 191, 108, 132 },
     { 168, 191, 148, 172 }, { 168, 191, 0, 24 },    { 168, 191, 24, 48 },   { 52, 76, 12, 36 },     { 52, 76, 228, 244 },
@@ -256,6 +263,8 @@ static const TouchRect sZukanHabitatListTouchRects[LIST_TOUCH_COUNT] = {
     { 112, 144, 32, 72 },   { 112, 144, 72, 112 },  { 112, 144, 112, 152 }, { 112, 144, 152, 192 }, { 112, 144, 192, 232 },
     { 144, 176, 32, 72 },   { 144, 176, 72, 112 },  { 144, 176, 112, 152 }, { 144, 176, 152, 192 }, { 144, 176, 192, 232 },
 };
+
+// clang-format on
 
 // The areas of the habitat list, as in zukan_common.c. An area's place in it is its habitat in the save
 static const ZukanHabitatTableEntry sZukanHabitatAreas[] = {
@@ -745,8 +754,7 @@ static void ZukanHabitat_SeqInit(ZukanHabitatWork *wk) {
         wk->step++;
         break;
     case 1:
-        if (ZukanHabitatGraphic_AreIconsLoaded(&wk->graphic) &&
-            !ZukanHabitatGraphic_IsPaletteRequested(&wk->graphic)) {
+        if (ZukanHabitatGraphic_AreIconsLoaded(&wk->graphic) && !ZukanHabitatGraphic_IsPaletteRequested(&wk->graphic)) {
             ZukanHabitat_SetSequence(wk, SEQ_FADE_IN, ACTION_NONE);
             wk->finished = FALSE;
         }
@@ -1415,8 +1423,7 @@ static void ZukanHabitat_UpdateTabs(ZukanHabitatWork *wk) {
 static void ZukanHabitat_UpdateNewMarks(ZukanHabitatWork *wk) {
     ZukanHabitat_UpdateNewMark(wk, TYPE_LAND, ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_NEW));
     ZukanHabitat_UpdateNewMark(wk, TYPE_WATER, ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_NEW + 1));
-    ZukanHabitat_UpdateNewMark(wk, TYPE_FISHING,
-                               ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_NEW + 2));
+    ZukanHabitat_UpdateNewMark(wk, TYPE_FISHING, ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_NEW + 2));
 }
 
 // Marks the tab of a kind of habitat that has a stamp to give
@@ -1596,8 +1603,7 @@ static int ZukanHabitat_GetSpecies(ZukanHabitatWork *wk, u8 cell) {
 static u32 ZukanHabitat_GetAward(ZukanHabitatWork *wk) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
 
-    if (area->complete == TRUE &&
-        func_02010cfc(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone)) == FALSE) {
+    if (area->complete == TRUE && func_02010cfc(wk->habitat, ZukanHabitat_GetHabitatIndex(area->zone)) == FALSE) {
         return AWARD_AREA;
     }
     return ZukanHabitat_GetTypeAward(wk, wk->type);

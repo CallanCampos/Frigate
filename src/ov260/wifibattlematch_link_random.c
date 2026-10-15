@@ -169,7 +169,7 @@ static BOOL WifiBattleMatchLink_RandomInit(GameProc *proc, u32 *state, void *par
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_FISHING, HEAPID_WIFIBATTLEMATCH_LINK);
     link->wordSet = GFL_WordSetSystemCreate(8, 0x40, HEAPID_WIFIBATTLEMATCH_LINK);
     link->net = WifiBattleMatchNet_Create(link->param->unk3C, linkParam->param->gameData, linkParam->unk1C,
-                                    HEAPID_WIFIBATTLEMATCH_LINK);
+                                          HEAPID_WIFIBATTLEMATCH_LINK);
     link->msgBox =
         WifiBattleMatchMsgBox_Create(0, 15, 14, 10, link->printQueue, link->font, HEAPID_WIFIBATTLEMATCH_LINK);
     link->task = WifiBattleMatchTask_Create(link, WifiBattleMatchLink_TaskStart, HEAPID_WIFIBATTLEMATCH_LINK);
@@ -1004,7 +1004,8 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         WifiBattleMatchTask_SetReturnSeq(task, 2);
         break;
     case 2:
-        WifiBattleMatchNet_StartReport(link->net, 1, 2, param->param->unk4, &param->battleResult->result, param->result == 2);
+        WifiBattleMatchNet_StartReport(link->net, 1, 2, param->param->unk4, &param->battleResult->result,
+                                       param->result == 2);
         link->exchangeDone = 0;
         link->exchangeResult = 0;
         *seq = 3;
@@ -2124,7 +2125,8 @@ static BOOL WifiBattleMatchLink_UpdateRecord(void *results, u32 battleType, Wifi
         second = link->param->ratings->results[2].second;
         break;
     }
-    if (rating != RndMatchData_GetParam(results, battleType + 5, 0) || first != RndMatchData_GetParam(results, battleType + 5, 1) ||
+    if (rating != RndMatchData_GetParam(results, battleType + 5, 0) ||
+        first != RndMatchData_GetParam(results, battleType + 5, 1) ||
         second != RndMatchData_GetParam(results, battleType + 5, 2)) {
         changed = TRUE;
     } else {

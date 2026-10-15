@@ -6,8 +6,8 @@
 #include "dwc/sake.h"
 #include "dwc/sc.h"
 
-// Nintendo's Wi-Fi Connection library's record database client, in overlay 260 (gdb.c), which wifibattlematch_net.c uses
-// to keep the Wi-Fi competitions' stats and the players' teams on the storage server (GameSpy's Sake, dwc/sake.h).
+// Nintendo's Wi-Fi Connection library's record database client, in overlay 260 (gdb.c), which wifibattlematch_net.c
+// uses to keep the Wi-Fi competitions' stats and the players' teams on the storage server (GameSpy's Sake, dwc/sake.h).
 // The ROM names it in its log texts ("Gdb[%d]> ", "DWCGdbError[%d]") and in the names of the Sake calls that it
 // reports failing. It works one request at a time, in the order of the library: start it, start a request, run it
 // each frame until it ends, then ask what the result was. The Sc, which this header used to hold, is dwc/sc.h's

@@ -2,8 +2,8 @@
 // own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
-#include "field/field_effect.h"
 #include "field/field.h"
+#include "field/field_effect.h"
 #include "field/field_map.h"
 #include "gfl/arc.h"
 #include "gfl/blact.h"
@@ -202,8 +202,7 @@ static void FieldEffects_InitEffectBuffer(FieldEffects *effects) {
     int i;
     FieldEffectHandle *handle;
 
-    handle = GFL_HeapAllocate(effects->heapId, effects->count * sizeof(FieldEffectHandle), TRUE, "field_effect.c",
-                              373);
+    handle = GFL_HeapAllocate(effects->heapId, effects->count * sizeof(FieldEffectHandle), TRUE, "field_effect.c", 373);
     effects->handles = handle;
     for (i = 0; i < effects->count; i++, handle++) {
         handle->id = FLDEFF_NONE;
@@ -252,14 +251,14 @@ static const FieldEffectVTable *FieldEffects_GetVTable(u32 id) {
 
 void FieldEffects_TCBManagerInit(FieldEffects *effects, u32 count) {
     effects->taskCount = count;
-    effects->tcbMgrWork = GFL_HeapAllocate(effects->heapId, GFL_TCBMgrCalcAllocSize(count), FALSE, "field_effect.c",
-                                           476);
+    effects->tcbMgrWork =
+        GFL_HeapAllocate(effects->heapId, GFL_TCBMgrCalcAllocSize(count), FALSE, "field_effect.c", 476);
     effects->tcbMgr = GFL_TCBMgrCreate(count, effects->tcbMgrWork);
     effects->taskStore = FieldEffectTCBStore_Create(effects->heapId, effects->tcbMgr, count, effects);
 }
 
-FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffectTaskVTable *vtable,
-                                        const VecFx32 *pos, u32 param1, void *param2, u32 priority) {
+FieldEffectTask *FieldEffects_TCBCreate(FieldEffects *effects, const FieldEffectTaskVTable *vtable, const VecFx32 *pos,
+                                        u32 param1, void *param2, u32 priority) {
     return FieldTerrainEffectTCB_Create(effects->taskStore, vtable, pos, param1, param2, priority);
 }
 

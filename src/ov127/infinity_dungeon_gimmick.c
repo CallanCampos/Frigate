@@ -3,6 +3,8 @@
 #include "constants/sound.h"
 #include "constants/version.h"
 #include "constants/zones.h"
+#include "field/encounter.h"
+#include "field/event_mapchange.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
@@ -13,8 +15,6 @@
 #include "field/field_script.h"
 #include "field/infinity_dungeon_rooms.h"
 #include "field/player_state.h"
-#include "field/event_mapchange.h"
-#include "field/encounter.h"
 #include "field/zone_change.h"
 #include "gfl/calctool.h"
 #include "gfl/fade.h"
@@ -39,13 +39,11 @@
 #define OBJECT_MACHINE_B 2
 #define OBJECT_LIFT 3
 
-
 // The archive of the models
 #define ARC_INFINITY_DUNGEON 0x104
 
 // The kind of a door event that opens the door, where any other closes it
 #define DOOR_OPEN 1
-
 
 // The direction of the arrival on a floor
 #define DIR_ARRIVAL 4
@@ -54,7 +52,6 @@
 
 // The bytes of the gimmick that its init clears, up to the dungeon
 #define INIT_CLEAR_SIZE 0x54
-
 
 // Where an object of a zone's scene stands
 typedef struct {
@@ -135,11 +132,14 @@ static const G3DSceneActorSetup sBlackActors[4] = {
     { 6, 0, 6, 0, sAnimationsLiftBlack, 1 },
 };
 
+// clang-format off
 static const G3DSceneResourceSetup sBlackResources[9] = {
     { ARC_INFINITY_DUNGEON, 0, 0, 0 }, { ARC_INFINITY_DUNGEON, 1, 0, 0 },  { ARC_INFINITY_DUNGEON, 2, 0, 0 },
     { ARC_INFINITY_DUNGEON, 3, 0, 0 }, { ARC_INFINITY_DUNGEON, 4, 0, 0 },  { ARC_INFINITY_DUNGEON, 5, 0, 0 },
     { ARC_INFINITY_DUNGEON, 12, 0, 0 }, { ARC_INFINITY_DUNGEON, 13, 0, 0 }, { 0, 0, 0, 0 },
 };
+
+// clang-format on
 
 static const G3DSceneResourceSetup sWhiteResources[9] = {
     { ARC_INFINITY_DUNGEON, 6, 0, 0 },  { ARC_INFINITY_DUNGEON, 7, 0, 0 },  { ARC_INFINITY_DUNGEON, 8, 0, 0 },
@@ -150,6 +150,7 @@ static const G3DSceneResourceSetup sWhiteResources[9] = {
 // The props of a room's walls, for its north, south, east and west passages. In the ROM they lie after the placements,
 // at 0x021f233c, where this file's .rodata puts them among its small tables: they may belong to infinity_dungeon.c
 
+// clang-format off
 static const ObjectPlacement sPlacements[8] = {
     { ZONE_BLACK_TOWER, 0, 120, 0, 32 },
     { ZONE_BLACK_TOWER, 1, 182, 0, 32 },
@@ -161,6 +162,8 @@ static const ObjectPlacement sPlacements[8] = {
     { ZONE_WHITE_TREEHOLLOW_2, 0, 104, 0, 0 },
 };
 
+// clang-format on
+
 void InfinityDungeonGimmick_Setup(Field *field) {
     HeapID heapId = Field_GetHeapID(field);
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
@@ -168,7 +171,8 @@ void InfinityDungeonGimmick_Setup(Field *field) {
     sys_memset(gimmick, 0, sizeof(InfinityDungeonGimmick));
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(gameData));
     InfinityDungeonGimmick_Init(gimmick, field, keyData, func_02017220(gameData));
-    gimmick->dungeon = GFL_HeapAllocate(heapId, InfinityDungeonGimmick_GetDungeonSize(), FALSE, "infinity_dungeon_gimmick.c", 510);
+    gimmick->dungeon =
+        GFL_HeapAllocate(heapId, InfinityDungeonGimmick_GetDungeonSize(), FALSE, "infinity_dungeon_gimmick.c", 510);
     InfinityDungeonGimmick_SetupDungeon(gimmick->dungeon, gameData, heapId);
     InfinityDungeonGimmick_SetupScene(gimmick->dungeon, gimmick);
     func_ov012_02166fc4(Field_GetActorSystem(field), 8);
@@ -373,7 +377,8 @@ static GameEventReturnCode InfinityDungeonGimmick_MachineEvent(GameEvent *event,
         (*state)++;
         break;
     case 1: {
-        if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(machineB->expObj, 0, machineB->actor, 0)) == TRUE) {
+        if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(machineB->expObj, 0, machineB->actor, 0)) ==
+            TRUE) {
             FieldExpObj_SetActorHidden(machineB->expObj, machineB->scene, machineB->actor, TRUE);
             FieldExpObj_SetActorHidden(machineA->expObj, machineA->scene, machineA->actor, FALSE);
             (*state)++;
@@ -605,8 +610,8 @@ static u32 InfinityDungeonGimmick_GetDungeonSize(void) {
 }
 
 // Moves up a floor of a dungeon that the player has just started, or into the arrival
-void InfinityDungeonGimmick_CallRoomChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 direction, u8 inTransition,
-                         u8 outTransition) {
+void InfinityDungeonGimmick_CallRoomChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 direction,
+                                           u8 inTransition, u8 outTransition) {
     GameEvent *event = GameEvent_Create(gsys, NULL, InfinityDungeonRoomChange_Event, sizeof(InfinityDungeonRoomChange));
     InfinityDungeonRoomChange *roomChange;
 
@@ -674,8 +679,8 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
             if (func_ov127_021f08d0(roomChange)) {
                 GFL_FadeSet(3, 0, 16, 4);
             } else {
-                GameEvent_ChainNext(event, CallFieldMapEntranceOutTransitionDefault(roomChange->gsys,
-                                                                                    roomChange->field, 0, 0));
+                GameEvent_ChainNext(
+                    event, CallFieldMapEntranceOutTransitionDefault(roomChange->gsys, roomChange->field, 0, 0));
             }
         }
         (*state)++;
@@ -718,8 +723,8 @@ static GameEventReturnCode InfinityDungeonRoomChange_Event(GameEvent *event, u32
                 FieldG3D_RestoreSurface(roomChange->field);
                 GFL_FadeSet(3, 16, 0, 4);
             } else {
-                GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(roomChange->gsys, roomChange->field, 0, 0,
-                                                                            1, 0, 0));
+                GameEvent_ChainNext(
+                    event, CallFieldMapEntranceInTransition(roomChange->gsys, roomChange->field, 0, 0, 1, 0, 0));
             }
         } else {
             FieldG3D_RestoreSurface(roomChange->field);

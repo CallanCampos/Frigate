@@ -2,8 +2,8 @@
 #define POKEBW2_GFL_NET_COMMAND_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "gfl/heap.h"
+#include "struct_decls.h"
 
 // The commands machines send each other. The library's own are below 0x100; a game's table takes a base of 0x100 or
 // more, the command's high byte, and its commands are the low byte. Data larger than a packet is sent in chunks

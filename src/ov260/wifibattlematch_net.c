@@ -489,7 +489,8 @@ u32 WifiBattleMatchNet_LoginMain(WifiBattleMatchNet *p_wk) {
     return 0;
 }
 
-void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u32 a3, const WifiBattleMatchNetKeys *keys) {
+void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u32 a3,
+                                   const WifiBattleMatchNetKeys *keys) {
     u32 modValue = mode;
 
     if (mode == 1) {
@@ -1074,8 +1075,8 @@ u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
         break;
     case 20:
         p_wk->counter++;
-        err = Sc_SubmitReport(p_wk->p_data->mine.connection, p_wk->unk1ac, WifiBattleMatchNet_OnRequestDone2, 100,
-                                  p_wk);
+        err =
+            Sc_SubmitReport(p_wk->p_data->mine.connection, p_wk->unk1ac, WifiBattleMatchNet_OnRequestDone2, 100, p_wk);
         if (err != 0) {
             WifiBattleMatchNet_SetDwcError(&p_wk->error, err, 2236);
             WifiBattleMatchNet_EndRequests(p_wk);
@@ -1242,7 +1243,9 @@ static int WifiBattleMatchNet_SendBattleResult(WifiBattleMatchNetInfo *info, Wif
                 theirsMode = 2;
                 break;
             default:
+                // clang-format off
                 GFL_ASSERT_MSG(0, "\x83\x6f\x83\x67\x83\x8b\x8c\x8b\x89\xca\x95\x73\x90\xb3\x92\x6c %d\n", param->outcome);
+                // clang-format on
                 break;
             }
         }
@@ -1622,10 +1625,10 @@ u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk) {
         GFL_ASSERT(p_wk->table_name_num < WBM_GDB_FIELD_TABLE_MAX);
         if (p_wk->recordIdArg == -1) {
             err = Gdb_GetMyRecords(WBM_GDB_TABLE_NAME, p_wk->tableNames, p_wk->table_name_num,
-                                      WifiBattleMatchNet_OnRecords, p_wk);
+                                   WifiBattleMatchNet_OnRecords, p_wk);
         } else {
-            err = Gdb_GetSpecificRecords(WBM_GDB_TABLE_NAME, &p_wk->recordIdArg, 1, p_wk->tableNames, p_wk->table_name_num,
-                                      WifiBattleMatchNet_OnRecords, p_wk);
+            err = Gdb_GetSpecificRecords(WBM_GDB_TABLE_NAME, &p_wk->recordIdArg, 1, p_wk->tableNames,
+                                         p_wk->table_name_num, WifiBattleMatchNet_OnRecords, p_wk);
         }
         if (err != 0) {
             WifiBattleMatchNet_SetGdbError(&p_wk->error, err, 3701);
@@ -1773,19 +1776,26 @@ static void WifiBattleMatchNet_ReadArena(int recordNum, GdbField **records, void
                 stats->numTripleLose = field->value.intValue;
             } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_NUM_SHOOTER_WIN))) {
                 stats->numShooterWin = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_NUM_SHOOTER_LOSE))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_NUM_SHOOTER_LOSE))) {
                 stats->numShooterLose = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_SINGLE))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_SINGLE))) {
                 stats->eloRatingSingle = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_DOUBLE))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_DOUBLE))) {
                 stats->eloRatingDouble = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_ROTATE))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_ROTATE))) {
                 stats->eloRatingRotate = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_TRIPLE))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_TRIPLE))) {
                 stats->eloRatingTriple = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_SHOOTER))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_SHOOTER))) {
                 stats->eloRatingShooter = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_DISCONNECTS_COUNTER))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_DISCONNECTS_COUNTER))) {
                 stats->disconnectsCounter = field->value.intValue;
             } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_CHEATS_COUNTER))) {
                 stats->cheatsCounter = field->value.intValue;
@@ -1813,13 +1823,17 @@ static void WifiBattleMatchNet_ReadWifiCup(int recordNum, GdbField **records, vo
 
             if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_NUM_WIFICUP_WIN))) {
                 stats->numWin = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_NUM_WIFICUP_LOSE))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_NUM_WIFICUP_LOSE))) {
                 stats->numLose = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_WIFICUP))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_ELO_RATING_1V1_WIFICUP))) {
                 stats->eloRating = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_DISCONNECTS_WIFICUP_COUNTER))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_DISCONNECTS_WIFICUP_COUNTER))) {
                 stats->disconnectsCounter = field->value.intValue;
-            } else if (!_STD_CompareNString(field->name, WifiBattleMatchNet_GetArenaFieldName(ARENA_CHEATS_WIFICUP_COUNTER))) {
+            } else if (!_STD_CompareNString(field->name,
+                                            WifiBattleMatchNet_GetArenaFieldName(ARENA_CHEATS_WIFICUP_COUNTER))) {
                 stats->cheatsCounter = field->value.intValue;
             } else if (!_STD_CompareNString(field->name, "RECORD_SAVE_IDX")) {
                 stats->recordSaveIdx = field->value.intValue;
@@ -2037,8 +2051,7 @@ u32 WifiBattleMatchNet_CreateRecordMain(WifiBattleMatchNet *p_wk) {
         p_wk->state = 1;
         break;
     case 1:
-        err = Gdb_CreateRecord(WBM_GDB_TABLE_NAME, p_wk->record, p_wk->table_name_num,
-                                   &p_wk->p_data->sake_recordID);
+        err = Gdb_CreateRecord(WBM_GDB_TABLE_NAME, p_wk->record, p_wk->table_name_num, &p_wk->p_data->sake_recordID);
         if (err != 0) {
             WifiBattleMatchNet_SetGdbError(&p_wk->error, err, 4750);
             return 2;

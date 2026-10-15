@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/wifi_bsubway.h"
 #include "app/codein.h"
+#include "app/wifi_bsubway.h"
 #include "app/wifi_bsubway_graphic.h"
 #include "app/wifi_login.h"
 #include "constants/arc.h"
@@ -643,13 +643,15 @@ static void WifiBSubwayRoom_FixData(WifiBSubwayRoom *room) {
     for (i = 0; i < ROOM_PLAYER_COUNT; i++) {
         players[i].countryCode =
             Country_GetValidCountry(players[i].countryCode, players[i].localCode, players[i].langCode);
-        players[i].localCode = Country_GetValidRegion(players[i].countryCode, players[i].localCode, players[i].langCode);
+        players[i].localCode =
+            Country_GetValidRegion(players[i].countryCode, players[i].localCode, players[i].langCode);
         players[i].trainerType = func_0202b5e8(func_0202b630(players[i].trainerType));
     }
     for (i = 0; i < ROOM_LEADER_COUNT; i++) {
         leaders[i].countryCode =
             Country_GetValidCountry(leaders[i].countryCode, leaders[i].localCode, leaders[i].langCode);
-        leaders[i].localCode = Country_GetValidRegion(leaders[i].countryCode, leaders[i].localCode, leaders[i].langCode);
+        leaders[i].localCode =
+            Country_GetValidRegion(leaders[i].countryCode, leaders[i].localCode, leaders[i].langCode);
     }
 }
 
@@ -1745,8 +1747,8 @@ static void WifiBSubwayView_SetNumber(WifiBSubwayView *view, u32 index, u32 numb
 
 static void WifiBSubwayView_StartYesNo(WifiBSubwayView *view) {
     sWifiBSubwayYesNoSetup.unk4 = view->yesNoFrameChars;
-    view->yesNo = ShopUI_CreateConfirmDialog(&sWifiBSubwayYesNoSetup, view->yesNoFrameChars, FRAME_PALETTE, 0,
-                                             view->heapId);
+    view->yesNo =
+        ShopUI_CreateConfirmDialog(&sWifiBSubwayYesNoSetup, view->yesNoFrameChars, FRAME_PALETTE, 0, view->heapId);
 }
 
 // Returns 0 for yes, BMPMENU_CANCEL for no, also when there is no menu, and BMPMENU_NULL until the player answers

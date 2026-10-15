@@ -242,7 +242,9 @@ static const G3DSceneResourceSetup sGymOpelucidResources[21] = {
     { GIMMICK_ARCID, 13, 0 },
 };
 
-static const G3DSceneSetup sGymOpelucidSceneSetup = { sGymOpelucidResources, NELEMS(sGymOpelucidResources), sGymOpelucidActors, NELEMS(sGymOpelucidActors) };
+static const G3DSceneSetup sGymOpelucidSceneSetup = { sGymOpelucidResources, NELEMS(sGymOpelucidResources),
+                                                      sGymOpelucidActors, NELEMS(sGymOpelucidActors) };
+// clang-format off
 static const OpelucidGymCurve sCurves[32] = {
     { 0, 0, 179 }, { 0, 299, 359 }, { 0, 199, 259 }, { 0, 259, 289 },
     { 0, 359, 389 }, { 0, 179, 0 }, { 0, 399, 579 }, { 0, 599, 659 },
@@ -253,6 +255,8 @@ static const OpelucidGymCurve sCurves[32] = {
     { 3, 659, 689 }, { 4, 659, 689 }, { 4, 699, 759 }, { 3, 699, 759 },
     { 4, 759, 789 }, { 3, 759, 789 }, { 5, 799, 979 }, { 5, 980, 1019 },
 };
+
+// clang-format on
 
 // What each move does, by tier, column and direction
 static const OpelucidGymStep sGymOpelucidSteps[TIER_COUNT][COLUMN_COUNT][DIRECTION_COUNT] = {
@@ -349,7 +353,8 @@ static BOOL (*sTierChecks[TIER_COUNT])(EventWork *eventWork) = {
 void GymOpelucid_Init(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     GimmickState *gimmickState = GameData_GetGimmickState(gameData);
-    OpelucidGymWork *work = Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(OpelucidGymWork));
+    OpelucidGymWork *work =
+        Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(OpelucidGymWork));
     FieldFog *fog;
 
     GFL_HeapCreateChild(HEAPID_FIELDMAP, HEAPID_GYM_OPELUCID, 0x30000);
@@ -431,7 +436,8 @@ static void GymOpelucid_PlacePlates(Field *field) {
     void *list = func_ov036_02184590(Field_GetG3DMapper(field));
 
     for (i = 0; i < PLATE_COUNT; i++) {
-        func_ov036_021ba624(i, sPlates[i].x, sPlates[i].z, sPlates[i].width, sPlates[i].depth, sPlates[i].value, 0x800000, list);
+        func_ov036_021ba624(i, sPlates[i].x, sPlates[i].z, sPlates[i].width, sPlates[i].depth, sPlates[i].value,
+                            0x800000, list);
     }
 }
 

@@ -30,7 +30,6 @@
 #include "gfl/tcb.h"
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
-#include "system/wipe.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"
@@ -46,6 +45,7 @@
 #include "system/gf_font.h"
 #include "system/poke_icon.h"
 #include "system/printsys.h"
+#include "system/wipe.h"
 #include "system/wordset.h"
 
 // The party list's screen: its graphics, the cursor, and what each mode does with the Pokémon picked. The ROM
@@ -654,7 +654,8 @@ static void PokeList_LoadResources(PokeListWork *wk) {
 
     iconArc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
     wk->clResources[CL_RES_PLTT(6)] = func_0204bc48(iconArc, PokeIcon_GetPaletteFile(), 0, 0xc0, wk->heapId);
-    wk->clResources[CL_RES_CELL(7)] = func_0204bde0(iconArc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->clResources[CL_RES_CELL(7)] =
+        func_0204bde0(iconArc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(iconArc);
 
     commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);

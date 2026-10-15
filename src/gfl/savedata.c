@@ -25,7 +25,7 @@ static u32 getSizeSaveTblBlk(SaveDataTable *svdt, u32 id);
 static void SaveData_BuildTable(SaveDataTable *svdt, u32 blockFooterSize);
 
 SaveDataTable *SaveData_InitTable(HeapID heapId, const SaveBlockDef *table, u32 count, u32 saveareaSize, u32 footerSize,
-    u32 blockFooterSize, u32 extraSize) {
+                                  u32 blockFooterSize, u32 extraSize) {
     SaveDataTable *svdt = GFL_HeapAllocate(heapId, sizeof(SaveDataTable), FALSE, "savedata.c", 73);
 
     sys_memset32(0, svdt, sizeof(SaveDataTable));
@@ -85,8 +85,10 @@ static void SaveData_BuildTable(SaveDataTable *svdt, u32 blockFooterSize) {
         offset += size + ((u8)size != 0 ? 0x100 - (u8)size : 0);
     }
     svdt->total_size = svdt->footerSize + (offset + svdt->extraSize);
+    // clang-format off
     GFL_ASSERT_MSG(svdt->total_size <= svdt->savearea_size, "SaveDataSize=0x%08xbytes, SaveAreaSize=0x%08xbytes",
         svdt->total_size, svdt->savearea_size);
+    // clang-format on
 }
 
 u32 getStartOffsetOfSaveBlockDataInSave(SaveDataTable *svdt, u32 gmdataid) {

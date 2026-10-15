@@ -46,6 +46,7 @@ static const WBEventVar sEventVars[3] = {
     { 0x40bc, 2 },
 };
 
+// clang-format off
 static const WBUnk52Bit sUnk52Bits[8] = {
     { 0, 8 },
     { 1, 9 },
@@ -57,6 +58,9 @@ static const WBUnk52Bit sUnk52Bits[8] = {
     { 7, 15 },
 };
 
+// clang-format on
+
+// clang-format off
 static const WBEventFlagBit sEventFlagBits[8] = {
     { 2400, 0, TRUE },
     { 2401, 1, TRUE },
@@ -67,6 +71,8 @@ static const WBEventFlagBit sEventFlagBits[8] = {
     { 684, 6, FALSE },
     { 685, 7, FALSE },
 };
+
+// clang-format on
 
 WBSaveData *WBSaveConvert_Create(void *save, HeapID heapId) {
     WBSaveData *data = GFL_HeapAllocate(heapId, sizeof(WBSaveData), TRUE, "wb_save_convert.c", 90);

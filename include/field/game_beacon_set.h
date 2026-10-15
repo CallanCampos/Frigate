@@ -6,9 +6,9 @@
 // message may be sent, and a function that fills the beacon in
 
 #include "types.h"
+#include "pml/item.h"
 #include "struct_decls.h"
 #include "system/game_beacon.h"
-#include "pml/item.h"
 
 void func_ov012_0215f958(u16 value);
 void func_ov012_0215f994(u16 value);

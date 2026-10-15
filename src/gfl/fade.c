@@ -5,8 +5,8 @@
 #include "gfl/std.h"
 #include "nitro/hw.h"
 
-// A fade steps the brightness by step every wait frames until it reaches the end. updateFreq scales the step and divides
-// the wait, for callers that update the fade less often than every frame
+// A fade steps the brightness by step every wait frames until it reaches the end. updateFreq scales the step and
+// divides the wait, for callers that update the fade less often than every frame
 typedef struct {
     u32 mode;
     s32 brightnessStart;
@@ -36,8 +36,8 @@ void GFL_FadeUpdate(void) {
     }
     sFadeMgr->wait = sFadeMgr->waitFrames;
     sFadeMgr->brightness += sFadeMgr->step;
-    if ((sFadeMgr->brightness >= sFadeMgr->brightnessEnd && sFadeMgr->step > 0)
-        || (sFadeMgr->brightness <= sFadeMgr->brightnessEnd && sFadeMgr->step < 0)) {
+    if ((sFadeMgr->brightness >= sFadeMgr->brightnessEnd && sFadeMgr->step > 0) ||
+        (sFadeMgr->brightness <= sFadeMgr->brightnessEnd && sFadeMgr->step < 0)) {
         sFadeMgr->brightness = sFadeMgr->brightnessEnd;
     }
     GFL_FadeFlush();

@@ -5,8 +5,8 @@
 #include "field/encounter_effect.h"
 #include "nitro/fx.h"
 #include "nnsys/gfd.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // Overlay 148, the event around the encounter effects that draw the captured screen in 3D, such as overlay 150's
 // grid of cells: it captures the 3D screen to VRAM bank D, maps the bank as a texture, then chains the effect's event.
@@ -35,6 +35,6 @@ typedef struct {
 // white flashes first, EncEffCapture_CreateFlashEvent, and the draw function, EncEffCapture_Draw, are declared in
 // field/encounter_effect.h
 GameEvent *EncEffCapture_CreateEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
-                               void (*render)(EncEffGrid *grid));
+                                     void (*render)(EncEffGrid *grid));
 
 #endif // POKEBW2_FIELD_ENCOUNTER_EFFECT_CAPTURE_H

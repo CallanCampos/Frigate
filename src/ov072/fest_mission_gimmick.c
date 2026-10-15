@@ -235,8 +235,7 @@ static BOOL func_ov072_021e8fec(FesGimmick *gimmick, FesMissionWork *work, int i
     BOOL result;
 
     if (FindActorByGPos_(gimmick->actors, (position->x >> 4) / FX32_ONE, (position->z >> 4) / FX32_ONE, position->y,
-                         FX32_CONST(20), FALSE, work->actors[index])
-        != NULL) {
+                         FX32_CONST(20), FALSE, work->actors[index]) != NULL) {
         return TRUE;
     }
     result = FALSE;

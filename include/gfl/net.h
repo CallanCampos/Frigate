@@ -277,8 +277,7 @@ BOOL func_02042bc4(void);
 BOOL func_02042bd8(NetHandle *handle);
 // Send a command to every machine, or to one; the game's commands wait for the negotiation
 BOOL func_02042be8(NetHandle *handle, int command, u16 size, const void *data);
-BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6,
-                   BOOL noCopy);
+BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const void *data, u32 a5, BOOL a6, BOOL noCopy);
 BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6, BOOL noCopy);
 BOOL func_02042cfc(NetHandle *handle);
 void func_02042d04(NetHandle *handle, u16 timing);

@@ -39,18 +39,51 @@ static void NoGear_Idle(NoGearWork *work);
 static const u32 sPaletteFileIds[2] = { 0, 1 };
 
 static const BGSetup sBG6Setup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7000), GX_BG_CHARBASE(0x00000), 0x6000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x7000),
+    GX_BG_CHARBASE(0x00000),
+    0x6000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sBG5Setup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800), GX_BG_CHARBASE(0x00000), 0x6000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x7800),
+    GX_BG_CHARBASE(0x00000),
+    0x6000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sBG4Setup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x6800), GX_BG_CHARBASE(0x00000), 0x6000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x6800),
+    GX_BG_CHARBASE(0x00000),
+    0x6000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 // The line is unused

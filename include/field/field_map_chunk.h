@@ -155,22 +155,22 @@ void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, void *resource, void *texture
 // The kinds of chunk, by the magic at the start of their files
 // field_map_chunk_wb.c
 BOOL FieldChunkAccessor_WB_Update(FieldChunk *chunk, FieldChunkContext *context);
-void FieldChunkAccessor_WB_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos, fx32 size,
-                                      fx32 baseY);
+void FieldChunkAccessor_WB_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
+                                      fx32 size, fx32 baseY);
 // field_map_chunk_gc.c
 BOOL FieldChunkAccessor_GC_Update(FieldChunk *chunk, FieldChunkContext *context);
-void FieldChunkAccessor_GC_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos, fx32 size,
-                                      fx32 baseY);
+void FieldChunkAccessor_GC_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
+                                      fx32 size, fx32 baseY);
 void FieldChunkAccessor_GC_GetTerrainBaseLayer(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
                                                fx32 size, fx32 baseY);
 // field_map_chunk_ng.c
 BOOL FieldChunkAccessor_NG_Update(FieldChunk *chunk, FieldChunkContext *context);
-void FieldChunkAccessor_NG_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos, fx32 size,
-                                      fx32 baseY);
+void FieldChunkAccessor_NG_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
+                                      fx32 size, fx32 baseY);
 // field_map_chunk_rd.c
 BOOL FieldChunkAccessor_RD_Update(FieldChunk *chunk, FieldChunkContext *context);
-void FieldChunkAccessor_RD_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos, fx32 size,
-                                      fx32 baseY);
+void FieldChunkAccessor_RD_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
+                                      fx32 size, fx32 baseY);
 // field_map_chunk_height.c
 void FieldChunkAccessor_GetTerrainCore(MapTerrainSamplerOutput *out, u32 layer, void *terrain, const VecFx32 *pos,
                                        fx32 size, fx32 baseY);

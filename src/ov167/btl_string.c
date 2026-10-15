@@ -3,12 +3,12 @@
 // BTL_STR module, which does the same.
 
 #include "types.h"
-#include "constants/arc.h"
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_setup.h"
 #include "battle/btl_string.h"
 #include "battle/trainer_data.h"
+#include "constants/arc.h"
 #include "gfl/msg.h"
 #include "gfl/str.h"
 #include "save/player_info.h"
@@ -70,6 +70,7 @@ static const u16 sSideMessages[] = {
     0x7e, 0x88, 0x8a, 0x8c, 0x8e, 0x90, 0x92, 0xa4, 0xa6, 0xa8, 0xaa, 0xac, 0xae,
 };
 
+// clang-format off
 static const BtlStringHandler sHandlers[] = {
     { 0x1b, func_ov167_021d54fc },
     { 0x5a, func_ov167_021d54fc },
@@ -87,12 +88,13 @@ static const BtlStringHandler sHandlers[] = {
     { 0x15, func_ov167_021d52a0 },
 };
 
+// clang-format on
+
 static BtlStringWork sWork;
 
 // Which variant of a message names a Pokémon: 0 for the player's side, 1 for a wild Pokémon, 2 for a foe's
 static inline int GetMonVariant(u8 monId) {
-    if (sWork.unk68 == 0
-        && AreClientsOnOppositeSides(sWork.mainModule, sWork.clientId, func_ov167_0219c648(monId))) {
+    if (sWork.unk68 == 0 && AreClientsOnOppositeSides(sWork.mainModule, sWork.clientId, func_ov167_0219c648(monId))) {
         if (BtlSetup_GetBattleType(sWork.mainModule) == 0 || BtlSetup_GetBattleType(sWork.mainModule) == 4) {
             return 1;
         }
@@ -161,8 +163,7 @@ void func_ov167_021d4d50(void) {
 
 // A Pokémon's nickname as the battle shows it, the Illusion's when it has one
 static void func_ov167_021d4d7c(u8 monId, u32 index) {
-    loadPokemonNicknameToStrbuf(sWork.wordSet, index,
-                                func_ov167_021bb064(GetPokeParamConst(sWork.pokeCon, monId)));
+    loadPokemonNicknameToStrbuf(sWork.wordSet, index, func_ov167_021bb064(GetPokeParamConst(sWork.pokeCon, monId)));
 }
 
 // A Pokémon's own nickname

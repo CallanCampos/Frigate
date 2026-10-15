@@ -230,8 +230,8 @@ static void Mystery_OnListMove(void *work);
 static void Mystery_CreateCardWin(MysteryWork *wk, HeapID heapId);
 static void Mystery_DeleteCardWin(MysteryWork *wk);
 static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const MysteryGiftRecvData *recv,
-                               GameData *gameData,
-                               MysteryActors *actors, MysteryBg *bg, MysteryBgScroll *scroll, HeapID heapId);
+                               GameData *gameData, MysteryActors *actors, MysteryBg *bg, MysteryBgScroll *scroll,
+                               HeapID heapId);
 static void MysteryEffect_Start(MysteryEffect *effect, u32 mode);
 static void MysteryEffect_Exit(MysteryEffect *effect);
 static void MysteryEffect_Main(MysteryEffect *effect);
@@ -1548,8 +1548,8 @@ static void Mystery_DeleteCardWin(MysteryWork *wk) {
 }
 
 static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const MysteryGiftRecvData *recv,
-                               GameData *gameData,
-                               MysteryActors *actors, MysteryBg *bg, MysteryBgScroll *scroll, HeapID heapId) {
+                               GameData *gameData, MysteryActors *actors, MysteryBg *bg, MysteryBgScroll *scroll,
+                               HeapID heapId) {
     u32 palNo;
     NNSG2dPaletteData *palette;
     void *buffer;

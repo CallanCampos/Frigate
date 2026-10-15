@@ -202,13 +202,11 @@ static const u16 sMsgPairs_0530[25][2] = {
     { Bank0399_Text_Empty_20, Bank0399_Text_Empty_21 },
 };
 
-static const u16 sTable_0424[26] = {
-    11, 18, 22, 22, 23, 23, 25, 25, 26, 26, 28, 28, 29, 29, 31, 31, 32, 32, 33, 33, 34, 34, 37, 44, 41, 0
-};
+static const u16 sTable_0424[26] = { 11, 18, 22, 22, 23, 23, 25, 25, 26, 26, 28, 28, 29,
+                                     29, 31, 31, 32, 32, 33, 33, 34, 34, 37, 44, 41, 0 };
 
-static const u16 sTable_0458[26] = {
-    17, 20, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 39, 46, 46, 0
-};
+static const u16 sTable_0458[26] = { 17, 20, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36,
+                                     36, 36, 36, 36, 36, 36, 36, 36, 36, 39, 46, 46, 0 };
 
 static const UnionMenuRow sMenu_029c[3] = {
     { Bank0399_Text_NoRestrictions, { 0x0 } },
@@ -240,6 +238,7 @@ static const UnionMenuRow sMenu_02fc[3] = {
     { Bank0399_Text_Cancel_6, { .sub = sMenu_039c } },
 };
 
+// clang-format off
 static const UnionMenuRow sMenu_0374[5] = {
     { Bank0399_Text_SingleBattle, { 0x0 } },
     { Bank0399_Text_DoubleBattle, { 0x1 } },
@@ -247,6 +246,8 @@ static const UnionMenuRow sMenu_0374[5] = {
     { Bank0399_Text_RotationBattle, { 0x3 } },
     { Bank0399_Text_Cancel_5, { .sub = sMenu_03f4 } },
 };
+
+// clang-format on
 
 static const UnionMenuRow sMenu_039c[5] = {
     { Bank0399_Text_DoubleBattle, { .sub = sMenu_02e4 } },
@@ -277,210 +278,175 @@ static const u8 sRuleResult[5][2][2] = {
 };
 
 static const UnionMenuRow sMenuMain[6] = {
-    { Bank0399_Text_Greet, { 2 } },  { Bank0399_Text_Battle, { 0x1b } }, { Bank0399_Text_Trade, { 0x18 } },
-    { Bank0399_Text_Draw, { 3 } },   { Bank0399_Text_Spin, { 0x19 } },   { Bank0399_Text_Cancel, { 0 } },
+    { Bank0399_Text_Greet, { 2 } }, { Bank0399_Text_Battle, { 0x1b } }, { Bank0399_Text_Trade, { 0x18 } },
+    { Bank0399_Text_Draw, { 3 } },  { Bank0399_Text_Spin, { 0x19 } },   { Bank0399_Text_Cancel, { 0 } },
 };
 
 static const u32 sLanguageFlags[8] = { 0, 1, 2, 3, 4, 7, 5, 6 };
 
-static const ListMenuRequest sMenuMainRequest = { 6, 6, 0, 0x0d, 0x1000, 0x2f, 0, 0, 0, 1, 0x0c, 0x10, 1, 1, 0x0d, 0x0c, 0 };
+static const ListMenuRequest sMenuMainRequest = { 6, 6,    0,    0x0d, 0x1000, 0x2f, 0,    0, 0,
+                                                  1, 0x0c, 0x10, 1,    1,      0x0d, 0x0c, 0 };
 
-static const ListMenuRequest sMenuRulesRequest = { 3, 3, 0, 0x0d, 0x1000, 0x2f, 0, 0, 0, 1, 0x0c, 0x10, 1, 1, 0x13, 0x0e, 0 };
+static const ListMenuRequest sMenuRulesRequest = { 3, 3,    0,    0x0d, 0x1000, 0x2f, 0,    0, 0,
+                                                   1, 0x0c, 0x10, 1,    1,      0x13, 0x0e, 0 };
 
 static const struct {
     u8 value;
     u8 unk01[3];
 } sMsgIndexTable[27] = {
-    { 2 }, { 2 }, { 2 }, { 5 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 4 }, { 4 }, { 4 }, { 4 }, { 2 }, { 5 }, { 5 },
+    { 2 }, { 2 }, { 2 }, { 5 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 },
+    { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 2 }, { 4 }, { 4 }, { 4 }, { 4 }, { 2 }, { 5 }, { 5 },
 };
 
-u16 func_ov034_0217aa7c(UnionSystem *unisys)
-{
+u16 func_ov034_0217aa7c(UnionSystem *unisys) {
     return sMsgPair_0204[getTrainerGender(unisys->param->playerInfo)];
 }
 
-u16 func_ov034_0217aa94(u8 gender)
-{
+u16 func_ov034_0217aa94(u8 gender) {
     return sMsgPair_0234[gender];
 }
 
-u16 func_ov034_0217aaa0(u8 gender)
-{
+u16 func_ov034_0217aaa0(u8 gender) {
     return sMsgPair_0218[gender];
 }
 
-u16 func_ov034_0217aaac(u8 gender)
-{
+u16 func_ov034_0217aaac(u8 gender) {
     return sMsgPair_0230[gender];
 }
 
-u16 func_ov034_0217aab8(u32 row, u8 gender)
-{
+u16 func_ov034_0217aab8(u32 row, u8 gender) {
     return sMsgPairs_04cc[row - 2][gender];
 }
 
-u16 func_ov034_0217aacc(u32 row, u8 gender)
-{
+u16 func_ov034_0217aacc(u32 row, u8 gender) {
     return sMsgPairs_0530[row - 2][gender];
 }
 
-u16 func_ov034_0217aae0(u32 row)
-{
+u16 func_ov034_0217aae0(u32 row) {
     return sTable_0424[row - 2];
 }
 
-u16 func_ov034_0217aaf0(u32 row)
-{
+u16 func_ov034_0217aaf0(u32 row) {
     return sTable_0458[row - 2];
 }
 
-u16 func_ov034_0217ab00(u8 gender)
-{
+u16 func_ov034_0217ab00(u8 gender) {
     return sMsgPair_01e8[gender];
 }
 
-u16 func_ov034_0217ab0c(u8 gender)
-{
+u16 func_ov034_0217ab0c(u8 gender) {
     return sMsgPair_0214[gender];
 }
 
-u16 func_ov034_0217ab18(u8 gender)
-{
+u16 func_ov034_0217ab18(u8 gender) {
     return sMsgPair_0208[gender];
 }
 
-u16 func_ov034_0217ab24(u8 gender)
-{
+u16 func_ov034_0217ab24(u8 gender) {
     return sMsgPair_0200[gender];
 }
 
-u16 func_ov034_0217ab30(UnionSystem *unisys)
-{
+u16 func_ov034_0217ab30(UnionSystem *unisys) {
     return sMsgPair_0210[getTrainerGender(unisys->param->playerInfo)];
 }
 
-u16 func_ov034_0217ab48(UnionSystem *unisys)
-{
+u16 func_ov034_0217ab48(UnionSystem *unisys) {
     return sMsgPair_020c[getTrainerGender(unisys->param->playerInfo)];
 }
 
-u16 func_ov034_0217ab60(u8 gender)
-{
+u16 func_ov034_0217ab60(u8 gender) {
     return sMsgPairs_0268[GFL_RandomLC(4)][gender];
 }
 
-u16 func_ov034_0217ab7c(u8 gender)
-{
+u16 func_ov034_0217ab7c(u8 gender) {
     return sMsgPair_0224[gender];
 }
 
-u16 func_ov034_0217ab88(u8 gender)
-{
+u16 func_ov034_0217ab88(u8 gender) {
     return sMsgPairs_0250[GFL_RandomLC(2)][gender];
 }
 
-u16 func_ov034_0217aba4(u8 gender)
-{
+u16 func_ov034_0217aba4(u8 gender) {
     return sMsgPairs_0258[GFL_RandomLC(4)][gender];
 }
 
-u16 func_ov034_0217abc0(u8 gender)
-{
+u16 func_ov034_0217abc0(u8 gender) {
     return sMsgPairs_0248[GFL_RandomLC(2)][gender];
 }
 
-u16 func_ov034_0217abdc(u8 gender)
-{
+u16 func_ov034_0217abdc(u8 gender) {
     return sMsgPairs_0278[GFL_RandomLC(4)][gender];
 }
 
-u16 func_ov034_0217abf8(u8 gender)
-{
+u16 func_ov034_0217abf8(u8 gender) {
     return sMsgPair_01fc[gender];
 }
 
-u16 func_ov034_0217ac04(u8 gender)
-{
+u16 func_ov034_0217ac04(u8 gender) {
     return sMsgPair_01f8[gender];
 }
 
-u16 func_ov034_0217ac10(u8 gender)
-{
+u16 func_ov034_0217ac10(u8 gender) {
     return sMsgPair_0228[gender];
 }
 
-u16 func_ov034_0217ac1c(u8 gender)
-{
+u16 func_ov034_0217ac1c(u8 gender) {
     return sMsgPair_01ec[gender];
 }
 
-u16 func_ov034_0217ac28(u8 gender)
-{
+u16 func_ov034_0217ac28(u8 gender) {
     return sMsgPair_01f0[gender];
 }
 
-u16 func_ov034_0217ac34(u8 gender)
-{
+u16 func_ov034_0217ac34(u8 gender) {
     return sMsgPair_022c[gender];
 }
 
-u16 func_ov034_0217ac40(u8 gender)
-{
+u16 func_ov034_0217ac40(u8 gender) {
     return sMsgPair_0238[gender];
 }
 
-u16 func_ov034_0217ac4c(u8 gender)
-{
+u16 func_ov034_0217ac4c(u8 gender) {
     return sMsgPair_0220[gender];
 }
 
-u16 func_ov034_0217ac58(u8 gender)
-{
+u16 func_ov034_0217ac58(u8 gender) {
     return sMsgPair_0244[gender];
 }
 
-u16 func_ov034_0217ac64(u8 gender)
-{
+u16 func_ov034_0217ac64(u8 gender) {
     return sMsgPair_0240[gender];
 }
 
-u16 func_ov034_0217ac70(u8 gender)
-{
+u16 func_ov034_0217ac70(u8 gender) {
     return sMsgPair_023c[gender];
 }
 
-u16 func_ov034_0217ac7c(u8 gender)
-{
+u16 func_ov034_0217ac7c(u8 gender) {
     return sMsgPair_01e0[gender];
 }
 
-u16 func_ov034_0217ac88(u8 gender)
-{
+u16 func_ov034_0217ac88(u8 gender) {
     return sMsgPair_01d8[gender];
 }
 
-u16 func_ov034_0217ac94(u8 gender)
-{
+u16 func_ov034_0217ac94(u8 gender) {
     return sMsgPair_01dc[gender];
 }
 
-u16 func_ov034_0217aca0(u8 gender)
-{
+u16 func_ov034_0217aca0(u8 gender) {
     return sMsgPair_021c[gender];
 }
 
-u16 func_ov034_0217acac(u8 gender)
-{
+u16 func_ov034_0217acac(u8 gender) {
     return sMsgPair_01f4[gender];
 }
 
-u16 func_ov034_0217acb8(u8 gender)
-{
+u16 func_ov034_0217acb8(u8 gender) {
     return sMsgPair_01e4[gender];
 }
 
-u32 UnionMsg_GetOriginMessage(UnionSystem *unisys, u8 country, u8 province)
-{
+u32 UnionMsg_GetOriginMessage(UnionSystem *unisys, u8 country, u8 province) {
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(unisys->param->gameData);
     u8 myCountry = UnityTowerVisitor_GetCountry(playerInfo);
     u8 myProvince = UnityTowerVisitor_GetProvince(playerInfo);
@@ -501,8 +467,7 @@ u32 UnionMsg_GetOriginMessage(UnionSystem *unisys, u8 country, u8 province)
 }
 
 // The words of the message system: the player or the one spoken to, their greeting by language and their origin
-static void UnionMsg_SetupWordSet(UnionSystem *unisys)
-{
+static void UnionMsg_SetupWordSet(UnionSystem *unisys) {
     UnionSelf *situ = &unisys->situ;
     PlayerInfo *playerInfo = unisys->param->playerInfo;
     const u16 *name;
@@ -573,8 +538,7 @@ static void UnionMsg_SetupWordSet(UnionSystem *unisys)
 }
 
 // Marks the language as seen in the player's Pokemon Wonder word list
-static void UnionMsg_SetLanguageFlag(GameData *gameData, u32 language)
-{
+static void UnionMsg_SetLanguageFlag(GameData *gameData, u32 language) {
     PMSWordSave *save = getDexBlkAddress(GameData_GetSaveControl(gameData));
     u16 index = language - 1;
 
@@ -589,32 +553,28 @@ static void UnionMsg_SetLanguageFlag(GameData *gameData, u32 language)
     }
 }
 
-static void UnionMsg_CreateWordSet(UnionSystem *unisys)
-{
+static void UnionMsg_CreateWordSet(UnionSystem *unisys) {
     if (unisys->wordset == NULL) {
         unisys->wordset = GFL_WordSetSystemCreate(5, 0x40, UNION_HEAPID);
         UnionMsg_SetupWordSet(unisys);
     }
 }
 
-static void UnionMsg_FreeWordSet(UnionSystem *unisys)
-{
+static void UnionMsg_FreeWordSet(UnionSystem *unisys) {
     if (unisys->wordset != NULL) {
         GFL_WordSetSystemFree(unisys->wordset);
         unisys->wordset = NULL;
     }
 }
 
-s32 UnionMsg_GetTableByte(s32 index)
-{
+s32 UnionMsg_GetTableByte(s32 index) {
     if (index >= 27) {
         return 0;
     }
     return sMsgIndexTable[index].value;
 }
 
-void UnionMsg_FreeAll(UnionSystem *unisys)
-{
+void UnionMsg_FreeAll(UnionSystem *unisys) {
     UnionMsg_FreeRulesWindow(unisys);
     UnionMsg_FreeInfoWindow(unisys);
     UnionMsg_FreeYesNo(unisys);
@@ -622,8 +582,7 @@ void UnionMsg_FreeAll(UnionSystem *unisys)
     UnionMsg_FreeMsgSystem(unisys);
 }
 
-void UnionMsg_CreateMsgSystem(UnionSystem *unisys, Field *field)
-{
+void UnionMsg_CreateMsgSystem(UnionSystem *unisys, Field *field) {
     void *fldmsg_bg;
 
     if (unisys->fld_msgwin_stream == NULL) {
@@ -639,8 +598,7 @@ void UnionMsg_CreateMsgSystem(UnionSystem *unisys, Field *field)
     }
 }
 
-static void UnionMsg_FreeMsgSystem(UnionSystem *unisys)
-{
+static void UnionMsg_FreeMsgSystem(UnionSystem *unisys) {
     if (unisys->fld_msgwin_stream != NULL) {
         func_ov036_02188b08(unisys->fld_msgwin_stream);
         func_ov036_02188ab0(unisys->fld_msgwin_stream);
@@ -658,8 +616,7 @@ static void UnionMsg_FreeMsgSystem(UnionSystem *unisys)
     }
 }
 
-void UnionMsg_PrintMessage(UnionSystem *unisys, u32 messageId)
-{
+void UnionMsg_PrintMessage(UnionSystem *unisys, u32 messageId) {
     GFL_ASSERT(unisys->fld_msgwin_stream != NULL);
     GFL_MsgDataLoadStrbuf(unisys->msgdata, messageId, unisys->msgbuf);
     GFL_WordSetFormatStrbuf(unisys->wordset, unisys->fmtbuf, unisys->msgbuf);
@@ -667,38 +624,33 @@ void UnionMsg_PrintMessage(UnionSystem *unisys, u32 messageId)
     unisys->msgPrinting = 1;
 }
 
-BOOL UnionMsg_IsPrintDone(UnionSystem *unisys)
-{
+BOOL UnionMsg_IsPrintDone(UnionSystem *unisys) {
     if (unisys->fld_msgwin_stream == NULL || unisys->msgPrinting == 0) {
         return TRUE;
     }
     return func_ov036_02188bdc(unisys->fld_msgwin_stream);
 }
 
-void UnionMsg_CreateAndPrint(UnionSystem *unisys, Field *field, u32 messageId)
-{
+void UnionMsg_CreateAndPrint(UnionSystem *unisys, Field *field, u32 messageId) {
     UnionMsg_CreateMsgSystem(unisys, field);
     UnionMsg_SetupWordSet(unisys);
     UnionMsg_PrintMessage(unisys, messageId);
 }
 
-void UnionMsg_CreateYesNo(UnionSystem *unisys, Field *field)
-{
+void UnionMsg_CreateYesNo(UnionSystem *unisys, Field *field) {
     if (unisys->fldmenu_yesno_func == NULL) {
         unisys->fldmenu_yesno_func = func_ov036_021880d4(Field_GetMsgBGSys(field), 0);
     }
 }
 
-void UnionMsg_FreeYesNo(UnionSystem *unisys)
-{
+void UnionMsg_FreeYesNo(UnionSystem *unisys) {
     if (unisys->fldmenu_yesno_func != NULL) {
         func_ov036_02187ea0(unisys->fldmenu_yesno_func);
         unisys->fldmenu_yesno_func = NULL;
     }
 }
 
-BOOL UnionMsg_UpdateYesNo(UnionSystem *unisys, BOOL *yes)
-{
+BOOL UnionMsg_UpdateYesNo(UnionSystem *unisys, BOOL *yes) {
     u32 answer;
 
     GFL_ASSERT(unisys->fldmenu_yesno_func != NULL);
@@ -711,8 +663,7 @@ BOOL UnionMsg_UpdateYesNo(UnionSystem *unisys, BOOL *yes)
 }
 
 static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const UnionMenuRow *rows, u32 count,
-                                ListMenuRequest *request)
-{
+                                ListMenuRequest *request) {
     void *msgBGSys = Field_GetMsgBGSys(field);
 
     if (unisys->fldmenu_func == NULL) {
@@ -722,16 +673,14 @@ static void UnionMsg_CreateMenu(UnionSystem *unisys, Field *field, const UnionMe
     }
 }
 
-static void UnionMsg_FreeMenu(UnionSystem *unisys)
-{
+static void UnionMsg_FreeMenu(UnionSystem *unisys) {
     if (unisys->fldmenu_func != NULL) {
         func_ov036_02187ea0(unisys->fldmenu_func);
         unisys->fldmenu_func = NULL;
     }
 }
 
-static s32 UnionMsg_UpdateMenu(UnionSystem *unisys, Field *field)
-{
+static s32 UnionMsg_UpdateMenu(UnionSystem *unisys, Field *field) {
     void *fldmsg_bg = Field_GetMsgBGSys(field);
 
     GFL_ASSERT(fldmsg_bg != NULL);
@@ -742,24 +691,20 @@ static s32 UnionMsg_UpdateMenu(UnionSystem *unisys, Field *field)
     return ListMenuUI_Update(unisys->fldmenu_func);
 }
 
-void UnionMsg_CreateMainMenu(UnionSystem *unisys, Field *field)
-{
+void UnionMsg_CreateMainMenu(UnionSystem *unisys, Field *field) {
     UnionMsg_CreateMenu(unisys, field, sMenuMain, 6, (ListMenuRequest *)&sMenuMainRequest);
 }
 
-void UnionMsg_FreeMainMenu(UnionSystem *unisys)
-{
+void UnionMsg_FreeMainMenu(UnionSystem *unisys) {
     UnionMsg_FreeMenu(unisys);
 }
 
-s32 UnionMsg_UpdateMainMenu(UnionSystem *unisys, Field *field)
-{
+s32 UnionMsg_UpdateMainMenu(UnionSystem *unisys, Field *field) {
     return UnionMsg_UpdateMenu(unisys, field);
 }
 
 // Opens the menu of the battle rules: the kind says which of sMenuInfo's, and which choices the rows show
-void UnionMsg_CreateRuleMenu(UnionSystem *unisys, Field *field, int kind, u8 *ruleSel)
-{
+void UnionMsg_CreateRuleMenu(UnionSystem *unisys, Field *field, int kind, u8 *ruleSel) {
     UnionMenuRow *rows;
     u8 count;
 
@@ -796,14 +741,12 @@ void UnionMsg_CreateRuleMenu(UnionSystem *unisys, Field *field, int kind, u8 *ru
     }
 }
 
-void UnionMsg_FreeRuleMenu(UnionSystem *unisys)
-{
+void UnionMsg_FreeRuleMenu(UnionSystem *unisys) {
     UnionMsg_FreeMenu(unisys);
 }
 
 // Whether the number is one of sMenuInfo's menus
-static inline BOOL UnionMsg_IsMenuKind(u32 kind)
-{
+static inline BOOL UnionMsg_IsMenuKind(u32 kind) {
     if (kind < NELEMS(sMenuInfo)) {
         return TRUE;
     }
@@ -811,15 +754,13 @@ static inline BOOL UnionMsg_IsMenuKind(u32 kind)
 }
 
 // The entry of sMenuInfo for a menu kind
-static inline const UnionMenuInfo *UnionMsg_GetMenuInfo(int kind)
-{
+static inline const UnionMenuInfo *UnionMsg_GetMenuInfo(int kind) {
     return &sMenuInfo[kind];
 }
 
 // Runs the menu of the battle rules and takes the choice: the value is a submenu or a rule. picked says the choice
 // changed the rules or opened a menu, isFinal that the rules are confirmed
-u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL *isFinal, Field *field)
-{
+u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL *isFinal, Field *field) {
     u32 ret;
     u32 i;
 
@@ -895,8 +836,7 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
     return 0;
 }
 
-void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field)
-{
+void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field) {
     if (unisys->fldmsgwin == NULL) {
         void *msgBGSys = Field_GetMsgBGSys(field);
 
@@ -905,8 +845,7 @@ void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field)
     }
 }
 
-void UnionMsg_FreeInfoWindow(UnionSystem *unisys)
-{
+void UnionMsg_FreeInfoWindow(UnionSystem *unisys) {
     if (unisys->fldmsgwin != NULL) {
         func_ov036_02188ab0(unisys->fldmsgwin);
         unisys->fldmsgwin = NULL;
@@ -914,8 +853,7 @@ void UnionMsg_FreeInfoWindow(UnionSystem *unisys)
 }
 
 // Opens the window that lists the regulation's rules, each in the color of whether the party meets it
-void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u32 battleType, u32 mode)
-{
+void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u32 battleType, u32 mode) {
     void *msgBGSys = Field_GetMsgBGSys(field);
     BOOL isMulti;
     int i;
@@ -958,8 +896,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
     }
 }
 
-BOOL UnionMsg_IsRulesPrinted(UnionSystem *unisys, Field *field)
-{
+BOOL UnionMsg_IsRulesPrinted(UnionSystem *unisys, Field *field) {
     void *queue = func_ov036_02187998(Field_GetMsgBGSys(field));
 
     if (unisys->alloc.rpm == NULL) {
@@ -968,8 +905,7 @@ BOOL UnionMsg_IsRulesPrinted(UnionSystem *unisys, Field *field)
     return func_02021c0c(queue);
 }
 
-void UnionMsg_FreeRulesWindow(UnionSystem *unisys)
-{
+void UnionMsg_FreeRulesWindow(UnionSystem *unisys) {
     if (unisys->alloc.rpm != NULL) {
         func_ov036_02188ab0(unisys->fldmsgwin);
         unisys->fldmsgwin = NULL;

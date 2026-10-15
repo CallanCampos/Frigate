@@ -36,12 +36,12 @@ typedef enum {
 } CAMERAContext;
 
 typedef enum {
-    CAMERA_SIZE_DSI_VGA,  // 640 x 480
-    CAMERA_SIZE_QVGA,     // 320 x 240
-    CAMERA_SIZE_QQVGA,    // 160 x 120
-    CAMERA_SIZE_CIF,      // 352 x 288
-    CAMERA_SIZE_QCIF,     // 176 x 144
-    CAMERA_SIZE_DS_LCD,   // 256 x 192
+    CAMERA_SIZE_DSI_VGA, // 640 x 480
+    CAMERA_SIZE_QVGA,    // 320 x 240
+    CAMERA_SIZE_QQVGA,   // 160 x 120
+    CAMERA_SIZE_CIF,     // 352 x 288
+    CAMERA_SIZE_QCIF,    // 176 x 144
+    CAMERA_SIZE_DS_LCD,  // 256 x 192
 } CAMERASize;
 
 typedef enum {

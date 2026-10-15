@@ -193,8 +193,8 @@ static void func_ov137_021eeff8(ResortWatch *watch, ResortWatchCallback callback
 static void func_ov137_021eeffc(ResortWatch *watch);
 static void func_ov137_021ef004(ResortWatch *watch);
 static void func_ov137_021ef0dc(ResortWatch *watch);
-static ResortWalkers *func_ov137_021ef124(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops,
-                                          void *unkb1c, JoinAvenueOccupants *occupants);
+static ResortWalkers *func_ov137_021ef124(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
+                                          JoinAvenueOccupants *occupants);
 static void func_ov137_021ef1b4(ResortWalkers *walkers);
 static void func_ov137_021ef1e8(ResortWalkers *walkers, Field *field);
 static void func_ov137_021ef234(ResortWalkers *walkers, u32 mode);
@@ -238,8 +238,8 @@ static void func_ov137_021efc78(ResortWalkerGroup *group, u32 mode);
 static void func_ov137_021efd2c(ResortWalkerGroup *group, u16 slot, ResortWalker *walker);
 static void func_ov137_021efd38(ResortWalkerGroup *group, u16 slot);
 static BOOL func_ov137_021efd48(ResortPerson *person, u16 *group, u16 *slot);
-static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortPersonData **datas,
-                                          JoinAvenueInfo *info, JoinAvenueOccupants *occupants, BOOL enabled);
+static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortPersonData **datas, JoinAvenueInfo *info,
+                                          JoinAvenueOccupants *occupants, BOOL enabled);
 static void func_ov137_021efe1c(ResortBubbles *bubbles);
 static void func_ov137_021efe54(ResortBubbles *bubbles, Field *field);
 static void func_ov137_021f007c(ResortBubbles *bubbles);
@@ -287,25 +287,28 @@ static void func_ov137_021f0be4(ResortSys *sys, GameData *gameData, HeapID heapI
 
 // Not referenced, as reading it is folded: the angle of the scene's second animation
 const u32 RESORT_FIELD_SCENE_ANGLE = 0xdd00;
-static const u32 sWalkerOccupantKinds[] = {0};
-static const u8 sCountByRank[] = {1, 2, 3, 4, 5};
-static const u8 sCountByUnk[] = {0, 1, 2, 3, 4, 5};
-static const G3DSceneAnimationSetup sSceneAnimations1[] = {{4, 0}, {5, 0}};
-static const G3DSceneAnimationSetup sSceneAnimations0[] = {{1, 0}, {2, 0}};
-static const u8 sCountByBadges[] = {0, 1, 1, 1, 1, 2, 2, 2, 2};
-static const u16 sGroupXs[RESORT_WALKER_GROUPS] = {12, 13, 14, 16, 17, 18};
-static const u16 sGroupDirs[RESORT_WALKER_GROUPS] = {0, 1, 0, 1, 0, 1};
+static const u32 sWalkerOccupantKinds[] = { 0 };
+static const u8 sCountByRank[] = { 1, 2, 3, 4, 5 };
+static const u8 sCountByUnk[] = { 0, 1, 2, 3, 4, 5 };
+static const G3DSceneAnimationSetup sSceneAnimations1[] = { { 4, 0 }, { 5, 0 } };
+static const G3DSceneAnimationSetup sSceneAnimations0[] = { { 1, 0 }, { 2, 0 } };
+static const u8 sCountByBadges[] = { 0, 1, 1, 1, 1, 2, 2, 2, 2 };
+static const u16 sGroupXs[RESORT_WALKER_GROUPS] = { 12, 13, 14, 16, 17, 18 };
+static const u16 sGroupDirs[RESORT_WALKER_GROUPS] = { 0, 1, 0, 1, 0, 1 };
+// clang-format off
 static const ResortWalkerPlace sWalkerPlaces[] = {
     {2, 0, 0, 0}, {2, 1, 1, 0}, {2, 2, 2, 0}, {2, 3, 3, 0}, {2, 4, 4, 0}, {2, 5, 5, 0}, {2, 6, 0, 1},
     {2, 7, 1, 1}, {3, 0, 2, 1}, {3, 1, 3, 1}, {3, 2, 4, 1}, {3, 3, 5, 1}, {3, 4, 0, 2}, {3, 5, 1, 2},
     {3, 6, 2, 2}, {3, 7, 3, 2}, {4, 0, 4, 2}, {4, 1, 5, 2}, {4, 2, 0, 3}, {4, 3, 1, 3}, {4, 4, 2, 3},
     {4, 5, 3, 3}, {4, 6, 4, 3}, {4, 7, 5, 3}, {4, 8, 0, 4}, {4, 9, 1, 4}, {4, 10, 2, 4}, {4, 11, 3, 4},
 };
-static const u8 sBubbleYs[RESORT_BUBBLES] = {6, 2, 19, 14, 17, 10, 14, 2, 10, 17, 10, 6, 2, 6, 14, 19};
-static const u8 sBubbleXs1[RESORT_BUBBLES] = {1, 16, 2, 15, 4, 16, 3, 13, 1, 13, 2, 16, 3, 15, 4, 14};
-static const u8 sBubbleXs0[RESORT_BUBBLES] = {1, 18, 2, 16, 4, 18, 3, 15, 1, 15, 2, 18, 3, 17, 4, 16};
-static const u32 sBubbleIntervalKinds[] = {0, 2, 3, 4};
-static const u32 sBubbleKinds[] = {0, 2, 3, 4};
+
+// clang-format on
+static const u8 sBubbleYs[RESORT_BUBBLES] = { 6, 2, 19, 14, 17, 10, 14, 2, 10, 17, 10, 6, 2, 6, 14, 19 };
+static const u8 sBubbleXs1[RESORT_BUBBLES] = { 1, 16, 2, 15, 4, 16, 3, 13, 1, 13, 2, 16, 3, 15, 4, 14 };
+static const u8 sBubbleXs0[RESORT_BUBBLES] = { 1, 18, 2, 16, 4, 18, 3, 15, 1, 15, 2, 18, 3, 17, 4, 16 };
+static const u32 sBubbleIntervalKinds[] = { 0, 2, 3, 4 };
+static const u32 sBubbleKinds[] = { 0, 2, 3, 4 };
 static BOOL (*const sWalkerStates[])(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player) = {
     func_ov137_021ef6d4, func_ov137_021ef710, func_ov137_021ef798, func_ov137_021ef7bc, func_ov137_021ef8e4,
 };
@@ -313,17 +316,17 @@ static const FieldActorMoveCode sWalkerMoveCode = {
     0, func_ov137_021efaf0, func_ov137_021efaf4, func_ov137_021efb48, func_ov137_021efb4c,
 };
 static const ResortSceneAnim sSceneAnims[] = {
-    {func_ov137_021f0818, func_ov137_021f08dc, func_ov137_021f09b4},
-    {func_ov137_021f0a38, func_ov137_021f0a80, func_ov137_021f0ad8},
+    { func_ov137_021f0818, func_ov137_021f08dc, func_ov137_021f09b4 },
+    { func_ov137_021f0a38, func_ov137_021f0a80, func_ov137_021f0ad8 },
 };
 static const G3DSceneActorSetup sSceneActors[] = {
-    {0, 0, 0, 0, sSceneAnimations0, 2},
-    {3, 0, 3, 0, sSceneAnimations1, 2},
+    { 0, 0, 0, 0, sSceneAnimations0, 2 },
+    { 3, 0, 3, 0, sSceneAnimations1, 2 },
 };
 static const G3DSceneResourceSetup sSceneResources[] = {
-    {298, 1, 0}, {298, 0, 0}, {298, 2, 0}, {298, 4, 0}, {298, 3, 0}, {298, 5, 0},
+    { 298, 1, 0 }, { 298, 0, 0 }, { 298, 2, 0 }, { 298, 4, 0 }, { 298, 3, 0 }, { 298, 5, 0 },
 };
-static const G3DSceneSetup sScene = {sSceneResources, 6, sSceneActors, 2};
+static const G3DSceneSetup sScene = { sSceneResources, 6, sSceneActors, 2 };
 
 void func_ov137_021eec80(Field *field) {
     void *block;
@@ -545,8 +548,8 @@ static void func_ov137_021ef0dc(ResortWatch *watch) {
     }
 }
 
-static ResortWalkers *func_ov137_021ef124(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops,
-                                          void *unkb1c, JoinAvenueOccupants *occupants) {
+static ResortWalkers *func_ov137_021ef124(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
+                                          JoinAvenueOccupants *occupants) {
     int i;
     ResortWalkers *walkers = GFL_HeapAllocate(heapId, sizeof(ResortWalkers), TRUE, "resort_field.c", 950);
 
@@ -602,8 +605,7 @@ static void func_ov137_021ef250(ResortWalkers *walkers, ResortPerson *person) {
     if (func_ov137_021efd48(person, &group, &slot)) {
         for (i = 0; i < RESORT_WALKERS; i++) {
             if (!func_ov137_021ef498(&walkers->walkers[i])) {
-                func_ov137_021ef418(&walkers->walkers[i], person, walkers->shops, walkers->unkb1c,
-                                    walkers->occupants);
+                func_ov137_021ef418(&walkers->walkers[i], person, walkers->shops, walkers->unkb1c, walkers->occupants);
                 func_ov137_021efd2c(&walkers->groups[group], slot, &walkers->walkers[i]);
                 return;
             }
@@ -988,7 +990,8 @@ static void func_ov137_021ef9a8(ResortWalker *walker, void *shops, void *unkb1c,
     GetGPosZ(func_ov137_021f110c(walker->person));
     for (i = 0; i < RESORT_WALKER_STOPS; i++) {
         JoinAvenuePerson *occupant = func_02038860(occupants, i);
-        if (!JoinAvenuePerson_IsEmpty(occupant) && shop == ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shops, occupant), 0)) {
+        if (!JoinAvenuePerson_IsEmpty(occupant) &&
+            shop == ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shops, occupant), 0)) {
             u16 z = ResortBinary_Get(unkb1c, i, 2);
             walker->stopZ[walker->stopCount] = z + GFL_RandomMTRange(7);
             walker->stopAcmd[walker->stopCount] = i % 2 == 0 ? DIR_RIGHT : DIR_LEFT;
@@ -1150,8 +1153,8 @@ static BOOL func_ov137_021efd48(ResortPerson *person, u16 *group, u16 *slot) {
     return FALSE;
 }
 
-static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortPersonData **datas,
-                                          JoinAvenueInfo *info, JoinAvenueOccupants *occupants, BOOL enabled) {
+static ResortBubbles *func_ov137_021efdac(HeapID heapId, void *msgBGSys, ResortPersonData **datas, JoinAvenueInfo *info,
+                                          JoinAvenueOccupants *occupants, BOOL enabled) {
     int i;
     ResortBubbles *bubbles = GFL_HeapAllocate(heapId, sizeof(ResortBubbles), TRUE, "resort_field.c", 2612);
 
@@ -1545,8 +1548,8 @@ static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMS
     peopleSetup.shops = ResortSys_GetShopData(sys);
     peopleSetup.unk18 = ResortSys_GetUnk20Table(sys);
     people->people = func_ov137_021f12b4(&peopleSetup, heapId);
-    people->walkers = func_ov137_021ef124(heapId, mmSys, player, ResortSys_GetShopData(sys), ResortSys_GetUnk20Table(sys),
-                                          ResortSys_GetOccupants(sys));
+    people->walkers = func_ov137_021ef124(heapId, mmSys, player, ResortSys_GetShopData(sys),
+                                          ResortSys_GetUnk20Table(sys), ResortSys_GetOccupants(sys));
     return people;
 }
 

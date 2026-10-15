@@ -135,31 +135,46 @@ typedef BOOL (*ConstMoveFunc)(FieldPlayerGrid *grid, u16 dir);
 
 static void FieldPlayerGrid_SetCommonStatus(FieldPlayerGrid *grid, u32 command, const GridMoveInput *input);
 static BOOL FieldPlayerGrid_CheckAllowUpdate(FieldPlayerGrid *grid, u16 dir);
-static BOOL FieldPlayerGrid_PlaySFXByTile(FieldPlayerGrid *grid, u32 command, const VecFx32 *pos, u32 layer, u32 season);
+static BOOL FieldPlayerGrid_PlaySFXByTile(FieldPlayerGrid *grid, u32 command, const VecFx32 *pos, u32 layer,
+                                          u32 season);
 static void FieldPlayerGrid_UpdateTileSFX(FieldPlayerGrid *grid, u32 command, u16 dir);
 static u32 FieldPlayerGrid_DecideCommand(FieldPlayerGrid *grid, const GridMoveInput *input);
 static u32 FieldPlayerGrid_DecideCommandNormal(FieldPlayerGrid *grid, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandNormalIdle(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandNormalMoving(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandNormalTurning(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandNormalBraking(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandNormalIdle(FieldPlayerGrid *grid, FieldActor *actor,
+                                                   const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandNormalMoving(FieldPlayerGrid *grid, FieldActor *actor,
+                                                     const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandNormalTurning(FieldPlayerGrid *grid, FieldActor *actor,
+                                                      const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandNormalBraking(FieldPlayerGrid *grid, FieldActor *actor,
+                                                      const GridMoveInput *input);
 static u32 FieldPlayerGrid_DecideCommandCatwalk(FieldPlayerGrid *grid, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandCatwalkIdle(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandCatwalkMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandCatwalkIdle(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandCatwalkMove(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor,
+                                                       const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
 static u32 FieldPlayerGrid_DecideCommandFall(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
 static u32 FieldPlayerGrid_DecideCommandBike(FieldPlayerGrid *grid, const GridMoveInput *input);
 static u32 FieldPlayerGrid_DecideCommandBikeIdle(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
 static BOOL MapTile_IsBlocksCycling2(u16 tileClass);
-static u32 FieldPlayerGrid_DecideCommandBikeMoving(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandBikeTurning(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandBikeBraking(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandBikeMoving(FieldPlayerGrid *grid, FieldActor *actor,
+                                                   const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandBikeTurning(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandBikeBraking(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
 static u32 FieldPlayerGrid_DecideCommandSurf(FieldPlayerGrid *grid, const GridMoveInput *input);
 static u32 FieldPlayerGrid_DecideCommandSurfIdle(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandSurfTurning(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static u32 FieldPlayerGrid_DecideCommandSurfBraking(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldActor *actor,
+                                                   const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandSurfTurning(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
+static u32 FieldPlayerGrid_DecideCommandSurfBraking(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateCore(FieldPlayerGrid *grid, u32 command, const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateNormal(FieldPlayerGrid *grid, u32 command, const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateNormalBusy(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
@@ -168,9 +183,12 @@ static void FieldPlayerGrid_UpdateNormalMove(FieldPlayerGrid *grid, FieldActor *
 static void FieldPlayerGrid_UpdateNormalTurn(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateNormalBrake(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateNormalJump(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static void FieldPlayerGrid_UpdateNormalCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static void FieldPlayerGrid_UpdateNormalCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
-static void FieldPlayerGrid_UpdateNormalCatwalkExitWait(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
+static void FieldPlayerGrid_UpdateNormalCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor,
+                                                       const GridMoveInput *input);
+static void FieldPlayerGrid_UpdateNormalCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input);
+static void FieldPlayerGrid_UpdateNormalCatwalkExitWait(FieldPlayerGrid *grid, FieldActor *actor,
+                                                        const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateNormalFall(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateBike(FieldPlayerGrid *grid, u32 command, const GridMoveInput *input);
 static void FieldPlayerGrid_UpdateBikeBusy(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input);
@@ -219,18 +237,19 @@ static BOOL FieldPlayerGrid_CheckWarpAtHitWall(FieldPlayerGrid *grid, u16 dir);
 // The sounds of steps by the tile's flags and by its class: of the tile ahead (LAY1), and of the player's own
 // (LAY0), which come first and are none. Each list ends with an empty entry
 static const TileFlagSFX TILE_FLAG_SFX_LAY1[] = {
-    {0x20, SEQ_SE_FLD_09, 2, 4},
-    {0, SEQ_SE_DUMMY, 0, 0},
+    { 0x20, SEQ_SE_FLD_09, 2, 4 },
+    { 0, SEQ_SE_DUMMY, 0, 0 },
 };
 
 static const TileFlagSFX TILE_FLAG_SFX_LAY0[] = {
-    {0, SEQ_SE_DUMMY, 0, 0},
+    { 0, SEQ_SE_DUMMY, 0, 0 },
 };
 
 static const TileClassSFX TILE_CLASS_SFX_LAY0[] = {
-    {NULL, 0, 0, 0, SEASON_ANY},
+    { NULL, 0, 0, 0, SEASON_ANY },
 };
 
+// clang-format off
 static const TileClassSFX TILE_CLASS_SFX_LAY1[] = {
     {(BOOL (*)(u32))MapTile_IsReallyTallGrass, SEQ_SE_FLD_08, 2, 4, SEASON_ANY},
     {MapTile_IsSnow_, SEQ_SE_FLD_11, 2, 4, SEASON_ANY},
@@ -246,6 +265,8 @@ static const TileClassSFX TILE_CLASS_SFX_LAY1[] = {
     {func_ov036_021a2cd4, SEQ_SE_FLD_12, 2, 4, 2},
     {NULL, 0, 0, 0, SEASON_ANY},
 };
+
+// clang-format on
 
 FieldPlayerGrid *FieldPlayerGrid_Create(FieldPlayerCore *core, HeapID heapId) {
     FieldPlayerGrid *grid = GFL_HeapAllocate(heapId, sizeof(FieldPlayerGrid), TRUE, "field_player_grid.c", 384);
@@ -319,7 +340,8 @@ static BOOL FieldPlayerGrid_CheckAllowUpdate(FieldPlayerGrid *grid, u16 dir) {
 
 // Plays the sound of a step on the tile at a position, every step when walking and at the sound's interval otherwise.
 // FALSE if the tile has none
-static BOOL FieldPlayerGrid_PlaySFXByTile(FieldPlayerGrid *grid, u32 command, const VecFx32 *pos, u32 layer, u32 season) {
+static BOOL FieldPlayerGrid_PlaySFXByTile(FieldPlayerGrid *grid, u32 command, const VecFx32 *pos, u32 layer,
+                                          u32 season) {
     u32 tileType;
     int interval;
     u32 se;
@@ -365,8 +387,8 @@ static BOOL FieldPlayerGrid_PlaySFXByTile(FieldPlayerGrid *grid, u32 command, co
             }
             for (; classSFX->check != NULL; classSFX++) {
                 // The class is the low half of the tile type
-                if (classSFX->check((u16)tileType) == TRUE
-                    && (classSFX->season == SEASON_ANY || classSFX->season == season)) {
+                if (classSFX->check((u16)tileType) == TRUE &&
+                    (classSFX->season == SEASON_ANY || classSFX->season == season)) {
                     se = classSFX->se;
                     if (mode == SFX_MODE_RUN) {
                         interval = classSFX->runInterval;
@@ -479,7 +501,8 @@ static u32 FieldPlayerGrid_DecideCommandNormal(FieldPlayerGrid *grid, const Grid
     return command;
 }
 
-static u32 FieldPlayerGrid_DecideCommandNormalIdle(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandNormalIdle(FieldPlayerGrid *grid, FieldActor *actor,
+                                                   const GridMoveInput *input) {
     if (IsAllActorAcmdFinished(actor) == TRUE) {
         if (input->dir != PLAYER_DIR_NONE) {
             // Running turns without stopping
@@ -500,7 +523,8 @@ static u32 FieldPlayerGrid_DecideCommandNormalIdle(FieldPlayerGrid *grid, FieldA
 
 // Walking and running: a step if nothing at all is in the way, a jump over a ledge that faces the same way, and
 // otherwise a bump into the wall
-static u32 FieldPlayerGrid_DecideCommandNormalMoving(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandNormalMoving(FieldPlayerGrid *grid, FieldActor *actor,
+                                                     const GridMoveInput *input) {
     u32 tileType;
     u32 tileFlags;
     u32 hit;
@@ -547,7 +571,8 @@ static u32 FieldPlayerGrid_DecideCommandNormalMoving(FieldPlayerGrid *grid, Fiel
     return GRID_COMMAND_BRAKE;
 }
 
-static u32 FieldPlayerGrid_DecideCommandNormalTurning(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandNormalTurning(FieldPlayerGrid *grid, FieldActor *actor,
+                                                      const GridMoveInput *input) {
     if (IsAllActorAcmdFinished(actor) == FALSE) {
         return GRID_COMMAND_NONE;
     }
@@ -557,7 +582,8 @@ static u32 FieldPlayerGrid_DecideCommandNormalTurning(FieldPlayerGrid *grid, Fie
     return FieldPlayerGrid_DecideCommandNormalMoving(grid, actor, input);
 }
 
-static u32 FieldPlayerGrid_DecideCommandNormalBraking(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandNormalBraking(FieldPlayerGrid *grid, FieldActor *actor,
+                                                      const GridMoveInput *input) {
     u16 faceDir = GetActorFaceDir(actor);
 
     if (input->dir != PLAYER_DIR_NONE && input->dir != faceDir) {
@@ -604,7 +630,8 @@ static u32 FieldPlayerGrid_DecideCommandCatwalk(FieldPlayerGrid *grid, const Gri
     return command;
 }
 
-static u32 FieldPlayerGrid_DecideCommandCatwalkIdle(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandCatwalkIdle(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     if (IsAllActorAcmdFinished(actor) == TRUE) {
         if (input->dir != PLAYER_DIR_NONE) {
             if (input->dir != GetActorFaceDir(actor) && input->force == FALSE) {
@@ -619,7 +646,8 @@ static u32 FieldPlayerGrid_DecideCommandCatwalkIdle(FieldPlayerGrid *grid, Field
 
 // On a catwalk: a step onto more catwalk if nothing is in the way, and a fall off it onto any tile that isn't a wall,
 // whatever else ActorRouteCollCheck found there
-static u32 FieldPlayerGrid_DecideCommandCatwalkMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandCatwalkMove(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     u32 tileType;
     u32 hit;
 
@@ -643,7 +671,8 @@ static u32 FieldPlayerGrid_DecideCommandCatwalkMove(FieldPlayerGrid *grid, Field
     return GRID_COMMAND_BRAKE;
 }
 
-static u32 FieldPlayerGrid_DecideCommandCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor,
+                                                       const GridMoveInput *input) {
     if (input->dir == PLAYER_DIR_NONE) {
         if (!FieldPlayerGrid_CheckCatwalkBalancingFlag(grid)) {
             FieldPlayerGrid_BeginCatwalkBalance(grid);
@@ -664,7 +693,8 @@ static u32 FieldPlayerGrid_DecideCommandCatwalkBalance(FieldPlayerGrid *grid, Fi
     return GRID_COMMAND_CATWALK_BALANCE;
 }
 
-static u32 FieldPlayerGrid_DecideCommandCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     if (IsAllActorAcmdFinished(actor) == TRUE) {
         return GRID_COMMAND_FALL;
     }
@@ -715,15 +745,17 @@ static u32 FieldPlayerGrid_DecideCommandBikeIdle(FieldPlayerGrid *grid, FieldAct
 }
 
 static BOOL MapTile_IsBlocksCycling2(u16 tileClass) {
-    if (MapTile_IsReallyTallGrass(tileClass) || MapTile_IsCatwalkBody_(tileClass) || MapTile_IsCatwalkEntryPoint(tileClass)
-        || MapTile_IsSnowNoCycling(tileClass) || MapTile_IsHiddenGrottoEntranceGrass(tileClass)) {
+    if (MapTile_IsReallyTallGrass(tileClass) || MapTile_IsCatwalkBody_(tileClass) ||
+        MapTile_IsCatwalkEntryPoint(tileClass) || MapTile_IsSnowNoCycling(tileClass) ||
+        MapTile_IsHiddenGrottoEntranceGrass(tileClass)) {
         return TRUE;
     }
     return FALSE;
 }
 
 // Cycling: as walking, and not onto the tiles that a bicycle can't cross
-static u32 FieldPlayerGrid_DecideCommandBikeMoving(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandBikeMoving(FieldPlayerGrid *grid, FieldActor *actor,
+                                                   const GridMoveInput *input) {
     u32 tileType;
     u32 tileFlags;
     u32 hit;
@@ -770,7 +802,8 @@ static u32 FieldPlayerGrid_DecideCommandBikeMoving(FieldPlayerGrid *grid, FieldA
     return GRID_COMMAND_BRAKE;
 }
 
-static u32 FieldPlayerGrid_DecideCommandBikeTurning(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandBikeTurning(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     if (IsAllActorAcmdFinished(actor) == FALSE) {
         return GRID_COMMAND_NONE;
     }
@@ -780,7 +813,8 @@ static u32 FieldPlayerGrid_DecideCommandBikeTurning(FieldPlayerGrid *grid, Field
     return FieldPlayerGrid_DecideCommandBikeMoving(grid, actor, input);
 }
 
-static u32 FieldPlayerGrid_DecideCommandBikeBraking(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandBikeBraking(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     u16 faceDir = GetActorFaceDir(actor);
 
     if (input->dir != PLAYER_DIR_NONE && input->dir != faceDir) {
@@ -831,7 +865,8 @@ static u32 FieldPlayerGrid_DecideCommandSurfIdle(FieldPlayerGrid *grid, FieldAct
 }
 
 // Surfing: only onto water with nothing in the way
-static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldActor *actor,
+                                                   const GridMoveInput *input) {
     u32 tileType;
     u32 tileFlags;
     u32 hit;
@@ -862,7 +897,8 @@ static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldA
     return GRID_COMMAND_BRAKE;
 }
 
-static u32 FieldPlayerGrid_DecideCommandSurfTurning(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandSurfTurning(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     if (IsAllActorAcmdFinished(actor) == FALSE) {
         return GRID_COMMAND_NONE;
     }
@@ -872,7 +908,8 @@ static u32 FieldPlayerGrid_DecideCommandSurfTurning(FieldPlayerGrid *grid, Field
     return FieldPlayerGrid_DecideCommandSurfMoving(grid, actor, input);
 }
 
-static u32 FieldPlayerGrid_DecideCommandSurfBraking(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static u32 FieldPlayerGrid_DecideCommandSurfBraking(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     u16 faceDir = GetActorFaceDir(actor);
 
     if (input->dir != PLAYER_DIR_NONE && input->dir != faceDir) {
@@ -1008,13 +1045,15 @@ static void FieldPlayerGrid_UpdateNormalJump(FieldPlayerGrid *grid, FieldActor *
     GFL_SndSEPlay(SEQ_SE_DANSA);
 }
 
-static void FieldPlayerGrid_UpdateNormalCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static void FieldPlayerGrid_UpdateNormalCatwalkBalance(FieldPlayerGrid *grid, FieldActor *actor,
+                                                       const GridMoveInput *input) {
     grid->state = GRID_STATE_CATWALK_BALANCE;
 }
 
 // The jump off a catwalk, in the held direction or the first one free. The actor stops following the map's height,
 // so it lands in the air over the tile below
-static void FieldPlayerGrid_UpdateNormalCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static void FieldPlayerGrid_UpdateNormalCatwalkExit(FieldPlayerGrid *grid, FieldActor *actor,
+                                                    const GridMoveInput *input) {
     u16 dir = input->dir;
 
     if (dir == PLAYER_DIR_NONE) {
@@ -1027,7 +1066,8 @@ static void FieldPlayerGrid_UpdateNormalCatwalkExit(FieldPlayerGrid *grid, Field
     grid->state = GRID_STATE_CATWALK_EXIT;
 }
 
-static void FieldPlayerGrid_UpdateNormalCatwalkExitWait(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
+static void FieldPlayerGrid_UpdateNormalCatwalkExitWait(FieldPlayerGrid *grid, FieldActor *actor,
+                                                        const GridMoveInput *input) {
     grid->state = GRID_STATE_CATWALK_EXIT_WAIT;
 }
 
@@ -1101,8 +1141,8 @@ static void FieldPlayerGrid_UpdateBikeMove(FieldPlayerGrid *grid, FieldActor *ac
         checkHeight = FALSE;
     } else {
         acmd = ACMD_WALK_2F;
-        if (FieldPlayerGrid_GetTileInDir(grid, PLAYER_DIR_NONE, &tileType) == TRUE
-            && MapTile_IsDeepSand(GetTileClass(tileType)) == TRUE) {
+        if (FieldPlayerGrid_GetTileInDir(grid, PLAYER_DIR_NONE, &tileType) == TRUE &&
+            MapTile_IsDeepSand(GetTileClass(tileType)) == TRUE) {
             acmd = ACMD_BIKE_DEEP_SAND;
             func_ov036_021a3e74(actor, Field_GetFieldEffects(grid->field));
         }
@@ -1222,8 +1262,8 @@ static u32 PlayerMoveCollCheck(FieldPlayerGrid *grid, FieldActor *actor, u16 dir
     if (GetTileTypeAtPosByActor(actor, &pos, tileType) == FALSE) {
         *tileType = 0xffffffff;
     }
-    if ((hit & 2) && MapTile_IsStrengthHole(GetTileClass(*tileType)) == TRUE
-        && func_ov012_0216820c(GetActorMModelSystem(actor), &pos) == TRUE) {
+    if ((hit & 2) && MapTile_IsStrengthHole(GetTileClass(*tileType)) == TRUE &&
+        func_ov012_0216820c(GetActorMModelSystem(actor), &pos) == TRUE) {
         hit &= ~2;
     }
     return hit;
@@ -1340,7 +1380,8 @@ BOOL func_ov036_0219ca30(FieldPlayerGrid *grid) {
 static u32 FieldPlayerGrid_GetConstMoveType(FieldPlayerGrid *grid, u16 dir) {
     u32 tileType = GetCachedTileUnderActor(FieldPlayerCore_GetActor(grid->core));
 
-    if (!FieldPlayerGrid_CheckFlag(grid, GRID_FLAG_CONST_MOVE_END_SPOT) && IsTileSlidingIce(GetTileClass(tileType)) == TRUE) {
+    if (!FieldPlayerGrid_CheckFlag(grid, GRID_FLAG_CONST_MOVE_END_SPOT) &&
+        IsTileSlidingIce(GetTileClass(tileType)) == TRUE) {
         return CONST_MOVE_STRAIGHT;
     }
     return CONST_MOVE_NONE;
@@ -1452,13 +1493,13 @@ static BOOL FieldPlayerGrid_CheckOnCatwalk(FieldPlayerGrid *grid) {
 // The first direction with a tile to fall onto, from the one the player faces
 static u16 FieldPlayerGrid_CalcCatwalkFallDir(FieldPlayerGrid *grid) {
     u32 tileType;
-    u16 nextDirs[4] = {DIR_RIGHT, DIR_LEFT, DIR_UP, DIR_DOWN};
+    u16 nextDirs[4] = { DIR_RIGHT, DIR_LEFT, DIR_UP, DIR_DOWN };
     u16 i;
     u16 dir = FieldPlayerCore_GetFaceDir(grid->core);
 
     for (i = 0; i < 4; i++, dir = nextDirs[dir]) {
-        if (FieldPlayerGrid_GetTileInDir(grid, dir, &tileType) == TRUE && !MapTile_IsCatwalk(GetTileClass(tileType))
-            && !MapTile_BlocksCollision(tileType)) {
+        if (FieldPlayerGrid_GetTileInDir(grid, dir, &tileType) == TRUE && !MapTile_IsCatwalk(GetTileClass(tileType)) &&
+            !MapTile_BlocksCollision(tileType)) {
             return dir;
         }
     }

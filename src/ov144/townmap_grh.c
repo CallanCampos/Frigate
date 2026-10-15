@@ -20,12 +20,7 @@
 #define ARCID_TOWNMAP_GRA 84
 
 // The resources of the map's actors
-enum {
-    TOWNMAP_RES_CHARS,
-    TOWNMAP_RES_CELL_ANIMS,
-    TOWNMAP_RES_PLTT,
-    TOWNMAP_RES_COUNT
-};
+enum { TOWNMAP_RES_CHARS, TOWNMAP_RES_CELL_ANIMS, TOWNMAP_RES_PLTT, TOWNMAP_RES_COUNT };
 
 typedef struct {
     u32 unk0;
@@ -65,11 +60,14 @@ static u32 TownMapClAct_GetRes(TownMapClAct *clact, u32 index);
 
 static const BGSysLCDConfig sTownMapLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BGMODE_0, GX_BG0_AS_2D };
 
+// clang-format off
 static const BGSysVRAMConfig sTownMapVRAMConfig = {
     GX_VRAM_A | GX_VRAM_D, GX_VRAM_E,               GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B,     GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,        GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_NONE,      GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
 };
+
+// clang-format on
 
 // In the order of TOWNMAP_BG_*
 static const TownMapBGSetup sTownMapBGSetups[TOWNMAP_BG_COUNT] = {

@@ -2,6 +2,7 @@
 // The split from fx.c is certain: the table ends this file's .rodata and FX_Atan2Idx is the only user.
 #include "nitro/fx.h"
 
+// clang-format off
 static const fx16 FX_AtanIdxTable_[129] = {
     0, 81, 163, 244, 326, 407, 489, 570,
     651, 732, 813, 894, 975, 1056, 1136, 1217,
@@ -21,6 +22,8 @@ static const fx16 FX_AtanIdxTable_[129] = {
     7856, 7899, 7942, 7984, 8026, 8068, 8110, 8151,
     8192,
 };
+
+// clang-format on
 
 u16 FX_Atan2Idx(fx32 y, fx32 x) {
     fx32 num;

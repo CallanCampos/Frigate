@@ -1,9 +1,9 @@
 // The colosseum's net commands from 0x1500, over which up to four players trade their info, trainer cards and parties,
 // with the senders for them. The file's name is a guess: the ROM only shows that it is a file of its own, before
 // colosseum.c, by the assert file name ("") of its assert
-#include "field/colosseum.h"
 #include "types.h"
 #include "app/pms_select.h"
+#include "field/colosseum.h"
 #include "field/event_colosseum_battle.h"
 #include "field/field_event.h"
 #include "field/union_comm.h"
@@ -48,6 +48,7 @@ static void Colosseum_RecvUnkB(int netId, int size, const void *data, void *work
 static void Colosseum_RecvUnkC(int netId, int size, const void *data, void *work, NetHandle *handle);
 static void Colosseum_RecvUnkD(int netId, int size, const void *data, void *work, NetHandle *handle);
 
+// clang-format off
 static const NetCommand sColosseumCommands[] = {
     {Colosseum_RecvNone, NULL},
     {Colosseum_RecvMember, Colosseum_GetRecvBuffer},
@@ -64,6 +65,8 @@ static const NetCommand sColosseumCommands[] = {
     {Colosseum_RecvUnkC, NULL},
     {Colosseum_RecvUnkD, NULL},
 };
+
+// clang-format on
 
 void Colosseum_RegisterCommands(UnionSystem *unisys) {
     func_02040c20(COLOSSEUM_CMD_BASE, sColosseumCommands, NELEMS(sColosseumCommands), unisys);
@@ -101,8 +104,8 @@ static void Colosseum_RecvCard(int netId, int size, const void *data, void *work
     UnionSystem *unisys = work;
     UnionColosseum *colosseum = unisys->colosseum_sys;
 
-    if (netId != func_02042a6c(func_02040440()) && colosseum != NULL && colosseum->commPlayer != NULL
-        && colosseum->cardCheck[netId] != NULL) {
+    if (netId != func_02042a6c(func_02040440()) && colosseum != NULL && colosseum->commPlayer != NULL &&
+        colosseum->cardCheck[netId] != NULL) {
         sys_memcpy(data, colosseum->card[netId], size);
         colosseum->cardReady[netId] = TRUE;
     }
@@ -126,8 +129,8 @@ static void Colosseum_RecvChoice(int netId, int size, const void *data, void *wo
 }
 
 BOOL Colosseum_SendChoice(const ColosseumChoice *choice) {
-    return func_02042c18(func_02040440(), GFL_NET_NETID_SERVER, COLOSSEUM_CMD_CHOICE, sizeof(ColosseumChoice), choice, FALSE,
-                  TRUE, TRUE);
+    return func_02042c18(func_02040440(), GFL_NET_NETID_SERVER, COLOSSEUM_CMD_CHOICE, sizeof(ColosseumChoice), choice,
+                         FALSE, TRUE, TRUE);
 }
 
 static void Colosseum_RecvUnk4(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -172,8 +175,8 @@ static void Colosseum_RecvParty(int netId, int size, const void *data, void *wor
 BOOL Colosseum_SendParty(const PokeParty *party) {
     NetHandle *handle = func_02040440();
 
-    return func_02042c18(handle, GFL_NET_NETID_SERVER, COLOSSEUM_CMD_PARTY, PokeParty_GetSaveDataSize(), party, TRUE, FALSE,
-                  TRUE);
+    return func_02042c18(handle, GFL_NET_NETID_SERVER, COLOSSEUM_CMD_PARTY, PokeParty_GetSaveDataSize(), party, TRUE,
+                         FALSE, TRUE);
 }
 
 static void Colosseum_RecvResult(int netId, int size, const void *data, void *work, NetHandle *handle) {

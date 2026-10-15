@@ -128,6 +128,7 @@ static const BOOL sZukanAreaListStateRunsList[STATE_COUNT] = {
     FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE,
 };
 
+// clang-format off
 static const TouchRect sZukanAreaListTouchRects[] = {
     { 0, 64, 0, 64 },       { 0, 23, 96, 127 },     { 24, 47, 96, 127 },    { 48, 71, 96, 127 },
     { 72, 95, 96, 127 },    { 96, 119, 96, 127 },   { 120, 143, 96, 127 },  { 144, 167, 96, 127 },
@@ -138,6 +139,8 @@ static const TouchRect sZukanAreaListTouchRects[] = {
     { 168, 191, 208, 231 }, { 168, 191, 232, 255 }, { 98, 122, 0, 64 },     { 121, 145, 0, 64 },
     { 144, 168, 0, 64 },    { TOUCH_RECT_END, 0, 0, 0 },
 };
+
+// clang-format on
 
 static BOOL ZukanAreaList_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     ZukanAreaListWork *wk = work;

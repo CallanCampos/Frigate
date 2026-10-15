@@ -164,7 +164,7 @@ void BtlSetup_SetTrainer1v1Double(BtlSetup *setup, GameData *gameData, BtlFieldS
 void BtlSetup_SetTrainer2v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, u32 a4, u32 a5,
                             HeapID heapId);
 void BtlSetup_SetTrainer1v2(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 trainerId, u32 trainerId2,
-                             HeapID heapId);
+                            HeapID heapId);
 void BtlSetup_SetTrainer3v3(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
 void BtlSetup_SetTrainerRotation(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status, u32 a3, HeapID heapId);
 // A multi battle of two linked players against trainers

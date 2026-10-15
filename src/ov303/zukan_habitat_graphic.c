@@ -219,8 +219,19 @@ static void ZukanHabitatGraphic_InitBG(void) {
     }
     // The main screen's text
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x00000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf800),
+                          GX_BG_CHARBASE(0x00000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(0, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(0);
@@ -230,8 +241,19 @@ static void ZukanHabitatGraphic_InitBG(void) {
     }
     // The message
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf000),
-                          GX_BG_CHARBASE(0x08000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf000),
+                          GX_BG_CHARBASE(0x08000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(1, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(1);
@@ -241,8 +263,19 @@ static void ZukanHabitatGraphic_InitBG(void) {
     }
     // The list
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe800),
-                          GX_BG_CHARBASE(0x10000), 0x8000, GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xe800),
+                          GX_BG_CHARBASE(0x10000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          2,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(2, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(2);
@@ -251,16 +284,38 @@ static void ZukanHabitatGraphic_InitBG(void) {
     }
     // The pattern behind it
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe000),
-                          GX_BG_CHARBASE(0x18000), 0x8000, GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xe000),
+                          GX_BG_CHARBASE(0x18000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          3,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(3, &setup, BGMODE_TEXT);
         GFL_BGSysSetBGEnabled(3, TRUE);
     }
     // The sub screen's text
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000),
-                          GX_BG_CHARBASE(0x04000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0x0000),
+                          GX_BG_CHARBASE(0x04000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(4);
@@ -270,8 +325,19 @@ static void ZukanHabitatGraphic_InitBG(void) {
     }
     // The area's name
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0800),
-                          GX_BG_CHARBASE(0x0c000), 0x8000, GX_BG_EXTPLTT_01, 1, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0x0800),
+                          GX_BG_CHARBASE(0x0c000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          1,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(5, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(5);
@@ -280,8 +346,19 @@ static void ZukanHabitatGraphic_InitBG(void) {
     }
     // The map
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0x1000),
-                          GX_BG_CHARBASE(0x10000), 0x8000, GX_BG_EXTPLTT_23, 3, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_256,
+                          GX_BG_SCRBASE(0x1000),
+                          GX_BG_CHARBASE(0x10000),
+                          0x8000,
+                          GX_BG_EXTPLTT_23,
+                          3,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(6, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(6);
@@ -289,8 +366,19 @@ static void ZukanHabitatGraphic_InitBG(void) {
         GFL_BGSysSetBGEnabled(6, TRUE);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0x1800),
-                          GX_BG_CHARBASE(0x1c000), 0x8000, GX_BG_EXTPLTT_23, 2, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_256,
+                          GX_BG_SCRBASE(0x1800),
+                          GX_BG_CHARBASE(0x1c000),
+                          0x8000,
+                          GX_BG_EXTPLTT_23,
+                          2,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(7, &setup, BGMODE_TEXT);
         GFL_BGSysClearScr(7);

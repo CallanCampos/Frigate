@@ -1,10 +1,10 @@
 #include "types.h"
-#include "save/adventure.h"
+#include "gfl/net.h"
 #include "gfl/rtc_cache.h"
 #include "gfl/std.h"
-#include "gfl/net.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"
+#include "save/adventure.h"
 #include "save/save_control.h"
 
 // The save block with the game's clock: what the RTC was at, the DS owner's birthday, the day's countdown and when

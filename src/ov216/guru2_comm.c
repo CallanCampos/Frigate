@@ -32,6 +32,7 @@ static void Guru2Comm_Recv14(int netId, int size, const void *data, void *work, 
 static void *Guru2Comm_GetBlockRecvBuffer(int netId, void *work, int size);
 
 // The commands from GURU2_NET_CMD_BASE
+// clang-format off
 static const NetCommand sGuru2Commands[GURU2_NET_CMD_COUNT] = {
     { Guru2Comm_RecvJoin, NULL },
     { Guru2Comm_RecvSignal, NULL },
@@ -50,6 +51,8 @@ static const NetCommand sGuru2Commands[GURU2_NET_CMD_COUNT] = {
     { Guru2Comm_Recv14, NULL },
     { Guru2Comm_RecvBlock, Guru2Comm_GetBlockRecvBuffer },
 };
+
+// clang-format on
 
 static UnionApp *Guru2Comm_GetUnionApp(Guru2CommWork *g2c) {
     return g2c->g2p->param->app;
@@ -122,8 +125,8 @@ static void Guru2Comm_RecvSignal(int netId, int size, const void *data, void *wo
             answer.count = g2c->joinCount;
             switch (signal->type) {
             case GURU2_SIGNAL_LEAVE_REQUEST:
-                if (g2c->joinCount != UnionApp_CountJoined(Guru2Comm_GetUnionApp(g2c))
-                    || g2c->joinCount != MATH_CountPopulation(UnionApp_GetJoined(Guru2Comm_GetUnionApp(g2c)))) {
+                if (g2c->joinCount != UnionApp_CountJoined(Guru2Comm_GetUnionApp(g2c)) ||
+                    g2c->joinCount != MATH_CountPopulation(UnionApp_GetJoined(Guru2Comm_GetUnionApp(g2c)))) {
                     answer.ok = FALSE;
                 } else {
                     g2c->leavingBits |= 1 << netId;

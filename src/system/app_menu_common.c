@@ -1,6 +1,6 @@
 #include "types.h"
-#include "constants/battle.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/pokemon.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"

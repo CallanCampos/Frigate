@@ -259,7 +259,7 @@ static void GetMoveTutorShopSortimentBits(GameSystem *gsys, u32 moveIndex, u32 t
 // Six bytes that no code in the ROM reads, probably the data of a function stripped at link, which the original kept
 // in the shared constant pool. Reading them before their definition keeps them there; this inline accessor emits no
 // code
-extern const u8 sUnk021d091e[6];
+const u8 sUnk021d091e[6];
 
 static inline u8 ShopUI_GetUnk021d091e(u32 index) {
     return sUnk021d091e[index];
@@ -310,6 +310,7 @@ static const ShopRect sListRects[] = {
     { 0, 12, 32, 6 },
 };
 
+// clang-format off
 static const ClActorSetup sActorSetups[] = {
     { 172, 22, 0, 0, 1 },
     { 172, 92, 0, 0, 0 },
@@ -317,6 +318,8 @@ static const ClActorSetup sActorSetups[] = {
     { 224, 128, 2, 0, 0 },
     { 21, 172, 0, 0, 1 },
 };
+
+// clang-format on
 
 // Where the camera looks while the shop is open, from the target, for each way the player faces
 static const VecFx32 sCameraTargetOffsets[] = {
@@ -326,6 +329,7 @@ static const VecFx32 sCameraTargetOffsets[] = {
     { FX32_CONST(80), FX32_CONST(-16), 0 },
 };
 
+// clang-format off
 static const SpecialPokeMartHeader SPECIAL_POKE_MART_HEADERS[] = {
     { 0xf7, { 26, 27, 28, 29, 30, 31 } },
     { 0xf8, { 32, 33, 34, 35, 36, 37 } },
@@ -337,6 +341,9 @@ static const SpecialPokeMartHeader SPECIAL_POKE_MART_HEADERS[] = {
     { 0xf2, { 68, 69, 70, 71, 72, 73 } },
 };
 
+// clang-format on
+
+// clang-format off
 static const ShopItem BP_SHOP_ITEMS_TMS[] = {
     { ITEM_TM17, 6 },
     { ITEM_TM20, 6 },
@@ -358,6 +365,9 @@ static const ShopItem BP_SHOP_ITEMS_TMS[] = {
     { ITEM_TM77, 24 },
 };
 
+// clang-format on
+
+// clang-format off
 static const MoveTutorShopItem MOVE_TUTOR_ITEMS_HUMILAU_CITY[] = {
     { { MOVE_BIND, 2 }, 0 },
     { { MOVE_SNORE, 2 }, 1 },
@@ -374,6 +384,9 @@ static const MoveTutorShopItem MOVE_TUTOR_ITEMS_HUMILAU_CITY[] = {
     { { MOVE_ROOST, 6 }, 5 },
 };
 
+// clang-format on
+
+// clang-format off
 static const MoveTutorShopItem MOVE_TUTOR_ITEMS_DRIFTVEIL_CITY[] = {
     { { MOVE_BUG_BITE, 2 }, 1 },
     { { MOVE_COVET, 2 }, 0 },
@@ -392,6 +405,9 @@ static const MoveTutorShopItem MOVE_TUTOR_ITEMS_DRIFTVEIL_CITY[] = {
     { { MOVE_ICE_PUNCH, 10 }, 14 },
 };
 
+// clang-format on
+
+// clang-format off
 static const MoveTutorShopItem MOVE_TUTOR_ITEMS_NACRENE_CITY[] = {
     { { MOVE_GASTRO_ACID, 6 }, 1 },
     { { MOVE_WORRY_SEED, 6 }, 0 },
@@ -410,6 +426,9 @@ static const MoveTutorShopItem MOVE_TUTOR_ITEMS_NACRENE_CITY[] = {
     { { MOVE_SKILL_SWAP, 12 }, 13 },
 };
 
+// clang-format on
+
+// clang-format off
 static const MoveTutorShopItem MOVE_TUTOR_ITEMS_LENTIMAS_TOWN[] = {
     { { MOVE_MAGIC_COAT, 4 }, 3 },
     { { MOVE_BLOCK, 6 }, 4 },
@@ -430,6 +449,9 @@ static const MoveTutorShopItem MOVE_TUTOR_ITEMS_LENTIMAS_TOWN[] = {
     { { MOVE_IRON_TAIL, 6 }, 8 },
 };
 
+// clang-format on
+
+// clang-format off
 static const ShopItem BP_SHOP_ITEMS_NORMAL[] = {
     { ITEM_PROTEIN, 1 },
     { ITEM_CALCIUM, 1 },
@@ -475,6 +497,7 @@ static const ShopItem BP_SHOP_ITEMS_NORMAL[] = {
     { ITEM_RARE_CANDY, 24 },
 };
 
+// clang-format on
 
 static const ShopItem *BP_SHOP_ITEMS[] = { BP_SHOP_ITEMS_NORMAL, BP_SHOP_ITEMS_TMS };
 
@@ -672,7 +695,8 @@ static BOOL ScriptNative_UpdateShopUI(VM *vm, void *env) {
         args.slot = &shop->slot;
         GetMoveTutorShopSortimentBits(gsys, shop->work.tutorMoveIndex, shop->work.tutorIndex, &args.learnable);
         args.move = shop->work.move;
-        GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS, EventMoveTutorPokeSelect_Create, &args));
+        GameEvent_ChainNext(event, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS,
+                                                                   EventMoveTutorPokeSelect_Create, &args));
         shop->state++;
         break;
     }

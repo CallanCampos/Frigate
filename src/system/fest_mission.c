@@ -1,8 +1,8 @@
 #include "types.h"
-#include "system/fest_mission.h"
 #include "gfl/random.h"
 #include "gfl/rtc_cache.h"
 #include "gfl/std.h"
+#include "system/fest_mission.h"
 #include "system/game_beacon.h"
 
 // A Funfest mission's config: its start, its time, its score and whether something a player did counts for it. The
@@ -19,6 +19,7 @@ static BOOL func_02014fac(const FestMissionConfig *config, u32 value);
 static const u8 FestMission_ExtraSeconds[4] = { 0, 30, 60, 180 };
 
 // Whether a value is the mission's target, by the mission's kind
+// clang-format off
 static const FestMissionTargetFunc FestMission_TargetFuncs[7] = {
     NULL,
     func_02014f98,
@@ -28,6 +29,8 @@ static const FestMissionTargetFunc FestMission_TargetFuncs[7] = {
     func_02014fac,
     func_02014fac,
 };
+
+// clang-format on
 
 FestMissionConfig *allocateForFestMission(HeapID heapId) {
     FestMissionConfig *config = GFL_HeapAllocate(heapId, sizeof(FestMissionConfig), TRUE, "fest_mission.c", 60);
@@ -113,31 +116,31 @@ BOOL FestMissionConfig_IsTarget(FestMissionConfig *config, u32 kind, u32 value) 
     const FestMissionTargetFunc *func = &FestMission_TargetFuncs[config->header.kind];
 
     switch (config->header.kind) {
-        case 1:
-            if (kind != 0x13 && kind != 0x14) {
-                return FALSE;
-            }
-            break;
-        case 2:
-            if (kind != 0x15 && kind != 0x16) {
-                return FALSE;
-            }
-            break;
-        case 3:
-            if (kind - 0x18 != config->info.target) {
-                return FALSE;
-            }
-            break;
-        case 4:
-            if (kind != 0x17) {
-                return FALSE;
-            }
-            break;
-        case 5:
-            if (kind - 0x1e != config->info.target) {
-                return FALSE;
-            }
-            break;
+    case 1:
+        if (kind != 0x13 && kind != 0x14) {
+            return FALSE;
+        }
+        break;
+    case 2:
+        if (kind != 0x15 && kind != 0x16) {
+            return FALSE;
+        }
+        break;
+    case 3:
+        if (kind - 0x18 != config->info.target) {
+            return FALSE;
+        }
+        break;
+    case 4:
+        if (kind != 0x17) {
+            return FALSE;
+        }
+        break;
+    case 5:
+        if (kind - 0x1e != config->info.target) {
+            return FALSE;
+        }
+        break;
     }
     return (*func)(config, value);
 }

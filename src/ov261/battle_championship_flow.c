@@ -841,7 +841,7 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         break;
     case 1:
         WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData,
-                            EntreeForest_Text_RecognizeAchievementBattlePresent, 1);
+                                    EntreeForest_Text_RecognizeAchievementBattlePresent, 1);
         *seq = 2;
         break;
     case 2:

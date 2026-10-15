@@ -1,12 +1,12 @@
-#include "field/field_map_chunk.h"
 #include "types.h"
 #include "field/field_g3d_mapper.h"
 #include "field/field_map.h"
+#include "field/field_map_chunk.h"
 #include "field/field_prop.h"
 #include "field/field_terrain_animator.h"
 
-// An 'NG' chunk file, which has no terrain: a model and props. The ROM doesn't name the file; the name is a guess. Function names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); NGChunkFile is ours
+// An 'NG' chunk file, which has no terrain: a model and props. The ROM doesn't name the file; the name is a guess.
+// Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); NGChunkFile is ours
 
 // The start of the file. Each offset is from the start of the file
 typedef struct {
@@ -58,8 +58,8 @@ BOOL FieldChunkAccessor_NG_Update(FieldChunk *chunk, FieldChunkContext *context)
         FieldChunk_SetupModel(chunk);
         if (FieldChunkContext_HasAnimator(context)) {
             FieldTerrainSRTAnimatorChunkState_Bind(FieldChunkContext_GetSRTAnimatorState(context),
-                                                   FieldChunk_GetModelResource(chunk),
-                                                   FieldChunk_GetUsedTexRsc(chunk), FieldChunk_GetModel(chunk));
+                                                   FieldChunk_GetModelResource(chunk), FieldChunk_GetUsedTexRsc(chunk),
+                                                   FieldChunk_GetModel(chunk));
         }
         loader->state = FIELD_CHUNK_LOAD_NONE;
         return FALSE;
@@ -68,7 +68,7 @@ BOOL FieldChunkAccessor_NG_Update(FieldChunk *chunk, FieldChunkContext *context)
     return TRUE;
 }
 
-void FieldChunkAccessor_NG_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos, fx32 size,
-                                      fx32 baseY) {
+void FieldChunkAccessor_NG_GetTerrain(MapTerrainSamplerOutput *out, const void *container, const VecFx32 *pos,
+                                      fx32 size, fx32 baseY) {
     out->layerCount = 0;
 }

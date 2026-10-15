@@ -1,7 +1,7 @@
-#include "field/field_map_chunk.h"
 #include "types.h"
 #include "field/field_g3d_mapper.h"
 #include "field/field_map.h"
+#include "field/field_map_chunk.h"
 #include "field/field_prop.h"
 #include "field/field_terrain_animator.h"
 #include "field/resort_mapcreate.h"
@@ -96,8 +96,8 @@ BOOL FieldChunkAccessor_RD_Update(FieldChunk *chunk, FieldChunkContext *context)
         FieldChunk_SetupModel(chunk);
         if (FieldChunkContext_HasAnimator(context)) {
             FieldTerrainSRTAnimatorChunkState_Bind(FieldChunkContext_GetSRTAnimatorState(context),
-                                                   FieldChunk_GetModelResource(chunk),
-                                                   FieldChunk_GetUsedTexRsc(chunk), FieldChunk_GetModel(chunk));
+                                                   FieldChunk_GetModelResource(chunk), FieldChunk_GetUsedTexRsc(chunk),
+                                                   FieldChunk_GetModel(chunk));
         }
         loader->state = FIELD_CHUNK_LOAD_END;
         break;

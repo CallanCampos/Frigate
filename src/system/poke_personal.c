@@ -1,11 +1,11 @@
 #include "types.h"
-#include "pml/personal.h"
-#include "pml/poke_party.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
+#include "pml/personal.h"
+#include "pml/poke_party.h"
 
 // The species' data of the personal archives: this game's, and Black and White's. The file's name is the ROM's
 // string; the functions' names are swan's

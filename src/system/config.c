@@ -1,14 +1,14 @@
 #include "types.h"
-#include "save/config.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"
 #include "gfl/std.h"
+#include "save/config.h"
 
 // The options (the ROM's string for the file, "config.c"). The names of the fields are guessed.
 
 // The layout of this table is not known: three groups of five words
-static const u32 sKeyRemaps[] = {0, 0, 0, 8, 1024, 1, 0, 0, 0, 512, 1, 1, 0, 0, 0};
+static const u32 sKeyRemaps[] = { 0, 0, 0, 8, 1024, 1, 0, 0, 0, 512, 1, 1, 0, 0, 0 };
 
 void initKeyBlk(void) {
     setKeyBlkStarted(sKeyRemaps);

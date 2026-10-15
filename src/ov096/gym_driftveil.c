@@ -170,6 +170,7 @@ static const G3DSceneAnimationSetup sElevatorAnimations[] = { { 6, 0 } };
 static const G3DSceneAnimationSetup sFreightRiderAnimations[] = { { 8, 0 }, { 0, 0xb }, { 0, 7 } };
 static const G3DSceneAnimationSetup sPadAnimations[] = { { 4, 0 }, { 0, 0xa }, { 0, 6 }, { 0xc, 0 } };
 
+// clang-format off
 static const G3DSceneActorSetup sGymDriftveilActors[ACTOR_COUNT] = {
     { 0, 0, 0, 0, sPadAnimations, 1 }, { 0, 0, 0, 0, sPadAnimations, 1 },
     { 0, 0, 0, 0, sPadAnimations, 1 }, { 0, 0, 0, 0, sPadAnimations, 1 },
@@ -217,6 +218,9 @@ static const G3DSceneActorSetup sGymDriftveilActors[ACTOR_COUNT] = {
     { 16, 0, 16, 0, NULL, 0 }, { 17, 0, 17, 0, NULL, 0 },
 };
 
+// clang-format on
+
+// clang-format off
 static const G3DSceneResourceSetup sGymDriftveilResources[18] = {
     { GIMMICK_ARCID, 0, 0 },    { GIMMICK_ARCID, 1, 0 },    { GIMMICK_ARCID, 2, 0 },    { GIMMICK_ARCID, 3, 0 },
     { GIMMICK_ARCID, 4, 0 },    { GIMMICK_ARCID, 9, 0 },    { GIMMICK_ARCID, 0xa, 0 },  { GIMMICK_ARCID, 0xb, 0 },
@@ -225,10 +229,14 @@ static const G3DSceneResourceSetup sGymDriftveilResources[18] = {
     { GIMMICK_ARCID, 0x10, 0 }, { GIMMICK_ARCID, 0x11, 0 },
 };
 
-static const G3DSceneSetup sGymDriftveilSceneSetup = { sGymDriftveilResources, NELEMS(sGymDriftveilResources), sGymDriftveilActors, NELEMS(sGymDriftveilActors) };
+// clang-format on
+
+static const G3DSceneSetup sGymDriftveilSceneSetup = { sGymDriftveilResources, NELEMS(sGymDriftveilResources),
+                                                       sGymDriftveilActors, NELEMS(sGymDriftveilActors) };
 
 // Each pad: how far it slides the player in tiles by the kind of pad, the tile it is on and the way it faces, and the
 // switch that the slide lands on
+// clang-format off
 static const DriftveilGymPad sPads[PAD_COUNT] = {
     { 0, 6, 8, 1, 6 }, { 0, 6, 17, 0, 0 }, { 0, 16, 8, 1, 7 },
     { 0, 16, 17, 0, 1 }, { 0, 26, 8, 1, 8 }, { 0, 26, 17, 0, 2 },
@@ -259,6 +267,8 @@ static const DriftveilGymPad sPads[PAD_COUNT] = {
     { 2, 26, 41, 1, 32 }, { 2, 26, 61, 0, 20 }, { 3, 18, 7, 3, 3 },
     { 3, 34, 7, 2, 1 },
 };
+
+// clang-format on
 
 void DriftveilGym_Init(Field *field) {
     GimmickState *gimmickState = GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field)));
@@ -355,11 +365,11 @@ static void DriftveilGym_InitObjects(DriftveilGymWork *work) {
     LoadFieldExpandObjData(work->expObj, &sGymDriftveilSceneSetup, 0);
     {
         const VecFx32 pads[PAD_MODEL_COUNT] = {
-            { FX32_CONST(96), FX32_CONST(0), FX32_CONST(200) }, { FX32_CONST(256), FX32_CONST(0), FX32_CONST(200) },
+            { FX32_CONST(96), FX32_CONST(0), FX32_CONST(200) },  { FX32_CONST(256), FX32_CONST(0), FX32_CONST(200) },
             { FX32_CONST(416), FX32_CONST(0), FX32_CONST(200) }, { FX32_CONST(576), FX32_CONST(0), FX32_CONST(200) },
-            { FX32_CONST(96), FX32_CONST(0), FX32_CONST(376) }, { FX32_CONST(256), FX32_CONST(0), FX32_CONST(376) },
+            { FX32_CONST(96), FX32_CONST(0), FX32_CONST(376) },  { FX32_CONST(256), FX32_CONST(0), FX32_CONST(376) },
             { FX32_CONST(416), FX32_CONST(0), FX32_CONST(376) }, { FX32_CONST(896), FX32_CONST(0), FX32_CONST(376) },
-            { FX32_CONST(96), FX32_CONST(0), FX32_CONST(552) }, { FX32_CONST(416), FX32_CONST(0), FX32_CONST(552) },
+            { FX32_CONST(96), FX32_CONST(0), FX32_CONST(552) },  { FX32_CONST(416), FX32_CONST(0), FX32_CONST(552) },
             { FX32_CONST(896), FX32_CONST(0), FX32_CONST(552) }, { FX32_CONST(256), FX32_CONST(0), FX32_CONST(728) },
             { FX32_CONST(896), FX32_CONST(0), FX32_CONST(728) }, { FX32_CONST(96), FX32_CONST(0), FX32_CONST(904) },
             { FX32_CONST(256), FX32_CONST(0), FX32_CONST(904) }, { FX32_CONST(576), FX32_CONST(0), FX32_CONST(904) },
@@ -652,7 +662,8 @@ static void DriftveilGym_PressSwitch(DriftveilGymWork *work, u32 index) {
 static GameEvent *DriftveilGym_CreateElevator(GameEvent *parent, GameSystem *gsys, u32 elevator, u32 down) {
     Field *field = GSYS_GetField(gsys);
     FieldPlayer *player = Field_GetPlayer(field);
-    GameEvent *event = GameEvent_Create(gsys, parent, DriftveilGym_ElevatorEventCallback, sizeof(DriftveilGymElevatorEvent));
+    GameEvent *event =
+        GameEvent_Create(gsys, parent, DriftveilGym_ElevatorEventCallback, sizeof(DriftveilGymElevatorEvent));
     DriftveilGymElevatorEvent *ev = GameEvent_GetData(event);
 
     ev->gsys = gsys;
@@ -738,7 +749,8 @@ static void DriftveilGym_MoveElevator(DriftveilGymElevatorEvent *ev) {
 static void DriftveilGym_ShowElevatorRider(DriftveilGymElevatorEvent *ev, BOOL atFloor, u16 model) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(ev->field);
     NNSG3dResMdl *resMdl =
-        GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(FieldExpObj_GetActor(expObj, 0, ev->elevator + ACTOR_ELEVATOR)))->resMdl;
+        GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(FieldExpObj_GetActor(expObj, 0, ev->elevator + ACTOR_ELEVATOR)))
+            ->resMdl;
     SRTMatrix *matrix;
     VecFx32 pos;
     FieldActor *playerActor;
@@ -777,7 +789,8 @@ static BOOL DriftveilGym_HasReachedHeight(DriftveilGymElevatorEvent *ev) {
 
 static GameEvent *DriftveilGym_CreateFreight(GameEvent *parent, GameSystem *gsys, BOOL up, BOOL withRider) {
     Field *field = GSYS_GetField(gsys);
-    GameEvent *event = GameEvent_Create(gsys, parent, DriftveilGym_FreightEventCallback, sizeof(DriftveilGymFreightEvent));
+    GameEvent *event =
+        GameEvent_Create(gsys, parent, DriftveilGym_FreightEventCallback, sizeof(DriftveilGymFreightEvent));
     DriftveilGymFreightEvent *ev = GameEvent_GetData(event);
     FieldExpObjAnm *anm;
 
@@ -859,7 +872,8 @@ static GameEventReturnCode DriftveilGym_FreightEventCallback(GameEvent *event, u
             SetActorHidden(FieldPlayer_GetActor(player), TRUE);
             SetActorHidden(ev->rider, TRUE);
             NNS_G3dMdlSetMdlFogEnableFlagAll(
-                GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(FieldExpObj_GetActor(expObj, 0, ACTOR_FREIGHT_RIDER)))->resMdl,
+                GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(FieldExpObj_GetActor(expObj, 0, ACTOR_FREIGHT_RIDER)))
+                    ->resMdl,
                 FALSE);
         }
         *state += 1;

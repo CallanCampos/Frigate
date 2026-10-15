@@ -1,6 +1,4 @@
 #include "types.h"
-#include "constants/arc.h"
-#include "constants/text_banks.h"
 #include "app/bag.h"
 #include "battle/b_bag_main.h"
 #include "battle/b_plist_main.h"
@@ -16,6 +14,8 @@
 #include "battle/btlv_scd.h"
 #include "battle/tr_ai.h"
 #include "battle/trainer_data.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
 #include "gfl/g3d.h"
@@ -536,7 +536,7 @@ BOOL func_ov167_021ceed8(BtlvCore *core, s32 *seq, void *work) {
     switch (*seq) {
     case 0:
         BtlvScd_StartCommandSelect(core->scd, core->mon, core->unk1B5, BattleClient_GetShooterEnergy(core->client),
-                            core->unkB8);
+                                   core->unkB8);
         (*seq)++;
     case 1:
         core->result = BtlvScd_GetCommandResult(core->scd);

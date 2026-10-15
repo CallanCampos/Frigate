@@ -8,8 +8,8 @@
 #include "types.h"
 #include "field/encounter_effect.h"
 #include "nitro/fx.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // The mesh's vertices, one more than its quads in each direction
 #define ENCEFF_RIPPLE_COLUMNS 33

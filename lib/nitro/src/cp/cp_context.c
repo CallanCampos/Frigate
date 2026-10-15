@@ -1,6 +1,7 @@
 #include "nitro/cp.h"
 
 // Save the math coprocessor registers, including the current operation modes.
+// clang-format off
 asm void CP_SaveContext(CPContext *context) {
     ldr r1, [pc, #0x34]
     stmfd sp!, {r4}
@@ -20,7 +21,10 @@ asm void CP_SaveContext(CPContext *context) {
     dcd 0x04000290
 }
 
+// clang-format on
+
 // Restore the saved register values and modes.
+// clang-format off
 asm void CPi_RestoreContext(const CPContext *context) {
     stmfd sp!, {r4}
     ldr r1, [pc, #0x2c]
@@ -38,3 +42,5 @@ asm void CPi_RestoreContext(const CPContext *context) {
     bx lr
     dcd 0x04000290
 }
+
+// clang-format on

@@ -122,8 +122,8 @@ void PokeVoice_CreateChatterInfo(PokeVoiceChatterInfo *info);
 // cry is not the wave archive's (a Chatot's recording), its samples, their count, sample rate and speed, returning
 // TRUE. The game's are getResIDFunc and getWaveInfoFunc
 typedef void (*PokeVoiceGetResIDFunc)(u32 species, u32 form, u32 *waveArc);
-typedef BOOL (*PokeVoiceGetWaveInfoFunc)(u32 species, u32 form, const PokeVoiceChatterInfo *chatterInfo,
-                                         void **samples, u32 *size, u32 *sampleRate, u32 *speed, s8 *volume);
+typedef BOOL (*PokeVoiceGetWaveInfoFunc)(u32 species, u32 form, const PokeVoiceChatterInfo *chatterInfo, void **samples,
+                                         u32 *size, u32 *sampleRate, u32 *speed, s8 *volume);
 
 void PokeVoice_Init(u16 a0, PokeVoiceGetResIDFunc getResID, PokeVoiceGetWaveInfoFunc getWaveInfo);
 // Releases the handles whose cries have ended; called each frame

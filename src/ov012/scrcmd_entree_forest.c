@@ -58,7 +58,7 @@ typedef struct {
     u32 unk20;
 } EntreeForestWarpData;
 
-static const VecFx32 data_ov012_0216dac4 = {0x1f8000, 0x20000, 0x168000};
+static const VecFx32 data_ov012_0216dac4 = { 0x1f8000, 0x20000, 0x168000 };
 
 static FieldActor *FieldScriptEnv_FindActor(FieldScriptEnv *env, u16 actorId);
 static void func_ov012_02164dcc(FieldScriptEnv *env, EntreeForestPokemon *pokemon);
@@ -225,8 +225,8 @@ static PartyPkm *CreateEntreeForestPkmFromActor(FieldScriptEnv *env, FieldActor 
 static GameEvent *EventEntreeForestBattleCall_Create(GameSystem *gsys, Field *field, PartyPkm *pkm,
                                                      EntreeForestPokemon pokemon, u16 *result, HeapID heapId) {
     GameData *gameData = GSYS_GetGameData(gsys);
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventEntreeForestBattleCall_Callback,
-                                        sizeof(EntreeForestBattleData));
+    GameEvent *event =
+        GameEvent_Create(gsys, NULL, EventEntreeForestBattleCall_Callback, sizeof(EntreeForestBattleData));
     EntreeForestBattleData *data = GameEvent_GetData(event);
 
     sys_memset(data, 0, sizeof(EntreeForestBattleData));
@@ -290,7 +290,7 @@ static GameEventReturnCode EventEntreeForestBattleCall_Callback(GameEvent *event
         bag = GameData_GetBag(gameData);
         trainerData = getTrainerDataBlkAddress(save);
         data->pdcWork = PdcWork_Create(gameData, data->pkm, &data->status, playerInfo, bag, trainerData,
-                                            getPokedexSaveAddress(save), data->heapId);
+                                       getPokedexSaveAddress(save), data->heapId);
         GSYS_QueueProcAsEvent(event, -1, &PDC_PROC_FUNCTIONS, data->pdcWork);
         (*state)++;
         break;

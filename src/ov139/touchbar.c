@@ -66,8 +66,8 @@ static void TouchBarGfx_Unload(TouchBarGfx *gfx);
 static u32 TouchBarGfx_GetResource(const TouchBarGfx *gfx, u32 res);
 static void LoadBarScreen(ArcTool *arc, u32 fileId, u32 bg, u32 charPos, u8 srcX, u8 srcY, u8 srcWidth, u8 srcHeight,
                           u8 x, u8 y, u8 width, u8 height, u8 palette, BOOL compressed, HeapID heapId);
-static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *gfx,
-                              const TouchBarItem *item, u32 surface, HeapID heapId);
+static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *gfx, const TouchBarItem *item,
+                              u32 surface, HeapID heapId);
 static void TouchBarIcon_Delete(TouchBarIcon *icon);
 static BOOL TouchBarIcon_CheckTouch(TouchBarIcon *icon);
 static BOOL TouchBarIcon_IsAnimEnded(TouchBarIcon *icon);
@@ -263,8 +263,7 @@ static void TouchBarGfx_Load(TouchBarGfx *gfx, u8 bg, u32 vramType, u32 bgScreen
         LoadBarScreen(arc, func_0202d828(), gfx->bg, CHAR_POS(gfx->bgChars), 0, 21, 32, 24, 0, 21, 32, 3, bgPalette,
                       FALSE, heapId);
     }
-    gfx->res[TOUCHBAR_RES_PALETTE] =
-        func_0204bbb8(arc, func_0202d810(), vramType, objPalette * 32, 0, 3, heapId);
+    gfx->res[TOUCHBAR_RES_PALETTE] = func_0204bbb8(arc, func_0202d810(), vramType, objPalette * 32, 0, 3, heapId);
     gfx->res[TOUCHBAR_RES_CHARS] = func_0204b81c(arc, func_0202d814(), FALSE, vramType, heapId);
     gfx->res[TOUCHBAR_RES_CELL_ANIMS] = func_0204bde0(arc, func_0202d818(mapping), func_0202d81c(mapping), heapId);
     GFL_ArcToolFree(arc);
@@ -305,8 +304,8 @@ static void LoadBarScreen(ArcTool *arc, u32 fileId, u32 bg, u32 charPos, u8 srcX
     GFL_HeapFree(file);
 }
 
-static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *gfx,
-                              const TouchBarItem *item, u32 surface, HeapID heapId) {
+static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *gfx, const TouchBarItem *item,
+                              u32 surface, HeapID heapId) {
     ClActorSetup setup;
     u32 chars;
     u32 palette;
@@ -420,7 +419,8 @@ static void TouchBarIcon_SetPressed(TouchBarIcon *icon, BOOL pressed) {
 static BOOL TouchBarIcon_IsPressed(TouchBarIcon *icon) {
     BOOL pressed = TRUE;
 
-    if (icon->anim != icon->item.anims[TOUCHBAR_ANIM_PRESSED] && icon->anim != icon->item.anims[TOUCHBAR_ANIM_TOGGLED]) {
+    if (icon->anim != icon->item.anims[TOUCHBAR_ANIM_PRESSED] &&
+        icon->anim != icon->item.anims[TOUCHBAR_ANIM_TOGGLED]) {
         pressed = FALSE;
     }
     return pressed;

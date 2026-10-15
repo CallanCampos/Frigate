@@ -3,14 +3,14 @@
 
 #include "types.h"
 #include "battle/regulation.h"
+#include "dwc/dwc.h"
 #include "field/field.h"
 #include "field/trcard_sys.h"
 #include "gfl/heap.h"
 #include "save/join_avenue.h"
 #include "save/player_info.h"
-#include "system/pms_data.h"
-#include "dwc/dwc.h"
 #include "struct_decls.h"
+#include "system/pms_data.h"
 
 // union_comm.c, overlay 28, which the ROM names: the Union Room's system work, its GameCommSys callbacks for
 // GAME_COMM_NO_UNION (see game_comm.c), its beacon and the players it has met. The field side is union_main.c, and
@@ -136,8 +136,8 @@ typedef struct {
     u8 state;
     u8 unk10[4];
     UnionGroup mycomm; // the ROM's name
-    u8 ruleSel[4]; // the battle format, two options and the menu kind
-    s32 partyCheck; // the regulation's checks of the party and of the Battle Box
+    u8 ruleSel[4];     // the battle format, two options and the menu kind
+    s32 partyCheck;    // the regulation's checks of the party and of the Battle Box
     s32 boxCheck;
     s16 wait; // frames
     s16 result;
@@ -159,12 +159,13 @@ typedef struct {
     u16 unk18;
     u8 mac[6]; // of the player, who is looked up by it
     u8 gender;
-    u8 kind; // UNION_CHAT_KIND_*
+    u8 kind;    // UNION_CHAT_KIND_*
     u8 subKind; // 0, or 1 for a friend and 2 for another player
     u8 unk23;
 } UnionVisitor;
 
-// What a line of the chat says: the player's sentence, or that it entered the Union Room, or what the player wants to do
+// What a line of the chat says: the player's sentence, or that it entered the Union Room, or what the player wants to
+// do
 #define UNION_CHAT_KIND_SENTENCE 0
 #define UNION_CHAT_KIND_ENTERED 1
 #define UNION_CHAT_KIND_BATTLE 2
@@ -214,7 +215,7 @@ struct UnionSystem {
     u8 msgPrinting;
     u8 beaconReady;
     u8 fieldActive;
-    u8 entryReply; // 1 when this machine's entry request was accepted, 2 when refused
+    u8 entryReply;      // 1 when this machine's entry request was accepted, 2 when refused
     u8 entryAcceptedTo; // a bit per net ID
     u8 entryRepliedTo;
     u8 unk282E;

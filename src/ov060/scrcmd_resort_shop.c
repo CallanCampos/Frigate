@@ -192,31 +192,42 @@ typedef struct {
 
 // Reading the layouts before their definitions keeps the unused entries in MWCC's
 // shared constant pool, as in the original. This inline accessor emits no code.
-extern const ResortShopWindowSetup sUnk021e8a6c;
-extern const ResortShopWindowSetup sWindow0;
-extern const ResortShopWindowSetup sWindow2;
-extern const ResortShopWindowSetup sWindow3;
-extern const ResortShopWindowSetup sUnk021e8a60;
-extern const ResortShopWindowSetup sWindow6;
-extern const ResortShopWindowSetup sWindow5;
-extern const ResortShopWindowSetup sUnk021e8ab4;
-extern const ResortShopWindowSetup sWindow1;
-extern const ResortShopWindowSetup sWindow4;
-extern const u8 sUnk021e8acc[16];
+const ResortShopWindowSetup sUnk021e8a6c;
+const ResortShopWindowSetup sWindow0;
+const ResortShopWindowSetup sWindow2;
+const ResortShopWindowSetup sWindow3;
+const ResortShopWindowSetup sUnk021e8a60;
+const ResortShopWindowSetup sWindow6;
+const ResortShopWindowSetup sWindow5;
+const ResortShopWindowSetup sUnk021e8ab4;
+const ResortShopWindowSetup sWindow1;
+const ResortShopWindowSetup sWindow4;
+const u8 sUnk021e8acc[16];
 
 static inline u32 ResortShop_GetLayoutBG(u32 index) {
     switch (index) {
-    case 0: return sUnk021e8a6c.bg;
-    case 1: return sWindow0.bg;
-    case 2: return sWindow2.bg;
-    case 3: return sWindow3.bg;
-    case 4: return sUnk021e8a60.bg;
-    case 5: return sWindow6.bg;
-    case 6: return sWindow5.bg;
-    case 7: return sUnk021e8ab4.bg;
-    case 8: return sWindow1.bg;
-    case 9: return sWindow4.bg;
-    default: return sUnk021e8acc[0];
+    case 0:
+        return sUnk021e8a6c.bg;
+    case 1:
+        return sWindow0.bg;
+    case 2:
+        return sWindow2.bg;
+    case 3:
+        return sWindow3.bg;
+    case 4:
+        return sUnk021e8a60.bg;
+    case 5:
+        return sWindow6.bg;
+    case 6:
+        return sWindow5.bg;
+    case 7:
+        return sUnk021e8ab4.bg;
+    case 8:
+        return sWindow1.bg;
+    case 9:
+        return sWindow4.bg;
+    default:
+        return sUnk021e8acc[0];
     }
 }
 
@@ -262,6 +273,7 @@ static const ResortShopCamera sCameras[] = {
     { 0xc000, 0, FX32_CONST(70) },
 };
 
+// clang-format off
 static const ClActorSetup sActorSetups[] = {
     { 172, 22, 0, 0, 1 },
     { 172, 92, 0, 0, 0 },
@@ -271,6 +283,8 @@ static const ClActorSetup sActorSetups[] = {
     { 18, 168, 0, 0, 1 },
     { 18, 168, 1, 0, 1 },
 };
+
+// clang-format on
 
 static const ResortShopWindowSetup *sWindowSetups[] = {
     &sWindow0, &sWindow1, &sWindow2, &sWindow3, &sWindow4, &sWindow5, &sWindow6,
@@ -1320,20 +1334,20 @@ static void func_ov060_021e7404(ResortShopWork *wk, u16 objCode) {
 }
 
 static void func_ov060_021e7470(ResortShopWork *wk, const ClActorSetup *iconSetup) {
-    wk->actors[0] = func_0204c040(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims, &sActorSetups[0], 0,
-                                  wk->heapId);
-    wk->actors[1] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims, &sActorSetups[1], 0,
-                                  wk->heapId);
-    wk->actors[2] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims, &sActorSetups[2], 0,
-                                  wk->heapId);
-    wk->actors[3] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims, &sActorSetups[3], 0,
-                                  wk->heapId);
+    wk->actors[0] = func_0204c040(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims,
+                                  &sActorSetups[0], 0, wk->heapId);
+    wk->actors[1] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
+                                  &sActorSetups[1], 0, wk->heapId);
+    wk->actors[2] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
+                                  &sActorSetups[2], 0, wk->heapId);
+    wk->actors[3] = func_0204c040(wk->clactUnit, wk->res[1].chars, wk->res[0].palette, wk->res[1].cellAnims,
+                                  &sActorSetups[3], 0, wk->heapId);
     func_0204c520(wk->actors[3], TRUE);
     wk->actors[4] = func_0204c040(wk->clactUnit, wk->res[2].chars, wk->res[2].palette, wk->res[2].cellAnims, iconSetup,
                                   0, wk->heapId);
     func_0204c378(wk->actors[4], 0, 1);
-    wk->actors[5] = func_0204c040(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims, &sActorSetups[6], 0,
-                                  wk->heapId);
+    wk->actors[5] = func_0204c040(wk->clactUnit, wk->res[0].chars, wk->res[0].palette, wk->res[0].cellAnims,
+                                  &sActorSetups[6], 0, wk->heapId);
     func_0204c124(wk->actors[5], FALSE);
     func_0204c124(wk->actors[1], FALSE);
     func_0204c124(wk->actors[2], FALSE);
@@ -1379,8 +1393,8 @@ static void func_ov060_021e76d0(ResortShopWork *wk) {
     for (i = 0; i < 7; i++) {
         const ResortShopWindowSetup *setup = sWindowSetups[i];
 
-        wk->windows[i] = BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height,
-                                              setup->palette, 1);
+        wk->windows[i] =
+            BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette, 1);
     }
     wk->printWindow.window = wk->windows[2];
     wk->printWindow.flushPending = FALSE;
@@ -1687,7 +1701,8 @@ static StrBuf *func_ov060_021e8040(ResortShopWork *wk, JoinAvenuePerson *person)
     void *flags = func_02038470(person);
     StrBuf *strbuf = GFL_StrBufCreate(128, wk->heapId);
     u16 shop = ResortShopData_GetShopParam(ResortShopData_GetPersonShop(wk->shops, person), 0);
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(wk->heapId));
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(wk->heapId));
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, shop + 42);
     u16 a = joinAveTextHandler(person, 21, NULL);
     u16 b = joinAveTextHandler(person, 22, NULL);

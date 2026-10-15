@@ -1,7 +1,7 @@
 #include "types.h"
-#include "gfl/sound.h"
 #include "gfl/dwc_vchat.h"
 #include "gfl/heap.h"
+#include "gfl/sound.h"
 #include "gfl/std.h"
 #include "nitro/mic.h"
 #include "nitro/os.h"

@@ -16,8 +16,22 @@ const u32 ACMD_QUEUE_WALK_W_8F[2] = { ACMD(0xe, 1), ACMD_END };
 const u32 ACMD_QUEUE_WALK_E_8F[2] = { ACMD(0xf, 1), ACMD_END };
 
 const fx32 JUMP_ANY_HEIGHT_TABLE[16] = {
-    2 * FX32_ONE, 4 * FX32_ONE, 6 * FX32_ONE, 8 * FX32_ONE, 9 * FX32_ONE, 10 * FX32_ONE, 10 * FX32_ONE, 10 * FX32_ONE,
-    9 * FX32_ONE, 8 * FX32_ONE, 6 * FX32_ONE, 5 * FX32_ONE, 3 * FX32_ONE, 2 * FX32_ONE, 0,            0,
+    2 * FX32_ONE,
+    4 * FX32_ONE,
+    6 * FX32_ONE,
+    8 * FX32_ONE,
+    9 * FX32_ONE,
+    10 * FX32_ONE,
+    10 * FX32_ONE,
+    10 * FX32_ONE,
+    9 * FX32_ONE,
+    8 * FX32_ONE,
+    6 * FX32_ONE,
+    5 * FX32_ONE,
+    3 * FX32_ONE,
+    2 * FX32_ONE,
+    0,
+    0,
 };
 
 GameEvent *CallEventPrepareResidentActorsForZoneChange(GameSystem *gsys, Field *field) {
@@ -68,10 +82,18 @@ GameEvent *CallMoveOneTileFrontEvent(GameSystem *gsys, Field *field) {
     u32 direction = GetActorFaceDir(FieldPlayer_GetActor(Field_GetPlayer(field)));
     const u32 *queue;
     switch (direction) {
-    case 0: queue = ACMD_QUEUE_WALK_N_8F; break;
-    case 1: queue = ACMD_QUEUE_WALK_S_8F; break;
-    case 2: queue = ACMD_QUEUE_WALK_W_8F; break;
-    case 3: queue = ACMD_QUEUE_WALK_E_8F; break;
+    case 0:
+        queue = ACMD_QUEUE_WALK_N_8F;
+        break;
+    case 1:
+        queue = ACMD_QUEUE_WALK_S_8F;
+        break;
+    case 2:
+        queue = ACMD_QUEUE_WALK_W_8F;
+        break;
+    case 3:
+        queue = ACMD_QUEUE_WALK_E_8F;
+        break;
     }
     return EventActionCall_Create(gsys, field, 0xff, queue);
 }
@@ -87,7 +109,6 @@ FieldActor *EventActionCall_FindActor(MMSys *mmSys, u16 actorId) {
     // Left unset for 0xf1, which returns whatever the register holds: the actor system
     return actor;
 }
-
 
 void EventActionCall_ClearTCBs(EventActionCallWork *work) {
     int i;
@@ -218,14 +239,21 @@ GameEvent *EventActorLinearMove_Create(GameSystem *gsys, FieldActor *actor, cons
     return event;
 }
 
-
 FieldAcmdTCB *FieldAcmdTCB_CreateWalkOneTile(FieldActor *actor, u32 direction) {
     const u32 *queue;
     switch (direction) {
-    case 0: queue = ACMD_QUEUE_WALK_N_8F; break;
-    case 1: queue = ACMD_QUEUE_WALK_S_8F; break;
-    case 2: queue = ACMD_QUEUE_WALK_W_8F; break;
-    case 3: queue = ACMD_QUEUE_WALK_E_8F; break;
+    case 0:
+        queue = ACMD_QUEUE_WALK_N_8F;
+        break;
+    case 1:
+        queue = ACMD_QUEUE_WALK_S_8F;
+        break;
+    case 2:
+        queue = ACMD_QUEUE_WALK_W_8F;
+        break;
+    case 3:
+        queue = ACMD_QUEUE_WALK_E_8F;
+        break;
     }
     func_ov012_02166f2c(actor);
     return FieldAcmdTCB_Create(actor, queue);

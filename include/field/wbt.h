@@ -369,8 +369,8 @@ void func_ov055_021e6bfc(WbtPartyFilter *filter, u16 item);
 void func_ov055_021e6c20(WbtPartyFilter *filter, u16 species);
 void func_ov055_021e6c44(WbtPartyFilter *filter, s16 file);
 // Picks count of the files at random, as the filter allows, and adds them to the filter
-void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files,
-                         u32 arcId, u8 count, MATHRandContext32 *rand);
+void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files, u32 arcId,
+                         u8 count, MATHRandContext32 *rand);
 void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 placeName);
 void func_ov055_021e71ec(WbtSystem *sys);
 

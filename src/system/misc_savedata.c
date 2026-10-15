@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/misc_savedata.h"
 #include "field/rival_select.h"
 #include "field/union_oneself.h"
 #include "gfl/std.h"
+#include "save/misc_savedata.h"
 #include "save/save_control.h"
 #include "system/str_tool.h"
 

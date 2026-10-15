@@ -88,23 +88,26 @@ static void EventBattleReturn_ShayminForms(EventBattleReturnParam *prm, PokePart
 static void EventBattleReturn_HealBall(PartyPkm *pkm);
 
 // Pickup's chances, in percent, cumulative: an item of sPickupItems from the slot for the level onwards
-static const u8 sPickupChances[9] = {30, 40, 50, 60, 70, 80, 90, 94, 98};
+static const u8 sPickupChances[9] = { 30, 40, 50, 60, 70, 80, 90, 94, 98 };
 
 // Honey Gather's chance of Honey, in percent, by tens of levels
-static const u8 sHoneyGatherChances[10] = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
+static const u8 sHoneyGatherChances[10] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
 
 // Pickup's rare items, for the last two percent, from the slot for the level onwards
 static const u16 sPickupRareItems[11] = {
-    ITEM_HYPER_POTION, ITEM_NUGGET,      ITEM_KINGS_ROCK,  ITEM_FULL_RESTORE, ITEM_ETHER,       ITEM_IRON_BALL,
-    ITEM_PRISM_SCALE,  ITEM_ELIXIR,      ITEM_PRISM_SCALE, ITEM_LEFTOVERS,    ITEM_PRISM_SCALE,
+    ITEM_HYPER_POTION, ITEM_NUGGET, ITEM_KINGS_ROCK,  ITEM_FULL_RESTORE, ITEM_ETHER,       ITEM_IRON_BALL,
+    ITEM_PRISM_SCALE,  ITEM_ELIXIR, ITEM_PRISM_SCALE, ITEM_LEFTOVERS,    ITEM_PRISM_SCALE,
 };
 
 // Pickup's items, from the slot for the level onwards
+// clang-format off
 static const u16 sPickupItems[18] = {
     ITEM_POTION,       ITEM_ANTIDOTE, ITEM_SUPER_POTION, ITEM_GREAT_BALL, ITEM_REPEL,       ITEM_ESCAPE_ROPE,
     ITEM_FULL_HEAL,    ITEM_HYPER_POTION, ITEM_ULTRA_BALL, ITEM_REVIVE,   ITEM_RARE_CANDY,  ITEM_SUN_STONE,
     ITEM_MOON_STONE,   ITEM_HEART_SCALE, ITEM_FULL_RESTORE, ITEM_MAX_REVIVE, ITEM_PP_UP,    ITEM_MAX_ELIXIR,
 };
+
+// clang-format on
 
 const GameProcFunctions EVENT_BATTLE_RETURN_PROC_FUNCTIONS = {
     EventBattleReturn_Init,
@@ -187,7 +190,8 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             if (prm->setup->unkA8 == BATTLE_RESULT_WIN) {
                 EventBattleReturn_PickupItems(party);
             }
-            EventBattleReturn_BurmyForms(prm, party, EventBattleReturn_GetBurmyTerrain(&prm->setup->fieldSituation, wk->heapId));
+            EventBattleReturn_BurmyForms(prm, party,
+                                         EventBattleReturn_GetBurmyTerrain(&prm->setup->fieldSituation, wk->heapId));
             EventBattleReturn_ShayminForms(prm, party);
             money = prm->setup->unkA4;
             if (money > 0) {
@@ -204,10 +208,12 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 slot = 0;
                 BoxSaveAccessor_GetNextFreeBoxSlot(boxes, &box, &slot);
                 wk->box = box;
-                msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, HEAPID_BATTLE_RETURN);
+                msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE,
+                                             HEAPID_BATTLE_RETURN);
                 wk->boxMessage = GFL_MsgDataLoadStrbufNew(
-                    msgData,
-                    EventWork_FlagGet(GameData_GetEventWork(prm->gameData), FLAG_BATTLE_RETURN_BOX_MESSAGE) ? 0xb2 : 0xb1);
+                    msgData, EventWork_FlagGet(GameData_GetEventWork(prm->gameData), FLAG_BATTLE_RETURN_BOX_MESSAGE)
+                                 ? 0xb2
+                                 : 0xb1);
                 GFL_MsgDataFree(msgData);
             }
             playerState = GameData_GetPlayerState(prm->gameData);
@@ -249,8 +255,9 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 nickname = TRUE;
             }
             if (nickname) {
-                wk->nameEntry = pokemonNameEntry(wk->heapId, wk->pkm, 10, NULL, (u32)wk->boxMessage, (u32)boxes, wk->box,
-                                                 getTrainerGameInfoAddress(GameData_GetSaveControl(prm->gameData)));
+                wk->nameEntry =
+                    pokemonNameEntry(wk->heapId, wk->pkm, 10, NULL, (u32)wk->boxMessage, (u32)boxes, wk->box,
+                                     getTrainerGameInfoAddress(GameData_GetSaveControl(prm->gameData)));
                 QueueGameProc(wk->procManager, OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, wk->nameEntry);
                 (*state)++;
             } else {

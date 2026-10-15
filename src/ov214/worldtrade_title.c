@@ -19,9 +19,9 @@
 #include "gfl/ui.h"
 #include "nitro/gx.h"
 #include "nitro/hw.h"
-#include "worldtrade_local.h"
 #include "system/bmp_winframe.h"
 #include "system/wipe.h"
+#include "worldtrade_local.h"
 
 // The Global Trade Station's title menu, where the player chooses to deposit or check a Pokémon, to search, or to
 // leave, and the lower screen's trade room that the other screens share. The file's name is a guess, as the ROM

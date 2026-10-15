@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/key_info.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
 #include "save/key_data_savedata.h"
+#include "save/key_info.h"
 #include "save/save_control.h"
 
 // The Key System's key information: the keys unlocked and enabled, and the difficulty, the city and the chamber that

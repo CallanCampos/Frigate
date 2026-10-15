@@ -370,11 +370,9 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
                 scaleY = FX_Mul(mcSrt.sy, cellSrt.sy);
                 offsetX = FX_Mul(markX * cos - markY * sin, scaleX);
                 offsetY = FX_Mul(markX * sin + markY * cos, scaleY);
-                nodeX =
-                    mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].pHierDataArray[j].pos.x;
+                nodeX = mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].pHierDataArray[j].pos.x;
                 nodeX += mcSrt.px;
-                nodeY =
-                    mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].pHierDataArray[j].pos.y;
+                nodeY = mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].pHierDataArray[j].pos.y;
                 nodeY += mcSrt.py;
                 offsetX += FX_Mul(nodeX * FX_CosIdx(mcSrt.rotZ) - nodeY * FX_SinIdx(mcSrt.rotZ), mcSrt.sx);
                 offsetY += FX_Mul(nodeX * FX_SinIdx(mcSrt.rotZ) + nodeY * FX_CosIdx(mcSrt.rotZ), mcSrt.sy);

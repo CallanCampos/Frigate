@@ -1,5 +1,4 @@
 #include "types.h"
-#include "system/nsbtx_to_clwk.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -8,6 +7,7 @@
 #include "nitro/os.h"
 #include "nnsys/g2d.h"
 #include "nnsys/g3d.h"
+#include "system/nsbtx_to_clwk.h"
 #include "system/palanm.h"
 
 // Shows a texture of a model file (NSBTX), such as an overworld sprite, on an actor: the texture's bitmap is cut
@@ -52,12 +52,12 @@ static void NsbtxToClwk_CopyTile(const u8 *src, u8 *dest, int *srcOffset, int *d
 }
 
 void NsbtxToClwk_LoadTexture(ClActor *actor, u32 arcId, u32 fileId, u8 texture, u16 width, u16 height, u32 a6, u32 a7,
-                   HeapID heapId) {
+                             HeapID heapId) {
     NsbtxToClwk_LoadTextureEx(actor, arcId, fileId, texture, width, height, a6, a7, NULL, 0, heapId);
 }
 
-void NsbtxToClwk_LoadTextureEx(ClActor *actor, u32 arcId, u32 fileId, u8 texture, u16 width, u16 height, u32 offset, u32 vramType,
-                   PaletteFade *fade, u8 palette, HeapID heapId) {
+void NsbtxToClwk_LoadTextureEx(ClActor *actor, u32 arcId, u32 fileId, u8 texture, u16 width, u16 height, u32 offset,
+                               u32 vramType, PaletteFade *fade, u8 palette, HeapID heapId) {
     NNSG2dImagePaletteProxy proxy;
     u32 size = width * height * 32;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(arcId, heapId);

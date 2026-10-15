@@ -2,9 +2,9 @@
 #include "app/box2_main.h"
 #include "app/box_search.h"
 #include "app/box_search_graphic.h"
-#include "app/ui/ui_scene.h"
-#include "app/ui/touchbar.h"
 #include "app/ui/frame_list.h"
+#include "app/ui/touchbar.h"
+#include "app/ui/ui_scene.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -180,8 +180,7 @@ static void func_ov255_021d5ff4(void *work, u32 index, PrintWindow *window, s16 
 static void func_ov255_021d6000(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
 static void func_ov255_021d6038(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId,
                                 u16 color, int y);
-static void func_ov255_021d6098(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData,
-                                u32 msgId);
+static void func_ov255_021d6098(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId);
 static void func_ov255_021d60b4(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData);
 static void func_ov255_021d60ec(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData);
 static int func_ov255_021d612c(int letter, int group);
@@ -338,17 +337,21 @@ static const u8 data_ov255_021d8f30[] = {
 
 // The animations of the main menu's buttons, off and on
 static const u8 data_ov255_021d8f4a[][3] = {
-    { 6, 7, 8 },    { 6, 7, 8 },    { 6, 7, 8 },    { 6, 7, 8 },    { 6, 7, 8 },
-    { 6, 7, 8 },    { 9, 10, 11 },  { 12, 13, 14 }, { 15, 16, 17 },
+    { 6, 7, 8 }, { 6, 7, 8 },   { 6, 7, 8 },    { 6, 7, 8 },    { 6, 7, 8 },
+    { 6, 7, 8 }, { 9, 10, 11 }, { 12, 13, 14 }, { 15, 16, 17 },
 };
 
 // The rows of a list of 7 items or fewer, and of a longer one with its scroll bar and arrows
+// clang-format off
 static const FrameListTouch data_ov255_021d90d0[] = {
     { { 0, 23, 184, 231 }, 8 },    { { 24, 47, 184, 231 }, 8 },   { { 48, 71, 184, 231 }, 8 },
     { { 72, 95, 184, 231 }, 8 },   { { 96, 119, 184, 231 }, 8 },  { { 120, 143, 184, 231 }, 8 },
     { { 144, 167, 184, 231 }, 8 }, { { TOUCH_RECT_END, 0, 0, 0 }, 0 },
 };
 
+// clang-format on
+
+// clang-format off
 static const FrameListTouch data_ov255_021d9110[] = {
     { { 0, 23, 184, 231 }, 0 },    { { 24, 47, 184, 231 }, 0 },   { { 48, 71, 184, 231 }, 0 },
     { { 72, 95, 184, 231 }, 0 },   { { 96, 119, 184, 231 }, 0 },  { { 120, 143, 184, 231 }, 0 },
@@ -356,12 +359,14 @@ static const FrameListTouch data_ov255_021d9110[] = {
     { { 168, 191, 200, 223 }, 5 }, { { TOUCH_RECT_END, 0, 0, 0 }, 0 },
 };
 
+// clang-format on
+
 static const UIObjResSetup data_ov255_021d8f88 = { 0, 0, ARCID_BOX2, 93, 92, 90, 91, 3, 0, 6 };
 
 // The rows of the lists
 static const TouchRect data_ov255_021d8f65[] = {
-    { 0, 23, 112, 183 },    { 24, 47, 112, 183 },   { 48, 71, 112, 183 },   { 72, 95, 112, 183 },
-    { 96, 119, 112, 183 },  { 120, 143, 112, 183 }, { 144, 167, 112, 183 }, { TOUCH_RECT_END, 0, 0, 0 },
+    { 0, 23, 112, 183 },   { 24, 47, 112, 183 },   { 48, 71, 112, 183 },   { 72, 95, 112, 183 },
+    { 96, 119, 112, 183 }, { 120, 143, 112, 183 }, { 144, 167, 112, 183 }, { TOUCH_RECT_END, 0, 0, 0 },
 };
 
 static const FrameListSetup data_ov255_021d8fa8 = {
@@ -388,12 +393,15 @@ static const u16 data_ov255_021d9004[] = {
 };
 
 // Where each group of abilities starts and ends in data_ov255_021d9248, from 1
+// clang-format off
 static const u8 data_ov255_021d9038[][2] = {
     { 1, 8 },     { 8, 12 },    { 12, 20 },   { 20, 27 },   { 27, 29 },   { 29, 38 },   { 38, 40 },
     { 40, 49 },   { 49, 60 },   { 60, 61 },   { 61, 63 },   { 63, 69 },   { 69, 82 },   { 82, 85 },
     { 85, 89 },   { 89, 98 },   { 98, 99 },   { 99, 107 },  { 107, 141 }, { 141, 152 }, { 152, 155 },
     { 155, 158 }, { 158, 164 }, { 0, 0 },     { 0, 0 },     { 164, 165 },
 };
+
+// clang-format on
 
 // The messages of the first letters
 static const u16 data_ov255_021d906c[] = {
@@ -413,6 +421,7 @@ static const u32 data_ov255_021d9168[] = {
 };
 
 // The main menu
+// clang-format off
 static const CursorMoveData data_ov255_021d91d0[] = {
     { 0, 0, 0, 0, 7, 1, 0, 0, { 0, 23, 120, 255 } },
     { 0, 0, 0, 0, 0, 2, 1, 1, { 24, 47, 120, 255 } },
@@ -426,6 +435,8 @@ static const CursorMoveData data_ov255_021d91d0[] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, { TOUCH_RECT_END, 0, 0, 0 } },
 };
 
+// clang-format on
+
 // The abilities in the order of their names
 static const u8 data_ov255_021d9248[] = {
     91,  106, 76,  148, 83,  107, 71,  123, 4,   145, 66,  34,  29,  13,  16,  14,  126, 130, 56,  6,   129,
@@ -438,6 +449,7 @@ static const u8 data_ov255_021d9248[] = {
     137, 36,  54,  163, 109, 84,  127, 162, 72,  10,  11,  41,  133, 73,  25,  147, 161,
 };
 
+// clang-format off
 static const BoxSearchSeqFunc data_ov255_021d92ec[] = {
     func_ov255_021d434c, func_ov255_021d4484, func_ov255_021d4570, func_ov255_021d4574, func_ov255_021d45d8,
     func_ov255_021d481c, NULL,                NULL,                NULL,                func_ov255_021d4844,
@@ -450,6 +462,9 @@ static const BoxSearchSeqFunc data_ov255_021d92ec[] = {
     func_ov255_021d5a14, func_ov255_021d5a54,
 };
 
+// clang-format on
+
+// clang-format off
 static const BoxSearchActorData data_ov255_021d9394[BOX_SEARCH_ACTOR_COUNT] = {
     { 184, 12, 6, 1, TRUE, 0, 0 },    { 184, 36, 6, 1, TRUE, 0, 0 },    { 184, 60, 6, 1, TRUE, 0, 0 },
     { 184, 84, 6, 1, TRUE, 0, 0 },    { 184, 108, 6, 1, TRUE, 0, 0 },   { 184, 132, 6, 1, TRUE, 0, 0 },
@@ -464,6 +479,8 @@ static const BoxSearchActorData data_ov255_021d9394[BOX_SEARCH_ACTOR_COUNT] = {
     { 176, 56, 4, 0, TRUE, 1, 0 },    { 176, 80, 6, 0, TRUE, 1, 0 },    { 176, 104, 8, 0, TRUE, 1, 0 },
     { 176, 128, 10, 0, TRUE, 1, 0 },  { 168, 168, 4, 0, TRUE, 2, 0 },   { 200, 168, 5, 0, TRUE, 2, 0 },
 };
+
+// clang-format on
 
 // The sequence that each button of the main menu starts
 static u32 data_ov255_021d9664[] = { 3, 12, 15, 24, 27, 30 };
@@ -488,7 +505,8 @@ static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *w
     wk->pokedex = GameData_GetPokedex(searchParam->syswk->param->gameData);
     wk->graphic = func_ov255_021d6d28(0, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_BOX_MAIN_SAVE_INIT, wk->heapId);
+    wk->msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_BOX_MAIN_SAVE_INIT, wk->heapId);
     wk->natureNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_NATURES, wk->heapId);
     wk->abilityNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_NAMES, wk->heapId);
     wk->abilityInfo = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_DESCRIPTIONS, wk->heapId);
@@ -661,8 +679,8 @@ static void func_ov255_021d3f74(BoxSearchWork *wk, ClActUnit *unit, HeapID heapI
     for (i = 0; i < BOX_SEARCH_ACTOR_COUNT; i++) {
         const BoxSearchActorData *data = &data_ov255_021d9394[i];
 
-        wk->actors[i] = UIObjRes_CreateActor(&wk->objRes[data->res], unit, data_ov255_021d9394[i].x, data->y,
-                                            data->anim, heapId);
+        wk->actors[i] =
+            UIObjRes_CreateActor(&wk->objRes[data->res], unit, data_ov255_021d9394[i].x, data->y, data->anim, heapId);
         func_0204c468(wk->actors[i], data->bgPriority);
         func_0204c124(wk->actors[i], data->visible);
         func_0204c520(wk->actors[i], TRUE);
@@ -786,10 +804,12 @@ static void func_ov255_021d4320(BoxSearchWork *wk, BOOL visible) {
 // Starts the main menu
 static int func_ov255_021d434c(BoxSearchWork *wk, int seq) {
     if (func_0203d554() == FALSE) {
-        wk->cursorMove = CursorMove_Create(data_ov255_021d91d0, &data_ov255_021d8f20, wk, TRUE, wk->menuPos, wk->heapId);
+        wk->cursorMove =
+            CursorMove_Create(data_ov255_021d91d0, &data_ov255_021d8f20, wk, TRUE, wk->menuPos, wk->heapId);
         func_ov255_021d5abc(wk, wk->menuPos, wk->menuPos);
     } else {
-        wk->cursorMove = CursorMove_Create(data_ov255_021d91d0, &data_ov255_021d8f20, wk, FALSE, wk->menuPos, wk->heapId);
+        wk->cursorMove =
+            CursorMove_Create(data_ov255_021d91d0, &data_ov255_021d8f20, wk, FALSE, wk->menuPos, wk->heapId);
     }
     CursorMove_SetHideOnTouch(wk->cursorMove);
     func_ov255_021d6798(wk);
@@ -1035,8 +1055,7 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
     case 5:
     case 6:
         if (wk->listCount > 7 || func_0203d554() == FALSE) {
-            func_ov255_021d6a48(wk, CRITERION_SPECIES,
-                                FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
+            func_ov255_021d6a48(wk, CRITERION_SPECIES, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
             func_ov255_021d6828(wk, 11, ret);
             func_ov255_021d4248(wk, wk->speciesNames, wk->param->syswk->search.species);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1092,7 +1111,7 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
             if (i >= 0 && i <= 6 && i < wk->listRows) {
                 func_ov255_021d6a48(wk, CRITERION_SPECIES,
                                     FrameList_GetValue(wk->list, i + FrameList_GetScroll(wk->list)));
-                    func_ov255_021d6828(wk, 11, i);
+                func_ov255_021d6828(wk, 11, i);
                 func_ov255_021d4248(wk, wk->speciesNames, wk->param->syswk->search.species);
                 FrameList_SetCursor(wk->list, i);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1364,8 +1383,7 @@ static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
     case 5:
     case 6:
         if (wk->listCount > 7 || func_0203d554() == FALSE) {
-            func_ov255_021d6a48(wk, CRITERION_ABILITY,
-                                FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
+            func_ov255_021d6a48(wk, CRITERION_ABILITY, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
             func_ov255_021d6828(wk, 11, ret);
             func_ov255_021d4248(wk, wk->abilityNames, wk->param->syswk->search.ability);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -2369,10 +2387,8 @@ static void func_ov255_021d6940(BoxSearchWork *wk, BOOL show) {
         } else {
             func_ov255_021d6098(wk, &wk->printWindows[9], wk->printQueue, wk->abilityNames, search->ability);
         }
-        func_ov255_021d6098(wk, &wk->printWindows[10], wk->printQueue, wk->msgData,
-                            data_ov255_021d8dc0[search->sex]);
-        func_ov255_021d6098(wk, &wk->printWindows[11], wk->printQueue, wk->msgData,
-                            data_ov255_021d8dba[search->item]);
+        func_ov255_021d6098(wk, &wk->printWindows[10], wk->printQueue, wk->msgData, data_ov255_021d8dc0[search->sex]);
+        func_ov255_021d6098(wk, &wk->printWindows[11], wk->printQueue, wk->msgData, data_ov255_021d8dba[search->item]);
         for (i = 7; i <= 11; i++) {
             BmpWin_FlushMap(wk->windows[i]);
         }

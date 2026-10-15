@@ -75,7 +75,7 @@ MusicalProgram *func_ov012_021522d8(HeapID heapId, Ov210Work *ov210, u16 shots) 
         left -= add;
     }
     {
-        u8 candidates[6] = {0};
+        u8 candidates[6] = { 0 };
         u8 count = 0;
 
         for (i = 0; i < 6; i++) {

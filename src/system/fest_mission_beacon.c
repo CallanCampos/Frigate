@@ -1,5 +1,4 @@
 #include "types.h"
-#include "system/fest_mission_beacon.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/species.h"
@@ -9,6 +8,7 @@
 #include "pml/item.h"
 #include "save/high_link.h"
 #include "save/player_info.h"
+#include "system/fest_mission_beacon.h"
 #include "system/game_beacon.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
@@ -16,7 +16,8 @@
 // The lists the festival keeps of a Funfest mission, most of them filled from the beacons of its players: the log of
 // what the players did, the Pass Powers they gave and the missions that other players offer, with the check of a
 // beacon's mission. The ROM has no string for the file, and its start is a guess: its tables are sorted apart from
-// fest_mission.c's in .rodata, so it is a file of its own that starts between FestMissionConfig_FromBeacon and FestMissionLog_Add.
+// fest_mission.c's in .rodata, so it is a file of its own that starts between FestMissionConfig_FromBeacon and
+// FestMissionLog_Add.
 
 // What func_020157dc returns for a beacon's mission: an offer's index, or one of these
 #define FEST_MISSION_OFFER_NEW FEST_MISSION_OFFER_MAX
@@ -52,6 +53,7 @@ static int func_020157dc(LinkFestival *festival, const GameBeacon *beacon);
 static const u16 FestMission_Kind5Max[10] = { 0, 0, 3, 5, 0, 0, 3, 2, 20, 0 };
 
 // Whether a mission's target is not valid, by the mission's kind
+// clang-format off
 static const FestMissionCheckFunc FestMission_CheckFuncs[6] = {
     NULL,
     func_0201560c,
@@ -60,6 +62,8 @@ static const FestMissionCheckFunc FestMission_CheckFuncs[6] = {
     func_02015684,
     func_0201569c,
 };
+
+// clang-format on
 
 // What a log entry's value is, by its kind: 1 an item, 3 a move, 5 a Pass Power, 6 a species
 static const u8 FestMission_LogCategories[LOG_KIND_MAX] = {
@@ -153,12 +157,12 @@ BOOL FestMissionPassPowers_AddBeacon(FestMissionPassPowers *passPowers, const Ga
     }
     FestMissionPassPower_Clear(&passPower);
     switch (beacon->type) {
-        case 0x32:
-            id = beacon->payload.gift.passPower;
-            passPower.received = TRUE;
-            break;
-        default:
-            return FALSE;
+    case 0x32:
+        id = beacon->payload.gift.passPower;
+        passPower.received = TRUE;
+        break;
+    default:
+        return FALSE;
     }
     for (i = 0; i < passPowers->count; i++) {
         if (id == passPowers->others[i].passPower) {
@@ -301,26 +305,26 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
         return FALSE;
     }
     switch (func_02015444(kind)) {
-        case 1:
-            if (PML_ItemIsDummy(info->unkC_0)) {
-                return TRUE;
-            }
-            break;
-        case 3:
-            if (info->unkC_0 == MOVE_NONE || info->unkC_0 >= MOVE_COUNT) {
-                return TRUE;
-            }
-            break;
-        case 5:
-            if (!PassPower_IsIDValid(info->unkC_0)) {
-                return TRUE;
-            }
-            break;
-        case 6:
-            if (info->unkC_0 == SPECIES_NONE || info->unkC_0 > SPECIES_GENESECT) {
-                return TRUE;
-            }
-            break;
+    case 1:
+        if (PML_ItemIsDummy(info->unkC_0)) {
+            return TRUE;
+        }
+        break;
+    case 3:
+        if (info->unkC_0 == MOVE_NONE || info->unkC_0 >= MOVE_COUNT) {
+            return TRUE;
+        }
+        break;
+    case 5:
+        if (!PassPower_IsIDValid(info->unkC_0)) {
+            return TRUE;
+        }
+        break;
+    case 6:
+        if (info->unkC_0 == SPECIES_NONE || info->unkC_0 > SPECIES_GENESECT) {
+            return TRUE;
+        }
+        break;
     }
     return FALSE;
 }
@@ -384,12 +388,12 @@ static BOOL func_0201569c(const FestMissionInfo *info) {
 // The kind of a log entry: mode 0 is the start of the mission, 1 a player met, and 2 what the beacon's type says
 static u8 func_020156c8(const GameBeacon *beacon, u32 mode) {
     switch (mode) {
-        case 0:
-            return LOG_KIND_START;
-        case 1:
-            return LOG_KIND_MEET;
-        default:
-            break;
+    case 0:
+        return LOG_KIND_START;
+    case 1:
+        return LOG_KIND_MEET;
+    default:
+        break;
     }
     if (beacon->type == 0x3c || beacon->type == 0x3d) {
         return LOG_KIND_NONE;
@@ -407,20 +411,20 @@ static BOOL func_020156f8(LinkFestival *festival, FestMissionLogEntry *entry, co
     }
     FestMissionLogEntry_Clear(entry);
     switch (kind) {
-        case LOG_KIND_TEXT:
-            sys_memcpy16(beacon->payload.mission.text, entry->text, sizeof(beacon->payload.mission.text));
-            entry->value = beacon->arg.mission.unk;
-            break;
-        case LOG_KIND_MEET:
-            entry->value = beacon->parentZoneId;
-            break;
-        default:
-            entry->value = ((const FestMissionInfo *)&beacon->payload)->unkC_0;
-            // What counts for the player's own mission is logged when the score is given
-            if (!own && mode == 2 && FestMissionConfig_IsTarget(&festival->config, kind, entry->value)) {
-                return FALSE;
-            }
-            break;
+    case LOG_KIND_TEXT:
+        sys_memcpy16(beacon->payload.mission.text, entry->text, sizeof(beacon->payload.mission.text));
+        entry->value = beacon->arg.mission.unk;
+        break;
+    case LOG_KIND_MEET:
+        entry->value = beacon->parentZoneId;
+        break;
+    default:
+        entry->value = ((const FestMissionInfo *)&beacon->payload)->unkC_0;
+        // What counts for the player's own mission is logged when the score is given
+        if (!own && mode == 2 && FestMissionConfig_IsTarget(&festival->config, kind, entry->value)) {
+            return FALSE;
+        }
+        break;
     }
     entry->kind = kind;
     entry->own = own;

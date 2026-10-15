@@ -2,9 +2,9 @@
 #define POKEBW2_FIELD_FEST_MISSION_PEOPLE_H
 
 #include "types.h"
-#include "gfl/arc.h"
 #include "field/fest_mission_data.h"
 #include "field/fest_mission_gimmick.h"
+#include "gfl/arc.h"
 #include "struct_decls.h"
 
 // Overlay 25: the Funfest missions of type 5, on entering a zone. It picks which of the zone's places get a person,
@@ -23,8 +23,8 @@ ArcTool *func_02014590(LinkFestival *festival);
 int GetZoneEncIDHighest3Bits(u16 zoneId);
 
 // On entering a zone: picks the places of the mission's people, then creates them
-void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival, FestMissionConfig *config,
-                         u16 zoneId);
+void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
+                                  FestMissionConfig *config, u16 zoneId);
 // Reads the species the mission's quiz or people use from the festival's archive into the work
 void FesMissionPeople_LoadSpecies(FesGimmick *gimmick, FesMissionWork *work);
 // Overlay 25's mission functions: the object code of the people, whether the items are on sale, and a zone's entry

@@ -192,8 +192,8 @@ BOOL s01FC_ItemCollectorGetPrice(VM *vm, FieldScriptEnv *env) {
     u16 group = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
-                                           HEAPID_TAIL(heapId), &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
+                                           &size);
     size /= sizeof(ItemCollectorPrice);
     *result = 0;
     for (i = 0; i < size; i++) {
@@ -220,8 +220,8 @@ BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
     bag = GameData_GetBag(gameData);
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
-                                           HEAPID_TAIL(heapId), &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
+                                           &size);
     size /= sizeof(ItemCollectorPrice);
     *result = FALSE;
     for (i = 0; i < size; i++) {
@@ -248,8 +248,8 @@ BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     u16 digits = ScriptReadAny(vm, env);
 
     wordSet = ScriptWork_GetWordSet(work);
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
-                                           HEAPID_TAIL(heapId), &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
+                                           &size);
     size /= sizeof(ItemCollectorPrice);
     for (i = 0; i < size; i++) {
         if (item == prices[i].item) {
@@ -273,8 +273,8 @@ BOOL s0237_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
 
     gameData = FieldScriptEnv_GetGameData(env);
     GameData_GetPlayerState(gameData);
-    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE,
-                                           HEAPID_TAIL(heapId), &size);
+    prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
+                                           &size);
     size /= sizeof(ItemCollectorPrice);
     for (i = 0; i < size; i++) {
         if (item == prices[i].item) {

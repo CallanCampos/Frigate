@@ -3,9 +3,9 @@
 // name for the file; scrcmd_msg.c is descriptive. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "battle/trainer_data.h"
 #include "constants/arc.h"
 #include "constants/script_text_banks.h"
-#include "battle/trainer_data.h"
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -40,9 +40,10 @@ static StrBuf *setupFormattedTextBuffer(FieldScriptEnv *env, StrBuf *dest, u32 f
 static StrBuf *LoadFieldScriptMessage(FieldScriptEnv *env, u32 fileNo, u32 msgId);
 
 // The up axis the balloon's offset is computed against
-static const VecFx32 ACTOR_MSGWIN_CALC_AXIS_Y = {0, FX32_ONE, 0};
+static const VecFx32 ACTOR_MSGWIN_CALC_AXIS_Y = { 0, FX32_ONE, 0 };
 
 // The offset of a balloon from its actor, by the half of the screen the actor is in and the column of the screen
+// clang-format off
 static const VecFx32 ACTOR_MSGWIN_ORIGIN_OFFSET_TABLE[2][4] = {
     {
         {0, FX32_CONST(16), FX32_CONST(-8)},
@@ -57,6 +58,8 @@ static const VecFx32 ACTOR_MSGWIN_ORIGIN_OFFSET_TABLE[2][4] = {
         {0, FX32_CONST(12), FX32_CONST(8)},
     },
 };
+
+// clang-format on
 
 // Opens the system message window at the top (1) or the bottom (2) of the screen, or for 0 away from the balloon
 // over an actor
@@ -292,7 +295,7 @@ static void ActorMsgWin_CalcAttachmentOffsetDynamic(const VecFx32 *pos, VecFx32 
     if (column < 4 && half < 2) {
         *offset = ACTOR_MSGWIN_ORIGIN_OFFSET_TABLE[half][column];
     } else {
-        VecFx32 zero = {0, 0, 0};
+        VecFx32 zero = { 0, 0, 0 };
 
         *offset = zero;
     }
@@ -431,8 +434,8 @@ static void ActorMsgWin_CalcAttachmentPos(FieldScriptEnv *env, BOOL force) {
     if (actor != NULL) {
         GetActorFaceDir(actor);
         CopyActorWPos(actor, &pos);
-        if (force == TRUE || pos.x != actorWork->actorPos.x || pos.y != actorWork->actorPos.y
-            || pos.z != actorWork->actorPos.z) {
+        if (force == TRUE || pos.x != actorWork->actorPos.x || pos.y != actorWork->actorPos.y ||
+            pos.z != actorWork->actorPos.z) {
             actorWork->actorPos = pos;
             camera = Field_GetCameraSystem(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
             g3dCamera = FieldCamera_GetG3DCamera(camera);

@@ -1,7 +1,7 @@
 #include "types.h"
+#include "app/ircbattlematch.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
-#include "app/ircbattlematch.h"
 #include "constants/version.h"
 #include "field/event_poke_status.h"
 #include "field/field.h"
@@ -108,8 +108,9 @@ BOOL func_ov012_021580c4(VM *vm, FieldScriptEnv *env) {
     holder->param->shot = func_0200ad5c(save);
     holder->param->loadComm = TRUE;
     holder->param->loadData = TRUE;
-    ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(209), &MUSICAL_SHOT_PROC_FUNCTIONS, holder->param,
-                                             func_ov012_02158da0, holder));
+    ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(
+                                   gsys, field, OVERLAY_ID(209), &MUSICAL_SHOT_PROC_FUNCTIONS, holder->param,
+                                   func_ov012_02158da0, holder));
     return TRUE;
 }
 
@@ -500,7 +501,6 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-
 BOOL func_ov012_02158858(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
 
@@ -518,7 +518,8 @@ BOOL func_ov012_0215887c(VM *vm, FieldScriptEnv *env) {
     sys_memset(&args, 0, sizeof(MusicalOv020Args));
     args.a0 = a0;
     args.a1 = a1;
-    ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS, EventMusicalPokeSelect_Create, &args));
+    ScriptWork_CallEvent(
+        work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_EVENT_POKE_STATUS, EventMusicalPokeSelect_Create, &args));
     return TRUE;
 }
 
@@ -623,8 +624,9 @@ BOOL func_ov012_021588d4(VM *vm, FieldScriptEnv *env) {
         } else {
             commWork->ircMatch.result = IRCBATTLEMATCH_MODE_MUSICAL_ARG1;
         }
-        ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
-                                                 &commWork->ircMatch, func_ov012_02158dac, holder));
+        ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(
+                                       gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
+                                       &commWork->ircMatch, func_ov012_02158dac, holder));
         return TRUE;
     case 19:
         if (commWork->comm != NULL && lost == TRUE) {
@@ -788,15 +790,14 @@ void func_ov012_02158dac(void *arg) {
 
     FieldScriptEnv_GetGameData(holder->env);
     GSYS_GetGameCommSystem(gsys);
-    if (holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_QUIT
-        && holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_BACK) {
+    if (holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_QUIT &&
+        holder->work->ircMatch.result != IRCBATTLEMATCH_RESULT_BACK) {
         *holder->work->result = 1;
         func_ov211_021ef3b8(holder->work->comm);
     } else {
         *holder->work->result = 0;
     }
 }
-
 
 BOOL func_ov012_02158de8(VM *vm, void *arg) {
     FieldScriptEnv *env = arg;
@@ -995,4 +996,3 @@ BOOL func_ov012_02158ff4(VM *vm, FieldScriptEnv *env) {
     }
     return FALSE;
 }
-

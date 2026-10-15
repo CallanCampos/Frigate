@@ -1,9 +1,8 @@
-#include "field/festival.h"
-
 #include "constants/sound.h"
 #include "field/fest_mission_data.h"
 #include "field/fest_mission_gimmick.h"
 #include "field/fest_mission_people.h"
+#include "field/festival.h"
 #include "field/field_sound.h"
 #include "field/player_state.h"
 #include "field/rival_select.h"
@@ -125,7 +124,8 @@ void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *rankin
     }
     for (; gap > 0; gap /= 3) {
         for (i = gap; i < count; i++) {
-            for (j = i; j >= gap && festival->records[order[j - gap]].member.score < festival->records[order[j]].member.score;
+            for (j = i;
+                 j >= gap && festival->records[order[j - gap]].member.score < festival->records[order[j]].member.score;
                  j -= gap) {
                 u8 swap = order[j];
 

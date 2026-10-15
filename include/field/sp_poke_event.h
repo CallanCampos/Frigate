@@ -11,7 +11,7 @@
 // A jump of the Pokémon: mode 0 sets it off from the start, which is the player, and 1 lands it at the end. frames is
 // how long the jump takes
 GameEvent *SpPokeEvent_CreateJump(GameSystem *gsys, u16 mode, const VecFx32 *start, const VecFx32 *end, fx32 height,
-                               u32 frames);
+                                  u32 frames);
 void SpPokeEvent_Appear(GameSystem *gsys, u16 a1, const VecFx32 *pos);
 GameEvent *SpPokeEvent_CreateWaitFrame(GameSystem *gsys, u16 a1);
 GameEvent *SpPokeEvent_CreateWaitAnimEnd(GameSystem *gsys, u16 a1);

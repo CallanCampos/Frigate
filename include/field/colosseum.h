@@ -48,7 +48,7 @@ struct UnionColosseum {
     u8 unkDF;
     ColosseumChoice choice[COLOSSEUM_MEMBER_MAX];
     u8 choiceReady[4];
-    TrainerCardData *card[COLOSSEUM_MEMBER_MAX]; // where a player's card arrives
+    TrainerCardData *card[COLOSSEUM_MEMBER_MAX];      // where a player's card arrives
     TrainerCardData *cardCheck[COLOSSEUM_MEMBER_MAX]; // the same cards, which the receive checks
     u8 cardReady[4];
     PokeParty *party[COLOSSEUM_MEMBER_MAX];

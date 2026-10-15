@@ -45,12 +45,15 @@ static int EncountMakeRndFull(int count);
 
 // The chance of each held item of the species' three, in percent: without and with Compound Eyes, in normal and in dark
 // grass
+// clang-format off
 static const u8 data_ov036_021d0118[4][3] = {
     {50, 5, 0},
     {60, 20, 0},
     {50, 5, 1},
     {60, 20, 5},
 };
+
+// clang-format on
 
 static int (*const ENCOUNT_SLOT_RANDOMIZE_FUNCS[4])(int count) = {
     EncountMakeRnd12,
@@ -60,6 +63,7 @@ static int (*const ENCOUNT_SLOT_RANDOMIZE_FUNCS[4])(int count) = {
 };
 
 // The chance of each slot, in percent, for each row the Lucky Encounter pass powers pick
+// clang-format off
 static const u8 ENCOUNTRATE_RND5T1[4][5] = {
     {60, 30, 5, 4, 1},
     {50, 30, 10, 5, 5},
@@ -67,6 +71,9 @@ static const u8 ENCOUNTRATE_RND5T1[4][5] = {
     {30, 20, 10, 20, 20},
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 ENCOUNTRATE_RND5T2[4][5] = {
     {40, 40, 15, 4, 1},
     {40, 35, 15, 5, 5},
@@ -74,6 +81,9 @@ static const u8 ENCOUNTRATE_RND5T2[4][5] = {
     {20, 20, 20, 20, 20},
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 ENCOUNTRATE_RND12[4][12] = {
     {20, 20, 10, 10, 10, 10, 5, 5, 4, 4, 1, 1},
     {10, 10, 10, 10, 10, 10, 10, 10, 5, 5, 5, 5},
@@ -81,7 +91,10 @@ static const u8 ENCOUNTRATE_RND12[4][12] = {
     {1, 1, 4, 4, 5, 5, 10, 10, 10, 10, 20, 20},
 };
 
+// clang-format on
+
 // N's Pokémon: the zones they appear in, the species and level, the nature, and the sex and ability
+// clang-format off
 const NPokeSpec N_POKEMON_INFO[14] = {
     {0x13f, 1, 509, 7, 10, 0, 1},
     {0x9a, 1, 519, 13, 22, 0, 1},
@@ -99,6 +112,9 @@ const NPokeSpec N_POKEMON_INFO[14] = {
     {0x9e, 1, 555, 35, 20, 0, 2},
 };
 
+// clang-format on
+
+// clang-format off
 static const SwarmData data_ov036_021d01fc[19] = {
     {0x13d, 83, 0, 40, 55},  {0x98, 97, 0, 40, 55},   {0x14b, 311, 0, 40, 55}, {0x141, 313, 0, 40, 55},
     {0x15c, 317, 0, 40, 55}, {0x9e, 450, 0, 40, 55},  {0x149, 177, 0, 40, 55}, {0x151, 162, 0, 40, 55},
@@ -106,6 +122,8 @@ static const SwarmData data_ov036_021d01fc[19] = {
     {0x178, 79, 0, 40, 55},  {0x17a, 22, 0, 40, 55},  {0x17f, 204, 0, 40, 55}, {0x183, 187, 0, 40, 55},
     {0x1cd, 332, 0, 40, 55}, {0x1be, 185, 0, 40, 55}, {0x1da, 168, 0, 40, 55},
 };
+
+// clang-format on
 
 void CreateEncountManager(EncountManager *manager, GameData *gameData, int encType, u32 mode, u16 weather) {
     SaveControl *save = GameData_GetSaveControl(gameData);
@@ -145,8 +163,7 @@ void CreateEncountManager(EncountManager *manager, GameData *gameData, int encTy
     }
     manager->pairActive = GameData_CheckPairFlag(gameData);
     manager->doubleBattle = FALSE;
-    if (manager->encType == ENCTYPE_GRASS_RARE && howManyPokesAreAbleToFight(party) >= 2 &&
-        GFL_RandomLC(100) < 40) {
+    if (manager->encType == ENCTYPE_GRASS_RARE && howManyPokesAreAbleToFight(party) >= 2 && GFL_RandomLC(100) < 40) {
         manager->doubleBattle = TRUE;
     }
     if (manager->pairActive) {
@@ -300,7 +317,8 @@ void FieldEncount_CreateWildPkm(PartyPkm *pkm, EncountManager *manager, WildPkmP
         if (param->item != 0) {
             PokeParty_SetParam(pkm, PKM_PARAM_ITEM, param->item);
         } else {
-            FieldEncount_SetRandomHeldItem(pkm, personal, manager->compoundEyes, manager->encType == ENCTYPE_GRASS_RARE);
+            FieldEncount_SetRandomHeldItem(pkm, personal, manager->compoundEyes,
+                                           manager->encType == ENCTYPE_GRASS_RARE);
         }
     }
     PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, getTrainerGender(manager->playerInfo));

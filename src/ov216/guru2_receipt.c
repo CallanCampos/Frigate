@@ -297,8 +297,7 @@ BOOL Guru2Receipt_Init(GameProc *proc, u32 *state, void *param, void *work) {
         wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_GURU2);
         Guru2Receipt_SetVRAMBanks();
         Guru2Receipt_InitBG();
-        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 16, 1,
-                    HEAPID_GURU2);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 16, 1, HEAPID_GURU2);
         Guru2Receipt_LoadBG(wk, arc);
         wk->vblankTcb = GFL_VBlankTCBAdd(Guru2Receipt_VBlank, wk, 1);
         wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_GURU2, HEAPID_GURU2, 32, 32);
@@ -419,6 +418,7 @@ BOOL Guru2Receipt_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
+// clang-format off
 static const Guru2ReceiptPalAnimStep sPalAnimSteps[] = {
     { 8, 2 },
     { 8, 3 },
@@ -426,6 +426,8 @@ static const Guru2ReceiptPalAnimStep sPalAnimSteps[] = {
     { 24, 0 },
     { 0, 0xff },
 };
+
+// clang-format on
 
 static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data) {
     Guru2ReceiptWork *wk = data;
@@ -653,8 +655,7 @@ static void Guru2Receipt_InitActorSys(Guru2ReceiptWork *wk, ArcTool *unused) {
     ClActSys_Create(&data_02093f08, &sVRAMConfig, HEAPID_GURU2);
     wk->actorUnit = func_0204bf1c(30, 1, HEAPID_GURU2);
     for (i = 0; i < GURU2_MEMBER_MAX; i++) {
-        wk->resources[GURU2_RECEIPT_RES_CHAR + i] =
-            func_0204b81c(arc, sActorFiles[0][gender], FALSE, 0, HEAPID_GURU2);
+        wk->resources[GURU2_RECEIPT_RES_CHAR + i] = func_0204b81c(arc, sActorFiles[0][gender], FALSE, 0, HEAPID_GURU2);
         wk->resources[GURU2_RECEIPT_RES_PLTT + i] =
             func_0204bbb8(arc, sActorFiles[1][gender], 0, i * 0x20, 0, 1, HEAPID_GURU2);
     }
@@ -685,6 +686,7 @@ static void Guru2Receipt_ExitActorSys(Guru2ReceiptWork *wk) {
 }
 
 // Where the trainers stand: the middle, then each member's place
+// clang-format off
 static const Guru2ReceiptPos sActorPositions[1 + GURU2_MEMBER_MAX] = {
     { 204, 84 },
     { 204, 53 },
@@ -693,6 +695,8 @@ static const Guru2ReceiptPos sActorPositions[1 + GURU2_MEMBER_MAX] = {
     { 184, 103 },
     { 174, 72 },
 };
+
+// clang-format on
 
 static void Guru2Receipt_CreateActors(Guru2ReceiptWork *wk) {
     ClActorSetup setup;
@@ -705,8 +709,8 @@ static void Guru2Receipt_CreateActors(Guru2ReceiptWork *wk) {
         setup.x = sActorPositions[i + 1].x;
         setup.y = sActorPositions[i + 1].y;
         wk->actors[i] = func_0204c040(wk->actorUnit, wk->resources[GURU2_RECEIPT_RES_CHAR + i],
-                                      wk->resources[GURU2_RECEIPT_RES_PLTT + i],
-                                      wk->resources[GURU2_RECEIPT_RES_CELL], &setup, 0, HEAPID_GURU2);
+                                      wk->resources[GURU2_RECEIPT_RES_PLTT + i], wk->resources[GURU2_RECEIPT_RES_CELL],
+                                      &setup, 0, HEAPID_GURU2);
         func_0204c520(wk->actors[i], TRUE);
         func_0204c488(wk->actors[i], 0);
         func_0204c124(wk->actors[i], FALSE);
@@ -813,8 +817,8 @@ static void Guru2Receipt_CheckKeys(Guru2ReceiptWork *wk) {
             }
         }
     } else {
-        if (!wk->entryClosed && func_0203ffc4() == 0
-            && wk->g2c->joinCount == UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk))) {
+        if (!wk->entryClosed && func_0203ffc4() == 0 &&
+            wk->g2c->joinCount == UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk))) {
             UnionApp_OpenEntry(Guru2Receipt_GetUnionApp(wk));
         }
     }
@@ -922,8 +926,8 @@ static int Guru2ReceiptSeq_CancelSignalWait(Guru2ReceiptWork *wk, int procSeq) {
 }
 
 static int Guru2ReceiptSeq_CancelOk(Guru2ReceiptWork *wk, int procSeq) {
-    if (wk->g2c->signalCount != UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk))
-        || wk->g2c->signalCount != Guru2Receipt_CountMembers2(wk)) {
+    if (wk->g2c->signalCount != UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk)) ||
+        wk->g2c->signalCount != Guru2Receipt_CountMembers2(wk)) {
         wk->signalTimer = 0;
         wk->seq = GURU2_RECEIPT_SEQ_CANCEL_REFUSED;
         Guru2Receipt_SeqEnd(wk);
@@ -1014,8 +1018,7 @@ static int Guru2ReceiptSeq_EndMsg(Guru2ReceiptWork *wk, int procSeq) {
 static int Guru2ReceiptSeq_EndWait(Guru2ReceiptWork *wk, int procSeq) {
     wk->wait++;
     if (wk->wait > 60) {
-        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 16, 1,
-                    HEAPID_GURU2);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 16, 1, HEAPID_GURU2);
         procSeq = GURU2_RECEIPT_PROC_FADE_OUT;
     }
     Guru2Receipt_SeqEnd(wk);
@@ -1088,11 +1091,9 @@ static int Guru2ReceiptSeq_ParentCancelSync(Guru2ReceiptWork *wk, int procSeq) {
 }
 
 static int Guru2ReceiptSeq_ParentCancelSyncWait(Guru2ReceiptWork *wk, int procSeq) {
-    if (func_02040664(func_02040440(), 0xcf, 40)
-        || wk->syncBits != (Guru2Receipt_GetJoined(wk) ^ wk->unk480C)) {
+    if (func_02040664(func_02040440(), 0xcf, 40) || wk->syncBits != (Guru2Receipt_GetJoined(wk) ^ wk->unk480C)) {
         func_02042e94(FALSE);
-        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 16, 1,
-                    HEAPID_GURU2);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 16, 1, HEAPID_GURU2);
         procSeq = GURU2_RECEIPT_PROC_FADE_OUT;
     }
     Guru2Receipt_SeqEnd(wk);
@@ -1356,8 +1357,7 @@ static void Guru2Receipt_PrintMessage(Guru2ReceiptWork *wk, u32 messageId, int u
     if (wk->stream != NULL) {
         func_020223cc(wk->stream);
     }
-    wk->stream = func_02022268(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, 0, wk->tcbManager, 0,
-                               HEAPID_GURU2, 15);
+    wk->stream = func_02022268(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, 0, wk->tcbManager, 0, HEAPID_GURU2, 15);
     BmpWin_TransferNow(wk->msgWindow);
 }
 
@@ -1429,8 +1429,7 @@ static void Guru2Receipt_UpdateActors(Guru2ReceiptWork *wk) {
 }
 
 static void Guru2Receipt_LoadTrainerPalette(Guru2ReceiptWork *wk, ArcTool *arc) {
-    wk->trainerPaletteFile =
-        GFL_G2DIOReadNCLR(GURU2_RECEIPT_TRAINER_ARCID, 0, &wk->trainerPalette, HEAPID_GURU2);
+    wk->trainerPaletteFile = GFL_G2DIOReadNCLR(GURU2_RECEIPT_TRAINER_ARCID, 0, &wk->trainerPalette, HEAPID_GURU2);
 }
 
 static void Guru2Receipt_FreeTrainerPalette(Guru2ReceiptWork *wk) {
@@ -1471,8 +1470,8 @@ static int Guru2Receipt_CheckMembers(Guru2ReceiptWork *wk, int unused) {
     }
     switch (count) {
     case 1:
-        if (UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk)) > 1
-            || UnionApp_GetJoined(Guru2Receipt_GetUnionApp(wk)) > 1) {
+        if (UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk)) > 1 ||
+            UnionApp_GetJoined(Guru2Receipt_GetUnionApp(wk)) > 1) {
             return GURU2_RECEIPT_PROC_MAIN;
         }
         wk->seq = GURU2_RECEIPT_SEQ_NO_MEMBERS_MSG_WAIT;

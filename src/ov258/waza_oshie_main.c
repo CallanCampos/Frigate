@@ -1,5 +1,4 @@
 #include "types.h"
-#include "pml/move_reminder.h"
 #include "app/p_status.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
@@ -28,6 +27,7 @@
 #include "nitro/hw.h"
 #include "nitro/os.h"
 #include "nnsys/g2d.h"
+#include "pml/move_reminder.h"
 #include "pml/poke_graphic.h"
 #include "pml/poke_party.h"
 #include "pml/waza.h"
@@ -352,6 +352,7 @@ const GameProcFunctions WazaOshieProcFunctions = { WazaOshieProc_Init, WazaOshie
 // The tables are declared in the order that gives the ROM's .rodata, with those of the actors and the cursor ahead
 // of the functions that read them
 
+// clang-format off
 static const BGSysVRAMConfig sWazaOshieVRAMConfig = {
     GX_VRAM_BG_128_B,
     GX_VRAM_BGEXTPLTT_NONE,
@@ -367,6 +368,8 @@ static const BGSysVRAMConfig sWazaOshieVRAMConfig = {
     GX_OBJVRAMMODE_CHAR_1D_64K,
 };
 
+// clang-format on
+
 static const WazaOshieMenuItem sWazaOshieButtonItems[2] = {
     { ShinkaDemoBtlMain_Text_Teach, 0 },
     { ShinkaDemoBtlMain_Text_Quit, APP_TASKMENU_ITEM_RETURN },
@@ -377,6 +380,7 @@ static const WazaOshieMenuItem sWazaOshieYesNoItems[2] = {
     { ShinkaDemoBtlMain_Text_No, 0 },
 };
 
+// clang-format off
 static const WazaOshieWindowData sWazaOshieWindows[WINDOW_COUNT] = {
     { 2, 0, 25, 1, 1, 0, 0 },      { 6, 0, 25, 1, 1, 0, 0 },       { 6, 8, 6, 6, 2, 15, 43 },
     { 6, 19, 6, 8, 2, 15, 55 },    { 6, 14, 6, 3, 2, 15, 71 },     { 6, 27, 6, 3, 2, 15, 77 },
@@ -385,6 +389,8 @@ static const WazaOshieWindowData sWazaOshieWindows[WINDOW_COUNT] = {
     { 4, 23, 13, 7, 4, 14, 728 },  { 2, 1, 0, 20, 3, 15, 1 },      { 2, 7, 5, 11, 16, 15, 61 },
     { 2, 21, 4, 9, 8, 15, 237 },
 };
+
+// clang-format on
 
 // The messages, by the parameter's mode
 static const u32 sWazaOshieMessages[2][MESSAGE_COUNT] = {
@@ -416,6 +422,7 @@ static const u32 sWazaOshieMessages[2][MESSAGE_COUNT] = {
     },
 };
 
+// clang-format off
 static const WazaOshieYesNoFuncs sWazaOshieYesNoFuncs[5] = {
     { WazaOshie_LearnYes, WazaOshie_LearnNo },
     { WazaOshie_QuitYes, WazaOshie_QuitNo },
@@ -423,6 +430,8 @@ static const WazaOshieYesNoFuncs sWazaOshieYesNoFuncs[5] = {
     { WazaOshie_GiveUpYes, WazaOshie_GiveUpNo },
     { WazaOshie_ForgetYes, WazaOshie_ForgetNo },
 };
+
+// clang-format on
 
 static const ClActSysSetup sWazaOshieActorSysSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 9, 5, 6, 32, 16, 16 };
 
@@ -606,43 +615,109 @@ static void WazaOshie_InitBG(void) {
         GFL_BGSysSetLCDConfig(&config);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x00000), 0x8000, GX_BG_EXTPLTT_01, 2, 0, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf800),
+                          GX_BG_CHARBASE(0x00000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          2,
+                          0,
+                          FALSE };
 
         GFL_BGSysCreateBG(2, &setup, 0);
         GFL_BGSysClearScr(2);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf000),
-                          GX_BG_CHARBASE(0x08000), 0x8000, GX_BG_EXTPLTT_01, 3, 0, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf000),
+                          GX_BG_CHARBASE(0x08000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          3,
+                          0,
+                          FALSE };
 
         GFL_BGSysCreateBG(3, &setup, 0);
         GFL_BGSysClearScr(3);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x00000), 0x8000, GX_BG_EXTPLTT_01, 0, 0, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf800),
+                          GX_BG_CHARBASE(0x00000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          0,
+                          FALSE };
 
         GFL_BGSysCreateBG(4, &setup, 0);
         GFL_BGSysClearScr(4);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf000),
-                          GX_BG_CHARBASE(0x18000), 0x8000, GX_BG_EXTPLTT_01, 2, 0, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf000),
+                          GX_BG_CHARBASE(0x18000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          2,
+                          0,
+                          FALSE };
 
         GFL_BGSysCreateBG(6, &setup, 0);
         GFL_BGSysClearScr(6);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xc000),
-                          GX_BG_CHARBASE(0x08000), 0x4000, GX_BG_EXTPLTT_01, 2, 0, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xc000),
+                          GX_BG_CHARBASE(0x08000),
+                          0x4000,
+                          GX_BG_EXTPLTT_01,
+                          2,
+                          0,
+                          FALSE };
 
         GFL_BGSysCreateBG(5, &setup, 0);
         GFL_BGSysClearScr(5);
     }
     {
-        BGSetup setup = { 0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xe000),
-                          GX_BG_CHARBASE(0x10000), 0x2000, GX_BG_EXTPLTT_01, 3, 0, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x1000,
+                          0,
+                          BGRES_512x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xe000),
+                          GX_BG_CHARBASE(0x10000),
+                          0x2000,
+                          GX_BG_EXTPLTT_01,
+                          3,
+                          0,
+                          FALSE };
 
         GFL_BGSysCreateBG(7, &setup, 0);
         GFL_BGSysClearScr(7);
@@ -696,9 +771,9 @@ static void WazaOshie_InitWindows(WazaOshieWork *work) {
     u32 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        work->windows[i] =
-            BmpWin_CreateDynamic(sWazaOshieWindows[i].bg, sWazaOshieWindows[i].x, sWazaOshieWindows[i].y,
-                                 sWazaOshieWindows[i].width, sWazaOshieWindows[i].height, sWazaOshieWindows[i].palette, 1);
+        work->windows[i] = BmpWin_CreateDynamic(sWazaOshieWindows[i].bg, sWazaOshieWindows[i].x, sWazaOshieWindows[i].y,
+                                                sWazaOshieWindows[i].width, sWazaOshieWindows[i].height,
+                                                sWazaOshieWindows[i].palette, 1);
         GFL_BitmapFill(BmpWin_GetBitmap(work->windows[i]), 0);
     }
     WazaOshie_ClearWindow(work->windows[WINDOW_TEACH]);
@@ -1410,10 +1485,9 @@ static void WazaOshie_InitActors(WazaOshieWork *work, ArcTool *arc) {
         setup.sequence = sWazaOshieActors[i].sequence;
         setup.priority = sWazaOshieActors[i].priority;
         setup.bgPriority = sWazaOshieActors[i].bgPriority;
-        work->actors[i] = func_0204c040(work->unit, work->chars[sWazaOshieActors[i].chars],
-                                        work->palettes[sWazaOshieActors[i].palette],
-                                        work->cellAnims[sWazaOshieActors[i].cellAnims], &setup,
-                                        sWazaOshieActors[i].surface, HEAPID_WAZA_OSHIE);
+        work->actors[i] = func_0204c040(
+            work->unit, work->chars[sWazaOshieActors[i].chars], work->palettes[sWazaOshieActors[i].palette],
+            work->cellAnims[sWazaOshieActors[i].cellAnims], &setup, sWazaOshieActors[i].surface, HEAPID_WAZA_OSHIE);
         func_0204c520(work->actors[i], FALSE);
     }
     func_0204c520(work->actors[ACTOR_RETURN], TRUE);
@@ -1481,6 +1555,7 @@ static u32 WazaOshie_SeqStatusReturn(WazaOshieWork *work) {
 }
 
 // The list's rows, the arrows, the return icon and the two buttons
+// clang-format off
 static const CursorMoveData sWazaOshieCursorData[] = {
     { 40, 52, 0, 0, 0, 1, 0, 0, { 69, 90, 21, 233 } },
     { 80, 60, 0, 0, 0, 2, 1, 1, { 93, 114, 21, 233 } },
@@ -1493,6 +1568,8 @@ static const CursorMoveData sWazaOshieCursorData[] = {
     { 224, 168, 0, 0, 8, 8, 8, 8, { 166, 191, 192, 255 } },
     { 0, 0, 0, 0, 0, 0, 0, 0, { TOUCH_RECT_END, 0, 0, 0 } },
 };
+
+// clang-format on
 
 static const CursorMoveCallbacks sWazaOshieCursorCallbacks = {
     WazaOshie_CursorDummy,
@@ -1765,10 +1842,9 @@ static u32 WazaOshie_SeqMoveChosen(WazaOshieWork *work) {
 // Darkens the touch screen behind the yes/no menu
 static void WazaOshie_SetDimmed(BOOL dimmed) {
     if (dimmed == TRUE) {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR,
-                                 GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3
-                                     | GX_BLEND_PLANEMASK_OBJ,
-                                 -8);
+        gfxRegSetBrightnessBlend(
+            REG_DB_BLDCNT_ADDR,
+            GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
     } else {
         G2S_BlendNone();
     }

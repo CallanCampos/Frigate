@@ -87,8 +87,6 @@ typedef struct {
 
 typedef BOOL (*MedalCheck)(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId);
 
-u32 func_ov012_021682a0(MMSys *mmSys);
-
 static void PokemonCenter_CheckMedals(GameData *gameData, SaveControl *p_sv, HeapID heapId);
 static void PokemonCenter_AcknowledgeMedal(FieldScriptEnv *env);
 static void PokemonCenter_DiscoverInitialMedals(FieldScriptEnv *env);

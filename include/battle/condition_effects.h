@@ -7,8 +7,8 @@
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0) where it has them
 
 #include "types.h"
-#include "struct_decls.h"
 #include "battle/btl_pokeparam.h"
+#include "struct_decls.h"
 
 // What a condition does at the end of a turn, or when it is cured: the damage or recovery, the countdown and the
 // messages. A cured condition gets its own message
@@ -19,7 +19,8 @@ BOOL Condition_SetDamageMessage(BattleHandlerString *string, BattleMon *mon, u32
 void Condition_SetAddMessage(u32 condition, BattleCondition value, BattleMon *mon, BattleHandlerString *string);
 // Sets the message for the cure of a condition, and returns whether it has one. The caller passes a condition that
 // ended, and a count that selects a second message
-BOOL Condition_SetCureMessage(u32 condition, BattleCondition cont, BattleMon *mon, u16 count, BattleHandlerString *string);
+BOOL Condition_SetCureMessage(u32 condition, BattleCondition cont, BattleMon *mon, u16 count,
+                              BattleHandlerString *string);
 // Whether the condition of a Pokemon keeps it from being switched out, in the event
 void Condition_CheckTrapped(BtlServerFlow *flow, BattleMon *mon);
 // Whether the conditions of a Pokemon ground it, or give it a type chart check, in the event

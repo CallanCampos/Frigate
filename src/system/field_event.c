@@ -1,9 +1,9 @@
 #include "types.h"
-#include "field/field_event.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
 #include "field/event_game_clear.h"
 #include "field/field.h"
+#include "field/field_event.h"
 #include "field/field_sound.h"
 #include "gfl/heap.h"
 #include "system/game_data.h"
@@ -59,7 +59,8 @@ static GameEventReturnCode EventFieldCloseKeepSound_Callback(GameEvent *event, u
 static GameEventReturnCode EventFieldOpen_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventFieldSubprocessTransition_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventFieldSubprocessCall_Callback(GameEvent *event, u32 *state, void *data);
-static GameEventReturnCode EventFieldSubprocessTransitionWithCallback_Callback(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventFieldSubprocessTransitionWithCallback_Callback(GameEvent *event, u32 *state,
+                                                                               void *data);
 static GameEventReturnCode EventFieldSubprocessCallWithCallback_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventPokeList_Callback(GameEvent *event, u32 *state, void *data);
 
@@ -253,9 +254,10 @@ GameEvent *EventFieldSubprocessTransition_Create(GameSystem *gsys, Field *field,
     return event;
 }
 
-GameEvent *EventFieldSubprocessCall_Create(GameSystem *gsys, Field *field, s32 overlayId, const GameProcFunctions *functions,
-                                           void *param) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventFieldSubprocessCall_Callback, sizeof(EventFieldSubprocessWork));
+GameEvent *EventFieldSubprocessCall_Create(GameSystem *gsys, Field *field, s32 overlayId,
+                                           const GameProcFunctions *functions, void *param) {
+    GameEvent *event =
+        GameEvent_Create(gsys, NULL, EventFieldSubprocessCall_Callback, sizeof(EventFieldSubprocessWork));
     EventFieldSubprocessWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
@@ -266,13 +268,14 @@ GameEvent *EventFieldSubprocessCall_Create(GameSystem *gsys, Field *field, s32 o
     return event;
 }
 
-static GameEventReturnCode EventFieldSubprocessTransitionWithCallback_Callback(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventFieldSubprocessTransitionWithCallback_Callback(GameEvent *event, u32 *state,
+                                                                               void *data) {
     EventFieldSubprocessCallbackWork *wk = data;
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, wk->overlayId,
-                                                                         wk->functions, wk->param));
+        GameEvent_ChainNext(
+            event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, wk->overlayId, wk->functions, wk->param));
         (*state)++;
         break;
     case 1:
@@ -314,9 +317,11 @@ static GameEventReturnCode EventFieldSubprocessCallWithCallback_Callback(GameEve
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *EventFieldSubprocessTransition_CreateWithCallback(GameSystem *gsys, Field *field, u32 overlayId, const GameProcFunctions *functions, void *param,
-                         void (*callback)(void *work), void *work) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventFieldSubprocessTransitionWithCallback_Callback, sizeof(EventFieldSubprocessCallbackWork));
+GameEvent *EventFieldSubprocessTransition_CreateWithCallback(GameSystem *gsys, Field *field, u32 overlayId,
+                                                             const GameProcFunctions *functions, void *param,
+                                                             void (*callback)(void *work), void *work) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventFieldSubprocessTransitionWithCallback_Callback,
+                                        sizeof(EventFieldSubprocessCallbackWork));
     EventFieldSubprocessCallbackWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;
@@ -332,7 +337,8 @@ GameEvent *EventFieldSubprocessTransition_CreateWithCallback(GameSystem *gsys, F
 GameEvent *EventFieldSubprocessCall_CreateWithCallback(GameSystem *gsys, Field *field, s32 overlayId,
                                                        const GameProcFunctions *functions, void *param,
                                                        void (*callback)(void *work), void *work) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventFieldSubprocessCallWithCallback_Callback, sizeof(EventFieldSubprocessCallbackWork));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventFieldSubprocessCallWithCallback_Callback,
+                                        sizeof(EventFieldSubprocessCallbackWork));
     EventFieldSubprocessCallbackWork *wk = GameEvent_GetData(event);
 
     wk->gsys = gsys;

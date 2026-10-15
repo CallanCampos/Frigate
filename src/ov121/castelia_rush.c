@@ -132,13 +132,13 @@ static void CasteliaRush_Free(FieldAsyncProc *proc, Field *field, void *data);
 static void CasteliaRush_Update(FieldAsyncProc *proc, Field *field, void *data);
 static CasteliaRushPasserby *CasteliaRush_FindFreePasserby(CasteliaRush *rush);
 static const CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(const CasteliaRush *rush, u16 x, u16 z, u16 dir,
-                                                 BOOL unused, BOOL *occupied);
-static void Passerby_Init(CasteliaRushPasserby *passerby, MMSys *actorSys, u16 zoneId,
-                                const CasteliaRushConfig *config, u32 index);
+                                                                BOOL unused, BOOL *occupied);
+static void Passerby_Init(CasteliaRushPasserby *passerby, MMSys *actorSys, u16 zoneId, const CasteliaRushConfig *config,
+                          u32 index);
 static void Passerby_Free(CasteliaRushPasserby *passerby);
 static void Passerby_Update(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player);
-static void Passerby_Start(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player, u8 type, u16 x,
-                                u16 z, u16 dir, u16 steps, const CasteliaRushLane *lane);
+static void Passerby_Start(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player, u8 type, u16 x, u16 z,
+                           u16 dir, u16 steps, const CasteliaRushLane *lane);
 static void Passerby_StopTalker(CasteliaRushPasserby *passerby);
 static void Passerby_End(CasteliaRushPasserby *passerby);
 static void Passerby_StepAside(CasteliaRushPasserby *passerby, FieldActor *obstacle);
@@ -146,7 +146,7 @@ static void CasteliaRushConfig_Load(CasteliaRushConfig *config, u16 dayPeriod, u
 static void CasteliaRushConfig_Free(CasteliaRushConfig *config);
 static void CasteliaRush_SpawnPassersby(CasteliaRushConfig *config, CasteliaRush *rush, u16 dayPeriod);
 static void CasteliaRush_SpawnPasserby(const CasteliaRush *rush, CasteliaRushConfig *config,
-                                const CasteliaRushLane *lane, CasteliaRushPasserby *passerby, u16 offset);
+                                       const CasteliaRushLane *lane, CasteliaRushPasserby *passerby, u16 offset);
 static void CasteliaRush_FillLanes(CasteliaRushConfig *config, CasteliaRush *rush, u16 dayPeriod);
 static u16 CasteliaRushConfig_GetWalkAcmd(const CasteliaRushConfig *config);
 static void Passerby_StartWalker(CasteliaRushPasserby *passerby);
@@ -154,17 +154,17 @@ static void Passerby_StartTalker(CasteliaRushPasserby *passerby);
 static void Passerby_UpdateWalker(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player);
 static void Passerby_UpdateTalker(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player);
 static BOOL Passerby_FindActorAhead(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldActor **found, u16 maxDist,
-                                u16 minDist);
+                                    u16 minDist);
 static BOOL Passerby_IsActorAhead(const CasteliaRushPasserby *passerby, FieldActor *actor, u16 maxDist, u16 minDist);
 static BOOL IsPosAhead(s16 x, s16 z, s16 otherX, s16 otherZ, u16 maxDist, u16 minDist, u16 dir);
 static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, void *msgBGSys, const CasteliaRushConfig *config,
-                                u16 dayPeriod, HeapID heapId);
+                                      u16 dayPeriod, HeapID heapId);
 static void CasteliaRushBalloons_Free(CasteliaRushBalloons *balloons);
 static void CasteliaRushBalloons_Clear(CasteliaRushBalloons *balloons);
 static void CasteliaRushBalloons_Update(CasteliaRushBalloons *balloons, const CasteliaRushConfig *config, Field *field);
 static void CasteliaRushBalloon_Init(CasteliaRushBalloon *balloon, u16 index);
 static void CasteliaRushBalloon_Show(CasteliaRushBalloon *balloon, void *msgBGSys, MsgData *msgData, u32 msgBase,
-                                u32 msgCount);
+                                     u32 msgCount);
 static void CasteliaRushBalloon_Update(CasteliaRushBalloon *balloon, void *msgBGSys);
 static void CasteliaRushBalloon_Reset(CasteliaRushBalloon *balloon);
 static void CasteliaRushBalloon_Hide(CasteliaRushBalloon *balloon, void *msgBGSys);
@@ -255,7 +255,7 @@ static CasteliaRushPasserby *CasteliaRush_FindFreePasserby(CasteliaRush *rush) {
 
 // The talker that stands on (x, z), setting *occupied, or the first talker in the direction dir from it
 static const CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(const CasteliaRush *rush, u16 x, u16 z, u16 dir,
-                                                 BOOL unused, BOOL *occupied) {
+                                                                BOOL unused, BOOL *occupied) {
     int i;
     s16 dx;
     s16 dz;
@@ -307,8 +307,8 @@ static const CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(const CasteliaRu
     return NULL;
 }
 
-static void Passerby_Init(CasteliaRushPasserby *passerby, MMSys *actorSys, u16 zoneId,
-                                const CasteliaRushConfig *config, u32 index) {
+static void Passerby_Init(CasteliaRushPasserby *passerby, MMSys *actorSys, u16 zoneId, const CasteliaRushConfig *config,
+                          u32 index) {
     u32 i = 0;
     u16 objCode;
     u32 rand;
@@ -352,8 +352,8 @@ static void Passerby_Update(CasteliaRushPasserby *passerby, MMSys *actorSys, Fie
     }
 }
 
-static void Passerby_Start(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player, u8 type, u16 x,
-                                u16 z, u16 dir, u16 steps, const CasteliaRushLane *lane) {
+static void Passerby_Start(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player, u8 type, u16 x, u16 z,
+                           u16 dir, u16 steps, const CasteliaRushLane *lane) {
     ZoneNPC npc;
 
     passerby->active = TRUE;
@@ -477,7 +477,7 @@ static void CasteliaRush_SpawnPassersby(CasteliaRushConfig *config, CasteliaRush
 
 // Starts a passer-by offset steps into a lane, at a random place across it, unless a talker stands there
 static void CasteliaRush_SpawnPasserby(const CasteliaRush *rush, CasteliaRushConfig *config,
-                                const CasteliaRushLane *lane, CasteliaRushPasserby *passerby, u16 offset) {
+                                       const CasteliaRushLane *lane, CasteliaRushPasserby *passerby, u16 offset) {
     u16 x;
     u16 z;
     u8 talker = FALSE;
@@ -505,8 +505,7 @@ static void CasteliaRush_SpawnPasserby(const CasteliaRush *rush, CasteliaRushCon
         talker = TRUE;
     }
     if (!occupied) {
-        Passerby_Start(passerby, rush->actorSys, rush->player, talker, x, z, lane->dir, lane->steps - offset,
-                            lane);
+        Passerby_Start(passerby, rush->actorSys, rush->player, talker, x, z, lane->dir, lane->steps - offset, lane);
     }
 }
 
@@ -629,7 +628,7 @@ static void Passerby_UpdateTalker(CasteliaRushPasserby *passerby, MMSys *actorSy
 
 // The first other visible actor ahead of the passer-by
 static BOOL Passerby_FindActorAhead(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldActor **found, u16 maxDist,
-                                u16 minDist) {
+                                    u16 minDist) {
     u32 index = 0;
     FieldActor *actor;
 
@@ -653,8 +652,7 @@ static BOOL Passerby_IsActorAhead(const CasteliaRushPasserby *passerby, FieldAct
     if (IsPosAhead(x, z, actorX, actorZ, maxDist, minDist, passerby->dir)) {
         return TRUE;
     }
-    return IsPosAhead(x, z, FldAct_GetInitGPosX(actor), FldAct_GetInitGPosZ(actor), maxDist, minDist,
-                               passerby->dir);
+    return IsPosAhead(x, z, FldAct_GetInitGPosX(actor), FldAct_GetInitGPosZ(actor), maxDist, minDist, passerby->dir);
 }
 
 static BOOL IsPosAhead(s16 x, s16 z, s16 otherX, s16 otherZ, u16 maxDist, u16 minDist, u16 dir) {
@@ -687,7 +685,7 @@ static BOOL IsPosAhead(s16 x, s16 z, s16 otherX, s16 otherZ, u16 maxDist, u16 mi
 }
 
 static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, void *msgBGSys, const CasteliaRushConfig *config,
-                                u16 dayPeriod, HeapID heapId) {
+                                      u16 dayPeriod, HeapID heapId) {
     int i = 0;
     u32 rand = GFL_RandomLC(0);
 
@@ -720,7 +718,8 @@ static void CasteliaRushBalloons_Clear(CasteliaRushBalloons *balloons) {
     }
 }
 
-static void CasteliaRushBalloons_Update(CasteliaRushBalloons *balloons, const CasteliaRushConfig *config, Field *field) {
+static void CasteliaRushBalloons_Update(CasteliaRushBalloons *balloons, const CasteliaRushConfig *config,
+                                        Field *field) {
     int i = 0;
     u32 rand = GFL_RandomLC(0);
     u16 dayPeriod = Field_GetDayPeriod(field);
@@ -729,7 +728,7 @@ static void CasteliaRushBalloons_Update(CasteliaRushBalloons *balloons, const Ca
         balloons->timer++;
         if (balloons->timer >= balloons->interval) {
             CasteliaRushBalloon_Show(&balloons->balloons[balloons->next], balloons->msgBGSys, balloons->msgData,
-                                config->msgBase, config->msgCount);
+                                     config->msgBase, config->msgCount);
             balloons->timer = 0;
             balloons->next = (balloons->next + 1) % BALLOON_COUNT;
             balloons->interval = rand % config->intervals[dayPeriod] + BALLOON_FRAMES;
@@ -753,7 +752,7 @@ static void CasteliaRushBalloon_Init(CasteliaRushBalloon *balloon, u16 index) {
 }
 
 static void CasteliaRushBalloon_Show(CasteliaRushBalloon *balloon, void *msgBGSys, MsgData *msgData, u32 msgBase,
-                                u32 msgCount) {
+                                     u32 msgCount) {
     u32 rand = GFL_RandomLC(0);
 
     balloon->active = TRUE;

@@ -47,8 +47,7 @@ static u8 UnityTowerState_GetParam(const UnityTowerFloor *state, u16 param) {
 
 static GameEvent *func_ov012_02160bb0(GameSystem *gsys, u16 floor, u16 *floorResult, u16 *countryResult,
                                       u16 *selectedResult) {
-    GameEvent *event =
-        GameEvent_Create(gsys, NULL, func_ov012_02160c64, sizeof(UnityTowerFloorSelectEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02160c64, sizeof(UnityTowerFloorSelectEvent));
     UnityTowerFloorSelectEvent *work = GameEvent_GetData(event);
     UnityTowerSurveySave *survey;
     int country;

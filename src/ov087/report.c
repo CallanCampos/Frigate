@@ -1,8 +1,8 @@
 #include "types.h"
-#include "field/report.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "field/player_state.h"
+#include "field/report.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -325,9 +325,9 @@ static void Report_PrintWindows(ReportScreen *wk) {
 
     wk->printQueue = func_02021998(wk->heapId);
     for (i = 0; i < REPORT_WINDOW_MAX; i++) {
-        wk->windows[i].window = BmpWin_CreateDynamic(
-            sWindowSetups[i].bg, sWindowSetups[i].x, sWindowSetups[i].y, sWindowSetups[i].width,
-            sWindowSetups[i].height, sWindowSetups[i].palette, TRUE);
+        wk->windows[i].window =
+            BmpWin_CreateDynamic(sWindowSetups[i].bg, sWindowSetups[i].x, sWindowSetups[i].y, sWindowSetups[i].width,
+                                 sWindowSetups[i].height, sWindowSetups[i].palette, TRUE);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[i].window), 0);
     }
 

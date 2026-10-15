@@ -19,8 +19,8 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/os.h"
-#include "pml/poke_party.h"
 #include "p_status_local.h"
+#include "pml/poke_party.h"
 #include "system/app_menu_common.h"
 #include "system/game_data.h"
 #include "system/wipe.h"
@@ -548,10 +548,16 @@ static void PStatus_ExitText(PStatusWork *wk) {
 
 static void PStatus_CheckTouch(PStatusWork *wk) {
     TouchRect rects[PSTA_BUTTON_COUNT + 1] = {
-        { 168, 192, 0, 40 },    { 168, 192, 40, 80 },   { 168, 192, 80, 120 },
-        { 168, 192, 120, 144 }, { 168, 192, 144, 168 }, { 168, 192, 168, 192 },
+        { 168, 192, 0, 40 },
+        { 168, 192, 40, 80 },
+        { 168, 192, 80, 120 },
+        { 168, 192, 120, 144 },
+        { 168, 192, 144, 168 },
+        { 168, 192, 168, 192 },
         // The last button's right edge is 256, which wraps to 0
-        { 168, 192, 200, 224 }, { 168, 192, 232, 0 },   { TOUCH_RECT_END, 0, 0, 0 },
+        { 168, 192, 200, 224 },
+        { 168, 192, 232, 0 },
+        { TOUCH_RECT_END, 0, 0, 0 },
     };
 
     wk->touchHit = func_0203da0c(rects);

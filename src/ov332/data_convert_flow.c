@@ -403,8 +403,7 @@ static void DataConvert_SeqWireless(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 16:
-        wk->transferResult =
-            func_020108dc(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
+        wk->transferResult = func_020108dc(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
         (*state)++;
         break;
     case 17:
@@ -685,8 +684,7 @@ static void DataConvert_SeqWifi(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 25:
-        wk->transferResult =
-            func_020108dc(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
+        wk->transferResult = func_020108dc(wk->memoryLink, wk->wbData, GameData_GetSaveControl(wk->param->gameData));
         (*state)++;
         break;
     case 26:

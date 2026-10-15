@@ -6,6 +6,7 @@
 #include "system/aeabi.h"
 
 // The lens flares of each effect set, ended by 8
+// clang-format off
 static const u16 LENS_FLARE_IDS[10][4] = {
     { 8, 8, 8, 8 },
     { 0, 8, 8, 8 },
@@ -19,7 +20,10 @@ static const u16 LENS_FLARE_IDS[10][4] = {
     { 0, 1, 2, 3 },
 };
 
+// clang-format on
+
 // The resources of each effect set
+// clang-format off
 static const u16 LENS_FLARE_RESOURCE_IDS[8][6] = {
     { 0x22, 0x20, 0x21, 0x23, 0x24, 0x0 },
     { 0x27, 0x25, 0x26, 0x28, 0x29, 0x0 },
@@ -30,6 +34,8 @@ static const u16 LENS_FLARE_RESOURCE_IDS[8][6] = {
     { 0x13, 0x11, 0x12, 0x14, 0x15, 0x0 },
     { 0x18, 0x16, 0x17, 0x19, 0x1a, 0x0 },
 };
+
+// clang-format on
 
 FieldLensFlareData *FieldLensFlareData_Create(HeapID heapId) {
     FieldLensFlareData *data;

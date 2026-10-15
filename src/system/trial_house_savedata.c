@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/trial_house.h"
 #include "gfl/std.h"
 #include "save/save_control.h"
+#include "save/trial_house.h"
 
 // The save block of the Battle Institute (the trial house): the results of the challenges, and the data of the file
 // that follows the battle examination's. The ROM has no string for the file, so the name is descriptive. Block 0x3f.

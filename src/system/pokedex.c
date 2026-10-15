@@ -1,5 +1,4 @@
 #include "types.h"
-#include "save/pokedex.h"
 #include "constants/language.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -7,6 +6,7 @@
 #include "gfl/std.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
+#include "save/pokedex.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 
@@ -62,11 +62,14 @@ static const PokeDexEvaluation data_0208f82c[] = {
     { 159, 1311 }, { 349, 1312 }, { 449, 1313 }, { 549, 1314 }, { 635, 1315 }, { 0, 1316 },
 };
 
+// clang-format off
 static const u16 NATIONAL_DEX_COMPLETION_EXCLUSIONS[] = {
     SPECIES_MEW,     SPECIES_CELEBI,  SPECIES_JIRACHI, SPECIES_DEOXYS,   SPECIES_PHIONE,
     SPECIES_MANAPHY, SPECIES_DARKRAI, SPECIES_SHAYMIN, SPECIES_ARCEUS,   SPECIES_KELDEO,
     SPECIES_MELOETTA, SPECIES_GENESECT, SPECIES_VICTINI,
 };
+
+// clang-format on
 
 static const PokeDexEvaluation data_0208f85e[] = {
     { 14, 4 },   { 29, 5 },   { 44, 6 },   { 64, 7 },   { 84, 8 },   { 104, 9 },  { 134, 10 }, { 164, 11 },
@@ -83,6 +86,7 @@ static const PokeDexEvaluation data_0208f8d8[] = {
     { 529, 53 }, { 559, 54 }, { 579, 55 }, { 599, 56 }, { 614, 57 }, { 629, 58 }, { 635, 59 }, { 0, 59 },
 };
 
+// clang-format off
 static const PokeDexFormEntry pokemonFormList[] = {
     { SPECIES_UNOWN, 28 },     { SPECIES_DEOXYS, 4 },   { SPECIES_SHAYMIN, 2 },  { SPECIES_GIRATINA, 2 },
     { SPECIES_ROTOM, 6 },      { SPECIES_SHELLOS, 2 },  { SPECIES_GASTRODON, 2 }, { SPECIES_BURMY, 3 },
@@ -91,6 +95,8 @@ static const PokeDexFormEntry pokemonFormList[] = {
     { SPECIES_KYUREM, 3 },     { SPECIES_KELDEO, 2 },   { SPECIES_THUNDURUS, 2 }, { SPECIES_TORNADUS, 2 },
     { SPECIES_LANDORUS, 2 },   { 0, 0 },
 };
+
+// clang-format on
 
 static inline void SetBit(u8 *bits, u16 index) {
     bits[index >> 3] |= (u8)(1 << (index & 7));
@@ -422,12 +428,11 @@ void func_0200d3c8(PokeDexSave *pokedex, u16 species, u32 *sex, u32 *rare, u32 *
                 break;
             }
         }
-        if (CheckShown(pokedex, POKEDEX_KIND_MALE, species)
-            || CheckShown(pokedex, POKEDEX_KIND_RARE_MALE, species)) {
+        if (CheckShown(pokedex, POKEDEX_KIND_MALE, species) || CheckShown(pokedex, POKEDEX_KIND_RARE_MALE, species)) {
             *sex = 0;
         }
-        if (CheckShown(pokedex, POKEDEX_KIND_FEMALE, species)
-            || CheckShown(pokedex, POKEDEX_KIND_RARE_FEMALE, species)) {
+        if (CheckShown(pokedex, POKEDEX_KIND_FEMALE, species) ||
+            CheckShown(pokedex, POKEDEX_KIND_RARE_FEMALE, species)) {
             *sex = 1;
         }
     } else {
@@ -633,13 +638,12 @@ BOOL func_0200d8d4(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 fo
         }
     } else {
         if (rare == TRUE) {
-            if (CheckSeen(pokedex, POKEDEX_KIND_RARE_MALE, species)
-                || CheckSeen(pokedex, POKEDEX_KIND_RARE_FEMALE, species)) {
+            if (CheckSeen(pokedex, POKEDEX_KIND_RARE_MALE, species) ||
+                CheckSeen(pokedex, POKEDEX_KIND_RARE_FEMALE, species)) {
                 return TRUE;
             }
         } else {
-            if (CheckSeen(pokedex, POKEDEX_KIND_MALE, species)
-                || CheckSeen(pokedex, POKEDEX_KIND_FEMALE, species)) {
+            if (CheckSeen(pokedex, POKEDEX_KIND_MALE, species) || CheckSeen(pokedex, POKEDEX_KIND_FEMALE, species)) {
                 return TRUE;
             }
         }
@@ -694,8 +698,8 @@ static u16 PokeDex_GetCaughtNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapI
     u16 *table = PML_PersonalLoadRegionalDexTable(heapId, 0);
 
     for (i = 1; i <= SPECIES_GENESECT; i++) {
-        if (PokeDex_IsCaught(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE
-            && PML_PkmIsRegionalDexExclude(i) == TRUE) {
+        if (PokeDex_IsCaught(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE &&
+            PML_PkmIsRegionalDexExclude(i) == TRUE) {
             count++;
         }
     }
@@ -709,8 +713,8 @@ static u16 PokeDex_GetSeenNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapId)
     u16 *table = PML_PersonalLoadRegionalDexTable(heapId, 0);
 
     for (i = 1; i <= SPECIES_GENESECT; i++) {
-        if (PokeDex_IsSeen(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE
-            && PML_PkmIsRegionalDexExclude(i) == TRUE) {
+        if (PokeDex_IsSeen(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE &&
+            PML_PkmIsRegionalDexExclude(i) == TRUE) {
             count++;
         }
     }

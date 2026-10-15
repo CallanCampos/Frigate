@@ -50,7 +50,8 @@ int NHTTPAddPostDataAscii(int connection, const char *name, const char *value) {
 
 // Sets the data that a request posts as it is, instead of as parts
 int NHTTPSetPostDataRaw(int connection, const void *data, u32 size) {
-    NHttpRequest *request = NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
+    NHttpRequest *request =
+        NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
 
     if (request == NULL) {
         return -1;
@@ -103,7 +104,8 @@ int NHTTPGetResultCode(int connection) {
 }
 
 int NHTTPSetVerifyOption(int connection, int option) {
-    NHttpRequest *request = NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
+    NHttpRequest *request =
+        NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
 
     if (request == NULL) {
         return -1;
@@ -114,7 +116,8 @@ int NHTTPSetVerifyOption(int connection, int option) {
 
 // Sets the user and the password of the request's basic authorization (32 characters at most each)
 int NHTTPSetBasicAuthorization(int connection, const char *user, const char *password) {
-    NHttpRequest *request = NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
+    NHttpRequest *request =
+        NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
     char text[0x41];
     int userLength;
     int passwordLength;
@@ -136,7 +139,8 @@ int NHTTPSetBasicAuthorization(int connection, const char *user, const char *pas
 }
 
 int NHTTPSetRootCA(int connection, void *certificates, int count) {
-    NHttpRequest *request = NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
+    NHttpRequest *request =
+        NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), (NHttpConnection *)connection);
 
     return NHTTPi_SetRootCA(request, certificates, count);
 }

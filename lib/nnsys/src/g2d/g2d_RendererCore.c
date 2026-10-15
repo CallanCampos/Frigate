@@ -180,9 +180,10 @@ static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2
     baseTrans.y -= surface->viewRect.posTopLeft.y;
 
     baseCharOffset = pCurrentInstance_->base2DCharOffset;
-    affined = (pCurrentInstance_->flipFlag == NNS_G2D_RENDERERFLIP_NONE && pCurrentInstance_->pCurrentMxtCacheFor2D != NULL)
-                  ? TRUE
-                  : FALSE;
+    affined =
+        (pCurrentInstance_->flipFlag == NNS_G2D_RENDERERFLIP_NONE && pCurrentInstance_->pCurrentMxtCacheFor2D != NULL)
+            ? TRUE
+            : FALSE;
 
     oam = &pCurrentInstance_->currentOam;
     for (i = 0; i < cell->numOAMAttrs; i++) {

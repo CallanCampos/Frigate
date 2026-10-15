@@ -1,9 +1,9 @@
 #include "types.h"
-#include "save/bag.h"
 #include "constants/items.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "pml/item.h"
+#include "save/bag.h"
 
 // The bag's save block: the five pockets, the items the player moved to the Free Space, and the cursor memory of the
 // bag and the battle bag. The name is the ROM's string. The functions' names are swan's, except where the header
@@ -31,6 +31,7 @@ static void BagSave_ClearItemEntry(BagItem *slot);
 static const u16 sDnaSplicers[] = { ITEM_DNA_SPLICERS_FUSE, ITEM_DNA_SPLICERS_SEPARATE };
 
 // The pocket of each item
+// clang-format off
 static const u8 sItemPockets[ITEM_LAST + 1] = {
     BAG_POCKET_ITEMS, // ITEM_NONE
     BAG_POCKET_ITEMS, // ITEM_MASTER_BALL
@@ -672,6 +673,8 @@ static const u8 sItemPockets[ITEM_LAST + 1] = {
     BAG_POCKET_KEY_ITEMS, // ITEM_DROPPED_ITEM_FEMALE
     BAG_POCKET_KEY_ITEMS, // ITEM_REVEAL_GLASS
 };
+
+// clang-format on
 
 u32 BagSave_GetBlockSize(void) {
     return sizeof(BagSave);

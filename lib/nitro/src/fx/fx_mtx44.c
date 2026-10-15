@@ -8,6 +8,7 @@
 #include "nitro/fx.h"
 
 #pragma thumb off
+// clang-format off
 asm void MTX_Identity44_(MtxFx44 *mtx) {
     mov r2, #0x1000
     mov r3, #0
@@ -22,6 +23,9 @@ asm void MTX_Identity44_(MtxFx44 *mtx) {
     bx lr
 }
 
+// clang-format on
+
+// clang-format off
 asm void MTX_Copy44To43_(const MtxFx44 *src, MtxFx43 *dst) {
     ldmia r0!, {r2, r3, ip}
     add r0, r0, #4
@@ -37,6 +41,8 @@ asm void MTX_Copy44To43_(const MtxFx44 *src, MtxFx43 *dst) {
     stmia r1!, {r2, r3, ip}
     bx lr
 }
+
+// clang-format on
 
 void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab) {
     MtxFx44 tmp;

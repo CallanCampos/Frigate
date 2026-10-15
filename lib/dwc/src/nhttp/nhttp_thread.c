@@ -100,8 +100,8 @@ static int NHTTPi_SkipLine(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int
 
 // Adds the size of what the connection's callback gives for a part of the post data, as it will be sent (a part sent
 // as text is longer when it is encoded). Returns FALSE if the callback can't be called
-static BOOL NHTTPi_GetPostContentlength(NHttpMutexInfo *mutexInfo, NHttpRequest *request, const char *name,
-                                        int *length, int mode) {
+static BOOL NHTTPi_GetPostContentlength(NHttpMutexInfo *mutexInfo, NHttpRequest *request, const char *name, int *length,
+                                        int mode) {
     int total = 0;
     NHttpConnection *connection = NHTTPi_Request2Connection(mutexInfo, request);
 
@@ -142,8 +142,8 @@ static BOOL NHTTPi_GetPostContentlength(NHttpMutexInfo *mutexInfo, NHttpRequest 
     return TRUE;
 }
 
-// Sends what the connection's callback gives for a part of the post data. Returns 0 if it all went into the send buffer,
-// 1 if the socket failed, 2 if the server closed it and 3 if the connection is gone or the request canceled
+// Sends what the connection's callback gives for a part of the post data. Returns 0 if it all went into the send
+// buffer, 1 if the socket failed, 2 if the server closed it and 3 if the connection is gone or the request canceled
 static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHttpRequest *request, u8 *sendBuffer, const char *name,
                                int sock, int *count, int mode) {
     char encoded[3];
@@ -192,8 +192,8 @@ static int NHTTPi_SendPostData(NHttpMutexInfo *mutexInfo, NHttpRequest *request,
 
             for (i = 0; i < size; i++) {
                 NHTTPi_memclr(encoded, 3);
-                result = NHTTPi_SaveBuf(request, sendBuffer, sock, count, encoded,
-                                        NHTTPi_encodeUrlChar(encoded, buffer[i]));
+                result =
+                    NHTTPi_SaveBuf(request, sendBuffer, sock, count, encoded, NHTTPi_encodeUrlChar(encoded, buffer[i]));
                 if (result < 0) {
                     return 1;
                 }
@@ -598,8 +598,7 @@ static int NHTTPi_SendProcPostDataBinary(NHttpThreadWork *work) {
                 return result;
             }
             if (part->binary) {
-                result = NHTTPi_SendHeaderData(
-                    work, sContentTypeOctetStream, sizeof(sContentTypeOctetStream) - 1);
+                result = NHTTPi_SendHeaderData(work, sContentTypeOctetStream, sizeof(sContentTypeOctetStream) - 1);
                 if (result != 0) {
                     return result;
                 }

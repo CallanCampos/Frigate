@@ -57,7 +57,8 @@ void LocalTvtSupport_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameDat
 }
 
 static LocalTvtSupport *LocalTvtSupport_Create(GameData *gameData, HeapID heapId) {
-    LocalTvtSupport *support = GFL_HeapAllocate(heapId, sizeof(LocalTvtSupport), TRUE, "local_tvt_person_support.c", 130);
+    LocalTvtSupport *support =
+        GFL_HeapAllocate(heapId, sizeof(LocalTvtSupport), TRUE, "local_tvt_person_support.c", 130);
 
     support->heapId = heapId;
     support->gameData = gameData;

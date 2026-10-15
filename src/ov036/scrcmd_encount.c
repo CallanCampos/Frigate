@@ -39,8 +39,8 @@ BOOL s0174_CallWildBattle(VM *vm, FieldScriptEnv *env) {
 
     ScriptWork_GetGameSystem(work);
     fieldWork = ScriptWork_GetFieldWork(work);
-    ScriptWork_CallEvent(work, EventWildBattleCall_CreateStatic(Field_GetEncountSystem(fieldWork->field), species,
-                                                                level, 0, flags));
+    ScriptWork_CallEvent(
+        work, EventWildBattleCall_CreateStatic(Field_GetEncountSystem(fieldWork->field), species, level, 0, flags));
     return TRUE;
 }
 
@@ -54,8 +54,8 @@ BOOL s0297_CallWildBattleEx(VM *vm, FieldScriptEnv *env) {
 
     ScriptWork_GetGameSystem(work);
     fieldWork = ScriptWork_GetFieldWork(work);
-    ScriptWork_CallEvent(work, EventWildBattleCall_CreateStatic(Field_GetEncountSystem(fieldWork->field), species,
-                                                                level, form, flags));
+    ScriptWork_CallEvent(
+        work, EventWildBattleCall_CreateStatic(Field_GetEncountSystem(fieldWork->field), species, level, form, flags));
     return TRUE;
 }
 
@@ -127,14 +127,12 @@ BOOL s021E_FishingChallengeGetRandomPkm(VM *vm, FieldScriptEnv *env) {
         if (EncData_Load(&encData, arc, CHALLENGE_FISHING_ZONES[i], season)) {
             if (encData.userData[ENCTYPE_FISHING] != 0) {
                 for (j = 0; j < FISHING_SLOT_COUNT; j++) {
-                    count = LoadEventEncountPokemonToBuffer(species, count,
-                                                            encData.fishing[j].species);
+                    count = LoadEventEncountPokemonToBuffer(species, count, encData.fishing[j].species);
                 }
             }
             if (encData.userData[ENCTYPE_FISHING_RARE] != 0) {
                 for (j = 0; j < FISHING_SLOT_COUNT; j++) {
-                    count = LoadEventEncountPokemonToBuffer(species, count,
-                                                            encData.fishingRare[j].species);
+                    count = LoadEventEncountPokemonToBuffer(species, count, encData.fishingRare[j].species);
                 }
             }
         }

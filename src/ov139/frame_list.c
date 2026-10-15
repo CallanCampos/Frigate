@@ -86,14 +86,13 @@ static void FlushWindows(FrameList *list);
 static u32 GetKeyTrigger(FrameList *list);
 static u32 GetKeyRepeat(FrameList *list);
 
-
 // How many rows to scroll by at once, from the speed that a drag or flick started at
 static const u8 sFlickRows[6] = { 32, 24, 16, 10, 6, 4 };
 
 // How far a drag has to go, by how long it has been held, for each speed
 static const u8 sFlickDistances[6][6] = {
-    { 16, 8, 6, 4, 4, 4 },        { 32, 16, 8, 6, 4, 1 },      { 64, 40, 32, 16, 8, 1 },
-    { 96, 80, 64, 48, 32, 1 },    { 112, 96, 80, 64, 48, 1 },  { 128, 112, 96, 80, 64, 1 },
+    { 16, 8, 6, 4, 4, 4 },     { 32, 16, 8, 6, 4, 1 },     { 64, 40, 32, 16, 8, 1 },
+    { 96, 80, 64, 48, 32, 1 }, { 112, 96, 80, 64, 48, 1 }, { 128, 112, 96, 80, 64, 1 },
 };
 
 FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
@@ -109,11 +108,11 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
     list->blinkAnm = BlinkPalAnm_Create(list->setup.layout.palette << 4, 16, list->setup.layout.bg, list->heapId);
     list->items = GFL_HeapAllocate(list->heapId, list->setup.count * sizeof(FrameListItem), TRUE, "frame_list.c", 265);
     if (list->setup.screenCount != 0) {
-        list->screens = GFL_HeapAllocate(list->heapId, list->setup.screenCount * sizeof(u16 *), FALSE, "frame_list.c",
-                                         270);
+        list->screens =
+            GFL_HeapAllocate(list->heapId, list->setup.screenCount * sizeof(u16 *), FALSE, "frame_list.c", 270);
         for (i = 0; i < list->setup.screenCount; i++) {
-            list->screens[i] = GFL_HeapAllocate(list->heapId, list->setup.layout.width * list->setup.layout.rowHeight * 2,
-                                                FALSE, "frame_list.c", 272);
+            list->screens[i] = GFL_HeapAllocate(
+                list->heapId, list->setup.layout.width * list->setup.layout.rowHeight * 2, FALSE, "frame_list.c", 272);
         }
     }
     list->rowCount = LIST_SCREEN_ROWS / list->setup.layout.rowHeight + 2;
@@ -122,7 +121,8 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
         list->rowCount = list->rowCount * 2;
     }
     list->frames = BGWinFrame_Create(BGWINFRAME_TRANSFER_VBLANK, list->rowCount, list->heapId);
-    list->printWindows = GFL_HeapAllocate(list->heapId, list->rowCount * sizeof(PrintWindow), FALSE, "frame_list.c", 284);
+    list->printWindows =
+        GFL_HeapAllocate(list->heapId, list->rowCount * sizeof(PrintWindow), FALSE, "frame_list.c", 284);
     for (i = 0; i < list->rowCount; i++) {
         BmpWin *window;
 
@@ -135,9 +135,9 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
         } else {
             BGWinFrame_InitFrame(list->frames, i, list->setup.layout.bg, list->setup.layout.width,
                                  list->setup.layout.rowHeight);
-            window = BmpWin_CreateDynamic(list->setup.layout.bg, list->setup.layout.windowX,
-                                          list->setup.layout.windowY, list->setup.layout.windowWidth,
-                                          list->setup.layout.windowHeight, list->setup.layout.windowPalette, TRUE);
+            window = BmpWin_CreateDynamic(list->setup.layout.bg, list->setup.layout.windowX, list->setup.layout.windowY,
+                                          list->setup.layout.windowWidth, list->setup.layout.windowHeight,
+                                          list->setup.layout.windowPalette, TRUE);
         }
         list->printWindows[i].window = window;
     }
@@ -200,7 +200,7 @@ void FrameList_LoadScreen(FrameList *list, ArcTool *arc, u32 fileId, BOOL compre
 }
 
 void FrameList_LoadScreenPalette(FrameList *list, ArcTool *arc, u32 fileId, BOOL compressed, u32 index, u16 tileOffset,
-                         u8 palette) {
+                                 u8 palette) {
     int i;
 
     FrameList_LoadScreen(list, arc, fileId, compressed, index);
@@ -802,8 +802,7 @@ static BOOL UpdateScroll(FrameList *list) {
             list->scroll--;
             PrintRow(list, list->scroll, GetOffscreenRowY(list, -1));
             list->firstRow = WrapRow(list->firstRow, list->shownRows, -1);
-            PrintRowOnBg2(list, list->scroll - list->shownRows2,
-                                list->rowOffset + GetOffscreenRowY(list, -1));
+            PrintRowOnBg2(list, list->scroll - list->shownRows2, list->rowOffset + GetOffscreenRowY(list, -1));
             list->firstRow2 = WrapRow(list->firstRow2, list->shownRows2, -1);
         } else {
             list->scroll++;
@@ -1270,7 +1269,8 @@ static void PrintRow(FrameList *list, int item, s8 y) {
     if (item >= 0 && item < list->count) {
         DrawItemFrame(list, item, list->firstRow);
         LoadRowScreen(list, list->firstRow, y);
-        list->setup.callbacks->print(list->setup.work, item, &list->printWindows[list->firstRow], y * 8 - list->bgOffset, TRUE);
+        list->setup.callbacks->print(list->setup.work, item, &list->printWindows[list->firstRow],
+                                     y * 8 - list->bgOffset, TRUE);
     } else {
         ClearRow(list, list->setup.layout.bg, y);
     }
@@ -1283,7 +1283,8 @@ static void PrintRowOnBg2(FrameList *list, int item, s8 y) {
 
             DrawItemFrame(list, item, row);
             LoadRowScreen(list, row, y);
-            list->setup.callbacks->print(list->setup.work, item, &list->printWindows[row], y * 8 - list->bgOffset, FALSE);
+            list->setup.callbacks->print(list->setup.work, item, &list->printWindows[row], y * 8 - list->bgOffset,
+                                         FALSE);
         } else {
             ClearRow(list, list->setup.layout.bg2, y);
         }
@@ -1301,8 +1302,7 @@ void FrameList_SetRowPalette(FrameList *list, u32 row, u32 palette) {
         } else if (y >= LIST_BG_ROWS) {
             y -= LIST_BG_ROWS;
         }
-        GFL_BGSysSetScrPaletteNo(list->setup.layout.bg, list->setup.layout.x, y, list->setup.layout.width, 1,
-                                 palette);
+        GFL_BGSysSetScrPaletteNo(list->setup.layout.bg, list->setup.layout.x, y, list->setup.layout.width, 1, palette);
         y++;
     }
     if (!list->waiting) {

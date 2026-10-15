@@ -199,9 +199,9 @@ JoinAvenueInfo *ResortSys_GetInfo(ResortSys *sys);
 ResortWork *ResortSys_GetWork(ResortSys *sys);
 // The answer to a question of the scripts: a message of SCRIPT_TEXT_GLOBAL_10685 for the person, or a number
 u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, GameData *gameData, WordSet *wordSet,
-                        HeapID heapId);
+                             HeapID heapId);
 BOOL ResortSys_GetPersonVisit(ResortPersonData *data, JoinAvenuePerson *person, ResortSys *sys, u16 *a3, u16 *a4,
-                         u16 *a5);
+                              u16 *a5);
 // Adds popularity points to the avenue: 0 nothing came of it, 1 a new rank, 2 no more ranks, 3 a new shop, 4 a new
 // rank with new texts, 5 both
 u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 *rank);
@@ -211,14 +211,15 @@ u32 ResortSys_GetInfoFlag1b(ResortSys *sys);
 // Whether the occupants' shops are all at the highest level
 BOOL ResortSys_AreAllShopsMaxLevel(ResortSys *sys);
 void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, ResortSys *sys, ResortPerson *person,
-                         WordSet *wordSet, GameData *gameData, HeapID heapId);
+                             WordSet *wordSet, GameData *gameData, HeapID heapId);
 void *ResortRecords_CreateWindow(void *msgBGSys, HeapID heapId);
 void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void *msgBGSys, WordSet *wordSet,
-                         GameData *gameData, u32 page, HeapID heapId);
+                             GameData *gameData, u32 page, HeapID heapId);
 u32 ResortSys_GetUnlock(ResortSys *sys, GameData *gameData);
 u32 ResortSys_GetUnlockForRank(ResortSys *sys, GameData *gameData, u32 rank);
 u32 ResortSys_GetTrainerTypeText(ResortBinary *texts, ResortPersonData *data, u32 column);
-void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field *field, ResortPerson *person, u32 mode);
+void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field *field, ResortPerson *person,
+                                     u32 mode);
 ResortSys *ResortSys_Get(Field *field);
 // The person of the script's actor
 ResortPerson *ResortSys_GetScriptPerson(FieldScriptEnv *env, ResortPeople *people);

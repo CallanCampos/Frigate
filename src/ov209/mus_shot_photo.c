@@ -118,7 +118,7 @@ MusShotPhoto *MusShotPhoto_Create(MusicalShot *shot, HeapID heapId) {
     photo->shot = shot;
     for (i = 0; i < 4; i++) {
         photo->pokes[i] = MusicalSystem_InitPoke(shot->pokes[i].species, shot->pokes[i].sex, shot->pokes[i].form,
-                                              shot->pokes[i].rare, shot->pokes[i].personality, heapId);
+                                                 shot->pokes[i].rare, shot->pokes[i].personality, heapId);
         for (j = 0; j < 8; j++) {
             u8 equip = shot->pokes[i].equips[j].unk4;
 

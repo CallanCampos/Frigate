@@ -3,12 +3,12 @@
 #include "field/field.h"
 #include "field/field_camera.h"
 #include "field/field_exp_obj.h"
-#include "nitro/fx.h"
 #include "field/field_task.h"
 #include "gfl/fade.h"
 #include "gfl/g3d.h"
 #include "gfl/sound.h"
 #include "gfl/std.h"
+#include "nitro/fx.h"
 #include "save/event_work.h"
 #include "system/game_data.h"
 #include "system/game_event.h"
@@ -162,16 +162,20 @@ static const G3DSceneActorSetup sScene2Actors[] = {
     { 16, 0, 16, 0, sScene2Animations8, NELEMS(sScene2Animations8) },
 };
 
-static const G3DSceneSetup sScene0 = { sScene0Resources, NELEMS(sScene0Resources), sScene0Actors, NELEMS(sScene0Actors) };
-static const G3DSceneSetup sScene1 = { sScene1Resources, NELEMS(sScene1Resources), sScene1Actors, NELEMS(sScene1Actors) };
+static const G3DSceneSetup sScene0 = { sScene0Resources, NELEMS(sScene0Resources), sScene0Actors,
+                                       NELEMS(sScene0Actors) };
+static const G3DSceneSetup sScene1 = { sScene1Resources, NELEMS(sScene1Resources), sScene1Actors,
+                                       NELEMS(sScene1Actors) };
 
 static const BadgeGateCameraShake sCameraShakes[2] = {
     { 138, 315, 4, 1, 1 },
     { 385, 430, 4, 2, 2 },
 };
 
-static const G3DSceneSetup sScene2 = { sScene2Resources, NELEMS(sScene2Resources), sScene2Actors, NELEMS(sScene2Actors) };
-static const G3DSceneSetup sScene3 = { sScene3Resources, NELEMS(sScene3Resources), sScene3Actors, NELEMS(sScene3Actors) };
+static const G3DSceneSetup sScene2 = { sScene2Resources, NELEMS(sScene2Resources), sScene2Actors,
+                                       NELEMS(sScene2Actors) };
+static const G3DSceneSetup sScene3 = { sScene3Resources, NELEMS(sScene3Resources), sScene3Actors,
+                                       NELEMS(sScene3Actors) };
 
 // The event work of each gate, which is 2 once its badge has been checked
 static const u16 sGateWorks[9] = { 0x40e4, 0x40e5, 0x40e6, 0x40e7, 0x40e8, 0x40e9, 0x40ea, 0x40eb, 0x40ec };
@@ -275,7 +279,6 @@ void func_ov103_021eecfc(BadgeGateWork *work) {
         FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 0), TRUE);
     }
 }
-
 
 BOOL func_ov103_021eefbc(u32 badge, EventWork *work) {
     u16 *value;
@@ -477,18 +480,21 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
         (*state)++;
         break;
     case 4:
-        if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 1)) == TRUE) {
+        if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene,
+                                                                     data->lastActor.actor, 1)) == TRUE) {
             func_ov103_021ef1dc(&data->lastActor, 1, TRUE);
             FieldExpObj_SetAnm(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 1, FALSE);
             FieldExpObj_SetAnm(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 2, TRUE);
             func_ov103_021ef1dc(&data->lastActor, 2, FALSE);
             func_ov103_021ef1dc(&data->lastActor, 0, FALSE);
-            FieldExpObj_SetAnmFrame(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 2, func_ov103_021ef200(data->gimmickWork));
+            FieldExpObj_SetAnmFrame(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 2,
+                                    func_ov103_021ef200(data->gimmickWork));
             (*state)++;
         }
         break;
     case 5:
-        if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene, data->lastActor.actor, 0)) == TRUE) {
+        if (FieldExpObjAnm_IsPlaybackFinished(FieldExpObj_GetAnmInfo(data->lastActor.expObj, data->lastActor.scene,
+                                                                     data->lastActor.actor, 0)) == TRUE) {
             func_ov103_021ef1dc(&data->lastActor, 0, TRUE);
             (*state)++;
         }
@@ -508,7 +514,6 @@ GameEventReturnCode BadgeGate_LastGateEvent(GameEvent *event, u32 *state, void *
     }
     return GAMEEVENT_CONTINUE;
 }
-
 
 void func_ov103_021ef518(BadgeGateLastEventData *data) {
     u32 i;
@@ -537,7 +542,6 @@ void func_ov103_021ef518(BadgeGateLastEventData *data) {
         }
     }
 }
-
 
 void func_ov103_021ef5dc(BadgeGateLastEventData *data) {
     if (data->state == 100) {

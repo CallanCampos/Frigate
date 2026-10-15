@@ -35,6 +35,7 @@ static void func_ov036_021a5998(FieldEffectTask *task, void *work);
 static void func_ov036_021a599c(FieldEffectTask *task, void *work);
 static void func_ov036_021a59dc(FieldEffectTask *task, void *work);
 
+// clang-format off
 static const FieldEffectTaskVTable FISHING_TASK_VTABLE = {
     sizeof(FishingTask),
     func_ov036_021a597c,
@@ -42,6 +43,8 @@ static const FieldEffectTaskVTable FISHING_TASK_VTABLE = {
     func_ov036_021a599c,
     func_ov036_021a59dc,
 };
+
+// clang-format on
 
 static u16 FISHING_ANM_ID = 107;
 

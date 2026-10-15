@@ -1,7 +1,7 @@
 #include "field/union_app.h"
+#include "types.h"
 #include "field/union_comm.h"
 #include "field/union_main.h"
-#include "types.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_handle.h"

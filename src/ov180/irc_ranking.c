@@ -407,8 +407,8 @@ static BOOL IrcRanking_Init(GameProc *proc, u32 *state, void *param, void *work)
     IrcRankingFling_Init(&wk->fling);
     IrcRankingList_Init(&wk->list, 1, 2, 5, 6, IrcRankingGraphic_GetBG(&wk->graphic),
                         IrcRankingGraphic_GetUnit(&wk->graphic), wk->msgData, wk->ranking, HEAP_ID);
-    wk->button = IrcAppBar_Create(2, IrcRankingGraphic_GetUnit(&wk->graphic), 4, 13, 0, 2, wk->font, wk->queue,
-                                  HEAP_ID);
+    wk->button =
+        IrcAppBar_Create(2, IrcRankingGraphic_GetUnit(&wk->graphic), 4, 13, 0, 2, wk->font, wk->queue, HEAP_ID);
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, HEAP_ID);
     wk->palette = func_0204bc48(arc, 5, CLACT_VRAM_MAIN, 0x1c0, HEAP_ID);
     GFL_ArcToolFree(arc);
@@ -555,23 +555,21 @@ static void IrcRanking_StepInput(IrcRankingStepMan *mgr, int *state, IrcRankingW
     if (!IrcAppBar_IsPressedOrDone(wk->button)) {
         if (IrcRankingTouch_GetHeldKeys(&wk->touch, &keyFrames) & PAD_KEY_DOWN) {
             if (FX32_CONST(keyFrames) > FX32_CONST(KEY_SCROLL_START_FRAMES)) {
-                IrcRankingFling_Start(
-                    &wk->fling,
-                    FX_Mul(FX_Div(FX32_CONST(keyFrames) - FX32_CONST(KEY_SCROLL_START_FRAMES),
-                                  FX32_CONST(KEY_SCROLL_FRAMES)),
-                           FX32_CONST(60)),
-                    KEY_SCROLL_FRAMES_FLING);
+                IrcRankingFling_Start(&wk->fling,
+                                      FX_Mul(FX_Div(FX32_CONST(keyFrames) - FX32_CONST(KEY_SCROLL_START_FRAMES),
+                                                    FX32_CONST(KEY_SCROLL_FRAMES)),
+                                             FX32_CONST(60)),
+                                      KEY_SCROLL_FRAMES_FLING);
             } else {
                 IrcRankingFling_Start(&wk->fling, FX32_CONST(2), KEY_SCROLL_FRAMES_FLING);
             }
         } else if (IrcRankingTouch_GetHeldKeys(&wk->touch, &keyFrames) & PAD_KEY_UP) {
             if (FX32_CONST(keyFrames) > FX32_CONST(KEY_SCROLL_START_FRAMES)) {
-                IrcRankingFling_Start(
-                    &wk->fling,
-                    -FX_Mul(FX_Div(FX32_CONST(keyFrames) - FX32_CONST(KEY_SCROLL_START_FRAMES),
-                                   FX32_CONST(KEY_SCROLL_FRAMES)),
-                            FX32_CONST(60)),
-                    KEY_SCROLL_FRAMES_FLING);
+                IrcRankingFling_Start(&wk->fling,
+                                      -FX_Mul(FX_Div(FX32_CONST(keyFrames) - FX32_CONST(KEY_SCROLL_START_FRAMES),
+                                                     FX32_CONST(KEY_SCROLL_FRAMES)),
+                                              FX32_CONST(60)),
+                                      KEY_SCROLL_FRAMES_FLING);
             } else {
                 IrcRankingFling_Start(&wk->fling, -FX32_CONST(2), KEY_SCROLL_FRAMES_FLING);
             }
@@ -608,11 +606,11 @@ static void IrcRanking_StepScrollToSelf(IrcRankingStepMan *mgr, int *state, IrcR
         wk->autoScrollFrames++;
         frames = wk->autoScrollFrames;
         if (FX32_CONST(frames) > FX32_CONST(KEY_SCROLL_START_FRAMES)) {
-            IrcRankingFling_Start(&wk->fling,
-                                  FX_Mul(FX_Div(FX32_CONST(frames) - FX32_CONST(KEY_SCROLL_START_FRAMES),
-                                                FX32_CONST(KEY_SCROLL_FRAMES)),
-                                         FX32_CONST(60)),
-                                  KEY_SCROLL_FRAMES_FLING);
+            IrcRankingFling_Start(
+                &wk->fling,
+                FX_Mul(FX_Div(FX32_CONST(frames) - FX32_CONST(KEY_SCROLL_START_FRAMES), FX32_CONST(KEY_SCROLL_FRAMES)),
+                       FX32_CONST(60)),
+                KEY_SCROLL_FRAMES_FLING);
         } else {
             IrcRankingFling_Start(&wk->fling, FX32_CONST(2), KEY_SCROLL_FRAMES_FLING);
         }
@@ -1065,8 +1063,7 @@ static void IrcRankingRow_Init(IrcRankingRow *row, const IrcRankingEntry *entry,
             palette = subPalette;
         }
         row->iconY[i] = setup.y;
-        row->icons[i] = func_0204c040(unit, row->iconChars, palette, row->iconCellAnims,
-                                      &setup, i, heapId);
+        row->icons[i] = func_0204c040(unit, row->iconChars, palette, row->iconCellAnims, &setup, i, heapId);
         func_0204c378(row->icons[i], PokeIcon_GetPalette(entry->species, entry->form, entry->sex, entry->isEgg), FALSE);
         if (setup.y > -16 && setup.y < 208) {
             func_0204c124(row->icons[i], TRUE);
@@ -1153,8 +1150,8 @@ static void IrcRankingScreens_Load(const IrcRankingScreens *screens, u8 bg, u32 
 static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) {
     TrainerLogSave *log = func_0200afbc(GameData_GetSaveControl(gameData));
     u16 count = func_0200afc8(log);
-    IrcRankingData *ranking = GFL_HeapAllocate(heapId, sizeof(u32) + count * sizeof(IrcRankingEntry), FALSE,
-                                               "irc_ranking.c", 2724);
+    IrcRankingData *ranking =
+        GFL_HeapAllocate(heapId, sizeof(u32) + count * sizeof(IrcRankingEntry), FALSE, "irc_ranking.c", 2724);
     IrcRankingEntry *entry;
     u8 prevValue;
     u8 prevRank;
@@ -1432,7 +1429,8 @@ static void IrcRanking_CopyTiles(GFLBitmap *src, GFLBitmap *dest, u32 srcX, u32 
     u8 *srcPixels = GFL_BitmapGetPixelData(src);
     u8 *destPixels = GFL_BitmapGetPixelData(dest);
 
-    sys_memcpy32(srcPixels + (srcX + width * srcY) * 32, destPixels + (destX + width * destY) * 32, width * height * 32);
+    sys_memcpy32(srcPixels + (srcX + width * srcY) * 32, destPixels + (destX + width * destY) * 32,
+                 width * height * 32);
 }
 
 static IrcRankingLabel *IrcRankingLabel_Create(const ClActorSetup *setup, u8 width, u8 height, u32 palette,

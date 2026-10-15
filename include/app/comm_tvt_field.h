@@ -31,7 +31,8 @@ struct CommTvtFieldParam {
     u32 unused30;
 };
 
-// The symbol is still COMM_TVT_FIELD_PROC_FUNCTIONS until it is renamed to COMM_TVT_FIELD_PROC_FUNCTIONS, the name in the C file
+// The symbol is still COMM_TVT_FIELD_PROC_FUNCTIONS until it is renamed to COMM_TVT_FIELD_PROC_FUNCTIONS, the name in
+// the C file
 extern const GameProcFunctions COMM_TVT_FIELD_PROC_FUNCTIONS;
 
 // Overlay 12's stubs, as this screen calls them: the state of the communication (always 0), the caller's number and

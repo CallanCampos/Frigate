@@ -7,11 +7,11 @@
 #include "field/trial_house.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
-#include "gfl/touchpanel.h"
-#include "gfl/ui.h"
 #include "gfl/net.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
+#include "gfl/touchpanel.h"
+#include "gfl/ui.h"
 #include "pml/poke_party.h"
 #include "save/records.h"
 #include "save/save_control.h"
@@ -351,7 +351,8 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
         extraSaveControl = GameData_GetSaveControl(GSYS_GetGameData(gsys));
         buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x277);
         if (func_02007560(extraSaveControl, 5, 0x8004, buffer, 0x800) == 1) {
-            sys_memcpy((u8 *)getAddressOfExtraSaveBlk(extraSaveControl, 5, 0) + 0x5a0, thSave->unk38, sizeof(thSave->unk38));
+            sys_memcpy((u8 *)getAddressOfExtraSaveBlk(extraSaveControl, 5, 0) + 0x5a0, thSave->unk38,
+                       sizeof(thSave->unk38));
         }
         GFL_HeapFree(buffer);
         freeIntermediateSaveExtraBlksAfterLoad2(extraSaveControl, 5);

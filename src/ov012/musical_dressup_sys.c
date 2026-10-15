@@ -36,8 +36,8 @@ static BOOL func_ov012_02151e68(GameProc *proc, u32 *state, void *param, void *w
     GFL_OvlLoad(OVERLAY_ID(209));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MUSICAL_DRESSUP, 0x40000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(MusicalDressUpWork), HEAPID_MUSICAL_DRESSUP);
-    wk->dressUp = GFL_HeapAllocate(HEAPID_MUSICAL_DRESSUP, sizeof(MusicalDressUpParam), FALSE, "musical_dressup_sys.c",
-                                   80);
+    wk->dressUp =
+        GFL_HeapAllocate(HEAPID_MUSICAL_DRESSUP, sizeof(MusicalDressUpParam), FALSE, "musical_dressup_sys.c", 80);
     wk->param = dressUp;
     wk->dressUp->comm = dressUp->comm;
     wk->dressUp->poke = dressUp->poke;

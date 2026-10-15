@@ -19,7 +19,8 @@ void GimmickDT9_Update(Field *field);
 GameEvent *GimmickDT9_CreateReleaseEvent(GameSystem *gsys);
 // The event that throws the second model from one position to another, its flight rising by height in the middle and
 // lasting frames
-GameEvent *GimmickDT9_CreateThrowEvent(GameSystem *gsys, const VecFx32 *from, const VecFx32 *to, fx32 height, u32 frames);
+GameEvent *GimmickDT9_CreateThrowEvent(GameSystem *gsys, const VecFx32 *from, const VecFx32 *to, fx32 height,
+                                       u32 frames);
 // Plays the second model's animations at the position
 void GimmickDT9_PlayThrown(GameSystem *gsys, const VecFx32 *pos);
 // The event that waits for the second model's first animation to pass its fifth frame

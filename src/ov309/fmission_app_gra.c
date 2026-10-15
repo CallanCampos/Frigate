@@ -144,8 +144,7 @@ static void FMissionAppGra_G3DInit(void) {
 }
 
 FMissionAppGra *FMissionAppGra_Create(u32 layout, HeapID heapId) {
-    FMissionAppGra *graphic =
-        GFL_HeapAllocate(heapId, sizeof(FMissionAppGra), FALSE, "fmission_app_gra.c", 446);
+    FMissionAppGra *graphic = GFL_HeapAllocate(heapId, sizeof(FMissionAppGra), FALSE, "fmission_app_gra.c", 446);
 
     sys_memset(graphic, 0, sizeof(FMissionAppGra));
     G2_BlendNone();

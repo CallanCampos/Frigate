@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/pokedex_skin_save.h"
 #include "gfl/std.h"
+#include "save/pokedex_skin_save.h"
 #include "save/save_control.h"
 
 // The downloaded Pokédex skin, extra save block 7: the characters and the palette of the Pokédex's cover. The ROM has

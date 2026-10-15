@@ -134,12 +134,16 @@ static VersionSpecificID VERSION_SPECIFIC_ZONES[VERSION_SPECIFIC_COUNT] = {
     { ZONE_ROUTE_4, ZONE_ROUTE_4_16 },
 };
 
+// clang-format off
 static const u16 ZONES_WITH_RAILS[12] = {
     ZONE_CASTELIA_CITY,    ZONE_SKYARROW_BRIDGE,     ZONE_VICTORY_ROAD_2,  ZONE_DRAGONSPIRAL_TOWER_5,
     ZONE_DRAGONSPIRAL_TOWER_7, ZONE_GEAR_STATION,    ZONE_ABYSSAL_RUINS,   ZONE_ABYSSAL_RUINS_2,
     ZONE_ABYSSAL_RUINS_3,  ZONE_ABYSSAL_RUINS_4,     ZONE_CASTELIA_CITY_8, ZONE_MARINE_TUBE,
 };
 
+// clang-format on
+
+// clang-format off
 static const ZoneAssignment ZONE_RAIL_ASSIGNMENTS[28] = {
     { ZONE_CASTELIA_CITY, 1 },         { ZONE_SKYARROW_BRIDGE, 17 },      { ZONE_CASTELIA_CITY_2, 2 },
     { ZONE_VICTORY_ROAD_2, 15 },       { ZONE_CELESTIAL_TOWER_2, 20 },    { ZONE_CELESTIAL_TOWER_3, 21 },
@@ -153,11 +157,16 @@ static const ZoneAssignment ZONE_RAIL_ASSIGNMENTS[28] = {
     { ZONE_BLACK_CITY, 0 },
 };
 
+// clang-format on
+
+// clang-format off
 static u16 WT_BT_ZONES[10] = {
     ZONE_WHITE_TREEHOLLOW_2, ZONE_BLACK_TOWER_2,      ZONE_WHITE_TREEHOLLOW_3, ZONE_BLACK_TOWER_3,
     ZONE_BLACK_TOWER_4,      ZONE_WHITE_TREEHOLLOW_4, ZONE_BLACK_TOWER_5,      ZONE_WHITE_TREEHOLLOW_5,
     ZONE_WHITE_TREEHOLLOW_6, ZONE_BLACK_TOWER_6,
 };
+
+// clang-format on
 
 static const u16 BC_WF_LOBBY_ZONES[4] = {
     ZONE_WHITE_FOREST,
@@ -167,11 +176,14 @@ static const u16 BC_WF_LOBBY_ZONES[4] = {
 };
 
 // The two tables that no code of the ROM reads are globals, read by the functions the original link dropped
+// clang-format off
 const u16 BC_WF_ZONES[9] = {
     ZONE_BLACK_CITY,   ZONE_BLACK_CITY_POKEMON_CENTER, ZONE_BLACK_CITY_2,
     ZONE_BLACK_CITY_3, ZONE_BLACK_CITY_4,              ZONE_BLACK_CITY_5,
     ZONE_WHITE_FOREST, ZONE_WHITE_FOREST_POKEMON_CENTER, ZONE_WHITE_FOREST_2,
 };
+
+// clang-format on
 
 static const ZoneAssignment ZONE_CAMERA_ASSIGNMENTS[9] = {
     { ZONE_ANVILLE_TOWN, 6 },      { ZONE_ROUTE_4, 4 },           { ZONE_VILLAGE_BRIDGE, 3 },
@@ -196,7 +208,7 @@ static const u16 NIMBASA_STADIUM_ZONES[5] = {
 };
 
 const u16 GEAR_STATION_PLATFORM_ZONES[9] = {
-    ZONE_GEAR_STATION_2, ZONE_GEAR_STATION_3, ZONE_GEAR_STATION_4, ZONE_GEAR_STATION_5, ZONE_GEAR_STATION_6,
+    ZONE_GEAR_STATION_2, ZONE_GEAR_STATION_3, ZONE_GEAR_STATION_4, ZONE_GEAR_STATION_5,  ZONE_GEAR_STATION_6,
     ZONE_GEAR_STATION_7, ZONE_GEAR_STATION_8, ZONE_BATTLE_SUBWAY,  ZONE_BATTLE_SUBWAY_2,
 };
 
@@ -542,7 +554,8 @@ BOOL IsZoneEntralinkHub(u16 zoneId) {
 
 BOOL GetZoneIsEntralinkAny(u16 zoneId) {
     zoneId = GetVersionedMapChangeZoneNum(zoneId);
-    if ((zoneId >= ZONE_NIMBASA_CITY_GATE && zoneId <= ZONE_UNDELLA_TOWN_GATE) || GetZoneIsEntreeForest(zoneId) == TRUE) {
+    if ((zoneId >= ZONE_NIMBASA_CITY_GATE && zoneId <= ZONE_UNDELLA_TOWN_GATE) ||
+        GetZoneIsEntreeForest(zoneId) == TRUE) {
         return TRUE;
     }
     return FALSE;

@@ -1046,7 +1046,8 @@ static void StartMenu_FreeUnk16C(StartMenuWork *wk) {
 }
 
 static void StartMenu_InitMsg(StartMenuWork *wk) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU_FIELDMAP_CTRL_HYBRID, HEAPID_STARTMENU);
+    wk->msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU_FIELDMAP_CTRL_HYBRID, HEAPID_STARTMENU);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, HEAPID_STARTMENU);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_STARTMENU);
     wk->printQueue = func_02021998(HEAPID_STARTMENU);
@@ -1454,7 +1455,8 @@ static void StartMenu_DrawItem(StartMenuWork *wk, u32 item, u32 row) {
     u8 y = row;
 
     GFL_BGSysLoadScrArea(2, 3, y, ITEM_WIDTH, rows, wk->itemScreens[item], 0, 0, ITEM_WIDTH, rows);
-    GFL_BGSysLoadScrArea(1, 3, y, ITEM_WIDTH, rows, BGWinFrame_GetScreen(wk->textScreens, item), 0, 0, ITEM_WIDTH, rows);
+    GFL_BGSysLoadScrArea(1, 3, y, ITEM_WIDTH, rows, BGWinFrame_GetScreen(wk->textScreens, item), 0, 0, ITEM_WIDTH,
+                         rows);
     GFL_BGSysQueueScrLoad(1);
     GFL_BGSysQueueScrLoad(2);
 }
@@ -1711,7 +1713,8 @@ static void StartMenu_CloseCGearWarning(StartMenuWork *wk) {
 }
 
 static void StartMenu_OpenDSiNotice(StartMenuWork *wk) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, HEAPID_TAIL(HEAPID_STARTMENU));
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, HEAPID_TAIL(HEAPID_STARTMENU));
     StrBuf *str;
 
     wk->notice.window = BmpWin_CreateDynamic(0, 2, 2, 30, 20, 5, 1);

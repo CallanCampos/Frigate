@@ -10,6 +10,7 @@
 #include "nitro/math.h"
 
 #pragma thumb off
+// clang-format off
 asm void sha1_block_constants(void) {
     dcd 0x5a827999
     dcd 0x6ed9eba1
@@ -17,7 +18,10 @@ asm void sha1_block_constants(void) {
     dcd 0xca62c1d6
 }
 
+// clang-format on
+
 // Hand-written assembly in the SDK, so an MWCC asm function here
+// clang-format off
 asm void sha1_block(MATHSHA1Context *context) {
     stmdb sp!, {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
     mov r11, r0
@@ -225,4 +229,6 @@ rounds_60_79:
     add sp, sp, #0x40
     ldmia sp!, {r4, r5, r6, r7, r8, r9, r10, r11, ip, pc}
 }
+
+// clang-format on
 #pragma thumb on

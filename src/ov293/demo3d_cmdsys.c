@@ -1,7 +1,7 @@
 #include "types.h"
-#include "app/demo3d/demo3d_cmdsys.h"
 #include "app/demo3d/demo3d_capture.h"
 #include "app/demo3d/demo3d_cmd.h"
+#include "app/demo3d/demo3d_cmdsys.h"
 #include "app/demo3d/demo3d_data.h"
 #include "app/demo3d/demo3d_engine.h"
 #include "constants/arc.h"

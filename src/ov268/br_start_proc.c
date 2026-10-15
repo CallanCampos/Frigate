@@ -3,12 +3,12 @@
 // br_core.c runs it as BR_PROCID_START
 
 #include "types.h"
-#include "app/battle_recorder/br_start_proc.h"
 #include "app/battle_recorder/br_core.h"
 #include "app/battle_recorder/br_fade.h"
 #include "app/battle_recorder/br_proc_sys.h"
 #include "app/battle_recorder/br_res.h"
 #include "app/battle_recorder/br_sidebar.h"
+#include "app/battle_recorder/br_start_proc.h"
 #include "app/battle_recorder/br_util.h"
 #include "constants/sound.h"
 #include "gfl/bg_sys.h"

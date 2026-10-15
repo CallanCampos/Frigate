@@ -24,6 +24,7 @@ typedef struct {
     u8 days;
 } SurveyQuestion;
 
+// clang-format off
 static const SurveyQuestion data_ov012_0216dad0[] = {
     {1, 0, {0xff, 0xff, 0xff}, 0, 0},
     {1, 1, {0, 0xff, 0xff}, 1, 2},
@@ -73,6 +74,8 @@ static const SurveyQuestion data_ov012_0216dad0[] = {
     {0, 1, {27, 0xff, 0xff}, 100, 0},
     {0, 1, {15, 0xff, 0xff}, 100, 0},
 };
+
+// clang-format on
 
 static BOOL func_ov012_021654a4(void *survey, u16 question);
 static BOOL func_ov012_021654e8(SaveControl *save);

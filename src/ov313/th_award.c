@@ -389,7 +389,8 @@ static void ThAward_InitIcons(ThAwardWork *wk) {
         }
         wk->icons[i].chars =
             func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE, 0, wk->heapId);
-        wk->icons[i].cellAnims = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
+        wk->icons[i].cellAnims =
+            func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
         sys_memset(&setup, 0, sizeof(setup));
         setup.x = positions[i].x;
         setup.y = positions[i].y;

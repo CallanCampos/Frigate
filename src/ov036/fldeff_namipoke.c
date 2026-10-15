@@ -109,6 +109,7 @@ static void func_ov036_021a4ff0(FieldEffectTask *task, void *work);
 static void func_ov036_021a5004(FieldEffectTask *task, void *work);
 static void func_ov036_021a5084(FieldEffectTask *task, void *work);
 
+// clang-format off
 static const FieldEffectTaskVTable SPLASH_TASK_VTABLE = {
     sizeof(SplashTask),
     func_ov036_021a4f2c,
@@ -117,7 +118,10 @@ static const FieldEffectTaskVTable SPLASH_TASK_VTABLE = {
     func_ov036_021a5084,
 };
 
+// clang-format on
+
 // The Pokémon of an actor on the grid
+// clang-format off
 static const FieldEffectTaskVTable NAMIPOKE_TASK_VTABLE = {
     sizeof(NamipokeTask),
     func_ov036_021a4588,
@@ -126,7 +130,10 @@ static const FieldEffectTaskVTable NAMIPOKE_TASK_VTABLE = {
     func_ov036_021a4924,
 };
 
+// clang-format on
+
 // The Pokémon of an actor on a rail
+// clang-format off
 static const FieldEffectTaskVTable NAMIPOKE_RAIL_TASK_VTABLE = {
     sizeof(NamipokeTask),
     func_ov036_021a4588,
@@ -134,6 +141,8 @@ static const FieldEffectTaskVTable NAMIPOKE_RAIL_TASK_VTABLE = {
     func_ov036_021a4944,
     func_ov036_021a4bc0,
 };
+
+// clang-format on
 
 void *func_ov036_021a4384(FieldEffects *effects, HeapID heapId) {
     FieldEffectNamipoke *namipoke =
@@ -374,8 +383,7 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
         if (namiTask->dir != wake->dir) {
             wake->dir = namiTask->dir;
             wake->pos = actorPos;
-        } else if (actorPos.x == wake->actorPos.x && actorPos.y == wake->actorPos.y &&
-                   actorPos.z == wake->actorPos.z) {
+        } else if (actorPos.x == wake->actorPos.x && actorPos.y == wake->actorPos.y && actorPos.z == wake->actorPos.z) {
             // The actor stopped: the wake catches up
             switch (wake->dir) {
             case DIR_UP:
@@ -500,8 +508,7 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
         if (namiTask->dir != wake->dir) {
             wake->dir = namiTask->dir;
             wake->pos = actorPos;
-        } else if (actorPos.x == wake->actorPos.x && actorPos.y == wake->actorPos.y &&
-                   actorPos.z == wake->actorPos.z) {
+        } else if (actorPos.x == wake->actorPos.x && actorPos.y == wake->actorPos.y && actorPos.z == wake->actorPos.z) {
             // The actor stopped: the wake catches up
             wake->pos.x += FX_Mul(forward.x, FX32_CONST(4));
             wake->pos.z += FX_Mul(forward.z, FX32_CONST(4));
@@ -734,8 +741,7 @@ static void func_ov036_021a5004(FieldEffectTask *task, void *work) {
     }
     objSys = func_ov036_021a3724(splashTask->params.splash->effects);
     if (splashTask->params.kind == 0) {
-        if (splashTask->animEnded == FALSE &&
-            !FieldG3DObjSystem_StepObjAnm(objSys, splashTask->objIdx, FX32_ONE)) {
+        if (splashTask->animEnded == FALSE && !FieldG3DObjSystem_StepObjAnm(objSys, splashTask->objIdx, FX32_ONE)) {
             splashTask->animEnded = TRUE;
         }
     } else {

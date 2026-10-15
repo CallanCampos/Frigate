@@ -176,8 +176,7 @@ static void MBWm_ParentCallback(void *arg) {
                 }
                 MBWm_ReportError(MB_WM_API_START_MP,
                                  func_020818f8(MBWm_ParentCallback, sWmWork->recvBuf, sWmWork->recvBufSize,
-                                               sWmWork->sendBuf, sWmWork->sendBufSize, singleMode, 0, 0, 0,
-                                               1, 1));
+                                               sWmWork->sendBuf, sWmWork->sendBufSize, singleMode, 0, 0, 0, 1, 1));
                 return;
             }
             if (MBWm_CanSend()) {
@@ -402,26 +401,23 @@ static void MBWm_ChildCallback(void *arg) {
                 BOOL valid;
                 int k;
 
-                valid = desc->gameInfoLength >= 0x10 && desc->gameInfoLength <= 0x80
-                     && desc->gameInfoLength == desc->gameInfo.userGameInfoLength + 0x10
-                     && desc->gameInfo.magicNumber == 1
-                     && desc->length == (desc->gameInfoLength + 1 + offsetof(WMBssDesc, gameInfo)) / sizeof(u16);
+                valid = desc->gameInfoLength >= 0x10 && desc->gameInfoLength <= 0x80 &&
+                        desc->gameInfoLength == desc->gameInfo.userGameInfoLength + 0x10 &&
+                        desc->gameInfo.magicNumber == 1 &&
+                        desc->length == (desc->gameInfoLength + 1 + offsetof(WMBssDesc, gameInfo)) / sizeof(u16);
                 if (!valid || !MBWm_IsMultibootBeacon(desc)) {
                     usable++;
                     continue;
                 }
-                if (sFilterGgid == 1
-                    && (desc->gameInfo.ggid & sWmConfig.ggidMask) == (sWmConfig.ggid & sWmConfig.ggidMask)) {
+                if (sFilterGgid == 1 &&
+                    (desc->gameInfo.ggid & sWmConfig.ggidMask) == (sWmConfig.ggid & sWmConfig.ggidMask)) {
                     usable++;
                     continue;
                 }
                 for (k = 0; k < work->scanCount ? TRUE : FALSE; k++) {
-                    BOOL same = desc->bssid[0] == entries[k].bssid[0]
-                             && desc->bssid[1] == entries[k].bssid[1]
-                             && desc->bssid[2] == entries[k].bssid[2]
-                             && desc->bssid[3] == entries[k].bssid[3]
-                             && desc->bssid[4] == entries[k].bssid[4]
-                             && desc->bssid[5] == entries[k].bssid[5];
+                    BOOL same = desc->bssid[0] == entries[k].bssid[0] && desc->bssid[1] == entries[k].bssid[1] &&
+                                desc->bssid[2] == entries[k].bssid[2] && desc->bssid[3] == entries[k].bssid[3] &&
+                                desc->bssid[4] == entries[k].bssid[4] && desc->bssid[5] == entries[k].bssid[5];
 
                     if (same) {
                         entries[k].gameInfoLength = desc->gameInfoLength;

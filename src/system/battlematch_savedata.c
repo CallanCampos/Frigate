@@ -1,11 +1,11 @@
 #include "types.h"
-#include "save/records.h"
 #include "app/livebattlematch_flow.h"
 #include "gfl/net.h"
 #include "gfl/rtc_cache.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"
+#include "save/records.h"
 #include "save/save_control.h"
 
 // The save block of the battle competitions: the results of the live competition (livematch_savedata.c) and of the

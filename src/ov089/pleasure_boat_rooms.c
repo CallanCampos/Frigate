@@ -76,11 +76,14 @@ static const RoomSide sRoomSides[PLEASURE_BOAT_ROOM_COUNT] = {
     { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 1, 1 }, { 1, 1 },
 };
 
+// clang-format off
 static const TrainerEntry sTrainers[TRAINER_TABLE_SIZE] = {
     { 52, 19, { 15, 16 } }, { 30, 32, { 19, 20 } }, { 31, 31, { 23, 24 } }, { 11, 16, { 27, 28 } },
     { 15, 33, { 32, 33 } }, { 13, 34, { 36, 37 } }, { 17, 35, { 40, 41 } }, { 44, 37, { 45, 46 } },
     { 45, 36, { 50, 51 } }, { 65, 141, { 55, 56 } },
 };
+
+// clang-format on
 
 // The same, once the flag of PleasureBoat_Create is set
 static const TrainerEntry sTrainersAlt[TRAINER_TABLE_SIZE] = {

@@ -52,7 +52,7 @@ static void func_ov012_0216055c(GameBeacon *info, u8 value, u8 extra, u32 type);
 static void func_ov012_02160598(GameBeacon *info);
 static void func_ov012_02160604(GameBeacon *info, u8 extra, u16 value, u16 type);
 
-static const u8 data_ov012_0216d718[5] = {10, 30, 50, 100, 200};
+static const u8 data_ov012_0216d718[5] = { 10, 30, 50, 100, 200 };
 
 void func_ov012_0215f958(u16 value) {
     if (GameBeacon_IsSpecialSpecies(value)) {
@@ -565,7 +565,8 @@ void func_ov012_02160390(GameData *gameData, u16 value) {
 }
 
 static void func_ov012_021603bc(GameBeacon *info, GameData *gameData, u16 value) {
-    wcharsncpy(TrainerGameInfo_GetThanks(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))), info->payload.named.name, 9);
+    wcharsncpy(TrainerGameInfo_GetThanks(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))),
+               info->payload.named.name, 9);
     info->type = 0x18;
     info->payload.named.value = value;
     GameBeacon_ClearRecent(info);

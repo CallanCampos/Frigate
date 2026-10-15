@@ -68,7 +68,7 @@ static BOOL LocalTvtCalling_IsFinished(LocalTvtCalling *calling);
 
 // The persons in the order of the list, and the messages of their names
 static const LocalTvtCallPerson sLocalTvtCallPersons[LOCAL_TVT_CALL_COUNT] = {
-    { LOCAL_TVT_CALL_DOCTOR, 4 }, { LOCAL_TVT_CALL_RIVAL, 1 },  { LOCAL_TVT_CALL_CHELEN, 2 },
+    { LOCAL_TVT_CALL_DOCTOR, 4 },  { LOCAL_TVT_CALL_RIVAL, 1 },  { LOCAL_TVT_CALL_CHELEN, 2 },
     { LOCAL_TVT_CALL_SUPPORT, 3 }, { LOCAL_TVT_CALL_MOTHER, 5 }, { LOCAL_TVT_CALL_SECRET, 6 },
 };
 

@@ -95,15 +95,16 @@ static u32 LiveBattleMatchFlow_GetResultMessageId(LiveBattleMatchFlow *wk);
 static void LiveBattleMatchFlow_PrintResult(LiveBattleMatchFlow *wk);
 
 // Prints a message, and goes to the step that waits for it, after which the task goes to the step next
-static inline void LiveBattleMatchFlow_PrintAndWait(LiveBattleMatchFlow *wk, WifiBattleMatchTask *task, u32 *seq, u32 msgId,
-                                                    u32 type, u32 waitSeq, u32 next) {
+static inline void LiveBattleMatchFlow_PrintAndWait(LiveBattleMatchFlow *wk, WifiBattleMatchTask *task, u32 *seq,
+                                                    u32 msgId, u32 type, u32 waitSeq, u32 next) {
     LiveBattleMatchFlow_PrintMessage(wk, msgId, type);
     *seq = waitSeq;
     WifiBattleMatchTask_SetReturnSeq(task, next);
 }
 
 LiveBattleMatchFlow *LiveBattleMatchFlow_Create(const LiveBattleMatchFlowParam *param, HeapID heapId) {
-    LiveBattleMatchFlow *wk = GFL_HeapAllocate(heapId, sizeof(LiveBattleMatchFlow), FALSE, "livebattlematch_flow.c", 270);
+    LiveBattleMatchFlow *wk =
+        GFL_HeapAllocate(heapId, sizeof(LiveBattleMatchFlow), FALSE, "livebattlematch_flow.c", 270);
 
     sys_memset(wk, 0, sizeof(LiveBattleMatchFlow));
     wk->param = *param;
@@ -116,7 +117,8 @@ LiveBattleMatchFlow *LiveBattleMatchFlow_Create(const LiveBattleMatchFlowParam *
     wk->font = GFL_FontCreate(0x17, 3, 0, 0, heapId);
     wk->task = WifiBattleMatchTask_Create(wk, LiveBattleMatchFlow_StepInit, heapId);
     wk->irc = LiveBattleMatchIrc_Create(wk->param.gameData, heapId);
-    wk->linkIcon = WifiBattleMatchLinkIcon_Create(WifiBattleMatchGraphic_GetClActUnit(wk->param.net), wk->param.seq, heapId);
+    wk->linkIcon =
+        WifiBattleMatchLinkIcon_Create(WifiBattleMatchGraphic_GetClActUnit(wk->param.net), wk->param.seq, heapId);
     WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
     wk->entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(wk->param.gameData)), 1);
     wk->record = func_0200f2d8(getRecordBlkAddress(GameData_GetSaveControl(wk->param.gameData)));
@@ -910,7 +912,8 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 14:
         if (LiveBattleMatchIrc_TakePlayerData(wk->irc, &received)) {
-            sys_memcpy(received, wk->param.partnerData, PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE);
+            sys_memcpy(received, wk->param.partnerData,
+                       PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE);
             *seq = 15;
         }
         break;
@@ -1258,8 +1261,8 @@ static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, vo
     }
 }
 
-// Shows a menu of kind 0 (yes or no at the right), 1 (the menu of a player with an entry), 2 (the menu of a player whose
-// entry ended) or 3 (yes or no, which can be left)
+// Shows a menu of kind 0 (yes or no at the right), 1 (the menu of a player with an entry), 2 (the menu of a player
+// whose entry ended) or 3 (yes or no, which can be left)
 static void LiveBattleMatchFlow_MenuStart(LiveBattleMatchFlow *wk, u32 kind) {
     WifiBattleMatchMenuParam param;
     u32 corner;
@@ -1378,13 +1381,16 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         card.unkA6 = Regulation_GetParam(regulation, 0x16);
         card.look = func_02008bf4(info);
         sys_memcpy(func_0200b794(wk->entry), card.data, sizeof(card.data));
-        card.startDate = LiveBattleMatchFlow_PackCode(TournamentEntry_GetField(wk->entry, 4), TournamentEntry_GetField(wk->entry, 5),
-                                                  TournamentEntry_GetField(wk->entry, 6));
-        card.endDate = LiveBattleMatchFlow_PackCode(TournamentEntry_GetField(wk->entry, 7), TournamentEntry_GetField(wk->entry, 8),
-                                                  TournamentEntry_GetField(wk->entry, 9));
+        card.startDate =
+            LiveBattleMatchFlow_PackCode(TournamentEntry_GetField(wk->entry, 4), TournamentEntry_GetField(wk->entry, 5),
+                                         TournamentEntry_GetField(wk->entry, 6));
+        card.endDate =
+            LiveBattleMatchFlow_PackCode(TournamentEntry_GetField(wk->entry, 7), TournamentEntry_GetField(wk->entry, 8),
+                                         TournamentEntry_GetField(wk->entry, 9));
         card.variant = TournamentEntry_GetField(wk->entry, 11);
-        wk->playerCard = WifiBattleMatchLiveCard_Create(&card, info, link, wk->param.seq, wk->param.font, wk->param.printQueue,
-                                             wk->msgCard, wk->wordSet, records, 0, wk->heapId);
+        wk->playerCard =
+            WifiBattleMatchLiveCard_Create(&card, info, link, wk->param.seq, wk->param.font, wk->param.printQueue,
+                                           wk->msgCard, wk->wordSet, records, 0, wk->heapId);
     }
 }
 
@@ -1418,7 +1424,8 @@ static void LiveBattleMatchFlow_PartnerCardCreate(LiveBattleMatchFlow *wk, LiveB
         ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
         u32 field11 = TournamentEntry_GetField(wk->entry, 11);
 
-        wk->partnerCard = WifiBattleMatchPartnerCard_Create(data, link, wk->param.seq, wk->param.font, wk->param.printQueue,
+        wk->partnerCard =
+            WifiBattleMatchPartnerCard_Create(data, link, wk->param.seq, wk->param.font, wk->param.printQueue,
                                               wk->msgCard, wk->wordSet, 1, 0, field11, wk->heapId);
     }
 }
@@ -1439,8 +1446,8 @@ static void LiveBattleMatchFlow_TeamListCreate(LiveBattleMatchFlow *wk) {
         ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
         BattleBoxSave *battleBox = getBattleBox(GameData_GetSaveControl(wk->param.gameData));
 
-        wk->teamList = WifiBattleMatchTeamList_Create(battleBox, link, wk->param.seq, wk->font, wk->param.printQueue, wk->msgCard,
-                                           wk->heapId);
+        wk->teamList = WifiBattleMatchTeamList_Create(battleBox, link, wk->param.seq, wk->font, wk->param.printQueue,
+                                                      wk->msgCard, wk->heapId);
     }
 }
 
@@ -1461,7 +1468,8 @@ static BOOL LiveBattleMatchFlow_TeamListIsDone(LiveBattleMatchFlow *wk) {
 
 // Copies the team of the battle box into dest
 static void LiveBattleMatchFlow_LoadTeam(LiveBattleMatchFlow *wk, PokeParty *dest) {
-    PokeParty *party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(wk->param.gameData)), wk->heapId);
+    PokeParty *party =
+        convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(wk->param.gameData)), wk->heapId);
 
     sys_memcpy(party, dest, PokeParty_GetSaveDataSize());
     GFL_HeapFree(party);

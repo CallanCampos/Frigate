@@ -2,10 +2,10 @@
 #define POKEBW2_FIELD_BSUBWAY_SCR_H
 
 #include "types.h"
+#include "app/ircbattlematch.h"
 #include "app/ov306.h"
 #include "battle/btl_setup.h"
 #include "gfl/heap.h"
-#include "app/ircbattlematch.h"
 #include "gfl/proc.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
@@ -243,6 +243,5 @@ typedef struct {
     u16 min;
     u16 max;
 } BSubwayTrainerRange;
-
 
 #endif // POKEBW2_FIELD_BSUBWAY_SCR_H

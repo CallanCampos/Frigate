@@ -467,8 +467,8 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         break;
     case TALK_STATE_SEND_INVITE:
         if (!CtvtTalk_CheckGameCancel(sys, talk) &&
-            CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_B,
-                                CtvtGame_GetType(CommTvt_GetGame(sys))) == TRUE) {
+            CtvtComm_SendPacket(sys, CommTvt_GetComm(sys), CTVT_PACKET_UNK_B, CtvtGame_GetType(CommTvt_GetGame(sys))) ==
+                TRUE) {
             talk->state = TALK_STATE_WAIT_ANSWERS;
             CtvtTalk_PrintGameMessage(sys, talk, 45, NULL, 0);
             talk->gameMenu = func_ov257_021aac98(sys, 24, 15);

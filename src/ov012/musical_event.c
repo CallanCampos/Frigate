@@ -83,15 +83,16 @@ static u8 func_ov012_02151b14(MusicalEventWork *work, u8 pos);
 static u32 func_ov012_02151b4c(PlayerInfo *info);
 static void func_ov012_02151e0c(MusicalEventWork *work);
 
-static const VecFx32 data_ov012_0216ade4 = {FX32_CONST(232), 0, FX32_CONST(200)};
+static const VecFx32 data_ov012_0216ade4 = { FX32_CONST(232), 0, FX32_CONST(200) };
 // MWCC lays these two out in the reverse of their definitions
-static const VecFx32 data_ov012_0216adfc = {FX32_CONST(168), 0, FX32_CONST(200)};
-static const VecFx32 data_ov012_0216adf0 = {FX32_CONST(136), 0, FX32_CONST(200)};
+static const VecFx32 data_ov012_0216adfc = { FX32_CONST(168), 0, FX32_CONST(200) };
+static const VecFx32 data_ov012_0216adf0 = { FX32_CONST(136), 0, FX32_CONST(200) };
 
 // The total points from which a number of the program's prize slots is drawn, from 10 slots down
-static const u16 data_ov012_0216ae08[10] = {12000, 8000, 5500, 3500, 2000, 1000, 500, 250, 100, 0};
+static const u16 data_ov012_0216ae08[10] = { 12000, 8000, 5500, 3500, 2000, 1000, 500, 250, 100, 0 };
 
 // The props each program can give
+// clang-format off
 static const u8 data_ov012_0216ae1c[7][40] = {
     {0x19, 0x1a, 0x4b, 0x21, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x30, 0x31, 0x32, 0x3c, 0x40, 0x46, 0x47, 0x48, 0x51,
      0x53, 0x55, 0x5e, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x08, 0x0d, 0x0e, 0x12, 0x24, 0x25, 0x10, 0x11, 0x14, 0x15, 0x20},
@@ -108,6 +109,8 @@ static const u8 data_ov012_0216ae1c[7][40] = {
     {0x21, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x31, 0x32, 0x3c, 0x47, 0x48, 0x0b, 0x2f, 0x49, 0x4a, 0x1f, 0x4f, 0x61,
      0x25, 0x39, 0x3b, 0x3d, 0x3e, 0x3f, 0x42, 0x45, 0x4d, 0x4e, 0x5b, 0x23, 0x2e, 0x33, 0x34, 0x35, 0x4c, 0x58, 0x59, 0x5a},
 };
+
+// clang-format on
 
 GameEvent *func_ov012_02150cf8(GameSystem *gsys, GameData *gameData, u8 slot, BOOL online, MusicalCommWork *comm) {
     GameEvent *event;
@@ -144,7 +147,7 @@ GameEvent *func_ov012_02150cf8(GameSystem *gsys, GameData *gameData, u8 slot, BO
     work->ov210 = MusicalSystem_InitProgramData(HEAPID_GAMEEVENT);
     if (work->online == FALSE || func_ov211_021f04a0(work->commWork->comm) == TRUE) {
         MusicalSystem_LoadProgramData(work->ov210, work->save, work->gameData, func_0200aee4(work->musicalSave),
-                            HEAPID_MUSICAL_EVENT);
+                                      HEAPID_MUSICAL_EVENT);
     }
     if (work->online == TRUE) {
         work->state = 11;
@@ -585,7 +588,7 @@ static void func_ov012_0215168c(MusicalEventWork *work) {
     func_0200aedc(work->musicalSave, points);
     func_0200af1c(work->musicalSave, points);
     {
-        u8 counts[4] = {0};
+        u8 counts[4] = { 0 };
 
         items = MusItemData_Init(HEAPID_GAMEEVENT);
         poke = work->stage->pokes[work->playerPos];

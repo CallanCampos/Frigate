@@ -127,7 +127,7 @@ static inline BOOL UnionEff_IsOnSpot(const s16 (*spots)[2], int count, int x, in
 BOOL UnionEff_IsOnSeatSpot(Field *field) {
     static const s16 spotsA[5][2] = { { 0x48, 0xa8 }, { 0x58, 0xa8 }, { 0x68, 0xa8 }, { 0x78, 0xa8 }, { 0x88, 0xa8 } };
     static const s16 spotsB[5][2] = { { 0x48, 0xa8 }, { 0x58, 0xa8 }, { 0x68, 0xa8 }, { 0x78, 0xa8 }, { 0x88, 0xa8 } };
-    const s16 (*spots)[2];
+    const s16(*spots)[2];
     VecFx32 pos;
     int i;
     int count;

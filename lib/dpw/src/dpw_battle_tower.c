@@ -1,5 +1,4 @@
 #include "dpw/dpw_bt.h"
-
 #include "dpw_internal.h"
 #include "dwc/gamestats.h"
 #include "nitro/os.h"

@@ -704,8 +704,8 @@ static const u8 sPkwdBookPosterGraphics[MOVIE_COUNT] = {
 };
 
 static const PkwdBookWindowSetup sPkwdBookMainWindows[7] = {
-    { 1, 2, 1, 28, 2, 5 },  { 1, 2, 5, 28, 2, 6 },  { 1, 2, 12, 28, 2, 6 },  { 1, 2, 3, 28, 2, 7 },
-    { 1, 3, 7, 28, 4, 7 },  { 1, 3, 14, 28, 4, 7 }, { 0xff, 0, 0, 0, 0, 0 },
+    { 1, 2, 1, 28, 2, 5 }, { 1, 2, 5, 28, 2, 6 },  { 1, 2, 12, 28, 2, 6 },  { 1, 2, 3, 28, 2, 7 },
+    { 1, 3, 7, 28, 4, 7 }, { 1, 3, 14, 28, 4, 7 }, { 0xff, 0, 0, 0, 0, 0 },
 };
 
 static const PkwdBookLoad sPkwdBookPosterChars[14] = {
@@ -720,12 +720,15 @@ static const PkwdBookLoad sPkwdBookPosterScreens[14] = {
     { 2, 0x44, 0, 0 }, { 2, 0x45, 0, 0 }, { 2, 0x46, 0, 0 }, { 0xff, 0, 0, 0 },
 };
 
+// clang-format off
 static const PkwdBookActorEntry sPkwdBookTypeIconActors[TYPE_ICON_COUNT + 1] = {
     { 0, 0x30, 1, 0, 0, 1, 11, RES_TYPE_ICON_CHARS },     { 0, 0x30, 1, 0, 0, 1, 12, RES_TYPE_ICON_CHARS + 1 },
     { 0, 0x30, 1, 0, 0, 1, 13, RES_TYPE_ICON_CHARS + 2 }, { 0, 0x30, 1, 0, 0, 1, 14, RES_TYPE_ICON_CHARS + 3 },
     { 0, 0x30, 1, 0, 0, 1, 15, RES_TYPE_ICON_CHARS + 4 }, { 0, 0x30, 1, 0, 0, 1, 16, RES_TYPE_ICON_CHARS + 5 },
     { 0xff, 0, 0, 0, 0, 0, 0, 0 },
 };
+
+// clang-format on
 
 const GameProcFunctions PKWD_BOOK_PROC_FUNCTIONS = { PkwdBook_Init, PkwdBook_Main, PkwdBook_Exit };
 
@@ -736,13 +739,17 @@ static const PkwdBookActorEntry sPkwdBookPokeIconActors[POKE_ICON_COUNT + 1] = {
     { 1, 0x28, 1, 0, 0, 0, 10, RES_POKE_ICON_CHARS + 6 }, { 0xff, 0, 0, 0, 0, 0, 0, 0 },
 };
 
+// clang-format off
 static const PkwdBookWindowSetup sPkwdBookPokemonWindows[12] = {
     { 4, 2, 1, 28, 2, 10 },  { 4, 1, 6, 10, 2, 13 },  { 4, 2, 11, 10, 2, 13 }, { 4, 4, 15, 12, 2, 13 },
     { 4, 13, 15, 12, 2, 13 }, { 4, 16, 4, 12, 2, 13 }, { 4, 16, 7, 12, 2, 13 }, { 4, 16, 10, 12, 2, 13 },
     { 4, 16, 13, 12, 2, 13 }, { 4, 4, 17, 12, 2, 13 }, { 4, 13, 17, 12, 2, 13 }, { 0xff, 0, 0, 0, 0, 0 },
 };
 
+// clang-format on
+
 // The list's touch table when all its movies fit, with no scroll bar
+// clang-format off
 static const FrameListTouch sPkwdBookShortListTouch[10] = {
     { { 0, 23, 16, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
     { { 24, 47, 16, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
@@ -755,6 +762,8 @@ static const FrameListTouch sPkwdBookShortListTouch[10] = {
     { { 168, 192, 168, 192 }, FRAMELIST_TOUCH_PAGE_DOWN },
     { { TOUCH_RECT_END, 0, 0, 0 }, 0 },
 };
+
+// clang-format on
 
 static const FrameListTouch sPkwdBookListTouch[11] = {
     { { 0, 23, 16, 231 }, FRAMELIST_TOUCH_ITEM_DECIDE },
@@ -780,6 +789,7 @@ static const PkwdBookActorEntry sPkwdBookMarkActors[MARK_ACTOR_COUNT + 1] = {
 };
 
 // The scripts of each movie, for a boy and then for a girl
+// clang-format off
 static const u16 sPkwdBookScriptBanks[MOVIE_COUNT * 2] = {
     TEXT_BANK_0182, TEXT_BANK_0181,
     TEXT_BANK_0184, TEXT_BANK_0183,
@@ -824,6 +834,8 @@ static const u16 sPkwdBookScriptBanks[MOVIE_COUNT * 2] = {
     TEXT_BANK_0262, TEXT_BANK_0261,
 };
 
+// clang-format on
+
 static const PkwdBookWindowSetup *sPkwdBookSubWindows[3] = {
     sPkwdBookListWindows,
     sPkwdBookCastWindows,
@@ -844,11 +856,14 @@ static const PkwdBookLabel *sPkwdBookLabels[4] = {
     sPkwdBookPokemonLabels,
 };
 
+// clang-format off
 static PkwdBookPageFunc sPkwdBookPageFuncs[PAGE_STATE_COUNT] = {
     PkwdBook_EnterList,    PkwdBook_RunList,    PkwdBook_LeaveList,
     PkwdBook_EnterCast,    PkwdBook_RunCast,    PkwdBook_LeaveCast,
     PkwdBook_EnterPokemon, PkwdBook_RunPokemon, PkwdBook_LeavePokemon,
 };
+
+// clang-format on
 
 static BOOL PkwdBook_Init(GameProc *proc, u32 *state, void *param, void *work) {
     PkwdBookWork *wk;
@@ -1195,8 +1210,7 @@ static void PkwdBook_LoadPokeIconRes(PkwdBookWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(wk->heapId));
     u32 i;
 
-    wk->resources.named.pokeIconPalette =
-        func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
+    wk->resources.named.pokeIconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, wk->heapId);
     wk->resources.named.pokeIconCells =
         func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), wk->heapId);
     for (i = 0; i < POKE_ICON_COUNT; i++) {
@@ -1211,9 +1225,8 @@ static void PkwdBook_SetPokeIcon(PkwdBookWork *wk, u32 slot, u32 species, u32 se
     u32 palette = PokeIcon_GetPalette(species, 0, sex, FALSE);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(wk->heapId));
     NNSG2dCharacterData *charData;
-    void *file =
-        GFL_G2DIOReadOBJNCGRArc(arc, PokeParty_GetIconIndex(species, 1, sex, FALSE), FALSE, &charData,
-                                HEAPID_TAIL(wk->heapId));
+    void *file = GFL_G2DIOReadOBJNCGRArc(arc, PokeParty_GetIconIndex(species, 1, sex, FALSE), FALSE, &charData,
+                                         HEAPID_TAIL(wk->heapId));
 
     func_0204ba40(wk->resources.named.pokeIconChars[slot], charData);
     GFL_HeapFree(file);

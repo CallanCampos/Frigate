@@ -25,7 +25,6 @@ struct SweetScentPalette {
     u16 second;
 };
 
-
 GameEvent *EventSweetScent_Create(Field *field, GameSystem *gsys);
 GameEvent *func_ov033_021785d4(GameSystem *gsys, Field *field, u8 partySlot);
 GameEventReturnCode EventSweetScent_Callback(GameEvent *event, u32 *state, void *data);

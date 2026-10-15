@@ -5,8 +5,8 @@
 // switches. Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "struct_decls.h"
 #include "field/field_script.h"
+#include "struct_decls.h"
 #include "system/vm.h"
 
 BOOL s0098_BGMPlay(VM *vm, FieldScriptEnv *env);

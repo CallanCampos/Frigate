@@ -65,8 +65,7 @@ static void func_ov137_021f11cc(ResortPerson *person, const ResortPersonSetup *s
 static void func_ov137_021f11e0(ResortPerson *person, const ResortPersonSetup *setup, ZoneNPC *npc);
 static void func_ov137_021f1208(ResortPerson *person, u16 *x, u16 *z, u16 *dir);
 static void func_ov137_021f122c(ResortPerson *person, const ResortPersonSetup *setup);
-static ResortPerson *func_ov137_021f1464(ResortPeople *people, const ResortPersonSource *source, BOOL unk20,
-                                         u16 index);
+static ResortPerson *func_ov137_021f1464(ResortPeople *people, const ResortPersonSource *source, BOOL unk20, u16 index);
 static void func_ov137_021f14d8(ResortPeople *people, ResortPerson *person);
 static void func_ov137_021f1504(ResortPeople *people);
 static void func_ov137_021f1670(ResortPeople *people);
@@ -74,14 +73,17 @@ static void func_ov137_021f16d0(ResortPeople *people, const ResortPersonSource *
                                 ResortPersonSetup *setup);
 static BOOL func_ov137_021f1700(int uid);
 
-static const u32 sKinds[] = {0, 4};
+static const u32 sKinds[] = { 0, 4 };
+// clang-format off
 static const ResortPersonType sTypes[] = {
     {func_ov137_021f1114, func_ov137_021f113c},
     {func_ov137_021f11b8, NULL},
     {func_ov137_021f11cc, NULL},
     {func_ov137_021f11e0, func_ov137_021f1208},
 };
-static const ZoneNPC sNpcTemplate = {0};
+
+// clang-format on
+static const ZoneNPC sNpcTemplate = { 0 };
 
 static ResortPerson *func_ov137_021f0e98(HeapID heapId, const ResortPersonSetup *setup) {
     u32 a;

@@ -7,6 +7,7 @@
 // header. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except IsDayPeriodNight
 
 // The hour each period starts at, by season
+// clang-format off
 static const u8 LIGHT_CHANGE_HOURS[SEASON_COUNT][DAY_PERIOD_COUNT] = {
     {  5, 10, 17, 20, 0 },
     {  4,  9, 19, 21, 0 },
@@ -14,7 +15,10 @@ static const u8 LIGHT_CHANGE_HOURS[SEASON_COUNT][DAY_PERIOD_COUNT] = {
     {  7, 11, 17, 19, 0 },
 };
 
+// clang-format on
+
 // The period of each hour, by season
+// clang-format off
 static const u8 day_part[SEASON_COUNT][24] = {
     {
         DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT, DAY_PERIOD_MIDNIGHT,
@@ -49,6 +53,8 @@ static const u8 day_part[SEASON_COUNT][24] = {
         DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT, DAY_PERIOD_NIGHT,
     },
 };
+
+// clang-format on
 
 u16 GetRealTimeDayPeriod(int season) {
     RTCTime time;

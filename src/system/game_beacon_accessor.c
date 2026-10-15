@@ -1,5 +1,4 @@
 #include "types.h"
-#include "system/game_beacon.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/species.h"
@@ -13,6 +12,7 @@
 #include "nitro/mi.h"
 #include "save/high_link.h"
 #include "save/survey_savedata.h"
+#include "system/game_beacon.h"
 #include "system/pms_data.h"
 #include "system/wordset.h"
 
@@ -53,7 +53,7 @@ enum {
 #define BEACON_MOVE_COUNT (MOVE_FUSION_BOLT + 1)
 
 static int GameBeaconInfoTable_Add(GameBeaconInfoTable *table, const GameBeacon *beacon, const GameBeaconTime *time,
-                         BOOL overwrite);
+                                   BOOL overwrite);
 static u16 func_02013ebc(const GameBeacon *beacon);
 static u16 func_02013f00(const GameBeacon *beacon);
 static u16 func_02013f14(const GameBeacon *beacon);
@@ -97,6 +97,7 @@ static BOOL (*const sFormatChecks[BEACON_FORMAT_COUNT])(const GameBeacon *beacon
 };
 
 // By beacon type; the types from BEACON_FORMAT_TYPE_MAX on have no format
+// clang-format off
 static const GameBeaconTypeFormat sTypeFormats[BEACON_FORMAT_TYPE_MAX] = {
     { 0, 0 }, { 0, 0 }, { 2, 1 }, { 2, 2 },
     { 2, 1 }, { 2, 2 }, { 1, 1 }, { 1, 2 },
@@ -114,6 +115,8 @@ static const GameBeaconTypeFormat sTypeFormats[BEACON_FORMAT_TYPE_MAX] = {
     { 16, 10 }, { 17, 10 }, { 17, 10 }, { 17, 10 },
     { 17, 10 }, { 0, 10 }, { 18, 10 }, { 18, 10 },
 };
+
+// clang-format on
 
 int GameBeaconInfoTable_TakeNew(GameBeaconInfoTable *table) {
     int count = 0;
@@ -167,7 +170,7 @@ void GameBeaconInfoTable_MarkAllNew(GameBeaconInfoTable *table) {
 // Stores a beacon in the list, over the one of the same trainer or in the first free entry, and returns the entry.
 // When the list is full, it drops the first beacon if overwrite is set, and else returns GAME_BEACON_LOG_MAX
 static int GameBeaconInfoTable_Add(GameBeaconInfoTable *table, const GameBeacon *beacon, const GameBeaconTime *time,
-                         BOOL overwrite) {
+                                   BOOL overwrite) {
     int i;
 
     for (i = 0; i < GAME_BEACON_LOG_MAX; i++) {
@@ -869,8 +872,8 @@ static BOOL func_02014430(const GameBeacon *beacon) {
 }
 
 static BOOL func_02014470(const GameBeacon *beacon) {
-    if (beacon->payload.withExtra.value != ZONE_WHITE_TREEHOLLOW
-        && beacon->payload.withExtra.value != ZONE_BLACK_TOWER) {
+    if (beacon->payload.withExtra.value != ZONE_WHITE_TREEHOLLOW &&
+        beacon->payload.withExtra.value != ZONE_BLACK_TOWER) {
         return TRUE;
     }
     if (beacon->payload.withExtra.extra >= 10) {

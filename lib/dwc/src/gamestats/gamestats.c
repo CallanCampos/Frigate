@@ -1,5 +1,4 @@
 #include "dwc/gamestats.h"
-
 #include "gamestats_internal.h"
 
 // The client of the game statistics server, see gamestats.h. A call is a small state machine that the game runs every
@@ -19,8 +18,8 @@ typedef struct GamestatsClient {
     BOOL configured;
     char gameName[0x20];
     GamestatsSecret secret;
-    // The scrambling of the payload: a generator of numbers with a multiplier, an increment and a modulus, and the key that
-    // the checksum of the payload is xored with
+    // The scrambling of the payload: a generator of numbers with a multiplier, an increment and a modulus, and the key
+    // that the checksum of the payload is xored with
     u32 multiplier;
     u32 increment;
     u32 modulus;
@@ -43,7 +42,8 @@ typedef struct GamestatsClient {
 static u32 GamestatsEncodedSize(u32 size);
 static void SeedRandom(u32 seed);
 static u8 NextRandom(void);
-static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus, u32 hashKey);
+static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus,
+                      u32 hashKey);
 static BOOL CheckAnswer(char *data, int size);
 static void OnSent(void);
 static void OnAnswered(char *data, int size, int status, void *arg);
@@ -53,7 +53,7 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
 
 static int sRandomState;
 static const char *sBaseUrl;
-static GamestatsClient sClient = {2};
+static GamestatsClient sClient = { 2 };
 
 // The size of size bytes in base64
 static u32 GamestatsEncodedSize(u32 size) {
@@ -72,7 +72,8 @@ static u8 NextRandom(void) {
 
 // Takes the game's name and secret and the generator's numbers, which have to be the ones of a full cycle: the
 // multiplier is 5 more than a multiple of 8, the increment odd and the modulus a power of two
-static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus, u32 hashKey) {
+static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus,
+                      u32 hashKey) {
     int bits = 0;
     int i;
 
@@ -150,8 +151,8 @@ static BOOL CheckAnswer(char *data, int size) {
 static void OnSent(void) {
 }
 
-// The HTTP client's answer to either request. The first one answers with a challenge of 32 characters, from which the hash
-// of the second request is made; the second answers with the data, or with a text that starts with "error:"
+// The HTTP client's answer to either request. The first one answers with a challenge of 32 characters, from which the
+// hash of the second request is made; the second answers with the data, or with a text that starts with "error:"
 static void OnAnswered(char *data, int size, int status, void *arg) {
     sClient.request = -1;
     if (sClient.state == 1) {
@@ -211,8 +212,8 @@ static void OnAnswered(char *data, int size, int status, void *arg) {
     }
 }
 
-// Scrambles the header and the payload into dest, in base64: a checksum xored with the key, and the bytes xored with the
-// generator that the checksum seeds
+// Scrambles the header and the payload into dest, in base64: a checksum xored with the key, and the bytes xored with
+// the generator that the checksum seeds
 static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize) {
     int total = payloadSize + headerSize;
     u8 *buffer;
@@ -249,7 +250,7 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
 
 void Gamestats_Start(int server, const char *key) {
     char secret[0x15];
-    char digits[9] = {0};
+    char digits[9] = { 0 };
     u32 multiplier;
     u32 increment;
     u32 modulus;
@@ -361,8 +362,8 @@ void *Gamestats_GetBody(int *size) {
     return sClient.body;
 }
 
-// Builds the URL of a request: the server, the game, the page and the player's ID, the hash that is still a placeholder and
-// the payload. The first request is cut before its hash, and the second keeps the one made from the first's answer
+// Builds the URL of a request: the server, the game, the page and the player's ID, the hash that is still a placeholder
+// and the payload. The first request is cut before its hash, and the second keeps the one made from the first's answer
 static int Send(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check, BOOL useHash) {
     char pidText[0x10];
     int header[2];
@@ -376,9 +377,9 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
         func_02058728(8, sClient.url, 0);
         sClient.url = NULL;
     }
-    sClient.url = func_020586e4(8, strlen(sBaseUrl) + strlen(sClient.gameName) + strlen(page) + strlen("?pid=")
-                                       + func_0207a2c0(pidText, 0x10, "%d", pid) + strlen("&hash=") + 0x28
-                                       + strlen("&data=") + GamestatsEncodedSize(size + 0xc) + 1);
+    sClient.url = func_020586e4(8, strlen(sBaseUrl) + strlen(sClient.gameName) + strlen(page) + strlen("?pid=") +
+                                       func_0207a2c0(pidText, 0x10, "%d", pid) + strlen("&hash=") + 0x28 +
+                                       strlen("&data=") + GamestatsEncodedSize(size + 0xc) + 1);
     if (sClient.url == NULL) {
         return 2;
     }

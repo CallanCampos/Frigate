@@ -1,5 +1,4 @@
 #include "types.h"
-#include "system/poke_icon.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
@@ -7,6 +6,7 @@
 #include "nitro/gx.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
+#include "system/poke_icon.h"
 
 // The Pokémon icons of ARCID_POKEICON: the file and the palette of a Pokémon's icon, the files of the icons' palette,
 // cells and animations, and a species packed with its form and sex. The ROM has no string for this file, so its name
@@ -14,8 +14,8 @@
 // by the OBJ mapping are kept here: they use no data that could show a second file, and they return files of the same
 // archive
 
-// The archive starts with the palette, a second palette that the PC boxes load, and the animations and cells for each OBJ
-// mapping; then come two files for each icon, the second for the female where there is one
+// The archive starts with the palette, a second palette that the PC boxes load, and the animations and cells for each
+// OBJ mapping; then come two files for each icon, the second for the female where there is one
 #define POKEICON_FILE_PALETTE 0
 #define POKEICON_FILE_PALETTE_ALT 1
 #define POKEICON_FILE_ANIM_32K 2
@@ -39,6 +39,7 @@
 #define POKEICON_PACK_SEX_SHIFT 14
 
 // The palettes of each icon: the male's, or the only one, in the low nibble and the female's in the high one
+// clang-format off
 static const u8 sPokeIconPalettes[] = {
     0x00, 0x11, 0x11, 0x11, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x11, 0x11, 0x00, 0x11, 0x22, 0x22,
     0x00, 0x00, 0x00, 0x22, 0x11, 0x00, 0x00, 0x22, 0x22, 0x22, 0x00, 0x22, 0x22, 0x22, 0x22, 0x22,
@@ -90,6 +91,8 @@ static const u8 sPokeIconPalettes[] = {
     0x22, 0x00, 0x00, 0x00,
 };
 
+// clang-format on
+
 u32 PokeIcon_GetFileOfPkm(BoxPkm *pkm) {
     BOOL wasEncrypted;
     u32 species;
@@ -127,14 +130,14 @@ u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg) {
 
     // The female's icon, if the archive has one
     switch (sex) {
-        case 0:
-            break;
-        case 1:
-            sex = GFL_ArcSysGetDataLength(ARCID_POKEICON, file + 1) != 0 ? 1 : 0;
-            break;
-        case 2:
-            sex = 0;
-            break;
+    case 0:
+        break;
+    case 1:
+        sex = GFL_ArcSysGetDataLength(ARCID_POKEICON, file + 1) != 0 ? 1 : 0;
+        break;
+    case 2:
+        sex = 0;
+        break;
     }
     return file + sex;
 }
@@ -186,53 +189,53 @@ u32 PokeIcon_GetAltPaletteFile(void) {
 
 u32 PokeIcon_GetCellFile_Main(void) {
     switch (GX_GetOBJVRamModeChar()) {
-        case GX_OBJVRAMMODE_CHAR_1D_32K:
-            return POKEICON_FILE_CELL_32K;
-        case GX_OBJVRAMMODE_CHAR_1D_64K:
-            return POKEICON_FILE_CELL_64K;
-        case GX_OBJVRAMMODE_CHAR_1D_128K:
-            return POKEICON_FILE_CELL_128K;
-        default:
-            return POKEICON_FILE_CELL_128K;
+    case GX_OBJVRAMMODE_CHAR_1D_32K:
+        return POKEICON_FILE_CELL_32K;
+    case GX_OBJVRAMMODE_CHAR_1D_64K:
+        return POKEICON_FILE_CELL_64K;
+    case GX_OBJVRAMMODE_CHAR_1D_128K:
+        return POKEICON_FILE_CELL_128K;
+    default:
+        return POKEICON_FILE_CELL_128K;
     }
 }
 
 u32 PokeIcon_GetCellFile_Sub(void) {
     switch (GXS_GetOBJVRamModeChar()) {
-        case GX_OBJVRAMMODE_CHAR_1D_32K:
-            return POKEICON_FILE_CELL_32K;
-        case GX_OBJVRAMMODE_CHAR_1D_64K:
-            return POKEICON_FILE_CELL_64K;
-        case GX_OBJVRAMMODE_CHAR_1D_128K:
-            return POKEICON_FILE_CELL_128K;
-        default:
-            return POKEICON_FILE_CELL_128K;
+    case GX_OBJVRAMMODE_CHAR_1D_32K:
+        return POKEICON_FILE_CELL_32K;
+    case GX_OBJVRAMMODE_CHAR_1D_64K:
+        return POKEICON_FILE_CELL_64K;
+    case GX_OBJVRAMMODE_CHAR_1D_128K:
+        return POKEICON_FILE_CELL_128K;
+    default:
+        return POKEICON_FILE_CELL_128K;
     }
 }
 
 u32 getOBJTileMapping_MainEng(void) {
     switch (GX_GetOBJVRamModeChar()) {
-        case GX_OBJVRAMMODE_CHAR_1D_32K:
-            return POKEICON_FILE_ANIM_32K;
-        case GX_OBJVRAMMODE_CHAR_1D_64K:
-            return POKEICON_FILE_ANIM_64K;
-        case GX_OBJVRAMMODE_CHAR_1D_128K:
-            return POKEICON_FILE_ANIM_128K;
-        default:
-            return POKEICON_FILE_ANIM_128K;
+    case GX_OBJVRAMMODE_CHAR_1D_32K:
+        return POKEICON_FILE_ANIM_32K;
+    case GX_OBJVRAMMODE_CHAR_1D_64K:
+        return POKEICON_FILE_ANIM_64K;
+    case GX_OBJVRAMMODE_CHAR_1D_128K:
+        return POKEICON_FILE_ANIM_128K;
+    default:
+        return POKEICON_FILE_ANIM_128K;
     }
 }
 
 u32 getOBJTileMapping_SubEng(void) {
     switch (GXS_GetOBJVRamModeChar()) {
-        case GX_OBJVRAMMODE_CHAR_1D_32K:
-            return POKEICON_FILE_ANIM_32K;
-        case GX_OBJVRAMMODE_CHAR_1D_64K:
-            return POKEICON_FILE_ANIM_64K;
-        case GX_OBJVRAMMODE_CHAR_1D_128K:
-            return POKEICON_FILE_ANIM_128K;
-        default:
-            return POKEICON_FILE_ANIM_128K;
+    case GX_OBJVRAMMODE_CHAR_1D_32K:
+        return POKEICON_FILE_ANIM_32K;
+    case GX_OBJVRAMMODE_CHAR_1D_64K:
+        return POKEICON_FILE_ANIM_64K;
+    case GX_OBJVRAMMODE_CHAR_1D_128K:
+        return POKEICON_FILE_ANIM_128K;
+    default:
+        return POKEICON_FILE_ANIM_128K;
     }
 }
 

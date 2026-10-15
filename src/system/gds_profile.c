@@ -1,6 +1,4 @@
-#include <stddef.h>
 #include "types.h"
-#include "save/gds_profile.h"
 #include "constants/language.h"
 #include "constants/text_banks.h"
 #include "constants/version.h"
@@ -10,6 +8,7 @@
 #include "gfl/str.h"
 #include "nitro/os.h"
 #include "pml/poke_party.h"
+#include "save/gds_profile.h"
 #include "save/player_info.h"
 #include "save/save_control.h"
 #include "save/trainer_game_info.h"
@@ -19,6 +18,7 @@
 #include "system/pms_data.h"
 #include "system/pms_word.h"
 #include "system/str_tool.h"
+#include <stddef.h>
 
 // The profile of the player that a battle video or a musical photo sent to the Global Link carries
 
@@ -181,14 +181,14 @@ u32 GdsProfile_GetUnionView(GdsProfile *profile) {
 // The language of the game that made the profile, or English if it isn't one
 static u8 getValidLanguage(GdsProfile *profile) {
     switch (profile->language) {
-        case LANGUAGE_JAPANESE:
-        case LANGUAGE_ENGLISH:
-        case LANGUAGE_FRENCH:
-        case LANGUAGE_ITALIAN:
-        case LANGUAGE_GERMAN:
-        case LANGUAGE_SPANISH:
-        case LANGUAGE_KOREAN:
-            return profile->language;
+    case LANGUAGE_JAPANESE:
+    case LANGUAGE_ENGLISH:
+    case LANGUAGE_FRENCH:
+    case LANGUAGE_ITALIAN:
+    case LANGUAGE_GERMAN:
+    case LANGUAGE_SPANISH:
+    case LANGUAGE_KOREAN:
+        return profile->language;
     }
     return LANGUAGE_ENGLISH;
 }

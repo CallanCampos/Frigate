@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/dpc_obj.h"
 #include "app/dpc_main.h"
+#include "app/dpc_obj.h"
 #include "gfl/arc.h"
 #include "gfl/bmp.h"
 #include "gfl/clact.h"
@@ -283,8 +283,8 @@ void DpcObj_LoadPokemon(DendouPCWork *wk) {
         wk->palettes[setup.palette] = PokeGra_LoadClActPalette(arc, poke->species, poke->form, poke->sex, rare, 0,
                                                                FALSE, CLACT_VRAM_MAIN, id * 0x20, HEAPID_DENDOU_PC);
         wk->cellAnims[setup.cellAnims] =
-            PokeGra_LoadClActCellAnims(poke->species, poke->form, poke->sex, rare, 0, FALSE,
-                                       DPCOBJ_MAPPING_128K, CLACT_VRAM_MAIN, HEAPID_DENDOU_PC);
+            PokeGra_LoadClActCellAnims(poke->species, poke->form, poke->sex, rare, 0, FALSE, DPCOBJ_MAPPING_128K,
+                                       CLACT_VRAM_MAIN, HEAPID_DENDOU_PC);
         *actor = DpcObj_AddActor(wk, &setup);
 
         DpcObj_SetPokePos(wk, id, sDpcObjPlaces[team->count - 1][i].angle);

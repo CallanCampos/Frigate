@@ -1,7 +1,6 @@
 // The Union Room's commands (a menu's choice, such as a trade or a battle), each run as a field event. The file's name
 // is a guess from the UnionSystem's subproc, which the ROM's asserts name: the ROM only shows that it is a file of its
 // own, by the assert file name ("") that its asserts share
-#include "field/union_main.h"
 #include "types.h"
 #include "app/p_status.h"
 #include "app/pms_select.h"
@@ -18,6 +17,7 @@
 #include "field/field_sound.h"
 #include "field/union_app.h"
 #include "field/union_comm.h"
+#include "field/union_main.h"
 #include "field/union_msg.h"
 #include "field/union_oneself.h"
 #include "field/zone.h"

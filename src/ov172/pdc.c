@@ -32,8 +32,8 @@ static BOOL Pdc_ProcInit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Pdc_ProcMain(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Pdc_ProcExit(GameProc *proc, u32 *state, void *param, void *work);
 
-PdcWork *PdcWork_Create(GameData *gameData, PartyPkm *pkm, BtlFieldStatus *status, PlayerInfo *playerInfo,
-                             BagSave *bag, TrainerDataSave *trainerData, PokeDexSave *pokedex, HeapID heapId) {
+PdcWork *PdcWork_Create(GameData *gameData, PartyPkm *pkm, BtlFieldStatus *status, PlayerInfo *playerInfo, BagSave *bag,
+                        TrainerDataSave *trainerData, PokeDexSave *pokedex, HeapID heapId) {
     PdcWork *work = GFL_HeapAllocate(heapId, sizeof(PdcWork), FALSE, "pdc.c", 80);
 
     work->gameData = gameData;

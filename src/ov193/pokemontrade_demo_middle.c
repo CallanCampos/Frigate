@@ -155,9 +155,9 @@ static void PokemonTradeDemoMiddle_CreateSprite(PokemonTradeWork *wk) {
         setup.sequence = 0;
         setup.priority = 0;
         setup.bgPriority = 0;
-        wk->work3D->actor = func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_DEMO],
-                                          wk->objRes[TRADE_OBJRES_PLTT_DEMO], wk->objRes[TRADE_OBJRES_CELL_DEMO],
-                                          &setup, 0, wk->heapId);
+        wk->work3D->actor =
+            func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_DEMO], wk->objRes[TRADE_OBJRES_PLTT_DEMO],
+                          wk->objRes[TRADE_OBJRES_CELL_DEMO], &setup, 0, wk->heapId);
         func_0204c520(wk->work3D->actor, TRUE);
         func_0204c124(wk->work3D->actor, TRUE);
     } else {
@@ -283,9 +283,11 @@ static void PokemonTradeDemoMiddle_StateMoves(PokemonTradeWork *wk) {
             MCSS_GetPosition(wk->mcss[0], &pos);
             TradeMcssMove_Free(wk->mcssMoves[0]);
             if (wk->unk11EF != 0) {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
             } else {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 18, &pos, sTradeDemoMiddleHopPath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 18, &pos, sTradeDemoMiddleHopPath, wk->heapId);
             }
             func_ov194_021c24cc(wk, 2, FALSE, PokemonTrade_GetPkm(wk, PokemonTrade_IsNegoType(wk)), TRUE);
             MCSS_PauseAnimation(wk->mcss[2]);
@@ -296,9 +298,11 @@ static void PokemonTradeDemoMiddle_StateMoves(PokemonTradeWork *wk) {
             MCSS_GetPosition(wk->mcss[0], &pos);
             TradeMcssMove_Free(wk->mcssMoves[0]);
             if (wk->unk11EF != 0) {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
             } else {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 40, &pos, sTradeDemoMiddleLongHopPath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 40, &pos, sTradeDemoMiddleLongHopPath, wk->heapId);
             }
         }
         PokemonTrade_SetState(wk, PokemonTradeDemoMiddle_StateMessage);
@@ -396,9 +400,11 @@ static void PokemonTradeDemoMiddle_StartMove(PokemonTradeWork *wk, int index) {
         MCSS_GetPosition(wk->mcss[index], &pos);
         TradeMcssMove_Free(wk->mcssMoves[3]);
         if (wk->unk11F0[0] != 0) {
-            wk->mcssMoves[3] = TradeMcssMove_CreateWithPath(wk->mcss[index], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
+            wk->mcssMoves[3] =
+                TradeMcssMove_CreateWithPath(wk->mcss[index], 20, &pos, sTradeDemoMiddleScenePath, wk->heapId);
         } else {
-            wk->mcssMoves[3] = TradeMcssMove_CreateWithPath(wk->mcss[index], 40, &pos, sTradeDemoMiddleLongHopPath, wk->heapId);
+            wk->mcssMoves[3] =
+                TradeMcssMove_CreateWithPath(wk->mcss[index], 40, &pos, sTradeDemoMiddleLongHopPath, wk->heapId);
         }
     } else {
         u32 pair[4] = { 2, 3, 0, 1 };
@@ -806,8 +812,8 @@ static void PokemonTradeDemoMiddle_Run(PokemonTradeWork *wk) {
     if (wk->timer == PokemonTradeDemoMiddle_Frame(0x490)) {
         func_0201ae2c(wk->mcss[index], 0, 0, 0, 0x7fff);
     }
-    if (PokemonTradeDemoMiddle_Frame(0x48e) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL
-        && wk->mcssMoves[3]->frame == 9) {
+    if (PokemonTradeDemoMiddle_Frame(0x48e) < wk->timer && wk->unk11EE != 0 && wk->mcssMoves[3] != NULL &&
+        wk->mcssMoves[3]->frame == 9) {
         VecFx32 pos8;
 
         MCSS_GetPosition(wk->mcss[other], &pos8);

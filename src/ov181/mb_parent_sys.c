@@ -1184,7 +1184,8 @@ static void MBParent_UpdateTransfer(MBParentWork *wk) {
     switch (wk->distributionSeq) {
     case 9:
         if (MBUtilMsg_IsQueueDone(wk->msg) == TRUE && MBUtilMsg_IsPrintDone(wk->msg) == TRUE &&
-            MBComm_IsSaveReady(wk->comm) == TRUE && MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_1, GFL_RandomLC(20) + 10) == TRUE) {
+            MBComm_IsSaveReady(wk->comm) == TRUE &&
+            MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_1, GFL_RandomLC(20) + 10) == TRUE) {
             wk->distributionSeq = 10;
         }
         break;
@@ -1225,7 +1226,8 @@ static void MBParent_UpdateTransfer(MBParentWork *wk) {
         }
         // fallthrough
     case 16:
-        if (MBComm_IsSaveMidReached(wk->comm) == TRUE && MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_3, 0) == TRUE) {
+        if (MBComm_IsSaveMidReached(wk->comm) == TRUE &&
+            MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_3, 0) == TRUE) {
             wk->distributionSeq = 17;
             wk->waitFrames = 0;
         }

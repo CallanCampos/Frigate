@@ -1,7 +1,7 @@
 #include "types.h"
-#include "gfl/sound.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
+#include "gfl/sound.h"
 
 // The BGM info archive: which interactive sound subsystem each BGM uses. The name is the ROM's string.
 

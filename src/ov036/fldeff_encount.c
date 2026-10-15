@@ -82,6 +82,7 @@ static const u8 ENCOUNT_EFFECT_VOLUMES[4] = { 127, 90, 60, 40 };
 // The effect of each kind of phenomenon; the first three are variants of the first effect
 static const u8 ENCOUNT_EFFECT_INDICES[8] = { 0, 0, 0, 1, 2, 3, 4, 5 };
 
+// clang-format off
 static const FieldEffectTaskVTable ENCOUNT_TASK_VTABLE = {
     sizeof(EncountTask),
     func_ov036_021a54b8,
@@ -90,6 +91,9 @@ static const FieldEffectTaskVTable ENCOUNT_TASK_VTABLE = {
     func_ov036_021a55b8,
 };
 
+// clang-format on
+
+// clang-format off
 static EncountEffectSpec ENCOUNT_EFFECT_SPECS[6] = {
     { 1, 3, 4, TRUE, FALSE, 1749, 60, { 141, 0, 0, 0 } },
     { 1, 1, 4, TRUE, FALSE, 1749, 68, { 149, 0, 0, 0 } },
@@ -98,6 +102,8 @@ static EncountEffectSpec ENCOUNT_EFFECT_SPECS[6] = {
     { 1, 1, 1, FALSE, FALSE, 1750, 74, { 121, 0, 0, 0 } },
     { 3, 1, 1, FALSE, FALSE, 1751, 75, { 153, 139, 122, 0 } },
 };
+
+// clang-format on
 
 void *func_ov036_021a50a4(FieldEffects *effects, HeapID heapId) {
     return func_ov036_021a5100(effects, heapId, 0);

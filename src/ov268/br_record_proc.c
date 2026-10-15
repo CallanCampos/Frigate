@@ -4,13 +4,13 @@
 // of the Global Link is played. The name is a guess: the ROM gives none, and br_core.c runs it as BR_PROCID_RECORD
 
 #include "types.h"
-#include "app/battle_recorder/br_record_proc.h"
 #include "app/battle_rec_ov.h"
 #include "app/battle_recorder/br_btn.h"
 #include "app/battle_recorder/br_core.h"
 #include "app/battle_recorder/br_fade.h"
 #include "app/battle_recorder/br_net.h"
 #include "app/battle_recorder/br_proc_sys.h"
+#include "app/battle_recorder/br_record_proc.h"
 #include "app/battle_recorder/br_res.h"
 #include "app/battle_recorder/br_util.h"
 #include "constants/arc.h"
@@ -145,6 +145,7 @@ static const BrRecordMsgWinData sBrRecordConfirmWins[] = {
     { 0, 0, 0, 0, 0 },
 };
 
+// clang-format off
 static const BrRecordMsgWinData sBrRecordInfoWins[MSGWIN_MAX] = {
     [MSGWIN_NAME] = { 4, 4, 24, 2, 8 },
     [MSGWIN_MODE] = { 4, 6, 24, 4, 0xa4 },
@@ -152,6 +153,8 @@ static const BrRecordMsgWinData sBrRecordInfoWins[MSGWIN_MAX] = {
     [MSGWIN_COUNTER] = { 3, 11, 7, 2, 0xa },
     [MSGWIN_COUNTER_UNIT] = { 3, 13, 7, 2, 0xb },
 };
+
+// clang-format on
 
 // Where the Pokémon icons go: in two rows of six, or in four groups of three
 static const struct {
@@ -253,9 +256,9 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
         } else {
             BrSeq_SetNext(p_wk->seq, BrRecord_SeqStart);
         }
-    } else if ((p_wk->p_param->mode == BR_RECORD_MODE_OTHER1 || p_wk->p_param->mode == BR_RECORD_MODE_OTHER2
-                || p_wk->p_param->mode == BR_RECORD_MODE_OTHER3)
-               && p_wk->p_param->isRecovery && *p_wk->p_param->unk3C && !p_wk->isSecure) {
+    } else if ((p_wk->p_param->mode == BR_RECORD_MODE_OTHER1 || p_wk->p_param->mode == BR_RECORD_MODE_OTHER2 ||
+                p_wk->p_param->mode == BR_RECORD_MODE_OTHER3) &&
+               p_wk->p_param->isRecovery && *p_wk->p_param->unk3C && !p_wk->isSecure) {
         // A saved video that has just been watched to its end for the first time is marked
         BrSeq_SetNext(p_wk->seq, BrRecord_SeqSecureSave);
     } else {
@@ -796,8 +799,7 @@ static void BrRecord_SeqSecureSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
     case SEQ_SAVE_MAIN:
         GFL_ASSERT(p_wk->p_param->mode <= BR_RECODE_PROC_OTHER_02);
         if (BattleRecOv_SaveSecureVideo(p_wk->p_param->gameData, p_wk->p_param->mode, &p_wk->saveSeq, &p_wk->saveSeq2,
-                                        p_wk->heapId)
-            == 2) {
+                                        p_wk->heapId) == 2) {
             func_0200bbb4();
             p_wk->isSecure = func_0200c124(p_wk->header, BATTLE_REC_HEADER_UNK2A, 0);
             *p_seq = SEQ_FADEOUT_START;
@@ -1244,8 +1246,8 @@ static void BrRecord_CreateButtons(BrRecordWork *p_wk, BrRecordProcParam *p_para
         setup.sequence = 0;
         setup.priority = 1;
         BrRes_GetObjData(p_param->res, 6, &obj);
-        p_wk->btn[BTN_RETURN] = BrBtn_InitEx(&setup, 4, 96, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, msg,
-                                             &obj, p_wk->heapId);
+        p_wk->btn[BTN_RETURN] =
+            BrBtn_InitEx(&setup, 4, 96, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, msg, &obj, p_wk->heapId);
         setup.x = 136;
         setup.sequence = 3;
         p_wk->btn[BTN_SAVE] = BrBtn_InitEx(&setup, 0x54, 96, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, msg,
@@ -1260,8 +1262,8 @@ static void BrRecord_CreateButtons(BrRecordWork *p_wk, BrRecordProcParam *p_para
         setup.sequence = 0;
         setup.priority = 1;
         BrRes_GetObjData(p_param->res, 6, &obj);
-        p_wk->btn[BTN_RETURN] = BrBtn_InitEx(&setup, 4, 96, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, msg,
-                                             &obj, p_wk->heapId);
+        p_wk->btn[BTN_RETURN] =
+            BrBtn_InitEx(&setup, 4, 96, CLACT_SURFACE_SUB, p_param->unit, p_wk->bmpoam, font, msg, &obj, p_wk->heapId);
     }
 
     p_wk->title[0] = BrMsgWin_Init(4, 8, 3, 16, 2, 14, p_wk->que, p_wk->heapId);

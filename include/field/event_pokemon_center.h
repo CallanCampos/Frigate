@@ -20,7 +20,6 @@ struct EventPokeCenHealData {
     FieldChunkPropHolder *centerProp;
 };
 
-
 GameEvent *EventPokeCenHeal_Create(GameSystem *gsys, GameEvent *parent, u8 ballCount);
 GameEventReturnCode EventPokeCenHeal_Callback(GameEvent *event, u32 *state, void *data);
 void EventPokeCenHeal_Init(EventPokeCenHealData *work, GameSystem *gsys, u8 ballCount);

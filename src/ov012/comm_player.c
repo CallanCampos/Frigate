@@ -103,8 +103,8 @@ void func_ov012_021615a4(CommPlayerSys *cps) {
 
     GFL_ASSERT(GAMESYSTEM_CheckFieldMapWork(cps->gsys) == TRUE);
     GFL_ASSERT(cps->act_ctrl == NULL);
-    cps->act_ctrl = FldCommActSys_Create(cps->unk8E, Field_GetActorSystem(GSYS_GetField(cps->gsys)), cps->heapId,
-                                         cps->unk90);
+    cps->act_ctrl =
+        FldCommActSys_Create(cps->unk8E, Field_GetActorSystem(GSYS_GetField(cps->gsys)), cps->heapId, cps->unk90);
     sys_memset(&status, 0, sizeof(CommPlayerStatus));
     for (i = 0; i < COMM_PLAYER_MAX; i++) {
         if (cps->players[i].hidden == TRUE) {

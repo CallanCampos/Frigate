@@ -30,6 +30,7 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
+// clang-format off
 const WbtTournamentInfo data_ov036_021d4920[15] = {
     { 0x4, 17, 2, 1, 2, { 0, 0, 0, 0 } },
     { 0x11, 0, 2, 2, 2, { 2, 2, 3, 3 } },
@@ -48,6 +49,9 @@ const WbtTournamentInfo data_ov036_021d4920[15] = {
     { 0x10, 28, 2, 1, 2, { 2, 2, 3, 3 } },
 };
 
+// clang-format on
+
+// clang-format off
 const HabitatListHeader HABITAT_LIST_HEADERS[57] = {
     { 0x9b8, 0x1ab, 0x18, 0 }, { 0x9c0, 0x1b5, 0x17, 0 }, { 0x9c1, 0x1be, 0x1c, 0 },
     { 0x9c2, 0x1bc, 0x1a, 0 }, { 0x9b9, 0x1c0, 0x1d, 0 }, { 0x9c3, 0x1c8, 0x20, 0 },
@@ -69,6 +73,8 @@ const HabitatListHeader HABITAT_LIST_HEADERS[57] = {
     { 0x9ea, 0x98, 0x26, 0 }, { 0x9ec, 0x13f, 0x30, 0 }, { 0x9eb, 0x13d, 0x2c, 0 },
     { 0x9ed, 0x1a7, 0x2b, 0 }, { 0x9ee, 0x183, 0x11, 0 }, { 0x9ef, 0xee, 0x21, 0 },
 };
+
+// clang-format on
 
 void func_ov036_021c97b8(OchibaEffectArgs *args) {
     TCBManager *tcbManager = Field_GetTCBMgr(args->field);
@@ -159,7 +165,6 @@ BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env) {
     GFL_ArcToolFree(arc);
     return FALSE;
 }
-
 
 BOOL CheckHabitatList(const HabitatList *list, PokeDexSave *pokedex, u8 time, u32 caught) {
     s32 i;
@@ -264,8 +269,8 @@ BOOL func_ov036_021c9b88(VM *vm, FieldScriptEnv *env) {
     result = ScriptReadVar(vm, env);
     *result = FALSE;
     index = func_ov033_0217aac4(unityTower, visitor);
-    if (index != 0xff &&
-        (u8)UnityTower_GetVisitorParam(getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index, 5)) {
+    if (index != 0xff && (u8)UnityTower_GetVisitorParam(
+                             getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), index, 5)) {
         *result = TRUE;
     }
     return FALSE;

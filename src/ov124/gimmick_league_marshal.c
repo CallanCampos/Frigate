@@ -107,11 +107,14 @@ static const G3DSceneAnimationSetup sModel3Animations[] = { { 9, 0 }, { 10, 0 } 
 static const G3DSceneAnimationSetup sModel0Animations[] = { { 1, 0 }, { 2, 0 } };
 static const G3DSceneAnimationSetup sModel1Animations[] = { { 4, 0 }, { 5, 0 }, { 6, 0 } };
 
+// clang-format off
 static const G3DSceneResourceSetup sResources[11] = {
     { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 }, { GIMMICK_ARCID, 3, 0 },
     { GIMMICK_ARCID, 4, 0 }, { GIMMICK_ARCID, 5, 0 }, { GIMMICK_ARCID, 6, 0 }, { GIMMICK_ARCID, 7, 0 },
     { GIMMICK_ARCID, 8, 0 }, { GIMMICK_ARCID, 9, 0 }, { GIMMICK_ARCID, 10, 0 },
 };
+
+// clang-format on
 
 static const G3DSceneActorSetup sActors[4] = {
     { 0, 0, 0, 0, sModel0Animations, NELEMS(sModel0Animations) },

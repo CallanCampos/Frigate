@@ -2,10 +2,10 @@
 #define POKEBW2_FIELD_APP_CALL_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "field/player_action.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
+#include "struct_decls.h"
 #include "system/game_event.h"
 
 // Called with the app call's input and its arg
@@ -137,7 +137,7 @@ GameEvent *EventFieldAppCall_Create(FieldAppCallInput *input, u16 code);
 void EventFieldAppCall_ConvAppResultToEventType(u32 result, u32 *eventType);
 void func_ov012_0215b754(FieldAppCallWork *work);
 void func_ov012_0215b76c(FieldAppCallParam *param, FieldAppCallInput *input, FieldAppCallPredicate canRetry,
-                          FieldAppCallPredicate callback1, FieldAppCallPredicate callback2, void *arg);
+                         FieldAppCallPredicate callback1, FieldAppCallPredicate callback2, void *arg);
 BOOL FieldAppCallParam_CanRetry(FieldAppCallParam *param);
 BOOL func_ov012_0215b7a8(FieldAppCallParam *param);
 BOOL func_ov012_0215b7c0(FieldAppCallParam *param);

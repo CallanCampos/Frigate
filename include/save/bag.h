@@ -18,8 +18,7 @@ struct BagItem {
 #define BAG_TMS_HMS_MAX 109
 #define BAG_MEDICINE_MAX 48
 #define BAG_BERRIES_MAX 64
-#define BAG_FREE_SPACE_MAX \
-    (BAG_ITEMS_MAX + BAG_KEY_ITEMS_MAX + BAG_TMS_HMS_MAX + BAG_MEDICINE_MAX + BAG_BERRIES_MAX)
+#define BAG_FREE_SPACE_MAX (BAG_ITEMS_MAX + BAG_KEY_ITEMS_MAX + BAG_TMS_HMS_MAX + BAG_MEDICINE_MAX + BAG_BERRIES_MAX)
 
 // How many of an item a slot holds
 #define BAG_ITEM_COUNT_MAX 999
@@ -35,16 +34,16 @@ struct BagSave {
     BagItem medicine[BAG_MEDICINE_MAX];  // 0x7d8
     BagItem berries[BAG_BERRIES_MAX];    // 0x898
     // A bit for each item that the player moved to the Free Space
-    u32 freeSpace[21];                   // 0x998
-};                                       // 0x9ec
+    u32 freeSpace[21]; // 0x998
+}; // 0x9ec
 
 // The cursor memory of the bag and of the battle bag, which is not saved
 typedef struct BagCursor {
-    s16 scrolls[BAG_POCKET_NONE];             // 0x00
-    s16 rows[BAG_POCKET_NONE];                // 0x0c
+    s16 scrolls[BAG_POCKET_NONE]; // 0x00
+    s16 rows[BAG_POCKET_NONE];    // 0x0c
     // The pocket the bag opens on
-    u16 pocket;                               // 0x18
-    u8 freeSpaceFilter;                       // 0x1a
+    u16 pocket;         // 0x18
+    u8 freeSpaceFilter; // 0x1a
     u16 unk1C;
     s16 battlePages[BATTLE_BAG_POCKET_COUNT]; // 0x1e
     s16 battleRows[BATTLE_BAG_POCKET_COUNT];  // 0x26
@@ -84,8 +83,8 @@ void func_020088e0(BagCursor *cursor, u16 item, u8 pocket);
 // The Free Space's filter
 u8 func_020088e8(BagCursor *cursor);
 void func_020088ec(BagCursor *cursor, u32 filter);
-// The bag's Free Space and item slots. Function names from swan, except BagSave_GetOwnedItemFlags and BagSave_GetPocketItems
-// Whether an item's Free Space bit is set
+// The bag's Free Space and item slots. Function names from swan, except BagSave_GetOwnedItemFlags and
+// BagSave_GetPocketItems Whether an item's Free Space bit is set
 BOOL BagSave_IsItemFreeSpaceBit(BagSave *bag, u16 item);
 // Whether an item is in the Free Space and in the bag
 BOOL BagSave_IsItemInFreeSpace(BagSave *bag, u16 item);

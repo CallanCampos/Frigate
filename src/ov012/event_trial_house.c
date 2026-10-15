@@ -84,9 +84,9 @@ static GameEventReturnCode func_ov012_02162ccc(GameEvent *event, u32 *state, voi
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, func_ov012_02161c88(gsys, data->unk10, 0x17, data->regulationId, data->party,
-                                                       data->picked, &data->choice, &data->screenResult,
-                                                       data->work->party));
+        GameEvent_ChainNext(event,
+                            func_ov012_02161c88(gsys, data->unk10, 0x17, data->regulationId, data->party, data->picked,
+                                                &data->choice, &data->screenResult, data->work->party));
         *state = 1;
         break;
     case 1:

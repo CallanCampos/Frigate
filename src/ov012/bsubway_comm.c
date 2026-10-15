@@ -32,6 +32,7 @@ static void func_ov012_02161c1c(int netId, int size, const void *data, void *wor
 static void func_ov012_02161c40(int netId, int size, const void *data, void *work, NetHandle *handle);
 static void func_ov012_02161c64(int netId, int size, const void *data, void *work, NetHandle *handle);
 
+// clang-format off
 static const NetCommand data_ov012_0216d8fc[] = {
     {func_ov012_02161ad8, NULL},
     {func_ov012_02161b4c, NULL},
@@ -43,6 +44,9 @@ static const NetCommand data_ov012_0216d8fc[] = {
     {func_ov012_02161c64, NULL},
 };
 
+// clang-format on
+
+// clang-format off
 static const GFLNetInitData data_ov012_0216d93c = {
     data_ov012_0216d8fc,
     NELEMS(data_ov012_0216d8fc),
@@ -80,6 +84,8 @@ static const GFLNetInitData data_ov012_0216d93c = {
     0,
     0,
 };
+
+// clang-format on
 
 void func_ov012_02161844(BSubwayScrWork *bsw) {
     func_020425ec(&data_ov012_0216d93c, NULL, bsw);
@@ -130,8 +136,7 @@ static void func_ov012_021618d8(BSubwayScrWork *bsw, GameData *gameData) {
 
     bsw->sendBuf[0] = getTrainerGender(info);
     for (i = 0; i < 2; i++) {
-        bsw->sendBuf[1 + i] =
-            PokeParty_GetParam(PokeParty_GetPkm(party, bsw->memberSlots[i]), PKM_PARAM_SPECIES, NULL);
+        bsw->sendBuf[1 + i] = PokeParty_GetParam(PokeParty_GetPkm(party, bsw->memberSlots[i]), PKM_PARAM_SPECIES, NULL);
     }
     bsw->sendBuf[3] = func_ov033_0217be1c(func_ov033_0217bd84(bsw));
 }

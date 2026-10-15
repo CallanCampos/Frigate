@@ -255,8 +255,9 @@ void func_0202d6a8(void);
 // game_beacon_accessor.c: tables of received beacons and the readers of a beacon's fields
 
 // A table of beacons with the times they were received at. It is used either as a list, filled from the front
-// (GameBeaconInfoTable_TakeNew to GameBeaconInfoTable_MarkAllNew), or as a ring that head is the newest entry of (GameBeaconInfoTable_RingIndex to GameBeaconInfoTable_GetCount).
-// BeaconStatus starts with one, the ring of the beacons that the game keeps
+// (GameBeaconInfoTable_TakeNew to GameBeaconInfoTable_MarkAllNew), or as a ring that head is the newest entry of
+// (GameBeaconInfoTable_RingIndex to GameBeaconInfoTable_GetCount). BeaconStatus starts with one, the ring of the
+// beacons that the game keeps
 typedef struct {
     GameBeacon beacons[GAME_BEACON_LOG_MAX];
     // GameBeaconTime's minute and hour
@@ -267,7 +268,8 @@ typedef struct {
 
 // A type's entry of the table that GameBeacon_GetTypeFormat and func_020140cc read
 typedef struct {
-    // What the type's message shows and its payload holds, the index of the checks and of GameBeacon_SetMessageWords's cases
+    // What the type's message shows and its payload holds, the index of the checks and of GameBeacon_SetMessageWords's
+    // cases
     u8 format;
     u8 unk1;
 } GameBeaconTypeFormat;

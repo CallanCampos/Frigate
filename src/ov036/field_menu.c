@@ -135,50 +135,54 @@ static void func_ov036_021a0970(HeapID heapId, u32 bg);
 
 // Where each slot's name window is, in tiles
 static const u8 data_ov036_021cfe34[7][2] = {
-    {6, 4}, {22, 4}, {6, 10}, {22, 10}, {6, 16}, {22, 16}, {13, 21},
+    { 6, 4 }, { 22, 4 }, { 6, 10 }, { 22, 10 }, { 6, 16 }, { 22, 16 }, { 13, 21 },
 };
 
 // The cursor's column and row of each slot
 static const u8 data_ov036_021cfe42[7][2] = {
-    {0, 0}, {1, 0}, {0, 1}, {1, 1}, {0, 2}, {1, 2}, {0, 3},
+    { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 }, { 1, 2 }, { 0, 3 },
 };
 
 // The message of each item's name
-static const u16 data_ov036_021cfe50[9] = {7, 2, 1, 3, 4, 5, 6, 9, 10};
+static const u16 data_ov036_021cfe50[9] = { 7, 2, 1, 3, 4, 5, 6, 9, 10 };
 
 // The screen of each kind of menu
-static const u32 data_ov036_021cfe64[7] = {0x12, 0x14, 0x14, 0x13, 0x14, 0x14, 0x12};
+static const u32 data_ov036_021cfe64[7] = { 0x12, 0x14, 0x14, 0x13, 0x14, 0x14, 0x12 };
 
-static const BGSetup data_ov036_021cfe80 = {0, 0, 0x1000, 0, 2, 0, 0xc, 0, 0x5800, 0, 1, 0, 0};
+static const BGSetup data_ov036_021cfe80 = { 0, 0, 0x1000, 0, 2, 0, 0xc, 0, 0x5800, 0, 1, 0, 0 };
 
-static const BGSetup data_ov036_021cfea0 = {0, 0, 0x800, 0, 1, 0, 0xa, 0, 0x5800, 0, 3, 0, 0};
+static const BGSetup data_ov036_021cfea0 = { 0, 0, 0x800, 0, 1, 0, 0xa, 0, 0x5800, 0, 3, 0, 0 };
 
 // An unused BG setup
-const BGSetup data_ov036_021cfec0 = {0, 0, 0x800, 0, 1, 0, 2, 1, 0x8000, 0, 0, 0, 0};
+const BGSetup data_ov036_021cfec0 = { 0, 0, 0x800, 0, 1, 0, 2, 1, 0x8000, 0, 0, 0, 0 };
 
-static const BGSetup data_ov036_021cfee0 = {0, 0, 0x1000, 0, 2, 0, 0xe, 0, 0x5800, 0, 3, 0, 0};
+static const BGSetup data_ov036_021cfee0 = { 0, 0, 0x1000, 0, 2, 0, 0xe, 0, 0x5800, 0, 3, 0, 0 };
 
 // Unused, three files for each of four items
-const u32 data_ov036_021cff00[12] = {9, 0x1f, 0x12, 0x11, 0x1f, 0x17, 0, 0x19, 0x12, 0x1f, 0x1f, 0x1f};
+const u32 data_ov036_021cff00[12] = { 9, 0x1f, 0x12, 0x11, 0x1f, 0x17, 0, 0x19, 0x12, 0x1f, 0x1f, 0x1f };
 
 // Where the cursor moves from each slot, up, down, left and right, for menus of four, five and six items. 0xfe
 // and 0xff are the bottom button's rows, 6 none
+// clang-format off
 static const u8 data_ov036_021cff70[3][8][4] = {
     {{0, 2, 0, 1}, {1, 3, 0, 1}, {0, 2, 2, 3}, {1, 3, 2, 3}, {6, 6, 6, 6}, {6, 6, 6, 6}, {0xfe, 6, 6, 6}, {0xfe, 6, 6, 6}},
     {{0, 2, 0, 1}, {1, 3, 0, 1}, {0, 4, 2, 3}, {1, 3, 2, 3}, {2, 4, 4, 4}, {6, 6, 6, 6}, {4, 6, 6, 6}, {4, 6, 6, 6}},
     {{0, 2, 0, 1}, {1, 3, 0, 1}, {0, 4, 2, 3}, {1, 5, 2, 3}, {2, 4, 4, 5}, {3, 5, 4, 5}, {0xff, 6, 6, 6}, {0xff, 6, 6, 6}},
 };
 
+// clang-format on
+
 // The characters, cells and animations of each item's icon
 static const u32 data_ov036_021cffd0[11][3] = {
-    {0x0f, 0x1f, 0x2a}, {0x09, 0x19, 0x24}, {0x0d, 0x1d, 0x28}, {0x07, 0x17, 0x22}, {0x0c, 0x1c, 0x27}, {0x0a, 0x1a, 0x25},
-    {0x06, 0x16, 0x21}, {0x09, 0x19, 0x24}, {0x08, 0x18, 0x23}, {0x0e, 0x1e, 0x29}, {0x0b, 0x1b, 0x26},
+    { 0x0f, 0x1f, 0x2a }, { 0x09, 0x19, 0x24 }, { 0x0d, 0x1d, 0x28 }, { 0x07, 0x17, 0x22 },
+    { 0x0c, 0x1c, 0x27 }, { 0x0a, 0x1a, 0x25 }, { 0x06, 0x16, 0x21 }, { 0x09, 0x19, 0x24 },
+    { 0x08, 0x18, 0x23 }, { 0x0e, 0x1e, 0x29 }, { 0x0b, 0x1b, 0x26 },
 };
 
 // The items of each kind of menu, the last one at the bottom button
 static const u32 data_ov036_021d0054[7][7] = {
-    {1, 2, 3, 4, 5, 6, 0}, {1, 2, 3, 4, 6, 7, 0}, {1, 3, 4, 5, 6, 7, 0}, {3, 4, 5, 6, 7, 7, 0},
-    {1, 2, 3, 4, 6, 7, 0}, {1, 2, 3, 4, 6, 7, 0}, {1, 2, 4, 5, 6, 8, 0},
+    { 1, 2, 3, 4, 5, 6, 0 }, { 1, 2, 3, 4, 6, 7, 0 }, { 1, 3, 4, 5, 6, 7, 0 }, { 3, 4, 5, 6, 7, 7, 0 },
+    { 1, 2, 3, 4, 6, 7, 0 }, { 1, 2, 3, 4, 6, 7, 0 }, { 1, 2, 4, 5, 6, 8, 0 },
 };
 
 FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *subscreen, Field *field, BOOL open) {
@@ -441,7 +445,7 @@ static void func_ov036_0219ff20(FieldMenu *menu, ArcTool *arc, u8 menuType, void
     GFL_BGSysLoadScr(5);
     menu->actUnit = func_0204bf1c(8, 0, menu->heapId);
     {
-        ClActSurfaceSetup surface = {0, 0, 0x100, 0xbf, 1, 0};
+        ClActSurfaceSetup surface = { 0, 0, 0x100, 0xbf, 1, 0 };
 
         menu->renderer = func_0204be9c(&surface, 1, menu->heapId);
     }
@@ -451,8 +455,8 @@ static void func_ov036_0219ff20(FieldMenu *menu, ArcTool *arc, u8 menuType, void
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 0;
-    menu->cursor = func_0204c040(menu->actUnit, menu->menuChars, menu->menuPalette, menu->menuCellAnims, &setup, 0,
-                                 menu->heapId);
+    menu->cursor =
+        func_0204c040(menu->actUnit, menu->menuChars, menu->menuPalette, menu->menuCellAnims, &setup, 0, menu->heapId);
     func_0204c53c(menu->cursor, FX32_ONE);
     func_0204c520(menu->cursor, TRUE);
     func_0204c468(menu->cursor, 2);
@@ -508,8 +512,9 @@ static int func_ov036_021a0240(u8 menuType) {
 static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
     FieldMenuItemSetup setup;
     FieldMenuName name;
-    FieldMenuName noName = {{'N', 'o', 'N', 'a', 'm', 'e', 0xffff}};
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOAD_FIELD_MENU_TEXTS, menu->tmpHeapId);
+    FieldMenuName noName = { { 'N', 'o', 'N', 'a', 'm', 'e', 0xffff } };
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOAD_FIELD_MENU_TEXTS, menu->tmpHeapId);
     const u32 *items;
     u8 i;
 
@@ -708,8 +713,8 @@ static void func_ov036_021a05b8(FieldMenu *menu) {
 
 static void func_ov036_021a06c8(FieldMenu *menu) {
     TouchRect rects[8] = {
-        {0x18, 0x40, 0x08, 0x78}, {0x18, 0x40, 0x88, 0xf8}, {0x48, 0x70, 0x08, 0x78}, {0x48, 0x70, 0x88, 0xf8},
-        {0x78, 0xa0, 0x08, 0x78}, {0x78, 0xa0, 0x88, 0xf8}, {0xa8, 0xbf, 0xe0, 0xf8}, {TOUCH_RECT_END, 0, 0, 0},
+        { 0x18, 0x40, 0x08, 0x78 }, { 0x18, 0x40, 0x88, 0xf8 }, { 0x48, 0x70, 0x08, 0x78 }, { 0x48, 0x70, 0x88, 0xf8 },
+        { 0x78, 0xa0, 0x08, 0x78 }, { 0x78, 0xa0, 0x88, 0xf8 }, { 0xa8, 0xbf, 0xe0, 0xf8 }, { TOUCH_RECT_END, 0, 0, 0 },
     };
     int slot = func_0203da0c(rects);
 
@@ -794,8 +799,8 @@ static void func_ov036_021a0820(FieldMenu *menu, FieldMenuItem *item, const Fiel
         actorSetup.scaleY = FX32_ONE;
         actorSetup.rotation = 0;
         actorSetup.affineMode = 2;
-        item->icon = func_0204c0a4(menu->actUnit, item->chars, menu->menuPalette, item->cellAnims, &actorSetup, 0,
-                                   menu->heapId);
+        item->icon =
+            func_0204c0a4(menu->actUnit, item->chars, menu->menuPalette, item->cellAnims, &actorSetup, 0, menu->heapId);
         func_0204c53c(item->icon, FX32_ONE);
         func_0204c520(item->icon, TRUE);
         func_0204c488(item->icon, 0);

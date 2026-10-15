@@ -41,7 +41,8 @@ static BOOL MedalInfoBeacon_LogExit(GameProc *proc, u32 *state, void *param, voi
 static void MedalInfoBeacon_LoadBeacons(MedalInfoBeaconWork *work);
 
 GameProcFunctions MedalInfo_ProcFunctions = { MedalInfo_Init, MedalInfoBeacon_MedalMain, MedalInfoBeacon_MedalExit };
-GameProcFunctions MedalInfoBeacon_ProcFunctions = { MedalInfoBeacon_LogInit, MedalInfoBeacon_LogMain, MedalInfoBeacon_LogExit };
+GameProcFunctions MedalInfoBeacon_ProcFunctions = { MedalInfoBeacon_LogInit, MedalInfoBeacon_LogMain,
+                                                    MedalInfoBeacon_LogExit };
 
 BOOL MedalInfo_Init(GameProc *proc, u32 *state, void *param, void *work) {
     MedalInfoParam *medalParam = param;

@@ -207,6 +207,7 @@ static const DowsingIconRes sIconRes[ICON_COUNT] = {
     { 12, 6, 10 },
 };
 
+// clang-format off
 static const DowsingSignal sSignals[10] = {
     { 0, 0, 0, 128, 88, 8 },
     { 1, 1, 1, 128, 104, 8 },
@@ -219,6 +220,8 @@ static const DowsingSignal sSignals[10] = {
     { 4, 5, 0, 128, 152, 0 },
     { 5, 4, 0, 128, 88, 0 },
 };
+
+// clang-format on
 
 static const DowsingBGSetup sDowsingBGSetups[] = {
     { BG_INFOWIN,
@@ -474,8 +477,8 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
             if (hit.type == HIT_HIDDEN_ITEM) {
                 const HiddenItem *item = hit.item;
                 if (zoneId != item->zoneId) {
-                    if (!item->outdoors || !zoneIsMatrix0 || GetZoneIsEntralinkAny(item->zoneId)
-                        || item->zoneId == ZONE_ROUTE_4_16) {
+                    if (!item->outdoors || !zoneIsMatrix0 || GetZoneIsEntralinkAny(item->zoneId) ||
+                        item->zoneId == ZONE_ROUTE_4_16) {
                         continue;
                     }
                 }
@@ -570,7 +573,8 @@ void Dowsing_UpdateAltFrame(DowsingWork *work, BOOL active) {
     if (active) {
         if (work->shownSignal != work->signal) {
             ClActorPos pos;
-            func_0204c124(work->icons[ICON_DIRECTION].actor, work->signal != SIGNAL_CLOSEST && work->signal != SIGNAL_NONE);
+            func_0204c124(work->icons[ICON_DIRECTION].actor,
+                          work->signal != SIGNAL_CLOSEST && work->signal != SIGNAL_NONE);
             func_0204c124(work->icons[ICON_CLOSEST].actor, work->signal == SIGNAL_CLOSEST);
             pos.x = sSignals[work->signal].x;
             pos.y = sSignals[work->signal].y;

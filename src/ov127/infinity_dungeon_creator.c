@@ -17,12 +17,15 @@
 #define INFINITY_DUNGEON_SPECIAL_RANK_COUNT 5
 #define INFINITY_DUNGEON_TRAINER_CLASS_COUNT 30
 
-static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 rank, u32 *trainers, InfinityDungeonRandom *rnd, HeapID heapId);
+static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 rank, u32 *trainers,
+                                               InfinityDungeonRandom *rnd, HeapID heapId);
 static int InfinityDungeonCreator_ListTrainerRooms(InfinityDungeon *dungeon, int floor, u32 *rooms, u32 *counts);
-static void InfinityDungeonCreator_PlaceSpecialTrainer(InfinityDungeon *dungeon, const u16 *specials, int floor, u32 rank, const u32 *rooms,
-                                int roomCount, const u32 *counts, InfinityDungeonRandom *rnd, int *specialCount);
+static void InfinityDungeonCreator_PlaceSpecialTrainer(InfinityDungeon *dungeon, const u16 *specials, int floor,
+                                                       u32 rank, const u32 *rooms, int roomCount, const u32 *counts,
+                                                       InfinityDungeonRandom *rnd, int *specialCount);
 static int InfinityDungeonCreator_ListGoalCandidates(InfinityDungeon *dungeon, u8 floor, u32 *slots, u32 *rooms);
-static void InfinityDungeonCreator_PickSpecialTrainers(InfinityDungeon *dungeon, u32 rank, u16 *specials, InfinityDungeonRandom *rnd);
+static void InfinityDungeonCreator_PickSpecialTrainers(InfinityDungeon *dungeon, u32 rank, u16 *specials,
+                                                       InfinityDungeonRandom *rnd);
 
 static inline u32 InfinityDungeonRandom_Next(InfinityDungeonRandom *rnd, u32 max) {
     rnd->state = rnd->multiplier * rnd->state + rnd->increment;
@@ -83,13 +86,15 @@ void InfinityDungeonCreator_Create(InfinityDungeon *dungeon, u32 rank, u32 seed,
         if (roomCount <= 0) {
             return;
         }
-        InfinityDungeonCreator_PlaceSpecialTrainer(dungeon, specials, floor, rank, rooms, roomCount, counts, &rnd, &specialCount);
+        InfinityDungeonCreator_PlaceSpecialTrainer(dungeon, specials, floor, rank, rooms, roomCount, counts, &rnd,
+                                                   &specialCount);
     }
     GFL_HeapFree(trainers);
 }
 
 // The trainers of a rank, in the order of the rank's classes, each class's share shuffled
-static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 rank, u32 *trainers, InfinityDungeonRandom *rnd, HeapID heapId) {
+static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 rank, u32 *trainers,
+                                               InfinityDungeonRandom *rnd, HeapID heapId) {
     int trainerCount = 0;
     u32 *candidates;
     u32 *group;
@@ -167,8 +172,9 @@ static int InfinityDungeonCreator_ListTrainerRooms(InfinityDungeon *dungeon, int
 
 // Puts the next special trainer on the floor, in the goal's trainer's place when the goal is on another floor and the
 // trainer is on this one, or else in a trainer's place of a random room
-static void InfinityDungeonCreator_PlaceSpecialTrainer(InfinityDungeon *dungeon, const u16 *specials, int floor, u32 rank, const u32 *rooms,
-                                int roomCount, const u32 *counts, InfinityDungeonRandom *rnd, int *specialCount) {
+static void InfinityDungeonCreator_PlaceSpecialTrainer(InfinityDungeon *dungeon, const u16 *specials, int floor,
+                                                       u32 rank, const u32 *rooms, int roomCount, const u32 *counts,
+                                                       InfinityDungeonRandom *rnd, int *specialCount) {
     u16 special = specials[*specialCount];
 
     if (dungeon->targetFloor != floor) {
@@ -235,7 +241,8 @@ static int InfinityDungeonCreator_ListGoalCandidates(InfinityDungeon *dungeon, u
 }
 
 // The five special trainers of a rank, shuffled
-static void InfinityDungeonCreator_PickSpecialTrainers(InfinityDungeon *dungeon, u32 rank, u16 *specials, InfinityDungeonRandom *rnd) {
+static void InfinityDungeonCreator_PickSpecialTrainers(InfinityDungeon *dungeon, u32 rank, u16 *specials,
+                                                       InfinityDungeonRandom *rnd) {
     u8 version = func_ov127_021f0dd8(dungeon);
     u16 first;
     int i;

@@ -688,8 +688,9 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         actorSetup.y = pos.y;
         actorSetup.bgPriority = 3;
         actorSetup.priority = 3;
-        work->actors[i] = func_0204c040(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
-                                        work->resources[RES_MEDAL_CELLS], &actorSetup, 0, heapId);
+        work->actors[i] =
+            func_0204c040(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
+                          work->resources[RES_MEDAL_CELLS], &actorSetup, 0, heapId);
         func_0204c488(work->actors[i], 0);
         func_0204c124(work->actors[i], FALSE);
     }
@@ -728,8 +729,9 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         windowSetup.y = windowPos.y;
         windowSetup.bgPriority = 3;
         windowSetup.priority = 3;
-        work->actors[j] = func_0204c040(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
-                                        work->resources[RES_MEDAL_CELLS], &windowSetup, 0, heapId);
+        work->actors[j] =
+            func_0204c040(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
+                          work->resources[RES_MEDAL_CELLS], &windowSetup, 0, heapId);
         func_0204c488(work->actors[j], 0);
         func_0204c124(work->actors[j], TRUE);
         func_0204c318(work->actors[j], OAM_MODE_OBJWND);
@@ -883,8 +885,7 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
                 break;
             case MEDAL_STATUS_DISCOVERED:
                 // A hint medal is the cell's last sequence
-                func_0204c488(work->actors[ACTOR_MEDAL + actor],
-                              func_0204c4a8(work->actors[ACTOR_MEDAL + actor]) - 1);
+                func_0204c488(work->actors[ACTOR_MEDAL + actor], func_0204c4a8(work->actors[ACTOR_MEDAL + actor]) - 1);
                 break;
             }
             if (shown == 1 && work->view == VIEW_NAMES) {
@@ -919,11 +920,9 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
                     palette = 0;
                 }
                 if (digit == 0) {
-                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), 10, x, y, 1, 1,
-                                         palette);
+                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), 10, x, y, 1, 1, palette);
                 } else {
-                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), digit, x, y, 1, 1,
-                                         palette);
+                    GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), digit, x, y, 1, 1, palette);
                 }
                 number -= digit * divisor;
                 divisor /= 10;
@@ -1541,8 +1540,7 @@ static void MedalBoxApp_DrawInfo(MedalBoxApp *work, MedalBoxEntry *medal, BOOL s
             str = GFL_MsgDataLoadStrbufNew(work->msgData[MSG_MEDAL_NAMES], MEDAL_NAME_NONE);
         }
         width = GFL_FontGetBlockWidth(str, work->font, 0);
-        PrintWindow_Print(&work->printWindows[WINDOW_INFO], work->printQueue, 232 - width, 48, str, work->font,
-                          color);
+        PrintWindow_Print(&work->printWindows[WINDOW_INFO], work->printQueue, 232 - width, 48, str, work->font, color);
         GFL_StrBufFree(str);
     }
     if (show == TRUE) {
@@ -2188,8 +2186,8 @@ static void MedalBoxApp_OpenMenu(MedalBoxApp *work) {
     init.y = 24;
     init.width = 13;
     init.height = 3;
-    work->menuRes = AppTaskMenuRes_Create(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 13, work->font, work->printQueue,
-                                          work->heapId);
+    work->menuRes =
+        AppTaskMenuRes_Create(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 13, work->font, work->printQueue, work->heapId);
     work->menu = AppTaskMenu_Create(&init, work->menuRes);
     work->messageWindow = BmpWin_CreateDynamic(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 1, 19, 17, 4, 11, 1);
     BmpWin_FlushMap(work->messageWindow);

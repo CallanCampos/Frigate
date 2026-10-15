@@ -4,10 +4,10 @@
 #include "types.h"
 #include "dpw/dpw_tr.h"
 
-// The Battle Subway's server library in overlay 189 ("/web/battletower/*.asp"), which the Wi-Fi Battle Subway of overlay
-// 191 talks to. It is built like dpw_tr.h's (a state that the game runs every frame, a result that is 0 or more when
-// the call went well). The ROM has no strings of this library's own, so the DpwBt_ names are guesses after the server's
-// pages
+// The Battle Subway's server library in overlay 189 ("/web/battletower/*.asp"), which the Wi-Fi Battle Subway of
+// overlay 191 talks to. It is built like dpw_tr.h's (a state that the game runs every frame, a result that is 0 or more
+// when the call went well). The ROM has no strings of this library's own, so the DpwBt_ names are guesses after the
+// server's pages
 
 // Starts and ends the library, for the player's ID and friend key, and runs it every frame
 void DpwBt_Init(s32 pid, u64 friendKey, int server);

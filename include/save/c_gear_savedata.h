@@ -2,8 +2,8 @@
 #define POKEBW2_SAVE_C_GEAR_SAVEDATA_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "save/shortcut.h"
+#include "struct_decls.h"
 #include "system/pms_data.h"
 
 #define CGEAR_PHRASE_MAX 5

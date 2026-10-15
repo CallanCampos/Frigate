@@ -61,6 +61,7 @@ static void func_ov036_021b41f4(GyoeTask *gyoeTask, VecFx32 *pos);
 static const u32 GYOE_MODEL_FILES[GYOE_KIND_COUNT] = { 50, 51, 52, 53 };
 
 // A bubble that stays when it is done, until its owner ends it
+// clang-format off
 static const FieldEffectTaskVTable GYOE_TASK_VTABLE = {
     sizeof(GyoeTask),
     func_ov036_021b3fc8,
@@ -69,7 +70,10 @@ static const FieldEffectTaskVTable GYOE_TASK_VTABLE = {
     func_ov036_021b4078,
 };
 
+// clang-format on
+
 // A bubble that ends itself when it is done
+// clang-format off
 static const FieldEffectTaskVTable GYOE_AUTO_END_TASK_VTABLE = {
     sizeof(GyoeTask),
     func_ov036_021b3fc8,
@@ -77,6 +81,8 @@ static const FieldEffectTaskVTable GYOE_AUTO_END_TASK_VTABLE = {
     func_ov036_021b4034,
     func_ov036_021b4078,
 };
+
+// clang-format on
 
 void *func_ov036_021b3e50(FieldEffects *effects, HeapID heapId) {
     FieldEffectGyoe *gyoe = GFL_HeapAllocate(heapId, sizeof(FieldEffectGyoe), TRUE, "fldeff_gyoe.c", 111);

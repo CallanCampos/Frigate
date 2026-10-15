@@ -12,15 +12,15 @@
 
 static u16 GetStrWidthForAlign(const StrBuf *strbuf, Font *font, u32 align);
 
-void PrintStrAligned(PrintWindow *window, PrintQueue *queue, u16 x, u16 y, const StrBuf *strbuf, Font *font,
-                         u16 color, u32 align) {
+void PrintStrAligned(PrintWindow *window, PrintQueue *queue, u16 x, u16 y, const StrBuf *strbuf, Font *font, u16 color,
+                     u32 align) {
     x -= GetStrWidthForAlign(strbuf, font, align);
     PrintWindow_Print(window, queue, x, y, strbuf, font, color);
 }
 
 // Prints "number1/number2" with the slash centered at x
 void PrintFraction(PrintWindow *window, PrintQueue *queue, Font *font, u16 x, u16 y, u16 color, s32 number1,
-                         s32 number2, HeapID heapId) {
+                   s32 number2, HeapID heapId) {
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_12, heapId);
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(heapId);
     StrBuf *buf = GFL_StrBufCreate(10, heapId);

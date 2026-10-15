@@ -6,7 +6,7 @@
 static int Sake_GetServerError(const char *name);
 
 // The declaration of the message's namespace
-static const char *sSakeNamespaceDeclarations[] = {"ns1=\"http://gamespy.net/sake\""};
+static const char *sSakeNamespaceDeclarations[] = { "ns1=\"http://gamespy.net/sake\"" };
 
 static int Sake_GetServerError(const char *name) {
     if (strcmp(name, "Success") == 0) {
@@ -77,8 +77,8 @@ void Sake_OnResponse(int status, int unused, SoapReader *reader, void *userData)
     }
     error = Sake_GetHttpResultError(status);
     if (error == SAKE_RESULT_SUCCESS) {
-        if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, request->type->responseName)
-            || !func_ov011_02170e90(reader, request->type->resultName, result, sizeof(result))) {
+        if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, request->type->responseName) ||
+            !func_ov011_02170e90(reader, request->type->resultName, result, sizeof(result))) {
             error = SAKE_RESULT_MALFORMED_RESPONSE;
         } else {
             error = Sake_GetServerError(result);

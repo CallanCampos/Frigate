@@ -154,6 +154,7 @@ static const u8 sFogTable[32] = {
     0x42, 0x46, 0x4a, 0x4e, 0x52, 0x56, 0x5a, 0x5e, 0x63, 0x67, 0x6b, 0x6f, 0x73, 0x77, 0x7b, 0x7f,
 };
 
+// clang-format off
 static const GymArea sAreas[] = {
     { 3, 13, 3, 3, 0x01810001, 0x140000 },  { 10, 1, 3, 4, 0x01810001, 0x140000 },
     { 19, 3, 3, 4, 0x01810001, 0x140000 },  { 24, 13, 3, 4, 0x01810001, 0x140000 },
@@ -162,6 +163,9 @@ static const GymArea sAreas[] = {
     { 18, 13, 13, 5, 0x00800000, 0x140000 },
 };
 
+// clang-format on
+
+// clang-format off
 static const RideEntry sRides[RIDE_COUNT] = {
     { 0, DIR_UP, 1, FALSE, FALSE, 0, 16, 0, 11, 16, 10, 11 },
     { 0, DIR_UP, 1, FALSE, TRUE, 0, 16, 10, 11, 16, 0, 11 },
@@ -181,9 +185,10 @@ static const RideEntry sRides[RIDE_COUNT] = {
     { 7, 9, 9, TRUE, TRUE, 1, 15, 0, 20, 4, 20, 14 },
 };
 
+// clang-format on
+
 void GymInsect_Init(Field *field) {
-    GymInsectWork *wk =
-        Field_AllocGimmickWorkBlock(field, GIMMICK_ID, Field_GetHeapID(field), sizeof(GymInsectWork));
+    GymInsectWork *wk = Field_AllocGimmickWorkBlock(field, GIMMICK_ID, Field_GetHeapID(field), sizeof(GymInsectWork));
     EventWork *eventWork;
     s32 i;
 

@@ -3,8 +3,8 @@
 
 #include "types.h"
 #include "gfl/heap.h"
-#include "system/str_tool.h"
 #include "struct_decls.h"
+#include "system/str_tool.h"
 
 // Word sets (wordset.c): the words that fill the placeholders in messages
 

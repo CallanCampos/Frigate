@@ -1,13 +1,14 @@
 // NitroSDK's libmath SHA-1 and the HMAC over it (the file name is a guess; see math_md5.c for why it is apart from
-// MD5). sha1_block, the compression, is hand-written ARM in sha1_block.c; the block function is called through a pointer
-// that sha1_set_masked can swap for a variant that clears words 6 and 14 of the block. Names are the SDK's as pret's
-// pokediamond and pmd-sky use them, or descriptive.
+// MD5). sha1_block, the compression, is hand-written ARM in sha1_block.c; the block function is called through a
+// pointer that sha1_set_masked can swap for a variant that clears words 6 and 14 of the block. Names are the SDK's as
+// pret's pokediamond and pmd-sky use them, or descriptive.
 #include "nitro/math.h"
 #include "nitro/mi.h"
 
 #define SHA1_BLOCK_SIZE 64
 
-#define BSWAP32(x) (((u8)((x) >> 24)) | (((x) >> 8) & 0x0000ff00) | (((x) << 8) & 0x00ff0000) | (((x) << 24) & 0xff000000))
+#define BSWAP32(x)                                                                                                     \
+    (((u8)((x) >> 24)) | (((x) >> 8) & 0x0000ff00) | (((x) << 8) & 0x00ff0000) | (((x) << 24) & 0xff000000))
 
 static void (*sSHA1BlockFunc)(MATHSHA1Context *context) = sha1_block;
 static u32 sSHA1Masked;

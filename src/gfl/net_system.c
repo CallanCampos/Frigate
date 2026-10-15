@@ -81,14 +81,14 @@ typedef struct {
 } NetSystemState;
 
 // Records a network error, from the line it was found on
-#define NET_ERROR(line)                                                             \
-    do {                                                                            \
-        GFLNetErrorInfo *err;                                                       \
-        func_02040158();                                                            \
-        err = func_02042540();                                                      \
-        if (!err->type) {                                                       \
-            func_020424ac(err->code, err->unk4, err->unk8, line);                   \
-        }                                                                           \
+#define NET_ERROR(line)                                                                                                \
+    do {                                                                                                               \
+        GFLNetErrorInfo *err;                                                                                          \
+        func_02040158();                                                                                               \
+        err = func_02042540();                                                                                         \
+        if (!err->type) {                                                                                              \
+            func_020424ac(err->code, err->unk4, err->unk8, line);                                                      \
+        }                                                                                                              \
     } while (0)
 
 static void func_0203e8c8(u8 state, int line);
@@ -216,7 +216,6 @@ static void func_0203ea5c(void) {
     sNetSys->unk1EA = 0;
     sNetSys->unk1ED = 0;
 }
-
 
 static void func_0203ebe0(int netID) {
     GFL_ASSERT(netID < GFL_NET_MACHINE_MAX);
@@ -978,7 +977,7 @@ static void func_0203fdbc(void) {
             }
             net = sNetSys;
             func_0203fc34(&net->serverRing, GFL_NET_NETID_SERVER, net->recvTemp, &net->serverRecvState,
-                func_0203e8e8());
+                          func_0203e8e8());
         }
     }
 }

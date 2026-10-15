@@ -1,6 +1,6 @@
 // The Entree Forest capture's scene (overlay 172): the battle view's graphics, the Pokémon of the dream appearing, the
-// choice between the bag and leaving, and the throw of a Poké Ball. Its seq is the step of the current proc. The name is
-// the ROM's string, from GFL_HeapAllocate's assert
+// choice between the bag and leaving, and the throw of a Poké Ball. Its seq is the step of the current proc. The name
+// is the ROM's string, from GFL_HeapAllocate's assert
 
 #include "types.h"
 #include "app/pdc_main.h"
@@ -157,11 +157,14 @@ static void PdcMain_SetProc(PdcMain *work, PdcMainProc proc) {
 }
 
 static const BGSysLCDConfig sLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D };
+// clang-format off
 static const BGSysVRAMConfig sVRAMConfig = {
     GX_VRAM_BG_128_D,  GX_VRAM_BGEXTPLTT_NONE, GX_VRAM_SUB_BG_128_C,  GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_64_E,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I, GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_01_FG,  GX_OBJVRAMMODE_CHAR_1D_64K, GX_OBJVRAMMODE_CHAR_1D_32K,
 };
+
+// clang-format on
 
 static void PdcMain_InitGraphics(HeapID heapId) {
     GFL_BGSysCreate(heapId);

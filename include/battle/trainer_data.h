@@ -85,8 +85,8 @@ typedef struct {
 // A field of a trainer's record (TRAINER_PARAM_*)
 u32 TrainerData_GetParam(int trainerId, u32 param);
 BOOL TrainerMsg_CheckExists(int trainerId, u32 msgId, HeapID heapId);
-// Loads the trainer's message of the type, or clears strbuf if it has none. Battle institution trainers only have types 0
-// and 1, and any other type leaves strbuf as it was
+// Loads the trainer's message of the type, or clears strbuf if it has none. Battle institution trainers only have types
+// 0 and 1, and any other type leaves strbuf as it was
 void TrainerMsg_Load(int trainerId, u32 msgId, StrBuf *strbuf, HeapID heapId);
 // 0 for a male class, 1 for a female one
 u8 TrainerClass_GetSex(u32 trainerClass);

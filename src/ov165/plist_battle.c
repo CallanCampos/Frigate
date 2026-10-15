@@ -209,7 +209,8 @@ static PokeListPartner *PokeListBattle_CreatePartner(PokeListWork *wk, PokeListP
             if (i % 2 != 0) {
                 offset = 0;
             }
-            partner->pkms[i] = PokeListBattle_CreatePartnerPkmAt(wk, PokeParty_GetPkm(partnerParam->party, i), col, row, offset);
+            partner->pkms[i] =
+                PokeListBattle_CreatePartnerPkmAt(wk, PokeParty_GetPkm(partnerParam->party, i), col, row, offset);
         } else {
             partner->pkms[i] = NULL;
         }

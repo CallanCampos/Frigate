@@ -2,7 +2,6 @@
 #define POKEBW2_SAVE_BATTLE_REC_H
 
 #include "types.h"
-#include <stddef.h>
 #include "battle/btl_setup.h"
 #include "gfl/heap.h"
 #include "nitro/math.h"
@@ -10,6 +9,7 @@
 #include "save/player_info.h"
 #include "struct_decls.h"
 #include "system/pms_data.h"
+#include <stddef.h>
 
 // battle_rec.c: the battle video that is loaded, which the battle recorder plays and the extra save data keeps
 
@@ -213,7 +213,8 @@ BattleRecHeader *func_0200c0c0(void);
 // The header of a video
 BattleRecHeader *func_0200c0cc(BattleRecVideo *video);
 // Makes the loaded video of a received profile, header and body, and decrypts its body
-void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body, SaveControl *save);
+void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body,
+                   SaveControl *save);
 // A value from the header, BATTLE_REC_HEADER_*, such as the video's number
 u64 func_0200c124(BattleRecHeader *header, u32 id, u32 index);
 // Sets the CRC of a body

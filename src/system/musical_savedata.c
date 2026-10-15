@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/musical_savedata.h"
 #include "gfl/std.h"
+#include "save/musical_savedata.h"
 #include "save/save_control.h"
 
 // The musical's save block: the photo of the last finale, the props owned and the ones not yet looked at, and the

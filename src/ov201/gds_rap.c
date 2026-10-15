@@ -5,8 +5,8 @@
 // GFL_HeapAllocate is given.
 
 #include "types.h"
-#include "app/gds_rap.h"
 #include "app/battle_rec_ov.h"
+#include "app/gds_rap.h"
 #include "constants/arc.h"
 #include "constants/language.h"
 #include "constants/text_banks.h"
@@ -54,6 +54,7 @@ static BOOL GdsRap_GetVideoPokemonPos(GdsRapWork *gdsrap, int index, s32 *client
 static void GdsRap_CopyNickname(const u16 *src, u16 *dest, int length);
 static BOOL GdsRap_RecvResponse(GdsRapWork *gdsrap);
 
+// clang-format off
 static const GdsRapBattleMode BattleModeBitTbl[] = {
     {0x18, 0xbf},
     {0x98, 0xbf},
@@ -76,6 +77,8 @@ static const GdsRapBattleMode BattleModeBitTbl[] = {
     {0x38, 0x38},
     {0x00, 0x00},
 };
+
+// clang-format on
 
 BOOL GdsRap_Init(GdsRapWork *gdsrap, const GdsRapInit *init) {
     BOOL ret;

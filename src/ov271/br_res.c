@@ -3,10 +3,10 @@
 // GFL_HeapAllocate's asserts
 
 #include "types.h"
-#include "constants/arc.h"
-#include "constants/text_banks.h"
 #include "app/battle_recorder/br_fade.h"
 #include "app/battle_recorder/br_res.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"

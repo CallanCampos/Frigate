@@ -1,6 +1,6 @@
 // What the Global Data Server client and the Battle Recorder do with the loaded battle video on its way to the server
-// and into the save. The ROM does not name the file: the name is a guess, after the Generation 4 games' battle_rec_ov.c,
-// which holds the same functions after the GDS client's files.
+// and into the save. The ROM does not name the file: the name is a guess, after the Generation 4 games'
+// battle_rec_ov.c, which holds the same functions after the GDS client's files.
 
 #include "types.h"
 #include "app/battle_rec_ov.h"

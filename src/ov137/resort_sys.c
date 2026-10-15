@@ -1,4 +1,3 @@
-#include "field/resort.h"
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/flags.h"
@@ -9,6 +8,7 @@
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_script.h"
+#include "field/resort.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
 #include "gfl/random.h"
@@ -126,45 +126,54 @@ static void ResortRecord_Setup(ResortSys *sys, JoinAvenueRecord *record, u16 sho
 static void ResortEntry_SetupFromType(ResortSys *sys, JoinAvenueEntry *entry, u16 shopKind, u32 type, HeapID heapId);
 static void ResortSys_ResetWork(ResortSys *sys, u32 value);
 
-const u16 RESORT_SYS_UNUSED[2] = {0, 8};
+const u16 RESORT_SYS_UNUSED[2] = { 0, 8 };
 // The kinds of data of the occupants
-static const u32 sOccupantKinds[1] = {0};
+static const u32 sOccupantKinds[1] = { 0 };
 // The shop kinds that need a row of the texts, and the type that row has
-static const ResortKeyValue sShopKindTexts[2] = {{4, 2}, {5, 3}};
+static const ResortKeyValue sShopKindTexts[2] = { { 4, 2 }, { 5, 3 } };
 // The chance in 100 of a new shop of the kind in a tier
-static const s32 sNewShopChances[3] = {10, 15, 20};
-static const ResortKeyValue sEntryTypes[3] = {{0, 2}, {1, 3}, {3, 5}};
-static const u8 sUnk021f56bc[13] = {0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6};
+static const s32 sNewShopChances[3] = { 10, 15, 20 };
+static const ResortKeyValue sEntryTypes[3] = { { 0, 2 }, { 1, 3 }, { 3, 5 } };
+static const u8 sUnk021f56bc[13] = { 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6 };
 // How much a person's shop kind counts for, in 12-bit fixed point
-static const s32 sShopKindMultipliers[3] = {0x800, 0x1000, 0x2000};
-static const ResortKeyValue sRecordTypes[4] = {{4, 0}, {5, 1}, {6, 2}, {7, 3}};
+static const s32 sShopKindMultipliers[3] = { 0x800, 0x1000, 0x2000 };
+static const ResortKeyValue sRecordTypes[4] = { { 4, 0 }, { 5, 1 }, { 6, 2 }, { 7, 3 } };
 // The kinds of people that hide, by the kind of the person that is hidden: the types before a 4
 static const u32 sHiddenTypes[2][4] = {
-    {2, 1, 4, 0},
-    {0, 2, 1, 4},
+    { 2, 1, 4, 0 },
+    { 0, 2, 1, 4 },
 };
 static const u8 sUnk021f56fc[7][7] = {
-    {0, 2, 7, 4, 6, 1, 3}, {1, 3, 0, 2, 7, 4, 6}, {4, 6, 1, 3, 0, 2, 7}, {2, 7, 4, 6, 1, 3, 0},
-    {3, 0, 2, 7, 4, 6, 1}, {6, 1, 3, 0, 2, 7, 4}, {7, 4, 6, 1, 3, 0, 2},
+    { 0, 2, 7, 4, 6, 1, 3 }, { 1, 3, 0, 2, 7, 4, 6 }, { 4, 6, 1, 3, 0, 2, 7 }, { 2, 7, 4, 6, 1, 3, 0 },
+    { 3, 0, 2, 7, 4, 6, 1 }, { 6, 1, 3, 0, 2, 7, 4 }, { 7, 4, 6, 1, 3, 0, 2 },
 };
 // The data that is made by the kind of the data it is made from and the kind it is made as
+// clang-format off
 static const u32 sMakeKinds[4][4] = {
     {0, 2, 1, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 4, 3, 0},
 };
+
+// clang-format on
+// clang-format off
 static const ResortPeopleRow sPeopleRows[RESORT_PERSON_COUNT] = {
     {{1, 2, -1}, {3, 4, 5, 6, 7, -1}}, {{0, 2, 3, -1}, {4, 5, 6, 7, -1}}, {{0, 1, 3, 4, -1}, {5, 6, 7, -1}},
     {{1, 2, 4, 5, -1}, {0, 6, 7, -1}}, {{2, 3, 5, 6, -1}, {0, 1, 7, -1}}, {{3, 4, 6, 7, -1}, {0, 1, 2, -1}},
     {{4, 5, 7, -1}, {0, 1, 2, 3, -1}}, {{5, 6, -1}, {0, 1, 2, 3, 4, -1}},
 };
+
+// clang-format on
+// clang-format off
 static const ResortUnlock sUnlocks[RESORT_SHOP_KIND_COUNT] = {
     {16, 8, 1, ResortUnlock_Always, FALSE},     {17, 9, 2, ResortUnlock_Always, FALSE},
     {19, 11, 4, ResortUnlock_Always, FALSE},    {20, 12, 5, ResortUnlock_Always, FALSE},
     {18, 10, 3, ResortUnlock_Always, FALSE},    {21, 13, 6, ResortUnlock_FlagSet, FALSE},
     {22, 14, 7, ResortUnlock_AllPeople, FALSE}, {23, 14, 8, ResortUnlock_Always, TRUE},
 };
+
+// clang-format on
 
 ResortSys *ResortSys_Create(const ResortSysSetup *setup, ResortWork *resortWork, HeapID heapId) {
     ResortSys *sys = GFL_HeapAllocate(heapId, sizeof(ResortSys), TRUE, "resort_sys.c", 75);
@@ -266,7 +275,7 @@ static u32 ResortSys_PickByGender(u32 gender, u32 male, u32 female) {
 
 // The answer to a question of the scripts: a message of the avenue's texts for the person asked about, or a number
 u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, GameData *gameData, WordSet *wordSet,
-                        HeapID heapId) {
+                             HeapID heapId) {
     ResortPersonData **datas = ResortSys_GetDatas(sys);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     ResortBinary *types = ResortSys_GetPersonTypes(sys);
@@ -622,7 +631,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
     }
     case 88: {
         u32 message;
-        u32 candidates[9] = {0};
+        u32 candidates[9] = { 0 };
         s32 count = 0;
         JoinAvenuePerson *person = func_ov137_021f1980(data);
         BOOL hasRecord = FALSE;
@@ -797,7 +806,7 @@ static BOOL ResortSys_MatchCondition(u32 type, JoinAvenuePerson *person, ResortS
 }
 
 BOOL ResortSys_GetPersonVisit(ResortPersonData *data, JoinAvenuePerson *person, ResortSys *sys, u16 *message, u16 *a4,
-                         u16 *a5) {
+                              u16 *a5) {
     ResortBinary *types = ResortSys_GetPersonTypes(sys);
     ResortBinary *texts = ResortSys_GetTexts(sys);
     u16 personType;
@@ -978,7 +987,7 @@ BOOL ResortSys_AreAllShopsMaxLevel(ResortSys *sys) {
 // Puts a text in the word set: the one of the kind of the first parameter, about the person that the second one
 // chooses: the script's own person (0xfe), none (0xff), or the one of a kind of data of the avenue by the third
 void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, ResortSys *sys, ResortPerson *person,
-                         WordSet *wordSet, GameData *gameData, HeapID heapId) {
+                             WordSet *wordSet, GameData *gameData, HeapID heapId) {
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     ResortShopData *shopData = ResortSys_GetShopData(sys);
     ResortBinary *ranks = ResortSys_GetRanks(sys);
@@ -1025,8 +1034,8 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         u16 trainerId = func_ov137_021f1968(data, JOIN_AVE_PARAM_TRAINER_ID, NULL);
         u16 version = func_ov137_021f1968(data, JOIN_AVE_PARAM_VERSION, NULL);
         u16 unk18 = func_ov137_021f1968(data, JOIN_AVE_PARAM_UNK_18, NULL);
-        StrBuf *buf = ResortSys_FormatShopText(shopData, data,
-                                          func_020394b0(shopId, trainerId, version, unk18, info, shopData), heapId);
+        StrBuf *buf = ResortSys_FormatShopText(
+            shopData, data, func_020394b0(shopId, trainerId, version, unk18, info, shopData), heapId);
 
         func_0202437c(wordSet, wordIndex, buf, func_ov137_021f1968(data, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(buf);
@@ -1389,7 +1398,7 @@ void *ResortRecords_CreateWindow(void *msgBGSys, HeapID heapId) {
 
 // Draws a page of the avenue's records: the people with the most of one thing, with their rank and number
 void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void *msgBGSys, WordSet *wordSet,
-                         GameData *gameData, u32 page, HeapID heapId) {
+                             GameData *gameData, u32 page, HeapID heapId) {
     ResortRankEntry entries[RESORT_PERSON_COUNT + 1];
     s32 total;
     s32 count = 0;
@@ -1692,7 +1701,8 @@ u32 ResortSys_GetTrainerTypeText(ResortBinary *texts, ResortPersonData *data, u3
 
 // Hides the people and NPCs who would share the screen with the player's; mode 2 only hides those that are behind
 // the camera
-void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field *field, ResortPerson *person, u32 mode) {
+void ResortSys_HideOverlappingActors(ResortPeople *people, ResortNPC *npc, Field *field, ResortPerson *person,
+                                     u32 mode) {
     FieldPlayer *player = Field_GetPlayer(field);
     FieldCamera *camera = Field_GetCameraSystem(field);
     BOOL cameraOnly = FALSE;

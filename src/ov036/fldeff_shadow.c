@@ -43,6 +43,7 @@ static void func_ov036_021a3d28(FieldEffectTask *task, void *work);
 
 static const VecFx32 SHADOW_SCALE = { FX32_ONE, FX32_ONE, FX32_CONST(0.75) };
 
+// clang-format off
 static const FieldEffectTaskVTable SHADOW_TASK_VTABLE = {
     sizeof(ShadowTask),
     func_ov036_021a3c20,
@@ -50,6 +51,8 @@ static const FieldEffectTaskVTable SHADOW_TASK_VTABLE = {
     func_ov036_021a3cd4,
     func_ov036_021a3d28,
 };
+
+// clang-format on
 
 void *FieldEffect_Shadow_Create(FieldEffects *effects, HeapID heapId) {
     Field *field;
@@ -115,8 +118,8 @@ static void func_ov036_021a3c20(FieldEffectTask *task, void *work) {
     request.pos = (VecFx32){ 0, 0, 0 };
     request.callback = NULL;
     request.callbackData = shadowTask;
-    shadowTask->actorIndex = BlActSys_ExecActorRequests(shadowTask->shadow->blact, shadowTask->shadow->matIndex,
-                                                        &request, 1, 3);
+    shadowTask->actorIndex =
+        BlActSys_ExecActorRequests(shadowTask->shadow->blact, shadowTask->shadow->matIndex, &request, 1, 3);
     if (shadowTask->actorIndex == 0xffff) {
         func_ov036_021a3a70(task);
         return;

@@ -1,9 +1,9 @@
 #include "types.h"
-#include "save/shortcut.h"
 #include "gfl/std.h"
 #include "nitro/math.h"
 #include "save/c_gear_savedata.h"
 #include "save/save_control.h"
+#include "save/shortcut.h"
 #include "system/shortcut_util.h"
 
 // The shortcuts registered to the Y button, a list without gaps inside the C-Gear's save block. The ROM has no

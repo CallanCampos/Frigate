@@ -60,7 +60,7 @@ void WifiBattleMatchTask_ReturnToSeq(WifiBattleMatchTask *task);
 
 // The message box, at the bottom of BG bg. The frame is drawn with frameChar and framePalette
 WifiBattleMatchMsgBox *WifiBattleMatchMsgBox_Create(u32 bg, u32 palette, u16 framePalette, u16 frameChar,
-                                           PrintQueue *printQueue, Font *font, HeapID heapId);
+                                                    PrintQueue *printQueue, Font *font, HeapID heapId);
 void WifiBattleMatchMsgBox_Free(WifiBattleMatchMsgBox *box);
 void WifiBattleMatchMsgBox_Update(WifiBattleMatchMsgBox *box);
 // Prints a message of msgData, with a WIFIBATTLEMATCH_MSG_* way of printing it
@@ -76,7 +76,7 @@ void WifiBattleMatchMsgBox_Clear(WifiBattleMatchMsgBox *box);
 // The list menu. WifiBattleMatchMenu_CreateBottomRight puts it at the bottom right
 WifiBattleMatchMenu *WifiBattleMatchMenu_CreateBottomRight(const WifiBattleMatchMenuParam *param, HeapID heapId);
 WifiBattleMatchMenu *WifiBattleMatchMenu_Create(const WifiBattleMatchMenuParam *param, u8 x, u8 y, u8 width, u8 height,
-                                         HeapID heapId);
+                                                HeapID heapId);
 void WifiBattleMatchMenu_Free(WifiBattleMatchMenu *menu);
 // The item picked, or -1 while none is
 s32 WifiBattleMatchMenu_Update(WifiBattleMatchMenu *menu);

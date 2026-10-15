@@ -1,12 +1,12 @@
-#include <stddef.h>
 #include "types.h"
-#include "save/battle_examination.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
+#include "save/battle_examination.h"
 #include "save/save_control.h"
 #include "save/trial_house.h"
 #include "system/game_data.h"
+#include <stddef.h>
 
 // The downloaded battle examination that the Trial House plays: five Trainers, a signature and a checksum.
 // Extra save block 5.
@@ -25,8 +25,8 @@ void BattleExamination_Init(BattleExaminationSave *examination) {
 BOOL BattleExamination_IsValid(void *saveBuffer) {
     BattleExaminationSave *examination = saveBuffer;
 
-    if (examination->crc == getCRC16(examination, offsetof(BattleExaminationSave, crc))
-        && examination->signature == BATTLE_EXAMINATION_SIGNATURE) {
+    if (examination->crc == getCRC16(examination, offsetof(BattleExaminationSave, crc)) &&
+        examination->signature == BATTLE_EXAMINATION_SIGNATURE) {
         return TRUE;
     }
     return FALSE;

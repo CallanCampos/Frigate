@@ -47,8 +47,8 @@ static inline u16 Sc_SwapU16(u16 value) {
 }
 
 static inline u32 Sc_SwapU32(u32 value) {
-    return ((value >> 24) & 0x000000ff) | ((value >> 8) & 0x0000ff00) | ((value << 8) & 0x00ff0000)
-           | ((value << 24) & 0xff000000);
+    return ((value >> 24) & 0x000000ff) | ((value >> 8) & 0x0000ff00) | ((value << 8) & 0x00ff0000) |
+           ((value << 24) & 0xff000000);
 }
 
 static int ScClient_Alloc(ScClient **client);
@@ -611,7 +611,7 @@ static u8 *Sc_PutGuid(u8 *dest, const char *text) {
 }
 
 // The declaration of the messages' namespace
-static const char *sCompetitionNamespaces[] = {"gsc=\"http://gamespy.net/competition/\""};
+static const char *sCompetitionNamespaces[] = { "gsc=\"http://gamespy.net/competition/\"" };
 
 static int ScClient_Begin(ScClient *client, ScClient *self) {
     if (func_ov011_0216c9f4() != 0) {
@@ -660,11 +660,11 @@ static int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertific
     if (writer == NULL) {
         return 5;
     }
-    if (!func_ov011_02170614(writer, "gsc", "CreateSession") || !func_ov011_02170614(writer, "gsc", "certificate")
-        || !Auth_WriteCertificate(certificate, "gsc", writer) || !func_ov011_02170660(writer, "gsc", "certificate")
-        || !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof))
-        || !func_ov011_02170818(writer, "gsc", "gameid", gameId) || !func_ov011_02170660(writer, "gsc", "CreateSession")
-        || !func_ov011_0216fea8(writer)) {
+    if (!func_ov011_02170614(writer, "gsc", "CreateSession") || !func_ov011_02170614(writer, "gsc", "certificate") ||
+        !Auth_WriteCertificate(certificate, "gsc", writer) || !func_ov011_02170660(writer, "gsc", "certificate") ||
+        !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
+        !func_ov011_02170818(writer, "gsc", "gameid", gameId) || !func_ov011_02170660(writer, "gsc", "CreateSession") ||
+        !func_ov011_0216fea8(writer)) {
         func_ov011_0216fe64(writer);
         return 7;
     }
@@ -688,22 +688,22 @@ static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader,
         if (status == 0) {
             result = 0;
             if (func_ov011_02170d18(reader)) {
-                if (!func_ov011_02170d28(reader, "CreateSessionResponse")
-                    && !func_ov011_02170d28(reader, "CreateMatchlessSessionResponse")) {
+                if (!func_ov011_02170d28(reader, "CreateSessionResponse") &&
+                    !func_ov011_02170d28(reader, "CreateMatchlessSessionResponse")) {
                     error = 9;
                 }
             } else {
                 error = 9;
             }
-            if (!func_ov011_02170d28(reader, "CreateSessionResult")
-                && !func_ov011_02170d28(reader, "CreateMatchlessSessionResult")) {
+            if (!func_ov011_02170d28(reader, "CreateSessionResult") &&
+                !func_ov011_02170d28(reader, "CreateMatchlessSessionResult")) {
                 error = 9;
             }
             if (func_ov011_02171090(reader, "result", &result)) {
                 if (error != 9) {
                     if (result == 0) {
-                        if (func_ov011_02170e90(reader, "csid", csid, sizeof(csid))
-                            && func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
+                        if (func_ov011_02170e90(reader, "csid", csid, sizeof(csid)) &&
+                            func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
                             ScClient_CopyCsid(client->self, csid);
                             ScClient_CopyCcid(client->self, ccid);
                             error = 0;
@@ -740,13 +740,14 @@ static int ScClient_PostReportIntention(ScClient *client, int gameId, const char
     if (writer == NULL) {
         return 5;
     }
-    if (!func_ov011_02170614(writer, "gsc", "SetReportIntention") || !func_ov011_02170614(writer, "gsc", "certificate")
-        || !Auth_WriteCertificate(certificate, "gsc", writer) || !func_ov011_02170660(writer, "gsc", "certificate")
-        || !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof))
-        || !func_ov011_021706b8(writer, "gsc", "csid", csid) || !func_ov011_021706b8(writer, "gsc", "ccid", ccid)
-        || !func_ov011_02170818(writer, "gsc", "gameid", gameId)
-        || !func_ov011_02170818(writer, "gsc", "authoritative", authoritative ? 1 : 0)
-        || !func_ov011_02170660(writer, "gsc", "SetReportIntention") || !func_ov011_0216fea8(writer)) {
+    if (!func_ov011_02170614(writer, "gsc", "SetReportIntention") ||
+        !func_ov011_02170614(writer, "gsc", "certificate") || !Auth_WriteCertificate(certificate, "gsc", writer) ||
+        !func_ov011_02170660(writer, "gsc", "certificate") ||
+        !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
+        !func_ov011_021706b8(writer, "gsc", "csid", csid) || !func_ov011_021706b8(writer, "gsc", "ccid", ccid) ||
+        !func_ov011_02170818(writer, "gsc", "gameid", gameId) ||
+        !func_ov011_02170818(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
+        !func_ov011_02170660(writer, "gsc", "SetReportIntention") || !func_ov011_0216fea8(writer)) {
         func_ov011_0216fe64(writer);
         return 7;
     }
@@ -769,10 +770,10 @@ static void ScClient_OnReportIntention(int status, int unused, SoapReader *reade
         if (status == 0) {
             error = 0;
             result = 0;
-            if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, "SetReportIntentionResponse")
-                || !func_ov011_02170d28(reader, "SetReportIntentionResult")
-                || !func_ov011_02171090(reader, "result", &result)
-                || !func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
+            if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, "SetReportIntentionResponse") ||
+                !func_ov011_02170d28(reader, "SetReportIntentionResult") ||
+                !func_ov011_02171090(reader, "result", &result) ||
+                !func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
                 error = 9;
             } else if (result == 0) {
                 ScClient_CopyCcid(client->self, ccid);
@@ -813,13 +814,13 @@ static int ScClient_PostReport(ScClient *client, int gameId, const char *csid, c
     if (writer == NULL) {
         return 5;
     }
-    if (!func_ov011_02170614(writer, "gsc", "SubmitReport") || !func_ov011_02170614(writer, "gsc", "certificate")
-        || !Auth_WriteCertificate(certificate, "gsc", writer) || !func_ov011_02170660(writer, "gsc", "certificate")
-        || !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof))
-        || !func_ov011_021706b8(writer, "gsc", "csid", csid) || !func_ov011_021706b8(writer, "gsc", "ccid", ccid)
-        || !func_ov011_02170818(writer, "gsc", "gameid", gameId)
-        || !func_ov011_02170818(writer, "gsc", "authoritative", authoritative ? 1 : 0)
-        || !func_ov011_02170660(writer, "gsc", "SubmitReport") || !func_ov011_0216fea8(writer)) {
+    if (!func_ov011_02170614(writer, "gsc", "SubmitReport") || !func_ov011_02170614(writer, "gsc", "certificate") ||
+        !Auth_WriteCertificate(certificate, "gsc", writer) || !func_ov011_02170660(writer, "gsc", "certificate") ||
+        !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
+        !func_ov011_021706b8(writer, "gsc", "csid", csid) || !func_ov011_021706b8(writer, "gsc", "ccid", ccid) ||
+        !func_ov011_02170818(writer, "gsc", "gameid", gameId) ||
+        !func_ov011_02170818(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
+        !func_ov011_02170660(writer, "gsc", "SubmitReport") || !func_ov011_0216fea8(writer)) {
         func_ov011_0216fe64(writer);
         return 5;
     }
@@ -843,9 +844,8 @@ static void ScClient_OnSubmitReport(int status, int unused, SoapReader *reader, 
         if (status == 0) {
             error = 0;
             result = 0;
-            if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, "SubmitReportResponse")
-                || !func_ov011_02170d28(reader, "SubmitReportResult")
-                || !func_ov011_02171090(reader, "result", &result)) {
+            if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, "SubmitReportResponse") ||
+                !func_ov011_02170d28(reader, "SubmitReportResult") || !func_ov011_02171090(reader, "result", &result)) {
                 error = 9;
             } else if (result != 0) {
                 if (result == 7) {

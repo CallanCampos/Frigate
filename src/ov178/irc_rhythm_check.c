@@ -17,10 +17,10 @@
 #include "gfl/gx_layers.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
+#include "gfl/net.h"
 #include "gfl/net_command.h"
 #include "gfl/net_handle.h"
 #include "gfl/net_system.h"
-#include "gfl/net.h"
 #include "gfl/proc.h"
 #include "gfl/random.h"
 #include "gfl/sound.h"
@@ -343,7 +343,7 @@ static const NetCommand sIrcRhythmCommands[1] = {
 
 static const BGSysLCDConfig sIrcRhythmLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_1, GX_BG0_AS_2D };
 
-static const u32 sIrcRhythmBGModes[BG_COUNT] = { BGMODE_TEXT, BGMODE_TEXT, BGMODE_TEXT, BGMODE_TEXT,
+static const u32 sIrcRhythmBGModes[BG_COUNT] = { BGMODE_TEXT, BGMODE_TEXT, BGMODE_TEXT,  BGMODE_TEXT,
                                                  BGMODE_TEXT, BGMODE_TEXT, BGMODE_AFFINE };
 
 static const u32 sIrcRhythmBGs[BG_COUNT] = { 0, 1, 2, 4, 5, 6, 7 };
@@ -1020,8 +1020,7 @@ static void IrcRhythmCheck_StepInterrupted(IrcRhythmCheckWork *wk, u16 *state) {
         *state = 2;
         break;
     case 2:
-        IrcRhythmWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain7_Text_ConnectionInterruptedPleaseRealign, 0,
-                                 0);
+        IrcRhythmWindow_PrintMsg(&wk->messageWindow, &wk->text, BtlMain7_Text_ConnectionInterruptedPleaseRealign, 0, 0);
         *state = 3;
         break;
     case 3:

@@ -59,4 +59,3 @@ static void func_0204f8c8(int ch) {
                       (channel->dstCtrl << 21) | channel->count;
     CPU_SetIRQMask(mode);
 }
-

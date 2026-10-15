@@ -236,6 +236,7 @@ const GameProcFunctions WIFIBATTLEMATCH_PROC_FUNCTIONS = {
     WifiBattleMatchSys_Exit,
 };
 
+// clang-format off
 static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
     { OVERLAY_ID(261), &BATTLE_CHAMPIONSHIP_FLOW_PROC_FUNCTIONS, WifiBattleMatchSys_CreateChampionshipParam,
       WifiBattleMatchSys_FinishChampionship },
@@ -251,6 +252,8 @@ static const WifiBattleMatchStep sWifiBattleMatchSysSteps[STEP_COUNT] = {
       WifiBattleMatchSys_FinishLogout },
     { OVERLAY_NONE, &data_ov167_021d6ce0, WifiBattleMatchSys_CreateReplayParam, WifiBattleMatchSys_FinishReplay },
 };
+
+// clang-format on
 
 static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, void *work) {
     WifiBattleMatchParam *matchParam = param;
@@ -535,11 +538,11 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
         }
         param->regulation = PokeRegulation_LoadNew(fileId, heapId);
     } else if (sys->mode == 0) {
-        param->regulation =
-            func_0200b530(TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 0));
+        param->regulation = func_0200b530(
+            TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 0));
     } else if (sys->mode == 1) {
-        param->regulation =
-            func_0200b530(TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 1));
+        param->regulation = func_0200b530(
+            TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 1));
     } else {
         GFL_ASSERT(0);
     }

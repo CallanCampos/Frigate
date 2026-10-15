@@ -52,11 +52,14 @@ static ClActUnit *WbtListClAct_GetUnit(WbtListClAct *clact);
 static const BGSysLCDConfig sWbtListLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
 static const ClActSysSetup sWbtListClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
+// clang-format off
 static const BGSysVRAMConfig sWbtListVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_32K,  GX_OBJVRAMMODE_CHAR_1D_32K,
 };
+
+// clang-format on
 
 static const WbtListBGSetup sWbtListBGSetups[BG_COUNT] = {
     { 0,

@@ -846,7 +846,7 @@ void func_ov194_021c29b4(PokemonTradeWork *wk) {
     for (i = 0; i < 16; i++) {
         wk->boxPaletteDim[i] = 0;
         for (j = 0; j < 3; j++) {
-            // c is declared first to match
+            // The order of these declarations sets the locals' registers
             int c;
             int shift = j * 5;
             c = (wk->boxPalette[i] >> shift) & 0x1f;

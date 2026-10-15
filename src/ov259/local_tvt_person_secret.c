@@ -65,8 +65,8 @@ static void LocalTvtSecret_Free(LocalTvtPerson *person, const LocalTvtPersonSetu
 static BOOL LocalTvtSecret_Greet(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 static BOOL LocalTvtSecret_Chat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 static BOOL LocalTvtSecret_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
-static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
-                                        int *step);
+static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, const LocalTvtPersonSetup *setup,
+                                        LocalTvtSecret *secret, int *step);
 static BOOL LocalTvtSecret_TalkChat(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
                                     int *step);
 static BOOL LocalTvtSecret_TalkBye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
@@ -92,6 +92,7 @@ static const u32 sLocalTvtStarterTypes[] = { TYPE_GRASS, TYPE_FIRE, TYPE_WATER }
 // The survey question each of the first calls talks about
 static const u32 sLocalTvtSecretQuestions[SECRET_SURVEY_CALLS] = { 1, 25, 28, 20, 7, 19, 2, 12 };
 
+// clang-format off
 static const LocalTvtSecretStage sLocalTvtSecretStages[] = {
     { 0, 8, SECRET_CALL_SURVEY, 0, 0, FALSE, 2 },   { 9, 9, SECRET_CALL_4, 0, 3, FALSE, 2 },
     { 10, 28, SECRET_CALL_TOPICS, 1, 0, TRUE, 2 },  { 29, 29, SECRET_CALL_TOPICS, 3, 1, TRUE, 2 },
@@ -99,6 +100,8 @@ static const LocalTvtSecretStage sLocalTvtSecretStages[] = {
     { 40, 48, SECRET_CALL_RANDOM, 3, 2, TRUE, 2 },  { 49, 49, SECRET_CALL_SHORT, 2, 0, TRUE, 4 },
     { 50, 50, SECRET_CALL_TOPICS, 3, 0, TRUE, 2 },  { 51, 51, SECRET_CALL_RANDOM, 3, 2, TRUE, 2 },
 };
+
+// clang-format on
 
 void LocalTvtSecret_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, LocalTvtCallData *callData,
                           BOOL unk, HeapID heapId) {
@@ -225,8 +228,8 @@ static BOOL LocalTvtSecret_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup
     return LocalTvtSecret_TalkBye(person, setup, secret, &secret->step);
 }
 
-static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, LocalTvtSecret *secret,
-                                        int *step) {
+static BOOL LocalTvtSecret_TalkGreeting(LocalTvtPerson *person, const LocalTvtPersonSetup *setup,
+                                        LocalTvtSecret *secret, int *step) {
     u32 messageId = 0;
     LocalTvtFace *face = LocalTvtChara_GetFace(setup->chara, 0);
 

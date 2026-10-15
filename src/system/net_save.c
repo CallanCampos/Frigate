@@ -1,21 +1,16 @@
 #include "types.h"
-#include "system/net_save.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"
 #include "gfl/net_handle.h"
 #include "gfl/random.h"
 #include "system/game_data.h"
+#include "system/net_save.h"
 
 // Saving the game on two machines at once, each waiting for the other between the steps so that both saves end
 // together or not at all. The name is the ROM's string.
 
 // The timing numbers of the steps
-enum {
-    NET_SAVE_TIMING_START = 0x71,
-    NET_SAVE_TIMING_WRITTEN,
-    NET_SAVE_TIMING_WAITED,
-    NET_SAVE_TIMING_END
-};
+enum { NET_SAVE_TIMING_START = 0x71, NET_SAVE_TIMING_WRITTEN, NET_SAVE_TIMING_WAITED, NET_SAVE_TIMING_END };
 
 #define NET_SAVE_TIMING_GROUP 8
 #define NET_SAVE_WAIT_MAX 60

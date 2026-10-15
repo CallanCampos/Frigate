@@ -7,11 +7,11 @@
 #include "field/zone.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
-#include "gfl/touchpanel.h"
-#include "gfl/ui.h"
 #include "gfl/msg.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
+#include "gfl/touchpanel.h"
+#include "gfl/ui.h"
 #include "system/bmp_menulist.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
@@ -33,8 +33,7 @@ void func_ov012_021550e4(void *subwork) {
 }
 
 FieldScriptEnv *CreateFieldScriptEnv(const FieldScriptEnvArgs *args, HeapID heapId) {
-    FieldScriptEnv *env =
-        GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(FieldScriptEnv), TRUE, "scrcmd_work.c", 0x97);
+    FieldScriptEnv *env = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(FieldScriptEnv), TRUE, "scrcmd_work.c", 0x97);
 
     env->heapId = heapId;
     env->args = *args;
@@ -281,10 +280,9 @@ void FieldScriptEnv_ShowListMenu(FieldScriptEnv *env) {
     scrolls = count > 6 ? TRUE : FALSE;
     height = CalcListMenuHeight(rows, request.rowHeight, request.unk0A_3, scrolls);
     ListMenuRequest_Set(&request, ListMenuCore_GetOptionCount(menu->options), menu->x, menu->y, width, height);
-    menu->ui = ListMenuUI_Create(msgBGSys, &request, menu->options, func_ov012_02155568, env, 0, menu->cursor,
-                                 menu->flags);
+    menu->ui =
+        ListMenuUI_Create(msgBGSys, &request, menu->options, func_ov012_02155568, env, 0, menu->cursor, menu->flags);
 }
-
 
 void FreeListMenuWork(ScriptListMenu *menu) {
     s32 i;

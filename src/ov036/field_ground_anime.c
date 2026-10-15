@@ -1,6 +1,6 @@
-// The animations of the map chunks' textures: SRT animations bound to each chunk's model, and texture pattern animations
-// that upload frames over the map's textures in VRAM. The name is the ROM's own, from GFL_HeapAllocate's file argument.
-// Function names and layouts from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// The animations of the map chunks' textures: SRT animations bound to each chunk's model, and texture pattern
+// animations that upload frames over the map's textures in VRAM. The name is the ROM's own, from GFL_HeapAllocate's
+// file argument. Function names and layouts from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "field/field_terrain_animator.h"
 #include "gfl/arc_util.h"
@@ -84,7 +84,7 @@ static void FieldTerrainAnimator_LoadSRT(FieldTerrainSRTAnimator *animator, u16 
 static void FieldTerrainSRTAnimator_Free(FieldTerrainSRTAnimator *animator);
 static void FieldTerrainSRTAnimator_Update(FieldTerrainSRTAnimator *animator, fx32 step);
 static FieldTerrainSRTAnimatorChunkState *FieldTerrainSRTAnimator_GetChunkState(FieldTerrainSRTAnimator *animator,
-                                                                               u32 chunkIndex);
+                                                                                u32 chunkIndex);
 static void FieldTerrainSRTAnimatorChunkState_Init(FieldTerrainSRTAnimatorChunkState *state, void *resAnm,
                                                    HeapID heapId);
 static void FieldTerrainSRTAnimatorChunkState_Free(FieldTerrainSRTAnimatorChunkState *state);
@@ -114,8 +114,8 @@ static u16 GFBTPController_GetLastTargetKeyFrame(GFBTPController *controller, u3
 static void GFBTPController_LoadFile(void *data, GFBTPController *controller);
 
 // The pixels per byte of each texture format, and the pixels of each texture size
-static const u8 TEX_FMT_PIXELS_PER_BYTE[8] = {0xff, 1, 4, 2, 1, 0xff, 1, 0xff};
-static const u16 TEXIMAGE_DIM_TO_PIXELS[8] = {8, 16, 32, 64, 128, 256, 512, 1024};
+static const u8 TEX_FMT_PIXELS_PER_BYTE[8] = { 0xff, 1, 4, 2, 1, 0xff, 1, 0xff };
+static const u16 TEXIMAGE_DIM_TO_PIXELS[8] = { 8, 16, 32, 64, 128, 256, 512, 1024 };
 
 FieldTerrainAnimator *FieldTerrainAnimator_Create(const FieldTerrainAnimatorSetup *setup, void *mapTextures,
                                                   HeapID heapId) {
@@ -207,7 +207,7 @@ static void FieldTerrainSRTAnimator_Update(FieldTerrainSRTAnimator *animator, fx
 }
 
 static FieldTerrainSRTAnimatorChunkState *FieldTerrainSRTAnimator_GetChunkState(FieldTerrainSRTAnimator *animator,
-                                                                               u32 chunkIndex) {
+                                                                                u32 chunkIndex) {
     if (animator->nsbtaData != NULL) {
         return &animator->chunkStates[chunkIndex];
     }
@@ -303,12 +303,11 @@ static void FieldTerrainTexPatAnimation_Init(FieldTerrainTexPatAnimation *animat
     animation->worldTextures = worldTextures;
     animation->gfbtpData = FieldTerrainTexPatAnimationPack_GetGFBTP(pack, index);
     GFBTPController_LoadFile(animation->gfbtpData, &animation->gfbtpController);
-    animation->privateTextures =
-        GFL_HeapAllocate(heapId, GFL_G3DResGetAllocSize(), TRUE, "field_ground_anime.c", 713);
+    animation->privateTextures = GFL_HeapAllocate(heapId, GFL_G3DResGetAllocSize(), TRUE, "field_ground_anime.c", 713);
     GFL_G3DResSetup(animation->privateTextures, FieldTerrainTexPatAnimationPack_GetNSBTX(pack, index));
     animation->targetCount = GFBTPController_GetTargetCount(&animation->gfbtpController);
-    animation->currentValues = GFL_HeapAllocate(heapId, animation->targetCount * sizeof(GFBTPValue), TRUE,
-                                                "field_ground_anime.c", 724);
+    animation->currentValues =
+        GFL_HeapAllocate(heapId, animation->targetCount * sizeof(GFBTPValue), TRUE, "field_ground_anime.c", 724);
     animation->textureDestVRAMAddresses =
         GFL_HeapAllocate(heapId, animation->targetCount * sizeof(int), TRUE, "field_ground_anime.c", 725);
     animation->textureSizes =
@@ -465,9 +464,9 @@ static u16 GFBTPController_GetLastTargetKeyFrame(GFBTPController *controller, u3
 }
 
 // Each array of the file is padded to four bytes
-#define ALIGN_SIZE_4(ptr, size)       \
-    if ((size) % 4 != 0) {            \
-        (ptr) += 4 - (size) % 4;      \
+#define ALIGN_SIZE_4(ptr, size)                                                                                        \
+    if ((size) % 4 != 0) {                                                                                             \
+        (ptr) += 4 - (size) % 4;                                                                                       \
     }
 
 static void GFBTPController_LoadFile(void *data, GFBTPController *controller) {

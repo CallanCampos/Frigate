@@ -139,8 +139,7 @@ void GFL_G3DSysCreate(BOOL frmTexVramMgr, u32 texVramSize, BOOL frmPltVramMgr, u
     if (frmTexVramMgr == FALSE) {
         u32 workSize = NNS_GfdGetLnkTexVramManagerWorkSize(texVramSize << 7);
 
-        g_G3DSystem.sys->texVramWork =
-            GFL_HeapAllocate(g_G3DSystem.sys->heapId, workSize, FALSE, "g3d_system.c", 126);
+        g_G3DSystem.sys->texVramWork = GFL_HeapAllocate(g_G3DSystem.sys->heapId, workSize, FALSE, "g3d_system.c", 126);
         NNS_GfdInitLnkTexVramManager(texVramSize << 17, 0, g_G3DSystem.sys->texVramWork, workSize, TRUE);
     } else {
         NNS_GfdInitFrmTexVramManager(texVramSize, TRUE);
@@ -149,8 +148,7 @@ void GFL_G3DSysCreate(BOOL frmTexVramMgr, u32 texVramSize, BOOL frmPltVramMgr, u
     if (frmPltVramMgr == FALSE) {
         u32 workSize = NNS_GfdGetLnkPlttVramManagerWorkSize(pltVramSize << 9);
 
-        g_G3DSystem.sys->pltVramWork =
-            GFL_HeapAllocate(g_G3DSystem.sys->heapId, workSize, FALSE, "g3d_system.c", 141);
+        g_G3DSystem.sys->pltVramWork = GFL_HeapAllocate(g_G3DSystem.sys->heapId, workSize, FALSE, "g3d_system.c", 141);
         NNS_GfdInitLnkPlttVramManager(pltVramSize << 14, g_G3DSystem.sys->pltVramWork, workSize, TRUE);
     } else {
         // BUG: this sets up the frame texture VRAM manager with the size of palette VRAM, as the frame palette one
@@ -570,8 +568,8 @@ static BOOL GFL_G3DResAllocPltMem(NNSG3dResTex *tex, NNSGfdPlttKey *pltKey) {
 BOOL GFL_G3DResIsTexUploadDone(void *resource) {
     NNSG3dResTex *tex = NNS_G3DResGetTexBlock(((G3DResource *)resource)->data);
 
-    if ((tex->texInfo.flag & NNS_G3D_RESTEX_LOADED) || (tex->tex4x4Info.flag & NNS_G3D_RESTEX_LOADED)
-        || (tex->plttInfo.flag & NNS_G3D_RESPLTT_LOADED)) {
+    if ((tex->texInfo.flag & NNS_G3D_RESTEX_LOADED) || (tex->tex4x4Info.flag & NNS_G3D_RESTEX_LOADED) ||
+        (tex->plttInfo.flag & NNS_G3D_RESPLTT_LOADED)) {
         return TRUE;
     }
     return FALSE;

@@ -13,6 +13,7 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
+// clang-format off
 const FieldChunkVTable FIELD_CHUNK_VTABLES[5] = {
     // "WB", "GC", "NG" and "RD" read as little-endian 16-bit numbers
     {0x4257, FieldChunkAccessor_WB_Update, FieldChunkAccessor_WB_GetTerrain, FieldChunkAccessor_WB_GetTerrain},
@@ -22,8 +23,10 @@ const FieldChunkVTable FIELD_CHUNK_VTABLES[5] = {
     {0xffffffff, FieldChunkAccessor_GC_Update, FieldChunkAccessor_GC_GetTerrain, FieldChunkAccessor_GC_GetTerrain},
 };
 
+// clang-format on
+
 // The terrain animations of the next mapper that FieldG3DMapper_CreateTerrainAnimator makes
-FieldTerrainAnimatorSetup GND_ANIME_WK = {0, 0, 0, 0x44, 0, 0x45, 0};
+FieldTerrainAnimatorSetup GND_ANIME_WK = { 0, 0, 0, 0x44, 0, 0x45, 0 };
 
 FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season) {
     FieldG3DMapper *mapper = GFL_HeapAllocate(heapId, sizeof(FieldG3DMapper), TRUE, "field_g3d_mapper.c", 0x100);
@@ -239,8 +242,8 @@ void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig
                                             "field_g3d_mapper.c", 0x313);
     mapper->chunkLocators = GFL_HeapAllocate(mapper->heapId, mapper->chunkCapacity * sizeof(FieldChunkLocator), TRUE,
                                              "field_g3d_mapper.c", 0x314);
-    mapper->drawnChunkIndices = GFL_HeapAllocate(mapper->heapId, mapper->chunkCapacity, TRUE, "field_g3d_mapper.c",
-                                                 0x315);
+    mapper->drawnChunkIndices =
+        GFL_HeapAllocate(mapper->heapId, mapper->chunkCapacity, TRUE, "field_g3d_mapper.c", 0x315);
     for (i = 0; i < mapper->chunkCapacity; i++) {
         FieldChunkLocator_Disable(&mapper->chunkHandles[i].locator);
         FieldChunkContext_Init(&mapper->chunkHandles[i].context, mapper, i, mapper->heapId);
@@ -330,8 +333,8 @@ u32 FieldG3DMapper_GetBasePosChunkHandleIdx(FieldG3DMapper *mapper) {
             minZ = pos.z - half;
             maxX = pos.x + half;
             maxZ = pos.z + half;
-            if (mapper->playerPos.x >= minX && mapper->playerPos.x < maxX && mapper->playerPos.z >= minZ
-                && mapper->playerPos.z < maxZ) {
+            if (mapper->playerPos.x >= minX && mapper->playerPos.x < maxX && mapper->playerPos.z >= minZ &&
+                mapper->playerPos.z < maxZ) {
                 return i;
             }
         }
@@ -872,7 +875,7 @@ void FieldChunkLocator_GetPos(FieldChunkLocator *locator, VecFx32 *position) {
 
 // Adds the terrain layers of the map's height areas at the position
 void func_ov036_0218543c(const FieldG3DMapper *mapper, const VecFx32 *position, FieldG3DMapperTerrain *output) {
-    VecFx16 normal = {0, FX16_ONE, 0};
+    VecFx16 normal = { 0, FX16_ONE, 0 };
     s32 added = 0;
     u32 count = output->layerCount;
     s32 areaCount = func_ov036_021ba684(mapper->heightEx);

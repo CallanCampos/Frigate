@@ -171,7 +171,8 @@ static void PlasmaFrigate_CheckPassword(PlasmaFrigatePassword *wk, NameEntryPara
         *wk->result = FALSE;
         return;
     }
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_PLASMA_FRIGATE_SCRCMD_BSUBWAY, wk->heapId);
+    msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_PLASMA_FRIGATE_SCRCMD_BSUBWAY, wk->heapId);
     password = GFL_MsgDataLoadStrbufNew(msgData, PlasmaFrigate_GetPasswordIndex(wk->playerInfo));
     if (GFL_StrBufCmpIgnoreAccents(nameEntry->name, password) == TRUE) {
         *wk->result = TRUE;

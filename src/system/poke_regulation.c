@@ -137,8 +137,8 @@ u32 PokeRegulation_CheckPokemonExtraRule(Regulation *regulation, RegulationExtra
             }
         }
         if (rule->type != TYPE_NULL) {
-            if (rule->type != PokeParty_GetParam(pkm, PKM_PARAM_TYPE1, NULL)
-                && rule->type != PokeParty_GetParam(pkm, PKM_PARAM_TYPE2, NULL)) {
+            if (rule->type != PokeParty_GetParam(pkm, PKM_PARAM_TYPE1, NULL) &&
+                rule->type != PokeParty_GetParam(pkm, PKM_PARAM_TYPE2, NULL)) {
                 return REGULATION_FAIL_TYPE;
             }
         }
@@ -157,8 +157,8 @@ u32 PokeRegulation_CheckPicked(Regulation *regulation, PokeParty *party, const u
     if (flags == 0) {
         return REGULATION_RESULT_OK;
     }
-    if ((flags & REGULATION_FAIL_LEVEL) || (flags & REGULATION_FAIL_SPECIES) || (flags & REGULATION_FAIL_EGG)
-        || (flags & REGULATION_FAIL_ITEM)) {
+    if ((flags & REGULATION_FAIL_LEVEL) || (flags & REGULATION_FAIL_SPECIES) || (flags & REGULATION_FAIL_EGG) ||
+        (flags & REGULATION_FAIL_ITEM)) {
         return REGULATION_RESULT_POKEMON;
     }
     if (flags & REGULATION_FAIL_SAME_SPECIES) {
@@ -400,8 +400,8 @@ BOOL PokeRegulation_PartyHasEgg(Regulation *regulation, PokeParty *party) {
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
-        if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL) == TRUE
-            && PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == TRUE) {
+        if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL) == TRUE &&
+            PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == TRUE) {
             return TRUE;
         }
     }
@@ -556,7 +556,7 @@ void PokeRegulation_FreePrintMsg(void *data) {
 
 BOOL PokeRegulation_PickTeam(Regulation *regulation, PokeParty *party, u8 *picked) {
     // Every order of the party's slots is tried, starting after this one
-    u8 order[PARTY_SIZE] = {1, 2, 3, 4, 5, 5};
+    u8 order[PARTY_SIZE] = { 1, 2, 3, 4, 5, 5 };
 
     while (nextOrder(order)) {
         if (checkPicked(regulation, party, order, picked, NULL) == TRUE) {
@@ -570,9 +570,9 @@ BOOL PokeRegulation_PickTeam(Regulation *regulation, PokeParty *party, u8 *picke
 // until the team is full. out gets the slots taken and flags the reasons others were not. Returns whether the team
 // is one the regulation allows
 static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *picked, u8 *out, u32 *flags) {
-    u32 species[PARTY_SIZE] = {0};
-    u32 forms[PARTY_SIZE] = {0};
-    u32 items[PARTY_SIZE] = {0};
+    u32 species[PARTY_SIZE] = { 0 };
+    u32 forms[PARTY_SIZE] = { 0 };
+    u32 items[PARTY_SIZE] = { 0 };
     u8 count = 0;
     u8 i, j, k;
     BOOL ok;
@@ -689,11 +689,11 @@ static BOOL nextOrder(u8 *order) {
                 for (; order[3] <= PARTY_SIZE; order[3]++) {
                     for (; order[4] <= PARTY_SIZE; order[4]++) {
                         for (; order[5] <= PARTY_SIZE; order[5]++) {
-                            if (order[0] != order[1] && order[0] != order[2] && order[0] != order[3]
-                                && order[0] != order[4] && order[0] != order[5] && order[1] != order[2]
-                                && order[1] != order[3] && order[1] != order[4] && order[1] != order[5]
-                                && order[2] != order[3] && order[2] != order[4] && order[2] != order[5]
-                                && order[3] != order[4] && order[3] != order[5] && order[4] != order[5]) {
+                            if (order[0] != order[1] && order[0] != order[2] && order[0] != order[3] &&
+                                order[0] != order[4] && order[0] != order[5] && order[1] != order[2] &&
+                                order[1] != order[3] && order[1] != order[4] && order[1] != order[5] &&
+                                order[2] != order[3] && order[2] != order[4] && order[2] != order[5] &&
+                                order[3] != order[4] && order[3] != order[5] && order[4] != order[5]) {
                                 return TRUE;
                             }
                         }

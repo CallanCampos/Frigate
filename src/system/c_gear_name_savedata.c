@@ -27,7 +27,8 @@ void func_020114a8(u16 *name) {
     StrBuf *str;
 
     sys_memset(name, 0, getNameSize());
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_CASTELIA_CITY_13, HEAPID_TAIL(HEAPID_SAVEDATA));
+    msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_CASTELIA_CITY_13, HEAPID_TAIL(HEAPID_SAVEDATA));
     str = GFL_MsgDataLoadStrbufNew(msgData, CasteliaCity13_Text_Awesome);
     GFL_StrBufStoreString(str, name, CGEAR_NAME_LENGTH);
     GFL_StrBufFree(str);

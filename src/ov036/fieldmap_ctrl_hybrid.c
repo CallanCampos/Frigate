@@ -28,8 +28,8 @@
 void func_ov036_0219e434(FieldmapCtrlHybrid *controller, Field *field);
 void func_ov036_0219e5cc(Field *field, FieldmapCtrlHybrid *controller);
 void func_ov036_0219e680(Field *field, FieldmapCtrlHybrid *controller);
-void func_ov036_0219e740(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir, const RailPosition *railPos,
-                         u32 pressedKeys, u32 heldKeys);
+void func_ov036_0219e740(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
+                         const RailPosition *railPos, u32 pressedKeys, u32 heldKeys);
 void func_ov036_0219e79c(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir, const VecFx32 *pos,
                          u32 pressedKeys, u32 heldKeys);
 BOOL func_ov036_0219e808(Field *field, FieldmapCtrlHybrid *controller, VecFx32 *pos, u16 dir);
@@ -125,12 +125,12 @@ void func_ov036_0219e5cc(Field *field, FieldmapCtrlHybrid *controller) {
     u32 tileAhead;
     RailPosition railPos;
 
-    if ((IsAllActorAcmdFinished(actor) == TRUE || func_ov036_0219a5dc(controller->player) == TRUE)
-        && dir != MOVE_DIR_NONE) {
+    if ((IsAllActorAcmdFinished(actor) == TRUE || func_ov036_0219a5dc(controller->player) == TRUE) &&
+        dir != MOVE_DIR_NONE) {
         tileUnder = FieldPlayer_GetTileTypeUnder(controller->player);
         tileAhead = FieldPlayer_GetTileTypeInDir(controller->player, dir);
-        if (func_ov036_021b3b54(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead)
-            && func_ov036_0219e854(field, controller, &railPos, dir)) {
+        if (func_ov036_021b3b54(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead) &&
+            func_ov036_0219e854(field, controller, &railPos, dir)) {
             func_ov036_0219e740(field, controller, dir, TRUE, &railPos, pressedKeys, heldKeys);
             return;
         }
@@ -159,12 +159,12 @@ void func_ov036_0219e680(Field *field, FieldmapCtrlHybrid *controller) {
         dir = GetActorMotionDir(actor);
         keyDir = FALSE;
     }
-    if ((IsAllActorAcmdFinished(actor) == TRUE || func_ov036_0219a5dc(controller->player) == TRUE)
-        && dir != MOVE_DIR_NONE) {
+    if ((IsAllActorAcmdFinished(actor) == TRUE || func_ov036_0219a5dc(controller->player) == TRUE) &&
+        dir != MOVE_DIR_NONE) {
         tileUnder = FieldPlayer_GetTileTypeUnder(controller->player);
         tileAhead = FieldPlayer_GetTileTypeInDir(controller->player, dir);
-        if (func_ov036_021b3b54(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead)
-            && func_ov036_0219e808(field, controller, &pos, dir)) {
+        if (func_ov036_021b3b54(GetTileClass(tileUnder)) && MapTile_BlocksCollision(tileAhead) &&
+            func_ov036_0219e808(field, controller, &pos, dir)) {
             func_ov036_0219e79c(field, controller, dir, keyDir, &pos, pressedKeys, heldKeys);
             controller->unk08 = 0;
             return;
@@ -174,8 +174,8 @@ void func_ov036_0219e680(Field *field, FieldmapCtrlHybrid *controller) {
     FieldPlayer_UpdateRailMovement(controller->player, pressedKeys, heldKeys);
 }
 
-void func_ov036_0219e740(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir, const RailPosition *railPos,
-                         u32 pressedKeys, u32 heldKeys) {
+void func_ov036_0219e740(Field *field, FieldmapCtrlHybrid *controller, u16 dir, BOOL keyDir,
+                         const RailPosition *railPos, u32 pressedKeys, u32 heldKeys) {
     FieldActor *actor = FieldPlayer_GetActor(controller->player);
     u16 a6;
     u16 a5;

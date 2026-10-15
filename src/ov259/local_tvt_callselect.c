@@ -671,8 +671,8 @@ static void LocalTvtCallScrollBar_Init(LocalTvtCallScrollBar *bar, const LocalTv
     setup.x = 248;
     setup.y = 24;
     setup.sequence = LIST_ANIM_SCROLL_BAR;
-    bar->actor = func_0204c040(select->setup.unit, select->chars, select->palette, select->cellAnims, &setup, 1,
-                               heapId);
+    bar->actor =
+        func_0204c040(select->setup.unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
     if (bar->enabled) {
         func_0204c124(bar->actor, TRUE);
     } else {

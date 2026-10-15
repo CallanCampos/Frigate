@@ -1,12 +1,11 @@
 #include "dwc/crypt.h"
-
 #include "crypt_internal.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-// The signature check of overlay 189 (ARM code beside the HTTP client): the server's answer to a Pokémon's check is signed,
-// and this library verifies the signature with an RSA public key, a SHA-1 digest and a library of big numbers. The ROM
-// names none of it, so the names say what the code does; they are none of the library's own.
+// The signature check of overlay 189 (ARM code beside the HTTP client): the server's answer to a Pokémon's check is
+// signed, and this library verifies the signature with an RSA public key, a SHA-1 digest and a library of big numbers.
+// The ROM names none of it, so the names say what the code does; they are none of the library's own.
 //
 // A big number keeps its words, the least significant first, with a length in words that has no zero word on top, and
 // the sign apart. The calls that need working numbers take them from a pool, which hands out the next of its twelve
@@ -41,8 +40,8 @@ typedef struct BigNumPool {
     CryptProgress *progress;
 } BigNumPool;
 
-// Divides by a number whose reciprocal is kept, to reduce a product with a few subtractions: the modulus, its reciprocal,
-// the modulus' length in bits and the length in bits that the reciprocal is for
+// Divides by a number whose reciprocal is kept, to reduce a product with a few subtractions: the modulus, its
+// reciprocal, the modulus' length in bits and the length in bits that the reciprocal is for
 typedef struct Reducer {
     BigNum modulus;
     BigNum reciprocal;
@@ -95,8 +94,7 @@ static BOOL SubMagnitude(BigNum *dest, BigNum *a, BigNum *b);
 static BOOL SubSigned(BigNum *dest, BigNum *a, BigNum *b);
 static BOOL CryptMul(BigNum *dest, BigNum *a, BigNum *b, BigNumPool *pool);
 static void MulWords(u32 *dest, const u32 *a, int aSize, const u32 *b, int bSize);
-static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNum *denominator,
-                BigNumPool *pool);
+static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNum *denominator, BigNumPool *pool);
 static BOOL BigMod(BigNum *remainder, BigNum *numerator, BigNum *denominator, BigNumPool *pool);
 static BOOL ModExp(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus, BigNumPool *pool);
 static BOOL CryptSquare(BigNum *dest, BigNum *a, BigNumPool *pool);
@@ -116,10 +114,9 @@ static int SetReducerModulus(Reducer *reducer, BigNum *modulus, BigNumPool *pool
 static BOOL ModMul(BigNum *dest, BigNum *a, BigNum *b, Reducer *reducer, BigNumPool *pool);
 static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, BigNum *numerator, Reducer *reducer, BigNumPool *pool);
 static int ComputeReciprocal(BigNum *reciprocal, BigNum *modulus, int bits, BigNumPool *pool);
-static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
-                        BigNumPool *pool);
-static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
-                       BigNumPool *pool, Montgomery *mont);
+static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus, BigNumPool *pool);
+static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus, BigNumPool *pool,
+                       Montgomery *mont);
 static asm u32 MulAddWords(u32 *dest, const u32 *a, int size, u32 word);
 static asm u32 MulWord(u32 *dest, const u32 *a, int size, u32 word);
 static asm void SquareDigits(u32 *dest, const u32 *a, int size);
@@ -128,8 +125,7 @@ static asm u32 AddWords(u32 *dest, const u32 *a, const u32 *b, int size);
 static asm u32 SubWords(u32 *dest, const u32 *a, const u32 *b, int size);
 static BOOL ReadAsn1(const u8 **data, u32 *size, int tag, u32 *length);
 static BOOL ParsePadding(const u8 *block, u32 size, const u8 **out, u32 *outSize);
-static BOOL ParseDigestInfo(const u8 *data, u32 size, const u8 **oid, u32 *oidSize, const u8 **digest,
-                            u32 *digestSize);
+static BOOL ParseDigestInfo(const u8 *data, u32 size, const u8 **oid, u32 *oidSize, const u8 **digest, u32 *digestSize);
 static int RsaPublic(u8 *out, int outSize, const u8 *input, int inputSize, const u8 *modulus, int modulusSize,
                      u32 exponent);
 static int ExtractDigest(u8 *out, int outSize, const u8 *signature, int signatureSize, const u8 *modulus,
@@ -156,7 +152,7 @@ static const u8 sTrailingZeros[64] = {
 // The number one, which only code that the link dead-stripped used. MWCC drops a static that nothing reads, so these
 // are globals, and they are declared here so that .rodata holds the file's objects in the ROM's order.
 const u32 CryptOneDigit = 1;
-const BigNum CryptOne = {(u32 *)&CryptOneDigit, 1, 1, 0, 0};
+const BigNum CryptOne = { (u32 *)&CryptOneDigit, 1, 1, 0, 0 };
 
 static const u8 *sTrailingZerosByWindow[7] = {
     sTrailingZeros + 63, sTrailingZeros + 62, sTrailingZeros + 60, sTrailingZeros + 56,
@@ -164,13 +160,13 @@ static const u8 *sTrailingZerosByWindow[7] = {
 };
 
 // The bit length of each value of a nibble
-static const s8 sNibbleBits[16] = {0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4};
+static const s8 sNibbleBits[16] = { 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4 };
 
 // The encodings of the exponents 3, 17 and 65537, which the key uses: a length, the window and the table's size, and
 // the pairs of a window's value and the zeros after it
-static const u8 sEncodedExponent3[10] = {0, 8, 1, 1, 1, 1, 1, 0, 0, 0};
-static const u8 sEncodedExponent17[10] = {0, 8, 1, 1, 1, 4, 1, 0, 0, 0};
-static const u8 sEncodedExponent65537[10] = {0, 8, 1, 1, 1, 16, 1, 0, 0, 0};
+static const u8 sEncodedExponent3[10] = { 0, 8, 1, 1, 1, 1, 1, 0, 0, 0 };
+static const u8 sEncodedExponent17[10] = { 0, 8, 1, 1, 1, 4, 1, 0, 0, 0 };
+static const u8 sEncodedExponent65537[10] = { 0, 8, 1, 1, 1, 16, 1, 0, 0, 0 };
 
 // Raises the input to the power of the exponent modulo the modulus, all as bytes with the most significant first, and
 // returns the length of the output, or a negative number: -1 when it does not fit, -2 when it failed and -3 for a
@@ -1201,8 +1197,7 @@ static inline void MulHalves(u32 *low, u32 *high, u32 bLow, u32 bHigh) {
 
 // Divides, schoolbook: the denominator is shifted up until its top bit is set, then each word of the quotient is
 // estimated from the top words of what is left, and the estimate is corrected
-static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNum *denominator,
-                BigNumPool *pool) {
+static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNum *denominator, BigNumPool *pool) {
     BigNum window;
     int shift;
     int i;
@@ -1326,7 +1321,8 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNu
             }
             estimate--;
         }
-        product->digits[denominatorSize] = MulWord(product->digits, shiftedDenominator->digits, denominatorSize, estimate);
+        product->digits[denominatorSize] =
+            MulWord(product->digits, shiftedDenominator->digits, denominatorSize, estimate);
         size = denominatorSize + 1;
         while (size > 0) {
             if (product->digits[size - 1] != 0) {
@@ -1860,8 +1856,8 @@ static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, BigNum *numerator, 
     if (bits != reducer->reciprocalBits) {
         reducer->reciprocalBits = ComputeReciprocal(&reducer->reciprocal, &reducer->modulus, bits, pool);
     }
-    if (ShiftRight(first, numerator, half - shift) && CryptMul(second, first, &reducer->reciprocal, pool)
-        && ShiftRight(quotient, second, shift + half)) {
+    if (ShiftRight(first, numerator, half - shift) && CryptMul(second, first, &reducer->reciprocal, pool) &&
+        ShiftRight(quotient, second, shift + half)) {
         quotient->negative = 0;
         if (CryptMul(second, &reducer->modulus, quotient, pool) && SubMagnitude(remainder, numerator, second)) {
             remainder->negative = 0;
@@ -1904,8 +1900,7 @@ static int ComputeReciprocal(BigNum *reciprocal, BigNum *modulus, int bits, BigN
 }
 
 // Raises to a power modulo with squarings and multiplications, a window of the exponent at a time
-static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
-                        BigNumPool *pool) {
+static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus, BigNumPool *pool) {
     int j;
     int bits;
     BOOL ok;
@@ -2041,8 +2036,8 @@ static inline void ReadWindow(const u8 **cursor, int *index, int *squarings) {
 }
 
 // Raises to a power modulo an odd number in the Montgomery form, with a table of the odd powers of the base
-static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
-                       BigNumPool *pool, Montgomery *mont) {
+static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus, BigNumPool *pool,
+                       Montgomery *mont) {
     const u8 *cursor = NULL;
     BOOL ok = FALSE;
     int saved;
@@ -2219,6 +2214,7 @@ done:
 
 // The primitives of the numbers' words are MWCC `asm` functions: the assembly that the bundled big-number library
 // shipped, unrolled by four with the long multiplications and the add with carry that the compiler does not use
+// clang-format off
 static asm u32 MulAddWords(u32 *dest, const u32 *a, int size, u32 word) {
     stmdb sp!, {r4, r5, r6, r7, r8, lr}
     mov r8, r0
@@ -2270,6 +2266,9 @@ MulAddWords_Loop1:
     ldmia sp!, {r4, r5, r6, r7, r8, pc}
 }
 
+// clang-format on
+
+// clang-format off
 static asm u32 MulWord(u32 *dest, const u32 *a, int size, u32 word) {
     stmdb sp!, {r4, r5, r6, r7, r8, r9, r10, r11, lr}
     mov r11, r0
@@ -2310,6 +2309,9 @@ MulWord_Loop1:
     ldmia sp!, {r4, r5, r6, r7, r8, r9, r10, r11, pc}
 }
 
+// clang-format on
+
+// clang-format off
 static asm void SquareDigits(u32 *dest, const u32 *a, int size) {
     stmdb sp!, {r4, r5, lr}
     subs r2, r2, #0x1
@@ -2324,11 +2326,13 @@ SquareDigits_Loop:
     ldmia sp!, {r4, r5, pc}
 }
 
+// clang-format on
+
 // Divides a double word by a word; the quotient comes back as a double word with a zero high word. Assembly as well:
 // it swaps the halves through r4, which it saves, where MWCC would use a scratch register and move the 64-bit halves
 // with `orr #0`, and it sits among the assembly helpers. It calls the runtime's unsigned 64-bit division.
-extern u64 _ll_udiv(u64 numerator, u64 denominator);
 
+// clang-format off
 static asm u64 DivWords(u32 high, u32 low, u32 divisor) {
     stmdb sp!, {r4, lr}
     mov r4, r0
@@ -2340,6 +2344,9 @@ static asm u64 DivWords(u32 high, u32 low, u32 divisor) {
     ldmia sp!, {r4, pc}
 }
 
+// clang-format on
+
+// clang-format off
 static asm u32 AddWords(u32 *dest, const u32 *a, const u32 *b, int size) {
     stmdb sp!, {r4, r5, r6, r7, r8, r9, lr}
     mov r9, r0
@@ -2383,6 +2390,9 @@ AddWords_Loop1:
     ldmia sp!, {r4, r5, r6, r7, r8, r9, pc}
 }
 
+// clang-format on
+
+// clang-format off
 static asm u32 SubWords(u32 *dest, const u32 *a, const u32 *b, int size) {
     stmdb sp!, {r4, r5, r6, r7, lr}
     mov r7, r0
@@ -2402,3 +2412,5 @@ SubWords_Loop:
     bge SubWords_Loop
     ldmia sp!, {r4, r5, r6, r7, pc}
 }
+
+// clang-format on

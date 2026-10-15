@@ -85,8 +85,8 @@ enum {
 #define INPUT_BACK 2
 #define INPUT_NONE (-1)
 
-// A record of the Battle Subway's save, which BSubwayWifiData_AllocLeaders copies: a player's name and place, and the message that
-// they left
+// A record of the Battle Subway's save, which BSubwayWifiData_AllocLeaders copies: a player's name and place, and the
+// message that they left
 typedef struct {
     u16 name[8];
     u8 unk10[2];

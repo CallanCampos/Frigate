@@ -1,9 +1,10 @@
 #include "types.h"
-#include "field/infinity_dungeon.h"
-#include "field/infinity_dungeon_gimmick.h"
+#include "field/battle_facility.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_script.h"
+#include "field/infinity_dungeon.h"
+#include "field/infinity_dungeon_gimmick.h"
 #include "field/infinity_dungeon_rooms.h"
 #include "gfl/random.h"
 #include "gfl/str.h"
@@ -15,8 +16,6 @@
 
 // The script plugin of the Black Tower and White Treehollow (plugin 9), commands from 1000. The actors that the
 // commands take are numbered from 0xb0
-
-u16 func_ov012_02162b28(u32 a0, u16 a1, HeapID heapId);
 
 typedef struct {
     u32 unk0;

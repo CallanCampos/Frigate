@@ -1,7 +1,7 @@
 #include "types.h"
-#include "system/pms.h"
 #include "save/c_gear_savedata.h"
 #include "save/save_control.h"
+#include "system/pms.h"
 
 // The C-Gear's phrases, at the start of the C-Gear's save block, which c_gear_savedata.c owns: their initial state
 // and their accessors. The ROM has no string for the file, so the name is a guess. Block 0x20.

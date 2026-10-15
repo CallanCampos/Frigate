@@ -26,6 +26,7 @@ typedef struct {
     u32 period;
 } HiddenHollowGimmick;
 
+// clang-format off
 static const HiddenHollowEntrance HIDDEN_HOLLOW_ENTRANCES[20] = {
     {0x1bd, 59, 2, 12},
     {0x149, 373, 0, 425},
@@ -48,6 +49,8 @@ static const HiddenHollowEntrance HIDDEN_HOLLOW_ENTRANCES[20] = {
     {0x13f, 751, 0, 634},
     {0x183, 620, 0, 741},
 };
+
+// clang-format on
 
 u32 GetHiddenHollowEntranceParam(u8 hollow, u32 param) {
     switch (param) {

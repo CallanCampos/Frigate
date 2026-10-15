@@ -1,5 +1,4 @@
 #include "types.h"
-#include "save/box.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
@@ -8,6 +7,7 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "pml/poke_party.h"
+#include "save/box.h"
 #include "save/save_control.h"
 #include "text/system/btl_pokeparam_box_main_save_init.h"
 
@@ -349,8 +349,8 @@ static u32 howManyNormalPokesAreInBox(BoxSaveAccessor *boxes, u32 trayNum) {
         count = 0;
         tray = BoxSaveAccessor_GetBox(boxes, trayNum);
         for (pos = 0; pos < BOX_MAX_POS; pos++) {
-            if (PML_PkmGetParam(&tray->pkm[pos], PKM_PARAM_SPECIES_VALID, NULL)
-                && PML_PkmGetParam(&tray->pkm[pos], PKM_PARAM_IS_EGG, NULL) == 0) {
+            if (PML_PkmGetParam(&tray->pkm[pos], PKM_PARAM_SPECIES_VALID, NULL) &&
+                PML_PkmGetParam(&tray->pkm[pos], PKM_PARAM_IS_EGG, NULL) == 0) {
                 count++;
             }
         }
@@ -384,8 +384,12 @@ u32 BoxSaveAccessor_GetPkmParam(BoxSaveAccessor *boxes, u32 trayNum, u32 pos, u3
     BoxMainSave *main = BoxSaveAccessor_GetMainSave(boxes);
     BoxTraySave *tray;
 
+    // clang-format off
     GFL_ASSERT((trayNum<BOX_MAX_TRAY)||(trayNum == BOXDAT_TRAYNUM_CURRENT));
+    // clang-format on
+    // clang-format off
     GFL_ASSERT(pos<BOX_MAX_POS);
+    // clang-format on
     if (trayNum == BOXDAT_TRAYNUM_CURRENT) {
         trayNum = main->currentTray;
     }
@@ -397,8 +401,12 @@ BoxPkm *BoxSaveAccessor_GetPkm(BoxSaveAccessor *boxes, u32 trayNum, u32 pos) {
     BoxMainSave *main = BoxSaveAccessor_GetMainSave(boxes);
     BoxTraySave *tray;
 
+    // clang-format off
     GFL_ASSERT(((trayNum<BOX_MAX_TRAY)||(trayNum == BOXDAT_TRAYNUM_CURRENT)));
+    // clang-format on
+    // clang-format off
     GFL_ASSERT((pos<BOX_MAX_POS));
+    // clang-format on
     if (trayNum == BOXDAT_TRAYNUM_CURRENT) {
         trayNum = main->currentTray;
     }

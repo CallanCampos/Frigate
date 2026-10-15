@@ -12,11 +12,7 @@ static const struct {
     u16 stepCount;
     u16 scriptId;
 } ABYSSAL_RUINS_DULL_SOUND_SCRIPTS[5] = {
-    { 0, 0x28e7 },
-    { 100, 0x28e8 },
-    { 300, 0x28e9 },
-    { 450, 0x28ea },
-    { 500, 0x28eb },
+    { 0, 0x28e7 }, { 100, 0x28e8 }, { 300, 0x28e9 }, { 450, 0x28ea }, { 500, 0x28eb },
 };
 
 GameEvent *CheckAbyssalRuinsStepEvent(GameSystem *gsys, Field *field) {
@@ -32,7 +28,8 @@ GameEvent *CheckAbyssalRuinsStepEvent(GameSystem *gsys, Field *field) {
     stepCount = PlayerSave_GetAbyssalRuinsStepCounter(playerSave);
     for (i = 0; i < 5; i++) {
         if (stepCount == ABYSSAL_RUINS_DULL_SOUND_SCRIPTS[i].stepCount) {
-            return EventScriptCall_Create(gsys, ABYSSAL_RUINS_DULL_SOUND_SCRIPTS[i].scriptId, NULL, Field_GetHeapID(field));
+            return EventScriptCall_Create(gsys, ABYSSAL_RUINS_DULL_SOUND_SCRIPTS[i].scriptId, NULL,
+                                          Field_GetHeapID(field));
         }
     }
     if (stepCount > 500) {

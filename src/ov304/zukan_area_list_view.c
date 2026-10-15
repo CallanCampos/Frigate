@@ -543,16 +543,15 @@ static void ZukanAreaListView_CreateActors(ZukanAreaListView *view) {
         func_0204c318(view->actors[i], GX_OAM_MODE_XLU);
     }
     // The marks' windows on the upper screen show the row under them unblended
-    for (i = ZUKAN_AREA_LIST_OBJ_MARK_WINDOW; i < ZUKAN_AREA_LIST_OBJ_MARK_WINDOW + ZUKAN_AREA_LIST_MARK_COUNT;
-         i++) {
+    for (i = ZUKAN_AREA_LIST_OBJ_MARK_WINDOW; i < ZUKAN_AREA_LIST_OBJ_MARK_WINDOW + ZUKAN_AREA_LIST_MARK_COUNT; i++) {
         view->actors[i] = UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_SUB], view->actorUnit, 0, 0, 12,
                                                HEAPID_ZUKAN_AREA_LIST);
         func_0204c124(view->actors[i], TRUE);
         func_0204c318(view->actors[i], 2);
     }
 
-    view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE] = UIObjRes_CreateActor(
-        &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 64, 15, HEAPID_ZUKAN_AREA_LIST);
+    view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE] =
+        UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 64, 15, HEAPID_ZUKAN_AREA_LIST);
     func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
     func_0204c520(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
 
@@ -571,19 +570,19 @@ static void ZukanAreaListView_CreateActors(ZukanAreaListView *view) {
     func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_HABITAT], TRUE);
     func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_HABITAT], 2);
 
-    view->actors[ZUKAN_AREA_LIST_OBJ_MODE] = UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN],
-                                                                  view->actorUnit, 32, 180, 1, HEAPID_ZUKAN_AREA_LIST);
+    view->actors[ZUKAN_AREA_LIST_OBJ_MODE] =
+        UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 180, 1, HEAPID_ZUKAN_AREA_LIST);
     func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_MODE], TRUE);
 
-    view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_BAR] = UIObjRes_CreateActor(
-        &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 2, HEAPID_ZUKAN_AREA_LIST);
+    view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_BAR] =
+        UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 2, HEAPID_ZUKAN_AREA_LIST);
 
-    view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL] = UIObjRes_CreateActor(
-        &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 252, 84, 3, HEAPID_ZUKAN_AREA_LIST);
+    view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL] =
+        UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 252, 84, 3, HEAPID_ZUKAN_AREA_LIST);
     func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL], 1);
 
-    view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME] = UIObjRes_CreateActor(
-        &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 32, HEAPID_ZUKAN_AREA_LIST);
+    view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME] =
+        UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 32, HEAPID_ZUKAN_AREA_LIST);
     func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME], 1);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_PAGE_UP] = UIObjRes_CreateActor(
@@ -592,8 +591,8 @@ static void ZukanAreaListView_CreateActors(ZukanAreaListView *view) {
         &view->res[ZUKAN_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 156, 168, 5, HEAPID_ZUKAN_AREA_LIST);
     view->actors[ZUKAN_AREA_LIST_OBJ_SHORTCUT] = UIObjRes_CreateActor(
         &view->res[ZUKAN_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 184, 172, 6, HEAPID_ZUKAN_AREA_LIST);
-    view->actors[ZUKAN_AREA_LIST_OBJ_EXIT] = UIObjRes_CreateActor(
-        &view->res[ZUKAN_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 208, 168, 0, HEAPID_ZUKAN_AREA_LIST);
+    view->actors[ZUKAN_AREA_LIST_OBJ_EXIT] = UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_TOUCHBAR],
+                                                                  view->actorUnit, 208, 168, 0, HEAPID_ZUKAN_AREA_LIST);
     view->actors[ZUKAN_AREA_LIST_OBJ_RETURN] = UIObjRes_CreateActor(
         &view->res[ZUKAN_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 232, 168, 1, HEAPID_ZUKAN_AREA_LIST);
 }

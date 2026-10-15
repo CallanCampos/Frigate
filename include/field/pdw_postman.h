@@ -9,8 +9,8 @@
 #include "gfl/msg.h"
 #include "gfl/str.h"
 #include "save/mystery_gift.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // An item sent from the Dream World and the number of it
 typedef struct {

@@ -71,6 +71,7 @@ static const BSubwayZoneGimmick sZoneGimmicks[10] = {
     { 72, 0x15 }, { 73, 0x16 }, { 75, 0x17 }, { 76, 0x18 }, { 74, 0x1f },
 };
 
+// clang-format off
 static const BSubwayGimmickFuncs sGimmickFuncs[10] = {
     { TrainSetup, TrainEnd, NULL },
     { TrainSetup, TrainEnd, NULL },
@@ -83,6 +84,8 @@ static const BSubwayGimmickFuncs sGimmickFuncs[10] = {
     { TrainSetup, TrainEnd, NULL },
     { TrainSetup, TrainEnd, NULL },
 };
+
+// clang-format on
 
 void FieldGimmickBSubway_Setup(Field *field) {
     u16 heapId;

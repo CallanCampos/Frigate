@@ -93,8 +93,6 @@ u16 GFL_SystemFontGetTabSize(void) {
 }
 
 void GFL_SystemFontSetColorIndices(u32 fg, u32 bg) {
-    sSystemFont->fgMask =
-        (fg << 28) | (fg << 24) | (fg << 20) | (fg << 16) | (fg << 12) | (fg << 8) | (fg << 4) | fg;
-    sSystemFont->bgMask =
-        (bg << 28) | (bg << 24) | (bg << 20) | (bg << 16) | (bg << 12) | (bg << 8) | (bg << 4) | bg;
+    sSystemFont->fgMask = (fg << 28) | (fg << 24) | (fg << 20) | (fg << 16) | (fg << 12) | (fg << 8) | (fg << 4) | fg;
+    sSystemFont->bgMask = (bg << 28) | (bg << 24) | (bg << 20) | (bg << 16) | (bg << 12) | (bg << 8) | (bg << 4) | bg;
 }

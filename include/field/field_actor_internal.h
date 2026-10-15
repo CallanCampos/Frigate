@@ -5,10 +5,10 @@
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
+#include "field/field_actor.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
 #include "nitro/fx.h"
-#include "field/field_actor.h"
 #include "struct_decls.h"
 
 // The UID of the player's actor

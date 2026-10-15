@@ -14,9 +14,9 @@
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
 #include "save/pokedex.h"
-#include "worldtrade_local.h"
 #include "system/bgwinfrm.h"
 #include "system/bmp_menulist.h"
+#include "worldtrade_local.h"
 
 // The Global Trade Station's input of a Pokémon's name, gender and level and of a country, in a window that slides
 // over the lower screen, for the deposit and search screens. A name is chosen by its initial's group, then the

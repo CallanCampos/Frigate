@@ -1,8 +1,8 @@
 #ifndef POKEBW2_CONSTANTS_MET_LOCATIONS_H
 #define POKEBW2_CONSTANTS_MET_LOCATIONS_H
 
-// Where a Pokémon was met or its egg was obtained, as PKM_PARAM_MET_LOCATION and PKM_PARAM_EGG_LOCATION hold them. Below
-// 30000 they are places in Unova, from 30001 the special places, in the order of their names, and above
+// Where a Pokémon was met or its egg was obtained, as PKM_PARAM_MET_LOCATION and PKM_PARAM_EGG_LOCATION hold them.
+// Below 30000 they are places in Unova, from 30001 the special places, in the order of their names, and above
 // LOCATION_EXTERNAL_BASE the people and places an egg can be received from. The names are ours
 
 // No egg location: the Pokémon wasn't hatched

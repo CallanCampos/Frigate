@@ -3,8 +3,8 @@
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
 #include "field/bsubway_scr.h"
-#include "field/wbt_battle.h"
 #include "field/wbt.h"
+#include "field/wbt_battle.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
@@ -269,8 +269,8 @@ static u16 *func_ov055_021e6ee0(u32 tournament, u32 group, HeapID heapId, u16 *c
     return files;
 }
 
-void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files,
-                         u32 arcId, u8 count, MATHRandContext32 *rand) {
+void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files, u32 arcId,
+                         u8 count, MATHRandContext32 *rand) {
     WbtPartyChoices *choices;
 
     clock();

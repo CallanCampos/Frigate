@@ -1,8 +1,8 @@
 #ifndef POKEBW2_BATTLE_BTL_EVENT_H
 #define POKEBW2_BATTLE_BTL_EVENT_H
 
-#include "struct_decls.h"
 #include "types.h"
+#include "struct_decls.h"
 
 // Checks whether an item's handlers are skipped for the item being run: the checking item, the server flow, the
 // checked item's factor type, the event, and the checked item's sub ID and mon

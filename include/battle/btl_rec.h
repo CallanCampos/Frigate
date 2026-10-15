@@ -31,8 +31,8 @@ BOOL func_ov167_021d49d0(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, vo
 
 // A recording is a stream of chunks, each starting with a header byte: the count in bits 0 to 3, the chunk type in bits
 // 4 to 6 (1 for the clients' actions, 2 for a turn without them, 3 for a timeout) and the start of a chapter in bit 7.
-// Each client's actions in a type 1 chunk start with a byte holding the client ID in bits 5 to 7 and the action count in
-// bits 0 to 4.
+// Each client's actions in a type 1 chunk start with a byte holding the client ID in bits 5 to 7 and the action count
+// in bits 0 to 4.
 
 // The reader of a recorded battle's actions, which the main module holds
 typedef struct {

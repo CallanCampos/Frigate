@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/wifi_p2pmatch_net.h"
 #include "app/wifi_p2pmatch.h"
+#include "app/wifi_p2pmatch_net.h"
 #include "gfl/net_command.h"
 #include "struct_decls.h"
 
@@ -26,6 +26,7 @@ static void WifiP2PMatchNet_RecvUnused0(int netId, int size, const void *data, v
 static void WifiP2PMatchNet_RecvUnused1(int netId, int size, const void *data, void *work, NetHandle *handle);
 static void WifiP2PMatchNet_RecvUnused2(int netId, int size, const void *data, void *work, NetHandle *handle);
 
+// clang-format off
 static const NetCommand sWifiP2PMatchNetCommands[WIFIP2PMATCH_NET_CMD_NUM] = {
     { WifiP2PMatchNet_RecvUnused0, NULL },
     { WifiP2PMatchNet_RecvUnused1, NULL },
@@ -37,6 +38,8 @@ static const NetCommand sWifiP2PMatchNetCommands[WIFIP2PMATCH_NET_CMD_NUM] = {
     { WifiP2PMatch_RecvParty, WifiP2PMatch_GetPartyRecvBuffer },
     { WifiP2PMatch_RecvCancel, NULL },
 };
+
+// clang-format on
 
 static const NetCommand *WifiP2PMatchNet_CommandTableGet(void) {
     return sWifiP2PMatchNetCommands;

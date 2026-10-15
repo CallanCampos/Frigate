@@ -454,7 +454,8 @@ MysteryYesNo *MysteryYesNo_Create(const MysteryYesNoSetup *setup, HeapID heapId)
     sys_memset(menu, 0, sizeof(MysteryYesNo));
     menu->queue = setup->queue;
     height = setup->count * 2;
-    menu->window = BmpWin_CreateDynamic(setup->bg, sYesNoWindow[1], 17 - height, sYesNoWindow[0], height, setup->palette, TRUE);
+    menu->window =
+        BmpWin_CreateDynamic(setup->bg, sYesNoWindow[1], 17 - height, sYesNoWindow[0], height, setup->palette, TRUE);
     BmpWin_DrawFrame(menu->window, WINFRAME_TRANSFER_NONE, setup->frameChar, setup->framePalette);
     window = menu->window;
     BmpWin_FlushChar(window);

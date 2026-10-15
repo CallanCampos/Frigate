@@ -1,7 +1,6 @@
 // The Union Room's net commands from 0x1400 that the machines send each other, with the senders for them. The file's
 // name is a guess: the ROM only shows that it is a file of its own, between union_main.c and union_subproc.c, by the
 // assert file name ("") that its asserts share
-#include "field/union_main.h"
 #include "types.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
@@ -17,6 +16,7 @@
 #include "field/field_sound.h"
 #include "field/union_app.h"
 #include "field/union_comm.h"
+#include "field/union_main.h"
 #include "field/union_msg.h"
 #include "field/union_oneself.h"
 #include "field/zone.h"
@@ -418,6 +418,6 @@ BOOL func_ov028_0217196c(u8 sendTo, u8 leftNetId) {
 
 BOOL func_ov028_0217199c(UnionSystem *unisys) {
     func_02036dc0(&unisys->joinPerson, GSYS_GetGameData(unisys->param->gsys));
-    return func_02042c18(func_02040440(), 0xff, UNION_NET_CMD_JOIN_AVENUE, sizeof(JoinAvenuePerson), &unisys->joinPerson,
-                         TRUE, FALSE, TRUE);
+    return func_02042c18(func_02040440(), 0xff, UNION_NET_CMD_JOIN_AVENUE, sizeof(JoinAvenuePerson),
+                         &unisys->joinPerson, TRUE, FALSE, TRUE);
 }

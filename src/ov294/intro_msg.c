@@ -127,8 +127,8 @@ void IntroMsg_Print(IntroMsg *msg, u32 messageId, BOOL frame) {
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     GFL_MsgDataLoadStrbuf(msg->msgData, messageId, msg->strbuf);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->expanded, msg->strbuf);
-    msg->printStream = func_02022268(window, 4, 0, msg->expanded, msg->font, wait, msg->tcbManager, 0xffff,
-                                     msg->heapId, 15);
+    msg->printStream =
+        func_02022268(window, 4, 0, msg->expanded, msg->font, wait, msg->tcbManager, 0xffff, msg->heapId, 15);
     if (!frame) {
         BmpWin_DrawFrame(window, WINFRAME_TRANSFER_VBLANK, FRAME_0_CHAR, FRAME_0_PALETTE);
     } else {
@@ -153,25 +153,26 @@ u32 IntroMsg_GetPrintState(IntroMsg *msg) {
 // Prints the message on, with A, B or a touch hurrying it and going past its pauses. Returns TRUE once it has ended
 BOOL IntroMsg_UpdatePrint(IntroMsg *msg) {
     if (msg->printStream != NULL) {
-    KeyCursor_Update(msg->keyCursor, msg->printStream, msg->window);
-    switch (func_020223b4(msg->printStream)) {
-    case PRINT_STREAM_DONE:
-        func_020223cc(msg->printStream);
-        msg->printStream = NULL;
-        return TRUE;
-    case PRINT_STREAM_PAUSED:
-        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B || func_0203da48()) {
-            func_020223bc(msg->printStream);
-            GFL_SndSEPlay(SEQ_SE_MESSAGE);
+        KeyCursor_Update(msg->keyCursor, msg->printStream, msg->window);
+        switch (func_020223b4(msg->printStream)) {
+        case PRINT_STREAM_DONE:
+            func_020223cc(msg->printStream);
+            msg->printStream = NULL;
+            return TRUE;
+        case PRINT_STREAM_PAUSED:
+            if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B ||
+                func_0203da48()) {
+                func_020223bc(msg->printStream);
+                GFL_SndSEPlay(SEQ_SE_MESSAGE);
+            }
+            break;
+        case PRINT_STREAM_RUNNING:
+            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
+                func_020223e0(msg->printStream, 0);
+            }
+            break;
         }
-        break;
-    case PRINT_STREAM_RUNNING:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(msg->printStream, 0);
-        }
-        break;
-    }
-    return FALSE;
+        return FALSE;
     }
     return FALSE;
 }

@@ -805,8 +805,8 @@ static BOOL IntroCmd_CreateObj(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
     cmd->objCellAnims = func_0204bde0(arc, 9, 8, cmd->heapId);
     GFL_ArcToolFree(arc);
     setup = sObjSetup;
-    cmd->obj = func_0204c040(IntroGraphic_GetClActUnit(cmd->graphic), cmd->objChars, cmd->objPalette,
-                             cmd->objCellAnims, &setup, 0, cmd->heapId);
+    cmd->obj = func_0204c040(IntroGraphic_GetClActUnit(cmd->graphic), cmd->objChars, cmd->objPalette, cmd->objCellAnims,
+                             &setup, 0, cmd->heapId);
     func_0204c124(cmd->obj, FALSE);
     return TRUE;
 }

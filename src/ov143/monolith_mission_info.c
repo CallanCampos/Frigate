@@ -104,12 +104,15 @@ static void MonolithMissionInfo_ClearAll(MonolithMissionInfoWork *miw);
 // The messages of what a mission asks for, by the kind of its target
 static const s16 sMonolithMissionInfoTargetMsgs[5] = { 68, 66, 61, 31, 67 };
 
+// clang-format off
 static const MonolithMissionInfoWindow sMonolithMissionInfoWindows[] = {
     { 0, 2, 0, 28, 3, 13 },  { 0, 2, 4, 28, 8, 13 },   { 0, 2, 15, 12, 2, 13 },
     { 0, 2, 17, 12, 2, 13 }, { 0, 2, 19, 12, 2, 13 },  { 0, 14, 15, 15, 2, 13 },
     { 0, 14, 17, 15, 2, 13 }, { 0, 14, 19, 15, 2, 13 }, { 0, 14, 21, 15, 2, 13 },
     { 0xff, 0, 0, 0, 0, 0 },
 };
+
+// clang-format on
 
 const GameProcFunctions MONOLITH_MISSION_INFO_PROC_FUNCTIONS = {
     MonolithMissionInfo_Init,
@@ -126,8 +129,8 @@ static const BGSetup sMonolithMissionInfoBGSetups[2] = {
 };
 
 static const MonolithMissionInfoText sMonolithMissionInfoTexts[MONOLITH_MISSION_INFO_WINDOW_COUNT] = {
-    { 55, 4, 0, 0 },    { 0, -1, 0, 0 },    { 56, 0, 0, 0 },    { 57, 0, 0, 0 },    { 71, -1, 0, 0 },
-    { 60, -1, 64, 0 },  { 61, -1, 0, 0 },   { 61, -1, 69, 0 },  { 61, -1, 70, 0 },
+    { 55, 4, 0, 0 },   { 0, -1, 0, 0 },  { 56, 0, 0, 0 },   { 57, 0, 0, 0 },   { 71, -1, 0, 0 },
+    { 60, -1, 64, 0 }, { 61, -1, 0, 0 }, { 61, -1, 69, 0 }, { 61, -1, 70, 0 },
 };
 
 static BOOL MonolithMissionInfo_Init(GameProc *proc, u32 *state, void *param, void *work) {
@@ -247,7 +250,8 @@ static void MonolithMissionInfo_CreateWindows(MonolithWork *wk, MonolithMissionI
         if (info->bg == 0xff) {
             break;
         }
-        miw->windows[i] = BmpWin_CreateDynamic(info->bg, info->x, info->y, info->width, info->height, info->palette, TRUE);
+        miw->windows[i] =
+            BmpWin_CreateDynamic(info->bg, info->x, info->y, info->width, info->height, info->palette, TRUE);
         BmpWin_FlushChar(miw->windows[i]);
         BmpWin_FlushMap(miw->windows[i]);
     }
@@ -304,7 +308,8 @@ static void MonolithMissionInfo_DrawTitle(MonolithWork *wk, MonolithMissionInfoW
     GFL_StrBufFree(str);
 }
 
-static void MonolithMissionInfo_DrawDescription(MonolithWork *wk, MonolithMissionInfoWork *miw, int mission, int level) {
+static void MonolithMissionInfo_DrawDescription(MonolithWork *wk, MonolithMissionInfoWork *miw, int mission,
+                                                int level) {
     FestMission data;
     StrBuf *str;
 
@@ -312,7 +317,8 @@ static void MonolithMissionInfo_DrawDescription(MonolithWork *wk, MonolithMissio
     func_ov027_02170cf8(miw->festText, mission, level, &data);
     str = GFL_StrBufCreate(256, HEAPID_MONOLITH);
     func_ov027_02170d90(miw->festText, str, &data, HEAPID_MONOLITH);
-    PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_DESCRIPTION], wk->printQueue, 0, 0, str, wk->font);
+    PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_DESCRIPTION], wk->printQueue, 0, 0, str,
+                             wk->font);
     GFL_StrBufFree(str);
 }
 
@@ -381,8 +387,8 @@ static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, Monolit
     MonolithMissionInfo_ClearWindow(miw, MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT);
     if (!unplayed) {
         str = GFL_MsgDataLoadStrbufNew(screen->work->msgMonolith, 71);
-        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_LABEL], screen->work->printQueue, 0, 0, str,
-                                 screen->work->font);
+        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_LABEL], screen->work->printQueue, 0, 0,
+                                 str, screen->work->font);
         GFL_StrBufFree(str);
         WordSetNumber(screen->work->wordSet, 0, count, 4, 0, TRUE);
         msgId = sMonolithMissionInfoTargetMsgs[miw->missions[miw->mission].params.unk05];
@@ -395,8 +401,8 @@ static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, Monolit
                                  120 - width, 0, str, screen->work->font);
         GFL_StrBufFree(str);
         str = GFL_MsgDataLoadStrbufNew(screen->work->msgMonolith, 69);
-        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT_LABEL], screen->work->printQueue, 0, 0,
-                                 str, screen->work->font);
+        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT_LABEL], screen->work->printQueue,
+                                 0, 0, str, screen->work->font);
         GFL_StrBufFree(str);
         WordSetNumber(screen->work->wordSet, 0, best, 4, 0, TRUE);
         format = GFL_MsgDataLoadStrbufNew(screen->work->msgMonolith, msgId);
@@ -404,12 +410,12 @@ static void MonolithMissionInfo_DrawRecords(MonolithScreenParam *screen, Monolit
         GFL_WordSetFormatStrbuf(screen->work->wordSet, str, format);
         GFL_StrBufFree(format);
         width = GFL_FontGetBlockWidth(str, screen->work->font, 0);
-        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT], screen->work->printQueue, 120 - width,
-                                 0, str, screen->work->font);
+        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT], screen->work->printQueue,
+                                 120 - width, 0, str, screen->work->font);
         GFL_StrBufFree(str);
         str = GFL_MsgDataLoadStrbufNew(screen->work->msgMonolith, 70);
-        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT], screen->work->printQueue, 0, 0, str,
-                                 screen->work->font);
+        PrintWindow_PrintNoColor(&miw->prints[MONOLITH_MISSION_INFO_WINDOW_BEST_COUNT], screen->work->printQueue, 0, 0,
+                                 str, screen->work->font);
         GFL_StrBufFree(str);
     }
 }

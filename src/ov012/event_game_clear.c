@@ -1,10 +1,11 @@
 #include "types.h"
+#include "app/unova_link.h"
 #include "constants/pokemon.h"
 #include "constants/version.h"
 #include "demo/the_end.h"
 #include "field/encounter.h"
-#include "field/event_game_clear.h"
 #include "field/event_3d_demo.h"
+#include "field/event_game_clear.h"
 #include "field/event_mapchange.h"
 #include "field/field.h"
 #include "field/field_event.h"
@@ -17,15 +18,14 @@
 #include "gfl/sound.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
-#include "app/unova_link.h"
 #include "save/config.h"
 #include "save/event_work.h"
 #include "save/medal_box.h"
 #include "save/save_control.h"
 #include "save/trainer_card.h"
+#include "system/game_comm.h"
 #include "system/game_data.h"
 #include "system/game_event.h"
-#include "system/game_comm.h"
 #include "system/game_system.h"
 #include "system/version.h"
 
@@ -274,7 +274,6 @@ u32 EventGameClear_Get3DDemoID(void) {
         return 6;
     }
 }
-
 
 void EventGameClear_NextState(GameClearWork *work, u32 *state) {
     ++*state;

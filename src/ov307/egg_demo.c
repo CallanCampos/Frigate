@@ -410,8 +410,10 @@ static void EggDemo_InitGraphics(EggDemoParam *param, EggDemoWork *wk) {
     GFL_BGSysSetBGEnabled(0, TRUE);
     GFL_BGSysSetBGEnabled(2, TRUE);
     GFL_BGSysSetBGEnabled(4, TRUE);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 |
-                        GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD, 0, 0);
+    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
+                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                        0, 0);
     GFL_BGSysResetStdPalette(0, GX_RGB(16, 16, 16));
     GFL_BGSysResetStdPalette(4, GX_RGB(0, 0, 0));
     wk->view = EggDemoView_Create(wk->heapId, param->pkm);
@@ -665,8 +667,8 @@ static void EggDemo_Print(EggDemoParam *param, EggDemoWork *wk, u32 messageId) {
     GFL_WordSetFormatStrbuf(wordSet, wk->message, format);
     GFL_WordSetSystemFree(wordSet);
     GFL_StrBufFree(format);
-    wk->printStream = func_02022268(wk->window, 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 2,
-                                    wk->heapId, 15);
+    wk->printStream =
+        func_02022268(wk->window, 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 2, wk->heapId, 15);
 }
 
 static BOOL EggDemo_IsPrintDone(EggDemoParam *param, EggDemoWork *wk) {

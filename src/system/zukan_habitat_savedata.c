@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/zukan_habitat_savedata.h"
 #include "gfl/std.h"
 #include "save/medal_box.h"
+#include "save/zukan_habitat_savedata.h"
 
 // The Pokédex's habitat list in the save: what the player has done of each habitat, and the zone, season and kind
 // of habitat that the list shows. The ROM has no string for the file, so the name is a guess. The list is not a save

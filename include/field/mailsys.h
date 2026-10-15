@@ -121,8 +121,8 @@ struct MailSysWork {
 // The mail screen's proc, which the field app call runs. It runs the screen of the mail as a child proc
 extern const GameProcFunctions MAILSYS_PROC_FUNCTIONS;
 
-// The proc for the field app call's table (MWCC counts this read, ahead of the table's definition, as a reference, which
-// puts the table among the other .rodata objects of mailsys.c as it is in the ROM)
+// The proc for the field app call's table (MWCC counts this read, ahead of the table's definition, as a reference,
+// which puts the table among the other .rodata objects of mailsys.c as it is in the ROM)
 static inline const GameProcFunctions *MailSys_GetProcFunctions(void) {
     return &MAILSYS_PROC_FUNCTIONS;
 }

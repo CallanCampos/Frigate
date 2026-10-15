@@ -1,7 +1,6 @@
-#include "nnsys/g2d.h"
-
 #include "nitro/gx.h"
 #include "nitro/mi.h"
+#include "nnsys/g2d.h"
 
 // NitroSystem's g2d_Renderer.c: the renderer, which draws cells, cell animations and multi-cell animations to its
 // surfaces through the renderer core, with a matrix stack of its own. The 2D surfaces share their affine matrices

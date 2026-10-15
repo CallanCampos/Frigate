@@ -7,7 +7,8 @@
 // The zones of each plugin. Declared in the order that MWCC lays out as the original does
 static const u16 sWbtStadiumZones[] = { 193 };
 static const u16 sBadgeGateZones[] = { 573 };
-static const u16 sPokemonCenterZones[] = { 1, 8, 20, 41, 65, 99, 109, 115, 122, 398, 407, 413, 425, 435, 443, 454, 460, 472, 602, 146 };
+static const u16 sPokemonCenterZones[] = { 1,   8,   20,  41,  65,  99,  109, 115, 122, 398,
+                                           407, 413, 425, 435, 443, 454, 460, 472, 602, 146 };
 static const u16 sResortZones[] = { 490, 491 };
 static const u16 sPlugin14Zones[] = { 604, 427, 139, 213 };
 static const u16 sWbtEntranceZones[] = { 192 };

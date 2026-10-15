@@ -21,8 +21,9 @@ void GameEvent_ChainNext(GameEvent *event, GameEvent *next);
 // Loads an overlay and runs the event that provider, in it, creates with args
 GameEvent *GameEvent_CreateOverlayDelegate(GameSystem *gsys, u32 overlayId, GameEventProvider provider, void *args);
 // Runs a proc of an overlay, then calls onEnd, if it is given, with arg
-GameEvent *EventFieldSubprocessTransition_CreateWithCallback(GameSystem *gsys, Field *field, u32 overlayId, const GameProcFunctions *functions, void *param,
-                         void (*onEnd)(void *arg), void *arg);
+GameEvent *EventFieldSubprocessTransition_CreateWithCallback(GameSystem *gsys, Field *field, u32 overlayId,
+                                                             const GameProcFunctions *functions, void *param,
+                                                             void (*onEnd)(void *arg), void *arg);
 GameEvent *GameEvent_Create(GameSystem *gsys, GameEvent *parent, GameEventCallback callback, u32 size);
 // Gives the event a new callback and new data of size bytes
 void GameEvent_Transplant(GameEvent *event, GameEventCallback callback, u32 size);

@@ -81,7 +81,7 @@ BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
     data->pms = PMSIParam_Create(kind, 0, 0, 0, GameData_GetSaveControl(gameData), HEAPID_USER);
     if (data->useCGear) {
         CGearPhrases_Get(getCGearDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))), data->cgearIndex,
-                      &sentence);
+                         &sentence);
         PMSIParam_SetSentence(data->pms, &sentence);
     }
     ScriptWork_CallEvent(work, event);

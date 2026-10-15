@@ -64,9 +64,8 @@ int _STD_CompareNString(const char *a, const char *b) {
 void GFL_RandomUpdateMT(u32 seed) {
     sGFLStd->mt[0] = seed;
     for (sGFLStd->mti = 1; sGFLStd->mti < MT_N; sGFLStd->mti++) {
-        sGFLStd->mt[sGFLStd->mti] = 1812433253
-                                        * (sGFLStd->mt[sGFLStd->mti - 1] ^ (sGFLStd->mt[sGFLStd->mti - 1] >> 30))
-                                    + sGFLStd->mti;
+        sGFLStd->mt[sGFLStd->mti] =
+            1812433253 * (sGFLStd->mt[sGFLStd->mti - 1] ^ (sGFLStd->mt[sGFLStd->mti - 1] >> 30)) + sGFLStd->mti;
     }
 }
 

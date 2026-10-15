@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/worldtrade_data.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
 #include "save/save_control.h"
+#include "save/worldtrade_data.h"
 
 // The Global Trade Station's save block, which keeps the Pokémon the player deposited. The ROM has no string for
 // the file, so the name is a guess (swan's SaveControl_GetWorldTradeData). Block 0x2e.

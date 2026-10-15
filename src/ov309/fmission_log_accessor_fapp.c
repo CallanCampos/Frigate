@@ -153,7 +153,8 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
         case 1: {
             fx32 perLevel = FX_Div(FX32_CONST(result->seconds), FX32_CONST(15));
 
-            result->bonusCount = FX_Whole(FX_Div(FX_Mul(perLevel, FX32_CONST(festival->info->level + 1)), FX32_CONST(3)));
+            result->bonusCount =
+                FX_Whole(FX_Div(FX_Mul(perLevel, FX32_CONST(festival->info->level + 1)), FX32_CONST(3)));
             result->bonusCount += score;
             break;
         }

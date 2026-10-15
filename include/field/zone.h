@@ -122,7 +122,6 @@ struct ZoneWarp {
     } pos;
 };
 
-
 extern const RespawnZoneInfo RESPAWN_ZONE_INFO[82];
 // Tables of zonedata.c that no code of the ROM reads
 extern const u16 BC_WF_ZONES[9];

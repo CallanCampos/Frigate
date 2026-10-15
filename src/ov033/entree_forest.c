@@ -1,18 +1,18 @@
 #include "types.h"
-#include "gfl/arc_util.h"
-#include "system/game_data.h"
-#include "save/player_info.h"
-#include "pml/poke_party.h"
-#include "gfl/heap.h"
-#include "gfl/arc.h"
 #include "field/entree_forest.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/symbol_map.h"
 #include "field/zone.h"
+#include "gfl/arc.h"
+#include "gfl/arc_util.h"
+#include "gfl/heap.h"
 #include "gfl/random.h"
-#include "system/tpoke_data.h"
+#include "pml/poke_party.h"
+#include "save/player_info.h"
 #include "struct_decls.h"
+#include "system/game_data.h"
+#include "system/tpoke_data.h"
 
 typedef struct {
     u16 moveCode;
@@ -27,6 +27,7 @@ static const u8 sPokemonPositions1[] = {
 };
 
 // The move code and the area of a Pokémon's actor, by EntreeForestPokemon.actorType
+// clang-format off
 static const EntreeForestActorAppearance sActorAppearances[8] = {
     { 2, 0, 0 },
     { 3, 1, 1 },
@@ -37,6 +38,8 @@ static const EntreeForestActorAppearance sActorAppearances[8] = {
     { 0x13, 0, 0 },
     { 0x12, 0, 0 },
 };
+
+// clang-format on
 
 // The actor of a Pokémon, before its ID, model, movement and position are set
 static const ZoneNPC sPokemonNPC = {
@@ -49,12 +52,12 @@ static const u8 sPokemonPositions2[] = {
 };
 
 static const u8 sPokemonPositions0[] = {
-    14, 18, 17, 12, 17, 18, 14, 12, 11, 18, 20, 12, 20, 18, 11, 12, 8,  14, 23, 14,
-    14, 21, 17, 15, 17, 21, 14, 15, 11, 21, 20, 15, 20, 21, 11, 15, 8,  19, 23, 19,
+    14, 18, 17, 12, 17, 18, 14, 12, 11, 18, 20, 12, 20, 18, 11, 12, 8, 14, 23, 14,
+    14, 21, 17, 15, 17, 21, 14, 15, 11, 21, 20, 15, 20, 21, 11, 15, 8, 19, 23, 19,
 };
 
 FieldActor *EntreeForest_SpawnPkmActor(const EntreeForestSpawnContext *context, const EntreeForestPokemon *pokemon,
-                                      u16 index, u16 x, u16 z, s32 y) {
+                                       u16 index, u16 x, u16 z, s32 y) {
     const EntreeForestActorAppearance *appearance;
     MMSys *actorSystem;
     u16 zoneId;
@@ -115,7 +118,8 @@ PartyPkm *func_ov033_02176bd0(HeapID heapId, GameData *gameData, const EntreeFor
     return pkm;
 }
 
-void EntreeForest_SpawnAllPokemon(Field *field, u32 actorIdBase, const EntreeForestPokemon *pokemon, u32 unused, u32 area) {
+void EntreeForest_SpawnAllPokemon(Field *field, u32 actorIdBase, const EntreeForestPokemon *pokemon, u32 unused,
+                                  u32 area) {
     const u8 *positions;
     EntreeForestSpawnContext context;
     FieldActor *playerActor;

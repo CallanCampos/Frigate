@@ -68,9 +68,9 @@ static const BmpMenuListHeader sMenuListHeader = {
 };
 
 WifiBattleMatchMsgBox *WifiBattleMatchMsgBox_Create(u32 bg, u32 palette, u16 framePalette, u16 frameChar,
-                                           PrintQueue *printQueue, Font *font, HeapID heapId) {
-    WifiBattleMatchMsgBox *p_wk = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchMsgBox), FALSE,
-                                                  "wifibattlematch_util.c", 95);
+                                                    PrintQueue *printQueue, Font *font, HeapID heapId) {
+    WifiBattleMatchMsgBox *p_wk =
+        GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchMsgBox), FALSE, "wifibattlematch_util.c", 95);
     BmpWin *window;
 
     sys_memset(p_wk, 0, sizeof(WifiBattleMatchMsgBox));
@@ -195,14 +195,14 @@ static void WifiBattleMatchUtil_MsgBoxStart(WifiBattleMatchMsgBox *p_wk, u32 mod
         AppPrintsysCommon_Init(&p_wk->printsys, APP_PRINTSYS_COMMON_KEYS);
         p_wk->p_keycursor = KeyCursor_Create(p_wk->bgColor, TRUE, FALSE, p_wk->heapId);
         p_wk->stream = func_02022268(p_wk->window, 0, 0, p_wk->strBuf, p_wk->font, func_02017bcc(), p_wk->tcbManager, 0,
-                                    p_wk->heapId, p_wk->bgColor);
+                                     p_wk->heapId, p_wk->bgColor);
         p_wk->mode = 1;
         break;
     case WIFIBATTLEMATCH_MSG_STREAM:
         GFL_ASSERT(p_wk->p_keycursor == NULL);
         AppPrintsysCommon_Init(&p_wk->printsys, APP_PRINTSYS_COMMON_KEYS);
         p_wk->stream = func_02022268(p_wk->window, 0, 0, p_wk->strBuf, p_wk->font, func_02017bcc(), p_wk->tcbManager, 0,
-                                    p_wk->heapId, p_wk->bgColor);
+                                     p_wk->heapId, p_wk->bgColor);
         p_wk->mode = 3;
         break;
     }
@@ -237,9 +237,9 @@ WifiBattleMatchMenu *WifiBattleMatchMenu_CreateBottomRight(const WifiBattleMatch
 }
 
 WifiBattleMatchMenu *WifiBattleMatchMenu_Create(const WifiBattleMatchMenuParam *param, u8 x, u8 y, u8 width, u8 height,
-                                         HeapID heapId) {
-    WifiBattleMatchMenu *menu = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchMenu), FALSE,
-                                                 "wifibattlematch_util.c", 475);
+                                                HeapID heapId) {
+    WifiBattleMatchMenu *menu =
+        GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchMenu), FALSE, "wifibattlematch_util.c", 475);
     BmpMenuListHeader header;
     BmpWin *window;
     u32 i;
@@ -297,8 +297,8 @@ s32 WifiBattleMatchMenu_Update(WifiBattleMatchMenu *menu) {
 }
 
 WifiBattleMatchTask *WifiBattleMatchTask_Create(void *work, WifiBattleMatchTaskFunc func, HeapID heapId) {
-    WifiBattleMatchTask *task = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchTask), FALSE,
-                                                 "wifibattlematch_util.c", 638);
+    WifiBattleMatchTask *task =
+        GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchTask), FALSE, "wifibattlematch_util.c", 638);
 
     sys_memset(task, 0, sizeof(WifiBattleMatchTask));
     task->work = work;

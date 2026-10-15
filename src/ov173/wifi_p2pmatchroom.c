@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/wifi_p2pmatchroom.h"
 #include "app/wf2dmap/wf2dmap_judge.h"
+#include "app/wifi_p2pmatchroom.h"
 #include "app/wifi_p2pmatchroom_map.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -76,8 +76,8 @@ static void WifiMcr_FriendSeatPosGet(const WIFI_MATCHROOM *wk, WF2DMAP_POS *pos,
 static void WifiMcr_ExitPosGet(const WIFI_MATCHROOM *wk, WF2DMAP_POS *pos);
 static MCR_MOVEOBJ *WifiMcr_FreeObjGet(WIFI_MATCHROOM *wk);
 static void WifiMcr_ObjDrawNew(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, BOOL hero);
-static void WifiMcr_ObjNew(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, const WF2DMAP_POS *pos, u32 friendNo, u16 view,
-                           u8 way, u32 status);
+static void WifiMcr_ObjNew(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, const WF2DMAP_POS *pos, u32 friendNo, u16 view, u8 way,
+                           u32 status);
 static BOOL WifiMcr_ObjAccessCheck(const MCR_MOVEOBJ *obj);
 static void WifiMcr_PlayerMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
 static void WifiMcr_NpcInMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj);
@@ -701,8 +701,8 @@ static void WifiMcr_ObjDrawNew(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, BOOL hero) 
     }
 }
 
-static void WifiMcr_ObjNew(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, const WF2DMAP_POS *pos, u32 friendNo, u16 view,
-                           u8 way, u32 status) {
+static void WifiMcr_ObjNew(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, const WF2DMAP_POS *pos, u32 friendNo, u16 view, u8 way,
+                           u32 status) {
     WF2DMAP_OBJDATA data;
 
     data.x = pos->x;

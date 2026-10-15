@@ -62,7 +62,8 @@ typedef struct {
 static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, u32 *state, void *data);
 
-GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, u32 slot, GameEventReturnCode (*callback)(GameEvent *event, u32 *state, void *data)) {
+GameEvent *prepareForPokemonNameEntryData(GameSystem *gsys, u16 *result, u32 slot,
+                                          GameEventReturnCode (*callback)(GameEvent *event, u32 *state, void *data)) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PartyPkm *pkm;
     StrBuf *name;
@@ -164,8 +165,8 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     work->field = GSYS_GetField(gsys);
     work->result = result;
     work->target = target;
-    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, mode, getTrainerGender(GetGameDataPlayerInfo(gameData)), 0, maxLength,
-                                     useCurrent ? name : NULL, gameInfo);
+    work->nameEntry = setupNameEntry(HEAPID_GAMEEVENT, mode, getTrainerGender(GetGameDataPlayerInfo(gameData)), 0,
+                                     maxLength, useCurrent ? name : NULL, gameInfo);
     GFL_StrBufFree(name);
     return event;
 }
@@ -271,7 +272,7 @@ static GameEventReturnCode EventPokeNameWordSetInput_Callback(GameEvent *event, 
 
     if (*state == 0) {
         GameEvent_ChainNext(event, EventPokeNameWordSetInput_Create(work->gsys, work->species, work->form, work->result,
-                                                                   work->wordSet));
+                                                                    work->wordSet));
         (*state)++;
         return FALSE;
     }

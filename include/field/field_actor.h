@@ -3,12 +3,12 @@
 
 #include "types.h"
 #include "constants/directions.h"
-#include "gfl/heap.h"
+#include "field/zone.h"
 #include "gfl/blact.h"
+#include "gfl/heap.h"
 #include "nitro/fx.h"
 #include "struct_decls.h"
 #include "system/game_event.h"
-#include "field/zone.h"
 
 // A position on the grid of 16-unit tiles. The game copies it as 8 bytes, with a field after z
 typedef struct {

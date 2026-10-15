@@ -946,7 +946,6 @@ u32 func_ov012_0215ed38(u32 direction, u16 angle) {
     return data_ov012_0216cdc8[data_ov012_0216cd68[rotated / 0x1000]][DIR_DOWN];
 }
 
-
 void SetRailActorFlag(FieldActor *actor) {
     SetActorFlag(actor, 0x2000);
 }

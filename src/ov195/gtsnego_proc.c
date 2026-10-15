@@ -241,6 +241,7 @@ static const TouchRect sGtsNegoScrollBarRect[] = {
 };
 
 // The rows of the list of people, and the button under them
+// clang-format off
 static const TouchRect sGtsNegoFriendRects[] = {
     { 24, 72, 0, 236 },
     { 72, 120, 0, 236 },
@@ -248,6 +249,8 @@ static const TouchRect sGtsNegoFriendRects[] = {
     { 168, 192, 64, 192 },
     { TOUCH_RECT_END, 0, 0, 0 },
 };
+
+// clang-format on
 
 static const NetCommand sGtsNegoCommands[] = {
     { GtsNego_OnRecvRequest, NULL },
@@ -548,8 +551,8 @@ static void GtsNego_StateWaitNameCheck(GtsNegoWork *wk) {
     }
     if (done) {
         if (bad) {
-            MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN,
-                                                  HEAPID_GTSNEGO);
+            MsgData *msgData =
+                GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_HANDLERS_BTL_MAIN, HEAPID_GTSNEGO);
             StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, GTSNEGO_DEFAULT_NAME_MSG);
 
             GFL_MsgDataFree(msgData);

@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_POKEWOOD_SYSTEM_H
 
 #include "types.h"
-#include "app/pokelist.h"
 #include "app/p_status.h"
+#include "app/pokelist.h"
 #include "battle/regulation.h"
 #include "gfl/heap.h"
 #include "save/pokewood.h"

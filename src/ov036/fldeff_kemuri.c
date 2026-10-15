@@ -31,6 +31,7 @@ static void func_ov036_021a3fac(FieldEffectTask *task, void *work);
 static void func_ov036_021a3fb8(FieldEffectTask *task, void *work);
 static void func_ov036_021a3fd4(FieldEffectTask *task, void *work);
 
+// clang-format off
 static const FieldEffectTaskVTable SMOKE_TASK_VTABLE = {
     sizeof(SmokeTask),
     func_ov036_021a3f78,
@@ -38,6 +39,8 @@ static const FieldEffectTaskVTable SMOKE_TASK_VTABLE = {
     func_ov036_021a3fb8,
     func_ov036_021a3fd4,
 };
+
+// clang-format on
 
 void *playSmokeEffect(FieldEffects *effects, HeapID heapId) {
     FieldEffectSmoke *smoke = GFL_HeapAllocate(heapId, sizeof(FieldEffectSmoke), TRUE, "fldeff_kemuri.c", 82);

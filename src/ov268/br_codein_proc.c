@@ -3,8 +3,8 @@
 // none, and br_core.c runs it as BR_PROCID_CODEIN
 
 #include "types.h"
-#include "app/battle_recorder/br_codein_proc.h"
 #include "app/battle_recorder/br_codein.h"
+#include "app/battle_recorder/br_codein_proc.h"
 #include "app/battle_recorder/br_core.h"
 #include "app/battle_recorder/br_fade.h"
 #include "app/battle_recorder/br_proc_sys.h"

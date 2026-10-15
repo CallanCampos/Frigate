@@ -53,8 +53,8 @@ GameEvent *FestSparkle_CheckPickUpGrid(FestSparkleGimmick *gimmick, const VecFx3
 
     for (i = 0; i < work->count; i++) {
         place = &work->places[work->placeIndex[i]];
-        if (func_ov036_021a5c5c(gimmick->sparkles, i) && place->isRail == FALSE
-            && CheckBGPositionMatchGrid(place, position)) {
+        if (func_ov036_021a5c5c(gimmick->sparkles, i) && place->isRail == FALSE &&
+            CheckBGPositionMatchGrid(place, position)) {
             return FestSparkle_PickUp(gimmick, work, i);
         }
     }
@@ -69,8 +69,8 @@ GameEvent *FestSparkle_CheckPickUpRail(FestSparkleGimmick *gimmick, const RailPo
     Field_GetResolvedControllerTypeID(gimmick->field);
     for (i = 0; i < work->count; i++) {
         place = &work->places[work->placeIndex[i]];
-        if (func_ov036_021a5c5c(gimmick->sparkles, i) && place->isRail == TRUE
-            && CheckBGPositionMatchRail(place, position)) {
+        if (func_ov036_021a5c5c(gimmick->sparkles, i) && place->isRail == TRUE &&
+            CheckBGPositionMatchRail(place, position)) {
             return FestSparkle_PickUp(gimmick, work, i);
         }
     }
@@ -99,8 +99,8 @@ BOOL FestSparkle_IsOnTile(FestSparkleGimmick *gimmick, u16 x, u16 z, fx32 height
                 func_ov012_0215d4ec(place, &railPos);
                 func_ov036_021b06ec(gimmick->rail, &railPos, &pos);
             }
-            if (POS_TO_GRID(pos.x) == x && POS_TO_GRID(pos.z) == z && pos.y - SPARKLE_HEIGHT_RANGE <= height
-                && pos.y + SPARKLE_HEIGHT_RANGE >= height) {
+            if (POS_TO_GRID(pos.x) == x && POS_TO_GRID(pos.z) == z && pos.y - SPARKLE_HEIGHT_RANGE <= height &&
+                pos.y + SPARKLE_HEIGHT_RANGE >= height) {
                 return TRUE;
             }
         }
@@ -170,7 +170,8 @@ static BOOL FestSparkle_IsBlockedGrid(FestSparkleGimmick *gimmick, FestSparkleWo
     return FALSE;
 }
 
-static BOOL FestSparkle_IsBlockedRail(FestSparkleGimmick *gimmick, FestSparkleWork *work, const RailPosition *position) {
+static BOOL FestSparkle_IsBlockedRail(FestSparkleGimmick *gimmick, FestSparkleWork *work,
+                                      const RailPosition *position) {
     FieldActor *actor = FindActorByRailPos(gimmick->actors, position, FALSE);
 
     if (actor != NULL && actor != gimmick->player) {

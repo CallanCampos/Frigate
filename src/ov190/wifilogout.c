@@ -1,8 +1,8 @@
-// wifilogout.c, in overlay 190: the process that logs out of the Nintendo Wi-Fi Connection. The ROM has no file name for
-// it, so it is named after its process (our name)
+// wifilogout.c, in overlay 190: the process that logs out of the Nintendo Wi-Fi Connection. The ROM has no file name
+// for it, so it is named after its process (our name)
 
-#include "app/wifi_login.h"
 #include "types.h"
+#include "app/wifi_login.h"
 #include "app/wifilogin_disp.h"
 #include "app/wifilogin_message.h"
 #include "constants/sound.h"

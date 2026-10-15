@@ -20,10 +20,8 @@ extern const char data_ov036_021d5744[];
 ResortMapCreateWork *func_ov036_021c8954(HeapID heapId);
 void func_ov036_021c897c(ResortMapCreateWork *work);
 void func_ov036_021c8984(ResortMapCreateWork *work, u16 zoneId, JoinAvenueInfo *info, JoinAvenueOccupants *occupants);
-u32 func_ov036_021c898c(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk,
-                        HeapID heapId);
-u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk,
-                        HeapID heapId);
+u32 func_ov036_021c898c(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk, HeapID heapId);
+u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, void *a2, void *a3, u32 count, u32 chunk, HeapID heapId);
 void func_ov036_021c8b40(ResortMapCreateWork *work, EventData *eventData);
 
 #endif // POKEBW2_FIELD_RESORT_MAPCREATE_H

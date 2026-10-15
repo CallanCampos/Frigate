@@ -9,6 +9,7 @@
 struct PCSoundEventData {
     GameSystem *gameSystem;
     Field *field;
+    // volatile only because the original reloads it at each use; nothing is known to change it behind the compiler
     FieldChunkPropHolder *volatile pcProp;
     u32 unkC;
     u32 skipSound;

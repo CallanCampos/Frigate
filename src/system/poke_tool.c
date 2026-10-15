@@ -1,5 +1,4 @@
 #include "types.h"
-#include "pml/poke_party.h"
 #include "constants/abilities.h"
 #include "constants/arc.h"
 #include "constants/items.h"
@@ -17,6 +16,7 @@
 #include "pml/mail.h"
 #include "pml/met_data.h"
 #include "pml/personal.h"
+#include "pml/poke_party.h"
 #include "pml/species_names.h"
 #include "pml/waza.h"
 #include "save/player_info.h"
@@ -110,8 +110,8 @@ static const u16 sSharedSpriteFormSpecies[] = {
 
 // The types of Hidden Power, by the value its IVs give
 static const u8 hpTypes[16] = {
-    TYPE_FIGHTING, TYPE_FLYING, TYPE_POISON,   TYPE_GROUND,  TYPE_ROCK, TYPE_BUG,    TYPE_GHOST, TYPE_STEEL,
-    TYPE_FIRE,     TYPE_WATER,  TYPE_GRASS,    TYPE_ELECTRIC, TYPE_PSYCHIC, TYPE_ICE, TYPE_DRAGON, TYPE_DARK,
+    TYPE_FIGHTING, TYPE_FLYING, TYPE_POISON, TYPE_GROUND,   TYPE_ROCK,    TYPE_BUG, TYPE_GHOST,  TYPE_STEEL,
+    TYPE_FIRE,     TYPE_WATER,  TYPE_GRASS,  TYPE_ELECTRIC, TYPE_PSYCHIC, TYPE_ICE, TYPE_DRAGON, TYPE_DARK,
 };
 
 // Whether each nature likes (1) or dislikes (-1) a flavor: spicy, dry, sweet, bitter and sour, which go with attack,
@@ -174,6 +174,7 @@ static const s8 natureStat[NATURE_COUNT][NATURE_STAT_COUNT] = {
 };
 
 // The offsets of blocks A to D in a Pokémon's data, by bits 13 to 17 of its PID
+// clang-format off
 static const u8 blockShufLUT[32][4] = {
     { 0x00, 0x20, 0x40, 0x60 },
     { 0x00, 0x20, 0x60, 0x40 },
@@ -208,6 +209,8 @@ static const u8 blockShufLUT[32][4] = {
     { 0x20, 0x00, 0x40, 0x60 },
     { 0x20, 0x00, 0x60, 0x40 },
 };
+
+// clang-format on
 
 static PersonalNowLoad g_PMLPersonalNowLoadForme;
 // Buffers for names: a species' or the player's, and an original trainer's to compare with the player's. Defined in
@@ -438,8 +441,7 @@ static void setNameChangedPkm(BoxPkm *pkm, u16 species) {
         setAbilityForForm(pkm, species, oldSpecies);
         UpdateGenderOnMonsChange(pkm, species, oldSpecies);
         if (!isNicknamed) {
-            GFL_MsgDataLoadRawStr(g_PMLSpeciesNamesResident, species, g_PMLPkmStringTemp,
-                                  NELEMS(g_PMLPkmStringTemp));
+            GFL_MsgDataLoadRawStr(g_PMLSpeciesNamesResident, species, g_PMLPkmStringTemp, NELEMS(g_PMLPkmStringTemp));
             PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)g_PMLPkmStringTemp);
         }
     }
@@ -1867,12 +1869,11 @@ static u32 PML_PkmGetParamCore(BoxPkm *pkm, u32 field, void *buffer) {
         result = blockD->unk1E;
         break;
     case PKM_PARAM_IVS_ALL:
-        result = blockB->hpIV | (blockB->atkIV << 5) | (blockB->defIV << 10) | (blockB->speIV << 15)
-                 | (blockB->spaIV << 20) | (blockB->spdIV << 25);
+        result = blockB->hpIV | (blockB->atkIV << 5) | (blockB->defIV << 10) | (blockB->speIV << 15) |
+                 (blockB->spaIV << 20) | (blockB->spdIV << 25);
         break;
     case PKM_PARAM_NIDORAN_NICKNAME:
-        if ((blockA->species == SPECIES_NIDORAN_F || blockA->species == SPECIES_NIDORAN_M)
-            && !blockB->isNicknamed) {
+        if ((blockA->species == SPECIES_NIDORAN_F || blockA->species == SPECIES_NIDORAN_M) && !blockB->isNicknamed) {
             result = FALSE;
         } else {
             result = TRUE;
@@ -1884,8 +1885,8 @@ static u32 PML_PkmGetParamCore(BoxPkm *pkm, u32 field, void *buffer) {
         if (blockA->species == SPECIES_ARCEUS && blockA->ability == ABILITY_MULTITYPE) {
             result = PML_ItemGetArceusPlateType(blockA->item);
         } else {
-            result = PML_PersonalGetParamSingle(blockA->species, blockB->form,
-                                                field - PKM_PARAM_TYPE1 + PERSONAL_TYPE_1);
+            result =
+                PML_PersonalGetParamSingle(blockA->species, blockB->form, field - PKM_PARAM_TYPE1 + PERSONAL_TYPE_1);
         }
         break;
     case PKM_PARAM_POKESTAR_FAME:
@@ -1990,8 +1991,8 @@ static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
         break;
     case PKM_PARAM_EV_HP: {
         int ev = blockA->hpEV;
-        int room = PKM_EV_TOTAL_MAX
-                   - (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
+        int room = PKM_EV_TOTAL_MAX -
+                   (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
         int change = value - ev;
 
         if (change > room) {
@@ -2005,8 +2006,8 @@ static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
     }
     case PKM_PARAM_EV_ATTACK: {
         int ev = blockA->atkEV;
-        int room = PKM_EV_TOTAL_MAX
-                   - (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
+        int room = PKM_EV_TOTAL_MAX -
+                   (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
         int change = value - ev;
 
         if (change > room) {
@@ -2020,8 +2021,8 @@ static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
     }
     case PKM_PARAM_EV_DEFENSE: {
         int ev = blockA->defEV;
-        int room = PKM_EV_TOTAL_MAX
-                   - (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
+        int room = PKM_EV_TOTAL_MAX -
+                   (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
         int change = value - ev;
 
         if (change > room) {
@@ -2035,8 +2036,8 @@ static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
     }
     case PKM_PARAM_EV_SPEED: {
         int ev = blockA->speEV;
-        int room = PKM_EV_TOTAL_MAX
-                   - (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
+        int room = PKM_EV_TOTAL_MAX -
+                   (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
         int change = value - ev;
 
         if (change > room) {
@@ -2050,8 +2051,8 @@ static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
     }
     case PKM_PARAM_EV_SP_ATTACK: {
         int ev = blockA->spaEV;
-        int room = PKM_EV_TOTAL_MAX
-                   - (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
+        int room = PKM_EV_TOTAL_MAX -
+                   (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
         int change = value - ev;
 
         if (change > room) {
@@ -2065,8 +2066,8 @@ static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
     }
     case PKM_PARAM_EV_SP_DEFENSE: {
         int ev = blockA->spdEV;
-        int room = PKM_EV_TOTAL_MAX
-                   - (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
+        int room = PKM_EV_TOTAL_MAX -
+                   (blockA->hpEV + blockA->atkEV + blockA->defEV + blockA->speEV + blockA->spaEV + blockA->spdEV);
         int change = value - ev;
 
         if (change > room) {
@@ -2416,9 +2417,9 @@ static void PML_PkmAddParam(BoxPkm *pkm, int param, int value) {
     case PKM_PARAM_MOVE1_PP + 1:
     case PKM_PARAM_MOVE1_PP + 2:
     case PKM_PARAM_MOVE1_PP + 3:
-        addClampedU8(&blockB->pp[param - PKM_PARAM_MOVE1_PP], value,
-                      PML_MoveGetMaxPP(blockB->moves[param - PKM_PARAM_MOVE1_PP],
-                                       blockB->ppUps[param - PKM_PARAM_MOVE1_PP]));
+        addClampedU8(
+            &blockB->pp[param - PKM_PARAM_MOVE1_PP], value,
+            PML_MoveGetMaxPP(blockB->moves[param - PKM_PARAM_MOVE1_PP], blockB->ppUps[param - PKM_PARAM_MOVE1_PP]));
         break;
     case PKM_PARAM_MOVE1_PP_UP:
     case PKM_PARAM_MOVE1_PP_UP + 1:

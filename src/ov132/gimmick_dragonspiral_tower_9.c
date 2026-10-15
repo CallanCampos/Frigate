@@ -179,7 +179,8 @@ static GameEventReturnCode GimmickDT9_ReleaseEvent(GameEvent *event, u32 *state,
     return frame >= lastFrame;
 }
 
-GameEvent *GimmickDT9_CreateThrowEvent(GameSystem *gsys, const VecFx32 *from, const VecFx32 *to, fx32 height, u32 frames) {
+GameEvent *GimmickDT9_CreateThrowEvent(GameSystem *gsys, const VecFx32 *from, const VecFx32 *to, fx32 height,
+                                       u32 frames) {
     int i;
     FieldExpObjAnm *anm;
     Field *field = GSYS_GetField(gsys);

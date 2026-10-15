@@ -268,8 +268,10 @@ void func_02043d6c(int netId, int size, const void *data, void *work, NetHandle 
     }
     switch (header->type) {
     case NET_LDATA_HEADER_START:
+        // clang-format off
         GFL_ASSERT_MSG(header->size <= netLdataWork->postWork[netId]->bufferSize, "BufferSize is not enough!![%x][%x]\n",
                        netLdataWork->postWork[netId]->bufferSize, header->size);
+        // clang-format on
         netLdataWork->postWork[netId]->size = header->size;
         netLdataWork->postWork[netId]->recvSize = 0;
         netLdataWork->postWork[netId]->done = FALSE;

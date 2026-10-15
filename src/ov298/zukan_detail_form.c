@@ -1618,7 +1618,8 @@ static void ZukanDetailForm_LoadIconResources(ZukanDetailFormParam *param, Zukan
                                               ZukanDetailCommon *common) {
     wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, param->heapId);
     wk->iconPalette = func_0204bc48(wk->iconArc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0, param->heapId);
-    wk->iconCellAnims = func_0204bde0(wk->iconArc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
+    wk->iconCellAnims =
+        func_0204bde0(wk->iconArc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), param->heapId);
 }
 
 static void ZukanDetailForm_FreeIconResources(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,

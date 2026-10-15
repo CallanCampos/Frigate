@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/survey_savedata.h"
 #include "gfl/std.h"
 #include "save/save_control.h"
+#include "save/survey_savedata.h"
 
 // The save block of the Passerby Analytics HQ's surveys: how many people answered each question and how, today and
 // before today, the player's own answers and the questions being surveyed. The ROM has no string for the file, so the

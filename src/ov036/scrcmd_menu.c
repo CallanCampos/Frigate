@@ -30,8 +30,8 @@ static GameEventReturnCode func_ov036_021a82bc(GameEvent *event, u32 *state, voi
         (*state)++;
     case 1:
         if (FieldScriptEnv_UpdateWaitCounter(yesNo->env) == TRUE) {
-            yesNo->window = func_ov036_021880d4(
-                Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(yesNo->env))), 0);
+            yesNo->window =
+                func_ov036_021880d4(Field_GetMsgBGSys(GSYS_GetField(FieldScriptEnv_GetGameSystem(yesNo->env))), 0);
             (*state)++;
         }
         break;

@@ -365,8 +365,8 @@ void GymElec_Init(Field *field) {
     wk->save = GymElec_GetSave(field);
     wk->switchSys = ISS_GetSwitchSys(GameSystem_GetISS(Field_GetGameSystem(field)));
     wk->scene = GymElecScene_Create(Field_GetExpObjSystem(field), heapId);
-    wk->fog = GymElecFog_Create(Field_GetFog(field), Field_GetCameraSystem(field), sFogStages, NELEMS(sFogStages), 0,
-                                heapId);
+    wk->fog =
+        GymElecFog_Create(Field_GetFog(field), Field_GetCameraSystem(field), sFogStages, NELEMS(sFogStages), 0, heapId);
     wk->followers = GymElecFollowers_Create(Field_GetActorSystem(field), wk->scene, heapId);
     wk->stageObjects = GymElecStageObjects_Create(wk->scene, heapId);
     wk->models = GymElecModels_Create(wk->scene, heapId);
@@ -830,8 +830,7 @@ static BOOL GymElecFollower_IsAttached(Follower *follower) {
 }
 
 static GymElecStageObjects *GymElecStageObjects_Create(GymElecScene *scene, HeapID heapId) {
-    GymElecStageObjects *stageObjects =
-        GFL_HeapAllocate(heapId, sizeof(GymElecStageObjects), TRUE, "gym_elec.c", 2268);
+    GymElecStageObjects *stageObjects = GFL_HeapAllocate(heapId, sizeof(GymElecStageObjects), TRUE, "gym_elec.c", 2268);
     int i;
 
     for (i = 0; i < STAGE_OBJECT_COUNT; i++) {
@@ -950,8 +949,8 @@ static GymElecEffects *GymElecEffects_Create(GymElecScene *scene, FieldPlayer *p
     }
     for (i = 0; i < BURST_COUNT; i++) {
         GymElecBurst_Init(&effects->bursts[i], GymElecScene_GetObject(scene, OBJECT_BURST_0 + i * BURST_OBJECT_COUNT),
-                   GymElecScene_GetObject(scene, OBJECT_BURST_0 + i * BURST_OBJECT_COUNT + 1),
-                   GymElecScene_GetObject(scene, OBJECT_BURST_0 + i * BURST_OBJECT_COUNT + 2));
+                          GymElecScene_GetObject(scene, OBJECT_BURST_0 + i * BURST_OBJECT_COUNT + 1),
+                          GymElecScene_GetObject(scene, OBJECT_BURST_0 + i * BURST_OBJECT_COUNT + 2));
     }
     GymElecEffects_SetMode(effects, 0);
     return effects;

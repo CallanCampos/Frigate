@@ -1,5 +1,5 @@
-#include "nnsys/g2d.h"
 #include "nitro/os.h"
+#include "nnsys/g2d.h"
 
 // NitroSystem's g2d_Image.c: image and palette proxies, which keep where an image or a palette was loaded in VRAM for
 // each engine and how to draw it, and the functions that load character and palette data into VRAM and fill them in

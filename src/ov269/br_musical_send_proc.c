@@ -3,10 +3,10 @@
 // runs it as BR_PROCID_MUSICAL_SEND
 
 #include "types.h"
-#include "app/battle_recorder/br_musical_send_proc.h"
 #include "app/battle_recorder/br_btn.h"
 #include "app/battle_recorder/br_fade.h"
 #include "app/battle_recorder/br_graphic.h"
+#include "app/battle_recorder/br_musical_send_proc.h"
 #include "app/battle_recorder/br_net.h"
 #include "app/battle_recorder/br_proc_sys.h"
 #include "app/battle_recorder/br_res.h"
@@ -390,8 +390,8 @@ static void BrMusicalSend_CreateButtons(BrMusicalSendWork *wk, BrMusicalSendProc
                 setup.x = 128;
                 setup.sequence = 4;
             }
-            wk->btn[i] = BrBtn_InitEx(&setup, msgID, 96, CLACT_SURFACE_SUB, unit, wk->bmpoam, font, msg, &obj,
-                                      wk->heapId);
+            wk->btn[i] =
+                BrBtn_InitEx(&setup, msgID, 96, CLACT_SURFACE_SUB, unit, wk->bmpoam, font, msg, &obj, wk->heapId);
         }
     }
 }

@@ -1,5 +1,4 @@
 #include "types.h"
-#include "save/trainer_game_info.h"
 #include "app/name_entry.h"
 #include "constants/arc.h"
 #include "constants/script_text_banks.h"
@@ -10,6 +9,7 @@
 #include "gfl/str.h"
 #include "save/save_control.h"
 #include "save/trainer_card.h"
+#include "save/trainer_game_info.h"
 #include "text/script/castelia_city_13.h"
 
 // The save block of the trainer's game info: the money, the badges, the favorite Pokémon, the greeting and thanks,
@@ -32,7 +32,8 @@ void TrainerGameInfo_Init(TrainerGameInfoSave *info) {
     TrainerGameInfo_ClearKeyboardTypes(info);
     info->palParkHighScore = 0;
 
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_CASTELIA_CITY_13, HEAPID_TAIL(HEAPID_SAVEDATA));
+    msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_CASTELIA_CITY_13, HEAPID_TAIL(HEAPID_SAVEDATA));
     str = GFL_MsgDataLoadStrbufNew(msgData, CasteliaCity13_Text_Hello);
     GFL_StrBufStoreString(str, info->greeting, TRAINER_GAME_INFO_MESSAGE_LENGTH);
     GFL_StrBufFree(str);

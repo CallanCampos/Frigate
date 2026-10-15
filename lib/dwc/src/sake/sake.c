@@ -84,8 +84,7 @@ SakeRequest *sakeUpdateRecord(Sake *sake, SakeUpdateRecordInput *input, SakeCall
 }
 
 SakeRequest *sakeGetMyRecords(Sake *sake, SakeGetMyRecordsInput *input, SakeCallback callback, void *userData) {
-    return Sake_StartRequest(sake, input, callback, userData, SAKE_REQUEST_GET_MY_RECORDS,
-                             Sake_SubmitGetMyRecords);
+    return Sake_StartRequest(sake, input, callback, userData, SAKE_REQUEST_GET_MY_RECORDS, Sake_SubmitGetMyRecords);
 }
 
 SakeRequest *sakeGetSpecificRecords(Sake *sake, SakeGetSpecificRecordsInput *input, SakeCallback callback,

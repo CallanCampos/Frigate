@@ -29,12 +29,7 @@ enum {
 };
 
 // The fields of a team's record, for TournamentTeam_GetField
-enum {
-    TOURNAMENT_TEAM_SPECIES,
-    TOURNAMENT_TEAM_FORM,
-    TOURNAMENT_TEAM_HAS_ITEM,
-    TOURNAMENT_TEAM_GENDER
-};
+enum { TOURNAMENT_TEAM_SPECIES, TOURNAMENT_TEAM_FORM, TOURNAMENT_TEAM_HAS_ITEM, TOURNAMENT_TEAM_GENDER };
 
 typedef struct {
     Regulation regulation;

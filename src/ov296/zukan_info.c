@@ -254,6 +254,7 @@ static const u8 sTypeIconTiles[TYPE_NULL + 1][2] = {
 static const u32 sLabelMessages[ZUKAN_INFO_STRBUF_COUNT] = {
     9, 195, 10, 11, 202, 197, 198, 199, 200, 201, 209, 204, 205, 206, 207, 208,
 };
+// clang-format off
 static const u16 sMsgBanks[ZUKAN_INFO_MSG_COUNT] = {
     TEXT_BANK_BTL_SERVER_FLOW_TITLE,
     TEXT_BANK_SPECIES_CATEGORIES,
@@ -291,6 +292,8 @@ static const u16 sMsgBanks[ZUKAN_INFO_MSG_COUNT] = {
     TEXT_BANK_SPECIES_NAMES_ES,
     TEXT_BANK_SPECIES_NAMES_KO,
 };
+
+// clang-format on
 
 ZukanInfo *func_ov296_0219d6e0(HeapID heapId, PartyPkm *pkm, BOOL national, BOOL caught, u32 mode, u32 engine,
                                u8 bgPriority, ClActUnit *unit, Font *font, PrintQueue *printQueue, MsgData *msgData0,
@@ -790,8 +793,8 @@ static void ZukanInfo_InitWindows(ZukanInfo *info) {
     u32 size;
     int i;
 
-    info->formNameTable = GFL_ArcToolReadHeapNewLZGetLen(info->arcs[ZUKAN_INFO_ARC_FORM_NAME_TABLE], 0, FALSE,
-                                                         info->heapId, &size);
+    info->formNameTable =
+        GFL_ArcToolReadHeapNewLZGetLen(info->arcs[ZUKAN_INFO_ARC_FORM_NAME_TABLE], 0, FALSE, info->heapId, &size);
     if (info->engine != 0) {
         palType = PALTYPE_SUB_BG;
     }
@@ -1131,8 +1134,8 @@ static void ZukanInfo_LoadSpriteResources(ZukanInfo *info, u32 slot) {
                                                info->personality, sub, info->heapId);
     info->palettes[slot] = PokeGra_LoadClActPalette(arc, info->species, info->form, info->sex, info->rare, 0, FALSE,
                                                     sub, slot * 32, info->heapId);
-    info->cellAnims[slot] = PokeGra_LoadClActCellAnims(info->species, info->form, info->sex, info->rare, 0, FALSE, 2,
-                                                       sub, info->heapId);
+    info->cellAnims[slot] =
+        PokeGra_LoadClActCellAnims(info->species, info->form, info->sex, info->rare, 0, FALSE, 2, sub, info->heapId);
 }
 
 static void ZukanInfo_FreeSpriteResources(ZukanInfo *info, u32 slot) {
@@ -1440,10 +1443,9 @@ static void ZukanInfo_InitFootprints(ZukanInfo *info) {
         sub = TRUE;
     }
     arc = info->arcs[ZUKAN_INFO_ARC_FOOTPRINT];
-    info->footprintPalette =
-        func_0204bbb8(arc, ZukanInfo_GetFootprintPaletteFile(), sub, 0xa0, 0, 1, info->heapId);
-    info->footprintCellAnimsOld = func_0204bde0(arc, ZukanInfo_GetFootprintCellFile(0),
-                                                ZukanInfo_GetFootprintAnimFile(0), info->heapId);
+    info->footprintPalette = func_0204bbb8(arc, ZukanInfo_GetFootprintPaletteFile(), sub, 0xa0, 0, 1, info->heapId);
+    info->footprintCellAnimsOld =
+        func_0204bde0(arc, ZukanInfo_GetFootprintCellFile(0), ZukanInfo_GetFootprintAnimFile(0), info->heapId);
     info->footprintCellAnims = func_0204bde0(arc, ZukanInfo_GetFootprintCellFile(SPECIES_ARCEUS + 1),
                                              ZukanInfo_GetFootprintAnimFile(SPECIES_ARCEUS + 1), info->heapId);
 }
@@ -1473,8 +1475,7 @@ static void ZukanInfo_LoadFootprint(ZukanInfo *info, u32 species, u32 form, u32 
     formFile = ZukanInfo_GetFootprintFormFile(species, form);
     if (formFile == 0xffff) {
         arc = info->arcs[ZUKAN_INFO_ARC_FOOTPRINT];
-        info->footprintChars[slot] =
-            func_0204b81c(arc, ZukanInfo_GetFootprintFile(species), TRUE, draw, info->heapId);
+        info->footprintChars[slot] = func_0204b81c(arc, ZukanInfo_GetFootprintFile(species), TRUE, draw, info->heapId);
     } else {
         info->footprintChars[slot] =
             func_0204b81c(info->arcs[ZUKAN_INFO_ARC_FOOTPRINT_FORM], formFile, TRUE, draw, info->heapId);

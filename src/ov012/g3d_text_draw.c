@@ -25,7 +25,7 @@ typedef struct {
 } G3DTextDrawWork;
 
 static const TexDimension TEX_DIM_LUT[TEX_DIM_COUNT] = {
-    {0x10, 1, 1}, {0x20, 2, 2}, {0x40, 3, 3}, {0x80, 4, 4}, {0x100, 5, 5}, {0x200, 6, 6}, {0x400, 7, 7},
+    { 0x10, 1, 1 }, { 0x20, 2, 2 }, { 0x40, 3, 3 }, { 0x80, 4, 4 }, { 0x100, 5, 5 }, { 0x200, 6, 6 }, { 0x400, 7, 7 },
 };
 
 static void G3DTextDraw_PrepareBitmap(GFLBitmap *bitmap);
@@ -35,8 +35,8 @@ static void G3DTextDraw_StringToTexture(G3DTextDrawWork *work, const StrBuf *tex
                                         HeapID heapId);
 static void G3DTextDraw_ConvertPalette(G3DTextDrawWork *work, const void *palette);
 
-BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, const char *plName, const StrBuf *text, u16 a5,
-                                u16 a6, u16 color, HeapID heapId, G3DTextDrawResource *resource) {
+BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, const char *plName, const StrBuf *text,
+                                u16 a5, u16 a6, u16 color, HeapID heapId, G3DTextDrawResource *resource) {
     G3DTextDrawResource res;
     NNSG3dResName texResName;
     NNSG3dResName plResName;

@@ -121,8 +121,7 @@ static ClActor *MailBox_CreateActor(MailBoxView *view, const MailBoxActorTemplat
     setup.priority = 0;
     setup.bgPriority = template->bgPriority;
     return func_0204c040(view->clActUnit, view->chars[template->charIndex], view->palettes[template->paletteIndex],
-                         view->cellAnims[template->cellAnimIndex], &setup, template->surface,
-                         HEAPID_MAILBOX_VIEW);
+                         view->cellAnims[template->cellAnimIndex], &setup, template->surface, HEAPID_MAILBOX_VIEW);
 }
 
 static void MailBox_FreeActor(MailBoxView *view, u32 index) {

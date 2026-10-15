@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/wbt_save.h"
 #include "gfl/std.h"
 #include "save/trial_house.h"
+#include "save/wbt_save.h"
 
 // The Pokémon World Tournament's part of the Trial House's save block: how often each tournament was won, the
 // Trainers beaten and three slots. The ROM has no string for the file, so the name is descriptive.

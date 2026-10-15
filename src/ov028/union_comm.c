@@ -44,6 +44,7 @@ static void UnionComm_InitVisitors(UnionVisitorList *list);
 
 static const NetCommand data_ov028_02172d04[22];
 
+// clang-format off
 static const GFLNetInitData data_ov028_02172c94 = {
     data_ov028_02172d04,
     22,
@@ -81,6 +82,8 @@ static const GFLNetInitData data_ov028_02172c94 = {
     0,
     0,
 };
+
+// clang-format on
 
 static const NetCommand data_ov028_02172d04[22] = {
     { func_ov028_02171138, NULL },
@@ -363,7 +366,8 @@ static void UnionComm_UpdateColosseum(UnionSystem *unisys) {
         if (!UnionCommand_IsActive(unisys)) {
             func_ov012_0216144c(unisys->param->gsys, unisys->colosseum_sys->commPlayer);
             if (unisys->colosseum_sys->unk17F == 0) {
-                if (func_ov012_021616b0(unisys->colosseum_sys->commPlayer, (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
+                if (func_ov012_021616b0(unisys->colosseum_sys->commPlayer,
+                                        (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
                     unisys->colosseum_sys->unk17F = 1;
                 }
             }

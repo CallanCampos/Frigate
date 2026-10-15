@@ -19,8 +19,9 @@ void func_ov167_021b19b0(BtlClient *client, u8 value);
 BOOL func_ov167_021b1d64(BtlClient *client);
 BOOL func_ov167_021b1d90(BtlClient *client);
 
-BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, void *netHandle, u16 clientId,
-                               u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand, HeapID heapId);
+BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, void *netHandle,
+                               u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
+                               HeapID heapId);
 void BattleClient_Delete(BtlClient *client);
 void func_ov167_021b18e8(BtlClient *client, void *data);
 void func_ov167_021b1910(BtlClient *client, BtlServer *server);

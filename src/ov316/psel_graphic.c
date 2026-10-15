@@ -256,10 +256,9 @@ static ClActUnit *PselClAct_GetUnit(PselClAct *clact) {
 
 static void PselG3dSys_Init(PselG3dSys *g3d, HeapID heapId) {
     GFL_G3DSysCreate(FALSE, 2, 0, 1, 0x1000, heapId, PselGraphic_G3DInit);
-    g3d->camera =
-        GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(85)), FX_CosIdx(DEG_TO_IDX(85)),
-                            FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024), 0, &sPselCameraPosition,
-                            &sPselCameraUpVector, &sPselCameraTarget, heapId);
+    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(85)),
+                                      FX_CosIdx(DEG_TO_IDX(85)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE, FX32_CONST(1024),
+                                      0, &sPselCameraPosition, &sPselCameraUpVector, &sPselCameraTarget, heapId);
 }
 
 static void PselG3dSys_Free(PselG3dSys *g3d) {

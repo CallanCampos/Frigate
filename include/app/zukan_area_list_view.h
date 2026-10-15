@@ -124,7 +124,8 @@ void ZukanAreaListView_Print(u32 window, StrBuf *strbuf, ZukanAreaListView *view
 void ZukanAreaListView_FillWindow(u32 window, u8 color, ZukanAreaListView *view);
 ClActor *ZukanAreaListView_GetActor(ZukanAreaListView *view, u32 index);
 // Creates the list of the areas, with the cursor on the area of a zone if it has it
-void ZukanAreaListView_InitList(ZukanAreaListView *view, u32 count, ZukanHabitatSummary *areas, u16 zone, u16 cursorPos);
+void ZukanAreaListView_InitList(ZukanAreaListView *view, u32 count, ZukanHabitatSummary *areas, u16 zone,
+                                u16 cursorPos);
 void ZukanAreaListView_ExitList(ZukanAreaListView *view);
 // Hides the marks that the list did not draw again after a jump
 void ZukanAreaListView_HideUndrawnMarks(ZukanAreaListView *view);

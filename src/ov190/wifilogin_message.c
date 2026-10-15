@@ -70,7 +70,8 @@ void WifiLoginMessage_Free(WifiLoginMessage *msg) {
         msg->stream = NULL;
     }
     WifiLoginMessage_ClearTitle(msg);
-    GFL_BGSysFreeCharMemory(WifiLoginMessage_GetMessageBG(msg->style), CHAR_POS(msg->frameChars), CHAR_SIZE(msg->frameChars));
+    GFL_BGSysFreeCharMemory(WifiLoginMessage_GetMessageBG(msg->style), CHAR_POS(msg->frameChars),
+                            CHAR_SIZE(msg->frameChars));
     GFL_BGSysFreeCharMemory(WifiLoginMessage_GetNoticeBG(msg->style), CHAR_POS(msg->frameCharsOther),
                             CHAR_SIZE(msg->frameCharsOther));
     func_020232d8();
@@ -364,7 +365,7 @@ u8 WifiLoginMessage_GetNoticeBG(u32 style) {
 
 // The confirm dialog of the GSYNC style, with its place on the screen by layout
 BmpMenu *WifiLoginMessage_CreateConfirmDialog(WifiLoginMessage *msg, u32 layout, u32 cursorPos) {
-    ConfirmDialogSetup setup = {1, 0, 0, 11, 0};
+    ConfirmDialogSetup setup = { 1, 0, 0, 11, 0 };
 
     setup.unk4 = msg->frameChars;
     switch (layout) {

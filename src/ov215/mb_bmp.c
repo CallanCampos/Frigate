@@ -38,6 +38,7 @@ static void MailBox_PrintMessageId(MailBoxView *view, MsgData *msgData, u32 inde
 static void MailBox_RegisterAuthorName(MailBoxWork *work, int unused);
 static void MailBox_PrintMessage(MailBoxWork *work);
 
+// clang-format off
 static const MailBoxWindowTemplate sWindowTemplates[MAILBOX_WINDOW_COUNT] = {
     { 2, 0, 24, 1, 1, 1, 0x3f0 },   { 6, 0, 24, 1, 1, 1, 0x3f0 },   { 2, 4, 1, 8, 2, 1, 0x3f0 },
     { 2, 4, 1, 8, 2, 1, 0x3e0 },    { 2, 4, 1, 8, 2, 1, 0x3d0 },    { 2, 4, 1, 8, 2, 1, 0x3c0 },
@@ -51,6 +52,8 @@ static const MailBoxWindowTemplate sWindowTemplates[MAILBOX_WINDOW_COUNT] = {
     { 4, 3, 3, 26, 4, 1, 0x1 },     { 4, 3, 8, 26, 4, 1, 0x69 },    { 4, 3, 13, 26, 4, 1, 0xd1 },
     { 4, 8, 19, 11, 2, 1, 0x139 },  { 4, 21, 19, 8, 2, 1, 0x139 },
 };
+
+// clang-format on
 
 void MailBox_CreateWindows(MailBoxWork *work) {
     u32 i;
@@ -66,7 +69,7 @@ void MailBox_CreateWindows(MailBoxWork *work) {
         MailBoxPrintState *printStates;
 
         work->view->windows[i] = BmpWin_CreateDynamic(template->bg, template->x, template->y, template->width,
-                                                       template->height, template->palette, TRUE);
+                                                      template->height, template->palette, TRUE);
         printStates = work->view->printStates;
         printStates[i].window = work->view->windows[i];
         printStates[i].printing = FALSE;

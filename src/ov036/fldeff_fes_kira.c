@@ -61,6 +61,7 @@ static void func_ov036_021a5ca8(FieldEffectTask *task, void *work);
 static void func_ov036_021a5cac(FieldEffectTask *task, void *work);
 static void func_ov036_021a5cdc(FieldEffectTask *task, void *work);
 
+// clang-format off
 static const FieldEffectTaskVTable FES_KIRA_TASK_VTABLE = {
     sizeof(FesKiraTask),
     func_ov036_021a5c8c,
@@ -68,6 +69,8 @@ static const FieldEffectTaskVTable FES_KIRA_TASK_VTABLE = {
     func_ov036_021a5cac,
     func_ov036_021a5cdc,
 };
+
+// clang-format on
 
 static FesKiraSpec FES_KIRA_SPEC = { 1, 99, { 158, 0, 0, 0 } };
 

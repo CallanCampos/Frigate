@@ -130,15 +130,16 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
                 slot = 0;
                 BoxSaveAccessor_GetNextFreeBoxSlot(boxes, &box, &slot);
                 wk->box = box;
-                msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, HEAPID_PDC_RETURN);
+                msgData =
+                    GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, HEAPID_PDC_RETURN);
                 wk->boxMessage = GFL_MsgDataLoadStrbufNew(
                     msgData,
                     EventWork_FlagGet(GameData_GetEventWork(prm->gameData), FLAG_PDC_RETURN_BOX_MESSAGE) ? 0xb2 : 0xb1);
                 GFL_MsgDataFree(msgData);
             }
-            PokeParty_SetupMetData(prm->pkm, 0, playerInfo,
-                                   ZoneData_GetPlaceNameID(PlayerState_GetZoneID(GameData_GetPlayerState(prm->gameData))),
-                                   wk->heapId);
+            PokeParty_SetupMetData(
+                prm->pkm, 0, playerInfo,
+                ZoneData_GetPlaceNameID(PlayerState_GetZoneID(GameData_GetPlayerState(prm->gameData))), wk->heapId);
             firstCatch = FALSE;
             nationalDex = PokeDex_IsNationalObtained(pokedex);
             if (!PokeDex_IsCaught(pokedex, PokeParty_GetParam(prm->pkm, PKM_PARAM_SPECIES, NULL))) {
@@ -175,8 +176,9 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
                 nickname = TRUE;
             }
             if (nickname) {
-                wk->nameEntry = pokemonNameEntry(wk->heapId, prm->pkm, 10, NULL, (u32)wk->boxMessage, (u32)boxes, wk->box,
-                                                 getTrainerGameInfoAddress(GameData_GetSaveControl(prm->gameData)));
+                wk->nameEntry =
+                    pokemonNameEntry(wk->heapId, prm->pkm, 10, NULL, (u32)wk->boxMessage, (u32)boxes, wk->box,
+                                     getTrainerGameInfoAddress(GameData_GetSaveControl(prm->gameData)));
                 QueueGameProc(wk->procManager, OVERLAY_ID(280), &NAME_ENTRY_PROC_FUNCTIONS, wk->nameEntry);
                 (*state)++;
             } else {

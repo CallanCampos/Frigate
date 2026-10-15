@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/c_gear_savedata.h"
 #include "gfl/std.h"
+#include "save/c_gear_savedata.h"
 #include "save/save_control.h"
 #include "save/shortcut.h"
 #include "system/game_data.h"

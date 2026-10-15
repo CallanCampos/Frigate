@@ -1,5 +1,5 @@
-#include "nnsys/g2d.h"
 #include "nitro/mi.h"
+#include "nnsys/g2d.h"
 
 // NitroSystem's g2d_SRTControl.c: the scale, rotation and translation that a cell or multi-cell animation's frame
 // gives, with a flag for each one that is set. The file name is a guess from the functions' NNSi_G2dSrtc prefix

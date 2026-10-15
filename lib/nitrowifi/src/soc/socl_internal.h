@@ -9,10 +9,10 @@
 extern const char SOCLi_Signature[];
 
 // socl_startup.c
-extern SOCLConfig *SOCLiConfigPtr;     // The config SOCL_Startup was given, NULL while SOCL is down
-extern u32 SOCLiDefaultLanBufferSize;  // The LAN buffer's size when the config gives none
-extern CPSInAddr SOCLiRequestedIP;     // The address that DHCP asks for
-extern u32 SOCLiDhcpState;             // SOCLI_DHCP_*
+extern SOCLConfig *SOCLiConfigPtr;    // The config SOCL_Startup was given, NULL while SOCL is down
+extern u32 SOCLiDefaultLanBufferSize; // The LAN buffer's size when the config gives none
+extern CPSInAddr SOCLiRequestedIP;    // The address that DHCP asks for
+extern u32 SOCLiDhcpState;            // SOCLI_DHCP_*
 extern CPSConfig SOCLiCPSConfig;
 
 // SOCLiDhcpState: DHCP is in use, and it has finished (or the address is static)
@@ -42,9 +42,9 @@ typedef struct SOCLRecvPipe {
     SOCLCommandPipe base;
     int cps_read_len;       // What the reads have taken from CPS's receive buffer and not yet consumed
     u16 rcvbuf_consume_min; // From SOCLSocketParam: how much to take before CPS_SocConsume
-    s8 peek;               // Suppresses UDP dequeue/CPS offset advances; SSL command reads ignore it
+    s8 peek;                // Suppresses UDP dequeue/CPS offset advances; SSL command reads ignore it
     u8 unk_ff;
-    SOCLUdpPacket *udp_tail;  // The datagrams that came in, oldest first
+    SOCLUdpPacket *udp_tail; // The datagrams that came in, oldest first
     SOCLUdpPacket *udp_head;
     u16 udp_queued;         // The bytes of datagram data they hold
     u16 udp_queued_max;     // From SOCLSocketParam's rcvpipe_unk_e
@@ -63,20 +63,20 @@ struct SOCLSocket;
 typedef struct SOCLSendPipe {
     SOCLCommandPipe base;
     SOCLSocketBuffer buffer;
-    u16 write_pos;           // Where the next write goes in the buffer (a ring)
-    u16 read_pos;            // How far the pipe's thread has taken data out of it
-    OSThreadQueue wait;      // Where a blocking write sleeps until the buffer has room
+    u16 write_pos;             // Where the next write goes in the buffer (a ring)
+    u16 read_pos;              // How far the pipe's thread has taken data out of it
+    OSThreadQueue wait;        // Where a blocking write sleeps until the buffer has room
     struct SOCLSocket *socket; // The socket that owns the pipe (a UDP socket shares the UDP send socket's)
 } SOCLSendPipe;
 
 // A socket, 0xbc bytes, followed in memory by its pipes and buffers
 typedef struct SOCLSocket {
-    u8 unk_00[8];              // The socket starts with its CPSSoc (0xa0 bytes: SOCL_Resolve makes one on its own)
-    u8 cps_state;              // 0x08, CPSSoc.state
+    u8 unk_00[8]; // The socket starts with its CPSSoc (0xa0 bytes: SOCL_Resolve makes one on its own)
+    u8 cps_state; // 0x08, CPSSoc.state
     u8 unk_09[0x3f];
-    SOCLSocketBuffer rcvbuf;   // 0x48
-    u32 rcvbuf_len;            // CPSSoc.rcvbuf_len: how much of the receive buffer holds data
-    SOCLSocketBuffer sndbuf;   // 0x54
+    SOCLSocketBuffer rcvbuf; // 0x48
+    u32 rcvbuf_len;          // CPSSoc.rcvbuf_len: how much of the receive buffer holds data
+    SOCLSocketBuffer sndbuf; // 0x54
     SOCLSocketBuffer rcvbuf_aux;
     SOCLSocketBuffer sndbuf_aux;
     u8 unk_6c[0x34];
@@ -87,8 +87,8 @@ typedef struct SOCLSocket {
     // for each test, with no call or store in between (SOCL_GetStatus loads it twice in a row)
     volatile s16 state;
     s8 flag_block;
-    s8 flag;    // The mode (SOCLSocketParam's flag_mode), copied into each command packet
-    u16 local_port;  // 0xb0
+    s8 flag;        // The mode (SOCLSocketParam's flag_mode), copied into each command packet
+    u16 local_port; // 0xb0
     u16 remote_port;
     CPSInAddr remote_ip;
     struct SOCLSocket *next; // The next socket of the list it is in
@@ -108,21 +108,21 @@ static inline SOCLSendPipe *SOCLi_GetSendPipe(const SOCLSocket *socket) {
 extern SOCLSocket *SOCLiUDPSendSocket;
 
 // SOCLi_ReadFrom's flags (BSD's MSG_PEEK and MSG_DONTWAIT)
-#define SOCLI_READ_PEEK 2     // Retain UDP datagrams/plain-CPS read position; SSL reads still consume copied bytes
-#define SOCLI_READ_NOBLOCK 4  // Do not wait for data
+#define SOCLI_READ_PEEK 2    // Retain UDP datagrams/plain-CPS read position; SSL reads still consume copied bytes
+#define SOCLI_READ_NOBLOCK 4 // Do not wait for data
 
 // SOCL_WriteTo's flags
 #define SOCLI_WRITE_NOBLOCK 4 // Do not wait for room in the send buffer
 
 // SOCLSocket.state
 #define SOCLI_STATE_CREATED 1
-#define SOCLI_STATE_BINDING 2        // SOCLi_ExecBindCommand has queued the bind (and connect)
-#define SOCLI_STATE_CONNECTED 4      // The bind (and for TCP the connect) succeeded
+#define SOCLI_STATE_BINDING 2   // SOCLi_ExecBindCommand has queued the bind (and connect)
+#define SOCLI_STATE_CONNECTED 4 // The bind (and for TCP the connect) succeeded
 #define SOCLI_STATE_CLOSING 8
 #define SOCLI_STATE_CLOSE_CALLED 0x10   // SOCL_Close has run (it queued the close command)
 #define SOCLI_STATE_CLOSED 0x20         // The close command has run: the socket waits in the trash list
 #define SOCLI_STATE_CONNECT_FAILED 0x40 // The connect failed, with the error in the socket's result
-#define SOCLI_STATE_RESET 0x80       // The connection was reset
+#define SOCLI_STATE_RESET 0x80          // The connection was reset
 
 static inline BOOL SOCLi_SocketIsCreated(const SOCLSocket *socket) {
     BOOL created = FALSE;
@@ -163,7 +163,7 @@ typedef struct SOCLCommandPacket {
     SOCLSocket *socket;
     OSMessageQueue *reply_queue; // Borrowed caller-stack result queue for mode 1, NULL otherwise
     s8 socket_flag;
-    s8 flag_block;               // Exactly 1 waits for the result; bit 0 blocks queue admission (writes use 3 or 0)
+    s8 flag_block; // Exactly 1 waits for the result; bit 0 blocks queue admission (writes use 3 or 0)
     u8 unk_0e[2];
     union {
         struct {
@@ -178,13 +178,13 @@ typedef struct SOCLCommandPacket {
             CPSInAddr *remote_ip;
         } read;
         struct {
-            u8 *buf1;        // Owned send-ring slices used by the queued callback, not application storage
-            int len1;        // Slice byte counts; buf2 is the wrapped part, not an application-buffer pointer
+            u8 *buf1; // Owned send-ring slices used by the queued callback, not application storage
+            int len1; // Slice byte counts; buf2 is the wrapped part, not an application-buffer pointer
             u8 *buf2;
             int len2;
-            u16 write_end;   // The pipe's write position after this data
+            u16 write_end; // The pipe's write position after this data
             u8 unk_22[2];
-            u16 local_port;  // For a UDP packet, the datagram's ports and address
+            u16 local_port; // For a UDP packet, the datagram's ports and address
             u16 remote_port;
             CPSInAddr remote_ip; // 0 for TCP
         } write;
@@ -250,11 +250,11 @@ void SOCLi_CleanupCPS(void);
 
 // socl_poll.c
 // SOCL_GetStatus's bits
-#define SOCL_STATUS_READABLE 0x01  // Data to read (or a datagram)
-#define SOCL_STATUS_WRITABLE 0x08  // Room in the send buffer
-#define SOCL_STATUS_ERROR 0x20     // The connect failed
-#define SOCL_STATUS_NOTCONN 0x40   // Neither connecting nor connected
-#define SOCL_STATUS_INVALID 0x80   // Not a socket
+#define SOCL_STATUS_READABLE 0x01 // Data to read (or a datagram)
+#define SOCL_STATUS_WRITABLE 0x08 // Room in the send buffer
+#define SOCL_STATUS_ERROR 0x20    // The connect failed
+#define SOCL_STATUS_NOTCONN 0x40  // Neither connecting nor connected
+#define SOCL_STATUS_INVALID 0x80  // Not a socket
 int SOCL_GetStatus(SOCLSocket *socket);
 
 // socl_misc.c

@@ -10,18 +10,18 @@
 #include "constants/pokemon.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
-#include "gfl/touchpanel.h"
-#include "gfl/ui.h"
 #include "gfl/sound.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
+#include "gfl/touchpanel.h"
+#include "gfl/ui.h"
 #include "pml/poke_party.h"
 #include "save/join_avenue.h"
 #include "system/game_beacon.h"
 #include "system/game_comm.h"
 
-BtlServer *func_ov167_0219e3cc(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon,
-                               u32 a3, HeapID heapId) {
+BtlServer *func_ov167_0219e3cc(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon, u32 a3,
+                               HeapID heapId) {
     BtlServer *server = GFL_HeapAllocate(heapId, sizeof(BtlServer), TRUE, "btl_server.c", 0xae);
     int i;
 
@@ -40,8 +40,8 @@ BtlServer *func_ov167_0219e3cc(BtlMainModule *mainModule, const MATHRandContext3
     for (i = 0; i < 4; i++) {
         func_ov167_0219f22c(&server->clients[i]);
     }
-    server->flow = func_ov167_0219f390(server, server->mainModule, server->pokeCon, &server->queue, server->unk4C,
-                                       server->heapId);
+    server->flow =
+        func_ov167_0219f390(server, server->mainModule, server->pokeCon, &server->queue, server->unk4C, server->heapId);
     server->clientIdList = func_ov167_0219ffe4(server->flow);
     func_ov167_0219e5f0(server, func_ov167_0219e608);
     return server;
@@ -81,8 +81,8 @@ void func_ov167_0219e560(BtlServer *server) {
     GFL_StrBufFree(server->strBuf);
     func_ov167_0219f570(server->flow);
     for (i = 0; i < 4; i++) {
-        if (server->clients[i].clientId != 0xff && server->clients[i].adapter != NULL
-            && !server->clients[i].isAttached) {
+        if (server->clients[i].clientId != 0xff && server->clients[i].adapter != NULL &&
+            !server->clients[i].isAttached) {
             func_ov167_021d4acc(server->clients[i].adapter);
         }
     }
@@ -545,7 +545,6 @@ BOOL func_ov167_0219ed24(BtlServer *server, int *seq) {
     return FALSE;
 }
 
-
 BOOL func_ov167_0219ed6c(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
@@ -750,7 +749,6 @@ void func_ov167_0219f0ac(BtlServer *server) {
     }
 }
 
-
 void func_ov167_0219f11c(BtlServer *server, u32 cmd) {
     func_ov167_0219f128(server, cmd, NULL, 0);
 }
@@ -775,7 +773,6 @@ void func_ov167_0219f16c(BtlServer *server, u32 cmd, u8 clientId, const void *da
         func_ov167_021d4aec(client->adapter, cmd, data, size);
     }
 }
-
 
 BOOL func_ov167_0219f19c(BtlServer *server) {
     BOOL done = TRUE;

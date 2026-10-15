@@ -2692,8 +2692,8 @@ static void BtlvInput_DrawRecorderCount(BtlvInput *work, const BtlvInputRecorder
     GFL_WordSetSystemFree(wordSet);
     GFL_StrBufFree(fmt);
     GFL_StrBufFree(buf);
-    PaletteFade_LoadData(work->paletteFade, PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 1) + 0x20, 1, 0x70,
-                         0x20);
+    PaletteFade_LoadData(work->paletteFade, PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 1) + 0x20, 1,
+                         0x70, 0x20);
 }
 
 // Clears the screen's text, buttons and actors and fades its palettes out

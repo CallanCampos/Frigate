@@ -1,3 +1,4 @@
+#include "dwc/nhttp.h"
 #include "ghttp_internal.h"
 
 // dwc_ghttp: DWC's use of the GameSpy HTTP client: the root certificate of its hosts, the starting and ending of the
@@ -27,8 +28,6 @@ struct DWCGHTTPEntry {
     DWCGHTTPEntry *next;
 };
 
-extern u8 data_ov011_021866c0[];
-
 int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost **post, DWCGHTTPProgressFunc progress,
                        DWCGHTTPCompletedFunc completed, void *param);
 int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressFunc progress,
@@ -41,8 +40,8 @@ static DWCGHTTPEntry *DWCi_FindGHTTPEntry(int request);
 static void DWCi_FreeAllGHTTPEntries(void);
 
 // The root certificate that DWC's hosts are checked against
-static void *sRootCerts[1] = {data_ov011_021866c0};
-static GHICertList sDWCRootCAList = {sRootCerts, 1};
+static void *sRootCerts[1] = { data_ov011_021866c0 };
+static GHICertList sDWCRootCAList = { sRootCerts, 1 };
 
 static DWCGHTTPEntry *sGHTTPEntries;
 static int sGHTTPStartCount;
@@ -134,8 +133,8 @@ int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPP
 
 // Starts the request for a URL, with a buffer of this size (the game gets it in the callbacks). Returns the request, or
 // an error that is below 0
-int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost **post,
-                       DWCGHTTPProgressFunc progress, DWCGHTTPCompletedFunc completed, void *param) {
+int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost **post, DWCGHTTPProgressFunc progress,
+                       DWCGHTTPCompletedFunc completed, void *param) {
     char *buffer = NULL;
     DWCGHTTPParam entryParam;
     DWCGHTTPEntry *entry;

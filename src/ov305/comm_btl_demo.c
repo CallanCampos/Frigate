@@ -29,10 +29,10 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nnsys/g3d.h"
+#include "pml/poke_party.h"
 #include "save/player_info.h"
 #include "save/records.h"
 #include "system/gf_font.h"
-#include "pml/poke_party.h"
 #include "system/printsys.h"
 
 // The screen before and after a link battle. The ROM has no name for this file; "comm_btl_demo.c" is a guess from
@@ -372,7 +372,7 @@ static const G3DSceneSetup sCommBtlDemoScenes[G3D_SCENE_COUNT] = {
 
 // The sounds, and those of the Wi-Fi competition
 static const u32 sCommBtlDemoSE[SE_COUNT][2] = {
-    { SEQ_SE_SYS_65, SEQ_SE_SYS_65 },   { SEQ_SE_SYS_66, SEQ_SE_WCS_02 },     { SEQ_SE_SYS_67, SEQ_SE_WCS_03 },
+    { SEQ_SE_SYS_65, SEQ_SE_SYS_65 },    { SEQ_SE_SYS_66, SEQ_SE_WCS_02 },   { SEQ_SE_SYS_67, SEQ_SE_WCS_03 },
     { SEQ_SE_TDEMO_009, SEQ_SE_WCS_04 }, { SEQ_SE_W235_03, SEQ_SE_W235_03 },
 };
 

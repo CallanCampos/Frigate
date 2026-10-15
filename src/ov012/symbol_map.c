@@ -11,6 +11,7 @@
 
 // The areas of the forest as it grows, by their IDs from 1, three to a row; 0 is no area. By how far the forest has
 // grown and by the season of its trees
+// clang-format off
 static const u8 SYMBOL_MAP_0[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     9, 8, 10,
@@ -24,6 +25,9 @@ static const u8 SYMBOL_MAP_0[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_1[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     12, 11, 13,
@@ -37,6 +41,9 @@ static const u8 SYMBOL_MAP_1[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_2[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     15, 14, 16,
@@ -50,6 +57,9 @@ static const u8 SYMBOL_MAP_2[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_3[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     18, 17, 19,
@@ -63,6 +73,9 @@ static const u8 SYMBOL_MAP_3[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_4[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     21, 20, 22,
@@ -76,6 +89,9 @@ static const u8 SYMBOL_MAP_4[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_5[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     24, 23, 25,
@@ -89,6 +105,9 @@ static const u8 SYMBOL_MAP_5[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_6[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     27, 26, 28,
@@ -102,6 +121,9 @@ static const u8 SYMBOL_MAP_6[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_7[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     3, 2, 4,
@@ -115,6 +137,9 @@ static const u8 SYMBOL_MAP_7[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_8[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     3, 2, 4,
@@ -128,6 +153,9 @@ static const u8 SYMBOL_MAP_8[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_9[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     3, 2, 4,
@@ -141,6 +169,9 @@ static const u8 SYMBOL_MAP_9[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_10[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     3, 2, 4,
@@ -154,6 +185,9 @@ static const u8 SYMBOL_MAP_10[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_11[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     3, 2, 4,
@@ -167,6 +201,9 @@ static const u8 SYMBOL_MAP_11[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_12[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     3, 2, 4,
@@ -180,6 +217,9 @@ static const u8 SYMBOL_MAP_12[SYMBOL_MAP_SIZE] = {
     0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 SYMBOL_MAP_13[SYMBOL_MAP_SIZE] = {
     0, 1, 0,
     3, 2, 4,
@@ -193,21 +233,11 @@ static const u8 SYMBOL_MAP_13[SYMBOL_MAP_SIZE] = {
     6, 5, 7,
 };
 
+// clang-format on
+
 static const u8 *const SYMBOL_MAP_TABLE[14] = {
-    SYMBOL_MAP_0,
-    SYMBOL_MAP_1,
-    SYMBOL_MAP_2,
-    SYMBOL_MAP_3,
-    SYMBOL_MAP_4,
-    SYMBOL_MAP_5,
-    SYMBOL_MAP_6,
-    SYMBOL_MAP_7,
-    SYMBOL_MAP_8,
-    SYMBOL_MAP_9,
-    SYMBOL_MAP_10,
-    SYMBOL_MAP_11,
-    SYMBOL_MAP_12,
-    SYMBOL_MAP_13,
+    SYMBOL_MAP_0, SYMBOL_MAP_1, SYMBOL_MAP_2, SYMBOL_MAP_3,  SYMBOL_MAP_4,  SYMBOL_MAP_5,  SYMBOL_MAP_6,
+    SYMBOL_MAP_7, SYMBOL_MAP_8, SYMBOL_MAP_9, SYMBOL_MAP_10, SYMBOL_MAP_11, SYMBOL_MAP_12, SYMBOL_MAP_13,
 };
 
 static u8 func_ov012_021606e8(const u8 *map, u8 area);

@@ -23,6 +23,7 @@ static const u8 sWifiRankLoseLimits[12] = { 0, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0 }
 
 // The Battle Points a streak of seven gives, by kind of train and by streaks done; the last row is the Wi-Fi train's,
 // by rank
+// clang-format off
 static const u8 sBattlePointRewards[7][10] = {
     { 3, 3, 3, 0, 0, 0, 0, 0, 0, 0 },
     { 5, 6, 7, 8, 9, 10, 10, 10, 10, 10 },
@@ -32,6 +33,8 @@ static const u8 sBattlePointRewards[7][10] = {
     { 5, 6, 7, 8, 9, 10, 10, 10, 10, 10 },
     { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
 };
+
+// clang-format on
 
 void func_ov033_0217b468(GameSystem *gsys) {
     func_02017954(GSYS_GetGameData(gsys), NULL);
@@ -66,8 +69,10 @@ BSubwayScrWork *func_ov033_0217b478(GameSystem *gsys, u16 a1, u16 a2) {
     if (a1 == 0) {
         bsw->playMode = a2;
         bsw->memberCount = func_ov033_0217bdc0(bsw->playMode);
-        for (i = 0; i < 4; i++) bsw->memberSlots[i] = 0xff;
-        for (i = 0; i < 14; i++) bsw->unk32[i] = 0xffff;
+        for (i = 0; i < 4; i++)
+            bsw->memberSlots[i] = 0xff;
+        for (i = 0; i < 14; i++)
+            bsw->unk32[i] = 0xffff;
         BSubwayPlayData_Init(bsw->unk70);
         BSubwayPlayData_ResetRound(bsw->unk70);
         if (BSubwayScoreData_HasStage(bsw->unk74, bsw->playMode) == 1) {
@@ -93,8 +98,8 @@ BSubwayScrWork *func_ov033_0217b478(GameSystem *gsys, u16 a1, u16 a2) {
             }
             teamIndex = bsw->unkC_5;
             count = BSubwayPlayData_GetData(bsw->unk70, 7, NULL);
-            func_ov033_0217c2c4(bsw, &bsw->unk2C8[teamIndex], level + teamIndex, count,
-                                &bsw->teamConfigs[teamIndex], bsw->heapId);
+            func_ov033_0217c2c4(bsw, &bsw->unk2C8[teamIndex], level + teamIndex, count, &bsw->teamConfigs[teamIndex],
+                                bsw->heapId);
         }
         mode = bsw->playMode;
         if (BSubwayScoreData_HasStage(bsw->unk74, mode) == 1) {
@@ -401,8 +406,7 @@ void func_ov033_0217bbac(BSubwayScrWork *bsw) {
     case 7:
     case 8:
         slot = round * 2;
-        func_ov033_0217c264(bsw, &bsw->trainers[0], bsw->unk32[slot], bsw->memberCount, NULL, NULL, NULL,
-                            bsw->heapId);
+        func_ov033_0217c264(bsw, &bsw->trainers[0], bsw->unk32[slot], bsw->memberCount, NULL, NULL, NULL, bsw->heapId);
         for (index = 0; index < bsw->memberCount; index++) {
             ids[index] = bsw->trainers[0].pokemon[index].species;
             values[index] = bsw->trainers[0].pokemon[index].item;
@@ -411,8 +415,7 @@ void func_ov033_0217bbac(BSubwayScrWork *bsw) {
                             bsw->heapId);
         break;
     default:
-        func_ov033_0217c264(bsw, &bsw->trainers[0], bsw->unk32[round], bsw->memberCount, NULL, NULL, NULL,
-                            bsw->heapId);
+        func_ov033_0217c264(bsw, &bsw->trainers[0], bsw->unk32[round], bsw->memberCount, NULL, NULL, NULL, bsw->heapId);
         break;
     }
 }
@@ -561,9 +564,9 @@ void func_ov033_0217be88(BSubwayScrWork *bsw, u8 variant) {
         base += 3;
     }
     for (index = 0; index < 3; index++) {
-        bsw->unk664[index] = func_ov033_0217c264(bsw, &bsw->unk2C8[index], base + index, bsw->memberCount,
-                                                 bsw->memberSpecies, bsw->memberItems, &bsw->teamConfigs[index],
-                                                 bsw->heapId);
+        bsw->unk664[index] =
+            func_ov033_0217c264(bsw, &bsw->unk2C8[index], base + index, bsw->memberCount, bsw->memberSpecies,
+                                bsw->memberItems, &bsw->teamConfigs[index], bsw->heapId);
     }
 }
 
@@ -797,8 +800,8 @@ void func_ov033_0217c2c4(BSubwayScrWork *bsw, BSubwayTrainer *trainer, u16 train
     temp = func_ov012_021628c0(trainer, 0xd4, trainerId, 15, heapId);
     iv = func_ov033_0217c288(trainerId);
     for (i = 0; i < 2; i++) {
-        func_ov012_02162490(&trainer->pokemon[i], 0xd3, config->files[i], config->id, config->pids[i], iv, i,
-                            count, heapId);
+        func_ov012_02162490(&trainer->pokemon[i], 0xd3, config->files[i], config->id, config->pids[i], iv, i, count,
+                            heapId);
     }
     GFL_HeapFree(temp);
 }

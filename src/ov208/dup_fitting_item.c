@@ -1,6 +1,6 @@
 #include "types.h"
-#include "field/dup_fitting_item.h"
 #include "app/musical/mus_item_draw.h"
+#include "field/dup_fitting_item.h"
 #include "gfl/heap.h"
 #include "nitro/fx.h"
 
@@ -87,7 +87,7 @@ BOOL DupFittingItemList_IsFull(DupFittingItemList *list) {
 }
 
 DupFittingItemNode *DupFittingItemNode_Create(HeapID heapId, MusItemDrawSys *sys, DupFittingItemEntry *entry,
-                                        const VecFx32 *pos) {
+                                              const VecFx32 *pos) {
     DupFittingItemNode *node = GFL_HeapAllocate(heapId, sizeof(DupFittingItemNode), FALSE, "dup_fitting_item.c", 204);
 
     node->next = NULL;

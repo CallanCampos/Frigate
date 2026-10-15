@@ -113,6 +113,7 @@ static const MailBoxChildProc sChildProcs[MAILBOX_CHILD_COUNT] = {
     { MailBox_StartPartyList, MailBox_EndPartyListCancelAsk, MAILBOX_STATE_INIT },
 };
 
+// clang-format off
 static const MailBoxStateFunc sStateFuncs[] = {
     MailBox_StateInit,       MailBox_StateExit,         MailBox_StateWaitWipe,    MailBox_StateWaitMessage,
     MailBox_StateWaitYesNo,  MailBox_StateWaitPaletteFx, MailBox_StateStartChild, MailBox_StateWaitChild,
@@ -122,6 +123,8 @@ static const MailBoxStateFunc sStateFuncs[] = {
     MailBox_StatePartyReturn, MailBox_StateGiveFadeIn,  MailBox_StateGiveResult,  MailBox_StateMailWritten,
     MailBox_StatePressReturn, MailBox_StatePressClose,  MailBox_StateBackToList,
 };
+
+// clang-format on
 
 BOOL MailBox_Update(MailBoxWork *work, u32 *state) {
     *state = sStateFuncs[*state](work);
@@ -696,8 +699,8 @@ static u32 MailBox_EndPartyListCancelAsk(MailBoxWork *work) {
 }
 
 static u32 MailBox_StartMailSys(MailBoxWork *work) {
-    work->childParam = MailTool_CreateWriteParam(work->param->gameData, 2, work->partyPos, PML_ItemGetMailID(work->item),
-                                           HEAPID_MAILBOX_PROC);
+    work->childParam = MailTool_CreateWriteParam(work->param->gameData, 2, work->partyPos,
+                                                 PML_ItemGetMailID(work->item), HEAPID_MAILBOX_PROC);
     QueueGameProc(work->procManager, OVERLAY_NONE, &sMailSysProc, work->childParam);
     return 0;
 }
@@ -705,8 +708,7 @@ static u32 MailBox_StartMailSys(MailBoxWork *work) {
 static u32 MailBox_EndMailSys(MailBoxWork *work) {
     work->mailGiven = MailTool_IsWritten(work->childParam);
     if (work->mailGiven == TRUE) {
-        MailTool_GiveMail(work->childParam,
-                            PokeParty_GetPkm(GameData_GetParty(work->param->gameData), work->partyPos));
+        MailTool_GiveMail(work->childParam, PokeParty_GetPkm(GameData_GetParty(work->param->gameData), work->partyPos));
         BagSave_SubItem(GameData_GetBag(work->param->gameData), work->item, 1, HEAPID_MAILBOX_PROC);
     }
     MailTool_FreeParam(work->childParam);

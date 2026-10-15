@@ -1,6 +1,6 @@
-#include "field/field_map_chunk.h"
 #include "types.h"
 #include "field/field_map.h"
+#include "field/field_map_chunk.h"
 #include "nitro/fx.h"
 
 // The height and tile type of a position in a chunk's terrain. The ROM doesn't name the file; the name is a guess.
@@ -44,6 +44,7 @@ typedef struct {
     MapHeightTile tiles[];
 } MapHeightData;
 
+// clang-format off
 static const fx16 MAP_HEIGHT_SLOPE_TABLE[] = {
     0x0, 0xffe, 0x0,
     -0x727, 0xe4e, 0x0,
@@ -364,6 +365,9 @@ static const fx16 MAP_HEIGHT_SLOPE_TABLE[] = {
     0xa3b, 0x6d2, 0xa3b,
 };
 
+// clang-format on
+
+// clang-format off
 static const fx32 MAP_HEIGHT_OFFSET_TABLE[] = {
     -0x1ffdf, -0x17fe7, 0x2ffcf, 0x0, -0xf18e5, -0xdb100, -0xeffcc, -0xf9c4f, -0xf1cb4, 0x393ab, 0x32136, 0x1ffdf,
     0xffef, 0x4f2d3, -0x15540, -0x46fbf, -0x21eec, -0x4aa60, -0x388e0, 0x169f3, 0x37fc7, -0x169f3, 0x930ad, 0x17fe7,
@@ -476,6 +480,8 @@ static const fx32 MAP_HEIGHT_OFFSET_TABLE[] = {
     0x6aa3f, 0xb8b4f, 0xcbe93, 0xdb98a, 0xa066c, -0xf09a3, -0x708ae, -0x113740, -0xe2432, 0x2ac05, -0x963a2, 0x377d2,
     0x137ec7, -0x7d7b, -0x17169, -0x4695a, 0x17873, -0x14028, -0xc7cea, -0x3e09e, 0x27585, -0x6a34d,
 };
+
+// clang-format on
 
 static inline u8 MapHeightTile_GetShape(const MapHeightTile *tile) {
     return tile->shape;

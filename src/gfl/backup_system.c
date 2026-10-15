@@ -105,7 +105,7 @@ static u16 func_0203b748(SaveData *sv, u32 copy);
 static void func_0203b774(SaveData *sv, BOOL blockSleep);
 static void func_0203b798(SaveData *sv, u32 *changed, u32 *total);
 static u32 func_0203b81c(SaveData *sv, u32 gmdataid, u32 copy, u32 *remaining, u32 *frameSize, u32 *pos,
-    BOOL *next_frame);
+                         BOOL *next_frame);
 static u16 func_0203b92c(SaveData *sv, u32 gmdataid, u32 copy, u32 pass);
 static u16 func_0203b988(SaveData *sv, u32 copy);
 static u32 func_0203b9bc(SaveData *sv, BOOL *passEnded);
@@ -123,7 +123,7 @@ static void func_0203be8c(SaveData *sv, u32 status);
 static BackupSystem *svsys;
 
 void mainBackupSystemInit(u32 heapId, BackupReadErrorCallback readErrorCallback,
-    BackupWriteErrorCallback writeErrorCallback) {
+                          BackupWriteErrorCallback writeErrorCallback) {
     svsys = GFL_HeapAllocate(heapId, sizeof(BackupSystem), FALSE, "backup_system.c", 223);
     sys_memset32(0, svsys, sizeof(BackupSystem));
     MATHi_CRC16InitTable(&svsys->crcTable, 0x1021);
@@ -156,7 +156,7 @@ static SaveData *SaveData_Init(const SaveDataParams *params, u32 heapId, void *b
     }
     sv->blockStatus = GFL_HeapAllocate(heapId, sv->blockStatusSize, TRUE, "backup_system.c", 293);
     sv->table = SaveData_InitTable(heapId, params->table, params->count, sv->savearea_size, SAVE_FOOTER_SIZE,
-        sizeof(BlockFooter), sv->crcsSize);
+                                   sizeof(BlockFooter), sv->crcsSize);
     sv->saveSize = GetSaveDataSize(sv->table);
     if (buffer == NULL) {
         sv->data = GFL_HeapAllocate(heapId, sv->savearea_size, TRUE, "backup_system.c", 305);
@@ -175,7 +175,6 @@ static SaveData *SaveData_Init(const SaveDataParams *params, u32 heapId, void *b
     }
     return sv;
 }
-
 
 SaveData *SaveData_InitMain(const SaveDataParams *params, u32 heapId) {
     return SaveData_Init(params, heapId, NULL, 0, TRUE);
@@ -474,10 +473,10 @@ static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
     func_0203be74(sv);
     mainData = sv->data;
     backupData = GFL_HeapAllocate(heapId, sv->saveSize, FALSE, "backup_system.c", 1065);
-    mainRead = readFlashWaitSuccess(func_0203b0b4(sv, SAVE_COPY_MAIN), mainData, sv->saveSize,
-        svsys->readErrorCallback);
-    backupRead = readFlashWaitSuccess(func_0203b0b4(sv, SAVE_COPY_BACKUP), backupData, sv->saveSize,
-        svsys->readErrorCallback);
+    mainRead =
+        readFlashWaitSuccess(func_0203b0b4(sv, SAVE_COPY_MAIN), mainData, sv->saveSize, svsys->readErrorCallback);
+    backupRead =
+        readFlashWaitSuccess(func_0203b0b4(sv, SAVE_COPY_BACKUP), backupData, sv->saveSize, svsys->readErrorCallback);
     if (mainRead == FALSE && backupRead == FALSE) {
         func_0203be8c(sv, BLOCK_STATUS_WRITE_MAIN);
         sys_memset32(0, mainData, sv->saveSize);
@@ -504,16 +503,16 @@ static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
     if (mainCheck.result == 0) {
         if (backupCheck.result != 0) {
             func_0203bdbc(sv, getSaveSize(sv->table), BLOCK_STATUS_WRITE_BACKUP);
-        func_0203bdbc(sv, getSaveSize(sv->table) + 1, BLOCK_STATUS_WRITE_BACKUP);
-        offset = sv->saveSize - SAVE_FOOTER_SIZE - sv->crcsSize;
-        sys_memcpy16(mainData + offset, backupData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
+            func_0203bdbc(sv, getSaveSize(sv->table) + 1, BLOCK_STATUS_WRITE_BACKUP);
+            offset = sv->saveSize - SAVE_FOOTER_SIZE - sv->crcsSize;
+            sys_memcpy16(mainData + offset, backupData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
         }
     } else if (backupCheck.result == 0) {
         if (mainCheck.result != 0) {
             func_0203bdbc(sv, getSaveSize(sv->table), BLOCK_STATUS_WRITE_MAIN);
-        func_0203bdbc(sv, getSaveSize(sv->table) + 1, BLOCK_STATUS_WRITE_MAIN);
-        offset = sv->saveSize - SAVE_FOOTER_SIZE - sv->crcsSize;
-        sys_memcpy16(backupData + offset, mainData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
+            func_0203bdbc(sv, getSaveSize(sv->table) + 1, BLOCK_STATUS_WRITE_MAIN);
+            offset = sv->saveSize - SAVE_FOOTER_SIZE - sv->crcsSize;
+            sys_memcpy16(backupData + offset, mainData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
         }
     } else {
         if (mainCheck.result == 1 || backupCheck.result == 1) {
@@ -526,9 +525,8 @@ static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
         return SAVE_LOAD_RESULT_NONE;
     }
     // Try the newer copy's CRCs first
-    if (mainCheck.result == 0
-        && ((mainCheck.count == 0 && backupCheck.count == 0xffffffff) || mainCheck.count >= backupCheck.count
-            || backupCheck.result != 0)) {
+    if (mainCheck.result == 0 && ((mainCheck.count == 0 && backupCheck.count == 0xffffffff) ||
+                                  mainCheck.count >= backupCheck.count || backupCheck.result != 0)) {
         datas[0] = mainData;
         copies[0] = SAVE_COPY_MAIN;
         datas[1] = backupData;
@@ -742,7 +740,7 @@ static void func_0203b798(SaveData *sv, u32 *changed, u32 *total) {
 // Compares a block with the card, a frame's worth at a time. Returns 0 to continue next frame, 1 if the block differs
 // and 2 if it is the same
 static u32 func_0203b81c(SaveData *sv, u32 gmdataid, u32 copy, u32 *remaining, u32 *frameSize, u32 *pos,
-    BOOL *next_frame) {
+                         BOOL *next_frame) {
     u32 offset = func_0203b0b4(sv, copy) + getStartOffsetOfSaveBlockDataInSave(sv->table, gmdataid);
     u32 size = *remaining;
     u32 blockPos;
@@ -806,7 +804,7 @@ static u16 func_0203b92c(SaveData *sv, u32 gmdataid, u32 copy, u32 pass) {
     offset = getStartOffsetOfSaveBlockDataInSave(sv->table, gmdataid);
     size = getSizeOfSaveBlockData(sv->table, gmdataid);
     return func_0203c07c(base + offset, SaveData_GetBlockPtr(sv, gmdataid), size + sizeof(BlockFooter),
-        svsys->writeErrorCallback);
+                         svsys->writeErrorCallback);
 }
 
 // Writes the blocks' CRCs
@@ -816,7 +814,6 @@ static u16 func_0203b988(SaveData *sv, u32 copy) {
 
     return func_0203c07c(dest, crcs, sv->crcsSize, svsys->writeErrorCallback);
 }
-
 
 // Saves a step at a time: finds the blocks that differ from the card, then writes them, the CRCs and the footer, to
 // the main copy and then the backup. *passEnded tells when the main copy is done
@@ -839,8 +836,8 @@ static u32 func_0203b9bc(SaveData *sv, BOOL *passEnded) {
                 return SAVE_RESULT_CONTINUE;
             }
             if (func_0203bda0(sv, sv->blockIndex) == BLOCK_STATUS_OK) {
-                u32 compare = func_0203b81c(sv, sv->blockIndex, SAVE_COPY_MAIN, &sv->compareRemaining,
-                    &sv->compareSize, &sv->comparePos, &next_frame);
+                u32 compare = func_0203b81c(sv, sv->blockIndex, SAVE_COPY_MAIN, &sv->compareRemaining, &sv->compareSize,
+                                            &sv->comparePos, &next_frame);
 
                 if (compare == 1) {
                     func_0203bdbc(sv, sv->blockIndex, BLOCK_STATUS_WRITE_MAIN);
@@ -982,7 +979,7 @@ static void func_0203bd0c(SaveData *sv, u32 copy) {
 
     sys_memset(footer, 0xff, SAVE_FOOTER_SIZE);
     func_0203bfd4(sv->saveSize + func_0203b0b4(sv, copy) - SAVE_FOOTER_SIZE, footer, SAVE_FOOTER_SIZE,
-        svsys->writeErrorCallback);
+                  svsys->writeErrorCallback);
 }
 
 static u16 func_0203bd48(SaveData *sv, u32 gmdataid) {
@@ -1014,7 +1011,6 @@ static void func_0203bdbc(SaveData *sv, u32 index, u32 status) {
     sv->blockStatus[word] &= 0xffffffff ^ (3 << shift);
     sv->blockStatus[word] |= status << shift;
 }
-
 
 // Swaps which copy each block is to be written to, for the backup's pass
 static void func_0203bdf0(SaveData *sv) {
@@ -1084,5 +1080,5 @@ BOOL func_0203bf30(u32 src, void *dest, u32 size) {
 
 BOOL func_0203bf48(SaveData *sv, u32 gmdataid, u32 copy, void *dest, u32 size) {
     return readFlashWaitSuccess(func_0203b0b4(sv, copy + 1) + getStartOffsetOfSaveBlockDataInSave(sv->table, gmdataid),
-        dest, size, svsys->readErrorCallback);
+                                dest, size, svsys->readErrorCallback);
 }

@@ -2,9 +2,10 @@
 #define POKEBW2_APP_POKEMON_TRADE_LOCAL_H
 
 #include "types.h"
-#include "app/ui/ui_scene.h"
-#include "app/ui/touchbar.h"
 #include "app/pokemon_trade.h"
+#include "app/ui/touchbar.h"
+#include "app/ui/ui_scene.h"
+#include "field/unity_tower.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -20,7 +21,6 @@
 #include "gfl/tcb.h"
 #include "gfl/tcbl.h"
 #include "gfl/touchpanel.h"
-#include "field/unity_tower.h"
 #include "gfl/ui.h"
 #include "save/player_info.h"
 #include "struct_decls.h"

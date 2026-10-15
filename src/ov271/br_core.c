@@ -65,6 +65,7 @@ const GameProcFunctions BR_CORE_PROC_FUNCTIONS = {
     BrCore_ProcExit,
 };
 
+// clang-format off
 static const BrProcData sBrProcTable[BR_PROCID_MAX] = {
     [BR_PROCID_START] = { &BR_START_PROC_FUNCTIONS, sizeof(BrStartProcParam), OVERLAY_ID(268), BrCore_StartBefore,
                           BrCore_StartAfter },
@@ -94,6 +95,8 @@ static const BrProcData sBrProcTable[BR_PROCID_MAX] = {
                                  BrCore_MusicalSendBefore, BrCore_MusicalSendAfter },
 };
 
+// clang-format on
+
 static BOOL BrCore_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     BrCoreParam *coreParam = param;
     BrCoreWork *wk;
@@ -122,8 +125,7 @@ static BOOL BrCore_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     BrCore_LoadRecordInfo(&wk->param->data->recordInfo, TRUE, wk->param->mainParam->gameData, HEAPID_BATTLE_RECORDER);
 
     if (wk->param->mainParam->mode != BR_MODE_BROWSE) {
-        wk->net =
-            BrNet_Init(wk->param->mainParam->gameData, wk->param->mainParam->unk8, HEAPID_BATTLE_RECORDER);
+        wk->net = BrNet_Init(wk->param->mainParam->gameData, wk->param->mainParam->unk8, HEAPID_BATTLE_RECORDER);
     } else {
         GFL_OvlLoad(OVERLAY_ID(201));
     }

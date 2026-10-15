@@ -290,8 +290,8 @@ static void TownMapCursor_SetPlace(TownMapCursor *cursor, TownMapPlace *place, c
 static void TownMapCursor_UpdateRing(TownMapCursor *cursor, const TownMapPoint *scroll);
 static TownMapPlace *TownMapCursor_GetPlace(const TownMapCursor *cursor);
 static void TownMapCursor_SetPull(TownMapCursor *cursor, BOOL pull);
-static void TownMapPlaces_Init(TownMapPlaces *places, u16 zoneId, u16 escapeZoneId, void *data,
-                               TownMapGraphic *graphic, GameData *gameData, HeapID heapId, BOOL all);
+static void TownMapPlaces_Init(TownMapPlaces *places, u16 zoneId, u16 escapeZoneId, void *data, TownMapGraphic *graphic,
+                               GameData *gameData, HeapID heapId, BOOL all);
 static void TownMapPlaces_Free(TownMapPlaces *places);
 static void TownMapPlaces_Main(TownMapPlaces *places);
 static void TownMapPlaces_SetScale(TownMapPlaces *places, fx32 scale, const TownMapPoint *center);
@@ -987,8 +987,8 @@ static void TownMapCursor_SetPull(TownMapCursor *cursor, BOOL pull) {
 }
 
 // Makes every place of the table but the other version's city. all makes every place arrived at and flown to
-static void TownMapPlaces_Init(TownMapPlaces *places, u16 zoneId, u16 escapeZoneId, void *data,
-                               TownMapGraphic *graphic, GameData *gameData, HeapID heapId, BOOL all) {
+static void TownMapPlaces_Init(TownMapPlaces *places, u16 zoneId, u16 escapeZoneId, void *data, TownMapGraphic *graphic,
+                               GameData *gameData, HeapID heapId, BOOL all) {
     int i;
     u32 count = 0;
     ClActUnit *unit = TownMapGraphic_GetUnit(graphic, TOWNMAP_UNIT_MAIN);
@@ -1525,7 +1525,8 @@ static void TownMapMap_Main(TownMapMap *map, TownMapPlaces *places) {
             if (map->scale == FX32_ONE) {
                 TownMapMap_SetLimits(map, 0, 0, 0, 0);
             } else {
-                TownMapMap_SetLimits(map, TOWNMAP_SCROLL_TOP, TOWNMAP_SCROLL_LEFT, TOWNMAP_SCROLL_RIGHT, TOWNMAP_SCROLL_BOTTOM);
+                TownMapMap_SetLimits(map, TOWNMAP_SCROLL_TOP, TOWNMAP_SCROLL_LEFT, TOWNMAP_SCROLL_RIGHT,
+                                     TOWNMAP_SCROLL_BOTTOM);
             }
             map->finished = TRUE;
         }

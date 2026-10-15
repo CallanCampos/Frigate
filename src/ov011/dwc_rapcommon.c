@@ -132,7 +132,9 @@ void DWCRapCommon_Free(u32 name, void *ptr, u32 size) {
 }
 
 void DWCRapCommon_Create(HeapID heapId, u32 size) {
+    // clang-format off
     GFL_ASSERT(pDwcRapWork==NULL);
+    // clang-format on
 
     pDwcRapWork = GFL_HeapAllocate(0, sizeof(DWCRapCommonWork), TRUE, "dwc_rapcommon.c", 332);
     pDwcRapWork->heapPtr = GFL_HeapAllocate(heapId, size - 0x80, FALSE, "dwc_rapcommon.c", 333);

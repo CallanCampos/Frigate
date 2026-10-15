@@ -13,6 +13,7 @@ static void MailBox_CursorMoved(void *work, int pos, int prevPos);
 static void MailBox_CursorTouched(void *work, int pos, int prevPos);
 
 // The touch screen's page and return buttons, and the return button of the mail
+// clang-format off
 static const TouchRect sButtonRects[] = {
     { 168, 191, 8, 32 },
     { 168, 191, 32, 56 },
@@ -20,6 +21,8 @@ static const TouchRect sButtonRects[] = {
     { 168, 191, 194, 231 },
     { TOUCH_RECT_END, 0, 0, 0 },
 };
+
+// clang-format on
 
 static const TouchRect sReturnRects[] = {
     { 160, 191, 230, 255 },

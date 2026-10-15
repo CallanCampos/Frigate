@@ -3,10 +3,10 @@
 // none, and br_core.c runs it as BR_PROCID_MENU
 
 #include "types.h"
-#include "app/battle_recorder/br_menu_proc.h"
 #include "app/battle_recorder/br_btn.h"
 #include "app/battle_recorder/br_core.h"
 #include "app/battle_recorder/br_fade.h"
+#include "app/battle_recorder/br_menu_proc.h"
 #include "app/battle_recorder/br_proc_sys.h"
 #include "app/battle_recorder/br_res.h"
 #include "app/battle_recorder/br_util.h"

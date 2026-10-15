@@ -75,7 +75,7 @@ BtlvBGauge *BtlvBGauge_Create(const BtlvBGaugeParam *param, HeapID heapId) {
     task = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(BtlvBGaugeTask), FALSE, "btlv_b_gauge.c", 0x8b);
     task->gauge = work;
     BtlvEffect_AddTask(GFL_TCBMgrAddTask(BtlvEffect_GetTCBManager(), BtlvBGauge_SlideTask, task, 0),
-                        BtlvBGauge_SlideTaskEnd, 0);
+                       BtlvBGauge_SlideTaskEnd, 0);
     work->busy = TRUE;
     GFL_SndSEPlay(SEQ_SE_TB_START);
     return work;

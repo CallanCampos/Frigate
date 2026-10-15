@@ -60,7 +60,8 @@ GameEventReturnCode EventFinishScriptSubEvents_Callback(GameEvent *event, u32 *s
 GameEvent *EventFinishScriptSubEvents_Create(FieldScriptEnv *env) {
     ScriptWork *scriptWork = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = GameEvent_Create(gsys, NULL, EventFinishScriptSubEvents_Callback, sizeof(FinishScriptSubEventsWork));
+    GameEvent *event =
+        GameEvent_Create(gsys, NULL, EventFinishScriptSubEvents_Callback, sizeof(FinishScriptSubEventsWork));
     FinishScriptSubEventsWork *work = GameEvent_GetData(event);
 
     work->gsys = gsys;

@@ -308,6 +308,7 @@ static const TouchRect sMonolithMissionTouchRects[] = {
 };
 
 // The touch rectangles of the three levels' buttons
+// clang-format off
 static const TouchRect sMonolithMissionLevelRects[] = {
     { 172, 188, 128, 156 },
     { 172, 188, 164, 192 },
@@ -320,9 +321,11 @@ static const TouchRect sMonolithMissionLevelRects[] = {
     { TOUCH_RECT_END, 0, 0, 0 },
 };
 
+// clang-format on
+
 // The cheat code: SELECT, DOWN three times, UP four times and SELECT
 static const u16 sMonolithMissionCode[MONOLITH_MISSION_CODE_LENGTH] = {
-    PAD_BUTTON_SELECT, PAD_KEY_DOWN, PAD_KEY_DOWN, PAD_KEY_DOWN, PAD_KEY_UP,
+    PAD_BUTTON_SELECT, PAD_KEY_DOWN, PAD_KEY_DOWN, PAD_KEY_DOWN,      PAD_KEY_UP,
     PAD_KEY_UP,        PAD_KEY_UP,   PAD_KEY_UP,   PAD_BUTTON_SELECT,
 };
 
@@ -330,12 +333,15 @@ static const MonolithMissionLevelRange sMonolithMissionLevelRanges[5] = {
     { 0, 1 }, { 1, 2 }, { 2, 3 }, { 2, 3 }, { 2, 3 },
 };
 
+// clang-format off
 static const s16 sMonolithMissionLevelButtons[] = {
     130, 177, 48, 1,
     166, 177, 48, 1,
     202, 177, 48, 1,
     -1, -1, -1, -1,
 };
+
+// clang-format on
 
 const GameProcFunctions MONOLITH_MISSION_SELECT_PROC_FUNCTIONS = {
     MonolithMission_Init,
@@ -354,6 +360,7 @@ static const BGSetup sMonolithMissionBGSetups[3] = {
 };
 
 // The buttons of the levels, then the markers of the rows
+// clang-format off
 static const MonolithMissionIcon sMonolithMissionIcons[MONOLITH_MISSION_ICON_COUNT + 1] = {
     { 140, 181, 16, 64, 1, 4 },
     { 176, 181, 16, 64, 1, 0 },
@@ -374,6 +381,8 @@ static const MonolithMissionIcon sMonolithMissionIcons[MONOLITH_MISSION_ICON_COU
     { 230, 32, 12, 64, 3, 0 },
     { -1, -1, -1, -1, -1, -1 },
 };
+
+// clang-format on
 
 static BOOL MonolithMission_Init(GameProc *proc, u32 *state, void *param, void *work) {
     MonolithScreenParam *screen = param;
@@ -1286,8 +1295,9 @@ static void MonolithMission_CreateIcons(MonolithScreenParam *screen, MonolithMis
         setup.sequence = icon->sequence;
         setup.priority = icon->priority;
         setup.bgPriority = icon->bgPriority;
-        mfw->icons[i] = func_0204c040(screen->work->clactUnit, screen->work->actorRes[1].chars, screen->work->actorRes[1].palette,
-                                      screen->work->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
+        mfw->icons[i] =
+            func_0204c040(screen->work->clactUnit, screen->work->actorRes[1].chars, screen->work->actorRes[1].palette,
+                          screen->work->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
         func_0204c520(mfw->icons[i], TRUE);
         if (icon->palette != 0) {
             func_0204c378(mfw->icons[i], (u8)icon->palette, TRUE);

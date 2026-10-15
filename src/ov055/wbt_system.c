@@ -1,6 +1,6 @@
 #include "types.h"
-#include "field/wbt_makematch.h"
 #include "field/wbt.h"
+#include "field/wbt_makematch.h"
 #include "gfl/heap.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
@@ -465,6 +465,7 @@ void func_ov055_021e62b0(WbtSystem *sys, MATHRandContext32 *rand) {
 }
 
 // The type chart, in damage multiples of 4
+// clang-format off
 static const u8 sTypeChart[17][17] = {
     { 4, 4, 4, 4, 4, 2, 4, 0, 2, 4, 4, 4, 4, 4, 4, 4, 4 },
     { 8, 4, 2, 2, 4, 8, 2, 0, 8, 4, 4, 4, 4, 2, 8, 4, 8 },
@@ -484,6 +485,8 @@ static const u8 sTypeChart[17][17] = {
     { 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 8, 4 },
     { 4, 2, 4, 4, 4, 4, 4, 8, 2, 4, 4, 4, 4, 8, 4, 4, 2 },
 };
+
+// clang-format on
 
 // How well one type attacks another: 0 not at all, 1 not very well, 2 normally and 3 super effectively. Type 17 is
 // no type

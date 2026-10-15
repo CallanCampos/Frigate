@@ -1,9 +1,9 @@
 #include "types.h"
-#include "save/timesig_savedata.h"
 #include "gfl/rtc_cache.h"
 #include "gfl/std.h"
 #include "nitro/rtc.h"
 #include "save/save_control.h"
+#include "save/timesig_savedata.h"
 
 // The save block of the trainer card's signature, when each badge was obtained and saved badge polish. The ROM has
 // no string for the file, so the name is a guess (it comes from swan's getTimeSigBlkAddress). Block 0x21.

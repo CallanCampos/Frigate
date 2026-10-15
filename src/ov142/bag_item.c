@@ -26,6 +26,7 @@ static void BagItemList_SortByName(BagItemList *list);
 static void BagItemList_SortByType(BagItemList *list);
 
 // Each item's place in alphabetical order
+// clang-format off
 static const u16 sItemNameOrder[ITEM_LAST + 1] = {
     0, 308, 559, 220, 378, 465, 333, 130, 332, 437, 550, 300, 393, 151, 236, 407,
     65, 383, 10, 54, 253, 16, 354, 205, 311, 249, 530, 203, 447, 313, 199, 501,
@@ -68,6 +69,8 @@ static const u16 sItemNameOrder[ITEM_LAST + 1] = {
     595, 591, 587, 1, 262, 263, 440, 128, 286, 93, 579, 455, 500, 609, 0, 215,
     216, 217, 610, 315, 131, 132, 363, 347, 481, 369, 230, 80, 147, 148, 445,
 };
+
+// clang-format on
 
 static s32 BagItemList_CompareSortKey(void *a, void *b) {
     BagItemSortEntry *entryA = a;
@@ -232,7 +235,8 @@ s32 BagItemList_CountInPocket(BagItemList *list, u32 pocket) {
 
 void BagItemList_SetFilter(BagItemList *list, u16 filter) {
     u32 pockets[] = {
-        BAG_POCKET_ITEMS, BAG_POCKET_ITEMS, BAG_POCKET_MEDICINE, BAG_POCKET_TMS_HMS, BAG_POCKET_BERRIES, BAG_POCKET_KEY_ITEMS,
+        BAG_POCKET_ITEMS,   BAG_POCKET_ITEMS,   BAG_POCKET_MEDICINE,
+        BAG_POCKET_TMS_HMS, BAG_POCKET_BERRIES, BAG_POCKET_KEY_ITEMS,
     };
     int i;
 
@@ -258,15 +262,15 @@ u32 BagItemList_CountShown(BagItemList *list, u32 pocket) {
     if (pocket != BAG_POCKET_FREE_SPACE) {
         items = BagSave_GetPocketItems(list->bag, pocket, &slots);
         for (i = 0; i < slots; i++) {
-            if (items[i].item != ITEM_NONE && list->inBag[items[i].item]
-                && !BagSave_IsItemFreeSpaceBit(list->bag, items[i].item)) {
+            if (items[i].item != ITEM_NONE && list->inBag[items[i].item] &&
+                !BagSave_IsItemFreeSpaceBit(list->bag, items[i].item)) {
                 count++;
             }
         }
     } else {
         for (i = 0; i <= ITEM_LAST; i++) {
-            if (list->entries[i].item != ITEM_NONE && list->inBag[list->entries[i].item]
-                && list->entries[i].shown == TRUE) {
+            if (list->entries[i].item != ITEM_NONE && list->inBag[list->entries[i].item] &&
+                list->entries[i].shown == TRUE) {
                 count++;
             }
         }
@@ -322,8 +326,8 @@ static void BagItemList_SortByType(BagItemList *list) {
         entry = &list->entries[i];
         data = PML_ItemArcHandleReadFile(arc, entry->item, list->heapId);
         // By the item's kind, then its place among them
-        sort[i].key = (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28) + (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16)
-            + entry->item;
+        sort[i].key = (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28) +
+                      (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16) + entry->item;
         sort[i].entry = *entry;
         GFL_HeapFree(data);
     }

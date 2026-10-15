@@ -301,6 +301,7 @@ static u32 sPkwdSelectScreenRemoveMessages[3] = {
     PokewoodLines_Text_Back,
 };
 
+// clang-format off
 static PkwdSelectScreenStateFunc sPkwdSelectScreenStates[] = {
     PkwdSelectScreen_FadeIn,        PkwdSelectScreen_WaitFadeIn,     PkwdSelectScreen_StartInput,
     PkwdSelectScreen_Input,         PkwdSelectScreen_WaitBlink,      PkwdSelectScreen_WaitMessage,
@@ -309,6 +310,8 @@ static PkwdSelectScreenStateFunc sPkwdSelectScreenStates[] = {
     PkwdSelectScreen_YesNoMenu,     PkwdSelectScreen_FadeOut,        PkwdSelectScreen_WaitFadeOut,
     PkwdSelectScreen_OpenDetails,   PkwdSelectScreen_Details,
 };
+
+// clang-format on
 
 // Where the upper screen's rank mark goes
 static const PkwdSelectScreenPos sPkwdSelectScreenMarkPos[MARK_COUNT] = { { 240, 152 } };
@@ -446,8 +449,7 @@ static BOOL PkwdSelectScreen_Init(GameProc *proc, u32 *state, void *param, void 
     wk->graphic = PkwdSelectScreenGraphic_Create(0, wk->heapId);
     PkwdSelectScreen_InitText(wk);
     PkwdSelectScreenBG_Load(&wk->bg, wk->heapId);
-    wk->touchBar =
-        PkwdSelectScreen_CreateTouchBar(wk, PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->heapId);
+    wk->touchBar = PkwdSelectScreen_CreateTouchBar(wk, PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->heapId);
     TouchBar_SetBgPriority(wk->touchBar, 1);
     wk->menuRes = AppTaskMenuRes_Create(0, 11, wk->font, wk->printQueue, wk->heapId);
     PkwdSelectScreen_LoadNewMarkRes(wk);
@@ -589,8 +591,7 @@ static void PkwdSelectScreenBG_LoadPoster(PkwdSelectScreenBG *bg, s32 movie, s32
     arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_COUNT, HEAPID_PKWD_SELECTSCREEN);
     if (cursor == CURSOR_NONE || movie == MOVIE_NONE) {
         GFL_G2DIOLoadArcNCLRDefault(arc, POSTER_PALETTE_FILE_NONE, 4, 0, 0x20, HEAPID_PKWD_SELECTSCREEN);
-        loadBGScrToVramByFileNoReserveNegAlign(arc, POSTER_SCREEN_FILE_NONE, 6, 0, 0, FALSE,
-                                               HEAPID_PKWD_SELECTSCREEN);
+        loadBGScrToVramByFileNoReserveNegAlign(arc, POSTER_SCREEN_FILE_NONE, 6, 0, 0, FALSE, HEAPID_PKWD_SELECTSCREEN);
         GFL_BGSysLoadArcNCGRStatic(arc, POSTER_CHARS_FILE_NONE, 6, 0, 0, FALSE, HEAPID_PKWD_SELECTSCREEN);
     } else {
         u32 graphics;
@@ -710,8 +711,7 @@ static void PkwdSelectScreen_CreateNewMarks(PkwdSelectScreenWork *wk) {
         setup.sequence = 1;
         setup.bgPriority = 2;
         wk->newMarks[i] = func_0204c040(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->newRes.chars,
-                                        wk->newRes.palette, wk->newRes.cellAnims, &setup, 0,
-                                        HEAPID_PKWD_SELECTSCREEN);
+                                        wk->newRes.palette, wk->newRes.cellAnims, &setup, 0, HEAPID_PKWD_SELECTSCREEN);
         func_0204c520(wk->newMarks[i], TRUE);
     }
 }
@@ -765,8 +765,7 @@ static void PkwdSelectScreen_CreateMarks(PkwdSelectScreenWork *wk) {
         setup.sequence = 10;
         setup.bgPriority = 1;
         wk->marks[i] = func_0204c040(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->markRes.chars,
-                                     wk->markRes.palette, wk->markRes.cellAnims, &setup, 1,
-                                     HEAPID_PKWD_SELECTSCREEN);
+                                     wk->markRes.palette, wk->markRes.cellAnims, &setup, 1, HEAPID_PKWD_SELECTSCREEN);
         func_0204c520(wk->marks[i], TRUE);
     }
 }
@@ -804,8 +803,8 @@ static void PkwdSelectScreen_CreateWindows(PkwdSelectScreenWork *wk) {
     for (i = 0; i < WINDOW_STATIC_COUNT; i++) {
         const PkwdSelectScreenWindowSetup *setup = &sPkwdSelectScreenWindows[i];
 
-        wk->windows[i].window = BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height,
-                                                     setup->palette, TRUE);
+        wk->windows[i].window =
+            BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette, TRUE);
     }
     LoadSysMsgBoxPalette(0, 14, 0, HEAPID_PKWD_SELECTSCREEN);
     LoadSysMsgBox(0, 0x20, 14, 0, HEAPID_PKWD_SELECTSCREEN);
@@ -997,8 +996,7 @@ static void PkwdSelectScreen_PrintMovie(PkwdSelectScreenWork *wk, s32 screen) {
                                        PRINT_COLOR(13, 12, 0));
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_RELEASE].window), 0);
         GFL_MsgDataLoadStrbuf(wk->msgData, sPkwdSelectScreenReleaseMessages[2], strbuf);
-        PrintWindow_Print(&wk->windows[WINDOW_RELEASE], wk->printQueue, 0, 0, strbuf, wk->font,
-                          PRINT_COLOR(15, 14, 0));
+        PrintWindow_Print(&wk->windows[WINDOW_RELEASE], wk->printQueue, 0, 0, strbuf, wk->font, PRINT_COLOR(15, 14, 0));
         GFL_MsgDataLoadStrbuf(wk->msgData, sPkwdSelectScreenReleaseMessages[0], strbuf);
         WordSetNumber(wk->wordSet, 0, 2000 + (u8)(wk->sorted[screen]->date >> 24), 4, 0, TRUE);
         WordSetNumber(wk->wordSet, 1, (u8)(wk->sorted[screen]->date >> 16), 2, 2, TRUE);
@@ -1054,8 +1052,8 @@ static void PkwdSelectScreen_UpdateCursor(PkwdSelectScreenWork *wk) {
 // Opens the message window and starts printing a message in it
 static void PkwdSelectScreen_PrintMessage(PkwdSelectScreenWork *wk, u32 messageId) {
     const PkwdSelectScreenWindowSetup *setup = &sPkwdSelectScreenWindows[WINDOW_MESSAGE];
-    BmpWin *window = BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette,
-                                          TRUE);
+    BmpWin *window =
+        BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette, TRUE);
 
     wk->windows[WINDOW_MESSAGE].window = window;
     BmpWin_DrawFrame(window, 2, 0x20, 14);
@@ -1069,8 +1067,8 @@ static void PkwdSelectScreen_PrintMessage(PkwdSelectScreenWork *wk, u32 messageI
 // Opens the details of a screen's movie: its cast, its box office gross and its summary
 static void PkwdSelectScreen_PrintDetails(PkwdSelectScreenWork *wk, s32 screen) {
     const PkwdSelectScreenWindowSetup *setup = &sPkwdSelectScreenWindows[WINDOW_DETAILS];
-    BmpWin *window = BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette,
-                                          TRUE);
+    BmpWin *window =
+        BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette, TRUE);
     StrBuf *featuring;
     StrBuf *grosses;
     StrBuf *summary;
@@ -1134,8 +1132,7 @@ static BOOL PkwdSelectScreen_RunState(PkwdSelectScreenWork *wk) {
 
 static BOOL PkwdSelectScreen_FadeIn(PkwdSelectScreenWork *wk) {
     wk->posterDirty = TRUE;
-    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 8, 1,
-                HEAPID_PKWD_SELECTSCREEN);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 8, 1, HEAPID_PKWD_SELECTSCREEN);
     wk->state = STATE_WAIT_FADE_IN;
     return FALSE;
 }

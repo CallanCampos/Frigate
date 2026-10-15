@@ -18,7 +18,6 @@ struct EventDendouMachineData {
     FieldPropHandle *centerHandle;
 };
 
-
 GameEvent *EventDendouMachine_Create(GameSystem *gsys, GameEvent *parent);
 GameEventReturnCode EventDendouMachine_Callback(GameEvent *event, u32 *state, void *data);
 void EventDendouMachine_Init(EventDendouMachineData *work, GameSystem *gsys);

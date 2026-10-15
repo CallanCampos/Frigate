@@ -103,4 +103,3 @@ int func_02044298(const RTCDate *date) {
     func_0207d0b4(date);
     return days;
 }
-

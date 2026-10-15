@@ -100,4 +100,3 @@ BOOL s00C8_CallDiving(VM *vm, FieldScriptEnv *env) {
     }
     return TRUE;
 }
-

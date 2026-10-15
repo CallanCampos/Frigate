@@ -838,8 +838,8 @@ static BOOL AccelMotion_Update(CutinAccelMotion *motion) {
     if (motion->frame < motion->frames - 1) {
         motion->frame++;
         VEC_MultAdd(FX_Mul(motion->speed, motion->frame * FX32_ONE) +
-                         FX_Mul(motion->accel, motion->frame * motion->frame * FX32_ONE) / 2,
-                     &motion->dir, &motion->start, &motion->pos);
+                        FX_Mul(motion->accel, motion->frame * motion->frame * FX32_ONE) / 2,
+                    &motion->dir, &motion->start, &motion->pos);
         return FALSE;
     }
     motion->pos = motion->end;

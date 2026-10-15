@@ -114,7 +114,6 @@ BattleEventItem *BattleEvent_AddItem(u32 factorType, u16 subId, u32 priority, u3
     return NULL;
 }
 
-
 void BattleEvent_RemoveIsolatedItems(void) {
     BattleEventItem *item = data_ov167_021db194.first;
     BattleEventItem *next;
@@ -222,10 +221,10 @@ void func_ov167_021bc94c(BtlServerFlow *flow, u32 event, u32 factorType, BOOL ch
 
     while (item != NULL) {
         next = item->next;
-        if ((!item->running || item->recallEnable) && !item->unk25 && !item->sleeping
-            && (factorType == 7 || item->factorType == factorType)
-            && (item->callDepth == 0 || item->callDepth < data_ov167_021db194.depth) && item->active
-            && (event != 0x73 || item->tempItem)) {
+        if ((!item->running || item->recallEnable) && !item->unk25 && !item->sleeping &&
+            (factorType == 7 || item->factorType == factorType) &&
+            (item->callDepth == 0 || item->callDepth < data_ov167_021db194.depth) && item->active &&
+            (event != 0x73 || item->tempItem)) {
             handlers = item->handlers;
             for (i = 0; i < item->numHandlers; i++) {
                 const BattleEventHandlerEntry *entry = &handlers[i];
@@ -410,13 +409,11 @@ void func_ov167_021bccd8(void) {
     }
 }
 
-
 void func_ov167_021bccf4(void) {
     if (data_ov167_021db3b0.sp != 0) {
         func_ov167_021bccd8();
     }
 }
-
 
 void BattleEventVar_Push(u32 line) {
     BattleEventVarStack *vars = &data_ov167_021db3b0;
@@ -453,7 +450,6 @@ void BattleEventVar_Pop(u32 line) {
         }
     }
 }
-
 
 void BattleEventVar_SetValue(u32 key, s32 value) {
     u32 index = func_ov167_021bcfd8(&data_ov167_021db3b0, key);
@@ -515,8 +511,7 @@ void BattleEventVar_MulValue(u16 key, s32 value) {
     s32 index = func_ov167_021bcffc(vars, key);
 
     if (index >= 0 && vars->kinds[index] == 3) {
-        vars->values[index] =
-            func_ov167_021bd020(vars, index, FX_Mul(vars->values[index], value));
+        vars->values[index] = func_ov167_021bd020(vars, index, FX_Mul(vars->values[index], value));
     }
 }
 

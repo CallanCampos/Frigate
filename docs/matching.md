@@ -1122,8 +1122,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - `p->stack[p->num - 1]` with the array a direct member of `*p` subtracts 1 and loads from the array's offset
   (`subs; lsls; ldr [r0, #0x4c]`), while the same index into an array inside a nested struct folds the `- 1` into the
-  offset (`lsls; ldr [r0, #0x48]`). The Battle Recorder's `BrProcSys_Pop` has the folded load, but its asserts name
-  `p_wk->stack_num` as a member of the work itself, so it stays unmatched.
+  offset (`lsls; ldr [r0, #0x48]`). The Battle Recorder's `BrProcSys_Pop` has the folded load with
+  `p_wk->stack_num` a member of the work itself, as its asserts name it: it matches as the pointer sum
+  `*(p_wk->stack + p_wk->stack_num - 1)`, which the next bullet explains.
+- A pointer sum and an index are not the same to MWCC. `*(p + i + k)` computes `p + i` once, loads the first element
+  as `[p, i]` and the next ones at immediate offsets from it (`[r, #k]`), and with a constant table it folds a `- 1`
+  into the table's literal address; `p[i + k]` adds the constant to the index first. Some twenty functions match only
+  as pointer sums, so the original wrote them so: `btl_server_cmd.c`'s readers of the command queue
+  (`*(que->buffer + que->readPtr + 1)`), the SSP JPEG decoder's EXIF readers, `field_ground_anime.c`,
+  `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `strbuf.c`, `startmenu.c` and others. A local
+  `u8 *p = data + pos` read as `p[0]`, `p[1]` doesn't give it either.
 
 - `field += value` on an `s16` field with an `int` value narrows the value first and shares the narrowed copy between
   such adds, where `field = field + value` adds the `int` as it is. The phrase input's `PMSIVEdit_ScrollWait` adds its

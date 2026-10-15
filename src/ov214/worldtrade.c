@@ -97,7 +97,8 @@ static BOOL WorldTradeProc_Init(GameProc *proc, u32 *state, void *param, void *w
     wk->lobbyMsgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0416, HEAPID_WORLDTRADE);
     wk->systemMsgManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, HEAPID_WORLDTRADE);
     wk->monsNameManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_WORLDTRADE);
-    wk->countryNameManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF, HEAPID_WORLDTRADE);
+    wk->countryNameManager = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE,
+                                                TEXT_BANK_EVENT_MAPCHANGE_LOAD_COUNTRY_TO_STRBUF, HEAPID_WORLDTRADE);
 
     WorldTrade_InitWork(wk, wtParam);
     GFL_BGSysInitVRAM(0);
@@ -328,7 +329,8 @@ void WorldTrade_TouchWinYesNoMakeEx(WorldTradeWork *wk, int y, int cgx, int pale
     GFL_ASSERT(wk->task_res == NULL);
     GFL_ASSERT(wk->task_work == NULL);
 
-    wk->task_res = AppTaskMenuRes_Create((u8)frame, (u8)palette, wk->print.font, wk->print.printQueue, HEAPID_WORLDTRADE);
+    wk->task_res =
+        AppTaskMenuRes_Create((u8)frame, (u8)palette, wk->print.font, wk->print.printQueue, HEAPID_WORLDTRADE);
     {
         AppTaskMenuItem items[2] = {
             { NULL, 0x39e3, 0 },

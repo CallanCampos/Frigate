@@ -122,8 +122,8 @@ void GFL_MsgDataLoadStrbuf(MsgData *msgData, u32 messageId, StrBuf *strbuf) {
 static void GFL_MsgDataDecryptStrbuf(StrBuf *strbuf, u32 messageId) {
     u32 length = GFL_StrBufGetCharCount(strbuf);
 
-    GFL_StrBufInsertTerminator(
-        strbuf, GFL_MsgDataDecryptString((u16 *)GFL_StrBufGetStringPtr(strbuf), length + 1, messageId));
+    GFL_StrBufInsertTerminator(strbuf,
+                               GFL_MsgDataDecryptString((u16 *)GFL_StrBufGetStringPtr(strbuf), length + 1, messageId));
 }
 
 // Decrypts a message up to its terminator, and returns its length
@@ -142,8 +142,6 @@ static u32 GFL_MsgDataDecryptString(u16 *str, u32 length, u32 messageId) {
     }
     return length;
 }
-
-
 
 StrBuf *GFL_MsgDataLoadStrbufNew(MsgData *msgData, u32 messageId) {
     MsgEntry *entry;

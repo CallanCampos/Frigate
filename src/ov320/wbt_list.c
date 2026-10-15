@@ -1,7 +1,7 @@
 #include "types.h"
-#include "app/wbt_list.h"
 #include "app/ui/print_msg.h"
 #include "app/ui/ui_scene.h"
+#include "app/wbt_list.h"
 #include "app/wbt_list_graphic.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
@@ -322,10 +322,7 @@ static void WbtList_Stub(WbtList *work);
 static const s16 sWbtListTitleX[2] = { 112, 112 };
 
 // The x of the two columns of entrants, hidden and shown
-static const s16 sWbtListColumnX[2][2] = {
-    { -72, 0 },
-    { 220, 148 }
-};
+static const s16 sWbtListColumnX[2][2] = { { -72, 0 }, { 220, 148 } };
 
 static const WbtListMessages sWbtListMessages[4] = {
     { Bank0406_Text_The, Bank0406_Text_StartsNow, Bank0406_Text_The, Bank0406_Text_ThesePokemonTrainersWho },
@@ -334,6 +331,7 @@ static const WbtListMessages sWbtListMessages[4] = {
     { 0, 0, 0, 0 }
 };
 
+// clang-format off
 static const WbtListWindowSetup sWbtListWindows[WINDOW_COUNT + 1] = {
     { 4, 2, 4, 28, 2, 2 },
     { 4, 2, 17, 28, 2, 2 },
@@ -341,6 +339,9 @@ static const WbtListWindowSetup sWbtListWindows[WINDOW_COUNT + 1] = {
     { 0xff, 0, 0, 0, 0, 0 }
 };
 
+// clang-format on
+
+// clang-format off
 static const WbtListObjResSetup sWbtListObjRes[OBJ_RES_COUNT] = {
     { 2, OBJ_RES_PALETTE, 0, 6 },
     { 5, OBJ_RES_CHARS, 0, 0 },
@@ -348,6 +349,9 @@ static const WbtListObjResSetup sWbtListObjRes[OBJ_RES_COUNT] = {
     { 11, -1, 0, 0 }
 };
 
+// clang-format on
+
+// clang-format off
 static const WbtListTrainerSetup sWbtListTrainers[ENTRANT_COUNT + 1] = {
     { 0x07, 0x03, TRAINER_PALETTE + 0, 0, 64, 0 },
     { 0x0d, 0x03, TRAINER_PALETTE + 1, 1, 64, 0 },
@@ -360,8 +364,11 @@ static const WbtListTrainerSetup sWbtListTrainers[ENTRANT_COUNT + 1] = {
     { 0xff, 0, 0, 0, 0, 0 }
 };
 
+// clang-format on
+
 const GameProcFunctions WBT_LIST_PROC_FUNCTIONS = { WbtListProc_Init, WbtListProc_Main, WbtListProc_Exit };
 
+// clang-format off
 static const WbtListNameSetup sWbtListNames[ENTRANT_COUNT + 1] = {
     { 8, 2, 56, 1, TRUE, 0, 16, 0 },
     { 8, 2, 56, 1, TRUE, 0, 17, 0 },
@@ -374,7 +381,10 @@ static const WbtListNameSetup sWbtListNames[ENTRANT_COUNT + 1] = {
     { 0xff, 0, 0, 0, 0, 0, 0, 0 }
 };
 
+// clang-format on
+
 // The bracket's lines: the four of the first round and the two of the second, each from either of its two entrants
+// clang-format off
 static const u16 sWbtListLines[LINE_COUNT * 2 * LINE_VALUE_COUNT] = {
     32, ACTOR_FLAG_ANIMATE, 8, 9,
     33, ACTOR_FLAG_ANIMATE | ACTOR_FLAG_FLIP_X, 8, 9,
@@ -389,6 +399,8 @@ static const u16 sWbtListLines[LINE_COUNT * 2 * LINE_VALUE_COUNT] = {
     42, ACTOR_FLAG_ANIMATE | ACTOR_FLAG_FLIP_Y, 10, 11,
     43, ACTOR_FLAG_ANIMATE | ACTOR_FLAG_FLIP_Y | ACTOR_FLAG_FLIP_X, 10, 11,
 };
+
+// clang-format on
 
 static const WbtListActorSetup sWbtListActors[ACTOR_COUNT + 1] = {
     { 0, 48, 1, TRUE, 0, 0, 8, 0 },
@@ -1186,8 +1198,8 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
     }
     src = GFL_MsgDataLoadStrbufNew(work->msgData, messageId);
     GFL_WordSetFormatStrbuf(wordSet, work->strbuf, src);
-    work->stream = func_02022268(work->windows[WINDOW_MESSAGE].window, 0, 0, work->strbuf, work->font,
-                                 func_02017bcc(), work->tcbManager, 4, work->heapId, 15);
+    work->stream = func_02022268(work->windows[WINDOW_MESSAGE].window, 0, 0, work->strbuf, work->font, func_02017bcc(),
+                                 work->tcbManager, 4, work->heapId, 15);
     window = work->windows[WINDOW_MESSAGE].window;
     BmpWin_TransferNow(window);
     GFL_WordSetSystemFree(wordSet);

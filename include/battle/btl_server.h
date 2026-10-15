@@ -6,13 +6,13 @@
 // where it has them
 
 #include "types.h"
-#include "gfl/heap.h"
-#include "gfl/str.h"
-#include "nitro/math.h"
 #include "battle/btl_action.h"
 #include "battle/btl_calc.h"
 #include "battle/btl_rec.h"
 #include "battle/btl_server_cmd.h"
+#include "gfl/heap.h"
+#include "gfl/str.h"
+#include "nitro/math.h"
 #include "struct_decls.h"
 
 // A client the server sends commands to
@@ -70,8 +70,8 @@ struct BtlServer {
     u8 unkCC2[2];
 };
 
-BtlServer *func_ov167_0219e3cc(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon,
-                               u32 a3, HeapID heapId);
+BtlServer *func_ov167_0219e3cc(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon, u32 a3,
+                               HeapID heapId);
 void func_ov167_0219e498(BtlServer *server, BtlAdapter *adapter, u8 clientId, u8 numCoverPos);
 void func_ov167_0219e4d0(BtlServer *server, u32 mode, void *netHandle, u8 clientId, u8 numCoverPos);
 void func_ov167_0219e514(BtlServer *server, u8 clientId, u8 numCoverPos);
@@ -126,6 +126,5 @@ void func_ov167_0219f33c(BtlServer *server);
 void func_ov167_0219f348(BtlServer *server);
 void RequestChangePokemon(BtlServer *server, u8 pos);
 BtlServerFlow *func_ov167_0219f38c(BtlServer *server);
-
 
 #endif // POKEBW2_BATTLE_BTL_SERVER_H

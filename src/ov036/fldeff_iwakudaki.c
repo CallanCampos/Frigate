@@ -41,6 +41,7 @@ static void func_ov036_021a5798(FieldEffectTask *task, void *work);
 static void func_ov036_021a57bc(FieldEffectTask *task, void *work);
 static void func_ov036_021a57ec(FieldEffectTask *task, void *work);
 
+// clang-format off
 static const FieldEffectTaskVTable ROCK_SMASH_TASK_VTABLE = {
     sizeof(RockSmashTask),
     func_ov036_021a5734,
@@ -49,11 +50,13 @@ static const FieldEffectTaskVTable ROCK_SMASH_TASK_VTABLE = {
     func_ov036_021a57ec,
 };
 
+// clang-format on
+
 static u32 ROCK_SMASH_ANM_IDS[ROCK_SMASH_ANM_COUNT] = { 117, 105, 155, 136 };
 
 void *func_ov036_021a5604(FieldEffects *effects, HeapID heapId) {
-    FieldEffectRockSmash *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectRockSmash), TRUE, "fldeff_iwakudaki.c",
-                                                    103);
+    FieldEffectRockSmash *effect =
+        GFL_HeapAllocate(heapId, sizeof(FieldEffectRockSmash), TRUE, "fldeff_iwakudaki.c", 103);
 
     effect->effects = effects;
     func_ov036_021a563c(effect);

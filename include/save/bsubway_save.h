@@ -2,8 +2,8 @@
 #define POKEBW2_SAVE_BSUBWAY_SAVE_H
 
 #include "types.h"
-#include "nitro/rtc.h"
 #include "gfl/heap.h"
+#include "nitro/rtc.h"
 #include "struct_decls.h"
 
 // The Battle Subway's save blocks: 0x38 the current play, 0x39 the scores, which include the Battle Points, and 0x3a

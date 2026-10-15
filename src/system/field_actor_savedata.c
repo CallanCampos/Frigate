@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/field_actor_savedata.h"
 #include "field/field_actor.h"
 #include "field/field_actor_internal.h"
 #include "gfl/std.h"
+#include "save/field_actor_savedata.h"
 
 // The save block of the field's actors, and the index of an object code's record, which the actors' system reads its
 // configs with. The ROM has no string for the file, so the name is descriptive. Block 0x29.

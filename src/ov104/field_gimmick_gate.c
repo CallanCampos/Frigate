@@ -6,9 +6,9 @@
 #include "field/field_environment.h"
 #include "field/field_exp_obj.h"
 #include "field/field_gimmick_gate.h"
-#include "field/gimmick_obj_elboard.h"
 #include "field/field_map.h"
 #include "field/field_script.h"
+#include "field/gimmick_obj_elboard.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/calctool.h"
@@ -122,17 +122,23 @@ typedef enum GimmickGateScene {
 // The board advances by this each frame
 static fx32 sBoardStep = FX32_ONE;
 
+// clang-format off
 static const G3DSceneAnimationSetup sScene0Animations[] = {
     { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 }, { 7, 0 }, { 8, 0 }, { 17, 0 },
     { 18, 0 }, { 19, 0 }, { 20, 0 }, { 21, 0 }, { 22, 0 }, { 23, 0 }, { 24, 0 }, { 25, 0 },
     { 26, 0 }, { 27, 0 }, { 28, 0 }, { 16, 0 }, { 29, 0 }, { 30, 0 },
 };
 
+// clang-format on
+
+// clang-format off
 static const G3DSceneAnimationSetup sScene1Animations[] = {
     { 9, 0 }, { 10, 0 }, { 11, 0 }, { 12, 0 }, { 13, 0 }, { 14, 0 }, { 15, 0 }, { 17, 0 },
     { 18, 0 }, { 19, 0 }, { 20, 0 }, { 21, 0 }, { 22, 0 }, { 23, 0 }, { 24, 0 }, { 25, 0 },
     { 26, 0 }, { 27, 0 }, { 28, 0 }, { 16, 0 }, { 29, 0 }, { 30, 0 },
 };
+
+// clang-format on
 
 static const G3DSceneActorSetup sScene0Actors[] = {
     { 0, 0, 1, 0, sScene0Animations, NELEMS(sScene0Animations) },
@@ -142,6 +148,7 @@ static const G3DSceneActorSetup sScene1Actors[] = {
     { 0, 0, 1, 0, sScene1Animations, NELEMS(sScene1Animations) },
 };
 
+// clang-format off
 static const G3DSceneResourceSetup sSceneResources[] = {
     { 0x83, 0, 0 }, { 0x83, 1, 0 }, { 0x83, 2, 0 }, { 0x83, 3, 0 },
     { 0x83, 4, 0 }, { 0x83, 5, 0 }, { 0x83, 6, 0 }, { 0x83, 7, 0 },
@@ -152,6 +159,8 @@ static const G3DSceneResourceSetup sSceneResources[] = {
     { 0x83, 26, 0 }, { 0x83, 27, 0 }, { 0x83, 28, 0 }, { 0x83, 29, 0 },
     { 0x83, 30, 0 }, { 0x83, 31, 0 }, { 0x83, 32, 0 },
 };
+
+// clang-format on
 
 static const G3DSceneSetup sSceneSetups[GATE_SCENE_COUNT] = {
     { sSceneResources, NELEMS(sSceneResources), sScene0Actors, NELEMS(sScene0Actors) },
@@ -185,7 +194,8 @@ void func_ov104_021eec80(Field *field) {
     GimmickGateWork *work;
     GimmickGateScene scene;
 
-    func_02008a84((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(field)))));
+    func_02008a84(
+        (Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(field)))));
     scene = GATE_SCENE_1;
     LoadFieldExpandObjData(expObj, &sSceneSetups[scene], scene);
     work = func_ov104_021eee34(field);
@@ -341,8 +351,8 @@ void func_ov104_021eeee0(GimmickGateWork *work) {
         return;
     }
     zone = Field_GetPlayerStateZoneID(work->field);
-    work->zoneData = GFL_HeapAllocate(work->heapId, sizeof(struct GimmickGateZoneData), FALSE,
-                                      "field_gimmick_gate.c", 0x39b);
+    work->zoneData =
+        GFL_HeapAllocate(work->heapId, sizeof(struct GimmickGateZoneData), FALSE, "field_gimmick_gate.c", 0x39b);
     count = GFL_ArcSysGetDataMax(0xac);
     for (i = 0; i < count; i++) {
         func_ov104_021f0150(&temp, 0xac, i);
@@ -479,7 +489,7 @@ void func_ov104_021ef114(GimmickGateWork *work) {
     if (work->boardEntries == 0) {
         count = GFL_ArcSysGetDataMax(0xa4);
         work->boardEntries = GFL_HeapAllocate(work->heapId, count * sizeof(struct GimmickGateBoardEntry), FALSE,
-                                         "field_gimmick_gate.c", 0x4b5);
+                                              "field_gimmick_gate.c", 0x4b5);
         for (i = 0; i < count; i++) {
             func_ov104_021f0324(&work->boardEntries[i], 0xa4, i);
         }
@@ -510,8 +520,7 @@ GimmickGateBoardEntry *func_ov104_021ef180(GimmickGateWork *work) {
     for (i = 0; i < work->boardEntryCount; i++) {
         flag = EventWork_FlagGet(eventWork, work->boardEntries[i].flagId);
         zoneMatch = func_ov104_021f0334(&work->boardEntries[i], zone);
-        if (func_ov104_021f037c(&work->boardEntries[i]) && flag &&
-            zoneMatch) {
+        if (func_ov104_021f037c(&work->boardEntries[i]) && flag && zoneMatch) {
             return &work->boardEntries[i];
         }
     }

@@ -3,9 +3,9 @@
 
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
+#include "app/name_entry.h"
 #include "gfl/str.h"
 #include "system/game_event.h"
-#include "app/name_entry.h"
 
 struct EventPhraseInputData {
     GameSystem *gsys;

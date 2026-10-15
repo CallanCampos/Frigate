@@ -1,7 +1,7 @@
 #include "types.h"
-#include "field/event_poke_status.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
+#include "field/event_poke_status.h"
 #include "field/field_event.h"
 #include "gfl/heap.h"
 #include "pml/poke_party.h"

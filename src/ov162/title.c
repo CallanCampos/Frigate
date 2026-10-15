@@ -202,23 +202,67 @@ static const G3DSceneResourceSetup sResources[] = {
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
 static const BGSetup sBGSetupSub3 = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
-    GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_256,
+    GX_BG_SCRBASE(0x0000),
+    GX_BG_CHARBASE(0x04000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    2,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sBGSetupSub2 = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0x1000), GX_BG_CHARBASE(0x04000), 0x8000,
-    GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_256,
+    GX_BG_SCRBASE(0x1000),
+    GX_BG_CHARBASE(0x04000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    3,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sBGSetupMain3 = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0800), GX_BG_CHARBASE(0x04000), 0x4000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x0800),
+    GX_BG_CHARBASE(0x04000),
+    0x4000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sBGSetupSub1 = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0800), GX_BG_CHARBASE(0x0c000), 0x4000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x0800),
+    GX_BG_CHARBASE(0x0c000),
+    0x4000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const VecFx32 sCameraPosition = { 0, 0, 0 };
@@ -247,6 +291,7 @@ static const SRTMatrix sTransform = {
     { { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE } } },
 };
 
+// clang-format off
 static const BGSysVRAMConfig sVRAMConfig = {
     GX_VRAM_BG_32_FG,
     GX_VRAM_BGEXTPLTT_NONE,
@@ -261,6 +306,8 @@ static const BGSysVRAMConfig sVRAMConfig = {
     GX_OBJVRAMMODE_CHAR_1D_64K,
     GX_OBJVRAMMODE_CHAR_1D_32K,
 };
+
+// clang-format on
 
 const GameProcFunctions TITLE_PROC_FUNCTIONS = { Title_Init, Title_Main, Title_Exit };
 
@@ -294,8 +341,7 @@ static void Title_UpdateTimer(TitleWork *wk) {
 }
 
 static void Title_HandleInput(TitleWork *wk) {
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_BUTTON_START)) &&
-        wk->layers == LAYERS_HIDDEN) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_BUTTON_START)) && wk->layers == LAYERS_HIDDEN) {
         GFL_BGSysSetDisplayLayout(0);
         GFL_BGSysSetBGEnabled(6, TRUE);
         GFL_BGSysSetBGEnabled(3, TRUE);
@@ -569,9 +615,9 @@ static void TitleG3D_Init(TitleG3D *g3d, HeapID heapId) {
     // The original divides near * aspect by FX32_ONE at run time
     right = FX_Div(FX_Mul(FX_Div(FX_Mul(CAMERA_NEAR, CAMERA_ASPECT), FX32_ONE), sin), cos);
     left = -FX_Div(FX_Mul(FX_Div(FX_Mul(CAMERA_NEAR, CAMERA_ASPECT), FX32_ONE), sin), cos);
-    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_FRUSTUM, top, bottom, left, right, CAMERA_NEAR,
-                                      FX32_CONST(2048), CAMERA_NEAR, &sCameraPosition, &sCameraUpVector,
-                                      &sCameraTarget, heapId);
+    g3d->camera =
+        GFL_G3DCameraCreate(G3DCAM_PROJECTION_FRUSTUM, top, bottom, left, right, CAMERA_NEAR, FX32_CONST(2048),
+                            CAMERA_NEAR, &sCameraPosition, &sCameraUpVector, &sCameraTarget, heapId);
     g3d->curve = GFL_G3DCurveLoadFileAll(heapId, ARCID_DEMO3D_RESOURCE, CURVE_FILE);
     g3d->light = GFL_G3DLightCreate(&sLightSetupList, heapId);
     GFL_G3DLightFlush(g3d->light);

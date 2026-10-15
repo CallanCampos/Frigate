@@ -12,16 +12,16 @@
 #include "field/zone.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
+#include "gfl/random.h"
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
-#include "gfl/random.h"
 #include "nitro/fx.h"
 #include "nitro/rtc.h"
 #include "pml/poke_party.h"
 #include "save/box.h"
 #include "save/config.h"
-#include "save/hall_of_fame.h"
 #include "save/event_work.h"
+#include "save/hall_of_fame.h"
 #include "save/player_info.h"
 #include "save/pokedex.h"
 #include "save/save_control.h"
@@ -471,7 +471,6 @@ BOOL func_ov012_02155d80(VM *vm, FieldScriptEnv *env) {
     *result = (func_0200ca50(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) & 1) ? TRUE : FALSE;
     return FALSE;
 }
-
 
 BOOL func_ov012_02155db4(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);

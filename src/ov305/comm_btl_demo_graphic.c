@@ -63,11 +63,14 @@ static void CommBtlDemoG3dSys_End(CommBtlDemoG3dSys *g3d);
 static const VecFx32 sCommBtlDemoCameraTarget = { 0, 0, 0 };
 static const VecFx32 sCommBtlDemoCameraPosition = { 0, 0, FX32_CONST(128) };
 
+// clang-format off
 static const BGSysVRAMConfig sCommBtlDemoVRAMConfig = {
     GX_VRAM_BG_128_A, GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_64_E, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_01_BD, GX_VRAM_TEXPLTT_0_F,    GX_OBJVRAMMODE_CHAR_1D_64K, GX_OBJVRAMMODE_CHAR_1D_64K,
 };
+
+// clang-format on
 
 // BG1 to BG3 of the main screen and BG0 to BG2 of the sub screen
 static const CommBtlDemoBGSetup sCommBtlDemoBGSetups[BG_COUNT] = {

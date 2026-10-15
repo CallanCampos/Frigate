@@ -181,13 +181,13 @@ static void func_ov167_021b0b90(BtlServerCmdQueue *que, u32 event, s32 format, c
                      ((args[4] & 0x1f) << 5) | ((args[3] & 0x1f) << 10) | (args[5] & 0x1f));
         break;
     case 0x16:
-        func_ov167_021b0a1c(que, ((args[0] & 7) << 5) | ((args[1] & 3) << 3) | ((args[2] & 1) << 2)
-                                     | ((args[3] & 1) << 1) | (args[4] & 1));
+        func_ov167_021b0a1c(que, ((args[0] & 7) << 5) | ((args[1] & 3) << 3) | ((args[2] & 1) << 2) |
+                                     ((args[3] & 1) << 1) | (args[4] & 1));
         func_ov167_021b0a58(que, args[5]);
         break;
     case 0x26:
-        func_ov167_021b0ab0(que, ((args[0] & 0x1f) << 15) | ((args[1] & 0x1f) << 10) | ((args[2] & 0x1f) << 5)
-                                     | (args[3] & 0x1f));
+        func_ov167_021b0ab0(que, ((args[0] & 0x1f) << 15) | ((args[1] & 0x1f) << 10) | ((args[2] & 0x1f) << 5) |
+                                     (args[3] & 0x1f));
         func_ov167_021b0a58(que, args[4]);
         func_ov167_021b0a58(que, args[5]);
         break;

@@ -147,18 +147,51 @@ static const BGSysVRAMConfig sDebugVRAMConfig = {
 static const BGSysLCDConfig sDebugLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
 
 static const BGSetup sDebugBG3Setup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0800), GX_BG_CHARBASE(0x0c000), 0x8000,
-    GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x0800),
+    GX_BG_CHARBASE(0x0c000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    3,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sDebugBG1Setup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x0000),
+    GX_BG_CHARBASE(0x04000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSetup sDebugBG5Setup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x0000),
+    GX_BG_CHARBASE(0x04000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 const GameProcFunctions CONTINUE_PROC_FUNCTIONS = { Continue_Init, Continue_Main, Continue_Exit };
@@ -387,9 +420,9 @@ static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     func_02007324(save);
     func_02008ab4((Config *)getTrainerDataBlkAddress(save));
     func_02008fb8(save, &location);
-    GCTX_ProcMgrReplaceProc(OVERLAY_NONE, &GAMESYSTEM_PROC_FUNCTIONS,
-                            GameSystem_CreateProcData(GAME_ENTRYPOINT_FIELD_CONTINUE, location.zoneId,
-                                                      &location.pos, location.unk18));
+    GCTX_ProcMgrReplaceProc(
+        OVERLAY_NONE, &GAMESYSTEM_PROC_FUNCTIONS,
+        GameSystem_CreateProcData(GAME_ENTRYPOINT_FIELD_CONTINUE, location.zoneId, &location.pos, location.unk18));
     func_02008af0(wk->config, cgearOn);
     func_0200ca6c(wk->gameInfo, gameInfoValues[0]);
     func_0200ca78(wk->gameInfo, gameInfoValues[1]);
@@ -560,7 +593,8 @@ static void DebugGameStart_CreateBG(const BGSetup *setup, u8 bg) {
 // The question on the sub screen, and the two answers on the main screen. The messages are those of system message
 // file 363: the questions from 0, and their answers from 5, two to a question
 static void DebugGameStart_CreateWindows(DebugGameStartWork *wk) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_START_2, HEAPID_DEBUG_GENDER_SELECT);
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_START_2, HEAPID_DEBUG_GENDER_SELECT);
     StrBuf *strbuf;
     u8 i;
 

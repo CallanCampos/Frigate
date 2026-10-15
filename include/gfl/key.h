@@ -38,5 +38,4 @@ void func_0203df90(SystemUI *ui, u32 pressed, u32 pressed30);
 void func_0203dfa0(SystemUI *ui, u32 held, u32 held30);
 void func_0203dfb0(SystemUI *ui, u32 typed, u32 typed30);
 
-
 #endif // POKEBW2_GFL_KEY_H

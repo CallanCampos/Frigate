@@ -1605,6 +1605,7 @@ static void IrcBattleMatch_UpdateLinkChange(IrcBattleMatch *work) {
 }
 
 // The message the multi battle and the others show once the link is lost, by mode
+// clang-format off
 static IrcBattleMatchMsg sIrcBattleMatchWaitMessages[] = {
     { IRCMATCH_MSG_BATTLE_STARTING },
     { IRCMATCH_MSG_BATTLE_STARTING },
@@ -1621,6 +1622,8 @@ static IrcBattleMatchMsg sIrcBattleMatchWaitMessages[] = {
     { IRCMATCH_MSG_WAIT_MOMENT },
     { IRCMATCH_MSG_WAIT_MOMENT },
 };
+
+// clang-format on
 
 static void IrcBattleMatch_StateConnectLoop(IrcBattleMatch *work) {
     if (work->linkChangePending && work->mode == IRCBATTLEMATCH_MODE_MULTI) {

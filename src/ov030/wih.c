@@ -442,8 +442,8 @@ void WH_SetScanTarget(u16 channel, const u8 *mac) {
 static BOOL WH_CheckBssDesc(const WMBssDesc *bssDesc) {
     u16 length = bssDesc->gameInfoLength;
 
-    if (length < 0x10 || length > 0x80 || length != bssDesc->gameInfo.userGameInfoLength + 0x10
-        || bssDesc->gameInfo.magicNumber != 1 || length < 8 || bssDesc->gameInfo.ggid != _pWmInfo->sParentParam.ggid) {
+    if (length < 0x10 || length > 0x80 || length != bssDesc->gameInfo.userGameInfoLength + 0x10 ||
+        bssDesc->gameInfo.magicNumber != 1 || length < 8 || bssDesc->gameInfo.ggid != _pWmInfo->sParentParam.ggid) {
         return FALSE;
     }
     if ((bssDesc->gameInfo.gameNameCount_attribute & 3) == 1) {
@@ -1040,7 +1040,8 @@ static void WH_StateOutInitialize(void *arg) {
     }
 }
 
-// WH_ParentConnect: starts as a parent, in the mode of the connection (the multi-point mode, the keys or the data shared)
+// WH_ParentConnect: starts as a parent, in the mode of the connection (the multi-point mode, the keys or the data
+// shared)
 BOOL WH_ParentConnect(u16 mode, u16 tgid, u16 channel, u16 maxEntry) {
     _pWmInfo->sBeaconCount = 0;
     _pWmInfo->sConnectMode = mode;
@@ -1223,7 +1224,8 @@ void WH_SetScanCallback(WHScanCallback callback) {
 
 // WH_SetGameInfo: the parent's beacon, once the machine is connected
 void WH_SetGameInfo(const void *data, int size, u32 ggid, int tgid) {
-    if (_pWmInfo != NULL && (_pWmInfo->sSysState == WH_SYSSTATE_CONNECTED || _pWmInfo->sSysState == WH_SYSSTATE_DATASHARING)) {
+    if (_pWmInfo != NULL &&
+        (_pWmInfo->sSysState == WH_SYSSTATE_CONNECTED || _pWmInfo->sSysState == WH_SYSSTATE_DATASHARING)) {
         func_020824bc(NULL, data, size, ggid, tgid, 1);
     }
 }

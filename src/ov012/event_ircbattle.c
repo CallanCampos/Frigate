@@ -127,8 +127,8 @@ void func_ov012_021504a4(EventIRCWork *work, GameData *gameData) {
     }
     for (i = 0; i < count; i++) {
         info = func_02017378(gameData, i);
-        if (i != func_02042a6c(func_02040440()) && info != NULL
-            && func_0200a438(GameData_GetWifiList(gameData), info, &friendIndex)) {
+        if (i != func_02042a6c(func_02040440()) && info != NULL &&
+            func_0200a438(GameData_GetWifiList(gameData), info, &friendIndex)) {
             if (i == partner) {
                 func_0200a29c(GameData_GetWifiList(gameData), friendIndex);
             } else if (work->players.result == 0) {
@@ -462,7 +462,6 @@ GameEventReturnCode EventIRC_Callback(GameEvent *event, u32 *state, void *data) 
     }
     return GAMEEVENT_CONTINUE;
 }
-
 
 GameEvent *CallIRC(GameSystem *gsys, Field *field, GameEvent *event, BOOL create) {
     EventIRCWork *work;

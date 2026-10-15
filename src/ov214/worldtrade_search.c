@@ -22,10 +22,10 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "pml/personal.h"
-#include "worldtrade_local.h"
 #include "system/bmp_menulist.h"
 #include "system/bmp_winframe.h"
 #include "system/wipe.h"
+#include "worldtrade_local.h"
 
 // The Global Trade Station's search screen, where the player sets the Pokémon, gender, level and country to look for,
 // asks the server, and picks one of the trainers found on the lower screen. The names are ours, guessed

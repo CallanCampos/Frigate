@@ -97,12 +97,11 @@ typedef BOOL (*DWCAttemptFunc)(void *param);
 BOOL func_ov011_0215fef8(int type, u8 numEntry, const char *query, DWCMatchedFunc matched, void *matchedParam,
                          DWCNewClientFunc newClient, void *newClientParam, DWCEvalFunc eval, void *evalParam,
                          DWCAttemptFunc attempt, int *attemptParam, void *param);
-BOOL func_ov011_0215ff7c(int type, u8 numEntry, DWCMatchedFunc matched, void *matchedParam,
-                         DWCNewClientFunc newClient, void *newClientParam, DWCAttemptFunc attempt,
-                         int *attemptParam, void *param);
+BOOL func_ov011_0215ff7c(int type, u8 numEntry, DWCMatchedFunc matched, void *matchedParam, DWCNewClientFunc newClient,
+                         void *newClientParam, DWCAttemptFunc attempt, int *attemptParam, void *param);
 BOOL func_ov011_0215fff4(int type, int friendIndex, DWCMatchedFunc matched, void *matchedParam,
-                         DWCNewClientFunc newClient, void *newClientParam, DWCAttemptFunc attempt,
-                         int *attemptParam, void *param);
+                         DWCNewClientFunc newClient, void *newClientParam, DWCAttemptFunc attempt, int *attemptParam,
+                         void *param);
 BOOL func_ov011_02160ed4(int index, const char *key, const char *value);
 
 // The machines: their IDs and which are there

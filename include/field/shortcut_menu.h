@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_SHORTCUT_MENU_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "field/app_call.h"
+#include "struct_decls.h"
 #include "system/game_event.h"
 
 struct ShortcutMenuWork {

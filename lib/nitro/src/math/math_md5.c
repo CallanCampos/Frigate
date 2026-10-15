@@ -14,11 +14,14 @@
 static u8 MD5_PADDING = 0x80;
 
 // Which word of the block each step of rounds 2 to 4 reads (round 1 reads them in order)
+// clang-format off
 static u32 MD5_MSG_INDEX[48] = {
     1, 6, 11, 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12,
     5, 8, 11, 14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2,
     0, 7, 14, 5, 12, 3, 10, 1, 8, 15, 6, 13, 4, 11, 2, 9,
 };
+
+// clang-format on
 
 // The integer parts of the sines the MD5 steps add
 static u32 MD5_PARTS_OF_SINES[64] = {
@@ -35,13 +38,13 @@ static u32 MD5_PARTS_OF_SINES[64] = {
 static void md5_transform(MATHMD5Context *context);
 
 // One MD5 step: a becomes b plus a rotated sum of a, the round's function of b, c and d, a word of the block and a sine
-#define MD5_STEP(a, b, c, d, f, word, sine, shift) \
-    {                                            \
-        u32 k = (sine);                          \
-        u32 m = (word);                          \
-        u32 mixed = (f);                         \
-        u32 sum = k + (m + ((a) + mixed));       \
-        (a) = (b) + MD5_ROTL(sum, (shift));      \
+#define MD5_STEP(a, b, c, d, f, word, sine, shift)                                                                     \
+    {                                                                                                                  \
+        u32 k = (sine);                                                                                                \
+        u32 m = (word);                                                                                                \
+        u32 mixed = (f);                                                                                               \
+        u32 sum = k + (m + ((a) + mixed));                                                                             \
+        (a) = (b) + MD5_ROTL(sum, (shift));                                                                            \
     }
 
 #define MD5_F(b, c, d) (((b) & (c)) | (~(b) & (d)))

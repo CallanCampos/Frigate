@@ -47,9 +47,9 @@ BOOL ghiDecryptReceivedData(GHIConnection *connection) {
         } while (result == 2 && outSize == 0);
 
         if (inSize > connection->decodeBuffer.length) {
-            func_ov011_0216cca8(8, 4, 1,
-                                "ghiDecryptReceivedData read past the end of connection->decodeBuffer! (%d\\%d bytes)\r\n",
-                                inSize, connection->decodeBuffer.length);
+            func_ov011_0216cca8(
+                8, 4, 1, "ghiDecryptReceivedData read past the end of connection->decodeBuffer! (%d\\%d bytes)\r\n",
+                inSize, connection->decodeBuffer.length);
             return FALSE;
         }
         connection->decodeBuffer.pos += inSize;

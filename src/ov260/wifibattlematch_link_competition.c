@@ -190,7 +190,8 @@ static BOOL WifiBattleMatchLink_CompetitionInit(GameProc *proc, u32 *state, void
     link = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchLinkCompetition), HEAPID_WIFIBATTLEMATCH_LINK);
     sys_memset(link, 0, sizeof(WifiBattleMatchLinkCompetition));
     link->param = linkParam;
-    link->entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(linkParam->param->gameData)), 0);
+    link->entry =
+        TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(linkParam->param->gameData)), 0);
     link->graphic = WifiBattleMatchGraphic_Create(1, HEAPID_WIFIBATTLEMATCH_LINK);
     link->res =
         WifiBattleMatchRes_Create(WifiBattleMatchGraphic_GetClActUnit(link->graphic), 0, HEAPID_WIFIBATTLEMATCH_LINK);
@@ -201,7 +202,7 @@ static BOOL WifiBattleMatchLink_CompetitionInit(GameProc *proc, u32 *state, void
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_FISHING, HEAPID_WIFIBATTLEMATCH_LINK);
     link->wordSet = GFL_WordSetSystemCreate(8, 0x40, HEAPID_WIFIBATTLEMATCH_LINK);
     link->net = WifiBattleMatchNet_Create(link->param->unk3C, linkParam->param->gameData, linkParam->unk1C,
-                                    HEAPID_WIFIBATTLEMATCH_LINK);
+                                          HEAPID_WIFIBATTLEMATCH_LINK);
     link->msgBox =
         WifiBattleMatchMsgBox_Create(0, 15, 14, 10, link->printQueue, link->font, HEAPID_WIFIBATTLEMATCH_LINK);
     link->task =
@@ -2010,7 +2011,8 @@ static void WifiBattleMatchLink_CompetitionTaskResult(WifiBattleMatchTask *task,
         WifiBattleMatchTask_SetReturnSeq(task, 2);
         break;
     case 2:
-        WifiBattleMatchNet_StartReport(link->net, 1, 0, param->param->unk4, &param->battleResult->result, param->result == 2);
+        WifiBattleMatchNet_StartReport(link->net, 1, 0, param->param->unk4, &param->battleResult->result,
+                                       param->result == 2);
         link->exchangeDone = 0;
         link->exchangeResult = 0;
         *seq = 3;
@@ -2741,13 +2743,14 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     entry = link->entry;
     playerInfo = GetGameDataPlayerInfo(link->param->param->gameData);
     unit = WifiBattleMatchGraphic_GetClActUnit(link->graphic);
-    previous = TournamentBlock_GetTeam(getTournamentBlockAddress(GameData_GetSaveControl(link->param->param->gameData)), 0);
+    previous =
+        TournamentBlock_GetTeam(getTournamentBlockAddress(GameData_GetSaveControl(link->param->param->gameData)), 0);
     sys_memset(&info, 0, sizeof(info));
     sys_memcpy(func_0200b794(entry), &info, 0x92);
-    info.startDate =
-        WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
-    info.endDate =
-        WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
+    info.startDate = WifiBattleMatchLink_PackBytes(
+        TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
+    info.endDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8),
+                                                 TournamentEntry_GetField(entry, 9));
     info.look = func_02008bf4(playerInfo);
     info.unkA0 = RndMatchData_GetParam(link->param->record, 10, 0);
     first = RndMatchData_GetParam(link->param->record, 10, 1);

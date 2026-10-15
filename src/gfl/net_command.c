@@ -78,6 +78,7 @@ static void *func_02040d48(int command);
 static void *func_02040d5c(int command);
 static int func_02041048(void);
 
+// clang-format off
 static const NetCommand sBaseCommands[GFL_NET_CMD_BASE_COUNT] = {
     { (void *)func_02040e0c, NULL },
     { func_02041cd8, NULL },
@@ -97,6 +98,8 @@ static const NetCommand sBaseCommands[GFL_NET_CMD_BASE_COUNT] = {
     { func_02043d6c, NULL },
     { (void *)func_02040e0c, NULL },
 };
+
+// clang-format on
 
 static NetCommandTable _BaseTable = { sBaseCommands, GFL_NET_CMD_BASE_COUNT };
 
@@ -273,16 +276,16 @@ void func_02040e10(int netId, int size, const void *data, void *work, NetHandle 
     if (handle == func_02040440() && _pCommandWork->aNetHugeRecv[index].used) {
         if (_pCommandWork->aNetHugeRecv[index].data != NULL) {
             sys_memcpy(data,
-                _pCommandWork->aNetHugeRecv[index].data
-                    + _pCommandWork->aNetHugeRecv[index].chunksReceived * _pCommandWork->aNetHugeRecv[index].chunkSize,
-                size);
+                       _pCommandWork->aNetHugeRecv[index].data + _pCommandWork->aNetHugeRecv[index].chunksReceived *
+                                                                     _pCommandWork->aNetHugeRecv[index].chunkSize,
+                       size);
         }
         _pCommandWork->aNetHugeRecv[index].chunksReceived++;
         if (_pCommandWork->aNetHugeRecv[index].chunksReceived == _pCommandWork->aNetHugeRecv[index].chunkCount) {
             if (_pCommandWork->aNetHugeRecv[index].data != NULL) {
                 func_02040d78(netId, _pCommandWork->aNetHugeRecv[index].netIds,
-                    _pCommandWork->aNetHugeRecv[index].command, _pCommandWork->aNetHugeRecv[index].size,
-                    _pCommandWork->aNetHugeRecv[index].data, handle);
+                              _pCommandWork->aNetHugeRecv[index].command, _pCommandWork->aNetHugeRecv[index].size,
+                              _pCommandWork->aNetHugeRecv[index].data, handle);
             }
             _pCommandWork->aNetHugeRecv[index].used = FALSE;
         }
@@ -297,7 +300,9 @@ void func_02040ebc(int netId, int size, const void *data, void *work, NetHandle 
         index = GFL_NET_HANDLE_MAX - 1;
     }
     if (handle == func_02040440() && func_02040de8(header->command, netId, header->size)) {
+        // clang-format off
         GFL_ASSERT(_pCommandWork->aNetHugeRecv[index].used==FALSE);
+        // clang-format on
         _pCommandWork->aNetHugeRecv[index].used = TRUE;
         _pCommandWork->aNetHugeRecv[index].size = header->size;
         _pCommandWork->aNetHugeRecv[index].data = func_02040de8(header->command, netId, header->size);
@@ -325,7 +330,9 @@ int func_02040f84(NetHandle *handle, u8 netIds, u16 command, u32 size, void *dat
     }
     send = &_pCommandWork->hugeSends[i];
     send->size = size;
+    // clang-format off
     GFL_ASSERT((pNetIni->maxSendSize - _HUGEDATA_DIFFBYTE)>0);
+    // clang-format on
     send->chunkSize = pNetIni->maxSendSize - _HUGEDATA_DIFFBYTE;
     send->chunkCount = size / send->chunkSize;
     send->lastSize = size % send->chunkSize;
@@ -355,8 +362,8 @@ static int func_02041048(void) {
             header.command = send->command;
             header.chunkSize = send->chunkSize;
             header.netIds = send->netIds;
-            send->sending = func_0203fafc(NET_CMD_HUGE_HEADER, (u8 *)&header, sizeof(header), 1, send->netId,
-                send->netIds, FALSE);
+            send->sending =
+                func_0203fafc(NET_CMD_HUGE_HEADER, (u8 *)&header, sizeof(header), 1, send->netId, send->netIds, FALSE);
             send->headerPending = 1 - send->sending;
             return send->sending;
         }

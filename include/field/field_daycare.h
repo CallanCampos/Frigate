@@ -2,11 +2,11 @@
 #define POKEBW2_FIELD_FIELD_DAYCARE_H
 
 #include "types.h"
-#include "gfl/heap.h"
-#include "app/pokelist.h"
 #include "app/p_status.h"
-#include "system/game_event.h"
+#include "app/pokelist.h"
+#include "gfl/heap.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // The event that picks a party Pokémon to leave at the day care
 typedef struct {

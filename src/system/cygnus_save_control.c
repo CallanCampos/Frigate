@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/cygnus_save_control.h"
 #include "constants/species.h"
 #include "gfl/backup_system.h"
 #include "gfl/heap.h"
+#include "save/cygnus_save_control.h"
 #include "save/dream_world.h"
 #include "save/save_control.h"
 
@@ -25,6 +25,7 @@ typedef struct {
 static BOOL IsDreamRadarSaveValid(void *buffer);
 static void updateCardData(SaveControl *save);
 
+// clang-format off
 static const CygnusPokemon sPokemon[] = {
     { 0x80808080, 0x01, SPECIES_TORNADUS, 1, 0 },
     { 0x92567284, 0x02, SPECIES_THUNDURUS, 1, 0 },
@@ -35,6 +36,8 @@ static const CygnusPokemon sPokemon[] = {
     { 0x44798367, 0x40, SPECIES_HO_OH, 0, 0 },
     { 0x96636983, 0x80, SPECIES_LUGIA, 0, 0 },
 };
+
+// clang-format on
 
 static CygnusSaveData sCardData;
 

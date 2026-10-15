@@ -48,10 +48,10 @@ struct InfinityDungeonRoomChange {
     MMSys *actorSystem;
     InfinityDungeon *dungeon;
     u16 heapId;
-    u8 mode; // 0 for a room of the same floor, 1 for the arrival on a floor
-    u8 inTransition; // 8 for the field's own transition into the room, 7 for the arrival on a floor
+    u8 mode;          // 0 for a room of the same floor, 1 for the arrival on a floor
+    u8 inTransition;  // 8 for the field's own transition into the room, 7 for the arrival on a floor
     u8 outTransition; // the same out of the room
-    u16 direction; // up, down, left, right, or 4 for the arrival
+    u16 direction;    // up, down, left, right, or 4 for the arrival
     InfinityDungeonDestination destination;
     const u16 *roomZones;
     u32 room;
@@ -68,14 +68,15 @@ InfinityDungeon *InfinityDungeonGimmick_GetDungeon(Field *field);
 GameEvent *InfinityDungeonGimmick_CreateDoorEvent(GameSystem *gsys, Field *field, u16 kind, u16 object);
 GameEvent *InfinityDungeonGimmick_CreateMachineEvent(GameSystem *gsys, Field *field);
 GameEvent *InfinityDungeonGimmick_CreateLiftEvent(GameSystem *gsys, Field *field);
-void InfinityDungeonGimmick_CallRoomChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 direction, u8 inTransition,
-                         u8 outTransition);
+void InfinityDungeonGimmick_CallRoomChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 direction,
+                                           u8 inTransition, u8 outTransition);
 void InfinityDungeonGimmick_CallFloorChange(ScriptWork *work, GameSystem *gsys, InfinityDungeon *dungeon, u16 a3);
 void InfinityDungeonRoomChange_Init(InfinityDungeonRoomChange *roomChange, GameSystem *gsys);
 InfinityDungeonRoom *InfinityDungeonRoomChange_GetRoom(InfinityDungeonRoomChange *roomChange);
 // Puts a wall prop in a passage
 void InfinityDungeonGimmick_SetWall(InfinityDungeonGimmick *gimmick, FieldPropHandle *handle, u32 index);
 void InfinityDungeonRoomChange_CreateTrainers(InfinityDungeonRoomChange *roomChange, InfinityDungeonRoom *room);
-void InfinityDungeonRoomChange_CreateWalls(InfinityDungeonRoomChange *roomChange, InfinityDungeonRoom *room, u32 floor, u32 roomIndex);
+void InfinityDungeonRoomChange_CreateWalls(InfinityDungeonRoomChange *roomChange, InfinityDungeonRoom *room, u32 floor,
+                                           u32 roomIndex);
 
 #endif // POKEBW2_FIELD_INFINITY_DUNGEON_GIMMICK_H

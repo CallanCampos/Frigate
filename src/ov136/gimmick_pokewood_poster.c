@@ -27,8 +27,7 @@ static void func_ov136_021eece0(GimmickWork *work);
 static void func_ov136_021eed38(GimmickWork *work);
 static void func_ov136_021eed44(GimmickWork *work);
 static void func_ov136_021eed50(GimmickWork *work, u32 poster);
-static void func_ov136_021eedc0(void *texResource, const char *texName, const char *plttName, u32 image,
-                                HeapID heapId);
+static void func_ov136_021eedc0(void *texResource, const char *texName, const char *plttName, u32 image, HeapID heapId);
 static u32 func_ov136_021eee94(const NNSG3dResTex *tex, const NNSG3dResDictTexData *texData);
 static u32 func_ov136_021eeea4(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *plttData);
 static void func_ov136_021eeeb4(NNSG3dResName *resName, const char *name);
@@ -93,8 +92,7 @@ static void func_ov136_021eed44(GimmickWork *work) {
 static void func_ov136_021eed50(GimmickWork *work, u32 poster) {
     HeapID heapId = HEAPID_TAIL(Field_GetHeapID(work->field));
     PokewoodSave *save = func_02011040(GSYS_GetGameData(Field_GetGameSystem(work->field)));
-    void *texResource =
-        GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
+    void *texResource = GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
     int series = func_02011270(save, poster);
 
     if (series > 0) {

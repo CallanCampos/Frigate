@@ -1,10 +1,10 @@
 #include "types.h"
 #include "field/event_wbt.h"
 #include "field/field_script.h"
-#include "field/wbt_battle.h"
-#include "field/wbt_stadium_gimmick.h"
 #include "field/scrcmd_wbt.h"
 #include "field/wbt.h"
+#include "field/wbt_battle.h"
+#include "field/wbt_stadium_gimmick.h"
 #include "gfl/overlay.h"
 #include "gfl/str.h"
 #include "pml/poke_party.h"
@@ -20,8 +20,9 @@
 
 // Puts the rival's name in a word of the WordSet
 static void func_ov057_021e75c0(FieldScriptEnv *env, WordSet *wordSet, u32 index) {
-    GFL_WordSetLoadStr(wordSet, index,
-                       getPtrToRivalName(getHollow_RivalData(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)))));
+    GFL_WordSetLoadStr(
+        wordSet, index,
+        getPtrToRivalName(getHollow_RivalData(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)))));
 }
 
 // Puts the species of a Pokémon of the party in a word of the script's WordSet

@@ -1,8 +1,6 @@
 // The Battle Subway's events: picking the Pokémon to enter, the battle, the trainers' and leaders' messages, and its
 // records screen. The name is descriptive
 #include "types.h"
-#include "constants/arc.h"
-#include "constants/text_banks.h"
 #include "app/bsubway_records.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
@@ -10,6 +8,8 @@
 #include "battle/btl_net.h"
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/bsubway_scr.h"
 #include "field/encounter.h"
 #include "field/event_battle.h"
@@ -279,7 +279,8 @@ GameEvent *func_ov012_02166118(BSubwayScrWork *bsw, GameSystem *gsys, int index,
     message = &bsw->trainers[index].message;
     if (message->type == 0xffff) {
         data->strbuf = GFL_StrBufCreate(0x300, HEAPID_GAMEEVENT);
-        msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BATTLE_SUBWAY_TRAINER_MESSAGES, HEAPID_GAMEEVENT);
+        msgData =
+            GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BATTLE_SUBWAY_TRAINER_MESSAGES, HEAPID_GAMEEVENT);
         messageId = bsw->trainers[index].message.id;
         if (messageId >= 0x3ae) {
             messageId = 0;
@@ -310,8 +311,9 @@ static GameEventReturnCode func_ov012_02166230(GameEvent *event, u32 *state, voi
         bsubwaySave = func_02017968(data->param.gameData);
         data->param.rank = BSubwayWifiData_GetLeaderRank(bsubwaySave);
         data->param.trainNumber = BSubwayWifiData_GetLeaderRoom(bsubwaySave);
-        GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(data->gsys, data->field, OVERLAY_ID(141),
-                                                                         &BSUBWAY_RECORDS_PROC_FUNCTIONS, &data->param));
+        GameEvent_ChainNext(event,
+                            EventFieldSubprocessTransition_Create(data->gsys, data->field, OVERLAY_ID(141),
+                                                                  &BSUBWAY_RECORDS_PROC_FUNCTIONS, &data->param));
         (*state)++;
         break;
     case 1:
@@ -536,7 +538,8 @@ GameEvent *func_ov012_0216657c(GameSystem *gsys, u16 index, u16 actorId) {
     data->pos.x += offset.x;
     data->pos.y += offset.y;
     data->pos.z += offset.z;
-    leaders = BSubwayWifiData_AllocLeaders(SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), 0x3a), HEAPID_GAMEEVENT);
+    leaders = BSubwayWifiData_AllocLeaders(SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), 0x3a),
+                                           HEAPID_GAMEEVENT);
     data->strbuf = PMSData_ToString(&leaders[index].message, HEAPID_GAMEEVENT);
     GFL_HeapFree(leaders);
     func_ov036_021a8c00(winPos, &winX, &winY);

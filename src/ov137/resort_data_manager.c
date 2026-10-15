@@ -61,10 +61,11 @@ typedef struct {
 
 static void func_ov137_021f1928(ResortPersonData *data, void *person, u32 kind, u16 index);
 
-static const u32 sUnk021f55a8[] = {0, 4, 2, 1};
-static const u32 sKindsOfScript[] = {0, 4, 2, 1};
-static const u32 sTypes[RESORT_KIND_COUNT] = {0, 3, 2, 2, 1};
-static const u32 sKinds[RESORT_KIND_COUNT] = {0, 1, 2, 3, 4};
+static const u32 sUnk021f55a8[] = { 0, 4, 2, 1 };
+static const u32 sKindsOfScript[] = { 0, 4, 2, 1 };
+static const u32 sTypes[RESORT_KIND_COUNT] = { 0, 3, 2, 2, 1 };
+static const u32 sKinds[RESORT_KIND_COUNT] = { 0, 1, 2, 3, 4 };
+// clang-format off
 static const ResortDataRange sRanges[RESORT_KIND_COUNT] = {
     {0, 8, 8},
     {8, 12, 4},
@@ -72,6 +73,8 @@ static const ResortDataRange sRanges[RESORT_KIND_COUNT] = {
     {20, 28, 8},
     {28, 40, 12},
 };
+
+// clang-format on
 static const ResortPersonFuncs sFuncs[] = {
     {
         (ResortPersonCreateFunc)func_02036d94,

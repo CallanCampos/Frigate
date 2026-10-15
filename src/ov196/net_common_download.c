@@ -292,7 +292,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
         break;
     case 5:
         if (!DWC_NdGetFileAsync(&session->files[session->selected], download->data,
-                                 session->files[session->selected].size)) {
+                                session->files[session->selected].size)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_ERROR;
             NetCommonDownload_Cleanup(session, 4, state, 9, 9);
             break;

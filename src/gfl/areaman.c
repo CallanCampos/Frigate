@@ -32,6 +32,7 @@ static const u8 sBitCountMasks[9] = { 0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 
 static const u8 sActiveBits[9] = { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
 
 // Of each byte, the free blocks at its start, the free blocks at its end, and the longest run of free blocks
+// clang-format off
 static const u8 sEightMinusLastOneBit[256] = {
     8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -51,6 +52,9 @@ static const u8 sEightMinusLastOneBit[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 sFirstOneBit[256] = {
     8, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
@@ -70,6 +74,9 @@ static const u8 sFirstOneBit[256] = {
     4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
 };
 
+// clang-format on
+
+// clang-format off
 static const u8 sMaxContinuousZeroBits[256] = {
     8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
     4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -88,6 +95,8 @@ static const u8 sMaxContinuousZeroBits[256] = {
     5, 4, 3, 3, 2, 2, 2, 2, 3, 2, 1, 1, 2, 1, 1, 1,
     4, 3, 2, 2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 1, 0,
 };
+
+// clang-format on
 
 AreaMan *GFL_AreaManCreate(u32 blocks, HeapID heapId) {
     AreaMan *man;

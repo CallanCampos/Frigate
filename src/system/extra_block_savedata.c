@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/extra_block_savedata.h"
 #include "gfl/std.h"
+#include "save/extra_block_savedata.h"
 #include "save/wbt_save.h"
 
 // Two extra save blocks that are only cleared here: one of 0xc8 bytes, and the three of a downloaded tournament of

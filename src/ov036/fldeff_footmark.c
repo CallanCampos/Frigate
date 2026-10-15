@@ -51,6 +51,7 @@ static const u8 FOOTMARK_TRACK_TEXTURES[4][4] = {
     { 7, 9, 5, 5 },
 };
 
+// clang-format off
 static const FieldEffectTaskVTable FOOTMARK_TASK_VTABLE = {
     sizeof(FootmarkTask),
     func_ov036_021b4878,
@@ -58,6 +59,8 @@ static const FieldEffectTaskVTable FOOTMARK_TASK_VTABLE = {
     func_ov036_021b4904,
     func_ov036_021b4968,
 };
+
+// clang-format on
 
 // The textures in the field effects' archive
 static const u16 FOOTMARK_TEXTURE_FILES[FOOTMARK_TEXTURE_COUNT] = {

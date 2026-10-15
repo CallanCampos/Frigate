@@ -848,7 +848,7 @@ static void PMSIView_CmdCategoryToWordWin(TCB *tcb, void *data) {
         if (PMSIVWordWin_WaitFadeIn(vwk->wordWin)) {
             PMSIVWordWin_MoveCursor(vwk->wordWin, PMSInput_GetWordWinCursorPos(vwk->mwk));
             PMSIVWordWin_SetScrollBar(vwk->wordWin, PMSInput_GetWordWinUpArrowVisible(vwk->mwk),
-                                PMSInput_GetWordWinDownArrowVisible(vwk->mwk));
+                                      PMSInput_GetWordWinDownArrowVisible(vwk->mwk));
             PMSIVWordWin_VisibleCursor(vwk->wordWin, TRUE);
             PMSIView_DeleteCommand(cwk);
         }

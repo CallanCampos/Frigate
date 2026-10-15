@@ -4773,7 +4773,8 @@ void func_ov167_021a78bc(BtlServerFlow *flow, BattleMon *mon, void *targets) {
     target = BtlMonSet_Get(targets, 0);
     ability = GetBattleMonStat(mon, 0x10);
     targetAbility = GetBattleMonStat(target, 0x10);
-    if (ability != targetAbility && !IsSkillSwapExcludedAbility(ability) && !IsSkillSwapExcludedAbility(targetAbility)) {
+    if (ability != targetAbility && !IsSkillSwapExcludedAbility(ability) &&
+        !IsSkillSwapExcludedAbility(targetAbility)) {
         BattleMoveEffectState *effect;
 
         monId = GetMonID(mon);
@@ -5532,8 +5533,8 @@ BOOL func_ov167_021a8e68(BtlServerFlow *flow, BattleParty *party, const BtlFlowE
                 }
                 monId = GetMonID(mon);
                 func_ov167_021b15d0(flow->queue, 0x5a, (u16)message, monId, exp, 0xffff0000);
-                func_ov167_021b1434(flow->queue, 0x3e, monId, entry->hp, entry->attack, entry->defense,
-                                    entry->speed, entry->spAttack, entry->spDefense);
+                func_ov167_021b1434(flow->queue, 0x3e, monId, entry->hp, entry->attack, entry->defense, entry->speed,
+                                    entry->spAttack, entry->spDefense);
                 remaining = exp;
                 while (func_ov167_021bc1b8(mon, &remaining, &flow->levelUp)) {
                 }
@@ -6073,8 +6074,8 @@ u32 ServerEvent_InterruptSwitch(BtlServerFlow *flow, BattleMon *mon) {
         if (flow->actionOrder[i].mon != mon && !flow->actionOrder[i].done) {
             entry = &flow->actionOrder[i];
             move = BattleAction_GetMove(&entry->action);
-            if (move == MOVE_PURSUIT
-                && MoveEvent_AddItem(flow->actionOrder[i].mon, move, GetBattleMonStat(flow->actionOrder[i].mon, 0xc))) {
+            if (move == MOVE_PURSUIT &&
+                MoveEvent_AddItem(flow->actionOrder[i].mon, move, GetBattleMonStat(flow->actionOrder[i].mon, 0xc))) {
                 flow->actionOrder[i].interrupting = TRUE;
             }
         }
@@ -7821,8 +7822,8 @@ void BattleHandler_Execute(BtlServerFlow *flow, void *work) {
     } else {
         result = TRUE;
     }
-    if ((header->checkPrevResult && !result)
-        || (header->checkFainted && IsFainted(GetPokeParamConst(flow->pokeCon, header->monId)))) {
+    if ((header->checkPrevResult && !result) ||
+        (header->checkFainted && IsFainted(GetPokeParamConst(flow->pokeCon, header->monId)))) {
         return;
     }
     switch (header->command) {
@@ -8177,7 +8178,8 @@ u8 BattleHandler_DecrementPP(BtlServerFlow *handler, BattleHandlerPPParam *param
 }
 
 // Function name from swan.
-u8 BattleHandler_CureCondition(BtlServerFlow *handler, const struct BattleHandlerCureConditionParam *param, u16 context) {
+u8 BattleHandler_CureCondition(BtlServerFlow *handler, const struct BattleHandlerCureConditionParam *param,
+                               u16 context) {
     BattleMon *target;
     u8 changed;
     u32 i;
@@ -8229,9 +8231,9 @@ u8 BattleHandler_AddCondition(BtlServerFlow *handler, const BattleHandlerAddCond
     showMessage = !BattleHandler_StrIsEnabled(&param->string) && !param->noMessage ? TRUE : FALSE;
     if (DoesBattleMonExist(&handler->posPoke, param->targetIndex)) {
         target = GetPokeParam(handler->pokeCon, param->targetIndex);
-        if (!IsFainted(target)
-            && !ServerControl_AddConditionCheckFail(handler, target, mon, param->condition, param->value,
-                                                    param->overwrite, param->showFail)) {
+        if (!IsFainted(target) &&
+            !ServerControl_AddConditionCheckFail(handler, target, mon, param->condition, param->value, param->overwrite,
+                                                 param->showFail)) {
             if (param->popup) {
                 ServerDisplay_AbilityPopupAdd(handler, mon);
             }
@@ -8927,8 +8929,8 @@ u8 BattleHandler_ForceSwitch(BtlServerFlow *handler, const BattleHandlerForceSwi
     target = GetPokeParam(handler->pokeCon, param->targetIndex);
     return ServerControl_ForceSwitchCore(handler, GetPokeParam(handler->pokeCon, param->header.monId), target,
                                          param->forced, &failed, param->effect, param->ignoreLevel, &param->string)
-             ? TRUE
-             : FALSE;
+               ? TRUE
+               : FALSE;
 }
 
 // Function names from swan.

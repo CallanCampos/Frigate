@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/unity_tower_floor_savedata.h"
 #include "gfl/std.h"
 #include "save/save_control.h"
+#include "save/unity_tower_floor_savedata.h"
 
 // The save block of the Unity Tower's floor: the visitors on the floor the player is on, which the game data keeps
 // while the game runs. The ROM has no string for the file, so the name is descriptive; unity_tower_savedata.c is the

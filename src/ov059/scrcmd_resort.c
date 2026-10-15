@@ -1,8 +1,8 @@
 #include "types.h"
-#include "constants/version.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/script_text_banks.h"
+#include "constants/version.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_script.h"
@@ -312,8 +312,7 @@ BOOL func_ov059_021e5950(VM *vm, FieldScriptEnv *env) {
     case 56:
     case 57:
     case 58:
-    case 59:
-    {
+    case 59: {
         u16 id;
 
         which -= 52;
@@ -750,7 +749,8 @@ BOOL func_ov059_021e66d8(VM *vm, FieldScriptEnv *env) {
     var2 = ScriptReadVar(vm, env);
     var3 = ScriptReadVar(vm, env);
     var4 = ScriptReadVar(vm, env);
-    *var = ResortSys_GetPersonVisit(func_ov137_021f1110(person), func_02038860(occupants, index), sys, var2, var3, var4);
+    *var =
+        ResortSys_GetPersonVisit(func_ov137_021f1110(person), func_02038860(occupants, index), sys, var2, var3, var4);
     return FALSE;
 }
 
@@ -1088,7 +1088,8 @@ BOOL func_ov059_021e6d50(VM *vm, FieldScriptEnv *env) {
     param = ScriptReadAny(vm, env);
     n = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
-    occupants = getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    occupants =
+        getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     count = 0;
     heapId = Field_GetHeapID(field);
     *var = 0;
@@ -1206,7 +1207,8 @@ BOOL func_ov059_021e6fc8(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(gsys);
     func_ov059_021e7bd8(field);
-    occupants = getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    occupants =
+        getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
     wordSet = ScriptWork_GetWordSet(work);
     heapId = Field_GetHeapID(field);
     index = ScriptReadAny(vm, env);
@@ -1761,8 +1763,8 @@ BOOL func_ov059_021e7ad8(VM *vm, FieldScriptEnv *env) {
     case 5:
     case 6:
     case 7:
-        func_ov137_021f1554(
-            people, func_ov137_021f1600(people, func_ov137_021f1980(func_ov137_021f1b94(unk30, 0, index))));
+        func_ov137_021f1554(people,
+                            func_ov137_021f1600(people, func_ov137_021f1980(func_ov137_021f1b94(unk30, 0, index))));
         break;
     case 8: {
         u32 i;

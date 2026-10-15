@@ -67,12 +67,8 @@ static const GameProcFunctions sReceiptProcFunctions = {
 };
 
 static BOOL (*const sGuru2SeqFuncs[])(Guru2CallWork *wk) = {
-    Guru2Seq_StartReceipt,
-    Guru2Seq_WaitReceipt,
-    Guru2Seq_WaitPokeList,
-    Guru2Seq_WaitPokeStatus,
-    Guru2Seq_WaitMain,
-    Guru2Seq_End,
+    Guru2Seq_StartReceipt,   Guru2Seq_WaitReceipt, Guru2Seq_WaitPokeList,
+    Guru2Seq_WaitPokeStatus, Guru2Seq_WaitMain,    Guru2Seq_End,
 };
 
 const GameProcFunctions GURU2_PROC_FUNCTIONS = {

@@ -196,14 +196,18 @@ static const G3DSceneAnimationSetup sMistraltonAnimations01[] = { { 1, 0 } };
 static const G3DSceneAnimationSetup sMistraltonAnimations08[] = { { 8, 0 } };
 static const G3DSceneAnimationSetup sMistraltonAnimations05[] = { { 5, 0 }, { 6, 0 } };
 
+// clang-format off
 static const G3DSceneResourceSetup sMistraltonResources[] = {
     { 0x7a, 0, 0, 0 }, { 0x7a, 1, 0, 0 }, { 0x7a, 2, 0, 0 }, { 0x7a, 3, 0, 0 },  { 0x7a, 4, 0, 0 },
     { 0x7a, 5, 0, 0 }, { 0x7a, 6, 0, 0 }, { 0x7a, 7, 0, 0 }, { 0x7a, 8, 0, 0 },  { 0x7a, 9, 0, 0 },
     { 0x7a, 10, 0, 0 }, { 0x7a, 11, 0, 0 }, { 0x7a, 12, 0, 0 },
 };
 
+// clang-format on
+
 #define FAN_ACTOR { 2, 0, 2, 0, sMistraltonAnimations03, NELEMS(sMistraltonAnimations03) }
 
+// clang-format off
 static const G3DSceneActorSetup sMistraltonActors[] = {
     { 0, 0, 0, 0, sMistraltonAnimations01, NELEMS(sMistraltonAnimations01) },
     FAN_ACTOR, FAN_ACTOR, FAN_ACTOR, FAN_ACTOR, FAN_ACTOR, FAN_ACTOR, FAN_ACTOR, FAN_ACTOR,
@@ -216,7 +220,10 @@ static const G3DSceneActorSetup sMistraltonActors[] = {
     { 11, 0, 11, 0, sMistraltonAnimations12, NELEMS(sMistraltonAnimations12) },
 };
 
-static const G3DSceneSetup sMistraltonScene = { sMistraltonResources, NELEMS(sMistraltonResources), sMistraltonActors, NELEMS(sMistraltonActors) };
+// clang-format on
+
+static const G3DSceneSetup sMistraltonScene = { sMistraltonResources, NELEMS(sMistraltonResources), sMistraltonActors,
+                                                NELEMS(sMistraltonActors) };
 
 // Defined at the end of the file, which is where it has to be for the order of the equal-size objects of .rodata
 static const int sMistraltonGrid[GRID_ROWS][GRID_COLUMNS];
@@ -290,8 +297,8 @@ void GymMistralton_Update(Field *field) {
                 }
             }
         }
-        func_02068410(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(
-                                                   FieldExpObj_GetActor(work->system, SCENE, ACTOR_EFFECT_FIRST + 1 + i)))
+        func_02068410(GFL_G3DMdlGetEngineModel(
+                          GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->system, SCENE, ACTOR_EFFECT_FIRST + 1 + i)))
                           ->resMdl,
                       work->alpha[i]);
     }
@@ -542,7 +549,8 @@ static GameEvent *Mistralton_CreateRideEvent(GameEvent *parent, GameSystem *gsys
     data->timer = 0;
     data->startTimer = 0;
     data->turns = 0;
-    if (sMistraltonGrid[z + 1][x] == GRID_WALL || GetFirstActorOnGPos(Field_GetActorSystem(field), x, z + 1, FALSE) != NULL) {
+    if (sMistraltonGrid[z + 1][x] == GRID_WALL ||
+        GetFirstActorOnGPos(Field_GetActorSystem(field), x, z + 1, FALSE) != NULL) {
         data->blocked = TRUE;
     } else {
         data->blocked = FALSE;
@@ -1073,9 +1081,9 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
 
     {
         const TilePos fanPositions[FAN_COUNT] = {
-            { 10, 0, 8 },  { 12, 0, 8 },  { 1, 0, 13 },  { 12, 0, 17 }, { 21, 0, 18 }, { 7, 0, 20 },
-            { 1, 0, 22 },  { 19, 0, 25 }, { 6, 0, 26 },  { 16, 0, 27 }, { 4, 0, 28 },  { 21, 0, 33 },
-            { 3, 0, 34 },  { 1, 0, 41 },  { 21, 0, 41 }, { 9, 0, 42 },  { 13, 0, 42 },
+            { 10, 0, 8 }, { 12, 0, 8 },  { 1, 0, 13 },  { 12, 0, 17 }, { 21, 0, 18 }, { 7, 0, 20 },
+            { 1, 0, 22 }, { 19, 0, 25 }, { 6, 0, 26 },  { 16, 0, 27 }, { 4, 0, 28 },  { 21, 0, 33 },
+            { 3, 0, 34 }, { 1, 0, 41 },  { 21, 0, 41 }, { 9, 0, 42 },  { 13, 0, 42 },
         };
 
         for (; i < FAN_COUNT; i++) {

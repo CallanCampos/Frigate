@@ -31,6 +31,7 @@ static const VecFx32 sUpVector = { 0, FX32_ONE, 0 };
 static const VecFx32 sTarget = { 0, 0, -FX32_ONE };
 
 // The model and its animations, which differ by version
+// clang-format off
 static const G3DSceneResourceSetup sResources[] = {
 #ifdef BLACK2
     { ARCID_INTRO, 22, 0 }, { ARCID_INTRO, 16, 0 }, { ARCID_INTRO, 17, 0 }, { ARCID_INTRO, 18, 0 }, { ARCID_INTRO, 12, 0 }, { ARCID_INTRO, 13, 0 },
@@ -38,6 +39,8 @@ static const G3DSceneResourceSetup sResources[] = {
     { ARCID_INTRO, 23, 0 }, { ARCID_INTRO, 19, 0 }, { ARCID_INTRO, 20, 0 }, { ARCID_INTRO, 21, 0 }, { ARCID_INTRO, 14, 0 }, { ARCID_INTRO, 15, 0 },
 #endif
 };
+
+// clang-format on
 
 static const G3DSceneAnimationSetup sAnimations[] = {
     { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 },
@@ -62,9 +65,9 @@ IntroG3d *IntroG3d_Create(IntroGraphic *graphic, u32 mode, HeapID heapId) {
     position = sPosition;
     upVector = sUpVector;
     target = sTarget;
-    g3d->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, FX32_CONST(6), -FX32_CONST(6), -FX32_CONST(8),
-                                      FX32_CONST(8), FX32_ONE, FX32_CONST(1024), FX32_ONE, &position, &upVector, &target,
-                                      heapId);
+    g3d->camera =
+        GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, FX32_CONST(6), -FX32_CONST(6), -FX32_CONST(8), FX32_CONST(8),
+                            FX32_ONE, FX32_CONST(1024), FX32_ONE, &position, &upVector, &target, heapId);
     if (mode != INTRO_MODE_PLAYER_NAMED && mode != INTRO_MODE_RIVAL_NAMED) {
         g3d->scene = GFL_G3DMgrNewScene(g3d->manager, &sSceneSetup);
         actor = GFL_G3DMgrGetActor(g3d->manager, g3d->scene);

@@ -3,9 +3,9 @@
 #include "field/event_wbt_wifi.h"
 #include "field/field.h"
 #include "field/field_script.h"
-#include "field/wbt_makematch.h"
 #include "field/scrcmd_wbt.h"
 #include "field/wbt.h"
+#include "field/wbt_makematch.h"
 #include "field/zone.h"
 #include "gfl/overlay.h"
 #include "save/bsubway_save.h"
@@ -69,7 +69,10 @@ BOOL WbtCmd_CheckRegulation(VM *vm, FieldScriptEnv *env) {
     WbtSystem *sys = func_ov055_021e5800(env);
     Regulation *regulation = func_ov055_021e5f78(sys);
 
-    *var = PokeRegulation_CheckPartyCanEnter(regulation, WbtMakeMatch_GetParty(sys, FieldScriptEnv_GetGameData(env))) == 0 ? TRUE : FALSE;
+    *var =
+        PokeRegulation_CheckPartyCanEnter(regulation, WbtMakeMatch_GetParty(sys, FieldScriptEnv_GetGameData(env))) == 0
+            ? TRUE
+            : FALSE;
     return FALSE;
 }
 

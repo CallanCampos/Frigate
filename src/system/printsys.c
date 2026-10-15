@@ -27,7 +27,8 @@
 #define STRCMD_CATEGORY_COLOR 0xff
 
 // A color of letter, shadow and background indices
-#define TEXT_COLOR(letter, shadow, background) ((((letter) & 0x1f) << 10) | (((shadow) & 0x1f) << 5) | ((background) & 0x1f))
+#define TEXT_COLOR(letter, shadow, background)                                                                         \
+    ((((letter) & 0x1f) << 10) | (((shadow) & 0x1f) << 5) | ((background) & 0x1f))
 #define TEXT_COLOR_LETTER(color) ((u8)(((color) >> 10) & 0x1f))
 #define TEXT_COLOR_SHADOW(color) ((u8)(((color) >> 5) & 0x1f))
 #define TEXT_COLOR_BACKGROUND(color) ((u8)((color) & 0x1f))
@@ -111,9 +112,6 @@ enum {
     PRINT_STREAM_PAGE_SCROLL,
     PRINT_STREAM_PAGE_CLEAR,
 };
-
-extern GFLBitmap *g_TextRendererTempBitmap;
-extern TextRenderer g_TextRenderer;
 
 GFLBitmap *g_TextRendererTempBitmap;
 TextRenderer g_TextRenderer;
@@ -372,7 +370,8 @@ static void GFL_TextRndBind(TextRenderer *renderer, Font *font, GFLBitmap *bitma
 }
 
 static void GFL_TextRndSetDefaultColor(TextRenderer *renderer, u16 color) {
-    u16 newColor = TEXT_COLOR(TEXT_COLOR_LETTER(color), TEXT_COLOR_SHADOW(color), TEXT_COLOR_BACKGROUND(renderer->color));
+    u16 newColor =
+        TEXT_COLOR(TEXT_COLOR_LETTER(color), TEXT_COLOR_SHADOW(color), TEXT_COLOR_BACKGROUND(renderer->color));
 
     renderer->defaultColor = color;
     renderer->color = newColor;
@@ -635,8 +634,7 @@ static void func_02022464(TCBEx *task, void *data) {
     if (stream->callback != NULL && stream->callbackWait) {
         stream->callbackWait = stream->callback(stream->event);
         if (stream->callbackWait) {
-            // A return here branches to a different, equivalent jump to the end
-            goto end;
+            return;
         }
         stream->event = stream->nextEvent;
     }
@@ -740,8 +738,6 @@ static void func_02022464(TCBEx *task, void *data) {
             return;
         }
     }
-end:
-    ;
 }
 
 // Carries out a stream command: page breaks, waits, speeds and the callback's events

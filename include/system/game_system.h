@@ -2,12 +2,12 @@
 #define POKEBW2_SYSTEM_GAME_SYSTEM_H
 
 #include "types.h"
+#include "gfl/heap.h"
 #include "gfl/proc.h"
 #include "gfl/str.h"
-#include "gfl/heap.h"
 #include "nitro/fx.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 typedef enum {
     GAME_ENTRYPOINT_OPENING,

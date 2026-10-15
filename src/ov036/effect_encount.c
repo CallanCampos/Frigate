@@ -83,21 +83,21 @@ static u16 GetRandomWingItemID(void);
 static GameEvent *CallGivePhenomenonItem(EncountSystem *system, u16 itemId);
 
 // The steps between phenomena and their chance, for each setting of the zone's encounter data
-static const u8 data_ov036_021d02c4[3][2] = {{20, 10}, {20, 10}, {5, 15}};
+static const u8 data_ov036_021d02c4[3][2] = { { 20, 10 }, { 20, 10 }, { 5, 15 } };
 
 // The shards a dust cloud gives in the zones of DUST_CLOUD_SHARD_ZONES
-static const u16 DUST_CLOUD_ITEMS_SHARDS[4] = {72, 73, 74, 75};
+static const u16 DUST_CLOUD_ITEMS_SHARDS[4] = { 72, 73, 74, 75 };
 
 // The phenomena each kind of tile can have: 1 for grass, 2 for water and dust
-static const u8 data_ov036_021d02d2[10] = {1, 1, 1, 1, 1, 2, 2, 1, 0, 0};
+static const u8 data_ov036_021d02d2[10] = { 1, 1, 1, 1, 1, 2, 2, 1, 0, 0 };
 
 // The rarer items of a dust cloud
-static const u16 DUST_CLOUD_ITEMS_NORMAL[10] = {80, 81, 82, 83, 84, 85, 107, 108, 109, 110};
+static const u16 DUST_CLOUD_ITEMS_NORMAL[10] = { 80, 81, 82, 83, 84, 85, 107, 108, 109, 110 };
 
 // The area around the player a phenomenon can appear in, left, right, up and down, all around for the first and in
 // one direction for the others
 static const s8 data_ov036_021d02f0[5][4] = {
-    {-5, 5, -5, 5}, {0, 5, -5, 5}, {-5, 0, -5, 5}, {-5, 5, -5, 0}, {-5, 5, 0, 5},
+    { -5, 5, -5, 5 }, { 0, 5, -5, 5 }, { -5, 0, -5, 5 }, { -5, 5, -5, 0 }, { -5, 5, 0, 5 },
 };
 
 static const u16 DUST_CLOUD_SHARD_ZONES[15] = {
@@ -515,8 +515,7 @@ static BOOL IsPositionOccupiedByActorAny(EncountSystem *system, s16 x, s16 y, s1
         }
         config = GetActorMdlInfo(actor);
         FldAct_GetGPos(actor, &pos);
-        if (y == pos.y && x >= pos.x && x < pos.x + config->collWidth && z <= pos.z &&
-            z > pos.z - config->collHeight) {
+        if (y == pos.y && x >= pos.x && x < pos.x + config->collWidth && z <= pos.z && z > pos.z - config->collHeight) {
             return TRUE;
         }
     }

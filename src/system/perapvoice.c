@@ -1,11 +1,11 @@
 #include "types.h"
-#include "save/chatter.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "nitro/mi.h"
 #include "pml/poke_party.h"
+#include "save/chatter.h"
 #include "save/save_control.h"
 
 // The Chatot's recorded cry (Perap is Chatot's Japanese name). The name is the ROM's string. Block 0x24.

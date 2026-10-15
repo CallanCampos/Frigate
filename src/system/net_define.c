@@ -1,11 +1,11 @@
 #include "types.h"
-#include "system/net_define.h"
 #include "field/net_devirc.h"
 #include "gfl/net.h"
 #include "gfl/net_devwifi.h"
 #include "gfl/net_devwireless.h"
 #include "gfl/overlay.h"
 #include "gfl/wm_icon.h"
+#include "system/net_define.h"
 
 // What the game gives the network library: the Wi-Fi icon's files, the device of each kind of connection with the
 // overlays it needs, the network's step of each frame and the kind of the game commands. The ROM has no string for

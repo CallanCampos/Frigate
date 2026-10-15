@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_INFINITY_DUNGEON_CREATOR_H
 
 #include "types.h"
-#include "gfl/heap.h"
 #include "field/infinity_dungeon.h"
+#include "gfl/heap.h"
 
 // infinity_dungeon_creator.c, overlay 127, which the ROM names: lays out the dungeon's trainers from its seed
 

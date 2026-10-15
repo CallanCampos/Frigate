@@ -23,7 +23,8 @@ void UpdateScriptFieldWk(void *fieldWork, GameSystem *gsys) {
     }
 }
 
-ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event, u16 scriptId, u32 arg4, u32 featureLevel) {
+ScriptWork *ScriptWork_Create(HeapID heapId, GameSystem *gsys, GameEvent *event, u16 scriptId, u32 arg4,
+                              u32 featureLevel) {
     ScriptWork *work;
     u32 reduced;
 

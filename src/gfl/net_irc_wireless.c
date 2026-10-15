@@ -63,8 +63,8 @@ const GFLNetInitData *func_02042f74(const GFLNetInitData *pNetInit, void *work) 
     if (NetIwSys != NULL && NetIwSys->unk101 == TRUE) {
         return pNetInit;
     }
-    sys = GFL_HeapAllocate(HEAPID_TAIL(pNetInit->parentHeapId), sizeof(NetIrcWireless), TRUE, "net_irc_wireless.c",
-                           114);
+    sys =
+        GFL_HeapAllocate(HEAPID_TAIL(pNetInit->parentHeapId), sizeof(NetIrcWireless), TRUE, "net_irc_wireless.c", 114);
     sys->aNetInit = *pNetInit;
     sys->work = work;
     sys->exitCallback = pNetInit->unk2C;
@@ -424,7 +424,9 @@ void func_02043764(int netId, int size, const void *data, void *work, NetHandle 
     int i;
     int num;
 
+    // clang-format off
     GFL_ASSERT(pTemp->num<_COLLECTMAC_NUM);
+    // clang-format on
     num = pTemp->num;
     if (num > _COLLECTMAC_NUM) {
         num = _COLLECTMAC_NUM;

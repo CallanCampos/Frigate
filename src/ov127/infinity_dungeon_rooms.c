@@ -38,14 +38,14 @@ typedef struct {
     InfinityDungeonGridPos stack[INFINITY_DUNGEON_WALK_DEPTH];
 } InfinityDungeonWalk;
 
-
 static void func_ov127_021f0c54(u8 *array, int count, MATHRandContext32 *rand);
 static const u8 *func_ov127_021f0d88(u16 rank, u8 floor, u8 version);
 static u8 func_ov127_021f1308(u32 rank, u8 floor, u8 version, u8 *types);
 static u8 func_ov127_021f1348(u32 rank, u8 floor, u8 version, u8 *types);
 static int func_ov127_021f1388(InfinityDungeonRoom *rooms, int *list, int width, int height);
 static InfinityDungeonRoom *func_ov127_021f13e8(const InfinityDungeonGridPos *pos, InfinityDungeonRoom *rooms);
-static const InfinityDungeonRoom *func_ov127_021f13f8(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms);
+static const InfinityDungeonRoom *func_ov127_021f13f8(const InfinityDungeonGridPos *pos,
+                                                      const InfinityDungeonRoom *rooms);
 static void func_ov127_021f1408(u8 direction, InfinityDungeonWalk *walk, InfinityDungeonRoom *rooms);
 static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms, int *directions,
                                int width, int height, BOOL allowVisited);
@@ -56,10 +56,13 @@ static BOOL func_ov127_021f1634(const InfinityDungeonRoom *rooms, int width, int
 
 static const u8 sIvs[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-static const u16 sBlack2Zones[6] = { ZONE_BLACK_TOWER_2, ZONE_BLACK_TOWER_3, ZONE_BLACK_TOWER_5, ZONE_BLACK_TOWER_4, ZONE_BLACK_TOWER_6, ZONE_BLACK_TOWER };
+static const u16 sBlack2Zones[6] = { ZONE_BLACK_TOWER_2, ZONE_BLACK_TOWER_3, ZONE_BLACK_TOWER_5,
+                                     ZONE_BLACK_TOWER_4, ZONE_BLACK_TOWER_6, ZONE_BLACK_TOWER };
 
-static const u16 sWhite2Zones[6] = { ZONE_WHITE_TREEHOLLOW_2, ZONE_WHITE_TREEHOLLOW_3, ZONE_WHITE_TREEHOLLOW_4, ZONE_WHITE_TREEHOLLOW_5, ZONE_WHITE_TREEHOLLOW_6, ZONE_WHITE_TREEHOLLOW };
+static const u16 sWhite2Zones[6] = { ZONE_WHITE_TREEHOLLOW_2, ZONE_WHITE_TREEHOLLOW_3, ZONE_WHITE_TREEHOLLOW_4,
+                                     ZONE_WHITE_TREEHOLLOW_5, ZONE_WHITE_TREEHOLLOW_6, ZONE_WHITE_TREEHOLLOW };
 
+// clang-format off
 static const InfinityDungeonLevelRange sLevelRanges[10] = {
     { 47, 50 },
     { 50, 53 },
@@ -73,6 +76,8 @@ static const InfinityDungeonLevelRange sLevelRanges[10] = {
     { 74, 77 },
 };
 
+// clang-format on
+
 static const InfinityDungeonPos sPos2c20 = { 6, 0, 0 };
 
 static const InfinityDungeonPos sPos2c38[2] = {
@@ -82,6 +87,7 @@ static const InfinityDungeonPos sPos2c38[2] = {
 
 static const InfinityDungeonPos sPos2c2c = { 6, 0, 0 };
 
+// clang-format off
 static const InfinityDungeonSize sSizes[10] = {
     { 3, 3 },
     { 3, 3 },
@@ -95,6 +101,9 @@ static const InfinityDungeonSize sSizes[10] = {
     { 4, 4 },
 };
 
+// clang-format on
+
+// clang-format off
 static const InfinityDungeonObjScript sObjScripts[30] = {
     { 0x18, 2, 4 },
     { 0x1a, 4, 5 },
@@ -127,6 +136,8 @@ static const InfinityDungeonObjScript sObjScripts[30] = {
     { 0x22, 5, 2 },
     { 0x23, 6, 3 },
 };
+
+// clang-format on
 
 static const u8 sTrainerClassSharesWhite2[10][30] = {
     { 0, 2, 1, 0, 2, 0, 1, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
@@ -334,6 +345,7 @@ static const InfinityDungeonPos sPosWhite2A[6][5] = {
     },
 };
 
+// clang-format off
 static const InfinityDungeonNpc sNpcs[21] = {
     { 2, 1, 1, 1, 0, 0, 0, 0x130 },
     { 3, 1, 1, 2, 2, 2, 2, 0x138 },
@@ -357,6 +369,8 @@ static const InfinityDungeonNpc sNpcs[21] = {
     { 0x2b, 6, 2, 2, 2, 2, 2, 0x140 },
     { 0x2c, 4, 3, 2, 2, 6, 6, 0x148 },
 };
+
+// clang-format on
 
 static const u8 sRoomCountsWhite2[10][5][20] = {
     {
@@ -526,6 +540,7 @@ static const InfinityDungeonRoomTemplate sRoomTemplates[19] = {
     { 2, 1, 3, { { 0, 6, 7 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } } },
 };
 
+// clang-format off
 static const InfinityDungeonTrainer sTrainers[640] = {
     { 0, 0, VERSION_WHITE2, 0 },
     { 0, 0, VERSION_WHITE2, 0 },
@@ -1169,6 +1184,8 @@ static const InfinityDungeonTrainer sTrainers[640] = {
     { 6, 9, VERSION_BLACK2, 26 },
 };
 
+// clang-format on
+
 static inline u32 InfinityDungeonRandom_Next(InfinityDungeonRandom *rnd, u32 max) {
     rnd->state = rnd->multiplier * rnd->state + rnd->increment;
     if (max == 0) {
@@ -1470,8 +1487,7 @@ void InfinityDungeon_LayoutFloors(InfinityDungeon *dungeon, u32 rank, u32 seed, 
                 kind = func_ov127_021f13e8(&pos, floorRooms)->kind;
                 if (kind != 0 && kind != 1) {
                     count = func_ov127_021f14c0(&pos, floorRooms, extraDirections, width, height, TRUE);
-                    func_ov127_021f1408(extraDirections[(u8)MATH_Rand32(&rand, count)], &extraWalk,
-                                        floorRooms);
+                    func_ov127_021f1408(extraDirections[(u8)MATH_Rand32(&rand, count)], &extraWalk, floorRooms);
                 }
             }
         }
@@ -1571,7 +1587,8 @@ static InfinityDungeonRoom *func_ov127_021f13e8(const InfinityDungeonGridPos *po
     return &rooms[pos->x + pos->y * INFINITY_DUNGEON_GRID_WIDTH];
 }
 
-static const InfinityDungeonRoom *func_ov127_021f13f8(const InfinityDungeonGridPos *pos, const InfinityDungeonRoom *rooms) {
+static const InfinityDungeonRoom *func_ov127_021f13f8(const InfinityDungeonGridPos *pos,
+                                                      const InfinityDungeonRoom *rooms) {
     return &rooms[pos->x + pos->y * INFINITY_DUNGEON_GRID_WIDTH];
 }
 

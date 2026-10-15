@@ -75,29 +75,30 @@ void WifiBattleMatchRes_LoadBG(WifiBattleMatchRes *res, u32 kind, HeapID heapId)
 void WifiBattleMatchRes_Update(WifiBattleMatchRes *res);
 
 // The rank card
-WifiBattleMatchCard *WifiBattleMatchRankCard_Create(const WifiBattleMatchRankInfo *info, u32 titleMsg, PlayerInfo *playerInfo,
-                                         ClActUnit *unit, WifiBattleMatchRes *res, Font *font,
-                                         PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet, HeapID heapId);
+WifiBattleMatchCard *WifiBattleMatchRankCard_Create(const WifiBattleMatchRankInfo *info, u32 titleMsg,
+                                                    PlayerInfo *playerInfo, ClActUnit *unit, WifiBattleMatchRes *res,
+                                                    Font *font, PrintQueue *printQueue, MsgData *msgData,
+                                                    WordSet *wordSet, HeapID heapId);
 void WifiBattleMatchRankCard_Free(WifiBattleMatchCard *card);
 
 // The digital card. The first of each pair is for the Wi-Fi competition's, the second for the live one's. ratio says
 // whether the card's results are printed as two numbers with a message between them; main picks the main screen, or the
 // sub screen
-WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCardInfo *info, u32 ratio, PlayerInfo *playerInfo,
-                                         ClActUnit *unit, WifiBattleMatchRes *res, Font *font,
-                                         PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet, void *records,
-                                         BOOL main, HeapID heapId);
+WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCardInfo *info, u32 ratio,
+                                                    PlayerInfo *playerInfo, ClActUnit *unit, WifiBattleMatchRes *res,
+                                                    Font *font, PrintQueue *printQueue, MsgData *msgData,
+                                                    WordSet *wordSet, void *records, BOOL main, HeapID heapId);
 WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCardInfo *info, PlayerInfo *playerInfo,
-                                         ClActUnit *unit, WifiBattleMatchRes *res, Font *font,
-                                         PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet, void *records,
-                                         BOOL main, HeapID heapId);
+                                                    ClActUnit *unit, WifiBattleMatchRes *res, Font *font,
+                                                    PrintQueue *printQueue, MsgData *msgData, WordSet *wordSet,
+                                                    void *records, BOOL main, HeapID heapId);
 void WifiBattleMatchWifiCard_Free(WifiBattleMatchCard *card);
 void WifiBattleMatchLiveCard_Free(WifiBattleMatchCard *card);
 // Shows a page of the card: its Pokémon, then two other pages that hide them
-void WifiBattleMatchWifiCard_ShowPage(WifiBattleMatchCard *card, u32 page, MsgData *msgData, PrintQueue *printQueue, Font *font,
-                         HeapID heapId);
-void WifiBattleMatchLiveCard_ShowPage(WifiBattleMatchCard *card, u32 page, MsgData *msgData, PrintQueue *printQueue, Font *font,
-                         HeapID heapId);
+void WifiBattleMatchWifiCard_ShowPage(WifiBattleMatchCard *card, u32 page, MsgData *msgData, PrintQueue *printQueue,
+                                      Font *font, HeapID heapId);
+void WifiBattleMatchLiveCard_ShowPage(WifiBattleMatchCard *card, u32 page, MsgData *msgData, PrintQueue *printQueue,
+                                      Font *font, HeapID heapId);
 // Is TRUE once everything of the card is printed
 BOOL WifiBattleMatchCard_Flush(WifiBattleMatchCard *card, PrintQueue *printQueue);
 // Slide the card in and out, each frame, and return TRUE once it is done
@@ -106,9 +107,10 @@ BOOL WifiBattleMatchCard_SlideOut(WifiBattleMatchCard *card);
 
 // The other player's card
 WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMatchPlayerData *data, ClActUnit *unit,
-                                                WifiBattleMatchRes *res, Font *font, PrintQueue *printQueue,
-                                                MsgData *msgData, WordSet *wordSet, u32 kind, u32 shown, u32 variant,
-                                                HeapID heapId);
+                                                              WifiBattleMatchRes *res, Font *font,
+                                                              PrintQueue *printQueue, MsgData *msgData,
+                                                              WordSet *wordSet, u32 kind, u32 shown, u32 variant,
+                                                              HeapID heapId);
 void WifiBattleMatchPartnerCard_Free(WifiBattleMatchPartnerCard *card);
 BOOL WifiBattleMatchPartnerCard_Flush(WifiBattleMatchPartnerCard *card, PrintQueue *printQueue);
 BOOL WifiBattleMatchPartnerCard_SlideIn(WifiBattleMatchPartnerCard *card);
@@ -120,8 +122,9 @@ void WifiBattleMatchLinkIcon_Update(WifiBattleMatchLinkIcon *icon);
 void WifiBattleMatchLinkIcon_SetShown(WifiBattleMatchLinkIcon *icon, BOOL shown);
 
 // The list of the team
-WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox, ClActUnit *unit, WifiBattleMatchRes *res,
-                                             Font *font, PrintQueue *printQueue, MsgData *msgData, HeapID heapId);
+WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox, ClActUnit *unit,
+                                                        WifiBattleMatchRes *res, Font *font, PrintQueue *printQueue,
+                                                        MsgData *msgData, HeapID heapId);
 void WifiBattleMatchTeamList_Free(WifiBattleMatchTeamList *list);
 BOOL WifiBattleMatchTeamList_SlideIn(WifiBattleMatchTeamList *list);
 BOOL WifiBattleMatchTeamList_SlideOut(WifiBattleMatchTeamList *list);

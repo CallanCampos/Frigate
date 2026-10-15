@@ -8,12 +8,12 @@
 #include "gfl/proc.h"
 #include "gfl/str.h"
 #include "nitro/fx.h"
+#include "save/memory_link_savedata.h"
 #include "save/player_info.h"
 #include "struct_decls.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "save/memory_link_savedata.h"
 
 // Unova Link, overlay 332: the Key System, which exchanges keys with another Black 2 or White 2, Memory Link, which
 // reads a Black or White save, and the Nintendo 3DS Link with Pokémon Dream Radar. None of these names is swan's.

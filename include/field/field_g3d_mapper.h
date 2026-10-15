@@ -5,11 +5,11 @@
 // from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "gfl/heap.h"
-#include "nitro/fx.h"
 #include "field/field_map.h"
 #include "field/field_map_chunk.h"
 #include "field/field_terrain_animator.h"
+#include "gfl/heap.h"
+#include "nitro/fx.h"
 #include "struct_decls.h"
 
 // An archive and a file in it

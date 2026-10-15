@@ -2,8 +2,8 @@
 #define POKEBW2_SYSTEM_AREA_DATA_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "gfl/heap.h"
+#include "struct_decls.h"
 
 // area_data.c: an area's record, which names the graphics its zones share. The ROM doesn't name the file; the name is
 // a guess. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the fields are named after

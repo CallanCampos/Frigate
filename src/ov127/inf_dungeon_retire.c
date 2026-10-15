@@ -2,6 +2,8 @@
 // and a no button. Named after the ROM's "inf_dungeon_retire.c"
 #include "field/inf_dungeon_retire.h"
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/subscreen.h"
 #include "gfl/arc.h"
@@ -23,8 +25,6 @@
 #include "system/gf_font.h"
 #include "system/printsys.h"
 #include "system/wipe.h"
-#include "constants/arc.h"
-#include "constants/text_banks.h"
 
 struct InfDungeonRetire {
     HeapID heapId; // never set, so 0
@@ -190,16 +190,49 @@ static void InfDungeonRetire_InitBGs(InfDungeonRetire *work, HeapID heapId) {
     u32 gender;
     static const u32 sPlayerPaletteFiles[2] = { 0, 1 };
     static const BGSetup sMessageBGSetup = {
-        0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800), GX_BG_CHARBASE(0), 0x6800,
-        GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, FALSE,
+        0,
+        0,
+        0x800,
+        0,
+        BGRES_256x256,
+        GX_BG_COLORMODE_16,
+        GX_BG_SCRBASE(0x7800),
+        GX_BG_CHARBASE(0),
+        0x6800,
+        GX_BG_EXTPLTT_01,
+        3,
+        GX_BG_AREAOVER_XLU,
+        FALSE,
     };
     static const BGSetup sMenuBGSetup = {
-        0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7000), GX_BG_CHARBASE(0), 0x6800,
-        GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE,
+        0,
+        0,
+        0x800,
+        0,
+        BGRES_256x256,
+        GX_BG_COLORMODE_16,
+        GX_BG_SCRBASE(0x7000),
+        GX_BG_CHARBASE(0),
+        0x6800,
+        GX_BG_EXTPLTT_01,
+        2,
+        GX_BG_AREAOVER_XLU,
+        FALSE,
     };
     static const BGSetup sFrameBGSetup = {
-        0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x6800), GX_BG_CHARBASE(0), 0x6800,
-        GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE,
+        0,
+        0,
+        0x800,
+        0,
+        BGRES_256x256,
+        GX_BG_COLORMODE_16,
+        GX_BG_SCRBASE(0x6800),
+        GX_BG_CHARBASE(0),
+        0x6800,
+        GX_BG_EXTPLTT_01,
+        2,
+        GX_BG_AREAOVER_XLU,
+        FALSE,
     };
 
     for (bg = 4; bg <= 7; bg++) {

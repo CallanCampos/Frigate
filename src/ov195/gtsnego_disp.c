@@ -899,9 +899,9 @@ static void GtsNegoDisp_CreateListFooter(GtsNegoDisp *disp) {
     setup.sequence = 0;
     setup.priority = 1;
     setup.bgPriority = 1;
-    disp->listFooter = func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_FOOTER],
-                                     disp->res[GTSNEGO_RES_PLTT_FOOTER], disp->res[GTSNEGO_RES_ANIM_FOOTER], &setup, 1,
-                                     disp->heapId);
+    disp->listFooter =
+        func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_FOOTER], disp->res[GTSNEGO_RES_PLTT_FOOTER],
+                      disp->res[GTSNEGO_RES_ANIM_FOOTER], &setup, 1, disp->heapId);
     func_0204c520(disp->listFooter, TRUE);
     func_0204c124(disp->listFooter, TRUE);
 }

@@ -90,7 +90,7 @@ static u16 Calendar_GetOffsetForZone(Calendar *calendar, u16 zoneId) {
 }
 
 static u16 Calendar_GetDayOfYear(u8 month, u8 day) {
-    u8 days[13] = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    u8 days[13] = { 0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     int i;
     u16 total = 0;
     u16 dayOfMonth;

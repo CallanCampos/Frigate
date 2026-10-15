@@ -310,8 +310,7 @@ static void CGearSw_BlinkLampQuick(CGearSw *work, int lamp, CGearSwPattern *patt
 static void CGearSw_LightLamp(CGearSw *work, int lamp, CGearSwPattern *pattern);
 static void CGearSw_SetLampColor(CGearSw *work, int lamp, int fraction, int max);
 static void CGearSw_ReadLampPalette(CGearSw *work, const u16 *colors, int palette);
-static BOOL CGearSw_TryLampPattern(CGearSw *work, int lamp, int palette, int pattern, int wantPattern,
-                                   int wantLamp);
+static BOOL CGearSw_TryLampPattern(CGearSw *work, int lamp, int palette, int pattern, int wantPattern, int wantLamp);
 static void CGearSwPattern_Init(CGearSwPattern *pattern, u16 max, u16 start, u8 loop);
 static void CGearSwPattern_Update(CGearSwPattern *pattern);
 static BOOL CGearSwPattern_IsFinished(CGearSwPattern *pattern, int lamp);
@@ -445,11 +444,14 @@ static const u8 sDarkActors[] = {
     ACTOR_EDIT, ACTOR_MARKER + 1, ACTOR_MARKER + 3, ACTOR_MARKER + 5, ACTOR_NOTICE, ACTOR_RADAR,
 };
 
+// clang-format off
 static const TouchRect sCGearSwButtonRects[8] = {
     { TOUCH_RECT_CIRCLE, 48, 22, 16 },   { TOUCH_RECT_CIRCLE, 208, 22, 16 },  { TOUCH_RECT_CIRCLE, 200, 180, 10 },
     { TOUCH_RECT_CIRCLE, 215, 163, 10 }, { TOUCH_RECT_CIRCLE, 228, 144, 10 }, { TOUCH_RECT_CIRCLE, 35, 160, 15 },
     { 84, 108, 84, 172 },                { 10, 26, 102, 154 },
 };
+
+// clang-format on
 
 // The color buttons, each after the gap that precedes it
 static const TouchRect sColorButtonRects[] = {
@@ -652,8 +654,7 @@ static void CGearSw_SetLampPattern(CGearSw *work, int pattern, int lamp, BOOL in
             for (i = 0; i < 3; i++) {
                 work->wirelessCycle = (work->wirelessCycle + 1) % 3;
                 if ((sWirelessBits[work->wirelessCycle] & bits) || (work->wirelessCycle == 2 && work->newBeacon)) {
-                    if (CGearSw_TryLampPattern(work, 1, sWirelessPalettes[work->wirelessCycle], twice, pattern,
-                                               lamp)) {
+                    if (CGearSw_TryLampPattern(work, 1, sWirelessPalettes[work->wirelessCycle], twice, pattern, lamp)) {
                         if (work->wirelessCycle == 2) {
                             work->newBeacon = FALSE;
                         }
@@ -846,8 +847,7 @@ static void CGearSw_ReadLampPalette(CGearSw *work, const u16 *colors, int palett
     }
 }
 
-static BOOL CGearSw_TryLampPattern(CGearSw *work, int lamp, int palette, int pattern, int wantPattern,
-                                   int wantLamp) {
+static BOOL CGearSw_TryLampPattern(CGearSw *work, int lamp, int palette, int pattern, int wantPattern, int wantLamp) {
     if (pattern == wantPattern && lamp == wantLamp) {
         work->lampTargets[lamp] = palette;
         work->lampPatterns[lamp] = pattern;
@@ -1024,8 +1024,8 @@ static void CGearSw_LoadObjRes(CGearSw *work, int gender) {
 
 static void CGearSw_LoadSkinChars(CGearSw *work) {
     NNSG2dCharacterData *character;
-    void *file = GFL_ArcToolReadHeapNew(work->arc, work->gender * SKIN_COUNT + work->skin + 19,
-                                        HEAPID_TAIL(work->heapId));
+    void *file =
+        GFL_ArcToolReadHeapNew(work->arc, work->gender * SKIN_COUNT + work->skin + 19, HEAPID_TAIL(work->heapId));
 
     NNS_G2dGetUnpackedCharacterData(file, &character);
     func_0204ba40(work->objRes[2], character);
@@ -1040,8 +1040,19 @@ static void CGearSw_InitBG(CGearSw *work) {
     }
     {
         BGSetup setup = {
-            0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x6000), GX_BG_CHARBASE(0x00000), 0x4000,
-            GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x6000),
+            GX_BG_CHARBASE(0x00000),
+            0x4000,
+            GX_BG_EXTPLTT_01,
+            0,
+            GX_BG_AREAOVER_XLU,
+            FALSE,
         };
 
         GFL_BGSysCreateBG(7, &setup, 0);
@@ -1052,8 +1063,19 @@ static void CGearSw_InitBG(CGearSw *work) {
     }
     {
         BGSetup setup = {
-            0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x6800), GX_BG_CHARBASE(0x00000), 0x4000,
-            GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x6800),
+            GX_BG_CHARBASE(0x00000),
+            0x4000,
+            GX_BG_EXTPLTT_01,
+            0,
+            GX_BG_AREAOVER_XLU,
+            FALSE,
         };
 
         GFL_BGSysCreateBG(6, &setup, 0);
@@ -1064,8 +1086,19 @@ static void CGearSw_InitBG(CGearSw *work) {
     }
     {
         BGSetup setup = {
-            0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7000), GX_BG_CHARBASE(0x00000), 0x4000,
-            GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x7000),
+            GX_BG_CHARBASE(0x00000),
+            0x4000,
+            GX_BG_EXTPLTT_01,
+            0,
+            GX_BG_AREAOVER_XLU,
+            FALSE,
         };
 
         GFL_BGSysCreateBG(4, &setup, 0);
@@ -1077,8 +1110,19 @@ static void CGearSw_InitBG(CGearSw *work) {
     {
         // The skin's
         BGSetup setup = {
-            0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800), GX_BG_CHARBASE(0x04000), 0x2000,
-            GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+            0,
+            0,
+            0x800,
+            0,
+            BGRES_256x256,
+            GX_BG_COLORMODE_16,
+            GX_BG_SCRBASE(0x7800),
+            GX_BG_CHARBASE(0x04000),
+            0x2000,
+            GX_BG_EXTPLTT_01,
+            0,
+            GX_BG_AREAOVER_XLU,
+            FALSE,
         };
 
         GFL_BGSysCreateBG(5, &setup, 0);
@@ -1256,12 +1300,15 @@ static void CGearSw_SetEditing(CGearSw *work, BOOL editing) {
 static const u8 sClockDigitSteps[4] = { 0, 6, 9, 6 };
 
 // The actors from ACTOR_CLOCK on
+// clang-format off
 static const CGearSwActorData sActorData[ACTOR_COUNT - ACTOR_CLOCK] = {
     { 1, 48, 22, 1, 2, 0 },   { 5, 208, 22, 1, 2, 0 },  { 21, 128, 10, 1, 1, 0 }, { 6, 200, 180, 1, 1, 0 },
     { 8, 215, 163, 1, 1, 0 }, { 10, 228, 144, 1, 1, 0 }, { 12, 35, 160, 1, 1, 0 }, { 3, 128, 96, 1, 7, 0 },
     { 16, 128, 86, 1, 7, 0 }, { 0, 68, 60, 1, 5, 1 },   { 22, 68, 60, 1, 6, 0 },  { 1, 128, 164, 1, 5, 1 },
     { 23, 128, 164, 1, 6, 0 }, { 2, 188, 60, 1, 5, 1 },  { 24, 188, 60, 1, 6, 0 }, { 28, 68, 60, 1, 3, 0 },
 };
+
+// clang-format on
 
 static const CGearSwMarkerPos sMarkerPositions[MARKER_POS_COUNT] = {
     { 16, 96, 4 },   { 40, 96, 3 },   { 60, 96, 2 },   { 196, 96, 2 },  { 216, 96, 3 },  { 240, 96, 4 },
@@ -2530,8 +2577,8 @@ static GameEventReturnCode CGearSw_EventMain(GameEvent *event, u32 *state, void 
         next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(17), func_ov017_0216e79c, NULL);
         break;
     case ACTION_RADAR:
-        next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(18), (GameEventProvider)func_ov018_0216e708,
-                                               field);
+        next =
+            GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(18), (GameEventProvider)func_ov018_0216e708, field);
         break;
     case ACTION_LOG:
         GameBeaconSys_ClearNotice(1);

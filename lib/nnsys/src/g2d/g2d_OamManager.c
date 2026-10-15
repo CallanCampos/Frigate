@@ -1,8 +1,7 @@
-#include "nnsys/g2d.h"
-
 #include "nitro/gx.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "nnsys/g2d.h"
 
 // NitroSystem's g2d_OamManager.c: the OAM managers. Each type of OAM has a buffer of its OAMs and affine parameters,
 // which the managers share out in ranges, and a manager fills its range each frame and sends it to the hardware

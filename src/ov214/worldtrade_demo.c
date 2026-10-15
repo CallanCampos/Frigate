@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/ui/ui_scene.h"
 #include "app/pokemon_trade.h"
+#include "app/ui/ui_scene.h"
 #include "constants/pokemon.h"
 #include "demo/shinka_demo.h"
 #include "gfl/heap.h"

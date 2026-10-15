@@ -2,8 +2,8 @@
 #define POKEBW2_SAVE_TRIAL_HOUSE_H
 
 #include "types.h"
-#include "struct_decls.h"
 #include "gfl/heap.h"
+#include "struct_decls.h"
 
 // Save block 0x3f
 // A Pokémon of a recorded team

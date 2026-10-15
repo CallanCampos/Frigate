@@ -1,6 +1,6 @@
 #include "types.h"
-#include "field/field_light_status.h"
 #include "constants/arc.h"
+#include "field/field_light_status.h"
 #include "field/field_weather.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
@@ -43,7 +43,8 @@ void FieldLightStatus_Get(u32 zoneId, u32 hour, u32 minute, u32 weather, u32 sea
     int seconds = minute * 60 + hour * 3600;
 
     if (weather != 0) {
-        data = FieldLightStatus_LoadData(ARCID_LIGHTS_BATTLE, FieldLightStatus_GetWeatherLight(weather), &count, HEAPID_TAIL(heapId));
+        data = FieldLightStatus_LoadData(ARCID_LIGHTS_BATTLE, FieldLightStatus_GetWeatherLight(weather), &count,
+                                         HEAPID_TAIL(heapId));
     }
     if (data == NULL) {
         u32 index = GetZoneStaticLightDataIndex(zoneId);
@@ -60,7 +61,8 @@ void FieldLightStatus_Get(u32 zoneId, u32 hour, u32 minute, u32 weather, u32 sea
             areaSeason = season;
         }
         areaData = AreaData_Create(HEAPID_TAIL(heapId), ZoneData_GetAreaID(zoneId), areaSeason);
-        data = FieldLightStatus_LoadData(ARCID_LIGHTS_FIELD, AreaData_GetLightsID(areaData), &count, HEAPID_TAIL(heapId));
+        data =
+            FieldLightStatus_LoadData(ARCID_LIGHTS_FIELD, AreaData_GetLightsID(areaData), &count, HEAPID_TAIL(heapId));
         AreaData_Free(areaData);
     }
     FieldLightStatus_GetColors(data, count, seconds, season, colors);

@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/dream_world.h"
-#include "gfl/std.h"
 #include "constants/items.h"
+#include "gfl/std.h"
+#include "save/dream_world.h"
 #include "save/save_control.h"
 
 // The save block of the Dream World: the Pokémon sent there to sleep, the items and the result it sent back,

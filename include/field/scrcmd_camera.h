@@ -5,8 +5,8 @@
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "struct_decls.h"
 #include "field/field_script.h"
+#include "struct_decls.h"
 #include "system/vm.h"
 
 BOOL s013F_EvCameraInit(VM *vm, FieldScriptEnv *env);

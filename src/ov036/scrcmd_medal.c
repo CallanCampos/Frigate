@@ -6,14 +6,14 @@
 #include "field/medal.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
+#include "nitro/fx.h"
+#include "nitro/rtc.h"
 #include "save/medal_box.h"
 #include "system/game_beacon.h"
 #include "system/game_comm.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
 #include "system/vm.h"
-#include "nitro/fx.h"
-#include "nitro/rtc.h"
 
 BOOL s026E_MedalGetCount(VM *vm, FieldScriptEnv *env) {
     MedalBox *box = SaveControl_GetMedalBox(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));

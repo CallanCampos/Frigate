@@ -49,7 +49,8 @@ static void PkwdSelectScreenClAct_Update(PkwdSelectScreenClAct *clact);
 static void PkwdSelectScreenClAct_VBlank(PkwdSelectScreenClAct *clact);
 static ClActUnit *PkwdSelectScreenClAct_GetUnit(PkwdSelectScreenClAct *clact);
 
-static const BGSysLCDConfig sPkwdSelectScreenLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
+static const BGSysLCDConfig sPkwdSelectScreenLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0,
+                                                           GX_BG0_AS_2D };
 static const ClActSysSetup sPkwdSelectScreenClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
 static const BGSysVRAMConfig sPkwdSelectScreenVRAMConfig = {
@@ -102,7 +103,8 @@ static const PkwdSelectScreenBGSetup sPkwdSelectScreenBGSetups[BG_COUNT] = {
 };
 
 PkwdSelectScreenGraphic *PkwdSelectScreenGraphic_Create(u32 layout, HeapID heapId) {
-    PkwdSelectScreenGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(PkwdSelectScreenGraphic), FALSE, "pkwd_selectscreen_graphic.c", 319);
+    PkwdSelectScreenGraphic *graphic =
+        GFL_HeapAllocate(heapId, sizeof(PkwdSelectScreenGraphic), FALSE, "pkwd_selectscreen_graphic.c", 319);
 
     sys_memset(graphic, 0, sizeof(PkwdSelectScreenGraphic));
     G2_BlendNone();
@@ -159,7 +161,8 @@ static void PkwdSelectScreenBG_Init(PkwdSelectScreenBG *bg, HeapID heapId) {
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sPkwdSelectScreenLCDConfig);
     for (i = 0; i < NELEMS(sPkwdSelectScreenBGSetups); i++) {
-        GFL_BGSysCreateBG(sPkwdSelectScreenBGSetups[i].bg, &sPkwdSelectScreenBGSetups[i].setup, sPkwdSelectScreenBGSetups[i].mode);
+        GFL_BGSysCreateBG(sPkwdSelectScreenBGSetups[i].bg, &sPkwdSelectScreenBGSetups[i].setup,
+                          sPkwdSelectScreenBGSetups[i].mode);
         GFL_BGSysClearBG(sPkwdSelectScreenBGSetups[i].bg);
         GFL_BGSysSetBGEnabled(sPkwdSelectScreenBGSetups[i].bg, sPkwdSelectScreenBGSetups[i].enabled);
     }

@@ -56,7 +56,8 @@ typedef struct WifiLoginMessage {
 WifiLoginMessage *WifiLoginMessage_Create(HeapID heapId, u32 bank, u32 style);
 void WifiLoginMessage_Update(WifiLoginMessage *msg);
 void WifiLoginMessage_Free(WifiLoginMessage *msg);
-// Print a message of the loaded bank (WifiLoginMessage_PrintFrom: of msgData), and wait for it with WifiLoginMessage_IsDone
+// Print a message of the loaded bank (WifiLoginMessage_PrintFrom: of msgData), and wait for it with
+// WifiLoginMessage_IsDone
 void WifiLoginMessage_Print(WifiLoginMessage *msg, u32 msgNo);
 void WifiLoginMessage_PrintFrom(WifiLoginMessage *msg, MsgData *msgData, u32 msgNo);
 // The same, then with the wait icon on the window

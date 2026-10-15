@@ -1,5 +1,4 @@
 #include "types.h"
-#include "system/wih_dwc.h"
 #include "app/comm_tvt_field.h"
 #include "gfl/net.h"
 #include "gfl/net_whpipe.h"
@@ -9,6 +8,7 @@
 #include "nitro/os.h"
 #include "nitro/wm.h"
 #include "system/ctvt_beacon.h"
+#include "system/wih_dwc.h"
 
 // What the wireless scan sees around the player, for the icons of the C-Gear and the other screens that show the
 // state of the wireless: the access points the console is set up for, the hotspots, the other access points with and
@@ -24,13 +24,7 @@
 #define WIFI_SLOT_SSID_COUNT 2
 #define WIFI_CONFIG_SIZE 0xa00
 
-enum {
-    AP_TIMER_KNOWN,
-    AP_TIMER_HOTSPOT,
-    AP_TIMER_OPEN,
-    AP_TIMER_LOCKED,
-    AP_TIMER_COUNT
-};
+enum { AP_TIMER_KNOWN, AP_TIMER_HOTSPOT, AP_TIMER_OPEN, AP_TIMER_LOCKED, AP_TIMER_COUNT };
 
 // One of the console's Wi-Fi connection settings
 typedef struct {
@@ -80,7 +74,9 @@ void *func_02012908(int num, HeapID heapId) {
     WihDwcWork *work;
 
     GFL_ASSERT(num <= _ALLBEACON_MAX);
+    // clang-format off
     GFL_ASSERT(_localWork==NULL);
+    // clang-format on
     work = allocConfigDSSoftwareFeature(heapId, sizeof(WihDwcWork), "wih_dwc.c", 73);
     work->num = num;
     work->parseWork = allocConfigDSSoftwareFeature(heapId, func_0205b588(), "wih_dwc.c", 76);
@@ -280,7 +276,9 @@ u32 func_02012be4(WifiList *wifiList) {
 }
 
 void setupDownloadPlayConfig(HeapID heapId) {
+    // clang-format off
     GFL_ASSERT(_localcfg==NULL);
+    // clang-format on
     _localcfg = allocConfigDSSoftwareFeature(heapId, WIFI_CONFIG_SIZE, "wih_dwc.c", 472);
 }
 

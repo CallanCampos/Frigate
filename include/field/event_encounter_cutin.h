@@ -4,8 +4,8 @@
 // Event function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 
 #include "types.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 GameEvent *EventFieldEffect_CreateBattleCutin(GameSystem *gsys, void *field3d, u32 selection, u32 param);
 

@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_ENCOUNTER_EFFECT_MODEL_H
 
 #include "types.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // Overlay 149 runs the encounter effects that play an animated 3D model over a capture of the screen. The file name
 // is descriptive, since the overlay embeds no name

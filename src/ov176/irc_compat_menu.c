@@ -539,8 +539,8 @@ static void IrcCompatMenuClAct_Init(IrcCompatMenuClAct *clact, const BGSysVRAMCo
     setup.x = 129;
     setup.y = 104;
     setup.sequence = 15;
-    clact->actors[ACTOR_BACKGROUND] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims,
-                                                    &setup, CLACT_SURFACE_SUB, heapId);
+    clact->actors[ACTOR_BACKGROUND] =
+        func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
     func_0204c124(clact->actors[ACTOR_BACKGROUND], TRUE);
     func_0204c468(clact->actors[ACTOR_BACKGROUND], 2);
     func_0204c520(clact->actors[ACTOR_BACKGROUND], FALSE);
@@ -956,8 +956,8 @@ static void IrcCompatMenuButtons_Init(IrcCompatMenuButtons *buttons, u8 bg, cons
         u32 height;
         GFLBitmap *bitmap;
 
-        buttons->windows[i] = BmpWin_CreateDynamic(bg, def->x + 4, def->y + 1, def->width - 8, def->height - 2,
-                                                   def->palette, TRUE);
+        buttons->windows[i] =
+            BmpWin_CreateDynamic(bg, def->x + 4, def->y + 1, def->width - 8, def->height - 2, def->palette, TRUE);
         GFL_BitmapFill(BmpWin_GetBitmap(buttons->windows[i]), 4);
         BmpWin_TransferNow(buttons->windows[i]);
         label = GFL_MsgDataLoadStrbufNew(IrcCompatMenuText_GetMsgData(text), def->msgId);

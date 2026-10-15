@@ -1,6 +1,6 @@
 #include "types.h"
-#include "gfl/sound.h"
 #include "gfl/heap.h"
+#include "gfl/sound.h"
 #include "gfl/std.h"
 #include "nnsys/snd.h"
 

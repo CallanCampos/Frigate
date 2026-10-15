@@ -254,10 +254,10 @@ const WMMpRecvData *func_02081040(const WMMpRecvBuf *recvBuf, u16 aid);
 // The calls that start the parent: apiids 8 and 0x19, each with a flag
 int func_02081544(WMCallbackFunc callback, int enable);
 int func_0208252c(WMCallbackFunc callback, int enable);
-int func_02081594(WMCallbackFunc callback);                                    // WM_StartParent
-int func_020815a0(WMCallbackFunc callback);                                    // WM_EndParent
-int func_020815c8(WMCallbackFunc callback, WMScanExParam *param);              // WM_StartScanEx
-int func_020816b4(WMCallbackFunc callback);                                    // WM_EndScan
+int func_02081594(WMCallbackFunc callback);                       // WM_StartParent
+int func_020815a0(WMCallbackFunc callback);                       // WM_EndParent
+int func_020815c8(WMCallbackFunc callback, WMScanExParam *param); // WM_StartScanEx
+int func_020816b4(WMCallbackFunc callback);                       // WM_EndScan
 // Starts the multi-point mode: like func_0208195c, with five more parameters
 int func_020818f8(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
                   u16 unk6, u16 unk7, u16 unk8, u16 unk9, u16 unk10);
@@ -265,8 +265,7 @@ int func_020818f8(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void 
 int func_020816dc(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave, u16 authMode);
 int func_02081774(WMCallbackFunc callback, u16 aid); // WM_Disconnect
 // WM_StartMP
-int func_0208195c(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize,
-                  u16 mpFreq);
+int func_0208195c(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq);
 // WM_SetMPDataToPortEx
 int func_02081998(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap, u16 port,
                   u16 prio);
@@ -276,9 +275,9 @@ int func_02081a68(WMCallbackFunc callback); // WM_EndMP
 int func_02081b18(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength);
 // WM_StartDataSharing
 int func_02081bd8(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode);
-int func_02081dbc(WMDataSharingInfo *dsi);                                                    // WM_EndDataSharing
-int func_02081df0(WMDataSharingInfo *dsi, const void *data, WMDataSet *dataSet);              // WM_StepDataSharing
-void *func_020823ac(const WMDataSharingInfo *dsi, const WMDataSet *dataSet, u16 aid);         // WM_GetSharedDataAddress
+int func_02081dbc(WMDataSharingInfo *dsi);                                            // WM_EndDataSharing
+int func_02081df0(WMDataSharingInfo *dsi, const void *data, WMDataSet *dataSet);      // WM_StepDataSharing
+void *func_020823ac(const WMDataSharingInfo *dsi, const WMDataSet *dataSet, u16 aid); // WM_GetSharedDataAddress
 // WM_SetGameInfo
 int func_020824bc(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr);
 // WM_SetLifeTime

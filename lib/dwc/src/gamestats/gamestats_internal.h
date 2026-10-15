@@ -37,7 +37,8 @@ BOOL DWC_ProcessGHTTP(void);
 typedef void (*GamestatsAnsweredFunc)(char *data, int size, int status, void *arg);
 typedef void (*GamestatsSentFunc)(void);
 // Starts a request for the URL and returns its number, or a negative number
-int DWC_GetGHTTPData(const char *url, int a1, int a2, GamestatsSentFunc sent, GamestatsAnsweredFunc answered, void *arg);
+int DWC_GetGHTTPData(const char *url, int a1, int a2, GamestatsSentFunc sent, GamestatsAnsweredFunc answered,
+                     void *arg);
 // Cancels a request
 void DWC_CancelGHTTPRequest(int request);
 

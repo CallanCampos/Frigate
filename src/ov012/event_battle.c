@@ -13,8 +13,6 @@
 #include "constants/species.h"
 #include "constants/version.h"
 #include "field/badge_gate.h"
-#include "field/infinity_dungeon.h"
-#include "field/infinity_dungeon_gimmick.h"
 #include "field/encounter.h"
 #include "field/event_battle.h"
 #include "field/event_battle_lose.h"
@@ -26,6 +24,8 @@
 #include "field/field_map.h"
 #include "field/field_status.h"
 #include "field/game_beacon_set.h"
+#include "field/infinity_dungeon.h"
+#include "field/infinity_dungeon_gimmick.h"
 #include "field/infinity_dungeon_rooms.h"
 #include "field/player_state.h"
 #include "field/trial_house.h"
@@ -94,16 +94,17 @@ static void *func_ov012_02169180(u32 *seed, void *work);
 static void *func_ov012_02169198(u32 *seed, void *work);
 
 // The result of a wild battle for each battle result
-static const u8 WILD_BATTLE_RESULT[7] = {0xff, 2, 0xff, 1, 1, 0, 0};
+static const u8 WILD_BATTLE_RESULT[7] = { 0xff, 2, 0xff, 1, 1, 0, 0 };
 
 // The beacons a trainer battle sends, for its kind of trainer and whether it starts or ends
 static void (*const data_ov012_0216dd24[3][2])(u16 trainerId) = {
-    {func_ov012_0215fa90, func_ov012_0215faf0},
-    {func_ov012_0215fb50, func_ov012_0215fbb0},
-    {func_ov012_0215fc10, func_ov012_0215fc70},
+    { func_ov012_0215fa90, func_ov012_0215faf0 },
+    { func_ov012_0215fb50, func_ov012_0215fbb0 },
+    { func_ov012_0215fc10, func_ov012_0215fc70 },
 };
 
 // Whether each battle result is not a defeat, for each battle type
+// clang-format off
 static const u8 BTL_RESULT_LUT[7][5] = {
     {0, 0, 0, 0, 0},
     {1, 1, 1, 1, 0},
@@ -114,8 +115,10 @@ static const u8 BTL_RESULT_LUT[7][5] = {
     {0, 0, 0, 0, 0},
 };
 
+// clang-format on
+
 // The trainer classes that send the third kind of beacon
-static u16 data_ov012_0216e5cc[7] = {0x9b, 0x9c, 0xc0, 0xbe, 0x0a, 0x0c, 0x0b};
+static u16 data_ov012_0216e5cc[7] = { 0x9b, 0x9c, 0xc0, 0xbe, 0x0a, 0x0c, 0x0b };
 
 static GameEventReturnCode EventWildBattleCall_Callback(GameEvent *event, u32 *state, void *work) {
     EventWildBattleCallWork *wk = work;
@@ -242,7 +245,8 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
         if (func_02018f60(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(field)))) {
             u8 level = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
 
-            setup->fieldSituation.env.terrain = func_ov127_021f0dd8(InfinityDungeonGimmick_GetDungeon(field)) == 0x17 ? 0x12 : 0x13;
+            setup->fieldSituation.env.terrain =
+                func_ov127_021f0dd8(InfinityDungeonGimmick_GetDungeon(field)) == 0x17 ? 0x12 : 0x13;
             setup->fieldSituation.env.bgType = level;
             setup->unkDD_5 = TRUE;
             setup->unkDE_0 = TRUE;

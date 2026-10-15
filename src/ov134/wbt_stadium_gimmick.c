@@ -69,8 +69,8 @@ static u32 WbtStadiumGimmick_GetPlttAddr(const NNSG3dResTex *tex, const NNSG3dRe
 static void WbtStadiumGimmick_MakeResName(NNSG3dResName *resName, const char *name);
 static u32 WbtStadiumGimmick_FindTexAddr(const NNSG3dResTex *tex, const char *name);
 static u32 WbtStadiumGimmick_FindPlttAddr(const NNSG3dResTex *tex, const char *name);
-static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource, const char *texName, const char *plttName, u16 file,
-                         u16 heapId);
+static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource, const char *texName,
+                                           const char *plttName, u16 file, u16 heapId);
 static void WbtStadiumGimmick_LoadSinglePortraitScene(GimmickWork *work, u8 position);
 static void WbtStadiumGimmick_AddEndTask(GimmickWork *work);
 static BOOL WbtStadiumGimmick_EndTask(void *data);
@@ -95,6 +95,7 @@ static const G3DSceneAnimationSetup sActor4Anms[] = { { 9, 0 } };
 static const G3DSceneAnimationSetup sActor13Anms[] = { { 0x1d, 0 } };
 static const G3DSceneAnimationSetup sActor6Anms[] = { { 0xe, 0 }, { 0xf, 0 } };
 static const G3DSceneAnimationSetup sActor11Anms[] = { { 0x15, 0 }, { 0x16, 0 }, { 0x17, 0 } };
+// clang-format off
 static const G3DSceneActorSetup sActors[] = {
     { 0, 0, 0, 0, sActor0Anms, 2 },    { 3, 0, 3, 0, NULL, 0 },          { 4, 0, 4, 0, sActor2Anms, 2 },
     { 7, 0, 7, 0, NULL, 0 },           { 8, 0, 8, 0, sActor4Anms, 1 },   { 10, 0, 10, 0, sActor5Anms, 2 },
@@ -102,6 +103,8 @@ static const G3DSceneActorSetup sActors[] = {
     { 18, 0, 18, 0, NULL, 0 },         { 19, 0, 19, 0, NULL, 0 },        { 20, 0, 20, 0, sActor11Anms, 3 },
     { 24, 0, 24, 0, sActor12Anms, 3 }, { 28, 0, 28, 0, sActor13Anms, 1 }, { 30, 0, 30, 0, sActor14Anms, 3 },
 };
+
+// clang-format on
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
 static char *sNameTexNames[3] = { "wbt_name01", "wbt_name02", "wbt_name03" };
@@ -608,8 +611,8 @@ static u32 WbtStadiumGimmick_FindPlttAddr(const NNSG3dResTex *tex, const char *n
 
 // Reads the portrait's character and palette, 4 by 4 characters taken from the 28th character of the first four
 // rows, and sends them to the texture and palette in VRAM
-static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource, const char *texName, const char *plttName, u16 file,
-                         u16 heapId) {
+static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource, const char *texName,
+                                           const char *plttName, u16 file, u16 heapId) {
     NNSG3dResTex *tex;
     u32 texAddr;
     u32 plttAddr;

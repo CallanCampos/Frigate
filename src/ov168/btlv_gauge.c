@@ -1547,15 +1547,15 @@ static void BtlvGauge_FlashTask(TCB *tcb, void *data) {
             }
         }
         if (work->paletteMask != 0) {
-            PaletteFade_StartFade(BtlvEffect_GetPaletteFade(), 1 << PALFADE_BUFFER_MAIN_OBJ, work->paletteMask, 0, 0, 8, 0x10,
-                                  BtlvEffect_GetTCBManager());
+            PaletteFade_StartFade(BtlvEffect_GetPaletteFade(), 1 << PALFADE_BUFFER_MAIN_OBJ, work->paletteMask, 0, 0, 8,
+                                  0x10, BtlvEffect_GetTCBManager());
             work->seq = 1;
         }
         break;
     case 1:
         if (PaletteFade_GetActiveMask(BtlvEffect_GetPaletteFade()) == 0) {
-            PaletteFade_StartFade(BtlvEffect_GetPaletteFade(), 1 << PALFADE_BUFFER_MAIN_OBJ, work->paletteMask, 0, 8, 0, 0x10,
-                                  BtlvEffect_GetTCBManager());
+            PaletteFade_StartFade(BtlvEffect_GetPaletteFade(), 1 << PALFADE_BUFFER_MAIN_OBJ, work->paletteMask, 0, 8, 0,
+                                  0x10, BtlvEffect_GetTCBManager());
             work->seq = 2;
         }
         break;

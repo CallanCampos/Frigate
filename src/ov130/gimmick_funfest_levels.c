@@ -101,7 +101,8 @@ static const G3DSceneActorSetup sFunfestLevelsActors[MODEL_COUNT] = {
     { 10, 0, 10, 0, sLeaveEffectAnimations, NELEMS(sLeaveEffectAnimations) },
 };
 
-static const G3DSceneSetup sFunfestLevelsSceneSetup = { sFunfestLevelsResources, NELEMS(sFunfestLevelsResources), sFunfestLevelsActors, NELEMS(sFunfestLevelsActors) };
+static const G3DSceneSetup sFunfestLevelsSceneSetup = { sFunfestLevelsResources, NELEMS(sFunfestLevelsResources),
+                                                        sFunfestLevelsActors, NELEMS(sFunfestLevelsActors) };
 
 void GimmickFunfestLevels_Setup(Field *field) {
     HeapID heapId = Field_GetHeapID(field);

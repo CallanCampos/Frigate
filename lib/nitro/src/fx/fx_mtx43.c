@@ -7,6 +7,7 @@
 #include "nitro/mi.h"
 
 #pragma thumb off
+// clang-format off
 asm void MTX_Identity43_(MtxFx43 *mtx) {
     mov r2, #0x1000
     mov r3, #0
@@ -20,6 +21,9 @@ asm void MTX_Identity43_(MtxFx43 *mtx) {
     bx lr
 }
 
+// clang-format on
+
+// clang-format off
 asm void MTX_Copy43To44_(const MtxFx43 *src, MtxFx44 *dst) {
     stmdb sp!, {r4}
     mov ip, #0
@@ -35,8 +39,11 @@ asm void MTX_Copy43To44_(const MtxFx43 *src, MtxFx44 *dst) {
     ldmia sp!, {r4}
     bx lr
 }
+
+// clang-format on
 #pragma thumb on
 
+// clang-format off
 asm void MTX_Scale43_(MtxFx43 *mtx, fx32 x, fx32 y, fx32 z) {
     stmia r0!, {r1}
     mov r1, #0
@@ -51,6 +58,8 @@ asm void MTX_Scale43_(MtxFx43 *mtx, fx32 x, fx32 y, fx32 z) {
     bx lr
 }
 
+// clang-format on
+
 #pragma thumb off
 void MTX_ScaleApply43(const MtxFx43 *src, MtxFx43 *dest, fx32 x, fx32 y, fx32 z) {
     MTX_ScaleApply33(&src->rt.rot, &dest->rt.rot, x, y, z);
@@ -60,6 +69,7 @@ void MTX_ScaleApply43(const MtxFx43 *src, MtxFx43 *dest, fx32 x, fx32 y, fx32 z)
 }
 #pragma thumb on
 
+// clang-format off
 asm void MTX_RotY43_(MtxFx43 *mtx, fx32 sin, fx32 cos) {
     str r1, [r0, #0x18]
     mov r3, #0
@@ -75,6 +85,8 @@ asm void MTX_RotY43_(MtxFx43 *mtx, fx32 sin, fx32 cos) {
     stmia r0!, {r1, r3}
     bx lr
 }
+
+// clang-format on
 
 #pragma thumb off
 void MTX_RotAxis43(MtxFx43 *mtx, const VecFx32 *axis, fx16 sin, fx16 cos) {

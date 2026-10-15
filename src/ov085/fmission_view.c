@@ -1,5 +1,4 @@
 #include "types.h"
-#include "field/fmission_view.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/beacon_view_common.h"
@@ -7,6 +6,7 @@
 #include "field/festival.h"
 #include "field/field_disp_control.h"
 #include "field/fmission_log_accessor_fv.h"
+#include "field/fmission_view.h"
 #include "field/fmission_view_local.h"
 #include "gfl/bmp.h"
 #include "gfl/clact.h"
@@ -214,7 +214,9 @@ static const u32 sFMissionViewPlayerModels[2] = { 209, 218 };
 // The sounds of a player's words, by their mark
 static const u16 sFMissionViewWordsSE[4] = { SEQ_SE_SW_FES_02, SEQ_SE_SW_FES_08, SEQ_SE_SW_FES_09, SEQ_SE_SW_FES_10 };
 // The palette of each look's icon
-static const u8 sFMissionViewLookPalettes[FMISSION_VIEW_LOOK_COUNT] = { 2, 3, 6, 5, 4, 5, 2, 0, 1, 3, 6, 5, 4, 7, 7, 0 };
+static const u8 sFMissionViewLookPalettes[FMISSION_VIEW_LOOK_COUNT] = {
+    2, 3, 6, 5, 4, 5, 2, 0, 1, 3, 6, 5, 4, 7, 7, 0
+};
 
 static const FMissionViewButton sFMissionViewButtons[FMISSION_VIEW_BUTTON_COUNT] = {
     { 164, 172, 0 }, { 196, 172, 0 }, { 228, 172, 0 }, { 16, 172, 0 }, { 88, 172, 1 }, { 112, 172, 2 },
@@ -536,10 +538,12 @@ void FMissionView_SetButtonState(FMissionView *view, u32 button, u32 state) {
                                 BUTTON_ANIM(FMISSION_VIEW_BUTTON_GREETING, state));
     }
     if (mask & (1 << FMISSION_VIEW_BUTTON_QUIT)) {
-        BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_QUIT], BUTTON_ANIM(FMISSION_VIEW_BUTTON_QUIT, state));
+        BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_QUIT],
+                                BUTTON_ANIM(FMISSION_VIEW_BUTTON_QUIT, state));
     }
     if (mask & (1 << FMISSION_VIEW_BUTTON_INFO)) {
-        BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_INFO], BUTTON_ANIM(FMISSION_VIEW_BUTTON_INFO, state));
+        BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_INFO],
+                                BUTTON_ANIM(FMISSION_VIEW_BUTTON_INFO, state));
     }
     if (mask & ((1 << FMISSION_VIEW_BUTTON_UP) | (1 << FMISSION_VIEW_BUTTON_DOWN))) {
         if (state == FMISSION_VIEW_BUTTON_STATE_NORMAL) {
@@ -547,7 +551,8 @@ void FMissionView_SetButtonState(FMissionView *view, u32 button, u32 state) {
             return;
         }
         BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_UP], BUTTON_ANIM(FMISSION_VIEW_BUTTON_UP, state));
-        BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_DOWN], BUTTON_ANIM(FMISSION_VIEW_BUTTON_DOWN, state));
+        BeaconView_SetActorAnim(view->buttons[FMISSION_VIEW_BUTTON_DOWN],
+                                BUTTON_ANIM(FMISSION_VIEW_BUTTON_DOWN, state));
     }
 }
 
@@ -610,7 +615,8 @@ static BOOL FMissionView_AddNewEntry(FMissionView *view) {
         break;
     }
     case 1:
-        if (FMissionLogEntryFV_IsOwn(view->newEntry) || FMissionLogEntryFV_GetKind(view->newEntry) != LOG_KIND_PASS_POWER) {
+        if (FMissionLogEntryFV_IsOwn(view->newEntry) ||
+            FMissionLogEntryFV_GetKind(view->newEntry) != LOG_KIND_PASS_POWER) {
             return TRUE;
         }
         if (!FMissionView_OfferEntryPassPower(view, view->newEntry)) {
@@ -657,8 +663,9 @@ static int FMissionView_GetTouchedButton(FMissionView *view, FMissionViewTouch *
         scroll |= 2;
     }
     for (i = 0; i < FMISSION_VIEW_BUTTON_COUNT; i++) {
-        if ((u8)(func_0204c4a0(view->buttons[i]) - (i + 1) * FMISSION_VIEW_BUTTON_STATE_COUNT) % FMISSION_VIEW_BUTTON_STATE_COUNT
-            >= FMISSION_VIEW_BUTTON_STATE_DISABLED) {
+        if ((u8)(func_0204c4a0(view->buttons[i]) - (i + 1) * FMISSION_VIEW_BUTTON_STATE_COUNT) %
+                FMISSION_VIEW_BUTTON_STATE_COUNT >=
+            FMISSION_VIEW_BUTTON_STATE_DISABLED) {
             continue;
         }
         if (sFMissionViewButtons[i].scroll != 0 && !(sFMissionViewButtons[i].scroll & scroll)) {
@@ -696,8 +703,8 @@ static void FMissionView_DrawMission(FMissionView *view) {
 
     func_ov027_02170d04(view->festText, view->message, (const FestMission *)view->config, view->tmpHeapId);
     x = (184 - (int)GFL_FontGetBlockWidth(view->message, view->font, 0)) / 2;
-    BeaconViewWin_Print(&view->wins[FMISSION_VIEW_WIN_MISSION].win, view->message, (u8)x, 4, 13,
-                        PRINT_COLOR(1, 2, 13), NULL, view->printNow);
+    BeaconViewWin_Print(&view->wins[FMISSION_VIEW_WIN_MISSION].win, view->message, (u8)x, 4, 13, PRINT_COLOR(1, 2, 13),
+                        NULL, view->printNow);
     WordSetNumber(view->wordSet, 0, view->config->info.count, 4, 1, TRUE);
     FMissionView_LoadMessage(view, view->config->info.unk10_6);
     BeaconViewWin_Print(&view->wins[FMISSION_VIEW_WIN_GOAL].win, view->message, 0, 0, 13, PRINT_COLOR(1, 2, 13), NULL,
@@ -708,8 +715,8 @@ static void FMissionView_DrawMemberCount(FMissionView *view, int *pending) {
     GFL_BitmapFill(view->wins[FMISSION_VIEW_WIN_MEMBERS].win.bitmap, 13);
     WordSetNumber(view->wordSet, 0, view->memberCount, 3, 1, TRUE);
     FMissionView_LoadMessage(view, Bank0040_Text_Participants);
-    BeaconViewWin_PrintEx(&view->wins[FMISSION_VIEW_WIN_MEMBERS].win, view->message, 0, 0, 13, PRINT_COLOR(1, 2, 13), pending,
-                          view->printNow, FALSE);
+    BeaconViewWin_PrintEx(&view->wins[FMISSION_VIEW_WIN_MEMBERS].win, view->message, 0, 0, 13, PRINT_COLOR(1, 2, 13),
+                          pending, view->printNow, FALSE);
 }
 
 // Shows or hides the buttons that a menu covers
@@ -870,13 +877,13 @@ static void FMissionView_PrintPanel(FMissionView *view, FMissionViewPanel *panel
         }
         if (view->printNow) {
             for (i = 0; i < FMISSION_VIEW_PANEL_LINE_COUNT; i++) {
-                GFL_TextRendererDrawToBitmapEx(panel->lines[i].bitmap, (i == 1) ? textX : 0, 0, panel->strs[i], view->font,
-                                               colors[i == 2]);
+                GFL_TextRendererDrawToBitmapEx(panel->lines[i].bitmap, (i == 1) ? textX : 0, 0, panel->strs[i],
+                                               view->font, colors[i == 2]);
             }
         } else {
             for (i = 0; i < FMISSION_VIEW_PANEL_LINE_COUNT; i++) {
-                func_02021c7c(view->printQueue, panel->lines[i].bitmap, (i == 1) ? textX : 0, 0, panel->strs[i], view->font,
-                              colors[i == 2]);
+                func_02021c7c(view->printQueue, panel->lines[i].bitmap, (i == 1) ? textX : 0, 0, panel->strs[i],
+                              view->font, colors[i == 2]);
             }
         }
     }
@@ -994,7 +1001,8 @@ static void FMissionView_AddPanel(FMissionView *view, FestMissionLogEntry *entry
     if (panel == NULL) {
         return;
     }
-    data = GFL_TCBExGetData(GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_PanelTask, sizeof(FMissionViewPanelTask), 0));
+    data = GFL_TCBExGetData(
+        GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_PanelTask, sizeof(FMissionViewPanelTask), 0));
     sys_memset(data, 0, sizeof(FMissionViewPanelTask));
     data->view = view;
     data->dir = dir;
@@ -1064,8 +1072,8 @@ static void FMissionView_ShowMessage(FMissionView *view, u8 messageId) {
 }
 
 static void FMissionView_StartMessage(FMissionView *view, StrBuf *strbuf, int *pending) {
-    FMissionViewMessageTask *data =
-        GFL_TCBExGetData(GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_MessageTask, sizeof(FMissionViewMessageTask), 0));
+    FMissionViewMessageTask *data = GFL_TCBExGetData(
+        GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_MessageTask, sizeof(FMissionViewMessageTask), 0));
 
     sys_memset(data, 0, sizeof(FMissionViewMessageTask));
     GFL_StrBufCopy(view->messageCopy, strbuf);

@@ -1,23 +1,23 @@
 #include "types.h"
 #include "constants/pokemon.h"
 #include "field/field.h"
+#include "field/field_actor.h"
 #include "field/field_menu.h"
 #include "field/field_script.h"
 #include "field/field_script_event.h"
-#include "field/field_actor.h"
 #include "field/hidden_event.h"
+#include "field/item_use_block.h"
 #include "field/itemuse_event.h"
 #include "field/player_action.h"
-#include "field/item_use_block.h"
 #include "field/player_state.h"
 #include "field/shortcut_menu.h"
 #include "field/subscreen.h"
 #include "gfl/graphics.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
+#include "gfl/std.h"
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
-#include "gfl/std.h"
 #include "pml/poke_party.h"
 #include "save/shortcut.h"
 #include "system/game_data.h"
@@ -275,7 +275,8 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
 
     switch (*state) {
     case 0:
-        item = ShortcutSave_GetRegistItem(SaveControl_GetShortcutSave(GameData_GetSaveControl(GSYS_GetGameData(work->gameSystem))), 0);
+        item = ShortcutSave_GetRegistItem(
+            SaveControl_GetShortcutSave(GameData_GetSaveControl(GSYS_GetGameData(work->gameSystem))), 0);
         noRibbon = FALSE;
         mode = ShortcutMenu_SetKeyItemID(work->input, item);
         checkPerms = ShortcutMenu_GetActionFromKeyItem(item, &action, &invalid);
@@ -363,7 +364,6 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
     }
     return GAMEEVENT_CONTINUE;
 }
-
 
 u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
     switch (item) {

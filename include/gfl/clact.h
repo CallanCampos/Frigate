@@ -160,8 +160,8 @@ void func_0204c028(ClActUnit *unit);
 // Positions are relative to a surface of the unit's renderer, or absolute with surface 0xffff
 ClActor *func_0204c040(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetup *setup, u16 surface,
                        HeapID heapId);
-ClActor *func_0204c0a4(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetupEx *setup,
-                       u16 surface, HeapID heapId);
+ClActor *func_0204c0a4(ClActUnit *unit, u32 chars, u32 palette, u32 cellAnims, const ClActorSetupEx *setup, u16 surface,
+                       HeapID heapId);
 void func_0204c108(ClActor *actor);
 void func_0204c124(ClActor *actor, BOOL visible);
 BOOL func_0204c138(ClActor *actor);
@@ -224,6 +224,13 @@ void func_0204c5bc(ClActor *actor);
 void func_0204c5c8(ClActor *actor, BOOL a1);
 // The actor system, which the ITCM reads
 extern ClActSys *g_ClActSys;
+
+// The renderers in ITCM (0x01ff8020..0x01ff8bf0), chosen by unk5 and unk6 of the unit. The ITCM has no source file yet,
+// so they are declared here beside the unit they draw
+void mainRenderer(ClActUnit *unit);
+void func_01ff8318(ClActUnit *unit);
+void func_01ff8610(ClActUnit *unit);
+void func_01ff8900(ClActUnit *unit);
 
 // Called from the ITCM
 void func_0204d3bc(ClActAnim *anim, fx32 frames);

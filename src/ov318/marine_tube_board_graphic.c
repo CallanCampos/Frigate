@@ -44,7 +44,8 @@ static void MarineTubeBoardClAct_Free(MarineTubeBoardClAct *clact);
 static void MarineTubeBoardClAct_Update(MarineTubeBoardClAct *clact);
 static void MarineTubeBoardClAct_VBlank(MarineTubeBoardClAct *clact);
 
-static const BGSysLCDConfig sMarineTubeBoardLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D };
+static const BGSysLCDConfig sMarineTubeBoardLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0,
+                                                          GX_BG0_AS_3D };
 static const ClActSysSetup sMarineTubeBoardClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
 static const BGSysVRAMConfig sMarineTubeBoardVRAMConfig = {
@@ -126,7 +127,8 @@ static void MarineTubeBoardBG_Init(MarineTubeBoardBG *bg, HeapID heapId) {
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sMarineTubeBoardLCDConfig);
     for (i = 0; i < NELEMS(sMarineTubeBoardBGSetups); i++) {
-        GFL_BGSysCreateBG(sMarineTubeBoardBGSetups[i].bg, &sMarineTubeBoardBGSetups[i].setup, sMarineTubeBoardBGSetups[i].mode);
+        GFL_BGSysCreateBG(sMarineTubeBoardBGSetups[i].bg, &sMarineTubeBoardBGSetups[i].setup,
+                          sMarineTubeBoardBGSetups[i].mode);
         GFL_BGSysClearBG(sMarineTubeBoardBGSetups[i].bg);
         GFL_BGSysSetBGEnabled(sMarineTubeBoardBGSetups[i].bg, sMarineTubeBoardBGSetups[i].enabled);
     }

@@ -37,9 +37,11 @@ static BOOL UnionOneself_SetActorNextStep(UnionActorSlot *slot, u8 step);
 static FieldActor *UnionOneself_CreateActor(UnionSystem *unisys, GameData *gameData, u16 look, u16 id);
 static u16 UnionOneself_GetActorId(UnionBeaconEntry *entry, UnionActorSlot *slot);
 static FieldActor *UnionOneself_FindActor(UnionSystem *unisys, UnionBeaconEntry *entry, UnionActorSlot *slot);
-static UnionActorSlot *UnionOneself_CreateActorSlot(UnionSystem *unisys, UnionBeaconEntry *entry, UnionMember *member, int memberIndex, BOOL visible, FieldActor **outActor);
+static UnionActorSlot *UnionOneself_CreateActorSlot(UnionSystem *unisys, UnionBeaconEntry *entry, UnionMember *member,
+                                                    int memberIndex, BOOL visible, FieldActor **outActor);
 static void UnionOneself_FreeActorSlot(UnionSystem *unisys, UnionBeaconEntry *entry, UnionActorSlot *slot);
-static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *rival, WifiList *wifiList, void *effWork, UnionBeaconEntry *entry);
+static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *rival, WifiList *wifiList, void *effWork,
+                                           UnionBeaconEntry *entry);
 static BOOL UnionOneself_IsMemberNew(UnionSystem *unisys, UnionBeaconEntry *entry, const u8 *mac);
 static BOOL UnionOneself_ShowFocus(UnionSystem *unisys, UnionBeaconEntry *entry);
 static BOOL UnionOneself_RunActor(UnionSystem *unisys, UnionActorSlot *slot, Field *field);
@@ -135,8 +137,8 @@ BOOL UnionOneself_CanTalkTo(UnionSystem *unisys, u16 id) {
     int i;
 
     for (i = 0; i < UNION_ACTOR_MAX; i++, slot++) {
-        if (slot->used == 1 && slot->entry != NULL && slot->entry->timeout != 0
-            && id == (slot->entry->index << 8 | (slot->member + UNION_ACTOR_ID_MEMBER_BASE))) {
+        if (slot->used == 1 && slot->entry != NULL && slot->entry->timeout != 0 &&
+            id == (slot->entry->index << 8 | (slot->member + UNION_ACTOR_ID_MEMBER_BASE))) {
             if (slot->step == 2 || slot->step == 1 || slot->nextStep == 1 || slot->nextStep == 2) {
                 return FALSE;
             }
@@ -202,9 +204,9 @@ static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *r
     }
     func_0207c33c(ownMac);
     for (i = 0; i < UNION_MEMBER_MAX; i++) {
-        if (entry->actor[i] == NULL && entry->beacon.members[i].used == 1
-            && GFL_STD_MemCmp(ownMac, entry->beacon.members[i].mac, 6) != 0
-            && UnionOneself_IsMemberNew(unisys, entry, entry->beacon.members[i].mac)) {
+        if (entry->actor[i] == NULL && entry->beacon.members[i].used == 1 &&
+            GFL_STD_MemCmp(ownMac, entry->beacon.members[i].mac, 6) != 0 &&
+            UnionOneself_IsMemberNew(unisys, entry, entry->beacon.members[i].mac)) {
             entry->actor[i] = UnionOneself_CreateActorSlot(unisys, entry, &entry->beacon.members[i], i, FALSE, &actor);
             entry->actor[i]->step = 1;
             UnionOneself_SetActorNextStep(entry->actor[i], 0);
@@ -246,8 +248,8 @@ static BOOL UnionOneself_ShowFocus(UnionSystem *unisys, UnionBeaconEntry *entry)
     for (i = 0; i < UNION_MEMBER_MAX; i++) {
         UnionActorSlot *slot = entry->actor[i];
 
-        if (slot != NULL && entry->beacon.members[i].used == 1
-            && GFL_STD_MemCmp(entry->beacon.members[i].mac, unisys->situ.mac78, 6) == 0) {
+        if (slot != NULL && entry->beacon.members[i].used == 1 &&
+            GFL_STD_MemCmp(entry->beacon.members[i].mac, unisys->situ.mac78, 6) == 0) {
             if (GSYS_CheckField(unisys->param->gsys) == TRUE) {
                 void *effWork = func_ov036_0218051c(GSYS_GetField(unisys->param->gsys));
 
@@ -353,8 +355,8 @@ static BOOL UnionOneself_RunActor(UnionSystem *unisys, UnionActorSlot *slot, Fie
 static BOOL UnionOneself_UpdateTimeout(UnionSystem *unisys, UnionBeaconEntry *entry) {
     UnionSelf *situ = &unisys->situ;
 
-    if (situ->mycomm.target == entry || situ->mycomm.unk4 == entry || situ->mycomm.answer_pc == entry
-        || situ->mycomm.parent == entry) {
+    if (situ->mycomm.target == entry || situ->mycomm.unk4 == entry || situ->mycomm.answer_pc == entry ||
+        situ->mycomm.parent == entry) {
         if (entry->timeout == 0) {
             entry->timeout = 1;
         }
@@ -407,8 +409,8 @@ static BOOL UnionOneself_ActorIdle(UnionSystem *unisys, UnionActorSlot *slot, Fi
         UnionOneself_SetActorNextStep(slot, 3);
         return TRUE;
     }
-    if (situ->unk02 != 0 && (situ->unk02 == beaconAct || (beaconAct == 0 && situ->unk02 == entry->beacon.unk07_5))
-        && slot->member == 0 && UnionMsg_GetTableByte(entry->beacon.activity) > entry->beacon.memberCount) {
+    if (situ->unk02 != 0 && (situ->unk02 == beaconAct || (beaconAct == 0 && situ->unk02 == entry->beacon.unk07_5)) &&
+        slot->member == 0 && UnionMsg_GetTableByte(entry->beacon.activity) > entry->beacon.memberCount) {
         FieldActor *actor = UnionOneself_FindActor(unisys, slot->entry, slot);
 
         if (IsAllActorAcmdFinished(actor) == TRUE) {

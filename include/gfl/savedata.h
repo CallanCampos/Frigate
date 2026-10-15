@@ -17,7 +17,7 @@ struct SaveBlockDef {
 
 // footerSize and extraSize count towards the save's size, before and after the blocks' data
 SaveDataTable *SaveData_InitTable(HeapID heapId, const SaveBlockDef *table, u32 count, u32 saveareaSize, u32 footerSize,
-    u32 blockFooterSize, u32 extraSize);
+                                  u32 blockFooterSize, u32 extraSize);
 void freeIntermediateSaveDataBlocks(SaveDataTable *svdt);
 // Clears the save's data and initializes each block in it
 void runSaveBlkInitializers(void *data, SaveDataTable *svdt);

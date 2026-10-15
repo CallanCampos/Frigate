@@ -6,8 +6,8 @@
 
 // What the files of the GameSpy HTTP client share, in overlay 189 after the NHTTP client. The ROM names one of the
 // files, ghttpEncryption.c, so the others are named after the files of GameSpy's ghttp that pret/pokerevo's Wii build
-// has (asm/SDK/DWC/gamespy/ghttp*.s), in the same order: Buffer, Callbacks, Common, Connection, Encryption, Main, Post and
-// Process. The functions have the names they have there (and in the ROM's debug texts)
+// has (asm/SDK/DWC/gamespy/ghttp*.s), in the same order: Buffer, Callbacks, Common, Connection, Encryption, Main, Post
+// and Process. The functions have the names they have there (and in the ROM's debug texts)
 
 typedef struct GHIConnection GHIConnection;
 typedef struct GHIEncryptor GHIEncryptor;
@@ -84,9 +84,9 @@ typedef struct GHICertList {
 // The encryption of a connection (ghttpEncryption.c): its engine, and the functions that start it, end it and
 // (en|de)crypt the data
 typedef int (*GHIEncryptFunc)(GHIConnection *connection, GHIEncryptor *encryptor, const char *in, int inSize, char *out,
-                               int *outSize);
-typedef int (*GHIDecryptFunc)(GHIConnection *connection, GHIEncryptor *encryptor, const char *in, int *inSize, char *out,
-                               int *outSize);
+                              int *outSize);
+typedef int (*GHIDecryptFunc)(GHIConnection *connection, GHIEncryptor *encryptor, const char *in, int *inSize,
+                              char *out, int *outSize);
 struct GHIEncryptor {
     GHIEncryptorState *state;
     int engine;

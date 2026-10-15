@@ -13,8 +13,8 @@
 // FieldSoundEmitter (struct_decls.h) is named after its functions
 
 // An emitter for unit at matrix, which enables the unit with range and volume unless it already is
-FieldSoundEmitter *FieldSoundEmitter_CreateAndSet(Field *field, SRTMatrix *matrix, ISS3DSoundUnitIndex unit,
-                                                  fx32 range, s32 volume);
+FieldSoundEmitter *FieldSoundEmitter_CreateAndSet(Field *field, SRTMatrix *matrix, ISS3DSoundUnitIndex unit, fx32 range,
+                                                  s32 volume);
 // An emitter without a sound, which only moves matrix along its curve
 FieldSoundEmitter *FieldSoundEmitter_Create(Field *field, SRTMatrix *matrix);
 void FieldSoundEmitter_Free(FieldSoundEmitter *emitter);

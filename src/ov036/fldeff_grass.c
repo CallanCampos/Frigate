@@ -55,6 +55,7 @@ static const BlActAnimStep GRASS_ANIM_SHAKE[] = {
     { 0, 0, 0, 3 }, { 1, 0, 0, 3 }, { 2, 0, 0, 3 }, { 3, 0, 0, 4 }, { BLACT_ANIM_CMD_END, 0, 0, 0 },
 };
 
+// clang-format off
 static const FieldEffectTaskVTable GRASS_TASK_VTABLE = {
     sizeof(GrassTask),
     func_ov036_021a415c,
@@ -63,12 +64,20 @@ static const FieldEffectTaskVTable GRASS_TASK_VTABLE = {
     func_ov036_021a4320,
 };
 
+// clang-format on
+
 static const BlActAnimStep GRASS_ANIM_SHAKE_LONG[] = {
-    { 0, 0, 0, 2 }, { 1, 0, 0, 2 }, { 0, 0, 0, 2 }, { 1, 0, 0, 2 },
-    { 0, 0, 0, 2 }, { 1, 0, 0, 2 }, { BLACT_ANIM_CMD_END, 0, 0, 0 },
+    { 0, 0, 0, 2 },
+    { 1, 0, 0, 2 },
+    { 0, 0, 0, 2 },
+    { 1, 0, 0, 2 },
+    { 0, 0, 0, 2 },
+    { 1, 0, 0, 2 },
+    { BLACT_ANIM_CMD_END, 0, 0, 0 },
 };
 
 // Each kind's texture in each season
+// clang-format off
 static const u16 GRASS_TEXTURES[GRASS_KIND_COUNT][4] = {
     { 1, 2, 3, 4 },
     { 6, 7, 8, 9 },
@@ -79,6 +88,8 @@ static const u16 GRASS_TEXTURES[GRASS_KIND_COUNT][4] = {
     { 1, 1, 1, 1 },
     { 6, 6, 6, 6 },
 };
+
+// clang-format on
 
 static const BlActAnimStep *GRASS_ANIMS_LONG[] = { GRASS_ANIM_SHAKE_LONG };
 

@@ -6,7 +6,8 @@ static int NHTTPi_WaitForConnection(NHttpConnection *connection);
 
 // Makes a connection for a URL, a method and the buffer for the answer. The callback gets the events of the
 // connection, with the argument
-int NHTTPCreateConnection(const char *url, int method, void *buffer, u32 bufferSize, NHttpCallback callback, void *arg) {
+int NHTTPCreateConnection(const char *url, int method, void *buffer, u32 bufferSize, NHttpCallback callback,
+                          void *arg) {
     NHttpRoot *root = NHTTPi_GetSystemInfoP();
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(root);

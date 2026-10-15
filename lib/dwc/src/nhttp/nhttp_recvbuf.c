@@ -45,9 +45,9 @@ static char NHTTPi_getRecvBufChar(NHttpResponse *response, NHttpHeaderBlock **bl
     return (*block)->data[index];
 }
 
-// Looks for the end of the line that starts at start. Gives where the next line starts (0 if the header ends there), and
-// the place of the first colon in colon, and how the line ended in lineEnd (1 for LF or CR, 2 for CR LF). -1 if the line
-// does not end before end
+// Looks for the end of the line that starts at start. Gives where the next line starts (0 if the header ends there),
+// and the place of the first colon in colon, and how the line ended in lineEnd (1 for LF or CR, 2 for CR LF). -1 if the
+// line does not end before end
 int NHTTPi_findNextLineHdrRecvBuf(NHttpResponse *response, int start, int end, int *colon, int *lineEnd) {
     NHttpHeaderBlock *block;
     int offset;
@@ -121,8 +121,8 @@ int NHTTPi_skipSpaceHdrRecvBuf(NHttpResponse *response, int start, int end) {
     return -1;
 }
 
-// Compares the header from start with a token without caring for the case. 0 if they are equal up to the end of the token
-// (its end, a space or the terminator), -1 if not
+// Compares the header from start with a token without caring for the case. 0 if they are equal up to the end of the
+// token (its end, a space or the terminator), -1 if not
 int NHTTPi_compareTokenN_HdrRecvBuf(NHttpResponse *response, int start, int end, const char *token, int terminator) {
     NHttpHeaderBlock *block;
     int offset;
@@ -131,8 +131,7 @@ int NHTTPi_compareTokenN_HdrRecvBuf(NHttpResponse *response, int start, int end,
     if (start < end) {
         NHTTPi_getRecvBufPos(response, start, &block, &offset);
         c = NHTTPi_getRecvBufChar(response, &block, &offset);
-        while ((NHTTPi_isUpper(c) ? c + ('a' - 'A') : c)
-               == (NHTTPi_isUpper(*token) ? *token + ('a' - 'A') : *token)) {
+        while ((NHTTPi_isUpper(c) ? c + ('a' - 'A') : c) == (NHTTPi_isUpper(*token) ? *token + ('a' - 'A') : *token)) {
             if (*token == 0 || *token == ' ' || *token == terminator || start == end - 1) {
                 return 0;
             }

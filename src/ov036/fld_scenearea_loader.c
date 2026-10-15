@@ -2,9 +2,9 @@
 // name is the ROM's own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
-#include "field/field_scene_area.h"
 #include "field/field.h"
 #include "field/field_camera.h"
+#include "field/field_scene_area.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
@@ -13,14 +13,16 @@
 static BOOL FieldCameraArea_CIRCLE_CheckColl(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos);
 static void FieldCameraAreaCalc_CIRCLE_AimPlayerCentre(FieldSceneArea *area, const CameraArea *cameraArea,
                                                        const VecFx32 *pos);
-static void FieldCameraAreaCalc_CIRCLE_FixedLookAt(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos);
+static void FieldCameraAreaCalc_CIRCLE_FixedLookAt(FieldSceneArea *area, const CameraArea *cameraArea,
+                                                   const VecFx32 *pos);
 static BOOL FieldCameraAreaCalc_RECT_CheckColl(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos);
 static void FieldCameraAreaCalc_RECT_PitchYawTZ(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos);
 static void FieldCameraAreaCalc_RECT_PitchYawTZ_BeginDisableDelay(FieldSceneArea *area, const CameraArea *cameraArea,
                                                                   const VecFx32 *pos);
 static void FieldCameraAreaCalc_RECT_PitchYawTZ_ResetEnableDelay(FieldSceneArea *area, const CameraArea *cameraArea,
                                                                  const VecFx32 *pos);
-static void CalcFieldDynCameraLerpFactors(const CameraArea *cameraArea, const VecFx32 *pos, fx32 *length, fx32 *progress);
+static void CalcFieldDynCameraLerpFactors(const CameraArea *cameraArea, const VecFx32 *pos, fx32 *length,
+                                          fx32 *progress);
 static void FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_STAY(FieldSceneArea *area, const CameraArea *cameraArea,
                                                               const VecFx32 *pos);
 static void FieldCameraAreaCalc_RECT_PitchYawTZLookatFOV_BeginDisableDelay(FieldSceneArea *area,
@@ -60,8 +62,8 @@ static const FieldDynCameraFunctions FIELD_CAMERA_AREA_FUNCS = {
 };
 
 FieldSceneAreaLoader *FieldSceneAreaLoader_Create(HeapID heapId) {
-    FieldSceneAreaLoader *loader = GFL_HeapAllocate(heapId, sizeof(FieldSceneAreaLoader), TRUE,
-                                                    "fld_scenearea_loader.c", 129);
+    FieldSceneAreaLoader *loader =
+        GFL_HeapAllocate(heapId, sizeof(FieldSceneAreaLoader), TRUE, "fld_scenearea_loader.c", 129);
     int i;
 
     for (i = 0; i < 2; i++) {
@@ -164,7 +166,8 @@ static void FieldCameraAreaCalc_CIRCLE_AimPlayerCentre(FieldSceneArea *area, con
     FieldCamera_CoordsSetEye(camera, &eye);
 }
 
-static void FieldCameraAreaCalc_CIRCLE_FixedLookAt(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos) {
+static void FieldCameraAreaCalc_CIRCLE_FixedLookAt(FieldSceneArea *area, const CameraArea *cameraArea,
+                                                   const VecFx32 *pos) {
     VecFx32 target;
     VecFx32 eye;
     FieldCamera *camera = GetFieldSceneAreaCamera(area);
@@ -207,7 +210,8 @@ static BOOL FieldCameraAreaCalc_RECT_CheckColl(FieldSceneArea *area, const Camer
 }
 
 // The pitch, yaw and distance blend from the first setting to the second across the rectangle
-static void FieldCameraAreaCalc_RECT_PitchYawTZ(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos) {
+static void FieldCameraAreaCalc_RECT_PitchYawTZ(FieldSceneArea *area, const CameraArea *cameraArea,
+                                                const VecFx32 *pos) {
     fx32 length;
     fx32 progress;
     fx32 pitch;
@@ -252,7 +256,8 @@ static void FieldCameraAreaCalc_RECT_PitchYawTZ_ResetEnableDelay(FieldSceneArea 
 }
 
 // The length of the rectangle along the blend, and how far into it the position is
-static void CalcFieldDynCameraLerpFactors(const CameraArea *cameraArea, const VecFx32 *pos, fx32 *length, fx32 *progress) {
+static void CalcFieldDynCameraLerpFactors(const CameraArea *cameraArea, const VecFx32 *pos, fx32 *length,
+                                          fx32 *progress) {
     VecFx32 tilePos = *pos;
 
     tilePos.x -= FX32_CONST(8);

@@ -51,9 +51,10 @@ static void func_ov012_02152b34(void *work);
 static void func_ov012_02152b50(void *work);
 
 static const NetCommand data_ov012_0216af34[] = {
-    {func_ov012_02152920, NULL},
+    { func_ov012_02152920, NULL },
 };
 
+// clang-format off
 static GFLNetInitData data_ov012_0216e034 = {
     data_ov012_0216af34,
     NELEMS(data_ov012_0216af34),
@@ -91,6 +92,8 @@ static GFLNetInitData data_ov012_0216e034 = {
     0x1f4,
     0,
 };
+
+// clang-format on
 
 static void func_ov012_0215291c(void *work, int netId) {
 }

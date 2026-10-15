@@ -40,7 +40,7 @@ enum {
 };
 
 void mainBackupSystemInit(u32 heapId, BackupReadErrorCallback readErrorCallback,
-    BackupWriteErrorCallback writeErrorCallback);
+                          BackupWriteErrorCallback writeErrorCallback);
 SaveData *SaveData_InitMain(const SaveDataParams *params, u32 heapId);
 // A save in the caller's memory, of svwk_size bytes. init tells whether to initialize the blocks
 SaveData *func_0203ad44(const SaveDataParams *params, u32 heapId, void *buffer, u32 svwk_size, BOOL init);

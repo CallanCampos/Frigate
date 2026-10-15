@@ -41,8 +41,8 @@ const MBUserInfo *MB_CommGetChildUser(u16 childAid) {
 }
 
 BOOL MB_CommIsBootable(u16 childAid) {
-    if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)
-        && MB_PARENT_WORK->childState[childAid - 1] == MB_COMM_PSTATE_SEND_COMPLETE) {
+    if (gMBCommWork != NULL && MBComm_IsValidAid(childAid) &&
+        MB_PARENT_WORK->childState[childAid - 1] == MB_COMM_PSTATE_SEND_COMPLETE) {
         return TRUE;
     }
     return FALSE;
@@ -75,8 +75,7 @@ BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
         return FALSE;
     }
 
-    if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)
-        && state == MB_PARENT_WORK->childState[childAid - 1]) {
+    if (gMBCommWork != NULL && MBComm_IsValidAid(childAid) && state == MB_PARENT_WORK->childState[childAid - 1]) {
         MB_PARENT_WORK->response[childAid - 1] = response;
         CPU_SetIRQMask(irq);
         return TRUE;
@@ -252,8 +251,8 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
             u8 count = 0;
             u8 file = request->fileNo;
 
-            if (file >= 16 || !MB_PARENT_WORK->files[file].valid
-                || MB_PARENT_WORK->childRequestGgid[aid - 1] != MB_PARENT_WORK->files[file].registry->ggid) {
+            if (file >= 16 || !MB_PARENT_WORK->files[file].valid ||
+                MB_PARENT_WORK->childRequestGgid[aid - 1] != MB_PARENT_WORK->files[file].registry->ggid) {
                 MB_PARENT_WORK->response[aid - 1] = MB_COMM_RESPONSE_KICK;
             } else {
                 for (i = 0; i < 16; i++) {
@@ -307,7 +306,8 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
             u8 file = MB_PARENT_WORK->childFile[aid - 1];
 
             if (file != 0xff) {
-                MB_PARENT_WORK->files[file].requestedBlock = MBComm_MaxBlock(MB_PARENT_WORK->files[file].requestedBlock, frame.value);
+                MB_PARENT_WORK->files[file].requestedBlock =
+                    MBComm_MaxBlock(MB_PARENT_WORK->files[file].requestedBlock, frame.value);
                 sBlockRequestMask |= 1 << file;
             }
         }
@@ -317,7 +317,7 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
             u8 file = MB_PARENT_WORK->childFile[aid - 1];
 
             if (file != 0xff) {
-                MB_PARENT_WORK->files[file].downloadMask &= (u16)~(1 << aid);
+                MB_PARENT_WORK->files[file].downloadMask &= (u16) ~(1 << aid);
                 MBComm_SetState(aid, MB_COMM_PSTATE_SEND_COMPLETE, NULL);
             }
         } else if (state == MB_COMM_PSTATE_SEND_COMPLETE) {
@@ -464,8 +464,8 @@ static int MBComm_SendBlock(void) {
     }
     for (i = 0; i < 16; i++) {
         MB_PARENT_WORK->fileCursor = (MB_PARENT_WORK->fileCursor + 1) % 16;
-        if (MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].valid
-            && MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].downloadMask != 0) {
+        if (MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].valid &&
+            MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].downloadMask != 0) {
             break;
         }
     }
@@ -482,8 +482,8 @@ static int MBComm_SendBlock(void) {
     frame.value = MB_PARENT_WORK->fileCursor;
     frame.value2 = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].sendCursor;
     out = MBFrame_Encode(&frame, gMBCommWork->sendBuf);
-    offsetInSegment = source.bufAddr
-                      - MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].layout.segOffset[source.segment];
+    offsetInSegment =
+        source.bufAddr - MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].layout.segOffset[source.segment];
     tableOffset = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].segmentRomOffsets[source.segment];
     cache = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].cache;
     if (!MBCache_Read(cache, offsetInSegment + tableOffset, out, source.size)) {
@@ -499,8 +499,8 @@ static int MBComm_SendBlock(void) {
                 for (n = 0; n < MB_CACHE_ENTRY_COUNT; n++) {
                     MBCacheEntry *candidate = &entries[n];
 
-                    if (candidate->state == MB_CACHE_ENTRY_READY
-                        && (oldest == NULL || oldest->offset > candidate->offset)) {
+                    if (candidate->state == MB_CACHE_ENTRY_READY &&
+                        (oldest == NULL || oldest->offset > candidate->offset)) {
                         oldest = candidate;
                     }
                 }
@@ -574,8 +574,8 @@ static void MBComm_AdvanceSendCursor(u32 file) {
     if (MB_PARENT_WORK->files[file].valid == 0 || MB_PARENT_WORK->files[file].downloadMask == 0) {
         return;
     }
-    if (MB_PARENT_WORK->files[file].requestedBlock <= MB_PARENT_WORK->files[file].sendCursor
-        && MB_PARENT_WORK->files[file].sendCursor <= MB_PARENT_WORK->files[file].requestedBlock + 2) {
+    if (MB_PARENT_WORK->files[file].requestedBlock <= MB_PARENT_WORK->files[file].sendCursor &&
+        MB_PARENT_WORK->files[file].sendCursor <= MB_PARENT_WORK->files[file].requestedBlock + 2) {
         MB_PARENT_WORK->files[file].sendCursor++;
     } else {
         MB_PARENT_WORK->files[file].sendCursor = MB_PARENT_WORK->files[file].requestedBlock;

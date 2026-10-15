@@ -23,8 +23,15 @@ static BOOL func_0204f820(BlActHandle *handle, const BlActAnimStep *step);
 static BOOL func_0204f858(BlActHandle *handle, const BlActAnimStep *step);
 
 const BlActSceneSetup BLACT_DEFAULT_CONFIG = {
-    0, 0, { FX32_ONE, FX32_ONE, FX32_ONE }, GX_RGB(31, 31, 31), GX_RGB(16, 16, 16), GX_RGB(16, 16, 16),
-    GX_RGB(0, 0, 0), 63, BLACT_ORIGIN_CENTER,
+    0,
+    0,
+    { FX32_ONE, FX32_ONE, FX32_ONE },
+    GX_RGB(31, 31, 31),
+    GX_RGB(16, 16, 16),
+    GX_RGB(16, 16, 16),
+    GX_RGB(0, 0, 0),
+    63,
+    BLACT_ORIGIN_CENTER,
 };
 
 BlActSys *BlActSys_Create(u16 texMatCount, u16 handleCount, BlActTransferFunc transfer, HeapID heapId) {
@@ -367,8 +374,8 @@ BOOL func_0204f768(BlActSys *sys, u32 actor, u16 *cmd) {
     u16 last = sys->handles[actor].cmd;
 
     *cmd = last;
-    if (last == BLACT_ANIM_CMD_GOTO || last == BLACT_ANIM_CMD_LOOP || last == BLACT_ANIM_CMD_CHANGE
-        || last == BLACT_ANIM_CMD_END) {
+    if (last == BLACT_ANIM_CMD_GOTO || last == BLACT_ANIM_CMD_LOOP || last == BLACT_ANIM_CMD_CHANGE ||
+        last == BLACT_ANIM_CMD_END) {
         return TRUE;
     }
     return FALSE;

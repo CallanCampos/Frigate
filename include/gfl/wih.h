@@ -4,11 +4,11 @@
 #include "types.h"
 #include "gfl/heap.h"
 
-// wih.c, in overlay 30: the wireless helper, which grew out of NitroSDK's demo wh.c; the DS Download Play parent uses it to
-// pick a channel and to shut the wireless down. The comments give the wh.c functions these appear to be
+// wih.c, in overlay 30: the wireless helper, which grew out of NitroSDK's demo wh.c; the DS Download Play parent uses
+// it to pick a channel and to shut the wireless down. The comments give the wh.c functions these appear to be
 
-// The filter that the parent passes each child that connects to (its callback from the wireless), with the filter's work
-// (the GFL net work): it says whether the child may stay
+// The filter that the parent passes each child that connects to (its callback from the wireless), with the filter's
+// work (the GFL net work): it says whether the child may stay
 typedef BOOL (*NetScanFilter)(const void *info, void *work);
 // What the helper calls with the AID of a child that has connected, or of the parent once this machine has connected
 typedef void (*WHConnectCallback)(int netId);
@@ -53,14 +53,14 @@ enum {
 // Called when the wireless has ended, with whether that succeeded. The callers ignore its result
 typedef BOOL (*WHCallback)(BOOL success);
 
-int WH_GetSystemState(void);  // WH_GetSystemState
+int WH_GetSystemState(void);       // WH_GetSystemState
 BOOL WH_StartMeasureChannel(void); // WH_StartMeasureChannel
-u16 WH_GetMeasureChannel(void);  // WH_GetMeasureChannel
+u16 WH_GetMeasureChannel(void);    // WH_GetMeasureChannel
 // Starts the helper with its work on the heap given
 BOOL WH_Initialize(HeapID heapId, WHCallback callback, u32 extended);
 // Frees the helper's work
-void WH_Release(void); // WH_Release
-BOOL WH_Finalize(void);                // WH_Finalize
+void WH_Release(void);            // WH_Release
+BOOL WH_Finalize(void);           // WH_Finalize
 BOOL WH_End(WHCallback callback); // WH_End
 // The wireless error that WH_GetLastError records, and the data the helper received from a machine
 int WH_GetLastError(void);
@@ -70,9 +70,9 @@ BOOL WH_StepDS(u8 *data);
 void WH_SetConnectCallback(WHConnectCallback callback);
 
 // What net_whpipe.c calls
-void WH_SetGgid(u32 ggid);                   // WH_SetGgid
+void WH_SetGgid(u32 ggid);                           // WH_SetGgid
 void WH_SetUserGameInfo(const void *data, u16 size); // WH_SetUserGameInfo
-u16 WH_GetBitmap(void);                        // WH_GetBitmap
+u16 WH_GetBitmap(void);                              // WH_GetBitmap
 // Scans for parents, calling back with each beacon it finds
 BOOL WH_StartScan(WHScanCallback callback, const u8 *mac, u16 channel); // WH_StartScan
 // Connects to a parent as a child, by its MAC address
@@ -98,6 +98,5 @@ void WH_SetScanPaused(BOOL paused);
 void WH_SetScanInfoCallback(WHScanInfoCallback callback);
 void WH_UpdateScan(void); // Run each frame: starts the scan again
 void WH_Reset(void);
-
 
 #endif // POKEBW2_GFL_WIH_H

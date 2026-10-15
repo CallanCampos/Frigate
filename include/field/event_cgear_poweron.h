@@ -5,8 +5,8 @@
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 typedef struct {
     // Set once the subscreen has changed to the C-Gear

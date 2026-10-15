@@ -2,12 +2,12 @@
 #define POKEBW2_NITRO_MB_PRIVATE_H
 
 #include "types.h"
-#include <stddef.h>
 #include "nitro/fs.h"
 #include "nitro/mb.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
+#include <stddef.h>
 
 // What the multiboot library's files share (libmb, the parent's side). The names are descriptive: the library keeps no
 // assert strings, so none of its own names survive

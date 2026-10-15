@@ -1,7 +1,7 @@
 #include "types.h"
-#include "app/ui/ui_scene.h"
-#include "app/ui/touchbar.h"
 #include "app/pokemon_trade_local.h"
+#include "app/ui/touchbar.h"
+#include "app/ui/ui_scene.h"
 #include "constants/arc.h"
 #include "constants/items.h"
 #include "constants/pokemon.h"
@@ -505,8 +505,10 @@ void func_ov194_021c3480(PokemonTradeWork *wk) {
     int i, j;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
 
-    wk->objRes[TRADE_OBJRES_PLTT_ICON] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x60, wk->heapId);
-    wk->objRes[TRADE_OBJRES_CELL_ICON] = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
+    wk->objRes[TRADE_OBJRES_PLTT_ICON] =
+        func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x60, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CELL_ICON] =
+        func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_MainEng(), wk->heapId);
     for (i = 0; i < ICON_COLUMNS; i++) {
         for (j = 0; j < COLUMN_ROWS; j++) {
             setup.x = 0;
@@ -742,15 +744,14 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
             if (async == TRUE && screenPos.x >= -16 && screenPos.x <= 272) {
                 if (!NNS_GfdRegisterNewVramTransferTask(35, proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB],
                                                         wk->iconCharData + slot * 0x200, 0x200)) {
-                    sys_memcpy(wk->iconCharData + slot * 0x200,
-                               (void *)((u32)G2S_GetOBJCharPtr() +
-                                        ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
-                               0x200);
+                    sys_memcpy(
+                        wk->iconCharData + slot * 0x200,
+                        (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
+                        0x200);
                 }
             } else {
                 sys_memcpy(wk->iconCharData + slot * 0x200,
-                           (void *)((u32)G2S_GetOBJCharPtr() +
-                                    ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
+                           (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
                            0x200);
             }
             func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
@@ -1337,8 +1338,10 @@ void func_ov194_021c479c(PokemonTradeWork *wk) {
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, wk->heapId);
     pkm0 = func_0201d624(PokemonTrade_GetPkm(wk, 0));
     pkm1 = func_0201d624(PokemonTrade_GetPkm(wk, 1));
-    wk->objRes[TRADE_OBJRES_CHAR_ICON0] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm0), FALSE, CLACT_VRAM_SUB, wk->heapId);
-    wk->objRes[TRADE_OBJRES_CHAR_ICON1] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm1), FALSE, CLACT_VRAM_SUB, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CHAR_ICON0] =
+        func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm0), FALSE, CLACT_VRAM_SUB, wk->heapId);
+    wk->objRes[TRADE_OBJRES_CHAR_ICON1] =
+        func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm1), FALSE, CLACT_VRAM_SUB, wk->heapId);
     iconSetup.x = 96;
     iconSetup.y = 12;
     iconSetup.sequence = 0;
@@ -1641,7 +1644,7 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
             }
         } else {
             wk->markIcons.icons[i] = UIObjRes_CreateActor(&wk->markIcons.res, wk->clactUnit, xs[i] * 8, 101,
-                                                         anim == -1 ? anims[i * 2] : anim, wk->heapId);
+                                                          anim == -1 ? anims[i * 2] : anim, wk->heapId);
             icon = wk->markIcons.icons[i];
             if (anim == -1) {
                 func_0204c124(icon, FALSE);

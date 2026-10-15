@@ -59,7 +59,8 @@ static void Demo3DExpCCruiser_LoadBG(HeapID heapId) {
 }
 
 static void Demo3DExpCCruiser_Init(Demo3DExp *exp) {
-    Demo3DExpCCruiser *work = GFL_HeapAllocate(exp->heapId, sizeof(Demo3DExpCCruiser), TRUE, "demo3d_exp_c_cruiser.c", 179);
+    Demo3DExpCCruiser *work =
+        GFL_HeapAllocate(exp->heapId, sizeof(Demo3DExpCCruiser), TRUE, "demo3d_exp_c_cruiser.c", 179);
     UIObjResSetup setup;
     ClActUnit *unit;
 

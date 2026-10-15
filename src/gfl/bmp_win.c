@@ -174,8 +174,8 @@ void BmpWin_MakeFrameScreen(BmpWin *window, u16 frameChar, u8 palette) {
                          BGSYS_FILL_TILE_PALETTE);
     GFL_BGSysFillScrArea(window->bg, pal | (frameChar + 6), window->x, window->y + window->height, window->width, 1,
                          BGSYS_FILL_TILE_PALETTE);
-    GFL_BGSysFillScrArea(window->bg, pal | (frameChar + 7), window->x + window->width, window->y + window->height, 1,
-                         1, BGSYS_FILL_TILE_PALETTE);
+    GFL_BGSysFillScrArea(window->bg, pal | (frameChar + 7), window->x + window->width, window->y + window->height, 1, 1,
+                         BGSYS_FILL_TILE_PALETTE);
 }
 
 void BmpWin_ClearScreen(BmpWin *window) {

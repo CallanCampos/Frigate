@@ -506,7 +506,8 @@ static void GSyncDisp_DeleteActors(GSyncDisp *disp) {
 static void GSyncDisp_LoadPokeIconRes(GSyncDisp *disp) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, disp->heapId);
 
-    disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_BOTH, 0, disp->heapId);
+    disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON] =
+        func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_BOTH, 0, disp->heapId);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC, disp->heapId);
     disp->res[GSYNC_DISP_RES_CELL_POKE_ICON] = func_0204bde0(arc, 14, 27, disp->heapId);

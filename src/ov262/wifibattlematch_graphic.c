@@ -52,12 +52,16 @@ static const BGSysLCDConfig sLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX
 
 static const ClActSysSetup sClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
+// clang-format off
 static const BGSysVRAMConfig sVRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,      GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
 };
 
+// clang-format on
+
+// clang-format off
 static const WifiBattleMatchGraphicBGSetup sBGSetups[BG_COUNT] = {
     { 0,
       { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,
@@ -93,9 +97,11 @@ static const WifiBattleMatchGraphicBGSetup sBGSetups[BG_COUNT] = {
       BGMODE_TEXT, TRUE },
 };
 
+// clang-format on
+
 WifiBattleMatchGraphic *WifiBattleMatchGraphic_Create(u32 layout, HeapID heapId) {
-    WifiBattleMatchGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchGraphic), FALSE,
-                                                       "wifibattlematch_graphic.c", 443);
+    WifiBattleMatchGraphic *graphic =
+        GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchGraphic), FALSE, "wifibattlematch_graphic.c", 443);
 
     sys_memset(graphic, 0, sizeof(WifiBattleMatchGraphic));
     G2_BlendNone();

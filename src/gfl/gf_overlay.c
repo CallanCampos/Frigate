@@ -144,8 +144,8 @@ static BOOL GFL_OvlCheckMemoryCollision(u32 id) {
         u32 loadedEnd;
 
         if (list[i].loaded == TRUE && GFL_OvlGetMemoryRange(list[i].id, &loadedStart, &loadedEnd) == TRUE) {
-            if ((start >= loadedStart && start < loadedEnd) || (end > loadedStart && end <= loadedEnd)
-                || (start <= loadedStart && end >= loadedEnd)) {
+            if ((start >= loadedStart && start < loadedEnd) || (end > loadedStart && end <= loadedEnd) ||
+                (start <= loadedStart && end >= loadedEnd)) {
                 GFL_ASSERT(0);
                 return FALSE;
             }

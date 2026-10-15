@@ -64,8 +64,8 @@ enum {
     ARENA_DISCONNECTS_WIFICUP_COUNTER = 40,
 };
 
-// The kinds of read that WifiBattleMatchNet_StartRead starts: it fills a WifiBattleMatchNetStats, a WifiBattleMatchNetCupStats,
-// a record ID, the team of the Wi-Fi cup and the date of the last login
+// The kinds of read that WifiBattleMatchNet_StartRead starts: it fills a WifiBattleMatchNetStats, a
+// WifiBattleMatchNetCupStats, a record ID, the team of the Wi-Fi cup and the date of the last login
 enum {
     WBM_READ_ARENA,
     WBM_READ_WIFICUP,
@@ -74,8 +74,8 @@ enum {
     WBM_READ_LAST_LOGIN,
 };
 
-// The kinds of record that WifiBattleMatchNet_StartWrite writes, with the data it takes: the team of the Wi-Fi cup, nothing
-// (the date is the current one), nothing, and a WifiBattleMatchNetRecordData
+// The kinds of record that WifiBattleMatchNet_StartWrite writes, with the data it takes: the team of the Wi-Fi cup,
+// nothing (the date is the current one), nothing, and a WifiBattleMatchNetRecordData
 enum {
     WBM_WRITE_WIFICUP,
     WBM_WRITE_LAST_LOGIN,
@@ -141,7 +141,8 @@ void WifiBattleMatchNet_ResetLogin(WifiBattleMatchNet *p_wk);
 u32 WifiBattleMatchNet_LoginMain(WifiBattleMatchNet *p_wk);
 // Sets the match query and its keys for the mode, and the machine that runs it; 0 while it runs, 1 once matched, 2
 // on failure
-void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u32 a3, const WifiBattleMatchNetKeys *keys);
+void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u32 a3,
+                                   const WifiBattleMatchNetKeys *keys);
 u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_CancelMatch(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_ResetEnd(WifiBattleMatchNet *p_wk);

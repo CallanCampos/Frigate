@@ -3,9 +3,9 @@
 
 #include "types.h"
 #include "app/pdc_msg.h"
+#include "battle/btlv_effect.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
-#include "battle/btlv_effect.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
@@ -49,8 +49,8 @@ enum {
 
 typedef struct {
     BmpWin *win;
-    s32 evA;       // the blend coefficient of the window, with 12 fractional bits
-    s32 evB;       // and of what is behind it
+    s32 evA; // the blend coefficient of the window, with 12 fractional bits
+    s32 evB; // and of what is behind it
     s32 evADelta;
     s32 evBDelta;
     u8 state;
@@ -83,8 +83,19 @@ static void PdcMsgFade_StartIn(PdcMsgFade *fade, u8 instant);
 static BOOL PdcMsgFade_Update(PdcMsgFade *fade);
 
 static const BGSetup sMsgBGSetup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x4800), GX_BG_CHARBASE(0x10000), 0x8000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, 0,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x4800),
+    GX_BG_CHARBASE(0x10000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    0,
 };
 
 PdcMsg *PdcMsg_Create(Font *font, const Config *config, TCBExManager *tcbManager, HeapID heapId) {
@@ -256,8 +267,8 @@ static void PdcMsg_Print(PdcMsg *msg, int waitFrames) {
     GFL_TextRndUpdateColorIndexLUT(1, 9, 12);
     GFL_BGSysSetBGEnabled(PDC_MSG_BG, TRUE);
     if (waitFrames != 0) {
-        msg->stream = func_02022268(msg->win, 0, 0, msg->strbuf, msg->font, msg->printWait, msg->tcbManager, 0,
-                                    msg->heapId, 12);
+        msg->stream =
+            func_02022268(msg->win, 0, 0, msg->strbuf, msg->font, msg->printWait, msg->tcbManager, 0, msg->heapId, 12);
         func_02022390(msg->stream);
         msg->instant = FALSE;
     } else {

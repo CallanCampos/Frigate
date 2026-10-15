@@ -177,6 +177,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
+  ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
 - An inlined SDK call whose packed value is built in another order: check the inline's parameter types against the
   SDK (an `int` where ours has an enum). (matching.md: "An inline's enum-typed parameter")
 - A stack argument stored after the next argument's setup starts, where the original stores it first, around a

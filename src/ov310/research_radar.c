@@ -390,9 +390,9 @@ static void ResearchRadar_LoadSubBG(HeapID heapId) {
 }
 
 static void ResearchRadar_AnimateSubBG(ResearchRadarWork *wk) {
-    GFL_BGSysSetScrPaletteNo(
-        RESEARCH_BG_SUB_PATTERN, 0, 0, 32, 24,
-        (u8)(ResearchRadar_GetFrames(wk) / PATTERN_FRAMES % PATTERN_PALETTES) + PATTERN_PALETTE_FIRST);
+    GFL_BGSysSetScrPaletteNo(RESEARCH_BG_SUB_PATTERN, 0, 0, 32, 24,
+                             (u8)(ResearchRadar_GetFrames(wk) / PATTERN_FRAMES % PATTERN_PALETTES) +
+                                 PATTERN_PALETTE_FIRST);
     GFL_BGSysLoadScr(RESEARCH_BG_SUB_PATTERN);
 }
 

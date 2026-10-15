@@ -345,7 +345,7 @@ void func_0204ff54(ParticleSystem *system) {
         GFL_G3DSysMtxGetViewLookAt(&lookAt);
         scale = sUnitScale;
         {
-            VecFx32 trans = {0, 0, 0};
+            VecFx32 trans = { 0, 0, 0 };
 
             MTX_Identity33_(&rot);
             NNS_G3dGlbSetBaseTrans(&trans);
@@ -461,9 +461,8 @@ void func_020500cc(ParticleSystem *system, G3DCameraProjection *projection, u16 
     if (projection != NULL) {
         system->cameraProjection = projection->type;
         system->camera = GFL_G3DCameraCreate(projection->type, projection->param1, projection->param2,
-                                             projection->param3, projection->param4, projection->near,
-                                             projection->far, projection->ndcRangeOverride, position, upVector,
-                                             target, heapId);
+                                             projection->param3, projection->param4, projection->near, projection->far,
+                                             projection->ndcRangeOverride, position, upVector, target, heapId);
     } else {
         system->cameraProjection = G3DCAM_PROJECTION_PERSPECTIVE;
         // 45 degrees across a 4:3 view

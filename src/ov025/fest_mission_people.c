@@ -91,8 +91,8 @@ static const u8 sActorCounts[7][8] = {
 };
 
 static const u16 sRandomParams[30] = {
-    17, 19, 28, 4,  137, 145, 26, 21, 79, 3,  138, 146, 25, 30, 76,
-    12, 139, 147, 18, 31,  77,  14, 140, 148, 22, 32, 27,  11, 144, 17,
+    17, 19,  28,  4,  137, 145, 26, 21,  79,  3,  138, 146, 25, 30,  76,
+    12, 139, 147, 18, 31,  77,  14, 140, 148, 22, 32,  27,  11, 144, 17,
 };
 
 static const FesMissionPeopleSet sPeopleSets[9] = {
@@ -199,8 +199,8 @@ static const FesMissionShopItem sShopItems[5][16] = {
       { ITEM_GOOEY_MULCH, 1000 } },
 };
 
-void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival, FestMissionConfig *config,
-                         u16 zoneId) {
+void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
+                                  FestMissionConfig *config, u16 zoneId) {
     FesMissionWork *work = (FesMissionWork *)entry;
     FestMission *mission = (FestMission *)config;
     MATHRandContext32 rand;

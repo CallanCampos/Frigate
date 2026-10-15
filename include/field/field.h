@@ -2,8 +2,8 @@
 #define POKEBW2_FIELD_FIELD_H
 
 #include "types.h"
-#include "gfl/g3d.h"
 #include "gfl/bmpwin.h"
+#include "gfl/g3d.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
 #include "nitro/fx.h"

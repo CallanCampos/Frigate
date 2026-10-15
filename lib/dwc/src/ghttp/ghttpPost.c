@@ -1,6 +1,5 @@
 #include "ghttp_internal.h"
 
-
 // ghttpPost: the posts of a request (the form or the XML message that it sends), made of items, and how they are sent.
 // The posts are urlencoded if they hold strings alone, multipart (form-data) if they hold files, and DIME messages if
 // they hold files and an XML message
@@ -66,8 +65,8 @@ typedef struct GHIDimeHeader {
 
 // The length of a text as the 16 bits of a DIME header, in network order
 #define GHI_DIME_LENGTH16(x) GHI_SWAP16((u16)(s16)(x))
-#define GHI_SWAP32(x)                                                                                    \
-    (((((u32)(x)) << 24) & 0xff000000) |                                                                 \
+#define GHI_SWAP32(x)                                                                                                  \
+    (((((u32)(x)) << 24) & 0xff000000) |                                                                               \
      (((((u32)(x)) << 8) & 0x00ff0000) | (((((u32)(x)) >> 24) & 0xff) | ((((u32)(x)) >> 8) & 0x0000ff00))))
 
 // How many bytes a text of this length is padded with to the next multiple of 4 (4 for none)
@@ -159,7 +158,7 @@ int ghttpPostAddFileFromMemory(GHIPost *post, const char *field, const void *byt
         func_ov011_0216ddfc(contentTypeCopy);
         return FALSE;
     } else {
-        GHIPostItem item = {0};
+        GHIPostItem item = { 0 };
 
         item.type = GHI_POST_MEMORY_FILE;
         item.name = fieldCopy;
@@ -422,7 +421,7 @@ BOOL ghiPostInitState(GHIConnection *connection) {
     }
     for (i = 0; i < count; i++) {
         GHIPostItem *item = func_ov011_0217158c(connection->post->items, i);
-        GHIPostItemState state = {0};
+        GHIPostItemState state = { 0 };
 
         state.item = item;
         if (!ghiPostItemStateInit(&state)) {
@@ -589,7 +588,7 @@ static int ghiPostFileDiskStateDoPosting(GHIPostItemState *state, GHIConnection 
         }
         if (state->position == state->fileSize) {
             if (connection->post->mixed) {
-                char padding[3] = {0, 0, 0};
+                char padding[3] = { 0, 0, 0 };
                 int padLength;
 
                 padLength = 4 - state->fileSize % 4;
@@ -625,7 +624,7 @@ static int ghiPostFileMemoryStateDoPosting(GHIPostItemState *state, GHIConnectio
             length = item->u.memory.length;
             if (length == state->position) {
                 if (connection->post->mixed) {
-                    char padding[3] = {0, 0, 0};
+                    char padding[3] = { 0, 0, 0 };
                     int padLength;
 
                     padLength = 4 - item->u.memory.length % 4;
@@ -655,7 +654,7 @@ static int ghiPostFileMemoryStateDoPosting(GHIPostItemState *state, GHIConnectio
         length = item->u.memory.length;
         if (length == state->position) {
             if (connection->post->mixed) {
-                char padding[3] = {0, 0, 0};
+                char padding[3] = { 0, 0, 0 };
                 int padLength;
 
                 padLength = 4 - item->u.memory.length % 4;
@@ -692,7 +691,7 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
 
             if (item->type == GHI_POST_STRING) {
                 func_0207a290(buffer, "%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n",
-                        first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name);
+                              first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name);
             } else if (item->type == GHI_POST_XML) {
                 if (connection->post->mixed) {
                     int count;
@@ -783,10 +782,10 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
                     }
                 } else {
                     func_0207a290(buffer,
-                            "%sContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: "
-                            "%s\r\n\r\n",
-                            first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name, fileName,
-                            contentType);
+                                  "%sContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: "
+                                  "%s\r\n\r\n",
+                                  first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name,
+                                  fileName, contentType);
                 }
             }
         }
@@ -831,8 +830,8 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
     return ghiPostFileMemoryStateDoPosting(state, connection);
 }
 
-// Sends the post of a connection, an item at a time. Returns 0 for an error, 1 once it is all sent, 2 to go on later and
-// 3 once the head of an XML message is sent
+// Sends the post of a connection, an item at a time. Returns 0 for an error, 1 once it is all sent, 2 to go on later
+// and 3 once the head of an XML message is sent
 int ghiPostDoPosting(GHIConnection *connection) {
     GHIPostingState *posting = &connection->postingState;
     int count = func_ov011_02171588(posting->states);

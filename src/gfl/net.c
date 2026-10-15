@@ -98,7 +98,6 @@ void func_020425ec(const GFLNetInitData *pNetInit, void (*callback)(void *work),
     }
 }
 
-
 BOOL func_02042788(void) {
     GFLNetSys *pNet = func_02042e78();
 
@@ -171,7 +170,6 @@ BOOL func_02042860(void (*callback)(void *work)) {
     }
     return FALSE;
 }
-
 
 void func_020428a0(void) {
     func_02041de4();
@@ -369,8 +367,8 @@ BOOL func_02042b00(void) {
 BOOL func_02042b20(void) {
     GFLNetSys *pNet = func_02042e78();
 
-    if (pNet != NULL
-        && (pNet->aNetInit.bNetType == GFL_NET_TYPE_WIFI || pNet->aNetInit.bNetType == GFL_NET_TYPE_WIFI_LOBBY)) {
+    if (pNet != NULL &&
+        (pNet->aNetInit.bNetType == GFL_NET_TYPE_WIFI || pNet->aNetInit.bNetType == GFL_NET_TYPE_WIFI_LOBBY)) {
         return TRUE;
     }
     return FALSE;
@@ -395,7 +393,6 @@ static void func_02042b40(void) {
         func_0203e7dc();
     }
 }
-
 
 void func_02042ba8(BOOL top, HeapID heapId) {
     func_02042ae4(240, 0);
@@ -443,8 +440,7 @@ BOOL func_02042c18(NetHandle *handle, u8 sendID, u16 command, u32 size, const vo
     return func_0203fafc(command, (u8 *)data, size, a5, func_020401dc(handle), dest, noCopy);
 }
 
-BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6,
-                   BOOL noCopy) {
+BOOL func_02042c9c(NetHandle *handle, int dest, u16 command, int size, const void *data, u32 a5, BOOL a6, BOOL noCopy) {
     GFLNetInitData *ini = func_02042e84();
 
     if (!func_02042bd8(handle) && command >= GFL_NET_CMD_BASE_COUNT) {

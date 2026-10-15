@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/funfest_savedata.h"
 #include "gfl/std.h"
+#include "save/funfest_savedata.h"
 #include "save/save_control.h"
 
 // The save block of the Funfest missions: how many were hosted, joined and completed, and each mission's record.

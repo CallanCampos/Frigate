@@ -5,10 +5,10 @@
 // commands of scrcmd_musical.c, and overlays 209, 210 and 211, which those load
 
 #include "types.h"
+#include "app/ircbattlematch.h"
 #include "app/musical/mus_item_data.h"
 #include "app/musical/musical_shot_sys.h"
 #include "app/musical/musical_system.h"
-#include "app/ircbattlematch.h"
 #include "field/mus_comm_func.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"

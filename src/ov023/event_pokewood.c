@@ -161,7 +161,8 @@ static const struct {
 
 // What each movie the downloaded movie's field 0 says is shown as, plus one. The original has room for four more
 static const u8 sSlotInfo[POKEWOOD_MOVIE_COUNT + 4] = {
-    0, 11, 11, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 12,
+    0, 11, 11, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4,  4,  4,  5,  5,
+    5, 6,  6,  6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 12,
 };
 
 // How each movie unlocks: by a kind that EventPokewood_UnlockMovies checks, and the kind's parameter
@@ -169,10 +170,10 @@ static const struct {
     u8 kind;
     u8 param;
 } sMovieUnlocks[POKEWOOD_MOVIE_COUNT] = {
-    { 0, 0 },  { 7, 0 },  { 1, 1 },  { 4, 0 },  { 1, 3 },  { 1, 4 },  { 1, 5 },  { 6, 0 },  { 1, 7 },  { 1, 8 },
-    { 1, 9 },  { 2, 0 },  { 1, 11 }, { 1, 12 }, { 1, 13 }, { 6, 0 },  { 1, 15 }, { 1, 16 }, { 2, 0 },  { 1, 18 },
-    { 1, 19 }, { 6, 0 },  { 1, 21 }, { 1, 22 }, { 3, 2 },  { 1, 24 }, { 1, 25 }, { 1, 26 }, { 6, 27 }, { 1, 28 },
-    { 1, 29 }, { 3, 3 },  { 1, 31 }, { 1, 32 }, { 1, 33 }, { 2, 0 },  { 1, 35 }, { 1, 36 }, { 1, 37 }, { 5, 0 },
+    { 0, 0 },  { 7, 0 }, { 1, 1 },  { 4, 0 },  { 1, 3 },  { 1, 4 },  { 1, 5 },  { 6, 0 },  { 1, 7 },  { 1, 8 },
+    { 1, 9 },  { 2, 0 }, { 1, 11 }, { 1, 12 }, { 1, 13 }, { 6, 0 },  { 1, 15 }, { 1, 16 }, { 2, 0 },  { 1, 18 },
+    { 1, 19 }, { 6, 0 }, { 1, 21 }, { 1, 22 }, { 3, 2 },  { 1, 24 }, { 1, 25 }, { 1, 26 }, { 6, 27 }, { 1, 28 },
+    { 1, 29 }, { 3, 3 }, { 1, 31 }, { 1, 32 }, { 1, 33 }, { 2, 0 },  { 1, 35 }, { 1, 36 }, { 1, 37 }, { 5, 0 },
 };
 
 static u32 EventPokewood_GetTitleMsgBase(u32 kind, u32 gender);
@@ -186,8 +187,8 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
 static BtlSetup *EventPokewood_LoadBlockSetup(GameSystem *gsys, Field *field, HeapID heapId);
 static BtlSetup *EventPokewood_LoadWatchSetup(GameSystem *gsys, Field *field, HeapID heapId, u8 slot);
 static void EventPokewood_LoadIntroText(PokewoodMovieParam *param, BtlSetup *setup, u32 movie, u32 kind, HeapID heapId);
-static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem *gsys, GameData *gameData, Field *field,
-                                           HeapID heapId);
+static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem *gsys, GameData *gameData,
+                                           Field *field, HeapID heapId);
 static void EventPokewood_FreeSetup(BtlSetup *setup);
 static void EventPokewood_StoreRecordedSetup(GameData *gameData, BtlSetup *setup, HeapID heapId);
 static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *setup);
@@ -269,7 +270,8 @@ void EventPokewood_CreateCastParty(PlayerInfo *playerInfo, PokeParty *dest, Heap
     GFL_HeapFree(party);
 }
 
-void EventPokewood_CreateCastPartyFromSave(PlayerInfo *playerInfo, PokeParty *dest, HeapID heapId, u32 movie, u32 side) {
+void EventPokewood_CreateCastPartyFromSave(PlayerInfo *playerInfo, PokeParty *dest, HeapID heapId, u32 movie,
+                                           u32 side) {
     EventPokewood_CreateCastParty(playerInfo, dest, heapId, movie, side);
 }
 
@@ -419,7 +421,8 @@ static BtlSetup *EventPokewood_LoadWatchSetup(GameSystem *gsys, Field *field, He
 }
 
 // Loads the lines the movie opens with
-static void EventPokewood_LoadIntroText(PokewoodMovieParam *param, BtlSetup *setup, u32 movie, u32 kind, HeapID heapId) {
+static void EventPokewood_LoadIntroText(PokewoodMovieParam *param, BtlSetup *setup, u32 movie, u32 kind,
+                                        HeapID heapId) {
     u32 gender = getTrainerGender(setup->unk34[0]);
     u32 isMale = TRUE;
     MsgData *msgData;
@@ -438,8 +441,8 @@ static void EventPokewood_LoadIntroText(PokewoodMovieParam *param, BtlSetup *set
 }
 
 // Sets up the battle of the movie that the event runs
-static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem *gsys, GameData *gameData, Field *field,
-                                           HeapID heapId) {
+static BtlSetup *EventPokewood_CreateSetup(PokewoodMovieParam *param, GameSystem *gsys, GameData *gameData,
+                                           Field *field, HeapID heapId) {
     PokewoodSave *save = func_02011040(gameData);
     BtlSetup *setup;
     PokewoodMovieFile *file;
@@ -855,8 +858,9 @@ static GameEventReturnCode EventPokewood_RunMenu(GameEvent *event, u32 *state, v
 
     switch (*state) {
     case 0:
-        GameEvent_ChainNext(event, EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(323),
-                                                                         &PKWD_SELECTSCREEN_PROC_FUNCTIONS, &wk->param));
+        GameEvent_ChainNext(event,
+                            EventFieldSubprocessTransition_Create(wk->gsys, wk->field, OVERLAY_ID(323),
+                                                                  &PKWD_SELECTSCREEN_PROC_FUNCTIONS, &wk->param));
         *state = 1;
         break;
     case 1:
@@ -1025,8 +1029,8 @@ static void EventPokewood_SetupRecordedOpponent(BtlSetup *setup, HeapID heapId) 
 
 // Shows the cast that has Pokéstar-only species under their names
 static void EventPokewood_ShowCastNames(BtlSetup *setup, HeapID heapId) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PASS_POWER_STARTMENU,
-                                          HEAPID_TAIL(heapId));
+    MsgData *msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PASS_POWER_STARTMENU, HEAPID_TAIL(heapId));
     PokewoodCastFile *file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_CAST, setup->unkDF, HEAPID_TAIL(heapId));
     PokeParty *party = setup->party[1];
     int i;

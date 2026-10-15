@@ -2,12 +2,12 @@
 // microphone and the speaker and Nintendo's voice chat library libVCT, which follows it in overlay 29. The ROM names
 // no file, so the name is a guess. The names are ours
 
-#include "gfl/dwc_vchat.h"
 #include "types.h"
 #include "dwc/dwc.h"
 #include "dwc/vct.h"
 #include "gfl/dwc_rap.h"
 #include "gfl/dwc_rapcommon.h"
+#include "gfl/dwc_vchat.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 #include "nitro/mic.h"
@@ -272,7 +272,7 @@ BOOL DWCRapVChat_ReceivePacket(int aid, u8 *data, int size) {
 // Starts the voice chat in heapId, with the library's codec and the number of machines to talk to
 void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
     VCTConfig config;
-    u8 channels[3] = {0, 0, 0};
+    u8 channels[3] = { 0, 0, 0 };
     BOOL ret;
 
     if (sVChatWork == NULL) {

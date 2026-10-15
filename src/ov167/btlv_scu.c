@@ -119,32 +119,32 @@ struct BtlvScu {
     u16 endWait;                       // 0x14C the wait after the last page
     u8 unk14E;                         // 0x14E only cleared, in func_ov167_021d0c24
     u8 encountStep;                    // 0x14F the step through the tables of the encounter procedures
-    u8 recPlay;                        // 0x150 the argument of func_ov167_021d1084, a recorded battle: skip the encounter
-    BtlvScuWinFade msgFade;            // 0x154
-    BattleMon *levelUpMon;             // 0x16C
-    BattleMonLevelUp levelUp;          // 0x170 the gains, then the new stats, which func_ov167_021bb10c writes over
-};                                     // size 0x180
+    u8 recPlay;               // 0x150 the argument of func_ov167_021d1084, a recorded battle: skip the encounter
+    BtlvScuWinFade msgFade;   // 0x154
+    BattleMon *levelUpMon;    // 0x16C
+    BattleMonLevelUp levelUp; // 0x170 the gains, then the new stats, which func_ov167_021bb10c writes over
+}; // size 0x180
 
 // The works of the procedures, which cast scu->work
 
 // One mon: func_ov167_021d1404 (wild single), 021d15f8 (trainer single), 021d215c, 021d26c4
 typedef struct BtlvScuSingleWork {
-    BattleMon *mon; // 0x00
-    u8 pos;         // 0x04 func_ov167_0219c744 of viewPos
-    u8 viewPos;     // 0x05
-    u8 monId;       // 0x06
-    u8 clientId;    // 0x07 of the trainer, or of the player
-    u8 unk08;       // 0x08 func_ov167_0219c8d0(mainModule, playerClientId, 0), a client ID for the message
+    BattleMon *mon;  // 0x00
+    u8 pos;          // 0x04 func_ov167_0219c744 of viewPos
+    u8 viewPos;      // 0x05
+    u8 monId;        // 0x06
+    u8 clientId;     // 0x07 of the trainer, or of the player
+    u8 unk08;        // 0x08 func_ov167_0219c8d0(mainModule, playerClientId, 0), a client ID for the message
 } BtlvScuSingleWork; // size 0x0C
 
 // Two wild mons: func_ov167_021d18b8, 021d1d64. The arrays are in another order than in BtlvScuDoubleWork
 typedef struct BtlvScuWildDoubleWork {
-    BattleMon *mons[2]; // 0x00
-    u8 monIds[2];       // 0x08
-    u8 pos[2];          // 0x0A
-    u8 viewPos[2];      // 0x0C
-    u8 unk0E;           // 0x0E never accessed
-    u8 clientId;        // 0x0F
+    BattleMon *mons[2];  // 0x00
+    u8 monIds[2];        // 0x08
+    u8 pos[2];           // 0x0A
+    u8 viewPos[2];       // 0x0C
+    u8 unk0E;            // 0x0E never accessed
+    u8 clientId;         // 0x0F
 } BtlvScuWildDoubleWork; // size 0x10
 
 // Two mons sent out together: func_ov167_021d2284, 021d23d4, 021d2820, 021d29bc
@@ -155,7 +155,7 @@ typedef struct BtlvScuDoubleWork {
     u8 monIds[2];       // 0x0C
     u8 count;           // 0x0E of the mons not fainted
     u8 clientId;        // 0x0F
-} BtlvScuDoubleWork; // size 0x10
+} BtlvScuDoubleWork;    // size 0x10
 
 // Three: func_ov167_021d252c, 021d2b88
 typedef struct BtlvScuTripleWork {
@@ -165,7 +165,7 @@ typedef struct BtlvScuTripleWork {
     u8 monIds[3];       // 0x12
     u8 count;           // 0x15
     u8 clientId;        // 0x16
-} BtlvScuTripleWork; // size 0x18
+} BtlvScuTripleWork;    // size 0x18
 
 // The sprites of the opposing trainers: func_ov167_021d2028 uses both, func_ov167_021d1f1c only viewPos[1]
 typedef struct BtlvScuTrainerWork {
@@ -213,9 +213,9 @@ typedef struct BtlvScuPkmTask {
 
 // func_ov167_021d3830 and func_ov167_021d386c: msgFade hides the message window, which is then cleared
 typedef struct BtlvScuMsgHideTask {
-    BtlvScu *scu; // 0x00
-    s32 seq;      // 0x04
-    u8 *count;    // 0x08 &scu->taskCount
+    BtlvScu *scu;     // 0x00
+    s32 seq;          // 0x04
+    u8 *count;        // 0x08 &scu->taskCount
 } BtlvScuMsgHideTask; // size 0x0C
 
 // A step of an encounter sequence, run until it returns TRUE
@@ -297,43 +297,53 @@ static u16 func_ov167_021d4578(BtlvScu *scu, u16 color);
 static void func_ov167_021d4590(BtlvScu *scu);
 
 // The view positions whose mons a recorded battle shows at once, by style
-static const u8 sSingleViewPos[] = {1, 0};
-static const u8 sDoubleViewPos[] = {2, 3, 4, 5};
-static const u8 sTripleViewPos[] = {2, 3, 4, 5, 6, 7};
+static const u8 sSingleViewPos[] = { 1, 0 };
+static const u8 sDoubleViewPos[] = { 2, 3, 4, 5 };
+static const u8 sTripleViewPos[] = { 2, 3, 4, 5, 6, 7 };
 
 // The steps of the encounter sequences, by func_ov167_021d1084's choice. The two-dimensional ones go by step, then by
 // the player's client ID. The 12-byte tables are declared in an order that MWCC's size sort lays out as the game
 // does
-static const BtlvScuEncountStep sDoubleWildMultiSteps[] = {func_ov167_021d1d64, func_ov167_021d27e8};
-static const BtlvScuEncountStep sDoubleTrainerMultiSteps[] = {func_ov167_021d1ee0, func_ov167_021d2248,
-                                                              func_ov167_021d27e8};
-static const BtlvScuEncountStep sTripleSteps[] = {func_ov167_021d1ec0, func_ov167_021d252c, func_ov167_021d2b88};
-static const BtlvScuEncountStep sDoubleTrainerSteps[] = {func_ov167_021d1ec0, func_ov167_021d2248, func_ov167_021d27e8};
-static const BtlvScuEncountStep sDoubleCommMultiSteps[] = {func_ov167_021d1ee0, func_ov167_021d2248,
-                                                           func_ov167_021d27e8};
+static const BtlvScuEncountStep sDoubleWildMultiSteps[] = { func_ov167_021d1d64, func_ov167_021d27e8 };
+static const BtlvScuEncountStep sDoubleTrainerMultiSteps[] = { func_ov167_021d1ee0, func_ov167_021d2248,
+                                                               func_ov167_021d27e8 };
+static const BtlvScuEncountStep sTripleSteps[] = { func_ov167_021d1ec0, func_ov167_021d252c, func_ov167_021d2b88 };
+static const BtlvScuEncountStep sDoubleTrainerSteps[] = { func_ov167_021d1ec0, func_ov167_021d2248,
+                                                          func_ov167_021d27e8 };
+static const BtlvScuEncountStep sDoubleCommMultiSteps[] = { func_ov167_021d1ee0, func_ov167_021d2248,
+                                                            func_ov167_021d27e8 };
+// clang-format off
 static const BtlvScuEncountStep sTripleCommSteps[][2] = {
     {func_ov167_021d1ec0, func_ov167_021d1ec0},
     {func_ov167_021d252c, func_ov167_021d2b88},
     {func_ov167_021d2b88, func_ov167_021d252c},
 };
+
+// clang-format on
+// clang-format off
 static const BtlvScuEncountStep sSingleCommSteps[][2] = {
     {func_ov167_021d1ec0, func_ov167_021d1ec0},
     {func_ov167_021d215c, func_ov167_021d26c4},
     {func_ov167_021d26c4, func_ov167_021d215c},
 };
+
+// clang-format on
+// clang-format off
 static const BtlvScuEncountStep sDoubleCommSteps[][2] = {
     {func_ov167_021d1ec0, func_ov167_021d1ec0},
     {func_ov167_021d2248, func_ov167_021d27e8},
     {func_ov167_021d27e8, func_ov167_021d2248},
 };
 
+// clang-format on
+
 // The BG setups, declared in the only order found that lays them out as the game does: BG1, BG2, BG3
 // BG1, the message window
-static const BGSetup sMsgBGSetup = {0, 0, 0x800, 0, 1, 0, 9, 4, 0x8000, 0, 0, 0, 0};
+static const BGSetup sMsgBGSetup = { 0, 0, 0x800, 0, 1, 0, 9, 4, 0x8000, 0, 0, 0, 0 };
 // BG2, the ability pop-up of side 0
-static const BGSetup sAbilityBG2Setup = {0x90, 0, 0x1000, 0, 3, 0, 10, 2, 0x8000, 0, 0, 0, 0};
+static const BGSetup sAbilityBG2Setup = { 0x90, 0, 0x1000, 0, 3, 0, 10, 2, 0x8000, 0, 0, 0, 0 };
 // BG3, the ability pop-up of side 1 and the level-up stats
-static const BGSetup sAbilityBG3Setup = {-0x90, 0, 0x2000, 0, 4, 0, 12, 2, 0x8000, 0, 0, 0, 0};
+static const BGSetup sAbilityBG3Setup = { -0x90, 0, 0x2000, 0, 4, 0, 12, 2, 0x8000, 0, 0, 0, 0 };
 
 static inline void BtlvScu_SetSubProc(BtlvScu *scu, BtlvSubProcFn main) {
     scu->subProc.init = NULL;
@@ -2630,8 +2640,7 @@ static void func_ov167_021d3ddc(BtlvScuAbilityWin *win) {
     int half;
 
     size = GFL_BitmapCalcPixelDataSize(win->bitmap);
-    sys_memcpy32((u8 *)win->scu->abilityChars->rawData + win->side * 0x900, GFL_BitmapGetPixelData(win->bitmap),
-                 size);
+    sys_memcpy32((u8 *)win->scu->abilityChars->rawData + win->side * 0x900, GFL_BitmapGetPixelData(win->bitmap), size);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     func_ov167_021d4ec0(scu->abilityStrbuf, 0x67, 2, win->monId, win->ability);
     if ((u8)func_020228c0(scu->abilityStrbuf, scu->smallFont, 0, widths, 2) > 1) {
@@ -2752,8 +2761,8 @@ static BOOL func_ov167_021d3f4c(BtlvScuAbilityWin *win) {
 }
 
 static void func_ov167_021d408c(BtlvScu *scu, BtlvBGaugeParam *status, u8 clientId1, u8 clientId2, s32 arg4) {
-    BattleParty *parties[2] = {NULL, NULL};
-    int counts[2] = {0, 0};
+    BattleParty *parties[2] = { NULL, NULL };
+    int counts[2] = { 0, 0 };
     BattleMon *mon;
     int side;
     s8 index;

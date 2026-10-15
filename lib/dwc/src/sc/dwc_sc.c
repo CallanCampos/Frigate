@@ -1,7 +1,6 @@
-#include "dwc/sc.h"
-
-#include <stdarg.h>
 #include "dwc/ext.h"
+#include "dwc/sc.h"
+#include <stdarg.h>
 
 // Overlay 260's Sc, the Wi-Fi library's client of the competition service: see dwc/sc.h.
 

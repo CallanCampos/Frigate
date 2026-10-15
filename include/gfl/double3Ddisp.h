@@ -4,8 +4,8 @@
 #include "types.h"
 #include "gfl/heap.h"
 
-// 3D on both screens (double3Ddisp.c), rendering to each on alternate frames. GFL_G3DDual3DRaiseNeedRenderFlag is called
-// after each frame's 3D, and GFL_G3DDual3DExecVBlank at VBlank switches screens
+// 3D on both screens (double3Ddisp.c), rendering to each on alternate frames. GFL_G3DDual3DRaiseNeedRenderFlag is
+// called after each frame's 3D, and GFL_G3DDual3DExecVBlank at VBlank switches screens
 
 void GFL_G3DDual3DInit(HeapID heapId);
 void GFL_G3DDual3DFree(void);

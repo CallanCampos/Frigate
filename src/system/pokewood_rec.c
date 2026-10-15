@@ -1,11 +1,11 @@
 #include "types.h"
-#include "save/pokewood.h"
 #include "battle/battle_rec_tool.h"
 #include "field/pokewood_system.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "gfl/rtc_cache.h"
 #include "gfl/std.h"
+#include "save/pokewood.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 
@@ -114,8 +114,8 @@ u32 func_020106ec(GameData *gameData, HeapID heapId, u32 slot, u16 *state) {
 }
 
 BOOL func_020107b0(void) {
-    if (addUpDataStream((const u8 *)sBlock, POKEWOOD_EXTRA_BLOCK_SIZE) != 0
-        && sBlock->crc == getCRC16(sBlock, POKEWOOD_BLOCK_CRC_SIZE)) {
+    if (addUpDataStream((const u8 *)sBlock, POKEWOOD_EXTRA_BLOCK_SIZE) != 0 &&
+        sBlock->crc == getCRC16(sBlock, POKEWOOD_BLOCK_CRC_SIZE)) {
         return TRUE;
     }
     return FALSE;

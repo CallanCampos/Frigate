@@ -128,7 +128,7 @@ void UIObjRes_Free(UIObjRes *res) {
 }
 
 ClActor *UIObjRes_CreateActor(UIObjRes *res, ClActUnit *unit, u8 x, u8 y, u8 anim, HeapID heapId) {
-    ClActorSetup setup = {0};
+    ClActorSetup setup = { 0 };
     ClActor *actor;
 
     setup.x = x;

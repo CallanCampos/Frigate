@@ -1,7 +1,7 @@
 #include "types.h"
-#include "app/wifi_p2pmatchroom_map.h"
 #include "app/wf2dmap/wf2dmap_map.h"
 #include "app/wifi_p2pmatchroom.h"
+#include "app/wifi_p2pmatchroom_map.h"
 
 // The maps of the Wi-Fi Club match board's room: one more block of eight seats and a PC for every eight friends of the
 // friend list. The ROM has no name for this file: it is named after the older games' wifi_p2pmatchroom_map.c
@@ -36,6 +36,7 @@ static const WIFI_MCR_MAPSIZE sWifiMcrMapSizes[WIFI_MCR_MAP_NUM] = {
 };
 
 // The second map is defined ahead of the first, which lays the two out in the order of the ROM
+// clang-format off
 static const WF2DMAP_MAP sWifiMcrMap1[16 * WIFI_MCR_MAP_GRID_Y] = {
     WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL,
     WL, WL, WL, WL, PC, WL, WL, WL, WL, WL, PC, WL, WL, WL, WL, WL,
@@ -50,6 +51,9 @@ static const WF2DMAP_MAP sWifiMcrMap1[16 * WIFI_MCR_MAP_GRID_Y] = {
     WL, FL, FL, FL, FL, FL, FL, EX, FL, FL, FL, FL, FL, FL, WL, WL,
 };
 
+// clang-format on
+
+// clang-format off
 static const WF2DMAP_MAP sWifiMcrMap0[16 * WIFI_MCR_MAP_GRID_Y] = {
     WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL,
     WL, WL, WL, WL, WL, WL, WL, PC, WL, WL, WL, WL, WL, WL, WL, WL,
@@ -64,6 +68,9 @@ static const WF2DMAP_MAP sWifiMcrMap0[16 * WIFI_MCR_MAP_GRID_Y] = {
     WL, FL, FL, FL, FL, FL, FL, EX, FL, FL, FL, FL, FL, FL, WL, WL,
 };
 
+// clang-format on
+
+// clang-format off
 static const WF2DMAP_MAP sWifiMcrMap2[22 * WIFI_MCR_MAP_GRID_Y] = {
     WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL,
     WL, WL, WL, WL, PC, WL, WL, WL, WL, WL, PC, WL, WL, WL, WL, WL, PC, WL, WL, WL, WL, WL,
@@ -77,6 +84,8 @@ static const WF2DMAP_MAP sWifiMcrMap2[22 * WIFI_MCR_MAP_GRID_Y] = {
     FL, FL, B2, B2, B2, B2, B2, FL, B0, B0, B0, B0, B0, FL, B1, B1, B1, B1, B1, FL, FL, WL,
     WL, FL, FL, FL, FL, FL, FL, FL, FL, FL, EX, FL, FL, FL, FL, FL, FL, FL, FL, FL, WL, WL,
 };
+
+// clang-format on
 
 static const WF2DMAP_MAP sWifiMcrMap3[28 * WIFI_MCR_MAP_GRID_Y] = {
     WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL, WL,

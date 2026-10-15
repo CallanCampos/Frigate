@@ -8,27 +8,30 @@
 // The digits and the character for a digit out of range, in full width and in ASCII, for decimal and hexadecimal
 // numbers, and the powers of 10 and 16 the digits are divided out by. Only GFL_WordSetFormatNumber's tables are used
 // in the ROM; the others were left by the formatters below, which nothing calls
-const u16 digitsMono[] = {0xff10, 0xff11, 0xff12, 0xff13, 0xff14, 0xff15, 0xff16, 0xff17, 0xff18, 0xff19, 0xff1f};
-const u16 digitsAscii[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?'};
-const u16 mono_0_9_Q[] = {0xff10, 0xff11, 0xff12, 0xff13, 0xff14, 0xff15, 0xff16, 0xff17, 0xff18, 0xff19, 0xff1f};
-const u16 ascii_0_9_Q[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?'};
-const u32 hexExponents[] = {0x1, 0x10, 0x100, 0x1000, 0x10000, 0x100000, 0x1000000, 0x10000000};
-const u16 hexDigitsMono[] = {0xff10, 0xff11, 0xff12, 0xff13, 0xff14, 0xff15, 0xff16, 0xff17, 0xff18,
-                             0xff19, 0xff21, 0xff22, 0xff23, 0xff24, 0xff25, 0xff26, 0xff1f};
-const u16 hexDigitsAscii[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '?'};
-const u32 decimalExponents[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
+const u16 digitsMono[] = { 0xff10, 0xff11, 0xff12, 0xff13, 0xff14, 0xff15, 0xff16, 0xff17, 0xff18, 0xff19, 0xff1f };
+const u16 digitsAscii[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?' };
+const u16 mono_0_9_Q[] = { 0xff10, 0xff11, 0xff12, 0xff13, 0xff14, 0xff15, 0xff16, 0xff17, 0xff18, 0xff19, 0xff1f };
+const u16 ascii_0_9_Q[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?' };
+const u32 hexExponents[] = { 0x1, 0x10, 0x100, 0x1000, 0x10000, 0x100000, 0x1000000, 0x10000000 };
+const u16 hexDigitsMono[] = { 0xff10, 0xff11, 0xff12, 0xff13, 0xff14, 0xff15, 0xff16, 0xff17, 0xff18,
+                              0xff19, 0xff21, 0xff22, 0xff23, 0xff24, 0xff25, 0xff26, 0xff1f };
+const u16 hexDigitsAscii[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '?' };
+const u32 decimalExponents[] = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000 };
 // Indexed by the count of digits: the value of the first digit, which for 0 digits is the largest a u32 has
 const u32 tenExponents[] = {
     1000000000, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
 };
 
 // The letter without its accent for each of 0xc0 to 0xff, or 0 to keep the character
+// clang-format off
 static const s8 Aaaaaa[] = {
     'A', 'A', 'A', 'A', 'A', 'A', 0,   'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I',
     'D', 'N', 'O', 'O', 'O', 'O', 'O', 0,   'O', 'U', 'U', 'U', 'U', 'Y', 'Y', 's',
     'a', 'a', 'a', 'a', 'a', 'a', 0,   'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i',
     'd', 'n', 'o', 'o', 'o', 'o', 'o', 0,   'o', 'u', 'u', 'u', 'u', 'y', 'y', 'y',
 };
+
+// clang-format on
 
 // The characters of codes 0x100 on in compressed strings
 static const u16 SPECIAL_COMPRESSED_CHAR_TABLE[] = {

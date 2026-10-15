@@ -1,9 +1,9 @@
-#include <stddef.h>
 #include "types.h"
-#include "save/join_avenue.h"
 #include "gfl/std.h"
+#include "save/join_avenue.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
+#include <stddef.h>
 
 // The Join Avenue's save block, and adding a visitor, a person or an entry to it: merged into the one who is already
 // there, or else added to the people met or the entries. The ROM has no string for the file, so the name is

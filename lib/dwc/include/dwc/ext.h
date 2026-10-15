@@ -1,12 +1,12 @@
 #ifndef POKEBW2_DWC_EXT_H
 #define POKEBW2_DWC_EXT_H
 
-#include <stdarg.h>
 #include "types.h"
-#include "nitro/os.h"
-#include "system/rtc.h"
 #include "dwc/sake.h"
 #include "dwc/soap.h"
+#include "nitro/os.h"
+#include "system/rtc.h"
+#include <stdarg.h>
 // For CPS's address (CPSMyIp), which is set once the library has started
 #include "nitrowifi/cps.h"
 #include "nitrowifi/soc.h"
@@ -168,8 +168,8 @@ typedef struct GsHttpRequest {
     void *handle;
 } GsHttpRequest;
 typedef void (*GsHttpResponseFunc)(int status, int a1, SoapReader *reader, void *userData);
-GsHttpRequest *func_ov011_0216ea4c(const char *url, const char *soapAction, SoapWriter *writer,
-                                   GsHttpResponseFunc func, void *userData);
+GsHttpRequest *func_ov011_0216ea4c(const char *url, const char *soapAction, SoapWriter *writer, GsHttpResponseFunc func,
+                                   void *userData);
 // The same with a callback that gives the data and its size, and a content type
 GsHttpRequest *func_ov011_0216eae0(const char *url, const char *soapAction, void *writer, GsHttpResponseFunc func,
                                    const void *a4, void *userData);
@@ -189,7 +189,8 @@ BOOL DWC_ProcessGHTTP(void);
 // A post: the form (or message) that a request sends
 typedef struct GHIPost GHIPost;
 // Adds a file made of bytes in memory to a post (a form), with the name of its field, the name of the file and its type
-int ghttpPostAddFileFromMemory(GHIPost *post, const char *field, const void *bytes, int size, const char *name, const char *type);
+int ghttpPostAddFileFromMemory(GHIPost *post, const char *field, const void *bytes, int size, const char *name,
+                               const char *type);
 // Called with an error code, to log it
 int DWCi_HandleGHTTPError(int error);
 // The state of a transfer that was started with a request of the module, and cancelling it

@@ -1,10 +1,10 @@
 #include "types.h"
-#include "app/ui/frame_list.h"
-#include "app/ui/print_msg.h"
 #include "app/t_download/t_download_graphic.h"
 #include "app/t_download/t_download_local.h"
 #include "app/t_download/t_download_save.h"
 #include "app/t_download/t_download_util.h"
+#include "app/ui/frame_list.h"
+#include "app/ui/print_msg.h"
 #include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -22,8 +22,8 @@
 #include "nnsys/gfd.h"
 #include "pml/poke_graphic.h"
 #include "system/app_keycursor.h"
-#include "system/app_printsys_common.h"
 #include "system/app_menu_common.h"
+#include "system/app_printsys_common.h"
 #include "system/app_taskmenu.h"
 #include "system/bmp_winframe.h"
 #include "system/printsys.h"
@@ -171,6 +171,7 @@ static const TDownloadBGRes sTDownloadBGPltts[] = {
     { 0xff },
 };
 
+// clang-format off
 static const TDownloadBGRes sTDownloadBGScreens[] = {
     { 7, 0xd, 0 },
     { 6, 0xe, 0 },
@@ -179,8 +180,11 @@ static const TDownloadBGRes sTDownloadBGScreens[] = {
     { 0xff },
 };
 
+// clang-format on
+
 static const s16 sTDownloadDetailMsgs[] = { 0x2f, 0x30, 0x31, 0xc };
 
+// clang-format off
 static const TDownloadBGRes sTDownloadBGChars[] = {
     { 7, 5, 0 },
     { 6, 5, 0 },
@@ -188,6 +192,8 @@ static const TDownloadBGRes sTDownloadBGChars[] = {
     { 1, 4, 0 },
     { 0xff },
 };
+
+// clang-format on
 
 static const s16 sTDownloadTitleMsgs[] = { 8, 0, 9, 10, 11 };
 
@@ -242,12 +248,16 @@ static const TDownloadWindowData sTDownloadSavedWindows[] = {
     { 0xff },
 };
 
+// clang-format off
 static const TouchRect sTDownloadSavedTouchRects[] = {
     { 0xa8, 0xc0, 0xe8, 0xff }, { 0xa8, 0xc0, 0x88, 0xa0 }, { 0xa8, 0xc0, 0xa8, 0xc0 },
     { 0x2c, 0x44, 0x08, 0xe8 }, { 0x54, 0x6c, 0x08, 0xe8 }, { 0x7c, 0x94, 0x08, 0xe8 },
     { TOUCH_RECT_END },
 };
 
+// clang-format on
+
+// clang-format off
 static const TDownloadWindowData sTDownloadReceivedWindows[] = {
     { 0, 2, 5, 0x1c, 2, 3 },
     { 0, 2, 8, 0x1c, 2, 3 },
@@ -257,11 +267,16 @@ static const TDownloadWindowData sTDownloadReceivedWindows[] = {
     { 0xff },
 };
 
+// clang-format on
+
+// clang-format off
 static const TouchRect sTDownloadSelectTouchRects[] = {
     { 0xa8, 0xc0, 0xe8, 0xff }, { 0xa8, 0xc0, 0x88, 0xa0 }, { 0xa8, 0xc0, 0xa8, 0xc0 },
     { 0x2c, 0x44, 0x08, 0xe8 }, { 0x54, 0x6c, 0x08, 0xe8 }, { 0x7c, 0x94, 0x08, 0xe8 },
     { TOUCH_RECT_END },
 };
+
+// clang-format on
 
 // The rows and buttons of a list that doesn't scroll
 static const FrameListTouch sTDownloadListTouchNoScroll[] = {
@@ -286,6 +301,7 @@ static const FrameListSetup sTDownloadListSetup = {
     sTDownloadListTouch,
 };
 
+// clang-format off
 static const TDownloadActorData sTDownloadObjActors[] = {
     { 0, 0x30, 1, TRUE, 0, 1, 4 },
     { 1, 0x38, 1, TRUE, 0, 1, 0x11 },
@@ -298,6 +314,8 @@ static const TDownloadActorData sTDownloadObjActors[] = {
     { 0xa, 0x30, 3, FALSE, 0, 1, 0x1d },
     { 0xff },
 };
+
+// clang-format on
 
 static const TDownloadBGRes *sTDownloadModeChars[T_DOWNLOAD_MODE_COUNT] = {
     sTDownloadModeBGChars,
@@ -342,6 +360,7 @@ static const TDownloadBGRes *sTDownloadModeScreens[T_DOWNLOAD_MODE_COUNT] = {
     sTDownloadModeBGScreens,
 };
 
+// clang-format off
 static const TDownloadWindowData sTDownloadWindows[] = {
     { 5, 2, 3, 0x1c, 2, 2 },
     { 5, 2, 7, 0xc, 2, 2 },
@@ -354,6 +373,8 @@ static const TDownloadWindowData sTDownloadWindows[] = {
     { 0, 1, 0x13, 0x1e, 4, 9 },
     { 0xff },
 };
+
+// clang-format on
 
 void TDownloadUtil_Nop(TDownloadWork *wk) {
 }

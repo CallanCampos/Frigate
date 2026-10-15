@@ -94,8 +94,8 @@ enum {
     // Not from swan: the heap of the diplomas, overlays 313 to 315
     HEAPID_AWARD = 0x83,
     HEAPID_PDC = 0x85,
-    // Not from swan: the heap of the "THE END" picture (overlay 267) and of the subway map (overlay 317), which never run
-    // together
+    // Not from swan: the heap of the "THE END" picture (overlay 267) and of the subway map (overlay 317), which never
+    // run together
     HEAPID_THE_END = 0x88,
     HEAPID_SUBWAY_MAP = 0x88,
     HEAPID_FIELD_CLACT = 0x89,

@@ -65,6 +65,7 @@ static void func_ov012_0215f918(NetHandle *handle, int a1, void *work);
 static void func_ov012_0215f920(void *work);
 static BeaconSearchBeacon *func_ov012_0215f924(BeaconSearchBeacon *beacon, BeaconSearchBeacon *other);
 
+// clang-format off
 static const GFLNetInitData data_ov012_0216d6a8 = {
     NULL,
     0,
@@ -102,6 +103,8 @@ static const GFLNetInitData data_ov012_0216d6a8 = {
     0,
     0,
 };
+
+// clang-format on
 
 void *func_ov012_0215f55c(u32 *seq, void *param) {
     GameSystem *gsys = param;

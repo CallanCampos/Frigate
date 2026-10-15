@@ -1,7 +1,6 @@
 #include "dwc/gdb.h"
-
-#include <stdarg.h>
 #include "dwc/ext.h"
+#include <stdarg.h>
 
 // Nintendo's Wi-Fi Connection library's record database client (see dwc/gdb.h). It keeps two requests' worth of
 // what a request was asked, one for the request that runs and one for the next, and one function that the Sake calls
@@ -114,6 +113,7 @@ static void Gdb_ReleaseUrls(void);
 static void Gdb_SetUrls(int server);
 
 // The names of the operations, for the log
+// clang-format off
 static const char *sOperationNames[GDB_OPERATION_NUM] = {
     "none",
     "initialize",
@@ -130,6 +130,8 @@ static const char *sOperationNames[GDB_OPERATION_NUM] = {
     "get random record",
     "get record count",
 };
+
+// clang-format on
 
 static Gdb sGdb;
 static GdbRequest sGdbRequests[2];
@@ -472,8 +474,8 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
             break;
         case GDB_OPERATION_RATE_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
-            Gdb_Printf(1516, "%s[gdb=>%s record_id=>%d rating=>%d].\n", sOperationNames[operation],
-                       slot->u.rate.table, slot->u.rate.recordId, slot->u.rate.rating);
+            Gdb_Printf(1516, "%s[gdb=>%s record_id=>%d rating=>%d].\n", sOperationNames[operation], slot->u.rate.table,
+                       slot->u.rate.recordId, slot->u.rate.rating);
             break;
         case GDB_OPERATION_SEARCH_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -690,7 +692,8 @@ static void Gdb_SetUrls(int server) {
 
     switch (server) {
     case 1:
-        func_0207a2c0(gSakeStorageUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
+        func_0207a2c0(gSakeStorageUrl, 128,
+                      "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
                       data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         func_0207a2c0(uploadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
@@ -702,7 +705,8 @@ static void Gdb_SetUrls(int server) {
         break;
     case 0:
     default:
-        func_0207a2c0(gSakeStorageUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
+        func_0207a2c0(gSakeStorageUrl, 128,
+                      "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
                       data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         func_0207a2c0(uploadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",

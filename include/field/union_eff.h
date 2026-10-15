@@ -3,8 +3,8 @@
 
 #include "types.h"
 #include "field/colosseum_tool.h"
-#include "field/union_comm.h"
 #include "field/field_actor.h"
+#include "field/union_comm.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
 

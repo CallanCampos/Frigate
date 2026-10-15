@@ -1,6 +1,5 @@
 #include "app/comm_tvt/comm_tvt_sys.h"
 #include "types.h"
-#include "constants/arc.h"
 #include "app/comm_tvt.h"
 #include "app/comm_tvt/camera_system.h"
 #include "app/comm_tvt/ctvt_call.h"
@@ -10,6 +9,7 @@
 #include "app/comm_tvt/ctvt_game.h"
 #include "app/comm_tvt/ctvt_talk.h"
 #include "app/comm_tvt/draw_system.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
 #include "field/field_sound.h"
@@ -1093,7 +1093,7 @@ void func_ov257_021aae44(CommTvtWork *sys) {
 
 void func_ov257_021aae54(CommTvtWork *sys, const CtvtCommMemberInfo *info) {
     Misc_AddMetTrainer(getHollow_RivalData(GameData_GetSaveControl(sys->param->gameData)),
-                  getIDAsUInt((PlayerInfo *)info->playerInfo));
+                       getIDAsUInt((PlayerInfo *)info->playerInfo));
 }
 
 void func_ov257_021aae7c(CommTvtWork *sys, BmpWin *window) {

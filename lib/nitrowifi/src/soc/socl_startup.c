@@ -1,8 +1,8 @@
-#include "nitrowifi/soc.h"
-#include "socl_internal.h"
 #include "dwc/wcm.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
+#include "nitrowifi/soc.h"
+#include "socl_internal.h"
 
 // SOCL's startup: it starts CPS with a configuration made from SOCL's, then the command packet queue and the socket
 // that sends UDP datagrams. pokediamond's NitroWiFi names the object socl_startup.o and every function in it.

@@ -184,8 +184,8 @@ static u16 Lightning_GetShade(Lightning *lightning);
 static const int sThunderSpeedScale[5] = { 10, 10, 13, 10, 16 };
 
 static const u8 sLightningFlashFrames[32] = {
-    15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 30, 30, 35,
-    35, 35, 40, 40,
+    15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 20, 20, 30, 30, 35, 35, 35, 40, 40,
 };
 
 static const int sGustBgScale[14] = {

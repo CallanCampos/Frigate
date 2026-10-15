@@ -24,6 +24,7 @@ static const u8 sAnswerMsgIdCounts[SURVEY_QUESTION_COUNT] = {
     2, 2, 2, 2, 2, 2, 2, 3, 3, 2, 3, 3, 4, 2, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 5, 8, 8, 8, 17, 11,
 };
 
+// clang-format off
 static const SurveyQuestion sQuestions[SURVEY_QUESTION_COUNT] = {
     { 1, 3, 2, 0, 0 },
     { 0, 3, 2, 2, 2 },
@@ -56,6 +57,8 @@ static const SurveyQuestion sQuestions[SURVEY_QUESTION_COUNT] = {
     { 0, 18, 5, 117, 75 },
     { 1, 12, 0, 134, 80 },
 };
+
+// clang-format on
 
 static const u8 sAnswerMsgIds[SURVEY_QUESTION_COUNT][SURVEY_ANSWER_MAX] = {
     { 1, 2 },

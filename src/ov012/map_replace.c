@@ -11,6 +11,7 @@
 
 // The events that change the map, which a MapReplaceEntry's condition picks: an event happened when its work has the
 // value
+// clang-format off
 const MapReplaceEvent EVENT_MAP_REPLACE_TABLE[10] = {
     { 3, 0, 0x4031, 0x1220 },
     { 4, 1, 0x4032, 0x224 },
@@ -23,6 +24,8 @@ const MapReplaceEvent EVENT_MAP_REPLACE_TABLE[10] = {
     { 11, 8, 0x4039, 0x120 },
     { 12, 9, 0x403a, 0x1028 },
 };
+
+// clang-format on
 
 MapReplace *MapReplace_Create(HeapID heapId, GameSystem *gsys) {
     MapReplace *replace = GFL_HeapAllocate(heapId, sizeof(MapReplace), TRUE, "map_replace.c", 0x77);

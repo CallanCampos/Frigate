@@ -749,8 +749,9 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         if (bsw->ov306Param.unk14 > BSUBWAY_COUNT_MAX) {
             bsw->ov306Param.unk14 = BSUBWAY_COUNT_MAX;
         }
-        ScriptWork_CallEvent(
-            work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(306), &BtlRecSelProcFunctions, &bsw->ov306Param, NULL, NULL));
+        ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_ID(306),
+                                                                                     &BtlRecSelProcFunctions,
+                                                                                     &bsw->ov306Param, NULL, NULL));
         result = TRUE;
         break;
     case 349:
@@ -881,8 +882,9 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         sys_memset(&bsw->ircMatchParam, 0, sizeof(bsw->ircMatchParam));
         bsw->ircMatchParam.gameData = gameData;
         bsw->ircMatchParam.result = IRCBATTLEMATCH_MODE_BSUBWAY;
-        ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
-                                                 &bsw->ircMatchParam, NULL, NULL));
+        ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(
+                                       gsys, field, OVERLAY_IRCBATTLEMATCH, &IRCBATTLEMATCH_PROC_FUNCTIONS,
+                                       &bsw->ircMatchParam, NULL, NULL));
         result = TRUE;
         break;
     case 409:

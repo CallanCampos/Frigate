@@ -291,8 +291,8 @@ typedef struct {
     u8 padding;
 } PkwdBriefingSeat;
 
-// A line of the credits: its entry in the table of sources or CREDITS_SPACE, the column of its window, how many tiles the credits go down
-// after it, and whether it ends at the middle of the screen
+// A line of the credits: its entry in the table of sources or CREDITS_SPACE, the column of its window, how many tiles
+// the credits go down after it, and whether it ends at the middle of the screen
 typedef struct {
     u8 line;
     u8 x;
@@ -347,8 +347,7 @@ static void PkwdBriefingText_CreateBriefingWindows(PkwdBriefingText *text, HeapI
 static void PkwdBriefingText_FreeBriefingWindows(PkwdBriefingText *text);
 static void PkwdBriefingText_Print(PkwdBriefingText *text, s32 window, StrBuf *strbuf, u32 rightAligned);
 static StrBuf *PkwdBriefingText_GetCredit(PkwdBriefingText *text, u32 line);
-static void PkwdBriefingText_PrintCredit(PkwdBriefingText *text, s32 window, u32 line, u32 rightAligned,
-                                         HeapID heapId);
+static void PkwdBriefingText_PrintCredit(PkwdBriefingText *text, s32 window, u32 line, u32 rightAligned, HeapID heapId);
 static void PkwdBriefingText_CreateCreditsWindows(PkwdBriefingText *text, HeapID heapId, u32 layout);
 static void PkwdBriefingText_FreeCreditsWindows(PkwdBriefingText *text);
 static void PkwdBriefingSet_Init(PkwdBriefingSet *set, HeapID heapId, s32 movie);
@@ -408,6 +407,7 @@ const GameProcFunctions PKWD_BRIEFING_CREDITS_PROC_FUNCTIONS = {
 };
 
 // The lines of the credits for each layout. The windows are 15 tiles wide
+// clang-format off
 static const PkwdBriefingCreditsLine sPkwdBriefingCreditsBoth[] = {
     { 0, 1, 0, TRUE },
     { 12, 17, 3, FALSE },
@@ -449,9 +449,12 @@ static const PkwdBriefingCreditsLine sPkwdBriefingCreditsBoth[] = {
     { CREDITS_END, 0, 0, FALSE },
 };
 
+// clang-format on
+
 // The frames of the palettes that the steps of each pattern show
 static const s16 sPkwdBriefingPatternFrames0[] = { 1, 2, 1, 0 };
 
+// clang-format off
 static const PkwdBriefingCreditsLine sPkwdBriefingCreditsRight[] = {
     { 0, 1, 2, FALSE },
     { 12, 2, 3, FALSE },
@@ -493,6 +496,9 @@ static const PkwdBriefingCreditsLine sPkwdBriefingCreditsRight[] = {
     { CREDITS_END, 0, 0, FALSE },
 };
 
+// clang-format on
+
+// clang-format off
 static const PkwdBriefingCreditsLine sPkwdBriefingCreditsLeft[] = {
     { 0, 16, 2, FALSE },
     { 12, 17, 3, FALSE },
@@ -534,18 +540,38 @@ static const PkwdBriefingCreditsLine sPkwdBriefingCreditsLeft[] = {
     { CREDITS_END, 0, 0, FALSE },
 };
 
+// clang-format on
+
 static const BGSysLCDConfig sPkwdBriefingLCDConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D };
 
 // BGs 2 and 3: the second BG of the text, and the frame around the set
-static const BGSetup sPkwdBriefingText2BGSetup = {
-    0, 0, 0x1000, 0, BGRES_256x512, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x1000), GX_BG_CHARBASE(0x18000), 0x8000,
-    GX_BG_EXTPLTT_01, 1, GX_BG_AREAOVER_XLU, 0
-};
+static const BGSetup sPkwdBriefingText2BGSetup = { 0,
+                                                   0,
+                                                   0x1000,
+                                                   0,
+                                                   BGRES_256x512,
+                                                   GX_BG_COLORMODE_16,
+                                                   GX_BG_SCRBASE(0x1000),
+                                                   GX_BG_CHARBASE(0x18000),
+                                                   0x8000,
+                                                   GX_BG_EXTPLTT_01,
+                                                   1,
+                                                   GX_BG_AREAOVER_XLU,
+                                                   0 };
 
-static const BGSetup sPkwdBriefingFrameBGSetup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x2000), GX_BG_CHARBASE(0x8000), 0x8000,
-    GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, 0
-};
+static const BGSetup sPkwdBriefingFrameBGSetup = { 0,
+                                                   0,
+                                                   0x800,
+                                                   0,
+                                                   BGRES_256x256,
+                                                   GX_BG_COLORMODE_16,
+                                                   GX_BG_SCRBASE(0x2000),
+                                                   GX_BG_CHARBASE(0x8000),
+                                                   0x8000,
+                                                   GX_BG_EXTPLTT_01,
+                                                   2,
+                                                   GX_BG_AREAOVER_XLU,
+                                                   0 };
 
 // The screen of the credits' frame for each layout
 static const u32 sPkwdBriefingCreditsScreens[CREDITS_LAYOUT_COUNT] = { 25, 26, 27 };
@@ -572,6 +598,7 @@ static const u32 sPkwdBriefingAudienceSE[][2] = {
 };
 
 // What each line of the credits reads
+// clang-format off
 static const u32 sPkwdBriefingCreditSources[] = {
     SOURCE_PLAYER_ROLE,       CREDIT_MOVIE + 1,         SOURCE_ACTOR_NAME,        CREDIT_MOVIE + 0,
     CREDIT_MOVIE + 4,         CREDIT_MOVIE + 6,         CREDIT_MOVIE + 8,         CREDIT_MOVIE + 10,
@@ -584,11 +611,22 @@ static const u32 sPkwdBriefingCreditSources[] = {
     CREDIT_MOVIE + 14,        SOURCE_STAR_NAME,         CREDIT_DIRECTOR_NAME,
 };
 
+// clang-format on
+
 // BG 5, the seats
-static const BGSetup sPkwdBriefingSeatsBGSetup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x4000), 0x4000,
-    GX_BG_EXTPLTT_01, 1, GX_BG_AREAOVER_XLU, 0
-};
+static const BGSetup sPkwdBriefingSeatsBGSetup = { 0,
+                                                   0,
+                                                   0x800,
+                                                   0,
+                                                   BGRES_256x256,
+                                                   GX_BG_COLORMODE_16,
+                                                   GX_BG_SCRBASE(0x0000),
+                                                   GX_BG_CHARBASE(0x4000),
+                                                   0x4000,
+                                                   GX_BG_EXTPLTT_01,
+                                                   1,
+                                                   GX_BG_AREAOVER_XLU,
+                                                   0 };
 
 // What every member of the audience starts from
 static const ClActorSetup sPkwdBriefingAudienceSetup = { 0, 0, AUDIENCE_SIT, 2, 0 };
@@ -747,35 +785,93 @@ static const G3DSceneAnimationSetup sPkwdBriefingSet26Anims[] = { { 1, 0 } };
 static const G3DSceneAnimationSetup sPkwdBriefingSet27Anims[] = { { 1, 0 } };
 static const G3DSceneAnimationSetup sPkwdBriefingSet28Anims[] = { { 1, 0 } };
 
-static const G3DSceneActorSetup sPkwdBriefingSet00Actor = { 0, 0, 0, 0, sPkwdBriefingSet00Anims, NELEMS(sPkwdBriefingSet00Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet01Actor = { 0, 0, 0, 0, sPkwdBriefingSet01Anims, NELEMS(sPkwdBriefingSet01Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet02Actor = { 0, 0, 0, 0, sPkwdBriefingSet02Anims, NELEMS(sPkwdBriefingSet02Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet03Actor = { 0, 0, 0, 0, sPkwdBriefingSet03Anims, NELEMS(sPkwdBriefingSet03Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet04Actor = { 0, 0, 0, 0, sPkwdBriefingSet04Anims, NELEMS(sPkwdBriefingSet04Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet05Actor = { 0, 0, 0, 0, sPkwdBriefingSet05Anims, NELEMS(sPkwdBriefingSet05Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet06Actor = { 0, 0, 0, 0, sPkwdBriefingSet06Anims, NELEMS(sPkwdBriefingSet06Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet07Actor = { 0, 0, 0, 0, sPkwdBriefingSet07Anims, NELEMS(sPkwdBriefingSet07Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet08Actor = { 0, 0, 0, 0, sPkwdBriefingSet08Anims, NELEMS(sPkwdBriefingSet08Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet09Actor = { 0, 0, 0, 0, sPkwdBriefingSet09Anims, NELEMS(sPkwdBriefingSet09Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet10Actor = { 0, 0, 0, 0, sPkwdBriefingSet10Anims, NELEMS(sPkwdBriefingSet10Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet11Actor = { 0, 0, 0, 0, sPkwdBriefingSet11Anims, NELEMS(sPkwdBriefingSet11Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet12Actor = { 0, 0, 0, 0, sPkwdBriefingSet12Anims, NELEMS(sPkwdBriefingSet12Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet13Actor = { 0, 0, 0, 0, sPkwdBriefingSet13Anims, NELEMS(sPkwdBriefingSet13Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet14Actor = { 0, 0, 0, 0, sPkwdBriefingSet14Anims, NELEMS(sPkwdBriefingSet14Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet15Actor = { 0, 0, 0, 0, sPkwdBriefingSet15Anims, NELEMS(sPkwdBriefingSet15Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet16Actor = { 0, 0, 0, 0, sPkwdBriefingSet16Anims, NELEMS(sPkwdBriefingSet16Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet17Actor = { 0, 0, 0, 0, sPkwdBriefingSet17Anims, NELEMS(sPkwdBriefingSet17Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet18Actor = { 0, 0, 0, 0, sPkwdBriefingSet18Anims, NELEMS(sPkwdBriefingSet18Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet19Actor = { 0, 0, 0, 0, sPkwdBriefingSet19Anims, NELEMS(sPkwdBriefingSet19Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet20Actor = { 0, 0, 0, 0, sPkwdBriefingSet20Anims, NELEMS(sPkwdBriefingSet20Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet21Actor = { 0, 0, 0, 0, sPkwdBriefingSet21Anims, NELEMS(sPkwdBriefingSet21Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet22Actor = { 0, 0, 0, 0, sPkwdBriefingSet22Anims, NELEMS(sPkwdBriefingSet22Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet23Actor = { 0, 0, 0, 0, sPkwdBriefingSet23Anims, NELEMS(sPkwdBriefingSet23Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet24Actor = { 0, 0, 0, 0, sPkwdBriefingSet24Anims, NELEMS(sPkwdBriefingSet24Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet25Actor = { 0, 0, 0, 0, sPkwdBriefingSet25Anims, NELEMS(sPkwdBriefingSet25Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet26Actor = { 0, 0, 0, 0, sPkwdBriefingSet26Anims, NELEMS(sPkwdBriefingSet26Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet27Actor = { 0, 0, 0, 0, sPkwdBriefingSet27Anims, NELEMS(sPkwdBriefingSet27Anims) };
-static const G3DSceneActorSetup sPkwdBriefingSet28Actor = { 0, 0, 0, 0, sPkwdBriefingSet28Anims, NELEMS(sPkwdBriefingSet28Anims) };
+static const G3DSceneActorSetup sPkwdBriefingSet00Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet00Anims, NELEMS(sPkwdBriefingSet00Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet01Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet01Anims, NELEMS(sPkwdBriefingSet01Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet02Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet02Anims, NELEMS(sPkwdBriefingSet02Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet03Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet03Anims, NELEMS(sPkwdBriefingSet03Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet04Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet04Anims, NELEMS(sPkwdBriefingSet04Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet05Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet05Anims, NELEMS(sPkwdBriefingSet05Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet06Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet06Anims, NELEMS(sPkwdBriefingSet06Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet07Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet07Anims, NELEMS(sPkwdBriefingSet07Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet08Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet08Anims, NELEMS(sPkwdBriefingSet08Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet09Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet09Anims, NELEMS(sPkwdBriefingSet09Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet10Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet10Anims, NELEMS(sPkwdBriefingSet10Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet11Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet11Anims, NELEMS(sPkwdBriefingSet11Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet12Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet12Anims, NELEMS(sPkwdBriefingSet12Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet13Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet13Anims, NELEMS(sPkwdBriefingSet13Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet14Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet14Anims, NELEMS(sPkwdBriefingSet14Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet15Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet15Anims, NELEMS(sPkwdBriefingSet15Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet16Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet16Anims, NELEMS(sPkwdBriefingSet16Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet17Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet17Anims, NELEMS(sPkwdBriefingSet17Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet18Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet18Anims, NELEMS(sPkwdBriefingSet18Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet19Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet19Anims, NELEMS(sPkwdBriefingSet19Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet20Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet20Anims, NELEMS(sPkwdBriefingSet20Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet21Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet21Anims, NELEMS(sPkwdBriefingSet21Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet22Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet22Anims, NELEMS(sPkwdBriefingSet22Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet23Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet23Anims, NELEMS(sPkwdBriefingSet23Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet24Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet24Anims, NELEMS(sPkwdBriefingSet24Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet25Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet25Anims, NELEMS(sPkwdBriefingSet25Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet26Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet26Anims, NELEMS(sPkwdBriefingSet26Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet27Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet27Anims, NELEMS(sPkwdBriefingSet27Anims)
+};
+static const G3DSceneActorSetup sPkwdBriefingSet28Actor = {
+    0, 0, 0, 0, sPkwdBriefingSet28Anims, NELEMS(sPkwdBriefingSet28Anims)
+};
 
 // The set of each movie
 static const G3DSceneSetup sPkwdBriefingScenes[MOVIE_COUNT] = {
@@ -823,10 +919,19 @@ static const G3DSceneSetup sPkwdBriefingScenes[MOVIE_COUNT] = {
 };
 
 // BG 6, the info window
-static const BGSetup sPkwdBriefingInfoBGSetup = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x1000), GX_BG_CHARBASE(0x4000), 0x4000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, 0
-};
+static const BGSetup sPkwdBriefingInfoBGSetup = { 0,
+                                                  0,
+                                                  0x800,
+                                                  0,
+                                                  BGRES_256x256,
+                                                  GX_BG_COLORMODE_16,
+                                                  GX_BG_SCRBASE(0x1000),
+                                                  GX_BG_CHARBASE(0x4000),
+                                                  0x4000,
+                                                  GX_BG_EXTPLTT_01,
+                                                  0,
+                                                  GX_BG_AREAOVER_XLU,
+                                                  0 };
 
 static const SRTMatrix sPkwdBriefingSetMatrix = {
     { 0, 0, 0 },
@@ -851,6 +956,7 @@ static const VecFx32 sPkwdBriefingCameraPos = { 0x6b33, 0x6b33, 0xc4cd };
 
 static const VecFx32 sPkwdBriefingCameraUp = { 0, FX32_ONE, 0 };
 
+// clang-format off
 static const PkwdBriefingSeat sPkwdBriefingSeats[SEAT_COUNT] = {
     { 32, 104, 3 },
     { 80, 104, 3 },
@@ -876,6 +982,8 @@ static const PkwdBriefingSeat sPkwdBriefingSeats[SEAT_COUNT] = {
     { 248, 200, 0 },
 };
 
+// clang-format on
+
 static const s16 *sPkwdBriefingPatternFrames[AUDIENCE_PATTERN_COUNT] = {
     sPkwdBriefingPatternFrames0,
     sPkwdBriefingPatternFrames1,
@@ -883,10 +991,19 @@ static const s16 *sPkwdBriefingPatternFrames[AUDIENCE_PATTERN_COUNT] = {
 };
 
 // BG 1, the text
-static const BGSetup sPkwdBriefingTextBGSetup = {
-    0, 0, 0x1000, 0, BGRES_256x512, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x10000), 0x8000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, 0
-};
+static const BGSetup sPkwdBriefingTextBGSetup = { 0,
+                                                  0,
+                                                  0x1000,
+                                                  0,
+                                                  BGRES_256x512,
+                                                  GX_BG_COLORMODE_16,
+                                                  GX_BG_SCRBASE(0x0000),
+                                                  GX_BG_CHARBASE(0x10000),
+                                                  0x8000,
+                                                  GX_BG_EXTPLTT_01,
+                                                  0,
+                                                  GX_BG_AREAOVER_XLU,
+                                                  0 };
 
 static BOOL PkwdBriefing_Init(GameProc *proc, u32 *state, void *param, void *work) {
     PkwdBriefingParam *briefingParam = param;
@@ -1293,8 +1410,8 @@ static StrBuf *PkwdBriefing_CreatePlayerName(PkwdBriefingParam *param, HeapID he
     if (param->movie < MOVIE_NO_PLAYER) {
         name = copyTrainerNameToNewStrbuf(param->playerInfo->name, heapId);
     } else {
-        MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PASS_POWER_STARTMENU,
-                                              HEAPID_TAIL(heapId));
+        MsgData *msgData =
+            GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PASS_POWER_STARTMENU, HEAPID_TAIL(heapId));
         StrBuf *compressed;
 
         name = GFL_StrBufCreate(16, heapId);
@@ -1331,8 +1448,8 @@ static void PkwdBriefing_LoadCredits(PkwdBriefingParam *param, PkwdBriefingText 
     text->credits[CREDIT_PLAYER_ROLE] = GFL_MsgDataLoadStrbufNew(text->msgData, movie * 15 + Bank0313_Text_Kid + sex);
     text->credits[CREDIT_PLAYER_NAME] = PkwdBriefing_CreatePlayerName(param, heapId);
 
-    msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PASS_POWER_STARTMENU,
-                                 HEAPID_TAIL(heapId));
+    msgData =
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_PASS_POWER_STARTMENU, HEAPID_TAIL(heapId));
     actorName2 = 0;
     if (sex == 0) {
         actorName = EventPassPowerStartmenu_Text_BrycenMan;
@@ -1534,14 +1651,14 @@ static void PkwdBriefingText_FreeCreditsWindows(PkwdBriefingText *text) {
 static void PkwdBriefingSet_Init(PkwdBriefingSet *set, HeapID heapId, s32 movie) {
     s32 first;
 
-    set->manager = GFL_G3DMgrCreate(sPkwdBriefingScenes[movie].resourceCount, sPkwdBriefingScenes[movie].actorCount,
-                                    heapId);
+    set->manager =
+        GFL_G3DMgrCreate(sPkwdBriefingScenes[movie].resourceCount, sPkwdBriefingScenes[movie].actorCount, heapId);
     set->scene = GFL_G3DMgrNewScene(set->manager, &sPkwdBriefingScenes[movie]);
     first = GFL_G3DMgrGetSceneFirstActorIdx(set->manager, set->scene);
     GFL_G3DActorBindAnm(GFL_G3DMgrGetActor(set->manager, first), 0);
-    set->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, 0x399, 0xf97, 0x159a, 0, FX32_ONE, 512 * FX32_ONE, 0,
-                                      &sPkwdBriefingCameraPos, &sPkwdBriefingCameraUp, &sPkwdBriefingCameraTarget,
-                                      heapId);
+    set->camera =
+        GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, 0x399, 0xf97, 0x159a, 0, FX32_ONE, 512 * FX32_ONE, 0,
+                            &sPkwdBriefingCameraPos, &sPkwdBriefingCameraUp, &sPkwdBriefingCameraTarget, heapId);
     set->curve = GFL_G3DCurveLoadFileAll(heapId, ARCID_PKWD_COUNT, FILE_CAMERA);
     set->light = GFL_G3DLightCreate(&sPkwdBriefingLightList, heapId);
     GFL_G3DLightFlush(set->light);
@@ -1706,8 +1823,8 @@ static void PkwdBriefingText_PrintLine(PkwdBriefingText *text, s32 line, u32 sex
     GFL_StrBufFree(strbuf);
     height = text->lineHeights[line];
     GFL_BitmapFill(BmpWin_GetBitmap(text->windows[0]), 0xee);
-    PrintWindow_Print(&text->printWindows[0], text->printQueue, 0, (128 - height * 16) / 2, text->lines[0],
-                      text->font, PRINT_COLOR(1, 2, 14));
+    PrintWindow_Print(&text->printWindows[0], text->printQueue, 0, (128 - height * 16) / 2, text->lines[0], text->font,
+                      PRINT_COLOR(1, 2, 14));
 }
 
 static void PkwdBriefingText_CountLines(PkwdBriefingText *text, u32 sex) {
@@ -1926,7 +2043,8 @@ static void PkwdBriefingAudience_UpdatePalettes(PkwdBriefingAudience *audience) 
             audience->frame = 0;
             audience->repeat--;
             if (audience->repeat <= 0) {
-                PkwdBriefingAudience_SetPattern(audience, PkwdBriefingAudience_PickPattern(audience, audience->pattern));
+                PkwdBriefingAudience_SetPattern(audience,
+                                                PkwdBriefingAudience_PickPattern(audience, audience->pattern));
                 audience->repeat =
                     PkwdBriefingAudience_Random(audience, sPkwdBriefingPatterns[audience->pattern].repeatMax) + 1;
             }

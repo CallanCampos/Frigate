@@ -23,6 +23,7 @@ static const G3DSceneAnimationSetup sAnimations05[] = { { 5, 0 }, { 6, 0 } };
 static const G3DSceneAnimationSetup sAnimations0B[] = { { 11, 0 }, { 12, 0 } };
 static const G3DSceneAnimationSetup sAnimations0E[] = { { 14, 0 }, { 15, 0 } };
 
+// clang-format off
 static const G3DSceneActorSetup sActors[6] = {
     { 0, 0, 0, 0, sAnimations01, NELEMS(sAnimations01) },
     { 2, 0, 2, 0, sAnimations03, NELEMS(sAnimations03) },
@@ -32,6 +33,9 @@ static const G3DSceneActorSetup sActors[6] = {
     { 13, 0, 13, 0, sAnimations0E, NELEMS(sAnimations0E) },
 };
 
+// clang-format on
+
+// clang-format off
 static const G3DSceneResourceSetup sResources[] = {
     { 0x9b, 0, 0 },  { 0x9b, 10, 0 }, { 0x9b, 2, 0 },  { 0x9b, 13, 0 },
     { 0x9b, 4, 0 },  { 0x9b, 19, 0 }, { 0x9b, 15, 0 }, { 0x9b, 5, 0 },
@@ -39,9 +43,12 @@ static const G3DSceneResourceSetup sResources[] = {
     { 0x9b, 17, 0 }, { 0x9b, 7, 0 },  { 0x9b, 22, 0 }, { 0x9b, 18, 0 },
 };
 
+// clang-format on
+
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
 // Where each actor is
+// clang-format off
 static const VecFx32 sActorPositions[6] = {
     { FX32_CONST(512), 0, FX32_CONST(672) },
     { FX32_CONST(512), 0, FX32_CONST(672) },
@@ -50,6 +57,8 @@ static const VecFx32 sActorPositions[6] = {
     { FX32_CONST(448), 0, FX32_CONST(704) },
     { FX32_CONST(544), 0, FX32_CONST(624) },
 };
+
+// clang-format on
 
 void func_ov105_021eec80(Field *field) {
     u16 heapId;

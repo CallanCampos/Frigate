@@ -13,6 +13,7 @@ typedef struct {
     BOOL received;
     // Where reading and writing continue
     s16 startPos;
+    // volatile: the original reloads it at each use; the receive path advances it while the main loop reads the buffer
     volatile s16 endPos;
 } NetRingBuff;
 

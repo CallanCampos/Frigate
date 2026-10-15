@@ -35,7 +35,6 @@ struct BagScriptResult {
     u16 *item;
 };
 
-
 BOOL s014A_FieldOpen(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -171,8 +170,8 @@ BOOL s0150_CallMailbox(VM *vm, FieldScriptEnv *env) {
     work->resource = mailbox;
     work->data = ScriptReadVar(vm, env);
     ScriptWork_CallEvent(scriptWork, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_MAILBOX,
-                                                                               &MAILBOX_PROC_FUNCTIONS, mailbox,
-                                                                               func_ov012_0215767c, work));
+                                                                                 &MAILBOX_PROC_FUNCTIONS, mailbox,
+                                                                                 func_ov012_0215767c, work));
     return TRUE;
 }
 
@@ -230,8 +229,9 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     work = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ScriptProcCallbackWork), FALSE, "scrcmd_proc.c", 411);
     work->resource = data;
     work->data = result;
-    ScriptWork_CallEvent(scriptWork, EventFieldSubprocessTransition_CreateWithCallback(gsys, field, OVERLAY_MOVE_REMINDER, &WazaOshieProcFunctions, data,
-                                                   func_ov012_02157728, work));
+    ScriptWork_CallEvent(
+        scriptWork, EventFieldSubprocessTransition_CreateWithCallback(
+                        gsys, field, OVERLAY_MOVE_REMINDER, &WazaOshieProcFunctions, data, func_ov012_02157728, work));
     return TRUE;
 }
 
@@ -302,13 +302,15 @@ BOOL s0151_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
         award = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanAwardParam), TRUE, "scrcmd_proc.c", 546);
         award->gameData = gameData;
         award->unk04 = value;
-        CreateScrCmdOverlayProcess(vm, env, OVERLAY_CHIHOU_ZUKAN_AWARD, &CHIHOU_ZUKAN_AWARD_PROC_FUNCTIONS, award, NULL, NULL);
+        CreateScrCmdOverlayProcess(vm, env, OVERLAY_CHIHOU_ZUKAN_AWARD, &CHIHOU_ZUKAN_AWARD_PROC_FUNCTIONS, award, NULL,
+                                   NULL);
         break;
     case 1:
         award = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanAwardParam), TRUE, "scrcmd_proc.c", 554);
         award->gameData = gameData;
         award->unk04 = value;
-        CreateScrCmdOverlayProcess(vm, env, OVERLAY_ZENKOKU_ZUKAN_AWARD, &ZENKOKU_ZUKAN_AWARD_PROC_FUNCTIONS, award, NULL, NULL);
+        CreateScrCmdOverlayProcess(vm, env, OVERLAY_ZENKOKU_ZUKAN_AWARD, &ZENKOKU_ZUKAN_AWARD_PROC_FUNCTIONS, award,
+                                   NULL, NULL);
         break;
     case 2:
         subwayMap = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(SubwayMapParam), TRUE, "scrcmd_proc.c", 563);

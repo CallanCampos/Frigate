@@ -1,6 +1,6 @@
 #include "types.h"
-#include "save/records.h"
 #include "gfl/std.h"
+#include "save/records.h"
 
 // The counters of the records the game keeps (the ROM has no string for the file, so the name is a guess). Their
 // maximums are 0, or one of the values of nines, as the byte of the record in sRecordMaxKind says.
@@ -9,15 +9,12 @@ static const struct {
     u16 destination;
     u16 source;
 } sRecordMoves[] = {
-    {26, 27},
-    {81, 82},
-    {83, 84},
-    {85, 86},
-    {87, 88},
+    { 26, 27 }, { 81, 82 }, { 83, 84 }, { 85, 86 }, { 87, 88 },
 };
 
-static const u32 nines[] = {999999999, 999999, 65535, 9999, 999, 6};
+static const u32 nines[] = { 999999999, 999999, 65535, 9999, 999, 6 };
 
+// clang-format off
 static u8 sRecordMaxKind[] = {
     0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
     0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -26,6 +23,8 @@ static u8 sRecordMaxKind[] = {
     3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     2, 2, 2, 2, 2, 2, 2, 0,
 };
+
+// clang-format on
 
 void EncryptRecordStorage(GameRecords *records, u32 id) {
     if (id != 0) {

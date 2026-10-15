@@ -6,8 +6,8 @@
 
 #include "types.h"
 #include "field/encounter_effect.h"
-#include "system/game_event.h"
 #include "struct_decls.h"
+#include "system/game_event.h"
 
 // The grid's work from 0x300c on. It runs 0x114 bytes past the end of the grid that overlay 150 allocates, over its
 // update function and mode if the wave got long enough, and over whatever follows it on the heap

@@ -7,8 +7,8 @@
 #include "field/mailtool.h"
 #include "field/mailview.h"
 #include "gfl/bg_sys.h"
-#include "gfl/bmpwin.h"
 #include "gfl/bmp.h"
+#include "gfl/bmpwin.h"
 #include "gfl/clact.h"
 #include "gfl/graphics.h"
 #include "gfl/gx_layers.h"
@@ -117,11 +117,14 @@ static const GameProcFunctions sMailSysPMSInputProc = {
 };
 
 // The VRAM banks of the screen, which mailview.c sets
+// clang-format off
 const BGSysVRAMConfig MailSys_VRAMConfig = {
     GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,  GX_VRAM_SUB_BGEXTPLTT_NONE,
     GX_VRAM_OBJ_64_E,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,  GX_VRAM_SUB_OBJEXTPLTT_NONE,
     GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_32K, GX_OBJVRAMMODE_CHAR_1D_32K,
 };
+
+// clang-format on
 
 static const MailSysPhaseFunc sMailSysPhaseFuncs[] = {
     MailSys_PhaseView,
@@ -138,11 +141,14 @@ static const u8 sMailSysPresetSentences[MAIL_DESIGN_COUNT][MAIL_WORD_COUNT] = {
 };
 
 // The three sentences, the word, and the two buttons, the cancel one last
+// clang-format off
 static const TouchRect sMailSysTouchRects[] = {
     { 0x18, 0x38, 0x18, 0xe8 }, { 0x40, 0x60, 0x18, 0xe8 }, { 0x68, 0x88, 0x18, 0xe8 },
     { 0x98, 0xa8, 0x40, 0x98 }, { 0xa8, 0xc0, 0xa8, 0xf8 }, { 0x90, 0xa8, 0xa8, 0xf8 },
     { TOUCH_RECT_END, 0, 0, 0 },
 };
+
+// clang-format on
 
 BOOL MailSys_ProcInit(GameProc *proc, u32 *state, void *param, void *unused) {
     MailParam *mailParam = param;
@@ -627,8 +633,8 @@ static void MailSys_ShowMessage(MailSysWork *work, u32 messageId) {
     BmpWin_DrawFrame(work->windows[6], WINFRAME_TRANSFER_NONE, 0xd, 4);
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[6]), 0xff);
     GFL_MsgDataLoadStrbuf(work->msgData, messageId, work->msgBuf);
-    work->printStream = func_02022268(work->windows[6], 0, 0, work->msgBuf, work->font, work->textSpeed,
-                                      work->tcbEx, 4, work->heapId, 15);
+    work->printStream = func_02022268(work->windows[6], 0, 0, work->msgBuf, work->font, work->textSpeed, work->tcbEx, 4,
+                                      work->heapId, 15);
     BmpWin_TransferNow(work->windows[6]);
 }
 

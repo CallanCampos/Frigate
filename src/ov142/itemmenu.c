@@ -1,9 +1,9 @@
 #include "types.h"
-#include "constants/arc.h"
-#include "app/itemmenu.h"
 #include "app/bag.h"
 #include "app/bag_item.h"
+#include "app/itemmenu.h"
 #include "app/itemmenu_disp.h"
+#include "constants/arc.h"
 #include "constants/items.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -32,16 +32,16 @@
 #include "save/encounter.h"
 #include "save/save_control.h"
 #include "system/app_keycursor.h"
-#include "system/blink_palanm.h"
-#include "system/scroll_bar.h"
-#include "system/shortcut_util.h"
 #include "system/app_taskmenu.h"
+#include "system/blink_palanm.h"
 #include "system/bmp_winframe.h"
 #include "system/game_beacon.h"
 #include "system/game_data.h"
 #include "system/gf_font.h"
 #include "system/palanm.h"
 #include "system/printsys.h"
+#include "system/scroll_bar.h"
+#include "system/shortcut_util.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
 #include "text/system/btl_main.h"
@@ -629,7 +629,8 @@ static void ItemMenu_StateUseRepel(ItemMenuWork *work) {
 
 // Waits for a message to be read
 static void ItemMenu_StateWaitMessage(ItemMenuWork *work) {
-    if (ItemMenuDisp_IsMessageDone(work) && ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+    if (ItemMenuDisp_IsMessageDone(work) &&
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
         GFL_BGSysClearScr(3);
         work->drawnScroll = 0xffff;
         ItemMenu_UpdateList(work);
@@ -893,8 +894,8 @@ static void ItemMenu_StateSelectItem(ItemMenuWork *work) {
         work->item = slot->item;
     }
     if (work->mode == 2) {
-        if (GetItemParam(work->item, ITEM_PARAM_IMPORTANT, work->heapId) == 0
-            && PML_ItemIsNotSpecialMonsball(work->item) == TRUE) {
+        if (GetItemParam(work->item, ITEM_PARAM_IMPORTANT, work->heapId) == 0 &&
+            PML_ItemIsNotSpecialMonsball(work->item) == TRUE) {
             if (PML_ItemIsMail(work->item)) {
                 work->result = 18;
             } else {
@@ -1094,8 +1095,8 @@ static void ItemMenu_StateTMAskBootUp(ItemMenuWork *work) {
 
 // Asks whether to teach the TM's move
 static void ItemMenu_StateTMShowMove(ItemMenuWork *work) {
-    if (GFL_SndPlayerIsActiveAny() != TRUE
-        && ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+    if (GFL_SndPlayerIsActiveAny() != TRUE &&
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
         GFL_MsgDataLoadStrbuf(work->msgData, BtlMain_Text_ContainedTeachPokemon, work->strbuf);
         loadMoveNameToStrbuf(work->wordSet, 0, PML_ItemGetTMWazaID(work->item));
         GFL_WordSetFormatStrbuf(work->wordSet, work->expandBuf, work->strbuf);
@@ -1568,8 +1569,8 @@ static void ItemMenu_SortByType(ItemMenuWork *work) {
     for (; i < count; i++) {
         item = &items[i];
         data = PML_ItemArcHandleReadFile(arc, item->item, work->heapId);
-        sort[i].key = (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28) + (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16)
-            + item->item;
+        sort[i].key = (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28) +
+                      (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16) + item->item;
         sort[i].item.item = item->item;
         sort[i].item.count = item->count;
         GFL_HeapFree(data);
@@ -1585,6 +1586,7 @@ static void ItemMenu_SortByType(ItemMenuWork *work) {
 }
 
 // Each item's place in alphabetical order
+// clang-format off
 static const u16 sItemNameOrder[ITEM_LAST + 1] = {
     0, 263, 466, 184, 329, 400, 288, 117, 287, 381, 460, 255, 344, 134, 198, 353,
     55, 334, 7, 46, 211, 12, 308, 171, 266, 208, 449, 169, 388, 268, 167, 426,
@@ -1628,6 +1630,8 @@ static const u16 sItemNameOrder[ITEM_LAST + 1] = {
     181, 182, 509, 270, 118, 119, 316, 302, 411, 322, 194, 70, 130, 131, 386,
 };
 
+// clang-format on
+
 // Sorts the pocket by the items' names
 static void ItemMenu_SortByName(ItemMenuWork *work) {
     ItemMenuSortEntry *sort;
@@ -1664,7 +1668,8 @@ static void ItemMenu_SortByNumber(ItemMenuWork *work) {
         s32 i = 0;
         BagItem *items;
 
-        sort = GFL_HeapAllocate(work->heapId, sizeof(ItemMenuSortEntry) * NELEMS(work->items), FALSE, "itemmenu.c", 3194);
+        sort =
+            GFL_HeapAllocate(work->heapId, sizeof(ItemMenuSortEntry) * NELEMS(work->items), FALSE, "itemmenu.c", 3194);
         items = GFL_HeapAllocate(work->heapId, sizeof(BagItem) * NELEMS(work->items), FALSE, "itemmenu.c", 3195);
         BagSave_CopyPocketRaw(work->bag, items, work->pocket, TRUE);
         count = BagSave_GetPocketItemCountCore(work->bag, work->pocket, TRUE);
@@ -1705,11 +1710,11 @@ static void ItemMenu_SortByUses(ItemMenuWork *work, BOOL mostUsedFirst) {
         data = PML_ItemArcHandleReadFile(arc, item->item, work->heapId);
         uses = BagSave_GetExistingItemCount(work->bag, item->item);
         if (mostUsedFirst == TRUE) {
-            sort[i].key = ((u64)(999 - uses) << 40) + (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28)
-                + (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16) + item->item;
+            sort[i].key = ((u64)(999 - uses) << 40) + (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28) +
+                          (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16) + item->item;
         } else {
-            sort[i].key = ((u64)uses << 40) + (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28)
-                + (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16) + item->item;
+            sort[i].key = ((u64)uses << 40) + (PML_ItemGetParam(data, ITEM_PARAM_KIND) << 28) +
+                          (PML_ItemGetParam(data, ITEM_PARAM_SORT_INDEX) << 16) + item->item;
         }
         sort[i].item = *item;
         GFL_HeapFree(data);
@@ -1842,7 +1847,8 @@ static u32 ItemMenu_GetPocketShortcut(s32 pocket) {
 static void ItemMenu_TogglePocketRegistration(ItemMenuWork *work) {
     u32 shortcut = ItemMenu_GetPocketShortcut(work->pocket);
 
-    GameData_SetKeyItemRegistration(work->gameData, shortcut, GameData_IsShortcutRegistered(work->gameData, shortcut) ^ TRUE);
+    GameData_SetKeyItemRegistration(work->gameData, shortcut,
+                                    GameData_IsShortcutRegistered(work->gameData, shortcut) ^ TRUE);
     GFL_SndSEPlay(SEQ_SE_SYS_07);
     ItemMenu_UpdatePocketRegistration(work);
 }
@@ -1850,7 +1856,8 @@ static void ItemMenu_TogglePocketRegistration(ItemMenuWork *work) {
 // Shows whether the pocket is registered
 static void ItemMenu_UpdatePocketRegistration(ItemMenuWork *work) {
     if (work->movingItem != TRUE) {
-        func_0204c488(work->buttons[2], GameData_IsShortcutRegistered(work->gameData, ItemMenu_GetPocketShortcut(work->pocket)) + 6);
+        func_0204c488(work->buttons[2],
+                      GameData_IsShortcutRegistered(work->gameData, ItemMenu_GetPocketShortcut(work->pocket)) + 6);
     }
 }
 
@@ -1969,8 +1976,8 @@ static void ItemMenu_ButtonCallback(u32 button, u32 event, void *data) {
     }
     if (button < 6) {
         s32 pockets[] = {
-            BAG_POCKET_MEDICINE, BAG_POCKET_TMS_HMS, BAG_POCKET_BERRIES, BAG_POCKET_KEY_ITEMS, BAG_POCKET_FREE_SPACE,
-            BAG_POCKET_ITEMS,
+            BAG_POCKET_MEDICINE,  BAG_POCKET_TMS_HMS,    BAG_POCKET_BERRIES,
+            BAG_POCKET_KEY_ITEMS, BAG_POCKET_FREE_SPACE, BAG_POCKET_ITEMS,
         };
 
         if (work->pocket != pockets[button]) {
@@ -2108,6 +2115,7 @@ static void ItemMenu_StateWaitFadeIn(ItemMenuWork *work) {
 
 // The buttons of the touch screen: the pockets, the arrows, sorting, registering, the exits, then the list's rows and
 // their registration marks
+// clang-format off
 static const TouchRect sButtonRects[] = {
     { 102, 143, 0, 39 },
     { 112, 155, 36, 71 },
@@ -2135,6 +2143,8 @@ static const TouchRect sButtonRects[] = {
     { 132, 155, 120, 143 },
     { TOUCH_RECT_END, 0, 0, 0 },
 };
+
+// clang-format on
 
 static BOOL ItemMenuProc_Init(GameProc *proc, u32 *state, void *param, void *data) {
     BagProcessData *bag = param;
@@ -2488,8 +2498,8 @@ static void ItemMenu_OpenSortMenu(ItemMenuWork *work) {
 
 // The sorts a pocket offers
 static void ItemMenu_GetSortActions(ItemMenuWork *work, u8 *actions) {
-    if (work->pocket == BAG_POCKET_ITEMS || work->pocket == BAG_POCKET_MEDICINE || work->pocket == BAG_POCKET_BERRIES
-        || work->pocket == BAG_POCKET_KEY_ITEMS) {
+    if (work->pocket == BAG_POCKET_ITEMS || work->pocket == BAG_POCKET_MEDICINE || work->pocket == BAG_POCKET_BERRIES ||
+        work->pocket == BAG_POCKET_KEY_ITEMS) {
         actions[0] = 0;
     } else {
         actions[0] = 1;
@@ -2671,23 +2681,24 @@ static void ItemMenu_GetFilterActions(ItemMenuWork *work, u8 *actions) {
     if (work->freeSpaceFilter != BAG_ITEM_FILTER_ALL) {
         actions[0] = 5;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_ITEMS && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_ITEMS) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_ITEMS &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_ITEMS) > 0) {
         actions[1] = 0;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_MEDICINE
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_MEDICINE) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_MEDICINE &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_MEDICINE) > 0) {
         actions[2] = 1;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_TMS_HMS
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_TMS_HMS) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_TMS_HMS &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_TMS_HMS) > 0) {
         actions[3] = 2;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_BERRIES
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_BERRIES) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_BERRIES &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_BERRIES) > 0) {
         actions[4] = 3;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_KEY_ITEMS
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_KEY_ITEMS) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_KEY_ITEMS &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_KEY_ITEMS) > 0) {
         actions[5] = 4;
     }
     actions[6] = 6;
@@ -2700,23 +2711,24 @@ s32 ItemMenu_CountFilterActions(ItemMenuWork *work) {
     if (work->freeSpaceFilter != BAG_ITEM_FILTER_ALL) {
         count++;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_ITEMS && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_ITEMS) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_ITEMS &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_ITEMS) > 0) {
         count++;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_MEDICINE
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_MEDICINE) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_MEDICINE &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_MEDICINE) > 0) {
         count++;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_TMS_HMS
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_TMS_HMS) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_TMS_HMS &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_TMS_HMS) > 0) {
         count++;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_BERRIES
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_BERRIES) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_BERRIES &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_BERRIES) > 0) {
         count++;
     }
-    if (work->freeSpaceFilter != BAG_ITEM_FILTER_KEY_ITEMS
-        && BagItemList_CountInPocket(&work->itemList, BAG_POCKET_KEY_ITEMS) > 0) {
+    if (work->freeSpaceFilter != BAG_ITEM_FILTER_KEY_ITEMS &&
+        BagItemList_CountInPocket(&work->itemList, BAG_POCKET_KEY_ITEMS) > 0) {
         count++;
     }
     return count;

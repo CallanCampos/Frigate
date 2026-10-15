@@ -10,6 +10,7 @@ static BOOL MapTile_IsTallGrassSingleBtl(u32 tileClass);
 static BOOL func_ov036_021a2c70(u32 tileClass);
 
 // The battle terrain of each tile class
+// clang-format off
 static const u8 data_ov036_021d0324[40][2] = {
     {0x00, 4},  {0x02, 2},  {0x03, 1}, {0x04, 5},  {0x05, 5},  {0x06, 5},  {0x07, 5}, {0x08, 5},
     {0x09, 5},  {0x0a, 10}, {0x0b, 8}, {0x0c, 8},  {0x0e, 7},  {0x0f, 7},  {0x10, 13}, {0x11, 4},
@@ -17,6 +18,8 @@ static const u8 data_ov036_021d0324[40][2] = {
     {0x1c, 9},  {0x1e, 3},  {0x1f, 0}, {0x20, 4},  {0x21, 5},  {0x22, 5},  {0x23, 8}, {0x25, 17},
     {0x26, 4},  {0x30, 10}, {0x3d, 6}, {0x3f, 6},  {0x43, 6},  {0x7c, 8},  {0xa1, 1}, {0xbe, 1},
 };
+
+// clang-format on
 
 u32 GetTileTypeAtPos(FieldG3DMapper *mapper, const VecFx32 *position) {
     MapTerrainBuf terrain;
@@ -222,14 +225,16 @@ BOOL MapTile_IsReallyTallGrassDoubleBtl(u32 tileClass) {
 }
 
 static BOOL MapTile_IsTallGrassSingleBtl(u32 tileClass) {
-    if (MapTile_IsNormalTallGrassSingleBtl(tileClass) == TRUE || MapTile_IsReallyTallGrassSingleBtl(tileClass) == TRUE) {
+    if (MapTile_IsNormalTallGrassSingleBtl(tileClass) == TRUE ||
+        MapTile_IsReallyTallGrassSingleBtl(tileClass) == TRUE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MapTile_IsTallGrassDoubleBtl(u32 tileClass) {
-    if (MapTile_IsNormalTallGrassDoubleBtl(tileClass) == TRUE || MapTile_IsReallyTallGrassDoubleBtl(tileClass) == TRUE) {
+    if (MapTile_IsNormalTallGrassDoubleBtl(tileClass) == TRUE ||
+        MapTile_IsReallyTallGrassDoubleBtl(tileClass) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -455,7 +460,9 @@ BOOL TileExitBlockCheck_Right(u16 tileClass) {
 }
 
 BOOL MapTile_IsBlocksCycling(u16 tileClass) {
-    if (MapTile_IsReallyTallGrass(tileClass) || MapTile_IsCatwalkBody_(tileClass) || MapTile_IsCatwalkEntryPoint(tileClass) || MapTile_IsSnowNoCycling(tileClass) || MapTile_IsHiddenGrottoEntranceGrass(tileClass)) {
+    if (MapTile_IsReallyTallGrass(tileClass) || MapTile_IsCatwalkBody_(tileClass) ||
+        MapTile_IsCatwalkEntryPoint(tileClass) || MapTile_IsSnowNoCycling(tileClass) ||
+        MapTile_IsHiddenGrottoEntranceGrass(tileClass)) {
         return TRUE;
     }
     return FALSE;

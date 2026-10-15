@@ -1,8 +1,8 @@
 #include "types.h"
-#include "system/game_event.h"
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
+#include "system/game_event.h"
 #include "system/game_system.h"
 
 // The game's events: each is a callback with a state and its own data, run once a frame by the game system until it

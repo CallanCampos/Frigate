@@ -1,7 +1,7 @@
 #include "types.h"
-#include "save/high_link.h"
 #include "field/survey.h"
 #include "gfl/std.h"
+#include "save/high_link.h"
 #include "save/playtime.h"
 #include "save/save_control.h"
 

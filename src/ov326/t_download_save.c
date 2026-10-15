@@ -58,8 +58,8 @@ static BOOL TDownloadSave_LoadSlot(TDownloadWork *wk, int slot) {
     u32 block;
     void *src;
 
-    wk->savedData[slot] = GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), T_DOWNLOAD_TOURNAMENT_SIZE, FALSE,
-                                           "t_download_save.c", 138);
+    wk->savedData[slot] =
+        GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), T_DOWNLOAD_TOURNAMENT_SIZE, FALSE, "t_download_save.c", 138);
     sys_memset32(0, wk->savedData[slot], T_DOWNLOAD_TOURNAMENT_SIZE);
     save = GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys));
     block = sTDownloadSaveBlocks[slot].block;
@@ -314,8 +314,7 @@ static inline BOOL TDownloadSave_IsCRCValid(TDownloadTournament *data) {
 }
 
 static inline BOOL TDownloadSave_IsValid(TDownloadTournament *data) {
-    if (data->id != 0 && TDownloadSave_IsKindUsable(data->kind) && data->state == 2
-        && TDownloadSave_IsCRCValid(data)) {
+    if (data->id != 0 && TDownloadSave_IsKindUsable(data->kind) && data->state == 2 && TDownloadSave_IsCRCValid(data)) {
         return TRUE;
     }
     return FALSE;
@@ -329,8 +328,8 @@ static int TDownloadSave_LoadReceived(TDownloadWork *wk) {
     for (i = 0; i < T_DOWNLOAD_RECEIVED_MAX; i++) {
         data = (TDownloadTournament *)wk->param->unk4 + i;
         if (TDownloadSave_IsValid(data) == TRUE) {
-            wk->receivedData[count] = GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), T_DOWNLOAD_TOURNAMENT_SIZE, TRUE,
-                                                       "t_download_save.c", 695);
+            wk->receivedData[count] =
+                GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), T_DOWNLOAD_TOURNAMENT_SIZE, TRUE, "t_download_save.c", 695);
             sys_memcpy32(data, wk->receivedData[count], T_DOWNLOAD_TOURNAMENT_SIZE);
             count++;
         }

@@ -191,9 +191,9 @@ static BOOL Demo3D_IsSkipRequested(Demo3DWork *work) {
     if (work->param->result != 0 || !GFL_WipeIsFinished()) {
         return FALSE;
     }
-    if (work->exp->skippable && (GCTX_HIDGetPressedKeys() &
-                                 (PAD_BUTTON_A | PAD_BUTTON_B | PAD_KEY_RIGHT | PAD_KEY_LEFT | PAD_KEY_UP |
-                                  PAD_KEY_DOWN | PAD_BUTTON_X | PAD_BUTTON_Y))) {
+    if (work->exp->skippable &&
+        (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_KEY_RIGHT | PAD_KEY_LEFT | PAD_KEY_UP |
+                                     PAD_KEY_DOWN | PAD_BUTTON_X | PAD_BUTTON_Y))) {
         return TRUE;
     }
     return FALSE;

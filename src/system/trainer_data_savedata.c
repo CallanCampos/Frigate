@@ -1,8 +1,8 @@
 #include "types.h"
-#include "save/trainer_data_savedata.h"
 #include "field/player_state.h"
-#include "save/save_control.h"
 #include "nitro/mi.h"
+#include "save/save_control.h"
+#include "save/trainer_data_savedata.h"
 
 // The save block with the options, the player's info and the play time. The ROM has no string for the file, so the
 // name is a guess. Block 0x1b.

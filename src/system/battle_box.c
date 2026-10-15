@@ -1,5 +1,4 @@
 #include "types.h"
-#include "save/box.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
@@ -7,6 +6,7 @@
 #include "gfl/msg.h"
 #include "gfl/std.h"
 #include "pml/poke_party.h"
+#include "save/box.h"
 #include "save/save_control.h"
 #include "text/system/btl_pokeparam_box_main_save_init.h"
 

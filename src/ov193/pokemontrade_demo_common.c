@@ -1,7 +1,7 @@
 #include "types.h"
+#include "app/pokemon_trade_local.h"
 #include "app/pokemontrade_demo_common.h"
 #include "app/pokemontrade_demo_up.h"
-#include "app/pokemon_trade_local.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
@@ -42,12 +42,15 @@ static void PokemonTradeDemoCommon_FollowPath0(SPLEmitter *emitter, u32 type);
 static void PokemonTradeDemoCommon_FollowPath1(SPLEmitter *emitter, u32 type);
 
 // The hops of a Pokémon's sprite, as offsets from its place: one hop of 18 frames, or two of 40
+// clang-format off
 static VecFx32 sTradeDemoCommonHopPath[18] = {
     { 0, 0, 0 },         { 0, 15901, 0 },     { 0, 30720, 0 },     { 0, 43444, 0 },     { 0, 53208, 0 },
     { 0, 59346, 0 },     { 0, 61440, 0 },     { 0, 59346, 0 },     { 0, 53208, 0 },     { 0, 43444, 0 },
     { 0, 30720, 0 },     { 0, 15901, 0 },     { 0, 0, 0 },         { 0, 0, 0 },         { 0, 0, 0 },
     { 0, 0, 0 },         { 0, 0, 0 },         { 0, 0, 0 },
 };
+
+// clang-format on
 
 static VecFx32 sTradeDemoCommonLongHopPath[40] = {
     { 0, 0, 0 },     { 0, 10601, 0 }, { 0, 20480, 0 }, { 0, 28963, 0 }, { 0, 35472, 0 }, { 0, 39564, 0 },
@@ -132,9 +135,9 @@ void PokemonTradeDemo_ShowActor(PokemonTradeWork *wk) {
         setup.sequence = 0;
         setup.priority = 0;
         setup.bgPriority = 0;
-        wk->work3D->actor = func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_DEMO],
-                                          wk->objRes[TRADE_OBJRES_PLTT_DEMO], wk->objRes[TRADE_OBJRES_CELL_DEMO],
-                                          &setup, 0, wk->heapId);
+        wk->work3D->actor =
+            func_0204c040(wk->clactUnit, wk->objRes[TRADE_OBJRES_CHAR_DEMO], wk->objRes[TRADE_OBJRES_PLTT_DEMO],
+                          wk->objRes[TRADE_OBJRES_CELL_DEMO], &setup, 0, wk->heapId);
         func_0204c520(wk->work3D->actor, TRUE);
         func_0204c124(wk->work3D->actor, TRUE);
     } else {
@@ -258,9 +261,11 @@ static void PokemonTradeDemoCommon_StateMoves(PokemonTradeWork *wk) {
             MCSS_GetPosition(wk->mcss[0], &pos);
             TradeMcssMove_Free(wk->mcssMoves[0]);
             if (wk->unk11EF != 0) {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoCommonScenePath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoCommonScenePath, wk->heapId);
             } else {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 18, &pos, sTradeDemoCommonHopPath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 18, &pos, sTradeDemoCommonHopPath, wk->heapId);
             }
             func_ov194_021c24cc(wk, 2, FALSE, PokemonTrade_GetPkm(wk, PokemonTrade_IsNegoType(wk)), TRUE);
             MCSS_PauseAnimation(wk->mcss[2]);
@@ -271,9 +276,11 @@ static void PokemonTradeDemoCommon_StateMoves(PokemonTradeWork *wk) {
             MCSS_GetPosition(wk->mcss[0], &pos);
             TradeMcssMove_Free(wk->mcssMoves[0]);
             if (wk->unk11EF != 0) {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoCommonScenePath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 20, &pos, sTradeDemoCommonScenePath, wk->heapId);
             } else {
-                wk->mcssMoves[0] = TradeMcssMove_CreateWithPath(wk->mcss[0], 40, &pos, sTradeDemoCommonLongHopPath, wk->heapId);
+                wk->mcssMoves[0] =
+                    TradeMcssMove_CreateWithPath(wk->mcss[0], 40, &pos, sTradeDemoCommonLongHopPath, wk->heapId);
             }
         }
         PokemonTrade_SetState(wk, PokemonTradeDemoCommon_StateMessage);

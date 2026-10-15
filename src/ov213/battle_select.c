@@ -136,8 +136,8 @@ static BOOL BattleSelect_Main(GameProc *proc, u32 *state, void *param, void *wor
         wk->state = 7;
         break;
     case 7:
-        if (func_02042c18(func_02040440(), 0xff, BATTLE_SELECT_NET_CMD_BASE, PokeParty_GetSaveDataSize(),
-                          select->unk1C, 0, FALSE, TRUE)) {
+        if (func_02042c18(func_02040440(), 0xff, BATTLE_SELECT_NET_CMD_BASE, PokeParty_GetSaveDataSize(), select->unk1C,
+                          0, FALSE, TRUE)) {
             func_02040624(func_02040440(), 20, 0x2f);
             wk->state = 8;
         }

@@ -65,8 +65,8 @@ void DpcBmp_PutTitle(DendouPCWork *wk) {
 
         WordSetNumber(wk->wordSet, 0, team->number, 4, 0, TRUE);
         GFL_WordSetFormatStrbuf(wk->wordSet, wk->expandBuf, str);
-        PrintStrAligned(&wk->win[DPCBMP_WIN_TITLE], wk->printQueue, 0, 0, wk->expandBuf, wk->font,
-                        DPCBMP_COLOR_BLACK, PRINT_ALIGN_LEFT);
+        PrintStrAligned(&wk->win[DPCBMP_WIN_TITLE], wk->printQueue, 0, 0, wk->expandBuf, wk->font, DPCBMP_COLOR_BLACK,
+                        PRINT_ALIGN_LEFT);
         GFL_StrBufFree(str);
     }
 

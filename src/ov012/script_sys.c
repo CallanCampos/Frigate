@@ -1,5 +1,4 @@
 #include "types.h"
-#include "gfl/arc.h"
 #include "field/event_data.h"
 #include "field/field_script.h"
 #include "field/field_script_event.h"
@@ -7,6 +6,7 @@
 #include "field/field_script_supervisor.h"
 #include "field/player_state.h"
 #include "field/zone.h"
+#include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"

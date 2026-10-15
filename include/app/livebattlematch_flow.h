@@ -15,8 +15,8 @@
 
 typedef struct LiveBattleMatchFlow LiveBattleMatchFlow;
 
-// What the player sends the other player over the link: their trainer info, the last results of the live competition and
-// the team picked, which comes after the LIVEBATTLEMATCH_PLAYER_HEADER_SIZE bytes of this
+// What the player sends the other player over the link: their trainer info, the last results of the live competition
+// and the team picked, which comes after the LIVEBATTLEMATCH_PLAYER_HEADER_SIZE bytes of this
 struct LiveBattleMatchPlayerData {
     PlayerInfo info;
     u8 mac[6];

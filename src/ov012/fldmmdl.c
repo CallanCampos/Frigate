@@ -108,6 +108,7 @@ static u16 GetActorSaveDataPositionSlotID(FieldActor *actor);
 static BOOL IsActorLastPositionInSaveData(FieldActor *actor);
 static BOOL LoadSaveDataStrengthRockPosition(FieldActor *actor, VecFx32 *pos);
 
+// clang-format off
 static StrengthRockSlot RELOADABLE_STRENGTH_ROCKS[] = {
     { 0x13f, 0, 0 },
     { 0x14d, 0, 1 },
@@ -176,6 +177,8 @@ static StrengthRockSlot RELOADABLE_STRENGTH_ROCKS[] = {
     { 0x1f9, 4, 64 },
     { 0xffff, 0xffff, STRENGTH_ROCK_SLOT_NONE },
 };
+
+// clang-format on
 
 MMSys *FldActSys_Create(HeapID heapId, u32 capacity, StrengthRockSave *save) {
     MMSys *system = GFL_HeapAllocate(heapId, sizeof(MMSys), TRUE, "fldmmdl.c", 202);
@@ -281,8 +284,7 @@ FieldActor *CreateNewActorByEntityNoWKOBJCODE(MMSys *mmSys, const ZoneNPC *npc, 
     return CreateNewActorByEntity(mmSys, npc, zoneId, NULL);
 }
 
-FieldActor *CreateNewActorByParam(MMSys *mmSys, s16 x, s16 z, u16 dir, u16 id, u16 objCode, u16 moveCode,
-                                  u32 zoneId) {
+FieldActor *CreateNewActorByParam(MMSys *mmSys, s16 x, s16 z, u16 dir, u16 id, u16 objCode, u16 moveCode, u32 zoneId) {
     ZoneNPC npc;
     ZoneNPCGridPosition *pos;
 
@@ -316,7 +318,8 @@ FieldActor *func_ov012_021668f8(MMSys *mmSys, ZoneNPC *npcs, s32 zoneId, u32 cou
 #endif
 
     do {
-        if (IsNPCSCRID0xFFFF(npcs) == FALSE && npcs->uid == uid && CheckNPCSpawnFlag(eventWork, npcs->spawnFlag) == FALSE) {
+        if (IsNPCSCRID0xFFFF(npcs) == FALSE && npcs->uid == uid &&
+            CheckNPCSpawnFlag(eventWork, npcs->spawnFlag) == FALSE) {
             actor = CreateNewActorByEntity(mmSys, npcs, zoneId, eventWork);
             break;
         }
@@ -2019,8 +2022,8 @@ void func_ov012_021681b0(FieldActor *actor) {
 }
 
 BOOL func_ov012_0216820c(MMSys *actorSystem, const VecFx32 *position) {
-    FieldActor *actor = FindActorByGPos(actorSystem, POS_TO_GRID(position->x), POS_TO_GRID(position->z), position->y,
-                                        0x20000, FALSE);
+    FieldActor *actor =
+        FindActorByGPos(actorSystem, POS_TO_GRID(position->x), POS_TO_GRID(position->z), position->y, 0x20000, FALSE);
 
     if (actor != NULL && IsActorLastPositionInSaveData(actor) == TRUE) {
         return TRUE;

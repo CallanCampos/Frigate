@@ -92,7 +92,7 @@ static BOOL NHttpRap_CreateRequest(u32 index, NHttpRap *rap) {
     int result;
 
     handle = NHTTPCreateConnection(rap->url, sRequests[index].method, rap->answer, rap->answerSize,
-                                 NHttpRap_RequestCallback, rap);
+                                   NHttpRap_RequestCallback, rap);
     GFL_ASSERT(handle);
     if (handle == 0) {
         return FALSE;
@@ -288,7 +288,7 @@ BOOL NHttpRap_SendValidate(NHttpRap *rap) {
     func_0207f7a4(rap->url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].url);
     request =
         NHTTPCreateConnection(sRequests[NHTTP_RAP_REQUEST_VALIDATE].url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].method,
-                            rap->answer, rap->answerSize, NHttpRap_RequestCallback, NULL);
+                              rap->answer, rap->answerSize, NHttpRap_RequestCallback, NULL);
     if (request == 0) {
         int error = NHTTPGetError();
 

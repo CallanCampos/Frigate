@@ -5,9 +5,9 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-// 3D on both screens, as in NitroSDK's dual 3D demo: the main engine renders to each screen on alternate frames, and the
-// display capture keeps each frame in VRAM C or D for the sub engine to show on the other screen. The sub engine shows
-// the capture in VRAM C as a direct color bitmap BG, or the one in VRAM D as bitmap OBJ, which tile the screen
+// 3D on both screens, as in NitroSDK's dual 3D demo: the main engine renders to each screen on alternate frames, and
+// the display capture keeps each frame in VRAM C or D for the sub engine to show on the other screen. The sub engine
+// shows the capture in VRAM C as a direct color bitmap BG, or the one in VRAM D as bitmap OBJ, which tile the screen
 
 // The OBJ that show the capture, 64x64 each, at the end of OAM
 #define OAM_COUNT 12

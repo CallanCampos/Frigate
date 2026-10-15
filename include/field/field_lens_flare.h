@@ -30,7 +30,6 @@ struct FieldLensFlare {
     GameData *gameData;
 };
 
-
 FieldLensFlareData *FieldLensFlareData_Create(HeapID heapId);
 FieldLensFlare *FieldLensFlare_Create(GameSystem *gameSystem, GameData *gameData, FieldExpObjSystem *expObjSys,
                                       u8 effectIndex, u32 dayPeriod, HeapID heapId);

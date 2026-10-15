@@ -107,8 +107,7 @@ static WaitIcon *sWaitIcon;
 
 static BOOL DeleteSave_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_SAVEDATA_DELETE, 0x30000);
-    sys_memset(GFL_ProcInitSubsystem(proc, sizeof(DeleteSaveWork), HEAPID_SAVEDATA_DELETE), 0,
-               sizeof(DeleteSaveWork));
+    sys_memset(GFL_ProcInitSubsystem(proc, sizeof(DeleteSaveWork), HEAPID_SAVEDATA_DELETE), 0, sizeof(DeleteSaveWork));
     return TRUE;
 }
 
@@ -251,9 +250,9 @@ static void DeleteSave_WaitWipeOut(DeleteSaveWork *wk, u32 *state) {
 
 static void DeleteSave_InitVRAM(void) {
     BGSysVRAMConfig vramConfig = {
-        GX_VRAM_BG_128_A, GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
+        GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
         GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
-        GX_VRAM_TEX_NONE, GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
+        GX_VRAM_TEX_NONE,  GX_VRAM_TEXPLTT_NONE,    GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
     };
 
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
@@ -269,8 +268,19 @@ static void DeleteSave_InitBG(void) {
         GFL_BGSysSetLCDConfig(&lcdConfig);
     }
     {
-        BGSetup setup = { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x00000), 0x8000, GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE };
+        BGSetup setup = { 0,
+                          0,
+                          0x800,
+                          0,
+                          BGRES_256x256,
+                          GX_BG_COLORMODE_16,
+                          GX_BG_SCRBASE(0xf800),
+                          GX_BG_CHARBASE(0x00000),
+                          0x8000,
+                          GX_BG_EXTPLTT_01,
+                          0,
+                          GX_BG_AREAOVER_XLU,
+                          FALSE };
 
         GFL_BGSysCreateBG(0, &setup, BGMODE_TEXT);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, TRUE);

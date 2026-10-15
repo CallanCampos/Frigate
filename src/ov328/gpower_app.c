@@ -1,6 +1,6 @@
 #include "types.h"
-#include "app/pass_power.h"
 #include "app/gpower_app_graphic.h"
+#include "app/pass_power.h"
 #include "app/ui/print_msg.h"
 #include "app/ui/ui_scene.h"
 #include "constants/arc.h"
@@ -282,11 +282,14 @@ enum {
     MSG_NO,
 };
 
+// clang-format off
 static const u16 sGPowerAppMessages[] = {
     BtlMainTitle_Text_ActivePassPower, BtlMainTitle_Text_None,              BtlMainTitle_Text_Entralink,
     BtlMainTitle_Text_Empty_19,        BtlMainTitle_Text_WillUseNeededHeld, BtlMainTitle_Text_NotHaveEnoughPass,
     BtlMainTitle_Text_Yes,             BtlMainTitle_Text_No,
 };
+
+// clang-format on
 
 static const GPowerAppBGFile sGPowerAppScreens[] = {
     { 7, 6, 0, 0 },
@@ -308,8 +311,8 @@ static const GPowerAppActorSetup sGPowerAppReturnActorSetups[] = {
     { 0xff },
 };
 
-static const GPowerAppActorGroup sGPowerAppReturnActorGroup = { RES_COMMON_PALETTE, RES_COMMON_CHARS, RES_COMMON_CELLS, 1,
-                                                                ACTOR_RETURN };
+static const GPowerAppActorGroup sGPowerAppReturnActorGroup = { RES_COMMON_PALETTE, RES_COMMON_CHARS, RES_COMMON_CELLS,
+                                                                1, ACTOR_RETURN };
 
 static const GPowerAppObjFile sGPowerAppObjFiles[] = {
     { 1, RES_PALETTE, 0, 3 },
@@ -361,7 +364,7 @@ static const GPowerAppDecideFrame sGPowerAppDecideFrames[] = {
 };
 
 static const TouchRect sGPowerAppSelectTouchRects[] = {
-    { 28, 52, 56, 248 },   { 60, 84, 32, 224 },    { 92, 116, 8, 200 },      { 132, 156, 128, 232 },
+    { 28, 52, 56, 248 },   { 60, 84, 32, 224 },    { 92, 116, 8, 200 },         { 132, 156, 128, 232 },
     { 96, 132, 216, 240 }, { 168, 192, 232, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
 };
 
@@ -764,8 +767,8 @@ static void GPowerApp_AddActors(GPowerApp *work, u32 vramType, const GPowerAppAc
         setup.sequence = setups->sequence;
         setup.priority = setups->priority;
         setup.bgPriority = setups->bgPriority;
-        actors[i] = func_0204c040(unit, work->resources[chars], work->resources[palette], work->resources[cells], &setup,
-                                  vramType, work->heapId);
+        actors[i] = func_0204c040(unit, work->resources[chars], work->resources[palette], work->resources[cells],
+                                  &setup, vramType, work->heapId);
         visible = FALSE;
         if (setups->visible == TRUE) {
             visible = TRUE;

@@ -96,8 +96,8 @@ static u16 *func_ov036_021aeb64(Regulation *regulation, GameData *gameData, u16 
 
     *count = 0;
     pokedex = GameData_GetPokedex(gameData);
-    species = GFL_HeapAllocate(HEAPID_TAIL(heapId), REGULATION_LIST_MAX * sizeof(u16), TRUE, "scrcmd_fld_battle.c",
-                               172);
+    species =
+        GFL_HeapAllocate(HEAPID_TAIL(heapId), REGULATION_LIST_MAX * sizeof(u16), TRUE, "scrcmd_fld_battle.c", 172);
     for (; i < REGULATION_SPECIES_COUNT; i++) {
         if ((1 << (i % 8)) & regulation->unkA[i / 8] && PokeDex_IsCaught(pokedex, i)) {
             if (*count >= REGULATION_LIST_MAX) {

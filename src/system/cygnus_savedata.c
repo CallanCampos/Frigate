@@ -1,9 +1,9 @@
-#include <stddef.h>
 #include "types.h"
-#include "save/cygnus_save_control.h"
 #include "gfl/std.h"
+#include "save/cygnus_save_control.h"
 #include "save/dream_world.h"
 #include "save/save_control.h"
+#include <stddef.h>
 
 // Pokémon Dream Radar's save block, and the checks and the encoding of the data that Dream Radar writes to the card,
 // which cygnus_save_control.c reads and writes. The ROM has no string for the file, so the name is a guess; the

@@ -7,8 +7,8 @@
 #include "struct_decls.h"
 
 // Graphics files of archives (arc_util.c): loading character, screen and palette files to VRAM and reading them, and
-// reading files that may be LZ compressed. The functions that take an ArcTool read from an archive kept open, the others
-// open the archive by its ID. A size of 0 loads all of a file
+// reading files that may be LZ compressed. The functions that take an ArcTool read from an archive kept open, the
+// others open the archive by its ID. A size of 0 loads all of a file
 
 // The palette memory a palette file is loaded to
 enum {
@@ -36,8 +36,8 @@ void loadBGScrToVramByNarcNoReserveNegAlign(u32 arcId, u32 fileId, u8 bg, u32 of
 void loadBGScrToVramByFileNoReserveNegAlign(ArcTool *arc, u32 fileId, u32 bg, u32 offset, u32 size, BOOL compressed,
                                             HeapID heapId);
 // The same, adding a palette offset to each entry of the screen. The asynchronous load waits for the next VBlank
-void loadBGScrToVramByNarcNoReserve(u32 arcId, u32 fileId, u8 bg, u32 offset, u32 palOffset, u32 size,
-                                    BOOL compressed, HeapID heapId);
+void loadBGScrToVramByNarcNoReserve(u32 arcId, u32 fileId, u8 bg, u32 offset, u32 palOffset, u32 size, BOOL compressed,
+                                    HeapID heapId);
 void GFL_G2DIOLoadNSCRSync(ArcTool *arc, u32 fileId, u8 bg, u32 offset, u32 palOffset, u32 size, BOOL compressed,
                            HeapID heapId);
 void GFL_G2DIOLoadNSCRAsync(ArcTool *arc, u32 fileId, u8 bg, u32 offset, u32 palOffset, u32 size, BOOL compressed,
@@ -50,8 +50,7 @@ void GFL_G2DIOLoadNCLR(u32 arcId, u32 fileId, u32 type, u32 srcOffset, u32 offse
 void GFL_G2DIOLoadArcNCLR(ArcTool *arc, u32 fileId, u32 type, u32 srcOffset, u32 offset, u32 size, HeapID heapId);
 // Read a graphics file, and return the file for GFL_HeapFree, or NULL if it is not of its kind
 void *GFL_G2DIOReadBGNCGR(u32 arcId, u32 fileId, BOOL compressed, NNSG2dCharacterData **character, HeapID heapId);
-void *GFL_G2DIOReadBGNCGRArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dCharacterData **character,
-                             HeapID heapId);
+void *GFL_G2DIOReadBGNCGRArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dCharacterData **character, HeapID heapId);
 void *GFL_G2DIOReadOBJNCGR(u32 arcId, u32 fileId, BOOL compressed, NNSG2dCharacterData **character, HeapID heapId);
 void *GFL_G2DIOReadOBJNCGRArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dCharacterData **character,
                               HeapID heapId);
@@ -64,8 +63,7 @@ void *GFL_G2DIOReadNCERArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dCell
 void *GFL_G2DIOReadNANR(u32 arcId, u32 fileId, BOOL compressed, NNSG2dAnimBankData **anims, HeapID heapId);
 void *GFL_G2DIOReadNANRArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dAnimBankData **anims, HeapID heapId);
 void *GFL_G2DIOReadNMCR(u32 arcId, u32 fileId, BOOL compressed, NNSG2dMultiCellDataBank **cells, HeapID heapId);
-void *GFL_G2DIOReadNMCRArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dMultiCellDataBank **cells,
-                           HeapID heapId);
+void *GFL_G2DIOReadNMCRArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dMultiCellDataBank **cells, HeapID heapId);
 void *GFL_G2DIOReadNMAR(u32 arcId, u32 fileId, BOOL compressed, NNSG2dAnimBankData **anims, HeapID heapId);
 void *GFL_G2DIOReadNMARArc(ArcTool *arc, u32 fileId, BOOL compressed, NNSG2dAnimBankData **anims, HeapID heapId);
 // Read a file into a new allocation, uncompressing it if it is LZ compressed, and return it, and its size by size

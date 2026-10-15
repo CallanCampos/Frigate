@@ -21,12 +21,12 @@ FieldChunk *FieldChunk_Create(const FieldChunkConfig *config, HeapID heapId) {
     chunk->unkA8 = config->unkA8;
     chunk->unkAC = config->unkAC;
     if (chunk->propCapacity1 != 0) {
-        chunk->propInstances = GFL_HeapAllocate(heapId, sizeof(FieldPropInstance) * config->propCapacity1, TRUE,
-                                                "field_g3d_map.c", 119);
+        chunk->propInstances =
+            GFL_HeapAllocate(heapId, sizeof(FieldPropInstance) * config->propCapacity1, TRUE, "field_g3d_map.c", 119);
     }
     if (chunk->propCapacity2 != 0) {
-        chunk->propInstances2 = GFL_HeapAllocate(heapId, sizeof(FieldPropInstance) * config->propCapacity2, TRUE,
-                                                 "field_g3d_map.c", 122);
+        chunk->propInstances2 =
+            GFL_HeapAllocate(heapId, sizeof(FieldPropInstance) * config->propCapacity2, TRUE, "field_g3d_map.c", 122);
     }
     FieldChunk_Reset(chunk);
     chunk->vtable = config->vtable;
@@ -55,7 +55,6 @@ FieldChunk *FieldChunk_Create(const FieldChunkConfig *config, HeapID heapId) {
     }
     return chunk;
 }
-
 
 void FieldChunk_Free(FieldChunk *chunk) {
     FieldChunk_UnbindArc(chunk);

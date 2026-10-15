@@ -1,5 +1,5 @@
-#include "nnsys/g3d.h"
 #include "nnsys/fnd.h"
+#include "nnsys/g3d.h"
 
 NNSG3dRenderObj *NNS_G3dAllocRenderObj(NNSFndAllocator *allocator) {
     return NNS_FndAllocFromAllocator(allocator, sizeof(NNSG3dRenderObj));

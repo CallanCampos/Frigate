@@ -124,7 +124,9 @@ static void func_0204115c(NetState *state, NetStateFunc func, int timer, int lin
 }
 
 static void func_02041164(HeapID heapId) {
+    // clang-format off
     GFL_ASSERT(NULL==_pNetState);
+    // clang-format on
     _pNetState = GFL_HeapAllocate(heapId, sizeof(NetState), TRUE, "net_state.c", 185);
     _pNetState->timer = 50;
     _pNetState->unk4C = TRUE;
@@ -138,7 +140,6 @@ static void func_020411c4(MATHRandContext32 *rand) {
 
     MATH_InitRand32(rand, (high << 32) + low);
 }
-
 
 // Ends the network once the device has
 static void func_020411fc(NetState *state) {
@@ -202,7 +203,9 @@ static void func_02041324(NetState *state) {
 }
 
 void func_02041354(const u8 *mac, BOOL parent) {
+    // clang-format off
     GFL_ASSERT(((u32)_pNetState->aMacAddress%2)==0);
+    // clang-format on
     if (mac != NULL) {
         sys_memcpy(mac, _pNetState->aMacAddress, sizeof(_pNetState->aMacAddress));
     }
@@ -479,8 +482,7 @@ void func_02041a30(int a0, void (*callback)(void *work), int a2) {
 static void func_02041af4(NetState *state) {
     GFLNetSys *sys = func_02042e78();
 
-    if (_pNetState->mode == NET_STATE_MODE_PARENT && _pNetState->func == func_02041940
-        && sys->pDevTable->unk10(1, 0)) {
+    if (_pNetState->mode == NET_STATE_MODE_PARENT && _pNetState->func == func_02041940 && sys->pDevTable->unk10(1, 0)) {
         func_0204115c(_pNetState, func_02041910, 0, 982);
     }
     if (_pNetState->mode == NET_STATE_MODE_CHILD && _pNetState->func == func_020416c8) {
@@ -935,10 +937,13 @@ void func_020424ac(int code, u32 a1, u32 a2, int type) {
 void func_020424e4(void) {
     if (_pNetState != NULL) {
         GFLNetInitData *pNetIni = func_02042e84();
-        BOOL isWifi = pNetIni->bNetType == GFL_NET_TYPE_WIFI || pNetIni->bNetType==GFL_NET_TYPE_WIFI_LOBBY || pNetIni->bNetType==GFL_NET_TYPE_WIFI_GTS;
+        BOOL isWifi = pNetIni->bNetType == GFL_NET_TYPE_WIFI || pNetIni->bNetType == GFL_NET_TYPE_WIFI_LOBBY ||
+                      pNetIni->bNetType == GFL_NET_TYPE_WIFI_GTS;
 
         if (!isWifi) {
-            GFL_DebugAssertFail("", 0, "pNetIni->bNetType == GFL_NET_TYPE_WIFI || pNetIni->bNetType==GFL_NET_TYPE_WIFI_LOBBY || pNetIni->bNetType==GFL_NET_TYPE_WIFI_GTS");
+            GFL_DebugAssertFail("", 0,
+                                "pNetIni->bNetType == GFL_NET_TYPE_WIFI || pNetIni->bNetType==GFL_NET_TYPE_WIFI_LOBBY "
+                                "|| pNetIni->bNetType==GFL_NET_TYPE_WIFI_GTS");
         }
         _pNetState->error.code = 0;
         _pNetState->error.unk4 = 0;

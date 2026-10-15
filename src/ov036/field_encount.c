@@ -43,8 +43,8 @@ static u32 EncountState_GetEncountRateStepCounter(EncountState *state);
 
 // How the encounter rate climbs, for each setting of the zone's encounter data
 static const EncountRateConfig ENCOUNT_RATE_CONFIGS[12] = {
-    {3, 1, 13, 2}, {3, 1, 19, 2}, {2, 3, 13, 3}, {2, 2, 19, 2}, {5, 1, 31, 2},  {5, 1, 31, 2},
-    {2, 18, 7, 8}, {2, 9, 7, 4},  {2, 3, 13, 3}, {1, 12, 7, 3}, {1, 9, 7, 3}, {2, 3, 13, 3},
+    { 3, 1, 13, 2 }, { 3, 1, 19, 2 }, { 2, 3, 13, 3 }, { 2, 2, 19, 2 }, { 5, 1, 31, 2 }, { 5, 1, 31, 2 },
+    { 2, 18, 7, 8 }, { 2, 9, 7, 4 },  { 2, 3, 13, 3 }, { 1, 12, 7, 3 }, { 1, 9, 7, 3 },  { 2, 3, 13, 3 },
 };
 
 EncountSystem *EncSys_Create(Field *field) {
@@ -123,10 +123,9 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
     }
     CreateEncountManager(&manager, system->gameData, encType, mode,
                          func_ov036_02199220(Field_GetWeatherSystem(system->field)));
-    if (!forced && !EncSys_CheckRNGEncounter(system, state,
-                                             FieldEncount_CalcEncountRate(&manager, system->gameData,
-                                                                          state->encountRate),
-                                             encType)) {
+    if (!forced &&
+        !EncSys_CheckRNGEncounter(
+            system, state, FieldEncount_CalcEncountRate(&manager, system->gameData, state->encountRate), encType)) {
         return NULL;
     }
     if (mode == 1) {
@@ -172,7 +171,8 @@ GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, 
     WildPkmParam *param;
 
     Field_GetPlayer(system->field);
-    CreateEncountManager(&manager, system->gameData, 0xff, 0, func_ov036_02199220(Field_GetWeatherSystem(system->field)));
+    CreateEncountManager(&manager, system->gameData, 0xff, 0,
+                         func_ov036_02199220(Field_GetWeatherSystem(system->field)));
     param = &params[0];
     sys_memset(params, 0, sizeof(params));
     param->species = species;

@@ -1,13 +1,13 @@
 #include "types.h"
+#include "app/musical/mus_item_data.h"
+#include "app/musical/mus_item_draw.h"
+#include "app/musical/mus_poke_draw.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
 #include "field/dup_fitting.h"
 #include "field/dup_fitting_item.h"
 #include "field/musical_dressup_sys.h"
-#include "app/musical/mus_item_data.h"
-#include "app/musical/mus_item_draw.h"
-#include "app/musical/mus_poke_draw.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -580,8 +580,19 @@ static void DupFitting_VBlank(TCB *tcb, void *data) {
 static const u16 DUP_FITTING_SCALE_ANGLES[3] = { 0x4000, 0x6e00, 0x78e0 };
 
 static const BGSetup DUP_FITTING_BG7_SETUP = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800), GX_BG_CHARBASE(0x10000), 0x8000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x7800),
+    GX_BG_CHARBASE(0x10000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static const BGSysVRAMConfig DUP_FITTING_VRAM_CONFIG = {
@@ -606,28 +617,94 @@ static const VecFx32 DUP_FITTING_CAMERA_UP = { 0, FX32_ONE, 0 };
 static const BGSysLCDConfig DUP_FITTING_LCD_CONFIG = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_3D };
 
 static const BGSetup DUP_FITTING_BG1_SETUP = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7800), GX_BG_CHARBASE(0), 0x1000,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x7800),
+    GX_BG_CHARBASE(0),
+    0x1000,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 static const BGSetup DUP_FITTING_BG2_SETUP = {
-    0, 0, 0x1000, 0, BGRES_256x512, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x6800), GX_BG_CHARBASE(0x8000), 0,
-    GX_BG_EXTPLTT_01, 2, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x1000,
+    0,
+    BGRES_256x512,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x6800),
+    GX_BG_CHARBASE(0x8000),
+    0,
+    GX_BG_EXTPLTT_01,
+    2,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 static const BGSetup DUP_FITTING_BG3_SETUP = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x6000), GX_BG_CHARBASE(0x8000), 0x8000,
-    GX_BG_EXTPLTT_01, 3, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x6000),
+    GX_BG_CHARBASE(0x8000),
+    0x8000,
+    GX_BG_EXTPLTT_01,
+    3,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 static const BGSetup DUP_FITTING_BG4_SETUP = {
-    0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x7000), GX_BG_CHARBASE(0x8000), 0,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x800,
+    0,
+    BGRES_256x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x7000),
+    GX_BG_CHARBASE(0x8000),
+    0,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 static const BGSetup DUP_FITTING_BG5_SETUP = {
-    0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x6000), GX_BG_CHARBASE(0x8000), 0,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x1000,
+    0,
+    BGRES_512x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x6000),
+    GX_BG_CHARBASE(0x8000),
+    0,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 static const BGSetup DUP_FITTING_BG6_SETUP = {
-    0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x5000), GX_BG_CHARBASE(0x8000), 0,
-    GX_BG_EXTPLTT_01, 0, GX_BG_AREAOVER_XLU, FALSE,
+    0,
+    0,
+    0x1000,
+    0,
+    BGRES_512x256,
+    GX_BG_COLORMODE_16,
+    GX_BG_SCRBASE(0x5000),
+    GX_BG_CHARBASE(0x8000),
+    0,
+    GX_BG_EXTPLTT_01,
+    0,
+    GX_BG_AREAOVER_XLU,
+    FALSE,
 };
 
 static void DupFitting_InitGraphics(DupFittingWork *work) {
@@ -814,7 +891,8 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         dimPlttKey = NNS_GfdAllocPlttVram(plttSize, FALSE, 0);
         size = MusItemData_GetTexSize(MusItemData_GetItem(items, work->entries[n].itemId));
         func_0204e4d0(size, &width, &height);
-        work->entries[n].material = BlActScene_AddMaterialExistTex(work->blact, texKey, plttKey, 0, size, width, height);
+        work->entries[n].material =
+            BlActScene_AddMaterialExistTex(work->blact, texKey, plttKey, 0, size, width, height);
         palette = GFL_G3DResGetTexPaletteData(res);
         for (j = 0; j < plttSize / 2; j++) {
             u16 color = palette[j];
@@ -1222,8 +1300,8 @@ static void DupFitting_UpdateCarouselDrag(DupFittingWork *work, s16 x, s16 y) {
     static const u16 tiltSteps[2] = { 0x100, 0 };
     // The smallest turn of a drag that moves the ring
     static const u16 dragMinTurn = 227;
-    s32 delta = func_020443d8(work->prevTouchX, work->prevTouchY * 72 / 48, work->touchX, work->touchY * 72 / 48, 128,
-                              80, 72);
+    s32 delta =
+        func_020443d8(work->prevTouchX, work->prevTouchY * 72 / 48, work->touchX, work->touchY * 72 / 48, 128, 80, 72);
 
     work->dragAccum += MATH_ABS(delta);
     if (work->touchStart == TRUE || work->dragAccum >= 0x71c) {
@@ -1485,7 +1563,8 @@ static void DupFitting_WearItem(DupFittingWork *work) {
         s32 category = func_ov210_021ef118(work->hoverPos);
         DupFittingItemNode *other;
 
-        for (other = DupFittingItemList_GetHead(work->wornList); other != NULL; other = DupFittingItemNode_GetNext(other)) {
+        for (other = DupFittingItemList_GetHead(work->wornList); other != NULL;
+             other = DupFittingItemNode_GetNext(other)) {
             if (category == func_ov210_021ef118(DupFittingItemNode_GetEquipPos(other))) {
                 break;
             }
@@ -1513,7 +1592,8 @@ static void DupFitting_WearItem(DupFittingWork *work) {
             DupFittingItemNode_SetPos(other, &pt);
             DupFittingItemNode_SetFrames(other, 10);
             z = 0;
-            for (node = DupFittingItemList_GetHead(work->stageList); node != NULL; node = DupFittingItemNode_GetNext(node)) {
+            for (node = DupFittingItemList_GetHead(work->stageList); node != NULL;
+                 node = DupFittingItemNode_GetNext(node)) {
                 MusItemDraw *nodeDraw = DupFittingItemNode_GetDraw(node);
 
                 MusItemDraw_GetPosition(work->itemSys, nodeDraw, &nodePos);
@@ -1527,7 +1607,8 @@ static void DupFitting_WearItem(DupFittingWork *work) {
     DupFittingItemList_AddHead(work->wornList, work->heldNode);
     MusItemDraw_SetSize(work->itemSys, heldDraw, FX32_ONE, FX32_ONE);
     DupFittingItemNode_SetEquipPos(work->heldNode, work->hoverPos);
-    for (node = DupFittingItemList_GetHead(work->wornList), z = 0; node != NULL; node = DupFittingItemNode_GetNext(node)) {
+    for (node = DupFittingItemList_GetHead(work->wornList), z = 0; node != NULL;
+         node = DupFittingItemNode_GetNext(node)) {
         MusItemDraw *nodeDraw = DupFittingItemNode_GetDraw(node);
         VecFx32 nodePos;
 
@@ -1575,7 +1656,8 @@ static void DupFitting_ReleaseHeld(DupFittingWork *work) {
         vec.y = FX32_CONST(target.y);
         if (MusItemDraw_GetItemFlag7(draw) == TRUE) {
             base = 0x66;
-        } else if (DupFittingItemNode_GetEquipPos(work->heldNode) == 7 || DupFittingItemNode_GetEquipPos(work->heldNode) == 8) {
+        } else if (DupFittingItemNode_GetEquipPos(work->heldNode) == 7 ||
+                   DupFittingItemNode_GetEquipPos(work->heldNode) == 8) {
             base = 0xde;
         } else {
             base = 0xca;
@@ -2089,7 +2171,8 @@ static void DupFitting_SaveWornItems(DupFittingWork *work) {
     u8 i = 0;
 
     func_0200ad20(work->param->save);
-    for (node = DupFittingItemList_GetHead(work->wornList); node != NULL && i < 8; node = DupFittingItemNode_GetNext(node), i++) {
+    for (node = DupFittingItemList_GetHead(work->wornList); node != NULL && i < 8;
+         node = DupFittingItemNode_GetNext(node), i++) {
         u16 pos = DupFittingItemNode_GetEquipPos(node);
 
         MusPokeDraw_GetEquipPos(work->poke, pos);
@@ -2393,8 +2476,8 @@ static void DupFitting_InitSparkles(DupFittingWork *work) {
     func_0204c124(work->okMark, FALSE);
     func_0204c520(work->okMark, TRUE);
     setup.sequence = 2;
-    work->touchEffect = func_0204c040(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7],
-                                      &setup, CLACT_SURFACE_MAIN, work->heapId);
+    work->touchEffect = func_0204c040(work->clactUnit, work->clactRes[1], work->clactRes[4], work->clactRes[7], &setup,
+                                      CLACT_SURFACE_MAIN, work->heapId);
     func_0204c124(work->touchEffect, FALSE);
     func_0204c520(work->touchEffect, TRUE);
 }

@@ -4,8 +4,8 @@
 #include "types.h"
 #include "struct_decls.h"
 
-// Debug text in the system font (textprint.c), from ASCII and Shift JIS strings. Strings are converted to glyph indices,
-// which are glyphs of the font offset by TEXTPRINT_GLYPH_BASE, after the control indices
+// Debug text in the system font (textprint.c), from ASCII and Shift JIS strings. Strings are converted to glyph
+// indices, which are glyphs of the font offset by TEXTPRINT_GLYPH_BASE, after the control indices
 
 enum {
     TEXTPRINT_NEWLINE = 1,

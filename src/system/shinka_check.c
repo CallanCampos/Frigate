@@ -1,5 +1,4 @@
 #include "types.h"
-#include "pml/evolution.h"
 #include "constants/arc.h"
 #include "constants/hold_effects.h"
 #include "constants/pokemon.h"
@@ -7,6 +6,7 @@
 #include "constants/zones.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
+#include "pml/evolution.h"
 #include "pml/item.h"
 #include "pml/personal.h"
 #include "pml/poke_party.h"
@@ -92,20 +92,20 @@ u16 CheckEvolveSpecies(PokeParty *party, PartyPkm *pkm, u32 mode, u32 a3, u8 sea
             case EVO_METHOD_ITEM:
                 break;
             case EVO_METHOD_LEVEL_ATK_GT_DEF:
-                if (evo[i].param <= level &&
-                    PokeParty_GetParam(pkm, PKM_PARAM_ATTACK, NULL) > PokeParty_GetParam(pkm, PKM_PARAM_DEFENSE, NULL)) {
+                if (evo[i].param <= level && PokeParty_GetParam(pkm, PKM_PARAM_ATTACK, NULL) >
+                                                 PokeParty_GetParam(pkm, PKM_PARAM_DEFENSE, NULL)) {
                     result = evo[i].species;
                 }
                 break;
             case EVO_METHOD_LEVEL_ATK_EQ_DEF:
-                if (evo[i].param <= level &&
-                    PokeParty_GetParam(pkm, PKM_PARAM_ATTACK, NULL) == PokeParty_GetParam(pkm, PKM_PARAM_DEFENSE, NULL)) {
+                if (evo[i].param <= level && PokeParty_GetParam(pkm, PKM_PARAM_ATTACK, NULL) ==
+                                                 PokeParty_GetParam(pkm, PKM_PARAM_DEFENSE, NULL)) {
                     result = evo[i].species;
                 }
                 break;
             case EVO_METHOD_LEVEL_ATK_LT_DEF:
-                if (evo[i].param <= level &&
-                    PokeParty_GetParam(pkm, PKM_PARAM_ATTACK, NULL) < PokeParty_GetParam(pkm, PKM_PARAM_DEFENSE, NULL)) {
+                if (evo[i].param <= level && PokeParty_GetParam(pkm, PKM_PARAM_ATTACK, NULL) <
+                                                 PokeParty_GetParam(pkm, PKM_PARAM_DEFENSE, NULL)) {
                     result = evo[i].species;
                 }
                 break;

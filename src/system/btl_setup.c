@@ -35,8 +35,8 @@ static void BtlSetup_LoadPlayerParty(BtlSetup *setup, GameData *gameData, HeapID
 static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldStatus *status);
 static void BtlSetup_LoadTrainerBase(BtlSetup *setup, GameData *gameData, u32 style, BtlFieldStatus *status,
                                      HeapID heapId);
-static void BtlSetup_SetNetImpl(BtlSetup *setup, GameData *gameData, u32 style, u8 multiMode, NetHandle *handle,
-                                u8 a5, u8 a6, HeapID heapId);
+static void BtlSetup_SetNetImpl(BtlSetup *setup, GameData *gameData, u32 style, u8 multiMode, NetHandle *handle, u8 a5,
+                                u8 a6, HeapID heapId);
 
 // The clients whose parties the difficulty changes the levels of
 static const u32 DIFFICULTY_ADJUST_PARTIES[] = { 1, 3 };
@@ -305,8 +305,8 @@ static void BtlSetup_LoadTrainerBase(BtlSetup *setup, GameData *gameData, u32 st
 }
 
 // What every link battle starts from, with a party and a player's info for each other client
-static void BtlSetup_SetNetImpl(BtlSetup *setup, GameData *gameData, u32 style, u8 multiMode, NetHandle *handle,
-                                u8 a5, u8 a6, HeapID heapId) {
+static void BtlSetup_SetNetImpl(BtlSetup *setup, GameData *gameData, u32 style, u8 multiMode, NetHandle *handle, u8 a5,
+                                u8 a6, HeapID heapId) {
     BtlFieldStatus status;
     u32 i;
 

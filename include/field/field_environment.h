@@ -4,8 +4,8 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
-#include "gfl/heap.h"
 #include "gfl/g3d.h"
+#include "gfl/heap.h"
 #include "struct_decls.h"
 
 void *Field_GetLightSystem(Field *field);
