@@ -1518,6 +1518,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- `BOOL x = a && b && c && ...` used as a value compiles to one flag per `&&` level, all zeroed up front, outermost
+  first, and set by nested tests, the first covering two compares. Flags like that in the asm are such a chain, not
+  separate variables: multiboot's `MBWm_ChildCallback` (`mb_wm.c`) has its beacon and BSSID checks as two of them.
 - With constant arguments, the order of an inline's `if`/`else` arms decides how much MWCC folds. NitroSDK's
   `G2_SetOBJEffect` (`nitro/gx.h`) keeps two stores and a `cmp #0x100` in NitroSystem's `SetAffinedOamPosition_`
   only when written `if (effect != AFFINE && effect != AFFINE_DOUBLE) { plain store } else { store with the
@@ -1804,6 +1807,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- MWCC 1.1p1 keeps a plain scalar static in a register across a loop and stores it once after, but never a struct
+  field: an original that loads a field once and stores it back on each pass copied it to a local. Multiboot's `MB_Init`
+  (`mb_wm.c`) came closer with `src = sWmConfig.name;` before its name loop and `sWmConfig.name = src;` inside it.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
   multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
