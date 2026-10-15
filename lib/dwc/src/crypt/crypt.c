@@ -1168,20 +1168,20 @@ static void MulWords(u32 *dest, const u32 *a, int aSize, const u32 *b, int bSize
 // Multiplies the word whose 16-bit halves are in *low and *high by the one whose halves are bLow and bHigh, from
 // 16-bit products, and leaves the low and the high word of the product in *low and *high
 static inline void MulHalves(u32 *low, u32 *high, u32 bLow, u32 bHigh) {
-    u32 aLow = *low;
     u32 aHigh = *high;
+    u32 aLow = *low;
     u32 middle = bHigh * aLow;
     u32 cross;
 
     aLow = bLow * aLow;
     cross = bLow * aHigh;
     aHigh = bHigh * aHigh;
-    cross += middle;
-    if (cross < middle) {
+    middle += cross;
+    if (middle < cross) {
         aHigh += 0x10000;
     }
-    aHigh += (cross >> 16) & 0xffff;
-    cross <<= 16;
+    aHigh += (middle >> 16) & 0xffff;
+    cross = middle << 16;
     aLow += cross;
     if (aLow < cross) {
         aHigh++;
@@ -1194,23 +1194,19 @@ static inline void MulHalves(u32 *low, u32 *high, u32 bLow, u32 bHigh) {
 // estimated from the top words of what is left, and the estimate is corrected
 static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNum *denominator,
                 BigNumPool *pool) {
+    BigNum window;
+    int shift;
+    int i;
+    int quotientSize;
     BigNum *product;
     BigNum *shiftedNumerator;
     BigNum *shiftedDenominator;
-    BigNum window;
-    int shift;
-    int denominatorSize;
-    int quotientSize;
-    int numeratorSize;
     u32 top;
-    u32 next = 0;
-    u32 *numeratorTop;
     u32 *quotientDigit;
-    u32 nextLow;
-    u32 nextHigh;
-    u32 topLow;
-    u32 topHigh;
-    int i;
+    int denominatorSize;
+    int numeratorSize;
+    u32 next;
+    u32 *numeratorTop;
 
     if (denominator->length == 0 || (denominator->length == 1 && denominator->digits[0] == 0)) {
         return FALSE;
@@ -1237,10 +1233,10 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNu
     if (!ShiftLeft(shiftedDenominator, denominator, shift)) {
         return FALSE;
     }
+    shiftedDenominator->negative = 0;
     if (!ShiftLeft(shiftedNumerator, numerator, shift + 32)) {
         return FALSE;
     }
-    shiftedDenominator->negative = 0;
     shiftedNumerator->negative = 0;
     denominatorSize = shiftedDenominator->length;
     numeratorSize = shiftedNumerator->length;
@@ -1249,6 +1245,7 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNu
     window.digits = shiftedNumerator->digits + quotientSize;
     window.length = denominatorSize;
     window.capacity = shiftedNumerator->capacity + 1;
+    next = 0;
     top = shiftedDenominator->digits[denominatorSize - 1];
     if (denominatorSize != 1) {
         next = shiftedDenominator->digits[denominatorSize - 2];
@@ -1274,9 +1271,11 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNu
     }
     quotientDigit--;
     for (i = 0; i < quotientSize - 1; i++) {
+        u32 estimate;
         u32 high;
         u32 low;
-        u32 estimate;
+        u32 estimateLow;
+        u32 estimateHigh;
         u32 byNextLow;
         u32 byNextHigh;
         u32 byTopLow;
@@ -1285,10 +1284,6 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNu
         int size;
         int oldLength;
 
-        nextLow = next & 0xffff;
-        nextHigh = (next >> 16) & 0xffff;
-        topLow = top & 0xffff;
-        topHigh = (top >> 16) & 0xffff;
         window.digits--;
         window.length++;
         high = numeratorTop[0];
@@ -1299,12 +1294,14 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNu
             estimate = DivWords(high, low, top);
         }
         for (;;) {
-            byNextLow = estimate & 0xffff;
-            byNextHigh = (estimate >> 16) & 0xffff;
-            MulHalves(&byNextLow, &byNextHigh, nextLow, nextHigh);
-            byTopLow = estimate & 0xffff;
-            byTopHigh = (estimate >> 16) & 0xffff;
-            MulHalves(&byTopLow, &byTopHigh, topLow, topHigh);
+            byNextLow = next & 0xffff;
+            byNextHigh = (next >> 16) & 0xffff;
+            estimateLow = estimate & 0xffff;
+            estimateHigh = (estimate >> 16) & 0xffff;
+            MulHalves(&byNextLow, &byNextHigh, estimateLow, estimateHigh);
+            byTopLow = top & 0xffff;
+            byTopHigh = (top >> 16) & 0xffff;
+            MulHalves(&byTopLow, &byTopHigh, estimateLow, estimateHigh);
             rest = low - byTopLow;
             if (rest > low) {
                 byTopHigh++;
@@ -1336,7 +1333,7 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNu
             estimate--;
             oldLength = window.length;
             AddSigned(&window, &window, shiftedDenominator);
-            shiftedNumerator->length = shiftedNumerator->length + window.length - oldLength;
+            shiftedNumerator->length += window.length - oldLength;
         }
         *quotientDigit-- = estimate;
         numeratorTop--;
@@ -1578,27 +1575,26 @@ static int EncodeExponent(BigNum *exponent, const u8 **encoded, int unused, BigN
 // Cuts the exponent into windows from the top: a pair of bytes for each, the window's value (odd) and the number of
 // zero bits after it, and a pair of zeros at the end. Runs of 256 zeros or more are pairs of 0 and 255 first
 static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
+    const u8 *zerosTable;
     int total;
-    u8 *out;
-    int wordsLeft;
     u32 low;
+    u8 *out;
+    u32 zeros;
+    int wordsLeft;
     u32 high;
     u32 *next;
     u32 current;
-    u32 zeros;
     u32 index;
     u32 skip;
-    u8 *in;
     int size;
     u32 bitPos;
     u32 mask;
-    const u8 *zerosTable;
 
     if (window > 6) {
         window = 6;
     }
-    mask = (1 << window) - 1;
     zerosTable = sTrailingZerosByWindow[window];
+    mask = (1 << window) - 1;
     bitPos = 0;
     total = (window + exponent->length * 32 - 1) / window * 2 + 2;
     dest[total] = 0;
@@ -1607,8 +1603,9 @@ static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
     next = exponent->digits;
     wordsLeft = exponent->length;
     low = *next++;
-    high = 0;
-    if (wordsLeft > 1) {
+    if (wordsLeft <= 1) {
+        high = 0;
+    } else {
         high = *next++;
     }
     current = low;
@@ -1638,7 +1635,7 @@ static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
             if (bitPos == 0) {
                 current = low;
             } else {
-                current = (high << (32 - bitPos)) | (low >> bitPos);
+                current = (low >> bitPos) | (high << (32 - bitPos));
             }
         }
         if (index == 0) {
@@ -1647,11 +1644,13 @@ static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
         out[0] = zeros;
         out[-1] = index;
         out -= 2;
-        while (zeros >= 256) {
-            zeros -= 256;
-            out[0] = 0xff;
-            out[-1] = 0;
-            out -= 2;
+        if (zeros >= 256) {
+            while (zeros >= 256) {
+                zeros -= 256;
+                out[0] = 0xff;
+                out[-1] = 0;
+                out -= 2;
+            }
         }
         bitPos += window;
         zeros = window;
@@ -1670,15 +1669,15 @@ static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
         if (bitPos == 0) {
             current = low;
         } else {
-            current = (high << (32 - bitPos)) | (low >> bitPos);
+            current = (low >> bitPos) | (high << (32 - bitPos));
         }
     }
-    in = out + 1;
+    out++;
     size = 2;
-    while (in[0] != 0 || in[1] != 0) {
-        dest[0] = in[0];
-        dest[1] = in[1];
-        in += 2;
+    while (out[0] != 0 || out[1] != 0) {
+        dest[0] = out[0];
+        dest[1] = out[1];
+        out += 2;
         size += 2;
         dest += 2;
     }
@@ -1902,14 +1901,13 @@ static int ComputeReciprocal(BigNum *reciprocal, BigNum *modulus, int bits, BigN
 // Raises to a power modulo with squarings and multiplications, a window of the exponent at a time
 static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
                         BigNumPool *pool) {
-    int entries;
+    int j;
     int bits;
     BOOL ok;
     int window;
     int count;
     int bit;
     int k;
-    int sign;
     BOOL first;
     BigNum table[16];
     Reducer reducer;
@@ -1945,7 +1943,7 @@ static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mo
         goto done;
     }
     if (bits <= 17) {
-        window = count;
+        window = 1;
     } else if (bits >= 256) {
         window = 5;
     } else if (bits >= 128) {
@@ -1953,8 +1951,8 @@ static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mo
     } else {
         window = 3;
     }
-    entries = 1 << (window - 1);
-    for (k = 1; k < entries; k++) {
+    j = 1 << (window - 1);
+    for (k = 1; k < j; k++) {
         InitNum(&table[k]);
         if (!ModMul(&table[k], &table[k - 1], squared, &reducer, pool)) {
             goto done;
@@ -1967,8 +1965,8 @@ static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mo
         goto done;
     }
     for (;;) {
-        int value;
         int last;
+        int value;
 
         if (!CryptTestBit(exponent, bit)) {
             if (!first) {
@@ -1984,17 +1982,18 @@ static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mo
         }
         value = 1;
         last = 0;
-        for (sign = 1; sign < window; sign++) {
-            if (bit - sign < 0) {
+        for (k = 1; k < window; k++) {
+            if (bit - k < 0) {
                 break;
             }
-            if (CryptTestBit(exponent, bit - sign)) {
-                value = (value << (sign - last)) | 1;
-                last = sign;
+            if (CryptTestBit(exponent, bit - k)) {
+                value = (value << (k - last)) | 1;
+                last = k;
             }
         }
+        j = last + 1;
         if (!first) {
-            for (k = 0; k < last + 1; k++) {
+            for (k = 0; k < j; k++) {
                 if (!ModMul(dest, dest, dest, &reducer, pool)) {
                     goto done;
                 }
@@ -2021,61 +2020,54 @@ done:
 
 // Reads a pair of the exponent's windows: a window's value and the number of squarings before the next one
 static inline void ReadWindow(const u8 **cursor, int *index, int *squarings) {
-    const u8 *p = *cursor;
-    int value = p[0];
-    int count = p[1];
+    int value = *(*cursor)++;
 
-    p += 2;
-    if (count == 0xff && value == 0) {
-        for (;;) {
-            value = p[0];
-            if (!(p[1] == 0xff && value == 0)) {
-                count += p[1] + 1;
-                p += 2;
-                break;
-            }
-            count += 0x100;
-            p += 2;
+    *squarings = *(*cursor)++;
+    if (*squarings == 0xff && value == 0) {
+        value = *(*cursor)++;
+        while (**cursor == 0xff && value == 0) {
+            *squarings += 0x100;
+            (*cursor)++;
+            value = *(*cursor)++;
         }
+        *squarings += *(*cursor)++ + 1;
     }
-    *cursor = p;
     *index = value;
-    *squarings = count;
 }
 
 // Raises to a power modulo an odd number in the Montgomery form, with a table of the odd powers of the base
 static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
                        BigNumPool *pool, Montgomery *mont) {
+    const u8 *cursor = NULL;
     BOOL ok = FALSE;
-    int saved = pool->used;
-    const u8 *cursor;
+    int saved;
+    int entries;
+    BigNum *reduced;
+    Montgomery *made;
     CryptProgress *progress = NULL;
     int counter = 0;
-    Montgomery *made = mont;
-    BigNum *reduced;
     u32 *table[16];
     int n;
     int window;
-    int entries;
     int perWord;
     int index;
     int squarings;
     int i;
-    u32 *acc;
-    u32 *product;
-    u32 *scratch;
-    u32 *modulusDigits;
-    u32 inverse;
-    int tableWords;
-    BigNum *tableNum;
     BigNum *scratchNum;
     BigNum *accNum;
+    BigNum *tableNum;
     BigNum *productNum;
-    int next;
+    int tableWords;
+    u32 *acc;
+    u32 inverse;
+    u32 *product;
+    u32 *modulusDigits;
+    u32 *scratch;
 
     if ((modulus->digits[0] & 1) == 0) {
         return FALSE;
     }
+    saved = pool->used;
     if (base->length == 0 || (base->length == 1 && base->digits[0] == 0)) {
         CryptSetWord(dest, 0);
         return TRUE;
@@ -2088,7 +2080,8 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
         CryptCopy(dest, base);
         return TRUE;
     }
-    if (mont == NULL) {
+    made = mont;
+    if (made == NULL) {
         made = NewMont();
         if (made == NULL) {
             goto done;
@@ -2108,10 +2101,9 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
     cursor += 4;
     n = made->modulus.length;
     if (base->length == n && base->digits[n - 1] < modulus->digits[n - 1]) {
-        reduced = (BigNum *)base;
+        reduced = base;
     } else if (base->length < n) {
-        reduced = &pool->numbers[pool->used];
-        pool->used++;
+        reduced = &pool->numbers[pool->used++];
         reduced->length = base->length;
         if (CryptResize(reduced, n) == NULL) {
             goto done;
@@ -2120,8 +2112,7 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
             reduced->digits[i] = base->digits[i];
         }
     } else {
-        reduced = &pool->numbers[pool->used];
-        pool->used++;
+        reduced = &pool->numbers[pool->used++];
         if (!BigMod(reduced, base, modulus, pool)) {
             goto done;
         }
@@ -2129,13 +2120,11 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
             goto done;
         }
     }
-    next = pool->used;
-    tableNum = &pool->numbers[next];
-    scratchNum = &pool->numbers[next + 1];
-    accNum = &pool->numbers[next + 2];
-    productNum = &pool->numbers[next + 3];
-    pool->used = next + 4;
     tableWords = entries * n + (exponent->length * perWord * 2 + 7) / 4;
+    tableNum = &pool->numbers[pool->used++];
+    scratchNum = &pool->numbers[pool->used++];
+    accNum = &pool->numbers[pool->used++];
+    productNum = &pool->numbers[pool->used++];
     if (Reserve(dest, n) == NULL) {
         goto done;
     }
@@ -2151,10 +2140,10 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
     if (Reserve(productNum, n * 2) == NULL) {
         goto done;
     }
-    table[0] = tableNum->digits;
     scratch = scratchNum->digits;
     acc = accNum->digits;
     product = productNum->digits;
+    table[0] = tableNum->digits;
     inverse = made->inverse;
     modulusDigits = made->modulus.digits;
     MulWords(product, reduced->digits, n, made->rSquared.digits, n);
@@ -2190,13 +2179,14 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
         if (index == 0 && squarings == 0) {
             break;
         }
-        if (squarings == 0 && index == 1) {
+        if (squarings != 0 || index != 1) {
+            MulWords(product, acc, n, table[index >> 1], n);
+            MontReduce(acc, product, modulusDigits, n, inverse);
+        } else {
             MulWords(product, acc, n, reduced->digits, n);
             MontReduce(dest->digits, product, modulusDigits, n, inverse);
             goto finish;
         }
-        MulWords(product, acc, n, table[index >> 1], n);
-        MontReduce(acc, product, modulusDigits, n, inverse);
     }
     for (i = n; i < n * 2; i++) {
         acc[i] = 0;

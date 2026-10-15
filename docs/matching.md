@@ -13,6 +13,11 @@ tools that show the differences.
   (`nhttp_stdlib.c`) matches only with its case folding as a macro (`TO_LOWER`) in the `while` condition, which also
   gives the original's rotated loop. And `return count == 0 ? -1 : value;` lowers `value`'s priority against
   `if (count == 0) value = -1; return value;` (`NHTTPi_strtonum`).
+- One counter and one temporary reused across a function's unrelated loops, as older C library code does, frees the
+  registers that separate variables would take: DWC's `ModExpPlain` (`crypt.c`) stops spilling its flag and bound
+  with one `k` for every loop and one `j` for both the table size and `last + 1`. An inline that writes its result
+  through an out-pointer rather than returning it into a local raises that variable's priority (`ReadWindow` in
+  `ModExpMont`), and an inline's own declaration order sets its registers (`MulHalves` in `BigDiv`).
 - A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
   taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
   (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
