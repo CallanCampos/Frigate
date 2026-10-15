@@ -49,7 +49,9 @@ still linked, and objdiff shows how close it is.
   `src/`; libraries built apart, with their own compiler, go in `lib/`. See
   [Code organization](docs/code-organization.md).
 - **Natural C only.** Write what a programmer at Game Freak could have written: no inline assembly, no
-  `volatile` or pointer tricks that only exist to move a register, no meaningless temporaries or permuter output.
+  `volatile` or casts to reach a field by byte offset, no meaningless temporaries or permuter output. A pointer sum
+  of the element's own type, `*(p + i + 1)`, is plain C that compiles differently from `p[i + 1]`: write it when it
+  gives the original's code.
   When a function doesn't match, keep the closest natural C and add a row to
   [Nonmatching functions](docs/nonmatching-functions.md) with both versions' addresses, the difference and what you
   tried. In `lib/` only, a function the SDK, or a library it bundles, wrote in assembly is written as an MWCC `asm`

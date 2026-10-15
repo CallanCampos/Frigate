@@ -27,8 +27,9 @@ a rule here changes, change it there too.
   over swan's; the header notes swan's name where it differs. The user chose this.
 - **Write C from the asm.** pret (pokeplatinum, pokeheartgold) and other decomps are references for names and
   structure, never code to copy. The user chose this explicitly for SPL.
-- **Natural C only.** No inline asm, permuter noise, unexplained `volatile`, pointer-arithmetic tricks or meaningless
-  temporaries. A function that doesn't match keeps the closest natural C and gets a row in
+- **Natural C only.** No inline asm, permuter noise, unexplained `volatile`, casts that reach a field by byte offset or
+  meaningless temporaries. A pointer sum of the element's own type (`*(p + i + 1)`, `(p + n - 1)->next`) is plain C,
+  which MWCC compiles differently from indexing: write it when it gives the original's address computation. A function that doesn't match keeps the closest natural C and gets a row in
   `docs/nonmatching-functions.md` (both addresses, the difference, and what was tried). The exceptions, in `lib/` only:
   a function that the SDK, or a library it bundles, wrote in assembly (an `asm` function in its C file, such as
   NitroSDK's `MTX_Identity43`, the CP15 cache functions or DWC's big-number helpers) is an MWCC `asm` function, said

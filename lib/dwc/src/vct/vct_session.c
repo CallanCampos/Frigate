@@ -245,7 +245,7 @@ BOOL VCT_InitSessions(VCTConfig *config) {
     for (i = 0; i < config->sessionCount - 1; i++) {
         sSessionPool.freeList[i].next = &sSessionPool.freeList[i + 1];
     }
-    sSessionPool.freeList[config->sessionCount - 1].next = NULL;
+    (sSessionPool.freeList + config->sessionCount - 1)->next = NULL;
     sSessionPool.usedList = NULL;
     sSessionState.mask = 0;
     sSessionState.count = 0;

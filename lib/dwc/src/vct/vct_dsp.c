@@ -67,7 +67,7 @@ BOOL VCT_InitPacketPool(void *buffer, u32 size) {
     for (i = 0; i < count - 1; i++) {
         sPacketPool.base[i].nextFree = &sPacketPool.base[i + 1];
     }
-    sPacketPool.base[count - 1].nextFree = NULL;
+    (sPacketPool.base + count - 1)->nextFree = NULL;
     sPacketPool.freeList = sPacketPool.base;
     return TRUE;
 }
@@ -198,7 +198,7 @@ void VCT_InitCapture(void) {
 // Filters a frame in place with a high-pass filter and returns the mean of the squares of the result
 u32 VCT_FilterFrame(s16 *samples, int bytes) {
     s16 input = samples[0];
-    unsigned long count = (u32)bytes >> 1;
+    u32 count = (u32)bytes >> 1;
     int minusInput = -(input * 0xe9f);
     u32 i;
     u64 sum;
@@ -218,7 +218,7 @@ u32 VCT_FilterFrame(s16 *samples, int bytes) {
     }
     sEcho.highpassMinusInput = minusInput;
     sEcho.highpassOutput = output;
-    samples[count - 1] = output;
+    *(samples + count - 1) = output;
     REG_DIVCNT = 1;
     REG_DIV_NUMER_LO = (u32)sum;
     REG_DIV_NUMER_HI = (u32)(sum >> 32);
