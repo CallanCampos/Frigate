@@ -2056,6 +2056,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`CryptOne`, a 20-byte `BigNum`) and its digit (`CryptOneDigit`) that only dead-stripped code used; as globals they
   sort into the shared `.rodata` by size, the digit first, which moved the file's start back 4 bytes from the
   previous file's range.
+- An object of 64 bytes or more gets a section of its own only under `-ipa file`; without it every size stays in the
+  shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
+  boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
+  apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With
