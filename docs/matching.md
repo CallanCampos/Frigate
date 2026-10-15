@@ -302,6 +302,13 @@ Same instructions, registers swapped.
   then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
   NitroSDK declares it, not `GXLightMask light`; casts or enum locals at the call don't help. Check the SDK's
   prototype of an inline before the call site.
+- In NitroSystem's 2.0/sp2p2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
+  written in place it loads `a` first (`g2d_Animation.c`'s `SequenceEdgeHandle_` clamps through
+  `GetLastFrame_(seq)`). Spilled locals take slots from the top of the frame down: the function's locals, then an
+  `if` block's, then its `else` block's, each in declaration order, then an inline's in reverse, so a slot order no
+  block layout gives needs the locals at function scope (`NNS_G2dInitMCAnimationInstance`). A second loop that
+  reuses the first loop's counter swaps registers with its block's temporary, where a counter of its own declared
+  after the others doesn't (`gfd_LinkedListTexVramMan.c`'s `NNS_GfdResetLnkTexVramState`).
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
