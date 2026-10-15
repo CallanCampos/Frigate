@@ -293,6 +293,7 @@ src/gfl/clact.c:
     .bss        start:0x0214193c end:0x02141940
 
 src/gfl/billboard.c:
+    complete
     .text       start:0x0204e390 end:0x0204f0f8
     .rodata     start:0x02093f80 end:0x0209401c
     .data       start:0x0209b00c end:0x0209b018

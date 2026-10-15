@@ -136,7 +136,7 @@ void func_0204e7f8(BlActScene *scene, u32 material, NNSGfdTexKey *texKey);
 void func_0204e808(BlActScene *scene, u32 material, NNSGfdTexKey texKey);
 void func_0204e820(BlActScene *scene, u32 material, NNSGfdPlttKey *plttKey);
 // Where a face is in its material's texture, and how big it is
-void func_0204e830(BlActScene *scene, u32 material, u32 face, u32 *offset, u32 *faceSize, u8 byRow);
+void func_0204e830(BlActScene *scene, u32 material, int face, u32 *offset, u32 *faceSize, u8 byRow);
 
 u32 BlActScene_AddNewActor(BlActScene *scene, u32 material, s16 scaleX, s16 scaleY, const VecFx32 *pos, u8 alpha,
                            u32 lights, u32 type);

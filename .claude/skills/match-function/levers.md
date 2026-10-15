@@ -160,6 +160,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- An inlined SDK call whose packed value is built in another order: check the inline's parameter types against the
+  SDK (an `int` where ours has an enum). (matching.md: "An inline's enum-typed parameter")
 - A stack argument stored after the next argument's setup starts, where the original stores it first, around a
   spilled local: sweep the local's width together with its callee's return type and `value` local.
   (matching.md: "A spilled local's width for the rule below")
@@ -393,6 +395,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Loops
 
+- A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2p2): put it last
+  in the `for` increment's comma list. (matching.md: "a `for` loop's comma-separated increment")
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
 - At `-O2,p` (`lib/irc`) loops are not rotated; a guard before the first pass and the test at the end is a guarded
