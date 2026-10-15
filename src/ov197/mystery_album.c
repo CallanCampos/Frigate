@@ -549,11 +549,25 @@ static void MysteryCardView_ClearPage(MysteryCardView *view, BOOL shown) {
     GFL_BGSysLoadScr(3);
 }
 
+// Loads a card's icon (its palette, unless it's a Pokémon's, its cells and its characters) for a window's slot
+static inline void MysteryCardView_LoadIcon(MysteryCardView *view, MysteryCard *card, u32 win, HeapID heapId) {
+    ArcTool *arc = MysteryCard_OpenIconArc(card, heapId);
+
+    if (MysteryCard_GetKind(card) != 1) {
+        view->iconPalettes[win] =
+            func_0204bbb8(arc, MysteryCard_GetIconPaletteFile(card), 0, (win + 4) * 32, 0, 1, heapId);
+    }
+    view->iconCellAnims[win] =
+        func_0204bde0(arc, MysteryCard_GetIconCellFile(card), MysteryCard_GetIconAnimFile(card), heapId);
+    view->iconChars[win] = func_0204b81c(arc, MysteryCard_GetIconCharFile(card), FALSE, 0, heapId);
+    GFL_ArcToolFree(arc);
+}
+
 static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL left, u32 page, u16 index, HeapID heapId) {
-    ArcTool *arc;
     MysteryCard *card = &view->cards[index + page * 4];
     MysteryCardPos pos = sCardPositions[index];
     u32 win = index;
+    GFLBitmap *date;
     ClActorSetup actorSetup;
     s16 dx;
     s16 dy;
@@ -602,18 +616,11 @@ static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL lef
         }
     }
     GFL_BGSysSetScrPaletteNo(3, pos.x, pos.y, 12, 7, MysteryCard_GetFramePalette(card));
-    GFL_BitmapCopy(MysteryCard_GetDateBitmap(card), BmpWin_GetBitmap(view->windows[win]));
+    date = MysteryCard_GetDateBitmap(card);
+    GFL_BitmapCopy(date, BmpWin_GetBitmap(view->windows[win]));
     BmpWin_FlushChar(view->windows[win]);
-    arc = MysteryCard_OpenIconArc(card, heapId);
-    if (MysteryCard_GetKind(card) != 1) {
-        view->iconPalettes[win] =
-            func_0204bbb8(arc, MysteryCard_GetIconPaletteFile(card), 0, (win + 4) * 32, 0, 1, heapId);
-    }
-    view->iconCellAnims[win] =
-        func_0204bde0(arc, MysteryCard_GetIconCellFile(card), MysteryCard_GetIconAnimFile(card), heapId);
+    MysteryCardView_LoadIcon(view, card, win, heapId);
     dx = 0;
-    view->iconChars[win] = func_0204b81c(arc, MysteryCard_GetIconCharFile(card), FALSE, 0, heapId);
-    GFL_ArcToolFree(arc);
     dy = 0;
     sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.y = pos.iconY;
