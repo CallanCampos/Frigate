@@ -31,6 +31,7 @@ lib/dpw/src/dpw_tr.c:
     .bss        start:0x021b2aa8 end:0x021b2c7c
 
 lib/dpw/src/dpw_battle_tower.c:
+    complete
     .text       start:0x021a8050 end:0x021a897c
     .data       start:0x021ae468 end:0x021ae53c
     .bss        start:0x021b2c7c end:0x021b2fa8

@@ -9,7 +9,8 @@
 // answer, and the answer of the server (a code, and for some calls the Pokémon) ends the call with a result: 0 or more
 // when it went well, and a negative number for the ways it failed. A call that could not start ends in state 0x18 with
 // the result -13, and the other states after an answer or a failure of the game statistics client are 0x18 too, until
-// the game asks for the end (DpwTr_IsFinished)
+// the game asks for the end (DpwTr_IsFinished). The few bytes copied into the request and from the head of the answer go
+// through the compiler's built-in memcpy (__memcpy), which copies a constant size in place; the larger copies call memcpy
 
 // The state of the library: where the call is, what it ended with, the player's ID and friend key, and the request
 // that is sent: the Pokémon, the signature that goes with it and the size of the signature. The answer of the server
@@ -73,8 +74,7 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            sDpwTrWork.code[0] = answer[0];
-            sDpwTrWork.code[1] = answer[1];
+            __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
                 sDpwTrWork.result = 0;
@@ -88,6 +88,12 @@ void DpwTr_Process(void) {
             case 7:
                 sDpwTrWork.result = -1;
                 break;
+            case 12:
+                sDpwTrWork.result = -6;
+                break;
+            case 13:
+                sDpwTrWork.result = -7;
+                break;
             case 8:
                 sDpwTrWork.result = -8;
                 break;
@@ -99,12 +105,6 @@ void DpwTr_Process(void) {
                 break;
             case 11:
                 sDpwTrWork.result = -11;
-                break;
-            case 12:
-                sDpwTrWork.result = -6;
-                break;
-            case 13:
-                sDpwTrWork.result = -7;
                 break;
             case 14:
                 sDpwTrWork.result = -2;
@@ -128,8 +128,7 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            sDpwTrWork.code[0] = answer[0];
-            sDpwTrWork.code[1] = answer[1];
+            __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
                 sDpwTrWork.result = 0;
@@ -236,8 +235,7 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            sDpwTrWork.code[0] = answer[0];
-            sDpwTrWork.code[1] = answer[1];
+            __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
                 sDpwTrWork.result = 0;
@@ -270,8 +268,7 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            sDpwTrWork.code[0] = answer[0];
-            sDpwTrWork.code[1] = answer[1];
+            __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
                 sDpwTrWork.result = 0;
@@ -307,8 +304,7 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            ((u8 *)sDpwTrWork.resultData)[0] = answer[0];
-            ((u8 *)sDpwTrWork.resultData)[1] = answer[1];
+            __memcpy(sDpwTrWork.resultData, answer, 2);
             switch (*(u8 *)sDpwTrWork.resultData) {
             case 1:
                 if ((u32)(size - 2) >= 0x128) {
@@ -389,14 +385,17 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            sDpwTrWork.code[0] = answer[0];
-            sDpwTrWork.code[1] = answer[1];
-            if (sDpwTrWork.code[0] == 1) {
+            __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
+            switch (sDpwTrWork.code[0]) {
+            case 1:
                 sDpwTrWork.result = 0;
-            } else if (sDpwTrWork.code[0] == 2) {
+                break;
+            case 2:
                 sDpwTrWork.result = -5;
-            } else if (sDpwTrWork.code[0] == 14) {
+                break;
+            case 14:
                 sDpwTrWork.result = -2;
+                break;
             }
             Gamestats_Close();
             break;
@@ -413,8 +412,7 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            sDpwTrWork.code[0] = answer[0];
-            sDpwTrWork.code[1] = answer[1];
+            __memcpy(sDpwTrWork.code, answer, sizeof(sDpwTrWork.code));
             switch (sDpwTrWork.code[0]) {
             case 1:
                 sDpwTrWork.result = 0;
@@ -447,8 +445,7 @@ void DpwTr_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwTrWork.state = 0x18;
             answer = Gamestats_GetBody(&size);
-            ((u8 *)sDpwTrWork.resultData)[0] = answer[0];
-            ((u8 *)sDpwTrWork.resultData)[1] = answer[1];
+            __memcpy(sDpwTrWork.resultData, answer, 2);
             if (size == 8) {
                 sDpwTrWork.result = 0;
             } else {
@@ -532,7 +529,7 @@ void DpwTr_Upload(Dpw_Tr_Data *data, const void *sign, u32 size) {
 }
 
 void DpwTr_UploadFinish(void) {
-    *(DpwFriendKey *)sDpwTrWork.request = sDpwTrWork.friendKey;
+    __memcpy(sDpwTrWork.request, &sDpwTrWork.friendKey, sizeof(sDpwTrWork.friendKey));
     Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
     if (Gamestats_Send("/web/worldexchange/post_finish.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) == 0) {
         sDpwTrWork.state = 4;
@@ -641,7 +638,7 @@ void DpwTr_Cancel(void) {
 
 void DpwTr_Search(const Dpw_Tr_PokemonSearchData *search, s32 maxNum, Dpw_Tr_Data *result) {
     sDpwTrWork.resultData = result;
-    *(Dpw_Tr_PokemonSearchData *)sDpwTrWork.request = *search;
+    __memcpy(sDpwTrWork.request, search, sizeof(*search));
     sDpwTrWork.request[6] = maxNum;
     Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
     if (Gamestats_Send("/web/worldexchange/search.asp", sDpwTrWork.pid, sDpwTrWork.request, 7, NULL) == 0) {
@@ -655,7 +652,7 @@ void DpwTr_Search(const Dpw_Tr_PokemonSearchData *search, s32 maxNum, Dpw_Tr_Dat
 
 void DpwTr_SearchEx(const Dpw_Tr_PokemonSearchDataEx *search, Dpw_Tr_Data *result) {
     sDpwTrWork.resultData = result;
-    *(Dpw_Tr_PokemonSearchDataEx *)sDpwTrWork.request = *search;
+    __memcpy(sDpwTrWork.request, search, sizeof(*search));
     Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
     if (Gamestats_Send("/web/worldexchange/search.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) == 0) {
         sDpwTrWork.state = 14;
@@ -683,7 +680,7 @@ void DpwTr_Exchange(s32 id, Dpw_Tr_Data *upload, Dpw_Tr_Data *result, const void
 }
 
 void DpwTr_ExchangeFinish(void) {
-    *(DpwFriendKey *)sDpwTrWork.request = sDpwTrWork.friendKey;
+    __memcpy(sDpwTrWork.request, &sDpwTrWork.friendKey, sizeof(sDpwTrWork.friendKey));
     Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
     if (Gamestats_Send("/web/worldexchange/exchange_finish.asp", sDpwTrWork.pid, sDpwTrWork.request, 8, NULL) == 0) {
         sDpwTrWork.state = 18;
