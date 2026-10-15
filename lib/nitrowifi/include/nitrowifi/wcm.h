@@ -59,8 +59,8 @@ s32 WCM_StopSearchAsync(void);
 // option is applied through WCM_SetSearchOption before the connection backend starts.
 s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option);
 s32 WCM_DisconnectAsync(void);
-// Starts a local wireless (DS-to-DS) parent connection, parallel to WCM_ConnectAsync's infrastructure one
-s32 WCM_StartParentAsync(void);
+// Descriptive name: restores idle operation through the selected backend, resetting an active connection if needed.
+s32 WCM_RestoreIdleAsync(void);
 s32 WCM_GetState(void);
 // Sets the search's channel option bits, returning the previous value
 s32 WCM_SetSearchOption(u32 option);
