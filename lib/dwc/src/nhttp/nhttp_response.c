@@ -51,13 +51,13 @@ int NHTTPi_getHeaderValue(NHttpResponse *response, const char *name, int *valueS
                 int start;
 
                 next = NHTTPi_findNextLineHdrRecvBuf(response, colon + 1, response->headerSize, NULL, &lineEnd);
-                if (next > 0) {
+                if (next <= 0) {
+                    valueEnd = response->headerSize;
+                } else {
                     if (next < lineEnd) {
                         return -1;
                     }
                     valueEnd = next - lineEnd;
-                } else {
-                    valueEnd = response->headerSize;
                 }
                 start = NHTTPi_skipSpaceHdrRecvBuf(response, colon + 1, valueEnd);
                 if (start < 0) {

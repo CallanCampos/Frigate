@@ -8,9 +8,6 @@ static inline int ghiIsSpace(int c) {
     return (c < 0 || c >= 0x80) ? 0 : (__ctype_map[c] & 0x100);
 }
 
-// The same, for a character from a text
-#define GHI_IS_SPACE(c) ((u32)(c) < 0x80 ? (__ctype_map[c] & 0x100) : 0)
-
 // Reads the URL of a connection: whether it is secure, the address, the port and the path (with spaces made +).
 // Returns FALSE if it isn't a URL
 BOOL ghiParseURL(GHIConnection *connection) {
@@ -178,8 +175,6 @@ void ghiDoConnecting(GHIConnection *connection) {
 
     func_ov011_0216cca8(8, 3, 0x10, "Connecting\n");
     if (connection->socket == -1) {
-        u16 port;
-
         connection->socket = func_ov011_0216de20(2, 1, 0);
         if (connection->socket == -1) {
             connection->completed = TRUE;
@@ -210,13 +205,12 @@ void ghiDoConnecting(GHIConnection *connection) {
 
             address.family = 2;
             if (connection->proxyAddress != NULL) {
-                port = connection->proxyPort;
+                address.port = GHI_SWAP16(connection->proxyPort);
             } else if (ghiProxyAddress != NULL) {
-                port = ghiProxyPort;
+                address.port = GHI_SWAP16(ghiProxyPort);
             } else {
-                port = connection->serverPort;
+                address.port = GHI_SWAP16(connection->serverPort);
             }
-            address.port = GHI_SWAP16(port);
             address.addr = connection->serverIp;
             result = func_ov011_0216dec4(connection->socket, &address, 8);
         }
@@ -693,17 +687,22 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
     char *contentLength;
     char *data;
     char *headersEnd;
+    char *headers;
     BOOL skipCR = TRUE;
 
     buffer = func_ov011_0216dddc(0x1000);
-    size = 0x1000;
     if (buffer == NULL) {
         connection->completed = TRUE;
         connection->result = 1;
         return;
     }
+    size = 0x1000;
     result = ghiDoReceive(connection, buffer, &size);
-    if (result == 3 || result == 1) {
+    if (result == 3) {
+        ghiFreeIfSet(buffer);
+        return;
+    }
+    if (result == 1) {
         ghiFreeIfSet(buffer);
         return;
     }
@@ -729,143 +728,140 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
 
     data = connection->recvBuffer.data;
     headersPos = connection->headersPos;
-    if (connection->statusCode / 100 == 1 &&
-        (strncmp(data + headersPos, "\r\n", 2) == 0 || strncmp(data + headersPos, "\n\n", 2) == 0)) {
+    headers = data + headersPos;
+    if (connection->statusCode / 100 == 1 && (strncmp(headers, "\r\n", 2) == 0 || strncmp(headers, "\n\n", 2) == 0)) {
         skipCR = FALSE;
-        headersEnd = data + headersPos;
+        headersEnd = headers;
     } else {
-        headersEnd = strstr(data + headersPos, "\r\n\r\n");
+        headersEnd = strstr(headers, "\r\n\r\n");
     }
     if (headersEnd == NULL) {
-        headersEnd = strstr(data + headersPos, "\n\n");
+        headersEnd = strstr(headers, "\n\n");
     }
-    if (headersEnd == NULL) {
-        if (result == 2) {
-            connection->completed = TRUE;
-            connection->result = 7;
-            connection->socketError = func_ov011_0216dfa8(connection->socket);
+    if (headersEnd != NULL) {
+        if (skipCR == TRUE) {
+            headersEnd += 2;
         }
-        ghiFreeIfSet(buffer);
-        return;
-    }
+        headersEnd[0] = '\0';
+        body = headersEnd + 2;
+        bodyLength = connection->recvBuffer.length - (body - connection->recvBuffer.data);
+        connection->recvBuffer.length = headersEnd - connection->recvBuffer.data + 1;
+        connection->recvBuffer.pos = connection->recvBuffer.length;
 
-    if (skipCR == TRUE) {
-        headersEnd += 2;
-    }
-    headersEnd[0] = '\0';
-    body = headersEnd + 2;
-    bodyLength = connection->recvBuffer.length - (body - connection->recvBuffer.data);
-    connection->recvBuffer.length = headersEnd - connection->recvBuffer.data + 1;
-    connection->recvBuffer.pos = connection->recvBuffer.length;
-
-    if (connection->statusCode / 100 == 1) {
-        if (bodyLength != 0) {
-            memmove(connection->recvBuffer.data, body, bodyLength + 1);
-            connection->recvBuffer.length = bodyLength;
-        } else {
-            ghiResetBuffer(&connection->recvBuffer);
-        }
-        if (connection->postingState.isXml != 0) {
-            connection->postingState.isXml = FALSE;
-            connection->state = 6;
-            ghiCallProgressCallback(connection, NULL, 0);
-        }
-        connection->state = 8;
-        ghiCallProgressCallback(connection, NULL, 0);
-        ghiFreeIfSet(buffer);
-        return;
-    }
-
-    if (connection->statusCode / 100 == 3) {
-        char *location;
-
-        if (connection->redirectCount > 10) {
-            connection->completed = TRUE;
-            connection->result = 11;
-            ghiFreeIfSet(buffer);
-            return;
-        }
-        location = strstr(data + headersPos, "Location:");
-        if (location != NULL) {
-            char *end;
-
-            location += 9;
-            while (GHI_IS_SPACE(location[0])) {
-                location++;
-            }
-            end = location;
-            while (end[0] != '\0' && !GHI_IS_SPACE(end[0])) {
-                end++;
-            }
-            end[0] = '\0';
-            if (location[0] == '/') {
-                connection->redirectUrl =
-                    func_ov011_0216dddc(strlen(connection->serverAddress) + strlen(location) + 14);
-                if (connection->redirectUrl == NULL) {
-                    connection->completed = TRUE;
-                    connection->result = 1;
-                }
-                func_0207a290(connection->redirectUrl, "http://%s:%d%s", connection->serverAddress,
-                              connection->serverPort, location);
+        if (connection->statusCode / 100 == 1) {
+            if (bodyLength != 0) {
+                memmove(connection->recvBuffer.data, body, bodyLength + 1);
+                connection->recvBuffer.length = bodyLength;
             } else {
-                connection->redirectUrl = func_ov011_0216e2c8(location);
-                if (connection->redirectUrl == NULL) {
-                    connection->completed = TRUE;
-                    connection->result = 1;
-                }
+                ghiResetBuffer(&connection->recvBuffer);
             }
+            if (connection->postingState.isXml != 0) {
+                connection->postingState.isXml = FALSE;
+                connection->state = 6;
+                ghiCallProgressCallback(connection, NULL, 0);
+            }
+            connection->state = 8;
+            ghiCallProgressCallback(connection, NULL, 0);
             ghiFreeIfSet(buffer);
             return;
         }
-    }
 
-    contentLength = strstr(data + headersPos, "Content-Length:");
-    if (contentLength != NULL) {
-        char maxValue[11] = "2147483647";
-        char *digits = contentLength + 16;
-        char *digitsEnd = digits;
-        int digitsLength;
+        if (connection->statusCode / 100 == 3) {
+            char *location;
 
-        for (; digitsEnd != NULL && digitsEnd[0] != '\0' && digitsEnd[0] != '\n' && digitsEnd[0] != '\r' &&
-               digitsEnd[0] != ' ';
-             digitsEnd++) {
+            if (connection->redirectCount > 10) {
+                connection->completed = TRUE;
+                connection->result = 11;
+                ghiFreeIfSet(buffer);
+                return;
+            }
+            location = strstr(headers, "Location:");
+            if (location != NULL) {
+                char *end;
+
+                location += 9;
+                while (ghiIsSpace(location[0])) {
+                    location++;
+                }
+                end = location;
+                while (end[0] != '\0' && !ghiIsSpace(end[0])) {
+                    end++;
+                }
+                end[0] = '\0';
+                if (location[0] == '/') {
+                    connection->redirectUrl =
+                        func_ov011_0216dddc(strlen(connection->serverAddress) + 14 + strlen(location));
+                    if (connection->redirectUrl == NULL) {
+                        connection->completed = TRUE;
+                        connection->result = 1;
+                    }
+                    func_0207a290(connection->redirectUrl, "http://%s:%d%s", connection->serverAddress,
+                                  connection->serverPort, location);
+                } else {
+                    connection->redirectUrl = func_ov011_0216e2c8(location);
+                    if (connection->redirectUrl == NULL) {
+                        connection->completed = TRUE;
+                        connection->result = 1;
+                    }
+                }
+                ghiFreeIfSet(buffer);
+                return;
+            }
         }
-        digitsLength = digitsEnd - digits;
-        if (digitsLength > strlen(maxValue)) {
+
+        contentLength = strstr(headers, "Content-Length:");
+        if (contentLength != NULL) {
+            char maxValue[11] = "2147483647";
+            char *digits = contentLength + 16;
+            char *digitsEnd = digits;
+            int maxLength = strlen(maxValue);
+            int digitsLength;
+
+            for (; digitsEnd != NULL && digitsEnd[0] != '\0' && digitsEnd[0] != '\n' && digitsEnd[0] != '\r' &&
+                   digitsEnd[0] != ' ';
+                 digitsEnd++) {
+            }
+            digitsLength = digitsEnd - digits;
+            if (digitsLength > maxLength) {
+                connection->completed = TRUE;
+                connection->result = 16;
+                ghiFreeIfSet(buffer);
+                return;
+            }
+            if (maxLength == digitsLength && strncmp(digits, maxValue, digitsLength) >= 0) {
+                connection->completed = TRUE;
+                connection->result = 16;
+                ghiFreeIfSet(buffer);
+                return;
+            }
+            connection->totalSize = atol(digits);
+        }
+
+        connection->chunked = strstr(headers, "Transfer-Encoding: chunked") != NULL ? TRUE : FALSE;
+        if (connection->chunked) {
+            connection->chunkHeader[0] = '\0';
+            connection->chunkHeaderLength = 0;
+            connection->chunkRemaining = 0;
+            connection->chunkState = 0;
+        }
+        if (connection->type == 3 || connection->type == 4) {
             connection->completed = TRUE;
-            connection->result = 16;
             ghiFreeIfSet(buffer);
             return;
         }
-        if (strlen(maxValue) == digitsLength && strncmp(digits, maxValue, digitsLength) >= 0) {
+        connection->state = 10;
+        if (contentLength != NULL && connection->totalSize == 0) {
             connection->completed = TRUE;
-            connection->result = 16;
             ghiFreeIfSet(buffer);
             return;
         }
-        connection->totalSize = atol(digits);
-    }
-
-    connection->chunked = strstr(data + headersPos, "Transfer-Encoding: chunked") != NULL ? TRUE : FALSE;
-    if (connection->chunked) {
-        connection->chunkHeader[0] = '\0';
-        connection->chunkHeaderLength = 0;
-        connection->chunkRemaining = 0;
-        connection->chunkState = 0;
-    }
-    if (connection->type == 3 || connection->type == 4) {
+        if (bodyLength > 0) {
+            ghiProcessIncomingFileData(connection, body, bodyLength);
+        }
+    } else if (result == 2) {
         connection->completed = TRUE;
-        ghiFreeIfSet(buffer);
-        return;
-    }
-    connection->state = 10;
-    if (contentLength != NULL && connection->totalSize == 0) {
-        connection->completed = TRUE;
-        ghiFreeIfSet(buffer);
-        return;
-    }
-    if (bodyLength > 0) {
-        ghiProcessIncomingFileData(connection, body, bodyLength);
+        connection->result = 7;
+        connection->socketError = func_ov011_0216dfa8(connection->socket);
     }
     ghiFreeIfSet(buffer);
 }

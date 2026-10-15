@@ -17,6 +17,11 @@ tools that show the differences.
   (`nhttp_stdlib.c`) matches only with its case folding as a macro (`TO_LOWER`) in the `while` condition, which also
   gives the original's rotated loop. And `return count == 0 ? -1 : value;` lowers `value`'s priority against
   `if (count == 0) value = -1; return value;` (`NHTTPi_strtonum`).
+- One counter and one temporary reused across a function's unrelated loops, as older C library code does, frees the
+  registers that separate variables would take: DWC's `ModExpPlain` (`crypt.c`) stops spilling its flag and bound
+  with one `k` for every loop and one `j` for both the table size and `last + 1`. An inline that writes its result
+  through an out-pointer rather than returning it into a local raises that variable's priority (`ReadWindow` in
+  `ModExpMont`), and an inline's own declaration order sets its registers (`MulHalves` in `BigDiv`).
 - A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
   taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
   (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
@@ -754,6 +759,10 @@ Same code, other `sp` offsets or frame size.
   statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
   (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
   `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it.
+- Stores through a walking pointer written `*p-- = a; *p-- = b;` compile at the same size as `p[0] = a; p[-1] = b;
+  p -= 2;` but allocate and schedule differently: DWC's `EncodeWindows` (`crypt.c`) only gets the original's
+  registers (a hoisted constant in fp) and order in the post-decrement form. A chained `current = low = *next++;`
+  likewise puts the load ahead of the next comparison, where a separate `current = low;` later does not.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
   `readSize = romfs_fread(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
@@ -1054,7 +1063,9 @@ Same instructions, scheduled in another order.
 - A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
   `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
   task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
-  with it `MBTask_ThreadMain` and `MBTask_Add` match.
+  with it `MBTask_ThreadMain` and `MBTask_Add` match. The same goes for DWC's HTTP client (`nhttp_internal.h`): the response's `headerSize`, which the receiving thread
+  stores and reloads at once, and the request list's `count`, whose `id = info->count++` loads the field twice, once
+  for the result and once for the increment, as only a `volatile` lvalue does.
 - A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
   `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
   is the parent's and child's shared part, which the parent's code casts to its extension (`MB_PARENT_WORK`), and
@@ -1874,6 +1885,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Switches
 
+- A `switch` of two cases tests them in value order but lays their bodies out in source order, which no order of
+  `if`s gives: GameSpy's `ghiSendBufferedData` (`ghttpBuffer.c`, overlay 189) matches only as `case -1: return FALSE;`
+  written before `case -2: return TRUE;`. A final `if (!f()) return 0; return 1;` always puts the `return 1`
+  first under dsi/1.1p1, whatever the spelling (ternary, `!= 0`, an enum, a result variable, `goto`); only
+  `switch (f()) { case 0: return FALSE; default: return TRUE; }` gives the original's `bne` past the `return 0`
+  (`ghiPostXmlStateDoPosting`, `ghttpPost.c`).
 - A `switch` with no `default:` whose cases leave one value unassigned keeps the index in `r3` instead of `r2`, as
   `b_plist_main.c`'s `BPlistMain_InitPageCursor` does, and writing `case 0:` last moves its block to the end of the
   switch (`BPlistMain_CanSwitch`).
@@ -2038,6 +2055,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Data and sections
 
+- Data that the ROM sorts among the others but that only another object's initializer points to is a global: as a
+  `static const`, MWCC lays it out after the whole size-sorted list. DWC's `crypt.c` keeps a constant big number 1
+  (`CryptOne`, a 20-byte `BigNum`) and its digit (`CryptOneDigit`) that only dead-stripped code used; as globals they
+  sort into the shared `.rodata` by size, the digit first, which moved the file's start back 4 bytes from the
+  previous file's range.
+- An object of 64 bytes or more gets a section of its own only under `-ipa file`; without it every size stays in the
+  shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
+  boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
+  apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With
@@ -2064,7 +2090,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC 2.0 lays a file's `.bss` statics out in the reverse of their definition order, without the size sort: the
   DWC utility's `dwc_wcm.c` (overlay 182) matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and
   `sEssid[0x20]` defined in that order, but the module check failed until they were defined as `sEssid`, `sBssid`,
-  `sWcm`, the ROM's order backwards.
+  `sWcm`, the ROM's order backwards. The symptom is literal pool addresses off by another static's size:
+  DPW's `dpw_tr.c` (overlay 189) differed in 61 bytes, each `sDpwTrWork` address 4 bytes off, until `sDpwTrWork`
+  was defined before the 4-byte `sDpwTrServerType`.
 - MWCC 2.0 (`2.0/sp2p2`) gives each initialized global of a file its own section and orders them by size, smallest
   first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a
   count and eight function pointers, 4 bytes each, before an 80-byte table: it declares the pointers in the reverse of

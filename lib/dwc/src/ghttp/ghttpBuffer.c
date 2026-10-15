@@ -129,7 +129,6 @@ BOOL ghiAppendDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
 BOOL ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
     int offset = 0;
     int available = 0;
-    GHIConnection *connection;
 
     if (buffer == NULL) {
         return FALSE;
@@ -143,8 +142,7 @@ BOOL ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
     if (buffer->readOnly) {
         return FALSE;
     }
-    connection = buffer->connection;
-    if (connection->encryptor.engine == 0 || !connection->encryptor.active) {
+    if (buffer->connection->encryptor.engine == 0 || !buffer->connection->encryptor.active) {
         return ghiAppendDataToBuffer(buffer, data, size);
     }
     if (size == 0) {
@@ -159,12 +157,13 @@ BOOL ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
         // BUG: the piece is size bytes, not chunk, so the data is encrypted again from the second piece on; the offset
         // advances by a chunk
 #ifdef BUGFIX
-        int result = connection->encryptor.encrypt(connection, &connection->encryptor, data + offset,
-                                                   size - offset < chunk ? size - offset : chunk,
-                                                   buffer->data + buffer->length, &available);
+        int result = buffer->connection->encryptor.encrypt(buffer->connection, &buffer->connection->encryptor,
+                                                           data + offset, size - offset < chunk ? size - offset : chunk,
+                                                           buffer->data + buffer->length, &available);
 #else
-        int result = connection->encryptor.encrypt(connection, &connection->encryptor, data + offset, size,
-                                                   buffer->data + buffer->length, &available);
+        int result =
+            buffer->connection->encryptor.encrypt(buffer->connection, &buffer->connection->encryptor, data + offset,
+                                                  size, buffer->data + buffer->length, &available);
 #endif
 
         if (result == 2) {
@@ -269,11 +268,11 @@ BOOL ghiSendBufferedData(GHIConnection *connection) {
         }
         sent = ghiDoSend(connection, connection->sendBuffer.data + connection->sendBuffer.pos,
                          connection->sendBuffer.length - connection->sendBuffer.pos);
-        if (sent == -2) {
-            return TRUE;
-        }
-        if (sent == -1) {
+        switch (sent) {
+        case -1:
             return FALSE;
+        case -2:
+            return TRUE;
         }
         connection->sendBuffer.pos += sent;
     } while (connection->sendBuffer.pos < connection->sendBuffer.length);

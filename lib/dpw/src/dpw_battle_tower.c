@@ -6,7 +6,8 @@
 
 // The Battle Subway's client, see dpw_bt.h. It works like dpw_tr.c: the states are even while a request is out and the
 // answer of the server decides the result, which is 0 or more when it went well and negative otherwise. The states
-// end at 0xc, which is also where a request that failed stops
+// end at 0xc, which is also where a request that failed stops. As there, the copies of a few bytes go through the
+// compiler's built-in memcpy (__memcpy), which copies a constant size in place
 
 // The team that is uploaded, with what the server needs to know about it. It is built here and then copied to the
 // request, the same bytes as the request holds
@@ -78,12 +79,11 @@ void DpwBt_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
             answer = Gamestats_GetBody(&size);
-            sDpwBtWork.code[0] = answer[0];
-            sDpwBtWork.code[1] = answer[1];
-            if (size == 0) {
-                sDpwBtWork.result = -2;
-            } else {
+            __memcpy(sDpwBtWork.code, answer, sizeof(sDpwBtWork.code));
+            if (size != 0) {
                 sDpwBtWork.result = sDpwBtWork.code[0];
+            } else {
+                sDpwBtWork.result = -2;
             }
             Gamestats_Close();
             break;
@@ -131,8 +131,7 @@ void DpwBt_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
             answer = Gamestats_GetBody(&size);
-            sDpwBtWork.code[0] = answer[0];
-            sDpwBtWork.code[1] = answer[1];
+            __memcpy(sDpwBtWork.code, answer, sizeof(sDpwBtWork.code));
             switch (sDpwBtWork.code[0]) {
             case 1:
                 sDpwBtWork.result = 0;
@@ -165,8 +164,7 @@ void DpwBt_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
             answer = Gamestats_GetBody(&size);
-            sDpwBtWork.code[0] = answer[0];
-            sDpwBtWork.code[1] = answer[1];
+            __memcpy(sDpwBtWork.code, answer, sizeof(sDpwBtWork.code));
             switch (sDpwBtWork.code[0]) {
             case 1:
                 sDpwBtWork.result = 0;
@@ -199,7 +197,7 @@ void DpwBt_Process(void) {
         case GAMESTATS_STATE_DONE:
             sDpwBtWork.state = 0xc;
             answer = Gamestats_GetBody(&size);
-            *(DpwFriendKey *)sDpwBtWork.resultData = *(const DpwFriendKey *)answer;
+            __memcpy(sDpwBtWork.resultData, answer, 8);
             if (size == 8) {
                 sDpwBtWork.result = 0;
             } else {
@@ -292,7 +290,7 @@ void DpwBt_Upload(int kind, int room, u8 win, const void *team, const void *sign
     sDpwBtUpload.kind = kind - 1;
     sDpwBtUpload.room = room - 1;
     sDpwBtUpload.win = win;
-    sDpwBtUpload.key = sDpwBtWork.friendKey;
+    __memcpy(&sDpwBtUpload.key, &sDpwBtWork.friendKey, sizeof(sDpwBtUpload.key));
     memcpy(sDpwBtUpload.sign, sign, 0x80);
     sDpwBtUpload.id = id;
     *(DpwBtUpload *)sDpwBtWork.request = sDpwBtUpload;
