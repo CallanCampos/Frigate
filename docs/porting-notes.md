@@ -66,6 +66,36 @@ through active operation and successful cleanup. Resolver results and `SOC_InetN
 storage overwritten by later calls. These storage lifetimes must survive a host implementation independently of
 the caller-buffer copies above.
 
+## Socket lifecycle and control
+
+`SOCL_CreateSocket` reads its parameter structure synchronously during allocation/initialization without retaining
+its pointer. Buffer/stack sizes count bytes and queue sizes count messages. The allocated socket owns its buffer,
+pipe and stack regions. Creation ignores the final command result, so a returned allocation handle alone does
+not prove registration or the CREATED state.
+
+Bind/connect wrappers retain decoded endpoint scalars rather than the caller's address object. TCP Bind can
+record a port without issuing backend work; UDP Connect only records its peer. TCP Connect waits for a callback
+only in exact blocking mode 1, otherwise mapping accepted work to EINPROGRESS. Endpoint writes can precede an
+error, and BINDING is set before queue submission without rollback on admission failure. Do not treat that bit as
+proof of queue acceptance or assume every error leaves the socket unchanged.
+
+Shutdown retains the allocation and ignores the wrapper's `how` argument. Close does not wait for its callback
+or reclamation, and an already absent positive handle also returns zero. The callback moves a live socket into
+trash; scavenging later drains owned pipes and frees the socket allocation. A UDP receive socket uses the shared
+send pipe and does not own its destruction. `SOCL_IsClosed` observes absence from live/trash lists, not a handle's
+historical ownership or generation. These stages do not establish arbitrary concurrent host-call safety.
+
+`SOCL_EnableSsl` retains borrowed mutable connection storage after returning. Its synchronous command applies
+the context/mode change, without completing a handshake. The context must survive installed operations and SSL
+close work using it; a `SOC_Close` return is not a release point. NULL detaches without freeing/resetting the
+old context or performing SSL shutdown, and the binding-state gate applies to detachment too.
+
+The wrappers have narrower control behavior than their BSD-style names suggest: Socket ignores domain/protocol,
+Fcntl implements commands 3/4 with nonblocking flag 4, and Poll overwrites descriptor results while checking status
+bits `0xe0` regardless of requested events. Poll's `ticks` is a decremented budget: -1 disables it, other nonpositive
+values allow one scan, and positive budgets decrease by 523 per delay rather than measuring an absolute deadline.
+Keep these observed units and completion stages explicit when replacing the DS backend.
+
 ## Word and byte order
 
 [`md5.c`](../lib/nitrowifi/src/ssl/md5.c)'s `MD5Encode` and `MD5Decode` use native copies, relying on little-endian

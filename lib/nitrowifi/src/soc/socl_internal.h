@@ -190,7 +190,7 @@ typedef struct SOCLCommandPacket {
             CPSInAddr remote_ip; // 0 for TCP
         } write;
         struct {
-            void *info; // What SOCL_EnableSsl was given (an SSL connection), or NULL to turn SSL off
+            void *info; // Borrowed connection retained by CPS; NULL detaches without freeing/resetting it
         } ssl;
         u8 raw[0x1c];
     } args;
@@ -226,14 +226,16 @@ int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CP
 int SOCLi_GetWriteBufferFreeSize(const SOCLSocket *socket);
 
 // socl_shutdown.c
+// Retains the allocation. Exact flag_block==1 waits for the callback; other modes report admission, not completion.
 int SOCL_Shutdown(SOCLSocket *socket);
 
 // socl_close.c
-// Whether a handle is no socket any more and has left the trash too
+// Tests nonnegative handle absence from live/trash lists, not historical allocation ownership or generation.
 BOOL SOCL_IsClosed(int socket);
 // TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
 // (SOC_Close's caller in DWC asks it after a failed close; no counterpart in pokediamond's NitroWiFi)
 BOOL func_ov011_02157314(int socket);
+// Returns without awaiting callback/reclamation; zero also covers an already absent positive handle.
 int SOCL_Close(int socket);
 void SOCLi_TrashSocket(void);
 
