@@ -2043,6 +2043,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Data and sections
 
+- Data that the ROM sorts among the others but that only another object's initializer points to is a global: as a
+  `static const`, MWCC lays it out after the whole size-sorted list. DWC's `crypt.c` keeps a constant big number 1
+  (`CryptOne`, a 20-byte `BigNum`) and its digit (`CryptOneDigit`) that only dead-stripped code used; as globals they
+  sort into the shared `.rodata` by size, the digit first, which moved the file's start back 4 bytes from the
+  previous file's range.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With

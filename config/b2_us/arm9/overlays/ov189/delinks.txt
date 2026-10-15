@@ -37,13 +37,14 @@ lib/dpw/src/dpw_battle_tower.c:
 
 lib/dwc/src/gamestats/gamestats.c:
     .text       start:0x021a893c end:0x021a90f0
-    .rodata     start:0x021ace78 end:0x021acea4
+    .rodata     start:0x021ace78 end:0x021acea0
     .data       start:0x021ae4fc end:0x021ae684
     .bss        start:0x021b2f68 end:0x021b2f6c
 
 lib/dwc/src/crypt/crypt.c:
+    complete
     .text       start:0x021a90f0 end:0x021ac838
-    .rodata     start:0x021acea4 end:0x021acf28
+    .rodata     start:0x021acea0 end:0x021acf28
     .data       start:0x021ae684 end:0x021ae6a0
     .bss        start:0x021b2f6c end:0x021b2f80
 

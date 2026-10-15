@@ -523,7 +523,7 @@ data_ov189_021acdb4 kind:data(any) addr:0x021acdb4
 data_ov189_021acdf8 kind:data(any) addr:0x021acdf8
 data_ov189_021ace78 kind:data(any) addr:0x021ace78
 data_ov189_021ace8c kind:data(any) addr:0x021ace8c
-data_ov189_021acea0 kind:data(any) addr:0x021acea0
+CryptOneDigit kind:data(any) addr:0x021acea0
 sEncodedExponent3 kind:data(any) addr:0x021acea4
 sEncodedExponent17 kind:data(any) addr:0x021aceae
 sEncodedExponent65537 kind:data(any) addr:0x021aceb8

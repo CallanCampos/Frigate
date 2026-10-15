@@ -136,11 +136,14 @@ static int ExtractDigest(u8 *out, int outSize, const u8 *signature, int signatur
                          int modulusSize, u32 exponent);
 static BOOL VerifyDigest(const u8 *digest, const u8 *signature, const u8 *modulus);
 
-// The allocator that the game gave: its function to free, the one to allocate, and an argument that is not used
+// The allocator that the game gave: its function to free, the one to allocate, and an argument that is not used. No
+// code in the ROM uses its last two words.
 static struct {
     CryptFreeFunc free;
     CryptAllocFunc alloc;
     u32 arg;
+    u32 unkC;
+    u32 unk10;
 } sAllocator;
 
 // The number of trailing zero bits of each value of a window, for windows of up to 6 bits: a window of w bits reads the
@@ -149,6 +152,12 @@ static const u8 sTrailingZeros[64] = {
     6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
 };
+
+// The number one, which only code that the link dead-stripped used. MWCC drops a static that nothing reads, so these
+// are globals, and they are declared here so that .rodata holds the file's objects in the ROM's order.
+const u32 CryptOneDigit = 1;
+const BigNum CryptOne = {(u32 *)&CryptOneDigit, 1, 1, 0, 0};
+
 static const u8 *sTrailingZerosByWindow[7] = {
     sTrailingZeros + 63, sTrailingZeros + 62, sTrailingZeros + 60, sTrailingZeros + 56,
     sTrailingZeros + 48, sTrailingZeros + 32, sTrailingZeros,
