@@ -131,7 +131,8 @@ typedef void (*NHttpReleaseFunc)(void *buffer, NHttpFreeFunc free, void *param);
 // What the server answered: the raw header (the first NHTTP_HEADER_SIZE bytes here, the rest in blocks) and the body
 // in the user's buffer
 struct NHttpResponse {
-    int headerSize;
+    // Written by the receiving thread while the caller's thread reads it
+    volatile int headerSize;
     int bufferUsed;
     int bodyReceived;
     int contentLength;
