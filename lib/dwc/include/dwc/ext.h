@@ -129,39 +129,37 @@ void func_ov011_0216cca8(int category, int type, int level, const char *format, 
 // read with the two accessors below
 u32 func_ov011_0217d380(const void *address);
 u16 func_ov011_0217d384(const void *address);
-// Formats an address as text (its ip and port) into buf, and returns buf; gt2.c also calls it with a 0 ip and a
-// string pointer in its second argument, so that argument's real type is unclear
-const char *func_ov011_0217ed14(u32 ip, u32 portOrAddr, char *buf);
-// Creates the socket the engine wraps, bound to the resolved address, with the two buffer sizes and the callback
-// that the lower layer calls when a datagram arrives for an address with no connection yet; returns 0, or an error
-int func_ov011_0217d144(void *engine, const void *address, int bufferSize1, int bufferSize2,
-                        void (*onSocketError)(void));
-// Sets two of the socket's callbacks (which is unclear; gt2.c wires one to each of its own dispatchers)
-void func_ov011_0217d3a0(void *socket,
-                         BOOL (*callback)(void *unused, u32 ip, u16 port, int len, const void *data));
-void func_ov011_0217d188(void *socket,
-                         void (*callback)(void *unused, void *handle, u32 ip, u16 port, void *context,
-                                           const void *data, int len));
+// Formats an address as text (its ip and port) into buf, and returns buf
+const char *func_ov011_0217ed14(u32 ip, u16 port, char *buf);
+// Creates the socket at socketOut, bound to localAddress, with byte buffer sizes and a socket error callback;
+// returns 0, or an error
+int func_ov011_0217d144(void **socketOut, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
+                        void (*onSocketError)(void *socket));
+// Sets the socket's unknown-message callback
+void func_ov011_0217d3a0(void *socket, BOOL (*callback)(void *unused, u32 ip, u16 port, const void *data, int len));
+// Sets the socket's incoming-connection-attempt callback
+void func_ov011_0217d188(void *socket, void (*callback)(void *unused, void *handle, u32 ip, u16 port,
+                                                        u32 elapsedMilliseconds, const void *data, int len));
 // The socket's own local address, once bound
 u32 func_ov011_0217d388(void *socket);
 u16 func_ov011_0217d38c(void *socket);
 // Shuts the socket down, in two steps
 void func_ov011_0217d158(void *socket);
 void func_ov011_0217d168(void *socket);
-// A connection's state, its biggest message size, closing it and sending a message of size bytes with flags
+// A connection's state, its biggest message size, closing it and sending a message of size bytes
 int func_ov011_0217d364(void *handle);
 int func_ov011_0217d390(void *handle);
 int func_ov011_0217d394(void *handle);
-int func_ov011_0217d290(void *handle, const void *message, int size, u32 flags);
-// Starts a connection attempt to an address with its own callback table (closed, received, ping and socket error,
-// in that order); writes its handle to *outHandle
-void func_ov011_0217d1a0(void *socket, void *outHandle, const char *addrText, const void *header, u32 headerSize,
-                         void *context, const void *table, int unused);
-// Installs a callback table (closed, received, ping and socket error, as above) on a connection that the lower
-// layer auto-accepted
-void func_ov011_0217d190(void *handle, const void *table);
-// Clears a buffer's first two fields
-void func_ov011_0217d198(void *buffer, int a1, int a2);
+int func_ov011_0217d290(void *handle, const void *message, int size, BOOL reliable);
+// Starts a connection attempt with its callback table (attempt result, received, closed, ping, in that order).
+// Writes the handle through outHandle when non-NULL. If blocking, pumps the socket until completion;
+// otherwise returns after starting. Returns the lower connection status.
+int func_ov011_0217d1a0(void *socket, void **outHandle, const char *addrText, const void *message, int length,
+                        u32 timeoutMs, const void *table, BOOL blocking);
+// Accepts a pending connection and installs its callback table; returns FALSE unless it is awaiting acceptance
+BOOL func_ov011_0217d190(void *handle, const void *table);
+// Rejects a pending connection, optionally sending a rejection message
+void func_ov011_0217d198(void *handle, const void *message, int length);
 
 // Overlay 11's HTTP client: posts a SOAP message to a URL with the SOAPAction header and calls the function with the
 // answer; returns the request, or 0 when it could not start

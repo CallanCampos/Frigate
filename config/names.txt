@@ -2871,8 +2871,8 @@ overlays/ov011 0x0215dd08 WCM_OnAsyncDone
 overlays/ov011 0x0215dd30 WCM_OnAsyncDoneWithStatus
 overlays/ov011 0x0216eea8 Gt2_GetEngine
 overlays/ov011 0x0216eeb0 Gt2_FreePendingConnect
-overlays/ov011 0x0216eebc Gt2_CompareLocalAddr
-overlays/ov011 0x0216eec8 Gt2_CompareRemoteAddr
+overlays/ov011 0x0216eebc Gt2_CompareInitMessage
+overlays/ov011 0x0216eec8 Gt2_ComparePendingHeader
 overlays/ov011 0x0216eed8 Gt2_CompareConnectionAddr
 overlays/ov011 0x0216eef4 Gt2_CompareConnectionHandle
 overlays/ov011 0x0216ef04 Gt2_OnSocketCreateError
@@ -2881,8 +2881,8 @@ overlays/ov011 0x0216f05c Gt2_OnConnectAttemptDone
 overlays/ov011 0x0216f1fc Gt2_OnPing
 overlays/ov011 0x0216f2bc Gt2_OnReceivedData
 overlays/ov011 0x0216f3b4 Gt2_OnUnknownMessage
-overlays/ov011 0x0216f40c Gt2_OnReceivedRaw
-overlays/ov011 0x0216f510 Gt2_GetMaxConnections
+overlays/ov011 0x0216f40c Gt2_OnIncomingAttempt
+overlays/ov011 0x0216f510 Gt2_IsInitialized
 overlays/ov011 0x0216f51c Gt2_CreateSocket
 overlays/ov011 0x0216f628 Gt2_GetConnectionState
 overlays/ov011 0x0216f698 Gt2_OpenConnection
