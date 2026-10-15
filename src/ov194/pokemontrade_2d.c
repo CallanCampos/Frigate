@@ -82,7 +82,7 @@ static BOOL func_ov194_021c60a0(TradeCurve *curve);
 static void func_ov194_021c4324(void);
 static void func_ov194_021c58b4(PokemonTradeWork *wk);
 static void func_ov194_021c5dcc(u32 param, fx32 frame);
-static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u16 vram, u32 paletteMask);
+static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 paletteMask);
 static void func_ov194_021c5f64(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask);
 
 // The cell actor systems of the trade, and of the trade demo, which has only a few sprites
@@ -1649,8 +1649,8 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
     u32 marks = PokeParty_GetParam(pkm, PKM_PARAM_MARKINGS, NULL);
     UIObjResSetup setup;
     u32 xs[] = { 25, 26, 27, 28, 29, 30, 20, 21 };
-    // The animation of each icon when set and when not, -1 for none
-    int anims[][2] = { { 1, 0 }, { 3, 2 }, { 5, 4 }, { 7, 6 }, { 9, 8 }, { 11, 10 }, { 12, -1 }, { 13, -1 } };
+    // The animation of each icon when set and when not, in pairs, -1 for none
+    int anims[] = { 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 12, -1, 13, -1 };
     int i;
 
     setup.vramType = CLACT_VRAM_MAIN;
@@ -1678,9 +1678,9 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
         int anim;
 
         if (marks & (1 << i)) {
-            anim = anims[i][0];
+            anim = anims[i * 2];
         } else {
-            anim = anims[i][1];
+            anim = anims[i * 2 + 1];
         }
         if (icon != NULL) {
             if (anim == -1) {
@@ -1693,7 +1693,7 @@ void func_ov194_021c4ec0(PokemonTradeWork *wk, PartyPkm *pkm, BOOL isEgg) {
             }
         } else {
             wk->markIcons.icons[i] = UIObjRes_CreateActor(&wk->markIcons.res, wk->clactUnit, xs[i] * 8, 101,
-                                                         anim == -1 ? anims[i][0] : anim, wk->heapId);
+                                                         anim == -1 ? anims[i * 2] : anim, wk->heapId);
             icon = wk->markIcons.icons[i];
             if (anim == -1) {
                 func_0204c124(icon, FALSE);
@@ -2259,7 +2259,7 @@ BOOL func_ov194_021c5e80(PokemonTradeWork *wk) {
 }
 
 // Dims the palettes of a standard palette memory (PALFADE_VRAM_*) in paletteMask
-static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u16 vram, u32 paletteMask) {
+static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 paletteMask) {
     PaletteFade *fade = PaletteFade_Create(wk->heapId);
     u8 *colors;
     int i;

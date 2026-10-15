@@ -953,6 +953,13 @@ Same instructions, scheduled in another order.
   the way: `poke_tool.c`'s `fillDataForHatchedEgg` stored `heapId` to the stack too early until `placeName` was a
   `u32` in it, in `PML_UtilSetupMetData`'s prototype and in that function's static helper. When a caller differs
   only in such an order, widen the callee's parameter and follow it down.
+  A conversion of the caller's own narrow parameter counts too, widening included: overlay 194's
+  `func_ov194_021c5e9c` passes its `vram` on to `PaletteFade_BlendBuffer`'s `u32`, and stores the call's last stack
+  argument after the register arguments, as the original does, only with `u32 vram` (or `int`), not `u16`.
+- Reads of a two-dimensional local array in both arms of an `if`/`else` (`anims[i][0]`, `anims[i][1]`) keep MWCC
+  from reusing the loop's `i << 2` after the arms and hoist the array's address above the branch; a flat array
+  indexed `[i * 2]` and `[i * 2 + 1]` builds the base in each arm and reuses the shift, as overlay 194's
+  `func_ov194_021c4ec0` does for its marking icons' animation pairs.
 - A `u32` local's reload from its stack slot is hoisted above a store through a pointer, and a `u16` local's is
   not: `event_battle_return.c`'s `EventBattleReturn_Main` sets up the evolution demo with `str r7, [r3, #4];
   ldr r0, [sp, #0x18]; ldr r2, =SHINKA_DEMO_PROC_FUNCTIONS; strh r0, [r3, #8]` only with `u16 species`. That in turn
