@@ -1919,6 +1919,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
       _pDLWork->error = error;                              ...
                                                             }
                                                             _pDLWork->error = result;
+- An empty `if` whose condition has three or more `&&` operands is not removed with the other empty statements: its
+  branches become blocks and go only later, so it splits the code around it for CSE and register allocation and
+  emits nothing. Two operands, `(void)(a && b && c)` and `if (TRUE)` are removed first. `btl_monset.c`'s
+  `SortBySpeed` keeps `set + j * 2` from its speed comparison across `BattleRandom` into the swap, in a saved
+  register, only with `if (i && j && set) {}` between the swap's `damage[i]` and `speed[i]` stores, and nowhere
+  else; a real `if (set == NULL) { return; }` there gives the same registers plus its own 4 bytes. That points at
+  code the release build dropped, such as a debug print under a condition, so it is a probe for where the original
+  has a block boundary, not code to commit.
 - In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
   `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
   tree is split. At 53-bit x87 precision, two cases form a group up to a distance of 4; three cases within a span
