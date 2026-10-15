@@ -5,8 +5,8 @@
 #include "nitro/rtc.h"
 #include "save/save_control.h"
 
-// The save block of the trainer card's signature and when each badge was obtained. The ROM has no string for the
-// file, so the name is a guess (it comes from swan's getTimeSigBlkAddress). Block 0x21.
+// The save block of the trainer card's signature, when each badge was obtained and saved badge polish. The ROM has
+// no string for the file, so the name is a guess (it comes from swan's getTimeSigBlkAddress). Block 0x21.
 
 #define SAVE_BLOCK_TIMESIG 0x21
 
@@ -86,14 +86,14 @@ void setBadgeGetSecondsTime(TimeSigSave *timeSig, u32 badgeId, u32 year, u32 mon
     timeSig->badgeDates[badgeId].year = year;
     timeSig->badgeDates[badgeId].month = month;
     timeSig->badgeDates[badgeId].day = day;
-    timeSig->unk638[badgeId] = 240;
+    timeSig->badgePolish[badgeId] = 240;
     saveSecondsTime(timeSig, seconds, seconds >> 32);
 }
 
-u16 func_020092a8(TimeSigSave *timeSig, u32 index) {
-    return timeSig->unk638[index];
+u16 func_020092a8(TimeSigSave *timeSig, u32 badgeId) {
+    return timeSig->badgePolish[badgeId];
 }
 
-void func_020092b8(TimeSigSave *timeSig, u32 index, u32 value) {
-    timeSig->unk638[index] = value;
+void func_020092b8(TimeSigSave *timeSig, u32 badgeId, u32 polish) {
+    timeSig->badgePolish[badgeId] = polish;
 }
