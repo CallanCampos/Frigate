@@ -24,7 +24,9 @@ every section.
   autoload: the camera, the DSP and the new DMA and WRAM functions; and in `lib/twl/src/`, the SSP JPEG encoder and
   decoder with their EXIF writer and reader, linked into overlay 257 and built as Thumb with the game's compiler,
   `-ipa file` and `-inline on,noauto`), `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under
-  DWC in overlay 11, Thumb with the game's compiler) and `lib/irc/` (the infrared link, overlay 31's last two files,
+  DWC in overlay 11, Thumb with the game's compiler), `lib/dwcutil/` (the DWC utility, the Wi-Fi Connection settings
+  in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's screens and selectable objects, built with
+  the game's compiler and flags; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files,
   built with the game's compiler and flags but `-O2,p`; the name is ours).
   NitroSDK's first source is libcrypto's RC4 (`lib/nitro/src/crypto/rc4.c`, ARM, `dsi/1.1p1`), which the game links
   last among its own code in ARM9 main. NitroSystem's sources (`lib/nnsys/src/fnd`, `gfd`, ...) are Thumb built with

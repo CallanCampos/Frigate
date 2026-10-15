@@ -20,13 +20,15 @@ typedef struct DWCUtilUiObjectPosition {
 
 // Per variant: how many objects it shows, where each of them sits, and which
 // resource each of them uses. The hit rectangle the selection tests is 120x16.
+// Declared in the order that gives the ROM's layout: MWCC sorts the tables by
+// size, and the two pairs of equal size come out in an order that depends on it.
 static const u16 sHitSize[2] = { 120, 16 };
-static const u8 sCounts[8] = { 2, 1, 1, 2, 1, 1, 2, 0 };
 static const DWCUtilUiObjectPosition sPositions[2] = { { 8, 172 }, { 132, 172 } };
-static const u8 sPosIndex[7][2] = { { 0, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 0 }, { 0, 1 } };
+static const u8 sCounts[8] = { 2, 1, 1, 2, 1, 1, 2, 0 };
 static const u8 sUiResources[7][2] = {
     { 0x27, 0x1f }, { 0x25, 0x00 }, { 0x27, 0x00 }, { 0x23, 0x1d }, { 0x21, 0x00 }, { 0x59, 0x00 }, { 0x27, 0x21 },
 };
+static const u8 sPosIndex[7][2] = { { 0, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 0 }, { 0, 1 } };
 
 static DWCUtilUiObject *sUiObject;
 

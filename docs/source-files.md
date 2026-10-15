@@ -1689,7 +1689,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 182
 
-103 of 1113 functions are in source files.
+118 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1698,7 +1698,8 @@ prints the tables below from the configs and the ROM:
 | `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
 | `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
-| `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | partial | descriptive |
+| `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
+| `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
 
 ### Overlay 184
 
