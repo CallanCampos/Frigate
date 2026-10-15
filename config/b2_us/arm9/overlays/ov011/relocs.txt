@@ -1,4 +1,3 @@
-from:0x020050c4 kind:load to:0x02155e68 module:main
 from:0x021503c4 kind:load to:0x02152079 module:overlay(11)
 from:0x021503de kind:thumb_call to:0x02042e84 module:main
 from:0x021503ea kind:thumb_call to:0x021522d4 module:overlay(11)
