@@ -76,12 +76,29 @@ typedef struct WCMApListHeader {
     WCMApEntry *tail; // the newest
 } WCMApListHeader;
 
-// WCM's own work area (WCM_WORK_SIZE bytes), zeroed by WCM_Init. Most of the connect and search state machine's
-// scratch area is still unmapped
+// Recovered DCF receive-record prefix, named here for its WCM consumer rather than as an established SDK type.
+// The payload follows this prefix in the registered receive buffer; its length is supplied separately.
+typedef struct WCMReceiveRecord {
+    u8 unk_00[6];
+    u16 payloadLength; // 0x06
+    u8 unk_08[6];
+    u16 signalWord; // 0x0e, the high byte is the encoded input to WCM_AddRssiSample
+    u8 unk_10[8];
+    u8 destination[6]; // 0x18
+    u8 source[6];      // 0x1e
+    u8 unk_24[8];
+    u8 payload[]; // 0x2c
+} WCMReceiveRecord;
+
+// WCM's mapped work prefix follows the DS allocation (WCM_WORK_SIZE bytes). Mode 2 allocates 0x4800 bytes;
+// its additional tail and most of the connect/search scratch area remain unmapped.
 typedef struct WCMWork {
     u8 unk_0000[0x600];
-    u8 scanBuffer[0x400]; // 0x600, scan capacity in bytes
-    u8 unk_0a00[0x1294 - 0xa00];
+    union {
+        u8 scan[0x400];
+        u8 receive[0x620];
+    } ioBuffer; // 0x600, the scan and DCF receive operations reuse this storage
+    u8 unk_0c20[0x1294 - 0xc20];
     OSAlarm alarm; // 0x1294
     s32 dmaNo; // 0x12c0, from WCMConfig.dmano
     void *apBuffer; // 0x12c4, from WCMConfig.pbdbuffer: a WCMApListHeader followed by its entries
@@ -94,7 +111,7 @@ typedef struct WCMWork {
     u8 apListLocked; // 0x12dc
     u8 wmIndInstalled; // 0x12dd
     u8 state; // 0x12de
-    u8 subState; // 0x12df
+    u8 wirelessMode;              // 0x12df, selected by WCM_InitCore: 1 for DS, 2 for DSi
     u8 unk_12e0[0x22a0 - 0x12e0]; // BSS data and notification storage
     WMScanExParam scanRequest;    // 0x22a0, including the 16-byte SSID match mask
     u32 scanCount;                // 0x22e4
@@ -106,7 +123,8 @@ typedef struct WCMWork {
 // WCM's own small globals, zeroed with the rest of .bss
 // data_ov011_0218df74: the anchor WCM_Init and WCM_Finish set and clear
 typedef struct WCMAnchor {
-    u32 unk_00;
+    u8 preferredMode; // 0x00, read when the requested mode is zero; no writer identified
+    u8 unk_01[3];
     WCMWork *work; // 0x04
 } WCMAnchor;
 
@@ -122,21 +140,20 @@ typedef struct WCMGlobal {
     u8 unk_2c[4];
     u8 ownMac[6]; // 0x30
     u8 unk_36[2];
-    u8 rssiSampleCount; // 0x38
-    u8 rssiSamples[0x13]; // 0x39, up to 16 used
+    u8 rssiSampleCursor; // 0x38, count until full, then 16 | the next ring index
+    u8 rssiSamples[16];  // 0x39
+    u8 unk_49[3];
 } WCMGlobal;
 
 static WCMAnchor sWork;
 static WCMGlobal sWcm;
 
-s32 WCM_InitCore(void *work, s32 size, BOOL keepBand);
-
-static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 band);
+static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode);
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option);
 static s32 WCM_SearchStep1(const u8 *bssid, const u8 *essid, u32 option);
 static s32 WCM_OnBeaconReceivedDSi(void *frame);
 static void WCM_StoreKnownNetwork(const void *bssDesc, const void *wepDesc);
-static void WCM_AddRssiSample(s32 rssi);
+static void WCM_AddRssiSample(s32 rawSample);
 static WCMWork *WCM_GetWork(void);
 static void WCM_SetConfig(WCMConfig *config, WCMNotify notify);
 static void WCM_ResetSearchOption(void);
@@ -146,7 +163,7 @@ static void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line);
 static s32 WCM_SetState(s32 newState);
 static void WCM_CancelTimeout(void);
 static void WCM_TimeoutAlarmHandler(void);
-static s32 WCM_DefaultBand(void);
+static s32 WCM_GetDefaultWirelessMode(void);
 static void WCM_ClearApListBuffer(void);
 static void *WCM_PointApListCore(u16 index);
 static WCMApEntry *WCM_AllocApEntry(void);
@@ -189,12 +206,12 @@ static void WCM_OnAsyncDone(void *ind);
 static void WCM_OnAsyncDoneWithStatus(void *ind);
 
 s32 WCM_Init(void *work, s32 size) {
-    return WCM_InitCore(work, size, TRUE);
+    return WCM_InitCore(work, size, 1);
 }
 
-s32 WCM_InitCore(void *work, s32 size, BOOL keepBand) {
+s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
     u32 irq;
-    s32 band;
+    s32 mode = requestedMode;
     s32 requiredSize;
     s32 result;
 
@@ -212,12 +229,13 @@ s32 WCM_InitCore(void *work, s32 size, BOOL keepBand) {
         return 1;
     }
     sys_memset(work, 0, size);
-    if (!keepBand && !sWcm.macCached) {
-        band = WCM_DefaultBand();
-    } else {
-        band = keepBand;
+    if (mode == 0) {
+        mode = sWork.preferredMode;
+        if (mode == 0) {
+            mode = WCM_GetDefaultWirelessMode();
+        }
     }
-    if (!WCM_GetRequiredWorkSize(&requiredSize, band)) {
+    if (!WCM_GetRequiredWorkSize(&requiredSize, mode)) {
         CPU_SetIRQMask(irq);
         return 1;
     }
@@ -226,10 +244,13 @@ s32 WCM_InitCore(void *work, s32 size, BOOL keepBand) {
         return 6;
     }
     sWork.work = work;
-    ((WCMWork *)work)->state = 1;
-    ((WCMWork *)work)->subState = 0;
-    ((WCMWork *)work)->apListLocked = 0;
-    ((WCMWork *)work)->wmIndInstalled = 0;
+    sWork.work->state = 1;
+    sWork.work->pendingNotify = 0;
+    sWork.work->scanChannelTime = 0;
+    sWork.work->apListLocked = 0;
+    sWork.work->wmIndInstalled = 0;
+    sWork.work->wirelessMode = mode;
+    WCM_ResetSearchOption();
     WCM_InitOnce();
     if (!clock_is_inited()) {
         clock_init();
@@ -237,7 +258,7 @@ s32 WCM_InitCore(void *work, s32 size, BOOL keepBand) {
     if (!func_0207bc18()) {
         func_0207bbf4();
     }
-    func_0207bc24((OSAlarm *)((u8 *)work + 0x1294));
+    func_0207bc24(&sWork.work->alarm);
     CPU_SetIRQMask(irq);
     return 0;
 }
@@ -260,10 +281,10 @@ void WCM_Finish(void) {
     CPU_SetIRQMask(irq);
 }
 
-static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 band) {
-    if (band == 1) {
+static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode) {
+    if (mode == 1) {
         *size = 0x23 << 8;
-    } else if (band == 2) {
+    } else if (mode == 2) {
         if (!hw_isDSi()) {
             return FALSE;
         }
@@ -304,7 +325,7 @@ s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
         CPU_SetIRQMask(irq);
         return 5;
     }
-    switch (work->subState) {
+    switch (work->wirelessMode) {
     case 1:
         result = WCM_StartupStep1();
         break;
@@ -348,7 +369,7 @@ s32 WCM_CleanupAsync(void) {
         return 1;
     }
 
-    switch (work->subState) {
+    switch (work->wirelessMode) {
     case 1:
         result = WCM_StartupStep2();
         break;
@@ -385,7 +406,7 @@ static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 optio
         CPU_SetIRQMask(irq);
         return 1;
     }
-    switch (work->subState) {
+    switch (work->wirelessMode) {
     case 1:
         result = WCM_SearchStep1(bssid, essid, option);
         break;
@@ -643,7 +664,7 @@ s32 WCM_GetChannelMask(void) {
     if (work->state < 3 || work->state > 10) {
         return 0;
     }
-    switch (work->subState) {
+    switch (work->wirelessMode) {
     case 1:
         return WCM_ComputeChannelGap(0);
     case 2:
@@ -766,7 +787,7 @@ static void WCM_TimeoutAlarmHandler(void) {
     WCM_CancelTimeout();
 }
 
-static s32 WCM_DefaultBand(void) {
+static s32 WCM_GetDefaultWirelessMode(void) {
     return hw_isDSi() ? 2 : 1;
 }
 
@@ -848,7 +869,7 @@ s32 WCM_OnBeaconReceived(void *frame, u16 param) {
             return 0;
         }
     }
-    if (work->subState == 1 && ((u16 *)frame)[0x1e] != 0) {
+    if (work->wirelessMode == 1 && ((u16 *)frame)[0x1e] != 0) {
         return 0;
     }
     entry = WCM_FindApEntryByBssid((const u8 *)frame + 4);
@@ -918,21 +939,6 @@ static WCMApEntry *WCM_GetOldestApEntry(void) {
     return NULL;
 }
 
-static WCMApEntry *WCM_FindApEntryById(s32 id) {
-    WCMWork *work = WCM_GetWork();
-    WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
-    WCMApEntry *entry = NULL;
-
-    if (header != NULL && work->apBufferWords > 0xc) {
-        for (entry = header->head; entry != NULL; entry = entry->next) {
-            if (entry->id == id) {
-                break;
-            }
-        }
-    }
-    return entry;
-}
-
 static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid) {
     WCMWork *work = WCM_GetWork();
     WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
@@ -945,6 +951,21 @@ static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid) {
         for (entry = header->head; entry != NULL; entry = entry->next) {
             u8 *record = entry->record;
             if (WCM_CompareBssID(record + 4, bssid)) {
+                break;
+            }
+        }
+    }
+    return entry;
+}
+
+static WCMApEntry *WCM_FindApEntryById(s32 id) {
+    WCMWork *work = WCM_GetWork();
+    WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
+    WCMApEntry *entry = NULL;
+
+    if (header != NULL && work->apBufferWords > 0xc) {
+        for (entry = header->head; entry != NULL; entry = entry->next) {
+            if (entry->id == id) {
                 break;
             }
         }
@@ -1012,7 +1033,7 @@ static void WCM_FillApEntry(const void *frame, WCMApEntry *entry) {
     sys_memset32_fast(0, record, 0xc0);
     sys_memcpy32_fast(frame, record, 0x40);
     ((u16 *)record)[0x1f] = 0;
-    record[0] = (work->subState == 1) ? 0x20 : 0x40;
+    record[0] = (work->wirelessMode == 1) ? 0x20 : 0x40;
 
     ie = (const u8 *)frame + 0x40;
     ieCount = ((const u16 *)frame)[0x1f];
@@ -1046,7 +1067,7 @@ static void *WCM_FindVendorIE(void *frame) {
     if (frame == NULL) {
         return NULL;
     }
-    if (hw_isDSi() && work->subState == 2) {
+    if (hw_isDSi() && work->wirelessMode == 2) {
         if (((u16 *)frame)[0x1f] != 0) {
             void *ie = WCM_GetInformationElement(frame, 0xdd, buf);
             if (ie != NULL && ((u16 *)ie)[5] == 1) {
@@ -1055,7 +1076,7 @@ static void *WCM_FindVendorIE(void *frame) {
         }
         return NULL;
     }
-    if (work->subState == 1) {
+    if (work->wirelessMode == 1) {
         u16 len = ((u16 *)frame)[0x1e];
         if (len != 0 && len >= 0x10 && len <= 0x80) {
             if (len == ((u8 *)frame)[0x4a] + 0x10 && ((u16 *)frame)[0x20] == 1 && ((u16 *)frame)[0] == (len + 1 + 0x40) / 2) {
@@ -1081,14 +1102,14 @@ static void WCM_InitOnce(void) {
     }
 }
 
-static WCMGlobal *WCM_GetGlobal(void) {
-    return &sWcm;
-}
-
 void WCM_DispatchRecvCallback(u8 *src, u8 *dst, u8 *data, u32 len) {
     if (sWcm.recvCallback != NULL) {
         sWcm.recvCallback(src, dst, data, len);
     }
+}
+
+static WCMGlobal *WCM_GetGlobal(void) {
+    return &sWcm;
 }
 
 const u8 *WCM_GetApMacAddress(void) {
@@ -1144,13 +1165,13 @@ s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *
         CPU_SetIRQMask(irq);
         return -1;
     }
-    if (work->state == 9 || work->subState == 1) {
+    if (work->state == 9 || work->wirelessMode == 1) {
         OS_UnlockMutex(&sWcm.mutex);
         CPU_SetIRQMask(irq);
         return -4;
     }
-    sentLen = WCM_BuildFrameHeader(work->subState + 1, (void *)header, headerLen, dataLen);
-    switch (work->subState + 1) {
+    sentLen = WCM_BuildFrameHeader(work->wirelessMode + 1, (void *)header, headerLen, dataLen);
+    switch (work->wirelessMode + 1) {
     case 1:
         WCM_SendFrame((const u8 *)header, work, sentLen, FALSE);
         break;
@@ -1231,7 +1252,7 @@ static s32 WCM_UpdateLinkQuality(void) {
 static s32 WCM_RssiToQuality(u32 rssi) {
     WCMWork *work = WCM_GetWork();
 
-    if (work->subState == 2) {
+    if (work->wirelessMode == 2) {
         if (rssi >= 0x16) {
             return 3;
         }
@@ -1255,17 +1276,9 @@ static s32 WCM_RssiToQuality(u32 rssi) {
     return 0;
 }
 
-// Adds a signal-level sample to the running RSSI average's circular buffer
-static void WCM_AddRssiSample(s32 rssi) {
-    u8 count = sWcm.rssiSampleCount;
-
-    sWcm.rssiSamples[count % 0x10] = (u8)rssi;
-    sWcm.rssiSampleCount = (u8)(count + 1);
-}
-
 static u8 WCM_GetAverageRssi(void) {
     s32 sum = 0;
-    u8 count = sWcm.rssiSampleCount;
+    u8 count = sWcm.rssiSampleCursor;
     int i;
 
     if (count > 0x10) {
@@ -1280,6 +1293,29 @@ static u8 WCM_GetAverageRssi(void) {
         sum /= count;
     }
     return sum;
+}
+
+// Adds a signal-level sample to the running RSSI average's circular buffer
+// Decodes the receive record's high signal byte. The original arithmetic is mode-dependent;
+// no physical units for the encoded input or the resulting sample have been established.
+static void WCM_AddRssiSample(s32 rawSample) {
+    u8 sample;
+    u8 cursor;
+
+    if (WCM_GetWork()->wirelessMode == 2) {
+        sample = (u8)rawSample;
+    } else if (rawSample & 2) {
+        sample = (u8)(rawSample << 2);
+    } else {
+        sample = (u8)((rawSample >> 2) + 25);
+    }
+    cursor = sWcm.rssiSampleCursor;
+    sWcm.rssiSamples[cursor % 16] = sample;
+    if (cursor < 16) {
+        sWcm.rssiSampleCursor = cursor + 1;
+    } else {
+        sWcm.rssiSampleCursor = 16 + ((cursor + 1) % 16);
+    }
 }
 
 // The startup FSM's WM_Initialize-adjacent first step: brings up the hardware and reads its MAC address
@@ -1688,7 +1724,8 @@ static void WCM_ConnectStep6(void *ind) {
                 break;
             }
             work->unk_22e8 = ((u16 *)ind)[5];
-            result = func_02081ab0((WMCallbackFunc)WCM_ConnectStep8, work->scanBuffer, 0x620);
+            result =
+                func_02081ab0((WMCallbackFunc)WCM_ConnectStep8, work->ioBuffer.receive, sizeof(work->ioBuffer.receive));
             if (result == 2) {
                 break;
             }
@@ -1766,11 +1803,11 @@ static void WCM_ConnectStep8(void *ind) {
             }
             break;
         case 0xf: {
-            WMBssDesc *bssDesc = *(WMBssDesc **)((u8 *)ind + 8);
-            u8 rssi = (u8)(((u16 *)bssDesc)[7] >> 8);
-            WCM_AddRssiSample(rssi);
-            cp15_invalidateDC(bssDesc, 0x620);
-            WCM_DispatchRecvCallback((u8 *)bssDesc + 0x1e, (u8 *)bssDesc + 0x18, (u8 *)bssDesc + 0x2c, ((u16 *)bssDesc)[3]);
+            WCMReceiveRecord *record = *(WCMReceiveRecord **)((u8 *)ind + 8);
+            u8 rawSample = (u8)(record->signalWord >> 8);
+            WCM_AddRssiSample(rawSample);
+            cp15_invalidateDC(record, 0x620);
+            WCM_DispatchRecvCallback(record->source, record->destination, record->payload, record->payloadLength);
             break;
         }
         default:
@@ -1891,7 +1928,7 @@ static void WCM_BuildScanRequest(const u8 *bssid, const u8 *essid, u32 option) {
     u16 channelTime;
 
     WCM_SetSearchOption(option);
-    work->scanRequest.scanBuf = (WMBssDesc *)work->scanBuffer;
+    work->scanRequest.scanBuf = (WMBssDesc *)work->ioBuffer.scan;
     work->scanRequest.scanBufSize = 0x400;
     work->scanRequest.channelList = (u16)((1 << WCM_PickChannel(0)) >> 1);
     channelTime = work->scanChannelTime;
