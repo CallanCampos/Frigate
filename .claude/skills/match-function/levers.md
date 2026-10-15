@@ -113,6 +113,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
+  move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
+  helper")
 - A NitroSystem (2.0/sp2p2) function's spill slots in another order: locals are slotted function scope first, then
   the `if` block's, then the `else` block's, then inlines' in reverse; move them to function scope.
   (matching.md: "In NitroSystem's 2.0/sp2p2 code a pointer sum")
