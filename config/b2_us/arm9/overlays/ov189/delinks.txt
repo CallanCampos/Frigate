@@ -98,6 +98,7 @@ lib/dwc/src/ghttp/dwc_ghttp.c:
     .bss        start:0x021b2860 end:0x021b2868
 
 lib/dwc/src/ghttp/ghttpBuffer.c:
+    complete
     .text       start:0x021a154c end:0x021a1980
     .data       start:0x021ad2a0 end:0x021ad2ec
 
@@ -126,6 +127,7 @@ lib/dwc/src/ghttp/ghttpPost.c:
     .data       start:0x021adadc end:0x021add30
 
 lib/dwc/src/ghttp/ghttpProcess.c:
+    complete
     .text       start:0x021a4114 end:0x021a54b4
     .rodata     start:0x021acd78 end:0x021acd84
     .data       start:0x021add30 end:0x021ae09c

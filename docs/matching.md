@@ -1881,6 +1881,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Switches
 
+- A `switch` of two cases tests them in value order but lays their bodies out in source order, which no order of
+  `if`s gives: GameSpy's `ghiSendBufferedData` (`ghttpBuffer.c`, overlay 189) matches only as `case -1: return FALSE;`
+  written before `case -2: return TRUE;`.
 - A `switch` with no `default:` whose cases leave one value unassigned keeps the index in `r3` instead of `r2`, as
   `b_plist_main.c`'s `BPlistMain_InitPageCursor` does, and writing `case 0:` last moves its block to the end of the
   switch (`BPlistMain_CanSwitch`).
