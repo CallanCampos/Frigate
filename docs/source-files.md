@@ -1967,7 +1967,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dup_fitting.c` | `0x021998c0`–`0x0219d88c` | 58 | partial | string at `0x0219ddc0` |
+| `dup_fitting.c` | `0x021998c0`–`0x0219d88c` | 58 | complete | string at `0x0219ddc0` |
 | `dup_fitting_item.c` | `0x0219d88c`–`0x0219db98` | 30 | complete | string at `0x0219ddd0` |
 
 ### Overlay 209

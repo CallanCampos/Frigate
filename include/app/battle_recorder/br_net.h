@@ -76,7 +76,8 @@ enum {
 void BrNet_StartRequest(BrNet *net, int type, const BrNetRequestParam *param);
 // TRUE once the request has finished
 BOOL BrNet_IsRequestEnd(BrNet *net);
-// TRUE if the request's result has a message, which it gives in msgID
+// Returns a status from 0 to 3 and consumes any valid GDS result, including those returning 0.
+// msgID may be NULL and is written only for results that map to a message; otherwise it is unchanged.
 BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID);
 // 2 once the connection has had an error, which ends the Battle Recorder's screens
 u32 BrNet_CheckError(BrNet *net);
