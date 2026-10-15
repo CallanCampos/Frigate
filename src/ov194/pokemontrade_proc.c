@@ -5,6 +5,7 @@
 #include "app/pokemon_trade/pokemontrade_nego.h"
 #include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/pokemon_trade/pokemontrade_save.h"
+#include "app/pokemon_trade/pokemontrade_touchbar.h"
 #include "app/pokemon_trade_local.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
@@ -2824,7 +2825,7 @@ static BOOL PokemonTrade_Init(GameProc *proc, u32 *state, PokemonTradeParam *par
     func_ov194_021c2de8(wk);
     if (wk->type < 4) {
         func_ov194_021bb228(wk);
-        func_ov194_021c2a24(wk);
+        PokemonTrade_CreateTouchBar(wk);
         func_02042ba8(TRUE, wk->heapId);
     }
     func_ov194_021c200c(wk, 0);

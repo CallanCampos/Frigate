@@ -10,6 +10,7 @@
 #include "app/pokemon_trade/pokemontrade_nego.h"
 #include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/pokemon_trade/pokemontrade_save.h"
+#include "app/pokemon_trade/pokemontrade_touchbar.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
 #include "field/unity_tower.h"
@@ -417,8 +418,6 @@ static inline u32 PokemonTrade_GetPressedKeys(void) {
     return keys;
 }
 
-// Touch bar declaration retained until its owner-header stage.
-void func_ov194_021c2a24(PokemonTradeWork *wk);
 // The trade demo, overlays 192 and 193
 void PokemonTradeIrcDemo_Start(PokemonTradeWork *wk);
 void PokemonTradeDemoCommon_Start(PokemonTradeWork *wk);

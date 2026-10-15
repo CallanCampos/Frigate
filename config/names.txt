@@ -11423,6 +11423,7 @@ overlays/ov194 0x021be998 TradeMcssMove_Interpolate
 overlays/ov194 0x021be9d0 TradeMcssMove_FollowPath
 overlays/ov194 0x021bea10 TradeMcssMove_Update
 overlays/ov194 0x021beacc TradeMcssMove_Free
+overlays/ov194 0x021c2a24 PokemonTrade_CreateTouchBar
 overlays/ov194 0x021c63a0 POKEMONTRADE_PROC_FUNCTIONS
 overlays/ov194 0x021c63c4 POKEMONTRADE_WIFICLUB_PROC_FUNCTIONS
 overlays/ov194 0x021c63f4 sSideButtonRects
