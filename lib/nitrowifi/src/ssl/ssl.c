@@ -218,7 +218,7 @@ static void SSLi_FinishKeyExchange(SSLContext *ctx, u8 *msg);
 static void SSLi_ComputeFinishedMd5(SSLContext *ctx, u8 *out, int sender);
 static void SSLi_ComputeFinishedSha1(SSLContext *ctx, u8 *out, int sender);
 static void SSLi_VerifyFinished(SSLContext *ctx, u8 *msg);
-static void SSLi_IncrementCounter(u8 *iv);
+static void SSLi_IncrementCounter(u8 *counterEnd);
 static u32 SSLi_Rc4Crypt(SSLContext *ctx, void *buf, u32 len);
 static u32 SSLi_CheckRecordMac(SSLContext *ctx, u8 *hdr);
 static u32 SSLi_ComputeMac(SSLContext *ctx, u8 *hdr);
@@ -1112,15 +1112,16 @@ static void SSLi_VerifyFinished(SSLContext *ctx, u8 *msg) {
     ctx->state = SSLI_STATE_FINISHED_VERIFIED;
 }
 
-// Adds 1 to an 8-byte big-endian sequence number, carrying leftward
-static void SSLi_IncrementCounter(u8 seq[8]) {
-    int i = 8;
+// counterEnd is one past an 8-byte big-endian counter; carry is bounded to those eight bytes.
+static void SSLi_IncrementCounter(u8 *counterEnd) {
+    int remaining = 8;
+
     do {
-        i--;
-        if (++seq[i] != 0) {
+        --counterEnd;
+        if (++*counterEnd != 0) {
             break;
         }
-    } while (i != 0);
+    } while (--remaining != 0);
 }
 
 // Decrypts received bytes with the read RC4 state and returns len unchanged.
@@ -1185,7 +1186,7 @@ static u32 SSLi_CheckRecordMac(SSLContext *ctx, u8 *hdr) {
     if (memcmp(hdr + 5 + len, mac, macLen) != 0) {
         ctx->state = SSLI_STATE_ERROR;
     }
-    SSLi_IncrementCounter(ctx->read_seq_num);
+    SSLi_IncrementCounter(ctx->read_seq_num + sizeof(ctx->read_seq_num));
     return len + 5;
 }
 
@@ -1237,7 +1238,7 @@ static u32 SSLi_ComputeMac(SSLContext *ctx, u8 *hdr) {
     hdr[3] = (u8)(len >> 8);
     hdr[4] = (u8)len;
     CPSi_rc4_crypt(&ctx->write_rc4, content, len);
-    SSLi_IncrementCounter(ctx->write_seq_num);
+    SSLi_IncrementCounter(ctx->write_seq_num + sizeof(ctx->write_seq_num));
     return len + 5;
 }
 

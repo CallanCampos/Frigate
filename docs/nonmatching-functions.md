@@ -443,7 +443,7 @@ in both versions.
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ComputeFinishedMd5` | `0x0215937c` / `0x021593bc` | 85 bytes differ, same size. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ComputeFinishedSha1` | `0x0215940c` / `0x0215944c` | Ours compiles to 0x90, the original is 0x94. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_VerifyFinished` | `0x021594a0` / `0x021594e0` | Size 0xb4/0x9e in both versions. Recovered original two-argument contract and fixed sender selector 1; existing hash arithmetic retained. Natural C remains nonmatching. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_IncrementCounter` | `0x02159540` / `0x02159580` | 12 bytes differ, same size. Open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_IncrementCounter` | `0x02159540` / `0x02159580` | Size 0x18/0x16 in both versions. Restored the original one-past-end pointer contract and both MAC callers together; the previous start-pointer adaptation was behaviorally equivalent. Natural bounded eight-byte carry remains nonmatching. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ComputeMac` | `0x021596f4` / `0x02159734` | Ours compiles to 0x1bc, the original is 0x1be. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_CheckRecordMac` | `0x0215956c` / `0x021595ac` | Size 0x184/0x188 in both versions. Recovered unsigned processed-record-length return (content length plus five); cryptographic body retained. Natural C remains nonmatching. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ReadExact` | `0x021598b4` / `0x021598f4` | Ours compiles to 0x44, the original is 0x42. Open. |
