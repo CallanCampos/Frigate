@@ -2086,7 +2086,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC 2.0 lays a file's `.bss` statics out in the reverse of their definition order, without the size sort: the
   DWC utility's `dwc_wcm.c` (overlay 182) matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and
   `sEssid[0x20]` defined in that order, but the module check failed until they were defined as `sEssid`, `sBssid`,
-  `sWcm`, the ROM's order backwards.
+  `sWcm`, the ROM's order backwards. The symptom is literal pool addresses off by another static's size:
+  DPW's `dpw_tr.c` (overlay 189) differed in 61 bytes, each `sDpwTrWork` address 4 bytes off, until `sDpwTrWork`
+  was defined before the 4-byte `sDpwTrServerType`.
 - MWCC 2.0 (`2.0/sp2p2`) gives each initialized global of a file its own section and orders them by size, smallest
   first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a
   count and eight function pointers, 4 bytes each, before an 80-byte table: it declares the pointers in the reverse of

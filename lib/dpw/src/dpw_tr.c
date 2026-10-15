@@ -31,8 +31,8 @@ typedef struct DpwTrWork {
 
 static int DpwTrMapGamestatsError(int group);
 
-static int sDpwTrServerType;
 static DpwTrWork sDpwTrWork;
+static int sDpwTrServerType;
 
 void DpwTr_Init(s32 pid, u64 friendKey, int server) {
     sDpwTrWork.state = 1;
