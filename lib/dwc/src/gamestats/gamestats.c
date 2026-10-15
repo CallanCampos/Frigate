@@ -47,7 +47,7 @@ static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, 
 static BOOL CheckAnswer(char *data, int size);
 static void OnSent(void);
 static void OnAnswered(char *data, int size, int status, void *arg);
-static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, int payloadSize);
+static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize);
 static void SetFailed(void);
 static int Send(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check, BOOL useHash);
 
@@ -157,68 +157,67 @@ static void OnAnswered(char *data, int size, int status, void *arg) {
     if (sClient.state == 1) {
         return;
     }
-    if (status != 0) {
-        SetFailed();
-        return;
-    }
-    switch (sClient.state) {
-    case 5:
-        if (size == 0x20) {
-            u8 block[0x34];
-            char digits[17] = "0123456789abcdef";
-            u8 *digest = (u8 *)sClient.hashField + 0x14;
-            int i;
+    if (status == 0) {
+        switch (sClient.state) {
+        case 5:
+            if (size == 0x20) {
+                u8 *digest = (u8 *)sClient.hashField + 0x14;
+                u8 block[0x34];
+                char digits[17] = "0123456789abcdef";
+                int i;
 
-            *(GamestatsSecret *)block = sClient.secret;
-            memcpy(block + 0x14, data, 0x20);
-            MATH_CalcSHA1(digest, block, 0x34);
-            for (i = 0; i < 0x14; i++) {
-                sClient.hashField[i * 2] = digits[digest[i] >> 4];
-                sClient.hashField[i * 2 + 1] = digits[digest[i] & 0xf];
+                *(GamestatsSecret *)block = sClient.secret;
+                memcpy(block + 0x14, data, 0x20);
+                MATH_CalcSHA1(digest, block, 0x34);
+                for (i = 0; i < 0x14; i++) {
+                    sClient.hashField[i * 2] = digits[digest[i] >> 4];
+                    sClient.hashField[i * 2 + 1] = digits[digest[i] & 0xf];
+                }
+                *(sClient.hashField - strlen("&hash=")) = '&';
+                strncpy(sClient.hash, sClient.hashField, 0x29);
+                sClient.state = 6;
+            } else {
+                SetFailed();
             }
-            *(sClient.hashField - strlen("&hash=")) = '&';
-            strncpy(sClient.hash, sClient.hashField, 0x29);
-            sClient.state = 6;
-        } else {
-            SetFailed();
-        }
-        func_02058814(data);
-        break;
-    case 7:
-        if (strncmp(data, "error:", strlen("error:")) == 0) {
             func_02058814(data);
-            SetFailed();
-            return;
+            break;
+        case 7:
+            if (strncmp(data, "error:", strlen("error:")) == 0) {
+                func_02058814(data);
+                SetFailed();
+                return;
+            }
+            if (sClient.answer != NULL) {
+                func_02058814(sClient.answer);
+                sClient.answer = NULL;
+            }
+            if (!CheckAnswer(data, size)) {
+                func_02058814(data);
+                SetFailed();
+                return;
+            }
+            if (sClient.check != NULL && !sClient.check(data, size)) {
+                func_02058814(data);
+                SetFailed();
+                return;
+            }
+            sClient.answer = data;
+            sClient.answerSize = size;
+            sClient.state = 8;
+            break;
         }
-        if (sClient.answer != NULL) {
-            func_02058814(sClient.answer);
-            sClient.answer = NULL;
-        }
-        if (!CheckAnswer(data, size)) {
-            func_02058814(data);
-            SetFailed();
-            return;
-        }
-        if (sClient.check != NULL && !sClient.check(data, size)) {
-            func_02058814(data);
-            SetFailed();
-            return;
-        }
-        sClient.answer = data;
-        sClient.answerSize = size;
-        sClient.state = 8;
-        break;
+    } else {
+        SetFailed();
     }
 }
 
 // Scrambles the header and the payload into dest, in base64: a checksum xored with the key, and the bytes xored with the
 // generator that the checksum seeds
-static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, int payloadSize) {
+static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize) {
     int total = payloadSize + headerSize;
     u8 *buffer;
     u32 sum = 0;
     int i;
-    int j;
 
     buffer = func_020586e4(8, total + 4);
     if (buffer == NULL) {
@@ -227,8 +226,8 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     for (i = 0; i < headerSize; i++) {
         buffer[i + 4] = header[i];
     }
-    for (j = 0; j < payloadSize; j++) {
-        buffer[headerSize + j + 4] = payload[j];
+    for (i = 0; i < (int)payloadSize; i++) {
+        buffer[headerSize + i + 4] = payload[i];
     }
     for (i = 0; i < total; i++) {
         sum += buffer[i + 4];
@@ -367,25 +366,26 @@ void *Gamestats_GetBody(int *size) {
 static int Send(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check, BOOL useHash) {
     char pidText[0x10];
     int header[2];
-    int length;
     int result;
+    char *url;
 
-    if (!sClient.configured) {
+    if (sClient.configured != TRUE) {
         return 3;
     }
     if (sClient.url != NULL) {
         func_02058728(8, sClient.url, 0);
         sClient.url = NULL;
     }
-    length = GamestatsEncodedSize(size + 0xc) + strlen("&data=") + strlen("&hash=") + func_0207a2c0(pidText, 0x10, "%d", pid)
-        + strlen("?pid=") + strlen(page) + strlen(sBaseUrl) + strlen(sClient.gameName) + 0x29;
-    sClient.url = func_020586e4(8, length);
+    sClient.url = func_020586e4(8, strlen(sBaseUrl) + strlen(sClient.gameName) + strlen(page) + strlen("?pid=")
+                                       + func_0207a2c0(pidText, 0x10, "%d", pid) + strlen("&hash=") + 0x28
+                                       + strlen("&data=") + GamestatsEncodedSize(size + 0xc) + 1);
     if (sClient.url == NULL) {
         return 2;
     }
     func_0207a290(sClient.url, "%s%s%s?pid=%d&hash=%s&data=", sBaseUrl, sClient.gameName, page, pid,
                   "0000000000000000000000000000000000000000", "");
-    sClient.urlEnd = sClient.url + strlen(sClient.url);
+    url = sClient.url;
+    sClient.urlEnd = url + strlen(url);
     sClient.hashField = sClient.urlEnd - strlen("&data=") - 0x28;
     header[0] = pid;
     header[1] = size;
@@ -399,7 +399,7 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
         memcpy(sClient.hashField, sClient.hash, 0x28);
         sClient.state = 6;
     } else {
-        sClient.hashField[-(int)strlen("&hash=")] = '\0';
+        *(sClient.hashField - strlen("&hash=")) = '\0';
         sClient.state = 4;
     }
     sClient.check = check;
