@@ -197,7 +197,7 @@ static s32 WCM_StartConnectStep(void);
 static s32 WCM_StartDisconnectStep(void);
 static s32 WCM_RestoreIdleStep(void);
 static s32 WCM_SendFrame(const u8 *dst, const void *buffer, u16 byteLen, void (*completion)(s32));
-static u16 WCM_ComputeChannelGap(u16 channelMask);
+static u16 WCM_GetDsAllowedChannelSpanMask(void);
 static void WCM_RequestReset(void);
 static void WCM_OnWmIndication(void *ind);
 static void WCM_OnWmControlComplete(void *ind);
@@ -289,13 +289,16 @@ void WCM_Finish(void) {
 }
 
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode) {
+    if (mode == 0) {
+        mode = WCM_GetDefaultWirelessMode();
+    }
     if (mode == 1) {
-        *size = 0x23 << 8;
+        *size = WCM_WORK_SIZE;
     } else if (mode == 2) {
         if (!hw_isDSi()) {
             return FALSE;
         }
-        *size = 0x12 << 10;
+        *size = 0x4800;
     } else {
         return FALSE;
     }
@@ -665,11 +668,20 @@ s32 WCM_SetSearchOption(u32 option) {
 
     irq = CPU_IRQDisable();
     work = sWork.work;
+    // BUG: The original reads the search option before checking whether WCM has been initialized.
+#ifdef BUGFIX
+    if (work == NULL) {
+        CPU_SetIRQMask(irq);
+        return 0;
+    }
+    old = work->searchOption;
+#else
     old = work->searchOption;
     if (work == NULL) {
         CPU_SetIRQMask(irq);
-        return old;
+        return 0;
     }
+#endif
     if (option & 0x8000) {
         mask |= 0x3ffe;
         if (!(option & 0x3ffe)) {
@@ -688,7 +700,7 @@ s32 WCM_SetSearchOption(u32 option) {
     if (option & 0x800000) {
         mask |= 0x400000;
     }
-    work->searchOption = (option & mask) | (old & ~mask);
+    work->searchOption = (old & ~mask) | option;
     CPU_SetIRQMask(irq);
     return old;
 }
@@ -701,7 +713,7 @@ s32 WCM_GetChannelMask(void) {
     }
     switch (work->wirelessMode) {
     case 1:
-        return WCM_ComputeChannelGap(0);
+        return WCM_GetDsAllowedChannelSpanMask();
     case 2:
         if (hw_isDSi()) {
             return func_02769e54();
@@ -1541,23 +1553,22 @@ static s32 WCM_SendFrame(const u8 *dst, const void *buffer, u16 byteLen, void (*
     return byteLen;
 }
 
-static u16 WCM_ComputeChannelGap(u16 channelMask) {
-    u32 i;
-    u32 bit = 0x8000;
-    u32 lowBit = 1;
-    u32 mask = channelMask;
+static u16 WCM_GetDsAllowedChannelSpanMask(void) {
+    u16 allowed = func_020810cc();
+    u16 upperMask = 0x8000;
+    u16 lowerMask = 1;
 
-    if (mask == 0) {
+    if (allowed == 0) {
         return 0;
     }
-    while (!(bit & mask)) {
-        bit >>= 1;
+    // Keep the inclusive span, including any gaps in the hardware's allowed-channel mask.
+    while (!(upperMask & allowed)) {
+        upperMask = (upperMask >> 1) | 0x8000;
     }
-    while (!(lowBit & mask)) {
-        lowBit <<= 1;
-        lowBit |= 1;
+    while (!(lowerMask & allowed)) {
+        lowerMask = (lowerMask << 1) | 1;
     }
-    return (u16)~((bit << 1) | (lowBit >> 1));
+    return (u16) ~((upperMask << 1) | (lowerMask >> 1));
 }
 
 static void WCM_RequestReset(void) {

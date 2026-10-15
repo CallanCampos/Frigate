@@ -63,9 +63,10 @@ s32 WCM_DisconnectAsync(void);
 // Descriptive name: restores idle operation through the selected backend, resetting an active connection if needed.
 s32 WCM_RestoreIdleAsync(void);
 s32 WCM_GetState(void);
-// Sets the search's channel option bits, returning the previous value
+// Updates the selected option fields and ORs the entire normalized incoming word, returning the previous word.
 s32 WCM_SetSearchOption(u32 option);
-// The channels a search or connect may still try, kept for WCM_PickChannel's callers
+// DS mode fills gaps between the lowest and highest hardware-allowed channel bits; DSi uses its backend mask.
+// Returns zero outside states 3 through 10.
 s32 WCM_GetChannelMask(void);
 s32 WCM_CountApList(void);
 s32 WCM_LockApList(s32 lock);
