@@ -387,8 +387,6 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_GetChannelMask` | `0x0215c2e0` / `0x0215c320` | Size 0x40/0x3c in both versions. DS mode calls the recovered zero-argument hardware-channel span helper; states 3 through 10, DSi gating and fallback results retain original behavior. Natural return-block layout remains nonmatching. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SetConfig` | `0x0215c338` / `0x0215c378` | Size 0x90/0xbc in both versions. Restored unsigned alignment-delta-plus-header acceptance, including exactly 12 usable bytes. The retained AP-list buffer and its private count are explicitly bytes; original clearing/default/callback behavior remains. Natural C retained; code generation remains open. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ResetSearchOption` | `0x0215c3f4` / `0x0215c434` | 12 bytes differ, same size. |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_PickChannel` | `0x0215c40c` / `0x0215c44c` | Ours compiles to 0x54, the original is 0x50 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SetState` | `0x0215c4bc` / `0x0215c4fc` | Ours compiles to 0x58, the original is 0x70 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CancelTimeout` | `0x0215c52c` / `0x0215c56c` | Ours compiles to 0x48, the original is 0x4c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ClearApListBuffer` | `0x0215c594` / `0x0215c5d4` | Ours compiles to 0x34, the original is 0x3c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CountApList` | `0x0215c5d0` / `0x0215c610` | Ours compiles to 0x34, the original is 0x3c |

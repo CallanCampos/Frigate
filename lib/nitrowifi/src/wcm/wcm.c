@@ -1,4 +1,5 @@
 #include "nitrowifi/wcm.h"
+#include "nitrowifi/wcm_internal.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -92,7 +93,7 @@ typedef struct WCMDcfCallbackView {
 
 // WCM's mapped work prefix follows the DS allocation (WCM_WORK_SIZE bytes). Mode 2 allocates 0x4800 bytes;
 // its additional tail and most of the connect/search scratch area remain unmapped.
-typedef struct WCMWork {
+struct WCMWork {
     u8 unk_0000[0x600];
     union {
         u8 scan[0x400];
@@ -126,7 +127,7 @@ typedef struct WCMWork {
     u16 associationId;            // 0x22e8, from the successful connection callback; cleared on disconnect or reset
     u16 connectionFailureReason;  // 0x22ea, retained across reset for retry and notification
     u8 unk_22ec[WCM_WORK_SIZE - 0x22ec];
-} WCMWork;
+};
 
 // WCM's own small globals, zeroed with the rest of .bss
 // data_ov011_0218df74: the anchor WCM_Init and WCM_Finish set and clear
@@ -137,7 +138,7 @@ typedef struct WCMAnchor {
 } WCMAnchor;
 
 // data_ov011_0218df7c, right after WCMAnchor: the globals WCM_InitOnce sets up once
-typedef struct WCMGlobal {
+struct WCMGlobal {
     u8 initialized; // 0x00, set once WCM_InitOnce has initialized the send state
     u8 unk_01[3];
     OSThreadQueue sendQueue; // 0x04
@@ -151,7 +152,7 @@ typedef struct WCMGlobal {
     u8 rssiSampleCursor; // 0x38, count until full, then 16 | the next ring index
     u8 rssiSamples[16];  // 0x39
     u8 unk_49[3];
-} WCMGlobal;
+};
 
 static WCMAnchor sWork;
 static WCMGlobal sWcm;
@@ -159,13 +160,8 @@ static WCMGlobal sWcm;
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode);
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option);
 static void WCM_AddRssiSample(s32 rawSample);
-static WCMWork *WCM_GetWork(void);
 static void WCM_SetConfig(WCMConfig *config, WCMNotify notify);
 static void WCM_ResetSearchOption(void);
-static u16 WCM_PickChannel(u32 channelIndex);
-static void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2);
-static void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line);
-static s32 WCM_SetState(s32 newState);
 static void WCM_CancelTimeout(void);
 static void WCM_TimeoutAlarmHandler(void);
 static s32 WCM_GetDefaultWirelessMode(void);
@@ -179,7 +175,6 @@ static void WCM_TouchApEntry(WCMApEntry *entry);
 static void *WCM_FindVendorIE(const WMBssDesc *bss);
 static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out);
 static void WCM_InitOnce(void);
-static WCMGlobal *WCM_GetGlobal(void);
 static void WCM_SetMacAddress(const u8 *mac);
 static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 headerLen, const void *data,
                                  s32 dataLen);
@@ -723,7 +718,7 @@ s32 WCM_GetChannelMask(void) {
     return 0;
 }
 
-static WCMWork *WCM_GetWork(void) {
+WCMWork *WCM_GetWork(void) {
     return sWork.work;
 }
 
@@ -758,24 +753,22 @@ static void WCM_ResetSearchOption(void) {
     WCM_GetWork()->searchOption = 0xaaa082;
 }
 
-static u16 WCM_PickChannel(u32 channelIndex) {
-    WCMWork *work = sWork.work;
-    u32 i;
-    u32 channel;
+u16 WCM_PickChannel(s32 channelIndex) {
+    s32 i;
+    s32 channel;
 
-    for (i = channelIndex; i < 13; i++) {
-        channel = i % 13;
-        if (work->searchOption & (1 << (channel + 1))) {
+    for (i = 0; i < 13; i++) {
+        channel = (channelIndex + i) % 13;
+        if (sWork.work->searchOption & (1 << (channel + 1))) {
             if (WCM_GetChannelMask() & (1 << channel)) {
                 break;
             }
         }
     }
-    channel = i % 13;
-    return (u16)(channel + 1);
+    return (u16)((channelIndex + i) % 13 + 1);
 }
 
-static void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line) {
+void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line) {
     WCMWork *work = sWork.work;
     s16 notify = work->pendingNotify;
 
@@ -784,7 +777,7 @@ static void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line) 
     WCM_Notify(notify, result, (s32)parameter, (void *)detail, line);
 }
 
-static void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2) {
+void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2) {
     WCMWork *work = sWork.work;
     struct {
         WCMNotice notice;
@@ -803,20 +796,20 @@ static void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 
     work->notify(&buf.notice);
 }
 
-static s32 WCM_SetState(s32 newState) {
-    WCMWork *work = sWork.work;
+void WCM_SetState(s32 newState) {
+    u32 irq = CPU_IRQDisable();
 
-    if (work->state == 9 && newState != 9) {
-        func_0207bd3c(&work->alarm);
+    if (sWork.work->state == 9 && newState != 9) {
+        func_0207bd3c(&sWork.work->alarm);
     }
-    if (work->state != 11) {
-        work->state = newState;
+    if (sWork.work->state != 11) {
+        sWork.work->state = newState;
     }
     if (newState == 9) {
-        func_0207bd3c(&work->alarm);
-        func_0207bcf4(&work->alarm, 0x22f5341, (void (*)(void *))WCM_TimeoutAlarmHandler, NULL);
+        func_0207bd3c(&sWork.work->alarm);
+        func_0207bcf4(&sWork.work->alarm, 0x22f5341, (void (*)(void *))WCM_TimeoutAlarmHandler, NULL);
     }
-    return 0;
+    CPU_SetIRQMask(irq);
 }
 
 static void WCM_CancelTimeout(void) {
@@ -1141,7 +1134,7 @@ void WCM_DispatchRecvCallback(u8 *src, u8 *dst, u8 *data, u32 len) {
     }
 }
 
-static WCMGlobal *WCM_GetGlobal(void) {
+WCMGlobal *WCM_GetGlobal(void) {
     return &sWcm;
 }
 
