@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_2d.h"
 #include "app/pokemon_trade/pokemontrade_message.h"
 #include "app/pokemon_trade/pokemontrade_nego.h"
 #include "app/pokemon_trade/pokemontrade_proc.h"
@@ -1467,7 +1468,7 @@ void func_ov194_021c4b88(PokemonTradeWork *wk) {
 
 // Shows the icon of a Pokémon's held item, a letter for mail, over a side's panel or, for side 2, the summary
 void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
-    ResSprite *sprite = &wk->infoIcons[0];
+    PokemonTradeSprite *sprite = &wk->infoIcons[0];
     UIObjResSetup setup;
     int x, y;
     BOOL mail = FALSE;
@@ -1514,7 +1515,7 @@ void func_ov194_021c4c00(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     }
 }
 
-void func_ov194_021c4cfc(ResSprite *sprite) {
+void func_ov194_021c4cfc(PokemonTradeSprite *sprite) {
     if (sprite->actor != NULL) {
         func_0204c108(sprite->actor);
         UIObjRes_Free(&sprite->res);
@@ -1525,7 +1526,7 @@ void func_ov194_021c4cfc(ResSprite *sprite) {
 // Shows the Pokérus icon of a Pokémon that has it, over a side's panel or in the summary, or the icon of a Pokémon
 // that had it
 void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm *pkm) {
-    ResSprite *sprite = &wk->infoIcons[1];
+    PokemonTradeSprite *sprite = &wk->infoIcons[1];
     UIObjResSetup setup;
     BOOL pokerus = pokerusDuration(pkm);
 
@@ -1568,7 +1569,7 @@ void func_ov194_021c4d18(PokemonTradeWork *wk, int side, BOOL summary, PartyPkm 
 
 // Shows the icon of a Pokémon that had Pokérus over a side's panel
 static void func_ov194_021c4e0c(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
-    ResSprite *sprite = &wk->infoIcons[2];
+    PokemonTradeSprite *sprite = &wk->infoIcons[2];
     UIObjResSetup setup;
     BOOL cured = pokeHasPkrs(pkm);
 

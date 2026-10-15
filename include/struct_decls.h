@@ -4,6 +4,8 @@
 // Every struct type is declared here once, and defined in the header of the module that owns it, if its layout is
 // known
 
+typedef struct PokemonTradeSprite PokemonTradeSprite;
+
 typedef struct PokemonTrade3DWork PokemonTrade3DWork;
 
 typedef struct TradeMcssMove TradeMcssMove;
