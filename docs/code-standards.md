@@ -1,0 +1,215 @@
+# Code standards
+
+The rules that every C file in `src/` and `lib/` follows, with the wrong and the right form of each, the cases where a
+rule doesn't apply, and what checks it. They come from audits of merged work: each wrong form below was in the tree.
+
+The aim behind all of them: **the code reads as what Game Freak, or the SDK's authors, wrote.** A function that only
+matches through a workaround keeps the natural C and gets a row in [Nonmatching functions](nonmatching-functions.md),
+even when that sends a complete file back to partial. A match is never worth a workaround.
+
+`tools/decomp/check_style.py` finds the rules a script can see. It runs in CI on the lines a pull request adds, after
+each edit in Claude Code and Codex sessions, and by hand:
+
+    .venv/bin/python tools/decomp/check_style.py src/ov033/x.c          # every line of a file
+    .venv/bin/python tools/decomp/check_style.py --diff origin/main      # the lines a branch adds
+
+The others (2, 3) need a reader: the `decomp-reviewer` agent and pull request review check them.
+
+## 1. Control flow as it reads
+
+**Do:** return where the function returns, and break out of a loop where the loop ends.
+
+**Don't:** jump to a label that only returns, or to a copy of the compiler's shared tail.
+
+```c
+/* Wrong: the goto only stands in for a return */
+        for (j = 0; j < 6; j++) {
+            if (mac[j] != 0) {
+                code = 0xf1;
+                goto end;
+            }
+        }
+        DSProt_CallCrash(NULL, NULL);
+        code = 0xfb;
+    }
+end:
+    return code * 0xbf;
+```
+
+```c
+/* Right */
+        for (j = 0; j < 6; j++) {
+            if (mac[j] != 0) {
+                break;
+            }
+        }
+        if (j == 6) {
+            DSProt_CallCrash(NULL, NULL);
+            code = 0xfb;
+        } else {
+            code = 0xf1;
+        }
+    }
+    return code * 0xbf;
+```
+
+**Does not apply when:** the label is a shared cleanup or error exit that frees or resets something (`fail:` in
+`nhttp_request.c`), a retry (`goto retry`), or leaves a search loop to skip its fallback (`goto inserted` in
+`vct_audio.c`). A `do { ... } while (0)` is fine as a macro's body, or as a breakable block with code and locals between
+its `break`s (`btl_server_flow.c`), never as a wrapper around one statement.
+
+**Checked:** a `goto` whose label is followed by nothing but a `return` or the function's end.
+
+## 2. No meaningless temporaries
+
+**Don't:** add a local that names nothing, set a variable twice to pick a branch, or split one expression into
+statements, only to move the compiler's registers or stop it folding a constant.
+
+```c
+/* Wrong: `zero` is there for the register allocator */
+    f32 zero = 0.0f;
+    scale = (fx32)((1.0f / zoom > zero) ? (1.0f / zoom) * FX32_ONE + 0.5f : (1.0f / zoom) * FX32_ONE - 0.5f);
+
+/* Right */
+    scale = FX32_CONST(1.0f / zoom);
+```
+
+```c
+/* Wrong */
+    side = 0;
+    if (!(wk->attacker & 1)) {
+        side = 1;
+    }
+    positions[0] = side;
+
+/* Right */
+    positions[0] = (wk->attacker & 1) ? 0 : 1;
+```
+
+**Does not apply when:** the local names a value the code uses more than once or that has a meaning of its own, or
+the original's own spelling is evidently the split one (two statements that each do something, a declaration order
+that a comment explains). A local the code needs is fine even if the order of its declaration matters to the match.
+
+**Checked:** by review, not by script.
+
+## 3. Macros and helpers as written
+
+**Don't:** expand a macro or an inline of the project or the SDK (`FX32_CONST`, `NELEMS`, `GX_RGB`, `FX_Mul`) by
+hand, or hand-copy a header's inline into a file, to change what the compiler does.
+
+**Checked:** by review.
+
+## 4. Indexing and pointers
+
+**Do:** index an array, or write a pointer sum of the element's own type when it gives the original's address
+computation: `*(p + i + 1)` and `(p + n - 1)->next` compile differently from `p[i + 1]` under MWCC, and some twenty
+functions match only that way.
+
+**Don't:** reach a field through a cast to another pointer type and a byte offset.
+
+```c
+/* Wrong */
+    rate = *(u16 *)((u8 *)work + 0x1310);
+    flags = ((u16 *)ind)[5];
+
+/* Right: the struct, with the field */
+    rate = work->connectBss.rateSetSupport;
+    flags = ind->reason;
+```
+
+**Does not apply when:** the data is untyped bytes (a packet, a file, a compressed stream) read through a `u8 *`.
+
+**Checked:** a `(u8 *)`, `(char *)` or `(s8 *)` cast followed by `+`, then a cast and a dereference.
+
+## 5. Declarations in their owner's header
+
+**Do:** declare a function or global once, in the header of the file that defines it, and include that header.
+Something whose owner isn't written yet goes in its module's shared header, with a comment saying so.
+
+**Don't:** write `extern` or another file's prototype in a `.c` file.
+
+```c
+/* Wrong, in fieldmap.c */
+extern const FieldMapConfig MAP_CONFIGS[];
+
+/* Right: MAP_CONFIGS is fieldmap.c's own .rodata, so it is defined there from the ROM's bytes */
+static const FieldMapConfig MAP_CONFIGS[] = { ... };
+```
+
+**Does not apply when:** a `static` function's forward declaration, or a plain declaration of the file's own data
+ahead of its definition, which can keep its data order (the two shop scripts' window setups).
+
+**Checked:** `extern` in a `.c` file, and a non-static prototype in a `.c` file that the file doesn't define.
+
+## 6. `volatile` only where the hardware or another thread needs it
+
+**Do:** keep a `volatile` only when the original's code needs it (removing it changes a function that matches), and
+say in one line what changes the value behind the compiler's back: an interrupt, another thread, the other CPU.
+
+**Checked:** a `volatile` with no comment on its line or the line before (register macros are exempt).
+
+## 7. Assembly
+
+**Don't:** write `asm` in `src/`. In `lib/`, `asm` is only for code the SDK, or a library it bundles, wrote in
+assembly (an MWCC `asm` function), or assembly a library inlined at several sites (a `static inline` with an `asm {}`
+block, such as `nitro/math.h`'s `MATH_CountLeadingZeros` in ARM code), with a comment saying which.
+
+**Do:** wrap every `asm` function in `// clang-format off` and `// clang-format on`, with a blank line before `on`:
+clang-format joins assembly into one line.
+
+**Checked:** `asm` in `src/`, and an `asm` function in `lib/` with no comment above it.
+
+## 8. Comments explain the code
+
+**Do:** say what the code does, or, for a necessary oddity, why, in one plain sentence.
+
+**Don't:** leave `TODO`, `FIXME` or `XXX`, or narrate how a function was matched: "added to match", "the permuter
+found", "this pass", "down from 81 bytes".
+
+```c
+/* Wrong */
+    // c is declared first to match
+
+/* Right */
+    // The order of these declarations sets the locals' registers
+```
+
+**Checked:** `TODO`/`FIXME`/`XXX` and narrating phrases in comments.
+
+## 9. Names
+
+Swan's names first, marked as swan's in the file's header; the SDK's own names in `lib/`; ours through
+`rename_symbol.py`. A static's symbol is renamed to its C name. A `func_`/`data_` identifier that `symbols.txt`
+already names is stale: `tools/decomp/apply_names.py` rewrites it.
+
+**Checked:** in CI, `apply_names.py --dry-run` must list nothing.
+
+## 10. Bugs
+
+A bug of the original game is `// BUG:` with an explanation, and an `#ifdef BUGFIX` that fixes it, with the original
+in the `#else`. A mistake of an earlier decompilation is just fixed: it isn't the game's bug.
+
+**Checked:** a `// BUG:` with no `#ifdef BUGFIX` in the next lines.
+
+## 11. Formatting
+
+`clang-format` 23.1.1 (`.clang-format`), on every file changed. Guard with `// clang-format off`/`on`: `asm` functions,
+tables laid out by hand, and a `GFL_ASSERT` whose expression has operators, since the macro turns the expression into
+a string in the ROM and clang-format's spacing would change it (`GFL_ASSERT((u16)size < (0xffff/2))`).
+
+**Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version.
+
+## 12. Rows of the nonmatching functions
+
+A row of [Nonmatching functions](nonmatching-functions.md) says, in the present tense, how the function differs now
+(size or bytes, and what the original does differently) and what was tried. No history ("down from 81 lines", "this
+pass", "the previous theory"), no counts of permuter iterations.
+
+**Checked:** narrating phrases on the lines a pull request adds to the file.
+
+## 13. The agents' copies
+
+The skills in `.claude/skills/` have Codex copies in `.agents/skills/`; a change to one goes into the other in the
+same commit.
+
+**Checked:** in CI, the two trees must be identical.

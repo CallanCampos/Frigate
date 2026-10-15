@@ -20,3 +20,35 @@ config_file = "agents/function-matcher.toml"
 [agents.struct-recovery]
 description = "Read-only specialist that derives a struct layout from all assembly accesses and reports the owning header and evidence."
 config_file = "agents/struct-recovery.toml"
+
+[agents.pbw-game-reviewer]
+description = "pokebw2 game code reviewer."
+config_file = "agents/pbw-game-reviewer.toml"
+
+[agents.pbw-library-reviewer]
+description = "pokebw2 library code reviewer."
+config_file = "agents/pbw-library-reviewer.toml"
+
+[agents.pbw-config-reviewer]
+description = "pokebw2 configs and decomp docs reviewer."
+config_file = "agents/pbw-config-reviewer.toml"
+
+[agents.pbw-data-reviewer]
+description = "pokebw2 data reviewer."
+config_file = "agents/pbw-data-reviewer.toml"
+
+[agents.pbw-tools-reviewer]
+description = "pokebw2 tools and infrastructure reviewer."
+config_file = "agents/pbw-tools-reviewer.toml"
+
+[agents.pbw-mwcc-expert]
+description = "MWCC matching expert for pokebw2."
+config_file = "agents/pbw-mwcc-expert.toml"
+
+[agents.pbw-arm-expert]
+description = "ARM9 assembly expert for pokebw2."
+config_file = "agents/pbw-arm-expert.toml"
+
+[agents.pbw-sdk-expert]
+description = "Nintendo DS/DSi SDK expert for pokebw2."
+config_file = "agents/pbw-sdk-expert.toml"

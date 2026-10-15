@@ -25,6 +25,9 @@ Limits:
 - Check probe output for compiler warnings in both versions. Fix warnings in owned files and report any warning that
   needs a declaration outside your ownership; a byte match does not make a warning acceptable.
 - Natural C only, as `CLAUDE.md` defines it. A match through unnatural C counts as no match.
+- `docs/code-standards.md` is the list of what natural C excludes, with the wrong and right forms; before you
+  report, run `.venv/bin/python tools/decomp/check_style.py --diff HEAD FILE` on each file you changed and fix
+  what it finds, or give the reason in a `// style-ok: RULE reason` comment.
 - No `add_source_file.py`, `mark_complete.py`, `rename_symbol.py`, `ninja` or commits: the caller registers, names,
   builds and commits. Names you would give go in the report instead.
 - Put scratch files in the scratchpad directory the prompt gives, prefixed with the file's name.
