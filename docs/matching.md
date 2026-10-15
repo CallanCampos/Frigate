@@ -555,6 +555,9 @@ Same code, other `sp` offsets or frame size.
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
   `ShinkaDemoPieces_Move` gets the original's slots only with each branch's `fx32 distSqXZ` block-scoped and set as
   `FX_Mul(x, x) + FX_Mul(z, z)` written out; through the file's `SquaredLengthXZ` inline they are temporaries.
+  Only when the assignment dominates every use, though: overlay 143's `MonolithMissionInfo_DrawRecords` gets `best`
+  slotted as a temporary through a pass-through inline getter, but `count`, assigned in one branch of an `if`/`else`,
+  keeps its declared slot whatever its type.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
