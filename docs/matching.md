@@ -8,6 +8,10 @@ tools that show the differences.
 
 ## Registers
 
+- The order of two independent updates in a loop body can decide the coloring of a whole function, even when the
+  asm shows them in the other order: the SSP decoder's `func_ov257_021abd84` (`ssp_jpegdec.c`) matches only with
+  `l++;` written before `sBitsLeft--;`, though the original emits the decrement first, and no declaration order moves
+  it.
 - An inline function copies its argument into the parameter (`mov r3, r6`) before testing it, where a macro tests
   the loaded value itself and gives each arm of its conditional a register of its own. DWC's `NHTTPi_compareToken`
   (`nhttp_stdlib.c`) matches only with its case folding as a macro (`TO_LOWER`) in the `while` condition, which also
