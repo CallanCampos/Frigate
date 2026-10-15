@@ -492,11 +492,12 @@ static int MBComm_SendBlock(void) {
             if (cache->missCounter != 0) {
                 cache->missCounter--;
             } else {
+                MBCacheEntry *entries = cache->entries;
                 MBCacheEntry *oldest = NULL;
                 int n;
 
                 for (n = 0; n < MB_CACHE_ENTRY_COUNT; n++) {
-                    MBCacheEntry *candidate = &cache->entries[n];
+                    MBCacheEntry *candidate = &entries[n];
 
                     if (candidate->state == MB_CACHE_ENTRY_READY
                         && (oldest == NULL || oldest->offset > candidate->offset)) {

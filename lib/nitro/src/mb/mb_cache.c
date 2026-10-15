@@ -31,12 +31,10 @@ void MBCache_Add(MBCache *cache, u32 offset, u32 size, void *buf, u32 state) {
 // Copies a part of the program from the cache, if it is all there
 BOOL MBCache_Read(MBCache *cache, u32 offset, void *dst, u32 size) {
     BOOL found = FALSE;
-    u32 irq;
-    MBCacheEntry *entry = &cache->entries[0];
-    MBCacheEntry *end = &cache->entries[MB_CACHE_ENTRY_COUNT];
+    u32 irq = CPU_IRQDisable();
+    MBCacheEntry *entry;
 
-    irq = CPU_IRQDisable();
-    for (; entry < end; entry++) {
+    for (entry = &cache->entries[0]; entry < &cache->entries[MB_CACHE_ENTRY_COUNT]; entry++) {
         if (entry->state >= MB_CACHE_ENTRY_READY) {
             int relative = offset - entry->offset;
 

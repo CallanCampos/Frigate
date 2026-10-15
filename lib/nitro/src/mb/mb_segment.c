@@ -210,6 +210,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
             if (ok) {
                 MBSecureWindow window;
                 const MBSecureAreaPart *part = sSecureAreaTable;
+                u8 *patch;
 
                 window.start = header->arm9RomOffset;
                 window.srcBase = header->arm9.ramAddr - header->arm9RomOffset;
@@ -220,11 +221,10 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
                     MBSegment_CopyRange(&window, part->start, part->start + part->length, FALSE);
                     part++;
                 }
-                {
-                u8 *arm9 = cache->entries[1].buf;
-
-                *(u32 *)(arm9 + ((u32)AutoloadCallback - header->arm9.ramAddr)) = MB_ARM_BX_LR;
-            }
+                // Stub out the autoload callback in the child's copy of ARM9 with a BX LR
+                patch = cache->entries[1].buf;
+                patch += (u32)AutoloadCallback - header->arm9.ramAddr;
+                *(u32 *)patch = MB_ARM_BX_LR;
             }
         }
         if (ok) {
@@ -431,9 +431,9 @@ BOOL MBFile_BuildLayout(MBBlockLayout *layout, const MBCommFile *file) {
 }
 
 // Finds the block of a program that a block number stands for
-BOOL MBFile_LocateBlock(MBBlockSource *source, const MBBlockLayout *layout, u16 block, const MBCommFile *file) {
+BOOL MBFile_LocateBlock(MBBlockSource *source, const MBBlockLayout *layout, u16 block, MBCommFile *file) {
     s8 i;
-    const MBSegment *segment;
+    MBSegment *segment;
     u32 offset;
 
     if (block >= layout->blockTotal) {

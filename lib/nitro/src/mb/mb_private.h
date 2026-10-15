@@ -314,7 +314,8 @@ typedef struct {
     u8 unk_00[0x10];
     u32 mode;
     void (*callback)(u32 ggid);
-    MBGameInfoRecord *head;
+    // The first program, which registering a program changes while the beacon is sent from the list
+    MBGameInfoRecord *volatile head;
     MBGameInfoRecord *current;
     const u8 *source;
     u8 state;
@@ -516,7 +517,7 @@ void MBComm_OnWmEvent(u16 event, void *arg);
 
 // mb_segment.c
 BOOL MBFile_BuildLayout(MBBlockLayout *layout, const MBCommFile *file);
-BOOL MBFile_LocateBlock(MBBlockSource *source, const MBBlockLayout *layout, u16 block, const MBCommFile *file);
+BOOL MBFile_LocateBlock(MBBlockSource *source, const MBBlockLayout *layout, u16 block, MBCommFile *file);
 int MBComm_FlushAndSend(u32 length, u16 aidBitmap, void *buf);
 
 // mb_gameinfo.c
