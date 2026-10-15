@@ -401,6 +401,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Loops
 
+- A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write
+  it as a counter times the step. (matching.md: "A loop offset that starts at 0")
 - A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2p2): put it last
   in the `for` increment's comma list. (matching.md: "a `for` loop's comma-separated increment")
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
