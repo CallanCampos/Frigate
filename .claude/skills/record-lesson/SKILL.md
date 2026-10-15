@@ -16,6 +16,7 @@ went only to memory, and the docs fell behind. Put each lesson where the next pe
 | The same, as a lookup | `.claude/skills/match-function/levers.md`, under its symptom | One line, with `(matching.md: "phrase")` pointing back |
 | Why one function doesn't match, and what was tried | `docs/nonmatching-functions.md` | A row in the existing table format |
 | A build failure and its fix | `.claude/skills/fix-build/SKILL.md` table | Symptom, then cause and fix |
+| A kind of bad code that got past review (a workaround kept for a match, a misplaced declaration) | `docs/code-standards.md`, as a rule or an example of one; a check in `tools/decomp/check_style.py` with a case in `tools/decomp/tests/check_style/` (flagged and near miss) when a script can see it; the bad shape in the matching `.claude/agents/review/pbw-*-reviewer.md` | The wrong and right forms, the case that showed it, and when it doesn't apply |
 | A step that was missed or a convention that was broken | The skill that covers that step; a hook (`.claude/hooks/guard.py`) if it must never happen again | An imperative line with the reason |
 | A useful scratchpad script | The fitting package of `tools/` ([tools/README.md](../../../tools/README.md)), with a docstring and usage like the others, and a mention in `docs/decompiling.md` | Commit it as `tools: ...`; the scratchpad is wiped between sessions |
 | The workstream's status, plan or the user's choices | The memory file for that workstream | Dates as absolute dates |

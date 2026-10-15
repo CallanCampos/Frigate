@@ -1,0 +1,10 @@
+lib/flagged.c:3: asm: asm function with no comment saying why it is assembly
+src/flagged.c:5: extern: extern in a .c file: declare it in the owner's header
+src/flagged.c:8: volatile: volatile without a comment saying what changes it
+src/flagged.c:17: goto-return: `goto end` only jumps to a return: return there instead
+src/flagged.c:26: byte-offset: a field reached by a cast and a byte offset: use the struct's field
+src/flagged.c:30: asm: asm in game code
+src/flagged.c:36: todo: TODO/FIXME/XXX left in
+src/flagged.c:37: narration: comment narrates the matching: say what the code does
+src/flagged.c:38: bug: // BUG: with no #ifdef BUGFIX fix after it
+src/flagged.c:6: prototype: `OtherFile_Function` is another file's: declare it in its owner's header

@@ -29,8 +29,11 @@ a rule here changes, change it there too.
   structure, never code to copy. The user chose this explicitly for SPL.
 - **Natural C only.** No inline asm, permuter noise, unexplained `volatile`, casts that reach a field by byte offset or
   meaningless temporaries. A pointer sum of the element's own type (`*(p + i + 1)`, `(p + n - 1)->next`) is plain C,
-  which MWCC compiles differently from indexing: write it when it gives the original's address computation. A function that doesn't match keeps the closest natural C and gets a row in
-  `docs/nonmatching-functions.md` (both addresses, the difference, and what was tried). The exceptions, in `lib/` only:
+  which MWCC compiles differently from indexing: write it when it gives the original's address computation. A function
+  that doesn't match keeps the closest natural C and gets a row in `docs/nonmatching-functions.md` (both addresses, the
+  difference, and what was tried), even when that sends a complete file back to partial. `docs/code-standards.md` has
+  every rule with its wrong and right forms; `tools/decomp/check_style.py` checks what a script can see, and CI's
+  Standards workflow runs it, clang-format 23.1.1 and the skills' sync on every pull request. The exceptions, in `lib/` only:
   a function that the SDK, or a library it bundles, wrote in assembly (an `asm` function in its C file, such as
   NitroSDK's `MTX_Identity43`, the CP15 cache functions or DWC's big-number helpers) is an MWCC `asm` function, said
   to be one in a comment, and assembly the library inlined at several sites (DS Protect's cache flush) is a
@@ -98,7 +101,13 @@ Skills in `.claude/skills/`, with Codex copies in `.agents/skills/` that change 
   index (`levers.md`) and the capped permuter (`permuter.md`).
 - `fix-build`: a link, module-check, SHA1 or White 2-only failure.
 - `finish-file`: verify both versions, mark complete, document mismatches, commit, then merge, rebuild and push.
-- `record-lesson`: where a new lesson goes and how to write it.
+- `record-lesson`: where a new lesson goes and how to write it. A "never again" lesson about code becomes a rule
+  of `docs/code-standards.md` with a check in `tools/decomp/check_style.py` and a fixture, and a bad shape in the
+  matching reviewer's list.
+- `code-standards`: the C rules, short, pointing to `docs/code-standards.md` and the checker.
+- `code-audit`: audit a scope (a pull request, a contributor's work, a directory) with the reviewers, then fix every
+  finding in a loop until a confirmation round is clean. Its state is `.claude/audit-state.json`, and a Stop hook
+  keeps the session on it until it is complete.
 
 Agents in `.claude/agents/`, used to keep large asm and diffs out of the main context. They run on cheaper models
 (`model:` in each file): `boundary-scout` on Haiku, the rest on Sonnet; pass `model: "opus"` for a function worth it.
@@ -107,3 +116,14 @@ Agents in `.claude/agents/`, used to keep large asm and diffs out of the main co
 - `boundary-scout`: proposes the files of a module range, read-only.
 - `struct-recovery`: derives a struct's layout from every access to it, read-only.
 - `decomp-reviewer`: an adversarial check of a file's diff before commit, read-only.
+
+Reviewers in `.claude/agents/review/`, one per area, for `code-audit`'s partitions and deep reviews, read-only, each
+with evidence discipline (what it read against what it infers) and a list of known bad shapes that grows with each
+real one: `pbw-game-reviewer` (src/, include/), `pbw-library-reviewer` (lib/), `pbw-config-reviewer` (config/ and the
+decomp docs), `pbw-data-reviewer` (data/, tools/data/), `pbw-tools-reviewer` (tools/, CI, the agents' config).
+Experts in `.claude/agents/experts/`, to consult, design or implement: `pbw-mwcc-expert` (matching under MWCC, on
+Opus), `pbw-arm-expert` (reading the assembly), `pbw-sdk-expert` (the Nintendo SDKs' APIs and names).
+
+Hooks in `.claude/hooks/`, with Codex copies in `.codex/hooks/`: `guard.py` blocks the process mistakes before a tool
+runs; `post_edit.py` checks an edited C file against the standards and clang-format and tells the agent;
+`audit_stop.py` holds a `code-audit` session to its loop.

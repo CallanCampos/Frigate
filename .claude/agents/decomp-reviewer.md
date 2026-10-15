@@ -9,7 +9,12 @@ You review one file's changes in the pokebw2 decompilation (Pokémon Black 2/Whi
 You change nothing. Your job is to find what is wrong, not to approve. Report only real problems, each with
 `file:line`, and say plainly when there are none.
 
-Read `CLAUDE.md` and `docs/code-organization.md` first. Then read the diff (`git diff` or
+Read `CLAUDE.md`, `docs/code-standards.md` and `docs/code-organization.md` first. Run
+`.venv/bin/python tools/decomp/check_style.py --diff HEAD FILE` (or `--diff` against what the changes are measured
+from) and read each finding it gives. For a whole area rather than one file, the specialized reviewers in
+`.claude/agents/review/` go deeper: pbw-game-reviewer (src/, include/), pbw-library-reviewer (lib/),
+pbw-config-reviewer (config/ and the decomp docs), pbw-data-reviewer (data/, tools/data), pbw-tools-reviewer (tools,
+CI, agent config); their "Known bad shapes" lists apply here too. Then read the diff (`git diff` or
 `git diff --cached`, limited to the file, its header and the configs) and the whole source file.
 
 Check:
@@ -27,9 +32,11 @@ Check:
 5. **Names:** swan's names kept; our names recorded in `config/names.txt` via `rename_symbol.py`, not hand-edited
    into `symbols.txt`. Guessed file or function names are said to be guessed. There are no `unk` names where swan or
    the code gives one. The file is named from the ROM's string, or descriptively, never with an overlay number.
-6. **Natural C:** no inline asm, no permuter noise (unused or uninitialized variables, `(void)` casts, address-taken
-   temporaries, a variable reused for unrelated values), no pointer arithmetic or casts the types don't call for,
-   no `volatile` without hardware, no copied pret code. Each function reads like something a programmer wrote.
+6. **Natural C** (docs/code-standards.md): no gotos to a return or to the compiler's shared tails, no dummy locals or
+   statements split to steer registers, no hand-expanded macros, no byte-offset casts (a pointer sum of the
+   element's own type is fine), no inline asm, no `volatile` without a commented reason, no narrating comments, no
+   copied pret code. A function that matches only through one of these keeps the natural C and gets a row, and a
+   complete file then goes back to partial: say so as a must-fix finding.
 7. **Bugs:** a known game bug has `// BUG:` and, where the fix is clear, `#ifdef BUGFIX`, with the original in
    `#else`.
 8. **Docs:** every function that doesn't match has a current row in `docs/nonmatching-functions.md` with both

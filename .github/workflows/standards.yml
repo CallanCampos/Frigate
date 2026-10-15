@@ -1,0 +1,86 @@
+name: Standards
+
+# Checks a pull request, or a push to main, against docs/code-standards.md: clang-format on the C files it changes (the
+# pinned 23.1.1, since releases format differently), check_style.py on the lines it adds, check_style.py's own fixture
+# tests, the skills' Codex copies against the Claude ones, and names that apply_names.py would still rewrite. It needs
+# no ROM, so pull requests from forks run it too.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  standards:
+    name: Code standards
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install clang-format
+        run: python -m pip install clang-format==23.1.1
+
+      - name: Find the base
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)
+          elif [ -n "${{ github.event.before }}" ] && git cat-file -e "${{ github.event.before }}" 2>/dev/null; then
+            base="${{ github.event.before }}"
+          else
+            base=$(git rev-parse HEAD~1)
+          fi
+          echo "sha=$base" >> "$GITHUB_OUTPUT"
+
+      - name: Formatting of the changed C files
+        run: |
+          files=$(git diff --name-only --diff-filter=ACMR "${{ steps.base.outputs.sha }}" -- \
+            'src/*.c' 'src/*.h' 'lib/*.c' 'lib/*.h' 'include/*.h')
+          if [ -z "$files" ]; then echo "No C files changed"; exit 0; fi
+          clang-format --version
+          if ! clang-format --dry-run --Werror $files; then
+            echo "::error::Run clang-format 23.1.1 on these files (pip install clang-format==23.1.1; clang-format -i FILE)."
+            echo "Guard asm functions, hand-laid-out tables and GFL_ASSERTs with operators with // clang-format off/on."
+            exit 1
+          fi
+
+      - name: Code standards of the added lines
+        run: python tools/decomp/check_style.py --diff "${{ steps.base.outputs.sha }}" --strict
+
+      - name: check_style.py's fixtures
+        run: python tools/decomp/tests/check_style/run.py
+
+      - name: The agents' Codex copies
+        run: |
+          status=0
+          if ! diff -r .claude/skills .agents/skills; then
+            echo "::error::.agents/skills must be a copy of .claude/skills: change both in the same commit."
+            status=1
+          fi
+          for hook in .claude/hooks/*.py; do
+            if ! diff "$hook" ".codex/hooks/$(basename "$hook")"; then
+              echo "::error::.codex/hooks/$(basename "$hook") must be a copy of $hook."
+              status=1
+            fi
+          done
+          exit $status
+
+      - name: Names symbols.txt already gives
+        run: |
+          stale=$(python tools/decomp/apply_names.py --dry-run)
+          if [ -n "$stale" ]; then
+            echo "$stale"
+            echo "::error::These identifiers have names in symbols.txt: run tools/decomp/apply_names.py."
+            exit 1
+          fi

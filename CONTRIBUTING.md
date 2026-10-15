@@ -51,7 +51,9 @@ still linked, and objdiff shows how close it is.
 - **Natural C only.** Write what a programmer at Game Freak could have written: no inline assembly, no
   `volatile` or casts to reach a field by byte offset, no meaningless temporaries or permuter output. A pointer sum
   of the element's own type, `*(p + i + 1)`, is plain C that compiles differently from `p[i + 1]`: write it when it
-  gives the original's code.
+  gives the original's code. [Code standards](docs/code-standards.md) has every rule with its wrong and right forms.
+  Pull requests run them in CI: clang-format 23.1.1 (`pip install clang-format==23.1.1`) on the C files you change,
+  and `tools/decomp/check_style.py --diff origin/main` on the lines you add, which you can run before pushing.
   When a function doesn't match, keep the closest natural C and add a row to
   [Nonmatching functions](docs/nonmatching-functions.md) with both versions' addresses, the difference and what you
   tried. In `lib/` only, a function the SDK, or a library it bundles, wrote in assembly is written as an MWCC `asm`

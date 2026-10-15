@@ -11,8 +11,12 @@ copies in the same commit.
 
 The named specialist roles from `.claude/agents/` are ported as Codex roles in `.codex/config.toml` and
 `.codex/agents/`. Skills that mention those roles can therefore use `boundary-scout`, `decomp-reviewer`,
-`file-writer`, `function-matcher`, and `struct-recovery`.
+`file-writer`, `function-matcher`, `struct-recovery`, the reviewers `pbw-game-reviewer`, `pbw-library-reviewer`,
+`pbw-config-reviewer`, `pbw-data-reviewer`, `pbw-tools-reviewer`, and the experts `pbw-mwcc-expert`,
+`pbw-arm-expert`, `pbw-sdk-expert`. `docs/code-standards.md` is the C rule set; `tools/decomp/check_style.py` checks
+it, and CI's Standards workflow runs it on every pull request.
 
-The `.codex/hooks.json` pre-tool hook runs `.codex/hooks/guard.py`, which enforces the repository's memory, process,
-staging, and protected-path rules. Keep `.claude/` and these Codex copies synchronized when either configuration
-changes.
+The `.codex/hooks.json` hooks run `.codex/hooks/guard.py` before a tool (the repository's process, staging and
+protected-path rules), `.codex/hooks/post_edit.py` after an edit (the code standards and clang-format), and
+`.codex/hooks/audit_stop.py` at the end of a turn (the code-audit loop). Keep `.claude/` and these Codex copies
+synchronized when either configuration changes; CI checks the skills and the hooks.
