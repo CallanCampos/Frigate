@@ -71,6 +71,7 @@ lib/dwc/src/nhttp/nhttp_list.c:
     .text       start:0x0219e118 end:0x0219e238
 
 lib/dwc/src/nhttp/nhttp_recvbuf.c:
+    complete
     .text       start:0x0219e238 end:0x0219e578
 
 lib/dwc/src/nhttp/nhttp_request.c:

@@ -126,28 +126,14 @@ int NHTTPi_skipSpaceHdrRecvBuf(NHttpResponse *response, int start, int end) {
 int NHTTPi_compareTokenN_HdrRecvBuf(NHttpResponse *response, int start, int end, const char *token, int terminator) {
     NHttpHeaderBlock *block;
     int offset;
-    int last;
     int c;
-    int t;
-    int lowerToken;
 
     if (start < end) {
         NHTTPi_getRecvBufPos(response, start, &block, &offset);
         c = NHTTPi_getRecvBufChar(response, &block, &offset);
-        last = end - 1;
-        for (;;) {
-            t = *token;
-            lowerToken = t;
-            if (NHTTPi_isUpper(t)) {
-                lowerToken = t + ('a' - 'A');
-            }
-            if (NHTTPi_isUpper(c)) {
-                c += 'a' - 'A';
-            }
-            if (c != lowerToken) {
-                break;
-            }
-            if (t == 0 || t == ' ' || t == terminator || start == last) {
+        while ((NHTTPi_isUpper(c) ? c + ('a' - 'A') : c)
+               == (NHTTPi_isUpper(*token) ? *token + ('a' - 'A') : *token)) {
+            if (*token == 0 || *token == ' ' || *token == terminator || start == end - 1) {
                 return 0;
             }
             c = NHTTPi_getRecvBufChar(response, &block, &offset);
@@ -194,8 +180,8 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHttpResponse *response, char *dest, int start, i
                         NHTTPi_memcpy(dest, block->data + start, count);
                         start = (start + count) & (NHTTP_HEADER_BLOCK_SIZE - 1);
                         size -= count;
-                        dest += count;
                         block = block->next;
+                        dest += count;
                     } while (size != 0);
                 }
             }

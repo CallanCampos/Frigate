@@ -274,8 +274,6 @@ in both versions.
 | `lib/dwc/src/crypt/crypt.c` | `EncodeWindows` | `0x021ab2d0` / `0x021ab310` | Same size, 197 bytes of registers: the original has `window` in r6, `dest` r7, the table r8 and 0xff in fp, and loads the digits and length with `ldm`. The inner skip loop, the duplicated word advance and the `u8`/`u32` types now match. Tried declaration sweeps, the table read inline. |
 | `lib/dwc/src/nhttp/nhttp_list.c` | `NHTTPi_setReqQueue` | `0x0219e0e0` / `0x0219e120` | 2 bytes short (0x54 against 0x56): the original reloads the queue's count where ours keeps it in a register. |
 | `lib/dwc/src/nhttp/nhttp_list.c` | `NHTTPi_findReqQueue` | `0x0219e138` / `0x0219e178` | 2 bytes long (0x32 against 0x30): the original ends both loops with a branch to one shared return, ours returns in each. |
-| `lib/dwc/src/nhttp/nhttp_recvbuf.c` | `NHTTPi_compareTokenN_HdrRecvBuf` | `0x0219e384` / `0x0219e3c4` | 8 bytes short (0x90 against 0x98): the same case folding as NHTTPi_compareToken, laid out differently. |
-| `lib/dwc/src/nhttp/nhttp_recvbuf.c` | `NHTTPi_loadFromHdrRecvBuf` | `0x0219e41c` / `0x0219e45c` | 4 bytes, same size: one pointer load is placed after the other one in ours. |
 | `lib/dwc/src/nhttp/nhttp_request.c` | `NHTTP_CreateRequest` | `0x0219e540` / `0x0219e580` | 2 bytes, same size: the original loads the constant 8 into r2 where ours uses r0. |
 | `lib/dwc/src/nhttp/nhttp_request.c` | `NHTTP_CancelRequestAsync` | `0x0219e96c` / `0x0219e9ac` | 2 bytes short (0x5a against 0x5c): a field is reloaded in the original. |
 | `lib/dwc/src/nhttp/nhttp_request.c` | `NHTTPi_cancelAllRequests` | `0x0219e9c8` / `0x0219ea08` | 2 bytes short (0x4a against 0x4c): a field is reloaded in the original. |
