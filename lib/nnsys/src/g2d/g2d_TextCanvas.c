@@ -35,12 +35,11 @@ static void DrawTextAligned(const NNSG2dTextCanvas *pTxn, int x, int y, int area
     const void *pos = txt;
     const int lfx = linefeed * -dir.y;
     const int lfy = linefeed * dir.x;
-    int ofsX = 0;
-    int ofsY = 0;
+    int line = 0;
 
     while (pos != NULL) {
-        lineX = x + ofsX;
-        lineY = y + ofsY;
+        lineX = x + lfx * line;
+        lineY = y + lfy * line;
 
         if (flags & NNS_G2D_HORIZONTALALIGN_RIGHT) {
             const int shift = areaWidth - NNSi_G2dFontGetStringWidth(pTxn->pFont, pTxn->hSpace, pos, NULL);
@@ -56,8 +55,7 @@ static void DrawTextAligned(const NNSG2dTextCanvas *pTxn, int x, int y, int area
         }
 
         NNSi_G2dTextCanvasDrawString(pTxn, lineX, lineY, cl, pos, &pos, dir);
-        ofsX += lfx;
-        ofsY += lfy;
+        line++;
     }
 }
 

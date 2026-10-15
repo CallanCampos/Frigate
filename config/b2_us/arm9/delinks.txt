@@ -825,6 +825,7 @@ lib/nnsys/src/gfd/gfdi_LinkedListVramMan_Common.c:
     .text       start:0x0205fa54 end:0x0205fcd4
 
 lib/nnsys/src/gfd/gfd_LinkedListTexVramMan.c:
+    complete
     .text       start:0x0205fcd4 end:0x0205fef8
     .rodata     start:0x02094268 end:0x02094298
     .bss        start:0x02141a54 end:0x02141a70
@@ -861,9 +862,11 @@ lib/nnsys/src/g2d/g2d_Load.c:
     .text       start:0x02060358 end:0x020603b4
 
 lib/nnsys/src/g2d/g2d_Animation.c:
+    complete
     .text       start:0x020603b4 end:0x02060650
 
 lib/nnsys/src/g2d/g2d_MultiCellAnimation.c:
+    complete
     .text       start:0x020612cc end:0x020619ac
 
 lib/nnsys/src/g2d/g2di_VRamLocation.c:
@@ -931,6 +934,7 @@ lib/nnsys/src/g2d/g2d_CharCanvas.c:
     .rodata     start:0x02094390 end:0x02094414
 
 lib/nnsys/src/g2d/g2d_TextCanvas.c:
+    complete
     .text       start:0x02064ab0 end:0x02064d8c
 
 lib/nnsys/src/g2d/g2d_NFT_load.c:

@@ -148,20 +148,18 @@ static inline void InitMCAnimation_(NNSG2dMultiCellAnimation *mcAnim, const NNSG
     mcAnim->totalVideoFrame = 0;
 }
 
-// Sets up an instance whose nodes each have a cell animation: the work holds the nodes, and then their cell
-// animations. It sets up the multi-cell animation too, which NNS_G2dInitMCAnimationInstance then does again
-static inline void InitMCAnimationNotShareCellAnim_(NNSG2dMultiCellAnimation *mcAnim, void *work,
+// Sets up a multi-cell animation whose nodes each have a cell animation, from the nodes and their cell animations. It
+// sets up the multi-cell animation too, which NNS_G2dInitMCAnimationInstance then does again
+static inline void InitMCAnimationNotShareCellAnim_(NNSG2dMultiCellAnimation *mcAnim, NNSG2dNode *nodes,
+                                                    NNSG2dCellAnimation *cellAnims, u16 num,
                                                     const NNSG2dAnimBankData *anims, const NNSG2dCellDataBank *cells,
                                                     const NNSG2dMultiCellDataBank *mcBank) {
-    u16 num = GetMaxNodeNum_(mcBank);
-    NNSG2dNode *nodes = work;
-    NNSG2dCellAnimation *cellAnims = (NNSG2dCellAnimation *)(nodes + num);
     u16 i;
 
     mcAnim->multiCellInstance.mcType = NNS_G2D_MCTYPE_DONOT_SHARE_CELLANIM;
     mcAnim->multiCellInstance.pCurrentMultiCell = NULL;
     mcAnim->multiCellInstance.pAnimDataBank = anims;
-    mcAnim->multiCellInstance.pCellAnimArray = work;
+    mcAnim->multiCellInstance.pCellAnimArray = nodes;
     for (i = 0; i < num; i++) {
         NNSi_G2dInitializeNode(&nodes[i], NNS_G2D_NODETYPE_CELL);
         nodes[i].pContent = &cellAnims[i];
@@ -173,27 +171,33 @@ static inline void InitMCAnimationNotShareCellAnim_(NNSG2dMultiCellAnimation *mc
 void NNS_G2dInitMCAnimationInstance(NNSG2dMultiCellAnimation *mcAnim, void *work, const NNSG2dAnimBankData *anims,
                                     const NNSG2dCellDataBank *cells, const NNSG2dMultiCellDataBank *mcBank,
                                     u32 mcType) {
+    NNSG2dMultiCellInstance *instance;
+    NNSG2dCellAnimation *cellAnims;
+    NNSG2dMCCellAnimation *mcCellAnims;
+    u16 numCellAnims;
+    u16 numNodes;
+    u16 i;
+
     if (mcType == NNS_G2D_MCTYPE_SHARE_CELLANIM) {
         // Cell animations for the most a multi-cell of the bank uses, shared by their index
-        NNSG2dMultiCellInstance *instance;
-        u16 num;
-        u16 i;
-        NNSG2dMCCellAnimation *cellAnims;
-
         mcAnim->multiCellInstance.mcType = NNS_G2D_MCTYPE_SHARE_CELLANIM;
         instance = &mcAnim->multiCellInstance;
         instance->pAnimDataBank = anims;
         instance->pCellAnimArray = work;
-        num = GetMaxCellAnimNum_(mcBank);
-        cellAnims = instance->pCellAnimArray;
-        for (i = 0; i < num; i++) {
-            NNSG2dMCCellAnimation *cellAnim = &cellAnims[i];
+        numCellAnims = GetMaxCellAnimNum_(mcBank);
+        mcCellAnims = instance->pCellAnimArray;
+        for (i = 0; i < numCellAnims; i++) {
+            NNSG2dMCCellAnimation *cellAnim = &mcCellAnims[i];
 
             NNS_G2dInitCellAnimation(&cellAnim->cellAnim, NNS_G2dGetAnimSequenceByIdx(anims, 0), cells);
             cellAnim->bInited = TRUE;
         }
     } else {
-        InitMCAnimationNotShareCellAnim_(mcAnim, work, anims, cells, mcBank);
+        // A cell animation for each node: the work holds the most nodes of a multi-cell of the bank, and then their
+        // cell animations
+        numNodes = GetMaxNodeNum_(mcBank);
+        cellAnims = (NNSG2dCellAnimation *)((NNSG2dNode *)work + numNodes);
+        InitMCAnimationNotShareCellAnim_(mcAnim, work, cellAnims, numNodes, anims, cells, mcBank);
     }
     InitMCAnimation_(mcAnim, mcBank);
 }

@@ -302,6 +302,17 @@ Same instructions, registers swapped.
   then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
   NitroSDK declares it, not `GXLightMask light`; casts or enum locals at the call don't help. Check the SDK's
   prototype of an inline before the call site.
+- In NitroSystem's 2.0/sp2p2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
+  written in place it loads `a` first (`g2d_Animation.c`'s `SequenceEdgeHandle_` clamps through
+  `GetLastFrame_(seq)`). Spilled locals take slots from the top of the frame down: the function's locals, then an
+  `if` block's, then its `else` block's, each in declaration order, then an inline's in reverse, so a slot order no
+  block layout gives needs the locals at function scope (`NNS_G2dInitMCAnimationInstance`). A second loop that
+  reuses the first loop's counter swaps registers with its block's temporary, where a counter of its own declared
+  after the others doesn't (`gfd_LinkedListTexVramMan.c`'s `NNS_GfdResetLnkTexVramState`).
+- A loop offset that starts at 0, grows by a step and is zeroed after the loop's hoisted invariants is a counter
+  times the step: MWCC strength-reduces `x + step * line` into a running offset that it zeroes in the loop's
+  preheader, where an offset kept by hand is zeroed before the hoisted code. NitroSystem's `g2d_TextCanvas.c`
+  `DrawTextAligned` matches with `int line = 0;`, `lineX = x + lfx * line;` and `line++`.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
@@ -2111,6 +2122,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   after a file's larger tables, is the next file's first object: the 4 bytes at 0x021a773c in overlay 310 can't end
   `research_graph.c`, whose tables are larger, and as `research_common.c`'s global `ResearchCommon_Unused` they take
   a section of their own ahead of that file's 8-byte table, as the ROM has them.
+- A global nothing refers to that the ROM has after the shared section, where ours sorts it first, needs an object
+  of its size or less in the shared section that the sort puts first, and the globals' declaration order decides
+  that tie: overlay 280's `namein.c` puts `NAME_ENTRY_SOUND_COUNT` where the ROM has it only declared right after
+  the array it counts, above the tables. When the function-local statics are all one size and every table is at
+  file scope, though, the layout fixes only their order in MWCC's list, not which functions own them: a fit with
+  placeholder statics proves nothing without the code using the values.
 - A small table that sits among a file's other small `static const` tables but that no code loads from was a
   referenced static whose reads were folded: an unreferenced `static const` is dropped, and a global gets a section
   of its own after the packed one. `pleasure_boat_rooms.c`'s `sTrainerCounts` holds the weekday `switch`'s seven

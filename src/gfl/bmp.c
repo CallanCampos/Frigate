@@ -612,19 +612,20 @@ static void GFL_BitmapFillArea_IDX8_VRAM(GFLBitmap *bitmap, s16 x, s16 y, u16 wi
 
 GFLBitmap *GFL_BitmapMakeLinear(GFLBitmap *bitmap, BOOL keepAsNew, HeapID heapId) {
     u16 tileSize = bitmap->tileSize;
-    u16 rowSize = tileSize / 8;
+    u16 bytesPerTileRow = tileSize / 8;
     u16 tilesY = bitmap->height / 8;
     u16 tilesX = bitmap->width / 8;
     GFLBitmap *linear = GFL_BitmapCreate(tilesX, tilesY, tileSize, heapId);
-    int i;
+    int byteIndex;
 
-    for (i = 0; i < tilesX * tilesY * tileSize; i++) {
-        int y = i / (tilesX * rowSize);
-        int x = i % (tilesX * rowSize);
-        int col = x % rowSize;
-        int tile = x / rowSize;
+    for (byteIndex = 0; byteIndex < tilesX * tilesY * tileSize; byteIndex++) {
+        int y = byteIndex / (tilesX * bytesPerTileRow);
+        int rowByteOffset = byteIndex % (tilesX * bytesPerTileRow);
+        int byteInTileRow = rowByteOffset % bytesPerTileRow;
+        int tileColumn = rowByteOffset / bytesPerTileRow;
 
-        linear->pixels[i] = bitmap->pixels[col + (y % 8) * rowSize + (tile + (y / 8) * tilesX) * tileSize];
+        linear->pixels[byteIndex] =
+            bitmap->pixels[byteInTileRow + (y % 8) * bytesPerTileRow + (tileColumn + (y / 8) * tilesX) * tileSize];
     }
     if (keepAsNew == FALSE) {
         GFL_BitmapCopy(linear, bitmap);
