@@ -1,40 +1,42 @@
+#include "gfl/std.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "vct_dsp_internal.h"
 #include "vct_internal.h"
 
 // The memory the packets come in, the microphone's levels, a filter on its samples, and a canceller of the echo of
 // the speaker. The divider and the square root unit of the hardware do the sums that need them.
 
 // The packets that are free, and the memory they are made of
-typedef struct VCTPacketPool {
+struct VCTPacketPool {
     VCTPacket *freeList;
     VCTPacket *base;
-} VCTPacketPool;
+};
 
 // What the library has made of the microphone's loudness
-typedef struct VCTCapture {
+struct VCTCapture {
     // Whether somebody is speaking
     u32 speaking;
     u32 level;
     // How many quiet frames end the speaking
     int quietFrameLimit;
     int unkC;
-} VCTCapture;
+};
 
 // How the loudness of the frames before has set the level that a voice has to rise above
-typedef struct VCTNoiseFloor {
+struct VCTNoiseFloor {
     u32 threshold;
     u32 index;
     int quietFrames;
-} VCTNoiseFloor;
+};
 
-typedef struct VCTEcho {
+struct VCTEcho {
     s16 attenuation;
     int highpassMinusInput;
     int readIndex;
     int writeIndex;
     int highpassOutput;
-} VCTEcho;
+};
 
 static VCTCapture sCapture = { 0, 0, 15, 0x3fc };
 static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };

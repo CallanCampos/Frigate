@@ -1,5 +1,6 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "vct_dsp_internal.h"
 #include "vct_internal.h"
 #include "vct_session_internal.h"
 

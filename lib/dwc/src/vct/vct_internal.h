@@ -50,26 +50,6 @@ typedef struct VCTVoicePacket {
     u8 payload[0x454];
 } VCTVoicePacket;
 
-// A voice packet that has come in, on its way to being played
-typedef struct VCTPacket VCTPacket;
-struct VCTPacket {
-    VCTPacket *nextFree;
-    VCTPacket *prev;
-    VCTPacket *next;
-    int codec;
-    u8 aid;
-    u8 slot;
-    u8 pad12[2];
-    int dataSize;
-    u32 sequence;
-    s16 samples[VCT_FRAME_SAMPLES];
-    int silence;
-    u32 timestamp;
-    u64 arrival;
-    u64 playTime;
-    u8 *data;
-};
-
 // What one machine's voice has gone through on the way to being played
 typedef struct VCTReceiver {
     u32 avgDelay;
@@ -130,10 +110,6 @@ extern VCTSettings gVCTSettings;
 BOOL func_ov011_02168b18(u8 aid, const void *data, int size);
 BOOL func_ov011_02168a08(u8 aid, const void *data, int size);
 
-// Copies size bytes, a multiple of 4, 32 bytes at a time where it can: NitroSDK's MIi_CpuCopyFast (not in nitro/mi.h
-// yet)
-void sys_memcpy32_fast(const void *src, void *dest, u32 size);
-
 // The timer count, which seeds the packets' sequence numbers
 u16 func_0207bb84(void);
 
@@ -163,19 +139,5 @@ void VCT_SetEchoCancel(BOOL enabled);
 BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now);
 int VCT_DecodeReceived(void);
 BOOL VCT_SendPending(void);
-
-// vct_dsp.c: packet memory, microphone levels and echo
-BOOL VCT_InitPacketPool(void *buffer, u32 size);
-void VCT_ClearPacketPool(void);
-VCTPacket *VCT_AllocPacket(void);
-void VCT_FreePacket(VCTPacket *packet);
-void VCT_ResetCapture(void);
-int VCT_UpdateVad(u32 energy, u32 rms, u8 *level);
-void VCT_InitCapture(void);
-u32 VCT_FilterFrame(s16 *samples, int bytes);
-void VCT_InitEcho(void);
-void VCT_SaveFarEnd(s16 *samples, int bytes);
-void VCT_CancelEcho(s16 *samples, int bytes, u32 rms);
-void VCT_MixSamples(s16 *a, s16 *b, s16 *out, u32 bytes);
 
 #endif // POKEBW2_DWC_VCT_INTERNAL_H

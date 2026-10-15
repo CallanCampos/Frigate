@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_VCT_H
 
 #include "types.h"
+#include "dwc/vct_dsp.h"
 #include "dwc/vct_session.h"
 #include "struct_decls.h"
 
@@ -49,9 +50,6 @@ BOOL VCT_SetCodec(int codec);
 void VCT_SetVad(BOOL enabled);
 // Whether to keep the microphone from picking up what the speaker plays
 void VCT_SetEchoCancel(BOOL enabled);
-
-// Copies the four words of how loud the microphone is: whether somebody is speaking, the level, and two limits
-void VCT_GetCaptureLevels(s32 *out);
 
 BOOL VCT_AttachSession(VCTSession *session);
 void VCT_DetachSession(VCTSession *session);
