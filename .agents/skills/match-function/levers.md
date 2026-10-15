@@ -480,6 +480,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
   compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
+- On NitroSystem's `2.0/sp2p2`, initialized globals are ordered by size, smallest first, and objects of one size in the
+  reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
 - The full model, checked by fuzzing MWCC: there is one list per file in declaration order, except tentative `.bss`
   statics, which join at the end in reverse order. Each kind (rodata, data, bss) gets its own shared section.
   Unreferenced statics are dropped. `rodata_order.py` doesn't model the per-kind sections or the `.bss` rule yet, but

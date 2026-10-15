@@ -1635,6 +1635,13 @@
 . 0x02065640 NNS_G3dReleaseMdlPltt
 . 0x020658a4 NNS_G3dGlbSetBaseTrans
 . 0x020658c8 NNS_G3dGlbSetBaseScale
+. 0x0206599c InvertMtx44
+. 0x02065b10 NNS_G3DGetInvProjectionMatrix
+. 0x02065bcc NNS_G3DGetInvViewProjectionMatrix
+. 0x02065c58 NNSi_G3dAnmBlendMat
+. 0x02065c9c blendScale_
+. 0x02065d0c NNSi_G3dAnmBlendJnt
+. 0x020660f8 NNSi_G3dAnmBlendVis
 . 0x02067b60 NNS_G3dGeIsBufferExist
 . 0x02067b74 NNS_G3dGeSetBuffer
 . 0x02067b88 NNS_G3dGeReleaseBuffer
@@ -1930,6 +1937,7 @@
 . 0x02077ce4 sha1_block
 . 0x0207873c MI_Copy36B
 . 0x02078758 MI_Copy48B
+. 0x0207877c MI_Copy64B
 . 0x02079c28 OSi_IrqCallback
 . 0x02079e20 OSi_EnterTimerCallback
 . 0x02079ed8 OS_SetIrqStackChecker
@@ -2188,6 +2196,14 @@
 . 0x0209b260 mtxStackPosSR_
 . 0x0209b268 mtxTransOnly_
 . 0x0209b280 zOffsetStep_
+. 0x0209b288 NNS_G3dFuncAnmVisNsBva
+. 0x0209b28c NNS_G3dFuncAnmJntNsBca
+. 0x0209b290 NNS_G3dFuncAnmMatNsBtp
+. 0x0209b294 NNS_G3dFuncAnmMatNsBta
+. 0x0209b298 NNS_G3dFuncAnmMatNsBma
+. 0x0209b29c NNS_G3dFuncBlendVis
+. 0x0209b2a0 NNS_G3dFuncBlendJnt
+. 0x0209b2a4 NNS_G3dFuncBlendMat
 . 0x0209b528 GXi_DmaId
 . 0x0209b52c MD5_PADDING
 . 0x0209b530 MD5_MSG_INDEX
