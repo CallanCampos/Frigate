@@ -68,9 +68,13 @@ static inline void EndSequence_(NNSG2dAnimController *animCtrl) {
     }
 }
 
+// The sequence's last frame
+static inline const NNSG2dAnimFrameData *GetLastFrame_(const NNSG2dAnimSequence *seq) {
+    return seq->pAnmFrameArray + seq->numFrames - 1;
+}
+
 // Turns a reverse sequence around at its end, or ends the sequence, and keeps the current frame inside it
 static void SequenceEdgeHandle_(NNSG2dAnimController *animCtrl) {
-    const NNSG2dAnimSequence *seq;
     const NNSG2dAnimFrameData *current;
 
     if (IsReversePlayMode_(animCtrl)) {
@@ -83,12 +87,11 @@ static void SequenceEdgeHandle_(NNSG2dAnimController *animCtrl) {
         EndSequence_(animCtrl);
     }
 
-    seq = animCtrl->pAnimSequence;
     current = animCtrl->pCurrent;
-    if (current > &seq->pAnmFrameArray[seq->numFrames - 1]) {
-        animCtrl->pCurrent = &seq->pAnmFrameArray[seq->numFrames - 1];
-    } else if (current < seq->pAnmFrameArray) {
-        animCtrl->pCurrent = seq->pAnmFrameArray;
+    if (current > GetLastFrame_(animCtrl->pAnimSequence)) {
+        animCtrl->pCurrent = GetLastFrame_(animCtrl->pAnimSequence);
+    } else if (current < animCtrl->pAnimSequence->pAnmFrameArray) {
+        animCtrl->pCurrent = animCtrl->pAnimSequence->pAnmFrameArray;
     }
 }
 
@@ -128,7 +131,7 @@ BOOL NNS_G2dTickAnimCtrl(NNSG2dAnimController *animCtrl, fx32 frames) {
         return FALSE;
     }
 
-    animCtrl->currentTime += abs(fx_mul_round(animCtrl->speed, frames));
+    animCtrl->currentTime += abs(FX_MulFunc(animCtrl->speed, frames));
     while (IsFrameEnd_(animCtrl)) {
         changed = TRUE;
         animCtrl->currentTime -= (animCtrl->pCurrent->frames << FX32_SHIFT);

@@ -231,7 +231,10 @@ static u32 StaffRollSeq_Logo(StaffRollWork *work);
 static u32 StaffRollSeq_Roll(StaffRollWork *work);
 static u32 StaffRollSeq_Copyright(StaffRollWork *work);
 static void StaffRoll_InitVRAM(void);
+static inline void StaffRoll_InitTopPictureBG(void);
+static inline void StaffRoll_InitBottomPictureBG(void);
 static void StaffRoll_InitBG(void);
+static inline void StaffRoll_InitBottomWindowBG(void);
 static void StaffRoll_FreeBG(void);
 static void StaffRoll_LoadGraphics(ArcTool *arc);
 static void StaffRoll_InitClAct(ArcTool *arc, StaffRollClAct *clact);
@@ -281,7 +284,11 @@ static BOOL StaffRollCmd_LastPicture(StaffRollWork *work, StaffRollLine *line);
 const GameProcFunctions STAFF_ROLL_PROC_FUNCTIONS = { StaffRoll_Init, StaffRoll_Main, StaffRoll_Exit };
 
 static const u16 sLineColors[8] = {
+#ifdef BLACK2
     PRINT_COLOR(1, 2, 0),  PRINT_COLOR(3, 4, 0),   PRINT_COLOR(5, 6, 0),   PRINT_COLOR(7, 8, 0),
+#else
+    PRINT_COLOR(5, 6, 0),  PRINT_COLOR(7, 8, 0),   PRINT_COLOR(5, 6, 0),   PRINT_COLOR(7, 8, 0),
+#endif
     PRINT_COLOR(9, 10, 0), PRINT_COLOR(11, 12, 0), PRINT_COLOR(13, 14, 0), 0,
 };
 
@@ -538,6 +545,44 @@ static void StaffRoll_InitVRAM(void) {
     GFL_BGSysSetVRAMBanks(&sStaffRollVRAMConfig);
 }
 
+// The picture BGs and the bottom window's BG are set up through inlines. Which BGs have one, and that the last is
+// defined after StaffRoll_InitBG, is a fit: it gives the ROM's order of the equal-size setups in .rodata
+static inline void StaffRoll_InitTopPictureBG(void) {
+    BGSetup setup = { 0,
+                      0,
+                      0x1000,
+                      0,
+                      BGRES_256x256,
+                      GX_BG_COLORMODE_256,
+                      GX_BG_SCRBASE(0xc000),
+                      GX_BG_CHARBASE(0x10000),
+                      0x8000,
+                      GX_BG_EXTPLTT_01,
+                      2,
+                      GX_BG_AREAOVER_XLU,
+                      FALSE };
+
+    GFL_BGSysCreateBG(0, &setup, BGMODE_TEXT);
+}
+
+static inline void StaffRoll_InitBottomPictureBG(void) {
+    BGSetup setup = { 0,
+                      0,
+                      0x1000,
+                      0,
+                      BGRES_256x256,
+                      GX_BG_COLORMODE_256,
+                      GX_BG_SCRBASE(0xc000),
+                      GX_BG_CHARBASE(0x10000),
+                      0x8000,
+                      GX_BG_EXTPLTT_23,
+                      2,
+                      GX_BG_AREAOVER_XLU,
+                      FALSE };
+
+    GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
+}
+
 static void StaffRoll_InitBG(void) {
     GFL_BGSysCreate(HEAPID_STAFF_ROLL);
     {
@@ -582,61 +627,31 @@ static void StaffRoll_InitBG(void) {
         MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, 0);
         GFL_BGSysSetBGTransform(3, &mtx, 128, 96);
     }
-    {
-        BGSetup setup = { 0,
-                          0,
-                          0x1000,
-                          0,
-                          BGRES_256x256,
-                          GX_BG_COLORMODE_256,
-                          GX_BG_SCRBASE(0xc000),
-                          GX_BG_CHARBASE(0x10000),
-                          0x8000,
-                          GX_BG_EXTPLTT_01,
-                          2,
-                          GX_BG_AREAOVER_XLU,
-                          FALSE };
-
-        GFL_BGSysCreateBG(0, &setup, BGMODE_TEXT);
-    }
-    {
-        BGSetup setup = { 0,
-                          0,
-                          0x800,
-                          0,
-                          BGRES_256x256,
-                          GX_BG_COLORMODE_16,
-                          GX_BG_SCRBASE(0xf800),
-                          GX_BG_CHARBASE(0x0000),
-                          0x8000,
-                          GX_BG_EXTPLTT_01,
-                          0,
-                          GX_BG_AREAOVER_XLU,
-                          FALSE };
-
-        GFL_BGSysCreateBG(5, &setup, BGMODE_TEXT);
-    }
-    {
-        BGSetup setup = { 0,
-                          0,
-                          0x1000,
-                          0,
-                          BGRES_256x256,
-                          GX_BG_COLORMODE_256,
-                          GX_BG_SCRBASE(0xc000),
-                          GX_BG_CHARBASE(0x10000),
-                          0x8000,
-                          GX_BG_EXTPLTT_23,
-                          2,
-                          GX_BG_AREAOVER_XLU,
-                          FALSE };
-
-        GFL_BGSysCreateBG(4, &setup, BGMODE_TEXT);
-    }
+    StaffRoll_InitTopPictureBG();
+    StaffRoll_InitBottomWindowBG();
+    StaffRoll_InitBottomPictureBG();
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG1, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, FALSE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0, FALSE);
+}
+
+static inline void StaffRoll_InitBottomWindowBG(void) {
+    BGSetup setup = { 0,
+                      0,
+                      0x800,
+                      0,
+                      BGRES_256x256,
+                      GX_BG_COLORMODE_16,
+                      GX_BG_SCRBASE(0xf800),
+                      GX_BG_CHARBASE(0x0000),
+                      0x8000,
+                      GX_BG_EXTPLTT_01,
+                      0,
+                      GX_BG_AREAOVER_XLU,
+                      FALSE };
+
+    GFL_BGSysCreateBG(5, &setup, BGMODE_TEXT);
 }
 
 static void StaffRoll_FreeBG(void) {
@@ -1091,11 +1106,13 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
     case 1:
         if (work->fastForward == TRUE) {
             alpha = work->logoFrame * 16 / 34;
+            eva = alpha;
+            evb = 16 - alpha;
         } else {
             alpha = work->logoFrame * 16 / 138;
+            eva = alpha;
+            evb = 16 - alpha;
         }
-        evb = 16 - alpha;
-        eva = alpha;
         work->logoFrame++;
         if (eva >= 16) {
             G2_ChangeBlendAlpha(16, 0);
@@ -1120,11 +1137,13 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
     case 3:
         if (work->fastForward == TRUE) {
             alpha = work->logoFrame * 16 / 34;
+            eva = 16 - alpha;
+            evb = alpha;
         } else {
             alpha = work->logoFrame * 16 / 138;
+            eva = 16 - alpha;
+            evb = alpha;
         }
-        eva = 16 - alpha;
-        evb = alpha;
         work->logoFrame++;
         if (evb >= 16) {
             G2_BlendNone();

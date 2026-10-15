@@ -53,7 +53,7 @@ struct GameSystem {
 extern const GameProcFunctions GAMESYSTEM_PROC_FUNCTIONS;
 extern GameSystem *g_GameSystem;
 
-GameSystemProcData *GameSystem_CreateProcData(GameEntryPoint entryPoint, u16 zoneId, const VecFx32 *spawnPos, s16 unk12);
+GameSystemProcData *GameSystem_CreateProcData(GameEntryPoint entryPoint, u16 zoneId, VecFx32 *spawnPos, s16 unk12);
 Field *GSYS_GetField(GameSystem *gsys);
 // A VBlank task that draws from the random generator, which the anti-piracy checks add when they fail, and how many
 // they added

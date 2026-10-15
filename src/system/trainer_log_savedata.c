@@ -44,8 +44,8 @@ BOOL func_0200b014(TrainerLogSave *log, u32 index) {
     return log->entries[index].unk10_17;
 }
 
-void func_0200b024(TrainerLogSave *log, u32 index, u16 *unk18, u8 *unk1A, u8 *unk1B_0, u8 *unk1B_6) {
-    TrainerLogEntry *entry = &log->entries[index];
+void func_0200b024(const TrainerLogSave *log, u32 index, u16 *unk18, u8 *unk1A, u8 *unk1B_0, u8 *unk1B_6) {
+    const TrainerLogEntry *entry = &log->entries[index];
 
     *unk18 = entry->unk18;
     *unk1A = entry->unk1A;

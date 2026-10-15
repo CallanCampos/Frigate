@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 506 ]
+        [ "MAP_MODEL_M_DUN0908_00_00" ]
     ]
 }

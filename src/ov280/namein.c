@@ -338,18 +338,18 @@ static BOOL NameBox_IsFull(NameBox *box);
 static u16 NameBox_GetLength(NameBox *box);
 static u16 NameBox_GetComposeLength(NameBox *box);
 static BOOL NameBox_ComposeAll(NameBox *box, int set);
-static BOOL NameBox_HasVisibleChar(NameBox *box);
+static BOOL NameBox_HasVisibleChar(const NameBox *box);
 static BOOL NameBox_IsValidGameSyncId(NameBox *box);
 static BOOL NameEntry_IsGameSyncIdChar(u16 c);
 static void KeyLayout_Init(KeyLayout *layout, u32 type, u32 index, const NameinKeyboardSet *keyboards, HeapID heapId);
 static void KeyLayout_SetKeyboard(KeyLayout *layout, u32 index, const NameinKeyboardSet *keyboards);
 static void KeyLayout_Clear(KeyLayout *layout);
 static int KeyLayout_GetChar(KeyLayout *layout, const KeyPos *pos, u16 *c);
-static BOOL KeyLayout_FindAtTouch(KeyLayout *layout, const TouchPos *touch, KeyPos *found);
+static BOOL KeyLayout_FindAtTouch(const KeyLayout *layout, const TouchPos *touch, KeyPos *found);
 static void KeyLayout_Move(KeyLayout *layout, KeyPos *pos, const KeyPos *delta);
 static void KeyLayout_PrintKeys(KeyLayout *layout, KeyPrint *print, PrintQueue *queue, Font *font, u16 heapId);
-static BOOL KeyLayout_GetRect(KeyLayout *layout, const KeyPos *pos, KeyRect *rect);
-static BOOL KeyLayout_FindKind(KeyLayout *layout, int kind, KeyPos *found);
+static BOOL KeyLayout_GetRect(const KeyLayout *layout, const KeyPos *pos, KeyRect *rect);
+static BOOL KeyLayout_FindKind(const KeyLayout *layout, int kind, KeyPos *found);
 static void KeyLayout_ConvertPos(KeyPos *pos, u32 from, u32 to);
 static BOOL AlphaLayout_GetRect(const KeyPos *pos, KeyRect *rect);
 static BOOL KanaLayout_GetRect(const KeyPos *pos, KeyRect *rect);
@@ -1170,9 +1170,9 @@ static BOOL NameBox_ComposeAll(NameBox *box, int set) {
     return FALSE;
 }
 
-static BOOL NameBox_HasVisibleChar(NameBox *box) {
-    int spaces;
+static BOOL NameBox_HasVisibleChar(const NameBox *box) {
     int i;
+    int spaces;
 
     if (box->length == 0) {
         return FALSE;
@@ -1265,7 +1265,7 @@ static int KeyLayout_GetChar(KeyLayout *layout, const KeyPos *pos, u16 *c) {
     return kind;
 }
 
-static BOOL KeyLayout_FindAtTouch(KeyLayout *layout, const TouchPos *touch, KeyPos *found) {
+static BOOL KeyLayout_FindAtTouch(const KeyLayout *layout, const TouchPos *touch, KeyPos *found) {
     KeyPos pos;
     KeyRect rect;
 
@@ -1330,12 +1330,12 @@ static void KeyLayout_PrintKeys(KeyLayout *layout, KeyPrint *print, PrintQueue *
     GFL_StrBufFree(buf);
 }
 
-static BOOL KeyLayout_GetRect(KeyLayout *layout, const KeyPos *pos, KeyRect *rect) {
+static BOOL KeyLayout_GetRect(const KeyLayout *layout, const KeyPos *pos, KeyRect *rect) {
     return layout->getRect(pos, rect);
 }
 
 // Finds the position of a kind of key
-static BOOL KeyLayout_FindKind(KeyLayout *layout, int kind, KeyPos *found) {
+static BOOL KeyLayout_FindKind(const KeyLayout *layout, int kind, KeyPos *found) {
     KeyPos pos;
 
     for (pos.y = 0; pos.y <= layout->height; pos.y++) {
@@ -1424,7 +1424,6 @@ static BOOL AlphaLayout_GetRect(const KeyPos *pos, KeyRect *rect) {
 
 static BOOL KanaLayout_GetRect(const KeyPos *pos, KeyRect *rect) {
     KeyPos cell;
-    int left;
 
     switch (KanaLayout_GetKind(pos, &cell)) {
     case KEY_KIND_CHAR:
@@ -1456,14 +1455,16 @@ static BOOL KanaLayout_GetRect(const KeyPos *pos, KeyRect *rect) {
         break;
     case KEY_KIND_SWITCH_PAGE:
         if (pos->x == 0) {
-            left = 3;
+            rect->left = 3;
+            rect->top = 16;
+            rect->right = rect->left + 4;
+            rect->bottom = rect->top + 3;
         } else {
-            left = 23;
+            rect->left = 23;
+            rect->top = 16;
+            rect->right = rect->left + 4;
+            rect->bottom = rect->top + 3;
         }
-        rect->left = left;
-        rect->top = 16;
-        rect->right = rect->left + 4;
-        rect->bottom = rect->top + 3;
         break;
     case KEY_KIND_SPACE:
         rect->left = 15;
@@ -2190,10 +2191,11 @@ static BOOL Keyboard_UpdateSlide(Keyboard *kb) {
                 if (kb->hasUpperLayer) {
                     GFL_BGSysSetBGEnabled(1, FALSE);
                     GFL_BGSysSetBGEnabled(2, FALSE);
+                    GFL_BGSysSetBGEnabled(3, FALSE);
                 } else {
                     GFL_BGSysSetBGEnabled(1, FALSE);
+                    GFL_BGSysSetBGEnabled(3, FALSE);
                 }
-                GFL_BGSysSetBGEnabled(3, FALSE);
                 kb->slideFrame = 0;
                 kb->slideStage = 1;
             }
@@ -2266,8 +2268,12 @@ static void Keyboard_ApplyType(Keyboard *kb, u32 type) {
     }
 }
 
+static inline BOOL Keyboard_IsKana(const Keyboard *kb) {
+    return kb->type == KEYBOARD_TYPE_KANA;
+}
+
 static void Keyboard_SetKanaPage(Keyboard *kb, u32 page, u32 group) {
-    if (kb->type == KEYBOARD_TYPE_KANA) {
+    if (Keyboard_IsKana(kb)) {
         if (kb->kanaGroup == group && kb->kanaPage == page) {
             return;
         }

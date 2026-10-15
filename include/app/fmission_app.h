@@ -65,8 +65,9 @@ enum {
     FMISSION_APP_MESSAGE_LEVEL,
     FMISSION_APP_MESSAGE_ITEM2,
     FMISSION_APP_MESSAGE_ITEM2_NO_ROOM,
-    // The names of the Entralink's two sides, for the level messages
-    FMISSION_APP_MESSAGE_WHITE,
+    // The names of the Entralink's two sides, for the level messages. These are places in the table of the messages'
+    // texts, which has none for the second item's messages
+    FMISSION_APP_MESSAGE_WHITE = FMISSION_APP_MESSAGE_ITEM2,
     FMISSION_APP_MESSAGE_BLACK,
 };
 
@@ -136,7 +137,7 @@ void FMissionAppDraw_SetActorPalette(FMissionApp *work, int type, int index, u32
 // Shows a number with the four digit actors from `first`, at x and y
 void FMissionAppDraw_SetNumber(FMissionApp *work, int type, int first, int number, int digits, BOOL pad, int x, int y);
 // Shows a time with the five actors from `first`: two digits, a colon and two digits
-void FMissionAppDraw_SetTime(FMissionApp *work, int type, int first, int minutes, int seconds);
+void FMissionAppDraw_SetTime(FMissionApp *work, int type, long first, int minutes, int seconds);
 void FMissionAppDraw_SetLevelIcon(FMissionApp *work, int index);
 // What of the sub screen is touched this frame: 0 for the return button
 int FMissionAppDraw_CheckTouch(FMissionApp *work);

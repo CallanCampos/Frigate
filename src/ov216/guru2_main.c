@@ -1414,11 +1414,17 @@ static int Guru2MainSeq_ParentAlignOwn(Guru2MainWork *g2m) {
 
 // Turns the disc until the front Egg is at the parent's position
 static int Guru2MainSeq_ParentAlign(Guru2MainWork *g2m) {
-    fx32 angle = g2m->frontEgg->angle;
-    fx32 speed = FX32_CONST(4);
-    fx32 target = sEggAngles[g2m->playerCount][g2m->position] << FX32_SHIFT;
-    fx32 distance = target - angle;
+    int position = g2m->position;
+    int count = g2m->playerCount;
+    fx32 angle;
+    fx32 target;
+    fx32 speed;
+    fx32 distance;
 
+    speed = FX32_CONST(4);
+    angle = g2m->frontEgg->angle;
+    target = sEggAngles[count][position] << FX32_SHIFT;
+    distance = target - angle;
     if (distance < 0) {
         distance = target + FULL_TURN - angle;
     }
@@ -1546,6 +1552,7 @@ static int Guru2MainSeq_Bonus(Guru2MainWork *g2m) {
     int count;
     u32 item;
     u32 last;
+    const u32 *range;
     BOOL added;
 
     Guru2Main_StartBonuses(g2m);
@@ -1558,8 +1565,9 @@ static int Guru2MainSeq_Bonus(Guru2MainWork *g2m) {
     item = sBonusItems[count][0];
     last = sBonusItems[count][1];
     item += GFL_RandomLC(0xffff) % (last - item + 1);
-    if (item < sBonusItems[count][0]) {
-        item = sBonusItems[count][0];
+    range = sBonusItems[count];
+    if (item < range[0]) {
+        item = range[0];
     } else if (item > last) {
         item = last;
     }
@@ -2238,12 +2246,12 @@ static void Guru2Main_InitDisc(Guru2MainWork *g2m) {
     Guru2Disc *disc = &g2m->disc;
 
     disc->scene = GFL_G3DMgrNewScene(g2m->g3dManager, &sDiscScenes[count - 2]);
+    disc->angle = 0;
     disc->angleOffset = sDiscAngleOffsets[count];
     VEC_Set(&disc->scale, FX32_ONE, FX32_ONE, FX32_ONE);
     disc->rotX = 0;
     disc->rotY = 0;
     disc->rotZ = 0;
-    disc->angle = 0;
     VEC_Set(&disc->pos, 0, FX32_CONST(-36), 0);
     disc->drawPos = disc->pos;
 }
@@ -2418,7 +2426,7 @@ static void Guru2Main_DrawObjects(Guru2MainWork *g2m) {
 
             VEC_Set(&srt.translation, cursor->pos.x, cursor->pos.y, cursor->pos.z);
             VEC_Set(&srt.scale, FX32_ONE, FX32_ONE, FX32_ONE);
-            MAT3_Identity(&srt.rotation);
+            MTX_Identity33_(&srt.rotation);
             GFL_G3DSysDrawObj(actor, &srt);
         }
     }
@@ -2454,13 +2462,14 @@ static void Guru2Egg_Update(Guru2Egg *egg, const VecFx32 *offset, fx32 angle, fx
 static Guru2Egg *Guru2Main_FindFrontEgg(Guru2MainWork *g2m) {
     int distances[GURU2_MEMBER_MAX];
     int order[GURU2_MEMBER_MAX];
-    int i;
-    int j;
+    int index;
     int count = g2m->playerCount;
     Guru2Objects *objects = &g2m->objects;
+    int i = 0;
+    int j;
+    int nearest;
     fx32 target = sEggAngles[count][g2m->position] << FX32_SHIFT;
 
-    i = 0;
     do {
         order[i] = i;
         distances[i] = 0xffff;
@@ -2477,10 +2486,10 @@ static Guru2Egg *Guru2Main_FindFrontEgg(Guru2MainWork *g2m) {
     }
 
     for (i = 1; i < count; i++) {
-        int index = order[i];
-        int distance = distances[index];
+        index = order[i];
+        nearest = distances[index];
 
-        for (j = i - 1; j >= 0 && distances[order[j]] > distance; j--) {
+        for (j = i - 1; j >= 0 && distances[order[j]] > nearest; j--) {
             order[j + 1] = order[j];
         }
         order[j + 1] = index;

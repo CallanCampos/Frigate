@@ -208,6 +208,8 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     u16 *moves;
     MoveReminderProcessData *data;
     ScriptProcCallbackWork *work;
+    // An enum variable, so that MWCC loads the 1 again for the return value
+    MoveReminderMode mode = MOVE_REMINDER_MODE_REMEMBER;
 
     scriptWork = FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
@@ -224,7 +226,7 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     data->trainerData = NULL;
     data->gsys = gsys;
     data->moves = moves;
-    data->mode = MOVE_REMINDER_MODE_REMEMBER;
+    data->mode = mode;
     work = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ScriptProcCallbackWork), FALSE, "scrcmd_proc.c", 411);
     work->resource = data;
     work->data = result;

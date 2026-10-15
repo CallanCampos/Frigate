@@ -132,7 +132,7 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
     field->status.scale.x = FX32_ONE;
     field->status.scale.y = FX32_ONE;
     field->status.scale.z = FX32_ONE;
-    MAT3_Identity(&field->status.rotation);
+    MTX_Identity33_(&field->status.rotation);
 
     palSize = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
     field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0xea);
@@ -214,7 +214,7 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
     field->status.scale.x = FX32_ONE;
     field->status.scale.y = FX32_ONE;
     field->status.scale.z = FX32_ONE;
-    MAT3_Identity(&field->status.rotation);
+    MTX_Identity33_(&field->status.rotation);
 
     palSize = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
     field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0x1f4);

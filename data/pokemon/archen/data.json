@@ -145,5 +145,6 @@
         }
     ],
     "regional_dex_number": 128,
-    "baby_species": "SPECIES_ARCHEN"
+    "baby_species": "SPECIES_ARCHEN",
+    "cry_volume": 110
 }

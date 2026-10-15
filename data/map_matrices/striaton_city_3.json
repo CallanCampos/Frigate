@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 828 ]
+        [ "MAP_MODEL_STRIATON_CITY_3_M_BUILL01_00_00" ]
     ]
 }

@@ -4,9 +4,12 @@
 #include "types.h"
 #include "battle/btl_action.h"
 #include "battle/btl_action_order.h"
+#include "battle/btl_faintrec.h"
 #include "battle/btl_handler_work.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_pospoke.h"
 #include "battle/btl_server.h"
+#include "battle/btl_wazarec.h"
 #include "struct_decls.h"
 
 // The start of every handler command's parameters
@@ -161,8 +164,8 @@ struct BtlServerFlow {
     u32 unk10;
     u32 unk14;
     u32 unk18;
-    u8 unk1C[0x3c4];
-    u8 unk3E0[0xc4];
+    BtlWazaRec wazaRec;
+    BtlFaintRec faintRec;
     ArcTool *unk4A4;
     BattleMoveEffectState *moveEffect;
     BtlFlowReactionList *unk4AC;
@@ -222,8 +225,8 @@ struct BtlServerFlow {
     u8 unk1A68[0x48];
     BtlFlowMoveParam *unk1AB0;
     BtlFlowMoveParam *unk1AB4;
-    // Passed to the ov169 function that several BattleHandler commands call through veneers
-    u8 unk1ab8[0x2c];
+    BtlPosPoke posPoke;
+    u8 unk1AD0[0x14];
     BattleHandlerString message;
     BtlFlowExpEntry expEntries[6];
     BtlFlowUnk1B54 unk1B54;
@@ -520,7 +523,7 @@ struct BattleHandlerPPParam {
 };
 
 struct BattleHandlerDrainParam {
-    u32 unk00;
+    BattleHandlerHeader header;
     u16 amount;
     u8 monIndex;
     u8 sourceIndex;
@@ -745,9 +748,9 @@ u8 func_ov167_021ac7ac(BtlServerFlow *handler, BattleHandlerHeader *param);
 u8 BattleHandler_AbilityPopupAdd(BtlServerFlow *handler, BattleHandlerHeader *param);
 u8 BattleHandler_RecoverHP(BtlServerFlow *handler, const BattleHandlerRecoverHPParam *param, u16 itemId);
 u8 BattleHandler_RecoverPP(BtlServerFlow *handler, const BattleHandlerPPParam *param, u16 itemId);
-u8 BattleHandler_CureCondition(BtlServerFlow *handler, struct BattleHandlerCureConditionParam *param, u32 context);
+u8 BattleHandler_CureCondition(BtlServerFlow *handler, const struct BattleHandlerCureConditionParam *param, u16 context);
 u8 BattleHandler_AddCondition(BtlServerFlow *handler, const BattleHandlerAddConditionParam *param);
-u8 BattleHandler_StatChange(BtlServerFlow *handler, struct BattleHandlerStatChangeParam *param, u16 context);
+u8 BattleHandler_StatChange(BtlServerFlow *handler, const struct BattleHandlerStatChangeParam *param, u16 context);
 u8 BattleHandler_SetStatStage(BtlServerFlow *handler, const BattleHandlerSetStatStageParam *param);
 u8 BattleHandler_SetStatus(BtlServerFlow *handler, const BattleHandlerSetStatusParam *param);
 u8 BattleHandler_AddSideEffect(BtlServerFlow *handler, const BattleHandlerAddSideEffectParam *param);

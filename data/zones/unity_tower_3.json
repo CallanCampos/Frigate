@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 336,
+    "area": "AREA_UNITY_TOWER_2",
     "matrix": "MAP_MATRIX_UNITY_TOWER_3",
     "scripts": "SCRIPTS_UNITY_TOWER_3",
     "text": "SCRIPT_TEXT_UNITY_TOWER_3",

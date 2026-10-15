@@ -194,8 +194,11 @@ static void StaActing_DrawDebug(StaActing *stage);
 // Read by StaActing_Main, which runs no script while it is set; nothing sets it
 static BOOL sStaActingPause;
 
-// Read only by StaActing_GetUnused
-const u32 STA_ACTING_UNUSED = 0x01600002;
+static const BGSysVRAMConfig STA_ACTING_VRAM_CONFIG = {
+    GX_VRAM_BG_128_D,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
+    GX_VRAM_OBJ_16_F,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_0123_E,  GX_OBJVRAMMODE_CHAR_1D_32K, GX_OBJVRAMMODE_CHAR_1D_32K,
+};
 
 static const VecFx32 STA_ACTING_CAMERA_UP = { 0, FX32_ONE, 0 };
 static const VecFx32 STA_ACTING_CAMERA_TARGET = { 0, 0, 0 };
@@ -315,12 +318,6 @@ static const BGSetup STA_ACTING_BG3_SETUP = {
     2,
     GX_BG_AREAOVER_XLU,
     FALSE,
-};
-
-static const BGSysVRAMConfig STA_ACTING_VRAM_CONFIG = {
-    GX_VRAM_BG_128_D,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
-    GX_VRAM_OBJ_16_F,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
-    GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_0123_E,  GX_OBJVRAMMODE_CHAR_1D_32K, GX_OBJVRAMMODE_CHAR_1D_32K,
 };
 
 StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId) {
@@ -758,6 +755,10 @@ static void StaActing_UpdateScroll(StaActing *stage) {
     GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, stage->curtainOffset);
 }
 
+// Read only by StaActing_GetUnused. Defined after StaActing_UpdateScroll, with STA_ACTING_VRAM_CONFIG first among the
+// tables: one of the orders that lay out the file's data as the original does
+const u32 STA_ACTING_UNUSED = 0x01600002;
+
 // Runs the program's first script, synced with the scripts of the four positions that differ from it
 static void StaActing_StartScripts(StaActing *stage) {
     u8 i;
@@ -1145,6 +1146,13 @@ static void StaActing_UpdateNpcItemUse(StaActing *stage) {
     }
 }
 
+static inline u8 StaActing_RandomHand(void) {
+    if ((u8)GFL_RandomMTRange(2) == 0) {
+        return STA_ACTING_EQUIP_HAND_R;
+    }
+    return STA_ACTING_EQUIP_HAND_L;
+}
+
 void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
     u8 i;
 
@@ -1167,10 +1175,8 @@ void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
                         equip = STA_ACTING_EQUIP_HAND_R;
                     } else if (hand[1] == TRUE && hand[0] == FALSE) {
                         equip = STA_ACTING_EQUIP_HAND_L;
-                    } else if ((u8)GFL_RandomMTRange(2) == 0) {
-                        equip = STA_ACTING_EQUIP_HAND_R;
                     } else {
-                        equip = STA_ACTING_EQUIP_HAND_L;
+                        equip = StaActing_RandomHand();
                     }
                     switch (timing) {
                     case 1:

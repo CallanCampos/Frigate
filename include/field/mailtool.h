@@ -36,7 +36,7 @@ MailParam *MailTool_CreateWriteParam(GameData *gameData, u32 a1, u8 partySlot, u
 MailParam *MailTool_CreatePokemonViewParam(GameData *gameData, PartyPkm *pkm, u32 heapId);
 MailParam *MailTool_CreateItemViewParam(GameData *gameData, u32 mailId, u32 heapId);
 // Whether the mail was written
-BOOL MailTool_IsWritten(MailParam *param);
+BOOL MailTool_IsWritten(const MailParam *param);
 // Gives the written mail to the Pokémon, and returns whether there was one
 BOOL MailTool_GiveMail(MailParam *param, PartyPkm *pkm);
 void MailTool_FreeParam(MailParam *param);

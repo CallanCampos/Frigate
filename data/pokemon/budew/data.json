@@ -170,5 +170,6 @@
         }
     ],
     "regional_dex_number": 133,
-    "baby_species": "SPECIES_BUDEW"
+    "baby_species": "SPECIES_BUDEW",
+    "cry_volume": 120
 }

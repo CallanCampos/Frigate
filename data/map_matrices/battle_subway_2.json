@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 914, 951, 969 ]
+        [ "MAP_MODEL_BATTLE_SUBWAY_2_M_BSUBWAY02_00_0", "MAP_MODEL_BATTLE_SUBWAY_2_M_BSUBWAY02_01_0", "MAP_MODEL_BATTLE_SUBWAY_2_M_BSUBWAY02_02_0" ]
     ]
 }

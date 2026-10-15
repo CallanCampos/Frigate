@@ -88,10 +88,16 @@ void func_02010300(KeyDataSave *keyData, u32 value) {
 }
 
 void func_02010304(KeyDataSave *keyData, u32 a1, u32 bit, BOOL set) {
+    u32 mask;
+
     if (set == FALSE) {
-        keyData->trainerFlags[a1] &= (1 << bit) ^ 0xffffffff;
+        mask = 0xffffffff;
+        mask ^= 1 << bit;
+        keyData->trainerFlags[a1] &= mask;
     } else {
-        keyData->trainerFlags[a1] |= 1 << bit;
+        mask = 1;
+        mask <<= bit;
+        keyData->trainerFlags[a1] |= mask;
     }
 }
 
@@ -112,10 +118,16 @@ BOOL func_02010340(KeyDataSave *keyData, u32 bit) {
 }
 
 void func_02010354(KeyDataSave *keyData, u32 bit, BOOL set) {
+    u32 mask;
+
     if (set == FALSE) {
-        keyData->flags &= (1 << bit) ^ 0xffffffff;
+        mask = 0xffffffff;
+        mask ^= 1 << bit;
+        keyData->flags &= mask;
     } else {
-        keyData->flags |= 1 << bit;
+        mask = 1;
+        mask <<= bit;
+        keyData->flags |= mask;
     }
 }
 

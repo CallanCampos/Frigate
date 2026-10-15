@@ -317,7 +317,7 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
         }
         break;
     case 1:
-        if (countOneBits(self->mycomm.doneMask) >= func_02042a78()) {
+        if (MATH_CountPopulation(self->mycomm.doneMask) >= func_02042a78()) {
             func_02042e9c(FALSE);
             self->mycomm.step++;
         }
@@ -615,14 +615,14 @@ void UnionGroup_Init(UnionSystem *unisys, UnionGroup *group) {
     group->unk44 = 0xffff;
 }
 
-int UnionGroup_AddMember(UnionGroup *group, const u8 *mac, u32 look, u8 gender) {
-    UnionMember *members;
+int UnionGroup_AddMember(UnionGroup *group, const u8 *mac, u8 look, u8 gender) {
     int i;
     int j;
 
-    members = group->members;
     for (i = 0; i < UNION_MEMBER_MAX; i++) {
-        if (members[i].used == 1 && GFL_STD_MemCmp(mac, members[i].mac, 6) == 0) {
+        UnionMember *member = &group->members[i];
+
+        if (member->used == 1 && GFL_STD_MemCmp(mac, member->mac, 6) == 0) {
             return i;
         }
     }

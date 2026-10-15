@@ -1,6 +1,6 @@
-// The SSL settings of the GDS client's connection: the certificate authority that the server's certificate must come
-// from, and the settings of a connection, which the socket library reads. The ROM names nothing here: the file's name
-// and its functions' are guesses.
+// The SSL settings of the GDS client's connection: CA records used by certificate checking and the template from
+// which the socket library's connection starts. The ROM names nothing here: the file's name and its functions' are
+// guesses.
 
 #include "types.h"
 #include "poke_net_internal.h"
@@ -44,7 +44,8 @@ static POKE_NET_SSL_CONNECTION sPOKE_NET_SSL_DefaultConnection;
 static u32 sPOKE_NET_SSL_Entropy[8];
 static POKE_NET_SSL_CONNECTION *sPOKE_NET_SSL_Connection;
 
-// Lets every certificate that the library's own check let through pass
+// Returns zero for every supplied certificate-check result; SSL replaces its result with this return value.
+// Earlier parser failures exit before this callback.
 static int POKE_NET_SSL_AuthCallback(int result, POKE_NET_SSL_CONNECTION *connection, int level) {
     return 0;
 }
@@ -52,7 +53,7 @@ static int POKE_NET_SSL_AuthCallback(int result, POKE_NET_SSL_CONNECTION *connec
 // Seeds the random numbers of the secure connections, and makes the default settings the first time
 void POKE_NET_SSL_Setup(void) {
     OS_GetLowEntropyData(sPOKE_NET_SSL_Entropy);
-    func_ov011_02159d64(sPOKE_NET_SSL_Entropy, sizeof(sPOKE_NET_SSL_Entropy));
+    CPS_SslAddRandomSeed(sPOKE_NET_SSL_Entropy, sizeof(sPOKE_NET_SSL_Entropy));
     if (sPOKE_NET_SSL_Connection != NULL) {
         return;
     }
@@ -63,7 +64,7 @@ void POKE_NET_SSL_Setup(void) {
     POKE_NET_SSL_SetAuthCallback(POKE_NET_SSL_AuthCallback);
 }
 
-// Sets the settings that connections start from, NULL for the default ones
+// Retains the supplied template for later StartConnection calls; NULL selects the static default.
 void POKE_NET_SSL_SetConnection(POKE_NET_SSL_CONNECTION *connection) {
     if (connection != NULL) {
         sPOKE_NET_SSL_Connection = connection;
@@ -76,12 +77,14 @@ void POKE_NET_SSL_SetAuthCallback(POKE_NET_SSL_AUTH_CALLBACK callback) {
     sPOKE_NET_SSL_Connection->AuthCallback = callback;
 }
 
+// Borrows the list, records and key bytes; stores pointer/count without copying or validating their contents.
 void POKE_NET_SSL_SetCaInfo(POKE_NET_SSL_CA_INFO **caInfo, int count) {
     sPOKE_NET_SSL_Connection->CaInfo = caInfo;
     sPOKE_NET_SSL_Connection->CaInfoCount = count;
 }
 
-// Makes the settings of a connection to a server, with a copy of the server's name
+// Copies the whole template, retaining its pointer fields without duplicating their storage.
+// A non-NULL serverName replaces the copied name pointer with a separately allocated copy.
 void POKE_NET_SSL_StartConnection(const char *serverName, POKE_NET_SSL_CONNECTION *connection) {
     sys_memcpy(sPOKE_NET_SSL_Connection, connection, sizeof(POKE_NET_SSL_CONNECTION));
     if (serverName == NULL) {

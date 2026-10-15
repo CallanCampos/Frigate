@@ -27,6 +27,7 @@ src/ov255/box2_bmp.c:
     .rodata     start:0x021d743c end:0x021d74e4
 
 src/ov255/box2_obj.c:
+    complete
     .text       start:0x021cf3c0 end:0x021d23d8
     .rodata     start:0x021d74e4 end:0x021d78c0
 
@@ -41,6 +42,7 @@ src/ov255/box2_bgwfrm.c:
     .text       start:0x021d364c end:0x021d3b64
 
 src/ov255/box_search.c:
+    complete
     .text       start:0x021d3b64 end:0x021d6d28
     .rodata     start:0x021d8db0 end:0x021d9490
     .data       start:0x021d9664 end:0x021d96c0

@@ -35,9 +35,9 @@ void func_0200ec80(u8 *answers, u8 question, u32 answer);
 void func_0200ecd8(SurveySave *survey, u8 question, u32 index);
 u8 func_0200ece4(SurveySave *survey, u32 index);
 // How many people answered a question today, which the second adds to, up to 9999, and before today
-u16 func_0200ecf0(SurveySave *survey, u8 question);
+u16 func_0200ecf0(SurveySave *survey, int question);
 void func_0200ecf8(SurveySave *survey, u32 question, u32 count);
-u32 func_0200ed14(SurveySave *survey, u8 question);
+u32 func_0200ed14(SurveySave *survey, int question);
 // How many people gave an answer, numbered from 1, today: whether it is full, the count, and adding to it, up to 99
 BOOL func_0200ed34(SurveySave *survey, u16 question, int answer);
 u32 func_0200ed48(SurveySave *survey, u16 question, int answer);

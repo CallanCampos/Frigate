@@ -1659,7 +1659,7 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
                 snap = TRUE;
             }
             if (VEC_Mag(&toPlace) > FX32_ONE) {
-                vecfx_normalize(&toPlace, &toPlace);
+                VEC_Normalize(&toPlace, &toPlace);
                 vecfx_mul(&toPlace, FX32_ONE, &toPlace);
             }
         }
@@ -1672,7 +1672,7 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
             fx32 dx;
             fx32 dy;
 
-            vecfx_normalize(&dir, &dir);
+            VEC_Normalize(&dir, &dir);
             dx = toPlace.x + dir.x * 3;
             dy = toPlace.y + dir.y * 3;
             if (dx > 0 && dx < FX32_ONE) {
@@ -1688,16 +1688,8 @@ static void ZukanDetailMap_MoveCursor(ZukanDetailMapParam *param, ZukanDetailMap
             cursorPos.x += (s16)(dx >> FX32_SHIFT);
             cursorPos.y += (s16)(dy >> FX32_SHIFT);
         }
-        if (cursorPos.x > 248) {
-            cursorPos.x = 248;
-        } else if (cursorPos.x < 0) {
-            cursorPos.x = 0;
-        }
-        if (cursorPos.y > 168) {
-            cursorPos.y = 168;
-        } else if (cursorPos.y < 8) {
-            cursorPos.y = 8;
-        }
+        cursorPos.x = MATH_CLAMP(cursorPos.x, 0, 248);
+        cursorPos.y = MATH_CLAMP(cursorPos.y, 8, 168);
         func_0204c140(wk->actors[ACTOR_CURSOR], &cursorPos, CLACT_SURFACE_MAIN);
         wk->place = ZukanDetailMap_FindTouchedPlace(param, wk, common, cursorPos.x, cursorPos.y);
         if (wk->place != prevPlace) {

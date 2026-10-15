@@ -4,8 +4,12 @@
 #include <stdarg.h>
 #include "types.h"
 #include "nitro/os.h"
+#include "system/rtc.h"
 #include "dwc/sake.h"
 #include "dwc/soap.h"
+// For CPS's address (CPSMyIp), which is set once the library has started
+#include "nitrowifi/cps.h"
+#include "nitrowifi/soc.h"
 
 // What the DWC code of overlay 260 (GameSpy's Sake, the competition client and Nintendo's Gdb) calls in the main
 // module and in overlays 11 and 189. The ROM names none of it, so these are the addresses with a word on what each
@@ -15,6 +19,7 @@
 void *memset(void *dest, int value, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
 void *memmove(void *dest, const void *src, u32 size);
+int memcmp(const void *a, const void *b, u32 size);
 char *strcpy(char *dest, const char *src);
 int strcmp(const char *a, const char *b);
 int strncmp(const char *a, const char *b, u32 size);
@@ -34,46 +39,11 @@ int fclose(void *file);
 u32 __fread(void *buffer, u32 size, u32 count, void *file);
 
 // What overlay 189's HTTP code (the NHTTP client and the GameSpy HTTP code) calls in the main module and overlay 11.
-// Of NitroSDK, the thread library: the message queue is initialized with the array it will hold (OS_InitMessageQueue's
-// code), a thread's end is waited for (OS_JoinThread's), and the thread that runs is the second word of the
-// scheduler's state, which swan names g_IsThreadSwitchRequested
-void func_0207acc4(OSMessageQueue *queue, OSMessage *messages, s32 count);
-#define OS_MESSAGE_BLOCK 1
-BOOL OS_SendMessage(OSMessageQueue *queue, OSMessage message, s32 flags);
-void func_0207a800(OSThread *thread);
-extern struct {
-    int unk_00;
-    OSThread *current;
-} g_IsThreadSwitchRequested;
+// NitroSDK's thread library, which it also calls, is in nitro/os.h
 // NitroSDK's STD_GetStringLength with a limit: the length of the string, or the limit if it is longer
 int func_0207f900(const char *s, int max);
-// The socket library of overlay 11, whose functions take and return negative error codes. The address and port of a
-// socket address are in network order, and its first byte is its size
-typedef struct SocAddrIn {
-    u8 len;
-    u8 family;
-    u16 port;
-    u32 addr;
-} SocAddrIn;
-typedef struct SocHostEnt {
-    char *name;
-    char **aliases;
-    s16 addrType;
-    s16 addrLength;
-    u8 **addrList;
-} SocHostEnt;
-int func_ov011_02157bd0(int domain, int type, int protocol);
-int func_ov011_02157c10(int sock, const SocAddrIn *address);
-int func_ov011_02157c50(int sock, void *buffer, int size, int flags);
-int func_ov011_02157cbc(int sock, const void *buffer, int size, int flags);
-int func_ov011_02157d30(int sock, int how);
-int func_ov011_02157d38(int sock);
-SocHostEnt *func_ov011_02157d40(const char *host);
-int func_ov011_02158034(const char *text, u32 *address);
-int func_ov011_02158174(int sock, void *sslInfo);
-void func_ov011_021575f8(void);
 // Seeds the random number generator of the secure connections with some bytes
-void func_ov011_02159d64(const void *data, u32 size);
+void CPS_SslAddRandomSeed(const void *data, u32 size);
 
 // GameSpy's common code in overlay 11, used by the HTTP code: realloc and free (the ones beside the allocator above),
 // the clock in milliseconds and a sleep, and the sockets (the numbers that the socket functions return are -1 for an
@@ -106,6 +76,9 @@ void func_ov011_02171600(void *array, const void *element, int (*compare)(const 
 void func_ov011_02171668(void *array, int index);
 int func_ov011_021716ac(void *array, const void *element, int (*compare)(const void *a, const void *b), int start,
                         int sorted);
+// Removes the element at index without calling the array's freeFunc on it (gt2.c's only caller frees it itself
+// first)
+void func_ov011_02171634(void *array, int index);
 
 // Writes at most size bytes of a formatted text to dest, returning the length it would have, or a negative number
 int func_0207a2c0(char *dest, u32 size, const char *format, ...);
@@ -150,6 +123,43 @@ u32 func_ov011_0216ee7c(char *dest, const char *src, u32 size);
 char *func_ov011_0216e2c8(const char *text);
 // Reports an error to the library, with a code, a type, a flag and the text
 void func_ov011_0216cca8(int category, int type, int level, const char *format, ...);
+
+// Overlay 11's lower socket layer, which gt2.c's "Udp Engine" builds on; not decompiled, so these are addresses
+// with a word on what each does, read off gt2.c's callers. An "address" is its own opaque object (not a raw ip),
+// read with the two accessors below
+u32 func_ov011_0217d380(const void *address);
+u16 func_ov011_0217d384(const void *address);
+// Formats an address as text (its ip and port) into buf, and returns buf
+const char *func_ov011_0217ed14(u32 ip, u16 port, char *buf);
+// Creates the socket at socketOut, bound to localAddress, with byte buffer sizes and a socket error callback;
+// returns 0, or an error
+int func_ov011_0217d144(void **socketOut, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
+                        void (*onSocketError)(void *socket));
+// Sets the socket's unknown-message callback
+void func_ov011_0217d3a0(void *socket, BOOL (*callback)(void *unused, u32 ip, u16 port, const void *data, int len));
+// Sets the socket's incoming-connection-attempt callback
+void func_ov011_0217d188(void *socket, void (*callback)(void *unused, void *handle, u32 ip, u16 port,
+                                                        u32 elapsedMilliseconds, const void *data, int len));
+// The socket's own local address, once bound
+u32 func_ov011_0217d388(void *socket);
+u16 func_ov011_0217d38c(void *socket);
+// Shuts the socket down, in two steps
+void func_ov011_0217d158(void *socket);
+void func_ov011_0217d168(void *socket);
+// A connection's state, its biggest message size, closing it and sending a message of size bytes
+int func_ov011_0217d364(void *handle);
+int func_ov011_0217d390(void *handle);
+int func_ov011_0217d394(void *handle);
+int func_ov011_0217d290(void *handle, const void *message, int size, BOOL reliable);
+// Starts a connection attempt with its callback table (attempt result, received, closed, ping, in that order).
+// Writes the handle through outHandle when non-NULL. If blocking, pumps the socket until completion;
+// otherwise returns after starting. Returns the lower connection status.
+int func_ov011_0217d1a0(void *socket, void **outHandle, const char *addrText, const void *message, int length,
+                        u32 timeoutMs, const void *table, BOOL blocking);
+// Accepts a pending connection and installs its callback table; returns FALSE unless it is awaiting acceptance
+BOOL func_ov011_0217d190(void *handle, const void *table);
+// Rejects a pending connection, optionally sending a rejection message
+void func_ov011_0217d198(void *handle, const void *message, int length);
 
 // Overlay 11's HTTP client: posts a SOAP message to a URL with the SOAPAction header and calls the function with the
 // answer; returns the request, or 0 when it could not start

@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "A species or form: data/pokemon/<species>/data.json, form_<n>.json or extra/<record>.json",
-    "description": "One record of the species data (archive a/0/1/6, the 0x4c bytes that PML_PersonalGetParam reads), with the record's level-up moves (a/0/1/8), evolutions (a/0/1/9) and, for a species or an extra record, baby species (a/0/2/0). tools/data/species_data.py packs them. A string value is the name of a constant from data/constants/ or include/constants/.",
+    "title": "A species or form: data/pokemon/<species>/data.json or form_<n>.json",
+    "description": "One record of the species data (archive a/0/1/6, the 0x4c bytes that PML_PersonalGetParam reads), with the record's level-up moves (a/0/1/8), evolutions (a/0/1/9) and, for a species, baby species (a/0/2/0). tools/data/species_data.py packs them. A string value is the name of a constant from data/constants/ or include/constants/.",
     "type": "object",
     "additionalProperties": false,
     "required": [
@@ -14,7 +14,7 @@
         "$schema": { "type": "string", "description": "This schema, for editors" },
         "name": {
             "type": "string",
-            "description": "The species' name, which the text files take with \\from{species.name}, also in capitals and with its article. Species only: forms and extra records have none"
+            "description": "The species' name, which the text files take with \\from{species.name}, also in capitals and with its article. National Pokédex species only: forms, the egg, the bad egg and the Pokéstar Studios species have none, whose names are lines of species_names.txt"
         },
         "name_article": {
             "enum": [ "a", "an" ],
@@ -93,6 +93,10 @@
         },
         "hidden_ability": { "$ref": "#/$defs/ability", "description": "The ability from the Dream World" },
         "flee_rate": { "$ref": "#/$defs/u8" },
+        "cry_volume": {
+            "type": "integer", "minimum": 0, "maximum": 127,
+            "description": "Playback volume from a/1/9/1 for species with a cry; absent for forms and extra personal records"
+        },
         "forms": {
             "type": "object", "additionalProperties": false, "required": [ "count", "sprite_offset" ],
             "description": "The species' forms. Their records follow the order of data/pokemon/forms.json, which the packer sets the record of the first form from; forms that only change the sprite have no record",
@@ -162,7 +166,7 @@
         },
         "regional_dex_number": {
             "type": [ "integer", "null" ], "minimum": 0, "maximum": 998,
-            "description": "The number in the Unova Pokédex, from 0 for Victini, or null for a species not in it. The table after the species records (a/0/1/6's last member) holds one for each species and extra record, 999 for none: its 301 numbers match the game's Unova Pokédex, #000 to #300. Forms have none"
+            "description": "The number in the Unova Pokédex, from 0 for Victini, or null for a species not in it. The table after the species records (a/0/1/6's last member) holds one for each species, 999 for none: its 301 numbers match the game's Unova Pokédex, #000 to #300. Forms have none"
         },
         "baby_species": {
             "$ref": "#/$defs/species",
@@ -204,7 +208,7 @@
         "move": { "type": "string", "x-constant": "MOVE_" },
         "species": {
             "type": [ "string", "integer" ], "x-constant": "SPECIES_", "minimum": 0, "maximum": 65535,
-            "description": "A SPECIES_* constant, or the number of a record that has none, as an extra record's"
+            "description": "A SPECIES_* constant"
         }
     }
 }

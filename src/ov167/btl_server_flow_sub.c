@@ -1,16 +1,20 @@
 #include "types.h"
 #include "battle/btl_ability.h"
 #include "battle/btl_event.h"
+#include "battle/btl_faintrec.h"
 #include "battle/btl_handler.h"
 #include "battle/btl_handler_work.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
+#include "battle/btl_monset.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/btl_pospoke.h"
 #include "battle/btl_server.h"
 #include "battle/btl_server_cmd.h"
 #include "battle/btl_server_flow.h"
 #include "battle/btl_server_flow_sub.h"
+#include "battle/btl_tables.h"
 #include "battle/handler_common.h"
+#include "battle/side_handlers.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
 #include "constants/moves.h"
@@ -93,7 +97,7 @@ u8 func_ov167_021ae32c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMo
     if (!param->flags.unk0) {
         redirect = func_ov167_021aed4c(flow, mon, param);
     }
-    func_ov169_0689ccc4(targets);
+    BtlMonSet_Clear(targets);
     flow->unk77F = 6;
     switch (style) {
     case BTL_STYLE_SINGLE:
@@ -111,9 +115,9 @@ u8 func_ov167_021ae32c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMo
         break;
     }
     if (count == 1) {
-        first = func_ov169_0689cdf8(targets, 0);
+        first = BtlMonSet_Get(targets, 0);
         if (first != NULL) {
-            flow->unk77F = func_ov169_0689d77c(flow->unk1ab8, GetMonID(first));
+            flow->unk77F = BtlPosPoke_GetPosOfMon(&flow->posPoke, GetMonID(first));
         }
         if (!func_ov167_021aeb10(flow, style, mon, param, target, targets)) {
             count = 0;
@@ -134,24 +138,24 @@ static u8 func_ov167_021ae430(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
     case 4:
     case 5:
     case 9:
-        func_ov169_0689ccd0(targets, redirect == 0x1f ? func_ov167_021aecac(flow, pos, 0)
+        BtlMonSet_Add(targets, redirect == 0x1f ? func_ov167_021aecac(flow, pos, 0)
                                                       : GetPokeParam(flow->pokeCon, redirect));
         return 1;
     case 1:
     case 7:
         if (redirect == 0x1f) {
-            func_ov169_0689ccd0(targets, mon);
+            BtlMonSet_Add(targets, mon);
         } else {
-            func_ov169_0689ccd0(targets, GetPokeParam(flow->pokeCon, redirect));
+            BtlMonSet_Add(targets, GetPokeParam(flow->pokeCon, redirect));
         }
         return 1;
     case 8:
-        func_ov169_0689ccd0(targets, mon);
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 0));
+        BtlMonSet_Add(targets, mon);
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
         return 2;
     case 13:
         if (redirect != 0x1f) {
-            func_ov169_0689ccd0(targets, GetPokeParam(flow->pokeCon, redirect));
+            BtlMonSet_Add(targets, GetPokeParam(flow->pokeCon, redirect));
             return 1;
         }
         return 0;
@@ -196,32 +200,32 @@ static u8 func_ov167_021ae590(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         single = func_ov167_021aecac(flow, pos, BattleRandom(2));
         break;
     case 5:
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 0));
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 1));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
         return 2;
     case 4:
-        func_ov169_0689ccd0(targets, func_ov167_021aecdc(flow, pos));
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 0));
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 1));
+        BtlMonSet_Add(targets, func_ov167_021aecdc(flow, pos));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
         return 3;
     case 8:
-        func_ov169_0689ccd0(targets, mon);
-        func_ov169_0689ccd0(targets, func_ov167_021aecdc(flow, pos));
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 0));
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 1));
+        BtlMonSet_Add(targets, mon);
+        BtlMonSet_Add(targets, func_ov167_021aecdc(flow, pos));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
         return 3;
     case 7:
         if (redirect == 0x1f) {
-            func_ov169_0689ccd0(targets, mon);
+            BtlMonSet_Add(targets, mon);
         } else {
-            func_ov169_0689ccd0(targets, GetPokeParam(flow->pokeCon, redirect));
+            BtlMonSet_Add(targets, GetPokeParam(flow->pokeCon, redirect));
         }
         return 1;
     case 1:
-        func_ov169_0689ccd0(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
+        BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
         return 1;
     case 2:
-        func_ov169_0689ccd0(targets, func_ov167_021aecdc(flow, pos));
+        BtlMonSet_Add(targets, func_ov167_021aecdc(flow, pos));
         return 1;
     case 13:
         if (redirect != 0x1f) {
@@ -237,7 +241,7 @@ static u8 func_ov167_021ae590(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         if (newTarget != 0x1f) {
             single = GetPokeParam(flow->pokeCon, newTarget);
         }
-        func_ov169_0689ccd0(targets, single);
+        BtlMonSet_Add(targets, single);
         return 1;
     }
     return 0;
@@ -272,47 +276,47 @@ static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         break;
     case 5:
         for (i = 0; i < adjacent->count1; i++) {
-            func_ov169_0689ccd0(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list1[i]));
+            BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list1[i]));
         }
         return adjacent->count1;
     case 4:
         count = 0;
         for (i = 0; i < adjacent->count1; i++) {
-            func_ov169_0689ccd0(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list1[i]));
+            BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list1[i]));
             count++;
         }
         for (j = 0; j < adjacent->count2; j++) {
             if (pos != adjacent->list2[j]) {
-                func_ov169_0689ccd0(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list2[j]));
+                BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, adjacent->list2[j]));
                 count++;
             }
         }
         return count;
     case 8:
-        func_ov169_0689ccd0(targets, mon);
+        BtlMonSet_Add(targets, mon);
         for (i = 0; i < 3; i++) {
             u8 allyPos = GetPosOnSameSide(pos, i);
 
             if (allyPos != pos) {
-                func_ov169_0689ccd0(targets, func_ov167_0219d180(flow->pokeCon, allyPos));
+                BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, allyPos));
             }
         }
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 0));
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 1));
-        func_ov169_0689ccd0(targets, func_ov167_021aecac(flow, pos, 2));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 0));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 1));
+        BtlMonSet_Add(targets, func_ov167_021aecac(flow, pos, 2));
         return 6;
     case 7:
         if (redirect == 0x1f) {
-            func_ov169_0689ccd0(targets, mon);
+            BtlMonSet_Add(targets, mon);
         } else {
-            func_ov169_0689ccd0(targets, GetPokeParam(flow->pokeCon, redirect));
+            BtlMonSet_Add(targets, GetPokeParam(flow->pokeCon, redirect));
         }
         return 1;
     case 1:
-        func_ov169_0689ccd0(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
+        BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
         return 1;
     case 2:
-        func_ov169_0689ccd0(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
+        BtlMonSet_Add(targets, func_ov167_0219d180(flow->pokeCon, targetPos));
         return 1;
     case 13:
         if (redirect != 0x1f) {
@@ -328,7 +332,7 @@ static u8 func_ov167_021ae82c(BtlServerFlow *flow, BattleMon *mon, u8 target, Bt
         if (newTarget != 0x1f) {
             single = GetPokeParam(flow->pokeCon, newTarget);
         }
-        func_ov169_0689ccd0(targets, single);
+        BtlMonSet_Add(targets, single);
         return 1;
     }
     return 0;
@@ -350,12 +354,16 @@ static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, 
     u8 index;
     u16 code;
 
-    if (func_ov167_021bd728(style) > 1 && func_ov169_0689cec0(targets) == 1) {
-        fainted = func_ov169_0689cdf8(targets, 0);
+    if (func_ov167_021bd728(style) > 1 && BtlMonSet_GetCount(targets) == 1) {
+        fainted = BtlMonSet_Get(targets, 0);
         if (IsFainted(fainted) && !IsAllyMonID(GetMonID(mon), GetMonID(fainted))) {
             pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
-            func_ov169_0689cd9c(targets, fainted);
-            code = getMoveFlag(param->move, 0xb) ? 0x600 | pos : 0x100 | pos;
+            BtlMonSet_Remove(targets, fainted);
+            if (getMoveFlag(param->move, 0xb)) {
+                code = 0x600 | pos;
+            } else {
+                code = 0x100 | pos;
+            }
             numPositions = func_ov167_0219bfe4(flow->mainModule, code, positions);
             for (i = 0; i < 3; i++) {
                 mons[i] = NULL;
@@ -394,7 +402,7 @@ static BOOL func_ov167_021aeb10(BtlServerFlow *flow, u32 style, BattleMon *mon, 
                 }
             }
             if (mons[index] != NULL) {
-                func_ov169_0689ccd0(targets, mons[index]);
+                BtlMonSet_Add(targets, mons[index]);
                 return TRUE;
             }
         }
@@ -743,7 +751,7 @@ u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, 
         numOut = GetClientBattlerCount(flow->mainModule, clientId);
         target = func_ov167_0219d4e4(party, slot);
         targetId = GetMonID(target);
-        targetPos = GetBattlePos(flow->unk1ab8, targetId);
+        targetPos = GetBattlePos(&flow->posPoke, targetId);
         // 0 for a mon in battle, 1 for one in a rotation battle's back slots, 2 for one in the party
         if (slot >= numOut) {
             placed = 2;
@@ -1096,7 +1104,7 @@ static BOOL func_ov167_021afb1c(BtlServerFlow *flow, BattleMon *mon, u16 item, s
 
     side = GetSideFromMonID(GetMonID(mon));
     cont = SetConditionTurns(5);
-    if (func_ov169_06898c10(side, 3, cont)) {
+    if (SideEffectEventAdd(side, 3, cont)) {
         message = BattleHandler_PushWork(flow, 4, 0x1f);
         BattleHandler_StrSetup(&message->string, 1, 0x88);
         BattleHandler_AddArg(&message->string, side);
@@ -1310,7 +1318,7 @@ static BOOL func_ov167_021aff14(BtlServerFlow *flow, BattleMon *mon, u16 item, s
     u8 monId;
     BattleHandlerCureConditionParam *work;
 
-    if (!IsFainted(mon) && !DoesBattleMonExist(flow->unk1ab8, GetMonID(mon))) {
+    if (!IsFainted(mon) && !DoesBattleMonExist(&flow->posPoke, GetMonID(mon))) {
         cured = FALSE;
         i = 0;
         while (TRUE) {
@@ -1339,7 +1347,7 @@ static BOOL func_ov167_021affb4(BtlServerFlow *flow, BattleMon *mon, u16 item, s
     BattleHandlerStatChangeParam *param;
 
     monId = GetMonID(mon);
-    if (GetBattlePos(flow->unk1ab8, monId) != 6 && !IsFainted(mon) && IsStatChangeValid(mon, stat, value)) {
+    if (GetBattlePos(&flow->posPoke, monId) != 6 && !IsFainted(mon) && IsStatChangeValid(mon, stat, value)) {
         param = BattleHandler_PushWork(flow, 0xe, monId);
         param->count = 1;
         param->monIds[0] = monId;
@@ -1713,7 +1721,7 @@ u32 func_ov167_021b05b4(BtlServerFlow *flow) {
             return 2;
         }
         if (alive[0] == 0) {
-            monId = func_ov169_0689d35c(flow->unk3E0);
+            monId = BtlFaintRec_GetLastFainted(&flow->faintRec);
             if (monId != 0x1f) {
                 monSide = GetSideFromMonID(monId);
                 if (monSide == side) {

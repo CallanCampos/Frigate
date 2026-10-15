@@ -154,7 +154,7 @@ s32 GetWarpIDByPlayerPosRail(EventData *data, const RailPosition *position) {
     return 0xffff;
 }
 
-ZoneWarp *GetZoneWarpByID(EventData *data, u16 warpId) {
+ZoneWarp *GetZoneWarpByID(const EventData *data, u16 warpId) {
     ZoneWarp *warps = data->warps;
 
     if (warps == NULL) {
@@ -170,7 +170,7 @@ BOOL IsWarpDestId256(ZoneWarp *warp) {
     return warp->destId == 0x100;
 }
 
-BOOL SetupZoneWarpArrival(EventData *eventData, ZoneSpawnInfo *spawn, u16 warpId, u16 posWeightBits) {
+BOOL SetupZoneWarpArrival(const EventData *eventData, ZoneSpawnInfo *spawn, u16 warpId, u16 posWeightBits) {
     ZoneWarp *warp = GetZoneWarpByID(eventData, warpId);
     VecFx32 position;
     RailPosition railPosition;
@@ -435,15 +435,13 @@ void *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
 
 s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *position, u16 direction) {
     ZoneBGEntity *entity;
-    u16 alternateDirection;
-    u16 count;
+    u32 count;
     u16 i;
     u16 flag;
 
     entity = data->entities;
     if (entity != NULL) {
         count = data->entityCount;
-        alternateDirection = direction - 2;
         for (i = 0; i < count; i++, entity++) {
             if (entity->condition >= 3) {
                 continue;
@@ -486,7 +484,7 @@ s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *pos
             case 4:
                 return entity->scrId;
             case 5:
-                if (alternateDirection <= 1) {
+                if (direction == 2 || direction == 3) {
                         return entity->scrId;
                     }
                 break;
@@ -532,7 +530,7 @@ void SetBGEntityLocation(EventData *data, u32 index, u16 x, u16 z, u16 y) {
         entities = data->entities;
         entity = &entities[index];
         if (entity->isRail == 0) {
-            coords = &entity->pos.grid.x;
+            coords = (s32 *)entity->pos.grid;
             coords[0] = x;
             coords[1] = y;
             coords[2] = z << 4;
@@ -551,8 +549,8 @@ u16 CalcWarpTransferAddend(u32 posWeightBits, u32 warpDirection, BOOL isRail, u3
     if (posWeightBits == 0) {
         return 0;
     }
-    index = posWeightBits & 0xf;
     width = (s32)(posWeightBits & 0xf0) >> 4;
+    index = posWeightBits & 0xf;
     direction = (s32)(posWeightBits & 0xf00) >> 8;
     if ((direction == 0 && warpDirection == 3) || (direction == 1 && warpDirection == 2) ||
         (direction == 3 && warpDirection == 0) || (direction == 2 && warpDirection == 1)) {
@@ -723,19 +721,21 @@ BOOL CheckWarpPositionMatch(const ZoneWarp *warp, const VecFx32 *position) {
     return FALSE;
 }
 
-void GetRailWarpOutPos(ZoneWarp *warp, u32 direction, RailPosition *position) {
-    ZoneWarpRailPosition *rail = &warp->pos.rail;
+void GetRailWarpOutPos(const ZoneWarp *warp, u32 direction, RailPosition *position) {
+    const ZoneWarpRailPosition *rail = &warp->pos.rail;
     u32 warpDirection = ZoneWarp_GetDirection(warp);
+    u16 param;
 
     position->componentId = rail->componentId;
     position->componentIsLine = 1;
     position->railDirection = ConvDirToRailDir(warpDirection);
     position->posSide = rail->posSide;
     position->posFront = rail->posFront;
+    param = rail->param;
     if (rail->sideSpan > 1) {
-        position->posSide += (s16)CalcWarpTransferAddend(direction, warpDirection, 1, rail->param, rail->sideSpan);
+        position->posSide += (s16)CalcWarpTransferAddend(direction, warpDirection, 1, param, rail->sideSpan);
     } else if (rail->frontSpan > 1) {
-        position->posFront += CalcWarpTransferAddend(direction, warpDirection, 1, rail->param, rail->frontSpan);
+        position->posFront += CalcWarpTransferAddend(direction, warpDirection, 1, param, rail->frontSpan);
     }
 }
 
@@ -760,7 +760,7 @@ void func_ov012_0215d88c(const ZoneBGEntity *entity, VecFx32 *position) {
     s32 y;
     s32 z;
 
-    coords = &entity->pos.grid.x;
+    coords = (const s32 *)entity->pos.grid;
     z = coords[1] << 16;
     x = coords[0] << 16;
     y = coords[2] << 12;
@@ -780,7 +780,7 @@ BOOL CheckBGPositionMatchGrid(const ZoneBGEntity *entity, const VecFx32 *positio
         return FALSE;
     }
     zRaw = position->z;
-    coords = &entity->pos.grid.x;
+    coords = (const s32 *)entity->pos.grid;
     z = (zRaw >> 4) / 4096;
     x = (position->x >> 4) / 4096;
     y = position->y >> 12;
@@ -794,7 +794,7 @@ void func_ov012_0215d8fc(const ZoneBGEntity *entity, RailPosition *position) {
     u32 direction;
     const u16 *values;
 
-    values = (const u16 *)&entity->pos.rail;
+    values = &entity->pos.rail.componentId;
     switch (entity->direction) {
     case 0:
         direction = 1;
@@ -825,7 +825,7 @@ BOOL CheckBGPositionMatchRail(const ZoneBGEntity *entity, const RailPosition *po
     if (entity->isRail == 0) {
         return FALSE;
     }
-    values = (const u16 *)&entity->pos.rail;
+    values = &entity->pos.rail.componentId;
     if (values[0] == position->componentId && values[1] == position->posFront && (s16)values[2] == position->posSide) {
         return TRUE;
     }

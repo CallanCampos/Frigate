@@ -227,7 +227,7 @@ static void func_ov036_021a5cdc(FieldEffectTask *task, void *work) {
     FesKiraTask *kiraTask = work;
     FieldEffectFesKira *effect = kiraTask->params.effect;
 
-    MAT3_Identity(&srt.rotation);
+    MTX_Identity33_(&srt.rotation);
     for (i = 0; i < FES_KIRA_MAX; i++) {
         if (kiraTask->kiras[i].active) {
             srt.translation = kiraTask->kiras[i].pos;

@@ -189,9 +189,6 @@ static const u8 sBadgePaletteStarts[16] = {
     2, 3, 6, 5, 4, 5, 2, 0, 1, 3, 6, 5, 4, 7, 7, 0,
 };
 
-// Two bytes that nothing in the overlay refers to, before the tables: a global that is not used
-const u8 WifiBattleMatchView_Unk021C5EB4[2] = { 0, 2 };
-
 // The windows of the Wi-Fi competition's card, of the other player's card, of the live one's card and of the rank
 // card, each with its x, y, width and height
 static const u8 sPartnerCardRects[8][4] = {
@@ -292,6 +289,8 @@ static u32 WifiBattleMatchView_GetRes(WifiBattleMatchRes *res, u32 index) {
 }
 
 void WifiBattleMatchRes_Update(WifiBattleMatchRes *res) {
+    // The palette rows that are blended: the first of the BGs and the third of the main screen's OBJs
+    static const u8 sRows[2] = { 0, 2 };
     int i;
 
     if (res->angle + 0x200 >= 0x10000) {
@@ -300,11 +299,11 @@ void WifiBattleMatchRes_Update(WifiBattleMatchRes *res) {
         res->angle += 0x200;
     }
     for (i = 0; i < 16; i++) {
-        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_MAIN, &res->colors[i], &res->angle, 0, 0, i,
+        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_MAIN, &res->colors[i], &res->angle, 0, sRows[0], i,
                                        res->colorsA[i], res->colorsB[i]);
-        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_SUB, &res->colors[i], &res->angle, 0, 0, i,
+        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_BG_PLTT_SUB, &res->colors[i], &res->angle, 0, sRows[0], i,
                                        res->colorsA[i], res->colorsB[i]);
-        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, &res->colors[i], &res->angle, 0, 2, i,
+        WifiBattleMatchView_BlendColor(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, &res->colors[i], &res->angle, 0, sRows[1], i,
                                        res->colorsA[i], res->colorsB[i]);
     }
 }
@@ -312,7 +311,7 @@ void WifiBattleMatchRes_Update(WifiBattleMatchRes *res) {
 // Blends two colors by the angle, and queues the result for a palette
 static void WifiBattleMatchView_BlendColor(NNS_GFD_DST_TYPE type, u16 *dst, const u16 *angle, u32 a3, u8 row,
                                            u8 index, u16 colorA, u16 colorB) {
-    s32 ratio = (FX_CosIdx(*angle) + FX32_ONE) / 2;
+    fx16 ratio = (FX_CosIdx(*angle) + FX32_ONE) / 2;
     u8 redA = colorA & 0x1f;
     u8 greenA = (colorA & 0x3e0) >> 5;
     u8 blueA = (colorA & 0x7c00) >> 10;
@@ -334,7 +333,9 @@ static void WifiBattleMatchView_PrintCounts(PrintWindow *printWindow, PrintQueue
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(heapId);
     StrBuf *text = GFL_StrBufCreate(0x20, heapId);
     u16 right = BmpWin_GetSizeX(printWindow->window) * 8;
-    int x = right;
+    // Where the second number and the message between the numbers start
+    int count2X;
+    int middleX;
     u16 width;
     StrBuf *format;
 
@@ -342,21 +343,21 @@ static void WifiBattleMatchView_PrintCounts(PrintWindow *printWindow, PrintQueue
     WordSetNumber(wordSet, 0, count2, 8, 0, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, text, format);
     width = GFL_FontGetBlockWidth(text, font, 0);
-    x -= width;
-    PrintWindow_PrintNoColor(printWindow, queue, x, 0, text, font);
+    count2X = right - width;
+    PrintWindow_PrintNoColor(printWindow, queue, count2X, 0, text, font);
     GFL_StrBufFree(format);
 
     format = GFL_MsgDataLoadStrbufNew(msgData, 0);
     width = GFL_FontGetBlockWidth(format, font, 0);
-    x -= width;
-    PrintWindow_PrintNoColor(printWindow, queue, x, 0, format, font);
+    middleX = count2X - width;
+    PrintWindow_PrintNoColor(printWindow, queue, middleX, 0, format, font);
     GFL_StrBufFree(format);
 
     format = GFL_MsgDataLoadStrbufNew(msgData, 1);
     WordSetNumber(wordSet, 0, count1, 8, 0, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, text, format);
     width = GFL_FontGetBlockWidth(text, font, 0);
-    PrintWindow_PrintNoColor(printWindow, queue, x - width, 0, text, font);
+    PrintWindow_PrintNoColor(printWindow, queue, middleX - width, 0, text, font);
     GFL_StrBufFree(format);
     GFL_StrBufFree(text);
     GFL_WordSetSystemFree(wordSet);
@@ -420,20 +421,20 @@ WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCar
     card->heapId = heapId;
     card->unit = unit;
     if (main) {
+        frameBG = 2;
         card->bg = 1;
         card->palette = 15;
         card->iconPaletteSlot = 5;
         card->itemPaletteSlot = 9;
         card->surface = CLACT_VRAM_MAIN;
-        frameBG = 2;
         gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     } else {
+        frameBG = 6;
         card->bg = 5;
         card->palette = 15;
         card->iconPaletteSlot = 3;
         card->itemPaletteSlot = 7;
         card->surface = CLACT_VRAM_SUB;
-        frameBG = 6;
         gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     }
     switch (info->variant) {
@@ -560,20 +561,20 @@ WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCar
     card->heapId = heapId;
     card->unit = unit;
     if (main) {
+        frameBG = 2;
         card->bg = 1;
         card->palette = 15;
         card->iconPaletteSlot = 5;
         card->itemPaletteSlot = 9;
         card->surface = CLACT_VRAM_MAIN;
-        frameBG = 2;
         gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     } else {
+        frameBG = 6;
         card->bg = 5;
         card->palette = 15;
         card->iconPaletteSlot = 3;
         card->itemPaletteSlot = 7;
         card->surface = CLACT_VRAM_SUB;
-        frameBG = 6;
         gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     }
     switch (info->variant) {
@@ -1062,21 +1063,24 @@ static void WifiBattleMatchView_CardFreeWindows(WifiBattleMatchCard *card) {
 
 static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUnit *unit, void *records,
                                               HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
+    u8 form;
+    u8 gender;
+    u8 hasItem;
+    ArcTool *arc;
+    u16 species;
     ClActorSetup setup;
     ClActorSetup itemSetup;
     int i;
 
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
     card->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), card->surface, card->iconPaletteSlot << 5, HEAPID_TAIL(heapId));
     card->iconCells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
-        u16 species = TournamentTeam_GetField(records, 0, i);
-        u8 form = TournamentTeam_GetField(records, 1, i);
-        u8 gender = TournamentTeam_GetField(records, 3, i);
+        species = TournamentTeam_GetField(records, 0, i);
+        form = TournamentTeam_GetField(records, 1, i);
+        gender = TournamentTeam_GetField(records, 3, i);
 
-        if (species == 0) {
-            species = 1;
-        }
+        species = species == 0 ? 1 : species;
         card->iconChars[i] =
             func_0204b81c(arc, PokeParty_GetIconIndex(species, form, gender, FALSE), FALSE, card->surface, HEAPID_TAIL(heapId));
     }
@@ -1093,10 +1097,10 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     setup.bgPriority = 1;
     setup.priority = 1;
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
-        u16 species = TournamentTeam_GetField(records, 0, i);
-        u8 form = TournamentTeam_GetField(records, 1, i);
-        u8 gender = TournamentTeam_GetField(records, 3, i);
-        u8 hasItem = TournamentTeam_GetField(records, 2, i);
+        species = TournamentTeam_GetField(records, 0, i);
+        form = TournamentTeam_GetField(records, 1, i);
+        gender = TournamentTeam_GetField(records, 3, i);
+        hasItem = TournamentTeam_GetField(records, 2, i);
 
         if (species != 0) {
             setup.x = i * 32 + 288;
@@ -1252,17 +1256,20 @@ WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMa
     case 0:
     case 1:
         GFL_BGSysLoadScrArea(2, 0, 0, 32, 2, GFL_BGSysIsScrHeapExists(2), 0, 24, 32, 32);
-        if (variant == 0) {
+        switch (variant) {
+        case 0:
             GFL_BGSysSetScrPaletteNo(2, 0, 0, 32, 2, 1);
             GFL_BGSysSetScrPaletteNo(2, 0, 3, 32, 32, 3);
-        } else if (variant == 1) {
+            GFL_BGSysSetScrPaletteNo(2, 0, 3, 1, 2, 1);
+            GFL_BGSysSetScrPaletteNo(2, 31, 3, 1, 2, 1);
+            break;
+        case 1:
             GFL_BGSysSetScrPaletteNo(2, 0, 0, 32, 2, 1);
             GFL_BGSysSetScrPaletteNo(2, 0, 3, 32, 32, 7);
-        } else {
+            GFL_BGSysSetScrPaletteNo(2, 0, 3, 1, 2, 1);
+            GFL_BGSysSetScrPaletteNo(2, 31, 3, 1, 2, 1);
             break;
         }
-        GFL_BGSysSetScrPaletteNo(2, 0, 3, 1, 2, 1);
-        GFL_BGSysSetScrPaletteNo(2, 31, 3, 1, 2, 1);
         break;
     }
     GFL_BGSysLoadScr(2);
@@ -1588,26 +1595,29 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
                                              Font *font, PrintQueue *printQueue, MsgData *msgData, HeapID heapId) {
     WifiBattleMatchTeamList *list = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchTeamList), FALSE,
                                                      "wifibattlematch_view.c", 3210);
-    PokeParty *party = convertBoxedPokeSetToParty(battleBox, HEAPID_TAIL(heapId));
+    PokeParty *party;
     ArcTool *arc;
     ClActorSetup setup;
     ClActorSetup itemSetup;
     ClActorPos pos;
+    u8 x;
+    u8 level;
     WordSet *wordSet;
     StrBuf *text;
     StrBuf *levelFormat;
     StrBuf *maleText;
     StrBuf *femaleText;
+    PartyPkm *pkm;
     int i;
 
     sys_memset(list, 0, sizeof(WifiBattleMatchTeamList));
+    party = convertBoxedPokeSetToParty(battleBox, HEAPID_TAIL(heapId));
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_WIFIBATTLEMATCH, 7, 2, 0, 0, FALSE, HEAPID_TAIL(heapId));
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
     list->palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 160, HEAPID_TAIL(heapId));
     list->cells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-        PartyPkm *pkm = PokeParty_GetPkm(party, i);
-
+        pkm = PokeParty_GetPkm(party, i);
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
             list->chars[i] =
                 func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(pkm)), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
@@ -1626,8 +1636,7 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     setup.sequence = 1;
     setup.priority = 1;
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-        PartyPkm *pkm = PokeParty_GetPkm(party, i);
-
+        pkm = PokeParty_GetPkm(party, i);
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
             setup.x = i * 40 + 24;
             list->actors[i] = func_0204c040(unit, list->chars[i], list->palette, list->cells, &setup, CLACT_VRAM_MAIN,
@@ -1637,8 +1646,8 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
                 itemSetup = setup;
                 itemSetup.x += 12;
                 itemSetup.y += 8;
-                itemSetup.sequence = 0;
                 itemSetup.priority = 0;
+                itemSetup.sequence = 0;
                 list->actors[TEAM_ACTOR_ITEM + i] = func_0204c040(unit, list->itemChars, list->itemPalette,
                                                                   list->itemCells, &itemSetup, CLACT_VRAM_MAIN, heapId);
             }
@@ -1650,12 +1659,12 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     maleText = GFL_MsgDataLoadStrbufNew(msgData, 100);
     femaleText = GFL_MsgDataLoadStrbufNew(msgData, 101);
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
-        PartyPkm *pkm = PokeParty_GetPkm(party, i);
-
+        pkm = PokeParty_GetPkm(party, i);
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
-            BmpWin *window = BmpWin_CreateDynamic(1, i * 5 + 1, 4, 5, 6, 15, TRUE);
+            BmpWin *window;
 
-            list->windows[i] = window;
+            list->windows[i] = BmpWin_CreateDynamic(1, i * 5 + 1, 4, 5, 6, 15, TRUE);
+            window = list->windows[i];
             BmpWin_FlushChar(window);
             BmpWin_FlushMap(window);
             GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
@@ -1666,10 +1675,11 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
                 PrintWindow_Print(&list->printWindows[i], printQueue, 32, 0, femaleText, font,
                                   PRINT_COLOR(3, 4, 0));
             }
-            WordSetNumber(wordSet, 0, (u8)PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL), 3, 1, TRUE);
+            level = PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
+            WordSetNumber(wordSet, 0, level, 3, 1, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, text, levelFormat);
-            PrintWindow_Print(&list->printWindows[i], printQueue, (u8)(20 - GFL_FontGetBlockWidth(text, font, 0) / 2),
-                              36, text, font, PRINT_COLOR(1, 2, 0));
+            x = 20 - GFL_FontGetBlockWidth(text, font, 0) / 2;
+            PrintWindow_Print(&list->printWindows[i], printQueue, x, 36, text, font, PRINT_COLOR(1, 2, 0));
         }
     }
     GFL_StrBufFree(femaleText);

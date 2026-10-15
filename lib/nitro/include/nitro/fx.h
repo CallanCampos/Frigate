@@ -71,80 +71,18 @@ typedef struct {
 } MtxFx44;
 
 // The sine and cosine of 4096 angles around the circle, as pairs
-extern const fx16 FX_SIN_COS_TABLE[4096 * 2];
+extern const fx16 FX_SinCosTable_[4096 * 2];
 
 // An angle in whole degrees as the 16-bit angle that FX_SinIdx and FX_CosIdx take, 0x10000 for a full turn
 #define DEG_TO_IDX(deg) ((u16)((deg) * 0x10000 / 360))
 
 static inline fx16 FX_SinIdx(int idx) {
-    return FX_SIN_COS_TABLE[(idx >> 4) << 1];
+    return FX_SinCosTable_[(idx >> 4) << 1];
 }
 
 static inline fx16 FX_CosIdx(int idx) {
-    return FX_SIN_COS_TABLE[((idx >> 4) << 1) + 1];
+    return FX_SinCosTable_[((idx >> 4) << 1) + 1];
 }
-
-void MAT3_Identity(MtxFx33 *mtx);
-
-// Rotations about an axis from its sine and cosine: NitroSDK's MTX_Rot22_, MTX_RotX33_ and the rest
-void MAT2_Rotation(MtxFx22 *mtx, fx32 sin, fx32 cos);
-// NitroSDK's MTX_Identity22 and MTX_Scale22
-void MAT2_Identity(MtxFx22 *mtx);
-void MAT2_Scaling(MtxFx22 *mtx, fx32 x, fx32 y);
-void MAT43_RotationY(MtxFx43 *mtx, fx32 sin, fx32 cos);
-void MAT43_RotationAxisAngle(MtxFx43 *mtx, const VecFx32 *axis, fx16 sin, fx16 cos);
-void MAT3_RotationY(MtxFx33 *mtx, fx32 sin, fx32 cos);
-void MAT3_RotationX(MtxFx33 *mtx, fx32 sin, fx32 cos);
-void MAT3_RotationY(MtxFx33 *mtx, fx32 sin, fx32 cos);
-void MAT3_RotationZ(MtxFx33 *mtx, fx32 sin, fx32 cos);
-// NitroSDK's MTX_ScaleApply22 and MTX_Concat33
-void MAT2_Scale(const MtxFx22 *src, MtxFx22 *dest, fx32 x, fx32 y);
-void MAT3_Mul(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab);
-void MAT3_MulVec(const VecFx32 *vec, const MtxFx33 *mtx, VecFx32 *dest);
-void MAT43_MulVec(const VecFx32 *vec, const MtxFx43 *mtx, VecFx32 *dest);
-// NitroSDK's MTX_Identity43, MTX_Scale43 and MTX_Concat43
-void MAT43_Identity(MtxFx43 *mtx);
-void MAT43_Scaling(MtxFx43 *mtx, fx32 x, fx32 y, fx32 z);
-void MAT43_Mul(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab);
-// Projection and camera matrices: NitroSDK's MTX_PerspectiveW, MTX_FrustumW, MTX_OrthoW and MTX_LookAt
-void MAT4_SetPerspective(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx);
-void MAT4_SetFrustum(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx);
-void MAT4_SetOrtho(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx);
-void MAT43_LookAt(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, MtxFx43 *mtx);
-
-void VEC_Add(const VecFx32 *a, const VecFx32 *b, VecFx32 *ab);
-void VEC_Subtract(const VecFx32 *a, const VecFx32 *b, VecFx32 *ab);
-void vecfx_normalize(const VecFx32 *src, VecFx32 *dest);
-fx32 vecfx_dist(const VecFx32 *a, const VecFx32 *b);
-void vecfx_muladd(fx32 scale, const VecFx32 *a, const VecFx32 *b, VecFx32 *dest);
-void vecfx_mul(const VecFx32 *src, fx32 scale, VecFx32 *dest);
-fx32 VEC_Mag(const VecFx32 *v);
-fx32 vecfx_dot(const VecFx32 *a, const VecFx32 *b);
-// NitroSDK's VEC_CrossProduct
-void vecfx_cross(const VecFx32 *a, const VecFx32 *b, VecFx32 *axb);
-// NitroSDK's VEC_Fx16 functions
-fx32 vecfx_dot16(const VecFx16 *a, const VecFx16 *b);
-void vecfx_cross16(const VecFx16 *a, const VecFx16 *b, VecFx16 *axb);
-void vecfx_normalize16(const VecFx16 *src, VecFx16 *dest);
-// NitroSDK's VEC_Fx16Add
-void vecfx_add16(const VecFx16 *a, const VecFx16 *b, VecFx16 *ab);
-
-// An angle in fixed point degrees as a 16-bit angle
-#define FX64C_65536_360 ((s64)0x000000b60b60b60bLL)
-#define FX_DEG_TO_IDX(deg) ((u16)(((deg) * FX64C_65536_360 + 0x80000000000LL) >> 44))
-
-fx32 FX_Div(fx32 numer, fx32 denom);
-s32 FX_ModS32(s32 numer, s32 denom);
-fx32 FX_Inv(fx32 x);
-// NitroSDK's FX_Mul as a function, rounding, and FX_Atan2Idx
-fx32 fx_mul_round(fx32 v1, fx32 v2);
-u16 fx_atan2(fx32 y, fx32 x);
-// NitroSDK's FX_AcosIdx
-u16 fx_acos(fx32 x);
-// Returns the fraction of x and writes its whole part, both with the sign of x
-fx32 fx_fract(fx32 x, fx32 *whole);
-fx32 FX_Sqrt(fx32 x);
-fx32 FX_InvSqrt(fx32 x);
 
 static inline fx32 FX_Mul(fx32 v1, fx32 v2) {
     return (fx32)(((fx64)v1 * v2 + 0x800LL) >> FX32_SHIFT);
@@ -158,7 +96,6 @@ static inline void VEC_Set(VecFx32 *v, fx32 x, fx32 y, fx32 z) {
     v->y = y;
     v->z = z;
 }
-void MAT2_SetScaleRot(MtxFx22 *mtx, u16 rot, fx32 scaleX, fx32 scaleY, u8 mode);
 
 static inline void VEC_Fx16Set(VecFx16 *v, fx16 x, fx16 y, fx16 z) {
     v->x = x;
@@ -166,13 +103,102 @@ static inline void VEC_Fx16Set(VecFx16 *v, fx16 x, fx16 y, fx16 z) {
     v->z = z;
 }
 
-// NitroSDK's MTX_Inverse43, which returns -1 when the matrix has no inverse
-int MAT43_Invert(const MtxFx43 *mtx, MtxFx43 *inv);
-// NitroSDK's MTX_Inverse33
-int MAT3_Invert(const MtxFx33 *mtx, MtxFx33 *inv);
-// NitroSDK's MTX_Copy33To44, MTX_Copy43To44 and MTX_Concat44
+// An angle in fixed point degrees as a 16-bit angle
+#define FX64C_65536_360 ((s64)0x000000b60b60b60bLL)
+#define FX_DEG_TO_IDX(deg) ((u16)(((deg) * FX64C_65536_360 + 0x80000000000LL) >> 44))
+
+// libfx, in link order. The names are NitroSDK's, as pret's pokediamond and pmd-sky use them; swan's names are noted
+// where they differ, and functions with no SDK name in pret keep swan's.
+
+// fx_mtx22.c. Swan: MAT2_Identity, MAT2_Rotation, MAT2_Scale
+void MTX_Identity22_(MtxFx22 *mtx);
+void MAT2_Scaling(MtxFx22 *mtx, fx32 x, fx32 y);
+// A rotation from its sine and cosine
+void MTX_Rot22_(MtxFx22 *mtx, fx32 sin, fx32 cos);
+void MTX_ScaleApply22(const MtxFx22 *src, MtxFx22 *dest, fx32 x, fx32 y);
+
+// fx_mtx33.c. Swan: MAT3_Identity, MAT3_Scale, MAT3_RotationX/Y/Z, MAT3_Mul, MAT3_MulVec
+void MTX_Identity33_(MtxFx33 *mtx);
 void MAT3_To4x4(const MtxFx33 *src, MtxFx44 *dst);
-void MAT43_To4x4(const MtxFx43 *src, MtxFx44 *dst);
-void MAT4_Mul(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab);
+void MAT3_Scaling(MtxFx33 *mtx, fx32 x, fx32 y, fx32 z);
+void MTX_ScaleApply33(const MtxFx33 *src, MtxFx33 *dest, fx32 x, fx32 y, fx32 z);
+// Rotations about an axis from its sine and cosine
+void MTX_RotX33_(MtxFx33 *mtx, fx32 sin, fx32 cos);
+void MTX_RotY33_(MtxFx33 *mtx, fx32 sin, fx32 cos);
+void MTX_RotZ33_(MtxFx33 *mtx, fx32 sin, fx32 cos);
+void MAT3_RotationAxisAngle(MtxFx33 *mtx, const VecFx32 *axis, fx32 sin, fx32 cos);
+// Returns -1 when the matrix has no inverse
+int MAT3_Invert(const MtxFx33 *mtx, MtxFx33 *inv);
+void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab);
+void MTX_MultVec33(const VecFx32 *vec, const MtxFx33 *mtx, VecFx32 *dest);
+
+// fx_mtx43.c. Swan: MAT43_Identity, MAT43_To4x4, MAT43_Scaling, MAT43_Scale, MAT43_RotationY, MAT43_RotationAxisAngle,
+// MAT43_Invert, MAT43_Mul, MAT43_MulVec, MAT43_LookAt
+void MTX_Identity43_(MtxFx43 *mtx);
+void MTX_Copy43To44_(const MtxFx43 *src, MtxFx44 *dst);
+void MTX_Scale43_(MtxFx43 *mtx, fx32 x, fx32 y, fx32 z);
+void MTX_ScaleApply43(const MtxFx43 *src, MtxFx43 *dest, fx32 x, fx32 y, fx32 z);
+void MTX_RotY43_(MtxFx43 *mtx, fx32 sin, fx32 cos);
+void MTX_RotAxis43(MtxFx43 *mtx, const VecFx32 *axis, fx16 sin, fx16 cos);
+// Returns -1 when the matrix has no inverse
+int MTX_Inverse43(const MtxFx43 *mtx, MtxFx43 *inv);
+void MTX_Concat43(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab);
+void MTX_MultVec43(const VecFx32 *vec, const MtxFx43 *mtx, VecFx32 *dest);
+void MTX_LookAt(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, MtxFx43 *mtx);
+
+// fx_mtx44.c. Swan: MAT4_Identity, MAT4_To4x3, MAT4_Mul, MAT4_SetFrustum, MAT4_SetPerspective, MAT4_SetOrtho
+void MTX_Identity44_(MtxFx44 *mtx);
+void MTX_Copy44To43_(const MtxFx44 *src, MtxFx43 *dst);
+void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab);
+void MTX_FrustumW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx);
+void MTX_PerspectiveW(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx);
+void MTX_OrthoW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx);
+
+// fx_cp.c, on the hardware divider and square root unit. Swan: fx_recip_raw (FX_InvFx64c)
+fx32 FX_Div(fx32 numer, fx32 denom);
+fx32 FX_Inv(fx32 denom);
+fx64 FX_InvFx64c(fx32 denom);
+fx32 FX_Sqrt(fx32 x);
+fx32 FX_InvSqrt(fx32 x);
+fx64 FX_GetDivResultFx64c(void);
+fx32 FX_GetDivResult(void);
+void FX_InvAsync(fx32 denom);
+void FX_DivAsync(fx32 numer, fx32 denom);
+s32 FX_DivS32(s32 numer, s32 denom);
+s32 FX_ModS32(s32 numer, s32 denom);
+
+// fx_vec.c. Swan: vecfx_add16, vecfx_dot, vecfx_dot16, vecfx_cross, vecfx_cross16, vecfx_length16, vecfx_normalize,
+// vecfx_normalize16, vecfx_muladd, vecfx_dist
+void VEC_Add(const VecFx32 *a, const VecFx32 *b, VecFx32 *ab);
+void VEC_Subtract(const VecFx32 *a, const VecFx32 *b, VecFx32 *ab);
+void VEC_Fx16Add(const VecFx16 *a, const VecFx16 *b, VecFx16 *ab);
+fx32 VEC_DotProduct(const VecFx32 *a, const VecFx32 *b);
+fx32 VEC_Fx16DotProduct(const VecFx16 *a, const VecFx16 *b);
+void VEC_CrossProduct(const VecFx32 *a, const VecFx32 *b, VecFx32 *axb);
+void VEC_Fx16CrossProduct(const VecFx16 *a, const VecFx16 *b, VecFx16 *axb);
+fx32 VEC_Mag(const VecFx32 *v);
+fx32 VEC_Fx16Mag(const VecFx16 *v);
+void VEC_Normalize(const VecFx32 *src, VecFx32 *dest);
+void VEC_Fx16Normalize(const VecFx16 *src, VecFx16 *dest);
+void VEC_MultAdd(fx32 scale, const VecFx32 *a, const VecFx32 *b, VecFx32 *dest);
+fx32 VEC_Distance(const VecFx32 *a, const VecFx32 *b);
+
+// fx_atanidx.c. Swan: fx_atan2
+u16 FX_Atan2Idx(fx32 y, fx32 x);
+
+// fx.c. Swan: fx_mul_round (FX_MulFunc, FX_Mul as a function, rounding), fx_fract (FX_Modf)
+void FX_Init(void);
+fx32 FX_MulFunc(fx32 v1, fx32 v2);
+// The 32-bit fixed point number times a 64-bit fraction with 32 fractional bits, rounded
+fx32 FX_Mul32x64cFunc(fx32 v32, fx64 v64c);
+// Returns the fraction of x and writes its whole part, both with the sign of x
+fx32 FX_Modf(fx32 x, fx32 *whole);
+
+// fx_trig.c (the file name is a guess). Swan: fx_acos
+u16 FX_AcosIdx(fx32 x);
+
+// GFL's calctool.c, also declared in gfl/calctool.h
+void vecfx_mul(const VecFx32 *src, fx32 scale, VecFx32 *dest);
+void MAT2_SetScaleRot(MtxFx22 *mtx, u16 rot, fx32 scaleX, fx32 scaleY, u8 mode);
 
 #endif // POKEBW2_NITRO_FX_H

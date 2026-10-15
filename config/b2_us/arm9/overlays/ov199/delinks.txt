@@ -17,6 +17,7 @@ src/ov199/gsync_message.c:
     .data       start:0x021b99f0 end:0x021b9a00
 
 src/ov199/gsync_download.c:
+    complete
     .text       start:0x021b4870 end:0x021b4b48
     .data       start:0x021b9a00 end:0x021b9a44
     .bss        start:0x021b9c00 end:0x021b9c20
@@ -40,6 +41,7 @@ src/ov199/pdwacc_message.c:
     .data       start:0x021b9b98 end:0x021b9bac
 
 src/ov199/pdwacc_disp.c:
+    complete
     .text       start:0x021b88d0 end:0x021b8f4c
     .rodata     start:0x021b9864 end:0x021b9964
     .data       start:0x021b9bac end:0x021b9c00

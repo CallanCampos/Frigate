@@ -122,7 +122,7 @@ static void func_ov036_021a59dc(FieldEffectTask *task, void *work) {
     FieldEffectFishing *effect = fishingTask->effect;
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
 
-    MAT3_Identity(&srt.rotation);
+    MTX_Identity33_(&srt.rotation);
     func_ov036_021a3ad4(task, &srt.translation);
     GFL_G3DSysDrawObjBBoxCull(effect->actor, &srt);
 }

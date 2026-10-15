@@ -158,5 +158,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_PHIONE"
+    "baby_species": "SPECIES_PHIONE",
+    "cry_volume": 120
 }

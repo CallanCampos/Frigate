@@ -142,8 +142,8 @@ static void CommTvtField_SetFunc(CommTvtFieldWork *wk, CommTvtFieldFunc func);
 static void CommTvtField_SetFuncLine(CommTvtFieldWork *wk, CommTvtFieldFunc func, int line);
 static void CommTvtField_InitBG(CommTvtFieldWork *wk);
 static void CommTvtField_CreateWindows(int count, const u32 *msgIds, CommTvtFieldWork *wk,
-                                       const CommTvtFieldWindowParam *params, const int *centersX, const int *centersY);
-static void CommTvtField_CreateWindow(u32 index, CommTvtFieldWork *wk, const CommTvtFieldWindowParam *param,
+                                       CommTvtFieldWindowParam *params, const int *centersX, const int *centersY);
+static void CommTvtField_CreateWindow(u32 index, CommTvtFieldWork *wk, CommTvtFieldWindowParam *param,
                                       const int *centersX, const int *centersY);
 static void CommTvtField_FreeWindow5(u32 index, CommTvtFieldWork *wk);
 static void CommTvtField_FreeWindow7(u32 index, CommTvtFieldWork *wk);
@@ -313,8 +313,7 @@ static void CommTvtField_InitBG(CommTvtFieldWork *wk) {
 }
 
 static void CommTvtField_CreateWindows(int count, const u32 *msgIds, CommTvtFieldWork *wk,
-                                       const CommTvtFieldWindowParam *params, const int *centersX,
-                                       const int *centersY) {
+                                       CommTvtFieldWindowParam *params, const int *centersX, const int *centersY) {
     int i;
     int j;
 
@@ -357,7 +356,7 @@ static void CommTvtField_CreateWindows(int count, const u32 *msgIds, CommTvtFiel
     GFL_BGSysQueueScrLoad(7);
 }
 
-static void CommTvtField_CreateWindow(u32 index, CommTvtFieldWork *wk, const CommTvtFieldWindowParam *param,
+static void CommTvtField_CreateWindow(u32 index, CommTvtFieldWork *wk, CommTvtFieldWindowParam *param,
                                       const int *centersX, const int *centersY) {
     s32 x;
     s32 y;
@@ -368,11 +367,12 @@ static void CommTvtField_CreateWindow(u32 index, CommTvtFieldWork *wk, const Com
         BmpWin_Free(wk->windows[index]);
         wk->windows[index] = NULL;
     }
-    x = 0;
     wk->windows[index] = BmpWin_CreateDynamic(7, param->x, param->y, param->width, param->height, 13, FALSE);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[index]), 0);
     if (centersX != NULL) {
-        x = centersX[index] - GFL_FontGetBlockWidth(wk->strbuf54, wk->font, x) / 2;
+        x = centersX[index] - GFL_FontGetBlockWidth(wk->strbuf54, wk->font, 0) / 2;
+    } else {
+        x = 0;
     }
     if (centersY != NULL) {
         y = centersY[index] - GFL_FontGetBlockHeight(wk->strbuf54, wk->font) / 2;

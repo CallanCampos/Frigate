@@ -155,5 +155,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SHINX"
+    "baby_species": "SPECIES_SHINX",
+    "cry_volume": 120
 }

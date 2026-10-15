@@ -53,6 +53,6 @@ data_ov076_021ea6f8 kind:data(any) addr:0x021ea738
 data_ov076_021ea6fc kind:data(any) addr:0x021ea73c
 data_ov076_021ea760 kind:data(any) addr:0x021ea7a0
 data_ov076_021ea76c kind:data(any) addr:0x021ea7ac
-data_ov076_021ea778 kind:data(any) addr:0x021ea7b8
-data_ov076_021ea7c4 kind:data(any) addr:0x021ea804
-data_ov076_021ea810 kind:data(any) addr:0x021ea850
+RAIN_WEATHER kind:data(any) addr:0x021ea7b8
+THUNDERSTORM_WEATHER kind:data(any) addr:0x021ea804
+GUSTY_RAIN_WEATHER kind:data(any) addr:0x021ea850

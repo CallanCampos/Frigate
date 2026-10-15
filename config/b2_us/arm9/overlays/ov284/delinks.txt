@@ -17,6 +17,7 @@ src/ov284/shinka_demo_effect.c:
     complete
 
 src/ov284/shinka_demo_view.c:
+    complete
     .text       start:0x021e4dd0 end:0x021e7824
     .rodata     start:0x021e7f80 end:0x021e7ff4
     .data       start:0x021e80c8 end:0x021e80dc

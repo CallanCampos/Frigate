@@ -10,16 +10,44 @@ src/ov215/mailtool.c:
     .data       start:0x021ab780 end:0x021ab78c
 
 src/ov215/mailsys.c:
+    complete
     .text       start:0x021a771c end:0x021a84e4
     .rodata     start:0x021ab004 end:0x021ab0a8
     .data       start:0x021ab78c end:0x021ab798
 
 src/ov215/mailview.c:
+    complete
     .text       start:0x021a84e4 end:0x021a8d68
     .rodata     start:0x021ab0a8 end:0x021ab158
     .data       start:0x021ab798 end:0x021ab7a4
 
 src/ov215/mb_seq.c:
-    .text       start:0x021a8d68 end:0x021ab004
-    .rodata     start:0x021ab158 end:0x021ab778
+    complete
+    .text       start:0x021aa188 end:0x021aaefc
+    .rodata     start:0x021ab610 end:0x021ab6c8
     .data       start:0x021ab7a4 end:0x021ab7c0
+
+src/ov215/mailbox.c:
+    complete
+    .text       start:0x021a8d68 end:0x021a8de4
+    .rodata     start:0x021ab158 end:0x021ab164
+
+src/ov215/mb_main.c:
+    complete
+    .text       start:0x021a8de4 end:0x021a9740
+    .rodata     start:0x021ab164 end:0x021ab2d4
+
+src/ov215/mb_bmp.c:
+    complete
+    .text       start:0x021a9740 end:0x021a9d90
+    .rodata     start:0x021ab2d4 end:0x021ab454
+
+src/ov215/mb_obj.c:
+    complete
+    .text       start:0x021a9d90 end:0x021aa188
+    .rodata     start:0x021ab454 end:0x021ab610
+
+src/ov215/mb_ui.c:
+    complete
+    .text       start:0x021aaefc end:0x021ab004
+    .rodata     start:0x021ab6c8 end:0x021ab778

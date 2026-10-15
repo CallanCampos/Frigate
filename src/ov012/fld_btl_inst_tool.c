@@ -110,6 +110,14 @@ BtlSetup *SetupTrialHouseBattle(GameSystem *gsys, PokeParty *party, u32 mode, BS
     return setup;
 }
 
+// Sets up the client's trainer from trainer, numbered from trainerIdBase
+static inline void SetTrialHouseTrainer(BtlSetup *setup, SetupClient client, const BSubwayTrainer *trainer,
+                                        u32 trainerIdBase) {
+    setup->trainers[client]->trainerId = trainer->unk00 - 1;
+    func_ov012_02162394(0, trainerIdBase + setup->trainers[client]->trainerId, trainer, setup->trainers[client], 0x87,
+                        TRUE, FALSE);
+}
+
 // A Trial House battle against one trainer, of levels between minLevel and maxLevel
 BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount, int mode, int count,
                               BSubwayTrainer *trainer, u32 a6, u32 trainerIdBase, u16 maxLevel, u16 minLevel, u32 a10,
@@ -118,6 +126,7 @@ BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount
     BtlFieldStatus status;
     BtlSetup *setup;
     SetupClient client;
+    PlayerInfo *info;
     u16 level;
 
     // Only mode 0 makes the setup, so the others use it unset
@@ -125,12 +134,11 @@ BtlSetup *func_ov012_02162068(GameSystem *gsys, PokeParty *party, int partyCount
         setup = BtlSetup_SetTrainerTrialHouse(gsys, 0, &status, FALSE, 4);
     }
     client = CLIENT_PLAYER;
-    setup->unk34[client] = GetGameDataPlayerInfo(gameData);
+    info = GetGameDataPlayerInfo(gameData);
+    setup->unk34[client] = info;
     RestrictPlayerParty(party, setup->party[client], partyCount, 0, 4);
     client = CLIENT_ENEMY;
-    setup->trainers[client]->trainerId = trainer->unk00 - 1;
-    func_ov012_02162394(0, trainerIdBase + setup->trainers[client]->trainerId, trainer, setup->trainers[client], 0x87,
-                        TRUE, FALSE);
+    SetTrialHouseTrainer(setup, client, trainer, trainerIdBase);
     level = minLevel + func_ov012_021627d4(rand) % (maxLevel - minLevel + 1);
     LoadTrialHouseParty(trainer, setup->party[client], level, count, 4);
     if (a11 == 0x17) {
@@ -313,8 +321,10 @@ u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pi
     personality = pid;
     if (personality == 0) {
         personality = PML_GenPID(id, data.species, data.form, 2, 2, 0);
+        pkm->personality = personality;
+    } else {
+        pkm->personality = personality;
     }
-    pkm->personality = personality;
     pkm->nature = data.nature;
     pkm->ivs.stat.hp = iv;
     pkm->ivs.stat.attack = iv;
@@ -342,13 +352,13 @@ u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pi
     ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1b);
     if (ability != 0) {
         if (pkm->personality & 1) {
+            pkm->ability = ability;
         } else {
-            ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
+            pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
         }
     } else {
-        ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
+        pkm->ability = PML_PersonalGetParamSingle(pkm->species, 0, 0x1a);
     }
-    pkm->ability = ability;
     pkm->happiness = happiness;
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, heapId);
     GFL_MsgDataLoadRawStr(msgData, pkm->species, pkm->nickname, NELEMS(pkm->nickname));
@@ -573,9 +583,9 @@ static BOOL func_ov012_02162ae8(const BSubwayTrainer *trainer) {
     return FALSE;
 }
 
-u32 func_ov012_02162b0c(u32 arcId, u16 file, HeapID heapId) {
+u16 func_ov012_02162b0c(u32 arcId, u16 file, HeapID heapId) {
     u16 *trainerData = func_ov012_021627c0(arcId, file, heapId);
-    u32 value = func_ov012_02162b38(trainerData[0]);
+    u16 value = func_ov012_02162b38(trainerData[0]);
 
     GFL_HeapFree(trainerData);
     return value;
@@ -589,7 +599,7 @@ u16 func_ov012_02162b28(u32 arcId, u16 file, HeapID heapId) {
     return trainerClass;
 }
 
-u32 func_ov012_02162b38(u32 trainerClass) {
+u16 func_ov012_02162b38(u32 trainerClass) {
     u32 i;
 
     for (i = 0; i < NELEMS(data_ov012_0216d9b4); i++) {

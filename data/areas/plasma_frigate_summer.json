@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_PLASMA_FRIGATE",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_240",
+    "srt_animation": 55,
+    "pattern_animation": 0,
+    "exterior": true,
+    "lights": 181,
+    "edge_color_table": 0,
+    "actor_material_color": 1
+}

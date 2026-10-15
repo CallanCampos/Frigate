@@ -188,5 +188,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 207,
-    "baby_species": "SPECIES_SPOINK"
+    "baby_species": "SPECIES_SPOINK",
+    "cry_volume": 120
 }

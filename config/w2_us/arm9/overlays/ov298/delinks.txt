@@ -34,6 +34,7 @@ src/ov298/zknd_tbar.c:
     .data       start:0x021ace78 end:0x021ace84
 
 src/ov298/zukan_detail_touchbar.c:
+    complete
     .text       start:0x021a12a8 end:0x021a2230
     .rodata     start:0x021ac258 end:0x021ac400
     .data       start:0x021ace84 end:0x021ace9c
@@ -50,6 +51,7 @@ src/ov298/zukan_detail_info.c:
     .rodata     start:0x021ac414 end:0x021ac460
 
 src/ov298/zukan_detail_map.c:
+    complete
     .text       start:0x021a32cc end:0x021a6414
     .rodata     start:0x021ac460 end:0x021ac788
     .data       start:0x021aceb4 end:0x021acec8
@@ -65,6 +67,7 @@ src/ov298/zukan_detail_form_data.c:
     .rodata     start:0x021ac830 end:0x021ac898
 
 src/ov298/zukan_detail_form.c:
+    complete
     .text       start:0x021a7a20 end:0x021abfb4
     .rodata     start:0x021ac898 end:0x021ace18
     .data       start:0x021acee0 end:0x021acf20

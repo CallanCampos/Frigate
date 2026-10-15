@@ -176,13 +176,16 @@ static const G3DSceneSetup sScene3 = { sScene3Resources, NELEMS(sScene3Resources
 // The event work of each gate, which is 2 once its badge has been checked
 static const u16 sGateWorks[9] = { 0x40e4, 0x40e5, 0x40e6, 0x40e7, 0x40e8, 0x40e9, 0x40ea, 0x40eb, 0x40ec };
 
-// The position of each gate's actors
+// The size of a grid square of the field
+#define GRID_SIZE FX32_CONST(16)
+
+// The position of each gate's actors, in grid squares
 static const VecFx32 sGatePositions[9] = {
-    { FX32_CONST(77), FX32_CONST(5), FX32_CONST(53) }, { FX32_CONST(72), FX32_CONST(5), FX32_CONST(53) },
-    { FX32_CONST(67), FX32_CONST(5), FX32_CONST(53) }, { FX32_CONST(62), FX32_CONST(5), FX32_CONST(53) },
-    { FX32_CONST(57), FX32_CONST(5), FX32_CONST(53) }, { FX32_CONST(52), FX32_CONST(5), FX32_CONST(53) },
-    { FX32_CONST(47), FX32_CONST(5), FX32_CONST(53) }, { FX32_CONST(42), FX32_CONST(5), FX32_CONST(53) },
-    { FX32_CONST(36), FX32_CONST(5), FX32_CONST(47) },
+    { 77 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE }, { 72 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE },
+    { 67 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE }, { 62 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE },
+    { 57 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE }, { 52 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE },
+    { 47 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE }, { 42 * GRID_SIZE, 5 * GRID_SIZE, 53 * GRID_SIZE },
+    { 36 * GRID_SIZE, 5 * GRID_SIZE, 47 * GRID_SIZE },
 };
 
 void func_ov103_021eec80(Field *field) {
@@ -554,12 +557,14 @@ void func_ov103_021ef5dc(BadgeGateLastEventData *data) {
 
 void func_ov103_021ef630(BadgeGateActor *actor, FieldExpObjSystem *system) {
     FieldExpObjAnm *anm;
+    SRTMatrix *matrix;
 
     FieldExpObj_AddScene(system, &sScene3, 3);
     actor->scene = 3;
     actor->actor = 0;
     actor->expObj = system;
-    FieldExpObj_GetActorMatrixPtr(system, 3, actor->actor)->translation = sGatePositions[8];
+    matrix = FieldExpObj_GetActorMatrixPtr(actor->expObj, 3, actor->actor);
+    matrix->translation = sGatePositions[8];
     FieldExpObj_SetActorHidden(actor->expObj, 3, actor->actor, TRUE);
     func_ov036_021b8248(actor->expObj, 3, actor->actor, 1);
     anm = FieldExpObj_GetAnmInfo(actor->expObj, actor->scene, actor->actor, 0);

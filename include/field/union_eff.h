@@ -2,13 +2,15 @@
 #define POKEBW2_FIELD_UNION_EFF_H
 
 #include "types.h"
+#include "field/colosseum_tool.h"
 #include "field/union_comm.h"
 #include "field/field_actor.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
 // union_eff.c, overlay 34, which the ROM names: the Union Room's effects on the field, the focus on a player and
-// the marks over them (the field keeps its work), and the colosseum's checks of who is ready
+// the marks over them (the field keeps its work). The colosseum's checks of who is ready are colosseum_tool.c's,
+// whose header this one includes
 
 // Whether the player stands on the Union Room's spot (the one entry of its table)
 BOOL UnionEff_IsPlayerOnSpot(Field *field);
@@ -26,15 +28,5 @@ void UnionEff_AddFocus(void *work, FieldActor *actor);
 void UnionEff_AddMark(void *work, FieldActor *actor, BOOL asonda);
 // Take the mark off an actor
 void UnionEff_RemoveMark(void *work, FieldActor *actor);
-// Whether the cards of all the players are in
-BOOL UnionEff_AllColosseumMembersHere(UnionColosseum *colosseum);
-BOOL UnionEff_AllColosseumCardsIn(UnionColosseum *colosseum);
-BOOL UnionEff_IsColosseumUnk170Set(UnionColosseum *colosseum);
-void UnionEff_ClearColosseumUnk170(UnionColosseum *colosseum);
-BOOL UnionEff_GetEntrySpot(Field *field, u32 kind, u32 *index);
-BOOL UnionEff_AllColosseumReady(UnionColosseum *colosseum);
-BOOL UnionEff_AnyColosseumUnk172(UnionColosseum *colosseum);
-BOOL UnionEff_IsOnSeatSpot(Field *field);
-void UnionEff_UpdateColosseumCommPlayers(UnionColosseum *colosseum);
 
 #endif // POKEBW2_FIELD_UNION_EFF_H

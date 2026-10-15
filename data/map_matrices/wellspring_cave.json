@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 486 ]
+        [ "MAP_MODEL_WELLSPRING_CAVE_M_DUN1401_00_00" ]
     ]
 }

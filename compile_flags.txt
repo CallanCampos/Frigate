@@ -4,7 +4,9 @@
 -Ilib/dpw/include
 -Ilib/dsprot/include
 -Ilib/dwc/include
+-Ilib/irc/include
 -Ilib/nitro/include
+-Ilib/nitrowifi/include
 -Ilib/nnsys/include
 -Ilib/poke_net/include
 -Ilib/spl/include

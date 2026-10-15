@@ -82,7 +82,7 @@ static FieldLightData *FieldLightStatus_LoadData(u32 arcId, u32 fileId, u32 *cou
     data = GFL_ArcSysReadHeapNew(arcId, fileId, heapId);
     for (i = 0; i < num; i++) {
         for (j = 0; j < 4; j++) {
-            vecfx_normalize16(&data[i].lightDirs[j], &data[i].lightDirs[j]);
+            VEC_Fx16Normalize(&data[i].lightDirs[j], &data[i].lightDirs[j]);
         }
     }
     return data;

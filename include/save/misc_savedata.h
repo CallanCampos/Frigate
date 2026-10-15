@@ -26,7 +26,8 @@ typedef struct {
 struct RivalDataSave {
     // The IDs of the trainers met last, the newest last
     u32 metTrainers[MISC_MET_TRAINER_MAX];
-    u32 metTrainerCount;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long metTrainerCount;
     u32 flags[MISC_FLAG_COUNT / 32];
     u16 rivalName[MISC_RIVAL_NAME_LENGTH];
     // The data that getHollow_RivalBlk's file keeps

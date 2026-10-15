@@ -15,7 +15,7 @@ typedef struct {
 } TimeSigBadgeDate;
 
 // The save block 0x21 (timesig_savedata.c, a guessed name): the trainer card's signature, when each badge was
-// obtained and the time it was last saved at
+// obtained, saved badge polish and the time it was last saved at
 struct TimeSigSave {
     u32 signature[0x180];
     u16 unk600;
@@ -30,7 +30,7 @@ struct TimeSigSave {
         };
     };
     u8 unk62C[0xc];
-    u16 unk638[TIMESIG_BADGE_COUNT];
+    u16 badgePolish[TIMESIG_BADGE_COUNT];
     u8 unk648[0x10];
 };
 
@@ -48,9 +48,9 @@ void func_020091f8(TimeSigSave *timeSig, u8 value);
 BOOL func_02009204(TimeSigSave *timeSig);
 void saveSecondsTime(TimeSigSave *timeSig, u32 low, u32 high);
 s64 loadSecondsTime(TimeSigSave *timeSig);
-u32 func_02009230(TimeSigSave *timeSig, u32 badgeId);
+TimeSigBadgeDate func_02009230(TimeSigSave *timeSig, u32 badgeId);
 void setBadgeGetSecondsTime(TimeSigSave *timeSig, u32 badgeId, u32 year, u32 month, u32 day);
-u16 func_020092a8(TimeSigSave *timeSig, u32 index);
-void func_020092b8(TimeSigSave *timeSig, u32 index, u32 value);
+u16 func_020092a8(TimeSigSave *timeSig, u32 badgeId);
+void func_020092b8(TimeSigSave *timeSig, u32 badgeId, u32 polish);
 
 #endif // POKEBW2_SAVE_TIMESIG_SAVEDATA_H

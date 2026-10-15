@@ -22,7 +22,7 @@ typedef struct G3DModel G3DModel;
 
 // Curves (ica_anime.c) that keep their keyframes in the caller's buffer: preloadCount frames at a time, or all of them.
 // They return NULL when the buffer is too small. GFL_G3DCurveCreateToLoadBufferEntire is not from swan
-G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u32 fileId, void *buffer, u32 bufferSize);
+G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u16 fileId, void *buffer, u32 bufferSize);
 G3DCurve *GFL_G3DCurveCreateToLoadBuffer(HeapID heapId, u32 arcId, u32 fileId, u32 preloadCount, void *buffer,
                                          u32 bufferSize);
 void GFL_G3DResBindData(void *resource, u32 kind, void *data);
@@ -267,9 +267,9 @@ void GFL_G3DCurveFrameSet(G3DCurve *curve, fx32 frame);
 fx32 GFL_G3DCurveGetNowFrame(G3DCurve *curve);
 u32 GFL_G3DCurveGetFrameCount(G3DCurve *curve);
 // The curve's values at a frame. They return FALSE when they give no value
-BOOL GFL_G3DCurveGetNowTranslationLoop(G3DCurve *curve, VecFx32 *translation, u32 frame);
-BOOL GFL_G3DCurveGetNowRotationLoop(G3DCurve *curve, VecFx32 *rotation, u32 frame);
-BOOL GFL_G3DCurveGetNowScaleLoop(G3DCurve *curve, VecFx32 *scale, u32 frame);
+BOOL GFL_G3DCurveGetNowTranslationLoop(const G3DCurve *curve, VecFx32 *translation, u32 frame);
+BOOL GFL_G3DCurveGetNowRotationLoop(const G3DCurve *curve, VecFx32 *rotation, u32 frame);
+BOOL GFL_G3DCurveGetNowScaleLoop(const G3DCurve *curve, VecFx32 *scale, u32 frame);
 void GFL_G3DCurveApplyCamera(G3DCamera *camera, G3DCurve *curve);
 // Moves the camera, or its target, to the curve's translation at its frame
 void GFL_G3DCurveApplyCameraPosTranslation(G3DCamera *camera, G3DCurve *curve);

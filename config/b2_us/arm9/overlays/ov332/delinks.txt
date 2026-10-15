@@ -17,6 +17,7 @@ src/ov332/key_system_graphic.c:
     .data       start:0x021c92d8 end:0x021c92f0
 
 src/ov332/key_system_util.c:
+    complete
     .text       start:0x021c054c end:0x021c1dd0
     .rodata     start:0x021c8d64 end:0x021c8dd8
     .data       start:0x021c92f0 end:0x021c9324
@@ -29,8 +30,9 @@ src/ov332/key_system_net.c:
     .bss        start:0x021c94a0 end:0x021c94c0
 
 src/ov332/key_system_flow.c:
-    .text       start:0x021c2b18 end:0x021c53dc
-    .rodata     start:0x021c8e68 end:0x021c8ff4
+    complete
+    .text       start:0x021c2b18 end:0x021c45bc
+    .rodata     start:0x021c8f14 end:0x021c8f5c
     .data       start:0x021c93b0 end:0x021c9448
 
 src/ov332/data_convert_flow.c:
@@ -54,3 +56,20 @@ src/ov332/cygnus_flow.c:
     .text       start:0x021c7028 end:0x021c8b34
     .rodata     start:0x021c9258 end:0x021c92b8
     .data       start:0x021c947c end:0x021c94a0
+
+src/ov332/key_system_key_frames.c:
+    complete
+    .rodata     start:0x021c8e68 end:0x021c8e74
+
+src/ov332/key_system_plate_frames.c:
+    complete
+    .rodata     start:0x021c8e74 end:0x021c8e84
+
+src/ov332/key_system_anim_data.c:
+    complete
+    .rodata     start:0x021c8e84 end:0x021c8f14
+
+src/ov332/key_system_flow_sub.c:
+    complete
+    .text       start:0x021c45bc end:0x021c53dc
+    .rodata     start:0x021c8f5c end:0x021c8ff4

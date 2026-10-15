@@ -112,7 +112,7 @@ typedef struct {
     BOOL active;
 } ClActTransfer;
 
-typedef struct {
+struct ClActSys {
     ClActOamMan oamMans[2];
     ClActRenderer renderer;
     ClActTransfer transfer;
@@ -123,7 +123,7 @@ typedef struct {
     BOOL oamReady;
     ClActUnit *units;
     ClActResMan res;
-} ClActSys;
+};
 
 struct ClActUnit {
     ClActor *actors;
@@ -153,7 +153,7 @@ typedef struct {
     NNSG2dCharacterData *transferChar;
 } ClActResSetup;
 
-typedef struct {
+struct ClActAnim {
     u32 type;
     NNSG2dCellDataBank *cells;
     NNSG2dAnimBankData *anims;
@@ -169,7 +169,7 @@ typedef struct {
             void *mcWork;
         };
     };
-} ClActAnim;
+};
 
 struct ClActor {
     ClActor *next;
@@ -215,7 +215,7 @@ void func_01ff8318(ClActUnit *unit);
 void func_01ff8610(ClActUnit *unit);
 void func_01ff8900(ClActUnit *unit);
 
-static ClActSys *g_ClActSys;
+ClActSys *g_ClActSys;
 
 void func_0204c5e4(ClActRenderer *renderer, const ClActSysSetup *setup, HeapID heapId);
 static void func_0204c614(BOOL updating);
@@ -245,11 +245,9 @@ static u16 func_0204c9f4(const MtxFx22 *mtx);
 static u16 func_0204ca08(const MtxFx22 *mtx);
 static BOOL func_0204ca1c(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view);
 static BOOL func_0204cb14(const NNSG2dCellData *cell, const MtxFx32 *mtx, const NNSG2dViewRect *view);
+static void func_0204cb8c(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx);
 static BOOL func_0204cc54(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top, fx32 bottom, const MtxFx32 *mtx,
                           const NNSG2dViewRect *view);
-#define CLACT_OAM_X(x) ((x) > 255 ? (x) | ~0xff : (x))
-#define CLACT_OAM_Y(y) ((y) > 127 ? (y) | ~0xff : (y))
-static void func_0204cb8c(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx);
 static void func_0204cda4(ClActTransfer *transfer, u8 count, HeapID heapId);
 static void func_0204cdf8(ClActTransfer *transfer);
 static void func_0204ce18(ClActTransfer *transfer, u32 count, HeapID heapId);
@@ -288,7 +286,6 @@ static void func_0204d35c(ClActAnim *anim, u16 sequence);
 static void func_0204d374(ClActAnim *anim, u16 sequence);
 static void setSeqToMultiCellAnim(ClActAnim *anim, u16 sequence);
 static void func_0204d3a4(ClActAnim *anim, fx32 time);
-static void func_0204d3bc(ClActAnim *anim, fx32 frames);
 static void func_0204d3d0(ClActAnim *anim, fx32 frames);
 static void func_0204d3dc(ClActAnim *anim, fx32 frames);
 static void func_0204d3e8(ClActAnim *anim, fx32 frames);
@@ -304,7 +301,6 @@ static void func_0204d434(ClActAnim *anim, u16 frame);
 static void func_0204d448(ClActAnim *anim, u16 frame);
 static void func_0204d454(ClActAnim *anim, u16 frame);
 static void func_0204d460(ClActAnim *anim, u16 frame);
-static void func_0204d46c(ClActAnim *anim, fx32 speed);
 static void func_0204d480(ClActAnim *anim, fx32 speed);
 static void func_0204d48c(ClActAnim *anim, fx32 speed);
 static void func_0204d498(ClActAnim *anim, fx32 speed);
@@ -1442,10 +1438,10 @@ static BOOL func_0204ca1c(const NNSG2dCellData *cell, const MtxFx32 *mtx, const 
         minX = minY;
         maxX = maxY;
     }
-    top = posY + (fx_mul_round(minY, mtx->_01) + fx_mul_round(minY, mtx->_11));
-    bottom = posY + (fx_mul_round(maxY, mtx->_01) + fx_mul_round(maxY, mtx->_11));
-    left = posX + (fx_mul_round(minX, mtx->_00) + fx_mul_round(minX, mtx->_10));
-    right = posX + (fx_mul_round(maxX, mtx->_00) + fx_mul_round(maxX, mtx->_10));
+    top = posY + (FX_MulFunc(minY, mtx->_01) + FX_MulFunc(minY, mtx->_11));
+    bottom = posY + (FX_MulFunc(maxY, mtx->_01) + FX_MulFunc(maxY, mtx->_11));
+    left = posX + (FX_MulFunc(minX, mtx->_00) + FX_MulFunc(minX, mtx->_10));
+    right = posX + (FX_MulFunc(maxX, mtx->_00) + FX_MulFunc(maxX, mtx->_10));
     if (bottom < top) {
         tmp = bottom;
         bottom = top;
@@ -1494,6 +1490,39 @@ static BOOL func_0204cb14(const NNSG2dCellData *cell, const MtxFx32 *mtx, const 
     return FALSE;
 }
 
+// An OAM's x or y, sign extended from its 9 or 8 bits: one past the right or bottom of the screen wraps around to the
+// left or top
+static inline s16 ClAct_WrapOamX(s16 x) {
+    if (x > 0xff) {
+        x |= 0xff00;
+    }
+    return x;
+}
+
+static inline s16 ClAct_WrapOamY(s16 y) {
+    if (y > 0x7f) {
+        y |= 0xff00;
+    }
+    return y;
+}
+
+// Called by the renderers before each OAM: skips one that is out of view
+static void func_0204cb8c(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx) {
+    GXOamAttr *oam = &state->oam;
+    GXOamShape shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
+    fx32 left = ClAct_WrapOamX(oam->x) << FX32_SHIFT;
+    fx32 right = (ClAct_WrapOamX(oam->x) + NNS_G2dGetOamSizeX(&shape)) << FX32_SHIFT;
+    fx32 top = ClAct_WrapOamY(oam->y) << FX32_SHIFT;
+    fx32 bottom = (ClAct_WrapOamY(oam->y) + NNS_G2dGetOamSizeY(&shape)) << FX32_SHIFT;
+
+    if (func_0204cc54(mtx->_20 - view->posTopLeft.x, mtx->_21 - view->posTopLeft.y, left, right, top, bottom, mtx,
+                      view)) {
+        state->skip = TRUE;
+    } else {
+        state->skip = FALSE;
+    }
+}
+
 static inline void ClAct_UpdateMinMax(fx32 value, fx32 *min, fx32 *max) {
     if (value < *min) {
         *min = value;
@@ -1510,16 +1539,16 @@ static BOOL func_0204cc54(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top,
     fx32 minY;
     fx32 maxY;
 
-    minX = fx_mul_round(left, mtx->_00) + fx_mul_round(top, mtx->_10);
+    minX = FX_MulFunc(left, mtx->_00) + FX_MulFunc(top, mtx->_10);
     maxX = minX;
-    ClAct_UpdateMinMax(fx_mul_round(left, mtx->_00) + fx_mul_round(bottom, mtx->_10), &minX, &maxX);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_00) + fx_mul_round(top, mtx->_10), &minX, &maxX);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_00) + fx_mul_round(bottom, mtx->_10), &minX, &maxX);
-    minY = fx_mul_round(left, mtx->_01) + fx_mul_round(top, mtx->_11);
+    ClAct_UpdateMinMax(FX_MulFunc(left, mtx->_00) + FX_MulFunc(bottom, mtx->_10), &minX, &maxX);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_00) + FX_MulFunc(top, mtx->_10), &minX, &maxX);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_00) + FX_MulFunc(bottom, mtx->_10), &minX, &maxX);
+    minY = FX_MulFunc(left, mtx->_01) + FX_MulFunc(top, mtx->_11);
     maxY = minY;
-    ClAct_UpdateMinMax(fx_mul_round(left, mtx->_01) + fx_mul_round(bottom, mtx->_11), &minY, &maxY);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_01) + fx_mul_round(top, mtx->_11), &minY, &maxY);
-    ClAct_UpdateMinMax(fx_mul_round(right, mtx->_01) + fx_mul_round(bottom, mtx->_11), &minY, &maxY);
+    ClAct_UpdateMinMax(FX_MulFunc(left, mtx->_01) + FX_MulFunc(bottom, mtx->_11), &minY, &maxY);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_01) + FX_MulFunc(top, mtx->_11), &minY, &maxY);
+    ClAct_UpdateMinMax(FX_MulFunc(right, mtx->_01) + FX_MulFunc(bottom, mtx->_11), &minY, &maxY);
     minX += posX;
     maxX += posX;
     minY += posY;
@@ -1528,40 +1557,6 @@ static BOOL func_0204cc54(fx32 posX, fx32 posY, fx32 left, fx32 right, fx32 top,
         return TRUE;
     }
     return FALSE;
-}
-
-// Called by the renderers before each OAM: skips one that is out of view
-#define CLACT_OAM_X(x) ((x) > 255 ? (x) | ~0xff : (x))
-#define CLACT_OAM_Y(y) ((y) > 127 ? (y) | ~0xff : (y))
-static void func_0204cb8c(ClActDrawState *state, const NNSG2dViewRect *view, u32 a2, u32 a3, const MtxFx32 *mtx) {
-    GXOamAttr *oam = &state->oam;
-    u32 shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
-    int shapeIdx = (int)(shape & 0xc000) >> 14;
-    int sizeIdx = shape >> 30;
-    int x = oam->x;
-    int y = oam->y;
-    fx32 left;
-    fx32 right;
-    fx32 top;
-    fx32 bottom;
-
-    // An OAM past the right or bottom of the screen wraps around to the left or top
-    if (x > 255) {
-        x |= ~0xff;
-    }
-    if (y > 127) {
-        y |= ~0xff;
-    }
-    left = x << FX32_SHIFT;
-    right = (x + NNSi_objSizeWTbl[shapeIdx][sizeIdx]) << FX32_SHIFT;
-    top = y << FX32_SHIFT;
-    bottom = (y + NNSi_objSizeHTbl[shapeIdx][sizeIdx]) << FX32_SHIFT;
-    if (func_0204cc54(mtx->_20 - view->posTopLeft.x, mtx->_21 - view->posTopLeft.y, left, right, top, bottom, mtx,
-                      view)) {
-        state->skip = TRUE;
-    } else {
-        state->skip = FALSE;
-    }
 }
 
 static void func_0204cda4(ClActTransfer *transfer, u8 count, HeapID heapId) {
@@ -1895,7 +1890,7 @@ static void func_0204d3a4(ClActAnim *anim, fx32 time) {
     func_0204d3bc(anim, 0);
 }
 
-static void func_0204d3bc(ClActAnim *anim, fx32 frames) {
+void func_0204d3bc(ClActAnim *anim, fx32 frames) {
     sAnimTickFuncs[anim->type](anim, frames);
 }
 
@@ -1959,7 +1954,7 @@ static void func_0204d460(ClActAnim *anim, u16 frame) {
     NNS_G2dSetMCAnimationCurrentFrame(&anim->mcAnim, frame);
 }
 
-static void func_0204d46c(ClActAnim *anim, fx32 speed) {
+void func_0204d46c(ClActAnim *anim, fx32 speed) {
     sAnimSetSpeedFuncs[anim->type](anim, speed);
 }
 

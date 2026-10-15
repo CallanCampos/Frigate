@@ -22,7 +22,7 @@ static u32 NHttpSocSslFilterNone(u32 flags) {
 
 static void NHttpSocSeedRandom(void) {
     OS_GetLowEntropyData(sEntropy);
-    func_ov011_02159d64(sEntropy, sizeof(sEntropy));
+    CPS_SslAddRandomSeed(sEntropy, sizeof(sEntropy));
 }
 
 // Whether the socket still has its connection: 0 if reading would wait, -1 if not
@@ -32,26 +32,26 @@ int NHTTPi_SocCheck(int sock) {
 
     if (sock == -1) {
         result = -1;
-    } else if (func_ov011_02157c50(sock, &byte, 1, 4) != -6) {
+    } else if (SOC_Read(sock, &byte, 1, 4) != -6) {
         result = -1;
     }
     return result;
 }
 
 int NHTTPi_SocOpen(NHttpRequest *request) {
-    return func_ov011_02157bd0(2, 1, 0);
+    return SOC_Socket(2, 1, 0);
 }
 
 // Closes the socket, trying again while the library says it is busy, and frees the secure connection's settings
 int NHTTPi_SocClose(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock) {
-    int result = func_ov011_02157d38(sock);
+    int result = SOC_Close(sock);
 
     if (result == 0 || result == -26) {
         int waited = 0;
 
-        while ((result = func_ov011_02157d38(sock)) == -26 && waited <= 10000) {
+        while ((result = SOC_Close(sock)) == -26 && waited <= 10000) {
             func_0207aa04(500);
-            func_ov011_021575f8();
+            SOCLi_TrashSocket();
             waited += 500;
         }
     }
@@ -79,7 +79,7 @@ int NHTTPi_SocConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest
             return result;
         }
     }
-    if (func_ov011_02157c10(sock, &address) < 0) {
+    if (SOC_Connect(sock, &address) < 0) {
         if (request->canceled != 0) {
             return NHTTP_SOCKET_CANCELED;
         }
@@ -106,7 +106,7 @@ int NHTTPi_SocSSLConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequ
     } else {
         ssl->filter = NHttpSocSslFilterDropBit15;
     }
-    if (func_ov011_02158174(sock, ssl) < 0) {
+    if (SOCL_EnableSsl(sock, ssl) < 0) {
         return NHTTP_SOCKET_ERROR;
     }
     NHttpSocSeedRandom();
@@ -122,7 +122,7 @@ int NHTTPi_SocRecv_sub(NHttpConnection *connection, int sock, void *buffer, int 
         u32 count;
 
         if (connection->recvSize == 0) {
-            int result = func_ov011_02157c50(sock, recvBuffer, NHTTP_RECV_BUFFER_SIZE, flags);
+            int result = SOC_Read(sock, recvBuffer, NHTTP_RECV_BUFFER_SIZE, flags);
 
             if (result <= 0) {
                 return result;
@@ -171,7 +171,7 @@ int NHTTPi_SocRecv(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, v
 }
 
 int NHTTPi_SocSend_sub(int sock, const void *buffer, int size, int flags) {
-    return func_ov011_02157cbc(sock, buffer, size, flags);
+    return SOC_Send(sock, buffer, size, flags);
 }
 
 int NHTTPi_SocSend(NHttpRequest *request, int sock, const void *buffer, int size, int flags) {
@@ -193,7 +193,7 @@ int NHTTPi_SocSend(NHttpRequest *request, int sock, const void *buffer, int size
 void NHTTPi_SocCancel(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock) {
     NHTTPi_lockReqList(mutexInfo);
     if (sock >= 0) {
-        func_ov011_02157d30(sock, 2);
+        SOC_Shutdown(sock, 2);
     }
     NHTTPi_unlockReqList(mutexInfo);
 }
@@ -203,10 +203,10 @@ u32 NHTTPi_resolveHostname(NHttpRequest *request, const char *host) {
     u32 address = 0;
     u32 parsed;
 
-    if (func_ov011_02158034(host, &parsed) != 0) {
+    if (SOC_InetAtoN(host, &parsed) != 0) {
         address = parsed;
     } else {
-        SocHostEnt *entry = func_ov011_02157d40(host);
+        SocHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry != NULL && entry->addrLength > 0) {
             NHTTPi_memcpy(&address, entry->addrList[0], 4);

@@ -23,7 +23,9 @@ every section.
   (NitroSDK), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound) and `lib/twl/` (TwlSDK's DSi libraries in the LTD
   autoload: the camera, the DSP and the new DMA and WRAM functions; and in `lib/twl/src/`, the SSP JPEG encoder and
   decoder with their EXIF writer and reader, linked into overlay 257 and built as Thumb with the game's compiler,
-  `-ipa file` and `-inline on,noauto`).
+  `-ipa file` and `-inline on,noauto`), `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under
+  DWC in overlay 11, Thumb with the game's compiler) and `lib/irc/` (the infrared link, overlay 31's last two files,
+  built with the game's compiler and flags but `-O2,p`; the name is ours).
   NitroSDK's first source is libcrypto's RC4 (`lib/nitro/src/crypto/rc4.c`, ARM, `dsi/1.1p1`), which the game links
   last among its own code in ARM9 main. NitroSystem's sources (`lib/nnsys/src/fnd`, `gfd`, ...) are Thumb built with
   CodeWarrior 2.0. A file built with other flags than the rest of its library is listed under `file_flags` in the
@@ -47,8 +49,9 @@ every section.
   (Game Freak's library), `pml/` (Pokémon data), `battle/`, `demo/` and `constants/`, whose ID lists, such as species
   and items, are generated from `data/constants/` (see [Constant lists](data.md#constant-lists)). The libraries'
   headers are in `lib/`, as `lib/nitro/include/nitro/`, `lib/nnsys/include/nnsys/`, `lib/spl/include/spl/`,
-  `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library) and
-  `lib/dpw/include/dpw/` (the Global Trade Station's server library).
+  `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
+  `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC),
+  `lib/dpw/include/dpw/` (the Global Trade Station's server library) and `lib/irc/include/irc/` (the infrared link).
   A header is named after the original file that owns its declarations, or after swan's header for it, such as
   `field/field_3dci.h`.
 - Put functions, data and callback tables used across source files or overlays in the owning file's header. Declare

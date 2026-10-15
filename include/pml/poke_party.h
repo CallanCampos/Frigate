@@ -152,7 +152,7 @@ typedef enum {
     PKM_PARAM_COUNT = 0xb4,
 } PkmField;
 
-u32 PokeParty_GetParam(PartyPkm *pkm, PkmField param, void *buffer);
+u32 PokeParty_GetParam(const PartyPkm *pkm, PkmField param, void *buffer);
 u32 PokeParty_GetNature(PartyPkm *pkm);
 // A field that is not a number takes a pointer to its value
 void PokeParty_SetParam(PartyPkm *pkm, PkmField param, u32 value);
@@ -251,7 +251,7 @@ void PokeParty_SetNature(PartyPkm *pkm, u32 nature);
 void setPkmBattleData(PartyPkm *pkm, u32 param, u32 value);
 // A Pokémon's icon in ARCID_POKEICON: its characters' file and its palette
 u32 PokeIcon_GetFileOfPkm(BoxPkm *pkm);
-u32 PokeIcon_GetPaletteOfPkm(BoxPkm *pkm);
+u8 PokeIcon_GetPaletteOfPkm(BoxPkm *pkm);
 // The files of the icons' palette, cells and animations in ARCID_POKEICON
 u32 PokeIcon_GetAltPaletteFile(void);
 u32 PokeIcon_GetCellFile_Main(void);
@@ -263,7 +263,7 @@ u32 PokeIcon_GetCellFile_Sub(void);
 u16 PokeIcon_PackSpecies(u32 species, u32 form, u32 sex);
 // A Pokémon icon's character file in its archive, and its palette
 u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg);
-u32 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
+u8 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
 // The level, 0 to 4, of a Pokémon's Pokéstar fame
 int PML_GetPokestarFameLevel(u8 fame);
 PartyPkm *PokeParty_GetPkm(PokeParty *party, u32 index);
@@ -291,7 +291,7 @@ void PokeParty_RecoverAll(PokeParty *party);
 // A Pokémon's icon in archive 7: its file, and the palette of the file PokeIcon_GetPaletteFile returns that it uses. The cells
 // and animations depend on the sub engine's OBJ VRAM mapping: PokeIcon_GetCellFile_Sub and getOBJTileMapping_SubEng return them
 u32 PokeParty_GetIconIndex(u32 species, u32 form, u32 sex, BOOL egg);
-u32 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
+u8 PokeIcon_GetPalette(u32 species, u32 form, u32 sex, BOOL egg);
 u32 PokeIcon_GetPaletteFile(void);
 u32 PokeIcon_GetCellFile_Sub(void);
 u32 getOBJTileMapping_SubEng(void);

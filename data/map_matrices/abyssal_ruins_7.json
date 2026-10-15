@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 562, 615 ],
-        [ 614, 616 ]
+        [ "MAP_MODEL_ABYSSAL_RUINS_7_M_DUN2007_00_00", "MAP_MODEL_ABYSSAL_RUINS_7_M_DUN2007_01_00" ],
+        [ "MAP_MODEL_ABYSSAL_RUINS_7_M_DUN2007_00_01", "MAP_MODEL_ABYSSAL_RUINS_7_M_DUN2007_01_01" ]
     ]
 }

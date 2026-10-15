@@ -1598,7 +1598,9 @@ static int func_ov255_021d5710(BoxSearchWork *wk, int seq) {
 
 // The list of markings, which turns each on and off
 static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
-    u32 ret, i;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long ret;
+    u32 i;
     int pos;
     u32 on;
 

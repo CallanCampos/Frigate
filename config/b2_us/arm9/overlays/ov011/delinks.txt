@@ -21,3 +21,94 @@ src/ov011/dwc_rap.c:
     .rodata     start:0x02184fc8 end:0x02184fd4
     .data       start:0x021852bc end:0x02185394
     .bss        start:0x0218ba04 end:0x0218ba08
+
+lib/nitrowifi/src/cps/cps.c:
+    .text       start:0x0215251c end:0x02155e34
+    .data       start:0x0218542c end:0x0218546c
+    .bss        start:0x0218ba0c end:0x0218dbe0
+
+lib/nitrowifi/src/soc/socl_startup.c:
+    .text       start:0x02155e34 end:0x02156000
+    .data       start:0x0218546c end:0x02185474
+    .bss        start:0x0218dbe0 end:0x0218dc20
+
+lib/nitrowifi/src/soc/socl_command.c:
+    .text       start:0x02156000 end:0x02156200
+    .bss        start:0x0218dc20 end:0x0218dc44
+
+lib/nitrowifi/src/soc/socl_create.c:
+    complete
+    .text       start:0x02156200 end:0x021564cc
+
+lib/nitrowifi/src/soc/socl_bind.c:
+    .text       start:0x021564cc end:0x021566d8
+    .data       start:0x02185474 end:0x02185478
+
+lib/nitrowifi/src/soc/socl_read.c:
+    .text       start:0x021566d8 end:0x02156d8c
+    .bss        start:0x0218dc44 end:0x0218dc4c
+
+lib/nitrowifi/src/soc/socl_write.c:
+    .text       start:0x02156d8c end:0x0215724c
+
+lib/nitrowifi/src/soc/socl_shutdown.c:
+    .text       start:0x0215724c end:0x021572f4
+
+lib/nitrowifi/src/soc/socl_close.c:
+    complete
+    .text       start:0x021572f4 end:0x02157620
+
+lib/nitrowifi/src/soc/socl_cleanup.c:
+    complete
+    .text       start:0x02157620 end:0x02157894
+
+lib/nitrowifi/src/soc/socl_poll.c:
+    .text       start:0x02157894 end:0x02157978
+
+lib/nitrowifi/src/soc/socl_misc.c:
+    complete
+    .text       start:0x02157978 end:0x02157980
+
+lib/nitrowifi/src/soc/socl_list.c:
+    .text       start:0x02157980 end:0x02157bd0
+    .bss        start:0x0218dc4c end:0x0218dc5c
+
+lib/nitrowifi/src/soc/soc.c:
+    .text       start:0x02157bd0 end:0x02158174
+    .data       start:0x02185478 end:0x021854cc
+    .bss        start:0x0218dc5c end:0x0218dde8
+
+lib/nitrowifi/src/soc/socl_ssl.c:
+    complete
+    .text       start:0x02158174 end:0x02158250
+
+lib/nitrowifi/src/ssl/ssl.c:
+    .text       start:0x02158250 end:0x0215a6b4
+    .rodata     start:0x02184fd4 end:0x02184fdc
+    .data       start:0x021854cc end:0x0218553c
+    .bss        start:0x0218dde8 end:0x0218df74
+
+lib/nitrowifi/src/ssl/md5.c:
+    .text       start:0x0215a6b4 end:0x0215ab04
+    .data       start:0x0218553c end:0x021856bc
+
+lib/nitrowifi/src/ssl/sha1.c:
+    .text       start:0x0215ab04 end:0x0215b1d8
+    .data       start:0x021856bc end:0x021856fc
+
+lib/nitrowifi/src/ssl/ssl_rc4.c:
+    complete
+    .text       start:0x0215b1d8 end:0x0215b274
+
+lib/nitrowifi/src/ssl/biginteger.c:
+    .text       start:0x0215b274 end:0x0215bbec
+
+lib/nitrowifi/src/wcm/wcm.c:
+    .text       start:0x0215bbec end:0x0215dd74
+    .rodata     start:0x02184fdc end:0x02185014
+    .bss        start:0x0218df74 end:0x0218dfc8
+
+lib/dwc/src/gt2/gt2.c:
+    .text       start:0x0216eea8 end:0x0216fbf8
+    .data       start:0x02186ffc end:0x021874a0
+    .bss        start:0x02190928 end:0x02190964

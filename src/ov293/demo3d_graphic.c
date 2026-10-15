@@ -221,7 +221,7 @@ void Demo3DGraphic_SetLightColor(Demo3DGraphic *graphic, u8 light, GXRgb color) 
 void Demo3DGraphic_SetLightVector(Demo3DGraphic *graphic, u8 light, const VecFx16 *direction) {
     VecFx16 normal;
 
-    vecfx_normalize16(direction, &normal);
+    VEC_Fx16Normalize(direction, &normal);
     GFL_G3DLightSetDirVector(graphic->g3d.lights, light, &normal);
 }
 

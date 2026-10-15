@@ -207,5 +207,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_KECLEON"
+    "baby_species": "SPECIES_KECLEON",
+    "cry_volume": 120
 }

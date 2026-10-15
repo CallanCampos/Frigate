@@ -17,16 +17,19 @@ src/ov293/demo3d_graphic.c:
     .data       start:0x021ab36c end:0x021ab380
 
 src/ov293/demo3d_engine.c:
+    complete
     .text       start:0x021a22b4 end:0x021a298c
     .rodata     start:0x021a3f14 end:0x021a3f38
     .data       start:0x021ab380 end:0x021ab390
 
 src/ov293/demo3d_data.c:
+    complete
     .text       start:0x021a298c end:0x021a2ba8
     .rodata     start:0x021a3f38 end:0x021ab230
     .data       start:0x021ab390 end:0x021ab3a0
 
 src/ov293/demo3d_capture.c:
+    complete
     .text       start:0x021a2ba8 end:0x021a2db8
     .rodata     start:0x021ab230 end:0x021ab25c
 
@@ -41,6 +44,7 @@ src/ov293/demo3d_cmdsys.c:
     .data       start:0x021ab3f0 end:0x021ab400
 
 src/ov293/demo3d_exp_c_cruiser.c:
+    complete
     .text       start:0x021a3c00 end:0x021a3d6c
     .rodata     start:0x021ab25c end:0x021ab340
     .data       start:0x021ab400 end:0x021ab420

@@ -179,10 +179,16 @@ BOOL MailSys_ProcMain(GameProc *proc, u32 *state, void *param, void *workPtr) {
         if (running == TRUE) {
             break;
         }
-        if (work->edit->mode == MAIL_EDIT_DONE || work->edit->mode == MAIL_EDIT_CANCEL) {
+        switch (work->edit->mode) {
+        case MAIL_EDIT_CANCEL:
             *state = 2;
-        } else {
+            break;
+        case MAIL_EDIT_DONE:
+            *state = 2;
+            break;
+        default:
             *state = 3;
+            break;
         }
         break;
     case 2:
@@ -513,7 +519,7 @@ static BOOL MailSys_PhaseView(MailSysWork *work) {
 }
 
 static BOOL MailSys_PhaseKeys(MailSysWork *work) {
-    BOOL moved = TRUE;
+    BOOL moved;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
         if (work->cursor == 4) {
@@ -548,12 +554,15 @@ static BOOL MailSys_PhaseKeys(MailSysWork *work) {
     } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
         work->cursor = 4;
         work->savedCursor = 0;
+        moved = TRUE;
     } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_DOWN) {
         work->cursor = (work->cursor + 1) % 6;
+        moved = TRUE;
     } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
         work->cursor = (work->cursor + 5) % 6;
+        moved = TRUE;
     } else {
-        moved = FALSE;
+        return FALSE;
     }
     if (!moved) {
         return FALSE;

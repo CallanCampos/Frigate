@@ -209,8 +209,8 @@ static void PStaRibbon_HandleInput(PStatusWork *wk, PStaRibbonWork *ribbon) {
                 PStaRibbon_SelectVisibleRow(wk, ribbon);
                 wk->isTouch = FALSE;
             } else {
-                ribbon->cursorRow = hit;
                 ribbon->isDragging = TRUE;
+                ribbon->cursorRow = hit;
                 ribbon->cursorMoved = TRUE;
                 ribbon->cursorEntry = PStaRibbon_GetRowEntry(ribbon, hit);
                 PStatus_EnableInput(wk, FALSE);
@@ -272,8 +272,10 @@ static BOOL PStaRibbon_HandleDetailKeys(PStatusWork *wk, PStaRibbonWork *ribbon)
             ribbon->cursorRow = row;
             ribbon->cursorMoved = TRUE;
             if (PStaRibbon_GetRowY(ribbon, ribbon->cursorRow) > CURSOR_Y_MAX) {
-                // The distance is narrowed to a u8 going down, but not going up
-                PStaRibbon_Scroll(wk, ribbon, (u8)(PStaRibbon_GetRowY(ribbon, ribbon->cursorRow) - CURSOR_Y_MAX));
+                // The distance is a u8 going down, but an s16 going up
+                u8 dy = PStaRibbon_GetRowY(ribbon, ribbon->cursorRow) - CURSOR_Y_MAX;
+
+                PStaRibbon_Scroll(wk, ribbon, dy);
             }
             PStaRibbon_MoveCursor(wk, ribbon, ribbon->cursorRow);
             PStaRibbon_FreeDetailWindows(wk, ribbon);
@@ -291,7 +293,9 @@ static BOOL PStaRibbon_HandleDetailKeys(PStatusWork *wk, PStaRibbonWork *ribbon)
             ribbon->cursorRow = row;
             ribbon->cursorMoved = TRUE;
             if (PStaRibbon_GetRowY(ribbon, ribbon->cursorRow) < LIST_TOP) {
-                PStaRibbon_Scroll(wk, ribbon, PStaRibbon_GetRowY(ribbon, ribbon->cursorRow) - LIST_TOP);
+                s16 dy = PStaRibbon_GetRowY(ribbon, ribbon->cursorRow) - LIST_TOP;
+
+                PStaRibbon_Scroll(wk, ribbon, dy);
             }
             PStaRibbon_MoveCursor(wk, ribbon, ribbon->cursorRow);
             PStaRibbon_FreeDetailWindows(wk, ribbon);

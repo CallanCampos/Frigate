@@ -3,3 +3,35 @@
     .ctor       start:0x021c05a8 end:0x021c05a8 kind:rodata align:4
     .data       start:0x021c05c0 end:0x021c1b60 kind:data align:32
     .bss        start:0x021c1b60 end:0x021c4220 kind:bss align:32
+
+src/ov182/dwc_raputil.c:
+    complete
+    .text       start:0x021a4920 end:0x021a49d0
+    .rodata     start:0x021bd2cc end:0x021bd2e4
+    .data       start:0x021c05c0 end:0x021c05d0
+
+lib/dwcutil/src/dwc_wcm.c:
+    complete
+    .text       start:0x021a71fc end:0x021a7858
+    .bss        start:0x021c2aa0 end:0x021c2af0
+
+lib/dwcutil/src/dwc_aoss.c:
+    .text       start:0x021a49d0 end:0x021a6c1c
+    .rodata     start:0x021bd2e4 end:0x021bd2e8
+    .data       start:0x021c05d0 end:0x021c0648
+    .bss        start:0x021c1b60 end:0x021c2940
+
+lib/dwcutil/src/dwc_aoss_ap.c:
+    .text       start:0x021a6c1c end:0x021a71fc
+    .data       start:0x021c0648 end:0x021c0678
+    .bss        start:0x021c2940 end:0x021c2aa0
+
+lib/dwcutil/src/dwc_util_screen.c:
+    .text       start:0x021ab588 end:0x021ab63c
+    .data       start:0x021c0740 end:0x021c0754
+    .bss        start:0x021c402c end:0x021c4030
+
+lib/dwcutil/src/dwc_util_ui_effect.c:
+    .text       start:0x021ab040 end:0x021ab17c
+    .rodata     start:0x021bfb18 end:0x021bfb24
+    .bss        start:0x021c4024 end:0x021c4028

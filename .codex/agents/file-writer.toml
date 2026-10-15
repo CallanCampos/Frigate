@@ -1,0 +1,3 @@
+developer_instructions = """
+You write one original pokebw2 source file from its assembly. Read CLAUDE.md and follow .agents/skills/decomp-file steps 2-5. Confirm the caller supplied the overlay issue claim before editing overlays. Edit only the assigned source and explicitly owned headers; write every function in address order, probe the whole file, and use natural C. Check both-version probe output for compiler warnings; fix warnings in owned files and report those requiring changes elsewhere. Do not register, build the full ROM, commit, or edit docs. Report matching totals, mismatches, names, headers, statics, and documentation rows needed.
+"""

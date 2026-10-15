@@ -346,7 +346,7 @@ void ActorTerrainEffect_ApplyAll(FieldActor *actor);
 // The collision flags at a grid position, with the world position's y
 u32 ActorRouteCollCheckCore(FieldActor *actor, const VecFx32 *position, s16 x, s16 y, s16 z, u16 dir);
 u32 ActorRouteCollCheck(FieldActor *actor, s16 x, s16 y, s16 z, u16 dir);
-BOOL CheckActorNewPosOtherActorCollision(FieldActor *actor, s16 x, s16 y, s16 z);
+BOOL CheckActorNewPosOtherActorCollision(const FieldActor *actor, s16 x, s16 y, s16 z);
 BOOL CheckActorVolumeOverGPos(FieldActor *actor, s16 x, s16 z, BOOL checkInit);
 BOOL IsGPosOutsideActorWalkArea(FieldActor *actor, s16 x, s16 z);
 BOOL CheckBlockedCollPathToPosition(FieldActor *actor, u16 dir, VecFx32 position);
@@ -504,7 +504,7 @@ void func_ov012_021681b0(FieldActor *actor);
 // The count of boulders with a saved position
 u32 func_ov012_021682a0(MMSys *system);
 // Sets a ZoneNPC's position on a rail
-void func_ov012_021682d4(ZoneNPC *npc, u16 railIndex, u16 frontPos, s16 sidePos);
+void func_ov012_021682d4(ZoneNPC *npc, u16 railIndex, u16 frontPos, u16 sidePos);
 
 // Overlay 36's functions that fldmmdl.c calls
 void func_ov036_0218ed18(MMSys *system);

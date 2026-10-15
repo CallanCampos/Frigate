@@ -135,5 +135,6 @@
         }
     ],
     "regional_dex_number": 115,
-    "baby_species": "SPECIES_DWEBBLE"
+    "baby_species": "SPECIES_DWEBBLE",
+    "cry_volume": 115
 }

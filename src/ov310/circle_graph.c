@@ -540,10 +540,10 @@ static void CircleGraph_BuildVertices(CircleGraph *graph) {
             graph->vertices[vtx].pos = center;
             graph->vertices[vtx].polygonId = i;
             graph->vertices[vtx + 1].color = color;
-            vecfx_add16(&center, &graph->points[j], &graph->vertices[vtx + 1].pos);
+            VEC_Fx16Add(&center, &graph->points[j], &graph->vertices[vtx + 1].pos);
             graph->vertices[vtx + 1].polygonId = i;
             graph->vertices[vtx + 2].color = color;
-            vecfx_add16(&center, &graph->points[(j + 1) % POINT_COUNT], &graph->vertices[vtx + 2].pos);
+            VEC_Fx16Add(&center, &graph->points[(j + 1) % POINT_COUNT], &graph->vertices[vtx + 2].pos);
             graph->vertices[vtx + 2].polygonId = i;
             vtx += 3;
         }

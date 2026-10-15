@@ -5,6 +5,7 @@
     .bss        start:0x021b5400 end:0x021b5420 kind:bss align:32
 
 src/ov190/wifilogin.c:
+    complete
     .text       start:0x021b2f80 end:0x021b3a80
     .rodata     start:0x021b50a0 end:0x021b50b4
     .data       start:0x021b52e0 end:0x021b5378
@@ -17,6 +18,7 @@ src/ov190/wifilogin_disp.c:
     .data       start:0x021b5378 end:0x021b53cc
 
 src/ov190/wifilogin_message.c:
+    complete
     .text       start:0x021b46cc end:0x021b4da4
     .rodata     start:0x021b52b4 end:0x021b52bc
     .data       start:0x021b53cc end:0x021b5400

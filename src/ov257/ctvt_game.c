@@ -3025,8 +3025,8 @@ static void CtvtGame_LaunchTarget(CtvtGame *game, CtvtGameTarget *target, u16 sc
     angle = game->lastAngle * 20 + CtvtGame_Rand(20) + 330;
     angle %= 360;
     MAT3_RotationEulerZYX(0, 0, angle * 182, &rotation);
-    MAT3_MulVec(&dir, &rotation, &target->velocity);
-    vecfx_normalize(&target->velocity, &target->velocity);
+    MTX_MultVec33(&dir, &rotation, &target->velocity);
+    VEC_Normalize(&target->velocity, &target->velocity);
     if (game->timeLeft <= 20) {
         speed += FX32_CONST(2);
     }
@@ -3159,7 +3159,7 @@ static void CtvtGame_Separate(fx32 *x0, fx32 *y0, fx32 *x1, fx32 *y1, fx32 minDi
 
     VEC_Set(&a, *x0, *y0, 0);
     VEC_Set(&b, *x1, *y1, 0);
-    dist = vecfx_dist(&a, &b);
+    dist = VEC_Distance(&a, &b);
     if (dist < minDist) {
         overlap = minDist - dist;
         if (*x0 < *x1) {

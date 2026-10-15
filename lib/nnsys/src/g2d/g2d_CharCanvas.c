@@ -348,18 +348,16 @@ static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont
 static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
                         const NNSG2dGlyph *pGlyph) {
     const int charSize = CharSize(pCC->dstBpp);
-    const int areaWidth = pCC->areaWidth;
-    const int areaHeight = pCC->areaHeight;
-    const int glyphWidth = pGlyph->pWidths->glyphWidth;
+    const u8 glyphWidth = pGlyph->pWidths->glyphWidth;
     const int glyphHeight = pFont->pRes->pGlyph->cellHeight;
+    const int areaW = pCC->areaWidth;
+    const int areaH = pCC->areaHeight;
     u32 left, top, right, bottom;
     int numX, numY;
     int xEnd, yEnd;
     int cy;
     u8 *charBase;
     Obj1DParam objParam;
-    int objHeightShift, objWidthShift;
-    int areaH, areaW;
     DrawGlyphParam param;
 
     if (glyphWidth == 0 || x + glyphWidth < 0 || y + glyphHeight < 0) {
@@ -369,12 +367,12 @@ static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, in
     left = (x <= 0) ? 0 : (u32)x / 8;
     top = (y <= 0) ? 0 : (u32)y / 8;
     right = (u32)(x + glyphWidth + 7) / 8;
-    if (right >= areaWidth) {
-        right = areaWidth;
+    if (right >= areaW) {
+        right = areaW;
     }
     bottom = (u32)(y + glyphHeight + 7) / 8;
-    if (bottom >= areaHeight) {
-        bottom = areaHeight;
+    if (bottom >= areaH) {
+        bottom = areaH;
     }
     numX = right - left;
     numY = bottom - top;
@@ -393,24 +391,24 @@ static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, in
     charBase = pCC->charBase;
 
     param.pSrc = pGlyph->image;
-    param.width = glyphWidth;
     param.height = glyphHeight;
+    param.width = glyphWidth;
     param.colorOffset = cl - 1;
     param.srcBpp = pFont->pRes->pGlyph->bpp;
     param.dstBpp = pCC->dstBpp;
     param.srcLineBits = param.srcBpp * pFont->pRes->pGlyph->cellWidth;
 
     objParam.param = pCC->param;
-    areaW = pCC->areaWidth;
-    areaH = pCC->areaHeight;
-    objWidthShift = objParam.objWidthShift;
-    objHeightShift = objParam.objHeightShift;
+    const int areaWidth = pCC->areaWidth;
+    const int areaHeight = pCC->areaHeight;
+    const int objWidthShift = objParam.objWidthShift;
+    const int objHeightShift = objParam.objHeightShift;
     for (cy = top; y > yEnd; cy++, y -= 8) {
         int px, cx;
 
         param.y = y;
         for (px = x, cx = left; px > xEnd; px -= 8, cx++) {
-            const u32 charNo = GetCharIndex1D(cx, cy, areaW, areaH, objWidthShift, objHeightShift);
+            const u32 charNo = GetCharIndex1D(cx, cy, areaWidth, areaHeight, objWidthShift, objHeightShift);
 
             param.x = px;
             param.pChar = (u32 *)(charBase + charNo * charSize);
@@ -490,7 +488,9 @@ static void ClearArea1D(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w
     const int bottom = y + h;
     const int bpp = pCC->dstBpp;
     const u32 pattern = FillPattern(cl, bpp);
-    Obj1DParam objParam = { pCC->param };
+    Obj1DParam objParam;
+
+    objParam.param = pCC->param;
     const int x0 = x & ~7;
     cy = y & ~7;
     const int x1 = (right + 7) & ~7;
@@ -510,7 +510,7 @@ static void ClearArea1D(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w
         int charX;
 
         height = MATH_MIN(bottom - cy, 8) - top;
-        for (charX = charX0, cx = x0; cx < x1; cx += 8, charX++) {
+        for (charX = charX0, cx = x0; cx < x1; charX++, cx += 8) {
             const u32 charNo = GetCharIndex1D(charX, charY, areaWidth, areaHeight, objWidthShift, objHeightShift);
             const int left = (cx < x) ? x - cx : 0;
             const int width = MATH_MIN(right - cx, 8) - left;

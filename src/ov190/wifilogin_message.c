@@ -98,17 +98,24 @@ void WifiLoginMessage_Print(WifiLoginMessage *msg, u32 msgNo) {
     WifiLoginMessage_PrintFrom(msg, msg->msgData, msgNo);
 }
 
+// The BG of the message window of a message. The const pointer matters: the style read through it is not shared with
+// the plain read that picks y, so it is loaded again before the call, as in the original
+static inline u8 WifiLoginMessage_GetMessageBGOf(const WifiLoginMessage *msg) {
+    return WifiLoginMessage_GetMessageBG(msg->style);
+}
+
 void WifiLoginMessage_PrintFrom(WifiLoginMessage *msg, MsgData *msgData, u32 msgNo) {
     BmpWin *window;
-    u8 y = 1;
     u32 flags;
+    u8 y;
 
     GFL_MsgDataLoadStrbuf(msgData, msgNo, msg->strbuf);
+    y = 1;
     if (msg->style != WIFILOGIN_MESSAGE_STYLE_PDWACC) {
         y = 19;
     }
     if (msg->messageWin == NULL) {
-        msg->messageWin = BmpWin_CreateDynamic(WifiLoginMessage_GetMessageBG(msg->style), 1, y, 30, 4, 11, TRUE);
+        msg->messageWin = BmpWin_CreateDynamic(WifiLoginMessage_GetMessageBGOf(msg), 1, y, 30, 4, 11, TRUE);
     }
     window = msg->messageWin;
     GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
@@ -126,7 +133,7 @@ void WifiLoginMessage_PrintFrom(WifiLoginMessage *msg, MsgData *msgData, u32 msg
     BmpWin_DrawFrame(window, WINFRAME_TRANSFER_VBLANK, msg->frameChars, 12);
     BmpWin_FlushChar(window);
     BmpWin_FlushMap(window);
-    GFL_BGSysQueueScrLoad(WifiLoginMessage_GetMessageBG(msg->style));
+    GFL_BGSysQueueScrLoad(WifiLoginMessage_GetMessageBGOf(msg));
 }
 
 void WifiLoginMessage_PrintWaiting(WifiLoginMessage *msg, u32 msgNo) {

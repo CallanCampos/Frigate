@@ -3,6 +3,7 @@
 #include "constants/pokemon.h"
 #include "constants/sound.h"
 #include "constants/species.h"
+#include "constants/version.h"
 #include "field/unity_tower.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
@@ -165,11 +166,13 @@ static void func_ov194_021bece8(PokemonTradeWork *wk) {
         if (wk->type != 7 && wk->type != 8) {
             if (wk->unk11EE != 0) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, 133, wk->strbufTemplate);
+                GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
+                func_ov194_021bfdf8(wk, TRUE, 0);
             } else {
                 GFL_MsgDataLoadStrbuf(wk->msgData, 49, wk->strbufTemplate);
+                GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
+                func_ov194_021bfdf8(wk, TRUE, 0);
             }
-            GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, wk->strbufTemplate);
-            func_ov194_021bfdf8(wk, TRUE, 0);
         }
         PokemonTrade_SetState(wk, func_ov194_021bed88);
     }
@@ -232,17 +235,25 @@ static void func_ov194_021bedfc(PokemonTradeWork *wk) {
     }
 }
 
-static inline void *BackupMail(GameData *gameData, HeapID heapId) {
+// GFLib's GFL_STD_MemCopy, an inline over the copy: the box's copy reads its destination before the call that gives
+// the source
+static inline void GFL_STD_MemCopy(const void *src, void *dest, u32 size) {
+    sys_memcpy(src, dest, size);
+}
+
+// The copies of the mail and of the records are inlined, and not `static`: each has a file name string of its own
+// in `.data`, ahead of the one the file's other allocations share, which MWCC gives only to an external inline
+inline void *BackupMail(GameData *gameData, HeapID heapId) {
     void *copy = GFL_HeapAllocate(heapId, func_020097a0(), FALSE, "pokemontrade_save.c", 370);
     u32 size = func_020097a0();
-    sys_memcpy(func_02009790(gameData), copy, size);
+    GFL_STD_MemCopy(func_02009790(gameData), copy, size);
     return copy;
 }
 
-static inline void *BackupRecords(GameData *gameData, HeapID heapId) {
+inline void *BackupRecords(GameData *gameData, HeapID heapId) {
     void *copy = GFL_HeapAllocate(heapId, func_020093d0(), FALSE, "pokemontrade_save.c", 401);
     u32 size = func_020093d0();
-    sys_memcpy(GameData_GetRecords(gameData), copy, size);
+    GFL_STD_MemCopy(GameData_GetRecords(gameData), copy, size);
     return copy;
 }
 
@@ -397,7 +408,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
             u32 size;
             wk->backup.box = GFL_HeapAllocate(wk->heapId, getSizeofPokeBox(), FALSE, "pokemontrade_save.c", 640);
             size = getSizeofPokeBox();
-            sys_memcpy(BoxSaveAccessor_GetBox(wk->boxes, wk->param->box), wk->backup.box, size);
+            GFL_STD_MemCopy(BoxSaveAccessor_GetBox(wk->boxes, wk->param->box), wk->backup.box, size);
         }
     } else {
         PokemonTradeParam *param = wk->param;
@@ -436,11 +447,18 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
     }
     func_0200a504(func_02017980(wk->gameData), wk->partnerInfo);
     {
+        // A trade with a game of the other colour
         BOOL medal = FALSE;
-        u8 unk = func_02008bfc(wk->partnerInfo);
-        if (unk == 20 || unk == 22) {
+        u8 version = func_02008bfc(wk->partnerInfo);
+#ifdef BLACK2
+        if (version == VERSION_WHITE || version == VERSION_WHITE2) {
             medal = TRUE;
         }
+#else
+        if (version == VERSION_BLACK || version == VERSION_BLACK2) {
+            medal = TRUE;
+        }
+#endif
         if (medal) {
             MedalBox_GiveMedal(SaveControl_GetMedalBox(GameData_GetSaveControl(wk->gameData)), 165);
         }

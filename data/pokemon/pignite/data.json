@@ -141,5 +141,6 @@
         }
     ],
     "regional_dex_number": 5,
-    "baby_species": "SPECIES_TEPIG"
+    "baby_species": "SPECIES_TEPIG",
+    "cry_volume": 120
 }

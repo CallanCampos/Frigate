@@ -873,9 +873,9 @@ void FieldG3D_InitCallback(void) {
 
 void FieldG3D_Init(Field *field) {
     BlActScene *scene;
+    u8 polyId;
     VecFx32 scale;
     VecFx32 up;
-    u8 polyId;
 
     field->actorBlAct = BlActSys_Create(0x40, 0x80, FldActSys_VRAMUploadFunc, field->heapId);
     scene = BlActSys_GetScene(field->actorBlAct);
@@ -889,8 +889,8 @@ void FieldG3D_Init(Field *field) {
     polyId = 0;
     BlActScene_SetBasePolyID(scene, &polyId);
     Field_LoadActorMatColorPreset(field);
-    field->g3DObjSystem = FieldG3DObjSystem_Create(field->heapId, 0x40, 0x40);
     up = DEFAULT_FIELDCAMERA_UP;
+    field->g3DObjSystem = FieldG3DObjSystem_Create(field->heapId, 0x40, 0x40);
     field->g3dCamera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_PERSPECTIVE, FX_SinIdx(DEG_TO_IDX(20)),
                                            FX_CosIdx(DEG_TO_IDX(20)), FX32_CONST(4.0 / 3.0), 0, FX32_ONE,
                                            FX32_CONST(1024), 0, &DEFAULT_FIELDCAMERA_POS, &up,
@@ -1446,7 +1446,7 @@ fx32 func_ov036_0218132c(Field *field) {
 }
 
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId) {
-    if (zoneId == 0x78 && !func_ov011_02154e70(field->gameData, 0)) {
+    if (zoneId == 0x78 && !GameData_IsMapReplaceEventSet(field->gameData, 0)) {
         return 0xfffffff;
     }
     return GetZoneFogIndex(zoneId);

@@ -13,6 +13,21 @@ BrNet *BrNet_Init(GameData *gameData, u32 a1, HeapID heapId);
 void BrNet_Exit(BrNet *net);
 void BrNet_Main(BrNet *net);
 
+// What a search for battle videos asks for
+typedef struct {
+    // The species the videos have, or BR_NET_VIDEO_SEARCH_MONSNO_NONE
+    u16 monsno;
+    // Where the videos' players live, or BR_NET_VIDEO_SEARCH_AREA_NONE in both
+    u8 country;
+    u8 area;
+    // The videos' battle mode, a line of the search screen's list, or BR_NET_VIDEO_SEARCH_MODE_NONE
+    u32 mode;
+} BrNetVideoSearchData;
+
+#define BR_NET_VIDEO_SEARCH_MONSNO_NONE 0xffff
+#define BR_NET_VIDEO_SEARCH_AREA_NONE 0xff
+#define BR_NET_VIDEO_SEARCH_MODE_NONE 19
+
 // The data of a request to the Global Link
 typedef union {
     struct {
@@ -30,6 +45,8 @@ typedef union {
         };
         u32 unk4;
     };
+    // The arguments of request 4, as the search screen gives them
+    BrNetVideoSearchData search;
     // The number of the battle video that requests 3 and 8 download and mark
     u64 dataNumber;
 } BrNetRequestParam;
@@ -59,7 +76,8 @@ enum {
 void BrNet_StartRequest(BrNet *net, int type, const BrNetRequestParam *param);
 // TRUE once the request has finished
 BOOL BrNet_IsRequestEnd(BrNet *net);
-// TRUE if the request's result has a message, which it gives in msgID
+// Returns a status from 0 to 3 and consumes any valid GDS result, including those returning 0.
+// msgID may be NULL and is written only for results that map to a message; otherwise it is unchanged.
 BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID);
 // 2 once the connection has had an error, which ends the Battle Recorder's screens
 u32 BrNet_CheckError(BrNet *net);

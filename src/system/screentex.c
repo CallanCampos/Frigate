@@ -128,6 +128,6 @@ void GFL_G3DAnmMdlDrawHeadless(G3DActor *actor) {
     NNS_G3dGlbPerspective(FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)), FX32_ONE * 4 / 3, FX32_ONE,
                           FX32_CONST(1024));
     NNS_G3dGlbLookAt(&camPos, &camUp, &camTarget);
-    MAT3_RotationX(&status.rotation, FX_SinIdx(DEG_TO_IDX(90)), FX_CosIdx(DEG_TO_IDX(90)));
+    MTX_RotX33_(&status.rotation, FX_SinIdx(DEG_TO_IDX(90)), FX_CosIdx(DEG_TO_IDX(90)));
     GFL_G3DSysDrawObj(actor, &status);
 }

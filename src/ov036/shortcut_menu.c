@@ -43,7 +43,7 @@ enum {
     STATE_SCROLL_OUT,
 };
 
-typedef struct ShortcutMenuApp {
+struct ShortcutMenuApp {
     ListMenuOption *options;
     BmpMenuList *list;
     BmpWin *window;
@@ -76,7 +76,7 @@ typedef struct ShortcutMenuApp {
     u16 *listPos;
     u32 scrolling;
     TCB *tcb;
-} ShortcutMenuApp;
+};
 
 // What the event that puts the field back after the menu runs on
 typedef struct {
@@ -490,13 +490,13 @@ s32 GetInput(ShortcutMenuApp *work) {
 }
 
 static void OnListCursor(BmpMenuList *list, s32 value, u8 init) {
-    ShortcutMenuApp *work = BmpMenuList_GetParam(list, BMPMENULIST_PARAM_WORK);
+    ShortcutMenuApp *work = (ShortcutMenuApp *)BmpMenuList_GetParam(list, BMPMENULIST_PARAM_WORK);
 
     work->cursorMoved = 1;
 }
 
 static void RedrawHighlight(BmpMenuList *list, u8 a1, u8 a2) {
-    ShortcutMenuApp *work = BmpMenuList_GetParam(list, BMPMENULIST_PARAM_WORK);
+    ShortcutMenuApp *work = (ShortcutMenuApp *)BmpMenuList_GetParam(list, BMPMENULIST_PARAM_WORK);
     u16 cursorY = BmpMenuList_GetCursorY(list) >> 3;
     u32 rowHeight = (u32)BmpMenuList_GetParam(list, BMPMENULIST_PARAM_ROW_HEIGHT) >> 3;
 

@@ -50,10 +50,10 @@ static VCTPacket *GetActiveHead(void);
 static int GetActiveCount(int slot);
 static VCTPacket *FindActiveBySlot(int slot);
 static int RemoveActive(VCTPacket *packet);
-static void EncodeMulaw(u8 *dst, const s16 *src, u32 count);
-static void DecodeMulaw(const u8 *src, s16 *dst, u32 count);
-static void EncodePcm8(u8 *dst, const s16 *src, u32 count);
-static void DecodePcm8(const s8 *src, s16 *dst, u32 count);
+static void EncodeMulaw(u8 *dst, s16 *src, u32 count);
+static void DecodeMulaw(u8 *src, s16 *dst, u32 count);
+static void EncodePcm8(u8 *dst, s16 *src, u32 count);
+static void DecodePcm8(s8 *src, s16 *dst, u32 count);
 static void ClearSlotQueues(int slot);
 static void FlushSlotQueue(int slot);
 static void FlushAllQueues(void);
@@ -82,18 +82,19 @@ static int sVadEnabled = TRUE;
 // The ends of the segments of the mu-law curve
 static int sSegmentEnds[8] = {0x3f, 0x7f, 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff};
 
-static VCTAudio sAudio;
-static VCTSession *sSlotSessions[VCT_SLOT_MAX];
-static VCTReceiver sReceivers[VCT_SLOT_MAX];
-static s16 sMixBuffer[VCT_FRAME_SAMPLES];
-static VCTSendQueue sSendQueue;
-// The packets in the order they came, and how many of each slot's
-static VCTList sActiveList;
-static int sActiveCounts[VCT_SLOT_MAX];
+// MWCC lays these out in reverse, so they are declared from the last to the first
 // Each slot's packets in the order of their sequence numbers
-static VCTPacket *sQueueHeads[VCT_SLOT_MAX];
-static int sQueueCounts[VCT_SLOT_MAX];
 static VCTPacket *sQueueTails[VCT_SLOT_MAX];
+static int sQueueCounts[VCT_SLOT_MAX];
+static VCTPacket *sQueueHeads[VCT_SLOT_MAX];
+// The packets in the order they came, and how many of each slot's
+static int sActiveCounts[VCT_SLOT_MAX];
+static VCTList sActiveList;
+static VCTSendQueue sSendQueue;
+static s16 sMixBuffer[VCT_FRAME_SAMPLES];
+static VCTReceiver sReceivers[VCT_SLOT_MAX];
+static VCTSession *sSlotSessions[VCT_SLOT_MAX];
+static VCTAudio sAudio;
 
 BOOL VCT_InitAudio(void)
 {
@@ -200,7 +201,7 @@ void VCT_DetachSession(VCTSession *session)
 }
 
 // Hands a frame of the microphone's samples to the library to send, returning whether it took it
-BOOL VCT_SubmitSamples(const void *samples, int size)
+BOOL VCT_SubmitSamples(void *samples, int size)
 {
     BOOL hasSender = FALSE;
     int i;
@@ -446,7 +447,7 @@ static VCTVoicePacket *EncodeNextFrame(void)
     }
     sSendQueue.pendingMask = sAudio.activeMask;
     sSendQueue.pendingMask &= ~(1 << gVCTSettings.aid);
-    sSendQueue.scheduleRow = countOneBits(sSendQueue.pendingMask) - 1;
+    sSendQueue.scheduleRow = MATH_CountPopulation(sSendQueue.pendingMask) - 1;
     if (sSendQueue.scheduleRow > 7) {
         return NULL;
     }
@@ -455,7 +456,7 @@ static VCTVoicePacket *EncodeNextFrame(void)
 }
 
 // Takes in a voice packet of the machine with the given ID, returning whether it has been queued
-BOOL VCT_HandleVoicePacket(int aid, const VCTVoicePacket *packet, int size, u64 now)
+BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now)
 {
     VCTReceiver *receiver = NULL;
     VCTPacket *queued;
@@ -718,7 +719,7 @@ static int RemoveActive(VCTPacket *packet)
 }
 
 // Codes samples as 8-bit mu-law
-static void EncodeMulaw(u8 *dst, const s16 *src, u32 count)
+static void EncodeMulaw(u8 *dst, s16 *src, u32 count)
 {
     u32 i;
 
@@ -749,7 +750,7 @@ static void EncodeMulaw(u8 *dst, const s16 *src, u32 count)
     }
 }
 
-static void DecodeMulaw(const u8 *src, s16 *dst, u32 count)
+static void DecodeMulaw(u8 *src, s16 *dst, u32 count)
 {
     u32 i;
 
@@ -762,7 +763,7 @@ static void DecodeMulaw(const u8 *src, s16 *dst, u32 count)
 }
 
 // Keeps the top eight bits of the samples
-static void EncodePcm8(u8 *dst, const s16 *src, u32 count)
+static void EncodePcm8(u8 *dst, s16 *src, u32 count)
 {
     u32 i;
 
@@ -771,7 +772,7 @@ static void EncodePcm8(u8 *dst, const s16 *src, u32 count)
     }
 }
 
-static void DecodePcm8(const s8 *src, s16 *dst, u32 count)
+static void DecodePcm8(s8 *src, s16 *dst, u32 count)
 {
     u32 i;
 

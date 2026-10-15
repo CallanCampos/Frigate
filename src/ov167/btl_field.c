@@ -1,8 +1,8 @@
 #include "types.h"
 #include "battle/btl_field.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
 #include "battle/btl_pokeparam.h"
+#include "battle/field_handlers.h"
 #include "gfl/heap.h"
 
 // Overlay 167's btl_field.c (named by its string): the weather and the effects of the whole field, such as Trick
@@ -189,7 +189,7 @@ BOOL FieldStatusaddEffectCore(BtlField *field, u32 effect, BattleCondition value
 BOOL func_ov167_021d5bc0(BtlField *field, u32 effect) {
     if (CheckFieldEffect(field, effect)) {
         if (field->events[effect] != NULL) {
-            func_ov169_06898080(field->events[effect]);
+            FieldEffectEventRemove(field->events[effect]);
             field->events[effect] = NULL;
         }
         clearEffect(field, effect);
@@ -220,7 +220,8 @@ BOOL func_ov167_021d5c04(BtlField *field, u32 effect, u8 monId) {
 
 // Removes a Pokemon from every effect that depends on it, ending the effects that no other Pokemon keeps up
 void func_ov167_021d5c60(BtlField *field, u8 monId) {
-    u32 effect;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long effect;
     u32 i;
     BOOL found;
 
@@ -240,7 +241,7 @@ void func_ov167_021d5c60(BtlField *field, u8 monId) {
                 field->dependPokes[effect][i] = NO_MON;
                 if (--field->dependPokeCounts[effect] == 0) {
                     if (field->events[effect] != NULL) {
-                        func_ov169_06898080(field->events[effect]);
+                        FieldEffectEventRemove(field->events[effect]);
                         field->events[effect] = NULL;
                     }
                     clearEffect(field, effect);
@@ -278,7 +279,7 @@ void func_ov167_021d5da4(BtlField *field, void (*callback)(u32 effect, BtlServer
             turns = func_ov167_021ce33c(field->conditions[effect]);
             if (turns != 0 && ++field->turnCounts[effect] >= turns) {
                 if (field->events[effect] != NULL) {
-                    func_ov169_06898080(field->events[effect]);
+                    FieldEffectEventRemove(field->events[effect]);
                     field->events[effect] = NULL;
                 }
                 clearEffect(field, effect);

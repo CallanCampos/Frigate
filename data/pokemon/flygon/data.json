@@ -182,5 +182,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 123,
-    "baby_species": "SPECIES_TRAPINCH"
+    "baby_species": "SPECIES_TRAPINCH",
+    "cry_volume": 120
 }

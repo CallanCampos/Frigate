@@ -194,5 +194,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_GIRAFARIG"
+    "baby_species": "SPECIES_GIRAFARIG",
+    "cry_volume": 110
 }

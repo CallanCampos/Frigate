@@ -610,6 +610,10 @@ static void WifiBattleMatchLink_TaskRatingConnect(WifiBattleMatchTask *task, u32
     }
 }
 
+static inline u32 WifiBattleMatchLinkPlayer_GetSize(void) {
+    return PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchLinkPlayer);
+}
+
 static void WifiBattleMatchLink_TaskRatingSearch(WifiBattleMatchTask *task, u32 *seq, void *work) {
     WifiBattleMatchLinkRandom *link = work;
     WifiBattleMatchLinkParam *param = link->param;
@@ -697,7 +701,7 @@ static void WifiBattleMatchLink_TaskRatingSearch(WifiBattleMatchTask *task, u32 
     case 4:
         if (WifiBattleMatchNet_TakePlayerInfo(link->net, &received)) {
             otherPlayer = param->otherPlayer;
-            sys_memcpy(received, otherPlayer, PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchLinkPlayer));
+            sys_memcpy(received, otherPlayer, WifiBattleMatchLinkPlayer_GetSize());
             fixCount = 0;
             noTerminator = TRUE;
             for (i = 0; i < 8; i++) {
@@ -1504,7 +1508,7 @@ static void WifiBattleMatchLink_TaskFreeSearch(WifiBattleMatchTask *task, u32 *s
     case 9:
         if (WifiBattleMatchNet_TakePlayerInfo(link->net, &received)) {
             otherPlayer = param->otherPlayer;
-            sys_memcpy(received, otherPlayer, PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchLinkPlayer));
+            sys_memcpy(received, otherPlayer, WifiBattleMatchLinkPlayer_GetSize());
             noTerminator = TRUE;
             for (i = 0; i < 8; i++) {
                 if (otherPlayer->info.name[i] == GFL_StrBufGetTerminator()) {
@@ -2120,10 +2124,11 @@ static BOOL WifiBattleMatchLink_UpdateRecord(void *results, u32 battleType, Wifi
         second = link->param->ratings->results[2].second;
         break;
     }
-    changed = FALSE;
     if (rating != RndMatchData_GetParam(results, battleType + 5, 0) || first != RndMatchData_GetParam(results, battleType + 5, 1) ||
         second != RndMatchData_GetParam(results, battleType + 5, 2)) {
         changed = TRUE;
+    } else {
+        changed = FALSE;
     }
     RndMatchData_SetParam(results, battleType + 5, 0, rating);
     RndMatchData_SetParam(results, battleType + 5, 1, first);

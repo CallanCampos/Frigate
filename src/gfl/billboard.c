@@ -76,7 +76,7 @@ void func_0204e450(BlActScene *scene) {
     GFL_HeapFree(scene);
 }
 
-void BlActScene_SetCustomNormal(BlActScene *scene, const VecFx16 *normal) {
+void BlActScene_SetCustomNormal(BlActScene *scene, VecFx16 *normal) {
     scene->customNormal = TRUE;
     VEC_Fx16Set(&scene->normal, normal->x, normal->y, normal->z);
 }
@@ -265,7 +265,7 @@ void func_0204e820(BlActScene *scene, u32 material, NNSGfdPlttKey *plttKey) {
     *plttKey = scene->materials[material].plttKey;
 }
 
-void func_0204e830(BlActScene *scene, u32 material, u32 face, u32 *offset, u32 *faceSize, u8 byRow) {
+void func_0204e830(BlActScene *scene, u32 material, int face, u32 *offset, u32 *faceSize, u8 byRow) {
     BlActMaterial *mat = &scene->materials[material];
 
     switch (mat->texFormat) {
@@ -284,7 +284,7 @@ void func_0204e830(BlActScene *scene, u32 material, u32 face, u32 *offset, u32 *
     if (byRow == FALSE) {
         *offset = face * *faceSize;
     } else {
-        u32 width = mat->texWidth;
+        int width = mat->texWidth;
 
         *offset = *faceSize * (face / width) + face % width * mat->faceWidth;
     }
@@ -427,22 +427,22 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights) {
     if (scene->keepViewMtx == FALSE) {
         gfxLookAt(&camPos, &camUp, &target, TRUE, &lookAt);
     } else {
-        MAT43_LookAt(&camPos, &camUp, &target, &lookAt);
+        MTX_LookAt(&camPos, &camUp, &target, &lookAt);
     }
-    MAT43_Invert(&lookAt, &inv);
+    MTX_Inverse43(&lookAt, &inv);
     MI_Copy36B(&inv, &rots[BLACT_TYPE_FACE_CAMERA]);
 
     // The camera's direction in the xz plane
     VEC_Subtract(&camPos, &target, &dir);
     dir.y = 0;
-    vecfx_normalize(&dir, &dir);
-    MAT3_Identity(&rots[BLACT_TYPE_FACE_CAMERA_Y]);
-    MAT3_RotationY(&rots[BLACT_TYPE_FACE_CAMERA_Y], dir.x, dir.z);
-    MAT3_RotationY(&rots[BLACT_TYPE_FACE_CAMERA_Y_FLAT], dir.x, dir.z);
-    MAT3_Identity(&rots[BLACT_TYPE_FIXED]);
+    VEC_Normalize(&dir, &dir);
+    MTX_Identity33_(&rots[BLACT_TYPE_FACE_CAMERA_Y]);
+    MTX_RotY33_(&rots[BLACT_TYPE_FACE_CAMERA_Y], dir.x, dir.z);
+    MTX_RotY33_(&rots[BLACT_TYPE_FACE_CAMERA_Y_FLAT], dir.x, dir.z);
+    MTX_Identity33_(&rots[BLACT_TYPE_FIXED]);
 
     VEC_Subtract(&camPos, &target, &camDir);
-    vecfx_normalize(&camDir, &camDir);
+    VEC_Normalize(&camDir, &camDir);
     if (scene->customNormal == TRUE) {
         normalX = scene->normal.x;
         normalY = scene->normal.y;
@@ -476,14 +476,16 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights) {
 
         // The face's corners in the texture, read from the far side when flipped
         if (actor->flipS) {
-            s1 = scene->texOffsetS + (actor->face % mat->facesPerRow * mat->faceWidth << FX32_SHIFT);
+            s1 = actor->face % mat->facesPerRow * mat->faceWidth << FX32_SHIFT;
+            s1 += scene->texOffsetS;
             s0 = s1 + (mat->faceWidth << FX32_SHIFT);
         } else {
             s0 = actor->face % mat->facesPerRow * mat->faceWidth << FX32_SHIFT;
             s1 = s0 + (mat->faceWidth << FX32_SHIFT);
         }
         if (actor->flipT) {
-            t1 = scene->texOffsetT + (actor->face / mat->facesPerRow * mat->faceHeight << FX32_SHIFT);
+            t1 = actor->face / mat->facesPerRow * mat->faceHeight << FX32_SHIFT;
+            t1 += scene->texOffsetT;
             t0 = t1 + (mat->faceHeight << FX32_SHIFT);
         } else {
             t0 = actor->face / mat->facesPerRow * mat->faceHeight << FX32_SHIFT;

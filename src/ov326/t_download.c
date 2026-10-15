@@ -388,18 +388,22 @@ static void TDownload_SelectMain(TDownloadWork *wk) {
 static BOOL TDownload_SelectTouch(TDownloadWork *wk) {
     int touched;
     s16 slot;
-    BOOL result = FALSE;
     int input = 0;
     BOOL moved = FALSE;
+    BOOL result = FALSE;
 
     touched = TDownloadUtil_GetTouch(wk, FALSE, wk->mode);
-    if (touched == 3 || touched == 4 || touched == 5) {
+    switch (touched) {
+    case 3:
+    case 4:
+    case 5:
         slot = touched - 3;
         if (wk->saveFlags & (1 << (slot + 4))) {
             wk->slotPos = slot;
             moved = TRUE;
             func_0203d564(TRUE);
         }
+        break;
     }
     if (moved == FALSE && touched == 0) {
         TDownloadUtil_PressButton(wk, 3, 0);
@@ -414,10 +418,10 @@ static BOOL TDownload_SelectTouch(TDownloadWork *wk) {
         func_0203d564(TRUE);
     }
     if (input != 0) {
-        result = TRUE;
         TDownloadUtil_UpdateCursorMode(wk, FALSE, TRUE, FALSE);
         wk->seq = 110;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
+        result = TRUE;
     }
     return result;
 }
@@ -651,9 +655,9 @@ static void TDownload_DetailMain(TDownloadWork *wk) {
 }
 
 static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
+    int button = 0;
     int input = 0;
     BOOL result = FALSE;
-    int button = 0;
     int page = wk->page[wk->tab];
     int touched = TDownloadUtil_GetTouch(wk, FALSE, wk->mode);
     int held = TDownloadUtil_GetTouch(wk, TRUE, wk->mode);
@@ -742,9 +746,9 @@ static BOOL TDownload_DetailTouch(TDownloadWork *wk) {
 }
 
 static BOOL TDownload_DetailKeys(TDownloadWork *wk) {
-    BOOL result = FALSE;
     int button = 0;
     int input = 0;
+    BOOL result = FALSE;
 
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
         TDownloadUtil_PressButton(wk, 3, 0);
@@ -1245,18 +1249,22 @@ static void TDownload_SavedMain(TDownloadWork *wk) {
 static BOOL TDownload_SavedTouch(TDownloadWork *wk) {
     int touched;
     s16 slot;
-    int input = 0;
-    BOOL result = FALSE;
+    u16 input = 0;
     BOOL moved = FALSE;
+    BOOL result = FALSE;
 
     touched = TDownloadUtil_GetTouch(wk, FALSE, wk->mode);
-    if (touched == 3 || touched == 4 || touched == 5) {
+    switch (touched) {
+    case 3:
+    case 4:
+    case 5:
         slot = touched - 3;
         if (wk->saveFlags & (1 << (slot + 4))) {
             wk->slotCursor = slot;
             moved = TRUE;
             func_0203d564(TRUE);
         }
+        break;
     }
     if (moved == FALSE && touched == 0) {
         TDownloadUtil_PressButton(wk, 3, 0);

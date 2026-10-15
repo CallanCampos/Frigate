@@ -156,7 +156,7 @@ static void GymHumilau_AddNextAreas(HumilauGymWork *work);
 static void GymHumilau_RestoreAreas(HumilauGymWork *work);
 static void GymHumilau_ClearSlots(HumilauGymWork *work);
 static int GymHumilau_GetRideLength(HumilauGymRideEvent *ev, u8 ride);
-static void GymHumilau_StartRide(HumilauGymRideEvent *ev, int frames, const VecFx32 *target);
+static void GymHumilau_StartRide(HumilauGymRideEvent *ev, int frames, VecFx32 *target);
 static BOOL GymHumilau_UpdateRide(HumilauGymRideEvent *ev);
 static BOOL GymHumilau_StartPush(HumilauGymRideEvent *ev);
 static BOOL GymHumilau_UpdatePush(HumilauGymRideEvent *ev);
@@ -183,15 +183,16 @@ static u8 GymHumilauState_GetSlot(HumilauGymState *state, int slot);
 static void GymHumilau_SetShortcutUsed(GimmickState *gimmickState, BOOL used);
 static BOOL GymHumilau_IsShortcutUsed(GimmickState *gimmickState);
 
-// Not used
-static const G3DSceneAnimationSetup sUnusedAnimations[] = { { 3, 0 }, { 2, 0 } };
-static const G3DSceneAnimationSetup sRideSplashAnimations[] = { { 13, 0 }, { 14, 0 } };
-static const G3DSceneAnimationSetup sPushSplashAnimations[] = { { 16, 0 }, { 17, 0 } };
 static const G3DSceneAnimationSetup sHumilauPlatformAnimations[] = { { 1, 0 }, { 2, 0 } };
 static const G3DSceneAnimationSetup sHitSplashAnimations[] = { { 7, 0 }, { 8, 0 } };
-static const G3DSceneAnimationSetup sStopSplashAnimations[] = { { 4, 0 }, { 5, 0 } };
 static const G3DSceneAnimationSetup sWakeAnimations[] = { { 10, 0 }, { 11, 0 } };
+static const G3DSceneAnimationSetup sStopSplashAnimations[] = { { 4, 0 }, { 5, 0 } };
 static const G3DSceneAnimationSetup sLeaderSplashAnimations[] = { { 19, 0 }, { 20, 0 } };
+static const G3DSceneAnimationSetup sRideSplashAnimations[] = { { 13, 0 }, { 14, 0 } };
+static const G3DSceneAnimationSetup sPushSplashAnimations[] = { { 16, 0 }, { 17, 0 } };
+// Not used. Not static: the ROM keeps it, in a section of its own ahead of the other tables, and an unused static would
+// be dropped
+const G3DSceneAnimationSetup GymHumilau_UnusedAnimations[] = { { 3, 0 }, { 2, 0 } };
 static const G3DSceneAnimationSetup sLeaderWavesAnimations[] = { { 22, 0 }, { 23, 0 }, { 24, 0 } };
 
 static const G3DSceneResourceSetup sGymHumilauResources[25];
@@ -215,48 +216,6 @@ static const HumilauGymRide sRides[RIDE_COUNT] = {
     { 13, 56, DIR_DOWN, 6 },  { 25, 56, DIR_DOWN, 3 },   { 5, 58, DIR_RIGHT, 21 }, { 25, 60, DIR_UP, 3 },
     { 13, 63, DIR_UP, 6 },    { 16, 63, DIR_UP, 51 },    { 5, 64, DIR_RIGHT, 6 },  { 12, 64, DIR_LEFT, 6 },
     { 5, 13, DIR_RIGHT, 21 },
-};
-
-static const G3DSceneResourceSetup sGymHumilauResources[25] = {
-    { ARCID_GYM_HUMILAU, 0, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 2, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 1, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 6, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 7, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 8, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 3, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 4, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 5, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 9, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 10, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 11, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 12, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 13, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 14, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 15, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 16, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 17, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 22, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 23, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 24, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 18, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 19, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 20, G3D_SCENE_RES_ARCSYS },
-    { ARCID_GYM_HUMILAU, 21, G3D_SCENE_RES_ARCSYS },
-};
-
-static const G3DSceneActorSetup sGymHumilauActors[23] = {
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
-    { 3, 0, 3, 0, sStopSplashAnimations, NELEMS(sStopSplashAnimations) },
-    { 6, 0, 6, 0, sHitSplashAnimations, NELEMS(sHitSplashAnimations) },
-    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
-    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
-    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
-    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
-    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
-    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
-    { 12, 0, 12, 0, sRideSplashAnimations, NELEMS(sRideSplashAnimations) },
-    { 15, 0, 15, 0, sPushSplashAnimations, NELEMS(sPushSplashAnimations) },
-    { 18, 0, 18, 0, sLeaderSplashAnimations, NELEMS(sLeaderSplashAnimations) },
-    { 21, 0, 21, 0, sLeaderWavesAnimations, NELEMS(sLeaderWavesAnimations) },
 };
 
 void GymHumilau_Init(Field *field) {
@@ -663,13 +622,15 @@ static GameEventReturnCode GymHumilau_RideEventCallback(GameEvent *event, u32 *s
         }
         break;
     case 8: {
-        VecFx32 offset = { 0, 0, 0 };
-
         GymHumilau_ClearAreas(work);
         GymHumilau_AddPlatformAreas(work, ev->platform);
         GymHumilau_AddNextAreas(work);
         work->standing = STANDING_RIDE_PLATFORM;
-        FieldCamera_CoordsSetEyeOffset(ev->camera, &offset);
+        {
+            VecFx32 offset = { 0, 0, 0 };
+
+            FieldCamera_CoordsSetEyeOffset(ev->camera, &offset);
+        }
         FieldCameraAnm_EVCameraEnd(ev->camera);
         FieldCamera_SetBind(ev->camera, ev->cameraBind);
         FieldCamera_EnableDelay(ev->camera);
@@ -748,11 +709,12 @@ static BOOL GymHumilau_GetRidePlatformPos(u8 ride, int *x, int *z) {
 
 // Adds the areas of the platforms next to the one that the player stands on
 static void GymHumilau_AddNextAreas(HumilauGymWork *work) {
-    s16 x, y, z;
+    FieldPlayer *player = Field_GetPlayer(work->field);
     u16 platform = 0;
+    s16 x, y, z;
     int dir;
 
-    FieldPlayer_GetGPos(Field_GetPlayer(work->field), &x, &y, &z);
+    FieldPlayer_GetGPos(player, &x, &y, &z);
     for (dir = 0; dir < 4; dir++) {
         int nextX = x;
         int nextZ = z;
@@ -813,8 +775,7 @@ static int GymHumilau_GetRideLength(HumilauGymRideEvent *ev, u8 ride) {
     int length, i;
 
     GymHumilau_GetRidePlatformPos(ride, &x, &z);
-    length = sRides[ride].length;
-    for (i = 1; i < sRides[ride].length; i++) {
+    for (i = 1, length = sRides[ride].length; i < sRides[ride].length; i++) {
         int nextX = x;
         int nextZ = z;
 
@@ -843,7 +804,7 @@ static int GymHumilau_GetRideLength(HumilauGymRideEvent *ev, u8 ride) {
     return length;
 }
 
-static void GymHumilau_StartRide(HumilauGymRideEvent *ev, int frames, const VecFx32 *target) {
+static void GymHumilau_StartRide(HumilauGymRideEvent *ev, int frames, VecFx32 *target) {
     HumilauGymMover *mover = &ev->mover;
 
     mover->frame = 0;
@@ -1059,9 +1020,9 @@ static void GymHumilau_EndTilt(HumilauGymWork *work) {
 // platform and the one it hits
 static void GymHumilau_PlaySplash(HumilauGymRideEvent *ev, int kind) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(ev->field);
+    int i;
     u16 actor;
     SRTMatrix *splash, *platform;
-    int i;
 
     switch (kind) {
     case SPLASH_STOP:
@@ -1160,9 +1121,9 @@ static void GymHumilau_PlayWake(HumilauGymRideEvent *ev, u16 platform) {
 // The splash around a platform that stops, a bigger one for the platform that is hit
 static void GymHumilau_PlayStopSplash(HumilauGymRideEvent *ev, u16 platform, BOOL hit) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(ev->field);
+    int i;
     u16 actor = ACTOR_STOP_SPLASH;
     SRTMatrix *matrix;
-    int i;
 
     if (hit) {
         actor = ACTOR_HIT_SPLASH;
@@ -1322,3 +1283,45 @@ static BOOL GymHumilau_IsShortcutUsed(GimmickState *gimmickState) {
     }
     return FALSE;
 }
+
+static const G3DSceneResourceSetup sGymHumilauResources[25] = {
+    { ARCID_GYM_HUMILAU, 0, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 2, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 1, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 6, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 7, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 8, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 3, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 4, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 5, G3D_SCENE_RES_ARCSYS },  { ARCID_GYM_HUMILAU, 9, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 10, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 11, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 12, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 13, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 14, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 15, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 16, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 17, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 22, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 23, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 24, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 18, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 19, G3D_SCENE_RES_ARCSYS }, { ARCID_GYM_HUMILAU, 20, G3D_SCENE_RES_ARCSYS },
+    { ARCID_GYM_HUMILAU, 21, G3D_SCENE_RES_ARCSYS },
+};
+
+static const G3DSceneActorSetup sGymHumilauActors[23] = {
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 0, 0, 0, 0, sHumilauPlatformAnimations, NELEMS(sHumilauPlatformAnimations) },
+    { 3, 0, 3, 0, sStopSplashAnimations, NELEMS(sStopSplashAnimations) },
+    { 6, 0, 6, 0, sHitSplashAnimations, NELEMS(sHitSplashAnimations) },
+    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
+    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
+    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
+    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
+    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
+    { 9, 0, 9, 0, sWakeAnimations, NELEMS(sWakeAnimations) },
+    { 12, 0, 12, 0, sRideSplashAnimations, NELEMS(sRideSplashAnimations) },
+    { 15, 0, 15, 0, sPushSplashAnimations, NELEMS(sPushSplashAnimations) },
+    { 18, 0, 18, 0, sLeaderSplashAnimations, NELEMS(sLeaderSplashAnimations) },
+    { 21, 0, 21, 0, sLeaderWavesAnimations, NELEMS(sLeaderWavesAnimations) },
+};

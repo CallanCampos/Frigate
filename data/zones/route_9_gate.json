@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 54,
+    "area": "AREA_ROUTE_9_GATE",
     "matrix": "MAP_MATRIX_OVERWORLD_2",
     "scripts": "SCRIPTS_ROUTE_9_GATE",
     "text": "SCRIPT_TEXT_ROUTE_9_GATE",

@@ -2,11 +2,12 @@
 #define POKEBW2_FIELD_UNION_ONESELF_H
 
 #include "types.h"
+#include "field/union_actor.h"
 #include "field/union_comm.h"
 #include "struct_decls.h"
 
-// union_oneself.c, overlay 34, which the ROM names: the Union Room's steps on the field, for this machine (its situ)
-// and for the players heard, whose actors it runs
+// union_oneself.c, overlay 34, which the ROM names: the Union Room's steps on the field for this machine (its situ).
+// The actors of the players heard are union_actor.c's, whose header this one includes
 
 // The steps of this machine (UnionSelf.step): a row of union_oneself.c's table, with a function to begin the step, one
 // to run it and one to end it. The rows from UNION_STEP_JOIN_DRAW to UNION_STEP_JOIN_EGG are those of the activities,
@@ -74,14 +75,6 @@ enum {
 #define UNION_ACTIVITY_EGG_TRADE 0x19
 #define UNION_ACTIVITY_NONE 0x1b
 
-// A step of an actor, for the player heard that it stands for
-typedef BOOL (*UnionActorFunc)(UnionSystem *unisys, UnionActorSlot *slot, Field *field, u8 *seq);
-
-void UnionOneself_ClearActors(UnionSystem *unisys);
-BOOL UnionActor_IsId(u16 id);
-void UnionOneself_UpdateActors(UnionSystem *unisys, GameData *gameData, Field *field);
-void UnionOneself_UpdateMarks(UnionSystem *unisys, GameData *gameData, Field *field);
-BOOL UnionActor_StepAppear(UnionSystem *unisys, UnionActorSlot *slot, Field *field, u8 *seq);
 void UnionOneself_CheckEntries(UnionSystem *unisys);
 GameEvent *UnionOneself_CreateCommandEvent(GameSystem *gsys, Field *field);
 BOOL UnionOneself_ReturnFalse(void);

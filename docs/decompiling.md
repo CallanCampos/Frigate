@@ -44,6 +44,11 @@ adds each variant's count of differing aligned lines, to tell apart variants of 
 `tools/decomp/locals.py src/... FUNC` prints the register or stack slot of each parameter and local of a function,
 from the debug info of its built object, which shows which variable to move when registers or stack slots differ.
 
+`tools/decomp/rodata_order.py` predicts how MWCC lays out a file's static data and searches small reorderings; when
+no structured order reaches the ROM's layout, `tools/decomp/rodata_solver.py` anneals the sequence of sizes by
+declaration slot until the layout-forced declaration order defines every table before its users, and prints the
+order to realize (docs/matching.md, "invert the model").
+
 ## Compiler
 
 The game code was built with CodeWarrior for DSi, a version between `dsi/1.1p1` and `dsi/1.3p1`, and
@@ -71,3 +76,9 @@ game, ignoring relocated bytes. For example:
 
 It needs `pyelftools`, `capstone` and `pyyaml`. To look at a function's disassembly, run `dsd dis` into
 `build/asm`, then use `tools/decomp/show_func.py`.
+
+Relocation masks include call targets, so a probe result does not establish which function a call reaches. A
+`size A/B` result reports lengths without comparing the function bytes: `BigInti_ModExpStep` stays at `0xbc/0xba`
+after restoring its multiplication width and replacing a subtraction with the original addition. Original call
+targets and argument meanings are separate evidence. ROM hashes also do not validate an incomplete file's C,
+because that file still links the original object until marked complete.

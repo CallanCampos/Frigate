@@ -14,10 +14,15 @@ void clock_init(void);
 #define OS_TicksToSeconds(tick) (((tick) * 64) / OS_SYSTEM_CLOCK)
 #define OS_TicksToMilliSeconds(tick) (((tick) * 64) / (OS_SYSTEM_CLOCK / 1000))
 #define OS_TicksToMicroSeconds(tick) (((tick) * 64 * 1000) / (OS_SYSTEM_CLOCK / 1000))
+#define OS_MilliSecondsToTicks(msec) ((u64)(((OS_SYSTEM_CLOCK / 1000) * (u64)(msec)) / 64))
+// NitroSDK's OSi_ReferSymbol, which does nothing but be called with a library's signature ("[SDK+...]"), keeping the
+// signature in the link
+void func_02004eb0(const char *signature);
 // Restarts the game, which swan names sys_reset
 void sys_reset(u32 parameter);
 // Stops the game after a fatal error, calling the registered handler first
 void sys_exit(void);
+void WaitByLoop(u32 cycles);
 // Stops the CPU until an interrupt, which swan names cp15_halt. NitroSDK's OS_Halt
 void cp15_halt(void);
 // Writes a range of the data cache back to memory, before DMA reads it. NitroSDK's DC_FlushRange
@@ -28,6 +33,11 @@ void cp15_invalidateDC(void *addr, u32 size);
 void cp15_cleanDC(const void *addr, u32 size);
 // Waits until the write buffer is empty
 void cp15_drainWriteBuffer(void);
+// Writes the whole data cache back to memory and discards it. NitroSDK's DC_FlushAll
+void cp15_invalidateDCAll(void);
+// Discards a range of the instruction cache, or all of it. NitroSDK's IC_InvalidateRange and IC_InvalidateAll
+void cp15_invalidateIC(void *addr, u32 size);
+void cp15_invalidateICAll(void);
 
 // The start of DTCM, where the linker places the DTCM module
 extern u32 SDK_AUTOLOAD_DTCM_START[];
@@ -80,6 +90,10 @@ s32 func_0207a1a0(u16 lockId);
 // NitroSDK's OS_DisableInterrupts and OS_RestoreInterrupts, under swan's names
 u32 CPU_IRQDisable(void);
 u32 CPU_SetIRQMask(u32 mask);
+// IRQ dispatcher; WCM also uses its address as a special mutex-owner marker.
+void CPU_IRQInvoke(void);
+// NitroSDK's OS_GetProcMode: the processor mode, 0x12 in an IRQ handler
+u32 CPU_GetMode(void);
 // NitroSDK's OS_EnableIrqMask, under swan's name
 u32 CPU_EnableInterrupts(u32 mask);
 // NitroSDK's OS_Sleep: waits for some milliseconds, letting other threads run
@@ -218,13 +232,29 @@ typedef struct OSMessageQueue {
     s32 usedCount;
 } OSMessageQueue;
 
+#define OS_MESSAGE_BLOCK 1
+
+// Sets up a queue that holds count messages in the array, by OS_InitMessageQueue's code
+void func_0207acc4(OSMessageQueue *queue, OSMessage *messages, s32 count);
+BOOL OS_SendMessage(OSMessageQueue *queue, OSMessage message, s32 flags);
 BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags);
+BOOL OS_ReadMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags); // The first message, left in the queue
+// OS_SNPrintf's role: snprintf
+int func_0207a2c0(char *dest, u32 size, const char *format, ...);
+// OS_DisableScheduler and OS_EnableScheduler's roles
+u32 func_0207aab4(void);
+u32 func_0207aad8(void);
 
 // NitroSDK's threads, under swan's names: OS_CreateThread, whose stack is its top, OS_SleepThread, which sleeps on
-// queue until OS_WakeupThread wakes it, and OS_WakeupThreadDirect, which starts a new thread. The thread's fields
-// aren't known yet
+// queue until OS_WakeupThread wakes it, and OS_WakeupThreadDirect, which starts a new thread. Of the thread's fields
+// only the link of the list of all threads and the specific words (NitroWiFi's CPS keeps a thread's socket in the
+// first) are known yet
 typedef struct OSThread {
-    u8 data[0xc0];
+    u8 unk_00[0x68];
+    struct OSThread *next;
+    u8 unk_6c[0x38];
+    void *specific[3];
+    u8 unk_b0[0x10];
 } OSThread;
 
 static inline void OS_InitThreadQueue(OSThreadQueue *queue) {
@@ -242,6 +272,54 @@ void scheduler_thread_exit_proc(void);
 // NitroSDK's OS_IsThreadTerminated, under swan's name, and OS_DestroyThread, by its code
 BOOL scheduler_is_thread_ended(const OSThread *thread);
 void func_0207a710(OSThread *thread);
+// NitroSDK's OS_JoinThread, by its code: waits for a thread's end
+void func_0207a800(OSThread *thread);
+// NitroSDK's OS_RescheduleThread, by its place before OS_YieldThread and by its use after OS_EnableScheduler: runs the
+// highest priority thread that is ready
+void func_0207a918(void);
+// NitroSDK's OS_YieldThread, by its place between OS_JoinThread and OS_SetThreadPriority: lets the other threads of the
+// same priority run
+void func_0207a92c(void);
+
+// The scheduler's state, which swan names g_IsThreadSwitchRequested: the thread that runs is its second word, and the
+// list of all threads, linked through their next, its third (NitroSDK's OSThreadInfo)
+extern struct {
+    int unk_00;
+    OSThread *current;
+    OSThread *list;
+} g_IsThreadSwitchRequested;
+
+// NitroSDK's OS_GetCurrentThread
+static inline OSThread *OS_GetCurrentThread(void) {
+    return g_IsThreadSwitchRequested.current;
+}
+
+// NitroSDK's events, by their code: a word of flags, and the threads waiting for some of them to be set
+typedef struct OSEvent {
+    vu32 flag;
+    OSThreadQueue queue;
+} OSEvent;
+
+// Whether func_0207c800 waits for all the flags of its pattern or for any of them
+#define OS_EVENT_MODE_AND 0
+#define OS_EVENT_MODE_OR 1
+
+// Clears an event's flags and its queue (OS_InitEvent's code)
+void func_0207c7f4(OSEvent *event);
+// Sleeps until all or any (mode) of the flags of pattern are set, then clears the flags of clearBits and returns the
+// flags that were set (OS_WaitEventEx's code)
+u32 func_0207c800(OSEvent *event, u32 pattern, u32 mode, u32 clearBits);
+// Sets flags and wakes the threads waiting on the event (OS_SignalEvent's code)
+void func_0207c864(OSEvent *event, u32 setPattern);
+
+// NitroSDK's alarms, by their code: OS_CreateAlarm, OS_SetAlarm (the alarm fires once after the ticks and calls the
+// function with the argument) and OS_CancelAlarm
+typedef struct OSAlarm {
+    u8 unk_00[0x2c];
+} OSAlarm;
+void func_0207bc24(OSAlarm *alarm);
+void func_0207bcf4(OSAlarm *alarm, u64 ticks, void (*handler)(void *arg), void *arg);
+void func_0207bd3c(OSAlarm *alarm);
 
 // NitroSDK's mutexes, which a thread may lock again; OS_LockMutex sleeps until the mutex is free
 typedef struct OSMutexLink {
@@ -258,6 +336,8 @@ typedef struct OSMutex {
 
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
+// NitroSDK's OS_TryLockMutex: TRUE when it got the mutex, without waiting
+BOOL func_0207aeec(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
 
 #endif // POKEBW2_NITRO_OS_H

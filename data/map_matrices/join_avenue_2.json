@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1030 ]
+        [ "MAP_MODEL_JOIN_AVENUE_2_M_RESONANCE01_00" ]
     ]
 }

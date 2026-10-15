@@ -903,11 +903,11 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
 }
 
 static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u32 kind) {
+    u32 layout;
     void *tournament = getTournamentBlockAddress(GameData_GetSaveControl(menu->param.gameData));
     WifiBattleMatchMenuParam param;
     TournamentEntry *entry;
     u8 x, y, width, height;
-    u32 layout;
 
     sys_memset(&param, 0, sizeof(WifiBattleMatchMenuParam));
     param.msgData = menu->param.msgData;
@@ -915,12 +915,12 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
     param.printQueue = menu->param.printQueue;
     switch (kind) {
     case LIST_TOP:
+        param.msgIds[0] = 2;
+        param.msgIds[1] = 3;
         param.msgIds[2] = 5;
         param.msgIds[3] = 6;
-        param.msgIds[0] = 2;
         param.count = 4;
         param.canCancel = 1;
-        param.msgIds[1] = 3;
         param.cancelValue = 3;
         layout = 0;
         break;
@@ -957,10 +957,10 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
     case LIST_LIVE:
         param.msgIds[0] = 11;
         param.msgIds[1] = 12;
-        layout = 1;
         param.count = 2;
-        param.canCancel = layout;
-        param.cancelValue = layout;
+        param.canCancel = 1;
+        param.cancelValue = 1;
+        layout = 1;
         break;
     }
     param.bg = 0;

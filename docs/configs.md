@@ -22,6 +22,30 @@ unsigned ones, while the game has one copy of it, so `_ll_mul` is a label on `_u
 to float) is a label on swan's `__aeabi_i2f`, and `_u32_div_f` (unsigned division) on `__aeabi_uidivmod`. `add-data`
 adds an object that nothing references, such as a global constant that the compiler folds into the code but still emits,
 so that the object before it does not seem to run on over it.
+
+Use `remove-orphan-reloc` when a relocation is filed in a module whose sections do not contain its source address.
+Give the actual source module explicitly; `.` means ARM9 main. The address is the relocation's **source** in Black 2,
+not its destination:
+
+```sh
+.venv/bin/python tools/decomp/config_fixes.py remove-orphan-reloc overlays/ov011 --source-module . 0x020050c4
+```
+
+This maps the address through the source owner, verifies that each version's address is inside that owner's sections
+and outside the recorded module's sections, and checks all relocation files before removing anything. It rejects
+multiple entries at the same source. An absent entry is allowed, including when only one version contains the
+orphan or when replaying the fix. Relocations elsewhere that point to the same destination are preserved. The saved
+record includes the source owner (`remove_orphan_reloc .`), so regeneration uses the same checks. Ordinary
+`remove-reloc` continues to map its source through the recorded module.
+
+Every fix resolves its addresses and arguments and validates its text changes for both versions before writing either
+version, so a mapping error or a conflicting relocation cannot leave only Black 2 changed. Replay still applies fixes
+in order because later fixes can depend on earlier ones.
+
+A label preserves an unresolved caller's name without replacing the function's canonical name. Static-reference checks
+consider every name at the destination, including labels, and use the first overlay candidate just as the linker does.
+An alias therefore cannot hide a reference to a static function.
+
 `section-start` and `section-end` move one end of a registered source file's section, as an object at a boundary
 that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files:
 

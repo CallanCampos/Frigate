@@ -43,25 +43,26 @@ void MBFrame_ClearChild(u16 aid) {
 // Writes a frame of the parent to a buffer, and gives where the data that goes with it starts, or NULL for a type
 // that is not known
 u8 *MBFrame_Encode(const MBFrame *frame, u8 *dst) {
-    u8 *out = dst + 1;
+    u8 *p = dst;
 
-    dst[0] = frame->type;
+    *p++ = frame->type;
     switch (frame->type) {
     case MB_FRAME_CONNECTED:
     case MB_FRAME_KICK:
     case MB_FRAME_FILE_INFO:
     case MB_FRAME_BOOT:
     case MB_FRAME_MEMBER_FULL:
-        return out;
+        break;
     case MB_FRAME_BLOCK:
-        out[0] = frame->value;
-        out[2] = frame->value2;
-        out[1] = (frame->value & 0xff00) >> 8;
-        out[3] = (frame->value2 & 0xff00) >> 8;
-        return out + 4;
+        *p++ = frame->value & 0xff;
+        *p++ = (frame->value & 0xff00) >> 8;
+        *p++ = frame->value2 & 0xff;
+        *p++ = (frame->value2 & 0xff00) >> 8;
+        break;
     default:
         return NULL;
     }
+    return p;
 }
 
 // Reads a frame of a child. A piece of a request is stored; the request is given once it is whole
@@ -69,7 +70,7 @@ const void *MBFrame_Decode(const u8 *src, MBChildFrame *out, u16 aid) {
     const u8 *next;
 
     out->type = src[0];
-    switch (src[0]) {
+    switch (out->type) {
     case MB_FRAME_REQUEST:
         if (MBFrame_IsComplete(aid)) {
             return sMBFrame.buf->slot[aid - 1];
@@ -101,7 +102,6 @@ const void *MBFrame_Decode(const u8 *src, MBChildFrame *out, u16 aid) {
 
 // Puts a piece of a request in its place in the child's slot
 static const void *MBFrame_Store(const MBChildFrame *frame, u16 aid) {
-    int index = aid - 1;
     u8 fragment;
 
     if (sMBFrame.buf == NULL) {
@@ -111,25 +111,20 @@ static const void *MBFrame_Store(const MBChildFrame *frame, u16 aid) {
     if (fragment > sMBFrame.fragmentCount) {
         return NULL;
     }
-    sys_memcpy(frame->pieceData, &sMBFrame.buf->slot[index][fragment * sMBFrame.payloadSize], sMBFrame.payloadSize);
-    sMBFrame.buf->received[index] |= 1 << fragment;
+    sys_memcpy(frame->pieceData, &sMBFrame.buf->slot[aid - 1][fragment * sMBFrame.payloadSize], sMBFrame.payloadSize);
+    sMBFrame.buf->received[aid - 1] |= 1 << fragment;
     if (MBFrame_IsComplete(aid)) {
-        return sMBFrame.buf->slot[index];
+        return sMBFrame.buf->slot[aid - 1];
     }
     return NULL;
 }
 
 static BOOL MBFrame_IsComplete(u16 aid) {
-    int count = sMBFrame.fragmentCount;
-    u16 i = 0;
+    u16 i;
 
-    if (count > 0) {
-        u32 received = sMBFrame.buf->received[aid - 1];
-
-        for (; i < count; i++) {
-            if (!(received & (1 << i))) {
-                return FALSE;
-            }
+    for (i = 0; i < sMBFrame.fragmentCount; i++) {
+        if ((sMBFrame.buf->received[aid - 1] & (1 << i)) == 0) {
+            return FALSE;
         }
     }
     return TRUE;

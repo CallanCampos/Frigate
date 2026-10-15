@@ -53,7 +53,7 @@ CtvtGameBalloon *CtvtGameBalloon_Create(CtvtGame *game, u16 netId, u8 pos, BOOL 
     balloon->wobblePhase = 0;
     balloon->wobbling = FALSE;
     if (netId == selfNetId) {
-        MAT3_Identity(&balloon->srt.rotation);
+        MTX_Identity33_(&balloon->srt.rotation);
         balloon->srt.translation.x = 0;
         balloon->srt.translation.y = FX32_CONST(-60);
         balloon->srt.translation.z = 0;
@@ -65,7 +65,7 @@ CtvtGameBalloon *CtvtGameBalloon_Create(CtvtGame *game, u16 netId, u8 pos, BOOL 
         if (memberCount == 3) {
             pos++;
         }
-        MAT3_Identity(&balloon->srt.rotation);
+        MTX_Identity33_(&balloon->srt.rotation);
         balloon->srt.translation.x = sBalloonPositions[pos].x;
         balloon->srt.translation.y = sBalloonPositions[pos].y;
         balloon->srt.translation.z = sBalloonPositions[pos].z;
@@ -93,8 +93,8 @@ void CtvtGameBalloon_Delete(CtvtGameBalloon *balloon) {
 static inline void CtvtGameBalloon_SetRotation(CtvtGameBalloon *balloon) {
     int index = ((u16)balloon->wobbleAngle >> 4) * 2;
 
-    MAT3_Identity(&balloon->srt.rotation);
-    MAT3_RotationZ(&balloon->srt.rotation, FX_SIN_COS_TABLE[index], FX_SIN_COS_TABLE[index + 1]);
+    MTX_Identity33_(&balloon->srt.rotation);
+    MTX_RotZ33_(&balloon->srt.rotation, FX_SinCosTable_[index], FX_SinCosTable_[index + 1]);
 }
 
 void CtvtGameBalloon_Update(CtvtGameBalloon *balloon) {
@@ -264,7 +264,7 @@ void CtvtGameBalloon_Draw(CtvtGameBalloon *balloon) {
         srt.scale.x = scale;
         srt.scale.y = scale;
         srt.scale.z = scale;
-        MAT3_Identity(&srt.rotation);
+        MTX_Identity33_(&srt.rotation);
         srt.translation.x = balloon->srt.translation.x;
         srt.translation.y = balloon->srt.translation.y;
         srt.translation.z = balloon->srt.translation.z;
@@ -339,7 +339,7 @@ CtvtGameShot *CtvtGameShot_Create(CtvtGame *game, u16 scene, int x, u8 vanishOnH
     shot->srt.scale.x = 0x500;
     shot->srt.scale.y = 0x500;
     shot->srt.scale.z = 0x500;
-    MAT3_Identity(&shot->srt.rotation);
+    MTX_Identity33_(&shot->srt.rotation);
     shot->srt.translation.x = FX32_CONST(x * 60) - FX32_CONST(90);
     shot->srt.translation.y = FX32_CONST(-100);
     shot->srt.translation.z = 0;
@@ -417,7 +417,7 @@ void CtvtGameShot_Draw(CtvtGameShot *shot) {
         srt.scale.x = shot->srt.scale.x;
         srt.scale.y = shot->srt.scale.y;
         srt.scale.z = shot->srt.scale.z;
-        MAT3_Identity(&srt.rotation);
+        MTX_Identity33_(&srt.rotation);
         srt.translation.x = shot->srt.translation.x;
         srt.translation.y = shot->srt.translation.y;
         srt.translation.z = shot->srt.translation.z - FX32_CONST(3);

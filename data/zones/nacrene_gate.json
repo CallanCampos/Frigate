@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 316,
+    "area": "AREA_NACRENE_GATE",
     "matrix": "MAP_MATRIX_NACRENE_GATE",
     "scripts": "SCRIPTS_NACRENE_GATE",
     "text": "SCRIPT_TEXT_NACRENE_GATE",

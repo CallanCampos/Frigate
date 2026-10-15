@@ -190,5 +190,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_STANTLER"
+    "baby_species": "SPECIES_STANTLER",
+    "cry_volume": 110
 }

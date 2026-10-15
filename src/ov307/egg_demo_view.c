@@ -170,7 +170,7 @@ static ViewActor *EggDemoView_CreateActors(HeapID heapId, u16 count) {
         actors[i].srt.scale.x = FX32_ONE;
         actors[i].srt.scale.y = FX32_ONE;
         actors[i].srt.scale.z = FX32_ONE;
-        MAT3_Identity(&actors[i].srt.rotation);
+        MTX_Identity33_(&actors[i].srt.rotation);
     }
     return actors;
 }

@@ -80,7 +80,7 @@ u8 func_0200ece4(SurveySave *survey, u32 index) {
     return survey->questions[index];
 }
 
-u16 func_0200ecf0(SurveySave *survey, u8 question) {
+u16 func_0200ecf0(SurveySave *survey, int question) {
     return survey->todayCounts[question];
 }
 
@@ -91,7 +91,7 @@ void func_0200ecf8(SurveySave *survey, u32 question, u32 count) {
     }
 }
 
-u32 func_0200ed14(SurveySave *survey, u8 question) {
+u32 func_0200ed14(SurveySave *survey, int question) {
     return survey->totalCounts[question];
 }
 

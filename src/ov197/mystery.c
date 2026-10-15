@@ -144,7 +144,7 @@ struct MysteryEffect {
     u16 objFadeColors[16];
     u16 whiteColors[16];
     u16 objColors[16];
-    MysteryGiftRecvData *recv;
+    const MysteryGiftRecvData *recv;
     MysteryParticle particle;
     // Where the icon stops, from the bottom of the Pokémon's sprite
     s16 height;
@@ -229,7 +229,8 @@ static u32 Mystery_UpdateList(MysteryWork *wk);
 static void Mystery_OnListMove(void *work);
 static void Mystery_CreateCardWin(MysteryWork *wk, HeapID heapId);
 static void Mystery_DeleteCardWin(MysteryWork *wk);
-static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, MysteryGiftRecvData *recv, GameData *gameData,
+static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const MysteryGiftRecvData *recv,
+                               GameData *gameData,
                                MysteryActors *actors, MysteryBg *bg, MysteryBgScroll *scroll, HeapID heapId);
 static void MysteryEffect_Start(MysteryEffect *effect, u32 mode);
 static void MysteryEffect_Exit(MysteryEffect *effect);
@@ -251,6 +252,9 @@ static void MysteryOamMsg_Exit(MysteryOamMsg *msg);
 static BOOL MysteryOamMsg_Update(MysteryOamMsg *msg);
 static u32 Mystery_GetSpriteBottom(BoxPkm *pkm, HeapID heapId);
 static BOOL Mystery_IsRecvDataValid(const MysteryGiftRecvData *recv, u32 errors);
+
+// The BG palettes of the main and of the sub screen. No code loads from it: its reads have constant indices
+static const u8 sBgPalTypes[2] = { PALTYPE_MAIN_BG, PALTYPE_SUB_BG };
 
 // The palette of the stars and the effect for each kind of gift
 static const u16 sKindPalettes[7] = { 0, 1, 2, 6, 6, 3, 0 };
@@ -364,17 +368,17 @@ static void MysteryBg_Load(MysteryBg *bg, u32 mode) {
     switch (mode) {
     case 0:
         arc = GFL_ArcSysCreateFileHandle(ARCID_MYSTERY, heapId);
-        GFL_G2DIOLoadArcNCLRDefault(arc, 6, 0, 0, 0, heapId);
-        GFL_G2DIOLoadArcNCLRDefault(arc, 6, 4, 0, 0x80, heapId);
-        GFL_G2DIOLoadArcNCLRDefault(arc, 7, 4, 0x20, 0x20, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, 6, sBgPalTypes[0], 0, 0, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, 6, sBgPalTypes[1], 0, 0x80, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, 7, sBgPalTypes[1], 0x20, 0x20, heapId);
         GFL_BGSysLoadArcNCGRStatic(arc, 15, 3, 0, 0, FALSE, heapId);
         GFL_BGSysLoadArcNCGRStatic(arc, 15, 7, 0, 0, FALSE, heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, 31, 3, 0, 0, FALSE, heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, 31, 7, 0, 0, FALSE, heapId);
         GFL_ArcToolFree(arc);
         arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, heapId);
-        GFL_G2DIOLoadArcNCLRDefault(arc, 5, 0, 15 * 0x20, 0x20, heapId);
-        GFL_G2DIOLoadArcNCLRDefault(arc, 5, 4, 15 * 0x20, 0x20, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, 5, sBgPalTypes[0], 15 * 0x20, 0x20, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, 5, sBgPalTypes[1], 15 * 0x20, 0x20, heapId);
         GFL_ArcToolFree(arc);
         LoadSysMsgBox(1, 10, 14, 0, heapId);
         LoadSysMsgBox(0, 1, 13, 0, heapId);
@@ -383,7 +387,7 @@ static void MysteryBg_Load(MysteryBg *bg, u32 mode) {
         break;
     case 1:
         arc = GFL_ArcSysCreateFileHandle(ARCID_MYSTERY, heapId);
-        GFL_G2DIOLoadArcNCLRDefault(arc, 6, 4, 0, 0xc0, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, 6, sBgPalTypes[1], 0, 0xc0, heapId);
         GFL_BGSysLoadArcNCGRStatic(arc, 15, 6, 0, 0, FALSE, heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, 21, 6, 0, 0, FALSE, heapId);
         GFL_ArcToolFree(arc);
@@ -1543,7 +1547,8 @@ static void Mystery_DeleteCardWin(MysteryWork *wk) {
     }
 }
 
-static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, MysteryGiftRecvData *recv, GameData *gameData,
+static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const MysteryGiftRecvData *recv,
+                               GameData *gameData,
                                MysteryActors *actors, MysteryBg *bg, MysteryBgScroll *scroll, HeapID heapId) {
     u32 palNo;
     NNSG2dPaletteData *palette;
@@ -1554,7 +1559,6 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, MysteryGi
     ArcTool *arc;
     s16 height;
     ClActorSetup setup;
-    HeapID tailHeapId;
 
     sys_memset(effect, 0, sizeof(MysteryEffect));
     effect->scroll = scroll;
@@ -1580,8 +1584,7 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, MysteryGi
     case 0:
         break;
     case 1:
-        tailHeapId = HEAPID_TAIL(heapId);
-        pkm = Mystery_CreateGiftPokemon(&recv->gift, tailHeapId, gameData);
+        pkm = Mystery_CreateGiftPokemon(&recv->gift, HEAPID_TAIL(heapId), gameData);
         arc = MakePokeGraArcHandle(heapId);
         effect->palette = PokeGra_LoadClActPaletteByBoxData(arc, func_0201d624(pkm), 0, 0, 0x1c0, heapId);
         effect->cellAnims = PokeGra_LoadClActCellAnimsByBoxData(func_0201d624(pkm), 0, 2, 0, heapId);

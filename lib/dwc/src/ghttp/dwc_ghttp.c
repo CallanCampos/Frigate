@@ -31,6 +31,9 @@ extern u8 data_ov011_021866c0[];
 
 int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost **post, DWCGHTTPProgressFunc progress,
                        DWCGHTTPCompletedFunc completed, void *param);
+int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressFunc progress,
+                     DWCGHTTPCompletedFunc completed, void *param);
+void DWC_CancelGHTTPRequest(int request);
 int DWCi_HandleGHTTPError(int error);
 static DWCGHTTPEntry *DWCi_NewGHTTPEntry(const DWCGHTTPParam *param);
 static void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPEntry *entry);

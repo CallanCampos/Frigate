@@ -186,5 +186,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_HO_OH"
+    "baby_species": "SPECIES_HO_OH",
+    "cry_volume": 110
 }

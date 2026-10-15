@@ -107,6 +107,7 @@ void NNS_GfdResetLnkTexVramState(void) {
     u32 indexSize;
     u32 i;
     GfdTexSlotSplit *slot;
+    u32 j;
 
     left4x4 = texMgr_.size4x4;
     // The palette indices of 4x4-compressed textures take half their size
@@ -126,13 +127,13 @@ void NNS_GfdResetLnkTexVramState(void) {
 
     // Their palette indices go at the bottom of slot 1, and normal textures fill what is left
     slots[1].unassigned -= indexSize;
-    for (i = 0, slot = slots; i < GFD_TEX_SLOT_COUNT; i++, slot++) {
+    for (j = 0, slot = slots; j < GFD_TEX_SLOT_COUNT; j++, slot++) {
         if (slot->unassigned > 0 && normalLeft > 0) {
             u32 part = slot->unassigned > normalLeft ? normalLeft : slot->unassigned;
 
-            normalLeft -= part;
             slot->normal += part;
             slot->unassigned -= part;
+            normalLeft -= part;
         }
     }
 

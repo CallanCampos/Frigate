@@ -11,17 +11,22 @@
 #define WIFI_STATUS_MAC_SIZE 6
 
 typedef struct {
-    u8 unk0[8];
+    // The GameSpy profile ID
+    s32 profileId;
+    u32 trainerId;
     // The MAC address of the friend the player is in a voice chat with
     u8 vchatMac[WIFI_STATUS_MAC_SIZE];
     u8 myMac[WIFI_STATUS_MAC_SIZE];
-    u8 unk14[3];
+    u8 trainerView;
+    u8 version;
+    u8 language;
     u8 gameMode;
     u8 wifiStatus;
-    u8 unk19[2];
+    u8 country;
+    u8 province;
     u8 unk1B_0 : 1;
     u8 vchatStatus : 1;
-    u8 unk1B_2 : 2;
+    u8 gender : 2;
     u8 useVChat : 1;
     u8 unk1B_5 : 3;
     // How many times the player has set a voice chat partner
@@ -33,7 +38,7 @@ u32 WIFI_STATUS_GetWifiStatus(const WIFI_STATUS *status);
 void WIFI_STATUS_SetWifiStatus(WIFI_STATUS *status, u8 wifiStatus);
 u32 WIFI_STATUS_GetGameMode(const WIFI_STATUS *status);
 void WIFI_STATUS_SetGameMode(WIFI_STATUS *status, u8 gameMode);
-BOOL WIFI_STATUS_GetVChatStatus(const WIFI_STATUS *status);
+u8 WIFI_STATUS_GetVChatStatus(const WIFI_STATUS *status);
 void WIFI_STATUS_SetVChatStatus(WIFI_STATUS *status, u8 vchatStatus);
 // Whether the friend is in a voice chat with the player
 BOOL WIFI_STATUS_IsVChatMac(const WIFI_STATUS *my, const WIFI_STATUS *friendStatus);

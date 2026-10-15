@@ -123,7 +123,7 @@ typedef struct {
 
 // A trainer's row: the name, rank, value and count drawn on a bitmap, and the Pokémon's icon on each screen
 typedef struct {
-    IrcRankingEntry *entry;
+    const IrcRankingEntry *entry;
     GFLBitmap *bitmap;
     ClActor *icons[2];
     s16 iconY[2];
@@ -276,12 +276,12 @@ static void IrcRankingList_Free(IrcRankingList *list);
 static void IrcRankingList_Settle(IrcRankingList *list);
 static void IrcRankingList_Move(IrcRankingList *list, s16 delta);
 static s16 IrcRankingList_GetScroll(IrcRankingList *list);
-static s16 IrcRankingList_FindSelf(IrcRankingList *list);
+static s16 IrcRankingList_FindSelf(const IrcRankingList *list);
 static s16 IrcRankingList_GetScrollMax(IrcRankingList *list);
 static void IrcRankingList_Redraw(IrcRankingList *list);
 static void IrcRankingList_Transfer(IrcRankingList *list);
 static void IrcRankingList_VBlank(TCB *tcb, void *data);
-static void IrcRankingRow_Init(IrcRankingRow *row, IrcRankingEntry *entry, ClActUnit *unit, u32 mainPalette,
+static void IrcRankingRow_Init(IrcRankingRow *row, const IrcRankingEntry *entry, ClActUnit *unit, u32 mainPalette,
                                u32 subPalette, MsgData *msgData, Font *font, WordSet *wordSet,
                                const IrcRankingScreens *screens, s16 mainY, s16 subY, HeapID heapId);
 static void IrcRankingRow_Free(IrcRankingRow *row);
@@ -579,7 +579,7 @@ static void IrcRanking_StepInput(IrcRankingStepMan *mgr, int *state, IrcRankingW
             IrcRankingList_Move(&wk->list, -delta.y);
             IrcRankingFling_Stop(&wk->fling);
         } else if (IrcRankingTouch_GetRelease(&wk->touch, NULL, NULL, &release, &moveFrames)) {
-            IrcRankingFling_Start(&wk->fling, vecfx_dot(&sIrcRankingUpVector, &release), moveFrames);
+            IrcRankingFling_Start(&wk->fling, VEC_DotProduct(&sIrcRankingUpVector, &release), moveFrames);
         }
     }
     if (IrcRankingFling_IsActive(&wk->fling)) {
@@ -601,9 +601,7 @@ static void IrcRanking_StepScrollToSelf(IrcRankingStepMan *mgr, int *state, IrcR
     s16 scrollMax;
     s16 frames;
 
-    if (target < 0) {
-        target = 0;
-    }
+    target = MATH_MAX(target, 0);
     scroll = IrcRankingList_GetScroll(&wk->list);
     scrollMax = IrcRankingList_GetScrollMax(&wk->list);
     if (target > scroll && scroll != scrollMax) {
@@ -812,7 +810,7 @@ static void IrcRankingList_Init(IrcRankingList *list, u8 bg1, u8 bg2, u8 bg5, u8
     list->scroll = 0;
     list->scrollMin = 0;
     list->scrollMax = list->count * ROW_HEIGHT - LIST_VISIBLE_HEIGHT;
-    list->scrollMax = list->scrollMax > 0 ? list->scrollMax : 0;
+    list->scrollMax = MATH_MAX(0, list->scrollMax);
     IrcRankingList_Redraw(list);
     IrcRankingList_Transfer(list);
     list->vblankTask = GFL_VBlankTCBAdd(IrcRankingList_VBlank, list, 0);
@@ -892,7 +890,7 @@ static s16 IrcRankingList_GetScroll(IrcRankingList *list) {
 }
 
 // The scroll of the player's row, or -1
-static s16 IrcRankingList_FindSelf(IrcRankingList *list) {
+static s16 IrcRankingList_FindSelf(const IrcRankingList *list) {
     int i;
     BOOL found = FALSE;
 
@@ -956,7 +954,6 @@ static void IrcRankingList_VBlank(TCB *tcb, void *data) {
     IrcRankingList *list = data;
     s16 x;
     s16 y;
-    s16 direction;
     int rem;
 
     if (list->transferPending) {
@@ -971,24 +968,30 @@ static void IrcRankingList_VBlank(TCB *tcb, void *data) {
             y = list->offsetB + rem;
             list->prevDirection = list->delta;
             list->flag = 1;
-        } else {
-            if ((list->delta >= 0 && list->prevDirection >= 0) || (list->delta < 0 && list->prevDirection < 0) ||
-                list->flag != 0) {
-                list->flag = 0;
-                direction = list->delta;
-            } else {
-                direction = list->prevDirection;
-            }
-            if (direction >= 0) {
+        } else if ((list->delta >= 0 && list->prevDirection >= 0) || (list->delta < 0 && list->prevDirection < 0) ||
+                   list->flag != 0) {
+            // The list goes on the way it went, or has just stood on a row: the way it goes now decides
+            list->flag = 0;
+            if (list->delta >= 0) {
                 x = list->offsetA + rem;
                 y = list->offsetB + rem;
-                direction = 1;
+                list->prevDirection = 1;
             } else {
                 x = list->offsetA - (ROW_HEIGHT - 1 - rem);
                 y = list->offsetB - (ROW_HEIGHT - 1 - rem);
-                direction = -1;
+                list->prevDirection = -1;
             }
-            list->prevDirection = direction;
+        } else {
+            // It has turned around within a row: the way it went before stays
+            if (list->prevDirection >= 0) {
+                x = list->offsetA + rem;
+                y = list->offsetB + rem;
+                list->prevDirection = 1;
+            } else {
+                x = list->offsetA - (ROW_HEIGHT - 1 - rem);
+                y = list->offsetB - (ROW_HEIGHT - 1 - rem);
+                list->prevDirection = -1;
+            }
         }
         GFL_BGSysMoveBG(list->bgs[0], BG_MOVE_SET_Y, x);
         GFL_BGSysMoveBG(list->bgs[1], BG_MOVE_SET_Y, x);
@@ -998,7 +1001,7 @@ static void IrcRankingList_VBlank(TCB *tcb, void *data) {
     }
 }
 
-static void IrcRankingRow_Init(IrcRankingRow *row, IrcRankingEntry *entry, ClActUnit *unit, u32 mainPalette,
+static void IrcRankingRow_Init(IrcRankingRow *row, const IrcRankingEntry *entry, ClActUnit *unit, u32 mainPalette,
                                u32 subPalette, MsgData *msgData, Font *font, WordSet *wordSet,
                                const IrcRankingScreens *screens, s16 mainY, s16 subY, HeapID heapId) {
     StrBuf *rankFormat;
@@ -1011,6 +1014,8 @@ static void IrcRankingRow_Init(IrcRankingRow *row, IrcRankingEntry *entry, ClAct
     ArcTool *arc;
     ClActorSetup setup;
     int i;
+    u32 halfWidth;
+    u32 palette;
 
     sys_memset(row, 0, sizeof(IrcRankingRow));
     row->entry = entry;
@@ -1027,12 +1032,15 @@ static void IrcRankingRow_Init(IrcRankingRow *row, IrcRankingEntry *entry, ClAct
     WordSetNumber(wordSet, 2, entry->value, 3, 0, TRUE);
     WordSetNumber(wordSet, 3, entry->count, 3, 0, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, text, rankFormat);
-    GFL_TextRendererDrawToBitmap(row->bitmap, 38 - GFL_FontGetBlockWidth(text, font, 0) / 2, 5, text, font);
+    halfWidth = GFL_FontGetBlockWidth(text, font, 0) / 2;
+    GFL_TextRendererDrawToBitmap(row->bitmap, 38 - halfWidth, 5, text, font);
     GFL_TextRendererDrawToBitmap(row->bitmap, 52, 5, entry->name, font);
     GFL_WordSetFormatStrbuf(wordSet, text, valueFormat);
-    GFL_TextRendererDrawToBitmap(row->bitmap, 142 - GFL_FontGetBlockWidth(text, font, 0) / 2, 5, text, font);
+    halfWidth = GFL_FontGetBlockWidth(text, font, 0) / 2;
+    GFL_TextRendererDrawToBitmap(row->bitmap, 142 - halfWidth, 5, text, font);
     GFL_WordSetFormatStrbuf(wordSet, text, countFormat);
-    GFL_TextRendererDrawToBitmap(row->bitmap, 194 - GFL_FontGetBlockWidth(text, font, 0) / 2, 5, text, font);
+    halfWidth = GFL_FontGetBlockWidth(text, font, 0) / 2;
+    GFL_TextRendererDrawToBitmap(row->bitmap, 194 - halfWidth, 5, text, font);
     GFL_StrBufFree(text);
     GFL_StrBufFree(countFormat);
     GFL_StrBufFree(valueFormat);
@@ -1051,11 +1059,13 @@ static void IrcRankingRow_Init(IrcRankingRow *row, IrcRankingEntry *entry, ClAct
         setup.x = 232;
         if (i == 0) {
             setup.y = mainY;
+            palette = mainPalette;
         } else {
             setup.y = subY;
+            palette = subPalette;
         }
         row->iconY[i] = setup.y;
-        row->icons[i] = func_0204c040(unit, row->iconChars, i == 0 ? mainPalette : subPalette, row->iconCellAnims,
+        row->icons[i] = func_0204c040(unit, row->iconChars, palette, row->iconCellAnims,
                                       &setup, i, heapId);
         func_0204c378(row->icons[i], PokeIcon_GetPalette(entry->species, entry->form, entry->sex, entry->isEgg), FALSE);
         if (setup.y > -16 && setup.y < 208) {

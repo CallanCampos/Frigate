@@ -63,7 +63,7 @@ Demo3DEngine *Demo3DEngine_Create(Demo3DGraphic *graphic, Demo3DParam *param, He
     }
     VEC_Set(&engine->srt.translation, 0, 0, 0);
     VEC_Set(&engine->srt.scale, FX32_ONE, FX32_ONE, FX32_ONE);
-    MAT3_Identity(&engine->srt.rotation);
+    MTX_Identity33_(&engine->srt.rotation);
     engine->unitCount = Demo3DData_GetUnitCount(engine->demoId);
     engine->scenes = GFL_HeapAllocate(heapId, engine->unitCount * sizeof(u16), TRUE, "demo3d_engine.c", 192);
     engine->cameraAnm = Demo3DData_LoadCamera(engine->demoId, heapId, 10);
@@ -178,6 +178,7 @@ void Demo3DEngine_SetStopped(Demo3DEngine *engine, u32 stopped) {
 // Makes the camera again from the projection's angles, as a frustum
 void Demo3DEngine_SetCamera(Demo3DEngine *engine, fx32 fovySin, fx32 fovyCos, s32 mainOffset, s32 subOffset) {
     fx32 right;
+    fx32 left;
     fx32 scale;
     fx32 width;
     fx32 top;
@@ -188,7 +189,7 @@ void Demo3DEngine_SetCamera(Demo3DEngine *engine, fx32 fovySin, fx32 fovyCos, s3
     fx32 scaleW;
     HeapID heapId;
     fx32 bottom;
-    fx16 cos;
+    fx32 cos;
     fx32 near;
 
     engine->fovySin = fovySin;
@@ -205,14 +206,14 @@ void Demo3DEngine_SetCamera(Demo3DEngine *engine, fx32 fovySin, fx32 fovyCos, s3
     near = engine->setup->near;
     far = engine->setup->far;
     sin = FX_SinIdx(angle);
-    height = FX_MUL(near, sin);
+    height = FX_Mul(near, sin);
     top = FX_Div(height, cos);
     bottom = -FX_Div(height, cos);
-    width = FX_MUL(near, DEMO3D_ASPECT);
+    width = FX_Mul(near, DEMO3D_ASPECT);
     scale = FX32_ONE;
-    right = FX_Div(FX_MUL(FX_Div(width, scale), sin), cos);
-    engine->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_FRUSTUM, top, bottom,
-                                         -FX_Div(FX_MUL(FX_Div(width, scale), sin), cos), right, near, far, scaleW,
+    right = FX_Div(FX_Mul(FX_Div(width, scale), sin), cos);
+    left = -FX_Div(FX_Mul(FX_Div(width, scale), sin), cos);
+    engine->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_FRUSTUM, top, bottom, left, right, near, far, scaleW,
                                          &sDemo3DCameraPosition, &sDemo3DCameraUpVector, &sDemo3DCameraTarget, heapId);
     GFL_G3DCameraOrthoGetTop(engine->camera, &engine->top);
     GFL_G3DCameraOrthoGetBottom(engine->camera, &engine->bottom);

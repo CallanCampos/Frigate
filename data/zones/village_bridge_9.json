@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 393,
+    "area": "AREA_VILLAGE_BRIDGE_9",
     "matrix": "MAP_MATRIX_VILLAGE_BRIDGE_9",
     "scripts": "SCRIPTS_VILLAGE_BRIDGE_9",
     "text": "SCRIPT_TEXT_VILLAGE_BRIDGE_9",

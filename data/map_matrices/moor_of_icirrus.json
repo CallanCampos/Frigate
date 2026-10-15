@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 513, 515 ],
-        [ 514, 516 ]
+        [ "MAP_MODEL_MOOR_OF_ICIRRUS_M_DUN1801_00_00", "MAP_MODEL_MOOR_OF_ICIRRUS_M_DUN1801_01_00" ],
+        [ "MAP_MODEL_MOOR_OF_ICIRRUS_M_DUN1801_00_01", "MAP_MODEL_MOOR_OF_ICIRRUS_M_DUN1801_01_01" ]
     ]
 }

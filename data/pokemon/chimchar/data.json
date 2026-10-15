@@ -197,5 +197,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CHIMCHAR"
+    "baby_species": "SPECIES_CHIMCHAR",
+    "cry_volume": 120
 }

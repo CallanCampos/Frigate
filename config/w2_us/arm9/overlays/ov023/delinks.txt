@@ -5,6 +5,7 @@
     .bss        start:0x0216f940 end:0x0216f940 kind:bss align:32
 
 src/ov023/event_pokewood.c:
+    complete
     .text       start:0x0216e6a0 end:0x0216f878
     .rodata     start:0x0216f878 end:0x0216f91c
     .data       start:0x0216f920 end:0x0216f940

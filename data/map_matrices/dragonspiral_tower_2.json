@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 547, 549 ],
-        [ 548, 550 ]
+        [ "MAP_MODEL_DRAGONSPIRAL_TOWER_2_M_DUN0809_00_00", "MAP_MODEL_DRAGONSPIRAL_TOWER_2_M_DUN0809_01_00" ],
+        [ "MAP_MODEL_DRAGONSPIRAL_TOWER_2_M_DUN0809_00_01", "MAP_MODEL_DRAGONSPIRAL_TOWER_2_M_DUN0809_01_01" ]
     ]
 }

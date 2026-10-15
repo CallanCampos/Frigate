@@ -1033,15 +1033,17 @@ static void TDownloadUtil_PrintItemLine(TDownloadWork *wk, PrintWindow *window, 
 
 void TDownloadUtil_MoveCursor(TDownloadWork *wk, int type, int pos) {
     ClActorPos cursor;
+    u32 index;
 
     if (type == 0) {
         cursor.x = TDownloadUtil_GetPosition(wk, (pos + 18) * 2);
-        pos += 18;
+        index = pos + 18;
+        cursor.y = TDownloadUtil_GetPosition(wk, index * 2 + 1);
     } else {
         cursor.x = TDownloadUtil_GetPosition(wk, (pos + 27) * 2);
-        pos += 27;
+        index = pos + 27;
+        cursor.y = TDownloadUtil_GetPosition(wk, index * 2 + 1);
     }
-    cursor.y = TDownloadUtil_GetPosition(wk, pos * 2 + 1);
     func_0204c140(wk->actors[2], &cursor, 0);
     if (!(wk->objFlags & T_DOWNLOAD_OBJ_FLAG_CURSOR_KEYS)) {
         TDownloadUtil_SetActorAnim(wk, T_DOWNLOAD_ACTOR_OBJ, 2, 2);
@@ -1049,14 +1051,13 @@ void TDownloadUtil_MoveCursor(TDownloadWork *wk, int type, int pos) {
 }
 
 void TDownloadUtil_SetCursorKeys(TDownloadWork *wk, BOOL active) {
-    u32 flags = wk->objFlags & ~T_DOWNLOAD_OBJ_FLAG_CURSOR_KEYS;
-    int anim = 2;
+    int anim;
 
-    wk->objFlags = flags;
+    wk->objFlags &= ~T_DOWNLOAD_OBJ_FLAG_CURSOR_KEYS;
+    anim = 2;
     if (active == TRUE) {
-        flags |= T_DOWNLOAD_OBJ_FLAG_CURSOR_KEYS;
-        wk->objFlags = flags;
         anim = 3;
+        wk->objFlags |= T_DOWNLOAD_OBJ_FLAG_CURSOR_KEYS;
     }
     TDownloadUtil_SetActorAnim(wk, T_DOWNLOAD_ACTOR_OBJ, 2, anim);
 }
@@ -1082,7 +1083,7 @@ void TDownloadUtil_AnimatePalette(TDownloadWork *wk) {
         if (wk->palAnimCount >= 0x10000) {
             wk->palAnimCount -= 0x10000;
         }
-        ratio = (FX_SIN_COS_TABLE[(wk->palAnimCount >> 4) * 2 + 1] + 0x1000) / 2;
+        ratio = (FX_SinCosTable_[(wk->palAnimCount >> 4) * 2 + 1] + 0x1000) / 2;
         for (i = 0; i < 16; i++) {
             u16 from = wk->palFadeFrom[i];
             u16 to = wk->palFadeTo[i];

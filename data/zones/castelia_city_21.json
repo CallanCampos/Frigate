@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 289,
+    "area": "AREA_STRIATON_CITY_8",
     "matrix": "MAP_MATRIX_CASTELIA_CITY_17",
     "scripts": "SCRIPTS_CASTELIA_CITY_21",
     "text": "SCRIPT_TEXT_CASTELIA_CITY_21",

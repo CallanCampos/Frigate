@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1036, 1037 ],
-        [ 1038, 1039 ]
+        [ "MAP_MODEL_NIMBASA_CITY_17_M_BWGYM0401_00_0", "MAP_MODEL_NIMBASA_CITY_17_M_BWGYM0401_01_0" ],
+        [ "MAP_MODEL_NIMBASA_CITY_17_M_BWGYM0401_00_0_2", "MAP_MODEL_NIMBASA_CITY_17_M_BWGYM0401_01_0_2" ]
     ]
 }

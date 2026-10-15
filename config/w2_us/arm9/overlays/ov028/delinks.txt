@@ -5,16 +5,34 @@
     .bss        start:0x02173120 end:0x02173120 kind:bss align:32
 
 src/ov028/union_comm.c:
+    complete
     .text       start:0x02170380 end:0x02170f08
     .rodata     start:0x02172cd4 end:0x02172df4
     .data       start:0x02172f60 end:0x02172f70
 
 src/ov028/union_main.c:
-    .text       start:0x02170f08 end:0x021723c4
-    .rodata     start:0x02172df4 end:0x02172ee4
-    .data       start:0x02172f70 end:0x021730a8
+    complete
+    .text       start:0x02170f08 end:0x0217114c
+    .data       start:0x02172f70 end:0x02172fcc
 
 src/ov028/colosseum.c:
-    .text       start:0x021723c4 end:0x02172cd4
+    complete
+    .text       start:0x02172870 end:0x02172cd4
+    .data       start:0x021730c4 end:0x02173120
+
+src/ov028/union_receive.c:
+    complete
+    .text       start:0x0217114c end:0x02171a1c
+    .data       start:0x02172fcc end:0x0217302c
+
+src/ov028/union_subproc.c:
+    complete
+    .text       start:0x02171a1c end:0x0217242c
+    .rodata     start:0x02172df4 end:0x02172ee4
+    .data       start:0x0217302c end:0x021730a8
+
+src/ov028/colosseum_comm.c:
+    complete
+    .text       start:0x0217242c end:0x02172870
     .rodata     start:0x02172ee4 end:0x02172f54
-    .data       start:0x021730a8 end:0x02173120
+    .data       start:0x021730a8 end:0x021730c4

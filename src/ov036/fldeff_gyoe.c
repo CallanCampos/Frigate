@@ -212,7 +212,7 @@ static void func_ov036_021b4078(FieldEffectTask *task, void *work) {
     NNS_G3dGlbSetProjectionMtx(&mtx);
     NNS_G3DFlushRenderState();
     NNS_G3DWaitFIFO();
-    MAT3_Identity(&status.rotation);
+    MTX_Identity33_(&status.rotation);
     func_ov036_021a3ad4(task, &status.translation);
     GFL_G3DSysDrawObjBBoxCull(gyoeTask->params.gyoe->actors[gyoeTask->params.kind], &status);
     NNS_G3dGlbSetProjectionMtx(&saved);
@@ -250,10 +250,10 @@ static void func_ov036_021b41a0(G3DCamera *camera, const VecFx32 *src, VecFx32 *
     GFL_G3DCameraGetLookatPos(camera, &camPos);
     GFL_G3DCameraGetLookatUpVector(camera, &camUp);
     GFL_G3DCameraGetLookatTarget(camera, &target);
-    MAT43_LookAt(&camPos, &camUp, &target, &lookAt);
+    MTX_LookAt(&camPos, &camUp, &target, &lookAt);
     MI_Copy36B(&lookAt, &rot);
     MAT3_Invert(&rot, &rot);
-    MAT3_MulVec(src, &rot, dest);
+    MTX_MultVec33(src, &rot, dest);
 }
 
 // The bubble hops up and comes back down, then stays for 30 frames, above the actor's head as the camera sees it

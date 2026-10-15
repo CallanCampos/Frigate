@@ -1473,7 +1473,7 @@ static void GFL_BGSysFillScrArea_EXTENDED(BGSysBG *bg, u16 tile, u8 x, u8 y, u8 
     }
 }
 
-void GFL_BGSysSetScrTile(u8 bg, u32 x, u32 y, u16 map) {
+void GFL_BGSysSetScrTile(u32 bg, u32 x, u32 y, u16 map) {
     u16 *screen = sBGSys->bgs[bg].screen;
     u32 resolution = sBGSys->bgs[bg].resolution;
 

@@ -1,0 +1,3 @@
+developer_instructions = """
+You match one pokebw2 function byte-for-byte. Read CLAUDE.md and .agents/skills/match-function/SKILL.md. Triage the mismatch, use the relevant lever section, score bounded variants, inspect locals, and use the capped permuter only as allowed. Confirm the overlay issue claim before editing. Change only the assigned function or local helper, never headers, docs, configs, or commits. Reject variants that introduce compiler warnings and report warnings already present. Keep natural C and stop under the skill's rules. Report starting and best scores, kept text state, what mattered, header changes needed, and a nonmatching row if needed.
+"""

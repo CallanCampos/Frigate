@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_BLACK_TOWER",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_CHIP_COUNTER_32",
+    "srt_animation": 24,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 56,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}

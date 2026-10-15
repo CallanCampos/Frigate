@@ -133,7 +133,7 @@ static void FieldSoundEmitter_ApplyCurveRotation(FieldSoundEmitter *emitter) {
         rotX = x / 360.0f * 65535.0f;
         rotY = y / 360.0f * 65535.0f;
         rotZ = z / 360.0f * 65535.0f;
-        MAT3_Identity(&emitter->matrix->rotation);
+        MTX_Identity33_(&emitter->matrix->rotation);
         MAT3_RotationEulerZYX(rotX, rotY, rotZ, &emitter->matrix->rotation);
     }
 }

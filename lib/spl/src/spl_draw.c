@@ -96,15 +96,15 @@ void SPLDraw_Billboard(SPLManager *mgr, SPLParticle *particle) {
 
     emitter = mgr->drawEmitter;
     header = emitter->resource->header;
-    alpha = (particle->baseAlpha * (particle->animAlpha + 1)) >> 5;
-    scaleAnimDir = header->scaleAnimDir;
     aspectRatio = header->aspectRatio;
+    scaleAnimDir = header->scaleAnimDir;
+    alpha = (particle->baseAlpha * (particle->animAlpha + 1)) >> 5;
     emitterColor = emitter->color;
     animScale = particle->animScale;
     color = particle->color;
     viewMatrix = mgr->viewMatrix;
-    reg_G3_POLYGON_ATTR = GX_PACK_POLYGONATTR_PARAM(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE,
-                                                    particle->polygonId, alpha, mgr->polygonAttr);
+    G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, particle->polygonId, alpha,
+                   mgr->polygonAttr);
     (void)reg_G3_POLYGON_ATTR;
     if (alpha == 0) {
         return;
@@ -125,7 +125,7 @@ void SPLDraw_Billboard(SPLManager *mgr, SPLParticle *particle) {
         pos.x = particle->position.x + particle->emitterPos.x;
         pos.y = particle->position.y + particle->emitterPos.y;
         pos.z = particle->position.z + particle->emitterPos.z;
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
         sin = FX_SinIdx(particle->rotation);
         cos = FX_CosIdx(particle->rotation);
         mtx.m[0][0] = FX_Mul(cos, scaleX);
@@ -146,7 +146,7 @@ void SPLDraw_Billboard(SPLManager *mgr, SPLParticle *particle) {
         pos.x = particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
         pos.y = particle->position.y + particle->emitterPos.y - mgr->drawEmitter->resource->header->emitterBasePos.y;
         pos.z = particle->position.z + particle->emitterPos.z - mgr->drawEmitter->resource->header->emitterBasePos.z;
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
         sin = FX_SinIdx(particle->rotation);
         cos = FX_CosIdx(particle->rotation);
         mtx.m[0][0] = FX_Mul(cos, scaleX);
@@ -210,7 +210,7 @@ void SPLDraw_Child_Billboard(SPLManager *mgr, SPLParticle *particle) {
         pos.x = particle->position.x + particle->emitterPos.x;
         pos.y = particle->position.y + particle->emitterPos.y;
         pos.z = particle->position.z + particle->emitterPos.z;
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
         sin = FX_SinIdx(particle->rotation);
         cos = FX_CosIdx(particle->rotation);
         mtx.m[0][0] = FX_Mul(cos, scaleX);
@@ -231,7 +231,7 @@ void SPLDraw_Child_Billboard(SPLManager *mgr, SPLParticle *particle) {
         pos.x = particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
         pos.y = particle->position.y + particle->emitterPos.y - mgr->drawEmitter->resource->header->emitterBasePos.y;
         pos.z = particle->position.z + particle->emitterPos.z - mgr->drawEmitter->resource->header->emitterBasePos.z;
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
         sin = FX_SinIdx(particle->rotation);
         cos = FX_CosIdx(particle->rotation);
         mtx.m[0][0] = FX_Mul(cos, scaleX);
@@ -307,17 +307,17 @@ void SPLDraw_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         viewZ.x = viewMatrix->m[0][2];
         viewZ.y = viewMatrix->m[1][2];
         viewZ.z = viewMatrix->m[2][2];
-        vecfx_cross(&dir, &viewZ, &dir);
+        VEC_CrossProduct(&dir, &viewZ, &dir);
         if (dir.x == 0 && dir.y == 0 && dir.z == 0) {
             return;
         }
-        vecfx_normalize(&dir, &dir);
+        VEC_Normalize(&dir, &dir);
         MI_Copy36B(viewMatrix, &rot);
-        MAT3_MulVec(&dir, &rot, &dir);
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec33(&dir, &rot, &dir);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
 
         vel = particle->velocity;
-        vecfx_normalize(&vel, &vel);
+        VEC_Normalize(&vel, &vel);
         dot = FX_Mul(vel.z, -viewMatrix->m[2][2]) +
               (FX_Mul(vel.x, -viewMatrix->m[0][2]) + FX_Mul(vel.y, -viewMatrix->m[1][2]));
         if (dot < 0) {
@@ -348,17 +348,17 @@ void SPLDraw_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         viewZ.x = viewMatrix->m[0][2];
         viewZ.y = viewMatrix->m[1][2];
         viewZ.z = viewMatrix->m[2][2];
-        vecfx_cross(&dir, &viewZ, &dir);
+        VEC_CrossProduct(&dir, &viewZ, &dir);
         if (dir.x == 0 && dir.y == 0 && dir.z == 0) {
             return;
         }
-        vecfx_normalize(&dir, &dir);
+        VEC_Normalize(&dir, &dir);
         MI_Copy36B(viewMatrix, &rot);
-        MAT3_MulVec(&dir, &rot, &dir);
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec33(&dir, &rot, &dir);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
 
         vel = particle->velocity;
-        vecfx_normalize(&vel, &vel);
+        VEC_Normalize(&vel, &vel);
         dot = FX_Mul(vel.z, -viewMatrix->m[2][2]) +
               (FX_Mul(vel.x, -viewMatrix->m[0][2]) + FX_Mul(vel.y, -viewMatrix->m[1][2]));
         if (dot < 0) {
@@ -438,17 +438,17 @@ void SPLDraw_Child_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         viewZ.x = viewMatrix->m[0][2];
         viewZ.y = viewMatrix->m[1][2];
         viewZ.z = viewMatrix->m[2][2];
-        vecfx_cross(&dir, &viewZ, &dir);
+        VEC_CrossProduct(&dir, &viewZ, &dir);
         if (dir.x == 0 && dir.y == 0 && dir.z == 0) {
             return;
         }
-        vecfx_normalize(&dir, &dir);
+        VEC_Normalize(&dir, &dir);
         MI_Copy36B(viewMatrix, &rot);
-        MAT3_MulVec(&dir, &rot, &dir);
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec33(&dir, &rot, &dir);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
 
         vel = particle->velocity;
-        vecfx_normalize(&vel, &vel);
+        VEC_Normalize(&vel, &vel);
         dot = FX_Mul(vel.z, -viewMatrix->m[2][2]) +
               (FX_Mul(vel.x, -viewMatrix->m[0][2]) + FX_Mul(vel.y, -viewMatrix->m[1][2]));
         if (dot < 0) {
@@ -479,17 +479,17 @@ void SPLDraw_Child_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         viewZ.x = viewMatrix->m[0][2];
         viewZ.y = viewMatrix->m[1][2];
         viewZ.z = viewMatrix->m[2][2];
-        vecfx_cross(&dir, &viewZ, &dir);
+        VEC_CrossProduct(&dir, &viewZ, &dir);
         if (dir.x == 0 && dir.y == 0 && dir.z == 0) {
             return;
         }
-        vecfx_normalize(&dir, &dir);
+        VEC_Normalize(&dir, &dir);
         MI_Copy36B(viewMatrix, &rot);
-        MAT3_MulVec(&dir, &rot, &dir);
-        MAT43_MulVec(&pos, viewMatrix, &pos);
+        MTX_MultVec33(&dir, &rot, &dir);
+        MTX_MultVec43(&pos, viewMatrix, &pos);
 
         vel = particle->velocity;
-        vecfx_normalize(&vel, &vel);
+        VEC_Normalize(&vel, &vel);
         dot = FX_Mul(vel.z, -viewMatrix->m[2][2]) +
               (FX_Mul(vel.x, -viewMatrix->m[0][2]) + FX_Mul(vel.y, -viewMatrix->m[1][2]));
         if (dot < 0) {
@@ -553,8 +553,8 @@ void SPLDraw_Polygon(SPLManager *mgr, SPLParticle *particle) {
         scaleY = FX_MUL(scaleY, particle->animScale);
         break;
     }
-    MAT43_Scaling(&scale, scaleX, scaleY, scaleY);
-    MAT43_Mul(&scale, &rot, &mtx);
+    MTX_Scale43_(&scale, scaleX, scaleY, scaleY);
+    MTX_Concat43(&scale, &rot, &mtx);
 
     if (!mgr->drawEmitter->resource->header->flags.relativeToBasePos) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;
@@ -615,8 +615,8 @@ void SPLDraw_Child_Polygon(SPLManager *mgr, SPLParticle *particle) {
         scaleY = FX_MUL(scaleY, particle->animScale);
         break;
     }
-    MAT43_Scaling(&scale, scaleX, scaleY, scaleY);
-    MAT43_Mul(&rot, &scale, &mtx);
+    MTX_Scale43_(&scale, scaleX, scaleY, scaleY);
+    MTX_Concat43(&rot, &scale, &mtx);
 
     if (!mgr->drawEmitter->resource->header->flags.relativeToBasePos) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;
@@ -671,11 +671,11 @@ void SPLDraw_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
                                                                            FX_CosIdx(particle->rotation), &rot);
 
     // A frame with its y axis along the direction
-    MAT43_Identity(&dirMtx);
+    MTX_Identity43_(&dirMtx);
     if (!mgr->drawEmitter->resource->header->dirFromPosition) {
-        vecfx_normalize(&particle->velocity, &dir);
+        VEC_Normalize(&particle->velocity, &dir);
     } else {
-        vecfx_normalize(&particle->position, &dir);
+        VEC_Normalize(&particle->position, &dir);
         dir.x = -dir.x;
         dir.y = -dir.y;
         dir.z = -dir.z;
@@ -683,14 +683,14 @@ void SPLDraw_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
     up.x = 0;
     up.y = FX32_ONE;
     up.z = 0;
-    dot = vecfx_dot(&dir, &up);
+    dot = VEC_DotProduct(&dir, &up);
     if (dot > FX32_CONST(0.8) || dot < FX32_CONST(-0.8)) {
         up.x = FX32_ONE;
         up.y = 0;
         up.z = 0;
     }
-    vecfx_cross(&dir, &up, &side);
-    vecfx_cross(&dir, &side, &normal);
+    VEC_CrossProduct(&dir, &up, &side);
+    VEC_CrossProduct(&dir, &side, &normal);
     dirMtx.m[0][0] = side.x;
     dirMtx.m[0][1] = side.y;
     dirMtx.m[0][2] = side.z;
@@ -700,7 +700,7 @@ void SPLDraw_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
     dirMtx.m[2][0] = normal.x;
     dirMtx.m[2][1] = normal.y;
     dirMtx.m[2][2] = normal.z;
-    MAT43_Mul(&rot, &dirMtx, &rot);
+    MTX_Concat43(&rot, &dirMtx, &rot);
 
     scaleX = FX_Mul(particle->baseScale, mgr->drawEmitter->resource->header->aspectRatio);
     scaleY = particle->baseScale;
@@ -716,8 +716,8 @@ void SPLDraw_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
         scaleY = FX_MUL(scaleY, particle->animScale);
         break;
     }
-    MAT43_Scaling(&scale, scaleX, scaleY, scaleY);
-    MAT43_Mul(&scale, &rot, &mtx);
+    MTX_Scale43_(&scale, scaleX, scaleY, scaleY);
+    MTX_Concat43(&scale, &rot, &mtx);
 
     if (!mgr->drawEmitter->resource->header->flags.relativeToBasePos) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;
@@ -772,11 +772,11 @@ void SPLDraw_Child_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
                                                                             FX_CosIdx(particle->rotation), &rot);
 
     // A frame with its y axis along the direction
-    MAT43_Identity(&dirMtx);
+    MTX_Identity43_(&dirMtx);
     if (!mgr->drawEmitter->resource->childResource->dirFromPosition) {
-        vecfx_normalize(&particle->velocity, &dir);
+        VEC_Normalize(&particle->velocity, &dir);
     } else {
-        vecfx_normalize(&particle->position, &dir);
+        VEC_Normalize(&particle->position, &dir);
         dir.x = -dir.x;
         dir.y = -dir.y;
         dir.z = -dir.z;
@@ -784,14 +784,14 @@ void SPLDraw_Child_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
     up.x = 0;
     up.y = FX32_ONE;
     up.z = 0;
-    dot = vecfx_dot(&dir, &up);
+    dot = VEC_DotProduct(&dir, &up);
     if (dot > FX32_CONST(0.8) || dot < FX32_CONST(-0.8)) {
         up.x = FX32_ONE;
         up.y = 0;
         up.z = 0;
     }
-    vecfx_cross(&dir, &up, &side);
-    vecfx_cross(&dir, &side, &normal);
+    VEC_CrossProduct(&dir, &up, &side);
+    VEC_CrossProduct(&dir, &side, &normal);
     dirMtx.m[0][0] = side.x;
     dirMtx.m[0][1] = side.y;
     dirMtx.m[0][2] = side.z;
@@ -801,7 +801,7 @@ void SPLDraw_Child_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
     dirMtx.m[2][0] = normal.x;
     dirMtx.m[2][1] = normal.y;
     dirMtx.m[2][2] = normal.z;
-    MAT43_Mul(&rot, &dirMtx, &rot);
+    MTX_Concat43(&rot, &dirMtx, &rot);
 
     scaleX = FX_Mul(particle->baseScale, mgr->drawEmitter->resource->header->aspectRatio);
     scaleY = particle->baseScale;
@@ -817,8 +817,8 @@ void SPLDraw_Child_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
         scaleY = FX_MUL(scaleY, particle->animScale);
         break;
     }
-    MAT43_Scaling(&scale, scaleX, scaleY, scaleY);
-    MAT43_Mul(&rot, &scale, &mtx);
+    MTX_Scale43_(&scale, scaleX, scaleY, scaleY);
+    MTX_Concat43(&rot, &scale, &mtx);
 
     if (!mgr->drawEmitter->resource->header->flags.relativeToBasePos) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;

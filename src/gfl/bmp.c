@@ -28,10 +28,10 @@ static void GFL_BitmapCopyArea_IDX4_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
                                          s16 destY, u16 width, u16 height, u16 colorKey);
 static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, u16 srcX, u16 srcY, s16 destX,
                                          s16 destY, u16 width, u16 height, u16 colorKey);
-static void GFL_BitmapFillArea_IDX4(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color);
-static void GFL_BitmapFillArea_IDX8(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color);
-static void GFL_BitmapFillArea_IDX4_VRAM(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color);
-static void GFL_BitmapFillArea_IDX8_VRAM(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color);
+static void GFL_BitmapFillArea_IDX4(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color);
+static void GFL_BitmapFillArea_IDX8(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color);
+static void GFL_BitmapFillArea_IDX4_VRAM(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color);
+static void GFL_BitmapFillArea_IDX8_VRAM(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color);
 
 GFLBitmap *GFL_BitmapCreate(u32 tileWidth, u32 tileHeight, u32 tileSize, HeapID heapId) {
     GFLBitmap *bitmap = GFL_HeapAllocate(heapId, sizeof(GFLBitmap), FALSE, "bmp.c", 97);
@@ -182,8 +182,8 @@ void GFL_BitmapFill(GFLBitmap *bitmap, u8 color) {
 }
 
 // Clips a copy to the source and the destination, and returns whether any of it is left
-static inline BOOL ClipCopyArea(const GFLBitmap *src, GFLBitmap *dest, u32 *srcX, u32 *srcY, int *destX, int *destY,
-                                u32 *width, u32 *height) {
+static inline BOOL ClipCopyArea(const GFLBitmap *src, const GFLBitmap *dest, u32 *srcX, u32 *srcY, int *destX,
+                                int *destY, u32 *width, u32 *height) {
     u32 h = *height;
     u32 w = *width;
 
@@ -220,15 +220,15 @@ static inline BOOL ClipCopyArea(const GFLBitmap *src, GFLBitmap *dest, u32 *srcX
 
 static void GFL_BitmapCopyArea_IDX4(const GFLBitmap *src, GFLBitmap *dest, u32 srcX, u32 srcY, int destX, int destY,
                                     u32 width, u32 height, u16 colorKey) {
-    int srcTilesX;
-    int destTilesX;
+    u32 srcTilesX;
+    u32 destTilesX;
     u32 i;
     u32 j;
-    u32 sx;
     int dx;
+    int sx;
     u8 *srcPixel;
     u8 *destPixel;
-    u8 color;
+    int color;
     int shift;
 
     if (!ClipCopyArea(src, dest, &srcX, &srcY, &destX, &destY, &width, &height)) {
@@ -263,12 +263,12 @@ static void GFL_BitmapCopyArea_IDX4(const GFLBitmap *src, GFLBitmap *dest, u32 s
 
 static void GFL_BitmapCopyArea_IDX8(const GFLBitmap *src, GFLBitmap *dest, u32 srcX, u32 srcY, int destX, int destY,
                                     u32 width, u32 height, u16 colorKey) {
-    int srcTilesX;
-    int destTilesX;
+    u32 srcTilesX;
+    u32 destTilesX;
     u32 i;
     u32 j;
-    u32 sx;
     int dx;
+    int sx;
     u8 *srcPixel;
     u8 *destPixel;
 
@@ -300,15 +300,15 @@ static void GFL_BitmapCopyArea_IDX8(const GFLBitmap *src, GFLBitmap *dest, u32 s
 
 static void GFL_BitmapCopyAreaRebased_IDX8(const GFLBitmap *src, GFLBitmap *dest, u32 srcX, u32 srcY, int destX,
                                            int destY, u32 width, u32 height, u16 colorKey, u8 paletteOffset) {
-    int srcTilesX;
-    int destTilesX;
+    u32 srcTilesX;
+    u32 destTilesX;
     u32 i;
     u32 j;
-    u32 sx;
     int dx;
+    int sx;
     u8 *srcPixel;
     u8 *destPixel;
-    u8 color;
+    int color;
 
     if (!ClipCopyArea(src, dest, &srcX, &srcY, &destX, &destY, &width, &height)) {
         return;
@@ -318,8 +318,8 @@ static void GFL_BitmapCopyAreaRebased_IDX8(const GFLBitmap *src, GFLBitmap *dest
     if (colorKey == GFL_BITMAP_NO_COLOR_KEY) {
         for (i = 0; i < height; i++, srcY++, destY++) {
             for (j = 0, dx = destX, sx = srcX; j < width; j++, sx++, dx++) {
-                destPixel = PIXEL_ADDR_256(dest->pixels, dx, destY, destTilesX);
                 srcPixel = PIXEL_ADDR_16(src->pixels, sx, srcY, srcTilesX);
+                destPixel = PIXEL_ADDR_256(dest->pixels, dx, destY, destTilesX);
                 color = (*srcPixel >> ((sx & 1) * 4)) & 0xf;
                 if (color != 0) {
                     color += paletteOffset;
@@ -331,11 +331,12 @@ static void GFL_BitmapCopyAreaRebased_IDX8(const GFLBitmap *src, GFLBitmap *dest
         // Any color key leaves color 0 transparent
         for (i = 0; i < height; i++, srcY++, destY++) {
             for (j = 0, dx = destX, sx = srcX; j < width; j++, sx++, dx++) {
-                destPixel = PIXEL_ADDR_256(dest->pixels, dx, destY, destTilesX);
                 srcPixel = PIXEL_ADDR_16(src->pixels, sx, srcY, srcTilesX);
+                destPixel = PIXEL_ADDR_256(dest->pixels, dx, destY, destTilesX);
                 color = (*srcPixel >> ((sx & 1) * 4)) & 0xf;
                 if (color != 0) {
-                    *destPixel = color + paletteOffset;
+                    color += paletteOffset;
+                    *destPixel = color;
                 }
             }
         }
@@ -345,10 +346,10 @@ static void GFL_BitmapCopyAreaRebased_IDX8(const GFLBitmap *src, GFLBitmap *dest
 // VRAM only takes 16-bit writes, so a pixel's byte is written with its neighbor
 static void GFL_BitmapCopyArea_IDX4_VRAM(const GFLBitmap *src, GFLBitmap *dest, u16 srcX, u16 srcY, s16 destX,
                                          s16 destY, u16 width, u16 height, u16 colorKey) {
-    int dx;
-    int dy;
     int sx;
     int sy;
+    int dx;
+    int dy;
     int xEnd;
     int yEnd;
     int srcTilesX;
@@ -358,7 +359,7 @@ static void GFL_BitmapCopyArea_IDX4_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
     BOOL odd;
     u16 high;
     u16 low;
-    u8 color;
+    int color;
     int shift;
 
     if (dest->width - destX < width) {
@@ -428,10 +429,10 @@ static void GFL_BitmapCopyArea_IDX4_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
 
 static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, u16 srcX, u16 srcY, s16 destX,
                                          s16 destY, u16 width, u16 height, u16 colorKey) {
-    int dx;
-    int dy;
     int sx;
     int sy;
+    int dx;
+    int dy;
     int xEnd;
     int yEnd;
     int srcTilesX;
@@ -439,7 +440,6 @@ static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
     u8 *srcPixel;
     u8 *destPixel;
     u16 pixels;
-    u8 color;
 
     if (dest->width - destX < width) {
         xEnd = srcX + (dest->width - destX);
@@ -460,8 +460,8 @@ static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
                     srcPixel = PIXEL_ADDR_256(src->pixels, sx, sy, srcTilesX);
                     destPixel = PIXEL_ADDR_256(dest->pixels, dx, dy, destTilesX);
                     if ((u32)destPixel & 1) {
-                        pixels = (srcPixel[0] << 8) | srcPixel[-1];
                         destPixel--;
+                        pixels = (srcPixel[0] << 8) | srcPixel[-1];
                     } else {
                         pixels = srcPixel[0] | (srcPixel[1] << 8);
                     }
@@ -475,14 +475,13 @@ static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
                 if (dx >= 0 && dy >= 0) {
                     srcPixel = PIXEL_ADDR_256(src->pixels, sx, sy, srcTilesX);
                     destPixel = PIXEL_ADDR_256(dest->pixels, dx, dy, destTilesX);
-                    color = srcPixel[0];
                     if ((u32)destPixel & 1) {
-                        pixels = srcPixel[-1] | (color << 8);
                         destPixel--;
+                        pixels = (srcPixel[0] << 8) | srcPixel[-1];
                     } else {
-                        pixels = color | (srcPixel[1] << 8);
+                        pixels = srcPixel[0] | (srcPixel[1] << 8);
                     }
-                    if (color != colorKey) {
+                    if (srcPixel[0] != colorKey) {
                         *(u16 *)destPixel = pixels;
                     }
                 }
@@ -491,11 +490,11 @@ static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
     }
 }
 
-static void GFL_BitmapFillArea_IDX4(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color) {
+static void GFL_BitmapFillArea_IDX4(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color) {
     int xEnd = x + width;
     int yEnd;
     int tilesX;
-    int i;
+    int i, j;
     u8 *pixel;
 
     if (xEnd > bitmap->width) {
@@ -506,10 +505,10 @@ static void GFL_BitmapFillArea_IDX4(GFLBitmap *bitmap, int x, int y, int width, 
         yEnd = bitmap->height;
     }
     tilesX = PIXELS_TO_TILES(bitmap->width);
-    for (; y < yEnd; y++) {
+    for (j = y; j < yEnd; j++) {
         for (i = x; i < xEnd; i++) {
-            if (i >= 0 && y >= 0) {
-                pixel = PIXEL_ADDR_16(bitmap->pixels, i, y, tilesX);
+            if (i >= 0 && j >= 0) {
+                pixel = PIXEL_ADDR_16(bitmap->pixels, i, j, tilesX);
                 if (i & 1) {
                     *pixel &= 0xf;
                     *pixel |= color << 4;
@@ -522,11 +521,11 @@ static void GFL_BitmapFillArea_IDX4(GFLBitmap *bitmap, int x, int y, int width, 
     }
 }
 
-static void GFL_BitmapFillArea_IDX8(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color) {
+static void GFL_BitmapFillArea_IDX8(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color) {
     int xEnd = x + width;
     int yEnd;
     int tilesX;
-    int i;
+    int i, j;
 
     if (xEnd > bitmap->width) {
         xEnd = bitmap->width;
@@ -536,20 +535,20 @@ static void GFL_BitmapFillArea_IDX8(GFLBitmap *bitmap, int x, int y, int width, 
         yEnd = bitmap->height;
     }
     tilesX = PIXELS_TO_TILES(bitmap->width);
-    for (; y < yEnd; y++) {
+    for (j = y; j < yEnd; j++) {
         for (i = x; i < xEnd; i++) {
-            if (i >= 0 && y >= 0) {
-                *PIXEL_ADDR_256(bitmap->pixels, i, y, tilesX) = color;
+            if (i >= 0 && j >= 0) {
+                *PIXEL_ADDR_256(bitmap->pixels, i, j, tilesX) = color;
             }
         }
     }
 }
 
-static void GFL_BitmapFillArea_IDX4_VRAM(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color) {
+static void GFL_BitmapFillArea_IDX4_VRAM(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color) {
     int xEnd = x + width;
     int yEnd;
     int tilesX;
-    int i;
+    int i, j;
     u16 *pixels;
     BOOL odd;
     u16 high;
@@ -564,10 +563,10 @@ static void GFL_BitmapFillArea_IDX4_VRAM(GFLBitmap *bitmap, int x, int y, int wi
         yEnd = bitmap->height;
     }
     tilesX = PIXELS_TO_TILES(bitmap->width);
-    for (; y < yEnd; y++) {
+    for (j = y; j < yEnd; j++) {
         for (i = x; i < xEnd; i++) {
-            if (i >= 0 && y >= 0) {
-                pixels = (u16 *)PIXEL_ADDR_16(bitmap->pixels, i, y, tilesX);
+            if (i >= 0 && j >= 0) {
+                pixels = (u16 *)PIXEL_ADDR_16(bitmap->pixels, i, j, tilesX);
                 if ((u32)pixels & 1) {
                     pixels = (u16 *)((u8 *)pixels - 1);
                     odd = TRUE;
@@ -588,11 +587,11 @@ static void GFL_BitmapFillArea_IDX4_VRAM(GFLBitmap *bitmap, int x, int y, int wi
 }
 
 // The same as GFL_BitmapFillArea_IDX8, as a write of a byte to VRAM is lost
-static void GFL_BitmapFillArea_IDX8_VRAM(GFLBitmap *bitmap, int x, int y, int width, u16 height, u8 color) {
+static void GFL_BitmapFillArea_IDX8_VRAM(GFLBitmap *bitmap, s16 x, s16 y, u16 width, u16 height, u8 color) {
     int xEnd = x + width;
     int yEnd;
     int tilesX;
-    int i;
+    int i, j;
 
     if (xEnd > bitmap->width) {
         xEnd = bitmap->width;
@@ -602,10 +601,10 @@ static void GFL_BitmapFillArea_IDX8_VRAM(GFLBitmap *bitmap, int x, int y, int wi
         yEnd = bitmap->height;
     }
     tilesX = PIXELS_TO_TILES(bitmap->width);
-    for (; y < yEnd; y++) {
+    for (j = y; j < yEnd; j++) {
         for (i = x; i < xEnd; i++) {
-            if (i >= 0 && y >= 0) {
-                *PIXEL_ADDR_256(bitmap->pixels, i, y, tilesX) = color;
+            if (i >= 0 && j >= 0) {
+                *PIXEL_ADDR_256(bitmap->pixels, i, j, tilesX) = color;
             }
         }
     }
@@ -613,19 +612,20 @@ static void GFL_BitmapFillArea_IDX8_VRAM(GFLBitmap *bitmap, int x, int y, int wi
 
 GFLBitmap *GFL_BitmapMakeLinear(GFLBitmap *bitmap, BOOL keepAsNew, HeapID heapId) {
     u16 tileSize = bitmap->tileSize;
-    u16 rowSize = tileSize / 8;
+    u16 bytesPerTileRow = tileSize / 8;
     u16 tilesY = bitmap->height / 8;
     u16 tilesX = bitmap->width / 8;
     GFLBitmap *linear = GFL_BitmapCreate(tilesX, tilesY, tileSize, heapId);
-    int i;
+    int byteIndex;
 
-    for (i = 0; i < tilesX * tilesY * tileSize; i++) {
-        int y = i / (tilesX * rowSize);
-        int x = i % (tilesX * rowSize);
-        int col = x % rowSize;
-        int tile = x / rowSize;
+    for (byteIndex = 0; byteIndex < tilesX * tilesY * tileSize; byteIndex++) {
+        int y = byteIndex / (tilesX * bytesPerTileRow);
+        int rowByteOffset = byteIndex % (tilesX * bytesPerTileRow);
+        int byteInTileRow = rowByteOffset % bytesPerTileRow;
+        int tileColumn = rowByteOffset / bytesPerTileRow;
 
-        linear->pixels[i] = bitmap->pixels[col + (y % 8) * rowSize + (tile + (y / 8) * tilesX) * tileSize];
+        linear->pixels[byteIndex] =
+            bitmap->pixels[byteInTileRow + (y % 8) * bytesPerTileRow + (tileColumn + (y / 8) * tilesX) * tileSize];
     }
     if (keepAsNew == FALSE) {
         GFL_BitmapCopy(linear, bitmap);

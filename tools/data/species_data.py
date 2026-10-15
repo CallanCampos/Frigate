@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The species data in data/pokemon/, one JSON file per species, form and extra record, as pokeplatinum's res/pokemon/:
+"""The species data in data/pokemon/, one JSON file per species and form, as pokeplatinum's res/pokemon/:
 dump writes them from the ROM once, and pack builds the archives from them, which the build does.
 
     species_data.py dump extract/b2_us/files data/pokemon
@@ -9,16 +9,18 @@ A record holds what the game keeps in four archives: the species data (a/0/1/6),
 evolutions (a/0/1/9) and its baby species (a/0/2/0), and a species' file its egg moves too (a/1/2/4).
 species.schema.json describes each field. The records are, in order:
 
-- the species of data/constants/species.txt, in data/pokemon/<species>/data.json, from SPECIES_NONE in none/;
-- the extra records, which no species' forms point at, in data/pokemon/extra/<record>.json, in order of their numbers;
+- the species of data/constants/species.txt, in data/pokemon/<species>/data.json, from SPECIES_NONE in none/: the
+  national Pokédex's, then from SPECIES_EGG the egg, the bad egg and the Pokéstar Studios species, which have no text
+  here, since their names are lines of species_names.txt after the national Pokédex's and they have no Pokédex entry;
 - the forms that have records of their own, in data/pokemon/<species>/form_<n>.json, in the order of
   data/pokemon/forms.json. A species' first form record is set from where its forms are.
 
-The species data archive ends with the Unova Pokédex numbers of the species and extra records, which their files hold
-as regional_dex_number; the baby species archive has no entries for the forms.
+The species data archive ends with the Unova Pokédex numbers of the species, which their files hold as
+regional_dex_number; the baby species archive has no entries for the forms.
 
 A species' egg moves (a/1/2/4, one entry per species, a count and the moves) are its learnset's egg_moves;
-SPECIES_NONE's entry is empty, so its file has none, and forms and extra records have none.
+SPECIES_NONE's entry is empty, so its file has none; only the national Pokédex's species have entries.
+Species records also keep cry_volume from a/1/9/1; pokemon_cries.py packs that archive.
 
 The experience tables of the growth rates (a/0/1/7) are data/pokemon/growth_rates.csv: a row per level from 0 to 100
 and a column per table, in archive order, each headed by its GROWTH_* constant. The two tables after the growth rates
@@ -96,7 +98,10 @@ def machine_name(bit: int) -> str:
 
 
 def directory(species: str) -> str:
-    return species.removeprefix("SPECIES_").lower()
+    """Returns a species' directory in data/pokemon/: its name, or for a Pokéstar Studios species, which is no
+    Pokémon but a movie's prop or costume, pokestar/ and its name there."""
+    name = species.removeprefix("SPECIES_").lower()
+    return f"pokestar/{name.removeprefix('pokestar_')}" if name.startswith("pokestar_") else name
 
 
 # Dumping
@@ -169,11 +174,13 @@ def dump(files: Path, output: Path):
     evolutions = read_narc((files / "a/0/1/9").read_bytes())
     babies = read_narc((files / "a/0/2/0").read_bytes())
     egg_moves = read_narc((files / "a/1/2/4").read_bytes())
+    cry_volumes = read_narc((files / "a/1/9/1").read_bytes())
     *records, table = personal
     dex = struct.unpack(f"<{len(table) // 2}H", table)
     species = sorted(load_list("species").items(), key=lambda item: item[1])
     if [v for _, v in species] != list(range(len(species))):
         sys.exit("species.txt doesn't number the species from 0 in order")
+    national = national_species()
 
     # The form records, by the species whose forms field points at them
     forms = []
@@ -199,15 +206,21 @@ def dump(files: Path, output: Path):
     names, with_article, categories, entries, heights, weights = (
         message_lines(text, n) for n in (NAMES, NAMES_WITH_ARTICLE, CATEGORIES, POKEDEX_ENTRIES, HEIGHTS, WEIGHTS))
     # After the species' entries, heights and weights, an empty one and then the alternate forms', in species order
-    form_lines = len(species) + 1
+    form_lines = national + 1
     languages = {language: [message_lines(text, n) for n in files_] for language, files_ in LANGUAGES.items()}
     language_forms = {name_: i for i, name_ in enumerate(LANGUAGE_FORMS)}
     for name_, index in species:
         data = entry(index)
-        if egg_moves[index]:
+        if 0 < index < len(cry_volumes):
+            data["cry_volume"] = struct.unpack_from("<H", cry_volumes[index], 2)[0]
+        if index < len(egg_moves) and egg_moves[index]:
             count = struct.unpack_from("<H", egg_moves[index])[0]
             moves = struct.unpack_from(f"<{count}H", egg_moves[index], 2)
             data["learnset"]["egg_moves"] = [name("MOVE_", move) for move in moves]
+        if index >= national:
+            data["$schema"] = "../" * (directory(name_).count("/") + 1) + "species.schema.json"
+            write(output / directory(name_) / "data.json", data)
+            continue
         species_text = {"name": to_json(names[index])}
         # SPECIES_NONE's line is empty
         if index and f"{{bd01}}{article(species_text)} {{ff00:255}}{names[index]}" != with_article[index]:
@@ -235,8 +248,8 @@ def dump(files: Path, output: Path):
         species_text["pokedex"] = pokedex
         schema = {"$schema": data.pop("$schema")}
         write(output / directory(name_) / "data.json", {**schema, **species_text, **data})
-    for index in range(len(species), form_start):
-        write(output / "extra" / f"{index}.json", entry(index))
+    if len(species) != form_start:
+        sys.exit(f"species.txt has {len(species)} species, but the form records start at {form_start}")
     for record, name_, form in forms:
         write(output / directory(name_) / f"form_{form}.json", entry(record))
     write(output / "forms.json", [[name_, form] for _, name_, form in forms])
@@ -264,15 +277,19 @@ def growth_tables(path: Path) -> list[bytes]:
     return [struct.pack("<101I", *(int(row[column]) for row in rows)) for column in range(1, len(header))]
 
 
+def national_species() -> int:
+    """Returns the number of the national Pokédex's species, from SPECIES_NONE: the species before SPECIES_EGG."""
+    return load_list("species")["SPECIES_EGG"]
+
+
 # Packing
 
 
 def record_files(root: Path) -> tuple[list[Path], int, dict[str, int]]:
-    """Returns the files of the records in order, the number of records with a baby species (the species and extra
-    records), and the first form record of each species with forms."""
+    """Returns the files of the records in order, the number of records with a baby species (the species'), and the
+    first form record of each species with forms."""
     species = sorted(load_list("species").items(), key=lambda item: item[1])
     files = [root / directory(name_) / "data.json" for name_, _ in species]
-    files += sorted((root / "extra").glob("*.json"), key=lambda path: int(path.stem))
     with_babies = len(files)
     first_forms: dict[str, int] = {}
     for species_name, form in json.loads((root / "forms.json").read_text()):
@@ -316,15 +333,14 @@ def record_bytes(data: dict, first_form: int, tutors_by_bit: list[list[str]], wh
 def pack(root: Path, outputs: list[Path]):
     schema = load_schema(root / "species.schema.json")
     files, with_babies, first_forms = record_files(root)
-    species_count = len(load_list("species"))
+    national = national_species()
     personal, levelup, evolutions, babies, dex, egg_moves = [], [], [], [], [], []
     tutors_by_bit = tutor_moves()
     for index, path in enumerate(files):
         where = label(path)
         data = load(path, schema)
         if (index < with_babies) != ("baby_species" in data and "regional_dex_number" in data):
-            raise DataError(f"{where}: a species or extra record has baby_species and regional_dex_number, and a form "
-                            "has neither")
+            raise DataError(f"{where}: a species has baby_species and regional_dex_number, and a form has neither")
         species_name = f"SPECIES_{path.parent.name.upper()}"
         first_form = first_forms.get(species_name, 0) if path.name == "data.json" else 0
         personal.append(record_bytes(data, first_form, tutors_by_bit, where))
@@ -333,12 +349,12 @@ def pack(root: Path, outputs: list[Path]):
         entries = [(value(e["method"], where), value(e["param"], where), value(e["species"], where))
                    for e in data["evolutions"]]
         evolutions.append(b"".join(struct.pack("<3H", *e) for e in entries + [(0, 0, 0)] * (EVOLUTIONS - len(entries))))
-        if index < species_count:
+        if index < national:
             moves = [value(move, where) for move in data["learnset"].get("egg_moves", [])]
             empty = "egg_moves" not in data["learnset"]
             egg_moves.append(b"" if empty else struct.pack(f"<H{len(moves)}H", len(moves), *moves))
         elif "egg_moves" in data["learnset"]:
-            raise DataError(f"{where}: only a species has egg_moves, not a form or an extra record")
+            raise DataError(f"{where}: only a national Pokédex species has egg_moves")
         if index < with_babies:
             babies.append(struct.pack("<H", value(data["baby_species"], where)))
             number = data["regional_dex_number"]

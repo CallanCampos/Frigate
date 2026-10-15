@@ -187,5 +187,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_CHARMANDER"
+    "baby_species": "SPECIES_CHARMANDER",
+    "cry_volume": 125
 }

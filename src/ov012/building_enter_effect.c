@@ -43,7 +43,7 @@ void setBuildingEnterVBlankCallback(void) {
 void func_ov012_02160e88(void) {
     MtxFx22 mtx;
 
-    MAT2_Identity(&mtx);
+    MTX_Identity22_(&mtx);
     G2_SetBG2Affine(&mtx, 128, 92, 0, 0);
     GFL_VBlankResetCallback();
 }

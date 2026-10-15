@@ -13,6 +13,7 @@
 #include "system/bmp_menulist.h"
 #include "system/game_data.h"
 #include "system/pms_word.h"
+#include "system/printsys.h"
 #include "system/wordset.h"
 #include "text/system/0399.h"
 
@@ -604,7 +605,7 @@ static void UnionMsg_FreeWordSet(UnionSystem *unisys)
     }
 }
 
-u8 UnionMsg_GetTableByte(s32 index)
+s32 UnionMsg_GetTableByte(s32 index)
 {
     if (index >= 27) {
         return 0;
@@ -632,7 +633,7 @@ void UnionMsg_CreateMsgSystem(UnionSystem *unisys, Field *field)
         unisys->msgbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         unisys->fmtbuf = GFL_StrBufCreate(0x100, UNION_HEAPID);
         UnionMsg_CreateWordSet(unisys);
-        unisys->fld_msgwin_stream = func_ov036_02188a54(fldmsg_bg, unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
+        unisys->fld_msgwin_stream = func_ov036_02188a54(fldmsg_bg, (u32)unisys->msgdata, 0, 1, 0x13, 0x1e, 4);
     } else {
         func_ov036_02188ae8(unisys->fld_msgwin_stream);
     }
@@ -743,7 +744,7 @@ static s32 UnionMsg_UpdateMenu(UnionSystem *unisys, Field *field)
 
 void UnionMsg_CreateMainMenu(UnionSystem *unisys, Field *field)
 {
-    UnionMsg_CreateMenu(unisys, field, sMenuMain, 6, &sMenuMainRequest);
+    UnionMsg_CreateMenu(unisys, field, sMenuMain, 6, (ListMenuRequest *)&sMenuMainRequest);
 }
 
 void UnionMsg_FreeMainMenu(UnionSystem *unisys)
@@ -800,6 +801,21 @@ void UnionMsg_FreeRuleMenu(UnionSystem *unisys)
     UnionMsg_FreeMenu(unisys);
 }
 
+// Whether the number is one of sMenuInfo's menus
+static inline BOOL UnionMsg_IsMenuKind(u32 kind)
+{
+    if (kind < NELEMS(sMenuInfo)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// The entry of sMenuInfo for a menu kind
+static inline const UnionMenuInfo *UnionMsg_GetMenuInfo(int kind)
+{
+    return &sMenuInfo[kind];
+}
+
 // Runs the menu of the battle rules and takes the choice: the value is a submenu or a rule. picked says the choice
 // changed the rules or opened a menu, isFinal that the rules are confirmed
 u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL *isFinal, Field *field)
@@ -818,7 +834,8 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
         if (ruleSel[3] == 0) {
             return ret;
         }
-        ret = sMenuInfo[ruleSel[3]].rows[sMenuInfo[ruleSel[3]].count - 1].value;
+        // The last row goes back to the menu that opened this one
+        ret = sMenuInfo[ruleSel[3]].rows[UnionMsg_GetMenuInfo(ruleSel[3])->count - 1].value;
         break;
     case 0x64:
         return sRuleResult[ruleSel[0]][ruleSel[1]][ruleSel[2]];
@@ -837,8 +854,8 @@ u32 UnionMsg_UpdateRuleMenu(UnionSystem *unisys, BOOL *picked, u8 *ruleSel, BOOL
         }
     }
 
-    for (i = 0; i < 8; i++) {
-        if (ret == (u32)sMenuInfo[i].rows) {
+    for (i = 0; UnionMsg_IsMenuKind(i); i++) {
+        if (UnionMsg_GetMenuInfo(i)->rows == (const UnionMenuRow *)ret) {
             *picked = TRUE;
             return i;
         }
@@ -883,7 +900,7 @@ void UnionMsg_CreateInfoWindow(UnionSystem *unisys, Field *field)
     if (unisys->fldmsgwin == NULL) {
         void *msgBGSys = Field_GetMsgBGSys(field);
 
-        unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1e, 2);
+        unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, (u32)unisys->msgdata, 0, 1, 1, 0x1e, 2);
         func_ov036_02188b18(unisys->fldmsgwin, 0, 0, Bank0399_Text_BattleFormatMultiBattle);
     }
 }
@@ -911,7 +928,7 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
     if (battleType != 1) {
         isMulti = FALSE;
     }
-    unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
+    unisys->fldmsgwin = func_ov036_02188a54(msgBGSys, (u32)unisys->msgdata, 0, 1, 1, 0x1a, 0x10);
     unisys->alloc.rpm = PokeRegulation_CreatePrintMsg(unisys->alloc.regulation, unisys->wordset, UNION_HEAPID, isMulti);
     UnionMsg_SetupWordSet(unisys);
 
@@ -926,19 +943,18 @@ void UnionMsg_CreateRulesWindow(UnionSystem *unisys, Field *field, u32 okMask, u
 
     for (i = 0; i < 6; i++) {
         RegulationRulesText *rpm;
-        u32 palette;
+        u32 color;
 
         if (okMask & (1 << i)) {
-            palette = 0x41;
+            color = PRINT_COLOR(4, 2, 0);
         } else {
-            palette = 0x11;
+            color = PRINT_COLOR(1, 2, 0);
         }
-        palette <<= 6;
 
         rpm = unisys->alloc.rpm;
-        func_ov036_02188b70(unisys->fldmsgwin, 0, (i * 2 + 4) * 8, rpm->rule[i], palette);
+        func_ov036_02188b70(unisys->fldmsgwin, 0, (i * 2 + 4) * 8, rpm->rule[i], color);
         rpm = unisys->alloc.rpm;
-        func_ov036_02188b70(unisys->fldmsgwin, 0x70, (i * 2 + 4) * 8, rpm->value[i], palette);
+        func_ov036_02188b70(unisys->fldmsgwin, 0x70, (i * 2 + 4) * 8, rpm->value[i], color);
     }
 }
 

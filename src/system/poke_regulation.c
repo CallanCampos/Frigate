@@ -23,24 +23,24 @@
 #define PRINT_MSG_RULE_COUNT 6
 #define PRINT_MSG_STRBUF_SIZE 64
 
-typedef StrBuf *(*PrintMsgValueFunc)(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+typedef StrBuf *(*PrintMsgValueFunc)(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
                                      StrBuf *temp, HeapID heapId);
 
 static u32 checkPokemon(Regulation *regulation, PartyPkm *pkm);
 static BOOL checkPokemonFlags(Regulation *regulation, PartyPkm *pkm, u32 *flags);
 static u32 getLevel(Regulation *regulation, u32 level);
-static StrBuf *makeCountText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
+static StrBuf *makeCountText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
                              HeapID heapId);
-static StrBuf *makeLevelText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
+static StrBuf *makeLevelText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
                              HeapID heapId);
-static StrBuf *makeSpecialPokemonText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+static StrBuf *makeSpecialPokemonText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
                                       StrBuf *temp, HeapID heapId);
-static StrBuf *makeSamePokemonText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+static StrBuf *makeSamePokemonText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
                                    StrBuf *temp, HeapID heapId);
-static StrBuf *makeSameItemsText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
-                                 HeapID heapId);
-static StrBuf *makeLauncherText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
-                                HeapID heapId);
+static StrBuf *makeSameItemsText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+                                 StrBuf *temp, HeapID heapId);
+static StrBuf *makeLauncherText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+                                StrBuf *temp, HeapID heapId);
 static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *picked, u8 *out, u32 *flags);
 static BOOL nextOrder(u8 *order);
 
@@ -416,7 +416,7 @@ void PokeRegulation_Load(u32 fileId, Regulation *regulation) {
     GFL_ArcSysRead(regulation, ARCID_REGULATION, fileId);
 }
 
-static StrBuf *makeCountText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
+static StrBuf *makeCountText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
                              HeapID heapId) {
     StrBuf *strbuf;
     u32 messageId;
@@ -438,7 +438,7 @@ static StrBuf *makeCountText(Regulation *regulation, WordSet *wordset, Regulatio
     return strbuf;
 }
 
-static StrBuf *makeLevelText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
+static StrBuf *makeLevelText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
                              HeapID heapId) {
     StrBuf *strbuf;
     u32 messageId;
@@ -465,7 +465,7 @@ static StrBuf *makeLevelText(Regulation *regulation, WordSet *wordset, Regulatio
     return strbuf;
 }
 
-static StrBuf *makeSpecialPokemonText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+static StrBuf *makeSpecialPokemonText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
                                       StrBuf *temp, HeapID heapId) {
     int i;
     u32 messageId;
@@ -483,7 +483,7 @@ static StrBuf *makeSpecialPokemonText(Regulation *regulation, WordSet *wordset, 
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
 
-static StrBuf *makeSamePokemonText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+static StrBuf *makeSamePokemonText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
                                    StrBuf *temp, HeapID heapId) {
     u32 messageId;
 
@@ -495,8 +495,8 @@ static StrBuf *makeSamePokemonText(Regulation *regulation, WordSet *wordset, Reg
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
 
-static StrBuf *makeSameItemsText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
-                                 HeapID heapId) {
+static StrBuf *makeSameItemsText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+                                 StrBuf *temp, HeapID heapId) {
     u32 messageId;
 
     if (regulation->unk9 == 1) {
@@ -507,8 +507,8 @@ static StrBuf *makeSameItemsText(Regulation *regulation, WordSet *wordset, Regul
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
 
-static StrBuf *makeLauncherText(Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg, StrBuf *temp,
-                                HeapID heapId) {
+static StrBuf *makeLauncherText(const Regulation *regulation, WordSet *wordset, RegulationPrintMsg *printMsg,
+                                StrBuf *temp, HeapID heapId) {
     u32 messageId;
 
     if (printMsg->launcher == 1) {
@@ -574,7 +574,7 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
     u32 forms[PARTY_SIZE] = {0};
     u32 items[PARTY_SIZE] = {0};
     u8 count = 0;
-    u8 i, j;
+    u8 i, j, k;
     BOOL ok;
     u16 levelTotal = 0;
     PartyPkm *pkm;
@@ -659,8 +659,8 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
             u32 requiredForm = Regulation_GetParam(regulation, REGULATION_PARAM_12);
 
             found = FALSE;
-            for (j = 0; j < count; j++) {
-                if (required == species[j] && requiredForm == forms[j]) {
+            for (k = 0; k < count; k++) {
+                if (required == species[k] && requiredForm == forms[k]) {
                     found = TRUE;
                     break;
                 }

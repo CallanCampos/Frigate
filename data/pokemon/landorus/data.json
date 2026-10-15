@@ -140,5 +140,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 200,
-    "baby_species": "SPECIES_LANDORUS"
+    "baby_species": "SPECIES_LANDORUS",
+    "cry_volume": 127
 }

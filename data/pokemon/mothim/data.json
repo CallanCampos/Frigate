@@ -165,5 +165,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_BURMY"
+    "baby_species": "SPECIES_BURMY",
+    "cry_volume": 125
 }

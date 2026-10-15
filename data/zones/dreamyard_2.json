@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 16,
     "npc_cache": 24,
-    "area": 290,
+    "area": "AREA_DREAMYARD_2",
     "matrix": "MAP_MATRIX_DREAMYARD_2",
     "scripts": "SCRIPTS_DREAMYARD_2",
     "text": "SCRIPT_TEXT_DREAMYARD_2",

@@ -320,7 +320,7 @@ void MCSSSys_Draw(MCSSSystem *system) {
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
-    MAT43_Invert(&NNS_G3dGlb.cameraMtx, &invCamera);
+    MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
     MAT3_To4x4(&rotation, &billboard);
 
@@ -331,11 +331,8 @@ void MCSSSys_Draw(MCSSSystem *system) {
         if (system->mcss[i] == NULL || system->mcss[i]->hidden || system->mcss[i]->loaded != TRUE) {
             continue;
         }
-        ortho = FALSE;
         z = 0;
-        if (system->ortho) {
-            ortho = system->mcss[i]->ortho;
-        }
+        ortho = system->ortho ? system->mcss[i]->ortho : FALSE;
         mcss = system->mcss[i];
         imageProxy = &mcss->imageProxy;
         if (ortho == FALSE) {
@@ -364,8 +361,8 @@ void MCSSSys_Draw(MCSSSystem *system) {
             MtxFx44 viewProj;
             fx32 w;
 
-            MAT43_To4x4(&NNS_G3dGlb.cameraMtx, &viewProj);
-            MAT4_Mul(&viewProj, &NNS_G3dGlb.projMtx, &viewProj);
+            MTX_Copy43To44_(&NNS_G3dGlb.cameraMtx, &viewProj);
+            MTX_Concat44(&viewProj, &NNS_G3dGlb.projMtx, &viewProj);
             MCSS_MulVecMtx44(&pos, &viewProj, &pos, &w);
             pos.x = FX_Mul(FX_Div(pos.x, w), 128 * FX32_ONE);
             pos.y = FX_Mul(FX_Div(pos.y, w), 96 * FX32_ONE);

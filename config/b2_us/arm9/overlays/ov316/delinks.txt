@@ -5,6 +5,7 @@
     .bss        start:0x0219fe20 end:0x0219fe20 kind:bss align:32
 
 src/ov316/psel.c:
+    complete
     .text       start:0x0219ce80 end:0x0219f6d0
     .rodata     start:0x0219fa84 end:0x0219fc44
     .data       start:0x0219fe00 end:0x0219fe08

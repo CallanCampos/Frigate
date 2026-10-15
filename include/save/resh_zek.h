@@ -22,8 +22,8 @@ void func_0200af9c(ReshZekSave *reshZek, u32 *dest);
 PartyPkm *func_0200afa8(ReshZekSave *reshZek);
 void func_0200afac(ReshZekSave *reshZek, const PartyPkm *pkm);
 
-// The init tail-calls a function at 0x0215cd8c with the block, which dsd can't tell between overlays 11 and 12;
-// neither overlay's function there inits a Pokémon, so the symbol is the linker's choice, overlay 11's
-void func_ov011_0215cd8c(void *block);
+// Unresolved save-init target. This label preserves the relocation's current overlay-11 address selection;
+// it does not identify the intended implementation or conflate it with the SDK's RSSI conversion function.
+void ReshZekSave_UnresolvedInitTarget(void *block);
 
 #endif // POKEBW2_SAVE_RESH_ZEK_H

@@ -167,13 +167,13 @@ typedef struct {
     WbtDownloadMessage *message;
 } WbtDownloadNetWork;
 
-// A tournament of the file: it is valid if it has a name, a known kind and its checksum
+// A tournament of the file: it is valid if it has a name, a kind for this version and its checksum
 typedef struct {
     u32 kind;
     u8 unk4[3];
     u8 version;
     u16 name;
-    u8 data[0x120a];
+    u8 data[0x1206];
     u32 checksum;
 } WbtDownloadTournament;
 
@@ -327,6 +327,9 @@ static void WbtDownloadMessage_Print(WbtDownloadMessage *p_wk, u32 mode) {
     case WBT_DOWNLOAD_MSG_PRINT_WAIT:
         p_wk->waitIcon =
             WaitIcon_Create(GFL_VBlankGetTCBMgr(), p_wk->window, WbtDownloadMessage_GetBgColor(p_wk), 16, p_wk->heapId);
+        PrintWindow_Print(&p_wk->printWindow, p_wk->queue, pos.x, pos.y, p_wk->strbuf, p_wk->font, p_wk->color);
+        p_wk->state = WBT_DOWNLOAD_MSG_STATE_QUEUE;
+        break;
     case WBT_DOWNLOAD_MSG_PRINT:
         PrintWindow_Print(&p_wk->printWindow, p_wk->queue, pos.x, pos.y, p_wk->strbuf, p_wk->font, p_wk->color);
         p_wk->state = WBT_DOWNLOAD_MSG_STATE_QUEUE;
@@ -597,13 +600,29 @@ static void WbtDownloadNet_FirstStep(WbtDownloadStack *stack, u32 *state, void *
     }
 }
 
-// Whether the kind of a tournament is one that the game knows
-static inline BOOL WbtDownloadTournament_IsKnownKind(u32 kind) {
+// The versions a tournament is for
+enum {
+    WBT_DOWNLOAD_KIND_WHITE2,
+    WBT_DOWNLOAD_KIND_BLACK2,
+    WBT_DOWNLOAD_KIND_BOTH,
+};
+
+#ifdef BLACK2
+#define WBT_DOWNLOAD_IS_BLACK2 TRUE
+#define WBT_DOWNLOAD_IS_WHITE2 FALSE
+#else
+#define WBT_DOWNLOAD_IS_BLACK2 FALSE
+#define WBT_DOWNLOAD_IS_WHITE2 TRUE
+#endif
+
+// Whether a tournament of this kind is for this version
+static inline BOOL WbtDownloadTournament_IsForThisVersion(u32 kind) {
     switch (kind) {
-    case 0:
-        return FALSE;
-    case 1:
-    case 2:
+    case WBT_DOWNLOAD_KIND_WHITE2:
+        return WBT_DOWNLOAD_IS_WHITE2;
+    case WBT_DOWNLOAD_KIND_BLACK2:
+        return WBT_DOWNLOAD_IS_BLACK2;
+    case WBT_DOWNLOAD_KIND_BOTH:
         return TRUE;
     default:
         return FALSE;
@@ -618,7 +637,7 @@ static inline BOOL WbtDownloadTournament_IsChecksumValid(const WbtDownloadTourna
 }
 
 static inline BOOL WbtDownloadTournament_IsValid(const WbtDownloadTournament *tournament) {
-    if (tournament->name != 0 && WbtDownloadTournament_IsKnownKind(tournament->kind) && tournament->version == 2 &&
+    if (tournament->name != 0 && WbtDownloadTournament_IsForThisVersion(tournament->kind) && tournament->version == 2 &&
         WbtDownloadTournament_IsChecksumValid(tournament)) {
         return TRUE;
     }
@@ -696,7 +715,11 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
             WbtDownloadMessage_PrintMsg(wk->message, wk->msgData, WBT_DOWNLOAD_MSG_NO_FILE, WBT_DOWNLOAD_MSG_STREAM);
             break;
         }
-        wk->param->result = success ? 0 : 2;
+        if (success) {
+            wk->param->result = 0;
+        } else {
+            wk->param->result = 2;
+        }
         (*state)++;
         break;
     }
@@ -774,15 +797,16 @@ static inline void WbtDownloadNetBG_InitCycle(WbtDownloadBG *bg, ArcTool *arc, u
 
 static void WbtDownloadNetBG_Load(WbtDownloadBG *bg, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PDWACC, heapId);
+    u32 chars;
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, PALTYPE_SUB_BG, 0, 0, heapId);
-    GFL_G2DIOLoadNSCRSync(arc, 6, 4, 0, (u16)GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, heapId), 0, FALSE,
-                          heapId);
+    chars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, heapId);
+    GFL_G2DIOLoadNSCRSync(arc, 6, 4, 0, (u16)chars, 0, FALSE, heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, PALTYPE_MAIN_BG, 0, 0, heapId);
-    GFL_G2DIOLoadNSCRSync(arc, 5, 0, 0, (u16)GFL_BGSysLoadArcNCGRDynamic(arc, 4, 0, 0, FALSE, heapId), 0, FALSE,
-                          heapId);
-    GFL_G2DIOLoadNSCRSync(arc, 7, 3, 0, (u16)GFL_BGSysLoadArcNCGRDynamic(arc, 4, 3, 0, FALSE, heapId), 0, FALSE,
-                          heapId);
+    chars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 0, 0, FALSE, heapId);
+    GFL_G2DIOLoadNSCRSync(arc, 5, 0, 0, (u16)chars, 0, FALSE, heapId);
+    chars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 3, 0, FALSE, heapId);
+    GFL_G2DIOLoadNSCRSync(arc, 7, 3, 0, (u16)chars, 0, FALSE, heapId);
     WbtDownloadNetBG_InitCycle(bg, arc, heapId);
     GFL_ArcToolFree(arc);
     GFL_BGSysAllocChar(1, 0x20, 0);

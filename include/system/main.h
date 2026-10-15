@@ -23,9 +23,8 @@ void func_0207bbf4(void);
 void CPU_SetIRQFunc(u32 interrupt, void (*func)(void));
 u32 CPU_IRQEnable(void);
 void scheduler_join_thread(OSThread *thread, OSThreadQueue *queue);
-// nitro/gx.h and nitro/fx.h. NitroSDK's GX_Init and FX_Init
+// nitro/gx.h. NitroSDK's GX_Init
 void gfxInit(void);
-void func_02074658(void);
 // nitro/fs.h. NitroSDK's FS_Init and FS_TryLoadTable: the size of the file tables, which it reads when given memory
 void fs_init(u32 dma);
 u32 func_02072358(void *mem, u32 size);

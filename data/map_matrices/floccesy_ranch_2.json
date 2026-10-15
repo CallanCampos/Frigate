@@ -1,7 +1,7 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 617, 619 ],
-        [ 618, 620 ]
+        [ "MAP_MODEL_FLOCCESY_RANCH_2_M_DUN2201_00_00", "MAP_MODEL_FLOCCESY_RANCH_2_M_DUN2201_01_00" ],
+        [ "MAP_MODEL_FLOCCESY_RANCH_2_M_DUN2201_00_01", "MAP_MODEL_FLOCCESY_RANCH_2_M_DUN2201_01_01" ]
     ]
 }

@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 844 ]
+        [ "MAP_MODEL_NUVEMA_TOWN_LAB_M_LABO01_00_00" ]
     ]
 }

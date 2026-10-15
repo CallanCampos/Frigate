@@ -86,17 +86,18 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | partial | descriptive |
+| `event_make.c` | `0x0214ff00`–`0x0215039c` | 6 | complete | descriptive |
 
 ### Overlay 11
 
-117 of 1688 functions are in source files.
+230 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `net_devwifi.c` | `0x021503c0`–`0x021505d4` | 26 | complete | string at `0x021852ac` |
 | `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | partial | string at `0x021852d0` |
 | `dwc_rapcommon.c` | `0x02152078`–`0x0215251c` | 14 | complete | string at `0x021853f0` |
+| `cps.c` | `0x0215251c`–`0x02155e34` | 113 | partial | descriptive |
 
 ### Overlay 12
 
@@ -105,45 +106,45 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `event_ircbattle.c` | `0x021503c0`–`0x02150cf8` | 13 | complete | string at `0x0216dfa0` |
-| `musical_event.c` | `0x02150cf8`–`0x02151e68` | 33 | partial | string at `0x0216dfb4` |
+| `musical_event.c` | `0x02150cf8`–`0x02151e68` | 33 | complete | string at `0x0216dfb4` |
 | `musical_dressup_sys.c` | `0x02151e68`–`0x02151f90` | 5 | complete | string at `0x0216dfd0` |
 | `musical_stage_sys.c` | `0x02151f90`–`0x021522d8` | 9 | complete | string at `0x0216dff4` |
-| `musical_program.c` | `0x021522d8`–`0x0215264c` | 15 | partial | string at `0x0216e008` |
+| `musical_program.c` | `0x021522d8`–`0x0215264c` | 15 | complete | string at `0x0216e008` |
 | `event_colosseum_battle.c` | `0x0215264c`–`0x0215291c` | 3 | complete | descriptive |
 | `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | partial | string at `0x0216e0a8` |
 | `delivery_irc.c` | `0x02152c0c`–`0x02153160` | 27 | complete | string at `0x0216e180` |
-| `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | partial | descriptive |
+| `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | complete | descriptive |
 | `intrude_work.c` | `0x021535dc`–`0x0215366c` | 12 | complete | descriptive |
-| `script_sys.c` | `0x0215366c`–`0x02153da4` | 41 | partial | string at `0x0216e190` |
+| `script_sys.c` | `0x0215366c`–`0x02153da4` | 41 | complete | string at `0x0216e190` |
 | `script_work.c` | `0x02153da4`–`0x02154070` | 31 | complete | string at `0x0216e1b4` |
-| `script_sub_event.c` | `0x02154070`–`0x02154180` | 7 | partial | descriptive |
+| `script_sub_event.c` | `0x02154070`–`0x02154180` | 7 | complete | descriptive |
 | `scrcmd_vm.c` | `0x02154180`–`0x02154948` | 59 | complete | descriptive |
 | `script_plugin.c` | `0x02154948`–`0x02154a64` | 5 | complete | descriptive |
-| `map_matrix.c` | `0x02154a64`–`0x02154c94` | 15 | partial | string at `0x0216e1c4` |
+| `map_matrix.c` | `0x02154a64`–`0x02154c94` | 15 | complete | string at `0x0216e1c4` |
 | `map_replace.c` | `0x02154c94`–`0x02154ea0` | 11 | complete | string at `0x0216e1d4` |
 | `respawn_zone.c` | `0x02154ea0`–`0x02154f98` | 7 | complete | descriptive |
 | `trainer_script.c` | `0x02154f98`–`0x021550a4` | 11 | complete | descriptive |
 | `scrcmd_work.c` | `0x021550a4`–`0x021555f8` | 47 | complete | string at `0x0216e1e4` |
 | `scrcmd_game_state.c` | `0x021555f8`–`0x02156174` | 55 | complete | descriptive |
 | `scrcmd_pokemon.c` | `0x02156174`–`0x021574a4` | 43 | complete | string at `0x0216e1f4` |
-| `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | partial | string at `0x0216e208` |
+| `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | complete | string at `0x0216e208` |
 | `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
-| `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | partial | string at `0x0216e22c` |
+| `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | complete | string at `0x0216e22c` |
 | `field_encount_st.c` | `0x021590ec`–`0x021593fc` | 15 | complete | string at `0x0216e240` |
 | `hiden_event.c` | `0x021593fc`–`0x02159bc0` | 43 | complete | descriptive |
 | `scrcmd_network.c` | `0x02159bc0`–`0x02159d54` | 9 | complete | string at `0x0216e254` |
-| `scrcmd_stadium.c` | `0x02159d54`–`0x0215a0b0` | 9 | partial | descriptive |
+| `scrcmd_stadium.c` | `0x02159d54`–`0x0215a0b0` | 9 | complete | descriptive |
 | `event_battle_lose.c` | `0x0215a0b0`–`0x0215a19c` | 2 | complete | descriptive |
 | `event_game_clear.c` | `0x0215a19c`–`0x0215a7a4` | 13 | complete | descriptive |
 | `event_field_menu.c` | `0x0215a7a4`–`0x0215aa68` | 3 | complete | descriptive |
 | `event_shortcut_menu.c` | `0x0215aa68`–`0x0215b488` | 17 | complete | string at `0x0216e268` |
-| `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | partial | string at `0x0216e280` |
-| `event_save.c` | `0x0215c4f8`–`0x0215c6b0` | 5 | partial | descriptive |
+| `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | complete | string at `0x0216e280` |
+| `event_save.c` | `0x0215c4f8`–`0x0215c6b0` | 5 | complete | descriptive |
 | `event_action_call.c` | `0x0215c6b0`–`0x0215cb48` | 13 | complete | descriptive |
-| `event_3d_demo.c` | `0x0215cb48`–`0x0215cd58` | 5 | partial | descriptive |
+| `event_3d_demo.c` | `0x0215cb48`–`0x0215cd58` | 5 | complete | descriptive |
 | `city_state.c` | `0x0215cd58`–`0x0215cda4` | 3 | complete | descriptive |
 | `eventdata_system.c` | `0x0215cda4`–`0x0215dabc` | 61 | partial | string at `0x0216e298` |
-| `field_actor_tool.c` | `0x0215dabc`–`0x0215ee10` | 69 | partial | descriptive |
+| `field_actor_tool.c` | `0x0215dabc`–`0x0215ee10` | 69 | complete | descriptive |
 | `zone_change.c` | `0x0215ee10`–`0x0215ef60` | 9 | complete | descriptive |
 | `itemuse_event.c` | `0x0215ef60`–`0x0215f23c` | 13 | complete | descriptive |
 | `hidden_item.c` | `0x0215f23c`–`0x0215f2d0` | 4 | complete | descriptive |
@@ -162,11 +163,11 @@ prints the tables below from the configs and the ROM:
 | `comm_player.c` | `0x021613d0`–`0x02161844` | 12 | complete | string at `0x0216e2e4` |
 | `bsubway_comm.c` | `0x02161844`–`0x02161c88` | 27 | complete | descriptive |
 | `fld_btl_inst_event.c` | `0x02161c88`–`0x02161f6c` | 4 | complete | descriptive |
-| `fld_btl_inst_tool.c` | `0x02161f6c`–`0x02162b64` | 22 | partial | string at `0x0216e36c` |
+| `fld_btl_inst_tool.c` | `0x02161f6c`–`0x02162b64` | 22 | complete | string at `0x0216e36c` |
 | `event_cgear_poweron.c` | `0x02162b64`–`0x02162c48` | 3 | complete | descriptive |
-| `event_trial_house.c` | `0x02162c48`–`0x02162f44` | 6 | partial | descriptive |
+| `event_trial_house.c` | `0x02162c48`–`0x02162f44` | 6 | complete | descriptive |
 | `ev_time.c` | `0x02162f44`–`0x021631c8` | 13 | complete | descriptive |
-| `field_g3d_map.c` | `0x021631c8`–`0x02163b38` | 47 | partial | string at `0x0216e380` |
+| `field_g3d_map.c` | `0x021631c8`–`0x02163b38` | 47 | complete | string at `0x0216e380` |
 | `report_event.c` | `0x02163b38`–`0x02164330` | 20 | complete | string at `0x0216e390` |
 | `shaymin_form.c` | `0x02164330`–`0x02164490` | 4 | complete | descriptive |
 | `scrcmd_trial_house.c` | `0x02164490`–`0x02164838` | 16 | complete | descriptive |
@@ -177,17 +178,17 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_sp_poke_gimmick.c` | `0x02165598`–`0x0216598c` | 8 | complete | descriptive |
 | `oneshot_dr.c` | `0x0216598c`–`0x021659ec` | 2 | complete | descriptive |
 | `namein_setup.c` | `0x021659ec`–`0x02165b1c` | 7 | complete | string at `0x0216e3a0` |
-| `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | partial | descriptive |
-| `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | partial | descriptive |
+| `event_league_lift.c` | `0x02165b1c`–`0x02165eb8` | 7 | complete | descriptive |
+| `event_bsubway.c` | `0x02165eb8`–`0x02166664` | 17 | complete | descriptive |
 | `fldmmdl.c` | `0x02166664`–`0x02168320` | 270 | complete | string at `0x0216e5c0` |
 | `fest_mission_field.c` | `0x02168320`–`0x02168468` | 5 | complete | descriptive |
 | `burmy_form.c` | `0x02168468`–`0x021684bc` | 1 | complete | descriptive |
 | `event_battle.c` | `0x021684bc`–`0x0216919c` | 26 | complete | string at `0x0216e5dc` |
 | `trcard_sys.c` | `0x0216919c`–`0x02169c1c` | 23 | complete | string at `0x0216e5ec` |
 | `scrcmd_sp_poke.c` | `0x02169c1c`–`0x02169c7c` | 4 | complete | descriptive |
-| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | partial | string at `0x0216e5fc` |
-| `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | partial | descriptive |
-| `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | partial | descriptive |
+| `waza_oshie.c` | `0x02169c7c`–`0x02169e18` | 4 | complete | string at `0x0216e5fc` |
+| `g3d_text_draw.c` | `0x02169e18`–`0x0216a190` | 7 | complete | descriptive |
+| `pass_power_check.c` | `0x0216a190`–`0x0216a23c` | 2 | complete | descriptive |
 | `pair_sys.c` | `0x0216a23c`–`0x0216a6a4` | 16 | complete | string at `0x0216e60c` |
 | `scrcmd_hollow_rival.c` | `0x0216a6a4`–`0x0216a82c` | 7 | complete | descriptive |
 | `scrcmd_keysystem.c` | `0x0216a82c`–`0x0216a950` | 5 | complete | string at `0x0216e618` |
@@ -275,7 +276,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_pokewood.c` | `0x0216e660`–`0x0216f838` | 41 | partial | string at `0x0216f8e0` |
+| `event_pokewood.c` | `0x0216e660`–`0x0216f838` | 41 | complete | string at `0x0216f8e0` |
 
 ### Overlay 24
 
@@ -283,7 +284,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `fest_mission_sparkle_place.c` | `0x0216f900`–`0x0216fb98` | 5 | partial | descriptive |
+| `fest_mission_sparkle_place.c` | `0x0216f900`–`0x0216fb98` | 5 | complete | descriptive |
 
 ### Overlay 25
 
@@ -291,7 +292,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `fest_mission_people.c` | `0x0216f900`–`0x0216fffc` | 17 | partial | descriptive |
+| `fest_mission_people.c` | `0x0216f900`–`0x0216fffc` | 17 | complete | descriptive |
 
 ### Overlay 26
 
@@ -316,9 +317,12 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `union_comm.c` | `0x02170340`–`0x02170ec8` | 41 | partial | string at `0x02172f20` |
-| `union_main.c` | `0x02170ec8`–`0x02172384` | 65 | partial | string at `0x02172f6c` |
-| `colosseum.c` | `0x02172384`–`0x02172c94` | 49 | partial | string at `0x02173084` |
+| `union_comm.c` | `0x02170340`–`0x02170ec8` | 41 | complete | string at `0x02172f20` |
+| `union_main.c` | `0x02170ec8`–`0x0217110c` | 10 | complete | string at `0x02172f6c` |
+| `union_receive.c` | `0x0217110c`–`0x021719dc` | 44 | complete | descriptive |
+| `union_subproc.c` | `0x021719dc`–`0x021723ec` | 13 | complete | descriptive |
+| `colosseum_comm.c` | `0x021723ec`–`0x02172830` | 29 | complete | descriptive |
+| `colosseum.c` | `0x02172830`–`0x02172c94` | 18 | complete | string at `0x02173084` |
 
 ### Overlay 29
 
@@ -326,7 +330,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dwc_rap_vchat.c` | `0x021922c0`–`0x02192ae8` | 19 | partial | descriptive |
+| `dwc_rap_vchat.c` | `0x021922c0`–`0x02192ae8` | 19 | complete | descriptive |
 | `vct_adpcm.c` | `0x02192ae8`–`0x02193cb0` | 8 | partial | descriptive |
 | `vct_audio.c` | `0x02193cb0`–`0x021956d4` | 39 | partial | descriptive |
 | `vct_session.c` | `0x021956d4`–`0x02196680` | 30 | partial | descriptive |
@@ -340,8 +344,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `net_devwireless.c` | `0x021730e0`–`0x0217333c` | 39 | complete | string at `0x0217576c` |
-| `net_whpipe.c` | `0x0217333c`–`0x02174140` | 60 | partial | string at `0x02175780` |
-| `wih.c` | `0x02174140`–`0x02175680` | 70 | partial | string at `0x021757b4` |
+| `net_whpipe.c` | `0x0217333c`–`0x02174140` | 60 | complete | string at `0x02175780` |
+| `wih.c` | `0x02174140`–`0x02175680` | 70 | complete | string at `0x021757b4` |
 
 ### Overlay 31
 
@@ -351,8 +355,8 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `net_devirc.c` | `0x02175800`–`0x0217591c` | 24 | complete | descriptive |
 | `net_irc.c` | `0x0217591c`–`0x02175f30` | 24 | complete | descriptive |
-| `irc_link.c` | `0x02175f30`–`0x02176384` | 19 | partial | descriptive |
-| `irc_spi.c` | `0x02176384`–`0x02176628` | 7 | partial | descriptive |
+| `irc_link.c` | `0x02175f30`–`0x02176384` | 19 | complete | descriptive |
+| `irc_spi.c` | `0x02176384`–`0x02176628` | 7 | complete | descriptive |
 
 ### Overlay 32
 
@@ -368,19 +372,19 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `entree_forest.c` | `0x02176b00`–`0x02176d88` | 5 | partial | descriptive |
+| `entree_forest.c` | `0x02176b00`–`0x02176d88` | 5 | complete | descriptive |
 | `event_funfest_mission.c` | `0x02176d88`–`0x02176ec4` | 2 | complete | descriptive |
 | `entree_forest_first_warp.c` | `0x02176ec4`–`0x02176f90` | 1 | complete | descriptive |
 | `scrcmd_funfest.c` | `0x02176f90`–`0x02177370` | 13 | complete | descriptive |
 | `entralink_warp.c` | `0x02177370`–`0x02177574` | 3 | complete | descriptive |
 | `event_cgear_shutdown.c` | `0x02177574`–`0x021775e8` | 2 | complete | descriptive |
 | `event_phrase_input.c` | `0x021775e8`–`0x02177998` | 6 | complete | descriptive |
-| `pdw_postman.c` | `0x02177998`–`0x02178448` | 47 | partial | string at `0x0217c600` |
+| `pdw_postman.c` | `0x02177998`–`0x02178448` | 47 | complete | string at `0x0217c600` |
 | `scrcmd_field_move.c` | `0x02178448`–`0x021785c4` | 6 | complete | descriptive |
 | `event_sweet_scent.c` | `0x021785c4`–`0x02178908` | 8 | complete | descriptive |
-| `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | partial | descriptive |
-| `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | partial | descriptive |
-| `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | partial | descriptive |
+| `event_fly.c` | `0x02178908`–`0x02178ca8` | 3 | complete | descriptive |
+| `event_chatot.c` | `0x02178ca8`–`0x021791c0` | 10 | complete | descriptive |
+| `event_fishing.c` | `0x021791c0`–`0x02179664` | 9 | complete | descriptive |
 | `event_dendou_machine.c` | `0x02179664`–`0x02179868` | 8 | complete | descriptive |
 | `event_pc.c` | `0x02179868`–`0x02179b54` | 8 | complete | descriptive |
 | `event_pokemon_center.c` | `0x02179b54`–`0x02179dd4` | 9 | complete | descriptive |
@@ -388,9 +392,9 @@ prints the tables below from the configs and the ROM:
 | `event_abyssal_ruins.c` | `0x02179e98`–`0x02179f04` | 1 | complete | descriptive |
 | `event_dive.c` | `0x02179f04`–`0x0217a1b0` | 7 | complete | descriptive |
 | `field_actor_animation.c` | `0x0217a1b0`–`0x0217a4a0` | 12 | complete | descriptive |
-| `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | partial | string at `0x0217c624` |
+| `fld_trade.c` | `0x0217a4a0`–`0x0217aa1c` | 11 | complete | string at `0x0217c624` |
 | `unity_visitor.c` | `0x0217aa1c`–`0x0217ac70` | 6 | complete | descriptive |
-| `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | partial | string at `0x0217c630` |
+| `trial_house.c` | `0x0217ac70`–`0x0217b468` | 19 | complete | string at `0x0217c630` |
 | `bsubway_scr.c` | `0x0217b468`–`0x0217c340` | 39 | partial | string at `0x0217c640` |
 
 ### Overlay 34
@@ -399,9 +403,11 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `union_oneself.c` | `0x02176b00`–`0x0217aa7c` | 87 | partial | string at `0x0217c6ec` |
-| `union_msg.c` | `0x0217aa7c`–`0x0217b68c` | 66 | partial | string at `0x0217c85c` |
-| `union_eff.c` | `0x0217b68c`–`0x0217becc` | 42 | partial | string at `0x0217c8b0` |
+| `union_actor.c` | `0x02176b00`–`0x02177444` | 23 | complete | descriptive |
+| `union_oneself.c` | `0x02177444`–`0x0217aa7c` | 64 | complete | string at `0x0217c6ec` |
+| `union_msg.c` | `0x0217aa7c`–`0x0217b68c` | 66 | complete | string at `0x0217c85c` |
+| `union_eff.c` | `0x0217b68c`–`0x0217bc84` | 32 | complete | string at `0x0217c8b0` |
+| `colosseum_tool.c` | `0x0217bc84`–`0x0217becc` | 10 | complete | descriptive |
 
 ### Overlay 35
 
@@ -415,19 +421,44 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 36
 
-1530 of 4339 functions are in source files. Embedded names without a file yet: `comm_entry_menu.c`, `ctalkmsgwin.c`, `enceff.c`, `entrance_camera.c`, `fes_gimmick.c`, `field_3dbg.c`, `field_bbd_color.c`, `field_camera.c`, `field_camera_anime.c`, `field_comm_actor.c`, `field_fade.c`, `field_flash.c`, `field_fmission_info.c`, `field_fog.c`, `field_g3dobj.c`, `field_light.c`, `field_msgbg.c`, `field_place_name.c`, `field_player_core.c`, `field_player_grid_event.c`, `field_player_nogrid.c`, `field_rail.c`, `field_rail_loader.c`, `field_saveanime.c`, `field_subscreen.c`, `field_task.c`, `field_task_manager.c`, `field_wfbc.c`, `field_zonefog.c`, `fieldmap_ctrl_grid.c`, `fieldmap_ctrl_nogrid_work.c`, `fieldmap_tcb_camera_zoom.c`, `fieldskill_mapeff.c`, `fld3d_ci.c`, `fld_exp_obj.c`, `fld_particle.c`, `fld_wipe_3dobj.c`, `fldeff_btrain.c`, `fldeff_bubble.c`, `fldeff_d06denki.c`, `fldeff_hide.c`, `fldeff_iaigiri.c`, `fldeff_ochiba.c`, `fldeff_reflect.c`, `fldeff_ripple.c`, `fldeff_splash.c`, `fldmmdl_acmd.c`, `fldmmdl_blact.c`, `fldmmdl_g3dobj.c`, `height_ex.c`, `ircbattlemenu.c`, `land_data_patch.c`, `party_select_list.c`, `place_name_letter.c`, `pleasure_boat.c`, `scrcmd_pokemon_fld.c`, `sodateya.c`, `weather.c`, `weather_task.c`.
+4339 of 4339 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `fieldmap.c` | `0x0217f600`–`0x021814dc` | 128 | partial | string at `0x021d4b20` |
+| `fieldmap_event.c` | `0x021814dc`–`0x0218304c` | 55 | partial | descriptive |
 | `field_buildmodel.c` | `0x0218304c`–`0x02184244` | 85 | partial | string at `0x021d4b2c` |
 | `field_g3d_mapper.c` | `0x02184244`–`0x021856a0` | 57 | partial | string at `0x021d4b4c` |
+| `field_camera.c` | `0x021856a0`–`0x02186ed0` | 84 | partial | string at `0x021d4b88` |
+| `field_camera_anime.c` | `0x02186ed0`–`0x021876d0` | 34 | partial | string at `0x021d4b98` |
+| `field_msgbg.c` | `0x021876d0`–`0x0218a7f8` | 177 | partial | string at `0x021d4bb0` |
 | `field_map_chunk_wb.c` | `0x0218a7f8`–`0x0218a8f8` | 2 | complete | descriptive |
 | `field_map_chunk_gc.c` | `0x0218a8f8`–`0x0218aa7c` | 3 | complete | descriptive |
 | `field_map_chunk_ng.c` | `0x0218aa7c`–`0x0218ab60` | 2 | complete | descriptive |
 | `field_map_chunk_rd.c` | `0x0218ab60`–`0x0218adac` | 2 | complete | descriptive |
+| `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | partial | string at `0x021d4bc0` |
+| `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | partial | string at `0x021d4bd0` |
+| `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | partial | descriptive |
+| `ctalkmsgwin.c` | `0x0218b1f8`–`0x0218d0f4` | 56 | partial | string at `0x021d4c23` |
+| `ircbattlemenu.c` | `0x0218d0f4`–`0x0218ed18` | 63 | partial | string at `0x021d4d24` |
+| `fldmmdl_acmd.c` | `0x0218ed18`–`0x02193680` | 430 | partial | string at `0x021d4d40` |
+| `fldmmdl_blact.c` | `0x02193680`–`0x021946b4` | 58 | partial | string at `0x021d4d50` |
+| `fldmmdl_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | partial | string at `0x021d4d60` |
+| `fld_act_rail.c` | `0x02195378`–`0x02196238` | 74 | partial | descriptive |
+| `field_rail_loader.c` | `0x02196238`–`0x02197534` | 62 | partial | string at `0x021d4de8` |
+| `field_fog.c` | `0x02197534`–`0x02197710` | 22 | partial | string at `0x021d4dfc` |
+| `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | partial | string at `0x021d4e08` |
+| `field_light.c` | `0x02197820`–`0x02198198` | 31 | partial | string at `0x021d4e18` |
+| `field_subscreen.c` | `0x02198198`–`0x02198bc0` | 72 | partial | string at `0x021d4e28` |
+| `field_3dbg.c` | `0x02198bc0`–`0x02199004` | 20 | partial | string at `0x021d4e3c` |
+| `weather.c` | `0x02199004`–`0x021993e0` | 16 | partial | string at `0x021d4e54` |
+| `weather_task.c` | `0x021993e0`–`0x0219a3b4` | 91 | partial | string at `0x021d4e60` |
+| `fieldmap_ctrl_grid.c` | `0x0219a3b4`–`0x0219a47c` | 5 | partial | string at `0x021d4e70` |
 | `field_player.c` | `0x0219a47c`–`0x0219ad4c` | 68 | complete | string at `0x021d4e88` |
+| `field_player_core.c` | `0x0219ad4c`–`0x0219b7a8` | 65 | partial | string at `0x021d4e98` |
 | `field_player_grid.c` | `0x0219b7a8`–`0x0219cea0` | 99 | complete | string at `0x021d4eac` |
+| `field_player_nogrid.c` | `0x0219cea0`–`0x0219e328` | 91 | partial | string at `0x021d4ee4` |
+| `fieldmap_ctrl_nogrid_work.c` | `0x0219e328`–`0x0219e430` | 7 | partial | string at `0x021d4efc` |
 | `fieldmap_ctrl_hybrid.c` | `0x0219e430`–`0x0219e9d0` | 13 | complete | string at `0x021d4f44` |
 | `field_ground_anime.c` | `0x0219e9d0`–`0x0219f178` | 32 | partial | string at `0x021d4f5c` |
 | `event_entrance_effect.c` | `0x0219f178`–`0x0219fa10` | 25 | complete | descriptive |
@@ -467,22 +498,67 @@ prints the tables below from the configs and the ROM:
 | `scrcmd_encount.c` | `0x021ae394`–`0x021ae6d4` | 9 | complete | string at `0x021d51f0` |
 | `scrcmd_camera.c` | `0x021ae6d4`–`0x021aea40` | 14 | complete | descriptive |
 | `scrcmd_fld_battle.c` | `0x021aea40`–`0x021aedf4` | 9 | complete | string at `0x021d5204` |
+| `scrcmd_pokemon_misc.c` | `0x021aedf4`–`0x021afa2c` | 27 | partial | descriptive |
+| `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | partial | string at `0x021d5218` |
 | `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | partial | descriptive |
+| `field_rail.c` | `0x021b0228`–`0x021b3a3c` | 137 | partial | string at `0x021d5238` |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
 | `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |
 | `fieldmap_func.c` | `0x021b427c`–`0x021b445c` | 9 | complete | string at `0x021d5290` |
+| `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | partial | descriptive |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
+| `fldeff_reflect.c` | `0x021b496c`–`0x021b4eb4` | 15 | partial | string at `0x021d5338` |
+| `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | partial | string at `0x021d534c` |
+| `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | partial | string at `0x021d5360` |
+| `fes_gimmick.c` | `0x021b64b0`–`0x021b6824` | 18 | partial | string at `0x021d5378` |
+| `place_name_letter.c` | `0x021b6824`–`0x021b733c` | 39 | partial | string at `0x021d53b0` |
+| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | partial | string at `0x021d53c4` |
+| `field_gimmick.c` | `0x021b7f7c`–`0x021b804c` | 4 | partial | descriptive |
+| `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | partial | string at `0x021d53d8` |
+| `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | partial | descriptive |
+| `field_fade.c` | `0x021b9494`–`0x021ba5d0` | 43 | partial | string at `0x021d53e8` |
+| `height_ex.c` | `0x021ba5d0`–`0x021ba81c` | 14 | partial | string at `0x021d53f8` |
+| `field_player_grid_event.c` | `0x021ba81c`–`0x021bb590` | 23 | partial | string at `0x021d5404` |
+| `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | partial | string at `0x021d5420` |
+| `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | partial | string at `0x021d5430` |
+| `sodateya.c` | `0x021bd2ac`–`0x021be790` | 65 | partial | string at `0x021d54a4` |
+| `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | partial | string at `0x021d54b4` |
+| `fldeff_splash.c` | `0x021be988`–`0x021beb70` | 9 | partial | string at `0x021d54c4` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
 | `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | partial | descriptive |
+| `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | partial | string at `0x021d54f0` |
+| `fieldmap_tcb_camera_zoom.c` | `0x021c05d4`–`0x021c0870` | 6 | partial | string at `0x021d5500` |
+| `field_task.c` | `0x021c0870`–`0x021c0914` | 11 | partial | string at `0x021d551c` |
+| `field_task_manager.c` | `0x021c0914`–`0x021c1bc4` | 52 | partial | string at `0x021d552c` |
+| `field_flash.c` | `0x021c1bc4`–`0x021c1d88` | 18 | partial | string at `0x021d5544` |
+| `fieldskill_mapeff.c` | `0x021c1d88`–`0x021c1e30` | 9 | partial | string at `0x021d5554` |
+| `fld_wipe_3dobj.c` | `0x021c1e30`–`0x021c2080` | 7 | partial | string at `0x021d5568` |
+| `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | partial | string at `0x021d557c` |
+| `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | partial | descriptive |
+| `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | partial | descriptive |
+| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | partial | string at `0x021d558c` |
+| `land_data_patch.c` | `0x021c2cbc`–`0x021c2ddc` | 6 | partial | string at `0x021d55a0` |
+| `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | partial | string at `0x021d55c0` |
+| `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | partial | string at `0x021d55f8` |
+| `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | partial | string at `0x021d5620` |
+| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | partial | string at `0x021d5634` |
+| `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | partial | string at `0x021d5648` |
+| `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | partial | string at `0x021d5654` |
+| `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | partial | string at `0x021d5664` |
+| `fldeff_bubble.c` | `0x021c6934`–`0x021c6cc8` | 15 | partial | string at `0x021d56b0` |
+| `field_saveanime.c` | `0x021c6cc8`–`0x021c7028` | 12 | partial | string at `0x021d56c0` |
 | `field_map_chunk_height.c` | `0x021c7028`–`0x021c71d4` | 1 | complete | descriptive |
+| `scrcmd_field.c` | `0x021c71d4`–`0x021c7b38` | 25 | partial | descriptive |
 | `scrcmd_medal.c` | `0x021c7b38`–`0x021c7fd8` | 13 | partial | descriptive |
 | `fld_vreq.c` | `0x021c7fd8`–`0x021c81f4` | 14 | complete | string at `0x021d56f0` |
 | `field_palace_sys.c` | `0x021c81f4`–`0x021c83e8` | 6 | complete | string at `0x021d56fc` |
 | `field_goout_effect.c` | `0x021c83e8`–`0x021c8808` | 11 | complete | string at `0x021d5710` |
 | `field_goout_effect_data.c` | `0x021c8808`–`0x021c8954` | 9 | complete | string at `0x021d5728` |
 | `resort_mapcreate.c` | `0x021c8954`–`0x021c8c34` | 6 | partial | string at `0x021d5744` |
+| `scrcmd_hidden_hollow.c` | `0x021c8c34`–`0x021c944c` | 19 | partial | descriptive |
+| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | partial | string at `0x021d5758` |
 | `scrcmd_ochiba.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | string at `0x021d5768` |
 
 ### Overlay 50
@@ -559,7 +635,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `scrcmd_resort.c` | `0x021e58c0`–`0x021e7c70` | 43 | partial | string at `0x021e7de0` |
+| `scrcmd_resort.c` | `0x021e58c0`–`0x021e7c70` | 43 | complete | string at `0x021e7de0` |
 | `scrcmd_medalinfo.c` | `0x021e7c70`–`0x021e7db4` | 3 | complete | string at `0x021e7df0` |
 
 ### Overlay 60
@@ -651,7 +727,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `oekaki_comm.c` | `0x0217cfc0`–`0x0217d34c` | 12 | complete | descriptive |
-| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | partial | string at `0x0217fd38` |
+| `oekaki.c` | `0x0217d34c`–`0x0217f84c` | 89 | complete | string at `0x0217fd38` |
 
 ### Overlay 71
 
@@ -691,7 +767,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `weather_particles.c` | `0x021e90c0`–`0x021ea0dc` | 37 | partial | descriptive |
+| `weather_particles.c` | `0x021e90c0`–`0x021ea0dc` | 37 | complete | descriptive |
 
 ### Overlay 76
 
@@ -699,7 +775,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `weather_rain.c` | `0x021e90c0`–`0x021ea674` | 47 | partial | descriptive |
+| `weather_rain.c` | `0x021e90c0`–`0x021ea674` | 47 | complete | descriptive |
 
 ### Overlay 77
 
@@ -723,7 +799,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `c_gear_sw.c` | `0x021ea860`–`0x021ed7f0` | 130 | partial | string at `0x021eda48` |
+| `c_gear_sw.c` | `0x021ea860`–`0x021ed7f0` | 130 | complete | string at `0x021eda48` |
 
 ### Overlay 80
 
@@ -747,7 +823,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `union_subdisp.c` | `0x021ea860`–`0x021eb9fc` | 37 | partial | string at `0x021eba80` |
+| `union_subdisp.c` | `0x021ea860`–`0x021eb9fc` | 37 | complete | string at `0x021eba80` |
 
 ### Overlay 83
 
@@ -808,7 +884,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pleasure_boat_rooms.c` | `0x021eec80`–`0x021ef054` | 7 | partial | descriptive |
+| `pleasure_boat_rooms.c` | `0x021eec80`–`0x021ef054` | 7 | complete | descriptive |
 
 ### Overlay 90
 
@@ -848,7 +924,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_mistralton.c` | `0x021eec80`–`0x021f0234` | 34 | partial | descriptive |
+| `gym_mistralton.c` | `0x021eec80`–`0x021f0234` | 34 | complete | descriptive |
 
 ### Overlay 95
 
@@ -864,7 +940,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_driftveil.c` | `0x021eec80`–`0x021efc70` | 30 | partial | descriptive |
+| `gym_driftveil.c` | `0x021eec80`–`0x021efc70` | 30 | complete | descriptive |
 
 ### Overlay 97
 
@@ -888,7 +964,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_opelucid.c` | `0x021eec80`–`0x021efbac` | 35 | partial | descriptive |
+| `gym_opelucid.c` | `0x021eec80`–`0x021efbac` | 35 | complete | descriptive |
 
 ### Overlay 100
 
@@ -896,7 +972,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_virbank.c` | `0x021eec80`–`0x021ef08c` | 11 | partial | descriptive |
+| `gym_virbank.c` | `0x021eec80`–`0x021ef08c` | 11 | complete | descriptive |
 
 ### Overlay 101
 
@@ -904,7 +980,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gym_humilau.c` | `0x021eec80`–`0x021f042c` | 43 | partial | descriptive |
+| `gym_humilau.c` | `0x021eec80`–`0x021f042c` | 43 | complete | descriptive |
 
 ### Overlay 102
 
@@ -912,7 +988,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | partial | descriptive |
+| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | complete | descriptive |
 
 ### Overlay 103
 
@@ -920,7 +996,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_badge_gate.c` | `0x021eec80`–`0x021ef794` | 17 | partial | descriptive |
+| `gimmick_badge_gate.c` | `0x021eec80`–`0x021ef794` | 17 | complete | descriptive |
 
 ### Overlay 104
 
@@ -928,8 +1004,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `field_gimmick_gate.c` | `0x021eec80`–`0x021efbd8` | 48 | partial | string at `0x021f078c` |
-| `gimmick_obj_elboard.c` | `0x021efbd8`–`0x021f039c` | 19 | partial | string at `0x021f07a4` |
+| `field_gimmick_gate.c` | `0x021eec80`–`0x021efbd8` | 48 | complete | string at `0x021f078c` |
+| `gimmick_obj_elboard.c` | `0x021efbd8`–`0x021f039c` | 19 | complete | string at `0x021f07a4` |
 
 ### Overlay 105
 
@@ -1033,7 +1109,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_plasma_frigate.c` | `0x021eec80`–`0x021efd00` | 55 | partial | descriptive |
+| `gimmick_plasma_frigate.c` | `0x021eec80`–`0x021efd00` | 55 | complete | descriptive |
 
 ### Overlay 118
 
@@ -1065,7 +1141,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `castelia_rush.c` | `0x021eef80`–`0x021efb80` | 35 | partial | descriptive |
+| `castelia_rush.c` | `0x021eef80`–`0x021efb80` | 35 | complete | descriptive |
 
 ### Overlay 122
 
@@ -1081,7 +1157,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_league_grimsley.c` | `0x021eec80`–`0x021ef154` | 18 | partial | descriptive |
+| `gimmick_league_grimsley.c` | `0x021eec80`–`0x021ef154` | 18 | complete | descriptive |
 
 ### Overlay 124
 
@@ -1113,11 +1189,11 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `infinity_dungeon_gimmick.c` | `0x021eec80`–`0x021efaf0` | 40 | partial | string at `0x021f4e20` |
-| `infinity_dungeon.c` | `0x021efaf0`–`0x021f0a64` | 34 | partial | string at `0x021f4f04` |
-| `infinity_dungeon_rooms.c` | `0x021f0a64`–`0x021f1684` | 38 | partial | descriptive |
-| `infinity_dungeon_creator.c` | `0x021f1684`–`0x021f1c80` | 6 | partial | string at `0x021f4f18` |
-| `inf_dungeon_retire.c` | `0x021f1c80`–`0x021f2128` | 19 | partial | string at `0x021f4f60` |
+| `infinity_dungeon_gimmick.c` | `0x021eec80`–`0x021efaf0` | 40 | complete | string at `0x021f4e20` |
+| `infinity_dungeon.c` | `0x021efaf0`–`0x021f0a64` | 34 | complete | string at `0x021f4f04` |
+| `infinity_dungeon_rooms.c` | `0x021f0a64`–`0x021f1684` | 38 | complete | descriptive |
+| `infinity_dungeon_creator.c` | `0x021f1684`–`0x021f1c80` | 6 | complete | string at `0x021f4f18` |
+| `inf_dungeon_retire.c` | `0x021f1c80`–`0x021f2128` | 19 | complete | string at `0x021f4f60` |
 
 ### Overlay 128
 
@@ -1125,7 +1201,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_passing_vehicles.c` | `0x021eec80`–`0x021eefe8` | 6 | partial | descriptive |
+| `gimmick_passing_vehicles.c` | `0x021eec80`–`0x021eefe8` | 6 | complete | descriptive |
 
 ### Overlay 129
 
@@ -1133,8 +1209,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `sp_poke_gimmick.c` | `0x021eec80`–`0x021ef834` | 31 | partial | string at `0x021f0120` |
-| `sp_poke_event.c` | `0x021ef834`–`0x021efccc` | 9 | partial | descriptive |
+| `sp_poke_gimmick.c` | `0x021eec80`–`0x021ef834` | 31 | complete | string at `0x021f0120` |
+| `sp_poke_event.c` | `0x021ef834`–`0x021efccc` | 9 | complete | descriptive |
 
 ### Overlay 130
 
@@ -1174,8 +1250,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_stadium_gimmick.c` | `0x021eec80`–`0x021efc60` | 35 | partial | descriptive |
-| `wbt_battle.c` | `0x021efc60`–`0x021f0994` | 32 | partial | string at `0x021f0edc` |
+| `wbt_stadium_gimmick.c` | `0x021eec80`–`0x021efc60` | 35 | complete | descriptive |
+| `wbt_battle.c` | `0x021efc60`–`0x021f0994` | 32 | complete | string at `0x021f0edc` |
 
 ### Overlay 135
 
@@ -1183,7 +1259,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_makematch.c` | `0x021eec80`–`0x021efbf4` | 39 | partial | string at `0x021efc20` |
+| `wbt_makematch.c` | `0x021eec80`–`0x021efbf4` | 39 | complete | string at `0x021efc20` |
 
 ### Overlay 136
 
@@ -1191,7 +1267,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_pokewood_poster.c` | `0x021eec80`–`0x021eef5c` | 13 | partial | descriptive |
+| `gimmick_pokewood_poster.c` | `0x021eec80`–`0x021eef5c` | 13 | complete | descriptive |
 
 ### Overlay 137
 
@@ -1203,7 +1279,7 @@ prints the tables below from the configs and the ROM:
 | `resort_people.c` | `0x021f0e98`–`0x021f1710` | 46 | complete | string at `0x021f58b0` |
 | `resort_data_manager.c` | `0x021f1710`–`0x021f1c24` | 30 | complete | string at `0x021f58c0` |
 | `resort_npc.c` | `0x021f1c24`–`0x021f1f1c` | 11 | complete | string at `0x021f58d8` |
-| `resort_sys.c` | `0x021f1f1c`–`0x021f52ac` | 61 | partial | string at `0x021f58e8` |
+| `resort_sys.c` | `0x021f1f1c`–`0x021f52ac` | 61 | complete | string at `0x021f58e8` |
 
 ### Overlay 139
 
@@ -1212,10 +1288,10 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `ui_scene.c` | `0x021998c0`–`0x02199aa0` | 9 | complete | string at `0x0219ce20` |
-| `touchbar.c` | `0x02199aa0`–`0x0219a2a4` | 41 | partial | string at `0x0219ce2c` |
+| `touchbar.c` | `0x02199aa0`–`0x0219a2a4` | 41 | complete | string at `0x0219ce2c` |
 | `print_msg.c` | `0x0219a2a4`–`0x0219a438` | 3 | complete | descriptive |
 | `msgsearch.c` | `0x0219a438`–`0x0219a584` | 4 | complete | string at `0x0219ce38` |
-| `yesno_menu.c` | `0x0219a584`–`0x0219af1c` | 8 | partial | string at `0x0219ce44` |
+| `yesno_menu.c` | `0x0219a584`–`0x0219af1c` | 8 | complete | string at `0x0219ce44` |
 | `frame_list.c` | `0x0219af1c`–`0x0219cd18` | 55 | partial | string at `0x0219ce54` |
 
 ### Overlay 140
@@ -1224,7 +1300,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `config_panel.c` | `0x0219ce80`–`0x0219ee3c` | 89 | partial | descriptive |
+| `config_panel.c` | `0x0219ce80`–`0x0219ee3c` | 89 | complete | descriptive |
 
 ### Overlay 141
 
@@ -1241,7 +1317,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `itemmenu.c` | `0x021998c0`–`0x0219d4c0` | 125 | complete | string at `0x021a1640` |
-| `itemmenu_disp.c` | `0x0219d4c0`–`0x021a03d4` | 58 | partial | descriptive |
+| `itemmenu_disp.c` | `0x0219d4c0`–`0x021a03d4` | 58 | complete | descriptive |
 | `bag_item.c` | `0x021a03d4`–`0x021a08e0` | 13 | complete | string at `0x021a1694` |
 
 ### Overlay 143
@@ -1255,9 +1331,9 @@ prints the tables below from the configs and the ROM:
 | `monolith_top.c` | `0x0219aa70`–`0x0219afac` | 17 | complete | descriptive |
 | `monolith_record.c` | `0x0219afac`–`0x0219b6d4` | 13 | complete | descriptive |
 | `monolith_status.c` | `0x0219b6d4`–`0x0219bb80` | 9 | complete | descriptive |
-| `monolith_power_select.c` | `0x0219bb80`–`0x0219d360` | 53 | partial | descriptive |
-| `monolith_power_info.c` | `0x0219d360`–`0x0219d8f8` | 12 | partial | descriptive |
-| `monolith_mission_select.c` | `0x0219d8f8`–`0x0219f64c` | 69 | partial | descriptive |
+| `monolith_power_select.c` | `0x0219bb80`–`0x0219d360` | 53 | complete | descriptive |
+| `monolith_power_info.c` | `0x0219d360`–`0x0219d8f8` | 12 | complete | descriptive |
+| `monolith_mission_select.c` | `0x0219d8f8`–`0x0219f64c` | 69 | complete | descriptive |
 | `monolith_mission_info.c` | `0x0219f64c`–`0x0219fe70` | 18 | partial | descriptive |
 
 ### Overlay 144
@@ -1266,7 +1342,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `townmap.c` | `0x0219ce80`–`0x0219f2dc` | 84 | partial | string at `0x0219f940` |
+| `townmap.c` | `0x0219ce80`–`0x0219f2dc` | 84 | complete | string at `0x0219f940` |
 | `townmap_grh.c` | `0x0219f2dc`–`0x0219f718` | 19 | complete | string at `0x0219f94c` |
 | `townmap_data.c` | `0x0219f718`–`0x0219f76c` | 4 | complete | descriptive |
 
@@ -1276,7 +1352,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `medalbox.c` | `0x0219ce80`–`0x021a0610` | 74 | partial | descriptive |
+| `medalbox.c` | `0x0219ce80`–`0x021a0610` | 74 | complete | descriptive |
 | `medalbox_data_sys.c` | `0x021a0610`–`0x021a0cc0` | 9 | complete | string at `0x021a13e8` |
 
 ### Overlay 146
@@ -1317,7 +1393,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `encounter_effect_grid.c` | `0x021f5da0`–`0x021f61d8` | 5 | partial | descriptive |
+| `encounter_effect_grid.c` | `0x021f5da0`–`0x021f61d8` | 5 | complete | descriptive |
 
 ### Overlay 151
 
@@ -1404,11 +1480,11 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `pokelist.c` | `0x02199a00`–`0x02199b88` | 4 | complete | descriptive |
 | `plist_sys.c` | `0x02199b88`–`0x0219e678` | 89 | partial | descriptive |
-| `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | partial | string at `0x021a4cec` |
+| `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | complete | string at `0x021a4cec` |
 | `plist_message.c` | `0x0219f5ec`–`0x0219fae8` | 23 | complete | string at `0x021a4cfc` |
 | `plist_menu.c` | `0x0219fae8`–`0x0219fef0` | 14 | complete | string at `0x021a4d0c` |
 | `plist_item.c` | `0x0219fef0`–`0x021a0d38` | 21 | complete | descriptive |
-| `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | partial | string at `0x021a4d1c` |
+| `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | complete | string at `0x021a4d1c` |
 | `plist_demo.c` | `0x021a1944`–`0x021a23e8` | 21 | complete | string at `0x021a4d2c` |
 | `status_rcv.c` | `0x021a23e8`–`0x021a30f8` | 7 | complete | descriptive |
 | `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | partial | descriptive |
@@ -1423,7 +1499,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `event_battle_return.c` | `0x0219ce80`–`0x0219d650` | 10 | partial | string at `0x0219d6c0` |
+| `event_battle_return.c` | `0x0219ce80`–`0x0219d650` | 10 | complete | string at `0x0219d6c0` |
 
 ### Overlay 167
 
@@ -1434,7 +1510,7 @@ prints the tables below from the configs and the ROM:
 | `btl_main.c` | `0x021998c0`–`0x0219e3cc` | 231 | partial | string at `0x021dae80` |
 | `btl_server.c` | `0x0219e3cc`–`0x0219f390` | 55 | complete | string at `0x021dae8c` |
 | `btl_server_flow.c` | `0x0219f390`–`0x021ae32c` | 997 | partial | string at `0x021dae9c` |
-| `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | partial | descriptive |
+| `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | complete | descriptive |
 | `btl_handler_work.c` | `0x021b083c`–`0x021b0a1c` | 11 | complete | descriptive |
 | `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | partial | descriptive |
 | `btl_client.c` | `0x021b1674`–`0x021b9950` | 311 | partial | string at `0x021daf60` |
@@ -1446,16 +1522,16 @@ prints the tables below from the configs and the ROM:
 | `ability_handlers.c` | `0x021bdcac`–`0x021c26ec` | 442 | complete | descriptive |
 | `item_handlers.c` | `0x021c26ec`–`0x021c5b04` | 431 | complete | descriptive |
 | `move_handlers.c` | `0x021c5b04`–`0x021cde38` | 620 | complete | descriptive |
-| `handler_common.c` | `0x021cde38`–`0x021ce10c` | 16 | partial | descriptive |
+| `handler_common.c` | `0x021cde38`–`0x021ce10c` | 16 | complete | descriptive |
 | `battle_overlay.c` | `0x021ce10c`–`0x021ce158` | 2 | complete | descriptive |
 | `battle_condition.c` | `0x021ce158`–`0x021ce520` | 20 | complete | descriptive |
 | `poke_type_pair.c` | `0x021ce520`–`0x021ce604` | 8 | complete | descriptive |
-| `btlv_core.c` | `0x021ce604`–`0x021d0c24` | 295 | partial | string at `0x021dafa0` |
+| `btlv_core.c` | `0x021ce604`–`0x021d0c24` | 295 | complete | string at `0x021dafa0` |
 | `btlv_scu.c` | `0x021d0c24`–`0x021d45b0` | 124 | complete | string at `0x021dafac` |
 | `btl_rec.c` | `0x021d45b0`–`0x021d4a1c` | 18 | partial | string at `0x021dafb8` |
 | `btl_adapter.c` | `0x021d4a1c`–`0x021d4c64` | 17 | complete | string at `0x021dafc4` |
 | `btl_string.c` | `0x021d4c64`–`0x021d5968` | 33 | complete | descriptive |
-| `btl_field.c` | `0x021d5968`–`0x021d5e1c` | 36 | partial | string at `0x021dafd4` |
+| `btl_field.c` | `0x021d5968`–`0x021d5e1c` | 36 | complete | string at `0x021dafd4` |
 | `pokewood_cutin.c` | `0x021d5e1c`–`0x021d6c24` | 48 | partial | string at `0x021dafe0` |
 
 ### Overlay 168
@@ -1477,6 +1553,24 @@ prints the tables below from the configs and the ROM:
 | `btlv_timer.c` | `0x021f2174`–`0x021f26b8` | 8 | partial | string at `0x021f41f8` |
 | `btlv_bg.c` | `0x021f26b8`–`0x021f2cdc` | 15 | complete | string at `0x021f4208` |
 | `btlv_finger_cursor.c` | `0x021f2cdc`–`0x021f2f54` | 7 | complete | string at `0x021f4214` |
+
+### Overlay 169
+
+1298 of 1298 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `field_handlers.c` | `0x06898020`–`0x068981f0` | 36 | complete | descriptive |
+| `pos_handlers.c` | `0x068981f0`–`0x06898bfc` | 175 | complete | descriptive |
+| `side_handlers.c` | `0x06898bfc`–`0x06899af0` | 261 | complete | descriptive |
+| `btlv_scd.c` | `0x06899af0`–`0x0689b938` | 428 | complete | string at `0x0689e938` |
+| `condition_effects.c` | `0x0689b938`–`0x0689ca10` | 263 | complete | descriptive |
+| `btl_tables.c` | `0x0689ca10`–`0x0689cc20` | 27 | complete | descriptive |
+| `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | complete | descriptive |
+| `btl_monset.c` | `0x0689ccc4`–`0x0689d178` | 38 | partial | descriptive |
+| `btl_wazarec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
+| `btl_faintrec.c` | `0x0689d284`–`0x0689d384` | 9 | complete | descriptive |
+| `btl_pospoke.c` | `0x0689d384`–`0x0689d790` | 44 | complete | descriptive |
 
 ### Overlay 170
 
@@ -1502,17 +1596,18 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `pdc.c` | `0x021998c0`–`0x021999a8` | 12 | complete | string at `0x0219a620` |
 | `pdc_main.c` | `0x021999a8`–`0x02199f94` | 11 | complete | string at `0x0219a628` |
-| `pdc_msg.c` | `0x02199f94`–`0x0219a53c` | 16 | partial | string at `0x0219a634` |
+| `pdc_msg.c` | `0x02199f94`–`0x0219a53c` | 16 | complete | string at `0x0219a634` |
 
 ### Overlay 173
 
-110 of 442 functions are in source files.
+442 of 442 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifi_p2pmatchroom.c` | `0x0219ce80`–`0x0219e0ac` | 88 | partial | descriptive |
+| `wifi_p2pmatchroom.c` | `0x0219ce80`–`0x0219e0ac` | 88 | complete | descriptive |
 | `wifi_p2pmatch_net.c` | `0x0219e0ac`–`0x0219e0f0` | 7 | complete | descriptive |
 | `wifi_p2pmatchroom_map.c` | `0x0219e0f0`–`0x0219e108` | 2 | complete | descriptive |
+| `wifi_p2pmatch.c` | `0x0219e108`–`0x021a61c0` | 332 | partial | descriptive |
 | `wifi_status.c` | `0x021a61c0`–`0x021a6268` | 13 | complete | descriptive |
 
 ### Overlay 174
@@ -1521,7 +1616,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `ircbattlematch.c` | `0x0219ce80`–`0x0219f0b4` | 86 | partial | string at `0x0219f30c` |
+| `ircbattlematch.c` | `0x0219ce80`–`0x0219f0b4` | 86 | complete | string at `0x0219f30c` |
 
 ### Overlay 175
 
@@ -1530,8 +1625,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `compatible_irc_sys.c` | `0x021998c0`–`0x0219a0f8` | 48 | complete | string at `0x0219ace4` |
-| `irc_compatible.c` | `0x0219a0f8`–`0x0219a89c` | 28 | partial | string at `0x0219acfc` |
-| `irc_appbar.c` | `0x0219a89c`–`0x0219abc4` | 14 | partial | string at `0x0219ad10` |
+| `irc_compatible.c` | `0x0219a0f8`–`0x0219a89c` | 28 | complete | string at `0x0219acfc` |
+| `irc_appbar.c` | `0x0219a89c`–`0x0219abc4` | 14 | complete | string at `0x0219ad10` |
 
 ### Overlay 176
 
@@ -1539,7 +1634,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_compat_menu.c` | `0x0219ad20`–`0x0219c278` | 60 | partial | descriptive |
+| `irc_compat_menu.c` | `0x0219ad20`–`0x0219c278` | 60 | complete | descriptive |
 
 ### Overlay 177
 
@@ -1547,7 +1642,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_sync_check.c` | `0x0219ad20`–`0x0219c9d8` | 79 | partial | descriptive |
+| `irc_sync_check.c` | `0x0219ad20`–`0x0219c9d8` | 79 | complete | descriptive |
 
 ### Overlay 178
 
@@ -1563,7 +1658,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_compat_result.c` | `0x0219ad20`–`0x0219c144` | 53 | partial | descriptive |
+| `irc_compat_result.c` | `0x0219ad20`–`0x0219c144` | 53 | complete | descriptive |
 
 ### Overlay 180
 
@@ -1571,7 +1666,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `irc_ranking.c` | `0x0219ad20`–`0x0219cc4c` | 70 | partial | string at `0x0219ce40` |
+| `irc_ranking.c` | `0x0219ad20`–`0x0219cc4c` | 70 | complete | string at `0x0219ce40` |
 
 ### Overlay 181
 
@@ -1589,8 +1684,21 @@ prints the tables below from the configs and the ROM:
 | `mb_gameinfo.c` | `0x021a2040`–`0x021a2638` | 14 | partial | descriptive |
 | `mb_wm.c` | `0x021a2638`–`0x021a3b28` | 28 | partial | descriptive |
 | `mb_cache.c` | `0x021a3b28`–`0x021a3bd4` | 3 | partial | descriptive |
-| `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | partial | descriptive |
-| `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | partial | descriptive |
+| `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | complete | descriptive |
+| `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | complete | descriptive |
+
+### Overlay 182
+
+103 of 1113 functions are in source files.
+
+| File | `.text` (Black 2) | Functions | Status | Name |
+| --- | --- | --- | --- | --- |
+| `dwc_raputil.c` | `0x021a4920`–`0x021a49d0` | 5 | complete | string at `0x021c05c0` |
+| `dwc_aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | partial | descriptive |
+| `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
+| `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
+| `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
+| `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | partial | descriptive |
 
 ### Overlay 184
 
@@ -1626,9 +1734,9 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `trainer_card.c` | `0x021a75a0`–`0x021a9f80` | 63 | complete | descriptive |
-| `trcard_bmp.c` | `0x021a9f80`–`0x021aaf00` | 22 | partial | descriptive |
+| `trcard_bmp.c` | `0x021a9f80`–`0x021aaf00` | 22 | complete | descriptive |
 | `trcard_obj.c` | `0x021aaf00`–`0x021ab178` | 6 | complete | descriptive |
-| `badge_view.c` | `0x021ab178`–`0x021acd20` | 71 | partial | string at `0x021ada4c` |
+| `badge_view.c` | `0x021ab178`–`0x021acd20` | 71 | complete | string at `0x021ada4c` |
 
 ### Overlay 187
 
@@ -1641,7 +1749,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 189
 
-498 of 498 functions are in source files. Embedded names without a file yet: `ncryption.c`.
+497 of 497 functions are in source files. Embedded names without a file yet: `ncryption.c`.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1674,7 +1782,7 @@ prints the tables below from the configs and the ROM:
 | `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | partial | descriptive |
 | `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | partial | descriptive |
 | `gamestats.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
-| `crypt.c` | `0x021a90f0`–`0x021ac838` | 68 | partial | descriptive |
+| `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | partial | descriptive |
 
 ### Overlay 190
 
@@ -1682,9 +1790,9 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifilogin.c` | `0x021b2f80`–`0x021b3a80` | 39 | partial | descriptive |
+| `wifilogin.c` | `0x021b2f80`–`0x021b3a80` | 39 | complete | descriptive |
 | `wifilogin_disp.c` | `0x021b3a80`–`0x021b46cc` | 17 | complete | string at `0x021b53b8` |
-| `wifilogin_message.c` | `0x021b46cc`–`0x021b4da4` | 21 | partial | string at `0x021b53cc` |
+| `wifilogin_message.c` | `0x021b46cc`–`0x021b4da4` | 21 | complete | string at `0x021b53cc` |
 | `wifilogout.c` | `0x021b4da4`–`0x021b50a0` | 17 | complete | descriptive |
 
 ### Overlay 191
@@ -1711,7 +1819,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pokemontrade_demo_common.c` | `0x021b2f80`–`0x021b3858` | 20 | partial | string at `0x021b6d18` |
+| `pokemontrade_demo_common.c` | `0x021b2f80`–`0x021b3858` | 20 | complete | string at `0x021b6d18` |
 | `pokemontrade_demo_up.c` | `0x021b3858`–`0x021b4234` | 4 | complete | string at `0x021b6d34` |
 | `pokemontrade_demo_down.c` | `0x021b4234`–`0x021b523c` | 20 | complete | string at `0x021b7004` |
 | `pokemontrade_demo_middle.c` | `0x021b523c`–`0x021b69d0` | 27 | complete | string at `0x021b73cc` |
@@ -1722,12 +1830,12 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pokemontrade_proc.c` | `0x021b76e0`–`0x021bbe14` | 179 | partial | string at `0x021c6eb0` |
+| `pokemontrade_proc.c` | `0x021b76e0`–`0x021bbe14` | 179 | complete | string at `0x021c6eb0` |
 | `pokemontrade_nego.c` | `0x021bbe14`–`0x021be808` | 99 | complete | string at `0x021c6ee0` |
 | `pokemontrade_mcss.c` | `0x021be808`–`0x021bead8` | 11 | complete | string at `0x021c6ef4` |
-| `pokemontrade_save.c` | `0x021bead8`–`0x021bfba4` | 32 | partial | string at `0x021c6f08` |
+| `pokemontrade_save.c` | `0x021bead8`–`0x021bfba4` | 32 | complete | string at `0x021c6f08` |
 | `pokemontrade_message.c` | `0x021bfba4`–`0x021c1918` | 50 | complete | descriptive |
-| `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | partial | string at `0x021c6fc0` |
+| `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | complete | string at `0x021c6fc0` |
 | `pokemontrade_2d.c` | `0x021c2a24`–`0x021c6380` | 109 | partial | string at `0x021c7330` |
 
 ### Overlay 195
@@ -1737,7 +1845,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `gtsnego_proc.c` | `0x021b2f80`–`0x021b4d24` | 67 | complete | descriptive |
-| `gtsnego_disp.c` | `0x021b4d24`–`0x021b66b8` | 61 | partial | string at `0x021b7b90` |
+| `gtsnego_disp.c` | `0x021b4d24`–`0x021b66b8` | 61 | complete | string at `0x021b7b90` |
 | `gtsnego_message.c` | `0x021b66b8`–`0x021b7870` | 47 | complete | string at `0x021b7bb4` |
 
 ### Overlay 196
@@ -1754,12 +1862,12 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mystery.c` | `0x021b5420`–`0x021b8348` | 57 | partial | string at `0x021be980` |
+| `mystery.c` | `0x021b5420`–`0x021b8348` | 57 | complete | string at `0x021be980` |
 | `mystery_graphic.c` | `0x021b8348`–`0x021b876c` | 23 | complete | string at `0x021be98c` |
-| `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | partial | string at `0x021be9a0` |
+| `mystery_util.c` | `0x021b876c`–`0x021b99e0` | 56 | complete | string at `0x021be9a0` |
 | `mystery_album.c` | `0x021b99e0`–`0x021bd068` | 59 | partial | string at `0x021be9b0` |
 | `mystery_net.c` | `0x021bd068`–`0x021bdd34` | 40 | complete | string at `0x021be9c0` |
-| `mystery_check.c` | `0x021bdd34`–`0x021be2dc` | 2 | partial | descriptive |
+| `mystery_check.c` | `0x021bdd34`–`0x021be2dc` | 2 | complete | descriptive |
 
 ### Overlay 198
 
@@ -1767,7 +1875,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `comm_tvt_field.c` | `0x021b2f80`–`0x021b4444` | 35 | partial | descriptive |
+| `comm_tvt_field.c` | `0x021b2f80`–`0x021b4444` | 35 | complete | descriptive |
 
 ### Overlay 199
 
@@ -1777,11 +1885,11 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `gsync_menu.c` | `0x021b2f80`–`0x021b4224` | 41 | complete | string at `0x021b99e0` |
 | `gsync_message.c` | `0x021b4224`–`0x021b4870` | 17 | complete | string at `0x021b99f0` |
-| `gsync_download.c` | `0x021b4870`–`0x021b4b48` | 16 | partial | string at `0x021b9a00` |
+| `gsync_download.c` | `0x021b4870`–`0x021b4b48` | 16 | complete | string at `0x021b9a00` |
 | `gsync_disp.c` | `0x021b4b48`–`0x021b5bfc` | 36 | complete | string at `0x021b9b40` |
 | `gsync_state.c` | `0x021b5bfc`–`0x021b8238` | 98 | complete | string at `0x021b9b50` |
 | `pdwacc_message.c` | `0x021b8238`–`0x021b88d0` | 13 | complete | string at `0x021b9b98` |
-| `pdwacc_disp.c` | `0x021b88d0`–`0x021b8f4c` | 8 | partial | string at `0x021b9bec` |
+| `pdwacc_disp.c` | `0x021b88d0`–`0x021b8f4c` | 8 | complete | string at `0x021b9bec` |
 | `pdwacc_state.c` | `0x021b8f4c`–`0x021b95ac` | 27 | complete | descriptive |
 
 ### Overlay 200
@@ -1798,7 +1906,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gds_rap.c` | `0x021b5420`–`0x021b6104` | 24 | partial | string at `0x021b7ae0` |
+| `gds_rap.c` | `0x021b5420`–`0x021b6104` | 24 | complete | string at `0x021b7ae0` |
 | `gds_rap_response.c` | `0x021b6104`–`0x021b631c` | 10 | complete | descriptive |
 | `battle_rec_ov.c` | `0x021b631c`–`0x021b64e8` | 7 | complete | descriptive |
 | `poke_net.c` | `0x021b64e8`–`0x021b7374` | 31 | partial | descriptive |
@@ -1826,7 +1934,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifi_note.c` | `0x021a9b60`–`0x021aded8` | 170 | partial | descriptive |
+| `wifi_note.c` | `0x021a9b60`–`0x021aded8` | 170 | complete | descriptive |
 
 ### Overlay 205
 
@@ -1844,12 +1952,12 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `p_sta_sys.c` | `0x021b2f80`–`0x021b50b0` | 36 | partial | descriptive |
+| `p_sta_sys.c` | `0x021b2f80`–`0x021b50b0` | 36 | complete | descriptive |
 | `p_status.c` | `0x021b50b0`–`0x021b5364` | 3 | complete | string at `0x021bb6ac` |
-| `p_sta_sub.c` | `0x021b5364`–`0x021b6924` | 29 | partial | string at `0x021bb6b8` |
-| `p_sta_info.c` | `0x021b6924`–`0x021b7644` | 12 | partial | string at `0x021bb6c4` |
-| `p_sta_ribbon.c` | `0x021b7644`–`0x021b8510` | 29 | partial | string at `0x021bb6d4` |
-| `p_sta_skill.c` | `0x021b8510`–`0x021ba900` | 43 | partial | string at `0x021bb6e4` |
+| `p_sta_sub.c` | `0x021b5364`–`0x021b6924` | 29 | complete | string at `0x021bb6b8` |
+| `p_sta_info.c` | `0x021b6924`–`0x021b7644` | 12 | complete | string at `0x021bb6c4` |
+| `p_sta_ribbon.c` | `0x021b7644`–`0x021b8510` | 29 | complete | string at `0x021bb6d4` |
+| `p_sta_skill.c` | `0x021b8510`–`0x021ba900` | 43 | complete | string at `0x021bb6e4` |
 | `p_sta_oam.c` | `0x021ba900`–`0x021bad9c` | 10 | complete | string at `0x021bb6f4` |
 | `ribbon.c` | `0x021bad9c`–`0x021bae10` | 2 | complete | descriptive |
 
@@ -1859,7 +1967,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dup_fitting.c` | `0x021998c0`–`0x0219d88c` | 58 | partial | string at `0x0219ddc0` |
+| `dup_fitting.c` | `0x021998c0`–`0x0219d88c` | 58 | complete | string at `0x0219ddc0` |
 | `dup_fitting_item.c` | `0x0219d88c`–`0x0219db98` | 30 | complete | string at `0x0219ddd0` |
 
 ### Overlay 209
@@ -1872,16 +1980,16 @@ prints the tables below from the configs and the ROM:
 | `mus_shot_photo.c` | `0x021ba598`–`0x021bad2c` | 10 | complete | string at `0x021c3020` |
 | `mus_shot_info.c` | `0x021bad2c`–`0x021bb368` | 11 | complete | string at `0x021c3034` |
 | `mus_item_draw.c` | `0x021bb368`–`0x021bb9bc` | 32 | complete | string at `0x021c3044` |
-| `mus_poke_draw.c` | `0x021bb9bc`–`0x021bbe50` | 24 | partial | string at `0x021c3054` |
-| `musical_mcss.c` | `0x021bbe50`–`0x021bd238` | 35 | partial | string at `0x021c3064` |
+| `mus_poke_draw.c` | `0x021bb9bc`–`0x021bbe50` | 24 | complete | string at `0x021c3054` |
+| `musical_mcss.c` | `0x021bbe50`–`0x021bd238` | 35 | complete | string at `0x021c3064` |
 | `sta_act_obj.c` | `0x021bd238`–`0x021bd42c` | 10 | complete | string at `0x021c3074` |
 | `sta_act_light.c` | `0x021bd42c`–`0x021bd778` | 12 | complete | string at `0x021c3084` |
 | `sta_act_bg.c` | `0x021bd778`–`0x021bd8f0` | 7 | complete | string at `0x021c30d0` |
-| `sta_act_poke.c` | `0x021bd8f0`–`0x021be9b0` | 36 | partial | string at `0x021c30e0` |
-| `sta_acting.c` | `0x021be9b0`–`0x021c0380` | 68 | partial | string at `0x021c30f0` |
+| `sta_act_poke.c` | `0x021bd8f0`–`0x021be9b0` | 36 | complete | string at `0x021c30e0` |
+| `sta_acting.c` | `0x021be9b0`–`0x021c0380` | 68 | complete | string at `0x021c30f0` |
 | `sta_act_effect.c` | `0x021c0380`–`0x021c051c` | 9 | complete | string at `0x021c3100` |
-| `sta_act_audience.c` | `0x021c051c`–`0x021c0ae0` | 15 | partial | string at `0x021c3114` |
-| `sta_act_button.c` | `0x021c0ae0`–`0x021c1024` | 6 | partial | string at `0x021c3128` |
+| `sta_act_audience.c` | `0x021c051c`–`0x021c0ae0` | 15 | complete | string at `0x021c3114` |
+| `sta_act_button.c` | `0x021c0ae0`–`0x021c1024` | 6 | complete | string at `0x021c3128` |
 | `sta_act_script.c` | `0x021c1024`–`0x021c134c` | 9 | complete | string at `0x021c313c` |
 | `script_command.c` | `0x021c134c`–`0x021c2bec` | 70 | complete | string at `0x021c3150` |
 
@@ -1891,7 +1999,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `musical_system.c` | `0x021eec80`–`0x021eef38` | 6 | partial | string at `0x021ef1a0` |
+| `musical_system.c` | `0x021eec80`–`0x021eef38` | 6 | complete | string at `0x021ef1a0` |
 | `mus_item_data.c` | `0x021eef38`–`0x021ef188` | 14 | complete | string at `0x021ef1b4` |
 
 ### Overlay 211
@@ -1900,7 +2008,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mus_comm_func.c` | `0x021ef1e0`–`0x021f0614` | 77 | partial | string at `0x021f06d0` |
+| `mus_comm_func.c` | `0x021ef1e0`–`0x021f0614` | 77 | complete | string at `0x021f06d0` |
 
 ### Overlay 213
 
@@ -1921,7 +2029,7 @@ prints the tables below from the configs and the ROM:
 | `worldtrade_demo.c` | `0x021d5c48`–`0x021d61dc` | 6 | complete | string at `0x021e2bec` |
 | `worldtrade_deposit.c` | `0x021d61dc`–`0x021d77c8` | 59 | partial | string at `0x021e2ca0` |
 | `worldtrade_enter.c` | `0x021d77c8`–`0x021d8074` | 30 | complete | string at `0x021e2d34` |
-| `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | partial | string at `0x021e2dd8` |
+| `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | complete | string at `0x021e2dd8` |
 | `worldtrade_mypoke.c` | `0x021daeb8`–`0x021dba8c` | 27 | complete | descriptive |
 | `worldtrade_partner.c` | `0x021dba8c`–`0x021dc784` | 29 | complete | descriptive |
 | `worldtrade_search.c` | `0x021dc784`–`0x021de3f8` | 61 | complete | string at `0x021e2f38` |
@@ -1938,9 +2046,14 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `mailtool.c` | `0x021a75a0`–`0x021a771c` | 6 | complete | string at `0x021ab780` |
-| `mailsys.c` | `0x021a771c`–`0x021a84e4` | 29 | partial | string at `0x021ab78c` |
-| `mailview.c` | `0x021a84e4`–`0x021a8d68` | 16 | partial | string at `0x021ab798` |
-| `mb_seq.c` | `0x021a8d68`–`0x021ab004` | 118 | partial | string at `0x021ab7a4` |
+| `mailsys.c` | `0x021a771c`–`0x021a84e4` | 29 | complete | string at `0x021ab78c` |
+| `mailview.c` | `0x021a84e4`–`0x021a8d68` | 16 | complete | string at `0x021ab798` |
+| `mailbox.c` | `0x021a8d68`–`0x021a8de4` | 3 | complete | descriptive |
+| `mb_main.c` | `0x021a8de4`–`0x021a9740` | 23 | complete | descriptive |
+| `mb_bmp.c` | `0x021a9740`–`0x021a9d90` | 15 | complete | descriptive |
+| `mb_obj.c` | `0x021a9d90`–`0x021aa188` | 17 | complete | descriptive |
+| `mb_seq.c` | `0x021aa188`–`0x021aaefc` | 50 | complete | string at `0x021ab7a4` |
+| `mb_ui.c` | `0x021aaefc`–`0x021ab004` | 10 | complete | descriptive |
 
 ### Overlay 216
 
@@ -1950,8 +2063,8 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `guru2.c` | `0x021bb700`–`0x021bb984` | 13 | complete | string at `0x021c1100` |
 | `guru2_comm.c` | `0x021bb984`–`0x021bbc98` | 25 | complete | string at `0x021c1108` |
-| `guru2_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | partial | descriptive |
-| `guru2_main.c` | `0x021bd6a0`–`0x021c08d0` | 185 | partial | string at `0x021c1158` |
+| `guru2_receipt.c` | `0x021bbc98`–`0x021bd6a0` | 69 | complete | descriptive |
+| `guru2_main.c` | `0x021bd6a0`–`0x021c08d0` | 185 | complete | string at `0x021c1158` |
 
 ### Overlay 253
 
@@ -1959,7 +2072,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mictest.c` | `0x0217c940`–`0x0217d648` | 46 | partial | string at `0x0217d800` |
+| `mictest.c` | `0x0217c940`–`0x0217d648` | 46 | complete | string at `0x0217d800` |
 
 ### Overlay 255
 
@@ -1971,10 +2084,10 @@ prints the tables below from the configs and the ROM:
 | `box2_main.c` | `0x021bb7e0`–`0x021c28a8` | 163 | complete | string at `0x021d9640` |
 | `box2_seq.c` | `0x021c28a8`–`0x021cdf18` | 192 | complete | string at `0x021d964c` |
 | `box2_bmp.c` | `0x021cdf18`–`0x021cf3c0` | 58 | complete | descriptive |
-| `box2_obj.c` | `0x021cf3c0`–`0x021d23d8` | 130 | partial | descriptive |
+| `box2_obj.c` | `0x021cf3c0`–`0x021d23d8` | 130 | complete | descriptive |
 | `box2_ui.c` | `0x021d23d8`–`0x021d364c` | 71 | complete | string at `0x021d9658` |
 | `box2_bgwfrm.c` | `0x021d364c`–`0x021d3b64` | 35 | complete | descriptive |
-| `box_search.c` | `0x021d3b64`–`0x021d6d28` | 118 | partial | descriptive |
+| `box_search.c` | `0x021d3b64`–`0x021d6d28` | 118 | complete | descriptive |
 | `box_search_graphic.c` | `0x021d6d28`–`0x021d6f6c` | 16 | complete | string at `0x021d96c0` |
 
 ### Overlay 256
@@ -1987,7 +2100,7 @@ prints the tables below from the configs and the ROM:
 | `dpc_main.c` | `0x021bb758`–`0x021bbd10` | 17 | complete | descriptive |
 | `dpc_seq.c` | `0x021bbd10`–`0x021bc714` | 21 | complete | descriptive |
 | `dpc_bmp.c` | `0x021bc714`–`0x021bce88` | 8 | complete | descriptive |
-| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | partial | descriptive |
+| `dpc_obj.c` | `0x021bce88`–`0x021bd748` | 25 | complete | descriptive |
 | `dpc_ui.c` | `0x021bd748`–`0x021bd8e4` | 3 | complete | descriptive |
 
 ### Overlay 257
@@ -2012,7 +2125,7 @@ prints the tables below from the configs and the ROM:
 | `ctvt_game_cam_graphic.c` | `0x021a9704`–`0x021a98d4` | 8 | complete | string at `0x021b26a4` |
 | `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | partial | string at `0x021b26c8` |
 | `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | partial | descriptive |
-| `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | partial | descriptive |
+| `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | complete | descriptive |
 | `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
 | `ssp_exifenc.c` | `0x021ae378`–`0x021af740` | 11 | complete | descriptive |
 
@@ -2026,7 +2139,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 259
 
-217 of 318 functions are in source files. Embedded names without a file yet: `local_tvt_callselect.c`, `local_tvt_util.c`.
+318 of 318 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -2036,6 +2149,8 @@ prints the tables below from the configs and the ROM:
 | `local_tvt_callmode.c` | `0x0219ac00`–`0x0219b3f4` | 16 | complete | string at `0x021a097c` |
 | `local_tvt_graphic.c` | `0x0219b3f4`–`0x0219b630` | 14 | complete | string at `0x021a0994` |
 | `local_tvt_message.c` | `0x0219b630`–`0x0219be0c` | 29 | complete | string at `0x021a09a8` |
+| `local_tvt_util.c` | `0x0219be0c`–`0x0219d558` | 51 | complete | string at `0x021a09bc` |
+| `local_tvt_callselect.c` | `0x0219d558`–`0x0219e3f0` | 50 | complete | string at `0x021a09d0` |
 | `local_tvt_calldata.c` | `0x0219e3f0`–`0x0219e70c` | 23 | complete | string at `0x021a09e8` |
 | `local_tvt_person.c` | `0x0219e70c`–`0x0219e908` | 8 | complete | string at `0x021a0a00` |
 | `local_tvt_person_support.c` | `0x0219e908`–`0x0219ee18` | 8 | complete | string at `0x021a0a14` |
@@ -2043,7 +2158,7 @@ prints the tables below from the configs and the ROM:
 | `local_tvt_person_doctor.c` | `0x0219f04c`–`0x0219f63c` | 11 | complete | string at `0x021a0a4c` |
 | `local_tvt_person_chelen.c` | `0x0219f63c`–`0x0219faac` | 9 | complete | string at `0x021a0a68` |
 | `local_tvt_person_rival.c` | `0x0219faac`–`0x0219fcac` | 7 | complete | string at `0x021a0a84` |
-| `local_tvt_person_secret.c` | `0x0219fcac`–`0x021a039c` | 27 | partial | string at `0x021a0aa0` |
+| `local_tvt_person_secret.c` | `0x0219fcac`–`0x021a039c` | 27 | complete | string at `0x021a0aa0` |
 
 ### Overlay 260
 
@@ -2052,8 +2167,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `wifibattlematch_link.c` | `0x021b2f80`–`0x021b3064` | 3 | complete | descriptive |
-| `wifibattlematch_link_random.c` | `0x021b3064`–`0x021b57dc` | 44 | partial | descriptive |
-| `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | partial | descriptive |
+| `wifibattlematch_link_random.c` | `0x021b3064`–`0x021b57dc` | 44 | complete | descriptive |
+| `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
 | `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | partial | descriptive |
 | `sake.c` | `0x021bc218`–`0x021bc4fc` | 19 | complete | descriptive |
@@ -2072,8 +2187,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `battle_championship_flow.c` | `0x02176b00`–`0x02177954` | 41 | partial | string at `0x0217a868` |
-| `livebattlematch_flow.c` | `0x02177954`–`0x021795c8` | 36 | partial | string at `0x0217a884` |
+| `battle_championship_flow.c` | `0x02176b00`–`0x02177954` | 41 | complete | string at `0x0217a868` |
+| `livebattlematch_flow.c` | `0x02177954`–`0x021795c8` | 36 | complete | string at `0x0217a884` |
 | `digitalcardcheck.c` | `0x021795c8`–`0x0217a27c` | 24 | complete | string at `0x0217a8bc` |
 | `livebattlematch_irc.c` | `0x0217a27c`–`0x0217a7b4` | 26 | complete | string at `0x0217a8d4` |
 
@@ -2084,7 +2199,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `wifibattlematch_graphic.c` | `0x021c2560`–`0x021c279c` | 14 | complete | string at `0x021c5fa0` |
-| `wifibattlematch_view.c` | `0x021c279c`–`0x021c568c` | 52 | partial | string at `0x021c5fbc` |
+| `wifibattlematch_view.c` | `0x021c279c`–`0x021c568c` | 52 | complete | string at `0x021c5fbc` |
 | `wifibattlematch_util.c` | `0x021c568c`–`0x021c5cf8` | 24 | complete | string at `0x021c5fd4` |
 
 ### Overlay 263
@@ -2122,7 +2237,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `staff_roll_main.c` | `0x0219ce80`–`0x0219e518` | 57 | partial | string at `0x0219e660` |
+| `staff_roll_main.c` | `0x0219ce80`–`0x0219e518` | 57 | complete | string at `0x0219e660` |
 
 ### Overlay 267
 
@@ -2135,14 +2250,24 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 268
 
-59 of 191 functions are in source files. Embedded names without a file yet: `br_codein.c`.
+191 of 191 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `br_start_proc.c` | `0x021ba140`–`0x021ba4f8` | 7 | complete | descriptive |
 | `br_menu_proc.c` | `0x021ba4f8`–`0x021ba7a0` | 4 | complete | descriptive |
 | `br_record_proc.c` | `0x021ba7a0`–`0x021bc1e0` | 30 | complete | descriptive |
-| `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | partial | descriptive |
+| `br_btlsubway_proc.c` | `0x021bc1e0`–`0x021bd02c` | 18 | complete | descriptive |
+| `br_rndmatch_proc.c` | `0x021bd02c`–`0x021bd804` | 11 | complete | descriptive |
+| `br_bvrank_proc.c` | `0x021bd804`–`0x021be790` | 20 | complete | descriptive |
+| `br_bvsearch_proc.c` | `0x021be790`–`0x021bf37c` | 19 | complete | descriptive |
+| `br_codein_proc.c` | `0x021bf37c`–`0x021bf540` | 3 | complete | descriptive |
+| `br_codein.c` | `0x021bf540`–`0x021bf6b8` | 8 | complete | string at `0x021c284c` |
+| `br_codein_disp.c` | `0x021bf6b8`–`0x021c004c` | 18 | complete | descriptive |
+| `br_codein_pv.c` | `0x021c004c`–`0x021c0afc` | 16 | complete | descriptive |
+| `br_bvsend_proc.c` | `0x021c0afc`–`0x021c0ea4` | 6 | complete | descriptive |
+| `br_bvdelete_proc.c` | `0x021c0ea4`–`0x021c13f8` | 11 | complete | descriptive |
+| `br_bvsave_proc.c` | `0x021c13f8`–`0x021c20e8` | 20 | complete | descriptive |
 
 ### Overlay 269
 
@@ -2167,7 +2292,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `br_core.c` | `0x021efe40`–`0x021f0770` | 30 | complete | descriptive |
-| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | partial | string at `0x021f7b84` |
+| `br_proc_sys.c` | `0x021f0770`–`0x021f0a6c` | 11 | complete | string at `0x021f7b84` |
 | `br_btn.c` | `0x021f0a6c`–`0x021f23b8` | 56 | complete | string at `0x021f7c20` |
 | `br_btn_data.c` | `0x021f23b8`–`0x021f266c` | 8 | complete | string at `0x021f7cd8` |
 | `br_res.c` | `0x021f266c`–`0x021f31b8` | 20 | complete | string at `0x021f7d50` |
@@ -2175,8 +2300,8 @@ prints the tables below from the configs and the ROM:
 | `br_util.c` | `0x021f34a0`–`0x021f54d8` | 63 | partial | string at `0x021f7e20` |
 | `br_fade.c` | `0x021f54d8`–`0x021f5b68` | 17 | complete | string at `0x021f7eb0` |
 | `br_sidebar.c` | `0x021f5b68`–`0x021f6224` | 18 | complete | string at `0x021f7ebc` |
-| `br_net.c` | `0x021f6224`–`0x021f6a1c` | 37 | partial | string at `0x021f7ed4` |
-| `br_pokesearch.c` | `0x021f6a1c`–`0x021f70a0` | 17 | partial | string at `0x021f7f08` |
+| `br_net.c` | `0x021f6224`–`0x021f6a1c` | 37 | complete | string at `0x021f7ed4` |
+| `br_pokesearch.c` | `0x021f6a1c`–`0x021f70a0` | 17 | complete | string at `0x021f7f08` |
 
 ### Overlay 272
 
@@ -2228,7 +2353,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `shinka_demo.c` | `0x021e30e0`–`0x021e49b0` | 44 | complete | string at `0x021e80a0` |
 | `shinka_demo_graphic.c` | `0x021e49b0`–`0x021e4dd0` | 23 | complete | string at `0x021e80b0` |
-| `shinka_demo_view.c` | `0x021e4dd0`–`0x021e7824` | 56 | partial | string at `0x021e80c8` |
+| `shinka_demo_view.c` | `0x021e4dd0`–`0x021e7824` | 56 | complete | string at `0x021e80c8` |
 | `shinka_demo_effect.c` | `0x021e7824`–`0x021e7d9c` | 28 | complete | string at `0x021e80dc` |
 
 ### Overlay 285
@@ -2260,8 +2385,8 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `b_plist_anm.c` | `0x021f4440`–`0x021f4f44` | 12 | complete | string at `0x021fb860` |
 | `b_plist_bmp.c` | `0x021f4f44`–`0x021f75dc` | 56 | complete | descriptive |
-| `b_plist_obj.c` | `0x021f75dc`–`0x021f8714` | 34 | partial | descriptive |
-| `b_plist_main.c` | `0x021f8714`–`0x021facd0` | 79 | partial | string at `0x021fb870` |
+| `b_plist_obj.c` | `0x021f75dc`–`0x021f8714` | 34 | complete | descriptive |
+| `b_plist_main.c` | `0x021f8714`–`0x021facd0` | 79 | complete | string at `0x021fb870` |
 | `b_plist_cursor.c` | `0x021facd0`–`0x021fadac` | 9 | complete | descriptive |
 
 ### Overlay 288
@@ -2270,8 +2395,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `b_scenario_main.c` | `0x021f4440`–`0x021f61a8` | 42 | partial | string at `0x021f7230` |
-| `b_scenario_graphic.c` | `0x021f61a8`–`0x021f6db0` | 32 | partial | descriptive |
+| `b_scenario_main.c` | `0x021f4440`–`0x021f61a8` | 42 | complete | string at `0x021f7230` |
+| `b_scenario_graphic.c` | `0x021f61a8`–`0x021f6db0` | 32 | complete | descriptive |
 
 ### Overlay 289
 
@@ -2279,7 +2404,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `b_choice_main.c` | `0x021f4440`–`0x021f51a0` | 33 | partial | string at `0x021f53fc` |
+| `b_choice_main.c` | `0x021f4440`–`0x021f51a0` | 33 | complete | string at `0x021f53fc` |
 
 ### Overlay 290
 
@@ -2287,7 +2412,8 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wifibattlematch_sys.c` | `0x021fb880`–`0x021fcf84` | 36 | partial | string at `0x021fd048` |
+| `wifibattlematch_sys.c` | `0x021fb880`–`0x021fcb4c` | 33 | complete | string at `0x021fd048` |
+| `wifibattlematch_battle.c` | `0x021fcb4c`–`0x021fcf84` | 3 | complete | descriptive |
 
 ### Overlay 293
 
@@ -2297,12 +2423,12 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `demo3d.c` | `0x021a1b20`–`0x021a1ea4` | 10 | complete | string at `0x021ab360` |
 | `demo3d_graphic.c` | `0x021a1ea4`–`0x021a22b4` | 24 | complete | string at `0x021ab36c` |
-| `demo3d_engine.c` | `0x021a22b4`–`0x021a298c` | 11 | partial | string at `0x021ab380` |
-| `demo3d_data.c` | `0x021a298c`–`0x021a2ba8` | 13 | partial | string at `0x021ab390` |
-| `demo3d_capture.c` | `0x021a2ba8`–`0x021a2db8` | 7 | partial | descriptive |
+| `demo3d_engine.c` | `0x021a22b4`–`0x021a298c` | 11 | complete | string at `0x021ab380` |
+| `demo3d_data.c` | `0x021a298c`–`0x021a2ba8` | 13 | complete | string at `0x021ab390` |
+| `demo3d_capture.c` | `0x021a2ba8`–`0x021a2db8` | 7 | complete | descriptive |
 | `demo3d_cmd.c` | `0x021a2db8`–`0x021a39e4` | 36 | complete | descriptive |
 | `demo3d_cmdsys.c` | `0x021a39e4`–`0x021a3c00` | 7 | complete | string at `0x021ab3f0` |
-| `demo3d_exp_c_cruiser.c` | `0x021a3c00`–`0x021a3d6c` | 4 | partial | string at `0x021ab400` |
+| `demo3d_exp_c_cruiser.c` | `0x021a3c00`–`0x021a3d6c` | 4 | complete | string at `0x021ab400` |
 
 ### Overlay 294
 
@@ -2325,7 +2451,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `game_clear_save.c` | `0x0219ce80`–`0x0219d460` | 13 | partial | descriptive |
+| `game_clear_save.c` | `0x0219ce80`–`0x0219d460` | 13 | complete | descriptive |
 | `battle_lose_message.c` | `0x0219d460`–`0x0219d704` | 6 | complete | descriptive |
 
 ### Overlay 296
@@ -2334,7 +2460,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | partial | string at `0x0219fba0` |
+| `zukan_info.c` | `0x0219d6e0`–`0x0219fa7c` | 61 | complete | string at `0x0219fba0` |
 
 ### Overlay 297
 
@@ -2357,12 +2483,12 @@ prints the tables below from the configs and the ROM:
 | `zukan_detail.c` | `0x021a03e8`–`0x021a0700` | 5 | complete | string at `0x021ace10` |
 | `zukan_detail_graphic.c` | `0x021a0700`–`0x021a0ae0` | 23 | complete | string at `0x021ace20` |
 | `zknd_tbar.c` | `0x021a0ae0`–`0x021a1268` | 39 | complete | string at `0x021ace38` |
-| `zukan_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | partial | string at `0x021ace44` |
+| `zukan_detail_touchbar.c` | `0x021a1268`–`0x021a21f0` | 44 | complete | string at `0x021ace44` |
 | `zukan_detail_headbar.c` | `0x021a21f0`–`0x021a24e0` | 13 | complete | string at `0x021ace5c` |
 | `zukan_detail_info.c` | `0x021a24e0`–`0x021a328c` | 20 | complete | descriptive |
-| `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | partial | descriptive |
+| `zukan_detail_map.c` | `0x021a328c`–`0x021a63d4` | 76 | complete | descriptive |
 | `zukan_detail_voice.c` | `0x021a63d4`–`0x021a79e0` | 39 | complete | string at `0x021ace88` |
-| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | partial | string at `0x021acec4` |
+| `zukan_detail_form.c` | `0x021a79e0`–`0x021abf74` | 75 | complete | string at `0x021acec4` |
 
 ### Overlay 299
 
@@ -2371,7 +2497,7 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `zukanlist.c` | `0x0219fbc0`–`0x0219fc14` | 3 | complete | descriptive |
-| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | partial | descriptive |
+| `zknlist_main.c` | `0x0219fc14`–`0x021a05dc` | 29 | complete | descriptive |
 | `zknlist_seq.c` | `0x021a05dc`–`0x021a0ec0` | 16 | complete | descriptive |
 | `zknlist_bmp.c` | `0x021a0ec0`–`0x021a13f0` | 12 | complete | descriptive |
 | `zknlist_obj.c` | `0x021a13f0`–`0x021a23a4` | 33 | complete | descriptive |
@@ -2397,7 +2523,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | partial | descriptive |
+| `zukan_open.c` | `0x0219fbc0`–`0x021a023c` | 19 | complete | descriptive |
 
 ### Overlay 302
 
@@ -2406,8 +2532,8 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `zukan.c` | `0x021acee0`–`0x021ad624` | 19 | complete | string at `0x021ae5a0` |
-| `zukan_common.c` | `0x021ad624`–`0x021adecc` | 20 | partial | string at `0x021ae5a8` |
-| `zukan_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | partial | string at `0x021ae5b8` |
+| `zukan_common.c` | `0x021ad624`–`0x021adecc` | 20 | complete | string at `0x021ae5a8` |
+| `zukan_search_engine.c` | `0x021adecc`–`0x021ae3dc` | 7 | complete | string at `0x021ae5b8` |
 
 ### Overlay 303
 
@@ -2415,7 +2541,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | partial | descriptive |
+| `zukan_habitat.c` | `0x0219fbc0`–`0x021a1a80` | 56 | complete | descriptive |
 | `zukan_habitat_graphic.c` | `0x021a1a80`–`0x021a32d8` | 58 | complete | descriptive |
 
 ### Overlay 304
@@ -2424,7 +2550,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zukan_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | partial | descriptive |
+| `zukan_area_list.c` | `0x0219fbc0`–`0x021a073c` | 34 | complete | descriptive |
 | `zukan_area_list_view.c` | `0x021a073c`–`0x021a1dac` | 58 | complete | descriptive |
 
 ### Overlay 305
@@ -2471,10 +2597,10 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `fmission_app.c` | `0x0219ce80`–`0x0219e938` | 34 | partial | descriptive |
+| `fmission_app.c` | `0x0219ce80`–`0x0219e938` | 34 | complete | descriptive |
 | `fmission_app_gra.c` | `0x0219e938`–`0x0219ecd8` | 21 | complete | string at `0x021a06f0` |
-| `fmission_app_draw.c` | `0x0219ecd8`–`0x0219fbc0` | 26 | partial | descriptive |
-| `fmission_log_accessor_fapp.c` | `0x0219fbc0`–`0x021a014c` | 6 | partial | string at `0x021a0720` |
+| `fmission_app_draw.c` | `0x0219ecd8`–`0x0219fbc0` | 26 | complete | descriptive |
+| `fmission_log_accessor_fapp.c` | `0x0219fbc0`–`0x021a014c` | 6 | complete | string at `0x021a0720` |
 
 ### Overlay 310
 
@@ -2482,19 +2608,19 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `research_radar.c` | `0x0219ce80`–`0x0219d3c0` | 23 | partial | descriptive |
+| `research_radar.c` | `0x0219ce80`–`0x0219d3c0` | 23 | complete | descriptive |
 | `research_top.c` | `0x0219d3c0`–`0x0219e470` | 96 | complete | string at `0x021a77ec` |
 | `research_list.c` | `0x0219e470`–`0x021a0f60` | 186 | complete | string at `0x021a77fc` |
-| `research_graph.c` | `0x021a0f60`–`0x021a4394` | 204 | partial | string at `0x021a780c` |
+| `research_graph.c` | `0x021a0f60`–`0x021a4394` | 204 | complete | string at `0x021a780c` |
 | `research_common.c` | `0x021a4394`–`0x021a47dc` | 49 | complete | string at `0x021a7820` |
 | `research_list_recovery.c` | `0x021a47dc`–`0x021a4820` | 9 | complete | string at `0x021a7834` |
 | `queue.c` | `0x021a4820`–`0x021a490c` | 13 | complete | string at `0x021a7850` |
-| `bg_font.c` | `0x021a490c`–`0x021a4ae0` | 7 | partial | string at `0x021a7858` |
+| `bg_font.c` | `0x021a490c`–`0x021a4ae0` | 7 | complete | string at `0x021a7858` |
 | `circle_graph.c` | `0x021a4ae0`–`0x021a5a88` | 64 | complete | string at `0x021a7864` |
 | `arrow.c` | `0x021a5a88`–`0x021a605c` | 25 | complete | string at `0x021a7874` |
 | `research_data.c` | `0x021a605c`–`0x021a6100` | 6 | complete | descriptive |
 | `percentage.c` | `0x021a6100`–`0x021a63e0` | 24 | complete | string at `0x021a787c` |
-| `palette_anime.c` | `0x021a63e0`–`0x021a6848` | 28 | partial | string at `0x021a788c` |
+| `palette_anime.c` | `0x021a63e0`–`0x021a6848` | 28 | complete | string at `0x021a788c` |
 
 ### Overlay 311
 
@@ -2502,7 +2628,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | partial | string at `0x0219e988` |
+| `un_select.c` | `0x0219ce80`–`0x0219e088` | 53 | complete | string at `0x0219e988` |
 | `un_select_graphic.c` | `0x0219e088`–`0x0219e3f4` | 17 | complete | string at `0x0219e994` |
 
 ### Overlay 312
@@ -2519,7 +2645,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `th_award.c` | `0x0219ce80`–`0x0219d9a8` | 14 | partial | descriptive |
+| `th_award.c` | `0x0219ce80`–`0x0219d9a8` | 14 | complete | descriptive |
 | `th_award_graphic.c` | `0x0219d9a8`–`0x0219dbe4` | 14 | complete | string at `0x0219ddc0` |
 
 ### Overlay 314
@@ -2528,7 +2654,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | partial | string at `0x0219db80` |
+| `chihou_zukan_award.c` | `0x0219ce80`–`0x0219d6a4` | 16 | complete | string at `0x0219db80` |
 | `chihou_zukan_award_graphic.c` | `0x0219d6a4`–`0x0219da10` | 17 | complete | string at `0x0219db98` |
 
 ### Overlay 315
@@ -2537,7 +2663,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `zenkoku_zukan_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | partial | string at `0x0219dc40` |
+| `zenkoku_zukan_award.c` | `0x0219ce80`–`0x0219d73c` | 16 | complete | string at `0x0219dc40` |
 | `zenkoku_zukan_award_graphic.c` | `0x0219d73c`–`0x0219daa8` | 17 | complete | string at `0x0219dc58` |
 
 ### Overlay 316
@@ -2546,7 +2672,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `psel.c` | `0x0219ce80`–`0x0219f6d0` | 80 | partial | string at `0x0219fe00` |
+| `psel.c` | `0x0219ce80`–`0x0219f6d0` | 80 | complete | string at `0x0219fe00` |
 | `psel_graphic.c` | `0x0219f6d0`–`0x0219fa84` | 23 | complete | string at `0x0219fe08` |
 
 ### Overlay 317
@@ -2591,7 +2717,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | partial | descriptive |
+| `wbt_list.c` | `0x0219ce80`–`0x0219eb70` | 50 | complete | descriptive |
 | `wbt_list_graphic.c` | `0x0219eb70`–`0x0219edb4` | 16 | complete | string at `0x0219f140` |
 
 ### Overlay 321
@@ -2600,7 +2726,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pkwd_count.c` | `0x0219ce80`–`0x0219dc04` | 34 | partial | descriptive |
+| `pkwd_count.c` | `0x0219ce80`–`0x0219dc04` | 34 | complete | descriptive |
 | `pkwd_count_graphic.c` | `0x0219dc04`–`0x0219de5c` | 17 | complete | string at `0x0219e2a0` |
 
 ### Overlay 322
@@ -2609,7 +2735,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pkwd_book.c` | `0x0219ce80`–`0x021a02a8` | 101 | partial | descriptive |
+| `pkwd_book.c` | `0x0219ce80`–`0x021a02a8` | 101 | complete | descriptive |
 | `pkwd_book_graphic.c` | `0x021a02a8`–`0x021a04fc` | 16 | complete | string at `0x021a0c8c` |
 
 ### Overlay 323
@@ -2635,7 +2761,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `pkwd_record_monitor.c` | `0x0219ce80`–`0x0219f098` | 65 | partial | descriptive |
+| `pkwd_record_monitor.c` | `0x0219ce80`–`0x0219f098` | 65 | complete | descriptive |
 | `pkwd_record_monitor_graphic.c` | `0x0219f098`–`0x0219f2dc` | 16 | complete | string at `0x0219f7d8` |
 
 ### Overlay 326
@@ -2646,9 +2772,9 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `win_record.c` | `0x0219ce80`–`0x0219e234` | 47 | complete | descriptive |
 | `win_record_graphic.c` | `0x0219e234`–`0x0219e478` | 16 | complete | string at `0x021a36c0` |
-| `t_download.c` | `0x0219e478`–`0x021a0a84` | 34 | partial | descriptive |
-| `t_download_util.c` | `0x021a0a84`–`0x021a24ac` | 66 | partial | descriptive |
-| `t_download_save.c` | `0x021a24ac`–`0x021a2afc` | 19 | partial | string at `0x021a3748` |
+| `t_download.c` | `0x0219e478`–`0x021a0a84` | 34 | complete | descriptive |
+| `t_download_util.c` | `0x021a0a84`–`0x021a24ac` | 66 | complete | descriptive |
+| `t_download_save.c` | `0x021a24ac`–`0x021a2afc` | 19 | complete | string at `0x021a3748` |
 | `t_download_graphic.c` | `0x021a2afc`–`0x021a2d40` | 16 | complete | string at `0x021a375c` |
 
 ### Overlay 327
@@ -2659,7 +2785,7 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `wbt_download_sys.c` | `0x021b5d80`–`0x021b60a4` | 15 | complete | string at `0x021b7320` |
 | `wbt_download_net_graphic.c` | `0x021b60a4`–`0x021b62f0` | 12 | complete | string at `0x021b7354` |
-| `wbt_download_net_util.c` | `0x021b62f0`–`0x021b70d4` | 33 | partial | string at `0x021b7370` |
+| `wbt_download_net_util.c` | `0x021b62f0`–`0x021b70d4` | 33 | complete | string at `0x021b7370` |
 
 ### Overlay 328
 
@@ -2694,9 +2820,10 @@ prints the tables below from the configs and the ROM:
 | --- | --- | --- | --- | --- |
 | `key_system_main.c` | `0x021beee0`–`0x021c0120` | 53 | complete | string at `0x021c92c0` |
 | `key_system_graphic.c` | `0x021c0120`–`0x021c054c` | 22 | complete | string at `0x021c92d8` |
-| `key_system_util.c` | `0x021c054c`–`0x021c1dd0` | 82 | partial | string at `0x021c92f0` |
+| `key_system_util.c` | `0x021c054c`–`0x021c1dd0` | 82 | complete | string at `0x021c92f0` |
 | `key_system_net.c` | `0x021c1dd0`–`0x021c2b18` | 35 | complete | string at `0x021c9394` |
-| `key_system_flow.c` | `0x021c2b18`–`0x021c53dc` | 81 | partial | descriptive |
+| `key_system_flow.c` | `0x021c2b18`–`0x021c45bc` | 48 | complete | descriptive |
+| `key_system_flow_sub.c` | `0x021c45bc`–`0x021c53dc` | 33 | complete | descriptive |
 | `data_convert_flow.c` | `0x021c53dc`–`0x021c6e14` | 38 | complete | string at `0x021c944c` |
 | `wb_save_block.c` | `0x021c6e14`–`0x021c6e80` | 4 | complete | descriptive |
 | `wb_save_convert.c` | `0x021c6e80`–`0x021c7028` | 3 | complete | string at `0x021c9468` |

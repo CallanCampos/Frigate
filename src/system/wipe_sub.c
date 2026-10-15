@@ -168,7 +168,7 @@ static void WipeCircle_GetSpan(s32 radius, s32 cx, s32 cy, s32 y, s32 *x1, s32 *
 static void WipeCircleWork_Compute(WipeCircleWork *work);
 static void WipeLine_Init(WipeScreen *screen, WipeLinePattern *pattern);
 static BOOL WipeLine_Main(WipeScreen *screen);
-static void WipeLineWork_Init(WipeLineWork *work, const WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
+static void WipeLineWork_Init(WipeLineWork *work, WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
                               WipeWnd *wnd, WipeHBlank *hblank, u32 heapId);
 static BOOL WipeLineWork_Step(WipeLineWork *work);
 static void WipeLineWork_Exit(WipeLineWork *work);
@@ -659,12 +659,14 @@ static inline void WipeLineWnd_SetInside(u8 screen, u32 window, int planes) {
 
 // Shows the planes inside a window on the lines it covers and outside it on the others
 static inline void WipeLineWnd_SetLine(WipeLineWnd *lines, int index, s32 line) {
-    if (lines->buf[index].lines[line] == 0) {
+    WipeLineBuf *buf = &lines->buf[index];
+
+    if (buf->lines[line] == 0) {
         WipeLineWnd_SetOutside(lines->screen, 0x3f);
-        WipeLineWnd_SetInside(lines->screen, lines->buf[index].window, 0x20);
+        WipeLineWnd_SetInside(lines->screen, buf->window, 0x20);
     } else {
         WipeLineWnd_SetOutside(lines->screen, 0x20);
-        WipeLineWnd_SetInside(lines->screen, lines->buf[index].window, 0x3f);
+        WipeLineWnd_SetInside(lines->screen, buf->window, 0x3f);
     }
 }
 
@@ -726,13 +728,13 @@ static BOOL WipeRect_Main(WipeScreen *screen) {
 static void WipeRectWork_Init(WipeRectWork *work, const WipeRectParam *param, s32 division, s32 sync, s32 screen,
                               WipeWnd *wnd) {
     WipeRect_SetSteps(work->cur, work->end, work->step, param->start, param->end, division);
-    work->syncCount = 0;
-    work->isOut = param->isOut;
     work->screen = screen;
     work->window = param->window;
     work->division = division;
     work->sync = sync;
+    work->syncCount = 0;
     work->wnd = wnd;
+    work->isOut = param->isOut;
     WipeSub_SetWnd(wnd, param->inPlanes, param->outPlanes, param->window, screen, param->start[0], param->start[1],
                    param->start[2], param->start[3], work->isOut);
 }
@@ -918,7 +920,7 @@ static BOOL WipeLine_Main(WipeScreen *screen) {
     return done;
 }
 
-static void WipeLineWork_Init(WipeLineWork *work, const WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
+static void WipeLineWork_Init(WipeLineWork *work, WipeLinePattern *pattern, s32 division, s32 sync, u32 screen,
                               WipeWnd *wnd, WipeHBlank *hblank, u32 heapId) {
     WipeLineWnd_Init(&work->lines, screen, 1, 0, 0);
     if (pattern->isOut == FALSE) {
@@ -978,10 +980,12 @@ static void WipeLineWork_Compute(WipeLineWork *work) {
 static void WipeLineRange_Apply(const WipeLineRange *range, WipeLineWnd *lines, s32 step, s32 division) {
     u32 start = range->start;
     u32 end = range->end;
-    s32 edge = (end - start) * step / division + start;
+    // The u8 fields promote to int, so the original's division is signed (_s32_div_f)
+    s32 edge = (range->end - range->start) * step / division;
     s32 i, to;
-    u16 covered;
+    BOOL covered;
 
+    edge += start;
     if (start <= end) {
         i = start;
         to = end;
@@ -989,10 +993,7 @@ static void WipeLineRange_Apply(const WipeLineRange *range, WipeLineWnd *lines, 
     } else {
         i = end;
         to = start;
-        covered = TRUE;
-        if (range->covered) {
-            covered = FALSE;
-        }
+        covered = range->covered ? FALSE : TRUE;
     }
     for (; i < to; i++) {
         if (i == edge) {

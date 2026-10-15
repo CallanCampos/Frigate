@@ -137,7 +137,7 @@ static BOOL StaScript_UpdateMoveVec(StaScriptMoveVec *move, VecFx32 *pos) {
         pos->z = move->end.z;
         return TRUE;
     }
-    vecfx_muladd(FX32_CONST(move->count), &move->step, &move->start, pos);
+    VEC_MultAdd(FX32_CONST(move->count), &move->step, &move->start, pos);
     return FALSE;
 }
 

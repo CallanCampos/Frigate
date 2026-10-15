@@ -49,7 +49,7 @@ BOOL UnionApp_RequestEntry(UnionApp *app, u8 netId) {
     if (app->entryMode == UNION_APP_ENTRY_CLOSED) {
         return FALSE;
     }
-    joined = countOneBits(app->status.joined);
+    joined = MATH_CountPopulation(app->status.joined);
     if (app->entryMode == UNION_APP_ENTRY_LIMITED && app->entryCount + 1U > app->entryLimit) {
         return FALSE;
     }
@@ -379,5 +379,5 @@ u32 UnionApp_GetJoined(UnionApp *app) {
 }
 
 u8 UnionApp_CountJoined(UnionApp *app) {
-    return countOneBits(app->status.joined);
+    return MATH_CountPopulation(app->status.joined);
 }

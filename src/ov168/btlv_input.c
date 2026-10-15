@@ -11,6 +11,7 @@
 #include "battle/btlv_finger_cursor.h"
 #include "battle/btlv_gauge.h"
 #include "battle/btlv_mcss.h"
+#include "battle/btlv_scd.h"
 #include "constants/arc.h"
 #include "constants/moves.h"
 #include "constants/sound.h"
@@ -269,10 +270,9 @@ typedef struct {
     u32 sequences[2];
 } BtlvInputTileSet;
 
-// The game lays out the shared .rodata section by size, with the objects of one size in an order that depends on where
-// each object is declared; no order of these declarations near the address order was found that gives the game's
-// layout, so the objects of equal size come out in another order and the functions that address them from the
-// section's base differ (BtlvInput_MoveScreenMain, BtlvInput_LoadTypeIcons)
+// MWCC lays out the shared .rodata section by size, and sorts the objects of one size (with a heap sort that is not
+// stable) in an order that depends on where each object is declared. The tables below are declared in the order that
+// gives the game's layout, which the functions address from the section's base; it is close to the address order.
 
 // The move screen's slot of each party slot
 static const u8 data_ov168_021f35cc[3] = { 1, 2, 3 };
@@ -284,32 +284,13 @@ static const s16 data_ov168_021f35d2[2] = { 1, 0 };
 static const u8 data_ov168_021f35d6[3][2] = { { 2, 1 }, { 0, 3 }, { 3, 0 } };
 // Which of the two extra buttons of the move screen each party slot gets
 static const u8 data_ov168_021f35dc[3][2] = { { 1, 1 }, { 1, 0 }, { 0, 1 } };
+// The type icons' template, which BtlvInput_LoadTypeIcons places and gives a priority per icon
+static const ClActorSetup data_ov168_021f35fa = { 0, 0, 0, 2, 1 };
 // The other palette lists of the type icons' animations
 static const s16 data_ov168_021f35e2[4] = { 0, 0, 0, 0 };
 static const s16 data_ov168_021f35ea[4] = { 1, 2, 1, 0 };
 // The template of most actors, all zero: each actor is placed and animated after it is created
 static const ClActorSetup data_ov168_021f35f2 = { 0, 0, 0, 0, 0 };
-// The type icons' template, which BtlvInput_LoadTypeIcons places and gives a priority per icon
-static const ClActorSetup data_ov168_021f35fa = { 0, 0, 0, 2, 1 };
-
-static const s32 data_ov168_021f3670[7] = { 0, 0, 0, 0, 1, 0, 0 };
-static const s32 data_ov168_021f368c[7] = { 0x200, 0x400, 0x800, 0x1000, 0x10, 0x4, 0x8 };
-static const s32 data_ov168_021f36a8[7] = { 0, 0, 0, 0, 1, 0, 0 };
-static const s32 data_ov168_021f36c4[7] = { 0, 0, 0, 0, 0x10, 0x4, 0x8 };
-
-static const TouchRect data_ov168_021f3700[8] = {
-    { 0x20, 0x50, 0x00, 0x80 }, { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 }, { 0x50, 0x80, 0x80, 0xff },
-    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
-};
-static const TouchRect data_ov168_021f3760[8] = {
-    { 0x38, 0x68, 0x40, 0xc0 }, { 0x38, 0x68, 0x40, 0xc0 }, { 0x38, 0x68, 0x40, 0xc0 }, { 0x38, 0x68, 0x40, 0xc0 },
-    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
-};
-
-// The move screen's buttons, without a usable move and with one
-static const BtlvInputButtonSet data_ov168_021f3604 = { data_ov168_021f3760, data_ov168_021f36a8, data_ov168_021f36c4 };
-static const BtlvInputButtonSet data_ov168_021f3610 = { data_ov168_021f3700, data_ov168_021f3670, data_ov168_021f368c };
-
 static const BtlvInputTypeAnim data_ov168_021f361c[3] = { { 4, 4 }, { 4, 4 }, { 2, 2 } };
 // The party icons' heights, by row and direction
 static const int data_ov168_021f3628[2][2] = { { 136, 136 }, { 24, 48 } };
@@ -317,11 +298,22 @@ static const int data_ov168_021f3628[2][2] = { { 136, 136 }, { 24, 48 } };
 static const ClActorPos data_ov168_021f3638[4] = { { 34, 65 }, { 162, 65 }, { 34, 113 }, { 162, 113 } };
 static const BGSysLCDConfig data_ov168_021f3648 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_2D };
 static const u32 data_ov168_021f3658[3][2] = { { 0x247, 0x246 }, { 0x245, 0 }, { 0, 0x245 } };
+static const s32 data_ov168_021f368c[7] = { 0x200, 0x400, 0x800, 0x1000, 0x10, 0x4, 0x8 };
+static const s32 data_ov168_021f36a8[7] = { 0, 0, 0, 0, 1, 0, 0 };
+static const s32 data_ov168_021f36c4[7] = { 0, 0, 0, 0, 0x10, 0x4, 0x8 };
+static const TouchRect data_ov168_021f3760[8] = {
+    { 0x38, 0x68, 0x40, 0xc0 }, { 0x38, 0x68, 0x40, 0xc0 }, { 0x38, 0x68, 0x40, 0xc0 }, { 0x38, 0x68, 0x40, 0xc0 },
+    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
+};
+// The move screen's buttons, without a usable move and with one
+static const BtlvInputButtonSet data_ov168_021f3604 = { data_ov168_021f3760, data_ov168_021f36a8, data_ov168_021f36c4 };
+static const s32 data_ov168_021f3670[7] = { 0, 0, 0, 0, 1, 0, 0 };
 static const BtlvInputScroll data_ov168_021f36e0[2][2] = { { { 256, 0 }, { 0, 192 } }, { { 256, 0 }, { 0, 0 } } };
-// Where each move tile's name is centered
-static const s32 data_ov168_021f3720[4][2] = { { 64, 10 }, { 192, 10 }, { 64, 58 }, { 192, 58 } };
-// The scroll of BG 4 for the button rise of each slot
-static const BtlvInputScroll data_ov168_021f3740[4] = { { 256, 448 }, { 256, 192 }, { 0, 192 }, { 0, 448 } };
+static const TouchRect data_ov168_021f3700[8] = {
+    { 0x20, 0x50, 0x00, 0x80 }, { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 }, { 0x50, 0x80, 0x80, 0xff },
+    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
+};
+static const BtlvInputButtonSet data_ov168_021f3610 = { data_ov168_021f3700, data_ov168_021f3670, data_ov168_021f368c };
 // Where each party icon goes, by rule
 static const ClActorPos data_ov168_021f3780[4][3] = {
     { { 128, 112 }, { -1, -1 }, { -1, -1 } },
@@ -329,12 +321,14 @@ static const ClActorPos data_ov168_021f3780[4][3] = {
     { { 88, 112 }, { 128, 112 }, { 168, 112 } },
     { { 104, 112 }, { 152, 112 }, { -1, -1 } },
 };
-
+// Where each move tile's name is centered
+static const s32 data_ov168_021f3720[4][2] = { { 64, 10 }, { 192, 10 }, { 64, 58 }, { 192, 58 } };
 // The tile palette of each move type
 static const u32 data_ov168_021f3864[17] = {
     464, 470, 473, 471, 472, 476, 475, 477, 479, 465, 466, 468, 467, 469, 478, 474, 480,
 };
-
+// The scroll of BG 4 for the button rise of each slot
+static const BtlvInputScroll data_ov168_021f3740[4] = { { 256, 448 }, { 256, 192 }, { 0, 192 }, { 0, 448 } };
 // The key cursor's stops of the move screen, without a usable move and with one, per slot
 static const BtlvInputKeyStop data_ov168_021f38a8[6] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, -5, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 0, 4 },
@@ -377,6 +371,13 @@ static const BtlvInputKeyStop data_ov168_021f39c8[7] = {
     { { 5, 5, 5, 5, -1, -1 }, 0, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 5, 4 },
     { { 6, 6, 6, 6, -1, -1 }, 0, KEY_CURSOR_NONE, 5, 4, 6, 4 },
 };
+// Where each type icon goes, with its palette
+static const BtlvInputTypeIconPos data_ov168_021f3a70[BTLV_INPUT_TYPE_COUNT] = {
+    { 0x20, 0x68, 3 }, { 0x50, 0x68, 3 }, { 0x80, 0x68, 3 }, { 0xb0, 0x68, 3 }, { 0xe0, 0x68, 3 }, { 0x08, 0x88, 2 },
+    { 0x38, 0x88, 2 }, { 0x68, 0x88, 2 }, { 0x98, 0x88, 2 }, { 0xc8, 0x88, 2 }, { 0xf8, 0x88, 2 }, { 0x20, 0xa8, 1 },
+    { 0x50, 0xa8, 1 }, { 0x80, 0xa8, 1 }, { 0xb0, 0xa8, 1 }, { 0xe0, 0xa8, 1 }, { 0x08, 0xc8, 0 }, { 0x38, 0xc8, 0 },
+    { 0x68, 0xc8, 0 }, { 0x98, 0xc8, 0 }, { 0xc8, 0xc8, 0 }, { 0xf8, 0xc8, 0 },
+};
 static const BtlvInputKeyStop data_ov168_021f3a1c[7] = {
     { { 0, 0, 0, 0, -1, -1 }, KEY_CURSOR_NONE, 2, KEY_CURSOR_NONE, 1, 0, 4 },
     { { 1, 1, 1, 1, -1, -1 }, KEY_CURSOR_NONE, 3, 0, KEY_CURSOR_NONE, 1, 4 },
@@ -386,35 +387,23 @@ static const BtlvInputKeyStop data_ov168_021f3a1c[7] = {
     { { 5, 5, 5, 5, -1, -1 }, 2, KEY_CURSOR_NONE, KEY_CURSOR_NONE, 6, 5, 4 },
     { { 6, 6, 6, 6, -1, -1 }, 2, KEY_CURSOR_NONE, 5, 4, 6, 4 },
 };
-
-// Where each type icon goes, with its palette
-static const BtlvInputTypeIconPos data_ov168_021f3a70[BTLV_INPUT_TYPE_COUNT] = {
-    { 0x20, 0x68, 3 }, { 0x50, 0x68, 3 }, { 0x80, 0x68, 3 }, { 0xb0, 0x68, 3 }, { 0xe0, 0x68, 3 }, { 0x08, 0x88, 2 },
-    { 0x38, 0x88, 2 }, { 0x68, 0x88, 2 }, { 0x98, 0x88, 2 }, { 0xc8, 0x88, 2 }, { 0xf8, 0x88, 2 }, { 0x20, 0xa8, 1 },
-    { 0x50, 0xa8, 1 }, { 0x80, 0xa8, 1 }, { 0xb0, 0xa8, 1 }, { 0xe0, 0xa8, 1 }, { 0x08, 0xc8, 0 }, { 0x38, 0xc8, 0 },
-    { 0x68, 0xc8, 0 }, { 0x98, 0xc8, 0 }, { 0xc8, 0xc8, 0 }, { 0xf8, 0xc8, 0 },
-};
-
 // Where each target panel's name is centered, by rule
 static const s32 data_ov168_021f3ac8[2][6][2] = {
     { { 64, 68 }, { 192, 20 }, { 192, 68 }, { 64, 20 }, { 0, 0 }, { 0, 0 } },
     { { 48, 68 }, { 208, 20 }, { 128, 68 }, { 128, 20 }, { 208, 68 }, { 48, 20 } },
 };
-
 // The tiles that grow or shrink, by set
 static const BtlvInputTileSet data_ov168_021f3b28[3] = {
     { { { 64, 56 }, { 192, 56 }, { 64, 104 }, { 192, 104 }, { -1, -1 }, { -1, -1 } }, { 8, 9 } },
     { { { 64, 56 }, { 192, 56 }, { 64, 104 }, { 192, 104 }, { 64, 104 }, { 192, 104 } }, { 8, 9 } },
     { { { 64, 56 }, { 192, 56 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 } }, { 8, 9 } },
 };
-
 static const BtlvInputBGSetup data_ov168_021f3b88[4] = {
     { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_16, 0, 4, 0x8000, 0, 1, 0, 0 }, BGMODE_TEXT },
     { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_16, 4, 4, 0x8000, 0, 1, 0, 0 }, BGMODE_TEXT },
     { { 0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, 8, 6, 0x8000, 0, 0, 0, 0 }, BGMODE_TEXT },
     { { 0, 0, 0x2000, 0, BGRES_128x128, GX_BG_COLORMODE_16, 0, 0, 0x8000, 0, 1, 0, 0 }, BGMODE_EXTENDED },
 };
-
 // The target screen's BG 4 map, by rule, attacker and move range
 static const u32 data_ov168_021f3c18[2][3][15] = {
     {
@@ -428,7 +417,6 @@ static const u32 data_ov168_021f3c18[2][3][15] = {
         { 405, 399, 408, 390, 402, 387, 393, 396, 384, 396, 384, 385, 393, 396, 392 },
     },
 };
-
 // The key cursor's stops of the move screen of each slot, without a usable move and with one
 static const BtlvInputKeyStop *data_ov168_021f41a4[3] = { data_ov168_021f39c8, data_ov168_021f38a8,
                                                           data_ov168_021f38f0 };
@@ -2583,7 +2571,7 @@ static void BtlvInput_DrawTargetPanels(BtlvInput *work, BtlvInputScreenTask *tas
     wordSet = GFL_WordSetSystemCreateDefault(HEAPID_TAIL(work->heapId));
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     for (i = 0; i < count; i++) {
-        if (param->mons[i].species != 0) {
+        if (param->mons[i].hp != 0) {
             fmt = GFL_MsgDataLoadStrbufNew(work->msgData, param->mons[i].msgForm + 3);
             loadPokemonNicknameToStrbuf(wordSet, 0, param->mons[i].pkm);
             GFL_WordSetFormatStrbuf(wordSet, buf, fmt);

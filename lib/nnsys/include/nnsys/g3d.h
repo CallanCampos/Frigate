@@ -296,6 +296,7 @@ BOOL NNS_G3dForceBindMdlPltt(NNSG3dResMdl *mdl, const NNSG3dResTex *tex, u32 plt
 void NNS_G3dReleaseMdlPltt(NNSG3dResMdl *mdl);
 void NNS_G3DModelAttachResource(NNSG3dRenderObj *obj, NNSG3dResMdl *mdl);
 NNSG3dAnmObj *NNS_G3DAnimationAlloc(NNSFndAllocator *allocator, const void *anm, const NNSG3dResMdl *mdl);
+u32 NNS_G3DAnimationCalcAllocSize(const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3dFreeAnmObj(NNSFndAllocator *allocator, NNSG3dAnmObj *anmObj);
 void NNS_G3DAnimationCreate(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl, const NNSG3dResTex *tex);
 void NNS_G3DAnimationBind(NNSG3dRenderObj *obj, NNSG3dAnmObj *anmObj);
@@ -436,7 +437,7 @@ static inline void NNS_G3dGlbSetProjectionMtx(const MtxFx44 *mtx) {
 }
 
 static inline void NNS_G3dGlbPerspectiveW(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW) {
-    MAT4_SetPerspective(fovySin, fovyCos, aspect, n, f, scaleW, &NNS_G3dGlb.projMtx);
+    MTX_PerspectiveW(fovySin, fovyCos, aspect, n, f, scaleW, &NNS_G3dGlb.projMtx);
     NNS_G3dGlb.flag &= ~(NNS_G3D_GLB_FLAG_INVPROJ_UPTODATE | NNS_G3D_GLB_FLAG_INVCAMERAPROJ_UPTODATE);
 }
 
@@ -445,7 +446,7 @@ static inline void NNS_G3dGlbPerspective(fx32 fovySin, fx32 fovyCos, fx32 aspect
 }
 
 static inline void NNS_G3dGlbFrustumW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW) {
-    MAT4_SetFrustum(t, b, l, r, n, f, scaleW, &NNS_G3dGlb.projMtx);
+    MTX_FrustumW(t, b, l, r, n, f, scaleW, &NNS_G3dGlb.projMtx);
     NNS_G3dGlb.flag &= ~(NNS_G3D_GLB_FLAG_INVPROJ_UPTODATE | NNS_G3D_GLB_FLAG_INVCAMERAPROJ_UPTODATE);
 }
 
@@ -454,7 +455,7 @@ static inline void NNS_G3dGlbFrustum(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx3
 }
 
 static inline void NNS_G3dGlbOrthoW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW) {
-    MAT4_SetOrtho(t, b, l, r, n, f, scaleW, &NNS_G3dGlb.projMtx);
+    MTX_OrthoW(t, b, l, r, n, f, scaleW, &NNS_G3dGlb.projMtx);
     NNS_G3dGlb.flag &= ~(NNS_G3D_GLB_FLAG_INVPROJ_UPTODATE | NNS_G3D_GLB_FLAG_INVCAMERAPROJ_UPTODATE);
 }
 
@@ -466,7 +467,7 @@ static inline void NNS_G3dGlbLookAt(const VecFx32 *camPos, const VecFx32 *camUp,
     NNS_G3dGlb.camPos = *camPos;
     NNS_G3dGlb.camUp = *camUp;
     NNS_G3dGlb.camTarget = *target;
-    MAT43_LookAt(camPos, camUp, target, &NNS_G3dGlb.cameraMtx);
+    MTX_LookAt(camPos, camUp, target, &NNS_G3dGlb.cameraMtx);
     NNS_G3dGlb.flag &= ~(NNS_G3D_GLB_FLAG_INVCAMERA_UPTODATE | NNS_G3D_GLB_FLAG_INVBASECAMERA_UPTODATE |
                          NNS_G3D_GLB_FLAG_INVCAMERAPROJ_UPTODATE | NNS_G3D_GLB_FLAG_BASECAMERA_UPTODATE);
 }

@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 13,
-    "area": 70,
+    "area": "AREA_UNDELLA_BAY",
     "matrix": "MAP_MATRIX_OVERWORLD",
     "scripts": "SCRIPTS_UNDELLA_TOWN",
     "text": "SCRIPT_TEXT_UNDELLA_TOWN",

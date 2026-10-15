@@ -110,7 +110,7 @@ static void OekakiComm_RecvSignal(int netId, int size, const void *data, void *w
             switch (signal->type) {
             case OEKAKI_SIGNAL_LEAVE_REQUEST:
                 if (wk->shareNum != UnionApp_CountJoined(wk->param->app) ||
-                    wk->shareNum != countOneBits(UnionApp_GetJoined(wk->param->app))) {
+                    wk->shareNum != MATH_CountPopulation(UnionApp_GetJoined(wk->param->app))) {
                     wk->signal.ok = FALSE;
                 } else {
                     wk->signal.ok = TRUE;

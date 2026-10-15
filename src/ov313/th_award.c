@@ -430,7 +430,7 @@ static void ThAward_InitRankIcons(ThAwardWork *wk) {
         return;
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_TH_AWARD, wk->heapId);
-    wk->rankPalette = func_0204bbb8(arc, 0, 0, 0, 0, 1, wk->heapId);
+    wk->rankPalette = func_0204bbb8(arc, 1, 0, 0, 0, 1, wk->heapId);
     wk->rankChars = func_0204b81c(arc, 3, FALSE, 0, wk->heapId);
     wk->rankCellAnims = func_0204bde0(arc, 6, 7, wk->heapId);
     GFL_ArcToolFree(arc);
@@ -469,10 +469,11 @@ static void ThAward_InitText(ThAwardWork *wk) {
     StrBuf *pointsText;
     StrBuf *rank;
     u16 kindWidth;
+    u16 pointsWidth;
     u16 labelWidth;
     u16 totalWidth;
     u16 windowWidth;
-    u16 points;
+    u32 points;
     u16 x;
     u16 labelX;
     u8 i;
@@ -485,8 +486,8 @@ static void ThAward_InitText(ThAwardWork *wk) {
     wk->printed[0] = TRUE;
     wk->transferred = FALSE;
     if (wk->param->downloaded) {
-        name = wk->param->save->unk38;
         record = &wk->param->save->records[1];
+        name = (const u16 *)wk->param->save->unk38;
     } else {
         record = &wk->param->save->records[0];
     }
@@ -542,19 +543,19 @@ static void ThAward_InitText(ThAwardWork *wk) {
     format = GFL_MsgDataLoadStrbufNew(wk->msgData, Global10440_Text_Empty);
     pointsText = GFL_StrBufCreate(5, wk->heapId);
     x = 0;
-    WordSetNumber(wordSet, 0, points, 4, 0, 1);
+    WordSetNumber(wordSet, 0, (u16)points, 4, 0, 1);
     GFL_WordSetFormatStrbuf(wordSet, pointsText, format);
     pointsLabel = GFL_MsgDataLoadStrbufNew(wk->msgData, Global10440_Text_Points);
-    kindWidth = GFL_FontGetBlockWidth(pointsText, wk->font, 0);
+    pointsWidth = GFL_FontGetBlockWidth(pointsText, wk->font, 0);
     labelWidth = GFL_FontGetBlockWidth(pointsLabel, wk->font, 0);
-    totalWidth = kindWidth + 8 + labelWidth;
+    totalWidth = pointsWidth + 8 + labelWidth;
     windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->windows[WINDOW_POINTS]));
     if (windowWidth >= totalWidth) {
         x = (windowWidth - totalWidth) / 2;
     }
     func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_POINTS]), x, sThAwardTextY[WINDOW_POINTS],
                   pointsText, wk->font, PRINT_COLOR(1, 2, 0));
-    labelX = x + kindWidth + 8;
+    labelX = x + pointsWidth + 8;
     func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_POINTS]), labelX, sThAwardTextY[WINDOW_POINTS],
                   pointsLabel, wk->font, PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(pointsLabel);

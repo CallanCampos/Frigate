@@ -166,7 +166,7 @@ static u16 MistraltonSave_GetFrames(MistraltonSave *save);
 static FieldTask *Mistralton_CreateLerpTask(Field *field, FieldActor *actor, u32 duration, VecFx32 *end);
 static BOOL MistraltonLerpTask_Run(void *data);
 static FieldTask *Mistralton_CreateBobTask(Field *field, FieldActor *actor, u16 amplitude, u32 period, u8 count);
-static BOOL MistraltonBobTask_Run(void *data);
+static BOOL MistraltonBobTask_Run(void *taskData);
 static void Mistralton_ApplyFrames(MistraltonWork *work, u16 frames);
 static u32 Mistralton_GetStage(u32 frames);
 static void Mistralton_SetStage(Field *field, int stage);
@@ -190,10 +190,10 @@ static void Mistralton_StepFanPitch(FanPitch *pitch, u16 frames);
 static void Mistralton_SetFanPitchTarget(FanPitch *pitch, u32 stage);
 
 static const G3DSceneAnimationSetup sMistraltonAnimations12[] = { { 12, 0 } };
-static const G3DSceneAnimationSetup sMistraltonAnimations08[] = { { 8, 0 } };
-static const G3DSceneAnimationSetup sMistraltonAnimations10[] = { { 10, 0 } };
 static const G3DSceneAnimationSetup sMistraltonAnimations03[] = { { 3, 0 } };
+static const G3DSceneAnimationSetup sMistraltonAnimations10[] = { { 10, 0 } };
 static const G3DSceneAnimationSetup sMistraltonAnimations01[] = { { 1, 0 } };
+static const G3DSceneAnimationSetup sMistraltonAnimations08[] = { { 8, 0 } };
 static const G3DSceneAnimationSetup sMistraltonAnimations05[] = { { 5, 0 }, { 6, 0 } };
 
 static const G3DSceneResourceSetup sMistraltonResources[] = {
@@ -218,59 +218,8 @@ static const G3DSceneActorSetup sMistraltonActors[] = {
 
 static const G3DSceneSetup sMistraltonScene = { sMistraltonResources, NELEMS(sMistraltonResources), sMistraltonActors, NELEMS(sMistraltonActors) };
 
-static const int sMistraltonGrid[GRID_ROWS][GRID_COLUMNS] = {
-    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-    { 0, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 0 },
-    { 0, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 0 },
-    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-    { 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-    { 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0 },
-    { 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0 },
-    { 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0 },
-    { 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-};
+// Defined at the end of the file, which is where it has to be for the order of the equal-size objects of .rodata
+static const int sMistraltonGrid[GRID_ROWS][GRID_COLUMNS];
 
 void GymMistralton_Init(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
@@ -457,15 +406,14 @@ static FieldTask *Mistralton_CreateBobTask(Field *field, FieldActor *actor, u16 
 static BOOL MistraltonBobTask_Run(void *taskData) {
     BobTask *data = taskData;
     BOOL done = FALSE;
-    VecFx32 offset;
     u32 period;
     u32 frame;
     u16 angle;
 
     switch (data->state) {
     case 0:
-        period = data->period;
         frame = data->frame + 1;
+        period = data->period;
         data->frame = frame;
         angle = (frame << 16) / period;
         if (frame >= period) {
@@ -477,13 +425,17 @@ static BOOL MistraltonBobTask_Run(void *taskData) {
             done = TRUE;
         }
         if (done) {
+            VecFx32 offset;
+
             offset.x = 0;
             offset.y = 0;
             offset.z = 0;
             SetActorWPosOffset(data->actor, &offset);
             data->state++;
         } else {
-            offset.x = FX_SIN_COS_TABLE[(angle >> 4) * 2] * data->amplitude;
+            VecFx32 offset;
+
+            offset.x = FX_SinCosTable_[(angle >> 4) * 2] * data->amplitude;
             offset.y = 0;
             offset.z = 0;
             SetActorWPosOffset(data->actor, &offset);
@@ -524,7 +476,7 @@ static void Mistralton_SetStage(Field *field, int stage) {
     MistraltonWork *work = Field_GetGimmickWorkBlock(field, WORK_BLOCK);
     const fx32 centerSpeeds[4] = { FX32_CONST(1), FX32_CONST(2), FX32_CONST(3), FX32_CONST(4) };
     const fx32 fanSpeeds[4] = { FX32_CONST(2), FX32_CONST(5), FX32_CONST(11), FX32_CONST(15) };
-    u32 count;
+    u8 count;
     u16 actor;
     u8 i;
 
@@ -542,8 +494,8 @@ static void Mistralton_SetStage(Field *field, int stage) {
     case 2:
         count = 1;
         work->frames = 0;
-        FieldExpObj_SetActorHidden(work->system, SCENE, ACTOR_EFFECT_FIRST, TRUE);
         actor = ACTOR_EFFECT_FIRST + 2;
+        FieldExpObj_SetActorHidden(work->system, SCENE, ACTOR_EFFECT_FIRST, TRUE);
         break;
     case 3:
         count = 2;
@@ -1103,7 +1055,8 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
     u16 actor;
-    u8 i;
+    u8 i = 0;
+    u8 j;
 
     LoadFieldExpandObjData(work->system, &sMistraltonScene, SCENE);
     matrix = FieldExpObj_GetActorMatrixPtr(work->system, SCENE, ACTOR_CENTER);
@@ -1125,7 +1078,9 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
             { 3, 0, 34 },  { 1, 0, 41 },  { 21, 0, 41 }, { 9, 0, 42 },  { 13, 0, 42 },
         };
 
-        for (i = 0; i < FAN_COUNT; i++) {
+        for (; i < FAN_COUNT; i++) {
+            SRTMatrix *matrix;
+
             actor = ACTOR_FAN_FIRST + i;
             matrix = FieldExpObj_GetActorMatrixPtr(work->system, SCENE, actor);
             matrix->translation.x = FX32_CONST(fanPositions[i].x * 16);
@@ -1144,12 +1099,14 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
     {
         const TilePos doorPositions[DOOR_COUNT] = { { 11, 0, 26 }, { 11, 0, 36 } };
 
-        for (i = 0; i < DOOR_COUNT; i++) {
-            actor = ACTOR_DOOR_FIRST + i;
+        for (j = 0; j < DOOR_COUNT; j++) {
+            SRTMatrix *matrix;
+
+            actor = ACTOR_DOOR_FIRST + j;
             matrix = FieldExpObj_GetActorMatrixPtr(work->system, SCENE, actor);
-            matrix->translation.x = FX32_CONST(doorPositions[i].x * 16);
-            matrix->translation.y = FX32_CONST(doorPositions[i].y * 16);
-            matrix->translation.z = FX32_CONST(doorPositions[i].z * 16);
+            matrix->translation.x = FX32_CONST(doorPositions[j].x * 16);
+            matrix->translation.y = FX32_CONST(doorPositions[j].y * 16);
+            matrix->translation.z = FX32_CONST(doorPositions[j].z * 16);
             func_ov036_021b8248(work->system, SCENE, actor, TRUE);
             FieldExpObj_SetActorHidden(work->system, SCENE, actor, FALSE);
             anm = FieldExpObj_GetAnmInfo(work->system, SCENE, actor, 0);
@@ -1159,19 +1116,21 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
         }
     }
 
-    for (actor = ACTOR_EFFECT_FIRST; actor <= ACTOR_EFFECT_FIRST + EFFECT_COUNT - 1; actor++) {
-        matrix = FieldExpObj_GetActorMatrixPtr(work->system, SCENE, actor);
+    for (j = ACTOR_EFFECT_FIRST; j <= ACTOR_EFFECT_FIRST + EFFECT_COUNT - 1; j++) {
+        SRTMatrix *matrix;
+
+        matrix = FieldExpObj_GetActorMatrixPtr(work->system, SCENE, j);
         matrix->translation.x = 0;
         matrix->translation.y = 0;
         matrix->translation.z = 0;
-        func_ov036_021b8248(work->system, SCENE, actor, FALSE);
-        if (actor == ACTOR_EFFECT_FIRST || (actor == ACTOR_EFFECT_FIRST + 1 && work->stage == 1)) {
-            FieldExpObj_SetActorHidden(work->system, SCENE, actor, FALSE);
+        func_ov036_021b8248(work->system, SCENE, j, FALSE);
+        if (j == ACTOR_EFFECT_FIRST || (j == ACTOR_EFFECT_FIRST + 1 && work->stage == 1)) {
+            FieldExpObj_SetActorHidden(work->system, SCENE, j, FALSE);
         } else {
-            FieldExpObj_SetActorHidden(work->system, SCENE, actor, TRUE);
+            FieldExpObj_SetActorHidden(work->system, SCENE, j, TRUE);
         }
-        anm = FieldExpObj_GetAnmInfo(work->system, SCENE, actor, 0);
-        FieldExpObj_SetAnm(work->system, SCENE, actor, 0, TRUE);
+        anm = FieldExpObj_GetAnmInfo(work->system, SCENE, j, 0);
+        FieldExpObj_SetAnm(work->system, SCENE, j, 0, TRUE);
         FieldExpObjAnm_SetLooped(anm, TRUE);
         FieldExpObjAnm_SetPaused(anm, FALSE);
     }
@@ -1277,3 +1236,57 @@ static void MistraltonSave_SetFrames(MistraltonSave *save, u16 frames) {
 static u16 MistraltonSave_GetFrames(MistraltonSave *save) {
     return save->frames;
 }
+
+static const int sMistraltonGrid[GRID_ROWS][GRID_COLUMNS] = {
+    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
+    { 0, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 0 },
+    { 0, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 0 },
+    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+    { 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
+    { 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
+    { 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
+    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+    { 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0 },
+    { 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0 },
+    { 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0 },
+    { 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+    { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+};

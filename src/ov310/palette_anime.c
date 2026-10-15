@@ -143,25 +143,25 @@ static void PaletteAnime_UpdateCore(PaletteAnime *anime) {
 }
 
 static void PaletteAnime_Pulse60(PaletteAnime *anime) {
-    u8 value = 16.0f + 16.0f * FX_FX32_TO_F32(FX_SinIdx((u16)((anime->frames << 16) / 60)));
-    u8 evy = value * 10 / 32;
+    u8 evy = (int)(16.0f + 16.0f * FX_FX32_TO_F32(FX_SinIdx((u16)((anime->frames << 16) / 60))));
 
+    evy = evy * 10 / 32;
     BlendColors(anime->backup, anime->dst, anime->count, evy, anime->color);
     anime->frames++;
 }
 
 static void PaletteAnime_Pulse30(PaletteAnime *anime) {
-    u8 value = 16.0f + 16.0f * FX_FX32_TO_F32(FX_SinIdx((u16)((anime->frames << 16) / 30)));
-    u8 evy = value * 3 / 32;
+    u8 evy = (int)(16.0f + 16.0f * FX_FX32_TO_F32(FX_SinIdx((u16)((anime->frames << 16) / 30))));
 
+    evy = evy * 3 / 32;
     BlendColors(anime->backup, anime->dst, anime->count, evy, anime->color);
     anime->frames++;
 }
 
 static void PaletteAnime_Pulse90(PaletteAnime *anime) {
-    u8 value = 16.0f + 16.0f * FX_FX32_TO_F32(FX_SinIdx((u16)((anime->frames << 16) / 90)));
-    u8 evy = value * 3 / 32;
+    u8 evy = (int)(16.0f + 16.0f * FX_FX32_TO_F32(FX_SinIdx((u16)((anime->frames << 16) / 90))));
 
+    evy = evy * 3 / 32;
     BlendColors(anime->backup, anime->dst, anime->count, evy, anime->color);
     anime->frames++;
 }

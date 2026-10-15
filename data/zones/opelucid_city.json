@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 10,
-    "area": 50,
+    "area": "AREA_OPELUCID_CITY",
     "matrix": "MAP_MATRIX_OVERWORLD",
     "scripts": "SCRIPTS_OPELUCID_CITY",
     "text": "SCRIPT_TEXT_OPELUCID_CITY",

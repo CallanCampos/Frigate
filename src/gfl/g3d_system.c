@@ -113,7 +113,7 @@ static BOOL GFL_G3DActorTestBBox(G3DActor *actor);
 static int TestModelBoundingBox(const s16 *box);
 
 void GFL_G3DSysCreate(BOOL frmTexVramMgr, u32 texVramSize, BOOL frmPltVramMgr, u32 pltVramSize, u16 dtcmAllocSize,
-                      HeapID heapId, G3DSystemInitCallback initCallback) {
+                      const HeapID heapId, G3DSystemInitCallback initCallback) {
     G3DCameraProjection projection;
     FxLookAt lookAt;
     Light light;
@@ -610,17 +610,25 @@ void *GFL_G3DResGetTexPaletteData(void *resource) {
     return (u8 *)tex + tex->plttInfo.ofsPlttData;
 }
 
+// A model of a model set that may be missing. The missing set and the missing entry share one NULL
+static inline NNSG3dResMdl *GFL_G3DGetMdlByIdx(const NNSG3dResMdlSet *mdlSet, u32 idx) {
+    const u32 *ofs;
+
+    if (mdlSet != NULL) {
+        ofs = NNS_G3dGetResDataByIdx(&mdlSet->dict, idx);
+        if (ofs != NULL) {
+            return (NNSG3dResMdl *)((u8 *)mdlSet + *ofs);
+        }
+    }
+    return NULL;
+}
+
 G3DModel *GFL_G3DMdlCreate(void *resource, u32 modelId, void *texture) {
     NNSG3dResMdl *mdl;
     NNSG3dResTex *tex = NULL;
     G3DModel *model;
-    NNSG3dResMdlSet *mdlSet = NNS_G3DResGetMdlBlock(((G3DResource *)resource)->data);
 
-    if (mdlSet != NULL) {
-        mdl = NNS_G3dGetMdlByIdx(mdlSet, modelId);
-    } else {
-        mdl = NULL;
-    }
+    mdl = GFL_G3DGetMdlByIdx(NNS_G3DResGetMdlBlock(((G3DResource *)resource)->data), modelId);
     if (texture != NULL) {
         tex = NNS_G3DResGetTexBlock(((G3DResource *)texture)->data);
     }

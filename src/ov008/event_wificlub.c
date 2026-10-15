@@ -3,6 +3,7 @@
 #include "app/pokemon_trade.h"
 #include "app/ui/ui_scene.h"
 #include "app/wifi_login.h"
+#include "app/wifi_status.h"
 #include "app/wificlub.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_select.h"

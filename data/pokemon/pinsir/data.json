@@ -180,5 +180,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 146,
-    "baby_species": "SPECIES_PINSIR"
+    "baby_species": "SPECIES_PINSIR",
+    "cry_volume": 110
 }

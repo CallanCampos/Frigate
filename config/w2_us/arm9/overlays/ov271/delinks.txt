@@ -11,6 +11,7 @@ src/ov271/br_core.c:
     .data       start:0x021f7ba0 end:0x021f7bc4
 
 src/ov271/br_proc_sys.c:
+    complete
     .text       start:0x021f07b0 end:0x021f0aac
     .data       start:0x021f7bc4 end:0x021f7c44
 
@@ -55,10 +56,12 @@ src/ov271/br_sidebar.c:
     .data       start:0x021f7efc end:0x021f7f14
 
 src/ov271/br_net.c:
+    complete
     .text       start:0x021f6264 end:0x021f6a5c
     .data       start:0x021f7f14 end:0x021f7f48
 
 src/ov271/br_pokesearch.c:
+    complete
     .text       start:0x021f6a5c end:0x021f70e0
     .rodata     start:0x021f7b2c end:0x021f7b90
     .data       start:0x021f7f48 end:0x021f7fc0

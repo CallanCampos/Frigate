@@ -177,8 +177,8 @@ void FieldLensFlare_CalcPos(FieldLensFlare *lensFlare, G3DCamera *camera) {
     GFL_G3DCameraGetLookatUpVector(camera, &up);
     GFL_G3DCameraGetLookatTarget(camera, &target);
     VEC_Subtract(&target, &position, &offset);
-    vecfx_normalize(&offset, &offset);
-    vecfx_muladd(0x3c000, &offset, &position, &offset);
+    VEC_Normalize(&offset, &offset);
+    VEC_MultAdd(0x3c000, &offset, &position, &offset);
     matrix = FieldExpObj_GetActorMatrixPtr(lensFlare->expObjSys, 3, 0);
     matrix->translation = offset;
 }

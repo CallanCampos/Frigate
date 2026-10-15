@@ -433,8 +433,8 @@ static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data) {
 
     if (anim->active) {
         if (anim->counter > sPalAnimSteps[anim->index].wait) {
-            anim->index++;
             anim->counter = 0;
+            anim->index++;
             if (sPalAnimSteps[anim->index].palette == 0xff) {
                 anim->index = 0;
             }
@@ -1451,6 +1451,10 @@ static void Guru2Receipt_SetActorLook(Guru2ReceiptWork *wk, NNSG2dPaletteData *p
     GFL_HeapFree(file);
 }
 
+static inline int Guru2Receipt_GetMemberCount(const Guru2ReceiptWork *wk) {
+    return wk->memberCount;
+}
+
 // The parent's check of the members each frame, which returns the proc's next sequence
 static int Guru2Receipt_CheckMembers(Guru2ReceiptWork *wk, int unused) {
     int count = Guru2Receipt_CountMembers2(wk);
@@ -1480,7 +1484,7 @@ static int Guru2Receipt_CheckMembers(Guru2ReceiptWork *wk, int unused) {
     case 2:
     case 3:
     case 4:
-        if (count < wk->memberCount) {
+        if (count < Guru2Receipt_GetMemberCount(wk)) {
             wk->g2c->joinCount = UnionApp_CountJoined(Guru2Receipt_GetUnionApp(wk));
         }
         break;

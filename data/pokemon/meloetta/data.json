@@ -162,5 +162,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 299,
-    "baby_species": "SPECIES_MELOETTA"
+    "baby_species": "SPECIES_MELOETTA",
+    "cry_volume": 120
 }

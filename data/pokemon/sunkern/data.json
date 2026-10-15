@@ -180,5 +180,6 @@
         }
     ],
     "regional_dex_number": 20,
-    "baby_species": "SPECIES_SUNKERN"
+    "baby_species": "SPECIES_SUNKERN",
+    "cry_volume": 110
 }

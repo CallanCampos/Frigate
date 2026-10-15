@@ -173,6 +173,7 @@ GameEventReturnCode EventGameOpening_Callback(GameEvent *event, u32 *state, void
     EventGameOpening *wk = data;
     GameSystem *gsys = wk->gsys;
     GameData *gameData = GSYS_GetGameData(gsys);
+    u32 realSeason;
     u8 season;
 
     switch (*state) {
@@ -181,7 +182,8 @@ GameEventReturnCode EventGameOpening_Callback(GameEvent *event, u32 *state, void
         (*state)++;
         break;
     case 1:
-        Season_Set(gameData, Season_GetRealTime());
+        realSeason = Season_GetRealTime();
+        Season_Set(gameData, realSeason);
         season = GameData_GetSeason(gameData);
         GameEvent_ChainNext(event, EventSeasonBanner_CreateStandalone(gsys, season, season));
         (*state)++;
@@ -1568,7 +1570,7 @@ void FieldMapControl_LoadZone(GameSystem *gsys, u16 zoneId) {
     SetAllowVersionSpecificArea(VERSION_AREA_BLACK2, FALSE);
     SetAllowVersionSpecificArea(VERSION_AREA_WHITE2, FALSE);
     SetAllowVersionSpecificArea(VERSION_AREA_2, FALSE);
-    if (func_ov011_02154e70(gameData, 0)) {
+    if (GameData_IsMapReplaceEventSet(gameData, 0)) {
         SetAllowVersionSpecificArea(VERSION_AREA_2, TRUE);
         SetAllowVersionSpecificArea(VERSION_AREA_OWN, TRUE);
     }

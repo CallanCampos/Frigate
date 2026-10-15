@@ -43,7 +43,7 @@ static void GFL_G3DCurveAllocPreload(G3DCurve *curve, int count);
 static BOOL GFL_G3DCurveSetLoadBuffer(G3DCurve *curve, int count, void *buffer, int bufferSize);
 static void GFL_G3DCurvePreloadFrames(G3DCurve *curve, fx32 frame);
 
-G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u32 fileId, void *buffer, u32 bufferSize) {
+G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u16 fileId, void *buffer, u32 bufferSize) {
     G3DCurve *curve = GFL_HeapAllocate(heapId, sizeof(G3DCurve), FALSE, "ica_anime.c", 84);
 
     GFL_G3DCurveReset(curve);
@@ -170,52 +170,40 @@ BOOL GFL_G3DCurveGetNowRotation(G3DCurve *curve, VecFx32 *rotation) {
     return FALSE;
 }
 
-BOOL GFL_G3DCurveGetNowTranslationLoop(G3DCurve *curve, VecFx32 *translation, u32 frame) {
-    u32 index;
-
-    index = frame % curve->frameCount;
+BOOL GFL_G3DCurveGetNowTranslationLoop(const G3DCurve *curve, VecFx32 *translation, u32 frame) {
+    frame %= curve->frameCount;
     if (curve->loadedCount == curve->frameCount) {
-        const VecFx32 *values = curve->translations;
-
-        translation->x = values[index].x;
-        translation->y = values[index].y;
-        translation->z = values[index].z;
+        translation->x = curve->translations[frame].x;
+        translation->y = curve->translations[frame].y;
+        translation->z = curve->translations[frame].z;
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL GFL_G3DCurveGetNowRotationLoop(G3DCurve *curve, VecFx32 *rotation, u32 frame) {
-    u32 index;
-
+BOOL GFL_G3DCurveGetNowRotationLoop(const G3DCurve *curve, VecFx32 *rotation, u32 frame) {
     if (!curve->hasRotation) {
         return FALSE;
     }
-    index = frame % curve->frameCount;
+    frame %= curve->frameCount;
     if (curve->loadedCount == curve->frameCount) {
-        const VecFx32 *values = curve->rotations;
-
-        rotation->x = values[index].x;
-        rotation->y = values[index].y;
-        rotation->z = values[index].z;
+        rotation->x = curve->rotations[frame].x;
+        rotation->y = curve->rotations[frame].y;
+        rotation->z = curve->rotations[frame].z;
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL GFL_G3DCurveGetNowScaleLoop(G3DCurve *curve, VecFx32 *scale, u32 frame) {
-    u32 index;
-
+BOOL GFL_G3DCurveGetNowScaleLoop(const G3DCurve *curve, VecFx32 *scale, u32 frame) {
     if (!curve->hasScale) {
         return FALSE;
     }
-    index = frame % curve->frameCount;
+    frame %= curve->frameCount;
     if (curve->loadedCount == curve->frameCount) {
-        const VecFx32 *values = curve->scales;
-
-        scale->x = values[index].x;
-        scale->y = values[index].y;
-        scale->z = values[index].z;
+        scale->x = curve->scales[frame].x;
+        scale->y = curve->scales[frame].y;
+        scale->z = curve->scales[frame].z;
         return TRUE;
     }
     return FALSE;
@@ -392,8 +380,8 @@ void GFL_G3DCurveApplyCamera(G3DCamera *camera, G3DCurve *curve) {
     angleY = 65535.0f * (y / 360.0f);
     angleZ = 65535.0f * (z / 360.0f);
     MAT3_RotationEulerZYX(angleX, angleY, angleZ, &matrix);
-    MAT3_MulVec(&forward, &matrix, &direction);
-    MAT3_MulVec(&up, &matrix, &upVector);
+    MTX_MultVec33(&forward, &matrix, &direction);
+    MTX_MultVec33(&up, &matrix, &upVector);
     GFL_G3DCurveGetNowTranslation(curve, &position);
     VEC_Add(&position, &direction, &target);
     GFL_G3DCameraSetLookatPos(camera, &position);

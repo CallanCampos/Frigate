@@ -4,5 +4,6 @@
     .bss        start:0x021f6200 end:0x021f6200 kind:bss align:32
 
 src/ov150/encounter_effect_grid.c:
+    complete
     .text       start:0x021f5da0 end:0x021f61d8
     .rodata     start:0x021f61d8 end:0x021f61e4

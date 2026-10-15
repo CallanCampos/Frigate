@@ -5,6 +5,7 @@
     .bss        start:0x021efc60 end:0x021efc60 kind:bss align:32
 
 src/ov121/castelia_rush.c:
+    complete
     .text       start:0x021eefc0 end:0x021efbc0
     .rodata     start:0x021efbc0 end:0x021efc08
     .data       start:0x021efc20 end:0x021efc60

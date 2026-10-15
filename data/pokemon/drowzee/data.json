@@ -198,5 +198,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_DROWZEE"
+    "baby_species": "SPECIES_DROWZEE",
+    "cry_volume": 110
 }

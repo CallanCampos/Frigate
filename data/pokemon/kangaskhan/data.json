@@ -203,5 +203,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_KANGASKHAN"
+    "baby_species": "SPECIES_KANGASKHAN",
+    "cry_volume": 110
 }

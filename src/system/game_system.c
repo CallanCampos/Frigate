@@ -190,8 +190,7 @@ static BOOL GameSystem_End(GameProc *proc, u32 *state, void *param, void *work) 
     return TRUE;
 }
 
-GameSystemProcData *GameSystem_CreateProcData(GameEntryPoint entryPoint, u16 zoneId, const VecFx32 *spawnPos,
-                                              s16 unk12) {
+GameSystemProcData *GameSystem_CreateProcData(GameEntryPoint entryPoint, u16 zoneId, VecFx32 *spawnPos, s16 unk12) {
     sys_memset(&g_GameSysProcData, 0, sizeof(g_GameSysProcData));
     g_GameSysProcData.entryPoint = entryPoint;
     g_GameSysProcData.zoneId = zoneId;

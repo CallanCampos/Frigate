@@ -65,22 +65,21 @@ struct ZoneWarpRailPosition {
     u16 param;
 };
 
-// Field names from swan's ZoneFurniture.
+// Field names from swan's ZoneFurniture. The struct is halfword-aligned (the festival missions copy it as a loop
+// of 10 halfwords), so a grid entity's s32 x, y and z are read through a cast of its position.
 struct ZoneBGEntity {
     u16 scrId;
     u16 condition;
     u16 direction;
     u16 isRail;
     union {
-        struct {
-            s32 x;
-            s32 y;
-            s32 z;
-        } grid;
+        // s32 x, y and z
+        u16 grid[6];
         struct {
             u16 componentId;
             u16 posFront;
-            s16 posSide;
+            // Signed; read through a cast where its sign matters
+            u16 posSide;
         } rail;
     } pos;
 };
@@ -184,7 +183,7 @@ BOOL IsWarpZoneOrWarpID0xFFFF(const ZoneWarp *warp);
 void SetZoneWarpLocation(EventData *eventData, u16 warpId, u16 x, u16 y, u16 z);
 u32 ZoneWarp_GetDirection(const ZoneWarp *warp);
 void GetGridWarpOutPos(ZoneWarp *warp, u32 direction, VecFx32 *position);
-void GetRailWarpOutPos(ZoneWarp *warp, u32 direction, RailPosition *position);
+void GetRailWarpOutPos(const ZoneWarp *warp, u32 direction, RailPosition *position);
 u16 CalcWarpTransferAddend(u32 posWeightBits, u32 warpDirection, BOOL isRail, u32 railParam, u16 span);
 void CreateZoneChangeData(ZoneSpawnInfo *spawn, u32 zoneId, s16 warpDir, s32 x, s32 y, s32 z);
 void CreateZoneChangeDataRail(ZoneSpawnInfo *spawn, u16 zoneId, s16 warpDir, u16 componentId, u16 posFront,
@@ -220,7 +219,7 @@ BOOL GetZoneIsPWTBattleStage(u16 zoneId);
 BOOL GetZoneIsUnionRoom(u16 zoneId);
 u16 GetZoneMatrixId(u16 zoneId);
 BOOL GetZoneSpawnInfoIsRail(ZoneSpawnInfo *spawn);
-ZoneWarp *GetZoneWarpByID(EventData *eventData, u16 warpId);
+ZoneWarp *GetZoneWarpByID(const EventData *eventData, u16 warpId);
 BOOL IsWarpDestId256(ZoneWarp *warp);
 BOOL IsZone150Or151(u16 zoneId);
 BOOL IsZoneAbyssalRuinsOutside(u16 zoneId);
@@ -246,7 +245,7 @@ void LoadZoneSpawnInfoCheckRail(ZoneSpawnInfo *spawn, u16 zoneId);
 void SetAllowVersionSpecificArea(u32 area, BOOL allow);
 void SetTeleportZoneDiscover(GameData *gameData, s32 zoneId);
 void SetupTeleportZoneChange(u16 returnLocation, ZoneSpawnInfo *spawn);
-BOOL SetupZoneWarpArrival(EventData *eventData, ZoneSpawnInfo *spawn, u16 warpId, u16 posWeightBits);
+BOOL SetupZoneWarpArrival(const EventData *eventData, ZoneSpawnInfo *spawn, u16 warpId, u16 posWeightBits);
 u16 ZoneData_GetAreaID(u16 zoneId);
 u16 GetZoneEntitiesID(u16 zoneId);
 u16 GetZoneEncID(u16 zoneId);

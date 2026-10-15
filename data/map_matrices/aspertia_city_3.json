@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1049 ]
+        [ "MAP_MODEL_ASPERTIA_CITY_3_M_BUILL08_00_00" ]
     ]
 }

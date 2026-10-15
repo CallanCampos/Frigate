@@ -4,5 +4,6 @@
     .bss        start:0x0216fd80 end:0x0216fd80 kind:bss align:32
 
 src/ov024/fest_mission_sparkle_place.c:
+    complete
     .text       start:0x0216f900 end:0x0216fb98
     .rodata     start:0x0216fb98 end:0x0216fd68

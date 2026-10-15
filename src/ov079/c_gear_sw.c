@@ -762,46 +762,63 @@ static void CGearSw_UpdateLamps(CGearSw *work) {
     }
 }
 
+// Each of these takes the place in its table first and then the fraction there, in one variable: MWCC then loads the
+// fraction before it sets the call's arguments up
 static void CGearSw_BlinkLampFast(CGearSw *work, int lamp, CGearSwPattern *pattern) {
     u16 count = CGearSwPattern_GetCount(pattern, lamp);
+    int fraction;
 
     if (count <= 36 && count >= 4) {
         count -= 4;
-        CGearSw_SetLampColor(work, lamp, sBlinkFractions[(NELEMS(sBlinkFractions) - 1) * (count % 8) / 8], 31);
+        fraction = (NELEMS(sBlinkFractions) - 1) * (count % 8) / 8;
+        fraction = sBlinkFractions[fraction];
+        CGearSw_SetLampColor(work, lamp, fraction, 31);
     }
 }
 
 static void CGearSw_BlinkLampSlow(CGearSw *work, int lamp, CGearSwPattern *pattern) {
     u16 count = CGearSwPattern_GetCount(pattern, lamp);
+    int fraction;
 
     if (count <= 112 && count >= 12) {
         count -= 12;
-        CGearSw_SetLampColor(work, lamp, sBlinkFractions[(NELEMS(sBlinkFractions) - 1) * count / 100], 31);
+        fraction = (NELEMS(sBlinkFractions) - 1) * count / 100;
+        fraction = sBlinkFractions[fraction];
+        CGearSw_SetLampColor(work, lamp, fraction, 31);
     }
 }
 
 static void CGearSw_BlinkLampTwice(CGearSw *work, int lamp, CGearSwPattern *pattern) {
     u16 count = CGearSwPattern_GetCount(pattern, lamp);
+    int fraction;
 
     if (count <= 78 && count >= 8) {
         count -= 8;
-        CGearSw_SetLampColor(work, lamp, sDoubleBlinkFractions[(NELEMS(sDoubleBlinkFractions) - 1) * count / 70], 31);
+        fraction = (NELEMS(sDoubleBlinkFractions) - 1) * count / 70;
+        fraction = sDoubleBlinkFractions[fraction];
+        CGearSw_SetLampColor(work, lamp, fraction, 31);
     }
 }
 
 static void CGearSw_BlinkLampQuick(CGearSw *work, int lamp, CGearSwPattern *pattern) {
     u16 count = CGearSwPattern_GetCount(pattern, lamp);
+    int fraction;
 
     if (count <= 20) {
-        CGearSw_SetLampColor(work, lamp, sBlinkFractions[(NELEMS(sBlinkFractions) - 1) * (count % 10) / 10], 31);
+        fraction = (NELEMS(sBlinkFractions) - 1) * (count % 10) / 10;
+        fraction = sBlinkFractions[fraction];
+        CGearSw_SetLampColor(work, lamp, fraction, 31);
     }
 }
 
 static void CGearSw_LightLamp(CGearSw *work, int lamp, CGearSwPattern *pattern) {
     u16 count = CGearSwPattern_GetCount(pattern, lamp);
+    int fraction;
 
     if (count <= 15) {
-        CGearSw_SetLampColor(work, lamp, sLightFractions[(NELEMS(sLightFractions) - 1) * count / 15], 31);
+        fraction = (NELEMS(sLightFractions) - 1) * count / 15;
+        fraction = sLightFractions[fraction];
+        CGearSw_SetLampColor(work, lamp, fraction, 31);
     }
 }
 
@@ -840,10 +857,10 @@ static BOOL CGearSw_TryLampPattern(CGearSw *work, int lamp, int palette, int pat
 }
 
 static void CGearSwPattern_Init(CGearSwPattern *pattern, u16 max, u16 start, u8 loop) {
-    pattern->count[2] = start;
-    pattern->max = max;
     pattern->count[1] = 0;
+    pattern->count[2] = start;
     pattern->count[0] = start * 2;
+    pattern->max = max;
     pattern->loop = loop;
     pattern->active = TRUE;
 }
@@ -1769,7 +1786,7 @@ static fx32 CGearSw_GetDistance(int x1, int y1, int x2, int y2) {
     b.x = FX32_CONST(x2);
     b.y = FX32_CONST(y2);
     b.z = 0;
-    return vecfx_dist(&a, &b);
+    return VEC_Distance(&a, &b);
 }
 
 // Whether another marker is too close to a point for this one to be there

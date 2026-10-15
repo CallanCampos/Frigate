@@ -1030,13 +1030,9 @@ static BOOL CygnusData_Save(CygnusData *data) {
 }
 
 static BOOL CygnusData_GetEntry(const CygnusData *data, u32 index, u32 *type, u32 *id) {
-    u32 entryType = data->entries[index].type;
-
-    if (entryType != CYGNUS_ENTRY_NONE) {
-        u32 entryId = data->entries[index].id;
-
-        *type = entryType;
-        *id = entryId;
+    if (data->entries[index].type != CYGNUS_ENTRY_NONE) {
+        *id = data->entries[index].id;
+        *type = data->entries[index].type;
         return TRUE;
     }
     return FALSE;
@@ -1201,8 +1197,11 @@ static void CygnusData_ReadEntries(CygnusData *data, const u32 *words, HeapID he
     if (data->count != 0) {
         for (j = 0; j < data->count - 1; j++) {
             for (i = data->count - 1; i > j; i--) {
-                if (data->entries[(s16)(i - 1)].legend < data->entries[(s16)i].legend) {
-                    CygnusData_SwapEntries(data, i - 1, i);
+                s16 prev = i - 1;
+                s16 cur = i;
+
+                if (data->entries[prev].legend < data->entries[cur].legend) {
+                    CygnusData_SwapEntries(data, prev, cur);
                 }
             }
         }
@@ -1375,6 +1374,7 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
     u32 iconPalette = 0;
     int rowGap;
     int row;
+    int posY;
     ClActorSetup setup;
 
     sys_memset(icon, 0, sizeof(CygnusIcon));
@@ -1415,7 +1415,8 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
     if (row != 0) {
         rowGap = 16;
     }
-    icon->pos.y = y + (row * 24 + 56) + rowGap;
+    posY = y + (row * 24 + 56);
+    icon->pos.y = posY + rowGap;
     setup.x = icon->pos.x;
     setup.y = icon->pos.y - 16;
     setup.bgPriority = 0;

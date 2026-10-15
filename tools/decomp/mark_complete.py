@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Mark source files complete in every version's delinks.txt, once all their functions match.
 
-Before marking, it checks that no function the file defines as `static` is called or referenced from another module.
+Before marking, it checks that no function the file defines as `static` is called or referenced from another file.
 Such a reference links to nothing once the file's object replaces the original code: the build then fails in the
-module that refers to it (the linker adds a veneer to address 0), which the per-function probe cannot see.
+referring module (the linker adds a veneer to address 0), which the per-function probe cannot see.
 
     mark_complete.py src/gfl/particle.c [src/...]
 """
@@ -13,12 +13,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.decomp.dsd_config import config_lock  # noqa: E402
+from tools.decomp.dsd_config import config_lock, reloc_module_names  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 SYMBOL_RE = re.compile(r"(\S+) kind:\S+ addr:(0x[0-9a-f]+)")
-RELOC_RE = re.compile(r"from:(0x[0-9a-f]+) kind:\S+ to:(0x[0-9a-f]+) module:(\S+)")
-RANGE_RE = re.compile(r"\s*\.text\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)")
+RELOC_RE = re.compile(r"from:(0x[0-9a-f]+) kind:\S+ to:(0x[0-9a-f]+)(?: add:\S+)? module:(\S+)")
+SECTION_RANGE_RE = re.compile(r"\s*(\S+)\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)")
 
 
 def module_name(config_dir: Path, version_dir: Path) -> str:
@@ -31,7 +31,7 @@ def module_name(config_dir: Path, version_dir: Path) -> str:
 
 
 def externally_used_statics(source: str, version_dir: Path) -> list[str]:
-    """Returns the functions that source defines as static but another module refers to."""
+    """Returns static functions referenced outside their original source file."""
     text = (ROOT / source).read_text()
     for delinks in version_dir.rglob("delinks.txt"):
         lines = delinks.read_text().splitlines()
@@ -39,27 +39,41 @@ def externally_used_statics(source: str, version_dir: Path) -> list[str]:
             continue
         i = lines.index(f"{source}:") + 1
         ranges = []
+        owner_ranges = []
         while i < len(lines) and lines[i].startswith((" ", "\t")):
-            m = RANGE_RE.match(lines[i])
+            m = SECTION_RANGE_RE.match(lines[i])
             if m:
-                ranges.append((int(m.group(1), 16), int(m.group(2), 16)))
+                bounds = (int(m.group(2), 16), int(m.group(3), 16))
+                owner_ranges.append(bounds)
+                if m.group(1) == ".text":
+                    ranges.append(bounds)
             i += 1
         own = module_name(delinks.parent, version_dir)
-        names = {}
+        own_modules = reloc_module_names(own)
+        # Labels may alias a function (including a local function). Keep every
+        # name: symbols.txt order must not let an alias hide its static name.
+        names: dict[int, set[str]] = {}
         for line in (delinks.parent / "symbols.txt").read_text().splitlines():
             m = SYMBOL_RE.match(line)
             if m:
-                names[int(m.group(2), 16) & ~1] = m.group(1)
+                names.setdefault(int(m.group(2), 16) & ~1, set()).add(m.group(1))
         used = set()
         for relocs in version_dir.rglob("relocs.txt"):
-            if relocs.parent == delinks.parent:
-                continue
             for line in relocs.read_text().splitlines():
                 m = RELOC_RE.match(line)
-                if m and m.group(3) == own:
+                # References within this original file are allowed, including its
+                # callback tables. Other files and unowned module gaps are external.
+                if m and relocs.parent == delinks.parent:
+                    origin = int(m.group(1), 16)
+                    if any(start <= origin < end for start, end in owner_ranges):
+                        continue
+                # dsd v0.12.1-dsi.4's delinker uses first_module() for symbol
+                # relocations, so overlays(11,12) binds only overlay 11.
+                targets = reloc_module_names(m.group(3)) if m else []
+                if m and (m.group(3) == own or (own_modules and targets[:1] == own_modules)):
                     target = int(m.group(2), 16) & ~1
                     if any(start <= target < end for start, end in ranges) and target in names:
-                        used.add(names[target])
+                        used.update(names[target])
         return sorted(n for n in used if re.search(r"^static [^;{=]*\b%s\(" % re.escape(n), text, re.M))
     return []
 
@@ -74,7 +88,7 @@ def main():
         for source in args.sources:
             statics = externally_used_statics(source, version_dir)
             if statics:
-                print(f"{source}: static but used by other modules in {version_dir.parent.name}: {', '.join(statics)}")
+                print(f"{source}: static but referenced outside its source file in {version_dir.parent.name}: {', '.join(statics)}")
                 failed = True
     if failed:
         return 1

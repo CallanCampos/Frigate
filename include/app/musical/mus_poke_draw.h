@@ -18,6 +18,11 @@ typedef struct {
     MusicalMcssCellInfo info;
 } MusPokeDrawEquipPos;
 
+// A prop position on a Pokémon, one for each marker cell from kind MUS_POKE_DRAW_CELL_EQUIP
+typedef enum {
+    MUS_POKE_DRAW_EQUIP_MAX = 9,
+} MusPokeDrawEquipNo;
+
 // A Pokémon being drawn
 typedef struct {
     BOOL active;
@@ -27,7 +32,7 @@ typedef struct {
     MusicalMcss *front;
     // NULL when it has no back
     MusicalMcss *back;
-    MusPokeDrawEquipPos equips[9];
+    MusPokeDrawEquipPos equips[MUS_POKE_DRAW_EQUIP_MAX];
     // The offsets of its marker cells of kinds 4 and 5, and whether they were drawn
     VecFx32 markPos4;
     VecFx32 markPos5;

@@ -176,8 +176,8 @@ static const FMissionAppUnitText sFMissionAppUnitTexts[] = {
 
 const GameProcFunctions FMISSION_APP_PROC_FUNCTIONS = { FMissionApp_Init, FMissionApp_Main, FMissionApp_Exit };
 
-static FMissionAppFunc sFMissionAppInitFuncs[FMISSION_APP_MODE_COUNT] = { FMissionApp_InitMission, FMissionApp_InitResult };
 static FMissionAppFunc sFMissionAppUpdateFuncs[FMISSION_APP_MODE_COUNT] = { FMissionApp_UpdateMission, FMissionApp_UpdateResult };
+static FMissionAppFunc sFMissionAppInitFuncs[FMISSION_APP_MODE_COUNT] = { FMissionApp_InitMission, FMissionApp_InitResult };
 
 static BOOL FMissionApp_Init(GameProc *proc, u32 *state, void *param, void *data) {
     FestivalEventParam *eventParam = param;
@@ -925,11 +925,10 @@ static void FMissionApp_PrintLog(FMissionApp *work, int window) {
     int i;
     int shown;
     int next;
-    int count = work->logCount;
     StrBuf *format;
     StrBuf *strbuf;
 
-    if (count == 0) {
+    if (work->logCount == 0) {
         return;
     }
     if (work->shownName == NULL) {
@@ -938,14 +937,14 @@ static void FMissionApp_PrintLog(FMissionApp *work, int window) {
         work->shownTrainerId = work->logEntries[0].trainerId;
     } else {
         shown = -1;
-        for (i = 0; i < count; i++) {
+        for (i = 0; i < work->logCount; i++) {
             if (work->shownTrainerId == work->logEntries[i].trainerId) {
                 shown = i;
                 break;
             }
         }
         next = shown + 1;
-        if (next >= count) {
+        if (next >= work->logCount) {
             next = 0;
         }
         GFL_StrBufFree(work->shownName);
@@ -982,11 +981,16 @@ static void FMissionApp_ReadLog(FMissionApp *work) {
 }
 
 // Puts a line of the festival's log in front of the screen's lines, where each player has one line
+// Whether a line of the festival's log has no player
+static inline BOOL FMissionApp_IsLogEntryEmpty(FMissionApp *work, u32 index) {
+    return work->log->entries[index].trainerId == 0;
+}
+
 static void FMissionApp_AddLogEntry(FMissionApp *work, int index) {
     int found;
     int i;
 
-    if (work->log->entries[index].trainerId == 0) {
+    if (FMissionApp_IsLogEntryEmpty(work, index)) {
         return;
     }
     found = -1;

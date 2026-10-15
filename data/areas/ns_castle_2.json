@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_NS_CASTLE",
+    "texture_set": "MAP_TEXTURE_SET_NS_CASTLE",
+    "srt_animation": 14,
+    "pattern_animation": 1,
+    "exterior": false,
+    "lights": 28,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}

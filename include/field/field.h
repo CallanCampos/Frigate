@@ -126,7 +126,7 @@ void func_ov036_021a8c00(u32 winPos, u32 *a1, u32 *a2);
 // whether printing has ended, clear, and the window
 MsgData *func_ov036_021879a0(void *msgBGSys, u32 fileId);
 void func_ov036_021879b8(MsgData *msgData);
-void *func_ov036_0218845c(void *msgBGSys);
+void *func_ov036_0218845c(void *msgBGSys, MsgData *msgData);
 void func_ov036_02188338(void *window);
 void func_ov036_0218836c(void *window, u32 a1, u32 a2, u32 messageId);
 void func_ov036_021883b0(void *window, u32 a1, u32 a2, StrBuf *strbuf);
@@ -254,7 +254,6 @@ FieldTaskManager *Field_GetTaskManager(Field *field);
 void Field_SetSeasonBannerOverdrawFlag(Field *field, BOOL flag);
 u32 GetZoneFogIndexAll(Field *field, u16 zoneId);
 void ShutdownFollowWork(GameData *gameData);
-BOOL func_ov011_02154e70(GameData *gameData, u32 a1);
 void func_ov012_02162f44(GameData *gameData);
 void func_ov012_021683f4(GameSystem *gsys, u16 zoneId);
 void func_ov036_0219ad24(FieldPlayer *player, RailPosition *pos);

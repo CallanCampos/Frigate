@@ -460,7 +460,7 @@ static void BadgeView_InitWork(BadgeViewWork *wk, TrainerCardParam *param) {
     wk->srt.scale.x = FX32_ONE;
     wk->srt.scale.y = FX32_ONE;
     wk->srt.scale.z = FX32_ONE;
-    MAT3_Identity(&wk->srt.rotation);
+    MTX_Identity33_(&wk->srt.rotation);
 }
 
 static void BadgeView_FreeWork(BadgeViewWork *wk) {
@@ -924,18 +924,8 @@ static void BadgeView_DrawMessage(BadgeViewWork *wk, int kind, int badge, int pa
     GFL_BitmapFill(BmpWin_GetBitmap(wk->win), 0);
     switch (kind) {
     case 0: {
-        u32 packed = func_02009230(wk->timeSig, badge);
-        TimeSigBadgeDate date;
-        TimeSigBadgeDate unpacked;
+        TimeSigBadgeDate date = func_02009230(wk->timeSig, badge);
 
-        unpacked.year = packed;
-        packed >>= 8;
-        unpacked.month = packed;
-        packed >>= 8;
-        unpacked.day = packed;
-        packed >>= 8;
-        unpacked.unk3 = packed;
-        date = unpacked;
         WordSetNumber(wk->wordSet, 0, date.year + 2000, 4, 0, TRUE);
         WordSetNumber(wk->wordSet, 1, date.month, 2, 0, TRUE);
         WordSetNumber(wk->wordSet, 2, date.day, 2, 0, TRUE);
@@ -1291,20 +1281,29 @@ static void BadgeView_Update(BadgeViewWork *wk) {
 // the Gym Leader's picture's
 static void BadgeView_StartMove(BadgeViewWork *wk, int move) {
     int from;
+    s16 to;
+    s16 frames;
     s16 half;
 
     from = sBadgeViewMoves[move].from;
-    BadgeView_StartValue(wk, 0, from, sBadgeViewMoves[move].to, sBadgeViewMoves[move].frames);
+    to = sBadgeViewMoves[move].to;
+    frames = sBadgeViewMoves[move].frames;
+    BadgeView_StartValue(wk, 0, from, to, frames);
     wk->scrollY = from;
     GFL_BGSysMoveBG(7, BG_MOVE_SET_Y, from);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->scrollY);
     wk->moveSeq = sBadgeViewMoves[move].moveSeq;
     half = move / 2;
     from = sBadgeViewLeaderMoves[half * 4];
-    BadgeView_StartValue(wk, 1, from, sBadgeViewLeaderMoves[half * 4 + 1], sBadgeViewLeaderMoves[half * 4 + 3]);
+    to = sBadgeViewLeaderMoves[half * 4 + 1];
+    frames = sBadgeViewLeaderMoves[half * 4 + 3];
+    BadgeView_StartValue(wk, 1, from, to, frames);
     BadgeView_SetLeadersX(wk, from);
+    half = move / 2;
     from = sBadgeViewModelMoves[half * 4];
-    BadgeView_StartValue(wk, 2, from, sBadgeViewModelMoves[half * 4 + 1], sBadgeViewModelMoves[half * 4 + 3]);
+    to = sBadgeViewModelMoves[half * 4 + 1];
+    frames = sBadgeViewModelMoves[half * 4 + 3];
+    BadgeView_StartValue(wk, 2, from, to, frames);
     wk->srt.translation.x = from << 8;
 }
 
@@ -1491,7 +1490,7 @@ static void BadgeView_SelectLeader(BadgeViewWork *wk, int show, int badge) {
 
 static void BadgeView_UpdateRotation(BadgeViewWork *wk) {
     wk->angle = 0x4000;
-    MAT3_RotationX(&wk->srt.rotation, FX_SinIdx(wk->angle), FX_CosIdx(wk->angle));
+    MTX_RotX33_(&wk->srt.rotation, FX_SinIdx(wk->angle), FX_CosIdx(wk->angle));
 }
 
 static void BadgeView_SetModelVisible(BadgeViewWork *wk, int visible) {
@@ -1517,7 +1516,7 @@ static void BadgeView_AnimatePalette(BadgeViewWork *wk) {
         if (wk->palAngle >= 0x10000) {
             wk->palAngle -= 0x10000;
         }
-        ratio = (FX_SIN_COS_TABLE[(wk->palAngle >> 4) * 2 + 1] + 0x1000) / 2;
+        ratio = (FX_SinCosTable_[(wk->palAngle >> 4) * 2 + 1] + 0x1000) / 2;
         for (i = 0; i < 16; i++) {
             u16 from = wk->palette[0][i];
             u16 to = wk->palette[1][i];

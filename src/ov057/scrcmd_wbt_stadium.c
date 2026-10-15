@@ -223,11 +223,11 @@ BOOL func_ov057_021e79fc(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     Field *field;
     WbtSystem *sys;
-    u32 opponentUnk;
+    u16 opponentUnk;
     StrBuf *name;
     StrBuf *playerName;
     StrBuf *strbuf;
-    u32 playerUnk;
+    u16 playerUnk;
     u8 mode;
 
     gsys = FieldScriptEnv_GetGameSystem(env);

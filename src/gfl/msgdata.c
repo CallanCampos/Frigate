@@ -206,19 +206,25 @@ void GFL_MsgDataLoadRawStr(MsgData *msgData, u32 messageId, u16 *dest, u32 size)
 }
 
 static MsgFileHeader *GFL_MsgDataLoadHeader(ArcTool *arc, u32 offset, HeapID heapId) {
-    MsgFileHeader header;
+    u8 buf[sizeof(MsgFileHeader)];
+    MsgFileHeader *header;
     MsgFileHeader *result;
 
     GFL_ArcToolSeek(arc, offset);
-    GFL_ArcToolReadRaw(arc, sizeof(MsgFileHeader), &header);
-    result = GFL_HeapAllocate(heapId, sizeof(MsgFileHeader) + header.langCount * sizeof(u32), FALSE, "msgdata.c", 499);
-    sys_memcpy(&header, result, sizeof(MsgFileHeader));
+    header = (MsgFileHeader *)buf;
+    GFL_ArcToolReadRaw(arc, sizeof(MsgFileHeader), header);
+    result = GFL_HeapAllocate(heapId, sizeof(MsgFileHeader) + header->langCount * sizeof(u32), FALSE, "msgdata.c", 499);
+    sys_memcpy(header, result, sizeof(MsgFileHeader));
     GFL_ArcToolReadRaw(arc, result->langCount * sizeof(u32), result->langOffsets);
     return result;
 }
 
+static inline u32 GFL_MsgDataGetLangOffset(const MsgData *msgData) {
+    return msgData->header->langOffsets[msgData->lang];
+}
+
 static void GFL_MsgDataPreloadFull(MsgData *msgData) {
-    u32 offset = msgData->header->langOffsets[msgData->lang];
+    u32 offset = GFL_MsgDataGetLangOffset(msgData);
     u32 size;
 
     if (msgData->arc != NULL) {

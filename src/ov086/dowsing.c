@@ -357,8 +357,30 @@ void Dowsing_Free(DowsingWork *work) {
     GFL_HeapFree(work);
 }
 
+// Whether the hit that the signal comes from has moved since the frame before, so that the signal's sound plays again
+static inline BOOL Dowsing_HitMoved(DowsingWork *work) {
+    u32 oldZ;
+    u32 oldX;
+    u32 newZ;
+    u32 newX;
+    BOOL changed = FALSE;
+    if (work->prevHit.type == HIT_HIDDEN_ITEM) {
+        oldX = work->prevHit.item->x;
+        oldZ = work->prevHit.item->z;
+    } else {
+        return TRUE;
+    }
+    if (work->hit.type == HIT_HIDDEN_ITEM) {
+        newX = work->hit.item->x;
+        newZ = work->hit.item->z;
+    }
+    if ((oldX != newX || oldZ != newZ) && work->prevSignal != work->signal) {
+        changed = TRUE;
+    }
+    return changed;
+}
+
 void Dowsing_Update(DowsingWork *work, BOOL active) {
-    DowsingHit best;
     MapMatrix *matrix;
     GameSystem *gsys;
     s32 playerX;
@@ -368,12 +390,12 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
     BOOL zoneIsMatrix0;
     u16 i;
     u16 count;
-    s32 bestDistance;
-    u16 bestIndex;
     s32 minX;
     s32 maxX;
     s32 minZ;
     s32 maxZ;
+    s32 bestDistance;
+    u16 bestIndex;
     VecFx32 *pos;
     s32 x;
     s32 z;
@@ -410,11 +432,11 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
     }
 
     minX = playerX - SEARCH_LEFT;
-    best.type = HIT_NONE;
     maxX = playerX + SEARCH_RIGHT;
     minZ = playerZ - SEARCH_TOP;
     maxZ = playerZ + SEARCH_BOTTOM;
     DowsingHit hit = { HIT_NONE, NULL };
+    DowsingHit best = hit;
     bestDistance = -1;
 
     if (work->searchRestart) {
@@ -494,8 +516,8 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
         if (work->signal == SIGNAL_CLOSEST) {
             BOOL start = FALSE;
             if (!work->soundOn) {
-                work->soundOn = TRUE;
                 start = TRUE;
+                work->soundOn = TRUE;
             } else if (work->soundTimer == 6) {
                 if (!GFL_SndPlayerIsActive(work->soundPlayer)) {
                     work->soundTimer--;
@@ -518,25 +540,7 @@ void Dowsing_Update(DowsingWork *work, BOOL active) {
         }
 
         if (quiet && work->signal != SIGNAL_CLOSEST && work->hit.type != HIT_NONE) {
-            BOOL changed = FALSE;
-            u32 oldX;
-            u32 oldZ;
-            u32 newX;
-            u32 newZ;
-            if (work->prevHit.type == HIT_HIDDEN_ITEM) {
-                oldX = work->prevHit.item->x;
-                oldZ = work->prevHit.item->z;
-                if (work->hit.type == HIT_HIDDEN_ITEM) {
-                    newX = work->hit.item->x;
-                    newZ = work->hit.item->z;
-                }
-                if (oldX != newX || oldZ != newZ || work->prevSignal != work->signal) {
-                    changed = TRUE;
-                }
-            } else {
-                changed = TRUE;
-            }
-            if (changed) {
+            if (Dowsing_HitMoved(work)) {
                 s32 player = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_120);
                 s32 pan = (sSignals[work->signal].pan - 8) * 16;
                 if (pan < -127) {

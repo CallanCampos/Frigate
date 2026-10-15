@@ -66,7 +66,7 @@ typedef struct Montgomery {
 static void *CryptAlloc(u32 size);
 static void CryptFree(void *ptr);
 static int BitLength32(u32 x);
-static int BitLength(const BigNum *n);
+static int BitLength(BigNum *n);
 static void CryptDestroy(BigNum *n);
 static void FreeNum(BigNum *n);
 static BigNum *CryptResize(BigNum *n, int words);
@@ -77,53 +77,53 @@ static BigNumPool *NewPool(void);
 static void InitPool(BigNumPool *pool);
 static void FreePool(BigNumPool *pool);
 static BigNum *CryptExpand(BigNum *n, int words);
-static BigNum *CryptCopy(BigNum *dest, const BigNum *src);
+static BigNum *CryptCopy(BigNum *dest, BigNum *src);
 static void CryptClear(BigNum *n);
 static BOOL CryptSetWord(BigNum *n, u32 word);
 static BigNum *FromBytes(const u8 *bytes, int size, BigNum *out);
-static int ToBytes(const BigNum *n, u8 *out);
-static int CryptCompare(const BigNum *a, const BigNum *b);
+static int ToBytes(BigNum *n, u8 *out);
+static int CryptCompare(BigNum *a, BigNum *b);
 static BOOL CryptSetBit(BigNum *n, int bit);
-static BOOL CryptTestBit(const BigNum *n, int bit);
-static BOOL ShiftLeft(BigNum *dest, const BigNum *src, int bits);
-static BOOL ShiftRight(BigNum *dest, const BigNum *src, int bits);
+static BOOL CryptTestBit(BigNum *n, int bit);
+static BOOL ShiftLeft(BigNum *dest, BigNum *src, int bits);
+static BOOL ShiftRight(BigNum *dest, BigNum *src, int bits);
 static BOOL AddWord(BigNum *n, u32 word);
 static BOOL SubWord(BigNum *n, u32 word);
-static BOOL AddSigned(BigNum *dest, const BigNum *a, const BigNum *b);
-static BOOL AddMagnitude(BigNum *dest, const BigNum *a, const BigNum *b);
-static BOOL SubMagnitude(BigNum *dest, const BigNum *a, const BigNum *b);
-static BOOL SubSigned(BigNum *dest, const BigNum *a, const BigNum *b);
-static BOOL CryptMul(BigNum *dest, const BigNum *a, const BigNum *b, BigNumPool *pool);
+static BOOL AddSigned(BigNum *dest, BigNum *a, BigNum *b);
+static BOOL AddMagnitude(BigNum *dest, BigNum *a, BigNum *b);
+static BOOL SubMagnitude(BigNum *dest, BigNum *a, BigNum *b);
+static BOOL SubSigned(BigNum *dest, BigNum *a, BigNum *b);
+static BOOL CryptMul(BigNum *dest, BigNum *a, BigNum *b, BigNumPool *pool);
 static void MulWords(u32 *dest, const u32 *a, int aSize, const u32 *b, int bSize);
-static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator, const BigNum *denominator,
+static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNum *denominator,
                 BigNumPool *pool);
-static BOOL BigMod(BigNum *remainder, const BigNum *numerator, const BigNum *denominator, BigNumPool *pool);
-static BOOL ModExp(BigNum *dest, const BigNum *base, const BigNum *exponent, const BigNum *modulus, BigNumPool *pool);
-static BOOL CryptSquare(BigNum *dest, const BigNum *a, BigNumPool *pool);
+static BOOL BigMod(BigNum *remainder, BigNum *numerator, BigNum *denominator, BigNumPool *pool);
+static BOOL ModExp(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus, BigNumPool *pool);
+static BOOL CryptSquare(BigNum *dest, BigNum *a, BigNumPool *pool);
 static void SquareWords(u32 *dest, const u32 *a, int size, u32 *scratch);
 static void MontReduce(u32 *dest, u32 *product, const u32 *modulus, int size, u32 inverse);
 static u32 InverseOfWord(u32 x);
-static int EncodeExponent(const BigNum *exponent, const u8 **encoded, int unused, BigNumPool *pool);
-static int EncodeWindows(u8 *dest, const BigNum *exponent, int window);
+static int EncodeExponent(BigNum *exponent, const u8 **encoded, int unused, BigNumPool *pool);
+static int EncodeWindows(u8 *dest, BigNum *exponent, int window);
 static inline void ReadWindow(const u8 **cursor, int *index, int *squarings);
-static BOOL MontInit(Montgomery *mont, const BigNum *modulus, BigNumPool *pool);
+static BOOL MontInit(Montgomery *mont, BigNum *modulus, BigNumPool *pool);
 static Montgomery *NewMont(void);
 static void InitMont(Montgomery *mont);
 static void FreeMont(Montgomery *mont);
 static void InitReducer(Reducer *reducer);
 static void FreeReducer(Reducer *reducer);
-static BOOL SetReducerModulus(Reducer *reducer, const BigNum *modulus);
-static BOOL ModMul(BigNum *dest, const BigNum *a, const BigNum *b, Reducer *reducer, BigNumPool *pool);
-static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, const BigNum *numerator, Reducer *reducer, BigNumPool *pool);
-static int ComputeReciprocal(BigNum *reciprocal, const BigNum *modulus, int bits, BigNumPool *pool);
-static BOOL ModExpPlain(BigNum *dest, const BigNum *base, const BigNum *exponent, const BigNum *modulus,
+static int SetReducerModulus(Reducer *reducer, BigNum *modulus, BigNumPool *pool);
+static BOOL ModMul(BigNum *dest, BigNum *a, BigNum *b, Reducer *reducer, BigNumPool *pool);
+static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, BigNum *numerator, Reducer *reducer, BigNumPool *pool);
+static int ComputeReciprocal(BigNum *reciprocal, BigNum *modulus, int bits, BigNumPool *pool);
+static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
                         BigNumPool *pool);
-static BOOL ModExpMont(BigNum *dest, const BigNum *base, const BigNum *exponent, const BigNum *modulus,
+static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
                        BigNumPool *pool, Montgomery *mont);
 static asm u32 MulAddWords(u32 *dest, const u32 *a, int size, u32 word);
 static asm u32 MulWord(u32 *dest, const u32 *a, int size, u32 word);
 static asm void SquareDigits(u32 *dest, const u32 *a, int size);
-static u32 DivWords(u32 high, u32 low, u32 divisor);
+static u64 DivWords(u32 high, u32 low, u32 divisor);
 static asm u32 AddWords(u32 *dest, const u32 *a, const u32 *b, int size);
 static asm u32 SubWords(u32 *dest, const u32 *a, const u32 *b, int size);
 static BOOL ReadAsn1(const u8 **data, u32 *size, int tag, u32 *length);
@@ -145,11 +145,11 @@ static struct {
 
 // The number of trailing zero bits of each value of a window, for windows of up to 6 bits: a window of w bits reads the
 // last 2^w of them
-static const s8 sTrailingZeros[64] = {
+static const u8 sTrailingZeros[64] = {
     6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
 };
-static const s8 *sTrailingZerosByWindow[7] = {
+static const u8 *sTrailingZerosByWindow[7] = {
     sTrailingZeros + 63, sTrailingZeros + 62, sTrailingZeros + 60, sTrailingZeros + 56,
     sTrailingZeros + 48, sTrailingZeros + 32, sTrailingZeros,
 };
@@ -211,15 +211,14 @@ static int RsaPublic(u8 *out, int outSize, const u8 *input, int inputSize, const
 // Reads the tag and the length of a piece of ASN.1, leaving the data at its content and the size at what is left
 static BOOL ReadAsn1(const u8 **data, u32 *size, int tag, u32 *length) {
     const u8 *p = *data;
-    u32 left;
+    u32 left = *size;
     u32 value = 0;
-    u32 count;
+    u8 count;
     u32 b;
 
     if (*p++ != tag) {
         return FALSE;
     }
-    left = *size;
     if (left < 1) {
         return FALSE;
     }
@@ -230,17 +229,15 @@ static BOOL ReadAsn1(const u8 **data, u32 *size, int tag, u32 *length) {
         if (left < count + 1) {
             return FALSE;
         }
+        left -= count;
         if (length != NULL) {
-            u32 digit = p[1] & 0x7f;
+            u32 digit = *++p & 0x7f;
 
-            p++;
             do {
                 value = digit + (value << 7);
-            } while ((--count & 0xff) != 0);
-            left -= (b & 0x7f);
+            } while (--count != 0);
         } else {
             p += count;
-            left -= count;
         }
     } else {
         p++;
@@ -348,12 +345,12 @@ static BOOL ParseDigestInfo(const u8 *data, u32 size, const u8 **oid, u32 *oidSi
 static int ExtractDigest(u8 *out, int outSize, const u8 *signature, int signatureSize, const u8 *modulus,
                          int modulusSize, u32 exponent) {
     u8 block[0x100];
-    const u8 *unpadded = NULL;
+    const u8 *unpadded;
     u32 unpaddedSize = 0;
     const u8 *digest;
     u32 digestSize = 0;
     int size;
-    int i;
+    u32 i;
 
     size = RsaPublic(block, sizeof(block), signature, signatureSize, modulus, modulusSize, exponent);
     if (size < 0) {
@@ -369,10 +366,10 @@ static int ExtractDigest(u8 *out, int outSize, const u8 *signature, int signatur
         return -1;
     }
     for (i = 0; i < digestSize; i++) {
-        out[i] = digest[i];
+        *out++ = digest[i];
     }
     for (; i < outSize; i++) {
-        out[i] = 0;
+        *out++ = 0;
     }
     return digestSize;
 }
@@ -396,7 +393,7 @@ static BOOL VerifyDigest(const u8 *digest, const u8 *signature, const u8 *modulu
 int Crypt_VerifySignature(const void *data, u32 size, void *signature, const u8 *key) {
     u8 digest[0x14];
 
-    func_02077720(digest, data, size);
+    MATH_CalcSHA1(digest, data, size);
     return VerifyDigest(digest, signature, key);
 }
 
@@ -438,7 +435,7 @@ static int BitLength32(u32 x) {
     return sNibbleBits[rest >> 4] + shift + 4;
 }
 
-static int BitLength(const BigNum *n) {
+static int BitLength(BigNum *n) {
     int top;
 
     if (n->length == 0) {
@@ -469,15 +466,22 @@ static void CryptDestroy(BigNum *n) {
     }
 }
 
+// Makes room for words if the number has less, as CryptExpand does, without the call when it has enough
+static inline BigNum *Reserve(BigNum *n, int words) {
+    return words > n->capacity ? CryptExpand(n, words) : n;
+}
+
+// Makes room for a number of bits, with a word to spare when it lacks room
+static inline BigNum *ReserveBits(BigNum *n, int bits) {
+    return (bits + 31) / 32 <= n->capacity ? n : CryptExpand(n, bits / 32 + 1);
+}
+
 // Makes room for words, with zeros above the length
 static BigNum *CryptResize(BigNum *n, int words) {
     int i;
 
     if (n->length < words) {
-        if (words > n->capacity) {
-            n = CryptExpand(n, words);
-        }
-        if (n == NULL) {
+        if (Reserve(n, words) == NULL) {
             return NULL;
         }
         if (n->digits != NULL) {
@@ -572,14 +576,11 @@ static BigNum *CryptExpand(BigNum *n, int words) {
     return n;
 }
 
-static BigNum *CryptCopy(BigNum *dest, const BigNum *src) {
+static BigNum *CryptCopy(BigNum *dest, BigNum *src) {
     if (dest == src) {
         return dest;
     }
-    if (src->length > dest->capacity) {
-        dest = CryptExpand(dest, src->length);
-    }
-    if (dest == NULL) {
+    if (Reserve(dest, src->length) == NULL) {
         return NULL;
     }
     sys_memcpy(src->digits, dest->digits, src->length * sizeof(u32));
@@ -600,10 +601,7 @@ static void CryptClear(BigNum *n) {
 }
 
 static BOOL CryptSetWord(BigNum *n, u32 word) {
-    if (n->capacity < 1) {
-        n = CryptExpand(n, 2);
-    }
-    if (n == NULL) {
+    if (ReserveBits(n, 32) == NULL) {
         return FALSE;
     }
     n->negative = 0;
@@ -617,10 +615,9 @@ static BOOL CryptSetWord(BigNum *n, u32 word) {
 
 // Reads size bytes, the most significant first, into out or into a new number
 static BigNum *FromBytes(const u8 *bytes, int size, BigNum *out) {
-    u32 word = 0;
+    u32 word;
     int words;
     int phase;
-    int count;
 
     if (out == NULL) {
         out = NewNum();
@@ -628,20 +625,18 @@ static BigNum *FromBytes(const u8 *bytes, int size, BigNum *out) {
     if (out == NULL) {
         return NULL;
     }
+    word = 0;
     if (size == 0) {
         out->length = 0;
         return out;
     }
-    if (out->capacity < ((size + 2) * 8 + 31) / 32) {
-        if (CryptExpand(out, (size + 2) * 8 / 32 + 1) == NULL) {
-            return NULL;
-        }
+    if (ReserveBits(out, (size + 2) * 8) == NULL) {
+        return NULL;
     }
     words = (u32)(size - 1) / 4 + 1;
     out->length = words;
-    phase = (size - 1) & 3;
-    count = size - 1;
-    do {
+    phase = (u32)(size - 1) % 4;
+    while (size-- != 0) {
         word = *bytes++ | (word << 8);
         if (phase-- == 0) {
             words--;
@@ -649,33 +644,37 @@ static BigNum *FromBytes(const u8 *bytes, int size, BigNum *out) {
             word = 0;
             phase = 3;
         }
-    } while (count-- != 0);
+    }
     CryptNormalize(out);
     return out;
 }
 
 // Writes the number as bytes, the most significant first, and returns how many
-static int ToBytes(const BigNum *n, u8 *out) {
+static int ToBytes(BigNum *n, u8 *out) {
     int bytes = (BitLength(n) + 7) / 8;
-    int i;
+    int i = bytes;
 
-    for (i = bytes - 1; i >= 0; i--) {
+    while (i-- > 0) {
         *out++ = n->digits[i / 4] >> (i % 4 * 8);
     }
     return bytes;
 }
 
 // Compares the sizes, which is the difference of their lengths, or the most significant word that differs
-static int CryptCompare(const BigNum *a, const BigNum *b) {
+static int CryptCompare(BigNum *a, BigNum *b) {
     int diff = a->length - b->length;
+    const u32 *ap;
+    const u32 *bp;
     int i;
 
     if (diff != 0) {
         return diff;
     }
+    ap = a->digits;
+    bp = b->digits;
     for (i = a->length - 1; i >= 0; i--) {
-        if (a->digits[i] != b->digits[i]) {
-            return a->digits[i] > b->digits[i] ? 1 : -1;
+        if (ap[i] != bp[i]) {
+            return ap[i] > bp[i] ? 1 : -1;
         }
     }
     return 0;
@@ -687,10 +686,8 @@ static BOOL CryptSetBit(BigNum *n, int bit) {
     int i;
 
     if (n->length <= word) {
-        if (word + 1 > n->capacity) {
-            if (CryptExpand(n, word + 1) == NULL) {
-                return FALSE;
-            }
+        if (Reserve(n, word + 1) == NULL) {
+            return FALSE;
         }
         for (i = n->length; i < word + 1; i++) {
             n->digits[i] = 0;
@@ -701,69 +698,77 @@ static BOOL CryptSetBit(BigNum *n, int bit) {
     return TRUE;
 }
 
-static BOOL CryptTestBit(const BigNum *n, int bit) {
+static BOOL CryptTestBit(BigNum *n, int bit) {
     int word;
+    int shift;
 
     if (bit < 0) {
         return FALSE;
     }
     word = bit / 32;
+    shift = bit % 32;
     if (n->length <= word) {
         return FALSE;
     }
-    return (n->digits[word] & (1 << (bit % 32))) != 0;
+    return (n->digits[word] & (1 << shift)) != 0;
 }
 
-static BOOL ShiftLeft(BigNum *dest, const BigNum *src, int bits) {
+static BOOL ShiftLeft(BigNum *dest, BigNum *src, int bits) {
     int words = bits / 32;
-    int shift = bits % 32;
-    int i;
-    u32 *out;
-
-    if (src->length + words + 1 > dest->capacity) {
-        if (CryptExpand(dest, src->length + words + 1) == NULL) {
-            return FALSE;
-        }
-    }
-    dest->negative = src->negative;
-    dest->digits[src->length + words] = 0;
-    out = dest->digits + words;
-    if (shift == 0) {
-        for (i = src->length - 1; i >= 0; i--) {
-            out[i] = src->digits[i];
-        }
-    } else {
-        for (i = src->length - 1; i >= 0; i--) {
-            u32 word = src->digits[i];
-
-            out[i + 1] |= word >> (32 - shift);
-            out[i] = word << shift;
-        }
-    }
-    sys_memset(dest->digits, 0, words * sizeof(u32));
-    dest->length = src->length + words + 1;
-    CryptNormalize(dest);
-    return TRUE;
-}
-
-static BOOL ShiftRight(BigNum *dest, const BigNum *src, int bits) {
-    int words = bits / 32;
-    int shift = bits % 32;
-    int count;
+    int shift;
+    int back;
     int i;
     const u32 *in;
     u32 *out;
     u32 word;
 
+    if (Reserve(dest, src->length + words + 1) == NULL) {
+        return FALSE;
+    }
+    dest->negative = src->negative;
+    shift = bits % 32;
+    back = 32 - shift;
+    in = src->digits;
+    out = dest->digits;
+    out[src->length + words] = 0;
+    if (shift == 0) {
+        for (i = src->length - 1; i >= 0; i--) {
+            out[words + i] = in[i];
+        }
+    } else {
+        for (i = src->length - 1; i >= 0; i--) {
+            word = in[i];
+            out[words + i + 1] |= word >> back;
+            out[words + i] = word << shift;
+        }
+    }
+    sys_memset(out, 0, words * sizeof(u32));
+    dest->length = src->length + words + 1;
+    CryptNormalize(dest);
+    return TRUE;
+}
+
+static BOOL ShiftRight(BigNum *dest, BigNum *src, int bits) {
+    int words;
+    int back;
+    int shift;
+    int count;
+    int i;
+    u32 *in;
+    u32 *out;
+    u32 word;
+    u32 low;
+
+    words = bits / 32;
+    shift = bits % 32;
+    back = 32 - shift;
     if (src->length < words) {
         CryptSetWord(dest, 0);
         return TRUE;
     }
     if (dest != src) {
-        if (src->length - words + 2 > dest->capacity) {
-            if (CryptExpand(dest, src->length - words + 2) == NULL) {
-                return FALSE;
-            }
+        if (Reserve(dest, src->length - words + 2) == NULL) {
+            return FALSE;
         }
         dest->negative = src->negative;
     }
@@ -772,16 +777,15 @@ static BOOL ShiftRight(BigNum *dest, const BigNum *src, int bits) {
     dest->length = count;
     out = dest->digits;
     if (shift == 0) {
-        for (i = 0; i < count + 1; i++) {
+        for (i = count + 1; i > 0; i--) {
             *out++ = *in++;
         }
     } else {
         word = *in++;
         for (i = 1; i < count; i++) {
-            u32 next = *in++;
-
-            *out++ = (word >> shift) | (next << (32 - shift));
-            word = next;
+            low = word >> shift;
+            word = *in++;
+            *out++ = low | (word << back);
         }
         *out++ = word >> shift;
         *out = 0;
@@ -793,6 +797,8 @@ static BOOL ShiftRight(BigNum *dest, const BigNum *src, int bits) {
 // Adds a word to the number, whatever its sign
 static BOOL AddWord(BigNum *n, u32 word) {
     int i;
+    u32 *digits;
+    u32 low;
 
     if (word == 0) {
         return TRUE;
@@ -800,26 +806,25 @@ static BOOL AddWord(BigNum *n, u32 word) {
     if (n->negative) {
         if (n->length > 1) {
             n->negative = 0;
-            SubWord(n, word);
+            i = SubWord(n, word);
             n->negative = 1;
-            return TRUE;
+            return i;
         }
-        if (n->digits[0] > word) {
-            n->digits[0] -= word;
+        digits = n->digits;
+        low = digits[0];
+        if (low > word) {
+            digits[0] = low - word;
+        } else if (low < word) {
+            n->negative = 0;
+            digits[0] = word - low;
         } else {
             n->negative = 0;
-            if (n->digits[0] < word) {
-                n->digits[0] = word - n->digits[0];
-            } else {
-                n->length = 0;
-            }
+            n->length = 0;
         }
         return TRUE;
     }
-    if (n->length + 1 > n->capacity) {
-        if (CryptExpand(n, n->length + 1) == NULL) {
-            return FALSE;
-        }
+    if (Reserve(n, n->length + 1) == NULL) {
+        return FALSE;
     }
     n->digits[n->length] = 0;
     for (i = 0;;) {
@@ -841,33 +846,37 @@ static BOOL AddWord(BigNum *n, u32 word) {
 
 static BOOL SubWord(BigNum *n, u32 word) {
     int i;
+    u32 *digits;
+    u32 low;
 
     if (word == 0) {
         return TRUE;
     }
     if (n->negative) {
         n->negative = 0;
-        AddWord(n, word);
+        i = AddWord(n, word);
         n->negative = 1;
-        return TRUE;
+        return i;
     }
     if (n->length <= 1) {
         if (n->length == 0) {
-            if (n->capacity < 1) {
-                if (CryptExpand(n, 1) == NULL) {
-                    return FALSE;
-                }
+            if (Reserve(n, 1) == NULL) {
+                return FALSE;
             }
             n->digits[0] = word;
             n->negative = 1;
             n->length = 1;
-        } else if (n->digits[0] == word) {
+            return TRUE;
+        }
+        digits = n->digits;
+        low = digits[0];
+        if (low == word) {
             n->length = 0;
-        } else if (n->digits[0] > word) {
-            n->digits[0] -= word;
+        } else if (low > word) {
+            digits[0] = low - word;
         } else {
             n->negative = 1;
-            n->digits[0] = word - n->digits[0];
+            digits[0] = word - low;
         }
         return TRUE;
     }
@@ -888,40 +897,47 @@ static BOOL SubWord(BigNum *n, u32 word) {
     return TRUE;
 }
 
-static BOOL AddSigned(BigNum *dest, const BigNum *a, const BigNum *b) {
-    const BigNum *swap;
+static BOOL AddSigned(BigNum *dest, BigNum *a, BigNum *b) {
+    BigNum *swap;
 
-    if (a->negative == b->negative) {
-        dest->negative = a->negative != 0;
-        return AddMagnitude(dest, a, b) != FALSE;
+    if (a->negative ^ b->negative) {
+        if (a->negative != 0) {
+            swap = a;
+            a = b;
+            b = swap;
+        }
+        if (CryptCompare(a, b) < 0) {
+            if (!SubMagnitude(dest, b, a)) {
+                return FALSE;
+            }
+            dest->negative = 1;
+        } else {
+            if (!SubMagnitude(dest, a, b)) {
+                return FALSE;
+            }
+            dest->negative = 0;
+        }
+        return TRUE;
     }
     if (a->negative != 0) {
-        swap = a;
-        a = b;
-        b = swap;
-    }
-    if (CryptCompare(a, b) < 0) {
-        if (!SubMagnitude(dest, b, a)) {
-            return FALSE;
-        }
         dest->negative = 1;
     } else {
-        if (!SubMagnitude(dest, a, b)) {
-            return FALSE;
-        }
         dest->negative = 0;
+    }
+    if (!AddMagnitude(dest, a, b)) {
+        return FALSE;
     }
     return TRUE;
 }
 
 // Adds the sizes of two numbers
-static BOOL AddMagnitude(BigNum *dest, const BigNum *a, const BigNum *b) {
-    const BigNum *swap;
-    int aSize;
-    int bSize;
+static BOOL AddMagnitude(BigNum *dest, BigNum *a, BigNum *b) {
+    BigNum *swap;
+    int max;
     int i;
     u32 carry;
-    const u32 *aDigits;
+    u32 digit;
+    u32 *aDigits;
     u32 *destDigits;
 
     if (a->length < b->length) {
@@ -929,70 +945,64 @@ static BOOL AddMagnitude(BigNum *dest, const BigNum *a, const BigNum *b) {
         a = b;
         b = swap;
     }
-    aSize = a->length;
-    if (aSize + 1 > dest->capacity) {
-        if (CryptExpand(dest, aSize + 1) == NULL) {
-            return FALSE;
-        }
+    max = a->length;
+    i = b->length;
+    if (Reserve(dest, max + 1) == NULL) {
+        return FALSE;
     }
-    bSize = b->length;
-    dest->length = aSize;
+    dest->length = max;
     aDigits = a->digits;
     destDigits = dest->digits;
-    carry = AddWords(destDigits, aDigits, b->digits, bSize);
-    destDigits += bSize;
-    aDigits += bSize;
-    i = bSize;
+    carry = AddWords(destDigits, aDigits, b->digits, i);
+    destDigits += i;
+    aDigits += i;
     if (carry != 0) {
-        while (i < aSize) {
-            u32 digit = *aDigits++;
-
-            *destDigits++ = digit + 1;
+        while (i < max) {
+            digit = *aDigits++;
             i++;
-            if (*(destDigits - 1) >= digit) {
+            if ((*destDigits++ = digit + 1) >= digit) {
                 carry = 0;
                 break;
             }
         }
+        if (i >= max && carry != 0) {
+            *destDigits++ = 1;
+            dest->length++;
+        }
     }
-    if (i >= aSize && carry != 0) {
-        *destDigits++ = 1;
-        dest->length++;
-    }
-    if (destDigits != aDigits && i < aSize) {
-        do {
+    if (destDigits != aDigits) {
+        for (; i < max; i++) {
             *destDigits++ = *aDigits++;
-            i++;
-        } while (i < aSize);
+        }
     }
     return TRUE;
 }
 
 // Subtracts a smaller size from a bigger one
-static BOOL SubMagnitude(BigNum *dest, const BigNum *a, const BigNum *b) {
-    int aSize = a->length;
-    int bSize = b->length;
-    int i = 0;
-    int borrow = 0;
-    const u32 *aDigits;
-    const u32 *bDigits;
+static BOOL SubMagnitude(BigNum *dest, BigNum *a, BigNum *b) {
+    int max = a->length;
+    int min = b->length;
+    int i;
+    int borrow;
+    u32 x;
+    u32 y;
+    u32 *aDigits;
+    u32 *bDigits;
     u32 *destDigits;
 
-    if (aSize < bSize) {
+    if (max < min) {
         return FALSE;
     }
-    if (aSize > dest->capacity) {
-        if (CryptExpand(dest, aSize) == NULL) {
-            return FALSE;
-        }
+    if (Reserve(dest, max) == NULL) {
+        return FALSE;
     }
     aDigits = a->digits;
     bDigits = b->digits;
     destDigits = dest->digits;
-    for (i = 0; i < bSize; i++) {
-        u32 x = *aDigits++;
-        u32 y = *bDigits++;
-
+    borrow = 0;
+    for (i = 0; i < min; i++) {
+        x = *aDigits++;
+        y = *bDigits++;
         if (borrow) {
             borrow = x <= y;
             x = x - y - 1;
@@ -1002,26 +1012,46 @@ static BOOL SubMagnitude(BigNum *dest, const BigNum *a, const BigNum *b) {
         }
         *destDigits++ = x;
     }
-    while (borrow && i < aSize) {
-        u32 x = *aDigits++;
-
-        i++;
-        *destDigits++ = x - 1;
-        borrow = x == 0;
-    }
-    if (destDigits != aDigits) {
-        while (i < aSize) {
-            *destDigits++ = *aDigits++;
+    if (borrow) {
+        while (i < max) {
             i++;
+            x = *aDigits++;
+            y = x - 1;
+            *destDigits++ = y;
+            if (x > y) {
+                break;
+            }
         }
     }
-    dest->length = aSize;
+    if (destDigits != aDigits) {
+        for (;;) {
+            if (i++ >= max) {
+                break;
+            }
+            destDigits[0] = aDigits[0];
+            if (i++ >= max) {
+                break;
+            }
+            destDigits[1] = aDigits[1];
+            if (i++ >= max) {
+                break;
+            }
+            destDigits[2] = aDigits[2];
+            if (i++ >= max) {
+                break;
+            }
+            destDigits[3] = aDigits[3];
+            destDigits += 4;
+            aDigits += 4;
+        }
+    }
+    dest->length = max;
     CryptNormalize(dest);
     return TRUE;
 }
 
-static BOOL SubSigned(BigNum *dest, const BigNum *a, const BigNum *b) {
-    const BigNum *swap;
+static BOOL SubSigned(BigNum *dest, BigNum *a, BigNum *b) {
+    BigNum *swap;
     BOOL add = FALSE;
     int negative = 0;
     int size;
@@ -1046,10 +1076,8 @@ static BOOL SubSigned(BigNum *dest, const BigNum *a, const BigNum *b) {
         return TRUE;
     }
     size = a->length > b->length ? a->length : b->length;
-    if (size > dest->capacity) {
-        if (CryptExpand(dest, size) == NULL) {
-            return FALSE;
-        }
+    if (Reserve(dest, size) == NULL) {
+        return FALSE;
     }
     if (CryptCompare(a, b) < 0) {
         if (!SubMagnitude(dest, b, a)) {
@@ -1065,7 +1093,7 @@ static BOOL SubSigned(BigNum *dest, const BigNum *a, const BigNum *b) {
     return TRUE;
 }
 
-static BOOL CryptMul(BigNum *dest, const BigNum *a, const BigNum *b, BigNumPool *pool) {
+static BOOL CryptMul(BigNum *dest, BigNum *a, BigNum *b, BigNumPool *pool) {
     int total;
     int aSize = a->length;
     int bSize = b->length;
@@ -1083,10 +1111,8 @@ static BOOL CryptMul(BigNum *dest, const BigNum *a, const BigNum *b, BigNumPool 
     } else {
         work = dest;
     }
-    if (total > work->capacity) {
-        if (CryptExpand(work, total) == NULL) {
-            return FALSE;
-        }
+    if (Reserve(work, total) == NULL) {
+        return FALSE;
     }
     work->length = total;
     MulWords(work->digits, a->digits, aSize, b->digits, bSize);
@@ -1100,32 +1126,76 @@ static BOOL CryptMul(BigNum *dest, const BigNum *a, const BigNum *b, BigNumPool 
 
 // Multiplies the words of two numbers the way it is taught: one row of the shorter number for each of the longer
 static void MulWords(u32 *dest, const u32 *a, int aSize, const u32 *b, int bSize) {
-    int i;
+    int swapSize;
+    const u32 *swapWords;
+    u32 *top;
 
     if (aSize < bSize) {
-        const u32 *swapWords = a;
-        int swapSize = aSize;
-
+        swapWords = a;
         a = b;
         b = swapWords;
+        swapSize = aSize;
         aSize = bSize;
         bSize = swapSize;
     }
-    dest[aSize] = MulWord(dest, a, aSize, b[0]);
-    for (i = 1; i < bSize; i++) {
-        dest[aSize + i] = MulAddWords(dest + i, a, aSize, b[i]);
+    top = dest + aSize;
+    top[0] = MulWord(dest, a, aSize, b[0]);
+    for (;;) {
+        if (--bSize <= 0) {
+            return;
+        }
+        top[1] = MulAddWords(dest + 1, a, aSize, b[1]);
+        if (--bSize <= 0) {
+            return;
+        }
+        top[2] = MulAddWords(dest + 2, a, aSize, b[2]);
+        if (--bSize <= 0) {
+            return;
+        }
+        top[3] = MulAddWords(dest + 3, a, aSize, b[3]);
+        if (--bSize <= 0) {
+            return;
+        }
+        top[4] = MulAddWords(dest + 4, a, aSize, b[4]);
+        top += 4;
+        dest += 4;
+        b += 4;
     }
+}
+
+// Multiplies the word whose 16-bit halves are in *low and *high by the one whose halves are bLow and bHigh, from
+// 16-bit products, and leaves the low and the high word of the product in *low and *high
+static inline void MulHalves(u32 *low, u32 *high, u32 bLow, u32 bHigh) {
+    u32 aLow = *low;
+    u32 aHigh = *high;
+    u32 middle = bHigh * aLow;
+    u32 cross;
+
+    aLow = bLow * aLow;
+    cross = bLow * aHigh;
+    aHigh = bHigh * aHigh;
+    cross += middle;
+    if (cross < middle) {
+        aHigh += 0x10000;
+    }
+    aHigh += (cross >> 16) & 0xffff;
+    cross <<= 16;
+    aLow += cross;
+    if (aLow < cross) {
+        aHigh++;
+    }
+    *low = aLow;
+    *high = aHigh;
 }
 
 // Divides, schoolbook: the denominator is shifted up until its top bit is set, then each word of the quotient is
 // estimated from the top words of what is left, and the estimate is corrected
-static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator, const BigNum *denominator,
+static BOOL BigDiv(BigNum *quotient, BigNum *remainder, BigNum *numerator, BigNum *denominator,
                 BigNumPool *pool) {
     BigNum *product;
     BigNum *shiftedNumerator;
     BigNum *shiftedDenominator;
     BigNum window;
-    int used;
     int shift;
     int denominatorSize;
     int quotientSize;
@@ -1134,6 +1204,10 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator,
     u32 next = 0;
     u32 *numeratorTop;
     u32 *quotientDigit;
+    u32 nextLow;
+    u32 nextHigh;
+    u32 topLow;
+    u32 topHigh;
     int i;
 
     if (denominator->length == 0 || (denominator->length == 1 && denominator->digits[0] == 0)) {
@@ -1150,13 +1224,12 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator,
         }
         return TRUE;
     }
-    used = pool->used;
-    product = &pool->numbers[used];
+    product = &pool->numbers[pool->used];
     product->negative = 0;
-    shiftedNumerator = &pool->numbers[used + 1];
-    shiftedDenominator = &pool->numbers[used + 2];
+    shiftedNumerator = &pool->numbers[pool->used + 1];
+    shiftedDenominator = &pool->numbers[pool->used + 2];
     if (quotient == NULL) {
-        quotient = &pool->numbers[used + 3];
+        quotient = &pool->numbers[pool->used + 3];
     }
     shift = 32 - BitLength(denominator) % 32;
     if (!ShiftLeft(shiftedDenominator, denominator, shift)) {
@@ -1179,24 +1252,21 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator,
         next = shiftedDenominator->digits[denominatorSize - 2];
     }
     numeratorTop = shiftedNumerator->digits + (numeratorSize - 1);
-    if (quotientSize + 1 > quotient->capacity) {
-        if (CryptExpand(quotient, quotientSize + 1) == NULL) {
-            return FALSE;
-        }
+    if (Reserve(quotient, quotientSize + 1) == NULL) {
+        goto fail;
     }
     quotient->negative = numerator->negative ^ denominator->negative;
     quotient->length = quotientSize;
     quotientDigit = quotient->digits + (quotientSize - 1);
-    if (denominatorSize + 1 > product->capacity) {
-        if (CryptExpand(product, denominatorSize + 1) == NULL) {
-            return FALSE;
-        }
+    if (Reserve(product, denominatorSize + 1) == NULL) {
+        goto fail;
     }
     if (CryptCompare(&window, shiftedDenominator) >= 0) {
         if (!SubMagnitude(&window, &window, shiftedDenominator)) {
-            return FALSE;
+            goto fail;
         }
         *quotientDigit = 1;
+        quotient->digits[quotient->length - 1] = 1;
     } else {
         quotient->length--;
     }
@@ -1205,10 +1275,18 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator,
         u32 high;
         u32 low;
         u32 estimate;
-        u32 carry;
+        u32 byNextLow;
+        u32 byNextHigh;
+        u32 byTopLow;
+        u32 byTopHigh;
+        u32 rest;
         int size;
         int oldLength;
 
+        nextLow = next & 0xffff;
+        nextHigh = (next >> 16) & 0xffff;
+        topLow = top & 0xffff;
+        topHigh = (top >> 16) & 0xffff;
         window.digits--;
         window.length++;
         high = numeratorTop[0];
@@ -1219,26 +1297,33 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator,
             estimate = DivWords(high, low, top);
         }
         for (;;) {
-            u64 byNext = (u64)estimate * next;
-            u64 byTop = (u64)estimate * top;
-            u32 remainderLow = low - (u32)byTop;
-            u32 remainderHigh = high - (u32)(byTop >> 32) - (remainderLow > low);
-
-            if (remainderHigh != 0) {
+            byNextLow = estimate & 0xffff;
+            byNextHigh = (estimate >> 16) & 0xffff;
+            MulHalves(&byNextLow, &byNextHigh, nextLow, nextHigh);
+            byTopLow = estimate & 0xffff;
+            byTopHigh = (estimate >> 16) & 0xffff;
+            MulHalves(&byTopLow, &byTopHigh, topLow, topHigh);
+            rest = low - byTopLow;
+            if (rest > low) {
+                byTopHigh++;
+            }
+            if (high - byTopHigh != 0) {
                 break;
             }
-            if ((u32)(byNext >> 32) < remainderLow) {
+            if (byNextHigh < rest) {
                 break;
             }
-            if ((u32)(byNext >> 32) == remainderLow && (u32)byNext <= numeratorTop[-2]) {
+            if (byNextHigh == rest && byNextLow <= numeratorTop[-2]) {
                 break;
             }
             estimate--;
         }
-        carry = MulWord(product->digits, shiftedDenominator->digits, denominatorSize, estimate);
-        product->digits[denominatorSize] = carry;
+        product->digits[denominatorSize] = MulWord(product->digits, shiftedDenominator->digits, denominatorSize, estimate);
         size = denominatorSize + 1;
-        while (size > 0 && product->digits[size - 1] == 0) {
+        while (size > 0) {
+            if (product->digits[size - 1] != 0) {
+                break;
+            }
             size--;
         }
         product->length = size;
@@ -1264,25 +1349,28 @@ static BOOL BigDiv(BigNum *quotient, BigNum *remainder, const BigNum *numerator,
         remainder->negative = negative;
     }
     return TRUE;
+fail:
+    return FALSE;
 }
 
-static BOOL BigMod(BigNum *remainder, const BigNum *numerator, const BigNum *denominator, BigNumPool *pool) {
+static BOOL BigMod(BigNum *remainder, BigNum *numerator, BigNum *denominator, BigNumPool *pool) {
     return BigDiv(NULL, remainder, numerator, denominator, pool);
 }
 
 // Raises to a power modulo, by Montgomery's method when the modulus is odd
-static BOOL ModExp(BigNum *dest, const BigNum *base, const BigNum *exponent, const BigNum *modulus, BigNumPool *pool) {
+static BOOL ModExp(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus, BigNumPool *pool) {
     if (modulus->length > 0 && (modulus->digits[0] & 1) != 0) {
         return ModExpMont(dest, base, exponent, modulus, pool, NULL);
     }
     return ModExpPlain(dest, base, exponent, modulus, pool);
 }
 
-static BOOL CryptSquare(BigNum *dest, const BigNum *a, BigNumPool *pool) {
-    int size = a->length;
+static BOOL CryptSquare(BigNum *dest, BigNum *a, BigNumPool *pool) {
     int used = pool->used;
-    BigNum *scratch = &pool->numbers[used];
     BigNum *work;
+    int max;
+    int size = a->length;
+    BigNum *scratch = &pool->numbers[used];
     u32 small4[8];
     u32 small8[16];
 
@@ -1295,26 +1383,23 @@ static BOOL CryptSquare(BigNum *dest, const BigNum *a, BigNumPool *pool) {
         dest->length = 0;
         return TRUE;
     }
-    if (size * 2 > work->capacity) {
-        if (CryptExpand(work, size * 2) == NULL) {
-            return FALSE;
-        }
+    max = size * 2;
+    if (Reserve(work, max) == NULL) {
+        return FALSE;
     }
-    work->length = size * 2;
+    work->length = max;
     work->negative = 0;
     if (size == 4) {
         SquareWords(work->digits, a->digits, 4, small4);
     } else if (size == 8) {
         SquareWords(work->digits, a->digits, 8, small8);
     } else {
-        if (size * 2 > scratch->capacity) {
-            if (CryptExpand(scratch, size * 2) == NULL) {
-                return FALSE;
-            }
+        if (Reserve(scratch, max) == NULL) {
+            return FALSE;
         }
         SquareWords(work->digits, a->digits, size, scratch->digits);
     }
-    if (size * 2 > 0 && work->digits[size * 2 - 1] == 0) {
+    if (max > 0 && work->digits[max - 1] == 0) {
         work->length--;
     }
     if (work != dest) {
@@ -1326,15 +1411,19 @@ static BOOL CryptSquare(BigNum *dest, const BigNum *a, BigNumPool *pool) {
 // Squares: the products of the pairs of different words are added up once, doubled, and the squares of the words
 // are added
 static void SquareWords(u32 *dest, const u32 *a, int size, u32 *scratch) {
-    int remaining = size - 1;
-    const u32 *in = a;
-    u32 *out;
     int i;
+    int remaining;
+    int max;
+    const u32 *in;
+    u32 *out;
 
-    dest[size * 2 - 1] = 0;
-    dest[0] = 0;
-    out = dest + 1;
-    if (remaining > 0) {
+    max = size * 2;
+    in = a;
+    out = dest;
+    out[0] = out[max - 1] = 0;
+    out++;
+    remaining = size;
+    if (--remaining > 0) {
         in++;
         out[remaining] = MulWord(out, in, remaining, a[0]);
         out += 2;
@@ -1347,55 +1436,58 @@ static void SquareWords(u32 *dest, const u32 *a, int size, u32 *scratch) {
         out[remaining] = MulAddWords(out, in, remaining, *current);
         out += 2;
     }
-    AddWords(dest, dest, dest, size * 2);
+    AddWords(dest, dest, dest, max);
     SquareDigits(scratch, a, size);
-    AddWords(dest, dest, scratch, size * 2);
+    AddWords(dest, dest, scratch, max);
 }
 
 // Reduces a product of 2 * size words by the modulus the Montgomery way: size words of multiples of the modulus are
 // added so that the low half is zero, and the high half, less the modulus when it is not smaller, is the result
 static void MontReduce(u32 *dest, u32 *product, const u32 *modulus, int size, u32 inverse) {
-    u32 carry = 0;
-    int i;
     u32 *high = product + size;
-    u32 *low = product;
+    int i;
+    u32 carry = 0;
+    u32 sum;
+    u32 word;
+    int j;
 
     for (i = 0; i < size; i++) {
-        u32 added = MulAddWords(low, modulus, size, low[0] * inverse);
-        u32 sum = added + carry;
-
+        word = MulAddWords(product, modulus, size, product[0] * inverse);
+        sum = word + carry;
         carry = sum < carry;
-        *high += sum;
-        if (*high < sum) {
+        word = *high + sum;
+        *high = word;
+        if (word < sum) {
             carry++;
         }
-        low++;
+        product++;
         high++;
     }
-    low = product + size;
+    j = size - 1;
     if (carry == 0) {
-        int j = size - 1;
-
-        if (low[j] == modulus[j]) {
-            while (j > 0 && low[j] == modulus[j]) {
+        if (product[j] == modulus[j]) {
+            while (j > 0) {
+                if (product[j] != modulus[j]) {
+                    break;
+                }
                 j--;
             }
         }
-        carry = low[j] >= modulus[j];
+        carry = product[j] >= modulus[j];
     }
     if (carry != 0) {
-        SubWords(dest, low, modulus, size);
+        SubWords(dest, product, modulus, size);
     } else {
         for (i = 0; i < size; i++) {
-            dest[i] = low[i];
+            dest[i] = product[i];
         }
     }
 }
 
 // The inverse of 2^32 modulo a word, by Euclid's algorithm, or 0 when they have a common factor
 static u32 InverseOfWord(u32 x) {
-    u32 a = x;
     u32 b = -x % x;
+    u32 a = x;
     u32 prev = 1;
     u32 prevPrev = 0;
     int sign = -1;
@@ -1413,19 +1505,17 @@ static u32 InverseOfWord(u32 x) {
     if (sign < 0) {
         prevPrev = x - prevPrev;
     }
-    if (a != 1) {
-        return 0;
-    }
-    return prevPrev % x;
+    return a == 1 ? prevPrev % x : 0;
 }
 
 // Writes the exponent as the windows that a power is computed with, after a header: the length, the window's bits and
 // the size of the table of odd powers. The exponents 3, 17 and 65537, which keys use, are kept ready
-static int EncodeExponent(const BigNum *exponent, const u8 **encoded, int unused, BigNumPool *pool) {
-    BigNum *work = &pool->numbers[pool->used];
-    const u8 *table = NULL;
+static int EncodeExponent(BigNum *exponent, const u8 **encoded, int unused, BigNumPool *pool) {
+    u8 *bytes;
     int window;
     int entries;
+    const u8 *table = NULL;
+    BigNum *work = &pool->numbers[pool->used];
     int perWord;
     int size;
     int bits = exponent->length * 32;
@@ -1434,11 +1524,11 @@ static int EncodeExponent(const BigNum *exponent, const u8 **encoded, int unused
         return 0;
     }
     if (exponent->length == 1) {
-        if (exponent->digits[0] == 0x10001) {
+        if (exponent->length == 1 && exponent->digits[0] == 0x10001) {
             table = sEncodedExponent65537;
-        } else if (exponent->digits[0] == 0x11) {
+        } else if (exponent->digits[0] == 0x11 && exponent->length == 1) {
             table = sEncodedExponent17;
-        } else if (exponent->digits[0] == 3) {
+        } else if (exponent->digits[0] == 3 && exponent->length == 1) {
             table = sEncodedExponent3;
         }
         window = 1;
@@ -1459,17 +1549,13 @@ static int EncodeExponent(const BigNum *exponent, const u8 **encoded, int unused
     }
     size = (exponent->length * perWord * 2 + 7) / 4;
     if (table == NULL) {
-        u8 *bytes;
-
-        if (size > work->capacity) {
-            if (CryptExpand(work, size) == NULL) {
-                return 0;
-            }
+        if (Reserve(work, size) == NULL) {
+            return 0;
         }
         bytes = (u8 *)work->digits;
-        size = EncodeWindows(bytes + 4, exponent, window);
-        bytes[0] = (size + 2) >> 8;
-        bytes[1] = size + 2;
+        size = EncodeWindows(bytes + 4, exponent, window) + 2;
+        bytes[0] = size >> 8;
+        bytes[1] = size;
         bytes[2] = window;
         bytes[3] = entries;
         table = bytes;
@@ -1482,55 +1568,56 @@ static int EncodeExponent(const BigNum *exponent, const u8 **encoded, int unused
 
 // Cuts the exponent into windows from the top: a pair of bytes for each, the window's value (odd) and the number of
 // zero bits after it, and a pair of zeros at the end. Runs of 256 zeros or more are pairs of 0 and 255 first
-static int EncodeWindows(u8 *dest, const BigNum *exponent, int window) {
-    int mask;
+static int EncodeWindows(u8 *dest, BigNum *exponent, int window) {
     int total;
-    int size = 2;
-    int zeros = 0;
-    int bitPos = 0;
-    int wordsLeft;
-    const s8 *zerosTable;
     u8 *out;
-    u8 *in;
-    u8 *copy;
-    const u32 *next;
+    int wordsLeft;
     u32 low;
     u32 high;
+    u32 *next;
     u32 current;
+    u32 zeros;
     u32 index;
+    u32 skip;
+    u8 *in;
+    int size;
+    u32 bitPos;
+    u32 mask;
+    const u8 *zerosTable;
 
     if (window > 6) {
         window = 6;
     }
     mask = (1 << window) - 1;
     zerosTable = sTrailingZerosByWindow[window];
+    bitPos = 0;
     total = (window + exponent->length * 32 - 1) / window * 2 + 2;
     dest[total] = 0;
     out = dest + total;
     out[-1] = 0;
-    out -= 2;
+    next = exponent->digits;
     wordsLeft = exponent->length;
-    low = exponent->digits[0];
+    low = *next++;
+    high = 0;
     if (wordsLeft > 1) {
-        high = exponent->digits[1];
-        next = exponent->digits + 2;
-    } else {
-        high = 0;
-        next = exponent->digits + 1;
+        high = *next++;
     }
     current = low;
+    out -= 2;
+    zeros = 0;
     for (;;) {
-        int skip;
-
-        index = current & mask;
-        skip = zerosTable[index];
-        if (skip != 0) {
+        for (;;) {
+            index = current & mask;
+            skip = zerosTable[index];
+            if (skip == 0) {
+                break;
+            }
             bitPos += skip;
             zeros += skip;
-            if (bitPos < 32) {
-                goto refill;
-            }
-            if (wordsLeft > 1) {
+            if (bitPos >= 32) {
+                if (wordsLeft <= 1) {
+                    break;
+                }
                 wordsLeft--;
                 low = high;
                 high = 0;
@@ -1538,7 +1625,11 @@ static int EncodeWindows(u8 *dest, const BigNum *exponent, int window) {
                     high = *next++;
                 }
                 bitPos -= 32;
-                goto refill;
+            }
+            if (bitPos == 0) {
+                current = low;
+            } else {
+                current = (high << (32 - bitPos)) | (low >> bitPos);
             }
         }
         if (index == 0) {
@@ -1567,7 +1658,6 @@ static int EncodeWindows(u8 *dest, const BigNum *exponent, int window) {
             }
             bitPos -= 32;
         }
-    refill:
         if (bitPos == 0) {
             current = low;
         } else {
@@ -1575,22 +1665,22 @@ static int EncodeWindows(u8 *dest, const BigNum *exponent, int window) {
         }
     }
     in = out + 1;
-    copy = dest;
+    size = 2;
     while (in[0] != 0 || in[1] != 0) {
-        copy[0] = in[0];
-        copy[1] = in[1];
+        dest[0] = in[0];
+        dest[1] = in[1];
         in += 2;
         size += 2;
-        copy += 2;
+        dest += 2;
     }
-    copy[0] = 0;
-    copy[1] = 0;
+    dest[0] = 0;
+    dest[1] = 0;
     return size;
 }
 
 // Sets up the Montgomery form for an odd modulus: its copy, R squared modulo it, and the word that the reduction
 // multiplies by
-static BOOL MontInit(Montgomery *mont, const BigNum *modulus, BigNumPool *pool) {
+static BOOL MontInit(Montgomery *mont, BigNum *modulus, BigNumPool *pool) {
     BOOL ok = FALSE;
     BigNum work;
     u32 first;
@@ -1609,26 +1699,31 @@ static BOOL MontInit(Montgomery *mont, const BigNum *modulus, BigNumPool *pool) 
     if (!CryptSetWord(&mont->rSquared, 0)) {
         return FALSE;
     }
-    if (CryptSetBit(&mont->rSquared, 32)) {
-        first = modulus->digits[0];
-        if (CryptSetWord(&work, InverseOfWord(first)) && ShiftLeft(&work, &work, 32)) {
-            if (work.length == 0 || (work.length == 1 && work.digits[0] == 0)) {
-                if (!CryptSetWord(&work, -1)) {
-                    goto done;
-                }
-            } else {
-                SubWord(&work, 1);
-            }
-            high = work.length >= 2 ? work.digits[1] : 0;
-            low = work.length >= 1 ? work.digits[0] : 0;
-            mont->inverse = DivWords(high, low, first);
-            CryptSetWord(&mont->rSquared, 0);
-            if (CryptSetBit(&mont->rSquared, mont->words * 64)
-                && BigMod(&mont->rSquared, &mont->rSquared, &mont->modulus, pool)
-                && CryptResize(&mont->rSquared, mont->words) != NULL) {
-                ok = TRUE;
-            }
-        }
+    if (!CryptSetBit(&mont->rSquared, 32)) {
+        goto done;
+    }
+    first = modulus->digits[0];
+    if (!CryptSetWord(&work, InverseOfWord(first))) {
+        goto done;
+    }
+    if (!ShiftLeft(&work, &work, 32)) {
+        goto done;
+    }
+    if (!(work.length == 0 || (work.length == 1 && work.digits[0] == 0))) {
+        SubWord(&work, 1);
+    } else if (!CryptSetWord(&work, -1)) {
+        goto done;
+    }
+    low = work.length >= 1 ? work.digits[0] : 0;
+    high = work.length >= 2 ? work.digits[1] : 0;
+    mont->inverse = DivWords(high, low, first);
+    CryptSetWord(&mont->rSquared, 0);
+    if (!CryptSetBit(&mont->rSquared, mont->words * 64)) {
+        goto done;
+    }
+    BigMod(&mont->rSquared, &mont->rSquared, &mont->modulus, pool);
+    if (CryptResize(&mont->rSquared, mont->words) != NULL) {
+        ok = TRUE;
     }
 done:
     CryptDestroy(&work);
@@ -1679,7 +1774,7 @@ static void FreeReducer(Reducer *reducer) {
     }
 }
 
-static BOOL SetReducerModulus(Reducer *reducer, const BigNum *modulus) {
+static int SetReducerModulus(Reducer *reducer, BigNum *modulus, BigNumPool *pool) {
     CryptCopy(&reducer->modulus, modulus);
     CryptSetWord(&reducer->reciprocal, 0);
     reducer->modulusBits = BitLength(modulus);
@@ -1688,50 +1783,52 @@ static BOOL SetReducerModulus(Reducer *reducer, const BigNum *modulus) {
 }
 
 // Multiplies two numbers and reduces the product
-static BOOL ModMul(BigNum *dest, const BigNum *a, const BigNum *b, Reducer *reducer, BigNumPool *pool) {
-    BigNum *product = &pool->numbers[pool->used];
-    const BigNum *input;
+static BOOL ModMul(BigNum *dest, BigNum *a, BigNum *b, Reducer *reducer, BigNumPool *pool) {
+    BigNum *product = &pool->numbers[pool->used++];
     BOOL ok = FALSE;
 
-    pool->used++;
-    if (b == NULL) {
-        input = a;
-    } else {
-        input = product;
+    if (b != NULL) {
         if (a == b) {
             if (!CryptSquare(product, a, pool)) {
                 goto done;
             }
-        } else if (!CryptMul(product, a, b, pool)) {
-            goto done;
+        } else {
+            if (!CryptMul(product, a, b, pool)) {
+                goto done;
+            }
         }
+    } else {
+        product = a;
     }
-    CryptReduce(NULL, dest, input, reducer, pool);
+    CryptReduce(NULL, dest, product, reducer, pool);
     ok = TRUE;
 done:
     pool->used--;
     return ok;
 }
 
+// Whether the number is zero
+static inline BOOL IsZero(BigNum *n) {
+    return n->length == 0 || (n->length == 1 && n->digits[0] == 0);
+}
+
 // Divides with the reciprocal of the modulus: the quotient is taken from the top half of the product with the
 // reciprocal, and off by at most 3
-static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, const BigNum *numerator, Reducer *reducer, BigNumPool *pool) {
+static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, BigNum *numerator, Reducer *reducer, BigNumPool *pool) {
     int saved = pool->used;
-    BigNum *first = &pool->numbers[saved];
-    BigNum *second = &pool->numbers[saved + 1];
+    BigNum *first = &pool->numbers[pool->used++];
+    BigNum *second = &pool->numbers[pool->used++];
     BOOL ok = FALSE;
     int bits;
     int shift;
     int tries;
+    int half;
 
-    pool->used = saved + 2;
     if (quotient == NULL) {
-        quotient = &pool->numbers[pool->used];
-        pool->used++;
+        quotient = &pool->numbers[pool->used++];
     }
     if (remainder == NULL) {
-        remainder = &pool->numbers[pool->used];
-        pool->used++;
+        remainder = &pool->numbers[pool->used++];
     }
     if (CryptCompare(numerator, &reducer->modulus) < 0) {
         CryptSetWord(quotient, 0);
@@ -1746,20 +1843,20 @@ static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, const BigNum *numer
     } else {
         shift = (bits - reducer->modulusBits * 2) / 2;
     }
+    half = bits / 2;
     if (bits != reducer->reciprocalBits) {
         reducer->reciprocalBits = ComputeReciprocal(&reducer->reciprocal, &reducer->modulus, bits, pool);
     }
-    if (ShiftRight(first, numerator, bits / 2 - shift) && CryptMul(second, first, &reducer->reciprocal, pool)
-        && ShiftRight(quotient, second, shift + bits / 2)) {
+    if (ShiftRight(first, numerator, half - shift) && CryptMul(second, first, &reducer->reciprocal, pool)
+        && ShiftRight(quotient, second, shift + half)) {
         quotient->negative = 0;
-        if (CryptMul(second, quotient, &reducer->modulus, pool) && SubMagnitude(remainder, numerator, second)) {
+        if (CryptMul(second, &reducer->modulus, quotient, pool) && SubMagnitude(remainder, numerator, second)) {
             remainder->negative = 0;
             tries = 0;
             while (CryptCompare(remainder, &reducer->modulus) >= 0) {
-                if (tries > 2) {
+                if (tries++ > 2) {
                     goto done;
                 }
-                tries++;
                 if (!SubMagnitude(remainder, remainder, &reducer->modulus)) {
                     goto done;
                 }
@@ -1767,11 +1864,7 @@ static BOOL CryptReduce(BigNum *quotient, BigNum *remainder, const BigNum *numer
                     goto done;
                 }
             }
-            if (remainder->length == 0 || (remainder->length == 1 && remainder->digits[0] == 0)) {
-                remainder->negative = 0;
-            } else {
-                remainder->negative = numerator->negative;
-            }
+            remainder->negative = IsZero(remainder) ? 0 : numerator->negative;
             ok = TRUE;
             quotient->negative = numerator->negative ^ reducer->modulus.negative;
         }
@@ -1782,7 +1875,7 @@ done:
 }
 
 // The reciprocal of the modulus, scaled by 2^bits, and the bits when it worked
-static int ComputeReciprocal(BigNum *reciprocal, const BigNum *modulus, int bits, BigNumPool *pool) {
+static int ComputeReciprocal(BigNum *reciprocal, BigNum *modulus, int bits, BigNumPool *pool) {
     BigNum power;
     int result = -1;
 
@@ -1798,20 +1891,24 @@ static int ComputeReciprocal(BigNum *reciprocal, const BigNum *modulus, int bits
 }
 
 // Raises to a power modulo with squarings and multiplications, a window of the exponent at a time
-static BOOL ModExpPlain(BigNum *dest, const BigNum *base, const BigNum *exponent, const BigNum *modulus,
+static BOOL ModExpPlain(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
                         BigNumPool *pool) {
-    BOOL ok = FALSE;
-    int count = 0;
-    int window;
     int entries;
-    int bits = BitLength(exponent);
+    int bits;
+    BOOL ok;
+    int window;
+    int count;
     int bit;
     int k;
     int sign;
-    BOOL first = TRUE;
+    BOOL first;
     BigNum table[16];
     Reducer reducer;
-    int squared;
+    BigNum *squared;
+
+    ok = FALSE;
+    count = 0;
+    bits = BitLength(exponent);
 
     if (base->length == 0 || (base->length == 1 && base->digits[0] == 0)) {
         CryptSetWord(dest, 0);
@@ -1826,17 +1923,16 @@ static BOOL ModExpPlain(BigNum *dest, const BigNum *base, const BigNum *exponent
         return TRUE;
     }
     InitReducer(&reducer);
-    if (!SetReducerModulus(&reducer, modulus)) {
+    if (SetReducerModulus(&reducer, modulus, pool) <= 0) {
         goto done;
     }
     InitNum(&table[0]);
     count = 1;
-    squared = pool->used;
-    pool->used++;
+    squared = &pool->numbers[pool->used++];
     if (!BigMod(&table[0], base, modulus, pool)) {
         goto done;
     }
-    if (!ModMul(&pool->numbers[squared], &table[0], &table[0], &reducer, pool)) {
+    if (!ModMul(squared, &table[0], &table[0], &reducer, pool)) {
         goto done;
     }
     if (bits <= 17) {
@@ -1851,15 +1947,16 @@ static BOOL ModExpPlain(BigNum *dest, const BigNum *base, const BigNum *exponent
     entries = 1 << (window - 1);
     for (k = 1; k < entries; k++) {
         InitNum(&table[k]);
-        if (!ModMul(&table[k], &table[k - 1], &pool->numbers[squared], &reducer, pool)) {
+        if (!ModMul(&table[k], &table[k - 1], squared, &reducer, pool)) {
             goto done;
         }
     }
     count = k;
+    first = TRUE;
+    bit = bits - 1;
     if (!CryptSetWord(dest, 1)) {
         goto done;
     }
-    bit = bits - 1;
     for (;;) {
         int value;
         int last;
@@ -1938,7 +2035,7 @@ static inline void ReadWindow(const u8 **cursor, int *index, int *squarings) {
 }
 
 // Raises to a power modulo an odd number in the Montgomery form, with a table of the odd powers of the base
-static BOOL ModExpMont(BigNum *dest, const BigNum *base, const BigNum *exponent, const BigNum *modulus,
+static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *modulus,
                        BigNumPool *pool, Montgomery *mont) {
     BOOL ok = FALSE;
     int saved = pool->used;
@@ -2030,30 +2127,20 @@ static BOOL ModExpMont(BigNum *dest, const BigNum *base, const BigNum *exponent,
     productNum = &pool->numbers[next + 3];
     pool->used = next + 4;
     tableWords = entries * n + (exponent->length * perWord * 2 + 7) / 4;
-    if (n > dest->capacity) {
-        if (CryptExpand(dest, n) == NULL) {
-            goto done;
-        }
+    if (Reserve(dest, n) == NULL) {
+        goto done;
     }
-    if (scratchNum->capacity < n * 4) {
-        if (CryptExpand(scratchNum, n * 4) == NULL) {
-            goto done;
-        }
+    if (Reserve(scratchNum, n * 4) == NULL) {
+        goto done;
     }
-    if (accNum->capacity < n * 2) {
-        if (CryptExpand(accNum, n * 2) == NULL) {
-            goto done;
-        }
+    if (Reserve(accNum, n * 2) == NULL) {
+        goto done;
     }
-    if (tableNum->capacity < tableWords) {
-        if (CryptExpand(tableNum, tableWords) == NULL) {
-            goto done;
-        }
+    if (Reserve(tableNum, tableWords) == NULL) {
+        goto done;
     }
-    if (productNum->capacity < n * 2) {
-        if (CryptExpand(productNum, n * 2) == NULL) {
-            goto done;
-        }
+    if (Reserve(productNum, n * 2) == NULL) {
+        goto done;
     }
     table[0] = tableNum->digits;
     scratch = scratchNum->digits;
@@ -2233,8 +2320,9 @@ SquareDigits_Loop:
     ldmia sp!, {r4, r5, pc}
 }
 
-static u32 DivWords(u32 high, u32 low, u32 divisor) {
-    return (((u64)high << 32) | low) / divisor;
+// Divides a double word by a word; the quotient comes back as a double word with a zero high word
+static u64 DivWords(u32 high, u32 low, u32 divisor) {
+    return (u32)((((u64)high << 32) | low) / divisor);
 }
 
 static asm u32 AddWords(u32 *dest, const u32 *a, const u32 *b, int size) {

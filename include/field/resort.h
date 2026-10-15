@@ -232,7 +232,7 @@ BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPers
 u32 ResortSys_GetVisitPoints(ResortSys *sys, ResortPersonData *data);
 u32 ResortSys_GetVisitScore(ResortSys *sys, ResortPersonData *data);
 void ResortSys_MarkMet(ResortSys *sys, ResortPersonData *a1, u32 a2);
-u16 ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2);
+BOOL ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2);
 // Whether all eight of the avenue's people are there
 BOOL ResortSys_IsFull(ResortSys *sys);
 

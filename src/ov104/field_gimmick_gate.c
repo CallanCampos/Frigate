@@ -80,7 +80,7 @@ void func_ov104_021eefc0(GimmickGateWork *work);
 void func_ov104_021ef02c(GimmickGateWork *work, u32 kind, u32 flag);
 u32 func_ov104_021ef04c(GimmickGateWork *work);
 u32 func_ov104_021ef068(GimmickGateWork *work);
-void func_ov104_021ef084(GimmickGateWork *work, u32 *species, s32 *count);
+void func_ov104_021ef084(const GimmickGateWork *work, u32 *species, s32 *count);
 void func_ov104_021ef114(GimmickGateWork *work);
 void func_ov104_021ef168(GimmickGateWork *work);
 GimmickGateBoardEntry *func_ov104_021ef180(GimmickGateWork *work);
@@ -112,25 +112,69 @@ void func_ov104_021eeea0(GimmickGateWork *work);
 void func_ov104_021eeee0(GimmickGateWork *work);
 GimmickGateSave *func_ov104_021eed58(Field *field);
 
-static const u32 sEntrySlots[3] = { 3, 4, 5 };
-
-// The zones whose weather the boards report, and the weathers they report
-extern const u16 data_ov104_021f039c[1];
-extern const u8 data_ov104_021f039e[3];
 // The board's scenes
-extern const G3DSceneSetup data_ov104_021f03d0[2];
+typedef enum GimmickGateScene {
+    GATE_SCENE_0,
+    GATE_SCENE_1,
+    GATE_SCENE_COUNT,
+} GimmickGateScene;
 
 // The board advances by this each frame
 static fx32 sBoardStep = FX32_ONE;
-static u16 sMessageKinds[8] = { 0, 1, 2, 3, 4, 5, 6 };
+
+static const G3DSceneAnimationSetup sScene0Animations[] = {
+    { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 }, { 7, 0 }, { 8, 0 }, { 17, 0 },
+    { 18, 0 }, { 19, 0 }, { 20, 0 }, { 21, 0 }, { 22, 0 }, { 23, 0 }, { 24, 0 }, { 25, 0 },
+    { 26, 0 }, { 27, 0 }, { 28, 0 }, { 16, 0 }, { 29, 0 }, { 30, 0 },
+};
+
+static const G3DSceneAnimationSetup sScene1Animations[] = {
+    { 9, 0 }, { 10, 0 }, { 11, 0 }, { 12, 0 }, { 13, 0 }, { 14, 0 }, { 15, 0 }, { 17, 0 },
+    { 18, 0 }, { 19, 0 }, { 20, 0 }, { 21, 0 }, { 22, 0 }, { 23, 0 }, { 24, 0 }, { 25, 0 },
+    { 26, 0 }, { 27, 0 }, { 28, 0 }, { 16, 0 }, { 29, 0 }, { 30, 0 },
+};
+
+static const G3DSceneActorSetup sScene0Actors[] = {
+    { 0, 0, 1, 0, sScene0Animations, NELEMS(sScene0Animations) },
+};
+
+static const G3DSceneActorSetup sScene1Actors[] = {
+    { 0, 0, 1, 0, sScene1Animations, NELEMS(sScene1Animations) },
+};
+
+static const G3DSceneResourceSetup sSceneResources[] = {
+    { 0x83, 0, 0 }, { 0x83, 1, 0 }, { 0x83, 2, 0 }, { 0x83, 3, 0 },
+    { 0x83, 4, 0 }, { 0x83, 5, 0 }, { 0x83, 6, 0 }, { 0x83, 7, 0 },
+    { 0x83, 8, 0 }, { 0x83, 9, 0 }, { 0x83, 10, 0 }, { 0x83, 11, 0 },
+    { 0x83, 12, 0 }, { 0x83, 13, 0 }, { 0x83, 14, 0 }, { 0x83, 15, 0 },
+    { 0x83, 16, 0 }, { 0x83, 17, 0 }, { 0x83, 18, 0 }, { 0x83, 19, 0 },
+    { 0x83, 20, 0 }, { 0x83, 21, 0 }, { 0x83, 24, 0 }, { 0x83, 25, 0 },
+    { 0x83, 26, 0 }, { 0x83, 27, 0 }, { 0x83, 28, 0 }, { 0x83, 29, 0 },
+    { 0x83, 30, 0 }, { 0x83, 31, 0 }, { 0x83, 32, 0 },
+};
+
+static const G3DSceneSetup sSceneSetups[GATE_SCENE_COUNT] = {
+    { sSceneResources, NELEMS(sSceneResources), sScene0Actors, NELEMS(sScene0Actors) },
+    { sSceneResources, NELEMS(sSceneResources), sScene1Actors, NELEMS(sScene1Actors) },
+};
+
+static const char *sBoardNames[7] = {
+    "gelboard_1", "gelboard_2", "gelboard_3", "gelboard_4", "gelboard_5", "gelboard_6", "gelboard_7",
+};
 static const char *sBoardPlNames[7] = {
     "gelboard_1_pl", "gelboard_2_pl", "gelboard_3_pl", "gelboard_4_pl",
     "gelboard_5_pl", "gelboard_6_pl", "gelboard_7_pl",
 };
-static const char *sBoardNames[7] = {
-    "gelboard_1", "gelboard_2", "gelboard_3", "gelboard_4", "gelboard_5", "gelboard_6", "gelboard_7",
-};
+
+static u16 sMessageKinds[8] = { 0, 1, 2, 3, 4, 5, 6 };
 static u16 sBoardAnimations[16] = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 };
+
+// The zones whose weather the boards report, and the weathers they report
+static const u16 sWeatherZones[] = { 0x71 };
+static const u8 sReportedWeathers[] = { 6, 7, 8 };
+
+static const u32 sEntrySlots[3] = { 3, 4, 5 };
+
 // Messages for the weathers, as GimmickGateZoneList gives them
 static u32 sWeatherMessages[15] = {
     0xb5, 0xb6, 0xb7, 0xb8, 0xba, 0xbb, 0xbe, 0xbf, 0xbd, 0xbc, 0xbc, 0xbc, 0xb9, 0xbc, 0xbc,
@@ -139,9 +183,11 @@ static u32 sWeatherMessages[15] = {
 void func_ov104_021eec80(Field *field) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     GimmickGateWork *work;
+    GimmickGateScene scene;
 
     func_02008a84((Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(field)))));
-    LoadFieldExpandObjData(expObj, &data_ov104_021f03d0[1], 1);
+    scene = GATE_SCENE_1;
+    LoadFieldExpandObjData(expObj, &sSceneSetups[scene], scene);
     work = func_ov104_021eee34(field);
     func_ov104_021eeee0(work);
     func_ov104_021ef114(work);
@@ -398,7 +444,7 @@ u32 func_ov104_021ef068(GimmickGateWork *work) {
     return 0;
 }
 
-void func_ov104_021ef084(GimmickGateWork *work, u32 *species, s32 *count) {
+void func_ov104_021ef084(const GimmickGateWork *work, u32 *species, s32 *count) {
     GameData *gameData = work->gameData;
     SaveControl *save;
     HallOfFameSave *hallOfFame;
@@ -971,18 +1017,18 @@ void func_ov104_021efa18(GimmickGateWork *work, GimmickGateZoneList *out) {
 
 void func_ov104_021efad0(GimmickGateWork *work, GimmickGateZoneList *list) {
     s32 count;
-    u32 i;
-    u32 j;
+    int i;
+    int j;
     u16 zone;
     u8 weather;
 
     func_ov104_021ef9f8(list);
     count = 0;
-    for (i = 0; i < 1; i++) {
-        zone = data_ov104_021f039c[i];
+    for (i = 0; i < NELEMS(sWeatherZones); i++) {
+        zone = sWeatherZones[i];
         weather = Field_GetWeatherForZone(work->field, zone);
-        for (j = 0; j < 3; j++) {
-            if (weather == data_ov104_021f039e[j]) {
+        for (j = 0; j < NELEMS(sReportedWeathers); j++) {
+            if (weather == sReportedWeathers[j]) {
                 if (count >= 4) {
                     break;
                 }

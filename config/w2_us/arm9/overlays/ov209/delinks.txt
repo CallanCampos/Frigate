@@ -29,10 +29,12 @@ src/ov209/mus_item_draw.c:
     .data       start:0x021c3084 end:0x021c3094
 
 src/ov209/mus_poke_draw.c:
+    complete
     .text       start:0x021bb9fc end:0x021bbe90
     .data       start:0x021c3094 end:0x021c30a4
 
 src/ov209/musical_mcss.c:
+    complete
     .text       start:0x021bbe90 end:0x021bd278
     .rodata     start:0x021c2dd4 end:0x021c2df8
     .data       start:0x021c30a4 end:0x021c30b4
@@ -59,16 +61,19 @@ src/ov209/sta_act_effect.c:
     .data       start:0x021c3140 end:0x021c3154
 
 src/ov209/sta_act_poke.c:
+    complete
     .text       start:0x021bd930 end:0x021be9f0
     .rodata     start:0x021c2dfc end:0x021c2e10
     .data       start:0x021c3120 end:0x021c3130
 
 src/ov209/sta_act_audience.c:
+    complete
     .text       start:0x021c055c end:0x021c0b20
     .rodata     start:0x021c2fac end:0x021c2fb8
     .data       start:0x021c3154 end:0x021c3168
 
 src/ov209/sta_act_button.c:
+    complete
     .text       start:0x021c0b20 end:0x021c1064
     .rodata     start:0x021c2fb8 end:0x021c2fc4
     .data       start:0x021c3168 end:0x021c317c
@@ -86,6 +91,7 @@ src/ov209/script_command.c:
     .data       start:0x021c3190 end:0x021c3280
 
 src/ov209/sta_acting.c:
+    complete
     .text       start:0x021be9f0 end:0x021c03c0
     .rodata     start:0x021c2e10 end:0x021c2fac
     .data       start:0x021c3130 end:0x021c3140

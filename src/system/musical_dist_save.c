@@ -34,12 +34,15 @@ void *func_0200cca0(GameData *gameData, HeapID heapId) {
     wk->seq = 0;
     if (result == 1) {
         wk->loaded = TRUE;
+        wk->block = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_BLOCK_MUSICAL_DIST, 0);
+        wk->blockHeader = wk->block;
+        wk->data = (u8 *)wk->block + sizeof(MusicalDistHeader);
     } else {
         wk->loaded = FALSE;
+        wk->block = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_BLOCK_MUSICAL_DIST, 0);
+        wk->blockHeader = wk->block;
+        wk->data = (u8 *)wk->block + sizeof(MusicalDistHeader);
     }
-    wk->block = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_BLOCK_MUSICAL_DIST, 0);
-    wk->blockHeader = wk->block;
-    wk->data = (u8 *)wk->block + sizeof(MusicalDistHeader);
     return wk;
 }
 

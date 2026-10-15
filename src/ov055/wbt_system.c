@@ -201,7 +201,7 @@ u8 func_ov055_021e5e28(WbtEntrant *entrant) {
     return entrant->unk2;
 }
 
-u32 func_ov055_021e5e2c(WbtEntrant *entrant) {
+u16 func_ov055_021e5e2c(WbtEntrant *entrant) {
     return entrant->unk6_0;
 }
 

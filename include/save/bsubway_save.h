@@ -140,7 +140,7 @@ void BSubwayScoreData_AddBattlePoints(BSubwayScoreData *score, u16 amount);
 // Takes Battle Points, down to 0
 void BSubwayScoreData_SubBattlePoints(BSubwayScoreData *score, u16 amount);
 u16 BSubwayScoreData_GetBattlePoints(BSubwayScoreData *score);
-u16 BSubwayScoreData_GetStreak(BSubwayScoreData *score, u16 mode);
+u16 BSubwayScoreData_GetStreak(BSubwayScoreData *score, u32 mode);
 u16 BSubwayScoreData_GetMaxStreak(BSubwayScoreData *score, u32 mode);
 // Raises the longest streak
 void BSubwayScoreData_UpdateMaxStreak(BSubwayScoreData *score, u32 mode, u32 value);

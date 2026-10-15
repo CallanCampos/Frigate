@@ -37,6 +37,12 @@
 // Each car has two paths, path car * 2 + switch, played by the car's animation path + 1
 #define PATH_COUNT (CAR_COUNT * 2)
 #define SPOT_COUNT 9
+
+// The scene's actors: four cars, their four switches and the four tracks that the switches turn. A car's actor is
+// `ACTOR_CAR + car` held in a u8 of its own: the original narrows the car's index again for it
+#define ACTOR_CAR 0
+#define ACTOR_SWITCH 4
+#define ACTOR_TRACK 8
 #define STATIONS_PER_PATH 2
 #define NO_PATH 0xff
 #define NO_CAR -1
@@ -111,7 +117,7 @@ static void RollerCoaster_Task(TCB *task, void *data);
 static u8 RollerCoaster_GetSpotPath(RollerCoasterWork *work, u8 spot);
 static u8 RollerCoaster_GetSpotCar(u8 spot);
 static BOOL RollerCoaster_IsCarAtSpot(RollerCoasterWork *work, u8 spot);
-static fx32 RollerCoaster_GetAnmFrame(FieldExpObjSystem *expObj, u8 actor, u16 anm);
+static fx32 RollerCoaster_GetAnmFrame(FieldExpObjSystem *expObj, u16 actor, u16 anm);
 static void RollerCoaster_SetAnmFrame(FieldExpObjSystem *expObj, u16 actor, u16 anm, fx32 frame);
 static GameEventReturnCode RollerCoaster_SwitchEvent(GameEvent *event, u32 *state, void *data);
 static BOOL RollerCoaster_IsIntroNeeded(RollerCoasterSave *save, int car);
@@ -126,21 +132,48 @@ static void RollerCoaster_GetJointTrans(const NNSG3dResJntAnm *anm, u32 node, fx
 static void RollerCoaster_GetTransData(fx32 *value, fx32 frame, const u32 *data, const NNSG3dResJntAnm *anm);
 static void RollerCoaster_UpdateAmbience(Field *field, RollerCoasterWork *work);
 
-// The animations of each actor, as indices into sResources. A car's animation 0 (resource 6) is its stop at a station,
-// and animation path + 1 (resources 7 to 14) runs it along one of the eight paths
+// A grid square where the player boards
+typedef struct {
+    u16 x;
+    u16 z;
+} RideSpot;
+
+// The tables are declared in this order because MWCC lays out objects of the same size by where each was declared,
+// and this is the most regular order found that gives the ROM's `.rodata`. The original's was most likely the plain
+// one (the resources, the cars' animations, the switches', the tracks', the actors, the setup) with one more constant
+// object among the other tables that the linker dropped: with an unreferenced non-static 16-byte constant there, that
+// order gives the ROM's layout too
+
+// The animations of each actor, as indices into sResources. A switch's or a track's animation 0 turns it to state 0
+// and animation 1 to state 1
+static const G3DSceneAnimationSetup sTrack0Animations[] = { { 23, 0 }, { 24, 0 } };
+
+// A car's animation 0 (resource 6) is its stop at a station, and animation path + 1 (resources 7 to 14) runs it along
+// one of the eight paths
 static const G3DSceneAnimationSetup sCarAnimations[] = {
     { 6, 0 }, { 7, 0 }, { 8, 0 }, { 9, 0 }, { 10, 0 }, { 11, 0 }, { 12, 0 }, { 13, 0 }, { 14, 0 },
 };
 
-// A switch's or a track's animation 0 turns it to state 0 and animation 1 to state 1
-static const G3DSceneAnimationSetup sSwitch0Animations[] = { { 15, 0 }, { 16, 0 } };
-static const G3DSceneAnimationSetup sSwitch1Animations[] = { { 17, 0 }, { 18, 0 } };
-static const G3DSceneAnimationSetup sSwitch2Animations[] = { { 19, 0 }, { 20, 0 } };
-static const G3DSceneAnimationSetup sSwitch3Animations[] = { { 21, 0 }, { 22, 0 } };
-static const G3DSceneAnimationSetup sTrack0Animations[] = { { 23, 0 }, { 24, 0 } };
 static const G3DSceneAnimationSetup sTrack1Animations[] = { { 25, 0 }, { 26, 0 } };
+
 static const G3DSceneAnimationSetup sTrack2Animations[] = { { 27, 0 }, { 28, 0 } };
+
 static const G3DSceneAnimationSetup sTrack3Animations[] = { { 29, 0 }, { 30, 0 } };
+
+// The frames at which a car on each path stops at a station
+static const fx32 sStationFrames[PATH_COUNT][STATIONS_PER_PATH] = {
+    { 0, FX32_CONST(40) },
+    { 0, FX32_CONST(65) },
+    { 0, 0 },
+    { 0, FX32_CONST(124) },
+    { 0, 0 },
+    { 0, FX32_CONST(126) },
+    { 0, 0 },
+    { 0, FX32_CONST(138) },
+};
+
+// The last frame of each car's path at which its switch still changes the path
+static const u16 sSwitchFrames[CAR_COUNT] = { 13, 105, 93, 70 };
 
 // The files of archive 292: resource 0 is the car's model, 1 the switch's, 2 to 5 the four tracks', 6 to 14 the cars'
 // animations, 15 to 22 the switches' and 23 to 30 the tracks'
@@ -157,6 +190,37 @@ static const G3DSceneResourceSetup sResources[] = {
     { ARCID_ROLLER_COASTER, 29, 0 }, { ARCID_ROLLER_COASTER, 30, 0 }, { ARCID_ROLLER_COASTER, 23, 0 },
     { ARCID_ROLLER_COASTER, 24, 0 },
 };
+
+// The station that each path's station frame stops at, as an index into sSpots
+static const s8 sStationSpots[PATH_COUNT][STATIONS_PER_PATH] = {
+    { 1, 0 }, { 1, 2 }, { 4, NO_SPOT }, { 4, 3 }, { 6, NO_SPOT }, { 6, 5 }, { 8, NO_SPOT }, { 8, 7 },
+};
+
+static const G3DSceneAnimationSetup sSwitch0Animations[] = { { 15, 0 }, { 16, 0 } };
+
+static const G3DSceneAnimationSetup sSwitch1Animations[] = { { 17, 0 }, { 18, 0 } };
+
+static const G3DSceneAnimationSetup sSwitch2Animations[] = { { 19, 0 }, { 20, 0 } };
+
+static const G3DSceneAnimationSetup sSwitch3Animations[] = { { 21, 0 }, { 22, 0 } };
+
+// Where each car's model is, which its animations are relative to
+static const VecFx32 sCarOrigins[CAR_COUNT] = {
+    { FX32_CONST(360), FX32_CONST(32), FX32_CONST(600) },
+    { FX32_CONST(664), FX32_CONST(32), FX32_CONST(616) },
+    { FX32_CONST(552), FX32_CONST(32), FX32_CONST(104) },
+    { FX32_CONST(88), FX32_CONST(32), FX32_CONST(600) },
+};
+
+// The files of the player's ride curve along each path
+static const u32 sRideCurves[PATH_COUNT] = { 33, 34, 35, 36, 37, 38, 31, 32 };
+
+// The grid squares where the player boards, and the car that stops at each
+static const RideSpot sSpots[SPOT_COUNT] = {
+    { 14, 39 }, { 22, 39 }, { 16, 27 }, { 16, 15 }, { 41, 40 }, { 49, 40 }, { 34, 8 }, { 22, 8 }, { 5, 39 },
+};
+
+static const u8 sSpotCars[SPOT_COUNT] = { 0, 0, 0, 1, 1, 2, 2, 3, 3 };
 
 // The four cars (actors 0 to 3), their four switches (4 to 7) and the four tracks that the switches turn (8 to 11),
 // as model and texture resources and their animations
@@ -177,49 +241,6 @@ static const G3DSceneActorSetup sActors[] = {
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-// The station that each path's station frame stops at, as an index into sSpots
-static const s8 sStationSpots[PATH_COUNT][STATIONS_PER_PATH] = {
-    { 1, 0 }, { 1, 2 }, { 4, NO_SPOT }, { 4, 3 }, { 6, NO_SPOT }, { 6, 5 }, { 8, NO_SPOT }, { 8, 7 },
-};
-
-// The files of the player's ride curve along each path
-static const u32 sRideCurves[PATH_COUNT] = { 33, 34, 35, 36, 37, 38, 31, 32 };
-
-// The grid squares where the player boards, and the car that stops at each
-typedef struct {
-    u16 x;
-    u16 z;
-} RideSpot;
-
-static const RideSpot sSpots[SPOT_COUNT] = {
-    { 14, 39 }, { 22, 39 }, { 16, 27 }, { 16, 15 }, { 41, 40 }, { 49, 40 }, { 34, 8 }, { 22, 8 }, { 5, 39 },
-};
-
-static const u8 sSpotCars[SPOT_COUNT] = { 0, 0, 0, 1, 1, 2, 2, 3, 3 };
-
-// Where each car's model is, which its animations are relative to
-static const VecFx32 sCarOrigins[CAR_COUNT] = {
-    { FX32_CONST(360), FX32_CONST(2), FX32_CONST(600) },
-    { FX32_CONST(664), FX32_CONST(2), FX32_CONST(616) },
-    { FX32_CONST(552), FX32_CONST(2), FX32_CONST(104) },
-    { FX32_CONST(88), FX32_CONST(2), FX32_CONST(600) },
-};
-
-// The frames at which a car on each path stops at a station
-static const fx32 sStationFrames[PATH_COUNT][STATIONS_PER_PATH] = {
-    { 0, FX32_CONST(40) },
-    { 0, FX32_CONST(65) },
-    { 0, 0 },
-    { 0, FX32_CONST(124) },
-    { 0, 0 },
-    { 0, FX32_CONST(126) },
-    { 0, 0 },
-    { 0, FX32_CONST(138) },
-};
-
-// The last frame of each car's path at which its switch still changes the path
-static const u16 sSwitchFrames[CAR_COUNT] = { 13, 105, 93, 70 };
-
 static inline FieldExpObjAnm *RollerCoaster_GetAnm(FieldExpObjSystem *expObj, u8 actor, u8 anm) {
     return FieldExpObj_GetAnmInfo(expObj, 0, actor, anm);
 }
@@ -235,27 +256,6 @@ static inline void RollerCoaster_ShowSwitchState(FieldExpObjSystem *expObj, u8 a
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(expObj, 0, actor, 1), FALSE);
     FieldExpObj_SetAnmFrame(expObj, 0, actor, state,
                             func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, state)));
-}
-
-// How far a car moves along its path in a frame
-static inline fx32 RollerCoaster_GetCarSpeed(FieldExpObjSystem *expObj, u16 car, u16 anm) {
-    G3DActor *actor = FieldExpObj_GetActor(expObj, 0, car);
-    fx32 lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, car, anm));
-    fx32 frame = RollerCoaster_GetAnmFrame(expObj, car, anm);
-    fx32 nextFrame = frame + FX32_ONE;
-    NNSG3dAnmObj *anmObj;
-    VecFx32 trans;
-    VecFx32 nextTrans;
-    VecFx32 move;
-
-    if (nextFrame >= lastFrame) {
-        nextFrame = 0;
-    }
-    anmObj = GFL_G3DAnmGetRenderObj(GFL_G3DActorGetAnm(actor, anm));
-    RollerCoaster_GetJointTrans(anmObj->resAnm, 0, frame, &trans);
-    RollerCoaster_GetJointTrans(anmObj->resAnm, 0, nextFrame, &nextTrans);
-    VEC_Subtract(&trans, &nextTrans, &move);
-    return VEC_Mag(&move);
 }
 
 static u8 RollerCoaster_FindSpot(int x, int z) {
@@ -283,18 +283,18 @@ void RollerCoaster_Init(Field *field) {
     int j;
     // Each actor's position is a local of its own: the ROM has twelve 12-byte initializers, each copied straight into
     // its actor's matrix, though the cars' and tracks' repeat sCarOrigins
-    VecFx32 car0 = { FX32_CONST(360), FX32_CONST(2), FX32_CONST(600) };
-    VecFx32 car1 = { FX32_CONST(664), FX32_CONST(2), FX32_CONST(616) };
-    VecFx32 car2 = { FX32_CONST(552), FX32_CONST(2), FX32_CONST(104) };
-    VecFx32 car3 = { FX32_CONST(88), FX32_CONST(2), FX32_CONST(600) };
-    VecFx32 switch0 = { FX32_CONST(472), FX32_CONST(2), FX32_CONST(536) };
-    VecFx32 switch1 = { FX32_CONST(216), FX32_CONST(2), FX32_CONST(264) };
-    VecFx32 switch2 = { FX32_CONST(744), FX32_CONST(2), FX32_CONST(664) };
-    VecFx32 switch3 = { FX32_CONST(408), FX32_CONST(2), FX32_CONST(152) };
-    VecFx32 track0 = { FX32_CONST(360), FX32_CONST(2), FX32_CONST(600) };
-    VecFx32 track1 = { FX32_CONST(664), FX32_CONST(2), FX32_CONST(616) };
-    VecFx32 track2 = { FX32_CONST(552), FX32_CONST(2), FX32_CONST(104) };
-    VecFx32 track3 = { FX32_CONST(88), FX32_CONST(2), FX32_CONST(600) };
+    VecFx32 car0 = { FX32_CONST(360), FX32_CONST(32), FX32_CONST(600) };
+    VecFx32 car1 = { FX32_CONST(664), FX32_CONST(32), FX32_CONST(616) };
+    VecFx32 car2 = { FX32_CONST(552), FX32_CONST(32), FX32_CONST(104) };
+    VecFx32 car3 = { FX32_CONST(88), FX32_CONST(32), FX32_CONST(600) };
+    VecFx32 switch0 = { FX32_CONST(472), FX32_CONST(32), FX32_CONST(536) };
+    VecFx32 switch1 = { FX32_CONST(216), FX32_CONST(32), FX32_CONST(264) };
+    VecFx32 switch2 = { FX32_CONST(744), FX32_CONST(32), FX32_CONST(664) };
+    VecFx32 switch3 = { FX32_CONST(408), FX32_CONST(32), FX32_CONST(152) };
+    VecFx32 track0 = { FX32_CONST(360), FX32_CONST(32), FX32_CONST(600) };
+    VecFx32 track1 = { FX32_CONST(664), FX32_CONST(32), FX32_CONST(616) };
+    VecFx32 track2 = { FX32_CONST(552), FX32_CONST(32), FX32_CONST(104) };
+    VecFx32 track3 = { FX32_CONST(88), FX32_CONST(32), FX32_CONST(600) };
 
     work = Field_AllocGimmickWorkBlock(field, GIMMICK_ID, Field_GetHeapID(field), sizeof(RollerCoasterWork));
     LoadFieldExpandObjData(expObj, &sSceneSetup, 0);
@@ -312,7 +312,7 @@ void RollerCoaster_Init(Field *field) {
     FieldExpObj_GetActorMatrixPtr(expObj, 0, 11)->translation = track3;
 
     for (i = 0; i < CAR_COUNT; i++) {
-        u8 car = i;
+        u8 actor = ACTOR_CAR + i;
         u8 anm;
         FieldExpObjAnm *anmInfo;
 
@@ -321,15 +321,17 @@ void RollerCoaster_Init(Field *field) {
         } else {
             anm = i * 2 + 1;
         }
-        FieldExpObj_SetAnm(expObj, 0, car, anm, TRUE);
-        FieldExpObj_SetAnm(expObj, 0, car, 0, TRUE);
-        anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, car, 0);
+        FieldExpObj_SetAnm(expObj, 0, actor, anm, TRUE);
+        FieldExpObj_SetAnm(expObj, 0, actor, 0, TRUE);
+        anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, actor, 0);
         FieldExpObjAnm_SetPaused(anmInfo, TRUE);
         FieldExpObjAnm_SetLooped(anmInfo, FALSE);
-        FieldExpObj_SetAnmFrame(expObj, 0, car, anm, save->frames[i]);
+        FieldExpObj_SetAnmFrame(expObj, 0, actor, anm, save->frames[i]);
 
-        RollerCoaster_ShowSwitchState(expObj, i + 4, save->switches[i]);
-        RollerCoaster_ShowSwitchState(expObj, i + 8, save->switches[i]);
+        actor = ACTOR_SWITCH + i;
+        RollerCoaster_ShowSwitchState(expObj, actor, save->switches[i]);
+        actor = ACTOR_TRACK + i;
+        RollerCoaster_ShowSwitchState(expObj, actor, save->switches[i]);
     }
 
     work = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
@@ -347,20 +349,21 @@ void RollerCoaster_Init(Field *field) {
 }
 
 static void RollerCoaster_Task(TCB *task, void *data) {
+    u8 i;
     Field *field = data;
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     RollerCoasterWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     RollerCoasterSave *save = GimmickState_GetUserData(GameData_GetGimmickState(gameData), GIMMICK_STATE_ID);
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(gameData);
-    u8 i;
 
     for (i = 0; i < CAR_COUNT; i++) {
         if (work->pendingSwitch[i]) {
             u8 newSwitch = (save->switches[i] + 1) % 2;
             u8 anm = i * 2 + 1 + newSwitch;
+            u8 actor = ACTOR_CAR + i;
 
-            if (RollerCoaster_GetAnmFrame(expObj, i, anm) == 0) {
+            if (RollerCoaster_GetAnmFrame(expObj, actor, anm) == 0) {
                 RollerCoaster_SwitchPath(expObj, newSwitch, i);
                 work->paths[i] = i * 2 + save->switches[i];
                 if (work->ridePath != NO_PATH && work->ridePath / 2 == i && work->ridePath != work->paths[i]) {
@@ -377,7 +380,9 @@ static void RollerCoaster_Task(TCB *task, void *data) {
 
     for (i = 0; i < CAR_COUNT; i++) {
         u8 path = work->paths[i];
-        FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, i, path + 1);
+        u8 anm = path + 1;
+        u8 actor = ACTOR_CAR + i;
+        FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, actor, anm);
 
         if (work->waits[i] != 0) {
             if (work->waitCar != i && --work->waits[i] == 0) {
@@ -396,7 +401,7 @@ static void RollerCoaster_Task(TCB *task, void *data) {
         } else {
             u8 index;
 
-            if (RollerCoaster_IsAtStation(path, func_ov036_021b8520(expObj, 0, i, path + 1), &index)) {
+            if (RollerCoaster_IsAtStation(path, func_ov036_021b8520(expObj, 0, actor, anm), &index)) {
                 FieldExpObjAnm_SetPaused(anmInfo, TRUE);
                 if (work->ridePath != NO_PATH && i == work->ridePath / 2) {
                     FieldSnd_StopAmbience(fieldSound, SEQ_SE_FLD_25);
@@ -409,9 +414,10 @@ static void RollerCoaster_Task(TCB *task, void *data) {
     }
 
     if (work->riding) {
-        VecFx32 pos = { 0, FX32_CONST(2), 0 };
+        VecFx32 pos = { 0, FX32_CONST(32), 0 };
         u8 car = work->ridePath / 2;
-        fx32 frame = func_ov036_021b8520(expObj, 0, car, work->ridePath + 1);
+        u8 anm = work->ridePath + 1;
+        fx32 frame = func_ov036_021b8520(expObj, 0, car, anm);
 
         if (GFL_G3DCurveGetNowTranslationLoop(work->curve, &pos, frame / FX32_ONE)) {
             pos.x += sCarOrigins[car].x;
@@ -446,9 +452,10 @@ void RollerCoaster_Update(Field *field) {
                                     GIMMICK_STATE_ID);
     FieldExpObj_StepAllAnimations(expObj);
     for (i = 0; i < CAR_COUNT; i++) {
+        u8 actor = ACTOR_CAR + i;
         u8 anm = work->paths[i] + 1;
 
-        save->frames[i] = RollerCoaster_GetAnmFrame(expObj, i, anm);
+        save->frames[i] = RollerCoaster_GetAnmFrame(expObj, actor, anm);
     }
 }
 
@@ -476,7 +483,7 @@ static BOOL RollerCoaster_IsCarAtSpot(RollerCoasterWork *work, u8 spot) {
     return station == spot;
 }
 
-static fx32 RollerCoaster_GetAnmFrame(FieldExpObjSystem *expObj, u8 actor, u16 anm) {
+static fx32 RollerCoaster_GetAnmFrame(FieldExpObjSystem *expObj, u16 actor, u16 anm) {
     fx32 frame = 0;
 
     GFL_G3DActorGetAnmFrame(FieldExpObj_GetActor(expObj, 0, actor), anm, &frame);
@@ -639,7 +646,8 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     FieldSound *fieldSound = GameData_GetFieldSoundSystem(GSYS_GetGameData(Field_GetGameSystem(field)));
     s32 player = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_76);
     u8 car = work->ridePath / 2;
-    FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, car, 0);
+    u8 actor = ACTOR_CAR + car;
+    FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, actor, 0);
     u8 anm;
     fx32 frame;
     fx32 speed;
@@ -652,13 +660,13 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         work->curve = GFL_G3DCurveCreateToLoadBufferEntire(HEAPID_TAIL(HEAPID_FIELDMAP), ARCID_ROLLER_COASTER,
                                                            sRideCurves[work->ridePath], work->curveBuffer,
                                                            sizeof(work->curveBuffer));
-        RollerCoaster_SetAnmFrame(expObj, car, 0, 0);
+        RollerCoaster_SetAnmFrame(expObj, actor, 0, 0);
         FieldExpObjAnm_SetPaused(anmInfo, FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         (*state)++;
         break;
     case 1:
-        if (RollerCoaster_GetAnmFrame(expObj, car, 0) >= FX32_CONST(15)) {
+        if (RollerCoaster_GetAnmFrame(expObj, actor, 0) >= FX32_CONST(15)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
             EventScriptCall_Start(event, SCRIPT_RIDE_START, NULL, 0, HEAPID_TAIL(HEAPID_FIELDMAP));
             (*state)++;
@@ -673,7 +681,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         if (FieldExpObjAnm_IsPlaybackFinished(anmInfo)) {
             SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), TRUE);
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
-            RollerCoaster_SetAnmPaused(expObj, car, work->ridePath + 1, FALSE);
+            RollerCoaster_SetAnmPaused(expObj, actor, work->ridePath + 1, FALSE);
             work->waits[car] = 0;
             work->stations[car] = NO_SPOT;
             work->waitCar = NO_CAR;
@@ -691,12 +699,12 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         }
         break;
     case 5: {
-        FieldExpObjAnm *pathAnm = RollerCoaster_GetAnm(expObj, car, work->ridePath + 1);
+        FieldExpObjAnm *pathAnm = RollerCoaster_GetAnm(expObj, actor, work->ridePath + 1);
         FieldActor *playerActor;
 
         work->waitCar = car;
         FieldExpObjAnm_SetPaused(pathAnm, TRUE);
-        RollerCoaster_SetAnmFrame(expObj, car, 0, 0);
+        RollerCoaster_SetAnmFrame(expObj, actor, 0, 0);
         FieldExpObjAnm_SetPaused(anmInfo, FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         playerActor = FieldPlayer_GetActor(Field_GetPlayer(field));
@@ -706,17 +714,17 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         break;
     }
     case 6:
-        if (RollerCoaster_GetAnmFrame(expObj, car, 0) >= FX32_CONST(15)) {
-            FieldPlayer *fieldPlayer;
-            VecFx32 pos = { 0, FX32_CONST(2), 0 };
-            u8 spot;
-
+        if (RollerCoaster_GetAnmFrame(expObj, actor, 0) >= FX32_CONST(15)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
-            fieldPlayer = Field_GetPlayer(field);
-            spot = work->stations[car];
-            pos.x = sSpots[spot].x * GRID_SIZE + GRID_SIZE / 2;
-            pos.z = (sSpots[spot].z - 2) * GRID_SIZE + GRID_SIZE / 2;
-            FieldPlayer_SetWPos(fieldPlayer, &pos);
+            {
+                FieldPlayer *fieldPlayer = Field_GetPlayer(field);
+                VecFx32 pos = { 0, FX32_CONST(32), 0 };
+                u8 spot = work->stations[car];
+
+                pos.x = sSpots[spot].x * GRID_SIZE + GRID_SIZE / 2;
+                pos.z = (sSpots[spot].z - 2) * GRID_SIZE + GRID_SIZE / 2;
+                FieldPlayer_SetWPos(fieldPlayer, &pos);
+            }
             work->riding = FALSE;
             (*state)++;
         }
@@ -733,7 +741,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     case 9:
         if (FieldExpObjAnm_IsPlaybackFinished(anmInfo)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
-            RollerCoaster_SetAnmPaused(expObj, car, work->ridePath + 1, FALSE);
+            RollerCoaster_SetAnmPaused(expObj, actor, work->ridePath + 1, FALSE);
             work->waits[car] = 0;
             work->stations[car] = NO_SPOT;
             GFL_G3DCurveFree(work->curve);
@@ -748,8 +756,9 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     }
 
     // Paths 2 to 5 go through tunnels, where the ambience stops
-    if (work->ridePath >= 2 && work->ridePath <= 5) {
-        frame = RollerCoaster_GetAnmFrame(expObj, car, work->ridePath + 1);
+    if (work->ridePath == 2 || work->ridePath == 3 || work->ridePath == 4 || work->ridePath == 5) {
+        anm = work->ridePath + 1;
+        frame = RollerCoaster_GetAnmFrame(expObj, actor, anm);
         switch (work->ridePath) {
         case 2:
             if (frame == PATH2_FRAME_STOP_FLD26) {
@@ -792,9 +801,30 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         }
     }
 
-    // The ride's sound is louder the faster the car goes
-    anm = work->ridePath + 1;
-    speed = RollerCoaster_GetCarSpeed(expObj, car, anm);
+    // The ride's sound is louder the faster the car goes: how far the car moves in a frame, as RollerCoaster_UpdateAmbience
+    // works it out for the nearest car
+    {
+        G3DActor *g3dActor = FieldExpObj_GetActor(expObj, 0, actor);
+        fx32 lastFrame;
+        fx32 nextFrame;
+        NNSG3dAnmObj *anmObj;
+        VecFx32 trans;
+        VecFx32 nextTrans;
+        VecFx32 move;
+
+        anm = work->ridePath + 1;
+        lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, anm));
+        frame = RollerCoaster_GetAnmFrame(expObj, actor, anm);
+        nextFrame = frame + FX32_ONE;
+        if (nextFrame >= lastFrame) {
+            nextFrame = 0;
+        }
+        anmObj = GFL_G3DAnmGetRenderObj(GFL_G3DActorGetAnm(g3dActor, anm));
+        RollerCoaster_GetJointTrans(anmObj->resAnm, 0, frame, &trans);
+        RollerCoaster_GetJointTrans(anmObj->resAnm, 0, nextFrame, &nextTrans);
+        VEC_Subtract(&trans, &nextTrans, &move);
+        speed = VEC_Mag(&move);
+    }
     volume = 0;
     if (speed >= SPEED_FASTEST) {
         volume = 127;
@@ -814,7 +844,8 @@ static GameEventReturnCode RollerCoaster_IntroEvent(GameEvent *event, u32 *state
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     RollerCoasterWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_ID);
     u8 car = work->ridePath / 2;
-    FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, car, 0);
+    u8 actor = ACTOR_CAR + car;
+    FieldExpObjAnm *anmInfo = FieldExpObj_GetAnmInfo(expObj, 0, actor, 0);
 
     // The saved state is fetched but not used
     GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(Field_GetGameSystem(field))), GIMMICK_STATE_ID);
@@ -824,13 +855,13 @@ static GameEventReturnCode RollerCoaster_IntroEvent(GameEvent *event, u32 *state
         (*state)++;
         break;
     case 1:
-        RollerCoaster_SetAnmFrame(expObj, car, 0, 0);
+        RollerCoaster_SetAnmFrame(expObj, actor, 0, 0);
         FieldExpObjAnm_SetPaused(anmInfo, FALSE);
         GFL_SndSEPlay(SEQ_SE_FLD_22);
         (*state)++;
         break;
     case 2:
-        if (RollerCoaster_GetAnmFrame(expObj, car, 0) >= FX32_CONST(15)) {
+        if (RollerCoaster_GetAnmFrame(expObj, actor, 0) >= FX32_CONST(15)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
             EventScriptCall_Start(event, SCRIPT_INTRO_RIDE, NULL, 0, HEAPID_TAIL(HEAPID_FIELDMAP));
             (*state)++;
@@ -844,7 +875,7 @@ static GameEventReturnCode RollerCoaster_IntroEvent(GameEvent *event, u32 *state
     case 4:
         if (FieldExpObjAnm_IsPlaybackFinished(anmInfo)) {
             FieldExpObjAnm_SetPaused(anmInfo, TRUE);
-            RollerCoaster_SetAnmPaused(expObj, car, work->ridePath + 1, FALSE);
+            RollerCoaster_SetAnmPaused(expObj, actor, work->ridePath + 1, FALSE);
             work->waits[car] = 0;
             work->stations[car] = NO_SPOT;
             work->ridePath = NO_PATH;
@@ -884,8 +915,9 @@ static void RollerCoaster_ToggleSwitch(Field *field, FieldExpObjSystem *expObj) 
 static void RollerCoaster_SwitchPath(FieldExpObjSystem *expObj, u8 oldSwitch, u8 car) {
     u8 oldAnm;
     u8 newAnm;
+    u8 actor;
     fx32 frame;
-    BOOL paused;
+    u8 paused;
 
     if (oldSwitch == 0) {
         oldAnm = car * 2 + 1;
@@ -894,12 +926,13 @@ static void RollerCoaster_SwitchPath(FieldExpObjSystem *expObj, u8 oldSwitch, u8
         newAnm = car * 2 + 1;
         oldAnm = newAnm + 1;
     }
-    frame = RollerCoaster_GetAnmFrame(expObj, car, oldAnm);
-    FieldExpObj_SetAnm(expObj, 0, car, oldAnm, FALSE);
-    FieldExpObj_SetAnm(expObj, 0, car, newAnm, TRUE);
-    RollerCoaster_SetAnmFrame(expObj, car, newAnm, frame);
-    paused = func_ov036_021b84ec(FieldExpObj_GetAnmInfo(expObj, 0, car, oldAnm));
-    FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(expObj, 0, car, newAnm), paused);
+    actor = ACTOR_CAR + car;
+    frame = RollerCoaster_GetAnmFrame(expObj, actor, oldAnm);
+    FieldExpObj_SetAnm(expObj, 0, actor, oldAnm, FALSE);
+    FieldExpObj_SetAnm(expObj, 0, actor, newAnm, TRUE);
+    RollerCoaster_SetAnmFrame(expObj, actor, newAnm, frame);
+    paused = func_ov036_021b84ec(FieldExpObj_GetAnmInfo(expObj, 0, actor, oldAnm));
+    FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(expObj, 0, actor, newAnm), paused);
 }
 
 static BOOL RollerCoaster_IsAtStation(u8 path, fx32 frame, u8 *index) {
@@ -915,7 +948,9 @@ static BOOL RollerCoaster_IsAtStation(u8 path, fx32 frame, u8 *index) {
 }
 
 static BOOL RollerCoaster_IsBeforeSwitch(FieldExpObjSystem *expObj, u8 car, u8 path) {
-    if (RollerCoaster_GetAnmFrame(expObj, car, path + 1) <= sSwitchFrames[car] * FX32_ONE) {
+    u8 actor = ACTOR_CAR + car;
+
+    if (RollerCoaster_GetAnmFrame(expObj, actor, path + 1) <= sSwitchFrames[car] * FX32_ONE) {
         return TRUE;
     }
     return FALSE;
@@ -1004,10 +1039,10 @@ static void RollerCoaster_GetTransData(fx32 *value, fx32 frame, const u32 *data,
                     *value = (v + v + v + subV) >> 2;
                 } else {
                     const fx32 *array = values;
+                    fx64 tripled = (fx64)array[index] * 3;
+                    fx64 sub = array[subIndex];
 
-                    v = array[index];
-                    subV = array[subIndex];
-                    *value = (fx32)(((fx64)v * 3 + subV) >> 2);
+                    *value = (fx32)((tripled + sub) >> 2);
                 }
                 return;
             } else {
@@ -1042,31 +1077,38 @@ noInterp:
 
 // Sets the ambience's volume by the speed of the car nearest the player
 static void RollerCoaster_UpdateAmbience(Field *field, RollerCoasterWork *work) {
-    FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
-    FieldSound *fieldSound = GameData_GetFieldSoundSystem(GSYS_GetGameData(Field_GetGameSystem(field)));
-    BOOL first = TRUE;
     fx32 nearestDist;
     int nearestCar;
     int nearestAnm;
+    BOOL first;
+    FieldSound *fieldSound;
+    FieldExpObjSystem *expObj;
     int i;
     VecFx32 pos;
     VecFx32 playerPos;
     VecFx32 diff;
+    VecFx32 trans;
+    VecFx32 nextTrans;
+    VecFx32 move;
     fx32 dist;
     G3DActor *actor;
     fx32 frame;
     fx32 speed;
     u16 volume;
 
+    expObj = Field_GetExpObjSystem(field);
+    fieldSound = GameData_GetFieldSoundSystem(GSYS_GetGameData(Field_GetGameSystem(field)));
+    first = TRUE;
     for (i = 0; i < CAR_COUNT; i++) {
         u8 car = i;
+        u8 carActor = ACTOR_CAR + car;
         u8 anm;
 
-        actor = FieldExpObj_GetActor(expObj, 0, car);
+        actor = FieldExpObj_GetActor(expObj, 0, carActor);
         anm = work->paths[car] + 1;
         // The animation's info is fetched but not used
-        FieldExpObj_GetAnmInfo(expObj, 0, car, anm);
-        frame = RollerCoaster_GetAnmFrame(expObj, car, anm);
+        FieldExpObj_GetAnmInfo(expObj, 0, carActor, anm);
+        frame = RollerCoaster_GetAnmFrame(expObj, carActor, anm);
         RollerCoaster_GetJointTrans(GFL_G3DAnmGetRenderObj(GFL_G3DActorGetAnm(actor, anm))->resAnm, 0, frame, &pos);
         VEC_Add(&pos, &sCarOrigins[car], &pos);
         FieldPlayer_GetWPos(Field_GetPlayer(field), &playerPos);
@@ -1075,7 +1117,7 @@ static void RollerCoaster_UpdateAmbience(Field *field, RollerCoasterWork *work) 
         // The original compares nearestDist before testing first, so the first car reads it before it is set
         if (nearestDist > dist || first) {
             nearestDist = dist;
-            nearestCar = car;
+            nearestCar = carActor;
             nearestAnm = work->paths[car] + 1;
             first = FALSE;
         }
@@ -1084,7 +1126,22 @@ static void RollerCoaster_UpdateAmbience(Field *field, RollerCoasterWork *work) 
     if (nearestDist >= AMBIENCE_RANGE) {
         volume = 0;
     } else {
-        speed = RollerCoaster_GetCarSpeed(expObj, nearestCar, nearestAnm);
+        G3DActor *nearestActor = FieldExpObj_GetActor(expObj, 0, nearestCar);
+        fx32 lastFrame;
+        fx32 nextFrame;
+        NNSG3dAnmObj *anmObj;
+
+        lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, nearestCar, nearestAnm));
+        frame = RollerCoaster_GetAnmFrame(expObj, nearestCar, nearestAnm);
+        nextFrame = frame + FX32_ONE;
+        if (nextFrame >= lastFrame) {
+            nextFrame = 0;
+        }
+        anmObj = GFL_G3DAnmGetRenderObj(GFL_G3DActorGetAnm(nearestActor, nearestAnm));
+        RollerCoaster_GetJointTrans(anmObj->resAnm, 0, frame, &trans);
+        RollerCoaster_GetJointTrans(anmObj->resAnm, 0, nextFrame, &nextTrans);
+        VEC_Subtract(&trans, &nextTrans, &move);
+        speed = VEC_Mag(&move);
         volume = 0;
         if (speed >= SPEED_FASTEST) {
             volume = 127;

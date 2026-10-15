@@ -604,10 +604,11 @@ static void MicTest_FreeWindows(MicTestBG *bg) {
 
 static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, void *arg) {
     u8 *buffer;
-    u32 bufferSize = 0x120;
+    u32 bufferSize;
 
     setupMic(heapId);
     GCTX_HIDBlockSleep(8);
+    bufferSize = 0x120;
     buffer = GFL_HeapAllocate(heapId, bufferSize, FALSE, "mictest.c", 1539);
     sys_memset(buffer, 0, bufferSize);
     mic->buffer = buffer;
@@ -615,7 +616,9 @@ static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, v
     mic->param.buffer = (void *)(((u32)buffer + 0x1f) & ~0x1f);
     mic->param.rate = MIC_SAMPLING_RATE_8180;
     mic->param.loop = TRUE;
-    mic->param.size = bufferSize - 0x20;
+    // Less the 32 bytes that aligning the start may skip
+    mic->param.size = bufferSize;
+    mic->param.size -= 0x20;
     mic->param.fullCallback = callback;
     mic->param.fullArg = arg;
     mic->wasOpen = func_02006e3c();
@@ -666,12 +669,12 @@ static void MicTestMic_Stop(MicTestMic *mic) {
 }
 
 static int MicTestMic_GetPeak(MicTestMic *mic) {
-    int size = mic->param.size;
-    int peak = 0;
-    u8 *samples = mic->param.buffer;
     int i;
+    int peak = 0;
+    int last = mic->param.size - 1;
+    u8 *samples = mic->param.buffer;
 
-    for (i = 0; i < size - 1; i++) {
+    for (i = 0; i < last; i++) {
         u8 sample = samples[i];
 
         if (sample < 0x80) {
@@ -782,21 +785,23 @@ static BOOL MicTest_SpawnNote(MicTestWork *wk, u32 heapId, s16 x, s16 y, TCBMana
 
 static void MicTestNote_Start(TCBManager *tcbManager, ClActor *actor, MicTestNote *note, s16 x, s16 y, fx32 speed,
                               int angle, int swayRadius, u32 delay) {
+    MicTestNote *work;
+
     note->task = GFL_TCBMgrAddTask(tcbManager, MicTestNote_Task, note, 0);
-    note = GFL_TCBGetData(note->task);
-    note->actor = actor;
-    note->delay = delay;
-    note->position.x = FX32_CONST(x);
-    note->position.y = FX32_CONST(y);
-    note->position.z = 0;
-    note->velocity.x = FX_Mul(speed, func_02044304(angle + 90));
-    note->velocity.y = -FX_Mul(speed, func_02044304(angle));
-    note->velocity.z = 0;
-    note->phase = 0;
-    note->phaseStep = FX32_CONST(6);
-    note->swayRadius = swayRadius;
-    func_0204c228(note->actor, x, 0);
-    func_0204c228(note->actor, y, 1);
+    work = GFL_TCBGetData(note->task);
+    work->actor = actor;
+    work->delay = delay;
+    work->position.x = FX32_CONST(x);
+    work->position.y = FX32_CONST(y);
+    work->position.z = 0;
+    work->velocity.x = FX_Mul(speed, func_02044304(angle + 90));
+    work->velocity.y = -FX_Mul(speed, func_02044304(angle));
+    work->velocity.z = 0;
+    work->phase = 0;
+    work->phaseStep = FX32_CONST(6);
+    work->swayRadius = swayRadius;
+    func_0204c228(work->actor, x, 0);
+    func_0204c228(work->actor, y, 1);
 }
 
 static void MicTestNote_Task(TCB *tcb, void *data) {
@@ -820,7 +825,8 @@ static void MicTestNote_Task(TCB *tcb, void *data) {
         note->phase -= FX32_CONST(360);
     }
     sway = (func_02044304(note->phase >> FX32_SHIFT) * note->swayRadius) >> FX32_SHIFT;
-    func_0204c228(note->actor, x + sway, 0);
+    x += sway;
+    func_0204c228(note->actor, x, 0);
     func_0204c228(note->actor, y, 1);
     if (y < -16) {
         func_0204c124(note->actor, FALSE);

@@ -878,7 +878,7 @@ static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
             from.z = 0;
             VEC_Subtract(&to, &from, &pull);
             if (VEC_Mag(&pull) > FX32_ONE) {
-                vecfx_normalize(&pull, &pull);
+                VEC_Normalize(&pull, &pull);
                 vecfx_mul(&pull, FX32_ONE, &pull);
             }
             moved = TRUE;
@@ -888,7 +888,7 @@ static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
         fx32 x;
         fx32 y;
 
-        vecfx_normalize(&move, &move);
+        VEC_Normalize(&move, &move);
         x = pull.x + move.x * 3;
         y = pull.y + move.y * 3;
         // At least a pixel
@@ -1486,6 +1486,13 @@ static void TownMapMap_Free(TownMapMap *map) {
     sys_memset(map, 0, sizeof(TownMapMap));
 }
 
+static inline void TownMapMap_SetLimits(TownMapMap *map, s16 top, s16 left, s16 right, s16 bottom) {
+    map->limitTop = top;
+    map->limitLeft = left;
+    map->limitRight = right;
+    map->limitBottom = bottom;
+}
+
 // Moves the zoom on, and the places with it
 static void TownMapMap_Main(TownMapMap *map, TownMapPlaces *places) {
     map->finished = FALSE;
@@ -1516,15 +1523,9 @@ static void TownMapMap_Main(TownMapMap *map, TownMapPlaces *places) {
             map->scale = map->scaleEnd;
             map->pos = map->end;
             if (map->scale == FX32_ONE) {
-                map->limitTop = 0;
-                map->limitLeft = 0;
-                map->limitRight = 0;
-                map->limitBottom = 0;
+                TownMapMap_SetLimits(map, 0, 0, 0, 0);
             } else {
-                map->limitTop = TOWNMAP_SCROLL_TOP;
-                map->limitRight = TOWNMAP_SCROLL_RIGHT;
-                map->limitLeft = TOWNMAP_SCROLL_LEFT;
-                map->limitBottom = TOWNMAP_SCROLL_BOTTOM;
+                TownMapMap_SetLimits(map, TOWNMAP_SCROLL_TOP, TOWNMAP_SCROLL_LEFT, TOWNMAP_SCROLL_RIGHT, TOWNMAP_SCROLL_BOTTOM);
             }
             map->finished = TRUE;
         }

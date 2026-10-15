@@ -133,5 +133,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 231,
-    "baby_species": "SPECIES_STUNFISK"
+    "baby_species": "SPECIES_STUNFISK",
+    "cry_volume": 115
 }

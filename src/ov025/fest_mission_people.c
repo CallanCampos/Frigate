@@ -293,11 +293,14 @@ static void FesMissionPeople_PlaceActors(GameSystem *gsys, FesMissionWork *work,
 
         if (zone->removed[i] == FALSE) {
             if (place->isRail == FALSE) {
-                func_ov012_021682c0(&npc, place->pos.grid.x, place->pos.grid.y, FX32_CONST(place->pos.grid.z));
+                const s32 *coords = (const s32 *)place->pos.grid;
+
+                func_ov012_021682c0(&npc, coords[0], coords[1], FX32_CONST(coords[2]));
                 npc.moveCode = 2;
             } else {
-                func_ov012_021682d4(&npc, place->pos.rail.componentId, place->pos.rail.posFront,
-                                    place->pos.rail.posSide);
+                const u16 *values = &place->pos.rail.componentId;
+
+                func_ov012_021682d4(&npc, values[0], values[1], values[2]);
                 npc.moveCode = 70;
             }
             npc.uid = 236 + i;
@@ -313,10 +316,10 @@ static void FesMissionPeople_PlaceActors(GameSystem *gsys, FesMissionWork *work,
 static BOOL FesMissionPeople_PickPlaces(GameSystem *gsys, FesMissionWork *work, FestMission *mission, u16 zoneId,
                                         MATHRandContext32 *rand) {
     int count;
-    ZoneBGEntity *entity;
     u32 pickedPlaces[4];
     u32 pickedParams[4];
     int i;
+    ZoneBGEntity *entity;
     int level;
     u8 pattern;
 
@@ -326,11 +329,12 @@ static BOOL FesMissionPeople_PickPlaces(GameSystem *gsys, FesMissionWork *work, 
     }
     work->placeCount = 0;
     for (i = 0; i < count; i++, entity++) {
-        if (entity->condition == 5 || entity->condition == 4) {
-            work->places[work->placeCount++] = *entity;
-            if (work->placeCount >= 20) {
-                break;
-            }
+        if (entity->condition != 5 && entity->condition != 4) {
+            continue;
+        }
+        work->places[work->placeCount++] = *entity;
+        if (work->placeCount >= 20) {
+            break;
         }
     }
     if (work->placeCount == 0) {

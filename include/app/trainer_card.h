@@ -206,7 +206,7 @@ BOOL TrainerCard_Exit(GameProc *proc, u32 *state, void *param, void *work);
 // trcard_bmp.c
 void TrCardBmp_Init(TrainerCardWork *wk);
 void TrCardBmp_Exit(TrainerCardWork *wk);
-void TrCardBmp_DrawFront(TrainerCardWork *wk, BmpWin **win, TrainerCardData *data);
+void TrCardBmp_DrawFront(TrainerCardWork *wk, BmpWin **win, const TrainerCardData *data);
 void TrCardBmp_DrawUnionView(TrainerCardWork *wk, u32 view, BOOL flush);
 void TrCardBmp_DrawPersonality(TrainerCardWork *wk, u32 personality, BOOL flush);
 void TrCardBmp_Flush(TrainerCardWork *wk, BmpWin **win);

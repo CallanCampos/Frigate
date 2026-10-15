@@ -835,8 +835,8 @@ static void ProcessCommand(StrmCommand *command) {
             }
         }
 
-        dataSize = samples;
         readOffset = blockOffset;
+        dataSize = samples;
         switch (player->header.head.format) {
         case STRM_FORMAT_PCM8:
             readSize = samples;
@@ -857,7 +857,7 @@ static void ProcessCommand(StrmCommand *command) {
             dataSize *= 2;
             break;
         }
-        fileOffset = readOffset + player->header.head.numChannels * (player->header.head.blockSize * block);
+        fileOffset = readOffset + player->header.head.numChannels * (block * player->header.head.blockSize);
         fileOffset += player->header.head.dataOffset;
 
         for (ch = 0; ch < command->numChannels; ch++) {

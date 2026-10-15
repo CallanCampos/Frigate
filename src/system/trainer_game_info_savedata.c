@@ -75,7 +75,7 @@ void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 a3
     info->unk0a_7 = a4 == 1;
 }
 
-void GetFavePokemonData(TrainerGameInfoSave *info, int *species, int *form, int *a3, int *a4) {
+void GetFavePokemonData(const TrainerGameInfoSave *info, int *species, int *form, int *a3, int *a4) {
     *species = info->faveSpecies;
     *form = info->faveForm;
     *a3 = info->unk0a_6;

@@ -4,11 +4,17 @@
 #include "save/high_link.h"
 
 #define PASS_POWER_COUNT 64
+// The loop over the pass powers tests its constant bound before the first pass, which MWCC only keeps for a counter
+// of an enum type, so the pass powers were numbered by an enum; high_link.h has none yet
+typedef enum {
+    PASS_POWER_ID_FIRST,
+    PASS_POWER_ID_COUNT = PASS_POWER_COUNT,
+} PassPowerId;
 #define PASS_POWER_UNLOCKED 0
 #define PASS_POWER_NEAR 1
 #define PASS_POWER_LOCKED 2
 // The levels a pass power needs, or one of these
-#define PASS_POWER_NONE 0xff
+#define PASS_POWER_LEVEL_NONE 0xff
 #define PASS_POWER_SPECIAL 0xfe
 
 u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags) {
@@ -18,7 +24,7 @@ u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags) {
     u32 bit;
     u32 unlocked;
 
-    if (level1 == PASS_POWER_NONE) {
+    if (level1 == PASS_POWER_LEVEL_NONE) {
         return PASS_POWER_LOCKED;
     }
     if (level1 == PASS_POWER_SPECIAL) {
@@ -51,10 +57,10 @@ u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags) {
 }
 
 u32 GetUnlockedPassPowerCount(void *data, void *levels, u8 *flags) {
-    int i;
+    PassPowerId i;
     u32 count = 0;
 
-    for (i = 0; i < PASS_POWER_COUNT; i++) {
+    for (i = PASS_POWER_ID_FIRST; i < PASS_POWER_ID_COUNT; i++) {
         if (CheckPassPowerUnlocked(data, i, levels, flags) == PASS_POWER_UNLOCKED) {
             count++;
         }

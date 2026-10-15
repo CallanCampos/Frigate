@@ -7,8 +7,8 @@
 // Not from swan: a genderless Pokémon's, which its sprite files treat as male (pokegra.c)
 #define GENDER_UNKNOWN 2
 
-// The species ID of an egg, which follows the national Pokédex in the species names
-#define SPECIES_EGG 650
+// SPECIES_EGG, the species ID of an egg, follows the national Pokédex (data/constants/species.txt)
+#include "constants/species.h"
 
 // Fields of a Pokémon, which PokeParty_GetParam and PokeParty_SetParam read and write. Names from swan's PkmField
 #define PKM_PARAM_PID 0x0

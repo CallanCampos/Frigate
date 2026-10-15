@@ -268,7 +268,7 @@ static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx) {
     mtx->scale.x = FX32_ONE;
     mtx->scale.y = FX32_ONE;
     mtx->scale.z = FX32_ONE;
-    MAT3_Identity(&mtx->rotation);
+    MTX_Identity33_(&mtx->rotation);
     if (wk->work3D != NULL) {
         if (!wk->work3D->cameraPosDone) {
             GFL_G3DCurveApplyCameraPosTranslation(wk->sceneCamera, wk->work3D->cameraPosPath);
@@ -811,7 +811,9 @@ static void func_ov194_021c2844(PokemonTradeWork *wk) {
             x = end + (over - 80) * 48 / 80 + 112;
         }
     }
-    pos = ((u64)((x + 48) % width) << 16) / width;
+    x += 48;
+    x %= width;
+    pos = ((u64)x << 16) / width;
     for (i = 0; i < count; i++) {
         func_ov194_021c2714(sCubeParams.distance, i, (i << 16) / count, 0x10000 - pos);
     }

@@ -73,7 +73,7 @@ static void BtlvStage_InitSRT(BtlvStage *stage, u32 side, fx32 scale) {
     stage->srt[side].scale.x = scale;
     stage->srt[side].scale.y = scale;
     stage->srt[side].scale.z = scale;
-    MAT3_Identity(&stage->srt[side].rotation);
+    MTX_Identity33_(&stage->srt[side].rotation);
 }
 
 BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u32 unk) {

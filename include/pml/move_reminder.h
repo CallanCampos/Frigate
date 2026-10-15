@@ -11,10 +11,10 @@
 #define OVERLAY_MOVE_REMINDER OVERLAY_ID(258)
 
 // What the screen is for, which picks its messages
-enum {
+typedef enum {
     MOVE_REMINDER_MODE_TEACH,
     MOVE_REMINDER_MODE_REMEMBER,
-};
+} MoveReminderMode;
 
 // How the screen was left
 enum {

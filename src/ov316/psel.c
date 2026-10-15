@@ -447,7 +447,7 @@ static PselObj *PselObj_AllocAll(HeapID heapId, u16 count) {
     for (i = 0; i < count; i++) {
         VEC_Set(&objs[i].status.translation, 0, 0, 0);
         VEC_Set(&objs[i].status.scale, FX32_ONE, FX32_ONE, FX32_ONE);
-        MAT3_Identity(&objs[i].status.rotation);
+        MTX_Identity33_(&objs[i].status.rotation);
     }
     return objs;
 }
@@ -1388,6 +1388,7 @@ static void PselText_ClearStream(PselWork *wk) {
 // Prints the type and name of a ball's Pokémon on the sub screen
 static void PselText_PrintType(PselWork *wk, s32 ball) {
     BmpWin *win = wk->win[2];
+    BOOL *done = &wk->winDone[2];
     u16 y = 0;
     WordSet *wordSet;
     StrBuf *src;
@@ -1413,7 +1414,7 @@ static void PselText_PrintType(PselWork *wk, s32 ball) {
     }
     func_02021c7c(wk->printQueue, BmpWin_GetBitmap(win), 0, y, str, wk->font, PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(str);
-    wk->winDone[2] = FALSE;
+    *done = FALSE;
     PselText_Flush(wk);
 }
 

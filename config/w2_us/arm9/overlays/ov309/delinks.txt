@@ -5,6 +5,7 @@
     .bss        start:0x021a0780 end:0x021a0780 kind:bss align:32
 
 src/ov309/fmission_app.c:
+    complete
     .text       start:0x0219cec0 end:0x0219e978
     .rodata     start:0x021a018c end:0x021a021c
     .data       start:0x021a0720 end:0x021a0730
@@ -16,11 +17,13 @@ src/ov309/fmission_app_gra.c:
     .data       start:0x021a0730 end:0x021a0744
 
 src/ov309/fmission_app_draw.c:
+    complete
     .text       start:0x0219ed18 end:0x0219fc00
     .rodata     start:0x021a041c end:0x021a06e4
     .data       start:0x021a0744 end:0x021a0760
 
 src/ov309/fmission_log_accessor_fapp.c:
+    complete
     .text       start:0x0219fc00 end:0x021a018c
     .rodata     start:0x021a06e4 end:0x021a070c
     .data       start:0x021a0760 end:0x021a0780

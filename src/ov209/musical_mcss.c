@@ -140,8 +140,8 @@ static void MusicalMcss_GetDataIDBase(u32 arcId, int species, int form, u32 sex,
                                       u32 *base, u32 *dirOffset, u32 *sexOffset, u32 *rareOffset, u32 *formPalette,
                                       BOOL singleCell);
 
-static const VecFx32 MUSICAL_MCSS_ORTHO_TARGET = { 0, 0, 0 };
 static const VecFx32 MUSICAL_MCSS_ORTHO_POS = { 0, 0, FX32_CONST(301) };
+static const VecFx32 MUSICAL_MCSS_ORTHO_TARGET = { 0, 0, 0 };
 static const VecFx32 MUSICAL_MCSS_ORTHO_UP = { 0, FX32_ONE, 0 };
 
 MusicalMcssSys *MusicalMcss_InitSystem(u32 count, HeapID heapId) {
@@ -210,11 +210,11 @@ static inline void MusicalMcss_GetAnimSrt(const NNSG2dAnimController *animCtrl, 
 }
 
 void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callback) {
-    int i;
-    int j;
-    u8 k;
+    const MusicalMcssCell *cell;
     MusicalMcss *mcss;
     NNSG2dImageProxy *imageProxy;
+    int i;
+    int j;
     NNSG2dMCCellAnimation **cellAnims;
     NNSG2dAnimDataSRT mcSrt;
     NNSG2dAnimDataSRT cellSrt;
@@ -230,6 +230,12 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
     fx32 y;
     fx32 z;
     fx32 w;
+    u8 k;
+    int rot;
+    fx32 markX;
+    fx32 markY;
+    fx32 nodeX;
+    fx32 nodeY;
     u8 flip;
 
     G3_PushMtx();
@@ -243,12 +249,11 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
     } else {
         gfxLookAt(&MUSICAL_MCSS_ORTHO_POS, &MUSICAL_MCSS_ORTHO_UP, &MUSICAL_MCSS_ORTHO_TARGET, TRUE, NULL);
     }
-    MAT43_Invert(&NNS_G3dGlb.cameraMtx, &invCamera);
+    MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
     MAT3_To4x4(&rotation, &billboard);
 
     for (i = 0; i < sys->count; i++) {
-        const NNSG2dMultiCellData *mcData;
         NNSG2dMultiCellAnimation *mcAnim;
 
         if (sys->mcss[i] == NULL || sys->mcss[i]->hidden) {
@@ -257,8 +262,8 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
         G3_PushMtx();
         mcss = sys->mcss[i];
         imageProxy = &mcss->imageProxy;
-        cellAnims = (NNSG2dMCCellAnimation **)&mcss->mcAnim.multiCellInstance.pCellAnimArray;
         mcAnim = &mcss->mcAnim;
+        cellAnims = (NNSG2dMCCellAnimation **)&mcss->mcAnim.multiCellInstance.pCellAnimArray;
         z = 0;
         MusicalMcss_GetAnimSrt(&mcAnim->animCtrl, &mcSrt);
         pos.x = mcss->pos.x;
@@ -284,8 +289,8 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
             viewport.m[3][1] = 0;
             viewport.m[3][2] = 0;
             viewport.m[3][3] = -FX32_ONE;
-            MAT43_To4x4(&NNS_G3dGlb.cameraMtx, &viewProj);
-            MAT4_Mul(&viewProj, &NNS_G3dGlb.projMtx, &viewProj);
+            MTX_Copy43To44_(&NNS_G3dGlb.cameraMtx, &viewProj);
+            MTX_Concat44(&viewProj, &NNS_G3dGlb.projMtx, &viewProj);
             MusicalMcss_MulVecMtx44(&pos, &viewProj, &pos, &w);
             pos.x = FX_Div(pos.x, w);
             pos.y = FX_Div(pos.y, w);
@@ -309,8 +314,8 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
             gfxRotateZ(-FX_SinIdx(rot), FX_CosIdx(rot));
         }
         G3_Scale(FX_Mul(mcSrt.sx, mcss->scale.x), FX_Mul(mcSrt.sy, mcss->scale.y), FX32_ONE);
-        MAT3_RotationZ(&centerRotation, -FX_SinIdx(mcss->rotation), FX_CosIdx(mcss->rotation));
-        MAT3_MulVec(&mcss->center, &centerRotation, &mcss->centerOffset);
+        MTX_RotZ33_(&centerRotation, -FX_SinIdx(mcss->rotation), FX_CosIdx(mcss->rotation));
+        MTX_MultVec33(&mcss->center, &centerRotation, &mcss->centerOffset);
         VEC_Subtract(&mcss->center, &mcss->centerOffset, &mcss->centerOffset);
         mcss->centerOffset.x = FX_Div(mcss->centerOffset.x, mcss->scale.x);
         mcss->centerOffset.y = FX_Div(mcss->centerOffset.y, mcss->scale.y);
@@ -320,59 +325,59 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
                          GX_TEXREPEAT_ST, GX_TEXFLIP_ST, imageProxy->attr.plttUse,
                          imageProxy->vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_3DMAIN]);
 
-        mcData = &mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index];
-        for (j = 0; j < mcData->numNodes; j++) {
-            const NNSG2dMultiCellHierarchyData *node = &mcData->pHierDataArray[j];
-            NNSG2dMCCellAnimation *cellAnim = &(*cellAnims)[(node->nodeAttr & 0xff00) >> 8];
-            const MusicalMcssCell *cell;
+        for (j = 0; j < mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].numNodes; j++) {
+            NNSG2dMCCellAnimation *cellAnim;
 
+            cellAnim =
+                &(*cellAnims)
+                    [(mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].pHierDataArray[j].nodeAttr &
+                      0xff00) >>
+                     8];
             MusicalMcss_GetAnimSrt(&cellAnim->cellAnim.animCtrl, &cellSrt);
             cell = &mcss->bin->cells[cellSrt.index];
             if (cell->quad2.width != 0) {
-                fx32 t;
-
                 if (mcss->flip) {
-                    t = cell->quad2.t + cell->quad2.height;
+                    MusicalMcss_DrawQuad(mcss, cell->quad2.x, cell->quad2.y, cell->quad2.width, cell->quad2.height,
+                                         cell->quad2.s, cell->quad2.t + cell->quad2.height, &cellSrt, &mcSrt, j,
+                                         sys->ortho, &z, flip);
                 } else {
-                    t = cell->quad2.t;
+                    MusicalMcss_DrawQuad(mcss, cell->quad2.x, cell->quad2.y, cell->quad2.width, cell->quad2.height,
+                                         cell->quad2.s, cell->quad2.t, &cellSrt, &mcSrt, j, sys->ortho, &z, flip);
                 }
-                MusicalMcss_DrawQuad(mcss, cell->quad2.x, cell->quad2.y, cell->quad2.width, cell->quad2.height,
-                                     cell->quad2.s, t, &cellSrt, &mcSrt, j, sys->ortho, &z, flip);
             }
             MusicalMcss_DrawQuad(mcss, cell->quad.x, cell->quad.y, cell->quad.width, cell->quad.height, cell->quad.s,
                                  cell->quad.t, &cellSrt, &mcSrt, j, sys->ortho, &z, flip);
 
             for (k = 0; k < 8; k++) {
-                MusicalMcssMark *mark;
-                u16 mcRot;
-                u16 rot;
-                fx32 markX;
-                fx32 markY;
-                fx32 nodeX;
-                fx32 nodeY;
+                u8 mark;
                 fx32 offsetX;
                 fx32 offsetY;
-                fx16 sin;
-                fx16 cos;
+                fx32 cos;
+                fx32 sin;
+                fx32 scaleX;
+                fx32 scaleY;
 
-                if (cell->marks[k] == 0xff) {
+                mark = cell->marks[k];
+                if (mark == 0xff) {
                     break;
                 }
-                mcRot = mcSrt.rotZ;
-                rot = mcRot + cellSrt.rotZ;
-                mark = &mcss->marks[cell->marks[k]];
-                markX = mark->x;
-                markY = mark->y;
+                rot = (u16)(mcSrt.rotZ + cellSrt.rotZ);
+                markX = mcss->marks[mark].x;
+                markY = mcss->marks[mark].y;
                 sin = FX_SinIdx(rot);
                 cos = FX_CosIdx(rot);
-                offsetX = FX_Mul(markX * cos - markY * sin, FX_Mul(mcSrt.sx, cellSrt.sx));
-                offsetY = FX_Mul(markX * sin + markY * cos, FX_Mul(mcSrt.sy, cellSrt.sy));
-                nodeX = mcData->pHierDataArray[j].pos.x + mcSrt.px;
-                nodeY = mcData->pHierDataArray[j].pos.y + mcSrt.py;
-                sin = FX_SinIdx(mcRot);
-                cos = FX_CosIdx(mcRot);
-                offsetX += FX_Mul(nodeX * cos - nodeY * sin, mcSrt.sx);
-                offsetY += FX_Mul(nodeX * sin + nodeY * cos, mcSrt.sy);
+                scaleX = FX_Mul(mcSrt.sx, cellSrt.sx);
+                scaleY = FX_Mul(mcSrt.sy, cellSrt.sy);
+                offsetX = FX_Mul(markX * cos - markY * sin, scaleX);
+                offsetY = FX_Mul(markX * sin + markY * cos, scaleY);
+                nodeX =
+                    mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].pHierDataArray[j].pos.x;
+                nodeX += mcSrt.px;
+                nodeY =
+                    mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt.index].pHierDataArray[j].pos.y;
+                nodeY += mcSrt.py;
+                offsetX += FX_Mul(nodeX * FX_CosIdx(mcSrt.rotZ) - nodeY * FX_SinIdx(mcSrt.rotZ), mcSrt.sx);
+                offsetY += FX_Mul(nodeX * FX_SinIdx(mcSrt.rotZ) + nodeY * FX_CosIdx(mcSrt.rotZ), mcSrt.sy);
                 offsetX += FX32_CONST(cellSrt.px);
                 offsetY += FX32_CONST(cellSrt.py);
 
@@ -384,12 +389,10 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
                 info.center = mcss->center;
                 info.rotation = mcss->rotation;
                 info.scale = mcss->scale;
-                info.cellRotation = rot + mark->rotation * 0x800;
-                callback((u8)mark->kind, &info, mcss->work);
-                if (mark->kind == 5) {
-                    mcss->center.x = info.offset.x;
-                    mcss->center.y = info.offset.y;
-                    mcss->center.z = 0;
+                info.cellRotation = rot + mcss->marks[mark].rotation * 0x800;
+                callback((u8)mcss->marks[mark].kind, &info, mcss->work);
+                if (mcss->marks[mark].kind == 5) {
+                    VEC_Set(&mcss->center, info.offset.x, info.offset.y, 0);
                 }
             }
         }
@@ -404,7 +407,6 @@ static void MusicalMcss_DrawQuad(MusicalMcss *mcss, fx32 x, fx32 y, fx32 width, 
     u16 rot;
     fx32 nodeX;
     fx32 nodeY;
-    const NNSG2dMultiCellHierarchyData *hier;
 
     if (ortho) {
         gfxOrtho(FX32_CONST(96), FX32_CONST(-95), FX32_CONST(-127), FX32_CONST(128), FX32_ONE, FX32_CONST(1000),
@@ -414,9 +416,12 @@ static void MusicalMcss_DrawQuad(MusicalMcss *mcss, fx32 x, fx32 y, fx32 width, 
     G3_RestoreMtx(29);
     G3_TexPlttBase(mcss->plttProxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_3DMAIN], mcss->plttProxy.fmt);
     G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 0, 31, 0);
-    hier = &mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt->index].pHierDataArray[node];
-    nodeX = (cellSrt->px + hier->pos.x) << 8;
-    nodeY = -(cellSrt->py + hier->pos.y) << 8;
+    nodeX =
+        (cellSrt->px + mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt->index].pHierDataArray[node].pos.x)
+        << 8;
+    nodeY =
+        -(cellSrt->py + mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt->index].pHierDataArray[node].pos.y)
+        << 8;
     if (flip == 0) {
         rot = mcss->rotation;
     } else if (flip & 1) {

@@ -313,7 +313,6 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
     s32 lookbits;
     int n;
     int base;
-    s16 *quant;
     u8 z;
     s32 end;
     int l;
@@ -394,9 +393,9 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
                     }
                     sDerivedTbl16 = (s16 *)&sHuffWork[tblOffset + HUFF_DERIVED];
                     sDerivedTbl32 = (s32 *)&sHuffWork[tblOffset + HUFF_DERIVED];
+                    count = 0;
                     bits = &sHuffWork[bitsOffset];
                     sHuffWork[bitsOffset] = 0;
-                    count = 0;
                     for (i = 1; i <= 16; i++) {
                         bits[i] = data[p];
                         count += bits[i];
@@ -521,14 +520,13 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
                             return 0;
                         }
                         base = (info & 0xf) * 64;
-                        quant = &sQuant[0][base];
                         p++;
                         for (i = 0; i < 64; i++) {
                             z = sZigzag[i];
                             if (base + z > 127) {
                                 return 0;
                             }
-                            quant[z] = ((data[p + 1] + (data[p] << 8)) * sAanScales[i] + 0x800) >> 12;
+                            sQuant[0][base + z] = ((data[p + 1] + (data[p] << 8)) * sAanScales[i] + 0x800) >> 12;
                             p += 2;
                         }
                     } else {
@@ -536,14 +534,13 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
                             return 0;
                         }
                         base = info * 64;
-                        quant = &sQuant[0][base];
                         p++;
                         for (i = 0; i < 64; i++) {
                             z = sZigzag[i];
                             if (base + z > 127) {
                                 return 0;
                             }
-                            quant[z] = (data[p] * sAanScales[i] + 0x800) >> 12;
+                            sQuant[0][base + z] = (data[p] * sAanScales[i] + 0x800) >> 12;
                             p++;
                         }
                     }
@@ -608,7 +605,6 @@ static void func_ov257_021ab764(u8 *data, s16 *coef, s32 *pos, int tbl) {
 static s32 func_ov257_021ab808(u8 *data, s32 *pos, s32 value, int nbits) {
     s32 negative;
     int i;
-    int len;
 
     if (nbits != 0) {
         negative = 0;
@@ -617,11 +613,12 @@ static s32 func_ov257_021ab808(u8 *data, s32 *pos, s32 value, int nbits) {
         }
         if (func_ov257_021abd3c(data, pos) == 0) {
             negative = (1 << nbits) - 1;
+            nbits--;
         } else {
             value = (value << 1) | 1;
+            nbits--;
         }
-        len = nbits - 1;
-        for (i = 0; i < len; i++) {
+        for (i = 0; i < nbits; i++) {
             if (*pos + 1 >= sDataSize) {
                 return 0;
             }
@@ -937,7 +934,7 @@ static inline int YccToRgb555(int y, int c) {
 
 // Converts the decoded MCU at (x, y) into RGB555 pixels of dest, a bitmap width pixels wide, clipped to height
 static void func_ov257_021ac018(u8 *dest, int x, int y, int width, int height) {
-    int i, j, h, v;
+    int h, v, i, j;
     int k;
     int p;
     int c;
@@ -1117,9 +1114,9 @@ BOOL SSP_StartJpegDecoder(u8 *data, u32 size, void *dst, s16 *width, s16 *height
         sys_memcpy(data + sigOffset, sig, SSP_SIGNATURE_SIZE);
         sys_memset(data + sigOffset, 0, SSP_SIGNATURE_SIZE);
         if (hw_isDSi()) {
-            func_027076c4();
+            PhotoSign_Init();
         }
-        signResult = func_02707ba4(sig, data, size);
+        signResult = PhotoSign_Verify(sig, data, size);
         sys_memcpy(sig, data + sigOffset, SSP_SIGNATURE_SIZE);
         if (signResult != 1) {
             return FALSE;

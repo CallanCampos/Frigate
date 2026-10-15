@@ -122,7 +122,7 @@ static void ZukanDetailTouchbar_StopGlow(ZukanDetailTouchbar *touchbar);
 static void ZukanDetailTouchbar_UpdateGlow(ZukanDetailTouchbar *touchbar);
 static u8 ZukanDetailTouchbar_GetPageItem(int page);
 static u8 ZukanDetailTouchbar_GetCommandItem(int command);
-static int ZukanDetailTouchbar_GetCommandPage(int command);
+static u8 ZukanDetailTouchbar_GetCommandPage(int command);
 static void ZukanDetailTouchbar_CreateMap(ZukanDetailTouchbar *touchbar);
 static void ZukanDetailTouchbar_FreeMap(ZukanDetailTouchbar *touchbar);
 static void ZukanDetailTouchbar_CreateForm(ZukanDetailTouchbar *touchbar);
@@ -650,7 +650,7 @@ static void ZukanDetailTouchbar_UpdateGeneral(ZukanDetailTouchbar *touchbar) {
     touch = ZukanDetailTouchbar_GetTouch(touchbar);
     if (trigger != ZUKAN_DETAIL_CMD_NONE) {
         u8 pageItem = ZukanDetailTouchbar_GetCommandItem(trigger);
-        int page = ZukanDetailTouchbar_GetCommandPage(trigger);
+        u8 page = ZukanDetailTouchbar_GetCommandPage(trigger);
 
         if (pageItem != ITEM_NONE && page != ZUKAN_DETAIL_PAGE_FORM) {
             for (item = GENERAL_FORM; item <= GENERAL_INFO; item++) {
@@ -794,7 +794,7 @@ static u8 ZukanDetailTouchbar_GetCommandItem(int command) {
     return ITEM_NONE;
 }
 
-static int ZukanDetailTouchbar_GetCommandPage(int command) {
+static u8 ZukanDetailTouchbar_GetCommandPage(int command) {
     switch (command) {
     case ZUKAN_DETAIL_CMD_INFO:
     case ZUKAN_DETAIL_CMD_INFO_TOUCH:

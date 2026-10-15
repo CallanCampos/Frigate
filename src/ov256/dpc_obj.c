@@ -211,7 +211,8 @@ static ClActor *DpcObj_AddActor(DendouPCWork *wk, const DpcObjSetup *setup) {
 }
 
 static void DpcObj_AddButtons(DendouPCWork *wk) {
-    u32 i;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long i;
 
     wk->unit = func_0204bf1c(31, 0, HEAPID_DENDOU_PC);
     for (i = 0; i < DPCOBJ_MAX; i++) {

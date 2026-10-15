@@ -5,6 +5,7 @@
     .bss        start:0x021bb740 end:0x021bb740 kind:bss align:32
 
 src/ov207/p_sta_sys.c:
+    complete
     .text       start:0x021b2fc0 end:0x021b50f0
     .rodata     start:0x021bae50 end:0x021bafe8
 
@@ -15,21 +16,25 @@ src/ov207/p_status.c:
     .data       start:0x021bb6e0 end:0x021bb6f8
 
 src/ov207/p_sta_sub.c:
+    complete
     .text       start:0x021b53a4 end:0x021b6964
     .rodata     start:0x021bb000 end:0x021bb118
     .data       start:0x021bb6f8 end:0x021bb704
 
 src/ov207/p_sta_info.c:
+    complete
     .text       start:0x021b6964 end:0x021b7684
     .rodata     start:0x021bb118 end:0x021bb17c
     .data       start:0x021bb704 end:0x021bb714
 
 src/ov207/p_sta_ribbon.c:
+    complete
     .text       start:0x021b7684 end:0x021b8550
     .rodata     start:0x021bb17c end:0x021bb184
     .data       start:0x021bb714 end:0x021bb724
 
 src/ov207/p_sta_skill.c:
+    complete
     .text       start:0x021b8550 end:0x021ba940
     .rodata     start:0x021bb184 end:0x021bb1c4
     .data       start:0x021bb724 end:0x021bb734

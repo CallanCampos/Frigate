@@ -195,5 +195,6 @@
         }
     ],
     "regional_dex_number": 80,
-    "baby_species": "SPECIES_BUNEARY"
+    "baby_species": "SPECIES_BUNEARY",
+    "cry_volume": 120
 }

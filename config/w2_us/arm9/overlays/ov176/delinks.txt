@@ -4,5 +4,6 @@
     .bss        start:0x0219c460 end:0x0219c460 kind:bss align:32
 
 src/ov176/irc_compat_menu.c:
+    complete
     .text       start:0x0219ad60 end:0x0219c2b8
     .rodata     start:0x0219c2b8 end:0x0219c45c

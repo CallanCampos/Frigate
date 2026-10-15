@@ -609,17 +609,32 @@ typedef enum {
 #define REG_GX_DISPCAPCNT_EVB_SHIFT 8
 #define REG_GX_DISPCAPCNT_EVA_SHIFT 0
 
-// The display capture, which writes the main engine's output to VRAM, blended with an image in VRAM with AB
-#define GX_CAPTURE_SIZE_256x192 3
-#define GX_CAPTURE_MODE_A 0
-#define GX_CAPTURE_MODE_AB 2
-#define GX_CAPTURE_SRCA_2D3D 0
-#define GX_CAPTURE_SRCA_3D 1
-#define GX_CAPTURE_SRCB_VRAM_0x00000 0
-#define GX_CAPTURE_DEST_VRAM_A_0x00000 0
-#define GX_CAPTURE_DEST_VRAM_B_0x00000 1
-#define GX_CAPTURE_DEST_VRAM_C_0x00000 2
-#define GX_CAPTURE_DEST_VRAM_D_0x00000 3
+// The display capture, which writes the main engine's output to VRAM, blended with an image in VRAM with AB.
+// NitroSDK passes its fields as enums too
+typedef enum {
+    GX_CAPTURE_SIZE_256x192 = 3,
+} GXCaptureSize;
+
+typedef enum {
+    GX_CAPTURE_MODE_A = 0,
+    GX_CAPTURE_MODE_AB = 2,
+} GXCaptureMode;
+
+typedef enum {
+    GX_CAPTURE_SRCA_2D3D = 0,
+    GX_CAPTURE_SRCA_3D = 1,
+} GXCaptureSrcA;
+
+typedef enum {
+    GX_CAPTURE_SRCB_VRAM_0x00000 = 0,
+} GXCaptureSrcB;
+
+typedef enum {
+    GX_CAPTURE_DEST_VRAM_A_0x00000 = 0,
+    GX_CAPTURE_DEST_VRAM_B_0x00000 = 1,
+    GX_CAPTURE_DEST_VRAM_C_0x00000 = 2,
+    GX_CAPTURE_DEST_VRAM_D_0x00000 = 3,
+} GXCaptureDest;
 
 // Which engine draws to the top screen
 #define GX_DISP_SELECT_SUB_MAIN 0
@@ -649,7 +664,8 @@ static inline int GX_GetDispSelect(void) {
 }
 
 // The fields go from the highest bit to the lowest, as NitroSDK's register field macros write them
-static inline void GX_SetCapture(int sz, int mode, int a, int b, int dest, int eva, int evb) {
+static inline void GX_SetCapture(GXCaptureSize sz, GXCaptureMode mode, GXCaptureSrcA a, GXCaptureSrcB b,
+                                 GXCaptureDest dest, int eva, int evb) {
     reg_GX_DISPCAPCNT = REG_GX_DISPCAPCNT_E_MASK | (mode << REG_GX_DISPCAPCNT_MOD_SHIFT) |
                         (b << REG_GX_DISPCAPCNT_SRCB_SHIFT) | (a << REG_GX_DISPCAPCNT_SRCA_SHIFT) |
                         (sz << REG_GX_DISPCAPCNT_WSIZE_SHIFT) | (dest << REG_GX_DISPCAPCNT_WB_SHIFT) |
@@ -897,7 +913,7 @@ static inline void G3_Scale(fx32 x, fx32 y, fx32 z) {
     reg_G3_MTX_SCALE = (u32)z;
 }
 
-static inline void G3_PolygonAttr(GXLightMask light, GXPolygonMode polyMode, GXCull cullMode, int polygonID, int alpha,
+static inline void G3_PolygonAttr(int light, GXPolygonMode polyMode, GXCull cullMode, int polygonID, int alpha,
                                   int misc) {
     reg_G3_POLYGON_ATTR = GX_PACK_POLYGONATTR_PARAM(light, polyMode, cullMode, polygonID, alpha, misc);
 }

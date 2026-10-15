@@ -145,5 +145,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 297,
-    "baby_species": "SPECIES_KYUREM"
+    "baby_species": "SPECIES_KYUREM",
+    "cry_volume": 120
 }

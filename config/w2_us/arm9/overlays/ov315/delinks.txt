@@ -5,6 +5,7 @@
     .bss        start:0x0219dcc0 end:0x0219dcc0 kind:bss align:32
 
 src/ov315/zenkoku_zukan_award.c:
+    complete
     .text       start:0x0219cec0 end:0x0219d77c
     .rodata     start:0x0219dae8 end:0x0219db6c
     .data       start:0x0219dc80 end:0x0219dc98

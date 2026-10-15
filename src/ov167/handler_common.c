@@ -2,9 +2,9 @@
 #include "battle/btl_event.h"
 #include "battle/btl_handler.h"
 #include "battle/btl_main.h"
-#include "battle/btl_ov169.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_server_flow.h"
+#include "battle/btl_tables.h"
 #include "battle/handler_common.h"
 #include "constants/items.h"
 #include "constants/species.h"
@@ -41,12 +41,12 @@ BOOL GiratinaArceusGenesectItemCheck(u16 species, u16 item) {
         }
         break;
     case SPECIES_ARCEUS:
-        if (func_ov169_0689cb08(item)) {
+        if (IsArceusPlate(item)) {
             return TRUE;
         }
         break;
     case SPECIES_GENESECT:
-        if (func_ov169_0689cb18(item)) {
+        if (IsGenesectDrive(item)) {
             return TRUE;
         }
         break;
@@ -68,8 +68,14 @@ BOOL func_ov167_021cdedc(BtlServerFlow *flow, u8 monId) {
 }
 
 BOOL func_ov167_021cdf08(BtlServerFlow *flow, u8 monId) {
-    if (func_ov167_021abca8(flow) == 0 && func_ov167_0219c648(monId) == 1) {
-        return TRUE;
+    if (func_ov167_021abca8(flow) == 0) {
+        u32 client = func_ov167_0219c648(monId);
+
+        // The original tests the client against 1 twice (`beq` to the next instruction, then `bne`), as two
+        // constants of the same value would
+        if (client == 1 || client == 1) {
+            return TRUE;
+        }
     }
     return FALSE;
 }

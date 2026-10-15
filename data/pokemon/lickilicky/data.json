@@ -187,5 +187,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 285,
-    "baby_species": "SPECIES_LICKITUNG"
+    "baby_species": "SPECIES_LICKITUNG",
+    "cry_volume": 120
 }

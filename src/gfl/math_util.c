@@ -38,7 +38,7 @@ u16 func_020443b4(u16 degrees) {
 
 int func_020443d8(int x1, int y1, int x2, int y2, int x3, int y3, int radius) {
     int dist = func_02044404(x1, y1, x2, y2, x3, y3);
-    int circumference = fx_mul_round((radius * 2) << FX32_SHIFT, FX32_CONST(3.14)) >> FX32_SHIFT;
+    int circumference = FX_MulFunc((radius * 2) << FX32_SHIFT, FX32_CONST(3.14)) >> FX32_SHIFT;
 
     return (dist << 16) / circumference;
 }
@@ -65,14 +65,14 @@ static int func_02044404(int x1, int y1, int x2, int y2, int x3, int y3) {
     VEC_Subtract(&b, &origin, &b);
     cross.x = 0;
     cross.y = 0;
-    cross.z = fx_mul_round(a.x, b.y) - fx_mul_round(b.x, a.y);
+    cross.z = FX_MulFunc(a.x, b.y) - FX_MulFunc(b.x, a.y);
     side = cross.x + cross.y + cross.z;
     dir.x = a.y;
     dir.y = a.x;
     dir.z = 0;
-    vecfx_normalize(&dir, &dir);
+    VEC_Normalize(&dir, &dir);
     VEC_Subtract(&b, &a, &cross);
-    dist = vecfx_dot(&dir, &cross) >> FX32_SHIFT;
+    dist = VEC_DotProduct(&dir, &cross) >> FX32_SHIFT;
     if (dist < 0) {
         dist = -dist;
     }

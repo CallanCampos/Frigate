@@ -7,9 +7,9 @@
 // Mystery Gift's check of a received gift before it is offered: its texts are terminated, its ID and kind are in
 // range and what it gives is valid. The name is ours (mystery_check.c); the ROM gives none for this file
 
-static u32 MysteryCheck_CountGiftErrors(const MysteryGift *gift, GameData *gameData, HeapID heapId);
+static u32 MysteryCheck_CountGiftErrors(MysteryGift *gift, GameData *gameData, HeapID heapId);
 
-u32 MysteryCheck_CountErrors(const MysteryGiftRecvData *recv, GameData *gameData, HeapID heapId) {
+u32 MysteryCheck_CountErrors(MysteryGiftRecvData *recv, GameData *gameData, HeapID heapId) {
     u32 errors = 0;
     BOOL unterminated = TRUE;
     int i;
@@ -25,7 +25,7 @@ u32 MysteryCheck_CountErrors(const MysteryGiftRecvData *recv, GameData *gameData
     return errors + MysteryCheck_CountGiftErrors(&recv->gift, gameData, heapId);
 }
 
-static u32 MysteryCheck_CountGiftErrors(const MysteryGift *gift, GameData *gameData, HeapID heapId) {
+static u32 MysteryCheck_CountGiftErrors(MysteryGift *gift, GameData *gameData, HeapID heapId) {
     u32 errors = 0;
     BOOL unterminated = TRUE;
     int i;
@@ -47,11 +47,11 @@ static u32 MysteryCheck_CountGiftErrors(const MysteryGift *gift, GameData *gameD
     }
     switch (gift->kind) {
     case 1:
-        pkm = Mystery_CreateGiftPokemon((MysteryGift *)gift, heapId, gameData);
-        if (pkm != NULL) {
-            GFL_HeapFree(pkm);
-        } else {
+        pkm = Mystery_CreateGiftPokemon(gift, heapId, gameData);
+        if (pkm == NULL) {
             errors++;
+        } else {
+            GFL_HeapFree(pkm);
         }
         break;
     case 2:

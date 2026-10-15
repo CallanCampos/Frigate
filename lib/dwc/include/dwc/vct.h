@@ -47,15 +47,15 @@ typedef struct VCTConfig {
 } VCTConfig;
 
 // Starts the library, returning FALSE for a configuration it cannot work with
-BOOL VCT_Init(const VCTConfig *config);
+BOOL VCT_Init(VCTConfig *config);
 void VCT_Shutdown(void);
 // Runs the library a tick
 void VCT_Tick(void);
 // Takes in a packet that another machine has sent, returning FALSE for one that is not meant for the library
-BOOL VCT_ReceivePacket(u8 aid, const void *data, int size);
+BOOL VCT_ReceivePacket(u8 aid, void *data, int size);
 
 // Hands a frame of 0x440 bytes of the microphone's samples over to be sent
-BOOL VCT_SubmitSamples(const void *samples, int size);
+BOOL VCT_SubmitSamples(void *samples, int size);
 // Fills a frame with the voices that are due, returning whether there was any, and gives the machines heard as bits
 BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask);
 // The five ways to code a frame, from 0: 8-bit samples, mu-law and ADPCM at 2, 3 and 4 bits. Not all are allowed

@@ -148,5 +148,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 101,
-    "baby_species": "SPECIES_SANDILE"
+    "baby_species": "SPECIES_SANDILE",
+    "cry_volume": 120
 }

@@ -129,5 +129,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 104,
-    "baby_species": "SPECIES_BASCULIN"
+    "baby_species": "SPECIES_BASCULIN",
+    "cry_volume": 110
 }

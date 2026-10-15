@@ -6,11 +6,14 @@
 #include "battle/b_plist_main.h"
 #include "battle/btl_client.h"
 #include "battle/btl_main.h"
+#include "battle/btl_poke_select.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_string.h"
+#include "battle/btl_tables.h"
 #include "battle/btlv.h"
 #include "battle/btlv_clact.h"
 #include "battle/btlv_effect.h"
+#include "battle/btlv_scd.h"
 #include "battle/tr_ai.h"
 #include "battle/trainer_data.h"
 #include "gfl/bmpwin.h"
@@ -97,7 +100,7 @@ struct BtlvCore {
     u8 unk1B6[6];
     TCBExManager *tcbManager;
     BtlvScu *scu;
-    void *unk1C4;
+    BtlvScd *scd;
     HeapID heapId;
 };
 
@@ -153,7 +156,21 @@ typedef struct BtlvTwoStringWork {
     u32 unk08;
 } BtlvTwoStringWork;
 
-extern const BtlvCmdEntry data_ov167_021da8c4[2];
+// The display commands that run a procedure of their own
+const BtlvCmdEntry data_ov167_021da8c4[2] = {
+    { 0, func_ov167_021ce940 },
+    { 1, func_ov167_021cea24 },
+};
+
+const BGSysLCDConfig data_ov167_021da8d4 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D };
+
+const ClActSysSetup data_ov167_021da8e4 = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 56, 48, 48, 48, 16, 16 };
+
+const BGSysVRAMConfig data_ov167_021da900 = {
+    GX_VRAM_BG_128_D,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,       GX_VRAM_SUB_BGEXTPLTT_NONE,
+    GX_VRAM_OBJ_64_E,  GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_16_I,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+    GX_VRAM_TEX_01_AB, GX_VRAM_TEXPLTT_01_FG,   GX_OBJVRAMMODE_CHAR_1D_64K, GX_OBJVRAMMODE_CHAR_1D_32K,
+};
 
 static inline void BtlvCore_SetSubProc(BtlvCore *core, BtlvSubProcFn main) {
     core->subProc.init = NULL;
@@ -251,8 +268,8 @@ BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeC
     core->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 0x40, 0x80);
     core->scu = func_ov167_021d0c24(core, core->mainModule, pokeCon, core->tcbManager, core->font, core->font2,
                                     core->clientId, heapId);
-    core->unk1C4 =
-        func_ov169_06899af0(core, core->mainModule, pokeCon, core->tcbManager, core->font, core->client, arg3, heapId);
+    core->scd =
+        BtlvScd_Create(core, core->mainModule, pokeCon, core->tcbManager, core->font, core->client, arg3, heapId);
     core->mainProc = NULL;
     core->seq = 0;
     core->subSeq = 0;
@@ -262,7 +279,7 @@ BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeC
 
 void func_ov167_021ce870(BtlvCore *core) {
     func_ov167_021d4d50();
-    func_ov169_06899ed0(core->unk1C4);
+    BtlvScd_Delete(core->scd);
     func_ov167_021d0f84(core->scu);
     GFL_TCBExMgrFree(core->tcbManager);
     GFL_StrBufFree(core->strbuf);
@@ -314,7 +331,7 @@ BOOL func_ov167_021ce940(BtlvCore *core, s32 *seq, void *work) {
         BtlvEffect_Init(data, core->font2, core->heapId);
         GFL_HeapFree(data);
         func_ov167_021d0cd4(core->scu);
-        func_ov169_06899c7c(core->unk1C4);
+        BtlvScd_CreateInput(core->scd);
         (*seq)++;
         break;
     case 1:
@@ -329,7 +346,7 @@ BOOL func_ov167_021ce940(BtlvCore *core, s32 *seq, void *work) {
                 core->unk1A0.unk08 = func_ov167_021b198c(core->client);
                 core->unk1A0.unk0C = 0;
                 if (!func_ov167_021b1990(core->client)) {
-                    func_ov169_0689b8dc(core->unk1C4, &core->unk1A0);
+                    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
                 }
             }
             return TRUE;
@@ -350,11 +367,11 @@ BOOL func_ov167_021cea24(BtlvCore *core, s32 *seq, void *work) {
         data = BtlvEffect_CreateSetup(core->mainModule, core->scu, core->heapId);
         BtlvEffect_Init(data, core->font2, core->heapId);
         GFL_HeapFree(data);
-        keys = func_ov169_0689b7c8(core->unk1C4);
+        keys = BtlvScd_GetKeyCursorFlag(core->scd);
         wk->savedKeys = *keys;
         *keys = 0;
         func_ov167_021d0cd4(core->scu);
-        func_ov169_06899c7c(core->unk1C4);
+        BtlvScd_CreateInput(core->scd);
         wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTLV_CORE, core->heapId);
         wk->wait = 0;
         (*seq)++;
@@ -381,24 +398,24 @@ BOOL func_ov167_021cea24(BtlvCore *core, s32 *seq, void *work) {
         core->unkB8 = 0;
         core->result = 0;
         core->unk1B5 = 0;
-        func_ov169_0689a038(core->unk1C4, core->mon, core->unk1B5, 0);
+        BtlvScd_StartCommandDemo(core->scd, core->mon, core->unk1B5, 0);
         (*seq)++;
         break;
     case 4:
-        if (func_ov169_0689a060(core->unk1C4)) {
-            func_ov169_0689a120(core->unk1C4, core->mon, core->unkB8);
+        if (BtlvScd_GetCommandResult(core->scd)) {
+            BtlvScd_StartMoveDemo(core->scd, core->mon, core->unkB8);
             (*seq)++;
         }
         break;
     case 5:
-        if (func_ov169_0689a060(core->unk1C4)) {
+        if (BtlvScd_GetCommandResult(core->scd)) {
             func_ov167_021d02cc(core, GetMonID(func_ov167_021ceec0(core, 0)), 0x21);
-            func_ov169_06899e5c(core->unk1C4);
+            BtlvScd_ResetScreen(core->scd);
             (*seq)++;
         }
         break;
     case 6:
-        if (func_ov167_021d02e8(core) && func_ov169_06899ea8(core->unk1C4)) {
+        if (func_ov167_021d02e8(core) && BtlvScd_IsIdle(core->scd)) {
             func_ov167_021d3094(core->scu, 0, 1, 0x21, PML_MoveGetParam(0x21, 0x1b), 0, 0);
             (*seq)++;
         }
@@ -454,12 +471,12 @@ BOOL func_ov167_021cea24(BtlvCore *core, s32 *seq, void *work) {
         break;
     case 13:
         if (func_ov167_021d02e8(core) && --wk->wait == 0) {
-            func_ov169_0689a038(core->unk1C4, core->mon, core->unk1B5, core->unkB8);
+            BtlvScd_StartCommandDemo(core->scd, core->mon, core->unk1B5, core->unkB8);
             (*seq)++;
         }
         break;
     case 14:
-        if (func_ov169_0689a060(core->unk1C4)) {
+        if (BtlvScd_GetCommandResult(core->scd)) {
             BattleClientCmd_StartItemSelect(core, 2, 0, 0, 1, 0);
             (*seq)++;
         }
@@ -468,7 +485,7 @@ BOOL func_ov167_021cea24(BtlvCore *core, s32 *seq, void *work) {
         if (func_ov167_021cf73c(core)) {
             GFL_MsgDataLoadStrbuf(wk->msgData, BtlvCore_Text_BiancaUsedPokeBall, core->strbuf);
             func_ov167_021d0308(core, core->strbuf, 0, NULL);
-            func_ov169_06899e5c(core->unk1C4);
+            BtlvScd_ResetScreen(core->scd);
             (*seq)++;
         }
         break;
@@ -505,7 +522,7 @@ BOOL func_ov167_021cea24(BtlvCore *core, s32 *seq, void *work) {
         }
         break;
     case 20:
-        *func_ov169_0689b7c8(core->unk1C4) = wk->savedKeys;
+        *BtlvScd_GetKeyCursorFlag(core->scd) = wk->savedKeys;
         return TRUE;
     }
     return FALSE;
@@ -518,11 +535,11 @@ BattleMon *func_ov167_021ceec0(BtlvCore *core, u32 index) {
 BOOL func_ov167_021ceed8(BtlvCore *core, s32 *seq, void *work) {
     switch (*seq) {
     case 0:
-        func_ov169_0689a008(core->unk1C4, core->mon, core->unk1B5, BattleClient_GetShooterEnergy(core->client),
+        BtlvScd_StartCommandSelect(core->scd, core->mon, core->unk1B5, BattleClient_GetShooterEnergy(core->client),
                             core->unkB8);
         (*seq)++;
     case 1:
-        core->result = func_ov169_0689a060(core->unk1C4);
+        core->result = BtlvScd_GetCommandResult(core->scd);
         if (core->result != 0) {
             return TRUE;
         }
@@ -534,11 +551,11 @@ BOOL func_ov167_021ceed8(BtlvCore *core, s32 *seq, void *work) {
 BOOL func_ov167_021cef50(BtlvCore *core, s32 *seq, void *work) {
     switch (*seq) {
     case 0:
-        func_ov169_0689a140(core->unk1C4, core->mon, core->unkB8);
+        BtlvScd_StartTargetSelect(core->scd, core->mon, core->unkB8);
         (*seq)++;
         break;
     case 1:
-        if (func_ov169_0689a158(core->unk1C4)) {
+        if (BtlvScd_IsTargetSelectDone(core->scd)) {
             return TRUE;
         }
         break;
@@ -591,7 +608,7 @@ void func_ov167_021cf048(BtlvCore *core, BattleMon *mon, void *arg2) {
     core->mon = mon;
     core->monId = GetMonID(mon);
     core->unkB8 = arg2;
-    func_ov169_0689a078(core->unk1C4, core->mon, arg2);
+    BtlvScd_StartMoveSelect(core->scd, core->mon, arg2);
     func_ov167_021cefb4(core, func_ov167_021cf110);
 }
 
@@ -603,17 +620,17 @@ void func_ov167_021cf094(BtlvCore *core, BtlvSelectTargetParam *param, void *arg
     core->monId = GetMonID(mon);
     core->unk1B0 = param;
     core->unkB8 = arg2;
-    func_ov169_0689a09c(core->unk1C4, param, arg2);
+    BtlvScd_StartRotationSelect(core->scd, param, arg2);
     func_ov167_021cefb4(core, func_ov167_021cf110);
 }
 
 void func_ov167_021cf0e4(BtlvCore *core) {
-    func_ov169_0689a114(core->unk1C4);
+    BtlvScd_ResumeMoveSelect(core->scd);
     func_ov167_021cefb4(core, func_ov167_021cf110);
 }
 
 BOOL func_ov167_021cf110(BtlvCore *core, s32 *seq, void *work) {
-    if (func_ov169_0689a10c(core->unk1C4)) {
+    if (BtlvScd_IsDone(core->scd)) {
         return TRUE;
     }
     return FALSE;
@@ -636,7 +653,7 @@ void func_ov167_021cf148(BtlvCore *core, BattleMon *mon, void *arg2) {
 
 u32 func_ov167_021cf174(BtlvCore *core) {
     if (func_ov167_021cefc4(core)) {
-        if (func_ov169_0689b228(core->unk1C4)) {
+        if (BtlvScd_IsTargetChosen(core->scd)) {
             return 1;
         }
         return 2;
@@ -650,20 +667,20 @@ void func_ov167_021cf1ac(BtlvCore *core) {
 
 void func_ov167_021cf1b4(BtlvCore *core) {
     BtlvEffect_StopIdleEffect();
-    func_ov169_0689a160(core->unk1C4);
+    BtlvScd_CancelProcs(core->scd);
     func_ov167_021cefbc(core);
 }
 
 void func_ov167_021cf1e0(BtlvCore *core) {
-    func_ov169_06899e34(core->unk1C4);
+    BtlvScd_ResetScreenIfShown(core->scd);
 }
 
 void func_ov167_021cf1f0(BtlvCore *core) {
-    func_ov169_06899e5c(core->unk1C4);
+    BtlvScd_ResetScreen(core->scd);
 }
 
 BOOL func_ov167_021cf200(BtlvCore *core) {
-    return func_ov169_06899ea8(core->unk1C4);
+    return BtlvScd_IsIdle(core->scd);
 }
 
 BOOL func_ov167_021cf210(BtlvCore *core) {
@@ -714,7 +731,7 @@ void func_ov167_021cf234(BtlvCore *core, BPlistParam *param, u8 mode, u8 partyIn
     param->heapId = core->heapId;
     param->font = core->font;
     param->unk14 = BtlSetup_GetBattleStyle(core->mainModule);
-    param->usingKeys = func_ov169_0689b7c8(core->unk1C4);
+    param->usingKeys = BtlvScd_GetKeyCursorFlag(core->scd);
     param->tcbManager = BtlvEffect_GetTCBManager();
     param->paletteFade = BtlvEffect_GetPaletteFade();
     param->gameData = func_ov167_0219bf98(core->mainModule);
@@ -733,17 +750,17 @@ void BattleClientCmd_StartPokeList(BtlvCore *core, const BtlvPokeListCmd *cmd, s
         partyIndex = 0;
     }
     func_ov167_021cf234(core, &core->ov287, cmd->mode, partyIndex, move);
-    count = func_ov169_0689cca0(select);
+    count = PokeSelect_GetCount(select);
     for (i = 0; i < count; i++) {
         if (i >= 2) {
             break;
         }
-        core->ov287.unk1D[i] = func_ov169_0689ccb4(select, i);
+        core->ov287.unk1D[i] = PokeSelect_Get(select, i);
     }
     for (; i < 2; i++) {
         core->ov287.unk1D[i] = 6;
     }
-    select->unk08 = 1;
+    select->selecting = TRUE;
     core->selectParam = select;
     core->subSeq = 0;
 }
@@ -758,16 +775,16 @@ BOOL BattleClientCmd_WaitPokeSelect(BtlvCore *core) {
     switch (core->subSeq) {
     case 0:
         if (core->ov287.unk1F == 1 || core->ov287.unk1F == 2) {
-            func_ov169_06899d9c(core->unk1C4, 0);
+            BtlvScd_StartFadeOut(core->scd, 0);
         } else {
-            func_ov169_06899d9c(core->unk1C4, 1);
+            BtlvScd_StartFadeOut(core->scd, 1);
         }
         GFL_OvlLoad(OVERLAY_ID(285));
         core->subSeq++;
         break;
     case 1:
-        if (func_ov169_06899dfc(core->unk1C4)) {
-            func_ov169_06899e24(core->unk1C4);
+        if (BtlvScd_IsFadeDone(core->scd)) {
+            BtlvScd_OnFadeOutDone(core->scd);
             GFL_OvlLoad(OVERLAY_ID(287));
             BPlistMain_Start(&core->ov287);
             core->subSeq++;
@@ -778,20 +795,20 @@ BOOL BattleClientCmd_WaitPokeSelect(BtlvCore *core) {
             if (core->ov287.unk1F != 5 && core->ov287.unk30 == 0) {
                 for (i = 0; i < 3; i++) {
                     if (core->ov287.unk48[i] != 0xff) {
-                        func_ov169_0689cc74(core->selectParam, i, core->ov287.unk48[i]);
-                        func_ov169_0689cca0(core->selectParam);
-                        core->selectParam->unk08 = 0;
+                        PokeSelect_Push(core->selectParam, i, core->ov287.unk48[i]);
+                        PokeSelect_GetCount(core->selectParam);
+                        core->selectParam->selecting = FALSE;
                     }
                 }
             }
             GFL_OvlUnload(OVERLAY_ID(287));
-            func_ov169_06899dd4(core->unk1C4);
-            func_ov169_06899e28(core->unk1C4);
+            BtlvScd_StartFadeIn(core->scd);
+            BtlvScd_OnFadeInStart(core->scd);
             core->subSeq++;
         }
         break;
     case 3:
-        if (func_ov169_06899dfc(core->unk1C4)) {
+        if (BtlvScd_IsFadeDone(core->scd)) {
             core->subSeq++;
         }
         break;
@@ -809,27 +826,6 @@ void BattleClientCmd_StartMoveInfoView(BtlvCore *core, u8 partyIndex, u8 slot) {
     core->subSeq = 0;
 }
 
-static inline u8 BtlvCore_GetBagKind(BtlvCore *core, u8 canUseItems, u8 arg5) {
-    if (!canUseItems) {
-        return 3;
-    }
-    if (BtlSetup_IsBattleType(core->mainModule, 0x40)) {
-        return 1;
-    }
-    if (BtlSetup_GetBattleType(core->mainModule) == 0) {
-        if (func_ov167_0219d3f8(core->pokeCon, 1) > 1) {
-            return 2;
-        }
-        if (arg5) {
-            return 4;
-        }
-    }
-    if (BtlSetup_IsBattleType(core->mainModule, 0x10000)) {
-        return 5;
-    }
-    return 0;
-}
-
 void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3, u8 canUseItems, u8 arg5) {
     u32 kind;
     BattleParty *party;
@@ -845,7 +841,7 @@ void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3,
         core->ov286.shooterEnergy = arg2;
         core->ov286.shooterSpent = arg3;
         core->ov286.item = 0;
-        core->ov286.usingKeys = func_ov169_0689b7c8(core->unk1C4);
+        core->ov286.usingKeys = BtlvScd_GetKeyCursorFlag(core->scd);
         core->ov286.quit = 0;
         core->ov286.shooterDisabled = func_ov167_0219db00(core->mainModule);
         kind = 0;
@@ -859,8 +855,32 @@ void BattleClientCmd_StartItemSelect(BtlvCore *core, u32 mode, u8 arg2, u8 arg3,
             kind = 1;
         }
         core->ov286.isWild = kind;
+        kind = 0;
         core->ov286.done = FALSE;
-        core->ov286.ballError = BtlvCore_GetBagKind(core, canUseItems, arg5);
+        if (!canUseItems) {
+            kind = 3;
+        } else if (BtlSetup_IsBattleType(core->mainModule, 0x40)) {
+            kind = 1;
+        } else {
+            switch (BtlSetup_GetBattleType(core->mainModule)) {
+            case 0:
+                if (func_ov167_0219d3f8(core->pokeCon, 1) > 1) {
+                    kind = 2;
+                    break;
+                }
+                if (arg5) {
+                    kind = 4;
+                    break;
+                }
+                // fallthrough
+            default:
+                if (BtlSetup_IsBattleType(core->mainModule, 0x10000)) {
+                    kind = 5;
+                }
+                break;
+            }
+        }
+        core->ov286.ballError = kind;
         func_ov167_021cf234(core, &core->ov287, 3, 0, 0);
         party = BattleClient_GetParty(core->client);
         count = GetNumMonsInParty(party);
@@ -884,13 +904,13 @@ BOOL func_ov167_021cf73c(BtlvCore *core) {
     case 0:
         break;
     case 1:
-        func_ov169_06899d9c(core->unk1C4, 1);
+        BtlvScd_StartFadeOut(core->scd, 1);
         GFL_OvlLoad(OVERLAY_ID(285));
         core->subSeq = 2;
         break;
     case 2:
-        if (func_ov169_06899dfc(core->unk1C4)) {
-            func_ov169_06899e24(core->unk1C4);
+        if (BtlvScd_IsFadeDone(core->scd)) {
+            BtlvScd_OnFadeOutDone(core->scd);
             GFL_OvlLoad(OVERLAY_ID(286));
             BBagMain_Start(&core->ov286);
             core->subSeq = 3;
@@ -907,7 +927,7 @@ BOOL func_ov167_021cf73c(BtlvCore *core) {
         }
         break;
     case 4:
-        if (core->ov286.item != 0 && core->ov286.pocket != 2 && !func_ov169_0689ca94(core->ov286.item)) {
+        if (core->ov286.item != 0 && core->ov286.pocket != 2 && !IsEscapeItem(core->ov286.item)) {
             core->ov287.item = core->ov286.item;
             GFL_OvlLoad(OVERLAY_ID(287));
             BPlistMain_Start(&core->ov287);
@@ -923,12 +943,12 @@ BOOL func_ov167_021cf73c(BtlvCore *core) {
         }
         break;
     case 6:
-        func_ov169_06899dd4(core->unk1C4);
-        func_ov169_06899e28(core->unk1C4);
+        BtlvScd_StartFadeIn(core->scd);
+        BtlvScd_OnFadeInStart(core->scd);
         core->subSeq = 7;
         break;
     case 7:
-        if (func_ov169_06899dfc(core->unk1C4)) {
+        if (BtlvScd_IsFadeDone(core->scd)) {
             GFL_OvlUnload(OVERLAY_ID(285));
             core->subSeq = 0;
             return TRUE;
@@ -990,13 +1010,13 @@ BOOL func_ov167_021cf9cc(BtlvCore *core) {
     case 0:
         break;
     case 1:
-        func_ov169_06899d9c(core->unk1C4, 1);
+        BtlvScd_StartFadeOut(core->scd, 1);
         GFL_OvlLoad(OVERLAY_ID(285));
         core->subSeq = 2;
         break;
     case 2:
-        if (func_ov169_06899dfc(core->unk1C4)) {
-            func_ov169_06899e24(core->unk1C4);
+        if (BtlvScd_IsFadeDone(core->scd)) {
+            BtlvScd_OnFadeOutDone(core->scd);
             GFL_OvlLoad(OVERLAY_ID(288));
             BScenarioMain_Start(&core->ov288);
             core->subSeq = 3;
@@ -1009,12 +1029,12 @@ BOOL func_ov167_021cf9cc(BtlvCore *core) {
         }
         break;
     case 4:
-        func_ov169_06899dd4(core->unk1C4);
-        func_ov169_06899e28(core->unk1C4);
+        BtlvScd_StartFadeIn(core->scd);
+        BtlvScd_OnFadeInStart(core->scd);
         core->subSeq = 5;
         break;
     case 5:
-        if (func_ov169_06899dfc(core->unk1C4)) {
+        if (BtlvScd_IsFadeDone(core->scd)) {
             GFL_OvlUnload(OVERLAY_ID(285));
             core->subSeq = 0;
             return TRUE;
@@ -1048,13 +1068,13 @@ BOOL func_ov167_021cfb40(BtlvCore *core) {
     case 0:
         break;
     case 1:
-        func_ov169_06899d9c(core->unk1C4, 0);
+        BtlvScd_StartFadeOut(core->scd, 0);
         GFL_OvlLoad(OVERLAY_ID(285));
         core->subSeq = 2;
         break;
     case 2:
-        if (func_ov169_06899dfc(core->unk1C4)) {
-            func_ov169_06899e24(core->unk1C4);
+        if (BtlvScd_IsFadeDone(core->scd)) {
+            BtlvScd_OnFadeOutDone(core->scd);
             GFL_OvlLoad(OVERLAY_ID(289));
             BChoiceMain_Start(&core->ov289);
             core->subSeq = 3;
@@ -1067,12 +1087,12 @@ BOOL func_ov167_021cfb40(BtlvCore *core) {
         }
         break;
     case 4:
-        func_ov169_06899dd4(core->unk1C4);
-        func_ov169_06899e28(core->unk1C4);
+        BtlvScd_StartFadeIn(core->scd);
+        BtlvScd_OnFadeInStart(core->scd);
         core->subSeq = 5;
         break;
     case 5:
-        if (func_ov169_06899dfc(core->unk1C4)) {
+        if (BtlvScd_IsFadeDone(core->scd)) {
             GFL_OvlUnload(OVERLAY_ID(285));
             core->subSeq = 0;
             return TRUE;
@@ -1575,18 +1595,18 @@ void func_ov167_021d05d4(BtlvCore *core, u8 arg1) {
 
     work = func_ov167_021ce93c(core, 0x3c);
     GetClientParty(core->pokeCon, core->clientId);
-    func_ov169_0689b670(core->unk1C4, work);
+    BtlvScd_ShowRotationScreen(core->scd, work);
 }
 
 BOOL func_ov167_021d0608(BtlvCore *core, u8 *out) {
-    if (func_ov169_0689b680(core->unk1C4, out)) {
+    if (BtlvScd_PollRotationInput(core->scd, out)) {
         return TRUE;
     }
     return FALSE;
 }
 
 void func_ov167_021d0630(BtlvCore *core) {
-    func_ov169_0689b6b4(core->unk1C4);
+    BtlvScd_HideRotationScreen(core->scd);
 }
 
 void func_ov167_021d0640(BtlvCore *core, u8 clientId, u8 arg2) {
@@ -1657,13 +1677,13 @@ void func_ov167_021d0798(BtlvCore *core, const BtlvStringParam *param1, const Bt
     work->unk08 = arg3;
     func_ov167_021d011c(param1, work->first);
     func_ov167_021d011c(param2, work->second);
-    func_ov169_0689b700(core->unk1C4, work);
+    BtlvScd_ShowYesNo(core->scd, work);
     GFL_HeapFree(work->first);
     GFL_HeapFree(work->second);
 }
 
 BOOL func_ov167_021d0828(BtlvCore *core, u32 *answer) {
-    return func_ov169_0689b728(core->unk1C4, answer);
+    return BtlvScd_PollYesNo(core->scd, answer);
 }
 
 void func_ov167_021d0838(BtlvCore *core, u8 partyIndex, u16 move) {
@@ -1674,13 +1694,13 @@ void func_ov167_021d0838(BtlvCore *core, u8 partyIndex, u16 move) {
 BOOL func_ov167_021d0854(BtlvCore *core, u8 *slot) {
     switch (core->subSeq) {
     case 0:
-        func_ov169_06899d9c(core->unk1C4, 0);
+        BtlvScd_StartFadeOut(core->scd, 0);
         GFL_OvlLoad(OVERLAY_ID(285));
         core->subSeq++;
         break;
     case 1:
-        if (func_ov169_06899dfc(core->unk1C4)) {
-            func_ov169_06899e24(core->unk1C4);
+        if (BtlvScd_IsFadeDone(core->scd)) {
+            BtlvScd_OnFadeOutDone(core->scd);
             GFL_OvlLoad(OVERLAY_ID(287));
             BPlistMain_Start(&core->ov287);
             core->subSeq++;
@@ -1689,13 +1709,13 @@ BOOL func_ov167_021d0854(BtlvCore *core, u8 *slot) {
     case 2:
         if (core->ov287.done) {
             GFL_OvlUnload(OVERLAY_ID(287));
-            func_ov169_06899dd4(core->unk1C4);
-            func_ov169_06899e28(core->unk1C4);
+            BtlvScd_StartFadeIn(core->scd);
+            BtlvScd_OnFadeInStart(core->scd);
             core->subSeq++;
         }
         break;
     case 3:
-        if (func_ov169_06899dfc(core->unk1C4)) {
+        if (BtlvScd_IsFadeDone(core->scd)) {
             core->subSeq++;
         }
         break;
@@ -1749,36 +1769,36 @@ BOOL func_ov167_021d0a08(BtlvCore *core) {
 }
 
 void BattleClientCmd_ForceQuitInputNotify(BtlvCore *core) {
-    func_ov169_0689b7cc(core->unk1C4);
+    BtlvScd_ForceQuitInput(core->scd);
 }
 
 BOOL BattleClientCmd_ForceQuitInputWait(BtlvCore *core) {
-    return func_ov169_0689b7f8(core->unk1C4);
+    return BtlvScd_IsForceQuitInputDone(core->scd);
 }
 
 u32 func_ov167_021d0a38(BtlvCore *core) {
-    return func_ov169_0689b8ec(core->unk1C4);
+    return BtlvScd_CheckRecorderInput(core->scd);
 }
 
 void func_ov167_021d0a48(BtlvCore *core, u16 arg1, u16 arg2) {
     core->unk1A0.unk00 = arg1;
     core->unk1A0.unk04 = arg2;
     core->unk1A0.unk0C = 0;
-    func_ov169_0689b8dc(core->unk1C4, &core->unk1A0);
+    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
 }
 
 void func_ov167_021d0a7c(BtlvCore *core, u16 arg1) {
     core->unk1A0.unk00 = arg1;
     core->unk1A0.unk04 = arg1;
     core->unk1A0.unk0C = 3;
-    func_ov169_0689b8dc(core->unk1C4, &core->unk1A0);
+    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
 }
 
 void func_ov167_021d0aa0(BtlvCore *core, u32 arg1, u32 arg2) {
     core->unk1A0.unk00 = arg1;
     core->unk1A0.unk04 = arg1;
     core->unk1A0.unk0C = arg2;
-    func_ov169_0689b8dc(core->unk1C4, &core->unk1A0);
+    BtlvScd_ShowRecorderScreen(core->scd, &core->unk1A0);
 }
 
 void func_ov167_021d0ad4(BtlvCore *core, u32 se) {
@@ -1835,16 +1855,16 @@ BOOL func_ov167_021d0b90(BtlvCore *core) {
 
 void func_ov167_021d0bac(BtlvCore *core, u32 arg1, u32 arg2, u32 arg3) {
     if (func_ov167_0219c988(core->mainModule) == 2) {
-        func_ov169_0689b904(core->unk1C4, arg1, arg2, arg3);
+        BtlvScd_SetTypeIconVisible(core->scd, arg1, arg2, arg3);
     }
 }
 
 u32 func_ov167_021d0be4(BtlvCore *core) {
-    return func_ov169_0689b920(core->unk1C4);
+    return BtlvScd_GetTypeMask(core->scd);
 }
 
 void func_ov167_021d0bf4(BtlvCore *core, u32 arg1) {
     if (func_ov167_0219c988(core->mainModule) == 2) {
-        func_ov169_0689b92c(core->unk1C4, arg1);
+        BtlvScd_StartTypeIconAnim(core->scd, arg1);
     }
 }

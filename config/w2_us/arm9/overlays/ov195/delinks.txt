@@ -11,6 +11,7 @@ src/ov195/gtsnego_proc.c:
     .data       start:0x021b7b40 end:0x021b7b68
 
 src/ov195/gtsnego_disp.c:
+    complete
     .text       start:0x021b4d64 end:0x021b66f8
     .rodata     start:0x021b7908 end:0x021b7af8
     .data       start:0x021b7b68 end:0x021b7be0

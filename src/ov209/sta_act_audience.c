@@ -31,11 +31,13 @@ static void StaActAudience_DrawMember(StaActAudience *sys, StaActAudienceMember 
 static void StaActAudience_SetCheerTargets(StaActAudience *sys);
 static void StaActAudience_ClearTargets(StaActAudience *sys);
 
-// Nothing reads it
-const u16 STA_ACT_AUDIENCE_UNUSED = 3;
+// The last column of a spectator's four, which StaActAudience_DrawMember counts back from to mirror one. The
+// read is folded, so no code refers to the table, but only a referenced static lies in the section of
+// STA_ACT_AUDIENCE_CHARS, as the original's does
+static const u16 STA_ACT_AUDIENCE_LAST_COLUMN[] = { 3 };
 
 // The first character of each type's spectator
-static const u16 STA_ACT_AUDIENCE_CHARS[] = { 0x10, 0x90, 0x08, 0x88, 0 };
+static const u16 STA_ACT_AUDIENCE_CHARS[] = { 0x10, 0x90, 0x08, 0x88 };
 
 StaActAudience *StaActAudience_InitSystem(HeapID heapId, StaActing *stage, MusicalStageParam *param) {
     u8 i;
@@ -87,20 +89,16 @@ static void StaActAudience_TermGraphic(StaActAudience *sys) {
 }
 
 static void StaActAudience_InitMembers(StaActAudience *sys, MusicalStageParam *param) {
+    u8 y;
     u8 i;
     u8 j;
     u8 n;
     u8 sum;
-    u16 total;
+    u16 total = 0;
     u8 points[4];
-    u8 shares[4];
+    u8 shares[4] = { 0, 0, 0, 0 };
     u8 types[STA_ACT_AUDIENCE_COUNT];
 
-    shares[0] = 0;
-    shares[1] = 0;
-    shares[2] = 0;
-    shares[3] = 0;
-    total = 0;
     sum = 0;
     for (i = 0; i < 4; i++) {
         points[i] = func_ov012_0215250c(param->program, i);
@@ -116,7 +114,8 @@ static void StaActAudience_InitMembers(StaActAudience *sys, MusicalStageParam *p
     n = 0;
     for (i = 0; i < 4; i++) {
         for (j = 0; j < shares[i]; j++) {
-            types[n++] = i;
+            types[n] = i;
+            n++;
         }
     }
     for (j = 0; j < 3; j++) {
@@ -128,12 +127,12 @@ static void StaActAudience_InitMembers(StaActAudience *sys, MusicalStageParam *p
             types[k] = type;
         }
     }
-    for (j = 0; j < 5; j++) {
+    for (y = 0; y < 5; y++) {
         for (i = 0; i < 12; i++) {
-            u8 index = i + j * 12;
+            u8 index = i + y * 12;
 
             sys->members[index].x = i + 2;
-            sys->members[index].y = j;
+            sys->members[index].y = y;
             sys->members[index].type = types[index];
             sys->members[index].timer = GFL_RandomLCAlt(60) + 1;
             sys->members[index].target = STA_ACT_AUDIENCE_NONE;
@@ -214,7 +213,6 @@ static void StaActAudience_DrawMember(StaActAudience *sys, StaActAudienceMember 
     u8 x;
     u8 y;
     u8 col;
-    int tile;
 
     switch (look) {
     case STA_ACT_AUDIENCE_LOOK_RIGHT:
@@ -235,13 +233,12 @@ static void StaActAudience_DrawMember(StaActAudience *sys, StaActAudienceMember 
     for (y = 0; y < 4; y++) {
         for (x = 0; x < 4; x++) {
             if (flip == TRUE) {
-                col = 3 - x + member->x * 4;
+                col = STA_ACT_AUDIENCE_LAST_COLUMN[0] - x + member->x * 4;
             } else {
                 col = x + member->x * 4;
             }
-            tile = base + x + y * 32;
-            GFL_BGSysFillScrArea(4, tile, col, y + member->y * 4 + 2, 1, 1, 0);
-            GFL_BGSysFillScrArea(6, tile, col, y + member->y * 4 + 5, 1, 1, 0);
+            GFL_BGSysFillScrArea(4, base + x + y * 32, col, y + member->y * 4 + 2, 1, 1, 0);
+            GFL_BGSysFillScrArea(6, base + x + y * 32, col, y + member->y * 4 + 5, 1, 1, 0);
         }
     }
     GFL_BGSysQueueScrLoad(4);

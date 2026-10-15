@@ -1340,7 +1340,7 @@ static void CommBtlDemoG3D_Draw(CommBtlDemoG3D *g3d) {
         matrix.scale.x = FX32_ONE;
         matrix.scale.y = FX32_ONE;
         matrix.scale.z = FX32_ONE;
-        MAT3_Identity(&matrix.rotation);
+        MTX_Identity33_(&matrix.rotation);
         GFL_G3DSysDrawObj(GFL_G3DMgrGetActor(g3d->manager, g3d->scene), &matrix);
     }
     CommBtlDemoGraphic_End3D(g3d->graphic);

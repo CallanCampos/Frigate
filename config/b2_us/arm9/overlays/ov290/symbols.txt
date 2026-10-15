@@ -36,7 +36,7 @@ WifiBattleMatchSys_BattleProcExit kind:function(thumb,size=0x44) addr:0x021fcb88
 WifiBattleMatchSys_BattleProcMain kind:function(thumb,size=0x3b6) addr:0x021fcbcc
 WIFIBATTLEMATCH_PROC_FUNCTIONS kind:data(any) addr:0x021fcf84
 sWifiBattleMatchSysSteps kind:data(any) addr:0x021fcf90
-sWifiBattleMatchSysBattleProcFunctions kind:data(any) addr:0x021fd020
+WIFIBATTLEMATCH_BATTLE_PROC_FUNCTIONS kind:data(any) addr:0x021fd020
 data_ov290_021fd040 kind:data(any) addr:0x021fd040
 data_ov290_021fd044 kind:data(any) addr:0x021fd044
 data_ov290_021fd048 kind:data(any) addr:0x021fd048

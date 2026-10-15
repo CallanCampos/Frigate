@@ -177,5 +177,6 @@
     },
     "evolutions": [],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_SHROOMISH"
+    "baby_species": "SPECIES_SHROOMISH",
+    "cry_volume": 120
 }

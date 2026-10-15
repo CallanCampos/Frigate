@@ -21,5 +21,60 @@ src/ov268/br_record_proc.c:
     .data       start:0x021c27e0 end:0x021c2814
 
 src/ov268/br_btlsubway_proc.c:
+    complete
     .text       start:0x021bc1e0 end:0x021bd02c
     .rodata     start:0x021c21d0 end:0x021c2390
+
+src/ov268/br_rndmatch_proc.c:
+    complete
+    .text       start:0x021bd02c end:0x021bd804
+    .rodata     start:0x021c2390 end:0x021c2574
+
+src/ov268/br_bvrank_proc.c:
+    complete
+    .text       start:0x021bd804 end:0x021be790
+    .rodata     start:0x021c2574 end:0x021c25a8
+    .data       start:0x021c2814 end:0x021c284c
+
+src/ov268/br_bvsearch_proc.c:
+    complete
+    .text       start:0x021be790 end:0x021bf37c
+    .rodata     start:0x021c25a8 end:0x021c26c4
+
+src/ov268/br_codein_proc.c:
+    complete
+    .text       start:0x021bf37c end:0x021bf540
+    .rodata     start:0x021c26c4 end:0x021c26d0
+
+src/ov268/br_codein.c:
+    complete
+    .text       start:0x021bf540 end:0x021bf6b8
+    .data       start:0x021c284c end:0x021c2894
+
+src/ov268/br_codein_disp.c:
+    complete
+    .text       start:0x021bf6b8 end:0x021c004c
+    .rodata     start:0x021c26d0 end:0x021c26d8
+    .data       start:0x021c2894 end:0x021c289c
+
+src/ov268/br_codein_pv.c:
+    complete
+    .text       start:0x021c004c end:0x021c0afc
+    .rodata     start:0x021c26d8 end:0x021c2760
+    .data       start:0x021c289c end:0x021c28d4
+
+src/ov268/br_bvsend_proc.c:
+    complete
+    .text       start:0x021c0afc end:0x021c0ea4
+    .rodata     start:0x021c2760 end:0x021c2774
+
+src/ov268/br_bvdelete_proc.c:
+    complete
+    .text       start:0x021c0ea4 end:0x021c13f8
+    .rodata     start:0x021c2774 end:0x021c2790
+    .data       start:0x021c28d4 end:0x021c2900
+
+src/ov268/br_bvsave_proc.c:
+    complete
+    .text       start:0x021c13f8 end:0x021c20e8
+    .rodata     start:0x021c2790 end:0x021c27c4

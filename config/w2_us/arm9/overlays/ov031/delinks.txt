@@ -14,12 +14,14 @@ src/ov031/net_irc.c:
     .data       start:0x0217674c end:0x021767c4
     .bss        start:0x021767e0 end:0x021768c8
 
-src/ov031/irc_link.c:
+lib/irc/src/irc_link.c:
+    complete
     .text       start:0x02175f70 end:0x021763c4
     .data       start:0x021767c4 end:0x021767c8
     .bss        start:0x021768c8 end:0x021769b0
 
-src/ov031/irc_spi.c:
+lib/irc/src/irc_spi.c:
+    complete
     .text       start:0x021763c4 end:0x02176668
     .data       start:0x021767c8 end:0x021767e0
     .bss        start:0x021769b0 end:0x02176b40

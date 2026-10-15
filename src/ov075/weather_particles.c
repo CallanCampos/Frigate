@@ -50,8 +50,8 @@ typedef struct {
     // The background's scroll, 0 to 255
     int scrollX;
     int unused0C[5];
-    // The step of the background's scroll, 0 to 251
-    u32 scrollStep;
+    // The step of the background's scroll, 0 to 251: sBlizzardScrollX's and sBlizzardScrollY's entry every 28
+    int scrollStep;
     int scrollY;
 } BlizzardWork;
 
@@ -335,7 +335,7 @@ static void Flake_Move(WeatherObj *obj) {
     }
     func_ov036_02199c80(obj, &pos);
     flake->acc += 8;
-    flake->swayIdx = (flake->swayIdx + 1) % 0x151;
+    flake->swayIdx = (flake->swayIdx + 1) % NELEMS(sFlakeSway);
     if ((pos.y < -0x11c && pos.y > -0x128) || (pos.y > 0xd4 && pos.y < 0xe8)) {
         *flake->mode = TRUE;
         func_ov036_0219980c(obj);
@@ -344,34 +344,39 @@ static void Flake_Move(WeatherObj *obj) {
 
 static void Flake_Add(WeatherTask *task, int count, HeapID heapId) {
     FlakeWork *work = func_ov036_021997e4(task);
-    int i;
+    int i = 0;
 
-    for (i = 0; i < count; i++) {
-        WeatherObj *obj = func_ov036_021997f4(task, heapId);
-        Flake *flake;
-        ClActor *actor;
-        ClActorPos pos;
+    if (count > 0) {
+        int *mode = &work->mode;
+        int *done = &work->done;
 
-        if (obj == NULL) {
-            break;
-        }
-        flake = func_ov036_02199c5c(obj);
-        actor = func_ov036_02199c64(obj);
-        func_0204c504(actor, GFL_RandomLC(4));
-        flake->acc = 0;
-        flake->swayIdx = 0;
-        flake->state = 0;
-        flake->timer = GFL_RandomLC(0) % 30 + 2;
-        flake->rate = GFL_RandomLC(8) + 12;
-        flake->mode = &work->mode;
-        flake->done = &work->done;
-        pos.x = GFL_RandomLC(0x19e) - 0x20;
-        if (work->mode == 1 && i >= count / 2) {
-            pos.y = -8 - 0x20 - GFL_RandomLC(20);
-        } else {
-            pos.y = -8 - GFL_RandomLC(20);
-        }
-        func_ov036_02199c80(obj, &pos);
+        do {
+            WeatherObj *obj = func_ov036_021997f4(task, heapId);
+            Flake *flake;
+            ClActor *actor;
+            ClActorPos pos;
+
+            if (obj == NULL) {
+                break;
+            }
+            flake = func_ov036_02199c5c(obj);
+            actor = func_ov036_02199c64(obj);
+            func_0204c504(actor, GFL_RandomLC(4));
+            flake->acc = 0;
+            flake->swayIdx = 0;
+            flake->state = 0;
+            flake->timer = (int)GFL_RandomLC(0) % 30 + 2;
+            flake->rate = GFL_RandomLC(8) + 12;
+            flake->mode = mode;
+            flake->done = done;
+            pos.x = GFL_RandomLC(0x19e) - 0x20;
+            if (work->mode == 1 && i >= count / 2) {
+                pos.y = -8 - 0x20 - GFL_RandomLC(20);
+            } else {
+                pos.y = -8 - GFL_RandomLC(20);
+            }
+            func_ov036_02199c80(obj, &pos);
+        } while (++i < count);
     }
 }
 
@@ -540,12 +545,15 @@ static void Blizzard_AddFlakes(WeatherTask *task, int count, HeapID heapId) {
 static void Blizzard_ScrollBg(WeatherTask *task, BlizzardWork *work) {
     int x;
     int y;
+    int scrollStep;
     int step;
 
     func_ov036_02199a78(task, &x, &y);
     func_ov036_02199b90(task, x, y);
-    step = (int)work->scrollStep / 28;
-    work->scrollStep = (work->scrollStep + 1) % 252;
+    scrollStep = work->scrollStep;
+    step = scrollStep / 28;
+    scrollStep = (scrollStep + 1) % (NELEMS(sBlizzardScrollX) * 28);
+    work->scrollStep = scrollStep;
     work->scrollX = work->scrollX + sBlizzardScrollX[step] - x / 2;
     work->scrollY = work->scrollY + sBlizzardScrollY[step] - y / 2;
     if (work->scrollX < 0) {

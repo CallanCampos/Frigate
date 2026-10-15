@@ -5,6 +5,7 @@
     .bss        start:0x021bea40 end:0x021bea60 kind:bss align:32
 
 src/ov197/mystery.c:
+    complete
     .text       start:0x021b5460 end:0x021b8388
     .rodata     start:0x021be31c end:0x021be3a4
     .data       start:0x021be9c0 end:0x021be9cc
@@ -16,6 +17,7 @@ src/ov197/mystery_graphic.c:
     .data       start:0x021be9cc end:0x021be9e0
 
 src/ov197/mystery_util.c:
+    complete
     .text       start:0x021b87ac end:0x021b9a20
     .rodata     start:0x021be598 end:0x021be650
     .data       start:0x021be9e0 end:0x021be9f0
@@ -33,5 +35,6 @@ src/ov197/mystery_net.c:
     .bss        start:0x021bea40 end:0x021bea60
 
 src/ov197/mystery_check.c:
+    complete
     .text       start:0x021bdd74 end:0x021be31c
     .rodata     start:0x021be964 end:0x021be9a0

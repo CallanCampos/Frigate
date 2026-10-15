@@ -222,7 +222,7 @@ void EventPokewood_CreateCastParty(PlayerInfo *playerInfo, PokeParty *dest, Heap
     PokeParty *party;
     PokewoodCastFile *file;
     s32 first;
-    s32 count;
+    s16 count;
 
     trainerId = getIDAsUInt(playerInfo);
     gender = getTrainerGender(playerInfo);
@@ -230,8 +230,8 @@ void EventPokewood_CreateCastParty(PlayerInfo *playerInfo, PokeParty *dest, Heap
     pkm = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), TRUE, "event_pokewood.c", 156);
     file = GFL_ArcSysReadHeapNew(ARCID_POKEWOOD_CAST, movie, heapId);
     count = file->count[side];
-    first = 0;
     PokeParty_InitCore(party, count);
+    first = 0;
     if (side == 1) {
         first = file->count[0];
     }
@@ -497,7 +497,7 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     MsgData *msgData;
 
     func_0200c1f0();
-    func_020107f0(2, pkm);
+    func_020107f0(2, (u32)pkm);
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_TAIL(HEAPID_GAMEEVENT));
     GFL_MsgDataLoadStrbuf(msgData, species, name);
@@ -1044,7 +1044,7 @@ static void EventPokewood_ShowCastNames(BtlSetup *setup, HeapID heapId) {
                     member->shownSpecies <= POKEWOOD_CAST_SPECIES_LAST) {
                     StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, member->shownSpecies - POKEWOOD_CAST_MSG_OFFSET);
 
-                    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, name);
+                    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
                     GFL_StrBufFree(name);
                 }
             }

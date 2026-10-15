@@ -1,0 +1,27 @@
+# The infrared link (irc), overlay 31's last two files: the frames between two machines (irc_link.c) over the card's
+# infrared chip on the backup SPI bus (irc_spi.c). The name is ours; the ROM names neither file. It was built apart
+# from the game, with the game's compiler and flags but -O2,p: at the game's -O4,p, MWCC rotates the loops of irc_spi.c
+# and drops irc_link.c's empty delay loops, and at -O2,p irc_spi.c matches whole, its text, pools, .data and .bss, in
+# both versions. Whether Game Freak or Nintendo wrote it is not known. Of the two files' 26 functions, 5 don't match
+# at -O4,p, and at -O2,p all 26 match, four in a respelled form; IrcLink_Checksum's loop alone has the -O4,p shape,
+# which at -O2,p only a guarded do/while gives.
+compiler = "dsi/1.1p1"
+flags = [
+    "-O2,p",               # Optimize, without the loop rotation of -O4
+    "-proc arm946e",       # ARM9 processor
+    "-thumb",              # Thumb code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char signed",        # char is signed
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-inline on,noauto",   # Only inline functions marked inline
+    "-ipa file",           # Interprocedural analysis within each file
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]

@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 1023 ]
+        [ "MAP_MODEL_ICIRRUS_CITY_6_M_DAISUKI01_00_0" ]
     ]
 }

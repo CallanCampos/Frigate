@@ -150,6 +150,9 @@ static void MysteryMsgWin_PrintStr(MysteryMsgWin *win, u32 mode);
 static void MysteryMsgWin_EndWait(MysteryMsgWin *win);
 static void MysteryOamText_GetPos(MysteryOamText *oamText, Font *font, MysteryPos *pos);
 
+// The width and the x of the yes/no menu's window, in tiles. No code loads from it: its reads have constant indices
+static const u8 sYesNoWindow[2] = { 12, 19 };
+
 static const BmpMenuListHeader sYesNoHeader = {
     NULL, NULL, NULL, 0, 0, 0, 13, 0, 3, 1, 15, 2, 0, 1, 0, 0, 0, NULL, 12, 13, NULL, NULL, NULL, NULL, 20,
 };
@@ -451,7 +454,7 @@ MysteryYesNo *MysteryYesNo_Create(const MysteryYesNoSetup *setup, HeapID heapId)
     sys_memset(menu, 0, sizeof(MysteryYesNo));
     menu->queue = setup->queue;
     height = setup->count * 2;
-    menu->window = BmpWin_CreateDynamic(setup->bg, 19, 17 - height, 12, height, setup->palette, TRUE);
+    menu->window = BmpWin_CreateDynamic(setup->bg, sYesNoWindow[1], 17 - height, sYesNoWindow[0], height, setup->palette, TRUE);
     BmpWin_DrawFrame(menu->window, WINFRAME_TRANSFER_NONE, setup->frameChar, setup->framePalette);
     window = menu->window;
     BmpWin_FlushChar(window);
@@ -924,9 +927,10 @@ void MysteryPal_BlendOne(u32 type, u16 *dest, u16 angle, u8 palette, u8 index, u
 
 void MysteryPal_Blend(u32 type, u16 *dest, u16 angle, u32 palette, const u16 *from, const u16 *to) {
     int i;
-    s16 t = (FX_CosIdx(angle) + FX32_ONE) / 2;
 
     for (i = 0; i < 16; i++) {
+        fx16 cosine = FX_CosIdx(angle);
+        s16 t = (cosine + FX32_ONE) / 2;
         u16 fromColor = from[i];
         u8 fromG = (fromColor & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
         u16 toColor = to[i];

@@ -482,7 +482,7 @@ static void CompatibleIrcSys_OnNegotiated(void *work, int netId) {
     CompatibleIrcSys *sys = work;
 
     sys->negotiatedBits |= 1 << netId;
-    if (countOneBits(sys->negotiatedBits) >= 2) {
+    if (MATH_CountPopulation(sys->negotiatedBits) >= 2) {
         sys->connected = TRUE;
     }
 }

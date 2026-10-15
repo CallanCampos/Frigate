@@ -241,12 +241,12 @@ BtlvEffectSetup *BtlvEffect_CreateSetup(BtlMainModule *mainModule, BtlvScu *scu,
                              mainModule, scu, heapId);
 }
 
-// NONMATCHING: 34 bytes. The seasonal test is `cmp r0, #0` where the game has `lsls r0, r0, #1` (only
-// `seasonal * 2` gives that; s8, BOOL8, bitfields and a u16 of both flags don't), and the arguments of
-// BtlvStage_Create and FieldLightStatus_Get are scheduled differently: ours loads two of FieldLightStatus_Get's before the stack
-// arguments are stored, and stores BtlvStage_Create's unk before heapId (prototype types, a local env pointer and the
-// season's type change nothing)
-void BtlvEffect_Init(const BtlvEffectSetup *setup, Font *font, HeapID heapId) {
+// NONMATCHING: 2 bytes. The seasonal test is `cmp r0, #0` where the game has `lsls r0, r0, #1` after the `ldrb`
+// (the flags come from the expression's last operation; only `seasonal * 2`, `<< 1` or `+ seasonal` give that, and
+// none is natural; s8, char, BOOL8, bitfields of every width, packed u16/u32 fields, masks and casts don't).
+// `setup` must not be `const`: with it, the loads from `setup` move above the stack-argument stores of
+// BtlvStage_Create and FieldLightStatus_Get, 34 bytes.
+void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
     BtlvEffectBgData *bgData;
     u8 season;
     int i;

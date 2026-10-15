@@ -239,30 +239,31 @@ static BOOL JpegEnc_PutBits(u8 *dst, u32 *pos, u32 value, u32 count) {
 static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs) {
     s32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
     s32 tmp10, tmp11, tmp12, tmp13;
+    s32 tmp10b, tmp11b, tmp12b;
     s32 z1, z3, z11, z13, z5;
     s32 workspace[64];
     const u8 *in;
     s32 *ws;
     const s32 *div;
     s16 *out;
-    int i;
+    int i, k;
 
     for (i = 0; i < 8; i++) {
         in = block + i;
+        ws = &workspace[i];
         tmp0 = in[0] + in[56] - 256;
-        tmp7 = in[0] - in[56];
         tmp1 = in[8] + in[48] - 256;
-        tmp6 = in[8] - in[48];
         tmp2 = in[16] + in[40] - 256;
-        tmp5 = in[16] - in[40];
         tmp3 = in[24] + in[32] - 256;
         tmp4 = in[24] - in[32];
+        tmp5 = in[16] - in[40];
+        tmp6 = in[8] - in[48];
+        tmp7 = in[0] - in[56];
 
         tmp10 = tmp0 + tmp3;
-        tmp13 = tmp0 - tmp3;
         tmp11 = tmp1 + tmp2;
         tmp12 = tmp1 - tmp2;
-        ws = &workspace[i];
+        tmp13 = tmp0 - tmp3;
         ws[0] = (tmp10 + tmp11) << 8;
         ws[32] = (tmp10 - tmp11) << 8;
         z1 = (tmp12 + tmp13) * 181;
@@ -282,10 +283,10 @@ static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs)
         ws[56] = z11 - z5 * 98 - tmp12 * 139;
     }
 
-    for (i = 0; i < 8; i++) {
-        ws = &workspace[i * 8];
+    for (i = 0, k = 0; i < 8; i++, k += 8) {
+        ws = &workspace[k];
         div = &divisors[i * 8];
-        out = &coefs[i * 8];
+        out = &coefs[k];
         tmp0 = ws[0] + ws[7];
         tmp7 = ws[0] - ws[7];
         tmp1 = ws[1] + ws[6];
@@ -296,26 +297,25 @@ static void JpegEnc_ForwardDct(const u8 *block, const s32 *divisors, s16 *coefs)
         tmp4 = ws[3] - ws[4];
 
         tmp10 = tmp0 + tmp3;
-        tmp13 = tmp0 - tmp3;
         tmp11 = tmp1 + tmp2;
         tmp12 = tmp1 - tmp2;
+        tmp13 = tmp0 - tmp3;
         z1 = (tmp12 + tmp13) * 181;
-        out[0] = (div[0] * ((tmp10 + tmp11 + 0x80) >> 8) + 0x800) >> 12;
-        out[4] = (div[4] * ((tmp10 - tmp11 + 0x80) >> 8) + 0x800) >> 12;
-        out[2] = (div[2] * (((tmp13 << 8) + z1 + 0x8000) >> 16) + 0x800) >> 12;
-        out[6] = (div[6] * (((tmp13 << 8) - z1 + 0x8000) >> 16) + 0x800) >> 12;
-
-        tmp10 = tmp4 + tmp5;
-        tmp11 = tmp5 + tmp6;
-        tmp12 = tmp6 + tmp7;
-        z5 = tmp10 + tmp12;
-        z3 = tmp11 * 181;
+        tmp10b = tmp4 + tmp5;
+        tmp11b = tmp5 + tmp6;
+        tmp12b = tmp6 + tmp7;
+        z5 = tmp10b + tmp12b;
+        z3 = tmp11b * 181;
         z11 = (tmp7 << 8) + z3;
         z13 = (tmp7 << 8) - z3;
-        out[1] = (div[1] * ((z11 + z5 * 98 + tmp12 * 139 + 0x8000) >> 16) + 0x800) >> 12;
-        out[5] = (div[5] * ((z13 + z5 * 237 - tmp12 * 334 + 0x8000) >> 16) + 0x800) >> 12;
-        out[3] = (div[3] * ((z13 - z5 * 237 + tmp12 * 334 + 0x8000) >> 16) + 0x800) >> 12;
-        out[7] = (div[7] * ((z11 - z5 * 98 - tmp12 * 139 + 0x8000) >> 16) + 0x800) >> 12;
+        out[0] = (div[0] * ((tmp10 + tmp11 + 0x80) >> 8) + 0x800) >> 12;
+        out[1] = (div[1] * ((z11 + z5 * 98 + tmp12b * 139 + 0x8000) >> 16) + 0x800) >> 12;
+        out[2] = (div[2] * (((tmp13 << 8) + z1 + 0x8000) >> 16) + 0x800) >> 12;
+        out[3] = (div[3] * ((z13 - z5 * 237 + tmp12b * 334 + 0x8000) >> 16) + 0x800) >> 12;
+        out[4] = (div[4] * ((tmp10 - tmp11 + 0x80) >> 8) + 0x800) >> 12;
+        out[5] = (div[5] * ((z13 + z5 * 237 - tmp12b * 334 + 0x8000) >> 16) + 0x800) >> 12;
+        out[6] = (div[6] * (((tmp13 << 8) - z1 + 0x8000) >> 16) + 0x800) >> 12;
+        out[7] = (div[7] * ((z11 - z5 * 98 - tmp12b * 139 + 0x8000) >> 16) + 0x800) >> 12;
     }
 }
 
@@ -325,6 +325,7 @@ static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *t
     u32 i, j, p;
     u16 code = 0;
     u32 size;
+    u32 value;
 
     sys_memset32_fast(0, &table->spec, sizeof(table->spec));
     switch (type) {
@@ -356,14 +357,17 @@ static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *t
         break;
     }
 
-    p = 0;
+    i = 0;
     sys_memset32_fast(0, work->sizes, sizeof(work->sizes));
-    for (i = 0; i < 16; i++) {
+    p = 0;
+    while (i < 16) {
         for (j = 0; j < table->spec.bits[i]; j++) {
-            work->sizes[p++] = i + 1;
+            work->sizes[p] = i + 1;
+            p++;
         }
+        work->sizes[p] = 0;
+        i++;
     }
-    work->sizes[p] = 0;
 
     sys_memset32_fast(0, work->codes, sizeof(work->codes));
     p = 0;
@@ -374,14 +378,15 @@ static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *t
             code++;
             p++;
         }
-        code <<= 1;
         size++;
+        code <<= 1;
     }
 
     for (p = 0; p < 256; p++) {
         if (work->sizes[p] != 0) {
-            table->spec.codes[table->spec.values[p]] = work->codes[p];
-            table->spec.sizes[table->spec.values[p]] = work->sizes[p];
+            value = table->spec.values[p];
+            table->spec.codes[value] = work->codes[p];
+            table->spec.sizes[value] = work->sizes[p];
         }
     }
 }
@@ -746,9 +751,9 @@ static BOOL JpegEnc_Sign(u8 *data, u32 size) {
     }
     sys_memset(&data[offset], 0, SSP_SIGNATURE_SIZE);
     if (hw_isDSi()) {
-        func_027076c4();
+        PhotoSign_Init();
     }
-    if (func_02707ba4(signature, data, size) != TRUE) {
+    if (PhotoSign_Sign(signature, data, size) != TRUE) {
         return FALSE;
     }
     sys_memcpy(signature, &data[offset], SSP_SIGNATURE_SIZE);
@@ -786,8 +791,9 @@ static void JpegEnc_MakeThumbnail(const u16 *src, u32 width, u32 height, u16 *ds
                     prev = v | (luma | u);
                 } else {
                     // The two pixels' Y, and their U and V averaged
+                    u = (prev >> 1) + (u >> 1) + (v >> 1);
                     ((u32 *)dst)[(x + y * dstWidth) >> 1] =
-                        luma | ((((prev >> 1) + (u >> 1) + (v >> 1)) & 0xff00ff00) | ((prev & 0xff) << 16));
+                        luma | (((prev & 0xff) << 16) | (u & 0xff00ff00));
                 }
             } else {
                 dst[y * dstWidth + x] = src[width * (srcY >> 4) + (srcX >> 4)];
@@ -811,7 +817,7 @@ static void JpegEnc_ConvertRGB555(const void *src, u32 width, u32 height, u8 *ds
 
     size = alignedWidth * alignedHeight;
     cbPlane = dst + size;
-    crPlane = cbPlane + size;
+    crPlane = dst + size + size;
 
     for (i = 0; i < size; i++) {
         x = i % alignedWidth;
@@ -860,21 +866,26 @@ static void JpegEnc_ConvertYUV422(const void *src, u32 width, u32 height, u8 *ds
 static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work, u32 width, u32 height, u32 quality,
                           u32 sampling, BOOL isThumbnail, const u8 *thumbnail, u32 thumbnailSize,
                           JpegEncConvertFunc convert) {
-    u32 hFactor = 1;
-    u32 vFactor = 1;
-    u32 mcusX, mcusY;
-    u32 blocksX, blocksY;
-    u32 chromBlocksX, chromBlocksY;
-    u32 yOffset, cbOffset, crOffset;
     JpegEncComponent components[3];
     u32 pos;
+    u32 yOffset, cbOffset, crOffset;
+    u32 chromBlocksX, chromBlocksY;
+    u32 blocksX, blocksY;
+    u32 mcusX, mcusY;
+    u32 hFactor = 1;
+    u32 vFactor = 1;
     u32 q;
     u32 i;
     u32 x, y;
-    u32 dcLumLength, dcChromLength, acLumLength, acChromLength;
     u32 dhtLength;
     u32 coefOffset;
     u32 size;
+    u8 (*quant)[64];
+    JpegEncHuffTable *dcLum;
+    JpegEncHuffTable *dcChrom;
+    JpegEncHuffTable *acLum;
+    JpegEncHuffTable *acChrom;
+    JpegEncHuffWork *huffWork;
 
     switch (sampling) {
     case SSP_JPEG_444:
@@ -892,6 +903,12 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     mcusY = height / (vFactor * 8);
     blocksX = width / 8;
     blocksY = height / 8;
+    quant = work->quant;
+    dcLum = &work->dcLum;
+    dcChrom = &work->dcChrom;
+    acLum = &work->acLum;
+    acChrom = &work->acChrom;
+    huffWork = &work->huffWork;
     chromBlocksX = blocksX / hFactor;
     chromBlocksY = blocksY / vFactor;
     coefOffset = sizeof(JpegEncWork) + blocksX * blocksY * 128;
@@ -903,11 +920,11 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     components[1].blocksX = chromBlocksX;
     components[1].blocksY = chromBlocksY;
     components[1].lastDc = 0;
-    components[2].coefs = (s16 *)((u8 *)work + (coefOffset + chromBlocksY * chromBlocksX * 128));
+    components[2].coefs = (s16 *)((u8 *)work + (coefOffset + chromBlocksX * chromBlocksY * 128));
     components[2].blocksX = chromBlocksX;
     components[2].blocksY = chromBlocksY;
     components[2].lastDc = 0;
-    yOffset = coefOffset + chromBlocksY * chromBlocksX * 128 * 2;
+    yOffset = coefOffset + chromBlocksX * chromBlocksY * 128 * 2;
     size = width * height;
     cbOffset = yOffset + size;
     crOffset = yOffset + size * 2;
@@ -926,7 +943,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         if (q > 255) {
             q = 255;
         }
-        work->quant[0][i] = q;
+        quant[0][i] = q;
         work->divisors[0][i] = sJpegEncAanScales[i] / (s32)q;
         q = (sJpegEncChromQuantTable[i] * quality + 50) / 100;
         if (q == 0) {
@@ -935,7 +952,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         if (q > 255) {
             q = 255;
         }
-        work->quant[1][i] = q;
+        quant[1][i] = q;
         work->divisors[1][i] = sJpegEncAanScales[i] / (s32)q;
     }
 
@@ -990,20 +1007,22 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     }
     dst[pos++] = 0;
     for (i = 0; i < 64; i++) {
-        dst[pos++] = work->quant[0][sJpegEncZigzag[i]];
+        dst[pos] = quant[0][sJpegEncZigzag[i]];
+        pos++;
     }
     dst[pos++] = 1;
     for (i = 0; i < 64; i++) {
-        dst[pos++] = work->quant[1][sJpegEncZigzag[i]];
+        dst[pos] = quant[1][sJpegEncZigzag[i]];
+        pos++;
     }
 
     // DHT
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->dcLum, 0);
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->acLum, 2);
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->dcChrom, 1);
-    JpegEnc_SetupHuffmanTable(&work->huffWork, &work->acChrom, 3);
-    dhtLength = 2 + JpegEnc_GetHuffmanTableLength(&work->dcLum) + JpegEnc_GetHuffmanTableLength(&work->dcChrom) +
-                JpegEnc_GetHuffmanTableLength(&work->acLum) + JpegEnc_GetHuffmanTableLength(&work->acChrom);
+    JpegEnc_SetupHuffmanTable(huffWork, dcLum, 0);
+    JpegEnc_SetupHuffmanTable(huffWork, acLum, 2);
+    JpegEnc_SetupHuffmanTable(huffWork, dcChrom, 1);
+    JpegEnc_SetupHuffmanTable(huffWork, acChrom, 3);
+    dhtLength = 2 + JpegEnc_GetHuffmanTableLength(dcLum) + JpegEnc_GetHuffmanTableLength(dcChrom) +
+                JpegEnc_GetHuffmanTableLength(acLum) + JpegEnc_GetHuffmanTableLength(acChrom);
     if (pos + 4 >= sJpegEncLimit) {
         return 0;
     }
@@ -1013,19 +1032,19 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     dst[pos + 3] = dhtLength;
     pos += 4;
     dst[pos++] = 0x00;
-    if (!JpegEnc_WriteHuffmanTable(&work->dcLum, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(dcLum, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x01;
-    if (!JpegEnc_WriteHuffmanTable(&work->dcChrom, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(dcChrom, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x10;
-    if (!JpegEnc_WriteHuffmanTable(&work->acLum, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(acLum, dst, &pos)) {
         return 0;
     }
     dst[pos++] = 0x11;
-    if (!JpegEnc_WriteHuffmanTable(&work->acChrom, dst, &pos)) {
+    if (!JpegEnc_WriteHuffmanTable(acChrom, dst, &pos)) {
         return 0;
     }
 
@@ -1038,39 +1057,40 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         return 0;
     }
     for (i = 0; i < sizeof(sJpegEncSosHeader); i++) {
-        dst[pos++] = sJpegEncSosHeader[i];
+        dst[pos] = sJpegEncSosHeader[i];
+        pos++;
     }
     for (y = 0; y < mcusY; y++) {
         for (x = 0; x < mcusX; x++) {
             if (sampling == SSP_JPEG_444) {
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x, y)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x, y)) {
                     return 0;
                 }
             } else if (sampling == SSP_JPEG_420) {
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2, y * 2)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, y * 2)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2 + 1, y * 2)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, y * 2)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2, y * 2 + 1)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, y * 2 + 1)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2 + 1, y * 2 + 1)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, y * 2 + 1)) {
                     return 0;
                 }
             } else {
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2, y)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, y)) {
                     return 0;
                 }
-                if (!JpegEnc_EncodeBlock(&work->dcLum, &work->acLum, &components[0], dst, &pos, x * 2 + 1, y)) {
+                if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2 + 1, y)) {
                     return 0;
                 }
             }
-            if (!JpegEnc_EncodeBlock(&work->dcChrom, &work->acChrom, &components[1], dst, &pos, x, y)) {
+            if (!JpegEnc_EncodeBlock(dcChrom, acChrom, &components[1], dst, &pos, x, y)) {
                 return 0;
             }
-            if (!JpegEnc_EncodeBlock(&work->dcChrom, &work->acChrom, &components[2], dst, &pos, x, y)) {
+            if (!JpegEnc_EncodeBlock(dcChrom, acChrom, &components[2], dst, &pos, x, y)) {
                 return 0;
             }
         }
@@ -1089,7 +1109,8 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     if (isThumbnail) {
         // The thumbnail is padded to an even size
         if ((pos & 1) == 1) {
-            dst[pos++] = 0;
+            dst[pos] = 0;
+            pos++;
         }
         return pos;
     }

@@ -312,7 +312,7 @@ static void WbtList_ShowLineJoint(WbtList *work);
 static void WbtList_ResetBracket(WbtList *work);
 static void WbtList_InitEntrants(WbtList *work);
 static void WbtList_InitMatches(WbtList *work);
-static s32 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset);
+static s16 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset);
 static BOOL WbtList_NextStep(WbtList *work);
 static BOOL WbtList_IsLastStep(WbtList *work);
 static void WbtList_ShuffleLines(WbtList *work);
@@ -973,15 +973,10 @@ static void WbtList_SavePalettes(WbtList *work, s32 count, s32 start, s32 sub) {
     sys_memcpy16(src + start * 16, work->palettes, count * 0x20);
 }
 
-// Turns one of the kept palettes gray, or back; with palette -1, all back
-static void WbtList_SetPaletteGray(WbtList *work, s32 palette, s32 start, BOOL restore) {
+// Makes the gray version of one of the kept palettes
+static inline void WbtList_MakeGrayPalette(WbtList *work, u32 palette) {
     s32 i;
 
-    if (palette == -1) {
-        NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, start * 0x20, work->palettes,
-                                           sizeof(work->palettes));
-        return;
-    }
     for (i = 0; i < 16; i++) {
         u16 color = work->palettes[palette][i];
         u16 b = (color >> 10) & 0x1f;
@@ -991,6 +986,16 @@ static void WbtList_SetPaletteGray(WbtList *work, s32 palette, s32 start, BOOL r
 
         work->grayPalettes[palette][i] = (gray << 10) + (gray << 5) + gray;
     }
+}
+
+// Turns one of the kept palettes gray, or back; with palette -1, all back
+static void WbtList_SetPaletteGray(WbtList *work, s32 palette, s32 start, BOOL restore) {
+    if (palette == -1) {
+        NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, start * 0x20, work->palettes,
+                                           sizeof(work->palettes));
+        return;
+    }
+    WbtList_MakeGrayPalette(work, palette);
     if (!restore) {
         NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, (palette + start) * 0x20,
                                            work->grayPalettes[palette], sizeof(work->grayPalettes[palette]));
@@ -1144,8 +1149,8 @@ static void WbtList_MoveColumns(WbtList *work) {
 static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
     WordSet *wordSet = GFL_WordSetSystemCreate(8, 40, work->heapId);
     s32 words = 0;
-    s32 first;
-    s32 second;
+    s16 first;
+    s16 second;
     StrBuf *src;
     BmpWin *window;
 
@@ -1266,16 +1271,18 @@ static s32 WbtList_GetPosition(WbtList *work, u32 index) {
 
 // Shows one of the bracket's lines from the winner's end, drawing itself or drawn
 static void WbtList_ShowLine(WbtList *work, s32 line, s32 drawn, s32 side) {
-    s32 index = line * 2 * LINE_VALUE_COUNT + side * LINE_VALUE_COUNT;
+    s32 index = line * 2 * LINE_VALUE_COUNT;
     s16 position;
     s16 flags;
     ClActorPos pos;
 
-    func_0204c488(work->actors[ACTOR_LINE + line], sWbtListLines[index + LINE_SEQUENCE + drawn]);
+    index += side * LINE_VALUE_COUNT;
+    func_0204c488(work->actors[ACTOR_LINE + line], sWbtListLines[drawn + (index + LINE_SEQUENCE)]);
     func_0204c124(work->actors[ACTOR_LINE + line], TRUE);
     func_0204c520(work->actors[ACTOR_LINE + line], TRUE);
     position = sWbtListLines[index + LINE_POSITION];
-    flags = sWbtListLines[index + LINE_FLAGS];
+    // The sum's order folds the column into the load's base, as *(data + pos + 1) does
+    flags = *(sWbtListLines + index + LINE_FLAGS);
     if (flags & ACTOR_FLAG_FLIP_Y) {
         func_0204c2b0(work->actors[ACTOR_LINE + line], 1, TRUE);
     } else {
@@ -1499,8 +1506,8 @@ static void WbtList_InitMatches(WbtList *work) {
 }
 
 // A MATCH_* value of the mode's current step, or of one at an offset from it
-static s32 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset) {
-    s32 value = 0;
+static s16 WbtList_GetMatchValue(WbtList *work, s32 field, s32 offset) {
+    s16 value = 0;
 
     if (work->mode == MODE_FIRST_ROUND) {
         offset += work->step + 3;

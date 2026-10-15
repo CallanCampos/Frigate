@@ -70,13 +70,13 @@ static void Demo3DExpCCruiser_Init(Demo3DExp *exp) {
         work->position = POSITION_COUNT - 1;
     }
     unit = Demo3DGraphic_GetClActUnit(exp->graphic);
+    setup.vramType = 1;
+    setup.flags = 0;
     setup.arcId = ARCID_DEMO3D_C_CRUISER;
     setup.paletteFile = 4;
     setup.charFile = 10;
     setup.cellFile = 13;
     setup.animFile = 20;
-    setup.vramType = 1;
-    setup.flags = 0;
     setup.paletteOffset = 0;
     setup.paletteStart = 0;
     setup.paletteCount = 1;

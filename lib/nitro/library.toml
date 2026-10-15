@@ -22,6 +22,7 @@ flags = [
 # The multiboot library (libmb), which overlay 181 links for the parent of DS Download Play, is Thumb code like the
 # game's, with -ipa file (its statics and the globals it defines are reached from one base) and -inline on,noauto
 [file_flags]
+"card/card_pull_out.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_cache.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_comm.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_frame.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
@@ -29,3 +30,21 @@ flags = [
 "mb/mb_segment.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_task.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
 "mb/mb_wm.c" = ["-thumb", "-ipa file", "-inline on,noauto"]
+
+# libfx is Thumb, with its ARM functions in #pragma thumb off
+"fx/fx.c" = ["-thumb"]
+"fx/fx_atanidx.c" = ["-thumb"]
+"fx/fx_cp.c" = ["-thumb"]
+"fx/fx_mtx22.c" = ["-thumb"]
+"fx/fx_mtx33.c" = ["-thumb"]
+"fx/fx_mtx43.c" = ["-thumb"]
+"fx/fx_mtx44.c" = ["-thumb"]
+"fx/fx_sincos.c" = ["-thumb"]
+"fx/fx_trig.c" = ["-thumb"]
+"fx/fx_vec.c" = ["-thumb"]
+
+# libmath's Thumb files, with their ARM functions in #pragma thumb off
+"math/math_crc.c" = ["-thumb"]
+"math/math_md5.c" = ["-thumb"]
+"math/math_sha1.c" = ["-thumb"]
+"math/math_pop.c" = ["-thumb"]

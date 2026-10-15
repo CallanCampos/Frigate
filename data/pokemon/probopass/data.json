@@ -180,5 +180,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 165,
-    "baby_species": "SPECIES_NOSEPASS"
+    "baby_species": "SPECIES_NOSEPASS",
+    "cry_volume": 120
 }

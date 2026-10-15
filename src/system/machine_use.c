@@ -1,5 +1,6 @@
 #include "types.h"
 #include "gfl/ui.h"
+#include "nitro/fx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/mic.h"
@@ -46,7 +47,7 @@ void SystemInit(void) {
     func_0207bbf4();
     func_0207cb88();
     gfxInit();
-    func_02074658();
+    FX_Init();
 
     if (func_0207ac24() & CONSOLE_TYPE_DEV_MASK) {
         func_0207f6e8(1);

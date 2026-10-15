@@ -17,10 +17,12 @@ src/ov216/guru2_comm.c:
     .data       start:0x021c1148 end:0x021c1158
 
 src/ov216/guru2_receipt.c:
+    complete
     .text       start:0x021bbcd8 end:0x021bd6e0
     .rodata     start:0x021c09cc end:0x021c0b74
 
 src/ov216/guru2_main.c:
+    complete
     .text       start:0x021bd6e0 end:0x021c0910
     .rodata     start:0x021c0b74 end:0x021c1134
     .data       start:0x021c1158 end:0x021c11c0

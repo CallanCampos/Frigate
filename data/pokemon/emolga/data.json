@@ -128,5 +128,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 144,
-    "baby_species": "SPECIES_EMOLGA"
+    "baby_species": "SPECIES_EMOLGA",
+    "cry_volume": 127
 }

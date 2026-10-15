@@ -6,10 +6,12 @@
 
 src/ov036/fieldmap.c:
     .text       start:0x0217f600 end:0x021814dc
+    .rodata     start:0x021c9eb8 end:0x021ca844
     .data       start:0x021d4b20 end:0x021d4b2c
 
 src/ov036/field_buildmodel.c:
     .text       start:0x0218304c end:0x02184244
+    .rodata     start:0x021ca8ac end:0x021ca930
     .data       start:0x021d4b2c end:0x021d4b40
 
 src/ov036/field_g3d_mapper.c:
@@ -24,6 +26,7 @@ src/ov036/fieldmap_ctrl_hybrid.c:
 
 src/ov036/scrcmd_medal.c:
     .text       start:0x021c7b38 end:0x021c7fd8
+    .rodata     start:0x021d4684 end:0x021d4704
 
 src/ov036/fld_vreq.c:
     complete
@@ -319,3 +322,327 @@ src/ov036/shortcut_menu.c:
     .rodata     start:0x021d2248 end:0x021d22a8
     .data       start:0x021d54e0 end:0x021d54f0
     .bss        start:0x021dd940 end:0x021dd94c
+
+src/ov036/fieldmap_event.c:
+    .text       start:0x021814dc end:0x0218304c
+    .rodata     start:0x021ca844 end:0x021ca8ac
+
+src/ov036/field_camera.c:
+    .text       start:0x021856a0 end:0x02186ed0
+    .rodata     start:0x021ca988 end:0x021ca9ac
+    .data       start:0x021d4b60 end:0x021d4b98
+
+src/ov036/field_camera_anime.c:
+    .text       start:0x02186ed0 end:0x021876d0
+    .data       start:0x021d4b98 end:0x021d4bb0
+
+src/ov036/field_msgbg.c:
+    .text       start:0x021876d0 end:0x0218a7f8
+    .rodata     start:0x021ca9ac end:0x021caab4
+    .data       start:0x021d4bb0 end:0x021d4bc0
+
+src/ov036/field_wfbc.c:
+    .text       start:0x0218adac end:0x0218ae38
+    .data       start:0x021d4bc0 end:0x021d4bd0
+
+src/ov036/field_comm_actor.c:
+    .text       start:0x0218ae38 end:0x0218b12c
+    .rodata     start:0x021caab4 end:0x021caad8
+    .data       start:0x021d4bd0 end:0x021d4be4
+
+src/ov036/ctalkmsgwin.c:
+    .text       start:0x0218b1f8 end:0x0218d0f4
+    .data       start:0x021d4be4 end:0x021d4c34
+
+src/ov036/ircbattlemenu.c:
+    .text       start:0x0218d0f4 end:0x0218ed18
+    .rodata     start:0x021caad8 end:0x021cacf4
+    .data       start:0x021d4c34 end:0x021d4d34
+
+src/ov036/field_menu_event.c:
+    .text       start:0x0218b12c end:0x0218b1f8
+
+src/ov036/fldmmdl_acmd.c:
+    .text       start:0x0218ed18 end:0x02193680
+    .rodata     start:0x021cacf4 end:0x021ce3a0
+    .data       start:0x021d4d34 end:0x021d4d50
+
+src/ov036/fldmmdl_blact.c:
+    .text       start:0x02193680 end:0x021946b4
+    .rodata     start:0x021ce3a0 end:0x021cf2e4
+    .data       start:0x021d4d50 end:0x021d4d60
+
+src/ov036/fldmmdl_g3dobj.c:
+    .text       start:0x021946b4 end:0x02195378
+    .rodata     start:0x021cf2e4 end:0x021cf3a8
+    .data       start:0x021d4d60 end:0x021d4d74
+
+src/ov036/fld_act_rail.c:
+    .text       start:0x02195378 end:0x02196238
+    .rodata     start:0x021cf3a8 end:0x021cf768
+    .data       start:0x021d4d74 end:0x021d4d98
+
+src/ov036/field_rail_loader.c:
+    .text       start:0x02196238 end:0x02197534
+    .rodata     start:0x021cf768 end:0x021cf9dc
+    .data       start:0x021d4d98 end:0x021d4dfc
+
+src/ov036/field_fog.c:
+    .text       start:0x02197534 end:0x02197710
+    .data       start:0x021d4dfc end:0x021d4e08
+
+src/ov036/field_zonefog.c:
+    .text       start:0x02197710 end:0x02197820
+    .data       start:0x021d4e08 end:0x021d4e18
+
+src/ov036/field_light.c:
+    .text       start:0x02197820 end:0x02198198
+    .data       start:0x021d4e18 end:0x021d4e28
+
+src/ov036/field_subscreen.c:
+    .text       start:0x02198198 end:0x02198bc0
+    .rodata     start:0x021cf9dc end:0x021cf9ec
+    .data       start:0x021d4e28 end:0x021d4e3c
+
+src/ov036/field_3dbg.c:
+    .text       start:0x02198bc0 end:0x02199004
+    .data       start:0x021d4e3c end:0x021d4e4c
+
+src/ov036/weather.c:
+    .text       start:0x02199004 end:0x021993e0
+    .rodata     start:0x021cf9ec end:0x021cfbe4
+    .data       start:0x021d4e4c end:0x021d4e60
+
+src/ov036/weather_task.c:
+    .text       start:0x021993e0 end:0x0219a3b4
+    .rodata     start:0x021cfbe4 end:0x021cfbfc
+    .data       start:0x021d4e60 end:0x021d4e70
+
+src/ov036/fieldmap_ctrl_grid.c:
+    .text       start:0x0219a3b4 end:0x0219a47c
+    .rodata     start:0x021cfbfc end:0x021cfc10
+    .data       start:0x021d4e70 end:0x021d4e88
+
+src/ov036/field_player_core.c:
+    .text       start:0x0219ad4c end:0x0219b7a8
+    .rodata     start:0x021cfc60 end:0x021cfcf0
+    .data       start:0x021d4e98 end:0x021d4eac
+
+src/ov036/field_player_nogrid.c:
+    .text       start:0x0219cea0 end:0x0219e328
+    .rodata     start:0x021cfdcc end:0x021cfdf4
+    .data       start:0x021d4ec0 end:0x021d4efc
+
+src/ov036/fieldmap_ctrl_nogrid_work.c:
+    .text       start:0x0219e328 end:0x0219e430
+    .rodata     start:0x021cfdf4 end:0x021cfe1c
+    .data       start:0x021d4efc end:0x021d4f18
+
+src/ov036/scrcmd_pokemon_misc.c:
+    .text       start:0x021aedf4 end:0x021afa2c
+
+src/ov036/scrcmd_pokemon_fld.c:
+    .text       start:0x021afa2c end:0x021afcd4
+    .data       start:0x021d5218 end:0x021d5230
+
+src/ov036/field_rail.c:
+    .text       start:0x021b0228 end:0x021b3a3c
+    .rodata     start:0x021d0f98 end:0x021d1004
+    .data       start:0x021d5230 end:0x021d525c
+
+src/ov036/union_mine_pms.c:
+    .text       start:0x021b445c end:0x021b46b0
+    .rodata     start:0x021d1078 end:0x021d1080
+    .data       start:0x021d52a0 end:0x021d5324
+
+src/ov036/fldeff_reflect.c:
+    .text       start:0x021b496c end:0x021b4eb4
+    .rodata     start:0x021d10d8 end:0x021d1110
+    .data       start:0x021d5338 end:0x021d534c
+
+src/ov036/field_place_name.c:
+    .text       start:0x021b4eb4 end:0x021b5b7c
+    .rodata     start:0x021d1110 end:0x021d1140
+    .data       start:0x021d534c end:0x021d5360
+
+src/ov036/field_fmission_info.c:
+    .text       start:0x021b5b7c end:0x021b64b0
+    .rodata     start:0x021d1140 end:0x021d1170
+    .data       start:0x021d5360 end:0x021d5378
+
+src/ov036/fes_gimmick.c:
+    .text       start:0x021b64b0 end:0x021b6824
+    .data       start:0x021d5378 end:0x021d5388
+
+src/ov036/place_name_letter.c:
+    .text       start:0x021b6824 end:0x021b733c
+    .rodata     start:0x021d1170 end:0x021d1244
+    .data       start:0x021d5388 end:0x021d53c4
+
+src/ov036/entrance_camera.c:
+    .text       start:0x021b733c end:0x021b7f7c
+    .rodata     start:0x021d1244 end:0x021d1274
+    .data       start:0x021d53c4 end:0x021d53d8
+
+src/ov036/field_gimmick.c:
+    .text       start:0x021b7f7c end:0x021b804c
+    .rodata     start:0x021d1274 end:0x021d1624
+
+src/ov036/fld_exp_obj.c:
+    .text       start:0x021b804c end:0x021b86d4
+    .rodata     start:0x021d1624 end:0x021d1634
+    .data       start:0x021d53d8 end:0x021d53e8
+
+src/ov036/field_transition.c:
+    .text       start:0x021b86d4 end:0x021b9494
+    .rodata     start:0x021d1634 end:0x021d1754
+
+src/ov036/field_fade.c:
+    .text       start:0x021b9494 end:0x021ba5d0
+    .rodata     start:0x021d1754 end:0x021d1760
+    .data       start:0x021d53e8 end:0x021d53f8
+
+src/ov036/height_ex.c:
+    .text       start:0x021ba5d0 end:0x021ba81c
+    .rodata     start:0x021d1760 end:0x021d176c
+    .data       start:0x021d53f8 end:0x021d5404
+
+src/ov036/field_player_grid_event.c:
+    .text       start:0x021ba81c end:0x021bb590
+    .rodata     start:0x021d176c end:0x021d1784
+    .data       start:0x021d5404 end:0x021d5420
+
+src/ov036/fld_particle.c:
+    .text       start:0x021bb590 end:0x021bb67c
+    .rodata     start:0x021d1784 end:0x021d1c80
+    .data       start:0x021d5420 end:0x021d5430
+
+src/ov036/fld3d_ci.c:
+    .text       start:0x021bb67c end:0x021bd2ac
+    .rodata     start:0x021d1c80 end:0x021d20e4
+    .data       start:0x021d5430 end:0x021d54a4
+
+src/ov036/sodateya.c:
+    .text       start:0x021bd2ac end:0x021be790
+    .rodata     start:0x021d20e4 end:0x021d220c
+    .data       start:0x021d54a4 end:0x021d54b0
+
+src/ov036/fldeff_ripple.c:
+    .text       start:0x021be790 end:0x021be988
+    .rodata     start:0x021d220c end:0x021d2234
+    .data       start:0x021d54b0 end:0x021d54c4
+
+src/ov036/fldeff_splash.c:
+    .text       start:0x021be988 end:0x021beb70
+    .rodata     start:0x021d2234 end:0x021d2248
+    .data       start:0x021d54c4 end:0x021d54d4
+
+src/ov036/field_g3dobj.c:
+    .text       start:0x021bfe88 end:0x021c05d4
+    .data       start:0x021d54f0 end:0x021d5500
+
+src/ov036/fieldmap_tcb_camera_zoom.c:
+    .text       start:0x021c05d4 end:0x021c0870
+    .data       start:0x021d5500 end:0x021d551c
+
+src/ov036/field_task.c:
+    .text       start:0x021c0870 end:0x021c0914
+    .data       start:0x021d551c end:0x021d552c
+
+src/ov036/field_task_manager.c:
+    .text       start:0x021c0914 end:0x021c1bc4
+    .rodata     start:0x021d22a8 end:0x021d22c0
+    .data       start:0x021d552c end:0x021d5544
+
+src/ov036/field_flash.c:
+    .text       start:0x021c1bc4 end:0x021c1d88
+    .rodata     start:0x021d22c0 end:0x021d22d0
+    .data       start:0x021d5544 end:0x021d5554
+
+src/ov036/fieldskill_mapeff.c:
+    .text       start:0x021c1d88 end:0x021c1e30
+    .data       start:0x021d5554 end:0x021d5568
+
+src/ov036/fld_wipe_3dobj.c:
+    .text       start:0x021c1e30 end:0x021c2080
+    .rodata     start:0x021d22d0 end:0x021d234c
+    .data       start:0x021d5568 end:0x021d557c
+
+src/ov036/pleasure_boat.c:
+    .text       start:0x021c2080 end:0x021c229c
+    .data       start:0x021d557c end:0x021d558c
+
+src/ov036/field_slope_slip.c:
+    .text       start:0x021c229c end:0x021c24b4
+    .rodata     start:0x021d234c end:0x021d236c
+
+src/ov036/field_water_current.c:
+    .text       start:0x021c24b4 end:0x021c2788
+    .rodata     start:0x021d236c end:0x021d2394
+
+src/ov036/fldeff_d06denki.c:
+    .text       start:0x021c2788 end:0x021c2cbc
+    .rodata     start:0x021d2394 end:0x021d24a8
+    .data       start:0x021d558c end:0x021d55a0
+
+src/ov036/land_data_patch.c:
+    .text       start:0x021c2cbc end:0x021c2ddc
+    .data       start:0x021d55a0 end:0x021d55b4
+
+src/ov036/fldeff_iaigiri.c:
+    .text       start:0x021c2ddc end:0x021c3180
+    .rodata     start:0x021d24a8 end:0x021d24f8
+    .data       start:0x021d55b4 end:0x021d55d4
+
+src/ov036/party_select_list.c:
+    .text       start:0x021c3180 end:0x021c3c34
+    .rodata     start:0x021d24f8 end:0x021d2540
+    .data       start:0x021d55d4 end:0x021d5620
+
+src/ov036/field_bbd_color.c:
+    .text       start:0x021c3c34 end:0x021c3d9c
+    .rodata     start:0x021d2540 end:0x021d2560
+    .data       start:0x021d5620 end:0x021d5634
+
+src/ov036/comm_entry_menu.c:
+    .text       start:0x021c3d9c end:0x021c5d7c
+    .rodata     start:0x021d2560 end:0x021d25ec
+    .data       start:0x021d5634 end:0x021d5648
+
+src/ov036/enceff.c:
+    .text       start:0x021c5d7c end:0x021c649c
+    .rodata     start:0x021d25ec end:0x021d2920
+    .data       start:0x021d5648 end:0x021d5654
+
+src/ov036/fldeff_btrain.c:
+    .text       start:0x021c649c end:0x021c66e8
+    .rodata     start:0x021d2920 end:0x021d2988
+    .data       start:0x021d5654 end:0x021d5664
+
+src/ov036/fldeff_hide.c:
+    .text       start:0x021c66e8 end:0x021c6934
+    .rodata     start:0x021d2988 end:0x021d29b4
+    .data       start:0x021d5664 end:0x021d5674
+
+src/ov036/fldeff_bubble.c:
+    .text       start:0x021c6934 end:0x021c6cc8
+    .rodata     start:0x021d29b4 end:0x021d29e0
+    .data       start:0x021d5674 end:0x021d56c0
+
+src/ov036/field_saveanime.c:
+    .text       start:0x021c6cc8 end:0x021c7028
+    .rodata     start:0x021d29e0 end:0x021d2a04
+    .data       start:0x021d56c0 end:0x021d56d4
+
+src/ov036/scrcmd_field.c:
+    .text       start:0x021c71d4 end:0x021c7b38
+    .rodata     start:0x021d4588 end:0x021d4684
+
+src/ov036/scrcmd_hidden_hollow.c:
+    .text       start:0x021c8c34 end:0x021c944c
+    .rodata     start:0x021d4818 end:0x021d48f4
+
+src/ov036/fldeff_ochiba.c:
+    .text       start:0x021c944c end:0x021c97b8
+    .rodata     start:0x021d48f4 end:0x021d4920
+    .data       start:0x021d5758 end:0x021d5768

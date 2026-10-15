@@ -2,7 +2,7 @@
     "$schema": "zone.schema.json",
     "map_type": 0,
     "npc_cache": 24,
-    "area": 381,
+    "area": "AREA_PWT_3",
     "matrix": "MAP_MATRIX_PWT_3",
     "scripts": "SCRIPTS_PWT_3",
     "text": "SCRIPT_TEXT_PWT_3",

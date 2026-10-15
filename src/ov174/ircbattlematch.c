@@ -453,7 +453,7 @@ static void IrcBattleMatch_OnNegotiated(void *work_, int netId) {
     IrcBattleMatch *work = work_;
 
     work->acceptedPlayers |= 1 << netId;
-    if (countOneBits(work->acceptedPlayers) >= 2) {
+    if (MATH_CountPopulation(work->acceptedPlayers) >= 2) {
         work->enoughPlayers = TRUE;
     }
 }
@@ -1274,11 +1274,15 @@ static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG0:
         init.unk6E = 0x11;
         init.gameCommandBase = 0x13;
-        goto musical;
+        init.bMPMode = TRUE;
+        init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
+        init.maxSendSize = work->param->musicalNetInit->maxSendSize;
+        init.unk6C = work->param->musicalNetInit->unk6C;
+        work->shownCount = -1;
+        break;
     case IRCBATTLEMATCH_MODE_MUSICAL_ARG1:
         init.unk6E = 0x11;
         init.gameCommandBase = 0x12;
-    musical:
         init.bMPMode = TRUE;
         init.maxConnectNum = work->param->musicalNetInit->maxConnectNum;
         init.maxSendSize = work->param->musicalNetInit->maxSendSize;
@@ -1287,16 +1291,20 @@ static void IrcBattleMatch_StateStartNet(IrcBattleMatch *work) {
         break;
     }
     func_020425ec(&init, NULL, work);
-    if (work->mode == IRCBATTLEMATCH_MODE_MULTI) {
-        func_020429d8(0x25);
-    } else if (work->mode == IRCBATTLEMATCH_MODE_MUSICAL_ARG0) {
-        func_020429e8(IrcBattleMatch_IsSameMusicalGame);
-        func_02042a40(0);
-        func_020429d8(0x11);
-    } else if (work->mode == IRCBATTLEMATCH_MODE_MUSICAL_ARG1) {
+    switch (work->mode) {
+    case IRCBATTLEMATCH_MODE_MUSICAL_ARG1:
         func_020429e8(IrcBattleMatch_IsSameMusicalGame);
         func_02042a40(1);
         func_020429d8(0x11);
+        break;
+    case IRCBATTLEMATCH_MODE_MUSICAL_ARG0:
+        func_020429e8(IrcBattleMatch_IsSameMusicalGame);
+        func_02042a40(0);
+        func_020429d8(0x11);
+        break;
+    case IRCBATTLEMATCH_MODE_MULTI:
+        func_020429d8(0x25);
+        break;
     }
     IrcBattleMatch_CreateBackMenu(work, FALSE);
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateWaitNet);

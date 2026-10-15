@@ -1339,9 +1339,11 @@ static u32 ResortSys_ChoosePersonType(ResortPersonData *data, ResortSys *sys, Ga
         JoinAvenuePerson *person = func_02038860(occupants, i);
 
         if (!JoinAvenuePerson_IsEmpty(person)) {
+            u32 shopKind;
+
             func_02038470(person);
-            if (ResortShopData_GetShopParam(ResortShopData_GetPersonShop(ResortSys_GetShopData(sys), person), 0) ==
-                playerShopKind) {
+            shopKind = ResortShopData_GetShopParam(ResortShopData_GetPersonShop(ResortSys_GetShopData(sys), person), 0);
+            if (shopKind == playerShopKind) {
                 hasPlayerShop = TRUE;
                 break;
             }
@@ -1402,8 +1404,6 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
     StrBuf *lineBuf;
     s32 i;
     s32 j;
-    ResortRankEntry *upper;
-    ResortRankEntry *lower;
 
     for (i = 0; i < RESORT_PERSON_COUNT + 1; i++) {
         entries[i].index = -1;
@@ -1419,8 +1419,11 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
                 ResortRankEntry *entry = &entries[count];
 
                 entry->index = j;
-                entry->value = joinAveTextHandler(
-                    person, page < 8 ? JOIN_AVE_PARAM_RECORD1 + page : JOIN_AVE_PARAM_MEDAL_COUNT, NULL);
+                if (page < 8) {
+                    entry->value = joinAveTextHandler(person, JOIN_AVE_PARAM_RECORD1 + page, NULL);
+                } else {
+                    entry->value = joinAveTextHandler(person, JOIN_AVE_PARAM_MEDAL_COUNT, NULL);
+                }
                 if (entry->value != 0) {
                     count++;
                 }
@@ -1437,14 +1440,14 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
 
     for (i = 0; i < count; i++) {
         for (j = count; j > i; j--) {
-            upper = &entries[j - 1];
-            lower = &entries[j];
-            if (upper->value < lower->value) {
-                u32 index = upper->index;
-                u32 value = upper->value;
+            ResortRankEntry *upper = &entries[j - 1];
+            u32 value = upper->value;
+            ResortRankEntry *lower = &entries[j];
 
-                upper->index = lower->index;
-                upper->value = lower->value;
+            if (value < lower->value) {
+                u32 index = upper->index;
+
+                *upper = *lower;
                 lower->value = value;
                 lower->index = index;
             }
@@ -1465,6 +1468,7 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
         ResortRankEntry *entry = &entries[i];
         u32 index = entry->index;
         JoinAvenuePerson *person;
+        u32 width;
         u32 y;
         u32 value;
         BOOL shared;
@@ -1478,8 +1482,9 @@ void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void 
         GFL_MsgDataLoadStrbuf(msgData, RESORT_MSG_RANK_PAGE + 9, templateBuf);
         WordSetNumber(wordSet, 0, rank + 1, 1, 1, 1);
         GFL_WordSetFormatStrbuf(wordSet, lineBuf, templateBuf);
+        width = GFL_FontGetBlockWidth(lineBuf, font, 0);
         y = (i * 2 + 3) * 8;
-        func_ov036_02187c4c(window, 40 - GFL_FontGetBlockWidth(lineBuf, font, 0), y, lineBuf);
+        func_ov036_02187c4c(window, 40 - width, y, lineBuf);
 
         GFL_MsgDataLoadStrbuf(msgData, RESORT_MSG_RANK_PAGE + 10, templateBuf);
         if (index == 8) {
@@ -1589,17 +1594,13 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
     ResortRankSelf entries[RESORT_PERSON_COUNT];
     s32 count;
     u32 position;
-    u32 record;
     u32 result;
-    s32 k;
     s32 i;
     s32 j;
-    s32 last;
 
     count = 0;
     result = 0;
     position = 0;
-    record = JOIN_AVE_PARAM_RECORD1 + page;
     for (i = 0; i < RESORT_PERSON_COUNT; i++) {
         entries[i].index = -1;
         entries[i].value = -1;
@@ -1615,7 +1616,11 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
                 ResortRankSelf *entry = &entries[count];
 
                 entry->index = i;
-                entry->value = joinAveTextHandler(other, page == 8 ? JOIN_AVE_PARAM_MEDAL_COUNT : record, NULL);
+                if (page == 8) {
+                    entry->value = joinAveTextHandler(other, JOIN_AVE_PARAM_MEDAL_COUNT, NULL);
+                } else {
+                    entry->value = joinAveTextHandler(other, JOIN_AVE_PARAM_RECORD1 + page, NULL);
+                }
                 if (person == other) {
                     entry->isSelf = TRUE;
                 }
@@ -1624,19 +1629,27 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
         }
     }
 
-    last = count - 1;
-    for (k = 0; k < last; k++) {
-        for (j = last; j > k; j--) {
-            ResortRankSelf *upper = &entries[j - 1];
-            ResortRankSelf *lower = &entries[j];
+    for (i = 0; i < count - 1; i++) {
+        for (j = count - 1; j > i; j--) {
+            s32 prev = j - 1;
 
-            if (upper->value < lower->value) {
-                u32 index = upper->index;
-                u32 value = upper->value;
+            if (entries[prev].value < entries[j].value) {
+                u32 value = entries[prev].value;
+                u32 index = entries[prev].index;
+#ifdef BUGFIX
+                BOOL isSelf = entries[prev].isSelf;
 
-                *upper = *lower;
-                lower->value = value;
-                lower->index = index;
+                entries[prev] = entries[j];
+                entries[j].value = value;
+                entries[j].index = index;
+                entries[j].isSelf = isSelf;
+#else
+                // BUG: only the value and the index are put back, so the person asked about loses isSelf when
+                // moved down and the function returns 8. Its callers only test for 0, which it isn't then anyway
+                entries[prev] = entries[j];
+                entries[j].value = value;
+                entries[j].index = index;
+#endif
             }
         }
     }
@@ -1647,6 +1660,7 @@ static u32 ResortSys_GetRecordRank(JoinAvenueOccupants *occupants, JoinAvenuePer
         if (entries[i].isSelf) {
             if (entries[i].value == 0) {
                 result = 8;
+                return result;
             }
             return result;
         }
@@ -2131,6 +2145,7 @@ BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPers
     u16 index;
     s32 count;
     s32 i;
+    u32 pick;
 
     ResortSys_GetInfo(sys);
     index = func_ov137_021f198c(a1);
@@ -2144,8 +2159,10 @@ BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPers
         }
     }
     if (count > 0) {
-        u32 pick = func_ov137_021f199c(a1, data, 23, count);
-        u32 near = 0;
+        u32 near;
+
+        pick = func_ov137_021f199c(a1, data, 23, count);
+        near = 0;
 
         for (i = 0; sPeopleRows[index].near[i] != -1; i++) {
             u8 id = sPeopleRows[index].near[i];
@@ -2169,8 +2186,10 @@ BOOL ResortSys_PickPersonToMeet(ResortSys *sys, ResortPersonData *a1, ResortPers
         }
     }
     if (count > 0) {
-        u32 pick = func_ov137_021f199c(a1, data, 24, count);
-        u32 near = 0;
+        u32 near;
+
+        pick = func_ov137_021f199c(a1, data, 24, count);
+        near = 0;
 
         for (i = 0; sPeopleRows[index].far[i] != -1; i++) {
             u8 id = sPeopleRows[index].far[i];
@@ -2247,7 +2266,7 @@ void ResortSys_MarkMet(ResortSys *sys, ResortPersonData *a1, u32 a2) {
     ResortWork_Set(work, RESORT_WORK_VISITS, ResortWork_Get(work, RESORT_WORK_VISITS) + 1);
 }
 
-u16 ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2) {
+BOOL ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2) {
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     s32 trainerIdMod;
     u32 rank;

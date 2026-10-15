@@ -411,12 +411,11 @@ static BOOL BrPokeSearch_IsLetterSeen(PokeDexSave *pokedex, u32 letter, const u1
 }
 
 static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, u32 letter, const u16 *table, u32 *num, HeapID heapId) {
+    u16 *buff;
+    u32 i;
     u32 end = sc_pokesearch_letter_index[letter + 1];
     u32 count = 0;
     u32 start = sc_pokesearch_letter_index[letter];
-    u32 i;
-    u32 j;
-    u16 *buff;
 
     for (i = start; i < end; i++) {
         if (PokeDex_IsSeen(pokedex, table[i])) {
@@ -427,15 +426,18 @@ static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, u32 letter, const 
     buff = GFL_HeapAllocate(heapId, count * sizeof(u16), FALSE, "br_pokesearch.c", 984);
     sys_memset(buff, 0, count * sizeof(u16));
 
-    i = 0;
-    for (j = start; j < end; j++) {
-        if (PokeDex_IsSeen(pokedex, table[j])) {
-            buff[i++] = table[j];
+    {
+        u32 n = 0;
+        for (i = start; i < end; i++) {
+            if (PokeDex_IsSeen(pokedex, table[i])) {
+                buff[n] = table[i];
+                n++;
+            }
         }
-    }
 
-    if (num != NULL) {
-        *num = i;
+        if (num != NULL) {
+            *num = n;
+        }
     }
     return buff;
 }

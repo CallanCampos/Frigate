@@ -16,6 +16,7 @@ src/ov287/b_plist_bmp.c:
     .rodata     start:0x021fae6c end:0x021fb0ac
 
 src/ov287/b_plist_obj.c:
+    complete
     .text       start:0x021f761c end:0x021f8754
     .rodata     start:0x021fb0ac end:0x021fb4a8
 
@@ -25,6 +26,7 @@ src/ov287/b_plist_cursor.c:
     .rodata     start:0x021fb618 end:0x021fb898
 
 src/ov287/b_plist_main.c:
+    complete
     .text       start:0x021f8754 end:0x021fad10
     .rodata     start:0x021fb4a8 end:0x021fb618
     .data       start:0x021fb8b0 end:0x021fb8c0

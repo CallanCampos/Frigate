@@ -37,31 +37,95 @@ typedef struct {
     u16 table[256];
 } MATHCRC16Table;
 
+// Added for math_crc.c: the CRC-8 and CRC-32 tables
 typedef struct {
-    u8 data[0x60];
+    u8 table[256];
+} MATHCRC8Table;
+
+typedef struct {
+    u32 table[256];
+} MATHCRC32Table;
+
+// The state of an MD5 or SHA-1 digest: the chaining words, the block being filled and the count of what was fed in
+typedef struct {
+    u32 state[4];
+    u64 length; // in bytes
+    union {
+        u8 bytes[64];
+        u32 words[16];
+    } block;
+} MATHMD5Context;
+
+typedef struct {
+    u32 state[5];
+    union {
+        u8 bytes[64];
+        u32 words[16];
+    } block;
+    u32 blockPos;   // bytes of block filled
+    u32 blockCount; // 64-byte blocks processed, as a 64-bit count in two words
+    u32 blockCountHigh;
 } MATHSHA1Context;
+
+// What MATH_CalcHMACSHA1's generic HMAC needs to know about a hash: the sizes of its digest and block, a context and a
+// buffer for a digest, and its three calls
+typedef struct {
+    u32 digestSize;
+    u32 blockSize;
+    void *context;
+    void *digest;
+    void (*init)(void *context);
+    void (*update)(void *context, const void *data, u32 size);
+    void (*getHash)(void *context, void *digest);
+} MATHHashInfo;
 
 #define MATH_SHA1_DIGEST_SIZE 20
 
-// The number of set bits, NitroSDK's MATH_CountPopulation (swan's name)
-u8 countOneBits(u32 x);
+// libmath, in link order. The names are NitroSDK's, as pret's pokediamond and pmd-sky use them; functions with no SDK
+// name in pret have descriptive ones.
 
-// The number of leading zero bits: NitroSDK's MATH_CountLeadingZerosFunc (swan's name), which MATH_CountLeadingZeros
-// calls from Thumb code, where CLZ doesn't exist
-u32 countLeadingZeros(u32 x);
+// math_pop.c. Swan: countLeadingZeros, countOneBits
+// The number of leading zero bits, which MATH_CountLeadingZeros calls from Thumb code, where CLZ doesn't exist
+u32 MATH_CountLeadingZerosFunc(u32 x);
+// The number of set bits
+u8 MATH_CountPopulation(u32 x);
 
 static inline u32 MATH_CountLeadingZeros(u32 x) {
-    return countLeadingZeros(x);
+    return MATH_CountLeadingZerosFunc(x);
 }
 
+// math_md5.c (MD5) and math_sha1.c (SHA-1 and HMAC-SHA1); the ROM's data order says they are two files, not one
+void MATH_MD5Init(MATHMD5Context *context);
+void MATH_MD5Update(MATHMD5Context *context, const void *data, u32 size);
+void MATH_MD5GetHash(MATHMD5Context *context, void *digest);
+void MATH_SHA1Init(MATHSHA1Context *context);
+void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size);
+void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest);
+// The SHA-1 digest of size bytes, through the three above
+void MATH_CalcSHA1(u8 *digest, const void *data, u32 size);
+// HMAC-SHA1 of dataSize bytes under a key; the 20-byte digest is written to digest
+void MATH_CalcHMACSHA1(void *digest, const void *data, u32 dataSize, const void *key, u32 keySize);
+
+// math_crc.c. Swan: MATH_CRC16CCITTInitTable (MATHi_CRC16InitTable)
+void MATHi_CRC8InitTable(MATHCRC8Table *table, u8 poly);
+void MATHi_CRC16InitTable(MATHCRC16Table *table, u16 poly);
+void MATHi_CRC16InitTableRev(MATHCRC16Table *table, u16 poly);
+void MATHi_CRC16UpdateRev(const MATHCRC16Table *table, u16 *crc, const void *data, u32 size);
+void MATHi_CRC32InitTableRev(MATHCRC32Table *table, u32 poly);
+u8 MATH_CalcCRC8(const MATHCRC8Table *table, const void *data, u32 size);
+u16 MATH_CalcCRC16(const MATHCRC16Table *table, const void *data, u32 size);
+u16 MATH_CalcCRC16CCITT(const MATHCRC16Table *table, const void *data, u32 size);
+u32 MATH_CalcCRC32(const MATHCRC32Table *table, const void *data, u32 size);
+
+// math.c
 // Quicksort of num elements of width bytes; stackBuffer may be NULL
 typedef s32 (*MATHCompareFunc)(void *a, void *b);
 void MATH_QSort(void *head, u32 num, u32 width, MATHCompareFunc comp, void *stackBuffer);
 
-void MATH_CRC16CCITTInitTable(MATHCRC16Table *table, u16 poly);
-u16 MATH_CalcCRC16CCITT(const MATHCRC16Table *table, const void *data, u32 size);
-void MATH_SHA1Init(MATHSHA1Context *context);
-void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size);
-void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest);
+// sha1_block.c
+// The SHA-1 compression of the context's block into its state, in ARM
+void sha1_block(MATHSHA1Context *context);
+// The 16 bytes of SHA-1 round constants in front of sha1_block; data, not code, and never called
+void sha1_block_constants(void);
 
 #endif // POKEBW2_NITRO_MATH_H

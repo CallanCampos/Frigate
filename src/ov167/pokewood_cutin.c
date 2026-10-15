@@ -823,9 +823,9 @@ static void AccelMotion_Init(CutinAccelMotion *motion, const CutinPoint *start, 
     VEC_Set(&motion->pos, FX32_CONST(start->x), FX32_CONST(start->y), 0);
     VEC_Set(&motion->start, FX32_CONST(start->x), FX32_CONST(start->y), 0);
     VEC_Set(&motion->end, FX32_CONST(end->x), FX32_CONST(end->y), 0);
-    dist = vecfx_dist(&motion->end, &motion->start);
+    dist = VEC_Distance(&motion->end, &motion->start);
     VEC_Subtract(&motion->end, &motion->start, &motion->dir);
-    vecfx_normalize(&motion->dir, &motion->dir);
+    VEC_Normalize(&motion->dir, &motion->dir);
     // From dist = speed * frames + accel * frames * frames / 2
     accel = FX_Div((dist - speed * frames) * 2, frames * frames * FX32_ONE);
     motion->speed = speed;
@@ -837,7 +837,7 @@ static void AccelMotion_Init(CutinAccelMotion *motion, const CutinPoint *start, 
 static BOOL AccelMotion_Update(CutinAccelMotion *motion) {
     if (motion->frame < motion->frames - 1) {
         motion->frame++;
-        vecfx_muladd(FX_Mul(motion->speed, motion->frame * FX32_ONE) +
+        VEC_MultAdd(FX_Mul(motion->speed, motion->frame * FX32_ONE) +
                          FX_Mul(motion->accel, motion->frame * motion->frame * FX32_ONE) / 2,
                      &motion->dir, &motion->start, &motion->pos);
         return FALSE;

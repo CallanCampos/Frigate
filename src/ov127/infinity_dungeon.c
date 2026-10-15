@@ -45,7 +45,7 @@ typedef struct {
 typedef u32 (*InfinityDungeonNpcScriptFunc)(InfinityDungeonNpcScriptArg *arg);
 
 static const u16 *InfinityDungeon_GetWallProps(InfinityDungeon *dungeon);
-static void InfinityDungeonRoomChange_CreateTrainerActor(InfinityDungeonRoomChange *roomChange, const InfinityDungeonPos *pos);
+static void InfinityDungeonRoomChange_CreateTrainerActor(const InfinityDungeonRoomChange *roomChange, const InfinityDungeonPos *pos);
 static BOOL func_ov127_021f00a8(KeyDataSave *keyData, InfinityDungeon *dungeon);
 static void func_ov127_021f0190(KeyDataSave *keyData, InfinityDungeon *dungeon);
 static u32 func_ov127_021f031c(InfinityDungeon *dungeon);
@@ -67,32 +67,6 @@ static void InfinityDungeon_PickReward(InfinityDungeon *dungeon, u32 rank, u32 s
 // The props that close a room's passages, in White 2 and in Black 2
 static const u16 sWhiteWallProps[INFINITY_DUNGEON_WALL_COUNT] = { 0x97, 0x9d, 0x9e, 0x9c };
 static const u16 sBlackWallProps[INFINITY_DUNGEON_WALL_COUNT] = { 0x96, 0x9a, 0x99, 0x9b };
-
-static const u16 sRewardWeightsRank0to4[6] = {
-    0x11, 0x11, 0x11, 0x11, 0x10, 0x10,
-};
-
-static const u16 sRewardItemsRank0to4[6] = {
-    ITEM_PROTEIN, ITEM_IRON, ITEM_CALCIUM, ITEM_ZINC, ITEM_CARBOS, ITEM_HP_UP,
-};
-
-static const u16 sRewardWeightsRank5to8[7] = {
-    0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xa,
-};
-
-static const u16 sRewardWeightsRank9[7] = {
-    0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xa,
-};
-
-static const u16 sRewardItemsRank5to8[7] = {
-    ITEM_HEALTH_WING, ITEM_MUSCLE_WING, ITEM_RESIST_WING, ITEM_GENIUS_WING, ITEM_CLEVER_WING, ITEM_SWIFT_WING,
-    ITEM_RARE_CANDY,
-};
-
-static const u16 sRewardItemsRank9[7] = {
-    ITEM_POMEG_BERRY, ITEM_KELPSY_BERRY, ITEM_QUALOT_BERRY, ITEM_HONDEW_BERRY, ITEM_GREPA_BERRY, ITEM_TAMATO_BERRY,
-    ITEM_RARE_CANDY,
-};
 
 static const u16 sBlack2Trainers0[32] = {
     0x38, 0x271, 0x280, 0x1e, 0x28, 0x26, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -131,27 +105,6 @@ static const u16 sWhite2Trainers1[32] = {
 static const u16 sWhite2Specials1[32] = {
     0x28b, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c,
     0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c, 0x28c,
-};
-
-static const InfinityDungeonFloor sFloorBlack2Mode0 = {
-    {
-        { 0x13, 0, { 0, 1, 0, 0 }, 0 },
-        { 0x13, 1, { 0, 1, 0, 0 }, 1 },
-        { 0, 4, { 0, 1, 0, 0 }, 2 },
-        { 0x13, 4, { 0, 0, 0, 0 }, 3 },
-        { 0, 4, { 1, 0, 1, 0 }, 4 },
-        { 0x13, 4, { 1, 1, 0, 1 }, 5 },
-        { 0, 4, { 1, 1, 0, 0 }, 6 },
-        { 0x13, 4, { 0, 0, 0, 0 }, 7 },
-        { 3, 4, { 0, 0, 1, 0 }, 8 },
-        { 7, 4, { 1, 0, 1, 1 }, 9 },
-        { 0x13, 4, { 1, 0, 0, 1 }, 10 },
-        { 0x13, 4, { 0, 0, 0, 0 }, 11 },
-        { 0x13, 4, { 0, 0, 0, 0 }, 12 },
-        { 0x13, 4, { 0, 0, 0, 0 }, 13 },
-        { 0x13, 4, { 0, 0, 0, 0 }, 14 },
-        { 0x13, 4, { 0, 0, 0, 0 }, 15 },
-    },
 };
 
 static const InfinityDungeonFloor sFloorBlack2Mode1 = {
@@ -209,6 +162,27 @@ static const InfinityDungeonFloor sFloorWhite2Mode1 = {
         { 0x13, 4, { 1, 0, 1, 0 }, 8 },
         { 1, 4, { 1, 0, 1, 1 }, 9 },
         { 8, 4, { 0, 0, 0, 1 }, 10 },
+        { 0x13, 4, { 0, 0, 0, 0 }, 11 },
+        { 0x13, 4, { 0, 0, 0, 0 }, 12 },
+        { 0x13, 4, { 0, 0, 0, 0 }, 13 },
+        { 0x13, 4, { 0, 0, 0, 0 }, 14 },
+        { 0x13, 4, { 0, 0, 0, 0 }, 15 },
+    },
+};
+
+static const InfinityDungeonFloor sFloorBlack2Mode0 = {
+    {
+        { 0x13, 0, { 0, 1, 0, 0 }, 0 },
+        { 0x13, 1, { 0, 1, 0, 0 }, 1 },
+        { 0, 4, { 0, 1, 0, 0 }, 2 },
+        { 0x13, 4, { 0, 0, 0, 0 }, 3 },
+        { 0, 4, { 1, 0, 1, 0 }, 4 },
+        { 0x13, 4, { 1, 1, 0, 1 }, 5 },
+        { 0, 4, { 1, 1, 0, 0 }, 6 },
+        { 0x13, 4, { 0, 0, 0, 0 }, 7 },
+        { 3, 4, { 0, 0, 1, 0 }, 8 },
+        { 7, 4, { 1, 0, 1, 1 }, 9 },
+        { 0x13, 4, { 1, 0, 0, 1 }, 10 },
         { 0x13, 4, { 0, 0, 0, 0 }, 11 },
         { 0x13, 4, { 0, 0, 0, 0 }, 12 },
         { 0x13, 4, { 0, 0, 0, 0 }, 13 },
@@ -310,7 +284,7 @@ void InfinityDungeonRoomChange_CreateTrainers(InfinityDungeonRoomChange *roomCha
     }
 }
 
-static void InfinityDungeonRoomChange_CreateTrainerActor(InfinityDungeonRoomChange *roomChange, const InfinityDungeonPos *pos) {
+static void InfinityDungeonRoomChange_CreateTrainerActor(const InfinityDungeonRoomChange *roomChange, const InfinityDungeonPos *pos) {
     FieldActor *actor = CreateNewActorByParam(roomChange->actorSystem, pos->x, pos->z, DIR_UP, 0xd1, 0xb9, 0,
                                               roomChange->destination.zoneId);
     SetActorSCRID(actor, 2000);
@@ -357,7 +331,7 @@ void func_ov127_021efde0(InfinityDungeonRoomChange *roomChange, InfinityDungeonR
             u16 trainerId = InfinityDungeon_GetTrainerId(roomChange->dungeon, roomChange->floor, slot);
 
             if (trainerId != INFINITY_DUNGEON_TRAINER_NONE) {
-                u32 objCode = func_ov012_02162b0c(INFINITY_DUNGEON_ARC_TRAINERS, trainerId, roomChange->heapId);
+                u16 objCode = func_ov012_02162b0c(INFINITY_DUNGEON_ARC_TRAINERS, trainerId, roomChange->heapId);
                 FieldActor *actor = CreateNewActorByParam(roomChange->actorSystem, roomNpc->x, roomNpc->y,
                                                           npc->direction, 176 + slot, objCode, npc->moveCode,
                                                           destination->zoneId);
@@ -443,9 +417,13 @@ static BOOL func_ov127_021f00a8(KeyDataSave *keyData, InfinityDungeon *dungeon) 
         return FALSE;
     }
 
-    mode = 0;
-    if (dungeon->version != VERSION_BLACK2) {
+    switch (dungeon->version) {
+    case VERSION_BLACK2:
+        mode = 0;
+        break;
+    default:
         mode = 1;
+        break;
     }
     mode = func_02010274(keyData, mode);
     {
@@ -474,24 +452,30 @@ static void func_ov127_021f0190(KeyDataSave *keyData, InfinityDungeon *dungeon) 
     u32 mode;
     int i;
     int j;
+    u32 index;
 
-    if (dungeon->version == VERSION_BLACK2) {
-        mode = func_02010274(keyData, 0);
-    } else {
-        mode = func_02010274(keyData, 1);
+    switch (dungeon->version) {
+    case VERSION_BLACK2:
+        index = 0;
+        break;
+    default:
+        index = 1;
+        break;
     }
+    mode = func_02010274(keyData, index);
     {
-    const u16 *white2Lists[2][2] = { { sWhite2Trainers0, sWhite2Specials0 }, { sWhite2Trainers1, sWhite2Specials1 } };
-    const u16 *black2Lists[2][2] = { { sBlack2Trainers0, sBlack2Specials0 }, { sBlack2Trainers1, sBlack2Specials1 } };
-    sys_memset(dungeon->trainerIds, 0, sizeof(dungeon->trainerIds));
-    sys_memset(dungeon->specialTrainers, 0, sizeof(dungeon->specialTrainers));
-    if (dungeon->version == VERSION_BLACK2) {
-        sys_memcpy(black2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
-        MI_CpuCopy16(black2Lists[mode][1], dungeon->specialTrainers, sizeof(dungeon->specialTrainers));
-    } else {
-        sys_memcpy(white2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
-        MI_CpuCopy16(white2Lists[mode][1], dungeon->specialTrainers, sizeof(dungeon->specialTrainers));
-    }
+        const u16 *white2Lists[2][2] = { { sWhite2Trainers0, sWhite2Specials0 }, { sWhite2Trainers1, sWhite2Specials1 } };
+        const u16 *black2Lists[2][2] = { { sBlack2Trainers0, sBlack2Specials0 }, { sBlack2Trainers1, sBlack2Specials1 } };
+
+        sys_memset(dungeon->trainerIds, 0, sizeof(dungeon->trainerIds));
+        sys_memset(dungeon->specialTrainers, 0, sizeof(dungeon->specialTrainers));
+        if (dungeon->version == VERSION_BLACK2) {
+            sys_memcpy(black2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
+            MI_CpuCopy16(black2Lists[mode][1], dungeon->specialTrainers, sizeof(dungeon->specialTrainers));
+        } else {
+            sys_memcpy(white2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
+            MI_CpuCopy16(white2Lists[mode][1], dungeon->specialTrainers, sizeof(dungeon->specialTrainers));
+        }
     }
     sys_memset(dungeon->specialRoom, 0, sizeof(dungeon->specialRoom));
     for (i = 0; i < INFINITY_DUNGEON_ROOM_COUNT; i++) {
@@ -516,7 +500,7 @@ static void func_ov127_021f0190(KeyDataSave *keyData, InfinityDungeon *dungeon) 
     }
 }
 
-u8 func_ov127_021f02e0(InfinityDungeon *dungeon) {
+u32 func_ov127_021f02e0(InfinityDungeon *dungeon) {
     int i;
     int floor;
 
@@ -884,6 +868,32 @@ BOOL func_ov127_021f096c(InfinityDungeon *dungeon, KeyDataSave *keyData) {
     return func_02010288(keyData, dungeon->targetFloor, dungeon->targetSlot);
 }
 
+static const u16 sRewardItemsRank0to4[6] = {
+    ITEM_PROTEIN, ITEM_IRON, ITEM_CALCIUM, ITEM_ZINC, ITEM_CARBOS, ITEM_HP_UP,
+};
+
+static const u16 sRewardWeightsRank0to4[6] = {
+    0x11, 0x11, 0x11, 0x11, 0x10, 0x10,
+};
+
+static const u16 sRewardItemsRank9[7] = {
+    ITEM_POMEG_BERRY, ITEM_KELPSY_BERRY, ITEM_QUALOT_BERRY, ITEM_HONDEW_BERRY, ITEM_GREPA_BERRY, ITEM_TAMATO_BERRY,
+    ITEM_RARE_CANDY,
+};
+
+static const u16 sRewardItemsRank5to8[7] = {
+    ITEM_HEALTH_WING, ITEM_MUSCLE_WING, ITEM_RESIST_WING, ITEM_GENIUS_WING, ITEM_CLEVER_WING, ITEM_SWIFT_WING,
+    ITEM_RARE_CANDY,
+};
+
+static const u16 sRewardWeightsRank5to8[7] = {
+    0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xa,
+};
+
+static const u16 sRewardWeightsRank9[7] = {
+    0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xa,
+};
+
 static void InfinityDungeon_PickReward(InfinityDungeon *dungeon, u32 rank, u32 seed) {
     u8 total = 0;
     u8 counts[10] = { 1, 1, 1, 2, 2, 1, 1, 2, 2, 1 };
@@ -894,20 +904,18 @@ static void InfinityDungeon_PickReward(InfinityDungeon *dungeon, u32 rank, u32 s
                                sRewardWeightsRank0to4, sRewardWeightsRank0to4, sRewardWeightsRank5to8,
                                sRewardWeightsRank5to8, sRewardWeightsRank5to8, sRewardWeightsRank5to8,
                                sRewardWeightsRank9 };
-    u16 itemCounts[10] = { 6, 6, 6, 6, 6, 7, 7, 7, 7, 7 };
+    const u16 itemCounts[10] = { 6, 6, 6, 6, 6, 7, 7, 7, 7, 7 };
     MATHRandContext32 rand;
     u8 roll;
     int i;
 
     MATH_InitRand32(&rand, seed);
     roll = MATH_Rand32(&rand, 100) + 1;
-    if (itemCounts[rank] > 0) {
-        for (i = 0; i < itemCounts[rank]; i++) {
-            total += weights[rank][i];
-            if (roll <= total) {
-                dungeon->rewardItem = items[rank][i];
-                break;
-            }
+    for (i = 0; i < itemCounts[rank]; i++) {
+        total += weights[rank][i];
+        if (roll <= total) {
+            dungeon->rewardItem = items[rank][i];
+            break;
         }
     }
     dungeon->rewardCount = counts[rank];

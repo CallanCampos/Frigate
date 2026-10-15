@@ -260,6 +260,8 @@ int ghiPostDoPosting(GHIConnection *connection);
 void ghiPostCleanupState(GHIConnection *connection);
 
 // ghttpProcess: what each state of a connection does
+BOOL ghiParseURL(GHIConnection *connection);
+BOOL ghiProcessIncomingFileData(GHIConnection *connection, const char *data, int size);
 void ghiDoSocketInit(GHIConnection *connection);
 void ghiDoHostLookup(GHIConnection *connection);
 void ghiDoLookupPending(GHIConnection *connection);

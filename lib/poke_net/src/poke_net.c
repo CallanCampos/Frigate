@@ -392,10 +392,10 @@ BOOL POKE_NET_IsIPAddress(const char *text) {
 // Gives a host's address as text, resolving its name if it is one
 BOOL POKE_NET_GetHostAddress(const char *host, char *address) {
     if (POKE_NET_IsIPAddress(host) == FALSE) {
-        SocHostEnt *entry = func_ov011_02157d40(host);
+        SocHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry != NULL) {
-            strcpy(address, func_ov011_02158014(*(SocInAddr *)entry->addrList[0]));
+            strcpy(address, SOC_InetNtoA(*(SocInAddr *)entry->addrList[0]));
         } else {
             return FALSE;
         }
@@ -417,7 +417,7 @@ static inline u32 POKE_NET_Swap32(u32 x) {
 BOOL POKE_NET_Setup(void) {
     char address[16];
 
-    gPOKE_NET_Control.Socket = func_ov011_02157bd0(POKE_NET_SOC_AF_INET, POKE_NET_SOC_SOCK_STREAM, 0);
+    gPOKE_NET_Control.Socket = SOC_Socket(POKE_NET_SOC_AF_INET, POKE_NET_SOC_SOCK_STREAM, 0);
     if (gPOKE_NET_Control.Socket == -1) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_CREATESOCKET;
         return FALSE;
@@ -426,9 +426,9 @@ BOOL POKE_NET_Setup(void) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_NETWORKSETTING;
         return FALSE;
     }
-    gPOKE_NET_Control.ServerAddr = POKE_NET_Swap32(func_ov011_02155d40(address));
+    gPOKE_NET_Control.ServerAddr = POKE_NET_Swap32(CPS_Resolve(address));
     POKE_NET_SSL_StartConnection(gPOKE_NET_Control.ServerURL, &sPOKE_NET_SslConnection);
-    if (func_ov011_02158174(gPOKE_NET_Control.Socket, &sPOKE_NET_SslConnection) < 0) {
+    if (SOCL_EnableSsl(gPOKE_NET_Control.Socket, &sPOKE_NET_SslConnection) < 0) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_SSL;
         return FALSE;
     }
@@ -439,8 +439,8 @@ void POKE_NET_CloseSocket(void) {
     if (gPOKE_NET_Control.Socket == -1) {
         return;
     }
-    func_ov011_02157d30(gPOKE_NET_Control.Socket, POKE_NET_SOC_SHUT_RDWR);
-    func_ov011_02157d38(gPOKE_NET_Control.Socket);
+    SOC_Shutdown(gPOKE_NET_Control.Socket, POKE_NET_SOC_SHUT_RDWR);
+    SOC_Close(gPOKE_NET_Control.Socket);
     gPOKE_NET_Control.Socket = -1;
     POKE_NET_SSL_EndConnection(&sPOKE_NET_SslConnection);
 }
@@ -457,7 +457,7 @@ BOOL POKE_NET_Connecting(void) {
     start = POKE_NET_GetTime();
 
     for (;;) {
-        result = func_ov011_02157c10(gPOKE_NET_Control.Socket, &address);
+        result = SOC_Connect(gPOKE_NET_Control.Socket, &address);
         if (result >= 0) {
             break;
         }
@@ -498,7 +498,7 @@ BOOL POKE_NET_Sending(void) {
         if (size > gPOKE_NET_Control.SendSize) {
             size = gPOKE_NET_Control.SendSize;
         }
-        result = func_ov011_02157cbc(gPOKE_NET_Control.Socket, gPOKE_NET_Control.SendBuffer + offset, size, 0);
+        result = SOC_Send(gPOKE_NET_Control.Socket, gPOKE_NET_Control.SendBuffer + offset, size, 0);
         if (result != POKE_NET_SOC_EWOULDBLOCK) {
             if (result < 0) {
                 gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_SENDTIMEOUT;
@@ -536,7 +536,7 @@ void POKE_NET_RecvThreadEntry(void *arg) {
         POKE_NET_LockMutex();
         if (!gPOKE_NET_Control.RecvDone) {
             gPOKE_NET_Control.RecvResult =
-                func_ov011_02157c50(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
+                SOC_Read(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
                                     gPOKE_NET_Control.RecvSize - offset, 0);
             gPOKE_NET_Control.RecvDone = TRUE;
         }

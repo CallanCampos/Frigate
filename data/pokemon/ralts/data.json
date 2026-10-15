@@ -199,5 +199,6 @@
         }
     ],
     "regional_dex_number": null,
-    "baby_species": "SPECIES_RALTS"
+    "baby_species": "SPECIES_RALTS",
+    "cry_volume": 120
 }

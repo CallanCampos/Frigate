@@ -119,6 +119,11 @@ static const u8 sPartyFramePokePos[6][2] = {
     { 24, 16 }, { 64, 24 }, { 24, 48 }, { 64, 56 }, { 24, 80 }, { 64, 88 },
 };
 
+// The type icons on the upper screen
+static const Box2ActorData sTypeIconData = {
+    { 160, 48, 0, 0, 1 }, 99, 4, 4, 0, 1,
+};
+
 // The first of the tray's Pokémon icons
 static const Box2ActorData sPokeIconData = {
     { 24, 48, 0, 10, 3 }, 0, 0, 0, 0, 0,
@@ -134,24 +139,19 @@ static const Box2ActorData sRangeDotData = {
     { 220, 120, 25, 19, 0 }, 122, 6, 6, 0, 0,
 };
 
-// The type icons on the upper screen
-static const Box2ActorData sTypeIconData = {
-    { 160, 48, 0, 0, 1 }, 99, 4, 4, 0, 1,
-};
-
 // The tray icons of the box list
 static const Box2ActorData sTrayIconData = {
     { 300, 0, 0, 80, 1 }, 116, 5, 5, 0, 0,
+};
+
+static const ClActSysSetup sClActSysSetup = {
+    0, 0, 0, 512, 4, 124, 4, 124, 0, 217, 11, 101, 0, 16, 16,
 };
 
 // The color of the tray icons' background, by wallpaper
 static const u8 sTrayIconColors[24] = {
     0x1b, 0x17, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
     0x26, 0x27, 0x10, 0x28, 0x18, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-};
-
-static const ClActSysSetup sClActSysSetup = {
-    0, 0, 0, 512, 4, 124, 4, 124, 0, 217, 11, 101, 0, 16, 16,
 };
 
 // The actors that are created from one setup each, by their ID
@@ -1149,7 +1149,8 @@ void func_ov255_021d0d10(Box2AppWork *app) {
 
 static void func_ov255_021d0d70(Box2SysWork *syswk) {
     Box2AppWork *app = syswk->app;
-    u32 i;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long i;
 
     app->actors[0] = func_ov255_021cf51c(app, &sActorData[0]);
     app->actors[1] = func_ov255_021cf51c(app, &sActorData[1]);
@@ -1473,7 +1474,6 @@ static void func_ov255_021d16cc(Box2SysWork *syswk, u32 tray, u8 *chr) {
     u8 i;
     u8 px;
     u8 py;
-    u16 fill;
     u32 species;
     void *personal;
     u8 y;
@@ -1499,9 +1499,9 @@ static void func_ov255_021d16cc(Box2SysWork *syswk, u32 tray, u8 *chr) {
                     color = 8;
                 }
                 color += 16;
-                fill = (color << 8) | color;
+                color = (color << 8) | color;
                 for (y = py; y < py + 2; y++) {
-                    sys_memset16(fill, &chr[((y & 7) << 3) + ((((y >> 3) << 2) + (px >> 3)) << 6) + (px & 7)], 2);
+                    sys_memset16(color, &chr[((y & 7) << 3) + ((((y >> 3) << 2) + (px >> 3)) << 6) + (px & 7)], 2);
                 }
             }
             PML_PkmReEncrypt(pkm, encrypted);

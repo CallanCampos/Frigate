@@ -8,8 +8,8 @@
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 
-const VecFx32 FIELD_CHUNK_SCALE_IDENTITY = { FX32_ONE, FX32_ONE, FX32_ONE };
 const VecFx32 FIELD_CHUNK_TRANSLATION_IDENTITY = { 0, 0, 0 };
+const VecFx32 FIELD_CHUNK_SCALE_IDENTITY = { FX32_ONE, FX32_ONE, FX32_ONE };
 const MtxFx33 FIELD_CHUNK_ROTATION_IDENTITY = { { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE } } };
 
 FieldChunk *FieldChunk_Create(const FieldChunkConfig *config, HeapID heapId) {
@@ -342,7 +342,7 @@ void FieldChunk_RenderProps(FieldChunk *chunk, void *camera) {
         cos = FX_CosIdx(chunk->propInstances[i].pos.rotationY);
         NNS_G3dGeLoadMtx43(&NNS_G3dGlb.cameraMtx);
         VEC_Add(&chunk->worldPos, &chunk->propInstances[i].pos.position, &mtx.rt.trans);
-        MAT3_RotationY(&mtx.rt.rot, sin, cos);
+        MTX_RotY33_(&mtx.rt.rot, sin, cos);
         NNS_G3dGeMultMtx43(&mtx);
         if (FieldChunk_CheckModelBBox(mdl) == TRUE) {
             GFL_G3DSysDispatchDraw(obj);
@@ -405,18 +405,26 @@ void FieldChunk_Reset(FieldChunk *chunk) {
     FieldChunk_ResetProps(chunk);
 }
 
+// The first model of a model set that may be missing. The missing set and the missing entry share one NULL, so this
+// isn't a NULL check around NNS_G3dGetMdlByIdx
+static inline NNSG3dResMdl *FieldChunk_GetFirstMdl(const NNSG3dResMdlSet *mdlSet) {
+    const u32 *ofs;
+
+    if (mdlSet != NULL) {
+        ofs = NNS_G3dGetResDataByIdx(&mdlSet->dict, 0);
+        if (ofs != NULL) {
+            return (NNSG3dResMdl *)((u8 *)mdlSet + *ofs);
+        }
+    }
+    return NULL;
+}
+
 void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, void *resource, void *texture) {
     void *mdlFile = GFL_G3DResGetResData(resource);
     void *texFile = GFL_G3DResGetResData(texture);
     NNSG3dResTex *tex = NULL;
-    NNSG3dResMdlSet *mdlSet = NNS_G3DResGetMdlBlock(mdlFile);
-    NNSG3dResMdl *mdl;
+    NNSG3dResMdl *mdl = FieldChunk_GetFirstMdl(NNS_G3DResGetMdlBlock(mdlFile));
 
-    if (mdlSet != NULL) {
-        mdl = NNS_G3dGetMdlByIdx(mdlSet, 0);
-    } else {
-        mdl = NULL;
-    }
     if (texFile != NULL) {
         tex = NNS_G3DResGetTexBlock(texFile);
     }

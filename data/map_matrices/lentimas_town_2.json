@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 979 ]
+        [ "MAP_MODEL_LENTIMAS_TOWN_2_M_H06_00_00" ]
     ]
 }

@@ -32,15 +32,18 @@ src/ov143/monolith_status.c:
     .rodata     start:0x021a0054 end:0x021a00a0
 
 src/ov143/monolith_power_select.c:
+    complete
     .text       start:0x0219bb80 end:0x0219d360
     .rodata     start:0x021a00a0 end:0x021a0134
     .data       start:0x021a046c end:0x021a04c4
 
 src/ov143/monolith_power_info.c:
+    complete
     .text       start:0x0219d360 end:0x0219d8f8
     .rodata     start:0x021a0134 end:0x021a0180
 
 src/ov143/monolith_mission_select.c:
+    complete
     .text       start:0x0219d8f8 end:0x0219f64c
     .rodata     start:0x021a0180 end:0x021a0340
     .data       start:0x021a04c4 end:0x021a0520

@@ -49,11 +49,12 @@ jobs:
         with:
           path: |
             tools/wibo
+            tools/sjiswrap.exe
             tools/objdiff-cli
             tools/mwccarm
             tools/dsd
             tools/dsd.rev
-          key: build-tools-${{ hashFiles('configure.py', 'lib/*/library.toml') }}
+          key: build-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('configure.py', 'lib/*/library.toml') }}
 
       - name: Build
         run: |
@@ -66,3 +67,82 @@ jobs:
         with:
           name: ${{ matrix.version }}_report
           path: build/${{ matrix.version }}/report.json
+
+  build-macos:
+    name: Build both ROMs on macOS
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: macos-26-intel
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Checkout base ROMs
+        uses: actions/checkout@v7
+        with:
+          repository: fuddlesworth/pokebw2-roms
+          ssh-key: ${{ secrets.ROMS_DEPLOY_KEY }}
+          path: roms
+
+      - name: Install packages
+        run: |
+          brew install coreutils ninja llvm xz
+          echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+
+      - name: Unpack base ROMs
+        run: |
+          mkdir -p orig
+          for version in b2_us w2_us; do
+            xz -dc "roms/baserom_${version}.nds.xz" > "orig/baserom_${version}.nds"
+          done
+          rm -rf roms
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Cache tools
+        uses: actions/cache@v6
+        with:
+          path: |
+            tools/wibo
+            tools/sjiswrap.exe
+            tools/objdiff-cli
+            tools/mwccarm
+            tools/dsd
+            tools/dsd.rev
+          key: build-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('configure.py', 'lib/*/library.toml') }}
+
+      - name: Build and verify both ROMs
+        run: |
+          for attempt in 1 2 3; do
+            if python3 configure.py b2_us w2_us; then break; fi
+            if [ "$attempt" -eq 3 ]; then exit 1; fi
+            sleep 5
+          done
+          mkdir -p build
+          : > build/ninja.log
+          for attempt in 1 2 3; do
+            if ninja -j 4 >> build/ninja.log 2>&1; then
+              echo "Ninja completed successfully"
+              tail -20 build/ninja.log
+              break
+            else
+              status=$?
+            fi
+            echo "Ninja attempt $attempt exited $status"
+            tail -100 build/ninja.log
+            if [ "$status" -ne 139 ] || [ "$attempt" -eq 3 ]; then exit "$status"; fi
+            sleep 5
+          done
+          if grep -n 'warning:' build/ninja.log; then exit 1; fi
+          echo "No compiler warnings; checking ROM SHA1s"
+          shasum -a 1 -c b2_us.sha1 w2_us.sha1
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-build-log
+          path: build/ninja.log

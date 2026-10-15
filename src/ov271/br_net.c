@@ -241,6 +241,8 @@ BOOL BrNet_GetResultMsg(BrNet *net, u32 *msgID) {
                     *msgID = result->detail + 0x12a;
                 }
                 ret = TRUE;
+            } else {
+                ret = TRUE;
             }
         } else if (result->type == 2) {
             switch (result->code) {

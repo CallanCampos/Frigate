@@ -121,5 +121,6 @@
     },
     "evolutions": [],
     "regional_dex_number": 174,
-    "baby_species": "SPECIES_JOLTIK"
+    "baby_species": "SPECIES_JOLTIK",
+    "cry_volume": 120
 }

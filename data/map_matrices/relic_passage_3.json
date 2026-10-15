@@ -1,6 +1,6 @@
 {
     "$schema": "map_matrix.schema.json",
     "maps": [
-        [ 710, 711 ]
+        [ "MAP_MODEL_RELIC_PASSAGE_3_M_DUN2803_00_00", "MAP_MODEL_RELIC_PASSAGE_3_M_DUN2803_01_00" ]
     ]
 }

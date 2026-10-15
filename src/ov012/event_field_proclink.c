@@ -288,11 +288,11 @@ BOOL func_ov012_0215b7c0(FieldAppCallParam *param) {
 }
 
 // The party screen
-void *func_ov012_0215b7d8(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215b7d8(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     GameData *gameData = GSYS_GetGameData(work->input->gameSystem);
     PokeListParam *param = PokeListParam_Create(gameData, 0, GameData_GetParty(gameData), HEAPID_GAMEEVENT);
-    BagProcessData *bag;
-    PStatusParam *status;
+    const BagProcessData *bag;
+    const PStatusParam *status;
     BOOL mailResult;
 
     param->action = work->action;
@@ -469,7 +469,7 @@ u32 func_ov012_0215b9cc(FieldAppCallWork *work, void *data) {
 }
 
 // The Pokédex
-void *func_ov012_0215bad4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215bad4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     ZukanParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanParam), FALSE, "event_field_proclink.c", 1295);
     FieldSound *sound;
 
@@ -502,13 +502,13 @@ u32 func_ov012_0215bb44(FieldAppCallWork *work, void *data) {
 
 
 // The summary screen
-void *func_ov012_0215bb70(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215bb70(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     PStatusParam *param =
         GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PStatusParam), TRUE, "event_field_proclink.c", 1362);
     GameData *gameData = GSYS_GetGameData(work->input->gameSystem);
     SaveControl *save = GameData_GetSaveControl(gameData);
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
-    PokeListParam *partyParam;
+    const PokeListParam *partyParam;
     s32 i;
     PokeParty *party;
     PartyPkm *pkm;
@@ -617,10 +617,10 @@ u32 func_ov012_0215bd1c(GameSystem *gsys) {
 }
 
 // The bag
-void *func_ov012_0215bd48(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215bd48(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     GameData *gameData = GSYS_GetGameData(work->input->gameSystem);
     BagProcessData *param;
-    PokeListParam *partyParam = prevParam;
+    const PokeListParam *partyParam = prevParam;
 
     switch (prevAppId) {
     case FIELD_APP_BAG:
@@ -645,7 +645,6 @@ void *func_ov012_0215bd48(FieldAppCallWork *work, s32 appParam, s32 prevAppId, v
     }
     return param;
 }
-
 
 u32 func_ov012_0215bdd0(FieldAppCallWork *work, void *data) {
     BagProcessData *param = data;
@@ -723,7 +722,7 @@ u32 func_ov012_0215bdd0(FieldAppCallWork *work, void *data) {
 
 
 // The trainer card
-void *func_ov012_0215bef4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215bef4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     GameData *gameData = GSYS_GetGameData(work->input->gameSystem);
     u32 zoneId = GameData_GetPlayerState(gameData)->zoneId;
     BOOL canEdit = TRUE;
@@ -753,7 +752,7 @@ u32 func_ov012_0215bf58(FieldAppCallWork *work, void *data) {
 }
 
 // The town map
-void *func_ov012_0215bf8c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215bf8c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     TownMapParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(TownMapParam), TRUE, "event_field_proclink.c", 1797);
     PlayerState *playerState;
     GameData *gameData;
@@ -816,7 +815,7 @@ u32 func_ov012_0215bff8(FieldAppCallWork *work, void *data) {
     return 1;
 }
 
-void *func_ov012_0215c094(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215c094(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     Ov140Param *param;
 
     getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(work->input->gameSystem)));
@@ -842,7 +841,7 @@ void func_ov012_0215c0dc(FieldAppCallWork *work, s32 appParam) {
                                                       Field_GetMsgBGSys(input->field), input->screenId, &work->result));
 }
 
-void *func_ov012_0215c10c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215c10c(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     Ov204Param *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(Ov204Param), TRUE, "event_field_proclink.c", 1997);
 
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
@@ -869,25 +868,28 @@ u32 func_ov012_0215c138(FieldAppCallWork *work, void *data) {
 
 
 // The mail
-void *func_ov012_0215c160(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215c160(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     GameData *gameData = GSYS_GetGameData(work->input->gameSystem);
-    PokeListParam *partyParam;
-    BagProcessData *bag;
+    const PokeListParam *partyParam;
+    const BagProcessData *bag;
     PokeParty *party;
     void *param;
+    u32 slot;
+    u32 item;
 
     GFL_OvlLoad(OVERLAY_ID(215));
     if (prevAppId == FIELD_APP_POKELIST) {
         partyParam = prevParam;
         party = GameData_GetParty(gameData);
-        work->partySlot = partyParam->index;
-        work->item = partyParam->item;
+        slot = partyParam->index;
+        work->partySlot = slot;
+        item = partyParam->item;
+        work->item = item;
         if (partyParam->result == 6) {
-            return MailTool_CreateWriteParam(gameData, 2, partyParam->index, PML_ItemGetMailID(partyParam->item),
-                                       HEAPID_GAMEEVENT);
+            return MailTool_CreateWriteParam(gameData, 2, partyParam->index, PML_ItemGetMailID(item), HEAPID_GAMEEVENT);
         }
         work->subMode = 1;
-        return MailTool_CreatePokemonViewParam(gameData, PokeParty_GetPkm(party, partyParam->index), HEAPID_GAMEEVENT);
+        return MailTool_CreatePokemonViewParam(gameData, PokeParty_GetPkm(party, slot), HEAPID_GAMEEVENT);
     }
     bag = prevParam;
     if (bag->mode == 2) {
@@ -943,10 +945,10 @@ void func_ov012_0215c2c8(void *param) {
 }
 
 // The evolution demo, for an item used from the bag or the party screen
-void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *script_evo(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     GameData *gameData = GSYS_GetGameData(work->input->gameSystem);
     ShinkaDemoParam *param = NULL;
-    PokeListParam *partyParam = prevParam;
+    const PokeListParam *partyParam = prevParam;
     PokeParty *party;
     PartyPkm *pkm;
     PlayerState *playerState;
@@ -992,7 +994,7 @@ u32 func_ov012_0215c3a4(FieldAppCallWork *work, void *param) {
     return 0;
 }
 
-void *func_ov012_0215c3d0(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215c3d0(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     BattleRecorderParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(BattleRecorderParam), TRUE, "event_field_proclink.c", 2349);
 
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
@@ -1023,7 +1025,7 @@ u32 func_ov012_0215c3fc(FieldAppCallWork *work, void *data) {
     }
 }
 
-void *func_ov012_0215c438(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215c438(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     Ov259Param *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(Ov259Param), TRUE, "event_field_proclink.c", 2417);
 
     param->unk0 = 1;
@@ -1041,7 +1043,7 @@ u32 func_ov012_0215c474(FieldAppCallWork *work, void *param) {
     return FIELD_APP_RESULT_NEXT;
 }
 
-void *func_ov012_0215c488(FieldAppCallWork *work, s32 appParam, s32 prevAppId, void *prevParam) {
+void *func_ov012_0215c488(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
     Ov145Param *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(Ov145Param), TRUE, "event_field_proclink.c", 2496);
 
     param->gameData = GSYS_GetGameData(work->input->gameSystem);

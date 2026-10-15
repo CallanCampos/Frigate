@@ -131,8 +131,8 @@ static void CasteliaRush_Init(FieldAsyncProc *proc, Field *field, void *data);
 static void CasteliaRush_Free(FieldAsyncProc *proc, Field *field, void *data);
 static void CasteliaRush_Update(FieldAsyncProc *proc, Field *field, void *data);
 static CasteliaRushPasserby *CasteliaRush_FindFreePasserby(CasteliaRush *rush);
-static CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(CasteliaRush *rush, u16 x, u16 z, u16 dir, BOOL unused,
-                                                 BOOL *occupied);
+static const CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(const CasteliaRush *rush, u16 x, u16 z, u16 dir,
+                                                 BOOL unused, BOOL *occupied);
 static void Passerby_Init(CasteliaRushPasserby *passerby, MMSys *actorSys, u16 zoneId,
                                 const CasteliaRushConfig *config, u32 index);
 static void Passerby_Free(CasteliaRushPasserby *passerby);
@@ -145,8 +145,8 @@ static void Passerby_StepAside(CasteliaRushPasserby *passerby, FieldActor *obsta
 static void CasteliaRushConfig_Load(CasteliaRushConfig *config, u16 dayPeriod, u16 zoneId, HeapID heapId);
 static void CasteliaRushConfig_Free(CasteliaRushConfig *config);
 static void CasteliaRush_SpawnPassersby(CasteliaRushConfig *config, CasteliaRush *rush, u16 dayPeriod);
-static void CasteliaRush_SpawnPasserby(CasteliaRush *rush, CasteliaRushConfig *config, const CasteliaRushLane *lane,
-                                CasteliaRushPasserby *passerby, u16 offset);
+static void CasteliaRush_SpawnPasserby(const CasteliaRush *rush, CasteliaRushConfig *config,
+                                const CasteliaRushLane *lane, CasteliaRushPasserby *passerby, u16 offset);
 static void CasteliaRush_FillLanes(CasteliaRushConfig *config, CasteliaRush *rush, u16 dayPeriod);
 static u16 CasteliaRushConfig_GetWalkAcmd(const CasteliaRushConfig *config);
 static void Passerby_StartWalker(CasteliaRushPasserby *passerby);
@@ -155,7 +155,7 @@ static void Passerby_UpdateWalker(CasteliaRushPasserby *passerby, MMSys *actorSy
 static void Passerby_UpdateTalker(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldPlayer *player);
 static BOOL Passerby_FindActorAhead(CasteliaRushPasserby *passerby, MMSys *actorSys, FieldActor **found, u16 maxDist,
                                 u16 minDist);
-static BOOL Passerby_IsActorAhead(CasteliaRushPasserby *passerby, FieldActor *actor, u16 maxDist, u16 minDist);
+static BOOL Passerby_IsActorAhead(const CasteliaRushPasserby *passerby, FieldActor *actor, u16 maxDist, u16 minDist);
 static BOOL IsPosAhead(s16 x, s16 z, s16 otherX, s16 otherZ, u16 maxDist, u16 minDist, u16 dir);
 static void CasteliaRushBalloons_Init(CasteliaRushBalloons *balloons, void *msgBGSys, const CasteliaRushConfig *config,
                                 u16 dayPeriod, HeapID heapId);
@@ -169,13 +169,13 @@ static void CasteliaRushBalloon_Update(CasteliaRushBalloon *balloon, void *msgBG
 static void CasteliaRushBalloon_Reset(CasteliaRushBalloon *balloon);
 static void CasteliaRushBalloon_Hide(CasteliaRushBalloon *balloon, void *msgBGSys);
 
-static const PasserbyUpdateFunc sPasserbyUpdateFuncs[] = { Passerby_UpdateWalker, Passerby_UpdateTalker };
-
 static const PasserbyStartFunc sPasserbyStartFuncs[] = { Passerby_StartWalker, Passerby_StartTalker };
 
+static const PasserbyUpdateFunc sPasserbyUpdateFuncs[] = { Passerby_UpdateWalker, Passerby_UpdateTalker };
+
 // The balloons' places on the bottom screen, in tiles
-static const u8 sBalloonY[BALLOON_COUNT] = { 6, 2, 17, 14, 17, 10, 14, 2, 10, 17, 10, 6, 2, 6, 14, 6 };
 static const u8 sBalloonX[BALLOON_COUNT] = { 1, 22, 2, 20, 4, 21, 3, 19, 1, 19, 2, 22, 3, 20, 4, 21 };
+static const u8 sBalloonY[BALLOON_COUNT] = { 6, 2, 17, 14, 17, 10, 14, 2, 10, 17, 10, 6, 2, 6, 14, 6 };
 
 const FieldAsyncProcDef CASTELIA_RUSH_PROC_DEF = {
     0, sizeof(CasteliaRush), CasteliaRush_Init, CasteliaRush_Free, CasteliaRush_Update, NULL,
@@ -254,8 +254,8 @@ static CasteliaRushPasserby *CasteliaRush_FindFreePasserby(CasteliaRush *rush) {
 }
 
 // The talker that stands on (x, z), setting *occupied, or the first talker in the direction dir from it
-static CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(CasteliaRush *rush, u16 x, u16 z, u16 dir, BOOL unused,
-                                                 BOOL *occupied) {
+static const CasteliaRushPasserby *CasteliaRush_FindTalkerAhead(const CasteliaRush *rush, u16 x, u16 z, u16 dir,
+                                                 BOOL unused, BOOL *occupied) {
     int i;
     s16 dx;
     s16 dz;
@@ -411,8 +411,8 @@ static void Passerby_StepAside(CasteliaRushPasserby *passerby, FieldActor *obsta
         dir = GetInverseDirection(dir);
     }
 
-    x = x + GetDirectionVectorCompX(dir);
-    z = z + GetDirectionVectorCompZ(dir);
+    x += GetDirectionVectorCompX(dir);
+    z += GetDirectionVectorCompZ(dir);
     if (dir <= 1) {
         if (z < passerby->lane->zMin || z > passerby->lane->zMax) {
             dir = GetInverseDirection(dir);
@@ -476,8 +476,8 @@ static void CasteliaRush_SpawnPassersby(CasteliaRushConfig *config, CasteliaRush
 }
 
 // Starts a passer-by offset steps into a lane, at a random place across it, unless a talker stands there
-static void CasteliaRush_SpawnPasserby(CasteliaRush *rush, CasteliaRushConfig *config, const CasteliaRushLane *lane,
-                                CasteliaRushPasserby *passerby, u16 offset) {
+static void CasteliaRush_SpawnPasserby(const CasteliaRush *rush, CasteliaRushConfig *config,
+                                const CasteliaRushLane *lane, CasteliaRushPasserby *passerby, u16 offset) {
     u16 x;
     u16 z;
     u8 talker = FALSE;
@@ -644,7 +644,7 @@ static BOOL Passerby_FindActorAhead(CasteliaRushPasserby *passerby, MMSys *actor
 }
 
 // Whether the actor or its starting place is ahead of the passer-by, between minDist and maxDist tiles
-static BOOL Passerby_IsActorAhead(CasteliaRushPasserby *passerby, FieldActor *actor, u16 maxDist, u16 minDist) {
+static BOOL Passerby_IsActorAhead(const CasteliaRushPasserby *passerby, FieldActor *actor, u16 maxDist, u16 minDist) {
     s16 actorX = GetGPosX(actor);
     s16 actorZ = GetGPosZ(actor);
     s16 x = GetGPosX(passerby->actor);

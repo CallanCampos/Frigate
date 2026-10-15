@@ -1370,7 +1370,7 @@ static void IrcRhythmParticles_Burst(IrcRhythmParticles *particles, const IrcRhy
                 ring.y = target.y << FX32_SHIFT;
                 ring.z = 0;
                 VEC_Subtract(&ring, &center, &dir);
-                vecfx_normalize(&dir, &dir);
+                VEC_Normalize(&dir, &dir);
                 target.x = FX_Whole(dir.x << 8);
                 target.y = FX_Whole(dir.y << 8);
                 target.x += origin->x;
@@ -1397,8 +1397,8 @@ static void IrcRhythmParticle_Update(IrcRhythmParticle *particle) {
     if (particle->active) {
         VEC_Subtract(&particle->end, &particle->start, &dir);
         length = VEC_Mag(&dir);
-        vecfx_normalize(&dir, &dir);
-        vecfx_muladd(length * particle->frame / particle->duration, &dir, &particle->start, &current);
+        VEC_Normalize(&dir, &dir);
+        VEC_MultAdd(length * particle->frame / particle->duration, &dir, &particle->start, &current);
         pos.x = current.x >> FX32_SHIFT;
         pos.y = current.y >> FX32_SHIFT;
         if (particle->frame++ > particle->duration) {

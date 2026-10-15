@@ -943,8 +943,7 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
                     work->flags |= BSCENARIO_FLAG_PREV_ANIM;
                 } else {
                     work->flags &= ~BSCENARIO_FLAG_KEYS;
-                    refresh = TRUE;
-                    redraw = TRUE;
+                    refresh = redraw = TRUE;
                     BScenarioGraphic_SetButtonAnim(work, BSCENARIO_BUTTON_PREV, 4);
                     work->pageStep = PAGE_STEP_PREV;
                     work->flags &= ~BSCENARIO_FLAG_NEXT_BLOCKED;
@@ -964,8 +963,7 @@ static void BScenarioMain_ScriptInput(BScenarioWork *work) {
                     work->flags |= BSCENARIO_FLAG_NEXT_ANIM;
                 } else {
                     work->flags &= ~BSCENARIO_FLAG_KEYS;
-                    refresh = TRUE;
-                    redraw = TRUE;
+                    refresh = redraw = TRUE;
                     BScenarioGraphic_SetButtonAnim(work, BSCENARIO_BUTTON_NEXT, 7);
                     work->pageStep = PAGE_STEP_NEXT;
                     work->flags &= ~BSCENARIO_FLAG_PREV_BLOCKED;
@@ -1248,7 +1246,6 @@ static void BScenarioMain_CastInput(BScenarioWork *work) {
 // Prints the shown Pokémon's name, sex, level, item, moves and Ability
 static void BScenarioMain_PrintCast(BScenarioWork *work, BOOL update) {
     StrBuf *buffer;
-    int sexMsg;
     int i;
 
     if (!update) {
@@ -1262,12 +1259,12 @@ static void BScenarioMain_PrintCast(BScenarioWork *work, BOOL update) {
     StrBuf *speciesStr = GFL_MsgDataLoadStrbufNew(work->msgData[0], sBScenarioCastMessages[CAST_MSG_SPECIES]);
     WordSet_LoadSpeciesName(work->wordSet, 0, (u16)species);
     GFL_WordSetFormatStrbuf(work->wordSet, buffer, speciesStr);
-    sexMsg = CAST_MSG_MALE;
     BScenarioGraphic_Print(work, 1, 0, 0, buffer, 0, TEXT_COLOR, FALSE, FALSE);
     GFL_StrBufFree(speciesStr);
 
-    int sex = work->mons[work->castIndex].sex;
+    int sexMsg = CAST_MSG_MALE;
     u32 color = TEXT_COLOR_MALE;
+    int sex = work->mons[work->castIndex].sex;
     if (sex == GENDER_FEMALE) {
         sexMsg = CAST_MSG_FEMALE;
         color = TEXT_COLOR_FEMALE;

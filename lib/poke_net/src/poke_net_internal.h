@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "dwc/ext.h"
+#include "nitrowifi/soc.h"
 #include "nitro/os.h"
 #include "poke_net/poke_net_gds.h"
 
@@ -101,17 +102,7 @@ int func_020583b0(int *code, int *type);
 
 // The socket library of overlay 11: resolving a host's name to an address in host order (0 if it fails), and an
 // address as text
-typedef struct {
-    u32 addr;
-} SocInAddr;
-u32 func_ov011_02155d40(const char *host);
-char *func_ov011_02158014(SocInAddr addr);
-#define POKE_NET_SOC_AF_INET 2
-#define POKE_NET_SOC_SOCK_STREAM 1
-#define POKE_NET_SOC_SHUT_RDWR 2
-#define POKE_NET_SOC_EWOULDBLOCK (-6)
-#define POKE_NET_SOC_EINPROGRESS (-26)
-#define POKE_NET_SOC_EISCONN (-30)
+u32 CPS_Resolve(const char *host);
 
 // The token of the Nintendo Wi-Fi Connection's service locator: the request for it, which fills the result as it
 // succeeds, and the step of the request, which gives its state

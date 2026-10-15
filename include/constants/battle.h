@@ -40,7 +40,7 @@
 #define BTL_WEATHER_HAIL 3
 #define BTL_WEATHER_SANDSTORM 4
 
-// Conditions of a side of the battle. The AI scripts tell which is which
+// Conditions of a side of the battle. The AI scripts tell which is which, and overlay 169's side_handlers.c the rest
 #define SIDE_CONDITION_REFLECT 0
 #define SIDE_CONDITION_LIGHT_SCREEN 1
 #define SIDE_CONDITION_SAFEGUARD 2
@@ -50,10 +50,21 @@
 #define SIDE_CONDITION_SPIKES 6
 #define SIDE_CONDITION_TOXIC_SPIKES 7
 #define SIDE_CONDITION_STEALTH_ROCK 8
+#define SIDE_CONDITION_WIDE_GUARD 9
+#define SIDE_CONDITION_QUICK_GUARD 10
+#define SIDE_CONDITION_RAINBOW 11
+#define SIDE_CONDITION_SEA_OF_FIRE 12
+#define SIDE_CONDITION_SWAMP 13
 
-// Conditions of the whole field. The AI scripts tell which is which
+// Conditions of the whole field. The AI scripts tell which is which, and overlay 169's field_handlers.c the rest
+#define FIELD_CONDITION_WEATHER 0
 #define FIELD_CONDITION_TRICK_ROOM 1
 #define FIELD_CONDITION_GRAVITY 2
+#define FIELD_CONDITION_IMPRISON 3
+#define FIELD_CONDITION_WATER_SPORT 4
+#define FIELD_CONDITION_MUD_SPORT 5
+#define FIELD_CONDITION_WONDER_ROOM 6
+#define FIELD_CONDITION_MAGIC_ROOM 7
 
 // Move categories, the category of the move data (MOVE_PARAM_CATEGORY)
 #define MOVE_CATEGORY_STATUS 0

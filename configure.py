@@ -4,14 +4,18 @@
 Run this once after cloning (and again after adding source files), then run `ninja`.
 """
 import argparse
+import ast
+import hashlib
 import io
 import json
+import os
 import platform
 import shlex
 import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 import tomllib
 import urllib.request
 import zipfile
@@ -27,7 +31,20 @@ VERSIONS = {
     "w2_us": {"sha1": "b5d7490be7b415b8f1e672a53e978a9cc667e56a", "rom": "pokewhite2_us.nds", "defines": ["WHITE2"]},
 }
 
-WIBO_VERSION = "1.2.0"
+# Upstream 1.2.0 predates the guest x87 initialization in decompals/wibo e8f4795. The fork's main is upstream
+# 420a75b, which has it, plus the imports that sjiswrap needs to load the compiler
+WIBO_REPO = "https://github.com/fuddlesworth/wibo"
+WIBO_VERSION = "pokebw2-sjis-1"
+WIBO_SHA256 = {
+    "wibo-x86_64": "d708570bd64cc8c176273a2bb7b5082f4fa849139d0ffe6cd0b96e26f3bc1ef2",
+    "wibo-macos": "d11a80c3e5dfa85b8097d1968640e12158630f86e95ef29029dcbb22b57dad89",
+}
+# sjiswrap runs the compiler on its sources converted from UTF-8 to Shift JIS, the encoding of the game's own text, so
+# that a string such as an assertion's Japanese expression is written as is. The fork's pokebw2 branch warns only for
+# a character that Shift JIS can't encode outside a comment, such as the é of a "Pokémon" in code
+SJISWRAP_REPO = "https://github.com/fuddlesworth/sjiswrap"
+SJISWRAP_VERSION = "v1.2.2-pokebw2.1"
+SJISWRAP_SHA256 = "4e9c917ba3f245da74a5a48ec91b459e956189cc1411233aa40046e0f7ac294f"
 OBJDIFF_VERSION = "v3.8.1"
 # Release binaries of wibo and objdiff-cli for macOS, by (sys.platform, machine); other platforms get the Linux x86-64
 # ones. wibo's macOS build is x86-64 only, and runs under Rosetta 2 on Apple silicon.
@@ -60,6 +77,10 @@ MWCC_VERSION = "dsi/1.1p1"
 # The linker only places delinked objects, so its version does not affect matching
 MWLD_VERSION = "dsi/1.1"
 
+# The compiler reads its sources as Shift JIS, from sjiswrap: in the default ASCII, a character whose second byte is
+# 0x5c, such as 表, would end in a backslash that escapes a closing quote or continues a // comment
+ENCODING_FLAG = "-enc SJIS"
+
 CC_FLAGS = [
     "-O4,p",               # Optimize for speed
     "-proc arm946e",       # ARM9 processor
@@ -78,6 +99,7 @@ CC_FLAGS = [
     "-requireprotos",      # Calling an undeclared function is an error, instead of an implicit declaration
     "-nolink",
     "-msgstyle gcc",
+    ENCODING_FLAG,
 ]
 
 # Libraries built apart from the game, each with its own compiler and flags: lib/<name>/ holds a library's public
@@ -98,7 +120,7 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
         with settings.open("rb") as f:
             library = tomllib.load(f)
         src = f"{(lib / 'src').relative_to(ROOT).as_posix()}/"
-        libraries[src] = (library["compiler"], library["flags"])
+        libraries[src] = (library["compiler"], [*library["flags"], ENCODING_FLAG])
         for path, flags in library.get("file_flags", {}).items():
             FILE_FLAGS[src + path] = flags
     return libraries
@@ -156,6 +178,10 @@ DATA_PACKS = [
     # Species data, level-up moves, evolutions, baby species, experience tables and egg moves
     ("tools/data/species_data.py", "data/pokemon",
      ["a/0/1/6", "a/0/1/8", "a/0/1/9", "a/0/2/0", "a/0/1/7", "a/1/2/4"], False),
+    ("tools/data/pokemon_graphics.py", "data/pokemon",
+     ["a/0/0/4", "a/0/0/7", "a/0/5/1", "a/1/6/5", "a/2/2/9"], True),
+    ("tools/data/pokemon_cries.py", "data/pokemon",
+     ["swan_sound_data.sdat", "a/1/9/1"], True),
     ("tools/data/move_data.py", "data/moves", ["a/0/2/1"], False),  # Move data
     ("tools/data/item_data.py", "data/items", ["a/0/2/4"], False),  # Item data
     # Trainers, their parties, and the table of their messages with its offsets
@@ -165,7 +191,16 @@ DATA_PACKS = [
     ("tools/data/zone_data.py", "data/zones", ["a/0/1/2"], False, ["data/events"]),
     ("tools/data/trade_data.py", "data/trades", ["a/1/6/3"], False),  # In-game trades
     ("tools/data/map_matrix_data.py", "data/map_matrices", ["a/0/0/9"], False),  # Map matrices
-    ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True),  # Map model glTF sources
+    # Map models, whose GLBs show the map texture sets' PNGs, which name the textures they bind
+    ("tools/data/map_model_data.py", "data/map_models", ["a/0/0/8"], True, ["data/map_texture_sets"]),
+    # Field prop models, which their bundles' textures go with in the same way
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/exterior", ["a/2/2/5"], True,
+     ["data/field_prop_textures/exterior", "data/field_prop_models/field_prop_model.schema.json"]),
+    ("tools/data/field_prop_model_data.py", "data/field_prop_models/interior", ["a/2/2/6"], True,
+     ["data/field_prop_textures/interior", "data/field_prop_models/field_prop_model.schema.json"]),
+    ("tools/data/map_texture_data.py", "data/map_texture_sets", ["a/0/1/4"], True),  # Map texture PNG sources
+    ("tools/data/map_texture_data.py", "data/field_prop_textures/exterior", ["a/1/7/4"], True),
+    ("tools/data/map_texture_data.py", "data/field_prop_textures/interior", ["a/1/7/5"], True),
     ("tools/data/area_data.py", "data/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
     ("tools/data/light_data.py", "data/lights", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
     # The town map's places, whose texts are messages of town_map.txt
@@ -188,10 +223,40 @@ DATA_PACKS = [
     ("tools/data/event_data.py", "data/events", ["a/1/2/6"], False),
 ]
 # What every packer reads besides its data: the scripts, and the move tutors' tables, which name the species data's
-# tutor bits (tools/data/species_data.py)
+# tutor bits (tools/data/species_data.py). A packer also depends on the modules of tools/ that it imports
+# (script_imports).
 DATA_PACK_TOOLS = ["tools/data/datajson.py", "tools/text/text_ids.py", "tools/data/gen_constants.py", "tools/data/narc.py",
                    "tools/text/text_sources.py", "tools/text/text_data.py", "tools/text/msgdata.py",
                    "src/ov036/scrcmd_shop.c", "tools/data/facility_data.py", "tools/data/make_constants.py"]
+# The C files a packer reads its tables from, besides scrcmd_shop.c
+DATA_PACK_SOURCES = {"tools/data/pokemon_graphics.py": ["src/system/poke_icon.c"],
+                     "tools/data/pokemon_cries.py": ["src/system/poke_icon.c"]}
+
+
+def script_imports(script: str) -> list[str]:
+    """Returns the modules of tools/ that a script imports, and theirs: as tools.data.narc, or as narc from the
+    script's own directory. Imports inside functions are left out, since those are the one-off commands'."""
+    found: list[str] = []
+    pending = [ROOT / script]
+    while pending:
+        path = pending.pop()
+        nodes = list(ast.parse(path.read_text()).body)
+        while nodes:
+            node = nodes.pop()
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                continue
+            nodes.extend(ast.iter_child_nodes(node))
+            names = ([alias.name for alias in node.names] if isinstance(node, ast.Import) else
+                     [node.module] if isinstance(node, ast.ImportFrom) and node.module and not node.level else [])
+            for name in names:
+                for candidate in (ROOT / (name.replace(".", "/") + ".py"), path.parent / f"{name}.py"):
+                    if candidate.is_file() and candidate.is_relative_to(ROOT / "tools"):
+                        module = str(candidate.relative_to(ROOT))
+                        if module not in found and candidate != ROOT / script:
+                            found.append(module)
+                            pending.append(candidate)
+                        break
+    return sorted(found)
 
 # The data in JSON that the text takes messages from, with \from{...} lines (tools/text/text_sources.py)
 TEXT_DATA_DIRS = ["data/pokemon", "data/moves", "data/items", "data/trainers", "data/abilities", "data/types",
@@ -256,15 +321,39 @@ class Writer:
         self.out.write(f"default {' '.join(str(t) for t in targets)}\n")
 
 
+def download_pinned(name: str, url: str, expected_hash: str, path: Path):
+    """Downloads a pinned release binary to path unless it is already there with the expected SHA256, replacing an older
+    cached one."""
+    if path.exists() and hashlib.sha256(path.read_bytes()).hexdigest() == expected_hash:
+        return
+    print(f"Downloading {name}")
+    with urllib.request.urlopen(url) as response:
+        data = response.read()
+    if hashlib.sha256(data).hexdigest() != expected_hash:
+        raise ValueError(f"Downloaded {name} has an unexpected SHA256: {url}")
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix=f"{path.name}-", delete=False) as temporary:
+        temporary.write(data)
+        temporary_path = Path(temporary.name)
+    try:
+        temporary_path.chmod(temporary_path.stat().st_mode | stat.S_IEXEC)
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
+def mwcc_command(mwcc: Path, tools_dir: Path = ROOT / "tools") -> list[str]:
+    """Returns the command that runs a Metrowerks compiler under wibo, through sjiswrap."""
+    return [str(tools_dir / "wibo"), str(tools_dir / "sjiswrap.exe"), str(mwcc)]
+
+
 def download_tools(tools_dir: Path):
     host = (sys.platform, platform.machine().lower())
-    wibo = tools_dir / "wibo"
-    if not wibo.exists():
-        print(f"Downloading wibo {WIBO_VERSION}")
-        binary = WIBO_BINARIES.get(host, "wibo-x86_64")
-        url = f"https://github.com/decompals/wibo/releases/download/{WIBO_VERSION}/{binary}"
-        urllib.request.urlretrieve(url, wibo)
-        wibo.chmod(wibo.stat().st_mode | stat.S_IEXEC)
+    binary = WIBO_BINARIES.get(host, "wibo-x86_64")
+    download_pinned(f"wibo {WIBO_VERSION}", f"{WIBO_REPO}/releases/download/{WIBO_VERSION}/{binary}",
+                    WIBO_SHA256[binary], tools_dir / "wibo")
+    download_pinned(f"sjiswrap {SJISWRAP_VERSION}",
+                    f"{SJISWRAP_REPO}/releases/download/{SJISWRAP_VERSION}/sjiswrap-windows-x86.exe",
+                    SJISWRAP_SHA256, tools_dir / "sjiswrap.exe")
 
     objdiff = tools_dir / "objdiff-cli"
     if not objdiff.exists():
@@ -422,7 +511,9 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         sources = sorted(str(p.relative_to(ROOT)) for d in [data_dir, *(other_dirs[0] if other_dirs else [])]
                          for p in ([ROOT / d] if (ROOT / d).is_file() else (ROOT / d).rglob("*")) if p.is_file())
         game = VERSIONS[version]["defines"][0].lower() if per_version else ""
-        n.build(outputs, "data_pack", sources, implicit=[script, *DATA_PACK_TOOLS, *constant_sources],
+        dependencies = sorted({script, *DATA_PACK_TOOLS, *script_imports(script), *DATA_PACK_SOURCES.get(script, []),
+                               *constant_sources})
+        n.build(outputs, "data_pack", sources, implicit=dependencies,
                 order_only=[files_ok], variables={"script": script, "dir": data_dir, "game": game})
         for path, archive in zip(paths, outputs):
             archive_ok = stamp_dir / "files" / f"{path.replace('/', '_')}.ok"
@@ -526,6 +617,7 @@ def main():
     n.comment(f"Generated by configure.py for {', '.join(versions)}, do not edit")
     n.variable("dsd", shlex.quote(str(dsd)))
     n.variable("wine", shlex.quote(wine))
+    n.variable("sjiswrap", shlex.quote(str(tools_dir / "sjiswrap.exe")))
     n.variable("python", shlex.quote(sys.executable))
     n.variable("includes", " ".join(f"-i {d}" for d in INCLUDE_DIRS))
     n.variable("as_includes", " ".join(f"-I {d}" for d in INCLUDE_DIRS))
@@ -536,15 +628,15 @@ def main():
     n.rule("delink", "$dsd delink --config-path $config", "Delinking $config")
     n.rule("lcf", "$dsd lcf --config-path $config", "Generating linker script for $config")
     # mwccarm writes the dependency file next to the object, with Windows paths that fix_depfile.py converts
-    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(mwcc))} {' '.join(CC_FLAGS)} $defines "
-           "-gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
+    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} {' '.join(CC_FLAGS)} "
+           "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
            depfile="$dep", deps="gcc")
     # The older compilers (SPL's 1.2/base) warn when MWCIncludes, their system include path, isn't set. The code finds its
     # headers through -i, so any value does
     for i, (compiler, _) in enumerate(LIBRARIES.values()):
         lib_mwcc = tools_dir / "mwccarm" / compiler / "mwccarm.exe"
-        n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine {shlex.quote(str(lib_mwcc))} $flags "
-               "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
+        n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
+               "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
@@ -565,10 +657,13 @@ def main():
     n.rule("rom_build", "$dsd rom build --config $in --rom $out", "Building $out")
     n.rule("check_modules", "$dsd check modules --config-path $config --fail && touch $out", "Checking modules")
     n.rule("sha1", "sha1sum --quiet -c $in && touch $out", "Checking $rom")
+    # The context stays UTF-8, for decomp.me
     n.rule("ctx", f"$wine {shlex.quote(str(mwcc))} -EP -lang=c99 -gccinc $defines $includes $in "
            "| grep -v -e '^#line' -e 'prepdump' > $out", "Preprocessing $in")
+    # decomp.me compiles the UTF-8 it is given without sjiswrap, so its scratches take the compiler's default encoding
+    decomp_me_flags = " ".join(flag for flag in CC_FLAGS if flag != ENCODING_FLAG)
     n.rule("objdiff_config", f"$python tools/build/objdiff_config.py $version --dsd $dsd "
-           f"--compiler {DECOMP_ME_COMPILER} --c-flags '{' '.join(CC_FLAGS)}' -o $out", "Writing $out")
+           f"--compiler {DECOMP_ME_COMPILER} --c-flags '{decomp_me_flags}' -o $out", "Writing $out")
     n.rule("report", f"{tools_dir / 'objdiff-cli'} report generate -p . -o $out", "Generating $out")
     n.rule("progress", "$python tools/build/progress.py $in", "Progress")
     configure_args = [*args.versions, *(["--bugfix"] if args.bugfix else []),

@@ -204,7 +204,7 @@ static void IrcCompatWindow_Free(IrcCompatWindow *win);
 static BOOL IrcCompatWindow_Flush(IrcCompatWindow *win, IrcCompatText *text);
 static void IrcCompatWindow_PrintMsg(IrcCompatWindow *win, IrcCompatText *text, u32 msgId, int x, s16 y);
 static void IrcCompatWindow_PrintMsgCentered(IrcCompatWindow *win, IrcCompatText *text, u32 msgId);
-static void IrcCompatWindow_PrintMsgNumber(IrcCompatWindow *win, IrcCompatText *text, u32 msgId, u32 number, u16 index);
+static void IrcCompatWindow_PrintMsgNumber(IrcCompatWindow *win, IrcCompatText *text, u8 msgId, u8 number, u16 index);
 static void IrcCompatWindow_PrintMsgPlayers(IrcCompatWindow *win, IrcCompatText *text, u32 msgId,
                                             const CompatibleIrcProfile *own, const CompatibleIrcProfile *other,
                                             HeapID heapId);
@@ -225,7 +225,7 @@ static void IrcCompatFlash_Free(IrcCompatFlash *flash);
 static void IrcCompatFlash_Update(IrcCompatFlash *flash);
 static void IrcCompatFlash_Start(IrcCompatFlash *flash);
 static BOOL IrcCompatFlash_IsDone(IrcCompatFlash *flash);
-static void IrcCompatFlash_BlendColor(u16 *dest, u16 frame, u16 duration, u32 palette, u8 index, u16 from, u16 to);
+static void IrcCompatFlash_BlendColor(u16 *dest, u16 frame, u16 duration, u8 palette, u8 index, u16 from, u16 to);
 static u32 IrcCompat_GetTier(u8 score, BOOL *carry);
 static u32 IrcCompat_GetRewardCount(u32 score, BOOL bothLogs);
 static u32 IrcCompatResult_GiveReward(IrcCompatResultWork *wk);
@@ -638,7 +638,7 @@ static void IrcCompatWindow_PrintMsgCentered(IrcCompatWindow *win, IrcCompatText
     PrintWindow_Print(&win->printWindow, queue, x, y, win->strbuf, font, PRINT_COLOR(15, 14, 4));
 }
 
-static void IrcCompatWindow_PrintMsgNumber(IrcCompatWindow *win, IrcCompatText *text, u32 msgId, u32 number,
+static void IrcCompatWindow_PrintMsgNumber(IrcCompatWindow *win, IrcCompatText *text, u8 msgId, u8 number,
                                            u16 index) {
     WordSet *wordSet;
     PrintQueue *queue;
@@ -759,7 +759,7 @@ static void IrcCompatResult_ShowStep(IrcCompatResultWork *wk, u16 *state) {
         break;
     case STEP_PRINT_SCORE: {
         u8 score = wk->param->result;
-        u8 msgId = score / 10 + 2;
+        u16 msgId = (u8)(score / 10 + 2);
 
         if (msgId > 12) {
             msgId = 12;
@@ -831,8 +831,8 @@ static void IrcCompatResult_ShowStep(IrcCompatResultWork *wk, u16 *state) {
         if (wk->counter++ > 30) {
             IrcAppBar_SetVisible(wk->button, TRUE);
             wk->counter = 0;
+            *state = STEP_SHOW_BUTTON;
         }
-        *state = STEP_SHOW_BUTTON;
         break;
     case STEP_SHOW_BUTTON:
         IrcAppBar_SetVisible(wk->button, TRUE);
@@ -1027,7 +1027,7 @@ static BOOL IrcCompatFlash_IsDone(IrcCompatFlash *flash) {
     return flash->done;
 }
 
-static void IrcCompatFlash_BlendColor(u16 *dest, u16 frame, u16 duration, u32 palette, u8 index, u16 from, u16 to) {
+static void IrcCompatFlash_BlendColor(u16 *dest, u16 frame, u16 duration, u8 palette, u8 index, u16 from, u16 to) {
     u8 fromR = from & GX_RGB_R_MASK;
     u8 fromG = (from & GX_RGB_G_MASK) >> GX_RGB_G_SHIFT;
     u8 fromB = (from & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT;
@@ -1104,19 +1104,17 @@ static u32 IrcCompatResult_GiveReward(IrcCompatResultWork *wk) {
             if (SWEET_HEART_MAX - owned < count) {
                 count = SWEET_HEART_MAX - owned;
             }
-            result = REWARD_GIVEN;
-            if (!BagSave_AddItem(bag, ITEM_SWEET_HEART, count, HEAPID_IRC_COMPAT)) {
+            if (BagSave_AddItem(bag, ITEM_SWEET_HEART, count, HEAPID_IRC_COMPAT)) {
+                result = REWARD_GIVEN;
+            } else {
                 result = REWARD_NO_ROOM;
             }
         }
     }
     if (wk->param->profile != NULL) {
         u16 *name = GetPlayerName(info);
-        u8 unk10_17 = 1;
+        u8 unk10_17 = getTrainerGender(info) != 0 ? 0 : 1;
 
-        if (getTrainerGender(info) != 0) {
-            unk10_17 = 0;
-        }
         func_0200b184(log, name, wk->param->result, unk10_17, other->birthMonth, other->birthDay, getIDAsUInt(info),
                       other->species, other->form, other->sex, other->isEgg);
     }

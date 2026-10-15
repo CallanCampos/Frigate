@@ -919,7 +919,7 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
             u32 field12 = TournamentEntry_GetField(wk->entry, 12);
             BOOL known = func_0200f254(wk->record, wk->param.partnerData->mac);
 
-            wk->readySent = (field12 != 0 || !known);
+            wk->readySent = (field12 != 0 || (field12 == 0 && !known));
             *seq = 16;
         } else {
             WifiBattleMatchLinkIcon_SetShown(wk->linkIcon, FALSE);
@@ -1077,8 +1077,8 @@ static void LiveBattleMatchFlow_StepRecord(WifiBattleMatchTask *task, u32 *seq, 
         }
         break;
     case 3: {
-        u32 won;
-        u32 lost;
+        u8 won;
+        u8 lost;
         u8 played = func_0200f1d8(wk->record, 0);
 
         func_0200f218(wk->record, played, wk->param.partnerData->mac);

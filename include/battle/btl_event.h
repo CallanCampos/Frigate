@@ -96,7 +96,7 @@ u8 HandlerGetMainModule(BattleEventItem *handler);
 u32 BattleEventItem_GetWorkValue(BattleEventItem *item, u32 index);
 void BattleEventItem_SetTempItemFlag(BattleEventItem *item);
 void BattleEventItem_SetRecallEnable(BattleEventItem *item);
-void BattleEventItem_SetWorkValue(BattleEventItem *item, u32 index, u32 value);
+void BattleEventItem_SetWorkValue(BattleEventItem *item, u8 index, u32 value);
 void func_ov167_021bc918(BtlServerFlow *flow, u32 event, u32 factorType, BOOL checkSkip);
 void func_ov167_021bc90c(BtlServerFlow *flow, u32 event, u32 factorType);
 void func_ov167_021bc94c(BtlServerFlow *flow, u32 event, u32 factorType, BOOL checkSkip);

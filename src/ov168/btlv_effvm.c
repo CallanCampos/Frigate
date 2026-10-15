@@ -3050,12 +3050,11 @@ static int BtlvEffvm_GetTargetPositions(BtlvEffvm *wk, int code, int *positions)
     return count;
 }
 
-// NONMATCHING: the rule-1 targets' `? 0 : 1` puts 0 in count's register and 1 in a register the original keeps 1 in
-// for the whole function, 5 bytes
 static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *positions) {
     int count = 1;
     int rule;
     int i;
+    int side;
     BtlvMcssPos pos;
 
     positions[0] = wk->defender;
@@ -3116,7 +3115,11 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
             case 9:
             case 13:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    side = 0;
+                    if (!(wk->attacker & 1)) {
+                        side = 1;
+                    }
+                    positions[0] = side;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4024[wk->attacker];
@@ -3128,7 +3131,11 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
                 break;
             case 11:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    side = 0;
+                    if (!(wk->attacker & 1)) {
+                        side = 1;
+                    }
+                    positions[0] = side;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4044[wk->attacker];
@@ -3528,7 +3535,7 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         if (work->angleStep == 0) {
             work->angleStep = 1;
         }
-        work->radius = vecfx_dist(&from, &to) / 2;
+        work->radius = VEC_Distance(&from, &to) / 2;
         if (param->motionType == 1 || param->motionType == 4) {
             work->height = 0;
         } else {
@@ -3549,14 +3556,14 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         dir.x = to.x - from.x;
         dir.y = to.y - from.y;
         dir.z = to.z - from.z;
-        vecfx_normalize(&dir, &dir);
+        VEC_Normalize(&dir, &dir);
         base.x = FX32_ONE;
         base.y = 0;
         base.z = 0;
-        angle = fx_acos(vecfx_dot(&base, &dir));
-        vecfx_cross(&base, &dir, &axis);
-        vecfx_normalize(&axis, &axis);
-        MAT43_RotationAxisAngle(&work->mtx, &axis, FX_SinIdx(angle), FX_CosIdx(angle));
+        angle = FX_AcosIdx(VEC_DotProduct(&base, &dir));
+        VEC_CrossProduct(&base, &dir, &axis);
+        VEC_Normalize(&axis, &axis);
+        MTX_RotAxis43(&work->mtx, &axis, FX_SinIdx(angle), FX_CosIdx(angle));
         work->mtx.rt.trans.x = from.x;
         work->mtx.rt.trans.y = from.y;
         work->mtx.rt.trans.z = from.z;
@@ -3575,17 +3582,17 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         vec.x = emitterAxis.x;
         vec.y = 0;
         vec.z = emitterAxis.z;
-        vecfx_normalize(&vec, &vec);
-        vecfx_normalize(&flat, &flat);
-        angle = fx_acos(vecfx_dot(&vec, &flat));
-        vecfx_cross(&vec, &flat, &rotAxis);
-        vecfx_normalize(&rotAxis, &rotAxis);
-        MAT43_RotationAxisAngle(&mtx, &rotAxis, FX_SinIdx(angle), FX_CosIdx(angle));
+        VEC_Normalize(&vec, &vec);
+        VEC_Normalize(&flat, &flat);
+        angle = FX_AcosIdx(VEC_DotProduct(&vec, &flat));
+        VEC_CrossProduct(&vec, &flat, &rotAxis);
+        VEC_Normalize(&rotAxis, &rotAxis);
+        MTX_RotAxis43(&mtx, &rotAxis, FX_SinIdx(angle), FX_CosIdx(angle));
         vec.x = emitterAxis.x;
         vec.y = emitterAxis.y;
         vec.z = emitterAxis.z;
-        MAT43_MulVec(&vec, &mtx, &vec);
-        vecfx_normalize(&vec, &vec);
+        MTX_MultVec43(&vec, &mtx, &vec);
+        VEC_Normalize(&vec, &vec);
         if (flip == TRUE) {
             vec.x *= -1;
             vec.z *= -1;
@@ -3638,7 +3645,6 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
     GFL_HeapFree(param);
 }
 
-// NONMATCHING: type and work swap r4/r5, so the zero of the type 5 branch is rematerialized (4 bytes longer)
 static void BtlvEffvm_MoveEmitterArc(SPLEmitter *emitter, u32 type) {
     BtlvEffvmEmitterMotionWork *work = func_02050364(emitter);
     VecFx32 pos;
@@ -3667,12 +3673,16 @@ static void BtlvEffvm_MoveEmitterArc(SPLEmitter *emitter, u32 type) {
             pos.z = FX_CosIdx(angle2);
             pos.z = FX_Mul(pos.z, work->height);
             pos.y = 0;
+        } else if (work->type == 5) {
+            pos.y = FX_CosIdx(angle2);
+            pos.y = FX_Mul(pos.y, work->height);
+            pos.z = 0;
         } else {
-            pos.y = work->type == 5 ? FX_CosIdx(angle2) : FX_CosIdx(angle);
+            pos.y = FX_CosIdx(angle);
             pos.y = FX_Mul(pos.y, work->height);
             pos.z = 0;
         }
-        MAT43_MulVec(&pos, &work->mtx, &pos);
+        MTX_MultVec43(&pos, &work->mtx, &pos);
         if (work->offsetMode != 0) {
             BtlvEffvm_ProjectToScreen(&pos, NULL);
         }
@@ -4037,8 +4047,8 @@ static void BtlvEffvm_ProjectToScreen(VecFx32 *pos, const VecFx32 *offset) {
     MtxFx44 mtx;
     fx32 w;
 
-    MAT43_To4x4(&NNS_G3dGlb.cameraMtx, &mtx);
-    MAT4_Mul(&mtx, &NNS_G3dGlb.projMtx, &mtx);
+    MTX_Copy43To44_(&NNS_G3dGlb.cameraMtx, &mtx);
+    MTX_Concat44(&mtx, &NNS_G3dGlb.projMtx, &mtx);
     if (offset != NULL) {
         pos->x += offset->x;
         pos->y += offset->y;
@@ -4282,9 +4292,8 @@ static void BtlvEffvm_BgmFadeTask(TCB *tcb, void *data) {
     }
 }
 
-// NONMATCHING: MWCC folds each step of the window's bounds, `- 0x100 + 1`, into one `subs #0xff`, where the original
-// keeps a subtraction of 0x100 and an addition of 1 (mixing in an unsigned `1u` keeps them apart), and the original
-// masks the vertical bounds with 0xffff before storing them, loading winV before winH
+// NONMATCHING: the original masks the vertical bounds with 0xffff (an `ands` against a mask built as 0xff << 8 | 0xff,
+// shared by both stores) where MWCC drops the mask under the 16-bit store, and loads winV before winH, 12 bytes
 static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
     BtlvEffvmWindowWork *work = data;
 
@@ -4302,16 +4311,20 @@ static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
             work->wait = work->waitReload;
             switch (work->dir) {
             case 0:
-                work->winV = work->winV - 0x100 + 1;
+                work->winV -= 0x100;
+                work->winV++;
                 break;
             case 1:
-                work->winV = work->winV + 0x100 - 1;
+                work->winV += 0x100;
+                work->winV--;
                 break;
             case 2:
-                work->winH = work->winH - 0x100 + 1;
+                work->winH -= 0x100;
+                work->winH++;
                 break;
             case 3:
-                work->winH = work->winH + 0x100 - 1;
+                work->winH += 0x100;
+                work->winH--;
                 break;
             }
             reg_G2_WIN0H = work->winH;
