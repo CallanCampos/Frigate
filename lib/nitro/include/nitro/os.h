@@ -90,6 +90,8 @@ s32 func_0207a1a0(u16 lockId);
 // NitroSDK's OS_DisableInterrupts and OS_RestoreInterrupts, under swan's names
 u32 CPU_IRQDisable(void);
 u32 CPU_SetIRQMask(u32 mask);
+// IRQ dispatcher; WCM also uses its address as a special mutex-owner marker.
+void CPU_IRQInvoke(void);
 // NitroSDK's OS_GetProcMode: the processor mode, 0x12 in an IRQ handler
 u32 CPU_GetMode(void);
 // NitroSDK's OS_EnableIrqMask, under swan's name

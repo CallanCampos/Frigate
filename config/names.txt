@@ -2835,13 +2835,13 @@ overlays/ov011 0x0215cac4 WCM_InitOnce
 overlays/ov011 0x0215caf8 WCM_DispatchRecvCallback
 overlays/ov011 0x0215cb0c WCM_GetGlobal
 overlays/ov011 0x0215cb14 WCM_GetApMacAddress
-overlays/ov011 0x0215cb48 WCM_GetConnectedApInfo
+overlays/ov011 0x0215cb48 WCM_GetConnectedApSsid
 overlays/ov011 0x0215cb8c WCM_SetRecvDCFCallback
 overlays/ov011 0x0215cba4 WCM_SendDCFDataEx
-overlays/ov011 0x0215cc90 WCM_OnDmaDone
+overlays/ov011 0x0215cc90 WCM_ReleaseIrqOwnedMutex
 overlays/ov011 0x0215ccb0 WCM_SetMacAddress
 overlays/ov011 0x0215ccc0 WCM_GetMacAddress
-overlays/ov011 0x0215ccd4 WCM_BuildFrameHeader
+overlays/ov011 0x0215ccd4 WCM_AssembleSendFrame
 overlays/ov011 0x0215cd28 WCM_CompareBytes
 overlays/ov011 0x0215cd4c WCM_CompareBssID
 overlays/ov011 0x0215cd58 WCM_UpdateLinkQuality
@@ -2867,8 +2867,8 @@ overlays/ov011 0x0215d8c4 WCM_OnDcfReceive
 overlays/ov011 0x0215d978 WCM_OnDisconnectPreparationComplete
 overlays/ov011 0x0215da3c WCM_OnResetComplete
 overlays/ov011 0x0215dc2c WCM_BuildScanRequest
-overlays/ov011 0x0215dd08 WCM_OnAsyncDone
-overlays/ov011 0x0215dd30 WCM_OnAsyncDoneWithStatus
+overlays/ov011 0x0215dd08 WCM_OnSendComplete
+overlays/ov011 0x0215dd30 WCM_OnSendCompleteWithCallback
 overlays/ov011 0x0216eea8 Gt2_GetEngine
 overlays/ov011 0x0216eeb0 Gt2_FreePendingConnect
 overlays/ov011 0x0216eebc Gt2_CompareInitMessage

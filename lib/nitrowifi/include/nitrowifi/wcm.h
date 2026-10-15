@@ -2,10 +2,11 @@
 #define POKEBW2_NITROWIFI_WCM_H
 
 #include "types.h"
+#include "nitro/os.h"
 
 // NitroWiFi's wireless connection manager (WCM), in overlays 11 and 12, which DWC's settings in overlay 182 drive. The
-// ROM names none of it: the names are those of the SDK's WCM calls that match what the functions do and where the
-// settings call them.
+// ROM names none of it: established SDK names are kept where identified; descriptive reconstruction names are
+// noted below.
 
 // What a WCM notification reports: the kind of the operation that ended, and its result
 typedef struct {
@@ -71,13 +72,15 @@ s32 WCM_LockApList(s32 lock);
 void *WCM_PointApList(u16 index);
 // A beacon or probe response NitroSDK's WM handed WCM; fills or touches its WCM_PointApList entry
 s32 WCM_OnBeaconReceived(void *frame, u16 param);
-// The channel and BSSID WCM is connected to, or 0/NULL while there is none
-s32 WCM_GetConnectedApInfo(u16 *channel);
+// Descriptive name: borrowed SSID bytes and optional length, or NULL/zero while disconnected. The bytes need not be
+// NUL-terminated and remain owned by WCM; a connection change or Finish can invalidate the pointer.
+const u8 *WCM_GetConnectedApSsid(u16 *ssidLength);
 void WCM_DispatchRecvCallback(u8 *src, u8 *dst, u8 *data, u32 len);
-// A DMA or WM wait's completion callback, decrementing its remaining count and waking its thread at zero
-void WCM_OnDmaDone(void *info);
-// Sends a frame to the MAC address dst as a header and the data after it, returning a negative number on an error.
-// NitroWiFi's CPS sends every frame through it (WCM_SendDCFDataEx's role)
+// Descriptive name: releases one mutex level only when its owner is the IRQ-handler address used as a special marker.
+void WCM_ReleaseIrqOwnedMutex(OSMutex *mutex);
+// Sends to the six-byte address dst, copying headerLen/dataLen bytes into WCM's work during this call. Assembly
+// precedes backend length validation. Returns -1 without work or -4 for an invalid state/reset in progress;
+// after a send attempt it returns headerLen + dataLen even if the backend rejected the assembled frame.
 s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *data, s32 dataLen);
 // Copies the MAC address of the wireless hardware to mac
 void WCM_GetMacAddress(u8 *mac);
