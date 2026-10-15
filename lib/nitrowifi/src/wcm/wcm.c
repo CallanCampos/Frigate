@@ -47,16 +47,16 @@ typedef struct WCMApEntry WCMApEntry;
 struct WCMApEntry {
     u8 inUse;
     u8 unk_01;
-    u16 rssi; // the beacon or probe response's signal level, WCM_OnBeaconReceived's param
+    u16 scanLinkLevel; // DS scan link level; the DSi producer's value domain is unconfirmed
     s32 id; // the AP list header's count when this entry was allocated or reused
     WCMApEntry *prev;
     WCMApEntry *next;
-    u8 record[0xc0]; // the raw beacon or probe response header, with its parsed information elements appended
+    WMBssDesc record; // Retained prefix; bytes 0x40..0xbf hold packed IEs rather than WMGameInfo.
 };
 
 // The caller's AP list buffer (WCMConfig.pbdbuffer), read as a header followed by up to apMax WCMApEntry records
 typedef struct WCMApListHeader {
-    s32 count;
+    u32 count;
     WCMApEntry *head; // the oldest entry (WCM_GetOldestApEntry's result)
     WCMApEntry *tail; // the newest
 } WCMApListHeader;
@@ -158,7 +158,6 @@ static WCMGlobal sWcm;
 
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode);
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option);
-static s32 WCM_OnBeaconReceivedDSi(void *frame);
 static void WCM_AddRssiSample(s32 rawSample);
 static WCMWork *WCM_GetWork(void);
 static void WCM_SetConfig(WCMConfig *config, WCMNotify notify);
@@ -177,9 +176,8 @@ static WCMApEntry *WCM_GetOldestApEntry(void);
 static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid);
 static WCMApEntry *WCM_FindApEntryById(s32 id);
 static void WCM_TouchApEntry(WCMApEntry *entry);
-static void WCM_FillApEntry(const void *frame, WCMApEntry *entry);
-static void *WCM_FindVendorIE(void *frame);
-static void *WCM_GetInformationElement(void *frame, u32 tag, void *out);
+static void *WCM_FindVendorIE(const WMBssDesc *bss);
+static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out);
 static void WCM_InitOnce(void);
 static WCMGlobal *WCM_GetGlobal(void);
 static void WCM_SetMacAddress(const u8 *mac);
@@ -899,49 +897,42 @@ static void *WCM_PointApListCore(u16 index) {
         return NULL;
     }
     CPU_SetIRQMask(irq);
-    return entry->record;
+    return &entry->record;
 }
 
-s32 WCM_OnBeaconReceived(void *frame, u16 param) {
+void WCM_OnBeaconReceived(const WMBssDesc *bss, u16 scanLinkLevel) {
     WCMWork *work = WCM_GetWork();
-    void *vendorIE;
-    WCMApEntry *entry = NULL;
+    WCMApEntry *entry;
 
-    if (work == NULL) {
-        return 0;
+    if (work == NULL || work->apListLocked != 0) {
+        return;
     }
-    if (work->apListLocked != 0) {
-        return 0;
+    if (hw_isDSi() && work->wirelessMode == 2 && WCM_FindVendorIE(bss) != NULL) {
+        return;
     }
-    if (hw_isDSi() && work->unk_12e0[3] == 2) {
-        if (WCM_OnBeaconReceivedDSi(frame) != 0) {
-            return 0;
-        }
+    if (work->wirelessMode == 1 && bss->gameInfoLength != 0) {
+        return;
     }
-    if (work->wirelessMode == 1 && ((u16 *)frame)[0x1e] != 0) {
-        return 0;
-    }
-    entry = WCM_FindApEntryByBssid((const u8 *)frame + 4);
-    if (!entry) {
+    entry = WCM_FindApEntryByBssid(bss->bssid);
+    if (entry == NULL) {
         entry = WCM_AllocApEntry();
     }
-    if (!entry && work->scanMode == 1) {
+    if (entry == NULL && work->scanMode == 1) {
         entry = WCM_GetOldestApEntry();
     }
     if (entry != NULL) {
-        WCM_FillApEntry(frame, entry);
-        ((u16 *)entry->record)[1] = param;
+        WCM_FillApEntry(bss, &entry->record);
+        entry->scanLinkLevel = scanLinkLevel;
         WCM_TouchApEntry(entry);
     }
-    return 0;
 }
 
 static WCMApEntry *WCM_AllocApEntry(void) {
     WCMWork *work = WCM_GetWork();
     WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
     WCMApEntry *entries;
-    s32 max;
-    s32 i;
+    u32 max;
+    u32 i;
     WCMApEntry *entry = NULL;
 
     if (header == NULL) {
@@ -951,19 +942,19 @@ static WCMApEntry *WCM_AllocApEntry(void) {
         return NULL;
     }
     max = (work->apBufferBytes - 0xc) / sizeof(WCMApEntry);
-    if (header->count >= max) {
+    if (max == 0 || header->count >= max) {
         return NULL;
     }
     entries = (WCMApEntry *)((u8 *)header + 0xc);
     for (i = 0; i < max; i++) {
-        if (!entries[i].inUse) {
+        entry = &entries[i];
+        if (!entry->inUse) {
             break;
         }
     }
     if (i >= max) {
-        return NULL;
+        return entry;
     }
-    entry = &entries[i];
     entry->inUse = TRUE;
     entry->id = header->count;
     entry->prev = header->tail;
@@ -998,7 +989,7 @@ static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid) {
     }
     if (header != NULL && work->apBufferBytes > 0xc) {
         for (entry = header->head; entry != NULL; entry = entry->next) {
-            u8 *record = entry->record;
+            u8 *record = (u8 *)&entry->record;
             if (WCM_CompareBssID(record + 4, bssid)) {
                 break;
             }
@@ -1068,75 +1059,69 @@ static void WCM_TouchApEntry(WCMApEntry *entry) {
     }
 }
 
-// Clears an entry's record, copies the raw beacon or probe response header in, and appends its parsed SSID and
-// security information elements after it
-static void WCM_FillApEntry(const void *frame, WCMApEntry *entry) {
+// Copies the descriptor prefix and retains selected IEs in the destination's raw 0x40..0xbf tail.
+void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination) {
     WCMWork *work = WCM_GetWork();
-    u8 *record = entry->record;
-    const u8 *ie;
-    u16 ieCount;
-    u16 ieLen;
-    s32 total = 0;
-    u16 n = 0;
+    const u8 *ie = (const u8 *)source + 0x40;
+    u8 *output = (u8 *)destination + 0x40;
+    u8 total = 0;
+    u16 n;
 
-    sys_memset32_fast(0, record, 0xc0);
-    sys_memcpy32_fast(frame, record, 0x40);
-    ((u16 *)record)[0x1f] = 0;
-    record[0] = (work->wirelessMode == 1) ? 0x20 : 0x40;
-
-    ie = (const u8 *)frame + 0x40;
-    ieCount = ((const u16 *)frame)[0x1f];
-    while (n < ieCount) {
+    sys_memset32_fast(0, destination, sizeof(*destination));
+    sys_memcpy32_fast(source, destination, 0x40);
+    destination->otherElementCount = 0;
+    destination->length = work->wirelessMode == 1 ? 0x20 : 0x40;
+    for (n = 0; n < source->otherElementCount; n++) {
         u8 tag = ie[0];
-        u8 len = ie[1];
-        if (tag == 0x32 || tag == 0x2a || tag == 0x2f || tag == 7 || tag == 0x30) {
-            ieLen = len + 2;
-            sys_memcpy_fast(ie, record + 0x40 + total, ieLen);
-            total += ieLen;
-            ((u16 *)(record + 0x3e))[0]++;
-        } else if (tag == 0xdd) {
-            if (sys_memcmp(ie + 2, data_ov011_02185008, 4) == 0 || sys_memcmp(ie + 2, data_ov011_0218500c, 5) == 0) {
-                ieLen = len + 2;
-                sys_memcpy_fast(ie, record + 0x40 + total, ieLen);
-                total += ieLen;
-                ((u16 *)(record + 0x3e))[0]++;
-            }
+        u16 ieLen = ie[1] + 2;
+        BOOL retain = tag == 0x32 || tag == 0x2a || tag == 0x2f || tag == 7 || tag == 0x30;
+
+        if (tag == 0xdd) {
+            retain = sys_memcmp(ie + 2, data_ov011_02185008, 4) == 0 ||
+                     sys_memcmp(ie + 2, data_ov011_0218500c, 5) == 0;
         }
-        ie += len + 2;
-        n++;
+        if (retain) {
+            sys_memcpy_fast(ie, output, (u8)ieLen);
+            output += ieLen;
+            total += (u8)ieLen;
+            destination->otherElementCount++;
+        }
+        ie += ieLen;
     }
-    ((u16 *)record)[0] += (u8)total;
+    destination->length += total;
 }
 
-static void *WCM_FindVendorIE(void *frame) {
+static void *WCM_FindVendorIE(const WMBssDesc *bss) {
     WCMWork *work = WCM_GetWork();
+    const u8 *bytes = (const u8 *)bss;
     u8 buf[4];
 
     sys_memcpy_fast(data_ov011_02185004, buf, 4);
-    if (frame == NULL) {
+    if (bss == NULL) {
         return NULL;
     }
-    if (hw_isDSi() && work->wirelessMode == 2) {
-        if (((u16 *)frame)[0x1f] != 0) {
-            void *ie = WCM_GetInformationElement(frame, 0xdd, buf);
-            if (ie != NULL && ((u16 *)ie)[5] == 1) {
-                return (u8 *)ie + 5;
+    if (hw_isDSi()) {
+        if (work->wirelessMode == 2 && bss->otherElementCount != 0) {
+            void *ie = WCM_GetInformationElement(bss, 0xdd, buf);
+            if (ie != NULL && *(u16 *)((u8 *)ie + 0xa) == 1) {
+                return (u8 *)ie + 0xa;
             }
         }
         return NULL;
     }
     if (work->wirelessMode == 1) {
-        u16 len = ((u16 *)frame)[0x1e];
+        u16 len = bss->gameInfoLength;
         if (len != 0 && len >= 0x10 && len <= 0x80) {
-            if (len == ((u8 *)frame)[0x4a] + 0x10 && ((u16 *)frame)[0x20] == 1 && ((u16 *)frame)[0] == (len + 1 + 0x40) / 2) {
-                return (u8 *)frame + 0x40;
+            if (len == bytes[0x4a] + 0x10 && *(const u16 *)(bytes + 0x40) == 1 &&
+                bss->length == (len + 1 + 0x40) / 2) {
+                return (u8 *)bss + 0x40;
             }
         }
     }
     return NULL;
 }
 
-static void *WCM_GetInformationElement(void *frame, u32 tag, void *out) {
+static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out) {
     return func_02703250(frame, tag, out);
 }
 

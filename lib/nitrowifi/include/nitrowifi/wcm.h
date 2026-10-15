@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "nitro/os.h"
+#include "nitro/wm.h"
 
 // NitroWiFi's wireless connection manager (WCM), in overlays 11 and 12, which DWC's settings in overlay 182 drive. The
 // ROM names none of it: established SDK names are kept where identified; descriptive reconstruction names are
@@ -72,7 +73,9 @@ s32 WCM_CountApList(void);
 s32 WCM_LockApList(s32 lock);
 void *WCM_PointApList(u16 index);
 // A beacon or probe response NitroSDK's WM handed WCM; fills or touches its WCM_PointApList entry
-s32 WCM_OnBeaconReceived(void *frame, u16 param);
+void WCM_OnBeaconReceived(const WMBssDesc *bss, u16 scanLinkLevel);
+// Descriptive name: destination is a raw 0xc0-byte retained descriptor with selected IEs packed after offset 0x40.
+void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination);
 // Descriptive name: borrowed SSID bytes and optional length, or NULL/zero while disconnected. The bytes need not be
 // NUL-terminated and remain owned by WCM; a connection change or Finish can invalidate the pointer.
 const u8 *WCM_GetConnectedApSsid(u16 *ssidLength);
