@@ -62,6 +62,7 @@ void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *rem
 void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus);
 void BigInt_ModExpFast(u16 *dst, const u16 *base, const u16 *exponent, int n, const u16 *modulus);
 void BigInt_BytesToDigits(u16 *dst, const u8 *src, int nbytes, int n);
-void BigInt_DigitsToBytes(u8 *dst, const u16 *src, int nbytes);
+// n is the source digit count passed by callers; the original implementation does not use it.
+void BigInt_DigitsToBytes(u8 *dst, const u16 *src, int nbytes, int n);
 
 #endif // POKEBW2_NITROWIFI_SSL_INTERNAL_H

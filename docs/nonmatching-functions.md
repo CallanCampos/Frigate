@@ -30,14 +30,12 @@ in both versions.
 | `lib/nitro/src/math/math_md5.c` | `MATH_MD5GetHash` | `0x020773dc` / `0x02077408` | 13 bytes: the original sets the block position to 0 (`mov r4, r1`) before the first fill, sharing the register of the 0. Tried the order of that store and of the transform. |
 | `lib/nitro/src/math/math_sha1.c` | `sha1_block_masked` | `0x02077454` / `0x02077480` | 8 bytes, r4 and r5 swapped: the original keeps the block pointer in r5 and word 14 in r4. Tried four orders of the declarations and statements. |
 | `lib/dwc/src/gt2/gt2.c` | `Gt2_OnConnectAttemptDone` | `0x0216f05c` / `0x0216f09c` | Same size, 29 bytes: register allocation differs in the raw-result-to-reason switch. Tried declaration reordering over two sessions. Open. |
-| `lib/dwc/src/gt2/gt2.c` | `Gt2_OnReceivedData` | `0x0216f2bc` / `0x0216f2fc` | Size 0xec/0xf8: structural; the pending connect's callback argument order read off the asm is still uncertain. Open. |
+| `lib/dwc/src/gt2/gt2.c` | `Gt2_OnReceivedData` | `0x0216f2bc` / `0x0216f2fc` | Same size, 25 bytes: registers and stack slots differ. The fixed-header lookup key now has the full pending-record layout, and the callback receives the reliable flag and pending userData in the original order. The address, length and pending pointer occupy different registers; the address buffer and key occupy different stack slots. |
 | `lib/dwc/src/gt2/gt2.c` | `Gt2_OnUnknownMessage` | `0x0216f3b4` / `0x0216f3f4` | Same size, 50 bytes: a `BOOL`-from-callback-result shape close but not exact; the final branch direction didn't match after two rounds. Open. |
-| `lib/dwc/src/gt2/gt2.c` | `Gt2_OnReceivedRaw` | `0x0216f40c` / `0x0216f44c` | Size 0xf4/0x104: structural; the auto-accept vs. ask-app branching is understood but register use differs throughout. Open. |
-| `lib/dwc/src/gt2/gt2.c` | `Gt2_CreateSocket` | `0x0216f51c` / `0x0216f55c` | Size 0x100/0x10c, 12 bytes short. The header documents a 0xa ("bad parameter") return that no written branch produces, unlike `Gt2_OpenConnection`/`Gt2_Connect`/`Gt2_CancelConnect`, which all validate before doing anything; a missing parameter check, not a reused literal, is the likely source of the 12 bytes. Open. |
-| `lib/dwc/src/gt2/gt2.c` | `Gt2_OpenConnection` | `0x0216f698` / `0x0216f6d8` | Size 0x130/0x17c: the least-understood function in the file; its own semantics are still a guess. Open. |
-| `lib/dwc/src/gt2/gt2.c` | `Gt2_Send` | `0x0216f814` / `0x0216f854` | Same size, 59 bytes: close after rewriting a `memcpy` call as a byte loop; a stack-offset shift remains. Open. |
+| `lib/dwc/src/gt2/gt2.c` | `Gt2_OnIncomingAttempt` | `0x0216f40c` / `0x0216f44c` | Same size, 133 bytes: register allocation and stack slots differ after restoring the original init-message copy, connection append before lookup, callback-table order, incoming elapsed-time argument and rejection handle. Formerly named Gt2_OnReceivedRaw. |
+| `lib/dwc/src/gt2/gt2.c` | `Gt2_OpenConnection` | `0x0216f698` / `0x0216f6d8` | Size 0x190/0x17c. Restored both init-message lookup copies, the existing-connection append, and the omitted new-connection pending registration/count tail. The callback table and timeout-millisecond argument now follow the lower layer. The original's inconsistent four-byte attempts representation is preserved; code generation remains open. |
+| `lib/dwc/src/gt2/gt2.c` | `Gt2_Send` | `0x0216f814` / `0x0216f854` | Same size, 59 bytes: close after rewriting a `memcpy` call as a byte loop; a stack-offset shift remains. The lower send argument is a reliable flag. The empty-header allocation overflow also occurs in the ROM; its capacity fix is conditional on BUGFIX and retains the original transmitted length. |
 | `lib/dwc/src/gt2/gt2.c` | `Gt2_Connect` | `0x0216f99c` / `0x0216f9dc` | Size 0xd8/0xd4: close after the same byte-loop fix as `Gt2_Send`; register use in the loop still differs slightly. Open. |
-| `lib/dwc/src/gt2/gt2.c` | `Gt2_CancelConnect` | `0x0216fa70` / `0x0216fab0` | Same size, 46 bytes: close after the byte-loop fix; loop-counter register allocation (index vs. pointer increment) still differs. Open. |
 | `src/ov036/shortcut_menu.c` | `func_ov036_021bedd8` | `0x021bedd8` / `0x021bee10` | 8 bytes short (0x224 against 0x22c). Open. |
 | `src/ov036/shortcut_menu.c` | `SetupMenu` | `0x021bf204` / `0x021bf24c` | 2 bytes short (0x82 against 0x84). The original sets `sys_memset_fast`, keeps the window in a register across the three flush calls and reloads it from `work->window` for `printWindow.window`; ours keeps it in `r4`. Tried: no local window, the local declared before and after the member stores, `printWindow` filled before the flushes, and the arguments of `BmpWin_CreateDynamic` written as literals and reordered. Open. |
 | `src/ov036/shortcut_menu.c` | `ReadInput` | `0x021bf3a8` / `0x021bf450` | 0xc short (0x1b0 against 0x1bc). The original's frame is 0x14 with `count` on the stack at `sp` and the six `u16` locals at `sp+4` to `sp+0xe`; ours is 0x10 with `count` in `r7` and the locals at `sp` to `sp+0xa`, so every access is offset by 4 and one register more is pushed. Tried: all 504 orders of the locals with the six `u16` in order, `volatile count`, `count` as `u32`/`u16`/`s16`, `handled` as `u8`/`u32` with and without an initializer, `newIndex` inlined and as `u8`/`s32`. Open. |
@@ -381,7 +379,7 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_Finish` | `0x0215bce0` / `0x0215bd20` | Ours compiles to 0x34, the original is 0x3c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_GetRequiredWorkSize` | `0x0215bd1c` / `0x0215bd5c` | Ours compiles to 0x2e, the original is 0x3a |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupAsync` | `0x0215bd58` / `0x0215bd98` | Ours compiles to 0xa0, the original is 0x98 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CleanupAsync` | `0x0215be00` / `0x0215be40` | Ours compiles to 0x48, the original is 0x78 |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CleanupAsync` | `0x0215be00` / `0x0215be40` | Size 0x7c/0x78. Restored state 3 reaching the backend/substate switch; the earlier C returned on every path. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SearchAsyncWithParams` | `0x0215bea0` / `0x0215bee0` | 12 bytes differ, same size. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ContinueSearchAsync` | `0x0215bf14` / `0x0215bf54` | Ours compiles to 0x70, the original is 0x64 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectAsync` | `0x0215bf78` / `0x0215bfb8` | Ours compiles to 0xbc, the original is 0x124 |
@@ -392,7 +390,6 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SetConfig` | `0x0215c338` / `0x0215c378` | Ours compiles to 0x90, the original is 0xbc |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ResetSearchOption` | `0x0215c3f4` / `0x0215c434` | 12 bytes differ, same size. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_PickChannel` | `0x0215c40c` / `0x0215c44c` | Ours compiles to 0x54, the original is 0x50 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_NotifyResult` | `0x0215c45c` / `0x0215c49c` | Ours compiles to 0x28, the original is 0x30 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_SetState` | `0x0215c4bc` / `0x0215c4fc` | Ours compiles to 0x58, the original is 0x70 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CancelTimeout` | `0x0215c52c` / `0x0215c56c` | Ours compiles to 0x48, the original is 0x4c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ClearApListBuffer` | `0x0215c594` / `0x0215c5d4` | Ours compiles to 0x34, the original is 0x3c |
@@ -414,7 +411,7 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_AddRssiSample` | `0x0215ce24` / `0x0215ce64` | Ours compiles to 0x10, the original is 0x64 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupStep1` | `0x0215ce88` / `0x0215cec8` | Ours compiles to 0x94, the original is 0xc8 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartupStep2` | `0x0215cf50` / `0x0215cf90` | Ours compiles to 0x40, the original is 0x44 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep1` | `0x0215cf94` / `0x0215cfd4` | Ours compiles to 0x6c, the original is 0xa4 |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep1` | `0x0215cf94` / `0x0215cfd4` | Size 0xa0/0xa4. Restored scan-request initialization, cache maintenance, counter update and submission; request storage now uses the SDK-owned WMScanExParam at work+0x22a0. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep2` | `0x0215d038` / `0x0215d078` | Ours compiles to 0x40, the original is 0x74 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_DisconnectStep` | `0x0215d0ac` / `0x0215d0ec` | Ours compiles to 0x40, the original is 0x44 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_StartParentStep` | `0x0215d0f0` / `0x0215d130` | Ours compiles to 0x70, the original is 0x94 |
@@ -422,15 +419,15 @@ in both versions.
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ComputeChannelGap` | `0x0215d1f8` / `0x0215d238` | Ours compiles to 0x42, the original is 0x4e |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_CancelConnection` | `0x0215d248` / `0x0215d288` | Ours compiles to 0x38, the original is 0x3c |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_OnWmIndication` | `0x0215d284` / `0x0215d2c4` | 53 bytes differ, same size. |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep3` | `0x0215d2d8` / `0x0215d318` | Ours compiles to 0x104, the original is 0x1e0 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep4` | `0x0215d4b8` / `0x0215d4f8` | Ours compiles to 0x64, the original is 0x1b0 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep5` | `0x0215d668` / `0x0215d6a8` | Ours compiles to 0x32, the original is 0x54 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep6` | `0x0215d6bc` / `0x0215d6fc` | Ours compiles to 0xc8, the original is 0x17c |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep7` | `0x0215d838` / `0x0215d878` | Ours compiles to 0x74, the original is 0x8c |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep8` | `0x0215d8c4` / `0x0215d904` | Ours compiles to 0xa0, the original is 0xb4 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep2` | `0x0215d978` / `0x0215d9b8` | Ours compiles to 0x58, the original is 0xc4 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep3` | `0x0215da3c` / `0x0215da7c` | Ours compiles to 0x40, the original is 0x1f0 |
-| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_BuildConnectRequest` | `0x0215dc2c` / `0x0215dc6c` | Ours compiles to 0xc0, the original is 0xdc |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep3` | `0x0215d2d8` / `0x0215d318` | Size 0x10c/0x1e0. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep4` | `0x0215d4b8` / `0x0215d4f8` | Size 0x1a0/0x1b0. Restored scan callbacks, beacon delivery, channel/counter updates, cache maintenance and resubmission; register allocation and code generation remain open. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep5` | `0x0215d668` / `0x0215d6a8` | Size 0x34/0x54. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep6` | `0x0215d6bc` / `0x0215d6fc` | Size 0x170/0x17c. Restored callback state handling and the halfword fields at work+0x22e8/0x22ea, preserving genuine BSS storage at work+0x12e0. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep7` | `0x0215d838` / `0x0215d878` | Size 0x80/0x8c. Uses the recovered halfword at work+0x22e8 and four-argument notification helper; the surrounding callback remains incomplete. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ConnectStep8` | `0x0215d8c4` / `0x0215d904` | Size 0xa8/0xb4. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep2` | `0x0215d978` / `0x0215d9b8` | Size 0x5c/0xc4. Notification calls use the recovered four-argument helper; the callback remains partially reconstructed. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_ParentStep3` | `0x0215da3c` / `0x0215da7c` | Size 0x1e4/0x1f0. Restored state handling, tail-halfword accesses and notification arguments from the original; code generation remains open. |
+| `lib/nitrowifi/src/wcm/wcm.c` | `WCM_BuildScanRequest` | `0x0215dc2c` / `0x0215dc6c` | Same size, 5 bytes differ. Corrected the void return, byte offsets, scan fields, channel mask, scan-type comparison and scan counter. The request reuses WMScanExParam; formerly named WCM_BuildConnectRequest. |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_OnAsyncDone` | `0x0215dd08` / `0x0215dd48` | Ours compiles to 0x24, the original is 0x26 |
 | `lib/nitrowifi/src/wcm/wcm.c` | `WCM_OnAsyncDoneWithStatus` | `0x0215dd30` / `0x0215dd70` | Ours compiles to 0x42, the original is 0x44 |
 | `lib/nitrowifi/src/ssl/ssl.c` | `CPS_SslCanRead` | `0x0215a43c` / `0x0215a47c` | 1 byte: the final `bne` branches to the wrong one of the two adjacent return blocks (`return 0` vs `return -1`), despite the condition being written in the same order as the asm. Tried both the combined-condition and the fully nested-if forms; the nested form made it worse (15 bytes), so this is the closest. Open. |
@@ -440,17 +437,14 @@ in both versions.
 | `lib/nitrowifi/src/ssl/ssl.c` | `CPS_SslTick` | `0x0215a604` / `0x0215a644` | 50 bytes. The session-cache expiry half is confident; the thread-list walk's exact field read on `soc->con` past `read_buf`/`when`/`block_type` (case `CPS_BLOCK_TCPREAD`) isn't fully confirmed. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseMessage` | `0x02158ba0` / `0x02158be0` | Stub (`return SSLI_STATE_ERROR`), ours 4 bytes against the original's 0x20c. Walks the server certificate's DER bytes a field at a time via `SSLi_ParseAsn1Field`, retrying until a field is fully buffered; the bookkeeping fields past `ctx+0x454` aren't recovered. Not attempted. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ProcessHandshakeMessage` | `0x02159918` / `0x02159958` | Stub (sets `ctx->state = SSLI_STATE_ERROR` and ignores `msg`/`msgLen`), ours 0xc against the original's 0x29c. Should dispatch on the handshake message type byte to the ServerHello/Certificate/ServerKeyExchange/ServerHelloDone handlers. Not attempted. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_RestoreSessionById` | `0x02158250` / `0x02158290` | Ours compiles to 0x70, the original is 0x74. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_FindSessionByPeer` | `0x021582c4` / `0x02158304` | Ours compiles to 0xac, the original is 0x78. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SaveSession` | `0x0215833c` / `0x0215837c` | Ours compiles to 0xbc, the original is 0xb4. Open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SaveSession` | `0x0215833c` / `0x0215837c` | Same size, 19 bytes differ. Restored the original peer-hit/invalid-entry/oldest-entry selection and clock() >> 16 timestamps; register allocation remains open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_RaisePriority` | `0x0215847c` / `0x021584bc` | 20 bytes differ, same size. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_FindNamedParam` | `0x021584e8` / `0x02158528` | Ours compiles to 0x40, the original is 0x38. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_DecodeLength` | `0x02158520` / `0x02158560` | Ours compiles to 0x50, the original is 0x42. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_BuildHostPattern` | `0x02158564` / `0x021585a4` | Ours compiles to 0x48, the original is 0x4a. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseCertTime` | `0x021585b0` / `0x021585f0` | Ours compiles to 0x8c, the original is 0x6c. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseAsn1Field` | `0x0215861c` / `0x0215865c` | Ours compiles to 0x1f8, the original is 0x340. DER tag/length/value walker; the field callbacks past `ctx+0x454` aren't fully recovered. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_VerifyQuickResumeSignature` | `0x0215895c` / `0x0215899c` | Ours compiles to 0x11c, the original is 0x124. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_CheckQuickResume` | `0x02158a80` / `0x02158ac0` | Ours compiles to 0xd0, the original is 0xc0. Open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseAsn1Field` | `0x0215861c` / `0x0215865c` | Size 0x1f4/0x340. The OID strings now have their original NUL terminators and comparisons use the original OID length. Other DER field callbacks and bookkeeping remain unrecovered. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_VerifyQuickResumeSignature` | `0x0215895c` / `0x0215899c` | Size 0x128/0x124. Restored the named public-key layout, four digit buffers, original modulus-length conversion and digest-suffix comparison; code generation remains open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_CheckQuickResume` | `0x02158a80` / `0x02158ac0` | Size 0xcc/0xc0. Restored the sentinel return and removed the invented assignment of a named public record to the private-key pointer; code generation remains open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_LabelLength` | `0x02158b40` / `0x02158b80` | Ours compiles to 0x14, the original is 0x16. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_MatchHostname` | `0x02158b58` / `0x02158b98` | Ours compiles to 0x42, the original is 0x46. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseServerHelloRandom2` | `0x02158dac` / `0x02158dec` | Ours compiles to 0xa4, the original is 0x94. Open. |
@@ -458,7 +452,6 @@ in both versions.
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_PickCipherSuite` | `0x02158e74` / `0x02158eb4` | 1 byte differs, same size. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseServerKeyExchange` | `0x02158ec0` / `0x02158f00` | 64 bytes differ, same size. RSA modulus/exponent extraction for the server key exchange. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ParseServerHello` | `0x02158f4c` / `0x02158f8c` | Ours compiles to 0x7c, the original is 0x74. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_DecryptPreMasterSecret` | `0x02158fc0` / `0x02159000` | Ours compiles to 0x138, the original is 0x168. RSA decryption of the pre-master secret. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_HashKeyMaterialBlock` | `0x02159128` / `0x02159168` | Ours compiles to 0x78, the original is 0x6c. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_GenerateKeyBlock` | `0x021591d4` / `0x02159214` | Ours compiles to 0x138, the original is 0x174. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ComputeFinishedMd5` | `0x0215937c` / `0x021593bc` | 85 bytes differ, same size. Open. |
@@ -471,7 +464,7 @@ in both versions.
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_GetRandomBytes` | `0x02159cbc` / `0x02159cfc` | Ours compiles to 0x98, the original is 0xa8. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_ReceiveRecord` | `0x02159bb4` / `0x02159bf4` | Ours compiles to 0xa4, the original is 0x108. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendClientHello` | `0x02159e9c` / `0x02159edc` | Ours compiles to 0xe4, the original is 0x118. Open. |
-| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendClientKeyExchange` | `0x02159fb4` / `0x02159ff4` | Ours compiles to 0x154, the original is 0x1d0. RSA-encrypts the pre-master secret. Open. |
+| `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendClientKeyExchange` | `0x02159fb4` / `0x02159ff4` | Ours compiles to 0x154, the original is 0x1d0. RSA-encrypts the pre-master secret. Open.  Its certificate-key view remains provisional and separate from the recovered named-public/CRT-private records. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_SendChangeCipherSpecAndFinished` | `0x02159db0` / `0x02159df0` | Ours compiles to 0x98, the original is 0xec. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_WaitForChangeCipherSpecAndFinished` | `0x0215a184` / `0x0215a1c4` | 4 bytes differ, same size. Open. |
 | `lib/nitrowifi/src/ssl/ssl.c` | `SSLi_DoHandshake` | `0x0215a1a8` / `0x0215a1e8` | 15 bytes differ, same size. Open. |
