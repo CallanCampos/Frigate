@@ -290,6 +290,18 @@ Same instructions, registers swapped.
   `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
   order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
   and declared first stores it right after the subtraction.
+- In NitroSystem's 2.0/sp2p2 code, a `for` loop's comma-separated increment keeps its last variable in a register for
+  the test and stores the earlier ones, and the `for` initializer's order sets the spill slots of the start values:
+  `g2d_CharCanvas.c`'s `ClearArea1D` matches with `for (; cy < y1; charY++, cy += 8)` and `for (charX = charX0, cx =
+  x0; cx < x1; charX++, cx += 8)`, and `DrawGlyph1D` with `cy++, y -= 8`. There too a load written before a group of
+  temporaries holds its low register and keeps the scheduler from interleaving them (`objParam.param = pCC->param;`
+  first in `ClearArea1D`), and a `const u8` local for a `u8` field picks other registers than an `int`
+  (`DrawGlyph1D`'s glyph width).
+- An inline's enum-typed parameter changes how MWCC orders and allocates the inlined expression when the argument
+  is an integer: `billboard.c`'s `BlActScene_Draw` packs its polygon attributes in the original's order (alpha,
+  then the polygon ID, then the light mask, `const | lights`) only with `G3_PolygonAttr` taking `int light`, as
+  NitroSDK declares it, not `GXLightMask light`; casts or enum locals at the call don't help. Check the SDK's
+  prototype of an inline before the call site.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
@@ -538,6 +550,11 @@ Same code, other `sp` offsets or frame size.
   `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
   `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
   the copy too, a sign that the CSE and copy propagation passes place it.
+- A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
+  which is slotted by first use after the named locals, while the same value computed in place stays a named local
+  slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
+  `ShinkaDemoPieces_Move` gets the original's slots only with each branch's `fx32 distSqXZ` block-scoped and set as
+  `FX_Mul(x, x) + FX_Mul(z, z)` written out; through the file's `SquaredLengthXZ` inline they are temporaries.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
