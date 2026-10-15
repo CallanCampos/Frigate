@@ -91,6 +91,7 @@ static void SetAffinedOamPosition_(const MtxFx22 *mtx, GXOamAttr *oam, const NNS
     fx32 halfH;
     int w;
     int h;
+    u32 effect;
 
     pos.x = GetOamAttrPosX_(oam) << FX32_SHIFT;
     pos.y = GetOamAttrPosY_(oam) << FX32_SHIFT;
@@ -109,6 +110,7 @@ static void SetAffinedOamPosition_(const MtxFx22 *mtx, GXOamAttr *oam, const NNS
                         0);
     }
 
+    effect = G2_GetOBJEffect(oam);
     shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
     w = NNS_G2dGetOamSizeX(&shape) >> 1;
     h = NNS_G2dGetOamSizeY(&shape) >> 1;
@@ -116,7 +118,7 @@ static void SetAffinedOamPosition_(const MtxFx22 *mtx, GXOamAttr *oam, const NNS
     halfH = h << FX32_SHIFT;
     pos.x += -halfW + mtx->_00 * w + mtx->_10 * h;
     pos.y += -halfH + mtx->_01 * w + mtx->_11 * h;
-    if (G2_GetOBJEffect(oam) == GX_OAM_EFFECT_AFFINE_DOUBLE) {
+    if (effect == GX_OAM_EFFECT_AFFINE_DOUBLE) {
         pos.x -= halfW;
         pos.y -= halfH;
     }
@@ -126,34 +128,63 @@ static void SetAffinedOamPosition_(const MtxFx22 *mtx, GXOamAttr *oam, const NNS
     G2_SetOBJPosition(oam, pos.x >> FX32_SHIFT, pos.y >> FX32_SHIFT);
 }
 
+// The current matrix, or the identity without one
+static inline const MtxFx32 *GetCurrentMtx_(void) {
+    if (pCurrentInstance_->pCurrentMtx == NULL) {
+        return &mtxIdentity_;
+    }
+    return pCurrentInstance_->pCurrentMtx;
+}
+
+// The affine parameter of the matrix cache for the OAM's flip on the surface, registered the first time
+static inline u16 GetAffineIndex_(const NNSG2dRenderSurface *surface, const GXOamAttr *oam) {
+    u32 flip = oam->flipV << 1 | oam->flipH;
+    NNSG2dRndCore2DMtxCache *cache = (NNSG2dRndCore2DMtxCache *)pCurrentInstance_->pCurrentMxtCacheFor2D;
+    u16 affineIdx = cache->affineIndex[flip][surface->type - NNS_G2D_SURFACETYPE_MAIN2D];
+
+    if (affineIdx == NNS_G2D_OAM_AFFINE_IDX_NOT_CACHED) {
+        if (flip == 0) {
+            affineIdx = pCurrentInstance_->pFuncOamAffineRegister(&cache->m22);
+        } else {
+            MtxFx22 flipped = cache->m22;
+
+            if (flip & NNS_G2D_RENDERERFLIP_H) {
+                flipped._00 = -flipped._00;
+                flipped._01 = -flipped._01;
+            }
+            if (flip & NNS_G2D_RENDERERFLIP_V) {
+                flipped._10 = -flipped._10;
+                flipped._11 = -flipped._11;
+            }
+            affineIdx = pCurrentInstance_->pFuncOamAffineRegister(&flipped);
+        }
+        cache->affineIndex[flip][surface->type - NNS_G2D_SURFACETYPE_MAIN2D] = affineIdx;
+    }
+    return affineIdx;
+}
+
 // Registers each of a cell's OAMs to a 2D surface, moved by the current matrix's translation and with its characters
 // moved by the image's offset. With a matrix cache, each OAM gets the cached matrix's affine parameters, registered
 // once per flip and surface; otherwise the renderer's flip is applied to it
 static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2dCellData *cell) {
-    NNSG2dRndCoreInstance *rnd = pCurrentInstance_;
-    const MtxFx32 *mtx = rnd->pCurrentMtx;
+    u32 baseCharOffset;
+    u16 i;
     GXOamAttr *oam;
     NNSG2dFVec2 baseTrans;
-    u32 baseCharOffset;
+    const MtxFx32 *mtx = GetCurrentMtx_();
     BOOL affined;
-    u16 i;
 
-    if (mtx == NULL) {
-        mtx = &mtxIdentity_;
-    }
     baseTrans.x = mtx->_20;
     baseTrans.y = mtx->_21;
     baseTrans.x -= surface->viewRect.posTopLeft.x;
     baseTrans.y -= surface->viewRect.posTopLeft.y;
 
     baseCharOffset = pCurrentInstance_->base2DCharOffset;
-    if (pCurrentInstance_->flipFlag == NNS_G2D_RENDERERFLIP_NONE && pCurrentInstance_->pCurrentMxtCacheFor2D != NULL) {
-        affined = TRUE;
-    } else {
-        affined = FALSE;
-    }
+    affined = (pCurrentInstance_->flipFlag == NNS_G2D_RENDERERFLIP_NONE && pCurrentInstance_->pCurrentMxtCacheFor2D != NULL)
+                  ? TRUE
+                  : FALSE;
 
-    oam = &rnd->currentOam;
+    oam = &pCurrentInstance_->currentOam;
     for (i = 0; i < cell->numOAMAttrs; i++) {
         u16 affineIdx;
 
@@ -168,31 +199,9 @@ static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2
 
         oam->charNo += baseCharOffset;
         if (affined) {
-            NNSG2dRndCore2DMtxCache *cache;
-            u32 flip = oam->flipV << 1 | oam->flipH;
             MtxFx22 m22;
 
-            cache = (NNSG2dRndCore2DMtxCache *)pCurrentInstance_->pCurrentMxtCacheFor2D;
-            affineIdx = cache->affineIndex[flip][surface->type - NNS_G2D_SURFACETYPE_MAIN2D];
-            if (affineIdx == NNS_G2D_OAM_AFFINE_IDX_NOT_CACHED) {
-                if (flip == 0) {
-                    affineIdx = pCurrentInstance_->pFuncOamAffineRegister(&cache->m22);
-                } else {
-                    MtxFx22 flipped = cache->m22;
-
-                    if (flip & NNS_G2D_RENDERERFLIP_H) {
-                        flipped._00 = -flipped._00;
-                        flipped._01 = -flipped._01;
-                    }
-                    if (flip & NNS_G2D_RENDERERFLIP_V) {
-                        flipped._10 = -flipped._10;
-                        flipped._11 = -flipped._11;
-                    }
-                    affineIdx = pCurrentInstance_->pFuncOamAffineRegister(&flipped);
-                }
-                cache->affineIndex[flip][surface->type - NNS_G2D_SURFACETYPE_MAIN2D] = affineIdx;
-            }
-
+            affineIdx = GetAffineIndex_(surface, oam);
             m22._00 = mtx->_00;
             m22._01 = mtx->_01;
             m22._10 = mtx->_10;

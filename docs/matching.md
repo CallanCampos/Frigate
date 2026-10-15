@@ -472,6 +472,9 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
+  declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
+  `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there.
 - Taking a parameter's address makes MWCC push all four argument registers to give it a home; an original that pushes
   fewer copied the parameter to a local first and passed that local's address: `g2d_Font.c`'s
   `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2p2).
@@ -743,6 +746,10 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- A sum of several terms in one expression has its right-hand terms evaluated first; accumulating it in separate
+  statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
+  (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
+  `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
   `readSize = romfs_fread(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
@@ -1496,6 +1503,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- With constant arguments, the order of an inline's `if`/`else` arms decides how much MWCC folds. NitroSDK's
+  `G2_SetOBJEffect` (`nitro/gx.h`) keeps two stores and a `cmp #0x100` in NitroSystem's `SetAffinedOamPosition_`
+  only when written `if (effect != AFFINE && effect != AFFINE_DOUBLE) { plain store } else { store with the
+  parameter }`; the `==`/`||` order folds into one store.
 - When both branches of an `if`/`else` give a local a constant, MWCC emits the then-value, branches over the else
   value on the condition, and the else-value last, so the condition's direction decides which constant comes first:
   `b_bag_anm.c`'s button animation needs `if (button >= 10) palette = 2; else palette = 5;`, and `< 10`, a ternary
