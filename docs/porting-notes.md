@@ -49,6 +49,17 @@ owned before the application-record-ready flag is set. Certificate parsing also 
 certificate bytes alongside copied fields. Storage changes need a lifetime audit of the parser, record
 dispatcher, `CPS_SslRead` and release paths together.
 
+[`poke_net_ssl.c`](../lib/poke_net/src/poke_net_ssl.c) retains a caller-supplied connection template. Starting a
+connection copies the template, retaining its borrowed CA list, records and key bytes; a non-NULL server name
+gets a separate allocated copy. Initial default setup zeroes the template, selecting client mode and supplying
+no private CRT key. Custom templates can supply opaque storage at the private-key slot; its producer and
+release contract remain unresolved.
+
+POKE_NET's default authentication callback returns zero for every supplied certificate-check result, replacing
+that result on paths reaching it. Earlier parser rejections still exit before the callback, and the original
+low-byte result can require further chain traversal. Preserve this original callback policy separately from
+the CA record and parser contracts when replacing the backend.
+
 SOCL copies application send data into its ring before returning, while queued commands retain ring slices and
 destination scalars. A successful send result counts admitted payload bytes rather than completed transmission.
 A nonblocking write may admit a prefix; a later blocking-loop admission failure can return an error after an
@@ -139,6 +150,12 @@ whose loop does not check the remaining length; it does not establish a nonnegat
 verification also accepts issuer keys by reference and does not locally bound signature/exponent counts against
 the selected modulus capacity. The private-key path derives `n` from modulus bytes plus one, without local
 prime/exponent/coefficient bounds; its fixed 48-byte output needs 24 readable digits in the intended result
-region. The unrecovered private-key writer and external issuer-key constraints remain relevant to these proofs.
+region.
+
+POKE_NET supplies one concrete issuer key: its default Nintendo CA record has a 128-byte modulus and a three-byte
+exponent. With `n=128`, their 64 and two significant digits fit the conversion regions and leave modulus headroom.
+This does not bound the parsed signature count to its 256-byte conversion capacity. Replacement CA lists are
+stored without validating their key lengths or extents; custom private-key producer constraints remain unresolved.
+
 No reachable game capacity violation or general corrective guard has been established. The byte/digit units and
 conditional division scratch contract are documented at the private declarations.
