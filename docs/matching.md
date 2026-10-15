@@ -567,6 +567,13 @@ Same code, other `sp` offsets or frame size.
   `static inline MysteryCardView_LoadIcon` that declares `arc` itself. A call's result held in a local before it
   is passed on (`date = MysteryCard_GetDateBitmap(card); GFL_BitmapCopy(date, ...)`) also moves the next
   argument's common subexpressions after the call, where the nested call computes them before it.
+- A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
+  saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
+  a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay
+  123's `func_ov123_021eed54` matches with its group loop in `GrimsleyRoom_InitGroupModels(work, 0)`, which counts
+  with its own `u8 index` parameter (`for (; index < GROUP_MODEL_COUNT; index++)`): the earlier loop then loads its
+  zeros from that slot and keeps the 1 for `SetPaused` in `r7`, as the original does. A local counter set from a
+  parameter (`i = first`) doesn't.
 - MWCC derives a large constant offset from one built earlier (`subs r6, #0x80` for 0x1cc from 0x24c) across calls
   and the fall-through of conditional branches, whatever pointer it is added to, and stops only at a join: a label
   reached from two places, as after an `if` without `else`, an `if`/`else`, `||` or an inline with two returns. Empty
