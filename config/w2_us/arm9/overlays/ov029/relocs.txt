@@ -450,6 +450,7 @@ from:0x02196ff0 kind:arm_call to:0x02196780 module:overlay(29)
 from:0x02196ffc kind:arm_call to:0x02193cf0 module:overlay(29)
 from:0x02197010 kind:arm_call to:0x02195bb0 module:overlay(29)
 from:0x02197014 kind:arm_call to:0x02196780 module:overlay(29)
+from:0x02197020 kind:load to:0x02005108 module:main
 from:0x02197024 kind:load to:0x021998cc module:overlay(29)
 from:0x02197028 kind:load to:0x021998d8 module:overlay(29)
 from:0x02197030 kind:arm_call to:0x02193de8 module:overlay(29)

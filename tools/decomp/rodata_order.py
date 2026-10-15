@@ -22,10 +22,11 @@ and a global that no code refers to with a trailing `!`, as in UNK:4!.
 The list must be complete, or the prediction is silently wrong: every function-local initializer counts, down to an
 8-byte struct (btlv_input.c's layout was declared unreachable until BtlvInput_StartTileAnim's ClActorSetup was
 listed), and a table referenced only from another table's initializer is referenced (the initializer relocates to
-it), so it is a plain entry, never `!`. List `--from-object` prints every data object of a compiled object file
-(compiler_probe.py leaves one next to its report) so nothing is forgotten, with the layout the compiler actually
-produced; `--check` compares the prediction against that object and fails loudly when the model and the compiler
-disagree.
+it), so it is a plain entry, never `!`. `--from-object` prints every data object of a compiled object file, such as
+the build's own (build/b2_us/src/ov168/btlv_input.o), so nothing is forgotten, with the layout the compiler actually
+produced; `--check` compares the prediction against that object: the order of each shared section and of the named
+objects with sections of their own, the spec's names and sizes against the object's, and the local initializers by
+size (their compiler-made names can't be matched to the spec's, so their order is not checked).
 
     rodata_order.py VRAM:48 VRAMNamed:48 Pos:12 Up:12 BG1:32@ BG2:32@
     rodata_order.py VRAM:48 VRAMNamed:48 Pos:12 Up:12 BG1:32@ BG2:32@ --want Pos Up VRAM VRAMNamed BG2 BG1 \
@@ -162,11 +163,28 @@ def check(objects: list[tuple[str, int, bool]], markers: dict[str, str], path: s
     if spec_local != object_local:
         ok = False
         print("MISMATCH: local initializers by size: spec has", dict(spec_local), "object has", dict(object_local))
+    actual_separate = [s[0] for s in layouts["separate"] if not s[0].startswith("@")]
+    separate_names = set(actual_separate)
+    want_separate = [name for name in predicted if name in separate_names]
+    if want_separate != actual_separate:
+        ok = False
+        print("MISMATCH: own sections, in order:")
+        print("  predicted:", " ".join(want_separate))
+        print("  compiled: ", " ".join(actual_separate))
     named = {name for name, _, _ in objects}
     missing = [f"{s[0]}:{s[1]}" for s in symbols if s[0] not in named and not s[0].startswith("@")]
     if missing:
         ok = False
         print("MISMATCH: not in the spec:", " ".join(missing))
+    sizes = {s[0]: s[1] for s in symbols}
+    stale = [name for name, _, _ in objects if markers.get(name) != "@" and name not in sizes]
+    if stale:
+        ok = False
+        print("MISMATCH: in the spec but not the object:", " ".join(stale))
+    wrong = [f"{name}:{size} (object {sizes[name]})" for name, size, _ in objects if name in sizes and sizes[name] != size]
+    if wrong:
+        ok = False
+        print("MISMATCH: sizes:", " ".join(wrong))
     return ok
 
 

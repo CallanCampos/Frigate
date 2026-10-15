@@ -44,7 +44,7 @@ void SystemInit(void) {
 
     os_init();
     clock_init();
-    func_0207bbf4();
+    OS_InitAlarm();
     func_0207cb88();
     gfxInit();
     FX_Init();

@@ -14,12 +14,11 @@ void main(void);
 void func_020051d8(BOOL blocked);
 
 // Declarations that belong to headers main.c and machine_use.c do not own, to be moved there:
-// nitro/os.h. NitroSDK's OS_Init, OS_InitAlarm, OS_SetIrqFunction, OS_EnableInterrupts and TwlSDK's
+// nitro/os.h. NitroSDK's OS_Init, OS_SetIrqFunction, OS_EnableInterrupts and TwlSDK's
 // OS_SleepThreadDirect, which scheduler_start_thread (OS_WakeupThreadDirect) undoes
 #define OS_IE_H_BLANK 0x2
 
 void os_init(void);
-void func_0207bbf4(void);
 void CPU_SetIRQFunc(u32 interrupt, void (*func)(void));
 u32 CPU_IRQEnable(void);
 void scheduler_join_thread(OSThread *thread, OSThreadQueue *queue);

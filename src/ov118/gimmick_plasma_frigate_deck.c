@@ -16,9 +16,9 @@ typedef struct {
     Field *field;
 } GimmickWork;
 
-void func_ov118_021eecdc(GimmickWork *work);
-void func_ov118_021eed80(GimmickWork *work);
-void func_ov118_021eed8c(GimmickWork *work);
+static void PlasmaFrigateDeck_LoadObjects(GimmickWork *work);
+static void PlasmaFrigateDeck_FreeObjects(GimmickWork *work);
+static void PlasmaFrigateDeck_StepAnimations(GimmickWork *work);
 
 static const G3DSceneResourceSetup sResources[] = {
     { 0x120, 0, 0 },
@@ -32,28 +32,27 @@ static const G3DSceneActorSetup sActors[] = {
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov118_021eec80(Field *field) {
-    GameData *gameData;
+void GimmickPlasmaFrigateDeck_Setup(Field *field) {
     GimmickWork *work;
 
-    // The game data is fetched and never used
-    gameData = GSYS_GetGameData(Field_GetGameSystem(field));
+    // The game data is fetched and discarded
+    GSYS_GetGameData(Field_GetGameSystem(field));
     work = Field_AllocGimmickWorkBlock(field, 1, Field_GetHeapID(field), sizeof(GimmickWork));
     work->system = Field_GetExpObjSystem(field);
     work->field = field;
-    func_ov118_021eecdc(work);
+    PlasmaFrigateDeck_LoadObjects(work);
 }
 
-void func_ov118_021eecb4(Field *field) {
-    func_ov118_021eed80(Field_GetGimmickWorkBlock(field, 1));
+void GimmickPlasmaFrigateDeck_End(Field *field) {
+    PlasmaFrigateDeck_FreeObjects(Field_GetGimmickWorkBlock(field, 1));
     Field_DeleteGimmickWorkBlock(field, 1);
 }
 
-void func_ov118_021eeccc(Field *field) {
-    func_ov118_021eed8c(Field_GetGimmickWorkBlock(field, 1));
+void GimmickPlasmaFrigateDeck_Update(Field *field) {
+    PlasmaFrigateDeck_StepAnimations(Field_GetGimmickWorkBlock(field, 1));
 }
 
-void func_ov118_021eecdc(GimmickWork *work) {
+static void PlasmaFrigateDeck_LoadObjects(GimmickWork *work) {
     s32 i;
     SRTMatrix *matrix;
 
@@ -84,10 +83,10 @@ void func_ov118_021eecdc(GimmickWork *work) {
     }
 }
 
-void func_ov118_021eed80(GimmickWork *work) {
+static void PlasmaFrigateDeck_FreeObjects(GimmickWork *work) {
     FieldExpObj_FreeScene(work->system, 0);
 }
 
-void func_ov118_021eed8c(GimmickWork *work) {
+static void PlasmaFrigateDeck_StepAnimations(GimmickWork *work) {
     FieldExpObj_StepAllAnimations(work->system);
 }

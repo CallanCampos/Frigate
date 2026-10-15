@@ -1,7 +1,6 @@
-#include "vct_internal.h"
-
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "vct_internal.h"
 
 // The memory the packets come in, the microphone's levels, a filter on its samples, and a canceller of the echo of
 // the speaker. The divider and the square root unit of the hardware do the sums that need them.
@@ -37,8 +36,8 @@ typedef struct VCTEcho {
     int highpassOutput;
 } VCTEcho;
 
-static VCTCapture sCapture = {0, 0, 15, 0x3fc};
-static s16 sInitialCoefficients[6] = {-5637, 16445, -14404, 11473, -12246, 892};
+static VCTCapture sCapture = { 0, 0, 15, 0x3fc };
+static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
 
 static s16 sEchoHistory[0x800];
 static s16 sFarEnd[VCT_FRAME_SAMPLES];
@@ -49,8 +48,7 @@ static u32 sLoudnessHistory[4];
 static VCTNoiseFloor sNoiseFloor;
 static VCTPacketPool sPacketPool;
 
-BOOL VCT_InitPacketPool(void *buffer, u32 size)
-{
+BOOL VCT_InitPacketPool(void *buffer, u32 size) {
     u32 i;
     u32 count = size / sizeof(VCTPacket);
 
@@ -74,14 +72,12 @@ BOOL VCT_InitPacketPool(void *buffer, u32 size)
     return TRUE;
 }
 
-void VCT_ClearPacketPool(void)
-{
+void VCT_ClearPacketPool(void) {
     sPacketPool.freeList = NULL;
     sPacketPool.base = NULL;
 }
 
-VCTPacket *VCT_AllocPacket(void)
-{
+VCTPacket *VCT_AllocPacket(void) {
     VCTPacket *packet = NULL;
     u32 irq = CPU_IRQDisable();
     VCTPacket *head = sPacketPool.freeList;
@@ -94,8 +90,7 @@ VCTPacket *VCT_AllocPacket(void)
     return packet;
 }
 
-void VCT_FreePacket(VCTPacket *packet)
-{
+void VCT_FreePacket(VCTPacket *packet) {
     u32 irq = CPU_IRQDisable();
 
     packet->nextFree = sPacketPool.freeList;
@@ -105,8 +100,7 @@ void VCT_FreePacket(VCTPacket *packet)
     CPU_SetIRQMask(irq);
 }
 
-void VCT_ResetCapture(void)
-{
+void VCT_ResetCapture(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -119,8 +113,7 @@ void VCT_ResetCapture(void)
     sNoiseFloor.quietFrames = 0;
 }
 
-void VCT_GetCaptureLevels(s32 *out)
-{
+void VCT_GetCaptureLevels(s32 *out) {
     if (out != NULL) {
         sys_memcpy(&sCapture, out, sizeof(VCTCapture));
     }
@@ -128,8 +121,7 @@ void VCT_GetCaptureLevels(s32 *out)
 
 // Decides from the loudness of a frame whether a voice has started, goes on or has ended: 0 for none, 1 for the start,
 // 2 for the middle and 3 for the end
-int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
-{
+int VCT_UpdateVad(u32 energy, u32 rms, u8 *level) {
     u32 scaled = rms >> 8;
     int result;
 
@@ -183,32 +175,28 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level)
         }
         if (REG_SQRT_RESULT > sNoiseFloor.threshold) {
             sNoiseFloor.quietFrames = 0;
-        } else {
-            sNoiseFloor.quietFrames++;
-            if (sNoiseFloor.quietFrames > sCapture.quietFrameLimit) {
-                sCapture.speaking = 0;
-                sNoiseFloor.quietFrames = 0;
-                sNoiseFloor.index = 0;
-                result = 3;
-                goto done;
-            }
+            return 2;
         }
-        result = 2;
+        sNoiseFloor.quietFrames++;
+        if (sNoiseFloor.quietFrames <= sCapture.quietFrameLimit) {
+            return 2;
+        }
+        sCapture.speaking = 0;
+        sNoiseFloor.quietFrames = 0;
+        sNoiseFloor.index = 0;
+        return 3;
     }
-done:
     return result;
 }
 
-void VCT_InitCapture(void)
-{
+void VCT_InitCapture(void) {
     sCapture.quietFrameLimit = 15;
     sCapture.unkC = sCapture.quietFrameLimit * 0x44;
     VCT_ResetCapture();
 }
 
 // Filters a frame in place with a high-pass filter and returns the mean of the squares of the result
-u32 VCT_FilterFrame(s16 *samples, int bytes)
-{
+u32 VCT_FilterFrame(s16 *samples, int bytes) {
     s16 input = samples[0];
     unsigned long count = (u32)bytes >> 1;
     int minusInput = -(input * 0xe9f);
@@ -241,8 +229,7 @@ u32 VCT_FilterFrame(s16 *samples, int bytes)
     return REG_DIV_RESULT_LO;
 }
 
-void VCT_InitEcho(void)
-{
+void VCT_InitEcho(void) {
     const s16 *coeffs = sInitialCoefficients;
     int i;
 
@@ -258,15 +245,13 @@ void VCT_InitEcho(void)
 }
 
 // Keeps the frame that was played, to know what the microphone heard of it
-void VCT_SaveFarEnd(s16 *samples, int bytes)
-{
+void VCT_SaveFarEnd(s16 *samples, int bytes) {
     sys_memcpy32_fast(samples, sFarEnd, bytes);
 }
 
 // Runs the speaker's frame through a filter of the echo's way back, and turns the microphone down by more the louder
 // the echo is
-static void SuppressEcho(s16 *mic, s16 *far, int bytes, u32 rms)
-{
+static void SuppressEcho(s16 *mic, s16 *far, int bytes, u32 rms) {
     u64 energy = 0;
     u32 i = 0;
     u32 count = (u32)bytes >> 1;
@@ -325,13 +310,11 @@ static void SuppressEcho(s16 *mic, s16 *far, int bytes, u32 rms)
     }
 }
 
-void VCT_CancelEcho(s16 *samples, int bytes, u32 rms)
-{
+void VCT_CancelEcho(s16 *samples, int bytes, u32 rms) {
     SuppressEcho(samples, sFarEnd, bytes, rms);
 }
 
-void VCT_MixSamples(s16 *a, s16 *b, s16 *out, u32 bytes)
-{
+void VCT_MixSamples(s16 *a, s16 *b, s16 *out, u32 bytes) {
     u32 count = bytes >> 1;
     u32 i;
 

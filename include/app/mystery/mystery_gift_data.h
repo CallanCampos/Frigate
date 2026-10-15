@@ -30,8 +30,7 @@ static const u32 sRibbonParams[15] = {
 // valid
 static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapID heapId, GameData *gameData) {
     const MysteryGiftPokemon *poke = (const MysteryGiftPokemon *)gift;
-    // The copy keeps a computed heap ID, such as a tail heap, in a slot of its own before the other locals, as the
-    // original's callers in overlay 197 have it
+    // The heap ID is copied, so that a computed one such as a tail heap gets a slot of its own
     HeapID heap = heapId;
     u16 level = poke->level;
     u32 trainerId = poke->trainerId;

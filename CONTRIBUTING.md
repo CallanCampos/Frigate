@@ -83,4 +83,5 @@ and naming of the code around yours.
 ## Claude Code
 
 The repository includes [Claude Code](https://claude.com/claude-code) skills and agents for this workflow, in
-`CLAUDE.md` and `.claude/`. They follow the same rules as this page. Using them is optional.
+`CLAUDE.md` and `.claude/`, with Codex copies in `AGENTS.md`, `.agents/` and `.codex/`. They follow the same rules as
+this page. Using them is optional. A change to a skill goes into both copies.

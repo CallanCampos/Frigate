@@ -16,4 +16,8 @@ s32 func_02769ce8(void);
 s32 func_02769dc4(const u8 *dst, const void *buffer, u16 byteLength, void (*completion)(s32 result));
 s32 func_02769e54(void);
 
+// The DSi build's reader of a beacon's information elements, in LTD: finds the element with the given tag in the BSS
+// description's frame, using out as scratch, and returns it or NULL
+void *func_02703250(const void *frame, u32 tag, void *out);
+
 #endif // POKEBW2_NITROWIFI_WCM_DSI_H

@@ -91,7 +91,7 @@ a rule here changes, change it there too.
 
 ## Skills and agents
 
-Skills in `.claude/skills/`:
+Skills in `.claude/skills/`, with Codex copies in `.agents/skills/` that change with them in the same commit:
 - `decomp-file`: the whole loop for one original file, from boundaries to commit.
 - `match-function`: the triage-and-levers loop for a function that doesn't match, with its stop rules, the symptom
   index (`levers.md`) and the capped permuter (`permuter.md`).

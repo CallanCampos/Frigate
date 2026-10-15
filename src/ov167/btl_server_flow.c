@@ -5139,7 +5139,7 @@ BOOL func_ov167_021a83ec(BtlServerFlow *flow, void *monSet) {
     }
     index = 0;
     while (TRUE) {
-        u32 condition = func_ov169_0689cb80(index++);
+        u32 condition = GetConditionByIndex(index++);
         if (condition == 0) {
             break;
         }

@@ -452,7 +452,7 @@ u32 func_ov167_021bd624(BattleMon *mon) {
     u32 i = 0;
 
     while (TRUE) {
-        u32 condition = func_ov169_0689cb6c(i++);
+        u32 condition = GetMentalHerbCondition(i++);
         if (condition == 0) {
             return condition;
         }

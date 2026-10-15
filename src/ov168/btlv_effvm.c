@@ -3054,7 +3054,6 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
     int count = 1;
     int rule;
     int i;
-    int side;
     BtlvMcssPos pos;
 
     positions[0] = wk->defender;
@@ -3115,11 +3114,7 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
             case 9:
             case 13:
                 if (rule == 1) {
-                    side = 0;
-                    if (!(wk->attacker & 1)) {
-                        side = 1;
-                    }
-                    positions[0] = side;
+                    positions[0] = (wk->attacker & 1) ? 0 : 1;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4024[wk->attacker];
@@ -3131,11 +3126,7 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
                 break;
             case 11:
                 if (rule == 1) {
-                    side = 0;
-                    if (!(wk->attacker & 1)) {
-                        side = 1;
-                    }
-                    positions[0] = side;
+                    positions[0] = (wk->attacker & 1) ? 0 : 1;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4044[wk->attacker];

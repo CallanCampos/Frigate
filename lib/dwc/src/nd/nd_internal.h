@@ -22,7 +22,7 @@ int func_0207a2c0(char *dest, u32 size, const char *format, ...);
 // Encodes a text of srcLen bytes into dest, which holds size bytes; the length, or -1
 int func_020580b8(const char *src, int srcLen, char *dest, int size);
 // Waits for a thread to end: NitroSDK's OS_JoinThread
-void func_0207a800(OSThread *thread);
+void OS_JoinThread(OSThread *thread);
 
 // What the access point's information is, as the Wi-Fi library fills it
 typedef struct NdApInfo {

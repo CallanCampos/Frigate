@@ -20,12 +20,12 @@ typedef struct SOCLConfig {
     } host_ip;
     void *(*alloc)(u32 size);
     void (*free)(void *ptr);
-    u32 cmd_packet_max;   // How many command packets the sockets can have waiting
-    u32 lan_buffer_size;  // 0 for SOCLiDefaultLanBufferSize
-    void *lan_buffer;     // NULL to allocate lan_buffer_size bytes
-    s32 cps_thread_prio;  // 0 for 11
-    s32 mtu;              // 0 for 576, and kept between 576 and 1500
-    s32 rwin;             // TCP's receive window, 0 for 0x10c0
+    u32 cmd_packet_max;  // How many command packets the sockets can have waiting
+    u32 lan_buffer_size; // 0 for SOCLiDefaultLanBufferSize
+    void *lan_buffer;    // NULL to allocate lan_buffer_size bytes
+    s32 cps_thread_prio; // 0 for 11
+    s32 mtu;             // 0 for 576, and kept between 576 and 1500
+    s32 rwin;            // TCP's receive window, 0 for 0x10c0
 } SOCLConfig;
 
 // The thread of a socket's command pipe, and how many packets it queues
@@ -175,9 +175,9 @@ void SOC_U32to4U8(u32 value, u8 *bytes);
 // this loop does not measure an absolute deadline. Returns the number of descriptors with nonzero revents.
 int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks);
 // Borrows mutable connection storage on a created TCP-mode socket whose binding-state bit is clear. Keep nonnull
-// sslInfo alive while installed and through SSL operations/close using it. Success confirms the change, not a handshake.
-// NULL detaches/selects plain TCP; it does not reset/free the old context or perform SSL shutdown. The state gate
-// also applies to detachment, so this is not an unrestricted cleanup operation for an already binding socket.
+// sslInfo alive while installed and through SSL operations/close using it. Success confirms the change, not a
+// handshake. NULL detaches/selects plain TCP; it does not reset/free the old context or perform SSL shutdown. The state
+// gate also applies to detachment, so this is not an unrestricted cleanup operation for an already binding socket.
 int SOCL_EnableSsl(int sock, void *sslInfo);
 void SOCLi_TrashSocket(void);
 

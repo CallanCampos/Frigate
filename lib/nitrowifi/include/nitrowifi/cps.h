@@ -113,58 +113,83 @@ typedef struct CPSSoc {
     CPSSocOoo ooo[4];
 } CPSSoc;
 
-// The stack's state that the socket layer reads
-extern u32 CPSMode;                  // CPSMode: the config's mode
-extern CPSInAddr CPSNetMask;         // CPSNetMask
-extern void *(*CPSiAlloc)(u32 size); // CPSiAlloc
-extern CPSInAddr CPSGatewayIp;       // CPSGatewayIp
-extern void (*CPSiFree)(void *ptr);  // CPSiFree
-extern u32 CPSNoIpReason;            // CPSNoIpReason
-extern CPSInAddr CPSMyIp;            // CPSMyIp, 0 until DHCP gives an address
-extern CPSInAddr CPSDnsIp[2];        // CPSDnsIp
-extern MATHRandContext32 CPSiRand;   // CPSiRand, which the SSL layer draws from too
+// The stack's state that the socket layer reads. CPS_Startup sets the config-derived ones and DHCP (or the static
+// configuration) the address ones
+extern u32 CPSMode; // CPSConfig.mode (the CPS_MODE_ flags)
+extern CPSInAddr CPSNetMask;
+extern void *(*CPSiAlloc)(u32 size); // CPSConfig.alloc, or a no-op when alloc or free is missing
+extern CPSInAddr CPSGatewayIp;
+extern void (*CPSiFree)(void *ptr);
+extern u32 CPSNoIpReason; // Why there is no address: the CPS_NOIP_REASON_ value
+extern CPSInAddr CPSMyIp; // 0 until DHCP gives an address
+extern CPSInAddr CPSDnsIp[2];
+extern MATHRandContext32 CPSiRand; // Seeded by CPS_Startup; the SSL layer draws from it too
 
 // CPS's signature, "[SDK+UBIQUITOUS:CPS]", which CPS_Startup refers to; the string sits in the main module at
 // 0x020050ac
 extern const char CPSi_Signature[];
 
-void CPS_SetAddressCheckCallback(BOOL (*callback)(void)); // CPS_SetAddressCheckCallback: may reject a DHCP address
-void CPS_Startup(CPSConfig *config);                      // CPS_Startup
-BOOL CPS_CalmDown(void);                                  // CPS_CalmDown: asks the DHCP thread to end, TRUE once it has
-void CPS_SetScavengerCallback(void (*callback)(void));    // CPS_SetScavengerCallback: called once a second
-void CPS_Cleanup(void);                                   // CPS_Cleanup
-void CPS_SetThreadPriority(u32 priority);                 // CPS_SetThreadPriority
+// Called with a DHCP-given address; FALSE rejects it
+void CPS_SetAddressCheckCallback(BOOL (*callback)(void));
+// Starts the receive, scavenger and ACK threads over the config's LAN buffer
+void CPS_Startup(CPSConfig *config);
+// Asks the scavenger (DHCP) thread to end; TRUE once it has
+BOOL CPS_CalmDown(void);
+// The function the scavenger thread calls once a second
+void CPS_SetScavengerCallback(void (*callback)(void));
+// Ends CPS's threads and forgets the address and the LAN buffer
+void CPS_Cleanup(void);
+// Sets the priority of the receive and scavenger threads
+void CPS_SetThreadPriority(u32 priority);
 // The wireless driver's receive callback, which puts a frame in the LAN buffer
 void CPSi_RecvCallback(u8 *src, u8 *dst, u8 *data, u32 len);
-u16 CPSi_GetNewPort(void);                                           // A free local port
-void CPS_SocRegister(CPSSoc *soc);                                   // CPS_SocRegister
-void CPS_SocUnRegister(void);                                        // CPS_SocUnRegister
-void CPS_SocDatagramMode(void);                                      // CPS_SocDatagramMode
-void CPS_SocBind(u16 localPort, u16 remotePort, CPSInAddr remoteIp); // CPS_SocBind
-void CPS_SocUse(void);                                               // CPS_SocUse
-void CPS_SocRelease(void);                                           // CPS_SocRelease
-void CPS_SocDup(OSThread *thread);                                   // CPS_SocDup: gives a thread the caller's socket
-void CPS_SetUdpCallback(BOOL (*callback)(u8 *data, u32 len, CPSSoc *soc)); // CPS_SetUdpCallback
-int CPSi_TcpConnect(CPSSoc *soc);                                          // TCP's connect, 0 once connected
-int CPS_TcpConnect(void);                                                  // CPS_TcpConnect
-void CPS_TcpShutdown(void);                                                // CPS_TcpShutdown
-void CPS_TcpClose(void);                                                   // CPS_TcpClose
-u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc);                                   // TCP's read
-u8 *CPS_SocRead(u32 *len);                                                 // CPS_SocRead
-void CPSi_TcpConsume(u32 len, CPSSoc *soc);                                // TCP's consume
-void CPS_SocConsume(u32 len);                                              // CPS_SocConsume
-u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc);    // TCP's write
-u32 CPS_SocWrite(u8 *data, u32 len);                                       // CPS_SocWrite
-s32 CPS_SocGetLength(void);              // CPS_SocGetLength, -1 once the connection is gone
-void CPS_SocFlush(void);                 // CPS_SocFlush
-CPSInAddr CPS_Resolve(const char *name); // CPS_Resolve
+// A free local port
+u16 CPSi_GetNewPort(void);
+
+// The socket calls act on the socket that the calling thread registered. Without one they do nothing
+// Registers a socket for the calling thread, and unregisters it
+void CPS_SocRegister(CPSSoc *soc);
+void CPS_SocUnRegister(void);
+// Makes the registered socket a UDP one
+void CPS_SocDatagramMode(void);
+// Sets the ports and the remote address of the registered socket; a local port of 0 takes a new one
+void CPS_SocBind(u16 localPort, u16 remotePort, CPSInAddr remoteIp);
+// Takes the registered socket for the calling thread, reset to closed, and gives it back
+void CPS_SocUse(void);
+void CPS_SocRelease(void);
+// Gives another thread the caller's socket
+void CPS_SocDup(OSThread *thread);
+// The function that gets the datagrams of the registered socket; it returns TRUE if it took the datagram
+void CPS_SetUdpCallback(BOOL (*callback)(u8 *data, u32 len, CPSSoc *soc));
+// TCP's connect, 0 once connected; CPS_TcpConnect does it for the registered socket
+int CPSi_TcpConnect(CPSSoc *soc);
+int CPS_TcpConnect(void);
+void CPS_TcpShutdown(void);
+// Waits up to about five seconds for the connection to close
+void CPS_TcpClose(void);
+// The received data and its length; consuming drops data from the front of the receive buffer
+u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc);
+u8 *CPS_SocRead(u32 *len);
+void CPSi_TcpConsume(u32 len, CPSSoc *soc);
+void CPS_SocConsume(u32 len);
+// Sends both pieces of data and returns how much was acknowledged
+u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc);
+u32 CPS_SocWrite(u8 *data, u32 len);
+// How much can be read, or -1 once the connection is gone
+s32 CPS_SocGetLength(void);
+// Sends what CPS_SocWrite held back
+void CPS_SocFlush(void);
+// The address of a name or of a dotted address, or 0
+CPSInAddr CPS_Resolve(const char *name);
 
 // CPS's SSL layer, which follows in the overlay: a socket's calls go there when its ssl is set
-u32 CPS_SslGetMaxPriority(void);                       // CPS_SslGetMaxPriority's role
-void CPS_SslSetMaxPriority(u32 priority);               // CPS_SslSetMaxPriority's role
-void CPS_SslSetNamedParams(void *const *params, u32 count); // Registers the caller's named params (pinned
-                                                            // certificates) on the current thread's connection
-void CPS_SslAddRandomSeed(const void *seed, u32 len);  // CPS_SslAddRandomSeed's role: stirs entropy into SSLi_GetRandomBytes's pool
+// The priority applied during selected crypto operations, or -1 when none; values of 32 and above disable it
+u32 CPS_SslGetMaxPriority(void);
+void CPS_SslSetMaxPriority(u32 priority);
+// Registers the caller's named params (pinned certificates) on the current thread's connection
+void CPS_SslSetNamedParams(void *const *params, u32 count);
+// Stirs entropy into the pool that SSLi_GetRandomBytes draws from
+void CPS_SslAddRandomSeed(const void *seed, u32 len);
 int CPS_SslConnect(CPSSoc *soc);
 u8 *CPS_SslRead(u32 *len, CPSSoc *soc);
 void CPS_SslReadRelease(u32 len, CPSSoc *soc);
@@ -172,8 +197,11 @@ s32 CPS_SslCanRead(CPSSoc *soc);
 u32 CPS_SslWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc);
 void CPS_SslShutdown(CPSSoc *soc);
 void CPS_SslClose(CPSSoc *soc);
+// Called once a second by CPS's scavenger thread: expires old session cache entries and wakes stalled handshakes
 void CPS_SslTick(s32 now);
+// Clears the session cache, whenever CPS drops its address
 void CPS_SslInit(void);
-void CPS_SetSsl(BOOL enable); // CPS_SetSsl's role: turns the SSL layer on for the caller's socket
+// Turns the SSL layer on, or off, for the caller's socket
+void CPS_SetSsl(BOOL enable);
 
 #endif // POKEBW2_NITROWIFI_CPS_H

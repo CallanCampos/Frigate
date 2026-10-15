@@ -4,16 +4,16 @@
 // an index into the table of step sizes, and the code of a sample says how far from the prediction the sample was
 // and which way, to the precision of the step.
 
-static const s8 sIndexAdjust2[4] = {-1, 1, -1, 1};
-static const s8 sIndexAdjust3[8] = {-1, -1, 1, 2, -1, -1, 1, 2};
-static const s8 sIndexAdjust4[16] = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
+static const s8 sIndexAdjust2[4] = { -1, 1, -1, 1 };
+static const s8 sIndexAdjust3[8] = { -1, -1, 1, 2, -1, -1, 1, 2 };
+static const s8 sIndexAdjust4[16] = { -1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8 };
 static const s16 sVctAdpcmStepTable[89] = {
-    7,     8,     9,     10,    11,    12,    13,    14,    16,    17,    19,    21,    23,    25,    28,    31,
-    34,    37,    41,    45,    50,    55,    60,    66,    73,    80,    88,    97,    107,   118,   130,   143,
-    157,   173,   190,   209,   230,   253,   279,   307,   337,   371,   408,   449,   494,   544,   598,   658,
-    724,   796,   876,   963,   1060,  1166,  1282,  1411,  1552,  1707,  1878,  2066,  2272,  2499,  2749,  3024,
-    3327,  3660,  4026,  4428,  4871,  5358,  5894,  6484,  7132,  7845,  8630,  9493,  10442, 11487, 12635, 13899,
-    15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767,
+    7,    8,     9,     10,    11,    12,    13,    14,    16,    17,    19,    21,    23,    25,    28,
+    31,   34,    37,    41,    45,    50,    55,    60,    66,    73,    80,    88,    97,    107,   118,
+    130,  143,   157,   173,   190,   209,   230,   253,   279,   307,   337,   371,   408,   449,   494,
+    544,  598,   658,   724,   796,   876,   963,   1060,  1166,  1282,  1411,  1552,  1707,  1878,  2066,
+    2272, 2499,  2749,  3024,  3327,  3660,  4026,  4428,  4871,  5358,  5894,  6484,  7132,  7845,  8630,
+    9493, 10442, 11487, 12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767,
 };
 
 static void DecodeAdpcm4(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
@@ -24,18 +24,17 @@ static void DecodeAdpcm2(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state);
 static void EncodeAdpcm2(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state);
 
 // Moves the step index by the adjustment of a code, within the table
-#define ADVANCE_STEP_INDEX(index, adjust) \
-    do {                                  \
-        (index) += (adjust);              \
-        if ((index) < 0) {                \
-            (index) = 0;                  \
-        } else if ((index) > 88) {        \
-            (index) = 88;                 \
-        }                                 \
+#define ADVANCE_STEP_INDEX(index, adjust)                                                                              \
+    do {                                                                                                               \
+        (index) += (adjust);                                                                                           \
+        if ((index) < 0) {                                                                                             \
+            (index) = 0;                                                                                               \
+        } else if ((index) > 88) {                                                                                     \
+            (index) = 88;                                                                                              \
+        }                                                                                                              \
     } while (0)
 
-static inline s16 DecodeSample4(VCTAdpcmState *state, int code)
-{
+static inline s16 DecodeSample4(VCTAdpcmState *state, int code) {
     int predictor = state->predictor;
     int index = state->stepIndex;
     int step = sVctAdpcmStepTable[index];
@@ -74,8 +73,7 @@ static inline s16 DecodeSample4(VCTAdpcmState *state, int code)
     return sample;
 }
 
-static inline s16 DecodeSample3(VCTAdpcmState *state, int code)
-{
+static inline s16 DecodeSample3(VCTAdpcmState *state, int code) {
     int index = state->stepIndex;
     int step = sVctAdpcmStepTable[index];
     int predictor = state->predictor;
@@ -106,8 +104,7 @@ static inline s16 DecodeSample3(VCTAdpcmState *state, int code)
     return sample;
 }
 
-static inline s16 DecodeSample2(VCTAdpcmState *state, int code)
-{
+static inline s16 DecodeSample2(VCTAdpcmState *state, int code) {
     int predictor = state->predictor;
     int index = state->stepIndex;
     int diff = sVctAdpcmStepTable[index];
@@ -134,8 +131,7 @@ static inline s16 DecodeSample2(VCTAdpcmState *state, int code)
     return sample;
 }
 
-static inline u8 EncodeSample4(VCTAdpcmState *state, s16 input)
-{
+static inline u8 EncodeSample4(VCTAdpcmState *state, s16 input) {
     int index = state->stepIndex;
     int predictor = state->predictor;
     int diff = input - predictor;
@@ -186,8 +182,7 @@ static inline u8 EncodeSample4(VCTAdpcmState *state, s16 input)
     return code;
 }
 
-static inline u8 EncodeSample3(VCTAdpcmState *state, s16 input)
-{
+static inline u8 EncodeSample3(VCTAdpcmState *state, s16 input) {
     int index = state->stepIndex;
     int step = sVctAdpcmStepTable[index];
     int predictor = state->predictor;
@@ -231,8 +226,7 @@ static inline u8 EncodeSample3(VCTAdpcmState *state, s16 input)
     return code;
 }
 
-static inline u8 EncodeSample2(VCTAdpcmState *state, s16 input)
-{
+static inline u8 EncodeSample2(VCTAdpcmState *state, s16 input) {
     int index = state->stepIndex;
     int step = sVctAdpcmStepTable[index];
     int predictor = state->predictor;
@@ -270,8 +264,7 @@ static inline u8 EncodeSample2(VCTAdpcmState *state, s16 input)
 }
 
 // Decodes count bytes of 4-bit codes, two samples to a byte, low nibble first
-static void DecodeAdpcm4(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
-{
+static void DecodeAdpcm4(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -282,8 +275,7 @@ static void DecodeAdpcm4(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
 }
 
 // Encodes count samples to 4-bit codes
-static void EncodeAdpcm4(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
-{
+static void EncodeAdpcm4(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count / 2; i++) {
@@ -296,8 +288,7 @@ static void EncodeAdpcm4(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
 }
 
 // Decodes groups of three bytes of 3-bit codes, eight samples to a group, the first sample in the top bits
-static void DecodeAdpcm3(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
-{
+static void DecodeAdpcm3(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count / 3; i++) {
@@ -319,8 +310,7 @@ static void DecodeAdpcm3(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
 }
 
 // Encodes count samples to 3-bit codes
-static void EncodeAdpcm3(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
-{
+static void EncodeAdpcm3(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count / 8; i++) {
@@ -343,8 +333,7 @@ static void EncodeAdpcm3(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
 }
 
 // Decodes count bytes of 2-bit codes, four samples to a byte, the first in the low bits
-static void DecodeAdpcm2(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
-{
+static void DecodeAdpcm2(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -357,8 +346,7 @@ static void DecodeAdpcm2(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state)
 }
 
 // Encodes count samples to 2-bit codes
-static void EncodeAdpcm2(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
-{
+static void EncodeAdpcm2(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count / 4; i++) {
@@ -373,8 +361,7 @@ static void EncodeAdpcm2(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state)
 }
 
 // Decodes a packet of ADPCM: the state it starts from, then bytes of codes at the given number of bits a sample
-void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits)
-{
+void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits) {
     VCTAdpcmState state;
 
     state.predictor = ((VCTAdpcmState *)packet)->predictor;
@@ -393,8 +380,7 @@ void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits)
 }
 
 // Encodes count samples to a packet of ADPCM, which starts with the state before the first sample
-void VCT_EncodeAdpcm(u8 *packet, s16 *src, int count, VCTAdpcmState *state, int bits)
-{
+void VCT_EncodeAdpcm(u8 *packet, s16 *src, int count, VCTAdpcmState *state, int bits) {
     VCTAdpcmState *header = (VCTAdpcmState *)packet;
 
     header->predictor = state->predictor;

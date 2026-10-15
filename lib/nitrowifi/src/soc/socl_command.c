@@ -1,6 +1,6 @@
+#include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
-#include "nitro/os.h"
 
 // SOCL's command packets: the socket calls do not run in the caller's thread but as packets that a command pipe's
 // thread takes from its queue and runs, one at a time. This file keeps the pool of packets (a queue of the free ones)
@@ -78,7 +78,8 @@ SOCLCommandPipe *SOCLi_GetCtrlPipe(SOCLSocket *socket) {
 }
 
 int SOCLi_SendCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet) {
-    BOOL sent = OS_SendMessage(&pipe->queue, packet, packet == NULL || (packet->flag_block & 1) ? OS_MESSAGE_BLOCK : OS_MESSAGE_NOBLOCK);
+    BOOL sent = OS_SendMessage(&pipe->queue, packet,
+                               packet == NULL || (packet->flag_block & 1) ? OS_MESSAGE_BLOCK : OS_MESSAGE_NOBLOCK);
 
     if (!sent) {
         SOCLi_FreeCommandPacket(packet);
@@ -132,7 +133,7 @@ void SOCLi_CommandPacketHandler(OSMessageQueue *queue) {
         }
         result = packet->handler(packet);
         irq = CPU_IRQDisable();
-        func_0207aab4();
+        OS_DisableScheduler();
         OS_ReceiveMessage(queue, NULL, OS_MESSAGE_NOBLOCK);
         if (packet->socket != NULL) {
             packet->socket->result = result;
@@ -141,7 +142,7 @@ void SOCLi_CommandPacketHandler(OSMessageQueue *queue) {
             OS_SendMessage(packet->reply_queue, (OSMessage)result, OS_MESSAGE_NOBLOCK);
         }
         SOCLi_FreeCommandPacket(packet);
-        func_0207aad8();
+        OS_EnableScheduler();
         CPU_SetIRQMask(irq);
     }
 }

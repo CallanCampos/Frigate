@@ -1,6 +1,6 @@
+#include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
-#include "nitro/os.h"
 
 // SOCL_Close: marks the socket closing and queues SOCLi_CloseCallBack in its control pipe, which shuts the connection
 // down and moves the socket to the trash list. SOCLi_TrashSocket (CPS's scavenger callback) cleans the trash up:
@@ -19,7 +19,7 @@ BOOL SOCL_IsClosed(int socket) {
     return FALSE;
 }
 
-BOOL func_ov011_02157314(int socket) {
+BOOL SOCL_IsNotClosing(int socket) {
     SOCLSocket *s = (SOCLSocket *)socket;
     u32 irq;
 
@@ -87,7 +87,7 @@ static int SOCLi_CloseCallBack(SOCLCommandPacket *packet) {
     u32 irq;
 
     if (SOCLi_SocketIsTCP(socket)) {
-        func_0207a800(&SOCLi_GetSendPipe(socket)->base.thread);
+        OS_JoinThread(&SOCLi_GetSendPipe(socket)->base.thread);
         CPS_TcpShutdown();
         CPS_TcpClose();
         CPS_SocRelease();
@@ -147,9 +147,9 @@ static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe) {
     if (pipe == NULL) {
         return;
     }
-    func_0207a800(&pipe->thread);
+    OS_JoinThread(&pipe->thread);
     irq = CPU_IRQDisable();
-    func_0207aab4();
+    OS_DisableScheduler();
     if (OS_ReceiveMessage(&pipe->queue, &message, OS_MESSAGE_NOBLOCK)) {
         do {
             if (message != NULL) {
@@ -161,8 +161,8 @@ static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe) {
             }
         } while (OS_ReceiveMessage(&pipe->queue, &message, OS_MESSAGE_NOBLOCK));
     }
-    func_0207aad8();
-    func_0207a918();
+    OS_EnableScheduler();
+    OS_RescheduleThread();
     CPU_SetIRQMask(irq);
 }
 

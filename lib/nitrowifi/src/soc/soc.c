@@ -1,14 +1,16 @@
 #include "nitrowifi/soc.h"
-#include "socl_internal.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "socl_internal.h"
 
 // soc.c: the BSD-style SOC_ calls over SOCL, which NitroWiFi's SOC_ API is (pokediamond's soc.o: the same calls under
 // the same names, in the reverse order, except that pokediamond calls the host name lookup SOC_GetHostByAddr, the
-// name of the reverse lookup; pokeheartgold's SOC_GetHostByName is the one for it). Their addresses and ports are in network order, so they swap them. The three
-// tables of socket parameters (SOCLSocketParamUDP and the others) are its data.
+// name of the reverse lookup; pokeheartgold's SOC_GetHostByName is the one for it). Their addresses and ports are in
+// network order, so they swap them. The three tables of socket parameters (SOCLSocketParamUDP and the others) are its
+// data.
 
 // How SOC_Socket's sockets are made. A TCP socket gets no receive buffer of its own: it reads from CPS's.
+// clang-format off
 SOCLSocketParam SOCLSocketParamUDP = {
     1, 1,
     { 0x5c0, 1, 0, 0, 0, 0, 0x800 },
@@ -29,6 +31,7 @@ SOCLSocketParam SOCLSocketParamUDPSend = {
     { 0, 0, 0 },
     { 0x800, 13, 32 },
 };
+// clang-format on
 
 // The allocator and deallocator that SOC_Startup was given
 static SocFreeFunc FreeFunc_SOC;

@@ -286,4 +286,23 @@ int func_02082560(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16
 // WM_MeasureChannel
 int func_0208259c(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime);
 
+// NitroSDK's WM calls that WCM makes, named by the WM API ids of the callbacks that follow them in WCM (3 enable,
+// 4 disable, 5 power on, 6 power off), so the names are inferred rather than read from the ROM
+// WM_Init: sets up the WM work in buf, returning 0 when it is done
+s32 func_02080758(void *buf, u16 dmaNo);
+// WM_Finish: 0 once the WM work is released
+BOOL func_02080908(void);
+// WMi_GetStatusAddress: the WM state word (0 stopped, 1 ready, 2 idle), which the caller invalidates from the cache
+void *func_02080dbc(void);
+// WM_Enable, WM_Disable, WM_PowerOn and WM_PowerOff
+int func_020812fc(WMCallbackFunc callback);
+int func_02081348(WMCallbackFunc callback);
+int func_02081370(WMCallbackFunc callback);
+int func_02081398(WMCallbackFunc callback);
+// WM_StartDCF and WM_EndDCF
+int func_02081ab0(WMCallbackFunc callback, void *buffer, u16 bufferSize);
+int func_02081b94(WMCallbackFunc callback);
+// WM_SetWEPKeyEx, WEP mode and key
+int func_02082470(WMCallbackFunc callback, u8 mode, u8 argument, void *data);
+
 #endif // POKEBW2_NITRO_WM_H

@@ -2053,9 +2053,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A float one ULP off a round decimal is written with the shortest digits that round to it, and a comment:
   Kadabra's sprite offset in `pokemontrade_3d.c` is 0x40533334, next to `3.3f`'s 0x40533333, so it is `3.3000002f`.
 - MWCC has no count-leading-zeros intrinsic: `__clz`, `__CLZ` and `__builtin_clz` all compile to a real call to an
-  external symbol, never the `clz` instruction, confirmed by direct compilation. Where the ROM has the bare
-  instruction inlined at a call site, as `vct_audio.c`'s `VCT_SendPending` does, give it a local `static inline`
-  wrapper with an `asm { clz x, x }` body, called in its place, the same pattern DS Protect's cache flush uses.
+  external symbol, never the `clz` instruction. A bare `clz` in ARM library code is the SDK's `MATH_CountLeadingZeros`,
+  which `nitro/math.h` inlines as the instruction in ARM code (MWCC defines `__thumb` only for Thumb) and as a call to
+  `MATH_CountLeadingZerosFunc` in Thumb code: `vct_audio.c`'s `VCT_SendPending` uses it.
 
 ## Data and sections
 

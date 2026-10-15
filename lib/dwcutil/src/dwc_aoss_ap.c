@@ -235,8 +235,8 @@ static // Searches for access points and lists them; 0 if it ended well
         return -1;
     }
     if (DWC_Wcm_Search(NULL, NULL, 0, 0x30bffe)) {
-        func_0207bc24(&alarm);
-        func_0207bcf4(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_SCAN);
+        OS_CreateAlarm(&alarm);
+        OS_SetAlarm(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_SCAN);
         do {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             switch ((int)message) {
@@ -314,7 +314,7 @@ static // Searches for access points and lists them; 0 if it ended well
             }
         }
     cancel:
-        func_0207bd3c(&alarm);
+        OS_CancelAlarm(&alarm);
         while (OS_ReceiveMessage(&sAossApQueue, &message, 0) == 1) {
         }
     }
@@ -358,8 +358,8 @@ static // Connects to the access point; 0 if it did
     sys_memcpy(param->key, sWep.key[connected], param->keyLength);
     WCM_ClearApListBuffer();
     if (DWC_Wcm_Search(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
-        func_0207bc24(&alarm);
-        func_0207bcf4(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_CONNECT);
+        OS_CreateAlarm(&alarm);
+        OS_SetAlarm(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_CONNECT);
         while (running) {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             switch ((int)message) {
@@ -368,7 +368,7 @@ static // Connects to the access point; 0 if it did
                 break;
             case DWC_WCM_EVENT_FOUND_AP:
                 if (!connected) {
-                    func_0207bd3c(&alarm);
+                    OS_CancelAlarm(&alarm);
                     if (DWC_Wcm_GetApList(&sBss, 1) != 1) {
                         running = FALSE;
                         break;
@@ -429,7 +429,7 @@ static // Connects to the access point; 0 if it did
                 break;
             }
         }
-        func_0207bd3c(&alarm);
+        OS_CancelAlarm(&alarm);
         while (OS_ReceiveMessage(&sAossApQueue, &message, 0) == 1) {
         }
     }

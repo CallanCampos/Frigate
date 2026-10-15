@@ -1,8 +1,7 @@
-#include "vct_internal.h"
-
+#include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
-#include "nitro/math.h"
+#include "vct_internal.h"
 
 // The sound going out and coming in. A frame of the microphone is filtered, coded and sent to every machine that
 // listens; the packets of the other machines wait in a queue each, and are decoded, mixed and played once their time
@@ -71,16 +70,16 @@ static VCTVoicePacket *EncodeNextFrame(void);
 static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask);
 
 // The frame sizes of the codecs in units of 0x44 bytes, and the bytes more
-static const u8 sFrameSizes[VCT_CODEC_MAX][2] = {{8, 0}, {8, 0}, {2, 4}, {3, 4}, {4, 4}};
+static const u8 sFrameSizes[VCT_CODEC_MAX][2] = { { 8, 0 }, { 8, 0 }, { 2, 4 }, { 3, 4 }, { 4, 4 } };
 
 // How many packets to send in each of the ticks that follow a frame, in a row for each number of machines to send to
-static const u8 sSendSchedule[22] = {1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 3, 0};
+static const u8 sSendSchedule[22] = { 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 3, 0 };
 
 // Whether to leave out frames with no voice in them
 static int sVadEnabled = TRUE;
 
 // The ends of the segments of the mu-law curve
-static int sSegmentEnds[8] = {0x3f, 0x7f, 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff};
+static int sSegmentEnds[8] = { 0x3f, 0x7f, 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff };
 
 // MWCC lays these out in reverse, so they are declared from the last to the first
 // Each slot's packets in the order of their sequence numbers
@@ -96,8 +95,7 @@ static VCTReceiver sReceivers[VCT_SLOT_MAX];
 static VCTSession *sSlotSessions[VCT_SLOT_MAX];
 static VCTAudio sAudio;
 
-BOOL VCT_InitAudio(void)
-{
+BOOL VCT_InitAudio(void) {
     u32 i;
     VCTCodec codec;
     const u8 *frameSize;
@@ -128,13 +126,11 @@ BOOL VCT_InitAudio(void)
     return TRUE;
 }
 
-void VCT_ClearSessionCount(void)
-{
+void VCT_ClearSessionCount(void) {
     sAudio.sessionCount = 0;
 }
 
-BOOL VCT_AttachSession(VCTSession *session)
-{
+BOOL VCT_AttachSession(VCTSession *session) {
     u32 slot;
 
     if (session == NULL) {
@@ -180,8 +176,7 @@ BOOL VCT_AttachSession(VCTSession *session)
     return TRUE;
 }
 
-void VCT_DetachSession(VCTSession *session)
-{
+void VCT_DetachSession(VCTSession *session) {
     u32 slot;
 
     for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
@@ -203,8 +198,7 @@ void VCT_DetachSession(VCTSession *session)
 }
 
 // Hands a frame of the microphone's samples to the library to send, returning whether it took it
-BOOL VCT_SubmitSamples(void *samples, int size)
-{
+BOOL VCT_SubmitSamples(void *samples, int size) {
     int i;
     BOOL hasSender = FALSE;
     VCTVoicePacket *packet;
@@ -239,8 +233,7 @@ BOOL VCT_SubmitSamples(void *samples, int size)
 }
 
 // Takes the next frame of a slot's voice from its queue, if its time has come
-static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask)
-{
+static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask) {
     int count;
     VCTPacket *packet;
     VCTReceiver *receiver = &sReceivers[slot];
@@ -253,7 +246,8 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask)
         packet = PeekQueue(slot);
 
         if (packet == NULL) {
-            goto queued;
+            receiver->queuedCount = count;
+            return FALSE;
         }
         if (packet->playTime > now + 0x34) {
             more = FALSE;
@@ -308,16 +302,11 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask)
         receiver->held = NULL;
     }
     return FALSE;
-
-queued:
-    receiver->queuedCount = count;
-    return FALSE;
 }
 
 // Mixes the voices that are due into a frame of samples, returning whether there is any, and sets the bits of the
 // machines heard
-BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask)
-{
+BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask) {
     BOOL heard;
     u32 slot;
 
@@ -357,8 +346,7 @@ BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask)
     return heard;
 }
 
-BOOL VCT_SetCodec(int codec)
-{
+BOOL VCT_SetCodec(int codec) {
     if (codec >= VCT_CODEC_MAX) {
         return FALSE;
     }
@@ -372,8 +360,7 @@ BOOL VCT_SetCodec(int codec)
     return TRUE;
 }
 
-void VCT_SetVad(BOOL enabled)
-{
+void VCT_SetVad(BOOL enabled) {
     sVadEnabled = enabled;
     VCT_ResetCapture();
     if (!enabled) {
@@ -381,14 +368,12 @@ void VCT_SetVad(BOOL enabled)
     }
 }
 
-void VCT_SetEchoCancel(BOOL enabled)
-{
+void VCT_SetEchoCancel(BOOL enabled) {
     sAudio.echoCancel = enabled;
 }
 
 // Codes the frame waiting in the send queue, returning the packet or NULL if there is none or it is silent
-static VCTVoicePacket *EncodeNextFrame(void)
-{
+static VCTVoicePacket *EncodeNextFrame(void) {
     VCTCodec codec = sAudio.codec;
     u32 queued = sSendQueue.writeIndex - sSendQueue.readIndex;
     VCTVoicePacket *packet;
@@ -464,8 +449,7 @@ static VCTVoicePacket *EncodeNextFrame(void)
 }
 
 // Takes in a voice packet of the machine with the given ID, returning whether it has been queued
-BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now)
-{
+BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now) {
     VCTReceiver *receiver = NULL;
     VCTPacket *queued;
     int i;
@@ -540,8 +524,7 @@ BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now)
 }
 
 // Decodes every packet that has come in and puts it in its slot's queue, returning how many there were
-int VCT_DecodeReceived(void)
-{
+int VCT_DecodeReceived(void) {
     VCTPacket *first = GetActiveHead();
     int i;
     int count;
@@ -574,19 +557,8 @@ int VCT_DecodeReceived(void)
     return count;
 }
 
-// The ARM count-leading-zeros instruction, inlined at its one call site, as DS Protect inlines its cache flush
-static inline u32 CountLeadingZeros(u32 x)
-{
-    asm
-    {
-        clz x, x
-    }
-    return x;
-}
-
 // Sends the frame that has been coded to the machines it is due to, as many as this tick allows
-BOOL VCT_SendPending(void)
-{
+BOOL VCT_SendPending(void) {
     int i;
     int sends;
 
@@ -605,7 +577,7 @@ BOOL VCT_SendPending(void)
         sends = sSendSchedule[sSendQueue.scheduleRow * 3 + sSendQueue.scheduleColumn++];
     }
     for (i = 0; i < sends; i++) {
-        int leading = CountLeadingZeros(sSendQueue.pendingMask);
+        int leading = MATH_CountLeadingZeros(sSendQueue.pendingMask);
 
         if (leading == 32) {
             break;
@@ -622,8 +594,7 @@ BOOL VCT_SendPending(void)
     return TRUE;
 }
 
-static void ResetActiveList(void)
-{
+static void ResetActiveList(void) {
     u32 irq = CPU_IRQDisable();
     int i;
 
@@ -636,8 +607,7 @@ static void ResetActiveList(void)
 }
 
 // Frees the packets in the order of arrival that belong to a slot
-static void FreeActiveOfSlot(int slot)
-{
+static void FreeActiveOfSlot(int slot) {
     u32 irq = CPU_IRQDisable();
     VCTPacket *packet;
 
@@ -649,8 +619,7 @@ static void FreeActiveOfSlot(int slot)
     CPU_SetIRQMask(irq);
 }
 
-static void FreeAllActive(void)
-{
+static void FreeAllActive(void) {
     u32 irq = CPU_IRQDisable();
     VCTPacket *packet = sActiveList.head;
     int i;
@@ -669,8 +638,7 @@ static void FreeAllActive(void)
     CPU_SetIRQMask(irq);
 }
 
-static int AppendActive(VCTPacket *packet)
-{
+static int AppendActive(VCTPacket *packet) {
     u32 irq = CPU_IRQDisable();
 
     if (sActiveList.head == NULL) {
@@ -689,18 +657,15 @@ static int AppendActive(VCTPacket *packet)
     return sActiveCounts[packet->slot];
 }
 
-static VCTPacket *GetActiveHead(void)
-{
+static VCTPacket *GetActiveHead(void) {
     return sActiveList.head;
 }
 
-static int GetActiveCount(int slot)
-{
+static int GetActiveCount(int slot) {
     return sActiveCounts[slot];
 }
 
-static VCTPacket *FindActiveBySlot(int slot)
-{
+static VCTPacket *FindActiveBySlot(int slot) {
     VCTPacket *packet = sActiveList.head;
     u32 irq = CPU_IRQDisable();
 
@@ -714,8 +679,7 @@ static VCTPacket *FindActiveBySlot(int slot)
     return NULL;
 }
 
-static int RemoveActive(VCTPacket *packet)
-{
+static int RemoveActive(VCTPacket *packet) {
     u32 irq = CPU_IRQDisable();
 
     if (packet->prev != NULL) {
@@ -740,8 +704,7 @@ static int RemoveActive(VCTPacket *packet)
 }
 
 // Codes samples as 8-bit mu-law
-static void EncodeMulaw(u8 *dst, s16 *src, u32 count)
-{
+static void EncodeMulaw(u8 *dst, s16 *src, u32 count) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -772,8 +735,7 @@ static void EncodeMulaw(u8 *dst, s16 *src, u32 count)
     }
 }
 
-static void DecodeMulaw(u8 *src, s16 *dst, u32 count)
-{
+static void DecodeMulaw(u8 *src, s16 *dst, u32 count) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -785,8 +747,7 @@ static void DecodeMulaw(u8 *src, s16 *dst, u32 count)
 }
 
 // Keeps the top eight bits of the samples
-static void EncodePcm8(u8 *dst, s16 *src, u32 count)
-{
+static void EncodePcm8(u8 *dst, s16 *src, u32 count) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -794,8 +755,7 @@ static void EncodePcm8(u8 *dst, s16 *src, u32 count)
     }
 }
 
-static void DecodePcm8(s8 *src, s16 *dst, u32 count)
-{
+static void DecodePcm8(s8 *src, s16 *dst, u32 count) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -803,8 +763,7 @@ static void DecodePcm8(s8 *src, s16 *dst, u32 count)
     }
 }
 
-static void ClearSlotQueues(int slot)
-{
+static void ClearSlotQueues(int slot) {
     u32 irq = CPU_IRQDisable();
 
     sQueueTails[slot] = NULL;
@@ -813,8 +772,7 @@ static void ClearSlotQueues(int slot)
     CPU_SetIRQMask(irq);
 }
 
-static void FlushSlotQueue(int slot)
-{
+static void FlushSlotQueue(int slot) {
     u32 irq = CPU_IRQDisable();
     VCTPacket *packet = sQueueHeads[slot];
 
@@ -833,8 +791,7 @@ static void FlushSlotQueue(int slot)
     CPU_SetIRQMask(irq);
 }
 
-static void FlushAllQueues(void)
-{
+static void FlushAllQueues(void) {
     u32 irq = CPU_IRQDisable();
     int slot;
 
@@ -858,8 +815,7 @@ static void FlushAllQueues(void)
 }
 
 // Puts a packet in a slot's queue before the packets with higher sequence numbers
-static int InsertSorted(VCTPacket *packet, u32 slot)
-{
+static int InsertSorted(VCTPacket *packet, u32 slot) {
     u32 irq;
     VCTPacket *at;
 
@@ -901,8 +857,7 @@ inserted:
     return sQueueCounts[slot];
 }
 
-static VCTPacket *PeekQueue(int slot)
-{
+static VCTPacket *PeekQueue(int slot) {
     u32 irq = CPU_IRQDisable();
 
     if (sQueueHeads[slot] != NULL) {
@@ -913,8 +868,7 @@ static VCTPacket *PeekQueue(int slot)
     return NULL;
 }
 
-static int PopQueue(int slot)
-{
+static int PopQueue(int slot) {
     u32 irq = CPU_IRQDisable();
 
     if (sQueueHeads[slot] != NULL) {
@@ -932,13 +886,11 @@ static int PopQueue(int slot)
     return sQueueCounts[slot];
 }
 
-static int GetQueueCount(int slot)
-{
+static int GetQueueCount(int slot) {
     return sQueueCounts[slot];
 }
 
-static void InitReceiver(VCTReceiver *receiver, int slot, int aid)
-{
+static void InitReceiver(VCTReceiver *receiver, int slot, int aid) {
     sys_memset(receiver, 0, 0x28);
     receiver->playoutDelay = 0x134df;
     receiver->lastDelay = 0;
@@ -965,8 +917,7 @@ static void InitReceiver(VCTReceiver *receiver, int slot, int aid)
 }
 
 // Lets go of the packet held back for the machine, and of the machine
-static void DropHeld(VCTReceiver *receiver)
-{
+static void DropHeld(VCTReceiver *receiver) {
     if (receiver->held != NULL) {
         VCT_FreePacket(receiver->held);
         receiver->held = NULL;
@@ -975,8 +926,7 @@ static void DropHeld(VCTReceiver *receiver)
 }
 
 // Holds a packet back in place of the last, taking it off the front of its queue
-static int SetHeld(VCTReceiver *receiver, VCTPacket *packet)
-{
+static int SetHeld(VCTReceiver *receiver, VCTPacket *packet) {
     if (receiver->held != NULL) {
         VCT_FreePacket(receiver->held);
     }
@@ -984,8 +934,7 @@ static int SetHeld(VCTReceiver *receiver, VCTPacket *packet)
     return PopQueue(receiver->slot);
 }
 
-static void ResetSequence(VCTReceiver *receiver, u16 sequence)
-{
+static void ResetSequence(VCTReceiver *receiver, u16 sequence) {
     receiver->sequence16 = sequence;
     receiver->expectedSequence = 0x10001;
     receiver->wrap = 0;
@@ -994,8 +943,7 @@ static void ResetSequence(VCTReceiver *receiver, u16 sequence)
 
 // Turns the 16-bit sequence number of a packet into one that goes on past 65535, returning FALSE for one so far off
 // that the machine has probably started over
-static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequence)
-{
+static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequence) {
     u16 distance = sequence - receiver->sequence16;
 
     if (distance < 3000) {
@@ -1026,8 +974,7 @@ static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequenc
 // Works out when a packet is to be played from the time it came and the time its machine stamped it with, and keeps
 // track of how much the delay between the two wanders so as to widen or narrow the margin the playing is kept behind.
 // Returns FALSE for a packet that is a repeat, out of range or too late or early to be of use
-static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet)
-{
+static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
     int trend = 0;
     u32 tickDelta;
     u32 arrivalDelta;

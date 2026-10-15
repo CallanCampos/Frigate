@@ -5,6 +5,9 @@
 
 // SOCL's state, shared by its files
 
+// NitroWiFi's signature, "[SDK+NINTENDO:WiFi3.3.30052.201006221129]", in the main module
+extern const char SOCLi_Signature[];
+
 // socl_startup.c
 extern SOCLConfig *SOCLiConfigPtr;     // The config SOCL_Startup was given, NULL while SOCL is down
 extern u32 SOCLiDefaultLanBufferSize;  // The LAN buffer's size when the config gives none
@@ -81,11 +84,7 @@ typedef struct SOCLSocket {
     SOCLCommandPipe *send_pipe;
     int result; // What the last command packet returned
     // SOCLI_STATE_*. volatile: the command pipes' threads change it while callers test it, and the original reloads it
-    // for each test (a plain s16 gets one load shared by the tests, and SOCL_GetStatus, SOCL_Connect, SOCLi_ReadFrom and
-    // SOCL_WriteTo change)
-    // TODO: volatile was added to match SOCL_GetStatus, SOCLi_ReadFrom and SOCL_WriteTo (and to bring SOCL_Connect and
-    // SOCL_Shutdown to size), on the reasoning that the command pipes' threads change it; it is not known whether
-    // NitroWiFi's own header declares it volatile. Revisit if another spelling of the tests turns up.
+    // for each test, with no call or store in between (SOCL_GetStatus loads it twice in a row)
     volatile s16 state;
     s8 flag_block;
     s8 flag;    // The mode (SOCLSocketParam's flag_mode), copied into each command packet
@@ -234,10 +233,9 @@ int SOCL_Shutdown(SOCLSocket *socket);
 BOOL SOCL_IsClosed(int socket);
 // TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
 // (SOC_Close's caller in DWC asks it after a failed close; no counterpart in pokediamond's NitroWiFi)
-BOOL func_ov011_02157314(int socket);
+BOOL SOCL_IsNotClosing(int socket);
 // Returns without awaiting callback/reclamation; zero also covers an already absent positive handle.
 int SOCL_Close(int socket);
-void SOCLi_TrashSocket(void);
 
 // socl_cleanup.c
 int SOCL_Cleanup(void);

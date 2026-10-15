@@ -239,7 +239,7 @@ static void CPSi_SetNoIp(u32 reason) {
 // CPSi_Yield: lets the other threads run while waiting
 static void CPSi_Yield(void) {
     if (sYieldWait == 0) {
-        func_0207a92c();
+        OS_YieldThread();
     } else {
         func_0207aa04(sYieldWait);
     }
@@ -258,7 +258,7 @@ static BOOL CPSi_LinkIsOn(void) {
 void CPS_Startup(CPSConfig *config) {
     u64 seed;
 
-    func_02004eb0(CPSi_Signature);
+    OSi_ReferSymbol(CPSi_Signature);
     if (config->random_seed) {
         seed = config->random_seed;
     } else {
@@ -303,7 +303,7 @@ void CPS_Startup(CPSConfig *config) {
                           CPS_STACK_SIZE, sThreadPriority);
     scheduler_start_thread(&sRecvThread);
     scheduler_start_thread(&sScavengerThread);
-    func_0207bc24(&sAckAlarm);
+    OS_CreateAlarm(&sAckAlarm);
     scheduler_init_thread(&sAckThread, CPSi_AckThread, NULL, sAckStack + CPS_STACK_SIZE, CPS_STACK_SIZE,
                           sThreadPriority - 1);
 }
@@ -331,15 +331,15 @@ void CPS_Cleanup(void) {
     u32 enabled;
 
     CPS_CalmDown();
-    func_0207a800(&sScavengerThread);
+    OS_JoinThread(&sScavengerThread);
     func_0207a710(&sRecvThread);
-    func_0207bd3c(&sAckAlarm);
+    OS_CancelAlarm(&sAckAlarm);
     enabled = CPU_IRQDisable();
     if (!scheduler_is_thread_ended(&sAckThread)) {
         scheduler_start_thread(&sAckThread);
     }
     CPU_SetIRQMask(enabled);
-    func_0207a800(&sAckThread);
+    OS_JoinThread(&sAckThread);
     sRecvWaiter = NULL;
     CPSi_SetNoIp(CPS_NOIP_REASON_NONE);
     sLanBuf = NULL;
@@ -1233,7 +1233,7 @@ static void CPSi_ReceiveSyn(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
         return;
     }
     // Let a thread that is about to listen get to it
-    func_0207a92c();
+    OS_YieldThread();
     soc = CPSi_FindListener(ip, tcp);
     if (soc != NULL) {
         CPSi_AcceptSyn(ip, tcp, soc);
@@ -1248,7 +1248,7 @@ static void CPSi_ReceiveSynAck(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
         CPSi_SendReset(ip, tcp, len);
         return;
     }
-    func_0207a92c();
+    OS_YieldThread();
     soc->ackno = CPS_GET32(tcp->seq) + 1;
     soc->remote_ackno = CPS_GET32(tcp->ack);
     soc->remote_win = CPS_GET16(&tcp->window);
@@ -1521,7 +1521,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
         CPSi_SendAck(soc, 2);
         break;
     }
-    func_0207a92c();
+    OS_YieldThread();
 }
 
 // CPSi_ReceiveFin: a FIN without ACK
@@ -1570,7 +1570,7 @@ static void CPSi_ReceiveRst(CPSIpHeader *ip, CPSTcpHeader *tcp) {
     if (soc == NULL) {
         return;
     }
-    func_0207a92c();
+    OS_YieldThread();
     soc->state = CPS_STT_CLOSED;
     if (soc->block_type == CPS_BLOCK_TCPCON || soc->block_type == CPS_BLOCK_TCPREAD) {
         soc->block_type = CPS_BLOCK_NONE;
@@ -1979,7 +1979,7 @@ int CPS_TcpConnect(void) {
 static void CPSi_TcpShutdown(CPSSoc *soc) {
     u32 enabled;
 
-    func_0207a92c();
+    OS_YieldThread();
     enabled = CPU_IRQDisable();
     if (soc->state == CPS_STT_SYN_RCVD || soc->state == CPS_STT_ESTABLISHED) {
         soc->state = CPS_STT_FIN_WAIT1;
@@ -2054,7 +2054,7 @@ u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc) {
         }
         CPU_SetIRQMask(enabled);
     } else {
-        func_0207a92c();
+        OS_YieldThread();
     }
     if ((*len = soc->rcvbuf_len) != 0) {
         return soc->rcvbuf;
@@ -2170,7 +2170,7 @@ static u32 CPSi_TcpSendSegments(u8 *data, u32 len, CPSSoc *soc, BOOL probe) {
             break;
         }
         sent = CPSi_SendTcp(data, sent, soc, CPS_TCP_PSH | CPS_TCP_ACK);
-        func_0207a92c();
+        OS_YieldThread();
         window -= sent;
         data += sent;
         len -= sent;
@@ -2538,8 +2538,8 @@ static void CPSi_SendDelayedAcks(void) {
         }
     }
     if (wait != 0xffffffff) {
-        func_0207bd3c(&sAckAlarm);
-        func_0207bcf4(&sAckAlarm, wait, CPSi_AckAlarm, NULL);
+        OS_CancelAlarm(&sAckAlarm);
+        OS_SetAlarm(&sAckAlarm, wait, CPSi_AckAlarm, NULL);
     }
     CPU_SetIRQMask(enabled);
 }

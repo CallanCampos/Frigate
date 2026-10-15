@@ -34,6 +34,7 @@ typedef struct {
 static u32 Demo3DData_CheckId(u32 demoId);
 static const Demo3DVariant *Demo3DData_GetVariant(const Demo3DUnit *unit, const Demo3DSceneParam *param);
 
+// clang-format off
 static const u16 sDemo3D26_FileIds0_0_0[] = { 443, 444, 442 };
 static const u16 sDemo3D17_FileIds2_0_0[] = { 24, 25, 26 };
 static const Demo3DFiles sDemo3D17_Files2_0[] = { { sDemo3D17_FileIds2_0_0, NELEMS(sDemo3D17_FileIds2_0_0) } };
@@ -1706,6 +1707,7 @@ static const Demo3DScene sDemo3DScenes[DEMO3D_ID_COUNT] = {
     { &sDemo3D25_Setup, sDemo3D25_Cmds, sDemo3D25_EndCmds, sDemo3D25_Units, NELEMS(sDemo3D25_Units) },
     { &sDemo3D26_Setup, sDemo3D26_Cmds, sDemo3D26_EndCmds, sDemo3D26_Units, NELEMS(sDemo3D26_Units) },
 };
+// clang-format on
 
 static u32 Demo3DData_CheckId(u32 demoId) {
     if (demoId == 0 || demoId >= DEMO3D_ID_COUNT) {

@@ -1,6 +1,6 @@
+#include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
-#include "nitro/os.h"
 
 // SOCL_GetStatus: what a socket can do now (data to read, room to write, an error, not connected). pokediamond's
 // NitroWiFi names the object socl_poll.o and its functions.

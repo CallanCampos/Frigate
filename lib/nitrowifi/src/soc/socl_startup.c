@@ -12,9 +12,6 @@ static void SOCLi_SetMyIP(void);
 static void SOCLi_DhcpTimeout(void);
 static BOOL SOCL_LinkIsOn(void);
 
-// NitroWiFi's signature, "[SDK+NINTENDO:WiFi3.3.30052.201006221129]", in the main module
-extern const char SOCLi_Signature[];
-
 SOCLConfig *SOCLiConfigPtr = NULL;
 u32 SOCLiDefaultLanBufferSize = 0x4000;
 
@@ -27,7 +24,7 @@ CPSConfig SOCLiCPSConfig;
 int SOCL_Startup(SOCLConfig *config) {
     int result;
 
-    func_02004eb0(SOCLi_Signature);
+    OSi_ReferSymbol(SOCLi_Signature);
     if (SOCLiConfigPtr != NULL) {
         return 0;
     }

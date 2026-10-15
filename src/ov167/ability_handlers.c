@@ -2258,7 +2258,7 @@ void HandlerTrace(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *wor
         count = HandlerGetAlivePartyCount(flow, myPos | 0x100, mons);
         numCandidates = 0;
         for (i = 0; i < count; i++) {
-            if (!func_ov169_0689cacc(GetBattleMonStat(GetBattleMon(flow, mons[i]), 0x10))) {
+            if (!IsTraceExcludedAbility(GetBattleMonStat(GetBattleMon(flow, mons[i]), 0x10))) {
                 candidates[numCandidates++] = mons[i];
             }
         }
@@ -2275,7 +2275,7 @@ void HandlerTrace(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *wor
         myPos = func_ov167_021ab840(flow, monId);
         if (pos != 6 && (func_ov167_021abc9c(flow) != 2 || IsAdjacentOpponent(myPos, pos))) {
             count = GetBattleMonStat(GetBattleMon(flow, enteringId), 0x10);
-            if (!func_ov169_0689cacc(count)) {
+            if (!IsTraceExcludedAbility(count)) {
                 ability = count;
                 targetId = enteringId;
             }
@@ -3194,7 +3194,7 @@ void HandlerMoldBreakerMemberIn(BattleEventItem *item, BtlServerFlow *flow, u8 m
 }
 
 BOOL func_ov167_021c09d0(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId, u8 monId) {
-    if (factorType == 4 && func_ov169_0689cb38(subId)) {
+    if (factorType == 4 && IsMoldBreakerIgnoredAbility(subId)) {
         return TRUE;
     }
     return FALSE;
