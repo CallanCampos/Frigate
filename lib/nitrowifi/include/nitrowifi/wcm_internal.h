@@ -20,4 +20,11 @@ u16 WCM_PickChannel(s32 channelIndex);
 void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2);
 void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line);
 
+// Adds a mode-dependent encoded signal sample; its physical units are unconfirmed.
+void WCM_AddRssiSample(s32 rawSample);
+// Cancels the timeout alarm and rearms it while connected in state 9.
+void WCM_CancelTimeout(void);
+// Copies six MAC-address bytes into WCM's globals; the source pointer is not retained.
+void WCM_SetMacAddress(const u8 *mac);
+
 #endif // POKEBW2_NITROWIFI_WCM_INTERNAL_H

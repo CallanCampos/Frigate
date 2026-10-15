@@ -196,10 +196,4 @@ int DWCi_HandleGHTTPError(int error);
 int ghttpGetState(int request);
 void ghttpCancelRequest(int request);
 
-// What DWC's settings in overlay 182 (the AOSS client) call in overlay 11 and the main module. The socket library's
-// calls are in nitrowifi/soc.h.
-// Clears the WCM's list of access points
-void WCM_ClearApListBuffer(void);
-
-
 #endif // POKEBW2_DWC_EXT_H

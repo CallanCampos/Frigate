@@ -159,13 +159,10 @@ static WCMGlobal sWcm;
 
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode);
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option);
-static void WCM_AddRssiSample(s32 rawSample);
 static void WCM_SetConfig(WCMConfig *config, WCMNotify notify);
 static void WCM_ResetSearchOption(void);
-static void WCM_CancelTimeout(void);
 static void WCM_TimeoutAlarmHandler(void);
 static s32 WCM_GetDefaultWirelessMode(void);
-static void WCM_ClearApListBuffer(void);
 static void *WCM_PointApListCore(u16 index);
 static WCMApEntry *WCM_AllocApEntry(void);
 static WCMApEntry *WCM_GetOldestApEntry(void);
@@ -175,12 +172,10 @@ static void WCM_TouchApEntry(WCMApEntry *entry);
 static void *WCM_FindVendorIE(const WMBssDesc *bss);
 static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out);
 static void WCM_InitOnce(void);
-static void WCM_SetMacAddress(const u8 *mac);
 static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 headerLen, const void *data,
                                  s32 dataLen);
 static BOOL WCM_CompareBytes(const void *a, const void *b, u32 size);
 static BOOL WCM_CompareBssID(const u8 *a, const u8 *b);
-static s32 WCM_UpdateLinkQuality(void);
 static s32 WCM_RssiToQuality(u32 rssi);
 static u8 WCM_GetAverageRssi(void);
 static s32 WCM_StartupStep1(void);
@@ -812,7 +807,7 @@ void WCM_SetState(s32 newState) {
     CPU_SetIRQMask(irq);
 }
 
-static void WCM_CancelTimeout(void) {
+void WCM_CancelTimeout(void) {
     WCMWork *work = sWork.work;
     u32 irq = CPU_IRQDisable();
 
@@ -831,7 +826,7 @@ static s32 WCM_GetDefaultWirelessMode(void) {
     return hw_isDSi() ? 2 : 1;
 }
 
-static void WCM_ClearApListBuffer(void) {
+void WCM_ClearApListBuffer(void) {
     u32 irq = CPU_IRQDisable();
     WCMWork *work = WCM_GetWork();
 
@@ -1227,7 +1222,7 @@ void WCM_ReleaseIrqOwnedMutex(OSMutex *mutex) {
     }
 }
 
-static void WCM_SetMacAddress(const u8 *mac) {
+void WCM_SetMacAddress(const u8 *mac) {
     sys_memcpy_fast(mac, sWcm.ownMac, 6);
 }
 
@@ -1268,7 +1263,7 @@ static BOOL WCM_CompareBssID(const u8 *a, const u8 *b) {
     return WCM_CompareBytes(a, b, 6);
 }
 
-static s32 WCM_UpdateLinkQuality(void) {
+s32 WCM_UpdateLinkQuality(void) {
     u32 irq = CPU_IRQDisable();
     WCMWork *work = WCM_GetWork();
     s32 quality = 0;
@@ -1329,7 +1324,7 @@ static u8 WCM_GetAverageRssi(void) {
 // Adds a signal-level sample to the running RSSI average's circular buffer
 // Decodes the receive record's high signal byte. The original arithmetic is mode-dependent;
 // no physical units for the encoded input or the resulting sample have been established.
-static void WCM_AddRssiSample(s32 rawSample) {
+void WCM_AddRssiSample(s32 rawSample) {
     u8 sample;
     u8 cursor;
 

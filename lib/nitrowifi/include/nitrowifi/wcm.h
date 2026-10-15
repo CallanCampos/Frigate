@@ -69,6 +69,10 @@ s32 WCM_SetSearchOption(u32 option);
 // DS mode fills gaps between the lowest and highest hardware-allowed channel bits; DSi uses its backend mask.
 // Returns zero outside states 3 through 10.
 s32 WCM_GetChannelMask(void);
+// Clears the AP-list storage with IRQs disabled, invalidating borrowed AP-list records regardless of list lock.
+void WCM_ClearApListBuffer(void);
+// Descriptive name: returns a computed level from 0 through 3 in connected state 9, or zero otherwise.
+s32 WCM_UpdateLinkQuality(void);
 s32 WCM_CountApList(void);
 s32 WCM_LockApList(s32 lock);
 void *WCM_PointApList(u16 index);
