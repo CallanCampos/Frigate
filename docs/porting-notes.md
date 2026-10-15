@@ -67,12 +67,24 @@ Avoiding before-array pointer formation remains native implementation work; no r
 established by this observation.
 
 Capacity also needs proof at callers. Multiplication retains only the low `n` 16-bit digits. Division partitions
-scratch into three `n`-digit regions, but its loop reads `top[0]` with `top = workBuf + 2*n + lenB`: a full-width
-divisor can place that access beyond those regions. `BigInt_ModExpFast` writes a radix marker at `work[modLen]`,
-with its next logical region starting at `work+n`. These accesses make high-digit headroom relevant to the
-executing path; describing every three-region scratch buffer as sufficient would omit that condition.
+scratch into three `n`-digit regions. For positive `n` and `n`-digit inputs, its numerator window reads
+`workBuf[3*n]` exactly when both inputs have `n` significant digits. A dividend shorter than the divisor takes the
+bypass branch; a divisor shorter than `n` digits keeps that read within the three regions. Division does not
+initialize the extra digit.
+Both originals contain the same access; an extra readable digit alone does not prove arithmetic correctness.
 
-The inspected SSL callers allocate extra digit capacity, but upstream signature/exponent lengths and private-key
-output extents have not all been proven against parser or key-format constraints. A reachable capacity violation
-and a general corrective guard remain unestablished. These questions are independent of the byte/digit units
-already documented at the private declarations.
+`BigInt_ModExp` has exactly three regions after its scratch pointer. When its SSL caller sets `n` to a positive
+modulus byte count of at least two, the modulus needs at most `ceil(n/2) < n` digits, which excludes that extra
+read. Fast exponentiation's direct divisions have five regions physically available. Its inverse has three
+regions and depends on the valid radix/Euclidean length invariants. The radix marker at `work[modLen]` must also
+fit before the next logical region at `work+n`; these storage observations do not prove every arithmetic input.
+
+The leaf client-key path has modulus/exponent limits of 256/8 bytes and a minimum modulus count of 51, giving
+extra digit capacity for positive parsed lengths. The initial ASN.1 length check precedes leading-zero removal,
+whose loop does not check the remaining length; it does not establish a nonnegative final count. Signature
+verification also accepts issuer keys by reference and does not locally bound signature/exponent counts against
+the selected modulus capacity. The private-key path derives `n` from modulus bytes plus one, without local
+prime/exponent/coefficient bounds; its fixed 48-byte output needs 24 readable digits in the intended result
+region. The unrecovered private-key writer and external issuer-key constraints remain relevant to these proofs.
+No reachable game capacity violation or general corrective guard has been established. The byte/digit units and
+conditional division scratch contract are documented at the private declarations.

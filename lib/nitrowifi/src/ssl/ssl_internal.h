@@ -67,6 +67,10 @@ void BigInt_Negate(u16 *digits, int n);
 void BigInt_Sub(u16 *dst, const u16 *a, const u16 *b, int n);
 // Writes only the low n digits of the product. Clearing dst first prevents general overlap with the inputs.
 void BigInt_Mul(u16 *dst, const u16 *a, const u16 *b, int n);
+// For positive n, inputs and supplied outputs have n digits; scratch has 3*n writable digits separate from them.
+// If both inputs have n significant digits, the original also reads workBuf[3*n], which it does not initialize.
+// A divisor with fewer than n significant digits avoids that extra read. This does not validate arithmetic inputs.
+// Either output may be NULL or reuse the dividend; final copies write quotient first, then remainder.
 void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *remainder, int n, u16 *workBuf);
 // Both exponentiation functions allocate and free their own temporary storage; allocation failure leaves dst
 // unchanged and is not reported through their void return values.

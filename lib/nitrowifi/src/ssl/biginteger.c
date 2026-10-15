@@ -212,8 +212,9 @@ static void BigInti_Square(u16 *dst, const u16 *src, int n) {
     }
 }
 
-// Divides dividend by divisor, both n digits long. quotient and remainder may each be NULL; workBuf needs 3*n
-// digits of scratch
+// Divides n-digit operands into optional quotient/remainder outputs. Three n-digit scratch regions follow;
+// when both operands have n significant digits, the original numerator window also reads workBuf[3*n].
+// That extra digit is not initialized here; padded operands avoid this access.
 void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *remainder, int n, u16 *workBuf) {
     u16 *qbuf = workBuf + n;
     u16 *rem = qbuf + n;
