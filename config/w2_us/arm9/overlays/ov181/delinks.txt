@@ -38,6 +38,7 @@ lib/nitro/src/mb/mb_comm.c:
     .bss        start:0x021a4810 end:0x021a4814
 
 lib/nitro/src/mb/mb_segment.c:
+    complete
     .text       start:0x021a16d8 end:0x021a2080
     .rodata     start:0x021a4294 end:0x021a42d0
     .data       start:0x021a4770 end:0x021a4778
@@ -53,6 +54,7 @@ lib/nitro/src/mb/mb_wm.c:
     .bss        start:0x021a48d0 end:0x021a4944
 
 lib/nitro/src/mb/mb_cache.c:
+    complete
     .text       start:0x021a3b68 end:0x021a3c14
 
 lib/nitro/src/mb/mb_task.c:

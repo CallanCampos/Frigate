@@ -516,7 +516,7 @@ void MBComm_OnWmEvent(u16 event, void *arg);
 
 // mb_segment.c
 BOOL MBFile_BuildLayout(MBBlockLayout *layout, const MBCommFile *file);
-BOOL MBFile_LocateBlock(MBBlockSource *source, const MBBlockLayout *layout, u16 block, const MBCommFile *file);
+BOOL MBFile_LocateBlock(MBBlockSource *source, const MBBlockLayout *layout, u16 block, MBCommFile *file);
 int MBComm_FlushAndSend(u32 length, u16 aidBitmap, void *buf);
 
 // mb_gameinfo.c

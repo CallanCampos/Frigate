@@ -746,6 +746,11 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- A constant stored through `p + (a - b)` is loaded before the subtraction, into a fresh register. When the original
+  subtracts first and then builds the constant in the freed register, the pointer was advanced in a statement of its
+  own: multiboot's `MB_ReadSegment` (`mb_segment.c`) matched with `patch += (u32)AutoloadCallback -
+  header->arm9.ramAddr; *(u32 *)patch = MB_ARM_BX_LR;`. A local holding the whole address is folded back and changes
+  nothing.
 - A sum of several terms in one expression has its right-hand terms evaluated first; accumulating it in separate
   statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
   (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
@@ -817,6 +822,9 @@ Same instructions, scheduled in another order.
   gives `adds r5, r5, r2`, where `<< 12` gave `adds r5, r2, r5`.
 - Loads through a pointer are not moved above stores unless the pointee is `const`. A load that the original
   schedules early, such as an argument loaded before the stack arguments are stored, points to a `const` parameter.
+  The reverse also shows: a store the original keeps after loads through a pointer, which ours hoists above them, means
+  the parameter isn't `const`. Multiboot's `MBFile_LocateBlock` (`mb_segment.c`) matched once its `file` lost the
+  `const`, and a non-`const` local cast from it did nothing.
   It has to be the parameter: `fld_scenearea_loader.c`'s camera-area callbacks scheduled their area's loads only
   once the callback typedefs took `const CameraArea *`, and a `const` local pointer to the member did nothing. The
   same change fixed the register allocation of the loop in `fld_scenearea.c` that calls them. A `void *` parameter
@@ -1796,6 +1804,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
+  push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
+  multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
+  and lost its `end` local, which had been computed before `CPU_IRQDisable()` and pushed `found` to the stack.
 - MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
   stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
   the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
