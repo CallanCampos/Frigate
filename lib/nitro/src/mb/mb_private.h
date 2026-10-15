@@ -314,7 +314,8 @@ typedef struct {
     u8 unk_00[0x10];
     u32 mode;
     void (*callback)(u32 ggid);
-    MBGameInfoRecord *head;
+    // The first program, which registering a program changes while the beacon is sent from the list
+    MBGameInfoRecord *volatile head;
     MBGameInfoRecord *current;
     const u8 *source;
     u8 state;

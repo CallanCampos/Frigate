@@ -34,6 +34,7 @@ static u16 MBGameInfo_Checksum(const u16 *data, int length) {
 void MBGameInfo_Build(MBGameInfoRecord *record, const MBGameRegistry *reg, const MBUserInfo *parentUser) {
     BOOL charFailed;
     BOOL paletteFailed;
+    u32 nameSize;
 
     MI_CpuClear16(record, sizeof(MBGameInfoRecord));
     record->iconError = 0;
@@ -48,7 +49,8 @@ void MBGameInfo_Build(MBGameInfoRecord *record, const MBGameRegistry *reg, const
         MI_CpuCopy16(parentUser, &record->parentUser, sizeof(MBUserInfo));
     }
     record->maxPlayers = reg->maxPlayerNum;
-    MI_CpuCopy16(reg->gameNamep, record->gameName, (u16)(MBGameInfo_CountChars(reg->gameNamep) * 2));
+    nameSize = MBGameInfo_CountChars(reg->gameNamep) * sizeof(u16);
+    MI_CpuCopy16(reg->gameNamep, record->gameName, (u16)nameSize);
     MI_CpuCopy16(reg->gameIntroductionp, record->gameIntro, sizeof(record->gameIntro));
     record->playerCount = 1;
     record->memberMask = 1;
@@ -255,8 +257,9 @@ static void MBGameInfo_StartMembers(void) {
 static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr) {
     u8 *params;
     u16 missing;
-    u32 sent;
     int i;
+    int j;
+    u32 sent;
 
     if (sSender.updateCount != sSender.current->updateCount) {
         MBGameInfo_StartMembers();
@@ -274,17 +277,16 @@ static void MBGameInfo_SendMembers(u32 ggid, u16 tgid, u8 attr) {
         sSender.callback(sSender.current->ggid);
     }
     // The loops test a 0/1 value: the original enters both with a jump to the test at their end
-    params = sBeacon.u.members.params;
-    for (i = 0; i < 8 ? TRUE : FALSE; i++) {
+    for (i = 0, params = sBeacon.u.members.params; i < 8 ? TRUE : FALSE; i++) {
         params[i] = sSender.current->params[i];
     }
     MI_CpuClear16(sBeacon.u.members.users, sizeof(sBeacon.u.members.users));
     missing = sSender.current->sentMask ^ sSender.current->memberMask;
     sent = 0;
-    for (i = 0; i < 15 ? TRUE : FALSE; i++) {
-        if ((2 << i) & missing) {
-            MI_CpuCopy16(&sSender.current->members[i], &sBeacon.u.members.users[sent], sizeof(MBUserInfo));
-            sSender.current->sentMask |= (u16)(2U << i);
+    for (j = 0; j < 15 ? TRUE : FALSE; j++) {
+        if ((2 << j) & missing) {
+            MI_CpuCopy16(&sSender.current->members[j], &sBeacon.u.members.users[sent], sizeof(MBUserInfo));
+            sSender.current->sentMask |= (u16)(2U << j);
             sent++;
             if (sent == 4) {
                 break;

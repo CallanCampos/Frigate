@@ -1052,6 +1052,13 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- `(u16)(n * 2)` in one expression folds into `lsls #0x11; lsrs #0x10`; the product in an `int` or `u32` local, cast at
+  the use, keeps `lsls #1` and `lsls #0x10; lsrs #0x10` apart. A `u16` local or parameter and `& 0xffff` fold too.
+  Multiboot's `MBGameInfo_Build` (`mb_gameinfo.c`) matched with `nameSize = MBGameInfo_CountChars(name) *
+  sizeof(u16);` and `(u16)nameSize` in the copy.
+- Two loops in a row that share one counter can swap the second loop's counter with another local; a counter of its
+  own, declared before that local, fixes it where no declaration order with the shared one does
+  (`MBGameInfo_SendMembers`, `mb_gameinfo.c`).
 - MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
   one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
   parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
